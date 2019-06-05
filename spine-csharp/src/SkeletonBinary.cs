@@ -160,8 +160,12 @@ namespace Spine {
 				if (string.IsNullOrEmpty(skeletonData.audioPath)) skeletonData.audioPath = null;
 			}
 
+			int n;
+			Object[] o;
+			
 			// Bones.
-			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
+			o = skeletonData.bones.Resize(n = ReadVarint(input, true)).Items;
+			for (int i = 0; i < n; i++) {
 				String name = ReadString(input);
 				BoneData parent = i == 0 ? null : skeletonData.bones.Items[ReadVarint(input, true)];
 				BoneData data = new BoneData(i, name, parent);
@@ -177,10 +181,12 @@ namespace Spine {
 				data.skinRequired = ReadBoolean(input);
 				if (nonessential) ReadInt(input); // Skip bone color.
 				skeletonData.bones.Add(data);
+				o[i] = data;
 			}
 
 			// Slots.
-			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
+			o = skeletonData.slots.Resize(n = ReadVarint(input, true)).Items;
+			for (int i = 0; i < n; i++) {
 				String slotName = ReadString(input);
 				BoneData boneData = skeletonData.bones.Items[ReadVarint(input, true)];
 				SlotData slotData = new SlotData(i, slotName, boneData);
@@ -200,32 +206,36 @@ namespace Spine {
 
 				slotData.attachmentName = ReadString(input);
 				slotData.blendMode = (BlendMode)ReadVarint(input, true);
-				skeletonData.slots.Add(slotData);
+				o[i] = slotData;
 			}
 
 			// IK constraints.
-			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
+			o = skeletonData.ikConstraints.Resize(n = ReadVarint(input, true)).Items;
+			for (int i = 0, nn; i < n; i++) {
 				IkConstraintData data = new IkConstraintData(ReadString(input));
 				data.order = ReadVarint(input, true);
 				data.skinRequired = ReadBoolean(input);
-				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
-					data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
+				Object[] bones = data.bones.Resize(nn = ReadVarint(input, true)).Items;
+				for (int ii = 0; ii < nn; ii++)
+					bones[ii] = skeletonData.bones.Items[ReadVarint(input, true)];
 				data.target = skeletonData.bones.Items[ReadVarint(input, true)];
 				data.mix = ReadFloat(input);
 				data.bendDirection = ReadSByte(input);
 				data.compress = ReadBoolean(input);
 				data.stretch = ReadBoolean(input);
 				data.uniform = ReadBoolean(input);
-				skeletonData.ikConstraints.Add(data);
+				o[i] = data;
 			}
 
 			// Transform constraints.
-			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
+			o = skeletonData.transformConstraints.Resize(n = ReadVarint(input, true)).Items;
+			for (int i = 0, nn; i < n; i++) {
 				TransformConstraintData data = new TransformConstraintData(ReadString(input));
 				data.order = ReadVarint(input, true);
 				data.skinRequired = ReadBoolean(input);
-				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
-				    data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
+				Object[] bones = data.bones.Resize(nn = ReadVarint(input, true)).Items;
+				for (int ii = 0; ii < nn; ii++)
+					bones[ii] = skeletonData.bones.Items[ReadVarint(input, true)];
 				data.target = skeletonData.bones.Items[ReadVarint(input, true)];
 				data.local = ReadBoolean(input);
 				data.relative = ReadBoolean(input);
@@ -239,16 +249,18 @@ namespace Spine {
 				data.translateMix = ReadFloat(input);
 				data.scaleMix = ReadFloat(input);
 				data.shearMix = ReadFloat(input);
-				skeletonData.transformConstraints.Add(data);
+				o[i] = data;
 			}
 
 			// Path constraints
-			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
+			o = skeletonData.pathConstraints.Resize(n = ReadVarint(input, true)).Items;
+			for (int i = 0, nn; i < n; i++) {
 				PathConstraintData data = new PathConstraintData(ReadString(input));
 				data.order = ReadVarint(input, true);
 				data.skinRequired = ReadBoolean(input);
-				for (int ii = 0, nn = ReadVarint(input, true); ii < nn; ii++)
-					data.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
+				Object[] bones = data.bones.Resize(nn = ReadVarint(input, true)).Items;
+				for (int ii = 0; ii < nn; ii++)
+					bones[ii] = skeletonData.bones.Items[ReadVarint(input, true)];
 				data.target = skeletonData.slots.Items[ReadVarint(input, true)];
 				data.positionMode = (PositionMode)Enum.GetValues(typeof(PositionMode)).GetValue(ReadVarint(input, true));
 				data.spacingMode = (SpacingMode)Enum.GetValues(typeof(SpacingMode)).GetValue(ReadVarint(input, true));
@@ -260,7 +272,7 @@ namespace Spine {
 				if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed) data.spacing *= scale;
 				data.rotateMix = ReadFloat(input);
 				data.translateMix = ReadFloat(input);
-				skeletonData.pathConstraints.Add(data);
+				o[i] = data;
 			}
 
 			// Default skin.
@@ -271,11 +283,16 @@ namespace Spine {
 			}
 
 			// Skins.
-			for (int i = 0, n = ReadVarint(input, true); i < n; i++)
-				skeletonData.skins.Add(ReadSkin(input, skeletonData, false, nonessential));
+			{
+				int i = skeletonData.skins.Count;
+				o = skeletonData.skins.Resize(n = i + ReadVarint(input, true)).Items;
+				for (; i < n; i++)
+					o[i] = ReadSkin(input, skeletonData, false, nonessential);
+			}
 
 			// Linked meshes.
-			for (int i = 0, n = linkedMeshes.Count; i < n; i++) {
+			n = linkedMeshes.Count;
+			for (int i = 0; i < n; i++) {
 				SkeletonJson.LinkedMesh linkedMesh = linkedMeshes[i];
 				Skin skin = linkedMesh.skin == null ? skeletonData.DefaultSkin : skeletonData.FindSkin(linkedMesh.skin);
 				if (skin == null) throw new Exception("Skin not found: " + linkedMesh.skin);
@@ -288,7 +305,8 @@ namespace Spine {
 			linkedMeshes.Clear();
 
 			// Events.
-			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
+			o = skeletonData.events.Resize(n = ReadVarint(input, true)).Items;
+			for (int i = 0; i < n; i++) {
 				EventData data = new EventData(ReadString(input));
 				data.Int = ReadVarint(input, false);
 				data.Float = ReadFloat(input);
@@ -298,36 +316,34 @@ namespace Spine {
 					data.Volume = ReadFloat(input);
 					data.Balance = ReadFloat(input);
 				}
-				skeletonData.events.Add(data);
+				o[i] = data;
 			}
 
 			// Animations.
-			for (int i = 0, n = ReadVarint(input, true); i < n; i++)
-				ReadAnimation(ReadString(input), input, skeletonData);
-
-			skeletonData.bones.TrimExcess();
-			skeletonData.slots.TrimExcess();
-			skeletonData.skins.TrimExcess();
-			skeletonData.events.TrimExcess();
-			skeletonData.animations.TrimExcess();
-			skeletonData.ikConstraints.TrimExcess();
-			skeletonData.pathConstraints.TrimExcess();
+			o = skeletonData.animations.Resize(n = ReadVarint(input, true)).Items;
+			for (int i = 0; i < n; i++)
+				o[i] = ReadAnimation(ReadString(input), input, skeletonData);
+			
 			return skeletonData;
 		}
 
 
 		/// <returns>May be null.</returns>
 		private Skin ReadSkin (Stream input, SkeletonData skeletonData, bool defaultSkin, bool nonessential) {
+
 			Skin skin = new Skin(defaultSkin ? "default" : ReadString(input));
+
 			if (!defaultSkin) {
-				for (int i = 0, n = ReadVarint(input, true); i < n; i++)
-					skin.bones.Add(skeletonData.bones.Items[ReadVarint(input, true)]);
+				Object[] bones = skeletonData.bones.Resize(ReadVarint(input, true)).Items;
+				for (int i = 0, n = skeletonData.bones.Count; i < n; i++)
+					bones[i] = skeletonData.bones.Items[ReadVarint(input, true)];
 				for (int i = 0, n = ReadVarint(input, true); i < n; i++)
 					skin.constraints.Add(skeletonData.ikConstraints.Items[ReadVarint(input, true)]);
 				for (int i = 0, n = ReadVarint(input, true); i < n; i++)
 					skin.constraints.Add(skeletonData.transformConstraints.Items[ReadVarint(input, true)]);
 				for (int i = 0, n = ReadVarint(input, true); i < n; i++)
 					skin.constraints.Add(skeletonData.pathConstraints.Items[ReadVarint(input, true)]);
+				skin.constraints.TrimExcess();
 			}
 			for (int i = 0, n = ReadVarint(input, true); i < n; i++) {
 				int slotIndex = ReadVarint(input, true);
@@ -552,8 +568,8 @@ namespace Spine {
 			return array;
 		}
 
-		private void ReadAnimation (String name, Stream input, SkeletonData skeletonData) {
-			var timelines = new ExposedList<Timeline>();
+		private Animation ReadAnimation (String name, Stream input, SkeletonData skeletonData) {
+			var timelines = new ExposedList<Timeline>(32);
 			float scale = Scale;
 			float duration = 0;
 
@@ -837,7 +853,7 @@ namespace Spine {
 			}
 
 			timelines.TrimExcess();
-			skeletonData.animations.Add(new Animation(name, timelines, duration));
+			return new Animation(name, timelines, duration);
 		}
 
 		private void ReadCurve (Stream input, int frameIndex, CurveTimeline timeline) {
