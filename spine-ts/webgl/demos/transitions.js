@@ -23,6 +23,7 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 
 		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas12.png");
 		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 

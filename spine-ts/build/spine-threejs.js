@@ -3962,6 +3962,8 @@ var spine;
 			var minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
 			for (var i = 0, n = drawOrder.length; i < n; i++) {
 				var slot = drawOrder[i];
+				if (!slot.bone.active)
+					continue;
 				var verticesLength = 0;
 				var vertices = null;
 				var attachment = slot.getAttachment();
