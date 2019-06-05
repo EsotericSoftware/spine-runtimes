@@ -6,280 +6,280 @@ filter: Linear,Linear
 repeat: none
 crosshair
   rotate: false
-  xy: 352, 7
+  xy: 976, 69
   size: 45, 45
   orig: 45, 45
   offset: 0, 0
   index: -1
 eye-indifferent
-  rotate: false
-  xy: 862, 105
+  rotate: true
+  xy: 967, 116
   size: 47, 45
   orig: 47, 45
   offset: 0, 0
   index: -1
 eye-surprised
   rotate: false
-  xy: 505, 79
+  xy: 434, 68
   size: 47, 45
   orig: 47, 45
   offset: 0, 0
   index: -1
 front-bracer
   rotate: false
-  xy: 826, 66
+  xy: 582, 78
   size: 29, 40
   orig: 29, 40
   offset: 0, 0
   index: -1
 front-fist-closed
   rotate: false
-  xy: 786, 65
+  xy: 825, 33
   size: 38, 41
   orig: 38, 41
   offset: 0, 0
   index: -1
 front-fist-open
-  rotate: true
-  xy: 710, 51
+  rotate: false
+  xy: 67, 53
   size: 43, 44
   orig: 43, 44
   offset: 0, 0
   index: -1
 front-foot
   rotate: false
-  xy: 210, 6
+  xy: 2, 62
   size: 63, 35
   orig: 63, 35
   offset: 0, 0
   index: -1
 front-shin
   rotate: true
-  xy: 665, 128
+  xy: 488, 77
   size: 41, 92
   orig: 41, 92
   offset: 0, 0
   index: -1
 front-thigh
-  rotate: true
-  xy: 2, 2
+  rotate: false
+  xy: 112, 41
   size: 23, 56
   orig: 23, 56
   offset: 0, 0
   index: -1
 front-upper-arm
   rotate: false
-  xy: 250, 205
+  xy: 865, 25
   size: 23, 49
   orig: 23, 49
   offset: 0, 0
   index: -1
 goggles
-  rotate: false
-  xy: 665, 171
+  rotate: true
+  xy: 743, 117
   size: 131, 83
   orig: 131, 83
   offset: 0, 0
   index: -1
 gun
-  rotate: false
-  xy: 798, 152
+  rotate: true
+  xy: 828, 143
   size: 105, 102
   orig: 105, 102
   offset: 0, 0
   index: -1
 head
   rotate: false
-  xy: 2, 27
+  xy: 2, 99
   size: 136, 149
   orig: 136, 149
   offset: 0, 0
   index: -1
 hoverboard-board
-  rotate: false
-  xy: 2, 178
+  rotate: true
+  xy: 140, 2
   size: 246, 76
   orig: 246, 76
   offset: 0, 0
   index: -1
 hoverboard-thruster
-  rotate: true
-  xy: 722, 96
+  rotate: false
+  xy: 987, 167
   size: 30, 32
   orig: 30, 32
   offset: 0, 0
   index: -1
 hoverglow-small
   rotate: false
-  xy: 275, 81
+  xy: 828, 103
   size: 137, 38
   orig: 137, 38
   offset: 0, 0
   index: -1
 mouth-grind
   rotate: false
-  xy: 614, 97
+  xy: 365, 41
   size: 47, 30
   orig: 47, 30
   offset: 0, 0
   index: -1
 mouth-oooo
   rotate: false
-  xy: 612, 65
+  xy: 602, 40
   size: 47, 30
   orig: 47, 30
   offset: 0, 0
   index: -1
 mouth-smile
   rotate: false
-  xy: 661, 64
+  xy: 651, 40
   size: 47, 30
   orig: 47, 30
   offset: 0, 0
   index: -1
 muzzle-glow
   rotate: false
-  xy: 382, 54
+  xy: 976, 42
   size: 25, 25
   orig: 25, 25
   offset: 0, 0
   index: -1
 muzzle-ring
   rotate: true
-  xy: 275, 54
+  xy: 799, 76
   size: 25, 105
   orig: 25, 105
   offset: 0, 0
   index: -1
 muzzle01
-  rotate: true
-  xy: 911, 95
+  rotate: false
+  xy: 365, 73
   size: 67, 40
   orig: 67, 40
   offset: 0, 0
   index: -1
 muzzle02
   rotate: false
-  xy: 792, 108
+  xy: 295, 71
   size: 68, 42
   orig: 68, 42
   offset: 0, 0
   index: -1
 muzzle03
   rotate: true
-  xy: 956, 171
+  xy: 932, 165
   size: 83, 53
   orig: 83, 53
   offset: 0, 0
   index: -1
 muzzle04
   rotate: false
-  xy: 275, 7
+  xy: 218, 68
   size: 75, 45
   orig: 75, 45
   offset: 0, 0
   index: -1
 muzzle05
   rotate: false
-  xy: 140, 3
+  xy: 906, 63
   size: 68, 38
   orig: 68, 38
   offset: 0, 0
   index: -1
 neck
   rotate: false
-  xy: 250, 182
+  xy: 1003, 46
   size: 18, 21
   orig: 18, 21
   offset: 0, 0
   index: -1
 portal-bg
   rotate: false
-  xy: 140, 43
+  xy: 218, 115
   size: 133, 133
   orig: 133, 133
   offset: 0, 0
   index: -1
 portal-flare1
   rotate: false
-  xy: 554, 65
+  xy: 767, 44
   size: 56, 30
   orig: 56, 30
   offset: 0, 0
   index: -1
 portal-flare2
-  rotate: true
-  xy: 759, 112
+  rotate: false
+  xy: 483, 44
   size: 57, 31
   orig: 57, 31
   offset: 0, 0
   index: -1
 portal-flare3
   rotate: false
-  xy: 554, 97
+  xy: 542, 45
   size: 58, 30
   orig: 58, 30
   offset: 0, 0
   index: -1
 portal-shade
   rotate: false
-  xy: 275, 121
+  xy: 353, 115
   size: 133, 133
   orig: 133, 133
   offset: 0, 0
   index: -1
 portal-streaks1
   rotate: false
-  xy: 410, 126
+  xy: 488, 120
   size: 126, 128
   orig: 126, 128
   offset: 0, 0
   index: -1
 portal-streaks2
   rotate: false
-  xy: 538, 129
+  xy: 616, 123
   size: 125, 125
   orig: 125, 125
   offset: 0, 0
   index: -1
 rear-bracer
   rotate: false
-  xy: 857, 67
+  xy: 295, 33
   size: 28, 36
   orig: 28, 36
   offset: 0, 0
   index: -1
 rear-foot
   rotate: false
-  xy: 663, 96
+  xy: 708, 45
   size: 57, 30
   orig: 57, 30
   offset: 0, 0
   index: -1
 rear-shin
   rotate: true
-  xy: 414, 86
+  xy: 708, 77
   size: 38, 89
   orig: 38, 89
   offset: 0, 0
   index: -1
 rear-thigh
   rotate: false
-  xy: 756, 63
+  xy: 987, 201
   size: 28, 47
   orig: 28, 47
   offset: 0, 0
   index: -1
 rear-upper-arm
-  rotate: true
-  xy: 60, 5
+  rotate: false
+  xy: 325, 25
   size: 20, 44
   orig: 20, 44
   offset: 0, 0
   index: -1
 torso
-  rotate: false
-  xy: 905, 164
+  rotate: true
+  xy: 616, 72
   size: 49, 90
   orig: 49, 90
   offset: 0, 0

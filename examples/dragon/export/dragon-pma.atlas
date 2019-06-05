@@ -4,165 +4,186 @@ size: 1024,1024
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-chin
-  rotate: true
-  xy: 856, 138
-  size: 214, 146
-  orig: 214, 146
-  offset: 0, 0
-  index: -1
 front-toe-a
-  rotate: true
-  xy: 584, 72
+  rotate: false
+  xy: 300, 765
   size: 29, 50
   orig: 29, 50
   offset: 0, 0
   index: -1
+front-toe-b
+  rotate: false
+  xy: 300, 878
+  size: 56, 57
+  orig: 56, 57
+  offset: 0, 0
+  index: -1
 head
   rotate: false
-  xy: 204, 756
+  xy: 2, 748
   size: 296, 260
   orig: 296, 260
   offset: 0, 0
   index: -1
 left-front-leg
   rotate: false
-  xy: 636, 355
+  xy: 185, 17
   size: 84, 57
   orig: 84, 57
   offset: 0, 0
   index: -1
-left-rear-thigh
-  rotate: true
-  xy: 207, 12
-  size: 91, 149
-  orig: 91, 149
+left-front-thigh
+  rotate: false
+  xy: 99, 2
+  size: 84, 72
+  orig: 84, 72
   offset: 0, 0
   index: -1
 left-wing01
   rotate: false
-  xy: 443, 103
+  xy: 744, 487
   size: 191, 256
   orig: 191, 256
   offset: 0, 0
   index: -1
 left-wing02
   rotate: true
-  xy: 502, 616
+  xy: 276, 13
   size: 179, 269
   orig: 179, 269
   offset: 0, 0
   index: -1
-left-wing04
-  rotate: false
-  xy: 636, 2
-  size: 188, 135
-  orig: 188, 135
+left-wing03
+  rotate: true
+  xy: 804, 9
+  size: 186, 207
+  orig: 186, 207
   offset: 0, 0
   index: -1
 left-wing05
-  rotate: false
-  xy: 636, 139
+  rotate: true
+  xy: 777, 790
   size: 218, 213
   orig: 218, 213
   offset: 0, 0
   index: -1
 left-wing06
   rotate: false
-  xy: 2, 317
+  xy: 314, 213
   size: 192, 331
   orig: 192, 331
   offset: 0, 0
   index: -1
 left-wing07
   rotate: true
-  xy: 750, 354
+  xy: 547, 33
   size: 159, 255
   orig: 159, 255
   offset: 0, 0
   index: -1
-right-rear-thigh
+right-rear-toe
   rotate: true
-  xy: 433, 10
-  size: 91, 149
-  orig: 91, 149
+  xy: 937, 679
+  size: 109, 77
+  orig: 109, 77
   offset: 0, 0
   index: -1
 right-wing01
   rotate: true
-  xy: 502, 797
+  xy: 2, 325
   size: 219, 310
   orig: 219, 310
   offset: 0, 0
   index: -1
 right-wing02
   rotate: false
-  xy: 2, 10
+  xy: 370, 703
   size: 203, 305
   orig: 203, 305
   offset: 0, 0
   index: -1
 right-wing03
   rotate: false
-  xy: 196, 361
+  xy: 2, 76
   size: 272, 247
   orig: 272, 247
   offset: 0, 0
   index: -1
-right-wing04
-  rotate: false
-  xy: 204, 610
-  size: 279, 144
-  orig: 279, 144
-  offset: 0, 0
-  index: -1
 right-wing05
   rotate: true
-  xy: 773, 515
+  xy: 508, 194
   size: 251, 229
   orig: 251, 229
   offset: 0, 0
   index: -1
 right-wing06
-  rotate: false
-  xy: 2, 650
+  rotate: true
+  xy: 2, 546
   size: 200, 366
   orig: 200, 366
   offset: 0, 0
   index: -1
 right-wing07
-  rotate: true
-  xy: 485, 414
+  rotate: false
+  xy: 575, 745
   size: 200, 263
   orig: 200, 263
   offset: 0, 0
   index: -1
 right-wing08
   rotate: false
-  xy: 207, 105
+  xy: 508, 447
   size: 234, 254
   orig: 234, 254
   offset: 0, 0
   index: -1
 right-wing09
   rotate: true
-  xy: 814, 768
+  xy: 739, 197
   size: 248, 204
   orig: 248, 204
   offset: 0, 0
   index: -1
 tail01
-  rotate: true
-  xy: 826, 16
+  rotate: false
+  xy: 370, 548
   size: 120, 153
   orig: 120, 153
   offset: 0, 0
   index: -1
 tail03
   rotate: false
-  xy: 358, 11
+  xy: 937, 585
   size: 73, 92
   orig: 73, 92
+  offset: 0, 0
+  index: -1
+tail04
+  rotate: false
+  xy: 300, 937
+  size: 56, 71
+  orig: 56, 71
+  offset: 0, 0
+  index: -1
+tail05
+  rotate: false
+  xy: 300, 817
+  size: 52, 59
+  orig: 52, 59
+  offset: 0, 0
+  index: -1
+tail06
+  rotate: false
+  xy: 2, 6
+  size: 95, 68
+  orig: 95, 68
+  offset: 0, 0
+  index: -1
+thiagobrayner
+  rotate: true
+  xy: 945, 197
+  size: 350, 31
+  orig: 350, 31
   offset: 0, 0
   index: -1
 
@@ -173,120 +194,99 @@ filter: Linear,Linear
 repeat: none
 back
   rotate: false
-  xy: 396, 290
+  xy: 491, 227
   size: 190, 185
   orig: 190, 185
   offset: 0, 0
   index: -1
 chest
   rotate: false
-  xy: 754, 386
+  xy: 408, 103
   size: 136, 122
   orig: 136, 122
   offset: 0, 0
   index: -1
-front-toe-b
+chin
   rotate: false
-  xy: 934, 341
-  size: 56, 57
-  orig: 56, 57
-  offset: 0, 0
-  index: -1
-left-front-thigh
-  rotate: true
-  xy: 105, 7
-  size: 84, 72
-  orig: 84, 72
+  xy: 2, 120
+  size: 214, 146
+  orig: 214, 146
   offset: 0, 0
   index: -1
 left-rear-leg
-  rotate: true
-  xy: 2, 93
+  rotate: false
+  xy: 283, 235
   size: 206, 177
   orig: 206, 177
   offset: 0, 0
   index: -1
-left-wing03
+left-rear-thigh
   rotate: false
-  xy: 2, 301
-  size: 186, 207
-  orig: 186, 207
+  xy: 546, 76
+  size: 91, 149
+  orig: 91, 149
+  offset: 0, 0
+  index: -1
+left-wing04
+  rotate: false
+  xy: 218, 98
+  size: 188, 135
+  orig: 188, 135
   offset: 0, 0
   index: -1
 left-wing08
-  rotate: false
-  xy: 588, 327
+  rotate: true
+  xy: 683, 79
   size: 164, 181
   orig: 164, 181
   offset: 0, 0
   index: -1
 left-wing09
   rotate: false
-  xy: 190, 308
+  xy: 683, 245
   size: 204, 167
   orig: 204, 167
   offset: 0, 0
   index: -1
 right-front-leg
   rotate: false
-  xy: 2, 2
+  xy: 214, 7
   size: 101, 89
   orig: 101, 89
   offset: 0, 0
   index: -1
 right-front-thigh
   rotate: false
-  xy: 892, 400
+  xy: 2, 10
   size: 108, 108
   orig: 108, 108
   offset: 0, 0
   index: -1
 right-rear-leg
-  rotate: false
-  xy: 588, 225
+  rotate: true
+  xy: 112, 2
   size: 116, 100
   orig: 116, 100
   offset: 0, 0
   index: -1
-right-rear-toe
+right-rear-thigh
   rotate: false
-  xy: 706, 210
-  size: 109, 77
-  orig: 109, 77
+  xy: 866, 94
+  size: 91, 149
+  orig: 91, 149
+  offset: 0, 0
+  index: -1
+right-wing04
+  rotate: false
+  xy: 2, 268
+  size: 279, 144
+  orig: 279, 144
   offset: 0, 0
   index: -1
 tail02
   rotate: true
-  xy: 754, 289
+  xy: 408, 6
   size: 95, 120
   orig: 95, 120
-  offset: 0, 0
-  index: -1
-tail04
-  rotate: false
-  xy: 876, 313
-  size: 56, 71
-  orig: 56, 71
-  offset: 0, 0
-  index: -1
-tail05
-  rotate: true
-  xy: 934, 287
-  size: 52, 59
-  orig: 52, 59
-  offset: 0, 0
-  index: -1
-tail06
-  rotate: true
-  xy: 817, 192
-  size: 95, 68
-  orig: 95, 68
-  offset: 0, 0
-  index: -1
-thiagobrayner
-  rotate: false
-  xy: 190, 477
-  size: 350, 31
-  orig: 350, 31
   offset: 0, 0
   index: -1
