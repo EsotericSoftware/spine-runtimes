@@ -332,9 +332,9 @@ public class SkeletonBinary {
 		Skin skin = new Skin(defaultSkin ? "default" : input.readStringRef());
 
 		if (!defaultSkin) {
-			Object[] bones = skeletonData.bones.setSize(input.readInt(true));
-			for (int i = 0, n = skeletonData.bones.size; i < n; i++)
-				bones[i] = skeletonData.bones.get(input.readInt(true));
+			Object[] bones = skin.bones.setSize(input.readInt(true));
+			for (int i = 0, n = skin.bones.size; i < n; i++)
+				bones[i] = skin.bones.get(input.readInt(true));
 
 			for (int i = 0, n = input.readInt(true); i < n; i++)
 				skin.constraints.add(skeletonData.ikConstraints.get(input.readInt(true)));
