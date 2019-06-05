@@ -91,6 +91,7 @@ package spine.flash {
 			var drawOrder : Vector.<Slot> = skeleton.drawOrder;
 			for (var i : int = 0, n : int = drawOrder.length; i < n; i++) {
 				var slot : Slot = drawOrder[i];
+				if (!slot.bone.active) continue;
 				var regionAttachment : RegionAttachment = slot.attachment as RegionAttachment;
 				if (!regionAttachment) continue;
 
