@@ -503,6 +503,7 @@ module spine {
 			let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
+				if (!slot.bone.active) continue;
 				let verticesLength = 0;
 				let vertices: ArrayLike<number> = null;
 				let attachment = slot.getAttachment();
