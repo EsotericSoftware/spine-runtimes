@@ -481,7 +481,10 @@ namespace Spine.Unity.Editor {
 							if (Application.isPlaying) {
 								foreach (var slot in skeleton.DrawOrder) {
 									if (skeletonRenderer.separatorSlots.Contains(slot))	EditorGUILayout.LabelField(SeparatorString);
-									EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(slot.Data.Name, Icons.slot), GUILayout.ExpandWidth(false));
+
+									using (new EditorGUI.DisabledScope(!slot.Bone.Active)) {
+										EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(slot.Data.Name, Icons.slot), GUILayout.ExpandWidth(false));
+									}
 								}
 							} else {
 								foreach (var slot in skeleton.DrawOrder) {
@@ -492,7 +495,9 @@ namespace Spine.Unity.Editor {
 											break;
 										}
 									}
-									EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(slot.Data.Name, Icons.slot), GUILayout.ExpandWidth(false));
+									using (new EditorGUI.DisabledScope(!slot.Bone.Active)) {
+										EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(slot.Data.Name, Icons.slot), GUILayout.ExpandWidth(false));
+									}
 								}
 							}
 								

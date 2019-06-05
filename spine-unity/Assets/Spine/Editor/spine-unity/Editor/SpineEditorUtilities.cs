@@ -2294,6 +2294,7 @@ namespace Spine.Unity.Editor {
 		public static void DrawBoneNames (Transform transform, Skeleton skeleton, float positionScale = 1f) {
 			GUIStyle style = BoneNameStyle;
 			foreach (Bone b in skeleton.Bones) {
+				if (!b.Active) continue;
 				var pos = new Vector3(b.WorldX * positionScale, b.WorldY * positionScale, 0) + (new Vector3(b.A, b.C) * (b.Data.Length * 0.5f));
 				pos = transform.TransformPoint(pos);
 				Handles.Label(pos, b.Data.Name, style);
@@ -2305,6 +2306,7 @@ namespace Spine.Unity.Editor {
 			DrawCrosshairs2D(skeleton.Bones.Items[0].GetWorldPosition(transform), 0.08f, positionScale);
 
 			foreach (Bone b in skeleton.Bones) {
+				if (!b.Active) continue;
 				DrawBone(transform, b, boneScale, positionScale);
 				boneScale = 1f;
 			}

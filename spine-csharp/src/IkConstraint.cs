@@ -45,6 +45,8 @@ namespace Spine {
 		internal bool compress, stretch;
 		internal float mix = 1;
 
+		internal bool active;
+
 		public IkConstraint (IkConstraintData data, Skeleton skeleton) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
@@ -129,6 +131,10 @@ namespace Spine {
 		public bool Stretch {
 			get { return stretch; }
 			set { stretch = value; }
+		}
+
+		public bool Active {
+			get { return active; }
 		}
 
 		/// <summary>The IK constraint's setup pose data.</summary>

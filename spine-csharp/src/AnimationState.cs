@@ -351,18 +351,20 @@ namespace Spine {
 			return mix;
 		}
 
-		static private void ApplyRotateTimeline (RotateTimeline rotateTimeline, Skeleton skeleton, float time, float alpha, MixBlend blend,
+		static private void ApplyRotateTimeline (RotateTimeline timeline, Skeleton skeleton, float time, float alpha, MixBlend blend,
 			float[] timelinesRotation, int i, bool firstFrame) {
 
 			if (firstFrame) timelinesRotation[i] = 0;
 
 			if (alpha == 1) {
-				rotateTimeline.Apply(skeleton, 0, time, null, 1, blend, MixDirection.In);
+				timeline.Apply(skeleton, 0, time, null, 1, blend, MixDirection.In);
 				return;
 			}
 
-			Bone bone = skeleton.bones.Items[rotateTimeline.boneIndex];
-			float[] frames = rotateTimeline.frames;
+			Bone bone = skeleton.bones.Items[timeline.boneIndex];
+			if (!bone.active) return;
+
+			float[] frames = timeline.frames;
 			float r1, r2;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -385,7 +387,7 @@ namespace Spine {
 					int frame = Animation.BinarySearch(frames, time, RotateTimeline.ENTRIES);
 					float prevRotation = frames[frame + RotateTimeline.PREV_ROTATION];
 					float frameTime = frames[frame];
-					float percent = rotateTimeline.GetCurvePercent((frame >> 1) - 1,
+					float percent = timeline.GetCurvePercent((frame >> 1) - 1,
 						1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
 
 					r2 = frames[frame + RotateTimeline.ROTATION] - prevRotation;

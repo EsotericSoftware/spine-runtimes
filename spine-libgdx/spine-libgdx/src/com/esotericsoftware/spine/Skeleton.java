@@ -666,6 +666,7 @@ public class Skeleton {
 		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
+			if (!slot.bone.active) continue;
 			int verticesLength = 0;
 			float[] vertices = null;
 			Attachment attachment = slot.attachment;

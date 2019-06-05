@@ -52,12 +52,15 @@ namespace Spine {
 		internal float a, b, worldX;
 		internal float c, d, worldY;
 
-		internal bool sorted, update;
+		internal bool sorted, active;
 
 		public BoneData Data { get { return data; } }
 		public Skeleton Skeleton { get { return skeleton; } }
 		public Bone Parent { get { return parent; } }
 		public ExposedList<Bone> Children { get { return children; } }
+		/// <summary>Returns false when the bone has not been computed because <see cref="BoneData.SkinRequired"/> is true and the
+		/// <see cref="Skeleton.Skin">active skin</see> does not <see cref="Skin.Bones">contain</see> this bone.</summary>
+		public bool Active { get { return active; } }
 		/// <summary>The local X translation.</summary>
 		public float X { get { return x; } set { x = value; } }
 		/// <summary>The local Y translation.</summary>

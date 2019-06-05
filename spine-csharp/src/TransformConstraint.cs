@@ -42,6 +42,8 @@ namespace Spine {
 		internal ExposedList<Bone> bones;
 		internal Bone target;
 		internal float rotateMix, translateMix, scaleMix, shearMix;
+		
+		internal bool active;
 
 		public TransformConstraint (TransformConstraintData data, Skeleton skeleton) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
@@ -300,6 +302,7 @@ namespace Spine {
 		public float ScaleMix { get { return scaleMix; } set { scaleMix = value; } }
 		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained scales.</summary>
 		public float ShearMix { get { return shearMix; } set { shearMix = value; } }
+		public bool Active { get { return active; } }
 		/// <summary>The transform constraint's setup pose data.</summary>
 		public TransformConstraintData Data { get { return data; } }
 
