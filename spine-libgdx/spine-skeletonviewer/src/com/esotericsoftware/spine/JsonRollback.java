@@ -115,10 +115,8 @@ public class JsonRollback {
 			JsonValue skins = root.get("skins");
 			if (skins != null && skins.isArray()) {
 				JsonValue newSkins = new JsonValue(ValueType.object);
-				for (JsonValue skinMap = skins.child; skinMap != null; skinMap = skinMap.next) {
-					JsonValue newSkin = skinMap.get("attachments");
-					newSkins.addChild(skinMap.getString("name"), newSkin);
-				}
+				for (JsonValue skinMap = skins.child; skinMap != null; skinMap = skinMap.next)
+					newSkins.addChild(skinMap.getString("name"), skinMap.get("attachments"));
 				root.remove("skins");
 				root.addChild("skins", newSkins);
 			}
