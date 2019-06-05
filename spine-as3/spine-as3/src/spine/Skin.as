@@ -38,7 +38,7 @@ package spine {
 		internal var _name : String;
 		private var _attachments : Vector.<Dictionary> = new Vector.<Dictionary>();
 		private var _bones: Vector.<BoneData> = new Vector.<BoneData>();
-		private var _constraints: Vector.<Constraint> = new Vector.<Constraint>();
+		private var _constraints: Vector.<ConstraintData> = new Vector.<ConstraintData>();
 
 		public function Skin(name : String) {
 			if (name == null) throw new ArgumentError("name cannot be null.");
@@ -69,7 +69,7 @@ package spine {
 			}
 
 			for(i = 0; i < skin._constraints.length; i++) {
-				var constraint : Constraint = skin._constraints[i];
+				var constraint : ConstraintData = skin._constraints[i];
 				contained = false;
 				for (j = 0; j < this._constraints.length; j++) {
 					if (_constraints[j] == constraint) {
@@ -105,7 +105,7 @@ package spine {
 			}
 
 			for(i = 0; i < skin._constraints.length; i++) {
-				var constraint : Constraint = skin._constraints[i];
+				var constraint : ConstraintData = skin._constraints[i];
 				contained = false;
 				for (j = 0; j < this._constraints.length; j++) {
 					if (_constraints[j] == constraint) {
@@ -181,7 +181,7 @@ package spine {
 			return _bones;
 		}
 		
-		public function get constraints() : Vector.<Constraint> {
+		public function get constraints() : Vector.<ConstraintData> {
 			return _constraints;
 		}
 

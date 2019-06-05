@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 package spine {
-	public class IkConstraint implements Constraint {
+	public class IkConstraint implements Updatable {
 		internal var _data : IkConstraintData;
 		public var bones : Vector.<Bone>;
 		public var target : Bone;
@@ -36,6 +36,7 @@ package spine {
 		public var compress: Boolean;
 		public var stretch: Boolean;
 		public var mix : Number;
+		public var active : Boolean;
 
 		public function IkConstraint(data : IkConstraintData, skeleton : Skeleton) {
 			if (data == null) throw new ArgumentError("data cannot be null.");
@@ -50,6 +51,10 @@ package spine {
 			for each (var boneData : BoneData in data.bones)
 				bones[bones.length] = skeleton.findBone(boneData.name);
 			target = skeleton.findBone(data.target._name);
+		}
+		
+		public function isActive() : Boolean {
+			return active;
 		}
 
 		public function apply() : void {
@@ -67,16 +72,12 @@ package spine {
 			}
 		}
 
-		public function getOrder() : Number {
-			return _data.order;
-		}
-
 		public function get data() : IkConstraintData {
 			return _data;
 		}
 
 		public function toString() : String {
-			return _data._name;
+			return _data.name;
 		}
 
 		/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world

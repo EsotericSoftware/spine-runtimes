@@ -88,7 +88,7 @@ package spine.examples {
 			skeleton.skeleton.setSlotsToSetupPose();
 			skeleton.state.setAnimationByName(0, "walk", true);
 			
-			var skin : Skin = new Skin("test");
+			var skin : Skin = new Skin("test");			
 			skin.copySkin(skeletonData.findSkin("goblingirl"));
 			skeleton.skeleton.skin = skin;
 			skeleton.skeleton.setToSetupPose();

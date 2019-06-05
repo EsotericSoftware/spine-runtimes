@@ -62,6 +62,7 @@ package spine.animation {
 		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var frames : Vector.<Number> = this.frames;
 			var slot : Slot = skeleton.slots[slotIndex];
+			if (!slot.bone.active) return;
 
 			if (time < frames[0]) {
 				switch (blend) {

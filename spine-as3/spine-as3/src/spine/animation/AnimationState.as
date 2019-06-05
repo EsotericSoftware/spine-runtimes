@@ -304,6 +304,7 @@ package spine.animation {
 			var rotateTimeline : RotateTimeline = RotateTimeline(timeline);
 			var frames : Vector.<Number> = rotateTimeline.frames;
 			var bone : Bone = skeleton.bones[rotateTimeline.boneIndex];
+			if (!bone.active) return;
 			var r1 : Number, r2 : Number;
 			if (time < frames[0]) {
 				switch (blend) {

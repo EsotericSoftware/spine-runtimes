@@ -60,6 +60,7 @@ package spine.animation {
 			var frames : Vector.<Number> = this.frames;
 
 			var bone : Bone = skeleton.bones[boneIndex];
+			if (!bone.active) return;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:

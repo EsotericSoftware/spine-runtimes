@@ -28,9 +28,7 @@
  *****************************************************************************/
 
 package spine {
-	public class IkConstraintData {
-		internal var _name : String;
-		public var order : Number;
+	public class IkConstraintData extends ConstraintData {		
 		public var bones : Vector.<BoneData> = new Vector.<BoneData>();
 		public var target : BoneData;
 		public var mix : Number = 1;
@@ -40,16 +38,7 @@ package spine {
 		public var uniform : Boolean = false;
 
 		public function IkConstraintData(name : String) {
-			if (name == null) throw new ArgumentError("name cannot be null.");
-			_name = name;
-		}
-
-		public function get name() : String {
-			return _name;
-		}
-
-		public function toString() : String {
-			return _name;
+			super(name, 0, false);			
 		}
 	}
 }

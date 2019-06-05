@@ -59,6 +59,7 @@ package spine.animation {
 		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var attachmentName : String;
 			var slot : Slot = skeleton.slots[slotIndex];
+			if (!slot.bone.active) return;
 			if (direction == MixDirection.Out && blend == MixBlend.setup) {
 				attachmentName = slot.data.attachmentName;
 				slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);

@@ -30,5 +30,6 @@
 package spine {
 	public interface Updatable {
 		function update() : void;
+		function isActive() : Boolean;
 	}
 }

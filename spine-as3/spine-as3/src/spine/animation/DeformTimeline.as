@@ -60,6 +60,7 @@ package spine.animation {
 			var vertexAttachment : VertexAttachment;
 			var setupVertices : Vector.<Number>;
 			var slot : Slot = skeleton.slots[slotIndex];
+			if (!slot.bone.active) return;
 			var slotAttachment : Attachment = slot.attachment;
 			if (!(slotAttachment is VertexAttachment) || !(VertexAttachment(slotAttachment).deformAttachment == attachment)) return;
 			

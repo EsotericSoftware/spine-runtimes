@@ -63,6 +63,7 @@ package spine.animation {
 			var frames : Vector.<Number> = this.frames;
 
 			var constraint : TransformConstraint = skeleton.transformConstraints[transformConstraintIndex];
+			if (!constraint.active) return;
 			var data : TransformConstraintData;
 			if (time < frames[0]) {
 				data = constraint.data;

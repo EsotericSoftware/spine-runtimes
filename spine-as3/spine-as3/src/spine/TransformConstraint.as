@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 package spine {
-	public class TransformConstraint implements Constraint {
+	public class TransformConstraint implements Updatable {
 		internal var _data : TransformConstraintData;
 		internal var _bones : Vector.<Bone>;
 		public var target : Bone;
@@ -37,6 +37,7 @@ package spine {
 		public var scaleMix : Number;
 		public var shearMix : Number;
 		internal var _temp : Vector.<Number> = new Vector.<Number>(2);
+		public var active : Boolean;
 
 		public function TransformConstraint(data : TransformConstraintData, skeleton : Skeleton) {
 			if (data == null) throw new ArgumentError("data cannot be null.");
@@ -50,6 +51,10 @@ package spine {
 			for each (var boneData : BoneData in data.bones)
 				_bones.push(skeleton.findBone(boneData.name));
 			target = skeleton.findBone(data.target._name);
+		}
+		
+		public function isActive() : Boolean {
+			return active;
 		}
 
 		public function apply() : void {
@@ -274,10 +279,6 @@ package spine {
 			}
 		}
 
-		public function getOrder() : Number {
-			return _data.order;
-		}
-
 		public function get data() : TransformConstraintData {
 			return _data;
 		}
@@ -287,7 +288,7 @@ package spine {
 		}
 
 		public function toString() : String {
-			return _data._name;
+			return _data.name;
 		}
 	}
 }

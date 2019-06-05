@@ -3747,7 +3747,7 @@ var spine;
 		Skeleton.prototype.sortReset = function (bones) {
 			for (var i = 0, n = bones.length; i < n; i++) {
 				var bone = bones[i];
-				if (!bone.update)
+				if (!bone.active)
 					continue;
 				if (bone.sorted)
 					this.sortReset(bone.children);

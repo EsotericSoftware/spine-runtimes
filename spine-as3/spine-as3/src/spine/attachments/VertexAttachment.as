@@ -39,10 +39,11 @@ package spine.attachments {
 		public var vertices : Vector.<Number>;
 		public var worldVerticesLength : int;
 		public var id : int = (nextID++ & 65535) << 11;
-		public var deformAttachment : VertexAttachment = this;
+		public var deformAttachment : VertexAttachment;
 
 		public function VertexAttachment(name : String) {
 			super(name);
+			deformAttachment = this;
 		}
 
 		/** Transforms local vertices to world coordinates.

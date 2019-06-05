@@ -41,6 +41,7 @@ package spine {
 		public var shearX : Number;
 		public var shearY : Number;
 		public var transformMode : TransformMode = TransformMode.normal;
+		public var skinRequired : Boolean;
 
 		/** @param parent May be null. */
 		public function BoneData(index : int, name : String, parent : BoneData) {

@@ -28,9 +28,7 @@
  *****************************************************************************/
 
 package spine {
-	public class TransformConstraintData {
-		internal var _name : String;
-		public var order : Number;
+	public class TransformConstraintData extends ConstraintData {			
 		internal var _bones : Vector.<BoneData> = new Vector.<BoneData>();
 		public var target : BoneData;
 		public var rotateMix : Number;
@@ -47,21 +45,11 @@ package spine {
 		public var local : Boolean = false;
 
 		public function TransformConstraintData(name : String) {
-			if (name == null) throw new ArgumentError("name cannot be null.");
-			_name = name;
+			super(name, 0, false);
 		}
 
-		public function get bones() : Vector.<BoneData> {
-			;
+		public function get bones() : Vector.<BoneData> {			
 			return _bones;
-		}
-
-		public function get name() : String {
-			return _name;
-		}
-
-		public function toString() : String {
-			return _name;
-		}
+		}		
 	}
 }

@@ -30,7 +30,7 @@
 package spine {
 	import spine.attachments.PathAttachment;
 
-	public class PathConstraint implements Constraint {
+	public class PathConstraint implements Updatable {
 		private static const NONE : int = -1, BEFORE : int = -2, AFTER : int = -3;
 		private static const epsilon : Number = 0.00001;
 		internal var _data : PathConstraintData;
@@ -43,6 +43,7 @@ package spine {
 		internal const _curves : Vector.<Number> = new Vector.<Number>();
 		internal const _lengths : Vector.<Number> = new Vector.<Number>();
 		internal const _segments : Vector.<Number> = new Vector.<Number>(10);
+		public var active : Boolean;
 
 		public function PathConstraint(data : PathConstraintData, skeleton : Skeleton) {
 			if (data == null) throw new ArgumentError("data cannot be null.");
@@ -56,6 +57,10 @@ package spine {
 			spacing = data.spacing;
 			rotateMix = data.rotateMix;
 			translateMix = data.translateMix;
+		}
+		
+		public function isActive() : Boolean {
+			return active;
 		}
 
 		public function apply() : void {
@@ -440,10 +445,6 @@ package spine {
 
 		public function get data() : PathConstraintData {
 			return _data;
-		}
-
-		public function getOrder() : Number {
-			return _data.order;
 		}
 
 		public function toString() : String {

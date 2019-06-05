@@ -104,8 +104,24 @@ package spine {
 			var bones : Vector.<Bone> = this.bones;
 			var i : Number = 0;
 			var n : Number = 0;
-			for (i = 0, n = bones.length; i < n; i++)
-				bones[i]._sorted = false;
+			var bone : Bone;
+			for (i = 0, n = bones.length; i < n; i++) {
+				bone = bones[i];
+				bone._sorted = bone.data.skinRequired;
+				bone.active = !bone._sorted;				
+			}
+			
+			if (skin != null) {
+				var skinBones : Vector.<BoneData> = skin.bones;
+				for (i = 0, n = this.skin.bones.length; i < n; i++) {
+					bone = this.bones[skinBones[i].index];
+					do {
+						bone._sorted = false;
+						bone.active = true;
+						bone = bone.parent;
+					} while (bone != null);
+				}
+			}
 
 			// IK first, lowest hierarchy depth first.
 			var ikConstraints : Vector.<IkConstraint> = this.ikConstraints;
@@ -143,8 +159,17 @@ package spine {
 			for (i = 0, n = bones.length; i < n; i++)
 				sortBone(bones[i]);
 		}
+		
+		static function contains(list : Vector.<ConstraintData>, element : ConstraintData) : Boolean {
+			for (var i : Number = 0; i < list.length; i++)
+				if  (list[i] == element) return true;
+			return false;
+		}
 
 		private function sortIkConstraint(constraint : IkConstraint) : void {
+			constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin != null && contains(this.skin.constraints, constraint.data)));
+			if (!constraint.active) return;
+			
 			var target : Bone = constraint.target;
 			sortBone(target);
 
@@ -164,6 +189,9 @@ package spine {
 		}
 
 		private function sortPathConstraint(constraint : PathConstraint) : void {
+			constraint.active = constraint.target.bone.isActive() && (!constraint.data.skinRequired || (this.skin != null && contains(this.skin.constraints, constraint.data)));
+			if (!constraint.active) return;
+			
 			var slot : Slot = constraint.target;
 			var slotIndex : Number = slot.data.index;
 			var slotBone : Bone = slot.bone;
@@ -192,6 +220,9 @@ package spine {
 		}
 
 		private function sortTransformConstraint(constraint : TransformConstraint) : void {
+			constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin != null && contains(this.skin.constraints, constraint.data)));
+			if (!constraint.active) return;
+			
 			sortBone(constraint.target);
 
 			var constrained : Vector.<Bone> = constraint.bones;
@@ -255,6 +286,7 @@ package spine {
 		private function sortReset(bones : Vector.<Bone>) : void {
 			for (var i : int = 0, n : int = bones.length; i < n; i++) {
 				var bone : Bone = bones[i];
+				if (!bone.active) continue;
 				if (bone._sorted) sortReset(bone.children);
 				bone._sorted = false;
 			}
@@ -393,6 +425,7 @@ package spine {
 		 * no old skin, each slot's setup mode attachment is attached from the new skin.
 		 * @param newSkin May be null. */
 		public function set skin(newSkin : Skin) : void {
+			if (newSkin == _skin) return;
 			if (newSkin) {
 				if (skin)
 					newSkin.attachAll(this, skin);
@@ -409,6 +442,7 @@ package spine {
 				}
 			}
 			_skin = newSkin;
+			updateCache();
 		}
 
 		/** @return May be null. */
@@ -451,7 +485,7 @@ package spine {
 		public function findIkConstraint(constraintName : String) : IkConstraint {
 			if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
 			for each (var ikConstraint : IkConstraint in ikConstraints)
-				if (ikConstraint._data._name == constraintName) return ikConstraint;
+				if (ikConstraint._data.name == constraintName) return ikConstraint;
 			return null;
 		}
 
@@ -459,7 +493,7 @@ package spine {
 		public function findTransformConstraint(constraintName : String) : TransformConstraint {
 			if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
 			for each (var transformConstraint : TransformConstraint in transformConstraints)
-				if (transformConstraint._data._name == constraintName) return transformConstraint;
+				if (transformConstraint._data.name == constraintName) return transformConstraint;
 			return null;
 		}
 
@@ -467,7 +501,7 @@ package spine {
 		public function findPathConstraint(constraintName : String) : PathConstraint {
 			if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
 			for each (var pathConstraint : PathConstraint in pathConstraints)
-				if (pathConstraint._data._name == constraintName) return pathConstraint;
+				if (pathConstraint._data.name == constraintName) return pathConstraint;
 			return null;
 		}
 
