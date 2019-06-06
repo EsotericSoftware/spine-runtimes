@@ -106,7 +106,8 @@ EReimportResult::Type USpineAtlasAssetFactory::Reimport (UObject* Obj) {
 	
 	FString currentSourcePath, filenameNoExtension, unusedExtension;
 	const FString longPackagePath = FPackageName::GetLongPackagePath(asset->GetOutermost()->GetPathName());
-	FPaths::Split(UFactory::GetCurrentFilename(), currentSourcePath, filenameNoExtension, unusedExtension);
+	FString currentFileName = asset->GetAtlasFileName().ToString();
+	FPaths::Split(currentFileName, currentSourcePath, filenameNoExtension, unusedExtension);
 	
 	LoadAtlas(asset, currentSourcePath, longPackagePath);
 	
