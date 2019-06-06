@@ -71,6 +71,7 @@ void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, floa
 
 	TransformConstraint *constraintP = skeleton._transformConstraints[_transformConstraintIndex];
 	TransformConstraint &constraint = *constraintP;
+	if (!constraint.isActive()) return;
 
 	if (time < _frames[0]) {
 		switch (blend) {

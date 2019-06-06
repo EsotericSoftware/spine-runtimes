@@ -41,9 +41,9 @@
 
 using namespace spine;
 
-RTTI_IMPL(TransformConstraint, Constraint)
+RTTI_IMPL(TransformConstraint, Updatable)
 
-TransformConstraint::TransformConstraint(TransformConstraintData &data, Skeleton &skeleton) : Constraint(),
+TransformConstraint::TransformConstraint(TransformConstraintData &data, Skeleton &skeleton) : Updatable(),
 																							  _data(data),
 																							  _target(skeleton.findBone(
 																									  data.getTarget()->getName())),
@@ -54,7 +54,8 @@ TransformConstraint::TransformConstraint(TransformConstraintData &data, Skeleton
 																							  _scaleMix(
 																									  data.getScaleMix()),
 																							  _shearMix(
-																									  data.getShearMix()) {
+																									  data.getShearMix()),
+																									  _active(false) {
 	_bones.ensureCapacity(_data.getBones().size());
 	for (size_t i = 0; i < _data.getBones().size(); ++i) {
 		BoneData *boneData = _data.getBones()[i];
@@ -380,3 +381,12 @@ void TransformConstraint::applyRelativeLocal() {
 		bone.updateWorldTransform(x, y, rotation, scaleX, scaleY, bone._ashearX, shearY);
 	}
 }
+
+bool TransformConstraint::isActive() {
+	return _active;
+}
+
+void TransformConstraint::setActive(bool inValue) {
+	_active = inValue;
+}
+

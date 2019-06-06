@@ -37,6 +37,8 @@ namespace spine {
 class Attachment;
 
 class Skeleton;
+class BoneData;
+class ConstraintData;
 
 /// Stores attachments by slot index and attachment name.
 /// See SkeletonData::getDefaultSkin, Skeleton::getSkin, and
@@ -142,9 +144,14 @@ public:
 
 	AttachmentMap::Entries getAttachments();
 
+	Vector<BoneData*>& getBones();
+
+	Vector<ConstraintData*>& getConstraints();
 private:
 	const String _name;
 	AttachmentMap _attachments;
+	Vector<BoneData*> _bones;
+	Vector<ConstraintData*> _constraints;
 
 	/// Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.
 	void attachAll(Skeleton &skeleton, Skin &oldSkin);

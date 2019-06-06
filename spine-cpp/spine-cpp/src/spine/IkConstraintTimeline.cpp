@@ -69,6 +69,8 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 
 	IkConstraint *constraintP = skeleton._ikConstraints[_ikConstraintIndex];
 	IkConstraint &constraint = *constraintP;
+	if (!constraint.isActive()) return;
+
 	if (time < _frames[0]) {
 		switch (blend) {
 			case MixBlend_Setup:

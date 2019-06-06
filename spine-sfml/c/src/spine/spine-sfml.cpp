@@ -128,7 +128,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		if (!attachment) continue;
 
 		// Early out if slot is invisible
-		if (slot->color.a == 0) {
+		if (slot->color.a == 0 || !slot->bone->active) {
 			spSkeletonClipping_clipEnd(clipper, slot);
 			continue;
 		}

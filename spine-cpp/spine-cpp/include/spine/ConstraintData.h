@@ -31,21 +31,32 @@
 #define Spine_Constraint_h
 
 #include <spine/Updatable.h>
+#include <spine/SpineString.h>
 
 namespace spine {
 /// The interface for all constraints.
-class SP_API Constraint : public Updatable {
-RTTI_DECL
+class SP_API ConstraintData : public SpineObject {
 
 public:
-	Constraint();
+	ConstraintData(const String& name);
 
-	virtual ~Constraint();
+	virtual ~ConstraintData();
 
-	virtual void update() = 0;
+	/// The IK constraint's name, which is unique within the skeleton.
+	const String& getName();
 
 	/// The ordinal for the order a skeleton's constraints will be applied.
-	virtual int getOrder() = 0;
+	size_t getOrder();
+	void setOrder(size_t inValue);
+
+	/// Whether the constraint is only active for a specific skin.
+	bool isSkinRequired();
+	void setSkinRequired(bool inValue);
+
+private:
+	const String _name;
+	size_t _order;
+	bool _skinRequired;
 };
 }
 

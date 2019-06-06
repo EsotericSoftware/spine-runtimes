@@ -37,6 +37,7 @@
 #include <spine/Event.h>
 
 #include <spine/Animation.h>
+#include <spine/Bone.h>
 #include <spine/TimelineType.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
@@ -67,6 +68,8 @@ void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 	String *attachmentName;
 	Slot *slotP = skeleton._slots[_slotIndex];
 	Slot &slot = *slotP;
+	if (!slot._bone.isActive()) return;
+
 	if (direction == MixDirection_Out && blend == MixBlend_Setup) {
 		attachmentName = &slot._data._attachmentName;
 		slot.setAttachment(attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName));

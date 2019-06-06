@@ -36,12 +36,13 @@
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
+#include <spine/ConstraintData.h>
 
 namespace spine {
     class BoneData;
     class SlotData;
     
-    class SP_API PathConstraintData : public SpineObject {
+    class SP_API PathConstraintData : public ConstraintData {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         
@@ -53,11 +54,6 @@ namespace spine {
         
     public:
         explicit PathConstraintData(const String& name);
-
-        const String& getName();
-        
-        int getOrder();
-        void setOrder(int inValue);
         
         Vector<BoneData*>& getBones();
         
@@ -89,8 +85,6 @@ namespace spine {
         void setTranslateMix(float inValue);
 
     private:
-        const String _name;
-        int _order;
         Vector<BoneData*> _bones;
         SlotData* _target;
         PositionMode _positionMode;

@@ -223,6 +223,10 @@ public:
 	bool isAppliedValid();
 	void setAppliedValid(bool valid);
 
+	bool isActive();
+
+	void setActive(bool inValue);
+
 private:
 	static bool yDown;
 
@@ -236,6 +240,7 @@ private:
 	float _a, _b, _worldX;
 	float _c, _d, _worldY;
 	bool _sorted;
+	bool _active;
 
 	/// Computes the individual applied transform values from the world transform. This can be useful to perform processing using
 	/// the applied transform after the world transform has been modified directly (eg, by a constraint)..

@@ -49,7 +49,8 @@ BoneData::BoneData(int index, const String &name, BoneData *parent) :
 		_scaleY(1),
 		_shearX(0),
 		_shearY(0),
-		_transformMode(TransformMode_Normal) {
+		_transformMode(TransformMode_Normal),
+		_skinRequired(false) {
 	assert(index >= 0);
 	assert(_name.length() > 0);
 }
@@ -136,4 +137,12 @@ TransformMode BoneData::getTransformMode() {
 
 void BoneData::setTransformMode(TransformMode inValue) {
 	_transformMode = inValue;
+}
+
+bool BoneData::isSkinRequired() {
+	return _skinRequired;
+}
+
+void BoneData::setSkinRequired(bool inValue) {
+	_skinRequired = inValue;
 }

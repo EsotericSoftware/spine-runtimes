@@ -144,6 +144,10 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		skeletonData->_audioPath.own(readString(input));
 	}
 
+	int numStrings = readVarint(input, true);
+	for (int i = 0; i < numStrings; i++)
+		skeletonData->_strings.add(readString(input));
+
 	/* Bones. */
 	int numBones = readVarint(input, true);
 	skeletonData->_bones.setSize(numBones, 0);
@@ -160,6 +164,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		data->_shearY = readFloat(input);
 		data->_length = readFloat(input) * _scale;
 		data->_transformMode = static_cast<TransformMode>(readVarint(input, true));
+		data->_skinRequired = readBoolean(input);
 		if (nonessential) {
 			/* Skip bone color. */
 			readInt(input);
@@ -184,7 +189,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 			slotData->getDarkColor().set(r / 255.0f, g / 255.0f, b / 255.0f, 1);
 			slotData->setHasDarkColor(true);
 		}
-		slotData->_attachmentName.own(readString(input));
+		slotData->_attachmentName = readStringRef(input, skeletonData);
 		slotData->_blendMode = static_cast<BlendMode>(readVarint(input, true));
 		skeletonData->_slots[i] = slotData;
 	}
@@ -195,7 +200,8 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	for (int i = 0; i < ikConstraintsCount; ++i) {
 		const char *name = readString(input);
 		IkConstraintData *data = new(__FILE__, __LINE__) IkConstraintData(String(name, true));
-		data->_order = readVarint(input, true);
+		data->setOrder(readVarint(input, true));
+		data->setSkinRequired(readBoolean(input));
 		int bonesCount = readVarint(input, true);
 		data->_bones.setSize(bonesCount, 0);
 		for (int ii = 0; ii < bonesCount; ++ii) {
@@ -216,7 +222,8 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	for (int i = 0; i < transformConstraintsCount; ++i) {
 		const char *name = readString(input);
 		TransformConstraintData *data = new(__FILE__, __LINE__) TransformConstraintData(String(name, true));
-		data->_order = readVarint(input, true);
+		data->setOrder(readVarint(input, true));
+		data->setSkinRequired(readBoolean(input));
 		int bonesCount = readVarint(input, true);
 		data->_bones.setSize(bonesCount, 0);
 		for (int ii = 0; ii < bonesCount; ++ii) {
@@ -244,7 +251,8 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	for (int i = 0; i < pathConstraintsCount; ++i) {
 		const char *name = readString(input);
 		PathConstraintData *data = new(__FILE__, __LINE__) PathConstraintData(String(name, true));
-		data->_order = readVarint(input, true);
+		data->setOrder(readVarint(input, true));
+		data->setSkinRequired(readBoolean(input));
 		int bonesCount = readVarint(input, true);
 		data->_bones.setSize(bonesCount, 0);
 		for (int ii = 0; ii < bonesCount; ++ii) {
@@ -266,20 +274,15 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	}
 
 	/* Default skin. */
-	skeletonData->_defaultSkin = readSkin(input, "default", skeletonData, nonessential);
-	int skinsCount = readVarint(input, true);
-	if (skeletonData->_defaultSkin) {
-		++skinsCount;
-	}
-	skeletonData->_skins.setSize(skinsCount, 0);
-	if (skeletonData->_defaultSkin) {
-		skeletonData->_skins[0] = skeletonData->_defaultSkin;
+	Skin* defaultSkin = readSkin(input, true, skeletonData, nonessential);
+	if (defaultSkin) {
+		skeletonData->_defaultSkin = defaultSkin;
+		skeletonData->_skins.add(defaultSkin);
 	}
 
 	/* Skins. */
-	for (size_t i = skeletonData->_defaultSkin ? 1 : 0; i < skeletonData->_skins.size(); ++i) {
-		String skinName(readString(input), true);
-		skeletonData->_skins[i] = readSkin(input, skinName, skeletonData, nonessential);
+	for (size_t i = 0, n = (size_t)readVarint(input, true); i < n; ++i) {
+		skeletonData->_skins.add(readSkin(input, false, skeletonData, nonessential));
 	}
 
 	/* Linked meshes. */
@@ -312,8 +315,8 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	int eventsCount = readVarint(input, true);
 	skeletonData->_events.setSize(eventsCount, 0);
 	for (int i = 0; i < eventsCount; ++i) {
-		const char *name = readString(input);
-		EventData *eventData = new(__FILE__, __LINE__) EventData(String(name, true));
+		const char *name = readStringRef(input, skeletonData);
+		EventData *eventData = new(__FILE__, __LINE__) EventData(String(name));
 		eventData->_intValue = readVarint(input, false);
 		eventData->_floatValue = readFloat(input);
 		eventData->_stringValue.own(readString(input));
@@ -379,6 +382,11 @@ char *SkeletonBinary::readString(DataInput *input) {
 	input->cursor += length - 1;
 	string[length - 1] = '\0';
 	return string;
+}
+
+char* SkeletonBinary::readStringRef(DataInput* input, SkeletonData* skeletonData) {
+	int index = readVarint(input, true);
+	return index == 0 ? nullptr : skeletonData->_strings[index - 1];
 }
 
 float SkeletonBinary::readFloat(DataInput *input) {
@@ -447,14 +455,27 @@ int SkeletonBinary::readVarint(DataInput *input, bool optimizePositive) {
 }
 
 Skin *
-SkeletonBinary::readSkin(DataInput *input, const String &skinName, SkeletonData *skeletonData, bool nonessential) {
-	int slotCount = readVarint(input, true);
-	if (slotCount == 0) return NULL;
-	Skin *skin = new(__FILE__, __LINE__) Skin(skinName);
-	for (int i = 0; i < slotCount; ++i) {
+SkeletonBinary::readSkin(DataInput *input, bool defaultSkin, SkeletonData *skeletonData, bool nonessential) {
+	Skin *skin = new(__FILE__, __LINE__) Skin(defaultSkin ? "default" : readStringRef(input, skeletonData));
+
+	if (!defaultSkin) {
+		for (int i = 0, n = readVarint(input, true); i < n; i++)
+			skin->getBones().add(skeletonData->_bones[readVarint(input, true)]);
+
+		for (int i = 0, n = readVarint(input, true); i < n; i++)
+			skin->getConstraints().add(skeletonData->_ikConstraints[readVarint(input, true)]);
+
+		for (int i = 0, n = readVarint(input, true); i < n; i++)
+			skin->getConstraints().add(skeletonData->_transformConstraints[readVarint(input, true)]);
+
+		for (int i = 0, n = readVarint(input, true); i < n; i++)
+			skin->getConstraints().add(skeletonData->_pathConstraints[readVarint(input, true)]);
+	}
+
+	for (int i = 0, n = readVarint(input, true); i < n; ++i) {
 		int slotIndex = readVarint(input, true);
 		for (int ii = 0, nn = readVarint(input, true); ii < nn; ++ii) {
-			String name(readString(input), true);
+			String name(readStringRef(input, skeletonData));
 			Attachment *attachment = readAttachment(input, skin, slotIndex, name, skeletonData, nonessential);
 			if (attachment) skin->setAttachment(slotIndex, String(name), attachment);
 		}
@@ -464,13 +485,13 @@ SkeletonBinary::readSkin(DataInput *input, const String &skinName, SkeletonData 
 
 Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slotIndex, const String &attachmentName,
 										   SkeletonData *skeletonData, bool nonessential) {
-	String name(readString(input), true);
+	String name(readStringRef(input, skeletonData));
 	if (name.isEmpty()) name = attachmentName;
 
 	AttachmentType type = static_cast<AttachmentType>(readByte(input));
 	switch (type) {
 		case AttachmentType_Region: {
-			String path(readString(input), true);
+			String path(readStringRef(input, skeletonData));
 			if (path.isEmpty()) path = name;
 			RegionAttachment *region = _attachmentLoader->newRegionAttachment(*skin, String(name), String(path));
 			region->_path = path;
@@ -500,7 +521,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 		case AttachmentType_Mesh: {
 			int vertexCount;
 			MeshAttachment *mesh;
-			String path(readString(input), true);
+			String path(readStringRef(input, skeletonData));
 			if (path.isEmpty()) path = name;
 
 			mesh = _attachmentLoader->newMeshAttachment(*skin, String(name), String(path));
@@ -524,14 +545,14 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			return mesh;
 		}
 		case AttachmentType_Linkedmesh: {
-			String path(readString(input), true);
+			String path(readStringRef(input, skeletonData));
 			if (path.isEmpty()) path = name;
 
 			MeshAttachment *mesh = _attachmentLoader->newMeshAttachment(*skin, String(name), String(path));
 			mesh->_path = path;
 			readColor(input, mesh->getColor());
-			String skinName(readString(input), true);
-			String parent(readString(input), true);
+			String skinName(readStringRef(input, skeletonData));
+			String parent(readStringRef(input, skeletonData));
 			bool inheritDeform = readBoolean(input);
 			if (nonessential) {
 				mesh->_width = readFloat(input) * _scale;
@@ -661,7 +682,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 					timeline->_slotIndex = slotIndex;
 					for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
 						float time = readFloat(input);
-						String attachmentName = String(readString(input), true);
+						String attachmentName(readStringRef(input, skeletonData));
 						timeline->setFrame(frameIndex, time, attachmentName);
 					}
 					timelines.add(timeline);
@@ -888,8 +909,8 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 		for (int ii = 0, nn = readVarint(input, true); ii < nn; ++ii) {
 			int slotIndex = readVarint(input, true);
 			for (int iii = 0, nnn = readVarint(input, true); iii < nnn; iii++) {
-				const char *attachmentName = readString(input);
-				Attachment *baseAttachment = skin->getAttachment(slotIndex, String(attachmentName, true));
+				const char *attachmentName = readStringRef(input, skeletonData);
+				Attachment *baseAttachment = skin->getAttachment(slotIndex, String(attachmentName));
 
 				if (!baseAttachment) {
 					ContainerUtil::cleanUpVectorOfPointers(timelines);

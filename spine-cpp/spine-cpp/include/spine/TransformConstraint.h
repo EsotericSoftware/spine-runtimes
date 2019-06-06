@@ -30,7 +30,7 @@
 #ifndef Spine_TransformConstraint_h
 #define Spine_TransformConstraint_h
 
-#include <spine/Constraint.h>
+#include <spine/ConstraintData.h>
 
 #include <spine/Vector.h>
 
@@ -39,7 +39,7 @@ namespace spine {
     class Skeleton;
     class Bone;
     
-    class SP_API TransformConstraint : public Constraint {
+    class SP_API TransformConstraint : public Updatable {
         friend class Skeleton;
         friend class TransformConstraintTimeline;
         
@@ -72,12 +72,17 @@ namespace spine {
         
         float getShearMix();
         void setShearMix(float inValue);
+
+		bool isActive();
+
+		void setActive(bool inValue);
         
     private:
         TransformConstraintData& _data;
         Vector<Bone*> _bones;
         Bone* _target;
         float _rotateMix, _translateMix, _scaleMix, _shearMix;
+        bool _active;
         
         void applyAbsoluteWorld();
         

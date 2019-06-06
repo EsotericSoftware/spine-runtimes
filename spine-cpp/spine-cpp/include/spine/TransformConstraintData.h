@@ -33,11 +33,12 @@
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
+#include <spine/ConstraintData.h>
 
 namespace spine {
     class BoneData;
     
-    class SP_API TransformConstraintData : public SpineObject {
+    class SP_API TransformConstraintData : public ConstraintData {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         
@@ -48,8 +49,6 @@ namespace spine {
     public:
         explicit TransformConstraintData(const String& name);
 
-        const String& getName();
-        int getOrder();
         Vector<BoneData*>& getBones();
         BoneData* getTarget();
         float getRotateMix();
@@ -68,8 +67,6 @@ namespace spine {
         bool isLocal();
         
     private:
-        const String _name;
-        int _order;
         Vector<BoneData*> _bones;
         BoneData* _target;
         float _rotateMix, _translateMix, _scaleMix, _shearMix;

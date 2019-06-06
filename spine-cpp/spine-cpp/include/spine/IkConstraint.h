@@ -30,7 +30,7 @@
 #ifndef Spine_IkConstraint_h
 #define Spine_IkConstraint_h
 
-#include <spine/Constraint.h>
+#include <spine/ConstraintData.h>
 
 #include <spine/Vector.h>
 
@@ -41,7 +41,7 @@ class Skeleton;
 
 class Bone;
 
-class SP_API IkConstraint : public Constraint {
+class SP_API IkConstraint : public Updatable {
 	friend class Skeleton;
 
 	friend class IkConstraintTimeline;
@@ -91,6 +91,10 @@ public:
 
 	void setMix(float inValue);
 
+	bool isActive();
+
+	void setActive(bool inValue);
+
 private:
 	IkConstraintData &_data;
 	Vector<Bone *> _bones;
@@ -99,6 +103,7 @@ private:
 	bool _stretch;
 	float _mix;
 	Bone *_target;
+	bool _active;
 };
 }
 

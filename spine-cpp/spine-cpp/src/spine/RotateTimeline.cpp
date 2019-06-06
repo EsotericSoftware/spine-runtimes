@@ -56,6 +56,7 @@ void RotateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	SP_UNUSED(direction);
 
 	Bone *bone = skeleton.getBones()[_boneIndex];
+	if (!bone->_active) return;
 
 	if (time < _frames[0]) {
 		switch (blend) {

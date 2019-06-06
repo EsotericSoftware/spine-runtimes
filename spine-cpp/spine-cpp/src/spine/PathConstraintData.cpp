@@ -41,8 +41,7 @@
 using namespace spine;
 
 PathConstraintData::PathConstraintData(const String &name) :
-		_name(name),
-		_order(0),
+		ConstraintData(name),
 		_target(NULL),
 		_positionMode(PositionMode_Fixed),
 		_spacingMode(SpacingMode_Length),
@@ -52,19 +51,6 @@ PathConstraintData::PathConstraintData(const String &name) :
 		_spacing(0),
 		_rotateMix(0),
 		_translateMix(0) {
-	assert(_name.length() > 0);
-}
-
-const String &PathConstraintData::getName() {
-	return _name;
-}
-
-int PathConstraintData::getOrder() {
-	return _order;
-}
-
-void PathConstraintData::setOrder(int inValue) {
-	_order = inValue;
 }
 
 Vector<BoneData *> &PathConstraintData::getBones() {

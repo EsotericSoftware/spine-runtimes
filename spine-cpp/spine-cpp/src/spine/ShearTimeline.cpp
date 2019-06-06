@@ -56,6 +56,7 @@ void ShearTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 
 	Bone *boneP = skeleton._bones[_boneIndex];
 	Bone &bone = *boneP;
+	if (!bone._active) return;
 
 	if (time < _frames[0]) {
 		switch (blend) {

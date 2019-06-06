@@ -668,6 +668,7 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 	}
 
 	Bone *bone = skeleton._bones[rotateTimeline->_boneIndex];
+	if (!bone->isActive()) return;
 	Vector<float>& frames = rotateTimeline->_frames;
 	float r1, r2;
 	if (time < frames[0]) {

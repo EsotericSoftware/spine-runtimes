@@ -41,6 +41,7 @@
 #include <spine/Animation.h>
 #include <spine/TimelineType.h>
 #include <spine/Slot.h>
+#include <spine/Bone.h>
 #include <spine/SlotData.h>
 
 using namespace spine;
@@ -67,6 +68,7 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 
 	Slot *slotP = skeleton._slots[_slotIndex];
 	Slot &slot = *slotP;
+	if (!slot._bone.isActive()) return;
 
 	Attachment *slotAttachment = slot.getAttachment();
 	if (slotAttachment == NULL || !slotAttachment->getRTTI().instanceOf(VertexAttachment::rtti)) {

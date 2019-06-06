@@ -106,6 +106,9 @@ public:
 
 	void setTransformMode(TransformMode inValue);
 
+	bool isSkinRequired();
+	void setSkinRequired(bool inValue);
+
 private:
 	const int _index;
 	const String _name;
@@ -113,6 +116,7 @@ private:
 	float _length;
 	float _x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY;
 	TransformMode _transformMode;
+	bool _skinRequired;
 };
 }
 

@@ -41,7 +41,7 @@
 
 using namespace spine;
 
-RTTI_IMPL(IkConstraint, Constraint)
+RTTI_IMPL(IkConstraint, Updatable)
 
 void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress, bool stretch, bool uniform, float alpha) {
 	Bone *p = bone.getParent();
@@ -207,14 +207,15 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 	}
 }
 
-IkConstraint::IkConstraint(IkConstraintData &data, Skeleton &skeleton) : Constraint(),
+IkConstraint::IkConstraint(IkConstraintData &data, Skeleton &skeleton) : Updatable(),
 																		 _data(data),
 																		 _bendDirection(data.getBendDirection()),
 																		 _compress(data.getCompress()),
 																		 _stretch(data.getStretch()),
 																		 _mix(data.getMix()),
 																		 _target(skeleton.findBone(
-																				 data.getTarget()->getName())) {
+																				 data.getTarget()->getName())),
+																				 _active(false) {
 	_bones.ensureCapacity(_data.getBones().size());
 	for (size_t i = 0; i < _data.getBones().size(); i++) {
 		BoneData *boneData = _data.getBones()[i];
@@ -294,3 +295,12 @@ bool IkConstraint::getCompress() {
 void IkConstraint::setCompress(bool inValue) {
 	_compress = inValue;
 }
+
+bool IkConstraint::isActive() {
+	return _active;
+}
+
+void IkConstraint::setActive(bool inValue) {
+	_active = inValue;
+}
+

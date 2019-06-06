@@ -30,7 +30,7 @@
 #ifndef Spine_PathConstraint_h
 #define Spine_PathConstraint_h
 
-#include <spine/Constraint.h>
+#include <spine/ConstraintData.h>
 
 #include <spine/Vector.h>
 
@@ -41,7 +41,7 @@ namespace spine {
     class Bone;
     class Slot;
     
-    class SP_API PathConstraint : public Constraint {
+    class SP_API PathConstraint : public Updatable {
         friend class Skeleton;
         friend class PathConstraintMixTimeline;
         friend class PathConstraintPositionTimeline;
@@ -77,6 +77,10 @@ namespace spine {
         void setTarget(Slot* inValue);
         
         PathConstraintData& getData();
+
+		bool isActive();
+
+		void setActive(bool inValue);
         
     private:
         static const float EPSILON;
@@ -95,6 +99,8 @@ namespace spine {
         Vector<float> _curves;
         Vector<float> _lengths;
         Vector<float> _segments;
+
+        bool _active;
         
         Vector<float>& computeWorldPositions(PathAttachment& path, int spacesCount, bool tangents, bool percentPosition, bool percentSpacing);
         

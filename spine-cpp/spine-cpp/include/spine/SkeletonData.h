@@ -172,6 +172,7 @@ private:
 	float _x, _y, _width, _height;
 	String _version;
 	String _hash;
+	Vector<char*> _strings;
 
 	// Nonessential.
 	float _fps;

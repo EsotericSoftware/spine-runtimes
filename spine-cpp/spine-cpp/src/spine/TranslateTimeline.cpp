@@ -68,6 +68,7 @@ void TranslateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Ve
 
 	Bone *boneP = skeleton._bones[_boneIndex];
 	Bone &bone = *boneP;
+	if (!bone._active) return;
 
 	if (time < _frames[0]) {
 		switch (blend) {

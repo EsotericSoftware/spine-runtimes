@@ -60,6 +60,8 @@ public:
 
 	static int getInt(Json *object, const char *name, int defaultValue);
 
+	static bool getBoolean(Json *object, const char *name, bool defaultValue);
+
 	/* For analysing failed parses. This returns a pointer to the parse error. You'll probably need to look a few chars back to make sense of it. Defined when Json_create() returns 0. 0 when Json_create() succeeds. */
 	static const char *getError();
 

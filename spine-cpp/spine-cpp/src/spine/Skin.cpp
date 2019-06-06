@@ -37,6 +37,7 @@
 #include <spine/Skeleton.h>
 
 #include <spine/Slot.h>
+#include <spine/ConstraintData.h>
 
 #include <assert.h>
 
@@ -157,6 +158,12 @@ void Skin::attachAll(Skeleton &skeleton, Skin &oldSkin) {
 }
 
 void Skin::addSkin(Skin* other) {
+	for (int i = 0; i < other->getBones().size(); i++)
+		if (!_bones.contains(other->getBones()[i])) _bones.add(other->getBones()[i]);
+
+	for (int i = 0; i < other->getConstraints().size(); i++)
+		if (!_constraints.contains(other->getConstraints()[i])) _constraints.add(other->getConstraints()[i]);
+
 	AttachmentMap::Entries entries = other->getAttachments();
 	while(entries.hasNext()) {
 		AttachmentMap::Entry& entry = entries.next();
@@ -165,6 +172,12 @@ void Skin::addSkin(Skin* other) {
 }
 
 void Skin::copySkin(Skin* other) {
+	for (int i = 0; i < other->getBones().size(); i++)
+		if (!_bones.contains(other->getBones()[i])) _bones.add(other->getBones()[i]);
+
+	for (int i = 0; i < other->getConstraints().size(); i++)
+		if (!_constraints.contains(other->getConstraints()[i])) _constraints.add(other->getConstraints()[i]);
+
 	AttachmentMap::Entries entries = other->getAttachments();
 	while(entries.hasNext()) {
 		AttachmentMap::Entry& entry = entries.next();
@@ -174,4 +187,12 @@ void Skin::copySkin(Skin* other) {
 			setAttachment(entry._slotIndex, entry._name, entry._attachment->copy());
 		}
 	}
+}
+
+Vector<ConstraintData*>& Skin::getConstraints() {
+	return _constraints;
+}
+
+Vector<BoneData*>& Skin::getBones() {
+	return _bones;
 }

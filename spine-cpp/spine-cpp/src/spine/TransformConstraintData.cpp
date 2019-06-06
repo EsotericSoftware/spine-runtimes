@@ -39,8 +39,7 @@
 
 using namespace spine;
 TransformConstraintData::TransformConstraintData(const String &name) :
-		_name(name),
-		_order(0),
+		ConstraintData(name),
 		_target(NULL),
 		_rotateMix(0),
 		_translateMix(0),
@@ -54,15 +53,6 @@ TransformConstraintData::TransformConstraintData(const String &name) :
 		_offsetShearY(0),
 		_relative(false),
 		_local(false) {
-	assert(_name.length() > 0);
-}
-
-const String &TransformConstraintData::getName() {
-	return _name;
-}
-
-int TransformConstraintData::getOrder() {
-	return _order;
 }
 
 Vector<BoneData *> &TransformConstraintData::getBones() {
