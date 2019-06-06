@@ -216,7 +216,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 		Slot* slot = Skeleton->getDrawOrder()[i];
 		Attachment* attachment = slot->getAttachment();
 
-		if (slot->getColor().a == 0) {
+		if (slot->getColor().a == 0 || !slot->getBone().isActive()) {
 			clipper.clipEnd(*slot);
 			continue;
 		}

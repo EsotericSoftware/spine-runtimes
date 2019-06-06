@@ -124,6 +124,109 @@ public:
 	}
 };
 
+void USpineSkeletonDataAsset::SetRawData(TArray<uint8> &Data) {
+	this->rawData.Empty();
+	this->rawData.Append(Data);
+
+	if (skeletonData) {
+		delete skeletonData;
+		skeletonData = nullptr;
+	}
+
+	LoadInfo();
+}
+
+static bool checkVersion(const char* version) {
+	String tokens[3];
+	int currToken = 0;
+
+	while (*version && currToken < 3) {
+		if (*version == '.') {
+			version++;
+			currToken++;
+			continue;
+		}
+
+		char str[2];
+		str[0] = *version;
+		str[1] = 0;
+		tokens[currToken].append(str);
+		version++;
+	}
+	int versionNumber[3];
+	for (int i = 0; i < 3; i++)
+		versionNumber[i] = atoi(tokens[i].buffer());
+
+	return versionNumber[0] >= 3 && versionNumber[1] >= 8 && versionNumber[2] >= 12;
+}
+
+static bool checkJson(const char* jsonData) {
+	Json json(jsonData);
+	Json* skeleton = Json::getItem(&json, "skeleton");
+	if (!skeleton) return false;
+	const char* version = Json::getString(skeleton, "spine", 0);
+	if (!version) return false;
+
+	return checkVersion(version);
+}
+
+struct BinaryInput {
+	const unsigned char* cursor;
+	const unsigned char* end;
+};
+
+static unsigned char readByte(BinaryInput *input) {
+	return *input->cursor++;
+}
+
+static int readVarint(BinaryInput *input, bool optimizePositive) {
+	unsigned char b = readByte(input);
+	int value = b & 0x7F;
+	if (b & 0x80) {
+		b = readByte(input);
+		value |= (b & 0x7F) << 7;
+		if (b & 0x80) {
+			b = readByte(input);
+			value |= (b & 0x7F) << 14;
+			if (b & 0x80) {
+				b = readByte(input);
+				value |= (b & 0x7F) << 21;
+				if (b & 0x80) value |= (readByte(input) & 0x7F) << 28;
+			}
+		}
+	}
+
+	if (!optimizePositive) {
+		value = (((unsigned int)value >> 1) ^ -(value & 1));
+	}
+
+	return value;
+}
+
+static char *readString(BinaryInput *input) {
+	int length = readVarint(input, true);
+	char *string;
+	if (length == 0) {
+		return NULL;
+	}
+	string = SpineExtension::alloc<char>(length, __FILE__, __LINE__);
+	memcpy(string, input->cursor, length - 1);
+	input->cursor += length - 1;
+	string[length - 1] = '\0';
+	return string;
+}
+
+static bool checkBinary(const char* binaryData, int length) {
+	BinaryInput input;
+	input.cursor = (const unsigned char*)binaryData;
+	input.end = (const unsigned char*)binaryData + length;
+	SpineExtension::free(readString(&input), __FILE__, __LINE__);
+	char* version = readString(&input);
+	bool result = checkVersion(version);
+	SpineExtension::free(version, __FILE__, __LINE__);
+	return result;
+}
+
 void USpineSkeletonDataAsset::LoadInfo() {
 #if WITH_EDITORONLY_DATA
 	int dataLen = rawData.Num();
@@ -132,17 +235,18 @@ void USpineSkeletonDataAsset::LoadInfo() {
 	SkeletonData* skeletonData = nullptr;
 	if (skeletonDataFileName.GetPlainNameString().Contains(TEXT(".json"))) {
 		SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(&loader);
-		skeletonData = json->readSkeletonData((const char*)rawData.GetData());
+		if(checkJson((const char*)rawData.GetData())) skeletonData = json->readSkeletonData((const char*)rawData.GetData());
 		if (!skeletonData) {
-			FMessageDialog::Debugf(FText::FromString(UTF8_TO_TCHAR(json->getError().buffer())));
+			FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure the version of your exported data matches your runtime version.\n\n") + skeletonDataFileName.GetPlainNameString() + FString("\n\n") + UTF8_TO_TCHAR(json->getError().buffer())));
 			UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(json->getError().buffer()));
 		}
 		delete json;
-	} else {
+	}
+	else {
 		SkeletonBinary* binary = new (__FILE__, __LINE__) SkeletonBinary(&loader);
-		skeletonData = binary->readSkeletonData((const unsigned char*)rawData.GetData(), (int)rawData.Num());
+		if (checkBinary((const char*)rawData.GetData(), (int)rawData.Num())) skeletonData = binary->readSkeletonData((const unsigned char*)rawData.GetData(), (int)rawData.Num());
 		if (!skeletonData) {
-			FMessageDialog::Debugf(FText::FromString(UTF8_TO_TCHAR(binary->getError().buffer())));
+			FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure the version of your exported data matches your runtime version.\n\n") + skeletonDataFileName.GetPlainNameString() + FString("\n\n") + UTF8_TO_TCHAR(binary->getError().buffer())));
 			UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(binary->getError().buffer()));
 		}
 		delete binary;
@@ -168,18 +272,6 @@ void USpineSkeletonDataAsset::LoadInfo() {
 #endif
 }
 
-void USpineSkeletonDataAsset::SetRawData(TArray<uint8> &Data) {
-	this->rawData.Empty();
-	this->rawData.Append(Data);
-
-	if (skeletonData) {
-		delete skeletonData;
-		skeletonData = nullptr;
-	}
-
-	LoadInfo();
-}
-
 SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas) {
 	if (!skeletonData || lastAtlas != Atlas) {
 		if (skeletonData) {
@@ -189,20 +281,20 @@ SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas) {
 		int dataLen = rawData.Num();
 		if (skeletonDataFileName.GetPlainNameString().Contains(TEXT(".json"))) {
 			SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(Atlas);
-			this->skeletonData = json->readSkeletonData((const char*)rawData.GetData());
+			if (checkJson((const char*)rawData.GetData())) this->skeletonData = json->readSkeletonData((const char*)rawData.GetData());
 			if (!skeletonData) {
 #if WITH_EDITORONLY_DATA
-				FMessageDialog::Debugf(FText::FromString(UTF8_TO_TCHAR(json->getError().buffer())));
+				FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure the version of your exported data matches your runtime version.\n\n") + skeletonDataFileName.GetPlainNameString() + FString("\n\n") + UTF8_TO_TCHAR(json->getError().buffer())));
 #endif
 				UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(json->getError().buffer()));
 			}
 			delete json;
 		} else {
 			SkeletonBinary* binary = new (__FILE__, __LINE__) SkeletonBinary(Atlas);
-			this->skeletonData = binary->readSkeletonData((const unsigned char*)rawData.GetData(), (int)rawData.Num());
+			if (checkBinary((const char*)rawData.GetData(), (int)rawData.Num())) this->skeletonData = binary->readSkeletonData((const unsigned char*)rawData.GetData(), (int)rawData.Num());
 			if (!skeletonData) {
 #if WITH_EDITORONLY_DATA
-				FMessageDialog::Debugf(FText::FromString(UTF8_TO_TCHAR(binary->getError().buffer())));
+				FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure the version of your exported data matches your runtime version.\n\n") + skeletonDataFileName.GetPlainNameString() + FString("\n\n") + UTF8_TO_TCHAR(binary->getError().buffer())));
 #endif
 				UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(binary->getError().buffer()));
 			}
