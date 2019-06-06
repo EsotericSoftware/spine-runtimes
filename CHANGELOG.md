@@ -29,6 +29,7 @@
 
 ## C# ##
 * **Breaking changes**
+  * **Changed `IkConstraintData.Bones` type from `List<BoneData>` to `ExposedList<BoneData>`** for unification reasons. *Note: this modification will most likely not affect user code.*
 
 * **Additions**
 
