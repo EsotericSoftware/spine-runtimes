@@ -286,40 +286,40 @@ cp -f ../owl/export/owl.png "$RUNTIME_DIR/spine-starling/spine-starling-example/
 
 echo "spine-ts"
 rm "$RUNTIME_DIR/spine-ts/webgl/example/assets/"*
-cp -f ../coin/export/coin-pro.json "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
+cp -f ../coin/export/coin-pro.skel "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../coin/export/coin-pma.atlas "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../coin/export/coin-pma.png "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 
-cp -f ../goblins/export/goblins-pro.json "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
+cp -f ../goblins/export/goblins-pro.skel "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../goblins/export/goblins-pma.atlas "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../goblins/export/goblins-pma.png "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 
-cp -f ../raptor/export/raptor-pro.json "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
+cp -f ../raptor/export/raptor-pro.skel "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../raptor/export/raptor-pma.atlas "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../raptor/export/raptor-pma.png "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 
-cp -f ../spineboy/export/spineboy-pro.json "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
+cp -f ../spineboy/export/spineboy-pro.skel "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../spineboy/export/spineboy-pma.atlas "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../spineboy/export/spineboy-pma.png "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../spineboy/export/spineboy.png "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 
-cp -f ../tank/export/tank-pro.json "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
+cp -f ../tank/export/tank-pro.skel "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../tank/export/tank-pma.atlas "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../tank/export/tank-pma.png "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 
-cp -f ../vine/export/vine-pro.json "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
+cp -f ../vine/export/vine-pro.skel "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../vine/export/vine-pma.atlas "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../vine/export/vine-pma.png "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 
-cp -f ../owl/export/owl-pro.json "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
+cp -f ../owl/export/owl-pro.skel "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../owl/export/owl-pma.atlas "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../owl/export/owl-pma.png "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 
-cp -f ../stretchyman/export/stretchyman-pro.json "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
+cp -f ../stretchyman/export/stretchyman-pro.skel "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../stretchyman/export/stretchyman-pma.atlas "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 cp -f ../stretchyman/export/stretchyman-pma.png "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 
-cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.json "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
+cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.skel "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 
 rm "$RUNTIME_DIR/spine-ts/canvas/example/assets/"*
 cp -f ../spineboy/export/spineboy-ess.json "$RUNTIME_DIR/spine-ts/canvas/example/assets/"
@@ -336,7 +336,7 @@ cp -f ../raptor/export/raptor-pro.json "$RUNTIME_DIR/spine-ts/player/example/ass
 cp -f ../raptor/export/raptor-pma.atlas "$RUNTIME_DIR/spine-ts/player/example/assets/"
 cp -f ../raptor/export/raptor-pma.png "$RUNTIME_DIR/spine-ts/player/example/assets/"
 
-cp -f ../spineboy/export/spineboy-pro.json "$RUNTIME_DIR/spine-ts/player/example/assets/"
+cp -f ../spineboy/export/spineboy-pro.skel "$RUNTIME_DIR/spine-ts/player/example/assets/"
 cp -f ../spineboy/export/spineboy-pma.atlas "$RUNTIME_DIR/spine-ts/player/example/assets/"
 cp -f ../spineboy/export/spineboy-pma.png "$RUNTIME_DIR/spine-ts/player/example/assets/"
 

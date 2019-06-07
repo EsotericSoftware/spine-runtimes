@@ -64,22 +64,22 @@ function init () {
 	shapes = new spine.webgl.ShapeRenderer(gl);
 	assetManager = new spine.webgl.AssetManager(gl);
 
-	// Tell AssetManager to load the resources for each model, including the exported .json file, the .atlas file and the .png
+	// Tell AssetManager to load the resources for each model, including the exported .skel file, the .atlas file and the .png
 	// file for the atlas. We then wait until all resources are loaded in the load() method.
-	assetManager.loadText("assets/spineboy-pro.json");
+	assetManager.loadBinary("assets/spineboy-pro.skel");
 	assetManager.loadTextureAtlas("assets/spineboy-pma.atlas");
-	assetManager.loadText("assets/raptor-pro.json");
+	assetManager.loadBinary("assets/raptor-pro.skel");
 	assetManager.loadTextureAtlas("assets/raptor-pma.atlas");
-	assetManager.loadText("assets/tank-pro.json");
+	assetManager.loadBinary("assets/tank-pro.skel");
 	assetManager.loadTextureAtlas("assets/tank-pma.atlas");
-	assetManager.loadText("assets/goblins-pro.json");
+	assetManager.loadBinary("assets/goblins-pro.skel");
 	assetManager.loadTextureAtlas("assets/goblins-pma.atlas");
-	assetManager.loadText("assets/vine-pro.json");
+	assetManager.loadBinary("assets/vine-pro.skel");
 	assetManager.loadTextureAtlas("assets/vine-pma.atlas");
-	assetManager.loadText("assets/stretchyman-pro.json");
+	assetManager.loadBinary("assets/stretchyman-pro.skel");
 	assetManager.loadTextureAtlas("assets/stretchyman-pma.atlas");
-	assetManager.loadText("assets/stretchyman-stretchy-ik-pro.json");
-	assetManager.loadText("assets/coin-pro.json");
+	assetManager.loadBinary("assets/stretchyman-stretchy-ik-pro.skel");
+	assetManager.loadBinary("assets/coin-pro.skel");
 	assetManager.loadTextureAtlas("assets/coin-pma.atlas");
 	requestAnimationFrame(load);
 }
@@ -111,11 +111,11 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
 	atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 
-	// Create a SkeletonJson instance for parsing the .json file.
-	var skeletonJson = new spine.SkeletonJson(atlasLoader);
+	// Create a SkeletonBinary instance for parsing the .skel file.
+	var skeletonBinary = new spine.SkeletonBinary(atlasLoader);
 
 	// Set the scale to apply during parsing, parse the file, and create a new skeleton.
-	var skeletonData = skeletonJson.readSkeletonData(assetManager.get("assets/" + name + ".json"));
+	var skeletonData = skeletonBinary.readSkeletonData(assetManager.get("assets/" + name + ".skel"));
 	var skeleton = new spine.Skeleton(skeletonData);
 	skeleton.setSkinByName(skin);
 	var bounds = calculateBounds(skeleton);

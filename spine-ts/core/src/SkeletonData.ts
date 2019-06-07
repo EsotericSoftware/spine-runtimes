@@ -45,6 +45,7 @@ module spine {
 		// Nonessential
 		fps = 0;
 		imagesPath: string;
+		audioPath: string;
 
 		findBone (boneName: string) {
 			if (boneName == null) throw new Error("boneName cannot be null.");

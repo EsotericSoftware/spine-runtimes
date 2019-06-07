@@ -384,6 +384,7 @@ declare module spine {
 		constructor(textureLoader: (image: HTMLImageElement) => any, pathPrefix?: string);
 		private static downloadText(url, success, error);
 		private static downloadBinary(url, success, error);
+		loadBinary(path: string, success?: (path: string, binary: Uint8Array) => void, error?: (path: string, error: string) => void): void;
 		loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, error: string) => void): void;
 		loadTexture(path: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
 		loadTextureData(path: string, data: string, success?: (path: string, image: HTMLImageElement) => void, error?: (path: string, error: string) => void): void;
@@ -481,6 +482,7 @@ declare module spine {
 		shearY: number;
 		transformMode: TransformMode;
 		skinRequired: boolean;
+		color: Color;
 		constructor(index: number, name: string, parent: BoneData);
 	}
 	enum TransformMode {
@@ -681,6 +683,42 @@ declare module spine {
 	}
 }
 declare module spine {
+	class SkeletonBinary {
+		static AttachmentTypeValues: number[];
+		static TransformModeValues: TransformMode[];
+		static PositionModeValues: PositionMode[];
+		static SpacingModeValues: SpacingMode[];
+		static RotateModeValues: RotateMode[];
+		static BlendModeValues: BlendMode[];
+		static BONE_ROTATE: number;
+		static BONE_TRANSLATE: number;
+		static BONE_SCALE: number;
+		static BONE_SHEAR: number;
+		static SLOT_ATTACHMENT: number;
+		static SLOT_COLOR: number;
+		static SLOT_TWO_COLOR: number;
+		static PATH_POSITION: number;
+		static PATH_SPACING: number;
+		static PATH_MIX: number;
+		static CURVE_LINEAR: number;
+		static CURVE_STEPPED: number;
+		static CURVE_BEZIER: number;
+		attachmentLoader: AttachmentLoader;
+		scale: number;
+		private linkedMeshes;
+		constructor(attachmentLoader: AttachmentLoader);
+		readSkeletonData(binary: Uint8Array): SkeletonData;
+		private readSkin(input, skeletonData, defaultSkin, nonessential);
+		private readAttachment(input, skeletonData, skin, slotIndex, attachmentName, nonessential);
+		private readVertices(input, vertexCount);
+		private readFloatArray(input, n, scale);
+		private readShortArray(input);
+		private readAnimation(input, name, skeletonData);
+		private readCurve(input, frameIndex, timeline);
+		setCurve(timeline: CurveTimeline, frameIndex: number, cx1: number, cy1: number, cx2: number, cy2: number): void;
+	}
+}
+declare module spine {
 	class SkeletonBounds {
 		minX: number;
 		minY: number;
@@ -742,6 +780,7 @@ declare module spine {
 		hash: string;
 		fps: number;
 		imagesPath: string;
+		audioPath: string;
 		findBone(boneName: string): BoneData;
 		findBoneIndex(boneName: string): number;
 		findSlot(slotName: string): SlotData;
@@ -997,6 +1036,8 @@ declare module spine {
 		setFromString(hex: string): this;
 		add(r: number, g: number, b: number, a: number): this;
 		clamp(): this;
+		static rgba8888ToColor(color: Color, value: number): void;
+		static rgb888ToColor(color: Color, value: number): void;
 	}
 	class MathUtils {
 		static PI: number;
@@ -1132,6 +1173,7 @@ declare module spine {
 		LinkedMesh = 3,
 		Path = 4,
 		Point = 5,
+		Clipping = 6,
 	}
 }
 declare module spine {
@@ -1729,6 +1771,7 @@ declare module spine {
 	}
 	interface SpinePlayerConfig {
 		jsonUrl: string;
+		skelUrl: string;
 		atlasUrl: string;
 		animation: string;
 		animations: string[];
