@@ -308,6 +308,7 @@ void Skeleton::setSkin(const String &skinName) {
 }
 
 void Skeleton::setSkin(Skin *newSkin) {
+	if (_skin == newSkin) return;
 	if (newSkin != NULL) {
 		if (_skin != NULL) {
 			Skeleton &thisRef = *this;
@@ -328,6 +329,7 @@ void Skeleton::setSkin(Skin *newSkin) {
 	}
 
 	_skin = newSkin;
+	updateCache();
 }
 
 Attachment *Skeleton::getAttachment(const String &slotName, const String &attachmentName) {

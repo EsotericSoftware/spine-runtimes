@@ -535,6 +535,7 @@ int spSkeleton_setSkinByName (spSkeleton* self, const char* skinName) {
 }
 
 void spSkeleton_setSkin (spSkeleton* self, spSkin* newSkin) {
+	if (self->skin == newSkin) return;
 	if (newSkin) {
 		if (self->skin)
 			spSkin_attachAll(newSkin, self, self->skin);
@@ -551,6 +552,7 @@ void spSkeleton_setSkin (spSkeleton* self, spSkin* newSkin) {
 		}
 	}
 	CONST_CAST(spSkin*, self->skin) = newSkin;
+	spSkeleton_updateCache(self);
 }
 
 spAttachment* spSkeleton_getAttachmentForSlotName (const spSkeleton* self, const char* slotName, const char* attachmentName) {
