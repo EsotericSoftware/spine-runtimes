@@ -54,6 +54,7 @@ function IkConstraint.new (data, skeleton)
 		compress = data.compress,
 		stretch = data.stretch,
 		bendDirection = data.bendDirection,
+    active = false
 	}
 	setmetatable(self, IkConstraint)
 

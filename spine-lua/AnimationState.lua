@@ -488,6 +488,7 @@ function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, bl
   local rotateTimeline = timeline
   local frames = rotateTimeline.frames
   local bone = skeleton.bones[rotateTimeline.boneIndex]
+  if not bone.active then return end
 	local r1 = 0
 	local r2 = 0
   if time < frames[0] then

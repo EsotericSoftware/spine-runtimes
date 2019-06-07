@@ -129,6 +129,13 @@ function utils.arrayCopy (src, srcOffset, dst, dstOffset, size)
 	end
 end
 
+function utils.arrayContains(array, element)
+  for i, arrayElement in ipairs(array) do    
+    if arrayElement == element then return true end
+  end
+  return false
+end
+
 function utils.clamp (value, min, max)
 	if value < min then return min end
 	if value > max then return max end

@@ -259,6 +259,7 @@ function Animation.RotateTimeline.new (frameCount)
 		local frames = self.frames
 
 		local bone = skeleton.bones[self.boneIndex]
+    if not bone.active then return end
 		if time < frames[0] then
 			if blend == MixBlend.setup then
 				bone.rotation = bone.data.rotation
@@ -334,6 +335,8 @@ function Animation.TranslateTimeline.new (frameCount)
 		local frames = self.frames
 
 		local bone = skeleton.bones[self.boneIndex]
+    if not bone.active then return end
+        
 		if time < frames[0] then
 			if blend == MixBlend.setup then
 				bone.x = bone.data.x
@@ -398,6 +401,8 @@ function Animation.ScaleTimeline.new (frameCount)
 		local frames = self.frames
 
 		local bone = skeleton.bones[self.boneIndex]
+    if not bone.active then return end
+    
 		if time < frames[0] then
 			if blend == MixBlend.setup then
 				bone.scaleX = bone.data.scaleX
@@ -499,6 +504,8 @@ function Animation.ShearTimeline.new (frameCount)
 		local frames = self.frames
 
 		local bone = skeleton.bones[self.boneIndex]
+    if not bone.active then return end
+    
 		if time < frames[0] then
 			if blend == MixBlend.setup then
 				bone.shearX = bone.data.shearX
@@ -577,6 +584,7 @@ function Animation.ColorTimeline.new (frameCount)
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 		local slot = skeleton.slots[self.slotIndex]
+    if not slot.bone.active then return end
 		if time < frames[0] then
 			if blend == MixBlend.setup then
 				slot.color:setFrom(slot.data.color)
@@ -668,6 +676,8 @@ function Animation.TwoColorTimeline.new (frameCount)
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local frames = self.frames
 		local slot = skeleton.slots[self.slotIndex]
+    if not slot.bone.active then return end
+    
 		if time < frames[0] then
 			if blend == MixBlend.setup then
 				slot.color:setFrom(slot.data.color)
@@ -758,6 +768,7 @@ function Animation.AttachmentTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local slot = skeleton.slots[self.slotIndex]
+    if not slot.bone.active then return end
 		local attachmentName
 		if direction == MixDirection.out and blend == MixBlend.setup then
 			attachmentName = slot.data.attachmentName
@@ -820,6 +831,8 @@ function Animation.DeformTimeline.new (frameCount)
 
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local slot = skeleton.slots[self.slotIndex]
+    if not slot.bone.active then return end
+    
 		local slotAttachment = slot.attachment
 		if not slotAttachment then return end
 		if not (slotAttachment.type == AttachmentType.mesh or slotAttachment.type == AttachmentType.linkedmesh or slotAttachment.type == AttachmentType.path or slotAttachment.type == AttachmentType.boundingbox) then return end
@@ -1211,6 +1224,7 @@ function Animation.IkConstraintTimeline.new (frameCount)
 		local frames = self.frames
 
 		local constraint = skeleton.ikConstraints[self.ikConstraintIndex]
+    if not constraint.active then return end
 		if time < frames[0] then
 			if blend == MixBlend.setup then
 				constraint.mix = constraint.data.mix
@@ -1316,6 +1330,8 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 		local frames = self.frames
 
 		local constraint = skeleton.transformConstraints[self.transformConstraintIndex]
+    if not constraint.active then return end
+    
 		if time < frames[0] then
 			local data = constraint.data
 			if blend == MixBlend.setup then
@@ -1402,6 +1418,8 @@ function Animation.PathConstraintPositionTimeline.new (frameCount)
 		local frames = self.frames
 
 		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
+    if not constraint.active then return end
+    
 		if (time < frames[0]) then
 			if blend == MixBlend.setup then
 				constraint.position = constraint.data.position
@@ -1461,6 +1479,8 @@ function Animation.PathConstraintSpacingTimeline.new (frameCount)
 		local frames = self.frames
 
 		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
+    if not constraint.active then return end
+    
 		if (time < frames[0]) then
 			if blend == MixBlend.setup then
 				constraint.spacing = constraint.data.spacing
@@ -1524,6 +1544,8 @@ function Animation.PathConstraintMixTimeline.new (frameCount)
 		local frames = self.frames
 
 		local constraint = skeleton.pathConstraints[self.pathConstraintIndex]
+    if not constraint.active then return end
+    
 		if (time < frames[0]) then
 			if blend == MixBlend.setup then
 				constraint.rotateMix = constraint.data.rotateMix

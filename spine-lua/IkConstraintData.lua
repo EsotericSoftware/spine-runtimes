@@ -34,6 +34,7 @@ function IkConstraintData.new (name)
 	local self = {
 		name = name,
 		order = 0,
+    skinRequired = false,
 		bones = {},
 		target = nil,
 		bendDirection = 1,

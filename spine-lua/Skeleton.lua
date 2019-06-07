@@ -113,8 +113,21 @@ function Skeleton:updateCache ()
 
 	local bones = self.bones
 	for _, bone in ipairs(bones) do
-		bone.sorted = false
+    bone.sorted = bone.data.skinRequired
+		bone.active = not bone.sorted
 	end
+  
+  if self.skin then
+    local skinBones = self.skin.bones
+    for i, boneData in ipairs(skinBones) do
+      local bone = bones[boneData.index]
+      while bone do
+        bone.sorted = false
+        bone.active = true
+        bone = bone.parent
+      end
+    end
+  end
 
 	local ikConstraints = self.ikConstraints
 	local transformConstraints = self.transformConstraints
@@ -172,6 +185,9 @@ function Skeleton:updateCache ()
 end
 
 function Skeleton:sortIkConstraint (constraint)
+  constraint.active = constraint.target.active and ((not constraint.data.skinRequired) or (self.skin and utils.arrayContains(self.skin.constraints, constraint)))
+  if not constraint.active then return end
+  
 	local target = constraint.target
 	self:sortBone(target)
 	
@@ -198,6 +214,9 @@ function Skeleton:sortIkConstraint (constraint)
 end
 
 function Skeleton:sortPathConstraint(constraint)
+  constraint.active = constraint.target.bone.active and ((not constraint.data.skinRequired) or (self.skin and utils.arrayContains(self.skin.constraints, constraint)))
+  if not constraint.active then return end
+  
 	local slot = constraint.target
 	local slotIndex = slot.data.index
 	local slotBone = slot.bone
@@ -229,6 +248,9 @@ function Skeleton:sortPathConstraint(constraint)
 end
 
 function Skeleton:sortTransformConstraint(constraint)
+  constraint.active = constraint.target.active and ((not constraint.data.skinRequired) or (self.skin and utils.arrayContains(self.skin.constraints, constraint)))
+  if not constraint.active then return end
+  
 	self:sortBone(constraint.target)
 	
 	local constrained = constraint.bones	
@@ -301,8 +323,10 @@ end
 
 function Skeleton:sortReset(bones)
 	for _, bone in ipairs(bones) do
-		if bone.sorted then self:sortReset(bone.children) end
-		bone.sorted = false
+    if bone.active then 
+      if bone.sorted then self:sortReset(bone.children) end
+      bone.sorted = false
+    end
 	end
 end
 
@@ -412,6 +436,7 @@ function Skeleton:setSkin (skinName)
 end
 
 function Skeleton:setSkinByReference(newSkin)
+  if (self.skin == newSkin) then return end
 	if newSkin then
 		if self.skin then
 			newSkin:attachAll(self, self.skin)
@@ -429,6 +454,7 @@ function Skeleton:setSkinByReference(newSkin)
 		end
 	end
 	self.skin = newSkin
+  self:updateCache()
 end
 
 function Skeleton:getAttachment (slotName, attachmentName)
@@ -498,28 +524,30 @@ function Skeleton:getBounds(offset, size)
 			local maxX = -99999999
 			local maxY = -99999999
 			for _, slot in ipairs(drawOrder) do
-				local vertices = {}
-				local attachment = slot.attachment
-				if attachment then
-					if attachment.type == AttachmentType.region then
-						attachment:computeWorldVertices(slot.bone, vertices, 0, 2)
-					elseif attachment.type == AttachmentType.mesh then
-						attachment:computeWorldVertices(slot, 0, attachment.worldVerticesLength, vertices, 0, 2)
-					end
-				end
-				if #vertices > 0 then
-					local nn = #vertices
-					local ii = 1
-					while ii <= nn do
-						local x = vertices[ii]
-						local y = vertices[ii + 1]
-						minX = math_min(minX, x)
-						minY = math_min(minY, y)
-						maxX = math_max(maxX, x)
-						maxY = math_max(maxY, y)
-						ii = ii + 2
-					end
-				end
+        if slot.bone.active then
+          local vertices = {}
+          local attachment = slot.attachment
+          if attachment then
+            if attachment.type == AttachmentType.region then
+              attachment:computeWorldVertices(slot.bone, vertices, 0, 2)
+            elseif attachment.type == AttachmentType.mesh then
+              attachment:computeWorldVertices(slot, 0, attachment.worldVerticesLength, vertices, 0, 2)
+            end
+          end
+          if #vertices > 0 then
+            local nn = #vertices
+            local ii = 1
+            while ii <= nn do
+              local x = vertices[ii]
+              local y = vertices[ii + 1]
+              minX = math_min(minX, x)
+              minY = math_min(minY, y)
+              maxX = math_max(maxX, x)
+              maxY = math_max(maxY, y)
+              ii = ii + 2
+            end
+          end
+        end
 			end
 			offset[1] = minX
 			offset[2] = minY
