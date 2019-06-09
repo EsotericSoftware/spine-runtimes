@@ -362,6 +362,7 @@ public class Skeleton {
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
 	public void updateWorldTransform (Bone parent) {
+		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
 		// This partial update avoids computing the world transform for constrained bones when 1) the bone is not updated
 		// before the constraint, 2) the constraint only needs to access the applied local transform, and 3) the constraint calls
 		// updateWorldTransform.
@@ -462,6 +463,7 @@ public class Skeleton {
 		return bones;
 	}
 
+	/** The list of bones and constraints, sorted in the order they should be updated, as computed by {@link #updateCache()}. */
 	public Array<Updatable> getUpdateCache () {
 		return updateCache;
 	}
@@ -473,7 +475,7 @@ public class Skeleton {
 	}
 
 	/** Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it
-	 * multiple times.
+	 * repeatedly.
 	 * @return May be null. */
 	public Bone findBone (String boneName) {
 		if (boneName == null) throw new IllegalArgumentException("boneName cannot be null.");
@@ -491,7 +493,7 @@ public class Skeleton {
 	}
 
 	/** Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
-	 * multiple times.
+	 * repeatedly.
 	 * @return May be null. */
 	public Slot findSlot (String slotName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
@@ -607,7 +609,7 @@ public class Skeleton {
 	}
 
 	/** Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
-	 * than to call it multiple times.
+	 * than to call it repeatedly.
 	 * @return May be null. */
 	public IkConstraint findIkConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
@@ -625,7 +627,7 @@ public class Skeleton {
 	}
 
 	/** Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
-	 * this method than to call it multiple times.
+	 * this method than to call it repeatedly.
 	 * @return May be null. */
 	public TransformConstraint findTransformConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
@@ -643,7 +645,7 @@ public class Skeleton {
 	}
 
 	/** Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
-	 * than to call it multiple times.
+	 * than to call it repeatedly.
 	 * @return May be null. */
 	public PathConstraint findPathConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
@@ -658,10 +660,11 @@ public class Skeleton {
 	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
 	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
 	 * @param size An output value, the width and height of the AABB.
-	 * @param temp Working memory. */
+	 * @param temp Working memory to temporarily store attachments' computed world vertices. */
 	public void getBounds (Vector2 offset, Vector2 size, FloatArray temp) {
 		if (offset == null) throw new IllegalArgumentException("offset cannot be null.");
 		if (size == null) throw new IllegalArgumentException("size cannot be null.");
+		if (temp == null) throw new IllegalArgumentException("temp cannot be null.");
 		Array<Slot> drawOrder = this.drawOrder;
 		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
@@ -748,6 +751,7 @@ public class Skeleton {
 		this.y = y;
 	}
 
+	/** Sets the skeleton X and Y position, which is added to the root bone worldX and worldY position. */
 	public void setPosition (float x, float y) {
 		this.x = x;
 		this.y = y;

@@ -122,6 +122,7 @@ public class SkeletonBinary {
 	}
 
 	public void setScale (float scale) {
+		if (scale == 0) throw new IllegalArgumentException("scale cannot be 0.");
 		this.scale = scale;
 	}
 

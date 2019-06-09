@@ -173,6 +173,7 @@ public class BoneData {
 	}
 
 	public void setTransformMode (TransformMode transformMode) {
+		if (transformMode == null) throw new IllegalArgumentException("transformMode cannot be null.");
 		this.transformMode = transformMode;
 	}
 

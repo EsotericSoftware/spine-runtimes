@@ -70,7 +70,8 @@ public class Animation {
 	/** Applies all the animation's timelines to the specified skeleton.
 	 * <p>
 	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection)}.
-	 * @param loop If true, the animation repeats after {@link #getDuration()}. */
+	 * @param loop If true, the animation repeats after {@link #getDuration()}.
+	 * @param events May be null to ignore fired events. */
 	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, Array<Event> events, float alpha,
 		MixBlend blend, MixDirection direction) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
@@ -144,12 +145,12 @@ public class Animation {
 		 *           (exclusive) and <code>time</code> (inclusive).
 		 * @param time The time within the animation. Most timelines find the key before and the key after this time so they can
 		 *           interpolate between the keys.
-		 * @param events If any events are fired, they are added to this list. Can be null to ignore firing events or if the
-		 *           timeline does not fire events.
+		 * @param events If any events are fired, they are added to this list. Can be null to ignore fired events or if the timeline
+		 *           does not fire events.
 		 * @param alpha 0 applies the current or setup value (depending on <code>blend</code>). 1 applies the timeline value.
 		 *           Between 0 and 1 applies a value between the current or setup value and the timeline value. By adjusting
 		 *           <code>alpha</code> over time, an animation can be mixed in or out. <code>alpha</code> can also be useful to
-		 *           apply animations on top of each other (layered).
+		 *           apply animations on top of each other (layering).
 		 * @param blend Controls how mixing is applied when <code>alpha</code> < 1.
 		 * @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions,
 		 *           such as {@link DrawOrderTimeline} or {@link AttachmentTimeline}. */
@@ -160,7 +161,8 @@ public class Animation {
 		public int getPropertyId ();
 	}
 
-	/** Controls how a timeline value is mixed with the setup pose value or current pose value.
+	/** Controls how a timeline value is mixed with the setup pose value or current pose value when a timeline's <code>alpha</code>
+	 * < 1.
 	 * <p>
 	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection)}. */
 	static public enum MixBlend {
@@ -181,7 +183,9 @@ public class Animation {
 		/** Transitions from the current value to the current value plus the timeline value. No change is made before the first key
 		 * (the current value is kept until the first key).
 		 * <p>
-		 * <code>add</code> is intended for animations layered on top of others, not for the first animations applied. */
+		 * <code>add</code> is intended for animations layered on top of others, not for the first animations applied. Properties
+		 * keyed by additive animations must be set manually or by another animation before applying the additive animations, else
+		 * the property values will increase continually. */
 		add
 	}
 
@@ -779,7 +783,8 @@ public class Animation {
 			this.slotIndex = index;
 		}
 
-		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed. */
+		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed. The {@link Slot#getDarkColor()} must not be
+		 * null. */
 		public int getSlotIndex () {
 			return slotIndex;
 		}

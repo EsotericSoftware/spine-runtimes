@@ -31,6 +31,7 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.OrderedMap;
+
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 
@@ -53,13 +54,15 @@ public class Skin {
 
 	/** Adds an attachment to the skin for the specified slot index and name. */
 	public void setAttachment (int slotIndex, String name, Attachment attachment) {
-		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
+		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
 		attachments.put(new SkinEntry(slotIndex, name, attachment), attachment);
 	}
 
 	/** Adds all attachments, bones, and constraints from the specified skin to this skin. */
 	public void addSkin (Skin skin) {
+		if (skin == null) throw new IllegalArgumentException("skin cannot be null.");
+
 		for (BoneData data : skin.bones)
 			if (!bones.contains(data, true)) bones.add(data);
 
@@ -70,8 +73,11 @@ public class Skin {
 			setAttachment(entry.slotIndex, entry.name, entry.attachment);
 	}
 
-	/** Adds all attachments, bones, and constraints from the specified skin to this skin. Attachments are deep copied. */
+	/** Adds all bones and constraints and copies of all attachments from the specified skin to this skin. Mesh attachments are not
+	 * copied, instead a new linked mesh is created. The attachment copies can be modified without affecting the originals. */
 	public void copySkin (Skin skin) {
+		if (skin == null) throw new IllegalArgumentException("skin cannot be null.");
+
 		for (BoneData data : skin.bones)
 			if (!bones.contains(data, true)) bones.add(data);
 
@@ -80,8 +86,7 @@ public class Skin {
 
 		for (SkinEntry entry : skin.attachments.keys()) {
 			if (entry.attachment instanceof MeshAttachment)
-				setAttachment(entry.slotIndex, entry.name,
-					entry.attachment != null ? ((MeshAttachment)entry.attachment).newLinkedMesh() : null);
+				setAttachment(entry.slotIndex, entry.name, ((MeshAttachment)entry.attachment).newLinkedMesh());
 			else
 				setAttachment(entry.slotIndex, entry.name, entry.attachment != null ? entry.attachment.copy() : null);
 		}
@@ -108,6 +113,8 @@ public class Skin {
 
 	/** Returns all attachments in this skin for the specified slot index. */
 	public void getAttachments (int slotIndex, Array<SkinEntry> attachments) {
+		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
+		if (attachments == null) throw new IllegalArgumentException("attachments cannot be null.");
 		for (SkinEntry entry : this.attachments.keys())
 			if (entry.slotIndex == slotIndex) attachments.add(entry);
 	}

@@ -259,7 +259,7 @@ public class MeshAttachment extends VertexAttachment {
 		return copy;
 	}
 
-	/** Returns a new mesh with this mesh set as the {@link #parentMesh}. **/
+	/** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. **/
 	public MeshAttachment newLinkedMesh () {
 		MeshAttachment mesh = new MeshAttachment(name);
 		mesh.region = region;

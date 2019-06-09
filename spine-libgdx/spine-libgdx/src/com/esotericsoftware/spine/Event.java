@@ -73,6 +73,7 @@ public class Event {
 	}
 
 	public void setString (String stringValue) {
+		if (stringValue == null) throw new IllegalArgumentException("stringValue cannot be null.");
 		this.stringValue = stringValue;
 	}
 

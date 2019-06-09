@@ -462,6 +462,7 @@ public class AnimationState {
 	 * It may be desired to use {@link AnimationState#setEmptyAnimation(int, float)} to mix the skeletons back to the setup pose,
 	 * rather than leaving them in their current pose. */
 	public void clearTrack (int trackIndex) {
+		if (trackIndex < 0) throw new IllegalArgumentException("trackIndex must be >= 0.");
 		if (trackIndex >= tracks.size) return;
 		TrackEntry current = tracks.get(trackIndex);
 		if (current == null) return;
@@ -521,6 +522,7 @@ public class AnimationState {
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	public TrackEntry setAnimation (int trackIndex, Animation animation, boolean loop) {
+		if (trackIndex < 0) throw new IllegalArgumentException("trackIndex must be >= 0.");
 		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
 		boolean interrupt = true;
 		TrackEntry current = expandToIndex(trackIndex);
@@ -560,6 +562,7 @@ public class AnimationState {
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	public TrackEntry addAnimation (int trackIndex, Animation animation, boolean loop, float delay) {
+		if (trackIndex < 0) throw new IllegalArgumentException("trackIndex must be >= 0.");
 		if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
 
 		TrackEntry last = expandToIndex(trackIndex);
@@ -783,6 +786,7 @@ public class AnimationState {
 
 	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
 	public TrackEntry getCurrent (int trackIndex) {
+		if (trackIndex < 0) throw new IllegalArgumentException("trackIndex must be >= 0.");
 		if (trackIndex >= tracks.size) return null;
 		return tracks.get(trackIndex);
 	}
@@ -892,6 +896,7 @@ public class AnimationState {
 		}
 
 		public void setAnimation (Animation animation) {
+			if (animation == null) throw new IllegalArgumentException("animation cannot be null.");
 			this.animation = animation;
 		}
 
@@ -1124,6 +1129,7 @@ public class AnimationState {
 		}
 
 		public void setMixBlend (MixBlend mixBlend) {
+			if (mixBlend == null) throw new IllegalArgumentException("mixBlend cannot be null.");
 			this.mixBlend = mixBlend;
 		}
 
@@ -1178,40 +1184,40 @@ public class AnimationState {
 		private final Array objects = new Array();
 		boolean drainDisabled;
 
-		public void start (TrackEntry entry) {
+		void start (TrackEntry entry) {
 			objects.add(EventType.start);
 			objects.add(entry);
 			animationsChanged = true;
 		}
 
-		public void interrupt (TrackEntry entry) {
+		void interrupt (TrackEntry entry) {
 			objects.add(EventType.interrupt);
 			objects.add(entry);
 		}
 
-		public void end (TrackEntry entry) {
+		void end (TrackEntry entry) {
 			objects.add(EventType.end);
 			objects.add(entry);
 			animationsChanged = true;
 		}
 
-		public void dispose (TrackEntry entry) {
+		void dispose (TrackEntry entry) {
 			objects.add(EventType.dispose);
 			objects.add(entry);
 		}
 
-		public void complete (TrackEntry entry) {
+		void complete (TrackEntry entry) {
 			objects.add(EventType.complete);
 			objects.add(entry);
 		}
 
-		public void event (TrackEntry entry, Event event) {
+		void event (TrackEntry entry, Event event) {
 			objects.add(EventType.event);
 			objects.add(entry);
 			objects.add(event);
 		}
 
-		public void drain () {
+		void drain () {
 			if (drainDisabled) return; // Not reentrant.
 			drainDisabled = true;
 
@@ -1260,7 +1266,7 @@ public class AnimationState {
 			drainDisabled = false;
 		}
 
-		public void clear () {
+		void clear () {
 			objects.clear();
 		}
 	}

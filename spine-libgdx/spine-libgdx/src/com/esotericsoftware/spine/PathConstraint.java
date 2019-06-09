@@ -497,6 +497,7 @@ public class PathConstraint implements Updatable {
 	}
 
 	public void setTarget (Slot target) {
+		if (target == null) throw new IllegalArgumentException("target cannot be null.");
 		this.target = target;
 	}
 

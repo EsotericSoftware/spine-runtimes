@@ -301,6 +301,7 @@ public class TransformConstraint implements Updatable {
 	}
 
 	public void setTarget (Bone target) {
+		if (target == null) throw new IllegalArgumentException("target cannot be null.");
 		this.target = target;
 	}
 

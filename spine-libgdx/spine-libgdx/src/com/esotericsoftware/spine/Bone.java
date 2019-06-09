@@ -538,6 +538,7 @@ public class Bone implements Updatable {
 
 	/** Transforms a point from world coordinates to the bone's local coordinates. */
 	public Vector2 worldToLocal (Vector2 world) {
+		if (world == null) throw new IllegalArgumentException("world cannot be null.");
 		float invDet = 1 / (a * d - b * c);
 		float x = world.x - worldX, y = world.y - worldY;
 		world.x = x * d * invDet - y * b * invDet;
@@ -547,6 +548,7 @@ public class Bone implements Updatable {
 
 	/** Transforms a point from the bone's local coordinates to world coordinates. */
 	public Vector2 localToWorld (Vector2 local) {
+		if (local == null) throw new IllegalArgumentException("local cannot be null.");
 		float x = local.x, y = local.y;
 		local.x = x * a + y * b + worldX;
 		local.y = x * c + y * d + worldY;

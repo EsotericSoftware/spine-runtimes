@@ -33,8 +33,8 @@ package com.esotericsoftware.spine;
 public interface Updatable {
 	public void update ();
 
-	/** Returns false when this item has not been updated because a skine is required and the {@link Skeleton#getSkin() active
-	 * skin} does not contain this item.
+	/** Returns false when this item has not been updated because a skin is required and the {@link Skeleton#getSkin() active skin}
+	 * does not contain this item.
 	 * @see Skin#getBones()
 	 * @see Skin#getConstraints() */
 	public boolean isActive ();

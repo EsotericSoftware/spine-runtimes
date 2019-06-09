@@ -106,6 +106,7 @@ public class IkConstraint implements Updatable {
 	}
 
 	public void setTarget (Bone target) {
+		if (target == null) throw new IllegalArgumentException("target cannot be null.");
 		this.target = target;
 	}
 
@@ -162,6 +163,7 @@ public class IkConstraint implements Updatable {
 	/** Applies 1 bone IK. The target is specified in the world coordinate system. */
 	static public void apply (Bone bone, float targetX, float targetY, boolean compress, boolean stretch, boolean uniform,
 		float alpha) {
+		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
 		if (!bone.appliedValid) bone.updateAppliedTransform();
 		Bone p = bone.parent;
 		float id = 1 / (p.a * p.d - p.b * p.c);
@@ -188,6 +190,8 @@ public class IkConstraint implements Updatable {
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
 	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, boolean stretch, float alpha) {
+		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
+		if (child == null) throw new IllegalArgumentException("child cannot be null.");
 		if (alpha == 0) {
 			child.updateWorldTransform();
 			return;

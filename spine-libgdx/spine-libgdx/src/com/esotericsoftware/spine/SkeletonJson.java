@@ -99,10 +99,12 @@ public class SkeletonJson {
 	}
 
 	public void setScale (float scale) {
+		if (scale == 0) throw new IllegalArgumentException("scale cannot be 0.");
 		this.scale = scale;
 	}
 
 	protected JsonValue parse (FileHandle file) {
+		if (file == null) throw new IllegalArgumentException("file cannot be null.");
 		return new JsonReader().parse(file);
 	}
 

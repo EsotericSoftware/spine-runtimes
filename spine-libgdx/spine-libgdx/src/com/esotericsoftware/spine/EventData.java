@@ -65,6 +65,7 @@ public class EventData {
 	}
 
 	public void setString (String stringValue) {
+		if (stringValue == null) throw new IllegalArgumentException("stringValue cannot be null.");
 		this.stringValue = stringValue;
 	}
 
@@ -73,6 +74,7 @@ public class EventData {
 	}
 
 	public void setAudioPath (String audioPath) {
+		if (audioPath == null) throw new IllegalArgumentException("audioPath cannot be null.");
 		this.audioPath = audioPath;
 	}
 
