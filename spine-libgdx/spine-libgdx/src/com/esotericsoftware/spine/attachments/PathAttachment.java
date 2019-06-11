@@ -29,7 +29,10 @@
 
 package com.esotericsoftware.spine.attachments;
 
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
+
 import com.badlogic.gdx.graphics.Color;
+
 import com.esotericsoftware.spine.PathConstraint;
 
 /** An attachment whose vertices make up a composite Bezier curve.
@@ -84,7 +87,7 @@ public class PathAttachment extends VertexAttachment {
 		PathAttachment copy = new PathAttachment(name);
 		copyTo(copy);
 		copy.lengths = new float[lengths.length];
-		System.arraycopy(lengths, 0, copy.lengths, 0, lengths.length);
+		arraycopy(lengths, 0, copy.lengths, 0, lengths.length);
 		copy.closed = closed;
 		copy.constantSpeed = constantSpeed;
 		copy.color.set(color);

@@ -29,7 +29,10 @@
 
 package com.esotericsoftware.spine.attachments;
 
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
+
 import com.badlogic.gdx.utils.FloatArray;
+
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
@@ -170,13 +173,13 @@ abstract public class VertexAttachment extends Attachment {
 	void copyTo (VertexAttachment attachment) {
 		if (bones != null) {
 			attachment.bones = new int[bones.length];
-			System.arraycopy(bones, 0, attachment.bones, 0, bones.length);
+			arraycopy(bones, 0, attachment.bones, 0, bones.length);
 		} else
 			attachment.bones = null;
 
 		if (vertices != null) {
 			attachment.vertices = new float[vertices.length];
-			System.arraycopy(vertices, 0, attachment.vertices, 0, vertices.length);
+			arraycopy(vertices, 0, attachment.vertices, 0, vertices.length);
 		} else
 			attachment.vertices = null;
 

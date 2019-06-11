@@ -29,6 +29,8 @@
 
 package com.esotericsoftware.spine.attachments;
 
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -242,17 +244,17 @@ public class MeshAttachment extends VertexAttachment {
 
 		copyTo(copy);
 		copy.regionUVs = new float[regionUVs.length];
-		System.arraycopy(regionUVs, 0, copy.regionUVs, 0, regionUVs.length);
+		arraycopy(regionUVs, 0, copy.regionUVs, 0, regionUVs.length);
 		copy.uvs = new float[uvs.length];
-		System.arraycopy(uvs, 0, copy.uvs, 0, uvs.length);
+		arraycopy(uvs, 0, copy.uvs, 0, uvs.length);
 		copy.triangles = new short[triangles.length];
-		System.arraycopy(triangles, 0, copy.triangles, 0, triangles.length);
+		arraycopy(triangles, 0, copy.triangles, 0, triangles.length);
 		copy.hullLength = hullLength;
 
 		// Nonessential.
 		if (edges != null) {
 			copy.edges = new short[edges.length];
-			System.arraycopy(edges, 0, copy.edges, 0, edges.length);
+			arraycopy(edges, 0, copy.edges, 0, edges.length);
 		}
 		copy.width = width;
 		copy.height = height;

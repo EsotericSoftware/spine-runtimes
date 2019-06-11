@@ -448,7 +448,7 @@ public class Skeleton {
 	/** Sets the slots and draw order to their setup pose values. */
 	public void setSlotsToSetupPose () {
 		Array<Slot> slots = this.slots;
-		System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
+		arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
 		for (int i = 0, n = slots.size; i < n; i++)
 			slots.get(i).setToSetupPose();
 	}

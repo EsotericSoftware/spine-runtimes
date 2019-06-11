@@ -29,6 +29,8 @@
 
 package com.esotericsoftware.spine;
 
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
+
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -38,6 +40,7 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SerializationException;
+
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
@@ -702,7 +705,7 @@ public class SkeletonJson {
 						else {
 							deform = new float[deformLength];
 							int start = valueMap.getInt("offset", 0);
-							System.arraycopy(verticesValue.asFloatArray(), 0, deform, start, verticesValue.size);
+							arraycopy(verticesValue.asFloatArray(), 0, deform, start, verticesValue.size);
 							if (scale != 1) {
 								for (int i = start, n = i + verticesValue.size; i < n; i++)
 									deform[i] *= scale;

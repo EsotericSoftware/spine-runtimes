@@ -31,6 +31,7 @@ package com.esotericsoftware.spine;
 
 import static com.esotericsoftware.spine.Animation.MixBlend.*;
 import static com.esotericsoftware.spine.Animation.MixDirection.*;
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
@@ -1067,7 +1068,7 @@ public class Animation {
 						}
 					} else {
 						// Vertex positions or deform offsets, no alpha.
-						System.arraycopy(lastVertices, 0, deform, 0, vertexCount);
+						arraycopy(lastVertices, 0, deform, 0, vertexCount);
 					}
 				} else {
 					switch (blend) {
@@ -1299,13 +1300,13 @@ public class Animation {
 			Array<Slot> drawOrder = skeleton.drawOrder;
 			Array<Slot> slots = skeleton.slots;
 			if (direction == out && blend == setup) {
-				System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
+				arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
 				return;
 			}
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				if (blend == setup || blend == first) System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
+				if (blend == setup || blend == first) arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
 				return;
 			}
 
@@ -1317,7 +1318,7 @@ public class Animation {
 
 			int[] drawOrderToSetupIndex = drawOrders[frame];
 			if (drawOrderToSetupIndex == null)
-				System.arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
+				arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
 			else {
 				for (int i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
 					drawOrder.set(i, slots.get(drawOrderToSetupIndex[i]));
