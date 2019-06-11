@@ -4850,6 +4850,8 @@ var spine;
 			polygons.length = 0;
 			for (var i = 0; i < slotCount; i++) {
 				var slot = slots[i];
+				if (!slot.bone.active)
+					continue;
 				var attachment = slot.getAttachment();
 				if (attachment instanceof spine.BoundingBoxAttachment) {
 					var boundingBox = attachment;
