@@ -50,6 +50,7 @@ package spine {
 
 			for (var i : int = 0; i < slotCount; i++) {
 				var slot : Slot = slots[i];
+				if (!slot.bone.active) continue;
 				var boundingBox : BoundingBoxAttachment = slot.attachment as BoundingBoxAttachment;
 				if (boundingBox == null) continue;
 				boundingBoxes[boundingBoxes.length] = boundingBox;
