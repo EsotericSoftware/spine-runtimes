@@ -129,6 +129,7 @@ void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/
 		spBoundingBoxAttachment* boundingBox;
 
 		spSlot* slot = skeleton->slots[i];
+		if (!slot->bone->active) continue;
 		spAttachment* attachment = slot->attachment;
 		if (!attachment || attachment->type != SP_ATTACHMENT_BOUNDING_BOX) continue;
 		boundingBox = (spBoundingBoxAttachment*)attachment;

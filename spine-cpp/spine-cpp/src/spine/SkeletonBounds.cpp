@@ -34,6 +34,7 @@
 #include <spine/SkeletonBounds.h>
 
 #include <spine/Skeleton.h>
+#include <spine/Bone.h>
 #include <spine/BoundingBoxAttachment.h>
 
 #include <spine/Slot.h>
@@ -56,6 +57,8 @@ void SkeletonBounds::update(Skeleton &skeleton, bool updateAabb) {
 
 	for (size_t i = 0; i < slotCount; i++) {
 		Slot *slot = slots[i];
+		if (!slot->getBone().isActive()) continue;
+
 		Attachment *attachment = slot->getAttachment();
 		if (attachment == NULL || !attachment->getRTTI().instanceOf(BoundingBoxAttachment::rtti)) {
 			continue;
