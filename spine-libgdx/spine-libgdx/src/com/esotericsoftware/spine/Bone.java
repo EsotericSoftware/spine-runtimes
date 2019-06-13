@@ -114,8 +114,8 @@ public class Bone implements Updatable {
 			Skeleton skeleton = this.skeleton;
 			float rotationY = rotation + 90 + shearY, sx = skeleton.scaleX, sy = skeleton.scaleY;
 			a = cosDeg(rotation + shearX) * scaleX * sx;
-			b = cosDeg(rotationY) * scaleY * sy;
-			c = sinDeg(rotation + shearX) * scaleX * sx;
+			b = cosDeg(rotationY) * scaleY * sx;
+			c = sinDeg(rotation + shearX) * scaleX * sy;
 			d = sinDeg(rotationY) * scaleY * sy;
 			worldX = x * sx + skeleton.x;
 			worldY = y * sy + skeleton.y;
