@@ -152,8 +152,8 @@ namespace Spine {
 			if (parent == null) { // Root bone.
 				float rotationY = rotation + 90 + shearY, sx = skeleton.scaleX, sy = skeleton.scaleY;
 				a = MathUtils.CosDeg(rotation + shearX) * scaleX * sx;
-				b = MathUtils.CosDeg(rotationY) * scaleY * sy;
-				c = MathUtils.SinDeg(rotation + shearX) * scaleX * sx;
+				b = MathUtils.CosDeg(rotationY) * scaleY * sx;
+				c = MathUtils.SinDeg(rotation + shearX) * scaleX * sy;
 				d = MathUtils.SinDeg(rotationY) * scaleY * sy;
 				worldX = x * sx + skeleton.x;
 				worldY = y * sy + skeleton.y;
