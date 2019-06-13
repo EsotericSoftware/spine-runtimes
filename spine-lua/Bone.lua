@@ -94,7 +94,7 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 	self.ashearX = shearX
 	self.ashearY = shearY
 	self.appliedValid = true
-	
+
 	local sx = self.skeleton.scaleX;
 	local sy = self.skeleton.scaleY;
 
@@ -102,11 +102,11 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 	if parent == nil then
 		local rotationY = rotation + 90 + shearY
 		local rotationRad = math_rad(rotation + shearX)
-		local rotationYRad = math_rad(rotationY)		
+		local rotationYRad = math_rad(rotationY)
 		local skeleton = self.skeleton
 		self.a = math_cos(rotationRad) * scaleX * sx
-		self.b = math_cos(rotationYRad) * scaleY * sy
-		self.c = math_sin(rotationRad) * scaleX * sx
+		self.b = math_cos(rotationYRad) * scaleY * sx
+		self.c = math_sin(rotationRad) * scaleX * sy
 		self.d = math_sin(rotationYRad) * scaleY * sy
 		self.worldX = x * sx + skeleton.x
 		self.worldY = y * sy + skeleton.y
@@ -160,7 +160,7 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		self.a = pa * la - pb * lc
 		self.b = pa * lb - pb * ld
 		self.c = pc * la + pd * lc
-		self.d = pc * lb + pd * ld	
+		self.d = pc * lb + pd * ld
 	elseif transformMode == TransformMode.noScale or transformMode == TransformMode.noScaleOrReflection then
 		local cos = math_cos(math_rad(rotation))
 		local sin = math_sin(math_rad(rotation))
@@ -184,9 +184,9 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		self.a = za * la + zb * lc
 		self.b = za * lb + zb * ld
 		self.c = zc * la + zd * lc
-		self.d = zc * lb + zd * ld		
+		self.d = zc * lb + zd * ld
 	end
-	
+
 	self.a = self.a * sx
 	self.b = self.b * sx
 	self.c = self.c * sy
