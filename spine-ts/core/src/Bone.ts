@@ -80,8 +80,8 @@ module spine {
 				let sx = skeleton.scaleX;
 				let sy = skeleton.scaleY;
 				this.a = MathUtils.cosDeg(rotation + shearX) * scaleX * sx;
-				this.b = MathUtils.cosDeg(rotationY) * scaleY * sy;
-				this.c = MathUtils.sinDeg(rotation + shearX) * scaleX * sx;
+				this.b = MathUtils.cosDeg(rotationY) * scaleY * sx;
+				this.c = MathUtils.sinDeg(rotation + shearX) * scaleX * sy;
 				this.d = MathUtils.sinDeg(rotationY) * scaleY * sy;
 				this.worldX = x * sx + skeleton.x;
 				this.worldY = y * sy + skeleton.y;
