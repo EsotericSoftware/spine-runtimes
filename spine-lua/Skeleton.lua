@@ -27,6 +27,7 @@
 -- EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+local utils = require "spine-lua.utils"
 local Bone = require "spine-lua.Bone"
 local Slot = require "spine-lua.Slot"
 local IkConstraint = require "spine-lua.IkConstraint"

@@ -102,6 +102,23 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 		--skeleton.vertexEffect = spine.JitterEffect.new(5, 5)
 		skeleton.vertexEffect = swirl
 		animationState:setAnimationByName(0, animation, true)
+  elseif jsonFile == "mix-and-match-pro.json" then
+    -- Create a new skin, by mixing and matching other skins
+    -- that fit together. Items making up the girl are individual
+    -- skins. Using the skin API, a new skin is created which is
+    -- a combination of all these individual item skins.
+    local skin = spine.Skin.new("mix-and-match")
+    skin:addSkin(skeletonData:findSkin("skin-base"))
+    skin:addSkin(skeletonData:findSkin("nose/short"))
+    skin:addSkin(skeletonData:findSkin("eyes/eyelids-girly"))
+    skin:addSkin(skeletonData:findSkin("eyes/violet"))
+    skin:addSkin(skeletonData:findSkin("hair/brown"))
+    skin:addSkin(skeletonData:findSkin("clothes/hoodie-orange"))
+    skin:addSkin(skeletonData:findSkin("legs/pants-jeans"))
+    skin:addSkin(skeletonData:findSkin("accessories/bag"))
+    skin:addSkin(skeletonData:findSkin("accessories/hat-red-yellow"))
+    skeleton:setSkinByReference(skin)
+    animationState:setAnimationByName(0, animation, true)
 	else
     animationState:setAnimationByName(0, animation, true)
   end
@@ -110,6 +127,7 @@ function loadSkeleton(atlasFile, jsonFile, x, y, scale, animation, skin)
 	return { skeleton = skeleton, state = animationState }
 end
 
+table.insert(skeletons, loadSkeleton("mix-and-match.atlas", "mix-and-match-pro.json", 240, 300, 0.3, "dance"))
 table.insert(skeletons, loadSkeleton("spineboy.atlas", "spineboy-pro.json", 240, 300, 0.4, "walk"))
 table.insert(skeletons, loadSkeleton("stretchyman.atlas", "stretchyman-stretchy-ik-pro.json", 40, 300, 0.5, "sneak"))
 table.insert(skeletons, loadSkeleton("coin.atlas", "coin-pro.json", 240, 160, 0.4, "animation"))
