@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 package spine.examples {
+	import spine.Skin;	
 	import starling.display.DisplayObjectContainer;
 	import starling.events.Touch;
 	import starling.events.TouchPhase;
@@ -43,38 +44,51 @@ package spine.examples {
 	import spine.attachments.AttachmentLoader;
 	import spine.starling.SkeletonAnimation;
 
-	public class CoinExample extends Sprite {
-		[Embed(source = "/coin-pro.json", mimeType = "application/octet-stream")]
-		static public const CoinJson : Class;
+	public class MixAndMatchExample extends Sprite {
+		[Embed(source = "/mix-and-match-pro.json", mimeType = "application/octet-stream")]
+		static public const MixAndMatchJson : Class;
 
-		[Embed(source = "/coin.atlas", mimeType = "application/octet-stream")]
-		static public const CoinAtlas : Class;
+		[Embed(source = "/mix-and-match.atlas", mimeType = "application/octet-stream")]
+		static public const MixAndMatchAtlas : Class;
 
-		[Embed(source = "/coin.png")]
-		static public const CoinAtlasTexture : Class;
+		[Embed(source = "/mix-and-match.png")]
+		static public const MixAndMatchAtlasTexture : Class;
 		private var skeleton : SkeletonAnimation;
 
-		public function CoinExample() {
+		public function MixAndMatchExample() {
 			var attachmentLoader : AttachmentLoader;
-			var spineAtlas : Atlas = new Atlas(new CoinAtlas(), new StarlingTextureLoader(new CoinAtlasTexture()));
+			var spineAtlas : Atlas = new Atlas(new MixAndMatchAtlas(), new StarlingTextureLoader(new MixAndMatchAtlasTexture()));
 			attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
 
 			var json : SkeletonJson = new SkeletonJson(attachmentLoader);
-			json.scale = 1;
-			var skeletonData : SkeletonData = json.readSkeletonData(new CoinJson());
+			json.scale = 0.5;
+			var skeletonData : SkeletonData = json.readSkeletonData(new MixAndMatchJson());
 
 			this.x = 400;
-			this.y = 300;
+			this.y = 500;
 
 			skeleton = new SkeletonAnimation(skeletonData);
-			skeleton.state.setAnimationByName(0, "animation", true);
-			skeleton.state.timeScale = 0.5;
-			skeleton.state.update(0.25);
-			skeleton.state.apply(skeleton.skeleton);
+			skeleton.state.setAnimationByName(0, "dance", true);								
 			
 			// enable two color tinting, which breaks batching between this skeleton
 			// and other Starling objects.
 			skeleton.twoColorTint = true;
+			
+			// Create a new skin, by mixing and matching other skins
+			// that fit together. Items making up the girl are individual
+			// skins. Using the skin API, a new skin is created which is
+			// a combination of all these individual item skins.
+			var mixAndMatchSkin : Skin = new Skin("custom-girl");
+			mixAndMatchSkin.addSkin(skeletonData.findSkin("skin-base"));
+			mixAndMatchSkin.addSkin(skeletonData.findSkin("nose/short"));
+			mixAndMatchSkin.addSkin(skeletonData.findSkin("eyes/eyelids-girly"));
+			mixAndMatchSkin.addSkin(skeletonData.findSkin("eyes/violet"));
+			mixAndMatchSkin.addSkin(skeletonData.findSkin("hair/brown"));
+			mixAndMatchSkin.addSkin(skeletonData.findSkin("clothes/hoodie-orange"));
+			mixAndMatchSkin.addSkin(skeletonData.findSkin("legs/pants-jeans"));
+			mixAndMatchSkin.addSkin(skeletonData.findSkin("accessories/bag"));
+			mixAndMatchSkin.addSkin(skeletonData.findSkin("accessories/hat-red-yellow"));
+			skeleton.skeleton.skin = mixAndMatchSkin;
 			
 			skeleton.skeleton.updateWorldTransform();
 
@@ -89,7 +103,7 @@ package spine.examples {
 			if (touch && touch.phase == TouchPhase.BEGAN) {
 				var parent : DisplayObjectContainer = this.parent;
 				this.removeFromParent(true);
-				parent.addChild(new MixAndMatchExample());
+				parent.addChild(new SpineboyExample());
 			}
 		}
 	}
