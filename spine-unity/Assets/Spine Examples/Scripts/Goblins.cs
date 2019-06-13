@@ -58,10 +58,10 @@ namespace Spine.Unity.Examples {
 			girlSkin = !girlSkin;
 			
 			if (girlSkin) {
-				skeletonAnimation.Skeleton.SetAttachment("right hand item", null);
-				skeletonAnimation.Skeleton.SetAttachment("left hand item", "spear");
+				skeletonAnimation.Skeleton.SetAttachment("right-hand-item", null);
+				skeletonAnimation.Skeleton.SetAttachment("left-hand-item", "spear");
 			} else
-				skeletonAnimation.Skeleton.SetAttachment("left hand item", "dagger");
+				skeletonAnimation.Skeleton.SetAttachment("left-hand-item", "dagger");
 		}
 	}
 }

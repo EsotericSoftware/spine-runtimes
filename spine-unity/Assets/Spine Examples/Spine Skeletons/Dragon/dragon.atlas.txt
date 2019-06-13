@@ -4,289 +4,289 @@ size: 1024,1024
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
-chin
-  rotate: true
-  xy: 856, 140
-  size: 214, 146
-  orig: 214, 146
-  offset: 0, 0
-  index: -1
 front-toe-a
-  rotate: true
-  xy: 584, 74
+  rotate: false
+  xy: 300, 765
   size: 29, 50
   orig: 29, 50
   offset: 0, 0
   index: -1
+front-toe-b
+  rotate: false
+  xy: 300, 878
+  size: 56, 57
+  orig: 56, 57
+  offset: 0, 0
+  index: -1
 head
   rotate: false
-  xy: 204, 758
+  xy: 2, 748
   size: 296, 260
   orig: 296, 260
   offset: 0, 0
   index: -1
 left-front-leg
   rotate: false
-  xy: 636, 357
+  xy: 185, 17
   size: 84, 57
   orig: 84, 57
   offset: 0, 0
   index: -1
-left-rear-thigh
-  rotate: true
-  xy: 207, 14
-  size: 91, 149
-  orig: 91, 149
+left-front-thigh
+  rotate: false
+  xy: 99, 2
+  size: 84, 72
+  orig: 84, 72
   offset: 0, 0
   index: -1
 left-wing01
   rotate: false
-  xy: 443, 105
+  xy: 744, 487
   size: 191, 256
   orig: 191, 256
   offset: 0, 0
   index: -1
 left-wing02
   rotate: true
-  xy: 502, 618
+  xy: 276, 13
   size: 179, 269
   orig: 179, 269
   offset: 0, 0
   index: -1
-left-wing04
-  rotate: false
-  xy: 636, 4
-  size: 188, 135
-  orig: 188, 135
+left-wing03
+  rotate: true
+  xy: 804, 9
+  size: 186, 207
+  orig: 186, 207
   offset: 0, 0
   index: -1
 left-wing05
-  rotate: false
-  xy: 636, 141
+  rotate: true
+  xy: 777, 790
   size: 218, 213
   orig: 218, 213
   offset: 0, 0
   index: -1
 left-wing06
   rotate: false
-  xy: 2, 319
+  xy: 314, 213
   size: 192, 331
   orig: 192, 331
   offset: 0, 0
   index: -1
 left-wing07
   rotate: true
-  xy: 750, 356
+  xy: 547, 33
   size: 159, 255
   orig: 159, 255
   offset: 0, 0
   index: -1
-right-rear-thigh
+right-rear-toe
   rotate: true
-  xy: 433, 12
-  size: 91, 149
-  orig: 91, 149
+  xy: 937, 679
+  size: 109, 77
+  orig: 109, 77
   offset: 0, 0
   index: -1
 right-wing01
   rotate: true
-  xy: 502, 799
+  xy: 2, 325
   size: 219, 310
   orig: 219, 310
   offset: 0, 0
   index: -1
 right-wing02
   rotate: false
-  xy: 2, 12
+  xy: 370, 703
   size: 203, 305
   orig: 203, 305
   offset: 0, 0
   index: -1
 right-wing03
   rotate: false
-  xy: 196, 363
+  xy: 2, 76
   size: 272, 247
   orig: 272, 247
   offset: 0, 0
   index: -1
-right-wing04
-  rotate: false
-  xy: 204, 612
-  size: 279, 144
-  orig: 279, 144
-  offset: 0, 0
-  index: -1
 right-wing05
   rotate: true
-  xy: 773, 517
+  xy: 508, 194
   size: 251, 229
   orig: 251, 229
   offset: 0, 0
   index: -1
 right-wing06
-  rotate: false
-  xy: 2, 652
+  rotate: true
+  xy: 2, 546
   size: 200, 366
   orig: 200, 366
   offset: 0, 0
   index: -1
 right-wing07
-  rotate: true
-  xy: 485, 416
+  rotate: false
+  xy: 575, 745
   size: 200, 263
   orig: 200, 263
   offset: 0, 0
   index: -1
 right-wing08
   rotate: false
-  xy: 207, 107
+  xy: 508, 447
   size: 234, 254
   orig: 234, 254
   offset: 0, 0
   index: -1
 right-wing09
   rotate: true
-  xy: 814, 770
+  xy: 739, 197
   size: 248, 204
   orig: 248, 204
   offset: 0, 0
   index: -1
 tail01
-  rotate: true
-  xy: 826, 18
+  rotate: false
+  xy: 370, 548
   size: 120, 153
   orig: 120, 153
   offset: 0, 0
   index: -1
 tail03
   rotate: false
-  xy: 358, 13
+  xy: 937, 585
   size: 73, 92
   orig: 73, 92
   offset: 0, 0
   index: -1
-
-dragon2.png
-size: 1024,1024
-format: RGBA8888
-filter: Linear,Linear
-repeat: none
-back
-  rotate: false
-  xy: 190, 800
-  size: 190, 185
-  orig: 190, 185
-  offset: 0, 0
-  index: -1
-chest
-  rotate: false
-  xy: 382, 863
-  size: 136, 122
-  orig: 136, 122
-  offset: 0, 0
-  index: -1
-front-toe-b
-  rotate: false
-  xy: 112, 155
-  size: 56, 57
-  orig: 56, 57
-  offset: 0, 0
-  index: -1
-left-front-thigh
-  rotate: false
-  xy: 278, 635
-  size: 84, 72
-  orig: 84, 72
-  offset: 0, 0
-  index: -1
-left-rear-leg
-  rotate: true
-  xy: 2, 603
-  size: 206, 177
-  orig: 206, 177
-  offset: 0, 0
-  index: -1
-left-wing03
-  rotate: false
-  xy: 2, 811
-  size: 186, 207
-  orig: 186, 207
-  offset: 0, 0
-  index: -1
-left-wing08
-  rotate: false
-  xy: 2, 214
-  size: 164, 181
-  orig: 164, 181
-  offset: 0, 0
-  index: -1
-left-wing09
-  rotate: true
-  xy: 2, 397
-  size: 204, 167
-  orig: 204, 167
-  offset: 0, 0
-  index: -1
-right-front-leg
-  rotate: false
-  xy: 278, 709
-  size: 101, 89
-  orig: 101, 89
-  offset: 0, 0
-  index: -1
-right-front-thigh
-  rotate: false
-  xy: 2, 104
-  size: 108, 108
-  orig: 108, 108
-  offset: 0, 0
-  index: -1
-right-rear-leg
-  rotate: false
-  xy: 2, 2
-  size: 116, 100
-  orig: 116, 100
-  offset: 0, 0
-  index: -1
-right-rear-toe
-  rotate: false
-  xy: 382, 784
-  size: 109, 77
-  orig: 109, 77
-  offset: 0, 0
-  index: -1
-tail02
-  rotate: false
-  xy: 181, 678
-  size: 95, 120
-  orig: 95, 120
-  offset: 0, 0
-  index: -1
 tail04
   rotate: false
-  xy: 381, 711
+  xy: 300, 937
   size: 56, 71
   orig: 56, 71
   offset: 0, 0
   index: -1
 tail05
   rotate: false
-  xy: 439, 723
+  xy: 300, 817
   size: 52, 59
   orig: 52, 59
   offset: 0, 0
   index: -1
 tail06
   rotate: false
-  xy: 181, 608
+  xy: 2, 6
   size: 95, 68
   orig: 95, 68
   offset: 0, 0
   index: -1
 thiagobrayner
-  rotate: false
-  xy: 190, 987
+  rotate: true
+  xy: 945, 197
   size: 350, 31
   orig: 350, 31
+  offset: 0, 0
+  index: -1
+
+dragon2.png
+size: 1024,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+back
+  rotate: false
+  xy: 491, 227
+  size: 190, 185
+  orig: 190, 185
+  offset: 0, 0
+  index: -1
+chest
+  rotate: false
+  xy: 408, 103
+  size: 136, 122
+  orig: 136, 122
+  offset: 0, 0
+  index: -1
+chin
+  rotate: false
+  xy: 2, 120
+  size: 214, 146
+  orig: 214, 146
+  offset: 0, 0
+  index: -1
+left-rear-leg
+  rotate: false
+  xy: 283, 235
+  size: 206, 177
+  orig: 206, 177
+  offset: 0, 0
+  index: -1
+left-rear-thigh
+  rotate: false
+  xy: 546, 76
+  size: 91, 149
+  orig: 91, 149
+  offset: 0, 0
+  index: -1
+left-wing04
+  rotate: false
+  xy: 218, 98
+  size: 188, 135
+  orig: 188, 135
+  offset: 0, 0
+  index: -1
+left-wing08
+  rotate: true
+  xy: 683, 79
+  size: 164, 181
+  orig: 164, 181
+  offset: 0, 0
+  index: -1
+left-wing09
+  rotate: false
+  xy: 683, 245
+  size: 204, 167
+  orig: 204, 167
+  offset: 0, 0
+  index: -1
+right-front-leg
+  rotate: false
+  xy: 214, 7
+  size: 101, 89
+  orig: 101, 89
+  offset: 0, 0
+  index: -1
+right-front-thigh
+  rotate: false
+  xy: 2, 10
+  size: 108, 108
+  orig: 108, 108
+  offset: 0, 0
+  index: -1
+right-rear-leg
+  rotate: true
+  xy: 112, 2
+  size: 116, 100
+  orig: 116, 100
+  offset: 0, 0
+  index: -1
+right-rear-thigh
+  rotate: false
+  xy: 866, 94
+  size: 91, 149
+  orig: 91, 149
+  offset: 0, 0
+  index: -1
+right-wing04
+  rotate: false
+  xy: 2, 268
+  size: 279, 144
+  orig: 279, 144
+  offset: 0, 0
+  index: -1
+tail02
+  rotate: true
+  xy: 408, 6
+  size: 95, 120
+  orig: 95, 120
   offset: 0, 0
   index: -1

@@ -24,6 +24,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Cutoff: 0.1
+    - _StencilComp: 8
+    - _StencilRef: 1
     - _StraightAlphaInput: 0
     m_Colors:
     - _Black: {r: 1, g: 0, b: 0, a: 1}

@@ -28,6 +28,8 @@ Material:
     - _Cutoff: 0.1
     - _FillPhase: 0
     - _RefractionStrength: 0.01
+    - _StencilComp: 8
+    - _StencilRef: 1
     - _StraightAlphaInput: 0
     - _node_3476: 0
     m_Colors:

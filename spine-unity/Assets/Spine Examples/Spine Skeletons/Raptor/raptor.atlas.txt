@@ -1,6 +1,6 @@
 
 raptor.png
-size: 1022,1022
+size: 1024,1024
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
