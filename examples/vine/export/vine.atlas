@@ -1,12 +1,12 @@
 
 vine.png
-size: 1024,128
+size: 128,1024
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 vine
-  rotate: true
-  xy: 2, 3
+  rotate: false
+  xy: 2, 2
   size: 68, 962
   orig: 68, 962
   offset: 0, 0

@@ -32,6 +32,7 @@
 "bleed": false,
 "limitMemory": false,
 "grid": false,
+"packing": "rectangles",
 "scale": [ 0.5 ],
 "scaleSuffix": [ "" ],
 "atlasExtension": ".atlas"

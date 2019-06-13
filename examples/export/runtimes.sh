@@ -38,6 +38,11 @@ cp -f ../coin/export/*.json "$RUNTIME_DIR/spine-libgdx/spine-libgdx-tests/assets
 cp -f ../coin/export/*.skel "$RUNTIME_DIR/spine-libgdx/spine-libgdx-tests/assets/coin/"
 cp -f ../coin/export/*-pma.* "$RUNTIME_DIR/spine-libgdx/spine-libgdx-tests/assets/coin/"
 
+rm -f "$RUNTIME_DIR/spine-libgdx/spine-libgdx-tests/assets/mix-and-match/"*
+cp -f ../mix-and-match/export/*.json "$RUNTIME_DIR/spine-libgdx/spine-libgdx-tests/assets/mix-and-match/"
+cp -f ../mix-and-match/export/*.skel "$RUNTIME_DIR/spine-libgdx/spine-libgdx-tests/assets/mix-and-match/"
+cp -f ../mix-and-match/export/*-pma.* "$RUNTIME_DIR/spine-libgdx/spine-libgdx-tests/assets/mix-and-match/"
+
 echo "spine-as3"
 rm "$RUNTIME_DIR/spine-as3/spine-as3-example/src/spineboy".*
 cp -f ../spineboy/export/spineboy-ess.json "$RUNTIME_DIR/spine-as3/spine-as3-example/src/"
@@ -90,6 +95,10 @@ cp -f ../tank/export/tank-pro.skel "$RUNTIME_DIR/spine-cocos2dx/example/Resource
 cp -f ../tank/export/tank.atlas "$RUNTIME_DIR/spine-cocos2dx/example/Resources/common/"
 cp -f ../tank/export/tank.png "$RUNTIME_DIR/spine-cocos2dx/example/Resources/common/"
 
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$RUNTIME_DIR/spine-cocos2dx/example/Resources/common/"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$RUNTIME_DIR/spine-cocos2dx/example/Resources/common/"
+cp -f ../mix-and-match/export/mix-and-match.png "$RUNTIME_DIR/spine-cocos2dx/example/Resources/common/"
+
 echo "spine-corona"
 rm "$RUNTIME_DIR/spine-corona/data/"*
 cp -f ../coin/export/coin-pro.json "$RUNTIME_DIR/spine-corona/data"
@@ -126,6 +135,10 @@ cp -f ../owl/export/owl-pro.json "$RUNTIME_DIR/spine-corona/data"
 cp -f ../owl/export/owl.atlas "$RUNTIME_DIR/spine-corona/data"
 cp -f ../owl/export/owl.png "$RUNTIME_DIR/spine-corona/data"
 
+cp -f ../mix-and-match/export/mix-and-match-pro.json "$RUNTIME_DIR/spine-corona/data"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$RUNTIME_DIR/spine-corona/data"
+cp -f ../mix-and-match/export/mix-and-match.png "$RUNTIME_DIR/spine-corona/data"
+
 echo "spine-love"
 rm "$RUNTIME_DIR/spine-love/data/"*
 cp -f ../coin/export/coin-pro.json "$RUNTIME_DIR/spine-love/data"
@@ -157,6 +170,10 @@ cp -f ../stretchyman/export/stretchyman.atlas "$RUNTIME_DIR/spine-love/data"
 cp -f ../stretchyman/export/stretchyman.png "$RUNTIME_DIR/spine-love/data"
 
 cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.json "$RUNTIME_DIR/spine-love/data"
+
+cp -f ../mix-and-match/export/mix-and-match-pro.json "$RUNTIME_DIR/spine-love/data"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$RUNTIME_DIR/spine-love/data"
+cp -f ../mix-and-match/export/mix-and-match.png "$RUNTIME_DIR/spine-love/data"
 
 echo "spine-sfml-c"
 rm "$RUNTIME_DIR/spine-sfml/c/data/"*
@@ -203,6 +220,11 @@ cp -f ../owl/export/owl-pro.skel "$RUNTIME_DIR/spine-sfml/c/data/"
 cp -f ../owl/export/owl-pma.atlas "$RUNTIME_DIR/spine-sfml/c/data/"
 cp -f ../owl/export/owl-pma.png "$RUNTIME_DIR/spine-sfml/c/data/"
 
+cp -f ../mix-and-match/export/mix-and-match-pro.json "$RUNTIME_DIR/spine-sfml/c/data/"
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$RUNTIME_DIR/spine-sfml/c/data/"
+cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$RUNTIME_DIR/spine-sfml/c/data/"
+cp -f ../mix-and-match/export/mix-and-match-pma.png "$RUNTIME_DIR/spine-sfml/c/data/"
+
 echo "spine-sfml-cpp"
 rm "$RUNTIME_DIR/spine-sfml/cpp/data/"*
 cp -f ../coin/export/coin-pro.json "$RUNTIME_DIR/spine-sfml/cpp/data/"
@@ -248,6 +270,11 @@ cp -f ../owl/export/owl-pro.skel "$RUNTIME_DIR/spine-sfml/cpp/data/"
 cp -f ../owl/export/owl-pma.atlas "$RUNTIME_DIR/spine-sfml/cpp/data/"
 cp -f ../owl/export/owl-pma.png "$RUNTIME_DIR/spine-sfml/cpp/data/"
 
+cp -f ../mix-and-match/export/mix-and-match-pro.json "$RUNTIME_DIR/spine-sfml/cpp/data/"
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$RUNTIME_DIR/spine-sfml/cpp/data/"
+cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$RUNTIME_DIR/spine-sfml/cpp/data/"
+cp -f ../mix-and-match/export/mix-and-match-pma.png "$RUNTIME_DIR/spine-sfml/cpp/data/"
+
 echo "spine-starling"
 # DO NOT DELETE EVERYTHING IN SOURCE, ESPECIALLY goblins-mesh-starling.png/.xml
 cp -f ../coin/export/coin-pro.json "$RUNTIME_DIR/spine-starling/spine-starling-example/src/"
@@ -283,6 +310,10 @@ cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.json "$RUNTIME_DIR/spine
 cp -f ../owl/export/owl-pro.json "$RUNTIME_DIR/spine-starling/spine-starling-example/src/"
 cp -f ../owl/export/owl.atlas "$RUNTIME_DIR/spine-starling/spine-starling-example/src/"
 cp -f ../owl/export/owl.png "$RUNTIME_DIR/spine-starling/spine-starling-example/src/"
+
+cp -f ../mix-and-match/export/mix-and-match-pro.json "$RUNTIME_DIR/spine-starling/spine-starling-example/src/"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$RUNTIME_DIR/spine-starling/spine-starling-example/src/"
+cp -f ../mix-and-match/export/mix-and-match.png "$RUNTIME_DIR/spine-starling/spine-starling-example/src/"
 
 echo "spine-ts"
 rm "$RUNTIME_DIR/spine-ts/webgl/example/assets/"*
@@ -320,6 +351,10 @@ cp -f ../stretchyman/export/stretchyman-pma.atlas "$RUNTIME_DIR/spine-ts/webgl/e
 cp -f ../stretchyman/export/stretchyman-pma.png "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 
 cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.skel "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
+
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
+cp -f ../mix-and-match/export/mix-and-match-pma.png "$RUNTIME_DIR/spine-ts/webgl/example/assets/"
 
 rm "$RUNTIME_DIR/spine-ts/canvas/example/assets/"*
 cp -f ../spineboy/export/spineboy-ess.json "$RUNTIME_DIR/spine-ts/canvas/example/assets/"

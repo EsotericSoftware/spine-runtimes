@@ -30,6 +30,7 @@ rm -rf ../raptor/export/*
 rm -rf ../tank/export/*
 rm -rf ../vine/export/*
 rm -rf ../owl/export/*
+rm -rf ../mix-and-match/export/*
 
 echo ""
 echo "Exporting..."
@@ -65,6 +66,11 @@ echo "Exporting..."
 -i ../hero/hero-pro.spine -o ../hero/export -e binary.json \
 -i ../hero/images -o ../hero/export -n hero -p atlas-1.0.json \
 -i ../hero/images -o ../hero/export -n hero-pma -p atlas-1.0-pma.json \
+\
+-i ../mix-and-match/mix-and-match-pro.spine -o ../mix-and-match/export -e json.json \
+-i ../mix-and-match/mix-and-match-pro.spine -o ../mix-and-match/export -e binary.json \
+-i ../mix-and-match/images -o ../mix-and-match/export -n mix-and-match -p atlas-0.5.json \
+-i ../mix-and-match/images -o ../mix-and-match/export -n mix-and-match-pma -p atlas-0.5-pma.json \
 \
 -i ../powerup/powerup-ess.spine -o ../powerup/export -e json.json \
 -i ../powerup/powerup-ess.spine -o ../powerup/export -e binary.json \
