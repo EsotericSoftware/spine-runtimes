@@ -108,8 +108,8 @@ Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, float
 		float sx = _skeleton.getScaleX();
 		float sy = _skeleton.getScaleY();
 		_a = MathUtil::cosDeg(rotation + shearX) * scaleX * sx;
-		_b = MathUtil::cosDeg(rotationY) * scaleY * sy;
-		_c = MathUtil::sinDeg(rotation + shearX) * scaleX * sx;
+		_b = MathUtil::cosDeg(rotationY) * scaleY * sx;
+		_c = MathUtil::sinDeg(rotation + shearX) * scaleX * sy;
 		_d = MathUtil::sinDeg(rotationY) * scaleY * sy;
 		_worldX = x * sx + _skeleton.getX();
 		_worldY = y * sy + _skeleton.getY();

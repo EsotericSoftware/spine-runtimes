@@ -79,8 +79,8 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 	if (!parent) { /* Root bone. */
 		float rotationY = rotation + 90 + shearY;
 		CONST_CAST(float, self->a) = COS_DEG(rotation + shearX) * scaleX * sx;
-		CONST_CAST(float, self->b) = COS_DEG(rotationY) * scaleY * sy;
-		CONST_CAST(float, self->c) = SIN_DEG(rotation + shearX) * scaleX * sx;
+		CONST_CAST(float, self->b) = COS_DEG(rotationY) * scaleY * sx;
+		CONST_CAST(float, self->c) = SIN_DEG(rotation + shearX) * scaleX * sy;
 		CONST_CAST(float, self->d) = SIN_DEG(rotationY) * scaleY * sy;
 		CONST_CAST(float, self->worldX) = x * sx + self->skeleton->x;
 		CONST_CAST(float, self->worldY) = y * sy + self->skeleton->y;
