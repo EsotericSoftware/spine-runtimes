@@ -450,6 +450,51 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
+void mixAndMatch (SkeletonData* skeletonData, Atlas* atlas) {
+	SkeletonDrawable drawable(skeletonData);
+	drawable.timeScale = 1;
+	drawable.setUsePremultipliedAlpha(true);
+
+	Skeleton* skeleton = drawable.skeleton;
+
+	Skin skin("mix-and-match");
+	skin.addSkin(skeletonData->findSkin("skin-base"));
+	skin.addSkin(skeletonData->findSkin("nose/short"));
+	skin.addSkin(skeletonData->findSkin("eyes/eyelids-girly"));
+	skin.addSkin(skeletonData->findSkin("eyes/violet"));
+	skin.addSkin(skeletonData->findSkin("hair/brown"));
+	skin.addSkin(skeletonData->findSkin("clothes/hoodie-orange"));
+	skin.addSkin(skeletonData->findSkin("legs/pants-jeans"));
+	skin.addSkin(skeletonData->findSkin("accessories/bag"));
+	skin.addSkin(skeletonData->findSkin("accessories/hat-red-yellow"));
+
+	skeleton->setSkin(&skin);
+	skeleton->setSlotsToSetupPose();
+
+	skeleton->setPosition(320, 590);
+	skeleton->updateWorldTransform();
+
+	drawable.state->setAnimation(0, "dance", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - goblins");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable.update(delta);
+
+		window.clear();
+		window.draw(drawable);
+		window.display();
+	}
+}
+
 /**
  * Used for debugging purposes during runtime development
  */
@@ -472,6 +517,7 @@ int main () {
 	DebugExtension dbgExtension(SpineExtension::getInstance());
 	SpineExtension::setInstance(&dbgExtension);
 
+	testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
 	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);

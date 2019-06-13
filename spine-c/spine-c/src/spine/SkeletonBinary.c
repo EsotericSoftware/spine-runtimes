@@ -832,16 +832,16 @@ spSkin* spSkeletonBinary_readSkin(spSkeletonBinary* self, _dataInput* input, int
 
 	if (!defaultSkin) {
 		for (i = 0, n = readVarint(input, 1); i < n; i++)
-			spBoneDataArray_add(skin->bones, spSkeletonData_findBone(skeletonData, readVarint(input, 1)));
+			spBoneDataArray_add(skin->bones, skeletonData->bones[readVarint(input, 1)]);
 
 		for (i = 0, n = readVarint(input, 1); i < n; i++)
-			spIkConstraintDataArray_add(skin->ikConstraints, spSkeletonData_findIkConstraint(skeletonData, readVarint(input, 1)));
+			spIkConstraintDataArray_add(skin->ikConstraints, skeletonData->ikConstraints[readVarint(input, 1)]);
 
 		for (i = 0, n = readVarint(input, 1); i < n; i++)
-			spTransformConstraintDataArray_add(skin->transformConstraints, spSkeletonData_findTransformConstraint(skeletonData, readVarint(input, 1)));
+			spTransformConstraintDataArray_add(skin->transformConstraints, skeletonData->transformConstraints[readVarint(input, 1)]);
 
 		for (i = 0, n = readVarint(input, 1); i < n; i++)
-			spPathConstraintDataArray_add(skin->pathConstraints, spSkeletonData_findPathConstraint(skeletonData, readVarint(input, 1)));
+			spPathConstraintDataArray_add(skin->pathConstraints, skeletonData->pathConstraints[readVarint(input, 1)]);
 	}
 
 	for (i = 0, n = readVarint(input, 1); i < n; ++i) {
