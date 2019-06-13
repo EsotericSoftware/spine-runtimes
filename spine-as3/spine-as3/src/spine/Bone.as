@@ -99,8 +99,8 @@ package spine {
 				rotationY = rotation + 90 + shearY;				
 				var skeleton : Skeleton = _skeleton;								
 				this.a = MathUtils.cosDeg(rotation + shearX) * scaleX * sx;
-				this.b = MathUtils.cosDeg(rotationY) * scaleY * sy;
-				this.c = MathUtils.sinDeg(rotation + shearX) * scaleX * sx;
+				this.b = MathUtils.cosDeg(rotationY) * scaleY * sx;
+				this.c = MathUtils.sinDeg(rotation + shearX) * scaleX * sy;
 				this.d = MathUtils.sinDeg(rotationY) * scaleY * sy;
 				worldX = x * sx + skeleton.x;
 				worldY = y * sy + skeleton.y;
