@@ -36,6 +36,7 @@
 #include "BatchingExample.h"
 #include "CoinExample.h"
 #include "SkeletonRendererSeparatorExample.h"
+#include "MixAndMatchExample.h"
 #include <spine/Debug.h>
 #include "AppMacros.h"
 #include <spine/SkeletonTwoColorBatch.h>
@@ -111,7 +112,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	
 	// create a scene. it's an autorelease object
 	//auto scene = RaptorExample::scene();
-	auto scene = CoinExample::scene();
+	auto scene = MixAndMatchExample::scene();
 
 	// run
 	director->runWithScene(scene);

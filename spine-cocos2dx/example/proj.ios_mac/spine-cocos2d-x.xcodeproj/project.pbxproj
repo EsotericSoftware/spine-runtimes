@@ -168,6 +168,8 @@
 		763105DA20BC1B9700927A1E /* VertexEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104AE20BC1B5800927A1E /* VertexEffect.cpp */; };
 		76798D1D22A95AB400F77964 /* ConstraintData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76798D1C22A95AB300F77964 /* ConstraintData.cpp */; };
 		76798D1E22A95AEF00F77964 /* ConstraintData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76798D1C22A95AB300F77964 /* ConstraintData.cpp */; };
+		767D80E322B29F22000BD703 /* MixAndMatchExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 767D80E022B29F22000BD703 /* MixAndMatchExample.cpp */; };
+		767D80E422B2A003000BD703 /* MixAndMatchExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 767D80E022B29F22000BD703 /* MixAndMatchExample.cpp */; };
 		76A45BDE1E64396800745AA1 /* SkeletonTwoColorBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76A45BDC1E64396800745AA1 /* SkeletonTwoColorBatch.cpp */; };
 		76A45BDF1E64396800745AA1 /* SkeletonTwoColorBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76A45BDC1E64396800745AA1 /* SkeletonTwoColorBatch.cpp */; };
 		76AAA3C01D180F7C00C54FCB /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B31D180F7C00C54FCB /* AppDelegate.cpp */; };
@@ -364,6 +366,8 @@
 		763104C120BC1B5E00927A1E /* ShearTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShearTimeline.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/ShearTimeline.cpp"; sourceTree = "<group>"; };
 		763104C220BC1B5E00927A1E /* TranslateTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TranslateTimeline.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/TranslateTimeline.cpp"; sourceTree = "<group>"; };
 		76798D1C22A95AB300F77964 /* ConstraintData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ConstraintData.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/ConstraintData.cpp"; sourceTree = "<group>"; };
+		767D80E022B29F22000BD703 /* MixAndMatchExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MixAndMatchExample.cpp; sourceTree = "<group>"; };
+		767D80E222B29F22000BD703 /* MixAndMatchExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MixAndMatchExample.h; sourceTree = "<group>"; };
 		76A45BDC1E64396800745AA1 /* SkeletonTwoColorBatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonTwoColorBatch.cpp; path = ../../src/spine/SkeletonTwoColorBatch.cpp; sourceTree = "<group>"; };
 		76A45BDD1E64396800745AA1 /* SkeletonTwoColorBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonTwoColorBatch.h; path = ../../src/spine/SkeletonTwoColorBatch.h; sourceTree = "<group>"; };
 		76AAA3B31D180F7C00C54FCB /* AppDelegate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AppDelegate.cpp; sourceTree = "<group>"; };
@@ -539,6 +543,8 @@
 		46880B8319C43A87006E1F66 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				767D80E022B29F22000BD703 /* MixAndMatchExample.cpp */,
+				767D80E222B29F22000BD703 /* MixAndMatchExample.h */,
 				76D1BFDF2029E35200A0272D /* SkeletonRendererSeparatorExample.cpp */,
 				76D1BFDE2029E35100A0272D /* SkeletonRendererSeparatorExample.h */,
 				76D520E41EB362DD00572471 /* CoinExample.cpp */,
@@ -871,6 +877,7 @@
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
 				763104E820BC1B5E00927A1E /* BoundingBoxAttachment.cpp in Sources */,
 				763104C720BC1B5E00927A1E /* DrawOrderTimeline.cpp in Sources */,
+				767D80E322B29F22000BD703 /* MixAndMatchExample.cpp in Sources */,
 				763104F520BC1B5E00927A1E /* MeshAttachment.cpp in Sources */,
 				763104E520BC1B5E00927A1E /* TwoColorTimeline.cpp in Sources */,
 				763104D420BC1B5E00927A1E /* IkConstraint.cpp in Sources */,
@@ -920,6 +927,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				767D80E422B2A003000BD703 /* MixAndMatchExample.cpp in Sources */,
 				76798D1E22A95AEF00F77964 /* ConstraintData.cpp in Sources */,
 				7631059E20BC1B9700927A1E /* Animation.cpp in Sources */,
 				7631059F20BC1B9700927A1E /* AnimationState.cpp in Sources */,
