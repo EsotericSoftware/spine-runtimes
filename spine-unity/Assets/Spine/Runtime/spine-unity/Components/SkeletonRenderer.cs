@@ -480,7 +480,7 @@ namespace Spine.Unity {
 		private void AssignSpriteMaskMaterials()
 		{
 			#if UNITY_EDITOR
-			if (!Application.isPlaying) {
+			if (!Application.isPlaying && !UnityEditor.EditorApplication.isUpdating) {
 				EditorFixStencilCompParameters();
 			}
 			#endif
