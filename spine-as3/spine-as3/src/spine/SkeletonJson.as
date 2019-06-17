@@ -68,6 +68,11 @@ package spine {
 		public function SkeletonJson(attachmentLoader : AttachmentLoader = null) {
 			this.attachmentLoader = attachmentLoader;
 		}
+		
+		private function getFloatValue(object : Object, key: String, defaultValue : Number) : Number {;
+			var hasKey : Boolean = object.hasOwnProperty(key);
+			return hasKey ? Number(object[key]) : defaultValue;
+		}
 
 		/** @param object A String or ByteArray. */
 		public function readSkeletonData(object : *, name : String = null) : SkeletonData {
@@ -558,8 +563,8 @@ package spine {
 
 						frameIndex = 0;
 						for each (valueMap in values) {
-							var x : Number = Number(valueMap["x"] || defaultValue) * timelineScale;
-							var y : Number = Number(valueMap["y"] || defaultValue) * timelineScale;
+							var x : Number = getFloatValue(valueMap, "x", defaultValue) * timelineScale;
+							var y : Number = getFloatValue(valueMap, "y", defaultValue) * timelineScale;
 							translateTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), x, y);
 							readCurve(valueMap, translateTimeline, frameIndex);
 							frameIndex++;
