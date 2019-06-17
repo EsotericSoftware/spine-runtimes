@@ -1,0 +1,34 @@
+
+eyes.png
+size: 1024,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+EyeLines
+  rotate: false
+  xy: 2, 152
+  size: 868, 322
+  orig: 868, 322
+  offset: 0, 0
+  index: -1
+EyeWhite
+  rotate: false
+  xy: 2, 2
+  size: 700, 148
+  orig: 700, 148
+  offset: 0, 0
+  index: -1
+L_Eye
+  rotate: false
+  xy: 872, 326
+  size: 148, 148
+  orig: 148, 148
+  offset: 0, 0
+  index: -1
+R_Eye
+  rotate: false
+  xy: 872, 326
+  size: 148, 148
+  orig: 148, 148
+  offset: 0, 0
+  index: -1
