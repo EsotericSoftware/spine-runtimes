@@ -82,6 +82,7 @@ spine-unity/obj
 Assembly-*.csproj
 Assembly-*.pidb
 AssetStoreTools*
+spine-unity/Assets/Tests/
 
 spine-tk2d/Assets/spine-csharp*
 !spine-tk2d/Assets/spine-csharp/Place spine-csharp src here.*
