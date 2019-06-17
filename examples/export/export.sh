@@ -12,8 +12,12 @@ if [ ! -f "$SPINE_EXE" ]; then
 fi
 echo "Spine exe: $SPINE_EXE"
 
-echo "Please enter the Spine editor version to use to clean the examples (e.g. 3.7.58-beta)"
-read version
+if [ "$#" -eq 1 ]; then
+    version=${1%/}
+else
+    echo "Please enter the Spine editor version to use to clean the examples (e.g. 3.7.58-beta)"
+    read version
+fi
 
 echo "Cleaning export directories ..."
 rm -rf ../alien/export/*
