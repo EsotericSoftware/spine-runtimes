@@ -67,6 +67,11 @@ spine-xna/.vs/
 
 spine-unity/Assets/spine-csharp*
 !spine-unity/Assets/spine-csharp/Place spine-csharp src here.*
+!spine-unity/Assets/spine-csharp/add spine-csharp src here.*
+spine-unity/Assets/Spine/Runtime/spine-csharp*
+!spine-unity/Assets/Spine/Runtime/spine-csharp/add spine-csharp here.txt.meta
+spine-unity/spine-unity.Editor.csproj
+spine-unity/spine-unity.csproj
 spine-unity/spine-unity.CSharp.csproj
 spine-unity/spine-unity.CSharp.Editor.csproj
 spine-unity/ProjectSettings
