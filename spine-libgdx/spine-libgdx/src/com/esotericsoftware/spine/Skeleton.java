@@ -419,6 +419,7 @@ public class Skeleton {
 		for (int i = 0, n = ikConstraints.size; i < n; i++) {
 			IkConstraint constraint = ikConstraints.get(i);
 			constraint.mix = constraint.data.mix;
+			constraint.softness = constraint.data.softness;
 			constraint.bendDirection = constraint.data.bendDirection;
 			constraint.compress = constraint.data.compress;
 			constraint.stretch = constraint.data.stretch;

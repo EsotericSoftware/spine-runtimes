@@ -39,7 +39,7 @@ public class IkConstraintData extends ConstraintData {
 	BoneData target;
 	int bendDirection = 1;
 	boolean compress, stretch, uniform;
-	float mix = 1;
+	float mix = 1, softness;
 
 	public IkConstraintData (String name) {
 		super(name);
@@ -67,6 +67,15 @@ public class IkConstraintData extends ConstraintData {
 
 	public void setMix (float mix) {
 		this.mix = mix;
+	}
+
+	/** For two bone IK, the distance from the maximum reach of the bones that rotation will slow. */
+	public float getSoftness () {
+		return softness;
+	}
+
+	public void setSoftness (float softness) {
+		this.softness = softness;
 	}
 
 	/** Controls the bend direction of the IK bones, either 1 or -1. */

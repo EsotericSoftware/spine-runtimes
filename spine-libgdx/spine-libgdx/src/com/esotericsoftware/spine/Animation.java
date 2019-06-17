@@ -1326,15 +1326,16 @@ public class Animation {
 		}
 	}
 
-	/** Changes an IK constraint's {@link IkConstraint#getMix()}, {@link IkConstraint#getBendDirection()},
-	 * {@link IkConstraint#getStretch()}, and {@link IkConstraint#getCompress()}. */
+	/** Changes an IK constraint's {@link IkConstraint#getMix()},{@link IkConstraint#getSoftness()},
+	 * {@link IkConstraint#getBendDirection()}, {@link IkConstraint#getStretch()}, and {@link IkConstraint#getCompress()}. */
 	static public class IkConstraintTimeline extends CurveTimeline {
-		static public final int ENTRIES = 5;
-		static private final int PREV_TIME = -5, PREV_MIX = -4, PREV_BEND_DIRECTION = -3, PREV_COMPRESS = -2, PREV_STRETCH = -1;
-		static private final int MIX = 1, BEND_DIRECTION = 2, COMPRESS = 3, STRETCH = 4;
+		static public final int ENTRIES = 6;
+		static private final int PREV_TIME = -6, PREV_MIX = -5, PREV_SOFTNESS = -4, PREV_BEND_DIRECTION = -3, PREV_COMPRESS = -2,
+			PREV_STRETCH = -1;
+		static private final int MIX = 1, SOFTNESS = 2, BEND_DIRECTION = 3, COMPRESS = 4, STRETCH = 5;
 
 		int ikConstraintIndex;
-		private final float[] frames; // time, mix, bendDirection, compress, stretch, ...
+		private final float[] frames; // time, mix, softness, bendDirection, compress, stretch, ...
 
 		public IkConstraintTimeline (int frameCount) {
 			super(frameCount);
@@ -1355,16 +1356,18 @@ public class Animation {
 			return ikConstraintIndex;
 		}
 
-		/** The time in seconds, mix, bend direction, compress, and stretch for each key frame. */
+		/** The time in seconds, mix, softness, bend direction, compress, and stretch for each key frame. */
 		public float[] getFrames () {
 			return frames;
 		}
 
-		/** Sets the time in seconds, mix, bend direction, compress, and stretch for the specified key frame. */
-		public void setFrame (int frameIndex, float time, float mix, int bendDirection, boolean compress, boolean stretch) {
+		/** Sets the time in seconds, mix, softness, bend direction, compress, and stretch for the specified key frame. */
+		public void setFrame (int frameIndex, float time, float mix, float softness, int bendDirection, boolean compress,
+			boolean stretch) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
 			frames[frameIndex + MIX] = mix;
+			frames[frameIndex + SOFTNESS] = softness;
 			frames[frameIndex + BEND_DIRECTION] = bendDirection;
 			frames[frameIndex + COMPRESS] = compress ? 1 : 0;
 			frames[frameIndex + STRETCH] = stretch ? 1 : 0;
@@ -1380,12 +1383,14 @@ public class Animation {
 				switch (blend) {
 				case setup:
 					constraint.mix = constraint.data.mix;
+					constraint.softness = constraint.data.softness;
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 					return;
 				case first:
 					constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
+					constraint.softness += (constraint.data.softness - constraint.softness) * alpha;
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
@@ -1396,6 +1401,8 @@ public class Animation {
 			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
 				if (blend == setup) {
 					constraint.mix = constraint.data.mix + (frames[frames.length + PREV_MIX] - constraint.data.mix) * alpha;
+					constraint.softness = constraint.data.softness
+						+ (frames[frames.length + PREV_SOFTNESS] - constraint.data.softness) * alpha;
 					if (direction == out) {
 						constraint.bendDirection = constraint.data.bendDirection;
 						constraint.compress = constraint.data.compress;
@@ -1407,6 +1414,7 @@ public class Animation {
 					}
 				} else {
 					constraint.mix += (frames[frames.length + PREV_MIX] - constraint.mix) * alpha;
+					constraint.softness += (frames[frames.length + PREV_SOFTNESS] - constraint.softness) * alpha;
 					if (direction == in) {
 						constraint.bendDirection = (int)frames[frames.length + PREV_BEND_DIRECTION];
 						constraint.compress = frames[frames.length + PREV_COMPRESS] != 0;
@@ -1419,11 +1427,14 @@ public class Animation {
 			// Interpolate between the previous frame and the current frame.
 			int frame = binarySearch(frames, time, ENTRIES);
 			float mix = frames[frame + PREV_MIX];
+			float softness = frames[frame + PREV_SOFTNESS];
 			float frameTime = frames[frame];
 			float percent = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
 			if (blend == setup) {
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha;
+				constraint.softness = constraint.data.softness
+					+ (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.data.softness) * alpha;
 				if (direction == out) {
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
@@ -1435,6 +1446,7 @@ public class Animation {
 				}
 			} else {
 				constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
+				constraint.softness += (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.softness) * alpha;
 				if (direction == in) {
 					constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
 					constraint.compress = frames[frame + PREV_COMPRESS] != 0;

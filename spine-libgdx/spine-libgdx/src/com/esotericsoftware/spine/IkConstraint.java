@@ -43,7 +43,7 @@ public class IkConstraint implements Updatable {
 	Bone target;
 	int bendDirection;
 	boolean compress, stretch;
-	float mix = 1;
+	float mix = 1, softness;
 
 	boolean active;
 
@@ -52,6 +52,7 @@ public class IkConstraint implements Updatable {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.data = data;
 		mix = data.mix;
+		softness = data.softness;
 		bendDirection = data.bendDirection;
 		compress = data.compress;
 		stretch = data.stretch;
@@ -72,6 +73,7 @@ public class IkConstraint implements Updatable {
 			bones.add(skeleton.bones.get(bone.data.index));
 		target = skeleton.bones.get(constraint.target.data.index);
 		mix = constraint.mix;
+		softness = constraint.softness;
 		bendDirection = constraint.bendDirection;
 		compress = constraint.compress;
 		stretch = constraint.stretch;
@@ -90,7 +92,7 @@ public class IkConstraint implements Updatable {
 			apply(bones.first(), target.worldX, target.worldY, compress, stretch, data.uniform, mix);
 			break;
 		case 2:
-			apply(bones.first(), bones.get(1), target.worldX, target.worldY, bendDirection, stretch, mix);
+			apply(bones.first(), bones.get(1), target.worldX, target.worldY, bendDirection, stretch, softness, mix);
 			break;
 		}
 	}
@@ -117,6 +119,15 @@ public class IkConstraint implements Updatable {
 
 	public void setMix (float mix) {
 		this.mix = mix;
+	}
+
+	/** For two bone IK, the distance from the maximum reach of the bones that rotation will slow. */
+	public float getSoftness () {
+		return softness;
+	}
+
+	public void setSoftness (float softness) {
+		this.softness = softness;
 	}
 
 	/** Controls the bend direction of the IK bones, either 1 or -1. */
@@ -189,7 +200,8 @@ public class IkConstraint implements Updatable {
 
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
-	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, boolean stretch, float alpha) {
+	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, boolean stretch, float softness,
+		float alpha) {
 		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
 		if (child == null) throw new IllegalArgumentException("child cannot be null.");
 		if (alpha == 0) {
@@ -233,12 +245,23 @@ public class IkConstraint implements Updatable {
 		b = pp.b;
 		c = pp.c;
 		d = pp.d;
-		float id = 1 / (a * d - b * c), x = targetX - pp.worldX, y = targetY - pp.worldY;
-		float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py, dd = tx * tx + ty * ty;
-		x = cwx - pp.worldX;
-		y = cwy - pp.worldY;
+		float id = 1 / (a * d - b * c), x = cwx - pp.worldX, y = cwy - pp.worldY;
 		float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 		float l1 = (float)Math.sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
+		x = targetX - pp.worldX;
+		y = targetY - pp.worldY;
+		float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
+		float dd = tx * tx + ty * ty;
+		if (softness != 0) {
+			float td = (float)Math.sqrt(dd), sd = td - l1 - l2 + softness;
+			if (sd > 0) {
+				float p = Math.min(1, sd / (softness * 2)) - 1;
+				p = (sd - softness * (1 - p * p)) / td;
+				tx -= p * tx;
+				ty -= p * ty;
+				dd = tx * tx + ty * ty;
+			}
+		}
 		outer:
 		if (u) {
 			l2 *= psx;
