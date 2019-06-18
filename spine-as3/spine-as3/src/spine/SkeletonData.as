@@ -46,6 +46,7 @@ package spine {
 		public var version : String, hash : String;
 		public var fps : Number;
 		public var imagesPath : String;
+		public var audioPath : String;
 
 		public function SkeletonData() {
 		}

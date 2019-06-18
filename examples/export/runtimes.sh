@@ -313,6 +313,7 @@ cp -f ../owl/export/owl.atlas "$ROOT/spine-starling/spine-starling-example/src/"
 cp -f ../owl/export/owl.png "$ROOT/spine-starling/spine-starling-example/src/"
 
 cp -f ../mix-and-match/export/mix-and-match-pro.json "$ROOT/spine-starling/spine-starling-example/src/"
+cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-starling/spine-starling-example/src/"
 cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-starling/spine-starling-example/src/"
 cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-starling/spine-starling-example/src/"
 

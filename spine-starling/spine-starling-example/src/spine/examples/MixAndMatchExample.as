@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 package spine.examples {
+	import spine.SkeletonBinary;
 	import spine.Skin;	
 	import starling.display.DisplayObjectContainer;
 	import starling.events.Touch;
@@ -45,7 +46,7 @@ package spine.examples {
 	import spine.starling.SkeletonAnimation;
 
 	public class MixAndMatchExample extends Sprite {
-		[Embed(source = "/mix-and-match-pro.json", mimeType = "application/octet-stream")]
+		[Embed(source = "/mix-and-match-pro.skel", mimeType = "application/octet-stream")]
 		static public const MixAndMatchJson : Class;
 
 		[Embed(source = "/mix-and-match.atlas", mimeType = "application/octet-stream")]
@@ -60,9 +61,9 @@ package spine.examples {
 			var spineAtlas : Atlas = new Atlas(new MixAndMatchAtlas(), new StarlingTextureLoader(new MixAndMatchAtlasTexture()));
 			attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
 
-			var json : SkeletonJson = new SkeletonJson(attachmentLoader);
-			json.scale = 0.5;
-			var skeletonData : SkeletonData = json.readSkeletonData(new MixAndMatchJson());
+			var binary : SkeletonBinary = new SkeletonBinary(attachmentLoader);
+			binary.scale = 0.5;
+			var skeletonData : SkeletonData = binary.readSkeletonData(new MixAndMatchJson());
 
 			this.x = 400;
 			this.y = 500;

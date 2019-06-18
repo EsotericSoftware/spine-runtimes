@@ -28,9 +28,11 @@
  *****************************************************************************/
 
 package spine.attachments {
+	import spine.Color;
 	public dynamic class PathAttachment extends VertexAttachment {
 		public var lengths : Vector.<Number>;
 		public var closed : Boolean, constantSpeed : Boolean;
+		public var color : Color = new Color(0, 0, 0, 0);
 
 		public function PathAttachment(name : String) {
 			super(name);

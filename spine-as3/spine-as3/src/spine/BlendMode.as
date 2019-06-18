@@ -38,5 +38,7 @@ package spine {
 		public function BlendMode(ordinal : int) {
 			this.ordinal = ordinal;
 		}
+		
+		public static const values : Array = [ normal, additive, multiply, screen ];
 	}
 }

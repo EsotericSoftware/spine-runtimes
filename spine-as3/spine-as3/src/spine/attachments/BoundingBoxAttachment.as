@@ -28,7 +28,11 @@
  *****************************************************************************/
 
 package spine.attachments {
+	import spine.Color;
+	
 	public dynamic class BoundingBoxAttachment extends VertexAttachment {
+		public var color : Color = new Color(0, 0, 0, 0);
+		
 		public function BoundingBoxAttachment(name : String) {
 			super(name);
 		}

@@ -95,5 +95,18 @@ package spine {
 			else if (this.a > 1) this.a = 1;
 			return this;
 		}
+		
+		public function setFromRgba8888(value: int) : void {
+			r = ((value & 0xff000000) >>> 24) / 255;
+			g = ((value & 0x00ff0000) >>> 16) / 255;
+			b = ((value & 0x0000ff00) >>> 8) / 255;
+			a = ((value & 0x000000ff)) / 255;
+		}
+
+		public function setFromRgb888(value: int) : void {
+			r = ((value & 0x00ff0000) >>> 16) / 255;
+			g = ((value & 0x0000ff00) >>> 8) / 255;
+			b = ((value & 0x000000ff)) / 255;
+		}
 	}
 }

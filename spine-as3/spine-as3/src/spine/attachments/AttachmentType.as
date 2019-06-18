@@ -39,6 +39,8 @@ package spine.attachments {
 		public static const clipping : AttachmentType = new AttachmentType(6, "clipping");
 		public var ordinal : int;
 		public var name : String;
+		
+		public static const values : Array = [ region, boundingbox, mesh, linkedmesh, path, point, clipping ];
 
 		public function AttachmentType(ordinal : int, name : String) {
 			this.ordinal = ordinal;
