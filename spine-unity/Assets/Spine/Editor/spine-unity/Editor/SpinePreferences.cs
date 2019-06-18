@@ -41,10 +41,16 @@
 
 using UnityEngine;
 using UnityEditor;
+using System.Threading;
 
 namespace Spine.Unity.Editor {
 
 	public class SpinePreferences : ScriptableObject {
+
+		#if NEW_PREFERENCES_SETTINGS_PROVIDER
+		static int wasPreferencesDirCreated = 0;
+		static int wasPreferencesAssetCreated = 0;
+		#endif
 
 		public const string SPINE_SETTINGS_ASSET_PATH = "Assets/Editor/SpineSettings.asset";
 
@@ -99,10 +105,13 @@ namespace Spine.Unity.Editor {
 			{
 				settings = ScriptableObject.CreateInstance<SpinePreferences>();
 				SpineEditorUtilities.OldPreferences.CopyOldToNewPreferences(ref settings);
-				if (!AssetDatabase.IsValidFolder("Assets/Editor"))
+				// Multiple threads may be calling this method during import, creating the folder
+				// multiple times with ascending number suffix. Atomic wasPreferencesDirCreated int
+				// variable is used to prevent any redundant create operations.
+				if (!AssetDatabase.IsValidFolder("Assets/Editor") && Interlocked.Exchange(ref wasPreferencesDirCreated, 1) == 0)
 					AssetDatabase.CreateFolder("Assets", "Editor");
-				AssetDatabase.CreateAsset(settings, SPINE_SETTINGS_ASSET_PATH);
-				AssetDatabase.SaveAssets();
+				if (Interlocked.Exchange(ref wasPreferencesAssetCreated, 1) == 0)
+					AssetDatabase.CreateAsset(settings, SPINE_SETTINGS_ASSET_PATH);
 			}
 			return settings;
 		}
