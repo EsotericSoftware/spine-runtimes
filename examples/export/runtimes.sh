@@ -404,6 +404,22 @@ cp -f ../tank/export/tank-pro.skel "$ROOT/spine-xna/example/data/"
 cp -f ../tank/export/tank.atlas "$ROOT/spine-xna/example/data/"
 cp -f ../tank/export/tank.png "$ROOT/spine-xna/example/data/"
 
+echo "spine-ue4"
+rm "$ROOT/spine-ue4/Content/GettingStarted/Assets/Raptor/raptor.json"
+rm "$ROOT/spine-ue4/Content/GettingStarted/Assets/Raptor/raptor.atlas"
+rm "$ROOT/spine-ue4/Content/GettingStarted/Assets/Raptor/raptor.png"
+rm "$ROOT/spine-ue4/Content/GettingStarted/Assets/Spineboy/spineboy.json"
+rm "$ROOT/spine-ue4/Content/GettingStarted/Assets/Spineboy/spineboy.atlas"
+rm "$ROOT/spine-ue4/Content/GettingStarted/Assets/Spineboy/spineboy.png"
+
+cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ue4/Content/GettingStarted/Assets/Raptor/raptor.json"
+cp -f ../raptor/export/raptor.atlas "$ROOT/spine-ue4/Content/GettingStarted/Assets/Raptor/"
+cp -f ../raptor/export/raptor.png "$ROOT/spine-ue4/Content/GettingStarted/Assets/Raptor/"
+
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-ue4/Content/GettingStarted/Assets/Spineboy/spineboy.json"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-ue4/Content/GettingStarted/Assets/Spineboy/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-ue4/Content/GettingStarted/Assets/Spineboy/"
+
 echo "spine-unity"
 
 # Section of assets specific for the spine-unity runtime.
