@@ -212,7 +212,7 @@ public class SkeletonBinary {
 					bones[ii] = skeletonData.bones.get(input.readInt(true));
 				data.target = skeletonData.bones.get(input.readInt(true));
 				data.mix = input.readFloat();
-				data.softness = input.readFloat();
+				data.softness = input.readFloat() * scale;
 				data.bendDirection = input.readByte();
 				data.compress = input.readBoolean();
 				data.stretch = input.readBoolean();
@@ -669,7 +669,7 @@ public class SkeletonBinary {
 				IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount);
 				timeline.ikConstraintIndex = index;
 				for (int frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readByte(),
+					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat() * scale, input.readByte(),
 						input.readBoolean(), input.readBoolean());
 					if (frameIndex < frameCount - 1) readCurve(input, frameIndex, timeline);
 				}
