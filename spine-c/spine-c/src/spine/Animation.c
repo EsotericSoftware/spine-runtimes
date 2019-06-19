@@ -1290,13 +1290,13 @@ void spDrawOrderTimeline_setFrame (spDrawOrderTimeline* self, int frameIndex, fl
 
 /**/
 
-static const int IKCONSTRAINT_PREV_TIME = -5, IKCONSTRAINT_PREV_MIX = -4, IKCONSTRAINT_PREV_BEND_DIRECTION = -3, IKCONSTRAINT_PREV_COMPRESS = -2, IKCONSTRAINT_PREV_STRETCH = -1;
-static const int IKCONSTRAINT_MIX = 1, IKCONSTRAINT_BEND_DIRECTION = 2, IKCONSTRAINT_COMPRESS = 3, IKCONSTRAINT_STRETCH = 4;
+static const int IKCONSTRAINT_PREV_TIME = -6, IKCONSTRAINT_PREV_MIX = -5, IKCONSTRAINT_PREV_SOFTNESS = -4, IKCONSTRAINT_PREV_BEND_DIRECTION = -3, IKCONSTRAINT_PREV_COMPRESS = -2, IKCONSTRAINT_PREV_STRETCH = -1;
+static const int IKCONSTRAINT_MIX = 1, IKCONSTRAINT_SOFTNESS = 2, IKCONSTRAINT_BEND_DIRECTION = 3, IKCONSTRAINT_COMPRESS = 4, IKCONSTRAINT_STRETCH = 5;
 
 void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time,
 		spEvent** firedEvents, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction) {
 	int frame;
-	float frameTime, percent, mix;
+	float frameTime, percent, mix, softness;
 	float *frames;
 	int framesCount;
 	spIkConstraint* constraint;
@@ -1309,12 +1309,14 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 		switch (blend) {
 			case SP_MIX_BLEND_SETUP:
 				constraint->mix = constraint->data->mix;
+				constraint->softness = constraint->data->softness;
 				constraint->bendDirection = constraint->data->bendDirection;
 				constraint->compress = constraint->data->compress;
 				constraint->stretch = constraint->data->stretch;
 				return;
 			case SP_MIX_BLEND_FIRST:
 				constraint->mix += (constraint->data->mix - constraint->mix) * alpha;
+				constraint->softness += (constraint->data->softness - constraint->softness) * alpha;
 				constraint->bendDirection = constraint->data->bendDirection;
 				constraint->compress = constraint->data->compress;
 				constraint->stretch = constraint->data->stretch;
@@ -1330,6 +1332,8 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 	if (time >= frames[framesCount - IKCONSTRAINT_ENTRIES]) { /* Time is after last frame. */
 		if (blend == SP_MIX_BLEND_SETUP) {
 			constraint->mix = constraint->data->mix + (frames[framesCount + IKCONSTRAINT_PREV_MIX] - constraint->data->mix) * alpha;
+			constraint->softness = constraint->data->softness
+								  + (frames[framesCount + IKCONSTRAINT_PREV_SOFTNESS] - constraint->data->softness) * alpha;
 			if (direction == SP_MIX_DIRECTION_OUT) {
 				constraint->bendDirection = constraint->data->bendDirection;
 				constraint->compress = constraint->data->compress;
@@ -1341,6 +1345,7 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 			}
 		} else {
 			constraint->mix += (frames[framesCount + IKCONSTRAINT_PREV_MIX] - constraint->mix) * alpha;
+			constraint->softness += (frames[framesCount + IKCONSTRAINT_PREV_SOFTNESS] - constraint->softness) * alpha;
 			if (direction == SP_MIX_DIRECTION_IN) {
 				constraint->bendDirection = (int)frames[framesCount + IKCONSTRAINT_PREV_BEND_DIRECTION];
 				constraint->compress = frames[framesCount + IKCONSTRAINT_PREV_COMPRESS] ? 1 : 0;
@@ -1353,11 +1358,14 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 	/* Interpolate between the previous frame and the current frame. */
 	frame = binarySearch(self->frames, self->framesCount, time, IKCONSTRAINT_ENTRIES);
 	mix = self->frames[frame + IKCONSTRAINT_PREV_MIX];
+	softness = frames[frame + IKCONSTRAINT_PREV_SOFTNESS];
 	frameTime = self->frames[frame];
 	percent = spCurveTimeline_getCurvePercent(SUPER(self), frame / IKCONSTRAINT_ENTRIES - 1, 1 - (time - frameTime) / (self->frames[frame + IKCONSTRAINT_PREV_TIME] - frameTime));
 
 	if (blend == SP_MIX_BLEND_SETUP) {
 		constraint->mix = constraint->data->mix + (mix + (frames[frame + IKCONSTRAINT_MIX] - mix) * percent - constraint->data->mix) * alpha;
+		constraint->softness = constraint->data->softness
+							  + (softness + (frames[frame + IKCONSTRAINT_SOFTNESS] - softness) * percent - constraint->data->softness) * alpha;
 		if (direction == SP_MIX_DIRECTION_OUT) {
 			constraint->bendDirection = constraint->data->bendDirection;
 			constraint->compress = constraint->data->compress;
@@ -1369,6 +1377,7 @@ void _spIkConstraintTimeline_apply (const spTimeline* timeline, spSkeleton* skel
 		}
 	} else {
 		constraint->mix += (mix + (frames[frame + IKCONSTRAINT_MIX] - mix) * percent - constraint->mix) * alpha;
+		constraint->softness += (softness + (frames[frame + IKCONSTRAINT_SOFTNESS] - softness) * percent - constraint->softness) * alpha;
 		if (direction == SP_MIX_DIRECTION_IN) {
 			constraint->bendDirection = (int)frames[frame + IKCONSTRAINT_PREV_BEND_DIRECTION];
 			constraint->compress = frames[frame + IKCONSTRAINT_PREV_COMPRESS] ? 1 : 0;
@@ -1389,10 +1398,11 @@ spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount) {
 	return (spIkConstraintTimeline*)_spBaseTimeline_create(framesCount, SP_TIMELINE_IKCONSTRAINT, IKCONSTRAINT_ENTRIES, _spIkConstraintTimeline_apply, _spIkConstraintTimeline_getPropertyId);
 }
 
-void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameIndex, float time, float mix, int bendDirection, int /*boolean*/ compress, int /*boolean*/ stretch) {
+void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameIndex, float time, float mix, float softness, int bendDirection, int /*boolean*/ compress, int /*boolean*/ stretch) {
 	frameIndex *= IKCONSTRAINT_ENTRIES;
 	self->frames[frameIndex] = time;
 	self->frames[frameIndex + IKCONSTRAINT_MIX] = mix;
+	self->frames[frameIndex + IKCONSTRAINT_SOFTNESS] = softness;
 	self->frames[frameIndex + IKCONSTRAINT_BEND_DIRECTION] = (float)bendDirection;
 	self->frames[frameIndex + IKCONSTRAINT_COMPRESS] = compress ? 1 : 0;
 	self->frames[frameIndex + IKCONSTRAINT_STRETCH] = stretch ? 1 : 0;

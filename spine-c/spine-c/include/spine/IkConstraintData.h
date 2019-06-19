@@ -50,6 +50,7 @@ typedef struct spIkConstraintData {
 	int /*boolean*/ stretch;
 	int /*boolean*/ uniform;
 	float mix;
+	float softness;
 
 #ifdef __cplusplus
 	spIkConstraintData() :
@@ -63,7 +64,8 @@ typedef struct spIkConstraintData {
 		compress(0),
 		stretch(0),
 		uniform(0),
-		mix(0) {
+		mix(0),
+		softness(0) {
 	}
 #endif
 } spIkConstraintData;

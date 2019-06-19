@@ -390,10 +390,11 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 		for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
 			float time = readFloat(input);
 			float mix = readFloat(input);
+			float softness = readFloat(input);
 			signed char bendDirection = readSByte(input);
 			int compress = readBoolean(input);
 			int stretch = readBoolean(input);
-			spIkConstraintTimeline_setFrame(timeline, frameIndex, time, mix, bendDirection, compress, stretch);
+			spIkConstraintTimeline_setFrame(timeline, frameIndex, time, mix, softness, bendDirection, compress, stretch);
 			if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
 		}
 		spTimelineArray_add(timelines, (spTimeline*)timeline);
@@ -991,6 +992,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->bones[readVarint(input, 1)];
 		data->mix = readFloat(input);
+		data->softness = readFloat(input);
 		data->bendDirection = readSByte(input);
 		data->compress = readBoolean(input);
 		data->stretch = readBoolean(input);
