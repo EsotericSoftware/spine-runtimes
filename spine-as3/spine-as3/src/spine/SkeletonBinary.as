@@ -169,6 +169,7 @@ package spine {
 					ikData.bones.push(skeletonData.bones[input.readInt(true)]);
 				ikData.target = skeletonData.bones[input.readInt(true)];
 				ikData.mix = input.readFloat();
+				ikData.softness = input.readFloat();
 				ikData.bendDirection = input.readByte();
 				ikData.compress = input.readBoolean();
 				ikData.stretch = input.readBoolean();
@@ -656,7 +657,7 @@ package spine {
 				frameIndex = 0;
 				ikConstraintTimeline.ikConstraintIndex = index;
 				for (frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					ikConstraintTimeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readByte(), input.readBoolean(),
+					ikConstraintTimeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readByte(), input.readBoolean(),
 						input.readBoolean());
 					if (frameIndex < frameCount - 1) this.readCurve(input, frameIndex, ikConstraintTimeline);
 				}

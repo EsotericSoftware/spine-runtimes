@@ -36,6 +36,7 @@ package spine {
 		public var compress : Boolean = false;
 		public var stretch : Boolean = false;
 		public var uniform : Boolean = false;
+		public var softness : Number = 0;
 
 		public function IkConstraintData(name : String) {
 			super(name, 0, false);			

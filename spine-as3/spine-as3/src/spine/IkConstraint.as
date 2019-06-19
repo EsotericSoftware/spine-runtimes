@@ -36,6 +36,7 @@ package spine {
 		public var compress: Boolean;
 		public var stretch: Boolean;
 		public var mix : Number;
+		public var softness : Number = 0;
 		public var active : Boolean;
 
 		public function IkConstraint(data : IkConstraintData, skeleton : Skeleton) {
@@ -43,6 +44,7 @@ package spine {
 			if (skeleton == null) throw new ArgumentError("skeleton cannot be null.");
 			_data = data;
 			mix = data.mix;
+			softness = data.softness;
 			bendDirection = data.bendDirection;
 			compress = data.compress;
 			stretch = data.stretch;
@@ -67,7 +69,7 @@ package spine {
 					apply1(bones[0], target.worldX, target.worldY, compress, stretch, _data.uniform, mix);
 					break;
 				case 2:
-					apply2(bones[0], bones[1], target.worldX, target.worldY, bendDirection, stretch, mix);
+					apply2(bones[0], bones[1], target.worldX, target.worldY, bendDirection, stretch, softness, mix);
 					break;
 			}
 		}
@@ -109,7 +111,7 @@ package spine {
 		/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
 		 * target is specified in the world coordinate system.
 		 * @param child Any descendant bone of the parent. */
-		static public function apply2(parent : Bone, child : Bone, targetX : Number, targetY : Number, bendDir : int, stretch : Boolean, alpha : Number) : void {
+		static public function apply2(parent : Bone, child : Bone, targetX : Number, targetY : Number, bendDir : int, stretch : Boolean, softness: Number, alpha : Number) : void {
 			if (alpha == 0) {
 				child.updateWorldTransform();
 				return;
@@ -151,12 +153,29 @@ package spine {
 			b = pp.b;
 			c = pp.c;
 			d = pp.d;
-			var id : Number = 1 / (a * d - b * c), x : Number = targetX - pp.worldX, y : Number = targetY - pp.worldY;
-			var tx : Number = (x * d - y * b) * id - px, ty : Number = (y * a - x * c) * id - py, dd : Number = tx * tx + ty * ty;
-			x = cwx - pp.worldX;
-			y = cwy - pp.worldY;
+			var id : Number = 1 / (a * d - b * c), x : Number = cwx - pp.worldX, y : Number = cwy - pp.worldY;
 			var dx : Number = (x * d - y * b) * id - px, dy : Number = (y * a - x * c) * id - py;
 			var l1 : Number = Math.sqrt(dx * dx + dy * dy), l2 : Number = child.data.length * csx, a1 : Number, a2 : Number;
+			if (l1 < 0.0001) {
+				apply1(parent, targetX, targetY, false, stretch, false, alpha);
+				child.updateWorldTransformWith(cx, cy, 0, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
+				return;
+			}
+			x = targetX - pp.worldX;
+			y = targetY - pp.worldY;
+			var tx : Number = (x * d - y * b) * id - px, ty : Number = (y * a - x * c) * id - py;
+			var dd : Number = tx * tx + ty * ty;
+			if (softness != 0) {
+				softness *= psx * (csx + 1) / 2;
+				var td : Number = Math.sqrt(dd), sd : Number = td - l1 - l2 * psx + softness;
+				if (sd > 0) {
+					var p : Number = Math.min(1, sd / (softness * 2)) - 1;
+					p = (sd - softness * (1 - p * p)) / td;
+					tx -= p * tx;
+					ty -= p * ty;
+					dd = tx * tx + ty * ty;
+				}
+			}
 			outer:
 			if (u) {
 				l2 *= psx;
@@ -165,7 +184,7 @@ package spine {
 					cos = -1;
 				else if (cos > 1) {
 					cos = 1;
-					if (stretch && l1 + l2 > 0.0001) sx *= (Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+					if (stretch) sx *= (Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
 				}
 				a2 = Math.acos(cos) * bendDir;
 				a = l1 + l2 * cos;

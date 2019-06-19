@@ -322,6 +322,7 @@ package spine {
 
 			for each (var ikConstraint : IkConstraint in ikConstraints) {
 				ikConstraint.mix = ikConstraint._data.mix;
+				ikConstraint.softness = ikConstraint._data.softness;
 				ikConstraint.bendDirection = ikConstraint._data.bendDirection;				
 				ikConstraint.compress = ikConstraint._data.compress;
 				ikConstraint.stretch = ikConstraint._data.stretch;				
