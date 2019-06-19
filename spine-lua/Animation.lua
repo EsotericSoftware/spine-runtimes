@@ -1181,21 +1181,23 @@ function Animation.DrawOrderTimeline.new (frameCount)
 end
 
 Animation.IkConstraintTimeline = {}
-Animation.IkConstraintTimeline.ENTRIES = 5
+Animation.IkConstraintTimeline.ENTRIES = 6
 function Animation.IkConstraintTimeline.new (frameCount)
 	local ENTRIES = Animation.IkConstraintTimeline.ENTRIES
-	local PREV_TIME = -5
-	local PREV_MIX = -4
+	local PREV_TIME = -6
+	local PREV_MIX = -5
+  local PREV_SOFTNESS = -4
 	local PREV_BEND_DIRECTION = -3
 	local PREV_COMPRESS = -2
 	local PREV_STRETCH = -1
 	local MIX = 1
-	local BEND_DIRECTION = 2
-	local COMPRESS = 3
-	local STRETCH = 4
+  local SOFTNESS = 2
+	local BEND_DIRECTION = 3
+	local COMPRESS = 4
+	local STRETCH = 5
 
 	local self = Animation.CurveTimeline.new(frameCount)
-	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES) -- time, mix, bendDirection, compress, stretch, ...
+	self.frames = utils.newNumberArrayZero(frameCount * ENTRIES) -- time, mix, softness, bendDirection, compress, stretch, ...
 	self.ikConstraintIndex = -1
 	self.type = TimelineType.ikConstraint
 
@@ -1203,10 +1205,11 @@ function Animation.IkConstraintTimeline.new (frameCount)
 		return TimelineType.ikConstraint * SHL_24 + self.ikConstraintIndex
 	end
 
-	function self:setFrame (frameIndex, time, mix, bendDirection, compress, stretch)
+	function self:setFrame (frameIndex, time, mix, softness, bendDirection, compress, stretch)
 		frameIndex = frameIndex * ENTRIES
 		self.frames[frameIndex] = time
 		self.frames[frameIndex + MIX] = mix
+    		self.frames[frameIndex + SOFTNESS] = softness
 		self.frames[frameIndex + BEND_DIRECTION] = bendDirection
 		if (compress) then
 			self.frames[frameIndex + COMPRESS] = 1
@@ -1228,11 +1231,13 @@ function Animation.IkConstraintTimeline.new (frameCount)
 		if time < frames[0] then
 			if blend == MixBlend.setup then
 				constraint.mix = constraint.data.mix
+        constraint.softness = constraint.data.softness
 				constraint.bendDirection = constraint.data.bendDirection
 				constraint.compress = constraint.data.compress
 				constraint.stretch = constraint.data.stretch
 			elseif blend == MixBlend.first then
 				constraint.mix = constraint.mix + (constraint.data.mix - constraint.mix) * alpha
+        constraint.softness = constraint.softness + (constraint.data.softness - constraint.softness) * alpha
 				constraint.bendDirection = constraint.data.bendDirection
 				constraint.compress = constraint.data.compress
 				constraint.stretch = constraint.data.stretch
@@ -1243,6 +1248,8 @@ function Animation.IkConstraintTimeline.new (frameCount)
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
 			if blend == MixBlend.setup then
 				constraint.mix = constraint.data.mix + (frames[zlen(frames) + PREV_MIX] - constraint.data.mix) * alpha
+        constraint.softness = constraint.data.softness
+						+ (frames[zlen(frames) + PREV_SOFTNESS] - constraint.data.softness) * alpha
 				if direction == MixDirection.out then
 					constraint.bendDirection = constraint.data.bendDirection
 					constraint.compress = constraint.data.compress
@@ -1253,7 +1260,8 @@ function Animation.IkConstraintTimeline.new (frameCount)
 					if (math_floor(frames[zlen(frames) + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
 				end
 			else
-				constraint.mix = constraint.mix + (frames[zlen(frames) + PREV_MIX] - constraint.mix) * alpha;
+        constraint.mix = constraint.mix + (frames[zlen(frames) + PREV_MIX] - constraint.mix) * alpha
+        constraint.softness = constraint.softness + (frames[zlen(frames) + PREV_SOFTNESS] - constraint.softness) * alpha
 				if direction == MixDirection._in then
 					constraint.bendDirection = math_floor(frames[zlen(frames) + PREV_BEND_DIRECTION])
 					if (math_floor(frames[zlen(frames) + PREV_COMPRESS]) == 1) then constraint.compress = true else constraint.compress = false end
@@ -1266,12 +1274,15 @@ function Animation.IkConstraintTimeline.new (frameCount)
 		-- Interpolate between the previous frame and the current frame.
 		local frame = binarySearch(frames, time, ENTRIES)
 		local mix = frames[frame + PREV_MIX]
+    local softness = frames[frame + PREV_SOFTNESS]
 		local frameTime = frames[frame]
 		local percent = self:getCurvePercent(math.floor(frame / ENTRIES) - 1,
 				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
 		if blend == MixBlend.setup then
 			constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha
+      constraint.softness = constraint.data.softness
+					+ (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.data.softness) * alpha
 			if direction == MixDirection.out then
 				constraint.bendDirection = constraint.data.bendDirection
 				constraint.compress = constraint.data.compress
@@ -1282,7 +1293,8 @@ function Animation.IkConstraintTimeline.new (frameCount)
 				if (math_floor(frames[frame + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
 			end
 		else
-			constraint.mix = constraint.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
+			constraint.mix = constraint.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha
+      constraint.softness = constraint.softness + (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.softness) * alpha
 			if direction == MixDirection._in then
 				constraint.bendDirection = math_floor(frames[frame + PREV_BEND_DIRECTION])
 				if (math_floor(frames[frame + PREV_COMPRESS]) == 1) then constraint.compress = true else constraint.compress = false end

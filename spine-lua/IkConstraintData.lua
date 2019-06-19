@@ -41,7 +41,8 @@ function IkConstraintData.new (name)
 		compress = false,
 		stretch = false,
 		uniform = false,
-		mix = 1
+		mix = 1,
+    softness = 0
 	}
 
 	return self

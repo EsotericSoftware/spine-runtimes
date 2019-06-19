@@ -363,6 +363,7 @@ function Skeleton:setBonesToSetupPose ()
 
 	for _,ikConstraint in ipairs(self.ikConstraints) do
 		ikConstraint.mix = ikConstraint.data.mix
+    ikConstraint.softness = ikConstraint.data.softness
 		ikConstraint.bendDirection = ikConstraint.data.bendDirection
 		ikConstraint.compress = ikConstraint.data.compress
 		ikConstraint.stretch = ikConstraint.data.stretch
