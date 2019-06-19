@@ -44,7 +44,8 @@ IkConstraintData::IkConstraintData(const String &name) :
 		_compress(false),
 		_stretch(false),
 		_uniform(false),
-		_mix(1) {
+		_mix(1),
+		_softness(0) {
 }
 
 Vector<BoneData *> &IkConstraintData::getBones() {
@@ -99,3 +100,12 @@ bool IkConstraintData::getUniform() {
 void IkConstraintData::setUniform(bool inValue) {
 	_uniform = inValue;
 }
+
+float IkConstraintData::getSoftness() {
+	return _softness;
+}
+
+void IkConstraintData::setSoftness(float inValue) {
+	_softness = inValue;
+}
+

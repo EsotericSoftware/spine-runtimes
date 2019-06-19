@@ -69,12 +69,13 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 							  sy, bone._ashearX, bone._ashearY);
 }
 
-void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, float alpha) {
+void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, float softness, float alpha) {
+	float a, b, c, d;
 	float px, py, psx, sx, psy;
 	float cx, cy, csx, cwx, cwy;
 	int o1, o2, s2, u;
 	Bone *pp = parent.getParent();
-	float tx, ty, dx, dy, dd, l1, l2, a1, a2, r;
+	float tx, ty, dx, dy, dd, l1, l2, a1, a2, r, td, sd, p;
 	float id, x, y;
 	if (alpha == 0) {
 		child.updateWorldTransform();
@@ -117,18 +118,37 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 		cwx = parent._a * cx + parent._b * cy + parent._worldX;
 		cwy = parent._c * cx + parent._d * cy + parent._worldY;
 	}
-	id = 1 / (pp->_a * pp->_d - pp->_b * pp->_c);
-	x = targetX - pp->_worldX;
-	y = targetY - pp->_worldY;
-	tx = (x * pp->_d - y * pp->_b) * id - px;
-	ty = (y * pp->_a - x * pp->_c) * id - py;
-	dd = tx * tx + ty * ty;
+	a = pp->_a;
+	b = pp->_b;
+	c = pp->_c;
+	d = pp->_d;
+	id = 1 / (a * d - b * c);
 	x = cwx - pp->_worldX;
 	y = cwy - pp->_worldY;
-	dx = (x * pp->_d - y * pp->_b) * id - px;
-	dy = (y * pp->_a - x * pp->_c) * id - py;
+	dx = (x * d - y * b) * id - px;
+	dy = (y * a - x * c) * id - py;
 	l1 = MathUtil::sqrt(dx * dx + dy * dy);
-	l2 = child.getData().getLength() * csx;
+	l2 = child._data.getLength() * csx, a1, a2;
+	if (l1 < 0.0001) {
+		apply(parent, targetX, targetY, false, stretch, false, alpha);
+		child.updateWorldTransform(cx, cy, 0, child._ascaleX, child._ascaleY, child._ashearX, child._ashearY);
+		return;
+	}
+	x = targetX - pp->_worldX;
+	y = targetY - pp->_worldY;
+	tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
+	dd = tx * tx + ty * ty;
+	if (softness != 0) {
+		softness *= psx * (csx + 1) / 2;
+		td = MathUtil::sqrt(dd), sd = td - l1 - l2 * psx + softness;
+		if (sd > 0) {
+			p = MathUtil::min(1.0f, sd / (softness * 2)) - 1;
+			p = (sd - softness * (1 - p * p)) / td;
+			tx -= p * tx;
+			ty -= p * ty;
+			dd = tx * tx + ty * ty;
+		}
+	}
 	if (u) {
 		float cosine, a, b;
 		l2 *= psx;
@@ -136,7 +156,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 		if (cosine < -1) cosine = -1;
 		else if (cosine > 1) {
 			cosine = 1;
-			if (stretch && l1 + l2 > 0.0001f) sx *= (MathUtil::sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+			if (stretch) sx *= (MathUtil::sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
 		}
 		a2 = MathUtil::acos(cosine) * bendDir;
 		a = l1 + l2 * cosine;
@@ -213,6 +233,7 @@ IkConstraint::IkConstraint(IkConstraintData &data, Skeleton &skeleton) : Updatab
 																		 _compress(data.getCompress()),
 																		 _stretch(data.getStretch()),
 																		 _mix(data.getMix()),
+																		 _softness(data.getSoftness()),
 																		 _target(skeleton.findBone(
 																				 data.getTarget()->getName())),
 																				 _active(false) {
@@ -238,7 +259,7 @@ void IkConstraint::update() {
 		case 2: {
 			Bone *bone0 = _bones[0];
 			Bone *bone1 = _bones[1];
-			apply(*bone0, *bone1, _target->getWorldX(), _target->getWorldY(), _bendDirection, _stretch, _mix);
+			apply(*bone0, *bone1, _target->getWorldX(), _target->getWorldY(), _bendDirection, _stretch, _softness, _mix);
 		}
 			break;
 	}

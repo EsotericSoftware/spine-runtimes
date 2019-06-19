@@ -56,7 +56,7 @@ public:
 	/// Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as
 	/// possible. The target is specified in the world coordinate system.
 	/// @param child A direct descendant of the parent bone.
-	static void apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, float alpha);
+	static void apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, float softness, float alpha);
 
 	IkConstraint(IkConstraintData &data, Skeleton &skeleton);
 
@@ -91,6 +91,10 @@ public:
 
 	void setMix(float inValue);
 
+	float getSoftness();
+
+	void setSoftness(float inValue);
+
 	bool isActive();
 
 	void setActive(bool inValue);
@@ -102,6 +106,7 @@ private:
 	bool _compress;
 	bool _stretch;
 	float _mix;
+	float _softness;
 	Bone *_target;
 	bool _active;
 };

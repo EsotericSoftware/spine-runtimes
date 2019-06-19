@@ -71,6 +71,9 @@ namespace spine {
         float getMix();
         void setMix(float inValue);
 
+		float getSoftness();
+		void setSoftness(float inValue);
+
     private:
         Vector<BoneData*> _bones;
         BoneData* _target;
@@ -79,6 +82,7 @@ namespace spine {
         bool _stretch;
         bool _uniform;
         float _mix;
+        float _softness;
     };
 }
 

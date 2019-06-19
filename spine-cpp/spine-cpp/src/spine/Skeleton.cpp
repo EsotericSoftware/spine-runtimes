@@ -247,6 +247,7 @@ void Skeleton::setBonesToSetupPose() {
 		constraint._compress = constraint._data._compress;
 		constraint._stretch = constraint._data._stretch;
 		constraint._mix = constraint._data._mix;
+		constraint._softness = constraint._data._softness;
 	}
 
 	for (size_t i = 0, n = _transformConstraints.size(); i < n; ++i) {
