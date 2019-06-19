@@ -137,6 +137,7 @@ module spine {
 					data.bones.push(skeletonData.bones[input.readInt(true)]);
 				data.target = skeletonData.bones[input.readInt(true)];
 				data.mix = input.readFloat();
+				data.softness = input.readFloat();
 				data.bendDirection = input.readByte();
 				data.compress = input.readBoolean();
 				data.stretch = input.readBoolean();
@@ -583,7 +584,7 @@ module spine {
 				let timeline = new IkConstraintTimeline(frameCount);
 				timeline.ikConstraintIndex = index;
 				for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readByte(), input.readBoolean(),
+					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readByte(), input.readBoolean(),
 						input.readBoolean());
 					if (frameIndex < frameCount - 1) this.readCurve(input, frameIndex, timeline);
 				}

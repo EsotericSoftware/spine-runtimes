@@ -1044,12 +1044,12 @@ module spine {
 	}
 
 	export class IkConstraintTimeline extends CurveTimeline {
-		static ENTRIES = 5;
-		static PREV_TIME = -5; static PREV_MIX = -4; static PREV_BEND_DIRECTION = -3; static PREV_COMPRESS = -2; static PREV_STRETCH = -1;
-		static MIX = 1; static BEND_DIRECTION = 2; static COMPRESS = 3; static STRETCH = 4;
+		static ENTRIES = 6;
+		static PREV_TIME = -6; static PREV_MIX = -5; static PREV_SOFTNESS = -4; static PREV_BEND_DIRECTION = -3; static PREV_COMPRESS = -2; static PREV_STRETCH = -1;
+		static MIX = 1; static SOFTNESS = 2; static BEND_DIRECTION = 3; static COMPRESS = 4; static STRETCH = 5;
 
 		ikConstraintIndex: number;
-		frames: ArrayLike<number>; // time, mix, bendDirection, compress, stretch, ...
+		frames: ArrayLike<number>; // time, mix, softness, bendDirection, compress, stretch, ...
 
 		constructor (frameCount: number) {
 			super(frameCount);
@@ -1060,11 +1060,12 @@ module spine {
 			return (TimelineType.ikConstraint << 24) + this.ikConstraintIndex;
 		}
 
-		/** Sets the time, mix and bend direction of the specified keyframe. */
-		setFrame (frameIndex: number, time: number, mix: number, bendDirection: number, compress: boolean, stretch: boolean) {
+		/** Sets the time, mix, softness, and bend direction of the specified keyframe. */
+		setFrame (frameIndex: number, time: number, mix: number, softness: number, bendDirection: number, compress: boolean, stretch: boolean) {
 			frameIndex *= IkConstraintTimeline.ENTRIES;
 			this.frames[frameIndex] = time;
 			this.frames[frameIndex + IkConstraintTimeline.MIX] = mix;
+			this.frames[frameIndex + IkConstraintTimeline.SOFTNESS] = softness;
 			this.frames[frameIndex + IkConstraintTimeline.BEND_DIRECTION] = bendDirection;
 			this.frames[frameIndex + IkConstraintTimeline.COMPRESS] = compress ? 1 : 0;
 			this.frames[frameIndex + IkConstraintTimeline.STRETCH] = stretch ? 1 : 0;
@@ -1078,12 +1079,14 @@ module spine {
 				switch (blend) {
 				case MixBlend.setup:
 					constraint.mix = constraint.data.mix;
+					constraint.softness = constraint.data.softness;
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 					return;
 				case MixBlend.first:
 					constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
+					constraint.softness += (constraint.data.softness - constraint.softness) * alpha;
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
@@ -1094,6 +1097,8 @@ module spine {
 			if (time >= frames[frames.length - IkConstraintTimeline.ENTRIES]) { // Time is after last frame.
 				if (blend == MixBlend.setup) {
 					constraint.mix = constraint.data.mix + (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.data.mix) * alpha;
+					constraint.softness = constraint.data.softness
+						+ (frames[frames.length + IkConstraintTimeline.PREV_SOFTNESS] - constraint.data.softness) * alpha;
 					if (direction == MixDirection.mixOut) {
 						constraint.bendDirection = constraint.data.bendDirection;
 						constraint.compress = constraint.data.compress;
@@ -1105,6 +1110,7 @@ module spine {
 					}
 				} else {
 					constraint.mix += (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.mix) * alpha;
+					constraint.softness += (frames[frames.length + IkConstraintTimeline.PREV_SOFTNESS] - constraint.softness) * alpha;
 					if (direction == MixDirection.mixIn) {
 						constraint.bendDirection = frames[frames.length + IkConstraintTimeline.PREV_BEND_DIRECTION];
 						constraint.compress = frames[frames.length + IkConstraintTimeline.PREV_COMPRESS] != 0;
@@ -1117,12 +1123,15 @@ module spine {
 			// Interpolate between the previous frame and the current frame.
 			let frame = Animation.binarySearch(frames, time, IkConstraintTimeline.ENTRIES);
 			let mix = frames[frame + IkConstraintTimeline.PREV_MIX];
+			let softness = frames[frame + IkConstraintTimeline.PREV_SOFTNESS];
 			let frameTime = frames[frame];
 			let percent = this.getCurvePercent(frame / IkConstraintTimeline.ENTRIES - 1,
 				1 - (time - frameTime) / (frames[frame + IkConstraintTimeline.PREV_TIME] - frameTime));
 
 			if (blend == MixBlend.setup) {
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.data.mix) * alpha;
+				constraint.softness = constraint.data.softness
+					+ (softness + (frames[frame + IkConstraintTimeline.SOFTNESS] - softness) * percent - constraint.data.softness) * alpha;
 				if (direction == MixDirection.mixOut) {
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
@@ -1134,6 +1143,7 @@ module spine {
 				}
 			} else {
 				constraint.mix += (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.mix) * alpha;
+				constraint.softness += (softness + (frames[frame + IkConstraintTimeline.SOFTNESS] - softness) * percent - constraint.softness) * alpha;
 				if (direction == MixDirection.mixIn) {
 					constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
 					constraint.compress = frames[frame + IkConstraintTimeline.PREV_COMPRESS] != 0;

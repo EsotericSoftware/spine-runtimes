@@ -981,10 +981,11 @@ var spine;
 		IkConstraintTimeline.prototype.getPropertyId = function () {
 			return (TimelineType.ikConstraint << 24) + this.ikConstraintIndex;
 		};
-		IkConstraintTimeline.prototype.setFrame = function (frameIndex, time, mix, bendDirection, compress, stretch) {
+		IkConstraintTimeline.prototype.setFrame = function (frameIndex, time, mix, softness, bendDirection, compress, stretch) {
 			frameIndex *= IkConstraintTimeline.ENTRIES;
 			this.frames[frameIndex] = time;
 			this.frames[frameIndex + IkConstraintTimeline.MIX] = mix;
+			this.frames[frameIndex + IkConstraintTimeline.SOFTNESS] = softness;
 			this.frames[frameIndex + IkConstraintTimeline.BEND_DIRECTION] = bendDirection;
 			this.frames[frameIndex + IkConstraintTimeline.COMPRESS] = compress ? 1 : 0;
 			this.frames[frameIndex + IkConstraintTimeline.STRETCH] = stretch ? 1 : 0;
@@ -998,12 +999,14 @@ var spine;
 				switch (blend) {
 					case MixBlend.setup:
 						constraint.mix = constraint.data.mix;
+						constraint.softness = constraint.data.softness;
 						constraint.bendDirection = constraint.data.bendDirection;
 						constraint.compress = constraint.data.compress;
 						constraint.stretch = constraint.data.stretch;
 						return;
 					case MixBlend.first:
 						constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
+						constraint.softness += (constraint.data.softness - constraint.softness) * alpha;
 						constraint.bendDirection = constraint.data.bendDirection;
 						constraint.compress = constraint.data.compress;
 						constraint.stretch = constraint.data.stretch;
@@ -1013,6 +1016,8 @@ var spine;
 			if (time >= frames[frames.length - IkConstraintTimeline.ENTRIES]) {
 				if (blend == MixBlend.setup) {
 					constraint.mix = constraint.data.mix + (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.data.mix) * alpha;
+					constraint.softness = constraint.data.softness
+						+ (frames[frames.length + IkConstraintTimeline.PREV_SOFTNESS] - constraint.data.softness) * alpha;
 					if (direction == MixDirection.mixOut) {
 						constraint.bendDirection = constraint.data.bendDirection;
 						constraint.compress = constraint.data.compress;
@@ -1026,6 +1031,7 @@ var spine;
 				}
 				else {
 					constraint.mix += (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.mix) * alpha;
+					constraint.softness += (frames[frames.length + IkConstraintTimeline.PREV_SOFTNESS] - constraint.softness) * alpha;
 					if (direction == MixDirection.mixIn) {
 						constraint.bendDirection = frames[frames.length + IkConstraintTimeline.PREV_BEND_DIRECTION];
 						constraint.compress = frames[frames.length + IkConstraintTimeline.PREV_COMPRESS] != 0;
@@ -1036,10 +1042,13 @@ var spine;
 			}
 			var frame = Animation.binarySearch(frames, time, IkConstraintTimeline.ENTRIES);
 			var mix = frames[frame + IkConstraintTimeline.PREV_MIX];
+			var softness = frames[frame + IkConstraintTimeline.PREV_SOFTNESS];
 			var frameTime = frames[frame];
 			var percent = this.getCurvePercent(frame / IkConstraintTimeline.ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + IkConstraintTimeline.PREV_TIME] - frameTime));
 			if (blend == MixBlend.setup) {
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.data.mix) * alpha;
+				constraint.softness = constraint.data.softness
+					+ (softness + (frames[frame + IkConstraintTimeline.SOFTNESS] - softness) * percent - constraint.data.softness) * alpha;
 				if (direction == MixDirection.mixOut) {
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
@@ -1053,6 +1062,7 @@ var spine;
 			}
 			else {
 				constraint.mix += (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.mix) * alpha;
+				constraint.softness += (softness + (frames[frame + IkConstraintTimeline.SOFTNESS] - softness) * percent - constraint.softness) * alpha;
 				if (direction == MixDirection.mixIn) {
 					constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
 					constraint.compress = frames[frame + IkConstraintTimeline.PREV_COMPRESS] != 0;
@@ -1060,16 +1070,18 @@ var spine;
 				}
 			}
 		};
-		IkConstraintTimeline.ENTRIES = 5;
-		IkConstraintTimeline.PREV_TIME = -5;
-		IkConstraintTimeline.PREV_MIX = -4;
+		IkConstraintTimeline.ENTRIES = 6;
+		IkConstraintTimeline.PREV_TIME = -6;
+		IkConstraintTimeline.PREV_MIX = -5;
+		IkConstraintTimeline.PREV_SOFTNESS = -4;
 		IkConstraintTimeline.PREV_BEND_DIRECTION = -3;
 		IkConstraintTimeline.PREV_COMPRESS = -2;
 		IkConstraintTimeline.PREV_STRETCH = -1;
 		IkConstraintTimeline.MIX = 1;
-		IkConstraintTimeline.BEND_DIRECTION = 2;
-		IkConstraintTimeline.COMPRESS = 3;
-		IkConstraintTimeline.STRETCH = 4;
+		IkConstraintTimeline.SOFTNESS = 2;
+		IkConstraintTimeline.BEND_DIRECTION = 3;
+		IkConstraintTimeline.COMPRESS = 4;
+		IkConstraintTimeline.STRETCH = 5;
 		return IkConstraintTimeline;
 	}(CurveTimeline));
 	spine.IkConstraintTimeline = IkConstraintTimeline;
@@ -2775,6 +2787,7 @@ var spine;
 			this.compress = false;
 			this.stretch = false;
 			this.mix = 1;
+			this.softness = 0;
 			this.active = false;
 			if (data == null)
 				throw new Error("data cannot be null.");
@@ -2782,6 +2795,7 @@ var spine;
 				throw new Error("skeleton cannot be null.");
 			this.data = data;
 			this.mix = data.mix;
+			this.softness = data.softness;
 			this.bendDirection = data.bendDirection;
 			this.compress = data.compress;
 			this.stretch = data.stretch;
@@ -2804,7 +2818,7 @@ var spine;
 					this.apply1(bones[0], target.worldX, target.worldY, this.compress, this.stretch, this.data.uniform, this.mix);
 					break;
 				case 2:
-					this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.stretch, this.mix);
+					this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.stretch, this.softness, this.mix);
 					break;
 			}
 		};
@@ -2834,7 +2848,7 @@ var spine;
 			}
 			bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY);
 		};
-		IkConstraint.prototype.apply2 = function (parent, child, targetX, targetY, bendDir, stretch, alpha) {
+		IkConstraint.prototype.apply2 = function (parent, child, targetX, targetY, bendDir, stretch, softness, alpha) {
 			if (alpha == 0) {
 				child.updateWorldTransform();
 				return;
@@ -2881,12 +2895,29 @@ var spine;
 			b = pp.b;
 			c = pp.c;
 			d = pp.d;
-			var id = 1 / (a * d - b * c), x = targetX - pp.worldX, y = targetY - pp.worldY;
-			var tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py, dd = tx * tx + ty * ty;
-			x = cwx - pp.worldX;
-			y = cwy - pp.worldY;
+			var id = 1 / (a * d - b * c), x = cwx - pp.worldX, y = cwy - pp.worldY;
 			var dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
-			var l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1 = 0, a2 = 0;
+			var l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
+			if (l1 < 0.0001) {
+				this.apply1(parent, targetX, targetY, false, stretch, false, alpha);
+				child.updateWorldTransformWith(cx, cy, 0, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
+				return;
+			}
+			x = targetX - pp.worldX;
+			y = targetY - pp.worldY;
+			var tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
+			var dd = tx * tx + ty * ty;
+			if (softness != 0) {
+				softness *= psx * (csx + 1) / 2;
+				var td = Math.sqrt(dd), sd = td - l1 - l2 * psx + softness;
+				if (sd > 0) {
+					var p = Math.min(1, sd / (softness * 2)) - 1;
+					p = (sd - softness * (1 - p * p)) / td;
+					tx -= p * tx;
+					ty -= p * ty;
+					dd = tx * tx + ty * ty;
+				}
+			}
 			outer: if (u) {
 				l2 *= psx;
 				var cos = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
@@ -2894,7 +2925,7 @@ var spine;
 					cos = -1;
 				else if (cos > 1) {
 					cos = 1;
-					if (stretch && l1 + l2 > 0.0001)
+					if (stretch)
 						sx *= (Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
 				}
 				a2 = Math.acos(cos) * bendDir;
@@ -2985,6 +3016,7 @@ var spine;
 			_this.stretch = false;
 			_this.uniform = false;
 			_this.mix = 1;
+			_this.softness = 0;
 			return _this;
 		}
 		return IkConstraintData;
@@ -3804,6 +3836,7 @@ var spine;
 			for (var i = 0, n = ikConstraints.length; i < n; i++) {
 				var constraint = ikConstraints[i];
 				constraint.mix = constraint.data.mix;
+				constraint.softness = constraint.data.softness;
 				constraint.bendDirection = constraint.data.bendDirection;
 				constraint.compress = constraint.data.compress;
 				constraint.stretch = constraint.data.stretch;
@@ -4090,6 +4123,7 @@ var spine;
 					data.bones.push(skeletonData.bones[input.readInt(true)]);
 				data.target = skeletonData.bones[input.readInt(true)];
 				data.mix = input.readFloat();
+				data.softness = input.readFloat();
 				data.bendDirection = input.readByte();
 				data.compress = input.readBoolean();
 				data.stretch = input.readBoolean();
@@ -4521,7 +4555,7 @@ var spine;
 				var timeline = new spine.IkConstraintTimeline(frameCount);
 				timeline.ikConstraintIndex = index;
 				for (var frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readByte(), input.readBoolean(), input.readBoolean());
+					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readByte(), input.readBoolean(), input.readBoolean());
 					if (frameIndex < frameCount - 1)
 						this.readCurve(input, frameIndex, timeline);
 				}
@@ -5505,6 +5539,7 @@ var spine;
 					if (data.target == null)
 						throw new Error("IK target bone not found: " + targetName);
 					data.mix = this.getValue(constraintMap, "mix", 1);
+					data.softness = this.getValue(constraintMap, "softness", 0);
 					data.bendDirection = this.getValue(constraintMap, "bendPositive", true) ? 1 : -1;
 					data.compress = this.getValue(constraintMap, "compress", false);
 					data.stretch = this.getValue(constraintMap, "stretch", false);
@@ -5922,7 +5957,7 @@ var spine;
 					var frameIndex = 0;
 					for (var i = 0; i < constraintMap.length; i++) {
 						var valueMap = constraintMap[i];
-						timeline.setFrame(frameIndex, this.getValue(valueMap, "time", 0), this.getValue(valueMap, "mix", 1), this.getValue(valueMap, "bendPositive", true) ? 1 : -1, this.getValue(valueMap, "compress", false), this.getValue(valueMap, "stretch", false));
+						timeline.setFrame(frameIndex, this.getValue(valueMap, "time", 0), this.getValue(valueMap, "mix", 1), this.getValue(valueMap, "softness", 0), this.getValue(valueMap, "bendPositive", true) ? 1 : -1, this.getValue(valueMap, "compress", false), this.getValue(valueMap, "stretch", false));
 						this.readCurve(valueMap, timeline, frameIndex);
 						frameIndex++;
 					}

@@ -175,10 +175,12 @@ declare module spine {
 		static ENTRIES: number;
 		static PREV_TIME: number;
 		static PREV_MIX: number;
+		static PREV_SOFTNESS: number;
 		static PREV_BEND_DIRECTION: number;
 		static PREV_COMPRESS: number;
 		static PREV_STRETCH: number;
 		static MIX: number;
+		static SOFTNESS: number;
 		static BEND_DIRECTION: number;
 		static COMPRESS: number;
 		static STRETCH: number;
@@ -186,7 +188,7 @@ declare module spine {
 		frames: ArrayLike<number>;
 		constructor(frameCount: number);
 		getPropertyId(): number;
-		setFrame(frameIndex: number, time: number, mix: number, bendDirection: number, compress: boolean, stretch: boolean): void;
+		setFrame(frameIndex: number, time: number, mix: number, softness: number, bendDirection: number, compress: boolean, stretch: boolean): void;
 		apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection): void;
 	}
 	class TransformConstraintTimeline extends CurveTimeline {
@@ -534,13 +536,14 @@ declare module spine {
 		compress: boolean;
 		stretch: boolean;
 		mix: number;
+		softness: number;
 		active: boolean;
 		constructor(data: IkConstraintData, skeleton: Skeleton);
 		isActive(): boolean;
 		apply(): void;
 		update(): void;
 		apply1(bone: Bone, targetX: number, targetY: number, compress: boolean, stretch: boolean, uniform: boolean, alpha: number): void;
-		apply2(parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, alpha: number): void;
+		apply2(parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, softness: number, alpha: number): void;
 	}
 }
 declare module spine {
@@ -552,6 +555,7 @@ declare module spine {
 		stretch: boolean;
 		uniform: boolean;
 		mix: number;
+		softness: number;
 		constructor(name: string);
 	}
 }
