@@ -567,7 +567,7 @@ namespace Spine.Unity {
 						return true;
 				}
 			}
-			return true;
+			return false;
 		}
 		#endif // UNITY_EDITOR
 
