@@ -248,12 +248,18 @@ public class IkConstraint implements Updatable {
 		float id = 1 / (a * d - b * c), x = cwx - pp.worldX, y = cwy - pp.worldY;
 		float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 		float l1 = (float)Math.sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
+		if (l1 < 0.0001f) {
+			apply(parent, targetX, targetY, false, stretch, false, alpha);
+			child.updateWorldTransform(cx, cy, 0, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
+			return;
+		}
 		x = targetX - pp.worldX;
 		y = targetY - pp.worldY;
 		float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
 		float dd = tx * tx + ty * ty;
 		if (softness != 0) {
-			float td = (float)Math.sqrt(dd), sd = td - l1 - l2 + softness;
+			softness *= psx * (csx + 1) / 2;
+			float td = (float)Math.sqrt(dd), sd = td - l1 - l2 * psx + softness;
 			if (sd > 0) {
 				float p = Math.min(1, sd / (softness * 2)) - 1;
 				p = (sd - softness * (1 - p * p)) / td;
@@ -270,7 +276,7 @@ public class IkConstraint implements Updatable {
 				cos = -1;
 			else if (cos > 1) {
 				cos = 1;
-				if (stretch && l1 + l2 > 0.0001f) sx *= ((float)Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+				if (stretch) sx *= ((float)Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
 			}
 			a2 = (float)Math.acos(cos) * bendDir;
 			a = l1 + l2 * cos;
