@@ -33,7 +33,7 @@ package spine.animation {
 	import spine.Skeleton;
 
 	public class IkConstraintTimeline extends CurveTimeline {
-		static public const ENTRIES : int = 5;
+		static public const ENTRIES : int = 6;
 		static internal const PREV_TIME : int = -6, PREV_MIX : int = -5, PREV_SOFTNESS : int = -4, PREV_BEND_DIRECTION : int = -3, PREV_COMPRESS : int = -2, PREV_STRETCH : int = -1;
 		static internal const MIX : int = 1, SOFTNESS : int = 2, BEND_DIRECTION : int = 3, COMPRESS : int = 4, STRETCH : int = 5;
 		public var ikConstraintIndex : int;
