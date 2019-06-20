@@ -37,7 +37,7 @@ namespace Spine {
 		internal BoneData target;
 		internal int bendDirection = 1;
 		internal bool compress, stretch, uniform;
-		internal float mix = 1;
+		internal float mix = 1, softness;
 
 		public IkConstraintData (string name) : base(name) {
 		}
@@ -58,6 +58,12 @@ namespace Spine {
 		public float Mix {
 			get { return mix; }
 			set { mix = value; }
+		}
+
+		///<summary>For two bone IK, the distance from the maximum reach of the bones that rotation will slow.</summary>
+		public float Softness {
+			get { return softness; }
+			set { softness = value; }
 		}
 
 		/// <summary>Controls the bend direction of the IK bones, either 1 or -1.</summary>

@@ -518,6 +518,7 @@ namespace Spine {
 			case TimelineType.IkConstraint:
 				ikc = skeleton.ikConstraints.Items[i];
 				ikc.mix = ikc.data.mix;
+				ikc.softness = ikc.data.softness;
 				ikc.bendDirection = ikc.data.bendDirection;
 				ikc.stretch = ikc.data.stretch;
 				break;

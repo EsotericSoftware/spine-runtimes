@@ -1352,15 +1352,16 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes an IK constraint's <see cref="IkConstraint.Mix"/>, <see cref="IkConstraint.BendDirection"/>,
-	/// <see cref="IkConstraint.Stretch"/>, and <see cref="IkConstraint.Compress"/>.</summary>
+	/// <summary>Changes an IK constraint's <see cref="IkConstraint.Mix"/>, <see cref="IkConstraint.Softness"/>,
+	/// <see cref="IkConstraint.BendDirection"/>, <see cref="IkConstraint.Stretch"/>, and <see cref="IkConstraint.Compress"/>.</summary>
 	public class IkConstraintTimeline : CurveTimeline {
-		public const int ENTRIES = 5;
-		private const int PREV_TIME = -5, PREV_MIX = -4, PREV_BEND_DIRECTION = -3, PREV_COMPRESS = -2, PREV_STRETCH = -1;
-		private const int MIX = 1, BEND_DIRECTION = 2, COMPRESS = 3, STRETCH = 4;
+		public const int ENTRIES = 6;
+		private const int PREV_TIME = -6, PREV_MIX = -5, PREV_SOFTNESS = -4, PREV_BEND_DIRECTION = -3, PREV_COMPRESS = -2,
+			PREV_STRETCH = -1;
+		private const int MIX = 1, SOFTNESS = 2, BEND_DIRECTION = 3, COMPRESS = 4, STRETCH = 5;
 
 		internal int ikConstraintIndex;
-		internal float[] frames; // time, mix, bendDirection, compress, stretch, ...
+		internal float[] frames; // time, mix, softness, bendDirection, compress, stretch, ...
 
 		public IkConstraintTimeline (int frameCount)
 			: base(frameCount) {
@@ -1382,14 +1383,16 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>The time in seconds, mix, bend direction, compress, and stretch for each key frame.</summary>
+		/// <summary>The time in seconds, mix, softness, bend direction, compress, and stretch for each key frame.</summary>
 		public float[] Frames { get { return frames; } set { frames = value; } }
 
-		/// <summary>Sets the time in seconds, mix, bend direction, compress, and stretch for the specified key frame.</summary>
-		public void SetFrame (int frameIndex, float time, float mix, int bendDirection, bool compress, bool stretch) {
+		/// <summary>Sets the time in seconds, mix, softness, bend direction, compress, and stretch for the specified key frame.</summary>
+		public void SetFrame (int frameIndex, float time, float mix, float softness, int bendDirection, bool compress,
+			bool stretch) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
 			frames[frameIndex + MIX] = mix;
+			frames[frameIndex + SOFTNESS] = softness;
 			frames[frameIndex + BEND_DIRECTION] = bendDirection;
 			frames[frameIndex + COMPRESS] = compress ? 1 : 0;
 			frames[frameIndex + STRETCH] = stretch ? 1 : 0;
@@ -1404,12 +1407,14 @@ namespace Spine {
 				switch (blend) {
 				case MixBlend.Setup:
 					constraint.mix = constraint.data.mix;
+					constraint.softness = constraint.data.softness;
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 					return;
 				case MixBlend.First:
 					constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
+					constraint.softness += (constraint.data.softness - constraint.softness) * alpha;
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
@@ -1421,6 +1426,8 @@ namespace Spine {
 			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
 				if (blend == MixBlend.Setup) {
 					constraint.mix = constraint.data.mix + (frames[frames.Length + PREV_MIX] - constraint.data.mix) * alpha;
+					constraint.softness = constraint.data.softness
+						+ (frames[frames.Length + PREV_SOFTNESS] - constraint.data.softness) * alpha;
 					if (direction == MixDirection.Out) {
 						constraint.bendDirection = constraint.data.bendDirection;
 						constraint.compress = constraint.data.compress;
@@ -1432,6 +1439,7 @@ namespace Spine {
 					}
 				} else {
 					constraint.mix += (frames[frames.Length + PREV_MIX] - constraint.mix) * alpha;
+					constraint.softness += (frames[frames.Length + PREV_SOFTNESS] - constraint.softness) * alpha;
 					if (direction == MixDirection.In) {
 						constraint.bendDirection = (int)frames[frames.Length + PREV_BEND_DIRECTION];
 						constraint.compress = frames[frames.Length + PREV_COMPRESS] != 0;
@@ -1444,11 +1452,14 @@ namespace Spine {
 			// Interpolate between the previous frame and the current frame.
 			int frame = Animation.BinarySearch(frames, time, ENTRIES);
 			float mix = frames[frame + PREV_MIX];
+			float softness = frames[frame + PREV_SOFTNESS];
 			float frameTime = frames[frame];
 			float percent = GetCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
 			if (blend == MixBlend.Setup) {
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha;
+				constraint.softness = constraint.data.softness
+					+ (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.data.softness) * alpha;
 				if (direction == MixDirection.Out) {
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
@@ -1460,6 +1471,7 @@ namespace Spine {
 				}
 			} else {
 				constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
+				constraint.softness += (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.softness) * alpha;
 				if (direction == MixDirection.In) {
 					constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
 					constraint.compress = frames[frame + PREV_COMPRESS] != 0;

@@ -188,6 +188,7 @@ namespace Spine {
 					data.target = skeletonData.FindBone(targetName);
 					if (data.target == null) throw new Exception("IK target bone not found: " + targetName);
 					data.mix = GetFloat(constraintMap, "mix", 1);
+					data.softness = GetFloat(constraintMap, "softness", 0) * scale;
 					data.bendDirection = GetBoolean(constraintMap, "bendPositive", true) ? 1 : -1;
 					data.compress = GetBoolean(constraintMap, "compress", false);
 					data.stretch = GetBoolean(constraintMap, "stretch", false);
@@ -648,6 +649,7 @@ namespace Spine {
 							frameIndex,
 							GetFloat(valueMap, "time", 0),
 							GetFloat(valueMap, "mix", 1),
+							GetFloat(valueMap, "softness", 0) * scale,
 							GetBoolean(valueMap, "bendPositive", true) ? 1 : -1,
 							GetBoolean(valueMap, "compress", true),
 							GetBoolean(valueMap, "stretch", false)
