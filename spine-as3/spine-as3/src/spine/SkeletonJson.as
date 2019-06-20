@@ -169,7 +169,7 @@ package spine {
 				ikConstraintData.compress = (constraintMap.hasOwnProperty("compress") && constraintMap["compress"]);
 				ikConstraintData.stretch = (constraintMap.hasOwnProperty("stretch") && constraintMap["stretch"]);
 				ikConstraintData.uniform = (constraintMap.hasOwnProperty("uniform") && constraintMap["uniform"]);
-				ikConstraintData.softness = constraintMap.hasOwnProperty("softness") ? constraintMap["softness"] : 0;
+				ikConstraintData.softness = (constraintMap.hasOwnProperty("softness") ? constraintMap["softness"] : 0) * scale;
 				ikConstraintData.mix = constraintMap.hasOwnProperty("mix") ? constraintMap["mix"] : 1;
 
 				skeletonData.ikConstraints.push(ikConstraintData);
@@ -589,7 +589,7 @@ package spine {
 					var bendDirection : int = (!valueMap.hasOwnProperty("bendPositive") || valueMap["bendPositive"]) ? 1 : -1;
 					var compress : Boolean = (valueMap.hasOwnProperty("compress") && valueMap["compress"]);
 					var stretch : Boolean = (valueMap.hasOwnProperty("stretch") && valueMap["stretch"]);
-					var softness : Number = valueMap.hasOwnProperty("softness") ? valueMap["softness"] : 0;
+					var softness : Number = (valueMap.hasOwnProperty("softness") ? valueMap["softness"] : 0) * scale;
 					ikTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), mix, softness, bendDirection, compress, stretch);
 					readCurve(valueMap, ikTimeline, frameIndex);
 					frameIndex++;
