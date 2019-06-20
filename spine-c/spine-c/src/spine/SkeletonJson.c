@@ -302,7 +302,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 			}
 		}
 		for (valueMap = constraintMap->child, frameIndex = 0; valueMap; valueMap = valueMap->next, ++frameIndex) {
-			spIkConstraintTimeline_setFrame(timeline, frameIndex, Json_getFloat(valueMap, "time", 0), Json_getFloat(valueMap, "mix", 1), Json_getFloat(valueMap, "softness", 0),
+			spIkConstraintTimeline_setFrame(timeline, frameIndex, Json_getFloat(valueMap, "time", 0), Json_getFloat(valueMap, "mix", 1), Json_getFloat(valueMap, "softness", 0) * self->scale,
 					Json_getInt(valueMap, "bendPositive", 1) ? 1 : -1, Json_getInt(valueMap, "compress", 0) ? 1 : 0, Json_getInt(valueMap, "stretch", 0) ? 1 : 0);
 			readCurve(valueMap, SUPER(timeline), frameIndex);
 		}
@@ -753,7 +753,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			data->stretch = Json_getInt(constraintMap, "stretch", 0) ? 1 : 0;
 			data->uniform = Json_getInt(constraintMap, "uniform", 0) ? 1 : 0;
 			data->mix = Json_getFloat(constraintMap, "mix", 1);
-			data->softness = Json_getFloat(constraintMap, "softness", 0);
+			data->softness = Json_getFloat(constraintMap, "softness", 0) * self->scale;
 
 			skeletonData->ikConstraints[i] = data;
 		}

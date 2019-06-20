@@ -209,7 +209,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		}
 		data->_target = skeletonData->_bones[readVarint(input, true)];
 		data->_mix = readFloat(input);
-		data->_softness = readFloat(input);
+		data->_softness = readFloat(input) * _scale;
 		data->_bendDirection = readSByte(input);
 		data->_compress = readBoolean(input);
 		data->_stretch = readBoolean(input);
@@ -810,7 +810,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 		for (int frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
 			float time = readFloat(input);
 			float mix = readFloat(input);
-			float softness = readFloat(input);
+			float softness = readFloat(input) * _scale;
 			signed char bendDirection = readSByte(input);
 			bool compress = readBoolean(input);
 			bool stretch = readBoolean(input);
