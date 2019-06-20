@@ -4123,7 +4123,7 @@ var spine;
 					data.bones.push(skeletonData.bones[input.readInt(true)]);
 				data.target = skeletonData.bones[input.readInt(true)];
 				data.mix = input.readFloat();
-				data.softness = input.readFloat();
+				data.softness = input.readFloat() * scale;
 				data.bendDirection = input.readByte();
 				data.compress = input.readBoolean();
 				data.stretch = input.readBoolean();
@@ -4555,7 +4555,7 @@ var spine;
 				var timeline = new spine.IkConstraintTimeline(frameCount);
 				timeline.ikConstraintIndex = index;
 				for (var frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readByte(), input.readBoolean(), input.readBoolean());
+					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat() * scale, input.readByte(), input.readBoolean(), input.readBoolean());
 					if (frameIndex < frameCount - 1)
 						this.readCurve(input, frameIndex, timeline);
 				}
@@ -5539,7 +5539,7 @@ var spine;
 					if (data.target == null)
 						throw new Error("IK target bone not found: " + targetName);
 					data.mix = this.getValue(constraintMap, "mix", 1);
-					data.softness = this.getValue(constraintMap, "softness", 0);
+					data.softness = this.getValue(constraintMap, "softness", 0) * scale;
 					data.bendDirection = this.getValue(constraintMap, "bendPositive", true) ? 1 : -1;
 					data.compress = this.getValue(constraintMap, "compress", false);
 					data.stretch = this.getValue(constraintMap, "stretch", false);
@@ -5957,7 +5957,7 @@ var spine;
 					var frameIndex = 0;
 					for (var i = 0; i < constraintMap.length; i++) {
 						var valueMap = constraintMap[i];
-						timeline.setFrame(frameIndex, this.getValue(valueMap, "time", 0), this.getValue(valueMap, "mix", 1), this.getValue(valueMap, "softness", 0), this.getValue(valueMap, "bendPositive", true) ? 1 : -1, this.getValue(valueMap, "compress", false), this.getValue(valueMap, "stretch", false));
+						timeline.setFrame(frameIndex, this.getValue(valueMap, "time", 0), this.getValue(valueMap, "mix", 1), this.getValue(valueMap, "softness", 0) * scale, this.getValue(valueMap, "bendPositive", true) ? 1 : -1, this.getValue(valueMap, "compress", false), this.getValue(valueMap, "stretch", false));
 						this.readCurve(valueMap, timeline, frameIndex);
 						frameIndex++;
 					}

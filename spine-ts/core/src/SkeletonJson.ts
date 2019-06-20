@@ -127,7 +127,7 @@ module spine {
 					if (data.target == null) throw new Error("IK target bone not found: " + targetName);
 
 					data.mix = this.getValue(constraintMap, "mix", 1);
-					data.softness = this.getValue(constraintMap, "softness", 0);
+					data.softness = this.getValue(constraintMap, "softness", 0) * scale;
 					data.bendDirection = this.getValue(constraintMap, "bendPositive", true) ? 1 : -1;
 					data.compress = this.getValue(constraintMap, "compress", false);
 					data.stretch = this.getValue(constraintMap, "stretch", false);
@@ -571,7 +571,7 @@ module spine {
 					let frameIndex = 0;
 					for (let i = 0; i < constraintMap.length; i++) {
 						let valueMap = constraintMap[i];
-						timeline.setFrame(frameIndex, this.getValue(valueMap, "time", 0), this.getValue(valueMap, "mix", 1), this.getValue(valueMap, "softness", 0),
+						timeline.setFrame(frameIndex, this.getValue(valueMap, "time", 0), this.getValue(valueMap, "mix", 1), this.getValue(valueMap, "softness", 0) * scale,
 							this.getValue(valueMap, "bendPositive", true) ? 1 : -1, this.getValue(valueMap, "compress", false), this.getValue(valueMap, "stretch", false));
 						this.readCurve(valueMap, timeline, frameIndex);
 						frameIndex++;
