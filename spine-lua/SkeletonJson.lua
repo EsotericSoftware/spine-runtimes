@@ -168,7 +168,7 @@ function SkeletonJson.new (attachmentLoader)
 				if not data.target then error("Target bone not found: " .. targetName) end
 
 				data.mix = getValue(constraintMap, "mix", 1)
-        data.softness = getValue(constraintMap, "softness", 0)
+        data.softness = getValue(constraintMap, "softness", 0) * scale
 				if constraintMap["bendPositive"] == nil or constraintMap["bendPositive"] == true then
           data.bendDirection = 1
         else
@@ -640,7 +640,7 @@ function SkeletonJson.new (attachmentLoader)
 					local mix = 1
           local softness = 0
 					if valueMap["mix"] ~= nil then mix = valueMap["mix"] end
-          if valueMap["softness"] ~= nil then softness = valueMap["softness"] end
+          if valueMap["softness"] ~= nil then softness = valueMap["softness"] * scale end
 					local bendPositive = 1
 					if valueMap["bendPositive"] == false then bendPositive = -1 end
 					local stretch = false
