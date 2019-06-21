@@ -384,25 +384,21 @@ cp -f ../coin/export/coin-pro.skel "$ROOT/spine-xna/example/data/"
 cp -f ../coin/export/coin.atlas "$ROOT/spine-xna/example/data/"
 cp -f ../coin/export/coin.png "$ROOT/spine-xna/example/data/"
 
-cp -f ../goblins/export/goblins-pro.json "$ROOT/spine-xna/example/data/"
-cp -f ../goblins/export/goblins-pro.skel "$ROOT/spine-xna/example/data/"
-cp -f ../goblins/export/goblins.atlas "$ROOT/spine-xna/example/data/goblins-mesh.atlas"
-cp -f ../goblins/export/goblins.png "$ROOT/spine-xna/example/data/"
-
 cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-xna/example/data/"
-cp -f ../raptor/export/raptor-pro.skel "$ROOT/spine-xna/example/data/"
 cp -f ../raptor/export/raptor.atlas "$ROOT/spine-xna/example/data/"
 cp -f ../raptor/export/raptor.png "$ROOT/spine-xna/example/data/"
 
-cp -f ../spineboy/export/spineboy-ess.json "$ROOT/spine-xna/example/data/"
-cp -f ../spineboy/export/spineboy-ess.skel "$ROOT/spine-xna/example/data/"
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-xna/example/data/"
 cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-xna/example/data/"
 cp -f ../spineboy/export/spineboy.png "$ROOT/spine-xna/example/data/"
 
 cp -f ../tank/export/tank-pro.json "$ROOT/spine-xna/example/data/"
-cp -f ../tank/export/tank-pro.skel "$ROOT/spine-xna/example/data/"
 cp -f ../tank/export/tank.atlas "$ROOT/spine-xna/example/data/"
 cp -f ../tank/export/tank.png "$ROOT/spine-xna/example/data/"
+
+cp -f ../mix-and-match/export/mix-and-match-pro.json "$ROOT/spine-xna/example/data/"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-xna/example/data/"
+cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-xna/example/data/"
 
 echo "spine-ue4"
 rm "$ROOT/spine-ue4/Content/GettingStarted/Assets/Raptor/raptor.json"
