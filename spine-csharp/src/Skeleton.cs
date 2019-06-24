@@ -44,7 +44,7 @@ namespace Spine {
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal float time;
-		internal float scaleX = 1, scaleY = 1;
+		private float scaleX = 1, scaleY = 1;
 		internal float x, y;
 
 		public SkeletonData Data { get { return data; } }
@@ -64,7 +64,7 @@ namespace Spine {
 		public float X { get { return x; } set { x = value; } }
 		public float Y { get { return y; } set { y = value; } }
 		public float ScaleX { get { return scaleX; } set { scaleX = value; } }
-		public float ScaleY { get { return scaleY; } set { scaleY = value; } }
+		public float ScaleY { get { return scaleY * (Bone.yDown ? -1 : 1); } set { scaleY = value; } }
 
 		[Obsolete("Use ScaleX instead. FlipX is when ScaleX is negative.")]
 		public bool FlipX { get { return scaleX < 0; } set { scaleX = value ? -1f : 1f; } }
