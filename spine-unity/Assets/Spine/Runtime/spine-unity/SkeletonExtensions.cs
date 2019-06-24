@@ -100,8 +100,8 @@ namespace Spine.Unity {
 		#region Skeleton
 		/// <summary>Sets the Skeleton's local scale using a UnityEngine.Vector2. If only individual components need to be set, set Skeleton.ScaleX or Skeleton.ScaleY.</summary>
 		public static void SetLocalScale (this Skeleton skeleton, Vector2 scale) {
-			skeleton.scaleX = scale.x;
-			skeleton.scaleY = scale.y;
+			skeleton.ScaleX = scale.x;
+			skeleton.ScaleY = scale.y;
 		}
 
 		/// <summary>Gets the internal bone matrix as a Unity bonespace-to-skeletonspace transformation matrix.</summary>
@@ -171,7 +171,7 @@ namespace Spine.Unity {
 
 		/// <summary>Returns the Skeleton's local scale as a UnityEngine.Vector2. If only individual components are needed, use Skeleton.ScaleX or Skeleton.ScaleY.</summary>
 		public static Vector2 GetLocalScale (this Skeleton skeleton) {
-			return new Vector2(skeleton.scaleX, skeleton.scaleY);
+			return new Vector2(skeleton.ScaleX, skeleton.ScaleY);
 		}
 
 		/// <summary>Calculates a 2x2 Transformation Matrix that can convert a skeleton-space position to a bone-local position.</summary>

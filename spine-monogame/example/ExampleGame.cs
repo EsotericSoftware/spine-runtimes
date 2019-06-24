@@ -77,8 +77,7 @@ namespace Spine {
 			AnimationStateData stateData = new AnimationStateData(skeleton.Data);
 			state = new AnimationState(stateData);
 
-			// Flip the skeleton on the y-axis and center it within the viewport
-			skeleton.ScaleY = -1;
+			// Center within the viewport
 			skeleton.X = game.GraphicsDevice.Viewport.Width / 2;
 			skeleton.Y = game.GraphicsDevice.Viewport.Height;
 
@@ -135,7 +134,6 @@ namespace Spine {
 			AnimationStateData stateData = new AnimationStateData(skeleton.Data);
 			state = new AnimationState(stateData);
 
-			skeleton.ScaleY = -1;
 			skeleton.X = game.GraphicsDevice.Viewport.Width / 2 + 200;
 			skeleton.Y = game.GraphicsDevice.Viewport.Height;
 
@@ -182,7 +180,6 @@ namespace Spine {
 			AnimationStateData stateData = new AnimationStateData(skeleton.Data);			
 			state = new AnimationState(stateData);
 
-			skeleton.ScaleY = -1;
 			skeleton.X = game.GraphicsDevice.Viewport.Width / 2;
 			skeleton.Y = game.GraphicsDevice.Viewport.Height;
 
@@ -237,7 +234,6 @@ namespace Spine {
 			AnimationStateData stateData = new AnimationStateData(skeleton.Data);
 			state = new AnimationState(stateData);
 
-			skeleton.ScaleY = -1;
 			skeleton.X = game.GraphicsDevice.Viewport.Width / 2;
 			skeleton.Y = game.GraphicsDevice.Viewport.Height;
 			
