@@ -687,8 +687,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							int vertexCount = 0;
 							const char *end = Json::getString(attachmentMap, "end", 0);
 							if (end) {
-								SlotData *slot = skeletonData->findSlot(end);
-								clip->_endSlot = slot;
+								clip->_endSlot = skeletonData->findSlot(end);
 							}
 							vertexCount = Json::getInt(attachmentMap, "vertexCount", 0) << 1;
 							readVertices(attachmentMap, clip, vertexCount);

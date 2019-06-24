@@ -153,11 +153,11 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	Json* ik = Json_getItem(root, "ik");
 	Json* transform = Json_getItem(root, "transform");
 	Json* paths = Json_getItem(root, "paths");
-	Json* deform = Json_getItem(root, "deform");
-	Json* drawOrder = Json_getItem(root, "drawOrder");
+	Json* deformJson = Json_getItem(root, "deform");
+	Json* drawOrderJson = Json_getItem(root, "drawOrder");
 	Json* events = Json_getItem(root, "events");
 	Json *boneMap, *slotMap, *constraintMap;
-	if (!drawOrder) drawOrder = Json_getItem(root, "draworder");
+	if (!drawOrderJson) drawOrderJson = Json_getItem(root, "draworder");
 
 	for (boneMap = bones ? bones->child : 0; boneMap; boneMap = boneMap->next)
 		timelinesCount += boneMap->size;
@@ -167,10 +167,10 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	timelinesCount += transform ? transform->size : 0;
 	for (constraintMap = paths ? paths->child : 0; constraintMap; constraintMap = constraintMap->next)
 		timelinesCount += constraintMap->size;
-	for (constraintMap = deform ? deform->child : 0; constraintMap; constraintMap = constraintMap->next)
+	for (constraintMap = deformJson ? deformJson->child : 0; constraintMap; constraintMap = constraintMap->next)
 		for (slotMap = constraintMap->child; slotMap; slotMap = slotMap->next)
 			timelinesCount += slotMap->size;
-	if (drawOrder) ++timelinesCount;
+	if (drawOrderJson) ++timelinesCount;
 	if (events) ++timelinesCount;
 
 	animation = spAnimation_create(root->name, timelinesCount);
@@ -381,7 +381,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	}
 
 	/* Deform timelines. */
-	for (constraintMap = deform ? deform->child : 0; constraintMap; constraintMap = constraintMap->next) {
+	for (constraintMap = deformJson ? deformJson->child : 0; constraintMap; constraintMap = constraintMap->next) {
 		spSkin* skin = spSkeletonData_findSkin(skeletonData, constraintMap->name);
 		for (slotMap = constraintMap->child; slotMap; slotMap = slotMap->next) {
 			int slotIndex = spSkeletonData_findSlotIndex(skeletonData, slotMap->name);
@@ -406,8 +406,8 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 				timeline->attachment = SUPER(attachment);
 
 				for (valueMap = timelineMap->child, frameIndex = 0; valueMap; valueMap = valueMap->next, ++frameIndex) {
-					Json* vertices = Json_getItem(valueMap, "vertices");
 					float* deform;
+					Json* vertices = Json_getItem(valueMap, "vertices");
 					if (!vertices) {
 						if (weighted) {
 							deform = tempDeform;
@@ -428,9 +428,9 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 						}
 						memset(deform + v, 0, sizeof(float) * (deformLength - v));
 						if (!weighted) {
-							float* vertices = attachment->vertices;
+							float* verticesValues = attachment->vertices;
 							for (v = 0; v < deformLength; ++v)
-								deform[v] += vertices[v];
+								deform[v] += verticesValues[v];
 						}
 					}
 					spDeformTimeline_setFrame(timeline, frameIndex, Json_getFloat(valueMap, "time", 0), deform);
@@ -445,9 +445,9 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	}
 
 	/* Draw order timeline. */
-	if (drawOrder) {
-		spDrawOrderTimeline* timeline = spDrawOrderTimeline_create(drawOrder->size, skeletonData->slotsCount);
-		for (valueMap = drawOrder->child, frameIndex = 0; valueMap; valueMap = valueMap->next, ++frameIndex) {
+	if (drawOrderJson) {
+		spDrawOrderTimeline* timeline = spDrawOrderTimeline_create(drawOrderJson->size, skeletonData->slotsCount);
+		for (valueMap = drawOrderJson->child, frameIndex = 0; valueMap; valueMap = valueMap->next, ++frameIndex) {
 			int ii;
 			int* drawOrder = 0;
 			Json* offsets = Json_getItem(valueMap, "offsets");
@@ -486,7 +486,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 			FREE(drawOrder);
 		}
 		animation->timelines[animation->timelinesCount++] = SUPER_CAST(spTimeline, timeline);
-		animation->duration = MAX(animation->duration, timeline->frames[drawOrder->size - 1]);
+		animation->duration = MAX(animation->duration, timeline->frames[drawOrderJson->size - 1]);
 	}
 
 	/* Event timeline. */
@@ -586,7 +586,7 @@ spSkeletonData* spSkeletonJson_readSkeletonDataFile (spSkeletonJson* self, const
 spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const char* json) {
 	int i, ii;
 	spSkeletonData* skeletonData;
-	Json *root, *skeleton, *bones, *boneMap, *ik, *transform, *path, *slots, *skins, *animations, *events;
+	Json *root, *skeleton, *bones, *boneMap, *ik, *transform, *pathJson, *slots, *skins, *animations, *events;
 	_spSkeletonJson* internal = SUB_CAST(_spSkeletonJson, self);
 
 	FREE(self->error);
@@ -811,12 +811,12 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	}
 
 	/* Path constraints */
-	path = Json_getItem(root, "path");
-	if (path) {
+	pathJson = Json_getItem(root, "path");
+	if (pathJson) {
 		Json *constraintMap;
-		skeletonData->pathConstraintsCount = path->size;
-		skeletonData->pathConstraints = MALLOC(spPathConstraintData*, path->size);
-		for (constraintMap = path->child, i = 0; constraintMap; constraintMap = constraintMap->next, ++i) {
+		skeletonData->pathConstraintsCount = pathJson->size;
+		skeletonData->pathConstraints = MALLOC(spPathConstraintData*, pathJson->size);
+		for (constraintMap = pathJson->child, i = 0; constraintMap; constraintMap = constraintMap->next, ++i) {
 			const char* name;
 			const char* item;
 
@@ -1070,19 +1070,19 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 						break;
 					}
 					case SP_ATTACHMENT_PATH: {
-						spPathAttachment* path = SUB_CAST(spPathAttachment, attachment);
+						spPathAttachment* pathAttachment = SUB_CAST(spPathAttachment, attachment);
 						int vertexCount = 0;
-						path->closed = Json_getInt(attachmentMap, "closed", 0);
-						path->constantSpeed = Json_getInt(attachmentMap, "constantSpeed", 1);
+						pathAttachment->closed = Json_getInt(attachmentMap, "closed", 0);
+						pathAttachment->constantSpeed = Json_getInt(attachmentMap, "constantSpeed", 1);
 						vertexCount = Json_getInt(attachmentMap, "vertexCount", 0);
-						_readVertices(self, attachmentMap, SUPER(path), vertexCount << 1);
+						_readVertices(self, attachmentMap, SUPER(pathAttachment), vertexCount << 1);
 
-						path->lengthsLength = vertexCount / 3;
-						path->lengths = MALLOC(float, path->lengthsLength);
+						pathAttachment->lengthsLength = vertexCount / 3;
+						pathAttachment->lengths = MALLOC(float, pathAttachment->lengthsLength);
 
 						curves = Json_getItem(attachmentMap, "lengths");
 						for (curves = curves->child, ii = 0; curves; curves = curves->next, ++ii) {
-							path->lengths[ii] = curves->valueFloat * self->scale;
+							pathAttachment->lengths[ii] = curves->valueFloat * self->scale;
 						}
 						break;
 					}

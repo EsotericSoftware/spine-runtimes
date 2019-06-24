@@ -127,10 +127,11 @@ void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/
 	for (i = 0; i < skeleton->slotsCount; ++i) {
 		spPolygon* polygon;
 		spBoundingBoxAttachment* boundingBox;
+		spAttachment* attachment;
 
 		spSlot* slot = skeleton->slots[i];
 		if (!slot->bone->active) continue;
-		spAttachment* attachment = slot->attachment;
+		attachment = slot->attachment;
 		if (!attachment || attachment->type != SP_ATTACHMENT_BOUNDING_BOX) continue;
 		boundingBox = (spBoundingBoxAttachment*)attachment;
 		self->boundingBoxes[self->count] = boundingBox;

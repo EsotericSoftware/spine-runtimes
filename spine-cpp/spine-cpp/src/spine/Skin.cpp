@@ -158,10 +158,10 @@ void Skin::attachAll(Skeleton &skeleton, Skin &oldSkin) {
 }
 
 void Skin::addSkin(Skin* other) {
-	for (int i = 0; i < other->getBones().size(); i++)
+	for (size_t i = 0; i < other->getBones().size(); i++)
 		if (!_bones.contains(other->getBones()[i])) _bones.add(other->getBones()[i]);
 
-	for (int i = 0; i < other->getConstraints().size(); i++)
+	for (size_t i = 0; i < other->getConstraints().size(); i++)
 		if (!_constraints.contains(other->getConstraints()[i])) _constraints.add(other->getConstraints()[i]);
 
 	AttachmentMap::Entries entries = other->getAttachments();
@@ -172,10 +172,10 @@ void Skin::addSkin(Skin* other) {
 }
 
 void Skin::copySkin(Skin* other) {
-	for (int i = 0; i < other->getBones().size(); i++)
+	for (size_t i = 0; i < other->getBones().size(); i++)
 		if (!_bones.contains(other->getBones()[i])) _bones.add(other->getBones()[i]);
 
-	for (int i = 0; i < other->getConstraints().size(); i++)
+	for (size_t i = 0; i < other->getConstraints().size(); i++)
 		if (!_constraints.contains(other->getConstraints()[i])) _constraints.add(other->getConstraints()[i]);
 
 	AttachmentMap::Entries entries = other->getAttachments();

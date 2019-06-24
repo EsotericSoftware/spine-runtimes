@@ -42,6 +42,7 @@ unique_ptr<T> make_unique(Args&&... args) {
 }
 
 void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
+	SP_UNUSED(state);
 	const String& animationName = (entry && entry->getAnimation()) ? entry->getAnimation()->getName() : String("");
 
 	switch (type) {
@@ -104,6 +105,8 @@ void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
 }
 
 void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonBounds bounds;
 
 	// Configure mixing.
@@ -158,6 +161,8 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void goblins (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -197,6 +202,8 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void raptor (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -240,6 +247,8 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void tank (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -269,6 +278,8 @@ void tank (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void vine (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -299,6 +310,8 @@ void vine (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -330,6 +343,8 @@ void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void stretchymanStrechyIk (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -363,6 +378,8 @@ void stretchymanStrechyIk (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void coin (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -377,7 +394,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
-	float swirlTime = 0;
+
 	while (window.isOpen()) {
 		while (window.pollEvent(event)) {
 			if (event.type == sf::Event::Closed) window.close();
@@ -395,6 +412,8 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void owl (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -451,6 +470,8 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void mixAndMatch (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -499,6 +520,8 @@ void mixAndMatch (SkeletonData* skeletonData, Atlas* atlas) {
  * Used for debugging purposes during runtime development
  */
 void test (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	Skeleton skeleton(skeletonData);
 	AnimationStateData animationStateData(skeletonData);
 	AnimationState animationState(&animationStateData);

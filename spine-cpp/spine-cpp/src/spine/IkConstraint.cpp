@@ -128,7 +128,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 	dx = (x * d - y * b) * id - px;
 	dy = (y * a - x * c) * id - py;
 	l1 = MathUtil::sqrt(dx * dx + dy * dy);
-	l2 = child._data.getLength() * csx, a1, a2;
+	l2 = child._data.getLength() * csx;
 	if (l1 < 0.0001) {
 		apply(parent, targetX, targetY, false, stretch, false, alpha);
 		child.updateWorldTransform(cx, cy, 0, child._ascaleX, child._ascaleY, child._ashearX, child._ashearY);
@@ -150,7 +150,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 		}
 	}
 	if (u) {
-		float cosine, a, b;
+		float cosine;
 		l2 *= psx;
 		cosine = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
 		if (cosine < -1) cosine = -1;
@@ -163,10 +163,10 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 		b = l2 * MathUtil::sin(a2);
 		a1 = MathUtil::atan2(ty * a - tx * b, tx * a + ty * b);
 	} else {
-		float a = psx * l2, b = psy * l2;
+		a = psx * l2, b = psy * l2;
 		float aa = a * a, bb = b * b, ll = l1 * l1, ta = MathUtil::atan2(ty, tx);
 		float c0 = bb * ll + aa * dd - aa * bb, c1 = -2 * bb * l1, c2 = bb - aa;
-		float d = c1 * c1 - 4 * c2 * c0;
+		d = c1 * c1 - 4 * c2 * c0;
 		if (d >= 0) {
 			float q = MathUtil::sqrt(d), r0, r1;
 			if (c1 < 0) q = -q;

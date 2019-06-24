@@ -71,7 +71,6 @@ spSkeletonBinary* spSkeletonBinary_create (spAtlas* atlas) {
 }
 
 void spSkeletonBinary_dispose (spSkeletonBinary* self) {
-	int i;
 	_spSkeletonBinary* internal = SUB_CAST(_spSkeletonBinary, self);
 	if (internal->ownsLoader) spAttachmentLoader_dispose(self->attachmentLoader);
 	FREE(internal->linkedMeshes);

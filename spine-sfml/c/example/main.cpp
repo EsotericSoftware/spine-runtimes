@@ -40,6 +40,7 @@ using namespace spine;
 #include <stdlib.h>
 
 void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
+	UNUSED(state);
 	const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
 
 	switch (type) {
@@ -107,6 +108,7 @@ void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
 }
 
 void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonBounds* bounds = SkeletonBounds_create();
 
 	// Configure mixing.
@@ -164,6 +166,7 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void goblins (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -199,6 +202,7 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void raptor (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -242,6 +246,7 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void tank (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -272,6 +277,7 @@ void tank (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void vine (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -303,6 +309,7 @@ void vine (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -334,6 +341,7 @@ void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void coin (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -349,7 +357,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
-	float swirlTime = 0;
+
 	while (window.isOpen()) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
@@ -366,6 +374,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void owl (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -423,6 +432,7 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
  * Used for debugging purposes during runtime development
  */
 void test (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	spSkeleton* skeleton = Skeleton_create(skeletonData);
 	spAnimationStateData* animData = spAnimationStateData_create(skeletonData);
 	spAnimationState* animState = spAnimationState_create(animData);
@@ -447,6 +457,7 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void testSkinsApi(SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -488,6 +499,7 @@ void testSkinsApi(SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void testMixAndMatch(SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);

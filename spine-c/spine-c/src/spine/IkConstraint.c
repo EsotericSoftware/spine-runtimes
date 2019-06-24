@@ -101,6 +101,7 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 	spBone* pp = parent->parent;
 	float tx, ty, dd, dx, dy, l1, l2, a1, a2, r, td, sd, p;
 	float id, x, y;
+	float aa, bb, ll, ta, c0, c1, c2;
 	if (alpha == 0) {
 		spBone_updateWorldTransform(child);
 		return;
@@ -171,7 +172,7 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 		}
 	}
 	if (u) {
-		float cosine, a, b;
+		float cosine;
 		l2 *= psx;
 		cosine = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
 		if (cosine < -1) cosine = -1;
@@ -184,10 +185,10 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 		b = l2 * SIN(a2);
 		a1 = ATAN2(ty * a - tx * b, tx * a + ty * b);
 	} else {
-		float a = psx * l2, b = psy * l2;
-		float aa = a * a, bb = b * b, ll = l1 * l1, ta = ATAN2(ty, tx);
-		float c0 = bb * ll + aa * dd - aa * bb, c1 = -2 * bb * l1, c2 = bb - aa;
-		float d = c1 * c1 - 4 * c2 * c0;
+		a = psx * l2; b = psy * l2;
+		aa = a * a, bb = b * b, ll = l1 * l1, ta = ATAN2(ty, tx);
+		c0 = bb * ll + aa * dd - aa * bb, c1 = -2 * bb * l1, c2 = bb - aa;
+		d = c1 * c1 - 4 * c2 * c0;
 		if (d >= 0) {
 			float q = SQRT(d), r0, r1;
 			if (c1 < 0) q = -q;
