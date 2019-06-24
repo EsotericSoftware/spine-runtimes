@@ -1166,7 +1166,16 @@ namespace Spine.Unity.Editor {
 
 					isSpineData = root.ContainsKey("skeleton");
 					if (isSpineData) {
-						var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
+						var skeletonInfo = root["skeleton"] as Dictionary<string, object>;
+						if (skeletonInfo == null)
+						{
+							Debug.LogWarningFormat("Could not parse '{0}' as a Spine JSON file, no skeleton key!", asset.name);
+							return false;
+						}
+						if (!skeletonInfo.ContainsKey("spine")) {
+							Debug.LogWarningFormat("Could not parse '{0}' as a Spine JSON file, no spine key!", asset.name);
+							return false;
+						}
 						object jv;
 						skeletonInfo.TryGetValue("spine", out jv);
 						rawVersion = jv as string;
