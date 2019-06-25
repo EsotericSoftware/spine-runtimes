@@ -2,36 +2,129 @@
 
 ## AS3
 * **Breaking changes**
+  * Renamed `Slot#getAttachmentVertices()` to `Slot#getDeform()`.
+  * Changed the `.json` curve format and added more assumptions for omitted values, reducing the average size of JSON exports.
+  * Renamed `Skin#addAttachment()` to `Skin#setAttachment()`.
+  * Removed `VertexAttachment#applyDeform()` and replaced it with `VertexAttachment#deformAttachment`. The attachment set on this field is used to decide if a `DeformTimeline` should be applied to the attachment active on the slot to which the timeline is applied.
+  * Removed `inheritDeform` field, getter, and setter from `MeshAttachment`.
+  * Changed `.skel` binary format, added a string table. References to strings in the data resolve to this string table, reducing storage size of binary files considerably.
+  * Changed the `.json` and `.skel` file formats to accomodate the new feature and file size optimiations. Old projects must be exported with Spine 3.8.20+ to be compatible with the 3.8 Spine runtimes.
 
 * **Additions**
+  * Added `SkeletonBinary` to load binary `.skel` files. See `MixAndMatchExample.as` in `spine-startling-example`.
+  * Added `x` and `y` coordinates for setup pose AABB in `SkeletonData`.
+  * Added support for rotated mesh region UVs.
+  * Added skin-specific bones and constraints which are only updated if the skeleton's current skin contains them.
+  * Improved Skin API to make it easier to handle mix-and-match use cases.
+    * Added `Skin#getAttachments()`. Returns all attachments in the skin.
+    * Added `Skin#getAttachments(int slotIndex)`. Returns all attachements in the skin for the given slot index.
+    * Added `Skin#addSkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin.
+    * Added `Skin#copySkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin. `VertexAttachment` are shallowly copied and will retain any parent mesh relationship. All other attachment types are deep copied.
+  * Added `Attachment#copy()` to all attachment type implementations. This lets you deep copy an attachment to modify it independently from the original, i.e. when programmatically changing texture coordinates or mesh vertices.
+  * Added `MeshAttachment#newLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
+  * Added IK softness.
 
 ### Starling
+* Added `MixAndMatchExample.as` to demonstrate the new Skin API additions and how to load binary `.skel` files.
 
 ## C
 * **Breaking changes**
+  * Renamed `spSlot#attachmentVertices` to `spSlot#deform`.
+  * Changed the `.json` curve format and added more assumptions for omitted values, reducing the average size of JSON exports.
+  * Renamed `spSkin_addAttachment()` to `Skin#spSkin_addAttachment()`.
+  * Removed `spVertexAttachment_applyDeform()` and replaced it with `VertexAttachment#deformAttachment`. The attachment set on this field is used to decide if a `spDeformTimeline` should be applied to the attachment active on the slot to which the timeline is applied.
+  * Removed `inheritDeform` field, getter, and setter from `spMeshAttachment`.
+  * Changed `.skel` binary format, added a string table. References to strings in the data resolve to this string table, reducing storage size of binary files considerably.
+  * Changed the `.json` and `.skel` file formats to accomodate the new feature and file size optimiations. Old projects must be exported with Spine 3.8.20+ to be compatible with the 3.8 Spine runtimes.
 
 * **Additions**
+  * Added `x` and `y` coordinates for setup pose AABB in `spSkeletonData`.
+  * Added support for rotated mesh region UVs.
+  * Added skin-specific bones and constraints which are only updated if the skeleton's current skin contains them.
+  * Improved Skin API to make it easier to handle mix-and-match use cases.
+    * Added `spSkin_getAttachments()`. Returns all attachments in the skin.
+    * Added `spSkin_getAttachments(int slotIndex)`. Returns all attachements in the skin for the given slot index.
+    * Added `spSkin_addSkin(spSkin* skin)`. Adds all attachments, bones, and skins from the specified skin to this skin.
+    * Added `spSkin_copySkin(spSkin* skin)`. Adds all attachments, bones, and skins from the specified skin to this skin. `spVertexAttachment` are shallowly copied and will retain any parent mesh relationship. All other attachment types are deep copied.
+    * All attachments inserted into skins are reference counted. When the last skin referencing an attachment is disposed, the attachment will also be disposed.
+  * Added `spAttachment_copy()` to all attachment type implementations. This lets you deep copy an attachment to modify it independently from the original, i.e. when programmatically changing texture coordinates or mesh vertices.
+  * Added `spMeshAttachment_newLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
+  * Added IK softness.
 
 ### Cocos2d-Objc
+* Added mix-and-match example to demonstrate the new Skin API.
 
 ### SFML
+* Added mix-and-match example to demonstrate the new Skin API.
 
 ## C++
-* ** Additions **
-* `AnimationState` and `TrackEntry` now also accept a subclass of `AnimationStateListenerObject` as a listener for animation events in the overloaded `setListener()` method.
+* **Breaking Changes**
+  * Renamed `Slot::getAttachmentVertices()` to `Slot::getDeform()`.
+  * Changed the `.json` curve format and added more assumptions for omitted values, reducing the average size of JSON exports.
+  * Renamed `Skin::addAttachment()` to `Skin::setAttachment()`.
+  * Removed `VertexAttachment::applyDeform()` and replaced it with `VertexAttachment::getDeformAttachment()`. The attachment set on this field is used to decide if a `DeformTimeline` should be applied to the attachment active on the slot to which the timeline is applied.
+  * Removed `_inheritDeform` field, getter, and setter from `MeshAttachment`.
+  * Changed `.skel` binary format, added a string table. References to strings in the data resolve to this string table, reducing storage size of binary files considerably.
+  * Changed the `.json` and `.skel` file formats to accomodate the new feature and file size optimiations. Old projects must be exported with Spine 3.8.20+ to be compatible with the 3.8 Spine runtimes.
 
-* **Breaking changes**
+* **Additions**
+  * `AnimationState` and `TrackEntry` now also accept a subclass of `AnimationStateListenerObject` as a listener for animation events in the overloaded `setListener()` method.
+  * `SkeletonBinary` and `SkeletonJson` now parse and set all non-essential data like audio path.
+  * Added `x` and `y` coordinates for setup pose AABB in `SkeletonData`.
+  * Added support for rotated mesh region UVs.
+  * Added skin-specific bones and constraints which are only updated if the skeleton's current skin contains them.
+  * Improved Skin API to make it easier to handle mix-and-match use cases.
+    * Added `Skin#getAttachments()`. Returns all attachments in the skin.
+    * Added `Skin#getAttachments(int slotIndex)`. Returns all attachements in the skin for the given slot index.
+    * Added `Skin#addSkin(Skin &skin)`. Adds all attachments, bones, and skins from the specified skin to this skin.
+    * Added `Skin#copySkin(Skin &skin)`. Adds all attachments, bones, and skins from the specified skin to this skin. `VertexAttachment` are shallowly copied and will retain any parent mesh relationship. All other attachment types are deep copied.
+    * All attachments inserted into skins are reference counted. When the last skin referencing an attachment is disposed, the attachment will also be disposed.
+  * Added `Attachment#copy()` to all attachment type implementations. This lets you deep copy an attachment to modify it independently from the original, i.e. when programmatically changing texture coordinates or mesh vertices.
+  * Added `MeshAttachment#newLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
+  * Added IK softness.
 
 ### Cocos2d-x
+* Updated to cocos2d-x 3.17.1
+* Added mix-and-match example to demonstrate the new Skin API.
+
 ### SFML
+* Added mix-and-match example to demonstrate the new Skin API.
 
 ### UE4
+* Added `bAutoPlaying` flag to `USpineSkeletonAnimationComponent`. When `false`, the component will not update the internal animation state and skeleton.
+* Updated example project to UE 4.22.
+* (Re-)Importing Spine assets will perform a version compatibility check and alert users about mismatches in editor mode.
+* `USpineSkeletonRendererComponent` allows passing a `USpineSkeletonComponent` to update it. This way, the renderer component can be used without a skeleton component on the same actor.
+* Added blueprint-callable methods to `SpineSkeletonComponent` and `SpineSkeletonAnimationComponent` to query and set skins, and enumerate bones, slots, and animations.
+* Extended skeleton data editor preview. The preview now shows bones, slots, animations, and skins found in the skeleton data. See this [blog post](http://esotericsoftware.com/blog/Unreal-Engine-4-quality-of-life-improvements).
+* Added preview animation and skin fields, allowing you to preview animations and skins right in the editor. See this [blog post](http://esotericsoftware.com/blog/Unreal-Engine-4-quality-of-life-improvements).
+* Removed dependency on `RHI`, `RenderCore`, and `ShaderCore`.
+* Re-importing atlases and their textures now works consistently in all situations.
+* Added mix-and-match example to demonstrate the new Skin API.
 
 ## C# ##
 * **Breaking changes**
   * **Changed `IkConstraintData.Bones` type from `List<BoneData>` to `ExposedList<BoneData>`** for unification reasons. *Note: this modification will most likely not affect user code.*
+  * Renamed `Slot#getAttachmentVertices()` to `Slot#getDeform()`.
+  * Changed the `.json` curve format and added more assumptions for omitted values, reducing the average size of JSON exports.
+  * Renamed `Skin#addAttachment()` to `Skin#setAttachment()`.
+  * Removed `VertexAttachment#applyDeform()` and replaced it with `VertexAttachment#deformAttachment`. The attachment set on this field is used to decide if a `DeformTimeline` should be applied to the attachment active on the slot to which the timeline is applied.
+  * Removed `inheritDeform` field, getter, and setter from `MeshAttachment`.
+  * Changed `.skel` binary format, added a string table. References to strings in the data resolve to this string table, reducing storage size of binary files considerably.
+  * Changed the `.json` and `.skel` file formats to accomodate the new feature and file size optimiations. Old projects must be exported with Spine 3.8.20+ to be compatible with the 3.8 Spine runtimes.
 
 * **Additions**
+  * Added `x` and `y` coordinates for setup pose AABB in `SkeletonData`.
+  * Added support for rotated mesh region UVs.
+  * Added skin-specific bones and constraints which are only updated if the skeleton's current skin contains them.
+  * Improved Skin API to make it easier to handle mix-and-match use cases.
+    * Added `Skin#GetAttachments()`. Returns all attachments in the skin.
+    * Added `Skin#GetAttachments(int slotIndex)`. Returns all attachements in the skin for the given slot index.
+    * Added `Skin#AddSkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin.
+    * Added `Skin#CopySkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin. `VertexAttachment` are shallowly copied and will retain any parent mesh relationship. All other attachment types are deep copied.
+  * Added `Attachment#Copy()` to all attachment type implementations. This lets you deep copy an attachment to modify it independently from the original, i.e. when programmatically changing texture coordinates or mesh vertices.
+  * Added `MeshAttachment#NewLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
+  * Added IK softness.
 
 ### Unity
 
@@ -41,41 +134,112 @@
   * **Removed redundant `Attachment.GetClone()` and `MeshAttachment.GetLinkedClone()` extension methods**. Use methods `Attachment.Copy` and `MeshAttachment.NewLinkedMesh()` instead.
   * **Renamed extension method `Attachment.GetClone(bool cloneMeshesAsLinked)` to `Attachment.GetCopy(bool cloneMeshesAsLinked)`** to follow the naming scheme of the Spine API.
   * **Changed `MeshAttachment.GetLinkedMesh()` method signatures:** removed optional parameters `bool inheritDeform = true, bool copyOriginalProperties = false`.
-  
+
 * **Additions**
   * **Spine Preferences stored in Assets/Editor/SpineSettings.asset** Now Spine uses the new `SettingsProvider` API, storing settings in a SpineSettings.asset file which can be shared with team members. Your old preferences are automatically migrated to the new system.
-
+  * Added support for Unity's SpriteMask to `SkeletonAnimation` and `SkeletonMecanim`. All mask interaction modes are supported. See this [blog post](http://esotericsoftware.com/blog/Unity-SpriteMask-and-RectMask2D-support).
+  * Added support for Unity's RectMask2D to SkeletonGraphics. See this [blog post](http://esotericsoftware.com/blog/Unity-SpriteMask-and-RectMask2D-support).
+  *
 
 ### XNA/MonoGame
+* Updated to latest MonoGame version 3.7.1
+* Rewrote example project to be cleaner and better demonstrate basic Spine features.
+* Added mix-and-match example to demonstrate the new Skin API.
 
 ## Java
 * **Breaking changes**
+  * Renamed `Slot#getAttachmentVertices()` to `Slot#getDeform()`.
+  * Changed the `.json` curve format and added more assumptions for omitted values, reducing the average size of JSON exports.
+  * Renamed `Skin#addAttachment()` to `Skin#setAttachment()`.
+  * Removed `VertexAttachment#applyDeform()` and replaced it with `VertexAttachment#deformAttachment`. The attachment set on this field is used to decide if a `DeformTimeline` should be applied to the attachment active on the slot to which the timeline is applied.
+  * Removed `inheritDeform` field, getter, and setter from `MeshAttachment`.
+  * Changed `.skel` binary format, added a string table. References to strings in the data resolve to this string table, reducing storage size of binary files considerably.
+  * `JsonRollback` tool now converts from 3.8 JSON to 3.7.
+  * Changed the `.json` and `.skel` file formats to accomodate the new feature and file size optimiations. Old projects must be exported with Spine 3.8.20+ to be compatible with the 3.8 Spine runtimes.
 
 * **Additions**
+  * Added `x` and `y` coordinates for setup pose AABB in `SkeletonData`.
+  * Added support for rotated mesh region UVs.
+  * Added skin-specific bones and constraints which are only updated if the skeleton's current skin contains them.
+  * Improved Skin API to make it easier to handle mix-and-match use cases.
+    * Added `Skin#getAttachments()`. Returns all attachments in the skin.
+    * Added `Skin#getAttachments(int slotIndex)`. Returns all attachements in the skin for the given slot index.
+    * Added `Skin#addSkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin.
+    * Added `Skin#copySkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin. `VertexAttachment` are shallowly copied and will retain any parent mesh relationship. All other attachment types are deep copied.
+  * Added `Attachment#copy()` to all attachment type implementations. This lets you deep copy an attachment to modify it independently from the original, i.e. when programmatically changing texture coordinates or mesh vertices.
+  * Added `MeshAttachment#newLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
+  * Added IK softness.
 
 ### libGDX
+* `SkeletonViewer` can load a skeleton by specifying it as the first argument on the command line.
+* Added mix-and-match example to demonstrate the new Skin API.
 
 ## Lua
 * **Breaking changes**
-*
+  * Renamed `Slot:getAttachmentVertices()` to `Slot#deform`.
+  * Changed the `.json` curve format and added more assumptions for omitted values, reducing the average size of JSON exports.
+  * Renamed `Skin:addAttachment()` to `Skin#setAttachment()`.
+  * Removed `VertexAttachment:applyDeform()` and replaced it with `VertexAttachment#deformAttachment`. The attachment set on this field is used to decide if a `DeformTimeline` should be applied to the attachment active on the slot to which the timeline is applied.
+  * Removed `inheritDeform` field, getter, and setter from `MeshAttachment`.
+  * Changed the `.json` file format to accomodate the new feature and file size optimiations. Old projects must be exported with Spine 3.8.20+ to be compatible with the 3.8 Spine runtimes.
+
 * **Additions**
+  * Added `x` and `y` coordinates for setup pose AABB in `SkeletonData`.
+  * Added support for rotated mesh region UVs.
+  * Added skin-specific bones and constraints which are only updated if the skeleton's current skin contains them.
+  * Improved Skin API to make it easier to handle mix-and-match use cases.
+    * Added `Skin:getAttachments()`. Returns all attachments in the skin.
+    * Added `Skin:getAttachments(slotIndex)`. Returns all attachements in the skin for the given slot index.
+    * Added `Skin:addSkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin.
+    * Added `Skin:copySkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin. `VertexAttachment` are shallowly copied and will retain any parent mesh relationship. All other attachment types are deep copied.
+  * Added `Attachment:copy()` to all attachment type implementations. This lets you deep copy an attachment to modify it independently from the original, i.e. when programmatically changing texture coordinates or mesh vertices.
+  * Added `MeshAttachment:newLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
+  * Added IK softness.
 
 ### Love2D
+* Added support for 0-1 RGBA color component range change in Löve 0.11+. Older Löve versions using the 0-255 range are still supported!
+* Added mix-and-match example to demonstrate the new Skin API.
 
 ### Corona
+* Added mix-and-match example to demonstrate the new Skin API.
 
 ## Typescript/Javascript
 * **Breaking changes**
+  * Renamed `MixDirection.in/out` to `MixDirection.mixIn/mixOut` as it was crashing a JS compressor.
+  *  Renamed `Slot#getAttachmentVertices()` to `Slot#getDeform()`.
+  * Changed the `.json` curve format and added more assumptions for omitted values, reducing the average size of JSON exports.
+  * Renamed `Skin#addAttachment()` to `Skin#setAttachment()`.
+  * Removed `VertexAttachment#applyDeform()` and replaced it with `VertexAttachment#deformAttachment`. The attachment set on this field is used to decide if a `DeformTimeline` should be applied to the attachment active on the slot to which the timeline is applied.
+  * Removed `inheritDeform` field, getter, and setter from `MeshAttachment`.
+  * Changed `.skel` binary format, added a string table. References to strings in the data resolve to this string table, reducing storage size of binary files considerably.
+  * Changed the `.json` and `.skel` file formats to accomodate the new feature and file size optimiations. Old projects must be exported with Spine 3.8.20+ to be compatible with the 3.8 Spine runtimes.
 
 * **Additions**
+  * Added support for loading binary data via `AssetManager#loadBinary()`. `AssetManager#get()` will return a `Uint8Array` for such assets.
+  * Added support for loading binaries via new `SkeletonBinary`. Parses a `Uint8Array`.
+  * Added `x` and `y` coordinates for setup pose AABB in `SkeletonData`.
+  * Added support for rotated mesh region UVs.
+  * Added skin-specific bones and constraints which are only updated if the skeleton's current skin contains them.
+  * Improved Skin API to make it easier to handle mix-and-match use cases.
+    * Added `Skin#getAttachments()`. Returns all attachments in the skin.
+    * Added `Skin#getAttachments(slotIndex: number)`. Returns all attachements in the skin for the given slot index.
+    * Added `Skin#addSkin(skin: Skin)`. Adds all attachments, bones, and skins from the specified skin to this skin.
+    * Added `Skin#copySkin(skin: Skin)`. Adds all attachments, bones, and skins from the specified skin to this skin. `VertexAttachment` are shallowly copied and will retain any parent mesh relationship. All other attachment types are deep copied.
+  * Added `Attachment#copy()` to all attachment type implementations. This lets you deep copy an attachment to modify it independently from the original, i.e. when programmatically changing texture coordinates or mesh vertices.
+  * Added `MeshAttachment#newLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
+  * Added IK softness.
 
 ### WebGL backend
+* `Input` can now take a partially defined implementation of `InputListener`.
+* Added mix-and-match example to demonstrate the new Skin API.
 
 ### Canvas backend
 
 ### Three.js backend
 
 ### Player
+* `SpinePlayer#setAnimation()` can now be called directly to set the animation being displayed.
+* The player supports loading `.skel` binary skeleton files by setting the `SpinePlayerConfig#skelUrl` field instead of `SpinePlayerConfig#jsonUrl`.
 
 # 3.7
 
