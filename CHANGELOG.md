@@ -105,10 +105,10 @@
 ## C# ##
 * **Breaking changes**
   * **Changed `IkConstraintData.Bones` type from `List<BoneData>` to `ExposedList<BoneData>`** for unification reasons. *Note: this modification will most likely not affect user code.*
-  * Renamed `Slot#getAttachmentVertices()` to `Slot#getDeform()`.
+  * Renamed `Slot.AttachmentVertices` to `Slot.Deform`.
   * Changed the `.json` curve format and added more assumptions for omitted values, reducing the average size of JSON exports.
-  * Renamed `Skin#addAttachment()` to `Skin#setAttachment()`.
-  * Removed `VertexAttachment#applyDeform()` and replaced it with `VertexAttachment#deformAttachment`. The attachment set on this field is used to decide if a `DeformTimeline` should be applied to the attachment active on the slot to which the timeline is applied.
+  * Renamed `Skin.AddAttachment()` to `Skin.SetAttachment()`.
+  * Removed `VertexAttachment.ApplyDeform()` and replaced it with `VertexAttachment.DeformAttachment`. The attachment set on this field is used to decide if a `DeformTimeline` should be applied to the attachment active on the slot to which the timeline is applied.
   * Removed `inheritDeform` field, getter, and setter from `MeshAttachment`.
   * Changed `.skel` binary format, added a string table. References to strings in the data resolve to this string table, reducing storage size of binary files considerably.
   * Changed the `.json` and `.skel` file formats to accomodate the new feature and file size optimiations. Old projects must be exported with Spine 3.8.20+ to be compatible with the 3.8 Spine runtimes.
@@ -118,12 +118,12 @@
   * Added support for rotated mesh region UVs.
   * Added skin-specific bones and constraints which are only updated if the skeleton's current skin contains them.
   * Improved Skin API to make it easier to handle mix-and-match use cases.
-    * Added `Skin#GetAttachments()`. Returns all attachments in the skin.
-    * Added `Skin#GetAttachments(int slotIndex)`. Returns all attachements in the skin for the given slot index.
-    * Added `Skin#AddSkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin.
-    * Added `Skin#CopySkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin. `VertexAttachment` are shallowly copied and will retain any parent mesh relationship. All other attachment types are deep copied.
-  * Added `Attachment#Copy()` to all attachment type implementations. This lets you deep copy an attachment to modify it independently from the original, i.e. when programmatically changing texture coordinates or mesh vertices.
-  * Added `MeshAttachment#NewLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
+    * Added `Skin.GetAttachments()`. Returns all attachments in the skin.
+    * Added `Skin.GetAttachments(int slotIndex, List<SkinEntry> attachments)`. Returns all attachements in the skin for the given slot index.
+    * Added `Skin.AddSkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin.
+    * Added `Skin.CopySkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin. `VertexAttachment` are shallowly copied and will retain any parent mesh relationship. All other attachment types are deep copied.
+  * Added `Attachment.Copy()` to all attachment type implementations. This lets you deep copy an attachment to modify it independently from the original, i.e. when programmatically changing texture coordinates or mesh vertices.
+  * Added `MeshAttachment.NewLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
   * Added IK softness.
 
 ### Unity
@@ -139,7 +139,7 @@
   * **Spine Preferences stored in Assets/Editor/SpineSettings.asset** Now Spine uses the new `SettingsProvider` API, storing settings in a SpineSettings.asset file which can be shared with team members. Your old preferences are automatically migrated to the new system.
   * Added support for Unity's SpriteMask to `SkeletonAnimation` and `SkeletonMecanim`. All mask interaction modes are supported. See this [blog post](http://esotericsoftware.com/blog/Unity-SpriteMask-and-RectMask2D-support).
   * Added support for Unity's RectMask2D to SkeletonGraphics. See this [blog post](http://esotericsoftware.com/blog/Unity-SpriteMask-and-RectMask2D-support).
-  *
+  * Added `Create 2D Hinge Chain` button at `SkeletonUtilityBone` inspector, previously only `Create 3D Hinge Chain` was available.
 
 ### XNA/MonoGame
 * Updated to latest MonoGame version 3.7.1
@@ -247,7 +247,7 @@
 * **Breaking changes**
   * The completion event will fire for looped 0 duration animations every frame.
   * `MixPose` is now called `MixBlend`
-  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
+  * Skeleton `flipX/flipY` has been replaced with `scaleX/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
   * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
 * **Additions**
   * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry#setMixBlend(MixBlend.add)` on each track. To specify the blend percentage, set `TrackEntry#alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
@@ -274,7 +274,7 @@
   * Listeners on `spAnimationState` and `spTrackEntry` will now also be called if a track entry gets disposed as part of disposing an animation state.
   * The completion event will fire for looped 0 duration animations every frame.
   * The spine-cocos2dx and spine-ue4 runtimes are now based on spine-cpp. See below for changes.
-  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
+  * Skeleton `flipX/flipY` has been replaced with `scaleX/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
   * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
   * `spMeshAttachment` has two new fields `regionTextureWith` and `regionTextureHeight`. These must be set in custom attachment loader. See `AtlasAttachmentLoader`.
 * **Additions**
@@ -348,7 +348,7 @@
 ## C# ##
 * **Breaking changes**
   * The completion event will fire for looped 0 duration animations every frame.
-  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
+  * Skeleton `flipX/flipY` has been replaced with `scaleX/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
   * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
 * **Additions**
   * Added additive animation blending. When playing back multiple animations on different tracks, where each animation modifies the same skeleton property, the results of tracks with lower indices are discarded, and only the result from the track with the highest index is used. With animation blending, the results of all tracks are mixed together. This allows effects like mixing multiple facial expressions (angry, happy, sad) with percentage mixes. By default the old behaviour is retained (results from lower tracks are discarded). To enable additive blending across animation tracks, call `TrackEntry#MixBlend = MixBlend.add` on each track. To specify the blend percentage, set `TrackEntry#Alpha`. See http://esotericsoftware.com/forum/morph-target-track-animation-mix-mode-9459 for a discussion.
@@ -406,6 +406,7 @@ This will automatically:
   1. download the Unity Timeline package
   2. activate the Spine Timeline components by setting the compile definition `SPINE_TIMELINE_PACKAGE_DOWNLOADED` for all platforms
   3. modify the `spine-unity.asmdef` file by adding the reference to the Unity Timeline library.
+* Added `Create 2D Hinge Chain` functionality at `SkeletonUtilityBone` inspector, previously only `Create 3D Hinge Chain` was available.
 
 ### XNA/MonoGame
 * Added support for any `Effect` to be used by `SkeletonRenderer`
@@ -418,7 +419,7 @@ This will automatically:
   * Skeleton attachments: Moved update of attached skeleton out of libGDX `SkeletonRenderer`, added overloaded method `Skeleton#updateWorldTransform(Bone)`, used for `SkeletonAttachment`. You now MUST call this new method with the bone of the parent skeleton to which the child skeleton is attached. See `SkeletonAttachmentTest` for and example.
   * The completion event will fire for looped 0 duration animations every frame.
   * `MixPose` is now called `MixBlend`.
-  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
+  * Skeleton `flipX/flipY` has been replaced with `scaleX/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
   * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
 * **Additions**
   * Added `EventData#audioPath` field. This field contains the file name of the audio file used for the event.
@@ -439,7 +440,7 @@ This will automatically:
 ## Lua
 * **Breaking changes**
   * The completion event will fire for looped 0 duration animations every frame.
-  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
+  * Skeleton `flipX/flipY` has been replaced with `scaleX/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
   * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
 * **Additions**
   * Added `JitterEffect` and `SwirlEffect` and support for vertex effects in Corona and Love
@@ -457,7 +458,7 @@ This will automatically:
 ## Typescript/Javascript
 * **Breaking changes**
   * The completion event will fire for looped 0 duration animations every frame.
-  * Skeleton `flipX/flipY` has been replaced with `scaleY/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
+  * Skeleton `flipX/flipY` has been replaced with `scaleX/scaleY`. This cleans up applying transforms and is more powerful. Allows scaling a whole skeleton which has bones that disallow scale inheritance
   * Mix time is no longer affected by `TrackEntry#timeScale`. See https://github.com/EsotericSoftware/spine-runtimes/issues/1194
 * **Additions**
   * Added `AssetManager.loadTextureAtlas`. Instead of loading the `.atlas` and corresponding image files manually, you can simply specify the location of the `.atlas` file and AssetManager will load the atlas and all its images automatically. `AssetManager.get("atlasname.atlas")` will then return an instance of `spine.TextureAtlas`.
