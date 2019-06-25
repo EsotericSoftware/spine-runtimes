@@ -163,6 +163,7 @@ This will automatically:
   1. download the Unity Timeline package
   2. activate the Spine Timeline components by setting the compile definition `SPINE_TIMELINE_PACKAGE_DOWNLOADED` for all platforms
   3. modify the `spine-unity.asmdef` file by adding the reference to the Unity Timeline library.
+* Added `Create 2D Hinge Chain` functionality at `SkeletonUtilityBone` inspector, previously only `Create 3D Hinge Chain` was available.
 
 ### XNA/MonoGame
 * Added support for any `Effect` to be used by `SkeletonRenderer`
