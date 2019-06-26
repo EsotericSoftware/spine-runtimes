@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-cpp works with data exported from spine 3.7.xx.
+spine-cpp works with data exported from spine 3.8.xx.
 
 spine-cpp supports all spine features.
 
