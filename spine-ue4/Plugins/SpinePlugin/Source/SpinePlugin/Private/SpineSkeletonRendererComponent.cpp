@@ -170,14 +170,15 @@ void USpineSkeletonRendererComponent::UpdateRenderer(USpineSkeletonComponent* sk
 	}
 }
 
-void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector>& Colors2, UMaterialInstanceDynamic* Material) {
+void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector> &Normals, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector>& Colors2, UMaterialInstanceDynamic* Material) {
 	if (Vertices.Num() == 0) return;
 	SetMaterial(Idx, Material);
 
-	CreateMeshSection(Idx, Vertices, Indices, TArray<FVector>(), Uvs, Colors, TArray<FProcMeshTangent>(), bCreateCollision);
+	CreateMeshSection(Idx, Vertices, Indices, Normals, Uvs, Colors, TArray<FProcMeshTangent>(), bCreateCollision);
 
 	Vertices.SetNum(0);
 	Indices.SetNum(0);
+	Normals.SetNum(0);
 	Uvs.SetNum(0);
 	Colors.SetNum(0);
 	Colors2.SetNum(0);
@@ -187,6 +188,7 @@ void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices
 void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 	TArray<FVector> vertices;
 	TArray<int32> indices;
+	TArray<FVector> normals;
 	TArray<FVector2D> uvs;
 	TArray<FColor> colors;
 	TArray<FVector> darkColors;
@@ -299,7 +301,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 		}
 
 		if (lastMaterial != material) {
-			Flush(meshSection, vertices, indices, uvs, colors, darkColors, lastMaterial);
+			Flush(meshSection, vertices, indices, normals, uvs, colors, darkColors, lastMaterial);
 			lastMaterial = material;
 			idx = 0;
 		}
@@ -319,6 +321,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 			colors.Add(FColor(r, g, b, a));
 			darkColors.Add(FVector(dr, dg, db));
 			vertices.Add(FVector(attachmentVertices[j], depthOffset, attachmentVertices[j + 1]));
+			normals.Add(FVector(0, -1, 0));
 			uvs.Add(FVector2D(attachmentUvs[j], attachmentUvs[j + 1]));
 		}
 
@@ -332,7 +335,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 		clipper.clipEnd(*slot);			
 	}
 	
-	Flush(meshSection, vertices, indices, uvs, colors, darkColors, lastMaterial);
+	Flush(meshSection, vertices, indices, normals, uvs, colors, darkColors, lastMaterial);
 	clipper.clipEnd();
 }
 
