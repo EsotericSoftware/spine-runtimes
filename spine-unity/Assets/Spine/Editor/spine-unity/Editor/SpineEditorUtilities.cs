@@ -963,23 +963,23 @@ namespace Spine.Unity.Editor {
 						TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 						if (texImporter == null) {
 							Debug.LogWarning(string.Format("{0} ::: Texture asset \"{1}\" not found. Skipping. Please check your atlas file for renamed files.", atlasAsset.name, texturePath));
-							continue;
 						}
+						else {
+							// Note: 'sRGBTexture = false' below might seem counter-intuitive, but prevents mipmaps from being
+							// generated incorrectly (causing white borders due to undesired custom weighting) for PMA textures
+							// when mipmaps are enabled later.
+							texImporter.sRGBTexture = false;
+							texImporter.textureCompression = TextureImporterCompression.Uncompressed;
+							texImporter.alphaSource = TextureImporterAlphaSource.FromInput;
+							texImporter.mipmapEnabled = false;
+							texImporter.alphaIsTransparency = false; // Prevent the texture importer from applying bleed to the transparent parts for PMA.
+							texImporter.spriteImportMode = SpriteImportMode.None;
+							texImporter.maxTextureSize = 2048;
 
-						// Note: 'sRGBTexture = false' below might seem counter-intuitive, but prevents mipmaps from being
-						// generated incorrectly (causing white borders due to undesired custom weighting) for PMA textures
-						// when mipmaps are enabled later.
-						texImporter.sRGBTexture = false;
-						texImporter.textureCompression = TextureImporterCompression.Uncompressed;
-						texImporter.alphaSource = TextureImporterAlphaSource.FromInput;
-						texImporter.mipmapEnabled = false;
-						texImporter.alphaIsTransparency = false; // Prevent the texture importer from applying bleed to the transparent parts for PMA.
-						texImporter.spriteImportMode = SpriteImportMode.None;
-						texImporter.maxTextureSize = 2048;
-
-						EditorUtility.SetDirty(texImporter);
-						AssetDatabase.ImportAsset(texturePath);
-						AssetDatabase.SaveAssets();
+							EditorUtility.SetDirty(texImporter);
+							AssetDatabase.ImportAsset(texturePath);
+							AssetDatabase.SaveAssets();
+						}
 					}
 
 					string pageName = Path.GetFileNameWithoutExtension(pageFiles[i]);
@@ -998,7 +998,11 @@ namespace Spine.Unity.Editor {
 						vestigialMaterials.Remove(mat);
 					}
 
-					mat.mainTexture = texture;
+					// Assign texture only if it successfully loaded. Otherwise, attempt to keep an existing, assigned texture.
+					if (texture != null) {
+						mat.mainTexture = texture;
+					}
+
 					EditorUtility.SetDirty(mat);
 					AssetDatabase.SaveAssets();
 
