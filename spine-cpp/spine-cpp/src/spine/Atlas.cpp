@@ -39,7 +39,7 @@
 
 using namespace spine;
 
-Atlas::Atlas(const String &path, TextureLoader *textureLoader) : _textureLoader(textureLoader) {
+Atlas::Atlas(const String &path, TextureLoader *textureLoader, bool createTexture) : _textureLoader(textureLoader) {
 	int dirLength;
 	char *dir;
 	int length;
@@ -57,16 +57,16 @@ Atlas::Atlas(const String &path, TextureLoader *textureLoader) : _textureLoader(
 
 	data = SpineExtension::readFile(path, &length);
 	if (data) {
-		load(data, length, dir);
+		load(data, length, dir, createTexture);
 	}
 
 	SpineExtension::free(data, __FILE__, __LINE__);
 	SpineExtension::free(dir, __FILE__, __LINE__);
 }
 
-Atlas::Atlas(const char *data, int length, const char *dir, TextureLoader *textureLoader) : _textureLoader(
+Atlas::Atlas(const char *data, int length, const char *dir, TextureLoader *textureLoader, bool createTexture) : _textureLoader(
 		textureLoader) {
-	load(data, length, dir);
+	load(data, length, dir, createTexture);
 }
 
 Atlas::~Atlas() {
@@ -102,7 +102,7 @@ Vector<AtlasPage*> &Atlas::getPages() {
 	return _pages;
 }
 
-void Atlas::load(const char *begin, int length, const char *dir) {
+void Atlas::load(const char *begin, int length, const char *dir, bool createTexture) {
 	static const char *formatNames[] = {"", "Alpha", "Intensity", "LuminanceAlpha", "RGB565", "RGBA4444", "RGB888",
 										"RGBA8888"};
 	static const char *textureFilterNames[] = {"", "Nearest", "Linear", "MipMap", "MipMapNearestNearest",
@@ -163,9 +163,15 @@ void Atlas::load(const char *begin, int length, const char *dir) {
 				}
 			}
 
-			if (_textureLoader) _textureLoader->load(*page, String(path));
-
-			SpineExtension::free(path, __FILE__, __LINE__);
+			if (createTexture)
+			{
+				if (_textureLoader) _textureLoader->load(*page, String(path));
+				SpineExtension::free(path, __FILE__, __LINE__);
+			}
+			else
+			{
+				page->texturePath = String(path, true);
+			}
 
 			_pages.add(page);
 		} else {

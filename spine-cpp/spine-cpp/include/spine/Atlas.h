@@ -67,6 +67,7 @@ enum TextureWrap {
 class SP_API AtlasPage : public SpineObject, public HasRendererObject {
 public:
 	String name;
+	String texturePath;
 	Format format;
 	TextureFilter minFilter;
 	TextureFilter magFilter;
@@ -100,9 +101,9 @@ class TextureLoader;
 
 class SP_API Atlas : public SpineObject {
 public:
-	Atlas(const String &path, TextureLoader *textureLoader);
+	Atlas(const String &path, TextureLoader *textureLoader, bool createTexture);
 
-	Atlas(const char *data, int length, const char *dir, TextureLoader *textureLoader);
+	Atlas(const char *data, int length, const char *dir, TextureLoader *textureLoader, bool createTexture);
 
 	~Atlas();
 
@@ -120,7 +121,7 @@ private:
 	Vector<AtlasRegion *> _regions;
 	TextureLoader *_textureLoader;
 
-	void load(const char *begin, int length, const char *dir);
+	void load(const char *begin, int length, const char *dir, bool createTexture);
 
 	class Str {
 	public:

@@ -198,7 +198,7 @@ void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, At
 }
 
 void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale) {
-	_atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader);
+	_atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader, true);
 	CCASSERT(_atlas, "Error reading atlas file.");
 
 	_attachmentLoader = new (__FILE__, __LINE__) Cocos2dAtlasAttachmentLoader(_atlas);
@@ -230,7 +230,7 @@ void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, 
 }
 
 void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale) {
-	_atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader);
+	_atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader, true);
 	CCASSERT(_atlas, "Error reading atlas file.");
 	
 	_attachmentLoader = new (__FILE__, __LINE__) Cocos2dAtlasAttachmentLoader(_atlas);
@@ -253,9 +253,10 @@ void SkeletonRenderer::update (float deltaTime) {
 }
 
 void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t transformFlags) {
+	_isAutoCulled = false;
   // Early exit if the skeleton is invisible
   if (getDisplayedOpacity() == 0 || _skeleton->getColor().a == 0){
-			return;
+		return;
 	}
 
   const int coordCount = computeTotalCoordCount(*_skeleton, _startSlotIndex, _endSlotIndex);
@@ -272,11 +273,14 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	const Camera* camera = Camera::getVisitingCamera();
 	const cocos2d::Rect brect = computeBoundingRect(worldCoords, coordCount / 2);
 	_boundingRect = brect;
-  if (camera && cullRectangle(transform, brect, *camera))
-  {
+
+	const bool autoCullingEnable = cocos2d::Director::getInstance()->isAutoCullingEnable();
+	if (autoCullingEnable && camera && cullRectangle(transform, brect, *camera))
+	{
 	  VLA_FREE(worldCoords);
+		_isAutoCulled = true;
 	  return;
-  }
+	}
 	#endif
 
 	const float* worldCoordPtr = worldCoords;
@@ -583,7 +587,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		if (!parent || parent->getChildrenCount() > 100 || getChildrenCount() != 0) {
 			lastTwoColorTrianglesCommand->setForceFlush(true);
 		} else {
-	  const cocos2d::Vector<Node*>& children = parent->getChildren();
+			const cocos2d::Vector<Node*>& children = parent->getChildren();
 			Node* sibling = nullptr;
 			for (ssize_t i = 0; i < children.size(); i++) {
 				if (children.at(i) == this) {
@@ -616,6 +620,10 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	VLA_FREE(worldCoords);
 }
 
+
+bool SkeletonRenderer::isAutoCulled () const {
+	return _isAutoCulled;
+}
 
 void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uint32_t transformFlags) {
 
