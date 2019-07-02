@@ -41,16 +41,16 @@ USING_NS_CC;
 namespace spine {
 
 	namespace {
-	    Cocos2dTextureLoader textureLoader;
+		Cocos2dTextureLoader textureLoader;
 
-	    int computeTotalCoordCount(Skeleton& skeleton, int startSlotIndex, int endSlotIndex);
-	    cocos2d::Rect computeBoundingRect(const float* coords, int vertexCount);
-	    void interleaveCoordinates(float* dst, const float* src, int vertexCount, int dstStride);
-	    BlendFunc makeBlendFunc(int blendMode, bool premultipliedAlpha);
-	    void transformWorldVertices(float* dstCoord, int coordCount, Skeleton& skeleton, int startSlotIndex, int endSlotIndex);
-		  bool cullRectangle(const Mat4& transform, const cocos2d::Rect& rect, const Camera& camera);
-		   Color4B ColorToColor4B(const Color& color);
-		  bool slotIsOutRange(Slot& slot, int startSlotIndex, int endSlotIndex);
+		int computeTotalCoordCount(Skeleton& skeleton, int startSlotIndex, int endSlotIndex);
+		cocos2d::Rect computeBoundingRect(const float* coords, int vertexCount);
+		void interleaveCoordinates(float* dst, const float* src, int vertexCount, int dstStride);
+		BlendFunc makeBlendFunc(int blendMode, bool premultipliedAlpha);
+		void transformWorldVertices(float* dstCoord, int coordCount, Skeleton& skeleton, int startSlotIndex, int endSlotIndex);
+		bool cullRectangle(const Mat4& transform, const cocos2d::Rect& rect, const Camera& camera);
+			Color4B ColorToColor4B(const Color& color);
+		bool slotIsOutRange(Slot& slot, int startSlotIndex, int endSlotIndex);
 	}
  
 // C Variable length array
@@ -111,18 +111,18 @@ void SkeletonRenderer::setupGLProgramState (bool twoColorTintEnabled) {
 	Texture2D *texture = nullptr;
 	for (int i = 0, n = _skeleton->getSlots().size(); i < n; i++) {
 		Slot* slot = _skeleton->getDrawOrder()[i];
-	Attachment* const attachment = slot->getAttachment();
+		Attachment* const attachment = slot->getAttachment();
 		if (!attachment) continue;
-	if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
-		RegionAttachment* regionAttachment = static_cast<RegionAttachment*>(attachment);
-		texture = static_cast<AttachmentVertices*>(regionAttachment->getRendererObject())->_texture;
-	} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
-				MeshAttachment* meshAttachment = static_cast<MeshAttachment*>(attachment);
-				texture = static_cast<AttachmentVertices*>(meshAttachment->getRendererObject())->_texture;
+		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
+			RegionAttachment* regionAttachment = static_cast<RegionAttachment*>(attachment);
+			texture = static_cast<AttachmentVertices*>(regionAttachment->getRendererObject())->_texture;
+		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
+			MeshAttachment* meshAttachment = static_cast<MeshAttachment*>(attachment);
+			texture = static_cast<AttachmentVertices*>(meshAttachment->getRendererObject())->_texture;
 		}
-	else {
-		continue;
-	}
+		else {
+			continue;
+		}
 		
 		if (texture != nullptr) {
 			break;
@@ -303,12 +303,18 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 	for (int i = 0, n = _skeleton->getSlots().size(); i < n; ++i) {
 		Slot* slot = _skeleton->getDrawOrder()[i];;
 		
+		if (slotIsOutRange(*slot, _startSlotIndex, _endSlotIndex)) {
+			_clipper->clipEnd(*slot);
+			continue;
+		}
+
 		if (!slot->getAttachment()) {
 			_clipper->clipEnd(*slot);
 			continue;
 		}
 
-		if (slotIsOutRange(*slot, _startSlotIndex, _endSlotIndex)) {
+		// Early exit if slot is invisible
+		if (slot->getColor().a == 0) {
 			_clipper->clipEnd(*slot);
 			continue;
 		}
@@ -317,8 +323,8 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 		TwoColorTriangles trianglesTwoColor;
 		
 		if (slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) {
-			RegionAttachment* attachment = (RegionAttachment*)slot->getAttachment();
-			attachmentVertices = (AttachmentVertices*)attachment->getRendererObject();
+			RegionAttachment* attachment = static_cast<RegionAttachment*>(slot->getAttachment());
+			attachmentVertices = static_cast<AttachmentVertices*>(attachment->getRendererObject());
 				
 			// Early exit if attachment is invisible
 			if (attachment->getColor().a == 0) {
@@ -893,6 +899,10 @@ namespace {
 			{
 				continue;
 			}
+				// Early exit if slot is invisible
+			if (slot.getColor().a == 0) {
+				continue;
+			}
 			if (attachment->getRTTI().isExactly(RegionAttachment::rtti))
 			{
 				coordCount += 8;
@@ -923,6 +933,9 @@ namespace {
 			}
 			if (slotIsOutRange(slot, startSlotIndex, endSlotIndex))
 			{
+				continue;
+			}
+	  	if (slot.getColor().a == 0) {
 				continue;
 			}
 			if (attachment->getRTTI().isExactly(RegionAttachment::rtti))
