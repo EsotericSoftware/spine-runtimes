@@ -84,7 +84,7 @@ namespace spine {
 		Slot* findSlot (const std::string& slotName) const;
 	
 		/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
-		 * attached if the corresponding attachment from the old skin was attached. Returns false if the skin was not found.
+		 * attached if the corresponding attachment from the old skin was attached.
 		 * @param skin May be empty string ("") for no skin.*/
 		void setSkin (const std::string& skinName);
 		/** @param skin May be 0 for no skin.*/
@@ -109,7 +109,7 @@ namespace spine {
 		/* Sets the range of slots that should be rendered. Use -1, -1 to clear the range */
 		void setSlotsRange(int startSlotIndex, int endSlotIndex);
 
-			// --- BlendProtocol
+		// --- BlendProtocol
 		void setBlendFunc (const cocos2d::BlendFunc& blendFunc)override;
 		const cocos2d::BlendFunc& getBlendFunc () const override;
 		void setOpacityModifyRGB (bool value) override;
