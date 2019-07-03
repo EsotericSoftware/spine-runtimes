@@ -77,10 +77,8 @@ public:
 
 	explicit AtlasPage(const String &inName) : name(inName), format(Format_RGBA8888), minFilter(TextureFilter_Nearest),
 											   magFilter(TextureFilter_Nearest), uWrap(TextureWrap_ClampToEdge),
-											   vWrap(TextureWrap_ClampToEdge) {
+											   vWrap(TextureWrap_ClampToEdge), width(0), height(0) {
 	}
-
-	virtual ~AtlasPage() { }
 };
 
 class SP_API AtlasRegion : public SpineObject {

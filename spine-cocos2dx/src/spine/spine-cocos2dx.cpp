@@ -66,8 +66,6 @@ static void setAttachmentVertices(MeshAttachment* attachment) {
 Cocos2dAtlasAttachmentLoader::Cocos2dAtlasAttachmentLoader(Atlas* atlas): AtlasAttachmentLoader(atlas) {	
 }
 
-Cocos2dAtlasAttachmentLoader::~Cocos2dAtlasAttachmentLoader() { }
-
 void Cocos2dAtlasAttachmentLoader::configureAttachment(Attachment* attachment) {
 	if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 		setAttachmentVertices((RegionAttachment*)attachment);
@@ -102,34 +100,31 @@ GLuint filter (TextureFilter filter) {
 	return GL_LINEAR;
 }
 
-Cocos2dTextureLoader::Cocos2dTextureLoader() : TextureLoader() { }
-Cocos2dTextureLoader::~Cocos2dTextureLoader() { }
-
 void Cocos2dTextureLoader::load(AtlasPage& page, const spine::String& path) {
 	Texture2D* texture = Director::getInstance()->getTextureCache()->addImage(path.buffer());
 	CCASSERT(texture != nullptr, "Invalid image");
-	texture->retain();
-	
-	Texture2D::TexParams textureParams = {filter(page.minFilter), filter(page.magFilter), wrap(page.uWrap), wrap(page.vWrap)};
-	texture->setTexParameters(textureParams);
-	
-	page.setRendererObject(texture);
-	page.width = texture->getPixelsWide();
-	page.height = texture->getPixelsHigh();
+	if (texture)
+	{
+		texture->retain();
+		Texture2D::TexParams textureParams = { filter(page.minFilter), filter(page.magFilter), wrap(page.uWrap), wrap(page.vWrap) };
+		texture->setTexParameters(textureParams);
+		page.setRendererObject(texture);
+		page.width = texture->getPixelsWide();
+		page.height = texture->getPixelsHigh();
+	}
 }
 	
 void Cocos2dTextureLoader::unload(void* texture) {
-	((Texture2D*)texture)->release();
+	if (texture)
+	{
+		((Texture2D*)texture)->release();
+	}
 }
 
 
-Cocos2dExtension::Cocos2dExtension() : DefaultSpineExtension() { }
-	
-Cocos2dExtension::~Cocos2dExtension() { }
-
 char *Cocos2dExtension::_readFile(const spine::String &path, int *length) {
 	Data data = FileUtils::getInstance()->getDataFromFile(FileUtils::getInstance()->fullPathForFilename(path.buffer()));
-	if (data.isNull()) return 0;
+	if (data.isNull()) return nullptr;
 	
 	// avoid buffer overflow (int is shorter than ssize_t in certain platforms)
 #if COCOS2D_VERSION >= 0x00031200
