@@ -99,9 +99,9 @@ class TextureLoader;
 
 class SP_API Atlas : public SpineObject {
 public:
-	Atlas(const String &path, TextureLoader *textureLoader, bool createTexture);
+	Atlas(const String &path, TextureLoader *textureLoader, bool createTexture = true);
 
-	Atlas(const char *data, int length, const char *dir, TextureLoader *textureLoader, bool createTexture);
+	Atlas(const char *data, int length, const char *dir, TextureLoader *textureLoader, bool createTexture = true);
 
 	~Atlas();
 
