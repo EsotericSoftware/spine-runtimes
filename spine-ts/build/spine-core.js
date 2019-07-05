@@ -1442,8 +1442,10 @@ var spine;
 				var timelineCount = current.animation.timelines.length;
 				var timelines = current.animation.timelines;
 				if ((i == 0 && mix == 1) || blend == spine.MixBlend.add) {
-					for (var ii = 0; ii < timelineCount; ii++)
+					for (var ii = 0; ii < timelineCount; ii++) {
+						spine.Utils.webkit602BugfixHelper(mix, blend);
 						timelines[ii].apply(skeleton, animationLast, animationTime, events, mix, blend, spine.MixDirection.mixIn);
+					}
 				}
 				else {
 					var timelineMode = current.timelineMode;
