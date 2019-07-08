@@ -497,8 +497,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 			for (int i = 0; i < 6; i++)
 				trackButtons.add(new TextButton(i + "", skin, "toggle"));
 
-			animationList.getSelection().setRequired(false);
-
 			premultipliedCheckbox.setChecked(true);
 
 			linearCheckbox.setChecked(true);
@@ -516,6 +514,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 			yScaleSlider.setValue(1);
 			yScaleSlider.setSnapToValues(new float[] {-1.5f, -1, -0.5f, 0.5f, 1, 1.5f}, 0.12f);
+
+			skinList.getSelection().setRequired(false);
+			skinList.getSelection().setToggle(true);
+
+			animationList.getSelection().setRequired(false);
+			animationList.getSelection().setToggle(true);
 
 			mixSlider.setValue(0.3f);
 			mixSlider.setSnapToValues(new float[] {1, 1.5f, 2, 2.5f, 3, 3.5f}, 0.12f);

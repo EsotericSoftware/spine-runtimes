@@ -1326,7 +1326,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes an IK constraint's {@link IkConstraint#getMix()},{@link IkConstraint#getSoftness()},
+	/** Changes an IK constraint's {@link IkConstraint#getMix()}, {@link IkConstraint#getSoftness()},
 	 * {@link IkConstraint#getBendDirection()}, {@link IkConstraint#getStretch()}, and {@link IkConstraint#getCompress()}. */
 	static public class IkConstraintTimeline extends CurveTimeline {
 		static public final int ENTRIES = 6;
@@ -1456,7 +1456,8 @@ public class Animation {
 		}
 	}
 
-	/** Changes a transform constraint's mixes. */
+	/** Changes a transform constraint's {@link TransformConstraint#getRotateMix()}, {@link TransformConstraint#getTranslateMix()},
+	 * {@link TransformConstraint#getScaleMix()}, and {@link TransformConstraint#getShearMix()}. */
 	static public class TransformConstraintTimeline extends CurveTimeline {
 		static public final int ENTRIES = 5;
 		static private final int PREV_TIME = -5, PREV_ROTATE = -4, PREV_TRANSLATE = -3, PREV_SCALE = -2, PREV_SHEAR = -1;
@@ -1687,7 +1688,8 @@ public class Animation {
 		}
 	}
 
-	/** Changes a path constraint's mixes. */
+	/** Changes a transform constraint's {@link PathConstraint#getRotateMix()} and
+	 * {@link TransformConstraint#getTranslateMix()}. */
 	static public class PathConstraintMixTimeline extends CurveTimeline {
 		static public final int ENTRIES = 3;
 		static private final int PREV_TIME = -3, PREV_ROTATE = -2, PREV_TRANSLATE = -1;
