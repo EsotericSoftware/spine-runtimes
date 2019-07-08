@@ -12,11 +12,11 @@
 	font-family: "PT Sans",Arial,"Helvetica Neue",Helvetica,Tahoma,sans-serif;
 	color: #dddddd;
 	-webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 .spine-player-error {
@@ -55,13 +55,13 @@
 }
 
 .spine-player-slider:hover .spine-player-slider-value {
-    height: 4px;
+	height: 4px;
 	background: rgba(98, 176, 238, 1);
 	transition: height 0.2s;
 }
 
 .spine-player-slider-value.hovering {
-    height: 4px;
+	height: 4px;
 	background: rgba(98, 176, 238, 1);
 	transition: height 0.2s;
 }
@@ -194,11 +194,11 @@
 
 .spine-player-popup {
 	user-select: none;
-    position: absolute;
-    background: rgba(0, 0, 0, 0.75);
-    z-index: 1;
+	position: absolute;
+	background: rgba(0, 0, 0, 0.75);
+	z-index: 1;
 	right: 2px;
-    bottom: 40px;
+	bottom: 40px;
 	border-radius: 4px;
 	max-height: 400%;
 	overflow: auto;
@@ -206,8 +206,8 @@
 }
 
 .spine-player-popup-title {
-    margin: 4px 15px 2px 15px;
-    text-align: center;
+	margin: 4px 15px 2px 15px;
+	text-align: center;
 }
 
 .spine-player-popup hr {
@@ -260,8 +260,8 @@
 	width: 32px;
 	height: 32px;
 	background-size: 20px;
-    background-repeat: no-repeat;
-    background-position: center;
+	background-repeat: no-repeat;
+	background-position: center;
 	cursor: pointer;
 	margin-right: 3px;
 	padding-bottom: 3px;
@@ -362,11 +362,11 @@
 
 .spine-player-button-icon-spine-logo {
 	height: 20px;
-    position: relative;
+	position: relative;
 	top: 1px;
-    margin: 0 8px !important;
-    align-self: center;
-    border: none !important;
+	margin: 0 8px !important;
+	align-self: center;
+	border: none !important;
 	width: auto !important;
 	cursor: pointer;
 	transition: transform 0.2s;
