@@ -49,7 +49,7 @@ public class SkinBonesMixAndMatchTest extends ApplicationAdapter {
 		Skin mixAndMatchSkin = new Skin("custom-girl");
 		mixAndMatchSkin.addSkin(skeletonData.findSkin("skin-base"));
 		mixAndMatchSkin.addSkin(skeletonData.findSkin("nose/short"));
-		mixAndMatchSkin.addSkin(skeletonData.findSkin("eyes/eyelids-girly"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("eyelids/girly"));
 		mixAndMatchSkin.addSkin(skeletonData.findSkin("eyes/violet"));
 		mixAndMatchSkin.addSkin(skeletonData.findSkin("hair/brown"));
 		mixAndMatchSkin.addSkin(skeletonData.findSkin("clothes/hoodie-orange"));

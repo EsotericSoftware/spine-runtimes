@@ -43,7 +43,7 @@ namespace Spine {
 		public Screen(Example game) {
 			this.game = game;
 			skeletonRenderer = new SkeletonRenderer(game.GraphicsDevice);
-			skeletonRenderer.PremultipliedAlpha = false;			
+			skeletonRenderer.PremultipliedAlpha = false;
 		}
 
 		public void UpdateInput() {
@@ -63,7 +63,7 @@ namespace Spine {
 		Skeleton skeleton;
 		AnimationState state;
 
-		public RaptorScreen(Example game) : base (game) {		
+		public RaptorScreen(Example game) : base (game) {
 			// Load the texture atlas
 			atlas = new Atlas("data/raptor.atlas", new XnaTextureLoader(game.GraphicsDevice));
 
@@ -82,7 +82,7 @@ namespace Spine {
 			skeleton.Y = game.GraphicsDevice.Viewport.Height;
 
 			// Set the "walk" animation on track one and let it loop forever
-			state.SetAnimation(0, "walk", true);			
+			state.SetAnimation(0, "walk", true);
 		}
 
 		public override void Render(float deltaTime) {
@@ -97,7 +97,7 @@ namespace Spine {
 			// Clear the screen and setup the projection matrix of the skeleton renderer
 			game.GraphicsDevice.Clear(Color.Black);
 			((BasicEffect)skeletonRenderer.Effect).Projection = Matrix.CreateOrthographicOffCenter(0, game.GraphicsDevice.Viewport.Width, game.GraphicsDevice.Viewport.Height, 0, 1, 0);
-			
+
 			// Draw the skeletons
 			skeletonRenderer.Begin();
 			skeletonRenderer.Draw(skeleton);
@@ -125,7 +125,7 @@ namespace Spine {
 			skeletonRenderer.Effect = twoColorTintEffect;
 
 			// The remaining code loads the atlas and skeleton data as in the raptor screen
-			atlas = new Atlas("data/tank.atlas", new XnaTextureLoader(game.GraphicsDevice));			
+			atlas = new Atlas("data/tank.atlas", new XnaTextureLoader(game.GraphicsDevice));
 			SkeletonJson json = new SkeletonJson(atlas);
 			json.Scale = 0.25f;
 			SkeletonData skeletonData = json.ReadSkeletonData("data/tank-pro.json");
@@ -154,14 +154,14 @@ namespace Spine {
 			skeletonRenderer.Begin();
 			skeletonRenderer.Draw(skeleton);
 			skeletonRenderer.End();
-			
+
 			if (mouseClicked) game.currentScreen = new SpineboyScreen(game);
 		}
 	}
 
 	/// <summary>
 	/// The Spineboy screen shows how to queue up multiple animations via animation state,
-	/// set the default mix time to smoothly transition between animations, and load a 
+	/// set the default mix time to smoothly transition between animations, and load a
 	/// skeleton from a binary .skel file.
 	/// </summary>
 	internal class SpineboyScreen : Screen {
@@ -169,7 +169,7 @@ namespace Spine {
 		Skeleton skeleton;
 		AnimationState state;
 
-		public SpineboyScreen(Example game) : base(game) {			
+		public SpineboyScreen(Example game) : base(game) {
 			atlas = new Atlas("data/spineboy.atlas", new XnaTextureLoader(game.GraphicsDevice));
 
 			SkeletonBinary binary = new SkeletonBinary(atlas);
@@ -177,7 +177,7 @@ namespace Spine {
 			SkeletonData skeletonData = binary.ReadSkeletonData("data/spineboy-pro.skel");
 
 			skeleton = new Skeleton(skeletonData);
-			AnimationStateData stateData = new AnimationStateData(skeleton.Data);			
+			AnimationStateData stateData = new AnimationStateData(skeleton.Data);
 			state = new AnimationState(stateData);
 
 			skeleton.X = game.GraphicsDevice.Viewport.Width / 2;
@@ -201,14 +201,14 @@ namespace Spine {
 			state.Update(deltaTime);
 			state.Apply(skeleton);
 			skeleton.UpdateWorldTransform();
-			
+
 			game.GraphicsDevice.Clear(Color.Black);
 			((BasicEffect)skeletonRenderer.Effect).Projection = Matrix.CreateOrthographicOffCenter(0, game.GraphicsDevice.Viewport.Width, game.GraphicsDevice.Viewport.Height, 0, 1, 0);
-			
+
 			skeletonRenderer.Begin();
 			skeletonRenderer.Draw(skeleton);
 			skeletonRenderer.End();
-			
+
 			if (mouseClicked) game.currentScreen = new MixAndMatchScreen(game);
 		}
 	}
@@ -236,7 +236,7 @@ namespace Spine {
 
 			skeleton.X = game.GraphicsDevice.Viewport.Width / 2;
 			skeleton.Y = game.GraphicsDevice.Viewport.Height;
-			
+
 			state.SetAnimation(0, "dance", true);
 
 			// Create a new skin, by mixing and matching other skins
@@ -246,7 +246,7 @@ namespace Spine {
 			var mixAndMatchSkin = new Spine.Skin("custom-girl");
 			mixAndMatchSkin.AddSkin(skeletonData.FindSkin("skin-base"));
 			mixAndMatchSkin.AddSkin(skeletonData.FindSkin("nose/short"));
-			mixAndMatchSkin.AddSkin(skeletonData.FindSkin("eyes/eyelids-girly"));
+			mixAndMatchSkin.AddSkin(skeletonData.FindSkin("eyelids/girly"));
 			mixAndMatchSkin.AddSkin(skeletonData.FindSkin("eyes/violet"));
 			mixAndMatchSkin.AddSkin(skeletonData.FindSkin("hair/brown"));
 			mixAndMatchSkin.AddSkin(skeletonData.FindSkin("clothes/hoodie-orange"));
@@ -295,6 +295,6 @@ namespace Spine {
 
 		protected override void Draw(GameTime gameTime) {
 			currentScreen.Render(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
-		}		
+		}
 	}
 }

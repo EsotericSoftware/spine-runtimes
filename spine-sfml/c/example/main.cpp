@@ -513,7 +513,7 @@ void testMixAndMatch(SkeletonData* skeletonData, Atlas* atlas) {
 	spSkin* skin = spSkin_create("mix-and-match");
 	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "skin-base"));
 	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "nose/short"));
-	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "eyes/eyelids-girly"));
+	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "eyelids/girly"));
 	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "eyes/violet"));
 	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "hair/brown"));
 	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "clothes/hoodie-orange"));
