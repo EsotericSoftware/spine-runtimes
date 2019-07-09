@@ -12100,9 +12100,9 @@ var spine;
 				};
 			}
 			this.setupInput();
-			if (skeletonData.skins.length == 1)
+			if (skeletonData.skins.length == 1 || (this.config.skins && this.config.skins.length == 1))
 				this.skinButton.classList.add("spine-player-hidden");
-			if (skeletonData.animations.length == 1)
+			if (skeletonData.animations.length == 1 || (this.config.animations && this.config.animations.length == 1))
 				this.animationButton.classList.add("spine-player-hidden");
 			this.config.success(this);
 			this.loaded = true;
