@@ -320,8 +320,8 @@ namespace Spine.Unity.Editor {
 			
 			// 'sRGBTexture = true' generates incorrectly weighted mipmaps at PMA textures,
 			// causing white borders due to undesired custom weighting.
-			if (texImporter.sRGBTexture && texImporter.mipmapEnabled) {
-				Debug.LogWarningFormat("`{0}` : Incorrect Texture Settings found: When enabling `Generate Mip Maps`, it is strongly recommended to disable `sRGB (Color Texture)`. Otherwise you will receive white border artifacts on an atlas exported with default `Premultiply alpha` settings.\n(You can disable this warning in `Edit - Preferences - Spine`)", texturePath);
+			if (texImporter.sRGBTexture && texImporter.mipmapEnabled && PlayerSettings.colorSpace == ColorSpace.Gamma) {
+				Debug.LogWarningFormat("`{0}` : Problematic Texture Settings found: When enabling `Generate Mip Maps` in Gamma color space, it is recommended to disable `sRGB (Color Texture)`. Otherwise you will receive white border artifacts on an atlas exported with default `Premultiply alpha` settings.\n(You can disable this warning in `Edit - Preferences - Spine`)", texturePath);
 			}
 			if (texImporter.alphaIsTransparency) {
 				int straightAlphaValue = material.GetInt(STRAIGHT_ALPHA_PARAM_ID);
@@ -1038,10 +1038,6 @@ namespace Spine.Unity.Editor {
 							continue;
 						}
 
-						// Note: 'sRGBTexture = false' below might seem counter-intuitive, but prevents mipmaps from being
-						// generated incorrectly (causing white borders due to undesired custom weighting) for PMA textures
-						// when mipmaps are enabled later.
-						texImporter.sRGBTexture = false;
 						texImporter.textureCompression = TextureImporterCompression.Uncompressed;
 						texImporter.alphaSource = TextureImporterAlphaSource.FromInput;
 						texImporter.mipmapEnabled = false;
