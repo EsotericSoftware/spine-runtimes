@@ -40,7 +40,7 @@ vertexOutput vert(vertexInput v, float4 vertexColor : COLOR)
 
 uniform fixed _ShadowAlphaCutoff;
 
-fixed4 frag(vertexOutput IN) : COLOR 
+fixed4 frag(vertexOutput IN) : SV_Target
 {
 	fixed4 texureColor = calculateTexturePixel(IN.texcoordAndAlpha.xy);
 	clip(texureColor.a * IN.texcoordAndAlpha.a - _ShadowAlphaCutoff);

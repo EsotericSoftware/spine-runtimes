@@ -196,7 +196,7 @@ Shader "Spine/Skeleton Lit" {
 			uniform sampler2D _MainTex;
 			uniform fixed _Cutoff;
 
-			float4 frag (v2f i) : COLOR {
+			float4 frag (v2f i) : SV_Target {
 				fixed4 texcol = tex2D(_MainTex, i.uvAndAlpha.xy);
 				clip(texcol.a * i.uvAndAlpha.a - _Cutoff);
 				SHADOW_CASTER_FRAGMENT(i)

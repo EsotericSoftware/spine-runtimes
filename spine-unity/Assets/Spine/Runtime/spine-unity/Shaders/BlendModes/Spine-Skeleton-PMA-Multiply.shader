@@ -60,7 +60,7 @@ Shader "Spine/Blend Modes/Skeleton PMA Multiply" {
 				return o;
 			}
 
-			float4 frag (VertexOutput i) : COLOR {
+			float4 frag (VertexOutput i) : SV_Target {
 				float4 texColor = tex2D(_MainTex, i.uv);
 				
 				#if defined(_STRAIGHT_ALPHA_INPUT)
