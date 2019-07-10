@@ -37,6 +37,10 @@
 #include <spine/SpineString.h>
 #include <spine/HasRendererObject.h>
 
+#ifdef SPINE_USE_STD_FUNCTION
+#include <functional>
+#endif
+
 namespace spine {
     enum EventType {
         EventType_Start,
@@ -56,7 +60,11 @@ namespace spine {
     class Skeleton;
     class RotateTimeline;
     
+#ifdef SPINE_USE_STD_FUNCTION
+    typedef std::function<void (AnimationState* state, EventType type, TrackEntry* entry, Event* event)> AnimationStateListener;
+#else
     typedef void (*AnimationStateListener) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
+#endif
     
     /// State for the playback of an animation
     class SP_API TrackEntry : public SpineObject, public HasRendererObject {
