@@ -46,6 +46,10 @@
 #define NEWHIERARCHYWINDOWCALLBACKS
 #endif
 
+#if UNITY_2018_3_OR_NEWER
+#define NEW_PREFERENCES_SETTINGS_PROVIDER
+#endif
+
 #if UNITY_2019_1_OR_NEWER
 #define NEW_TIMELINE_AS_PACKAGE
 #endif
@@ -174,11 +178,33 @@ namespace Spine.Unity.Editor {
 
 		static int STRAIGHT_ALPHA_PARAM_ID = Shader.PropertyToID("_StraightAlphaInput");
 
+	#if NEW_PREFERENCES_SETTINGS_PROVIDER
+		static class SpineSettingsProviderRegistration
+		{
+			[SettingsProvider]
+			public static SettingsProvider CreateSpineSettingsProvider()
+			{
+				var provider = new SettingsProvider("Spine", SettingsScope.User)
+				{
+					label = "Spine",
+					guiHandler = (searchContext) =>
+					{
+						Preferences.HandlePreferencesGUI(); // This line shall NOT be merged to 3.8 branch. Version to provide a non-behavior-changing implementation for 3.7 branch.
+					},
+
+					// Populate the search keywords to enable smart search filtering and label highlighting:
+					keywords = new HashSet<string>(new[] { "Spine", "Preferences", "Skeleton", "Default", "Mix", "Duration" })
+				};
+				return provider;
+			}
+		}
+	#else
 		// Preferences entry point
 		[PreferenceItem("Spine")]
 		static void PreferencesGUI () {
 			Preferences.HandlePreferencesGUI();
 		}
+	#endif
 
 		// Auto-import entry point
 		static void OnPostprocessAllAssets (string[] imported, string[] deleted, string[] moved, string[] movedFromAssetPaths) {
@@ -206,39 +232,39 @@ namespace Spine.Unity.Editor {
 			Icons.Initialize();
 
 			// Drag and Drop
-		#if UNITY_2019_1_OR_NEWER
+#if UNITY_2019_1_OR_NEWER
 			SceneView.duringSceneGui -= DragAndDropInstantiation.SceneViewDragAndDrop;
 			SceneView.duringSceneGui += DragAndDropInstantiation.SceneViewDragAndDrop;
-		#else
+#else
 			SceneView.onSceneGUIDelegate -= DragAndDropInstantiation.SceneViewDragAndDrop;
 			SceneView.onSceneGUIDelegate += DragAndDropInstantiation.SceneViewDragAndDrop;
-		#endif
+#endif
 
 			EditorApplication.hierarchyWindowItemOnGUI -= HierarchyHandler.HandleDragAndDrop;
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyHandler.HandleDragAndDrop;
 
 			// Hierarchy Icons
-			#if NEWPLAYMODECALLBACKS
+#if NEWPLAYMODECALLBACKS
 			EditorApplication.playModeStateChanged -= HierarchyHandler.IconsOnPlaymodeStateChanged;
 			EditorApplication.playModeStateChanged += HierarchyHandler.IconsOnPlaymodeStateChanged;
 			HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-			#else
+#else
 			EditorApplication.playmodeStateChanged -= HierarchyHandler.IconsOnPlaymodeStateChanged;
 			EditorApplication.playmodeStateChanged += HierarchyHandler.IconsOnPlaymodeStateChanged;
 			HierarchyHandler.IconsOnPlaymodeStateChanged();
-			#endif
+#endif
 
 			// Data Refresh Edit Mode.
 			// This prevents deserialized SkeletonData from persisting from play mode to edit mode.
-			#if NEWPLAYMODECALLBACKS
+#if NEWPLAYMODECALLBACKS
 			EditorApplication.playModeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
 			EditorApplication.playModeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
 			DataReloadHandler.OnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-			#else
+#else
 			EditorApplication.playmodeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
 			EditorApplication.playmodeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
 			DataReloadHandler.OnPlaymodeStateChanged();
-			#endif
+#endif
 
 			if (SpineEditorUtilities.Preferences.textureImporterWarning) {
 				IssueWarningsForUnrecommendedTextureSettings();
@@ -298,14 +324,14 @@ namespace Spine.Unity.Editor {
 			}
 			return true;
 		}
-		#endregion
+#endregion
 
 		public static class Preferences {
-			#if SPINE_TK2D
+#if SPINE_TK2D
 			const float DEFAULT_DEFAULT_SCALE = 1f;
-			#else
+#else
 			const float DEFAULT_DEFAULT_SCALE = 0.01f;
-			#endif
+#endif
 			const string DEFAULT_SCALE_KEY = "SPINE_DEFAULT_SCALE";
 			public static float defaultScale = DEFAULT_DEFAULT_SCALE;
 
@@ -378,11 +404,11 @@ namespace Spine.Unity.Editor {
 				showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
 				if (EditorGUI.EndChangeCheck()) {
 					EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
-					#if NEWPLAYMODECALLBACKS
+#if NEWPLAYMODECALLBACKS
 					HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-					#else
+#else
 					HierarchyHandler.IconsOnPlaymodeStateChanged();
-					#endif
+#endif
 				}
 
 				BoolPrefsField(ref autoReloadSceneSkeletons, AUTO_RELOAD_SCENESKELETONS_KEY, new GUIContent("Auto-reload scene components", "Reloads Skeleton components in the scene whenever their SkeletonDataAsset is modified. This makes it so changes in the SkeletonDataAsset inspector are immediately reflected. This may be slow when your scenes have large numbers of SkeletonRenderers or SkeletonGraphic."));
@@ -432,7 +458,7 @@ namespace Spine.Unity.Editor {
 					}
 				}
 				
-				#if NEW_TIMELINE_AS_PACKAGE
+#if NEW_TIMELINE_AS_PACKAGE
 				GUILayout.Space(20);
 				EditorGUILayout.LabelField("Timeline Support", EditorStyles.boldLabel);
 				using (new GUILayout.HorizontalScope()) {
@@ -446,7 +472,7 @@ namespace Spine.Unity.Editor {
 							SpineEditorUtilities.SpinePackageDependencyUtility.DisableTimelineSupport();
 					}
 				}
-				#endif
+#endif
 
 				GUILayout.Space(20);
 				EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
@@ -1459,20 +1485,20 @@ namespace Spine.Unity.Editor {
 			
 			/// <summary>Handles creating a new GameObject in the Unity Editor. This uses the new ObjectFactory API where applicable.</summary>
 			public static GameObject NewGameObject (string name) {
-				#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 				return ObjectFactory.CreateGameObject(name);
-				#else
+#else
 				return new GameObject(name);
-				#endif
+#endif
 			}
 
 			/// <summary>Handles creating a new GameObject in the Unity Editor. This uses the new ObjectFactory API where applicable.</summary>
 			public static GameObject NewGameObject (string name, params System.Type[] components) {
-				#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 				return ObjectFactory.CreateGameObject(name, components);
-				#else
+#else
 				return new GameObject(name, components);
-				#endif
+#endif
 			}
 
 			public static void InstantiateEmptySpineGameObject<T> (string name) where T : MonoBehaviour {
@@ -1824,7 +1850,7 @@ namespace Spine.Unity.Editor {
 				Failure
 			}
 
-			#if NEW_TIMELINE_AS_PACKAGE
+#if NEW_TIMELINE_AS_PACKAGE
 			const string SPINE_TIMELINE_PACKAGE_DOWNLOADED_DEFINE = "SPINE_TIMELINE_PACKAGE_DOWNLOADED";
 			const string TIMELINE_PACKAGE_NAME = "com.unity.timeline";
 			const string TIMELINE_ASMDEF_DEPENDENCY_STRING = "\"Unity.Timeline\"";
@@ -1877,9 +1903,9 @@ namespace Spine.Unity.Editor {
 
 			internal static void HandleSuccessfulTimelinePackageDownload () {
 
-				#if !SPINE_TK2D
+#if !SPINE_TK2D
 				SpineBuildEnvUtility.EnableSpineAsmdefFiles();
-				#endif
+#endif
 				SpineBuildEnvUtility.AddDependencyToAsmdefFile(TIMELINE_ASMDEF_DEPENDENCY_STRING);
 				SpineBuildEnvUtility.EnableBuildDefine(SPINE_TIMELINE_PACKAGE_DOWNLOADED_DEFINE);
 
@@ -1911,7 +1937,7 @@ namespace Spine.Unity.Editor {
 					}
 				}
 			}
-			#endif
+#endif
 		}
 	}
 
