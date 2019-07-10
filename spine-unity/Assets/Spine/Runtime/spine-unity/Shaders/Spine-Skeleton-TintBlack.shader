@@ -69,7 +69,7 @@ Shader "Spine/Skeleton Tint Black" {
 				return o;
 			}
 
-			float4 frag (VertexOutput i) : COLOR {
+			float4 frag (VertexOutput i) : SV_Target {
 				float4 texColor = tex2D(_MainTex, i.uv);
 				
 				#if defined(_STRAIGHT_ALPHA_INPUT)
@@ -110,7 +110,7 @@ Shader "Spine/Skeleton Tint Black" {
 				return o;
 			}
 
-			float4 frag (v2f i) : COLOR {
+			float4 frag (v2f i) : SV_Target {
 				fixed4 texcol = tex2D(_MainTex, i.uv);
 				clip(texcol.a - _Cutoff);
 				SHADOW_CASTER_FRAGMENT(i)

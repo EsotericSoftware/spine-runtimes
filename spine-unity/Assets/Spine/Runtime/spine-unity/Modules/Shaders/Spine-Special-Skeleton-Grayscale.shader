@@ -101,7 +101,7 @@ Shader "Spine/Special/Skeleton Grayscale" {
 				return o;
 			}
 
-			float4 frag (VertexOutput i) : COLOR {
+			float4 frag (VertexOutput i) : SV_Target {
 				fixed4 texcol = tex2D(_MainTex, i.uv);
 				clip(texcol.a - _Cutoff);
 				SHADOW_CASTER_FRAGMENT(i)
