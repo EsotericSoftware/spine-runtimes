@@ -175,9 +175,13 @@ namespace Spine.Unity.Editor {
 		static int STRAIGHT_ALPHA_PARAM_ID = Shader.PropertyToID("_StraightAlphaInput");
 
 		// Preferences entry point
-		[PreferenceItem("Spine")]
-		static void PreferencesGUI () {
-			Preferences.HandlePreferencesGUI();
+		[SettingsProvider]
+		static SettingsProvider PreferencesGUI ()
+		{
+			return new SettingsProvider("Preferences/Spine", SettingsScope.User)
+			{
+				guiHandler = searchContext => Preferences.HandlePreferencesGUI() 
+			};
 		}
 
 		// Auto-import entry point
