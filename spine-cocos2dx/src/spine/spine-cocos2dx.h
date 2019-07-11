@@ -41,15 +41,11 @@ namespace spine {
 	class Cocos2dAtlasAttachmentLoader: public AtlasAttachmentLoader {
 	public:
 		Cocos2dAtlasAttachmentLoader(Atlas* atlas);
-		virtual ~Cocos2dAtlasAttachmentLoader();
 		virtual void configureAttachment(Attachment* attachment);
 	};
 	
 	class Cocos2dTextureLoader: public TextureLoader {
 	public:
-		Cocos2dTextureLoader();
-		
-		virtual ~Cocos2dTextureLoader();
 		
 		virtual void load(AtlasPage& page, const String& path);
 		
@@ -58,9 +54,6 @@ namespace spine {
 	
 	class Cocos2dExtension: public DefaultSpineExtension {
 	public:
-		Cocos2dExtension();
-		
-		virtual ~Cocos2dExtension();
 		
 	protected:
 		virtual char *_readFile(const String &path, int *length);

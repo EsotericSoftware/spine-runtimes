@@ -48,7 +48,7 @@ bool BatchingExample::init () {
 
 	// Load the texture atlas. Note that the texture loader has to live
 	// as long as the Atlas, as the Atlas destructor will call TextureLoader::unload.
-	_atlas = new (__FILE__, __LINE__) Atlas("spineboy.atlas", &textureLoader);
+	_atlas = new (__FILE__, __LINE__) Atlas("spineboy.atlas", &textureLoader, true);
 	CCASSERT(_atlas, "Error reading atlas file.");
 
 	// This attachment loader configures attachments with data needed for cocos2d-x rendering.
