@@ -57,7 +57,7 @@ bool MixAndMatchExample::init () {
 	skin = new (__FILE__, __LINE__) Skin("mix-and-match");
 	skin->addSkin(skeletonData->findSkin("skin-base"));
 	skin->addSkin(skeletonData->findSkin("nose/short"));
-	skin->addSkin(skeletonData->findSkin("eyes/eyelids-girly"));
+	skin->addSkin(skeletonData->findSkin("eyelids/girly"));
 	skin->addSkin(skeletonData->findSkin("eyes/violet"));
 	skin->addSkin(skeletonData->findSkin("hair/brown"));
 	skin->addSkin(skeletonData->findSkin("clothes/hoodie-orange"));

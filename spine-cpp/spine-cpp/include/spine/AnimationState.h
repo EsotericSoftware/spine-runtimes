@@ -65,7 +65,7 @@ namespace spine {
 #else
 	typedef void (*AnimationStateListener) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
 #endif
-	
+
 	/// Abstract class to inherit from to create a callback object
 	class SP_API AnimationStateListenerObject {
 	public:
