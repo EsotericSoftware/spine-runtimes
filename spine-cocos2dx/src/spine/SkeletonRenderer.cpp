@@ -274,7 +274,7 @@ namespace spine {
 		const cocos2d::Rect brect = computeBoundingRect(worldCoords, coordCount / 2);
 		_boundingRect = brect;
 
-		const bool autoCullingEnable = cocos2d::Director::getInstance()->isAutoCullingEnable();
+		const bool autoCullingEnable = true;
 		if (autoCullingEnable && camera && cullRectangle(transform, brect, *camera))
 		{
 			VLA_FREE(worldCoords);
