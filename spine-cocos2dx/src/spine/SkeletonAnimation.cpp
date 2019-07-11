@@ -55,7 +55,10 @@ void animationCallback (AnimationState* state, EventType type, TrackEntry* entry
 void trackEntryCallback (AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
 	((SkeletonAnimation*)state->getRendererObject())->onTrackEntryEvent(entry, type, event);
     if (type == EventType_Dispose)
-        if (entry->getRendererObject()) delete (spine::_TrackEntryListeners*)entry->getRendererObject();
+		if (entry->getRendererObject()) {
+			delete (spine::_TrackEntryListeners*)entry->getRendererObject();
+			entry->setRendererObject(NULL);
+		}
 }
 
 static _TrackEntryListeners* getListeners (TrackEntry* entry) {
