@@ -43,6 +43,10 @@ public:
 	virtual ~Updatable();
 
 	virtual void update() = 0;
+
+	virtual bool isActive() = 0;
+
+	virtual void setActive(bool inValue) = 0;
 };
 }
 

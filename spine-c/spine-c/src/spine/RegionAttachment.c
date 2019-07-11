@@ -41,12 +41,36 @@ void _spRegionAttachment_dispose (spAttachment* attachment) {
 	FREE(self);
 }
 
+spAttachment* _spRegionAttachment_copy (spAttachment* attachment) {
+	spRegionAttachment* self = SUB_CAST(spRegionAttachment, attachment);
+	spRegionAttachment* copy = spRegionAttachment_create(attachment->name);
+	copy->regionWidth = self->regionWidth;
+	copy->regionHeight = self->regionHeight;
+	copy->regionOffsetX = self->regionOffsetX;
+	copy->regionOffsetY = self->regionOffsetY;
+	copy->regionOriginalWidth = self->regionOriginalWidth;
+	copy->regionOriginalHeight = self->regionOriginalHeight;
+	copy->rendererObject = self->rendererObject;
+	MALLOC_STR(copy->path, self->path);
+	copy->x = self->x;
+	copy->y = self->y;
+	copy->scaleX = self->scaleX;
+	copy->scaleY = self->scaleY;
+	copy->rotation = self->rotation;
+	copy->width = self->width;
+	copy->height = self->height;
+	memcpy(copy->uvs, self->uvs, sizeof(float) * 8);
+	memcpy(copy->offset, self->offset, sizeof(float) * 8);
+	spColor_setFromColor(&copy->color, &self->color);
+	return SUPER(copy);
+}
+
 spRegionAttachment* spRegionAttachment_create (const char* name) {
 	spRegionAttachment* self = NEW(spRegionAttachment);
 	self->scaleX = 1;
 	self->scaleY = 1;
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
-	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_REGION, _spRegionAttachment_dispose);
+	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_REGION, _spRegionAttachment_dispose, _spRegionAttachment_copy);
 	return self;
 }
 

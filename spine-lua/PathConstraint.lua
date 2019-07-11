@@ -73,7 +73,8 @@ function PathConstraint.new (data, skeleton)
 		world = {},
 		curves = {},
 		lengths = {},
-		segments = {}
+		segments = {},
+    active = false    
 	}
 	setmetatable(self, PathConstraint)
 

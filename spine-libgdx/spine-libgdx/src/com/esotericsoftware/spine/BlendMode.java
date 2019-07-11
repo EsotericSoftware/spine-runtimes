@@ -55,5 +55,5 @@ public enum BlendMode {
 		return dest;
 	}
 
-	static public BlendMode[] values = values();
+	static public final BlendMode[] values = values();
 }

@@ -37,11 +37,13 @@ namespace Spine {
 	/// <para>
 	/// See <a href="http://esotericsoftware.com/spine-transform-constraints">Transform constraints</a> in the Spine User Guide.</para>
 	/// </summary>
-	public class TransformConstraint : IConstraint {
+	public class TransformConstraint : IUpdatable {
 		internal TransformConstraintData data;
 		internal ExposedList<Bone> bones;
 		internal Bone target;
 		internal float rotateMix, translateMix, scaleMix, shearMix;
+		
+		internal bool active;
 
 		public TransformConstraint (TransformConstraintData data, Skeleton skeleton) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
@@ -288,7 +290,6 @@ namespace Spine {
 			}
 		}
 
-		public int Order { get { return data.order; } }
 		/// <summary>The bones that will be modified by this transform constraint.</summary>
 		public ExposedList<Bone> Bones { get { return bones; } }
 		/// <summary>The target bone whose world transform will be copied to the constrained bones.</summary>
@@ -301,6 +302,7 @@ namespace Spine {
 		public float ScaleMix { get { return scaleMix; } set { scaleMix = value; } }
 		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained scales.</summary>
 		public float ShearMix { get { return shearMix; } set { shearMix = value; } }
+		public bool Active { get { return active; } }
 		/// <summary>The transform constraint's setup pose data.</summary>
 		public TransformConstraintData Data { get { return data; } }
 

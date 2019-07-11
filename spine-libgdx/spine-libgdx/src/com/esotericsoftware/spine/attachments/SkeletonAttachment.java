@@ -48,4 +48,10 @@ public class SkeletonAttachment extends Attachment {
 	public void setSkeleton (Skeleton skeleton) {
 		this.skeleton = skeleton;
 	}
+
+	public Attachment copy () {
+		SkeletonAttachment copy = new SkeletonAttachment(name);
+		copy.skeleton = skeleton;
+		return copy;
+	}
 }

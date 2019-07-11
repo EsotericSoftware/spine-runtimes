@@ -46,7 +46,7 @@
 #include <spine/ClippingAttachment.h>
 #include <spine/Color.h>
 #include <spine/ColorTimeline.h>
-#include <spine/Constraint.h>
+#include <spine/ConstraintData.h>
 #include <spine/ContainerUtil.h>
 #include <spine/CurveTimeline.h>
 #include <spine/Debug.h>

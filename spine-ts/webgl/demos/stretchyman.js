@@ -91,7 +91,7 @@ var stretchymanDemo = function(canvas, bgColor) {
 				target = null;
 			},
 			dragged: function(x, y) {
-				if (target != null) {
+				if (target != null && x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
 					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
 					if (target.parent !== null)
 						target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));

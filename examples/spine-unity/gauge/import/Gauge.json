@@ -1,0 +1,42 @@
+{
+"skeleton": { "hash": "rc2mxcPRae3DQs+8yUQlM2SkaRg", "spine": "3.6.07-beta", "width": 250, "height": 60, "fps": 1, "images": "./images/" },
+"bones": [
+	{ "name": "root" },
+	{ "name": "Bar", "parent": "root", "x": -112.29 }
+],
+"slots": [
+	{ "name": "Background", "bone": "root", "attachment": "Background" },
+	{ "name": "Bar", "bone": "Bar", "attachment": "Bar" },
+	{ "name": "Border", "bone": "root", "attachment": "Border" }
+],
+"skins": {
+	"default": {
+		"Background": {
+			"Background": { "width": 224, "height": 32 }
+		},
+		"Bar": {
+			"Bar": { "x": 112.29, "width": 224, "height": 32 }
+		},
+		"Border": {
+			"Border": { "width": 250, "height": 60 }
+		}
+	}
+},
+"animations": {
+	"Fill": {
+		"bones": {
+			"Bar": {
+				"scale": [
+					{
+						"time": 0,
+						"x": 0.002,
+						"y": 1,
+						"curve": [ 0.25, 0, 0.75, 1 ]
+					},
+					{ "time": 1, "x": 1, "y": 1 }
+				]
+			}
+		}
+	}
+}
+}

@@ -38,7 +38,7 @@ namespace Spine {
 	/// <para>
 	/// See <a href="http://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide.</para>
 	/// </summary>
-	public class PathConstraint : IConstraint {
+	public class PathConstraint : IUpdatable {
 		const int NONE = -1, BEFORE = -2, AFTER = -3;
 		const float Epsilon = 0.00001f;
 
@@ -46,6 +46,8 @@ namespace Spine {
 		internal ExposedList<Bone> bones;
 		internal Slot target;
 		internal float position, spacing, rotateMix, translateMix;
+
+		internal bool active;
 
 		internal ExposedList<float> spaces = new ExposedList<float>(), positions = new ExposedList<float>();
 		internal ExposedList<float> world = new ExposedList<float>(), curves = new ExposedList<float>(), lengths = new ExposedList<float>();
@@ -446,7 +448,6 @@ namespace Spine {
 			}
 		}
 		
-		public int Order { get { return data.order; } }
 		/// <summary>The position along the path.</summary>
 		public float Position { get { return position; } set { position = value; } }
 		/// <summary>The spacing between bones.</summary>
@@ -459,11 +460,8 @@ namespace Spine {
 		public ExposedList<Bone> Bones { get { return bones; } }
 		/// <summary>The slot whose path attachment will be used to constrained the bones.</summary>
 		public Slot Target { get { return target; } set { target = value; } }
+		public bool Active { get { return active; } }
 		/// <summary>The path constraint's setup pose data.</summary>
 		public PathConstraintData Data { get { return data; } }
-
-		override public string ToString () {
-			return data.name;
-		}
 	}
 }

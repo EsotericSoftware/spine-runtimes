@@ -41,6 +41,9 @@ local math_signum = utils.signum
 local math_floor = math.floor
 local math_ceil = math.ceil
 local math_mod = utils.mod
+local testBit = utils.testBit
+local setBit = utils.setBit
+local clearBit = utils.clearBit
 
 local function zlen(array)
 	return #array + 1
@@ -50,7 +53,8 @@ local EMPTY_ANIMATION = Animation.new("<empty>", {}, 0)
 local SUBSEQUENT = 0
 local FIRST = 1
 local HOLD = 2
-local HOLD_MIX = 3;
+local HOLD_MIX = 3
+local NOT_LAST = 4
 
 local EventType = {
 	start = 0,
@@ -356,7 +360,7 @@ function AnimationState:apply (skeleton)
 
 				for ii,timeline in ipairs(timelines) do
 					local timelineBlend = MixBlend.setup
-					if timelineMode[ii] == SUBSEQUENT then timelineBlend = blend end
+					if clearBit(timelineMode[ii], NOT_LAST) == SUBSEQUENT then timelineBlend = blend end
 
 					if timeline.type == Animation.TimelineType.rotate then
 						self:applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii * 2,
@@ -419,15 +423,21 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
       local direction = MixDirection.out;
 			local timelineBlend = MixBlend.setup
 			local alpha = 0
-			if timelineMode[i] == SUBSEQUENT then
-				if not attachments and timeline.type == Animation.TimelineType.attachment then skipSubsequent = true end
+			if clearBit(timelineMode[i], NOT_LAST) == SUBSEQUENT then
+				if not attachments and timeline.type == Animation.TimelineType.attachment then
+					if testBit(timelineMode[i], NOT_LAST) then 
+						skipSubsequent = true
+					else
+						blend = MixBlend.setup
+					end
+				end
 				if not drawOrder and timeline.type == Animation.TimelineType.drawOrder then skipSubsequent = true end
 				timelineBlend = blend
 				alpha = alphaMix
-			elseif timelineMode[i] == FIRST then
+			elseif clearBit(timelineMode[i], NOT_LAST) == FIRST then
 				timelineBlend = MixBlend.setup
 				alpha = alphaMix
-			elseif timelineMode[i] == HOLD then
+			elseif clearBit(timelineMode[i], NOT_LAST) == HOLD then
 				timelineBlend = MixBlend.setup
 				alpha = alphaHold
 			else
@@ -443,7 +453,7 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 				else
           if timelineBlend == MixBlend.setup then
             if timeline.type == Animation.TimelineType.attachment then
-              if attachments then direction = MixDirection._in end
+              if attachments or testBit(timelineMode[i], NOT_LAST) then direction = MixDirection._in end
             elseif timeline.type == Animation.TimelineType.drawOrder then
               if drawOrder then direction = MixDirection._in end
             end
@@ -478,6 +488,7 @@ function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, bl
   local rotateTimeline = timeline
   local frames = rotateTimeline.frames
   local bone = skeleton.bones[rotateTimeline.boneIndex]
+  if not bone.active then return end
 	local r1 = 0
 	local r2 = 0
   if time < frames[0] then
@@ -803,7 +814,10 @@ function AnimationState:_animationsChanged ()
 
 	self.propertyIDs = {}
 
+	local highestIndex = -1
 	for i, entry in pairs(self.tracks) do
+		if i > highestIndex then highestIndex = i end
+
 		if entry then
 			while entry.mixingFrom do
 				entry = entry.mixingFrom
@@ -811,15 +825,45 @@ function AnimationState:_animationsChanged ()
 
 			repeat
 				if (entry.mixingTo == nil or entry.mixBlend ~= MixBlend.add) then
-					self:setTimelineModes(entry)
+					self:computeHold(entry)
 				end
 				entry = entry.mixingTo
 			until (entry == nil)
 		end
 	end
+
+	self.propertyIDs = {}
+	for i = highestIndex, 0, -1 do
+		entry = self.tracks[i]
+		while entry do
+			self:computeNotLast(entry)
+			entry = entry.mixingFrom
+		end
+	end
 end
 
-function AnimationState:setTimelineModes(entry)
+function AnimationState:computeNotLast(entry)
+	local timelines = entry.animation.timelines
+	local timelinesCount = #entry.animation.timelines
+	local timelineMode = entry.timelineMode
+	local propertyIDs = self.propertyIDs
+ 
+	local i = 1
+	while i <= timelinesCount do
+		local timeline = timelines[i]
+		if (timeline.type == Animation.TimelineType.attachment) then
+			local slotIndex = timeline.slotIndex
+			if not (propertyIDs[slotIndex] == nil) then
+				timelineMode[i] = setBit(timelineMode[i], NOT_LAST)
+			else
+				propertyIDs[slotIndex] = true
+			end
+		end
+		i = i + 1
+	end
+end
+
+function AnimationState:computeHold(entry)
 	local to = entry.mixingTo
 	local timelines = entry.animation.timelines
 	local timelinesCount = #entry.animation.timelines
@@ -847,7 +891,11 @@ function AnimationState:setTimelineModes(entry)
 			timelineMode[i] = SUBSEQUENT
 		else
 			propertyIDs[id] = id
-			if to == nil or not self:hasTimeline(to, id) then
+			local timeline = timelines[i]
+			if to == nil or timeline.type == Animation.TimelineType.attachment 
+				or timeline.type == Animation.TimelineType.drawOrder 
+				or timeline.type == Animation.TimelineType.event 
+				or not self:hasTimeline(to, id) then
 				timelineMode[i] = FIRST
 			else
 				local next = to.mixingTo

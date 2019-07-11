@@ -40,6 +40,7 @@ extern "C" {
 typedef struct spIkConstraintData {
 	const char* const name;
 	int order;
+	int /*boolean*/ skinRequired;
 	int bonesCount;
 	spBoneData** bones;
 
@@ -49,10 +50,13 @@ typedef struct spIkConstraintData {
 	int /*boolean*/ stretch;
 	int /*boolean*/ uniform;
 	float mix;
+	float softness;
 
 #ifdef __cplusplus
 	spIkConstraintData() :
 		name(0),
+		order(0),
+		skinRequired(0),
 		bonesCount(0),
 		bones(0),
 		target(0),
@@ -60,7 +64,8 @@ typedef struct spIkConstraintData {
 		compress(0),
 		stretch(0),
 		uniform(0),
-		mix(0) {
+		mix(0),
+		softness(0) {
 	}
 #endif
 } spIkConstraintData;

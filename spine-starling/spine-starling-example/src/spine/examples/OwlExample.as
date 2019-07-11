@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 package spine.examples {
+	import spine.Skin;
 	import spine.animation.MixBlend;
 	import spine.animation.TrackEntry;
 	import starling.display.DisplayObjectContainer;

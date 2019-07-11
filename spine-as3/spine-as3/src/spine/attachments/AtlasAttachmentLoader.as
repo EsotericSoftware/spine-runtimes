@@ -47,8 +47,8 @@ package spine.attachments {
 				throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
 			var attachment : RegionAttachment = new RegionAttachment(name);
 			attachment.rendererObject = region;
-			var scaleX : Number = region.page.width / nextPOT(region.page.width);
-			var scaleY : Number = region.page.height / nextPOT(region.page.height);
+			var scaleX : Number = 1;
+			var scaleY : Number = 1;
 			attachment.setUVs(region.u * scaleX, region.v * scaleY, region.u2 * scaleX, region.v2 * scaleY, region.rotate);
 			attachment.regionOffsetX = region.offsetX;
 			attachment.regionOffsetY = region.offsetY;
@@ -65,13 +65,14 @@ package spine.attachments {
 				throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
 			var attachment : MeshAttachment = new MeshAttachment(name);
 			attachment.rendererObject = region;
-			var scaleX : Number = region.page.width / nextPOT(region.page.width);
-			var scaleY : Number = region.page.height / nextPOT(region.page.height);
+			var scaleX : Number = 1;
+			var scaleY : Number = 1;
 			attachment.regionU = region.u * scaleX;
 			attachment.regionV = region.v * scaleY;
 			attachment.regionU2 = region.u2 * scaleX;
 			attachment.regionV2 = region.v2 * scaleY;
 			attachment.regionRotate = region.rotate;
+			attachment.regionDegrees = region.degrees;
 			attachment.regionOffsetX = region.offsetX;
 			attachment.regionOffsetY = region.offsetY;
 			attachment.regionWidth = region.width;

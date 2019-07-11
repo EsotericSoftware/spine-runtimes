@@ -145,5 +145,28 @@ package spine.attachments {
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		}
+		
+		override public function copy (): Attachment {
+			var copy : RegionAttachment = new RegionAttachment(name);	
+			copy.regionWidth = regionWidth;
+			copy.regionHeight = regionHeight;
+			copy.regionOffsetX = regionOffsetX;
+			copy.regionOffsetY = regionOffsetY;
+			copy.regionOriginalWidth = regionOriginalWidth;
+			copy.regionOriginalHeight = regionOriginalHeight;			
+			copy.rendererObject = rendererObject;
+			copy.path = path;
+			copy.x = x;
+			copy.y = y;
+			copy.scaleX = scaleX;
+			copy.scaleY = scaleY;
+			copy.rotation = rotation;
+			copy.width = width;
+			copy.height = height;
+			copy.uvs = uvs.concat();
+			copy.offset = offset.concat();			
+			copy.color.setFromColor(color);
+			return copy;
+		}
 	}
 }

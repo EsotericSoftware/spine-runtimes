@@ -37,6 +37,10 @@
 #include <spine/SpineString.h>
 #include <spine/HasRendererObject.h>
 
+#ifdef SPINE_USE_STD_FUNCTION
+#include <functional>
+#endif
+
 namespace spine {
     enum EventType {
         EventType_Start,
@@ -55,8 +59,22 @@ namespace spine {
     class AnimationStateData;
     class Skeleton;
     class RotateTimeline;
-    
-    typedef void (*AnimationStateListener) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
+
+#ifdef SPINE_USE_STD_FUNCTION
+	typedef std::function<void (AnimationState* state, EventType type, TrackEntry* entry, Event* event)> AnimationStateListener;
+#else
+	typedef void (*AnimationStateListener) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
+#endif
+
+	/// Abstract class to inherit from to create a callback object
+	class SP_API AnimationStateListenerObject {
+	public:
+		AnimationStateListenerObject() { };
+		virtual ~AnimationStateListenerObject() { };
+	public:
+		/// The callback function to be called
+		virtual void callback(AnimationState* state, EventType type, TrackEntry* entry, Event* event) = 0;
+	};
     
     /// State for the playback of an animation
     class SP_API TrackEntry : public SpineObject, public HasRendererObject {
@@ -240,6 +258,8 @@ namespace spine {
         
         void setListener(AnimationStateListener listener);
 
+		void setListener(AnimationStateListenerObject* listener);
+
     private:
         Animation* _animation;
         
@@ -258,6 +278,7 @@ namespace spine {
         Vector<TrackEntry*> _timelineHoldMix;
         Vector<float> _timelinesRotation;
         AnimationStateListener _listener;
+		AnimationStateListenerObject* _listenerObject;
         
         void reset();
     };
@@ -395,6 +416,7 @@ namespace spine {
         void setTimeScale(float inValue);
 
         void setListener(AnimationStateListener listener);
+		void setListener(AnimationStateListenerObject* listener);
 
 		void disableQueue();
 		void enableQueue();
@@ -412,6 +434,7 @@ namespace spine {
         bool _animationsChanged;
 
         AnimationStateListener _listener;
+		AnimationStateListenerObject* _listenerObject;
         
         float _timeScale;
 
@@ -427,22 +450,24 @@ namespace spine {
         void queueEvents(TrackEntry* entry, float animationTime);
         
         /// Sets the active TrackEntry for a given track number.
-        void setCurrent(size_t index, TrackEntry* current, bool interrupt);
+        void setCurrent(size_t index, TrackEntry *current, bool interrupt);
 
         TrackEntry* expandToIndex(size_t index);
 
         /// Object-pooling version of new TrackEntry. Obtain an unused TrackEntry from the pool and clear/initialize its values.
         /// @param last May be NULL.
-        TrackEntry* newTrackEntry(size_t trackIndex, Animation* animation, bool loop, TrackEntry* last);
+        TrackEntry* newTrackEntry(size_t trackIndex, Animation *animation, bool loop, TrackEntry *last);
 
         /// Dispose all track entries queued after the given TrackEntry.
         void disposeNext(TrackEntry* entry);
 
         void animationsChanged();
 
-        void setTimelineModes(TrackEntry* entry);
+        void computeHold(TrackEntry *entry);
 
-        bool hasTimeline(TrackEntry* entry, int inId);
+        void computeNotLast(TrackEntry *entry);
+
+        bool hasTimeline(TrackEntry *entry, int inId);
     };
 }
 

@@ -53,6 +53,7 @@ typedef enum {
 typedef struct spPathConstraintData {
 	const char* const name;
 	int order;
+	int/*bool*/ skinRequired;
 	int bonesCount;
 	spBoneData** const bones;
 	spSlotData* target;
@@ -65,6 +66,8 @@ typedef struct spPathConstraintData {
 #ifdef __cplusplus
 	spPathConstraintData() :
 		name(0),
+		order(0),
+		skinRequired(0),
 		bonesCount(0),
 		bones(0),
 		target(0),

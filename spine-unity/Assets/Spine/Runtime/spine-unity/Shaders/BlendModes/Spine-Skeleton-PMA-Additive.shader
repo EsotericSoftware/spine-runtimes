@@ -60,7 +60,7 @@ Shader "Spine/Blend Modes/Skeleton PMA Additive" {
 				return o;
 			}
 
-			float4 frag (VertexOutput i) : COLOR {
+			float4 frag (VertexOutput i) : SV_Target {
 				float4 texColor = tex2D(_MainTex, i.uv);
 
 				#if defined(_STRAIGHT_ALPHA_INPUT)
@@ -88,24 +88,26 @@ Shader "Spine/Blend Modes/Skeleton PMA Additive" {
 			#include "UnityCG.cginc"
 			struct v2f { 
 				V2F_SHADOW_CASTER;
-				float2 uv : TEXCOORD1;
+				float4 uvAndAlpha : TEXCOORD1;
 			};
 
 			uniform float4 _MainTex_ST;
 
-			v2f vert (appdata_base v) {
+			v2f vert (appdata_base v, float4 vertexColor : COLOR) {
 				v2f o;
 				TRANSFER_SHADOW_CASTER(o)
-				o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
+				o.uvAndAlpha.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
+				o.uvAndAlpha.z = 0;
+				o.uvAndAlpha.a = vertexColor.a;
 				return o;
 			}
 
 			uniform sampler2D _MainTex;
 			uniform fixed _Cutoff;
 
-			float4 frag (v2f i) : COLOR {
-				fixed4 texcol = tex2D(_MainTex, i.uv);
-				clip(texcol.a - _Cutoff);
+			float4 frag (v2f i) : SV_Target {
+				fixed4 texcol = tex2D(_MainTex, i.uvAndAlpha.xy);
+				clip(texcol.a * i.uvAndAlpha.a - _Cutoff);
 				SHADOW_CASTER_FRAGMENT(i)
 			}
 			ENDCG

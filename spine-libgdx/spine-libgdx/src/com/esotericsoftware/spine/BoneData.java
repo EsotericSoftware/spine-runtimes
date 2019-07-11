@@ -39,6 +39,7 @@ public class BoneData {
 	float length;
 	float x, y, rotation, scaleX = 1, scaleY = 1, shearX, shearY;
 	TransformMode transformMode = TransformMode.normal;
+	boolean skinRequired;
 
 	// Nonessential.
 	final Color color = new Color(0.61f, 0.61f, 0.61f, 1); // 9b9b9bff
@@ -74,7 +75,7 @@ public class BoneData {
 		return index;
 	}
 
-	/** The name of the bone, which is unique within the skeleton. */
+	/** The name of the bone, which is unique across all bones in the skeleton. */
 	public String getName () {
 		return name;
 	}
@@ -172,7 +173,19 @@ public class BoneData {
 	}
 
 	public void setTransformMode (TransformMode transformMode) {
+		if (transformMode == null) throw new IllegalArgumentException("transformMode cannot be null.");
 		this.transformMode = transformMode;
+	}
+
+	/** When true, {@link Skeleton#updateWorldTransform()} only updates this bone if the {@link Skeleton#getSkin()} contains this
+	 * bone.
+	 * @see Skin#getBones() */
+	public boolean getSkinRequired () {
+		return skinRequired;
+	}
+
+	public void setSkinRequired (boolean skinRequired) {
+		this.skinRequired = skinRequired;
 	}
 
 	/** The color of the bone as it was in Spine. Available only when nonessential data was exported. Bones are not usually

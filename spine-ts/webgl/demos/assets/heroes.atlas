@@ -6,2906 +6,2912 @@ filter: Linear,Linear
 repeat: none
 Assassin/Assassin_arm_lower_far
   rotate: false
-  xy: 706, 337
+  xy: 128, 133
   size: 40, 43
   orig: 85, 69
   offset: 22, 13
   index: -1
 Assassin/Assassin_arm_lower_near
-  rotate: false
-  xy: 842, 289
+  rotate: true
+  xy: 231, 115
   size: 40, 43
   orig: 85, 69
   offset: 23, 15
   index: -1
 Assassin/Assassin_arm_upper_far
-  rotate: false
-  xy: 108, 550
+  rotate: true
+  xy: 56, 148
   size: 31, 60
   orig: 99, 93
   offset: 33, 16
   index: -1
 Assassin/Assassin_arm_upper_near
-  rotate: false
-  xy: 404, 483
+  rotate: true
+  xy: 539, 177
   size: 32, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 Assassin/Assassin_foot_far_1
   rotate: false
-  xy: 335, 776
+  xy: 390, 138
   size: 63, 28
   orig: 107, 58
   offset: 24, 14
   index: -1
 Assassin/Assassin_foot_far_2_bent
-  rotate: true
-  xy: 822, 565
+  rotate: false
+  xy: 603, 192
   size: 56, 36
   orig: 101, 64
   offset: 21, 13
   index: -1
 Assassin/Assassin_foot_near_1
-  rotate: true
-  xy: 281, 109
+  rotate: false
+  xy: 64, 118
   size: 62, 28
   orig: 107, 58
   offset: 25, 14
   index: -1
 Assassin/Assassin_foot_near_2_bent
-  rotate: true
-  xy: 495, 230
+  rotate: false
+  xy: 2, 189
   size: 56, 36
   orig: 101, 64
   offset: 21, 14
   index: -1
 Assassin/Assassin_hand_far_1_fistBack
-  rotate: false
-  xy: 804, 304
+  rotate: true
+  xy: 836, 57
   size: 36, 35
   orig: 67, 53
   offset: 15, 8
   index: -1
 Assassin/Assassin_hand_far_2_fistPalm
   rotate: false
-  xy: 668, 343
+  xy: 2, 44
   size: 36, 33
   orig: 67, 53
   offset: 16, 9
   index: -1
 Assassin/Assassin_hand_near_1_fistBack
   rotate: false
-  xy: 681, 140
+  xy: 983, 54
   size: 36, 35
   orig: 67, 53
   offset: 17, 7
   index: -1
 Assassin/Assassin_hand_near_2_fistPalm
   rotate: false
-  xy: 725, 2
+  xy: 639, 43
   size: 36, 33
   orig: 67, 53
   offset: 15, 11
   index: -1
 Assassin/Assassin_head_1
-  rotate: true
-  xy: 2, 330
+  rotate: false
+  xy: 2, 714
   size: 136, 108
   orig: 179, 179
   offset: 18, 13
   index: -1
 Assassin/Assassin_head_2_injured
-  rotate: true
-  xy: 2, 192
+  rotate: false
+  xy: 140, 700
   size: 136, 108
   orig: 179, 179
   offset: 18, 11
   index: -1
 Assassin/Assassin_leg_lower_far
-  rotate: true
-  xy: 242, 2
+  rotate: false
+  xy: 983, 827
   size: 37, 63
   orig: 64, 107
   offset: 17, 22
   index: -1
 Assassin/Assassin_leg_lower_near_1
-  rotate: true
-  xy: 299, 546
+  rotate: false
+  xy: 278, 745
   size: 37, 63
   orig: 64, 107
   offset: 17, 22
   index: -1
 Assassin/Assassin_leg_lower_near_2
-  rotate: false
-  xy: 408, 418
+  rotate: true
+  xy: 125, 329
   size: 38, 63
   orig: 64, 107
   offset: 16, 23
   index: -1
 Assassin/Assassin_leg_upper_far
-  rotate: false
-  xy: 433, 2
+  rotate: true
+  xy: 210, 61
   size: 25, 49
   orig: 58, 89
   offset: 17, 17
   index: -1
 Assassin/Assassin_leg_upper_near
-  rotate: false
-  xy: 405, 2
+  rotate: true
+  xy: 43, 62
   size: 26, 49
   orig: 58, 89
   offset: 16, 17
   index: -1
 Assassin/Assassin_neck
-  rotate: false
-  xy: 936, 88
+  rotate: true
+  xy: 705, 13
   size: 22, 20
   orig: 43, 36
   offset: 11, 8
   index: -1
 Assassin/Assassin_torso
   rotate: false
-  xy: 904, 630
+  xy: 817, 410
   size: 73, 70
   orig: 169, 149
   offset: 50, 36
   index: -1
 Assassin/Assassin_waist
-  rotate: false
-  xy: 357, 2
+  rotate: true
+  xy: 490, 311
   size: 46, 49
   orig: 93, 71
   offset: 25, 12
   index: -1
-BeardyBuck/BeardyBuck_arm_lower_far
-  rotate: false
-  xy: 735, 80
-  size: 24, 38
-  orig: 85, 69
-  offset: 29, 16
-  index: -1
-YoungBuck/YoungBuck_arm_lower_far
-  rotate: false
-  xy: 735, 80
-  size: 24, 38
-  orig: 85, 69
-  offset: 29, 16
-  index: -1
 BeardyBuck/BeardyBuck_arm_lower_near
-  rotate: false
-  xy: 893, 249
+  rotate: true
+  xy: 261, 35
   size: 27, 42
   orig: 85, 69
   offset: 28, 14
   index: -1
 BeardyBuck/BeardyBuck_arm_upper_far
-  rotate: false
-  xy: 407, 115
+  rotate: true
+  xy: 650, 230
   size: 34, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 Buck/BuckMatthews_arm_upper_far
-  rotate: false
-  xy: 407, 115
+  rotate: true
+  xy: 650, 230
   size: 34, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 BeardyBuck/BeardyBuck_arm_upper_near
   rotate: false
-  xy: 412, 53
+  xy: 310, 225
   size: 34, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 BeardyBuck/BeardyBuck_foot_far_1
-  rotate: true
-  xy: 639, 244
+  rotate: false
+  xy: 170, 116
   size: 56, 28
   orig: 107, 58
   offset: 24, 15
   index: -1
 BeardyBuck/BeardyBuck_foot_near_1
-  rotate: true
-  xy: 639, 244
+  rotate: false
+  xy: 170, 116
   size: 56, 28
   orig: 107, 58
   offset: 24, 15
   index: -1
 Buck/BuckMatthews_foot_far_1
-  rotate: true
-  xy: 639, 244
+  rotate: false
+  xy: 170, 116
   size: 56, 28
   orig: 107, 58
   offset: 24, 15
   index: -1
 Buck/BuckMatthews_foot_near_1
-  rotate: true
-  xy: 639, 244
+  rotate: false
+  xy: 170, 116
   size: 56, 28
   orig: 107, 58
   offset: 24, 15
   index: -1
 Duck/DuckMatthews_foot_far_1
-  rotate: true
-  xy: 639, 244
+  rotate: false
+  xy: 170, 116
   size: 56, 28
   orig: 107, 58
   offset: 24, 15
   index: -1
 Duck/DuckMatthews_foot_near_1
-  rotate: true
-  xy: 639, 244
+  rotate: false
+  xy: 170, 116
   size: 56, 28
   orig: 107, 58
   offset: 24, 15
   index: -1
 Truck/TruckMatthews_foot_far_1
-  rotate: true
-  xy: 639, 244
+  rotate: false
+  xy: 170, 116
   size: 56, 28
   orig: 107, 58
   offset: 24, 15
   index: -1
 Truck/TruckMatthews_foot_near_1
-  rotate: true
-  xy: 639, 244
+  rotate: false
+  xy: 170, 116
   size: 56, 28
   orig: 107, 58
   offset: 24, 15
   index: -1
 YoungBuck/YoungBuck_foot_far_1
-  rotate: true
-  xy: 639, 244
+  rotate: false
+  xy: 170, 116
   size: 56, 28
   orig: 107, 58
   offset: 24, 15
   index: -1
 YoungBuck/YoungBuck_foot_near_1
-  rotate: true
-  xy: 639, 244
+  rotate: false
+  xy: 170, 116
   size: 56, 28
   orig: 107, 58
   offset: 24, 15
   index: -1
 BeardyBuck/BeardyBuck_foot_far_2_bent
   rotate: false
-  xy: 805, 525
+  xy: 2, 298
   size: 57, 38
   orig: 101, 64
   offset: 17, 12
   index: -1
 BeardyBuck/BeardyBuck_foot_near_2_bent
   rotate: false
-  xy: 805, 525
+  xy: 2, 298
   size: 57, 38
   orig: 101, 64
   offset: 17, 12
   index: -1
 Buck/BuckMatthews_foot_far_2_bent
   rotate: false
-  xy: 805, 525
+  xy: 2, 298
   size: 57, 38
   orig: 101, 64
   offset: 17, 12
   index: -1
 Buck/BuckMatthews_foot_near_2_bent
   rotate: false
-  xy: 805, 525
+  xy: 2, 298
   size: 57, 38
   orig: 101, 64
   offset: 17, 12
   index: -1
 Chuck/ChuckMatthews_foot_far_2_bent
   rotate: false
-  xy: 805, 525
+  xy: 2, 298
   size: 57, 38
   orig: 101, 64
   offset: 17, 12
   index: -1
 Chuck/ChuckMatthews_foot_near_2_bent
   rotate: false
-  xy: 805, 525
+  xy: 2, 298
   size: 57, 38
   orig: 101, 64
   offset: 17, 12
   index: -1
 Duck/DuckMatthews_foot_far_2_bent
   rotate: false
-  xy: 805, 525
+  xy: 2, 298
   size: 57, 38
   orig: 101, 64
   offset: 17, 12
   index: -1
 Duck/DuckMatthews_foot_near_2_bent
   rotate: false
-  xy: 805, 525
+  xy: 2, 298
   size: 57, 38
   orig: 101, 64
   offset: 17, 12
   index: -1
 YoungBuck/YoungBuck_foot_far_2_bent
   rotate: false
-  xy: 805, 525
+  xy: 2, 298
   size: 57, 38
   orig: 101, 64
   offset: 17, 12
   index: -1
 YoungBuck/YoungBuck_foot_near_2_bent
   rotate: false
-  xy: 805, 525
+  xy: 2, 298
   size: 57, 38
   orig: 101, 64
   offset: 17, 12
   index: -1
 BeardyBuck/BeardyBuck_hand_far_1_fistBack
-  rotate: true
-  xy: 657, 302
+  rotate: false
+  xy: 448, 53
   size: 39, 31
   orig: 67, 53
   offset: 15, 13
   index: -1
 BeardyBuck/BeardyBuck_hand_far_2_fistPalm
-  rotate: true
-  xy: 864, 532
+  rotate: false
+  xy: 224, 27
   size: 34, 32
   orig: 67, 53
   offset: 17, 12
   index: -1
 BeardyBuck/BeardyBuck_hand_near_1_fistBack
-  rotate: true
-  xy: 986, 485
+  rotate: false
+  xy: 128, 95
   size: 39, 36
   orig: 67, 53
   offset: 15, 13
   index: -1
 BeardyBuck/BeardyBuck_hand_near_2_fistPalm
-  rotate: true
-  xy: 857, 388
+  rotate: false
+  xy: 829, 23
   size: 34, 32
   orig: 67, 53
   offset: 17, 10
   index: -1
 BeardyBuck/BeardyBuck_head_1
   rotate: true
-  xy: 141, 548
+  xy: 278, 639
   size: 100, 118
   orig: 179, 179
   offset: 39, 6
   index: -1
 BeardyBuck/BeardyBuck_head_2_injured
-  rotate: false
-  xy: 268, 652
+  rotate: true
+  xy: 425, 661
   size: 100, 122
   orig: 179, 179
   offset: 38, 6
   index: -1
 BeardyBuck/BeardyBuck_leg_lower_far
-  rotate: false
-  xy: 432, 580
+  rotate: true
+  xy: 737, 289
   size: 36, 60
   orig: 64, 107
   offset: 16, 26
   index: -1
 BeardyBuck/BeardyBuck_leg_lower_near_1
-  rotate: false
-  xy: 311, 108
+  rotate: true
+  xy: 295, 327
   size: 38, 63
   orig: 64, 107
   offset: 15, 22
   index: -1
 BeardyBuck/BeardyBuck_leg_lower_near_2
   rotate: true
-  xy: 898, 557
+  xy: 547, 247
   size: 34, 62
   orig: 34, 62
   offset: 0, 0
   index: -1
 BeardyBuck/BeardyBuck_leg_upper_far
   rotate: true
-  xy: 615, 378
+  xy: 404, 168
   size: 33, 57
   orig: 58, 89
   offset: 12, 16
   index: -1
 BeardyBuck/BeardyBuck_leg_upper_near
-  rotate: false
-  xy: 568, 293
+  rotate: true
+  xy: 601, 157
   size: 33, 57
   orig: 58, 89
   offset: 12, 16
   index: -1
 BeardyBuck/BeardyBuck_neck
   rotate: true
-  xy: 906, 197
+  xy: 1000, 92
   size: 24, 21
   orig: 43, 36
   offset: 10, 8
   index: -1
 GabrielCaine/GabrielCaine_neck
   rotate: true
-  xy: 906, 197
+  xy: 1000, 92
   size: 24, 21
   orig: 43, 36
   offset: 10, 8
   index: -1
 YoungBuck/YoungBuck_neck
   rotate: true
-  xy: 906, 197
+  xy: 1000, 92
   size: 24, 21
   orig: 43, 36
   offset: 10, 8
   index: -1
 BeardyBuck/BeardyBuck_torso
   rotate: false
-  xy: 419, 776
+  xy: 960, 408
   size: 56, 61
   orig: 169, 149
   offset: 56, 38
   index: -1
 BeardyBuck/BeardyBuck_waist
   rotate: true
-  xy: 445, 238
+  xy: 687, 310
   size: 46, 48
   orig: 93, 71
   offset: 24, 12
   index: -1
-Buck/BuckMatthews_arm_lower_far
-  rotate: false
-  xy: 736, 40
-  size: 24, 38
-  orig: 85, 69
-  offset: 29, 16
-  index: -1
 Buck/BuckMatthews_arm_lower_near
   rotate: true
-  xy: 652, 177
+  xy: 914, 35
   size: 27, 42
   orig: 85, 69
   offset: 28, 14
   index: -1
 Buck/BuckMatthews_arm_upper_near
-  rotate: false
-  xy: 448, 53
+  rotate: true
+  xy: 838, 217
   size: 34, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 Buck/BuckMatthews_hand_far_1_fistBack
   rotate: false
-  xy: 633, 439
+  xy: 305, 20
   size: 37, 29
   orig: 67, 53
   offset: 16, 14
   index: -1
-Buck/BuckMatthews_hand_far_2_fistPalm
-  rotate: true
-  xy: 791, 168
-  size: 32, 30
-  orig: 67, 53
-  offset: 18, 13
-  index: -1
 Buck/BuckMatthews_hand_near_1_fistBack
-  rotate: true
-  xy: 986, 444
+  rotate: false
+  xy: 2, 79
   size: 39, 36
   orig: 67, 53
   offset: 15, 13
   index: -1
 Buck/BuckMatthews_hand_near_2_fistPalm
-  rotate: true
-  xy: 891, 388
+  rotate: false
+  xy: 958, 20
   size: 34, 32
   orig: 67, 53
   offset: 17, 12
   index: -1
 YoungBuck/YoungBuck_hand_far_2_fistPalm
-  rotate: true
-  xy: 891, 388
+  rotate: false
+  xy: 958, 20
   size: 34, 32
   orig: 67, 53
   offset: 17, 12
   index: -1
 Buck/BuckMatthews_head_1
-  rotate: true
-  xy: 127, 10
+  rotate: false
+  xy: 921, 661
   size: 97, 113
   orig: 179, 179
   offset: 40, 16
   index: -1
 Buck/BuckMatthews_head_2_injured
-  rotate: false
-  xy: 127, 109
+  rotate: true
+  xy: 113, 604
   size: 94, 117
   orig: 179, 179
   offset: 42, 14
   index: -1
 Buck/BuckMatthews_leg_lower_far
   rotate: true
-  xy: 898, 593
+  xy: 229, 290
   size: 35, 62
   orig: 64, 107
   offset: 15, 25
   index: -1
 Buck/BuckMatthews_leg_lower_near_2
   rotate: true
-  xy: 898, 593
+  xy: 229, 290
   size: 35, 62
   orig: 64, 107
   offset: 15, 25
   index: -1
 Duck/DuckMatthews_leg_lower_far
   rotate: true
-  xy: 898, 593
+  xy: 229, 290
   size: 35, 62
   orig: 64, 107
   offset: 15, 25
   index: -1
 Duck/DuckMatthews_leg_lower_near_2
   rotate: true
-  xy: 898, 593
+  xy: 229, 290
   size: 35, 62
   orig: 64, 107
   offset: 15, 25
   index: -1
 Buck/BuckMatthews_leg_lower_near_1
-  rotate: false
-  xy: 518, 444
+  rotate: true
+  xy: 799, 271
   size: 36, 59
   orig: 64, 107
   offset: 14, 24
   index: -1
 Buck/BuckMatthews_leg_upper_far
   rotate: false
-  xy: 569, 234
+  xy: 243, 157
   size: 33, 57
   orig: 58, 89
   offset: 12, 16
   index: -1
 Duck/DuckMatthews_leg_upper_far
   rotate: false
-  xy: 569, 234
+  xy: 243, 157
   size: 33, 57
   orig: 58, 89
   offset: 12, 16
   index: -1
 Truck/TruckMatthews_leg_upper_far
   rotate: false
-  xy: 569, 234
+  xy: 243, 157
   size: 33, 57
   orig: 58, 89
   offset: 12, 16
   index: -1
 YoungBuck/YoungBuck_leg_upper_far
   rotate: false
-  xy: 569, 234
+  xy: 243, 157
   size: 33, 57
   orig: 58, 89
   offset: 12, 16
   index: -1
 Buck/BuckMatthews_leg_upper_near
   rotate: true
-  xy: 609, 343
+  xy: 711, 154
   size: 33, 57
   orig: 58, 89
   offset: 12, 16
   index: -1
 Duck/DuckMatthews_leg_upper_near
   rotate: true
-  xy: 609, 343
+  xy: 711, 154
   size: 33, 57
   orig: 58, 89
   offset: 12, 16
   index: -1
 Truck/TruckMatthews_leg_upper_near
   rotate: true
-  xy: 609, 343
+  xy: 711, 154
   size: 33, 57
   orig: 58, 89
   offset: 12, 16
   index: -1
 YoungBuck/YoungBuck_leg_upper_near
   rotate: true
-  xy: 609, 343
+  xy: 711, 154
   size: 33, 57
   orig: 58, 89
   offset: 12, 16
   index: -1
 Buck/BuckMatthews_neck
   rotate: false
-  xy: 789, 2
+  xy: 827, 2
   size: 22, 19
   orig: 22, 19
   offset: 0, 0
   index: -1
 Buck/BuckMatthews_torso
-  rotate: false
-  xy: 242, 41
+  rotate: true
+  xy: 892, 409
   size: 60, 66
   orig: 169, 149
   offset: 55, 36
   index: -1
 Buck/BuckMatthews_waist
-  rotate: false
-  xy: 486, 180
+  rotate: true
+  xy: 825, 309
   size: 46, 48
   orig: 93, 71
   offset: 24, 12
   index: -1
 Chuck/ChuckMatthews_waist
-  rotate: false
-  xy: 486, 180
+  rotate: true
+  xy: 825, 309
   size: 46, 48
   orig: 93, 71
   offset: 24, 12
   index: -1
 Duck/DuckMatthews_waist
-  rotate: false
-  xy: 486, 180
+  rotate: true
+  xy: 825, 309
   size: 46, 48
   orig: 93, 71
   offset: 24, 12
   index: -1
 Truck/TruckMatthews_waist
-  rotate: false
-  xy: 486, 180
+  rotate: true
+  xy: 825, 309
   size: 46, 48
   orig: 93, 71
   offset: 24, 12
   index: -1
 YoungBuck/YoungBuck_waist
-  rotate: false
-  xy: 486, 180
+  rotate: true
+  xy: 825, 309
   size: 46, 48
   orig: 93, 71
   offset: 24, 12
   index: -1
-Chuck/ChuckMatthews_arm_lower_far
-  rotate: true
-  xy: 761, 202
-  size: 24, 38
-  orig: 85, 69
-  offset: 29, 16
-  index: -1
-Truck/TruckMatthews_arm_lower_far
-  rotate: true
-  xy: 761, 202
-  size: 24, 38
-  orig: 85, 69
-  offset: 29, 16
-  index: -1
 Chuck/ChuckMatthews_arm_lower_near
-  rotate: false
-  xy: 648, 35
+  rotate: true
+  xy: 94, 35
   size: 27, 42
   orig: 85, 69
   offset: 28, 14
   index: -1
 Truck/TruckMatthews_arm_lower_near
-  rotate: false
-  xy: 648, 35
+  rotate: true
+  xy: 94, 35
   size: 27, 42
   orig: 85, 69
   offset: 28, 14
   index: -1
 Chuck/ChuckMatthews_arm_upper_far
-  rotate: false
-  xy: 481, 115
+  rotate: true
+  xy: 101, 216
   size: 34, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 Chuck/ChuckMatthews_arm_upper_near
-  rotate: false
-  xy: 484, 53
+  rotate: true
+  xy: 346, 216
   size: 34, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 Chuck/ChuckMatthews_foot_far_1
-  rotate: true
-  xy: 584, 123
+  rotate: false
+  xy: 525, 115
   size: 56, 28
   orig: 107, 58
   offset: 24, 15
   index: -1
 Chuck/ChuckMatthews_foot_near_1
-  rotate: true
-  xy: 584, 123
+  rotate: false
+  xy: 525, 115
   size: 56, 28
   orig: 107, 58
   offset: 24, 15
   index: -1
-Chuck/ChuckMatthews_hand_far_1_fistBack
-  rotate: false
-  xy: 860, 167
-  size: 34, 28
-  orig: 67, 53
-  offset: 17, 15
-  index: -1
-Chuck/ChuckMatthews_hand_far_2_fistPalm
-  rotate: false
-  xy: 896, 166
-  size: 32, 29
-  orig: 67, 53
-  offset: 18, 14
-  index: -1
 Chuck/ChuckMatthews_hand_near_1_fistBack
-  rotate: true
-  xy: 986, 403
+  rotate: false
+  xy: 640, 78
   size: 39, 36
   orig: 67, 53
   offset: 15, 13
   index: -1
 Truck/TruckMatthews_hand_near_1_fistBack
-  rotate: true
-  xy: 986, 403
+  rotate: false
+  xy: 640, 78
   size: 39, 36
   orig: 67, 53
   offset: 15, 13
   index: -1
 Chuck/ChuckMatthews_hand_near_2_fistPalm
   rotate: false
-  xy: 719, 187
+  xy: 446, 19
   size: 34, 32
   orig: 67, 53
   offset: 17, 12
   index: -1
 Chuck/ChuckMatthews_head_1
-  rotate: false
-  xy: 335, 806
+  rotate: true
+  xy: 332, 483
   size: 82, 95
   orig: 179, 179
   offset: 52, 11
   index: -1
 Chuck/ChuckMatthews_head_2_injured
   rotate: false
-  xy: 818, 796
+  xy: 921, 560
   size: 86, 99
   orig: 179, 179
   offset: 52, 7
   index: -1
 Chuck/ChuckMatthews_leg_lower_far
-  rotate: false
-  xy: 438, 483
+  rotate: true
+  xy: 360, 325
   size: 36, 63
   orig: 64, 107
   offset: 13, 24
   index: -1
 Chuck/ChuckMatthews_leg_lower_near_2
-  rotate: false
-  xy: 438, 483
+  rotate: true
+  xy: 360, 325
   size: 36, 63
   orig: 64, 107
   offset: 13, 24
   index: -1
 Chuck/ChuckMatthews_leg_lower_near_1
-  rotate: false
-  xy: 595, 450
+  rotate: true
+  xy: 936, 271
   size: 36, 59
   orig: 64, 107
   offset: 15, 25
   index: -1
 Chuck/ChuckMatthews_leg_upper_far
-  rotate: false
-  xy: 604, 243
+  rotate: true
+  xy: 874, 154
   size: 33, 57
   orig: 58, 89
   offset: 12, 16
   index: -1
 Chuck/ChuckMatthews_leg_upper_near
-  rotate: false
-  xy: 604, 243
+  rotate: true
+  xy: 874, 154
   size: 33, 57
   orig: 58, 89
   offset: 12, 16
   index: -1
-Chuck/ChuckMatthews_neck
-  rotate: true
-  xy: 962, 197
-  size: 24, 21
-  orig: 43, 36
-  offset: 10, 8
-  index: -1
 Chuck/ChuckMatthews_torso
-  rotate: false
-  xy: 223, 109
+  rotate: true
+  xy: 509, 412
   size: 56, 62
   orig: 169, 149
   offset: 56, 38
   index: -1
 Commander/Commander-Firestrike_arm_lower_far
-  rotate: true
-  xy: 640, 123
+  rotate: false
+  xy: 549, 725
   size: 16, 36
   orig: 84, 68
   offset: 32, 19
   index: -1
 Commander/Commander-Firestrike_arm_lower_near
-  rotate: true
-  xy: 678, 120
+  rotate: false
+  xy: 1002, 518
   size: 18, 40
   orig: 18, 40
   offset: 0, 0
   index: -1
 Commander/Commander-Firestrike_arm_upper_far
-  rotate: false
-  xy: 586, 2
+  rotate: true
+  xy: 489, 53
   size: 22, 53
   orig: 97, 92
   offset: 36, 19
   index: -1
 Commander/Commander-Firestrike_arm_upper_near
-  rotate: false
-  xy: 617, 566
+  rotate: true
+  xy: 681, 62
   size: 23, 53
   orig: 97, 92
   offset: 35, 18
   index: -1
 Commander/Commander-Firestrike_foot_far_1
-  rotate: true
-  xy: 628, 181
+  rotate: false
+  xy: 587, 3
   size: 41, 22
   orig: 106, 57
   offset: 32, 17
   index: -1
 Commander/Commander-Firestrike_foot_near_1
-  rotate: true
-  xy: 628, 181
+  rotate: false
+  xy: 587, 3
   size: 41, 22
   orig: 106, 57
   offset: 32, 17
   index: -1
 Commander/Commander-Firestrike_foot_far_2_bent
-  rotate: true
-  xy: 761, 89
+  rotate: false
+  xy: 156, 4
   size: 38, 25
   orig: 99, 63
   offset: 19, 19
   index: -1
 Commander/Commander-Firestrike_foot_near_2_bent
-  rotate: true
-  xy: 761, 89
+  rotate: false
+  xy: 156, 4
   size: 38, 25
   orig: 99, 63
   offset: 19, 19
   index: -1
 Commander/Commander-Firestrike_hand_far_1_fistBack
   rotate: false
-  xy: 550, 713
+  xy: 804, 2
   size: 21, 25
   orig: 66, 51
   offset: 21, 15
   index: -1
 Commander/Commander-Firestrike_hand_near_1_fistBack
   rotate: false
-  xy: 550, 713
+  xy: 804, 2
   size: 21, 25
   orig: 66, 51
   offset: 21, 15
   index: -1
 Commander/Commander-Firestrike_hand_far_2_fistPalm
-  rotate: true
-  xy: 1004, 172
+  rotate: false
+  xy: 713, 290
   size: 20, 18
   orig: 66, 51
   offset: 21, 20
   index: -1
 Commander/Commander-Firestrike_hand_near_2_fistPalm
-  rotate: true
-  xy: 1004, 172
+  rotate: false
+  xy: 713, 290
   size: 20, 18
   orig: 66, 51
   offset: 21, 20
   index: -1
 Commander/Commander-Firestrike_head_1
-  rotate: false
-  xy: 2, 2
+  rotate: true
+  xy: 547, 283
   size: 39, 55
   orig: 178, 178
   offset: 66, 20
   index: -1
 Commander/Commander-Firestrike_head_2_injured
-  rotate: false
-  xy: 2, 2
+  rotate: true
+  xy: 547, 283
   size: 39, 55
   orig: 178, 178
   offset: 66, 20
   index: -1
 Commander/Commander-Firestrike_leg_lower_far
   rotate: false
-  xy: 526, 585
+  xy: 398, 671
   size: 22, 68
   orig: 63, 106
   offset: 20, 16
   index: -1
 Commander/Commander-Firestrike_leg_lower_near_2
   rotate: false
-  xy: 526, 585
+  xy: 398, 671
   size: 22, 68
   orig: 63, 106
   offset: 20, 16
   index: -1
 Commander/Commander-Firestrike_leg_lower_near_1
-  rotate: false
-  xy: 304, 173
+  rotate: true
+  xy: 942, 118
   size: 23, 65
   orig: 63, 106
   offset: 22, 19
   index: -1
 Commander/Commander-Firestrike_leg_upper_far
   rotate: true
-  xy: 618, 413
+  xy: 266, 64
   size: 24, 52
   orig: 57, 88
   offset: 17, 19
   index: -1
 Commander/Commander-Firestrike_leg_upper_near
-  rotate: false
-  xy: 486, 2
+  rotate: true
+  xy: 677, 37
   size: 23, 49
   orig: 57, 88
   offset: 15, 18
   index: -1
 Commander/Commander-Firestrike_neck
   rotate: true
-  xy: 307, 2
+  xy: 661, 186
   size: 42, 48
   orig: 56, 75
   offset: 8, 26
   index: -1
 Commander/Commander-Firestrike_torso
-  rotate: true
-  xy: 43, 8
+  rotate: false
+  xy: 764, 413
   size: 49, 66
   orig: 49, 66
   offset: 0, 0
   index: -1
 Commander/Commander-Firestrike_waist
   rotate: false
-  xy: 261, 612
+  xy: 241, 425
   size: 36, 36
   orig: 92, 70
   offset: 29, 15
   index: -1
 Duck/DuckMatthews_arm_lower_far
-  rotate: false
-  xy: 762, 49
+  rotate: true
+  xy: 764, 2
   size: 25, 38
   orig: 85, 69
   offset: 28, 16
   index: -1
 Duck/DuckMatthews_arm_lower_near
   rotate: false
-  xy: 645, 79
+  xy: 608, 55
   size: 29, 42
   orig: 85, 69
   offset: 27, 14
   index: -1
 Duck/DuckMatthews_arm_upper_far
   rotate: true
-  xy: 555, 550
+  xy: 947, 175
   size: 32, 60
   orig: 99, 93
   offset: 34, 16
   index: -1
 Duck/DuckMatthews_arm_upper_near
-  rotate: false
-  xy: 521, 505
+  rotate: true
+  xy: 470, 173
   size: 32, 60
   orig: 99, 93
   offset: 34, 16
   index: -1
 Duck/DuckMatthews_hand_far_1_fistBack
-  rotate: true
-  xy: 925, 386
+  rotate: false
+  xy: 873, 53
   size: 39, 31
   orig: 67, 53
   offset: 15, 13
   index: -1
 Duck/DuckMatthews_hand_far_2_fistPalm
   rotate: false
-  xy: 719, 153
+  xy: 482, 19
   size: 34, 32
   orig: 67, 53
   offset: 17, 12
   index: -1
 Duck/DuckMatthews_hand_near_1_fistBack
-  rotate: true
-  xy: 986, 362
+  rotate: false
+  xy: 169, 78
   size: 39, 36
   orig: 67, 53
   offset: 15, 13
   index: -1
 Duck/DuckMatthews_hand_near_2_fistPalm
   rotate: false
-  xy: 755, 168
+  xy: 865, 19
   size: 34, 32
   orig: 67, 53
   offset: 17, 12
   index: -1
 Duck/DuckMatthews_head_1
-  rotate: true
-  xy: 112, 348
+  rotate: false
+  xy: 568, 650
   size: 118, 112
   orig: 179, 179
   offset: 40, 17
   index: -1
 Duck/DuckMatthews_head_2_injured
-  rotate: true
-  xy: 112, 228
+  rotate: false
+  xy: 801, 660
   size: 118, 114
   orig: 179, 179
   offset: 41, 17
   index: -1
 Duck/DuckMatthews_leg_lower_near_1
   rotate: true
-  xy: 733, 492
+  xy: 61, 262
   size: 36, 59
   orig: 64, 107
   offset: 14, 24
   index: -1
 Duck/DuckMatthews_neck
   rotate: true
-  xy: 455, 751
+  xy: 699, 524
   size: 23, 20
   orig: 43, 36
   offset: 11, 9
   index: -1
 Duck/DuckMatthews_torso
   rotate: true
-  xy: 364, 580
+  xy: 373, 408
   size: 60, 66
   orig: 169, 149
   offset: 55, 36
   index: -1
-Dummy/Dummy_arm_lower_far
-  rotate: false
-  xy: 763, 9
-  size: 24, 38
-  orig: 24, 38
-  offset: 0, 0
-  index: -1
 Dummy/Dummy_arm_lower_near
-  rotate: false
-  xy: 958, 424
+  rotate: true
+  xy: 588, 27
   size: 26, 42
   orig: 26, 42
   offset: 0, 0
   index: -1
 Dummy/Dummy_arm_upper_far
   rotate: true
-  xy: 672, 456
+  xy: 813, 182
   size: 33, 59
   orig: 33, 59
   offset: 0, 0
   index: -1
 Dummy/Dummy_arm_upper_near
-  rotate: false
-  xy: 832, 464
+  rotate: true
+  xy: 60, 181
   size: 33, 59
   orig: 33, 59
   offset: 0, 0
   index: -1
 Dummy/Dummy_foot_far_1
   rotate: false
-  xy: 690, 308
+  xy: 455, 112
   size: 55, 27
   orig: 55, 27
   offset: 0, 0
   index: -1
 Dummy/Dummy_foot_far_2_bent
-  rotate: true
-  xy: 842, 334
+  rotate: false
+  xy: 2, 151
   size: 52, 36
   orig: 52, 36
   offset: 0, 0
   index: -1
 Dummy/Dummy_foot_near_1
-  rotate: true
-  xy: 733, 251
+  rotate: false
+  xy: 583, 99
   size: 55, 26
   orig: 55, 26
   offset: 0, 0
   index: -1
 Dummy/Dummy_foot_near_2_bent
-  rotate: true
-  xy: 761, 254
+  rotate: false
+  xy: 177, 146
   size: 52, 36
   orig: 52, 36
   offset: 0, 0
   index: -1
 Dummy/Dummy_hand_1_fistBack
   rotate: false
-  xy: 929, 197
+  xy: 947, 210
   size: 31, 24
   orig: 31, 24
   offset: 0, 0
   index: -1
-Dummy/Dummy_hand_2_fistPalm
-  rotate: false
-  xy: 884, 45
-  size: 27, 25
-  orig: 27, 25
-  offset: 0, 0
-  index: -1
 Dummy/Dummy_head_1
   rotate: false
-  xy: 668, 700
+  xy: 913, 471
   size: 87, 87
   orig: 87, 87
   offset: 0, 0
   index: -1
 Dummy/Dummy_head_2_injured
   rotate: false
-  xy: 757, 700
+  xy: 429, 470
   size: 87, 87
   orig: 87, 87
   offset: 0, 0
   index: -1
 Dummy/Dummy_leg_lower_far
   rotate: false
-  xy: 441, 177
+  xy: 969, 347
   size: 43, 59
   orig: 43, 59
   offset: 0, 0
   index: -1
 Dummy/Dummy_leg_lower_near_1
-  rotate: false
-  xy: 979, 633
+  rotate: true
+  xy: 370, 363
   size: 43, 67
   orig: 43, 67
   offset: 0, 0
   index: -1
 Dummy/Dummy_leg_lower_near_2
-  rotate: false
-  xy: 476, 506
+  rotate: true
+  xy: 64, 339
   size: 43, 59
   orig: 43, 59
   offset: 0, 0
   index: -1
 Dummy/Dummy_leg_upper_far
   rotate: true
-  xy: 470, 567
+  xy: 210, 88
   size: 25, 54
   orig: 25, 54
   offset: 0, 0
   index: -1
 Dummy/Dummy_leg_upper_near
   rotate: true
-  xy: 470, 567
+  xy: 210, 88
   size: 25, 54
   orig: 25, 54
   offset: 0, 0
   index: -1
 Dummy/Dummy_neck
-  rotate: false
-  xy: 801, 202
+  rotate: true
+  xy: 699, 499
   size: 23, 20
   orig: 23, 20
   offset: 0, 0
   index: -1
 Dummy/Dummy_torso
-  rotate: false
-  xy: 346, 483
+  rotate: true
+  xy: 573, 410
   size: 56, 60
   orig: 56, 60
   offset: 0, 0
   index: -1
 Dummy/Dummy_waist
   rotate: false
-  xy: 748, 338
+  xy: 766, 189
   size: 45, 45
   orig: 45, 45
   offset: 0, 0
   index: -1
 Fletch/Fletch_arm_lower_far
   rotate: true
-  xy: 826, 199
+  xy: 196, 2
   size: 23, 38
   orig: 84, 67
   offset: 30, 16
   index: -1
-Fletch/Fletch_arm_lower_near
-  rotate: false
-  xy: 709, 79
-  size: 24, 39
-  orig: 84, 67
-  offset: 29, 15
-  index: -1
 Fletch/Fletch_arm_upper_far
-  rotate: false
-  xy: 867, 471
+  rotate: true
+  xy: 276, 118
   size: 28, 59
   orig: 97, 92
   offset: 34, 15
   index: -1
 Fletch/Fletch_arm_upper_near
   rotate: true
-  xy: 897, 457
+  xy: 659, 116
   size: 28, 59
   orig: 97, 92
   offset: 34, 15
   index: -1
 Fletch/Fletch_foot_far_1
-  rotate: true
-  xy: 559, 2
+  rotate: false
+  xy: 553, 72
   size: 53, 25
   orig: 106, 57
   offset: 27, 13
   index: -1
 Fletch/Fletch_foot_near_1
-  rotate: true
-  xy: 559, 2
+  rotate: false
+  xy: 553, 72
   size: 53, 25
   orig: 106, 57
   offset: 27, 13
   index: -1
 Fletch/Fletch_foot_far_2_bent
-  rotate: true
-  xy: 993, 727
+  rotate: false
+  xy: 121, 64
   size: 44, 29
   orig: 99, 63
   offset: 27, 15
   index: -1
 Fletch/Fletch_foot_near_2_bent
-  rotate: true
-  xy: 993, 727
+  rotate: false
+  xy: 121, 64
   size: 44, 29
   orig: 99, 63
   offset: 27, 15
   index: -1
 Fletch/Fletch_hand_far_1_fistBack
-  rotate: false
-  xy: 580, 352
+  rotate: true
+  xy: 995, 146
   size: 27, 26
   orig: 66, 51
   offset: 20, 15
   index: -1
 Fletch/Fletch_hand_near_1_fistBack
-  rotate: false
-  xy: 580, 352
+  rotate: true
+  xy: 995, 146
   size: 27, 26
   orig: 66, 51
   offset: 20, 15
   index: -1
-Fletch/Fletch_hand_far_2_fistPalm
-  rotate: false
-  xy: 930, 166
-  size: 32, 29
-  orig: 66, 51
-  offset: 17, 12
-  index: -1
-Fletch/Fletch_hand_near_2_fistPalm
-  rotate: false
-  xy: 930, 166
-  size: 32, 29
-  orig: 66, 51
-  offset: 17, 12
-  index: -1
 Fletch/Fletch_head_1
   rotate: false
-  xy: 550, 621
+  xy: 607, 468
   size: 90, 79
   orig: 178, 178
   offset: 38, 20
   index: -1
 Fletch/Fletch_head_2_injured
   rotate: false
-  xy: 108, 468
+  xy: 2, 439
   size: 90, 78
   orig: 179, 179
   offset: 38, 21
   index: -1
 Fletch/Fletch_leg_lower_far
-  rotate: false
-  xy: 858, 633
+  rotate: true
+  xy: 758, 364
   size: 44, 70
   orig: 63, 106
   offset: 14, 15
   index: -1
 Fletch/Fletch_leg_lower_near_2
-  rotate: false
-  xy: 858, 633
+  rotate: true
+  xy: 758, 364
   size: 44, 70
   orig: 63, 106
   offset: 14, 15
   index: -1
 Fletch/Fletch_leg_lower_near_1
   rotate: true
-  xy: 364, 545
+  xy: 541, 324
   size: 33, 67
   orig: 63, 106
   offset: 17, 19
   index: -1
 Fletch/Fletch_leg_upper_far
   rotate: true
-  xy: 603, 302
+  xy: 712, 210
   size: 39, 52
   orig: 57, 88
   offset: 14, 18
   index: -1
 Fletch/Fletch_leg_upper_near
-  rotate: false
-  xy: 317, 354
+  rotate: true
+  xy: 660, 266
   size: 42, 51
   orig: 57, 88
   offset: 1, 19
   index: -1
 Fletch/Fletch_neck
   rotate: true
-  xy: 573, 794
+  xy: 37, 268
   size: 28, 21
   orig: 42, 35
   offset: 7, 7
   index: -1
 Fletch/Fletch_torso
   rotate: false
-  xy: 200, 469
+  xy: 94, 440
   size: 82, 77
   orig: 168, 148
   offset: 32, 36
   index: -1
 Fletch/Fletch_waist
-  rotate: true
-  xy: 226, 354
+  rotate: false
+  xy: 512, 559
   size: 113, 89
   orig: 192, 146
   offset: 5, 48
   index: -1
-GabrielCaine/GabrielCaine_arm_lower_far
-  rotate: true
-  xy: 866, 197
-  size: 24, 38
-  orig: 85, 69
-  offset: 29, 16
-  index: -1
 GabrielCaine/GabrielCaine_arm_lower_near
-  rotate: false
-  xy: 948, 260
+  rotate: true
+  xy: 138, 35
   size: 27, 42
   orig: 85, 69
   offset: 28, 14
   index: -1
 GabrielCaine/GabrielCaine_arm_upper_far
   rotate: true
-  xy: 681, 530
+  xy: 163, 216
   size: 34, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 GabrielCaine/GabrielCaine_arm_upper_near
   rotate: true
-  xy: 743, 530
+  xy: 225, 216
   size: 34, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 GabrielCaine/GabrielCaine_foot_far_1
-  rotate: true
-  xy: 448, 418
+  rotate: false
+  xy: 594, 127
   size: 63, 28
   orig: 107, 58
   offset: 24, 14
   index: -1
 GabrielCaine/GabrielCaine_foot_near_1
-  rotate: true
-  xy: 448, 418
+  rotate: false
+  xy: 594, 127
   size: 63, 28
   orig: 107, 58
   offset: 24, 14
   index: -1
 GabrielCaine/GabrielCaine_foot_far_2_bent
-  rotate: true
-  xy: 261, 548
+  rotate: false
+  xy: 958, 309
   size: 61, 36
   orig: 101, 64
   offset: 19, 13
   index: -1
 GabrielCaine/GabrielCaine_foot_near_2_bent
-  rotate: true
-  xy: 261, 548
+  rotate: false
+  xy: 958, 309
   size: 61, 36
   orig: 101, 64
   offset: 19, 13
   index: -1
 GabrielCaine/GabrielCaine_hand_far_1_fistBack
   rotate: false
-  xy: 433, 548
+  xy: 518, 10
   size: 35, 30
   orig: 67, 53
   offset: 17, 15
   index: -1
-GabrielCaine/GabrielCaine_hand_far_2_fistPalm
-  rotate: false
-  xy: 931, 133
-  size: 32, 31
-  orig: 67, 53
-  offset: 18, 14
-  index: -1
 GabrielCaine/GabrielCaine_hand_near_1_fistBack
   rotate: false
-  xy: 640, 141
+  xy: 795, 59
   size: 39, 34
   orig: 67, 53
   offset: 15, 13
   index: -1
-GabrielCaine/GabrielCaine_hand_near_2_fistPalm
-  rotate: false
-  xy: 985, 226
-  size: 32, 31
-  orig: 67, 53
-  offset: 18, 14
-  index: -1
 GabrielCaine/GabrielCaine_head_1
-  rotate: false
-  xy: 370, 680
+  rotate: true
+  xy: 97, 519
   size: 83, 94
   orig: 179, 179
   offset: 48, 15
   index: -1
 GabrielCaine/GabrielCaine_head_2_injured
-  rotate: false
-  xy: 906, 702
+  rotate: true
+  xy: 2, 519
   size: 85, 93
   orig: 179, 179
   offset: 48, 16
   index: -1
 GabrielCaine/GabrielCaine_leg_lower_far
   rotate: false
-  xy: 478, 442
+  xy: 983, 959
   size: 38, 62
   orig: 64, 107
   offset: 10, 22
   index: -1
 GabrielCaine/GabrielCaine_leg_lower_near_2
   rotate: false
-  xy: 478, 442
+  xy: 983, 959
   size: 38, 62
   orig: 64, 107
   offset: 10, 22
   index: -1
 GabrielCaine/GabrielCaine_leg_lower_near_1
   rotate: true
-  xy: 141, 785
+  xy: 892, 330
   size: 38, 64
   orig: 64, 107
   offset: 13, 21
   index: -1
 GabrielCaine/GabrielCaine_leg_upper_far
-  rotate: false
-  xy: 846, 705
+  rotate: true
+  xy: 282, 423
   size: 58, 89
   orig: 58, 89
   offset: 0, 0
   index: -1
 GabrielCaine/GabrielCaine_leg_upper_near
-  rotate: false
-  xy: 958, 368
+  rotate: true
+  xy: 276, 90
   size: 26, 54
   orig: 58, 89
   offset: 16, 17
   index: -1
 GabrielCaine/GabrielCaine_torso
   rotate: false
-  xy: 299, 585
+  xy: 699, 414
   size: 63, 65
   orig: 169, 149
   offset: 54, 36
   index: -1
 GabrielCaine/GabrielCaine_waist
-  rotate: false
-  xy: 511, 2
+  rotate: true
+  xy: 610, 301
   size: 46, 48
   orig: 93, 71
   offset: 24, 12
   index: -1
-MetalMan-Blue/MetalMan-Blue_arm_lower_far
-  rotate: true
-  xy: 964, 168
-  size: 24, 38
-  orig: 24, 38
-  offset: 0, 0
-  index: -1
 MetalMan-Blue/MetalMan-Blue_arm_lower_near
-  rotate: false
-  xy: 996, 318
+  rotate: true
+  xy: 402, 26
   size: 26, 42
   orig: 26, 42
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_arm_upper_far
   rotate: true
-  xy: 672, 421
+  xy: 287, 181
   size: 33, 59
   orig: 33, 59
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_arm_upper_near
   rotate: true
-  xy: 672, 421
+  xy: 287, 181
   size: 33, 59
   orig: 33, 59
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_foot_far_1
-  rotate: true
-  xy: 958, 468
+  rotate: false
+  xy: 817, 95
   size: 55, 26
   orig: 55, 26
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_foot_far_2_bent
   rotate: false
-  xy: 839, 251
+  xy: 770, 144
   size: 52, 36
   orig: 52, 36
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_foot_near_2_bent
   rotate: false
-  xy: 839, 251
+  xy: 770, 144
   size: 52, 36
   orig: 52, 36
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_foot_near_1
-  rotate: true
-  xy: 914, 303
+  rotate: false
+  xy: 64, 90
   size: 55, 26
   orig: 55, 26
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_hand_1_fistBack
   rotate: true
-  xy: 820, 101
+  xy: 660, 316
   size: 31, 24
   orig: 31, 24
   offset: 0, 0
   index: -1
-MetalMan-Blue/MetalMan-Blue_hand_2_fistPalm
-  rotate: false
-  xy: 884, 18
-  size: 27, 25
-  orig: 27, 25
-  offset: 0, 0
-  index: -1
 MetalMan-Blue/MetalMan-Blue_head_1
   rotate: false
-  xy: 642, 611
+  xy: 518, 470
   size: 87, 87
   orig: 87, 87
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_head_2_injured
   rotate: false
-  xy: 731, 611
+  xy: 193, 463
   size: 87, 87
   orig: 87, 87
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_leg_lower_far
   rotate: true
-  xy: 642, 566
+  xy: 2, 338
   size: 43, 59
   orig: 43, 59
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_leg_lower_near_1
-  rotate: false
-  xy: 979, 564
+  rotate: true
+  xy: 439, 363
   size: 43, 67
   orig: 43, 67
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_leg_lower_near_2
   rotate: true
-  xy: 703, 566
+  xy: 234, 327
   size: 43, 59
   orig: 43, 59
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_leg_upper_far
-  rotate: false
-  xy: 942, 304
+  rotate: true
+  xy: 681, 87
   size: 25, 54
   orig: 25, 54
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_leg_upper_near
-  rotate: false
-  xy: 942, 304
+  rotate: true
+  xy: 681, 87
   size: 25, 54
   orig: 25, 54
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_neck
   rotate: true
-  xy: 914, 82
+  xy: 287, 227
   size: 23, 20
   orig: 23, 20
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_torso
-  rotate: false
-  xy: 350, 421
+  rotate: true
+  xy: 635, 410
   size: 56, 60
   orig: 56, 60
   offset: 0, 0
   index: -1
 MetalMan-Blue/MetalMan-Blue_waist
   rotate: false
-  xy: 795, 341
+  xy: 900, 189
   size: 45, 45
   orig: 45, 45
   offset: 0, 0
   index: -1
 PamelaFrost-02/PamelaFrost-02_arm_lower_far
   rotate: true
-  xy: 482, 352
+  xy: 383, 3
   size: 21, 38
   orig: 85, 69
   offset: 31, 16
   index: -1
 PamelaFrost-05/PamelaFrost-05_arm_lower_far
   rotate: true
-  xy: 482, 352
+  xy: 383, 3
   size: 21, 38
   orig: 85, 69
   offset: 31, 16
   index: -1
 PamelaFrost-02/PamelaFrost-02_arm_lower_near
-  rotate: true
-  xy: 913, 360
+  rotate: false
+  xy: 994, 9
   size: 24, 43
   orig: 85, 69
   offset: 30, 13
   index: -1
 PamelaFrost-05/PamelaFrost-05_arm_lower_near
-  rotate: true
-  xy: 913, 360
+  rotate: false
+  xy: 994, 9
   size: 24, 43
   orig: 85, 69
   offset: 30, 13
   index: -1
 PamelaFrost-02/PamelaFrost-02_arm_upper_far
-  rotate: false
-  xy: 591, 65
+  rotate: true
+  xy: 453, 86
   size: 24, 56
   orig: 99, 93
   offset: 37, 17
   index: -1
 PamelaFrost-02/PamelaFrost-02_arm_upper_near
-  rotate: false
-  xy: 614, 123
+  rotate: true
+  xy: 332, 84
   size: 24, 56
   orig: 99, 93
   offset: 37, 17
   index: -1
 PamelaFrost-02/PamelaFrost-02_foot_far_1
   rotate: false
-  xy: 748, 308
+  xy: 720, 114
   size: 54, 28
   orig: 107, 58
   offset: 26, 15
   index: -1
 PamelaFrost-02/PamelaFrost-02_foot_near_1
   rotate: false
-  xy: 748, 308
+  xy: 720, 114
   size: 54, 28
   orig: 107, 58
   offset: 26, 15
   index: -1
 PamelaFrost-03/PamelaFrost-03_foot_far_1
   rotate: false
-  xy: 748, 308
+  xy: 720, 114
   size: 54, 28
   orig: 107, 58
   offset: 26, 15
   index: -1
 PamelaFrost-03/PamelaFrost-03_foot_near_1
   rotate: false
-  xy: 748, 308
+  xy: 720, 114
   size: 54, 28
   orig: 107, 58
   offset: 26, 15
   index: -1
 PamelaFrost-04/PamelaFrost-04_foot_far_1
   rotate: false
-  xy: 748, 308
+  xy: 720, 114
   size: 54, 28
   orig: 107, 58
   offset: 26, 15
   index: -1
 PamelaFrost-04/PamelaFrost-04_foot_near_1
   rotate: false
-  xy: 748, 308
+  xy: 720, 114
   size: 54, 28
   orig: 107, 58
   offset: 26, 15
   index: -1
 PamelaFrost-05/PamelaFrost-05_foot_far_1
   rotate: false
-  xy: 748, 308
+  xy: 720, 114
   size: 54, 28
   orig: 107, 58
   offset: 26, 15
   index: -1
 PamelaFrost-05/PamelaFrost-05_foot_near_1
   rotate: false
-  xy: 748, 308
+  xy: 720, 114
   size: 54, 28
   orig: 107, 58
   offset: 26, 15
   index: -1
 PamelaFrost/PamelaFrost_foot_far_1
   rotate: false
-  xy: 748, 308
+  xy: 720, 114
   size: 54, 28
   orig: 107, 58
   offset: 26, 15
   index: -1
 PamelaFrost-02/PamelaFrost-02_foot_far_2_bent
-  rotate: true
-  xy: 610, 9
+  rotate: false
+  xy: 348, 178
   size: 54, 36
   orig: 101, 64
   offset: 20, 12
   index: -1
 PamelaFrost-02/PamelaFrost-02_foot_near_2_bent
-  rotate: true
-  xy: 610, 9
+  rotate: false
+  xy: 348, 178
   size: 54, 36
   orig: 101, 64
   offset: 20, 12
   index: -1
 PamelaFrost-03/PamelaFrost-03_foot_far_2_bent
-  rotate: true
-  xy: 610, 9
+  rotate: false
+  xy: 348, 178
   size: 54, 36
   orig: 101, 64
   offset: 20, 12
   index: -1
 PamelaFrost-03/PamelaFrost-03_foot_near_2_bent
-  rotate: true
-  xy: 610, 9
+  rotate: false
+  xy: 348, 178
   size: 54, 36
   orig: 101, 64
   offset: 20, 12
   index: -1
 PamelaFrost-04/PamelaFrost-04_foot_far_2_bent
-  rotate: true
-  xy: 610, 9
+  rotate: false
+  xy: 348, 178
   size: 54, 36
   orig: 101, 64
   offset: 20, 12
   index: -1
 PamelaFrost-04/PamelaFrost-04_foot_near_2_bent
-  rotate: true
-  xy: 610, 9
+  rotate: false
+  xy: 348, 178
   size: 54, 36
   orig: 101, 64
   offset: 20, 12
   index: -1
 PamelaFrost/PamelaFrost_foot_far_2_bent
-  rotate: true
-  xy: 610, 9
+  rotate: false
+  xy: 348, 178
   size: 54, 36
   orig: 101, 64
   offset: 20, 12
   index: -1
 PamelaFrost/PamelaFrost_foot_near_2_bent
-  rotate: true
-  xy: 610, 9
+  rotate: false
+  xy: 348, 178
   size: 54, 36
   orig: 101, 64
   offset: 20, 12
   index: -1
 PamelaFrost-02/PamelaFrost-02_hand_far_1_fistBack
-  rotate: true
-  xy: 788, 97
+  rotate: false
+  xy: 668, 5
   size: 35, 30
   orig: 67, 53
   offset: 17, 15
   index: -1
-PamelaFrost-02/PamelaFrost-02_hand_far_2_fistPalm
-  rotate: false
-  xy: 846, 104
-  size: 31, 29
-  orig: 67, 53
-  offset: 18, 14
-  index: -1
-PamelaFrost-02/PamelaFrost-02_hand_near_2_fistPalm
-  rotate: false
-  xy: 846, 104
-  size: 31, 29
-  orig: 67, 53
-  offset: 18, 14
-  index: -1
 PamelaFrost-02/PamelaFrost-02_hand_near_1_fistBack
   rotate: true
-  xy: 789, 60
+  xy: 555, 5
   size: 35, 30
   orig: 67, 53
   offset: 17, 15
   index: -1
 PamelaFrost-02/PamelaFrost-02_head_1
   rotate: true
-  xy: 2, 468
+  xy: 695, 746
   size: 142, 104
   orig: 179, 179
   offset: 22, 14
   index: -1
 PamelaFrost-02/PamelaFrost-02_head_2_injured
-  rotate: false
-  xy: 484, 918
+  rotate: true
+  xy: 319, 741
   size: 142, 104
   orig: 179, 179
   offset: 23, 14
   index: -1
 PamelaFrost-02/PamelaFrost-02_leg_lower_far
-  rotate: false
-  xy: 424, 286
+  rotate: true
+  xy: 352, 252
   size: 33, 64
   orig: 64, 107
   offset: 17, 21
   index: -1
 PamelaFrost-02/PamelaFrost-02_leg_lower_near_1
-  rotate: false
-  xy: 450, 352
+  rotate: true
+  xy: 177, 184
   size: 30, 64
   orig: 64, 107
   offset: 17, 22
   index: -1
 PamelaFrost-02/PamelaFrost-02_leg_lower_near_2
-  rotate: false
-  xy: 459, 286
+  rotate: true
+  xy: 244, 252
   size: 33, 64
   orig: 64, 107
   offset: 17, 21
   index: -1
 PamelaFrost-02/PamelaFrost-02_leg_upper_far
-  rotate: true
-  xy: 555, 511
+  rotate: false
+  xy: 190, 308
   size: 37, 59
   orig: 58, 89
   offset: 8, 18
   index: -1
 PamelaFrost-02/PamelaFrost-02_leg_upper_near
   rotate: true
-  xy: 733, 454
+  xy: 860, 253
   size: 36, 59
   orig: 58, 89
   offset: 9, 18
   index: -1
 PamelaFrost-02/PamelaFrost-02_neck
   rotate: false
-  xy: 993, 702
+  xy: 94, 65
   size: 22, 23
   orig: 43, 36
   offset: 11, 8
   index: -1
 PamelaFrost-02/PamelaFrost-02_torso
-  rotate: false
-  xy: 329, 177
+  rotate: true
+  xy: 178, 407
   size: 54, 61
   orig: 169, 149
   offset: 61, 39
   index: -1
 PamelaFrost-02/PamelaFrost-02_waist
-  rotate: true
-  xy: 534, 181
+  rotate: false
+  xy: 660, 146
   size: 48, 38
   orig: 93, 71
   offset: 21, 17
   index: -1
-PamelaFrost-03/PamelaFrost-03_arm_lower_far
-  rotate: false
-  xy: 696, 182
-  size: 21, 38
-  orig: 85, 69
-  offset: 31, 16
-  index: -1
-PamelaFrost-04/PamelaFrost-04_arm_lower_far
-  rotate: false
-  xy: 696, 182
-  size: 21, 38
-  orig: 85, 69
-  offset: 31, 16
-  index: -1
-PamelaFrost/PamelaFrost_arm_lower_far
-  rotate: false
-  xy: 696, 182
-  size: 21, 38
-  orig: 85, 69
-  offset: 31, 16
-  index: -1
 PamelaFrost-03/PamelaFrost-03_arm_lower_near
-  rotate: false
-  xy: 922, 258
+  rotate: true
+  xy: 824, 156
   size: 24, 43
   orig: 85, 69
   offset: 30, 13
   index: -1
 PamelaFrost-04/PamelaFrost-04_arm_lower_near
-  rotate: false
-  xy: 922, 258
+  rotate: true
+  xy: 824, 156
   size: 24, 43
   orig: 85, 69
   offset: 30, 13
   index: -1
 PamelaFrost-03/PamelaFrost-03_arm_upper_far
   rotate: true
-  xy: 522, 352
+  xy: 337, 110
   size: 26, 56
   orig: 99, 93
   offset: 35, 17
   index: -1
 PamelaFrost-04/PamelaFrost-04_arm_upper_far
   rotate: true
-  xy: 522, 352
+  xy: 337, 110
   size: 26, 56
   orig: 99, 93
   offset: 35, 17
   index: -1
 PamelaFrost-03/PamelaFrost-03_arm_upper_near
-  rotate: false
-  xy: 617, 65
+  rotate: true
+  xy: 395, 110
   size: 26, 56
   orig: 99, 93
   offset: 35, 17
   index: -1
 PamelaFrost-04/PamelaFrost-04_arm_upper_near
-  rotate: false
-  xy: 617, 65
+  rotate: true
+  xy: 395, 110
   size: 26, 56
   orig: 99, 93
   offset: 35, 17
   index: -1
 PamelaFrost/PamelaFrost_arm_upper_near
-  rotate: false
-  xy: 617, 65
+  rotate: true
+  xy: 395, 110
   size: 26, 56
   orig: 99, 93
   offset: 35, 17
   index: -1
 PamelaFrost-03/PamelaFrost-03_hand_far_1_fistBack
   rotate: false
-  xy: 823, 135
+  xy: 84, 3
   size: 34, 30
   orig: 67, 53
   offset: 17, 15
   index: -1
 PamelaFrost-04/PamelaFrost-04_hand_far_1_fistBack
   rotate: false
-  xy: 823, 135
+  xy: 84, 3
   size: 34, 30
   orig: 67, 53
   offset: 17, 15
   index: -1
-PamelaFrost-03/PamelaFrost-03_hand_far_2_fistPalm
-  rotate: true
-  xy: 884, 72
-  size: 30, 28
-  orig: 67, 53
-  offset: 19, 14
-  index: -1
 PamelaFrost-03/PamelaFrost-03_hand_near_1_fistBack
-  rotate: true
-  xy: 789, 23
+  rotate: false
+  xy: 260, 3
   size: 35, 30
   orig: 67, 53
   offset: 17, 15
   index: -1
 PamelaFrost-04/PamelaFrost-04_hand_near_1_fistBack
-  rotate: true
-  xy: 789, 23
+  rotate: false
+  xy: 260, 3
   size: 35, 30
   orig: 67, 53
   offset: 17, 15
   index: -1
 PamelaFrost/PamelaFrost_hand_near_1_fistBack
-  rotate: true
-  xy: 789, 23
+  rotate: false
+  xy: 260, 3
   size: 35, 30
   orig: 67, 53
   offset: 17, 15
   index: -1
-PamelaFrost-03/PamelaFrost-03_hand_near_2_fistPalm
-  rotate: false
-  xy: 879, 104
-  size: 31, 29
-  orig: 67, 53
-  offset: 18, 14
-  index: -1
 PamelaFrost-03/PamelaFrost-03_head_1
   rotate: false
-  xy: 207, 776
+  xy: 440, 763
   size: 126, 125
   orig: 179, 179
   offset: 31, 15
   index: -1
 PamelaFrost-03/PamelaFrost-03_head_2_injured
-  rotate: true
-  xy: 892, 897
+  rotate: false
+  xy: 817, 893
   size: 125, 128
   orig: 179, 179
   offset: 32, 13
   index: -1
 PamelaFrost-03/PamelaFrost-03_leg_lower_far
-  rotate: false
-  xy: 494, 288
+  rotate: true
+  xy: 477, 243
   size: 33, 62
   orig: 64, 107
   offset: 16, 23
   index: -1
 PamelaFrost-03/PamelaFrost-03_leg_lower_near_2
-  rotate: false
-  xy: 494, 288
+  rotate: true
+  xy: 477, 243
   size: 33, 62
   orig: 64, 107
   offset: 16, 23
   index: -1
 PamelaFrost-03/PamelaFrost-03_leg_lower_near_1
   rotate: true
-  xy: 898, 525
+  xy: 532, 145
   size: 30, 60
   orig: 64, 107
   offset: 17, 24
   index: -1
 PamelaFrost-03/PamelaFrost-03_leg_upper_far
-  rotate: false
-  xy: 556, 450
+  rotate: true
+  xy: 63, 300
   size: 37, 59
   orig: 58, 89
   offset: 8, 18
   index: -1
 PamelaFrost-04/PamelaFrost-04_leg_upper_far
-  rotate: false
-  xy: 556, 450
+  rotate: true
+  xy: 63, 300
   size: 37, 59
   orig: 58, 89
   offset: 8, 18
   index: -1
 PamelaFrost-03/PamelaFrost-03_leg_upper_near
-  rotate: false
-  xy: 794, 464
+  rotate: true
+  xy: 122, 252
   size: 36, 59
   orig: 58, 89
   offset: 9, 18
   index: -1
 PamelaFrost-04/PamelaFrost-04_leg_upper_near
-  rotate: false
-  xy: 794, 464
+  rotate: true
+  xy: 122, 252
   size: 36, 59
   orig: 58, 89
   offset: 9, 18
   index: -1
 PamelaFrost-03/PamelaFrost-03_neck
   rotate: false
-  xy: 912, 107
+  xy: 874, 191
   size: 22, 24
   orig: 43, 36
   offset: 11, 8
   index: -1
 PamelaFrost-04/PamelaFrost-04_neck
   rotate: false
-  xy: 912, 107
+  xy: 874, 191
   size: 22, 24
   orig: 43, 36
   offset: 11, 8
   index: -1
 PamelaFrost-03/PamelaFrost-03_torso
-  rotate: false
-  xy: 351, 115
+  rotate: true
+  xy: 2, 383
   size: 54, 60
   orig: 169, 149
   offset: 61, 39
   index: -1
 PamelaFrost-03/PamelaFrost-03_waist
-  rotate: true
-  xy: 799, 254
+  rotate: false
+  xy: 340, 138
   size: 48, 38
   orig: 93, 71
   offset: 21, 17
   index: -1
 PamelaFrost-04/PamelaFrost-04_waist
-  rotate: true
-  xy: 799, 254
+  rotate: false
+  xy: 340, 138
   size: 48, 38
   orig: 93, 71
   offset: 21, 17
   index: -1
 PamelaFrost-05/PamelaFrost-05_waist
-  rotate: true
-  xy: 799, 254
+  rotate: false
+  xy: 340, 138
   size: 48, 38
   orig: 93, 71
   offset: 21, 17
   index: -1
 PamelaFrost/PamelaFrost_waist
-  rotate: true
-  xy: 799, 254
+  rotate: false
+  xy: 340, 138
   size: 48, 38
   orig: 93, 71
   offset: 21, 17
   index: -1
-PamelaFrost-04/PamelaFrost-04_hand_far_2_fistPalm
-  rotate: true
-  xy: 821, 68
-  size: 31, 28
-  orig: 67, 53
-  offset: 18, 14
-  index: -1
-PamelaFrost-04/PamelaFrost-04_hand_near_2_fistPalm
-  rotate: true
-  xy: 821, 35
-  size: 31, 29
-  orig: 67, 53
-  offset: 18, 14
-  index: -1
 PamelaFrost-04/PamelaFrost-04_head_1
   rotate: false
-  xy: 141, 650
+  xy: 568, 764
   size: 125, 124
   orig: 179, 179
   offset: 32, 15
   index: -1
 PamelaFrost-04/PamelaFrost-04_head_2_injured
-  rotate: true
-  xy: 761, 897
+  rotate: false
+  xy: 440, 892
   size: 125, 129
   orig: 179, 179
   offset: 32, 12
   index: -1
 PamelaFrost-04/PamelaFrost-04_leg_lower_far
-  rotate: false
-  xy: 517, 116
+  rotate: true
+  xy: 774, 236
   size: 33, 62
   orig: 64, 107
   offset: 16, 23
   index: -1
 PamelaFrost-04/PamelaFrost-04_leg_lower_near_2
-  rotate: false
-  xy: 517, 116
+  rotate: true
+  xy: 774, 236
   size: 33, 62
   orig: 64, 107
   offset: 16, 23
   index: -1
 PamelaFrost-04/PamelaFrost-04_leg_lower_near_1
   rotate: true
-  xy: 556, 418
+  xy: 933, 143
   size: 30, 60
   orig: 64, 107
   offset: 17, 24
   index: -1
 PamelaFrost-04/PamelaFrost-04_torso
-  rotate: false
-  xy: 385, 177
+  rotate: true
+  xy: 94, 384
   size: 54, 61
   orig: 169, 149
   offset: 61, 39
   index: -1
 PamelaFrost-05/PamelaFrost-05_arm_upper_far
-  rotate: false
-  xy: 669, 244
+  rotate: true
+  xy: 390, 84
   size: 24, 56
   orig: 99, 93
   offset: 37, 17
   index: -1
 PamelaFrost-05/PamelaFrost-05_arm_upper_near
   rotate: true
-  xy: 761, 228
+  xy: 737, 78
   size: 24, 56
   orig: 99, 93
   offset: 37, 17
   index: -1
 PamelaFrost-05/PamelaFrost-05_foot_far_2_bent
-  rotate: true
-  xy: 695, 252
+  rotate: false
+  xy: 121, 178
   size: 54, 36
   orig: 101, 64
   offset: 20, 12
   index: -1
 PamelaFrost-05/PamelaFrost-05_foot_near_2_bent
-  rotate: true
-  xy: 695, 252
+  rotate: false
+  xy: 121, 178
   size: 54, 36
   orig: 101, 64
   offset: 20, 12
   index: -1
-PamelaFrost-05/PamelaFrost-05_hand_far_1_fistBack
-  rotate: false
-  xy: 895, 135
-  size: 34, 29
-  orig: 67, 53
-  offset: 17, 15
-  index: -1
-PamelaFrost-05/PamelaFrost-05_hand_far_2_fistPalm
-  rotate: false
-  xy: 852, 43
-  size: 30, 28
-  orig: 67, 53
-  offset: 19, 14
-  index: -1
 PamelaFrost-05/PamelaFrost-05_hand_near_1_fistBack
   rotate: false
-  xy: 823, 167
+  xy: 901, 3
   size: 35, 30
   orig: 67, 53
   offset: 17, 15
   index: -1
-PamelaFrost-05/PamelaFrost-05_hand_near_2_fistPalm
-  rotate: true
-  xy: 821, 2
-  size: 31, 29
-  orig: 67, 53
-  offset: 18, 14
-  index: -1
 PamelaFrost-05/PamelaFrost-05_head_1
   rotate: true
-  xy: 596, 791
+  xy: 688, 638
   size: 106, 109
   orig: 179, 179
   offset: 39, 9
   index: -1
 PamelaFrost-05/PamelaFrost-05_head_2_injured
   rotate: true
-  xy: 707, 789
+  xy: 2, 606
   size: 106, 109
   orig: 179, 179
   offset: 39, 9
   index: -1
 PamelaFrost-05/PamelaFrost-05_leg_lower_far
-  rotate: false
-  xy: 520, 52
+  rotate: true
+  xy: 921, 236
   size: 33, 62
   orig: 64, 107
   offset: 16, 25
   index: -1
 PamelaFrost-05/PamelaFrost-05_leg_lower_near_2
-  rotate: false
-  xy: 520, 52
+  rotate: true
+  xy: 921, 236
   size: 33, 62
   orig: 64, 107
   offset: 16, 25
   index: -1
 PamelaFrost-05/PamelaFrost-05_leg_lower_near_1
   rotate: true
-  xy: 733, 421
+  xy: 278, 148
   size: 31, 60
   orig: 64, 107
   offset: 17, 25
   index: -1
 PamelaFrost-05/PamelaFrost-05_leg_upper_far
-  rotate: false
-  xy: 633, 470
+  rotate: true
+  xy: 875, 291
   size: 37, 59
   orig: 58, 89
   offset: 8, 18
   index: -1
 PamelaFrost-05/PamelaFrost-05_leg_upper_near
-  rotate: false
-  xy: 443, 115
+  rotate: true
+  xy: 352, 287
   size: 36, 60
   orig: 58, 89
   offset: 9, 16
   index: -1
-PamelaFrost-05/PamelaFrost-05_neck
-  rotate: true
-  xy: 999, 144
-  size: 22, 23
-  orig: 43, 36
-  offset: 11, 9
-  index: -1
 PamelaFrost-05/PamelaFrost-05_torso
-  rotate: false
-  xy: 356, 54
+  rotate: true
+  xy: 309, 367
   size: 54, 59
   orig: 169, 149
   offset: 61, 41
   index: -1
 PamelaFrost/PamelaFrost_arm_lower_near
   rotate: true
-  xy: 877, 223
+  xy: 38, 7
   size: 24, 42
   orig: 85, 69
   offset: 29, 14
   index: -1
 PamelaFrost/PamelaFrost_arm_upper_far
   rotate: true
-  xy: 819, 224
+  xy: 942, 91
   size: 25, 56
   orig: 99, 93
   offset: 35, 17
   index: -1
 PamelaFrost/PamelaFrost_foot_near_1
   rotate: false
-  xy: 895, 427
+  xy: 886, 113
   size: 54, 28
   orig: 107, 58
   offset: 25, 15
   index: -1
 PamelaFrost/PamelaFrost_hand_far_1_fistBack
   rotate: false
-  xy: 859, 135
+  xy: 120, 3
   size: 34, 30
   orig: 67, 53
   offset: 17, 15
   index: -1
-PamelaFrost/PamelaFrost_hand_far_2_fistPalm
-  rotate: false
-  xy: 852, 13
-  size: 30, 28
-  orig: 67, 53
-  offset: 19, 14
-  index: -1
-PamelaFrost/PamelaFrost_hand_near_2_fistPalm
-  rotate: false
-  xy: 851, 73
-  size: 31, 29
-  orig: 67, 53
-  offset: 18, 14
-  index: -1
 PamelaFrost/PamelaFrost_head_1
   rotate: false
-  xy: 345, 907
+  xy: 817, 776
   size: 137, 115
   orig: 179, 179
   offset: 25, 10
   index: -1
 PamelaFrost/PamelaFrost_head_2_injured
-  rotate: false
-  xy: 207, 903
+  rotate: true
+  xy: 319, 885
   size: 136, 119
   orig: 179, 179
   offset: 25, 6
   index: -1
 PamelaFrost/PamelaFrost_leg_lower_far
   rotate: false
-  xy: 519, 380
+  xy: 2, 234
   size: 33, 62
   orig: 64, 107
   offset: 17, 24
   index: -1
 PamelaFrost/PamelaFrost_leg_lower_near_1
-  rotate: false
-  xy: 552, 119
+  rotate: true
+  xy: 463, 141
   size: 30, 60
   orig: 64, 107
   offset: 17, 25
   index: -1
 PamelaFrost/PamelaFrost_leg_lower_near_2
   rotate: true
-  xy: 617, 531
+  xy: 37, 227
   size: 33, 62
   orig: 64, 107
   offset: 16, 23
   index: -1
 PamelaFrost/PamelaFrost_leg_upper_far
   rotate: true
-  xy: 672, 491
+  xy: 124, 290
   size: 37, 59
   orig: 58, 89
   offset: 8, 18
   index: -1
 PamelaFrost/PamelaFrost_leg_upper_near
   rotate: true
-  xy: 897, 487
+  xy: 183, 252
   size: 36, 59
   orig: 58, 89
   offset: 9, 18
   index: -1
-PamelaFrost/PamelaFrost_neck
-  rotate: true
-  xy: 999, 120
-  size: 22, 23
-  orig: 43, 36
-  offset: 11, 9
-  index: -1
 PamelaFrost/PamelaFrost_torso
-  rotate: false
-  xy: 470, 594
+  rotate: true
+  xy: 697, 358
   size: 54, 59
   orig: 169, 149
   offset: 61, 40
   index: -1
 StumpyPete/StumpyPete_arm_lower_far
-  rotate: false
-  xy: 884, 293
+  rotate: true
+  xy: 402, 54
   size: 28, 43
   orig: 85, 69
   offset: 27, 12
   index: -1
 StumpyPete/StumpyPete_arm_lower_near
   rotate: true
-  xy: 977, 259
+  xy: 544, 42
   size: 28, 42
   orig: 85, 69
   offset: 27, 13
   index: -1
 StumpyPete/StumpyPete_arm_upper_far
   rotate: false
-  xy: 529, 293
+  xy: 611, 242
   size: 37, 57
   orig: 99, 93
   offset: 28, 20
   index: -1
 StumpyPete/StumpyPete_arm_upper_near
   rotate: true
-  xy: 674, 382
+  xy: 418, 239
   size: 37, 57
   orig: 99, 93
   offset: 28, 20
   index: -1
 StumpyPete/StumpyPete_foot_far_1
-  rotate: true
-  xy: 460, 2
+  rotate: false
+  xy: 736, 52
   size: 49, 24
   orig: 107, 58
   offset: 27, 14
   index: -1
 StumpyPete/StumpyPete_foot_far_2_bent
   rotate: true
-  xy: 880, 338
+  xy: 193, 554
   size: 48, 31
   orig: 101, 64
   offset: 27, 14
   index: -1
 StumpyPete/StumpyPete_foot_near_1
   rotate: false
-  xy: 552, 116
+  xy: 944, 1020
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 StumpyPete/StumpyPete_foot_near_2_bent
   rotate: false
-  xy: 552, 116
+  xy: 944, 1020
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 StumpyPete/StumpyPete_hand_far_1_fistBack
   rotate: false
-  xy: 689, 2
+  xy: 2, 11
   size: 34, 31
   orig: 67, 53
   offset: 17, 15
   index: -1
-StumpyPete/StumpyPete_hand_far_2_fistPalm
-  rotate: true
-  xy: 954, 223
-  size: 34, 29
-  orig: 67, 53
-  offset: 18, 15
-  index: -1
-StumpyPete/StumpyPete_hand_near_2_fistPalm
-  rotate: true
-  xy: 954, 223
-  size: 34, 29
-  orig: 67, 53
-  offset: 18, 15
-  index: -1
 StumpyPete/StumpyPete_hand_near_1_fistBack
   rotate: false
-  xy: 720, 120
+  xy: 632, 10
   size: 34, 31
   orig: 67, 53
   offset: 17, 15
   index: -1
 StumpyPete/StumpyPete_head_1
   rotate: false
-  xy: 484, 824
+  xy: 799, 566
   size: 110, 92
   orig: 179, 179
   offset: 33, 8
   index: -1
 StumpyPete/StumpyPete_head_2_injured
-  rotate: true
-  xy: 228, 240
+  rotate: false
+  xy: 398, 567
   size: 112, 92
   orig: 179, 179
   offset: 33, 8
   index: -1
 StumpyPete/StumpyPete_leg_lower_far
-  rotate: true
-  xy: 764, 566
+  rotate: false
+  xy: 232, 642
   size: 43, 56
   orig: 64, 107
   offset: 14, 26
   index: -1
 StumpyPete/StumpyPete_leg_lower_near_1
   rotate: true
-  xy: 370, 642
+  xy: 892, 370
   size: 36, 75
   orig: 64, 107
   offset: 14, 9
   index: -1
 StumpyPete/StumpyPete_leg_lower_near_2
-  rotate: false
-  xy: 820, 623
+  rotate: true
+  xy: 157, 369
   size: 36, 75
   orig: 64, 107
   offset: 14, 9
   index: -1
 StumpyPete/StumpyPete_leg_upper_far
   rotate: false
-  xy: 574, 181
+  xy: 64, 386
   size: 25, 51
   orig: 58, 89
   offset: 16, 17
   index: -1
 StumpyPete/StumpyPete_leg_upper_near
-  rotate: false
-  xy: 601, 181
+  rotate: true
+  xy: 930, 64
   size: 25, 51
   orig: 58, 89
   offset: 16, 17
   index: -1
-StumpyPete/StumpyPete_neck
-  rotate: false
-  xy: 996, 289
-  size: 26, 27
-  orig: 43, 36
-  offset: 9, 6
-  index: -1
 StumpyPete/StumpyPete_torso
   rotate: false
-  xy: 228, 173
+  xy: 722, 571
   size: 74, 65
   orig: 169, 149
   offset: 51, 34
   index: -1
 StumpyPete/StumpyPete_waist
-  rotate: true
-  xy: 317, 407
+  rotate: false
+  xy: 476, 278
   size: 69, 31
   orig: 93, 71
   offset: 18, 15
   index: -1
 Truck/TruckMatthews_arm_upper_far
-  rotate: false
-  xy: 533, 231
+  rotate: true
+  xy: 541, 211
   size: 34, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 Truck/TruckMatthews_arm_upper_near
   rotate: false
-  xy: 555, 57
+  xy: 985, 209
   size: 34, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 Truck/TruckMatthews_foot_far_2_bent
   rotate: false
-  xy: 795, 424
+  xy: 293, 287
   size: 57, 38
   orig: 101, 64
   offset: 17, 12
   index: -1
 Truck/TruckMatthews_foot_near_2_bent
   rotate: false
-  xy: 795, 424
+  xy: 293, 287
   size: 57, 38
   orig: 101, 64
   offset: 17, 12
   index: -1
 Truck/TruckMatthews_hand_far_1_fistBack
   rotate: false
-  xy: 648, 2
+  xy: 320, 51
   size: 39, 31
   orig: 67, 53
   offset: 15, 13
   index: -1
-Truck/TruckMatthews_hand_far_2_fistPalm
-  rotate: false
-  xy: 985, 194
-  size: 32, 30
-  orig: 67, 53
-  offset: 18, 13
-  index: -1
-Truck/TruckMatthews_hand_near_2_fistPalm
-  rotate: false
-  xy: 965, 135
-  size: 32, 31
-  orig: 67, 53
-  offset: 18, 13
-  index: -1
 Truck/TruckMatthews_head_1
   rotate: true
-  xy: 477, 740
+  xy: 817, 482
   size: 82, 94
   orig: 179, 179
   offset: 48, 11
   index: -1
 Truck/TruckMatthews_head_2_injured
-  rotate: false
-  xy: 906, 797
+  rotate: true
+  xy: 232, 552
   size: 85, 98
   orig: 179, 179
   offset: 47, 7
   index: -1
 Truck/TruckMatthews_leg_lower_far
   rotate: false
-  xy: 361, 354
+  xy: 983, 892
   size: 36, 65
   orig: 64, 107
   offset: 12, 23
   index: -1
 Truck/TruckMatthews_leg_lower_near_2
   rotate: false
-  xy: 361, 354
+  xy: 983, 892
   size: 36, 65
   orig: 64, 107
   offset: 12, 23
   index: -1
 Truck/TruckMatthews_leg_lower_near_1
-  rotate: false
-  xy: 860, 568
+  rotate: true
+  xy: 425, 325
   size: 36, 63
   orig: 64, 107
   offset: 14, 23
   index: -1
-Truck/TruckMatthews_neck
-  rotate: false
-  xy: 936, 110
-  size: 24, 21
-  orig: 43, 36
-  offset: 10, 8
-  index: -1
 Truck/TruckMatthews_torso
-  rotate: false
-  xy: 284, 478
+  rotate: true
+  xy: 441, 408
   size: 60, 66
   orig: 169, 149
   offset: 55, 36
   index: -1
 TurboTed/TurboTed_arm_lower_far
-  rotate: false
-  xy: 706, 37
+  rotate: true
+  xy: 182, 31
   size: 28, 40
   orig: 28, 40
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_arm_lower_near
   rotate: true
-  xy: 719, 221
+  xy: 787, 29
   size: 28, 40
   orig: 28, 40
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_arm_upper_far
-  rotate: true
-  xy: 322, 240
+  rotate: false
+  xy: 641, 349
   size: 44, 59
   orig: 44, 59
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_arm_upper_near
-  rotate: true
-  xy: 383, 240
+  rotate: false
+  xy: 282, 490
   size: 44, 60
   orig: 44, 60
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_foot_far_1
-  rotate: true
-  xy: 993, 835
+  rotate: false
+  xy: 824, 123
   size: 60, 29
   orig: 60, 29
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_foot_far_2_bent
   rotate: false
-  xy: 554, 380
+  xy: 713, 251
   size: 59, 36
   orig: 59, 36
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_foot_near_2_bent
   rotate: false
-  xy: 554, 380
+  xy: 713, 251
   size: 59, 36
   orig: 59, 36
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_foot_near_1
-  rotate: true
-  xy: 993, 773
+  rotate: false
+  xy: 2, 117
   size: 60, 29
   orig: 60, 29
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_hand_1_fistBack
-  rotate: true
-  xy: 756, 129
+  rotate: false
+  xy: 344, 20
   size: 37, 29
   orig: 37, 29
   offset: 0, 0
   index: -1
-TurboTed/TurboTed_hand_2_fistPalm
-  rotate: true
-  xy: 922, 223
-  size: 33, 30
-  orig: 33, 30
-  offset: 0, 0
-  index: -1
 TurboTed/TurboTed_head_1
   rotate: false
-  xy: 455, 655
+  xy: 722, 481
   size: 93, 83
   orig: 93, 83
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_head_2_injured
   rotate: false
-  xy: 573, 702
+  xy: 627, 549
   size: 93, 87
   orig: 93, 87
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_leg_lower_far
-  rotate: false
-  xy: 399, 352
+  rotate: true
+  xy: 509, 359
   size: 49, 64
   orig: 49, 64
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_leg_lower_near_1
-  rotate: false
-  xy: 322, 286
+  rotate: true
+  xy: 241, 372
   size: 49, 66
   orig: 49, 66
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_leg_lower_near_2
-  rotate: false
-  xy: 373, 286
+  rotate: true
+  xy: 575, 359
   size: 49, 64
   orig: 49, 64
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_leg_upper_far
-  rotate: false
-  xy: 969, 306
+  rotate: true
+  xy: 874, 86
   size: 25, 54
   orig: 25, 54
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_leg_upper_near
-  rotate: false
-  xy: 969, 306
+  rotate: true
+  xy: 874, 86
   size: 25, 54
   orig: 25, 54
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_neck
   rotate: true
-  xy: 695, 222
+  xy: 997, 279
   size: 28, 22
   orig: 28, 22
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_torso
-  rotate: false
-  xy: 304, 46
+  rotate: true
+  xy: 830, 357
   size: 50, 60
   orig: 50, 60
   offset: 0, 0
   index: -1
 TurboTed/TurboTed_waist
   rotate: true
-  xy: 854, 424
+  xy: 776, 104
   size: 38, 39
   orig: 38, 39
   offset: 0, 0
   index: -1
 YoungBuck/YoungBuck_arm_lower_near
-  rotate: false
-  xy: 677, 35
+  rotate: true
+  xy: 40, 33
   size: 27, 42
   orig: 85, 69
   offset: 28, 14
   index: -1
 YoungBuck/YoungBuck_arm_upper_far
   rotate: true
-  xy: 733, 385
+  xy: 477, 207
   size: 34, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 YoungBuck/YoungBuck_arm_upper_near
   rotate: true
-  xy: 795, 388
+  xy: 408, 203
   size: 34, 60
   orig: 99, 93
   offset: 32, 16
   index: -1
 YoungBuck/YoungBuck_hand_far_1_fistBack
-  rotate: true
-  xy: 676, 79
+  rotate: false
+  xy: 361, 51
   size: 39, 31
   orig: 67, 53
   offset: 15, 13
   index: -1
 YoungBuck/YoungBuck_hand_near_1_fistBack
   rotate: false
-  xy: 652, 206
+  xy: 512, 77
   size: 39, 36
   orig: 67, 53
   offset: 15, 13
   index: -1
 YoungBuck/YoungBuck_hand_near_2_fistPalm
   rotate: false
-  xy: 787, 134
+  xy: 728, 18
   size: 34, 32
   orig: 67, 53
   offset: 17, 12
   index: -1
 YoungBuck/YoungBuck_head_1
   rotate: true
-  xy: 2, 59
+  xy: 567, 890
   size: 131, 123
   orig: 179, 179
   offset: 30, 10
   index: -1
 YoungBuck/YoungBuck_head_2_injured
-  rotate: false
-  xy: 628, 899
+  rotate: true
+  xy: 692, 890
   size: 131, 123
   orig: 179, 179
   offset: 30, 10
   index: -1
 YoungBuck/YoungBuck_leg_lower_far
   rotate: true
-  xy: 550, 584
+  xy: 956, 777
   size: 35, 65
   orig: 64, 107
   offset: 14, 23
   index: -1
 YoungBuck/YoungBuck_leg_lower_near_1
   rotate: true
-  xy: 962, 526
+  xy: 414, 287
   size: 36, 60
   orig: 64, 107
   offset: 14, 24
   index: -1
 YoungBuck/YoungBuck_leg_lower_near_2
-  rotate: false
-  xy: 482, 375
+  rotate: true
+  xy: 758, 327
   size: 35, 65
   orig: 64, 107
   offset: 14, 23
   index: -1
 YoungBuck/YoungBuck_torso
   rotate: false
-  xy: 419, 839
+  xy: 332, 571
   size: 63, 66
   orig: 169, 149
   offset: 54, 34
   index: -1
 sword_1
   rotate: false
-  xy: 114, 616
+  xy: 956, 814
   size: 25, 207
   orig: 168, 289
   offset: 72, 34
   index: -1
 sword_2_swing
   rotate: false
-  xy: 2, 612
+  xy: 207, 810
   size: 110, 211
   orig: 253, 288
   offset: 72, 33
   index: -1
 sword_3_bigSwing
   rotate: false
-  xy: 2, 825
+  xy: 2, 824
   size: 203, 197
   orig: 333, 289
   offset: 57, 34
+  index: -1
+
+heroes2.png
+size: 1024,64
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+BeardyBuck/BeardyBuck_arm_lower_far
+  rotate: true
+  xy: 424, 29
+  size: 24, 38
+  orig: 85, 69
+  offset: 29, 16
+  index: -1
+YoungBuck/YoungBuck_arm_lower_far
+  rotate: true
+  xy: 424, 29
+  size: 24, 38
+  orig: 85, 69
+  offset: 29, 16
+  index: -1
+Buck/BuckMatthews_arm_lower_far
+  rotate: true
+  xy: 464, 29
+  size: 24, 38
+  orig: 85, 69
+  offset: 29, 16
+  index: -1
+Buck/BuckMatthews_hand_far_2_fistPalm
+  rotate: false
+  xy: 211, 23
+  size: 32, 30
+  orig: 67, 53
+  offset: 18, 13
+  index: -1
+Chuck/ChuckMatthews_arm_lower_far
+  rotate: true
+  xy: 504, 29
+  size: 24, 38
+  orig: 85, 69
+  offset: 29, 16
+  index: -1
+Truck/TruckMatthews_arm_lower_far
+  rotate: true
+  xy: 504, 29
+  size: 24, 38
+  orig: 85, 69
+  offset: 29, 16
+  index: -1
+Chuck/ChuckMatthews_hand_far_1_fistBack
+  rotate: false
+  xy: 279, 25
+  size: 34, 28
+  orig: 67, 53
+  offset: 17, 15
+  index: -1
+Chuck/ChuckMatthews_hand_far_2_fistPalm
+  rotate: false
+  xy: 356, 24
+  size: 32, 29
+  orig: 67, 53
+  offset: 18, 14
+  index: -1
+Chuck/ChuckMatthews_neck
+  rotate: false
+  xy: 472, 6
+  size: 24, 21
+  orig: 43, 36
+  offset: 10, 8
+  index: -1
+Dummy/Dummy_arm_lower_far
+  rotate: true
+  xy: 544, 29
+  size: 24, 38
+  orig: 24, 38
+  offset: 0, 0
+  index: -1
+Dummy/Dummy_hand_2_fistPalm
+  rotate: false
+  xy: 939, 5
+  size: 27, 25
+  orig: 27, 25
+  offset: 0, 0
+  index: -1
+Fletch/Fletch_arm_lower_near
+  rotate: true
+  xy: 315, 29
+  size: 24, 39
+  orig: 84, 67
+  offset: 29, 15
+  index: -1
+Fletch/Fletch_hand_far_2_fistPalm
+  rotate: false
+  xy: 390, 24
+  size: 32, 29
+  orig: 66, 51
+  offset: 17, 12
+  index: -1
+Fletch/Fletch_hand_near_2_fistPalm
+  rotate: false
+  xy: 390, 24
+  size: 32, 29
+  orig: 66, 51
+  offset: 17, 12
+  index: -1
+GabrielCaine/GabrielCaine_arm_lower_far
+  rotate: true
+  xy: 584, 29
+  size: 24, 38
+  orig: 85, 69
+  offset: 29, 16
+  index: -1
+GabrielCaine/GabrielCaine_hand_far_2_fistPalm
+  rotate: false
+  xy: 2, 22
+  size: 32, 31
+  orig: 67, 53
+  offset: 18, 14
+  index: -1
+GabrielCaine/GabrielCaine_hand_near_2_fistPalm
+  rotate: false
+  xy: 36, 22
+  size: 32, 31
+  orig: 67, 53
+  offset: 18, 14
+  index: -1
+MetalMan-Blue/MetalMan-Blue_arm_lower_far
+  rotate: true
+  xy: 624, 29
+  size: 24, 38
+  orig: 24, 38
+  offset: 0, 0
+  index: -1
+MetalMan-Blue/MetalMan-Blue_hand_2_fistPalm
+  rotate: false
+  xy: 315, 2
+  size: 27, 25
+  orig: 27, 25
+  offset: 0, 0
+  index: -1
+PamelaFrost-02/PamelaFrost-02_hand_far_2_fistPalm
+  rotate: true
+  xy: 664, 22
+  size: 31, 29
+  orig: 67, 53
+  offset: 18, 14
+  index: -1
+PamelaFrost-02/PamelaFrost-02_hand_near_2_fistPalm
+  rotate: true
+  xy: 664, 22
+  size: 31, 29
+  orig: 67, 53
+  offset: 18, 14
+  index: -1
+PamelaFrost-03/PamelaFrost-03_arm_lower_far
+  rotate: true
+  xy: 939, 32
+  size: 21, 38
+  orig: 85, 69
+  offset: 31, 16
+  index: -1
+PamelaFrost-04/PamelaFrost-04_arm_lower_far
+  rotate: true
+  xy: 939, 32
+  size: 21, 38
+  orig: 85, 69
+  offset: 31, 16
+  index: -1
+PamelaFrost/PamelaFrost_arm_lower_far
+  rotate: true
+  xy: 939, 32
+  size: 21, 38
+  orig: 85, 69
+  offset: 31, 16
+  index: -1
+PamelaFrost-03/PamelaFrost-03_hand_far_2_fistPalm
+  rotate: true
+  xy: 849, 23
+  size: 30, 28
+  orig: 67, 53
+  offset: 19, 14
+  index: -1
+PamelaFrost-03/PamelaFrost-03_hand_near_2_fistPalm
+  rotate: true
+  xy: 695, 22
+  size: 31, 29
+  orig: 67, 53
+  offset: 18, 14
+  index: -1
+PamelaFrost-04/PamelaFrost-04_hand_far_2_fistPalm
+  rotate: true
+  xy: 819, 22
+  size: 31, 28
+  orig: 67, 53
+  offset: 18, 14
+  index: -1
+PamelaFrost-04/PamelaFrost-04_hand_near_2_fistPalm
+  rotate: true
+  xy: 726, 22
+  size: 31, 29
+  orig: 67, 53
+  offset: 18, 14
+  index: -1
+PamelaFrost-05/PamelaFrost-05_hand_far_1_fistBack
+  rotate: false
+  xy: 139, 24
+  size: 34, 29
+  orig: 67, 53
+  offset: 17, 15
+  index: -1
+PamelaFrost-05/PamelaFrost-05_hand_far_2_fistPalm
+  rotate: true
+  xy: 879, 23
+  size: 30, 28
+  orig: 67, 53
+  offset: 19, 14
+  index: -1
+PamelaFrost-05/PamelaFrost-05_hand_near_2_fistPalm
+  rotate: true
+  xy: 757, 22
+  size: 31, 29
+  orig: 67, 53
+  offset: 18, 14
+  index: -1
+PamelaFrost-05/PamelaFrost-05_neck
+  rotate: false
+  xy: 424, 4
+  size: 22, 23
+  orig: 43, 36
+  offset: 11, 9
+  index: -1
+PamelaFrost/PamelaFrost_hand_far_2_fistPalm
+  rotate: true
+  xy: 909, 23
+  size: 30, 28
+  orig: 67, 53
+  offset: 19, 14
+  index: -1
+PamelaFrost/PamelaFrost_hand_near_2_fistPalm
+  rotate: true
+  xy: 788, 22
+  size: 31, 29
+  orig: 67, 53
+  offset: 18, 14
+  index: -1
+PamelaFrost/PamelaFrost_neck
+  rotate: false
+  xy: 448, 4
+  size: 22, 23
+  orig: 43, 36
+  offset: 11, 9
+  index: -1
+StumpyPete/StumpyPete_hand_far_2_fistPalm
+  rotate: false
+  xy: 175, 24
+  size: 34, 29
+  orig: 67, 53
+  offset: 18, 15
+  index: -1
+StumpyPete/StumpyPete_hand_near_2_fistPalm
+  rotate: false
+  xy: 175, 24
+  size: 34, 29
+  orig: 67, 53
+  offset: 18, 15
+  index: -1
+StumpyPete/StumpyPete_neck
+  rotate: false
+  xy: 979, 26
+  size: 26, 27
+  orig: 43, 36
+  offset: 9, 6
+  index: -1
+Truck/TruckMatthews_hand_far_2_fistPalm
+  rotate: false
+  xy: 245, 23
+  size: 32, 30
+  orig: 67, 53
+  offset: 18, 13
+  index: -1
+Truck/TruckMatthews_hand_near_2_fistPalm
+  rotate: false
+  xy: 70, 22
+  size: 32, 31
+  orig: 67, 53
+  offset: 18, 13
+  index: -1
+Truck/TruckMatthews_neck
+  rotate: false
+  xy: 498, 6
+  size: 24, 21
+  orig: 43, 36
+  offset: 10, 8
+  index: -1
+TurboTed/TurboTed_hand_2_fistPalm
+  rotate: false
+  xy: 104, 23
+  size: 33, 30
+  orig: 33, 30
+  offset: 0, 0
   index: -1

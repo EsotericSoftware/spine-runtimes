@@ -102,6 +102,7 @@ module spine.webgl {
 				let slots = skeleton.slots;
 				for (let i = 0, n = slots.length; i < n; i++) {
 					let slot = slots[i];
+					if (!slot.bone.active) continue;
 					let attachment = slot.getAttachment();
 					if (!(attachment instanceof MeshAttachment)) continue;
 					let mesh = <MeshAttachment>attachment;
@@ -151,6 +152,7 @@ module spine.webgl {
 				let slots = skeleton.slots;
 				for (let i = 0, n = slots.length; i < n; i++) {
 					let slot = slots[i];
+					if (!slot.bone.active) continue;
 					let attachment = slot.getAttachment();
 					if (!(attachment instanceof PathAttachment)) continue;
 					let path = <PathAttachment>attachment;
@@ -199,6 +201,7 @@ module spine.webgl {
 				shapes.setColor(this.clipColor)
 				for (let i = 0, n = slots.length; i < n; i++) {
 					let slot = slots[i];
+					if (!slot.bone.active) continue;
 					let attachment = slot.getAttachment();
 					if (!(attachment instanceof ClippingAttachment)) continue;
 					let clip = <ClippingAttachment>attachment;

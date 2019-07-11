@@ -25,6 +25,8 @@ Material:
     m_Floats:
     - _Cutoff: 0.1
     - _FillPhase: 0
+    - _StencilComp: 8
+    - _StencilRef: 1
     - _StraightAlphaInput: 0
     m_Colors:
     - _FillColor: {r: 1, g: 1, b: 1, a: 1}

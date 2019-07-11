@@ -26,50 +26,50 @@ eyes
   offset: 0, 0
   index: -1
 fingers
-  rotate: false
-  xy: 877, 214
+  rotate: true
+  xy: 643, 183
   size: 31, 33
   orig: 31, 33
   offset: 0, 0
   index: -1
 foot1
   rotate: false
-  xy: 743, 205
+  xy: 863, 205
   size: 50, 42
   orig: 50, 42
   offset: 0, 0
   index: -1
 foot2
   rotate: false
-  xy: 688, 209
+  xy: 915, 209
   size: 53, 38
   orig: 53, 38
   offset: 0, 0
   index: -1
 forearm1
-  rotate: false
-  xy: 795, 198
+  rotate: true
+  xy: 970, 206
   size: 41, 49
   orig: 41, 49
   offset: 0, 0
   index: -1
 forearm2
-  rotate: false
-  xy: 910, 215
+  rotate: true
+  xy: 423, 79
   size: 31, 32
   orig: 31, 32
   offset: 0, 0
   index: -1
 hand1
   rotate: false
-  xy: 838, 199
+  xy: 140, 24
   size: 37, 48
   orig: 37, 48
   offset: 0, 0
   index: -1
 hand2
-  rotate: false
-  xy: 286, 49
+  rotate: true
+  xy: 604, 183
   size: 31, 37
   orig: 31, 37
   offset: 0, 0
@@ -103,8 +103,8 @@ shin1
   offset: 0, 0
   index: -1
 shin2
-  rotate: false
-  xy: 192, 32
+  rotate: true
+  xy: 807, 196
   size: 51, 54
   orig: 51, 54
   offset: 0, 0
@@ -131,15 +131,15 @@ thigh2
   offset: 0, 0
   index: -1
 upper-arm1
-  rotate: false
-  xy: 140, 16
+  rotate: true
+  xy: 749, 197
   size: 50, 56
   orig: 50, 56
   offset: 0, 0
   index: -1
 upper-arm2
-  rotate: false
-  xy: 245, 27
+  rotate: true
+  xy: 688, 208
   size: 39, 59
   orig: 39, 59
   offset: 0, 0

@@ -29,6 +29,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 namespace Spine.Unity.Modules.AttachmentTools {
 	public static class AttachmentRegionExtensions {
@@ -414,7 +415,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 				var originalAttachment = sourceAttachments[i];
 				
 				if (IsRenderable(originalAttachment)) {
-					var newAttachment = originalAttachment.GetClone(true);
+					var newAttachment = originalAttachment.GetCopy(true);
 					var region = newAttachment.GetRegion();
 					int existingIndex;
 					if (existingRegions.TryGetValue(region, out existingIndex)) {
@@ -429,7 +430,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 					outputAttachments[i] = newAttachment;
 				} else {
-					outputAttachments[i] = useOriginalNonrenderables ? originalAttachment : originalAttachment.GetClone(true);
+					outputAttachments[i] = useOriginalNonrenderables ? originalAttachment : originalAttachment.GetCopy(true);
 					regionIndexes.Add(NonrenderingRegion); // Output attachments pairs with regionIndexes list 1:1. Pad with a sentinel if the attachment doesn't have a region.
 				}
 			}
@@ -503,13 +504,14 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var texturesToPack = new List<Texture2D>();
 			var originalRegions = new List<AtlasRegion>();
 			int newRegionIndex = 0;
-			foreach (var skinEntry in skinAttachments) {
-				var originalKey = skinEntry.Key;
-				var originalAttachment = skinEntry.Value;
+			
+			foreach (DictionaryEntry skinEntry in skinAttachments) {
+				var originalKey = (Skin.SkinEntry)skinEntry.Key;
+				var originalAttachment = (Attachment)skinEntry.Value;
 
 				Attachment newAttachment;
 				if (IsRenderable(originalAttachment)) {
-					newAttachment = originalAttachment.GetClone(true);
+					newAttachment = originalAttachment.GetCopy(true);
 					var region = newAttachment.GetRegion();
 					int existingIndex;
 					if (existingRegions.TryGetValue(region, out existingIndex)) {
@@ -523,9 +525,9 @@ namespace Spine.Unity.Modules.AttachmentTools {
 					}
 
 					repackedAttachments.Add(newAttachment);
-					newSkin.AddAttachment(originalKey.slotIndex, originalKey.name, newAttachment);
+					newSkin.SetAttachment(originalKey.SlotIndex, originalKey.Name, newAttachment);
 				} else {
-					newSkin.AddAttachment(originalKey.slotIndex, originalKey.name, useOriginalNonrenderables ? originalAttachment : originalAttachment.GetClone(true));
+					newSkin.SetAttachment(originalKey.SlotIndex, originalKey.Name, useOriginalNonrenderables ? originalAttachment : originalAttachment.GetCopy(true));
 				}	
 			}
 
@@ -793,7 +795,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			var newSkin = new Skin(original.name + " clone");
 			var newSkinAttachments = newSkin.Attachments;
 
-			foreach (var a in original.Attachments)
+			foreach (DictionaryEntry a in original.Attachments)
 				newSkinAttachments[a.Key] = a.Value;
 
 			return newSkin;
@@ -804,7 +806,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			int slotIndex = skeleton.FindSlotIndex(slotName);
 			if (skeleton == null) throw new System.ArgumentNullException("skeleton", "skeleton cannot be null.");
 			if (slotIndex == -1) throw new System.ArgumentException(string.Format("Slot '{0}' does not exist in skeleton.", slotName), "slotName");
-			skin.AddAttachment(slotIndex, keyName, attachment);
+			skin.SetAttachment(slotIndex, keyName, attachment);
 		}
 
 		/// <summary>Adds skin items from another skin. For items that already exist, the previous values are replaced.</summary>
@@ -823,7 +825,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 		/// <summary>Adds an attachment to the skin for the specified slot index and name. If the name already exists for the slot, the previous value is replaced.</summary>
 		public static void SetAttachment (this Skin skin, int slotIndex, string keyName, Attachment attachment) {
-			skin.AddAttachment(slotIndex, keyName, attachment);
+			skin.SetAttachment(slotIndex, keyName, attachment);
 		}
 		
 		public static void RemoveAttachment (this Skin skin, string slotName, string keyName, SkeletonData skeletonData) {
@@ -848,21 +850,21 @@ namespace Spine.Unity.Modules.AttachmentTools {
 
 			if (cloneAttachments) {
 				if (overwrite) {
-					foreach (var e in sourceAttachments)
-						destinationAttachments[e.Key] = e.Value.GetClone(cloneMeshesAsLinked);
+					foreach (DictionaryEntry e in sourceAttachments)
+						destinationAttachments[e.Key] = ((Attachment)e.Value).GetCopy(cloneMeshesAsLinked);
 				} else {
-					foreach (var e in sourceAttachments) {
-						if (destinationAttachments.ContainsKey(e.Key)) continue;
-						destinationAttachments.Add(e.Key, e.Value.GetClone(cloneMeshesAsLinked));
+					foreach (DictionaryEntry e in sourceAttachments) {
+						if (destinationAttachments.Contains(e.Key)) continue;
+						destinationAttachments.Add(e.Key, ((Attachment)e.Value).GetCopy(cloneMeshesAsLinked));
 					}
 				}
 			} else {
 				if (overwrite) {
-					foreach (var e in sourceAttachments)
+					foreach (DictionaryEntry e in sourceAttachments)
 						destinationAttachments[e.Key] = e.Value;
 				} else {
-					foreach (var e in sourceAttachments) {
-						if (destinationAttachments.ContainsKey(e.Key)) continue;
+					foreach (DictionaryEntry e in sourceAttachments) {
+						if (destinationAttachments.Contains(e.Key)) continue;
 						destinationAttachments.Add(e.Key, e.Value);
 					}
 				}
@@ -875,213 +877,40 @@ namespace Spine.Unity.Modules.AttachmentTools {
 	public static class AttachmentCloneExtensions {
 		/// <summary>
 		/// Clones the attachment.</summary>
-		public static Attachment GetClone (this Attachment o, bool cloneMeshesAsLinked) {
-			var regionAttachment = o as RegionAttachment;
-			if (regionAttachment != null)
-				return regionAttachment.GetClone();			
-
+		public static Attachment GetCopy (this Attachment o, bool cloneMeshesAsLinked) {
 			var meshAttachment = o as MeshAttachment;
-			if (meshAttachment != null)
-				return cloneMeshesAsLinked ? meshAttachment.GetLinkedClone() : meshAttachment.GetClone();
-
-			var boundingBoxAttachment = o as BoundingBoxAttachment;
-			if (boundingBoxAttachment != null)
-				return boundingBoxAttachment.GetClone();
-
-			var pathAttachment = o as PathAttachment;
-			if (pathAttachment != null)
-				return pathAttachment.GetClone();
-
-			var pointAttachment = o as PointAttachment;
-			if (pointAttachment != null)
-				return pointAttachment.GetClone();
-
-			var clippingAttachment = o as ClippingAttachment;
-			if (clippingAttachment != null)
-				return clippingAttachment.GetClone();
-
-			return null;
+			if (meshAttachment != null && cloneMeshesAsLinked)
+				return meshAttachment.NewLinkedMesh();
+			return o.Copy();
 		}
-
-		public static RegionAttachment GetClone (this RegionAttachment o) {
-			return new RegionAttachment(o.Name) {
-				x = o.x,
-				y = o.y,
-				rotation = o.rotation,
-				scaleX = o.scaleX,
-				scaleY = o.scaleY,
-				width = o.width,
-				height = o.height,
-
-				r = o.r,
-				g = o.g,
-				b = o.b,
-				a = o.a,
-
-				Path = o.Path,
-				RendererObject = o.RendererObject,
-				regionOffsetX = o.regionOffsetX,
-				regionOffsetY = o.regionOffsetY,
-				regionWidth = o.regionWidth,
-				regionHeight = o.regionHeight,
-				regionOriginalWidth = o.regionOriginalWidth,
-				regionOriginalHeight = o.regionOriginalHeight,
-				uvs = o.uvs.Clone() as float[],
-				offset = o.offset.Clone() as float[]
-			};
-		}
-
-		public static ClippingAttachment GetClone (this ClippingAttachment o) {
-			var ca = new ClippingAttachment(o.Name) {
-				endSlot = o.endSlot
-			};
-			CloneVertexAttachment(o, ca);
-			return ca;
-		}
-
-		public static PointAttachment GetClone (this PointAttachment o) {
-			var pa = new PointAttachment(o.Name) {
-				rotation = o.rotation,
-				x = o.x,
-				y = o.y
-			};
-			return pa;
-		}
-
-		public static BoundingBoxAttachment GetClone (this BoundingBoxAttachment o) {
-			var ba = new BoundingBoxAttachment(o.Name);
-			CloneVertexAttachment(o, ba);
-			return ba;
-		}
-
-		public static MeshAttachment GetLinkedClone (this MeshAttachment o, bool inheritDeform = true) {
-			return o.GetLinkedMesh(o.Name, o.RendererObject as AtlasRegion, inheritDeform, copyOriginalProperties: true);
-		}
-
-		/// <summary>
-		/// Returns a clone of the MeshAttachment. This will cause Deform animations to stop working unless you explicity set the .parentMesh to the original.</summary>
-		public static MeshAttachment GetClone (this MeshAttachment o) {
-			var ma = new MeshAttachment(o.Name) {
-				r = o.r,
-				g = o.g,
-				b = o.b,
-				a = o.a,
-
-				inheritDeform = o.inheritDeform,
-
-				Path = o.Path,
-				RendererObject = o.RendererObject,
-
-				regionOffsetX = o.regionOffsetX,
-				regionOffsetY = o.regionOffsetY,
-				regionWidth = o.regionWidth,
-				regionHeight = o.regionHeight,
-				regionOriginalWidth = o.regionOriginalWidth,
-				regionOriginalHeight = o.regionOriginalHeight,
-				RegionU = o.RegionU,
-				RegionV = o.RegionV,
-				RegionU2 = o.RegionU2,
-				RegionV2 = o.RegionV2,
-				RegionRotate = o.RegionRotate,
-				uvs = o.uvs.Clone() as float[]
-			};
-
-			// Linked mesh
-			if (o.ParentMesh != null) {
-				// bones, vertices, worldVerticesLength, regionUVs, triangles, HullLength, Edges, Width, Height
-				ma.ParentMesh = o.ParentMesh;
-			} else {
-				CloneVertexAttachment(o, ma); // bones, vertices, worldVerticesLength
-				ma.regionUVs = o.regionUVs.Clone() as float[];
-				ma.triangles = o.triangles.Clone() as int[];
-				ma.hulllength = o.hulllength;
-
-				// Nonessential.
-				ma.Edges = (o.Edges == null) ? null : o.Edges.Clone() as int[]; // Allow absence of Edges array when nonessential data is not exported.
-				ma.Width = o.Width;
-				ma.Height = o.Height;
-			}
-
-			return ma;
-		}
-
-		public static PathAttachment GetClone (this PathAttachment o) {
-			var newPathAttachment = new PathAttachment(o.Name) {
-				lengths = o.lengths.Clone() as float[],
-				closed = o.closed,
-				constantSpeed = o.constantSpeed
-			};
-			CloneVertexAttachment(o, newPathAttachment);
-
-			return newPathAttachment;
-		}
-
-		static void CloneVertexAttachment (VertexAttachment src, VertexAttachment dest) {
-			dest.worldVerticesLength = src.worldVerticesLength;
-			if (src.bones != null)
-				dest.bones = src.bones.Clone() as int[];
-
-			if (src.vertices != null)
-				dest.vertices = src.vertices.Clone() as float[];
-		}
-
 
 		#region Runtime Linked MeshAttachments
 		/// <summary>
 		/// Returns a new linked mesh linked to this MeshAttachment. It will be mapped to the AtlasRegion provided.</summary>
-		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, string newLinkedMeshName, AtlasRegion region, bool inheritDeform = true, bool copyOriginalProperties = false) {
-			//if (string.IsNullOrEmpty(attachmentName)) throw new System.ArgumentException("attachmentName cannot be null or empty", "attachmentName");
+		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, string newLinkedMeshName, AtlasRegion region) {
 			if (region == null) throw new System.ArgumentNullException("region");
-
-			// If parentMesh is a linked mesh, create a link to its parent. Preserves Deform animations.
-			if (o.ParentMesh != null)
-				o = o.ParentMesh;
-
-			// 1. NewMeshAttachment (AtlasAttachmentLoader.cs)
-			var mesh = new MeshAttachment(newLinkedMeshName);
+			MeshAttachment mesh = o.NewLinkedMesh();
 			mesh.SetRegion(region, false);
-
-			// 2. (SkeletonJson.cs::ReadAttachment. case: LinkedMesh)
-			mesh.Path = newLinkedMeshName;
-			if (copyOriginalProperties) {
-				mesh.r = o.r;
-				mesh.g = o.g;
-				mesh.b = o.b;
-				mesh.a = o.a;
-			} else {
-				mesh.r = 1f;
-				mesh.g = 1f;
-				mesh.b = 1f;
-				mesh.a = 1f;
-			}
-			
-			//mesh.ParentMesh property call below sets mesh.Width and mesh.Height
-
-			// 3. Link mesh with parent. (SkeletonJson.cs)
-			mesh.inheritDeform = inheritDeform;
-			mesh.ParentMesh = o;
-			mesh.UpdateUVs();
-
 			return mesh;
 		}
 
 		/// <summary>
 		/// Returns a new linked mesh linked to this MeshAttachment. It will be mapped to an AtlasRegion generated from a Sprite. The AtlasRegion will be mapped to a new Material based on the shader.
 		/// For better caching and batching, use GetLinkedMesh(string, AtlasRegion, bool)</summary>
-		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, Sprite sprite, Shader shader, bool inheritDeform = true, Material materialPropertySource = null) {
+		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, Sprite sprite, Shader shader, Material materialPropertySource = null) {
 			var m = new Material(shader);
 			if (materialPropertySource != null) {
 				m.CopyPropertiesFromMaterial(materialPropertySource);
 				m.shaderKeywords = materialPropertySource.shaderKeywords;
 			}
-			return o.GetLinkedMesh(sprite.name, sprite.ToAtlasRegion(), inheritDeform);
+			return o.GetLinkedMesh(sprite.name, sprite.ToAtlasRegion());
 		}
 
 		/// <summary>
 		/// Returns a new linked mesh linked to this MeshAttachment. It will be mapped to an AtlasRegion generated from a Sprite. The AtlasRegion will be mapped to a new Material based on the shader.
 		/// For better caching and batching, use GetLinkedMesh(string, AtlasRegion, bool)</summary>
-		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, Sprite sprite, Material materialPropertySource, bool inheritDeform = true) {
-			return o.GetLinkedMesh(sprite, materialPropertySource.shader, inheritDeform, materialPropertySource);
+		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, Sprite sprite, Material materialPropertySource) {
+			return o.GetLinkedMesh(sprite, materialPropertySource.shader, materialPropertySource);
 		}
 		#endregion
 
@@ -1111,7 +940,7 @@ namespace Spine.Unity.Modules.AttachmentTools {
 		public static Attachment GetRemappedClone (this Attachment o, AtlasRegion atlasRegion, bool cloneMeshAsLinked = true, bool useOriginalRegionSize = false, float scale = 0.01f) {
 			var regionAttachment = o as RegionAttachment;
 			if (regionAttachment != null) {
-				RegionAttachment newAttachment = regionAttachment.GetClone();
+				RegionAttachment newAttachment = (RegionAttachment)regionAttachment.Copy();
 				newAttachment.SetRegion(atlasRegion, false);
 				if (!useOriginalRegionSize) {
 					newAttachment.width = atlasRegion.width * scale;
@@ -1122,13 +951,13 @@ namespace Spine.Unity.Modules.AttachmentTools {
 			} else {
 				var meshAttachment = o as MeshAttachment;
 				if (meshAttachment != null) {
-					MeshAttachment newAttachment = cloneMeshAsLinked ? meshAttachment.GetLinkedClone(cloneMeshAsLinked) : meshAttachment.GetClone();
+					MeshAttachment newAttachment = cloneMeshAsLinked ? meshAttachment.NewLinkedMesh() : (MeshAttachment)meshAttachment.Copy();
 					newAttachment.SetRegion(atlasRegion);
 					return newAttachment;
 				}
 			}
 
-			return o.GetClone(true); // Non-renderable Attachments will return as normal cloned attachments.
+			return o.GetCopy(true); // Non-renderable Attachments will return as normal cloned attachments.
 		}
 		#endregion
 	}

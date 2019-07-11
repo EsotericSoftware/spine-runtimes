@@ -128,7 +128,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		if (!attachment) continue;
 
 		// Early out if slot is invisible
-		if (slot->color.a == 0) {
+		if (slot->color.a == 0 || !slot->bone->active) {
 			spSkeletonClipping_clipEnd(clipper, slot);
 			continue;
 		}
@@ -256,11 +256,11 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		if (vertexEffect != 0) {
 			spFloatArray_clear(tempUvs);
 			spColorArray_clear(tempColors);
-			for (int i = 0; i < verticesCount; i++) {
+			for (int j = 0; j < verticesCount; j++) {
 				spColor vertexColor = light;
 				spColor dark;
 				dark.r = dark.g = dark.b = dark.a = 0;
-				int index = i << 1;
+				int index = j << 1;
 				float x = vertices[index];
 				float y = vertices[index + 1];
 				float u = uvs[index];
@@ -273,8 +273,8 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 				spColorArray_add(tempColors, vertexColor);
 			}
 
-			for (int i = 0; i < indicesCount; ++i) {
-				int index = indices[i] << 1;
+			for (int j = 0; j < indicesCount; ++j) {
+				int index = indices[j] << 1;
 				vertex.position.x = vertices[index];
 				vertex.position.y = vertices[index + 1];
 				vertex.texCoords.x = uvs[index] * size.x;
@@ -287,8 +287,8 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 				vertexArray->append(vertex);
 			}
 		} else {
-			for (int i = 0; i < indicesCount; ++i) {
-				int index = indices[i] << 1;
+			for (int j = 0; j < indicesCount; ++j) {
+				int index = indices[j] << 1;
 				vertex.position.x = vertices[index];
 				vertex.position.y = vertices[index + 1];
 				vertex.texCoords.x = uvs[index] * size.x;

@@ -34,6 +34,7 @@ local math_sqrt = math.sqrt
 local math_acos = math.acos
 local math_sin = math.sin
 local math_cos = math.cos
+local math_min = math.min
 local table_insert = table.insert
 local math_deg = math.deg
 local math_rad = math.rad
@@ -51,9 +52,11 @@ function IkConstraint.new (data, skeleton)
 		bones = {},
 		target = nil,
 		mix = data.mix,
+    softness = data.softness,
 		compress = data.compress,
 		stretch = data.stretch,
 		bendDirection = data.bendDirection,
+    active = false
 	}
 	setmetatable(self, IkConstraint)
 
@@ -77,7 +80,7 @@ function IkConstraint:update ()
 	if boneCount == 1 then
 		self:apply1(bones[1], target.worldX, target.worldY, self.compress, self.stretch, self.data.uniform, self.mix)
 	elseif boneCount == 2 then
-		self:apply2(bones[1], bones[2], target.worldX, target.worldY, self.bendDirection, self.stretch, self.mix)
+		self:apply2(bones[1], bones[2], target.worldX, target.worldY, self.bendDirection, self.stretch, self.softness, self.mix)
 	end
 end
 
@@ -110,7 +113,7 @@ function IkConstraint:apply1 (bone, targetX, targetY, compress, stretch, uniform
 	bone:updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY)
 end
 
-function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch, alpha)
+function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch, softness, alpha)
 	if alpha == 0 then
 		child:updateWorldTransform()
 		return
@@ -168,19 +171,36 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 	c = pp.c
 	d = pp.d
 	local id = 1 / (a * d - b * c)
-	local x = targetX - pp.worldX
-	local y = targetY - pp.worldY
-	local tx = (x * d - y * b) * id - px
-	local ty = (y * a - x * c) * id - py
-	local dd = tx * tx + ty * ty
-	x = cwx - pp.worldX
-	y = cwy - pp.worldY
-	local dx = (x * d - y * b) * id - px
-	local dy = (y * a - x * c) * id - py
-	local l1 = math_sqrt(dx * dx + dy * dy)
-	local l2 = child.data.length * csx
-	local a1 = 0
-	local a2 = 0
+  local x = cwx - pp.worldX
+  local y = cwy - pp.worldY
+  local dx = (x * d - y * b) * id - px
+  local dy = (y * a - x * c) * id - py
+  local l1 = math_sqrt(dx * dx + dy * dy)
+  local l2 = child.data.length * csx
+  local a1 = 0
+  local a2 = 0
+  if l1 < 0.0001 then
+    self:apply1(parent, targetX, targetY, false, stretch, false, alpha)
+    child:updateWorldTransformWith(cx, cy, 0, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY)
+    return
+  end
+  x = targetX - pp.worldX
+  y = targetY - pp.worldY
+  local tx = (x * d - y * b) * id - px
+  local ty = (y * a - x * c) * id - py
+  local dd = tx * tx + ty * ty
+  if softness ~= 0 then
+    softness = softness * (psx * (csx + 1) / 2)
+    local td = math_sqrt(dd)
+    local sd = td - l1 - l2 * psx + softness
+    if sd > 0 then
+      local p = math_min(1, sd / (softness * 2)) - 1
+      p = (sd - softness * (1 - p * p)) / td
+      tx = tx - p * tx
+      ty = ty - p * ty
+      dd = tx * tx + ty * ty
+    end
+  end
 
 	if u then
 		l2 = l2 * psx

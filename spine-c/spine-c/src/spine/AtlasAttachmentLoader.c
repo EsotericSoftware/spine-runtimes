@@ -67,6 +67,7 @@ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loa
 		attachment->regionU2 = region->u2;
 		attachment->regionV2 = region->v2;
 		attachment->regionRotate = region->rotate;
+		attachment->regionDegrees = region->degrees;
 		attachment->regionOffsetX = region->offsetX;
 		attachment->regionOffsetY = region->offsetY;
 		attachment->regionWidth = region->width;
@@ -80,7 +81,7 @@ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loa
 	case SP_ATTACHMENT_PATH:
 		return SUPER(SUPER(spPathAttachment_create(name)));
 	case SP_ATTACHMENT_POINT:
-		return SUPER(SUPER(spPointAttachment_create(name)));
+		return SUPER(spPointAttachment_create(name));
 	case SP_ATTACHMENT_CLIPPING:
 		return SUPER(SUPER(spClippingAttachment_create(name)));
 	default:

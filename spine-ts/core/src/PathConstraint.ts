@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 module spine {
-	export class PathConstraint implements Constraint {
+	export class PathConstraint implements Updatable {
 		static NONE = -1; static BEFORE = -2; static AFTER = -3;
 		static epsilon = 0.00001;
 
@@ -40,6 +40,8 @@ module spine {
 		spaces = new Array<number>(); positions = new Array<number>();
 		world = new Array<number>(); curves = new Array<number>(); lengths = new Array<number>();
 		segments = new Array<number>();
+
+		active = false;
 
 		constructor (data: PathConstraintData, skeleton: Skeleton) {
 			if (data == null) throw new Error("data cannot be null.");
@@ -53,6 +55,10 @@ module spine {
 			this.spacing = data.spacing;
 			this.rotateMix = data.rotateMix;
 			this.translateMix = data.translateMix;
+		}
+
+		isActive () {
+			return this.active;
 		}
 
 		apply () {
@@ -416,10 +422,6 @@ module spine {
 				else
 					out[o + 2] = Math.atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 			}
-		}
-
-		getOrder () {
-			return this.data.order;
 		}
 	}
 }

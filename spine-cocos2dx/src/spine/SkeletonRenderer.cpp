@@ -315,7 +315,7 @@ namespace spine {
 			}
 
 			// Early exit if slot is invisible
-			if (slot->getColor().a == 0) {
+			if (slot->getColor().a == 0 || !slot->getBone().isActive()) {
 				_clipper->clipEnd(*slot);
 				continue;
 			}
@@ -649,12 +649,14 @@ namespace spine {
 			V3F_C4B_T2F_Quad quad;
 			for (int i = 0, n = _skeleton->getSlots().size(); i < n; i++) {
 				Slot* slot = _skeleton->getDrawOrder()[i];
-				if (!slot->getAttachment() || !slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) {
-					continue;
-				}
+				
+				if (!slot->getBone().isActive()) continue;
+				if (!slot->getAttachment() || !slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) continue;
+
 				if (slotIsOutRange(*slot, _startSlotIndex, _endSlotIndex)) {
 					continue;
 				}
+
 				RegionAttachment* attachment = (RegionAttachment*)slot->getAttachment();
 				float worldVertices[8];
 				attachment->computeWorldVertices(slot->getBone(), worldVertices, 0, 2);
@@ -674,6 +676,7 @@ namespace spine {
 			glLineWidth(2);
 			for (int i = 0, n = _skeleton->getBones().size(); i < n; i++) {
 				Bone *bone = _skeleton->getBones()[i];
+				if (!bone->isActive()) continue;
 				float x = bone->getData().getLength() * bone->getA() + bone->getWorldX();
 				float y = bone->getData().getLength() * bone->getC() + bone->getWorldY();
 				drawNode->drawLine(Vec2(bone->getWorldX(), bone->getWorldY()), Vec2(x, y), Color4F::RED);
@@ -682,6 +685,7 @@ namespace spine {
 			auto color = Color4F::BLUE; // Root bone is blue.
 			for (int i = 0, n = _skeleton->getBones().size(); i < n; i++) {
 				Bone *bone = _skeleton->getBones()[i];
+				if (!bone->isActive()) continue;
 				drawNode->drawPoint(Vec2(bone->getWorldX(), bone->getWorldY()), 4, color);
 				if (i == 0) color = Color4F::GREEN;
 			}
@@ -692,6 +696,7 @@ namespace spine {
 			glLineWidth(1);
 			for (int i = 0, n = _skeleton->getSlots().size(); i < n; ++i) {
 				Slot* slot = _skeleton->getDrawOrder()[i];
+				if (!slot->getBone().isActive()) continue;
 				if (!slot->getAttachment() || !slot->getAttachment()->getRTTI().isExactly(MeshAttachment::rtti)) continue;
 				MeshAttachment* const mesh = static_cast<MeshAttachment*>(slot->getAttachment());
 				VLA(float, worldCoord, mesh->getWorldVerticesLength());

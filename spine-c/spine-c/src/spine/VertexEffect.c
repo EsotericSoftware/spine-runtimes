@@ -92,6 +92,7 @@ void _spSwirlVertexEffect_transform(spVertexEffect* self, float* positionX, floa
 }
 
 void _spSwirlVertexEffect_end(spVertexEffect* self) {
+	UNUSED(self);
 }
 
 spSwirlVertexEffect* spSwirlVertexEffect_create(float radius) {

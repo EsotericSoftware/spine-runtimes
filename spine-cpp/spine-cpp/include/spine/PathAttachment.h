@@ -48,7 +48,8 @@ namespace spine {
         void setClosed(bool inValue);
         bool isConstantSpeed();
         void setConstantSpeed(bool inValue);
-        
+
+		virtual Attachment* copy();
     private:
         Vector<float> _lengths;
         bool _closed;

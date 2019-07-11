@@ -54,7 +54,7 @@ public class Bone implements Updatable {
 	float a, b, worldX;
 	float c, d, worldY;
 
-	boolean sorted;
+	boolean sorted, active;
 
 	/** @param parent May be null. */
 	public Bone (BoneData data, Skeleton skeleton, Bone parent) {
@@ -114,8 +114,8 @@ public class Bone implements Updatable {
 			Skeleton skeleton = this.skeleton;
 			float rotationY = rotation + 90 + shearY, sx = skeleton.scaleX, sy = skeleton.scaleY;
 			a = cosDeg(rotation + shearX) * scaleX * sx;
-			b = cosDeg(rotationY) * scaleY * sy;
-			c = sinDeg(rotation + shearX) * scaleX * sx;
+			b = cosDeg(rotationY) * scaleY * sx;
+			c = sinDeg(rotation + shearX) * scaleX * sy;
 			d = sinDeg(rotationY) * scaleY * sy;
 			worldX = x * sx + skeleton.x;
 			worldY = y * sy + skeleton.y;
@@ -235,6 +235,12 @@ public class Bone implements Updatable {
 		return children;
 	}
 
+	/** Returns false when the bone has not been computed because {@link BoneData#getSkinRequired()} is true and the
+	 * {@link Skeleton#getSkin() active skin} does not {@link Skin#getBones() contain} this bone. */
+	public boolean isActive () {
+		return active;
+	}
+
 	// -- Local transform
 
 	/** The local x translation. */
@@ -260,7 +266,7 @@ public class Bone implements Updatable {
 		this.y = y;
 	}
 
-	/** The local rotation. */
+	/** The local rotation in degrees, counter clockwise. */
 	public float getRotation () {
 		return rotation;
 	}
@@ -335,7 +341,7 @@ public class Bone implements Updatable {
 		this.ay = ay;
 	}
 
-	/** The applied local rotation. */
+	/** The applied local rotation in degrees, counter clockwise. */
 	public float getARotation () {
 		return arotation;
 	}
@@ -532,6 +538,7 @@ public class Bone implements Updatable {
 
 	/** Transforms a point from world coordinates to the bone's local coordinates. */
 	public Vector2 worldToLocal (Vector2 world) {
+		if (world == null) throw new IllegalArgumentException("world cannot be null.");
 		float invDet = 1 / (a * d - b * c);
 		float x = world.x - worldX, y = world.y - worldY;
 		world.x = x * d * invDet - y * b * invDet;
@@ -541,6 +548,7 @@ public class Bone implements Updatable {
 
 	/** Transforms a point from the bone's local coordinates to world coordinates. */
 	public Vector2 localToWorld (Vector2 local) {
+		if (local == null) throw new IllegalArgumentException("local cannot be null.");
 		float x = local.x, y = local.y;
 		local.x = x * a + y * b + worldX;
 		local.y = x * c + y * d + worldY;

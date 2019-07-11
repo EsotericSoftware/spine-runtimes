@@ -50,6 +50,13 @@ void SSpineWidget::Construct(const FArguments& args) {
 
 void SSpineWidget::SetData(USpineWidget* Widget) {
 	this->widget = Widget;
+	if (widget && widget->skeleton && widget->Atlas) {
+		Skeleton *skeleton = widget->skeleton;
+		skeleton->setToSetupPose();
+		skeleton->updateWorldTransform();
+		Vector<float> scratchBuffer;
+		skeleton->getBounds(this->boundsMin.X, this->boundsMin.Y, this->boundsSize.X, this->boundsSize.Y, scratchBuffer);
+	}
 }
 
 static void setVertex(FSlateVertex* vertex, float x, float y, float u, float v, const FColor& color, const FVector2D& offset) {
@@ -70,6 +77,7 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 							   int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const {
 
 	SSpineWidget* self = (SSpineWidget*)this;
+	UMaterialInstanceDynamic* MatNow = nullptr;
 
 	if (widget && widget->skeleton && widget->Atlas) {
 		widget->skeleton->getColor().set(widget->Color.R, widget->Color.G, widget->Color.B, widget->Color.A);
@@ -152,38 +160,8 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 				widget->pageToScreenBlendMaterial.Add(currPage, widget->atlasScreenBlendMaterials[i]);
 			}
 		}
-		// self->UpdateMesh(LayerId, OutDrawElements, AllottedGeometry, widget->skeleton);
-	}
-	//return LayerId;
 
-	self->renderData.IndexData.SetNumUninitialized(6);
-	uint32* indexData = (uint32*)renderData.IndexData.GetData();
-	indexData[0] = 0;
-	indexData[1] = 1;
-	indexData[2] = 2;
-	indexData[3] = 2;
-	indexData[4] = 3;
-	indexData[5] = 0;
-
-	self->renderData.VertexData.SetNumUninitialized(4);
-	FSlateVertex* vertexData = (FSlateVertex*)renderData.VertexData.GetData();
-	FVector2D offset = AllottedGeometry.AbsolutePosition;
-	FColor white = FColor(0xffffffff);
-
-	float width = AllottedGeometry.GetAbsoluteSize().X;
-	float height = AllottedGeometry.GetAbsoluteSize().Y;
-
-	setVertex(&vertexData[0], 0, 0, 0, 0, white, offset);
-	setVertex(&vertexData[1], width, 0, 1, 0, white, offset);
-	setVertex(&vertexData[2], width, height, 1, 1, white, offset);
-	setVertex(&vertexData[3], 0, height, 0, 1, white, offset);
-
-	if (brush && renderData.VertexData.Num() > 0 && renderData.IndexData.Num() > 0) {
-		FSlateShaderResourceProxy* shaderResource = FSlateDataPayload::ResourceManager->GetShaderResource(widget->Brush);
-		FSlateResourceHandle resourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(widget->Brush);
-		if (shaderResource)
-			FSlateDrawElement::MakeCustomVerts(OutDrawElements, LayerId, resourceHandle, renderData.VertexData,
-											   renderData.IndexData, nullptr, 0, 0);
+		self->UpdateMesh(LayerId, OutDrawElements, AllottedGeometry, widget->skeleton);
 	}
 
 	return LayerId;
@@ -192,6 +170,14 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements, const FGeometry& AllottedGeometry, int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector>& Colors2, UMaterialInstanceDynamic* Material) {
 	if (Vertices.Num() == 0) return;
 	SSpineWidget* self = (SSpineWidget*)this;
+
+	const FVector2D widgetSize = AllottedGeometry.GetDrawSize();
+	const FVector2D sizeScale = widgetSize / FVector2D(boundsSize.X, boundsSize.Y);
+	const float setupScale = sizeScale.GetMin();
+
+	for (int i = 0; i < Vertices.Num(); i++) {
+		Vertices[i] = (Vertices[i] + FVector(-boundsMin.X - boundsSize.X / 2, boundsMin.Y + boundsSize.Y / 2, 0)) * setupScale * widget->Scale + FVector(widgetSize.X / 2, widgetSize.Y / 2, 0);
+	}
 
 	self->renderData.IndexData.SetNumUninitialized(Indices.Num());
 	uint32* indexData = (uint32*)renderData.IndexData.GetData();
@@ -202,22 +188,19 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements
 	FVector2D offset = AllottedGeometry.AbsolutePosition;
 	FColor white = FColor(0xffffffff);
 
-	float width = AllottedGeometry.GetAbsoluteSize().X;
-	float height = AllottedGeometry.GetAbsoluteSize().Y;
-
 	for (size_t i = 0; i < (size_t)Vertices.Num(); i++) {
 		setVertex(&vertexData[i], Vertices[i].X, Vertices[i].Y, Uvs[i].X, Uvs[i].Y, Colors[i], offset);
 	}
 
-	/*FSlateBrush brush;
-	brush.SetResourceObject(Material);
-	brush = widget->Brush;
+	brush = &widget->Brush;
+	if (Material) {
+		renderData.Brush = MakeShareable(new FSlateMaterialBrush(*Material, FVector2D(64, 64)));
+		renderData.RenderingResourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(*renderData.Brush);
+	}
 
-	FSlateShaderResourceProxy* shaderResource = FSlateDataPayload::ResourceManager->GetShaderResource(brush);
-	if (shaderResource) {
-		FSlateResourceHandle resourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(brush);
-		FSlateDrawElement::MakeCustomVerts(OutDrawElements, LayerId, resourceHandle, renderData.VertexData, renderData.IndexData, nullptr, 0, 0);
-	}*/
+	if (renderData.RenderingResourceHandle.IsValid()) {
+		FSlateDrawElement::MakeCustomVerts(OutDrawElements, LayerId, renderData.RenderingResourceHandle, renderData.VertexData, renderData.IndexData, nullptr, 0, 0);
+	}
 
 	Vertices.SetNum(0);
 	Indices.SetNum(0);
@@ -255,6 +238,8 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 		float* attachmentUvs = nullptr;
 
 		Slot* slot = Skeleton->getDrawOrder()[i];
+		if (!slot->getBone().isActive()) continue;
+
 		Attachment* attachment = slot->getAttachment();
 		if (!attachment) continue;
 		if (!attachment->getRTTI().isExactly(RegionAttachment::rtti) && !attachment->getRTTI().isExactly(MeshAttachment::rtti) && !attachment->getRTTI().isExactly(ClippingAttachment::rtti)) continue;
@@ -339,7 +324,7 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 		for (int j = 0; j < numVertices << 1; j += 2) {
 			colors.Add(FColor(r, g, b, a));
 			darkColors.Add(FVector(dr, dg, db));
-			vertices.Add(FVector(attachmentVertices[j], depthOffset, attachmentVertices[j + 1]));
+			vertices.Add(FVector(attachmentVertices[j], -attachmentVertices[j + 1], depthOffset));
 			uvs.Add(FVector2D(attachmentUvs[j], attachmentUvs[j + 1]));
 		}
 

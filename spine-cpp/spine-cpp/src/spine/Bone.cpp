@@ -75,7 +75,8 @@ Bone::Bone(BoneData &data, Skeleton &skeleton, Bone *parent) : Updatable(),
 															   _c(0),
 															   _d(1),
 															   _worldY(0),
-															   _sorted(false) {
+															   _sorted(false),
+															   _active(false) {
 	setToSetupPose();
 }
 
@@ -537,4 +538,12 @@ void Bone::updateAppliedTransform() {
 			_arotation = 90 - MathUtil::atan2(rd, rb) * MathUtil::Rad_Deg;
 		}
 	}
+}
+
+bool Bone::isActive() {
+	return _active;
+}
+
+void Bone::setActive(bool inValue) {
+	_active = inValue;
 }

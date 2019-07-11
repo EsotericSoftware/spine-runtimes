@@ -82,14 +82,14 @@ namespace Spine.Unity.Playables {
 			}
 
 			if (currentInputs != 1 && 1f - totalWeight > greatestWeight) {
-				skeleton.scaleX = originalScaleX;
-				skeleton.scaleY = originalScaleY;
+				skeleton.ScaleX = originalScaleX;
+				skeleton.ScaleY = originalScaleY;
 			}
 		}
 
 		public void SetSkeletonScaleFromFlip (Skeleton skeleton, bool flipX, bool flipY) {
-			skeleton.scaleX = flipX ? -baseScaleX : baseScaleX;
-			skeleton.scaleY = flipY ? -baseScaleY : baseScaleY;
+			skeleton.ScaleX = flipX ? -baseScaleX : baseScaleX;
+			skeleton.ScaleY = flipY ? -baseScaleY : baseScaleY;
 		}
 
 		public override void OnGraphStop (Playable playable) {
@@ -99,8 +99,8 @@ namespace Spine.Unity.Playables {
 				return;
 
 			var skeleton = playableHandle.Skeleton;
-			skeleton.scaleX = originalScaleX;
-			skeleton.scaleY = originalScaleY;
+			skeleton.ScaleX = originalScaleX;
+			skeleton.ScaleY = originalScaleY;
 		}
 	}
 

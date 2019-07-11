@@ -44,6 +44,9 @@ abstract public class Attachment {
 	}
 
 	public String toString () {
-		return getName();
+		return name;
 	}
+
+	/** Returns a copy of the attachment. **/
+	abstract public Attachment copy ();
 }

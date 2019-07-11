@@ -65,6 +65,7 @@ public class EventData {
 	}
 
 	public void setString (String stringValue) {
+		if (stringValue == null) throw new IllegalArgumentException("stringValue cannot be null.");
 		this.stringValue = stringValue;
 	}
 
@@ -73,6 +74,7 @@ public class EventData {
 	}
 
 	public void setAudioPath (String audioPath) {
+		if (audioPath == null) throw new IllegalArgumentException("audioPath cannot be null.");
 		this.audioPath = audioPath;
 	}
 
@@ -92,7 +94,7 @@ public class EventData {
 		this.balance = balance;
 	}
 
-	/** The name of the event, which is unique within the skeleton. */
+	/** The name of the event, which is unique across all events in the skeleton. */
 	public String getName () {
 		return name;
 	}

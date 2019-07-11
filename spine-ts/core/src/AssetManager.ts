@@ -74,6 +74,25 @@ module spine {
 			request.send();
 		}
 
+		loadBinary(path: string,
+			success: (path: string, binary: Uint8Array) => void = null,
+			error: (path: string, error: string) => void = null) {
+			path = this.pathPrefix + path;
+			this.toLoad++;
+
+			AssetManager.downloadBinary(path, (data: Uint8Array): void => {
+				this.assets[path] = data;
+				if (success) success(path, data);
+				this.toLoad--;
+				this.loaded++;
+			}, (state: number, responseText: string): void => {
+				this.errors[path] = `Couldn't load binary ${path}: status ${status}, ${responseText}`;
+				if (error) error(path, `Couldn't load binary ${path}: status ${status}, ${responseText}`);
+				this.toLoad--;
+				this.loaded++;
+			});
+		}
+
 		loadText(path: string,
 			success: (path: string, text: string) => void = null,
 			error: (path: string, error: string) => void = null) {

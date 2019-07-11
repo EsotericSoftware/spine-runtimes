@@ -23,6 +23,7 @@ var spritesheetsDemo = function(canvas, bgColor) {
 		assetManager = spineDemos.assetManager;
 		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas12.png");
 		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();
@@ -122,7 +123,7 @@ var spritesheetsDemo = function(canvas, bgColor) {
 		walkLastTimePrecise += delta;
 		while (walkLastTimePrecise - walkLastTime > 1 / FPS) {
 			var newWalkTime = walkLastTime + 1 / FPS;
-			walkAnim.apply(skeletonSeq, walkLastTime, newWalkTime, true, null, 1, true, false);
+			walkAnim.apply(skeletonSeq, walkLastTime, newWalkTime, true, null, 1, spine.MixBlend.setup, spine.MixDirection.mixIn);
 			walkLastTime = newWalkTime;
 		}
 		skeletonSeq.updateWorldTransform();

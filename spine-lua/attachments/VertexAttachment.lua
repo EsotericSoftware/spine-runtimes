@@ -32,7 +32,7 @@
 -- to 1-based indexing eventually.
 
 local setmetatable = setmetatable
-
+local utils = require "spine-lua.utils"
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local Attachment = require "spine-lua.attachments.Attachment"
 
@@ -52,6 +52,7 @@ function VertexAttachment.new (name, attachmentType)
 		nextID = nextID - 65535
 	end
 	self.id = nextID * SHL_11
+  self.deformAttachment = self
 	nextID = nextID + 1
 	setmetatable(self, VertexAttachment)
 	return self
@@ -60,7 +61,7 @@ end
 function VertexAttachment:computeWorldVertices (slot, start, count, worldVertices, offset, stride)
 	count = offset + (count / 2) * stride
 	local skeleton = slot.bone.skeleton
-	local deformArray = slot.attachmentVertices
+	local deformArray = slot.deform
 	local vertices = self.vertices
 	local bones = self.bones
 	if not bones then
@@ -147,8 +148,21 @@ function VertexAttachment:computeWorldVertices (slot, start, count, worldVertice
 	end
 end
 
-function VertexAttachment:applyDeform (sourceAttachment)
-	return self == sourceAttachment
+function VertexAttachment:copyTo (attachment)
+  if self.bones then
+    attachment.bones = utils.copy(self.bones)
+  else
+    attachment.bones = nil
+  end
+  
+  if self.vertices then
+    attachment.vertices = utils.copy(self.vertices)
+  else
+    attachment.vertices = nil
+  end
+  
+  attachment.worldVerticesLength = self.worldVerticesLength
+  attachment.deformAttachment = self.deformAttachment
 end
 
 return VertexAttachment

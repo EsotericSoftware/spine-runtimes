@@ -55,7 +55,7 @@ public class SlotData {
 		return index;
 	}
 
-	/** The name of the slot, which is unique within the skeleton. */
+	/** The name of the slot, which is unique across all slots in the skeleton. */
 	public String getName () {
 		return name;
 	}
@@ -77,6 +77,7 @@ public class SlotData {
 		return darkColor;
 	}
 
+	/** @param darkColor May be null. */
 	public void setDarkColor (Color darkColor) {
 		this.darkColor = darkColor;
 	}
@@ -97,6 +98,7 @@ public class SlotData {
 	}
 
 	public void setBlendMode (BlendMode blendMode) {
+		if (blendMode == null) throw new IllegalArgumentException("blendMode cannot be null.");
 		this.blendMode = blendMode;
 	}
 

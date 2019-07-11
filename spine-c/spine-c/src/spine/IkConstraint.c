@@ -41,6 +41,7 @@ spIkConstraint *spIkConstraint_create(spIkConstraintData *data, const spSkeleton
 	self->compress = data->compress;
 	self->stretch = data->stretch;
 	self->mix = data->mix;
+	self->softness = data->softness;
 
 	self->bonesCount = self->data->bonesCount;
 	self->bones = MALLOC(spBone*, self->bonesCount);
@@ -62,7 +63,7 @@ void spIkConstraint_apply(spIkConstraint *self) {
 			spIkConstraint_apply1(self->bones[0], self->target->worldX, self->target->worldY, self->compress, self->stretch, self->data->uniform, self->mix);
 			break;
 		case 2:
-			spIkConstraint_apply2(self->bones[0], self->bones[1], self->target->worldX, self->target->worldY, self->bendDirection, self->stretch, self->mix);
+			spIkConstraint_apply2(self->bones[0], self->bones[1], self->target->worldX, self->target->worldY, self->bendDirection, self->stretch, self->softness, self->mix);
 			break;
 	}
 }
@@ -92,13 +93,15 @@ void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, int /*bo
 		sy, bone->ashearX, bone->ashearY);
 }
 
-void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float targetY, int bendDir, int /*boolean*/ stretch, float alpha) {
+void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float targetY, int bendDir, int /*boolean*/ stretch, float softness, float alpha) {
+	float a, b, c, d;
 	float px, py, psx, sx, psy;
 	float cx, cy, csx, cwx, cwy;
 	int o1, o2, s2, u;
 	spBone* pp = parent->parent;
-	float tx, ty, dd, dx, dy, l1, l2, a1, a2, r;
+	float tx, ty, dd, dx, dy, l1, l2, a1, a2, r, td, sd, p;
 	float id, x, y;
+	float aa, bb, ll, ta, c0, c1, c2;
 	if (alpha == 0) {
 		spBone_updateWorldTransform(child);
 		return;
@@ -135,36 +138,57 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 		cwx = parent->a * cx + parent->b * cy + parent->worldX;
 		cwy = parent->c * cx + parent->d * cy + parent->worldY;
 	}
-	id = 1 / (pp->a * pp->d - pp->b * pp->c);
-	x = targetX - pp->worldX;
-	y = targetY - pp->worldY;
-	tx = (x * pp->d - y * pp->b) * id - px;
-	ty = (y * pp->a - x * pp->c) * id - py;
-	dd = tx * tx + ty * ty;
+	a = pp->a;
+	b = pp->b;
+	c = pp->c;
+	d = pp->d;
+	id = 1 / (a * d - b * c);
 	x = cwx - pp->worldX;
 	y = cwy - pp->worldY;
-	dx = (x * pp->d - y * pp->b) * id - px;
-	dy = (y * pp->a - x * pp->c) * id - py;
+	dx = (x * d - y * b) * id - px;
+	dy = (y * a - x * c) * id - py;
 	l1 = SQRT(dx * dx + dy * dy);
 	l2 = child->data->length * csx;
+	if (l1 < 0.0001) {
+		spIkConstraint_apply1(parent, targetX, targetY, 0, stretch, 0, alpha);
+		spBone_updateWorldTransformWith(child, cx, cy, 0, child->ascaleX, child->ascaleY, child->ashearX, child->ashearY);
+		return;
+	}
+	x = targetX - pp->worldX;
+	y = targetY - pp->worldY;
+	tx = (x * d - y * b) * id - px;
+	ty = (y * a - x * c) * id - py;
+	dd = tx * tx + ty * ty;
+	if (softness != 0) {
+		softness *= psx * (csx + 1) / 2;
+		td = SQRT(dd);
+		sd = td - l1 - l2 * psx + softness;
+		if (sd > 0) {
+			p = MIN(1, sd / (softness * 2)) - 1;
+			p = (sd - softness * (1 - p * p)) / td;
+			tx -= p * tx;
+			ty -= p * ty;
+			dd = tx * tx + ty * ty;
+		}
+	}
 	if (u) {
-		float cosine, a, b;
+		float cosine;
 		l2 *= psx;
 		cosine = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
 		if (cosine < -1) cosine = -1;
 		else if (cosine > 1) {
 			cosine = 1;
-			if (stretch && l1 + l2 > 0.0001f) sx *= (SQRT(dd) / (l1 + l2) - 1) * alpha + 1;
+			if (stretch) sx *= (SQRT(dd) / (l1 + l2) - 1) * alpha + 1;
 		}
 		a2 = ACOS(cosine) * bendDir;
 		a = l1 + l2 * cosine;
 		b = l2 * SIN(a2);
 		a1 = ATAN2(ty * a - tx * b, tx * a + ty * b);
 	} else {
-		float a = psx * l2, b = psy * l2;
-		float aa = a * a, bb = b * b, ll = l1 * l1, ta = ATAN2(ty, tx);
-		float c0 = bb * ll + aa * dd - aa * bb, c1 = -2 * bb * l1, c2 = bb - aa;
-		float d = c1 * c1 - 4 * c2 * c0;
+		a = psx * l2; b = psy * l2;
+		aa = a * a, bb = b * b, ll = l1 * l1, ta = ATAN2(ty, tx);
+		c0 = bb * ll + aa * dd - aa * bb, c1 = -2 * bb * l1, c2 = bb - aa;
+		d = c1 * c1 - 4 * c2 * c0;
 		if (d >= 0) {
 			float q = SQRT(d), r0, r1;
 			if (c1 < 0) q = -q;

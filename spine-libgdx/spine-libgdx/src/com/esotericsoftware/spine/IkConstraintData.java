@@ -34,32 +34,15 @@ import com.badlogic.gdx.utils.Array;
 /** Stores the setup pose for an {@link IkConstraint}.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide. */
-public class IkConstraintData {
-	final String name;
-	int order;
+public class IkConstraintData extends ConstraintData {
 	final Array<BoneData> bones = new Array();
 	BoneData target;
 	int bendDirection = 1;
 	boolean compress, stretch, uniform;
-	float mix = 1;
+	float mix = 1, softness;
 
 	public IkConstraintData (String name) {
-		if (name == null) throw new IllegalArgumentException("name cannot be null.");
-		this.name = name;
-	}
-
-	/** The IK constraint's name, which is unique within the skeleton. */
-	public String getName () {
-		return name;
-	}
-
-	/** See {@link Constraint#getOrder()}. */
-	public int getOrder () {
-		return order;
-	}
-
-	public void setOrder (int order) {
-		this.order = order;
+		super(name);
 	}
 
 	/** The bones that are constrained by this IK constraint. */
@@ -84,6 +67,15 @@ public class IkConstraintData {
 
 	public void setMix (float mix) {
 		this.mix = mix;
+	}
+
+	/** For two bone IK, the distance from the maximum reach of the bones that rotation will slow. */
+	public float getSoftness () {
+		return softness;
+	}
+
+	public void setSoftness (float softness) {
+		this.softness = softness;
 	}
 
 	/** Controls the bend direction of the IK bones, either 1 or -1. */
@@ -122,9 +114,5 @@ public class IkConstraintData {
 
 	public void setUniform (boolean uniform) {
 		this.uniform = uniform;
-	}
-
-	public String toString () {
-		return name;
 	}
 }

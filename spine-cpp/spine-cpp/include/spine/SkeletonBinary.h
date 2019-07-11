@@ -95,6 +95,8 @@ namespace spine {
         void setError(const char* value1, const char* value2);
         
         char* readString(DataInput* input);
+
+        char* readStringRef(DataInput* input, SkeletonData* skeletonData);
         
         float readFloat(DataInput* input);
         
@@ -110,7 +112,7 @@ namespace spine {
         
         int readVarint(DataInput* input, bool optimizePositive);
         
-        Skin* readSkin(DataInput* input, const String& skinName, SkeletonData* skeletonData, bool nonessential);
+        Skin* readSkin(DataInput* input, bool defaultSkin, SkeletonData* skeletonData, bool nonessential);
         
         Attachment* readAttachment(DataInput* input, Skin* skin, int slotIndex, const String& attachmentName, SkeletonData* skeletonData, bool nonessential);
         

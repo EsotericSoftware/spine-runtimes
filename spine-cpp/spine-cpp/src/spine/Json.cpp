@@ -90,6 +90,18 @@ int Json::getInt(Json *value, const char *name, int defaultValue) {
 	return value ? value->_valueInt : defaultValue;
 }
 
+bool Json::getBoolean(spine::Json *value, const char *name, bool defaultValue) {
+	value = getItem(value, name);
+	if (value) {
+		if (value->_valueString) return strcmp(value->_valueString, "true") == 0;
+		if (value->_type == JSON_NULL) return false;
+		if (value->_type == JSON_NUMBER) return value->_valueFloat != 0;
+		return defaultValue;
+	} else {
+		return defaultValue;
+	}
+}
+
 const char *Json::getError() {
 	return _error;
 }

@@ -37,6 +37,7 @@
 #include <spine/Event.h>
 
 #include <spine/Animation.h>
+#include <spine/Bone.h>
 #include <spine/TimelineType.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
@@ -68,6 +69,7 @@ void ColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 
 	Slot *slotP = skeleton._slots[_slotIndex];
 	Slot &slot = *slotP;
+	if (!slot._bone.isActive()) return;
 	if (time < _frames[0]) {
 		switch (blend) {
 			case MixBlend_Setup:

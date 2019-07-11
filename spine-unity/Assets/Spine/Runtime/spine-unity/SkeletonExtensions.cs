@@ -100,8 +100,8 @@ namespace Spine.Unity {
 		#region Skeleton
 		/// <summary>Sets the Skeleton's local scale using a UnityEngine.Vector2. If only individual components need to be set, set Skeleton.ScaleX or Skeleton.ScaleY.</summary>
 		public static void SetLocalScale (this Skeleton skeleton, Vector2 scale) {
-			skeleton.scaleX = scale.x;
-			skeleton.scaleY = scale.y;
+			skeleton.ScaleX = scale.x;
+			skeleton.ScaleY = scale.y;
 		}
 
 		/// <summary>Gets the internal bone matrix as a Unity bonespace-to-skeletonspace transformation matrix.</summary>
@@ -171,7 +171,7 @@ namespace Spine.Unity {
 
 		/// <summary>Returns the Skeleton's local scale as a UnityEngine.Vector2. If only individual components are needed, use Skeleton.ScaleX or Skeleton.ScaleY.</summary>
 		public static Vector2 GetLocalScale (this Skeleton skeleton) {
-			return new Vector2(skeleton.scaleX, skeleton.scaleY);
+			return new Vector2(skeleton.ScaleX, skeleton.ScaleY);
 		}
 
 		/// <summary>Calculates a 2x2 Transformation Matrix that can convert a skeleton-space position to a bone-local position.</summary>
@@ -506,7 +506,7 @@ namespace Spine {
 				skeleton.slots.Items[i].SetColorToSetupPose();
 				break;
 			case TimelineType.Deform:
-				skeleton.slots.Items[i].attachmentVertices.Clear();
+				skeleton.slots.Items[i].Deform.Clear();
 				break;
 			
 			// Skeleton
@@ -518,6 +518,7 @@ namespace Spine {
 			case TimelineType.IkConstraint:
 				ikc = skeleton.ikConstraints.Items[i];
 				ikc.mix = ikc.data.mix;
+				ikc.softness = ikc.data.softness;
 				ikc.bendDirection = ikc.data.bendDirection;
 				ikc.stretch = ikc.data.stretch;
 				break;
@@ -600,25 +601,6 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>
-		/// Shortcut for posing a skeleton at a specific time. Time is in seconds. (frameNumber / 30f) will give you seconds.
-		/// If you need to do this often, you should get the Animation object yourself using skeleton.data.FindAnimation. and call Apply on that.</summary>
-		/// <param name = "skeleton">The skeleton to pose.</param>
-		/// <param name="animationName">The name of the animation to use.</param>
-		/// <param name = "time">The time of the pose within the animation.</param>
-		/// <param name = "loop">Wraps the time around if it is longer than the duration of the animation.</param>
-		public static void PoseWithAnimation (this Skeleton skeleton, string animationName, float time, bool loop = false) {
-			// Fail loud when skeleton.data is null.
-			Spine.Animation animation = skeleton.data.FindAnimation(animationName);
-			if (animation == null) return;
-			animation.Apply(skeleton, 0, time, loop, null, 1f, MixBlend.Setup, MixDirection.In);
-		}
-
-		/// <summary>Pose a skeleton according to a given time in an animation. This is the simplified version of Animation.Apply(skeleton).</summary>
-		public static void PoseSkeleton (this Animation animation, Skeleton skeleton, float time, bool loop = false) {
-			animation.Apply(skeleton, 0, time, loop, null, 1f, MixBlend.Setup, MixDirection.In);
-		}
-
 		/// <summary>Resets Skeleton parts to Setup Pose according to a Spine.Animation's keyed items.</summary>
 		public static void SetKeyedItemsToSetupPose (this Animation animation, Skeleton skeleton) {
 			animation.Apply(skeleton, 0, 0, false, null, 0, MixBlend.Setup, MixDirection.Out);
@@ -626,21 +608,6 @@ namespace Spine {
 
 		public static void AllowImmediateQueue (this TrackEntry trackEntry) {
 			if (trackEntry.nextTrackLast < 0) trackEntry.nextTrackLast = 0;
-		}
-
-		#endregion
-
-		#region Skins
-		/// <summary><see cref="Spine.Skin.FindNamesForSlot(int,List)"/></summary>
-		public static void FindNamesForSlot (this Skin skin, string slotName, SkeletonData skeletonData, List<string> results) {
-			int slotIndex = skeletonData.FindSlotIndex(slotName);
-			skin.FindNamesForSlot(slotIndex, results);
-		}
-
-		/// <summary><see cref="Spine.Skin.FindAttachmentsForSlot(int,List)"/></summary>
-		public static void FindAttachmentsForSlot (this Skin skin, string slotName, SkeletonData skeletonData, List<Attachment> results) {
-			int slotIndex = skeletonData.FindSlotIndex(slotName);
-			skin.FindAttachmentsForSlot(slotIndex, results);
 		}
 		#endregion
 	}

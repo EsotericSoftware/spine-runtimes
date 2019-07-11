@@ -16,18 +16,20 @@ struct vertexInput
 struct vertexOutput
 { 
 	V2F_SHADOW_CASTER;
-	float2 texcoord : TEXCOORD1;
+	float4 texcoordAndAlpha : TEXCOORD1;
 };
 
 ////////////////////////////////////////
 // Vertex program
 //
 
-vertexOutput vert(vertexInput v)
+vertexOutput vert(vertexInput v, float4 vertexColor : COLOR)
 {
 	vertexOutput o;
 	TRANSFER_SHADOW_CASTER(o)
-	o.texcoord = calculateTextureCoord(v.texcoord);
+	o.texcoordAndAlpha.xy = calculateTextureCoord(v.texcoord);
+	o.texcoordAndAlpha.z = 0;
+	o.texcoordAndAlpha.a = vertexColor.a;
 	return o;
 }
 
@@ -38,10 +40,10 @@ vertexOutput vert(vertexInput v)
 
 uniform fixed _ShadowAlphaCutoff;
 
-fixed4 frag(vertexOutput IN) : COLOR 
+fixed4 frag(vertexOutput IN) : SV_Target
 {
-	fixed4 texureColor = calculateTexturePixel(IN.texcoord);
-	clip(texureColor.a - _ShadowAlphaCutoff);
+	fixed4 texureColor = calculateTexturePixel(IN.texcoordAndAlpha.xy);
+	clip(texureColor.a * IN.texcoordAndAlpha.a - _ShadowAlphaCutoff);
 	
 	SHADOW_CASTER_FRAGMENT(IN)
 }

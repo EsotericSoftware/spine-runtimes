@@ -49,8 +49,9 @@ function MeshAttachment.new (name)
 	self.color = Color.newWith(1, 1, 1, 1)
 	self.hullLength = 0
 	self.parentMesh = nil
-	self.inheritDeform = false
 	self.tempColor = Color.newWith(1, 1, 1, 1)
+  self.width = 0
+  self.height = 0
 	setmetatable(self, MeshAttachment)
 	return self
 end
@@ -60,6 +61,11 @@ function MeshAttachment:updateUVs ()
 	local v = 0
 	local width = 0
 	local height = 0
+	
+	local regionUVs = self.regionUVs
+	if not self.uvs or (#self.uvs ~= #regionUVs) then self.uvs = utils.newNumberArray(#regionUVs) end
+	local uvs = self.uvs
+	
 	if not self.region then
 		u = 0
 		v = 0
@@ -69,44 +75,57 @@ function MeshAttachment:updateUVs ()
 		local region = self.region
 		local textureWidth = region.page.width
 		local textureHeight = region.page.height
-		if region.rotate then
+		
+		if region.degrees == 90 then
 			u = region.u - (region.originalHeight - region.offsetY - region.height) / textureWidth
 			v = region.v - (region.originalWidth - region.offsetX - region.width) / textureHeight
-				width = region.originalHeight / textureWidth
-				height = region.originalWidth / textureHeight
+			width = region.originalHeight / textureWidth
+			height = region.originalWidth / textureHeight
+			local i = 0
+			local n = #uvs
+			while i < n do
+				uvs[i + 1] = u + regionUVs[i + 2] * width;
+				uvs[i + 2] = v + (1 - regionUVs[i + 1]) * height;
+				i = i + 2
+			end
+		elseif region.degrees == 180 then
+			u = region.u - (region.originalWidth - region.offsetX - region.width) / textureWidth
+			v = region.v - region.offsetY / textureHeight
+			width = region.originalWidth / textureWidth
+			height = region.originalHeight / textureHeight
+			local i = 0
+			local n = #uvs
+			while i < n do
+				uvs[i + 1] = u + (1 - regionUVs[i + 1]) * width;
+				uvs[i + 2] = v + (1 - regionUVs[i + 2]) * height;
+				i = i + 2
+			end
+		elseif region.degrees == 270 then
+			u = region.u - region.offsetY / textureWidth
+			v = region.v - region.offsetX / textureHeight
+			width = region.originalHeight / textureWidth
+			height = region.originalWidth / textureHeight
+			local i = 0
+			local n = #uvs
+			while i < n do
+				uvs[i + 1] = u + (1 - regionUVs[i + 2]) * width;
+				uvs[i + 2] = v + regionUVs[i + 1] * height;
+				i = i + 2
+			end
 		else
 			u = region.u - region.offsetX / textureWidth;
 			v = region.v - (region.originalHeight - region.offsetY - region.height) / textureHeight;
 			width = region.originalWidth / textureWidth;
 			height = region.originalHeight / textureHeight;
+			local i = 0
+			local n = #uvs
+			while i < n do
+				uvs[i + 1] = u + regionUVs[i + 1] * width;
+				uvs[i + 2] = v + regionUVs[i + 2] * height;
+				i = i + 2
+			end
 		end
 	end
-	
-	local regionUVs = self.regionUVs
-	if not self.uvs or (#self.uvs ~= #regionUVs) then self.uvs = utils.newNumberArray(#regionUVs) end
-	local uvs = self.uvs
-	
-	if self.region and self.region.rotate then
-		local i = 0
-		local n = #uvs
-		while i < n do
-			uvs[i + 1] = u + regionUVs[i + 2] * width;
-			uvs[i + 2] = v + height - regionUVs[i + 1] * height;
-			i = i + 2
-		end
-	else
-		local i = 0
-		local n = #uvs
-		while i < n do
-			uvs[i + 1] = u + regionUVs[i + 1] * width;
-			uvs[i + 2] = v + regionUVs[i + 2] * height;
-			i = i + 2
-		end
-	end
-end
-
-function MeshAttachment:applyDeform (sourceAttachment)
-	return self == sourceAttachment or (self.inheritDeform and self.parentMesh == sourceAttachment)
 end
 
 function MeshAttachment:setParentMesh (parentMesh)
@@ -119,6 +138,43 @@ function MeshAttachment:setParentMesh (parentMesh)
 		self.triangles = parentMesh.triangles
 		self.hullLength = parentMesh.hullLength
 	end
+end
+
+function MeshAttachment:copy ()
+  if self.parentMesh then return self:newLinkedMesh() end
+  
+  local copy = MeshAttachment.new(self.name)  
+  copy.region = self.region
+  copy.path = self.path
+  copy.color:setFrom(self.color)
+
+  self:copyTo(copy)
+  copy.regionUVs = utils.copy(self.regionUVs)
+  copy.uvs = utils.copy(self.uvs)
+  copy.triangles = utils.copy(self.triangles)
+  copy.hullLength = self.hullLength
+  if self.edges then
+    copy.edges = utils.copy(edges)
+  end
+  copy.width = self.width
+  copy.height = self.height
+  
+  return copy
+end
+
+function MeshAttachment:newLinkedMesh ()
+  local copy = MeshAttachment.new(self.name)  
+  copy.region = self.region
+  copy.path = self.path
+  copy.color:setFrom(self.color)
+  if self.parentMesh then
+    copy.deformAttachment = self.parentMesh
+  else
+    copy.deformAttachment = self
+  end
+  copy:setParentMesh(self.parentMesh)
+  copy:updateUVs()
+  return copy
 end
 
 return MeshAttachment

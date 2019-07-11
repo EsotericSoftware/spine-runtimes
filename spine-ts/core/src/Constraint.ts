@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 module spine {
-	export interface Constraint extends Updatable {
-		getOrder(): number;
+	export abstract class ConstraintData {
+		constructor(public name: string, public order: number, public skinRequired: boolean) { }
 	}
 }

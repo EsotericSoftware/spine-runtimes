@@ -66,6 +66,8 @@ typedef struct spPathConstraint {
 
 	float segments[10];
 
+	int /*boolean*/ active;
+
 #ifdef __cplusplus
 	spPathConstraint() :
 		data(0),
@@ -85,7 +87,8 @@ typedef struct spPathConstraint {
 		curvesCount(0),
 		curves(0),
 		lengthsCount(0),
-		lengths(0) {
+		lengths(0),
+		active(0) {
 	}
 #endif
 } spPathConstraint;

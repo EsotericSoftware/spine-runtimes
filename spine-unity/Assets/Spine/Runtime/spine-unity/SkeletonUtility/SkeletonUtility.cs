@@ -128,7 +128,7 @@ namespace Spine.Unity {
 		void Update () {
 			var skeleton = skeletonRenderer.skeleton;
 			if (skeleton != null && boneRoot != null) {
-				boneRoot.localScale = new Vector3(skeleton.scaleX, skeleton.scaleY, 1f);
+				boneRoot.localScale = new Vector3(skeleton.ScaleX, skeleton.ScaleY, 1f);
 			}
 		}
 

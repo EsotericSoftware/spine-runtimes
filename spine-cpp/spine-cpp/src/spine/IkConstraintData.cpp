@@ -38,26 +38,14 @@
 using namespace spine;
 
 IkConstraintData::IkConstraintData(const String &name) :
-		_name(name),
-		_order(0),
+		ConstraintData(name),
 		_target(NULL),
 		_bendDirection(1),
 		_compress(false),
 		_stretch(false),
 		_uniform(false),
-		_mix(1) {
-}
-
-const String &IkConstraintData::getName() {
-	return _name;
-}
-
-size_t IkConstraintData::getOrder() {
-	return _order;
-}
-
-void IkConstraintData::setOrder(size_t inValue) {
-	_order = inValue;
+		_mix(1),
+		_softness(0) {
 }
 
 Vector<BoneData *> &IkConstraintData::getBones() {
@@ -112,3 +100,12 @@ bool IkConstraintData::getUniform() {
 void IkConstraintData::setUniform(bool inValue) {
 	_uniform = inValue;
 }
+
+float IkConstraintData::getSoftness() {
+	return _softness;
+}
+
+void IkConstraintData::setSoftness(float inValue) {
+	_softness = inValue;
+}
+

@@ -97,7 +97,7 @@ public:
 protected:
 	void UpdateMesh (spine::Skeleton* Skeleton);
 
-	void Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector> &Colors2, UMaterialInstanceDynamic* Material);
+	void Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector> &Normals, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector> &Colors2, UMaterialInstanceDynamic* Material);
 	
 	spine::Vector<float> worldVertices;
 	spine::SkeletonClipping clipper;

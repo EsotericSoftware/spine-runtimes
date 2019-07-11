@@ -43,7 +43,7 @@ namespace Spine {
 		internal ExposedList<IkConstraintData> ikConstraints = new ExposedList<IkConstraintData>();
 		internal ExposedList<TransformConstraintData> transformConstraints = new ExposedList<TransformConstraintData>();
 		internal ExposedList<PathConstraintData> pathConstraints = new ExposedList<PathConstraintData>();
-		internal float width, height;
+		internal float x , y, width, height;
 		internal string version, hash;
 
 		// Nonessential.
@@ -73,7 +73,9 @@ namespace Spine {
 		public ExposedList<TransformConstraintData> TransformConstraints { get { return transformConstraints; } set { transformConstraints = value; } }
 		public ExposedList<PathConstraintData> PathConstraints { get { return pathConstraints; } set { pathConstraints = value; } }
 
-		public float Width { get { return width; } set { width = value; } }
+        public float X { get { return x; } set { x = value; } }
+        public float Y { get { return y; } set { y = value; } }
+        public float Width { get { return width; } set { width = value; } }
 		public float Height { get { return height; } set { height = value; } }
 		/// <summary>The Spine version used to export this data, or null.</summary>
 		public string Version { get { return version; } set { version = value; } }

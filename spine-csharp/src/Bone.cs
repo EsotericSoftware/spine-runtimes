@@ -52,12 +52,15 @@ namespace Spine {
 		internal float a, b, worldX;
 		internal float c, d, worldY;
 
-		internal bool sorted;
+		internal bool sorted, active;
 
 		public BoneData Data { get { return data; } }
 		public Skeleton Skeleton { get { return skeleton; } }
 		public Bone Parent { get { return parent; } }
 		public ExposedList<Bone> Children { get { return children; } }
+		/// <summary>Returns false when the bone has not been computed because <see cref="BoneData.SkinRequired"/> is true and the
+		/// <see cref="Skeleton.Skin">active skin</see> does not <see cref="Skin.Bones">contain</see> this bone.</summary>
+		public bool Active { get { return active; } }
 		/// <summary>The local X translation.</summary>
 		public float X { get { return x; } set { x = value; } }
 		/// <summary>The local Y translation.</summary>
@@ -147,7 +150,7 @@ namespace Spine {
 
 			Bone parent = this.parent;
 			if (parent == null) { // Root bone.
-				float rotationY = rotation + 90 + shearY, sx = skeleton.scaleX, sy = skeleton.scaleY;
+				float rotationY = rotation + 90 + shearY, sx = skeleton.ScaleX, sy = skeleton.ScaleY;
 				a = MathUtils.CosDeg(rotation + shearX) * scaleX * sx;
 				b = MathUtils.CosDeg(rotationY) * scaleY * sx;
 				c = MathUtils.SinDeg(rotation + shearX) * scaleX * sy;
@@ -209,15 +212,15 @@ namespace Spine {
 			case TransformMode.NoScale:
 			case TransformMode.NoScaleOrReflection: {
 					float cos = MathUtils.CosDeg(rotation), sin = MathUtils.SinDeg(rotation);
-					float za = (pa * cos + pb * sin) / skeleton.scaleX;
-					float zc = (pc * cos + pd * sin) / skeleton.scaleY;
+					float za = (pa * cos + pb * sin) / skeleton.ScaleX;
+					float zc = (pc * cos + pd * sin) / skeleton.ScaleY;
 					float s = (float)Math.Sqrt(za * za + zc * zc);
 					if (s > 0.00001f) s = 1 / s;
 					za *= s;
 					zc *= s;
 					s = (float)Math.Sqrt(za * za + zc * zc);
 					if (data.transformMode == TransformMode.NoScale
-						&& (pa * pd - pb * pc < 0) != (skeleton.scaleX < 0 != skeleton.scaleY < 0)) s = -s;
+						&& (pa * pd - pb * pc < 0) != (skeleton.ScaleX < 0 != skeleton.ScaleY < 0)) s = -s;
 
 					float r = MathUtils.PI / 2 + MathUtils.Atan2(zc, za);
 					float zb = MathUtils.Cos(r) * s;
@@ -234,10 +237,10 @@ namespace Spine {
 				}
 			}
 
-			a *= skeleton.scaleX;
-			b *= skeleton.scaleX;
-			c *= skeleton.scaleY;
-			d *= skeleton.scaleY;
+			a *= skeleton.ScaleX;
+			b *= skeleton.ScaleX;
+			c *= skeleton.ScaleY;
+			d *= skeleton.ScaleY;
 		}
 
 		public void SetToSetupPose () {

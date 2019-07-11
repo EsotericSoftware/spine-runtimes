@@ -64,4 +64,13 @@ function PointAttachment:computeWorldRotation(bone)
 	return math_deg(math_atan2(y, x))
 end
 
+function PointAttachment:copy ()
+  local copy = PointAttachment.new(self.name)
+  copy.x = self.x
+  copy.y = self.y
+  copy.rotation = self.rotation
+  copy.color:setFrom(self.color)
+  return copy
+end
+
 return PointAttachment

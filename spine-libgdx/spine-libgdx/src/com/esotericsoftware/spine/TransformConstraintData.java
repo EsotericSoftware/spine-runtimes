@@ -34,9 +34,7 @@ import com.badlogic.gdx.utils.Array;
 /** Stores the setup pose for a {@link TransformConstraint}.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-transform-constraints">Transform constraints</a> in the Spine User Guide. */
-public class TransformConstraintData {
-	final String name;
-	int order;
+public class TransformConstraintData extends ConstraintData {
 	final Array<BoneData> bones = new Array();
 	BoneData target;
 	float rotateMix, translateMix, scaleMix, shearMix;
@@ -44,22 +42,7 @@ public class TransformConstraintData {
 	boolean relative, local;
 
 	public TransformConstraintData (String name) {
-		if (name == null) throw new IllegalArgumentException("name cannot be null.");
-		this.name = name;
-	}
-
-	/** The transform constraint's name, which is unique within the skeleton. */
-	public String getName () {
-		return name;
-	}
-
-	/** See {@link Constraint#getOrder()}. */
-	public int getOrder () {
-		return order;
-	}
-
-	public void setOrder (int order) {
-		this.order = order;
+		super(name);
 	}
 
 	/** The bones that will be modified by this transform constraint. */
@@ -181,9 +164,5 @@ public class TransformConstraintData {
 
 	public void setLocal (boolean local) {
 		this.local = local;
-	}
-
-	public String toString () {
-		return name;
 	}
 }

@@ -35,8 +35,8 @@ import com.badlogic.gdx.utils.Pool;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 
-/** Collects each {@link BoundingBoxAttachment} that is visible and computes the world vertices for its polygon. The polygon
- * vertices are provided along with convenience methods for doing hit detection. */
+/** Collects each visible {@link BoundingBoxAttachment} and computes the world vertices for its polygon. The polygon vertices are
+ * provided along with convenience methods for doing hit detection. */
 public class SkeletonBounds {
 	private float minX, minY, maxX, maxY;
 	private Array<BoundingBoxAttachment> boundingBoxes = new Array();
@@ -64,6 +64,7 @@ public class SkeletonBounds {
 
 		for (int i = 0; i < slotCount; i++) {
 			Slot slot = slots.get(i);
+			if (!slot.bone.active) continue;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof BoundingBoxAttachment) {
 				BoundingBoxAttachment boundingBox = (BoundingBoxAttachment)attachment;
@@ -134,6 +135,7 @@ public class SkeletonBounds {
 
 	/** Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds. */
 	public boolean aabbIntersectsSkeleton (SkeletonBounds bounds) {
+		if (bounds == null) throw new IllegalArgumentException("bounds cannot be null.");
 		return minX < bounds.maxX && maxX > bounds.minX && minY < bounds.maxY && maxY > bounds.minY;
 	}
 
@@ -148,6 +150,7 @@ public class SkeletonBounds {
 
 	/** Returns true if the polygon contains the point. */
 	public boolean containsPoint (FloatArray polygon, float x, float y) {
+		if (polygon == null) throw new IllegalArgumentException("polygon cannot be null.");
 		float[] vertices = polygon.items;
 		int nn = polygon.size;
 
@@ -177,6 +180,7 @@ public class SkeletonBounds {
 
 	/** Returns true if the polygon contains any part of the line segment. */
 	public boolean intersectsSegment (FloatArray polygon, float x1, float y1, float x2, float y2) {
+		if (polygon == null) throw new IllegalArgumentException("polygon cannot be null.");
 		float[] vertices = polygon.items;
 		int nn = polygon.size;
 

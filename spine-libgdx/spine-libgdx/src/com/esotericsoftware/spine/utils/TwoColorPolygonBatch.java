@@ -29,6 +29,8 @@
 
 package com.esotericsoftware.spine.utils;
 
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -754,7 +756,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 			triangles[triangleIndex++] = (short)(polygonTriangles[i] + startVertex);
 		this.triangleIndex = triangleIndex;
 
-		System.arraycopy(polygonVertices, verticesOffset, vertices, vertexIndex, verticesCount);
+		arraycopy(polygonVertices, verticesOffset, vertices, vertexIndex, verticesCount);
 		this.vertexIndex += verticesCount;
 	}
 
@@ -821,7 +823,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 		}
 		this.triangleIndex = triangleIndex;
 
-		System.arraycopy(spriteVertices, offset, vertices, vertexIndex, count);
+		arraycopy(spriteVertices, offset, vertices, vertexIndex, count);
 		this.vertexIndex += count;
 	}
 

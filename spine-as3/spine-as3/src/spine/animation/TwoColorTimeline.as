@@ -67,6 +67,7 @@ package spine.animation {
 			var frames : Vector.<Number> = this.frames;
 			var slot : Slot = skeleton.slots[slotIndex];
 			var light : Color, dark : Color;
+			if (!slot.bone.active) return;
 
 			if (time < frames[0]) {
 				switch (blend) {

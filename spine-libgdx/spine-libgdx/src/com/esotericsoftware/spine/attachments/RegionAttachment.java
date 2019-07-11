@@ -29,10 +29,13 @@
 
 package com.esotericsoftware.spine.attachments;
 
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+
 import com.esotericsoftware.spine.Bone;
 
 /** An attachment that displays a textured quadrilateral.
@@ -262,5 +265,22 @@ public class RegionAttachment extends Attachment {
 
 	public void setPath (String path) {
 		this.path = path;
+	}
+
+	public Attachment copy () {
+		RegionAttachment copy = new RegionAttachment(name);
+		copy.region = region;
+		copy.path = path;
+		copy.x = x;
+		copy.y = y;
+		copy.scaleX = scaleX;
+		copy.scaleY = scaleY;
+		copy.rotation = rotation;
+		copy.width = width;
+		copy.height = height;
+		arraycopy(uvs, 0, copy.uvs, 0, 8);
+		arraycopy(offset, 0, copy.offset, 0, 8);
+		copy.color.set(color);
+		return copy;
 	}
 }

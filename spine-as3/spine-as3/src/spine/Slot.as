@@ -37,7 +37,7 @@ package spine {
 		public var darkColor : Color;
 		internal var _attachment : Attachment;
 		private var _attachmentTime : Number;
-		public var attachmentVertices : Vector.<Number> = new Vector.<Number>();
+		public var deform : Vector.<Number> = new Vector.<Number>();
 
 		public function Slot(data : SlotData, bone : Bone) {
 			if (data == null) throw new ArgumentError("data cannot be null.");
@@ -72,7 +72,7 @@ package spine {
 			if (_attachment == attachment) return;
 			_attachment = attachment;
 			_attachmentTime = _bone._skeleton.time;
-			attachmentVertices.length = 0;
+			deform.length = 0;
 		}
 
 		public function set attachmentTime(time : Number) : void {

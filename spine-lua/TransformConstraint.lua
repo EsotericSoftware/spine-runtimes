@@ -54,7 +54,8 @@ function TransformConstraint.new (data, skeleton)
 		bones = {},
 		target = nil,
 		rotateMix = data.rotateMix, translateMix = data.translateMix, scaleMix = data.scaleMix, shearMix = data.shearMix,
-		temp = { 0, 0 }
+		temp = { 0, 0 },
+    active = false
 	}
 	setmetatable(self, TransformConstraint)
 

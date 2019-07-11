@@ -105,6 +105,8 @@ namespace spine {
         
         Vector<float>& getOffset();
         Vector<float>& getUVs();
+
+        virtual Attachment* copy();
         
     private:
         static const int BLX;

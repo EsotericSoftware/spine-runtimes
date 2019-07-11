@@ -46,7 +46,7 @@ public class SkeletonData {
 	final Array<IkConstraintData> ikConstraints = new Array();
 	final Array<TransformConstraintData> transformConstraints = new Array();
 	final Array<PathConstraintData> pathConstraints = new Array();
-	float width, height;
+	float x, y, width, height;
 	String version, hash;
 
 	// Nonessential.
@@ -231,6 +231,24 @@ public class SkeletonData {
 	/** @param name May be null. */
 	public void setName (String name) {
 		this.name = name;
+	}
+
+	/** The X coordinate of the skeleton's axis aligned bounding box in the setup pose. */
+	public float getX () {
+		return x;
+	}
+
+	public void setX (float x) {
+		this.x = x;
+	}
+
+	/** The Y coordinate of the skeleton's axis aligned bounding box in the setup pose. */
+	public float getY () {
+		return y;
+	}
+
+	public void setY (float y) {
+		this.y = y;
 	}
 
 	/** The width of the skeleton's axis aligned bounding box in the setup pose. */

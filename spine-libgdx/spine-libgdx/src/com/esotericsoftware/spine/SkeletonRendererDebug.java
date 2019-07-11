@@ -67,10 +67,13 @@ public class SkeletonRendererDebug {
 	}
 
 	public SkeletonRendererDebug (ShapeRenderer shapes) {
+		if (shapes == null) throw new IllegalArgumentException("shapes cannot be null.");
 		this.shapes = shapes;
 	}
 
 	public void draw (Skeleton skeleton) {
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
+
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		int srcFunc = premultipliedAlpha ? GL20.GL_ONE : GL20.GL_SRC_ALPHA;
 		Gdx.gl.glBlendFunc(srcFunc, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -84,7 +87,7 @@ public class SkeletonRendererDebug {
 		if (drawBones) {
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
-				if (bone.parent == null) continue;
+				if (bone.parent == null || !bone.active) continue;
 				float length = bone.data.length, width = boneWidth;
 				if (length == 0) {
 					length = 8;
@@ -239,6 +242,7 @@ public class SkeletonRendererDebug {
 			shapes.setColor(boneOriginColor);
 			for (int i = 0, n = bones.size; i < n; i++) {
 				Bone bone = bones.get(i);
+				if (!bone.active) continue;
 				shapes.circle(bone.worldX, bone.worldY, 3 * scale, 8);
 			}
 		}
@@ -294,7 +298,7 @@ public class SkeletonRendererDebug {
 	public void setPoints (boolean points) {
 		this.drawPoints = points;
 	}
-	
+
 	public void setClipping (boolean clipping) {
 		this.drawClipping = clipping;
 	}

@@ -43,6 +43,7 @@ package spine.animation {
 
 		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var constraint : PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
+			if (!constraint.active) return;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:

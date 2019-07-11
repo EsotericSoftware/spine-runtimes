@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 #include "CoinExample.h"
-#include "BatchingExample.h"
+#include "MixAndMatchExample.h"
 
 USING_NS_CC;
 using namespace spine;
@@ -57,7 +57,7 @@ bool CoinExample::init () {
 		else if (skeletonNode->getTimeScale() == 1)
 			skeletonNode->setTimeScale(0.3f);
 		else
-			Director::getInstance()->replaceScene(BatchingExample::scene());
+			Director::getInstance()->replaceScene(MixAndMatchExample::scene());
 		return true;
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);

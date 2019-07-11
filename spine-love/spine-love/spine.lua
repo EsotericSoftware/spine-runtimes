@@ -200,20 +200,22 @@ function PolygonBatcher:draw (texture, vertices, uvs, numVertices, indices, colo
 	local vertexStart = self.verticesLength + 1
 	local vertexEnd = vertexStart + numVertices
 	local vertex = self.vertex
+  local colorScalar = 1;
+  if love._version_major <= 10 then colorScalar = 255 end
 	if not self.useTwoColorTint then
-		vertex[5] = color.r * 255
-		vertex[6] = color.g * 255
-		vertex[7] = color.b * 255
-		vertex[8] = color.a * 255
+		vertex[5] = color.r * colorScalar
+		vertex[6] = color.g * colorScalar
+		vertex[7] = color.b * colorScalar
+		vertex[8] = color.a * colorScalar
 	else
-		vertex[5] = color.r * 255
-		vertex[6] = color.g * 255
-		vertex[7] = color.b * 255
-		vertex[8] = color.a * 255
-		vertex[9] = darkColor.r * 255
-		vertex[10] = darkColor.g * 255
-		vertex[11] = darkColor.b * 255
-		vertex[12] = darkColor.a * 255
+		vertex[5] = color.r * colorScalar
+		vertex[6] = color.g * colorScalar
+		vertex[7] = color.b * colorScalar
+		vertex[8] = color.a * colorScalar
+		vertex[9] = darkColor.r * colorScalar
+		vertex[10] = darkColor.g * colorScalar
+		vertex[11] = darkColor.b * colorScalar
+		vertex[12] = darkColor.a * colorScalar
 	end
 	
 	local v = 1
@@ -231,15 +233,15 @@ function PolygonBatcher:draw (texture, vertices, uvs, numVertices, indices, colo
 			vertex[2] = tempVertex.y
 			vertex[3] = tempVertex.u
 			vertex[4] = tempVertex.v
-			vertex[5] = tempVertex.light.r * 255
-			vertex[6] = tempVertex.light.g * 255
-			vertex[7] = tempVertex.light.b * 255
-			vertex[8] = tempVertex.light.a * 255
+			vertex[5] = tempVertex.light.r * colorScalar
+			vertex[6] = tempVertex.light.g * colorScalar
+			vertex[7] = tempVertex.light.b * colorScalar
+			vertex[8] = tempVertex.light.a * colorScalar
 			if (self.useTwoColorTint) then
-				vertex[9] = tempVertex.dark.r * 255
-				vertex[10] = tempVertex.dark.g * 255
-				vertex[11] = tempVertex.dark.b * 255
-				vertex[12] = tempVertex.dark.a * 255
+				vertex[9] = tempVertex.dark.r * colorScalar
+				vertex[10] = tempVertex.dark.g * colorScalar
+				vertex[11] = tempVertex.dark.b * colorScalar
+				vertex[12] = tempVertex.dark.a * colorScalar
 			end
 			mesh:setVertex(vertexStart, vertex)
 			vertexStart = vertexStart + 1
@@ -320,76 +322,78 @@ function SkeletonRenderer:draw (skeleton)
 
 	local drawOrder = skeleton.drawOrder
 	for i, slot in ipairs(drawOrder) do
-		local attachment = slot.attachment
-		local vertices = worldVertices
-		local uvs = nil
-		local indices = nil
-		local texture = nil
-		local color = tmpColor
-		if attachment then
-			if attachment.type == spine.AttachmentType.region then
-				numVertices = 4
-				attachment:computeWorldVertices(slot.bone, vertices, 0, 2)
-				uvs = attachment.uvs
-				indices = SkeletonRenderer.QUAD_TRIANGLES
-				texture = attachment.region.renderObject.texture
-			elseif attachment.type == spine.AttachmentType.mesh then
-				numVertices = attachment.worldVerticesLength / 2
-				attachment:computeWorldVertices(slot, 0, attachment.worldVerticesLength, vertices, 0, 2)
-				uvs = attachment.uvs
-				indices = attachment.triangles
-				texture = attachment.region.renderObject.texture
-			elseif attachment.type == spine.AttachmentType.clipping then
-				self.clipper:clipStart(slot, attachment)
-			end
+    if slot.bone.active then
+      local attachment = slot.attachment
+      local vertices = worldVertices
+      local uvs = nil
+      local indices = nil
+      local texture = nil
+      local color = tmpColor
+      if attachment then
+        if attachment.type == spine.AttachmentType.region then
+          numVertices = 4
+          attachment:computeWorldVertices(slot.bone, vertices, 0, 2)
+          uvs = attachment.uvs
+          indices = SkeletonRenderer.QUAD_TRIANGLES
+          texture = attachment.region.renderObject.texture
+        elseif attachment.type == spine.AttachmentType.mesh then
+          numVertices = attachment.worldVerticesLength / 2
+          attachment:computeWorldVertices(slot, 0, attachment.worldVerticesLength, vertices, 0, 2)
+          uvs = attachment.uvs
+          indices = attachment.triangles
+          texture = attachment.region.renderObject.texture
+        elseif attachment.type == spine.AttachmentType.clipping then
+          self.clipper:clipStart(slot, attachment)
+        end
 
-			if texture then								
-				local slotBlendMode = slot.data.blendMode
-				if lastBlendMode ~= slotBlendMode then
-          batcher:stop()
-					batcher:begin()
+        if texture then								
+          local slotBlendMode = slot.data.blendMode
+          if lastBlendMode ~= slotBlendMode then
+            batcher:stop()
+            batcher:begin()
+            
+            if slotBlendMode == spine.BlendMode.normal then
+              love.graphics.setBlendMode("alpha")
+            elseif slotBlendMode == spine.BlendMode.additive then
+              love.graphics.setBlendMode("add")
+            elseif slotBlendMode == spine.BlendMode.multiply then
+              love.graphics.setBlendMode("multiply", "premultiplied")
+            elseif slotBlendMode == spine.BlendMode.screen then
+              love.graphics.setBlendMode("screen")
+            end
+            lastBlendMode = slotBlendMode					
+          end
           
-					if slotBlendMode == spine.BlendMode.normal then
- 						love.graphics.setBlendMode("alpha")
-					elseif slotBlendMode == spine.BlendMode.additive then
- 						love.graphics.setBlendMode("add")
-					elseif slotBlendMode == spine.BlendMode.multiply then
-						love.graphics.setBlendMode("multiply", "premultiplied")
-					elseif slotBlendMode == spine.BlendMode.screen then
-						love.graphics.setBlendMode("screen")
-					end
-					lastBlendMode = slotBlendMode					
-				end
-				
-				local skeleton = slot.bone.skeleton
-				local skeletonColor = skeleton.color
-				local slotColor = slot.color
-				local attachmentColor = attachment.color
-				local alpha = skeletonColor.a * slotColor.a * attachmentColor.a
-				local multiplier = alpha
-				if premultipliedAlpha then multiplier = 1 end
-				color:set(skeletonColor.r * slotColor.r * attachmentColor.r * multiplier,
-							skeletonColor.g * slotColor.g * attachmentColor.g * multiplier,
-							skeletonColor.b * slotColor.b * attachmentColor.b * multiplier,
-							alpha)
-						
-				local dark = tmpColor2
-				if slot.darkColor then dark = slot.darkColor
-				else dark:set(0, 0, 0, 0) end
-				
-				if self.clipper:isClipping() then
-					self.clipper:clipTriangles(vertices, attachment.uvs, indices, #indices)
-					vertices = self.clipper.clippedVertices
-					numVertices = #vertices / 2
-					uvs = self.clipper.clippedUVs
-					indices = self.clipper.clippedTriangles
-				end
-				
-				batcher:draw(texture, vertices, uvs, numVertices, indices, color, dark, self.vertexEffect)
-			end
-			
-			self.clipper:clipEnd(slot)
-		end
+          local skeleton = slot.bone.skeleton
+          local skeletonColor = skeleton.color
+          local slotColor = slot.color
+          local attachmentColor = attachment.color
+          local alpha = skeletonColor.a * slotColor.a * attachmentColor.a
+          local multiplier = alpha
+          if premultipliedAlpha then multiplier = 1 end
+          color:set(skeletonColor.r * slotColor.r * attachmentColor.r * multiplier,
+                skeletonColor.g * slotColor.g * attachmentColor.g * multiplier,
+                skeletonColor.b * slotColor.b * attachmentColor.b * multiplier,
+                alpha)
+              
+          local dark = tmpColor2
+          if slot.darkColor then dark = slot.darkColor
+          else dark:set(0, 0, 0, 0) end
+          
+          if self.clipper:isClipping() then
+            self.clipper:clipTriangles(vertices, attachment.uvs, indices, #indices)
+            vertices = self.clipper.clippedVertices
+            numVertices = #vertices / 2
+            uvs = self.clipper.clippedUVs
+            indices = self.clipper.clippedTriangles
+          end
+          
+          batcher:draw(texture, vertices, uvs, numVertices, indices, color, dark, self.vertexEffect)
+        end
+        
+        self.clipper:clipEnd(slot)
+      end
+    end
 	end
 
 	batcher:stop()

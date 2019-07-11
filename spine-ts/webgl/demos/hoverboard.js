@@ -25,6 +25,7 @@ var hoverboardDemo = function(canvas, bgColor) {
 		assetManager = spineDemos.assetManager;
 		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas12.png");
 		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		input = new spine.webgl.Input(canvas);
@@ -117,7 +118,7 @@ var hoverboardDemo = function(canvas, bgColor) {
 				target = null;
 			},
 			dragged: function(x, y) {
-				if (target != null) {
+				if (target != null && x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
 					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
 					if (target.parent !== null) {
 						target.parent.worldToLocal(temp2.set(coords.x, coords.y));

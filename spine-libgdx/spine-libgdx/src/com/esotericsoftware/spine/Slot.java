@@ -31,6 +31,7 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.FloatArray;
+
 import com.esotericsoftware.spine.Animation.DeformTimeline;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
@@ -44,7 +45,7 @@ public class Slot {
 	final Color color = new Color(), darkColor;
 	Attachment attachment;
 	private float attachmentTime;
-	private FloatArray attachmentVertices = new FloatArray();
+	private FloatArray deform = new FloatArray();
 
 	public Slot (SlotData data, Bone bone) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -65,6 +66,7 @@ public class Slot {
 		darkColor = slot.darkColor == null ? null : new Color(slot.darkColor);
 		attachment = slot.attachment;
 		attachmentTime = slot.attachmentTime;
+		deform.addAll(slot.deform);
 	}
 
 	/** The slot's setup pose data. */
@@ -99,14 +101,13 @@ public class Slot {
 		return attachment;
 	}
 
-	/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears
-	 * {@link #attachmentVertices}.
+	/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears {@link #deform}.
 	 * @param attachment May be null. */
 	public void setAttachment (Attachment attachment) {
 		if (this.attachment == attachment) return;
 		this.attachment = attachment;
 		attachmentTime = bone.skeleton.time;
-		attachmentVertices.clear();
+		deform.clear();
 	}
 
 	/** The time that has elapsed since the last time the attachment was set or cleared. Relies on Skeleton
@@ -119,17 +120,17 @@ public class Slot {
 		attachmentTime = bone.skeleton.time - time;
 	}
 
-	/** Vertices to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
+	/** Values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
 	 * weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
 	 * <p>
 	 * See {@link VertexAttachment#computeWorldVertices(Slot, int, int, float[], int, int)} and {@link DeformTimeline}. */
-	public FloatArray getAttachmentVertices () {
-		return attachmentVertices;
+	public FloatArray getDeform () {
+		return deform;
 	}
 
-	public void setAttachmentVertices (FloatArray attachmentVertices) {
-		if (attachmentVertices == null) throw new IllegalArgumentException("attachmentVertices cannot be null.");
-		this.attachmentVertices = attachmentVertices;
+	public void setDeform (FloatArray deform) {
+		if (deform == null) throw new IllegalArgumentException("deform cannot be null.");
+		this.deform = deform;
 	}
 
 	/** Sets this slot to the setup pose. */

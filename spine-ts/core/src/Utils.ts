@@ -121,6 +121,19 @@ module spine {
 			else if (this.a > 1) this.a = 1;
 			return this;
 		}
+
+		static rgba8888ToColor(color: Color, value: number) {
+			color.r = ((value & 0xff000000) >>> 24) / 255;
+			color.g = ((value & 0x00ff0000) >>> 16) / 255;
+			color.b = ((value & 0x0000ff00) >>> 8) / 255;
+			color.a = ((value & 0x000000ff)) / 255;
+		}
+
+		static rgb888ToColor (color: Color, value: number) {
+			color.r = ((value & 0x00ff0000) >>> 16) / 255;
+			color.g = ((value & 0x0000ff00) >>> 8) / 255;
+			color.b = ((value & 0x000000ff)) / 255;
+		}
 	}
 
 	export class MathUtils {
@@ -262,6 +275,13 @@ module spine {
 		// This function is used to fix WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
 		static webkit602BugfixHelper (alpha: number, blend: MixBlend) {
 
+		}
+
+		static contains<T> (array: Array<T>, element: T, identity = true) {
+			for (var i = 0; i < array.length; i++) {
+				if (array[i] == element) return true;
+			}
+			return false;
 		}
 	}
 

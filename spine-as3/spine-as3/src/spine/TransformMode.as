@@ -34,5 +34,7 @@ package spine {
 		public static const noRotationOrReflection : TransformMode = new TransformMode();
 		public static const noScale : TransformMode = new TransformMode();
 		public static const noScaleOrReflection : TransformMode = new TransformMode();
+		
+		public static const values : Array = [ normal, onlyTranslation, noRotationOrReflection, noScale, noScaleOrReflection ];
 	}
 }

@@ -1,0 +1,30 @@
+{
+"skeleton": { "hash": "zBR2x5RGJoCPEHpszlOxG4dsqEw", "spine": "3.6.07-beta", "width": 868, "height": 322, "fps": 1, "images": "" },
+"bones": [
+	{ "name": "root" },
+	{ "name": "L_Eye", "parent": "root", "x": -223.17, "y": 2.99 },
+	{ "name": "R_Eye", "parent": "root", "x": 237.32, "y": 6.4 }
+],
+"slots": [
+	{ "name": "EyeWhite", "bone": "root", "attachment": "EyeWhite" },
+	{ "name": "R_Eye", "bone": "R_Eye", "attachment": "R_Eye" },
+	{ "name": "L_Eye", "bone": "L_Eye", "attachment": "L_Eye" },
+	{ "name": "EyeLines", "bone": "root", "attachment": "EyeLines" }
+],
+"skins": {
+	"default": {
+		"EyeLines": {
+			"EyeLines": { "y": 28, "width": 868, "height": 322 }
+		},
+		"EyeWhite": {
+			"EyeWhite": { "x": 3, "y": 2, "width": 700, "height": 148 }
+		},
+		"L_Eye": {
+			"L_Eye": { "x": -0.81, "y": 2, "width": 148, "height": 148 }
+		},
+		"R_Eye": {
+			"R_Eye": { "x": 0.67, "y": -1.39, "width": 148, "height": 148 }
+		}
+	}
+}
+}

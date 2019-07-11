@@ -37,19 +37,22 @@ import com.badlogic.gdx.utils.Array;
  * the last bone is as close to the target bone as possible.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide. */
-public class IkConstraint implements Constraint {
+public class IkConstraint implements Updatable {
 	final IkConstraintData data;
 	final Array<Bone> bones;
 	Bone target;
 	int bendDirection;
 	boolean compress, stretch;
-	float mix = 1;
+	float mix = 1, softness;
+
+	boolean active;
 
 	public IkConstraint (IkConstraintData data, Skeleton skeleton) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.data = data;
 		mix = data.mix;
+		softness = data.softness;
 		bendDirection = data.bendDirection;
 		compress = data.compress;
 		stretch = data.stretch;
@@ -70,6 +73,7 @@ public class IkConstraint implements Constraint {
 			bones.add(skeleton.bones.get(bone.data.index));
 		target = skeleton.bones.get(constraint.target.data.index);
 		mix = constraint.mix;
+		softness = constraint.softness;
 		bendDirection = constraint.bendDirection;
 		compress = constraint.compress;
 		stretch = constraint.stretch;
@@ -88,13 +92,9 @@ public class IkConstraint implements Constraint {
 			apply(bones.first(), target.worldX, target.worldY, compress, stretch, data.uniform, mix);
 			break;
 		case 2:
-			apply(bones.first(), bones.get(1), target.worldX, target.worldY, bendDirection, stretch, mix);
+			apply(bones.first(), bones.get(1), target.worldX, target.worldY, bendDirection, stretch, softness, mix);
 			break;
 		}
-	}
-
-	public int getOrder () {
-		return data.order;
 	}
 
 	/** The bones that will be modified by this IK constraint. */
@@ -108,6 +108,7 @@ public class IkConstraint implements Constraint {
 	}
 
 	public void setTarget (Bone target) {
+		if (target == null) throw new IllegalArgumentException("target cannot be null.");
 		this.target = target;
 	}
 
@@ -118,6 +119,15 @@ public class IkConstraint implements Constraint {
 
 	public void setMix (float mix) {
 		this.mix = mix;
+	}
+
+	/** For two bone IK, the distance from the maximum reach of the bones that rotation will slow. */
+	public float getSoftness () {
+		return softness;
+	}
+
+	public void setSoftness (float softness) {
+		this.softness = softness;
 	}
 
 	/** Controls the bend direction of the IK bones, either 1 or -1. */
@@ -148,6 +158,10 @@ public class IkConstraint implements Constraint {
 		this.stretch = stretch;
 	}
 
+	public boolean isActive () {
+		return active;
+	}
+
 	/** The IK constraint's setup pose data. */
 	public IkConstraintData getData () {
 		return data;
@@ -160,6 +174,7 @@ public class IkConstraint implements Constraint {
 	/** Applies 1 bone IK. The target is specified in the world coordinate system. */
 	static public void apply (Bone bone, float targetX, float targetY, boolean compress, boolean stretch, boolean uniform,
 		float alpha) {
+		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
 		if (!bone.appliedValid) bone.updateAppliedTransform();
 		Bone p = bone.parent;
 		float id = 1 / (p.a * p.d - p.b * p.c);
@@ -185,7 +200,10 @@ public class IkConstraint implements Constraint {
 
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
-	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, boolean stretch, float alpha) {
+	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, boolean stretch, float softness,
+		float alpha) {
+		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
+		if (child == null) throw new IllegalArgumentException("child cannot be null.");
 		if (alpha == 0) {
 			child.updateWorldTransform();
 			return;
@@ -227,12 +245,29 @@ public class IkConstraint implements Constraint {
 		b = pp.b;
 		c = pp.c;
 		d = pp.d;
-		float id = 1 / (a * d - b * c), x = targetX - pp.worldX, y = targetY - pp.worldY;
-		float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py, dd = tx * tx + ty * ty;
-		x = cwx - pp.worldX;
-		y = cwy - pp.worldY;
+		float id = 1 / (a * d - b * c), x = cwx - pp.worldX, y = cwy - pp.worldY;
 		float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 		float l1 = (float)Math.sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
+		if (l1 < 0.0001f) {
+			apply(parent, targetX, targetY, false, stretch, false, alpha);
+			child.updateWorldTransform(cx, cy, 0, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
+			return;
+		}
+		x = targetX - pp.worldX;
+		y = targetY - pp.worldY;
+		float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
+		float dd = tx * tx + ty * ty;
+		if (softness != 0) {
+			softness *= psx * (csx + 1) / 2;
+			float td = (float)Math.sqrt(dd), sd = td - l1 - l2 * psx + softness;
+			if (sd > 0) {
+				float p = Math.min(1, sd / (softness * 2)) - 1;
+				p = (sd - softness * (1 - p * p)) / td;
+				tx -= p * tx;
+				ty -= p * ty;
+				dd = tx * tx + ty * ty;
+			}
+		}
 		outer:
 		if (u) {
 			l2 *= psx;
@@ -241,7 +276,7 @@ public class IkConstraint implements Constraint {
 				cos = -1;
 			else if (cos > 1) {
 				cos = 1;
-				if (stretch && l1 + l2 > 0.0001f) sx *= ((float)Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+				if (stretch) sx *= ((float)Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
 			}
 			a2 = (float)Math.acos(cos) * bendDir;
 			a = l1 + l2 * cos;

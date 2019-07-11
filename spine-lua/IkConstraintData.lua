@@ -34,13 +34,15 @@ function IkConstraintData.new (name)
 	local self = {
 		name = name,
 		order = 0,
+    skinRequired = false,
 		bones = {},
 		target = nil,
 		bendDirection = 1,
 		compress = false,
 		stretch = false,
 		uniform = false,
-		mix = 1
+		mix = 1,
+    softness = 0
 	}
 
 	return self

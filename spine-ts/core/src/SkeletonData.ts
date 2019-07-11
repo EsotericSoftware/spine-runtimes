@@ -39,12 +39,13 @@ module spine {
 		ikConstraints = new Array<IkConstraintData>();
 		transformConstraints = new Array<TransformConstraintData>();
 		pathConstraints = new Array<PathConstraintData>();
-		width: number; height: number;
-		version: string; hash: string; 
-		
+		x: number; y: number; width: number; height: number;
+		version: string; hash: string;
+
 		// Nonessential
 		fps = 0;
 		imagesPath: string;
+		audioPath: string;
 
 		findBone (boneName: string) {
 			if (boneName == null) throw new Error("boneName cannot be null.");

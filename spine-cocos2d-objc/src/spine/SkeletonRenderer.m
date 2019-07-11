@@ -195,6 +195,7 @@ static bool handlerQueued = false;
 	for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
 		spSlot* slot = _skeleton->drawOrder[i];
 		if (!slot->attachment) continue;
+		if (!slot->bone->active) continue;
 		CCTexture *texture = 0;
 		switch (slot->attachment->type) {
 		case SP_ATTACHMENT_REGION: {
@@ -398,6 +399,7 @@ static bool handlerQueued = false;
 		CGPoint points[4];
 		for (int i = 0, n = _skeleton->slotsCount; i < n; i++) {
 			spSlot* slot = _skeleton->drawOrder[i];
+			if (!slot->bone->active) continue;
 			if (!slot->attachment || slot->attachment->type != SP_ATTACHMENT_REGION) continue;
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
 			spRegionAttachment_computeWorldVertices(attachment, slot->bone, _worldVertices, 0, 2);
@@ -412,6 +414,7 @@ static bool handlerQueued = false;
 		// Bone lengths.
 		for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
 			spBone *bone = _skeleton->bones[i];
+			if (!bone->active) continue;
 			float x = bone->data->length * bone->a + bone->worldX;
 			float y = bone->data->length * bone->c + bone->worldY;
 			[_drawNode drawSegmentFrom:ccp(bone->worldX, bone->worldY) to: ccp(x, y)radius:2 color:[CCColor redColor]];
@@ -420,6 +423,7 @@ static bool handlerQueued = false;
 		// Bone origins.
 		for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
 			spBone *bone = _skeleton->bones[i];
+			if (!bone->active) continue;
 			[_drawNode drawDot:ccp(bone->worldX, bone->worldY) radius:4 color:[CCColor greenColor]];
 			if (i == 0) [_drawNode drawDot:ccp(bone->worldX, bone->worldY) radius:4 color:[CCColor blueColor]];
 		}

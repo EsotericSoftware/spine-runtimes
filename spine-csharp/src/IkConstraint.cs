@@ -37,19 +37,22 @@ namespace Spine {
 	/// <para>
 	/// See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide.</para>
 	/// </summary>
-	public class IkConstraint : IConstraint {
+	public class IkConstraint : IUpdatable {
 		internal IkConstraintData data;
 		internal ExposedList<Bone> bones = new ExposedList<Bone>();
 		internal Bone target;
 		internal int bendDirection;
 		internal bool compress, stretch;
-		internal float mix = 1;
+		internal float mix = 1, softness;
+
+		internal bool active;
 
 		public IkConstraint (IkConstraintData data, Skeleton skeleton) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 			this.data = data;
 			mix = data.mix;
+			softness = data.softness;
 			bendDirection = data.bendDirection;
 			compress = data.compress;
 			stretch = data.stretch;
@@ -70,6 +73,7 @@ namespace Spine {
 				bones.Add(skeleton.Bones.Items[bone.data.index]);
 			target = skeleton.Bones.Items[constraint.target.data.index];
 			mix = constraint.mix;
+			softness = constraint.softness;
 			bendDirection = constraint.bendDirection;
 			compress = constraint.compress;
 			stretch = constraint.stretch;
@@ -88,14 +92,9 @@ namespace Spine {
 				Apply(bones.Items[0], target.worldX, target.worldY, compress, stretch, data.uniform, mix);
 				break;
 			case 2:
-				Apply(bones.Items[0], bones.Items[1], target.worldX, target.worldY, bendDirection, stretch, mix);
+				Apply(bones.Items[0], bones.Items[1], target.worldX, target.worldY, bendDirection, stretch, softness, mix);
 				break;
 			}
-		}
-
-
-		public int Order {
-			get { return data.order; }
 		}
 
 		/// <summary>The bones that will be modified by this IK constraint.</summary>
@@ -113,6 +112,12 @@ namespace Spine {
 		public float Mix {
 			get { return mix; }
 			set { mix = value; }
+		}
+
+		///<summary>For two bone IK, the distance from the maximum reach of the bones that rotation will slow.</summary>
+		public float Softness {
+			get { return softness; }
+			set { softness = value; }
 		}
 
 		/// <summary>Controls the bend direction of the IK bones, either 1 or -1.</summary>
@@ -134,6 +139,10 @@ namespace Spine {
 		public bool Stretch {
 			get { return stretch; }
 			set { stretch = value; }
+		}
+
+		public bool Active {
+			get { return active; }
 		}
 
 		/// <summary>The IK constraint's setup pose data.</summary>
@@ -173,7 +182,8 @@ namespace Spine {
 
 		/// <summary>Applies 2 bone IK. The target is specified in the world coordinate system.</summary>
 		/// <param name="child">A direct descendant of the parent bone.</param>
-		static public void Apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, bool stretch, float alpha) {
+		static public void Apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, bool stretch, float softness,
+			float alpha) {
 			if (alpha == 0) {
 				child.UpdateWorldTransform();
 				return;
@@ -215,12 +225,29 @@ namespace Spine {
 			b = pp.b;
 			c = pp.c;
 			d = pp.d;
-			float id = 1 / (a * d - b * c), x = targetX - pp.worldX, y = targetY - pp.worldY;
-			float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py, dd = tx * tx + ty * ty;
-			x = cwx - pp.worldX;
-			y = cwy - pp.worldY;
+			float id = 1 / (a * d - b * c), x = cwx - pp.worldX, y = cwy - pp.worldY;
 			float dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
 			float l1 = (float)Math.Sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
+			if (l1 < 0.0001f) {
+				Apply(parent, targetX, targetY, false, stretch, false, alpha);
+				child.UpdateWorldTransform(cx, cy, 0, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
+				return;
+			}
+			x = targetX - pp.worldX;
+			y = targetY - pp.worldY;
+			float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
+			float dd = tx * tx + ty * ty;
+			if (softness != 0) {
+				softness *= psx * (csx + 1) / 2;
+				float td = (float)Math.Sqrt(dd), sd = td - l1 - l2 * psx + softness;
+				if (sd > 0) {
+					float p = Math.Min(1, sd / (softness * 2)) - 1;
+					p = (sd - softness * (1 - p * p)) / td;
+					tx -= p * tx;
+					ty -= p * ty;
+					dd = tx * tx + ty * ty;
+				}
+			}
 			if (u) {
 				l2 *= psx;
 				float cos = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
@@ -228,7 +255,7 @@ namespace Spine {
 					cos = -1;
 				else if (cos > 1) {
 					cos = 1;
-					if (stretch && l1 + l2 > 0.0001f) sx *= ((float)Math.Sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+					if (stretch) sx *= ((float)Math.Sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
 				}
 				a2 = (float)Math.Acos(cos) * bendDir;
 				a = l1 + l2 * cos;

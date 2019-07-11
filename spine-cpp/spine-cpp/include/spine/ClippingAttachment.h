@@ -48,6 +48,8 @@ namespace spine {
         
         SlotData* getEndSlot();
         void setEndSlot(SlotData* inValue);
+
+		virtual Attachment* copy();
         
     private:
         SlotData* _endSlot;

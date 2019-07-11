@@ -39,9 +39,11 @@ package spine.attachments {
 		public var vertices : Vector.<Number>;
 		public var worldVerticesLength : int;
 		public var id : int = (nextID++ & 65535) << 11;
+		public var deformAttachment : VertexAttachment;
 
 		public function VertexAttachment(name : String) {
 			super(name);
+			deformAttachment = this;
 		}
 
 		/** Transforms local vertices to world coordinates.
@@ -52,7 +54,7 @@ package spine.attachments {
 		public function computeWorldVertices(slot : Slot, start : int, count : int, worldVertices : Vector.<Number>, offset : int, stride : int) : void {
 			count = offset + (count >> 1) * stride;
 			var skeleton : Skeleton = slot.skeleton;
-			var deformArray : Vector.<Number> = slot.attachmentVertices;
+			var deformArray : Vector.<Number> = slot.deform;
 			var vertices : Vector.<Number> = this.vertices;
 			var bones : Vector.<int> = this.bones;
 			var deform : Vector.<Number>;
@@ -124,10 +126,20 @@ package spine.attachments {
 				}
 			}
 		}
+		
+		public function copyTo(attachment : VertexAttachment) : void {
+			if (bones != null) {
+				attachment.bones = bones.concat();				
+			} else
+				attachment.bones = null;
 
-		/** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
-		public function applyDeform(sourceAttachment : VertexAttachment) : Boolean {
-			return this == sourceAttachment;
+			if (this.vertices != null) {
+				attachment.vertices = vertices.concat();				
+			} else
+				attachment.vertices = null;
+
+			attachment.worldVerticesLength = worldVerticesLength;
+			attachment.deformAttachment = deformAttachment;
 		}
 	}
 }

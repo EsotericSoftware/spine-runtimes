@@ -54,6 +54,7 @@ struct spBone {
 	float const c, d, worldY;
 
 	int/*bool*/ sorted;
+	int/*bool*/ active;
 
 #ifdef __cplusplus
 	spBone() :
@@ -68,7 +69,7 @@ struct spBone {
 		a(0), b(0), worldX(0),
 		c(0), d(0), worldY(0),
 
-		sorted(0) {
+		sorted(0), active(0) {
 	}
 #endif
 };

@@ -42,7 +42,7 @@ import com.esotericsoftware.spine.utils.SpineUtils;
  * constrained bones so they follow a {@link PathAttachment}.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
-public class PathConstraint implements Constraint {
+public class PathConstraint implements Updatable {
 	static private final int NONE = -1, BEFORE = -2, AFTER = -3;
 	static private final float epsilon = 0.00001f;
 
@@ -50,6 +50,8 @@ public class PathConstraint implements Constraint {
 	final Array<Bone> bones;
 	Slot target;
 	float position, spacing, rotateMix, translateMix;
+
+	boolean active;
 
 	private final FloatArray spaces = new FloatArray(), positions = new FloatArray();
 	private final FloatArray world = new FloatArray(), curves = new FloatArray(), lengths = new FloatArray();
@@ -448,10 +450,6 @@ public class PathConstraint implements Constraint {
 		}
 	}
 
-	public int getOrder () {
-		return data.order;
-	}
-
 	/** The position along the path. */
 	public float getPosition () {
 		return position;
@@ -499,7 +497,12 @@ public class PathConstraint implements Constraint {
 	}
 
 	public void setTarget (Slot target) {
+		if (target == null) throw new IllegalArgumentException("target cannot be null.");
 		this.target = target;
+	}
+
+	public boolean isActive () {
+		return active;
 	}
 
 	/** The path constraint's setup pose data. */

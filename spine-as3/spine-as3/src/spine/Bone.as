@@ -56,6 +56,8 @@ package spine {
 		public var worldX : Number;
 		public var worldY : Number;
 		internal var _sorted : Boolean;
+		public var active : Boolean;
+		
 
 		/** @param parent May be null. */
 		public function Bone(data : BoneData, skeleton : Skeleton, parent : Bone) {
@@ -65,6 +67,10 @@ package spine {
 			_skeleton = skeleton;
 			_parent = parent;
 			setToSetupPose();
+		}
+		
+		public function isActive() : Boolean {
+			return active;
 		}
 
 		/** Same as updateWorldTransform(). This method exists for Bone to implement Updatable. */

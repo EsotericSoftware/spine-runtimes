@@ -31,17 +31,24 @@
 #include <spine/extension.h>
 
 void _spPointAttachment_dispose (spAttachment* attachment) {
-	spPathAttachment* self = SUB_CAST(spPathAttachment, attachment);
-
-	_spVertexAttachment_deinit(SUPER(self));
-
+	spPointAttachment* self = SUB_CAST(spPointAttachment, attachment);
+	_spAttachment_deinit(attachment);
 	FREE(self);
+}
+
+spAttachment* _spPointAttachment_copy (spAttachment* attachment) {
+	spPointAttachment* self = SUB_CAST(spPointAttachment, attachment);
+	spPointAttachment* copy = spPointAttachment_create(attachment->name);
+	copy->x = self->x;
+	copy->y = self->y;
+	copy->rotation = self->rotation;
+	spColor_setFromColor(&copy->color, &self->color);
+	return SUPER(copy);
 }
 
 spPointAttachment* spPointAttachment_create (const char* name) {
 	spPointAttachment* self = NEW(spPointAttachment);
-	_spVertexAttachment_init(SUPER(self));
-	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_POINT, _spPointAttachment_dispose);
+	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_POINT, _spPointAttachment_dispose, _spPointAttachment_copy);
 	return self;
 }
 

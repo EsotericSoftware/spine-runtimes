@@ -42,7 +42,7 @@ using namespace spine;
 
 RTTI_IMPL(VertexAttachment, Attachment)
 
-VertexAttachment::VertexAttachment(const String &name) : Attachment(name), _worldVerticesLength(0), _id(getNextID()) {
+VertexAttachment::VertexAttachment(const String &name) : Attachment(name), _worldVerticesLength(0), _deformAttachment(this), _id(getNextID()) {
 }
 
 VertexAttachment::~VertexAttachment() {
@@ -65,7 +65,7 @@ void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t cou
 	size_t stride) {
 	count = offset + (count >> 1) * stride;
 	Skeleton &skeleton = slot._bone._skeleton;
-	Vector<float> *deformArray = &slot.getAttachmentVertices();
+	Vector<float> *deformArray = &slot.getDeform();
 	Vector<float> *vertices = &_vertices;
 	Vector<size_t> &bones = _bones;
 	if (bones.size() == 0) {
@@ -131,10 +131,6 @@ void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t cou
 	}
 }
 
-bool VertexAttachment::applyDeform(VertexAttachment *sourceAttachment) {
-	return this == sourceAttachment;
-}
-
 int VertexAttachment::getId() {
 	return _id;
 }
@@ -155,8 +151,23 @@ void VertexAttachment::setWorldVerticesLength(size_t inValue) {
 	_worldVerticesLength = inValue;
 }
 
+VertexAttachment* VertexAttachment::getDeformAttachment() {
+	return _deformAttachment;
+}
+
+void VertexAttachment::setDeformAttachment(VertexAttachment* attachment) {
+	_deformAttachment = attachment;
+}
+
 int VertexAttachment::getNextID() {
 	static int nextID = 0;
 
 	return (nextID++ & 65535) << 11;
+}
+
+void VertexAttachment::copyTo(VertexAttachment* other) {
+	other->_bones.clearAndAddAll(this->_bones);
+	other->_vertices.clearAndAddAll(this->_vertices);
+	other->_worldVerticesLength = this->_worldVerticesLength;
+	other->_deformAttachment = this->_deformAttachment;
 }

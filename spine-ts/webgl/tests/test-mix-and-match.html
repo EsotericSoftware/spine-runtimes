@@ -1,0 +1,118 @@
+<html>
+<script src="../../build/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<style>
+	* { margin: 0; padding: 0; }
+	body, html { height: 100% }
+	canvas { position: absolute; width: 100% ;height: 100%; }
+</style>
+<body>
+<div id="label" style="position: absolute; top: 0; left: 0; color: #fff; z-index: 10"></div>
+<canvas id="canvas" style="background: red;"></canvas>
+</body>
+<script>
+
+var FILE = "mix-and-match-pro";
+var ANIMATION = "dance";
+var SCALE = 0.5;
+
+var canvas, context, gl, renderer, input, assetManager;
+var skeletons = [];
+var timeKeeper;
+var label = document.getElementById("label");
+var updateMean = new spine.WindowedMean();
+var renderMean = new spine.WindowedMean();
+
+function init() {
+	canvas = document.getElementById("canvas");
+	canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+	context = new spine.webgl.ManagedWebGLRenderingContext(canvas, { alpha: false });
+	gl = context.gl;
+
+	renderer = new spine.webgl.SceneRenderer(canvas, context);
+	assetManager = new spine.webgl.AssetManager(context, "../example/assets/");
+	input = new spine.webgl.Input(canvas);
+
+	assetManager.loadTextureAtlas(FILE.replace("-pro", "").replace("-ess", "") + "-pma.atlas");
+	assetManager.loadBinary(FILE + ".skel");
+
+	timeKeeper = new spine.TimeKeeper();
+	requestAnimationFrame(load);
+}
+
+var run = true;
+
+function load() {
+	timeKeeper.update();
+	if (assetManager.isLoadingComplete()) {
+		var atlas = assetManager.get(FILE.replace("-pro", "").replace("-ess", "") + "-pma.atlas");
+		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var skeletonBinary = new spine.SkeletonBinary(atlasLoader);
+		skeletonBinary.scale = SCALE;
+		var skeletonData = skeletonBinary.readSkeletonData(assetManager.get(FILE + ".skel"));
+
+		skeleton = new spine.Skeleton(skeletonData);
+		var stateData = new spine.AnimationStateData(skeleton.data);
+		state = new spine.AnimationState(stateData);
+		stateData.defaultMix = 0;
+
+		// Create a new skin, by mixing and matching other skins
+		// that fit together. Items making up the girl are individual
+		// skins. Using the skin API, a new skin is created which is
+		// a combination of all these individual item skins.
+		var mixAndMatchSkin = new spine.Skin("custom-girl");
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("skin-base"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("nose/short"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("eyelids/girly"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("eyes/violet"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("hair/brown"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("clothes/hoodie-orange"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("legs/pants-jeans"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("accessories/bag"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("accessories/hat-red-yellow"));
+		skeleton.setSkin(mixAndMatchSkin);
+
+		state.setAnimation(0, ANIMATION, true);
+		skeletons.push({ skeleton: skeleton, state: state });
+
+		requestAnimationFrame(render);
+	} else {
+		requestAnimationFrame(load);
+	}
+}
+
+function render() {
+	var start = Date.now()
+	timeKeeper.update();
+	var delta = timeKeeper.delta;
+
+	for (var i = 0; i < skeletons.length; i++) {
+		var state = skeletons[i].state;
+		var skeleton = skeletons[i].skeleton;
+		state.update(delta);
+		state.apply(skeleton);
+		skeleton.updateWorldTransform();
+	}
+	updateMean.addValue(Date.now() - start);
+	start = Date.now();
+
+	gl.clearColor(0.2, 0.2, 0.2, 1);
+	gl.clear(gl.COLOR_BUFFER_BIT);
+
+	renderer.resize(spine.webgl.ResizeMode.Fit);
+	renderer.begin();
+	for (var i = 0; i < skeletons.length; i++) {
+		var skeleton = skeletons[i].skeleton;
+		renderer.drawSkeleton(skeleton, true);
+	}
+	renderer.end();
+
+	requestAnimationFrame(render)
+	renderMean.addValue(Date.now() - start);
+	label.innerHTML = ("Update time: " + Number(updateMean.getMean()).toFixed(2) + " ms\n" +
+					   "Render time: " + Number(renderMean.getMean()).toFixed(2) + " ms\n");
+}
+
+init();
+</script>
+</html>

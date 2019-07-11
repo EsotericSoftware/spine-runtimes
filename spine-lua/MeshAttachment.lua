@@ -79,7 +79,7 @@ x,y=slot.bone.skeleton.x,slot.bone.skeleton.y
 		local m00, m01, m10, m11 = bone.m00, bone.m01, bone.m10, bone.m11
 		local vertices = self.vertices
 		local verticesCount = #vertices
-		if slot.attachmentVertices and #slot.attachmentVertices == verticesCount then vertices = slot.attachmentVertices end
+		if slot.deform and #slot.deform == verticesCount then vertices = slot.deform end
 		for i = 1, verticesCount, 2 do
 			local vx = vertices[i]
 			local vy = vertices[i + 1]

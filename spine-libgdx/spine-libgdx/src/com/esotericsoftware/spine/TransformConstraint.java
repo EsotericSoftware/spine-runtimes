@@ -38,11 +38,13 @@ import com.badlogic.gdx.utils.Array;
  * bones to match that of the target bone.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-transform-constraints">Transform constraints</a> in the Spine User Guide. */
-public class TransformConstraint implements Constraint {
+public class TransformConstraint implements Updatable {
 	final TransformConstraintData data;
 	final Array<Bone> bones;
 	Bone target;
 	float rotateMix, translateMix, scaleMix, shearMix;
+
+	boolean active;
 	final Vector2 temp = new Vector2();
 
 	public TransformConstraint (TransformConstraintData data, Skeleton skeleton) {
@@ -288,10 +290,6 @@ public class TransformConstraint implements Constraint {
 		}
 	}
 
-	public int getOrder () {
-		return data.order;
-	}
-
 	/** The bones that will be modified by this transform constraint. */
 	public Array<Bone> getBones () {
 		return bones;
@@ -303,6 +301,7 @@ public class TransformConstraint implements Constraint {
 	}
 
 	public void setTarget (Bone target) {
+		if (target == null) throw new IllegalArgumentException("target cannot be null.");
 		this.target = target;
 	}
 
@@ -340,6 +339,10 @@ public class TransformConstraint implements Constraint {
 
 	public void setShearMix (float shearMix) {
 		this.shearMix = shearMix;
+	}
+
+	public boolean isActive () {
+		return active;
 	}
 
 	/** The transform constraint's setup pose data. */

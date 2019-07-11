@@ -42,10 +42,11 @@ package spine {
 		public var ikConstraints : Vector.<IkConstraintData> = new Vector.<IkConstraintData>();
 		public var transformConstraints : Vector.<TransformConstraintData> = new Vector.<TransformConstraintData>();
 		public var pathConstraints : Vector.<PathConstraintData> = new Vector.<PathConstraintData>();
-		public var width : Number, height : Number;
+		public var x : Number, y : Number, width : Number, height : Number;
 		public var version : String, hash : String;
 		public var fps : Number;
 		public var imagesPath : String;
+		public var audioPath : String;
 
 		public function SkeletonData() {
 		}
@@ -120,7 +121,7 @@ package spine {
 		public function findIkConstraint(constraintName : String) : IkConstraintData {
 			if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
 			for each (var ikConstraintData : IkConstraintData in ikConstraints)
-				if (ikConstraintData._name == constraintName) return ikConstraintData;
+				if (ikConstraintData.name == constraintName) return ikConstraintData;
 			return null;
 		}
 
@@ -129,7 +130,7 @@ package spine {
 		public function findTransformConstraint(constraintName : String) : TransformConstraintData {
 			if (constraintName == null) throw new ArgumentError("constraintName cannot be null.");
 			for each (var transformConstraintData : TransformConstraintData in transformConstraints)
-				if (transformConstraintData._name == constraintName) return transformConstraintData;
+				if (transformConstraintData.name == constraintName) return transformConstraintData;
 			return null;
 		}
 

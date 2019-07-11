@@ -59,6 +59,7 @@ package spine.animation {
 			var frames : Vector.<Number> = this.frames;
 
 			var bone : Bone = skeleton.bones[boneIndex];
+			if (!bone.active) return;
 			var r : Number;
 			if (time < frames[0]) {
 				switch (blend) {

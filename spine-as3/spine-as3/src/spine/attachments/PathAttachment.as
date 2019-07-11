@@ -28,12 +28,23 @@
  *****************************************************************************/
 
 package spine.attachments {
+	import spine.Color;
 	public dynamic class PathAttachment extends VertexAttachment {
 		public var lengths : Vector.<Number>;
 		public var closed : Boolean, constantSpeed : Boolean;
+		public var color : Color = new Color(0, 0, 0, 0);
 
 		public function PathAttachment(name : String) {
 			super(name);
+		}
+		
+		override public function copy (): Attachment {
+			var copy : PathAttachment = new PathAttachment(name);
+			copyTo(copy);
+			copy.lengths = lengths.concat();			
+			copy.closed = closed;
+			copy.constantSpeed = constantSpeed;			
+			return copy;
 		}
 	}
 }

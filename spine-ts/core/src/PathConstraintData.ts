@@ -28,9 +28,7 @@
  *****************************************************************************/
 
 module spine {
-	export class PathConstraintData {
-		name: string;
-		order = 0;
+	export class PathConstraintData extends ConstraintData {
 		bones = new Array<BoneData>();
 		target: SlotData;
 		positionMode: PositionMode;
@@ -40,7 +38,7 @@ module spine {
 		position: number; spacing: number; rotateMix: number; translateMix: number;
 
 		constructor (name: string) {
-			this.name = name;
+			super(name, 0, false);
 		}
 	}
 

@@ -52,7 +52,7 @@ namespace Spine {
 		/// <summary>The duration of the animation in seconds, which is the highest time of all keys in the timeline.</summary>
 		public float Duration { get { return duration; } set { duration = value; } }
 
-		/// <summary>The animation's name, which is unique within the skeleton.</summary>
+		/// <summary>The animation's name, which is unique across all animations in the skeleton.</summary>
 		public string Name { get { return name; } }
 
 		/// <summary>Applies all the animation's timelines to the specified skeleton.</summary>
@@ -336,7 +336,7 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Bone bone = skeleton.bones.Items[boneIndex];
-
+			if (!bone.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -438,7 +438,7 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Bone bone = skeleton.bones.Items[boneIndex];
-
+			if (!bone.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -501,7 +501,7 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Bone bone = skeleton.bones.Items[boneIndex];
-
+			if (!bone.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -606,6 +606,7 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Bone bone = skeleton.bones.Items[boneIndex];
+			if (!bone.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -699,6 +700,7 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Slot slot = skeleton.slots.Items[slotIndex];
+			if (!slot.bone.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				var slotData = slot.data;
@@ -816,6 +818,7 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Slot slot = skeleton.slots.Items[slotIndex];
+			if (!slot.bone.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				var slotData = slot.data;
@@ -960,6 +963,7 @@ namespace Spine {
 							MixDirection direction) {
 			string attachmentName;
 			Slot slot = skeleton.slots.Items[slotIndex];
+			if (!slot.bone.active) return;
 			if (direction == MixDirection.Out && blend == MixBlend.Setup) {
 				attachmentName = slot.data.attachmentName;
 				slot.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
@@ -986,7 +990,7 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a slot's <see cref="Slot.AttachmentVertices"/> to deform a <see cref="VertexAttachment"/>.</summary>
+	/// <summary>Changes a slot's <see cref="Slot.Deform"/> to deform a <see cref="VertexAttachment"/>.</summary>
 	public class DeformTimeline : CurveTimeline, ISlotTimeline {
 		internal int slotIndex;
 		internal VertexAttachment attachment;
@@ -1033,44 +1037,45 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Slot slot = skeleton.slots.Items[slotIndex];
+			if (!slot.bone.active) return;
 			VertexAttachment vertexAttachment = slot.attachment as VertexAttachment;
-			if (vertexAttachment == null || !vertexAttachment.ApplyDeform(attachment)) return;
+			if (vertexAttachment == null || vertexAttachment.DeformAttachment != attachment) return;
 
-			var verticesArray = slot.attachmentVertices;
-			if (verticesArray.Count == 0) blend = MixBlend.Setup;
+			var deformArray = slot.Deform;
+			if (deformArray.Count == 0) blend = MixBlend.Setup;
 
 			float[][] frameVertices = this.frameVertices;
 			int vertexCount = frameVertices[0].Length;
 			float[] frames = this.frames;
-			float[] vertices;
+			float[] deform;
 
 			if (time < frames[0]) {  // Time is before first frame.
 				
 				switch (blend) {
 				case MixBlend.Setup:
-					verticesArray.Clear();
+					deformArray.Clear();
 					return;
 				case MixBlend.Replace:
 					if (alpha == 1) {
-						verticesArray.Clear();
+						deformArray.Clear();
 						return;
 					}
 
-					// verticesArray.SetSize(vertexCount) // Ensure size and preemptively set count.
-					if (verticesArray.Capacity < vertexCount) verticesArray.Capacity = vertexCount;	
-					verticesArray.Count = vertexCount;
-					vertices = verticesArray.Items;
+					// deformArray.SetSize(vertexCount) // Ensure size and preemptively set count.
+					if (deformArray.Capacity < vertexCount) deformArray.Capacity = vertexCount;
+					deformArray.Count = vertexCount;
+					deform = deformArray.Items;
 
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions.
 						float[] setupVertices = vertexAttachment.vertices;
 						for (int i = 0; i < vertexCount; i++)
-							vertices[i] += (setupVertices[i] - vertices[i]) * alpha;
+							deform[i] += (setupVertices[i] - deform[i]) * alpha;
 					} else {
 						// Weighted deform offsets.
 						alpha = 1 - alpha;
 						for (int i = 0; i < vertexCount; i++)
-							vertices[i] *= alpha;
+							deform[i] *= alpha;
 					}
 					return;
 				default:
@@ -1079,10 +1084,10 @@ namespace Spine {
 
 			}
 
-			// verticesArray.SetSize(vertexCount) // Ensure size and preemptively set count.
-			if (verticesArray.Capacity < vertexCount) verticesArray.Capacity = vertexCount;	
-			verticesArray.Count = vertexCount;
-			vertices = verticesArray.Items;
+			// deformArray.SetSize(vertexCount) // Ensure size and preemptively set count.
+			if (deformArray.Capacity < vertexCount) deformArray.Capacity = vertexCount;
+			deformArray.Count = vertexCount;
+			deform = deformArray.Items;
 
 			if (time >= frames[frames.Length - 1]) { // Time is after last frame.
 
@@ -1093,15 +1098,15 @@ namespace Spine {
 							// Unweighted vertex positions, no alpha.
 							float[] setupVertices = vertexAttachment.vertices;
 							for (int i = 0; i < vertexCount; i++)
-								vertices[i] += lastVertices[i] - setupVertices[i];
+								deform[i] += lastVertices[i] - setupVertices[i];
 						} else {
 							// Weighted deform offsets, no alpha.
 							for (int i = 0; i < vertexCount; i++)
-								vertices[i] += lastVertices[i];
+								deform[i] += lastVertices[i];
 						}
 					} else {
 						// Vertex positions or deform offsets, no alpha.
-						Array.Copy(lastVertices, 0, vertices, 0, vertexCount);
+						Array.Copy(lastVertices, 0, deform, 0, vertexCount);
 					}
 				} else {
 					switch (blend) {
@@ -1111,12 +1116,12 @@ namespace Spine {
 								float[] setupVertices = vertexAttachment.vertices;
 								for (int i = 0; i < vertexCount; i++) {
 									float setup = setupVertices[i];
-									vertices[i] = setup + (lastVertices[i] - setup) * alpha;
+									deform[i] = setup + (lastVertices[i] - setup) * alpha;
 								}
 							} else {
 								// Weighted deform offsets, with alpha.
 								for (int i = 0; i < vertexCount; i++)
-									vertices[i] = lastVertices[i] * alpha;
+									deform[i] = lastVertices[i] * alpha;
 							}
 							break;
 						}
@@ -1124,18 +1129,18 @@ namespace Spine {
 						case MixBlend.Replace:
 							// Vertex positions or deform offsets, with alpha.
 							for (int i = 0; i < vertexCount; i++)
-								vertices[i] += (lastVertices[i] - vertices[i]) * alpha;
+								deform[i] += (lastVertices[i] - deform[i]) * alpha;
 							break;
 						case MixBlend.Add:
 							if (vertexAttachment.bones == null) {
 								// Unweighted vertex positions, no alpha.
 								float[] setupVertices = vertexAttachment.vertices;
 								for (int i = 0; i < vertexCount; i++)
-									vertices[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+									deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
 							} else {
 								// Weighted deform offsets, alpha.
 								for (int i = 0; i < vertexCount; i++)
-									vertices[i] += lastVertices[i] * alpha;
+									deform[i] += lastVertices[i] * alpha;
 							}
 							break;
 					}
@@ -1157,20 +1162,20 @@ namespace Spine {
 						float[] setupVertices = vertexAttachment.vertices;
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i];
-							vertices[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
+							deform[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
 						}
 					} else {
 						// Weighted deform offsets, no alpha.
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i];
-							vertices[i] += prev + (nextVertices[i] - prev) * percent;
+							deform[i] += prev + (nextVertices[i] - prev) * percent;
 						}
 					}
 				} else {
 					// Vertex positions or deform offsets, no alpha.
 					for (int i = 0; i < vertexCount; i++) {
 						float prev = prevVertices[i];
-						vertices[i] = prev + (nextVertices[i] - prev) * percent;
+						deform[i] = prev + (nextVertices[i] - prev) * percent;
 					}
 				}
 			} else {
@@ -1181,13 +1186,13 @@ namespace Spine {
 							float[] setupVertices = vertexAttachment.vertices;
 							for (int i = 0; i < vertexCount; i++) {
 								float prev = prevVertices[i], setup = setupVertices[i];
-								vertices[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+								deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
 							}
 						} else {
 							// Weighted deform offsets, with alpha.
 							for (int i = 0; i < vertexCount; i++) {
 								float prev = prevVertices[i];
-								vertices[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+								deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
 							}
 						}
 						break;
@@ -1197,7 +1202,7 @@ namespace Spine {
 						// Vertex positions or deform offsets, with alpha.
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i];
-							vertices[i] += (prev + (nextVertices[i] - prev) * percent - vertices[i]) * alpha;
+							deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
 						}
 						break;
 					}
@@ -1207,13 +1212,13 @@ namespace Spine {
 							float[] setupVertices = vertexAttachment.vertices;
 							for (int i = 0; i < vertexCount; i++) {
 								float prev = prevVertices[i];
-								vertices[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+								deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
 							}
 						} else {
 							// Weighted deform offsets, with alpha.
 							for (int i = 0; i < vertexCount; i++) {
 								float prev = prevVertices[i];
-								vertices[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
+								deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
 							}
 						}
 						break;
@@ -1347,15 +1352,16 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes an IK constraint's <see cref="IkConstraint.Mix"/>, <see cref="IkConstraint.BendDirection"/>,
-	/// <see cref="IkConstraint.Stretch"/>, and <see cref="IkConstraint.Compress"/>.</summary>
+	/// <summary>Changes an IK constraint's <see cref="IkConstraint.Mix"/>, <see cref="IkConstraint.Softness"/>,
+	/// <see cref="IkConstraint.BendDirection"/>, <see cref="IkConstraint.Stretch"/>, and <see cref="IkConstraint.Compress"/>.</summary>
 	public class IkConstraintTimeline : CurveTimeline {
-		public const int ENTRIES = 5;
-		private const int PREV_TIME = -5, PREV_MIX = -4, PREV_BEND_DIRECTION = -3, PREV_COMPRESS = -2, PREV_STRETCH = -1;
-		private const int MIX = 1, BEND_DIRECTION = 2, COMPRESS = 3, STRETCH = 4;
+		public const int ENTRIES = 6;
+		private const int PREV_TIME = -6, PREV_MIX = -5, PREV_SOFTNESS = -4, PREV_BEND_DIRECTION = -3, PREV_COMPRESS = -2,
+			PREV_STRETCH = -1;
+		private const int MIX = 1, SOFTNESS = 2, BEND_DIRECTION = 3, COMPRESS = 4, STRETCH = 5;
 
 		internal int ikConstraintIndex;
-		internal float[] frames; // time, mix, bendDirection, compress, stretch, ...
+		internal float[] frames; // time, mix, softness, bendDirection, compress, stretch, ...
 
 		public IkConstraintTimeline (int frameCount)
 			: base(frameCount) {
@@ -1377,14 +1383,16 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>The time in seconds, mix, bend direction, compress, and stretch for each key frame.</summary>
+		/// <summary>The time in seconds, mix, softness, bend direction, compress, and stretch for each key frame.</summary>
 		public float[] Frames { get { return frames; } set { frames = value; } }
 
-		/// <summary>Sets the time in seconds, mix, bend direction, compress, and stretch for the specified key frame.</summary>
-		public void SetFrame (int frameIndex, float time, float mix, int bendDirection, bool compress, bool stretch) {
+		/// <summary>Sets the time in seconds, mix, softness, bend direction, compress, and stretch for the specified key frame.</summary>
+		public void SetFrame (int frameIndex, float time, float mix, float softness, int bendDirection, bool compress,
+			bool stretch) {
 			frameIndex *= ENTRIES;
 			frames[frameIndex] = time;
 			frames[frameIndex + MIX] = mix;
+			frames[frameIndex + SOFTNESS] = softness;
 			frames[frameIndex + BEND_DIRECTION] = bendDirection;
 			frames[frameIndex + COMPRESS] = compress ? 1 : 0;
 			frames[frameIndex + STRETCH] = stretch ? 1 : 0;
@@ -1393,17 +1401,20 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			IkConstraint constraint = skeleton.ikConstraints.Items[ikConstraintIndex];
+			if (!constraint.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
 				case MixBlend.Setup:
 					constraint.mix = constraint.data.mix;
+					constraint.softness = constraint.data.softness;
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 					return;
 				case MixBlend.First:
 					constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
+					constraint.softness += (constraint.data.softness - constraint.softness) * alpha;
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
@@ -1415,6 +1426,8 @@ namespace Spine {
 			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
 				if (blend == MixBlend.Setup) {
 					constraint.mix = constraint.data.mix + (frames[frames.Length + PREV_MIX] - constraint.data.mix) * alpha;
+					constraint.softness = constraint.data.softness
+						+ (frames[frames.Length + PREV_SOFTNESS] - constraint.data.softness) * alpha;
 					if (direction == MixDirection.Out) {
 						constraint.bendDirection = constraint.data.bendDirection;
 						constraint.compress = constraint.data.compress;
@@ -1426,6 +1439,7 @@ namespace Spine {
 					}
 				} else {
 					constraint.mix += (frames[frames.Length + PREV_MIX] - constraint.mix) * alpha;
+					constraint.softness += (frames[frames.Length + PREV_SOFTNESS] - constraint.softness) * alpha;
 					if (direction == MixDirection.In) {
 						constraint.bendDirection = (int)frames[frames.Length + PREV_BEND_DIRECTION];
 						constraint.compress = frames[frames.Length + PREV_COMPRESS] != 0;
@@ -1438,11 +1452,14 @@ namespace Spine {
 			// Interpolate between the previous frame and the current frame.
 			int frame = Animation.BinarySearch(frames, time, ENTRIES);
 			float mix = frames[frame + PREV_MIX];
+			float softness = frames[frame + PREV_SOFTNESS];
 			float frameTime = frames[frame];
 			float percent = GetCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
 			if (blend == MixBlend.Setup) {
 				constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha;
+				constraint.softness = constraint.data.softness
+					+ (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.data.softness) * alpha;
 				if (direction == MixDirection.Out) {
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
@@ -1454,6 +1471,7 @@ namespace Spine {
 				}
 			} else {
 				constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
+				constraint.softness += (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.softness) * alpha;
 				if (direction == MixDirection.In) {
 					constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
 					constraint.compress = frames[frame + PREV_COMPRESS] != 0;
@@ -1508,6 +1526,7 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			TransformConstraint constraint = skeleton.transformConstraints.Items[transformConstraintIndex];
+			if (!constraint.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				TransformConstraintData data = constraint.data;
@@ -1608,6 +1627,7 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
+			if (!constraint.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -1654,6 +1674,7 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixBlend blend,
 									MixDirection direction) {
 			PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
+			if (!constraint.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -1731,6 +1752,7 @@ namespace Spine {
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
+			if (!constraint.active) return;
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {

@@ -58,4 +58,12 @@ public class ClippingAttachment extends VertexAttachment {
 	public Color getColor () {
 		return color;
 	}
+
+	public Attachment copy () {
+		ClippingAttachment copy = new ClippingAttachment(name);
+		copyTo(copy);
+		copy.endSlot = endSlot;
+		copy.color.set(color);
+		return copy;
+	}
 }

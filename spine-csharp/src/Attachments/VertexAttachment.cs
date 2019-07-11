@@ -30,8 +30,9 @@
 using System;
 
 namespace Spine {
-	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's vertices.</summary> 
-	public class VertexAttachment : Attachment {
+	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
+	/// <see cref="Slot.Deform"/>.</summary> 
+	public abstract class VertexAttachment : Attachment {
 		static int nextID = 0;
 		static readonly Object nextIdLock = new Object();
 
@@ -39,16 +40,21 @@ namespace Spine {
 		internal int[] bones;
 		internal float[] vertices;
 		internal int worldVerticesLength;
+		internal VertexAttachment deformAttachment;
 
 		/// <summary>Gets a unique ID for this attachment.</summary>
 		public int Id { get { return id; } }
 		public int[] Bones { get { return bones; } set { bones = value; } }
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
 		public int WorldVerticesLength { get { return worldVerticesLength; } set { worldVerticesLength = value; } }
+		///<summary>Deform keys for the deform attachment are also applied to this attachment.
+		/// May be null if no deform keys should be applied.</summary>
+		public VertexAttachment DeformAttachment { get { return deformAttachment; } set { deformAttachment = value; } }
 
 		public VertexAttachment (string name)
 			: base(name) {
 
+			deformAttachment = this;
 			lock (VertexAttachment.nextIdLock) {
 				id = (VertexAttachment.nextID++ & 65535) << 11;
 			}
@@ -58,7 +64,13 @@ namespace Spine {
 			ComputeWorldVertices(slot, 0, worldVerticesLength, worldVertices, 0);
 		}
 
-		/// <summary>Transforms local vertices to world coordinates.</summary>
+		/// <summary>
+		/// Transforms the attachment's local <see cref="Vertices"/> to world coordinates. If the slot's <see cref="Slot.Deform"/> is
+		/// not empty, it is used to deform the vertices.
+		/// <para />
+		/// See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+		/// Runtimes Guide.
+		/// </summary>
 		/// <param name="start">The index of the first <see cref="Vertices"/> value to transform. Each vertex has 2 values, x and y.</param>
 		/// <param name="count">The number of world vertex values to output. Must be less than or equal to <see cref="WorldVerticesLength"/> - start.</param>
 		/// <param name="worldVertices">The output world vertices. Must have a length greater than or equal to <paramref name="offset"/> + <paramref name="count"/>.</param>
@@ -67,7 +79,7 @@ namespace Spine {
 		public void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride = 2) {
 			count = offset + (count >> 1) * stride;
 			Skeleton skeleton = slot.bone.skeleton;
-			var deformArray = slot.attachmentVertices;
+			var deformArray = slot.deform;
 			float[] vertices = this.vertices;
 			int[] bones = this.bones;
 			if (bones == null) {
@@ -121,9 +133,24 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>Returns true if a deform originally applied to the specified attachment should be applied to this attachment.</summary>
-		virtual public bool ApplyDeform (VertexAttachment sourceAttachment) {
-			return this == sourceAttachment;
-		}			
+		///<summary>Does not copy id (generated) or name (set on construction).</summary>
+		internal void CopyTo (VertexAttachment attachment) {
+			if (bones != null) {
+				attachment.bones = new int[bones.Length];
+				Array.Copy(bones, 0, attachment.bones, 0, bones.Length);
+			}
+			else
+				attachment.bones = null;
+			
+			if (vertices != null) {
+				attachment.vertices = new float[vertices.Length];
+				Array.Copy(vertices, 0, attachment.vertices, 0, vertices.Length);
+			}
+			else
+				attachment.vertices = null;
+			
+			attachment.worldVerticesLength = worldVerticesLength;
+			attachment.deformAttachment = deformAttachment;
+		}
 	}
 }

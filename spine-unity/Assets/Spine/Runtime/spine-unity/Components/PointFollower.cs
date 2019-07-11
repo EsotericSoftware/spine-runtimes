@@ -150,7 +150,7 @@ namespace Spine.Unity {
 
 			if (followSkeletonFlip) {
 				Vector3 localScale = thisTransform.localScale;
-				localScale.y = Mathf.Abs(localScale.y) * Mathf.Sign(bone.skeleton.scaleX * bone.skeleton.scaleY);
+				localScale.y = Mathf.Abs(localScale.y) * Mathf.Sign(bone.skeleton.ScaleX * bone.skeleton.ScaleY);
 				thisTransform.localScale = localScale;
 			}
 		}

@@ -281,3 +281,26 @@ Vector<float> &RegionAttachment::getUVs() {
 spine::Color &RegionAttachment::getColor() {
 	return _color;
 }
+
+Attachment* RegionAttachment::copy() {
+	RegionAttachment* copy = new (__FILE__, __LINE__) RegionAttachment(getName());
+	copy->_regionWidth = _regionWidth;
+	copy->_regionHeight = _regionHeight;
+	copy->_regionOffsetX = _regionOffsetX;
+	copy->_regionOffsetY = _regionOffsetY;
+	copy->_regionOriginalWidth = _regionOriginalWidth;
+	copy->_regionOriginalHeight = _regionOriginalHeight;
+	copy->setRendererObject(getRendererObject());
+	copy->_path = _path;
+	copy->_x = _x;
+	copy->_y = _y;
+	copy->_scaleX = _scaleX;
+	copy->_scaleY = _scaleY;
+	copy->_rotation = _rotation;
+	copy->_width = _width;
+	copy->_height = _height;
+	copy->_uvs.clearAndAddAll(_uvs);
+	copy->_vertexOffset.clearAndAddAll(_vertexOffset);
+	copy->_color.set(_color);
+	return copy;
+}

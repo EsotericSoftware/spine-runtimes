@@ -34,9 +34,7 @@ import com.badlogic.gdx.utils.Array;
 /** Stores the setup pose for a {@link PathConstraint}.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide. */
-public class PathConstraintData {
-	final String name;
-	int order;
+public class PathConstraintData extends ConstraintData {
 	final Array<BoneData> bones = new Array();
 	SlotData target;
 	PositionMode positionMode;
@@ -46,22 +44,7 @@ public class PathConstraintData {
 	float position, spacing, rotateMix, translateMix;
 
 	public PathConstraintData (String name) {
-		if (name == null) throw new IllegalArgumentException("name cannot be null.");
-		this.name = name;
-	}
-
-	/** The path constraint's name, which is unique within the skeleton. */
-	public String getName () {
-		return name;
-	}
-
-	/** See {@link Constraint#getOrder()}. */
-	public int getOrder () {
-		return order;
-	}
-
-	public void setOrder (int order) {
-		this.order = order;
+		super(name);
 	}
 
 	/** The bones that will be modified by this path constraint. */
@@ -75,6 +58,7 @@ public class PathConstraintData {
 	}
 
 	public void setTarget (SlotData target) {
+		if (target == null) throw new IllegalArgumentException("target cannot be null.");
 		this.target = target;
 	}
 
@@ -84,6 +68,7 @@ public class PathConstraintData {
 	}
 
 	public void setPositionMode (PositionMode positionMode) {
+		if (positionMode == null) throw new IllegalArgumentException("positionMode cannot be null.");
 		this.positionMode = positionMode;
 	}
 
@@ -93,6 +78,7 @@ public class PathConstraintData {
 	}
 
 	public void setSpacingMode (SpacingMode spacingMode) {
+		if (spacingMode == null) throw new IllegalArgumentException("spacingMode cannot be null.");
 		this.spacingMode = spacingMode;
 	}
 
@@ -102,6 +88,7 @@ public class PathConstraintData {
 	}
 
 	public void setRotateMode (RotateMode rotateMode) {
+		if (rotateMode == null) throw new IllegalArgumentException("rotateMode cannot be null.");
 		this.rotateMode = rotateMode;
 	}
 
@@ -148,10 +135,6 @@ public class PathConstraintData {
 
 	public void setTranslateMix (float translateMix) {
 		this.translateMix = translateMix;
-	}
-
-	public String toString () {
-		return name;
 	}
 
 	/** Controls how the first bone is positioned along the path.

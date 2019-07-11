@@ -66,6 +66,12 @@ namespace Spine {
 		/// (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
 		/// place.
 		internal const int HoldMix = 3;
+		/// 1) An attachment timeline in a subsequent track entry sets the attachment for the same slot as this attachment
+		/// timeline.<para />
+		/// Result: This attachment timeline will not use MixDirection.out, which would otherwise show the setup mode attachment (or
+		/// none if not visible in setup mode). This allows deform timelines to be applied for the subsequent entry to mix from, rather
+		/// than mixing from the setup pose.
+		internal const int NotLast = 4;
 
 		protected AnimationStateData data;
 		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
@@ -233,7 +239,7 @@ namespace Spine {
 
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelinesItems[ii];
-						MixBlend timelineBlend = timelineMode[ii] == AnimationState.Subsequent ? blend : MixBlend.Setup;
+						MixBlend timelineBlend = (timelineMode[ii] & AnimationState.NotLast - 1) == AnimationState.Subsequent ? blend : MixBlend.Setup;
 						var rotateTimeline = timeline as RotateTimeline;
 						if (rotateTimeline != null)
 							ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1,
@@ -291,9 +297,12 @@ namespace Spine {
 					MixDirection direction = MixDirection.Out;
 					MixBlend timelineBlend;
 					float alpha;
-					switch (timelineMode[i]) {
+					switch (timelineMode[i] & AnimationState.NotLast - 1) {
 						case AnimationState.Subsequent:
-							if (!attachments && timeline is AttachmentTimeline) continue;
+							if (!attachments && timeline is AttachmentTimeline) {
+								if ((timelineMode[i] & AnimationState.NotLast) == AnimationState.NotLast) continue;
+								blend = MixBlend.Setup;
+							}
 							if (!drawOrder && timeline is DrawOrderTimeline) continue;
 							timelineBlend = blend;
 							alpha = alphaMix;
@@ -321,7 +330,7 @@ namespace Spine {
 					} else {
 						if (timelineBlend == MixBlend.Setup) {
 							if (timeline is AttachmentTimeline) {
-								if (attachments) direction = MixDirection.In;
+								if (attachments || (timelineMode[i] & AnimationState.NotLast) == AnimationState.NotLast) direction = MixDirection.In;
 							} else if (timeline is DrawOrderTimeline) {
 								if (drawOrder) {
 									direction = MixDirection.In;
@@ -342,18 +351,20 @@ namespace Spine {
 			return mix;
 		}
 
-		static private void ApplyRotateTimeline (RotateTimeline rotateTimeline, Skeleton skeleton, float time, float alpha, MixBlend blend,
+		static private void ApplyRotateTimeline (RotateTimeline timeline, Skeleton skeleton, float time, float alpha, MixBlend blend,
 			float[] timelinesRotation, int i, bool firstFrame) {
 
 			if (firstFrame) timelinesRotation[i] = 0;
 
 			if (alpha == 1) {
-				rotateTimeline.Apply(skeleton, 0, time, null, 1, blend, MixDirection.In);
+				timeline.Apply(skeleton, 0, time, null, 1, blend, MixDirection.In);
 				return;
 			}
 
-			Bone bone = skeleton.bones.Items[rotateTimeline.boneIndex];
-			float[] frames = rotateTimeline.frames;
+			Bone bone = skeleton.bones.Items[timeline.boneIndex];
+			if (!bone.active) return;
+
+			float[] frames = timeline.frames;
 			float r1, r2;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -376,7 +387,7 @@ namespace Spine {
 					int frame = Animation.BinarySearch(frames, time, RotateTimeline.ENTRIES);
 					float prevRotation = frames[frame + RotateTimeline.PREV_ROTATION];
 					float frameTime = frames[frame];
-					float percent = rotateTimeline.GetCurvePercent((frame >> 1) - 1,
+					float percent = timeline.GetCurvePercent((frame >> 1) - 1,
 						1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
 
 					r2 = frames[frame + RotateTimeline.ROTATION] - prevRotation;
@@ -715,25 +726,34 @@ namespace Spine {
 		private void AnimationsChanged () {
 			animationsChanged = false;
 
+			// Process in the order that animations are applied.
 			propertyIDs.Clear();
 
 			var tracksItems = tracks.Items;
 			for (int i = 0, n = tracks.Count; i < n; i++) {
 				TrackEntry entry = tracksItems[i];
 				if (entry == null) continue;
-				// Move to last entry, then iterate in reverse (the order animations are applied).
-				while (entry.mixingFrom != null)
+				while (entry.mixingFrom != null) // Move to last entry, then iterate in reverse.
 					entry = entry.mixingFrom;
 
 				do {
-					if (entry.mixingTo == null || entry.mixBlend != MixBlend.Add) SetTimelineModes(entry);
+					if (entry.mixingTo == null || entry.mixBlend != MixBlend.Add) ComputeHold(entry);
 					entry = entry.mixingTo;
 				} while (entry != null);
+			}
 
+			// Process in the reverse order that animations are applied.
+			propertyIDs.Clear();
+			for (int i = tracks.Count - 1; i >= 0; i--) {
+				TrackEntry entry = tracksItems[i];
+				while (entry != null) {
+					ComputeNotLast(entry);
+					entry = entry.mixingFrom;
+				}
 			}
 		}
 
-		private void SetTimelineModes (TrackEntry entry) {
+		private void ComputeHold (TrackEntry entry) {
 			TrackEntry to = entry.mixingTo;
 			var timelines = entry.animation.timelines.Items;
 			int timelinesCount = entry.animation.timelines.Count;
@@ -752,12 +772,14 @@ namespace Spine {
 
 			// outer:
 			for (int i = 0; i < timelinesCount; i++) {
-				int id = timelines[i].PropertyId;
+				Timeline timeline = timelines[i];
+				int id = timeline.PropertyId;
 				if (!propertyIDs.Add(id))
 					timelineMode[i] = AnimationState.Subsequent;
-				else if (to == null || !HasTimeline(to, id))
+				else if (to == null || timeline is AttachmentTimeline || timeline is DrawOrderTimeline
+						|| timeline is EventTimeline || !HasTimeline(to, id)) {
 					timelineMode[i] = AnimationState.First;
-				else {
+				} else {
 					for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
 						if (HasTimeline(next, id)) continue;
 						if (next.mixDuration > 0) {
@@ -770,6 +792,20 @@ namespace Spine {
 					timelineMode[i] = AnimationState.Hold;
 				}
 				continue_outer: {}
+			}
+		}
+
+		private void ComputeNotLast (TrackEntry entry) {
+			var timelines = entry.animation.timelines.Items;
+			int timelinesCount = entry.animation.timelines.Count;
+			int[] timelineMode = entry.timelineMode.Items;
+			var propertyIDs = this.propertyIDs;
+
+			for (int i = 0; i < timelinesCount; i++) {
+				if (timelines[i] is AttachmentTimeline) {
+					AttachmentTimeline timeline = (AttachmentTimeline)timelines[i];
+					if (!propertyIDs.Add(timeline.slotIndex)) timelineMode[i] |= AnimationState.NotLast;
+				}
 			}
 		}
 

@@ -42,6 +42,7 @@ unique_ptr<T> make_unique(Args&&... args) {
 }
 
 void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
+	SP_UNUSED(state);
 	const String& animationName = (entry && entry->getAnimation()) ? entry->getAnimation()->getName() : String("");
 
 	switch (type) {
@@ -104,6 +105,8 @@ void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
 }
 
 void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonBounds bounds;
 
 	// Configure mixing.
@@ -158,12 +161,20 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void goblins (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
 
 	Skeleton* skeleton = drawable.skeleton;
-	skeleton->setSkin("goblin");
+
+	Skin* skin = skeleton->getData()->findSkin("goblingirl");
+	Skin copy("test");
+
+	copy.copySkin(skin);
+
+	skeleton->setSkin(&copy);
 	skeleton->setSlotsToSetupPose();
 
 	skeleton->setPosition(320, 590);
@@ -191,6 +202,8 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void raptor (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -234,6 +247,8 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void tank (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -263,6 +278,8 @@ void tank (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void vine (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -293,6 +310,8 @@ void vine (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -324,6 +343,8 @@ void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void stretchymanStrechyIk (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -357,6 +378,8 @@ void stretchymanStrechyIk (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void coin (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -371,7 +394,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
-	float swirlTime = 0;
+
 	while (window.isOpen()) {
 		while (window.pollEvent(event)) {
 			if (event.type == sf::Event::Closed) window.close();
@@ -389,6 +412,8 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void owl (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
@@ -444,10 +469,59 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
+void mixAndMatch (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
+	SkeletonDrawable drawable(skeletonData);
+	drawable.timeScale = 1;
+	drawable.setUsePremultipliedAlpha(true);
+
+	Skeleton* skeleton = drawable.skeleton;
+
+	Skin skin("mix-and-match");
+	skin.addSkin(skeletonData->findSkin("skin-base"));
+	skin.addSkin(skeletonData->findSkin("nose/short"));
+	skin.addSkin(skeletonData->findSkin("eyelids/girly"));
+	skin.addSkin(skeletonData->findSkin("eyes/violet"));
+	skin.addSkin(skeletonData->findSkin("hair/brown"));
+	skin.addSkin(skeletonData->findSkin("clothes/hoodie-orange"));
+	skin.addSkin(skeletonData->findSkin("legs/pants-jeans"));
+	skin.addSkin(skeletonData->findSkin("accessories/bag"));
+	skin.addSkin(skeletonData->findSkin("accessories/hat-red-yellow"));
+
+	skeleton->setSkin(&skin);
+	skeleton->setSlotsToSetupPose();
+
+	skeleton->setPosition(320, 590);
+	skeleton->updateWorldTransform();
+
+	drawable.state->setAnimation(0, "dance", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - goblins");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable.update(delta);
+
+		window.clear();
+		window.draw(drawable);
+		window.display();
+	}
+}
+
 /**
  * Used for debugging purposes during runtime development
  */
 void test (SkeletonData* skeletonData, Atlas* atlas) {
+	SP_UNUSED(atlas);
+
 	Skeleton skeleton(skeletonData);
 	AnimationStateData animationStateData(skeletonData);
 	AnimationState animationState(&animationStateData);
@@ -466,6 +540,8 @@ int main () {
 	DebugExtension dbgExtension(SpineExtension::getInstance());
 	SpineExtension::setInstance(&dbgExtension);
 
+	testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
+	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(stretchymanStrechyIk, "data/stretchyman-stretchy-ik-pro.json", "data/stretchyman-stretchy-ik-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
@@ -474,7 +550,6 @@ int main () {
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
-	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
 
 	dbgExtension.reportLeaks();

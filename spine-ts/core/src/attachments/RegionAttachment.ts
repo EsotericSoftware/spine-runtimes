@@ -172,5 +172,23 @@ module spine {
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		}
+
+		copy (): Attachment {
+			let copy = new RegionAttachment(name);
+			copy.region = this.region;
+			copy.rendererObject = this.rendererObject;
+			copy.path = this.path;
+			copy.x = this.x;
+			copy.y = this.y;
+			copy.scaleX = this.scaleX;
+			copy.scaleY = this.scaleY;
+			copy.rotation = this.rotation;
+			copy.width = this.width;
+			copy.height = this.height;
+			Utils.arrayCopy(this.uvs, 0, copy.uvs, 0, 8);
+			Utils.arrayCopy(this.offset, 0, copy.offset, 0, 8);
+			copy.color.setFromColor(this.color);
+			return copy;
+		}
 	}
 }

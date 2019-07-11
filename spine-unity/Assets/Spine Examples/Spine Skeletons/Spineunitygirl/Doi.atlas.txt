@@ -1,278 +1,278 @@
 
 Doi.png
-size: 646,520
+size: 1024,512
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 armL
   rotate: false
-  xy: 1, 46
+  xy: 2, 36
   size: 163, 133
   orig: 163, 133
   offset: 0, 0
   index: -1
 armR
   rotate: true
-  xy: 165, 46
+  xy: 167, 36
   size: 133, 109
   orig: 133, 109
   offset: 0, 0
   index: -1
 arrow
-  rotate: true
-  xy: 467, 1
+  rotate: false
+  xy: 609, 334
   size: 64, 85
   orig: 64, 85
   offset: 0, 0
   index: -1
 body
   rotate: false
-  xy: 1, 180
+  xy: 2, 171
   size: 274, 339
   orig: 274, 339
   offset: 0, 0
   index: -1
 bootR
   rotate: false
-  xy: 499, 258
+  xy: 783, 426
   size: 91, 84
   orig: 91, 84
   offset: 0, 0
   index: -1
 browL
   rotate: false
-  xy: 228, 23
+  xy: 126, 12
   size: 40, 22
   orig: 40, 22
   offset: 0, 0
   index: -1
 browR
   rotate: true
-  xy: 591, 287
+  xy: 2, 2
   size: 32, 25
   orig: 32, 25
   offset: 0, 0
   index: -1
 eyelids closed
   rotate: false
-  xy: 276, 201
+  xy: 278, 191
   size: 183, 92
   orig: 183, 92
   offset: 0, 0
   index: -1
 eyelids open
-  rotate: true
-  xy: 499, 343
+  rotate: false
+  xy: 502, 421
   size: 176, 89
   orig: 176, 89
   offset: 0, 0
   index: -1
 hairL
   rotate: false
-  xy: 589, 459
+  xy: 548, 239
   size: 54, 60
   orig: 54, 60
   offset: 0, 0
   index: -1
 hairL2
   rotate: false
-  xy: 553, 4
+  xy: 385, 49
   size: 71, 76
   orig: 71, 76
   offset: 0, 0
   index: -1
 hairM
-  rotate: true
-  xy: 467, 66
+  rotate: false
+  xy: 876, 433
   size: 96, 77
   orig: 96, 77
   offset: 0, 0
   index: -1
 hairM blob
   rotate: true
-  xy: 133, 15
+  xy: 29, 4
   size: 30, 45
   orig: 30, 45
   offset: 0, 0
   index: -1
 hairM blobS
   rotate: false
-  xy: 545, 142
+  xy: 448, 146
   size: 16, 20
   orig: 16, 20
   offset: 0, 0
   index: -1
 hairR
-  rotate: true
-  xy: 1, 4
+  rotate: false
+  xy: 974, 427
   size: 41, 83
   orig: 41, 83
   offset: 0, 0
   index: -1
 hairR2
   rotate: true
-  xy: 460, 163
+  xy: 680, 416
   size: 94, 101
   orig: 94, 101
   offset: 0, 0
   index: -1
 hairSide
   rotate: false
-  xy: 179, 21
+  xy: 76, 10
   size: 48, 24
   orig: 48, 24
   offset: 0, 0
   index: -1
 head
   rotate: false
-  xy: 276, 294
+  xy: 278, 285
   size: 222, 225
   orig: 222, 225
   offset: 0, 0
   index: -1
 indexL
-  rotate: true
-  xy: 405, 7
+  rotate: false
+  xy: 640, 260
   size: 24, 36
   orig: 24, 36
   offset: 0, 0
   index: -1
 indexR
   rotate: false
-  xy: 296, 3
+  xy: 207, 6
   size: 34, 28
   orig: 34, 28
   offset: 0, 0
   index: -1
 inmouth
-  rotate: false
-  xy: 589, 403
+  rotate: true
+  xy: 548, 191
   size: 46, 55
   orig: 46, 55
   offset: 0, 0
   index: -1
 irisL
   rotate: true
-  xy: 85, 11
+  xy: 609, 298
   size: 34, 47
   orig: 34, 47
   offset: 0, 0
   index: -1
 irisL flatspec
   rotate: false
-  xy: 625, 70
+  xy: 278, 41
   size: 19, 10
   orig: 19, 10
   offset: 0, 0
   index: -1
 irisL spec
-  rotate: true
-  xy: 624, 384
+  rotate: false
+  xy: 448, 168
   size: 18, 21
   orig: 18, 21
   offset: 0, 0
   index: -1
 irisR
   rotate: false
-  xy: 589, 355
+  xy: 604, 249
   size: 34, 47
   orig: 34, 47
   offset: 0, 0
   index: -1
 irisR flatspec
-  rotate: true
-  xy: 445, 178
+  rotate: false
+  xy: 502, 288
   size: 22, 11
   orig: 22, 11
   offset: 0, 0
   index: -1
 irisR spec
   rotate: false
-  xy: 545, 124
+  xy: 448, 127
   size: 16, 17
   orig: 16, 17
   offset: 0, 0
   index: -1
 middleL
   rotate: true
-  xy: 331, 5
+  xy: 243, 8
   size: 26, 36
   orig: 26, 36
   offset: 0, 0
   index: -1
 middleR
   rotate: true
-  xy: 591, 320
+  xy: 766, 342
   size: 34, 26
   orig: 34, 26
   offset: 0, 0
   index: -1
 mouth
-  rotate: true
-  xy: 562, 168
+  rotate: false
+  xy: 675, 331
   size: 89, 83
   orig: 89, 83
   offset: 0, 0
   index: -1
 nose
   rotate: false
-  xy: 545, 113
+  xy: 658, 322
   size: 11, 10
   orig: 11, 10
   offset: 0, 0
   index: -1
 pinkyL
-  rotate: false
-  xy: 442, 4
+  rotate: true
+  xy: 605, 191
   size: 24, 27
   orig: 24, 27
   offset: 0, 0
   index: -1
 pony1
-  rotate: false
-  xy: 394, 32
+  rotate: true
+  xy: 278, 53
   size: 72, 105
   orig: 72, 105
   offset: 0, 0
   index: -1
 pony2
   rotate: true
-  xy: 562, 81
+  xy: 463, 197
   size: 86, 83
   orig: 86, 83
   offset: 0, 0
   index: -1
 ringL
   rotate: false
-  xy: 269, 1
+  xy: 605, 217
   size: 26, 30
   orig: 26, 30
   offset: 0, 0
   index: -1
 rotate
-  rotate: true
-  xy: 275, 32
+  rotate: false
+  xy: 502, 301
   size: 105, 118
   orig: 105, 118
   offset: 0, 0
   index: -1
 strap
   rotate: true
-  xy: 276, 138
+  xy: 278, 127
   size: 62, 168
   orig: 62, 168
   offset: 0, 0
   index: -1
 thumbL
   rotate: false
-  xy: 460, 265
+  xy: 168, 6
   size: 37, 28
   orig: 37, 28
   offset: 0, 0
   index: -1
 thumbR
-  rotate: false
-  xy: 368, 6
+  rotate: true
+  xy: 766, 378
   size: 36, 25
   orig: 36, 25
   offset: 0, 0

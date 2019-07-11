@@ -68,6 +68,11 @@ package spine {
 		public function SkeletonJson(attachmentLoader : AttachmentLoader = null) {
 			this.attachmentLoader = attachmentLoader;
 		}
+		
+		private function getFloatValue(object : Object, key: String, defaultValue : Number) : Number {;
+			var hasKey : Boolean = object.hasOwnProperty(key);
+			return hasKey ? Number(object[key]) : defaultValue;
+		}
 
 		/** @param object A String or ByteArray. */
 		public function readSkeletonData(object : *, name : String = null) : SkeletonData {
@@ -91,6 +96,8 @@ package spine {
 			if (skeletonMap) {
 				skeletonData.hash = skeletonMap["hash"];
 				skeletonData.version = skeletonMap["spine"];
+				skeletonData.x = skeletonMap["x"] || 0;
+				skeletonData.y = skeletonMap["y"] || 0;
 				skeletonData.width = skeletonMap["width"] || 0;
 				skeletonData.height = skeletonMap["height"] || 0;
 				skeletonData.fps = skeletonMap["fps"] || 0;
@@ -116,6 +123,7 @@ package spine {
 				boneData.shearX = Number(boneMap["shearX"] || 0);
 				boneData.shearY = Number(boneMap["shearY"] || 0);
 				boneData.transformMode = TransformMode[boneMap["transform"] || "normal"];
+				boneData.skinRequired = boneMap.hasOwnProperty("skin") ? boneMap["skin"] : false;
 				skeletonData.bones.push(boneData);
 			}
 
@@ -146,6 +154,7 @@ package spine {
 			for each (var constraintMap : Object in root["ik"]) {
 				var ikConstraintData : IkConstraintData = new IkConstraintData(constraintMap["name"]);
 				ikConstraintData.order = constraintMap["order"] || 0;
+				ikConstraintData.skinRequired = constraintMap.hasOwnProperty("skin") ? constraintMap["skin"] : false;
 
 				for each (boneName in constraintMap["bones"]) {
 					var bone : BoneData = skeletonData.findBone(boneName);
@@ -160,6 +169,7 @@ package spine {
 				ikConstraintData.compress = (constraintMap.hasOwnProperty("compress") && constraintMap["compress"]);
 				ikConstraintData.stretch = (constraintMap.hasOwnProperty("stretch") && constraintMap["stretch"]);
 				ikConstraintData.uniform = (constraintMap.hasOwnProperty("uniform") && constraintMap["uniform"]);
+				ikConstraintData.softness = (constraintMap.hasOwnProperty("softness") ? constraintMap["softness"] : 0) * scale;
 				ikConstraintData.mix = constraintMap.hasOwnProperty("mix") ? constraintMap["mix"] : 1;
 
 				skeletonData.ikConstraints.push(ikConstraintData);
@@ -169,6 +179,7 @@ package spine {
 			for each (constraintMap in root["transform"]) {
 				var transformConstraintData : TransformConstraintData = new TransformConstraintData(constraintMap["name"]);
 				transformConstraintData.order = constraintMap["order"] || 0;
+				transformConstraintData.skinRequired = constraintMap.hasOwnProperty("skin") ? constraintMap["skin"] : false;
 
 				for each (boneName in constraintMap["bones"]) {
 					bone = skeletonData.findBone(boneName);
@@ -201,6 +212,7 @@ package spine {
 			for each (constraintMap in root["path"]) {
 				var pathConstraintData : PathConstraintData = new PathConstraintData(constraintMap["name"]);
 				pathConstraintData.order = constraintMap["order"] || 0;
+				pathConstraintData.skinRequired = constraintMap.hasOwnProperty("skin") ? constraintMap["skin"] : false;
 
 				for each (boneName in constraintMap["bones"]) {
 					bone = skeletonData.findBone(boneName);
@@ -226,17 +238,51 @@ package spine {
 			}
 
 			// Skins.
-			var skins : Object = root["skins"];
-			for (var skinName : String in skins) {
-				var skinMap : Object = skins[skinName];
-				var skin : Skin = new Skin(skinName);
-				for (slotName in skinMap) {
-					var slotIndex : int = skeletonData.findSlotIndex(slotName);
-					var slotEntry : Object = skinMap[slotName];
+			var skins : Object = root["skins"];			
+			for (var i : Number = 0; i < skins.length; i++) {
+				var ii : Number;
+				var skinMap : Object = skins[i];
+				var skin : Skin = new Skin(skinMap["name"]);
+				
+				if (skinMap["bones"]) {
+					for (ii = 0; ii < skinMap["bones"].length; ii++) {
+						var boneData : BoneData = skeletonData.findBone(skinMap["bones"][ii]);
+						if (boneData == null) throw new Error("Skin bone not found: " + skinMap["bones"][ii]);
+						skin.bones.push(boneData);
+					}
+				}
+				
+				if (skinMap["ik"]) {
+					for (ii = 0; ii < skinMap["ik"].length; ii++) {
+						var constraint : ConstraintData = skeletonData.findIkConstraint(skinMap["ik"][ii]);
+						if (constraint == null) throw new Error("Skin IK constraint not found: " + skinMap["ik"][ii]);
+						skin.constraints.push(constraint);
+					}
+				}
+				
+				if (skinMap["transform"]) {									
+					for (ii = 0; ii < skinMap["transform"].length; ii++) {
+						var constraint : ConstraintData = skeletonData.findTransformConstraint(skinMap["transform"][ii]);
+						if (constraint == null) throw new Error("Skin transform constraint not found: " + skinMap["transform"][ii]);
+						skin.constraints.push(constraint);
+					}
+				}
+				
+				if (skinMap["path"]) {
+					for (ii = 0; ii < skinMap["path"].length; ii++) {
+						var constraint : ConstraintData = skeletonData.findPathConstraint(skinMap["path"][ii]);
+						if (constraint == null) throw new Error("Skin path constraint not found: " + skinMap["path"][ii]);
+						skin.constraints.push(constraint);
+					}
+				}
+				
+				for (slotName in skinMap.attachments) {
+					var slot : SlotData = skeletonData.findSlot(slotName);
+					var slotEntry : Object = skinMap.attachments[slotName];
 					for (var attachmentName : String in slotEntry) {
-						var attachment : Attachment = readAttachment(slotEntry[attachmentName], skin, slotIndex, attachmentName, skeletonData);
+						var attachment : Attachment = readAttachment(slotEntry[attachmentName], skin, slot.index, attachmentName, skeletonData);
 						if (attachment != null)
-							skin.addAttachment(slotIndex, attachmentName, attachment);
+							skin.setAttachment(slot.index, attachmentName, attachment);
 					}
 				}
 				skeletonData.skins[skeletonData.skins.length] = skin;
@@ -251,6 +297,7 @@ package spine {
 				if (!parentSkin) throw new Error("Skin not found: " + linkedMesh.skin);
 				var parentMesh : Attachment = parentSkin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 				if (!parentMesh) throw new Error("Parent mesh not found: " + linkedMesh.parent);
+				linkedMesh.mesh.deformAttachment = linkedMesh.inheritDeform ? VertexAttachment(parentMesh) : linkedMesh.mesh;
 				linkedMesh.mesh.parentMesh = MeshAttachment(parentMesh);
 				linkedMesh.mesh.updateUVs();
 			}
@@ -320,8 +367,8 @@ package spine {
 					mesh.width = Number(map["width"] || 0) * scale;
 					mesh.height = Number(map["height"] || 0) * scale;
 					if (map["parent"]) {
-						mesh.inheritDeform = map.hasOwnProperty("deform") ? Boolean(map["deform"]) : true;
-						linkedMeshes.push(new LinkedMesh(mesh, map["skin"], slotIndex, map["parent"]));
+						var inheritDeform : Boolean = map.hasOwnProperty("deform") ? Boolean(map["deform"]) : true;
+						linkedMeshes.push(new LinkedMesh(mesh, map["skin"], slotIndex, map["parent"], inheritDeform));
 						return mesh;
 					}
 					var uvs : Vector.<Number> = getFloatArray(map, "uvs", 1);
@@ -437,7 +484,7 @@ package spine {
 
 						frameIndex = 0;
 						for each (valueMap in values)
-							attachmentTimeline.setFrame(frameIndex++, valueMap["time"], valueMap["name"]);
+							attachmentTimeline.setFrame(frameIndex++, Number(valueMap["time"] || 0), valueMap["name"]);
 						timelines[timelines.length] = attachmentTimeline;
 						duration = Math.max(duration, attachmentTimeline.frames[attachmentTimeline.frameCount - 1]);
 					} else if (timelineName == "color") {
@@ -451,7 +498,7 @@ package spine {
 							var g : Number = toColor(color, 1);
 							var b : Number = toColor(color, 2);
 							var a : Number = toColor(color, 3);
-							colorTimeline.setFrame(frameIndex, valueMap["time"], r, g, b, a);
+							colorTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), r, g, b, a);
 							readCurve(valueMap, colorTimeline, frameIndex);
 							frameIndex++;
 						}
@@ -469,7 +516,7 @@ package spine {
 							var dark : Color = new Color(0, 0, 0, 0);
 							light.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
 							dark.setFrom(toColor(darkColor, 0), toColor(darkColor, 1), toColor(darkColor, 2), toColor(darkColor, 3));
-							twoColorTimeline.setFrame(frameIndex, valueMap["time"], light.r, light.g, light.b, light.a, dark.r, dark.g, dark.b);
+							twoColorTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), light.r, light.g, light.b, light.a, dark.r, dark.g, dark.b);
 							readCurve(valueMap, twoColorTimeline, frameIndex);
 							frameIndex++;
 						}
@@ -494,7 +541,7 @@ package spine {
 
 						frameIndex = 0;
 						for each (valueMap in values) {
-							rotateTimeline.setFrame(frameIndex, valueMap["time"], valueMap["angle"]);
+							rotateTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), Number(valueMap["angle"] || 0));
 							readCurve(valueMap, rotateTimeline, frameIndex);
 							frameIndex++;
 						}
@@ -503,9 +550,11 @@ package spine {
 					} else if (timelineName == "translate" || timelineName == "scale" || timelineName == "shear") {
 						var translateTimeline : TranslateTimeline;
 						var timelineScale : Number = 1;
-						if (timelineName == "scale")
+						var defaultValue : Number = 0;
+						if (timelineName == "scale") {
 							translateTimeline = new ScaleTimeline(values.length);
-						else if (timelineName == "shear")
+							defaultValue = 1;
+						} else if (timelineName == "shear")
 							translateTimeline = new ShearTimeline(values.length);
 						else {
 							translateTimeline = new TranslateTimeline(values.length);
@@ -515,9 +564,9 @@ package spine {
 
 						frameIndex = 0;
 						for each (valueMap in values) {
-							var x : Number = Number(valueMap["x"] || 0) * timelineScale;
-							var y : Number = Number(valueMap["y"] || 0) * timelineScale;
-							translateTimeline.setFrame(frameIndex, valueMap["time"], x, y);
+							var x : Number = getFloatValue(valueMap, "x", defaultValue) * timelineScale;
+							var y : Number = getFloatValue(valueMap, "y", defaultValue) * timelineScale;
+							translateTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), x, y);
 							readCurve(valueMap, translateTimeline, frameIndex);
 							frameIndex++;
 						}
@@ -540,7 +589,8 @@ package spine {
 					var bendDirection : int = (!valueMap.hasOwnProperty("bendPositive") || valueMap["bendPositive"]) ? 1 : -1;
 					var compress : Boolean = (valueMap.hasOwnProperty("compress") && valueMap["compress"]);
 					var stretch : Boolean = (valueMap.hasOwnProperty("stretch") && valueMap["stretch"]);
-					ikTimeline.setFrame(frameIndex, valueMap["time"], mix, bendDirection, compress, stretch);
+					var softness : Number = (valueMap.hasOwnProperty("softness") ? valueMap["softness"] : 0) * scale;
+					ikTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), mix, softness, bendDirection, compress, stretch);
 					readCurve(valueMap, ikTimeline, frameIndex);
 					frameIndex++;
 				}
@@ -560,7 +610,7 @@ package spine {
 					var translateMix : Number = valueMap.hasOwnProperty("translateMix") ? valueMap["translateMix"] : 1;
 					var scaleMix : Number = valueMap.hasOwnProperty("scaleMix") ? valueMap["scaleMix"] : 1;
 					var shearMix : Number = valueMap.hasOwnProperty("shearMix") ? valueMap["shearMix"] : 1;
-					transformTimeline.setFrame(frameIndex, valueMap["time"], rotateMix, translateMix, scaleMix, shearMix);
+					transformTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), rotateMix, translateMix, scaleMix, shearMix);
 					readCurve(valueMap, transformTimeline, frameIndex);
 					frameIndex++;
 				}
@@ -593,7 +643,7 @@ package spine {
 						frameIndex = 0;
 						for each (valueMap in values) {
 							var value : Number = valueMap[timelineName] || 0;
-							pathTimeline.setFrame(frameIndex, valueMap["time"], value * timelineScale);
+							pathTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), value * timelineScale);
 							readCurve(valueMap, pathTimeline, frameIndex);
 							frameIndex++;
 						}
@@ -606,7 +656,7 @@ package spine {
 						for each (valueMap in values) {
 							rotateMix = valueMap.hasOwnProperty("rotateMix") ? valueMap["rotateMix"] : 1;
 							translateMix = valueMap.hasOwnProperty("translateMix") ? valueMap["translateMix"] : 1;
-							pathMixTimeline.setFrame(frameIndex, valueMap["time"], rotateMix, translateMix);
+							pathMixTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), rotateMix, translateMix);
 							readCurve(valueMap, pathMixTimeline, frameIndex);
 							frameIndex++;
 						}
@@ -660,7 +710,7 @@ package spine {
 								}
 							}
 
-							deformTimeline.setFrame(frameIndex, valueMap["time"], deform);
+							deformTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), deform);
 							readCurve(valueMap, deformTimeline, frameIndex);
 							frameIndex++;
 						}
@@ -701,7 +751,7 @@ package spine {
 						for (i = slotCount - 1; i >= 0; i--)
 							if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
 					}
-					drawOrderTimeline.setFrame(frameIndex++, drawOrderMap["time"], drawOrder);
+					drawOrderTimeline.setFrame(frameIndex++, Number(drawOrderMap["time"] || 0), drawOrder);
 				}
 				timelines[timelines.length] = drawOrderTimeline;
 				duration = Math.max(duration, drawOrderTimeline.frames[drawOrderTimeline.frameCount - 1]);
@@ -714,7 +764,7 @@ package spine {
 				for each (var eventMap : Object in eventsMap) {
 					var eventData : EventData = skeletonData.findEvent(eventMap["name"]);
 					if (!eventData) throw new Error("Event not found: " + eventMap["name"]);
-					var event : Event = new Event(eventMap["time"], eventData);
+					var event : Event = new Event(Number(eventMap["time"] || 0), eventData);
 					event.intValue = eventMap.hasOwnProperty("int") ? eventMap["int"] : eventData.intValue;
 					event.floatValue = eventMap.hasOwnProperty("float") ? eventMap["float"] : eventData.floatValue;
 					event.stringValue = eventMap.hasOwnProperty("string") ? eventMap["string"] : eventData.stringValue;
@@ -736,8 +786,8 @@ package spine {
 			if (!curve) return;
 			if (curve == "stepped")
 				timeline.setStepped(frameIndex);
-			else if (curve is Array)
-				timeline.setCurve(frameIndex, curve[0], curve[1], curve[2], curve[3]);
+			else
+				timeline.setCurve(frameIndex, parseFloat(curve.toString()), Number(map["c2"] || 0), Number(map["c3"] || 1), Number(map["c4"] || 1));
 		}
 
 		static private function toColor(hexString : String, colorIndex : int) : Number {
@@ -784,11 +834,13 @@ class LinkedMesh {
 	internal var parent : String, skin : String;
 	internal var slotIndex : int;
 	internal var mesh : MeshAttachment;
+	internal var inheritDeform : Boolean;
 
-	public function LinkedMesh(mesh : MeshAttachment, skin : String, slotIndex : int, parent : String) {
+	public function LinkedMesh(mesh : MeshAttachment, skin : String, slotIndex : int, parent : String, inheritDeform : Boolean) {
 		this.mesh = mesh;
 		this.skin = skin;
 		this.slotIndex = slotIndex;
 		this.parent = parent;
+		this.inheritDeform = inheritDeform;
 	}
 }

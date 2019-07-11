@@ -56,4 +56,17 @@ public class SpineUtils {
 	public static float atan2 (float y, float x) {
 		return (float)Math.atan2(y, x);
 	}
+
+	static public void arraycopy (Object src, int srcPos, Object dest, int destPos, int length) {
+		if (src == null) throw new IllegalArgumentException("src cannot be null.");
+		if (dest == null) throw new IllegalArgumentException("dest cannot be null.");
+		try {
+			System.arraycopy(src, srcPos, dest, destPos, length);
+		} catch (ArrayIndexOutOfBoundsException ex) {
+			throw new ArrayIndexOutOfBoundsException( //
+				"Src: " + java.lang.reflect.Array.getLength(src) + ", " + srcPos //
+					+ ", dest: " + java.lang.reflect.Array.getLength(dest) + ", " + destPos //
+					+ ", count: " + length);
+		}
+	}
 }

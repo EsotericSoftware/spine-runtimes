@@ -178,5 +178,27 @@ namespace Spine {
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + bwy;
 			//offset += stride;
 		}
+
+		public override Attachment Copy () {
+			RegionAttachment copy = new RegionAttachment(this.Name);
+			copy.RendererObject = RendererObject;
+			copy.regionOffsetX = regionOffsetX;
+			copy.regionOffsetY = regionOffsetY;
+			copy.regionWidth = regionWidth;
+			copy.regionHeight = regionHeight;
+			copy.regionOriginalWidth = regionOriginalWidth;
+			copy.regionOriginalHeight = regionOriginalHeight;
+			copy.Path = Path;
+			copy.x = x;
+			copy.y = y;
+			copy.scaleX = scaleX;
+			copy.scaleY = scaleY;
+			copy.rotation = rotation;
+			copy.width = width;
+			copy.height = height;
+			Array.Copy(uvs, 0, copy.uvs, 0, 8);
+			Array.Copy(offset, 0, copy.offset, 0, 8);
+			return copy;
+		}
 	}
 }

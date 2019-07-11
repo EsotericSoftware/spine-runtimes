@@ -1,26 +1,26 @@
 
 spineboy.png
-size: 1022,1022
+size: 1024,1024
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 eye_indifferent
   rotate: false
-  xy: 549, 694
+  xy: 550, 694
   size: 93, 89
   orig: 93, 89
   offset: 0, 0
   index: -1
 eye_surprised
   rotate: false
-  xy: 834, 857
+  xy: 834, 856
   size: 93, 89
   orig: 93, 89
   offset: 0, 0
   index: -1
 front_bracer
-  rotate: true
-  xy: 375, 432
+  rotate: false
+  xy: 678, 774
   size: 58, 80
   orig: 58, 80
   offset: 0, 0
@@ -34,14 +34,14 @@ front_fist_closed
   index: -1
 front_fist_open
   rotate: false
-  xy: 447, 504
+  xy: 550, 605
   size: 86, 87
   orig: 86, 87
   offset: 0, 0
   index: -1
 front_foot
   rotate: false
-  xy: 549, 785
+  xy: 550, 785
   size: 126, 69
   orig: 126, 69
   offset: 0, 0
@@ -63,9 +63,9 @@ front_foot_bend2
 front_shin
   rotate: false
   xy: 466, 670
-  size: 81, 184
+  size: 82, 184
   orig: 82, 184
-  offset: 1, 0
+  offset: 0, 0
   index: -1
 front_thigh
   rotate: false
@@ -117,8 +117,8 @@ mouth_oooo
   offset: 0, 0
   index: -1
 mouth_smile
-  rotate: true
-  xy: 550, 599
+  rotate: false
+  xy: 447, 532
   size: 93, 59
   orig: 93, 59
   offset: 0, 0
@@ -132,15 +132,15 @@ muzzle
   index: -1
 neck
   rotate: false
-  xy: 64, 6
-  size: 35, 41
+  xy: 796, 819
+  size: 36, 41
   orig: 36, 41
   offset: 0, 0
   index: -1
 rear_bracer
   rotate: false
-  xy: 677, 782
-  size: 55, 72
+  xy: 738, 788
+  size: 56, 72
   orig: 56, 72
   offset: 0, 0
   index: -1
@@ -160,28 +160,28 @@ rear_foot_bend1
   index: -1
 rear_foot_bend2
   rotate: false
-  xy: 729, 863
+  xy: 729, 862
   size: 103, 83
   orig: 103, 83
   offset: 0, 0
   index: -1
 rear_shin
   rotate: true
-  xy: 729, 948
-  size: 74, 178
+  xy: 729, 947
+  size: 75, 178
   orig: 75, 178
-  offset: 1, 0
+  offset: 0, 0
   index: -1
 rear_thigh
   rotate: true
   xy: 909, 957
-  size: 65, 103
+  size: 65, 104
   orig: 65, 104
-  offset: 0, 1
+  offset: 0, 0
   index: -1
 rear_upper_arm
-  rotate: false
-  xy: 370, 343
+  rotate: true
+  xy: 447, 483
   size: 47, 87
   orig: 47, 87
   offset: 0, 0

@@ -185,7 +185,15 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 			region.name = line
 			region.page = page
 
-			if readValue() == "true" then region.rotate = true end
+			local rotateValue = readValue()
+			if rotateValue == "true" then
+				region.degrees = 90
+			elseif rotateValue == "false" then
+				region.degrees = 0
+			else
+				region.degrees = tonumber(rotateValue)
+			end
+			if region.degrees == 90 then region.rotate = true end
 
 			local tuple = readTuple()
 			local x = parseInt(tuple[1])

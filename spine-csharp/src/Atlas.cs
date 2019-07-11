@@ -153,7 +153,14 @@ namespace Spine {
 					region.name = line;
 					region.page = page;
 
-					region.rotate = Boolean.Parse(ReadValue(reader));
+					string rotateValue = ReadValue(reader);
+					if (rotateValue == "true")
+						region.degrees = 90;
+					else if (rotateValue == "false")
+						region.degrees = 0;
+					else
+						region.degrees = int.Parse(rotateValue);
+					region.rotate = region.degrees == 90;
 
 					ReadTuple(reader, tuple);
 					int x = int.Parse(tuple[0], CultureInfo.InvariantCulture);
@@ -304,6 +311,7 @@ namespace Spine {
 		public int originalWidth, originalHeight;
 		public int index;
 		public bool rotate;
+		public int degrees;
 		public int[] splits;
 		public int[] pads;
 

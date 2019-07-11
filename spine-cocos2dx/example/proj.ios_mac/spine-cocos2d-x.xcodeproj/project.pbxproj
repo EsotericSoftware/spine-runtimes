@@ -75,7 +75,6 @@
 		763104DD20BC1B5E00927A1E /* Triangulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A020BC1B5600927A1E /* Triangulator.cpp */; };
 		763104DE20BC1B5E00927A1E /* Skeleton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A120BC1B5600927A1E /* Skeleton.cpp */; };
 		763104DF20BC1B5E00927A1E /* AttachmentLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A220BC1B5600927A1E /* AttachmentLoader.cpp */; };
-		763104E020BC1B5E00927A1E /* Constraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A320BC1B5600927A1E /* Constraint.cpp */; };
 		763104E120BC1B5E00927A1E /* AttachmentTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A420BC1B5600927A1E /* AttachmentTimeline.cpp */; };
 		763104E220BC1B5E00927A1E /* Updatable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A520BC1B5600927A1E /* Updatable.cpp */; };
 		763104E320BC1B5E00927A1E /* RegionAttachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A620BC1B5700927A1E /* RegionAttachment.cpp */; };
@@ -120,7 +119,6 @@
 		763105A820BC1B9700927A1E /* BoundingBoxAttachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104AB20BC1B5700927A1E /* BoundingBoxAttachment.cpp */; };
 		763105A920BC1B9700927A1E /* ClippingAttachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A720BC1B5700927A1E /* ClippingAttachment.cpp */; };
 		763105AA20BC1B9700927A1E /* ColorTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7631049620BC1B5500927A1E /* ColorTimeline.cpp */; };
-		763105AB20BC1B9700927A1E /* Constraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A320BC1B5600927A1E /* Constraint.cpp */; };
 		763105AC20BC1B9700927A1E /* CurveTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7631048920BC1B5400927A1E /* CurveTimeline.cpp */; };
 		763105AD20BC1B9700927A1E /* DeformTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104BE20BC1B5D00927A1E /* DeformTimeline.cpp */; };
 		763105AE20BC1B9700927A1E /* DrawOrderTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7631048A20BC1B5400927A1E /* DrawOrderTimeline.cpp */; };
@@ -168,6 +166,10 @@
 		763105D820BC1B9700927A1E /* Updatable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A520BC1B5600927A1E /* Updatable.cpp */; };
 		763105D920BC1B9700927A1E /* VertexAttachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7631049220BC1B5500927A1E /* VertexAttachment.cpp */; };
 		763105DA20BC1B9700927A1E /* VertexEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104AE20BC1B5800927A1E /* VertexEffect.cpp */; };
+		76798D1D22A95AB400F77964 /* ConstraintData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76798D1C22A95AB300F77964 /* ConstraintData.cpp */; };
+		76798D1E22A95AEF00F77964 /* ConstraintData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76798D1C22A95AB300F77964 /* ConstraintData.cpp */; };
+		767D80E322B29F22000BD703 /* MixAndMatchExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 767D80E022B29F22000BD703 /* MixAndMatchExample.cpp */; };
+		767D80E422B2A003000BD703 /* MixAndMatchExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 767D80E022B29F22000BD703 /* MixAndMatchExample.cpp */; };
 		76A45BDE1E64396800745AA1 /* SkeletonTwoColorBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76A45BDC1E64396800745AA1 /* SkeletonTwoColorBatch.cpp */; };
 		76A45BDF1E64396800745AA1 /* SkeletonTwoColorBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76A45BDC1E64396800745AA1 /* SkeletonTwoColorBatch.cpp */; };
 		76AAA3C01D180F7C00C54FCB /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B31D180F7C00C54FCB /* AppDelegate.cpp */; };
@@ -332,7 +334,6 @@
 		763104A020BC1B5600927A1E /* Triangulator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Triangulator.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/Triangulator.cpp"; sourceTree = "<group>"; };
 		763104A120BC1B5600927A1E /* Skeleton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Skeleton.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/Skeleton.cpp"; sourceTree = "<group>"; };
 		763104A220BC1B5600927A1E /* AttachmentLoader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AttachmentLoader.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/AttachmentLoader.cpp"; sourceTree = "<group>"; };
-		763104A320BC1B5600927A1E /* Constraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Constraint.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/Constraint.cpp"; sourceTree = "<group>"; };
 		763104A420BC1B5600927A1E /* AttachmentTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AttachmentTimeline.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/AttachmentTimeline.cpp"; sourceTree = "<group>"; };
 		763104A520BC1B5600927A1E /* Updatable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Updatable.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/Updatable.cpp"; sourceTree = "<group>"; };
 		763104A620BC1B5700927A1E /* RegionAttachment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RegionAttachment.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/RegionAttachment.cpp"; sourceTree = "<group>"; };
@@ -364,6 +365,9 @@
 		763104C020BC1B5E00927A1E /* SkeletonBounds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonBounds.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/SkeletonBounds.cpp"; sourceTree = "<group>"; };
 		763104C120BC1B5E00927A1E /* ShearTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShearTimeline.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/ShearTimeline.cpp"; sourceTree = "<group>"; };
 		763104C220BC1B5E00927A1E /* TranslateTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TranslateTimeline.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/TranslateTimeline.cpp"; sourceTree = "<group>"; };
+		76798D1C22A95AB300F77964 /* ConstraintData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ConstraintData.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/ConstraintData.cpp"; sourceTree = "<group>"; };
+		767D80E022B29F22000BD703 /* MixAndMatchExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MixAndMatchExample.cpp; sourceTree = "<group>"; };
+		767D80E222B29F22000BD703 /* MixAndMatchExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MixAndMatchExample.h; sourceTree = "<group>"; };
 		76A45BDC1E64396800745AA1 /* SkeletonTwoColorBatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonTwoColorBatch.cpp; path = ../../src/spine/SkeletonTwoColorBatch.cpp; sourceTree = "<group>"; };
 		76A45BDD1E64396800745AA1 /* SkeletonTwoColorBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonTwoColorBatch.h; path = ../../src/spine/SkeletonTwoColorBatch.h; sourceTree = "<group>"; };
 		76AAA3B31D180F7C00C54FCB /* AppDelegate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AppDelegate.cpp; sourceTree = "<group>"; };
@@ -539,6 +543,8 @@
 		46880B8319C43A87006E1F66 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				767D80E022B29F22000BD703 /* MixAndMatchExample.cpp */,
+				767D80E222B29F22000BD703 /* MixAndMatchExample.h */,
 				76D1BFDF2029E35200A0272D /* SkeletonRendererSeparatorExample.cpp */,
 				76D1BFDE2029E35100A0272D /* SkeletonRendererSeparatorExample.h */,
 				76D520E41EB362DD00572471 /* CoinExample.cpp */,
@@ -611,6 +617,7 @@
 		76AAA3B21D180F7300C54FCB /* spine */ = {
 			isa = PBXGroup;
 			children = (
+				76798D1C22A95AB300F77964 /* ConstraintData.cpp */,
 				763104B620BC1B5C00927A1E /* Animation.cpp */,
 				7631049B20BC1B5600927A1E /* AnimationState.cpp */,
 				763104AF20BC1B5800927A1E /* AnimationStateData.cpp */,
@@ -624,7 +631,6 @@
 				763104AB20BC1B5700927A1E /* BoundingBoxAttachment.cpp */,
 				763104A720BC1B5700927A1E /* ClippingAttachment.cpp */,
 				7631049620BC1B5500927A1E /* ColorTimeline.cpp */,
-				763104A320BC1B5600927A1E /* Constraint.cpp */,
 				7631048920BC1B5400927A1E /* CurveTimeline.cpp */,
 				763104BE20BC1B5D00927A1E /* DeformTimeline.cpp */,
 				7631048A20BC1B5400927A1E /* DrawOrderTimeline.cpp */,
@@ -841,7 +847,6 @@
 				76AAA40C1D18106000C54FCB /* AttachmentVertices.cpp in Sources */,
 				76D1BFE02029E35200A0272D /* SkeletonRendererSeparatorExample.cpp in Sources */,
 				763104EF20BC1B5E00927A1E /* IkConstraintTimeline.cpp in Sources */,
-				763104E020BC1B5E00927A1E /* Constraint.cpp in Sources */,
 				763104D820BC1B5E00927A1E /* AnimationState.cpp in Sources */,
 				763104EE20BC1B5E00927A1E /* SkeletonClipping.cpp in Sources */,
 				763104E420BC1B5E00927A1E /* ClippingAttachment.cpp in Sources */,
@@ -872,6 +877,7 @@
 				503AE10017EB989F00D1A890 /* AppController.mm in Sources */,
 				763104E820BC1B5E00927A1E /* BoundingBoxAttachment.cpp in Sources */,
 				763104C720BC1B5E00927A1E /* DrawOrderTimeline.cpp in Sources */,
+				767D80E322B29F22000BD703 /* MixAndMatchExample.cpp in Sources */,
 				763104F520BC1B5E00927A1E /* MeshAttachment.cpp in Sources */,
 				763104E520BC1B5E00927A1E /* TwoColorTimeline.cpp in Sources */,
 				763104D420BC1B5E00927A1E /* IkConstraint.cpp in Sources */,
@@ -880,6 +886,7 @@
 				763104D120BC1B5E00927A1E /* MathUtil.cpp in Sources */,
 				763104DD20BC1B5E00927A1E /* Triangulator.cpp in Sources */,
 				763104F320BC1B5E00927A1E /* Animation.cpp in Sources */,
+				76798D1D22A95AB400F77964 /* ConstraintData.cpp in Sources */,
 				76AAA40E1D18106000C54FCB /* SkeletonAnimation.cpp in Sources */,
 				76AAA4111D18106000C54FCB /* spine-cocos2dx.cpp in Sources */,
 				763104FC20BC1B5E00927A1E /* PathConstraintData.cpp in Sources */,
@@ -920,6 +927,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				767D80E422B2A003000BD703 /* MixAndMatchExample.cpp in Sources */,
+				76798D1E22A95AEF00F77964 /* ConstraintData.cpp in Sources */,
 				7631059E20BC1B9700927A1E /* Animation.cpp in Sources */,
 				7631059F20BC1B9700927A1E /* AnimationState.cpp in Sources */,
 				763105A020BC1B9700927A1E /* AnimationStateData.cpp in Sources */,
@@ -933,7 +942,6 @@
 				763105A820BC1B9700927A1E /* BoundingBoxAttachment.cpp in Sources */,
 				763105A920BC1B9700927A1E /* ClippingAttachment.cpp in Sources */,
 				763105AA20BC1B9700927A1E /* ColorTimeline.cpp in Sources */,
-				763105AB20BC1B9700927A1E /* Constraint.cpp in Sources */,
 				763105AC20BC1B9700927A1E /* CurveTimeline.cpp in Sources */,
 				763105AD20BC1B9700927A1E /* DeformTimeline.cpp in Sources */,
 				763105AE20BC1B9700927A1E /* DrawOrderTimeline.cpp in Sources */,

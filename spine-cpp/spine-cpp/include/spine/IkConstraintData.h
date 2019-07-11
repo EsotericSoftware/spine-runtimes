@@ -33,11 +33,12 @@
 #include <spine/Vector.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
+#include <spine/ConstraintData.h>
 
 namespace spine {
     class BoneData;
     
-    class SP_API IkConstraintData : public SpineObject {
+    class SP_API IkConstraintData : public ConstraintData {
         friend class SkeletonBinary;
         friend class SkeletonJson;
         friend class IkConstraint;
@@ -46,12 +47,6 @@ namespace spine {
         
     public:
         explicit IkConstraintData(const String& name);
-        
-        /// The IK constraint's name, which is unique within the skeleton.
-        const String& getName();
-
-        size_t getOrder();
-        void setOrder(size_t inValue);
         
         /// The bones that are constrained by this IK Constraint.
         Vector<BoneData*>& getBones();
@@ -76,9 +71,10 @@ namespace spine {
         float getMix();
         void setMix(float inValue);
 
+		float getSoftness();
+		void setSoftness(float inValue);
+
     private:
-        const String _name;
-        size_t _order;
         Vector<BoneData*> _bones;
         BoneData* _target;
         int _bendDirection;
@@ -86,6 +82,7 @@ namespace spine {
         bool _stretch;
         bool _uniform;
         float _mix;
+        float _softness;
     };
 }
 

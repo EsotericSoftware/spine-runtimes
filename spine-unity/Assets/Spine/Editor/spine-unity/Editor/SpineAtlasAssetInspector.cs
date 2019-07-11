@@ -133,12 +133,12 @@ namespace Spine.Unity.Editor {
 			}
 
 			EditorGUILayout.Space();
-			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Set Mipmap Bias to " + SpineEditorUtilities.Preferences.DEFAULT_MIPMAPBIAS, tooltip: "This may help textures with mipmaps be less blurry when used for 2D sprites."))) {
+			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Set Mipmap Bias to " + SpinePreferences.DEFAULT_MIPMAPBIAS, tooltip: "This may help textures with mipmaps be less blurry when used for 2D sprites."))) {
 				foreach (var m in atlasAsset.materials) {
 					var texture = m.mainTexture;
-					texture.mipMapBias = SpineEditorUtilities.Preferences.DEFAULT_MIPMAPBIAS;
+					texture.mipMapBias = SpinePreferences.DEFAULT_MIPMAPBIAS;
 				}
-				Debug.Log("Texture mipmap bias set to " + SpineEditorUtilities.Preferences.DEFAULT_MIPMAPBIAS);
+				Debug.Log("Texture mipmap bias set to " + SpinePreferences.DEFAULT_MIPMAPBIAS);
 			}
 
 			EditorGUILayout.Space();

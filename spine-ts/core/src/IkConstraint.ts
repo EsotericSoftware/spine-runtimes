@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 module spine {
-	export class IkConstraint implements Constraint {
+	export class IkConstraint implements Updatable {
 		data: IkConstraintData;
 		bones: Array<Bone>;
 		target: Bone;
@@ -36,12 +36,15 @@ module spine {
 		compress = false;
 		stretch = false;
 		mix = 1;
+		softness = 0;
+		active = false;
 
 		constructor (data: IkConstraintData, skeleton: Skeleton) {
 			if (data == null) throw new Error("data cannot be null.");
 			if (skeleton == null) throw new Error("skeleton cannot be null.");
 			this.data = data;
 			this.mix = data.mix;
+			this.softness = data.softness;
 			this.bendDirection = data.bendDirection;
 			this.compress = data.compress;
 			this.stretch = data.stretch;
@@ -52,8 +55,8 @@ module spine {
 			this.target = skeleton.findBone(data.target.name);
 		}
 
-		getOrder () {
-			return this.data.order;
+		isActive () {
+			return this.active;
 		}
 
 		apply () {
@@ -68,7 +71,7 @@ module spine {
 				this.apply1(bones[0], target.worldX, target.worldY, this.compress, this.stretch, this.data.uniform, this.mix);
 				break;
 			case 2:
-				this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.stretch, this.mix);
+				this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.stretch, this.softness, this.mix);
 				break;
 			}
 		}
@@ -102,7 +105,7 @@ module spine {
 		/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
 		 * target is specified in the world coordinate system.
 		 * @param child A direct descendant of the parent bone. */
-		apply2 (parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, alpha: number) {
+		apply2 (parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, softness: number, alpha: number) {
 			if (alpha == 0) {
 				child.updateWorldTransform();
 				return;
@@ -144,12 +147,29 @@ module spine {
 			b = pp.b;
 			c = pp.c;
 			d = pp.d;
-			let id = 1 / (a * d - b * c), x = targetX - pp.worldX, y = targetY - pp.worldY;
-			let tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py, dd = tx * tx + ty * ty;
-			x = cwx - pp.worldX;
-			y = cwy - pp.worldY;
+			let id = 1 / (a * d - b * c), x = cwx - pp.worldX, y = cwy - pp.worldY;
 			let dx = (x * d - y * b) * id - px, dy = (y * a - x * c) * id - py;
-			let l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1 = 0, a2 = 0;
+			let l1 = Math.sqrt(dx * dx + dy * dy), l2 = child.data.length * csx, a1, a2;
+			if (l1 < 0.0001) {
+				this.apply1(parent, targetX, targetY, false, stretch, false, alpha);
+				child.updateWorldTransformWith(cx, cy, 0, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
+				return;
+			}
+			x = targetX - pp.worldX;
+			y = targetY - pp.worldY;
+			let tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
+			let dd = tx * tx + ty * ty;
+			if (softness != 0) {
+				softness *= psx * (csx + 1) / 2;
+				let td = Math.sqrt(dd), sd = td - l1 - l2 * psx + softness;
+				if (sd > 0) {
+					let p = Math.min(1, sd / (softness * 2)) - 1;
+					p = (sd - softness * (1 - p * p)) / td;
+					tx -= p * tx;
+					ty -= p * ty;
+					dd = tx * tx + ty * ty;
+				}
+			}
 			outer:
 			if (u) {
 				l2 *= psx;
@@ -158,7 +178,7 @@ module spine {
 					cos = -1;
 				else if (cos > 1) {
 					cos = 1;
-					if (stretch && l1 + l2 > 0.0001) sx *= (Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+					if (stretch) sx *= (Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
 				}
 				a2 = Math.acos(cos) * bendDir;
 				a = l1 + l2 * cos;

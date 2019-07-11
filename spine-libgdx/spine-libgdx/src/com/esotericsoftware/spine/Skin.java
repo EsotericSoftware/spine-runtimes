@@ -30,11 +30,10 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ObjectMap.Entry;
-import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.OrderedMap;
 
 import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
 
 /** Stores attachments by slot index and attachment name.
  * <p>
@@ -42,32 +41,55 @@ import com.esotericsoftware.spine.attachments.Attachment;
  * <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
 public class Skin {
 	final String name;
-	final ObjectMap<Key, Attachment> attachments = new ObjectMap();
-	private final Key lookup = new Key();
-	final Pool<Key> keyPool = new Pool(64) {
-		protected Object newObject () {
-			return new Key();
-		}
-	};
+	final OrderedMap<SkinEntry, Attachment> attachments = new OrderedMap();
+	final Array<BoneData> bones = new Array();
+	final Array<ConstraintData> constraints = new Array();
+	private final SkinEntry lookup = new SkinEntry();
 
 	public Skin (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
+		this.attachments.orderedKeys().ordered = false;
 	}
 
 	/** Adds an attachment to the skin for the specified slot index and name. */
-	public void addAttachment (int slotIndex, String name, Attachment attachment) {
-		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
+	public void setAttachment (int slotIndex, String name, Attachment attachment) {
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
-		Key key = keyPool.obtain();
-		key.set(slotIndex, name);
-		attachments.put(key, attachment);
+		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
+		attachments.put(new SkinEntry(slotIndex, name, attachment), attachment);
 	}
 
-	/** Adds all attachments from the specified skin to this skin. */
-	public void addAttachments (Skin skin) {
-		for (Entry<Key, Attachment> entry : skin.attachments.entries())
-			addAttachment(entry.key.slotIndex, entry.key.name, entry.value);
+	/** Adds all attachments, bones, and constraints from the specified skin to this skin. */
+	public void addSkin (Skin skin) {
+		if (skin == null) throw new IllegalArgumentException("skin cannot be null.");
+
+		for (BoneData data : skin.bones)
+			if (!bones.contains(data, true)) bones.add(data);
+
+		for (ConstraintData data : skin.constraints)
+			if (!constraints.contains(data, true)) constraints.add(data);
+
+		for (SkinEntry entry : skin.attachments.keys())
+			setAttachment(entry.slotIndex, entry.name, entry.attachment);
+	}
+
+	/** Adds all bones and constraints and copies of all attachments from the specified skin to this skin. Mesh attachments are not
+	 * copied, instead a new linked mesh is created. The attachment copies can be modified without affecting the originals. */
+	public void copySkin (Skin skin) {
+		if (skin == null) throw new IllegalArgumentException("skin cannot be null.");
+
+		for (BoneData data : skin.bones)
+			if (!bones.contains(data, true)) bones.add(data);
+
+		for (ConstraintData data : skin.constraints)
+			if (!constraints.contains(data, true)) constraints.add(data);
+
+		for (SkinEntry entry : skin.attachments.keys()) {
+			if (entry.attachment instanceof MeshAttachment)
+				setAttachment(entry.slotIndex, entry.name, ((MeshAttachment)entry.attachment).newLinkedMesh());
+			else
+				setAttachment(entry.slotIndex, entry.name, entry.attachment != null ? entry.attachment.copy() : null);
+		}
 	}
 
 	/** Returns the attachment for the specified slot index and name, or null. */
@@ -80,43 +102,39 @@ public class Skin {
 	/** Removes the attachment in the skin for the specified slot index and name, if any. */
 	public void removeAttachment (int slotIndex, String name) {
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
-		Key key = keyPool.obtain();
-		key.set(slotIndex, name);
-		attachments.remove(key);
-		keyPool.free(key);
+		lookup.set(slotIndex, name);
+		attachments.remove(lookup);
 	}
 
-	public void findNamesForSlot (int slotIndex, Array<String> names) {
-		if (names == null) throw new IllegalArgumentException("names cannot be null.");
+	/** Returns all attachments in this skin. */
+	public Array<SkinEntry> getAttachments () {
+		return attachments.orderedKeys();
+	}
+
+	/** Returns all attachments in this skin for the specified slot index. */
+	public void getAttachments (int slotIndex, Array<SkinEntry> attachments) {
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
-		for (Key key : attachments.keys())
-			if (key.slotIndex == slotIndex) names.add(key.name);
-	}
-
-	public void findAttachmentsForSlot (int slotIndex, Array<Attachment> attachments) {
 		if (attachments == null) throw new IllegalArgumentException("attachments cannot be null.");
-		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
-		for (Entry<Key, Attachment> entry : this.attachments.entries())
-			if (entry.key.slotIndex == slotIndex) attachments.add(entry.value);
+		for (SkinEntry entry : this.attachments.keys())
+			if (entry.slotIndex == slotIndex) attachments.add(entry);
 	}
 
-	public void getAttachments (Array<Attachment> attachments) {
-		if (attachments == null) throw new IllegalArgumentException("attachments cannot be null.");
-		for (Attachment attachment : this.attachments.values())
-			attachments.add(attachment);
-	}
-
+	/** Clears all attachments, bones, and constraints. */
 	public void clear () {
-		for (Key key : attachments.keys())
-			keyPool.free(key);
 		attachments.clear(1024);
+		bones.clear();
+		constraints.clear();
 	}
 
-	public int size () {
-		return attachments.size;
+	public Array<BoneData> getBones () {
+		return bones;
 	}
 
-	/** The skin's name, which is unique within the skeleton. */
+	public Array<ConstraintData> getConstraints () {
+		return constraints;
+	}
+
+	/** The skin's name, which is unique across all skins in the skeleton. */
 	public String getName () {
 		return name;
 	}
@@ -127,26 +145,50 @@ public class Skin {
 
 	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
 	void attachAll (Skeleton skeleton, Skin oldSkin) {
-		for (Entry<Key, Attachment> entry : oldSkin.attachments.entries()) {
-			int slotIndex = entry.key.slotIndex;
+		for (SkinEntry entry : oldSkin.attachments.keys()) {
+			int slotIndex = entry.slotIndex;
 			Slot slot = skeleton.slots.get(slotIndex);
-			if (slot.attachment == entry.value) {
-				Attachment attachment = getAttachment(slotIndex, entry.key.name);
+			if (slot.attachment == entry.attachment) {
+				Attachment attachment = getAttachment(slotIndex, entry.name);
 				if (attachment != null) slot.setAttachment(attachment);
 			}
 		}
 	}
 
-	static class Key {
+	/** Stores an entry in the skin consisting of the slot index, name, and attachment **/
+	static public class SkinEntry {
 		int slotIndex;
 		String name;
-		int hashCode;
+		Attachment attachment;
+		private int hashCode;
 
-		public void set (int slotIndex, String name) {
+		SkinEntry () {
+			set(0, "");
+		}
+
+		SkinEntry (int slotIndex, String name, Attachment attachment) {
+			set(slotIndex, name);
+			this.attachment = attachment;
+		}
+
+		void set (int slotIndex, String name) {
 			if (name == null) throw new IllegalArgumentException("name cannot be null.");
 			this.slotIndex = slotIndex;
 			this.name = name;
-			hashCode = name.hashCode() + slotIndex * 37;
+			this.hashCode = name.hashCode() + slotIndex * 37;
+		}
+
+		public int getSlotIndex () {
+			return slotIndex;
+		}
+
+		/** The name the attachment is associated with, equivalent to the skin placeholder name in the Spine editor. */
+		public String getName () {
+			return name;
+		}
+
+		public Attachment getAttachment () {
+			return attachment;
 		}
 
 		public int hashCode () {
@@ -155,7 +197,7 @@ public class Skin {
 
 		public boolean equals (Object object) {
 			if (object == null) return false;
-			Key other = (Key)object;
+			SkinEntry other = (SkinEntry)object;
 			if (slotIndex != other.slotIndex) return false;
 			if (!name.equals(other.name)) return false;
 			return true;

@@ -29,14 +29,6 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.attachments.Attachment;
-import com.esotericsoftware.spine.attachments.ClippingAttachment;
-import com.esotericsoftware.spine.attachments.MeshAttachment;
-import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.SkeletonAttachment;
-import com.esotericsoftware.spine.utils.SkeletonClipping;
-import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -46,6 +38,14 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ShortArray;
+
+import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.ClippingAttachment;
+import com.esotericsoftware.spine.attachments.MeshAttachment;
+import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.SkeletonAttachment;
+import com.esotericsoftware.spine.utils.SkeletonClipping;
+import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 public class SkeletonRenderer {
 	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
@@ -72,10 +72,13 @@ public class SkeletonRenderer {
 		if (batch instanceof TwoColorPolygonBatch) {
 			draw((TwoColorPolygonBatch)batch, skeleton);
 			return;
-		} else if (batch instanceof PolygonSpriteBatch) {
+		}
+		if (batch instanceof PolygonSpriteBatch) {
 			draw((PolygonSpriteBatch)batch, skeleton);
 			return;
 		}
+		if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
 		VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
@@ -88,6 +91,7 @@ public class SkeletonRenderer {
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
+			if (!slot.bone.active) continue;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
@@ -147,12 +151,12 @@ public class SkeletonRenderer {
 	 * next. */
 	@SuppressWarnings("null")
 	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
-		Vector2 tempPos = this.temp;
-		Vector2 tempUv = this.temp2;
-		Color tempLight = this.temp3;
-		Color tempDark = this.temp4;
-		Color temp5 = this.temp5;
-		Color temp6 = this.temp6;
+		if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
+
+		Vector2 tempPosition = this.temp, tempUV = this.temp2;
+		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
+		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
 		VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
@@ -166,6 +170,7 @@ public class SkeletonRenderer {
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
+			if (!slot.bone.active) continue;
 			Texture texture = null;
 			int vertexSize = clipper.isClipping() ? 2 : 5;
 			Attachment attachment = slot.attachment;
@@ -229,21 +234,21 @@ public class SkeletonRenderer {
 						clippedTriangles.size);
 				} else {
 					if (vertexEffect != null) {
-						temp5.set(NumberUtils.floatToIntColor(c));
-						temp6.set(0);
+						tempLight1.set(NumberUtils.floatToIntColor(c));
+						tempDark1.set(0);
 						for (int v = 0, u = 0; v < verticesLength; v += 5, u += 2) {
-							tempPos.x = vertices[v];
-							tempPos.y = vertices[v + 1];
-							tempLight.set(temp5);
-							tempDark.set(temp6);
-							tempUv.x = uvs[u];
-							tempUv.y = uvs[u + 1];
-							vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
-							vertices[v] = tempPos.x;
-							vertices[v + 1] = tempPos.y;
-							vertices[v + 2] = tempLight.toFloatBits();
-							vertices[v + 3] = tempUv.x;
-							vertices[v + 4] = tempUv.y;
+							tempPosition.x = vertices[v];
+							tempPosition.y = vertices[v + 1];
+							tempLight2.set(tempLight1);
+							tempDark2.set(tempDark1);
+							tempUV.x = uvs[u];
+							tempUV.y = uvs[u + 1];
+							vertexEffect.transform(tempPosition, tempUV, tempLight2, tempDark2);
+							vertices[v] = tempPosition.x;
+							vertices[v + 1] = tempPosition.y;
+							vertices[v + 2] = tempLight2.toFloatBits();
+							vertices[v + 3] = tempUV.x;
+							vertices[v + 4] = tempUV.y;
 						}
 					} else {
 						for (int v = 2, u = 0; v < verticesLength; v += 5, u += 2) {
@@ -269,12 +274,12 @@ public class SkeletonRenderer {
 	 * next. */
 	@SuppressWarnings("null")
 	public void draw (TwoColorPolygonBatch batch, Skeleton skeleton) {
-		Vector2 tempPos = this.temp;
-		Vector2 tempUv = this.temp2;
-		Color tempLight = this.temp3;
-		Color tempDark = this.temp4;
-		Color temp5 = this.temp5;
-		Color temp6 = this.temp6;
+		if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
+		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
+
+		Vector2 tempPosition = this.temp, tempUV = this.temp2;
+		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
+		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
 		VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
@@ -289,6 +294,7 @@ public class SkeletonRenderer {
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
+			if (!slot.bone.active) continue;
 			Texture texture = null;
 			int vertexSize = clipper.isClipping() ? 2 : 6;
 			Attachment attachment = slot.attachment;
@@ -360,22 +366,22 @@ public class SkeletonRenderer {
 						clippedTriangles.size);
 				} else {
 					if (vertexEffect != null) {
-						temp5.set(NumberUtils.floatToIntColor(light));
-						temp6.set(NumberUtils.floatToIntColor(dark));
+						tempLight1.set(NumberUtils.floatToIntColor(light));
+						tempDark1.set(NumberUtils.floatToIntColor(dark));
 						for (int v = 0, u = 0; v < verticesLength; v += 6, u += 2) {
-							tempPos.x = vertices[v];
-							tempPos.y = vertices[v + 1];
-							tempLight.set(temp5);
-							tempDark.set(temp6);
-							tempUv.x = uvs[u];
-							tempUv.y = uvs[u + 1];
-							vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
-							vertices[v] = tempPos.x;
-							vertices[v + 1] = tempPos.y;
-							vertices[v + 2] = tempLight.toFloatBits();
-							vertices[v + 3] = tempDark.toFloatBits();
-							vertices[v + 4] = tempUv.x;
-							vertices[v + 5] = tempUv.y;
+							tempPosition.x = vertices[v];
+							tempPosition.y = vertices[v + 1];
+							tempLight2.set(tempLight1);
+							tempDark2.set(tempDark1);
+							tempUV.x = uvs[u];
+							tempUV.y = uvs[u + 1];
+							vertexEffect.transform(tempPosition, tempUV, tempLight2, tempDark2);
+							vertices[v] = tempPosition.x;
+							vertices[v + 1] = tempPosition.y;
+							vertices[v + 2] = tempLight2.toFloatBits();
+							vertices[v + 3] = tempDark2.toFloatBits();
+							vertices[v + 4] = tempUV.x;
+							vertices[v + 5] = tempUV.y;
 						}
 					} else {
 						for (int v = 2, u = 0; v < verticesLength; v += 6, u += 2) {
@@ -396,45 +402,42 @@ public class SkeletonRenderer {
 	}
 
 	private void applyVertexEffect (float[] vertices, int verticesLength, int stride, float light, float dark) {
-		Vector2 tempPos = this.temp;
-		Vector2 tempUv = this.temp2;
-		Color tempLight = this.temp3;
-		Color tempDark = this.temp4;
-		Color temp5 = this.temp5;
-		Color temp6 = this.temp6;
+		Vector2 tempPosition = this.temp, tempUV = this.temp2;
+		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
+		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
 		VertexEffect vertexEffect = this.vertexEffect;
-		temp5.set(NumberUtils.floatToIntColor(light));
-		temp6.set(NumberUtils.floatToIntColor(dark));
+		tempLight1.set(NumberUtils.floatToIntColor(light));
+		tempDark1.set(NumberUtils.floatToIntColor(dark));
 		if (stride == 5) {
 			for (int v = 0; v < verticesLength; v += stride) {
-				tempPos.x = vertices[v];
-				tempPos.y = vertices[v + 1];
-				tempUv.x = vertices[v + 3];
-				tempUv.y = vertices[v + 4];
-				tempLight.set(temp5);
-				tempDark.set(temp6);
-				vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
-				vertices[v] = tempPos.x;
-				vertices[v + 1] = tempPos.y;
-				vertices[v + 2] = tempLight.toFloatBits();
-				vertices[v + 3] = tempUv.x;
-				vertices[v + 4] = tempUv.y;
+				tempPosition.x = vertices[v];
+				tempPosition.y = vertices[v + 1];
+				tempUV.x = vertices[v + 3];
+				tempUV.y = vertices[v + 4];
+				tempLight2.set(tempLight1);
+				tempDark2.set(tempDark1);
+				vertexEffect.transform(tempPosition, tempUV, tempLight2, tempDark2);
+				vertices[v] = tempPosition.x;
+				vertices[v + 1] = tempPosition.y;
+				vertices[v + 2] = tempLight2.toFloatBits();
+				vertices[v + 3] = tempUV.x;
+				vertices[v + 4] = tempUV.y;
 			}
 		} else {
 			for (int v = 0; v < verticesLength; v += stride) {
-				tempPos.x = vertices[v];
-				tempPos.y = vertices[v + 1];
-				tempUv.x = vertices[v + 4];
-				tempUv.y = vertices[v + 5];
-				tempLight.set(temp5);
-				tempDark.set(temp6);
-				vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
-				vertices[v] = tempPos.x;
-				vertices[v + 1] = tempPos.y;
-				vertices[v + 2] = tempLight.toFloatBits();
-				vertices[v + 3] = tempDark.toFloatBits();
-				vertices[v + 4] = tempUv.x;
-				vertices[v + 5] = tempUv.y;
+				tempPosition.x = vertices[v];
+				tempPosition.y = vertices[v + 1];
+				tempUV.x = vertices[v + 4];
+				tempUV.y = vertices[v + 5];
+				tempLight2.set(tempLight1);
+				tempDark2.set(tempDark1);
+				vertexEffect.transform(tempPosition, tempUV, tempLight2, tempDark2);
+				vertices[v] = tempPosition.x;
+				vertices[v + 1] = tempPosition.y;
+				vertices[v + 2] = tempLight2.toFloatBits();
+				vertices[v + 3] = tempDark2.toFloatBits();
+				vertices[v + 4] = tempUV.x;
+				vertices[v + 5] = tempUV.y;
 			}
 		}
 	}
@@ -447,14 +450,17 @@ public class SkeletonRenderer {
 		this.premultipliedAlpha = premultipliedAlpha;
 	}
 
+	/** @return May be null. */
 	public VertexEffect getVertexEffect () {
 		return vertexEffect;
 	}
 
+	/** @param vertexEffect May be null. */
 	public void setVertexEffect (VertexEffect vertexEffect) {
 		this.vertexEffect = vertexEffect;
 	}
 
+	/** Modifies the skeleton or vertex positions, UVs, or colors during rendering. */
 	static public interface VertexEffect {
 		public void begin (Skeleton skeleton);
 

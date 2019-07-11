@@ -68,6 +68,8 @@ void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, f
 
 	PathConstraint *constraintP = skeleton._pathConstraints[_pathConstraintIndex];
 	PathConstraint &constraint = *constraintP;
+	if (!constraint.isActive()) return;
+
 	if (time < _frames[0]) {
 		switch (blend) {
 			case MixBlend_Setup:

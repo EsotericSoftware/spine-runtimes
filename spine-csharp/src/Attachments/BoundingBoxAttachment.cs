@@ -35,5 +35,11 @@ namespace Spine {
 		public BoundingBoxAttachment (string name)
 			: base(name) {
 		}
+
+		public override Attachment Copy () {
+			BoundingBoxAttachment copy = new BoundingBoxAttachment(this.Name);
+			CopyTo(copy);
+			return copy;
+		}
 	}
 }

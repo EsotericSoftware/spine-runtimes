@@ -29,28 +29,31 @@
 
 package com.esotericsoftware.spine.attachments;
 
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
+
+import com.badlogic.gdx.utils.FloatArray;
+
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
 
-import com.badlogic.gdx.utils.FloatArray;
-
 /** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
- * {@link Slot#getAttachmentVertices()}. */
-public class VertexAttachment extends Attachment {
+ * {@link Slot#getDeform()}. */
+abstract public class VertexAttachment extends Attachment {
 	static private int nextID;
 
 	private final int id = (nextID() & 65535) << 11;
 	int[] bones;
 	float[] vertices;
 	int worldVerticesLength;
+	VertexAttachment deformAttachment = this;
 
 	public VertexAttachment (String name) {
 		super(name);
 	}
 
-	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the slot has
-	 * {@link Slot#getAttachmentVertices()}, they are used to deform the vertices.
+	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the slot's {@link Slot#getDeform()} is
+	 * not empty, it is used to deform the vertices.
 	 * <p>
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
@@ -63,7 +66,7 @@ public class VertexAttachment extends Attachment {
 	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride) {
 		count = offset + (count >> 1) * stride;
 		Skeleton skeleton = slot.getSkeleton();
-		FloatArray deformArray = slot.getAttachmentVertices();
+		FloatArray deformArray = slot.getDeform();
 		float[] vertices = this.vertices;
 		int[] bones = this.bones;
 		if (bones == null) {
@@ -117,10 +120,15 @@ public class VertexAttachment extends Attachment {
 		}
 	}
 
-	/** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. The default
-	 * implementation returns true only when <code>sourceAttachment</code> is this attachment. */
-	public boolean applyDeform (VertexAttachment sourceAttachment) {
-		return this == sourceAttachment;
+	/** Deform keys for the deform attachment are also applied to this attachment.
+	 * @return May be null if no deform keys should be applied. */
+	public VertexAttachment getDeformAttachment () {
+		return deformAttachment;
+	}
+
+	/** @param deformAttachment May be null if no deform keys should be applied. */
+	public void setDeformAttachment (VertexAttachment deformAttachment) {
+		this.deformAttachment = deformAttachment;
 	}
 
 	/** The bones which affect the {@link #getVertices()}. The array entries are, for each vertex, the number of bones affecting
@@ -159,6 +167,24 @@ public class VertexAttachment extends Attachment {
 	/** Returns a unique ID for this attachment. */
 	public int getId () {
 		return id;
+	}
+
+	/** Does not copy id (generated) or name (set on construction). **/
+	void copyTo (VertexAttachment attachment) {
+		if (bones != null) {
+			attachment.bones = new int[bones.length];
+			arraycopy(bones, 0, attachment.bones, 0, bones.length);
+		} else
+			attachment.bones = null;
+
+		if (vertices != null) {
+			attachment.vertices = new float[vertices.length];
+			arraycopy(vertices, 0, attachment.vertices, 0, vertices.length);
+		} else
+			attachment.vertices = null;
+
+		attachment.worldVerticesLength = worldVerticesLength;
+		attachment.deformAttachment = deformAttachment;
 	}
 
 	static private synchronized int nextID () {

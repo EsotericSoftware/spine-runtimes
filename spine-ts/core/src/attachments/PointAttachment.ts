@@ -48,5 +48,14 @@ module spine {
 			let y = cos * bone.c + sin * bone.d;
 			return Math.atan2(y, x) * MathUtils.radDeg;
 		}
+
+		copy (): Attachment {
+			let copy = new PointAttachment(name);
+			copy.x = this.x;
+			copy.y = this.y;
+			copy.rotation = this.rotation;
+			copy.color.setFromColor(this.color);
+			return copy;
+		}
 	}
 }

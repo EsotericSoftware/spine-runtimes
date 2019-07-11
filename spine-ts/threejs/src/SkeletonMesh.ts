@@ -147,6 +147,7 @@ module spine.threejs {
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let vertexSize = clipper.isClipping() ? 2 : SkeletonMesh.VERTEX_SIZE;
 				let slot = drawOrder[i];
+				if (!slot.bone.active) continue;
 				let attachment = slot.getAttachment();
 				let attachmentColor: Color = null;
 				let texture: ThreeJsTexture = null;

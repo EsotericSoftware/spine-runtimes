@@ -36,5 +36,16 @@ module spine {
 		constructor (name: string) {
 			super(name);
 		}
+
+		copy (): Attachment {
+			let copy = new PathAttachment(name);
+			this.copyTo(copy);
+			copy.lengths = new Array<number>(this.lengths.length);
+			Utils.arrayCopy(this.lengths, 0, copy.lengths, 0, this.lengths.length);
+			copy.closed = closed;
+			copy.constantSpeed = this.constantSpeed;
+			copy.color.setFromColor(this.color);
+			return copy;
+		}
 	}
 }

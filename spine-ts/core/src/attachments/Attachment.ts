@@ -35,6 +35,8 @@ module spine {
 			if (name == null) throw new Error("name cannot be null.");
 			this.name = name;
 		}
+
+		abstract copy (): Attachment;
 	}
 
 	export abstract class VertexAttachment extends Attachment {
@@ -44,6 +46,7 @@ module spine {
 		bones: Array<number>;
 		vertices: ArrayLike<number>;
 		worldVerticesLength = 0;
+		deformAttachment: VertexAttachment = this;
 
 		constructor (name: string) {
 			super(name);
@@ -57,7 +60,7 @@ module spine {
 		computeWorldVertices (slot: Slot, start: number, count: number, worldVertices: ArrayLike<number>, offset: number, stride: number) {
 			count = offset + (count >> 1) * stride;
 			let skeleton = slot.bone.skeleton;
-			let deformArray = slot.attachmentVertices;
+			let deformArray = slot.deform;
 			let vertices = this.vertices;
 			let bones = this.bones;
 			if (bones == null) {
@@ -112,9 +115,21 @@ module spine {
 			}
 		}
 
-		/** Returns true if a deform originally applied to the specified attachment should be applied to this attachment. */
-		applyDeform (sourceAttachment: VertexAttachment) {
-			return this == sourceAttachment;
+		copyTo (attachment: VertexAttachment) {
+			if (this.bones != null) {
+				attachment.bones = new Array<number>(this.bones.length);
+				Utils.arrayCopy(this.bones, 0, attachment.bones, 0, this.bones.length);
+			} else
+				attachment.bones = null;
+
+			if (this.vertices != null) {
+				attachment.vertices = Utils.newFloatArray(this.vertices.length);
+				Utils.arrayCopy(this.vertices, 0, attachment.vertices, 0, this.vertices.length);
+			} else
+				attachment.vertices = null;
+
+			attachment.worldVerticesLength = this.worldVerticesLength;
+			attachment.deformAttachment = this.deformAttachment;
 		}
 	}
 }

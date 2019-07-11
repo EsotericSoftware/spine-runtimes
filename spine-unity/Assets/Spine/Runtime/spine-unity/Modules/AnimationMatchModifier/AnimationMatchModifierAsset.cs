@@ -224,7 +224,7 @@ namespace Spine.Unity.Modules {
 			static IkConstraintTimeline GetFillerTimeline (IkConstraintTimeline timeline, SkeletonData skeletonData) {
 				var t = new IkConstraintTimeline(1);
 				var ikConstraintData = skeletonData.ikConstraints.Items[timeline.ikConstraintIndex];
-				t.SetFrame(0, 0, ikConstraintData.mix, ikConstraintData.bendDirection, ikConstraintData.compress, ikConstraintData.stretch);
+				t.SetFrame(0, 0, ikConstraintData.mix, ikConstraintData.softness, ikConstraintData.bendDirection, ikConstraintData.compress, ikConstraintData.stretch);
 				return t;
 			}
 

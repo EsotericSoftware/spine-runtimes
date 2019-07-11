@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-starling works with data exported from Spine 3.7.xx.
+spine-starling works with data exported from Spine 3.8.xx.
 
 spine-starling supports all Spine features.
 

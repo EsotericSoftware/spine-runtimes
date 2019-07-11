@@ -40,6 +40,7 @@ using namespace spine;
 #include <stdlib.h>
 
 void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
+	UNUSED(state);
 	const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
 
 	switch (type) {
@@ -107,6 +108,7 @@ void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
 }
 
 void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonBounds* bounds = SkeletonBounds_create();
 
 	// Configure mixing.
@@ -164,6 +166,7 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void goblins (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -199,6 +202,7 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void raptor (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -242,6 +246,7 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void tank (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -272,6 +277,7 @@ void tank (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void vine (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -303,6 +309,7 @@ void vine (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -334,6 +341,7 @@ void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void coin (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -349,7 +357,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	window.setFramerateLimit(60);
 	sf::Event event;
 	sf::Clock deltaClock;
-	float swirlTime = 0;
+
 	while (window.isOpen()) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
@@ -366,6 +374,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 void owl (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
@@ -423,6 +432,7 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
  * Used for debugging purposes during runtime development
  */
 void test (SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
 	spSkeleton* skeleton = Skeleton_create(skeletonData);
 	spAnimationStateData* animData = spAnimationStateData_create(skeletonData);
 	spAnimationState* animState = spAnimationState_create(animData);
@@ -446,7 +456,104 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 	Skeleton_dispose(skeleton);
 }
 
+void testSkinsApi(SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(true);
+
+	Skeleton* skeleton = drawable->skeleton;
+
+	spSkin* skin = spSkin_create("test-skin");
+	spSkin_copySkin(skin, spSkeletonData_findSkin(skeletonData, "goblingirl"));
+	// spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "goblingirl"));
+	spSkeleton_setSkin(skeleton, skin);
+	spSkeleton_setSlotsToSetupPose(skeleton);
+
+	skeleton->x = 320;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - skins api");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	spSkin_clear(skin);
+	spSkin_dispose(skin);
+}
+
+void testMixAndMatch(SkeletonData* skeletonData, Atlas* atlas) {
+	UNUSED(atlas);
+	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(true);
+
+	Skeleton* skeleton = drawable->skeleton;
+
+	// Create a new skin, by mixing and matching other skins
+	// that fit together. Items making up the girl are individual
+	// skins. Using the skin API, a new skin is created which is
+	// a combination of all these individual item skins.
+	spSkin* skin = spSkin_create("mix-and-match");
+	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "skin-base"));
+	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "nose/short"));
+	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "eyelids/girly"));
+	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "eyes/violet"));
+	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "hair/brown"));
+	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "clothes/hoodie-orange"));
+	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "legs/pants-jeans"));
+	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "accessories/bag"));
+	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "accessories/hat-red-yellow"));
+	spSkeleton_setSkin(skeleton, skin);
+	spSkeleton_setSlotsToSetupPose(skeleton);
+
+	skeleton->x = 320;
+	skeleton->y = 590;
+	Skeleton_updateWorldTransform(skeleton);
+
+	AnimationState_setAnimationByName(drawable->state, 0, "dance", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - mix and match");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable->update(delta);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+
+	spSkin_clear(skin);
+	spSkin_dispose(skin);
+}
+
 int main () {
+	testcase(testMixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
+	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 1.0f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(stretchyman, "data/stretchyman-stretchy-ik-pro.json", "data/stretchyman-stretchy-ik-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
@@ -455,7 +562,7 @@ int main () {
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
-	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
+	// testcase(testSkinsApi, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	return 0;
 }

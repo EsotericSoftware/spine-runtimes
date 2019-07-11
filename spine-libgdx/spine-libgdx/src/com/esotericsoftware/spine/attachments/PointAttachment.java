@@ -29,7 +29,9 @@
 
 package com.esotericsoftware.spine.attachments;
 
-import static com.badlogic.gdx.math.MathUtils.*;
+import static com.badlogic.gdx.math.MathUtils.cosDeg;
+import static com.badlogic.gdx.math.MathUtils.radDeg;
+import static com.badlogic.gdx.math.MathUtils.sinDeg;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -91,5 +93,14 @@ public class PointAttachment extends Attachment {
 		float x = cos * bone.getA() + sin * bone.getB();
 		float y = cos * bone.getC() + sin * bone.getD();
 		return (float)Math.atan2(y, x) * radDeg;
+	}
+
+	public Attachment copy () {
+		PointAttachment copy = new PointAttachment(name);
+		copy.x = x;
+		copy.y = y;
+		copy.rotation = rotation;
+		copy.color.set(color);
+		return copy;
 	}
 }

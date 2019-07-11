@@ -242,4 +242,23 @@ function RegionAttachment:computeWorldVertices (bone, worldVertices, offset, str
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y
 end
 
+function RegionAttachment:copy ()
+  local copy = RegionAttachment.new(self.name)
+  copy.x = self.x
+	copy.y = self.y
+	copy.scaleX = self.scaleX
+	copy.scaleY = self.scaleY
+	copy.rotation = self.rotation
+	copy.width = self.width
+	copy.height = self.height
+	copy.color:setFrom(self.color)
+	copy.path = self.path
+	copy.rendererObject = self.rendererObject
+	copy.region = self.region
+	copy.offset = Utils.copy(self.offset)
+	copy.uvs = Utils.copy(self.uvs)
+	copy.tempColor:setFrom(self.tempColor)
+  return copy
+end
+
 return RegionAttachment

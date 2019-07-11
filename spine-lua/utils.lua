@@ -129,6 +129,13 @@ function utils.arrayCopy (src, srcOffset, dst, dstOffset, size)
 	end
 end
 
+function utils.arrayContains(array, element)
+  for i, arrayElement in ipairs(array) do    
+    if arrayElement == element then return true end
+  end
+  return false
+end
+
 function utils.clamp (value, min, max)
 	if value < min then return min end
 	if value > max then return max end
@@ -164,6 +171,24 @@ function utils.randomTriangularWith(min, max, mode)
 	local d = max - min
 	if (u <= (mode - min) / d) then return min + math_sqrt(u * d * (mode - min)) end
 	return max - math_sqrt((1 - u) * d * (max - mode))
+end
+
+function utils.testBit(value, bit)
+  return value % (2 * bit) >= bit
+end
+
+function utils.setBit(value, bit)
+  if value % (2 * bit) >= bit then
+    return value
+  end
+  return value + bit
+end
+
+function utils.clearBit(value, bit)
+  if value % (2 * bit) >= bit then
+    return value - bit
+  end
+  return value
 end
 
 return utils

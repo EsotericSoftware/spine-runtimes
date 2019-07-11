@@ -17,6 +17,7 @@ var skinsDemo = function(canvas, bgColor) {
 		assetManager = spineDemos.assetManager;
 		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 		assetManager.loadTexture(DEMO_NAME, textureLoader, "heroes.png");
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "heroes2.png");
 		assetManager.loadText(DEMO_NAME, "heroes.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		input = new spine.webgl.Input(canvas);
@@ -164,7 +165,7 @@ var skinsDemo = function(canvas, bgColor) {
 			var skin = skins[(Math.random() * skins.length - 1) | 0];
 			var attachments = skin.attachments[slot];
 			for (var attachmentName in attachments) {
-				newSkin.addAttachment(slot, attachmentName, attachments[attachmentName]);
+				newSkin.setAttachment(slot, attachmentName, attachments[attachmentName]);
 			}
 		}
 		setSkin(newSkin);

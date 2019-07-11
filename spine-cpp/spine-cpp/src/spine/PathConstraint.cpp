@@ -44,21 +44,22 @@
 
 using namespace spine;
 
-RTTI_IMPL(PathConstraint, Constraint)
+RTTI_IMPL(PathConstraint, Updatable)
 
 const float PathConstraint::EPSILON = 0.00001f;
 const int PathConstraint::NONE = -1;
 const int PathConstraint::BEFORE = -2;
 const int PathConstraint::AFTER = -3;
 
-PathConstraint::PathConstraint(PathConstraintData &data, Skeleton &skeleton) : Constraint(),
+PathConstraint::PathConstraint(PathConstraintData &data, Skeleton &skeleton) : Updatable(),
 																			   _data(data),
 																			   _target(skeleton.findSlot(
 																					   data.getTarget()->getName())),
 																			   _position(data.getPosition()),
 																			   _spacing(data.getSpacing()),
 																			   _rotateMix(data.getRotateMix()),
-																			   _translateMix(data.getTranslateMix()) {
+																			   _translateMix(data.getTranslateMix()),
+																			   _active(false) {
 	_bones.ensureCapacity(_data.getBones().size());
 	for (size_t i = 0; i < _data.getBones().size(); i++) {
 		BoneData *boneData = _data.getBones()[i];
@@ -567,4 +568,12 @@ void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, fl
 											x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 		}
 	}
+}
+
+bool PathConstraint::isActive() {
+	return _active;
+}
+
+void PathConstraint::setActive(bool inValue) {
+	_active = inValue;
 }

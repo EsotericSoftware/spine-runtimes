@@ -29,18 +29,9 @@
 
 package com.esotericsoftware.spine;
 
-import static com.badlogic.gdx.math.Interpolation.linear;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveBy;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.removeActor;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
+import static com.badlogic.gdx.math.Interpolation.*;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
-import java.awt.FileDialog;
-import java.awt.Frame;
-import java.awt.Toolkit;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 
@@ -88,10 +79,15 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+
 import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.AnimationState.AnimationStateAdapter;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
+
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.Toolkit;
 
 public class SkeletonViewer extends ApplicationAdapter {
 	static final float checkModifiedInterval = 0.250f;
@@ -111,7 +107,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 	Skeleton skeleton;
 	AnimationState state;
 	FileHandle skeletonFile;
-	long lastModified;
+	long skeletonModified, atlasModified;
 	float lastModifiedCheck, reloadTimer;
 	StringBuilder status = new StringBuilder();
 	Preferences prefs;
@@ -144,9 +140,26 @@ public class SkeletonViewer extends ApplicationAdapter {
 		ui.prefsLoaded = true;
 	}
 
+	FileHandle atlasFile (FileHandle skeletonFile) {
+		String atlasFileName = skeletonFile.nameWithoutExtension();
+		if (atlasFileName.endsWith(".json") || atlasFileName.endsWith(".skel"))
+			atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 5);
+		FileHandle atlasFile = skeletonFile.sibling(atlasFileName + ".atlas");
+		if (!atlasFile.exists()) {
+			if (atlasFileName.endsWith("-pro") || atlasFileName.endsWith("-ess"))
+				atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 4);
+			for (String suffix : atlasSuffixes) {
+				atlasFile = skeletonFile.sibling(atlasFileName + suffix);
+				if (atlasFile.exists()) break;
+			}
+		}
+		return atlasFile;
+	}
+
 	void loadSkeleton (final FileHandle skeletonFile) {
 		if (skeletonFile == null) return;
 
+		FileHandle atlasFile = atlasFile(skeletonFile);
 		try {
 			// Setup a texture atlas that uses a white image for images not found in the atlas.
 			Pixmap pixmap = new Pixmap(32, 32, Format.RGBA8888);
@@ -155,24 +168,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 			final AtlasRegion fake = new AtlasRegion(new Texture(pixmap), 0, 0, 32, 32);
 			pixmap.dispose();
 
-			String atlasFileName = skeletonFile.nameWithoutExtension();
-			if (atlasFileName.endsWith(".json") || atlasFileName.endsWith(".skel"))
-				atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 5);
-			FileHandle atlasFile = skeletonFile.sibling(atlasFileName + ".atlas");
-			if (!atlasFile.exists()) {
-				if (atlasFileName.endsWith("-pro") || atlasFileName.endsWith("-ess"))
-					atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 4);
-				for (String suffix : atlasSuffixes) {
-					atlasFile = skeletonFile.sibling(atlasFileName + suffix);
-					if (atlasFile.exists()) break;
-				}
-			}
-			TextureAtlasData data = !atlasFile.exists() ? null : new TextureAtlasData(atlasFile, atlasFile.parent(), false);
-
-			if (data != null) {
+			TextureAtlasData atlasData = null;
+			if (atlasFile.exists()) {
+				atlasData = new TextureAtlasData(atlasFile, atlasFile.parent(), false);
 				boolean linear = true;
-				for (int i = 0, n = data.getPages().size; i < n; i++) {
-					Page page = data.getPages().get(i);
+				for (int i = 0, n = atlasData.getPages().size; i < n; i++) {
+					Page page = atlasData.getPages().get(i);
 					if (page.minFilter != TextureFilter.Linear || page.magFilter != TextureFilter.Linear) {
 						linear = false;
 						break;
@@ -181,7 +182,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				ui.linearCheckbox.setChecked(linear);
 			}
 
-			atlas = new TextureAtlas(data) {
+			atlas = new TextureAtlas(atlasData) {
 				public AtlasRegion findRegion (String name) {
 					AtlasRegion region = super.findRegion(name);
 					if (region == null) {
@@ -232,10 +233,11 @@ public class SkeletonViewer extends ApplicationAdapter {
 		});
 
 		this.skeletonFile = skeletonFile;
+		skeletonModified = skeletonFile.lastModified();
+		atlasModified = atlasFile.lastModified();
+		lastModifiedCheck = checkModifiedInterval;
 		prefs.putString("lastFile", skeletonFile.path());
 		prefs.flush();
-		lastModified = skeletonFile.lastModified();
-		lastModifiedCheck = checkModifiedInterval;
 
 		// Populate UI.
 
@@ -306,7 +308,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 				if (lastModifiedCheck < 0) {
 					lastModifiedCheck = checkModifiedInterval;
 					long time = skeletonFile.lastModified();
-					if (time != 0 && lastModified != time) reloadTimer = reloadDelay;
+					if (time != 0 && skeletonModified != time) reloadTimer = reloadDelay;
+					time = atlasFile(skeletonFile).lastModified();
+					if (time != 0 && atlasModified != time) reloadTimer = reloadDelay;
 				}
 			} else {
 				reloadTimer -= delta;
@@ -427,7 +431,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		Slider loadScaleSlider = new Slider(0.1f, 3, 0.01f, false, skin);
 		Label loadScaleLabel = new Label("100%", skin);
-		TextButton loadScaleResetButton = new TextButton("Reset", skin);
+		TextButton loadScaleResetButton = new TextButton("Reload", skin);
 
 		Slider zoomSlider = new Slider(0.01f, 10, 0.01f, false, skin);
 		Label zoomLabel = new Label("100%", skin);
@@ -493,8 +497,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 			for (int i = 0; i < 6; i++)
 				trackButtons.add(new TextButton(i + "", skin, "toggle"));
 
-			animationList.getSelection().setRequired(false);
-
 			premultipliedCheckbox.setChecked(true);
 
 			linearCheckbox.setChecked(true);
@@ -512,6 +514,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 			yScaleSlider.setValue(1);
 			yScaleSlider.setSnapToValues(new float[] {-1.5f, -1, -0.5f, 0.5f, 1, 1.5f}, 0.12f);
+
+			skinList.getSelection().setRequired(false);
+			skinList.getSelection().setToggle(true);
+
+			animationList.getSelection().setRequired(false);
+			animationList.getSelection().setToggle(true);
 
 			mixSlider.setValue(0.3f);
 			mixSlider.setSnapToValues(new float[] {1, 1.5f, 2, 2.5f, 3, 3.5f}, 0.12f);
@@ -540,6 +548,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 
 		void layout () {
+			float resetWidth = loadScaleResetButton.getPrefWidth();
+
 			root.defaults().space(6);
 			root.columnDefaults(0).top().right().padTop(3);
 			root.columnDefaults(1).left();
@@ -548,7 +558,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				Table table = table();
 				table.add(loadScaleLabel).width(29);
 				table.add(loadScaleSlider).growX();
-				table.add(loadScaleResetButton);
+				table.add(loadScaleResetButton).width(resetWidth);
 				root.add(table).fill().row();
 			}
 			root.add("Zoom:");
@@ -556,7 +566,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				Table table = table();
 				table.add(zoomLabel).width(29);
 				table.add(zoomSlider).growX();
-				table.add(zoomResetButton);
+				table.add(zoomResetButton).width(resetWidth);
 				root.add(table).fill().row();
 			}
 			root.add("Scale X:");
@@ -564,7 +574,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				Table table = table();
 				table.add(xScaleLabel).width(29);
 				table.add(xScaleSlider).growX();
-				table.add(xScaleResetButton).row();
+				table.add(xScaleResetButton).width(resetWidth);
 				root.add(table).fill().row();
 			}
 			root.add("Scale Y:");
@@ -572,7 +582,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				Table table = table();
 				table.add(yScaleLabel).width(29);
 				table.add(yScaleSlider).growX();
-				table.add(yScaleResetButton);
+				table.add(yScaleResetButton).width(resetWidth);
 				root.add(table).fill().row();
 			}
 			root.add("Debug:");
@@ -677,6 +687,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 					String dir = fileDialog.getDirectory();
 					if (name == null || dir == null) return;
 					loadSkeleton(new FileHandle(new File(dir, name).getAbsolutePath()));
+					ui.toast("Loaded.");
 				}
 			});
 
@@ -718,16 +729,22 @@ public class SkeletonViewer extends ApplicationAdapter {
 			loadScaleSlider.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					loadScaleLabel.setText(Integer.toString((int)(loadScaleSlider.getValue() * 100)) + "%");
-					if (!loadScaleSlider.isDragging()) loadSkeleton(skeletonFile);
+					if (!loadScaleSlider.isDragging()) {
+						loadSkeleton(skeletonFile);
+						ui.toast("Reloaded.");
+					}
+					loadScaleResetButton.setText(loadScaleSlider.getValue() == 1 ? "Reload" : "Reset");
 				}
 			});
 			loadScaleResetButton.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					resetCameraPosition();
-					if (loadScaleSlider.getValue() == 1)
+					if (loadScaleSlider.getValue() == 1) {
 						loadSkeleton(skeletonFile);
-					else
+						ui.toast("Reloaded.");
+					} else
 						loadScaleSlider.setValue(1);
+					loadScaleResetButton.setText("Reload");
 				}
 			});
 

@@ -20,6 +20,7 @@ var imageChangesDemo = function(canvas, bgColor) {
 		assetManager = spineDemos.assetManager;
 		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
 		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
+		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas12.png");
 		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
 		assetManager.loadJson(DEMO_NAME, "demos.json");
 		timeKeeper = new spine.TimeKeeper();

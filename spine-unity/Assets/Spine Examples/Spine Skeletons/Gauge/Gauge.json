@@ -1,5 +1,15 @@
 {
-"skeleton": { "hash": "rc2mxcPRae3DQs+8yUQlM2SkaRg", "spine": "3.6.07-beta", "width": 250, "height": 60, "fps": 1, "images": "./images/" },
+"skeleton": {
+	"hash": "KzaKKsSONZMiN9P/N5Sy60ksi9M",
+	"spine": "3.8.33-beta",
+	"x": -125,
+	"y": -30,
+	"width": 250,
+	"height": 60,
+	"fps": 1,
+	"images": "./images/",
+	"audio": "C:/Spine/example_projects_unity/Gauge/old_export"
+},
 "bones": [
 	{ "name": "root" },
 	{ "name": "Bar", "parent": "root", "x": -112.29 }
@@ -9,31 +19,29 @@
 	{ "name": "Bar", "bone": "Bar", "attachment": "Bar" },
 	{ "name": "Border", "bone": "root", "attachment": "Border" }
 ],
-"skins": {
-	"default": {
-		"Background": {
-			"Background": { "width": 224, "height": 32 }
-		},
-		"Bar": {
-			"Bar": { "x": 112.29, "width": 224, "height": 32 }
-		},
-		"Border": {
-			"Border": { "width": 250, "height": 60 }
+"skins": [
+	{
+		"name": "default",
+		"attachments": {
+			"Background": {
+				"Background": { "width": 224, "height": 32 }
+			},
+			"Bar": {
+				"Bar": { "x": 112.29, "width": 224, "height": 32 }
+			},
+			"Border": {
+				"Border": { "width": 250, "height": 60 }
+			}
 		}
 	}
-},
+],
 "animations": {
 	"Fill": {
 		"bones": {
 			"Bar": {
 				"scale": [
-					{
-						"time": 0,
-						"x": 0.002,
-						"y": 1,
-						"curve": [ 0.25, 0, 0.75, 1 ]
-					},
-					{ "time": 1, "x": 1, "y": 1 }
+					{ "x": 0.002, "curve": 0.25, "c3": 0.75 },
+					{ "time": 1 }
 				]
 			}
 		}

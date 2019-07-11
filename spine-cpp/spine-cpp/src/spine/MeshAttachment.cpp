@@ -55,8 +55,8 @@ MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name), Has
 													 _height(0),
 													 _color(1, 1, 1, 1),
 													 _hullLength(0),
-													 _inheritDeform(false),
-													 _regionRotate(false) {
+													 _regionRotate(false),
+													 _regionDegrees(0) {
 }
 
 MeshAttachment::~MeshAttachment() {}
@@ -66,33 +66,63 @@ void MeshAttachment::updateUVs() {
 		_uvs.setSize(_regionUVs.size(), 0);
 	}
 
-	if (_regionRotate) {
-		float textureHeight = _regionWidth / (_regionV2 - _regionV);
-		float textureWidth = _regionHeight / (_regionU2 - _regionU);
-		float u = _regionU - (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureWidth;
-		float v = _regionV - (_regionOriginalWidth - _regionOffsetX - _regionWidth) / textureHeight;
-		float width = _regionOriginalHeight / textureWidth;
-		float height = _regionOriginalWidth / textureHeight;
-		for (size_t i = 0, n = _uvs.size(); i < n; i += 2) {
-			_uvs[i] = u + _regionUVs[i + 1] * width;
-			_uvs[i + 1] = v + height - _regionUVs[i] * height;
+	int i = 0, n = _regionUVs.size();
+	float u = _regionU, v = _regionV;
+	float width = 0, height = 0;
+
+	switch (_regionDegrees) {
+		case 90: {
+			float textureWidth = _regionHeight / (_regionU2 - _regionU);
+			float textureHeight = _regionWidth / (_regionV2 - _regionV);
+			u -= (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureWidth;
+			v -= (_regionOriginalWidth - _regionOffsetX - _regionWidth) / textureHeight;
+			width = _regionOriginalHeight / textureWidth;
+			height = _regionOriginalWidth / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				_uvs[i] = u + _regionUVs[i + 1] * width;
+				_uvs[i + 1] = v + (1 - _regionUVs[i]) * height;
+			}
+			return;
 		}
-	} else {
-		float textureWidth = _regionWidth / (_regionU2 - _regionU);
-		float textureHeight = _regionHeight / (_regionV2 - _regionV);
-		float u = _regionU - _regionOffsetX / textureWidth;
-		float v = _regionV - (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureHeight;
-		float width = _regionOriginalWidth / textureWidth;
-		float height = _regionOriginalHeight / textureHeight;
-		for (size_t i = 0, n = _uvs.size(); i < n; i += 2) {
-			_uvs[i] = u + _regionUVs[i] * width;
-			_uvs[i + 1] = v + _regionUVs[i + 1] * height;
+		case 180: {
+			float textureWidth = _regionWidth / (_regionU2 - _regionU);
+			float textureHeight = _regionHeight / (_regionV2 - _regionV);
+			u -= (_regionOriginalWidth - _regionOffsetX - _regionWidth) / textureWidth;
+			v -= _regionOffsetY / textureHeight;
+			width = _regionOriginalWidth / textureWidth;
+			height = _regionOriginalHeight / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				_uvs[i] = u + (1 - _regionUVs[i]) * width;
+				_uvs[i + 1] = v + (1 - _regionUVs[i + 1]) * height;
+			}
+			return;
+		}
+		case 270: {
+			float textureHeight = _regionHeight / (_regionV2 - _regionV);
+			float textureWidth = _regionWidth / (_regionU2 - _regionU);
+			u -= _regionOffsetY / textureWidth;
+			v -= _regionOffsetX / textureHeight;
+			width = _regionOriginalHeight / textureWidth;
+			height = _regionOriginalWidth / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				_uvs[i] = u + (1 - _regionUVs[i + 1]) * width;
+				_uvs[i + 1] = v + _regionUVs[i] * height;
+			}
+			return;
+		}
+		default: {
+			float textureWidth = _regionWidth / (_regionU2 - _regionU);
+			float textureHeight = _regionHeight / (_regionV2 - _regionV);
+			u -= _regionOffsetX / textureWidth;
+			v -= (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureHeight;
+			width = _regionOriginalWidth / textureWidth;
+			height = _regionOriginalHeight / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				_uvs[i] = u + _regionUVs[i] * width;
+				_uvs[i + 1] = v + _regionUVs[i + 1] * height;
+			}
 		}
 	}
-}
-
-bool MeshAttachment::applyDeform(VertexAttachment *sourceAttachment) {
-	return this == sourceAttachment || (_inheritDeform && _parentMesh == sourceAttachment);
 }
 
 int MeshAttachment::getHullLength() {
@@ -211,14 +241,6 @@ void MeshAttachment::setRegionOriginalHeight(float inValue) {
 	_regionOriginalHeight = inValue;
 }
 
-bool MeshAttachment::getInheritDeform() {
-	return _inheritDeform;
-}
-
-void MeshAttachment::setInheritDeform(bool inValue) {
-	_inheritDeform = inValue;
-}
-
 MeshAttachment *MeshAttachment::getParentMesh() {
 	return _parentMesh;
 }
@@ -260,4 +282,60 @@ void MeshAttachment::setHeight(float inValue) {
 
 spine::Color &MeshAttachment::getColor() {
 	return _color;
+}
+
+Attachment* MeshAttachment::copy() {
+	if (_parentMesh) return newLinkedMesh();
+
+	MeshAttachment* copy = new (__FILE__, __LINE__) MeshAttachment(getName());
+	copy->setRendererObject(getRendererObject());
+	copy->_regionU = _regionU;
+	copy->_regionV = _regionV;
+	copy->_regionU2 = _regionU2;
+	copy->_regionV2 = _regionV2;
+	copy->_regionRotate = _regionRotate;
+	copy->_regionDegrees = _regionDegrees;
+	copy->_regionOffsetX =  _regionOffsetX;
+	copy->_regionOffsetY = _regionOffsetY;
+	copy->_regionWidth = _regionWidth;
+	copy->_regionHeight = _regionHeight;
+	copy->_regionOriginalWidth = _regionOriginalWidth;
+	copy->_regionOriginalHeight = _regionOriginalHeight;
+	copy->_path = _path;
+	copy->_color.set(_color);
+
+	copyTo(copy);
+	copy->_regionUVs.clearAndAddAll(_regionUVs);
+	copy->_uvs.clearAndAddAll(_uvs);
+	copy->_triangles.clearAndAddAll(_triangles);
+	copy->_hullLength = _hullLength;
+
+	// Nonessential.
+	copy->_edges.clearAndAddAll(copy->_edges);
+	copy->_width = _width;
+	copy->_height = _height;
+	return copy;
+}
+
+MeshAttachment* MeshAttachment::newLinkedMesh() {
+	MeshAttachment* copy = new (__FILE__, __LINE__) MeshAttachment(getName());
+	copy->setRendererObject(getRendererObject());
+	copy->_regionU = _regionU;
+	copy->_regionV = _regionV;
+	copy->_regionU2 = _regionU2;
+	copy->_regionV2 = _regionV2;
+	copy->_regionRotate = _regionRotate;
+	copy->_regionDegrees = _regionDegrees;
+	copy->_regionOffsetX =  _regionOffsetX;
+	copy->_regionOffsetY = _regionOffsetY;
+	copy->_regionWidth = _regionWidth;
+	copy->_regionHeight = _regionHeight;
+	copy->_regionOriginalWidth = _regionOriginalWidth;
+	copy->_regionOriginalHeight = _regionOriginalHeight;
+	copy->_path = _path;
+	copy->_color.set(_color);
+	copy->_deformAttachment = this->_deformAttachment;
+	copy->setParentMesh(_parentMesh ? _parentMesh : this);
+	copy->updateUVs();
+	return copy;
 }
