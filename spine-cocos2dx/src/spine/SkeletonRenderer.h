@@ -48,7 +48,6 @@ namespace spine {
 
 		void update (float deltaTime) override;
 		void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags) override;
-		bool isAutoCulled () const;
 		cocos2d::Rect getBoundingBox () const override;
 		void onEnter () override;
 		void onExit () override;
@@ -158,7 +157,6 @@ namespace spine {
 	
 		int _startSlotIndex;
 		int _endSlotIndex;
-		bool _isAutoCulled = false;
 	};
 
 }
