@@ -111,6 +111,7 @@ void SkeletonAnimation::initialize () {
 	super::initialize();
 
 	_ownsAnimationStateData = true;
+	_updateOnlyIfVisible = false;
 	_state = new (__FILE__, __LINE__) AnimationState(new (__FILE__, __LINE__) AnimationStateData(_skeleton->getData()));
 	_state->setRendererObject(this);
 	_state->setListener(animationCallback);
@@ -128,6 +129,8 @@ SkeletonAnimation::~SkeletonAnimation () {
 }
 
 void SkeletonAnimation::update (float deltaTime) {
+	if (_updateOnlyIfVisible && !isVisible()) return;
+
 	super::update(deltaTime);
 
 	deltaTime *= _timeScale;
@@ -304,6 +307,10 @@ void SkeletonAnimation::setTrackEventListener (TrackEntry* entry, const EventLis
 
 AnimationState* SkeletonAnimation::getState() const {
 	return _state;
+}
+
+void SkeletonAnimation::setUpdateOnlyIfVisible(bool status) {
+	_updateOnlyIfVisible = status;
 }
 
 }

@@ -99,6 +99,7 @@ public:
 	virtual void onTrackEntryEvent (TrackEntry* entry, EventType type, Event* event);
 
 	AnimationState* getState() const;
+	void setUpdateOnlyIfVisible(bool status);
 
 CC_CONSTRUCTOR_ACCESS:
 	SkeletonAnimation ();
@@ -109,6 +110,7 @@ protected:
 	AnimationState* _state;
 
 	bool _ownsAnimationStateData;
+	bool _updateOnlyIfVisible;
 	bool _firstDraw;
 
 	StartListener _startListener;
