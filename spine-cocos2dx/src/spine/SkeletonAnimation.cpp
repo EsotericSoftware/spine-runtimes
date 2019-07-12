@@ -129,7 +129,7 @@ SkeletonAnimation::~SkeletonAnimation () {
 }
 
 void SkeletonAnimation::update (float deltaTime) {
-	if (_updateOnlyIfVisible && (isAutoCulled() || !isVisible())) return;
+	if (_updateOnlyIfVisible && !isVisible()) return;
 
 	super::update(deltaTime);
 
