@@ -1804,7 +1804,7 @@ namespace Spine.Unity.Editor {
 			internal static void IconsOnGUI (int instanceId, Rect selectionRect) {
 				Rect r = new Rect(selectionRect);
 				if (skeletonRendererTable.ContainsKey(instanceId)) {
-					r.x = r.width - 15;
+					r.x = (r.width - 15) + selectionRect.x;;
 					r.width = 15;
 					GUI.Label(r, Icons.spine);
 				} else if (skeletonUtilityBoneTable.ContainsKey(instanceId)) {
