@@ -25,9 +25,9 @@ The setup for cocos2d-x differs from most other Spine Runtimes because the cocos
 1. Create a new cocos2d-x project. See [the cocos2d-x documentation](http://www.cocos2d-x.org/docs/static-pages/installation.html)
 2. Delete the folder `cocos2d/cocos/editor-support/spine`. This will remove the outdated Spine cocos2d-x runtime shipped by cocos2d-x.
 3. Open your project in your IDE of choice, then open the cocos2d_libs sub project and delete the `editor-support/spine` group. This will remove the outdated Spine cocos2d-x runtime shipped by cocos2d-x from your build.
-3. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
-4. Add the sources from `spine-cpp/spine-cpp/src/spine` and `spine-cocos2dx/src/spine` to your project
-4. Add the folders `spine-cpp/spine-cpp/include` and `spine-cocos2dx/src` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
+4. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
+5. Add the sources from `spine-cpp/spine-cpp/src/spine` and `spine-cocos2dx/src/spine` to your project. According to the version of cocos2d-x you are using, you need to copy source files in `spine-cocos2dx/src/spine/v3` or `spine-cocos2dx/src/spine/v4` to the destination folder. 
+6. Add the folders `spine-cpp/spine-cpp/include` and `spine-cocos2dx/src` to your header search path. Note that includes are specified as `#inclue <spine/file.h>`, so the `spine` directory cannot be omitted when copying the source files.
 
 ## Example
 The Spine cocos2d-x example works on Windows, Mac OS X, iOS and Android.
