@@ -325,3 +325,11 @@ void IkConstraint::setActive(bool inValue) {
 	_active = inValue;
 }
 
+float IkConstraint::getSoftness() {
+    return _softness;
+}
+
+void IkConstraint::setSoftness(float inValue) {
+    _softness = inValue;
+}
+
