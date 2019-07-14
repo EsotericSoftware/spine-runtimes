@@ -883,6 +883,7 @@ public class Animation {
 		final String[] attachmentNames;
 
 		public AttachmentTimeline (int frameCount) {
+			if (frameCount <= 0) throw new IllegalArgumentException("frameCount must be > 0: " + frameCount);
 			frames = new float[frameCount];
 			attachmentNames = new String[frameCount];
 		}
@@ -1197,6 +1198,7 @@ public class Animation {
 		private final Event[] events;
 
 		public EventTimeline (int frameCount) {
+			if (frameCount <= 0) throw new IllegalArgumentException("frameCount must be > 0: " + frameCount);
 			frames = new float[frameCount];
 			events = new Event[frameCount];
 		}
@@ -1263,6 +1265,7 @@ public class Animation {
 		private final int[][] drawOrders;
 
 		public DrawOrderTimeline (int frameCount) {
+			if (frameCount <= 0) throw new IllegalArgumentException("frameCount must be > 0: " + frameCount);
 			frames = new float[frameCount];
 			drawOrders = new int[frameCount][];
 		}
