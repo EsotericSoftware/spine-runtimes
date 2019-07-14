@@ -1,7 +1,11 @@
 #ifndef SHADER_MATHS_INCLUDED
 #define SHADER_MATHS_INCLUDED
 
+#if defined(USE_LWRP)
+#include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Core.hlsl"
+#else
 #include "UnityCG.cginc"
+#endif
 
 ////////////////////////////////////////
 // Maths functions

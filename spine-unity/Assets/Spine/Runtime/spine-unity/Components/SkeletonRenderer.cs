@@ -306,6 +306,14 @@ namespace Spine.Unity {
 
 			if (OnRebuild != null)
 				OnRebuild(this);
+
+			#if UNITY_EDITOR
+			if (!Application.isPlaying) {
+				string errorMessage = null;
+				if (MaterialChecks.IsMaterialSetupProblematic(this, ref errorMessage))
+					Debug.LogWarningFormat("Problematic material setup at {0}: {1}", this.name, errorMessage);
+			}
+			#endif
 		}
 
 		/// <summary>

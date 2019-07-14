@@ -29,6 +29,7 @@
 
 using UnityEngine;
 using UnityEditor;
+using Spine.Unity;
 
 using SpineInspectorUtility = Spine.Unity.Editor.SpineInspectorUtility;
 
@@ -36,6 +37,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 	static readonly string kShaderVertexLit = "Spine/Sprite/Vertex Lit";
 	static readonly string kShaderPixelLit = "Spine/Sprite/Pixel Lit";
 	static readonly string kShaderUnlit = "Spine/Sprite/Unlit";
+	static readonly string kShaderLitLW = "Lightweight Render Pipeline/Spine/Sprite";
 	static readonly int kSolidQueue = 2000;
 	static readonly int kAlphaTestQueue = 2450;
 	static readonly int kTransparentQueue = 3000;
@@ -54,6 +56,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 		VertexLit,
 		PixelLit,
 		Unlit,
+		LitLightweight
 	};
 
 	private enum eCulling {
@@ -120,6 +123,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 	static GUIContent _depthText = new GUIContent("Write to Depth", "Write to Depth Buffer by clipping alpha.");
 	static GUIContent _depthAlphaCutoffText = new GUIContent("Depth Alpha Cutoff", "Threshold for depth write alpha cutoff");
 	static GUIContent _shadowAlphaCutoffText = new GUIContent("Shadow Alpha Cutoff", "Threshold for shadow alpha cutoff");
+	static GUIContent _receiveShadowsText = new GUIContent("Receive Shadows", "When enabled, other GameObjects can cast shadows onto this GameObject. 'Write to Depth' has to be enabled in Lightweight RP.");
 	static GUIContent _fixedNormalText = new GUIContent("Fixed Normals", "If this is ticked instead of requiring mesh normals a Fixed Normal will be used instead (it's quicker and can result in better looking lighting effects on 2d objects).");
 	static GUIContent _fixedNormalDirectionText = new GUIContent("Fixed Normal Direction", "Should normally be (0,0,1) if in view-space or (0,0,-1) if in model-space.");
 	static GUIContent _adjustBackfaceTangentText = new GUIContent("Adjust Back-face Tangents", "Tick only if you are going to rotate the sprite to face away from the camera, the tangents will be flipped when this is the case to make lighting correct.");
@@ -128,7 +132,8 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 	static GUIContent[] _lightingModeOptions = {
 		new GUIContent("Vertex Lit"),
 		new GUIContent("Pixel Lit"),
-		new GUIContent("Unlit")
+		new GUIContent("Unlit"),
+		new GUIContent("Lit Lightweight")
 	};
 	static GUIContent _blendModeText = new GUIContent("Blend Mode", "Blend Mode");
 	static GUIContent[] _blendModeOptions = {
@@ -160,7 +165,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 	static GUIContent _meshRequiresTangentsText = new GUIContent("Note: Material requires a mesh with tangents.");
 	static GUIContent _meshRequiresNormalsText = new GUIContent("Note: Material requires a mesh with normals.");
 	static GUIContent _meshRequiresNormalsAndTangentsText = new GUIContent("Note: Material requires a mesh with Normals and Tangents.");
-
+	
 	const string _primaryMapsText = "Main Maps";
 	const string _depthLabelText = "Depth";
 	const string _shadowsText = "Shadows";
@@ -324,6 +329,10 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 						if (material.shader.name != kShaderUnlit)
 							_materialEditor.SetShader(Shader.Find(kShaderUnlit), false);
 						break;
+					case eLightMode.LitLightweight:
+						if (material.shader.name != kShaderLitLW)
+							_materialEditor.SetShader(Shader.Find(kShaderLitLW), false);
+						break;
 					}
 				}
 
@@ -350,6 +359,11 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 				}
 
 				dataChanged = true;
+			}
+
+			if (QualitySettings.activeColorSpace == ColorSpace.Linear &&
+				!EditorGUI.showMixedValue && blendMode == eBlendMode.PreMultipliedAlpha) {
+				EditorGUILayout.HelpBox(MaterialChecks.kPMANotSupportedLinearMessage, MessageType.Error, true);
 			}
 		}
 
@@ -554,12 +568,44 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 	}
 
 	protected virtual bool RenderShadowsProperties () {
+		bool dataChanged = false;
+
 		EditorGUI.BeginChangeCheck();
 		_materialEditor.RangeProperty(_shadowAlphaCutoff, _shadowAlphaCutoffText.text);
-		return EditorGUI.EndChangeCheck();
+		dataChanged = EditorGUI.EndChangeCheck();
+		bool areMixedShaders = false;
+		bool hasReceiveShadowsParameter = IsLWRPShader(_materialEditor, out areMixedShaders);
+
+		if (hasReceiveShadowsParameter) {
+			bool forceDisableReceiveShadows = !_writeToDepth.hasMixedValue && _writeToDepth.floatValue == 0;
+			EditorGUI.BeginDisabledGroup(forceDisableReceiveShadows);
+			
+			EditorGUI.BeginChangeCheck();
+			bool mixedValue;
+			bool enableReceive = !IsKeywordEnabled(_materialEditor, "_RECEIVE_SHADOWS_OFF", out mixedValue);
+			EditorGUI.showMixedValue = mixedValue;
+			enableReceive = EditorGUILayout.Toggle(_receiveShadowsText, enableReceive);
+
+			EditorGUI.showMixedValue = false;
+
+			if (EditorGUI.EndChangeCheck() || forceDisableReceiveShadows) {
+				SetKeyword(_materialEditor, "_RECEIVE_SHADOWS_OFF", !enableReceive || forceDisableReceiveShadows);
+				dataChanged = true;
+			}
+			EditorGUI.EndDisabledGroup(); // forceDisableReceiveShadows
+		}
+
+		return dataChanged;
 	}
 
 	protected virtual bool RenderSphericalHarmonicsProperties () {
+
+		bool areMixedShaders = false;
+		bool isLWRPShader = IsLWRPShader(_materialEditor, out areMixedShaders);
+		bool hasSHParameter = areMixedShaders || !isLWRPShader;
+		if (!hasSHParameter)
+			return false;
+		
 		EditorGUI.BeginChangeCheck();
 		bool mixedValue;
 		bool enabled = IsKeywordEnabled(_materialEditor, "_SPHERICAL_HARMONICS", out mixedValue);
@@ -828,6 +874,21 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 			m.DisableKeyword(keyword);
 	}
 
+	static bool IsLWRPShader (MaterialEditor editor, out bool mixedValue) {
+		
+		mixedValue = false;
+		bool isAnyLWRPShader = false;
+		foreach (Material material in editor.targets) {
+			if (material.shader.name == kShaderLitLW) {
+				isAnyLWRPShader = true;
+			}
+			else if (isAnyLWRPShader) {
+				mixedValue = true;
+			}
+		}
+		return isAnyLWRPShader;
+	}
+
 	static bool IsKeywordEnabled (MaterialEditor editor, string keyword, out bool mixedValue) {
 		bool keywordEnabled = ((Material)editor.target).IsKeywordEnabled(keyword);
 		mixedValue = false;
@@ -845,13 +906,18 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 	static eLightMode GetMaterialLightMode (Material material) {
 		if (material.shader.name == kShaderPixelLit) {
 			return eLightMode.PixelLit;
-		} else if (material.shader.name == kShaderUnlit) {
+		}
+		else if (material.shader.name == kShaderUnlit) {
 			return eLightMode.Unlit;
-		} else {
+		}
+		else if (material.shader.name == kShaderLitLW) {
+			return eLightMode.LitLightweight;
+		}
+		else { // if (material.shader.name == kShaderVertexLit)
 			return eLightMode.VertexLit;
 		}
 	}
-
+	
 	static eBlendMode GetMaterialBlendMode (Material material) {
 		if (material.IsKeywordEnabled("_ALPHABLEND_ON"))
 			return eBlendMode.StandardAlpha;
