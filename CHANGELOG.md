@@ -140,6 +140,15 @@
   * Added support for Unity's SpriteMask to `SkeletonAnimation` and `SkeletonMecanim`. All mask interaction modes are supported. See this [blog post](http://esotericsoftware.com/blog/Unity-SpriteMask-and-RectMask2D-support).
   * Added support for Unity's RectMask2D to SkeletonGraphics. See this [blog post](http://esotericsoftware.com/blog/Unity-SpriteMask-and-RectMask2D-support).
   * Added `Create 2D Hinge Chain` button at `SkeletonUtilityBone` inspector, previously only `Create 3D Hinge Chain` was available.
+  * **Now supporting Lightweight Render Pipeline (LWRP) through an additional UPM package.**
+    * **Installation:** You can download the Unity Package Manager (UPM) package via the [download page](http://esotericsoftware.com/spine-unity-download) or find it in the [spine-runtimes/spine-unity/Packages](https://github.com/EsotericSoftware/spine-runtimes/tree/3.8-beta/spine-unity/Packages) subdirectory on the git repository. You can then either unzip (copy if using git) the package to    
+      a) the `Packages` directory in your project where it will automatically be loaded, or      
+      b) to an arbitrary directory outside the Assets directory and then open Package Manager in Unity, select the `+` icon, choose `Add package from disk..` and point it to the package.json file.    
+      The Project panel should now show an entry `Spine Lightweight RP Shaders` under `Packages`. If the directory is not yet listed, you will need to close and re-open Unity to have it display the directory and its contents.
+    * **Usage:** The package provides two shaders specifically built for the lightweight render pipeline:
+      * `Lightweight Render Pipeline/Spine/Skeleton Lit`, as a lightweight variant of the `Spine/Skeleton Lit` shader and
+      * `Lightweight Render Pipeline/Spine/Sprite`, as a lightweight variant of the `Spine/Sprite/Vertex Lit` and `Pixel Lit` shaders, which were not functioning in the lightweight render pipeline. The shaders can be assigned to materials as usual and will respect your settings of the assigned `LightweightRenderPipelineAsset` under `Project Settings - Graphics`.
+    * **Example:** You can find an example scene in the package under `com.esotericsoftware.spine.lwrp-shaders-3.8/Examples/LWRP Shaders.unity` that demonstrates the use of the above shaders.
 
 ### XNA/MonoGame
 * Updated to latest MonoGame version 3.7.1
