@@ -29,9 +29,17 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Deprecated {
 
+	/// <summary>
+	/// Deprecated. The spine-unity 3.7 runtime introduced SkeletonDataModifierAssets BlendModeMaterials which replaced SlotBlendModes. See the
+	/// <see href="http://esotericsoftware.com/spine-unity-skeletondatamodifierassets#BlendModeMaterials">SkeletonDataModifierAssets BlendModeMaterials documentation page</see> and
+	/// <see href="http://esotericsoftware.com/forum/Slot-blending-not-work-11281">this forum thread</see> for further information.
+	/// This class will be removed in the spine-unity 3.9 runtime.
+	/// </summary>
+	[Obsolete("The spine-unity 3.7 runtime introduced SkeletonDataModifierAssets BlendModeMaterials which replaced SlotBlendModes. Will be removed in spine-unity 3.9.", false)]
 	[DisallowMultipleComponent]
 	public class SlotBlendModes : MonoBehaviour {
 

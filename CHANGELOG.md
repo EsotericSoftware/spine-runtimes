@@ -151,12 +151,28 @@
     * **Restrictions** As all Spine shaders, the LWRP shaders **do not support `Premultiply alpha` (PMA) atlas textures in Linear color space**. Please export your atlas textures as `straight alpha` textures with disabled `Premultiply alpha` setting when using Linear color space. You can check the current color space via `Project Settings - Player - Other Settings - Color Space.`.
     * **Example:** You can find an example scene in the package under `com.esotericsoftware.spine.lwrp-shaders-3.8/Examples/LWRP Shaders.unity` that demonstrates usage of the LWRP shaders.
 
+* **Removed / Deprecated**
+  * Deprecated `Modules/SlotBlendModes/SlotBlendModes` component. Changed namespace from `Spine.Unity.Modules` to `Spine.Unity.Deprecated`. Moved to `Deprecated/SlotBlendModes`.
+
 * **Restructuring (Non-Breaking)**
   
   Note: The following changes will most likely not affect users of the Spine-Unity runtime as the API remains unchanged and no references are invalidated.
   * Removed duplicates of `.cginc` files in `Modules/Shaders/Sprite` that were also present in the `Modules/Shaders/Sprite/CGIncludes` directory.
   * Moved shaders from `Modules/Shaders` to `Shaders` directory.
   * Moved shaders from `Modules/SkeletonGraphic/Shaders` to `Shaders/SkeletonGraphic`.
+  * Moved components from `SkeletonGraphic` to `Components` and `Components/Following` except for `SkeletonGraphicMirror` which was moved to `Spine Examples/Scripts/Sample Components`.
+  * Moved `BoneFollower`, `BoneFollowerGraphic` and `PointFollower` from `Components` directory to `Components/Following`.
+  * Moved `BoundingBoxFollower` component from `Modules/BoundingBoxFollower` to `Components/Following`.
+  * Moved `Modules/SkeletonRenderSeparator` directory to `Components/SkeletonRenderSeparator`.
+  * Moved `Modules/CustomMaterials` directory to `Components/SkeletonRendererCustomMaterials`.
+  * Moved `Asset Types/BlendModeMaterialsAsset.cs` class, `Shaders/BlendModes/Default BlendModeMaterials.asset` and materials from `Shaders/BlendModes` to `SkeletonDataModifierAssets/BlendModeMaterials` directory.
+  * Moved `Modules/Ghost` directory to `Spine Examples/Scripts/Sample Components/Ghost`.
+  * Moved `Modules/SkeletonUtility Modules` directory to `Spine Examples/Scripts/Sample Components/SkeletonUtility Modules`.
+  * Moved `Modules/AnimationMatchModifier` directory to `Spine Examples/Scripts/MecanimAnimationMatchModifier`.
+  * Moved `SkeletonRagdoll` and `SkeletonRagdoll2D` components from `Modules/Ragdoll` directory to `Spine Examples/Scripts/Sample Components/SkeletonUtility Modules`.
+  * Moved `AttachmentTools.cs` to `Utility` directory.
+  * Moved `SkeletonExtensions.cs` to `Utility` directory.
+  * Moved `Modules/YieldInstructions` directory to `Utility/YieldInstructions`.
   
 ### XNA/MonoGame
 * Updated to latest MonoGame version 3.7.1
