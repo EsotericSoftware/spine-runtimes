@@ -1,7 +1,13 @@
+// Upgrade NOTE: upgraded instancing buffer 'PerDrawSprite' to new syntax.
+
 #ifndef SHADER_SHARED_INCLUDED
 #define SHADER_SHARED_INCLUDED
 
+#if defined(USE_LWRP)
+#include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Core.hlsl"
+#else
 #include "UnityCG.cginc"
+#endif
 
 #ifdef UNITY_INSTANCING_ENABLED
 
@@ -34,14 +40,37 @@ inline float4 calculateWorldPos(float4 vertex)
 	return mul(unity_ObjectToWorld, vertex);
 }
 
+#if defined(USE_LWRP)
+// snaps post-transformed position to screen pixels
+inline float4 UnityPixelSnap(float4 pos)
+{
+	float2 hpc = _ScreenParams.xy * 0.5f;
+#if  SHADER_API_PSSL
+	// sdk 4.5 splits round into v_floor_f32(x+0.5) ... sdk 5.0 uses v_rndne_f32, for compatabilty we use the 4.5 version
+	float2 temp = ((pos.xy / pos.w) * hpc) + float2(0.5f, 0.5f);
+	float2 pixelPos = float2(__v_floor_f32(temp.x), __v_floor_f32(temp.y));
+#else
+	float2 pixelPos = round((pos.xy / pos.w) * hpc);
+#endif
+	pos.xy = pixelPos / hpc * pos.w;
+	return pos;
+}
+#endif
+
 inline float4 calculateLocalPos(float4 vertex)
 {
+#if !defined(USE_LWRP)
 #ifdef UNITY_INSTANCING_ENABLED
     vertex.xy *= _Flip.xy;
 #endif
+#endif
 
+#if defined(USE_LWRP)
+	float4 pos = TransformObjectToHClip(vertex.xyz);
+#else
 	float4 pos = UnityObjectToClipPos(vertex);
-	
+#endif
+
 #ifdef PIXELSNAP_ON
 	pos = UnityPixelSnap(pos);
 #endif
@@ -51,7 +80,11 @@ inline float4 calculateLocalPos(float4 vertex)
 
 inline half3 calculateWorldNormal(float3 normal)
 {
+#if defined(USE_LWRP)
+	return TransformObjectToWorldNormal(normal);
+#else
 	return UnityObjectToWorldNormal(normal);
+#endif
 }
 
 ////////////////////////////////////////
@@ -70,7 +103,8 @@ half3 UnpackScaleNormal(half4 packednormal, half bumpScale)
 	#else
 		half3 normal;
 		normal.xy = (packednormal.wy * 2 - 1);
-		#if (SHADER_TARGET >= 30)
+		// Note: we allow scaled normals in LWRP since we might be using fewer instructions.
+		#if (SHADER_TARGET >= 30) || defined(USE_LWRP)
 			// SM2.0: instruction count limitation
 			// SM2.0: normal scaler is not supported
 			normal.xy *= bumpScale;
@@ -83,7 +117,11 @@ half3 UnpackScaleNormal(half4 packednormal, half bumpScale)
 
 inline half3 calculateWorldTangent(float4 tangent)
 {
+#if defined(USE_LWRP)
+	return TransformObjectToWorldDir(tangent.xyz);
+#else
 	return UnityObjectToWorldDir(tangent);
+#endif
 }
 
 inline half3 calculateWorldBinormal(half3 normalWorld, half3 tangentWorld, float tangentSign)
@@ -109,82 +147,46 @@ inline half3 calculateNormalFromBumpMap(float2 texUV, half3 tangentWorld, half3 
 // Blending functions
 //
 
-inline fixed4 calculateLitPixel(fixed4 texureColor, fixed4 color, fixed3 lighting) : SV_Target
+inline fixed4 prepareLitPixelForOutput(fixed4 finalPixel, fixed4 color) : SV_Target
 {
-	fixed4 finalPixel;
-	
 #if defined(_ALPHABLEND_ON)
 	//Normal Alpha
-	finalPixel.a = texureColor.a * color.a;
-	finalPixel.rgb = texureColor.rgb * color.rgb * (lighting * finalPixel.a);
+	finalPixel.rgb *= finalPixel.a;
 #elif defined(_ALPHAPREMULTIPLY_ON)
 	//Pre multiplied alpha
-	finalPixel = texureColor * color;
-	finalPixel.rgb *= lighting * color.a;
+	finalPixel.rgb *= color.a;
 #elif defined(_MULTIPLYBLEND)
 	//Multiply
-	finalPixel = texureColor * color;
-	finalPixel.rgb *= lighting;
 	finalPixel = lerp(fixed4(1,1,1,1), finalPixel, finalPixel.a);
 #elif defined(_MULTIPLYBLEND_X2)
 	//Multiply x2
-	finalPixel.rgb = texureColor.rgb * color.rgb * lighting * 2.0f;
-	finalPixel.a = color.a * texureColor.a;
+	finalPixel.rgb *= 2.0f;
 	finalPixel = lerp(fixed4(0.5f,0.5f,0.5f,0.5f), finalPixel, finalPixel.a);
 #elif defined(_ADDITIVEBLEND)
 	//Additive
-	finalPixel = texureColor * 2.0f * color;
-	finalPixel.rgb *= lighting * color.a;
+	finalPixel *= 2.0f;
+	finalPixel.rgb *= color.a;
 #elif defined(_ADDITIVEBLEND_SOFT)
 	//Additive soft
-	finalPixel = texureColor * color;
-	finalPixel.rgb *= lighting * finalPixel.a;
+	finalPixel.rgb *= finalPixel.a;
 #else 
 	//Opaque
 	finalPixel.a = 1;
-	finalPixel.rgb = texureColor.rgb * color.rgb * lighting;
 #endif
-	
+	return finalPixel;
+}
+
+inline fixed4 calculateLitPixel(fixed4 texureColor, fixed4 color, fixed3 lighting) : SV_Target
+{
+	fixed4 finalPixel = texureColor * color * fixed4(lighting, 1);
+	finalPixel = prepareLitPixelForOutput(finalPixel, color);
 	return finalPixel;
 }
 
 inline fixed4 calculateLitPixel(fixed4 texureColor, fixed3 lighting) : SV_Target
 {
-	fixed4 finalPixel;
-	
-#if defined(_ALPHABLEND_ON)	
-	//Normal Alpha
-	finalPixel.a = texureColor.a;
-	finalPixel.rgb = texureColor.rgb * (lighting * finalPixel.a);
-#elif defined(_ALPHAPREMULTIPLY_ON)
-	//Pre multiplied alpha
-	finalPixel = texureColor;
-	finalPixel.rgb *= lighting;
-#elif defined(_MULTIPLYBLEND)
-	//Multiply
-	finalPixel = texureColor;
-	finalPixel.rgb *= lighting;
-	finalPixel = lerp(fixed4(1,1,1,1), finalPixel, finalPixel.a);
-#elif defined(_MULTIPLYBLEND_X2)
-	//Multiply x2
-	finalPixel.rgb = texureColor.rgb * lighting * 2.0f;
-	finalPixel.a = texureColor.a;
-	finalPixel = lerp(fixed4(0.5f,0.5f,0.5f,0.5f), finalPixel, finalPixel.a);
-#elif defined(_ADDITIVEBLEND)
-	//Additive
-	finalPixel = texureColor * 2.0f;
-	finalPixel.rgb *= lighting;
-#elif defined(_ADDITIVEBLEND_SOFT)
-	//Additive soft
-	finalPixel = texureColor;
-	finalPixel.rgb *= lighting * finalPixel.a;
-#else 
-	//Opaque
-	finalPixel.a = 1;
-	finalPixel.rgb = texureColor.rgb * lighting;
-#endif
-	
-	return finalPixel;
+	// note: we let the optimizer work, removed duplicate code.
+	return calculateLitPixel(texureColor, fixed4(1, 1, 1, 1), lighting);
 }
 
 inline fixed4 calculateAdditiveLitPixel(fixed4 texureColor, fixed4 color, fixed3 lighting) : SV_Target
@@ -227,75 +229,14 @@ inline fixed4 calculateAdditiveLitPixel(fixed4 texureColor, fixed3 lighting) : S
 
 inline fixed4 calculatePixel(fixed4 texureColor, fixed4 color) : SV_Target
 {
-	fixed4 finalPixel;
-	
-#if defined(_ALPHABLEND_ON)	
-	//Normal Alpha
-	finalPixel.a = texureColor.a * color.a;
-	finalPixel.rgb = (texureColor.rgb * color.rgb) * finalPixel.a;
-#elif defined(_ALPHAPREMULTIPLY_ON)
-	//Pre multiplied alpha
-	finalPixel = texureColor * color;
-	finalPixel.rgb *= color.a;
-#elif defined(_MULTIPLYBLEND)
-	//Multiply
-	finalPixel = color * texureColor;
-	finalPixel = lerp(fixed4(1,1,1,1), finalPixel, finalPixel.a);
-#elif defined(_MULTIPLYBLEND_X2)
-	//Multiply x2
-	finalPixel.rgb = texureColor.rgb * color.rgb * 2.0f;
-	finalPixel.a = color.a * texureColor.a;
-	finalPixel = lerp(fixed4(0.5f,0.5f,0.5f,0.5f), finalPixel, finalPixel.a);
-#elif defined(_ADDITIVEBLEND)
-	//Additive
-	finalPixel = texureColor * 2.0f * color;
-#elif defined(_ADDITIVEBLEND_SOFT)
-	//Additive soft
-	finalPixel = color * texureColor;
-	finalPixel.rgb *= finalPixel.a;
-#else 
-	//Opaque
-	finalPixel.a = 1;
-	finalPixel.rgb = texureColor.rgb * color.rgb;
-#endif
-	
-	return finalPixel;
+	// note: we let the optimizer work, removed duplicate code.
+	return calculateLitPixel(texureColor, color, fixed3(1, 1, 1));
 }
 
 inline fixed4 calculatePixel(fixed4 texureColor) : SV_Target
 {
-	fixed4 finalPixel;
-	
-#if defined(_ALPHABLEND_ON)	
-	//Normal Alpha
-	finalPixel.a = texureColor.a;
-	finalPixel.rgb = texureColor.rgb * finalPixel.a;
-#elif defined(_ALPHAPREMULTIPLY_ON)
-	//Pre multiplied alpha
-	finalPixel = texureColor;
-#elif defined(_MULTIPLYBLEND)
-	//Multiply
-	finalPixel = texureColor;
-	finalPixel = lerp(fixed4(1,1,1,1), finalPixel, finalPixel.a);
-#elif defined(_MULTIPLYBLEND_X2)
-	//Multiply x2
-	finalPixel.rgb = texureColor.rgb * 2.0f;
-	finalPixel.a = texureColor.a;
-	finalPixel = lerp(fixed4(0.5f,0.5f,0.5f,0.5f), finalPixel, finalPixel.a);
-#elif defined(_ADDITIVEBLEND)
-	//Additive
-	finalPixel = texureColor * 2.0f;
-#elif defined(_ADDITIVEBLEND_SOFT)
-	//Additive soft
-	finalPixel = texureColor;
-	finalPixel.rgb *= finalPixel.a;
-#else
-	//Opaque
-	finalPixel.a = 1;
-	finalPixel.rgb = texureColor.rgb;
-#endif 
-
-	return finalPixel;
+	// note: we let the optimizer work, removed duplicate code.
+	return calculateLitPixel(texureColor, fixed4(1, 1, 1, 1), fixed3(1, 1, 1));
 }
 
 ////////////////////////////////////////
@@ -380,7 +321,7 @@ inline fixed4 adjustColor(fixed4 color)
 
 #if defined(_FOG) && (defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2))
 
-inline fixed4 applyFog(fixed4 pixel, float1 fogCoord) 
+inline fixed4 applyFog(fixed4 pixel, float fogCoordOrFactorAtLWRP) 
 {
 #if defined(_ADDITIVEBLEND) || defined(_ADDITIVEBLEND_SOFT)
 	//In additive mode blend from clear to black based on luminance
@@ -400,14 +341,19 @@ inline fixed4 applyFog(fixed4 pixel, float1 fogCoord)
 #else
 	//In opaque mode just return fog color;
 	fixed4 fogColor = unity_FogColor;
-#endif 
+#endif
 	
-	UNITY_APPLY_FOG_COLOR(fogCoord, pixel, fogColor);
+	#if defined(USE_LWRP)
+	pixel.rgb = MixFogColor(pixel.rgb, fogColor.rgb, fogCoordOrFactorAtLWRP);
+	#else
+	UNITY_APPLY_FOG_COLOR(fogCoordOrFactorAtLWRP, pixel, fogColor);
+	#endif
 	
 	return pixel;
 }
 
 #define APPLY_FOG(pixel, input) pixel = applyFog(pixel, input.fogCoord);
+#define APPLY_FOG_LWRP(pixel, fogFactor) pixel = applyFog(pixel, fogFactor);
 	
 #define APPLY_FOG_ADDITIVE(pixel, input) \
 	UNITY_APPLY_FOG_COLOR(input.fogCoord, pixel.rgb, fixed4(0,0,0,0)); // fog towards black in additive pass
@@ -415,6 +361,7 @@ inline fixed4 applyFog(fixed4 pixel, float1 fogCoord)
 #else
 
 #define APPLY_FOG(pixel, input)
+#define APPLY_FOG_LWRP(pixel, fogFactor)
 #define APPLY_FOG_ADDITIVE(pixel, input)
 
 #endif

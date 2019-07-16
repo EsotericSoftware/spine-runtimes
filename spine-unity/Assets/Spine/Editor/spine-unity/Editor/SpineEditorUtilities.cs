@@ -175,9 +175,7 @@ namespace Spine.Unity.Editor {
 		public static string editorPath = "";
 		public static string editorGUIPath = "";
 		public static bool initialized;
-
-		static int STRAIGHT_ALPHA_PARAM_ID = Shader.PropertyToID("_StraightAlphaInput");
-
+		
 	#if NEW_PREFERENCES_SETTINGS_PROVIDER
 		static class SpineSettingsProviderRegistration
 		{
@@ -314,21 +312,15 @@ namespace Spine.Unity.Editor {
 			int extensionPos = texturePath.LastIndexOf('.');
 			string materialPath = texturePath.Substring(0, extensionPos) + "_Material.mat";
 			Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
-			if (material == null || !material.HasProperty(STRAIGHT_ALPHA_PARAM_ID)) {
-				return true; // non-Spine shader used on material
-			}
-			
-			// 'sRGBTexture = true' generates incorrectly weighted mipmaps at PMA textures,
-			// causing white borders due to undesired custom weighting.
-			if (texImporter.sRGBTexture && texImporter.mipmapEnabled && PlayerSettings.colorSpace == ColorSpace.Gamma) {
-				Debug.LogWarningFormat("`{0}` : Problematic Texture Settings found: When enabling `Generate Mip Maps` in Gamma color space, it is recommended to disable `sRGB (Color Texture)`. Otherwise you will receive white border artifacts on an atlas exported with default `Premultiply alpha` settings.\n(You can disable this warning in `Edit - Preferences - Spine`)", texturePath);
-			}
-			if (texImporter.alphaIsTransparency) {
-				int straightAlphaValue = material.GetInt(STRAIGHT_ALPHA_PARAM_ID);
-				if (straightAlphaValue == 0) {
-					string materialName = System.IO.Path.GetFileName(materialPath);
-					Debug.LogWarningFormat("`{0}` and material `{1}` : Incorrect Texture / Material Settings found: It is strongly recommended to disable `Alpha Is Transparency` on `Premultiply alpha` textures.\nAssuming `Premultiply alpha` texture because `Straight Alpha Texture` is disabled at material). (You can disable this warning in `Edit - Preferences - Spine`)", texturePath, materialName);
-				}
+
+			if (material == null)
+				return true;
+
+			string errorMessage = null;
+			if (MaterialChecks.IsTextureSetupProblematic(material, PlayerSettings.colorSpace,
+				texImporter. sRGBTexture, texImporter. mipmapEnabled, texImporter. alphaIsTransparency,
+				texturePath, materialPath, ref errorMessage)) {
+				Debug.LogWarning(errorMessage);
 			}
 			return true;
 		}
@@ -860,6 +852,8 @@ namespace Spine.Unity.Editor {
 				// Import atlases first.
 				var atlases = new List<AtlasAssetBase>();
 				foreach (string ap in atlasPaths) {
+					if (ap.StartsWith("Packages"))
+						continue;
 					TextAsset atlasText = AssetDatabase.LoadAssetAtPath<TextAsset>(ap);
 					AtlasAssetBase atlas = IngestSpineAtlas(atlasText);
 					atlases.Add(atlas);
@@ -868,6 +862,8 @@ namespace Spine.Unity.Editor {
 				// Import skeletons and match them with atlases.
 				bool abortSkeletonImport = false;
 				foreach (string skeletonPath in skeletonPaths) {
+					if (skeletonPath.StartsWith("Packages"))
+						continue;
 					if (!reimport && CheckForValidSkeletonData(skeletonPath)) {
 						ReloadSkeletonData(skeletonPath);
 						continue;

@@ -299,6 +299,11 @@ namespace Spine.Unity.Editor {
 
 			if (!valid)
 				return;
+			
+			string errorMessage = null;
+			if (MaterialChecks.IsMaterialSetupProblematic((SkeletonRenderer)this.target, ref errorMessage)) {
+				EditorGUILayout.HelpBox(errorMessage, MessageType.Error, true);
+			}
 
 			// More Render Options...
 			using (new SpineInspectorUtility.BoxScope()) {

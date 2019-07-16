@@ -64,14 +64,14 @@ Shader "Spine/Skeleton Lit" {
 
 			#pragma multi_compile __ POINT SPOT
 
-			half3 computeLighting (int idx, half3 dirToLight, half3 eyeNormal, half3 viewDir, half4 diffuseColor, half atten) {
+			half3 computeLighting (int idx, half3 dirToLight, half3 eyeNormal, half4 diffuseColor, half atten) {
 				half NdotL = max(dot(eyeNormal, dirToLight), 0.0);
 				// diffuse
 				half3 color = NdotL * diffuseColor.rgb * unity_LightColor[idx].rgb;
 				return color * atten;
 			}
 
-			half3 computeOneLight (int idx, float3 eyePosition, half3 eyeNormal, half3 viewDir, half4 diffuseColor) {
+			half3 computeOneLight (int idx, float3 eyePosition, half3 eyeNormal, half4 diffuseColor) {
 				float3 dirToLight = unity_LightPosition[idx].xyz;
 				half att = 1.0;
 
@@ -94,7 +94,7 @@ Shader "Spine/Skeleton Lit" {
 				#endif
 
 				att *= 0.5; // passed in light colors are 2x brighter than what used to be in FFP
-				return min (computeLighting (idx, dirToLight, eyeNormal, viewDir, diffuseColor, att), 1.0);
+				return min (computeLighting (idx, dirToLight, eyeNormal, diffuseColor, att), 1.0);
 			}
 
 			int4 unity_VertexLightParams; // x: light count, y: zero, z: one (y/z needed by d3d9 vs loop instruction)
@@ -103,7 +103,7 @@ Shader "Spine/Skeleton Lit" {
 				float3 pos : POSITION;
 				float3 normal : NORMAL;
 				half4 color : COLOR;
-				float3 uv0 : TEXCOORD0;
+				float2 uv0 : TEXCOORD0;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
@@ -124,12 +124,11 @@ Shader "Spine/Skeleton Lit" {
 				half3 fixedNormal = half3(0,0,-1);
 				half3 eyeNormal = normalize(mul((float3x3)UNITY_MATRIX_IT_MV, fixedNormal));
 				//half3 eyeNormal = half3(0,0,1);
-				half3 viewDir = 0.0;
 
 				// Lights
 				half3 lcolor = half4(0,0,0,1).rgb + color.rgb * glstate_lightmodel_ambient.rgb;
 				for (int il = 0; il < LIGHT_LOOP_LIMIT; ++il) {
-					lcolor += computeOneLight(il, eyePos, eyeNormal, viewDir, color);
+					lcolor += computeOneLight(il, eyePos, eyeNormal, color);
 				}
 
 				color.rgb = lcolor.rgb;
