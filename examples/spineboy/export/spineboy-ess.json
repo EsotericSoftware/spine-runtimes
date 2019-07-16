@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "AUQx/betarHq9lEIe4JRkbTm95k",
-	"spine": "3.8.33-beta",
+	"hash": "XIf0WIqvG88R2IljysIpGbv6Odo",
+	"spine": "3.8.44-beta",
 	"x": -221.27,
 	"y": -8.57,
 	"width": 470.72,
@@ -167,37 +167,11 @@
 	{
 		"name": "default",
 		"attachments": {
-			"eye": {
-				"eye-indifferent": { "x": 85.72, "y": -28.18, "rotation": -70.63, "width": 93, "height": 89 },
-				"eye-surprised": { "x": 85.72, "y": -28.18, "rotation": -70.63, "width": 93, "height": 89 }
-			},
-			"front-bracer": {
-				"front-bracer": { "x": 12.03, "y": -1.68, "rotation": 79.6, "width": 58, "height": 80 }
-			},
-			"front-fist": {
-				"front-fist-closed": { "x": 35.5, "y": 6, "rotation": 67.16, "width": 75, "height": 82 },
-				"front-fist-open": { "x": 39.57, "y": 7.76, "rotation": 67.16, "width": 86, "height": 87 }
-			},
-			"front-foot": {
-				"front-foot": { "x": 29.52, "y": 7.84, "rotation": 18.69, "width": 126, "height": 69 }
-			},
-			"front-shin": {
-				"front-shin": { "x": 55.12, "y": -3.54, "rotation": 96.59, "width": 82, "height": 184 }
-			},
-			"front-thigh": {
-				"front-thigh": { "x": 42.48, "y": 4.45, "rotation": 84.87, "width": 45, "height": 112 }
-			},
-			"front-upper-arm": {
-				"front-upper-arm": { "x": 25.2, "y": 1.17, "rotation": 97.9, "width": 46, "height": 97 }
-			},
-			"goggles": {
-				"goggles": { "x": 97.08, "y": 6.54, "rotation": -70.63, "width": 261, "height": 166 }
-			},
 			"gun": {
 				"gun": { "x": 77.3, "y": 16.4, "rotation": 60.83, "width": 210, "height": 203 }
 			},
-			"head": {
-				"head": { "x": 128.96, "y": 0.3, "rotation": -70.63, "width": 271, "height": 298 }
+			"rear-shin": {
+				"rear-shin": { "x": 58.29, "y": -2.75, "rotation": 92.37, "width": 75, "height": 178 }
 			},
 			"head-bb": {
 				"head": {
@@ -210,6 +184,30 @@
 				"mouth-grind": { "x": 23.69, "y": -32.24, "rotation": -70.63, "width": 93, "height": 59 },
 				"mouth-oooo": { "x": 23.69, "y": -32.24, "rotation": -70.63, "width": 93, "height": 59 },
 				"mouth-smile": { "x": 23.69, "y": -32.24, "rotation": -70.63, "width": 93, "height": 59 }
+			},
+			"rear-upper-arm": {
+				"rear-upper-arm": { "x": 21.13, "y": 4.09, "rotation": 89.33, "width": 40, "height": 87 }
+			},
+			"front-upper-arm": {
+				"front-upper-arm": { "x": 25.2, "y": 1.17, "rotation": 97.9, "width": 46, "height": 97 }
+			},
+			"front-bracer": {
+				"front-bracer": { "x": 12.03, "y": -1.68, "rotation": 79.6, "width": 58, "height": 80 }
+			},
+			"front-foot": {
+				"front-foot": { "x": 29.52, "y": 7.84, "rotation": 18.69, "width": 126, "height": 69 }
+			},
+			"goggles": {
+				"goggles": { "x": 97.08, "y": 6.54, "rotation": -70.63, "width": 261, "height": 166 }
+			},
+			"front-shin": {
+				"front-shin": { "x": 55.12, "y": -3.54, "rotation": 96.59, "width": 82, "height": 184 }
+			},
+			"neck": {
+				"neck": { "x": 9.77, "y": -3.01, "rotation": -55.22, "width": 36, "height": 41 }
+			},
+			"head": {
+				"head": { "x": 128.96, "y": 0.3, "rotation": -70.63, "width": 271, "height": 298 }
 			},
 			"muzzle": {
 				"muzzle01": {
@@ -249,26 +247,28 @@
 					"height": 90
 				}
 			},
-			"neck": {
-				"neck": { "x": 9.77, "y": -3.01, "rotation": -55.22, "width": 36, "height": 41 }
-			},
 			"rear-bracer": {
 				"rear-bracer": { "x": 11.15, "y": -2.2, "rotation": 66.17, "width": 56, "height": 72 }
-			},
-			"rear-foot": {
-				"rear-foot": { "x": 31.51, "y": 3.58, "rotation": 23.07, "width": 113, "height": 60 }
-			},
-			"rear-shin": {
-				"rear-shin": { "x": 58.29, "y": -2.75, "rotation": 92.37, "width": 75, "height": 178 }
 			},
 			"rear-thigh": {
 				"rear-thigh": { "x": 33.11, "y": -4.11, "rotation": 72.54, "width": 55, "height": 94 }
 			},
-			"rear-upper-arm": {
-				"rear-upper-arm": { "x": 21.13, "y": 4.09, "rotation": 89.33, "width": 40, "height": 87 }
+			"front-fist": {
+				"front-fist-closed": { "x": 35.5, "y": 6, "rotation": 67.16, "width": 75, "height": 82 },
+				"front-fist-open": { "x": 39.57, "y": 7.76, "rotation": 67.16, "width": 86, "height": 87 }
+			},
+			"eye": {
+				"eye-indifferent": { "x": 85.72, "y": -28.18, "rotation": -70.63, "width": 93, "height": 89 },
+				"eye-surprised": { "x": 85.72, "y": -28.18, "rotation": -70.63, "width": 93, "height": 89 }
+			},
+			"front-thigh": {
+				"front-thigh": { "x": 42.48, "y": 4.45, "rotation": 84.87, "width": 45, "height": 112 }
 			},
 			"torso": {
 				"torso": { "x": 63.61, "y": 7.12, "rotation": -94.54, "width": 98, "height": 180 }
+			},
+			"rear-foot": {
+				"rear-foot": { "x": 31.51, "y": 3.58, "rotation": 23.07, "width": 113, "height": 60 }
 			}
 		}
 	}
@@ -279,14 +279,6 @@
 "animations": {
 	"death": {
 		"slots": {
-			"eye": {
-				"attachment": [
-					{ "name": "eye-surprised" },
-					{ "time": 0.4667, "name": "eye-indifferent" },
-					{ "time": 2.2333, "name": "eye-surprised" },
-					{ "time": 4.5333, "name": "eye-indifferent" }
-				]
-			},
 			"front-fist": {
 				"attachment": [
 					{ "name": "front-fist-open" }
@@ -297,6 +289,14 @@
 					{ "name": "mouth-oooo" },
 					{ "time": 2.2333, "name": "mouth-grind" },
 					{ "time": 4.5333, "name": "mouth-oooo" }
+				]
+			},
+			"eye": {
+				"attachment": [
+					{ "name": "eye-surprised" },
+					{ "time": 0.4667, "name": "eye-indifferent" },
+					{ "time": 2.2333, "name": "eye-surprised" },
+					{ "time": 4.5333, "name": "eye-indifferent" }
 				]
 			}
 		},

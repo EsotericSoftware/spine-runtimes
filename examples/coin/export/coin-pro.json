@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "UAXc6AgX0g45vxO38bHIVx5jbNo",
-	"spine": "3.8.33-beta",
+	"spine": "3.8.44-beta",
 	"x": -152.5,
 	"y": -151,
 	"width": 305,
@@ -43,10 +43,6 @@
 				"coin-front-shine-logo": { "width": 282, "height": 282 },
 				"coin-front-shine-spineboy": { "width": 282, "height": 282 }
 			},
-			"coin-front-texture": {
-				"coin-front-logo": { "width": 305, "height": 302 },
-				"coin-front-spineboy": { "width": 305, "height": 302 }
-			},
 			"coin-side": {
 				"coin-side-straight": { "x": 0.5, "width": 17, "height": 282 }
 			},
@@ -55,6 +51,10 @@
 			},
 			"shine": {
 				"shine": { "y": 0.5, "scaleX": 1.6004, "scaleY": 1.6004, "width": 72, "height": 245 }
+			},
+			"coin-front-texture": {
+				"coin-front-logo": { "width": 305, "height": 302 },
+				"coin-front-spineboy": { "width": 305, "height": 302 }
 			}
 		}
 	}

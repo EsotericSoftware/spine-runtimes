@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "gLtfCboTLKcJPKYtT0pyDxr7Uag",
-	"spine": "3.8.33-beta",
+	"hash": "E3PAF6YBVsi9Z1sx6PPvmTFTEqQ",
+	"spine": "3.8.44-beta",
 	"x": -95.43,
 	"y": -18.79,
 	"width": 196.03,
@@ -70,9 +70,6 @@
 	{
 		"name": "default",
 		"attachments": {
-			"belt ends": {
-				"belt-ends": { "x": -16.39, "y": 1.81, "rotation": -94.05, "width": 45, "height": 56 }
-			},
 			"hair1": {
 				"hair-1": { "x": -7.34, "y": -30.73, "rotation": -92.2, "width": 82, "height": 39 }
 			},
@@ -81,6 +78,30 @@
 			},
 			"head": {
 				"head": { "x": 53.12, "y": -6.83, "rotation": -89.55, "width": 116, "height": 124 }
+			},
+			"right hand": {
+				"right-hand": { "x": 26.55, "y": 4.35, "rotation": 111.62, "width": 56, "height": 58 }
+			},
+			"left foot": {
+				"left-foot": { "x": 36.96, "y": 10.44, "rotation": 12.11, "width": 80, "height": 47 },
+				"left-foot-bent01": { "x": 34.83, "y": 6.79, "rotation": 12.11, "width": 87, "height": 43 },
+				"left-foot-bent02": { "x": 33.04, "y": 6.77, "rotation": 12.11, "width": 82, "height": 43 },
+				"left-foot-side": { "x": 37.79, "y": 6.08, "rotation": 12.11, "width": 90, "height": 42 }
+			},
+			"left hand": {
+				"left-hand": { "x": 18.27, "y": 3.71, "rotation": 5.29, "width": 52, "height": 53 }
+			},
+			"belt ends": {
+				"belt-ends": { "x": -16.39, "y": 1.81, "rotation": -94.05, "width": 45, "height": 56 }
+			},
+			"right foot": {
+				"right-foot": { "x": 16.73, "y": -1.85, "rotation": 13.07, "width": 66, "height": 56 },
+				"right-foot-bent01": { "x": 29.37, "y": 7.58, "rotation": 13.07, "width": 85, "height": 43 },
+				"right-foot-bent02": { "x": 26.23, "y": 7.38, "rotation": 13.07, "width": 79, "height": 43 },
+				"right-foot-side": { "x": 31.34, "y": 7.88, "rotation": 13.07, "width": 90, "height": 42 }
+			},
+			"torso": {
+				"torso": { "x": 8.63, "y": -3.3, "rotation": -95.84, "width": 77, "height": 85 }
 			},
 			"hood end1": {
 				"hood-end1a": { "x": -36.39, "y": 3.08, "rotation": -92.2, "width": 23, "height": 84 },
@@ -97,27 +118,6 @@
 				"hood-end2d": { "x": -33.2, "y": -2.46, "rotation": -78.9, "width": 23, "height": 76 },
 				"hood-end2e": { "x": -31.88, "y": -5.66, "rotation": -78.9, "width": 28, "height": 74 },
 				"hood-end2f": { "x": -28.63, "y": -6.4, "rotation": -78.9, "width": 31, "height": 70 }
-			},
-			"left foot": {
-				"left-foot": { "x": 36.96, "y": 10.44, "rotation": 12.11, "width": 80, "height": 47 },
-				"left-foot-bent01": { "x": 34.83, "y": 6.79, "rotation": 12.11, "width": 87, "height": 43 },
-				"left-foot-bent02": { "x": 33.04, "y": 6.77, "rotation": 12.11, "width": 82, "height": 43 },
-				"left-foot-side": { "x": 37.79, "y": 6.08, "rotation": 12.11, "width": 90, "height": 42 }
-			},
-			"left hand": {
-				"left-hand": { "x": 18.27, "y": 3.71, "rotation": 5.29, "width": 52, "height": 53 }
-			},
-			"right foot": {
-				"right-foot": { "x": 16.73, "y": -1.85, "rotation": 13.07, "width": 66, "height": 56 },
-				"right-foot-bent01": { "x": 29.37, "y": 7.58, "rotation": 13.07, "width": 85, "height": 43 },
-				"right-foot-bent02": { "x": 26.23, "y": 7.38, "rotation": 13.07, "width": 79, "height": 43 },
-				"right-foot-side": { "x": 31.34, "y": 7.88, "rotation": 13.07, "width": 90, "height": 42 }
-			},
-			"right hand": {
-				"right-hand": { "x": 26.55, "y": 4.35, "rotation": 111.62, "width": 56, "height": 58 }
-			},
-			"torso": {
-				"torso": { "x": 8.63, "y": -3.3, "rotation": -95.84, "width": 77, "height": 85 }
 			}
 		}
 	}
@@ -125,6 +125,15 @@
 "animations": {
 	"run": {
 		"slots": {
+			"right foot": {
+				"attachment": [
+					{ "name": "right-foot-side" },
+					{ "time": 0.1667, "name": "right-foot-bent01" },
+					{ "time": 0.2333, "name": "right-foot-bent02" },
+					{ "time": 0.3, "name": "right-foot-bent01" },
+					{ "time": 0.4333, "name": "right-foot-side" }
+				]
+			},
 			"hood end1": {
 				"attachment": [
 					{ "name": "hood-end1b" },
@@ -174,15 +183,6 @@
 					{ "time": 0.6667, "name": "left-foot-bent02" },
 					{ "time": 0.7667, "name": "left-foot-bent01" },
 					{ "time": 0.8667, "name": "left-foot-side" }
-				]
-			},
-			"right foot": {
-				"attachment": [
-					{ "name": "right-foot-side" },
-					{ "time": 0.1667, "name": "right-foot-bent01" },
-					{ "time": 0.2333, "name": "right-foot-bent02" },
-					{ "time": 0.3, "name": "right-foot-bent01" },
-					{ "time": 0.4333, "name": "right-foot-side" }
 				]
 			}
 		},
@@ -451,15 +451,6 @@
 	},
 	"run-linear": {
 		"slots": {
-			"left foot": {
-				"attachment": [
-					{ "name": "left-foot-side" },
-					{ "time": 0.6, "name": "left-foot-bent01" },
-					{ "time": 0.6667, "name": "left-foot-bent02" },
-					{ "time": 0.7667, "name": "left-foot-bent01" },
-					{ "time": 0.8667, "name": "left-foot-side" }
-				]
-			},
 			"right foot": {
 				"attachment": [
 					{ "name": "right-foot-side" },
@@ -467,6 +458,15 @@
 					{ "time": 0.2333, "name": "right-foot-bent02" },
 					{ "time": 0.3, "name": "right-foot-bent01" },
 					{ "time": 0.4333, "name": "right-foot-side" }
+				]
+			},
+			"left foot": {
+				"attachment": [
+					{ "name": "left-foot-side" },
+					{ "time": 0.6, "name": "left-foot-bent01" },
+					{ "time": 0.6667, "name": "left-foot-bent02" },
+					{ "time": 0.7667, "name": "left-foot-bent01" },
+					{ "time": 0.8667, "name": "left-foot-side" }
 				]
 			}
 		},
@@ -655,15 +655,6 @@
 	},
 	"run-rough": {
 		"slots": {
-			"left foot": {
-				"attachment": [
-					{ "name": "left-foot-side" },
-					{ "time": 0.6, "name": "left-foot-bent01" },
-					{ "time": 0.6667, "name": "left-foot-bent02" },
-					{ "time": 0.7333, "name": "left-foot-bent01" },
-					{ "time": 0.8, "name": "left-foot-side" }
-				]
-			},
 			"right foot": {
 				"attachment": [
 					{ "name": "right-foot-side" },
@@ -671,6 +662,15 @@
 					{ "time": 0.2667, "name": "right-foot-bent02" },
 					{ "time": 0.3333, "name": "right-foot-bent01" },
 					{ "time": 0.4, "name": "right-foot-side" }
+				]
+			},
+			"left foot": {
+				"attachment": [
+					{ "name": "left-foot-side" },
+					{ "time": 0.6, "name": "left-foot-bent01" },
+					{ "time": 0.6667, "name": "left-foot-bent02" },
+					{ "time": 0.7333, "name": "left-foot-bent01" },
+					{ "time": 0.8, "name": "left-foot-side" }
 				]
 			}
 		},

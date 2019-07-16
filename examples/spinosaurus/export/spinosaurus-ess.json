@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "1qTCYNGncKp5Ol1mAdGTsq6OHaM",
-	"spine": "3.8.33-beta",
+	"hash": "/oBn/39C9DiEo+0+HkQuS2jebw8",
+	"spine": "3.8.44-beta",
 	"x": -840,
 	"y": -766.03,
 	"width": 1680,
@@ -29,20 +29,20 @@
 	{
 		"name": "default",
 		"attachments": {
+			"quit": {
+				"quit": { "width": 216, "height": 77 }
+			},
 			"leaves": {
 				"leaves": { "y": -28.54, "width": 1042, "height": 522 }
+			},
+			"settings": {
+				"settings": { "width": 446, "height": 76 }
 			},
 			"logo": {
 				"logo": { "y": -20.4, "width": 917, "height": 323 }
 			},
 			"play": {
 				"play": { "width": 218, "height": 77 }
-			},
-			"quit": {
-				"quit": { "width": 216, "height": 77 }
-			},
-			"settings": {
-				"settings": { "width": 446, "height": 76 }
 			}
 		}
 	}
@@ -50,18 +50,6 @@
 "animations": {
 	"animation": {
 		"slots": {
-			"leaves": {
-				"color": [
-					{ "color": "ffffff00" },
-					{ "time": 0.3333, "color": "ffffffff" }
-				]
-			},
-			"logo": {
-				"color": [
-					{ "color": "ffffff00" },
-					{ "time": 0.3333, "color": "ffffffff" }
-				]
-			},
 			"play": {
 				"color": [
 					{ "time": 1.3333, "color": "fff99dff" },
@@ -74,6 +62,18 @@
 				"color": [
 					{ "time": 2.4, "color": "fff99dff" },
 					{ "time": 2.6333, "color": "ffffffff" }
+				]
+			},
+			"leaves": {
+				"color": [
+					{ "color": "ffffff00" },
+					{ "time": 0.3333, "color": "ffffffff" }
+				]
+			},
+			"logo": {
+				"color": [
+					{ "color": "ffffff00" },
+					{ "time": 0.3333, "color": "ffffffff" }
 				]
 			},
 			"settings": {

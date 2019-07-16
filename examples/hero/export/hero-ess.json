@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "GKlLtUkXkXrplEF0opVpUHvO7E4",
-	"spine": "3.8.33-beta",
+	"spine": "3.8.44-beta",
 	"x": -87.83,
 	"y": -0.03,
 	"width": 319.3,
@@ -71,14 +71,8 @@
 	{
 		"name": "default",
 		"attachments": {
-			"body": {
-				"body": { "x": 33.82, "y": 2.6, "rotation": -92.7, "width": 97, "height": 95 }
-			},
-			"eyes": {
-				"eyes": { "x": 6.48, "y": 50.75, "rotation": 0.12, "width": 82, "height": 31 }
-			},
-			"fingers": {
-				"fingers": { "x": 16.22, "y": 1.37, "rotation": 82.36, "width": 31, "height": 33 }
+			"thigh2": {
+				"thigh2": { "x": 15.71, "y": -4.62, "rotation": 85.46, "width": 57, "height": 64 }
 			},
 			"foot1": {
 				"foot1": { "x": 12.55, "y": 0.12, "rotation": 90.96, "width": 50, "height": 42 }
@@ -86,47 +80,53 @@
 			"foot2": {
 				"foot2": { "x": 8.83, "y": 2.92, "rotation": 90.42, "width": 53, "height": 38 }
 			},
+			"mouth": {
+				"mouth": { "x": 12.07, "y": 10.76, "rotation": 0.12, "width": 61, "height": 13 }
+			},
 			"forearm1": {
 				"forearm1": { "x": 11.88, "y": -5.04, "rotation": 106.62, "width": 41, "height": 49 }
 			},
 			"forearm2": {
 				"forearm2": { "x": 13.09, "y": -0.64, "rotation": 83.72, "width": 31, "height": 32 }
 			},
+			"upperarm1": {
+				"upper-arm1": { "x": 6.6, "y": 0.06, "rotation": 137.18, "width": 50, "height": 56 }
+			},
 			"hand1": {
 				"hand1": { "x": 11.93, "y": -0.7, "rotation": 90.37, "width": 37, "height": 48 }
-			},
-			"hand2": {
-				"hand2": { "x": 14.24, "y": 1.64, "rotation": 82.36, "width": 31, "height": 37 }
-			},
-			"head": {
-				"head": { "x": 7.8, "y": 71.88, "rotation": 0.12, "width": 172, "height": 173 }
-			},
-			"mantles": {
-				"mantles": { "x": 15.58, "y": 11.76, "rotation": -90.45, "width": 136, "height": 55 }
-			},
-			"mouth": {
-				"mouth": { "x": 12.07, "y": 10.76, "rotation": 0.12, "width": 61, "height": 13 }
-			},
-			"shin1": {
-				"shin1": { "x": 8.96, "y": 0.67, "rotation": 96.81, "width": 53, "height": 57 }
-			},
-			"shin2": {
-				"shin2": { "x": 2.25, "y": -2.94, "rotation": 87.72, "width": 51, "height": 54 }
 			},
 			"thigh1": {
 				"thigh1": { "x": 11.99, "y": -1.02, "rotation": 107.07, "width": 60, "height": 63 }
 			},
-			"thigh2": {
-				"thigh2": { "x": 15.71, "y": -4.62, "rotation": 85.46, "width": 57, "height": 64 }
+			"weapon": {
+				"sword": { "x": 71.39, "y": 0.2, "rotation": 0.2, "width": 216, "height": 69 }
 			},
-			"upperarm1": {
-				"upper-arm1": { "x": 6.6, "y": 0.06, "rotation": 137.18, "width": 50, "height": 56 }
+			"shin2": {
+				"shin2": { "x": 2.25, "y": -2.94, "rotation": 87.72, "width": 51, "height": 54 }
+			},
+			"head": {
+				"head": { "x": 7.8, "y": 71.88, "rotation": 0.12, "width": 172, "height": 173 }
+			},
+			"body": {
+				"body": { "x": 33.82, "y": 2.6, "rotation": -92.7, "width": 97, "height": 95 }
+			},
+			"hand2": {
+				"hand2": { "x": 14.24, "y": 1.64, "rotation": 82.36, "width": 31, "height": 37 }
+			},
+			"eyes": {
+				"eyes": { "x": 6.48, "y": 50.75, "rotation": 0.12, "width": 82, "height": 31 }
+			},
+			"fingers": {
+				"fingers": { "x": 16.22, "y": 1.37, "rotation": 82.36, "width": 31, "height": 33 }
+			},
+			"mantles": {
+				"mantles": { "x": 15.58, "y": 11.76, "rotation": -90.45, "width": 136, "height": 55 }
+			},
+			"shin1": {
+				"shin1": { "x": 8.96, "y": 0.67, "rotation": 96.81, "width": 53, "height": 57 }
 			},
 			"upperarm2": {
 				"upper-arm2": { "x": 13.33, "y": -2.22, "rotation": 90.45, "width": 39, "height": 59 }
-			},
-			"weapon": {
-				"sword": { "x": 71.39, "y": 0.2, "rotation": 0.2, "width": 216, "height": 69 }
 			}
 		}
 	}
