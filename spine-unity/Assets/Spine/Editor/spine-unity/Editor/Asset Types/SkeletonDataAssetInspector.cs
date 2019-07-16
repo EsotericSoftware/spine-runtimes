@@ -558,7 +558,7 @@ namespace Spine.Unity.Editor {
 		void DrawUnityTools () {
 			#if SPINE_SKELETON_MECANIM
 			using (new SpineInspectorUtility.BoxScope()) {
-				isMecanimExpanded = EditorGUILayout.Foldout(isMecanimExpanded, SpineInspectorUtility.TempContent("SkeletonAnimator", SpineInspectorUtility.UnityIcon<SceneAsset>()));
+				isMecanimExpanded = EditorGUILayout.Foldout(isMecanimExpanded, SpineInspectorUtility.TempContent("SkeletonMecanim", SpineInspectorUtility.UnityIcon<SceneAsset>()));
 				if (isMecanimExpanded) {
 					using (new SpineInspectorUtility.IndentScope()) {
 						EditorGUILayout.PropertyField(controller, SpineInspectorUtility.TempContent("Controller", SpineInspectorUtility.UnityIcon<Animator>()));
@@ -570,7 +570,7 @@ namespace Spine.Unity.Editor {
 								if (GUILayout.Button(SpineInspectorUtility.TempContent("Generate Mecanim Controller"), GUILayout.Height(20)))
 									SkeletonBaker.GenerateMecanimAnimationClips(targetSkeletonDataAsset);
 							}
-							EditorGUILayout.HelpBox("SkeletonAnimator is the Mecanim alternative to SkeletonAnimation.\nIt is not required.", MessageType.Info);
+							EditorGUILayout.HelpBox("SkeletonMecanim is the Mecanim alternative to SkeletonAnimation.\nIt is not required.", MessageType.Info);
 
 						} else {
 

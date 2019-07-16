@@ -71,7 +71,7 @@ namespace Spine.Unity.Editor {
 	/// </summary>
 	public static class SkeletonBaker {
 
-		#region SkeletonAnimator's Mecanim Clips
+		#region SkeletonMecanim's Mecanim Clips
 		#if SPINE_SKELETONMECANIM
 		public static void UpdateMecanimClips (SkeletonDataAsset skeletonDataAsset) {
 			if (skeletonDataAsset.controller == null)

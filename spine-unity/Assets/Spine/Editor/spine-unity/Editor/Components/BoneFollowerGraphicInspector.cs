@@ -174,7 +174,7 @@ namespace Spine.Unity.Editor {
 			} else {
 				var boneFollowerSkeletonGraphic = targetBoneFollower.skeletonGraphic;
 				if (boneFollowerSkeletonGraphic == null) {
-					EditorGUILayout.HelpBox("SkeletonGraphic is unassigned. Please assign a SkeletonRenderer (SkeletonAnimation or SkeletonAnimator).", MessageType.Warning);
+					EditorGUILayout.HelpBox("SkeletonGraphic is unassigned. Please assign a SkeletonRenderer (SkeletonAnimation or SkeletonMecanim).", MessageType.Warning);
 				} else {
 					boneFollowerSkeletonGraphic.Initialize(false);
 

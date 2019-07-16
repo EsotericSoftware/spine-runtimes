@@ -180,7 +180,7 @@ namespace Spine.Unity.Editor {
 			} else {
 				var boneFollowerSkeletonRenderer = targetBoneFollower.skeletonRenderer;
 				if (boneFollowerSkeletonRenderer == null) {
-					EditorGUILayout.HelpBox("SkeletonRenderer is unassigned. Please assign a SkeletonRenderer (SkeletonAnimation or SkeletonAnimator).", MessageType.Warning);
+					EditorGUILayout.HelpBox("SkeletonRenderer is unassigned. Please assign a SkeletonRenderer (SkeletonAnimation or SkeletonMecanim).", MessageType.Warning);
 				} else {
 					boneFollowerSkeletonRenderer.Initialize(false);
 
