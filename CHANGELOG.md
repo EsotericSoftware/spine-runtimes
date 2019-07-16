@@ -134,6 +134,11 @@
   * **Removed redundant `Attachment.GetClone()` and `MeshAttachment.GetLinkedClone()` extension methods**. Use methods `Attachment.Copy` and `MeshAttachment.NewLinkedMesh()` instead.
   * **Renamed extension method `Attachment.GetClone(bool cloneMeshesAsLinked)` to `Attachment.GetCopy(bool cloneMeshesAsLinked)`** to follow the naming scheme of the Spine API.
   * **Changed `MeshAttachment.GetLinkedMesh()` method signatures:** removed optional parameters `bool inheritDeform = true, bool copyOriginalProperties = false`.
+  * Changed namespace `Spine.Unity.Modules` to `Spine.Unity` and `Spine.Unity.Examples` after restructuring (see section below) in respective classes:
+    * When receiving namespace related errors, replace using statements of `using Spine.Unity.Modules.AttachmentTools;` with `using Spine.Unity.AttachmentTools;`. You can remove `using Spine.Unity.Modules;` statements when a `using Spine.Unity` statement is already present in the file.
+    * `AttachmentTools`, `SkeletonPartsRenderer`, `SkeletonRenderSeparator`, `SkeletonRendererCustomMaterials` changed to namespace `Spine.Unity`.
+    * `SkeletonGhost`, `SkeletonGhostRenderer`, `AtlasRegionAttacher`, `SkeletonGraphicMirror`, `SkeletonRagdoll`, `SkeletonRagdoll2D`, `SkeletonUtilityEyeConstraint`, `SkeletonUtilityGroundConstraint`, `SkeletonUtilityKinematicShadow` changed to namespace `Spine.Unity.Examples`.
+  
 
 * **Additions**
   * **Spine Preferences stored in Assets/Editor/SpineSettings.asset** Now Spine uses the new `SettingsProvider` API, storing settings in a SpineSettings.asset file which can be shared with team members. Your old preferences are automatically migrated to the new system.
@@ -142,7 +147,7 @@
   * Added `Create 2D Hinge Chain` button at `SkeletonUtilityBone` inspector, previously only `Create 3D Hinge Chain` was available.
   * **Now supporting Lightweight Render Pipeline (LWRP) through an additional UPM package.**
     * **Installation:** You can download the Unity Package Manager (UPM) package via the [download page](http://esotericsoftware.com/spine-unity-download) or find it in the [spine-runtimes/spine-unity/Packages](https://github.com/EsotericSoftware/spine-runtimes/tree/3.8-beta/spine-unity/Packages) subdirectory on the git repository. You can then either unzip (copy if using git) the package to    
-      a) the `Packages` directory in your project where it will automatically be loaded, or      
+      a) the `Packages` directory in your project where it will automatically be loaded, or
       b) to an arbitrary directory outside the Assets directory and then open Package Manager in Unity, select the `+` icon, choose `Add package from disk..` and point it to the package.json file.    
       The Project panel should now show an entry `Spine Lightweight RP Shaders` under `Packages`. If the directory is not yet listed, you will need to close and re-open Unity to have it display the directory and its contents.
     * **Usage:** The package provides two shaders specifically built for the lightweight render pipeline:
@@ -151,7 +156,7 @@
     * **Restrictions** As all Spine shaders, the LWRP shaders **do not support `Premultiply alpha` (PMA) atlas textures in Linear color space**. Please export your atlas textures as `straight alpha` textures with disabled `Premultiply alpha` setting when using Linear color space. You can check the current color space via `Project Settings - Player - Other Settings - Color Space.`.
     * **Example:** You can find an example scene in the package under `com.esotericsoftware.spine.lwrp-shaders-3.8/Examples/LWRP Shaders.unity` that demonstrates usage of the LWRP shaders.
 
-* **Removed / Deprecated**
+* **Deprecated**
   * Deprecated `Modules/SlotBlendModes/SlotBlendModes` component. Changed namespace from `Spine.Unity.Modules` to `Spine.Unity.Deprecated`. Moved to `Deprecated/SlotBlendModes`.
 
 * **Restructuring (Non-Breaking)**

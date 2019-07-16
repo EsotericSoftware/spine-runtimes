@@ -35,7 +35,7 @@ using System.Collections.Generic;
 using Spine.Unity;
 using Spine.Unity.Editor;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Examples {
 	
 	[CustomEditor(typeof(SkeletonRenderSeparator))]
 	public class SkeletonRenderSeparatorInspector : UnityEditor.Editor {

@@ -29,7 +29,7 @@
 
 using UnityEngine;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity {
 	[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 	public class SkeletonPartsRenderer : MonoBehaviour {
 

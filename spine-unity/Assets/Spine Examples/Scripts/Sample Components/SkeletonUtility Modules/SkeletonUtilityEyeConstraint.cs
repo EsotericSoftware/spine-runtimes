@@ -30,7 +30,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Examples {
 	public class SkeletonUtilityEyeConstraint : SkeletonUtilityConstraint {
 		public Transform[] eyes;
 		public float radius = 0.5f;

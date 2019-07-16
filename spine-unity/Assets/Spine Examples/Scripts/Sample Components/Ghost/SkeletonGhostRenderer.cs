@@ -32,7 +32,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Examples {
 	public class SkeletonGhostRenderer : MonoBehaviour {
 		static readonly Color32 TransparentBlack = new Color32(0, 0, 0, 0);
 		const string colorPropertyName = "_Color";

@@ -35,7 +35,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity {
 
 	#if NEW_PREFAB_SYSTEM
 	[ExecuteAlways]
@@ -67,7 +67,7 @@ namespace Spine.Unity.Modules {
 		public bool copyPropertyBlock = true;
 		[Tooltip("Copies MeshRenderer flags into each parts renderer")]
 		public bool copyMeshRendererFlags = true;
-		public List<Spine.Unity.Modules.SkeletonPartsRenderer> partsRenderers = new List<SkeletonPartsRenderer>();
+		public List<Spine.Unity.SkeletonPartsRenderer> partsRenderers = new List<SkeletonPartsRenderer>();
 
 		#if UNITY_EDITOR
 		void Reset () {

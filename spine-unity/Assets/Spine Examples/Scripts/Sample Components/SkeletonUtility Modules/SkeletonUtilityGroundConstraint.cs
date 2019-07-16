@@ -33,7 +33,7 @@
 
 using UnityEngine;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Examples {
 
 	#if NEW_PREFAB_SYSTEM
 	[ExecuteAlways]

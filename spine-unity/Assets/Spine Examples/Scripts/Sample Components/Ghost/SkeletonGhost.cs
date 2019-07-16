@@ -32,7 +32,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Examples {
 	
 	[RequireComponent(typeof(SkeletonRenderer))]
 	public class SkeletonGhost : MonoBehaviour {

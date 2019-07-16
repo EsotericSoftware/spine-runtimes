@@ -31,7 +31,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
-using Spine.Unity.Modules.AttachmentTools;
+using Spine.Unity.AttachmentTools;
 
 namespace Spine.Unity.Examples {
 	public class SpriteAttacher : MonoBehaviour {

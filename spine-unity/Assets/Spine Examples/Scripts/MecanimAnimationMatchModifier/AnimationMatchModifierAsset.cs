@@ -34,7 +34,7 @@ using UnityEngine;
 using Spine;
 using Spine.Unity;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Examples {
 
 	//[CreateAssetMenu(menuName = "Spine/SkeletonData Modifiers/Animation Match", order = 200)]
 	public class AnimationMatchModifierAsset : SkeletonDataModifierAsset {

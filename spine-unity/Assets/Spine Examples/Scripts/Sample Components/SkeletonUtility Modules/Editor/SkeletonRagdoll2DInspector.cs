@@ -32,6 +32,6 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Examples {
 	public class SkeletonRagdoll2DInspector {}
 }

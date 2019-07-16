@@ -37,7 +37,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using Spine.Unity.Modules;
+using Spine.Unity.Examples;
 
 namespace Spine.Unity.Editor {
 

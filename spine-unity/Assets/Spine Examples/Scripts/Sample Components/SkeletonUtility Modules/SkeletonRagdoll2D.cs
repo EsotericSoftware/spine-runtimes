@@ -33,7 +33,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Examples {
 	[RequireComponent(typeof(SkeletonRenderer))]
 	public class SkeletonRagdoll2D : MonoBehaviour {
 		static Transform parentSpaceHelper;

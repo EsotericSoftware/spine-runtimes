@@ -31,7 +31,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity.Examples {
 	public class SkeletonGraphicMirror : MonoBehaviour {
 
 		public SkeletonRenderer source;

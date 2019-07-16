@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 using UnityEngine;
-using Spine.Unity.Modules.AttachmentTools;
+using Spine.Unity.AttachmentTools;
 using System.Collections;
 
 namespace Spine.Unity.Examples {

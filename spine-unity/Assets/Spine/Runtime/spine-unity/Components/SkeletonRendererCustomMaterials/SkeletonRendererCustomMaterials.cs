@@ -38,7 +38,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Spine.Unity.Modules {
+namespace Spine.Unity {
 	#if NEW_PREFAB_SYSTEM
 	[ExecuteAlways]
 	#else

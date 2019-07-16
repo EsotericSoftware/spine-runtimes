@@ -31,7 +31,7 @@ using UnityEngine;
 using System.Collections;
 using Spine.Unity;
 
-using Spine.Unity.Modules;
+using Spine.Unity.Examples;
 
 namespace Spine.Unity.Examples {
 	public class SpineboyPole : MonoBehaviour {

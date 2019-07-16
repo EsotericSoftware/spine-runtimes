@@ -31,7 +31,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using Spine.Unity.Modules.AttachmentTools;
+using Spine.Unity.AttachmentTools;
 
 namespace Spine.Unity.Examples {
 	public class EquipSystemExample : MonoBehaviour, IHasSkeletonDataAsset {

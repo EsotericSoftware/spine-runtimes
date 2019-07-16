@@ -31,7 +31,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 
-namespace Spine.Unity.Modules.AttachmentTools {
+namespace Spine.Unity.AttachmentTools {
 	public static class AttachmentRegionExtensions {
 		#region GetRegion
 		/// <summary>
