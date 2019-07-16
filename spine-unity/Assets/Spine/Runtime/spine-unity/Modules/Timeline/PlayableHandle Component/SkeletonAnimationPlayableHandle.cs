@@ -42,7 +42,6 @@ namespace Spine.Unity.Playables {
 	public class SkeletonAnimationPlayableHandle : SpinePlayableHandleBase {
 		#region Inspector
 		public SkeletonAnimation skeletonAnimation;
-		//public float fadeOutDuration = 0.5f;
 
 		#if UNITY_EDITOR
 		void OnValidate () {
@@ -53,8 +52,6 @@ namespace Spine.Unity.Playables {
 
 		#endregion
 
-		//readonly HashSet<int> frameAppliedProperties = new HashSet<int>();
-
 		public override Skeleton Skeleton {	get { return skeletonAnimation.Skeleton; } }
 		public override SkeletonData SkeletonData { get { return skeletonAnimation.Skeleton.data; } }
 
@@ -62,52 +59,7 @@ namespace Spine.Unity.Playables {
 		void Awake () {
 			if (skeletonAnimation == null)
 				skeletonAnimation = GetComponent<SkeletonAnimation>();
-
-			//frameAppliedProperties.Clear();
 		}
-
-		//Skeleton skeleton;
-		//int frameTrackCount = 0;
-		//int frameCurrentInputs = 0;
-		//bool firstCleared = false;
-		//int lastApplyFrame = 0;
-		//public override void ProcessFrame (Playable playable, FrameData info, SpineAnimationMixerBehaviour mixer) {
-		//	if (skeletonAnimation == null) return;
-		//	if (skeleton == null) skeleton = skeletonAnimation.Skeleton;
-
-		//	// New frame.
-		//	if (lastApplyFrame != Time.frameCount) {
-		//		if (frameTrackCount > 0)
-		//			frameAppliedProperties.Clear();					
-
-		//		frameCurrentInputs = 0;
-		//		frameTrackCount = 0;	
-		//	}
-		//	lastApplyFrame = Time.frameCount;
-
-		//	int currentInputs = mixer.ApplyPlayableFrame(playable, skeleton, frameAppliedProperties, frameTrackCount);
-		//	frameCurrentInputs += currentInputs;
-
-		//	// EXPERIMENTAL: Handle overriding SkeletonAnimation.AnimationState.
-		//	if (frameCurrentInputs > 0) {
-		//		var state = skeletonAnimation.AnimationState;
-
-		//		if (!firstCleared) {
-		//			firstCleared = true;
-		//			for (int i = 0; i < 4; i++) {
-		//				if (state.GetCurrent(i) != null) state.SetEmptyAnimation(i, fadeOutDuration);
-		//			}
-		//		}
-
-		//		// Update again whenever an animation is playing in the AnimationState. Quite wasteful.
-		//		//if (state.GetCurrent(0) != null) {
-		//			skeleton.UpdateWorldTransform();
-		//		//}
-		//	}
-
-		//	frameTrackCount++;
-		//}
 #endif
 	}
-
 }

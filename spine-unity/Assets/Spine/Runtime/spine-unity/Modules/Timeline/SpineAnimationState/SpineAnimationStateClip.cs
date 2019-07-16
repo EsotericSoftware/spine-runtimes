@@ -42,7 +42,7 @@ namespace Spine.Unity.Playables {
 
 		public override Playable CreatePlayable (PlayableGraph graph, GameObject owner) {
 			var playable = ScriptPlayable<SpineAnimationStateBehaviour>.Create(graph, template);
-			playable.GetBehaviour(); //SpineAnimationStateBehaviour clone = playable.GetBehaviour();
+			playable.GetBehaviour();
 			return playable;
 		}
 	}

@@ -45,10 +45,6 @@ namespace Spine.Unity.Playables {
 
 		public abstract Skeleton Skeleton { get; }
 
-		/// <summary>MixerBehaviour ProcessFrame method handler.</summary>
-		/// <returns>Returns true if a playable was applied previously</returns>
-		//public abstract void ProcessFrame (Playable playable, FrameData info, SpineAnimationMixerBehaviour mixer);
-
 		/// <summary>Subscribe to this to handle user events played by the Unity playable</summary>
 		public event SpineEventDelegate AnimationEvents;
 
