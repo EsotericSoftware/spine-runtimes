@@ -5635,7 +5635,7 @@ var spine;
 					}
 					if (skinMap.transform) {
 						for (var ii = 0; ii < skinMap.transform.length; ii++) {
-							var constraint = skeletonData.findIkConstraint(skinMap.transform[ii]);
+							var constraint = skeletonData.findTransformConstraint(skinMap.transform[ii]);
 							if (constraint == null)
 								throw new Error("Skin transform constraint not found: " + skinMap.transform[i]);
 							skin.constraints.push(constraint);
@@ -5643,7 +5643,7 @@ var spine;
 					}
 					if (skinMap.path) {
 						for (var ii = 0; ii < skinMap.path.length; ii++) {
-							var constraint = skeletonData.findIkConstraint(skinMap.path[ii]);
+							var constraint = skeletonData.findPathConstraint(skinMap.path[ii]);
 							if (constraint == null)
 								throw new Error("Skin path constraint not found: " + skinMap.path[i]);
 							skin.constraints.push(constraint);
