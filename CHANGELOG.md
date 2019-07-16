@@ -173,6 +173,8 @@
   * Moved `AttachmentTools.cs` to `Utility` directory.
   * Moved `SkeletonExtensions.cs` to `Utility` directory.
   * Moved `Modules/YieldInstructions` directory to `Utility/YieldInstructions`.
+  * Moved corresponding editor scripts of the above components to restructured directories as well.
+  * Renamed inspector editor class `PointFollowerEditor` to `PointFollowerInspector` for consistency reasons.
   
 ### XNA/MonoGame
 * Updated to latest MonoGame version 3.7.1

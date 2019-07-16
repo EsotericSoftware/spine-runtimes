@@ -37,7 +37,7 @@ namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
 
 	[CustomEditor(typeof(PointFollower)), CanEditMultipleObjects]
-	public class PointFollowerEditor : Editor {
+	public class PointFollowerInspector : Editor {
 		SerializedProperty slotName, pointAttachmentName, skeletonRenderer, followZPosition, followBoneRotation, followSkeletonFlip;
 		PointFollower targetPointFollower;
 		bool needsReset;
