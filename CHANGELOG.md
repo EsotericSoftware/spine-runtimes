@@ -138,7 +138,10 @@
     * When receiving namespace related errors, replace using statements of `using Spine.Unity.Modules.AttachmentTools;` with `using Spine.Unity.AttachmentTools;`. You can remove `using Spine.Unity.Modules;` statements when a `using Spine.Unity` statement is already present in the file.
     * `AttachmentTools`, `SkeletonPartsRenderer`, `SkeletonRenderSeparator`, `SkeletonRendererCustomMaterials` changed to namespace `Spine.Unity`.
     * `SkeletonGhost`, `SkeletonGhostRenderer`, `AtlasRegionAttacher`, `SkeletonGraphicMirror`, `SkeletonRagdoll`, `SkeletonRagdoll2D`, `SkeletonUtilityEyeConstraint`, `SkeletonUtilityGroundConstraint`, `SkeletonUtilityKinematicShadow` changed to namespace `Spine.Unity.Examples`.
-  
+  * Split `Editor/Utility/SpineEditorUtilities` class into multiple files with partial class qualifier.
+    * Nested classes `SpineEditorUtilities.AssetUtility` and `SpineEditorUtilities.EditorInstantiation` are now no longer nested. If you receive namespace related errors, replace any occurrance of
+      * `SpineEditorUtilities.AssetUtility` with `AssetUtility` and
+      * `SpineEditorUtilities.EditorInstantiation` with `EditorInstantiation`.
 
 * **Additions**
   * **Spine Preferences stored in Assets/Editor/SpineSettings.asset** Now Spine uses the new `SettingsProvider` API, storing settings in a SpineSettings.asset file which can be shared with team members. Your old preferences are automatically migrated to the new system.

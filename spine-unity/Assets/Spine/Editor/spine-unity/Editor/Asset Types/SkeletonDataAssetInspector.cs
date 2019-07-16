@@ -255,7 +255,7 @@ namespace Spine.Unity.Editor {
 			FieldInfo nameField = typeof(AnimationReferenceAsset).GetField("animationName", BindingFlags.NonPublic | BindingFlags.Instance);
 			FieldInfo skeletonDataAssetField = typeof(AnimationReferenceAsset).GetField("skeletonDataAsset", BindingFlags.NonPublic | BindingFlags.Instance);
 			foreach (var animation in targetSkeletonData.Animations) {
-				string assetPath = string.Format("{0}/{1}.asset", dataPath, SpineEditorUtilities.AssetUtility.GetPathSafeName(animation.Name));
+				string assetPath = string.Format("{0}/{1}.asset", dataPath, AssetUtility.GetPathSafeName(animation.Name));
 				AnimationReferenceAsset existingAsset = AssetDatabase.LoadAssetAtPath<AnimationReferenceAsset>(assetPath);
 				if (existingAsset == null) {
 					AnimationReferenceAsset newAsset = ScriptableObject.CreateInstance<AnimationReferenceAsset>();
@@ -600,7 +600,7 @@ namespace Spine.Unity.Editor {
 				warnings.Add("Missing Skeleton JSON");
 			} else {
 				var fieldValue = (TextAsset)skeletonJSON.objectReferenceValue;
-				if (!SpineEditorUtilities.AssetUtility.IsSpineData(fieldValue)) {
+				if (!AssetUtility.IsSpineData(fieldValue)) {
 					warnings.Add("Skeleton data file is not a valid Spine JSON or binary file.");
 				} else {
 					#if SPINE_TK2D
@@ -631,7 +631,7 @@ namespace Spine.Unity.Editor {
 						} else {
 							List<string> missingPaths = null;
 							if (atlasAssets.arraySize > 0) {
-								missingPaths = SpineEditorUtilities.AssetUtility.GetRequiredAtlasRegions(AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue));
+								missingPaths = AssetUtility.GetRequiredAtlasRegions(AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue));
 
 								foreach (var atlas in atlasList) {
 									for (int i = 0; i < missingPaths.Count; i++) {
@@ -661,7 +661,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		void DoReimport () {
-			SpineEditorUtilities.AssetUtility.ImportSpineContent(new [] { AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue) }, true);
+			AssetUtility.ImportSpineContent(new [] { AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue) }, true);
 			preview.Clear();
 			InitializeEditor();
 			EditorUtility.SetDirty(targetSkeletonDataAsset);
@@ -831,7 +831,7 @@ namespace Spine.Unity.Editor {
 
 				if (previewGameObject == null) {
 					try {
-						previewGameObject = SpineEditorUtilities.EditorInstantiation.InstantiateSkeletonAnimation(skeletonDataAsset, skinName).gameObject;
+						previewGameObject = EditorInstantiation.InstantiateSkeletonAnimation(skeletonDataAsset, skinName).gameObject;
 
 						if (previewGameObject != null) {
 							previewGameObject.hideFlags = HideFlags.HideAndDontSave;

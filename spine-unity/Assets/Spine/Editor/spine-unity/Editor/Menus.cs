@@ -36,12 +36,12 @@ namespace Spine.Unity.Editor {
 	public static class Menus {
 		[MenuItem("GameObject/Spine/SkeletonRenderer", false, 10)]
 		static public void CreateSkeletonRendererGameObject () {
-			SpineEditorUtilities.EditorInstantiation.InstantiateEmptySpineGameObject<SkeletonRenderer>("New SkeletonRenderer");
+			EditorInstantiation.InstantiateEmptySpineGameObject<SkeletonRenderer>("New SkeletonRenderer");
 		}
 
 		[MenuItem("GameObject/Spine/SkeletonAnimation", false, 10)]
 		static public void CreateSkeletonAnimationGameObject () {
-			SpineEditorUtilities.EditorInstantiation.InstantiateEmptySpineGameObject<SkeletonAnimation>("New SkeletonAnimation");
+			EditorInstantiation.InstantiateEmptySpineGameObject<SkeletonAnimation>("New SkeletonAnimation");
 		}
 	}
 }

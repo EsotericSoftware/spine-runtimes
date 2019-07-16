@@ -113,7 +113,7 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.HelpBox(string.Format("Animation named {0} was not found for this Skeleton.", animationNameProperty.stringValue), MessageType.Warning);
 			} else {
 				using (new SpineInspectorUtility.BoxScope()) {
-					if (!string.Equals(SpineEditorUtilities.AssetUtility.GetPathSafeName(animationName), ThisAnimationReferenceAsset.name, System.StringComparison.OrdinalIgnoreCase))
+					if (!string.Equals(AssetUtility.GetPathSafeName(animationName), ThisAnimationReferenceAsset.name, System.StringComparison.OrdinalIgnoreCase))
 						EditorGUILayout.HelpBox("Animation name value does not match this asset's name. Inspectors using this asset may be misleading.", MessageType.None);
 
 					EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(animationName, SpineEditorUtilities.Icons.animation));

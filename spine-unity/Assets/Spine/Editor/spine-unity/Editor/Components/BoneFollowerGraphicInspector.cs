@@ -47,7 +47,7 @@ namespace Spine.Unity.Editor {
 		[MenuItem ("CONTEXT/SkeletonGraphic/Add BoneFollower GameObject")]
 		static void AddBoneFollowerGameObject (MenuCommand cmd) {
 			var skeletonGraphic = cmd.context as SkeletonGraphic;
-			var go = SpineEditorUtilities.EditorInstantiation.NewGameObject("BoneFollower", typeof(RectTransform));
+			var go = EditorInstantiation.NewGameObject("BoneFollower", typeof(RectTransform));
 			var t = go.transform;
 			t.SetParent(skeletonGraphic.transform);
 			t.localPosition = Vector3.zero;

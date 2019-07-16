@@ -92,7 +92,7 @@ namespace Spine.Unity.Editor {
 				string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
 				for (int i = 0; i < regions.Count; i++) {
 					AtlasRegion region = regions[i];
-					string bakedPrefabPath = Path.Combine(bakedDirPath, SpineEditorUtilities.AssetUtility.GetPathSafeRegionName(region) + ".prefab").Replace("\\", "/");
+					string bakedPrefabPath = Path.Combine(bakedDirPath, AssetUtility.GetPathSafeRegionName(region) + ".prefab").Replace("\\", "/");
 					GameObject prefab = (GameObject)AssetDatabase.LoadAssetAtPath(bakedPrefabPath, typeof(GameObject));
 					baked.Add(prefab != null);
 					bakedObjects.Add(prefab);
