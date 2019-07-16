@@ -42,7 +42,7 @@ namespace Spine.Unity {
 		public Material screenMaterialTemplate;
 		public Material additiveMaterialTemplate;
 
-		public bool applyAdditiveMaterial;
+		public bool applyAdditiveMaterial = true;
 
 		public override void Apply (SkeletonData skeletonData) {
 			ApplyMaterials(skeletonData, multiplyMaterialTemplate, screenMaterialTemplate, additiveMaterialTemplate, applyAdditiveMaterial);

@@ -17,4 +17,4 @@ MonoBehaviour:
     type: 2}
   additiveMaterialTemplate: {fileID: 2100000, guid: 4deba332d47209e4780b3c5fcf0e3745,
     type: 2}
-  applyAdditiveMaterial: 0
+  applyAdditiveMaterial: 1

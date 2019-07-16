@@ -156,6 +156,10 @@
     * **Restrictions** As all Spine shaders, the LWRP shaders **do not support `Premultiply alpha` (PMA) atlas textures in Linear color space**. Please export your atlas textures as `straight alpha` textures with disabled `Premultiply alpha` setting when using Linear color space. You can check the current color space via `Project Settings - Player - Other Settings - Color Space.`.
     * **Example:** You can find an example scene in the package under `com.esotericsoftware.spine.lwrp-shaders-3.8/Examples/LWRP Shaders.unity` that demonstrates usage of the LWRP shaders.
 
+* **Changes of default values**
+  * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.SpineStyle` instead of `MixMode.MixAlways`.
+  * `BlendModeMaterialAsset` and it's instance `Default BlendModeMaterials.asset` now have `Apply Additive Material` set to `true` by default in order to apply all blend modes by default.
+
 * **Deprecated**
   * Deprecated `Modules/SlotBlendModes/SlotBlendModes` component. Changed namespace from `Spine.Unity.Modules` to `Spine.Unity.Deprecated`. Moved to `Deprecated/SlotBlendModes`.
 
