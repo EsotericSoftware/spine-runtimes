@@ -183,6 +183,7 @@
   * Moved `Modules/AnimationMatchModifier` directory to `Spine Examples/Scripts/MecanimAnimationMatchModifier`.
   * Moved `SkeletonRagdoll` and `SkeletonRagdoll2D` components from `Modules/Ragdoll` directory to `Spine Examples/Scripts/Sample Components/SkeletonUtility Modules`.
   * Moved `AttachmentTools.cs` to `Utility` directory.
+  * Split the file `AttachmentTools` into 4 new files for each contained class. No namespace or other API changes performed.
   * Moved `SkeletonExtensions.cs` to `Utility` directory.
   * Moved `Modules/YieldInstructions` directory to `Utility/YieldInstructions`.
   * Moved corresponding editor scripts of the above components to restructured directories as well.
