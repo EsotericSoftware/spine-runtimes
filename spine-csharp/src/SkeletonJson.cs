@@ -855,9 +855,7 @@ namespace Spine {
 			if (curveObject is string)
 				timeline.SetStepped(frameIndex);
 			else {
-				var curve = curveObject as List<Object>;
-				if (curve != null)
-					timeline.SetCurve(frameIndex, (float)curveObject, GetFloat(valueMap, "c2", 0), GetFloat(valueMap, "c3", 1), GetFloat(valueMap, "c4", 1));
+				timeline.SetCurve(frameIndex, (float)curveObject, GetFloat(valueMap, "c2", 0), GetFloat(valueMap, "c3", 1), GetFloat(valueMap, "c4", 1));
 			}
 		}
 
