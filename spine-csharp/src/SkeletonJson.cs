@@ -103,7 +103,7 @@ namespace Spine {
                 skeletonData.y = GetFloat(skeletonMap, "y", 0);
                 skeletonData.width = GetFloat(skeletonMap, "width", 0);
 				skeletonData.height = GetFloat(skeletonMap, "height", 0);
-				skeletonData.fps = GetFloat(skeletonMap, "fps", 0);
+				skeletonData.fps = GetFloat(skeletonMap, "fps", 30);
 				skeletonData.imagesPath = GetString(skeletonMap, "images", null);
 				skeletonData.audioPath = GetString(skeletonMap, "audio", null);
 			}
@@ -327,6 +327,7 @@ namespace Spine {
 				if (skin == null) throw new Exception("Slot not found: " + linkedMesh.skin);
 				Attachment parent = skin.GetAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 				if (parent == null) throw new Exception("Parent mesh not found: " + linkedMesh.parent);
+				linkedMesh.mesh.DeformAttachment = linkedMesh.inheritDeform ? (VertexAttachment)parent : linkedMesh.mesh;
 				linkedMesh.mesh.ParentMesh = (MeshAttachment)parent;
 				linkedMesh.mesh.UpdateUVs();
 			}
@@ -374,9 +375,6 @@ namespace Spine {
 			name = GetString(map, "name", name);
 
 			var typeName = GetString(map, "type", "region");
-			if (typeName == "skinnedmesh") typeName = "weightedmesh";
-			if (typeName == "weightedmesh") typeName = "mesh";
-			if (typeName == "weightedlinkedmesh") typeName = "linkedmesh";
 			var type = (AttachmentType)Enum.Parse(typeof(AttachmentType), typeName, true);
 
 			string path = GetString(map, "path", name);
@@ -645,15 +643,9 @@ namespace Spine {
 					timeline.ikConstraintIndex = skeletonData.ikConstraints.IndexOf(constraint);
 					int frameIndex = 0;
 					foreach (Dictionary<string, Object> valueMap in values) {
-						timeline.SetFrame(
-							frameIndex,
-							GetFloat(valueMap, "time", 0),
-							GetFloat(valueMap, "mix", 1),
-							GetFloat(valueMap, "softness", 0) * scale,
-							GetBoolean(valueMap, "bendPositive", true) ? 1 : -1,
-							GetBoolean(valueMap, "compress", true),
-							GetBoolean(valueMap, "stretch", false)
-						);
+						timeline.SetFrame(frameIndex, GetFloat(valueMap, "time", 0), GetFloat(valueMap, "mix", 1),
+							GetFloat(valueMap, "softness", 0) * scale, GetBoolean(valueMap, "bendPositive", true) ? 1 : -1,
+							GetBoolean(valueMap, "compress", false), GetBoolean(valueMap, "stretch", false));
 						ReadCurve(valueMap, timeline, frameIndex);
 						frameIndex++;
 					}
@@ -671,12 +663,8 @@ namespace Spine {
 					timeline.transformConstraintIndex = skeletonData.transformConstraints.IndexOf(constraint);
 					int frameIndex = 0;
 					foreach (Dictionary<string, Object> valueMap in values) {
-						float time = GetFloat(valueMap, "time", 0);
-						float rotateMix = GetFloat(valueMap, "rotateMix", 1);
-						float translateMix = GetFloat(valueMap, "translateMix", 1);
-						float scaleMix = GetFloat(valueMap, "scaleMix", 1);
-						float shearMix = GetFloat(valueMap, "shearMix", 1);
-						timeline.SetFrame(frameIndex, time, rotateMix, translateMix, scaleMix, shearMix);
+						timeline.SetFrame(frameIndex, GetFloat(valueMap, "time", 0), GetFloat(valueMap, "rotateMix", 1),
+								GetFloat(valueMap, "translateMix", 1), GetFloat(valueMap, "scaleMix", 1), GetFloat(valueMap, "shearMix", 1));
 						ReadCurve(valueMap, timeline, frameIndex);
 						frameIndex++;
 					}
@@ -721,7 +709,8 @@ namespace Spine {
 							timeline.pathConstraintIndex = index;
 							int frameIndex = 0;
 							foreach (Dictionary<string, Object> valueMap in values) {
-								timeline.SetFrame(frameIndex, GetFloat(valueMap, "time", 0), GetFloat(valueMap, "rotateMix", 1), GetFloat(valueMap, "translateMix", 1));
+								timeline.SetFrame(frameIndex, GetFloat(valueMap, "time", 0), GetFloat(valueMap, "rotateMix", 1),
+									GetFloat(valueMap, "translateMix", 1));
 								ReadCurve(valueMap, timeline, frameIndex);
 								frameIndex++;
 							}
@@ -854,9 +843,8 @@ namespace Spine {
 			Object curveObject = valueMap["curve"];
 			if (curveObject is string)
 				timeline.SetStepped(frameIndex);
-			else {
+			else
 				timeline.SetCurve(frameIndex, (float)curveObject, GetFloat(valueMap, "c2", 0), GetFloat(valueMap, "c3", 1), GetFloat(valueMap, "c4", 1));
-			}
 		}
 
 		internal class LinkedMesh {
