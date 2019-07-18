@@ -27,25 +27,12 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if UNITY_2017 || UNITY_2018 || (UNITY_2019_1_OR_NEWER && SPINE_TIMELINE_PACKAGE_DOWNLOADED)
 using System;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-namespace Spine.Unity.Playables {
-	[Serializable]
-	public class SpineAnimationStateClip : PlayableAsset, ITimelineClipAsset {
-		public SpineAnimationStateBehaviour template = new SpineAnimationStateBehaviour();
-
-		public ClipCaps clipCaps { get { return ClipCaps.None; } }
-
-		public override Playable CreatePlayable (PlayableGraph graph, GameObject owner) {
-			var playable = ScriptPlayable<SpineAnimationStateBehaviour>.Create(graph, template);
-			playable.GetBehaviour();
-			return playable;
-		}
-	}
-
+[Serializable]
+public class SpineSkeletonFlipBehaviour : PlayableBehaviour {
+    public bool flipX, flipY;
 }
-#endif

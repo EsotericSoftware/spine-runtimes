@@ -27,39 +27,39 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-//using UnityEngine.Playables;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
+using System.Collections.Generic;
 
-using Spine;
 using Spine.Unity;
-using Spine.Unity.Playables;
 
 namespace Spine.Unity.Playables {
-
-	[AddComponentMenu("Spine/Playables/SkeletonAnimation Playable Handle (Playables)")]
-	public class SkeletonAnimationPlayableHandle : SpinePlayableHandleBase {
-		#region Inspector
-		public SkeletonAnimation skeletonAnimation;
-
-		#if UNITY_EDITOR
-		void OnValidate () {
-			if (this.skeletonAnimation == null)
-				skeletonAnimation = GetComponent<SkeletonAnimation>();
+	
+	[TrackColor(0.855f, 0.8623f, 0.87f)]
+	[TrackClipType(typeof(SpineSkeletonFlipClip))]
+	[TrackBindingType(typeof(SpinePlayableHandleBase))]
+	public class SpineSkeletonFlipTrack : TrackAsset {
+		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
+			return ScriptPlayable<SpineSkeletonFlipMixerBehaviour>.Create(graph, inputCount);
 		}
-		#endif
 
-		#endregion
+		public override void GatherProperties (PlayableDirector director, IPropertyCollector driver) {
+#if UNITY_EDITOR
+			SpinePlayableHandleBase trackBinding = director.GetGenericBinding(this) as SpinePlayableHandleBase;
+			if (trackBinding == null)
+				return;
 
-		public override Skeleton Skeleton {	get { return skeletonAnimation.Skeleton; } }
-		public override SkeletonData SkeletonData { get { return skeletonAnimation.Skeleton.data; } }
+			var serializedObject = new UnityEditor.SerializedObject(trackBinding);
+			var iterator = serializedObject.GetIterator();
+			while (iterator.NextVisible(true)) {
+				if (iterator.hasVisibleChildren)
+					continue;
 
-		#if UNITY_2017 || UNITY_2018 || (UNITY_2019_1_OR_NEWER && SPINE_TIMELINE_PACKAGE_DOWNLOADED)
-		void Awake () {
-			if (skeletonAnimation == null)
-				skeletonAnimation = GetComponent<SkeletonAnimation>();
-		}
+				driver.AddFromName<SpinePlayableHandleBase>(trackBinding.gameObject, iterator.propertyPath);
+			}
 #endif
+			base.GatherProperties(director, driver);
+		}
 	}
 }

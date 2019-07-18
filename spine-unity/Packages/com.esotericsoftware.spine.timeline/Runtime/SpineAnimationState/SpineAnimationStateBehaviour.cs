@@ -27,41 +27,35 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if UNITY_2017 || UNITY_2018 || (UNITY_2019_1_OR_NEWER && SPINE_TIMELINE_PACKAGE_DOWNLOADED)
- using UnityEngine;
+using System;
+using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
+using Spine;
+using Spine.Unity;
 using System.Collections.Generic;
 
-using Spine.Unity;
-
 namespace Spine.Unity.Playables {
-	
-	[TrackColor(0.855f, 0.8623f, 0.87f)]
-	[TrackClipType(typeof(SpineSkeletonFlipClip))]
-	[TrackBindingType(typeof(SpinePlayableHandleBase))]
-	public class SpineSkeletonFlipTrack : TrackAsset {
-		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
-			return ScriptPlayable<SpineSkeletonFlipMixerBehaviour>.Create(graph, inputCount);
-		}
 
-		public override void GatherProperties (PlayableDirector director, IPropertyCollector driver) {
-#if UNITY_EDITOR
-			SpinePlayableHandleBase trackBinding = director.GetGenericBinding(this) as SpinePlayableHandleBase;
-			if (trackBinding == null)
-				return;
+	using Animation = Spine.Animation;
 
-			var serializedObject = new UnityEditor.SerializedObject(trackBinding);
-			var iterator = serializedObject.GetIterator();
-			while (iterator.NextVisible(true)) {
-				if (iterator.hasVisibleChildren)
-					continue;
+	[Serializable]
+	public class SpineAnimationStateBehaviour : PlayableBehaviour {
+		public AnimationReferenceAsset animationReference;
+		public bool loop;
 
-				driver.AddFromName<SpinePlayableHandleBase>(trackBinding.gameObject, iterator.propertyPath);
-			}
-#endif
-			base.GatherProperties(director, driver);
-		}
+		[Header("Mix Properties")]
+		public bool customDuration = false;
+		public float mixDuration = 0.1f;
+
+		[Range(0, 1f)]
+		public float attachmentThreshold = 0.5f;
+
+		[Range(0, 1f)]
+		public float eventThreshold = 0.5f;
+
+		[Range(0, 1f)]
+		public float drawOrderThreshold = 0.5f;
 	}
+
 }
-#endif

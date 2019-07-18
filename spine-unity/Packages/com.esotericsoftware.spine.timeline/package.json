@@ -1,0 +1,19 @@
+{
+	"name": "com.esotericsoftware.spine.timeline", 
+	"displayName": "Spine Timeline Extensions",
+	"description": "This plugin provides integration of spine-unity for the Unity Timeline.\n\nPrerequisites:\nIt requires a working installation of the spine-unity runtime, version 3.8.\n(See http://esotericsoftware.com/git/spine-runtimes/spine-unity)",
+	"version": "3.8.0",
+	"unity": "2018.3",
+	"author": {
+		"name": "Esoteric Software",
+		"email": "contact@esotericsoftware.com",
+		"url": "http://esotericsoftware.com/"
+	},
+	"dependencies": {
+		"com.unity.timeline": "1.0.0"
+	},
+	"keywords": [
+		"spine",
+		"timeline"
+	] 
+}

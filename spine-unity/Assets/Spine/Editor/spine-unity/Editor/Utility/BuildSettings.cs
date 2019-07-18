@@ -47,10 +47,6 @@
 #define NEW_PREFERENCES_SETTINGS_PROVIDER
 #endif
 
-#if UNITY_2019_1_OR_NEWER
-#define NEW_TIMELINE_AS_PACKAGE
-#endif
-
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -74,105 +70,6 @@ namespace Spine.Unity.Editor {
 				SpineBuildEnvUtility.EnableSpineAsmdefFiles();
 				SpineBuildEnvUtility.DisableBuildDefine(SPINE_TK2D_DEFINE);
 			}
-		}
-
-		public static class SpinePackageDependencyUtility
-		{
-			public enum RequestState {
-				NoRequestIssued = 0,
-				InProgress,
-				Success,
-				Failure
-			}
-
-			#if NEW_TIMELINE_AS_PACKAGE
-			const string SPINE_TIMELINE_PACKAGE_DOWNLOADED_DEFINE = "SPINE_TIMELINE_PACKAGE_DOWNLOADED";
-			const string TIMELINE_PACKAGE_NAME = "com.unity.timeline";
-			const string TIMELINE_ASMDEF_DEPENDENCY_STRING = "\"Unity.Timeline\"";
-			static UnityEditor.PackageManager.Requests.AddRequest timelineRequest = null;
-			
-			/// <summary>
-			/// Enables Spine's Timeline components by downloading the Timeline Package in Unity 2019 and newer
-			/// and setting respective compile definitions once downloaded.
-			/// </summary>
-			internal static void EnableTimelineSupport () {
-				Debug.Log("Downloading Timeline package " + TIMELINE_PACKAGE_NAME + ".");
-				timelineRequest = UnityEditor.PackageManager.Client.Add(TIMELINE_PACKAGE_NAME);
-				// Note: unfortunately there is no callback provided, only polling support.
-				// So polling HandlePendingAsyncTimelineRequest() is necessary.
-
-				EditorApplication.update -= UpdateAsyncTimelineRequest;
-				EditorApplication.update += UpdateAsyncTimelineRequest;
-			}
-
-			public static void UpdateAsyncTimelineRequest () {
-				HandlePendingAsyncTimelineRequest();
-			}
-
-			public static RequestState HandlePendingAsyncTimelineRequest () {
-				if (timelineRequest == null)
-					return RequestState.NoRequestIssued;
-
-				var status = timelineRequest.Status;
-				if (status == UnityEditor.PackageManager.StatusCode.InProgress) {
-					return RequestState.InProgress;
-				}
-				else {
-					EditorApplication.update -= UpdateAsyncTimelineRequest;
-					timelineRequest = null;
-					if (status == UnityEditor.PackageManager.StatusCode.Failure) {
-						Debug.LogError("Download of package " + TIMELINE_PACKAGE_NAME + " failed!");
-						return RequestState.Failure;
-					}
-					else { // status == UnityEditor.PackageManager.StatusCode.Success
-						HandleSuccessfulTimelinePackageDownload();
-						return RequestState.Success;
-					}
-				}
-			}
-
-			internal static void DisableTimelineSupport () {
-				SpineBuildEnvUtility.DisableBuildDefine(SPINE_TIMELINE_PACKAGE_DOWNLOADED_DEFINE);
-				SpineBuildEnvUtility.RemoveDependencyFromAsmdefFile(TIMELINE_ASMDEF_DEPENDENCY_STRING);
-			}
-
-			internal static void HandleSuccessfulTimelinePackageDownload () {
-
-				#if !SPINE_TK2D
-				SpineBuildEnvUtility.EnableSpineAsmdefFiles();
-				#endif
-				SpineBuildEnvUtility.AddDependencyToAsmdefFile(TIMELINE_ASMDEF_DEPENDENCY_STRING);
-				SpineBuildEnvUtility.EnableBuildDefine(SPINE_TIMELINE_PACKAGE_DOWNLOADED_DEFINE);
-
-				ReimportTimelineScripts();
-			}
-
-			internal static void ReimportTimelineScripts () {
-				// Note: unfortunately AssetDatabase::Refresh is not enough and
-				// ImportAsset on a dir does not have the desired effect.
-				List<string> searchStrings = new List<string>();
-				searchStrings.Add("SpineAnimationStateBehaviour t:script");
-				searchStrings.Add("SpineAnimationStateClip t:script");
-				searchStrings.Add("SpineAnimationStateMixerBehaviour t:script");
-				searchStrings.Add("SpineAnimationStateTrack t:script");
-
-				searchStrings.Add("SpineSkeletonFlipBehaviour t:script");
-				searchStrings.Add("SpineSkeletonFlipClip t:script");
-				searchStrings.Add("SpineSkeletonFlipMixerBehaviour t:script");
-				searchStrings.Add("SpineSkeletonFlipTrack t:script");
-
-				searchStrings.Add("SkeletonAnimationPlayableHandle t:script");
-				searchStrings.Add("SpinePlayableHandleBase t:script");
-
-				foreach (string searchString in searchStrings) {
-					string[] guids = AssetDatabase.FindAssets(searchString);
-					foreach (string guid in guids) {
-						string currentPath = AssetDatabase.GUIDToAssetPath(guid);
-						AssetDatabase.ImportAsset(currentPath, ImportAssetOptions.ForceUpdate);
-					}
-				}
-			}
-			#endif
 		}
 	}
 
@@ -252,69 +149,6 @@ namespace Spine.Unity.Editor {
 		public static void EnableSpineAsmdefFiles () {
 			SetAsmdefFileActive("spine-unity-editor", true);
 			SetAsmdefFileActive("spine-unity", true);
-		}
-
-		public static void AddDependencyToAsmdefFile (string dependencyName) {
-			string asmdefName = "spine-unity";
-			string filePath = FindAsmdefFile(asmdefName);
-			if (string.IsNullOrEmpty(filePath))
-				return;
-
-			if (System.IO.File.Exists(filePath)) {
-				string fileContent = File.ReadAllText(filePath);
-
-				if (!fileContent.Contains("references")) {
-					string nameLine = string.Concat("\"name\": \"", asmdefName, "\"");
-					fileContent = fileContent.Replace(nameLine,
-													nameLine +
-													@",\n""references"": []");
-				}
-
-				if (!fileContent.Contains(dependencyName)) {
-					fileContent = fileContent.Replace(@"""references"": [",
-													@"""references"": [" + dependencyName);
-					File.WriteAllText(filePath, fileContent);
-				}
-			}
-		}
-
-		public static void RemoveDependencyFromAsmdefFile (string dependencyName) {
-			string asmdefName = "spine-unity";
-			string filePath = FindAsmdefFile(asmdefName);
-			if (string.IsNullOrEmpty(filePath))
-				return;
-
-			if (System.IO.File.Exists(filePath)) {
-				string fileContent = File.ReadAllText(filePath);
-				// this simple implementation shall suffice for now.
-				if (fileContent.Contains(dependencyName)) {
-					fileContent = fileContent.Replace(dependencyName, "");
-					File.WriteAllText(filePath, fileContent);
-				}
-			}
-		}
-
-		internal static string FindAsmdefFile (string filename) {
-			string filePath = FindAsmdefFile(filename, isDisabledFile: false);
-			if (string.IsNullOrEmpty(filePath))
-				filePath = FindAsmdefFile(filename, isDisabledFile: true);
-			return filePath;
-		}
-
-		internal static string FindAsmdefFile (string filename, bool isDisabledFile) {
-
-			string typeSearchString = isDisabledFile ? " t:TextAsset" : " t:AssemblyDefinitionAsset";
-			string extension = isDisabledFile ? ".txt" : ".asmdef";
-			string filenameWithExtension = filename + (isDisabledFile ? ".txt" : ".asmdef");
-			string[] guids = AssetDatabase.FindAssets(filename + typeSearchString);
-			foreach (string guid in guids) {
-				string currentPath = AssetDatabase.GUIDToAssetPath(guid);
-				if (!string.IsNullOrEmpty(currentPath)) {
-					if (System.IO.Path.GetFileName(currentPath) == filenameWithExtension)
-						return currentPath;
-				}
-			}
-			return null;
 		}
 
 		internal static void SetAsmdefFileActive (string filename, bool setActive) {

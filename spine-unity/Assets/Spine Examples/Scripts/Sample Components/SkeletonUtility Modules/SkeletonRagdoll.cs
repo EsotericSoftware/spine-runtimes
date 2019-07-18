@@ -205,22 +205,22 @@ namespace Spine.Unity.Examples {
 			if (disableIK) {
 				var ikConstraints = skeleton.IkConstraints;
 				for (int i = 0, n = ikConstraints.Count; i < n; i++)
-					ikConstraints.Items[i].mix = 0;
+					ikConstraints.Items[i].Mix = 0;
 			}
 
 			if (disableOtherConstraints) {
-				var transformConstraints = skeleton.transformConstraints;
+				var transformConstraints = skeleton.TransformConstraints;
 				for (int i = 0, n = transformConstraints.Count; i < n; i++) {
-					transformConstraints.Items[i].rotateMix = 0;
-					transformConstraints.Items[i].scaleMix = 0;
-					transformConstraints.Items[i].shearMix = 0;
-					transformConstraints.Items[i].translateMix = 0;
+					transformConstraints.Items[i].RotateMix = 0;
+					transformConstraints.Items[i].ScaleMix = 0;
+					transformConstraints.Items[i].ShearMix = 0;
+					transformConstraints.Items[i].TranslateMix = 0;
 				}
 
-				var pathConstraints = skeleton.pathConstraints;
+				var pathConstraints = skeleton.PathConstraints;
 				for (int i = 0, n = pathConstraints.Count; i < n; i++) {
-					pathConstraints.Items[i].rotateMix = 0;
-					pathConstraints.Items[i].translateMix = 0;
+					pathConstraints.Items[i].RotateMix = 0;
+					pathConstraints.Items[i].TranslateMix = 0;
 				}
 			}
 
@@ -277,7 +277,7 @@ namespace Spine.Unity.Examples {
 		#endregion
 
 		void RecursivelyCreateBoneProxies (Bone b) {
-			string boneName = b.data.name;
+			string boneName = b.Data.Name;
 			if (stopBoneNames.Contains(boneName))
 				return;
 
@@ -288,7 +288,7 @@ namespace Spine.Unity.Examples {
 
 			t.parent = transform;
 			t.localPosition = new Vector3(b.WorldX, b.WorldY, 0);
-			t.localRotation = Quaternion.Euler(0, 0, b.WorldRotationX - b.shearX);
+			t.localRotation = Quaternion.Euler(0, 0, b.WorldRotationX - b.ShearX);
 			t.localScale = new Vector3(b.WorldScaleX, b.WorldScaleY, 1);
 
 			// MITCH: You left "todo: proper ragdoll branching"
@@ -350,9 +350,9 @@ namespace Spine.Unity.Examples {
 					}
 				}
 
-				b.x = Mathf.Lerp(b.x, boneLocalPosition.x, mix);
-				b.y = Mathf.Lerp(b.y, boneLocalPosition.y, mix);
-				b.rotation = Mathf.Lerp(b.rotation, boneLocalRotation, mix);
+				b.X = Mathf.Lerp(b.X, boneLocalPosition.x, mix);
+				b.Y = Mathf.Lerp(b.Y, boneLocalPosition.y, mix);
+				b.Rotation = Mathf.Lerp(b.Rotation, boneLocalRotation, mix);
 				//b.AppliedRotation = Mathf.Lerp(b.AppliedRotation, boneLocalRotation, mix);
 			}
 		}
@@ -394,7 +394,7 @@ namespace Spine.Unity.Examples {
 			float a = b.AppliedRotation;
 			while (parent != null) {
 				a += parent.AppliedRotation;
-				parent = parent.parent;
+				parent = parent.Parent;
 			}
 			return a;
 		}

@@ -29,7 +29,6 @@
 
 #define SPINE_EDITMODEPOSE
 
-#if UNITY_2017 || UNITY_2018 || (UNITY_2019_1_OR_NEWER && SPINE_TIMELINE_PACKAGE_DOWNLOADED)
 using System;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -155,8 +154,8 @@ namespace Spine.Unity.Playables {
 					dummyAnimationState = dummyAnimationState ?? new AnimationState(spineComponent.skeletonDataAsset.GetAnimationStateData());
 
 					var toTrack = dummyAnimationState.GetCurrent(0);
-					var fromTrack = toTrack != null ? toTrack.mixingFrom : null;
-					bool isAnimationTransitionMatch = (toTrack != null && toTrack.animation == toAnimation && fromTrack != null && fromTrack.animation == fromAnimation);
+					var fromTrack = toTrack != null ? toTrack.MixingFrom : null;
+					bool isAnimationTransitionMatch = (toTrack != null && toTrack.Animation == toAnimation && fromTrack != null && fromTrack.Animation == fromAnimation);
 					
 					if (!isAnimationTransitionMatch) {
 						dummyAnimationState.ClearTracks();
@@ -167,10 +166,10 @@ namespace Spine.Unity.Playables {
 					}
 
 					// Update track times.
-					fromTrack.trackTime = fromClipTime;
+					fromTrack.TrackTime = fromClipTime;
 					if (toTrack != null) {
-						toTrack.trackTime = toClipTime;
-						toTrack.mixTime = toClipTime;
+						toTrack.TrackTime = toClipTime;
+						toTrack.MixTime = toClipTime;
 					}
 
 					// Apply Pose
@@ -192,4 +191,3 @@ namespace Spine.Unity.Playables {
 	}
 
 }
-#endif

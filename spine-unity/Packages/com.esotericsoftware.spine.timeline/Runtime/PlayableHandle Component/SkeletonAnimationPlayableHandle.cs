@@ -27,30 +27,37 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if UNITY_2017 || UNITY_2018 || (UNITY_2019_1_OR_NEWER && SPINE_TIMELINE_PACKAGE_DOWNLOADED)
-using UnityEditor;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Playables;
+//using UnityEngine.Playables;
 
-[CustomPropertyDrawer(typeof(SpineSkeletonFlipBehaviour))]
-public class SpineSkeletonFlipDrawer : PropertyDrawer
-{
-    public override float GetPropertyHeight (SerializedProperty property, GUIContent label)
-    {
-        int fieldCount = 1;
-        return fieldCount * EditorGUIUtility.singleLineHeight;
-    }
+using Spine;
+using Spine.Unity;
+using Spine.Unity.Playables;
 
-    public override void OnGUI (Rect position, SerializedProperty property, GUIContent label)
-    {
-		SerializedProperty flipXProp = property.FindPropertyRelative("flipX");
-		SerializedProperty flipYProp = property.FindPropertyRelative("flipY");
+namespace Spine.Unity.Playables {
 
-        Rect singleFieldRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-        EditorGUI.PropertyField(singleFieldRect, flipXProp);
+	[AddComponentMenu("Spine/Playables/SkeletonAnimation Playable Handle (Playables)")]
+	public class SkeletonAnimationPlayableHandle : SpinePlayableHandleBase {
+		#region Inspector
+		public SkeletonAnimation skeletonAnimation;
 
-		singleFieldRect.y += EditorGUIUtility.singleLineHeight;
-		EditorGUI.PropertyField(singleFieldRect, flipYProp);
-    }
+		#if UNITY_EDITOR
+		void OnValidate () {
+			if (this.skeletonAnimation == null)
+				skeletonAnimation = GetComponent<SkeletonAnimation>();
+		}
+		#endif
+
+		#endregion
+
+		public override Skeleton Skeleton {	get { return skeletonAnimation.Skeleton; } }
+		public override SkeletonData SkeletonData { get { return skeletonAnimation.Skeleton.Data; } }
+
+		void Awake () {
+			if (skeletonAnimation == null)
+				skeletonAnimation = GetComponent<SkeletonAnimation>();
+		}
+	}
 }
-#endif

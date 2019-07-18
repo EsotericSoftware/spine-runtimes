@@ -27,37 +27,28 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if UNITY_2017 || UNITY_2018 || (UNITY_2019_1_OR_NEWER && SPINE_TIMELINE_PACKAGE_DOWNLOADED)
-using System;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Playables;
-using UnityEngine.Timeline;
-using Spine;
-using Spine.Unity;
-using System.Collections.Generic;
 
-namespace Spine.Unity.Playables {
+[CustomPropertyDrawer(typeof(SpineSkeletonFlipBehaviour))]
+public class SpineSkeletonFlipDrawer : PropertyDrawer
+{
+    public override float GetPropertyHeight (SerializedProperty property, GUIContent label)
+    {
+        int fieldCount = 1;
+        return fieldCount * EditorGUIUtility.singleLineHeight;
+    }
 
-	using Animation = Spine.Animation;
+    public override void OnGUI (Rect position, SerializedProperty property, GUIContent label)
+    {
+		SerializedProperty flipXProp = property.FindPropertyRelative("flipX");
+		SerializedProperty flipYProp = property.FindPropertyRelative("flipY");
 
-	[Serializable]
-	public class SpineAnimationStateBehaviour : PlayableBehaviour {
-		public AnimationReferenceAsset animationReference;
-		public bool loop;
+        Rect singleFieldRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+        EditorGUI.PropertyField(singleFieldRect, flipXProp);
 
-		[Header("Mix Properties")]
-		public bool customDuration = false;
-		public float mixDuration = 0.1f;
-
-		[Range(0, 1f)]
-		public float attachmentThreshold = 0.5f;
-
-		[Range(0, 1f)]
-		public float eventThreshold = 0.5f;
-
-		[Range(0, 1f)]
-		public float drawOrderThreshold = 0.5f;
-	}
-
+		singleFieldRect.y += EditorGUIUtility.singleLineHeight;
+		EditorGUI.PropertyField(singleFieldRect, flipYProp);
+    }
 }
-#endif

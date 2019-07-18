@@ -35,10 +35,6 @@
 #define NEW_PREFERENCES_SETTINGS_PROVIDER
 #endif
 
-#if UNITY_2019_1_OR_NEWER
-#define NEW_TIMELINE_AS_PACKAGE
-#endif
-
 using UnityEngine;
 using UnityEditor;
 using System.Threading;
@@ -170,22 +166,6 @@ namespace Spine.Unity.Editor {
 						SceneView.RepaintAll();
 					}
 				}
-
-				#if NEW_TIMELINE_AS_PACKAGE
-				GUILayout.Space(20);
-				EditorGUILayout.LabelField("Timeline Support", EditorStyles.boldLabel);
-				using (new GUILayout.HorizontalScope()) {
-					EditorGUILayout.PrefixLabel("Timeline Package Support");
-
-					var requestState = SpineEditorUtilities.SpinePackageDependencyUtility.HandlePendingAsyncTimelineRequest();
-					using (new EditorGUI.DisabledGroupScope(requestState != SpineEditorUtilities.SpinePackageDependencyUtility.RequestState.NoRequestIssued)) {
-						if (GUILayout.Button("Enable", GUILayout.Width(64)))
-							SpineEditorUtilities.SpinePackageDependencyUtility.EnableTimelineSupport();
-						if (GUILayout.Button("Disable", GUILayout.Width(64)))
-							SpineEditorUtilities.SpinePackageDependencyUtility.DisableTimelineSupport();
-					}
-				}
-				#endif
 
 				GUILayout.Space(20);
 				EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);

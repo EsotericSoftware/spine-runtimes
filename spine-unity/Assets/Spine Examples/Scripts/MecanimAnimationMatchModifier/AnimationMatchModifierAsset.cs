@@ -43,7 +43,7 @@ namespace Spine.Unity.Examples {
 
 		public override void Apply (SkeletonData skeletonData) {
 			if (matchAllAnimations)
-				AnimationTools.MatchAnimationTimelines(skeletonData.animations, skeletonData);
+				AnimationTools.MatchAnimationTimelines(skeletonData.Animations, skeletonData);
 		}
 
 		public static class AnimationTools {
@@ -63,7 +63,7 @@ namespace Spine.Unity.Examples {
 				// and a collection of dummy timelines that can be used to fill-in missing items.
 				var timelineDictionary = new Dictionary<int, Spine.Timeline>();
 				foreach (var animation in animations) {
-					foreach (var timeline in animation.timelines) {
+					foreach (var timeline in animation.Timelines) {
 						if (timeline is EventTimeline) continue;
 
 						int propertyID = timeline.PropertyId;
@@ -78,12 +78,12 @@ namespace Spine.Unity.Examples {
 				var currentAnimationIDs = new HashSet<int>();
 				foreach (var animation in animations) {
 					currentAnimationIDs.Clear();
-					foreach (var timeline in animation.timelines) {
+					foreach (var timeline in animation.Timelines) {
 						if (timeline is EventTimeline) continue;
 						currentAnimationIDs.Add(timeline.PropertyId);
 					}
 
-					var animationTimelines = animation.timelines;
+					var animationTimelines = animation.Timelines;
 					foreach (int propertyID in idsToMatch) {
 						if (!currentAnimationIDs.Contains(propertyID))
 							animationTimelines.Add(timelineDictionary[propertyID]);
@@ -100,116 +100,98 @@ namespace Spine.Unity.Examples {
 			}
 
 			static Timeline GetFillerTimeline (Timeline timeline, SkeletonData skeletonData) {
-				int propertyID = timeline.PropertyId;
-				int tt = propertyID >> 24;
-				var timelineType = (TimelineType)tt;
-
-				switch (timelineType) {
-					// Bone
-					case TimelineType.Rotate:
-						return GetFillerTimeline((RotateTimeline)timeline, skeletonData);
-					case TimelineType.Translate:
-						return GetFillerTimeline((TranslateTimeline)timeline, skeletonData);
-					case TimelineType.Scale:
-						return GetFillerTimeline((ScaleTimeline)timeline, skeletonData);
-					case TimelineType.Shear:
-						return GetFillerTimeline((ShearTimeline)timeline, skeletonData);
-
-					// Slot
-					case TimelineType.Attachment:
-						return GetFillerTimeline((AttachmentTimeline)timeline, skeletonData);
-					case TimelineType.Color:
-						return GetFillerTimeline((ColorTimeline)timeline, skeletonData);
-					case TimelineType.TwoColor:
-						return GetFillerTimeline((TwoColorTimeline)timeline, skeletonData);
-					case TimelineType.Deform:
-						return GetFillerTimeline((DeformTimeline)timeline, skeletonData);
-
-					// Skeleton
-					case TimelineType.DrawOrder:
-						return GetFillerTimeline((DrawOrderTimeline)timeline, skeletonData);
-
-					// IK Constraint
-					case TimelineType.IkConstraint:
-						return GetFillerTimeline((IkConstraintTimeline)timeline, skeletonData);
-
-					// TransformConstraint
-					case TimelineType.TransformConstraint:
-						return GetFillerTimeline((TransformConstraintTimeline)timeline, skeletonData);
-
-					// Path Constraint
-					case TimelineType.PathConstraintPosition:
-						return GetFillerTimeline((PathConstraintPositionTimeline)timeline, skeletonData);
-					case TimelineType.PathConstraintSpacing:
-						return GetFillerTimeline((PathConstraintSpacingTimeline)timeline, skeletonData);
-					case TimelineType.PathConstraintMix:
-						return GetFillerTimeline((PathConstraintMixTimeline)timeline, skeletonData);
-				}
-
+				if (timeline is RotateTimeline)
+					return GetFillerTimeline((RotateTimeline)timeline, skeletonData);
+				if (timeline is TranslateTimeline)
+					return GetFillerTimeline((TranslateTimeline)timeline, skeletonData);
+				if (timeline is ScaleTimeline)
+					return GetFillerTimeline((ScaleTimeline)timeline, skeletonData);
+				if (timeline is ShearTimeline)
+					return GetFillerTimeline((ShearTimeline)timeline, skeletonData);
+				if (timeline is AttachmentTimeline)
+					return GetFillerTimeline((AttachmentTimeline)timeline, skeletonData);
+				if (timeline is ColorTimeline)
+					return GetFillerTimeline((ColorTimeline)timeline, skeletonData);
+				if (timeline is TwoColorTimeline)
+					return GetFillerTimeline((TwoColorTimeline)timeline, skeletonData);
+				if (timeline is DeformTimeline)
+					return GetFillerTimeline((DeformTimeline)timeline, skeletonData);
+				if (timeline is DrawOrderTimeline)
+					return GetFillerTimeline((DrawOrderTimeline)timeline, skeletonData);
+				if (timeline is IkConstraintTimeline)
+					return GetFillerTimeline((IkConstraintTimeline)timeline, skeletonData);
+				if (timeline is TransformConstraintTimeline)
+					return GetFillerTimeline((TransformConstraintTimeline)timeline, skeletonData);
+				if (timeline is PathConstraintPositionTimeline)
+					return GetFillerTimeline((PathConstraintPositionTimeline)timeline, skeletonData);
+				if (timeline is PathConstraintSpacingTimeline)
+					return GetFillerTimeline((PathConstraintSpacingTimeline)timeline, skeletonData);
+				if (timeline is PathConstraintMixTimeline)
+					return GetFillerTimeline((PathConstraintMixTimeline)timeline, skeletonData);
 				return null;
 			}
 
 			static RotateTimeline GetFillerTimeline (RotateTimeline timeline, SkeletonData skeletonData) {
 				var t = new RotateTimeline(1);
-				t.boneIndex = timeline.boneIndex;
+				t.BoneIndex = timeline.BoneIndex;
 				t.SetFrame(0, 0, 0);
 				return t;
 			}
 
 			static TranslateTimeline GetFillerTimeline (TranslateTimeline timeline, SkeletonData skeletonData) {
 				var t = new TranslateTimeline(1);
-				t.boneIndex = timeline.boneIndex;
+				t.BoneIndex = timeline.BoneIndex;
 				t.SetFrame(0, 0, 0, 0);
 				return t;
 			}
 
 			static ScaleTimeline GetFillerTimeline (ScaleTimeline timeline, SkeletonData skeletonData) {
 				var t = new ScaleTimeline(1);
-				t.boneIndex = timeline.boneIndex;
+				t.BoneIndex = timeline.BoneIndex;
 				t.SetFrame(0, 0, 0, 0);
 				return t;
 			}
 
 			static ShearTimeline GetFillerTimeline (ShearTimeline timeline, SkeletonData skeletonData) {
 				var t = new ShearTimeline(1);
-				t.boneIndex = timeline.boneIndex;
+				t.BoneIndex = timeline.BoneIndex;
 				t.SetFrame(0, 0, 0, 0);
 				return t;
 			}
 
 			static AttachmentTimeline GetFillerTimeline (AttachmentTimeline timeline, SkeletonData skeletonData) {
 				var t = new AttachmentTimeline(1);
-				t.slotIndex = timeline.slotIndex;
-				var slotData = skeletonData.slots.Items[t.slotIndex];
-				t.SetFrame(0, 0, slotData.attachmentName);
+				t.SlotIndex = timeline.SlotIndex;
+				var slotData = skeletonData.Slots.Items[t.SlotIndex];
+				t.SetFrame(0, 0, slotData.AttachmentName);
 				return t;
 			}
 
 			static ColorTimeline GetFillerTimeline (ColorTimeline timeline, SkeletonData skeletonData) {
 				var t = new ColorTimeline(1);
-				t.slotIndex = timeline.slotIndex;
-				var slotData = skeletonData.slots.Items[t.slotIndex];
-				t.SetFrame(0, 0, slotData.r, slotData.g, slotData.b, slotData.a);
+				t.SlotIndex = timeline.SlotIndex;
+				var slotData = skeletonData.Slots.Items[t.SlotIndex];
+				t.SetFrame(0, 0, slotData.R, slotData.G, slotData.B, slotData.A);
 				return t;
 			}
 
 			static TwoColorTimeline GetFillerTimeline (TwoColorTimeline timeline, SkeletonData skeletonData) {
 				var t = new TwoColorTimeline(1);
-				t.slotIndex = timeline.slotIndex;
-				var slotData = skeletonData.slots.Items[t.slotIndex];
-				t.SetFrame(0, 0, slotData.r, slotData.g, slotData.b, slotData.a, slotData.r2, slotData.g2, slotData.b2);
+				t.SlotIndex = timeline.SlotIndex;
+				var slotData = skeletonData.Slots.Items[t.SlotIndex];
+				t.SetFrame(0, 0, slotData.R, slotData.G, slotData.B, slotData.A, slotData.R2, slotData.G2, slotData.B2);
 				return t;
 			}
 
 			static DeformTimeline GetFillerTimeline (DeformTimeline timeline, SkeletonData skeletonData) {
 				var t = new DeformTimeline(1);
-				t.slotIndex = timeline.slotIndex;
-				t.attachment = timeline.attachment;
+				t.SlotIndex = timeline.SlotIndex;
+				t.Attachment = timeline.Attachment;
 
-				if (t.attachment.IsWeighted()) {
-					t.SetFrame(0, 0, new float[t.attachment.vertices.Length]);
+				if (t.Attachment.IsWeighted()) {
+					t.SetFrame(0, 0, new float[t.Attachment.Vertices.Length]);
 				} else {
-					t.SetFrame(0, 0, t.attachment.vertices.Clone() as float[]);
+					t.SetFrame(0, 0, t.Attachment.Vertices.Clone() as float[]);
 				}
 
 				return t;
@@ -223,36 +205,36 @@ namespace Spine.Unity.Examples {
 
 			static IkConstraintTimeline GetFillerTimeline (IkConstraintTimeline timeline, SkeletonData skeletonData) {
 				var t = new IkConstraintTimeline(1);
-				var ikConstraintData = skeletonData.ikConstraints.Items[timeline.ikConstraintIndex];
-				t.SetFrame(0, 0, ikConstraintData.mix, ikConstraintData.softness, ikConstraintData.bendDirection, ikConstraintData.compress, ikConstraintData.stretch);
+				var ikConstraintData = skeletonData.IkConstraints.Items[timeline.IkConstraintIndex];
+				t.SetFrame(0, 0, ikConstraintData.Mix, ikConstraintData.Softness, ikConstraintData.BendDirection, ikConstraintData.Compress, ikConstraintData.Stretch);
 				return t;
 			}
 
 			static TransformConstraintTimeline GetFillerTimeline (TransformConstraintTimeline timeline, SkeletonData skeletonData) {
 				var t = new TransformConstraintTimeline(1);
-				var data = skeletonData.transformConstraints.Items[timeline.transformConstraintIndex];
-				t.SetFrame(0, 0, data.rotateMix, data.translateMix, data.scaleMix, data.shearMix);
+				var data = skeletonData.TransformConstraints.Items[timeline.TransformConstraintIndex];
+				t.SetFrame(0, 0, data.RotateMix, data.TranslateMix, data.ScaleMix, data.ShearMix);
 				return t;
 			}
 
 			static PathConstraintPositionTimeline GetFillerTimeline (PathConstraintPositionTimeline timeline, SkeletonData skeletonData) {
 				var t = new PathConstraintPositionTimeline(1);
-				var data = skeletonData.pathConstraints.Items[timeline.pathConstraintIndex];
-				t.SetFrame(0, 0, data.position);
+				var data = skeletonData.PathConstraints.Items[timeline.PathConstraintIndex];
+				t.SetFrame(0, 0, data.Position);
 				return t;
 			}
 
 			static PathConstraintSpacingTimeline GetFillerTimeline (PathConstraintSpacingTimeline timeline, SkeletonData skeletonData) {
 				var t = new PathConstraintSpacingTimeline(1);
-				var data = skeletonData.pathConstraints.Items[timeline.pathConstraintIndex];
-				t.SetFrame(0, 0, data.spacing);
+				var data = skeletonData.PathConstraints.Items[timeline.PathConstraintIndex];
+				t.SetFrame(0, 0, data.Spacing);
 				return t;
 			}
 
 			static PathConstraintMixTimeline GetFillerTimeline (PathConstraintMixTimeline timeline, SkeletonData skeletonData) {
 				var t = new PathConstraintMixTimeline(1);
-				var data = skeletonData.pathConstraints.Items[timeline.pathConstraintIndex];
-				t.SetFrame(0, 0, data.rotateMix, data.translateMix);
+				var data = skeletonData.PathConstraints.Items[timeline.PathConstraintIndex];
+				t.SetFrame(0, 0, data.RotateMix, data.TranslateMix);
 				return t;
 			}
 			#endregion

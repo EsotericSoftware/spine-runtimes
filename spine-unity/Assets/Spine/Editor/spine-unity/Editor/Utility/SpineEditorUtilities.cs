@@ -50,10 +50,6 @@
 #define NEW_PREFERENCES_SETTINGS_PROVIDER
 #endif
 
-#if UNITY_2019_1_OR_NEWER
-#define NEW_TIMELINE_AS_PACKAGE
-#endif
-
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;

@@ -27,24 +27,21 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if UNITY_2017 || UNITY_2018 || (UNITY_2019_1_OR_NEWER && SPINE_TIMELINE_PACKAGE_DOWNLOADED)
+using System;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-namespace Spine.Unity.Playables {
-	[TrackColor(0.9960785f, 0.2509804f, 0.003921569f)]
-	[TrackClipType(typeof(SpineAnimationStateClip))]
-	[TrackBindingType(typeof(SkeletonAnimation))]
-	public class SpineAnimationStateTrack : TrackAsset {
-		public int trackIndex = 0;
+[Serializable]
+public class SpineSkeletonFlipClip : PlayableAsset, ITimelineClipAsset {
+	public SpineSkeletonFlipBehaviour template = new SpineSkeletonFlipBehaviour();
 
-		public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount) {
-			var scriptPlayable = ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create(graph, inputCount);
-			var mixerBehaviour = scriptPlayable.GetBehaviour();
-			mixerBehaviour.trackIndex = this.trackIndex;
-			return scriptPlayable;
-		}
+	public ClipCaps clipCaps {
+		get { return ClipCaps.None; }
+	}
+
+	public override Playable CreatePlayable (PlayableGraph graph, GameObject owner) {
+		var playable = ScriptPlayable<SpineSkeletonFlipBehaviour>.Create(graph, template);
+		return playable;
 	}
 }
-#endif

@@ -110,7 +110,7 @@ namespace Spine.Unity.Examples {
 				if (e.Float > 0)
 					spawnInterval = e.Float;
 				
-				if (!string.IsNullOrEmpty(e.stringValue))
+				if (!string.IsNullOrEmpty(e.String))
 					this.color = HexToColor(e.String);
 			}
 		}
