@@ -35,7 +35,10 @@
 #include <spine/AttachmentVertices.h>
 #include <algorithm>
 
-#define INITIAL_WORLD_VERTICES_LENGTH 1000
+#ifndef SPINE_INITIAL_WORLD_VERTICES_LENGTH
+#define SPINE_INITIAL_WORLD_VERTICES_LENGTH 1000
+#endif
+
 // Used for transforming attachments for bounding boxes & debug rendering
 static float* worldVertices = nullptr;
 static size_t worldVerticesLength = 0;
@@ -92,8 +95,8 @@ namespace spine {
 	
 	void SkeletonRenderer::initialize () {
 		if (!worldVertices) {
-			worldVertices = new float[INITIAL_WORLD_VERTICES_LENGTH];
-			worldVerticesLength = INITIAL_WORLD_VERTICES_LENGTH;
+			worldVertices = new float[SPINE_INITIAL_WORLD_VERTICES_LENGTH];
+			worldVerticesLength = SPINE_INITIAL_WORLD_VERTICES_LENGTH;
 		}
 		
 		_clipper = new (__FILE__, __LINE__) SkeletonClipping();
