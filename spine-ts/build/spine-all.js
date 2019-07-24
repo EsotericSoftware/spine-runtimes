@@ -11048,6 +11048,10 @@ var spine;
 				_this.material = new threejs.SkeletonMeshMaterial();
 				return _this;
 			}
+			MeshBatcher.prototype.dispose = function () {
+				this.geometry.dispose();
+				this.material.dispose();
+			};
 			MeshBatcher.prototype.clear = function () {
 				var geo = this.geometry;
 				geo.drawRange.start = 0;
@@ -11158,6 +11162,11 @@ var spine;
 				state.apply(skeleton);
 				skeleton.updateWorldTransform();
 				this.updateGeometry();
+			};
+			SkeletonMesh.prototype.dispose = function () {
+				for (var i = 0; i < this.batches.length; i++) {
+					this.batches[i].dispose();
+				}
 			};
 			SkeletonMesh.prototype.clearBatches = function () {
 				for (var i = 0; i < this.batches.length; i++) {

@@ -1807,6 +1807,7 @@ declare module spine.threejs {
 		private indices;
 		private indicesLength;
 		constructor(maxVertices?: number);
+		dispose(): void;
 		clear(): void;
 		begin(): void;
 		canBatch(verticesLength: number, indicesLength: number): boolean;
@@ -1836,6 +1837,7 @@ declare module spine.threejs {
 		private tempColor;
 		constructor(skeletonData: SkeletonData);
 		update(deltaTime: number): void;
+		dispose(): void;
 		private clearBatches();
 		private nextBatch();
 		private updateGeometry();

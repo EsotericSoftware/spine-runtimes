@@ -55,6 +55,11 @@ module spine.threejs {
 			this.material = new SkeletonMeshMaterial();
 		}
 
+		dispose () {
+			this.geometry.dispose();
+			this.material.dispose();
+		}
+
 		clear () {
 			let geo = (<THREE.BufferGeometry>this.geometry);
 			geo.drawRange.start = 0;
