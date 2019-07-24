@@ -43,18 +43,44 @@ namespace Spine.Unity {
 			"Warning: Premultiply-alpha atlas textures not supported in Linear color space!\n\nPlease\n"
 			+ "a) re-export atlas as straight alpha texture with 'premultiply alpha' unchecked or\n"
 			+ "b) switch to Gamma color space via\nProject Settings - Player - Other Settings - Color Space.\n";
+		public static readonly string kZSpacingRequiredMessage = 
+			"Warning: Z Spacing required on selected shader! Otherwise you will receive incorrect results.\n\nPlease\n"
+			+ "1) make sure at least minimal 'Z Spacing' is set at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' and\n"
+			+ "2) ensure that the skeleton has overlapping parts on different Z depth. You can adjust this in Spine via draw order.\n";
+		public static readonly string kZSpacingRecommendedMessage =
+			"Warning: Z Spacing recommended on selected shader configuration!\n\nPlease\n"
+			+ "1) make sure at least minimal 'Z Spacing' is set at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' and\n"
+			+ "2) ensure that the skeleton has overlapping parts on different Z depth. You can adjust this in Spine via draw order.\n";
 
 		public static bool IsMaterialSetupProblematic (SkeletonRenderer renderer, ref string errorMessage) {
 			var materials = renderer.GetComponent<Renderer>().sharedMaterials;
 			bool isProblematic = false;
 			foreach (var mat in materials) {
-				isProblematic |= MaterialChecks.IsMaterialSetupProblematic(mat, ref errorMessage);
+				if (mat == null) continue;
+				isProblematic |= IsMaterialSetupProblematic(mat, ref errorMessage);
+				if (renderer.zSpacing == 0) {
+					isProblematic |= IsZSpacingRequired(mat, ref errorMessage);
+				}
 			}
 			return isProblematic;
 		}
 
 		public static bool IsMaterialSetupProblematic(Material material, ref string errorMessage) {
 			return !IsColorSpaceSupported(material, ref errorMessage);
+		}
+
+		public static bool IsZSpacingRequired(Material material, ref string errorMessage) {
+			bool hasForwardAddPass = material.FindPass("FORWARD_DELTA") >= 0;
+			if (hasForwardAddPass) {
+				errorMessage += kZSpacingRequiredMessage;
+				return true;
+			}
+			bool zWrite = material.HasProperty("_ZWrite") && material.GetFloat("_ZWrite") > 0.0f;
+			if (zWrite) {
+				errorMessage += kZSpacingRecommendedMessage;
+				return true;
+			}
+			return false;
 		}
 
 		public static bool IsColorSpaceSupported (Material material, ref string errorMessage) {

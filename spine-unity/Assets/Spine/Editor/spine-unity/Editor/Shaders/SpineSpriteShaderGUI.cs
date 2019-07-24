@@ -200,7 +200,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 
 		_pixelSnap = FindProperty("PixelSnap", props);
 
-		_writeToDepth = FindProperty("_ZWrite", props);
+		_writeToDepth = FindProperty("_ZWrite", props, false);
 		_depthAlphaCutoff = FindProperty("_Cutoff", props);
 		_shadowAlphaCutoff = FindProperty("_ShadowAlphaCutoff", props);
 		_renderQueue = FindProperty("_RenderQueue", props);
@@ -435,18 +435,23 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 
 		EditorGUI.BeginChangeCheck();
 
-		bool mixedValue = _writeToDepth.hasMixedValue;
-		EditorGUI.showMixedValue = mixedValue;
-		bool writeTodepth = EditorGUILayout.Toggle(_depthText, _writeToDepth.floatValue != 0.0f);
+		bool showDepthAlphaCutoff = true;
+		// e.g. Pixel Lit shader always has ZWrite enabled
+		if (_writeToDepth != null) {
+			bool mixedValue = _writeToDepth.hasMixedValue;
+			EditorGUI.showMixedValue = mixedValue;
+			bool writeTodepth = EditorGUILayout.Toggle(_depthText, _writeToDepth.floatValue != 0.0f);
 
-		if (EditorGUI.EndChangeCheck()) {
-			SetInt("_ZWrite", writeTodepth ? 1 : 0);
-			_depthAlphaCutoff.floatValue = writeTodepth ? 0.5f : 0.0f;
-			mixedValue = false;
-			dataChanged = true;
+			if (EditorGUI.EndChangeCheck()) {
+				SetInt("_ZWrite", writeTodepth ? 1 : 0);
+				_depthAlphaCutoff.floatValue = writeTodepth ? 0.5f : 0.0f;
+				mixedValue = false;
+				dataChanged = true;
+			}
+
+			showDepthAlphaCutoff = writeTodepth && !mixedValue && GetMaterialBlendMode((Material)_materialEditor.target) != eBlendMode.Opaque;
 		}
-
-		if (writeTodepth && !mixedValue && GetMaterialBlendMode((Material)_materialEditor.target) != eBlendMode.Opaque) {
+		if (showDepthAlphaCutoff) {
 			EditorGUI.BeginChangeCheck();
 			_materialEditor.RangeProperty(_depthAlphaCutoff, _depthAlphaCutoffText.text);
 			dataChanged |= EditorGUI.EndChangeCheck();

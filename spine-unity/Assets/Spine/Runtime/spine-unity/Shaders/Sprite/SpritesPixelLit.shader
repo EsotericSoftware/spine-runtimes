@@ -4,9 +4,9 @@ Shader "Spine/Sprite/Pixel Lit"
 	{
 		_MainTex ("Main Texture", 2D) = "white" {}
 		_Color ("Color", Color) = (1,1,1,1)
-		
+		 
 		_BumpScale("Scale", Float) = 1.0
-		_BumpMap ("Normal Map", 2D) = "bump" {}
+		_BumpMap ("Normal Map", 2D) = "bump" {} 
 		
 		[MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
 		[PerRendererData] _AlphaTex ("External Alpha", 2D) = "white" {}
@@ -24,7 +24,6 @@ Shader "Spine/Sprite/Pixel Lit"
 		_DiffuseRamp ("Diffuse Ramp Texture", 2D) = "gray" {}
 		
 		_FixedNormal ("Fixed Normal", Vector) = (0,0,1,1)
-		_ZWrite ("Depth Write", Float) = 1.0
 		_Cutoff ("Depth alpha cutoff", Range(0,1)) = 0.5
 		_ShadowAlphaCutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 		_CustomRenderQueue ("Custom Render Queue", Float) = 0.0
@@ -64,7 +63,8 @@ Shader "Spine/Sprite/Pixel Lit"
 			Name "FORWARD" 
 			Tags { "LightMode" = "ForwardBase" }
 			Blend [_SrcBlend] [_DstBlend]
-			ZWrite [_ZWrite]
+			// Note: ZWrite needs to be enabled for following ForwardAdd pass, otherwise parts will look as if shining through by getting lit.
+			ZWrite On
 			ZTest LEqual
 			Cull [_Cull]
 			
