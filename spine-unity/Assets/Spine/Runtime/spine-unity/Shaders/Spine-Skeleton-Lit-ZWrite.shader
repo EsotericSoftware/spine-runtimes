@@ -1,14 +1,15 @@
 // - Vertex Lit + ShadowCaster
 // - Premultiplied Alpha Blending (Optional straight alpha input)
-// - Double-sided, no depth
+// - Double-sided, ZWrite
 
-Shader "Spine/Skeleton Lit" {
+Shader "Spine/Skeleton Lit ZWrite" {
 	Properties {
-		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
+		_Cutoff ("Depth alpha cutoff", Range(0,1)) = 0.1
+		_ShadowAlphaCutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[NoScaleOffset] _MainTex ("Main Texture", 2D) = "black" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
-		[HideInInspector] [Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
+		[HideInInspector] [HideInInspector, Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
 	}
 
 	SubShader {
@@ -24,7 +25,7 @@ Shader "Spine/Skeleton Lit" {
 		Pass {
 			Tags { "LightMode"="Vertex" "Queue"="Transparent" "IgnoreProjector"="true" "RenderType"="Transparent" }
 
-			ZWrite Off
+			ZWrite On
 			Cull Off
 			Blend One OneMinusSrcAlpha
 
@@ -34,6 +35,7 @@ Shader "Spine/Skeleton Lit" {
 			#pragma fragment frag
 			#pragma target 2.0
 
+			#define _ALPHA_CLIP
 			#include "CGIncludes/Spine-Skeleton-Lit-Common.cginc"
 			ENDCG
 
@@ -56,7 +58,7 @@ Shader "Spine/Skeleton Lit" {
 			#pragma multi_compile_shadowcaster
 			#pragma fragmentoption ARB_precision_hint_fastest
 			
-			#define SHADOW_CUTOFF _Cutoff
+			#define SHADOW_CUTOFF _ShadowAlphaCutoff
 			#include "CGIncludes/Spine-Skeleton-Lit-Common-Shadow.cginc"
 
 			ENDCG

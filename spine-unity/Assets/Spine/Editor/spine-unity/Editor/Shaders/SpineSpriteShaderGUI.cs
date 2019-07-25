@@ -183,7 +183,8 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 		base.AssignNewShaderToMaterial(material, oldShader, newShader);
 
 		//If not originally a sprite shader set default keywords
-		if (oldShader.name != kShaderVertexLit && oldShader.name != kShaderPixelLit && oldShader.name != kShaderUnlit) {
+		if (oldShader.name != kShaderVertexLit && oldShader.name != kShaderPixelLit && oldShader.name != kShaderUnlit &&
+			oldShader.name != kShaderLitLW) {
 			SetDefaultSpriteKeywords(material, newShader);
 		}
 
