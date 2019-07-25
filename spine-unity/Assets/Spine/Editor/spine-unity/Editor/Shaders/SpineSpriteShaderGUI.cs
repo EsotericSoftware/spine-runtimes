@@ -127,7 +127,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 	static GUIContent _fixedNormalText = new GUIContent("Fixed Normals", "If this is ticked instead of requiring mesh normals a Fixed Normal will be used instead (it's quicker and can result in better looking lighting effects on 2d objects).");
 	static GUIContent _fixedNormalDirectionText = new GUIContent("Fixed Normal Direction", "Should normally be (0,0,1) if in view-space or (0,0,-1) if in model-space.");
 	static GUIContent _adjustBackfaceTangentText = new GUIContent("Adjust Back-face Tangents", "Tick only if you are going to rotate the sprite to face away from the camera, the tangents will be flipped when this is the case to make lighting correct.");
-	static GUIContent _sphericalHarmonicsText = new GUIContent("Spherical Harmonics", "Enable to use spherical harmonics to calculate ambient light / light probes. In vertex-lit mode this will be approximated from scenes ambient trilight settings.");
+	static GUIContent _sphericalHarmonicsText = new GUIContent("Light Probes & Ambient", "Enable to use spherical harmonics to aplpy ambient light and/or light probes. In vertex-lit mode this will be approximated from scenes ambient trilight settings.");
 	static GUIContent _lightingModeText = new GUIContent("Lighting Mode", "Lighting Mode");
 	static GUIContent[] _lightingModeOptions = {
 		new GUIContent("Vertex Lit"),
