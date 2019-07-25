@@ -95,6 +95,10 @@ void Skin::addAttachment(size_t slotIndex, const String &name, Attachment *attac
 	_attachments.put(slotIndex, name, attachment);
 }
 
+void Skin::removeAttachment(size_t slotIndex, const String& name) {
+	_attachments.remove(slotIndex, name);
+}
+
 Attachment *Skin::getAttachment(size_t slotIndex, const String &name) {
 	return _attachments.get(slotIndex, name);
 }

@@ -119,6 +119,9 @@ public:
 	/// If the name already exists for the slot, the previous value is replaced.
 	void addAttachment(size_t slotIndex, const String &name, Attachment *attachment);
 
+	// Removes the attachment from the skin.
+	void removeAttachment(size_t slotIndex, const String& name);
+
 	/// Returns the attachment for the specified slot index and name, or NULL.
 	Attachment *getAttachment(size_t slotIndex, const String &name);
 
