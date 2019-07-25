@@ -124,6 +124,9 @@ public:
 	/// Returns the attachment for the specified slot index and name, or NULL.
 	Attachment *getAttachment(size_t slotIndex, const String &name);
 
+	// Removes the attachment from the skin.
+	void removeAttachment(size_t slotIndex, const String& name);
+
 	/// Finds the skin keys for a given slot. The results are added to the passed array of names.
 	/// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
 	/// @param names Found skin key names will be added to this array.

@@ -112,6 +112,10 @@ Attachment *Skin::getAttachment(size_t slotIndex, const String &name) {
 	return _attachments.get(slotIndex, name);
 }
 
+void Skin::removeAttachment(size_t slotIndex, const String& name) {
+	_attachments.remove(slotIndex, name);
+}
+
 void Skin::findNamesForSlot(size_t slotIndex, Vector<String> &names) {
 	Skin::AttachmentMap::Entries entries = _attachments.getEntries();
 	while (entries.hasNext()) {
