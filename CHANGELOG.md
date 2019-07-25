@@ -164,6 +164,7 @@
       * `Lightweight Render Pipeline/Spine/Sprite`, as a lightweight variant of the `Spine/Sprite/Vertex Lit` and `Pixel Lit` shaders, which were not functioning in the lightweight render pipeline. The shaders can be assigned to materials as usual and will respect your settings of the assigned `LightweightRenderPipelineAsset` under `Project Settings - Graphics`.
     * **Restrictions** As all Spine shaders, the LWRP shaders **do not support `Premultiply alpha` (PMA) atlas textures in Linear color space**. Please export your atlas textures as `straight alpha` textures with disabled `Premultiply alpha` setting when using Linear color space. You can check the current color space via `Project Settings - Player - Other Settings - Color Space.`.
     * **Example:** You can find an example scene in the package under `com.esotericsoftware.spine.lwrp-shaders-3.8/Examples/LWRP Shaders.unity` that demonstrates usage of the LWRP shaders.
+  * Added `Spine/Skeleton Lit ZWrite` shader. This variant of the `Spine/Skeleton Lit` shader writes to the depth buffer with configurable depth alpha threshold. Apart from that it is identical to `Spine/Skeleton Lit`.
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.SpineStyle` instead of `MixMode.MixAlways`.
@@ -178,6 +179,7 @@
   * Removed duplicates of `.cginc` files in `Modules/Shaders/Sprite` that were also present in the `Modules/Shaders/Sprite/CGIncludes` directory.
   * Moved shaders from `Modules/Shaders` to `Shaders` directory.
   * Moved shaders from `Modules/SkeletonGraphic/Shaders` to `Shaders/SkeletonGraphic`.
+  * Renamed shader `Shaders/Spine-SkeletonLit.shader` to `Shaders/Spine-Skeleton-Lit.shader`.
   * Moved components from `SkeletonGraphic` to `Components` and `Components/Following` except for `SkeletonGraphicMirror` which was moved to `Spine Examples/Scripts/Sample Components`.
   * Moved `BoneFollower`, `BoneFollowerGraphic` and `PointFollower` from `Components` directory to `Components/Following`.
   * Moved `BoundingBoxFollower` component from `Modules/BoundingBoxFollower` to `Components/Following`.
