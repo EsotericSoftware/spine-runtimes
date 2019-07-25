@@ -270,10 +270,21 @@ static bool handlerQueued = false;
 				b *= _skeleton->color.b * slot->color.b;
 			}
 			self.texture = texture;
-			CGSize size = texture.contentSize;
-			GLKVector2 center = GLKVector2Make(size.width / 2.0, size.height / 2.0);
-			GLKVector2 extents = GLKVector2Make(size.width / 2.0, size.height / 2.0);
-			if (_skipVisibilityCheck || CCRenderCheckVisbility(transform, center, extents)) {
+			bool isVisible = true;
+			if (!_skipVisibilityCheck) {
+				float minX = FLT_MAX, minY = FLT_MAX, maxX = FLT_MIN, maxY = FLT_MIN;
+				for (int i = 0; i < verticesCount * 2; i+=2) {
+					minX = MIN(vertices[i], minX);
+					maxX = MAX(vertices[i], maxX);
+					minY = MIN(vertices[i+1], minY);
+					maxY = MAX(vertices[i+1], maxY);
+				}
+				GLKVector2 center = GLKVector2Make((maxX - minX) / 2, (maxY - minY) / 2);
+				GLKVector2 extents = GLKVector2Make((maxX - minX), (maxY - minY));
+				isVisible = CCRenderCheckVisbility(transform, center, extents);
+			}
+			
+			if (isVisible) {
 				
 				if (spSkeletonClipping_isClipping(_clipper)) {
 					spSkeletonClipping_clipTriangles(_clipper, vertices, verticesCount, triangles, trianglesCount, uvs, 2);
