@@ -280,8 +280,8 @@ static bool handlerQueued = false;
 					minY = MIN(vertices[i+1], minY);
 					maxY = MAX(vertices[i+1], maxY);
 				}
-				GLKVector2 center = GLKVector2Make((maxX - minX) / 2, (maxY - minY) / 2);
-				GLKVector2 extents = GLKVector2Make((maxX - minX), (maxY - minY));
+				GLKVector2 center = GLKVector2Make(minX + (maxX - minX) / 2, minY + (maxY - minY) / 2);
+				GLKVector2 extents = GLKVector2Make((maxX - minX) / 2, (maxY - minY) / 2);
 				isVisible = CCRenderCheckVisbility(transform, center, extents);
 			}
 			
