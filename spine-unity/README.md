@@ -2,10 +2,6 @@
 
 The **spine-unity** runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Unity](http://unity3d.com/). spine-unity is based on [spine-csharp](../spine-csharp).
 
-For more documentation, see [spine-unity Documentation](http://esotericsoftware.com/spine-unity).
-
-While spine-unity can render directly with Unity, without the need for any other plugins, it also works with [2D Toolkit](http://www.2dtoolkit.com/) and can render skeletons using a TK2D texture atlas.
-
 ## Licensing
 
 You are welcome to evaluate the Spine Runtimes and the examples we provide in this repository free of charge.
@@ -24,25 +20,22 @@ spine-unity supports all Spine features.
 
 Unity's physics components do not support dynamically assigned vertices so they cannot be used to mirror bone-weighted and deformed BoundingBoxAttachments. However, BoundingBoxAttachment vertices at runtime will still deform correctly and can be used to perform manual hit detection.
 
-## Documentation
+## Usage
 
-A Spine skeleton GameObject (a GameObject with a SkeletonAnimation component on it) can be used throughout Unity like any other GameObject. It renders through `MeshRenderer`.
+### [Please see the spine-unity guide for full documentation](http://esotericsoftware.com/spine-unity).
 
-See [spine-unity Documentation](http://esotericsoftware.com/spine-unity).
+1. Create an empty Unity project (or use an existing project).
+2. Download and import the [`spine-unity.unitypackage`](http://esotericsoftware.com/spine-unity-download/).
 
-## Quick installation
+See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs and check out the spine-unity examples for demonstrations of Unity specific features.
 
-Download the latest Spine-Unity unitypackage from the download page: http://esotericsoftware.com/spine-unity-download/
+## Example
 
-In the `Assets/Spine Examples/Scenes` folder you will find many example scenes that demonstrate various spine-unity features.
+### [Please see the spine-unity guide for full documentation](http://esotericsoftware.com/spine-unity).
 
-----------
-
-> More resources:
-- [Spine-Unity Documentation](http://esotericsoftware.com/spine-unity)
-- [Importing Spine Skeletons into Unity](http://esotericsoftware.com/spine-unity#Importing-into-Unity)
-
-----------
+1. Create an empty Unity project
+2. Download and import the [`spine-unity.unitypackage`](http://esotericsoftware.com/spine-unity-download/).
+3. Explore the example scenes found in the `Assets/Spine Examples/Scenes` folder.
 
 ## Notes
 
