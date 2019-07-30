@@ -180,9 +180,11 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements
 	}
 
 	self->renderData.IndexData.SetNumUninitialized(Indices.Num());
-	uint32* indexData = (uint32*)renderData.IndexData.GetData();
-	memcpy(indexData, Indices.GetData(), sizeof(uint32) * Indices.Num());
-
+	SlateIndex* indexData = (SlateIndex*)renderData.IndexData.GetData();
+	for (int i = 0; i < Indices.Num(); i++) {
+		indexData[i] = (SlateIndex)Indices[i];
+	}
+	
 	self->renderData.VertexData.SetNumUninitialized(Vertices.Num());
 	FSlateVertex* vertexData = (FSlateVertex*)renderData.VertexData.GetData();
 	FVector2D offset = AllottedGeometry.AbsolutePosition;
