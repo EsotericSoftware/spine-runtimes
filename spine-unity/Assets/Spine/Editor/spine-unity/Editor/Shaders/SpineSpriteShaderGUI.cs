@@ -479,7 +479,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 						break;
 					default:
 						{
-							bool zWrite = material.GetFloat("_ZWrite") > 0.0f;
+							bool zWrite = HasZWriteEnabled(material);
 							SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderType);
 						}
 						break;
@@ -807,14 +807,15 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 		//Start with Culling disabled
 		material.SetInt("_Cull", (int)eCulling.Off);
 		//Start with Z writing disabled
-		material.SetInt("_ZWrite", 0);
+		if (material.HasProperty("_ZWrite"))
+			material.SetInt("_ZWrite", 0);
 	}
 
 	//Z write is on then
 
 	static void SetRenderType (Material material, string renderType, bool useCustomRenderQueue) {
 		//Want a check box to say if should use Sprite render queue (for custom writing depth and normals)
-		bool zWrite = material.GetFloat("_ZWrite") > 0.0f;
+		bool zWrite = HasZWriteEnabled(material);
 
 		if (useCustomRenderQueue) {
 			//If sprite has fixed normals then assign custom render type so we can write its correct normal with soft edges
@@ -848,7 +849,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 		eBlendMode blendMode = GetMaterialBlendMode(material);
 		SetBlendMode(material, blendMode);
 
-		bool zWrite = material.GetFloat("_ZWrite") > 0.0f;
+		bool zWrite = HasZWriteEnabled(material);
 		bool clipAlpha = zWrite && blendMode != eBlendMode.Opaque && material.GetFloat("_Cutoff") > 0.0f;
 		SetKeyword(material, "_ALPHA_CLIP", clipAlpha);
 
@@ -965,7 +966,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 			{
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
-				bool zWrite = material.GetFloat("_ZWrite") > 0.0f;
+				bool zWrite = HasZWriteEnabled(material);
 				SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
 				renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
 			}
@@ -974,7 +975,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 			{
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcColor);
-				bool zWrite = material.GetFloat("_ZWrite") > 0.0f;
+				bool zWrite = HasZWriteEnabled(material);
 				SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
 				renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
 			}
@@ -983,7 +984,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 			{
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.SrcColor);
-				bool zWrite = material.GetFloat("_ZWrite") > 0.0f;
+				bool zWrite = HasZWriteEnabled(material);
 				SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
 				renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
 			}
@@ -992,7 +993,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 			{
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.DstColor);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.SrcColor);
-				bool zWrite = material.GetFloat("_ZWrite") > 0.0f;
+				bool zWrite = HasZWriteEnabled(material);
 				SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
 				renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
 			}
@@ -1001,7 +1002,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 			{
 				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
 				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-				bool zWrite = material.GetFloat("_ZWrite") > 0.0f;
+				bool zWrite = HasZWriteEnabled(material);
 				SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
 				renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
 			}
@@ -1040,5 +1041,11 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 		return material.IsKeywordEnabled("_FIXED_NORMALS_VIEWSPACE_BACKFACE") || material.IsKeywordEnabled("_FIXED_NORMALS_MODELSPACE_BACKFACE");
 	}
 
+	static bool HasZWriteEnabled (Material material) {
+		if (material.HasProperty("_ZWrite")) {
+			return material.GetFloat("_ZWrite") > 0.0f;
+		}
+		else return true; // Pixel Lit shader always has _ZWrite enabled.
+	}
 	#endregion
 }
