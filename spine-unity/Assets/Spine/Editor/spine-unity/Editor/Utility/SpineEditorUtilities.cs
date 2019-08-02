@@ -95,8 +95,10 @@ namespace Spine.Unity.Editor {
 			string[] assets = AssetDatabase.FindAssets("t:script SpineEditorUtilities");
 			string assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
 			editorPath = Path.GetDirectoryName(assetPath).Replace("\\", "/");
-			editorGUIPath = editorPath + "/GUI";
 
+			assets = AssetDatabase.FindAssets("t:texture icon-subMeshRenderer");
+			assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
+			editorGUIPath = Path.GetDirectoryName(assetPath).Replace("\\", "/");
 			Icons.Initialize();
 
 			// Drag and Drop

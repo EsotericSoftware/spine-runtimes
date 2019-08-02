@@ -157,8 +157,11 @@
   * Added `Create 2D Hinge Chain` button at `SkeletonUtilityBone` inspector, previously only `Create 3D Hinge Chain` was available.
   * **Now supporting Lightweight Render Pipeline (LWRP) through an additional UPM package.**
     * **Installation:** You can download the Unity Package Manager (UPM) package via the [download page](http://esotericsoftware.com/spine-unity-download) or find it in the [spine-runtimes/spine-unity/Modules](https://github.com/EsotericSoftware/spine-runtimes/tree/3.8-beta/spine-unity/Modules) subdirectory on the git repository. You can then either unzip (copy if using git) the package to
-      a) the `Packages` directory in your project where it will automatically be loaded, or
-      b) to an arbitrary directory outside the Assets directory and then open Package Manager in Unity, select the `+` icon, choose `Add package from disk..` and point it to the package.json file.    
+      * a) the `Packages` directory in your project where it will automatically be loaded, or
+      * b) to an arbitrary directory outside the Assets directory and then open Package Manager in Unity, select the `+` icon, choose `Add package from disk..` and point it to the package.json file.
+
+      > If you are using git and Unity 2019.2 or newer versions and receive an error that dependencies could not be resolved by the package manager (only higher versions of Unity's `Lightweight RP` package are available, e.g. `6.9.0` and up), please copy the prepared package-UNITYVERSION.json file for your Unity version (e.g. `package-2019.2.json`) over the existing package.json file to change the dependency accordingly. Unfortunately Unity's Package Manager does not provide a way to specify a version range for a dependency like "5.7.2 - 6.9.0" yet, so this manual step is necessary for git users.
+     
       The Project panel should now show an entry `Spine Lightweight RP Shaders` under `Packages`. If the directory is not yet listed, you will need to close and re-open Unity to have it display the directory and its contents.
     * **Usage:** The package provides two shaders specifically built for the lightweight render pipeline:
       * `Lightweight Render Pipeline/Spine/Skeleton Lit`, as a lightweight variant of the `Spine/Skeleton Lit` shader and

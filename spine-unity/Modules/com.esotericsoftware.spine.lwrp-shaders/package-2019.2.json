@@ -3,14 +3,14 @@
 	"displayName": "Spine Lightweight RP Shaders",
 	"description": "This plugin provides lightweight render pipeline (LWRP) shaders for the spine-unity runtime.\n\nPrerequisites:\nIt requires a working installation of the spine-unity runtime, version 3.8.\n(See http://esotericsoftware.com/git/spine-runtimes/spine-unity)",
 	"version": "3.8.0",
-	"unity": "2019.1",
+	"unity": "2019.2",
 	"author": {
 		"name": "Esoteric Software",
 		"email": "contact@esotericsoftware.com",
 		"url": "http://esotericsoftware.com/"
 	},
 	"dependencies": {
-		"com.unity.render-pipelines.lightweight": "5.7.2"
+		"com.unity.render-pipelines.lightweight": "6.9.0"
 	},
 	"keywords": [
 		"spine",
