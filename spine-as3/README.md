@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-as3 works with data exported from Spine 3.8.xx.
+spine-as3 works with data exported from Spine 3.9.xx.
 
 spine-as3 supports all Spine features, including meshes. If using the `spine.flash` classes for rendering, meshes are not supported.
 

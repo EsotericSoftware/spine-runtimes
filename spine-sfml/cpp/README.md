@@ -13,7 +13,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-sfml works with data exported from Spine 3.8.xx.
+spine-sfml works with data exported from Spine 3.9.xx.
 
 spine-sfml supports all Spine features except two color tinting.
 

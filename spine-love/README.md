@@ -13,7 +13,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-love works with data exported from Spine 3.8.x.
+spine-love works with data exported from Spine 3.9.x.
 
 spine-love supports all Spine features except for blending modes other than normal.
 
