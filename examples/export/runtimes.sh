@@ -129,8 +129,6 @@ cp -f ../stretchyman/export/stretchyman-pro.json "$ROOT/spine-corona/data"
 cp -f ../stretchyman/export/stretchyman.atlas "$ROOT/spine-corona/data"
 cp -f ../stretchyman/export/stretchyman.png "$ROOT/spine-corona/data"
 
-cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.json "$ROOT/spine-corona/data"
-
 cp -f ../owl/export/owl-pro.json "$ROOT/spine-corona/data"
 cp -f ../owl/export/owl.atlas "$ROOT/spine-corona/data"
 cp -f ../owl/export/owl.png "$ROOT/spine-corona/data"
@@ -168,8 +166,6 @@ cp -f ../vine/export/vine.png "$ROOT/spine-love/data"
 cp -f ../stretchyman/export/stretchyman-pro.json "$ROOT/spine-love/data"
 cp -f ../stretchyman/export/stretchyman.atlas "$ROOT/spine-love/data"
 cp -f ../stretchyman/export/stretchyman.png "$ROOT/spine-love/data"
-
-cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.json "$ROOT/spine-love/data"
 
 cp -f ../mix-and-match/export/mix-and-match-pro.json "$ROOT/spine-love/data"
 cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-love/data"
@@ -211,9 +207,6 @@ cp -f ../stretchyman/export/stretchyman-pro.json "$ROOT/spine-sfml/c/data/"
 cp -f ../stretchyman/export/stretchyman-pro.skel "$ROOT/spine-sfml/c/data/"
 cp -f ../stretchyman/export/stretchyman-pma.atlas "$ROOT/spine-sfml/c/data/"
 cp -f ../stretchyman/export/stretchyman-pma.png "$ROOT/spine-sfml/c/data/"
-
-cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.json "$ROOT/spine-sfml/c/data"
-cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.skel "$ROOT/spine-sfml/c/data"
 
 cp -f ../owl/export/owl-pro.json "$ROOT/spine-sfml/c/data/"
 cp -f ../owl/export/owl-pro.skel "$ROOT/spine-sfml/c/data/"
@@ -262,9 +255,6 @@ cp -f ../stretchyman/export/stretchyman-pro.skel "$ROOT/spine-sfml/cpp/data/"
 cp -f ../stretchyman/export/stretchyman-pma.atlas "$ROOT/spine-sfml/cpp/data/"
 cp -f ../stretchyman/export/stretchyman-pma.png "$ROOT/spine-sfml/cpp/data/"
 
-cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.json "$ROOT/spine-sfml/cpp/data"
-cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.skel "$ROOT/spine-sfml/cpp/data"
-
 cp -f ../owl/export/owl-pro.json "$ROOT/spine-sfml/cpp/data/"
 cp -f ../owl/export/owl-pro.skel "$ROOT/spine-sfml/cpp/data/"
 cp -f ../owl/export/owl-pma.atlas "$ROOT/spine-sfml/cpp/data/"
@@ -305,8 +295,6 @@ cp -f ../vine/export/vine.png "$ROOT/spine-starling/spine-starling-example/src/"
 cp -f ../stretchyman/export/stretchyman-pro.json "$ROOT/spine-starling/spine-starling-example/src/"
 cp -f ../stretchyman/export/stretchyman.atlas "$ROOT/spine-starling/spine-starling-example/src/"
 cp -f ../stretchyman/export/stretchyman.png "$ROOT/spine-starling/spine-starling-example/src/"
-
-cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.json "$ROOT/spine-starling/spine-starling-example/src/"
 
 cp -f ../owl/export/owl-pro.json "$ROOT/spine-starling/spine-starling-example/src/"
 cp -f ../owl/export/owl.atlas "$ROOT/spine-starling/spine-starling-example/src/"
@@ -351,8 +339,6 @@ cp -f ../owl/export/owl-pma.png "$ROOT/spine-ts/webgl/example/assets/"
 cp -f ../stretchyman/export/stretchyman-pro.skel "$ROOT/spine-ts/webgl/example/assets/"
 cp -f ../stretchyman/export/stretchyman-pma.atlas "$ROOT/spine-ts/webgl/example/assets/"
 cp -f ../stretchyman/export/stretchyman-pma.png "$ROOT/spine-ts/webgl/example/assets/"
-
-cp -f ../stretchyman/export/stretchyman-stretchy-ik-pro.skel "$ROOT/spine-ts/webgl/example/assets/"
 
 cp -f ../mix-and-match/export/mix-and-match-pro.skel "$ROOT/spine-ts/webgl/example/assets/"
 cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$ROOT/spine-ts/webgl/example/assets/"

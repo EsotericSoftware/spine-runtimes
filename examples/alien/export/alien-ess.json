@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "5wFWXjLvxi+GryXQDbei5GgP7rU",
-	"spine": "3.8.44-beta",
+	"hash": "GI5HIy7VXSyAemjLiD8DnxDgI+E",
+	"spine": "3.8.55",
 	"x": -191.3,
 	"y": -4.51,
 	"width": 365.79,
@@ -238,10 +238,30 @@
 "animations": {
 	"death": {
 		"slots": {
+			"eye": {
+				"attachment": [
+					{ "time": 1.3667, "name": null }
+				]
+			},
 			"head": {
 				"attachment": [
 					{ "time": 0.2333, "name": "burst01" },
 					{ "time": 0.4667, "name": "burst02" },
+					{ "time": 1.3667, "name": null }
+				]
+			},
+			"eye-pupil": {
+				"attachment": [
+					{ "time": 1.3667, "name": null }
+				]
+			},
+			"blown-up-neck": {
+				"attachment": [
+					{ "time": 1.3667, "name": "blown-up-neck" }
+				]
+			},
+			"eye-highlight": {
+				"attachment": [
 					{ "time": 1.3667, "name": null }
 				]
 			},
@@ -256,26 +276,6 @@
 					{ "time": 1.5667, "name": "splat02" },
 					{ "time": 1.7333, "name": "splat03" },
 					{ "time": 1.8667, "name": null }
-				]
-			},
-			"blown-up-neck": {
-				"attachment": [
-					{ "time": 1.3667, "name": "blown-up-neck" }
-				]
-			},
-			"eye-pupil": {
-				"attachment": [
-					{ "time": 1.3667, "name": null }
-				]
-			},
-			"eye": {
-				"attachment": [
-					{ "time": 1.3667, "name": null }
-				]
-			},
-			"eye-highlight": {
-				"attachment": [
-					{ "time": 1.3667, "name": null }
 				]
 			}
 		},

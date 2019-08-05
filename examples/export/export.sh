@@ -108,9 +108,6 @@ echo "Exporting..."
 -i ../stretchyman/images -o ../stretchyman/export -n stretchyman -p atlas-1.0.json \
 -i ../stretchyman/images -o ../stretchyman/export -n stretchyman-pma -p atlas-1.0-pma.json \
 \
--i ../stretchyman/stretchyman-stretchy-ik-pro.spine -o ../stretchyman/export -e json.json \
--i ../stretchyman/stretchyman-stretchy-ik-pro.spine -o ../stretchyman/export -e binary.json \
-\
 -i ../tank/tank-pro.spine -o ../tank/export -e json.json \
 -i ../tank/tank-pro.spine -o ../tank/export -e binary.json \
 -i ../tank/images -o ../tank/export -n tank -p atlas-0.5.json \
