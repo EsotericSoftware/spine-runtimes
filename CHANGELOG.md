@@ -1,3 +1,78 @@
+# 3.9
+
+## AS3
+* **Breaking changes**
+* **Additions**
+
+### Starling
+
+## C
+* **Breaking changes**
+* **Additions**
+
+### Cocos2d-Objc
+
+### SFML
+
+## C++
+* **Breaking Changes**
+
+* **Additions**
+
+### Cocos2d-x
+
+### SFML
+
+### UE4
+
+## C# ##
+* **Breaking changes**
+
+* **Additions**
+
+### Unity
+
+* **Breaking changes**
+
+* **Additions**
+
+* **Changes of default values**
+
+* **Deprecated**
+
+* **Restructuring (Non-Breaking)**
+
+### XNA/MonoGame
+
+## Java
+* **Breaking changes**
+
+* **Additions**
+
+### libGDX
+
+## Lua
+* **Breaking changes**
+
+* **Additions**
+
+### Love2D
+
+### Corona
+
+## Typescript/Javascript
+* **Breaking changes**
+
+* **Additions**
+
+### WebGL backend
+
+### Canvas backend
+
+### Three.js backend
+
+### Player
+
 # 3.8
 
 ## AS3
@@ -145,9 +220,9 @@
       * `SpineEditorUtilities.AssetUtility` with `AssetUtility` and
       * `SpineEditorUtilities.EditorInstantiation` with `EditorInstantiation`.
   * **Timeline Support has been moved to a separate UPM Package** Previously the Spine Timeline integration was located in the `Modules/Timeline` directory and was deactivated by default, making it necessary to activate it via the Spine Preferences. Now the Timeline integration has been moved to an additional UPM package which can be found under `Modules/com.esotericsoftware.spine.timeline`.
-   * **Installation:** You can download the Unity Package Manager (UPM) package via the [download page](http://esotericsoftware.com/spine-unity-download) or find it in the [spine-runtimes/spine-unity/Modules](https://github.com/EsotericSoftware/spine-runtimes/tree/3.8-beta/spine-unity/Modules) subdirectory on the git repository. You can then either unzip (copy if using git) the package to    
+   * **Installation:** You can download the Unity Package Manager (UPM) package via the [download page](http://esotericsoftware.com/spine-unity-download) or find it in the [spine-runtimes/spine-unity/Modules](https://github.com/EsotericSoftware/spine-runtimes/tree/3.8-beta/spine-unity/Modules) subdirectory on the git repository. You can then either unzip (copy if using git) the package to
       a) the `Packages` directory in your project where it will automatically be loaded, or
-      b) to an arbitrary directory outside the Assets directory and then open Package Manager in Unity, select the `+` icon, choose `Add package from disk..` and point it to the package.json file.    
+      b) to an arbitrary directory outside the Assets directory and then open Package Manager in Unity, select the `+` icon, choose `Add package from disk..` and point it to the package.json file.
       The Project panel should now show an entry `Spine Timeline Extensions` under `Packages`. If the directory is not yet listed, you will need to close and re-open Unity to have it display the directory and its contents.
 
 * **Additions**
@@ -161,7 +236,7 @@
       * b) to an arbitrary directory outside the Assets directory and then open Package Manager in Unity, select the `+` icon, choose `Add package from disk..` and point it to the package.json file.
 
       > If you are using git and Unity 2019.2 or newer versions and receive an error that dependencies could not be resolved by the package manager (only higher versions of Unity's `Lightweight RP` package are available, e.g. `6.9.0` and up), please copy the prepared package-UNITYVERSION.json file for your Unity version (e.g. `package-2019.2.json`) over the existing package.json file to change the dependency accordingly. Unfortunately Unity's Package Manager does not provide a way to specify a version range for a dependency like "5.7.2 - 6.9.0" yet, so this manual step is necessary for git users.
-     
+
       The Project panel should now show an entry `Spine Lightweight RP Shaders` under `Packages`. If the directory is not yet listed, you will need to close and re-open Unity to have it display the directory and its contents.
     * **Usage:** The package provides two shaders specifically built for the lightweight render pipeline:
       * `Lightweight Render Pipeline/Spine/Skeleton Lit`, as a lightweight variant of the `Spine/Skeleton Lit` shader and
@@ -178,7 +253,7 @@
   * Deprecated `Modules/SlotBlendModes/SlotBlendModes` component. Changed namespace from `Spine.Unity.Modules` to `Spine.Unity.Deprecated`. Moved to `Deprecated/SlotBlendModes`.
 
 * **Restructuring (Non-Breaking)**
-  
+
   Note: The following changes will most likely not affect users of the Spine-Unity runtime as the API remains unchanged and no references are invalidated.
   * Removed duplicates of `.cginc` files in `Modules/Shaders/Sprite` that were also present in the `Modules/Shaders/Sprite/CGIncludes` directory.
   * Moved shaders from `Modules/Shaders` to `Shaders` directory.
@@ -201,7 +276,7 @@
   * Moved `Modules/YieldInstructions` directory to `Utility/YieldInstructions`.
   * Moved corresponding editor scripts of the above components to restructured directories as well.
   * Renamed inspector editor class `PointFollowerEditor` to `PointFollowerInspector` for consistency reasons.
-  
+
 ### XNA/MonoGame
 * Updated to latest MonoGame version 3.7.1
 * Rewrote example project to be cleaner and better demonstrate basic Spine features.
