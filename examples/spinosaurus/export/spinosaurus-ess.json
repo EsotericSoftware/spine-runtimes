@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "/oBn/39C9DiEo+0+HkQuS2jebw8",
-	"spine": "3.8.44-beta",
+	"hash": "Fm7ZAFF1Cq7l7KrYgoAPA18D/rI",
+	"spine": "3.8.55",
 	"x": -840,
 	"y": -766.03,
 	"width": 1680,
@@ -50,12 +50,12 @@
 "animations": {
 	"animation": {
 		"slots": {
-			"play": {
+			"settings": {
 				"color": [
-					{ "time": 1.3333, "color": "fff99dff" },
-					{ "time": 1.5667, "color": "ffffffff", "curve": "stepped" },
-					{ "time": 1.8333, "color": "ffffffff" },
-					{ "time": 2.0667, "color": "fff99dff" }
+					{ "time": 1.8667, "color": "fff99dff" },
+					{ "time": 2.1, "color": "ffffffff", "curve": "stepped" },
+					{ "time": 2.3667, "color": "ffffffff" },
+					{ "time": 2.6, "color": "fff99dff" }
 				]
 			},
 			"quit": {
@@ -64,24 +64,24 @@
 					{ "time": 2.6333, "color": "ffffffff" }
 				]
 			},
-			"leaves": {
-				"color": [
-					{ "color": "ffffff00" },
-					{ "time": 0.3333, "color": "ffffffff" }
-				]
-			},
 			"logo": {
 				"color": [
 					{ "color": "ffffff00" },
 					{ "time": 0.3333, "color": "ffffffff" }
 				]
 			},
-			"settings": {
+			"leaves": {
 				"color": [
-					{ "time": 1.8667, "color": "fff99dff" },
-					{ "time": 2.1, "color": "ffffffff", "curve": "stepped" },
-					{ "time": 2.3667, "color": "ffffffff" },
-					{ "time": 2.6, "color": "fff99dff" }
+					{ "color": "ffffff00" },
+					{ "time": 0.3333, "color": "ffffffff" }
+				]
+			},
+			"play": {
+				"color": [
+					{ "time": 1.3333, "color": "fff99dff" },
+					{ "time": 1.5667, "color": "ffffffff", "curve": "stepped" },
+					{ "time": 1.8333, "color": "ffffffff" },
+					{ "time": 2.0667, "color": "fff99dff" }
 				]
 			}
 		},

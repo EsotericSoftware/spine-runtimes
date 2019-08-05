@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "E3PAF6YBVsi9Z1sx6PPvmTFTEqQ",
-	"spine": "3.8.44-beta",
+	"hash": "ta3kc25Djpzf9HaoV3V1qYL4H+k",
+	"spine": "3.8.55",
 	"x": -95.43,
 	"y": -18.79,
 	"width": 196.03,
@@ -125,15 +125,6 @@
 "animations": {
 	"run": {
 		"slots": {
-			"right foot": {
-				"attachment": [
-					{ "name": "right-foot-side" },
-					{ "time": 0.1667, "name": "right-foot-bent01" },
-					{ "time": 0.2333, "name": "right-foot-bent02" },
-					{ "time": 0.3, "name": "right-foot-bent01" },
-					{ "time": 0.4333, "name": "right-foot-side" }
-				]
-			},
 			"hood end1": {
 				"attachment": [
 					{ "name": "hood-end1b" },
@@ -153,6 +144,15 @@
 					{ "time": 0.8, "name": "hood-end1d" },
 					{ "time": 0.8333, "name": "hood-end1a" },
 					{ "time": 0.8667, "name": "hood-end1b" }
+				]
+			},
+			"right foot": {
+				"attachment": [
+					{ "name": "right-foot-side" },
+					{ "time": 0.1667, "name": "right-foot-bent01" },
+					{ "time": 0.2333, "name": "right-foot-bent02" },
+					{ "time": 0.3, "name": "right-foot-bent01" },
+					{ "time": 0.4333, "name": "right-foot-side" }
 				]
 			},
 			"hood end2": {

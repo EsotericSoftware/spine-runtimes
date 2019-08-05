@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "XIf0WIqvG88R2IljysIpGbv6Odo",
-	"spine": "3.8.44-beta",
+	"hash": "MOhkPvw8nLOrjuLm/U98aFMannI",
+	"spine": "3.8.55",
 	"x": -221.27,
 	"y": -8.57,
 	"width": 470.72,
@@ -279,16 +279,16 @@
 "animations": {
 	"death": {
 		"slots": {
-			"front-fist": {
-				"attachment": [
-					{ "name": "front-fist-open" }
-				]
-			},
 			"mouth": {
 				"attachment": [
 					{ "name": "mouth-oooo" },
 					{ "time": 2.2333, "name": "mouth-grind" },
 					{ "time": 4.5333, "name": "mouth-oooo" }
+				]
+			},
+			"front-fist": {
+				"attachment": [
+					{ "name": "front-fist-open" }
 				]
 			},
 			"eye": {
@@ -483,15 +483,15 @@
 	},
 	"hit": {
 		"slots": {
-			"front-fist": {
-				"attachment": [
-					{ "time": 0.1667, "name": "front-fist-open" }
-				]
-			},
 			"mouth": {
 				"attachment": [
 					{ "name": "mouth-grind" },
 					{ "time": 0.3333, "name": "mouth-smile" }
+				]
+			},
+			"front-fist": {
+				"attachment": [
+					{ "time": 0.1667, "name": "front-fist-open" }
 				]
 			}
 		},
@@ -767,16 +767,16 @@
 	},
 	"jump": {
 		"slots": {
+			"mouth": {
+				"attachment": [
+					{ "name": "mouth-grind" }
+				]
+			},
 			"front-fist": {
 				"attachment": [
 					{ "name": "front-fist-open" },
 					{ "time": 0.2, "name": "front-fist-closed" },
 					{ "time": 0.6667, "name": "front-fist-open" }
-				]
-			},
-			"mouth": {
-				"attachment": [
-					{ "name": "mouth-grind" }
 				]
 			}
 		},

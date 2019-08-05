@@ -78,7 +78,6 @@ function init () {
 	assetManager.loadTextureAtlas("assets/vine-pma.atlas");
 	assetManager.loadBinary("assets/stretchyman-pro.skel");
 	assetManager.loadTextureAtlas("assets/stretchyman-pma.atlas");
-	assetManager.loadBinary("assets/stretchyman-stretchy-ik-pro.skel");
 	assetManager.loadBinary("assets/coin-pro.skel");
 	assetManager.loadTextureAtlas("assets/coin-pma.atlas");
 	requestAnimationFrame(load);
@@ -93,7 +92,6 @@ function load () {
 		skeletons["goblins"] = loadSkeleton("goblins-pro", "walk", true, "goblin");
 		skeletons["vine"] = loadSkeleton("vine-pro", "grow", true);
 		skeletons["stretchyman"] = loadSkeleton("stretchyman-pro", "sneak", true);
-		skeletons["stretchyman-stretchy-ik"] = loadSkeleton("stretchyman-stretchy-ik-pro", "sneak", true);
 		skeletons["coin"] = loadSkeleton("coin-pro", "animation", true);
 		setupUI();
 		requestAnimationFrame(render);
@@ -106,7 +104,7 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	if (skin === undefined) skin = "default";
 
 	// Load the texture atlas using name.atlas from the AssetManager.
-	atlas = assetManager.get("assets/" + name.replace("-ess", "").replace("-pro", "").replace("-stretchy-ik", "") + (premultipliedAlpha ? "-pma": "") + ".atlas");
+	atlas = assetManager.get("assets/" + name.replace("-ess", "").replace("-pro", "") + (premultipliedAlpha ? "-pma": "") + ".atlas");
 
 	// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
 	atlasLoader = new spine.AtlasAttachmentLoader(atlas);

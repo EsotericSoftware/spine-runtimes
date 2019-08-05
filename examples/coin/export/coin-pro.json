@@ -1,13 +1,13 @@
 {
 "skeleton": {
-	"hash": "UAXc6AgX0g45vxO38bHIVx5jbNo",
-	"spine": "3.8.44-beta",
+	"hash": "Dq1Q0p2Nq9WJ9gmLxp3FURbKp7Y",
+	"spine": "3.8.55",
 	"x": -152.5,
 	"y": -151,
 	"width": 305,
 	"height": 302,
 	"images": "./images/",
-	"audio": "C:/Program Files (x86)/Spine/examples/coin-new"
+	"audio": ""
 },
 "bones": [
 	{ "name": "root" },
@@ -62,23 +62,6 @@
 "animations": {
 	"animation": {
 		"slots": {
-			"coin-front-shine": {
-				"twoColor": [
-					{ "light": "7d7d7dff", "dark": "000000" },
-					{ "time": 0.2667, "light": "000000ff", "dark": "7e7e7e" },
-					{ "time": 0.664, "light": "000000ff", "dark": "000000" },
-					{ "time": 1.0333, "light": "7f7f7fff", "dark": "000000" },
-					{ "time": 1.3333, "light": "404040ff", "dark": "000000" },
-					{ "time": 1.6, "light": "000000ff", "dark": "7e7e7e" },
-					{ "time": 2.0022, "light": "000000ff", "dark": "000000" },
-					{ "time": 2.4, "light": "7f7f7fff", "dark": "000000" },
-					{ "time": 2.6667, "light": "7d7d7dff", "dark": "000000" }
-				],
-				"attachment": [
-					{ "time": 0.6667, "name": "coin-front-shine-spineboy" },
-					{ "time": 2, "name": "coin-front-shine-logo" }
-				]
-			},
 			"coin-front-texture": {
 				"color": [
 					{ "color": "858585ff" },
@@ -96,6 +79,23 @@
 				"attachment": [
 					{ "time": 0.6667, "name": "coin-front-spineboy" },
 					{ "time": 2, "name": "coin-front-logo" }
+				]
+			},
+			"coin-front-shine": {
+				"twoColor": [
+					{ "light": "7d7d7dff", "dark": "000000" },
+					{ "time": 0.2667, "light": "000000ff", "dark": "7e7e7e" },
+					{ "time": 0.664, "light": "000000ff", "dark": "000000" },
+					{ "time": 1.0333, "light": "7f7f7fff", "dark": "000000" },
+					{ "time": 1.3333, "light": "404040ff", "dark": "000000" },
+					{ "time": 1.6, "light": "000000ff", "dark": "7e7e7e" },
+					{ "time": 2.0022, "light": "000000ff", "dark": "000000" },
+					{ "time": 2.4, "light": "7f7f7fff", "dark": "000000" },
+					{ "time": 2.6667, "light": "7d7d7dff", "dark": "000000" }
+				],
+				"attachment": [
+					{ "time": 0.6667, "name": "coin-front-shine-spineboy" },
+					{ "time": 2, "name": "coin-front-shine-logo" }
 				]
 			}
 		},
