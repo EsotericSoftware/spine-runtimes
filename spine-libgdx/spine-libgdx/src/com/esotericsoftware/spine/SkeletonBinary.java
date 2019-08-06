@@ -328,12 +328,18 @@ public class SkeletonBinary {
 		return skeletonData;
 	}
 
+	/** @return May be null. */
 	private Skin readSkin (SkeletonInput input, SkeletonData skeletonData, boolean defaultSkin, boolean nonessential)
 		throws IOException {
 
-		Skin skin = new Skin(defaultSkin ? "default" : input.readStringRef());
-
-		if (!defaultSkin) {
+		Skin skin;
+		int slotCount;
+		if (defaultSkin) {
+			slotCount = input.readInt(true);
+			if (slotCount == 0) return null;
+			skin = new Skin("default");
+		} else {
+			skin = new Skin(input.readStringRef());
 			Object[] bones = skin.bones.setSize(input.readInt(true));
 			for (int i = 0, n = skin.bones.size; i < n; i++)
 				bones[i] = skeletonData.bones.get(input.readInt(true));
@@ -345,9 +351,11 @@ public class SkeletonBinary {
 			for (int i = 0, n = input.readInt(true); i < n; i++)
 				skin.constraints.add(skeletonData.pathConstraints.get(input.readInt(true)));
 			skin.constraints.shrink();
+
+			slotCount = input.readInt(true);
 		}
 
-		for (int i = 0, n = input.readInt(true); i < n; i++) {
+		for (int i = 0, n = slotCount; i < n; i++) {
 			int slotIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				String name = input.readStringRef();
