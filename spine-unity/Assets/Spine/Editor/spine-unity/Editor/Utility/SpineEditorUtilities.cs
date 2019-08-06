@@ -97,8 +97,13 @@ namespace Spine.Unity.Editor {
 			editorPath = Path.GetDirectoryName(assetPath).Replace("\\", "/");
 
 			assets = AssetDatabase.FindAssets("t:texture icon-subMeshRenderer");
-			assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
-			editorGUIPath = Path.GetDirectoryName(assetPath).Replace("\\", "/");
+			if (assets.Length > 0) {
+				assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
+				editorGUIPath = Path.GetDirectoryName(assetPath).Replace("\\", "/");
+			}
+			else {
+				editorGUIPath = editorPath.Replace("/Utility", "/GUI");
+			}
 			Icons.Initialize();
 
 			// Drag and Drop
