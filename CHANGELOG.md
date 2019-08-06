@@ -204,7 +204,7 @@
 ### Unity
 
 * **Breaking changes**
-  * **Officially supported Unity versions are 2017.1-2019.1**.
+  * **Officially supported Unity versions are 2017.1-2019.2**.
   * **Spine `.asmdef` files are again active by default**. They have previously been deactivated to `.txt` extension which is now no longer necessary.
   * **Removed PoseSkeleton() and PoseWithAnimation()** extension methods to prevent issues where animations are not mixed out. Problem was that these methods did not set AnimationState, leaving incorrect state at e.g. attachments enabled at slots when starting subsequent animations. As a replacement you can use `AnimationState.ClearTrack(0);` followed by `var entry = AnimationState.SetAnimation(0, animation, loop); entry.TrackTime = time` to achieve similar behaviour.
   * **The `Shadow alpha cutoff` shader parameter is now respecting slot-color alpha** values at all Spine shaders. A fragment's texture color alpha is multiplied with slot-color alpha before the result is tested against the `Shadow alpha cutoff` threshold.
