@@ -355,7 +355,7 @@ public class SkeletonBinary {
 			slotCount = input.readInt(true);
 		}
 
-		for (int i = 0, n = slotCount; i < n; i++) {
+		for (int i = 0; i < slotCount; i++) {
 			int slotIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				String name = input.readStringRef();
