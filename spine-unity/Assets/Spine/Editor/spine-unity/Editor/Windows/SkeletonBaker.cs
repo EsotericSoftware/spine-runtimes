@@ -1301,9 +1301,14 @@ namespace Spine.Unity.Editor {
 			var animEvents = new List<AnimationEvent>();
 			for (int i = 0, n = frames.Length; i < n; i++) {
 				var spineEvent = events[i];
+				string eventName = spineEvent.Data.Name;
+				if (SpineEditorUtilities.Preferences.mecanimEventIncludeFolderName)
+					eventName = eventName.Replace("/", ""); // calls method FolderNameEventName()
+				else
+					eventName = eventName.Substring(eventName.LastIndexOf('/') + 1); // calls method EventName()
 				var unityAnimationEvent = new AnimationEvent {
 					time = frames[i],
-					functionName = spineEvent.Data.Name,
+					functionName = eventName,
 					messageOptions = eventOptions
 				};
 
