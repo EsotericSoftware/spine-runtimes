@@ -239,7 +239,7 @@ namespace Spine.Unity.Editor {
 				}
 
 				EditorGUILayout.Space();
-				EditorGUILayout.LabelField("Mecanim Settings", EditorStyles.boldLabel);
+				EditorGUILayout.LabelField("Mecanim Bake Settings", EditorStyles.boldLabel);
 				{
 					SpineEditorUtilities.BoolPrefsField(ref mecanimEventIncludeFolderName, MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY, new GUIContent("Include Folder Name in Event", "When enabled, Mecanim events will call methods named 'FolderNameEventName', when disabled it will call 'EventName'."));
 				}
