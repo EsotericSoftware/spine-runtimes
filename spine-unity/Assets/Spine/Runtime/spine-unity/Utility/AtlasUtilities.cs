@@ -333,9 +333,9 @@ namespace Spine.Unity.AttachmentTools {
 			var originalRegions = new List<AtlasRegion>();
 			int newRegionIndex = 0;
 			
-			foreach (DictionaryEntry skinEntry in skinAttachments) {
-				var originalKey = (Skin.SkinEntry)skinEntry.Key;
-				var originalAttachment = (Attachment)skinEntry.Value;
+			foreach (var skinEntry in skinAttachments) {
+				var originalKey = skinEntry.Key;
+				var originalAttachment = skinEntry.Value;
 
 				Attachment newAttachment;
 				if (IsRenderable(originalAttachment)) {

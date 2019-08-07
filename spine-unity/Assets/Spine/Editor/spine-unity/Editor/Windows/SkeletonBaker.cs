@@ -339,28 +339,14 @@ namespace Spine.Unity.Editor {
 					slotTransform.parent = prefabRoot.transform;
 					slotTable.Add(slotData.Name, slotTransform);
 
-					List<Attachment> attachments = new List<Attachment>();
-					List<string> attachmentNames = new List<string>();
-
 					var skinEntries = new List<Skin.SkinEntry>();
 					skin.GetAttachments(slotIndex, skinEntries);
-					foreach (var entry in skinEntries) {
-						attachments.Add(entry.Attachment);
-						attachmentNames.Add(entry.Name);
-					}
-
-					if (skin != skeletonData.DefaultSkin) {
-						skinEntries.Clear();
+					if (skin != skeletonData.DefaultSkin)
 						skeletonData.DefaultSkin.GetAttachments(slotIndex, skinEntries);
-						foreach (var entry in skinEntries) {
-							attachments.Add(entry.Attachment);
-							attachmentNames.Add(entry.Name);
-						}
-					}
 
-					for (int a = 0; a < attachments.Count; a++) {
-						var attachment = attachments[a];
-						string attachmentName = attachmentNames[a];
+					for (int a = 0; a < skinEntries.Count; a++) {
+						var attachment = skinEntries[a].Attachment;
+						string attachmentName = skinEntries[a].Name;
 						string attachmentMeshName = "[" + slotData.Name + "] " + attachmentName;
 						Vector3 offset = Vector3.zero;
 						float rotation = 0;
