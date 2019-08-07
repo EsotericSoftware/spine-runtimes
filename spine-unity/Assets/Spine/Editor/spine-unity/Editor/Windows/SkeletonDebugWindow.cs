@@ -84,7 +84,7 @@ namespace Spine.Unity.Editor {
 		[SpineBone(dataField:"skeletonRenderer")]
 		public string boneName;
 
-		readonly Dictionary<Slot, List<Attachment>> attachmentTable = new Dictionary<Slot, List<Attachment>>();
+		readonly Dictionary<Slot, List<Skin.SkinEntry>> attachmentTable = new Dictionary<Slot, List<Skin.SkinEntry>>();
 
 		static bool staticLostValues = true;
 
@@ -338,7 +338,7 @@ namespace Spine.Unity.Editor {
 						}
 
 						int baseIndent = EditorGUI.indentLevel;
-						foreach (KeyValuePair<Slot, List<Attachment>> pair in attachmentTable) {
+						foreach (KeyValuePair<Slot, List<Skin.SkinEntry>> pair in attachmentTable) {
 							Slot slot = pair.Key;
 
 							using (new EditorGUILayout.HorizontalScope()) {
@@ -352,7 +352,8 @@ namespace Spine.Unity.Editor {
 								}
 							}
 
-							foreach (var attachment in pair.Value) {
+							foreach (var skinEntry in pair.Value) {
+								var attachment = skinEntry.Attachment;
 								GUI.contentColor = slot.Attachment == attachment ? Color.white : Color.grey;
 								EditorGUI.indentLevel = baseIndent + 2;
 								var icon = Icons.GetAttachmentIcon(attachment);
@@ -577,21 +578,12 @@ namespace Spine.Unity.Editor {
 
 			attachmentTable.Clear();
 			for (int i = skeleton.Slots.Count - 1; i >= 0; i--) {
-				var attachments = new List<Attachment>();
+				var attachments = new List<Skin.SkinEntry>();
 				attachmentTable.Add(skeleton.Slots.Items[i], attachments);
 				// Add skin attachments.
-				var skinEntries = new List<Skin.SkinEntry>();
-				skin.GetAttachments(i, skinEntries);
-				foreach (var entry in skinEntries) {
-					attachments.Add(entry.Attachment);
-				}
-				if (notDefaultSkin) { // Add default skin attachments.
-					skinEntries.Clear();
-					defaultSkin.GetAttachments(i, skinEntries);
-					foreach (var entry in skinEntries) {
-						attachments.Add(entry.Attachment);
-					}
-				}
+				skin.GetAttachments(i, attachments);
+				if (notDefaultSkin) // Add default skin attachments.
+					defaultSkin.GetAttachments(i, attachments);
 			}
 
 			activeSkin = skeleton.Skin;

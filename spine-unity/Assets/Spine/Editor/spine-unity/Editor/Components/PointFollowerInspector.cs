@@ -111,7 +111,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void DrawPointsInSkin (Skin skin, Skeleton skeleton, Transform transform) {
-			foreach (DictionaryEntry skinEntry in skin.Attachments) {
+			foreach (var skinEntry in skin.Attachments) {
 				var attachment = skinEntry.Value as PointAttachment;
 				if (attachment != null) {
 					var skinKey = (Skin.SkinEntry)skinEntry.Key;
