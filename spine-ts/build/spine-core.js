@@ -4222,8 +4222,16 @@ var spine;
 			return skeletonData;
 		};
 		SkeletonBinary.prototype.readSkin = function (input, skeletonData, defaultSkin, nonessential) {
-			var skin = new spine.Skin(defaultSkin ? "default" : input.readStringRef());
-			if (!defaultSkin) {
+			var skin = null;
+			var slotCount = 0;
+			if (defaultSkin) {
+				slotCount = input.readInt(true);
+				if (slotCount == 0)
+					return null;
+				skin = new spine.Skin("default");
+			}
+			else {
+				skin = new spine.Skin(input.readStringRef());
 				skin.bones.length = input.readInt(true);
 				for (var i = 0, n = skin.bones.length; i < n; i++)
 					skin.bones[i] = skeletonData.bones[input.readInt(true)];
@@ -4233,8 +4241,9 @@ var spine;
 					skin.constraints.push(skeletonData.transformConstraints[input.readInt(true)]);
 				for (var i = 0, n = input.readInt(true); i < n; i++)
 					skin.constraints.push(skeletonData.pathConstraints[input.readInt(true)]);
+				slotCount = input.readInt(true);
 			}
-			for (var i = 0, n = input.readInt(true); i < n; i++) {
+			for (var i = 0; i < slotCount; i++) {
 				var slotIndex = input.readInt(true);
 				for (var ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					var name_3 = input.readStringRef();
