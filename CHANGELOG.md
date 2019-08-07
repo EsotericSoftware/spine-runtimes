@@ -183,6 +183,7 @@
   * Renamed `Slot.AttachmentVertices` to `Slot.Deform`.
   * Changed the `.json` curve format and added more assumptions for omitted values, reducing the average size of JSON exports.
   * Renamed `Skin.AddAttachment()` to `Skin.SetAttachment()`.
+  * Removed `FindAttachmentsForSlot(int slotIndex, List<Attachment> attachments)` and `FindNamesForSlot (int slotIndex, List<string> names)` and replaced it with `Skin.GetAttachments(int slotIndex, List<SkinEntry> attachments)` which returns the combined `SkinEntry` object holding both name and attachment.
   * Removed `VertexAttachment.ApplyDeform()` and replaced it with `VertexAttachment.DeformAttachment`. The attachment set on this field is used to decide if a `DeformTimeline` should be applied to the attachment active on the slot to which the timeline is applied.
   * Removed `inheritDeform` field, getter, and setter from `MeshAttachment`.
   * Changed `.skel` binary format, added a string table. References to strings in the data resolve to this string table, reducing storage size of binary files considerably.
@@ -194,7 +195,7 @@
   * Added skin-specific bones and constraints which are only updated if the skeleton's current skin contains them.
   * Improved Skin API to make it easier to handle mix-and-match use cases.
     * Added `Skin.GetAttachments()`. Returns all attachments in the skin.
-    * Added `Skin.GetAttachments(int slotIndex, List<SkinEntry> attachments)`. Returns all attachements in the skin for the given slot index.
+    * Added `Skin.GetAttachments(int slotIndex, List<SkinEntry> attachments)`. Returns all attachements in the skin for the given slot index. This method replaces `FindAttachmentsForSlot` and `FindNamesForSlot`.
     * Added `Skin.AddSkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin.
     * Added `Skin.CopySkin(Skin skin)`. Adds all attachments, bones, and skins from the specified skin to this skin. `VertexAttachment` are shallowly copied and will retain any parent mesh relationship. All other attachment types are deep copied.
   * Added `Attachment.Copy()` to all attachment type implementations. This lets you deep copy an attachment to modify it independently from the original, i.e. when programmatically changing texture coordinates or mesh vertices.
