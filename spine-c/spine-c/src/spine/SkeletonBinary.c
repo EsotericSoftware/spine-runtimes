@@ -825,12 +825,15 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 
 spSkin* spSkeletonBinary_readSkin(spSkeletonBinary* self, _dataInput* input, int/*bool*/ defaultSkin,
 		spSkeletonData* skeletonData, int/*bool*/ nonessential) {
-	spSkin* skin;
-	int i, n, ii, nn;
-	const char* skinName = defaultSkin ? "default" : readStringRef(input, skeletonData);
-	skin = spSkin_create(skinName);
+	spSkin *skin;
+	int i, n, ii, nn, slotCount;
 
-	if (!defaultSkin) {
+	if (defaultSkin) {
+		slotCount = readVarint(input, 1);
+		if (slotCount == 0) return 0;
+		skin = spSkin_create("default");
+	} else {
+		skin = spSkin_create(readStringRef(input, skeletonData));
 		for (i = 0, n = readVarint(input, 1); i < n; i++)
 			spBoneDataArray_add(skin->bones, skeletonData->bones[readVarint(input, 1)]);
 
@@ -842,9 +845,11 @@ spSkin* spSkeletonBinary_readSkin(spSkeletonBinary* self, _dataInput* input, int
 
 		for (i = 0, n = readVarint(input, 1); i < n; i++)
 			spPathConstraintDataArray_add(skin->pathConstraints, skeletonData->pathConstraints[readVarint(input, 1)]);
+
+		slotCount = readVarint(input, 1);
 	}
 
-	for (i = 0, n = readVarint(input, 1); i < n; ++i) {
+	for (i = 0; i < slotCount; ++i) {
 		int slotIndex = readVarint(input, 1);
 		for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii) {
 			const char* name = readStringRef(input, skeletonData);
