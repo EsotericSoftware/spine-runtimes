@@ -36,10 +36,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-
-#if UNITY_EDITOR
 using System.Linq;
-#endif
 
 namespace Spine.Collections
 {
@@ -566,7 +563,6 @@ namespace Spine.Collections
 		}
 	}
 
-	#if UNITY_EDITOR
 	internal class OrderedDictionaryDebugView<TKey, TValue>
 	{
 		private readonly OrderedDictionary<TKey, TValue> dictionary;
@@ -582,7 +578,6 @@ namespace Spine.Collections
 			}
 		}
 	}
-	#endif
 
 	/// <summary>
 	/// Provides extensions methods for constructing instances of <see cref="OrderedDictionary{TKey, TValue}"/>.
