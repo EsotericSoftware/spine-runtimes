@@ -73,7 +73,7 @@ namespace Spine {
 			this.attachmentLoader = attachmentLoader;
 			Scale = 1;
 		}
-			
+
 		#if !ISUNITY && WINDOWS_STOREAPP
 		private async Task<SkeletonData> ReadFile(string path) {
 			var folder = Windows.ApplicationModel.Package.Current.InstalledLocation;
@@ -160,7 +160,7 @@ namespace Spine {
 				String name = input.ReadString();
 				BoneData parent = i == 0 ? null : skeletonData.bones.Items[input.ReadInt(true)];
 				BoneData data = new BoneData(i, name, parent);
-				data.rotation = input.ReadFloat();		
+				data.rotation = input.ReadFloat();
 				data.x = input.ReadFloat() * scale;
 				data.y = input.ReadFloat() * scale;
 				data.scaleX = input.ReadFloat();
@@ -314,7 +314,7 @@ namespace Spine {
 			o = skeletonData.animations.Resize(n = input.ReadInt(true)).Items;
 			for (int i = 0; i < n; i++)
 				o[i] = ReadAnimation(input.ReadString(), input, skeletonData);
-			
+
 			return skeletonData;
 		}
 
@@ -322,13 +322,19 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		private Skin ReadSkin (SkeletonInput input, SkeletonData skeletonData, bool defaultSkin, bool nonessential) {
 
-			Skin skin = new Skin(defaultSkin ? "default" : input.ReadStringRef());
+			Skin skin;
+			int slotCount;
 
-			if (!defaultSkin) {
+			if (defaultSkin) {
+				slotCount = input.ReadInt(true);
+				if (slotCount == 0) return null;
+				skin = new Skin("default"));
+			} else {
+				skin = new Skin(input.ReadStringRef());
 				Object[] bones = skin.bones.Resize(input.ReadInt(true)).Items;
 				for (int i = 0, n = skin.bones.Count; i < n; i++)
 					bones[i] = skeletonData.bones.Items[input.ReadInt(true)];
-				
+
 				for (int i = 0, n = input.ReadInt(true); i < n; i++)
 					skin.constraints.Add(skeletonData.ikConstraints.Items[input.ReadInt(true)]);
 				for (int i = 0, n = input.ReadInt(true); i < n; i++)
@@ -336,8 +342,9 @@ namespace Spine {
 				for (int i = 0, n = input.ReadInt(true); i < n; i++)
 					skin.constraints.Add(skeletonData.pathConstraints.Items[input.ReadInt(true)]);
 				skin.constraints.TrimExcess();
+				slotCount = input.ReadInt(true);
 			}
-			for (int i = 0, n = input.ReadInt(true); i < n; i++) {
+			for (int i = 0; i < slotCount; i++) {
 				int slotIndex = input.ReadInt(true);
 				for (int ii = 0, nn = input.ReadInt(true); ii < nn; ii++) {
 					String name = input.ReadStringRef();
@@ -360,7 +367,7 @@ namespace Spine {
 			switch (type) {
 			case AttachmentType.Region: {
 					String path = input.ReadStringRef();
-					float rotation = input.ReadFloat();		
+					float rotation = input.ReadFloat();
 					float x = input.ReadFloat();
 					float y = input.ReadFloat();
 					float scaleX = input.ReadFloat();
@@ -391,7 +398,7 @@ namespace Spine {
 					int vertexCount = input.ReadInt(true);
 					Vertices vertices = ReadVertices(input, vertexCount);
 					if (nonessential) input.ReadInt(); //int color = nonessential ? input.ReadInt() : 0; // Avoid unused local warning.
-					
+
 					BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, name);
 					if (box == null) return null;
 					box.worldVerticesLength = vertexCount << 1;
@@ -484,7 +491,7 @@ namespace Spine {
 					path.bones = vertices.bones;
 					path.lengths = lengths;
 					// skipped porting: if (nonessential) Color.rgba8888ToColor(path.getColor(), color);
-					return path;                    
+					return path;
 				}
 			case AttachmentType.Point: {
 					float rotation = input.ReadFloat();
@@ -560,7 +567,7 @@ namespace Spine {
 		private int[] ReadShortArray (SkeletonInput input) {
 			int n = input.ReadInt(true);
 			int[] array = new int[n];
-			for (int i = 0; i < n; i++) 
+			for (int i = 0; i < n; i++)
 				array[i] = (input.ReadByte() << 8) | input.ReadByte();
 			return array;
 		}
@@ -719,7 +726,7 @@ namespace Spine {
 								float timelineScale = 1;
 								if (timelineType == PATH_SPACING) {
 									timeline = new PathConstraintSpacingTimeline(frameCount);
-									if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed) timelineScale = scale; 
+									if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed) timelineScale = scale;
 								} else {
 									timeline = new PathConstraintPositionTimeline(frameCount);
 									if (data.positionMode == PositionMode.Fixed) timelineScale = scale;
