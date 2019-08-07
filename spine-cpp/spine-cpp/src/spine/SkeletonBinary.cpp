@@ -457,9 +457,14 @@ int SkeletonBinary::readVarint(DataInput *input, bool optimizePositive) {
 
 Skin *
 SkeletonBinary::readSkin(DataInput *input, bool defaultSkin, SkeletonData *skeletonData, bool nonessential) {
-	Skin *skin = new(__FILE__, __LINE__) Skin(defaultSkin ? "default" : readStringRef(input, skeletonData));
-
-	if (!defaultSkin) {
+	Skin *skin;
+	int slotCount = 0;
+	if (defaultSkin) {
+		slotCount = readVarint(input, true);
+		if (slotCount == 0) return NULL;
+		skin = new(__FILE__, __LINE__) Skin("default");
+	} else {
+		skin = new(__FILE__, __LINE__) Skin(readStringRef(input, skeletonData));
 		for (int i = 0, n = readVarint(input, true); i < n; i++)
 			skin->getBones().add(skeletonData->_bones[readVarint(input, true)]);
 
@@ -471,9 +476,10 @@ SkeletonBinary::readSkin(DataInput *input, bool defaultSkin, SkeletonData *skele
 
 		for (int i = 0, n = readVarint(input, true); i < n; i++)
 			skin->getConstraints().add(skeletonData->_pathConstraints[readVarint(input, true)]);
+		slotCount = readVarint(input, true);
 	}
 
-	for (int i = 0, n = readVarint(input, true); i < n; ++i) {
+	for (int i = 0; i < slotCount; ++i) {
 		int slotIndex = readVarint(input, true);
 		for (int ii = 0, nn = readVarint(input, true); ii < nn; ++ii) {
 			String name(readStringRef(input, skeletonData));

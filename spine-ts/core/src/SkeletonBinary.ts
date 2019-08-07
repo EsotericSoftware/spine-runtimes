@@ -245,9 +245,15 @@ module spine {
 		}
 
 		private readSkin (input: BinaryInput, skeletonData: SkeletonData, defaultSkin: boolean, nonessential: boolean): Skin {
-			let skin = new Skin(defaultSkin ? "default" : input.readStringRef());
+			let skin = null;
+			let slotCount = 0;
 
-			if (!defaultSkin) {
+			if (defaultSkin) {
+				slotCount = input.readInt(true)
+				if (slotCount == 0) return null;
+				skin = new Skin("default");
+			} else {
+				skin = new Skin(input.readStringRef());
 				skin.bones.length = input.readInt(true);
 				for (let i = 0, n = skin.bones.length; i < n; i++)
 					skin.bones[i] = skeletonData.bones[input.readInt(true)];
@@ -258,9 +264,11 @@ module spine {
 					skin.constraints.push(skeletonData.transformConstraints[input.readInt(true)]);
 				for (let i = 0, n = input.readInt(true); i < n; i++)
 					skin.constraints.push(skeletonData.pathConstraints[input.readInt(true)]);
+
+				slotCount = input.readInt(true);
 			}
 
-			for (let i = 0, n = input.readInt(true); i < n; i++) {
+			for (let i = 0; i < slotCount; i++) {
 				let slotIndex = input.readInt(true);
 				for (let ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					let name = input.readStringRef();
