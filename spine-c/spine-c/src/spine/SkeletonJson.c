@@ -110,6 +110,14 @@ static void readCurve (Json* frame, spCurveTimeline* timeline, int frameIndex) {
 	if (!curve) return;
 	if (curve->type == Json_String && strcmp(curve->valueString, "stepped") == 0)
 		spCurveTimeline_setStepped(timeline, frameIndex);
+	else if (curve->type == Json_Array) {
+		Json* child0 = curve->child;
+		Json* child1 = child0->next;
+		Json* child2 = child1->next;
+		Json* child3 = child2->next;
+		spCurveTimeline_setCurve(timeline, frameIndex, child0->valueFloat, child1->valueFloat, child2->valueFloat,
+			child3->valueFloat);
+	}
 	else {
 		float c1 = Json_getFloat(frame, "curve", 0);
 		float c2 = Json_getFloat(frame, "c2", 0);
@@ -383,6 +391,10 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	/* Deform timelines. */
 	for (constraintMap = deformJson ? deformJson->child : 0; constraintMap; constraintMap = constraintMap->next) {
 		spSkin* skin = spSkeletonData_findSkin(skeletonData, constraintMap->name);
+
+		if (!skin && strcmp(constraintMap->name, "default") == 0)
+			skin = skeletonData->defaultSkin;
+
 		for (slotMap = constraintMap->child; slotMap; slotMap = slotMap->next) {
 			int slotIndex = spSkeletonData_findSlotIndex(skeletonData, slotMap->name);
 			Json* timelineMap;
@@ -587,6 +599,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	int i, ii;
 	spSkeletonData* skeletonData;
 	Json *root, *skeleton, *bones, *boneMap, *ik, *transform, *pathJson, *slots, *skins, *animations, *events;
+	int verMajor, verMinor, verPatch, verFields;
 	_spSkeletonJson* internal = SUB_CAST(_spSkeletonJson, self);
 
 	FREE(self->error);
@@ -606,6 +619,27 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	if (skeleton) {
 		MALLOC_STR(skeletonData->hash, Json_getString(skeleton, "hash", 0));
 		MALLOC_STR(skeletonData->version, Json_getString(skeleton, "spine", 0));
+
+		verFields = sscanf(skeletonData->version, "%d.%d.%d", &verMajor, &verMinor, &verPatch);
+
+		if (verFields != 3) {
+			spSkeletonData_dispose(skeletonData);
+			_spSkeletonJson_setError(self, 0, "Invalid version field: ", Json_getString(skeleton, "spine", 0));
+			return 0;
+		}
+
+		if (verMajor < 3 || (verMajor == 3 && verMinor < 6)) {
+			spSkeletonData_dispose(skeletonData);
+			_spSkeletonJson_setError(self, 0, "Unsupported old version: ", Json_getString(skeleton, "spine", 0));
+			return 0;
+		}
+
+		if (verMajor > 3 || (verMajor == 3 && verMinor > 8)) {
+			spSkeletonData_dispose(skeletonData);
+			_spSkeletonJson_setError(self, 0, "Unsupported future version: ", Json_getString(skeleton, "spine", 0));
+			return 0;
+		}
+
 		skeletonData->x = Json_getFloat(skeleton, "x", 0);
 		skeletonData->y = Json_getFloat(skeleton, "y", 0);
 		skeletonData->width = Json_getFloat(skeleton, "width", 0);
@@ -879,7 +913,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			Json *attachmentsMap;
 			Json *curves;
 			Json *skinPart;
-			spSkin *skin = spSkin_create(Json_getString(skinMap, "name", ""));
+			spSkin *skin = spSkin_create(Json_getString(skinMap, "name", skinMap->name));
 
 			skinPart = Json_getItem(skinMap, "bones");
 			if (skinPart) {
@@ -936,7 +970,12 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			skeletonData->skins[skeletonData->skinsCount++] = skin;
 			if (strcmp(skin->name, "default") == 0) skeletonData->defaultSkin = skin;
 
-			for (attachmentsMap = Json_getItem(skinMap, "attachments")->child; attachmentsMap; attachmentsMap = attachmentsMap->next) {
+			Json *skinAttachments = Json_getItem(skinMap, "attachments");
+
+			if (!skinAttachments)
+				skinAttachments = skinMap;
+
+			for (attachmentsMap = skinAttachments->child; attachmentsMap; attachmentsMap = attachmentsMap->next) {
 				spSlotData* slot = spSkeletonData_findSlot(skeletonData, attachmentsMap->name);
 				Json *attachmentMap;
 

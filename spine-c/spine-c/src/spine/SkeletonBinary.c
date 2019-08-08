@@ -34,6 +34,9 @@
 #include <spine/Animation.h>
 #include <spine/Array.h>
 
+int spCurrentlyLoadingBefore_3_7;
+int spCurrentlyLoadingBefore_3_8;
+
 typedef struct {
 	const unsigned char* cursor; 
 	const unsigned char* end;
@@ -154,6 +157,12 @@ char* readString (_dataInput* input) {
 }
 
 static char* readStringRef(_dataInput* input, spSkeletonData* skeletonData) {
+	if (spCurrentlyLoadingBefore_3_8) {
+		skeletonData->strings = REALLOC(skeletonData->strings, char*, skeletonData->stringsCount + 1);
+		skeletonData->strings[skeletonData->stringsCount] = readString(input);
+		return skeletonData->strings[skeletonData->stringsCount++];
+	}
+
 	int index = readVarint(input, 1);
 	return index == 0 ? 0 : skeletonData->strings[index - 1];
 }
@@ -389,10 +398,10 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 		for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
 			float time = readFloat(input);
 			float mix = readFloat(input);
-			float softness = readFloat(input);
+			float softness = spCurrentlyLoadingBefore_3_8 ? 0.0f : readFloat(input);
 			signed char bendDirection = readSByte(input);
-			int compress = readBoolean(input);
-			int stretch = readBoolean(input);
+			int compress = spCurrentlyLoadingBefore_3_7 ? 0 : readBoolean(input);
+			int stretch = spCurrentlyLoadingBefore_3_7 ? 0 : readBoolean(input);
 			spIkConstraintTimeline_setFrame(timeline, frameIndex, time, mix, softness, bendDirection, compress, stretch);
 			if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
 		}
@@ -876,6 +885,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonDataFile (spSkeletonBinary* self, c
 spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const unsigned char* binary,
 		const int length) {
 	int i, n, ii, nonessential;
+	int verMajor, verMinor, verPatch, verFields;
 	spSkeletonData* skeletonData;
 	_spSkeletonBinary* internal = SUB_CAST(_spSkeletonBinary, self);
 
@@ -901,8 +911,50 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		skeletonData->version = 0;
 	}
 
-	skeletonData->x = readFloat(input);
-	skeletonData->y = readFloat(input);
+	verFields = sscanf(skeletonData->version, "%d.%d.%d", &verMajor, &verMinor, &verPatch);
+
+	if (verFields != 3) {
+		FREE(input);
+		spSkeletonData_dispose(skeletonData);
+
+		_spSkeletonBinary_setError(self, "Invalid version field", "");
+		return 0;
+	}
+
+	if (verMajor < 3 || (verMajor == 3 && verMinor < 6)) {
+		FREE(input);
+		spSkeletonData_dispose(skeletonData);
+
+		_spSkeletonBinary_setError(self, "Unsupported old version", "");
+		return 0;
+	}
+
+	if (verMajor > 3 || (verMajor == 3 && verMinor > 8)) {
+		FREE(input);
+		spSkeletonData_dispose(skeletonData);
+
+		_spSkeletonBinary_setError(self, "Unsupported future version", "");
+		return 0;
+	}
+
+	spCurrentlyLoadingBefore_3_7 = 0;
+	spCurrentlyLoadingBefore_3_8 = 0;
+
+	if (verMajor == 3 && verMinor == 6) {
+		spCurrentlyLoadingBefore_3_7 = 1;
+		spCurrentlyLoadingBefore_3_8 = 1;
+	} else if (verMajor == 3 && verMinor == 7) {
+		spCurrentlyLoadingBefore_3_8 = 1;
+	}
+
+	if (spCurrentlyLoadingBefore_3_8) {
+		skeletonData->x = 0.0f;
+		skeletonData->y = 0.0f;
+	} else {
+		skeletonData->x = readFloat(input);
+		skeletonData->y = readFloat(input);
+	}
+
 	skeletonData->width = readFloat(input);
 	skeletonData->height = readFloat(input);
 
@@ -912,13 +964,20 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		/* Skip images path & fps */
 		readFloat(input);
 		FREE(readString(input));
-		FREE(readString(input));
+
+		if (!spCurrentlyLoadingBefore_3_7)
+			FREE(readString(input));
 	}
 
-	skeletonData->stringsCount = n = readVarint(input, 1);
-	skeletonData->strings = MALLOC(char*, skeletonData->stringsCount);
-	for (i = 0; i < n; i++) {
-		skeletonData->strings[i] = readString(input);
+	if (spCurrentlyLoadingBefore_3_8) {
+		skeletonData->stringsCount = 0;
+		skeletonData->strings = 0;
+	} else {
+		skeletonData->stringsCount = n = readVarint(input, 1);
+		skeletonData->strings = MALLOC(char*, skeletonData->stringsCount);
+		for (i = 0; i < n; i++) {
+			skeletonData->strings[i] = readString(input);
+		}
 	}
 
 	/* Bones. */
@@ -948,7 +1007,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 			case 3: data->transformMode = SP_TRANSFORMMODE_NOSCALE; break;
 			case 4: data->transformMode = SP_TRANSFORMMODE_NOSCALEORREFLECTION; break;
 		}
-		data->skinRequired = readBoolean(input);
+		data->skinRequired = spCurrentlyLoadingBefore_3_8 ? 0 : readBoolean(input);
 		if (nonessential) readInt(input); /* Skip bone color. */
 		skeletonData->bones[i] = data;
 	}
@@ -988,7 +1047,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		/* TODO Avoid copying of name */
 		spIkConstraintData* data = spIkConstraintData_create(name);
 		data->order = readVarint(input, 1);
-		data->skinRequired = readBoolean(input);
+		data->skinRequired = spCurrentlyLoadingBefore_3_8 ? 0 : readBoolean(input);
 		FREE(name);
 		data->bonesCount = readVarint(input, 1);
 		data->bones = MALLOC(spBoneData*, data->bonesCount);
@@ -996,11 +1055,11 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->bones[readVarint(input, 1)];
 		data->mix = readFloat(input);
-		data->softness = readFloat(input);
+		data->softness = spCurrentlyLoadingBefore_3_8 ? 0.0f : readFloat(input);
 		data->bendDirection = readSByte(input);
-		data->compress = readBoolean(input);
-		data->stretch = readBoolean(input);
-		data->uniform = readBoolean(input);
+		data->compress = spCurrentlyLoadingBefore_3_7 ? 0 : readBoolean(input);
+		data->stretch = spCurrentlyLoadingBefore_3_7 ? 0 : readBoolean(input);
+		data->uniform = spCurrentlyLoadingBefore_3_7 ? 0 : readBoolean(input);
 		skeletonData->ikConstraints[i] = data;
 	}
 
@@ -1013,7 +1072,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		/* TODO Avoid copying of name */
 		spTransformConstraintData* data = spTransformConstraintData_create(name);
 		data->order = readVarint(input, 1);
-		data->skinRequired = readBoolean(input);
+		data->skinRequired = spCurrentlyLoadingBefore_3_8 ? 0 : readBoolean(input);
 		FREE(name);
 		data->bonesCount = readVarint(input, 1);
 		CONST_CAST(spBoneData**, data->bones) = MALLOC(spBoneData*, data->bonesCount);
@@ -1043,7 +1102,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		/* TODO Avoid copying of name */
 		spPathConstraintData* data = spPathConstraintData_create(name);
 		data->order = readVarint(input, 1);
-		data->skinRequired = readBoolean(input);
+		data->skinRequired = spCurrentlyLoadingBefore_3_8 ? 0 : readBoolean(input);
 		FREE(name);
 		data->bonesCount = readVarint(input, 1);
 		CONST_CAST(spBoneData**, data->bones) = MALLOC(spBoneData*, data->bonesCount);
@@ -1113,7 +1172,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		eventData->intValue = readVarint(input, 0);
 		eventData->floatValue = readFloat(input);
 		eventData->stringValue = readString(input);
-		eventData->audioPath = readString(input);
+		eventData->audioPath = spCurrentlyLoadingBefore_3_7 ? 0 : readString(input);
 		if (eventData->audioPath) {
 			eventData->volume = readFloat(input);
 			eventData->balance = readFloat(input);
