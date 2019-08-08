@@ -587,6 +587,7 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	int i, ii;
 	spSkeletonData* skeletonData;
 	Json *root, *skeleton, *bones, *boneMap, *ik, *transform, *pathJson, *slots, *skins, *animations, *events;
+	int verMajor, verMinor, verPatch, verFields;
 	_spSkeletonJson* internal = SUB_CAST(_spSkeletonJson, self);
 
 	FREE(self->error);
@@ -606,6 +607,21 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	if (skeleton) {
 		MALLOC_STR(skeletonData->hash, Json_getString(skeleton, "hash", 0));
 		MALLOC_STR(skeletonData->version, Json_getString(skeleton, "spine", 0));
+
+		verFields = sscanf(skeletonData->version, "%d.%d.%d", &verMajor, &verMinor, &verPatch);
+
+		if (verFields != 3) {
+			spSkeletonData_dispose(skeletonData);
+			_spSkeletonJson_setError(self, 0, "Invalid version field: ", Json_getString(skeleton, "spine", 0));
+			return 0;
+		}
+
+		if (verMajor != 3 || verMinor != 8) {
+			spSkeletonData_dispose(skeletonData);
+			_spSkeletonJson_setError(self, 0, "Unsupported version: ", Json_getString(skeleton, "spine", 0));
+			return 0;
+		}
+
 		skeletonData->x = Json_getFloat(skeleton, "x", 0);
 		skeletonData->y = Json_getFloat(skeleton, "y", 0);
 		skeletonData->width = Json_getFloat(skeleton, "width", 0);

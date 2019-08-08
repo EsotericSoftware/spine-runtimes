@@ -876,6 +876,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonDataFile (spSkeletonBinary* self, c
 spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const unsigned char* binary,
 		const int length) {
 	int i, n, ii, nonessential;
+	int verMajor, verMinor, verPatch, verFields;
 	spSkeletonData* skeletonData;
 	_spSkeletonBinary* internal = SUB_CAST(_spSkeletonBinary, self);
 
@@ -899,6 +900,24 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	if (!strlen(skeletonData->version)) {
 		FREE(skeletonData->version);
 		skeletonData->version = 0;
+	}
+
+	verFields = sscanf(skeletonData->version, "%d.%d.%d", &verMajor, &verMinor, &verPatch);
+
+	if (verFields != 3) {
+		FREE(input);
+		spSkeletonData_dispose(skeletonData);
+
+		_spSkeletonBinary_setError(self, "Invalid version field", "");
+		return 0;
+	}
+
+	if (verMajor != 3 || verMinor != 8) {
+		FREE(input);
+		spSkeletonData_dispose(skeletonData);
+
+		_spSkeletonBinary_setError(self, "Unsupported version", "");
+		return 0;
 	}
 
 	skeletonData->x = readFloat(input);
