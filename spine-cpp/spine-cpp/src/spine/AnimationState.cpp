@@ -1071,6 +1071,7 @@ void AnimationState::computeNotLast(TrackEntry *entry) {
 			AttachmentTimeline *timeline = static_cast<AttachmentTimeline *>(timelines[i]);
 			if (!_propertyIDs.contains(timeline->getSlotIndex())) {
 				_propertyIDs.add(timeline->getSlotIndex());
+			} else {
 				timelineMode[i] |= NotLast;
 			}
 		}
