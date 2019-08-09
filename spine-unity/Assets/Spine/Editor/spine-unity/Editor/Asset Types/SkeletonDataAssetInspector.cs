@@ -484,49 +484,32 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				var slotAttachments = new List<Attachment>();
-				var slotAttachmentNames = new List<string>();
-				var defaultSkinAttachmentNames = new List<string>();
+				var slotAttachments = new List<Skin.SkinEntry>();
+				var defaultSkinAttachments = new List<Skin.SkinEntry>();
 				var slotsItems = preview.Skeleton.Slots.Items;
 				for (int i = preview.Skeleton.Slots.Count - 1; i >= 0; i--) {
 					Slot slot = slotsItems[i];
 					EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(slot.Data.Name, Icons.slot));
 					if (showAttachments) {
 						slotAttachments.Clear();
-						slotAttachmentNames.Clear();
-						defaultSkinAttachmentNames.Clear();
+						defaultSkinAttachments.Clear();
 
 						using (new SpineInspectorUtility.IndentScope()) {
 							{
-								var skinEntries = new List<Skin.SkinEntry>();
-								skin.GetAttachments(i, skinEntries);
-								foreach (var entry in skinEntries) {
-									slotAttachments.Add(entry.Attachment);
-									slotAttachmentNames.Add(entry.Name);
-								}
-
+								skin.GetAttachments(i, slotAttachments);
 								if (skin != defaultSkin) {
-									skinEntries.Clear();
-									defaultSkin.GetAttachments(i, skinEntries);
-									foreach (var entry in skinEntries) {
-										slotAttachments.Add(entry.Attachment);
-										slotAttachmentNames.Add(entry.Name);
-										defaultSkinAttachmentNames.Add(entry.Name);
-									}
-
+									defaultSkin.GetAttachments(i, slotAttachments);
+									defaultSkin.GetAttachments(i, defaultSkinAttachments);
 								} else {
-									skinEntries.Clear();
-									defaultSkin.GetAttachments(i, skinEntries);
-									foreach (var entry in skinEntries) {
-										defaultSkinAttachmentNames.Add(entry.Name);
-									}
+									defaultSkin.GetAttachments(i, defaultSkinAttachments);
 								}
 							}
 
 							for (int a = 0; a < slotAttachments.Count; a++) {
-								Attachment attachment = slotAttachments[a];
-								string attachmentName = slotAttachmentNames[a];
-								bool attachmentIsFromSkin = !defaultSkinAttachmentNames.Contains(attachmentName);
+								var skinEntry = slotAttachments[a];
+								Attachment attachment = skinEntry.Attachment;
+								string attachmentName = skinEntry.Name;
+								bool attachmentIsFromSkin = !defaultSkinAttachments.Contains(skinEntry);
 
 								Texture2D attachmentTypeIcon = Icons.GetAttachmentIcon(attachment);
 								bool initialState = slot.Attachment == attachment;

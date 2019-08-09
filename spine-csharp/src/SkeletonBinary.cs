@@ -328,7 +328,7 @@ namespace Spine {
 			if (defaultSkin) {
 				slotCount = input.ReadInt(true);
 				if (slotCount == 0) return null;
-				skin = new Skin("default"));
+				skin = new Skin("default");
 			} else {
 				skin = new Skin(input.ReadStringRef());
 				Object[] bones = skin.bones.Resize(input.ReadInt(true)).Items;
