@@ -696,11 +696,8 @@ namespace Spine.Unity.Editor {
 		SkeletonAnimation skeletonAnimation;
 		GameObject previewGameObject;
 		internal bool requiresRefresh;
-
-		#if !SPINE_UNITY_2018_PREVIEW_API
 		float animationLastTime;
-		#endif
-
+		
 		static float CurrentTime { get { return (float)EditorApplication.timeSinceStartup; } }
 
 		Action Repaint;
@@ -793,10 +790,8 @@ namespace Spine.Unity.Editor {
 
 			if (previewRenderUtility == null) {
 				previewRenderUtility = new PreviewRenderUtility(true);
-				#if !SPINE_UNITY_2018_PREVIEW_API
 				animationLastTime = CurrentTime;
-				#endif
-
+				
 				const int PreviewLayer = 30;
 				const int PreviewCameraCullingMask = 1 << PreviewLayer;
 
@@ -885,12 +880,10 @@ namespace Spine.Unity.Editor {
 
 				
 				if (!EditorApplication.isPlaying) {
-					#if !SPINE_UNITY_2018_PREVIEW_API
 					float current = CurrentTime;
 					float deltaTime = (current - animationLastTime);
 					skeletonAnimation.Update(deltaTime);
 					animationLastTime = current;
-					#endif
 					skeletonAnimation.LateUpdate();
 				}
 
