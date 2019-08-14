@@ -106,7 +106,13 @@ namespace Spine.Unity {
 			skeletonTransform = skeletonRenderer.transform;
 			skeletonRenderer.OnRebuild -= HandleRebuildRenderer;
 			skeletonRenderer.OnRebuild += HandleRebuildRenderer;
-			skeletonTransformIsParent = Transform.ReferenceEquals(skeletonTransform, transform.parent);
+			
+			skeletonTransformIsParent = false;
+                	Transform parent = transform.parent;
+                	while (!skeletonTransformIsParent && parent != null) {
+                    		skeletonTransformIsParent = Transform.ReferenceEquals(skeletonTransform, parent);
+                    		parent = parent.parent;
+                	} 
 
 			if (!string.IsNullOrEmpty(boneName))
 				bone = skeletonRenderer.skeleton.FindBone(boneName);
@@ -129,8 +135,14 @@ namespace Spine.Unity {
 			}
 
 			#if UNITY_EDITOR
-			if (!Application.isPlaying)
-				skeletonTransformIsParent = Transform.ReferenceEquals(skeletonTransform, transform.parent);
+			if (!Application.isPlaying) {
+				skeletonTransformIsParent = false;
+                		Transform parent = transform.parent;
+                		while (!skeletonTransformIsParent && parent != null) {
+                    			skeletonTransformIsParent = Transform.ReferenceEquals(skeletonTransform, parent);
+                    			parent = parent.parent;
+                		} 
+			}
 			#endif
 
 			if (bone == null) {
