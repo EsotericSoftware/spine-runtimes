@@ -59,6 +59,7 @@ namespace Spine.Unity {
 		[SpineBone(dataField: "skeletonRenderer")]
 		[SerializeField] public string boneName;
 
+		public bool followXYPosition = true;
 		public bool followZPosition = true;
 		public bool followBoneRotation = true;
 
@@ -142,7 +143,9 @@ namespace Spine.Unity {
 			Transform thisTransform = this.transform;
 			if (skeletonTransformIsParent) {
 				// Recommended setup: Use local transform properties if Spine GameObject is the immediate parent
-				thisTransform.localPosition = new Vector3(bone.worldX, bone.worldY, followZPosition ? 0f : thisTransform.localPosition.z);
+				thisTransform.localPosition = new Vector3(followXYPosition ? bone.worldX : thisTransform.localPosition.x,
+														followXYPosition ? bone.worldY : thisTransform.localPosition.y,
+														followZPosition ? 0f : thisTransform.localPosition.z);
 				if (followBoneRotation) {
 					float halfRotation = Mathf.Atan2(bone.c, bone.a) * 0.5f;
 					if (followLocalScale && bone.scaleX < 0) // Negate rotation from negative scaleX. Don't use negative determinant. local scaleY doesn't factor into used rotation.
@@ -157,6 +160,10 @@ namespace Spine.Unity {
 				// For special cases: Use transform world properties if transform relationship is complicated
 				Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY, 0f));
 				if (!followZPosition) targetWorldPosition.z = thisTransform.position.z;
+				if (!followXYPosition) {
+					targetWorldPosition.x = thisTransform.position.x;
+					targetWorldPosition.y = thisTransform.position.y;
+				}
 
 				float boneWorldRotation = bone.WorldRotationX;
 
