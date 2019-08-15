@@ -289,7 +289,8 @@ namespace Spine.Unity.AttachmentTools {
 			var repackedRegions = new List<AtlasRegion>();
 			for (int i = 0, n = originalRegions.Count; i < n; i++) {
 				var oldRegion = originalRegions[i];
-				var newRegion = UVRectToAtlasRegion(rects[i], oldRegion.name, page, oldRegion.offsetX, oldRegion.offsetY, oldRegion.rotate);
+				var newRegion = UVRectToAtlasRegion(rects[i], oldRegion.name, page, oldRegion.offsetX, oldRegion.offsetY,
+					oldRegion.rotate, oldRegion.originalWidth, oldRegion.originalHeight);
 				repackedRegions.Add(newRegion);
 			}
 
@@ -381,7 +382,8 @@ namespace Spine.Unity.AttachmentTools {
 			var repackedRegions = new List<AtlasRegion>();
 			for (int i = 0, n = originalRegions.Count; i < n; i++) {
 				var oldRegion = originalRegions[i];
-				var newRegion = UVRectToAtlasRegion(rects[i], oldRegion.name, page, oldRegion.offsetX, oldRegion.offsetY, oldRegion.rotate);
+				var newRegion = UVRectToAtlasRegion(rects[i], oldRegion.name, page, oldRegion.offsetX, oldRegion.offsetY,
+					oldRegion.rotate, oldRegion.originalWidth, oldRegion.originalHeight);
 				repackedRegions.Add(newRegion);
 			}
 
@@ -424,7 +426,7 @@ namespace Spine.Unity.AttachmentTools {
 			CachedRegionTextures.TryGetValue(ar, out output);
 			if (output == null) {
 				Texture2D sourceTexture = ar.GetMainTexture();
-				Rect r = ar.GetUnityRect(sourceTexture.height);
+				Rect r = ar.GetUnityRect();
 				int width = (int)r.width;
 				int height = (int)r.height;
 				output = new Texture2D(width, height, textureFormat, mipmaps) { name = ar.name };
@@ -516,7 +518,8 @@ namespace Spine.Unity.AttachmentTools {
 
 		/// <summary>
 		/// Creates a new Spine AtlasRegion according to a Unity UV Rect (x-right, y-up, uv-normalized).</summary>
-		static AtlasRegion UVRectToAtlasRegion (Rect uvRect, string name, AtlasPage page, float offsetX, float offsetY, bool rotate) {			
+		static AtlasRegion UVRectToAtlasRegion (Rect uvRect, string name, AtlasPage page, float offsetX, float offsetY, bool rotate,
+												int originalWidth, int originalHeight) {
 			var tr  = UVRectToTextureRect(uvRect, page.width, page.height);
 			var rr = tr.SpineUnityFlipRect(page.height);
 
@@ -542,9 +545,9 @@ namespace Spine.Unity.AttachmentTools {
 				index = -1,
 
 				width = w,
-				originalWidth = w,
+				originalWidth = originalWidth,
 				height = h,
-				originalHeight = h,
+				originalHeight = originalHeight,
 				offsetX = offsetX,
 				offsetY = offsetY,
 				x = x,
