@@ -170,7 +170,8 @@ namespace Spine.Unity.Examples {
 			if (skinName != "")
 				skin = skeletonData.FindSkin(skinName);
 
-			skin.SetAttachment(slotIndex, att.Name, att);
+			if (skin != null)
+				skin.SetAttachment(slotIndex, att.Name, att);
 
 			return att;
 		}
