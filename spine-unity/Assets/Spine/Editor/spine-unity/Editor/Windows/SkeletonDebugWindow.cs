@@ -582,7 +582,7 @@ namespace Spine.Unity.Editor {
 				attachmentTable.Add(skeleton.Slots.Items[i], attachments);
 				// Add skin attachments.
 				skin.GetAttachments(i, attachments);
-				if (notDefaultSkin) // Add default skin attachments.
+				if (notDefaultSkin && defaultSkin != null) // Add default skin attachments.
 					defaultSkin.GetAttachments(i, attachments);
 			}
 

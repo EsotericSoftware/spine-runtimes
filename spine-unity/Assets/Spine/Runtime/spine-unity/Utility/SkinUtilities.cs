@@ -58,7 +58,7 @@ namespace Spine.Unity.AttachmentTools {
 			var defaultSkin = skeleton.data.DefaultSkin;
 			var activeSkin = skeleton.skin;
 
-			if (includeDefaultSkin)
+			if (includeDefaultSkin && defaultSkin != null)
 				defaultSkin.CopyTo(newSkin, true, cloneAttachments, cloneMeshesAsLinked);
 
 			if (activeSkin != null)
