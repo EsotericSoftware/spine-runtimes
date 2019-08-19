@@ -37,7 +37,7 @@ namespace Spine.Unity.Editor {
 
 	[CustomEditor(typeof(BoneFollower)), CanEditMultipleObjects]
 	public class BoneFollowerInspector : Editor {
-		SerializedProperty boneName, skeletonRenderer, followZPosition, followBoneRotation, followLocalScale, followSkeletonFlip;
+		SerializedProperty boneName, skeletonRenderer, followXYPosition, followZPosition, followBoneRotation, followLocalScale, followSkeletonFlip;
 		BoneFollower targetBoneFollower;
 		bool needsReset;
 
@@ -82,6 +82,7 @@ namespace Spine.Unity.Editor {
 			skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
 			boneName = serializedObject.FindProperty("boneName");
 			followBoneRotation = serializedObject.FindProperty("followBoneRotation");
+			followXYPosition = serializedObject.FindProperty("followXYPosition");
 			followZPosition = serializedObject.FindProperty("followZPosition");
 			followLocalScale = serializedObject.FindProperty("followLocalScale");
 			followSkeletonFlip = serializedObject.FindProperty("followSkeletonFlip");
@@ -172,6 +173,7 @@ namespace Spine.Unity.Editor {
 				needsReset |= EditorGUI.EndChangeCheck();
 
 				EditorGUILayout.PropertyField(followBoneRotation);
+				EditorGUILayout.PropertyField(followXYPosition);
 				EditorGUILayout.PropertyField(followZPosition);
 				EditorGUILayout.PropertyField(followLocalScale);
 				EditorGUILayout.PropertyField(followSkeletonFlip);

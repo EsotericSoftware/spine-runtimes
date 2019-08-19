@@ -63,6 +63,7 @@ namespace Spine.Unity {
 		public bool followSkeletonFlip = true;
 		[Tooltip("Follows the target bone's local scale. BoneFollower cannot inherit world/skewed scale because of UnityEngine.Transform property limitations.")]
 		public bool followLocalScale = false;
+		public bool followXYPosition = true;
 		public bool followZPosition = true;
 
 		[System.NonSerialized] public Bone bone;
@@ -134,12 +135,18 @@ namespace Spine.Unity {
 
 			if (skeletonTransformIsParent) {
 				// Recommended setup: Use local transform properties if Spine GameObject is the immediate parent
-				thisTransform.localPosition = new Vector3(bone.worldX * scale, bone.worldY * scale, followZPosition ? 0f : thisTransform.localPosition.z);
+				thisTransform.localPosition = new Vector3(followXYPosition ? bone.worldX * scale : thisTransform.localPosition.x,
+														followXYPosition ? bone.worldY * scale : thisTransform.localPosition.y,
+														followZPosition ? 0f : thisTransform.localPosition.z);
 				if (followBoneRotation) thisTransform.localRotation = bone.GetQuaternion();
 			} else {
 				// For special cases: Use transform world properties if transform relationship is complicated
 				Vector3 targetWorldPosition = skeletonTransform.TransformPoint(new Vector3(bone.worldX * scale, bone.worldY * scale, 0f));
 				if (!followZPosition) targetWorldPosition.z = thisTransform.position.z;
+				if (!followXYPosition) {
+					targetWorldPosition.x = thisTransform.position.x;
+					targetWorldPosition.y = thisTransform.position.y;
+				}
 
 				float boneWorldRotation = bone.WorldRotationX;
 
