@@ -823,7 +823,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 	Json *slots = Json::getItem(root, "slots");
 	Json *ik = Json::getItem(root, "ik");
 	Json *transform = Json::getItem(root, "transform");
-	Json *paths = Json::getItem(root, "paths");
+	Json *paths = Json::getItem(root, "path");
 	Json *deform = Json::getItem(root, "deform");
 	Json *drawOrder = Json::getItem(root, "drawOrder");
 	Json *events = Json::getItem(root, "events");

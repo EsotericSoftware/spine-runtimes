@@ -141,7 +141,6 @@ public class JsonRollback {
 
 		JsonValue curve = map.get("curve");
 		if (curve == null) {
-			if (map.name != null && map.name.equals("color")) System.out.println();
 			for (JsonValue child = map.child; child != null; child = child.next)
 				rollbackCurves(child);
 			return;
