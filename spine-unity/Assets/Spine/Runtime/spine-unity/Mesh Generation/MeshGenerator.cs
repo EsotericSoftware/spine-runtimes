@@ -133,6 +133,14 @@ namespace Spine.Unity {
 		}
 
 		#region Step 1 : Generate Instructions
+		/// <summary>
+		/// A specialized variant of <see cref="GenerateSkeletonRendererInstruction"/>.
+		/// Generates renderer instructions using a single submesh, using only a single material and texture.
+		/// </summary>
+		/// <param name="instructionOutput">The resulting instructions.</param>
+		/// <param name="skeleton">The skeleton to generate renderer instructions for.</param>
+		/// <param name="material">Material to be set at the renderer instruction. When null, the last attachment
+		/// in the draw order list is assigned as the instruction's material.</param>
 		public static void GenerateSingleSubmeshInstruction (SkeletonRendererInstruction instructionOutput, Skeleton skeleton, Material material) {
 			ExposedList<Slot> drawOrder = skeleton.drawOrder;
 			int drawOrderCount = drawOrder.Count;
@@ -161,6 +169,7 @@ namespace Spine.Unity {
 			};
 
 			#if SPINE_TRIANGLECHECK
+			object rendererObject = null;
 			bool skeletonHasClipping = false;
 			var drawOrderItems = drawOrder.Items;
 			for (int i = 0; i < drawOrderCount; i++) {
@@ -174,11 +183,13 @@ namespace Spine.Unity {
 
 				var regionAttachment = attachment as RegionAttachment;
 				if (regionAttachment != null) {
+					rendererObject = regionAttachment.RendererObject;
 					attachmentVertexCount = 4;
 					attachmentTriangleCount = 6;
 				} else {
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
+						rendererObject = meshAttachment.RendererObject;
 						attachmentVertexCount = meshAttachment.worldVerticesLength >> 1;
 						attachmentTriangleCount = meshAttachment.triangles.Length;
 					} else {
@@ -194,8 +205,14 @@ namespace Spine.Unity {
 				current.rawTriangleCount += attachmentTriangleCount;
 				current.rawVertexCount += attachmentVertexCount;
 				totalRawVertexCount += attachmentVertexCount;
-
 			}
+		#if !SPINE_TK2D
+			if (material == null)
+				current.material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
+		#else
+			if (material == null)
+				current.material = (rendererObject is Material) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
+		#endif
 
 			instructionOutput.hasActiveClipping = skeletonHasClipping;
 			instructionOutput.rawVertexCount = totalRawVertexCount;
