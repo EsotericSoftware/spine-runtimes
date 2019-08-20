@@ -246,6 +246,10 @@
     * **Restrictions** As all Spine shaders, the LWRP shaders **do not support `Premultiply alpha` (PMA) atlas textures in Linear color space**. Please export your atlas textures as `straight alpha` textures with disabled `Premultiply alpha` setting when using Linear color space. You can check the current color space via `Project Settings - Player - Other Settings - Color Space.`.
     * **Example:** You can find an example scene in the package under `com.esotericsoftware.spine.lwrp-shaders-3.8/Examples/LWRP Shaders.unity` that demonstrates usage of the LWRP shaders.
   * Added `Spine/Skeleton Lit ZWrite` shader. This variant of the `Spine/Skeleton Lit` shader writes to the depth buffer with configurable depth alpha threshold. Apart from that it is identical to `Spine/Skeleton Lit`.
+  * Additional yield instructions to wait for animation track events `End`, `Complete` and `Interrupt`.
+    * `WaitForSpineAnimationComplete` now proves an additional `bool includeEndEvent` parameter, defaults to `false` (previous behaviour).
+    * Added a new `WaitForSpineAnimationEnd` yield instruction.
+    * Added a new generic `WaitForSpineAnimation` yield instruction which can be configured to wait for any combination of animation track events. It is now used as base class for `WaitForSpineAnimationComplete` and `WaitForSpineAnimationEnd`.
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.SpineStyle` instead of `MixMode.MixAlways`.
