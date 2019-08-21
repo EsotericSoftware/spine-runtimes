@@ -71,6 +71,7 @@
     <Compile Include="src\BlendMode.cs" />
     <Compile Include="src\Bone.cs" />
     <Compile Include="src\BoneData.cs" />
+    <Compile Include="src\Collections\OrderedDictionary.cs" />
     <Compile Include="src\ConstraintData.cs" />
     <Compile Include="src\Triangulator.cs" />
     <Compile Include="src\Event.cs" />
