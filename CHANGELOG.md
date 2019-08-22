@@ -211,6 +211,7 @@
   * **The `Shadow alpha cutoff` shader parameter is now respecting slot-color alpha** values at all Spine shaders. A fragment's texture color alpha is multiplied with slot-color alpha before the result is tested against the `Shadow alpha cutoff` threshold.
   * **Removed redundant `Attachment.GetClone()` and `MeshAttachment.GetLinkedClone()` extension methods**. Use methods `Attachment.Copy` and `MeshAttachment.NewLinkedMesh()` instead.
   * **Renamed extension method `Attachment.GetClone(bool cloneMeshesAsLinked)` to `Attachment.GetCopy(bool cloneMeshesAsLinked)`** to follow the naming scheme of the Spine API.
+  * `SkeletonDataAsset.atlasAssets` is now an array of the base class `AtlasAssetBase` instead of `SpineAtlasAsset`, which provides `IEnumerable<> Materials` instead of `List<> materials`. Replace any access via `atlasAsset.materials[0]` with `atlasAsset.Materials.First()` and add a `using System.Linq;` statement.
   * **Changed `MeshAttachment.GetLinkedMesh()` method signatures:** removed optional parameters `bool inheritDeform = true, bool copyOriginalProperties = false`.
   * Changed namespace `Spine.Unity.Modules` to `Spine.Unity` and `Spine.Unity.Examples` after restructuring (see section below) in respective classes:
     * When receiving namespace related errors, replace using statements of `using Spine.Unity.Modules.AttachmentTools;` with `using Spine.Unity.AttachmentTools;`. You can remove `using Spine.Unity.Modules;` statements when a `using Spine.Unity` statement is already present in the file.
