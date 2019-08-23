@@ -55,8 +55,6 @@ namespace Spine.Unity.Examples {
 			if (skeletonRenderer.valid) Apply(skeletonRenderer);
 		}
 
-		void Start () { } // Allow checkbox in inspector
-
 		void Apply (SkeletonRenderer skeletonRenderer) {
 			if (!this.enabled) return;
 

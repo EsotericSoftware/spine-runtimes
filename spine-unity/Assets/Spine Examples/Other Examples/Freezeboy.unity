@@ -3428,7 +3428,6 @@ GameObject:
   - component: {fileID: 1126206821}
   - component: {fileID: 1126206824}
   - component: {fileID: 1126206820}
-  - component: {fileID: 1126206819}
   m_Layer: 0
   m_Name: Spine GameObject (spineboy-unity)
   m_TagString: Untagged
@@ -3436,24 +3435,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1126206819
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1126206818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26947ae098a8447408d80c0c86e35b48, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  skeletonRenderer: {fileID: 1126206820}
-  customSlotMaterials: []
-  customMaterialOverrides:
-  - overrideDisabled: 1
-    originalMaterial: {fileID: 2100000, guid: 1455e88fdb81ccc45bdeaedd657bad4d, type: 2}
-    replacementMaterial: {fileID: 2100000, guid: 128e02fa6a4f5964fa898757a425b354,
-      type: 2}
 --- !u!114 &1126206820
 MonoBehaviour:
   m_ObjectHideFlags: 0
