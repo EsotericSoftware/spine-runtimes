@@ -51,7 +51,7 @@ namespace Spine.Unity.Editor {
 		public const string SPINE_SETTINGS_ASSET_PATH = "Assets/Editor/SpineSettings.asset";
 
 		#if SPINE_TK2D
-		const float DEFAULT_DEFAULT_SCALE = 1f;
+		internal const float DEFAULT_DEFAULT_SCALE = 1f;
 		#else
 		internal const float DEFAULT_DEFAULT_SCALE = 0.01f;
 		#endif
