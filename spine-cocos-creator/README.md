@@ -12,7 +12,7 @@ The Spine Runtimes are developed with the intent to be used with data exported f
 
 ## Spine version
 
-spine-cocos-creator works with data exported from Spine 3.7.xx.
+spine-cocos-creator works with data exported from Spine 3.8.xx.
 
 spine-cocos-creator supports all Spine features.
 
@@ -34,7 +34,7 @@ The Spine runtime code corresponding this pull request is locating at `framework
 
 ## The official workflow
 
-After this pull request get merged, and the next version of Cocos Creator (v2.0.10) get released, user can finally benefit the C++ Spine runtime and new features in v3.7.
+After this pull request get merged, and the next version of Cocos Creator (v2.2.0) get released, user can finally benefit the C++ Spine runtime and new features in v3.8.
 
 A ordinary workflow for using Spine in Cocos Creator is described below:
 
