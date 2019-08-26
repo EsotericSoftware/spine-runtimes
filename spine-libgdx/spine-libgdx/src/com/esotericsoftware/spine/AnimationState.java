@@ -695,7 +695,7 @@ public class AnimationState {
 		entry.next = null;
 	}
 
-	private void animationsChanged () {
+	void animationsChanged () {
 		animationsChanged = false;
 
 		// Process in the order that animations are applied.
