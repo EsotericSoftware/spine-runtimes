@@ -65,7 +65,7 @@ namespace Spine.Unity {
 		protected override void OnValidate () {
 			// This handles Scene View preview.
 			base.OnValidate ();
-			if (this.IsValid) { 
+			if (this.IsValid) {
 				if (skeletonDataAsset == null) {
 					Clear();
 				} else if (skeletonDataAsset.skeletonJSON == null) {
@@ -86,14 +86,14 @@ namespace Spine.Unity {
 							else
 								skeleton.SetSkin(skin);
 						}
-							
+
 					}
 
 					// Only provide visual feedback to inspector changes in Unity Editor Edit mode.
 					if (!Application.isPlaying) {
 						skeleton.ScaleX = this.initialFlipX ? -1 : 1;
 						skeleton.ScaleY = this.initialFlipY ? -1 : 1;
-						
+
 						state.ClearTrack(0);
 						skeleton.SetToSetupPose();
 						if (!string.IsNullOrEmpty(startingAnimation)) {
@@ -115,7 +115,7 @@ namespace Spine.Unity {
 
 			base.Reset();
 			if (material == null || material.shader != Shader.Find("Spine/SkeletonGraphic"))
-				Debug.LogWarning("SkeletonGraphic works best with the SkeletonGraphic material.");			
+				Debug.LogWarning("SkeletonGraphic works best with the SkeletonGraphic material.");
 		}
 		#endif
 		#endregion
@@ -153,7 +153,7 @@ namespace Spine.Unity {
 			}
 		}
 		public override Texture mainTexture {
-			get { 
+			get {
 				if (overrideTexture != null) return overrideTexture;
 				return baseTexture;
 			}
@@ -206,7 +206,7 @@ namespace Spine.Unity {
 
 			skeleton.UpdateWorldTransform();
 
-			if (UpdateWorld != null) { 
+			if (UpdateWorld != null) {
 				UpdateWorld(this);
 				skeleton.UpdateWorldTransform();
 			}
@@ -318,7 +318,7 @@ namespace Spine.Unity {
 
 			canvasRenderer.SetMesh(mesh);
 			smartMesh.instructionUsed.Set(currentInstructions);
-			
+
 			if (currentInstructions.submeshInstructions.Count > 0) {
 				var material = currentInstructions.submeshInstructions.Items[0].material;
 				if (material != null && baseTexture != material.mainTexture) {
@@ -331,5 +331,5 @@ namespace Spine.Unity {
 			//this.UpdateMaterial(); // TODO: This allocates memory.
 		}
 		#endregion
-	} 
+	}
 }

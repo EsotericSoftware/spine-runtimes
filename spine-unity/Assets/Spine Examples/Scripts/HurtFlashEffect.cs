@@ -49,7 +49,7 @@ public class HurtFlashEffect : MonoBehaviour {
 		if (mpb == null) mpb = new MaterialPropertyBlock();
 		if (meshRenderer == null) meshRenderer = GetComponent<MeshRenderer>();
 		meshRenderer.GetPropertyBlock(mpb);
-		
+
 		StartCoroutine(FlashRoutine());
 	}
 

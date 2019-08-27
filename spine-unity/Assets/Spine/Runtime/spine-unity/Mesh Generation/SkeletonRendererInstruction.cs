@@ -27,7 +27,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Not for optimization. Do  not disable.
+// Not for optimization. Do not disable.
 #define SPINE_TRIANGLECHECK // Avoid calling SetTriangles at the cost of checking for mesh differences (vertex counts, memberwise attachment list compare) every frame.
 //#define SPINE_DEBUG
 
@@ -98,7 +98,7 @@ namespace Spine.Unity {
 				if (!slot.bone.active) continue;
 				attachmentsItems[i] = slot.attachment;
 			}
-			
+
 			#endif
 		}
 
@@ -147,7 +147,7 @@ namespace Spine.Unity {
 			var submeshInstructionsItemsB = b.submeshInstructions.Items;
 
 			var attachmentsA = a.attachments.Items;
-			var attachmentsB = b.attachments.Items;		
+			var attachmentsB = b.attachments.Items;
 			for (int i = 0; i < attachmentCountB; i++)
 				if (!System.Object.ReferenceEquals(attachmentsA[i], attachmentsB[i])) return true;
 
@@ -162,7 +162,7 @@ namespace Spine.Unity {
 					&& submeshA.rawTriangleCount == submeshB.rawTriangleCount &&
 					submeshA.rawFirstVertexIndex == submeshB.rawFirstVertexIndex
 				))
-					return true;			
+					return true;
 			}
 
 			return false;

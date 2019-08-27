@@ -42,7 +42,7 @@ namespace Spine.Unity.Examples {
 		[SpineSkin(dataField: "skeletonDataAsset")]
 		public string startingSkin = "base";
 		public Material skeletonGraphicMaterial;
-		
+
 		IEnumerator Start () {
 			if (skeletonDataAsset == null) yield break;
 			skeletonDataAsset.GetSkeletonData(false); // Preload SkeletonDataAsset.

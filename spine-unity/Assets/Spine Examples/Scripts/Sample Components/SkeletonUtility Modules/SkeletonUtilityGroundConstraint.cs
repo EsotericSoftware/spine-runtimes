@@ -57,7 +57,7 @@ namespace Spine.Unity.Examples {
 		public float castOffset = 0;
 		[Tooltip("Y-Axis adjustment")]
 		public float groundOffset = 0;
-		[Tooltip("How fast the target IK position adjusts to the ground.  Use smaller values to prevent snapping")]
+		[Tooltip("How fast the target IK position adjusts to the ground. Use smaller values to prevent snapping")]
 		public float adjustSpeed = 5;
 
 		Vector3 rayOrigin;

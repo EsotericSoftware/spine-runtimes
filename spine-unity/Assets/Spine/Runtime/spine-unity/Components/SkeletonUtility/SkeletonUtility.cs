@@ -145,7 +145,7 @@ namespace Spine.Unity {
 			OnDisable();
 			OnEnable();
 		}
-		
+
 		void OnEnable () {
 			if (skeletonRenderer == null) {
 				skeletonRenderer = GetComponent<SkeletonRenderer>();

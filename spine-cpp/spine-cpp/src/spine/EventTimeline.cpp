@@ -57,10 +57,9 @@ EventTimeline::~EventTimeline() {
 }
 
 void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						  MixBlend blend, MixDirection direction) {
-	if (pEvents == NULL) {
-		return;
-	}
+	MixBlend blend, MixDirection direction
+) {
+	if (pEvents == NULL) return;
 
 	Vector<Event *> &events = *pEvents;
 
@@ -75,9 +74,7 @@ void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 		return;
 	}
 
-	if (time < _frames[0]) {
-		return; // Time is before first frame.
-	}
+	if (time < _frames[0]) return; // Time is before first frame.
 
 	int frame;
 	if (lastTime < _frames[0]) {
@@ -87,16 +84,13 @@ void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 		float frameTime = _frames[frame];
 		while (frame > 0) {
 			// Fire multiple events with the same frame.
-			if (_frames[frame - 1] != frameTime) {
-				break;
-			}
+			if (_frames[frame - 1] != frameTime) break;
 			frame--;
 		}
 	}
 
-	for (; (size_t)frame < frameCount && time >= _frames[frame]; ++frame) {
+	for (; (size_t)frame < frameCount && time >= _frames[frame]; ++frame)
 		events.add(_events[frame]);
-	}
 }
 
 int EventTimeline::getPropertyId() {

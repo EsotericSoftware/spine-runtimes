@@ -62,7 +62,7 @@ namespace Spine.Unity.Playables {
 				this.lastInputWeights = new float[inputCount];
 
 				for (int i = 0; i < inputCount; i++)
-					this.lastInputWeights[i] = default(float);				
+					this.lastInputWeights[i] = default(float);
 			}
 			var lastInputWeights = this.lastInputWeights;
 
@@ -156,7 +156,7 @@ namespace Spine.Unity.Playables {
 					var toTrack = dummyAnimationState.GetCurrent(0);
 					var fromTrack = toTrack != null ? toTrack.MixingFrom : null;
 					bool isAnimationTransitionMatch = (toTrack != null && toTrack.Animation == toAnimation && fromTrack != null && fromTrack.Animation == fromAnimation);
-					
+
 					if (!isAnimationTransitionMatch) {
 						dummyAnimationState.ClearTracks();
 						fromTrack = dummyAnimationState.SetAnimation(0, fromAnimation, fromClipLoop);

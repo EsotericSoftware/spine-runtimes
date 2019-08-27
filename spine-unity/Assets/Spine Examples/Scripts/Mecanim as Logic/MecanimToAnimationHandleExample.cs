@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Spine.Unity.Examples {
-	
+
 	// This StateMachineBehaviour handles sending the Mecanim state information to the component that handles playing the Spine animations.
 	public class MecanimToAnimationHandleExample : StateMachineBehaviour {
 		SkeletonAnimationHandleExample animationHandle;

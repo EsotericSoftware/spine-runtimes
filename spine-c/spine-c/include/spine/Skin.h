@@ -89,7 +89,7 @@ struct _SkinHashTableEntry {
 typedef struct {
 	spSkin super;
 	_Entry* entries; /* entries list stored for getting attachment name by attachment index */
-	_SkinHashTableEntry* entriesHashTable[SKIN_ENTRIES_HASH_TABLE_SIZE];  /* hashtable for fast attachment lookup */
+	_SkinHashTableEntry* entriesHashTable[SKIN_ENTRIES_HASH_TABLE_SIZE]; /* hashtable for fast attachment lookup */
 } _spSkin;
 
 SP_API spSkin* spSkin_create (const char* name);

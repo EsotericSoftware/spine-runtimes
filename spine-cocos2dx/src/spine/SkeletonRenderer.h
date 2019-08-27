@@ -63,10 +63,10 @@ namespace spine {
 
 		void setDebugBonesEnabled(bool enabled);
 		bool getDebugBonesEnabled() const;
-	
+
 		void setDebugMeshesEnabled(bool enabled);
 		bool getDebugMeshesEnabled() const;
- 
+
 		void setDebugBoundingRectEnabled(bool enabled);
 		bool getDebugBoundingRectEnabled() const;
 
@@ -81,14 +81,14 @@ namespace spine {
 		Bone* findBone (const std::string& boneName) const;
 		/* Returns 0 if the slot was not found. */
 		Slot* findSlot (const std::string& slotName) const;
-	
+
 		/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
 		 * attached if the corresponding attachment from the old skin was attached.
 		 * @param skin May be empty string ("") for no skin.*/
 		void setSkin (const std::string& skinName);
 		/** @param skin May be 0 for no skin.*/
 		void setSkin (const char* skinName);
-	
+
 		/* Returns 0 if the slot or attachment was not found. */
 		Attachment* getAttachment (const std::string& slotName, const std::string& attachmentName) const;
 		/* Returns false if the slot or attachment was not found.
@@ -96,15 +96,15 @@ namespace spine {
 		bool setAttachment (const std::string& slotName, const std::string& attachmentName);
 		/* @param attachmentName May be 0 for no attachment. */
 		bool setAttachment (const std::string& slotName, const char* attachmentName);
-	
+
 		/* Enables/disables two color tinting for this instance. May break batching */
 		void setTwoColorTint(bool enabled);
 		/* Whether two color tinting is enabled */
 		bool isTwoColorTint();
-	
+
 		/* Sets the vertex effect to be used, set to 0 to disable vertex effects */
 		void setVertexEffect(VertexEffect* effect);
-	
+
 		/* Sets the range of slots that should be rendered. Use -1, -1 to clear the range */
 		void setSlotsRange(int startSlotIndex, int endSlotIndex);
 
@@ -113,7 +113,7 @@ namespace spine {
 		const cocos2d::BlendFunc& getBlendFunc () const override;
 		void setOpacityModifyRGB (bool value) override;
 		bool isOpacityModifyRGB () const override;
-	
+
 	CC_CONSTRUCTOR_ACCESS:
 		SkeletonRenderer ();
 		SkeletonRenderer(Skeleton* skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false, bool ownsAtlas = false);
@@ -131,7 +131,7 @@ namespace spine {
 		void initWithBinaryFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
 
 		virtual void initialize ();
-	
+
 	protected:
 		void setSkeletonData (SkeletonData* skeletonData, bool ownsSkeletonData);
 		void setupGLProgramState(bool twoColorTintEnabled);
@@ -154,7 +154,7 @@ namespace spine {
 		SkeletonClipping* _clipper;
 		VertexEffect* _effect;
 		cocos2d::Rect _boundingRect;
-	
+
 		int _startSlotIndex;
 		int _endSlotIndex;
 	};

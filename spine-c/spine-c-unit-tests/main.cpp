@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 
 
 
-extern "C" { // probably unnecessary 
+extern "C" { // probably unnecessary
 
 	void _spAtlasPage_createTexture(spAtlasPage* self, const char* path) {
 		self->rendererObject = 0;

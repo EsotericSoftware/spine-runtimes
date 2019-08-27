@@ -53,7 +53,8 @@ const int PathConstraintPositionTimeline::PREV_VALUE = -1;
 const int PathConstraintPositionTimeline::VALUE = 1;
 
 PathConstraintPositionTimeline::PathConstraintPositionTimeline(int frameCount) : CurveTimeline(frameCount),
-																				 _pathConstraintIndex(0) {
+	_pathConstraintIndex(0)
+{
 	_frames.setSize(frameCount * ENTRIES, 0);
 }
 
@@ -61,7 +62,8 @@ PathConstraintPositionTimeline::~PathConstraintPositionTimeline() {
 }
 
 void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents,
-										   float alpha, MixBlend blend, MixDirection direction) {
+	float alpha, MixBlend blend, MixDirection direction
+) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -72,14 +74,14 @@ void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, f
 
 	if (time < _frames[0]) {
 		switch (blend) {
-			case MixBlend_Setup:
-				constraint._position = constraint._data._position;
-				return;
-			case MixBlend_First:
-				constraint._position += (constraint._data._position - constraint._position) * alpha;
-				return;
-			default:
-				return;
+		case MixBlend_Setup:
+			constraint._position = constraint._data._position;
+			return;
+		case MixBlend_First:
+			constraint._position += (constraint._data._position - constraint._position) * alpha;
+			return;
+		default:
+			return;
 		}
 	}
 
@@ -93,15 +95,14 @@ void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, f
 		position = _frames[frame + PREV_VALUE];
 		float frameTime = _frames[frame];
 		float percent = getCurvePercent(frame / ENTRIES - 1,
-										1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+			1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
 
 		position += (_frames[frame + VALUE] - position) * percent;
 	}
-	if (blend == MixBlend_Setup) {
+	if (blend == MixBlend_Setup)
 		constraint._position = constraint._data._position + (position - constraint._data._position) * alpha;
-	} else {
+	else
 		constraint._position += (position - constraint._position) * alpha;
-	}
 }
 
 int PathConstraintPositionTimeline::getPropertyId() {

@@ -103,7 +103,7 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 	local readTuple = function ()
 		local line = readLine()
 		local idx = line:find(":")
-		if not idx then 
+		if not idx then
 			error("Invalid line: " .. line, 2)
 		end
 		local i = 1

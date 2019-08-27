@@ -90,7 +90,7 @@ namespace Spine.Unity.Examples {
 			input.x = Input.GetAxis(XAxis);
 			input.y = Input.GetAxis(YAxis);
 			bool inputJumpStop = Input.GetButtonUp(JumpButton);
-			bool inputJumpStart = Input.GetButtonDown(JumpButton);			
+			bool inputJumpStart = Input.GetButtonDown(JumpButton);
 			bool doCrouch = (isGrounded && input.y < -0.5f) || (forceCrouchEndTime > Time.time);
 			bool doJumpInterrupt = false;
 			bool doJump = false;
@@ -116,7 +116,7 @@ namespace Spine.Unity.Examples {
 
 			// Dummy physics and controller using UnityEngine.CharacterController.
 			Vector3 gravityDeltaVelocity = Physics.gravity * gravityScale * dt;
-			
+
 			if (doJump) {
 				velocity.y = jumpSpeed;
 				minimumJumpEndTime = Time.time + minimumJumpDuration;
@@ -132,8 +132,8 @@ namespace Spine.Unity.Examples {
 					velocity.x *= Mathf.Sign(input.x);
 				}
 			}
-			
-			
+
+
 			if (!isGrounded) {
 				if (wasGrounded) {
 					if (velocity.y < 0)
@@ -144,7 +144,7 @@ namespace Spine.Unity.Examples {
 			}
 			controller.Move(velocity * dt);
 			wasGrounded = isGrounded;
-			
+
 			// Determine and store character state
 			if (isGrounded) {
 				if (doCrouch) {

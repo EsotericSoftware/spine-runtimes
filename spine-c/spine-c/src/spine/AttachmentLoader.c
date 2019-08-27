@@ -32,8 +32,7 @@
 #include <spine/extension.h>
 
 typedef struct _spAttachmentLoaderVtable {
-	spAttachment* (*createAttachment) (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name,
-			const char* path);
+	spAttachment* (*createAttachment) (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name, const char* path);
 	void (*configureAttachment) (spAttachmentLoader* self, spAttachment*);
 	void (*disposeAttachment) (spAttachmentLoader* self, spAttachment*);
 	void (*dispose) (spAttachmentLoader* self);

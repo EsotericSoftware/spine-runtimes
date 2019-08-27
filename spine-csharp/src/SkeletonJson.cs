@@ -99,9 +99,9 @@ namespace Spine {
 				var skeletonMap = (Dictionary<string, Object>)root["skeleton"];
 				skeletonData.hash = (string)skeletonMap["hash"];
 				skeletonData.version = (string)skeletonMap["spine"];
-                skeletonData.x = GetFloat(skeletonMap, "x", 0);
-                skeletonData.y = GetFloat(skeletonMap, "y", 0);
-                skeletonData.width = GetFloat(skeletonMap, "width", 0);
+				skeletonData.x = GetFloat(skeletonMap, "x", 0);
+				skeletonData.y = GetFloat(skeletonMap, "y", 0);
+				skeletonData.width = GetFloat(skeletonMap, "width", 0);
 				skeletonData.height = GetFloat(skeletonMap, "height", 0);
 				skeletonData.fps = GetFloat(skeletonMap, "fps", 30);
 				skeletonData.imagesPath = GetString(skeletonMap, "images", null);
@@ -159,7 +159,7 @@ namespace Spine {
 						data.b2 = ToColor(color2, 2, 6);
 						data.hasSecondColor = true;
 					}
-						
+
 					data.attachmentName = GetString(slotMap, "attachment", null);
 					if (slotMap.ContainsKey("blend"))
 						data.blendMode = (BlendMode)Enum.Parse(typeof(BlendMode), (string)slotMap["blend"], true);
@@ -272,7 +272,7 @@ namespace Spine {
 
 			// Skins.
 			if (root.ContainsKey("skins")) {
-				foreach (Dictionary<string, object> skinMap in (List<object>)root["skins"]) { 
+				foreach (Dictionary<string, object> skinMap in (List<object>)root["skins"]) {
 					Skin skin = new Skin((string)skinMap["name"]);
 					if (skinMap.ContainsKey("bones")) {
 						foreach (string entryName in (List<Object>)skinMap["bones"]) {
@@ -312,7 +312,7 @@ namespace Spine {
 								} catch (Exception e) {
 									throw new Exception("Error reading attachment: " + entry.Key + ", skin: " + skin, e);
 								}
-							} 
+							}
 						}
 					}
 					skeletonData.skins.Add(skin);
@@ -358,7 +358,7 @@ namespace Spine {
 					} catch (Exception e) {
 						throw new Exception("Error reading animation: " + entry.Key, e);
 					}
-				}   
+				}
 			}
 
 			skeletonData.bones.TrimExcess();
@@ -739,7 +739,7 @@ namespace Spine {
 							var timeline = new DeformTimeline(values.Count);
 							timeline.slotIndex = slotIndex;
 							timeline.attachment = attachment;
-							
+
 							int frameIndex = 0;
 							foreach (Dictionary<string, Object> valueMap in values) {
 								float[] deform;

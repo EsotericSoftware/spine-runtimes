@@ -27,7 +27,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Not for optimization. Do  not disable.
+// Not for optimization. Do not disable.
 #define SPINE_TRIANGLECHECK // Avoid calling SetTriangles at the cost of checking for mesh differences (vertex counts, memberwise attachment list compare) every frame.
 //#define SPINE_DEBUG
 
@@ -73,12 +73,12 @@ namespace Spine.Unity {
 
 		public override string ToString () {
 			return
-				string.Format("[SubmeshInstruction: slots {0} to {1}. (Material){2}. preActiveClippingSlotSource:{3}]", 
-					startSlot, 
-					endSlot - 1, 
-					material == null ? "<none>" : material.name, 
+				string.Format("[SubmeshInstruction: slots {0} to {1}. (Material){2}. preActiveClippingSlotSource:{3}]",
+					startSlot,
+					endSlot - 1,
+					material == null ? "<none>" : material.name,
 					preActiveClippingSlotSource
 				);
 		}
-	}	
+	}
 }

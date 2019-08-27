@@ -74,7 +74,7 @@ function PathConstraint.new (data, skeleton)
 		curves = {},
 		lengths = {},
 		segments = {},
-    active = false    
+		active = false
 	}
 	setmetatable(self, PathConstraint)
 
@@ -99,7 +99,7 @@ function PathConstraint:update ()
 	local rotate = rotateMix > 0
 	if not translate and not rotate then return end
 
-	local data = self.data;	
+	local data = self.data;
 	local percentSpacing = data.spacingMode == PathConstraintData.SpacingMode.percent
 	local rotateMode = data.rotateMode
 	local tangents = rotateMode == PathConstraintData.RotateMode.tangent
@@ -119,10 +119,10 @@ function PathConstraint:update ()
 		while i < n do
 			local bone = bones[i + 1];
 			local setupLength = bone.data.length
-      if setupLength < PathConstraint.epsilon then
-        if scale then lengths[i + 1] = 0 end
-        i = i + 1
-        spaces[i + 1] = 0
+			if setupLength < PathConstraint.epsilon then
+				if scale then lengths[i + 1] = 0 end
+				i = i + 1
+				spaces[i + 1] = 0
 			elseif percentSpacing then
 				if scale then
 					local x = setupLength * bone.a
@@ -132,18 +132,18 @@ function PathConstraint:update ()
 				end
 				i = i + 1
 				spaces[i + 1] = spacing
-      else
-   			local x = setupLength * bone.a
-        local y = setupLength * bone.c
-        local length = math_sqrt(x * x + y * y)
-        if scale then lengths[i + 1] = length end
-        i = i + 1
-        if lengthSpacing then 
-          spaces[i + 1] = (setupLength + spacing) * length / setupLength
-        else
-          spaces[i + 1] = spacing * length / setupLength
-        end
-      end
+			else
+	 			local x = setupLength * bone.a
+				local y = setupLength * bone.c
+				local length = math_sqrt(x * x + y * y)
+				if scale then lengths[i + 1] = length end
+				i = i + 1
+				if lengthSpacing then
+					spaces[i + 1] = (setupLength + spacing) * length / setupLength
+				else
+					spaces[i + 1] = spacing * length / setupLength
+				end
+			end
 		end
 	else
 		local i = 1
@@ -205,7 +205,7 @@ function PathConstraint:update ()
 			else
 				r = math_atan2(dy, dx)
 			end
-			r = r - math_atan2(c, a)			
+			r = r - math_atan2(c, a)
 			if tip then
 				cos = math_cos(r)
 				sin = math_sin(r)
@@ -389,7 +389,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 		i = i + 1
 		w = w + 6
 	end
-	if percentPosition then 
+	if percentPosition then
 		position = position * pathLength
 	else
 		position = position * pathLength / path.lengths[curveCount];
@@ -533,11 +533,11 @@ end
 
 function PathConstraint:addCurvePosition(p, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o, tangents)
 	if p == 0 or (p ~= p) then
-    out[o + 1] = x1
+		out[o + 1] = x1
 		out[o + 2] = y1
 		out[o + 3] = math_atan2(cy1 - y1, cx1 - x1)
 		return;
-  end
+	end
 	local tt = p * p
 	local ttt = tt * p
 	local u = 1 - p
@@ -551,13 +551,13 @@ function PathConstraint:addCurvePosition(p, x1, y1, cx1, cy1, cx2, cy2, x2, y2, 
 	local y = y1 * uuu + cy1 * uut3 + cy2 * utt3 + y2 * ttt
 	out[o + 1] = x
 	out[o + 2] = y
-	if tangents then 
-    if p < 0.001 then
-      out[o + 3] = math_atan2(cy1 - y1, cx1 - x1)
-    else
-      out[o + 3] = math_atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt))
-    end
-  end
+	if tangents then
+		if p < 0.001 then
+			out[o + 3] = math_atan2(cy1 - y1, cx1 - x1)
+		else
+			out[o + 3] = math_atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt))
+		end
+	end
 end
 
 return PathConstraint

@@ -100,7 +100,7 @@ MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const Strin
 
 BoundingBoxAttachment *AtlasAttachmentLoader::newBoundingBoxAttachment(Skin &skin, const String &name) {
 	SP_UNUSED(skin);
-	return new(__FILE__, __LINE__)  BoundingBoxAttachment(name);
+	return new(__FILE__, __LINE__) BoundingBoxAttachment(name);
 }
 
 PathAttachment *AtlasAttachmentLoader::newPathAttachment(Skin &skin, const String &name) {

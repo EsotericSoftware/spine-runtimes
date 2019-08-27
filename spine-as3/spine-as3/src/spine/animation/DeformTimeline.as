@@ -34,7 +34,7 @@ package spine.animation {
 	import spine.Skeleton;
 	import spine.Slot;
 
-	public class DeformTimeline extends CurveTimeline {		
+	public class DeformTimeline extends CurveTimeline {
 		public var slotIndex : int;
 		public var frames : Vector.<Number>;
 		public var frameVertices : Vector.<Vector.<Number>>;
@@ -63,16 +63,16 @@ package spine.animation {
 			if (!slot.bone.active) return;
 			var slotAttachment : Attachment = slot.attachment;
 			if (!(slotAttachment is VertexAttachment) || !(VertexAttachment(slotAttachment).deformAttachment == attachment)) return;
-			
+
 			var deformArray : Vector.<Number> = slot.deform;
 			if (deformArray.length == 0) blend = MixBlend.setup;
-			
+
 			var frameVertices : Vector.<Vector.<Number>> = this.frameVertices;
 			var vertexCount : int = frameVertices[0].length;
 			var deform : Vector.<Number>;
 
 			var frames : Vector.<Number> = this.frames;
-			var i : int;			
+			var i : int;
 			if (time < frames[0]) {
 				vertexAttachment = VertexAttachment(slotAttachment);
 				switch (blend) {
@@ -99,27 +99,27 @@ package spine.animation {
 					}
 				}
 				return;
-			}						
+			}
 
 			deformArray.length = vertexCount;
 			deform = deformArray;
-			var n : int;			
+			var n : int;
 			var setup : Number, prev : Number;
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
 				var lastVertices : Vector.<Number> = frameVertices[frames.length - 1];
 				if (alpha == 1) {
 					if (blend == MixBlend.add) {
 						vertexAttachment = VertexAttachment(slotAttachment);
-						if (vertexAttachment.bones == null) {							
+						if (vertexAttachment.bones == null) {
 							setupVertices = vertexAttachment.vertices;
-							for (i = 0; i < vertexCount; i++) {								
+							for (i = 0; i < vertexCount; i++) {
 								deform[i] += lastVertices[i] - setupVertices[i];
 							}
-						} else {							
+						} else {
 							for (i = 0; i < vertexCount; i++)
 								deform[i] += lastVertices[i];
 						}
-					} else {						
+					} else {
 						for (i = 0, n = vertexCount; i < n; i++)
 							deform[i] = lastVertices[i];
 					}
@@ -146,16 +146,16 @@ package spine.animation {
 								deform[i] += (lastVertices[i] - deform[i]) * alpha;
 						case MixBlend.add:
 							vertexAttachment = VertexAttachment(slotAttachment);
-							if (vertexAttachment.bones == null) {								
+							if (vertexAttachment.bones == null) {
 								setupVertices = vertexAttachment.vertices;
-								for (i = 0; i < vertexCount; i++) {									
+								for (i = 0; i < vertexCount; i++) {
 									deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
 								}
 							} else {
 								for (i = 0; i < vertexCount; i++)
 									deform[i] += lastVertices[i] * alpha;
-							}							
-					}					
+							}
+					}
 				}
 				return;
 			}
@@ -170,20 +170,20 @@ package spine.animation {
 			if (alpha == 1) {
 				if (blend == MixBlend.add) {
 					vertexAttachment = VertexAttachment(slotAttachment);
-					if (vertexAttachment.bones == null) {						
+					if (vertexAttachment.bones == null) {
 						setupVertices = vertexAttachment.vertices;
 						for (i = 0; i < vertexCount; i++) {
 							prev = prevVertices[i];
 							deform[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
 						}
-					} else {						
+					} else {
 						for (i = 0; i < vertexCount; i++) {
-							prev = prevVertices[i];					
+							prev = prevVertices[i];
 							deform[i] += prev + (nextVertices[i] - prev) * percent;
 						}
 					}
-				} else {					
-					for (i = 0; i < vertexCount; i++) {						
+				} else {
+					for (i = 0; i < vertexCount; i++) {
 						prev = prevVertices[i];
 						deform[i] = prev + (nextVertices[i] - prev) * percent;
 					}
@@ -216,19 +216,19 @@ package spine.animation {
 						break;
 					case MixBlend.add:
 						vertexAttachment = VertexAttachment(slotAttachment);
-						if (vertexAttachment.bones == null) {							
+						if (vertexAttachment.bones == null) {
 							setupVertices = vertexAttachment.vertices;
 							for (i = 0; i < vertexCount; i++) {
 								prev = prevVertices[i], setup = setupVertices[i];
 								deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
 							}
-						} else {							
+						} else {
 							for (i = 0; i < vertexCount; i++) {
 								prev = prevVertices[i];
 								deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
 							}
 						}
-				}				
+				}
 			}
 		}
 	}

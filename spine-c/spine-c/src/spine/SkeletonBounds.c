@@ -166,8 +166,11 @@ int/*bool*/spSkeletonBounds_aabbContainsPoint (spSkeletonBounds* self, float x, 
 
 int/*bool*/spSkeletonBounds_aabbIntersectsSegment (spSkeletonBounds* self, float x1, float y1, float x2, float y2) {
 	float m, x, y;
-	if ((x1 <= self->minX && x2 <= self->minX) || (y1 <= self->minY && y2 <= self->minY) || (x1 >= self->maxX && x2 >= self->maxX)
-			|| (y1 >= self->maxY && y2 >= self->maxY)) return 0;
+	if ((x1 <= self->minX && x2 <= self->minX)
+		|| (y1 <= self->minY && y2 <= self->minY)
+		|| (x1 >= self->maxX && x2 >= self->maxX)
+		|| (y1 >= self->maxY && y2 >= self->maxY)
+	) return 0;
 	m = (y2 - y1) / (x2 - x1);
 	y = m * (self->minX - x1) + y1;
 	if (y > self->minY && y < self->maxY) return 1;

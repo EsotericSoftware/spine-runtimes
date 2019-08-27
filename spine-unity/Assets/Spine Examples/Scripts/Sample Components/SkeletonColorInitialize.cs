@@ -74,7 +74,7 @@ namespace Spine.Unity.Prototyping {
 					var slot = skeleton.FindSlot(s.slot);
 					if (slot != null) slot.SetColor(s.color);
 				}
-					
+
 			}
 		}
 

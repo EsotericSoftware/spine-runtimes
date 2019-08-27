@@ -38,7 +38,7 @@ namespace Spine {
 		internal float floatValue;
 		internal string stringValue;
 		internal float volume;
-		internal  float balance;
+		internal float balance;
 
 		public EventData Data { get { return data; } }
 		/// <summary>The animation time this event was keyed.</summary>

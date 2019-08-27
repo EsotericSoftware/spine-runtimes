@@ -55,14 +55,13 @@ public:
 	/// @param time The time within the animation. Most timelines find the key before and the key after this time so they can interpolate between the keys.
 	/// @param pEvents If any events are fired, they are added to this array. Can be NULL to ignore firing events or if the timeline does not fire events. May be NULL.
 	/// @param alpha alpha 0 applies the current or setup pose value (depending on pose parameter). 1 applies the timeline
-	///     value. Between 0 and 1 applies a value between the current or setup pose and the timeline value. By adjusting
-	///     alpha over time, an animation can be mixed in or out. alpha can also be useful to
-	///      apply animations on top of each other (layered).
+	///	value. Between 0 and 1 applies a value between the current or setup pose and the timeline value. By adjusting alpha over
+	///	time, an animation can be mixed in or out. alpha can also be useful to apply animations on top of each other (layered).
 	/// @param blend Controls how mixing is applied when alpha is than 1.
 	/// @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions such as DrawOrderTimeline and AttachmentTimeline.
 	virtual void
 	apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixBlend blend,
-		  MixDirection direction) = 0;
+		MixDirection direction) = 0;
 
 	virtual int getPropertyId() = 0;
 };

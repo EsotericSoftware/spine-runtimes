@@ -27,7 +27,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Not for optimization. Do  not disable.
+// Not for optimization. Do not disable.
 #define SPINE_TRIANGLECHECK // Avoid calling SetTriangles at the cost of checking for mesh differences (vertex counts, memberwise attachment list compare) every frame.
 //#define SPINE_DEBUG
 
@@ -110,7 +110,7 @@ namespace Spine.Unity {
 		///<summary>This is a Mesh that also stores the instructions SkeletonRenderer generated for it.</summary>
 		public class SmartMesh : IDisposable {
 			public Mesh mesh = SpineMesh.NewSkeletonMesh();
-			public SkeletonRendererInstruction instructionUsed = new SkeletonRendererInstruction();		
+			public SkeletonRendererInstruction instructionUsed = new SkeletonRendererInstruction();
 
 			public void Clear () {
 				mesh.Clear();

@@ -31,7 +31,7 @@ using UnityEngine;
 using Spine;
 using Spine.Unity;
 
-namespace Spine.Unity.Examples {	
+namespace Spine.Unity.Examples {
 	public class BoneLocalOverride : MonoBehaviour {
 		[SpineBone]
 		public string boneName;

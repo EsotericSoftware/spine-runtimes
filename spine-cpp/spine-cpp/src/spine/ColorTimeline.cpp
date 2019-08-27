@@ -62,7 +62,8 @@ ColorTimeline::ColorTimeline(int frameCount) : CurveTimeline(frameCount), _slotI
 }
 
 void ColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						  MixBlend blend, MixDirection direction) {
+	MixBlend blend, MixDirection direction
+) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -72,15 +73,15 @@ void ColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 	if (!slot._bone.isActive()) return;
 	if (time < _frames[0]) {
 		switch (blend) {
-			case MixBlend_Setup:
-				slot._color.set(slot._data._color);
-				return;
-			case MixBlend_First: {
-				Color &color = slot._color, setup = slot._data._color;
-				color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
-						  (setup.a - color.a) * alpha);
-			}
-			default: ;
+		case MixBlend_Setup:
+			slot._color.set(slot._data._color);
+			return;
+		case MixBlend_First: {
+			Color &color = slot._color, setup = slot._data._color;
+			color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
+				(setup.a - color.a) * alpha);
+		}
+		default: ;
 		}
 		return;
 	}
@@ -101,8 +102,7 @@ void ColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 		b = _frames[frame + PREV_B];
 		a = _frames[frame + PREV_A];
 		float frameTime = _frames[frame];
-		float percent = getCurvePercent(frame / ENTRIES - 1,
-										1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+		float percent = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
 
 		r += (_frames[frame + R] - r) * percent;
 		g += (_frames[frame + G] - g) * percent;

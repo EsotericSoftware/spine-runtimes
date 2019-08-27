@@ -98,9 +98,7 @@ public:
 
 	float localToWorldRotation(float localRotation);
 
-	///
 	/// Rotates the world transform the specified amount and sets isAppliedValid to false.
-	///
 	/// @param degrees Degrees.
 	void rotateWorld(float degrees);
 

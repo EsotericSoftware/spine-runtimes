@@ -50,7 +50,8 @@ RotateTimeline::RotateTimeline(int frameCount) : CurveTimeline(frameCount), _bon
 }
 
 void RotateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						   MixBlend blend, MixDirection direction) {
+	MixBlend blend, MixDirection direction
+) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -60,21 +61,20 @@ void RotateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 
 	if (time < _frames[0]) {
 		switch (blend) {
-			case MixBlend_Setup: {
-				bone->_rotation = bone->_data._rotation;
-				break;
-			}
-			case MixBlend_First: {
-				float r = bone->_data._rotation - bone->_rotation;
-				bone->_rotation += (r - (16384 - (int) (16384.499999999996 - r / 360)) * 360) * alpha;
-				break;
-			}
-			default: {
-				// TODO?
-				break;
-			}
+		case MixBlend_Setup: {
+			bone->_rotation = bone->_data._rotation;
+			break;
 		}
-
+		case MixBlend_First: {
+			float r = bone->_data._rotation - bone->_rotation;
+			bone->_rotation += (r - (16384 - (int) (16384.499999999996 - r / 360)) * 360) * alpha;
+			break;
+		}
+		default: {
+			// TODO?
+			break;
+		}
+		}
 		return;
 	}
 
@@ -100,7 +100,7 @@ void RotateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	float prevRotation = _frames[frame + PREV_ROTATION];
 	float frameTime = _frames[frame];
 	float percent = getCurvePercent((frame >> 1) - 1,
-									1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+		1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
 	float r = _frames[frame + ROTATION] - prevRotation;
 	r = prevRotation + (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * percent;
 	switch (blend) {

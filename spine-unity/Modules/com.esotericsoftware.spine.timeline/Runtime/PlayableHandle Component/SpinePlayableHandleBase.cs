@@ -39,7 +39,7 @@ namespace Spine.Unity.Playables {
 
 	/// <summary>Base class for Spine Playable Handle components, commonly for integrating with UnityEngine Timeline.</summary>
 	public abstract class SpinePlayableHandleBase : MonoBehaviour {
-		
+
 		/// <summary>Gets the SkeletonData of the targeted Spine component.</summary>
 		public abstract SkeletonData SkeletonData { get; }
 

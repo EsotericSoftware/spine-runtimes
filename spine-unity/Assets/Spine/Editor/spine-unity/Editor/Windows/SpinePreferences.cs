@@ -116,10 +116,10 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void HandlePreferencesGUI (SerializedObject settings) {
-			
+
 			float prevLabelWidth = EditorGUIUtility.labelWidth;
 			EditorGUIUtility.labelWidth = 250;
-			
+
 			using (new EditorGUI.IndentLevelScope()) {
 				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(settings.FindProperty("showHierarchyIcons"), new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."));
@@ -138,7 +138,7 @@ namespace Spine.Unity.Editor {
 				{
 					SpineEditorUtilities.FloatPropertyField(settings.FindProperty("defaultMix"), new GUIContent("Default Mix", "The Default Mix Duration for newly imported SkeletonDataAssets."), min: 0f);
 					SpineEditorUtilities.FloatPropertyField(settings.FindProperty("defaultScale"), new GUIContent("Default SkeletonData Scale", "The Default skeleton import scale for newly imported SkeletonDataAssets."), min: 0.0000001f);
-					
+
 					SpineEditorUtilities.ShaderPropertyField(settings.FindProperty("defaultShader"), new GUIContent("Default Shader"), SpinePreferences.DEFAULT_DEFAULT_SHADER);
 
 					EditorGUILayout.PropertyField(settings.FindProperty("setTextureImporterSettings"), new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."));
@@ -163,7 +163,7 @@ namespace Spine.Unity.Editor {
 				{
 					EditorGUILayout.PropertyField(settings.FindProperty("mecanimEventIncludeFolderName"), new GUIContent("Include Folder Name in Event", "When enabled, Mecanim events will call methods named 'FolderNameEventName', when disabled it will call 'EventName'."));
 				}
-				
+
 				EditorGUILayout.Space();
 				EditorGUILayout.LabelField("Handles and Gizmos", EditorStyles.boldLabel);
 				{

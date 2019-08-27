@@ -52,7 +52,8 @@ PathConstraintSpacingTimeline::PathConstraintSpacingTimeline(int frameCount) : P
 }
 
 void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents,
-										  float alpha, MixBlend blend, MixDirection direction) {
+	float alpha, MixBlend blend, MixDirection direction
+) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -63,14 +64,14 @@ void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, fl
 
 	if (time < _frames[0]) {
 		switch (blend) {
-			case MixBlend_Setup:
-				constraint._spacing = constraint._data._spacing;
-				return;
-			case MixBlend_First:
-				constraint._spacing += (constraint._data._spacing - constraint._spacing) * alpha;
-				return;
-			default:
-				return;
+		case MixBlend_Setup:
+			constraint._spacing = constraint._data._spacing;
+			return;
+		case MixBlend_First:
+			constraint._spacing += (constraint._data._spacing - constraint._spacing) * alpha;
+			return;
+		default:
+			return;
 		}
 	}
 
@@ -84,16 +85,15 @@ void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, fl
 		spacing = _frames[frame + PREV_VALUE];
 		float frameTime = _frames[frame];
 		float percent = getCurvePercent(frame / ENTRIES - 1,
-										1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+			1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
 
 		spacing += (_frames[frame + VALUE] - spacing) * percent;
 	}
 
-	if (blend == MixBlend_Setup) {
+	if (blend == MixBlend_Setup)
 		constraint._spacing = constraint._data._spacing + (spacing - constraint._data._spacing) * alpha;
-	} else {
+	else
 		constraint._spacing += (spacing - constraint._spacing) * alpha;
-	}
 }
 
 int PathConstraintSpacingTimeline::getPropertyId() {

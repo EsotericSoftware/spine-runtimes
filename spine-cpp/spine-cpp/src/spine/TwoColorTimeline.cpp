@@ -69,7 +69,8 @@ TwoColorTimeline::TwoColorTimeline(int frameCount) : CurveTimeline(frameCount), 
 }
 
 void TwoColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-							 MixBlend blend, MixDirection direction) {
+	MixBlend blend, MixDirection direction
+) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -159,8 +160,7 @@ int TwoColorTimeline::getPropertyId() {
 	return ((int) TimelineType_TwoColor << 24) + _slotIndex;
 }
 
-void TwoColorTimeline::setFrame(int frameIndex, float time, float r, float g, float b, float a, float r2, float g2,
-								float b2) {
+void TwoColorTimeline::setFrame(int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
 	frameIndex *= ENTRIES;
 	_frames[frameIndex] = time;
 	_frames[frameIndex + R] = r;

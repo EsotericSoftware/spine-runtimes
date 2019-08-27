@@ -46,7 +46,7 @@ void spAnimationState_disposeStatics () {
 }
 
 /* Forward declaration of some "private" functions so we can keep
-   the same function order in C as we have method order in Java */
+ the same function order in C as we have method order in Java. */
 void _spAnimationState_disposeTrackEntry (spTrackEntry* entry);
 void _spAnimationState_disposeTrackEntries (spAnimationState* state, spTrackEntry* entry);
 int /*boolean*/ _spAnimationState_updateMixingFrom (spAnimationState* self, spTrackEntry* entry, float delta);
@@ -65,7 +65,6 @@ int _spAnimationState_addPropertyID(spAnimationState* self, int id);
 void _spTrackEntry_computeHold(spTrackEntry* self, spAnimationState* state);
 void _spTrackEntry_computeNotLast(spTrackEntry* self, spAnimationState* state);
 
-
 _spEventQueue* _spEventQueue_create (_spAnimationState* state) {
 	_spEventQueue *self = CALLOC(_spEventQueue, 1);
 	self->state = state;
@@ -78,7 +77,7 @@ _spEventQueue* _spEventQueue_create (_spAnimationState* state) {
 
 void _spEventQueue_free (_spEventQueue* self) {
 	FREE(self->objects);
-    FREE(self);
+	FREE(self);
 }
 
 void _spEventQueue_ensureCapacity (_spEventQueue* self, int newElements) {
@@ -250,7 +249,7 @@ void spAnimationState_dispose (spAnimationState* self) {
 	_spEventQueue_free(internal->queue);
 	FREE(internal->events);
 	FREE(internal->propertyIDs);
-    FREE(internal);
+	FREE(internal);
 }
 
 void spAnimationState_update (spAnimationState* self, float delta) {
@@ -370,9 +369,9 @@ int spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		/* Apply mixing from entries first. */
 		mix = current->alpha;
 		if (current->mixingFrom)
-            mix *= _spAnimationState_applyMixingFrom(self, current, skeleton, blend);
-        else if (current->trackTime >= current->trackEnd && current->next == 0)
-            mix = 0;
+			mix *= _spAnimationState_applyMixingFrom(self, current, skeleton, blend);
+		else if (current->trackTime >= current->trackEnd && current->next == 0)
+			mix = 0;
 
 		/* Apply current entry. */
 		animationLast = current->animationLast; animationTime = spTrackEntry_getAnimationTime(current);
@@ -493,7 +492,7 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 			from->totalAlpha += alpha;
 			if (timeline->type == SP_TIMELINE_ROTATE)
 				_spAnimationState_applyRotateTimeline(self, timeline, skeleton, animationTime, alpha, timelineBlend,
-													  timelinesRotation, i << 1, firstFrame);
+					timelinesRotation, i << 1, firstFrame);
 			else {
 				if (timelineBlend == SP_MIX_BLEND_SETUP) {
 					if (timeline->type == SP_TIMELINE_ATTACHMENT) {
@@ -504,7 +503,7 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 				}
 
 				spTimeline_apply(timeline, skeleton, animationLast, animationTime, events, &internal->eventsCount,
-								 alpha, timelineBlend, direction);
+					alpha, timelineBlend, direction);
 			}
 		}
 	}
@@ -518,7 +517,9 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 	return mix;
 }
 
-void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* timeline, spSkeleton* skeleton, float time, float alpha, spMixBlend blend, float* timelinesRotation, int i, int /*boolean*/ firstFrame) {
+void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* timeline, spSkeleton* skeleton, float time,
+	float alpha, spMixBlend blend, float* timelinesRotation, int i, int /*boolean*/ firstFrame
+) {
 	spRotateTimeline *rotateTimeline;
 	float *frames;
 	spBone* bone;
@@ -562,8 +563,7 @@ void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* 
 			prevRotation = frames[frame + ROTATE_PREV_ROTATION];
 			frameTime = frames[frame];
 			percent = spCurveTimeline_getCurvePercent(SUPER(rotateTimeline), (frame >> 1) - 1,
-													  1 - (time - frameTime) /
-														  (frames[frame + ROTATE_PREV_TIME] - frameTime));
+				1 - (time - frameTime) / (frames[frame + ROTATE_PREV_TIME] - frameTime));
 
 			r2 = frames[frame + ROTATE_ROTATION] - prevRotation;
 			r2 -= (16384 - (int) (16384.499999999996 - r2 / 360)) * 360;
@@ -698,8 +698,7 @@ void _spAnimationState_setCurrent (spAnimationState* self, int index, spTrackEnt
 }
 
 /** Set the current animation. Any queued animations are cleared. */
-spTrackEntry* spAnimationState_setAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
-												   int/*bool*/loop) {
+spTrackEntry* spAnimationState_setAnimationByName (spAnimationState* self, int trackIndex, const char* animationName, int/*bool*/loop) {
 	spAnimation* animation = spSkeletonData_findAnimation(self->data->skeletonData, animationName);
 	return spAnimationState_setAnimation(self, trackIndex, animation, loop);
 }
@@ -730,13 +729,13 @@ spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIn
 /** Adds an animation to be played delay seconds after the current or last queued animation, taking into account any mix
  * duration. */
 spTrackEntry* spAnimationState_addAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
-												   int/*bool*/loop, float delay) {
+	int/*bool*/loop, float delay
+) {
 	spAnimation* animation = spSkeletonData_findAnimation(self->data->skeletonData, animationName);
 	return spAnimationState_addAnimation(self, trackIndex, animation, loop, delay);
 }
 
-spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop,
-											 float delay) {
+spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop, float delay) {
 	spTrackEntry* entry;
 	_spAnimationState* internal = SUB_CAST(_spAnimationState, self);
 	spTrackEntry* last = _spAnimationState_expandToIndex(self, trackIndex);

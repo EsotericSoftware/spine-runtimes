@@ -86,7 +86,7 @@ namespace Spine {
 		public void Apply () {
 			Update();
 		}
-		
+
 		public void Update () {
 			PathAttachment attachment = target.Attachment as PathAttachment;
 			if (attachment == null) return;
@@ -447,7 +447,7 @@ namespace Spine {
 					output[o + 2] = (float)Math.Atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 			}
 		}
-		
+
 		/// <summary>The position along the path.</summary>
 		public float Position { get { return position; } set { position = value; } }
 		/// <summary>The spacing between bones.</summary>

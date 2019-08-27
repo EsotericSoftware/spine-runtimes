@@ -35,8 +35,8 @@ namespace Spine.Unity.Examples {
 	public class DummyMecanimControllerExample : MonoBehaviour {
 
 		public Animator logicAnimator;
-		public SkeletonAnimationHandleExample animationHandle; 
-		
+		public SkeletonAnimationHandleExample animationHandle;
+
 		[Header("Controls")]
 		public KeyCode walkButton = KeyCode.LeftShift;
 		public KeyCode jumpButton = KeyCode.Space;
@@ -56,7 +56,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		void Update () {
-			float x = Input.GetAxisRaw("Horizontal");			
+			float x = Input.GetAxisRaw("Horizontal");
 			if (Input.GetKey(walkButton)) {
 				x *= 0.4f;
 			}
@@ -72,7 +72,7 @@ namespace Spine.Unity.Examples {
 				if (isGrounded)
 					StartCoroutine(FakeJump());
 			}
-				
+
 			logicAnimator.SetFloat(horizontalSpeedProperty, Mathf.Abs(speed.x));
 			logicAnimator.SetFloat(verticalSpeedProperty, speed.y);
 			logicAnimator.SetBool(groundedProperty, isGrounded);

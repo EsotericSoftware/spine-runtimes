@@ -31,7 +31,7 @@ using System;
 
 namespace Spine {
 	/// <summary>>An attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
-	/// <see cref="Slot.Deform"/>.</summary> 
+	/// <see cref="Slot.Deform"/>.</summary>
 	public abstract class VertexAttachment : Attachment {
 		static int nextID = 0;
 		static readonly Object nextIdLock = new Object();
@@ -141,14 +141,14 @@ namespace Spine {
 			}
 			else
 				attachment.bones = null;
-			
+
 			if (vertices != null) {
 				attachment.vertices = new float[vertices.Length];
 				Array.Copy(vertices, 0, attachment.vertices, 0, vertices.Length);
 			}
 			else
 				attachment.vertices = null;
-			
+
 			attachment.worldVerticesLength = worldVerticesLength;
 			attachment.deformAttachment = deformAttachment;
 		}

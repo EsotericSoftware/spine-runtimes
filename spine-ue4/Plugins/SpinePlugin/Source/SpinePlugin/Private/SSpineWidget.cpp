@@ -74,7 +74,7 @@ static void setVertex(FSlateVertex* vertex, float x, float y, float u, float v, 
 }
 
 int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyClippingRect, FSlateWindowElementList& OutDrawElements,
-							   int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const {
+	int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const {
 
 	SSpineWidget* self = (SSpineWidget*)this;
 	UMaterialInstanceDynamic* MatNow = nullptr;

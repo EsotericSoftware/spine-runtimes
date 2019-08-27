@@ -46,7 +46,7 @@ namespace Spine.Unity {
 		public override IEnumerable<Material> Materials { get { return materials; } }
 		public override int MaterialCount { get { return materials == null ? 0 : materials.Length; } }
 		public override Material PrimaryMaterial { get { return materials[0]; } }
-		
+
 		#region Runtime Instantiation
 		/// <summary>
 		/// Creates a runtime AtlasAsset</summary>

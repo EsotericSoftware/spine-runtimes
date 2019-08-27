@@ -38,7 +38,7 @@
 	bool _debugBones;
 	bool _premultipliedAlpha;
 	bool _twoColorTint;
-    bool _skipVisibilityCheck;
+	bool _skipVisibilityCheck;
 	ccBlendFunc _blendFunc;
 	CCDrawNode* _drawNode;
 	bool _ownsSkeletonData;

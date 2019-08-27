@@ -33,7 +33,7 @@ using Spine;
 
 namespace Spine.Unity {
 	/// <summary>
-	/// Use this as a condition-blocking yield instruction for Unity Coroutines. 
+	/// Use this as a condition-blocking yield instruction for Unity Coroutines.
 	/// The routine will pause until the AnimationState.TrackEntry fires its End event.</summary>
 	public class WaitForSpineTrackEntryEnd : IEnumerator {
 
@@ -59,7 +59,7 @@ namespace Spine.Unity {
 
 		#region Reuse
 		/// <summary>
-		/// One optimization high-frequency YieldInstruction returns is to cache instances to minimize GC pressure. 
+		/// One optimization high-frequency YieldInstruction returns is to cache instances to minimize GC pressure.
 		/// Use NowWaitFor to reuse the same instance of WaitForSpineAnimationEnd.</summary>
 		public WaitForSpineTrackEntryEnd NowWaitFor (Spine.TrackEntry trackEntry) {
 			SafeSubscribe(trackEntry);

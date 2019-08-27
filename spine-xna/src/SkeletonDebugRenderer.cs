@@ -104,7 +104,7 @@ namespace Spine {
 					if (bone.Parent == null) continue;
 					var x = bone.Data.Length * bone.A + bone.WorldX;
 					var y = bone.Data.Length * bone.C + bone.WorldY;
-					renderer.Line(bone.WorldX, bone.WorldY, x, y);					
+					renderer.Line(bone.WorldX, bone.WorldY, x, y);
 				}
 				if (DrawSkeletonXY) renderer.X(skeletonX, skeletonY, 4);
 			}

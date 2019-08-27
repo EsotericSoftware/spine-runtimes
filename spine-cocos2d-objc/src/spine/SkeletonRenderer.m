@@ -68,7 +68,7 @@ static bool handlerQueued = false;
 		batcher = spTwoColorBatcher_create();
 		mesh = spMesh_create(64000, 32000);
 	}
-	
+
 	_ownsSkeletonData = ownsSkeletonData;
 
 	_worldVertices = MALLOC(float, 1000); // Max number of vertices per mesh.
@@ -81,7 +81,7 @@ static bool handlerQueued = false;
 	_drawNode = [[CCDrawNode alloc] init];
 	[_drawNode setBlendMode: [CCBlendMode premultipliedAlphaMode]];
 	[self addChild:_drawNode];
-	
+
 	[self setShader:[CCShader positionTextureColorShader]];
 
 	_premultipliedAlpha = true;
@@ -89,7 +89,7 @@ static bool handlerQueued = false;
 		CCBlendFuncSrcColor: @(GL_ONE),
 		CCBlendFuncDstColor: @(GL_ONE_MINUS_SRC_COLOR)}
 	];
-	
+
 	_clipper = spSkeletonClipping_create();
 	_effect = 0;
 }
@@ -167,15 +167,15 @@ static bool handlerQueued = false;
 	// notification system that may break if the block is called on a
 	// separate thread.
 	if (!handlerQueued) {
-		[[CCDirector sharedDirector] addFrameCompletionHandler: ^{			
+		[[CCDirector sharedDirector] addFrameCompletionHandler: ^{
 			spMesh_clearParts(mesh);
 			handlerQueued = false;
 		}];
 		handlerQueued = true;
 	}
-	
+
 	if (_effect) _effect->begin(_effect, _skeleton);
-	
+
 	CCColor* nodeColor = self.color;
 	_skeleton->color.r = nodeColor.red;
 	_skeleton->color.g = nodeColor.green;
@@ -232,7 +232,7 @@ static bool handlerQueued = false;
 		}
 		default: ;
 		}
-		
+
 		if (texture) {
 			if (slot->data->blendMode != blendMode) {
 				blendMode = slot->data->blendMode;
@@ -283,9 +283,9 @@ static bool handlerQueued = false;
 				GLKVector2 extents = GLKVector2Make((maxX - minX) / 2, (maxY - minY) / 2);
 				isVisible = CCRenderCheckVisbility(transform, center, extents);
 			}
-			
+
 			if (isVisible) {
-				
+
 				if (spSkeletonClipping_isClipping(_clipper)) {
 					spSkeletonClipping_clipTriangles(_clipper, vertices, verticesCount, triangles, trianglesCount, uvs, 2);
 					vertices = _clipper->clippedVertices->items;
@@ -294,7 +294,7 @@ static bool handlerQueued = false;
 					triangles = _clipper->clippedTriangles->items;
 					trianglesCount = _clipper->clippedTriangles->size;
 				}
-				
+
 				if (trianglesCount > 0) {
 					if (!self.twoColorTint) {
 						CCRenderBuffer buffer = [renderer enqueueTriangles:(trianglesCount / 3) andVertexes:verticesCount withState:self.renderState globalSortOrder:0];
@@ -330,13 +330,13 @@ static bool handlerQueued = false;
 						} else {
 							dr = dg = db = 0;
 						}
-						
+
 						spMeshPart meshPart;
 						spMesh_allocatePart(mesh, &meshPart, verticesCount / 2, trianglesCount, self.texture.name, srcBlend, dstBlend);
-						
+
 						spVertex* verts = &meshPart.mesh->vertices[meshPart.startVertex];
 						unsigned short* indices = &meshPart.mesh->indices[meshPart.startIndex];
-						
+
 						if (_effect) {
 							spColor light;
 							light.r = r;
@@ -351,13 +351,13 @@ static bool handlerQueued = false;
 							for (int i = 0; i * 2 < verticesCount; i++, verts++) {
 								spColor lightCopy = light;
 								spColor darkCopy = dark;
-								
+
 								CCVertex vertex;
 								vertex.position = GLKVector4Make(vertices[i * 2], vertices[i * 2 + 1], 0.0, 1.0);
 								verts->u = uvs[i * 2];
 								verts->v = 1 - uvs[i * 2 + 1];
 								_effect->transform(_effect, &vertex.position.x, &vertex.position.y, &verts->u, &verts->v, &lightCopy, &darkCopy);
-								
+
 								vertex = CCVertexApplyTransform(vertex, transform);
 								verts->x = vertex.position.x;
 								verts->y = vertex.position.y;
@@ -365,7 +365,7 @@ static bool handlerQueued = false;
 								verts->w = vertex.position.w;
 								verts->color = ((unsigned short)(lightCopy.r * 255))| ((unsigned short)(lightCopy.g * 255)) << 8 | ((unsigned short)(lightCopy.b * 255)) <<16 | ((unsigned short)(lightCopy.a * 255)) << 24;
 								verts->color2 = ((unsigned short)(darkCopy.r * 255)) | ((unsigned short)(darkCopy.g * 255)) << 8 | ((unsigned short)(darkCopy.b * 255)) << 16 | ((unsigned short)(darkCopy.a * 255)) << 24;
-								
+
 							}
 						} else {
 							for (int i = 0; i * 2 < verticesCount; i++, verts++) {
@@ -382,11 +382,11 @@ static bool handlerQueued = false;
 								verts->v = 1 - uvs[i * 2 + 1];
 							}
 						}
-						
+
 						for (int j = 0; j < trianglesCount; j++, indices++) {
 							*indices = triangles[j];
 						}
-						
+
 						[renderer enqueueBlock:^{
 							spTwoColorBatcher_add(batcher, meshPart);
 						} globalSortOrder:0 debugLabel: nil threadSafe: false];
@@ -397,13 +397,13 @@ static bool handlerQueued = false;
 		spSkeletonClipping_clipEnd(_clipper, slot);
 	}
 	spSkeletonClipping_clipEnd2(_clipper);
-	
+
 	if (self.twoColorTint) {
 		[renderer enqueueBlock:^{
 			spTwoColorBatcher_flush(batcher);
 		} globalSortOrder:0 debugLabel: nil threadSafe: false];
 	}
-	
+
 	[_drawNode clear];
 	if (_debugSlots) {
 		// Slots.
@@ -430,7 +430,7 @@ static bool handlerQueued = false;
 			float y = bone->data->length * bone->c + bone->worldY;
 			[_drawNode drawSegmentFrom:ccp(bone->worldX, bone->worldY) to: ccp(x, y)radius:2 color:[CCColor redColor]];
 		}
-		
+
 		// Bone origins.
 		for (int i = 0, n = _skeleton->bonesCount; i < n; i++) {
 			spBone *bone = _skeleton->bones[i];
@@ -439,7 +439,7 @@ static bool handlerQueued = false;
 			if (i == 0) [_drawNode drawDot:ccp(bone->worldX, bone->worldY) radius:4 color:[CCColor blueColor]];
 		}
 	}
-	
+
 	if (_effect) _effect->end(_effect);
 }
 

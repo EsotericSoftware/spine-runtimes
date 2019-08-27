@@ -59,12 +59,12 @@ void spIkConstraint_dispose(spIkConstraint *self) {
 
 void spIkConstraint_apply(spIkConstraint *self) {
 	switch (self->bonesCount) {
-		case 1:
-			spIkConstraint_apply1(self->bones[0], self->target->worldX, self->target->worldY, self->compress, self->stretch, self->data->uniform, self->mix);
-			break;
-		case 2:
-			spIkConstraint_apply2(self->bones[0], self->bones[1], self->target->worldX, self->target->worldY, self->bendDirection, self->stretch, self->softness, self->mix);
-			break;
+	case 1:
+		spIkConstraint_apply1(self->bones[0], self->target->worldX, self->target->worldY, self->compress, self->stretch, self->data->uniform, self->mix);
+		break;
+	case 2:
+		spIkConstraint_apply2(self->bones[0], self->bones[1], self->target->worldX, self->target->worldY, self->bendDirection, self->stretch, self->softness, self->mix);
+		break;
 	}
 }
 

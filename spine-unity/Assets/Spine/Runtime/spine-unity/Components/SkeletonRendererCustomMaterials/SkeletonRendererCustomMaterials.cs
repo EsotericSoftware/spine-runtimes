@@ -55,7 +55,7 @@ namespace Spine.Unity {
 		void Reset () {
 			skeletonRenderer = GetComponent<SkeletonRenderer>();
 
-			// Populate atlas list 
+			// Populate atlas list
 			if (skeletonRenderer != null && skeletonRenderer.skeletonDataAsset != null) {
 				var atlasAssets = skeletonRenderer.skeletonDataAsset.atlasAssets;
 
@@ -148,7 +148,7 @@ namespace Spine.Unity {
 
 				if (!skeletonRenderer.CustomMaterialOverride.TryGetValue(atlasMaterialOverride.originalMaterial, out currentMaterial))
 					continue;
-				
+
 				// Do not revert the material if it was changed by something else
 				if (currentMaterial != atlasMaterialOverride.replacementMaterial)
 					continue;
@@ -157,7 +157,7 @@ namespace Spine.Unity {
 			}
 			#endif
 		}
-			
+
 		// OnEnable applies the overrides at runtime, and when the editor loads.
 		void OnEnable () {
 			if (skeletonRenderer == null)

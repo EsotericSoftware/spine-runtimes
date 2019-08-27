@@ -36,7 +36,7 @@ namespace Spine.Unity.Examples {
 	public class SkeletonRenderPartInspector : UnityEditor.Editor {
 		SpineInspectorUtility.SerializedSortingProperties sortingProperties;
 
-		void OnEnable () {			
+		void OnEnable () {
 			sortingProperties = new SpineInspectorUtility.SerializedSortingProperties(SpineInspectorUtility.GetRenderersSerializedObject(serializedObject));
 		}
 

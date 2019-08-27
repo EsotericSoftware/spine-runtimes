@@ -69,7 +69,7 @@ namespace Spine.Unity.AttachmentTools {
 
 		/// <summary>Sets the region (image) of a RegionAttachment</summary>
 		public static void SetRegion (this RegionAttachment attachment, AtlasRegion region, bool updateOffset = true) {
-			if (region == null) throw new System.ArgumentNullException("region"); 
+			if (region == null) throw new System.ArgumentNullException("region");
 
 			// (AtlasAttachmentLoader.cs)
 			attachment.RendererObject = region;
@@ -86,7 +86,7 @@ namespace Spine.Unity.AttachmentTools {
 
 		/// <summary>Sets the region (image) of a MeshAttachment</summary>
 		public static void SetRegion (this MeshAttachment attachment, AtlasRegion region, bool updateUVs = true) {
-			if (region == null) throw new System.ArgumentNullException("region"); 
+			if (region == null) throw new System.ArgumentNullException("region");
 
 			// (AtlasAttachmentLoader.cs)
 			attachment.RendererObject = region;

@@ -75,21 +75,21 @@ void spShader_dispose(spShader* shader);
 
 typedef struct spTwoColorBatcher {
 	spShader* shader;
-	
+
 	uint32_t vertexBufferHandle;
 	spVertex* verticesBuffer;
 	uint32_t numVertices;
-	
+
 	uint32_t indexBufferHandle;
 	unsigned short* indicesBuffer;
 	uint32_t numIndices;
-	
+
 	int32_t positionAttributeLocation;
 	int32_t colorAttributeLocation;
 	int32_t color2AttributeLocation;
 	int32_t texCoordsAttributeLocation;
 	int32_t textureUniformLocation;
-	
+
 	uint32_t lastTextureHandle;
 	uint32_t lastSrcBlend;
 	uint32_t lastDstBlend;

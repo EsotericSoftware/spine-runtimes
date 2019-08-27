@@ -36,6 +36,6 @@ package spine.animation {
 		}
 
 		public static const In : MixDirection = new MixDirection(0);
-		public static const Out : MixDirection = new MixDirection(1);		
+		public static const Out : MixDirection = new MixDirection(1);
 	}
 }

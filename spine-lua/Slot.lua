@@ -46,10 +46,10 @@ function Slot.new (data, bone)
 		attachment = nil,
 		attachmentTime = 0,
 		deform = {}
-	}	
+	}
 
 	setmetatable(self, Slot)
-	
+
 	if data.darkColor then self.darkColor = Color.newWith(1, 1, 1, 1) end
 
 	self:setToSetupPose()

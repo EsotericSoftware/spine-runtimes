@@ -59,7 +59,7 @@ namespace Spine {
 			SetMix(from, to, duration);
 		}
 
-		/// <summary>Sets a mix duration when changing from the specified animation to the other. 
+		/// <summary>Sets a mix duration when changing from the specified animation to the other.
 		/// See TrackEntry.MixDuration.</summary>
 		public void SetMix (Animation from, Animation to, float duration) {
 			if (from == null) throw new ArgumentNullException("from", "from cannot be null.");
@@ -70,7 +70,7 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// The mix duration to use when changing from the specified animation to the other, 
+		/// The mix duration to use when changing from the specified animation to the other,
 		/// or the DefaultMix if no mix duration has been set.
 		/// </summary>
 		public float GetMix (Animation from, Animation to) {

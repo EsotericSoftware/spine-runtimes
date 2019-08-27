@@ -44,7 +44,7 @@
 
 #include <stdio.h>
 
-#define STRINGIFY(A)  #A
+#define STRINGIFY(A) #A
 #define MAX_VERTICES 64000
 #define MAX_INDICES 64000
 
@@ -76,7 +76,7 @@ const char* TWO_COLOR_TINT_FRAGMENT_SHADER = STRINGIFY(
 \n#ifdef GL_ES\n
 precision lowp float;
 \n#endif\n
-													   
+
 uniform sampler2D texture;
 
 varying vec4 v_light;
@@ -84,10 +84,10 @@ varying vec4 v_dark;
 varying vec2 v_texCoord;
 
 void main() {
-   vec4 texColor = texture2D(texture, v_texCoord);
-   float alpha = texColor.a * v_light.a;
-   gl_FragColor.a = alpha;
-   gl_FragColor.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;
+	vec4 texColor = texture2D(texture, v_texCoord);
+	float alpha = texColor.a * v_light.a;
+	gl_FragColor.a = alpha;
+	gl_FragColor.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;
 }
 );
 
@@ -111,7 +111,7 @@ void spMesh_allocatePart(spMesh* mesh, spMeshPart* part, uint32_t numVertices, u
 		mesh->numIndices = mesh->numAllocatedIndices + numIndices;
 		mesh->indices = REALLOC(mesh->indices, unsigned short, mesh->numIndices);
 	}
-	
+
 	part->mesh = mesh;
 	part->startVertex = mesh->numAllocatedVertices;
 	part->numIndices = numIndices;
@@ -120,7 +120,7 @@ void spMesh_allocatePart(spMesh* mesh, spMeshPart* part, uint32_t numVertices, u
 	part->textureHandle = textureHandle;
 	part->srcBlend = srcBlend;
 	part->dstBlend = dstBlend;
-	
+
 	mesh->numAllocatedVertices += numVertices;
 	mesh->numAllocatedIndices += numIndices;
 }
@@ -161,19 +161,19 @@ GLuint compileShader(GLenum shaderType, const char* shaderSource) {
 spShader* spShader_create(const char* vertexShaderSource, const char* fragmentShaderSource) {
 	GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
 	GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
-	
+
 	GLuint program = glCreateProgram();
 	glAttachShader(program, vertexShader);
 	glAttachShader(program, fragmentShader);
 	glLinkProgram(program);
-	
+
 	GLint status;
 	glGetProgramiv(program, GL_LINK_STATUS, &status);
 	if (!status) {
 		printf("Unknown error while linking program\n");
 		exit(-1);
 	}
-	
+
 	spShader* shader = MALLOC(spShader, 1);
 	shader->program = program;
 	shader->vertexShader = vertexShader;
@@ -190,14 +190,14 @@ void spShader_dispose(spShader* shader) {
 
 spTwoColorBatcher* spTwoColorBatcher_create() {
 	spTwoColorBatcher* batcher = MALLOC(spTwoColorBatcher, 1);
-	
+
 	batcher->shader = spShader_create(TWO_COLOR_TINT_VERTEX_SHADER, TWO_COLOR_TINT_FRAGMENT_SHADER);
 	batcher->positionAttributeLocation = glGetAttribLocation(batcher->shader->program, "a_position");
 	batcher->colorAttributeLocation = glGetAttribLocation(batcher->shader->program, "a_color");
 	batcher->color2AttributeLocation = glGetAttribLocation(batcher->shader->program, "a_color2");
 	batcher->texCoordsAttributeLocation = glGetAttribLocation(batcher->shader->program, "a_texCoords");
 	batcher->textureUniformLocation = glGetUniformLocation(batcher->shader->program, "texture");
-	
+
 	glGenBuffers(1, &batcher->vertexBufferHandle);
 	glGenBuffers(1, &batcher->indexBufferHandle);
 	batcher->verticesBuffer = MALLOC(spVertex, MAX_VERTICES);
@@ -214,20 +214,20 @@ void spTwoColorBatcher_add(spTwoColorBatcher* batcher, spMeshPart mesh) {
 	if (batcher->numVertices + mesh.numVertices > MAX_VERTICES || batcher->numIndices + mesh.numIndices > MAX_INDICES) {
 		spTwoColorBatcher_flush(batcher);
 	}
-	
+
 	if (batcher->lastTextureHandle != mesh.textureHandle || batcher->lastSrcBlend != mesh.srcBlend || batcher->lastDstBlend != mesh.dstBlend) {
 		spTwoColorBatcher_flush(batcher);
 	}
-	
+
 	spVertex* vertices = &batcher->verticesBuffer[batcher->numVertices];
 	unsigned short* indices = &batcher->indicesBuffer[batcher->numIndices];
-	
+
 	memcpy(vertices, &mesh.mesh->vertices[mesh.startVertex], mesh.numVertices * sizeof(spVertex));
 	unsigned short offset = (unsigned short)batcher->numVertices;
 	for (int i = 0, j = mesh.startIndex, n = mesh.numIndices; i < n; i++, j++) {
 		indices[i] = mesh.mesh->indices[j] + offset;
 	}
-	
+
 	batcher->numIndices += mesh.numIndices;
 	batcher->numVertices += mesh.numVertices;
 	batcher->lastSrcBlend = mesh.srcBlend;
@@ -238,39 +238,39 @@ void spTwoColorBatcher_add(spTwoColorBatcher* batcher, spMeshPart mesh) {
 void spTwoColorBatcher_flush(spTwoColorBatcher* batcher) {
 	if (batcher->numVertices == 0 || batcher->numIndices == 0)
 		return;
-	
+
 	glUseProgram(batcher->shader->program);
-		
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, batcher->lastTextureHandle);
 	glUniform1i(batcher->textureUniformLocation, 0);
-	
+
 	glBlendFunc(batcher->lastSrcBlend, batcher->lastDstBlend);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, batcher->vertexBufferHandle);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(spVertex) * batcher->numVertices , batcher->verticesBuffer, GL_DYNAMIC_DRAW);
-	
+
 	glEnableVertexAttribArray(batcher->positionAttributeLocation);
 	glEnableVertexAttribArray(batcher->colorAttributeLocation);
 	glEnableVertexAttribArray(batcher->color2AttributeLocation);
 	glEnableVertexAttribArray(batcher->texCoordsAttributeLocation);
-	
+
 	glVertexAttribPointer(batcher->positionAttributeLocation, 4, GL_FLOAT, GL_FALSE, sizeof(spVertex), (GLvoid*)offsetof(spVertex, x));
 	glVertexAttribPointer(batcher->colorAttributeLocation, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(spVertex), (GLvoid*)offsetof(spVertex, color));
 	glVertexAttribPointer(batcher->color2AttributeLocation, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(spVertex), (GLvoid*)offsetof(spVertex, color2));
 	glVertexAttribPointer(batcher->texCoordsAttributeLocation, 2, GL_FLOAT, GL_FALSE, sizeof(spVertex), (GLvoid*)offsetof(spVertex, u));
-	
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, batcher->indexBufferHandle);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * batcher->numIndices, batcher->indicesBuffer, GL_STATIC_DRAW);
-	
+
 	glDrawElements(GL_TRIANGLES, (GLsizei)batcher->numIndices, GL_UNSIGNED_SHORT, 0);
-	
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	
+
 	glUseProgram(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	
+
 	batcher->numIndices = 0;
 	batcher->numVertices = 0;
 	batcher->lastSrcBlend = -1;

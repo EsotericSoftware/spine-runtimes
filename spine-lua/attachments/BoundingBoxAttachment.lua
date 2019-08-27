@@ -45,9 +45,9 @@ function BoundingBoxAttachment.new (name)
 end
 
 function BoundingBoxAttachment:copy ()
-  local copy = BoundingBoxAttachment.new(self.name)
-  self:copyTo(copy)
-  copy.color:setFrom(self.color)
-  return copy
+	local copy = BoundingBoxAttachment.new(self.name)
+	self:copyTo(copy)
+	copy.color:setFrom(self.color)
+	return copy
 end
 return BoundingBoxAttachment

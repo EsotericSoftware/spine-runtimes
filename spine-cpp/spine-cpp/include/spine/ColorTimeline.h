@@ -47,7 +47,7 @@ public:
 
 	virtual void
 	apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixBlend blend,
-		  MixDirection direction);
+		MixDirection direction);
 
 	virtual int getPropertyId();
 

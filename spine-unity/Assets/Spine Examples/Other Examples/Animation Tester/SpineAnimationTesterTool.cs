@@ -62,7 +62,7 @@ namespace Spine.Unity.Examples {
 			public bool loop;
 			public KeyCode key;
 
-			[Space]			
+			[Space]
 			public bool useCustomMixDuration;
 			public float mixDuration;
 			//public bool useChainToControl;
@@ -107,12 +107,12 @@ namespace Spine.Unity.Examples {
 						boundAnimationsStringBuilder.AppendFormat("[{0}]  {1}\n", ba.key.ToString(), animationName);
 					}
 
-				}	
+				}
 
 				boundAnimationsText.text = boundAnimationsStringBuilder.ToString();
 
 			}
-				
+
 		}
 
 		void Start () {
@@ -135,7 +135,7 @@ namespace Spine.Unity.Examples {
 						TrackEntry trackEntry;
 						if (!string.IsNullOrEmpty(control.animationName)) {
 							trackEntry = animationState.SetAnimation(trackIndex, control.animationName, control.loop);
-							
+
 						} else {
 							float mix = control.useCustomMixDuration ? control.mixDuration : animationState.Data.DefaultMix;
 							trackEntry = animationState.SetEmptyAnimation(trackIndex, mix);
@@ -153,7 +153,7 @@ namespace Spine.Unity.Examples {
 						}
 
 						// Don't parse more than one animation per track.
-						break; 
+						break;
 					}
 				}
 			}

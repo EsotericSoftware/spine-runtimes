@@ -158,8 +158,9 @@ module spine {
 		}
 
 		loadTextureAtlas (path: string,
-				   success: (path: string, atlas: TextureAtlas) => void = null,
-				   error: (path: string, error: string) => void = null) {
+			success: (path: string, atlas: TextureAtlas) => void = null,
+			error: (path: string, error: string) => void = null
+		) {
 			let parent = path.lastIndexOf("/") >= 0 ? path.substring(0, path.lastIndexOf("/")) : "";
 			path = this.pathPrefix + path;
 			this.toLoad++;

@@ -65,8 +65,7 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 			if (uniform) sy *= s;
 		}
 	}
-	bone.updateWorldTransform(bone._ax, bone._ay, bone._arotation + rotationIK * alpha, sx,
-							  sy, bone._ashearX, bone._ashearY);
+	bone.updateWorldTransform(bone._ax, bone._ay, bone._arotation + rotationIK * alpha, sx, sy, bone._ashearX, bone._ashearY);
 }
 
 void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, float softness, float alpha) {
@@ -222,21 +221,21 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 		a2 = ((a2 + os) * MathUtil::Rad_Deg - child._ashearX) * s2 + o2 - child._arotation;
 		if (a2 > 180) a2 -= 360;
 		else if (a2 < -180) a2 += 360;
-		child.updateWorldTransform(cx, cy, child._arotation + a2 * alpha, child._ascaleX, child._ascaleY,
-								   child._ashearX, child._ashearY);
+		child.updateWorldTransform(cx, cy, child._arotation + a2 * alpha, child._ascaleX, child._ascaleY, child._ashearX, child._ashearY);
 	}
 }
 
 IkConstraint::IkConstraint(IkConstraintData &data, Skeleton &skeleton) : Updatable(),
-																		 _data(data),
-																		 _bendDirection(data.getBendDirection()),
-																		 _compress(data.getCompress()),
-																		 _stretch(data.getStretch()),
-																		 _mix(data.getMix()),
-																		 _softness(data.getSoftness()),
-																		 _target(skeleton.findBone(
-																				 data.getTarget()->getName())),
-																				 _active(false) {
+	_data(data),
+	_bendDirection(data.getBendDirection()),
+	_compress(data.getCompress()),
+	_stretch(data.getStretch()),
+	_mix(data.getMix()),
+	_softness(data.getSoftness()),
+	_target(skeleton.findBone(
+	data.getTarget()->getName())),
+	_active(false)
+{
 	_bones.ensureCapacity(_data.getBones().size());
 	for (size_t i = 0; i < _data.getBones().size(); i++) {
 		BoneData *boneData = _data.getBones()[i];
@@ -251,17 +250,17 @@ void IkConstraint::apply() {
 
 void IkConstraint::update() {
 	switch (_bones.size()) {
-		case 1: {
-			Bone *bone0 = _bones[0];
-			apply(*bone0, _target->getWorldX(), _target->getWorldY(), _compress, _stretch, _data._uniform, _mix);
-		}
-			break;
-		case 2: {
-			Bone *bone0 = _bones[0];
-			Bone *bone1 = _bones[1];
-			apply(*bone0, *bone1, _target->getWorldX(), _target->getWorldY(), _bendDirection, _stretch, _softness, _mix);
-		}
-			break;
+	case 1: {
+		Bone *bone0 = _bones[0];
+		apply(*bone0, _target->getWorldX(), _target->getWorldY(), _compress, _stretch, _data._uniform, _mix);
+	}
+		break;
+	case 2: {
+		Bone *bone0 = _bones[0];
+		Bone *bone1 = _bones[1];
+		apply(*bone0, *bone1, _target->getWorldX(), _target->getWorldY(), _bendDirection, _stretch, _softness, _mix);
+	}
+	break;
 	}
 }
 
@@ -326,10 +325,10 @@ void IkConstraint::setActive(bool inValue) {
 }
 
 float IkConstraint::getSoftness() {
-    return _softness;
+	return _softness;
 }
 
 void IkConstraint::setSoftness(float inValue) {
-    _softness = inValue;
+	_softness = inValue;
 }
 

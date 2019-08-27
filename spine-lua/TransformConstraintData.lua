@@ -34,7 +34,7 @@ function TransformConstraintData.new (name)
 	local self = {
 		name = name,
 		order = 0,
-    skinRequired = false,
+		skinRequired = false,
 		bones = {},
 		target = nil,
 		rotateMix = 0, translateMix = 0, scaleMix = 0, shearMix = 0,

@@ -56,7 +56,7 @@ namespace Spine.Unity {
 				if (skeletonRenderer != null)
 					skeletonRenderer.GenerateMeshOverride -= HandleRender;
 				#endif
-				
+
 				skeletonRenderer = value;
 				if (value == null)
 					this.enabled = false;
@@ -152,7 +152,7 @@ namespace Spine.Unity {
 
 		public void OnEnable () {
 			if (skeletonRenderer == null) return;
-			if (copiedBlock == null) copiedBlock = new MaterialPropertyBlock();	
+			if (copiedBlock == null) copiedBlock = new MaterialPropertyBlock();
 			mainMeshRenderer = skeletonRenderer.GetComponent<MeshRenderer>();
 
 			#if SPINE_OPTIONAL_RENDEROVERRIDE
@@ -192,7 +192,7 @@ namespace Spine.Unity {
 			skeletonRenderer.LateUpdate();
 
 			foreach (var s in partsRenderers)
-				s.ClearMesh();		
+				s.ClearMesh();
 		}
 
 		MaterialPropertyBlock copiedBlock;
@@ -242,7 +242,7 @@ namespace Spine.Unity {
 					}
 				}
 			}
-				
+
 			// Clear extra renderers if they exist.
 			for (; rendererIndex < rendererCount; rendererIndex++) {
 				partsRenderers[rendererIndex].ClearMesh();

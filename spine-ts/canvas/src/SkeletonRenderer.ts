@@ -163,7 +163,7 @@ module spine.canvas {
 						ctx.globalAlpha = color.a;
 						// experimental tinting via compositing, doesn't work
 						// ctx.globalCompositeOperation = "source-atop";
-						// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0)  + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
+						// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0) + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
 						// ctx.fillRect(0, 0, w, h);
 					}
 
@@ -250,9 +250,9 @@ module spine.canvas {
 			let multiplier = pma ? alpha : 1;
 			let color = this.tempColor;
 			color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
-					  skeletonColor.g * slotColor.g * regionColor.g * multiplier,
-					  skeletonColor.b * slotColor.b * regionColor.b * multiplier,
-					  alpha);
+				skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+				skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+				alpha);
 
 			region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
 
@@ -299,9 +299,9 @@ module spine.canvas {
 			let multiplier = pma ? alpha : 1;
 			let color = this.tempColor;
 			color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
-					  skeletonColor.g * slotColor.g * regionColor.g * multiplier,
-					  skeletonColor.b * slotColor.b * regionColor.b * multiplier,
-					  alpha);
+				skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+				skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+				alpha);
 
 			let numVertices = mesh.worldVerticesLength / 2;
 			if (this.vertices.length < mesh.worldVerticesLength) {

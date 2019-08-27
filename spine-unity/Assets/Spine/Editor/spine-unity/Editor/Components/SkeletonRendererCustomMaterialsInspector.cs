@@ -100,13 +100,13 @@ namespace Spine.Unity.Editor {
 				_customSlotMaterialsPrev = CopyList(componentCustomSlotMaterials);
 			}
 
-			// Compare new values with saved. If change is detected: 
+			// Compare new values with saved. If change is detected:
 			// store new values, restore old values, remove overrides, restore new values, restore overrides.
 
 			// 1. Store new values
 			var customMaterialOverridesNew = CopyList(componentCustomMaterialOverrides);
 			var customSlotMaterialsNew = CopyList(componentCustomSlotMaterials);
-			
+
 			// Detect changes
 			if (!_customMaterialOverridesPrev.SequenceEqual(customMaterialOverridesNew) ||
 				!_customSlotMaterialsPrev.SequenceEqual(customSlotMaterialsNew)) {
@@ -160,6 +160,6 @@ namespace Spine.Unity.Editor {
 
 		static List<T> CopyList<T> (List<T> list) {
 			return list.GetRange(0, list.Count);
-		} 
+		}
 	}
 }

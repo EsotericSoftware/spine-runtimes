@@ -123,7 +123,7 @@ namespace Spine.Unity {
 				cache.Clear();
 			}
 		}
-	
+
 	}
 
 }

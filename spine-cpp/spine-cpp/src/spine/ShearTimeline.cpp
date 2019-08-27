@@ -49,7 +49,8 @@ ShearTimeline::ShearTimeline(int frameCount) : TranslateTimeline(frameCount) {
 }
 
 void ShearTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						  MixBlend blend, MixDirection direction) {
+	MixBlend blend, MixDirection direction
+) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -60,14 +61,14 @@ void ShearTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 
 	if (time < _frames[0]) {
 		switch (blend) {
-			case MixBlend_Setup:
-				bone._shearX = bone._data._shearX;
-				bone._shearY = bone._data._shearY;
-				return;
-			case MixBlend_First:
-				bone._shearX += (bone._data._shearX - bone._shearX) * alpha;
-				bone._shearY += (bone._data._shearY - bone._shearY) * alpha;
-			default: {}
+		case MixBlend_Setup:
+			bone._shearX = bone._data._shearX;
+			bone._shearY = bone._data._shearY;
+			return;
+		case MixBlend_First:
+			bone._shearX += (bone._data._shearX - bone._shearX) * alpha;
+			bone._shearY += (bone._data._shearY - bone._shearY) * alpha;
+		default: {}
 		}
 		return;
 	}
@@ -84,7 +85,7 @@ void ShearTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 		y = _frames[frame + PREV_Y];
 		float frameTime = _frames[frame];
 		float percent = getCurvePercent(frame / ENTRIES - 1,
-										1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+			1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
 
 		x = x + (_frames[frame + X] - x) * percent;
 		y = y + (_frames[frame + Y] - y) * percent;

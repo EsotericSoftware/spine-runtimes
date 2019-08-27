@@ -226,7 +226,7 @@ void spSkin_copySkin(spSkin* self, const spSkin* other) {
 
 	entry = spSkin_getAttachments(other);
 	while (entry) {
-		if  (entry->attachment->type == SP_ATTACHMENT_MESH) {
+		if (entry->attachment->type == SP_ATTACHMENT_MESH) {
 			spMeshAttachment* attachment = spMeshAttachment_newLinkedMesh(SUB_CAST(spMeshAttachment, entry->attachment));
 			spSkin_setAttachment(self, entry->slotIndex, entry->name, SUPER(SUPER(attachment)));
 		} else {

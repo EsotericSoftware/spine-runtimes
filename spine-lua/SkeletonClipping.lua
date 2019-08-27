@@ -48,7 +48,7 @@ function SkeletonClipping.new ()
 		clipOutput = {},
 		clippedVertices = {},
 		clippedUVs = {},
-		clippedTriangles = {},		
+		clippedTriangles = {},
 		clipAttachment = nil
 	}
 	setmetatable(self, SkeletonClipping)
@@ -59,7 +59,7 @@ end
 function SkeletonClipping:clipStart(slot, clip)
 	if self.clipAttachment then return 0 end
 	self.clipAttachment = clip
-	
+
 	local n = clip.worldVerticesLength
 	self.clippingPolygon = {}
 	local vertices = self.clippingPolygon
@@ -69,7 +69,7 @@ function SkeletonClipping:clipStart(slot, clip)
 	for _,polygon in ipairs(self.clippingPolygons) do
 		self:makeClockwise(polygon)
 		table_insert(polygon, polygon[1])
-		table_insert(polygon, polygon[2])		
+		table_insert(polygon, polygon[2])
 	end
 	return #self.clippingPolygons
 end
@@ -103,7 +103,7 @@ function SkeletonClipping:clipTriangles(vertices, uvs, triangles, trianglesLengt
 	local polygonsCount = #self.clippingPolygons
 
 	local index = 1
-	
+
 	local i = 1
 	while i <= trianglesLength do
 		local vertexOffset = (triangles[i] - 1) * 2 + 1
@@ -146,7 +146,7 @@ function SkeletonClipping:clipTriangles(vertices, uvs, triangles, trianglesLengt
 						local x = clipOutputItems[ii]
 						local y = clipOutputItems[ii + 1]
 						clippedVerticesItems[s] = x
-						clippedVerticesItems[s + 1] = y						
+						clippedVerticesItems[s + 1] = y
 						local c0 = x - x3
 						local c1 = y - y3
 						local a = (d0 * c0 + d1 * c1) * d
@@ -186,7 +186,7 @@ function SkeletonClipping:clipTriangles(vertices, uvs, triangles, trianglesLengt
 				clippedUVsItems[s + 2] = u2
 				clippedUVsItems[s + 3] = v2
 				clippedUVsItems[s + 4] = u3
-				clippedUVsItems[s + 5] = v3					
+				clippedUVsItems[s + 5] = v3
 
 				s = #clippedTriangles + 1
 				local clippedTrianglesItems = clippedTriangles
@@ -280,7 +280,7 @@ function SkeletonClipping:clip(x1, y1, x2, y2, x3, y3, clippingArea, output)
 				end
 				table_insert(output, inputX2)
 				table_insert(output, inputY2)
-			end			
+			end
 			if not continue then clipped = true end
 			ii = ii + 2
 		end

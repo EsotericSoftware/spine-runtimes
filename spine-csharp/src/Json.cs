@@ -45,19 +45,17 @@ namespace Spine {
 }
 
 /**
- *
  * Copyright (c) 2016 Adriano Tinoco d'Oliveira Rezende
- * 
+ *
  * Based on the JSON parser by Patrick van Bergen
  * http://techblog.procurios.nl/k/news/view/14605/14863/how-do-i-write-my-own-parser-(for-json).html
  *
  * Changes made:
- * 
- * 	- Optimized parser speed (deserialize roughly near 3x faster than original)
- *  - Added support to handle lexer/parser error messages with line numbers
- *  - Added more fine grained control over type conversions during the parsing
- *  - Refactory API (Separate Lexer code from Parser code and the Encoder from Decoder)
  *
+ * - Optimized parser speed (deserialize roughly near 3x faster than original)
+ * - Added support to handle lexer/parser error messages with line numbers
+ * - Added more fine grained control over type conversions during the parsing
+ * - Refactory API (Separate Lexer code from Parser code and the Encoder from Decoder)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -71,7 +69,6 @@ namespace Spine {
  * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
  * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * 
  */
 namespace SharpJson
 {
@@ -132,19 +129,19 @@ namespace SharpJson
 		{
 			int idx = 0;
 			StringBuilder builder = null;
-			
+
 			SkipWhiteSpaces();
-			
+
 			// "
 			char c = json[index++];
-			
+
 			bool failed = false;
 			bool complete = false;
-			
+
 			while (!complete && !failed) {
 				if (index == json.Length)
 					break;
-				
+
 				c = json[index++];
 				if (c == '"') {
 					complete = true;
@@ -152,9 +149,9 @@ namespace SharpJson
 				} else if (c == '\\') {
 					if (index == json.Length)
 						break;
-					
+
 					c = json[index++];
-					
+
 					switch (c) {
 					case '"':
 						stringBuffer[idx++] = '"';
@@ -184,10 +181,10 @@ namespace SharpJson
 						int remainingLength = json.Length - index;
 						if (remainingLength >= 4) {
 							var hex = new string(json, index, 4);
-							
+
 							// XXX: handle UTF
 							stringBuffer[idx++] = (char) Convert.ToInt32(hex, 16);
-							
+
 							// skip 4 chars
 							index += 4;
 						} else {
@@ -198,38 +195,38 @@ namespace SharpJson
 				} else {
 					stringBuffer[idx++] = c;
 				}
-				
+
 				if (idx >= stringBuffer.Length) {
 					if (builder == null)
 						builder = new StringBuilder();
-					
+
 					builder.Append(stringBuffer, 0, idx);
 					idx = 0;
 				}
 			}
-			
+
 			if (!complete) {
 				success = false;
 				return null;
 			}
-			
+
 			if (builder != null)
 				return builder.ToString ();
 			else
 				return new string (stringBuffer, 0, idx);
 		}
-		
+
 		string GetNumberString()
 		{
 			SkipWhiteSpaces();
 
 			int lastIndex = GetLastIndexOfNumber(index);
 			int charLength = (lastIndex - index) + 1;
-			
+
 			var result = new string (json, index, charLength);
-			
+
 			index = lastIndex + 1;
-			
+
 			return result;
 		}
 
@@ -237,10 +234,10 @@ namespace SharpJson
 		{
 			float number;
 			var str = GetNumberString ();
-			
+
 			if (!float.TryParse (str, NumberStyles.Float, CultureInfo.InvariantCulture, out number))
 				return 0;
-			
+
 			return number;
 		}
 
@@ -248,25 +245,25 @@ namespace SharpJson
 		{
 			double number;
 			var str = GetNumberString ();
-			
+
 			if (!double.TryParse(str, NumberStyles.Any, CultureInfo.InvariantCulture, out number))
 				return 0;
-			
+
 			return number;
 		}
-		
+
 		int GetLastIndexOfNumber(int index)
 		{
 			int lastIndex;
-			
+
 			for (lastIndex = index; lastIndex < json.Length; lastIndex++) {
 				char ch = json[lastIndex];
-				
+
 				if ((ch < '0' || ch > '9') && ch != '+' && ch != '-'
 				    && ch != '.' && ch != 'e' && ch != 'E')
 					break;
 			}
-			
+
 			return lastIndex - 1;
 		}
 
@@ -301,9 +298,9 @@ namespace SharpJson
 		{
 			if (index == json.Length)
 				return Token.None;
-			
+
 			char c = json[index++];
-			
+
 			switch (c) {
 			case '{':
 				return Token.CurlyOpen;
@@ -326,9 +323,9 @@ namespace SharpJson
 			}
 
 			index--;
-			
+
 			int remainingLength = json.Length - index;
-			
+
 			// false
 			if (remainingLength >= 5) {
 				if (json[index] == 'f' &&
@@ -340,7 +337,7 @@ namespace SharpJson
 					return Token.False;
 				}
 			}
-			
+
 			// true
 			if (remainingLength >= 4) {
 				if (json[index] == 't' &&
@@ -351,7 +348,7 @@ namespace SharpJson
 					return Token.True;
 				}
 			}
-			
+
 			// null
 			if (remainingLength >= 4) {
 				if (json[index] == 'n' &&
@@ -437,25 +434,25 @@ namespace SharpJson
 						TriggerError("Invalid token; expected ':'");
 						return null;
 					}
-					
+
 					// value
 					object value = ParseValue();
 
 					if (errorMessage != null)
 						return null;
-					
+
 					table[name] = value;
 					break;
 				}
 			}
-			
+
 			//return null; // Unreachable code
 		}
 
 		IList<object> ParseArray()
 		{
 			var array = new List<object>();
-			
+
 			// [
 			lexer.NextToken();
 
@@ -482,7 +479,7 @@ namespace SharpJson
 					break;
 				}
 			}
-			
+
 			//return null; // Unreachable code
 		}
 

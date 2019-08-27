@@ -107,27 +107,27 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 - (id) initWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
 	self = [super initWithData:skeletonData ownsSkeletonData:ownsSkeletonData];
 	if (!self) return nil;
-	
+
 	[self initialize];
-	
+
 	return self;
 }
 
 - (id) initWithFile:(NSString*)skeletonDataFile atlas:(spAtlas*)atlas scale:(float)scale {
 	self = [super initWithFile:skeletonDataFile atlas:atlas scale:scale];
 	if (!self) return nil;
-	
+
 	[self initialize];
-	
+
 	return self;
 }
 
 - (id) initWithFile:(NSString*)skeletonDataFile atlasFile:(NSString*)atlasFile scale:(float)scale {
 	self = [super initWithFile:skeletonDataFile atlasFile:atlasFile scale:scale];
 	if (!self) return nil;
-	
+
 	[self initialize];
-	
+
 	return self;
 }
 
@@ -155,7 +155,7 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 
 - (void) setAnimationStateData:(spAnimationStateData*)stateData {
 	NSAssert(stateData, @"stateData cannot be null.");
-	
+
 	if (_ownsAnimationStateData) spAnimationStateData_dispose(_state->data);
 	spAnimationState_dispose(_state);
 

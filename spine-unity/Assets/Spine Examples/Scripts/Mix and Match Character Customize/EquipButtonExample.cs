@@ -54,7 +54,7 @@ namespace Spine.Unity.Examples {
 			var button = GetComponent<Button>();
 			button.onClick.AddListener(
 				delegate { equipSystem.Equip(asset); }
-			);	
+			);
 		}
 	}
 }

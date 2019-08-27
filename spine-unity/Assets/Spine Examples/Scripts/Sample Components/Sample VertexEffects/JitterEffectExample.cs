@@ -70,7 +70,7 @@ namespace Spine.Unity.Examples {
 			//var uvs = buffers.uvBuffer;
 			//var colors = buffers.colorBuffer;
 
-			// 
+			//
 		}
 
 		void OnDisable () {

@@ -181,9 +181,8 @@ spAtlas* spAtlas_create(const char* begin, int length, const char* dir, void* re
 	self->rendererObject = rendererObject;
 
 	while (readLine(&begin, end, &str)) {
-		if (str.end - str.begin == 0) {
+		if (str.end - str.begin == 0)
 			page = 0;
-		}
 		else if (!page) {
 			char* name = mallocString(&str);
 			char* path = MALLOC(char, dirLength + needsSlash + strlen(name) + 1);
@@ -232,8 +231,7 @@ spAtlas* spAtlas_create(const char* begin, int length, const char* dir, void* re
 
 			_spAtlasPage_createTexture(page, path);
 			FREE(path);
-		}
-		else {
+		} else {
 			spAtlasRegion *region = spAtlasRegion_create();
 			if (lastRegion)
 				lastRegion->next = region;
@@ -245,13 +243,12 @@ spAtlas* spAtlas_create(const char* begin, int length, const char* dir, void* re
 			region->name = mallocString(&str);
 
 			if (!readValue(&begin, end, &str)) return abortAtlas(self);
-			if (equals(&str, "true")) {
+			if (equals(&str, "true"))
 				region->degrees = 90;
-			} else if (equals(&str, "false")) {
+			else if (equals(&str, "false"))
 				region->degrees = 0;
-			} else {
+			else
 				region->degrees = toInt(&str);
-			}
 			region->rotate = region->degrees == 90;
 
 			if (readTuple(&begin, end, tuple) != 2) return abortAtlas(self);
@@ -267,8 +264,7 @@ spAtlas* spAtlas_create(const char* begin, int length, const char* dir, void* re
 			if (region->rotate) {
 				region->u2 = (region->x + region->height) / (float)page->width;
 				region->v2 = (region->y + region->width) / (float)page->height;
-			}
-			else {
+			} else {
 				region->u2 = (region->x + region->width) / (float)page->width;
 				region->v2 = (region->y + region->height) / (float)page->height;
 			}

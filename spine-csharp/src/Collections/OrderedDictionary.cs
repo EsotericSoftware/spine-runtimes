@@ -344,7 +344,7 @@ namespace Spine.Collections
 					dictionary[value.Key] = index;
 				}
 				else {
-					dictionary.Add(value.Key, index);  // will throw if key already exists
+					dictionary.Add(value.Key, index); // will throw if key already exists
 					dictionary.Remove(key);
 				}
 				keys[index] = value.Key;

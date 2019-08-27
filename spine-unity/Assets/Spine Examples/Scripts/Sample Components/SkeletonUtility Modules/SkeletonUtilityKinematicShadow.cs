@@ -31,7 +31,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Spine.Unity.Examples {
-	
+
 	// SkeletonUtilityKinematicShadow allows hinge chains to inherit a velocity interpreted from changes in parent transform position or from unrelated rigidbodies.
 	// Note: Uncheck "useRootTransformIfNull
 	public class SkeletonUtilityKinematicShadow : MonoBehaviour {
@@ -71,14 +71,14 @@ namespace Spine.Unity.Examples {
 			if (!detachedShadow) {
 				// Do not change to null coalescing operator (??). Unity overloads null checks for UnityEngine.Objects but not the ?? operator.
 				if (parent == null)
-					shadowRootTransform.parent = transform.root;  
+					shadowRootTransform.parent = transform.root;
 				else
 					shadowRootTransform.parent = parent;
 			}
 
 			if (hideShadow)
 				shadowRoot.hideFlags = HideFlags.HideInHierarchy;
-			
+
 			var shadowJoints = shadowRoot.GetComponentsInChildren<Joint>();
 			foreach (Joint j in shadowJoints)
 				j.connectedAnchor *= scale;

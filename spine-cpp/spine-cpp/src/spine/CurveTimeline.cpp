@@ -113,7 +113,6 @@ float CurveTimeline::getCurvePercent(size_t frameIndex, float percent) {
 				prevX = _curves[i - 2];
 				prevY = _curves[i - 1];
 			}
-
 			return prevY + (_curves[i + 1] - prevY) * (percent - prevX) / (x - prevX);
 		}
 	}

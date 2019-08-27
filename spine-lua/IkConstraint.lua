@@ -52,11 +52,11 @@ function IkConstraint.new (data, skeleton)
 		bones = {},
 		target = nil,
 		mix = data.mix,
-    softness = data.softness,
+		softness = data.softness,
 		compress = data.compress,
 		stretch = data.stretch,
 		bendDirection = data.bendDirection,
-    active = false
+		active = false
 	}
 	setmetatable(self, IkConstraint)
 
@@ -171,36 +171,36 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 	c = pp.c
 	d = pp.d
 	local id = 1 / (a * d - b * c)
-  local x = cwx - pp.worldX
-  local y = cwy - pp.worldY
-  local dx = (x * d - y * b) * id - px
-  local dy = (y * a - x * c) * id - py
-  local l1 = math_sqrt(dx * dx + dy * dy)
-  local l2 = child.data.length * csx
-  local a1 = 0
-  local a2 = 0
-  if l1 < 0.0001 then
-    self:apply1(parent, targetX, targetY, false, stretch, false, alpha)
-    child:updateWorldTransformWith(cx, cy, 0, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY)
-    return
-  end
-  x = targetX - pp.worldX
-  y = targetY - pp.worldY
-  local tx = (x * d - y * b) * id - px
-  local ty = (y * a - x * c) * id - py
-  local dd = tx * tx + ty * ty
-  if softness ~= 0 then
-    softness = softness * (psx * (csx + 1) / 2)
-    local td = math_sqrt(dd)
-    local sd = td - l1 - l2 * psx + softness
-    if sd > 0 then
-      local p = math_min(1, sd / (softness * 2)) - 1
-      p = (sd - softness * (1 - p * p)) / td
-      tx = tx - p * tx
-      ty = ty - p * ty
-      dd = tx * tx + ty * ty
-    end
-  end
+	local x = cwx - pp.worldX
+	local y = cwy - pp.worldY
+	local dx = (x * d - y * b) * id - px
+	local dy = (y * a - x * c) * id - py
+	local l1 = math_sqrt(dx * dx + dy * dy)
+	local l2 = child.data.length * csx
+	local a1 = 0
+	local a2 = 0
+	if l1 < 0.0001 then
+		self:apply1(parent, targetX, targetY, false, stretch, false, alpha)
+		child:updateWorldTransformWith(cx, cy, 0, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY)
+		return
+	end
+	x = targetX - pp.worldX
+	y = targetY - pp.worldY
+	local tx = (x * d - y * b) * id - px
+	local ty = (y * a - x * c) * id - py
+	local dd = tx * tx + ty * ty
+	if softness ~= 0 then
+		softness = softness * (psx * (csx + 1) / 2)
+		local td = math_sqrt(dd)
+		local sd = td - l1 - l2 * psx + softness
+		if sd > 0 then
+			local p = math_min(1, sd / (softness * 2)) - 1
+			p = (sd - softness * (1 - p * p)) / td
+			tx = tx - p * tx
+			ty = ty - p * ty
+			dd = tx * tx + ty * ty
+		end
+	end
 
 	if u then
 		l2 = l2 * psx

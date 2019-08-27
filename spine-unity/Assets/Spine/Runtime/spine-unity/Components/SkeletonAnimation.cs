@@ -34,7 +34,7 @@
 using UnityEngine;
 
 namespace Spine.Unity {
-	
+
 	#if NEW_PREFAB_SYSTEM
 	[ExecuteAlways]
 	#else
@@ -45,11 +45,11 @@ namespace Spine.Unity {
 
 		#region IAnimationStateComponent
 		/// <summary>
-		/// This is the Spine.AnimationState object of this SkeletonAnimation. You can control animations through it. 
+		/// This is the Spine.AnimationState object of this SkeletonAnimation. You can control animations through it.
 		/// Note that this object, like .skeleton, is not guaranteed to exist in Awake. Do all accesses and caching to it in Start</summary>
 		public Spine.AnimationState state;
 		/// <summary>
-		/// This is the Spine.AnimationState object of this SkeletonAnimation. You can control animations through it. 
+		/// This is the Spine.AnimationState object of this SkeletonAnimation. You can control animations through it.
 		/// Note that this object, like .skeleton, is not guaranteed to exist in Awake. Do all accesses and caching to it in Start</summary>
 		public Spine.AnimationState AnimationState { get { return this.state; } }
 		#endregion
@@ -153,7 +153,7 @@ namespace Spine.Unity {
 				return;
 
 			state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
-		
+
 			if (!string.IsNullOrEmpty(_animationName)) {
 				var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
 				if (animationObject != null) {

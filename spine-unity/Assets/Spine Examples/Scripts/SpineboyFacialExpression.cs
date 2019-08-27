@@ -71,7 +71,7 @@ namespace Spine.Unity.Examples {
 
 		void Update () {
 			if (Mathf.Abs(footPlanter.Balance) > balanceThreshold)
-				shockTimer = shockDuration;	
+				shockTimer = shockDuration;
 
 			if (shockTimer > 0)
 				shockTimer -= Time.deltaTime;

@@ -40,25 +40,26 @@ using std::vector;
 namespace spine {
 
 typedef struct _TrackEntryListeners {
-    StartListener startListener;
-    InterruptListener interruptListener;
-    EndListener endListener;
-    DisposeListener disposeListener;
-    CompleteListener completeListener;
-    EventListener eventListener;
+	StartListener startListener;
+	InterruptListener interruptListener;
+	EndListener endListener;
+	DisposeListener disposeListener;
+	CompleteListener completeListener;
+	EventListener eventListener;
 } _TrackEntryListeners;
-    
+
 void animationCallback (AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
 	((SkeletonAnimation*)state->getRendererObject())->onAnimationStateEvent(entry, type, event);
 }
 
 void trackEntryCallback (AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
 	((SkeletonAnimation*)state->getRendererObject())->onTrackEntryEvent(entry, type, event);
-    if (type == EventType_Dispose)
+	if (type == EventType_Dispose) {
 		if (entry->getRendererObject()) {
 			delete (spine::_TrackEntryListeners*)entry->getRendererObject();
 			entry->setRendererObject(NULL);
 		}
+	}
 }
 
 static _TrackEntryListeners* getListeners (TrackEntry* entry) {
@@ -68,7 +69,7 @@ static _TrackEntryListeners* getListeners (TrackEntry* entry) {
 	}
 	return (_TrackEntryListeners*)entry->getRendererObject();
 }
-    
+
 //
 
 SkeletonAnimation* SkeletonAnimation::createWithData (SkeletonData* skeletonData, bool ownsSkeletonData) {
@@ -150,7 +151,7 @@ void SkeletonAnimation::draw(cocos2d::Renderer *renderer, const cocos2d::Mat4 &t
 void SkeletonAnimation::setAnimationStateData (AnimationStateData* stateData) {
 	CCASSERT(stateData, "stateData cannot be null.");
 
-    if (_ownsAnimationStateData) delete _state->getData();
+	if (_ownsAnimationStateData) delete _state->getData();
 	delete _state;
 
 	_ownsAnimationStateData = false;
@@ -180,7 +181,7 @@ TrackEntry* SkeletonAnimation::addAnimation (int trackIndex, const std::string& 
 	}
 	return _state->addAnimation(trackIndex, animation, loop, delay);
 }
-	
+
 TrackEntry* SkeletonAnimation::setEmptyAnimation (int trackIndex, float mixDuration) {
 	return _state->setEmptyAnimation(trackIndex, mixDuration);
 }
@@ -214,15 +215,15 @@ void SkeletonAnimation::onAnimationStateEvent (TrackEntry* entry, EventType type
 	case EventType_Start:
 		if (_startListener) _startListener(entry);
 		break;
-    case EventType_Interrupt:
-        if (_interruptListener) _interruptListener(entry);
-        break;
+	case EventType_Interrupt:
+		if (_interruptListener) _interruptListener(entry);
+		break;
 	case EventType_End:
 		if (_endListener) _endListener(entry);
 		break;
-    case EventType_Dispose:
-        if (_disposeListener) _disposeListener(entry);
-        break;
+	case EventType_Dispose:
+		if (_disposeListener) _disposeListener(entry);
+		break;
 	case EventType_Complete:
 		if (_completeListener) _completeListener(entry);
 		break;
@@ -239,15 +240,15 @@ void SkeletonAnimation::onTrackEntryEvent (TrackEntry* entry, EventType type, Ev
 	case EventType_Start:
 		if (listeners->startListener) listeners->startListener(entry);
 		break;
-    case EventType_Interrupt:
-        if (listeners->interruptListener) listeners->interruptListener(entry);
-        break;
+	case EventType_Interrupt:
+		if (listeners->interruptListener) listeners->interruptListener(entry);
+		break;
 	case EventType_End:
 		if (listeners->endListener) listeners->endListener(entry);
 		break;
-    case EventType_Dispose:
-        if (listeners->disposeListener) listeners->disposeListener(entry);
-        break;
+	case EventType_Dispose:
+		if (listeners->disposeListener) listeners->disposeListener(entry);
+		break;
 	case EventType_Complete:
 		if (listeners->completeListener) listeners->completeListener(entry);
 		break;
@@ -260,17 +261,17 @@ void SkeletonAnimation::onTrackEntryEvent (TrackEntry* entry, EventType type, Ev
 void SkeletonAnimation::setStartListener (const StartListener& listener) {
 	_startListener = listener;
 }
-    
+
 void SkeletonAnimation::setInterruptListener (const InterruptListener& listener) {
-    _interruptListener = listener;
+	_interruptListener = listener;
 }
-    
+
 void SkeletonAnimation::setEndListener (const EndListener& listener) {
 	_endListener = listener;
 }
-    
+
 void SkeletonAnimation::setDisposeListener (const DisposeListener& listener) {
-    _disposeListener = listener;
+	_disposeListener = listener;
 }
 
 void SkeletonAnimation::setCompleteListener (const CompleteListener& listener) {
@@ -284,17 +285,17 @@ void SkeletonAnimation::setEventListener (const EventListener& listener) {
 void SkeletonAnimation::setTrackStartListener (TrackEntry* entry, const StartListener& listener) {
 	getListeners(entry)->startListener = listener;
 }
-    
+
 void SkeletonAnimation::setTrackInterruptListener (TrackEntry* entry, const InterruptListener& listener) {
-    getListeners(entry)->interruptListener = listener;
+	getListeners(entry)->interruptListener = listener;
 }
 
 void SkeletonAnimation::setTrackEndListener (TrackEntry* entry, const EndListener& listener) {
 	getListeners(entry)->endListener = listener;
 }
-    
+
 void SkeletonAnimation::setTrackDisposeListener (TrackEntry* entry, const DisposeListener& listener) {
-    getListeners(entry)->disposeListener = listener;
+	getListeners(entry)->disposeListener = listener;
 }
 
 void SkeletonAnimation::setTrackCompleteListener (TrackEntry* entry, const CompleteListener& listener) {

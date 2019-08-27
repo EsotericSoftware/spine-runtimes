@@ -88,7 +88,7 @@ namespace Spine.Unity.Examples {
 			PlayAnimationForState(StringToHash(stateShortName), layerIndex);
 		}
 
-		/// <summary>Plays an  animation based on the hash of the state name.</summary>
+		/// <summary>Plays an animation based on the hash of the state name.</summary>
 		public void PlayAnimationForState (int shortNameHash, int layerIndex) {
 			var foundAnimation = GetAnimationForState(shortNameHash);
 			if (foundAnimation == null)
@@ -139,7 +139,7 @@ namespace Spine.Unity.Examples {
 			state.AddAnimation(0, this.TargetAnimation, true, 0f);
 		}
 
-		Spine.Animation TryGetTransition (Spine.Animation from, Spine.Animation to) {			
+		Spine.Animation TryGetTransition (Spine.Animation from, Spine.Animation to) {
 			foreach (var transition in transitions) {
 				if (transition.from.Animation == from && transition.to.Animation == to) {
 					return transition.transition.Animation;

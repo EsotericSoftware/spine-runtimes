@@ -74,7 +74,7 @@ namespace Spine.Unity.Editor {
 		protected GUIContent NormalsLabel, TangentsLabel, MaskInteractionLabel;
 		protected GUIContent MaskMaterialsHeadingLabel, MaskMaterialsNoneLabel, MaskMaterialsInsideLabel, MaskMaterialsOutsideLabel;
 		protected GUIContent SetMaterialButtonLabel, ClearMaterialButtonLabel, DeleteMaterialButtonLabel;
-		
+
 		const string ReloadButtonString = "Reload";
 		static GUILayoutOption reloadButtonWidth;
 		static GUILayoutOption ReloadButtonWidth { get { return reloadButtonWidth = reloadButtonWidth ?? GUILayout.Width(GUI.skin.label.CalcSize(new GUIContent(ReloadButtonString)).x + 20); } }
@@ -123,7 +123,7 @@ namespace Spine.Unity.Editor {
 			MaskMaterialsOutsideLabel = new GUIContent("Outside Mask", "Materials used when Mask Interaction is set to Outside Mask.");
 			SetMaterialButtonLabel = new GUIContent("Set", "Prepares material references for switching to the corresponding Mask Interaction mode at runtime. Creates the required materials if they do not exist.");
 			ClearMaterialButtonLabel = new GUIContent("Clear", "Clears unused material references. Note: when switching to the corresponding Mask Interaction mode at runtime, a new material is generated on the fly.");
-			DeleteMaterialButtonLabel = new GUIContent("Delete", "Clears unused material references and deletes the corresponding assets.  Note: when switching to the corresponding Mask Interaction mode at runtime, a new material is generated on the fly.");
+			DeleteMaterialButtonLabel = new GUIContent("Delete", "Clears unused material references and deletes the corresponding assets. Note: when switching to the corresponding Mask Interaction mode at runtime, a new material is generated on the fly.");
 
 			var so = this.serializedObject;
 			skeletonDataAsset = so.FindProperty("skeletonDataAsset");
@@ -287,7 +287,7 @@ namespace Spine.Unity.Editor {
 
 				if (valid)
 					EditorGUILayout.PropertyField(initialSkinName, SpineInspectorUtility.TempContent("Initial Skin"));
-				
+
 			}
 
 			EditorGUILayout.Space();
@@ -299,7 +299,7 @@ namespace Spine.Unity.Editor {
 
 			if (!valid)
 				return;
-			
+
 			string errorMessage = null;
 			if (MaterialChecks.IsMaterialSetupProblematic((SkeletonRenderer)this.target, ref errorMessage)) {
 				EditorGUILayout.HelpBox(errorMessage, MessageType.Error, true);
@@ -374,7 +374,7 @@ namespace Spine.Unity.Editor {
 														differentMaskModesSelected, allowDelete : true, isActiveMaterial: activeMaskInteractionValue == (int)SpriteMaskInteraction.VisibleOutsideMask);
 						}
 						#endif
-						
+
 						EditorGUILayout.Space();
 
 						if (valid && !isInspectingPrefab) {
@@ -557,7 +557,7 @@ namespace Spine.Unity.Editor {
 		static bool SkeletonDataAssetIsValid (SkeletonDataAsset asset) {
 			return asset != null && asset.GetSkeletonData(quiet: true) != null;
 		}
-		
+
 		bool AreAnyMaskMaterialsMissing() {
 			#if BUILT_IN_SPRITE_MASK_COMPONENT
 			foreach (var o in targets) {

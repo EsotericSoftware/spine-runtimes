@@ -76,7 +76,7 @@ namespace Spine.Unity.Deprecated {
 				this.texture2D = texture;
 			}
 		}
-		
+
 		internal static Material GetOrAddMaterialFor(Material materialSource, Texture2D texture) {
 			if (materialSource == null || texture == null) return null;
 
@@ -211,7 +211,7 @@ namespace Spine.Unity.Deprecated {
 				}
 			}
 			slotsWithCustomMaterial = null;
-			
+
 			Applied = false;
 			if (skeletonRenderer.valid) skeletonRenderer.LateUpdate();
 		}

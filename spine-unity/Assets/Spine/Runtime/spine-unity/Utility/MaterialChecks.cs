@@ -39,11 +39,11 @@ namespace Spine.Unity {
 		static readonly int STRAIGHT_ALPHA_PARAM_ID = Shader.PropertyToID("_StraightAlphaInput");
 		static readonly string ALPHAPREMULTIPLY_ON_KEYWORD = "_ALPHAPREMULTIPLY_ON";
 
-		public static readonly string kPMANotSupportedLinearMessage = 
+		public static readonly string kPMANotSupportedLinearMessage =
 			"Warning: Premultiply-alpha atlas textures not supported in Linear color space!\n\nPlease\n"
 			+ "a) re-export atlas as straight alpha texture with 'premultiply alpha' unchecked or\n"
 			+ "b) switch to Gamma color space via\nProject Settings - Player - Other Settings - Color Space.\n";
-		public static readonly string kZSpacingRequiredMessage = 
+		public static readonly string kZSpacingRequiredMessage =
 			"Warning: Z Spacing required on selected shader! Otherwise you will receive incorrect results.\n\nPlease\n"
 			+ "1) make sure at least minimal 'Z Spacing' is set at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' and\n"
 			+ "2) ensure that the skeleton has overlapping parts on different Z depth. You can adjust this in Spine via draw order.\n";
@@ -93,7 +93,7 @@ namespace Spine.Unity {
 			return true;
 		}
 
-		
+
 		public static bool UsesSpineShader (Material material) {
 			return material.shader.name.Contains("Spine/");
 		}

@@ -70,12 +70,12 @@ namespace Spine.Unity.Editor {
 				if (skeletonData != null) {
 					animation = skeletonData.FindAnimation(animationName);
 				}
-			} 
+			}
 			bool animationNotFound = (animation == null);
 
 			if (changeNextFrame) {
 				changeNextFrame = false;
-				
+
 				if (ThisSkeletonDataAsset != lastSkeletonDataAsset || ThisSkeletonDataAsset.GetSkeletonData(true) != lastSkeletonData) {
 					preview.Clear();
 					preview.Initialize(Repaint, ThisSkeletonDataAsset, LastSkinName);

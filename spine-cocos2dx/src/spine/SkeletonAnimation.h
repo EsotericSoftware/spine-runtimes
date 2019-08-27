@@ -82,16 +82,16 @@ public:
 	void clearTrack (int trackIndex = 0);
 
 	void setStartListener (const StartListener& listener);
-    void setInterruptListener (const InterruptListener& listener);
+	void setInterruptListener (const InterruptListener& listener);
 	void setEndListener (const EndListener& listener);
-    void setDisposeListener (const DisposeListener& listener);
+	void setDisposeListener (const DisposeListener& listener);
 	void setCompleteListener (const CompleteListener& listener);
 	void setEventListener (const EventListener& listener);
 
 	void setTrackStartListener (TrackEntry* entry, const StartListener& listener);
-    void setTrackInterruptListener (TrackEntry* entry, const InterruptListener& listener);
+	void setTrackInterruptListener (TrackEntry* entry, const InterruptListener& listener);
 	void setTrackEndListener (TrackEntry* entry, const EndListener& listener);
-    void setTrackDisposeListener (TrackEntry* entry, const DisposeListener& listener);
+	void setTrackDisposeListener (TrackEntry* entry, const DisposeListener& listener);
 	void setTrackCompleteListener (TrackEntry* entry, const CompleteListener& listener);
 	void setTrackEventListener (TrackEntry* entry, const EventListener& listener);
 
@@ -114,9 +114,9 @@ protected:
 	bool _firstDraw;
 
 	StartListener _startListener;
-    InterruptListener _interruptListener;
+	InterruptListener _interruptListener;
 	EndListener _endListener;
-    DisposeListener _disposeListener;
+	DisposeListener _disposeListener;
 	CompleteListener _completeListener;
 	EventListener _eventListener;
 

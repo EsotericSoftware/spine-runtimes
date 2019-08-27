@@ -165,7 +165,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 	static GUIContent _meshRequiresTangentsText = new GUIContent("Note: Material requires a mesh with tangents.");
 	static GUIContent _meshRequiresNormalsText = new GUIContent("Note: Material requires a mesh with normals.");
 	static GUIContent _meshRequiresNormalsAndTangentsText = new GUIContent("Note: Material requires a mesh with Normals and Tangents.");
-	
+
 	const string _primaryMapsText = "Main Maps";
 	const string _depthLabelText = "Depth";
 	const string _shadowsText = "Shadows";
@@ -585,7 +585,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 		if (hasReceiveShadowsParameter) {
 			bool forceDisableReceiveShadows = !_writeToDepth.hasMixedValue && _writeToDepth.floatValue == 0;
 			EditorGUI.BeginDisabledGroup(forceDisableReceiveShadows);
-			
+
 			EditorGUI.BeginChangeCheck();
 			bool mixedValue;
 			bool enableReceive = !IsKeywordEnabled(_materialEditor, "_RECEIVE_SHADOWS_OFF", out mixedValue);
@@ -611,7 +611,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 		bool hasSHParameter = areMixedShaders || !isLWRPShader;
 		if (!hasSHParameter)
 			return false;
-		
+
 		EditorGUI.BeginChangeCheck();
 		bool mixedValue;
 		bool enabled = IsKeywordEnabled(_materialEditor, "_SPHERICAL_HARMONICS", out mixedValue);
@@ -882,7 +882,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 	}
 
 	static bool IsLWRPShader (MaterialEditor editor, out bool mixedValue) {
-		
+
 		mixedValue = false;
 		bool isAnyLWRPShader = false;
 		foreach (Material material in editor.targets) {
@@ -924,7 +924,7 @@ public class SpineSpriteShaderGUI : ShaderGUI {
 			return eLightMode.VertexLit;
 		}
 	}
-	
+
 	static eBlendMode GetMaterialBlendMode (Material material) {
 		if (material.IsKeywordEnabled("_ALPHABLEND_ON"))
 			return eBlendMode.StandardAlpha;

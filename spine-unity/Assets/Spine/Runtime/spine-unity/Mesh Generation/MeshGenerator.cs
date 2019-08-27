@@ -27,7 +27,7 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-// Not for optimization. Do  not disable.
+// Not for optimization. Do not disable.
 #define SPINE_TRIANGLECHECK // Avoid calling SetTriangles at the cost of checking for mesh differences (vertex counts, memberwise attachment list compare) every frame.
 //#define SPINE_DEBUG
 
@@ -339,7 +339,7 @@ namespace Spine.Unity {
 					Material material;
 					if (isCustomSlotMaterialsPopulated) {
 						if (!customSlotMaterials.TryGetValue(slot, out material))
-							material = (Material)((AtlasRegion)rendererObject).page.rendererObject;				
+							material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
 					} else {
 						material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
 					}
@@ -385,7 +385,7 @@ namespace Spine.Unity {
 
 					workingSubmeshInstructions.Resize(submeshIndex + 1);
 					workingSubmeshInstructions.Items[submeshIndex] = current;
-					//submeshIndex++;	
+					//submeshIndex++;
 				}
 			}
 
@@ -463,7 +463,7 @@ namespace Spine.Unity {
 				if (instruction.preActiveClippingSlotSource >= 0) {
 					var slot = drawOrderItems[instruction.preActiveClippingSlotSource];
 					clipper.ClipStart(slot, slot.attachment as ClippingAttachment);
-				}	
+				}
 			}
 
 			for (int slotIndex = instruction.startSlot; slotIndex < instruction.endSlot; slotIndex++) {
@@ -479,7 +479,7 @@ namespace Spine.Unity {
 				int attachmentIndexCount;
 
 				Color c = default(Color);
-				
+
 				// Identify and prepare values.
 				var region = attachment as RegionAttachment;
 				if (region != null) {
@@ -612,7 +612,7 @@ namespace Spine.Unity {
 						int oldTriangleCount = submesh.Count;
 						{ //submesh.Resize(oldTriangleCount + attachmentIndexCount);
 							int newTriangleCount = oldTriangleCount + attachmentIndexCount;
-							if (newTriangleCount > submesh.Items.Length) Array.Resize(ref submesh.Items, newTriangleCount); 
+							if (newTriangleCount > submesh.Items.Length) Array.Resize(ref submesh.Items, newTriangleCount);
 							submesh.Count = newTriangleCount;
 						}
 						var submeshItems = submesh.Items;
@@ -687,7 +687,7 @@ namespace Spine.Unity {
 					int vi = vertexIndex;
 					b2.y = 1f;
 
-					{ 
+					{
 						if (uv2 == null) {
 							uv2 = new ExposedList<Vector2>();
 							uv3 = new ExposedList<Vector2>();
@@ -872,7 +872,7 @@ namespace Spine.Unity {
 					{ //submesh.Resize(submesh.rawTriangleCount);
 						int newTriangleCount = submeshInstruction.rawTriangleCount;
 						if (newTriangleCount > currentSubmeshBuffer.Items.Length)
-							Array.Resize(ref currentSubmeshBuffer.Items, newTriangleCount); 
+							Array.Resize(ref currentSubmeshBuffer.Items, newTriangleCount);
 						else if (newTriangleCount < currentSubmeshBuffer.Items.Length) {
 							// Zero the extra.
 							var sbi = currentSubmeshBuffer.Items;
@@ -929,9 +929,9 @@ namespace Spine.Unity {
 			var rg = new Vector2(r2, g2);
 			var bo = new Vector2(b2, 1f);
 
-			int ovc = vertexBuffer.Count;				
+			int ovc = vertexBuffer.Count;
 			int newVertexCount = ovc + vertexCount;
-			{ 
+			{
 				if (uv2 == null) {
 					uv2 = new ExposedList<Vector2>();
 					uv3 = new ExposedList<Vector2>();
@@ -1013,8 +1013,8 @@ namespace Spine.Unity {
 						}
 						mesh.uv2 = this.uv2.Items;
 						mesh.uv3 = this.uv3.Items;
-					}	
-				}				
+					}
+				}
 			}
 		}
 
@@ -1043,7 +1043,7 @@ namespace Spine.Unity {
 			mesh.subMeshCount = submeshCount;
 
 			for (int i = 0; i < submeshCount; i++)
-				mesh.SetTriangles(submeshesItems[i].Items, i, false);				
+				mesh.SetTriangles(submeshesItems[i].Items, i, false);
 		}
 
 		public void FillTrianglesSingle (Mesh mesh) {
@@ -1166,7 +1166,7 @@ namespace Spine.Unity {
 			Vector4 tangent;
 			tangent.z = 0;
 			for (int i = 0; i < vertexCount; ++i) {
-				Vector2 t = tempTanBuffer[i]; 
+				Vector2 t = tempTanBuffer[i];
 
 				// t.Normalize() (aggressively inlined). Even better if offloaded to GPU via vertex shader.
 				float magnitude = Mathf.Sqrt(t.x * t.x + t.y * t.y);
@@ -1299,5 +1299,5 @@ namespace Spine.Unity {
 			AttachmentIndices.Clear();
 		}
 		#endregion
-	}	
+	}
 }

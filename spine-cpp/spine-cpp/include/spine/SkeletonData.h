@@ -112,7 +112,6 @@ public:
 
 	/// The skeleton's default skin.
 	/// By default this skin contains all attachments that were not in a skin in Spine.
-	///
 	/// @return May be NULL.
 	Skin *getDefaultSkin();
 

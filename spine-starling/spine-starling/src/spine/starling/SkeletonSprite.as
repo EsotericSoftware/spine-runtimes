@@ -59,12 +59,12 @@ package spine.starling {
 		static private var _tempMatrix : Matrix = new Matrix();
 		static private var _tempVertices : Vector.<Number> = new Vector.<Number>(8);
 		static internal var blendModes : Vector.<String> = new <String>[BlendMode.NORMAL, BlendMode.ADD, BlendMode.MULTIPLY, BlendMode.SCREEN];
-		private var _skeleton : Skeleton;		
+		private var _skeleton : Skeleton;
 		private var _smoothing : String = "bilinear";
 		private var _twoColorTint : Boolean = false;
 		private static var clipper: SkeletonClipping = new SkeletonClipping();
 		private static var QUAD_INDICES : Vector.<uint> = new <uint>[0, 1, 2, 2, 3, 0];
-		
+
 		public var vertexEffect : VertexEffect;
 		private var tempLight : spine.Color = new spine.Color(0, 0, 0);
 		private var tempDark : spine.Color = new spine.Color(0, 0, 0);
@@ -73,7 +73,7 @@ package spine.starling {
 		public function SkeletonSprite(skeletonData : SkeletonData) {
 			Bone.yDown = true;
 			_skeleton = new Skeleton(skeletonData);
-			_skeleton.updateWorldTransform();			
+			_skeleton.updateWorldTransform();
 		}
 
 		override public function render(painter : Painter) : void {
@@ -83,7 +83,7 @@ package spine.starling {
 			var r : Number = skeleton.color.r * 255;
 			var g : Number = skeleton.color.g * 255;
 			var b : Number = skeleton.color.b * 255;
-			var drawOrder : Vector.<Slot> = skeleton.drawOrder;			
+			var drawOrder : Vector.<Slot> = skeleton.drawOrder;
 			var ii : int, iii : int;
 			var attachmentColor: spine.Color;
 			var rgb : uint, a : Number;
@@ -92,7 +92,7 @@ package spine.starling {
 			var verticesLength : int, verticesCount : int, indicesLength : int;
 			var indexData : IndexData, indices : Vector.<uint>, vertexData : VertexData;
 			var uvs : Vector.<Number>;
-			
+
 			if (vertexEffect != null) vertexEffect.begin(skeleton);
 
 			for (var i : int = 0, n : int = drawOrder.length; i < n; ++i) {
@@ -105,16 +105,16 @@ package spine.starling {
 					verticesLength = 4 * 2;
 					verticesCount = verticesLength >> 1;
 					if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
-					region.computeWorldVertices(slot.bone, worldVertices, 0, 2);					
+					region.computeWorldVertices(slot.bone, worldVertices, 0, 2);
 
 					mesh = region.rendererObject as SkeletonMesh;
-					indices = QUAD_INDICES;					
+					indices = QUAD_INDICES;
 					if (mesh == null) {
 						if (region.rendererObject is Image)
 							region.rendererObject = mesh = new SkeletonMesh(Image(region.rendererObject).texture);
 						if (region.rendererObject is AtlasRegion)
-							region.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(region.rendererObject).rendererObject).texture);						
-						if (_twoColorTint) mesh.setStyle(new TwoColorMeshStyle());					
+							region.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(region.rendererObject).rendererObject).texture);
+						if (_twoColorTint) mesh.setStyle(new TwoColorMeshStyle());
 						indexData = mesh.getIndexData();
 						for (ii = 0; ii < indices.length; ii++)
 							indexData.setIndex(ii, indices[ii]);
@@ -123,23 +123,23 @@ package spine.starling {
 					}
 					indexData = mesh.getIndexData();
 					attachmentColor = region.color;
-					uvs = region.uvs;													
+					uvs = region.uvs;
 				} else if (slot.attachment is MeshAttachment) {
 					var meshAttachment : MeshAttachment = MeshAttachment(slot.attachment);
 					verticesLength = meshAttachment.worldVerticesLength;
 					verticesCount = verticesLength >> 1;
 					if (worldVertices.length < verticesLength) worldVertices.length = verticesLength;
 					meshAttachment.computeWorldVertices(slot, 0, meshAttachment.worldVerticesLength, worldVertices, 0, 2);
-					
+
 					mesh = meshAttachment.rendererObject as SkeletonMesh;
-					indices = meshAttachment.triangles;					
+					indices = meshAttachment.triangles;
 					if (mesh == null) {
 						if (meshAttachment.rendererObject is Image)
 							meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(meshAttachment.rendererObject).texture);
 						if (meshAttachment.rendererObject is AtlasRegion)
-							meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(meshAttachment.rendererObject).rendererObject).texture);						
+							meshAttachment.rendererObject = mesh = new SkeletonMesh(Image(AtlasRegion(meshAttachment.rendererObject).rendererObject).texture);
 						if (_twoColorTint) mesh.setStyle(new TwoColorMeshStyle());
-						
+
 						indexData = mesh.getIndexData();
 						indicesLength = meshAttachment.triangles.length;
 						for (ii = 0; ii < indicesLength; ii++) {
@@ -150,7 +150,7 @@ package spine.starling {
 					}
 					indexData = mesh.getIndexData();
 					attachmentColor = meshAttachment.color;
-					uvs = meshAttachment.uvs;					
+					uvs = meshAttachment.uvs;
 				} else if (slot.attachment is ClippingAttachment) {
 					var clip : ClippingAttachment = ClippingAttachment(slot.attachment);
 					clipper.clipStart(slot, clip);
@@ -158,28 +158,28 @@ package spine.starling {
 				} else {
 					continue;
 				}
-				
+
 				a = slot.color.a * attachmentColor.a;
 				if (a == 0) {
-				   clipper.clipEndWithSlot(slot);
-				   continue;
+					clipper.clipEndWithSlot(slot);
+					continue;
 				}
 				rgb = Color.rgb(r * slot.color.r * attachmentColor.r, g * slot.color.g * attachmentColor.g, b * slot.color.b * attachmentColor.b);
 				if (slot.darkColor == null) dark = Color.rgb(0, 0, 0);
-				else dark = Color.rgb(slot.darkColor.r * 255, slot.darkColor.g * 255, slot.darkColor.b * 255);	
+				else dark = Color.rgb(slot.darkColor.r * 255, slot.darkColor.g * 255, slot.darkColor.b * 255);
 
 				if (clipper.isClipping()) {
 					clipper.clipTriangles(worldVertices, indices, indices.length, uvs);
-					
-					// Need to create a new mesh here, see https://github.com/EsotericSoftware/spine-runtimes/issues/1125					
+
+					// Need to create a new mesh here, see https://github.com/EsotericSoftware/spine-runtimes/issues/1125
 					mesh = new SkeletonMesh(mesh.texture);
-					if (_twoColorTint) mesh.setStyle(new TwoColorMeshStyle());	
+					if (_twoColorTint) mesh.setStyle(new TwoColorMeshStyle());
 					indexData = mesh.getIndexData();
 
 					verticesCount = clipper.clippedVertices.length >> 1;
 					worldVertices = clipper.clippedVertices;
-					uvs = clipper.clippedUvs;					
-					
+					uvs = clipper.clippedUvs;
+
 					indices = clipper.clippedTriangles;
 					indicesLength = indices.length;
 					indexData.numIndices = indicesLength;
@@ -190,7 +190,7 @@ package spine.starling {
 				}
 
 				vertexData = mesh.getVertexData();
-				vertexData.numVertices = verticesCount;	
+				vertexData.numVertices = verticesCount;
 				if (vertexEffect != null) {
 					tempLight.r = ((rgb >> 16) & 0xff) / 255.0;
 					tempLight.g = ((rgb >> 8) & 0xff) / 255.0;
@@ -209,7 +209,7 @@ package spine.starling {
 						tempVertex.dark.setFromColor(tempDark);
 						vertexEffect.transform(tempVertex);
 						vertexData.colorize("color", Color.rgb(tempVertex.light.r * 255, tempVertex.light.g * 255, tempVertex.light.b * 255), tempVertex.light.a, ii, 1);
-						if (_twoColorTint) vertexData.colorize("color2", Color.rgb(tempVertex.dark.r * 255, tempVertex.dark.g * 255, tempVertex.dark.b * 255), a, ii, 1);						
+						if (_twoColorTint) vertexData.colorize("color2", Color.rgb(tempVertex.dark.r * 255, tempVertex.dark.g * 255, tempVertex.dark.b * 255), a, ii, 1);
 						mesh.setVertexPosition(ii, tempVertex.x, tempVertex.y);
 						mesh.setTexCoords(ii, tempVertex.u, tempVertex.v);
 					}
@@ -219,24 +219,24 @@ package spine.starling {
 					for (ii = 0, iii = 0; ii < verticesCount; ii++, iii += 2) {
 						mesh.setVertexPosition(ii, worldVertices[iii], worldVertices[iii + 1]);
 						mesh.setTexCoords(ii, uvs[iii], uvs[iii + 1]);
-					}				
+					}
 				}
 				if (indexData.numIndices > 0 && vertexData.numVertices > 0) {
 					painter.state.blendMode = blendModes[slot.data.blendMode.ordinal];
 					painter.batchMesh(mesh);
 				}
-				
+
 				clipper.clipEndWithSlot(slot);
 			}
 			painter.state.blendMode = originalBlendMode;
 			clipper.clipEnd();
-			
+
 			if (vertexEffect != null) vertexEffect.end();
 		}
 
 		override public function hitTest(localPoint : Point) : DisplayObject {
 			if (!this.visible || !this.touchable) return null;
-			
+
 			var minX : Number = Number.MAX_VALUE, minY : Number = Number.MAX_VALUE;
 			var maxX : Number = -Number.MAX_VALUE, maxY : Number = -Number.MAX_VALUE;
 			var slots : Vector.<Slot> = skeleton.slots;
@@ -318,11 +318,11 @@ package spine.starling {
 		public function set smoothing(smoothing : String) : void {
 			_smoothing = smoothing;
 		}
-		
+
 		public function get twoColorTint() : Boolean {
 			return _twoColorTint;
 		}
-		
+
 		public function set twoColorTint(tint : Boolean) : void {
 			_twoColorTint = tint;
 		}

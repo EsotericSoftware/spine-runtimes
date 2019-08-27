@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using System.Collections;
 
 namespace Spine.Unity.AttachmentTools {
-	
+
 	public static class AtlasUtilities {
 		internal const TextureFormat SpineTextureFormat = TextureFormat.RGBA32;
 		internal const float DefaultMipmapBias = -0.5f;
@@ -223,7 +223,7 @@ namespace Spine.Unity.AttachmentTools {
 		/// Fills the outputAttachments list with new attachment objects based on the attachments in sourceAttachments, but mapped to a new single texture using the same material.</summary>
 		/// <param name="sourceAttachments">The list of attachments to be repacked.</param>
 		/// <param name = "outputAttachments">The List(Attachment) to populate with the newly created Attachment objects.</param>
-		/// 
+		///
 		/// <param name="materialPropertySource">May be null. If no Material property source is provided, no special </param>
 		public static void GetRepackedAttachments (List<Attachment> sourceAttachments, List<Attachment> outputAttachments, Material materialPropertySource, out Material outputMaterial, out Texture2D outputTexture, int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps, string newAssetName = "Repacked Attachments", bool clearCache = false, bool useOriginalNonrenderables = true) {
 			if (sourceAttachments == null) throw new System.ArgumentNullException("sourceAttachments");
@@ -241,7 +241,7 @@ namespace Spine.Unity.AttachmentTools {
 			int newRegionIndex = 0;
 			for (int i = 0, n = sourceAttachments.Count; i < n; i++) {
 				var originalAttachment = sourceAttachments[i];
-				
+
 				if (IsRenderable(originalAttachment)) {
 					var newAttachment = originalAttachment.GetCopy(true);
 					var region = newAttachment.GetRegion();
@@ -332,7 +332,7 @@ namespace Spine.Unity.AttachmentTools {
 			var texturesToPack = new List<Texture2D>();
 			var originalRegions = new List<AtlasRegion>();
 			int newRegionIndex = 0;
-			
+
 			foreach (var skinEntry in skinAttachments) {
 				var originalKey = skinEntry.Key;
 				var originalAttachment = skinEntry.Value;
@@ -356,7 +356,7 @@ namespace Spine.Unity.AttachmentTools {
 					newSkin.SetAttachment(originalKey.SlotIndex, originalKey.Name, newAttachment);
 				} else {
 					newSkin.SetAttachment(originalKey.SlotIndex, originalKey.Name, useOriginalNonrenderables ? originalAttachment : originalAttachment.GetCopy(true));
-				}	
+				}
 			}
 
 			// Fill a new texture with the collected attachment textures.
@@ -489,7 +489,7 @@ namespace Spine.Unity.AttachmentTools {
 		/// Returns a Rect of the AtlasRegion according to Spine texture coordinates. (x-right, y-down)</summary>
 		static Rect GetSpineAtlasRect (this AtlasRegion region, bool includeRotate = true) {
 			if (includeRotate && region.rotate)
-				return new Rect(region.x, region.y, region.height, region.width);				
+				return new Rect(region.x, region.y, region.height, region.width);
 			else
 				return new Rect(region.x, region.y, region.width, region.height);
 		}
@@ -517,7 +517,7 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>
 		/// Creates a new Spine AtlasRegion according to a Unity UV Rect (x-right, y-up, uv-normalized).</summary>
 		static AtlasRegion UVRectToAtlasRegion (Rect uvRect, AtlasRegion referenceRegion, AtlasPage page) {
-			var tr  = UVRectToTextureRect(uvRect, page.width, page.height);
+			var tr = UVRectToTextureRect(uvRect, page.width, page.height);
 			var rr = tr.SpineUnityFlipRect(page.height);
 
 			int x = (int)rr.x, y = (int)rr.y;

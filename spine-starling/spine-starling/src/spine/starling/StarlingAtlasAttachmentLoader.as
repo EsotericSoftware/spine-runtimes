@@ -78,15 +78,15 @@ package spine.starling {
 				tmp = attachment.regionWidth;
 				attachment.regionWidth = attachment.regionHeight;
 				attachment.regionHeight = tmp;
-                attachment["regionU2"] = 0;
-                attachment["regionV2"] = 1;
-                attachment["regionU"] = 1;
-                attachment["regionV"] = 0;
-			}else{
-                attachment["regionU"] = 0;
-                attachment["regionV"] = 0;
-                attachment["regionU2"] = 1;
-                attachment["regionV2"] = 1;
+				attachment["regionU2"] = 0;
+				attachment["regionV2"] = 1;
+				attachment["regionU"] = 1;
+				attachment["regionV"] = 0;
+			} else {
+				attachment["regionU"] = 0;
+				attachment["regionV"] = 0;
+				attachment["regionU2"] = 1;
+				attachment["regionV2"] = 1;
 			}
 			attachment.setUVs(attachment["regionU"], attachment["regionV"], attachment["regionU2"], attachment["regionV2"], rotated);
 			return attachment;
@@ -122,7 +122,7 @@ package spine.starling {
 			attachment.regionWidth = texture.width;
 			attachment.regionHeight = texture.height;
 			attachment.regionOriginalWidth = frame ? frame.width : texture.width;
-			attachment.regionOriginalHeight = frame ? frame.height : texture.height;			
+			attachment.regionOriginalHeight = frame ? frame.height : texture.height;
 			if (rotated) {
 				var tmp : Number = attachment.regionOriginalWidth;
 				attachment.regionOriginalWidth = attachment.regionOriginalHeight;

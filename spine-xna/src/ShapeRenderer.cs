@@ -37,11 +37,11 @@ using System.Text;
 namespace Spine {
 	/// <summary>
 	/// Batch drawing of lines and shapes that can be derrived from lines.
-	/// 
+	///
 	/// Call drawing methods in between Begin()/End()
 	/// </summary>
 	public class ShapeRenderer {
-		GraphicsDevice device;		
+		GraphicsDevice device;
 		List<VertexPositionColor> vertices = new List<VertexPositionColor>();
 		Color color = Color.White;
 		BasicEffect effect;
@@ -77,18 +77,18 @@ namespace Spine {
 
 		/** Draws a circle using {@link ShapeType#Line} or {@link ShapeType#Filled}. */
 		public void Circle(float x, float y, float radius, int segments) {
-			if (segments <= 0) throw new ArgumentException("segments must be > 0.");			
+			if (segments <= 0) throw new ArgumentException("segments must be > 0.");
 			float angle = 2 * MathUtils.PI / segments;
 			float cos = MathUtils.Cos(angle);
 			float sin = MathUtils.Sin(angle);
 			float cx = radius, cy = 0;
 			float temp = 0;
-							
-			for (int i = 0; i < segments; i++) {				
+
+			for (int i = 0; i < segments; i++) {
 				vertices.Add(new VertexPositionColor(new Vector3(x + cx, y + cy, 0), color));
 				temp = cx;
 				cx = cos * cx - sin * cy;
-				cy = sin * temp + cos * cy;				
+				cy = sin * temp + cos * cy;
 				vertices.Add(new VertexPositionColor(new Vector3(x + cx, y + cy, 0), color));
 			}
 			vertices.Add(new VertexPositionColor(new Vector3(x + cx, y + cy, 0), color));
@@ -157,7 +157,7 @@ namespace Spine {
 
 			foreach (EffectPass pass in effect.CurrentTechnique.Passes) {
 				pass.Apply();
-				device.DrawUserPrimitives(PrimitiveType.LineList, verticesArray, 0, verticesArray.Length / 2);		
+				device.DrawUserPrimitives(PrimitiveType.LineList, verticesArray, 0, verticesArray.Length / 2);
 			}
 
 			vertices.Clear();

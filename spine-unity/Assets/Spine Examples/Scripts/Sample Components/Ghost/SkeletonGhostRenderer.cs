@@ -86,7 +86,7 @@ namespace Spine.Unity.Examples {
 				t = Mathf.Lerp(t, 0, Time.deltaTime * fadeSpeed);
 				if (t <= 0)
 					break;
-				
+
 				yield return null;
 			}
 
@@ -99,7 +99,7 @@ namespace Spine.Unity.Examples {
 			Color32 black = SkeletonGhostRenderer.TransparentBlack;
 
 			float t = 1f;
-			
+
 			for (float hardTimeLimit = 5f; hardTimeLimit > 0; hardTimeLimit -= Time.deltaTime) {
 				c = Color32.Lerp(black, startColor, t);
 				mpb.SetColor(colorId, c);

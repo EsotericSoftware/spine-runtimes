@@ -31,7 +31,7 @@
 #define Spine_MixPose_h
 
 namespace spine {
-///
+
 /// Controls how a timeline is mixed with the setup or current pose.
 /// See also Timeline::apply(Skeleton&, float, float, Vector&, float, Blend, MixDirection)
 enum MixBlend {

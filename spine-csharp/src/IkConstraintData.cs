@@ -73,7 +73,7 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// When true, and only a single bone is being constrained, 
+		/// When true, and only a single bone is being constrained,
 		/// if the target is too close, the bone is scaled to reach it. </summary>
 		public bool Compress {
 			get { return compress; }
@@ -81,7 +81,7 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// When true, if the target is out of range, the parent bone is scaled on the X axis to reach it. 
+		/// When true, if the target is out of range, the parent bone is scaled on the X axis to reach it.
 		/// If the bone has local nonuniform scale, stretching is not applied.</summary>
 		public bool Stretch {
 			get { return stretch; }
@@ -89,7 +89,7 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// When true, only a single bone is being constrained and Compress or Stretch is used, 
+		/// When true, only a single bone is being constrained and Compress or Stretch is used,
 		/// the bone is scaled both on the X and Y axes.</summary>
 		public bool Uniform {
 			get { return uniform; }

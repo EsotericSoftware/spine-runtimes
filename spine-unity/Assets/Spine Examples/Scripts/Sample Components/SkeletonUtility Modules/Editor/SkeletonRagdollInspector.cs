@@ -33,7 +33,7 @@ using UnityEngine;
 using UnityEditor;
 
 namespace Spine.Unity.Examples {
-	
+
 	public class SkeletonRagdollInspector : UnityEditor.Editor {
 		[CustomPropertyDrawer(typeof(SkeletonRagdoll.LayerFieldAttribute))]
 		public class LayerFieldPropertyDrawer : PropertyDrawer {

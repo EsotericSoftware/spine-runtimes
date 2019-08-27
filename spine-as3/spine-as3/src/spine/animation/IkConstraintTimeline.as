@@ -94,7 +94,7 @@ package spine.animation {
 						constraint.bendDirection = int(frames[frames.length + PREV_BEND_DIRECTION]);
 						constraint.compress = int(frames[frames.length + PREV_COMPRESS]) != 0;
 						constraint.stretch = int(frames[frames.length + PREV_STRETCH]) != 0;
-					}					
+					}
 				} else {
 					constraint.mix += (frames[frames.length + PREV_MIX] - constraint.mix) * alpha;
 					constraint.softness += (frames[frames.length + PREV_SOFTNESS] - constraint.softness) * alpha;
@@ -121,12 +121,12 @@ package spine.animation {
 				if (direction == MixDirection.Out) {
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
-					constraint.stretch = constraint.data.stretch;	
+					constraint.stretch = constraint.data.stretch;
 				} else {
 					constraint.bendDirection = int(frames[frame + PREV_BEND_DIRECTION]);
 					constraint.compress = int(frames[frame + PREV_COMPRESS]) != 0;
 					constraint.stretch = int(frames[frame + PREV_STRETCH]) != 0;
-				}				
+				}
 			} else {
 				constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
 				constraint.softness += (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.softness) * alpha;
