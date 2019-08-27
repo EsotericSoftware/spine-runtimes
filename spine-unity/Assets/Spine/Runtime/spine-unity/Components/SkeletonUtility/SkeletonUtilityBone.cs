@@ -167,7 +167,7 @@ namespace Spine.Unity {
 						}
 						break;
 				}
-				
+
 			} else if (mode == Mode.Override) {
 				if (transformLerpComplete)
 					return;
@@ -232,7 +232,7 @@ namespace Spine.Unity {
 		#if UNITY_EDITOR
 		void OnDrawGizmos () {
 			if (IncompatibleTransformMode)
-				Gizmos.DrawIcon(transform.position + new Vector3(0, 0.128f, 0), "icon-warning");		
+				Gizmos.DrawIcon(transform.position + new Vector3(0, 0.128f, 0), "icon-warning");
 		}
 		#endif
 	}

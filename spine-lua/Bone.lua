@@ -70,7 +70,7 @@ function Bone.new (data, skeleton, parent)
 		a = 0, b = 0, worldX = 0, -- a b x
 		c = 0, d = 0, worldY = 0, -- c d y
 		sorted = false,
-    active = false
+		active = false
 	}
 	setmetatable(self, Bone)
 

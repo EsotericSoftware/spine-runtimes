@@ -65,7 +65,7 @@ namespace Spine.Unity.Editor {
 		public static string editorPath = "";
 		public static string editorGUIPath = "";
 		public static bool initialized;
-	
+
 		// Auto-import entry point
 		static void OnPostprocessAllAssets (string[] imported, string[] deleted, string[] moved, string[] movedFromAssetPaths) {
 			if (imported.Length == 0)
@@ -81,7 +81,7 @@ namespace Spine.Unity.Editor {
 
 		static void Initialize () {
 			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
-			
+
 			#if !NEW_PREFERENCES_SETTINGS_PROVIDER
 			Preferences.Load();
 			#else

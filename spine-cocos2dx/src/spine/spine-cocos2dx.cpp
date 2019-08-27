@@ -48,7 +48,7 @@ static void setAttachmentVertices(RegionAttachment* attachment) {
 		vertices[i].texCoords.u = attachment->getUVs()[ii];
 		vertices[i].texCoords.v = attachment->getUVs()[ii + 1];
 	}
-	attachment->setRendererObject(attachmentVertices, deleteAttachmentVertices);	
+	attachment->setRendererObject(attachmentVertices, deleteAttachmentVertices);
 }
 
 static void setAttachmentVertices(MeshAttachment* attachment) {
@@ -63,7 +63,7 @@ static void setAttachmentVertices(MeshAttachment* attachment) {
 	attachment->setRendererObject(attachmentVertices, deleteAttachmentVertices);
 }
 
-Cocos2dAtlasAttachmentLoader::Cocos2dAtlasAttachmentLoader(Atlas* atlas): AtlasAttachmentLoader(atlas) {	
+Cocos2dAtlasAttachmentLoader::Cocos2dAtlasAttachmentLoader(Atlas* atlas): AtlasAttachmentLoader(atlas) {
 }
 
 void Cocos2dAtlasAttachmentLoader::configureAttachment(Attachment* attachment) {
@@ -113,7 +113,7 @@ void Cocos2dTextureLoader::load(AtlasPage& page, const spine::String& path) {
 		page.height = texture->getPixelsHigh();
 	}
 }
-	
+
 void Cocos2dTextureLoader::unload(void* texture) {
 	if (texture)
 	{
@@ -125,7 +125,7 @@ void Cocos2dTextureLoader::unload(void* texture) {
 char *Cocos2dExtension::_readFile(const spine::String &path, int *length) {
 	Data data = FileUtils::getInstance()->getDataFromFile(FileUtils::getInstance()->fullPathForFilename(path.buffer()));
 	if (data.isNull()) return nullptr;
-	
+
 	// avoid buffer overflow (int is shorter than ssize_t in certain platforms)
 #if COCOS2D_VERSION >= 0x00031200
 	ssize_t tmpLen;

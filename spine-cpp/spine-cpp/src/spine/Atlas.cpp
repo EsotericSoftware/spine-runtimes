@@ -89,12 +89,8 @@ void Atlas::flipV() {
 }
 
 AtlasRegion *Atlas::findRegion(const String &name) {
-	for (size_t i = 0, n = _regions.size(); i < n; ++i) {
-		if (_regions[i]->name == name) {
-			return _regions[i];
-		}
-	}
-
+	for (size_t i = 0, n = _regions.size(); i < n; ++i)
+		if (_regions[i]->name == name) return _regions[i];
 	return NULL;
 }
 
@@ -103,11 +99,9 @@ Vector<AtlasPage*> &Atlas::getPages() {
 }
 
 void Atlas::load(const char *begin, int length, const char *dir, bool createTexture) {
-	static const char *formatNames[] = {"", "Alpha", "Intensity", "LuminanceAlpha", "RGB565", "RGBA4444", "RGB888",
-										"RGBA8888"};
-	static const char *textureFilterNames[] = {"", "Nearest", "Linear", "MipMap", "MipMapNearestNearest",
-											   "MipMapLinearNearest",
-											   "MipMapNearestLinear", "MipMapLinearLinear"};
+	static const char *formatNames[] = {"", "Alpha", "Intensity", "LuminanceAlpha", "RGB565", "RGBA4444", "RGB888", "RGBA8888"};
+	static const char *textureFilterNames[] = {"", "Nearest", "Linear", "MipMap", "MipMapNearestNearest", "MipMapLinearNearest",
+		"MipMapNearestLinear", "MipMapLinearLinear"};
 
 	int count;
 	const char *end = begin + length;
@@ -125,9 +119,7 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 			char *name = mallocString(&str);
 			char *path = SpineExtension::calloc<char>(dirLength + needsSlash + strlen(name) + 1, __FILE__, __LINE__);
 			memcpy(path, dir, dirLength);
-			if (needsSlash) {
-				path[dirLength] = '/';
-			}
+			if (needsSlash) path[dirLength] = '/';
 			strcpy(path + dirLength + needsSlash, name);
 
 			page = new(__FILE__, __LINE__) AtlasPage(String(name, true));
@@ -163,15 +155,11 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 				}
 			}
 
-			if (createTexture)
-			{
+			if (createTexture) {
 				if (_textureLoader) _textureLoader->load(*page, String(path));
 				SpineExtension::free(path, __FILE__, __LINE__);
-			}
-			else
-			{
+			} else
 				page->texturePath = String(path, true);
-			}
 
 			_pages.add(page);
 		} else {
@@ -181,13 +169,9 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 			region->name = String(mallocString(&str), true);
 
 			readValue(&begin, end, &str);
-			if (equals(&str, "true")) {
-				region->degrees = 90;
-			} else if (equals(&str, "false")) {
-				region->degrees = 0;
-			} else {
-				region->degrees = toInt(&str);
-			}
+			if (equals(&str, "true")) region->degrees = 90;
+			else if (equals(&str, "false")) region->degrees = 0;
+			else region->degrees = toInt(&str);
 			region->rotate = region->degrees == 90;
 
 			readTuple(&begin, end, tuple);
@@ -251,41 +235,32 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 }
 
 void Atlas::trim(Str *str) {
-	while (isspace((unsigned char) *str->begin) && str->begin < str->end) {
+	while (isspace((unsigned char) *str->begin) && str->begin < str->end)
 		(str->begin)++;
-	}
 
-	if (str->begin == str->end) {
-		return;
-	}
+	if (str->begin == str->end) return;
 
 	str->end--;
 
-	while (((unsigned char)*str->end == '\r') && str->end >= str->begin) {
+	while (((unsigned char)*str->end == '\r') && str->end >= str->begin)
 		str->end--;
-	}
 
 	str->end++;
 }
 
 int Atlas::readLine(const char **begin, const char *end, Str *str) {
-	if (*begin == end) {
-		return 0;
-	}
+	if (*begin == end) return 0;
 
 	str->begin = *begin;
 
 	/* Find next delimiter. */
-	while (*begin != end && **begin != '\n') {
+	while (*begin != end && **begin != '\n')
 		(*begin)++;
-	}
 
 	str->end = *begin;
 	trim(str);
 
-	if (*begin != end) {
-		(*begin)++;
-	}
+	if (*begin != end) (*begin)++;
 
 	return 1;
 }
@@ -294,13 +269,9 @@ int Atlas::beginPast(Str *str, char c) {
 	const char *begin = str->begin;
 	while (true) {
 		char lastSkippedChar = *begin;
-		if (begin == str->end) {
-			return 0;
-		}
+		if (begin == str->end) return 0;
 		begin++;
-		if (lastSkippedChar == c) {
-			break;
-		}
+		if (lastSkippedChar == c) break;
 	}
 	str->begin = begin;
 	return 1;
@@ -308,10 +279,7 @@ int Atlas::beginPast(Str *str, char c) {
 
 int Atlas::readValue(const char **begin, const char *end, Str *str) {
 	readLine(begin, end, str);
-	if (!beginPast(str, ':')) {
-		return 0;
-	}
-
+	if (!beginPast(str, ':')) return 0;
 	trim(str);
 	return 1;
 }
@@ -320,16 +288,11 @@ int Atlas::readTuple(const char **begin, const char *end, Str tuple[]) {
 	int i;
 	Str str = {NULL, NULL};
 	readLine(begin, end, &str);
-	if (!beginPast(&str, ':')) {
-		return 0;
-	}
+	if (!beginPast(&str, ':')) return 0;
 
 	for (i = 0; i < 3; ++i) {
 		tuple[i].begin = str.begin;
-		if (!beginPast(&str, ',')) {
-			break;
-		}
-
+		if (!beginPast(&str, ',')) break;
 		tuple[i].end = str.begin - 2;
 		trim(&tuple[i]);
 	}
@@ -352,11 +315,8 @@ char *Atlas::mallocString(Str *str) {
 int Atlas::indexOf(const char **array, int count, Str *str) {
 	int length = (int) (str->end - str->begin);
 	int i;
-	for (i = count - 1; i >= 0; i--) {
-		if (strncmp(array[i], str->begin, length) == 0) {
-			return i;
-		}
-	}
+	for (i = count - 1; i >= 0; i--)
+		if (strncmp(array[i], str->begin, length) == 0) return i;
 	return 0;
 }
 

@@ -1,3 +1,3 @@
 # spine-js
 
-spine-js has been deprecated and is superseded by [spine-ts](../spine-ts).
+spine-js has been replaced by [spine-ts](../spine-ts).

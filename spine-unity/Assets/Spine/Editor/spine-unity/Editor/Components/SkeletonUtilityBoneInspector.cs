@@ -83,7 +83,7 @@ namespace Spine.Unity.Editor {
 					var slotAttachments = new List<Skin.SkinEntry>();
 					int slotIndex = skeleton.FindSlotIndex(slot.Data.Name);
 					skin.GetAttachments(slotIndex, slotAttachments);
-					
+
 					var boundingBoxes = new List<BoundingBoxAttachment>();
 					foreach (var att in slotAttachments) {
 						var boundingBoxAttachment = att.Attachment as BoundingBoxAttachment;

@@ -54,11 +54,11 @@ function AttachmentLoader.new ()
 	function self:newPathAttachment(skin, name)
 		return PathAttachment.new(name)
 	end
-	
+
 	function self:newPointAttachment(skin, name)
 		return PointAttachment.new(name)
 	end
-	
+
 	function self:newClippingAttachment(skin, name)
 		return ClippingAttachment.new(name)
 	end

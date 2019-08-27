@@ -38,7 +38,7 @@ namespace Spine.Unity.Editor {
 
 	[CustomEditor(typeof(BoneFollowerGraphic)), CanEditMultipleObjects]
 	public class BoneFollowerGraphicInspector : Editor {
-		
+
 		SerializedProperty boneName, skeletonGraphic, followXYPosition, followZPosition, followBoneRotation, followLocalScale, followSkeletonFlip;
 		BoneFollowerGraphic targetBoneFollower;
 		bool needsReset;
@@ -107,7 +107,7 @@ namespace Spine.Unity.Editor {
 			} else {
 				var targetBone = tbf.bone;
 				if (targetBone == null) return;
-				
+
 				SpineHandles.DrawBoneWireframe(transform, targetBone, SpineHandles.TransformContraintColor, positionScale);
 				Handles.Label(targetBone.GetWorldPosition(transform, positionScale), targetBone.Data.Name, SpineHandles.BoneNameStyle);
 			}

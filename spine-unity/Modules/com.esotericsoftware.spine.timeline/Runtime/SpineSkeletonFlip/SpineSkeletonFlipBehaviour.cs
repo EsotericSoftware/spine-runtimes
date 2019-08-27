@@ -34,5 +34,5 @@ using UnityEngine.Timeline;
 
 [Serializable]
 public class SpineSkeletonFlipBehaviour : PlayableBehaviour {
-    public bool flipX, flipY;
+	public bool flipX, flipY;
 }

@@ -39,7 +39,7 @@ namespace Spine.Unity.Examples {
 		// Implementing IHasSkeletonDataAsset allows Spine attribute drawers to automatically detect this component as a skeleton data source.
 		public SkeletonDataAsset skeletonDataAsset;
 		SkeletonDataAsset IHasSkeletonDataAsset.SkeletonDataAsset { get { return this.skeletonDataAsset; } }
-		
+
 		public Material sourceMaterial;
 		public bool applyPMA = true;
 		public List<EquipHook> equippables = new List<EquipHook>();
@@ -57,7 +57,7 @@ namespace Spine.Unity.Examples {
 			[SpineAttachment(skinField:"templateSkin")]
 			public string templateAttachment;
 		}
-		
+
 		public enum EquipType {
 			Gun,
 			Goggles

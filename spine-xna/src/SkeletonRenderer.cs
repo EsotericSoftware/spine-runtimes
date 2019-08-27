@@ -40,7 +40,7 @@ namespace Spine {
 		private const int BL = 2;
 		private const int BR = 3;
 
-		SkeletonClipping clipper = new SkeletonClipping();	
+		SkeletonClipping clipper = new SkeletonClipping();
 		GraphicsDevice device;
 		MeshBatcher batcher;
 		public MeshBatcher Batcher { get { return batcher; } }
@@ -78,7 +78,7 @@ namespace Spine {
 			defaultBlendState = premultipliedAlpha ? BlendState.AlphaBlend : BlendState.NonPremultiplied;
 
 			device.RasterizerState = rasterizerState;
-			device.BlendState = defaultBlendState;			
+			device.BlendState = defaultBlendState;
 		}
 
 		public void End () {

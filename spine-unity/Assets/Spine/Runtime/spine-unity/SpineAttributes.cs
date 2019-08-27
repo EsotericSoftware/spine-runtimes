@@ -224,7 +224,7 @@ namespace Spine.Unity {
 		/// <summary>
 		/// Smart popup menu for Spine Attachments
 		/// </summary>
-		/// <param name="currentSkinOnly">Filters popup results to only include the current Skin.  Only valid when a SkeletonRenderer is the data source.</param>
+		/// <param name="currentSkinOnly">Filters popup results to only include the current Skin. Only valid when a SkeletonRenderer is the data source.</param>
 		/// <param name="returnAttachmentPath">Returns a fully qualified path for an Attachment in the format "Skin/Slot/AttachmentName". This path format is only used by the SpineAttachment helper methods like SpineAttachment.GetAttachment and .GetHierarchy. Do not use full path anywhere else in Spine's system.</param>
 		/// <param name="placeholdersOnly">Filters popup results to exclude attachments that are not children of Skin Placeholders</param>
 		/// <param name="slotField">If specified, a locally scoped field with the name supplied by in slotField will be used to limit the popup results to children of a named slot</param>

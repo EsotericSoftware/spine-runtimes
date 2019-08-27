@@ -77,7 +77,7 @@ package spine.animation {
 			timelineMode.length = 0;
 			timelineHoldMix.length = 0;
 			timelinesRotation.length = 0;
-		}		
+		}
 
 		public function resetRotationDirection() : void {
 			timelinesRotation.length = 0;

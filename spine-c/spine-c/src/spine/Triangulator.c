@@ -115,9 +115,9 @@ static int _isConcave(int index, int vertexCount, float* vertices, short* indice
 	int previous = indices[(vertexCount + index - 1) % vertexCount] << 1;
 	int current = indices[index] << 1;
 	int next = indices[(index + 1) % vertexCount] << 1;
-	return !_positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1],
-						 vertices[next],
-						 vertices[next + 1]);
+	return !_positiveArea(vertices[previous], vertices[previous + 1],
+		vertices[current], vertices[current + 1],
+		vertices[next], vertices[next + 1]);
 }
 
 static int _winding (float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {

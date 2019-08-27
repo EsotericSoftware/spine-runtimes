@@ -43,7 +43,7 @@ namespace Spine.Unity {
 		/// <summary>Gets the SkeletonDataAsset of the Spine Component.</summary>
 		SkeletonDataAsset SkeletonDataAsset { get; }
 	}
-	
+
 	/// <summary>A Spine-Unity Component that manages a Spine.Skeleton instance, instantiated from a SkeletonDataAsset.</summary>
 	public interface ISkeletonComponent {
 		/// <summary>Gets the SkeletonDataAsset of the Spine Component.</summary>

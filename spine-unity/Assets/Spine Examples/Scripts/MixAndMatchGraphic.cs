@@ -82,8 +82,8 @@ namespace Spine.Unity.Examples {
 			// STEP 0: PREPARE SKINS
 			// Let's prepare a new skin to be our custom skin with equips/customizations. We get a clone so our original skins are unaffected.
 			customSkin = customSkin ?? new Skin("custom skin"); // This requires that all customizations are done with skin placeholders defined in Spine.
-			//customSkin = customSkin ?? skeleton.UnshareSkin(true, false, skeletonAnimation.AnimationState); // use this if you are not customizing on the default skin and don't plan to remove 
-			// Next let's get the skin that contains our source attachments. These are the attachments that 
+			//customSkin = customSkin ?? skeleton.UnshareSkin(true, false, skeletonAnimation.AnimationState); // use this if you are not customizing on the default skin and don't plan to remove
+			// Next let's get the skin that contains our source attachments. These are the attachments that
 			var baseSkin = skeleton.Data.FindSkin(baseSkinName);
 
 			// STEP 1: "EQUIP" ITEMS USING SPRITES
@@ -94,7 +94,7 @@ namespace Spine.Unity.Examples {
 
 			// Let's do this for the visor.
 			int visorSlotIndex = skeleton.FindSlotIndex(visorSlot); // You can access GetAttachment and SetAttachment via string, but caching the slotIndex is faster.
-			Attachment baseAttachment = baseSkin.GetAttachment(visorSlotIndex, visorKey);  // STEP 1.1
+			Attachment baseAttachment = baseSkin.GetAttachment(visorSlotIndex, visorKey); // STEP 1.1
 			Attachment newAttachment = baseAttachment.GetRemappedClone(visorSprite, sourceMaterial); // STEP 1.2 - 1.3
 			customSkin.SetAttachment(visorSlotIndex, visorKey, newAttachment); // STEP 1.4
 

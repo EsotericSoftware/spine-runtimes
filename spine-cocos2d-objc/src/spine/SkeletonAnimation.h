@@ -48,9 +48,9 @@ typedef void(^spEventListener)(spTrackEntry* entry, spEvent* event);
 	float _timeScale;
 
 	spStartListener _startListener;
-    spInterruptListener _interruptListener;
+	spInterruptListener _interruptListener;
 	spEndListener _endListener;
-    spDisposeListener _disposeListener;
+	spDisposeListener _disposeListener;
 	spCompleteListener _completeListener;
 	spEventListener _eventListener;
 }

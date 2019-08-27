@@ -43,18 +43,18 @@ namespace spine {
 		Cocos2dAtlasAttachmentLoader(Atlas* atlas);
 		virtual void configureAttachment(Attachment* attachment);
 	};
-	
+
 	class Cocos2dTextureLoader: public TextureLoader {
 	public:
-		
+
 		virtual void load(AtlasPage& page, const String& path);
-		
+
 		virtual void unload(void* texture);
 	};
-	
+
 	class Cocos2dExtension: public DefaultSpineExtension {
 	public:
-		
+
 	protected:
 		virtual char *_readFile(const String &path, int *length);
 	};

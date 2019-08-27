@@ -127,7 +127,7 @@ namespace Spine.Unity.Editor {
 			SerializedProperty relativeProperty = property.serializedObject.FindProperty(propertyName); // baseProperty
 
 			// If base property is not found, look for the sibling property.
-			if (relativeProperty == null) { 
+			if (relativeProperty == null) {
 				string propertyPath = property.propertyPath;
 				int localPathLength = property.name.Length;
 
@@ -210,7 +210,7 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.BeginVertical(BoxScopeStyle);
 				if (indent) EditorGUI.indentLevel++;
 			}
-				
+
 			public void Dispose () {
 				if (indent) EditorGUI.indentLevel--;
 				EditorGUILayout.EndVertical();
@@ -300,7 +300,7 @@ namespace Spine.Unity.Editor {
 					var component = o as Component;
 					if (component != null) {
 						var renderer = component.GetComponent<Renderer>();
-						if (renderer != null) 
+						if (renderer != null)
 							renderers.Add(renderer);
 					}
 				}

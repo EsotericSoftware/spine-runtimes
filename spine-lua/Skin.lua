@@ -35,14 +35,14 @@ local SkinEntry = {}
 SkinEntry.__index = SkinEntry
 
 function SkinEntry.new (slotIndex, name, attachment)
-    local self = {
-      slotIndex = slotIndex,
-      name = name,
-      attachment = attachment
-    }
-    setmetatable(self, SkinEntry)
-    
-    return self
+	local self = {
+		slotIndex = slotIndex,
+		name = name,
+		attachment = attachment
+	}
+	setmetatable(self, SkinEntry)
+
+	return self
 end
 
 local Skin = {}
@@ -54,8 +54,8 @@ function Skin.new (name)
 	local self = {
 		name = name,
 		attachments = {},
-    bones = {},
-    constraints = {}
+		bones = {},
+		constraints = {}
 	}
 	setmetatable(self, Skin)
 
@@ -69,67 +69,67 @@ function Skin:setAttachment (slotIndex, name, attachment)
 end
 
 function Skin:addSkin (skin)
-  for i, bone in ipairs(skin.bones) do
-    local contained = false
-    for j, otherBone in ipairs(self.bones) do
-      if otherBone == bone then
-        contained = true
-        break
-      end
-    end
-    if not contained then table_insert(self.bones, bone) end
-  end
-  
-  for i, constraint in ipairs(skin.constraints) do
-    local contained = false
-    for j, otherConstraint in ipairs(self.constraints) do
-      if otherConstraint == constraint then
-        contained = true
-        break
-      end
-    end
-    if not contained then table_insert(self.constraints, constraint) end
-  end
-  
-  local attachments = skin:getAttachments()
-  for i, entry in ipairs(attachments) do
-    self:setAttachment(entry.slotIndex, entry.name, entry.attachment)
-  end
+	for i, bone in ipairs(skin.bones) do
+		local contained = false
+		for j, otherBone in ipairs(self.bones) do
+			if otherBone == bone then
+			contained = true
+			break
+			end
+		end
+		if not contained then table_insert(self.bones, bone) end
+	end
+
+	for i, constraint in ipairs(skin.constraints) do
+		local contained = false
+		for j, otherConstraint in ipairs(self.constraints) do
+			if otherConstraint == constraint then
+				contained = true
+				break
+			end
+		end
+		if not contained then table_insert(self.constraints, constraint) end
+	end
+
+	local attachments = skin:getAttachments()
+	for i, entry in ipairs(attachments) do
+		self:setAttachment(entry.slotIndex, entry.name, entry.attachment)
+	end
 end
 
 function Skin:copySkin (skin)
-  for i, bone in ipairs(skin.bones) do
-    local contained = false
-    for j, otherBone in ipairs(self.bones) do
-      if otherBone == bone then
-        contained = true
-        break
-      end
-    end
-    if not contained then table_insert(self.bones, bone) end
-  end
-  
-  for i, constraint in ipairs(skin.constraints) do
-    local contained = false
-    for j, otherConstraint in ipairs(self.constraints) do
-      if otherConstraint == constraint then
-        contained = true
-        break
-      end
-    end
-    if not contained then table_insert(self.constraints, constraint) end
-  end
-  
-  local attachments = skin:getAttachments()
-  for i, entry in ipairs(attachments) do
-    if entry.attachment.type == AttachmentType.mesh then
-      entry.attachment = entry.attachment:newLinkedMesh()
-      self:setAttachment(entry.slotIndex, entry.name, entry.attachment)
-    else
-      entry.attachment = entry.attachment:copy()
-      self:setAttachment(entry.slotIndex, entry.name, entry.attachment)
-    end
-  end
+	for i, bone in ipairs(skin.bones) do
+		local contained = false
+		for j, otherBone in ipairs(self.bones) do
+			if otherBone == bone then
+			contained = true
+			break
+			end
+		end
+		if not contained then table_insert(self.bones, bone) end
+	end
+
+	for i, constraint in ipairs(skin.constraints) do
+		local contained = false
+		for j, otherConstraint in ipairs(self.constraints) do
+			if otherConstraint == constraint then
+			contained = true
+			break
+			end
+		end
+		if not contained then table_insert(self.constraints, constraint) end
+	end
+
+	local attachments = skin:getAttachments()
+	for i, entry in ipairs(attachments) do
+		if entry.attachment.type == AttachmentType.mesh then
+			entry.attachment = entry.attachment:newLinkedMesh()
+			self:setAttachment(entry.slotIndex, entry.name, entry.attachment)
+		else
+			entry.attachment = entry.attachment:copy()
+			self:setAttachment(entry.slotIndex, entry.name, entry.attachment)
+		end
+	end
 end
 
 function Skin:getAttachment (slotIndex, name)
@@ -143,43 +143,43 @@ function Skin:getAttachment (slotIndex, name)
 end
 
 function Skin:removeAttachment (slotIndex, name)
-  local slotAttachments = self.attachments[slotIndex]
-  if slotAttachments then
-    slotAttachments[name] = nil
-  end
+	local slotAttachments = self.attachments[slotIndex]
+	if slotAttachments then
+		slotAttachments[name] = nil
+	end
 end
 
 function Skin:getAttachments ()
-  local entries = {}
-  for slotIndex, slotAttachments in pairs(self.attachments) do
-    if slotAttachments then
-      for name, attachment in pairs(slotAttachments) do
-        if attachment then
-          table_insert(entries, SkinEntry.new(slotIndex, name, attachment))
-        end
-      end
-    end
-  end
-  return entries
+	local entries = {}
+	for slotIndex, slotAttachments in pairs(self.attachments) do
+		if slotAttachments then
+			for name, attachment in pairs(slotAttachments) do
+				if attachment then
+					table_insert(entries, SkinEntry.new(slotIndex, name, attachment))
+				end
+			end
+		end
+	end
+	return entries
 end
 
 function Skin:getAttachmentsForSlot (slotIndex)
-  local entries = {}
-  local slotAttachments = self.attachments[slotIndex]
-  if slotAttachments then
-    for name, attachment in pairs(slotAttachments) do
-      if attachment then
-        table_insert(entries, SkinEntry.new(slotIndex, name, attachment))
-      end
-    end
-  end
-  return entries
+	local entries = {}
+	local slotAttachments = self.attachments[slotIndex]
+	if slotAttachments then
+		for name, attachment in pairs(slotAttachments) do
+			if attachment then
+				table_insert(entries, SkinEntry.new(slotIndex, name, attachment))
+			end
+		end
+	end
+	return entries
 end
 
 function Skin:clear ()
-  self.attachments = {}
-  self.bones = {}
-  self.constraints = {}
+	self.attachments = {}
+	self.bones = {}
+	self.constraints = {}
 end
 
 function Skin:attachAll(skeleton, oldSkin)
@@ -194,7 +194,7 @@ function Skin:attachAll(skeleton, oldSkin)
 						local attachment = self:getAttachment(i, key)
 						if attachment then
 							print("Set attachment " .. attachment.name .. " on slot " .. slot.data.name)
-							slot:setAttachment(attachment) 
+							slot:setAttachment(attachment)
 						end
 						break
 					end

@@ -35,7 +35,7 @@ using Spine;
 using Spine.Unity;
 
 namespace Spine.Unity {
-	
+
 	using Animation = Spine.Animation;
 	using AnimationState = Spine.AnimationState;
 
@@ -68,7 +68,7 @@ namespace Spine.Unity {
 		void SetActiveSkeleton (SkeletonAnimation skeletonAnimation) {
 			foreach (var sa in skeletonAnimations)
 				sa.gameObject.SetActive(sa == skeletonAnimation);
-			
+
 			currentSkeletonAnimation = skeletonAnimation;
 		}
 

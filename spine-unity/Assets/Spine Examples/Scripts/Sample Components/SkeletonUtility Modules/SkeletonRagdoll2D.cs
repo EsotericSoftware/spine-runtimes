@@ -47,7 +47,7 @@ namespace Spine.Unity.Examples {
 
 		[Header("Parameters")]
 		public bool applyOnStart;
-		[Tooltip("Warning!  You will have to re-enable and tune mix values manually if attempting to remove the ragdoll system.")]
+		[Tooltip("Warning! You will have to re-enable and tune mix values manually if attempting to remove the ragdoll system.")]
 		public bool disableIK = true;
 		public bool disableOtherConstraints = false;
 		[Space]
@@ -56,7 +56,7 @@ namespace Spine.Unity.Examples {
 		public float gravityScale = 1;
 		[Tooltip("If no BoundingBox Attachment is attached to a bone, this becomes the default Width or Radius of a Bone's ragdoll Rigidbody")]
 		public float thickness = 0.125f;
-		[Tooltip("Default rotational limit value.  Min is negative this value, Max is this value.")]
+		[Tooltip("Default rotational limit value. Min is negative this value, Max is this value.")]
 		public float rotationLimit = 20;
 		public float rootMass = 20;
 		[Tooltip("If your ragdoll seems unstable or uneffected by limits, try lowering this value.")]
@@ -293,7 +293,7 @@ namespace Spine.Unity.Examples {
 				if (length == 0) {
 					var circle = boneGameObject.AddComponent<CircleCollider2D>();
 					circle.radius = thickness * 0.5f;
-				} else {				
+				} else {
 					var box = boneGameObject.AddComponent<BoxCollider2D>();
 					box.size = new Vector2(length, thickness);
 					box.offset = new Vector2(length * 0.5f, 0); // box.center in UNITY_4

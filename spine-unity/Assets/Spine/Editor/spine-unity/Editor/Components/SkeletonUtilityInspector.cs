@@ -47,7 +47,7 @@ namespace Spine.Unity.Editor {
 		SkeletonUtility skeletonUtility;
 		Skeleton skeleton;
 		SkeletonRenderer skeletonRenderer;
-		
+
 		#if !NEW_PREFAB_SYSTEM
 		bool isPrefab;
 		#endif
@@ -71,7 +71,7 @@ namespace Spine.Unity.Editor {
 			isPrefab |= PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab;
 			#endif
 		}
-			
+
 		public override void OnInspectorGUI () {
 			#if !NEW_PREFAB_SYSTEM
 			if (isPrefab) {
@@ -82,7 +82,7 @@ namespace Spine.Unity.Editor {
 
 			if (!skeletonRenderer.valid) {
 				GUILayout.Label(new GUIContent("Spine Component invalid. Check Skeleton Data Asset.", Icons.warning));
-				return;	
+				return;
 			}
 
 			EditorGUILayout.PropertyField(serializedObject.FindProperty("boneRoot"), SpineInspectorUtility.TempContent("Skeleton Root"));

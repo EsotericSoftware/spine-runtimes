@@ -257,7 +257,7 @@ namespace Spine {
 		/// <summary>
 		/// Computes the individual applied transform values from the world transform. This can be useful to perform processing using
 		/// the applied transform after the world transform has been modified directly (eg, by a constraint)..
-		/// 
+		///
 		/// Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation.
 		/// </summary>
 		internal void UpdateAppliedTransform () {
@@ -301,7 +301,7 @@ namespace Spine {
 			}
 		}
 
-		public void WorldToLocal (float worldX, float worldY, out float localX, out float localY) {			
+		public void WorldToLocal (float worldX, float worldY, out float localX, out float localY) {
 			float a = this.a, b = this.b, c = this.c, d = this.d;
 			float invDet = 1 / (a * d - b * c);
 			float x = worldX - this.worldX, y = worldY - this.worldY;

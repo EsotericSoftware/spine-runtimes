@@ -39,7 +39,7 @@ namespace Spine.Unity.Examples {
 
 		[Range(-360, 360)]
 		public float extraRotation;
-		
+
 		public void Start () {
 			skeletonAnimation = GetComponent<SkeletonAnimation>();
 			headBone = skeletonAnimation.Skeleton.FindBone("head");
@@ -50,13 +50,13 @@ namespace Spine.Unity.Examples {
 		public void UpdateLocal (ISkeletonAnimation skeletonRenderer) {
 			headBone.Rotation += extraRotation;
 		}
-		
+
 		public void OnMouseDown () {
 			skeletonAnimation.Skeleton.SetSkin(girlSkin ? "goblin" : "goblingirl");
 			skeletonAnimation.Skeleton.SetSlotsToSetupPose();
-			
+
 			girlSkin = !girlSkin;
-			
+
 			if (girlSkin) {
 				skeletonAnimation.Skeleton.SetAttachment("right-hand-item", null);
 				skeletonAnimation.Skeleton.SetAttachment("left-hand-item", "spear");

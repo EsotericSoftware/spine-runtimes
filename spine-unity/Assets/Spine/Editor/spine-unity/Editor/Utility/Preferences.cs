@@ -86,7 +86,7 @@ namespace Spine.Unity.Editor {
 			Preferences.HandlePreferencesGUI();
 		}
 	#endif
-		
+
 	#if NEW_PREFERENCES_SETTINGS_PROVIDER
 		public static SpinePreferences Preferences {
 			get {

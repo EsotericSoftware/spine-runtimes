@@ -35,7 +35,7 @@
 #include <spine/Array.h>
 
 typedef struct {
-	const unsigned char* cursor; 
+	const unsigned char* cursor;
 	const unsigned char* end;
 } _dataInput;
 
@@ -118,13 +118,13 @@ static int readVarint (_dataInput* input, int/*bool*/optimizePositive) {
 		b = readByte(input);
 		value |= (b & 0x7F) << 7;
 		if (b & 0x80) {
+			b = readByte(input);
+			value |= (b & 0x7F) << 14;
+			if (b & 0x80) {
 				b = readByte(input);
-				value |= (b & 0x7F) << 14;
-				if (b & 0x80) {
-					b = readByte(input);
-					value |= (b & 0x7F) << 21;
-					if (b & 0x80) value |= (readByte(input) & 0x7F) << 28;
-				}
+				value |= (b & 0x7F) << 21;
+				if (b & 0x80) value |= (readByte(input) & 0x7F) << 28;
+			}
 		}
 	}
 	if (!optimizePositive) value = (((unsigned int)value >> 1) ^ -(value & 1));
@@ -206,18 +206,18 @@ static void readColor (_dataInput* input, float *r, float *g, float *b, float *a
 
 static void readCurve (_dataInput* input, spCurveTimeline* timeline, int frameIndex) {
 	switch (readByte(input)) {
-		case CURVE_STEPPED: {
-			spCurveTimeline_setStepped(timeline, frameIndex);
-			break;
-		}
-		case CURVE_BEZIER: {
-			float cx1 = readFloat(input);
-			float cy1 = readFloat(input);
-			float cx2 = readFloat(input);
-			float cy2 = readFloat(input);
-			spCurveTimeline_setCurve(timeline, frameIndex, cx1, cy1, cx2, cy2);
-			break;
-		}
+	case CURVE_STEPPED: {
+		spCurveTimeline_setStepped(timeline, frameIndex);
+		break;
+	}
+	case CURVE_BEZIER: {
+		float cx1 = readFloat(input);
+		float cy1 = readFloat(input);
+		float cx2 = readFloat(input);
+		float cy2 = readFloat(input);
+		spCurveTimeline_setCurve(timeline, frameIndex, cx1, cy1, cx2, cy2);
+		break;
+	}
 	}
 }
 
@@ -264,56 +264,56 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 			unsigned char timelineType = readByte(input);
 			int frameCount = readVarint(input, 1);
 			switch (timelineType) {
-				case SLOT_ATTACHMENT: {
-					spAttachmentTimeline* timeline = spAttachmentTimeline_create(frameCount);
-					timeline->slotIndex = slotIndex;
-					for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-						float time = readFloat(input);
-						const char* attachmentName = readStringRef(input, skeletonData);
-						/* TODO Avoid copying of attachmentName inside */
-						spAttachmentTimeline_setFrame(timeline, frameIndex, time, attachmentName);
-					}
-					spTimelineArray_add(timelines, (spTimeline*)timeline);
-					duration = MAX(duration, timeline->frames[frameCount - 1]);
-					break;
+			case SLOT_ATTACHMENT: {
+				spAttachmentTimeline* timeline = spAttachmentTimeline_create(frameCount);
+				timeline->slotIndex = slotIndex;
+				for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
+					float time = readFloat(input);
+					const char* attachmentName = readStringRef(input, skeletonData);
+					/* TODO Avoid copying of attachmentName inside */
+					spAttachmentTimeline_setFrame(timeline, frameIndex, time, attachmentName);
 				}
-				case SLOT_COLOR: {
-					spColorTimeline* timeline = spColorTimeline_create(frameCount);
-					timeline->slotIndex = slotIndex;
-					for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-						float time = readFloat(input);
-						float r, g, b, a;
-						readColor(input, &r, &g, &b, &a);
-						spColorTimeline_setFrame(timeline, frameIndex, time, r, g, b, a);
-						if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
-					}
-					spTimelineArray_add(timelines, (spTimeline*)timeline);
-					duration = MAX(duration, timeline->frames[(frameCount - 1) * COLOR_ENTRIES]);
-					break;
+				spTimelineArray_add(timelines, (spTimeline*)timeline);
+				duration = MAX(duration, timeline->frames[frameCount - 1]);
+				break;
+			}
+			case SLOT_COLOR: {
+				spColorTimeline* timeline = spColorTimeline_create(frameCount);
+				timeline->slotIndex = slotIndex;
+				for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
+					float time = readFloat(input);
+					float r, g, b, a;
+					readColor(input, &r, &g, &b, &a);
+					spColorTimeline_setFrame(timeline, frameIndex, time, r, g, b, a);
+					if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
 				}
-				case SLOT_TWO_COLOR: {
-					spTwoColorTimeline* timeline = spTwoColorTimeline_create(frameCount);
-					timeline->slotIndex = slotIndex;
-					for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-						float time = readFloat(input);
-						float r, g, b, a;
-						float r2, g2, b2, a2;
-						readColor(input, &r, &g, &b, &a);
-						readColor(input, &a2, &r2, &g2, &b2);
-						spTwoColorTimeline_setFrame(timeline, frameIndex, time, r, g, b, a, r2, g2, b2);
-						if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
-					}
-					spTimelineArray_add(timelines, (spTimeline*)timeline);
-					duration = MAX(duration, timeline->frames[(frameCount - 1) * TWOCOLOR_ENTRIES]);
-					break;
+				spTimelineArray_add(timelines, (spTimeline*)timeline);
+				duration = MAX(duration, timeline->frames[(frameCount - 1) * COLOR_ENTRIES]);
+				break;
+			}
+			case SLOT_TWO_COLOR: {
+				spTwoColorTimeline* timeline = spTwoColorTimeline_create(frameCount);
+				timeline->slotIndex = slotIndex;
+				for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
+					float time = readFloat(input);
+					float r, g, b, a;
+					float r2, g2, b2, a2;
+					readColor(input, &r, &g, &b, &a);
+					readColor(input, &a2, &r2, &g2, &b2);
+					spTwoColorTimeline_setFrame(timeline, frameIndex, time, r, g, b, a, r2, g2, b2);
+					if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
 				}
-				default: {
-					for (iii = 0; iii < timelines->size; ++iii)
-						spTimeline_dispose(timelines->items[iii]);
-					spTimelineArray_dispose(timelines);
-					_spSkeletonBinary_setError(self, "Invalid timeline type for a slot: ", skeletonData->slots[slotIndex]->name);
-					return 0;
-				}
+				spTimelineArray_add(timelines, (spTimeline*)timeline);
+				duration = MAX(duration, timeline->frames[(frameCount - 1) * TWOCOLOR_ENTRIES]);
+				break;
+			}
+			default: {
+				for (iii = 0; iii < timelines->size; ++iii)
+					spTimeline_dispose(timelines->items[iii]);
+				spTimelineArray_dispose(timelines);
+				_spSkeletonBinary_setError(self, "Invalid timeline type for a slot: ", skeletonData->slots[slotIndex]->name);
+				return 0;
+			}
 			}
 		}
 	}
@@ -325,57 +325,57 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 			unsigned char timelineType = readByte(input);
 			int frameCount = readVarint(input, 1);
 			switch (timelineType) {
-				case BONE_ROTATE: {
-					spRotateTimeline *timeline = spRotateTimeline_create(frameCount);
-					timeline->boneIndex = boneIndex;
-					for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-						float time = readFloat(input);
-						float degrees = readFloat(input);
-						spRotateTimeline_setFrame(timeline, frameIndex, time, degrees);
-						if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
-					}
-					spTimelineArray_add(timelines, (spTimeline*)timeline);
-					duration = MAX(duration, timeline->frames[(frameCount - 1) * ROTATE_ENTRIES]);
-					break;
+			case BONE_ROTATE: {
+				spRotateTimeline *timeline = spRotateTimeline_create(frameCount);
+				timeline->boneIndex = boneIndex;
+				for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
+					float time = readFloat(input);
+					float degrees = readFloat(input);
+					spRotateTimeline_setFrame(timeline, frameIndex, time, degrees);
+					if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
 				}
-				case BONE_TRANSLATE:
-				case BONE_SCALE:
-				case BONE_SHEAR: {
-					float timelineScale = 1;
-					spTranslateTimeline *timeline = 0;
-					switch (timelineType) {
-						case BONE_SCALE:
-							timeline = spScaleTimeline_create(frameCount);
-							break;
-						case BONE_SHEAR:
-							timeline = spShearTimeline_create(frameCount);
-							break;
-						case BONE_TRANSLATE:
-							timeline = spTranslateTimeline_create(frameCount);
-							timelineScale = self->scale;
-							break;
-						default:
-							break;
-					}
-					timeline->boneIndex = boneIndex;
-					for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-						float time = readFloat(input);
-						float x = readFloat(input) * timelineScale;
-						float y = readFloat(input) * timelineScale;
-						spTranslateTimeline_setFrame(timeline, frameIndex, time, x, y);
-						if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
-					}
-					spTimelineArray_add(timelines, (spTimeline*)timeline);
-					duration = MAX(duration, timeline->frames[(frameCount - 1) * TRANSLATE_ENTRIES]);
-					break;
+				spTimelineArray_add(timelines, (spTimeline*)timeline);
+				duration = MAX(duration, timeline->frames[(frameCount - 1) * ROTATE_ENTRIES]);
+				break;
+			}
+			case BONE_TRANSLATE:
+			case BONE_SCALE:
+			case BONE_SHEAR: {
+				float timelineScale = 1;
+				spTranslateTimeline *timeline = 0;
+				switch (timelineType) {
+					case BONE_SCALE:
+						timeline = spScaleTimeline_create(frameCount);
+						break;
+					case BONE_SHEAR:
+						timeline = spShearTimeline_create(frameCount);
+						break;
+					case BONE_TRANSLATE:
+						timeline = spTranslateTimeline_create(frameCount);
+						timelineScale = self->scale;
+						break;
+					default:
+						break;
 				}
-				default: {
-					for (iii = 0; iii < timelines->size; ++iii)
-						spTimeline_dispose(timelines->items[iii]);
-					spTimelineArray_dispose(timelines);
-					_spSkeletonBinary_setError(self, "Invalid timeline type for a bone: ", skeletonData->bones[boneIndex]->name);
-					return 0;
+				timeline->boneIndex = boneIndex;
+				for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
+					float time = readFloat(input);
+					float x = readFloat(input) * timelineScale;
+					float y = readFloat(input) * timelineScale;
+					spTranslateTimeline_setFrame(timeline, frameIndex, time, x, y);
+					if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
 				}
+				spTimelineArray_add(timelines, (spTimeline*)timeline);
+				duration = MAX(duration, timeline->frames[(frameCount - 1) * TRANSLATE_ENTRIES]);
+				break;
+			}
+			default: {
+				for (iii = 0; iii < timelines->size; ++iii)
+					spTimeline_dispose(timelines->items[iii]);
+				spTimelineArray_dispose(timelines);
+				_spSkeletonBinary_setError(self, "Invalid timeline type for a bone: ", skeletonData->bones[boneIndex]->name);
+				return 0;
+			}
 			}
 		}
 	}
@@ -413,7 +413,7 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 			float scaleMix = readFloat(input);
 			float shearMix = readFloat(input);
 			spTransformConstraintTimeline_setFrame(timeline, frameIndex, time, rotateMix, translateMix,
-					scaleMix, shearMix);
+				scaleMix, shearMix);
 			if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
 		}
 		spTimelineArray_add(timelines, (spTimeline*)timeline);
@@ -428,43 +428,43 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 			unsigned char timelineType = readByte(input);
 			int frameCount = readVarint(input, 1);
 			switch (timelineType) {
-				case PATH_POSITION:
-				case PATH_SPACING: {
-					spPathConstraintPositionTimeline* timeline = 0;
-					float timelineScale = 1;
-					if (timelineType == PATH_SPACING) {
-						timeline = (spPathConstraintPositionTimeline*)spPathConstraintSpacingTimeline_create(frameCount);
-						if (data->spacingMode == SP_SPACING_MODE_LENGTH || data->spacingMode == SP_SPACING_MODE_FIXED)
-							timelineScale = self->scale;
-					} else {
-						timeline = spPathConstraintPositionTimeline_create(frameCount);
-						if (data->positionMode == SP_POSITION_MODE_FIXED)
-							timelineScale = self->scale;
-					}
-					timeline->pathConstraintIndex = index;
-					for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-						float time = readFloat(input);
-						float value = readFloat(input) * timelineScale;
-						spPathConstraintPositionTimeline_setFrame(timeline, frameIndex, time, value);
-						if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
-					}
-					spTimelineArray_add(timelines, (spTimeline*)timeline);
-					duration = MAX(duration, timeline->frames[(frameCount - 1) * PATHCONSTRAINTPOSITION_ENTRIES]);
-					break;
+			case PATH_POSITION:
+			case PATH_SPACING: {
+				spPathConstraintPositionTimeline* timeline = 0;
+				float timelineScale = 1;
+				if (timelineType == PATH_SPACING) {
+					timeline = (spPathConstraintPositionTimeline*)spPathConstraintSpacingTimeline_create(frameCount);
+					if (data->spacingMode == SP_SPACING_MODE_LENGTH || data->spacingMode == SP_SPACING_MODE_FIXED)
+						timelineScale = self->scale;
+				} else {
+					timeline = spPathConstraintPositionTimeline_create(frameCount);
+					if (data->positionMode == SP_POSITION_MODE_FIXED)
+						timelineScale = self->scale;
 				}
-				case PATH_MIX: {
-					spPathConstraintMixTimeline* timeline = spPathConstraintMixTimeline_create(frameCount);
-					timeline->pathConstraintIndex = index;
-					for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-						float time = readFloat(input);
-						float rotateMix = readFloat(input);
-						float translateMix = readFloat(input);
-						spPathConstraintMixTimeline_setFrame(timeline, frameIndex, time, rotateMix, translateMix);
-						if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
-					}
-					spTimelineArray_add(timelines, (spTimeline*)timeline);
-					duration = MAX(duration, timeline->frames[(frameCount - 1) * PATHCONSTRAINTMIX_ENTRIES]);
+				timeline->pathConstraintIndex = index;
+				for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
+					float time = readFloat(input);
+					float value = readFloat(input) * timelineScale;
+					spPathConstraintPositionTimeline_setFrame(timeline, frameIndex, time, value);
+					if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
 				}
+				spTimelineArray_add(timelines, (spTimeline*)timeline);
+				duration = MAX(duration, timeline->frames[(frameCount - 1) * PATHCONSTRAINTPOSITION_ENTRIES]);
+				break;
+			}
+			case PATH_MIX: {
+				spPathConstraintMixTimeline* timeline = spPathConstraintMixTimeline_create(frameCount);
+				timeline->pathConstraintIndex = index;
+				for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
+					float time = readFloat(input);
+					float rotateMix = readFloat(input);
+					float translateMix = readFloat(input);
+					spPathConstraintMixTimeline_setFrame(timeline, frameIndex, time, rotateMix, translateMix);
+					if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
+				}
+				spTimelineArray_add(timelines, (spTimeline*)timeline);
+				duration = MAX(duration, timeline->frames[(frameCount - 1) * PATHCONSTRAINTMIX_ENTRIES]);
+			}
 			}
 		}
 	}
@@ -482,7 +482,7 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 				int frameCount;
 
 				spVertexAttachment* attachment = SUB_CAST(spVertexAttachment,
-						spSkin_getAttachment(skin, slotIndex, attachmentName));
+					spSkin_getAttachment(skin, slotIndex, attachmentName));
 				if (!attachment) {
 					for (i = 0; i < timelines->size; ++i)
 						spTimeline_dispose(timelines->items[i]);
@@ -684,140 +684,140 @@ spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput
 	type = (spAttachmentType)readByte(input);
 
 	switch (type) {
-		case SP_ATTACHMENT_REGION: {
-			const char* path = readStringRef(input, skeletonData);
-			spAttachment* attachment;
-			spRegionAttachment* region;
-			if (!path) MALLOC_STR(path, name);
-			else {
-				const char* tmp = 0;
-				MALLOC_STR(tmp, path);
-				path = tmp;
-			}
-			attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
-			region = SUB_CAST(spRegionAttachment, attachment);
-			region->path = path;
-			region->rotation = readFloat(input);
-			region->x = readFloat(input) * self->scale;
-			region->y = readFloat(input) * self->scale;
-			region->scaleX = readFloat(input);
-			region->scaleY = readFloat(input);
-			region->width = readFloat(input) * self->scale;
-			region->height = readFloat(input) * self->scale;
-			readColor(input, &region->color.r, &region->color.g, &region->color.b, &region->color.a);
-			spRegionAttachment_updateOffset(region);
-			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-			return attachment;
+	case SP_ATTACHMENT_REGION: {
+		const char* path = readStringRef(input, skeletonData);
+		spAttachment* attachment;
+		spRegionAttachment* region;
+		if (!path) MALLOC_STR(path, name);
+		else {
+			const char* tmp = 0;
+			MALLOC_STR(tmp, path);
+			path = tmp;
 		}
-		case SP_ATTACHMENT_BOUNDING_BOX: {
-			int vertexCount = readVarint(input, 1);
-			spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
-			_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
-			if (nonessential) readInt(input); /* Skip color. */
-			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-			return attachment;
+		attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
+		region = SUB_CAST(spRegionAttachment, attachment);
+		region->path = path;
+		region->rotation = readFloat(input);
+		region->x = readFloat(input) * self->scale;
+		region->y = readFloat(input) * self->scale;
+		region->scaleX = readFloat(input);
+		region->scaleY = readFloat(input);
+		region->width = readFloat(input) * self->scale;
+		region->height = readFloat(input) * self->scale;
+		readColor(input, &region->color.r, &region->color.g, &region->color.b, &region->color.a);
+		spRegionAttachment_updateOffset(region);
+		spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+		return attachment;
+	}
+	case SP_ATTACHMENT_BOUNDING_BOX: {
+		int vertexCount = readVarint(input, 1);
+		spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+		_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
+		if (nonessential) readInt(input); /* Skip color. */
+		spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+		return attachment;
+	}
+	case SP_ATTACHMENT_MESH: {
+		int vertexCount;
+		spAttachment* attachment;
+		spMeshAttachment* mesh;
+		const char* path = readStringRef(input, skeletonData);
+		if (!path) MALLOC_STR(path, name);
+		else {
+			const char* tmp = 0;
+			MALLOC_STR(tmp, path);
+			path = tmp;
 		}
-		case SP_ATTACHMENT_MESH: {
-			int vertexCount;
-			spAttachment* attachment;
-			spMeshAttachment* mesh;
-			const char* path = readStringRef(input, skeletonData);
-			if (!path) MALLOC_STR(path, name);
-			else {
-				const char* tmp = 0;
-				MALLOC_STR(tmp, path);
-				path = tmp;
-			}
-			attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
-			mesh = SUB_CAST(spMeshAttachment, attachment);
-			mesh->path = path;
-			readColor(input, &mesh->color.r, &mesh->color.g, &mesh->color.b, &mesh->color.a);
-			vertexCount = readVarint(input, 1);
-			mesh->regionUVs = _readFloatArray(input, vertexCount << 1, 1);
-			mesh->triangles = (unsigned short*)_readShortArray(input, &mesh->trianglesCount);
-			_readVertices(self, input, SUPER(mesh), vertexCount);
-			spMeshAttachment_updateUVs(mesh);
-			mesh->hullLength = readVarint(input, 1) << 1;
-			if (nonessential) {
-				mesh->edges = (int*)_readShortArray(input, &mesh->edgesCount);
-				mesh->width = readFloat(input) * self->scale;
-				mesh->height = readFloat(input) * self->scale;
-			} else {
-				mesh->edges = 0;
-				mesh->width = 0;
-				mesh->height = 0;
-			}
-			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-			return attachment;
+		attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
+		mesh = SUB_CAST(spMeshAttachment, attachment);
+		mesh->path = path;
+		readColor(input, &mesh->color.r, &mesh->color.g, &mesh->color.b, &mesh->color.a);
+		vertexCount = readVarint(input, 1);
+		mesh->regionUVs = _readFloatArray(input, vertexCount << 1, 1);
+		mesh->triangles = (unsigned short*)_readShortArray(input, &mesh->trianglesCount);
+		_readVertices(self, input, SUPER(mesh), vertexCount);
+		spMeshAttachment_updateUVs(mesh);
+		mesh->hullLength = readVarint(input, 1) << 1;
+		if (nonessential) {
+			mesh->edges = (int*)_readShortArray(input, &mesh->edgesCount);
+			mesh->width = readFloat(input) * self->scale;
+			mesh->height = readFloat(input) * self->scale;
+		} else {
+			mesh->edges = 0;
+			mesh->width = 0;
+			mesh->height = 0;
 		}
-		case SP_ATTACHMENT_LINKED_MESH: {
-			const char* skinName;
-			const char* parent;
-			spAttachment* attachment;
-			spMeshAttachment* mesh;
-			int inheritDeform;
-			const char* path = readStringRef(input, skeletonData);
-			if (!path) MALLOC_STR(path, name);
-			else {
-				const char* tmp = 0;
-				MALLOC_STR(tmp, path);
-				path = tmp;
-			}
-			attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
-			mesh = SUB_CAST(spMeshAttachment, attachment);
-			mesh->path = path;
-			readColor(input, &mesh->color.r, &mesh->color.g, &mesh->color.b, &mesh->color.a);
-			skinName = readStringRef(input, skeletonData);
-			parent = readStringRef(input, skeletonData);
-			inheritDeform = readBoolean(input);
-			if (nonessential) {
-				mesh->width = readFloat(input) * self->scale;
-				mesh->height = readFloat(input) * self->scale;
-			}
-			_spSkeletonBinary_addLinkedMesh(self, mesh, skinName, slotIndex, parent, inheritDeform);
-			return attachment;
+		spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+		return attachment;
+	}
+	case SP_ATTACHMENT_LINKED_MESH: {
+		const char* skinName;
+		const char* parent;
+		spAttachment* attachment;
+		spMeshAttachment* mesh;
+		int inheritDeform;
+		const char* path = readStringRef(input, skeletonData);
+		if (!path) MALLOC_STR(path, name);
+		else {
+			const char* tmp = 0;
+			MALLOC_STR(tmp, path);
+			path = tmp;
 		}
-		case SP_ATTACHMENT_PATH: {
-			spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
-			spPathAttachment* path = SUB_CAST(spPathAttachment, attachment);
-			int vertexCount = 0;
-			path->closed = readBoolean(input);
-			path->constantSpeed = readBoolean(input);
-			vertexCount = readVarint(input, 1);
-			_readVertices(self, input, SUPER(path), vertexCount);
-			path->lengthsLength = vertexCount / 3;
-			path->lengths = MALLOC(float, path->lengthsLength);
-			for (i = 0; i < path->lengthsLength; ++i) {
-				path->lengths[i] = readFloat(input) * self->scale;
-			}
-			if (nonessential) readInt(input); /* Skip color. */
-			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-			return attachment;
+		attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
+		mesh = SUB_CAST(spMeshAttachment, attachment);
+		mesh->path = path;
+		readColor(input, &mesh->color.r, &mesh->color.g, &mesh->color.b, &mesh->color.a);
+		skinName = readStringRef(input, skeletonData);
+		parent = readStringRef(input, skeletonData);
+		inheritDeform = readBoolean(input);
+		if (nonessential) {
+			mesh->width = readFloat(input) * self->scale;
+			mesh->height = readFloat(input) * self->scale;
 		}
-		case SP_ATTACHMENT_POINT: {
-			spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
-			spPointAttachment* point = SUB_CAST(spPointAttachment, attachment);
-			point->rotation = readFloat(input);
-			point->x = readFloat(input) * self->scale;
-			point->y = readFloat(input) * self->scale;
+		_spSkeletonBinary_addLinkedMesh(self, mesh, skinName, slotIndex, parent, inheritDeform);
+		return attachment;
+	}
+	case SP_ATTACHMENT_PATH: {
+		spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+		spPathAttachment* path = SUB_CAST(spPathAttachment, attachment);
+		int vertexCount = 0;
+		path->closed = readBoolean(input);
+		path->constantSpeed = readBoolean(input);
+		vertexCount = readVarint(input, 1);
+		_readVertices(self, input, SUPER(path), vertexCount);
+		path->lengthsLength = vertexCount / 3;
+		path->lengths = MALLOC(float, path->lengthsLength);
+		for (i = 0; i < path->lengthsLength; ++i) {
+			path->lengths[i] = readFloat(input) * self->scale;
+		}
+		if (nonessential) readInt(input); /* Skip color. */
+		spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+		return attachment;
+	}
+	case SP_ATTACHMENT_POINT: {
+		spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+		spPointAttachment* point = SUB_CAST(spPointAttachment, attachment);
+		point->rotation = readFloat(input);
+		point->x = readFloat(input) * self->scale;
+		point->y = readFloat(input) * self->scale;
 
-			if (nonessential) {
-				readColor(input, &point->color.r, &point->color.g, &point->color.b, &point->color.a);
-			}
-			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-			return attachment;
+		if (nonessential) {
+			readColor(input, &point->color.r, &point->color.g, &point->color.b, &point->color.a);
 		}
-		case SP_ATTACHMENT_CLIPPING: {
-			int endSlotIndex = readVarint(input, 1);
-			int vertexCount = readVarint(input, 1);
-			spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
-			spClippingAttachment* clip = SUB_CAST(spClippingAttachment, attachment);
-			_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
-			if (nonessential) readInt(input); /* Skip color. */
-			clip->endSlot = skeletonData->slots[endSlotIndex];
-			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-			return attachment;
-		}
+		spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+		return attachment;
+	}
+	case SP_ATTACHMENT_CLIPPING: {
+		int endSlotIndex = readVarint(input, 1);
+		int vertexCount = readVarint(input, 1);
+		spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+		spClippingAttachment* clip = SUB_CAST(spClippingAttachment, attachment);
+		_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
+		if (nonessential) readInt(input); /* Skip color. */
+		clip->endSlot = skeletonData->slots[endSlotIndex];
+		spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+		return attachment;
+	}
 	}
 
 	return 0;
@@ -942,11 +942,11 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		data->length = readFloat(input) * self->scale;
 		mode = readVarint(input, 1);
 		switch (mode) {
-			case 0: data->transformMode = SP_TRANSFORMMODE_NORMAL; break;
-			case 1: data->transformMode = SP_TRANSFORMMODE_ONLYTRANSLATION; break;
-			case 2: data->transformMode = SP_TRANSFORMMODE_NOROTATIONORREFLECTION; break;
-			case 3: data->transformMode = SP_TRANSFORMMODE_NOSCALE; break;
-			case 4: data->transformMode = SP_TRANSFORMMODE_NOSCALEORREFLECTION; break;
+		case 0: data->transformMode = SP_TRANSFORMMODE_NORMAL; break;
+		case 1: data->transformMode = SP_TRANSFORMMODE_ONLYTRANSLATION; break;
+		case 2: data->transformMode = SP_TRANSFORMMODE_NOROTATIONORREFLECTION; break;
+		case 3: data->transformMode = SP_TRANSFORMMODE_NOSCALE; break;
+		case 4: data->transformMode = SP_TRANSFORMMODE_NOSCALEORREFLECTION; break;
 		}
 		data->skinRequired = readBoolean(input);
 		if (nonessential) readInt(input); /* Skip bone color. */

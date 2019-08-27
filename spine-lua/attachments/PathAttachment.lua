@@ -42,20 +42,20 @@ function PathAttachment.new (name)
 	local self = VertexAttachment.new(name, AttachmentType.path)
 	self.lengths = nil
 	self.color = Color.newWith(1, 1, 1, 1)
-  self.closed = false
-  self.constantSpeed = false
+	self.closed = false
+	self.constantSpeed = false
 	setmetatable(self, PathAttachment)
 	return self
 end
 
 function PathAttachment:copy ()
-  local copy = PathAttachment.new(self.name)
-  self:copyTo(copy)
-  copy.length = utils.copy(self.lengths)
-  copy.closed = self.closed
-  copy.constantSpeed = self.constantSpeed
-  copy.color:setFrom(self.color)
-  return copy
+	local copy = PathAttachment.new(self.name)
+	self:copyTo(copy)
+	copy.length = utils.copy(self.lengths)
+	copy.closed = self.closed
+	copy.constantSpeed = self.constantSpeed
+	copy.color:setFrom(self.color)
+	return copy
 end
 
 return PathAttachment

@@ -101,7 +101,7 @@ namespace Spine.Unity {
 		/// <remarks>Interaction modes with <see cref="UnityEngine.SpriteMask"/> components are identical to Unity's <see cref="UnityEngine.SpriteRenderer"/>,
 		/// see https://docs.unity3d.com/ScriptReference/SpriteMaskInteraction.html. </remarks>
 		public SpriteMaskInteraction maskInteraction = SpriteMaskInteraction.None;
-		
+
 		[System.Serializable]
 		public class SpriteMaskInteractionMaterials {
 			/// <summary>Material references for switching material sets at runtime when <see cref="SkeletonRenderer.maskInteraction"/> changes to <see cref="SpriteMaskInteraction.None"/>.</summary>
@@ -113,7 +113,7 @@ namespace Spine.Unity {
 		}
 		/// <summary>Material references for switching material sets at runtime when <see cref="SkeletonRenderer.maskInteraction"/> changes.</summary>
 		public SpriteMaskInteractionMaterials maskMaterials = new SpriteMaskInteractionMaterials();
-		
+
 		/// <summary>Shader property ID used for the Stencil comparison function.</summary>
 		public static readonly int STENCIL_COMP_PARAM_ID = Shader.PropertyToID("_StencilComp");
 		/// <summary>Shader property value used as Stencil comparison function for <see cref="SpriteMaskInteraction.None"/>.</summary>
@@ -340,11 +340,11 @@ namespace Spine.Unity {
 
 				// STEP 1.9. Post-process workingInstructions. ==================================================================================
 				#if SPINE_OPTIONAL_MATERIALOVERRIDE
-				if (customMaterialOverride.Count > 0) // isCustomMaterialOverridePopulated 
+				if (customMaterialOverride.Count > 0) // isCustomMaterialOverridePopulated
 					MeshGenerator.TryReplaceMaterials(workingSubmeshInstructions, customMaterialOverride);
 				#endif
 
-				// STEP 2. Update vertex buffer based on verts from the attachments.  ===========================================================
+				// STEP 2. Update vertex buffer based on verts from the attachments. ===========================================================
 				meshGenerator.settings = new MeshGenerator.Settings {
 					pmaVertexColors = this.pmaVertexColors,
 					zSpacing = this.zSpacing,
@@ -367,7 +367,7 @@ namespace Spine.Unity {
 
 				// STEP 1.9. Post-process workingInstructions. ==================================================================================
 				#if SPINE_OPTIONAL_MATERIALOVERRIDE
-				if (customMaterialOverride.Count > 0) // isCustomMaterialOverridePopulated 
+				if (customMaterialOverride.Count > 0) // isCustomMaterialOverridePopulated
 					MeshGenerator.TryReplaceMaterials(workingSubmeshInstructions, customMaterialOverride);
 				#endif
 
@@ -380,7 +380,7 @@ namespace Spine.Unity {
 
 				updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, currentSmartMesh.instructionUsed);
 
-				// STEP 2. Update vertex buffer based on verts from the attachments.  ===========================================================
+				// STEP 2. Update vertex buffer based on verts from the attachments. ===========================================================
 				meshGenerator.settings = new MeshGenerator.Settings {
 					pmaVertexColors = this.pmaVertexColors,
 					zSpacing = this.zSpacing,
@@ -508,7 +508,7 @@ namespace Spine.Unity {
 				if (maskMaterials.materialsOutsideMask.Length == 0 || maskMaterials.materialsOutsideMask[0] == null) {
 					if (!InitSpriteMaskMaterialsOutsideMask())
 						return;
-				}	
+				}
 				this.meshRenderer.materials = maskMaterials.materialsOutsideMask;
 			}
 		}

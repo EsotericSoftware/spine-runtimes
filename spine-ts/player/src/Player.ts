@@ -327,7 +327,7 @@ module spine {
 			if (!config.alpha) config.alpha = false;
 			if (!config.backgroundColor) config.backgroundColor = "#000000";
 			if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
-			if (typeof config.premultipliedAlpha  === "undefined") config.premultipliedAlpha = true;
+			if (typeof config.premultipliedAlpha === "undefined") config.premultipliedAlpha = true;
 			if (!config.success) config.success = (widget) => {};
 			if (!config.error) config.error = (widget, msg) => {};
 			if (!config.debug) config.debug = {
@@ -350,11 +350,11 @@ module spine {
 			if (typeof config.debug.meshes === "undefined") config.debug.meshes = false;
 
 			if (config.animations && config.animation) {
-				if  (config.animations.indexOf(config.animation) < 0) throw new Error("Default animation '" +  config.animation + "' is not contained in the list of selectable animations " + escapeHtml(JSON.stringify(this.config.animations)) + ".");
+				if (config.animations.indexOf(config.animation) < 0) throw new Error("Default animation '" + config.animation + "' is not contained in the list of selectable animations " + escapeHtml(JSON.stringify(this.config.animations)) + ".");
 			}
 
 			if (config.skins && config.skin) {
-				if  (config.skins.indexOf(config.skin) < 0) throw new Error("Default skin '" +  config.skin + "' is not contained in the list of selectable skins " + escapeHtml(JSON.stringify(this.config.skins)) + ".");
+				if (config.skins.indexOf(config.skin) < 0) throw new Error("Default skin '" + config.skin + "' is not contained in the list of selectable skins " + escapeHtml(JSON.stringify(this.config.skins)) + ".");
 			}
 
 			if (!config.controlBones) config.controlBones = [];
@@ -401,7 +401,7 @@ module spine {
 			try {
 				// Validate the configuration
 				this.config = this.validateConfig(config);
-			}  catch (e) {
+			} catch (e) {
 				this.showError(e);
 				return dom
 			}
@@ -755,7 +755,7 @@ module spine {
 				}
 
 				let transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / this.config.viewport.transitionTime;
-				if (this.previousViewport &&  transitionAlpha < 1) {
+				if (this.previousViewport && transitionAlpha < 1) {
 					let oldViewport = {
 						x: this.previousViewport.x - (this.previousViewport.padLeft as number),
 						y: this.previousViewport.y - (this.previousViewport.padBottom as number),
@@ -1189,7 +1189,7 @@ module spine {
 
 			let steps = 100;
 			let stepTime = animation.duration > 0 ? animation.duration / steps : 0;
-			let minX =  100000000;
+			let minX = 100000000;
 			let maxX = -100000000;
 			let minY = 100000000;
 			let maxY = -100000000;

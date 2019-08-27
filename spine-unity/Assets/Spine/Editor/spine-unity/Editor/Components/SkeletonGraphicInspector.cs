@@ -142,9 +142,9 @@ namespace Spine.Unity.Editor {
 			var size = bounds.size;
 			var center = bounds.center;
 			var p = new Vector2(
-				        0.5f - (center.x / size.x),
-				        0.5f - (center.y / size.y)
-			        );
+				0.5f - (center.x / size.x),
+				0.5f - (center.y / size.y)
+			);
 
 			skeletonGraphic.rectTransform.sizeDelta = size;
 			skeletonGraphic.rectTransform.pivot = p;

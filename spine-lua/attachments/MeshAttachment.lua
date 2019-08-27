@@ -50,8 +50,8 @@ function MeshAttachment.new (name)
 	self.hullLength = 0
 	self.parentMesh = nil
 	self.tempColor = Color.newWith(1, 1, 1, 1)
-  self.width = 0
-  self.height = 0
+	self.width = 0
+	self.height = 0
 	setmetatable(self, MeshAttachment)
 	return self
 end
@@ -61,11 +61,11 @@ function MeshAttachment:updateUVs ()
 	local v = 0
 	local width = 0
 	local height = 0
-	
+
 	local regionUVs = self.regionUVs
 	if not self.uvs or (#self.uvs ~= #regionUVs) then self.uvs = utils.newNumberArray(#regionUVs) end
 	local uvs = self.uvs
-	
+
 	if not self.region then
 		u = 0
 		v = 0
@@ -75,7 +75,7 @@ function MeshAttachment:updateUVs ()
 		local region = self.region
 		local textureWidth = region.page.width
 		local textureHeight = region.page.height
-		
+
 		if region.degrees == 90 then
 			u = region.u - (region.originalHeight - region.offsetY - region.height) / textureWidth
 			v = region.v - (region.originalWidth - region.offsetX - region.width) / textureHeight
@@ -141,40 +141,40 @@ function MeshAttachment:setParentMesh (parentMesh)
 end
 
 function MeshAttachment:copy ()
-  if self.parentMesh then return self:newLinkedMesh() end
-  
-  local copy = MeshAttachment.new(self.name)  
-  copy.region = self.region
-  copy.path = self.path
-  copy.color:setFrom(self.color)
+	if self.parentMesh then return self:newLinkedMesh() end
 
-  self:copyTo(copy)
-  copy.regionUVs = utils.copy(self.regionUVs)
-  copy.uvs = utils.copy(self.uvs)
-  copy.triangles = utils.copy(self.triangles)
-  copy.hullLength = self.hullLength
-  if self.edges then
-    copy.edges = utils.copy(edges)
-  end
-  copy.width = self.width
-  copy.height = self.height
-  
-  return copy
+	local copy = MeshAttachment.new(self.name)
+	copy.region = self.region
+	copy.path = self.path
+	copy.color:setFrom(self.color)
+
+	self:copyTo(copy)
+	copy.regionUVs = utils.copy(self.regionUVs)
+	copy.uvs = utils.copy(self.uvs)
+	copy.triangles = utils.copy(self.triangles)
+	copy.hullLength = self.hullLength
+	if self.edges then
+		copy.edges = utils.copy(edges)
+	end
+	copy.width = self.width
+	copy.height = self.height
+
+	return copy
 end
 
 function MeshAttachment:newLinkedMesh ()
-  local copy = MeshAttachment.new(self.name)  
-  copy.region = self.region
-  copy.path = self.path
-  copy.color:setFrom(self.color)
-  if self.parentMesh then
-    copy.deformAttachment = self.parentMesh
-  else
-    copy.deformAttachment = self
-  end
-  copy:setParentMesh(self.parentMesh)
-  copy:updateUVs()
-  return copy
+	local copy = MeshAttachment.new(self.name)
+	copy.region = self.region
+	copy.path = self.path
+	copy.color:setFrom(self.color)
+	if self.parentMesh then
+		copy.deformAttachment = self.parentMesh
+	else
+		copy.deformAttachment = self
+	end
+	copy:setParentMesh(self.parentMesh)
+	copy:updateUVs()
+	return copy
 end
 
 return MeshAttachment

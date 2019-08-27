@@ -84,7 +84,7 @@ namespace Spine {
 			foreach (BoneData boneData in data.bones) {
 				Bone bone;
 				if (boneData.parent == null) {
-					bone = new Bone(boneData, this, null);				
+					bone = new Bone(boneData, this, null);
 				} else {
 					Bone parent = bones.Items[boneData.parent.index];
 					bone = new Bone(boneData, this, parent);
@@ -214,7 +214,7 @@ namespace Spine {
 			if (skin != null) SortPathConstraintAttachment(skin, slotIndex, slotBone);
 			if (data.defaultSkin != null && data.defaultSkin != skin)
 				SortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
-			
+
 			Attachment attachment = slot.attachment;
 			if (attachment is PathAttachment) SortPathConstraintAttachment(attachment, slotBone);
 
@@ -477,12 +477,12 @@ namespace Spine {
 		/// <para>Sets the skin used to look up attachments before looking in the <see cref="SkeletonData.DefaultSkin"/>. If the
 		/// skin is changed, <see cref="UpdateCache()"/> is called.
 		/// </para>
-	 	/// <para>Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. 
+	 	/// <para>Attachments from the new skin are attached if the corresponding attachment from the old skin was attached.
 		/// If there was no old skin, each slot's setup mode attachment is attached from the new skin.
 		/// </para>
-		/// <para>After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling 
-		/// <see cref="Skeleton.SetSlotsToSetupPose()"/>. 
-		/// Also, often <see cref="AnimationState.Apply(Skeleton)"/> is called before the next time the 
+		/// <para>After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling
+		/// <see cref="Skeleton.SetSlotsToSetupPose()"/>.
+		/// Also, often <see cref="AnimationState.Apply(Skeleton)"/> is called before the next time the
 		/// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.</para>
 		/// </summary>
 		/// <param name="newSkin">May be null.</param>
@@ -543,7 +543,7 @@ namespace Spine {
 			}
 			throw new Exception("Slot not found: " + slotName);
 		}
-			
+
 		/// <returns>May be null.</returns>
 		public IkConstraint FindIkConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");

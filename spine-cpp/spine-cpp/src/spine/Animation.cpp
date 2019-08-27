@@ -52,7 +52,8 @@ Animation::~Animation() {
 }
 
 void Animation::apply(Skeleton &skeleton, float lastTime, float time, bool loop, Vector<Event *> *pEvents, float alpha,
-					  MixBlend blend, MixDirection direction) {
+	MixBlend blend, MixDirection direction
+) {
 	if (loop && _duration != 0) {
 		time = MathUtil::fmod(time, _duration);
 		if (lastTime > 0) {
@@ -91,15 +92,12 @@ int Animation::binarySearch(Vector<float> &values, float target, int step) {
 
 	int current = (int) (static_cast<uint32_t>(high) >> 1);
 	while (true) {
-		if (values[(current + 1) * step] <= target) {
+		if (values[(current + 1) * step] <= target)
 			low = current + 1;
-		} else {
+		else
 			high = current;
-		}
 
-		if (low == high) {
-			return (low + 1) * step;
-		}
+		if (low == high) return (low + 1) * step;
 
 		current = (int) (static_cast<uint32_t>(low + high) >> 1);
 	}
@@ -109,21 +107,16 @@ int Animation::binarySearch(Vector<float> &values, float target) {
 	int low = 0;
 	int size = (int)values.size();
 	int high = size - 2;
-	if (high == 0) {
-		return 1;
-	}
+	if (high == 0) return 1;
 
 	int current = (int) (static_cast<uint32_t>(high) >> 1);
 	while (true) {
-		if (values[(current + 1)] <= target) {
+		if (values[(current + 1)] <= target)
 			low = current + 1;
-		} else {
+		else
 			high = current;
-		}
 
-		if (low == high) {
-			return (low + 1);
-		}
+		if (low == high) return (low + 1);
 
 		current = (int) (static_cast<uint32_t>(low + high) >> 1);
 	}

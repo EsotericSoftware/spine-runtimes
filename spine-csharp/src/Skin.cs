@@ -34,7 +34,7 @@ using Spine.Collections;
 
 namespace Spine {
 	/// <summary>Stores attachments by slot index and attachment name.
-	/// <para>See SkeletonData <see cref="Spine.SkeletonData.DefaultSkin"/>, Skeleton <see cref="Spine.Skeleton.Skin"/>, and 
+	/// <para>See SkeletonData <see cref="Spine.SkeletonData.DefaultSkin"/>, Skeleton <see cref="Spine.Skeleton.Skin"/>, and
 	/// <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide.</para>
 	/// </summary>
 	public class Skin {
@@ -47,7 +47,7 @@ namespace Spine {
 		public OrderedDictionary<SkinEntry, Attachment> Attachments { get { return attachments; } }
 		public ExposedList<BoneData> Bones { get { return bones; } }
 		public ExposedList<ConstraintData> Constraints { get { return constraints; } }
-		
+
 		public Skin (string name) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			this.name = name;
@@ -174,7 +174,7 @@ namespace Spine {
 				}
 			}
 		}
-	
+
 		// Avoids boxing in the dictionary and is necessary to omit entry.attachment in the comparison.
 		class SkinEntryComparer : IEqualityComparer<SkinEntry> {
 			internal static readonly SkinEntryComparer Instance = new SkinEntryComparer();

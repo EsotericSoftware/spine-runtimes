@@ -75,9 +75,7 @@ Vector<int> &Triangulator::triangulate(Vector<float> &vertices) {
 				float p2x = vertices[p2], p2y = vertices[p2 + 1];
 				float p3x = vertices[p3], p3y = vertices[p3 + 1];
 				for (size_t ii = (next + 1) % vertexCount; ii != previous; ii = (ii + 1) % vertexCount) {
-					if (!isConcaveArray[ii]) {
-						continue;
-					}
+					if (!isConcaveArray[ii]) continue;
 
 					int v = indices[ii] << 1;
 					float &vx = vertices[v], vy = vertices[v + 1];
@@ -95,9 +93,7 @@ Vector<int> &Triangulator::triangulate(Vector<float> &vertices) {
 
 			if (next == 0) {
 				do {
-					if (!isConcaveArray[i]) {
-						break;
-					}
+					if (!isConcaveArray[i]) break;
 					i--;
 				} while (i > 0);
 				break;
@@ -133,15 +129,13 @@ Vector<int> &Triangulator::triangulate(Vector<float> &vertices) {
 
 Vector<Vector<float> *> &Triangulator::decompose(Vector<float> &vertices, Vector<int> &triangles) {
 	Vector<Vector<float> *> &convexPolygons = _convexPolygons;
-	for (size_t i = 0, n = convexPolygons.size(); i < n; ++i) {
+	for (size_t i = 0, n = convexPolygons.size(); i < n; ++i)
 		_polygonPool.free(convexPolygons[i]);
-	}
 	convexPolygons.clear();
 
 	Vector<Vector<int> *> &convexPolygonsIndices = _convexPolygonsIndices;
-	for (size_t i = 0, n = convexPolygonsIndices.size(); i < n; ++i) {
+	for (size_t i = 0, n = convexPolygonsIndices.size(); i < n; ++i)
 		_polygonIndicesPool.free(convexPolygonsIndices[i]);
-	}
 	convexPolygonsIndices.clear();
 
 	Vector<int> *polygonIndices = _polygonIndicesPool.obtain();
@@ -224,16 +218,12 @@ Vector<Vector<float> *> &Triangulator::decompose(Vector<float> &vertices, Vector
 		int winding0 = winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
 
 		for (size_t ii = 0; ii < n; ++ii) {
-			if (ii == i) {
-				continue;
-			}
+			if (ii == i) continue;
 
 			Vector<int> *otherIndicesP = convexPolygonsIndices[ii];
 			Vector<int> &otherIndices = *otherIndicesP;
 
-			if (otherIndices.size() != 3) {
-				continue;
-			}
+			if (otherIndices.size() != 3) continue;
 
 			int otherFirstIndex = otherIndices[0];
 			int otherSecondIndex = otherIndices[1];
@@ -244,9 +234,7 @@ Vector<Vector<float> *> &Triangulator::decompose(Vector<float> &vertices, Vector
 
 			float x3 = otherPoly[otherPoly.size() - 2], y3 = otherPoly[otherPoly.size() - 1];
 
-			if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex) {
-				continue;
-			}
+			if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex) continue;
 
 			int winding1 = winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);
 			int winding2 = winding(x3, y3, firstX, firstY, secondX, secondY);
@@ -285,8 +273,9 @@ bool Triangulator::isConcave(int index, int vertexCount, Vector<float> &vertices
 	int current = indices[index] << 1;
 	int next = indices[(index + 1) % vertexCount] << 1;
 
-	return !positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1],
-						 vertices[next], vertices[next + 1]);
+	return !positiveArea(vertices[previous], vertices[previous + 1],
+		vertices[current], vertices[current + 1],
+		vertices[next], vertices[next + 1]);
 }
 
 bool Triangulator::positiveArea(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
@@ -295,6 +284,5 @@ bool Triangulator::positiveArea(float p1x, float p1y, float p2x, float p2y, floa
 
 int Triangulator::winding(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
 	float px = p2x - p1x, py = p2y - p1y;
-
 	return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
 }

@@ -48,7 +48,7 @@ namespace Spine.Unity.Examples {
 
 		void AddRigidbody () {
 			var rb = gameObject.AddComponent<Rigidbody2D>();
-	        rb.freezeRotation = true;
+			rb.freezeRotation = true;
 			naturalCollider.enabled = true;
 		}
 
@@ -77,7 +77,7 @@ namespace Spine.Unity.Examples {
 			RaycastHit2D hit = Physics2D.Raycast((Vector2)rbPosition, (Vector2)(estimatedPos - rbPosition), Vector3.Distance(estimatedPos, rbPosition), groundMask);
 			if (hit.collider != null)
 				skeletonPoint = hit.point;
-			
+
 			ragdoll.RootRigidbody.isKinematic = true;
 			ragdoll.SetSkeletonPosition(skeletonPoint);
 

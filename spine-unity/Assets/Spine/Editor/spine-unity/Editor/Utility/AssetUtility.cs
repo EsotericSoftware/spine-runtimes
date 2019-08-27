@@ -49,7 +49,7 @@ using System.Reflection;
 using System.Globalization;
 
 namespace Spine.Unity.Editor {
-	
+
 	public static class AssetUtility {
 		public const string SkeletonDataSuffix = "_SkeletonData";
 		public const string AtlasSuffix = "_Atlas";
@@ -318,16 +318,16 @@ namespace Spine.Unity.Editor {
 			foreach (var inspector in skeletonDataInspectors) {
 				inspector.UpdateSkeletonData();
 			}
-				
+
 			// Any post processing of images
 
-			// Under some circumstances (e.g. on first import) SkeletonGraphic objects 
+			// Under some circumstances (e.g. on first import) SkeletonGraphic objects
 			// have their skeletonGraphic.skeletonDataAsset reference corrupted
 			// by the instance of the ScriptableObject being destroyed but still assigned.
 			// Here we restore broken skeletonGraphic.skeletonDataAsset references.
 			var skeletonGraphicObjects = Resources.FindObjectsOfTypeAll(typeof(SkeletonGraphic)) as SkeletonGraphic[];
 			foreach (var skeletonGraphic in skeletonGraphicObjects) {
-					
+
 				if (skeletonGraphic.skeletonDataAsset == null) {
 					var skeletonGraphicID = skeletonGraphic.GetInstanceID();
 					if (SpineEditorUtilities.DataReloadHandler.savedSkeletonDataAssetAtSKeletonGraphicID.ContainsKey(skeletonGraphicID)) {
@@ -337,7 +337,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 		}
-			
+
 		static void ReloadSkeletonData (string skeletonJSONPath) {
 			string dir = Path.GetDirectoryName(skeletonJSONPath);
 			TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonJSONPath);
@@ -950,7 +950,7 @@ namespace Spine.Unity.Editor {
 
 			return newSkeletonAnimation;
 		}
-			
+
 		/// <summary>Handles creating a new GameObject in the Unity Editor. This uses the new ObjectFactory API where applicable.</summary>
 		public static GameObject NewGameObject (string name) {
 			#if NEW_PREFAB_SYSTEM

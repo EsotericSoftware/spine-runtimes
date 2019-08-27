@@ -149,7 +149,7 @@ namespace Spine.Unity {
 		}
 
 		/// <summary>Gets the bone's Unity World position using its Spine GameObject Transform. UpdateWorldTransform needs to have been called for this to return the correct, updated value.</summary>
-		public static Vector3 GetWorldPosition (this Bone bone, UnityEngine.Transform spineGameObjectTransform) {		
+		public static Vector3 GetWorldPosition (this Bone bone, UnityEngine.Transform spineGameObjectTransform) {
 			return spineGameObjectTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY));
 		}
 
@@ -211,11 +211,11 @@ namespace Spine.Unity {
 			object rendererObject = null;
 			var renderableAttachment = a as IHasRendererObject;
 			if (renderableAttachment != null)
-				rendererObject = renderableAttachment.RendererObject;		
-			
+				rendererObject = renderableAttachment.RendererObject;
+
 			if (rendererObject == null)
 				return null;
-			
+
 			#if SPINE_TK2D
 			return (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
 			#else
@@ -494,7 +494,7 @@ namespace Spine {
 				bone.shearX = bone.data.shearX;
 				bone.shearY = bone.data.shearY;
 				break;
-			
+
 			// Slot
 			case TimelineType.Attachment:
 				skeleton.SetSlotAttachmentToSetupPose(i);
@@ -508,7 +508,7 @@ namespace Spine {
 			case TimelineType.Deform:
 				skeleton.slots.Items[i].Deform.Clear();
 				break;
-			
+
 			// Skeleton
 			case TimelineType.DrawOrder:
 				skeleton.SetDrawOrderToSetupPose();

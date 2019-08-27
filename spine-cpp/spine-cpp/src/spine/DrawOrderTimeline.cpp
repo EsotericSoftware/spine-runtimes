@@ -57,7 +57,8 @@ DrawOrderTimeline::DrawOrderTimeline(int frameCount) : Timeline() {
 }
 
 void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-							  MixBlend blend, MixDirection direction) {
+	MixBlend blend, MixDirection direction
+) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(alpha);
@@ -67,9 +68,8 @@ void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Ve
 	if (direction == MixDirection_Out && blend == MixBlend_Setup) {
 		drawOrder.clear();
 		drawOrder.ensureCapacity(slots.size());
-		for (size_t i = 0, n = slots.size(); i < n; ++i) {
+		for (size_t i = 0, n = slots.size(); i < n; ++i)
 			drawOrder.add(slots[i]);
-		}
 		return;
 	}
 
@@ -77,9 +77,8 @@ void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Ve
 		if (blend == MixBlend_Setup || blend == MixBlend_First) {
 			drawOrder.clear();
 			drawOrder.ensureCapacity(slots.size());
-			for (size_t i = 0, n = slots.size(); i < n; ++i) {
+			for (size_t i = 0, n = slots.size(); i < n; ++i)
 				drawOrder.add(slots[i]);
-			}
 		}
 		return;
 	}
@@ -88,20 +87,17 @@ void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Ve
 	if (time >= _frames[_frames.size() - 1]) {
 		// Time is after last frame.
 		frame = _frames.size() - 1;
-	} else {
+	} else
 		frame = (size_t)Animation::binarySearch(_frames, time) - 1;
-	}
 
 	Vector<int> &drawOrderToSetupIndex = _drawOrders[frame];
 	if (drawOrderToSetupIndex.size() == 0) {
 		drawOrder.clear();
-		for (size_t i = 0, n = slots.size(); i < n; ++i) {
+		for (size_t i = 0, n = slots.size(); i < n; ++i)
 			drawOrder.add(slots[i]);
-		}
 	} else {
-		for (size_t i = 0, n = drawOrderToSetupIndex.size(); i < n; ++i) {
+		for (size_t i = 0, n = drawOrderToSetupIndex.size(); i < n; ++i)
 			drawOrder[i] = slots[drawOrderToSetupIndex[i]];
-		}
 	}
 }
 

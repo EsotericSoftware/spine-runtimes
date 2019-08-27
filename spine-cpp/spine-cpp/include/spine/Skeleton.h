@@ -135,7 +135,6 @@ public:
 	/// See Skeleton::setSlotsToSetupPose()
 	/// Also, often AnimationState::apply(Skeleton&) is called before the next time the
 	/// skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
-	///
 	/// @param newSkin May be NULL.
 	void setSkin(Skin *newSkin);
 

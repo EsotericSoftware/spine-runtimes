@@ -74,7 +74,7 @@ void spSlot_setToSetupPose (spSlot* self) {
 		spSlot_setAttachment(self, 0);
 	else {
 		spAttachment* attachment = spSkeleton_getAttachmentForSlotIndex(
-				self->bone->skeleton, self->data->index, self->data->attachmentName);
+			self->bone->skeleton, self->data->index, self->data->attachmentName);
 		CONST_CAST(spAttachment*, self->attachment) = 0;
 		spSlot_setAttachment(self, attachment);
 	}

@@ -111,12 +111,12 @@ function Triangulator:triangulate (verticesArray)
 					end
 					ii = (ii + 1) % vertexCount
 				end
-				if (not goToHead) then 
+				if (not goToHead) then
 					breakLoop = true
 					break
 				end
 			end
-			
+
 			if breakLoop then break end
 
 			if _next == 0 then
@@ -308,7 +308,7 @@ function Triangulator:decompose(verticesArray, triangles)
 		i = i - 1
 	end
 
-	return convexPolygons;	
+	return convexPolygons;
 end
 
 function Triangulator:isConcave(index, vertexCount, vertices, indices)

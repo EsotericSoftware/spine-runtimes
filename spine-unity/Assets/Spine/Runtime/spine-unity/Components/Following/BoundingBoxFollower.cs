@@ -91,7 +91,7 @@ namespace Spine.Unity {
 				return;
 
 			skeletonRenderer.Initialize(false);
-			
+
 			if (string.IsNullOrEmpty(slotName))
 				return;
 
@@ -103,7 +103,7 @@ namespace Spine.Unity {
 				skeletonRenderer.skeleton == slot.Skeleton		// Skeleton object did not change.
 				&&
 				slotName == slot.data.name						// Slot object did not change.
-			) 
+			)
 				return;
 
 			DisposeColliders();
@@ -131,7 +131,7 @@ namespace Spine.Unity {
 				if (!valid) {
 					if (this.gameObject.activeInHierarchy)
 						Debug.LogWarning("Bounding Box Follower not valid! Slot [" + slotName + "] does not contain any Bounding Box Attachments!");
-					else 
+					else
 						Debug.LogWarning("Bounding Box Follower tried to rebuild as a prefab.");
 				}
 			}
@@ -141,7 +141,7 @@ namespace Spine.Unity {
 			if (skin == null) return;
 			var skinEntries = new List<Skin.SkinEntry>();
 			skin.GetAttachments(slotIndex, skinEntries);
-			
+
 			foreach (var entry in skinEntries) {
 				var attachment = skin.GetAttachment(slotIndex, entry.Name);
 				var boundingBoxAttachment = attachment as BoundingBoxAttachment;
@@ -190,7 +190,7 @@ namespace Spine.Unity {
 					}
 				} else {
 					foreach (var c in colliders)
-						if (c != null) 
+						if (c != null)
 							DestroyImmediate(c);
 				}
 			} else {

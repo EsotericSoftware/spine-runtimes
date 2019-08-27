@@ -61,7 +61,7 @@ namespace Spine {
 	}
 
 	public class SwirlEffect : IVertexEffect {
-		private float worldX, worldY, angle;		
+		private float worldX, worldY, angle;
 
 		public float Radius { get; set; }
 		public float Angle { get { return angle; } set { angle = value * MathUtils.DegRad; } }
@@ -76,10 +76,10 @@ namespace Spine {
 
 		public void Begin(Skeleton skeleton) {
 			worldX = skeleton.X + CenterX;
-			worldY = skeleton.Y + CenterY;		
+			worldY = skeleton.Y + CenterY;
 		}
 
-		public void End() {			
+		public void End() {
 		}
 
 		public void Transform(ref VertexPositionColorTextureColor vertex) {

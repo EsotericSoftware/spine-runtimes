@@ -57,7 +57,7 @@ namespace Spine.Unity.Editor {
 						"If your atlas was exported with Premultiply Alpha, " +
 						"your SpriteRenderer should use the generated Spine _Material asset (or any Material with a PMA shader) instead of Sprites-Default.");
 				}
-				return spriteSlicesLabel; 
+				return spriteSlicesLabel;
 			}
 		}
 
@@ -256,12 +256,12 @@ namespace Spine.Unity.Editor {
 
 				}
 				#endif
-				
+
 			}
 			#else
 			if (atlasFile.objectReferenceValue != null) {
-				
-				
+
+
 				int baseIndent = EditorGUI.indentLevel;
 
 				var regions = SpineAtlasAssetInspector.GetRegions(atlasAsset.GetAtlas());
@@ -299,7 +299,7 @@ namespace Spine.Unity.Editor {
 					} else {
 						EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(regionName, icon));
 					}
-					
+
 				}
 				EditorGUI.indentLevel = baseIndent;
 			}

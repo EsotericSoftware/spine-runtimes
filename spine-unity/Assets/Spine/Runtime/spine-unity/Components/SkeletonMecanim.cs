@@ -196,7 +196,7 @@ namespace Spine.Unity {
 						bool isInterruptionActive, shallInterpolateWeightTo1;
 						GetAnimatorClipInfos(layer, out isInterruptionActive, out clipInfoCount, out nextClipInfoCount, out interruptingClipInfoCount,
 											out clipInfo, out nextClipInfo, out interruptingClipInfo, out shallInterpolateWeightTo1);
-						
+
 						for (int c = 0; c < clipInfoCount; c++) {
 							var info = clipInfo[c];
 							float weight = info.weight * layerWeight; if (weight == 0) continue;
@@ -233,9 +233,9 @@ namespace Spine.Unity {
 					AnimatorStateInfo interruptingStateInfo;
 					float interruptingClipTimeAddition;
 					GetAnimatorStateInfos(layer, out isInterruptionActive, out stateInfo, out nextStateInfo, out interruptingStateInfo, out interruptingClipTimeAddition);
-					
+
 					bool hasNext = nextStateInfo.fullPathHash != 0;
-					
+
 					int clipInfoCount, nextClipInfoCount, interruptingClipInfoCount;
 					IList<AnimatorClipInfo> clipInfo, nextClipInfo, interruptingClipInfo;
 					bool shallInterpolateWeightTo1;
@@ -267,7 +267,7 @@ namespace Spine.Unity {
 							}
 						}
 					} else { // case MixNext || SpineStyle
-							 // Apply first non-zero weighted clip
+						// Apply first non-zero weighted clip
 						int c = 0;
 						for (; c < clipInfoCount; c++) {
 							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
@@ -380,7 +380,7 @@ namespace Spine.Unity {
 		#endif
 
 			void GetStateUpdatesFromAnimator (int layer) {
-				
+
 				var layerInfos = layerClipInfos[layer];
 				int clipInfoCount = animator.GetCurrentAnimatorClipInfoCount(layer);
 				int nextClipInfoCount = animator.GetNextAnimatorClipInfoCount(layer);

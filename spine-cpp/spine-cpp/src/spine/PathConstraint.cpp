@@ -52,14 +52,15 @@ const int PathConstraint::BEFORE = -2;
 const int PathConstraint::AFTER = -3;
 
 PathConstraint::PathConstraint(PathConstraintData &data, Skeleton &skeleton) : Updatable(),
-																			   _data(data),
-																			   _target(skeleton.findSlot(
-																					   data.getTarget()->getName())),
-																			   _position(data.getPosition()),
-																			   _spacing(data.getSpacing()),
-																			   _rotateMix(data.getRotateMix()),
-																			   _translateMix(data.getTranslateMix()),
-																			   _active(false) {
+	_data(data),
+	_target(skeleton.findSlot(
+	data.getTarget()->getName())),
+	_position(data.getPosition()),
+	_spacing(data.getSpacing()),
+	_rotateMix(data.getRotateMix()),
+	_translateMix(data.getTranslateMix()),
+	_active(false)
+{
 	_bones.ensureCapacity(_data.getBones().size());
 	for (size_t i = 0; i < _data.getBones().size(); i++) {
 		BoneData *boneData = _data.getBones()[i];
@@ -98,9 +99,7 @@ void PathConstraint::update() {
 	_spaces.setSize(spacesCount, 0);
 	float spacing = _spacing;
 	if (scale || !percentSpacing) {
-		if (scale) {
-			_lengths.setSize(boneCount, 0);
-		}
+		if (scale) _lengths.setSize(boneCount, 0);
 		bool lengthSpacing = data._spacingMode == SpacingMode_Length;
 
 		for (size_t i = 0, n = spacesCount - 1; i < n;) {
@@ -108,9 +107,7 @@ void PathConstraint::update() {
 			Bone &bone = *boneP;
 			float setupLength = bone._data.getLength();
 			if (setupLength < PathConstraint::EPSILON) {
-				if (scale) {
-					_lengths[i] = 0;
-				}
+				if (scale) _lengths[i] = 0;
 				_spaces[++i] = 0;
 			} else if (percentSpacing) {
 				if (scale) {
@@ -137,8 +134,7 @@ void PathConstraint::update() {
 	}
 
 	Vector<float>& positions = computeWorldPositions(*attachment, spacesCount, tangents,
-													data.getPositionMode() == PositionMode_Percent,
-													percentSpacing);
+		data.getPositionMode() == PositionMode_Percent, percentSpacing);
 	float boneX = positions[0];
 	float boneY = positions[1];
 	float offsetRotation = data.getOffsetRotation();
@@ -174,13 +170,12 @@ void PathConstraint::update() {
 
 		if (rotate) {
 			float a = bone._a, b = bone._b, c = bone._c, d = bone._d, r, cos, sin;
-			if (tangents) {
+			if (tangents)
 				r = positions[p - 1];
-			} else if (_spaces[i + 1] < PathConstraint::EPSILON) {
+			else if (_spaces[i + 1] < PathConstraint::EPSILON)
 				r = positions[p + 2];
-			} else {
+			else
 				r = MathUtil::atan2(dy, dx);
-			}
 
 			r -= MathUtil::atan2(c, a);
 
@@ -190,15 +185,13 @@ void PathConstraint::update() {
 				float length = bone._data.getLength();
 				boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
 				boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
-			} else {
+			} else
 				r += offsetRotation;
-			}
 
-			if (r > MathUtil::Pi) {
+			if (r > MathUtil::Pi)
 				r -= MathUtil::Pi_2;
-			} else if (r < -MathUtil::Pi) {
+			else if (r < -MathUtil::Pi)
 				r += MathUtil::Pi_2;
-			}
 
 			r *= rotateMix;
 			cos = MathUtil::cos(r);
@@ -266,8 +259,7 @@ PathConstraintData &PathConstraint::getData() {
 }
 
 Vector<float>&
-PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, bool tangents, bool percentPosition,
-									  bool percentSpacing) {
+PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, bool tangents, bool percentPosition, bool percentSpacing) {
 	Slot &target = *_target;
 	float position = _position;
 	_positions.setSize(spacesCount * 3 + 2, 0);
@@ -283,14 +275,11 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 		Vector<float> &lengths = path.getLengths();
 		curveCount -= closed ? 1 : 2;
 		pathLength = lengths[curveCount];
-		if (percentPosition) {
-			position *= pathLength;
-		}
+		if (percentPosition) position *= pathLength;
 
 		if (percentSpacing) {
-			for (int i = 1; i < spacesCount; ++i) {
+			for (int i = 1; i < spacesCount; ++i)
 				_spaces[i] *= pathLength;
-			}
 		}
 
 		world.setSize(8, 0);
@@ -301,10 +290,7 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 
 			if (closed) {
 				p = MathUtil::fmod(p, pathLength);
-
-				if (p < 0) {
-					p += pathLength;
-				}
+				if (p < 0) p += pathLength;
 				curve = 0;
 			} else if (p < 0) {
 				if (prevCurve != BEFORE) {
@@ -329,13 +315,11 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 			// Determine curve containing position.
 			for (;; curve++) {
 				float length = lengths[curve];
-				if (p > length) {
-					continue;
-				}
+				if (p > length) continue;
 
-				if (curve == 0) {
+				if (curve == 0)
 					p /= length;
-				} else {
+				else {
 					float prev = lengths[curve - 1];
 					p = (p - prev) / (length - prev);
 				}
@@ -347,13 +331,12 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 				if (closed && curve == curveCount) {
 					path.computeWorldVertices(target, verticesLength - 4, 4, world, 0);
 					path.computeWorldVertices(target, 0, 4, world, 4);
-				} else {
+				} else
 					path.computeWorldVertices(target, curve * 6 + 2, 8, world, 0);
-				}
 			}
 
 			addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7],
-							 out, o, tangents || (i > 0 && space < EPSILON));
+				out, o, tangents || (i > 0 && space < EPSILON));
 		}
 		return out;
 	}
@@ -410,16 +393,14 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 		y1 = y2;
 	}
 
-	if (percentPosition) {
+	if (percentPosition)
 		position *= pathLength;
-	} else {
+	else
 		position *= pathLength / path.getLengths()[curveCount - 1];
-	}
 
 	if (percentSpacing) {
-		for (int i = 1; i < spacesCount; ++i) {
+		for (int i = 1; i < spacesCount; ++i)
 			_spaces[i] *= pathLength;
-		}
 	}
 
 	float curveLength = 0;
@@ -430,10 +411,7 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 
 		if (closed) {
 			p = MathUtil::fmod(p, pathLength);
-
-			if (p < 0) {
-				p += pathLength;
-			}
+			if (p < 0) p += pathLength;
 			curve = 0;
 		} else if (p < 0) {
 			addBeforePosition(p, world, 0, out, o);
@@ -446,13 +424,10 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 		// Determine curve containing position.
 		for (;; curve++) {
 			float length = _curves[curve];
-			if (p > length) {
-				continue;
-			}
-
-			if (curve == 0) {
+			if (p > length) continue;
+			if (curve == 0)
 				p /= length;
-			} else {
+			else {
 				float prev = _curves[curve - 1];
 				p = (p - prev) / (length - prev);
 			}
@@ -504,20 +479,17 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 		p *= curveLength;
 		for (;; segment++) {
 			float length = _segments[segment];
-			if (p > length) {
-				continue;
-			}
-
-			if (segment == 0) {
+			if (p > length) continue;
+			if (segment == 0)
 				p /= length;
-			} else {
+			else {
 				float prev = _segments[segment - 1];
 				p = segment + (p - prev) / (length - prev);
 			}
 			break;
 		}
 		addCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o,
-						 tangents || (i > 0 && space < EPSILON));
+			tangents || (i > 0 && space < EPSILON));
 	}
 
 	return out;
@@ -529,7 +501,6 @@ void PathConstraint::addBeforePosition(float p, Vector<float> &temp, int i, Vect
 	float dx = temp[i + 2] - x1;
 	float dy = temp[i + 3] - y1;
 	float r = MathUtil::atan2(dy, dx);
-
 	output[o] = x1 + p * MathUtil::cos(r);
 	output[o + 1] = y1 + p * MathUtil::sin(r);
 	output[o + 2] = r;
@@ -547,7 +518,8 @@ void PathConstraint::addAfterPosition(float p, Vector<float> &temp, int i, Vecto
 }
 
 void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2,
-									  float y2, Vector<float> &output, int o, bool tangents) {
+	float y2, Vector<float> &output, int o, bool tangents
+) {
 	if (p < EPSILON || MathUtil::isNan(p)) {
 		output[o] = x1;
 		output[o + 1] = y1;
@@ -561,12 +533,10 @@ void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, fl
 	output[o] = x;
 	output[o + 1] = y;
 	if (tangents) {
-		if (p < 0.001) {
+		if (p < 0.001)
 			output[o + 2] = MathUtil::atan2(cy1 - y1, cx1 - x1);
-		} else {
-			output[o + 2] = MathUtil::atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt),
-											x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
-		}
+		else
+			output[o + 2] = MathUtil::atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 	}
 }
 

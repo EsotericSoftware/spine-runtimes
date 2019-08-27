@@ -49,7 +49,7 @@ namespace Spine.Unity.Editor {
 		public static Color PathColor { get { return new Color(254/255f, 127/255f, 0); } }
 		public static Color TransformContraintColor { get { return new Color(170/255f, 226/255f, 35/255f); } }
 		public static Color IkColor { get { return new Color(228/255f,90/255f,43/255f); } }
-		public static Color PointColor { get { return new Color(1f, 1f, 0f, 1f);  } }
+		public static Color PointColor { get { return new Color(1f, 1f, 0f, 1f); } }
 
 		static Vector3[] _boneMeshVerts = {
 			new Vector3(0, 0, 0),

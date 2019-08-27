@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using System.Collections;
 
 namespace Spine.Unity.AttachmentTools {
-	
+
 	public static class AttachmentCloneExtensions {
 		/// <summary>
 		/// Clones the attachment.</summary>

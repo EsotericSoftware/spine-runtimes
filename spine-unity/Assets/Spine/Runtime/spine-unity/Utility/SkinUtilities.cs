@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using System.Collections;
 
 namespace Spine.Unity.AttachmentTools {
-	
+
 	public static class SkinUtilities {
 
 		#region Skeleton Skin Extensions
@@ -106,7 +106,7 @@ namespace Spine.Unity.AttachmentTools {
 		public static void SetAttachment (this Skin skin, int slotIndex, string keyName, Attachment attachment) {
 			skin.SetAttachment(slotIndex, keyName, attachment);
 		}
-		
+
 		public static void RemoveAttachment (this Skin skin, string slotName, string keyName, SkeletonData skeletonData) {
 			int slotIndex = skeletonData.FindSlotIndex(slotName);
 			if (skeletonData == null) throw new System.ArgumentNullException("skeletonData", "skeletonData cannot be null.");

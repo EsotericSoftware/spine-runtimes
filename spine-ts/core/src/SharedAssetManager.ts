@@ -113,7 +113,7 @@ module spine {
 			path = this.pathPrefix + path;
 			if (!this.queueAsset(clientId, textureLoader, path)) return;
 
-			let img = new Image();			 
+			let img = new Image();
 			img.src = path;
 			img.crossOrigin = "anonymous";
 			img.onload = (ev) => {

@@ -36,7 +36,7 @@ using Spine.Unity;
 using Spine.Unity.Editor;
 
 namespace Spine.Unity.Examples {
-	
+
 	[CustomEditor(typeof(SkeletonRenderSeparator))]
 	public class SkeletonRenderSeparatorInspector : UnityEditor.Editor {
 		SkeletonRenderSeparator component;
@@ -130,7 +130,7 @@ namespace Spine.Unity.Examples {
 								separatorNamesProp.isExpanded = true;
 							}
 						}
-							
+
 						if (separatorNamesProp != null) {
 							if (skeletonRendererExpanded) {
 								EditorGUI.indentLevel++;
@@ -152,7 +152,7 @@ namespace Spine.Unity.Examples {
 					if (!Application.isPlaying)
 						slotsReapplyRequired = true;
 				}
-					
+
 
 				totalParts = separatorCount + 1;
 				var counterStyle = skeletonRendererExpanded ? EditorStyles.label : EditorStyles.miniLabel;
@@ -189,7 +189,7 @@ namespace Spine.Unity.Examples {
 						}
 					}
 				}
-					
+
 				if (partsRenderers_.isExpanded != partsRenderersExpanded) partsRenderersExpanded = partsRenderers_.isExpanded;
 				if (partsRenderers_.isExpanded) {
 					using (new EditorGUILayout.HorizontalScope()) {
@@ -198,7 +198,7 @@ namespace Spine.Unity.Examples {
 							if (GUILayout.Button("Clear Parts Renderers")) {
 								// Do you really want to destroy all?
 								Undo.RegisterCompleteObjectUndo(component, "Clear Parts Renderers");
-								if (EditorUtility.DisplayDialog("Destroy Renderers", "Do you really want to destroy all the Parts Renderer GameObjects in the list?", "Destroy", "Cancel")) {						
+								if (EditorUtility.DisplayDialog("Destroy Renderers", "Do you really want to destroy all the Parts Renderer GameObjects in the list?", "Destroy", "Cancel")) {
 									foreach (var r in componentRenderers) {
 										if (r != null)
 											Undo.DestroyObjectImmediate(r.gameObject);

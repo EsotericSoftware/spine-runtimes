@@ -58,7 +58,8 @@ AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(
 }
 
 void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-							   MixBlend blend, MixDirection direction) {
+	MixBlend blend, MixDirection direction
+) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(alpha);

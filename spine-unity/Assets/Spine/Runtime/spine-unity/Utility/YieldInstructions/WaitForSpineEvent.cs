@@ -33,7 +33,7 @@ using Spine;
 
 namespace Spine.Unity {
 	/// <summary>
-	/// Use this as a condition-blocking yield instruction for Unity Coroutines. 
+	/// Use this as a condition-blocking yield instruction for Unity Coroutines.
 	/// The routine will pause until the AnimationState fires an event matching the given event name or EventData reference.</summary>
 	public class WaitForSpineEvent : IEnumerator {
 
@@ -74,7 +74,7 @@ namespace Spine.Unity {
 				m_WasFired = true;
 				return;
 			}
-		
+
 			m_AnimationState = state;
 			m_EventName = eventName;
 			state.Event += HandleAnimationStateEventByName;
@@ -86,11 +86,11 @@ namespace Spine.Unity {
 			Subscribe(state, eventDataReference, unsubscribeAfterFiring);
 		}
 
-		public WaitForSpineEvent (SkeletonAnimation skeletonAnimation, Spine.EventData eventDataReference, bool unsubscribeAfterFiring = true) {			
+		public WaitForSpineEvent (SkeletonAnimation skeletonAnimation, Spine.EventData eventDataReference, bool unsubscribeAfterFiring = true) {
 			// If skeletonAnimation is invalid, its state will be null. Subscribe handles null states just fine.
 			Subscribe(skeletonAnimation.state, eventDataReference, unsubscribeAfterFiring);
 		}
-			
+
 		public WaitForSpineEvent (Spine.AnimationState state, string eventName, bool unsubscribeAfterFiring = true) {
 			SubscribeByName(state, eventName, unsubscribeAfterFiring);
 		}
@@ -117,7 +117,7 @@ namespace Spine.Unity {
 
 		#region Reuse
 		/// <summary>
-		/// By default, WaitForSpineEvent will unsubscribe from the event immediately after it fires a correct matching event. 
+		/// By default, WaitForSpineEvent will unsubscribe from the event immediately after it fires a correct matching event.
 		/// If you want to reuse this WaitForSpineEvent instance on the same event, you can set this to false.</summary>
 		public bool WillUnsubscribeAfterFiring { get { return m_unsubscribeAfterFiring; } set { m_unsubscribeAfterFiring = value; } }
 

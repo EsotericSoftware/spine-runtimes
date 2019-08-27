@@ -33,7 +33,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Spine.Unity.Examples {
-	
+
 	[RequireComponent(typeof(SkeletonRenderer))]
 	public class SkeletonGhost : MonoBehaviour {
 		// Internal Settings
@@ -102,21 +102,21 @@ namespace Spine.Unity.Examples {
 		/*
 		 *	Int Value:		0 sets ghostingEnabled to false, 1 sets ghostingEnabled to true
 		 *	Float Value:	Values greater than 0 set the spawnRate equal the float value
-		 *	String Value:	Pass RGBA hex color values in to set the color property.  IE:   "A0FF8BFF"
+		 *	String Value:	Pass RGBA hex color values in to set the color property. IE: "A0FF8BFF"
 		 */
 		void OnEvent (Spine.TrackEntry trackEntry, Spine.Event e) {
 			if (e.Data.Name.Equals("Ghosting", System.StringComparison.Ordinal)) {
 				ghostingEnabled = e.Int > 0;
 				if (e.Float > 0)
 					spawnInterval = e.Float;
-				
+
 				if (!string.IsNullOrEmpty(e.String))
 					this.color = HexToColor(e.String);
 			}
 		}
 
 		//SkeletonAnimator
-		//SkeletonAnimator or Mecanim based animations only support toggling ghostingEnabled.  Be sure not to set anything other than the Int param in Spine or String will take priority.
+		//SkeletonAnimator or Mecanim based animations only support toggling ghostingEnabled. Be sure not to set anything other than the Int param in Spine or String will take priority.
 		void Ghosting (float val) {
 			ghostingEnabled = val > 0;
 		}
@@ -179,7 +179,7 @@ namespace Spine.Unity.Examples {
 				Destroy(mat);
 		}
 
-		//based on UnifyWiki  http://wiki.unity3d.com/index.php?title=HexConverter
+		// based on UnifyWiki http://wiki.unity3d.com/index.php?title=HexConverter
 		static Color32 HexToColor (string hex) {
 			const System.Globalization.NumberStyles HexNumber = System.Globalization.NumberStyles.HexNumber;
 

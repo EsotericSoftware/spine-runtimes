@@ -51,7 +51,7 @@ namespace Spine {
 			Array.Copy(lengths, 0, copy.lengths, 0, lengths.Length);
 			copy.closed = closed;
 			copy.constantSpeed = constantSpeed;
-			       return copy;
+			return copy;
 		}
 	}
 }

@@ -46,11 +46,11 @@ function ClippingAttachment.new (name)
 end
 
 function ClippingAttachment:copy ()
-  local copy = ClippingAttachment.new(self.name)
-  self:copyTo(copy)
-  copy.endSlot = self.endSlot
-  copy.color:setFrom(self.color)
-  return copy
+	local copy = ClippingAttachment.new(self.name)
+	self:copyTo(copy)
+	copy.endSlot = self.endSlot
+	copy.color:setFrom(self.color)
+	return copy
 end
 
 return ClippingAttachment

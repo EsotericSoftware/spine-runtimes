@@ -37,36 +37,36 @@
 
 namespace spine {
 
-    class SP_API TranslateTimeline : public CurveTimeline {
-        friend class SkeletonBinary;
-        friend class SkeletonJson;
-        
-        RTTI_DECL
-        
-    public:
-        static const int ENTRIES;
+	class SP_API TranslateTimeline : public CurveTimeline {
+		friend class SkeletonBinary;
+		friend class SkeletonJson;
 
-        explicit TranslateTimeline(int frameCount);
+		RTTI_DECL
 
-        virtual ~TranslateTimeline();
-        
-        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
-        
-        virtual int getPropertyId();
-        
-        /// Sets the time and value of the specified keyframe.
-        void setFrame(int frameIndex, float time, float x, float y);
-        
-    protected:
+	public:
+		static const int ENTRIES;
+
+		explicit TranslateTimeline(int frameCount);
+
+		virtual ~TranslateTimeline();
+
+		virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
+
+		virtual int getPropertyId();
+
+		/// Sets the time and value of the specified keyframe.
+		void setFrame(int frameIndex, float time, float x, float y);
+
+	protected:
 		static const int PREV_TIME;
 		static const int PREV_X;
 		static const int PREV_Y;
 		static const int X;
 		static const int Y;
-        
-        Vector<float> _frames;
-        int _boneIndex;
-    };
+
+		Vector<float> _frames;
+		int _boneIndex;
+	};
 }
 
 #endif /* Spine_TranslateTimeline_h */

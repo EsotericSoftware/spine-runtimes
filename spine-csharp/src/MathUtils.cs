@@ -63,12 +63,12 @@ namespace Spine {
 		static public float Cos (float radians) {
 			return sin[(int)((radians + PI / 2) * RadToIndex) & SIN_MASK];
 		}
-			
+
 		/// <summary>Returns the sine in radians from a lookup table.</summary>
 		static public float SinDeg (float degrees) {
 			return sin[(int)(degrees * DegToIndex) & SIN_MASK];
 		}
-			
+
 		/// <summary>Returns the cosine in radians from a lookup table.</summary>
 		static public float CosDeg (float degrees) {
 			return sin[(int)((degrees + 90) * DegToIndex) & SIN_MASK];

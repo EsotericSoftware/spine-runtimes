@@ -58,11 +58,10 @@ namespace Spine {
 		static public Texture2D LoadTexture (GraphicsDevice device, String path) {
 
 #if WINDOWS_PHONE
-            Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
-            using (Stream input = stream)
-            {
+			Stream stream = Microsoft.Xna.Framework.TitleContainer.OpenStream(path);
+			using (Stream input = stream) {
 #else
-            using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+			using (Stream input = new FileStream(path, FileMode.Open, FileAccess.Read)) {
 #endif
 				try {
 					return Util.LoadTexture(device, input);

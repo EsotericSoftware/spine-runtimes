@@ -130,10 +130,10 @@ function utils.arrayCopy (src, srcOffset, dst, dstOffset, size)
 end
 
 function utils.arrayContains(array, element)
-  for i, arrayElement in ipairs(array) do    
-    if arrayElement == element then return true end
-  end
-  return false
+	for i, arrayElement in ipairs(array) do
+		if arrayElement == element then return true end
+	end
+	return false
 end
 
 function utils.clamp (value, min, max)
@@ -143,23 +143,23 @@ function utils.clamp (value, min, max)
 end
 
 function utils.signum (value)
-  if value < 0 then
-    return -1
-  elseif value > 0 then
-    return 1
-  else
-    return 0
-  end
+	if value < 0 then
+		return -1
+	elseif value > 0 then
+		return 1
+	else
+		return 0
+	end
 end
 
 -- Implements Java float modulo
 function utils.mod(a, b)
-  if b < 0 then b = -b end
-  if a < 0 then
-    return -(-a % b)
-  else
-    return a % b
-  end
+	if b < 0 then b = -b end
+	if a < 0 then
+		return -(-a % b)
+	else
+		return a % b
+	end
 end
 
 function utils.randomTriangular(min, max)
@@ -174,21 +174,21 @@ function utils.randomTriangularWith(min, max, mode)
 end
 
 function utils.testBit(value, bit)
-  return value % (2 * bit) >= bit
+	return value % (2 * bit) >= bit
 end
 
 function utils.setBit(value, bit)
-  if value % (2 * bit) >= bit then
-    return value
-  end
-  return value + bit
+	if value % (2 * bit) >= bit then
+		return value
+	end
+	return value + bit
 end
 
 function utils.clearBit(value, bit)
-  if value % (2 * bit) >= bit then
-    return value - bit
-  end
-  return value
+	if value % (2 * bit) >= bit then
+		return value - bit
+	end
+	return value
 end
 
 return utils

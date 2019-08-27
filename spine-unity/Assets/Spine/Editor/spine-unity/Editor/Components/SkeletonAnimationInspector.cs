@@ -32,7 +32,7 @@ using UnityEngine;
 using Spine;
 
 namespace Spine.Unity.Editor {
-	
+
 	[CustomEditor(typeof(SkeletonAnimation))]
 	[CanEditMultipleObjects]
 	public class SkeletonAnimationInspector : SkeletonRendererInspector {
@@ -73,7 +73,7 @@ namespace Spine.Unity.Editor {
 				component.timeScale = Mathf.Max(component.timeScale, 0);
 			}
 			EditorGUILayout.Space();
-			
+
 			if (!isInspectingPrefab) {
 				if (requireRepaint) {
 					SceneView.RepaintAll();

@@ -51,25 +51,26 @@ const int RegionAttachment::BRX = 6;
 const int RegionAttachment::BRY = 7;
 
 RegionAttachment::RegionAttachment(const String &name) : Attachment(name), HasRendererObject(),
-														 _x(0),
-														 _y(0),
-														 _rotation(0),
-														 _scaleX(1),
-														 _scaleY(1),
-														 _width(0),
-														 _height(0),
-														 _regionOffsetX(0),
-														 _regionOffsetY(0),
-														 _regionWidth(0),
-														 _regionHeight(0),
-														 _regionOriginalWidth(0),
-														 _regionOriginalHeight(0),
-														 _path(),
-														 _regionU(0),
-														 _regionV(0),
-														 _regionU2(0),
-														 _regionV2(0),
-														 _color(1, 1, 1, 1) {
+	_x(0),
+	_y(0),
+	_rotation(0),
+	_scaleX(1),
+	_scaleY(1),
+	_width(0),
+	_height(0),
+	_regionOffsetX(0),
+	_regionOffsetY(0),
+	_regionWidth(0),
+	_regionHeight(0),
+	_regionOriginalWidth(0),
+	_regionOriginalHeight(0),
+	_path(),
+	_regionU(0),
+	_regionV(0),
+	_regionU2(0),
+	_regionV2(0),
+	_color(1, 1, 1, 1)
+{
 	_vertexOffset.setSize(NUM_UVS, 0);
 	_uvs.setSize(NUM_UVS, 0);
 }

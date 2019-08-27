@@ -77,7 +77,7 @@ namespace Spine.Unity.Editor {
 		string TargetAssetGUID { get { return AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(targetSkeletonDataAsset)); } }
 		string LastSkinKey { get { return TargetAssetGUID + "_lastSkin"; } }
 		string LastSkinName { get { return EditorPrefs.GetString(LastSkinKey, ""); } }
-		
+
 		void OnEnable () {
 			InitializeEditor();
 		}
@@ -137,7 +137,7 @@ namespace Spine.Unity.Editor {
 			PopulateWarnings();
 			if (targetSkeletonDataAsset.skeletonJSON == null) {
 				targetSkeletonData = null;
-				return;	
+				return;
 			}
 
 			targetSkeletonData = warnings.Count == 0 ? targetSkeletonDataAsset.GetSkeletonData(false) : null;
@@ -145,7 +145,7 @@ namespace Spine.Unity.Editor {
 			if (targetSkeletonData != null && warnings.Count <= 0) {
 				preview.Initialize(this.Repaint, targetSkeletonDataAsset, this.LastSkinName);
 			}
-				
+
 		}
 
 		void Clear () {
@@ -215,7 +215,7 @@ namespace Spine.Unity.Editor {
 				DrawAnimationList();
 				if (targetSkeletonData.Animations.Count > 0) {
 					const string AnimationReferenceButtonText = "Create Animation Reference Assets";
-					const string AnimationReferenceTooltipText = "AnimationReferenceAsset acts as Unity asset for a reference to a Spine.Animation. This can be used in inspectors.\n\nIt serializes  a reference to a SkeletonDataAsset and an animationName.\n\nAt runtime, a reference to its Spine.Animation is loaded and cached into the object to be used as needed. This skips the need to find and cache animation references in individual MonoBehaviours.";
+					const string AnimationReferenceTooltipText = "AnimationReferenceAsset acts as Unity asset for a reference to a Spine.Animation. This can be used in inspectors.\n\nIt serializes a reference to a SkeletonDataAsset and an animationName.\n\nAt runtime, a reference to its Spine.Animation is loaded and cached into the object to be used as needed. This skips the need to find and cache animation references in individual MonoBehaviours.";
 					if (GUILayout.Button(SpineInspectorUtility.TempContent(AnimationReferenceButtonText, Icons.animationRoot, AnimationReferenceTooltipText), GUILayout.Width(250), GUILayout.Height(26))) {
 						CreateAnimationReferenceAssets();
 					}
@@ -273,7 +273,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		void OnInspectorGUIMulti () {
-			
+
 			// Skeleton data file field.
 			using (new SpineInspectorUtility.BoxScope()) {
 				EditorGUILayout.LabelField("SkeletonData", EditorStyles.boldLabel);
@@ -376,7 +376,7 @@ namespace Spine.Unity.Editor {
 				using (new SpineInspectorUtility.IndentScope())
 					SpineInspectorUtility.PropertyFieldWideLabel(defaultMix, DefaultMixLabel, 160);
 
-				
+
 				if (fromAnimation.arraySize > 0) {
 					using (new SpineInspectorUtility.IndentScope()) {
 						EditorGUILayout.LabelField("Custom Mix Durations", EditorStyles.boldLabel);
@@ -400,7 +400,7 @@ namespace Spine.Unity.Editor {
 							}
 						}
 					}
-				}				
+				}
 
 				using (new EditorGUILayout.HorizontalScope()) {
 					EditorGUILayout.Space();
@@ -426,7 +426,7 @@ namespace Spine.Unity.Editor {
 				return;
 
 			bool isPreviewWindowOpen = preview.IsValid;
-			
+
 			if (isPreviewWindowOpen) {
 				if (GUILayout.Button(SpineInspectorUtility.TempContent("Setup Pose", Icons.skeleton), GUILayout.Width(105), GUILayout.Height(18))) {
 					preview.ClearAnimationSetupPose();
@@ -480,7 +480,7 @@ namespace Spine.Unity.Editor {
 							int attachmentCount = skin.Attachments.Count;
 							EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(string.Format("{0} ({1} attachment{2})", skin.Name, attachmentCount, SpineInspectorUtility.PluralThenS(attachmentCount)), Icons.skin));
 						}
-							
+
 					}
 				}
 
@@ -505,7 +505,7 @@ namespace Spine.Unity.Editor {
 									else {
 										defaultSkin.GetAttachments(i, defaultSkinAttachments);
 									}
-								}	
+								}
 							}
 
 							for (int a = 0; a < slotAttachments.Count; a++) {
@@ -519,7 +519,7 @@ namespace Spine.Unity.Editor {
 
 								Texture2D iconToUse = attachmentIsFromSkin ? Icons.skinPlaceholder : attachmentTypeIcon;
 								bool toggled = EditorGUILayout.ToggleLeft(SpineInspectorUtility.TempContent(attachmentName, iconToUse), slot.Attachment == attachment, GUILayout.MinWidth(150f));
-								
+
 								if (attachmentIsFromSkin) {
 									Rect extraIconRect = GUILayoutUtility.GetLastRect();
 									extraIconRect.x += extraIconRect.width - (attachmentTypeIcon.width * 2f);
@@ -538,7 +538,7 @@ namespace Spine.Unity.Editor {
 					}
 				}
 			}
-			
+
 		}
 
 		void DrawUnityTools () {
@@ -638,7 +638,7 @@ namespace Spine.Unity.Editor {
 								foreach (string missingRegion in missingPaths)
 									warnings.Add(string.Format("Missing Region: '{0}'", missingRegion));
 							}
-							
+
 						}
 					}
 
@@ -663,7 +663,7 @@ namespace Spine.Unity.Editor {
 			preview.OnDestroy();
 		}
 
-		override public bool HasPreviewGUI () {			
+		override public bool HasPreviewGUI () {
 			if (serializedObject.isEditingMultipleObjects)
 				return false;
 
@@ -700,7 +700,7 @@ namespace Spine.Unity.Editor {
 		GameObject previewGameObject;
 		internal bool requiresRefresh;
 		float animationLastTime;
-		
+
 		static float CurrentTime { get { return (float)EditorApplication.timeSinceStartup; } }
 
 		Action Repaint;
@@ -794,7 +794,7 @@ namespace Spine.Unity.Editor {
 			if (previewRenderUtility == null) {
 				previewRenderUtility = new PreviewRenderUtility(true);
 				animationLastTime = CurrentTime;
-				
+
 				const int PreviewLayer = 30;
 				const int PreviewCameraCullingMask = 1 << PreviewLayer;
 
@@ -881,7 +881,7 @@ namespace Spine.Unity.Editor {
 				var renderer = go.GetComponent<Renderer>();
 				renderer.enabled = true;
 
-				
+
 				if (!EditorApplication.isPlaying) {
 					float current = CurrentTime;
 					float deltaTime = (current - animationLastTime);
@@ -1005,7 +1005,7 @@ namespace Spine.Unity.Editor {
 				if (isEmpty) {
 					skeleton.SetToSetupPose();
 					animationState.SetAnimation(0, targetAnimation, loop);
-				} else {					
+				} else {
 					bool sameAnimation = (currentTrack.Animation == targetAnimation);
 					if (sameAnimation) {
 						currentTrack.TimeScale = (currentTrack.TimeScale == 0) ? 1f : 0f; // pause/play

@@ -81,8 +81,8 @@ extern "C" {
 	} \
 	void name##_add(name* self, itemType value) { \
 		if (self->size == self->capacity) { \
-            self->capacity = MAX(8, (int)(self->size * 1.75f)); \
-            self->items = REALLOC(self->items, itemType, self->capacity); \
+			self->capacity = MAX(8, (int)(self->size * 1.75f)); \
+			self->items = REALLOC(self->items, itemType, self->capacity); \
 		} \
 		self->items[self->size++] = value; \
 	} \

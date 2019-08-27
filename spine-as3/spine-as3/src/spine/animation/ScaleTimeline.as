@@ -78,7 +78,7 @@ package spine.animation {
 			if (alpha == 1) {
 				if (blend == MixBlend.add) {
 					bone.scaleX += x - bone.data.scaleX;
-					bone.scaleY += y - bone.data.scaleY;	
+					bone.scaleY += y - bone.data.scaleY;
 				} else {
 					bone.scaleX = x;
 					bone.scaleY = y;

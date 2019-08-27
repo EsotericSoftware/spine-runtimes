@@ -42,7 +42,7 @@ namespace Spine {
 		internal ExposedList<Bone> bones;
 		internal Bone target;
 		internal float rotateMix, translateMix, scaleMix, shearMix;
-		
+
 		internal bool active;
 
 		public TransformConstraint (TransformConstraintData data, Skeleton skeleton) {

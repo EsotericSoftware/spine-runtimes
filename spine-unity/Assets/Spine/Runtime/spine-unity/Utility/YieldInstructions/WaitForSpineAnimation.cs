@@ -33,7 +33,7 @@ using System;
 
 namespace Spine.Unity {
 	/// <summary>
-	/// Use this as a condition-blocking yield instruction for Unity Coroutines. 
+	/// Use this as a condition-blocking yield instruction for Unity Coroutines.
 	/// The routine will pause until the AnimationState.TrackEntry fires any of the
 	/// configured events.
 	/// <p/>
@@ -41,7 +41,7 @@ namespace Spine.Unity {
 	/// and <see cref="http://esotericsoftware.com/spine-api-reference#AnimationStateListener"/>
 	/// for more information on when track events will be triggered.</summary>
 	public class WaitForSpineAnimation : IEnumerator {
-		
+
 		[Flags]
 		public enum AnimationEventTypes
 		{
@@ -67,7 +67,7 @@ namespace Spine.Unity {
 			return this;
 		}
 		#endregion
-		
+
 		#region IEnumerator
 		bool IEnumerator.MoveNext () {
 			if (m_WasFired) {

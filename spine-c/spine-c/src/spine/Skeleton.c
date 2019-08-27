@@ -251,8 +251,7 @@ static void _sortIkConstraint (_spSkeleton* const internal, spIkConstraint* cons
 				break;
 			}
 		}
-		if (!contains)
-			_addToUpdateCacheReset(internal, child);
+		if (!contains) _addToUpdateCacheReset(internal, child);
 	}
 
 	_addToUpdateCache(internal, SP_UPDATE_IK_CONSTRAINT, constraint);

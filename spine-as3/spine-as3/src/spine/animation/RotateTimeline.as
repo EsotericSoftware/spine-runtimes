@@ -85,7 +85,7 @@ package spine.animation {
 						r -= (16384 - int((16384.499999999996 - r / 360))) * 360; // Wrap within -180 and 180.
 					case MixBlend.add:
 						bone.rotation += r * alpha;
-				}				
+				}
 				return;
 			}
 
@@ -96,16 +96,16 @@ package spine.animation {
 			var percent : Number = getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
 
 			r = frames[frame + ROTATION] - prevRotation;
-			r = prevRotation + (r - (16384 - int((16384.499999999996 - r / 360))) * 360) * percent;			
+			r = prevRotation + (r - (16384 - int((16384.499999999996 - r / 360))) * 360) * percent;
 			switch (blend) {
-				case MixBlend.setup:					
+				case MixBlend.setup:
 					bone.rotation = bone.data.rotation + (r - (16384 - int((16384.499999999996 - r / 360))) * 360) * alpha;
 					break;
 				case MixBlend.first:
 				case MixBlend.replace:
-					r += bone.data.rotation - bone.rotation;					
+					r += bone.data.rotation - bone.rotation;
 				case MixBlend.add:
-					bone.rotation += (r - (16384 - int((16384.499999999996 - r / 360))) * 360) * alpha;	
+					bone.rotation += (r - (16384 - int((16384.499999999996 - r / 360))) * 360) * alpha;
 			}
 		}
 	}

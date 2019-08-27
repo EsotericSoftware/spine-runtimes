@@ -45,9 +45,9 @@ typedef struct spAttachmentLoader {
 	const void* const vtable;
 #ifdef __cplusplus
 	spAttachmentLoader () :
-					error1(0),
-					error2(0),
-					vtable(0) {
+		error1(0),
+		error2(0),
+		vtable(0) {
 	}
 #endif
 } spAttachmentLoader;

@@ -52,13 +52,13 @@ namespace Spine.Unity {
 				return animation;
 			}
 		}
-		
+
 		public void Initialize () {
 			if (skeletonDataAsset == null) return;
 			this.animation = skeletonDataAsset.GetSkeletonData(AnimationReferenceAsset.QuietSkeletonData).FindAnimation(animationName);
 			if (this.animation == null) Debug.LogWarningFormat("Animation '{0}' not found in SkeletonData : {1}.", animationName, skeletonDataAsset.name);
 		}
-		
+
 		public static implicit operator Animation (AnimationReferenceAsset asset) {
 			return asset.Animation;
 		}

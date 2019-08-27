@@ -199,37 +199,37 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		sf::BlendMode blend;
 		if (!usePremultipliedAlpha) {
 			switch (slot->data->blendMode) {
-				case BLEND_MODE_NORMAL:
-					blend = normal;
-					break;
-				case BLEND_MODE_ADDITIVE:
-					blend = additive;
-					break;
-				case BLEND_MODE_MULTIPLY:
-					blend = multiply;
-					break;
-				case BLEND_MODE_SCREEN:
-					blend = screen;
-					break;
-				default:
-					blend = normal;
+			case BLEND_MODE_NORMAL:
+				blend = normal;
+				break;
+			case BLEND_MODE_ADDITIVE:
+				blend = additive;
+				break;
+			case BLEND_MODE_MULTIPLY:
+				blend = multiply;
+				break;
+			case BLEND_MODE_SCREEN:
+				blend = screen;
+				break;
+			default:
+				blend = normal;
 			}
 		} else {
 			switch (slot->data->blendMode) {
-				case BLEND_MODE_NORMAL:
-					blend = normalPma;
-					break;
-				case BLEND_MODE_ADDITIVE:
-					blend = additivePma;
-					break;
-				case BLEND_MODE_MULTIPLY:
-					blend = multiplyPma;
-					break;
-				case BLEND_MODE_SCREEN:
-					blend = screenPma;
-					break;
-				default:
-					blend = normalPma;
+			case BLEND_MODE_NORMAL:
+				blend = normalPma;
+				break;
+			case BLEND_MODE_ADDITIVE:
+				blend = additivePma;
+				break;
+			case BLEND_MODE_MULTIPLY:
+				blend = multiplyPma;
+				break;
+			case BLEND_MODE_SCREEN:
+				blend = screenPma;
+				break;
+			default:
+				blend = normalPma;
 			}
 		}
 

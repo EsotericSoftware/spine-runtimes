@@ -141,7 +141,7 @@ namespace Spine.Unity.Examples {
 		}
 
 	}
-		
+
 
 	public static class SpriteAttachmentExtensions {
 		[System.Obsolete]

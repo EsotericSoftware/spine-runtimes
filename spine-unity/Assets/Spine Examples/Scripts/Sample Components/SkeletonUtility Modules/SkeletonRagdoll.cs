@@ -47,7 +47,7 @@ namespace Spine.Unity.Examples {
 
 		[Header("Parameters")]
 		public bool applyOnStart;
-		[Tooltip("Warning!  You will have to re-enable and tune mix values manually if attempting to remove the ragdoll system.")]
+		[Tooltip("Warning! You will have to re-enable and tune mix values manually if attempting to remove the ragdoll system.")]
 		public bool disableIK = true;
 		public bool disableOtherConstraints = false;
 		[Space(18)]
@@ -58,7 +58,7 @@ namespace Spine.Unity.Examples {
 		public bool useGravity = true;
 		[Tooltip("If no BoundingBox Attachment is attached to a bone, this becomes the default Width or Radius of a Bone's ragdoll Rigidbody")]
 		public float thickness = 0.125f;
-		[Tooltip("Default rotational limit value.  Min is negative this value, Max is this value.")]
+		[Tooltip("Default rotational limit value. Min is negative this value, Max is this value.")]
 		public float rotationLimit = 20;
 		public float rootMass = 20;
 		[Tooltip("If your ragdoll seems unstable or uneffected by limits, try lowering this value.")]
@@ -200,7 +200,7 @@ namespace Spine.Unity.Examples {
 					Debug.LogWarning(msg);
 				}
 			}
-				
+
 			// Disable skeleton constraints.
 			if (disableIK) {
 				var ikConstraints = skeleton.IkConstraints;
@@ -263,7 +263,7 @@ namespace Spine.Unity.Examples {
 			isActive = false;
 			foreach (var t in boneTable.Values)
 				Destroy(t.gameObject);
-			
+
 			Destroy(ragdollRoot.gameObject);
 
 			boneTable.Clear();
@@ -298,7 +298,7 @@ namespace Spine.Unity.Examples {
 				if (length == 0) {
 					var ball = boneGameObject.AddComponent<SphereCollider>();
 					ball.radius = thickness * 0.5f;
-				} else {					
+				} else {
 					var box = boneGameObject.AddComponent<BoxCollider>();
 					box.size = new Vector3(length, thickness, thickness);
 					box.center = new Vector3(length * 0.5f, 0);
@@ -369,7 +369,7 @@ namespace Spine.Unity.Examples {
 			foreach (Slot s in skeleton.Slots) {
 				if (s.Bone == b) {
 					skin.GetAttachments(skeleton.Slots.IndexOf(s), skinEntries);
-					
+
 					foreach (var entry in skinEntries) {
 						var bbAttachment = entry.Attachment as BoundingBoxAttachment;
 						if (bbAttachment != null) {

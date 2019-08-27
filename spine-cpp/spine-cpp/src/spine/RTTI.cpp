@@ -52,14 +52,9 @@ bool RTTI::isExactly(const RTTI &rtti) const {
 
 bool RTTI::instanceOf(const RTTI &rtti) const {
 	const RTTI *pCompare = this;
-
 	while (pCompare) {
-		if (pCompare->_className == rtti._className) {
-			return true;
-		}
-
+		if (pCompare->_className == rtti._className) return true;
 		pCompare = pCompare->_pBaseRTTI;
 	}
-
 	return false;
 }

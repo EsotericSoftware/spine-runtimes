@@ -74,7 +74,7 @@ namespace Spine.Unity.Editor {
 					if (skeletonDataAsset != null) skeletonDataAssetsToReload.Add(skeletonDataAsset);
 				}
 
-				// Under some circumstances (e.g. on first import) SkeletonGraphic objects 
+				// Under some circumstances (e.g. on first import) SkeletonGraphic objects
 				// have their skeletonGraphic.skeletonDataAsset reference corrupted
 				// by the instance of the ScriptableObject being destroyed but still assigned.
 				// Here we save the skeletonGraphic.skeletonDataAsset asset path in order

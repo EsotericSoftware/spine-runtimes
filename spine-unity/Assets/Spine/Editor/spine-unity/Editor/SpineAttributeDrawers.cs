@@ -74,7 +74,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			// Handle multi-editing when instances don't use the same SkeletonDataAsset.
-			if (!SpineInspectorUtility.TargetsUseSameData(property.serializedObject)) { 
+			if (!SpineInspectorUtility.TargetsUseSameData(property.serializedObject)) {
 				EditorGUI.DelayedTextField(position, property, label);
 				return;
 			}
@@ -118,7 +118,7 @@ namespace Spine.Unity.Editor {
 				skeletonDataAsset = property.serializedObject.targetObject as SkeletonDataAsset;
 				if (skeletonDataAsset == null) return;
 			}
-				
+
 			position = EditorGUI.PrefixLabel(position, label);
 
 			Texture2D image = Icon;
@@ -136,7 +136,7 @@ namespace Spine.Unity.Editor {
 					return skeletonComponent;
 			} else {
 				var component = property.serializedObject.targetObject as Component;
-				if (component != null)					
+				if (component != null)
 					return component.GetComponentInChildren(typeof(ISkeletonComponent)) as ISkeletonComponent;
 			}
 
@@ -255,8 +255,8 @@ namespace Spine.Unity.Editor {
 					string choiceValue = TargetAttribute.defaultAsEmptyString && isDefault ? string.Empty : name;
 					menu.AddItem(new GUIContent(name), !property.hasMultipleDifferentValues && choiceValue == property.stringValue, HandleSelect, new SpineDrawerValuePair(choiceValue, property));
 				}
-					
-			}			
+
+			}
 		}
 
 	}
@@ -342,7 +342,7 @@ namespace Spine.Unity.Editor {
 						menu.AddItem(new GUIContent(name), !property.hasMultipleDifferentValues && name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
 					}
 				}
-					
+
 			}
 		}
 

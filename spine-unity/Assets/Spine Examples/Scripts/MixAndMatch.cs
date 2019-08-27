@@ -93,7 +93,7 @@ namespace Spine.Unity.Examples {
 
 			// Let's do this for the visor.
 			int visorSlotIndex = skeleton.FindSlotIndex(visorSlot); // You can access GetAttachment and SetAttachment via string, but caching the slotIndex is faster.
-			Attachment templateAttachment = templateSkin.GetAttachment(visorSlotIndex, visorKey);  // STEP 1.1
+			Attachment templateAttachment = templateSkin.GetAttachment(visorSlotIndex, visorKey); // STEP 1.1
 			Attachment newAttachment = templateAttachment.GetRemappedClone(visorSprite, sourceMaterial); // STEP 1.2 - 1.3
 			customSkin.SetAttachment(visorSlotIndex, visorKey, newAttachment); // STEP 1.4
 
@@ -127,7 +127,7 @@ namespace Spine.Unity.Examples {
 			} else {
 				skeleton.SetSkin(customSkin); // Just use the custom skin directly.
 			}
-				
+
 			skeleton.SetSlotsToSetupPose(); // Use the pose from setup pose.
 			skeletonAnimation.Update(0); // Use the pose in the currently active animation.
 

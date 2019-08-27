@@ -65,12 +65,12 @@ function PointAttachment:computeWorldRotation(bone)
 end
 
 function PointAttachment:copy ()
-  local copy = PointAttachment.new(self.name)
-  copy.x = self.x
-  copy.y = self.y
-  copy.rotation = self.rotation
-  copy.color:setFrom(self.color)
-  return copy
+	local copy = PointAttachment.new(self.name)
+	copy.x = self.x
+	copy.y = self.y
+	copy.rotation = self.rotation
+	copy.color:setFrom(self.color)
+	return copy
 end
 
 return PointAttachment

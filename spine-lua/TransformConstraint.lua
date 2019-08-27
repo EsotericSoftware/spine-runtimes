@@ -55,7 +55,7 @@ function TransformConstraint.new (data, skeleton)
 		target = nil,
 		rotateMix = data.rotateMix, translateMix = data.translateMix, scaleMix = data.scaleMix, shearMix = data.shearMix,
 		temp = { 0, 0 },
-    active = false
+		active = false
 	}
 	setmetatable(self, TransformConstraint)
 
@@ -169,7 +169,7 @@ function TransformConstraint:applyAbsoluteWorld ()
 			bone.d = math_sin(r) * s
 			modified = true
 		end
-		
+
 		if modified then bone.appliedValid = false end
 	end
 end
@@ -191,7 +191,7 @@ function TransformConstraint:applyRelativeWorld ()
 	local bones = self.bones
 	for _, bone in ipairs(bones) do
 		local modified = false
-		
+
 		if rotateMix ~= 0 then
 			local a = bone.a
 			local b = bone.b
@@ -248,7 +248,7 @@ function TransformConstraint:applyRelativeWorld ()
 			bone.d = math_sin(r) * s
 			modified = true
 		end
-		
+
 		if modified then bone.appliedValid = false end
 	end
 end
@@ -264,7 +264,7 @@ function TransformConstraint:applyAbsoluteLocal ()
 	for _, bone in ipairs(bones) do
 		local modified = false
 		if not bone.appliedValid then bone:updateAppliedTransform() end
-		
+
 		local rotation = bone.arotation
 		if rotateMix ~= 0 then
 			local r = target.arotation - rotation + self.data.offsetRotation
@@ -305,7 +305,7 @@ function TransformConstraint:applyRelativeLocal ()
 	local rotateMix = self.rotateMix
 	local translateMix = self.translateMix
 	local scaleMix = self.scaleMix
-	local shearMix = self.shearMix	
+	local shearMix = self.shearMix
 	local target = self.target
 	if not target.appliedValid then target:updateAppliedTransform() end
 	local bones = self.bones

@@ -35,7 +35,7 @@ using System.Collections.Generic;
 using Spine.Unity;
 
 namespace Spine.Unity.Playables {
-	
+
 	[TrackColor(0.855f, 0.8623f, 0.87f)]
 	[TrackClipType(typeof(SpineSkeletonFlipClip))]
 	[TrackBindingType(typeof(SpinePlayableHandleBase))]

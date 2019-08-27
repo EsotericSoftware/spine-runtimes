@@ -59,28 +59,28 @@ function SkeletonBounds:update (skeleton, updateAabb)
 	local slots = skeleton.slots
 
 	for _,slot in ipairs(skeleton.slots) do
-    if (slot.bone.active) then
-      local attachment = slot.attachment
-      if attachment and attachment.type == AttachmentType.boundingbox then
-        local boundingBox = attachment
-        table_insert(boundingBoxes, boundingBox)
+		if (slot.bone.active) then
+			local attachment = slot.attachment
+			if attachment and attachment.type == AttachmentType.boundingbox then
+				local boundingBox = attachment
+				table_insert(boundingBoxes, boundingBox)
 
-        local polygon = {}
-        table_insert(polygons, polygon)
+				local polygon = {}
+				table_insert(polygons, polygon)
 
-        boundingBox:computeWorldVertices(slot, 0, boundingBox.worldVerticesLength, polygon, 0, 2)
-      end
-    end
+				boundingBox:computeWorldVertices(slot, 0, boundingBox.worldVerticesLength, polygon, 0, 2)
+			end
+		end
 	end
 
-	if updateAabb then 
-    self:aabbCompute()
-  else
-    self.minX = 9999999
-    self.minY = 9999999
-    self.maxX = -9999999
-    self.maxY = -9999999
-  end
+	if updateAabb then
+		self:aabbCompute()
+	else
+		self.minX = 9999999
+		self.minY = 9999999
+		self.maxX = -9999999
+		self.maxY = -9999999
+	end
 end
 
 function SkeletonBounds:aabbCompute ()

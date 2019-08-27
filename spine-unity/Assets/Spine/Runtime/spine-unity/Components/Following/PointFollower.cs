@@ -69,7 +69,7 @@ namespace Spine.Unity {
 			if (!valid)
 				return;
 
-			UpdateReferences();	
+			UpdateReferences();
 
 			#if UNITY_EDITOR
 			if (Application.isEditor) LateUpdate();

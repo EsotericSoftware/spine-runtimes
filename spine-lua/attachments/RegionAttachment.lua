@@ -85,7 +85,7 @@ local C4A = 32
 local RegionAttachment = {}
 RegionAttachment.__index = RegionAttachment
 setmetatable(RegionAttachment, { __index = Attachment })
- 
+
 RegionAttachment.OX1 = 1
 RegionAttachment.OY1 = 2
 RegionAttachment.OX2 = 3
@@ -243,8 +243,8 @@ function RegionAttachment:computeWorldVertices (bone, worldVertices, offset, str
 end
 
 function RegionAttachment:copy ()
-  local copy = RegionAttachment.new(self.name)
-  copy.x = self.x
+	local copy = RegionAttachment.new(self.name)
+	copy.x = self.x
 	copy.y = self.y
 	copy.scaleX = self.scaleX
 	copy.scaleY = self.scaleY
@@ -258,7 +258,7 @@ function RegionAttachment:copy ()
 	copy.offset = Utils.copy(self.offset)
 	copy.uvs = Utils.copy(self.uvs)
 	copy.tempColor:setFrom(self.tempColor)
-  return copy
+	return copy
 end
 
 return RegionAttachment

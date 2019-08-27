@@ -40,7 +40,7 @@ namespace Spine.Unity.Examples {
 
 		MaterialPropertyBlock mpb;
 		float timeToNextColor = 0;
-		
+
 		void Start () {
 			mpb = new MaterialPropertyBlock();
 		}
