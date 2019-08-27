@@ -815,12 +815,12 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 			float alpha;
 			switch (timelineMode[i] & (NotLast - 1)) {
 				case Subsequent:
+					timelineBlend = blend;
 					if (!attachments && (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))) {
 						if ((timelineMode[i] & NotLast) == NotLast) continue;
-						blend = MixBlend_Setup;
+						timelineBlend = MixBlend_Setup;
 					}
 					if (!drawOrder && (timeline->getRTTI().isExactly(DrawOrderTimeline::rtti))) continue;
-					timelineBlend = blend;
 					alpha = alphaMix;
 					break;
 				case First:

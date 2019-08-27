@@ -246,13 +246,13 @@ package spine.animation {
 					var timelineBlend: MixBlend;
 					var alpha : Number = 0;
 					switch (timelineMode[i] & (NOT_LAST - 1)) {
-					case SUBSEQUENT:						
+					case SUBSEQUENT:
+						timelineBlend = blend;
 						if (!attachments && timeline is AttachmentTimeline) {
 							if ((timelineMode[i] & NOT_LAST) == NOT_LAST) continue;
-							blend = MixBlend.setup;
+							timelineBlend = MixBlend.setup;
 						}
 						if (!drawOrder && timeline is DrawOrderTimeline) continue;
-						timelineBlend = blend;
 						alpha = alphaMix;
 						break;
 					case FIRST:

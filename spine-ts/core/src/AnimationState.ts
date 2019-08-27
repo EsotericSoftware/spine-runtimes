@@ -235,12 +235,12 @@ module spine {
 					let alpha = 0;
 					switch (timelineMode[i] & (AnimationState.NOT_LAST - 1)) {
 					case AnimationState.SUBSEQUENT:
+						timelineBlend = blend;
 						if (!attachments && timeline instanceof AttachmentTimeline) {
 							if ((timelineMode[i] & AnimationState.NOT_LAST) == AnimationState.NOT_LAST) continue;
-							blend = MixBlend.setup;
+							timelineBlend = MixBlend.setup;
 						}
 						if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
-						timelineBlend = blend;
 						alpha = alphaMix;
 						break;
 					case AnimationState.FIRST:

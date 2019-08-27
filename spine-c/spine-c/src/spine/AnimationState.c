@@ -468,12 +468,12 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 
 			switch (timelineMode->items[i] & (NOT_LAST - 1)) {
 				case SUBSEQUENT:
+					timelineBlend = blend;
 					if (!attachments && timeline->type == SP_TIMELINE_ATTACHMENT) {
 						if ((timelineMode->items[i] & NOT_LAST) == NOT_LAST) continue;
-						blend = SP_MIX_BLEND_SETUP;
+						timelineBlend = SP_MIX_BLEND_SETUP;
 					}
 					if (!drawOrder && timeline->type == SP_TIMELINE_DRAWORDER) continue;
-					timelineBlend = blend;
 					alpha = alphaMix;
 					break;
 				case FIRST:
