@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-using Spine;
+using CompatibilityProblemInfo = Spine.Unity.SkeletonDataCompatibility.CompatibilityProblemInfo;
 
 namespace Spine.Unity {
 
@@ -114,26 +114,26 @@ namespace Spine.Unity {
 				Clear();
 				return null;
 			}
-
+			
 			// Disabled to support attachmentless/skinless SkeletonData.
-//			if (atlasAssets == null) {
-//				atlasAssets = new AtlasAsset[0];
-//				if (!quiet)
-//					Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
-//				Clear();
-//				return null;
-//			}
-//			#if !SPINE_TK2D
-//			if (atlasAssets.Length == 0) {
-//				Clear();
-//				return null;
-//			}
-//			#else
-//			if (atlasAssets.Length == 0 && spriteCollection == null) {
-//				Clear();
-//				return null;
-//			}
-//			#endif
+			//			if (atlasAssets == null) {
+			//				atlasAssets = new AtlasAsset[0];
+			//				if (!quiet)
+			//					Debug.LogError("Atlas not set for SkeletonData asset: " + name, this);
+			//				Clear();
+			//				return null;
+			//			}
+			//			#if !SPINE_TK2D
+			//			if (atlasAssets.Length == 0) {
+			//				Clear();
+			//				return null;
+			//			}
+			//			#else
+			//			if (atlasAssets.Length == 0 && spriteCollection == null) {
+			//				Clear();
+			//				return null;
+			//			}
+			//			#endif
 
 			if (skeletonData != null)
 				return skeletonData;
@@ -162,6 +162,17 @@ namespace Spine.Unity {
 
 			bool isBinary = skeletonJSON.name.ToLower().Contains(".skel");
 			SkeletonData loadedSkeletonData;
+
+			#if UNITY_EDITOR
+			if (skeletonJSON) {
+				SkeletonDataCompatibility.VersionInfo fileVersion = SkeletonDataCompatibility.GetVersionInfo(skeletonJSON);
+				CompatibilityProblemInfo compatibilityProblemInfo = SkeletonDataCompatibility.GetCompatibilityProblemInfo(fileVersion);
+				if (compatibilityProblemInfo != null) {
+					SkeletonDataCompatibility.DisplayCompatibilityProblem(compatibilityProblemInfo.DescriptionString(), skeletonJSON);
+					return null;
+				}
+			}
+			#endif
 
 			try {
 				if (isBinary)
