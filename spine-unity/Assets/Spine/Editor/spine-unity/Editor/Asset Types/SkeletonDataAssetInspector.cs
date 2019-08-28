@@ -40,7 +40,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-using Spine;
+using CompatibilityProblemInfo = Spine.Unity.SkeletonDataCompatibility.CompatibilityProblemInfo;
 
 namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
@@ -69,6 +69,7 @@ namespace Spine.Unity.Editor {
 		SkeletonData targetSkeletonData;
 
 		readonly List<string> warnings = new List<string>();
+		CompatibilityProblemInfo compatibilityProblemInfo = null;
 		readonly SkeletonInspectorPreview preview = new SkeletonInspectorPreview();
 
 		GUIStyle activePlayButtonStyle, idlePlayButtonStyle;
@@ -140,9 +141,9 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
-			targetSkeletonData = warnings.Count == 0 ? targetSkeletonDataAsset.GetSkeletonData(false) : null;
+			targetSkeletonData = NoProblems() ? targetSkeletonDataAsset.GetSkeletonData(false) : null;
 
-			if (targetSkeletonData != null && warnings.Count <= 0) {
+			if (targetSkeletonData != null && NoProblems()) {
 				preview.Initialize(this.Repaint, targetSkeletonDataAsset, this.LastSkinName);
 			}
 
@@ -174,11 +175,14 @@ namespace Spine.Unity.Editor {
 			// Header
 			EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(target.name + " (SkeletonDataAsset)", Icons.spine), EditorStyles.whiteLargeLabel);
 			if (targetSkeletonData != null) EditorGUILayout.LabelField("(Drag and Drop to instantiate.)", EditorStyles.miniLabel);
-
+			
 			// Main Serialized Fields
 			using (var changeCheck = new EditorGUI.ChangeCheckScope()) {
 				using (new SpineInspectorUtility.BoxScope())
 					DrawSkeletonDataFields();
+
+				if (compatibilityProblemInfo != null)
+					return;
 
 				using (new SpineInspectorUtility.BoxScope()) {
 					DrawAtlasAssetsFields();
@@ -197,11 +201,11 @@ namespace Spine.Unity.Editor {
 					}
 				}
 			}
-
+			
 			// Unity Quirk: Some code depends on valid preview. If preview is initialized elsewhere, this can cause contents to change between Layout and Repaint events, causing GUILayout control count errors.
-			if (warnings.Count <= 0)
+			if (NoProblems())
 				preview.Initialize(this.Repaint, targetSkeletonDataAsset, this.LastSkinName);
-
+			
 			if (targetSkeletonData != null) {
 				GUILayout.Space(20f);
 
@@ -317,6 +321,12 @@ namespace Spine.Unity.Editor {
 				}
 			}
 			EditorGUILayout.PropertyField(skeletonJSON, SpineInspectorUtility.TempContent(skeletonJSON.displayName, Icons.spine));
+
+			if (compatibilityProblemInfo != null) {
+				EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(compatibilityProblemInfo.DescriptionString(), Icons.warning), GUILayout.Height(52));
+				return;
+			}
+
 			EditorGUILayout.DelayedFloatField(scale); //EditorGUILayout.PropertyField(scale);
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(skeletonDataModifiers, true);
@@ -581,12 +591,14 @@ namespace Spine.Unity.Editor {
 
 		void PopulateWarnings () {
 			warnings.Clear();
+			compatibilityProblemInfo = null;
 
 			if (skeletonJSON.objectReferenceValue == null) {
 				warnings.Add("Missing Skeleton JSON");
 			} else {
 				var fieldValue = (TextAsset)skeletonJSON.objectReferenceValue;
-				if (!AssetUtility.IsSpineData(fieldValue)) {
+				
+				if (!AssetUtility.IsSpineData(fieldValue, out compatibilityProblemInfo)) {
 					warnings.Add("Skeleton data file is not a valid Spine JSON or binary file.");
 				} else {
 					#if SPINE_TK2D
@@ -657,6 +669,10 @@ namespace Spine.Unity.Editor {
 			EditorPrefs.SetString(LastSkinKey, skinName);
 		}
 
+		bool NoProblems() {
+			return warnings.Count == 0 && compatibilityProblemInfo == null;
+		}
+
 		#region Preview Handlers
 		void HandleOnDestroyPreview () {
 			EditorApplication.update -= preview.HandleEditorUpdate;
@@ -677,7 +693,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		override public void OnInteractivePreviewGUI (Rect r, GUIStyle background) {
-			if (warnings.Count <= 0) {
+			if (NoProblems()) {
 				preview.Initialize(this.Repaint, targetSkeletonDataAsset, this.LastSkinName);
 				preview.HandleInteractivePreviewGUI(r, background);
 			}
