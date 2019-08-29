@@ -151,9 +151,12 @@ namespace Spine.Unity.Editor {
 
 		public static void IssueWarningsForUnrecommendedTextureSettings() {
 
-			string[] atlasDescriptionGUIDs = AssetDatabase.FindAssets("t:textasset .atlas"); // Note: finds .atlas.txt files
+			string[] atlasDescriptionGUIDs = AssetDatabase.FindAssets("t:textasset .atlas"); // Note: finds ".atlas.txt" but also ".atlas 1.txt" files.
 			for (int i = 0; i < atlasDescriptionGUIDs.Length; ++i) {
 				string atlasDescriptionPath = AssetDatabase.GUIDToAssetPath(atlasDescriptionGUIDs[i]);
+				if (!atlasDescriptionPath.EndsWith(".atlas.txt"))
+					continue;
+
 				string texturePath = atlasDescriptionPath.Replace(".atlas.txt", ".png");
 
 				bool textureExists = IssueWarningsForUnrecommendedTextureSettings(texturePath);
