@@ -41,7 +41,8 @@ namespace Spine.Unity {
 
 		public static readonly string kPMANotSupportedLinearMessage =
 			"Warning: Premultiply-alpha atlas textures not supported in Linear color space!\n\nPlease\n"
-			+ "a) re-export atlas as straight alpha texture with 'premultiply alpha' unchecked or\n"
+			+ "a) re-export atlas as straight alpha texture with 'premultiply alpha' unchecked\n"
+			+ "   (if you have already done this, please set the 'Straight Alpha Texture' Material parameter to 'true') or\n"
 			+ "b) switch to Gamma color space via\nProject Settings - Player - Other Settings - Color Space.\n";
 		public static readonly string kZSpacingRequiredMessage =
 			"Warning: Z Spacing required on selected shader! Otherwise you will receive incorrect results.\n\nPlease\n"
