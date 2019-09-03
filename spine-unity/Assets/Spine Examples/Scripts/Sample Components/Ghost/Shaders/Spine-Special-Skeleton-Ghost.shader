@@ -56,7 +56,7 @@ Shader "Spine/Special/SkeletonGhost" {
 			    return o;
 			}
 
-			fixed4 frag (VertexOutput i) : COLOR {
+			fixed4 frag (VertexOutput i) : SV_Target {
 			    fixed4 tc = tex2D(_MainTex, i.uv);
 				tc = fixed4(max(_TextureFade, tc.r), max(_TextureFade, tc.g), max(_TextureFade, tc.b), tc.a);
 				return tc * ((i.color * _Color) * tc.a);
