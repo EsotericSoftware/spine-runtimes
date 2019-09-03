@@ -53,7 +53,7 @@ Shader "Spine/Special/Skeleton Grayscale" {
 				return o;
 			}
 
-			float4 frag (VertexOutput i) : COLOR {
+			float4 frag (VertexOutput i) : SV_Target {
 				float4 rawColor = tex2D(_MainTex,i.uv);
 				float finalAlpha = (rawColor.a * i.vertexColor.a);
 
