@@ -112,7 +112,7 @@ namespace Spine.Unity {
 
 			string primaryRuntimeVersionDebugString = compatibleBinaryVersions[0][0] + "." + compatibleBinaryVersions[0][1];
 			if (string.IsNullOrEmpty(fileVersion.rawVersion)) {
-				Debug.LogWarningFormat("Skeleton '{0}' has no version information. It is incompatible with your runtime version: spine-unity v{1}", asset.name, primaryRuntimeVersionDebugString);
+				// very likely not a Spine skeleton json file at all.
 				return null;
 			}
 
@@ -129,14 +129,14 @@ namespace Spine.Unity {
 		}
 
 		public static CompatibilityProblemInfo GetCompatibilityProblemInfo (VersionInfo fileVersion) {
+			if (fileVersion == null)
+				return null;
+
 			CompatibilityProblemInfo info = new CompatibilityProblemInfo();
 			info.actualVersion = fileVersion;
 			info.compatibleVersions = (fileVersion.sourceType == SourceType.Binary) ? compatibleBinaryVersions
 				: compatibleJsonVersions;
-
-			if (fileVersion == null)
-				return info;
-
+			
 			foreach (var compatibleVersion in info.compatibleVersions) {
 				bool majorMatch = fileVersion.version[0] == compatibleVersion[0];
 				bool minorMatch = fileVersion.version[1] == compatibleVersion[1];
