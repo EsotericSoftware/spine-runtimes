@@ -180,13 +180,11 @@ namespace Spine {
 			internal static readonly SkinEntryComparer Instance = new SkinEntryComparer();
 
 			bool IEqualityComparer<SkinEntry>.Equals (SkinEntry e1, SkinEntry e2) {
-				if (e1.SlotIndex != e2.SlotIndex) return false;
-				if (!string.Equals(e1.Name, e2.Name, StringComparison.Ordinal)) return false;
-				return true;
+				return e1.hashCode == e2.hashCode;
 			}
 
 			int IEqualityComparer<SkinEntry>.GetHashCode (SkinEntry e) {
-				return e.Name.GetHashCode() + e.SlotIndex * 37;
+				return e.hashCode;
 			}
 		}
 	}
