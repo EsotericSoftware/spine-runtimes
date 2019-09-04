@@ -119,6 +119,7 @@ namespace Spine.Unity {
 					return;
 				}
 			}
+			if (!bone.Active) return;
 
 			var thisTransform = cachedTransform;
 			float skeletonFlipRotation = Mathf.Sign(skeleton.ScaleX * skeleton.ScaleY);
