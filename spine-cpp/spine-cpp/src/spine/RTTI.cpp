@@ -32,17 +32,16 @@
 #endif
 
 #include <spine/RTTI.h>
-#include <spine/SpineString.h>
 
 using namespace spine;
 
-RTTI::RTTI(const std::string &className) : _className(className), _pBaseRTTI(NULL) {
+RTTI::RTTI(const StringImpl &className) : _className(className), _pBaseRTTI(NULL) {
 }
 
-RTTI::RTTI(const std::string &className, const RTTI &baseRTTI) : _className(className), _pBaseRTTI(&baseRTTI) {
+RTTI::RTTI(const StringImpl &className, const RTTI &baseRTTI) : _className(className), _pBaseRTTI(&baseRTTI) {
 }
 
-const std::string &RTTI::getClassName() const {
+const StringImpl &RTTI::getClassName() const {
 	return _className;
 }
 
