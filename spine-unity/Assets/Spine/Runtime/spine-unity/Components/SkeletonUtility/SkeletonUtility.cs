@@ -70,6 +70,10 @@ namespace Spine.Unity {
 
 		public static PolygonCollider2D AddBoundingBoxGameObject (string name, BoundingBoxAttachment box, Slot slot, Transform parent, bool isTrigger = true) {
 			var go = new GameObject("[BoundingBox]" + (string.IsNullOrEmpty(name) ? box.Name : name));
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+				UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Spawn BoundingBox");
+# endif
 			var got = go.transform;
 			got.parent = parent;
 			got.localPosition = Vector3.zero;
@@ -145,7 +149,7 @@ namespace Spine.Unity {
 			OnDisable();
 			OnEnable();
 		}
-
+		
 		void OnEnable () {
 			if (skeletonRenderer == null) {
 				skeletonRenderer = GetComponent<SkeletonRenderer>();
@@ -291,6 +295,10 @@ namespace Spine.Unity {
 				return boneRoot;
 
 			boneRoot = new GameObject("SkeletonUtility-SkeletonRoot").transform;
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+				UnityEditor.Undo.RegisterCreatedObjectUndo(boneRoot.gameObject, "Spawn Bone");
+#endif
 			boneRoot.parent = transform;
 			boneRoot.localPosition = Vector3.zero;
 			boneRoot.localRotation = Quaternion.identity;
@@ -330,6 +338,10 @@ namespace Spine.Unity {
 
 		public GameObject SpawnBone (Bone bone, Transform parent, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
 			GameObject go = new GameObject(bone.Data.Name);
+		#if UNITY_EDITOR
+			if (!Application.isPlaying)
+				UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Spawn Bone");
+		#endif
 			var goTransform = go.transform;
 			goTransform.parent = parent;
 

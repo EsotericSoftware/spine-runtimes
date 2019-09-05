@@ -143,21 +143,25 @@ namespace Spine.Unity.Editor {
 		}
 
 		void SpawnFollowHierarchy () {
+			Undo.RegisterCompleteObjectUndo(skeletonUtility, "Spawn Hierarchy");
 			Selection.activeGameObject = skeletonUtility.SpawnHierarchy(SkeletonUtilityBone.Mode.Follow, true, true, true);
 			AttachIconsToChildren(skeletonUtility.boneRoot);
 		}
 
 		void SpawnFollowHierarchyRootOnly () {
+			Undo.RegisterCompleteObjectUndo(skeletonUtility, "Spawn Root");
 			Selection.activeGameObject = skeletonUtility.SpawnRoot(SkeletonUtilityBone.Mode.Follow, true, true, true);
 			AttachIconsToChildren(skeletonUtility.boneRoot);
 		}
 
 		void SpawnOverrideHierarchy () {
+			Undo.RegisterCompleteObjectUndo(skeletonUtility, "Spawn Hierarchy");
 			Selection.activeGameObject = skeletonUtility.SpawnHierarchy(SkeletonUtilityBone.Mode.Override, true, true, true);
 			AttachIconsToChildren(skeletonUtility.boneRoot);
 		}
 
 		void SpawnOverrideHierarchyRootOnly () {
+			Undo.RegisterCompleteObjectUndo(skeletonUtility, "Spawn Root");
 			Selection.activeGameObject = skeletonUtility.SpawnRoot(SkeletonUtilityBone.Mode.Override, true, true, true);
 			AttachIconsToChildren(skeletonUtility.boneRoot);
 		}
