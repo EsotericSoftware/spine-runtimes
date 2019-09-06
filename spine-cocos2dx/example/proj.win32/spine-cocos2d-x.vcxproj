@@ -153,7 +153,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\..\..\spine-cpp\spine-cpp\src\spine\BoundingBoxAttachment.cpp" />
     <ClCompile Include="..\..\..\spine-cpp\spine-cpp\src\spine\ClippingAttachment.cpp" />
     <ClCompile Include="..\..\..\spine-cpp\spine-cpp\src\spine\ColorTimeline.cpp" />
-    <ClCompile Include="..\..\..\spine-cpp\spine-cpp\src\spine\Constraint.cpp" />
+    <ClCompile Include="..\..\..\spine-cpp\spine-cpp\src\spine\ConstraintData.cpp" />
     <ClCompile Include="..\..\..\spine-cpp\spine-cpp\src\spine\CurveTimeline.cpp" />
     <ClCompile Include="..\..\..\spine-cpp\spine-cpp\src\spine\DeformTimeline.cpp" />
     <ClCompile Include="..\..\..\spine-cpp\spine-cpp\src\spine\DrawOrderTimeline.cpp" />
@@ -211,6 +211,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\BatchingExample.cpp" />
     <ClCompile Include="..\Classes\CoinExample.cpp" />
     <ClCompile Include="..\Classes\GoblinsExample.cpp" />
+    <ClCompile Include="..\Classes\MixAndMatchExample.cpp" />
     <ClCompile Include="..\Classes\RaptorExample.cpp" />
     <ClCompile Include="..\Classes\SkeletonRendererSeparatorExample.cpp" />
     <ClCompile Include="..\Classes\SpineboyExample.cpp" />
@@ -234,7 +235,6 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\ClippingAttachment.h" />
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\Color.h" />
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\ColorTimeline.h" />
-    <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\Constraint.h" />
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\ContainerUtil.h" />
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\CurveTimeline.h" />
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\Debug.h" />
@@ -309,6 +309,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\BatchingExample.h" />
     <ClInclude Include="..\Classes\CoinExample.h" />
     <ClInclude Include="..\Classes\GoblinsExample.h" />
+    <ClInclude Include="..\Classes\MixAndMatchExample.h" />
     <ClInclude Include="..\Classes\RaptorExample.h" />
     <ClInclude Include="..\Classes\SkeletonRendererSeparatorExample.h" />
     <ClInclude Include="..\Classes\SpineboyExample.h" />
