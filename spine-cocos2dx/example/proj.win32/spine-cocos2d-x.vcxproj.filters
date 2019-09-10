@@ -78,9 +78,6 @@
     <ClCompile Include="..\..\..\spine-cpp\spine-cpp\src\spine\ColorTimeline.cpp">
       <Filter>spine</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\spine-cpp\spine-cpp\src\spine\Constraint.cpp">
-      <Filter>spine</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\spine-cpp\spine-cpp\src\spine\CurveTimeline.cpp">
       <Filter>spine</Filter>
     </ClCompile>
@@ -246,6 +243,12 @@
     <ClCompile Include="..\Classes\TankExample.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\spine-cpp\spine-cpp\src\spine\ConstraintData.cpp">
+      <Filter>spine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\MixAndMatchExample.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -342,9 +345,6 @@
       <Filter>spine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\ColorTimeline.h">
-      <Filter>spine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\Constraint.h">
       <Filter>spine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\ContainerUtil.h">
@@ -535,6 +535,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\Vertices.h">
       <Filter>spine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\MixAndMatchExample.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
