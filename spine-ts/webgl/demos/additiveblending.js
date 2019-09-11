@@ -17,7 +17,7 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 	var left, right, up, down;
 	var cursor;
 
-	var clientMouseX = 0, clientMouseY = 0;
+	var clientMouseX = 0, clientMouseY = 0, mouseMoved;
 
 	var DEMO_NAME = "AdditiveBlendingDemo";
 
@@ -53,21 +53,18 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 		state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 
 		state.setAnimation(0, "idle", true);
-		left = state.setAnimation(1, "blink", true);
-
+		state.setAnimation(1, "blink", true);
 		left = state.setAnimation(2, "left", true);
 		right = state.setAnimation(3, "right", true);
 		up = state.setAnimation(4, "up", true);
 		down = state.setAnimation(5, "down", true);
-
-
 		left.mixBlend = spine.MixBlend.add;
-		left.alpha = 0;
 		right.mixBlend = spine.MixBlend.add;
-		right.alpha = 0;
 		up.mixBlend = spine.MixBlend.add;
-		up.alpha = 0;
 		down.mixBlend = spine.MixBlend.add;
+		left.alpha = 0;
+		right.alpha = 0;
+		up.alpha = 0;
 		down.alpha = 0;
 
 		state.apply(skeleton);
@@ -86,21 +83,13 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 	}
 
 	function calculateBlend (x, y, isPageCoords) {
-		if (isPageCoords) {
-			var canvasBounds = canvas.getBoundingClientRect();
-			x = Math.max(0, Math.min(canvasBounds.width, x - canvasBounds.x));
-			y = Math.max(0, Math.min(canvasBounds.height, y - canvasBounds.y));
-		}
-		x = x / canvas.width;
-		y = y / canvas.height;
-		if (x > 1) x = 1;
-		if (x < 0) x = 0;
-		if (y > 1) y = 1;
-		if (y < 0) y = 0;
-		left.alpha = (Math.max(x, 0.5) - 0.5) * 2;
-		right.alpha = (0.5 - Math.min(x, 0.5)) * 2;
-		up.alpha = (0.5 - Math.min(y, 0.5)) * 2;
-		down.alpha = (Math.max(y, 0.5) - 0.5) * 2;
+		var canvasBounds = canvas.getBoundingClientRect();
+		var centerX = canvasBounds.x + canvasBounds.width / 2;
+		var centerY = canvasBounds.y + canvasBounds.height / 2;
+		right.alpha = x < centerX ? 1 - x / centerX : 0;
+		left.alpha = x > centerX ? (x - centerX) / (window.innerWidth - centerX): 0;
+		up.alpha = y < centerY ? 1 - y / centerY : 0;
+		down.alpha = y > centerY ? (y - centerY) / (window.innerHeight - centerY): 0;
 	}
 
 	function setupInput () {
@@ -108,6 +97,7 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 			document.addEventListener("mousemove", function (event) {
 				clientMouseX = event.clientX;
 				clientMouseY = event.clientY;
+				mouseMoved = true;
 			}, false);
 		} else {
 			var input = new spine.webgl.Input(canvas);
@@ -134,9 +124,7 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 	}
 
 	function render () {
-		if (!isMobileDevice()) {
-			calculateBlend(clientMouseX, clientMouseY, true);
-		}
+		if (!isMobileDevice() && mouseMoved) calculateBlend(clientMouseX, clientMouseY, true);
 
 		timeKeeper.update();
 		var delta = timeKeeper.delta;

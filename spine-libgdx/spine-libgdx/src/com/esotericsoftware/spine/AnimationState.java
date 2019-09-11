@@ -291,12 +291,12 @@ public class AnimationState {
 				float alpha;
 				switch (timelineMode[i] & NOT_LAST - 1) {
 				case SUBSEQUENT:
+					timelineBlend = blend;
 					if (!attachments && timeline instanceof AttachmentTimeline) {
 						if ((timelineMode[i] & NOT_LAST) == NOT_LAST) continue;
-						blend = MixBlend.setup;
+						timelineBlend = MixBlend.setup;
 					}
 					if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
-					timelineBlend = blend;
 					alpha = alphaMix;
 					break;
 				case FIRST:
@@ -695,7 +695,7 @@ public class AnimationState {
 		entry.next = null;
 	}
 
-	private void animationsChanged () {
+	void animationsChanged () {
 		animationsChanged = false;
 
 		// Process in the order that animations are applied.

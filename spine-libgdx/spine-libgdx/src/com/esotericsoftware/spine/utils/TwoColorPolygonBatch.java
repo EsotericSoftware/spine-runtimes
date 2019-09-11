@@ -1460,11 +1460,11 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 			+ "\n" //
 			+ "void main()\n" //
 			+ "{\n" //
-			+ "   v_light = a_light;\n" //
-			+ "   v_light.a = v_light.a * (255.0/254.0);\n" //
-			+ "   v_dark = a_dark;\n" //
-			+ "   v_texCoords = a_texCoord0;\n" //
-			+ "   gl_Position =  u_projTrans * a_position;\n" //
+			+ "  v_light = a_light;\n" //
+			+ "  v_light.a = v_light.a * (255.0/254.0);\n" //
+			+ "  v_dark = a_dark;\n" //
+			+ "  v_texCoords = a_texCoord0;\n" //
+			+ "  gl_Position = u_projTrans * a_position;\n" //
 			+ "}\n";
 		String fragmentShader = "#ifdef GL_ES\n" //
 			+ "#define LOWP lowp\n" //

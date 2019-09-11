@@ -434,7 +434,8 @@ namespace spine {
 
 			const cocos2d::Color4B color4B = ColorToColor4B(color);
 			const cocos2d::Color4B darkColor4B = ColorToColor4B(darkColor);
-			const BlendFunc blendFunc = makeBlendFunc(slot->getData().getBlendMode(), _premultipliedAlpha);
+			const BlendFunc blendFunc = makeBlendFunc(slot->getData().getBlendMode(), attachmentVertices->_texture->hasPremultipliedAlpha());
+			_blendFunc = blendFunc;
 
 			if (hasSingleTint) {
 				if (_clipper->isClipping()) {

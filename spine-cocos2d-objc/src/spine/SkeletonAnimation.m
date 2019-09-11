@@ -32,12 +32,12 @@
 #import <spine/extension.h>
 
 typedef struct _TrackEntryListeners {
-    spStartListener startListener;
-    spInterruptListener interruptListener;
-    spEndListener endListener;
-    spDisposeListener disposeListener;
-    spCompleteListener completeListener;
-    spEventListener eventListener;
+	spStartListener startListener;
+	spInterruptListener interruptListener;
+	spEndListener endListener;
+	spDisposeListener disposeListener;
+	spCompleteListener completeListener;
+	spEventListener eventListener;
 } _TrackEntryListeners;
 
 static void animationCallback (spAnimationState* state, spEventType type, spTrackEntry* entry, spEvent* event) {
@@ -46,16 +46,16 @@ static void animationCallback (spAnimationState* state, spEventType type, spTrac
 
 void trackEntryCallback (spAnimationState* state, spEventType type, spTrackEntry* entry, spEvent* event) {
 	[(SkeletonAnimation*)state->rendererObject onTrackEntryEvent:entry type:type event:event];
-    if (type == SP_ANIMATION_DISPOSE) {
-        if (entry->rendererObject) {
-            _TrackEntryListeners* listeners = (_TrackEntryListeners*)entry->rendererObject;
-            [listeners->startListener release];
-            [listeners->endListener release];
-            [listeners->completeListener release];
-            [listeners->eventListener release];
-            FREE(listeners);
-        }
-    }
+	if (type == SP_ANIMATION_DISPOSE) {
+		if (entry->rendererObject) {
+			_TrackEntryListeners* listeners = (_TrackEntryListeners*)entry->rendererObject;
+			[listeners->startListener release];
+			[listeners->endListener release];
+			[listeners->completeListener release];
+			[listeners->eventListener release];
+			FREE(listeners);
+		}
+	}
 }
 
 static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
@@ -95,7 +95,7 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 
 - (void) initialize {
 	_ownsAnimationStateData = true;
-    _timeScale = 1;
+	_timeScale = 1;
 
 	_state = spAnimationState_create(spAnimationStateData_create(_skeleton->data));
 	_state->rendererObject = self;
@@ -136,9 +136,9 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 	spAnimationState_dispose(_state);
 
 	[_startListener release];
-    [_interruptListener release];
+	[_interruptListener release];
 	[_endListener release];
-    [_disposeListener release];
+	[_disposeListener release];
 	[_completeListener release];
 	[_eventListener release];
 
@@ -204,17 +204,17 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 	case SP_ANIMATION_START:
 		if (_startListener) _startListener(entry);
 		break;
-    case SP_ANIMATION_INTERRUPT:
-        if (_interruptListener) _interruptListener(entry);
-        break;
+	case SP_ANIMATION_INTERRUPT:
+		if (_interruptListener) _interruptListener(entry);
+		break;
 	case SP_ANIMATION_END:
 		if (_endListener) _endListener(entry);
 		break;
-    case SP_ANIMATION_DISPOSE:
-        if (_disposeListener) _disposeListener(entry);
-        break;
+	case SP_ANIMATION_DISPOSE:
+		if (_disposeListener) _disposeListener(entry);
+		break;
 	case SP_ANIMATION_COMPLETE:
-        if (_completeListener) _completeListener(entry);
+		if (_completeListener) _completeListener(entry);
 		break;
 	case SP_ANIMATION_EVENT:
 		if (_eventListener) _eventListener(entry, event);
@@ -229,15 +229,15 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 	case SP_ANIMATION_START:
 		if (listeners->startListener) listeners->startListener(entry);
 		break;
-    case SP_ANIMATION_INTERRUPT:
-        if (listeners->interruptListener) listeners->interruptListener(entry);
-        break;
+	case SP_ANIMATION_INTERRUPT:
+		if (listeners->interruptListener) listeners->interruptListener(entry);
+		break;
 	case SP_ANIMATION_END:
 		if (listeners->endListener) listeners->endListener(entry);
 		break;
-    case SP_ANIMATION_DISPOSE:
-        if (listeners->disposeListener) listeners->disposeListener(entry);
-        break;
+	case SP_ANIMATION_DISPOSE:
+		if (listeners->disposeListener) listeners->disposeListener(entry);
+		break;
 	case SP_ANIMATION_COMPLETE:
 		if (listeners->completeListener) listeners->completeListener(entry);
 		break;
@@ -252,7 +252,7 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 }
 
 - (void) setListenerForEntry:(spTrackEntry*)entry onInterrupt:(spInterruptListener)listener {
-    getListeners(entry)->interruptListener = [listener copy];
+	getListeners(entry)->interruptListener = [listener copy];
 }
 
 - (void) setListenerForEntry:(spTrackEntry*)entry onEnd:(spEndListener)listener {
@@ -260,7 +260,7 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 }
 
 - (void) setListenerForEntry:(spTrackEntry*)entry onDispose:(spDisposeListener)listener {
-    getListeners(entry)->disposeListener = [listener copy];
+	getListeners(entry)->disposeListener = [listener copy];
 }
 
 - (void) setListenerForEntry:(spTrackEntry*)entry onComplete:(spCompleteListener)listener {

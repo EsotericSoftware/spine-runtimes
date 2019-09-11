@@ -35,7 +35,7 @@ import com.esotericsoftware.spine.AnimationState.TrackEntry;
 /** Stores mix (crossfade) durations to be applied when {@link AnimationState} animations are changed. */
 public class AnimationStateData {
 	final SkeletonData skeletonData;
-	final ObjectFloatMap<Key> animationToMixTime = new ObjectFloatMap();
+	final ObjectFloatMap<Key> animationToMixTime = new ObjectFloatMap(51, 0.8f);
 	final Key tempKey = new Key();
 	float defaultMix;
 

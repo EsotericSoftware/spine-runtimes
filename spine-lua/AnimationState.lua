@@ -423,15 +423,15 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 			local timelineBlend = MixBlend.setup
 			local alpha = 0
 			if clearBit(timelineMode[i], NOT_LAST) == SUBSEQUENT then
+				timelineBlend = blend
 				if not attachments and timeline.type == Animation.TimelineType.attachment then
 					if testBit(timelineMode[i], NOT_LAST) then
 						skipSubsequent = true
 					else
-						blend = MixBlend.setup
+						timelineBlend = MixBlend.setup
 					end
 				end
 				if not drawOrder and timeline.type == Animation.TimelineType.drawOrder then skipSubsequent = true end
-				timelineBlend = blend
 				alpha = alphaMix
 			elseif clearBit(timelineMode[i], NOT_LAST) == FIRST then
 				timelineBlend = MixBlend.setup
