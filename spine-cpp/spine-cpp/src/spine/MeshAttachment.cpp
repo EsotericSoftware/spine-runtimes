@@ -193,6 +193,14 @@ void MeshAttachment::setRegionRotate(bool inValue) {
 	_regionRotate = inValue;
 }
 
+int MeshAttachment::getRegionDegrees() {
+	return _regionDegrees;
+}
+
+void MeshAttachment::setRegionDegrees(int inValue) {
+	_regionDegrees = inValue;
+}
+
 float MeshAttachment::getRegionOffsetX() {
 	return _regionOffsetX;
 }
