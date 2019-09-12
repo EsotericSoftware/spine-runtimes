@@ -75,7 +75,7 @@ function SkeletonClipping:clipStart(slot, clip)
 end
 
 function SkeletonClipping:clipEnd(slot)
-	if self.clipAttachment and self.clipAttachment.endSlot == slot then self:clipEnd2() end
+	if self.clipAttachment and self.clipAttachment.endSlot == slot.data then self:clipEnd2() end
 end
 
 function SkeletonClipping:clipEnd2()
