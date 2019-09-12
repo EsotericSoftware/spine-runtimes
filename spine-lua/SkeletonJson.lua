@@ -251,6 +251,39 @@ function SkeletonJson.new (attachmentLoader)
 		if root["skins"] then
 			for skinName,skinMap in pairs(root["skins"]) do
 				local skin = Skin.new(skinMap["name"])
+				
+				if skinMap["bones"] then
+					for _, entry in ipairs(skinMap["bones"]) do
+						local bone = skeletonData:findBone(entry)
+						if bone == nil then error("Skin bone not found:  " .. entry, 2) end
+						table_insert(skin.bones, bone)
+					end
+				end
+				
+				if skinMap["ik"] then
+					for _, entry in ipairs(skinMap["ik"]) do
+						local constraint = skeletonData:findIkConstraint(entry)
+						if constraint == nil then error("Skin IK constraint not found:  " .. entry, 2) end
+						table_insert(skin.constraints, constraint)
+					end
+				end
+				
+				if skinMap["transform"] then
+					for _, entry in ipairs(skinMap["transform"]) do
+						local constraint = skeletonData:findTransformConstraint(entry)
+						if constraint == nil then error("Skin transform constraint not found:  " .. entry, 2) end
+						table_insert(skin.constraints, constraint)
+					end
+				end
+				
+				if skinMap["path"] then
+					for _, entry in ipairs(skinMap["path"]) do
+						local constraint = skeletonData:findPathConstraint(entry)
+						if constraint == nil then error("Skin path constraint not found:  " .. entry, 2) end
+						table_insert(skin.constraints, constraint)
+					end
+				end
+				
 				for slotName,slotMap in pairs(skinMap.attachments) do
 					local slotIndex = skeletonData.slotNameIndices[slotName]
 					for attachmentName,attachmentMap in pairs(slotMap) do
