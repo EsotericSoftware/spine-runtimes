@@ -680,8 +680,8 @@ function SkeletonJson.new (attachmentLoader)
 		end
 
 		-- Path constraint timelines.
-		if map.paths then
-			for constraintName,constraintMap in pairs(map.paths) do
+		if map.path then
+			for constraintName,constraintMap in pairs(map.path) do
 				local index = skeletonData:findPathConstraintIndex(constraintName)
 				if index == -1 then error("Path constraint not found: " .. constraintName, 2) end
 				local data = skeletonData.pathConstraints[index]
