@@ -240,11 +240,20 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 		float* attachmentUvs = nullptr;
 
 		Slot* slot = Skeleton->getDrawOrder()[i];
-		if (!slot->getBone().isActive()) continue;
+		if (!slot->getBone().isActive()) {
+			clipper.clipEnd(*slot);
+			continue;
+		}
 
 		Attachment* attachment = slot->getAttachment();
-		if (!attachment) continue;
-		if (!attachment->getRTTI().isExactly(RegionAttachment::rtti) && !attachment->getRTTI().isExactly(MeshAttachment::rtti) && !attachment->getRTTI().isExactly(ClippingAttachment::rtti)) continue;
+		if (!attachment) {
+			clipper.clipEnd(*slot);
+			continue;
+		}
+		if (!attachment->getRTTI().isExactly(RegionAttachment::rtti) && !attachment->getRTTI().isExactly(MeshAttachment::rtti) && !attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
+			clipper.clipEnd(*slot);
+			continue;
+		}
 
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
@@ -278,23 +287,38 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 		UMaterialInstanceDynamic* material = nullptr;
 		switch (slot->getData().getBlendMode()) {
 		case BlendMode_Normal:
-			if (!widget->pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			if (!widget->pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
 			material = widget->pageToNormalBlendMaterial[attachmentAtlasRegion->page];
 			break;
 		case BlendMode_Additive:
-			if (!widget->pageToAdditiveBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			if (!widget->pageToAdditiveBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
 			material = widget->pageToAdditiveBlendMaterial[attachmentAtlasRegion->page];
 			break;
 		case BlendMode_Multiply:
-			if (!widget->pageToMultiplyBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			if (!widget->pageToMultiplyBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
 			material = widget->pageToMultiplyBlendMaterial[attachmentAtlasRegion->page];
 			break;
 		case BlendMode_Screen:
-			if (!widget->pageToScreenBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			if (!widget->pageToScreenBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
 			material = widget->pageToScreenBlendMaterial[attachmentAtlasRegion->page];
 			break;
 		default:
-			if (!widget->pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			if (!widget->pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
 			material = widget->pageToNormalBlendMaterial[attachmentAtlasRegion->page];
 		}
 
@@ -305,7 +329,10 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 			attachmentIndices = clipper.getClippedTriangles().buffer();
 			numIndices = clipper.getClippedTriangles().size();
 			attachmentUvs = clipper.getClippedUVs().buffer();
-			if (clipper.getClippedTriangles().size() == 0) continue;
+			if (clipper.getClippedTriangles().size() == 0) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
 		}
 
 		if (lastMaterial != material) {
