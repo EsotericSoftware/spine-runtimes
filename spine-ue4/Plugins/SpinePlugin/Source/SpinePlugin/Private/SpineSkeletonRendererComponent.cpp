@@ -223,8 +223,14 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 			continue;
 		}
 
-		if (!attachment) continue;
-		if (!attachment->getRTTI().isExactly(RegionAttachment::rtti) && !attachment->getRTTI().isExactly(MeshAttachment::rtti) && !attachment->getRTTI().isExactly(ClippingAttachment::rtti)) continue;		
+		if (!attachment) {
+			clipper.clipEnd(*slot);
+			continue;
+		}
+		if (!attachment->getRTTI().isExactly(RegionAttachment::rtti) && !attachment->getRTTI().isExactly(MeshAttachment::rtti) && !attachment->getRTTI().isExactly(ClippingAttachment::rtti)) {
+			clipper.clipEnd(*slot);
+			continue;
+		}
 		
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
@@ -270,23 +276,38 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 		UMaterialInstanceDynamic* material = nullptr;
 		switch (slot->getData().getBlendMode()) {
 		case BlendMode_Normal:
-			if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
 			material = pageToNormalBlendMaterial[attachmentAtlasRegion->page];
 			break;
 		case BlendMode_Additive:
-			if (!pageToAdditiveBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			if (!pageToAdditiveBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
 			material = pageToAdditiveBlendMaterial[attachmentAtlasRegion->page];
 			break;
 		case BlendMode_Multiply:
-			if (!pageToMultiplyBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			if (!pageToMultiplyBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
 			material = pageToMultiplyBlendMaterial[attachmentAtlasRegion->page];
 			break;
 		case BlendMode_Screen:
-			if (!pageToScreenBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			if (!pageToScreenBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
 			material = pageToScreenBlendMaterial[attachmentAtlasRegion->page];
 			break;
 		default:
-			if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) continue;
+			if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
 			material = pageToNormalBlendMaterial[attachmentAtlasRegion->page];
 		}
 
@@ -297,7 +318,10 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 			attachmentIndices = clipper.getClippedTriangles().buffer();
 			numIndices = clipper.getClippedTriangles().size();
 			attachmentUvs = clipper.getClippedUVs().buffer();
-			if (clipper.getClippedTriangles().size() == 0) continue;
+			if (clipper.getClippedTriangles().size() == 0) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
 		}
 
 		if (lastMaterial != material) {
