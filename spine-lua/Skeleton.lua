@@ -114,6 +114,7 @@ function Skeleton:updateCache ()
 
 	local bones = self.bones
 	for _, bone in ipairs(bones) do
+		print("reset " .. bone.data.name)
 		bone.sorted = bone.data.skinRequired
 		bone.active = not bone.sorted
 	end
@@ -123,6 +124,7 @@ function Skeleton:updateCache ()
 		for i, boneData in ipairs(skinBones) do
 			local bone = bones[boneData.index]
 			while bone do
+				print("skin bone reset " .. bone.data.name)
 				bone.sorted = false
 				bone.active = true
 				bone = bone.parent
@@ -186,7 +188,7 @@ function Skeleton:updateCache ()
 end
 
 function Skeleton:sortIkConstraint (constraint)
-	constraint.active = constraint.target.active and ((not constraint.data.skinRequired) or (self.skin and utils.arrayContains(self.skin.constraints, constraint)))
+	constraint.active = constraint.target.active and ((not constraint.data.skinRequired) or (self.skin and utils.arrayContains(self.skin.constraints, constraint.data)))
 	if not constraint.active then return end
 
 	local target = constraint.target
@@ -215,7 +217,7 @@ function Skeleton:sortIkConstraint (constraint)
 end
 
 function Skeleton:sortPathConstraint(constraint)
-	constraint.active = constraint.target.bone.active and ((not constraint.data.skinRequired) or (self.skin and utils.arrayContains(self.skin.constraints, constraint)))
+	constraint.active = constraint.target.bone.active and ((not constraint.data.skinRequired) or (self.skin and utils.arrayContains(self.skin.constraints, constraint.data)))
 	if not constraint.active then return end
 
 	local slot = constraint.target
@@ -249,7 +251,7 @@ function Skeleton:sortPathConstraint(constraint)
 end
 
 function Skeleton:sortTransformConstraint(constraint)
-	constraint.active = constraint.target.active and ((not constraint.data.skinRequired) or (self.skin and utils.arrayContains(self.skin.constraints, constraint)))
+	constraint.active = constraint.target.active and ((not constraint.data.skinRequired) or (self.skin and utils.arrayContains(self.skin.constraints, constraint.data)))
 	if not constraint.active then return end
 
 	self:sortBone(constraint.target)
