@@ -171,12 +171,12 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements
 	if (Vertices.Num() == 0) return;
 	SSpineWidget* self = (SSpineWidget*)this;
 
-	const FVector2D widgetSize = AllottedGeometry.GetDrawSize();
+	const FVector2D widgetSize = AllottedGeometry.GetLocalSize();
 	const FVector2D sizeScale = widgetSize / FVector2D(boundsSize.X, boundsSize.Y);
 	const float setupScale = sizeScale.GetMin();
 
 	for (int i = 0; i < Vertices.Num(); i++) {
-		Vertices[i] = (Vertices[i] + FVector(-boundsMin.X - boundsSize.X / 2, boundsMin.Y + boundsSize.Y / 2, 0)) * setupScale * widget->Scale + FVector(widgetSize.X / 2, widgetSize.Y / 2, 0);
+		Vertices[i] = (Vertices[i] + FVector(-boundsMin.X - boundsSize.X / 2, boundsMin.Y + boundsSize.Y / 2, 0)) * setupScale + FVector(widgetSize.X / 2, widgetSize.Y / 2, 0);
 	}
 
 	self->renderData.IndexData.SetNumUninitialized(Indices.Num());
@@ -189,9 +189,11 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements
 	FSlateVertex* vertexData = (FSlateVertex*)renderData.VertexData.GetData();
 	FVector2D offset = AllottedGeometry.AbsolutePosition;
 	FColor white = FColor(0xffffffff);
-
+	
+	const FSlateRenderTransform& Transform = AllottedGeometry.GetAccumulatedRenderTransform();
+	
 	for (size_t i = 0; i < (size_t)Vertices.Num(); i++) {
-		setVertex(&vertexData[i], Vertices[i].X, Vertices[i].Y, Uvs[i].X, Uvs[i].Y, Colors[i], offset);
+		setVertex(&vertexData[i], 0, 0, Uvs[i].X, Uvs[i].Y, Colors[i], Transform.TransformPoint(FVector2D(Vertices[i])));
 	}
 
 	brush = &widget->Brush;
