@@ -63,12 +63,14 @@ public:
 
 	void clearAllocations() {
 		_allocated.clear();
+		_usedMemory = 0;
 	}
 
 	virtual void *_alloc(size_t size, const char *file, int line) {
 		void *result = _extension->_alloc(size, file, line);
 		_allocated[result] = Allocation(result, size, file, line);
 		_allocations++;
+		_usedMemory += size;
 		return result;
 	}
 
@@ -76,14 +78,17 @@ public:
 		void *result = _extension->_calloc(size, file, line);
 		_allocated[result] = Allocation(result, size, file, line);
 		_allocations++;
+		_usedMemory += size;
 		return result;
 	}
 
 	virtual void *_realloc(void *ptr, size_t size, const char *file, int line) {
+		if (_allocated.count(ptr)) _usedMemory -= _allocated[ptr].size;
 		_allocated.erase(ptr);
 		void *result = _extension->_realloc(ptr, size, file, line);
 		_reallocations++;
 		_allocated[result] = Allocation(result, size, file, line);
+		_usedMemory += size;
 		return result;
 	}
 
@@ -91,6 +96,7 @@ public:
 		if (_allocated.count(mem)) {
 			_extension->_free(mem, file, line);
 			_frees++;
+			_usedMemory -= _allocated[mem].size;
 			_allocated.erase(mem);
 			return;
 		}
@@ -102,6 +108,10 @@ public:
 	virtual char *_readFile(const String &path, int *length) {
 		return _extension->_readFile(path, length);
 	}
+	
+	size_t getUsedMemory() {
+		return _usedMemory;
+	}
 
 private:
 	SpineExtension* _extension;
@@ -109,6 +119,7 @@ private:
 	size_t _allocations;
 	size_t _reallocations;
 	size_t _frees;
+	size_t _usedMemory;
 };
 }
 
