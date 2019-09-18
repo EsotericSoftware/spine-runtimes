@@ -34,7 +34,6 @@
 #include <spine/Vector.h>
 #include <spine/Color.h>
 
-#include <string>
 #include <spine/HasRendererObject.h>
 
 #define NUM_UVS 8

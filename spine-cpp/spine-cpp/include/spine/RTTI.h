@@ -32,16 +32,14 @@
 
 #include <spine/SpineObject.h>
 
-#include <string>
-
 namespace spine {
 class SP_API RTTI : public SpineObject {
 public:
-	explicit RTTI(const std::string &className);
+	explicit RTTI(const char *className);
 
-	RTTI(const std::string &className, const RTTI &baseRTTI);
+	RTTI(const char *className, const RTTI &baseRTTI);
 
-	const std::string &getClassName() const;
+	const char *getClassName() const;
 
 	bool isExactly(const RTTI &rtti) const;
 
@@ -53,7 +51,7 @@ private:
 
 	RTTI &operator=(const RTTI &obj);
 
-	const std::string _className;
+	const char* _className;
 	const RTTI *_pBaseRTTI;
 };
 }

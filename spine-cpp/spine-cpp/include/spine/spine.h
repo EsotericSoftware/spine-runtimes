@@ -49,7 +49,6 @@
 #include <spine/ConstraintData.h>
 #include <spine/ContainerUtil.h>
 #include <spine/CurveTimeline.h>
-#include <spine/Debug.h>
 #include <spine/DeformTimeline.h>
 #include <spine/DrawOrderTimeline.h>
 #include <spine/Event.h>

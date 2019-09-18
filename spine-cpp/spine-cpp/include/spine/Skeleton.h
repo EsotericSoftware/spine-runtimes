@@ -36,8 +36,6 @@
 #include <spine/SpineString.h>
 #include <spine/Color.h>
 
-#include <limits> // std::numeric_limits
-
 namespace spine {
 class SkeletonData;
 

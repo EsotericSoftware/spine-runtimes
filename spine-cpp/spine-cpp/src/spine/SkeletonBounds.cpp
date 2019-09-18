@@ -39,6 +39,8 @@
 
 #include <spine/Slot.h>
 
+#include <float.h>
+
 using namespace spine;
 
 SkeletonBounds::SkeletonBounds() : _minX(0), _minY(0), _maxX(0), _maxY(0) {
@@ -87,10 +89,10 @@ void SkeletonBounds::update(Skeleton &skeleton, bool updateAabb) {
 	if (updateAabb)
 		aabbCompute();
 	else {
-		_minX = std::numeric_limits<float>::min();
-		_minY = std::numeric_limits<float>::min();
-		_maxX = std::numeric_limits<float>::max();
-		_maxY = std::numeric_limits<float>::max();
+		_minX = FLT_MIN;
+		_minY = FLT_MIN;
+		_maxX = FLT_MAX;
+		_maxY = FLT_MAX;
 	}
 }
 
@@ -197,10 +199,10 @@ float SkeletonBounds::getHeight() {
 }
 
 void SkeletonBounds::aabbCompute() {
-	float minX = std::numeric_limits<float>::min();
-	float minY = std::numeric_limits<float>::min();
-	float maxX = std::numeric_limits<float>::max();
-	float maxY = std::numeric_limits<float>::max();
+	float minX = FLT_MIN;
+	float minY = FLT_MIN;
+	float maxX = FLT_MAX;
+	float maxY = FLT_MAX;
 
 	for (size_t i = 0, n = _polygons.size(); i < n; ++i) {
 		Polygon *polygon = _polygons[i];
