@@ -33,8 +33,6 @@
 #include <spine/Extension.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
-#include <stdlib.h>
-#include <memory>
 #include <assert.h>
 
 namespace spine {
@@ -131,7 +129,9 @@ public:
 
 		if (inIndex != _size) {
 			for (size_t i = inIndex; i < _size; ++i) {
-				std::swap(_buffer[i], _buffer[i + 1]);
+				T tmp(_buffer[i]);
+				_buffer[i] = _buffer[i + 1];
+				_buffer[i + 1] = tmp;
 			}
 		}
 

@@ -44,6 +44,8 @@
 #include <spine/DrawOrderTimeline.h>
 #include <spine/EventTimeline.h>
 
+#include <float.h>
+
 using namespace spine;
 
 void dummyOnAnimationEventFunc(AnimationState *state, spine::EventType type, TrackEntry *entry, Event *event = NULL) {
@@ -914,7 +916,7 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 	entry._trackTime = 0;
 	entry._trackLast = -1;
 	entry._nextTrackLast = -1; // nextTrackLast == -1 signifies a TrackEntry that wasn't applied yet.
-	entry._trackEnd = std::numeric_limits<float>::max(); // loop ? float.MaxValue : animation.Duration;
+	entry._trackEnd = FLT_MAX; // loop ? float.MaxValue : animation.Duration;
 	entry._timeScale = 1;
 
 	entry._alpha = 1;

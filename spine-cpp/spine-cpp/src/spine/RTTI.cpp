@@ -36,24 +36,24 @@
 
 using namespace spine;
 
-RTTI::RTTI(const std::string &className) : _className(className), _pBaseRTTI(NULL) {
+RTTI::RTTI(const char *className) : _className(className), _pBaseRTTI(NULL) {
 }
 
-RTTI::RTTI(const std::string &className, const RTTI &baseRTTI) : _className(className), _pBaseRTTI(&baseRTTI) {
+RTTI::RTTI(const char *className, const RTTI &baseRTTI) : _className(className), _pBaseRTTI(&baseRTTI) {
 }
 
-const std::string &RTTI::getClassName() const {
+const char *RTTI::getClassName() const {
 	return _className;
 }
 
 bool RTTI::isExactly(const RTTI &rtti) const {
-	return (this->_className == rtti._className);
+	return !strcmp(this->_className, rtti._className);
 }
 
 bool RTTI::instanceOf(const RTTI &rtti) const {
 	const RTTI *pCompare = this;
 	while (pCompare) {
-		if (pCompare->_className == rtti._className) return true;
+		if (!strcmp(pCompare->_className, rtti._className)) return true;
 		pCompare = pCompare->_pBaseRTTI;
 	}
 	return false;
