@@ -18,12 +18,15 @@
 * **Breaking Changes**
 
 * **Additions**
+* Removed dependency on STL throughout the code base, cutting down on the LOC that need parsing by 66%.
 
 ### Cocos2d-x
 
 ### SFML
 
 ### UE4
+* `SpineWidget` now supports the full widget transform, including rendering scale/shear.
+* **Breaking changes**: `SpineWidget` no longer has the `Scale` property. Instead the size x/y properties can be used.
 
 ## C# ##
 * **Breaking changes**
