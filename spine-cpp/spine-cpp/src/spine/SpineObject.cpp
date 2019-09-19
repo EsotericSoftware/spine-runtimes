@@ -36,11 +36,11 @@
 using namespace spine;
 
 void *SpineObject::operator new(size_t sz) {
-	return SpineExtension::calloc<SpineObject>(sz, __FILE__, __LINE__);
+	return SpineExtension::getInstance()->_calloc(sz, __FILE__, __LINE__);
 }
 
 void *SpineObject::operator new(size_t sz, const char *file, int line) {
-	return SpineExtension::calloc<SpineObject>(sz, file, line);
+	return SpineExtension::getInstance()->_calloc(sz, file, line);
 }
 
 void *SpineObject::operator new(size_t sz, void *ptr) {

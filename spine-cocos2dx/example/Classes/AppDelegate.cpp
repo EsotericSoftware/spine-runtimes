@@ -112,7 +112,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	
 	// create a scene. it's an autorelease object
 	//auto scene = RaptorExample::scene();
-	auto scene = MixAndMatchExample::scene();
+	auto scene = BatchingExample::scene();
 
 	// run
 	director->runWithScene(scene);

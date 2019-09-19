@@ -38,6 +38,8 @@
 
 #include <spine/ContainerUtil.h>
 
+#include <stdint.h>
+
 using namespace spine;
 
 Animation::Animation(const String &name, Vector<Timeline *> &timelines, float duration) :
