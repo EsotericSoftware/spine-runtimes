@@ -36,7 +36,7 @@ module spine.webgl {
 		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext, contextConfig: any = { alpha: "true" }) {
 			if (canvasOrContext instanceof HTMLCanvasElement) {
 				let canvas = canvasOrContext;
-				this.gl = <WebGLRenderingContext> (canvas.getContext("webgl", contextConfig) || canvas.getContext("experimental-webgl", contextConfig));
+				this.gl = <WebGLRenderingContext> (canvas.getContext("webgl2", contextConfig) || canvas.getContext("webgl", contextConfig) || canvas.getContext("experimental-webgl", contextConfig));
 				this.canvas = canvas;
 				canvas.addEventListener("webglcontextlost", (e: any) => {
 					let event = <WebGLContextEvent>e;
