@@ -310,7 +310,7 @@ namespace Spine.Unity.Editor {
 				string dir = Path.GetDirectoryName(skeletonPath);
 
 #if SPINE_TK2D
-				IngestSpineProject(loadedAsset, compatibilityProblems, null);
+				IngestSpineProject(loadedAsset, null);
 #else
 				var localAtlases = FindAtlasesAtPath(dir);
 				var requiredPaths = GetRequiredAtlasRegions(skeletonPath);
