@@ -1515,14 +1515,14 @@ var spine;
 					var alpha = 0;
 					switch (timelineMode[i] & (AnimationState.NOT_LAST - 1)) {
 						case AnimationState.SUBSEQUENT:
+							timelineBlend = blend;
 							if (!attachments && timeline instanceof spine.AttachmentTimeline) {
 								if ((timelineMode[i] & AnimationState.NOT_LAST) == AnimationState.NOT_LAST)
 									continue;
-								blend = spine.MixBlend.setup;
+								timelineBlend = spine.MixBlend.setup;
 							}
 							if (!drawOrder && timeline instanceof spine.DrawOrderTimeline)
 								continue;
-							timelineBlend = blend;
 							alpha = alphaMix;
 							break;
 						case AnimationState.FIRST:
@@ -10945,7 +10945,7 @@ var spine;
 				this.restorables = new Array();
 				if (canvasOrContext instanceof HTMLCanvasElement) {
 					var canvas_1 = canvasOrContext;
-					this.gl = (canvas_1.getContext("webgl", contextConfig) || canvas_1.getContext("experimental-webgl", contextConfig));
+					this.gl = (canvas_1.getContext("webgl2", contextConfig)) || (canvas_1.getContext("webgl", contextConfig) || canvas_1.getContext("experimental-webgl", contextConfig));
 					this.canvas = canvas_1;
 					canvas_1.addEventListener("webglcontextlost", function (e) {
 						var event = e;
