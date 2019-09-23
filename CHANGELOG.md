@@ -148,9 +148,9 @@
       * `SpineEditorUtilities.AssetUtility` with `AssetUtility` and
       * `SpineEditorUtilities.EditorInstantiation` with `EditorInstantiation`.
   * **Timeline Support has been moved to a separate UPM Package** Previously the Spine Timeline integration was located in the `Modules/Timeline` directory and was deactivated by default, making it necessary to activate it via the Spine Preferences. Now the Timeline integration has been moved to an additional UPM package which can be found under `Modules/com.esotericsoftware.spine.timeline`.
-   * **Installation:** You can download the Unity Package Manager (UPM) package via the [download page](http://esotericsoftware.com/spine-unity-download) or find it in the [spine-runtimes/spine-unity/Modules](https://github.com/EsotericSoftware/spine-runtimes/tree/3.8-beta/spine-unity/Modules) subdirectory on the git repository. You can then either unzip (copy if using git) the package to    
+   * **Installation:** You can download the Unity Package Manager (UPM) package via the [download page](http://esotericsoftware.com/spine-unity-download) or find it in the [spine-runtimes/spine-unity/Modules](https://github.com/EsotericSoftware/spine-runtimes/tree/3.8-beta/spine-unity/Modules) subdirectory on the git repository. You can then either unzip (copy if using git) the package to
       a) the `Packages` directory in your project where it will automatically be loaded, or
-      b) to an arbitrary directory outside the Assets directory and then open Package Manager in Unity, select the `+` icon, choose `Add package from disk..` and point it to the package.json file.    
+      b) to an arbitrary directory outside the Assets directory and then open Package Manager in Unity, select the `+` icon, choose `Add package from disk..` and point it to the package.json file.
       The Project panel should now show an entry `Spine Timeline Extensions` under `Packages`. If the directory is not yet listed, you will need to close and re-open Unity to have it display the directory and its contents.
 
 * **Additions**
@@ -164,7 +164,7 @@
       * b) to an arbitrary directory outside the Assets directory and then open Package Manager in Unity, select the `+` icon, choose `Add package from disk..` and point it to the package.json file.
 
       > If you are using git and Unity 2019.2 or newer versions and receive an error that dependencies could not be resolved by the package manager (only higher versions of Unity's `Lightweight RP` package are available, e.g. `6.9.0` and up), please copy the prepared package-UNITYVERSION.json file for your Unity version (e.g. `package-2019.2.json`) over the existing package.json file to change the dependency accordingly. Unfortunately Unity's Package Manager does not provide a way to specify a version range for a dependency like "5.7.2 - 6.9.0" yet, so this manual step is necessary for git users.
-     
+
       The Project panel should now show an entry `Spine Lightweight RP Shaders` under `Packages`. If the directory is not yet listed, you will need to close and re-open Unity to have it display the directory and its contents.
     * **Usage:** The package provides two shaders specifically built for the lightweight render pipeline:
       * `Lightweight Render Pipeline/Spine/Skeleton`, as a lightweight variant of the `Spine/Skeleton` shader,
@@ -186,7 +186,7 @@
   * Deprecated `Modules/SlotBlendModes/SlotBlendModes` component. Changed namespace from `Spine.Unity.Modules` to `Spine.Unity.Deprecated`. Moved to `Deprecated/SlotBlendModes`.
 
 * **Restructuring (Non-Breaking)**
-  
+
   Note: The following changes will most likely not affect users of the Spine-Unity runtime as the API remains unchanged and no references are invalidated.
   * Removed duplicates of `.cginc` files in `Modules/Shaders/Sprite` that were also present in the `Modules/Shaders/Sprite/CGIncludes` directory.
   * Moved shaders from `Modules/Shaders` to `Shaders` directory.
@@ -209,7 +209,7 @@
   * Moved `Modules/YieldInstructions` directory to `Utility/YieldInstructions`.
   * Moved corresponding editor scripts of the above components to restructured directories as well.
   * Renamed inspector editor class `PointFollowerEditor` to `PointFollowerInspector` for consistency reasons.
-  
+
 ### XNA/MonoGame
 * Updated to latest MonoGame version 3.7.1
 * Rewrote example project to be cleaner and better demonstrate basic Spine features.
@@ -282,6 +282,7 @@
   * Removed `inheritDeform` field, getter, and setter from `MeshAttachment`.
   * Changed `.skel` binary format, added a string table. References to strings in the data resolve to this string table, reducing storage size of binary files considerably.
   * Changed the `.json` and `.skel` file formats to accomodate the new feature and file size optimiations. Old projects must be exported with Spine 3.8.20+ to be compatible with the 3.8 Spine runtimes.
+  * Updated runtime to be compatible with TypeScript 3.6.3.
 
 * **Additions**
   * Added support for loading binary data via `AssetManager#loadBinary()`. `AssetManager#get()` will return a `Uint8Array` for such assets.
