@@ -48,7 +48,7 @@ namespace spine {
 		void interleaveCoordinates(float* dst, const float* src, int vertexCount, int dstStride);
 		BlendFunc makeBlendFunc(int blendMode, bool premultipliedAlpha);
 		void transformWorldVertices(float* dstCoord, int coordCount, Skeleton& skeleton, int startSlotIndex, int endSlotIndex);
-		bool cullRectangle(const Mat4& transform, const cocos2d::Rect& rect, const Camera& camera);
+		bool cullRectangle(Renderer* renderer, const Mat4& transform, const cocos2d::Rect& rect);
 			Color4B ColorToColor4B(const Color& color);
 		bool slotIsOutRange(Slot& slot, int startSlotIndex, int endSlotIndex);
 	}
@@ -268,11 +268,9 @@ namespace spine {
 		transformWorldVertices(worldCoords, coordCount, *_skeleton, _startSlotIndex, _endSlotIndex);
 
 		#if CC_USE_CULLING
-		const Camera* camera = Camera::getVisitingCamera();
-		const cocos2d::Rect brect = computeBoundingRect(worldCoords, coordCount / 2);
-		_boundingRect = brect;
+		const cocos2d::Rect bb = computeBoundingRect(worldCoords, coordCount / 2);
 
-		if (camera && cullRectangle(transform, brect, *camera)) {
+		if (cullRectangle(renderer, transform, bb)) {			
 			VLA_FREE(worldCoords);
 			return;
 		}
@@ -989,60 +987,35 @@ namespace spine {
 		}
 
 
-		bool cullRectangle(const Mat4& transform, const cocos2d::Rect& rect, const Camera& camera) {
-			// Compute rectangle center and half extents in local space
-			// TODO: Pass the bounding rectangle with this representation directly
-			const float halfRectWidth = rect.size.width * 0.5f;
-			const float halfRectHeight = rect.size.height * 0.5f;
-			const float l_cx = rect.origin.x + halfRectWidth;
-			const float l_cy = rect.origin.y + halfRectHeight;
-
-			// Transform rectangle center to world space
-			const float w_cx = (l_cx * transform.m[0] + l_cy * transform.m[4]) + transform.m[12];
-			const float w_cy = (l_cx * transform.m[1] + l_cy * transform.m[5]) + transform.m[13];
-
-			// Compute rectangle half extents in world space
-			const float w_ex = std::abs(halfRectWidth * transform.m[0]) + std::abs(halfRectHeight * transform.m[4]);
-			const float w_ey = std::abs(halfRectWidth * transform.m[1]) + std::abs(halfRectHeight * transform.m[5]);
-
-			// Transform rectangle to clip space
-			const Mat4& viewMatrix = camera.getViewMatrix();
-			const Mat4& projectionMatrix = camera.getProjectionMatrix();
-			const float c_cx = (w_cx + viewMatrix.m[12]) * projectionMatrix.m[0];
-			const float c_cy = (w_cy + viewMatrix.m[13]) * projectionMatrix.m[5];
-			const float c_ex = w_ex * projectionMatrix.m[0];
-			const float c_ey = w_ey * projectionMatrix.m[5];
-			// The rectangle has z == 0 in world space
-			// cw = projectionMatrix[11] * vz = -vz = wz -viewMatrix.m[14] = -viewMatrix.m[14]
-			const float c_w = -viewMatrix.m[14]; // w in clip space
-
-			// For each edge, test the rectangle corner closest to it
-			// If its distance to the edge is negative, the whole rectangle is outside the screen
-			// Note: the test is conservative and can return false positives in some cases
-			// The test is done in clip space [-1, +1]
-			// e.g. left culling <==> (c_cx + c_ex) / cw < -1 <==> (c_cx + c_ex) < -cw
-
-			// Left
-			if (c_cx + c_ex < -c_w) {
+		bool cullRectangle(Renderer* renderer, const Mat4& transform, const cocos2d::Rect& rect) {
+			if (Camera::getVisitingCamera() == nullptr)
 				return true;
-			}
+			
+			auto director = Director::getInstance();
+			auto scene = director->getRunningScene();
+						
+			if (!scene || (scene && Camera::getDefaultCamera() != Camera::getVisitingCamera()))
+				return false;
 
-			// Right
-			if (c_cx - c_ex > c_w) {
-				return true;
-			}
+			Rect visibleRect(director->getVisibleOrigin(), director->getVisibleSize());
+			
+			// transform center point to screen space
+			float hSizeX = rect.size.width/2;
+			float hSizeY = rect.size.height/2;
+			Vec3 v3p(rect.origin.x + hSizeX, rect.origin.y + hSizeY, 0);
+			transform.transformPoint(&v3p);
+			Vec2 v2p = Camera::getVisitingCamera()->projectGL(v3p);
 
-			// Bottom
-			if (c_cy + c_ey < -c_w) {
-				return true;
-			}
-
-			// Top
-			if (c_cy - c_ey > c_w) {
-				return true;
-			}
-
-			return false;
+			// convert content size to world coordinates
+			float wshw = std::max(fabsf(hSizeX * transform.m[0] + hSizeY * transform.m[4]), fabsf(hSizeX * transform.m[0] - hSizeY * transform.m[4]));
+			float wshh = std::max(fabsf(hSizeX * transform.m[1] + hSizeY * transform.m[5]), fabsf(hSizeX * transform.m[1] - hSizeY * transform.m[5]));
+			
+			// enlarge visible rect half size in screen coord
+			visibleRect.origin.x -= wshw;
+			visibleRect.origin.y -= wshh;
+			visibleRect.size.width += wshw * 2;
+			visibleRect.size.height += wshh * 2;
+			return !visibleRect.containsPoint(v2p);
 		}
 
 
