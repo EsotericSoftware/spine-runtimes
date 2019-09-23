@@ -33,15 +33,16 @@ The setup for cocos2d-x differs from most other Spine Runtimes because the cocos
 The Spine cocos2d-x example works on Windows, Mac OS X, iOS and Android.
 
 ### Windows
-1. Install [Visual Studio 2015 Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx)
+1. Install [Visual Studio 2019 Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx)
 2. Install CMake via the [Windows installer package](https://cmake.org/download/).
 3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 4. Run CMake GUI from the start menu
 5. Click `Browse Source` and select the directory `spine-runtimes`
 6. Click `Browse Build` and select the `spine-runtimes/spine-cocos2dx/build` directory. You can create the `build` folder directly in the file dialog via `New Folder`.
-7. Click `Configure`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
+7. Click `Configure`. Check `SPINE_COCOS2D_X`
+8. Click `Configure` again. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
 7. Open the file `spine-cocos2dx\example\cocos2d\cocos\2d\cocos2dx.props` and remove the `libSpine.lib` entry from the `<AdditionalDependencies>` tag.
-8. Open the `spine-runtimes/spine-cocos2dx/example/proj.win32/spine-cocos2d-x.sln` file in Visual Studio 2015. Visual Studio may ask you to install the Windows XP/7 SDK, which you should install.
+8. Open the `spine-runtimes/spine-cocos2dx/example/proj.win32/spine-cocos2d-x.sln` file in Visual Studio 2019. Visual Studio may ask you to install the Windows XP/7 SDK, which you should install.
 9. Expand `References` of the libcocos2d sub project, and remove the entry for `libSpine`, which should be marked with an error.
 9. Right click the `spine-cocos2d-x` project in the solution explorer and select `Set as Startup Project` from the context menu
 10. Click `Local Windows Debugger` to run the example

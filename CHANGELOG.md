@@ -164,6 +164,7 @@
 ### Cocos2d-x
 * Updated to cocos2d-x 3.17.1
 * Added mix-and-match example to demonstrate the new Skin API.
+* Exmaple project requires Visual Studio 2019 on Windows
 
 ### SFML
 * Added mix-and-match example to demonstrate the new Skin API.

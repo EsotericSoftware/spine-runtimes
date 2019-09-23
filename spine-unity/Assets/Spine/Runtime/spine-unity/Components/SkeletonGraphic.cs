@@ -313,7 +313,7 @@ namespace Spine.Unity {
 
 			var mesh = smartMesh.mesh;
 			meshGenerator.FillVertexData(mesh);
-			if (updateTriangles) meshGenerator.FillTrianglesSingle(mesh);
+			if (updateTriangles) meshGenerator.FillTriangles(mesh);
 			meshGenerator.FillLateVertexData(mesh);
 
 			canvasRenderer.SetMesh(mesh);

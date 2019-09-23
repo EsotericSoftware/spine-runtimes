@@ -1515,14 +1515,14 @@ var spine;
 					var alpha = 0;
 					switch (timelineMode[i] & (AnimationState.NOT_LAST - 1)) {
 						case AnimationState.SUBSEQUENT:
+							timelineBlend = blend;
 							if (!attachments && timeline instanceof spine.AttachmentTimeline) {
 								if ((timelineMode[i] & AnimationState.NOT_LAST) == AnimationState.NOT_LAST)
 									continue;
-								blend = spine.MixBlend.setup;
+								timelineBlend = spine.MixBlend.setup;
 							}
 							if (!drawOrder && timeline instanceof spine.DrawOrderTimeline)
 								continue;
-							timelineBlend = blend;
 							alpha = alphaMix;
 							break;
 						case AnimationState.FIRST:
