@@ -162,6 +162,11 @@ namespace Spine {
 			copy.regionOriginalHeight = regionOriginalHeight;
 			copy.RegionRotate = RegionRotate;
 			copy.RegionDegrees = RegionDegrees;
+			copy.RegionU = RegionU;
+			copy.RegionV = RegionV;
+			copy.RegionU2 = RegionU2;
+			copy.RegionV2 = RegionV2;
+
 			copy.Path = Path;
 			copy.r = r;
 			copy.g = g;
@@ -199,12 +204,17 @@ namespace Spine {
 			mesh.regionOriginalHeight = regionOriginalHeight;
 			mesh.RegionDegrees = RegionDegrees;
 			mesh.RegionRotate = RegionRotate;
+			mesh.RegionU = RegionU;
+			mesh.RegionV = RegionV;
+			mesh.RegionU2 = RegionU2;
+			mesh.RegionV2 = RegionV2;
 
 			mesh.Path = Path;
 			mesh.r = r;
 			mesh.g = g;
 			mesh.b = b;
 			mesh.a = a;
+
 			mesh.deformAttachment = deformAttachment;
 			mesh.ParentMesh = parentMesh != null ? parentMesh : this;
 			mesh.UpdateUVs();
