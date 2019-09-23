@@ -148,7 +148,6 @@ namespace Spine.Unity {
 			// Clear last state of attachments and submeshes
 			instructionOutput.Clear(); // submeshInstructions.Clear(); attachments.Clear();
 			var workingSubmeshInstructions = instructionOutput.submeshInstructions;
-			workingSubmeshInstructions.Resize(1);
 
 			#if SPINE_TRIANGLECHECK
 			instructionOutput.attachments.Resize(drawOrderCount);
@@ -206,11 +205,12 @@ namespace Spine.Unity {
 				current.rawVertexCount += attachmentVertexCount;
 				totalRawVertexCount += attachmentVertexCount;
 			}
+
 		#if !SPINE_TK2D
-			if (material == null)
+			if (material == null && rendererObject != null)
 				current.material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
 		#else
-			if (material == null)
+			if (material == null && rendererObject != null)
 				current.material = (rendererObject is Material) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
 		#endif
 
@@ -218,7 +218,13 @@ namespace Spine.Unity {
 			instructionOutput.rawVertexCount = totalRawVertexCount;
 			#endif
 
-			workingSubmeshInstructions.Items[0] = current;
+			if (totalRawVertexCount > 0) {
+				workingSubmeshInstructions.Resize(1);
+				workingSubmeshInstructions.Items[0] = current;
+			}
+			else {
+				workingSubmeshInstructions.Resize(0);
+			}
 		}
 
 		public static void GenerateSkeletonRendererInstruction (SkeletonRendererInstruction instructionOutput, Skeleton skeleton, Dictionary<Slot, Material> customSlotMaterials, List<Slot> separatorSlots, bool generateMeshOverride, bool immutableTriangles = false) {
@@ -1044,10 +1050,6 @@ namespace Spine.Unity {
 
 			for (int i = 0; i < submeshCount; i++)
 				mesh.SetTriangles(submeshesItems[i].Items, i, false);
-		}
-
-		public void FillTrianglesSingle (Mesh mesh) {
-			mesh.SetTriangles(submeshes.Items[0].Items, 0, false);
 		}
 		#endregion
 
