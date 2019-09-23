@@ -360,6 +360,7 @@
   * Removed `inheritDeform` field, getter, and setter from `MeshAttachment`.
   * Changed `.skel` binary format, added a string table. References to strings in the data resolve to this string table, reducing storage size of binary files considerably.
   * Changed the `.json` and `.skel` file formats to accomodate the new feature and file size optimiations. Old projects must be exported with Spine 3.8.20+ to be compatible with the 3.8 Spine runtimes.
+  * Updated runtime to be compatible with TypeScript 3.6.3.
 
 * **Additions**
   * Added support for loading binary data via `AssetManager#loadBinary()`. `AssetManager#get()` will return a `Uint8Array` for such assets.
