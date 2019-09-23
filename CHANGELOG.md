@@ -65,6 +65,7 @@
 
 ## Typescript/Javascript
 * **Breaking changes**
+* Updated runtime to be compatible with TypeScript 3.6.3.
 
 * **Additions**
 
