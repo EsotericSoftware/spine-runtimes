@@ -1,7 +1,10 @@
 var __extends = (this && this.__extends) || (function () {
-	var extendStatics = Object.setPrototypeOf ||
-		({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-		function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	var extendStatics = function (d, b) {
+		extendStatics = Object.setPrototypeOf ||
+			({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+			function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+		return extendStatics(d, b);
+	};
 	return function (d, b) {
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
@@ -10940,12 +10943,12 @@ var spine;
 	(function (webgl) {
 		var ManagedWebGLRenderingContext = (function () {
 			function ManagedWebGLRenderingContext(canvasOrContext, contextConfig) {
-				if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
 				var _this = this;
+				if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
 				this.restorables = new Array();
 				if (canvasOrContext instanceof HTMLCanvasElement) {
 					var canvas_1 = canvasOrContext;
-					this.gl = (canvas_1.getContext("webgl2", contextConfig)) || (canvas_1.getContext("webgl", contextConfig) || canvas_1.getContext("experimental-webgl", contextConfig));
+					this.gl = (canvas_1.getContext("webgl2", contextConfig) || canvas_1.getContext("webgl", contextConfig));
 					this.canvas = canvas_1;
 					canvas_1.addEventListener("webglcontextlost", function (e) {
 						var event = e;
