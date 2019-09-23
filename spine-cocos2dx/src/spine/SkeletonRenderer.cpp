@@ -254,13 +254,12 @@ namespace spine {
 
 	void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t transformFlags) {
 		// Early exit if the skeleton is invisible
-		if (getDisplayedOpacity() == 0 || _skeleton->getColor().a == 0){
+		if (getDisplayedOpacity() == 0 || _skeleton->getColor().a == 0) {
 			return;
 		}
 
 		const int coordCount = computeTotalCoordCount(*_skeleton, _startSlotIndex, _endSlotIndex);
-		if (coordCount == 0)
-		{
+		if (coordCount == 0) {
 			return;
 		}
 		assert(coordCount % 2 == 0);
@@ -273,8 +272,7 @@ namespace spine {
 		const cocos2d::Rect brect = computeBoundingRect(worldCoords, coordCount / 2);
 		_boundingRect = brect;
 
-		if (camera && cullRectangle(transform, brect, *camera))
-		{
+		if (camera && cullRectangle(transform, brect, *camera)) {
 			VLA_FREE(worldCoords);
 			return;
 		}
@@ -726,7 +724,13 @@ namespace spine {
 	}
 
 	cocos2d::Rect SkeletonRenderer::getBoundingBox () const {
-		return _boundingRect;
+		const int coordCount = computeTotalCoordCount(*_skeleton, _startSlotIndex, _endSlotIndex);
+		if (coordCount == 0) return { 0, 0, 0, 0 };
+		VLA(float, worldCoords, coordCount);
+		transformWorldVertices(worldCoords, coordCount, *_skeleton, _startSlotIndex, _endSlotIndex);
+		const cocos2d::Rect bb = computeBoundingRect(worldCoords, coordCount / 2);
+		VLA_FREE(worldCoords);
+		return bb;
 	}
 
 	// --- Convenience methods for Skeleton_* functions.
@@ -862,8 +866,7 @@ namespace spine {
 	}
 
 	namespace {
-		cocos2d::Rect computeBoundingRect(const float* coords, int vertexCount)
-		{
+		cocos2d::Rect computeBoundingRect(const float* coords, int vertexCount) {
 			assert(coords);
 			assert(vertexCount > 0);
 
@@ -872,8 +875,7 @@ namespace spine {
 			float minY = v[1];
 			float maxX = minX;
 			float maxY = minY;
-			for (int i = 1; i < vertexCount; ++i)
-			{
+			for (int i = 1; i < vertexCount; ++i) {
 				v += 2;
 				float x = v[0];
 				float y = v[1];
@@ -885,37 +887,30 @@ namespace spine {
 			return { minX, minY, maxX - minX, maxY - minY };
 		}
 
-		bool slotIsOutRange(Slot& slot, int startSlotIndex, int endSlotIndex)
-		{
+		bool slotIsOutRange(Slot& slot, int startSlotIndex, int endSlotIndex) {
 			const int index = slot.getData().getIndex();
 			return startSlotIndex > index || endSlotIndex < index;
 		}
 
-		int computeTotalCoordCount(Skeleton& skeleton, int startSlotIndex, int endSlotIndex)
-		{
+		int computeTotalCoordCount(Skeleton& skeleton, int startSlotIndex, int endSlotIndex) {
 			int coordCount = 0;
-			for (size_t i = 0; i < skeleton.getSlots().size(); ++i)
-			{
+			for (size_t i = 0; i < skeleton.getSlots().size(); ++i) {
 				Slot& slot = *skeleton.getSlots()[i];
 				Attachment* const attachment = slot.getAttachment();
-				if (!attachment)
-				{
+				if (!attachment) {
 					continue;
 				}
-				if (slotIsOutRange(slot, startSlotIndex, endSlotIndex))
-				{
+				if (slotIsOutRange(slot, startSlotIndex, endSlotIndex)) {
 					continue;
 				}
 					// Early exit if slot is invisible
 				if (slot.getColor().a == 0) {
 					continue;
 				}
-				if (attachment->getRTTI().isExactly(RegionAttachment::rtti))
-				{
+				if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 					coordCount += 8;
 				}
-				else if (attachment->getRTTI().isExactly(MeshAttachment::rtti))
-				{
+				else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 					MeshAttachment* const mesh = static_cast<MeshAttachment*>(attachment);
 					coordCount += mesh->getWorldVerticesLength();
 				}
@@ -924,36 +919,29 @@ namespace spine {
 		}
 
 
-		void transformWorldVertices(float* dstCoord, int coordCount, Skeleton& skeleton, int startSlotIndex, int endSlotIndex)
-		{
+		void transformWorldVertices(float* dstCoord, int coordCount, Skeleton& skeleton, int startSlotIndex, int endSlotIndex) {
 			float* dstPtr = dstCoord;
 	#ifndef NDEBUG
 			float* const dstEnd = dstCoord + coordCount;
 	#endif
-			for (size_t i = 0; i < skeleton.getSlots().size(); ++i)
-			{
+			for (size_t i = 0; i < skeleton.getSlots().size(); ++i) {
 				/*const*/ Slot& slot = *skeleton.getDrawOrder()[i]; // match the draw order of SkeletonRenderer::Draw
 				Attachment* const attachment = slot.getAttachment();
-				if (!attachment)
-				{
+				if (!attachment) {
 					continue;
 				}
-				if (slotIsOutRange(slot, startSlotIndex, endSlotIndex))
-				{
+				if (slotIsOutRange(slot, startSlotIndex, endSlotIndex)) {
 					continue;
 				}
-	  		if (slot.getColor().a == 0) {
+				if (slot.getColor().a == 0) {
 					continue;
 				}
-				if (attachment->getRTTI().isExactly(RegionAttachment::rtti))
-				{
+				if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 					RegionAttachment* const regionAttachment = static_cast<RegionAttachment*>(attachment);
 					assert(dstPtr + 8 <= dstEnd);
 					regionAttachment->computeWorldVertices(slot.getBone(), dstPtr, 0, 2);
 					dstPtr += 8;
-				}
-				else if (attachment->getRTTI().isExactly(MeshAttachment::rtti))
-				{
+				} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 					MeshAttachment* const mesh = static_cast<MeshAttachment*>(attachment);
 					assert(dstPtr + mesh->getWorldVerticesLength() <= dstEnd);
 					mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), dstPtr, 0, 2);
@@ -963,16 +951,11 @@ namespace spine {
 			assert(dstPtr == dstEnd);
 		}
 
-		void interleaveCoordinates(float* dst, const float* src, int count, int dstStride)
-		{
-			if (dstStride == 2)
-			{
+		void interleaveCoordinates(float* dst, const float* src, int count, int dstStride) {
+			if (dstStride == 2) {
 				memcpy(dst, src, sizeof(float) * count * 2);
-			}
-			else
-			{
-				for (int i = 0; i < count; ++i)
-				{
+			} else {
+				for (int i = 0; i < count; ++i) {
 					dst[0] = src[0];
 					dst[1] = src[1];
 					dst += dstStride;
@@ -982,8 +965,7 @@ namespace spine {
 
 		}
 
-		BlendFunc makeBlendFunc(int blendMode, bool premultipliedAlpha)
-		{
+		BlendFunc makeBlendFunc(int blendMode, bool premultipliedAlpha) {
 			BlendFunc blendFunc;
 			switch (blendMode) {
 			case BlendMode_Additive:
@@ -1007,8 +989,7 @@ namespace spine {
 		}
 
 
-		bool cullRectangle(const Mat4& transform, const cocos2d::Rect& rect, const Camera& camera)
-		{
+		bool cullRectangle(const Mat4& transform, const cocos2d::Rect& rect, const Camera& camera) {
 			// Compute rectangle center and half extents in local space
 			// TODO: Pass the bounding rectangle with this representation directly
 			const float halfRectWidth = rect.size.width * 0.5f;
@@ -1042,26 +1023,22 @@ namespace spine {
 			// e.g. left culling <==> (c_cx + c_ex) / cw < -1 <==> (c_cx + c_ex) < -cw
 
 			// Left
-			if (c_cx + c_ex < -c_w)
-			{
+			if (c_cx + c_ex < -c_w) {
 				return true;
 			}
 
 			// Right
-			if (c_cx - c_ex > c_w)
-			{
+			if (c_cx - c_ex > c_w) {
 				return true;
 			}
 
 			// Bottom
-			if (c_cy + c_ey < -c_w)
-			{
+			if (c_cy + c_ey < -c_w) {
 				return true;
 			}
 
 			// Top
-			if (c_cy - c_ey > c_w)
-			{
+			if (c_cy - c_ey > c_w) {
 				return true;
 			}
 
@@ -1069,8 +1046,7 @@ namespace spine {
 		}
 
 
-		Color4B ColorToColor4B(const Color& color)
-		{
+		Color4B ColorToColor4B(const Color& color) {
 			return { (GLubyte)(color.r * 255.f), (GLubyte)(color.g * 255.f), (GLubyte)(color.b * 255.f), (GLubyte)(color.a * 255.f) };
 		}
 	}
