@@ -29,14 +29,14 @@
 
 module spine.webgl {
 	export class ManagedWebGLRenderingContext {
-		public canvas: HTMLCanvasElement;
+		public canvas: HTMLCanvasElement | OffscreenCanvas;
 		public gl: WebGLRenderingContext;
 		private restorables = new Array<Restorable>();
 
 		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext, contextConfig: any = { alpha: "true" }) {
 			if (canvasOrContext instanceof HTMLCanvasElement) {
 				let canvas = canvasOrContext;
-				this.gl = <WebGLRenderingContext> (canvas.getContext("webgl2", contextConfig)) || (canvas.getContext("webgl", contextConfig) || canvas.getContext("experimental-webgl", contextConfig));
+				this.gl = <WebGLRenderingContext> (canvas.getContext("webgl2", contextConfig) || canvas.getContext("webgl", contextConfig));
 				this.canvas = canvas;
 				canvas.addEventListener("webglcontextlost", (e: any) => {
 					let event = <WebGLContextEvent>e;
