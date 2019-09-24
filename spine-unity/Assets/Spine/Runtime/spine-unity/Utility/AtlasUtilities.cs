@@ -324,6 +324,8 @@ namespace Spine.Unity.AttachmentTools {
 			var skinAttachments = o.Attachments;
 			var newSkin = new Skin(newName);
 
+			newSkin.bones.AddRange(o.bones);
+			
 			// Use these to detect and use shared regions.
 			var existingRegions = new Dictionary<AtlasRegion, int>();
 			var regionIndexes = new List<int>();
