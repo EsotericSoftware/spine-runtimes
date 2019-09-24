@@ -269,7 +269,8 @@ namespace Spine.Unity.AttachmentTools {
 			newTexture.name = newAssetName;
 			// Copy settings
 			if (texturesToPack.Count > 0) {
-				newTexture.anisoLevel = texturesToPack[0].anisoLevel;
+				var sourceTexture = texturesToPack[0];
+				newTexture.CopyTextureAttributesFrom(sourceTexture);
 			}
 			var rects = newTexture.PackTextures(texturesToPack.ToArray(), padding, maxAtlasSize);
 
@@ -362,7 +363,11 @@ namespace Spine.Unity.AttachmentTools {
 			// Fill a new texture with the collected attachment textures.
 			var newTexture = new Texture2D(maxAtlasSize, maxAtlasSize, textureFormat, mipmaps);
 			newTexture.mipMapBias = AtlasUtilities.DefaultMipmapBias;
-			newTexture.anisoLevel = texturesToPack[0].anisoLevel;
+
+			if (texturesToPack.Count > 0) {
+				var sourceTexture = texturesToPack[0];
+				newTexture.CopyTextureAttributesFrom(sourceTexture);
+			}
 			newTexture.name = newName;
 			var rects = newTexture.PackTextures(texturesToPack.ToArray(), padding, maxAtlasSize);
 
@@ -428,6 +433,7 @@ namespace Spine.Unity.AttachmentTools {
 				int width = (int)r.width;
 				int height = (int)r.height;
 				output = new Texture2D(width, height, textureFormat, mipmaps) { name = ar.name };
+				output.CopyTextureAttributesFrom(sourceTexture);
 				AtlasUtilities.CopyTexture(sourceTexture, r, output);
 				CachedRegionTextures.Add(ar, output);
 				CachedRegionTexturesList.Add(output);
@@ -440,12 +446,14 @@ namespace Spine.Unity.AttachmentTools {
 			var spriteTexture = s.texture;
 			var r = s.textureRect;
 			var newTexture = new Texture2D((int)r.width, (int)r.height, textureFormat, mipmaps);
+			newTexture.CopyTextureAttributesFrom(spriteTexture);
 			AtlasUtilities.CopyTexture(spriteTexture, r, newTexture);
 			return newTexture;
 		}
 
 		static Texture2D GetClone (this Texture2D t, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
 			var newTexture = new Texture2D((int)t.width, (int)t.height, textureFormat, mipmaps);
+			newTexture.CopyTextureAttributesFrom(t);
 			AtlasUtilities.CopyTexture(t, new Rect(0, 0, t.width, t.height), newTexture);
 			return newTexture;
 		}
@@ -564,6 +572,15 @@ namespace Spine.Unity.AttachmentTools {
 		static Texture2D GetMainTexture (this AtlasRegion region) {
 			var material = (region.page.rendererObject as Material);
 			return material.mainTexture as Texture2D;
+		}
+
+		static void CopyTextureAttributesFrom(this Texture2D destination, Texture2D source) {
+			destination.filterMode = source.filterMode;
+			destination.anisoLevel = source.anisoLevel;
+			destination.alphaIsTransparency = source.alphaIsTransparency;
+			destination.wrapModeU = source.wrapModeU;
+			destination.wrapModeV = source.wrapModeV;
+			destination.wrapModeW = source.wrapModeW;
 		}
 
 		static void ApplyPMA (this Texture2D texture, bool applyImmediately = true) {
