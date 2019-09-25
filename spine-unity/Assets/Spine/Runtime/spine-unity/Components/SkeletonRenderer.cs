@@ -100,7 +100,7 @@ namespace Spine.Unity {
 		/// by e.g. the LWRP renderer, leading to incorrect draw order (e.g. "A1 B A2" changed to "A1A2 B").
 		/// You can disable this parameter when everything is drawn correctly to save the additional performance cost.
 		/// </summary>
-		public bool fixDrawOrder = true;
+		public bool fixDrawOrder = false;
 		#endif
 
 		/// <summary>If true, the mesh generator adds normals to the output mesh. For better performance and reduced memory requirements, use a shader that assumes the desired normal.</summary>
