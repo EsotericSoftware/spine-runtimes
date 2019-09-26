@@ -470,23 +470,9 @@ namespace Spine.Unity.Editor {
 				string texturePath = assetPath + "/" + pageFiles[i];
 				Texture2D texture = (Texture2D)AssetDatabase.LoadAssetAtPath(texturePath, typeof(Texture2D));
 
-				if (SpineEditorUtilities.Preferences.setTextureImporterSettings) {
-					TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
-					if (texImporter == null) {
-						Debug.LogWarning(string.Format("{0} ::: Texture asset \"{1}\" not found. Skipping. Please check your atlas file for renamed files.", atlasAsset.name, texturePath));
-						continue;
-					}
-
-					texImporter.textureCompression = TextureImporterCompression.Uncompressed;
-					texImporter.alphaSource = TextureImporterAlphaSource.FromInput;
-					texImporter.mipmapEnabled = false;
-					texImporter.alphaIsTransparency = false; // Prevent the texture importer from applying bleed to the transparent parts for PMA.
-					texImporter.spriteImportMode = SpriteImportMode.None;
-					texImporter.maxTextureSize = 2048;
-
-					EditorUtility.SetDirty(texImporter);
-					AssetDatabase.ImportAsset(texturePath);
-					AssetDatabase.SaveAssets();
+				if (SpineEditorUtilities.Preferences.setTextureImporterSettings && 
+					!System.IO.File.Exists(texturePath + ".meta")) {
+					SetDefaultTextureSettings(texturePath, atlasAsset);
 				}
 
 				string pageName = Path.GetFileNameWithoutExtension(pageFiles[i]);
@@ -505,7 +491,9 @@ namespace Spine.Unity.Editor {
 					vestigialMaterials.Remove(mat);
 				}
 
-				mat.mainTexture = texture;
+				if (texture != null)
+					mat.mainTexture = texture;
+
 				EditorUtility.SetDirty(mat);
 				AssetDatabase.SaveAssets();
 
@@ -558,6 +546,26 @@ namespace Spine.Unity.Editor {
 
 			protectFromStackGarbageCollection.Remove(atlasAsset);
 			return (AtlasAssetBase)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAssetBase));
+		}
+
+		static bool SetDefaultTextureSettings (string texturePath, SpineAtlasAsset atlasAsset) {
+			TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
+			if (texImporter == null) {
+				Debug.LogWarning(string.Format("{0}: Texture asset \"{1}\" not found. Skipping. Please check your atlas file for renamed files.", atlasAsset.name, texturePath));
+				return false;
+			}
+
+			texImporter.textureCompression = TextureImporterCompression.Uncompressed;
+			texImporter.alphaSource = TextureImporterAlphaSource.FromInput;
+			texImporter.mipmapEnabled = false;
+			texImporter.alphaIsTransparency = false; // Prevent the texture importer from applying bleed to the transparent parts for PMA.
+			texImporter.spriteImportMode = SpriteImportMode.None;
+			texImporter.maxTextureSize = 2048;
+
+			EditorUtility.SetDirty(texImporter);
+			AssetDatabase.ImportAsset(texturePath);
+			AssetDatabase.SaveAssets();
+			return true;
 		}
 #endregion
 
