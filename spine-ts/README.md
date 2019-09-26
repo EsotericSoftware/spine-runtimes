@@ -26,7 +26,7 @@ spine-ts works with data exported from Spine 3.8.xx.
 
 spine-ts WebGL & players backends supports all Spine features.
 
-spine-ts Canvas does not support color tinting, mesh attachments and clipping. Only the alpha channel from tint colors is applied. Experimental support for mesh attachments can be enabled by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers.
+spine-ts Canvas does not support white space stripped texture atlases, color tinting, mesh attachments and clipping. Only the alpha channel from tint colors is applied. Experimental support for mesh attachments can be enabled by setting `spine.canvas.SkeletonRenderer.useTriangleRendering` to true. Note that this method is slow and may lead to artifacts on some browsers.
 
 spine-ts THREE.JS does not support two color tinting & blend modes. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
 
