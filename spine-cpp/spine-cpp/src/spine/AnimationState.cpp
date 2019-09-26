@@ -976,7 +976,7 @@ void AnimationState::computeHold(TrackEntry *entry) {
 	if (to != NULL && to->_holdPrevious) {
 		for (size_t i = 0; i < timelinesCount; i++) {
 			int id = timelines[i]->getPropertyId();
-			if (!_propertyIDs.contains(id)) _propertyIDs.add(id);
+			if (!_propertyIDs.containsKey(id)) _propertyIDs.put(id, true);
 			timelineMode[i] = Hold;
 		}
 		return;
@@ -988,18 +988,18 @@ void AnimationState::computeHold(TrackEntry *entry) {
 	for (; i < timelinesCount; ++i) {
 		Timeline *timeline = timelines[i];
 		int id = timeline->getPropertyId();
-		if (_propertyIDs.contains(id)) {
+		if (_propertyIDs.containsKey(id)) {
 			timelineMode[i] = Subsequent;
 		} else {
-			_propertyIDs.add(id);
+			_propertyIDs.put(id, true);
 
 			if (to == NULL || timeline->getRTTI().isExactly(AttachmentTimeline::rtti) ||
 					timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) ||
-					timeline->getRTTI().isExactly(EventTimeline::rtti) || !hasTimeline(to, id)) {
+					timeline->getRTTI().isExactly(EventTimeline::rtti) || !to->_animation->hasTimeline(id)) {
 				timelineMode[i] = First;
 			} else {
 				for (TrackEntry *next = to->_mixingTo; next != NULL; next = next->_mixingTo) {
-					if (hasTimeline(next, id)) continue;
+					if (next->_animation->hasTimeline(id)) continue;
 					if (entry->_mixDuration > 0) {
 						timelineMode[i] = HoldMix;
 						timelineHoldMix[i] = entry;
@@ -1022,17 +1022,10 @@ void AnimationState::computeNotLast(TrackEntry *entry) {
 	for (size_t i = 0; i < timelinesCount; i++) {
 		if (timelines[i]->getRTTI().isExactly(AttachmentTimeline::rtti)) {
 			AttachmentTimeline *timeline = static_cast<AttachmentTimeline *>(timelines[i]);
-			if (!_propertyIDs.contains(timeline->getSlotIndex()))
-				_propertyIDs.add(timeline->getSlotIndex());
+			if (!_propertyIDs.containsKey(timeline->getSlotIndex()))
+				_propertyIDs.put(timeline->getSlotIndex(), true);
 			else
 				timelineMode[i] |= NotLast;
 		}
 	}
-}
-
-bool AnimationState::hasTimeline(TrackEntry* entry, int inId) {
-	Vector<Timeline *> &timelines = entry->_animation->_timelines;
-	for (size_t i = 0, n = timelines.size(); i < n; ++i)
-		if (timelines[i]->getPropertyId() == inId) return true;
-	return false;
 }

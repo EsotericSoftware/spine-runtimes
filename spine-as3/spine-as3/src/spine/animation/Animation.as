@@ -30,10 +30,12 @@
 package spine.animation {
 	import spine.Event;
 	import spine.Skeleton;
+	import flash.utils.Dictionary;
 
 	public class Animation {
 		internal var _name : String;
 		public var _timelines : Vector.<Timeline>;
+		internal var _timelineIds : Dictionary = new Dictionary();
 		public var duration : Number;
 
 		public function Animation(name : String, timelines : Vector.<Timeline>, duration : Number) {
@@ -41,7 +43,13 @@ package spine.animation {
 			if (timelines == null) throw new ArgumentError("timelines cannot be null.");
 			_name = name;
 			_timelines = timelines;
+			for (var i : Number = 0; i < timelines.length; i++)
+				_timelineIds[timelines[i].getPropertyId()] = true;
 			this.duration = duration;
+		}
+		
+		public function hasTimeline(id: Number) : Boolean {
+			return _timelineIds[id] == true;
 		}
 
 		public function get timelines() : Vector.<Timeline> {

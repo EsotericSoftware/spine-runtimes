@@ -393,7 +393,7 @@ namespace spine {
 		Vector<Event*> _events;
 		EventQueue* _queue;
 
-		Vector<int> _propertyIDs;
+		HashMap<int, bool> _propertyIDs;
 		bool _animationsChanged;
 
 		AnimationStateListener _listener;
@@ -429,8 +429,6 @@ namespace spine {
 		void computeHold(TrackEntry *entry);
 
 		void computeNotLast(TrackEntry *entry);
-
-		bool hasTimeline(TrackEntry *entry, int inId);
 	};
 }
 

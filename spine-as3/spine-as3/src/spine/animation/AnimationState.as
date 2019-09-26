@@ -664,11 +664,11 @@ package spine.animation {
 				if (contained != null) {
 					timelineMode[i] = AnimationState.SUBSEQUENT;
 				} else if (to == null || timeline is AttachmentTimeline || timeline is DrawOrderTimeline
-					|| timeline is EventTimeline || !hasTimeline(to, intId)) {
+					|| timeline is EventTimeline || !to.animation.hasTimeline(intId)) {
 					timelineMode[i] = AnimationState.FIRST;
 				} else {
 					for (var next : TrackEntry = to.mixingTo; next != null; next = next.mixingTo) {
-						if (hasTimeline(next, intId)) continue;
+						if (next.animation.hasTimeline(intId)) continue;
 						if (entry.mixDuration > 0) {
 							timelineMode[i] = AnimationState.HOLD_MIX;
 							timelineHoldMix[i] = entry;
@@ -679,13 +679,6 @@ package spine.animation {
 					timelineMode[i] = AnimationState.HOLD;
 				}
 			}
-		}
-
-		private static function hasTimeline (entry: TrackEntry, id : int) : Boolean {
-			var timelines : Vector.<Timeline> = entry.animation.timelines;
-			for (var i : int = 0, n : int = entry.animation.timelines.length; i < n; i++)
-				if (timelines[i].getPropertyId() == id) return true;
-			return false;
 		}
 
 		public function getCurrent(trackIndex : int) : TrackEntry {
