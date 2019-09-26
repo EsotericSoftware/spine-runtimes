@@ -50,8 +50,17 @@ function Animation.new (name, timelines, duration)
 	local self = {
 		name = name,
 		timelines = timelines,
+		timelineIds = {},
 		duration = duration
 	}
+	
+	for i,timeline in ipairs(self.timelines) do
+		self.timelineIds[timeline:getPropertyId()] = true
+	end
+
+	function self:hasTimeline(id)
+		return self.timelineIds[id] == true
+	end
 
 	function self:apply (skeleton, lastTime, time, loop, events, alpha, blend, direction)
 		if not skeleton then error("skeleton cannot be nil.", 2) end
