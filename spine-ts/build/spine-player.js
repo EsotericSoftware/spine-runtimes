@@ -21,8 +21,14 @@ var spine;
 				throw new Error("timelines cannot be null.");
 			this.name = name;
 			this.timelines = timelines;
+			this.timelineIds = [];
+			for (var i = 0; i < timelines.length; i++)
+				this.timelineIds[timelines[i].getPropertyId()] = true;
 			this.duration = duration;
 		}
+		Animation.prototype.hasTimeline = function (id) {
+			return this.timelineIds[id] == true;
+		};
 		Animation.prototype.apply = function (skeleton, lastTime, time, loop, events, alpha, blend, direction) {
 			if (skeleton == null)
 				throw new Error("skeleton cannot be null.");
@@ -1885,12 +1891,12 @@ var spine;
 				if (!propertyIDs.add(id))
 					timelineMode[i] = AnimationState.SUBSEQUENT;
 				else if (to == null || timeline instanceof spine.AttachmentTimeline || timeline instanceof spine.DrawOrderTimeline
-					|| timeline instanceof spine.EventTimeline || !this.hasTimeline(to, id)) {
+					|| timeline instanceof spine.EventTimeline || !to.animation.hasTimeline(id)) {
 					timelineMode[i] = AnimationState.FIRST;
 				}
 				else {
 					for (var next = to.mixingTo; next != null; next = next.mixingTo) {
-						if (this.hasTimeline(next, id))
+						if (next.animation.hasTimeline(id))
 							continue;
 						if (entry.mixDuration > 0) {
 							timelineMode[i] = AnimationState.HOLD_MIX;

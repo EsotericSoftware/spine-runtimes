@@ -632,11 +632,11 @@ module spine {
 				if (!propertyIDs.add(id))
 					timelineMode[i] = AnimationState.SUBSEQUENT;
 				else if (to == null || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
-					|| timeline instanceof EventTimeline || !this.hasTimeline(to, id)) {
+					|| timeline instanceof EventTimeline || !to.animation.hasTimeline(id)) {
 					timelineMode[i] = AnimationState.FIRST;
 				} else {
 					for (let next = to.mixingTo; next != null; next = next.mixingTo) {
-						if (this.hasTimeline(next, id)) continue;
+						if (next.animation.hasTimeline(id)) continue;
 						if (entry.mixDuration > 0) {
 							timelineMode[i] = AnimationState.HOLD_MIX;
 							timelineDipMix[i] = next;
