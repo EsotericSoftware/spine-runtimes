@@ -231,6 +231,7 @@
       a) the `Packages` directory in your project where it will automatically be loaded, or
       b) to an arbitrary directory outside the Assets directory and then open Package Manager in Unity, select the `+` icon, choose `Add package from disk..` and point it to the package.json file.
       The Project panel should now show an entry `Spine Timeline Extensions` under `Packages`. If the directory is not yet listed, you will need to close and re-open Unity to have it display the directory and its contents.
+  * `SkeletonMecanim`'s `Layer Mix Mode` enum name `MixMode.SpineStyle` has been renamed to `MixMode.Hard`. This is most likely not set via code and thus unlikely to be a problem. Serialized scenes and prefabs are unaffected.
 
 * **Additions**
   * **Spine Preferences stored in Assets/Editor/SpineSettings.asset** Now Spine uses the new `SettingsProvider` API, storing settings in a SpineSettings.asset file which can be shared with team members. Your old preferences are automatically migrated to the new system.
@@ -263,7 +264,7 @@
 		You can leave this parameter disabled when everything is drawn correctly to save the additional performance cost.
 
 * **Changes of default values**
-  * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.SpineStyle` instead of `MixMode.MixAlways`.
+  * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.MixNext` instead of `MixMode.MixAlways`.
   * `BlendModeMaterialAsset` and it's instance `Default BlendModeMaterials.asset` now have `Apply Additive Material` set to `true` by default in order to apply all blend modes by default.
 
 * **Deprecated**
