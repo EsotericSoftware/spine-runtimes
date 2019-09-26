@@ -37,7 +37,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
-
+import com.badlogic.gdx.utils.IntSet;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
@@ -45,6 +45,7 @@ import com.esotericsoftware.spine.attachments.VertexAttachment;
 public class Animation {
 	final String name;
 	final Array<Timeline> timelines;
+	final IntSet timelineIds;
 	float duration;
 
 	public Animation (String name, Array<Timeline> timelines, float duration) {
@@ -52,11 +53,19 @@ public class Animation {
 		if (timelines == null) throw new IllegalArgumentException("timelines cannot be null.");
 		this.name = name;
 		this.timelines = timelines;
+		this.timelineIds = new IntSet();
+		for (Timeline timeline : timelines)
+			timelineIds.add(timeline.getPropertyId());
 		this.duration = duration;
 	}
 
 	public Array<Timeline> getTimelines () {
 		return timelines;
+	}
+
+	/** Whether the timeline with the property id is contained in this animation **/
+	boolean hasTimeline (int id) {
+		return timelineIds.contains(id);
 	}
 
 	/** The duration of the animation in seconds, which is the highest time of all keys in the timeline. */

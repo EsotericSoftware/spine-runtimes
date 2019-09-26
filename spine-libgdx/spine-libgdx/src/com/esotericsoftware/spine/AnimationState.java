@@ -745,11 +745,11 @@ public class AnimationState {
 			if (!propertyIDs.add(id))
 				timelineMode[i] = SUBSEQUENT;
 			else if (to == null || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
-				|| timeline instanceof EventTimeline || !hasTimeline(to, id)) {
+				|| timeline instanceof EventTimeline || !to.animation.hasTimeline(id)) {
 				timelineMode[i] = FIRST;
 			} else {
 				for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
-					if (hasTimeline(next, id)) continue;
+					if (next.animation.hasTimeline(id)) continue;
 					if (next.mixDuration > 0) {
 						timelineMode[i] = HOLD_MIX;
 						timelineHoldMix[i] = next;
@@ -774,13 +774,6 @@ public class AnimationState {
 				if (!propertyIDs.add(timeline.slotIndex)) timelineMode[i] |= NOT_LAST;
 			}
 		}
-	}
-
-	private boolean hasTimeline (TrackEntry entry, int id) {
-		Object[] timelines = entry.animation.timelines.items;
-		for (int i = 0, n = entry.animation.timelines.size; i < n; i++)
-			if (((Timeline)timelines[i]).getPropertyId() == id) return true;
-		return false;
 	}
 
 	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
