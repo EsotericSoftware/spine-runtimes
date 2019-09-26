@@ -663,13 +663,6 @@ module spine {
 			}
 		}
 
-		hasTimeline (entry: TrackEntry, id: number) : boolean {
-			let timelines = entry.animation.timelines;
-			for (let i = 0, n = timelines.length; i < n; i++)
-				if (timelines[i].getPropertyId() == id) return true;
-			return false;
-		}
-
 		getCurrent (trackIndex: number) {
 			if (trackIndex >= this.tracks.length) return null;
 			return this.tracks[trackIndex];

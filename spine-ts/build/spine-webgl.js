@@ -1922,13 +1922,6 @@ var spine;
 				}
 			}
 		};
-		AnimationState.prototype.hasTimeline = function (entry, id) {
-			var timelines = entry.animation.timelines;
-			for (var i = 0, n = timelines.length; i < n; i++)
-				if (timelines[i].getPropertyId() == id)
-					return true;
-			return false;
-		};
 		AnimationState.prototype.getCurrent = function (trackIndex) {
 			if (trackIndex >= this.tracks.length)
 				return null;

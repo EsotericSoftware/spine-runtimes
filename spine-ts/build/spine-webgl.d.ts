@@ -283,7 +283,6 @@ declare module spine {
 		_animationsChanged(): void;
 		computeHold(entry: TrackEntry): void;
 		computeNotLast(entry: TrackEntry): void;
-		hasTimeline(entry: TrackEntry, id: number): boolean;
 		getCurrent(trackIndex: number): TrackEntry;
 		addListener(listener: AnimationStateListener2): void;
 		removeListener(listener: AnimationStateListener2): void;
