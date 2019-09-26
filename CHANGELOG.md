@@ -177,6 +177,11 @@
     * `WaitForSpineAnimationComplete` now proves an additional `bool includeEndEvent` parameter, defaults to `false` (previous behaviour).
     * Added a new `WaitForSpineAnimationEnd` yield instruction.
     * Added a new generic `WaitForSpineAnimation` yield instruction which can be configured to wait for any combination of animation track events. It is now used as base class for `WaitForSpineAnimationComplete` and `WaitForSpineAnimationEnd`.
+  * Additional **Fix Draw Order** parameter at SkeletonRenderer, defaults to `disabled` (previous behaviour).
+    Applies only when 3+ submeshes are used (2+ materials with alternating order, e.g. "A B A").
+		If true, MaterialPropertyBlocks are assigned at each material to prevent aggressive batching of submeshes
+		by e.g. the LWRP renderer, leading to incorrect draw order (e.g. "A1 B A2" changed to "A1A2 B").
+		You can leave this parameter disabled when everything is drawn correctly to save the additional performance cost.
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.SpineStyle` instead of `MixMode.MixAlways`.

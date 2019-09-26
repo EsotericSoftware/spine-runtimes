@@ -31,6 +31,10 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
+#if UNITY_2018_1_OR_NEWER
+#define PER_MATERIAL_PROPERTY_BLOCKS
+#endif
+
 #if UNITY_2017_1_OR_NEWER
 #define BUILT_IN_SPRITE_MASK_COMPONENT
 #endif
@@ -89,6 +93,15 @@ namespace Spine.Unity {
 		/// <summary>If true, the renderer assumes the skeleton only requires one Material and one submesh to render. This allows the MeshGenerator to skip checking for changes in Materials. Enable this as an optimization if the skeleton only uses one Material.</summary>
 		/// <remarks>This disables SkeletonRenderSeparator functionality.</remarks>
 		public bool singleSubmesh = false;
+
+		#if PER_MATERIAL_PROPERTY_BLOCKS
+		/// <summary> Applies only when 3+ submeshes are used (2+ materials with alternating order, e.g. "A B A").
+		/// If true, MaterialPropertyBlocks are assigned at each material to prevent aggressive batching of submeshes
+		/// by e.g. the LWRP renderer, leading to incorrect draw order (e.g. "A1 B A2" changed to "A1A2 B").
+		/// You can disable this parameter when everything is drawn correctly to save the additional performance cost.
+		/// </summary>
+		public bool fixDrawOrder = false;
+		#endif
 
 		/// <summary>If true, the mesh generator adds normals to the output mesh. For better performance and reduced memory requirements, use a shader that assumes the desired normal.</summary>
 		[UnityEngine.Serialization.FormerlySerializedAs("calculateNormals")] public bool addNormals = false;
@@ -422,6 +435,12 @@ namespace Spine.Unity {
 				AssignSpriteMaskMaterials();
 			}
 			#endif
+
+			#if PER_MATERIAL_PROPERTY_BLOCKS
+			if (fixDrawOrder && meshRenderer.sharedMaterials.Length > 2) {
+				SetDrawOrderMaterialPropertyBlocks();
+			}
+			#endif
 		}
 
 		public void FindAndApplySeparatorSlots (string startsWith, bool clearExistingSeparators = true, bool updateStringArray = false) {
@@ -580,5 +599,33 @@ namespace Spine.Unity {
 		#endif // UNITY_EDITOR
 
 		#endif //#if BUILT_IN_SPRITE_MASK_COMPONENT
+
+		#if PER_MATERIAL_PROPERTY_BLOCKS
+		private MaterialPropertyBlock reusedPropertyBlock;
+		public static readonly int SUBMESH_DUMMY_PARAM_ID = Shader.PropertyToID("_Submesh");
+
+		/// <summary>
+		/// This method was introduced as a workaround for too aggressive submesh draw call batching,
+		/// leading to incorrect draw order when 3+ materials are used at submeshes in alternating order.
+		/// Otherwise, e.g. when using Lightweight Render Pipeline, deliberately separated draw calls
+		/// "A1 B A2" are reordered to "A1A2 B", regardless of batching-related project settings.
+		/// </summary>
+		private void SetDrawOrderMaterialPropertyBlocks() {
+			if (reusedPropertyBlock == null) reusedPropertyBlock = new MaterialPropertyBlock();
+			
+			bool hasPerRendererBlock = meshRenderer.HasPropertyBlock();
+			if (hasPerRendererBlock) {
+				meshRenderer.GetPropertyBlock(reusedPropertyBlock);
+			}
+
+			for (int i = 0; i < meshRenderer.sharedMaterials.Length; ++i) {
+				if (!hasPerRendererBlock) meshRenderer.GetPropertyBlock(reusedPropertyBlock, i);
+				// Note: this parameter shall not exist at any shader, then Unity will create separate
+				// material instances (not in terms of memory cost or leakage).
+				reusedPropertyBlock.SetFloat(SUBMESH_DUMMY_PARAM_ID, i);
+				meshRenderer.SetPropertyBlock(reusedPropertyBlock, i);
+			}
+		}
+		#endif
 	}
 }
