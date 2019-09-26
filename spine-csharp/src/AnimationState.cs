@@ -136,7 +136,7 @@ namespace Spine {
 					float nextTime = current.trackLast - next.delay;
 					if (nextTime >= 0) {
 						next.delay = 0;
-						next.trackTime = current.timeScale == 0 ? 0 : (nextTime / current.timeScale + delta) * next.timeScale;
+						next.trackTime += current.timeScale == 0 ? 0 : (nextTime / current.timeScale + delta) * next.timeScale;
 						current.trackTime += currentDelta;
 						SetCurrent(i, next, true);
 						while (next.mixingFrom != null) {

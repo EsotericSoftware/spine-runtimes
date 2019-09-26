@@ -141,6 +141,23 @@ namespace Spine {
 			}
 		}
 
+		// Additional overload provided because ExposedList<T> only implements IEnumerable<T>,
+		// leading to sub-optimal behavior: It grows multiple times as it assumes not
+		// to know the final size ahead of insertion.
+		public void AddRange (ExposedList<T> list) {
+			CheckCollection(list);
+
+			int collectionCount = list.Count;
+			if (collectionCount == 0)
+				return;
+
+			GrowIfNeeded(collectionCount);
+			list.CopyTo(Items, Count);
+			Count += collectionCount;
+
+			version++;
+		}
+
 		public void AddRange (IEnumerable<T> collection) {
 			CheckCollection(collection);
 

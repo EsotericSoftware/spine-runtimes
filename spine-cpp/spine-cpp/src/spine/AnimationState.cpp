@@ -353,7 +353,7 @@ void AnimationState::update(float delta) {
 			float nextTime = current._trackLast - next->_delay;
 			if (nextTime >= 0) {
 				next->_delay = 0;
-				next->_trackTime = current._timeScale == 0 ? 0 : (nextTime / current._timeScale + delta) * next->_timeScale;
+				next->_trackTime += current._timeScale == 0 ? 0 : (nextTime / current._timeScale + delta) * next->_timeScale;
 				current._trackTime += currentDelta;
 				setCurrent(i, next, true);
 				while (next->_mixingFrom != NULL) {
