@@ -31,6 +31,7 @@ module spine {
 	export class Animation {
 		name: string;
 		timelines: Array<Timeline>;
+		timelineIds: Array<boolean>;
 		duration: number;
 
 		constructor (name: string, timelines: Array<Timeline>, duration: number) {
@@ -38,7 +39,14 @@ module spine {
 			if (timelines == null) throw new Error("timelines cannot be null.");
 			this.name = name;
 			this.timelines = timelines;
+			this.timelineIds = [];
+			for (var i = 0; i < timelines.length; i++)
+				this.timelineIds[timelines[i].getPropertyId()] = true;
 			this.duration = duration;
+		}
+
+		hasTimeline (id: number) {
+			return this.timelineIds[id] == true;
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {

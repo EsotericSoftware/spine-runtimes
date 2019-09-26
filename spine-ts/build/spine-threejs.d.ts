@@ -2,8 +2,10 @@ declare module spine {
 	class Animation {
 		name: string;
 		timelines: Array<Timeline>;
+		timelineIds: Array<boolean>;
 		duration: number;
 		constructor(name: string, timelines: Array<Timeline>, duration: number);
+		hasTimeline(id: number): boolean;
 		apply(skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection): void;
 		static binarySearch(values: ArrayLike<number>, target: number, step?: number): number;
 		static linearSearch(values: ArrayLike<number>, target: number, step: number): number;
@@ -281,7 +283,6 @@ declare module spine {
 		_animationsChanged(): void;
 		computeHold(entry: TrackEntry): void;
 		computeNotLast(entry: TrackEntry): void;
-		hasTimeline(entry: TrackEntry, id: number): boolean;
 		getCurrent(trackIndex: number): TrackEntry;
 		addListener(listener: AnimationStateListener2): void;
 		removeListener(listener: AnimationStateListener2): void;
