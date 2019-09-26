@@ -31,7 +31,6 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.OrderedMap;
-
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 
@@ -41,7 +40,7 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
  * <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
 public class Skin {
 	final String name;
-	final OrderedMap<SkinEntry, Attachment> attachments = new OrderedMap();
+	final OrderedMap<SkinEntry, SkinEntry> attachments = new OrderedMap();
 	final Array<BoneData> bones = new Array();
 	final Array<ConstraintData> constraints = new Array();
 	private final SkinEntry lookup = new SkinEntry();
@@ -56,7 +55,11 @@ public class Skin {
 	public void setAttachment (int slotIndex, String name, Attachment attachment) {
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
-		attachments.put(new SkinEntry(slotIndex, name, attachment), attachment);
+		SkinEntry newEntry = new SkinEntry(slotIndex, name, attachment);
+		SkinEntry oldEntry = attachments.put(newEntry, newEntry);
+		if (oldEntry != null) {
+			oldEntry.attachment = attachment;
+		}
 	}
 
 	/** Adds all attachments, bones, and constraints from the specified skin to this skin. */
@@ -96,7 +99,8 @@ public class Skin {
 	public Attachment getAttachment (int slotIndex, String name) {
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 		lookup.set(slotIndex, name);
-		return attachments.get(lookup);
+		SkinEntry entry = attachments.get(lookup);
+		return entry != null ? entry.attachment : null;
 	}
 
 	/** Removes the attachment in the skin for the specified slot index and name, if any. */
