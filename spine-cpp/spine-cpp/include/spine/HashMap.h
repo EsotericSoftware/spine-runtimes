@@ -89,11 +89,17 @@ public:
 	}
 
 	~HashMap() {
+		clear();
+	}
+
+	void clear() {
 		for (Entry *entry = _head; entry != NULL;) {
 			Entry* next = entry->next;
 			delete entry;
 			entry = next;
 		}
+		_head = NULL;
+		_size = 0;
 	}
 
 	size_t size() {

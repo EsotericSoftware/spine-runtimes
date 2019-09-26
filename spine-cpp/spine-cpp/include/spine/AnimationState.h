@@ -393,7 +393,7 @@ namespace spine {
 		Vector<Event*> _events;
 		EventQueue* _queue;
 
-		Vector<int> _propertyIDs;
+		HashMap<int, bool> _propertyIDs;
 		bool _animationsChanged;
 
 		AnimationStateListener _listener;
