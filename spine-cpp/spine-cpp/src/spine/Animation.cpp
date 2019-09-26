@@ -44,9 +44,16 @@ using namespace spine;
 
 Animation::Animation(const String &name, Vector<Timeline *> &timelines, float duration) :
 		_timelines(timelines),
+		_timelineIds(),
 		_duration(duration),
 		_name(name) {
 	assert(_name.length() > 0);
+	for (int i = 0; i < (int)timelines.size(); i++)
+		_timelineIds.put(timelines[i]->getPropertyId(), true);
+}
+
+bool Animation::hasTimeline(int id) {
+	return _timelineIds.containsKey(id);
 }
 
 Animation::~Animation() {

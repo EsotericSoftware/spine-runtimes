@@ -995,11 +995,11 @@ void AnimationState::computeHold(TrackEntry *entry) {
 
 			if (to == NULL || timeline->getRTTI().isExactly(AttachmentTimeline::rtti) ||
 					timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) ||
-					timeline->getRTTI().isExactly(EventTimeline::rtti) || !hasTimeline(to, id)) {
+					timeline->getRTTI().isExactly(EventTimeline::rtti) || !to->_animation->hasTimeline(id)) {
 				timelineMode[i] = First;
 			} else {
 				for (TrackEntry *next = to->_mixingTo; next != NULL; next = next->_mixingTo) {
-					if (hasTimeline(next, id)) continue;
+					if (next->_animation->hasTimeline(id)) continue;
 					if (entry->_mixDuration > 0) {
 						timelineMode[i] = HoldMix;
 						timelineHoldMix[i] = entry;
@@ -1028,11 +1028,4 @@ void AnimationState::computeNotLast(TrackEntry *entry) {
 				timelineMode[i] |= NotLast;
 		}
 	}
-}
-
-bool AnimationState::hasTimeline(TrackEntry* entry, int inId) {
-	Vector<Timeline *> &timelines = entry->_animation->_timelines;
-	for (size_t i = 0, n = timelines.size(); i < n; ++i)
-		if (timelines[i]->getPropertyId() == inId) return true;
-	return false;
 }

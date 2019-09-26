@@ -429,8 +429,6 @@ namespace spine {
 		void computeHold(TrackEntry *entry);
 
 		void computeNotLast(TrackEntry *entry);
-
-		bool hasTimeline(TrackEntry *entry, int inId);
 	};
 }
 
