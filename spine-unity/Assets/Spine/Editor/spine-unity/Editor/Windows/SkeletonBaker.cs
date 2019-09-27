@@ -184,9 +184,7 @@ namespace Spine.Unity.Editor {
 				Debug.LogError("Could not export Spine Skeleton because SkeletonDataAsset is null or invalid!");
 				return;
 			}
-
-			#if !NEW_PREFAB_SYSTEM
-
+			
 			if (outputPath == "") {
 				outputPath = System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(skeletonDataAsset)) + "/Baked";
 				System.IO.Directory.CreateDirectory(outputPath);
@@ -281,7 +279,13 @@ namespace Spine.Unity.Editor {
 				Object prefab = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject));
 
 				if (prefab == null) {
+					#if NEW_PREFAB_SYSTEM
+					GameObject emptyGameObject = new GameObject();
+					prefab = PrefabUtility.SaveAsPrefabAssetAndConnect(emptyGameObject, prefabPath, InteractionMode.AutomatedAction);
+					GameObject.DestroyImmediate(emptyGameObject);
+					#else
 					prefab = PrefabUtility.CreateEmptyPrefab(prefabPath);
+					#endif
 					newPrefab = true;
 				}
 
@@ -428,14 +432,22 @@ namespace Spine.Unity.Editor {
 				}
 
 				if (newPrefab) {
+					#if NEW_PREFAB_SYSTEM
+					PrefabUtility.SaveAsPrefabAssetAndConnect(prefabRoot, prefabPath, InteractionMode.AutomatedAction);
+					#else
 					PrefabUtility.ReplacePrefab(prefabRoot, prefab, ReplacePrefabOptions.ConnectToPrefab);
+					#endif
 				} else {
 
 					foreach (string str in unusedMeshNames) {
 						Mesh.DestroyImmediate(meshTable[str], true);
 					}
 
+					#if NEW_PREFAB_SYSTEM
+					PrefabUtility.SaveAsPrefabAssetAndConnect(prefabRoot, prefabPath, InteractionMode.AutomatedAction);
+					#else
 					PrefabUtility.ReplacePrefab(prefabRoot, prefab, ReplacePrefabOptions.ReplaceNameBased);
+					#endif
 				}
 
 
@@ -447,8 +459,6 @@ namespace Spine.Unity.Editor {
 				GameObject.DestroyImmediate(prefabRoot);
 
 			}
-			#endif
-
 		}
 
 		#region Attachment Baking
