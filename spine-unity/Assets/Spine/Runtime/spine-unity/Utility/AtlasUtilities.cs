@@ -580,7 +580,9 @@ namespace Spine.Unity.AttachmentTools {
 		static void CopyTextureAttributesFrom(this Texture2D destination, Texture2D source) {
 			destination.filterMode = source.filterMode;
 			destination.anisoLevel = source.anisoLevel;
+		#if UNITY_EDITOR
 			destination.alphaIsTransparency = source.alphaIsTransparency;
+		#endif
 			destination.wrapModeU = source.wrapModeU;
 			destination.wrapModeV = source.wrapModeV;
 			destination.wrapModeW = source.wrapModeW;
