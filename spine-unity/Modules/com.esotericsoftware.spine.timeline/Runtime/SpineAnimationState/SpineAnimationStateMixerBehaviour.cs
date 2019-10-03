@@ -70,7 +70,7 @@ namespace Spine.Unity.Playables {
 			for (int i = 0; i < inputCount; i++) {
 				float lastInputWeight = lastInputWeights[i];
 				float inputWeight = playable.GetInputWeight(i);
-				bool trackStarted = inputWeight > lastInputWeight;
+				bool trackStarted = lastInputWeight == 0 && inputWeight > 0;
 				lastInputWeights[i] = inputWeight;
 
 				if (trackStarted) {
@@ -84,9 +84,10 @@ namespace Spine.Unity.Playables {
 						if (clipData.animationReference.Animation != null) {
 							Spine.TrackEntry trackEntry = state.SetAnimation(trackIndex, clipData.animationReference.Animation, clipData.loop);
 
-							//trackEntry.TrackTime = (float)inputPlayable.GetTime(); // More accurate time-start?
 							trackEntry.EventThreshold = clipData.eventThreshold;
 							trackEntry.DrawOrderThreshold = clipData.drawOrderThreshold;
+							trackEntry.TrackTime = (float)inputPlayable.GetTime() * (float)inputPlayable.GetSpeed();
+							trackEntry.TimeScale = (float)inputPlayable.GetSpeed();
 							trackEntry.AttachmentThreshold = clipData.attachmentThreshold;
 
 							if (clipData.customDuration)
@@ -111,15 +112,15 @@ namespace Spine.Unity.Playables {
 			if (spineComponent == null) return;
 
 			int inputCount = playable.GetInputCount();
-			int lastOneWeight = -1;
+			int lastNonZeroWeightTrack = -1;
 
 			for (int i = 0; i < inputCount; i++) {
 				float inputWeight = playable.GetInputWeight(i);
-				if (inputWeight >= 1) lastOneWeight = i;
+				if (inputWeight > 0) lastNonZeroWeightTrack = i;
 			}
 
-			if (lastOneWeight != -1) {
-				ScriptPlayable<SpineAnimationStateBehaviour> inputPlayableClip = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastOneWeight);
+			if (lastNonZeroWeightTrack != -1) {
+				ScriptPlayable<SpineAnimationStateBehaviour> inputPlayableClip = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastNonZeroWeightTrack);
 				SpineAnimationStateBehaviour clipData = inputPlayableClip.GetBehaviour();
 
 				var skeleton = spineComponent.Skeleton;
@@ -133,16 +134,16 @@ namespace Spine.Unity.Playables {
 				Animation fromAnimation = null;
 				float fromClipTime = 0;
 				bool fromClipLoop = false;
-				if (lastOneWeight != 0 && inputCount > 1) {
-					var fromClip = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastOneWeight - 1);
+				if (lastNonZeroWeightTrack != 0 && inputCount > 1) {
+					var fromClip = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastNonZeroWeightTrack - 1);
 					var fromClipData = fromClip.GetBehaviour();
 					fromAnimation = fromClipData.animationReference != null ? fromClipData.animationReference.Animation : null;
-					fromClipTime = (float)fromClip.GetTime();
+					fromClipTime = (float)fromClip.GetTime() * (float)fromClip.GetSpeed();
 					fromClipLoop = fromClipData.loop;
 				}
 
 				Animation toAnimation = clipData.animationReference != null ? clipData.animationReference.Animation : null;
-				float toClipTime = (float)inputPlayableClip.GetTime();
+				float toClipTime = (float)inputPlayableClip.GetTime() * (float)inputPlayableClip.GetSpeed();
 				float mixDuration = clipData.mixDuration;
 
 				if (!clipData.customDuration && fromAnimation != null && toAnimation != null) {

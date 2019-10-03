@@ -92,6 +92,10 @@ namespace Spine.Unity.Editor {
 		public const bool DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME = true;
 		public bool mecanimEventIncludeFolderName = DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME;
 
+		// Timeline extension module
+		public const bool DEFAULT_TIMELINE_USE_BLEND_DURATION = true;
+		public bool timelineUseBlendDuration = DEFAULT_TIMELINE_USE_BLEND_DURATION;
+
 #if NEW_PREFERENCES_SETTINGS_PROVIDER
 		public static void Load () {
 			SpineHandles.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, DEFAULT_SCENE_ICONS_SCALE);
@@ -184,6 +188,12 @@ namespace Spine.Unity.Editor {
 						SpineEditorUtilities.SpineTK2DEditorUtility.EnableTK2D();
 					if (GUILayout.Button("Disable", GUILayout.Width(64)))
 						SpineEditorUtilities.SpineTK2DEditorUtility.DisableTK2D();
+				}
+
+				GUILayout.Space(20);
+				EditorGUILayout.LabelField("Timeline Extension", EditorStyles.boldLabel);
+				{
+					EditorGUILayout.PropertyField(settings.FindProperty("timelineUseBlendDuration"), new GUIContent("Use Blend Duration", "When enabled, MixDuration will be synced with timeline clip transition duration 'Ease In Duration'."));
 				}
 			}
 			EditorGUIUtility.labelWidth = prevLabelWidth;

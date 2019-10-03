@@ -27,38 +27,25 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System;
-using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Timeline;
-using Spine;
-using Spine.Unity;
-using System.Collections.Generic;
+using UnityEditor;
+using Spine.Unity.Playables;
 
-namespace Spine.Unity.Playables {
+namespace Spine.Unity.Editor {
 
-	using Animation = Spine.Animation;
+	[CustomEditor(typeof(SpineSkeletonFlipClip))]
+	[CanEditMultipleObjects]
+	public class SpineSkeletonFlipClipInspector : UnityEditor.Editor {
 
-	[Serializable]
-	public class SpineAnimationStateBehaviour : PlayableBehaviour {
-		public AnimationReferenceAsset animationReference;
-		public bool loop;
+		protected SerializedProperty templateProp = null;
 
-		// Mix Properties
-		public bool customDuration = false;
-		public bool useBlendDuration = true;
-		[SerializeField]
-		private bool isInitialized = false; // required to read preferences values from editor side.
-		public float mixDuration = 0.1f;
+		public void OnEnable () {
+			templateProp = serializedObject.FindProperty("template");
+		}
 
-		[Range(0, 1f)]
-		public float attachmentThreshold = 0.5f;
-
-		[Range(0, 1f)]
-		public float eventThreshold = 0.5f;
-
-		[Range(0, 1f)]
-		public float drawOrderThreshold = 0.5f;
+		public override void OnInspectorGUI () {
+			serializedObject.Update();
+			EditorGUILayout.PropertyField(templateProp);
+			serializedObject.ApplyModifiedProperties();
+		}
 	}
-
 }
