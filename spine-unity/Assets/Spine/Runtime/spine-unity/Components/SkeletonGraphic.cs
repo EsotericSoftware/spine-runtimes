@@ -288,6 +288,8 @@ namespace Spine.Unity {
 					if (!Application.isPlaying)
 						Update(0f);
 					#endif
+					if (freeze)
+						Update(0f);
 				}
 			}
 		}
