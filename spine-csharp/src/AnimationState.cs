@@ -777,11 +777,11 @@ namespace Spine {
 				if (!propertyIDs.Add(id))
 					timelineMode[i] = AnimationState.Subsequent;
 				else if (to == null || timeline is AttachmentTimeline || timeline is DrawOrderTimeline
-						|| timeline is EventTimeline || !HasTimeline(to, id)) {
+						|| timeline is EventTimeline || !to.animation.HasTimeline(id)) {
 					timelineMode[i] = AnimationState.First;
 				} else {
 					for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
-						if (HasTimeline(next, id)) continue;
+						if (next.animation.HasTimeline(id)) continue;
 						if (next.mixDuration > 0) {
 							timelineMode[i] = AnimationState.HoldMix;
 							timelineHoldMix[i] = next;
@@ -807,13 +807,6 @@ namespace Spine {
 					if (!propertyIDs.Add(timeline.slotIndex)) timelineMode[i] |= AnimationState.NotLast;
 				}
 			}
-		}
-
-		static bool HasTimeline (TrackEntry entry, int id) {
-			var timelines = entry.animation.timelines.Items;
-			for (int i = 0, n = entry.animation.timelines.Count; i < n; i++)
-				if (timelines[i].PropertyId == id) return true;
-			return false;
 		}
 
 		/// <returns>The track entry for the animation currently playing on the track, or null if no animation is currently playing.</returns>

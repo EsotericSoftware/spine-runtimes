@@ -96,8 +96,11 @@ namespace Spine.Unity {
 				}
 			}
 			set {
-				if (_animationName == value)
-					return;
+				if (_animationName == value) {
+					TrackEntry entry = state.GetCurrent(0);
+					if (entry != null && entry.loop == loop)
+						return;
+				}
 				_animationName = value;
 
 				if (string.IsNullOrEmpty(value)) {

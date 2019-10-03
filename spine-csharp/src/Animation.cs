@@ -37,11 +37,15 @@ namespace Spine {
 	public class Animation {
 		internal String name;
 		internal ExposedList<Timeline> timelines;
+		internal HashSet<int> timelineIds;
 		internal float duration;
 
 		public Animation (string name, ExposedList<Timeline> timelines, float duration) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			if (timelines == null) throw new ArgumentNullException("timelines", "timelines cannot be null.");
+			this.timelineIds = new HashSet<int>();
+			foreach (Timeline timeline in timelines)
+				timelineIds.Add(timeline.PropertyId);
 			this.name = name;
 			this.timelines = timelines;
 			this.duration = duration;
@@ -54,6 +58,11 @@ namespace Spine {
 
 		/// <summary>The animation's name, which is unique across all animations in the skeleton.</summary>
 		public string Name { get { return name; } }
+
+		/// <summary>Whether the timeline with the property id is contained in this animation.</summary>
+		public bool HasTimeline (int id) {
+			return timelineIds.Contains(id);
+		}
 
 		/// <summary>Applies all the animation's timelines to the specified skeleton.</summary>
 		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList, float, MixBlend, MixDirection)"/>
