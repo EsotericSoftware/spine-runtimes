@@ -32,30 +32,39 @@ using UnityEngine;
 using Spine;
 using Spine.Unity;
 using Spine.Unity.Playables;
+using Spine.Unity.Editor;
 
-//[CustomPropertyDrawer(typeof(SpineAnimationStateBehaviour))]
+[CustomPropertyDrawer(typeof(SpineAnimationStateBehaviour))]
 public class SpineAnimationStateDrawer : PropertyDrawer {
-	/*
+	
 	public override float GetPropertyHeight (SerializedProperty property, GUIContent label) {
 		const int fieldCount = 8;
 		return fieldCount * EditorGUIUtility.singleLineHeight;
 	}
 
 	public override void OnGUI (Rect position, SerializedProperty property, GUIContent label) {
-		SerializedProperty skeletonDataAssetProp = property.FindPropertyRelative("skeletonDataAsset");
-		SerializedProperty animationNameProp = property.FindPropertyRelative("animationName");
+		SerializedProperty animationReferenceProp = property.FindPropertyRelative("animationReference");
 		SerializedProperty loopProp = property.FindPropertyRelative("loop");
+
+		SerializedProperty customDurationProp = property.FindPropertyRelative("customDuration");
+		SerializedProperty useBlendDurationProp = property.FindPropertyRelative("useBlendDuration");
+		SerializedProperty mixDurationProp = property.FindPropertyRelative("mixDuration");
 		SerializedProperty eventProp = property.FindPropertyRelative("eventThreshold");
 		SerializedProperty attachmentProp = property.FindPropertyRelative("attachmentThreshold");
 		SerializedProperty drawOrderProp = property.FindPropertyRelative("drawOrderThreshold");
 
+		// initialize useBlendDuration parameter according to preferences
+		SerializedProperty isInitializedProp = property.FindPropertyRelative("isInitialized");
+		if (!isInitializedProp.hasMultipleDifferentValues && isInitializedProp.boolValue == false) {
+			useBlendDurationProp.boolValue = SpineEditorUtilities.Preferences.timelineUseBlendDuration;
+			isInitializedProp.boolValue = true;
+		}
+		
 		Rect singleFieldRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-		EditorGUI.PropertyField(singleFieldRect, skeletonDataAssetProp);
 
 		float lineHeightWithSpacing = EditorGUIUtility.singleLineHeight + 2f;
 
-		singleFieldRect.y += lineHeightWithSpacing;
-		EditorGUI.PropertyField(singleFieldRect, animationNameProp);
+		EditorGUI.PropertyField(singleFieldRect, animationReferenceProp);
 
 		singleFieldRect.y += lineHeightWithSpacing;
 		EditorGUI.PropertyField(singleFieldRect, loopProp);
@@ -66,6 +75,19 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		EditorGUI.LabelField(singleFieldRect, "Mixing Settings", EditorStyles.boldLabel);
 
 		singleFieldRect.y += lineHeightWithSpacing;
+		EditorGUI.PropertyField(singleFieldRect, customDurationProp);
+
+		bool greyOutCustomDurations = (!customDurationProp.hasMultipleDifferentValues &&
+										customDurationProp.boolValue == false);
+		using (new EditorGUI.DisabledGroupScope(greyOutCustomDurations)) {
+			singleFieldRect.y += lineHeightWithSpacing;
+			EditorGUI.PropertyField(singleFieldRect, useBlendDurationProp);
+
+			singleFieldRect.y += lineHeightWithSpacing;
+			EditorGUI.PropertyField(singleFieldRect, mixDurationProp);
+		}
+
+		singleFieldRect.y += lineHeightWithSpacing;
 		EditorGUI.PropertyField(singleFieldRect, eventProp);
 
 		singleFieldRect.y += lineHeightWithSpacing;
@@ -74,5 +96,4 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		singleFieldRect.y += lineHeightWithSpacing;
 		EditorGUI.PropertyField(singleFieldRect, drawOrderProp);
 	}
-	*/
 }

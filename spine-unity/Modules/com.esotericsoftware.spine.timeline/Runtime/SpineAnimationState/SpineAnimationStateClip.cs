@@ -37,12 +37,20 @@ namespace Spine.Unity.Playables {
 	public class SpineAnimationStateClip : PlayableAsset, ITimelineClipAsset {
 		public SpineAnimationStateBehaviour template = new SpineAnimationStateBehaviour();
 
-		public ClipCaps clipCaps { get { return ClipCaps.None; } }
+		public ClipCaps clipCaps { get { return ClipCaps.Blending | ClipCaps.ClipIn | ClipCaps.SpeedMultiplier | (template.loop ? ClipCaps.Looping : 0); } }
 
 		public override Playable CreatePlayable (PlayableGraph graph, GameObject owner) {
 			var playable = ScriptPlayable<SpineAnimationStateBehaviour>.Create(graph, template);
 			playable.GetBehaviour();
 			return playable;
+		}
+
+		public override double duration {
+			get {
+				if (template.animationReference == null)
+					return 0;
+				return template.animationReference.Animation.Duration;
+			}
 		}
 	}
 
