@@ -28,6 +28,10 @@
  *****************************************************************************/
 
 module spine {
+	/** An {@link AttachmentLoader} that configures attachments using texture regions from an {@link TextureAtlas}.
+	 *
+	 * See [Loading skeleton data](http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data) in the
+	 * Spine Runtimes Guide. */
 	export class AtlasAttachmentLoader implements AttachmentLoader {
 		atlas: TextureAtlas;
 
@@ -35,7 +39,6 @@ module spine {
 			this.atlas = atlas;
 		}
 
-		/** @return May be null to not load an attachment. */
 		newRegionAttachment (skin: Skin, name: string, path: string): RegionAttachment {
 			let region = this.atlas.findRegion(path);
 			if (region == null) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
@@ -45,7 +48,6 @@ module spine {
 			return attachment;
 		}
 
-		/** @return May be null to not load an attachment. */
 		newMeshAttachment (skin: Skin, name: string, path: string) : MeshAttachment {
 			let region = this.atlas.findRegion(path);
 			if (region == null) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
@@ -55,12 +57,10 @@ module spine {
 			return attachment;
 		}
 
-		/** @return May be null to not load an attachment. */
 		newBoundingBoxAttachment (skin: Skin, name: string) : BoundingBoxAttachment {
 			return new BoundingBoxAttachment(name);
 		}
 
-		/** @return May be null to not load an attachment */
 		newPathAttachment (skin: Skin, name: string): PathAttachment {
 			return new PathAttachment(name);
 		}

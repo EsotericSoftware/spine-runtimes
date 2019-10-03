@@ -28,6 +28,12 @@
  *****************************************************************************/
 
 module spine {
+
+	/** Stores the current pose values for an {@link Event}.
+	 *
+	 * See Timeline {@link Timeline#apply()},
+	 * AnimationStateListener {@link AnimationStateListener#event()}, and
+	 * [Events](http://esotericsoftware.com/spine-events) in the Spine User Guide. */
 	export class Event {
 		data: EventData;
 		intValue: number;

@@ -28,14 +28,36 @@
  *****************************************************************************/
 
 module spine {
+	/** Collects each visible {@link BoundingBoxAttachment} and computes the world vertices for its polygon. The polygon vertices are
+	 * provided along with convenience methods for doing hit detection. */
 	export class SkeletonBounds {
-		minX = 0; minY = 0; maxX = 0; maxY = 0;
+
+		/** The left edge of the axis aligned bounding box. */
+		minX = 0;
+
+		/** The bottom edge of the axis aligned bounding box. */
+		minY = 0;
+
+		/** The right edge of the axis aligned bounding box. */
+		maxX = 0;
+
+		/** The top edge of the axis aligned bounding box. */
+		maxY = 0;
+
+		/** The visible bounding boxes. */
 		boundingBoxes = new Array<BoundingBoxAttachment>();
+
+		/** The world vertices for the bounding box polygons. */
 		polygons = new Array<ArrayLike<number>>();
+
 		private polygonPool = new Pool<ArrayLike<number>>(() => {
 			return Utils.newFloatArray(16);
 		});
 
+		/** Clears any previous polygons, finds all visible bounding box attachments, and computes the world vertices for each bounding
+		 * box's polygon.
+		 * @param updateAabb If true, the axis aligned bounding box containing all the polygons is computed. If false, the
+		 *           SkeletonBounds AABB methods will always return true. */
 		update (skeleton: Skeleton, updateAabb: boolean) {
 			if (skeleton == null) throw new Error("skeleton cannot be null.");
 			let boundingBoxes = this.boundingBoxes;
@@ -155,7 +177,7 @@ module spine {
 		}
 
 		/** Returns the first bounding box attachment that contains any part of the line segment, or null. When doing many checks, it
-		 * is usually more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns
+		 * is usually more efficient to only call this method if {@link #aabbIntersectsSegment()} returns
 		 * true. */
 		intersectsSegment (x1: number, y1: number, x2: number, y2: number) {
 			let polygons = this.polygons;
@@ -195,10 +217,12 @@ module spine {
 			return index == -1 ? null : this.polygons[index];
 		}
 
+		/** The width of the axis aligned bounding box. */
 		getWidth () {
 			return this.maxX - this.minX;
 		}
 
+		/** The height of the axis aligned bounding box. */
 		getHeight () {
 			return this.maxY - this.minY;
 		}

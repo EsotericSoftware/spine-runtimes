@@ -28,10 +28,15 @@
  *****************************************************************************/
 
 module spine {
+
+	/** A simple container for a list of timelines and a name. */
 	export class Animation {
+		/** The animation's name, which is unique across all animations in the skeleton. */
 		name: string;
 		timelines: Array<Timeline>;
 		timelineIds: Array<boolean>;
+
+		/** The duration of the animation in seconds, which is the highest time of all keys in the timeline. */
 		duration: number;
 
 		constructor (name: string, timelines: Array<Timeline>, duration: number) {
@@ -49,6 +54,11 @@ module spine {
 			return this.timelineIds[id] == true;
 		}
 
+		/** Applies all the animation's timelines to the specified skeleton.
+		 *
+		 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection)}.
+		 * @param loop If true, the animation repeats after {@link #getDuration()}.
+		 * @param events May be null to ignore fired events. */
 		apply (skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			if (skeleton == null) throw new Error("skeleton cannot be null.");
 
@@ -62,6 +72,8 @@ module spine {
 				timelines[i].apply(skeleton, lastTime, time, events, alpha, blend, direction);
 		}
 
+		/** @param target After the first and before the last value.
+	 	 * @returns index of first value greater than the target. */
 		static binarySearch (values: ArrayLike<number>, target: number, step: number = 1) {
 			let low = 0;
 			let high = values.length / step - 2;
@@ -84,18 +96,63 @@ module spine {
 		}
 	}
 
+	/** The interface for all timelines. */
 	export interface Timeline {
+		/** Applies this timeline to the skeleton.
+		 * @param skeleton The skeleton the timeline is being applied to. This provides access to the bones, slots, and other
+		 *           skeleton components the timeline may change.
+		 * @param lastTime The time this timeline was last applied. Timelines such as {@link EventTimeline}} trigger only at specific
+		 *           times rather than every frame. In that case, the timeline triggers everything between `lastTime`
+		 *           (exclusive) and `time` (inclusive).
+		 * @param time The time within the animation. Most timelines find the key before and the key after this time so they can
+		 *           interpolate between the keys.
+		 * @param events If any events are fired, they are added to this list. Can be null to ignore fired events or if the timeline
+		 *           does not fire events.
+		 * @param alpha 0 applies the current or setup value (depending on `blend`). 1 applies the timeline value.
+		 *           Between 0 and 1 applies a value between the current or setup value and the timeline value. By adjusting
+		 *           `alpha` over time, an animation can be mixed in or out. `alpha` can also be useful to
+		 *           apply animations on top of each other (layering).
+		 * @param blend Controls how mixing is applied when `alpha` < 1.
+		 * @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions,
+		 *           such as {@link DrawOrderTimeline} or {@link AttachmentTimeline}. */
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection): void;
+
+		/** Uniquely encodes both the type of this timeline and the skeleton property that it affects. */
 		getPropertyId (): number;
 	}
 
+	/** Controls how a timeline value is mixed with the setup pose value or current pose value when a timeline's `alpha`
+	 * < 1.
+	 *
+	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection)}. */
 	export enum MixBlend {
+		/** Transitions from the setup value to the timeline value (the current value is not used). Before the first key, the setup
+		 * value is set. */
 		setup,
+		/** Transitions from the current value to the timeline value. Before the first key, transitions from the current value to
+		 * the setup value. Timelines which perform instant transitions, such as {@link DrawOrderTimeline} or
+		 * {@link AttachmentTimeline}, use the setup value before the first key.
+		 *
+		 * `first` is intended for the first animations applied, not for animations layered on top of those. */
 		first,
+		/** Transitions from the current value to the timeline value. No change is made before the first key (the current value is
+		 * kept until the first key).
+		 *
+		 * `replace` is intended for animations layered on top of others, not for the first animations applied. */
 		replace,
+		/** Transitions from the current value to the current value plus the timeline value. No change is made before the first key
+		 * (the current value is kept until the first key).
+		 *
+		 * `add` is intended for animations layered on top of others, not for the first animations applied. Properties
+		 * keyed by additive animations must be set manually or by another animation before applying the additive animations, else
+		 * the property values will increase continually. */
 		add
 	}
 
+	/** Indicates whether a timeline's `alpha` is mixing out over time toward 0 (the setup or current pose value) or
+	 * mixing in toward 1 (the timeline's value).
+	 *
+	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection)}. */
 	export enum MixDirection {
 		mixIn, mixOut
 	}
@@ -109,6 +166,7 @@ module spine {
 		twoColor
 	}
 
+	/** The base class for timelines that use interpolation between key frame values. */
 	export abstract class CurveTimeline implements Timeline {
 		static LINEAR = 0; static STEPPED = 1; static BEZIER = 2;
 		static BEZIER_SIZE = 10 * 2 - 1;
@@ -122,18 +180,23 @@ module spine {
 			this.curves = Utils.newFloatArray((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
 		}
 
+		/** The number of key frames for this timeline. */
 		getFrameCount () {
 			return this.curves.length / CurveTimeline.BEZIER_SIZE + 1;
 		}
 
+		/** Sets the specified key frame to linear interpolation. */
 		setLinear (frameIndex: number) {
 			this.curves[frameIndex * CurveTimeline.BEZIER_SIZE] = CurveTimeline.LINEAR;
 		}
 
+		/** Sets the specified key frame to stepped interpolation. */
 		setStepped (frameIndex: number) {
 			this.curves[frameIndex * CurveTimeline.BEZIER_SIZE] = CurveTimeline.STEPPED;
 		}
 
+		/** Returns the interpolation type for the specified key frame.
+		 * @returns Linear is 0, stepped is 1, Bezier is 2. */
 		getCurveType (frameIndex: number): number {
 			let index = frameIndex * CurveTimeline.BEZIER_SIZE;
 			if (index == this.curves.length) return CurveTimeline.LINEAR;
@@ -143,9 +206,9 @@ module spine {
 			return CurveTimeline.BEZIER;
 		}
 
-		/** Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
-		 * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
-		 * the difference between the keyframe's values. */
+		/** Sets the specified key frame to Bezier interpolation. `cx1` and `cx2` are from 0 to 1,
+		 * representing the percent of time between the two key frames. `cy1` and `cy2` are the percent of the
+		 * difference between the key frame's values. */
 		setCurve (frameIndex: number, cx1: number, cy1: number, cx2: number, cy2: number) {
 			let tmpx = (-cx1 * 2 + cx2) * 0.03, tmpy = (-cy1 * 2 + cy2) * 0.03;
 			let dddfx = ((cx1 - cx2) * 3 + 1) * 0.006, dddfy = ((cy1 - cy2) * 3 + 1) * 0.006;
@@ -169,6 +232,7 @@ module spine {
 			}
 		}
 
+		/** Returns the interpolated percentage for the specified key frame and linear percentage. */
 		getCurvePercent (frameIndex: number, percent: number) {
 			percent = MathUtils.clamp(percent, 0, 1);
 			let curves = this.curves;
@@ -199,12 +263,16 @@ module spine {
 		abstract apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection): void;
 	}
 
+	/** Changes a bone's local {@link Bone#rotation}. */
 	export class RotateTimeline extends CurveTimeline {
 		static ENTRIES = 2;
 		static PREV_TIME = -2; static PREV_ROTATION = -1;
 		static ROTATION = 1;
 
+		/** The index of the bone in {@link Skeleton#bones} that will be changed. */
 		boneIndex: number;
+
+		/** The time in seconds and rotation in degrees for each key frame. */
 		frames: ArrayLike<number>; // time, degrees, ...
 
 		constructor (frameCount: number) {
@@ -278,12 +346,16 @@ module spine {
 		}
 	}
 
+	/** Changes a bone's local {@link Bone#x} and {@link Bone#y}. */
 	export class TranslateTimeline extends CurveTimeline {
 		static ENTRIES = 3;
 		static PREV_TIME = -3; static PREV_X = -2; static PREV_Y = -1;
 		static X = 1; static Y = 2;
 
+		/** The index of the bone in {@link Skeleton#bones} that will be changed. */
 		boneIndex: number;
+
+		/** The time in seconds, x, and y values for each key frame. */
 		frames: ArrayLike<number>; // time, x, y, ...
 
 		constructor (frameCount: number) {
@@ -295,7 +367,7 @@ module spine {
 			return (TimelineType.translate << 24) + this.boneIndex;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/** Sets the time in seconds, x, and y values for the specified key frame. */
 		setFrame (frameIndex: number, time: number, x: number, y: number) {
 			frameIndex *= TranslateTimeline.ENTRIES;
 			this.frames[frameIndex] = time;
@@ -354,6 +426,7 @@ module spine {
 		}
 	}
 
+	/** Changes a bone's local {@link Bone#scaleX)} and {@link Bone#scaleY}. */
 	export class ScaleTimeline extends TranslateTimeline {
 		constructor (frameCount: number) {
 			super(frameCount);
@@ -454,6 +527,7 @@ module spine {
 		}
 	}
 
+	/** Changes a bone's local {@link Bone#shearX} and {@link Bone#shearY}. */
 	export class ShearTimeline extends TranslateTimeline {
 		constructor (frameCount: number) {
 			super(frameCount);
@@ -514,12 +588,16 @@ module spine {
 		}
 	}
 
+	/** Changes a slot's {@link Slot#color}. */
 	export class ColorTimeline extends CurveTimeline {
 		static ENTRIES = 5;
 		static PREV_TIME = -5; static PREV_R = -4; static PREV_G = -3; static PREV_B = -2; static PREV_A = -1;
 		static R = 1; static G = 2; static B = 3; static A = 4;
 
+		/** The index of the slot in {@link Skeleton#slots} that will be changed. */
 		slotIndex: number;
+
+		/** The time in seconds, red, green, blue, and alpha values for each key frame. */
 		frames: ArrayLike<number>; // time, r, g, b, a, ...
 
 		constructor (frameCount: number) {
@@ -531,7 +609,7 @@ module spine {
 			return (TimelineType.color << 24) + this.slotIndex;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/** Sets the time in seconds, red, green, blue, and alpha for the specified key frame. */
 		setFrame (frameIndex: number, time: number, r: number, g: number, b: number, a: number) {
 			frameIndex *= ColorTimeline.ENTRIES;
 			this.frames[frameIndex] = time;
@@ -591,13 +669,18 @@ module spine {
 		}
 	}
 
+	/** Changes a slot's {@link Slot#color} and {@link Slot#darkColor} for two color tinting. */
 	export class TwoColorTimeline extends CurveTimeline {
 		static ENTRIES = 8;
 		static PREV_TIME = -8; static PREV_R = -7; static PREV_G = -6; static PREV_B = -5; static PREV_A = -4;
 		static PREV_R2 = -3; static PREV_G2 = -2; static PREV_B2 = -1;
 		static R = 1; static G = 2; static B = 3; static A = 4; static R2 = 5; static G2 = 6; static B2 = 7;
 
+		/** The index of the slot in {@link Skeleton#slots()} that will be changed. The {@link Slot#darkColor()} must not be
+		 * null. */
 		slotIndex: number;
+
+		/** The time in seconds, red, green, blue, and alpha values of the color, red, green, blue of the dark color, for each key frame. */
 		frames: ArrayLike<number>; // time, r, g, b, a, r2, g2, b2, ...
 
 		constructor (frameCount: number) {
@@ -609,7 +692,7 @@ module spine {
 			return (TimelineType.twoColor << 24) + this.slotIndex;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/** Sets the time in seconds, light, and dark colors for the specified key frame. */
 		setFrame (frameIndex: number, time: number, r: number, g: number, b: number, a: number, r2: number, g2: number, b2: number) {
 			frameIndex *= TwoColorTimeline.ENTRIES;
 			this.frames[frameIndex] = time;
@@ -688,9 +771,15 @@ module spine {
 		}
 	}
 
+	/** Changes a slot's {@link Slot#attachment}. */
 	export class AttachmentTimeline implements Timeline {
+		/** The index of the slot in {@link Skeleton#slots} that will be changed. */
 		slotIndex: number;
+
+		/** The time in seconds for each key frame. */
 		frames: ArrayLike<number> // time, ...
+
+		/** The attachment name for each key frame. May contain null values to clear the attachment. */
 		attachmentNames: Array<string>;
 
 		constructor (frameCount: number) {
@@ -702,11 +791,12 @@ module spine {
 			return (TimelineType.attachment << 24) + this.slotIndex;
 		}
 
+		/** The number of key frames for this timeline. */
 		getFrameCount () {
 			return this.frames.length;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/** Sets the time in seconds and the attachment name for the specified key frame. */
 		setFrame (frameIndex: number, time: number, attachmentName: string) {
 			this.frames[frameIndex] = time;
 			this.attachmentNames[frameIndex] = attachmentName;
@@ -744,10 +834,18 @@ module spine {
 
 	let zeros : ArrayLike<number> = null;
 
+	/** Changes a slot's {@link Slot#deform} to deform a {@link VertexAttachment}. */
 	export class DeformTimeline extends CurveTimeline {
+		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed. */
 		slotIndex: number;
+
+		/** The attachment that will be deformed. */
 		attachment: VertexAttachment;
+
+		/** The time in seconds for each key frame. */
 		frames: ArrayLike<number>; // time, ...
+
+		/** The vertices for each key frame. */
 		frameVertices: Array<ArrayLike<number>>;
 
 		constructor (frameCount: number) {
@@ -761,7 +859,8 @@ module spine {
 			return (TimelineType.deform << 27) + + this.attachment.id + this.slotIndex;
 		}
 
-		/** Sets the time of the specified keyframe. */
+		/** Sets the time in seconds and the vertices for the specified key frame.
+		 * @param vertices Vertex positions for an unweighted VertexAttachment, or deform offsets if it has weights. */
 		setFrame (frameIndex: number, time: number, vertices: ArrayLike<number>) {
 			this.frames[frameIndex] = time;
 			this.frameVertices[frameIndex] = vertices;
@@ -945,8 +1044,12 @@ module spine {
 		}
 	}
 
+	/** Fires an {@link Event} when specific animation times are reached. */
 	export class EventTimeline implements Timeline {
+		/** The time in seconds for each key frame. */
 		frames: ArrayLike<number>; // time, ...
+
+		/** The event for each key frame. */
 		events: Array<Event>;
 
 		constructor (frameCount: number) {
@@ -958,17 +1061,18 @@ module spine {
 			return TimelineType.event << 24;
 		}
 
+		/** The number of key frames for this timeline. */
 		getFrameCount () {
 			return this.frames.length;
 		}
 
-		/** Sets the time of the specified keyframe. */
+		/** Sets the time in seconds and the event for the specified key frame. */
 		setFrame (frameIndex: number, event: Event) {
 			this.frames[frameIndex] = event.time;
 			this.events[frameIndex] = event;
 		}
 
-		/** Fires events for frames > lastTime and <= time. */
+		/** Fires events for frames > `lastTime` and <= `time`. */
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			if (firedEvents == null) return;
 			let frames = this.frames;
@@ -997,8 +1101,12 @@ module spine {
 		}
 	}
 
+	/** Changes a skeleton's {@link Skeleton#drawOrder}. */
 	export class DrawOrderTimeline implements Timeline {
+		/** The time in seconds for each key frame. */
 		frames: ArrayLike<number>; // time, ...
+
+		/** The draw order for each key frame. See {@link #setFrame(int, float, int[])}. */
 		drawOrders: Array<Array<number>>;
 
 		constructor (frameCount: number) {
@@ -1010,12 +1118,14 @@ module spine {
 			return TimelineType.drawOrder << 24;
 		}
 
+		/** The number of key frames for this timeline. */
 		getFrameCount () {
 			return this.frames.length;
 		}
 
-		/** Sets the time of the specified keyframe.
-		 * @param drawOrder May be null to use bind pose draw order. */
+		/** Sets the time in seconds and the draw order for the specified key frame.
+		 * @param drawOrder For each slot in {@link Skeleton#slots}, the index of the new draw order. May be null to use setup pose
+		 *           draw order. */
 		setFrame (frameIndex: number, time: number, drawOrder: Array<number>) {
 			this.frames[frameIndex] = time;
 			this.drawOrders[frameIndex] = drawOrder;
@@ -1051,12 +1161,17 @@ module spine {
 		}
 	}
 
+	/** Changes an IK constraint's {@link IkConstraint#mix}, {@link IkConstraint#softness},
+	 * {@link IkConstraint#bendDirection}, {@link IkConstraint#stretch}, and {@link IkConstraint#compress}. */
 	export class IkConstraintTimeline extends CurveTimeline {
 		static ENTRIES = 6;
 		static PREV_TIME = -6; static PREV_MIX = -5; static PREV_SOFTNESS = -4; static PREV_BEND_DIRECTION = -3; static PREV_COMPRESS = -2; static PREV_STRETCH = -1;
 		static MIX = 1; static SOFTNESS = 2; static BEND_DIRECTION = 3; static COMPRESS = 4; static STRETCH = 5;
 
+		/** The index of the IK constraint slot in {@link Skeleton#ikConstraints} that will be changed. */
 		ikConstraintIndex: number;
+
+		/** The time in seconds, mix, softness, bend direction, compress, and stretch for each key frame. */
 		frames: ArrayLike<number>; // time, mix, softness, bendDirection, compress, stretch, ...
 
 		constructor (frameCount: number) {
@@ -1068,7 +1183,7 @@ module spine {
 			return (TimelineType.ikConstraint << 24) + this.ikConstraintIndex;
 		}
 
-		/** Sets the time, mix, softness, and bend direction of the specified keyframe. */
+		/** Sets the time in seconds, mix, softness, bend direction, compress, and stretch for the specified key frame. */
 		setFrame (frameIndex: number, time: number, mix: number, softness: number, bendDirection: number, compress: boolean, stretch: boolean) {
 			frameIndex *= IkConstraintTimeline.ENTRIES;
 			this.frames[frameIndex] = time;
@@ -1161,12 +1276,17 @@ module spine {
 		}
 	}
 
+	/** Changes a transform constraint's {@link TransformConstraint#rotateMix}, {@link TransformConstraint#translateMix},
+	 * {@link TransformConstraint#scaleMix}, and {@link TransformConstraint#shearMix}. */
 	export class TransformConstraintTimeline extends CurveTimeline {
 		static ENTRIES = 5;
 		static PREV_TIME = -5; static PREV_ROTATE = -4; static PREV_TRANSLATE = -3; static PREV_SCALE = -2; static PREV_SHEAR = -1;
 		static ROTATE = 1; static TRANSLATE = 2; static SCALE = 3; static SHEAR = 4;
 
+		/** The index of the transform constraint slot in {@link Skeleton#transformConstraints} that will be changed. */
 		transformConstraintIndex: number;
+
+		/** The time in seconds, rotate mix, translate mix, scale mix, and shear mix for each key frame. */
 		frames: ArrayLike<number>; // time, rotate mix, translate mix, scale mix, shear mix, ...
 
 		constructor (frameCount: number) {
@@ -1178,7 +1298,7 @@ module spine {
 			return (TimelineType.transformConstraint << 24) + this.transformConstraintIndex;
 		}
 
-		/** Sets the time and mixes of the specified keyframe. */
+		/** The time in seconds, rotate mix, translate mix, scale mix, and shear mix for the specified key frame. */
 		setFrame (frameIndex: number, time: number, rotateMix: number, translateMix: number, scaleMix: number, shearMix: number) {
 			frameIndex *= TransformConstraintTimeline.ENTRIES;
 			this.frames[frameIndex] = time;
@@ -1249,13 +1369,16 @@ module spine {
 		}
 	}
 
+	/** Changes a path constraint's {@link PathConstraint#position}. */
 	export class PathConstraintPositionTimeline extends CurveTimeline {
 		static ENTRIES = 2;
 		static PREV_TIME = -2; static PREV_VALUE = -1;
 		static VALUE = 1;
 
+		/** The index of the path constraint slot in {@link Skeleton#pathConstraints} that will be changed. */
 		pathConstraintIndex: number;
 
+		/** The time in seconds and path constraint position for each key frame. */
 		frames: ArrayLike<number>; // time, position, ...
 
 		constructor (frameCount: number) {
@@ -1267,7 +1390,7 @@ module spine {
 			return (TimelineType.pathConstraintPosition << 24) + this.pathConstraintIndex;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
+		/** Sets the time in seconds and path constraint position for the specified key frame. */
 		setFrame (frameIndex: number, time: number, value: number) {
 			frameIndex *= PathConstraintPositionTimeline.ENTRIES;
 			this.frames[frameIndex] = time;
@@ -1309,6 +1432,7 @@ module spine {
 		}
 	}
 
+	/** Changes a path constraint's {@link PathConstraint#spacing}. */
 	export class PathConstraintSpacingTimeline extends PathConstraintPositionTimeline {
 		constructor (frameCount: number) {
 			super(frameCount);
@@ -1354,13 +1478,17 @@ module spine {
 		}
 	}
 
+	/** Changes a transform constraint's {@link PathConstraint#rotateMix} and
+	 * {@link TransformConstraint#translateMix}. */
 	export class PathConstraintMixTimeline extends CurveTimeline {
 		static ENTRIES = 3;
 		static PREV_TIME = -3; static PREV_ROTATE = -2; static PREV_TRANSLATE = -1;
 		static ROTATE = 1; static TRANSLATE = 2;
 
+		/** The index of the path constraint slot in {@link Skeleton#getPathConstraints()} that will be changed. */
 		pathConstraintIndex: number;
 
+		/** The time in seconds, rotate mix, and translate mix for each key frame. */
 		frames: ArrayLike<number>; // time, rotate mix, translate mix, ...
 
 		constructor (frameCount: number) {
@@ -1372,7 +1500,7 @@ module spine {
 			return (TimelineType.pathConstraintMix << 24) + this.pathConstraintIndex;
 		}
 
-		/** Sets the time and mixes of the specified keyframe. */
+		/** The time in seconds, rotate mix, and translate mix for the specified key frame. */
 		setFrame (frameIndex: number, time: number, rotateMix: number, translateMix: number) {
 			frameIndex *= PathConstraintMixTimeline.ENTRIES;
 			this.frames[frameIndex] = time;

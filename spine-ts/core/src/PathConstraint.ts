@@ -28,14 +28,35 @@
  *****************************************************************************/
 
 module spine {
+
+	/** Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
+	 * constrained bones so they follow a {@link PathAttachment}.
+	 *
+	 * See [Path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide. */
 	export class PathConstraint implements Updatable {
 		static NONE = -1; static BEFORE = -2; static AFTER = -3;
 		static epsilon = 0.00001;
 
+		/** The path constraint's setup pose data. */
 		data: PathConstraintData;
+
+		/** The bones that will be modified by this path constraint. */
 		bones: Array<Bone>;
+
+		/** The slot whose path attachment will be used to constrained the bones. */
 		target: Slot;
-		position = 0; spacing = 0; rotateMix = 0; translateMix = 0;
+
+		/** The position along the path. */
+		position = 0;
+
+		/** The spacing between bones. */
+		spacing = 0;
+
+		/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
+		rotateMix = 0;
+
+		/** A percentage (0-1) that controls the mix between the constrained and unconstrained translations. */
+		translateMix = 0;
 
 		spaces = new Array<number>(); positions = new Array<number>();
 		world = new Array<number>(); curves = new Array<number>(); lengths = new Array<number>();
@@ -61,6 +82,7 @@ module spine {
 			return this.active;
 		}
 
+		/** Applies the constraint to the constrained bones. */
 		apply () {
 			this.update();
 		}
