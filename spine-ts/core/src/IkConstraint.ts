@@ -28,14 +28,35 @@
  *****************************************************************************/
 
 module spine {
+
+	/** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
+	 * the last bone is as close to the target bone as possible.
+	 *
+	 * See [IK constraints](http://esotericsoftware.com/spine-ik-constraints) in the Spine User Guide. */
 	export class IkConstraint implements Updatable {
+		/** The IK constraint's setup pose data. */
 		data: IkConstraintData;
+
+		/** The bones that will be modified by this IK constraint. */
 		bones: Array<Bone>;
+
+		/** The bone that is the IK target. */
 		target: Bone;
+
+		/** Controls the bend direction of the IK bones, either 1 or -1. */
 		bendDirection = 0;
+
+		/** When true and only a single bone is being constrained, if the target is too close, the bone is scaled to reach it. */
 		compress = false;
+
+		/** When true, if the target is out of range, the parent bone is scaled to reach it. If more than one bone is being constrained
+		 * and the parent bone has local nonuniform scale, stretch is not applied. */
 		stretch = false;
+
+		/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
 		mix = 1;
+
+		/** For two bone IK, the distance from the maximum reach of the bones that rotation will slow. */
 		softness = 0;
 		active = false;
 
@@ -59,6 +80,7 @@ module spine {
 			return this.active;
 		}
 
+		/** Applies the constraint to the constrained bones. */
 		apply () {
 			this.update();
 		}
@@ -76,8 +98,7 @@ module spine {
 			}
 		}
 
-		/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
-		 * coordinate system. */
+		/** Applies 1 bone IK. The target is specified in the world coordinate system. */
 		apply1 (bone: Bone, targetX: number, targetY: number, compress: boolean, stretch: boolean, uniform: boolean, alpha: number) {
 			if (!bone.appliedValid) bone.updateAppliedTransform();
 			let p = bone.parent;
@@ -102,8 +123,7 @@ module spine {
 				bone.ashearY);
 		}
 
-		/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
-		 * target is specified in the world coordinate system.
+		/** Applies 2 bone IK. The target is specified in the world coordinate system.
 		 * @param child A direct descendant of the parent bone. */
 		apply2 (parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, softness: number, alpha: number) {
 			if (alpha == 0) {

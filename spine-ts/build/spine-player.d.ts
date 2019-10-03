@@ -253,12 +253,12 @@ declare module spine {
 		static NOT_LAST: number;
 		data: AnimationStateData;
 		tracks: TrackEntry[];
+		timeScale: number;
 		events: Event[];
-		listeners: AnimationStateListener2[];
+		listeners: AnimationStateListener[];
 		queue: EventQueue;
 		propertyIDs: IntSet;
 		animationsChanged: boolean;
-		timeScale: number;
 		trackEntryPool: Pool<TrackEntry>;
 		constructor(data: AnimationStateData);
 		update(delta: number): void;
@@ -284,8 +284,8 @@ declare module spine {
 		computeHold(entry: TrackEntry): void;
 		computeNotLast(entry: TrackEntry): void;
 		getCurrent(trackIndex: number): TrackEntry;
-		addListener(listener: AnimationStateListener2): void;
-		removeListener(listener: AnimationStateListener2): void;
+		addListener(listener: AnimationStateListener): void;
+		removeListener(listener: AnimationStateListener): void;
 		clearListeners(): void;
 		clearListenerNotifications(): void;
 	}
@@ -294,7 +294,7 @@ declare module spine {
 		next: TrackEntry;
 		mixingFrom: TrackEntry;
 		mixingTo: TrackEntry;
-		listener: AnimationStateListener2;
+		listener: AnimationStateListener;
 		trackIndex: number;
 		loop: boolean;
 		holdPrevious: boolean;
@@ -348,7 +348,7 @@ declare module spine {
 		complete = 4,
 		event = 5
 	}
-	interface AnimationStateListener2 {
+	interface AnimationStateListener {
 		start(entry: TrackEntry): void;
 		interrupt(entry: TrackEntry): void;
 		end(entry: TrackEntry): void;
@@ -356,7 +356,7 @@ declare module spine {
 		complete(entry: TrackEntry): void;
 		event(entry: TrackEntry, event: Event): void;
 	}
-	abstract class AnimationStateAdapter2 implements AnimationStateListener2 {
+	abstract class AnimationStateAdapter implements AnimationStateListener {
 		start(entry: TrackEntry): void;
 		interrupt(entry: TrackEntry): void;
 		end(entry: TrackEntry): void;
@@ -446,10 +446,10 @@ declare module spine {
 		appliedValid: boolean;
 		a: number;
 		b: number;
-		worldX: number;
 		c: number;
 		d: number;
 		worldY: number;
+		worldX: number;
 		sorted: boolean;
 		active: boolean;
 		constructor(data: BoneData, skeleton: Skeleton, parent: Bone);
@@ -708,8 +708,8 @@ declare module spine {
 		static CURVE_LINEAR: number;
 		static CURVE_STEPPED: number;
 		static CURVE_BEZIER: number;
-		attachmentLoader: AttachmentLoader;
 		scale: number;
+		attachmentLoader: AttachmentLoader;
 		private linkedMeshes;
 		constructor(attachmentLoader: AttachmentLoader);
 		readSkeletonData(binary: Uint8Array): SkeletonData;
@@ -852,6 +852,7 @@ declare module spine {
 		private attachmentTime;
 		deform: number[];
 		constructor(data: SlotData, bone: Bone);
+		getSkeleton(): Skeleton;
 		getAttachment(): Attachment;
 		setAttachment(attachment: Attachment): void;
 		setAttachmentTime(time: number): void;

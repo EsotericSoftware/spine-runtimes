@@ -28,6 +28,11 @@
  *****************************************************************************/
 
 module spine {
+
+	/** The interface which can be implemented to customize creating and populating attachments.
+	 *
+	 * See [Loading skeleton data](http://esotericsoftware.com/spine-loading-skeleton-data#AttachmentLoader) in the Spine
+	 * Runtimes Guide. */
 	export interface AttachmentLoader {
 		/** @return May be null to not load an attachment. */
 		newRegionAttachment (skin: Skin, name: string, path: string): RegionAttachment;
