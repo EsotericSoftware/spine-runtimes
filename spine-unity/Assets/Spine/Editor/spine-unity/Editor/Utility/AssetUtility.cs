@@ -469,10 +469,8 @@ namespace Spine.Unity.Editor {
 			for (int i = 0; i < pageFiles.Count; i++) {
 				string texturePath = assetPath + "/" + pageFiles[i];
 				Texture2D texture = (Texture2D)AssetDatabase.LoadAssetAtPath(texturePath, typeof(Texture2D));
-
-				if (SpineEditorUtilities.Preferences.setTextureImporterSettings && 
-					!System.IO.File.Exists(texturePath + ".meta")) {
-					SetDefaultTextureSettings(texturePath, atlasAsset);
+				if (SpineEditorUtilities.Preferences.setTextureImporterSettings) {
+					SetDefaultTextureSettingsIfNew(texturePath, atlasAsset);
 				}
 
 				string pageName = Path.GetFileNameWithoutExtension(pageFiles[i]);
@@ -548,12 +546,26 @@ namespace Spine.Unity.Editor {
 			return (AtlasAssetBase)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAssetBase));
 		}
 
-		static bool SetDefaultTextureSettings (string texturePath, SpineAtlasAsset atlasAsset) {
+		static bool SetDefaultTextureSettingsIfNew (string texturePath, SpineAtlasAsset atlasAsset) {
 			TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 			if (texImporter == null) {
 				Debug.LogWarning(string.Format("{0}: Texture asset \"{1}\" not found. Skipping. Please check your atlas file for renamed files.", atlasAsset.name, texturePath));
 				return false;
 			}
+
+		#if UNITY_2018_1_OR_NEWER
+			bool customTextureSettingsExist = !texImporter.importSettingsMissing;
+		#else
+			// unfortunately, importSettingsMissing is not available in Unity 2017,
+			// so we check if any settings deviate from Unity's default texture settings.
+			bool customTextureSettingsExist = texImporter.mipmapEnabled != true ||
+				texImporter.maxTextureSize != 2048 ||
+				texImporter.alphaIsTransparency != true ||
+				texImporter.wrapMode != TextureWrapMode.Repeat ||
+				texImporter.filterMode != FilterMode.Bilinear;
+		#endif
+			if (customTextureSettingsExist)
+				return false;
 
 			texImporter.textureCompression = TextureImporterCompression.Uncompressed;
 			texImporter.alphaSource = TextureImporterAlphaSource.FromInput;
