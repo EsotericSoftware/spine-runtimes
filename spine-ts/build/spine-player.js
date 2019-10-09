@@ -8227,7 +8227,19 @@ var spine;
 				var gl = this.context.gl;
 				this.bind();
 				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
-				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
+				gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, GLTexture.validateMagFilter(magFilter));
+			};
+			GLTexture.validateMagFilter = function (magFilter) {
+				switch (magFilter) {
+					case spine.TextureFilter.MipMap:
+					case spine.TextureFilter.MipMapLinearLinear:
+					case spine.TextureFilter.MipMapLinearNearest:
+					case spine.TextureFilter.MipMapNearestLinear:
+					case spine.TextureFilter.MipMapNearestNearest:
+						return spine.TextureFilter.Linear;
+					default:
+						return magFilter;
+				}
 			};
 			GLTexture.prototype.setWraps = function (uWrap, vWrap) {
 				var gl = this.context.gl;
