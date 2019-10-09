@@ -168,6 +168,22 @@ Vector<PathConstraintData *> &SkeletonData::getPathConstraints() {
 	return _pathConstraints;
 }
 
+float SkeletonData::getX() {
+	return _x;
+}
+
+void SkeletonData::setX(float inValue) {
+	_x = inValue;
+}
+
+float SkeletonData::getY() {
+	return _y;
+}
+
+void SkeletonData::setY(float inValue) {
+	_y = inValue;
+}
+
 float SkeletonData::getWidth() {
 	return _width;
 }
