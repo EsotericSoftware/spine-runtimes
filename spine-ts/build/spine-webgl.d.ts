@@ -1363,6 +1363,7 @@ declare module spine.webgl {
 		private useMipMaps;
 		constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement, useMipMaps?: boolean);
 		setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
+		static validateMagFilter(magFilter: TextureFilter): TextureFilter.Nearest | TextureFilter.Linear | TextureFilter.Linear;
 		setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
 		update(useMipMaps: boolean): void;
 		restore(): void;

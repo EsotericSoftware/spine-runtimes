@@ -46,7 +46,20 @@ module spine.webgl {
 			let gl = this.context.gl;
 			this.bind();
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magFilter);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, GLTexture.validateMagFilter(magFilter));
+		}
+
+		static validateMagFilter (magFilter: TextureFilter) {
+			switch(magFilter) {
+				case TextureFilter.MipMap:
+				case TextureFilter.MipMapLinearLinear:
+				case TextureFilter.MipMapLinearNearest:
+				case TextureFilter.MipMapNearestLinear:
+				case TextureFilter.MipMapNearestNearest:
+					return TextureFilter.Linear;
+				default:
+					return magFilter;
+			}
 		}
 
 		setWraps (uWrap: TextureWrap, vWrap: TextureWrap) {
