@@ -50,16 +50,16 @@ public:
 	void UpdateRenderer(USpineSkeletonComponent* Skeleton);
 
 	// Material Instance parents
-	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* NormalBlendMaterial;
 	
-	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* AdditiveBlendMaterial;
 	
-	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* MultiplyBlendMaterial;
 	
-	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* ScreenBlendMaterial;
 
 	// Need to hold on to the dynamic instances, or the GC will kill us while updating them
