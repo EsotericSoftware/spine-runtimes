@@ -27,6 +27,7 @@
 
 ### UE4
 * `SpineWidget` now supports the full widget transform, including rendering scale/shear.
+* Materials on `SkeletonRendererComponent` are now blueprint read and writeable. This allows setting dynamic material instances at runtime.
 * **Breaking changes**: `SpineWidget` no longer has the `Scale` property. Instead the size x/y properties can be used.
 
 ## C# ##
