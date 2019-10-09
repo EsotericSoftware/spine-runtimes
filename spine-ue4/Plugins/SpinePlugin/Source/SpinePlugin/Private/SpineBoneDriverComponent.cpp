@@ -40,7 +40,7 @@ void USpineBoneDriverComponent::BeginPlay () {
 }
 
 void USpineBoneDriverComponent::BeforeUpdateWorldTransform(USpineSkeletonComponent* skeleton) {	
-	if (skeleton == lastBoundComponent) {		
+	if (skeleton == lastBoundComponent && skeleton) {		
 		if (UseComponentTransform) {
 			skeleton->SetBoneWorldPosition(BoneName, GetComponentLocation());
 		}
@@ -56,7 +56,7 @@ void USpineBoneDriverComponent::TickComponent (float DeltaTime, ELevelTick TickT
 
 	if (Target) {
 		USpineSkeletonComponent* skeleton = static_cast<USpineSkeletonComponent*>(Target->GetComponentByClass(USpineSkeletonComponent::StaticClass()));
-		if (skeleton != lastBoundComponent) {
+		if (skeleton != lastBoundComponent && skeleton) {
 			// if (lastBoundComponent) lastBoundComponent->BeforeUpdateWorldTransform.RemoveAll(this);
 			if (!skeleton->BeforeUpdateWorldTransform.GetAllObjects().Contains(this))
 				skeleton->BeforeUpdateWorldTransform.AddDynamic(this, &USpineBoneDriverComponent::BeforeUpdateWorldTransform);
