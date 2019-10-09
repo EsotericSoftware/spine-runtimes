@@ -19,6 +19,7 @@
 
 * **Additions**
 * Removed dependency on STL throughout the code base, cutting down on the LOC that need parsing by 66%.
+* Exposed `x` and `y` on `SkeletonData` through getters and setters.
 
 ### Cocos2d-x
 
