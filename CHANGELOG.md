@@ -82,6 +82,7 @@
   * Added `Attachment#copy()` to all attachment type implementations. This lets you deep copy an attachment to modify it independently from the original, i.e. when programmatically changing texture coordinates or mesh vertices.
   * Added `MeshAttachment#newLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
   * Added IK softness.
+  * Exposed `x` and `y` on `SkeletonData` through getters and setters.
 
 ### Cocos2d-x
 * Updated to cocos2d-x 3.17.1
