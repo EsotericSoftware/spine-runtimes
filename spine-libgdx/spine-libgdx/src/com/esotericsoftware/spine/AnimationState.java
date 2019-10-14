@@ -37,6 +37,8 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
+import com.badlogic.gdx.utils.SnapshotArray;
+
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
@@ -86,7 +88,7 @@ public class AnimationState {
 	private AnimationStateData data;
 	final Array<TrackEntry> tracks = new Array();
 	private final Array<Event> events = new Array();
-	final Array<AnimationStateListener> listeners = new Array();
+	final SnapshotArray<AnimationStateListener> listeners = new SnapshotArray();
 	private final EventQueue queue = new EventQueue();
 	private final IntSet propertyIDs = new IntSet();
 	boolean animationsChanged;
@@ -1214,44 +1216,47 @@ public class AnimationState {
 			drainDisabled = true;
 
 			Array objects = this.objects;
-			Array<AnimationStateListener> listeners = AnimationState.this.listeners;
+			SnapshotArray<AnimationStateListener> listenersArray = AnimationState.this.listeners;
 			for (int i = 0; i < objects.size; i += 2) {
 				EventType type = (EventType)objects.get(i);
 				TrackEntry entry = (TrackEntry)objects.get(i + 1);
+				int listenersCount = listenersArray.size;
+				Object[] listeners = listenersArray.begin();
 				switch (type) {
 				case start:
 					if (entry.listener != null) entry.listener.start(entry);
-					for (int ii = 0; ii < listeners.size; ii++)
-						listeners.get(ii).start(entry);
+					for (int ii = 0; ii < listenersCount; ii++)
+						((AnimationStateListener)listeners[ii]).start(entry);
 					break;
 				case interrupt:
 					if (entry.listener != null) entry.listener.interrupt(entry);
-					for (int ii = 0; ii < listeners.size; ii++)
-						listeners.get(ii).interrupt(entry);
+					for (int ii = 0; ii < listenersCount; ii++)
+						((AnimationStateListener)listeners[ii]).interrupt(entry);
 					break;
 				case end:
 					if (entry.listener != null) entry.listener.end(entry);
-					for (int ii = 0; ii < listeners.size; ii++)
-						listeners.get(ii).end(entry);
+					for (int ii = 0; ii < listenersCount; ii++)
+						((AnimationStateListener)listeners[ii]).end(entry);
 					// Fall through.
 				case dispose:
 					if (entry.listener != null) entry.listener.dispose(entry);
-					for (int ii = 0; ii < listeners.size; ii++)
-						listeners.get(ii).dispose(entry);
+					for (int ii = 0; ii < listenersCount; ii++)
+						((AnimationStateListener)listeners[ii]).dispose(entry);
 					trackEntryPool.free(entry);
 					break;
 				case complete:
 					if (entry.listener != null) entry.listener.complete(entry);
-					for (int ii = 0; ii < listeners.size; ii++)
-						listeners.get(ii).complete(entry);
+					for (int ii = 0; ii < listenersCount; ii++)
+						((AnimationStateListener)listeners[ii]).complete(entry);
 					break;
 				case event:
 					Event event = (Event)objects.get(i++ + 2);
 					if (entry.listener != null) entry.listener.event(entry, event);
-					for (int ii = 0; ii < listeners.size; ii++)
-						listeners.get(ii).event(entry, event);
+					for (int ii = 0; ii < listenersCount; ii++)
+						((AnimationStateListener)listeners[ii]).event(entry, event);
 					break;
 				}
+				listenersArray.end();
 			}
 			clear();
 
