@@ -42,7 +42,7 @@ public class EventTimelineTests {
 	private final SkeletonData skeletonData;
 	private final Skeleton skeleton;
 	private final Array<Event> firedEvents = new Array();
-	private EventTimeline timeline = new EventTimeline(0);
+	private EventTimeline timeline = new EventTimeline(1);
 	private char[] events;
 	private float[] frames;
 
