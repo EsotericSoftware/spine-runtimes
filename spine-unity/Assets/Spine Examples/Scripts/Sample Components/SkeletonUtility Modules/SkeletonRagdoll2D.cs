@@ -29,6 +29,10 @@
 
 // Contributed by: Mitch Thompson
 
+#if UNITY_2019_2_OR_NEWER
+#define HINGE_JOINT_NEW_BEHAVIOUR
+#endif
+
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
@@ -158,9 +162,22 @@ namespace Spine.Unity.Examples {
 					joint.connectedAnchor = localPos;
 
 					joint.GetComponent<Rigidbody2D>().mass = joint.connectedBody.mass * massFalloffFactor;
+
+				#if HINGE_JOINT_NEW_BEHAVIOUR
+					float referenceAngle = (rbParent.transform.eulerAngles.z - t.eulerAngles.z + 360f) % 360f;
+					float minAngle = referenceAngle - rotationLimit;
+					float maxAngle = referenceAngle + rotationLimit;
+					if (maxAngle > 180f) {
+						minAngle -= 360f;
+						maxAngle -= 360f;
+					}
+				#else
+					float minAngle = - rotationLimit;
+					float maxAngle = rotationLimit;
+				#endif
 					joint.limits = new JointAngleLimits2D {
-						min = -rotationLimit,
-						max = rotationLimit
+						min = minAngle,
+						max = maxAngle
 					};
 					joint.useLimits = true;
 				}
@@ -284,7 +301,7 @@ namespace Spine.Unity.Examples {
 			t.parent = transform;
 			t.localPosition = new Vector3(b.WorldX, b.WorldY, 0);
 			t.localRotation = Quaternion.Euler(0, 0, b.WorldRotationX - b.ShearX);
-			t.localScale = new Vector3(b.WorldScaleX, b.WorldScaleY, 0);
+			t.localScale = new Vector3(b.WorldScaleX, b.WorldScaleY, 1);
 
 			// MITCH: You left "todo: proper ragdoll branching"
 			var colliders = AttachBoundingBoxRagdollColliders(b, boneGameObject, skeleton, this.gravityScale);
