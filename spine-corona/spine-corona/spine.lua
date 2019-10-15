@@ -163,7 +163,7 @@ function spine.Skeleton:updateWorldTransform()
 		local indices = nil
 
 		if slot.bone.active then
-
+			local isClippingAttachment = false
 			if attachment then
 				if attachment.type == spine.AttachmentType.region then
 					numVertices = 4
@@ -183,6 +183,7 @@ function spine.Skeleton:updateWorldTransform()
 					blendMode = toCoronaBlendMode(slot.data.blendMode)
 				elseif attachment.type == spine.AttachmentType.clipping then
 					self.clipper:clipStart(slot, attachment)
+					isClippingAttachment = true
 				end
 
 				if texture and vertices and indices then
@@ -195,9 +196,9 @@ function spine.Skeleton:updateWorldTransform()
 					if premultipliedAlpha then multiplier = alpha end
 
 					color:set(skeletonColor.r * slotColor.r * attachmentColor.r * multiplier,
-						skeletonColor.g * slotColor.g * attachmentColor.g * multiplier,
-						skeletonColor.b * slotColor.b * attachmentColor.b * multiplier,
-						alpha)
+							skeletonColor.g * slotColor.g * attachmentColor.g * multiplier,
+							skeletonColor.b * slotColor.b * attachmentColor.b * multiplier,
+							alpha)
 
 					if not lastTexture then lastTexture = texture end
 					if lastColor.r == -1 then lastColor:setFrom(color) end
@@ -222,9 +223,9 @@ function spine.Skeleton:updateWorldTransform()
 					end
 
 					self:batch(vertices, uvs, numVertices, indices, groupVertices, groupUvs, groupIndices)
-				end
 
-				self.clipper:clipEnd(slot)
+				end
+				if not isClippingAttachment then self.clipper:clipEnd(slot) end
 			end
 		end
 	end
