@@ -196,9 +196,9 @@ function spine.Skeleton:updateWorldTransform()
 					if premultipliedAlpha then multiplier = alpha end
 
 					color:set(skeletonColor.r * slotColor.r * attachmentColor.r * multiplier,
-						skeletonColor.g * slotColor.g * attachmentColor.g * multiplier,
-						skeletonColor.b * slotColor.b * attachmentColor.b * multiplier,
-						alpha)
+							skeletonColor.g * slotColor.g * attachmentColor.g * multiplier,
+							skeletonColor.b * slotColor.b * attachmentColor.b * multiplier,
+							alpha)
 
 					if not lastTexture then lastTexture = texture end
 					if lastColor.r == -1 then lastColor:setFrom(color) end
