@@ -191,8 +191,9 @@ function spine.Skeleton:updateWorldTransform()
 					local slotColor = slot.color
 					local attachmentColor = attachment.color
 					local alpha = skeletonColor.a * slotColor.a * attachmentColor.a
-					local multiplier = alpha
-					if premultipliedAlpha then multiplier = 1 end
+					local multiplier = 1
+					if premultipliedAlpha then multiplier = alpha end
+
 					color:set(skeletonColor.r * slotColor.r * attachmentColor.r * multiplier,
 						skeletonColor.g * slotColor.g * attachmentColor.g * multiplier,
 						skeletonColor.b * slotColor.b * attachmentColor.b * multiplier,
