@@ -38,34 +38,41 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntSet;
+
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
 /** A simple container for a list of timelines and a name. */
 public class Animation {
 	final String name;
-	final Array<Timeline> timelines;
-	final IntSet timelineIds;
+	Array<Timeline> timelines;
+	final IntSet timelineIDs = new IntSet();
 	float duration;
 
 	public Animation (String name, Array<Timeline> timelines, float duration) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
-		if (timelines == null) throw new IllegalArgumentException("timelines cannot be null.");
 		this.name = name;
-		this.timelines = timelines;
-		this.timelineIds = new IntSet();
-		for (Timeline timeline : timelines)
-			timelineIds.add(timeline.getPropertyId());
 		this.duration = duration;
+		setTimelines(timelines);
 	}
 
+	/** If the returned array or the timelines it contains are modified, {@link #setTimelines(Array)} must be called. */
 	public Array<Timeline> getTimelines () {
 		return timelines;
 	}
 
-	/** Whether the timeline with the property id is contained in this animation **/
-	boolean hasTimeline (int id) {
-		return timelineIds.contains(id);
+	public void setTimelines (Array<Timeline> timelines) {
+		if (timelines == null) throw new IllegalArgumentException("timelines cannot be null.");
+		this.timelines = timelines;
+
+		timelineIDs.clear();
+		for (Timeline timeline : timelines)
+			timelineIDs.add(timeline.getPropertyId());
+	}
+
+	/** Return true if this animation contains a timeline with the specified property ID. **/
+	public boolean hasTimeline (int id) {
+		return timelineIDs.contains(id);
 	}
 
 	/** The duration of the animation in seconds, which is the highest time of all keys in the timeline. */
