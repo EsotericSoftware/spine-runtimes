@@ -76,8 +76,7 @@ namespace Spine {
 		protected AnimationStateData data;
 		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
 		private readonly ExposedList<Event> events = new ExposedList<Event>();
-
-		// difference to libgdx reference: delegates are used for event callbacks instead of 'Array<AnimationStateListener> listeners'.
+		// difference to libgdx reference: delegates are used for event callbacks instead of 'final SnapshotArray<AnimationStateListener> listeners'.
 		internal void OnStart (TrackEntry entry) { if (Start != null) Start(entry); }
 		internal void OnInterrupt (TrackEntry entry) { if (Interrupt != null) Interrupt(entry); }
 		internal void OnEnd (TrackEntry entry) { if (End != null) End(entry); }
@@ -85,12 +84,12 @@ namespace Spine {
 		internal void OnComplete (TrackEntry entry) { if (Complete != null) Complete(entry); }
 		internal void OnEvent (TrackEntry entry, Event e) { if (Event != null) Event(entry, e); }
 
-		public delegate void TrackEntryDelegate(TrackEntry trackEntry);
+		public delegate void TrackEntryDelegate (TrackEntry trackEntry);
 		public event TrackEntryDelegate Start, Interrupt, End, Dispose, Complete;
 
-		public delegate void TrackEntryEventDelegate(TrackEntry trackEntry, Event e);
+		public delegate void TrackEntryEventDelegate (TrackEntry trackEntry, Event e);
 		public event TrackEntryEventDelegate Event;
-
+		// end of difference
 		private readonly EventQueue queue; // Initialized by constructor.
 		private readonly HashSet<int> propertyIDs = new HashSet<int>();
 		private bool animationsChanged;
@@ -98,7 +97,7 @@ namespace Spine {
 
 		private readonly Pool<TrackEntry> trackEntryPool = new Pool<TrackEntry>();
 
-		public AnimationState(AnimationStateData data) {
+		public AnimationState (AnimationStateData data) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
 			this.data = data;
 			this.queue = new EventQueue(
@@ -233,8 +232,8 @@ namespace Spine {
 				} else {
 					var timelineMode = current.timelineMode.Items;
 
-					bool firstFrame = current.timelinesRotation.Count == 0;
-					if (firstFrame) current.timelinesRotation.EnsureCapacity(timelines.Count << 1);
+					bool firstFrame = current.timelinesRotation.Count != timelineCount << 1;
+					if (firstFrame) current.timelinesRotation.Resize(timelines.Count << 1);
 					var timelinesRotation = current.timelinesRotation.Items;
 
 					for (int ii = 0; ii < timelineCount; ii++) {
@@ -242,8 +241,8 @@ namespace Spine {
 						MixBlend timelineBlend = (timelineMode[ii] & AnimationState.NotLast - 1) == AnimationState.Subsequent ? blend : MixBlend.Setup;
 						var rotateTimeline = timeline as RotateTimeline;
 						if (rotateTimeline != null)
-							ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1,
-												firstFrame);
+							ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation,
+												ii << 1, firstFrame);
 						else
 							timeline.Apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection.In);
 					}
@@ -287,7 +286,7 @@ namespace Spine {
 				var timelineMode = from.timelineMode.Items;
 				var timelineHoldMix = from.timelineHoldMix.Items;
 
-				bool firstFrame = from.timelinesRotation.Count == 0;
+				bool firstFrame = from.timelinesRotation.Count != timelineCount << 1;
 				if (firstFrame)	from.timelinesRotation.Resize(timelines.Count << 1); // from.timelinesRotation.setSize
 				var timelinesRotation = from.timelinesRotation.Items;
 
@@ -325,8 +324,8 @@ namespace Spine {
 
 					var rotateTimeline = timeline as RotateTimeline;
 					if (rotateTimeline != null) {
-						ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1,
-											firstFrame);
+						ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation,
+											i << 1, firstFrame);
 					} else {
 						if (timelineBlend == MixBlend.Setup) {
 							if (timeline is AttachmentTimeline) {
