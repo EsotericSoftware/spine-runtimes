@@ -86,8 +86,10 @@ namespace Spine.Unity.Editor {
 		public const bool DEFAULT_AUTO_RELOAD_SCENESKELETONS = true;
 		public bool autoReloadSceneSkeletons = DEFAULT_AUTO_RELOAD_SCENESKELETONS;
 
+		public const string SCENE_ICONS_SCALE_KEY = "SPINE_SCENE_ICONS_SCALE";
 		internal const float DEFAULT_SCENE_ICONS_SCALE = 1f;
-		public static float handleScale = DEFAULT_SCENE_ICONS_SCALE;
+		[Range(0.01f, 2f)]
+		public float handleScale = DEFAULT_SCENE_ICONS_SCALE;
 
 		public const bool DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME = true;
 		public bool mecanimEventIncludeFolderName = DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME;
@@ -95,7 +97,7 @@ namespace Spine.Unity.Editor {
 		// Timeline extension module
 		public const bool DEFAULT_TIMELINE_USE_BLEND_DURATION = true;
 		public bool timelineUseBlendDuration = DEFAULT_TIMELINE_USE_BLEND_DURATION;
-
+		
 #if NEW_PREFERENCES_SETTINGS_PROVIDER
 		public static void Load () {
 			GetOrCreateSettings();
@@ -171,10 +173,10 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.LabelField("Handles and Gizmos", EditorStyles.boldLabel);
 				{
 					EditorGUI.BeginChangeCheck();
-					handleScale = EditorGUILayout.Slider("Editor Bone Scale", handleScale, 0.01f, 2f);
-					handleScale = Mathf.Max(0.01f, handleScale);
+					var scaleProperty = settings.FindProperty("handleScale");
+					EditorGUILayout.PropertyField(scaleProperty, new GUIContent("Editor Bone Scale"));
 					if (EditorGUI.EndChangeCheck()) {
-						EditorPrefs.SetFloat(SpinePreferences.SCENE_ICONS_SCALE_KEY, handleScale);
+						EditorPrefs.SetFloat(SpinePreferences.SCENE_ICONS_SCALE_KEY, scaleProperty.floatValue);
 						SceneView.RepaintAll();
 					}
 				}
