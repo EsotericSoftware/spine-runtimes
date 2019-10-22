@@ -94,13 +94,15 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void Initialize () {
-			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
-
+			// Note: Preferences need to be loaded when changing play mode
+			// to initialize handle scale correctly.
 			#if !NEW_PREFERENCES_SETTINGS_PROVIDER
 			Preferences.Load();
 			#else
 			SpinePreferences.Load();
 			#endif
+
+			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
 			string[] assets = AssetDatabase.FindAssets("t:script SpineEditorUtilities");
 			string assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
