@@ -65,13 +65,27 @@ namespace Spine.Unity.Editor {
 		public static string editorPath = "";
 		public static string editorGUIPath = "";
 		public static bool initialized;
+		private static List<string> texturesWithoutMetaFile = new List<string>();
 
-		// Auto-import entry point
+		// Auto-import entry point for textures
+		void OnPreprocessTexture () {
+		#if UNITY_2018_1_OR_NEWER
+			bool customTextureSettingsExist = !assetImporter.importSettingsMissing;
+		#else
+			bool customTextureSettingsExist = System.IO.File.Exists(assetImporter.assetPath + ".meta");
+		#endif
+			if (!customTextureSettingsExist) {
+				texturesWithoutMetaFile.Add(assetImporter.assetPath);
+			}
+		}
+
+		// Auto-import post process entry point for all assets
 		static void OnPostprocessAllAssets (string[] imported, string[] deleted, string[] moved, string[] movedFromAssetPaths) {
 			if (imported.Length == 0)
 				return;
 
-			AssetUtility.HandleOnPostprocessAllAssets(imported);
+			AssetUtility.HandleOnPostprocessAllAssets(imported, texturesWithoutMetaFile);
+			texturesWithoutMetaFile.Clear();
 		}
 
 #region Initialization
@@ -80,13 +94,15 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void Initialize () {
-			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
-
+			// Note: Preferences need to be loaded when changing play mode
+			// to initialize handle scale correctly.
 			#if !NEW_PREFERENCES_SETTINGS_PROVIDER
 			Preferences.Load();
 			#else
 			SpinePreferences.Load();
 			#endif
+
+			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
 			string[] assets = AssetDatabase.FindAssets("t:script SpineEditorUtilities");
 			string assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);

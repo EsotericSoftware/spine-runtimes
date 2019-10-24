@@ -129,8 +129,8 @@ namespace Spine.Unity.Editor {
 
 			public const float DEFAULT_MIPMAPBIAS = SpinePreferences.DEFAULT_MIPMAPBIAS;
 
-			public const float DEFAULT_SCENE_ICONS_SCALE = SpinePreferences.DEFAULT_SCENE_ICONS_SCALE;
-			public const string SCENE_ICONS_SCALE_KEY = SpinePreferences.SCENE_ICONS_SCALE_KEY;
+			public const string SCENE_ICONS_SCALE_KEY = "SPINE_SCENE_ICONS_SCALE";
+			public static float handleScale = SpinePreferences.DEFAULT_SCENE_ICONS_SCALE;
 
 			const string AUTO_RELOAD_SCENESKELETONS_KEY = "SPINE_AUTO_RELOAD_SCENESKELETONS";
 			public static bool autoReloadSceneSkeletons = SpinePreferences.DEFAULT_AUTO_RELOAD_SCENESKELETONS;
@@ -140,6 +140,7 @@ namespace Spine.Unity.Editor {
 
 			const string TIMELINE_USE_BLEND_DURATION_KEY = "SPINE_TIMELINE_USE_BLEND_DURATION_KEY";
 			public static bool timelineUseBlendDuration = SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION;
+
 
 			static bool preferencesLoaded = false;
 
@@ -158,8 +159,7 @@ namespace Spine.Unity.Editor {
 				atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
 				textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
 				timelineUseBlendDuration = EditorPrefs.GetBool(TIMELINE_USE_BLEND_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION);
-
-				SpineHandles.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, DEFAULT_SCENE_ICONS_SCALE);
+				handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, SpinePreferences.DEFAULT_SCENE_ICONS_SCALE);
 				preferencesLoaded = true;
 			}
 
@@ -176,6 +176,7 @@ namespace Spine.Unity.Editor {
 				newPreferences.atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
 				newPreferences.textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
 				newPreferences.timelineUseBlendDuration = EditorPrefs.GetBool(TIMELINE_USE_BLEND_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION);
+				newPreferences.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, SpinePreferences.DEFAULT_SCENE_ICONS_SCALE);
 			}
 
 			public static void SaveToEditorPrefs(SpinePreferences preferences) {
@@ -190,6 +191,7 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetBool(ATLASTXT_WARNING_KEY, preferences.atlasTxtImportWarning);
 				EditorPrefs.SetBool(TEXTUREIMPORTER_WARNING_KEY, preferences.textureImporterWarning);
 				EditorPrefs.SetBool(TIMELINE_USE_BLEND_DURATION_KEY, preferences.timelineUseBlendDuration);
+				EditorPrefs.SetFloat(SCENE_ICONS_SCALE_KEY, preferences.handleScale);
 			}
 #endif
 
@@ -254,10 +256,10 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.LabelField("Handles and Gizmos", EditorStyles.boldLabel);
 				{
 					EditorGUI.BeginChangeCheck();
-					SpineHandles.handleScale = EditorGUILayout.Slider("Editor Bone Scale", SpineHandles.handleScale, 0.01f, 2f);
-					SpineHandles.handleScale = Mathf.Max(0.01f, SpineHandles.handleScale);
+					handleScale = EditorGUILayout.Slider("Editor Bone Scale", handleScale, 0.01f, 2f);
+					handleScale = Mathf.Max(0.01f, handleScale);
 					if (EditorGUI.EndChangeCheck()) {
-						EditorPrefs.SetFloat(SCENE_ICONS_SCALE_KEY, SpineHandles.handleScale);
+						EditorPrefs.SetFloat(SCENE_ICONS_SCALE_KEY, handleScale);
 						SceneView.RepaintAll();
 					}
 				}

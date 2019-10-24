@@ -1064,7 +1064,7 @@ namespace Spine {
 				case MixBlend.Setup:
 					deformArray.Clear();
 					return;
-				case MixBlend.Replace:
+				case MixBlend.First:
 					if (alpha == 1) {
 						deformArray.Clear();
 						return;
