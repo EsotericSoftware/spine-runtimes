@@ -68,7 +68,7 @@ public class AttachmentTimelineTests {
 		skeleton = new Skeleton(skeletonData);
 		slot = skeleton.findSlot("slot");
 
-		AttachmentTimeline timeline = new AttachmentTimeline(2);
+		AttachmentTimeline timeline = new AttachmentTimeline(2, 0);
 		timeline.setFrame(0, 0, "attachment1");
 		timeline.setFrame(1, 0.5f, "attachment2");
 
