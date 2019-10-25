@@ -165,6 +165,80 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 	SkeletonBounds_dispose(bounds);
 }
 
+void ikDemo (SkeletonData* skeletonData, Atlas* atlas) {
+    UNUSED(atlas);
+
+    // Create the SkeletonDrawable and position it
+    AnimationStateData* stateData = AnimationStateData_create(skeletonData);
+    SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData, stateData);
+    drawable->timeScale = 1;
+    drawable->setUsePremultipliedAlpha(true);
+
+    Skeleton* skeleton = drawable->skeleton;
+    skeleton->x = 320;
+    skeleton->y = 590;
+
+    // Queue the "walk" animation on the first track.
+    AnimationState_setAnimationByName(drawable->state, 0, "walk", true);
+
+    // Queue the "aim" animation on a higher track.
+    // It consists of a single frame that positions
+    // the back arm and gun such that they point at
+    // the "crosshair" bone. By setting this
+    // animation on a higher track, it overrides
+    // any changes to the back arm and gun made
+    // by the walk animation, allowing us to
+    // mix the two. The mouse position following
+    // is performed in the render() method below.
+    AnimationState_setAnimationByName(drawable->state, 1, "aim", true);
+
+    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - IK Demo");
+    window.setFramerateLimit(60);
+    sf::Event event;
+    sf::Clock deltaClock;
+    while (window.isOpen()) {
+        while (window.pollEvent(event))
+            if (event.type == sf::Event::Closed) window.close();
+
+        float delta = deltaClock.getElapsedTime().asSeconds();
+        deltaClock.restart();
+
+        // Update and apply the animations to the skeleton,
+        // then calculate the world transforms of every bone.
+        // This is needed so we can call Bone#worldToLocal()
+        // later.
+        drawable->update(delta);
+
+        // Position the "crosshair" bone at the mouse
+        // location. We do this before calling
+        // skeleton.updateWorldTransform() below, so
+        // our change is incorporated before the IK
+        // constraint is applied.
+        //
+        // When setting the crosshair bone position
+        // to the mouse position, we need to translate
+        // from "mouse space" to "local bone space". Note that the local
+        // bone space is calculated using the bone's parent
+        // worldToLocal() function!
+        sf::Vector2i mouseCoords = sf::Mouse::getPosition(window);
+        float boneCoordsX = 0, boneCoordsY = 0;
+        Bone* crosshair = Skeleton_findBone(drawable->skeleton, "crosshair"); // Should be cached.
+        Bone_worldToLocal(crosshair->parent, mouseCoords.x, mouseCoords.y, &boneCoordsX, &boneCoordsY);
+        crosshair->x = boneCoordsX;
+        crosshair->y = boneCoordsY;
+        crosshair->appliedValid = false;
+
+        // Calculate final world transform with the
+        // crosshair bone set to the mouse cursor
+        // position.
+        Skeleton_updateWorldTransform(drawable->skeleton);
+
+        window.clear();
+        window.draw(*drawable);
+        window.display();
+    }
+}
+
 void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 	UNUSED(atlas);
 	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
@@ -552,6 +626,7 @@ void testMixAndMatch(SkeletonData* skeletonData, Atlas* atlas) {
 }
 
 int main () {
+    testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(testMixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
 	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 1.0f);
