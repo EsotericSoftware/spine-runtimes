@@ -192,7 +192,7 @@ public class Animation {
 
 	static private enum TimelineType {
 		rotate, translateX, translateY, scaleX, scaleY, shearX, shearY, //
-		r, b, g, a, r2, g2, b2, //
+		rgb, a, rgb2, //
 		attachment, deform, //
 		event, drawOrder, //
 		ikConstraint, transformConstraint, //
@@ -808,9 +808,8 @@ public class Animation {
 
 		public ColorTimeline (int frameCount, int bezierIndex, int slotIndex) {
 			super(frameCount, ENTRIES, bezierIndex, //
-				TimelineType.r.ordinal() + "|" + slotIndex, //
-				TimelineType.g.ordinal() + "|" + slotIndex, //
-				TimelineType.b.ordinal() + "|" + slotIndex, TimelineType.a.ordinal() + "|" + slotIndex);
+				TimelineType.rgb.ordinal() + "|" + slotIndex, //
+				TimelineType.a.ordinal() + "|" + slotIndex);
 			this.slotIndex = slotIndex;
 		}
 
@@ -893,12 +892,9 @@ public class Animation {
 
 		public TwoColorTimeline (int frameCount, int bezierIndex, int slotIndex) {
 			super(frameCount, ENTRIES, bezierIndex, //
-				TimelineType.r.ordinal() + "|" + slotIndex, //
-				TimelineType.g.ordinal() + "|" + slotIndex, //
-				TimelineType.b.ordinal() + "|" + slotIndex, //
+				TimelineType.rgb.ordinal() + "|" + slotIndex, //
 				TimelineType.a.ordinal() + "|" + slotIndex, //
-				TimelineType.r2.ordinal() + "|" + slotIndex, //
-				TimelineType.g2.ordinal() + "|" + slotIndex, TimelineType.b2.ordinal() + "|" + slotIndex);
+				TimelineType.rgb2.ordinal() + "|" + slotIndex);
 			this.slotIndex = slotIndex;
 		}
 
