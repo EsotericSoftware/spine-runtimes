@@ -39,6 +39,7 @@ typedef void(^spEndListener)(spTrackEntry* entry);
 typedef void(^spDisposeListener)(spTrackEntry* entry);
 typedef void(^spCompleteListener)(spTrackEntry* entry);
 typedef void(^spEventListener)(spTrackEntry* entry, spEvent* event);
+typedef void(^spUpdateWorldTransformsListener)(SkeletonAnimation* node);
 
 /** Draws an animated skeleton, providing an AnimationState for applying one or more animations and queuing animations to be
  * played later. */
@@ -90,5 +91,7 @@ typedef void(^spEventListener)(spTrackEntry* entry, spEvent* event);
 @property (nonatomic, copy) spDisposeListener disposeListener;
 @property (nonatomic, copy) spCompleteListener completeListener;
 @property (nonatomic, copy) spEventListener eventListener;
+@property (nonatomic, copy) spUpdateWorldTransformsListener preUpdateWorldTransformsListener;
+@property (nonatomic, copy) spUpdateWorldTransformsListener postUpdateWorldTransformsListener;
 
 @end

@@ -27,33 +27,37 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "IKExample.h"
-#include "SpineboyExample.h"
-
-USING_NS_CC;
-using namespace spine;
+#import "IKExample.h"
+#import "SpineboyExample.h"
 
 // This example demonstrates how to set the position
 // of a bone based on the touch position, which in
 // turn will make an IK chain follow that bone
 // smoothly.
-Scene* IKExample::scene () {
-    Scene *scene = Scene::create();
-    scene->addChild(IKExample::create());
-    return scene;
+@implementation IKExample
+
++ (CCScene*) scene {
+	CCScene *scene = [CCScene node];
+	[scene addChild:[IKExample node]];
+	return scene;
 }
 
-bool IKExample::init () {
-    if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
-	
+-(id) init {
+	self = [super init];
+	if (!self) return nil;
+
 	// Load the Spineboy skeleton and create a SkeletonAnimation node from it
 	// centered on the screen.
-    skeletonNode = SkeletonAnimation::createWithJsonFile("spineboy-pro.json", "spineboy.atlas", 0.6f);
-    skeletonNode->setPosition(Vec2(_contentSize.width / 2, 20));
-    addChild(skeletonNode);
-    
+
+	skeletonNode = [SkeletonAnimation skeletonWithFile:@"spineboy-pro.json" atlasFile:@"spineboy.atlas" scale:0.4];
+	CGSize windowSize = [[CCDirector sharedDirector] viewSize];
+	[skeletonNode setPosition:ccp(windowSize.width / 2, 20)];
+	[self addChild:skeletonNode];
+	self.userInteractionEnabled = YES;
+    self.contentSize = windowSize;
+	
 	// Queue the "walk" animation on the first track.
-	skeletonNode->setAnimation(0, "walk", true);
+	[skeletonNode setAnimationForTrack:0 name:@"walk" loop:YES];
 	
 	// Queue the "aim" animation on a higher track.
 	// It consists of a single frame that positions
@@ -64,20 +68,8 @@ bool IKExample::init () {
 	// by the walk animation, allowing us to
 	// mix the two. The mouse position following
 	// is performed in the lambda below.
-	skeletonNode->setAnimation(1, "aim", true);
+	[skeletonNode setAnimationForTrack:1 name:@"aim" loop:YES];
 
-	// Next we setup a listener that receives and stores
-	// the current mouse location. The location is converted
-	// to the skeleton's coordinate system.
-	EventListenerMouse* mouseListener = EventListenerMouse::create();
-	mouseListener->onMouseMove = [this] (cocos2d::Event* event) -> void {
-		// convert the mosue location to the skeleton's coordinate space
-		// and store it.
-		EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
-		position = skeletonNode->convertToNodeSpace(mouseEvent->getLocationInView());
-	};
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
-	
 	// Position the "crosshair" bone at the mouse
 	// location.
 	//
@@ -91,30 +83,36 @@ bool IKExample::init () {
 	// converted mouse location, we call updateWorldTransforms()
 	// again so the change of the IK target position is
 	// applied to the rest of the skeleton.
-	skeletonNode->setPostUpdateWorldTransformsListener([this] (SkeletonAnimation* node) -> void {
-		Bone* crosshair = node->findBone("crosshair"); // The bone should be cached
-		float localX = 0, localY = 0;
-		crosshair->getParent()->worldToLocal(position.x, position.y, localX, localY);
-		crosshair->setX(localX);
-		crosshair->setY(localY);
-		crosshair->setAppliedValid(false);
-		
-		node->getSkeleton()->updateWorldTransform();
-	});
-	
-	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
-        Director::getInstance()->replaceScene(SpineboyExample::scene());
-        return true;
+	__weak IKExample* scene = self;
+	skeletonNode.postUpdateWorldTransformsListener = ^(SkeletonAnimation* node) {
+		if (scene != NULL) {
+			__strong IKExample* sceneStrong = scene;
+			spBone* crosshair = [node findBone:@"crosshair"]; // The bone should be cached
+			float localX = 0, localY = 0;
+			spBone_worldToLocal(crosshair->parent, sceneStrong->position.x, sceneStrong->position.y, &localX, &localY);
+			crosshair->x = localX;
+			crosshair->y = localY;
+			crosshair->appliedValid = FALSE;
+			spBone_updateWorldTransform(crosshair);
+		}
     };
-	
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-	
-    scheduleUpdate();
-
-    return true;
+	return self;
 }
 
-void IKExample::update (float deltaTime) {
-    
+#if ( TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR )
+- (void)touchBegan:(UITouch *)touch withEvent:(UIEvent *)event {
+	position = [skeletonNode convertToNodeSpace:touch.locationInWorld];
+	printf("%f %f\n", position.x, position.y);
 }
+
+- (void)touchMoved:(UITouch *)touch withEvent:(UIEvent *)event {
+	position = [skeletonNode convertToNodeSpace:touch.locationInWorld];
+	printf("%f %f\n", position.x, position.y);
+}
+
+- (void)touchEnded:(UITouch *)touch withEvent:(UIEvent *)event {
+	[[CCDirector sharedDirector] replaceScene:[SpineboyExample scene]];
+}
+#endif
+
+@end

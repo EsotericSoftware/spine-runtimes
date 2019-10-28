@@ -143,9 +143,12 @@
 
 ### Cocos2d-Objc
 * Added mix-and-match example to demonstrate the new Skin API.
+* Added `IKExample`.
+* Added `SkeletonAnimation preUpdateWorldTransformsListener` and `SkeletonAnimation postUpdateWorldTransformsListener`. When set, these callbacks will be invokved before and after the skeleton's `updateWorldTransforms()` method is called. See the `IKExample` how it can be used.
 
 ### SFML
 * Added mix-and-match example to demonstrate the new Skin API.
+* Added `IKExample`.
 
 ## C++
 * **Breaking Changes**
@@ -178,6 +181,7 @@
 * Updated to cocos2d-x 3.17.1
 * Added mix-and-match example to demonstrate the new Skin API.
 * Exmaple project requires Visual Studio 2019 on Windows
+* Added `IKExample`.
 * Added `SkeletonAnimation::setPreUpdateWorldTransformsListener()` and `SkeletonAnimation::setPreUpdateWorldTransformsListener()`. When set, these callbacks will be invokved before and after the skeleton's `updateWorldTransforms()` method is called. See the `IKExample` how it can be used.
 
 ### SFML

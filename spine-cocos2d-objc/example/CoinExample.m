@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 #import "CoinExample.h"
-#import "SpineBoyExample.h"
+#import "IKExample.h"
 
 @implementation CoinExample
 
@@ -66,7 +66,7 @@
 	else if (skeletonNode.timeScale == 1)
 		skeletonNode.timeScale = 0.3f;
 	else
-		[[CCDirector sharedDirector] replaceScene:[SpineboyExample scene]];
+		[[CCDirector sharedDirector] replaceScene:[IKExample scene]];
 }
 #endif
 
