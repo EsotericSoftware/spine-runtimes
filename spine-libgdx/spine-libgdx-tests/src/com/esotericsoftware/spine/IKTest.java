@@ -61,10 +61,6 @@ public class IKTest extends ApplicationAdapter {
 		// mix the two. The mouse position following
 		// is performed in the render() method below.
 		state.setAnimation(1, "aim", true);
-		
-		// apply the state once, so we have world
-		// bone positions that we can use.
-		skeleton.setToSetupPose();
 	}
 
 	public void render () {

@@ -135,9 +135,11 @@ void SkeletonAnimation::update (float deltaTime) {
 	super::update(deltaTime);
 
 	deltaTime *= _timeScale;
+	if (_preUpdateListener) _preUpdateListener(this);
 	_state->update(deltaTime);
 	_state->apply(*_skeleton);
 	_skeleton->updateWorldTransform();
+	if (_postUpdateListener) _postUpdateListener(this);
 }
 
 void SkeletonAnimation::draw(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, uint32_t transformFlags) {
@@ -280,6 +282,14 @@ void SkeletonAnimation::setCompleteListener (const CompleteListener& listener) {
 
 void SkeletonAnimation::setEventListener (const EventListener& listener) {
 	_eventListener = listener;
+}
+
+void SkeletonAnimation::setPreUpdateWorldTransformsListener(const UpdateWorldTransformsListener &listener) {
+	_preUpdateListener = listener;
+}
+
+void SkeletonAnimation::setPostUpdateWorldTransformsListener(const UpdateWorldTransformsListener &listener) {
+	_postUpdateListener = listener;
 }
 
 void SkeletonAnimation::setTrackStartListener (TrackEntry* entry, const StartListener& listener) {

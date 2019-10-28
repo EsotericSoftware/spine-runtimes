@@ -205,6 +205,8 @@
 		76AAA4471D1811B000C54FCB /* SpineboyExample.h in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3BF1D180F7C00C54FCB /* SpineboyExample.h */; };
 		76AAA4571D18132D00C54FCB /* common in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4521D18132D00C54FCB /* common */; };
 		76AAA4581D18132D00C54FCB /* common in Resources */ = {isa = PBXBuildFile; fileRef = 76AAA4521D18132D00C54FCB /* common */; };
+		76C893B0236715B8009D8DC8 /* IKExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76C893AE236715B8009D8DC8 /* IKExample.cpp */; };
+		76C893B1236715B8009D8DC8 /* IKExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76C893AE236715B8009D8DC8 /* IKExample.cpp */; };
 		76D1BFE02029E35200A0272D /* SkeletonRendererSeparatorExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D1BFDF2029E35200A0272D /* SkeletonRendererSeparatorExample.cpp */; };
 		76D1BFE12029E37700A0272D /* SkeletonRendererSeparatorExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D1BFDF2029E35200A0272D /* SkeletonRendererSeparatorExample.cpp */; };
 		76D520E61EB362DD00572471 /* CoinExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D520E41EB362DD00572471 /* CoinExample.cpp */; };
@@ -392,6 +394,8 @@
 		76AAA40A1D18106000C54FCB /* spine-cocos2dx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "spine-cocos2dx.cpp"; path = "../../src/spine/spine-cocos2dx.cpp"; sourceTree = "<group>"; };
 		76AAA40B1D18106000C54FCB /* spine-cocos2dx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "spine-cocos2dx.h"; path = "../../src/spine/spine-cocos2dx.h"; sourceTree = "<group>"; };
 		76AAA4521D18132D00C54FCB /* common */ = {isa = PBXFileReference; lastKnownFileType = folder; path = common; sourceTree = "<group>"; };
+		76C893AE236715B8009D8DC8 /* IKExample.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IKExample.cpp; sourceTree = "<group>"; };
+		76C893AF236715B8009D8DC8 /* IKExample.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IKExample.h; sourceTree = "<group>"; };
 		76D1BFDE2029E35100A0272D /* SkeletonRendererSeparatorExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkeletonRendererSeparatorExample.h; sourceTree = "<group>"; };
 		76D1BFDF2029E35200A0272D /* SkeletonRendererSeparatorExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SkeletonRendererSeparatorExample.cpp; sourceTree = "<group>"; };
 		76D520E41EB362DD00572471 /* CoinExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CoinExample.cpp; sourceTree = "<group>"; };
@@ -562,6 +566,8 @@
 				76AAA3BB1D180F7C00C54FCB /* RaptorExample.h */,
 				76AAA3BE1D180F7C00C54FCB /* SpineboyExample.cpp */,
 				76AAA3BF1D180F7C00C54FCB /* SpineboyExample.h */,
+				76C893AE236715B8009D8DC8 /* IKExample.cpp */,
+				76C893AF236715B8009D8DC8 /* IKExample.h */,
 			);
 			name = Classes;
 			path = ../Classes;
@@ -887,6 +893,7 @@
 				763104DD20BC1B5E00927A1E /* Triangulator.cpp in Sources */,
 				763104F320BC1B5E00927A1E /* Animation.cpp in Sources */,
 				76798D1D22A95AB400F77964 /* ConstraintData.cpp in Sources */,
+				76C893B0236715B8009D8DC8 /* IKExample.cpp in Sources */,
 				76AAA40E1D18106000C54FCB /* SkeletonAnimation.cpp in Sources */,
 				76AAA4111D18106000C54FCB /* spine-cocos2dx.cpp in Sources */,
 				763104FC20BC1B5E00927A1E /* PathConstraintData.cpp in Sources */,
@@ -953,6 +960,7 @@
 				763105B420BC1B9700927A1E /* IkConstraintData.cpp in Sources */,
 				763105B520BC1B9700927A1E /* IkConstraintTimeline.cpp in Sources */,
 				763105B620BC1B9700927A1E /* Json.cpp in Sources */,
+				76C893B1236715B8009D8DC8 /* IKExample.cpp in Sources */,
 				763105B720BC1B9700927A1E /* LinkedMesh.cpp in Sources */,
 				763105B820BC1B9700927A1E /* MathUtil.cpp in Sources */,
 				763105B920BC1B9700927A1E /* MeshAttachment.cpp in Sources */,
