@@ -22,6 +22,8 @@
 * Exposed `x` and `y` on `SkeletonData` through getters and setters.
 
 ### Cocos2d-x
+* Added `IKExample` scene to illustrate how to drive a bone and IK chain through mouse movement.
+* Added `SkeletonAnimation::setPreUpdateWorldTransformsListener()` and `SkeletonAnimation::setPostUpdateWorldTransformsListener()`. This allows users to modify bone transforms and other skeleton properties before and after the world transforms of all bones are calculated. See the `IKExample` for a usage example.
 
 ### SFML
 
