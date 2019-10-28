@@ -32,17 +32,16 @@
 #include <vector>
 #include <string>
 
-#include "RaptorExample.h"
-#include "BatchingExample.h"
-#include "CoinExample.h"
-#include "SkeletonRendererSeparatorExample.h"
-#include "MixAndMatchExample.h"
+#include "IKExample.h"
+#include <spine/spine-cocos2dx.h>
 #include <spine/Debug.h>
 #include "AppMacros.h"
 #include <spine/SkeletonTwoColorBatch.h>
 
 USING_NS_CC;
 using namespace std;
+
+using namespace spine;
 
 DebugExtension debugExtension(SpineExtension::getInstance());
 
@@ -112,7 +111,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	
 	// create a scene. it's an autorelease object
 	//auto scene = RaptorExample::scene();
-	auto scene = BatchingExample::scene();
+	auto scene = IKExample::scene();
 
 	// run
 	director->runWithScene(scene);

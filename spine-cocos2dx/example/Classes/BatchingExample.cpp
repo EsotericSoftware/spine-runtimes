@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 #include "BatchingExample.h"
-#include "SpineboyExample.h"
+#include "IKExample.h"
 
 USING_NS_CC;
 using namespace spine;
@@ -96,7 +96,7 @@ bool BatchingExample::init () {
 
 	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
 	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
-		Director::getInstance()->replaceScene(SpineboyExample::scene());
+		Director::getInstance()->replaceScene(IKExample::scene());
 		return true;
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);

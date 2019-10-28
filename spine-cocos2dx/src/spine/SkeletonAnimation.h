@@ -36,12 +36,15 @@
 
 namespace spine {
 
+class SkeletonAnimation;
+
 typedef std::function<void(TrackEntry* entry)> StartListener;
 typedef std::function<void(TrackEntry* entry)> InterruptListener;
 typedef std::function<void(TrackEntry* entry)> EndListener;
 typedef std::function<void(TrackEntry* entry)> DisposeListener;
 typedef std::function<void(TrackEntry* entry)> CompleteListener;
 typedef std::function<void(TrackEntry* entry, Event* event)> EventListener;
+typedef std::function<void(SkeletonAnimation* node)> UpdateWorldTransformsListener;
 
 /** Draws an animated skeleton, providing an AnimationState for applying one or more animations and queuing animations to be
   * played later. */
@@ -87,6 +90,8 @@ public:
 	void setDisposeListener (const DisposeListener& listener);
 	void setCompleteListener (const CompleteListener& listener);
 	void setEventListener (const EventListener& listener);
+	void setPreUpdateWorldTransformsListener(const UpdateWorldTransformsListener& listener);
+	void setPostUpdateWorldTransformsListener(const UpdateWorldTransformsListener& listener);
 
 	void setTrackStartListener (TrackEntry* entry, const StartListener& listener);
 	void setTrackInterruptListener (TrackEntry* entry, const InterruptListener& listener);
@@ -119,6 +124,8 @@ protected:
 	DisposeListener _disposeListener;
 	CompleteListener _completeListener;
 	EventListener _eventListener;
+	UpdateWorldTransformsListener _preUpdateListener;
+	UpdateWorldTransformsListener _postUpdateListener;
 
 private:
 	typedef SkeletonRenderer super;
