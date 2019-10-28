@@ -64,7 +64,7 @@ cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
 cp -f ../raptor/export/raptor.atlas "$ROOT/spine-cocos2d-objc/Resources/"
 cp -f ../raptor/export/raptor.png "$ROOT/spine-cocos2d-objc/Resources/"
 
-cp -f ../spineboy/export/spineboy-ess.json "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
 cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-cocos2d-objc/Resources/"
 cp -f ../spineboy/export/spineboy.png "$ROOT/spine-cocos2d-objc/Resources/"
 

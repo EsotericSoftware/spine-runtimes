@@ -1,7 +1,7 @@
 
 #import "cocos2d.h"
 #import "AppDelegate.h"
-#import "SpineboyExample.h"
+#import "IKExample.h"
 
 @implementation AppController
 
@@ -24,7 +24,7 @@
   			CCSetupShowDebugStats: @YES,
 		}];
     
-    [[CCDirector sharedDirector] runWithScene:[SpineboyExample scene]];
+    [[CCDirector sharedDirector] runWithScene:[IKExample scene]];
     
     return YES;
 }

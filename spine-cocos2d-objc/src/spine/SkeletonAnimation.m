@@ -80,6 +80,8 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 @synthesize endListener = _endListener;
 @synthesize completeListener = _completeListener;
 @synthesize eventListener = _eventListener;
+@synthesize preUpdateWorldTransformsListener = _preUpdateWorldTransformsListener;
+@synthesize postUpdateWorldTransformsListener = _postUpdateWorldTransformsListener;
 
 + (id) skeletonWithData:(spSkeletonData*)skeletonData ownsSkeletonData:(bool)ownsSkeletonData {
 	return [[[self alloc] initWithData:skeletonData ownsSkeletonData:ownsSkeletonData] autorelease];
@@ -141,6 +143,8 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 	[_disposeListener release];
 	[_completeListener release];
 	[_eventListener release];
+	[_preUpdateWorldTransformsListener release];
+	[_postUpdateWorldTransformsListener release];
 
 	[super dealloc];
 }
@@ -150,7 +154,9 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 	spSkeleton_update(_skeleton, deltaTime);
 	spAnimationState_update(_state, deltaTime);
 	spAnimationState_apply(_state, _skeleton);
+	if (_preUpdateWorldTransformsListener) _preUpdateWorldTransformsListener(self);
 	spSkeleton_updateWorldTransform(_skeleton);
+	if (_postUpdateWorldTransformsListener) _postUpdateWorldTransformsListener(self);
 }
 
 - (void) setAnimationStateData:(spAnimationStateData*)stateData {

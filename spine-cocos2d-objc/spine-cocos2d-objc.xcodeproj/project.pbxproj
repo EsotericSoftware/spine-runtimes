@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		43C3282F170B0C19004A9460 /* spine-cocos2d-objc.m in Sources */ = {isa = PBXBuildFile; fileRef = 43C3282D170B0C19004A9460 /* spine-cocos2d-objc.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		43C3286C170B0DA6004A9460 /* spineboy-ess.json in Resources */ = {isa = PBXBuildFile; fileRef = 43C32868170B0DA6004A9460 /* spineboy-ess.json */; };
 		43C3286E170B0DA6004A9460 /* spineboy.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 43C3286A170B0DA6004A9460 /* spineboy.atlas */; };
 		43C3286F170B0DA6004A9460 /* spineboy.png in Resources */ = {isa = PBXBuildFile; fileRef = 43C3286B170B0DA6004A9460 /* spineboy.png */; };
 		43C3287D170B0DBE004A9460 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 43C32871170B0DBE004A9460 /* Default-568h@2x.png */; };
@@ -34,6 +33,8 @@
 		765A2EF61D7D7A08003FB779 /* goblins.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 765A2EF41D7D7A08003FB779 /* goblins.atlas */; };
 		765A2EF71D7D7A08003FB779 /* goblins.png in Resources */ = {isa = PBXBuildFile; fileRef = 765A2EF51D7D7A08003FB779 /* goblins.png */; };
 		76BF7E071E66ED9C00485998 /* GLUtils.c in Sources */ = {isa = PBXBuildFile; fileRef = 76BF7E051E66ED9C00485998 /* GLUtils.c */; };
+		76C893BC23672757009D8DC8 /* IKExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 76C893B623672757009D8DC8 /* IKExample.m */; };
+		76C893BF236728A4009D8DC8 /* spineboy-pro.json in Resources */ = {isa = PBXBuildFile; fileRef = 76C893BE236728A4009D8DC8 /* spineboy-pro.json */; };
 		76EE4E461EB36DE6000254F4 /* Array.c in Sources */ = {isa = PBXBuildFile; fileRef = 76EE4E421EB36DE6000254F4 /* Array.c */; };
 		76EE4E471EB36DE6000254F4 /* ClippingAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 76EE4E431EB36DE6000254F4 /* ClippingAttachment.c */; };
 		76EE4E481EB36DE6000254F4 /* SkeletonClipping.c in Sources */ = {isa = PBXBuildFile; fileRef = 76EE4E441EB36DE6000254F4 /* SkeletonClipping.c */; };
@@ -138,7 +139,6 @@
 /* Begin PBXFileReference section */
 		43C3282D170B0C19004A9460 /* spine-cocos2d-objc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "spine-cocos2d-objc.m"; path = "src/spine/spine-cocos2d-objc.m"; sourceTree = "<group>"; };
 		43C3282E170B0C19004A9460 /* spine-cocos2d-objc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "spine-cocos2d-objc.h"; path = "src/spine/spine-cocos2d-objc.h"; sourceTree = "<group>"; };
-		43C32868170B0DA6004A9460 /* spineboy-ess.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "spineboy-ess.json"; path = "Resources/spineboy-ess.json"; sourceTree = "<group>"; };
 		43C3286A170B0DA6004A9460 /* spineboy.atlas */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = spineboy.atlas; path = Resources/spineboy.atlas; sourceTree = "<group>"; };
 		43C3286B170B0DA6004A9460 /* spineboy.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spineboy.png; path = Resources/spineboy.png; sourceTree = "<group>"; };
 		43C32871170B0DBE004A9460 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "Resources-ios/Default-568h@2x.png"; sourceTree = "<group>"; };
@@ -171,6 +171,9 @@
 		765A2EF51D7D7A08003FB779 /* goblins.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = goblins.png; path = Resources/goblins.png; sourceTree = "<group>"; };
 		76BF7E051E66ED9C00485998 /* GLUtils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GLUtils.c; path = src/spine/GLUtils.c; sourceTree = "<group>"; };
 		76BF7E061E66ED9C00485998 /* GLUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GLUtils.h; path = src/spine/GLUtils.h; sourceTree = "<group>"; };
+		76C893B623672757009D8DC8 /* IKExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IKExample.m; path = example/IKExample.m; sourceTree = "<group>"; };
+		76C893BB23672757009D8DC8 /* IKExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IKExample.h; path = example/IKExample.h; sourceTree = "<group>"; };
+		76C893BE236728A4009D8DC8 /* spineboy-pro.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "spineboy-pro.json"; path = "Resources/spineboy-pro.json"; sourceTree = "<group>"; };
 		76EE4E421EB36DE6000254F4 /* Array.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Array.c; path = "../spine-c/spine-c/src/spine/Array.c"; sourceTree = "<group>"; };
 		76EE4E431EB36DE6000254F4 /* ClippingAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ClippingAttachment.c; path = "../spine-c/spine-c/src/spine/ClippingAttachment.c"; sourceTree = "<group>"; };
 		76EE4E441EB36DE6000254F4 /* SkeletonClipping.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SkeletonClipping.c; path = "../spine-c/spine-c/src/spine/SkeletonClipping.c"; sourceTree = "<group>"; };
@@ -282,6 +285,8 @@
 				43C32823170B0BC7004A9460 /* spine-cocos2d-objc */,
 				43F7FF8C1927F96700CA4038 /* SpineboyExample.h */,
 				43F7FF8D1927F96700CA4038 /* SpineboyExample.m */,
+				76C893BB23672757009D8DC8 /* IKExample.h */,
+				76C893B623672757009D8DC8 /* IKExample.m */,
 				43F7FF8A1927F96700CA4038 /* GoblinsExample.h */,
 				43F7FF8B1927F96700CA4038 /* GoblinsExample.m */,
 				76F5BDA81D2BDE67005917E5 /* RaptorExample.h */,
@@ -364,6 +369,7 @@
 		43C32867170B0C7F004A9460 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				76C893BE236728A4009D8DC8 /* spineboy-pro.json */,
 				76EE4E4E1EB36E53000254F4 /* coin.atlas */,
 				76EE4E4F1EB36E53000254F4 /* coin-pro.json */,
 				76EE4E501EB36E53000254F4 /* coin.png */,
@@ -376,7 +382,6 @@
 				76F5BDA01D2BDE1C005917E5 /* tank-pro.json */,
 				76F5BDA11D2BDE1C005917E5 /* tank.png */,
 				43F7010D1927FBC700CA4038 /* goblins-pro.json */,
-				43C32868170B0DA6004A9460 /* spineboy-ess.json */,
 				43C3286A170B0DA6004A9460 /* spineboy.atlas */,
 				43C3286B170B0DA6004A9460 /* spineboy.png */,
 			);
@@ -484,6 +489,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 9A5D248C170A94DA0030D4DD;
@@ -540,7 +546,6 @@
 			files = (
 				765A2EF61D7D7A08003FB779 /* goblins.atlas in Resources */,
 				76F5BDA51D2BDE1C005917E5 /* tank.atlas in Resources */,
-				43C3286C170B0DA6004A9460 /* spineboy-ess.json in Resources */,
 				43C3286E170B0DA6004A9460 /* spineboy.atlas in Resources */,
 				43C3286F170B0DA6004A9460 /* spineboy.png in Resources */,
 				43C3287D170B0DBE004A9460 /* Default-568h@2x.png in Resources */,
@@ -557,6 +562,7 @@
 				76EE4E511EB36E53000254F4 /* coin.atlas in Resources */,
 				76F5BDA21D2BDE1C005917E5 /* raptor.atlas in Resources */,
 				43C32883170B0DBE004A9460 /* Icon-Small.png in Resources */,
+				76C893BF236728A4009D8DC8 /* spineboy-pro.json in Resources */,
 				43C32884170B0DBE004A9460 /* Icon-Small@2x.png in Resources */,
 				43C32885170B0DBE004A9460 /* Icon.png in Resources */,
 				76F5BDA71D2BDE1C005917E5 /* tank.png in Resources */,
@@ -607,6 +613,7 @@
 				76F28D311DEC810300CDE54D /* Slot.c in Sources */,
 				43C32A06170B0F93004A9460 /* main.m in Sources */,
 				76F28D351DEC810300CDE54D /* VertexAttachment.c in Sources */,
+				76C893BC23672757009D8DC8 /* IKExample.m in Sources */,
 				76FAC1961E3FA15E001CCC8C /* Color.c in Sources */,
 				76F28D331DEC810300CDE54D /* TransformConstraint.c in Sources */,
 				43C32A09170B10FF004A9460 /* AppDelegate.m in Sources */,
