@@ -43,7 +43,6 @@ import com.badlogic.gdx.utils.SerializationException;
 
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
-import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.DeformTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
@@ -51,6 +50,7 @@ import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintMixTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintPositionTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintSpacingTimeline;
+import com.esotericsoftware.spine.Animation.PercentCurveTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.ShearTimeline;
@@ -58,6 +58,7 @@ import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.Animation.TwoColorTimeline;
+import com.esotericsoftware.spine.Animation.ValueCurveTimeline;
 import com.esotericsoftware.spine.BoneData.TransformMode;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
@@ -500,7 +501,6 @@ public class SkeletonJson {
 	private void readAnimation (JsonValue map, String name, SkeletonData skeletonData) {
 		float scale = this.scale;
 		Array<Timeline> timelines = new Array();
-		float duration = 0;
 
 		// Slot timelines.
 		for (JsonValue slotMap = map.getChild("slots"); slotMap != null; slotMap = slotMap.next) {
@@ -508,45 +508,34 @@ public class SkeletonJson {
 			if (slot == null) throw new SerializationException("Slot not found: " + slotMap.name);
 			for (JsonValue timelineMap = slotMap.child; timelineMap != null; timelineMap = timelineMap.next) {
 				String timelineName = timelineMap.name;
-				if (timelineName.equals("attachment")) {
-					AttachmentTimeline timeline = new AttachmentTimeline(timelineMap.size);
-					timeline.slotIndex = slot.index;
+				int frameIndex = 0, bezierIndex = 0;
 
-					int frameIndex = 0;
-					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next)
-						timeline.setFrame(frameIndex++, valueMap.getFloat("time", 0), valueMap.getString("name"));
+				if (timelineName.equals("attachment")) {
+					AttachmentTimeline timeline = new AttachmentTimeline(timelineMap.size, slot.index);
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next, frameIndex++)
+						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), valueMap.getString("name"));
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
 
 				} else if (timelineName.equals("color")) {
-					ColorTimeline timeline = new ColorTimeline(timelineMap.size);
-					timeline.slotIndex = slot.index;
-
-					int frameIndex = 0;
-					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
+					ColorTimeline timeline = new ColorTimeline(timelineMap.size, 0, slot.index);
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next, frameIndex++) {
 						Color color = Color.valueOf(valueMap.getString("color"));
 						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), color.r, color.g, color.b, color.a);
-						readCurve(valueMap, timeline, frameIndex);
-						frameIndex++;
+						bezierIndex = readCurve(valueMap, timeline, frameIndex, bezierIndex);
 					}
+					timeline.shrink(bezierIndex);
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * ColorTimeline.ENTRIES]);
 
 				} else if (timelineName.equals("twoColor")) {
-					TwoColorTimeline timeline = new TwoColorTimeline(timelineMap.size);
-					timeline.slotIndex = slot.index;
-
-					int frameIndex = 0;
-					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
-						Color light = Color.valueOf(valueMap.getString("light"));
-						Color dark = Color.valueOf(valueMap.getString("dark"));
-						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), light.r, light.g, light.b, light.a, dark.r, dark.g,
-							dark.b);
-						readCurve(valueMap, timeline, frameIndex);
-						frameIndex++;
+					TwoColorTimeline timeline = new TwoColorTimeline(timelineMap.size, 0, slot.index);
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next, frameIndex++) {
+						Color light = Color.valueOf(valueMap.getString("light")), dark = Color.valueOf(valueMap.getString("dark"));
+						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), light.r, light.g, light.b, light.a, //
+							dark.r, dark.g, dark.b);
+						bezierIndex = readCurve(valueMap, timeline, frameIndex, bezierIndex);
 					}
+					timeline.shrink(bezierIndex);
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * TwoColorTimeline.ENTRIES]);
 
 				} else
 					throw new RuntimeException("Invalid timeline type for a slot: " + timelineName + " (" + slotMap.name + ")");
@@ -558,43 +547,53 @@ public class SkeletonJson {
 			BoneData bone = skeletonData.findBone(boneMap.name);
 			if (bone == null) throw new SerializationException("Bone not found: " + boneMap.name);
 			for (JsonValue timelineMap = boneMap.child; timelineMap != null; timelineMap = timelineMap.next) {
+				JsonValue valueMap = timelineMap.child;
+				if (valueMap == null) continue;
 				String timelineName = timelineMap.name;
+				int frameIndex = 0, bezierIndex = 0;
+
 				if (timelineName.equals("rotate")) {
-					RotateTimeline timeline = new RotateTimeline(timelineMap.size);
-					timeline.boneIndex = bone.index;
-
-					int frameIndex = 0;
-					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
-						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), valueMap.getFloat("angle", 0));
-						readCurve(valueMap, timeline, frameIndex);
-						frameIndex++;
+					RotateTimeline timeline = new RotateTimeline(timelineMap.size, 0, bone.index);
+					float rotation = valueMap.getFloat("angle", 0);
+					for (;; frameIndex++) {
+						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), rotation);
+						valueMap = valueMap.next;
+						if (valueMap == null) break;
+						bezierIndex = readCurve(valueMap, timeline, frameIndex, bezierIndex, rotation,
+							rotation = valueMap.getFloat("angle", 0));
 					}
+					timeline.shrink(bezierIndex);
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * RotateTimeline.ENTRIES]);
 
-				} else if (timelineName.equals("translate") || timelineName.equals("scale") || timelineName.equals("shear")) {
-					TranslateTimeline timeline;
-					float timelineScale = 1, defaultValue = 0;
-					if (timelineName.equals("scale")) {
-						timeline = new ScaleTimeline(timelineMap.size);
-						defaultValue = 1;
-					} else if (timelineName.equals("shear"))
-						timeline = new ShearTimeline(timelineMap.size);
-					else {
-						timeline = new TranslateTimeline(timelineMap.size);
-						timelineScale = scale;
+				} else if (timelineName.equals("translate")) {
+					TranslateTimeline timeline = new TranslateTimeline(timelineMap.size, 0, bone.index);
+					for (; valueMap != null; valueMap = valueMap.next, frameIndex++) {
+						float x = valueMap.getFloat("x", 0), y = valueMap.getFloat("y", 0);
+						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), x * scale, y * scale);
+						bezierIndex = readCurve(valueMap, timeline, frameIndex, bezierIndex);
 					}
-					timeline.boneIndex = bone.index;
-
-					int frameIndex = 0;
-					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
-						float x = valueMap.getFloat("x", defaultValue), y = valueMap.getFloat("y", defaultValue);
-						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), x * timelineScale, y * timelineScale);
-						readCurve(valueMap, timeline, frameIndex);
-						frameIndex++;
-					}
+					timeline.shrink(bezierIndex);
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * TranslateTimeline.ENTRIES]);
+
+				} else if (timelineName.equals("scale")) {
+					ScaleTimeline timeline = new ScaleTimeline(timelineMap.size, 0, bone.index);
+					for (; valueMap != null; valueMap = valueMap.next, frameIndex++) {
+						float x = valueMap.getFloat("x", 1), y = valueMap.getFloat("y", 1);
+						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), x, y);
+						bezierIndex = readCurve(valueMap, timeline, frameIndex, bezierIndex);
+					}
+					timeline.shrink(bezierIndex);
+					timelines.add(timeline);
+
+				} else if (timelineName.equals("shear")) {
+					ShearTimeline timeline = new ShearTimeline(timelineMap.size, 0, bone.index);
+					for (; valueMap != null; valueMap = valueMap.next, frameIndex++) {
+						float x = valueMap.getFloat("x", 0), y = valueMap.getFloat("y", 0);
+						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), x, y);
+						bezierIndex = readCurve(valueMap, timeline, frameIndex, bezierIndex);
+					}
+					timeline.shrink(bezierIndex);
+					timelines.add(timeline);
 
 				} else
 					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneMap.name + ")");
@@ -604,35 +603,32 @@ public class SkeletonJson {
 		// IK constraint timelines.
 		for (JsonValue constraintMap = map.getChild("ik"); constraintMap != null; constraintMap = constraintMap.next) {
 			IkConstraintData constraint = skeletonData.findIkConstraint(constraintMap.name);
-			IkConstraintTimeline timeline = new IkConstraintTimeline(constraintMap.size);
-			timeline.ikConstraintIndex = skeletonData.getIkConstraints().indexOf(constraint, true);
-			int frameIndex = 0;
-			for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
+			IkConstraintTimeline timeline = new IkConstraintTimeline(constraintMap.size, 0,
+				skeletonData.getIkConstraints().indexOf(constraint, true));
+			int frameIndex = 0, bezierIndex = 0;
+			for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next, frameIndex++) {
 				timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), valueMap.getFloat("mix", 1),
 					valueMap.getFloat("softness", 0) * scale, valueMap.getBoolean("bendPositive", true) ? 1 : -1,
 					valueMap.getBoolean("compress", false), valueMap.getBoolean("stretch", false));
-				readCurve(valueMap, timeline, frameIndex);
-				frameIndex++;
+				bezierIndex = readCurve(valueMap, timeline, frameIndex, bezierIndex);
 			}
+			timeline.shrink(bezierIndex);
 			timelines.add(timeline);
-			duration = Math.max(duration, timeline.getFrames()[(timeline.getFrameCount() - 1) * IkConstraintTimeline.ENTRIES]);
 		}
 
 		// Transform constraint timelines.
 		for (JsonValue constraintMap = map.getChild("transform"); constraintMap != null; constraintMap = constraintMap.next) {
 			TransformConstraintData constraint = skeletonData.findTransformConstraint(constraintMap.name);
-			TransformConstraintTimeline timeline = new TransformConstraintTimeline(constraintMap.size);
-			timeline.transformConstraintIndex = skeletonData.getTransformConstraints().indexOf(constraint, true);
-			int frameIndex = 0;
-			for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next) {
+			TransformConstraintTimeline timeline = new TransformConstraintTimeline(constraintMap.size, 0,
+				skeletonData.getTransformConstraints().indexOf(constraint, true));
+			int frameIndex = 0, bezierIndex = 0;
+			for (JsonValue valueMap = constraintMap.child; valueMap != null; valueMap = valueMap.next, frameIndex++) {
 				timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), valueMap.getFloat("rotateMix", 1),
 					valueMap.getFloat("translateMix", 1), valueMap.getFloat("scaleMix", 1), valueMap.getFloat("shearMix", 1));
-				readCurve(valueMap, timeline, frameIndex);
-				frameIndex++;
+				bezierIndex = readCurve(valueMap, timeline, frameIndex, bezierIndex);
 			}
+			timeline.shrink(bezierIndex);
 			timelines.add(timeline);
-			duration = Math.max(duration,
-				timeline.getFrames()[(timeline.getFrameCount() - 1) * TransformConstraintTimeline.ENTRIES]);
 		}
 
 		// Path constraint timelines.
@@ -642,39 +638,37 @@ public class SkeletonJson {
 			int index = skeletonData.pathConstraints.indexOf(data, true);
 			for (JsonValue timelineMap = constraintMap.child; timelineMap != null; timelineMap = timelineMap.next) {
 				String timelineName = timelineMap.name;
-				if (timelineName.equals("position") || timelineName.equals("spacing")) {
-					PathConstraintPositionTimeline timeline;
-					float timelineScale = 1;
-					if (timelineName.equals("spacing")) {
-						timeline = new PathConstraintSpacingTimeline(timelineMap.size);
-						if (data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed) timelineScale = scale;
-					} else {
-						timeline = new PathConstraintPositionTimeline(timelineMap.size);
-						if (data.positionMode == PositionMode.fixed) timelineScale = scale;
-					}
-					timeline.pathConstraintIndex = index;
-					int frameIndex = 0;
-					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
+				int frameIndex = 0, bezierIndex = 0;
+
+				if (timelineName.equals("position")) {
+					PathConstraintPositionTimeline timeline = new PathConstraintPositionTimeline(timelineMap.size, 0, index);
+					float timelineScale = data.positionMode == PositionMode.fixed ? scale : 1;
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next, frameIndex++) {
 						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), valueMap.getFloat(timelineName, 0) * timelineScale);
-						readCurve(valueMap, timeline, frameIndex);
-						frameIndex++;
+						bezierIndex = readCurve(valueMap, timeline, frameIndex, bezierIndex);
 					}
+					timeline.shrink(bezierIndex);
 					timelines.add(timeline);
-					duration = Math.max(duration,
-						timeline.getFrames()[(timeline.getFrameCount() - 1) * PathConstraintPositionTimeline.ENTRIES]);
+
+				} else if (timelineName.equals("spacing")) {
+					PathConstraintSpacingTimeline timeline = new PathConstraintSpacingTimeline(timelineMap.size, 0, index);
+					float timelineScale = data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed ? scale : 1;
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next, frameIndex++) {
+						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), valueMap.getFloat(timelineName, 0) * timelineScale);
+						bezierIndex = readCurve(valueMap, timeline, frameIndex, bezierIndex);
+					}
+					timeline.shrink(bezierIndex);
+					timelines.add(timeline);
+
 				} else if (timelineName.equals("mix")) {
-					PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(timelineMap.size);
-					timeline.pathConstraintIndex = index;
-					int frameIndex = 0;
-					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
+					PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(timelineMap.size, 0, index);
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next, frameIndex++) {
 						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), valueMap.getFloat("rotateMix", 1),
 							valueMap.getFloat("translateMix", 1));
-						readCurve(valueMap, timeline, frameIndex);
-						frameIndex++;
+						bezierIndex = readCurve(valueMap, timeline, frameIndex, bezierIndex);
 					}
+					timeline.shrink(bezierIndex);
 					timelines.add(timeline);
-					duration = Math.max(duration,
-						timeline.getFrames()[(timeline.getFrameCount() - 1) * PathConstraintMixTimeline.ENTRIES]);
 				}
 			}
 		}
@@ -693,12 +687,9 @@ public class SkeletonJson {
 					float[] vertices = attachment.getVertices();
 					int deformLength = weighted ? vertices.length / 3 * 2 : vertices.length;
 
-					DeformTimeline timeline = new DeformTimeline(timelineMap.size);
-					timeline.slotIndex = slot.index;
-					timeline.attachment = attachment;
-
-					int frameIndex = 0;
-					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next) {
+					DeformTimeline timeline = new DeformTimeline(timelineMap.size, 0, slot.index, attachment);
+					int frameIndex = 0, bezierIndex = 0;
+					for (JsonValue valueMap = timelineMap.child; valueMap != null; valueMap = valueMap.next, frameIndex++) {
 						float[] deform;
 						JsonValue verticesValue = valueMap.get("vertices");
 						if (verticesValue == null)
@@ -718,11 +709,10 @@ public class SkeletonJson {
 						}
 
 						timeline.setFrame(frameIndex, valueMap.getFloat("time", 0), deform);
-						readCurve(valueMap, timeline, frameIndex);
-						frameIndex++;
+						bezierIndex = readCurve(valueMap, timeline, frameIndex, bezierIndex);
 					}
+					timeline.shrink(bezierIndex);
 					timelines.add(timeline);
-					duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
 				}
 			}
 		}
@@ -734,7 +724,7 @@ public class SkeletonJson {
 			DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrdersMap.size);
 			int slotCount = skeletonData.slots.size;
 			int frameIndex = 0;
-			for (JsonValue drawOrderMap = drawOrdersMap.child; drawOrderMap != null; drawOrderMap = drawOrderMap.next) {
+			for (JsonValue drawOrderMap = drawOrdersMap.child; drawOrderMap != null; drawOrderMap = drawOrderMap.next, frameIndex++) {
 				int[] drawOrder = null;
 				JsonValue offsets = drawOrderMap.get("offsets");
 				if (offsets != null) {
@@ -759,10 +749,9 @@ public class SkeletonJson {
 					for (int i = slotCount - 1; i >= 0; i--)
 						if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
 				}
-				timeline.setFrame(frameIndex++, drawOrderMap.getFloat("time", 0), drawOrder);
+				timeline.setFrame(frameIndex, drawOrderMap.getFloat("time", 0), drawOrder);
 			}
 			timelines.add(timeline);
-			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
 		}
 
 		// Event timeline.
@@ -770,7 +759,7 @@ public class SkeletonJson {
 		if (eventsMap != null) {
 			EventTimeline timeline = new EventTimeline(eventsMap.size);
 			int frameIndex = 0;
-			for (JsonValue eventMap = eventsMap.child; eventMap != null; eventMap = eventMap.next) {
+			for (JsonValue eventMap = eventsMap.child; eventMap != null; eventMap = eventMap.next, frameIndex++) {
 				EventData eventData = skeletonData.findEvent(eventMap.getString("name"));
 				if (eventData == null) throw new SerializationException("Event not found: " + eventMap.getString("name"));
 				Event event = new Event(eventMap.getFloat("time", 0), eventData);
@@ -781,23 +770,42 @@ public class SkeletonJson {
 					event.volume = eventMap.getFloat("volume", eventData.volume);
 					event.balance = eventMap.getFloat("balance", eventData.balance);
 				}
-				timeline.setFrame(frameIndex++, event);
+				timeline.setFrame(frameIndex, event);
 			}
 			timelines.add(timeline);
-			duration = Math.max(duration, timeline.getFrames()[timeline.getFrameCount() - 1]);
 		}
 
 		timelines.shrink();
+		float duration = 0;
+		for (int i = 0, n = timelines.size; i < n; i++)
+			duration = Math.max(duration, timelines.get(i).getDuration());
 		skeletonData.animations.add(new Animation(name, timelines, duration));
 	}
 
-	void readCurve (JsonValue map, CurveTimeline timeline, int frameIndex) {
+	int readCurve (JsonValue map, PercentCurveTimeline timeline, int frameIndex, int bezierIndex) {
 		JsonValue curve = map.get("curve");
-		if (curve == null) return;
-		if (curve.isString())
-			timeline.setStepped(frameIndex);
-		else
-			timeline.setCurve(frameIndex, curve.asFloat(), map.getFloat("c2", 0), map.getFloat("c3", 1), map.getFloat("c4", 1));
+		if (curve != null) {
+			if (curve.isString())
+				timeline.setStepped(frameIndex);
+			else {
+				timeline.setBezier(frameIndex, bezierIndex++, curve.asFloat(), map.getFloat("c2", 0), map.getFloat("c3", 1),
+					map.getFloat("c4", 1));
+			}
+		}
+		return bezierIndex;
+	}
+
+	int readCurve (JsonValue map, ValueCurveTimeline timeline, int frameIndex, int bezierIndex, float value1, float value2) {
+		JsonValue curve = map.get("curve");
+		if (curve != null) {
+			if (curve.isString())
+				timeline.setStepped(frameIndex);
+			else {
+				timeline.setBezier(frameIndex, bezierIndex++, value1, curve.asFloat(), map.getFloat("c2", 0), map.getFloat("c3", 1),
+					map.getFloat("c4", 1), value2);
+			}
+		}
+		return bezierIndex;
 	}
 
 	static class LinkedMesh {

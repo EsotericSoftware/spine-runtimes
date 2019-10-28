@@ -55,6 +55,10 @@ public class SkeletonData {
 
 	// --- Bones.
 
+	public SkeletonData () {
+		super();
+	}
+
 	/** The skeleton's bones, sorted parent first. The root bone is always the first bone. */
 	public Array<BoneData> getBones () {
 		return bones;

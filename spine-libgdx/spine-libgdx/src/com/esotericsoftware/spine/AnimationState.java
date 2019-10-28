@@ -29,12 +29,12 @@
 
 package com.esotericsoftware.spine;
 
-import static com.esotericsoftware.spine.Animation.RotateTimeline.*;
+import static com.esotericsoftware.spine.Animation.ValueCurveTimeline.*;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.IntSet;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.badlogic.gdx.utils.SnapshotArray;
@@ -90,7 +90,7 @@ public class AnimationState {
 	private final Array<Event> events = new Array();
 	final SnapshotArray<AnimationStateListener> listeners = new SnapshotArray();
 	private final EventQueue queue = new EventQueue();
-	private final IntSet propertyIDs = new IntSet();
+	private final ObjectSet<String> propertyIds = new ObjectSet();
 	boolean animationsChanged;
 	private float timeScale = 1;
 
@@ -367,19 +367,13 @@ public class AnimationState {
 		} else {
 			r1 = blend == MixBlend.setup ? bone.data.rotation : bone.rotation;
 			if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.
-				r2 = bone.data.rotation + frames[frames.length + PREV_ROTATION];
+				r2 = bone.data.rotation + frames[frames.length + PREV_VALUE];
 			else {
 				// Interpolate between the previous frame and the current frame.
 				int frame = Animation.binarySearch(frames, time, ENTRIES);
-				float prevRotation = frames[frame + PREV_ROTATION];
-				float frameTime = frames[frame];
-				float percent = timeline.getCurvePercent((frame >> 1) - 1,
-					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				r2 = frames[frame + ROTATION] - prevRotation;
-				r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
-				r2 = prevRotation + r2 * percent + bone.data.rotation;
-				r2 -= (16384 - (int)(16384.499999999996 - r2 / 360)) * 360;
+				r2 = bone.data.rotation + timeline.getCurveValue((frame >> 1) - 1, time, //
+					frames[frame + PREV_TIME], frames[frame + PREV_VALUE], //
+					frames[frame], frames[frame + VALUE]);
 			}
 		}
 
@@ -409,8 +403,7 @@ public class AnimationState {
 			timelinesRotation[i] = total;
 		}
 		timelinesRotation[i + 1] = diff;
-		r1 += total * alpha;
-		bone.rotation = r1 - (16384 - (int)(16384.499999999996 - r1 / 360)) * 360;
+		bone.rotation = r1 + total * alpha;
 	}
 
 	private void queueEvents (TrackEntry entry, float animationTime) {
@@ -700,7 +693,7 @@ public class AnimationState {
 		animationsChanged = false;
 
 		// Process in the order that animations are applied.
-		propertyIDs.clear(2048);
+		propertyIds.clear(2048);
 		for (int i = 0, n = tracks.size; i < n; i++) {
 			TrackEntry entry = tracks.get(i);
 			if (entry == null) continue;
@@ -713,7 +706,7 @@ public class AnimationState {
 		}
 
 		// Process in the reverse order that animations are applied.
-		propertyIDs.clear(2048);
+		propertyIds.clear(2048);
 		for (int i = tracks.size - 1; i >= 0; i--) {
 			TrackEntry entry = tracks.get(i);
 			while (entry != null) {
@@ -730,11 +723,11 @@ public class AnimationState {
 		int[] timelineMode = entry.timelineMode.setSize(timelinesCount);
 		entry.timelineHoldMix.clear();
 		Object[] timelineHoldMix = entry.timelineHoldMix.setSize(timelinesCount);
-		IntSet propertyIDs = this.propertyIDs;
+		ObjectSet<String> propertyIds = this.propertyIds;
 
 		if (to != null && to.holdPrevious) {
 			for (int i = 0; i < timelinesCount; i++) {
-				propertyIDs.add(((Timeline)timelines[i]).getPropertyId());
+				propertyIds.addAll(((Timeline)timelines[i]).getPropertyIds());
 				timelineMode[i] = HOLD;
 			}
 			return;
@@ -743,15 +736,15 @@ public class AnimationState {
 		outer:
 		for (int i = 0; i < timelinesCount; i++) {
 			Timeline timeline = (Timeline)timelines[i];
-			int id = timeline.getPropertyId();
-			if (!propertyIDs.add(id))
+			String[] ids = timeline.getPropertyIds();
+			if (!propertyIds.addAll(ids))
 				timelineMode[i] = SUBSEQUENT;
 			else if (to == null || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
-				|| timeline instanceof EventTimeline || !to.animation.hasTimeline(id)) {
+				|| timeline instanceof EventTimeline || !to.animation.hasTimeline(ids)) {
 				timelineMode[i] = FIRST;
 			} else {
 				for (TrackEntry next = to.mixingTo; next != null; next = next.mixingTo) {
-					if (next.animation.hasTimeline(id)) continue;
+					if (next.animation.hasTimeline(ids)) continue;
 					if (next.mixDuration > 0) {
 						timelineMode[i] = HOLD_MIX;
 						timelineHoldMix[i] = next;
@@ -768,12 +761,12 @@ public class AnimationState {
 		Object[] timelines = entry.animation.timelines.items;
 		int timelinesCount = entry.animation.timelines.size;
 		int[] timelineMode = entry.timelineMode.items;
-		IntSet propertyIDs = this.propertyIDs;
+		ObjectSet<String> propertyIds = this.propertyIds;
 
 		for (int i = 0; i < timelinesCount; i++) {
 			if (timelines[i] instanceof AttachmentTimeline) {
 				AttachmentTimeline timeline = (AttachmentTimeline)timelines[i];
-				if (!propertyIDs.add(timeline.slotIndex)) timelineMode[i] |= NOT_LAST;
+				if (!propertyIds.addAll(timeline.getPropertyIds())) timelineMode[i] |= NOT_LAST;
 			}
 		}
 	}
