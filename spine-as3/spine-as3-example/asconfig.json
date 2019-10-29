@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+        "output": "bin/spine-as3-example.swf",        
+        "source-path": [
+            "src",
+            "../spine-as3/src"
+        ],
+        "default-size": {
+            "width": 550,
+            "height": 500
+        },
+        "target-player": "32.0",
+        "swf-version": 43        
+    },        
+	"files": [
+		"src/spine/examples/Main.as"
+	]
+}

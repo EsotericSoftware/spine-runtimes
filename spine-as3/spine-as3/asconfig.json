@@ -1,0 +1,13 @@
+{
+	"type": "lib",
+	"compilerOptions": {
+		"source-path": [
+			"src"
+		],
+		"include-sources": [
+			"src"
+		],
+        "output": "../spine-as3/lib/spine-as3.swc",
+        "target-player": "32.0"
+	}
+}
