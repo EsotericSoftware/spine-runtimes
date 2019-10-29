@@ -2,9 +2,12 @@
 
 ## AS3
 * **Breaking changes**
+* Switched projects from FDT to Visual Studio Code. See updated `README.md` files for instructions.
+
 * **Additions**
 
 ### Starling
+* Switched projects from FDT to Visual Studio Code. See updated `README.md` files for instructions.
 
 ## C
 * **Breaking changes**
