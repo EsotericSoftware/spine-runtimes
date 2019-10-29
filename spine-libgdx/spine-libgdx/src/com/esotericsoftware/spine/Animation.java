@@ -114,24 +114,8 @@ public class Animation {
 		return name;
 	}
 
-	/** @param target After the first and before the last value.
-	 * @return index of first value greater than the target. */
-	static int binarySearch (float[] values, float target, int step) {
-		int low = 0;
-		int high = values.length / step - 2;
-		if (high == 0) return step;
-		int current = high >>> 1;
-		while (true) {
-			if (values[(current + 1) * step] <= target)
-				low = current + 1;
-			else
-				high = current;
-			if (low == high) return (low + 1) * step;
-			current = (low + high) >>> 1;
-		}
-	}
-
-	/** @param target After the first and before the last value.
+	/** Binary search using a stride of 1.
+	 * @param target After the first and before the last value.
 	 * @return index of first value greater than the target. */
 	static int binarySearch (float[] values, float target) {
 		int low = 0;
@@ -148,10 +132,49 @@ public class Animation {
 		}
 	}
 
+	/** Binary search using a stride of 2.
+	 * @param target After the first and before the last value.
+	 * @return index of first value greater than the target. */
+	static int binarySearch2 (float[] values, float target) {
+		int low = 0;
+		int high = (values.length >> 1) - 2;
+		if (high == 0) return 2;
+		int current = high >>> 1;
+		while (true) {
+			if (values[(current + 1) << 1] <= target)
+				low = current + 1;
+			else
+				high = current;
+			if (low == high) return (low + 1) << 1;
+			current = (low + high) >>> 1;
+		}
+	}
+
+	/** Binary search using the specified stride.
+	 * @param target After the first and before the last value.
+	 * @return index of first value greater than the target. */
+	static int binarySearch (float[] values, float target, int step) {
+		int low = 0;
+		int high = values.length / step - 2;
+		if (high == 0) return step;
+		int current = high >>> 1;
+		while (true) {
+			if (values[(current + 1) * step] <= target)
+				low = current + 1;
+			else
+				high = current;
+			if (low == high) return (low + 1) * step;
+			current = (low + high) >>> 1;
+		}
+	}
+
+	/** Linear search using the specified stride. Not used, but for comparison with binary searches.
+	 * @param target After the first and before the last value.
+	 * @return index of first value greater than the target. */
 	static int linearSearch (float[] values, float target, int step) {
 		for (int i = 0, last = values.length - step; i <= last; i += step)
 			if (values[i] > target) return i;
-		return -1;
+		return step;
 	}
 
 	/** Controls how a timeline value is mixed with the setup pose value or current pose value when a timeline's <code>alpha</code>
@@ -520,7 +543,7 @@ public class Animation {
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			int frame = binarySearch(frames, time, ENTRIES);
+			int frame = binarySearch2(frames, time);
 			float r = getCurveValue((frame >> 1) - 1, time, //
 				frames[frame + PREV_TIME], frames[frame + PREV_VALUE], //
 				frames[frame], frames[frame + VALUE]);
@@ -1600,7 +1623,7 @@ public class Animation {
 				position = frames[frames.length + PREV_VALUE];
 			else {
 				// Interpolate between the previous frame and the current frame.
-				int frame = binarySearch(frames, time, ENTRIES);
+				int frame = binarySearch2(frames, time);
 				position = getCurveValue((frame >> 1) - 1, time, //
 					frames[frame + PREV_TIME], frames[frame + PREV_VALUE], //
 					frames[frame], frames[frame + VALUE]);
@@ -1649,7 +1672,7 @@ public class Animation {
 				spacing = frames[frames.length + PREV_VALUE];
 			else {
 				// Interpolate between the previous frame and the current frame.
-				int frame = binarySearch(frames, time, ENTRIES);
+				int frame = binarySearch2(frames, time);
 				spacing = getCurveValue((frame >> 1) - 1, time, //
 					frames[frame + PREV_TIME], frames[frame + PREV_VALUE], //
 					frames[frame], frames[frame + VALUE]);

@@ -370,7 +370,7 @@ public class AnimationState {
 				r2 = bone.data.rotation + frames[frames.length + PREV_VALUE];
 			else {
 				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.binarySearch(frames, time, ENTRIES);
+				int frame = Animation.binarySearch2(frames, time);
 				r2 = bone.data.rotation + timeline.getCurveValue((frame >> 1) - 1, time, //
 					frames[frame + PREV_TIME], frames[frame + PREV_VALUE], //
 					frames[frame], frames[frame + VALUE]);
