@@ -18,33 +18,28 @@ spine-starling works with data exported from Spine 3.9.xx.
 
 spine-starling supports all Spine features.
 
-spine-starling does not yet support loading the binary format.
-
 # Usage
 1. Create a new Starling 2.0 project as per the [documentation].
 2. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it as a zip via the download button above.
 3. Copy the sources in `spine-as3/spine-as3/src/` and `spine-starling/spine-starling/src/` into your project's source directory
 
 ## Example
-The Spine AS3 example works on Windows, Linux and Mac OS X. This guide assumes you are using [FDT Free](http://fdt.powerflasher.com/) as your development environment.
+The Spine Starling example works on Windows, Linux and Mac OS X. This guide assumes you are using [Visual Studio Code](https://code.visualstudio.com/) together with the [ActionScript & MXML extension for Visual Studio Code](https://github.com/BowlerHatLLC/vscode-as3mxml/wiki) as your development environment.
 
-1. Download [FDT free](http://fdt.powerflasher.com/buy-download/) for your operating system.
-3. Download and install Adobe Flash Player 22 with debugging support](https://www.adobe.com/support/flashplayer/debug_downloads.html#fp15)
-2. Download the latest [Flex SDK](http://www.adobe.com/devnet/flex/flex-sdk-download.html). We assume it will be installed to some folder on your disk called `flex_sdk`.
-3. Download the latest [Adobe AIR SDK](http://www.adobe.com/devnet/air/air-sdk-download.html)
-4. Extract the AIR SDK contents, and copy them to your `flex_sdk` folder. This will replace the Adobe AIR version shipped with Flex.
-5. Open FDT, go to `Preferences -> FDT -> Installed SDKs`
-6. Click `Add` and browse to `flex_sdk`
-7. Go to `File -> Import -> General -> Existing Projects into Workspace`
-6. Browse to `spine-as3/`. You should see both the `spine-as3` and `spine-as3-example` project in the import dialog. Click `Finish`
-7. Go to `File -> Import -> General -> Existing Projects into Workspace`
-6. Browse to `spine-starling/`. You should see both the `spine-starling` and `spine-starling-example` project in the import dialog. Click `Finish`
-8. Right click the `Main.as` file in `spine-starling-example/src/spine` in the FDT explorer and select `Debug As -> FDT SWF Application`
+1. Install [Visual Studio Code](https://code.visualstudio.com/).
+2. Install the [ActionScript & MXML extension for Visual Studio Code](https://github.com/BowlerHatLLC/vscode-as3mxml/wiki).
+3. Install [Adobe Flash Player Projector version 32 with debugging support](https://www.adobe.com/support/flashplayer/debug_downloads.html#fp15).
+4. Install the [Adobe AIR SDK 32](http://www.adobe.com/devnet/air/air-sdk-download.html) by simply extracting it to a known location.
 
-**Note**: FDT Free does not allow project dependencies. If you modify the sources of `spine-as3` or `spine-starling`, you will have to compile the project to an `.swc` and place it in `spine-starling-example/libs`.
+To run the Flash example project `spine-starling-example`.
 
-## Examples
+1. Open the `spine-starling-example/` folder in Visual Studio Code.
+2. Set the AIR SDK location when prompted.
+3. Launch the `Launch Spine Starling Example` launch configuration.
 
-- [Spine atlas example](spine-starling-example/src/AtlasExample.as#L21)
-- [Starling atlas example](spine-starling-example/src/StarlingAtlasExample.as#L18)
-- [Skin example](spine-starling-example/src/GoblinsExample.as#L21)
+Instead of directly adding the sources of from `spine-starling/src` to your project, you can also link the SWC file `spine-starling/lib/spine-starling.swc`. To (re-)compile this file yourself with Visual Studio Code:
+
+1. Open the `spine-starling/` folder in Visual Studio Code.
+2. Press `CTRL + SHIFT + B` (`CMD + SHIFT + B` on macOS) and select `ActionScript: compile release - asconfig.json`
+
+Note that `spine-starling` depends on the sources of the `spine-as3` project. See the `asconfig.json` file more information on dependencies.

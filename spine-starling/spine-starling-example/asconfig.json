@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+        "output": "bin/spine-starling-example.swf",        
+        "source-path": [
+            "src",
+            "../../spine-as3/spine-as3/src",
+            "../../spine-starling/spine-starling/src"
+        ],
+        "library-path": [
+            "../../spine-starling/spine-starling/starling-2.4.swc"
+        ],
+        "default-size": {
+            "width": 550,
+            "height": 500
+        },
+        "target-player": "32.0",
+        "swf-version": 43        
+    },        
+	"files": [
+		"src/spine/examples/Main.as"
+	]
+}

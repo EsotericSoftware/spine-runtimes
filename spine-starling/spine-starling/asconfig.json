@@ -1,0 +1,18 @@
+{
+	"type": "lib",
+	"compilerOptions": {
+		"source-path": [
+            "src",
+            "../../spine-as3/spine-as3/src"
+		],
+		"include-sources": [
+            "src",
+            "../../spine-as3/spine-as3/src"
+        ],
+        "external-library-path": [
+            "starling-2.4.swc"
+        ],
+        "output": "lib/spine-starling.swc",
+        "target-player": "32.0"
+	}
+}
