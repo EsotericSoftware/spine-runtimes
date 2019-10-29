@@ -99,6 +99,7 @@
   * Removed `inheritDeform` field, getter, and setter from `MeshAttachment`.
   * Changed `.skel` binary format, added a string table. References to strings in the data resolve to this string table, reducing storage size of binary files considerably.
   * Changed the `.json` and `.skel` file formats to accomodate the new feature and file size optimiations. Old projects must be exported with Spine 3.8.20+ to be compatible with the 3.8 Spine runtimes.
+  * Switched projects from FDT to Visual Studio Code. See updated `README.md` files for instructions.
 
 * **Additions**
   * Added `SkeletonBinary` to load binary `.skel` files. See `MixAndMatchExample.as` in `spine-startling-example`.
@@ -116,6 +117,7 @@
 
 ### Starling
 * Added `MixAndMatchExample.as` to demonstrate the new Skin API additions and how to load binary `.skel` files.
+* Switched projects from FDT to Visual Studio Code. See updated `README.md` files for instructions.
 
 ## C
 * **Breaking changes**
