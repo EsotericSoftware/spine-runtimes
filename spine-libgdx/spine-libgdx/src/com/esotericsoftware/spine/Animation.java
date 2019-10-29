@@ -270,8 +270,7 @@ public class Animation {
 		float[] curves;
 
 		/** @param frameEntries The number of entries stored per frame.
-		 * @param bezierCount The number of frames that will use Bezier curves, used to reduce allocations. Pass 0 if unknown, which
-		 *           will allocate for <code>frameCount</code> Bezier curves (see {@link #shrink(int)}).
+		 * @param bezierCount The maximum number of frames that will use Bezier curves. See {@link #shrink(int)}.
 		 * @param propertyIds Unique identifiers for each property the timeline modifies. */
 		public CurveTimeline (int frameCount, int frameEntries, int bezierCount, String... propertyIds) {
 			super(frameCount, frameEntries, propertyIds);
@@ -290,9 +289,7 @@ public class Animation {
 			curves[frameIndex] = STEPPED;
 		}
 
-		/** Sets the specified key frame to Bezier interpolation.
-		 * @param frameIndex Between 0 and <code>frameCount - 1</code>. */
-		protected int setBezier (int frameIndex, int bezierIndex) {
+		int setBezier (int frameIndex, int bezierIndex) {
 			int index = getFrameCount() - 1 + bezierIndex * BEZIER_SIZE;
 			curves[frameIndex] = BEZIER + index;
 			return index;
@@ -311,7 +308,8 @@ public class Animation {
 			return BEZIER;
 		}
 
-		/** Shrinks the storage for Bezier curves, for use when <code>bezierCount</code> specified in the constructor was 0. */
+		/** Shrinks the storage for Bezier curves, for use when <code>bezierCount</code> specified in the constructor was larger
+		 * than the actual number of Bezier curves. */
 		public void shrink (int bezierCount) {
 			int size = getFrameCount() - 1 + bezierCount * BEZIER_SIZE;
 			if (curves.length > size) {
@@ -325,24 +323,27 @@ public class Animation {
 	/** The base class for timelines that use interpolation between key frames for one or more properties using a percentage of the
 	 * difference between values. */
 	static public abstract class PercentCurveTimeline extends CurveTimeline {
-		public PercentCurveTimeline (int frameCount, int frameEntries, int bezierIndex, String... propertyIds) {
-			super(frameCount, frameEntries, bezierIndex, propertyIds);
+		/** @param bezierCount The maximum number of frames that will use Bezier curves. See {@link #shrink(int)}.
+		 * @param propertyIds Unique identifiers for each property the timeline modifies. */
+		public PercentCurveTimeline (int frameCount, int frameEntries, int bezierCount, String... propertyIds) {
+			super(frameCount, frameEntries, bezierCount, propertyIds);
 		}
 
 		/** Sets the specified key frame to Bezier interpolation.
-		 * <p>
-		 * <code>cx1</code> and <code>cx2</code> are from 0 to 1, representing the percent of time between the two key frames.
-		 * <p>
-		 * <code>cy1</code> and <code>cy2</code> are the percent of the difference between the key frame's values.
-		 * @param frameIndex Between 0 and <code>frameCount - 1</code>. */
-		public void setBezier (int frameIndex, int bezierIndex, float cx1, float cy1, float cx2, float cy2) {
+		 * @param frameIndex Between 0 and <code>frameCount - 1</code>.
+		 * @param cx1 The time for the first Bezier handle.
+		 * @param cy1 The percentage of the difference between the key frame's values for the first Bezier handle.
+		 * @param cx2 The time of the second Bezier handle.
+		 * @param cy2 The percentage of the difference between the key frame's values for the second Bezier handle. */
+		public void setBezier (int frameIndex, int bezierIndex, float time1, float cx1, float cy1, float cx2, float cy2,
+			float time2) {
 			int i = setBezier(frameIndex, bezierIndex);
 			float[] curves = this.curves;
-			float tmpx = cx2 * 0.03f - cx1 * 0.06f, tmpy = cy2 * 0.03f - cy1 * 0.06f;
-			float dddx = (cx1 - cx2 + 0.33333333f) * 0.018f, dddy = (cy1 - cy2 + 0.33333333f) * 0.018f;
+			float tmpx = (time1 - cx1 * 2 + cx2) * 0.03f, tmpy = cy2 * 0.03f - cy1 * 0.06f;
+			float dddx = ((cx1 - cx2) * 3 - time1 + time2) * 0.006f, dddy = (cy1 - cy2 + 0.33333333f) * 0.018f;
 			float ddx = tmpx * 2 + dddx, ddy = tmpy * 2 + dddy;
-			float dx = cx1 * 0.3f + tmpx + dddx * 0.16666667f, dy = cy1 * 0.3f + tmpy + dddy * 0.16666667f;
-			float x = dx, y = dy;
+			float dx = (cx1 - time1) * 0.3f + tmpx + dddx * 0.16666667f, dy = cy1 * 0.3f + tmpy + dddy * 0.16666667f;
+			float x = time1 + dx, y = dy;
 			for (int n = i + BEZIER_SIZE; i < n; i += 2) {
 				curves[i] = x;
 				curves[i + 1] = y;
@@ -360,21 +361,19 @@ public class Animation {
 		public float getCurvePercent (int frameIndex, float time, float time1, float time2) {
 			float[] curves = this.curves;
 			int i = (int)curves[frameIndex];
+			if (i == LINEAR) return MathUtils.clamp((time - time1) / (time2 - time1), 0, 1);
 			if (i == STEPPED) return 0;
-			float percent = MathUtils.clamp((time - time1) / (time2 - time1), 0, 1);
-			if (i == LINEAR) return percent;
 			i -= BEZIER;
-			float x = 0;
-			for (int start = i, n = i + BEZIER_SIZE; i < n; i += 2) {
-				x = curves[i];
-				if (x >= percent) {
-					if (i == start) return curves[i + 1] * percent / x; // First point is 0,0.
-					float prevX = curves[i - 2], prevY = curves[i - 1];
-					return prevY + (curves[i + 1] - prevY) * (percent - prevX) / (x - prevX);
+			if (curves[i] > time) return curves[i + 1] * (time - time1) / (curves[i] - time1);
+			i += 2;
+			for (int n = i + BEZIER_SIZE - 2; i < n; i += 2) {
+				if (curves[i] >= time) {
+					float x = curves[i - 2], y = curves[i - 1];
+					return y + (curves[i + 1] - y) * (time - x) / (curves[i] - x);
 				}
 			}
-			float y = curves[i - 1];
-			return y + (1 - y) * (percent - x) / (1 - x); // Last point is 1,1.
+			float x = curves[i - 2], y = curves[i - 1];
+			return y + (1 - y) * (time - x) / (time2 - x);
 		}
 	}
 
@@ -385,8 +384,10 @@ public class Animation {
 		static final int PREV_TIME = -2, PREV_VALUE = -1;
 		static final int VALUE = 1;
 
-		public ValueCurveTimeline (int frameCount, int bezierIndex, String... propertyIds) {
-			super(frameCount, 2, bezierIndex, propertyIds);
+		/** @param bezierCount The maximum number of frames that will use Bezier curves. See {@link #shrink(int)}.
+		 * @param propertyIds Unique identifiers for each property the timeline modifies. */
+		public ValueCurveTimeline (int frameCount, int bezierCount, String... propertyIds) {
+			super(frameCount, 2, bezierCount, propertyIds);
 		}
 
 		public int getFrameCount () {
@@ -401,53 +402,50 @@ public class Animation {
 		}
 
 		/** Sets the specified key frame to Bezier interpolation.
-		 * <p>
-		 * <code>y1</code> and <code>y2</code> are the key frame values for this and the next frame.
-		 * <p>
-		 * <code>cx1</code> and <code>cx2</code> are from 0 to 1, representing the percent of time between the two key frames.
-		 * <p>
-		 * <code>cy1</code> and <code>cy2</code> are in the key frames' value space.
-		 * @param frameIndex Between 0 and <code>frameCount - 1</code>. */
-		public void setBezier (int frameIndex, int bezierIndex, float y1, float cx1, float cy1, float cx2, float cy2, float y2) {
+		 * @param frameIndex Between 0 and <code>frameCount - 1</code>.
+		 * @param cx1 The time for the first Bezier handle.
+		 * @param cy1 The value for the first Bezier handle.
+		 * @param cx2 The time of the second Bezier handle.
+		 * @param cy2 The value for the second Bezier handle. */
+		public void setBezier (int frameIndex, int bezierIndex, float time1, float value1, float cx1, float cy1, float cx2,
+			float cy2, float time2, float value2) {
 			int i = setBezier(frameIndex, bezierIndex);
 			float[] curves = this.curves;
-			float tmpx = cx2 * 0.03f - cx1 * 0.06f, tmpy = (y1 - cy1 * 2 + cy2) * 0.03f;
-			float dddfx = (cx1 - cx2 + 0.33333333f) * 0.018f, dddfy = ((cy1 - cy2) * 3 - y1 + y2) * 0.006f;
-			float ddx = tmpx * 2 + dddfx, ddy = tmpy * 2 + dddfy;
-			float dx = cx1 * 0.3f + tmpx + dddfx * 0.16666667f, dy = (cy1 - y1) * 0.3f + tmpy + dddfy * 0.16666667f;
-			float x = dx, y = y1 + dy;
+			float tmpx = (time1 - cx1 * 2 + cx2) * 0.03f, tmpy = (value1 - cy1 * 2 + cy2) * 0.03f;
+			float dddx = ((cx1 - cx2) * 3 - time1 + time2) * 0.006f, dddy = ((cy1 - cy2) * 3 - value1 + value2) * 0.006f;
+			float ddx = tmpx * 2 + dddx, ddy = tmpy * 2 + dddy;
+			float dx = (cx1 - time1) * 0.3f + tmpx + dddx * 0.16666667f, dy = (cy1 - value1) * 0.3f + tmpy + dddy * 0.16666667f;
+			float x = time1 + dx, y = value1 + dy;
 			for (int n = i + BEZIER_SIZE; i < n; i += 2) {
 				curves[i] = x;
 				curves[i + 1] = y;
 				dx += ddx;
 				dy += ddy;
-				ddx += dddfx;
-				ddy += dddfy;
+				ddx += dddx;
+				ddy += dddy;
 				x += dx;
 				y += dy;
 			}
 		}
 
-		/** Returns the interpolated value for the specified key frame and times.
+		/** Returns the interpolated value for the specified key frame, times, and values.
 		 * @param frameIndex Between 0 and <code>frameCount - 1</code>. */
 		public float getCurveValue (int frameIndex, float time, float time1, float value1, float time2, float value2) {
 			float[] curves = this.curves;
 			int i = (int)curves[frameIndex];
+			if (i == LINEAR) return value1 + (value2 - value1) * MathUtils.clamp((time - time1) / (time2 - time1), 0, 1);
 			if (i == STEPPED) return value1;
-			float percent = MathUtils.clamp((time - time1) / (time2 - time1), 0, 1);
-			if (i == LINEAR) return value1 + (value2 - value1) * percent;
 			i -= BEZIER;
-			float x = 0;
-			for (int start = i, n = i + BEZIER_SIZE; i < n; i += 2) {
-				x = curves[i];
-				if (x >= percent) {
-					if (i == start) return value1 + (curves[i + 1] - value1) * percent / x; // First point is 0,value1.
-					float prevY = curves[i - 1], prevX = curves[i - 2];
-					return prevY + (curves[i + 1] - prevY) * (percent - prevX) / (x - prevX);
+			if (curves[i] > time) return value1 + (curves[i + 1] - value1) * (time - value1) / (curves[i] - value1);
+			i += 2;
+			for (int n = i + BEZIER_SIZE - 2; i < n; i += 2) {
+				if (curves[i] >= time) {
+					float x = curves[i - 2], y = curves[i - 1];
+					return y + (curves[i + 1] - y) * (time - x) / (curves[i] - x);
 				}
 			}
-			float y = curves[i - 1];
-			return y + (value2 - y) * (percent - x) / (1 - x); // Last point is 1,value2.
+			float x = curves[i - 2], y = curves[i - 1];
+			return y + (value2 - y) * (time - x) / (time2 - x);
 		}
 	}
 
