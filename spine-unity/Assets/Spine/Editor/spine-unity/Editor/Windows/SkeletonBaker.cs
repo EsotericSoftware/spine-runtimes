@@ -186,7 +186,7 @@ namespace Spine.Unity.Editor {
 			}
 			
 			if (outputPath == "") {
-				outputPath = System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(skeletonDataAsset)) + "/Baked";
+				outputPath = System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(skeletonDataAsset)).Replace('\\', '/') + "/Baked";
 				System.IO.Directory.CreateDirectory(outputPath);
 			}
 
@@ -1424,7 +1424,7 @@ namespace Spine.Unity.Editor {
 			atlasAsset.GetAtlas(); // Initializes atlasAsset.
 
 			string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
-			string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+			string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath).Replace('\\', '/');
 			string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
 			string bakedPrefabPath = Path.Combine(bakedDirPath, AssetUtility.GetPathSafeName(region.name) + ".prefab").Replace("\\", "/");
 
