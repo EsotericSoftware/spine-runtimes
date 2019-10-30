@@ -143,7 +143,7 @@ namespace Spine.Unity.Editor {
 								attachmentType = (AttachmentType)System.Enum.Parse(typeof(AttachmentType), typeString, true);
 							} catch (System.ArgumentException e) {
 								// For more info, visit: http://esotericsoftware.com/forum/Spine-editor-and-runtime-version-management-6534
-								Debug.LogWarning(string.Format("Unidentified Attachment type: \"{0}\". Skeleton may have been exported from an incompatible Spine version.", typeString));
+								Debug.LogWarning(string.Format("Unidentified Attachment type: \"{0}\". Skeleton may have been exported from an incompatible Spine version.", typeString), spineJson);
 								throw e;
 							}
 
@@ -309,7 +309,7 @@ namespace Spine.Unity.Editor {
 					continue;
 				}
 
-				string dir = Path.GetDirectoryName(skeletonPath);
+				string dir = Path.GetDirectoryName(skeletonPath).Replace('\\', '/');
 
 #if SPINE_TK2D
 				IngestSpineProject(loadedAsset, null);
@@ -353,7 +353,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void ReloadSkeletonData (string skeletonJSONPath, CompatibilityProblemInfo compatibilityProblemInfo) {
-			string dir = Path.GetDirectoryName(skeletonJSONPath);
+			string dir = Path.GetDirectoryName(skeletonJSONPath).Replace('\\', '/');
 			TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonJSONPath);
 			DirectoryInfo dirInfo = new DirectoryInfo(dir);
 			FileInfo[] files = dirInfo.GetFiles("*.asset");
@@ -437,7 +437,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			string primaryName = Path.GetFileNameWithoutExtension(atlasText.name).Replace(".atlas", "");
-			string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(atlasText));
+			string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(atlasText)).Replace('\\', '/');
 
 			string atlasPath = assetPath + "/" + primaryName + AtlasSuffix + ".asset";
 
@@ -515,9 +515,9 @@ namespace Spine.Unity.Editor {
 			AssetDatabase.SaveAssets();
 
 			if (pageFiles.Count != atlasAsset.materials.Length)
-				Debug.LogWarning(string.Format("{0} :: Not all atlas pages were imported. If you rename your image files, please make sure you also edit the filenames specified in the atlas file.", atlasAsset.name));
+				Debug.LogWarning(string.Format("{0} :: Not all atlas pages were imported. If you rename your image files, please make sure you also edit the filenames specified in the atlas file.", atlasAsset.name), atlasAsset);
 			else
-				Debug.Log(string.Format("{0} :: Imported with {1} material", atlasAsset.name, atlasAsset.materials.Length));
+				Debug.Log(string.Format("{0} :: Imported with {1} material", atlasAsset.name, atlasAsset.materials.Length), atlasAsset);
 
 			// Iterate regions and bake marked.
 			Atlas atlas = atlasAsset.GetAtlas();
@@ -525,7 +525,7 @@ namespace Spine.Unity.Editor {
 				FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
 				var regions = (List<AtlasRegion>)field.GetValue(atlas);
 				string atlasAssetPath = AssetDatabase.GetAssetPath(atlasAsset);
-				string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath);
+				string atlasAssetDirPath = Path.GetDirectoryName(atlasAssetPath).Replace('\\', '/');
 				string bakedDirPath = Path.Combine(atlasAssetDirPath, atlasAsset.name);
 
 				bool hasBakedRegions = false;
@@ -552,7 +552,7 @@ namespace Spine.Unity.Editor {
 		static bool SetDefaultTextureSettings (string texturePath, SpineAtlasAsset atlasAsset) {
 			TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 			if (texImporter == null) {
-				Debug.LogWarning(string.Format("{0}: Texture asset \"{1}\" not found. Skipping. Please check your atlas file for renamed files.", atlasAsset.name, texturePath));
+				Debug.LogWarning(string.Format("{0}: Texture asset \"{1}\" not found. Skipping. Please check your atlas file for renamed files.", atlasAsset.name, texturePath), atlasAsset);
 				return false;
 			}
 
@@ -573,7 +573,7 @@ namespace Spine.Unity.Editor {
 #region Import SkeletonData (json or binary)
 		internal static string GetSkeletonDataAssetFilePath(TextAsset spineJson) {
 			string primaryName = Path.GetFileNameWithoutExtension(spineJson.name);
-			string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(spineJson));
+			string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(spineJson)).Replace('\\', '/');
 			return assetPath + "/" + primaryName + SkeletonDataSuffix + ".asset";
 		}
 
@@ -656,7 +656,7 @@ namespace Spine.Unity.Editor {
 
 #region Spine Skeleton Data File Validation
 		public static bool CheckForValidSkeletonData (string skeletonJSONPath) {
-			string dir = Path.GetDirectoryName(skeletonJSONPath);
+			string dir = Path.GetDirectoryName(skeletonJSONPath).Replace('\\', '/');
 			TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonJSONPath);
 			DirectoryInfo dirInfo = new DirectoryInfo(dir);
 			FileInfo[] files = dirInfo.GetFiles("*.asset");
@@ -694,7 +694,7 @@ namespace Spine.Unity.Editor {
 				switch (result) {
 					case -1:
 						//Debug.Log("Select Atlas");
-						AtlasAssetBase selectedAtlas = BrowseAtlasDialog(Path.GetDirectoryName(skeletonPath));
+						AtlasAssetBase selectedAtlas = BrowseAtlasDialog(Path.GetDirectoryName(skeletonPath).Replace('\\', '/'));
 						if (selectedAtlas != null) {
 							localAtlases.Clear();
 							localAtlases.Add(selectedAtlas);
@@ -706,7 +706,8 @@ namespace Spine.Unity.Editor {
 						}
 						break;
 					case 0: // Resolve AtlasAssets...
-						var atlasList = MultiAtlasDialog(requiredPaths, Path.GetDirectoryName(skeletonPath), Path.GetFileNameWithoutExtension(skeletonPath));
+						var atlasList = MultiAtlasDialog(requiredPaths, Path.GetDirectoryName(skeletonPath).Replace('\\', '/'),
+							Path.GetFileNameWithoutExtension(skeletonPath));
 						if (atlasList != null)
 							AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath), atlasList.ToArray());
 
@@ -905,7 +906,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			if (data == null) {
-				Debug.LogWarning("InstantiateSkeletonAnimation tried to instantiate a skeleton from an invalid SkeletonDataAsset.");
+				Debug.LogWarning("InstantiateSkeletonAnimation tried to instantiate a skeleton from an invalid SkeletonDataAsset.", skeletonDataAsset);
 				return null;
 			}
 
@@ -920,7 +921,7 @@ namespace Spine.Unity.Editor {
 				newSkeletonAnimation.Initialize(false);
 			} catch (System.Exception e) {
 				if (destroyInvalid) {
-					Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.");
+					Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.", skeletonDataAsset);
 					GameObject.DestroyImmediate(go);
 				}
 				throw e;
@@ -982,7 +983,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			if (data == null) {
-				Debug.LogWarning("InstantiateSkeletonMecanim tried to instantiate a skeleton from an invalid SkeletonDataAsset.");
+				Debug.LogWarning("InstantiateSkeletonMecanim tried to instantiate a skeleton from an invalid SkeletonDataAsset.", skeletonDataAsset);
 				return null;
 			}
 
@@ -991,7 +992,7 @@ namespace Spine.Unity.Editor {
 
 			if (skeletonDataAsset.controller == null) {
 				SkeletonBaker.GenerateMecanimAnimationClips(skeletonDataAsset);
-				Debug.Log(string.Format("Mecanim controller was automatically generated and assigned for {0}", skeletonDataAsset.name));
+				Debug.Log(string.Format("Mecanim controller was automatically generated and assigned for {0}", skeletonDataAsset.name), skeletonDataAsset);
 			}
 
 			go.GetComponent<Animator>().runtimeAnimatorController = skeletonDataAsset.controller;
@@ -1005,7 +1006,7 @@ namespace Spine.Unity.Editor {
 				newSkeletonMecanim.Initialize(false);
 			} catch (System.Exception e) {
 				if (destroyInvalid) {
-					Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.");
+					Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.", skeletonDataAsset);
 					GameObject.DestroyImmediate(go);
 				}
 				throw e;
