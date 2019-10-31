@@ -1361,6 +1361,7 @@ declare module spine.webgl {
 		private texture;
 		private boundUnit;
 		private useMipMaps;
+		static DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL: boolean;
 		constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement, useMipMaps?: boolean);
 		setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
 		static validateMagFilter(magFilter: TextureFilter): TextureFilter.Nearest | TextureFilter.Linear | TextureFilter.Linear;
