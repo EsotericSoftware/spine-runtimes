@@ -106,12 +106,12 @@ namespace Spine.Unity.Editor {
 
 			string[] assets = AssetDatabase.FindAssets("t:script SpineEditorUtilities");
 			string assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
-			editorPath = Path.GetDirectoryName(assetPath).Replace("\\", "/");
+			editorPath = Path.GetDirectoryName(assetPath).Replace('\\', '/');
 
 			assets = AssetDatabase.FindAssets("t:texture icon-subMeshRenderer");
 			if (assets.Length > 0) {
 				assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
-				editorGUIPath = Path.GetDirectoryName(assetPath).Replace("\\", "/");
+				editorGUIPath = Path.GetDirectoryName(assetPath).Replace('\\', '/');
 			}
 			else {
 				editorGUIPath = editorPath.Replace("/Utility", "/GUI");

@@ -34,6 +34,8 @@ module spine.webgl {
 		private boundUnit = 0;
 		private useMipMaps = false;
 
+		public static DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL = false;
+
 		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement, useMipMaps: boolean = false) {
 			super(image);
 			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
@@ -75,6 +77,7 @@ module spine.webgl {
 				this.texture = this.context.gl.createTexture();
 			}
 			this.bind();
+			if (GLTexture.DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL) gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._image);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, useMipMaps ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
