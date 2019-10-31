@@ -35,14 +35,16 @@ module spine {
 		private errors: Map<string> = {};
 		private toLoad = 0;
 		private loaded = 0;
+		private rawDataUris: Map<string> = {};
 
 		constructor (textureLoader: (image: HTMLImageElement) => any, pathPrefix: string = "") {
 			this.textureLoader = textureLoader;
 			this.pathPrefix = pathPrefix;
 		}
 
-		private static downloadText (url: string, success: (data: string) => void, error: (status: number, responseText: string) => void) {
+		private downloadText (url: string, success: (data: string) => void, error: (status: number, responseText: string) => void) {
 			let request = new XMLHttpRequest();
+			if (this.rawDataUris[url]) url = this.rawDataUris[url];
 			request.open("GET", url, true);
 			request.onload = () => {
 				if (request.status == 200) {
@@ -57,8 +59,9 @@ module spine {
 			request.send();
 		}
 
-		private static downloadBinary (url: string, success: (data: Uint8Array) => void, error: (status: number, responseText: string) => void) {
+		private downloadBinary (url: string, success: (data: Uint8Array) => void, error: (status: number, responseText: string) => void) {
 			let request = new XMLHttpRequest();
+			if (this.rawDataUris[url]) url = this.rawDataUris[url];
 			request.open("GET", url, true);
 			request.responseType = "arraybuffer";
 			request.onload = () => {
@@ -74,13 +77,17 @@ module spine {
 			request.send();
 		}
 
+		setRawDataURI(path: string, data: string) {
+			this.rawDataUris[this.pathPrefix + path] = data;
+		}
+
 		loadBinary(path: string,
 			success: (path: string, binary: Uint8Array) => void = null,
 			error: (path: string, error: string) => void = null) {
 			path = this.pathPrefix + path;
 			this.toLoad++;
 
-			AssetManager.downloadBinary(path, (data: Uint8Array): void => {
+			this.downloadBinary(path, (data: Uint8Array): void => {
 				this.assets[path] = data;
 				if (success) success(path, data);
 				this.toLoad--;
@@ -99,7 +106,7 @@ module spine {
 			path = this.pathPrefix + path;
 			this.toLoad++;
 
-			AssetManager.downloadText(path, (data: string): void => {
+			this.downloadText(path, (data: string): void => {
 				this.assets[path] = data;
 				if (success) success(path, data);
 				this.toLoad--;
@@ -116,12 +123,13 @@ module spine {
 			success: (path: string, image: HTMLImageElement) => void = null,
 			error: (path: string, error: string) => void = null) {
 			path = this.pathPrefix + path;
+			let storagePath = path;
 			this.toLoad++;
 			let img = new Image();
 			img.crossOrigin = "anonymous";
 			img.onload = (ev) => {
 				let texture = this.textureLoader(img);
-				this.assets[path] = texture;
+				this.assets[storagePath] = texture;
 				this.toLoad--;
 				this.loaded++;
 				if (success) success(path, img);
@@ -132,29 +140,8 @@ module spine {
 				this.loaded++;
 				if (error) error(path, `Couldn't load image ${path}`);
 			}
+			if (this.rawDataUris[path]) path = this.rawDataUris[path];
 			img.src = path;
-		}
-
-		loadTextureData(path: string, data: string,
-			success: (path: string, image: HTMLImageElement) => void = null,
-			error: (path: string, error: string) => void = null) {
-			path = this.pathPrefix + path;
-			this.toLoad++;
-			let img = new Image();
-			img.onload = (ev) => {
-				let texture = this.textureLoader(img);
-				this.assets[path] = texture;
-				this.toLoad--;
-				this.loaded++;
-				if (success) success(path, img);
-			}
-			img.onerror = (ev) => {
-				this.errors[path] = `Couldn't load image ${path}`;
-				this.toLoad--;
-				this.loaded++;
-				if (error) error(path, `Couldn't load image ${path}`);
-			}
-			img.src = data;
 		}
 
 		loadTextureAtlas (path: string,
@@ -165,12 +152,12 @@ module spine {
 			path = this.pathPrefix + path;
 			this.toLoad++;
 
-			AssetManager.downloadText(path, (atlasData: string): void => {
+			this.downloadText(path, (atlasData: string): void => {
 				let pagesLoaded: any = { count: 0 };
 				let atlasPages = new Array<string>();
 				try {
 					let atlas = new TextureAtlas(atlasData, (path: string) => {
-						atlasPages.push(parent + "/" + path);
+						atlasPages.push(parent == "" ? path : parent + "/" + path);
 						let image = document.createElement("img") as HTMLImageElement;
 						image.width = 16;
 						image.height = 16;
@@ -194,7 +181,7 @@ module spine {
 							if (!pageLoadError) {
 								try {
 									let atlas = new TextureAtlas(atlasData, (path: string) => {
-										return this.get(parent + "/" + path);
+										return this.get(parent == "" ? path : parent + "/" + path);
 									});
 									this.assets[path] = atlas;
 									if (success) success(path, atlas);

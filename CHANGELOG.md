@@ -554,6 +554,7 @@ This will automatically:
   * Support for stretchy IK
   * Support for audio events, see `audioPath`, `volume` and `balance` fields on event (data).
   * `TrackEntry` has an additional field called `holdPrevious`. It can be used to counter act a limitation of `AnimationState` resulting in "dipping" of parts of the animation. For a full discussion of the problem and the solution we've implemented, see this [forum thread](http://esotericsoftware.com/forum/Probably-Easy-Animation-mixing-with-multiple-tracks-10682?p=48130&hilit=holdprevious#p48130).
+  * Added `AssetManager#setRawDataURI(path, data)`. Allows to set raw data URIs for a specific path, which in turn enables embedding assets into JavaScript/HTML.
 
 ### WebGL backend
 * Added `VertexEffect` interface, instances of which can be set on `SkeletonRenderer`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect`, and the example which allows to set effects.
