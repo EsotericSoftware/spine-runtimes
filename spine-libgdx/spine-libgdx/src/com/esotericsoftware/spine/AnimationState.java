@@ -29,8 +29,6 @@
 
 package com.esotericsoftware.spine;
 
-import static com.esotericsoftware.spine.Animation.ValueCurveTimeline.*;
-
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
@@ -366,15 +364,7 @@ public class AnimationState {
 			}
 		} else {
 			r1 = blend == MixBlend.setup ? bone.data.rotation : bone.rotation;
-			if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.
-				r2 = bone.data.rotation + frames[frames.length + PREV_VALUE];
-			else {
-				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.binarySearch2(frames, time);
-				r2 = bone.data.rotation + timeline.getCurveValue((frame >> 1) - 1, time, //
-					frames[frame + PREV_TIME], frames[frame + PREV_VALUE], //
-					frames[frame], frames[frame + VALUE]);
-			}
+			r2 = bone.data.rotation + timeline.getCurveValue(time);
 		}
 
 		// Mix between rotations using the direction of the shortest route on the first frame.
