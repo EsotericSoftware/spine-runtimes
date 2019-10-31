@@ -29,6 +29,10 @@
 
 // Contributed by: Mitch Thompson
 
+#if UNITY_2019_2_OR_NEWER
+#define HINGE_JOINT_NEW_BEHAVIOUR
+#endif
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -39,7 +43,8 @@ namespace Spine.Unity.Editor {
 
 	[CustomEditor(typeof(SkeletonUtilityBone)), CanEditMultipleObjects]
 	public class SkeletonUtilityBoneInspector : UnityEditor.Editor {
-		SerializedProperty mode, boneName, zPosition, position, rotation, scale, overrideAlpha, parentReference;
+		SerializedProperty mode, boneName, zPosition, position, rotation, scale, overrideAlpha, hierarchy, parentReference;
+		GUIContent hierarchyLabel;
 
 		//multi selected flags
 		bool containsFollows, containsOverrides, multiObject;
@@ -59,7 +64,12 @@ namespace Spine.Unity.Editor {
 			rotation = this.serializedObject.FindProperty("rotation");
 			scale = this.serializedObject.FindProperty("scale");
 			overrideAlpha = this.serializedObject.FindProperty("overrideAlpha");
+			hierarchy = this.serializedObject.FindProperty("hierarchy");
+			hierarchyLabel = new GUIContent("Skeleton Utility Parent");
 			parentReference = this.serializedObject.FindProperty("parentReference");
+
+			utilityBone = (SkeletonUtilityBone)target;
+			skeletonUtility = utilityBone.hierarchy;
 			EvaluateFlags();
 
 			if (!utilityBone.valid && skeletonUtility != null && skeletonUtility.skeletonRenderer != null)
@@ -99,9 +109,6 @@ namespace Spine.Unity.Editor {
 		}
 
 		void EvaluateFlags () {
-			utilityBone = (SkeletonUtilityBone)target;
-			skeletonUtility = utilityBone.hierarchy;
-
 			if (Selection.objects.Length == 1) {
 				containsFollows = utilityBone.mode == SkeletonUtilityBone.Mode.Follow;
 				containsOverrides = utilityBone.mode == SkeletonUtilityBone.Mode.Override;
@@ -156,6 +163,7 @@ namespace Spine.Unity.Editor {
 			using (new EditorGUI.DisabledGroupScope(containsFollows)) {
 				EditorGUILayout.PropertyField(overrideAlpha);
 				EditorGUILayout.PropertyField(parentReference);
+				EditorGUILayout.PropertyField(hierarchy, hierarchyLabel);
 			}
 
 			EditorGUILayout.Space();
@@ -292,85 +300,238 @@ namespace Spine.Unity.Editor {
 		}
 
 		void CreateHingeChain2D () {
-			var utilBoneArr = utilityBone.GetComponentsInChildren<SkeletonUtilityBone>();
-
-			foreach (var utilBone in utilBoneArr) {
-				if (utilBone.GetComponent<Collider2D>() == null) {
-					if (utilBone.bone.Data.Length == 0) {
-						var sphere = utilBone.gameObject.AddComponent<CircleCollider2D>();
-						sphere.radius = 0.1f;
-					} else {
-						float length = utilBone.bone.Data.Length;
-						var box = utilBone.gameObject.AddComponent<BoxCollider2D>();
-						box.size = new Vector3(length, length / 3f, 0.2f);
-						box.offset = new Vector3(length / 2f, 0, 0);
-					}
-				}
-
-				utilBone.gameObject.AddComponent<Rigidbody2D>();
+			var kinematicParentUtilityBone = utilityBone.transform.parent.GetComponent<SkeletonUtilityBone>();
+			if (kinematicParentUtilityBone == null) {
+				UnityEditor.EditorUtility.DisplayDialog("No parent SkeletonUtilityBone found!", "Please select the first physically moving chain node, having a parent GameObject with a SkeletonUtilityBone component attached.", "OK");
+				return;
 			}
 
-			utilityBone.GetComponent<Rigidbody2D>().isKinematic = true;
+			float mass = 10;
+			const float rotationLimit = 20.0f;
 
-			foreach (var utilBone in utilBoneArr) {
-				if (utilBone == utilityBone)
-					continue;
+			SetSkeletonUtilityToFlipByRotation();
 
-				utilBone.mode = SkeletonUtilityBone.Mode.Override;
+			kinematicParentUtilityBone.mode = SkeletonUtilityBone.Mode.Follow;
+			kinematicParentUtilityBone.position = kinematicParentUtilityBone.rotation = kinematicParentUtilityBone.scale = kinematicParentUtilityBone.zPosition = true;
 
-				var joint = utilBone.gameObject.AddComponent<HingeJoint2D>();
-				joint.connectedBody = utilBone.transform.parent.GetComponent<Rigidbody2D>();
+			GameObject commonParentObject = new GameObject(skeletonUtility.name + " HingeChain Parent " + utilityBone.name);
+			var commonParentActivateOnFlip = commonParentObject.AddComponent<ActivateBasedOnFlipDirection>();
+			commonParentActivateOnFlip.skeletonRenderer = skeletonUtility.skeletonRenderer;
+
+			// HingeChain Parent
+			// Needs to be on top hierarchy level (not attached to the moving skeleton at least) for physics to apply proper momentum.
+			GameObject normalChainParentObject = new GameObject("HingeChain");
+			normalChainParentObject.transform.SetParent(commonParentObject.transform);
+			commonParentActivateOnFlip.activeOnNormalX = normalChainParentObject;
+
+			//var followRotationComponent = normalChainParentObject.AddComponent<FollowSkeletonUtilityRootRotation>();
+			//followRotationComponent.reference = skeletonUtility.boneRoot;
+
+			// Follower Kinematic Rigidbody
+			GameObject followerKinematicObject = new GameObject(kinematicParentUtilityBone.name + " Follower");
+			followerKinematicObject.transform.parent = normalChainParentObject.transform;
+			var followerRigidbody = followerKinematicObject.AddComponent<Rigidbody2D>();
+			followerRigidbody.mass = mass;
+			followerRigidbody.isKinematic = true;
+			followerKinematicObject.AddComponent<FollowLocationRigidbody2D>().reference = kinematicParentUtilityBone.transform;
+			followerKinematicObject.transform.position = kinematicParentUtilityBone.transform.position;
+			followerKinematicObject.transform.rotation = kinematicParentUtilityBone.transform.rotation;
+
+			// Child Bones
+			var utilityBones = utilityBone.GetComponentsInChildren<SkeletonUtilityBone>();
+			var childBoneParentReference = followerKinematicObject.transform;
+			for (int i = 0; i < utilityBones.Length; ++i) {
+				var childBone = utilityBones[i];
+				mass *= 0.75f;
+				childBone.parentReference = (i == 0) ? kinematicParentUtilityBone.transform : childBoneParentReference;
+				childBone.transform.SetParent(normalChainParentObject.transform, true); // we need a flat hierarchy of all Joint objects in Unity.
+				AttachRigidbodyAndCollider2D(childBone);
+				childBone.mode = SkeletonUtilityBone.Mode.Override;
+				childBone.scale = childBone.position = childBone.zPosition = false;
+
+				HingeJoint2D joint = childBone.gameObject.AddComponent<HingeJoint2D>();
+				joint.connectedBody = childBoneParentReference.GetComponent<Rigidbody2D>();
 				joint.useLimits = true;
-				joint.limits = new JointAngleLimits2D {
-					min = -20,
-					max = 20
-				};
-				utilBone.GetComponent<Rigidbody2D>().mass = utilBone.transform.parent.GetComponent<Rigidbody2D>().mass * 0.75f;
+				ApplyJoint2DAngleLimits(joint, rotationLimit, childBoneParentReference, childBone.transform);
+
+				childBone.GetComponent<Rigidbody2D>().mass = mass;
+				childBoneParentReference = childBone.transform;
 			}
+
+			Duplicate2DHierarchyForFlippedChains(normalChainParentObject, commonParentActivateOnFlip, skeletonUtility.transform, rotationLimit);
+			UnityEditor.Selection.activeGameObject = commonParentObject;
+		}
+
+		void ApplyJoint2DAngleLimits (HingeJoint2D joint, float rotationLimit, Transform parentBone, Transform bone) {
+		#if HINGE_JOINT_NEW_BEHAVIOUR
+			float referenceAngle = (parentBone.eulerAngles.z - bone.eulerAngles.z + 360f) % 360f;
+			float minAngle = referenceAngle - rotationLimit;
+			float maxAngle = referenceAngle + rotationLimit;
+			if (maxAngle > 270f) {
+				minAngle -= 360f;
+				maxAngle -= 360f;
+			}
+			if (minAngle < -90f) {
+				minAngle += 360f;
+				maxAngle += 360f;
+			}
+#else
+			float minAngle = - rotationLimit;
+			float maxAngle = rotationLimit;
+#endif
+			joint.limits = new JointAngleLimits2D {
+				min = minAngle,
+				max = maxAngle
+			};
+		}
+
+		void Duplicate2DHierarchyForFlippedChains (GameObject normalChainParentObject, ActivateBasedOnFlipDirection commonParentActivateOnFlip,
+													Transform skeletonUtilityRoot, float rotationLimit) {
+
+			GameObject mirroredChain = GameObject.Instantiate(normalChainParentObject, normalChainParentObject.transform.position,
+				normalChainParentObject.transform.rotation, commonParentActivateOnFlip.transform);
+			mirroredChain.name = normalChainParentObject.name + " FlippedX";
+			
+			commonParentActivateOnFlip.activeOnFlippedX = mirroredChain;
+
+			var followerKinematicObject = mirroredChain.GetComponentInChildren<FollowLocationRigidbody2D>();
+			followerKinematicObject.followFlippedX = true;
+			FlipBone2DHorizontal(followerKinematicObject.transform, skeletonUtilityRoot);
+
+			var childBoneJoints = mirroredChain.GetComponentsInChildren<HingeJoint2D>();
+			Transform prevRotatedChild = null;
+			Transform parentTransformForAngles = followerKinematicObject.transform;
+			for (int i = 0; i < childBoneJoints.Length; ++i) {
+				var joint = childBoneJoints[i];
+				FlipBone2DHorizontal(joint.transform, skeletonUtilityRoot);
+				ApplyJoint2DAngleLimits(joint, rotationLimit, parentTransformForAngles, joint.transform);
+				
+				GameObject rotatedChild = GameObject.Instantiate(joint.gameObject, joint.transform, true);
+				rotatedChild.name = joint.name + " rotated";
+				var rotationEulerAngles = rotatedChild.transform.localEulerAngles;
+				rotationEulerAngles.x = 180;
+				rotatedChild.transform.localEulerAngles = rotationEulerAngles;
+				DestroyImmediate(rotatedChild.GetComponent<HingeJoint2D>());
+				DestroyImmediate(rotatedChild.GetComponent<BoxCollider2D>());
+				DestroyImmediate(rotatedChild.GetComponent<Rigidbody2D>());
+
+				DestroyImmediate(joint.gameObject.GetComponent<SkeletonUtilityBone>());
+
+				if (i > 0) {
+					var utilityBone = rotatedChild.GetComponent<SkeletonUtilityBone>();
+					utilityBone.parentReference = prevRotatedChild;
+				}
+				prevRotatedChild = rotatedChild.transform;
+				parentTransformForAngles = joint.transform;
+			}
+
+			mirroredChain.SetActive(false);
+		}
+
+		void FlipBone2DHorizontal(Transform bone, Transform mirrorPosition) {
+			Vector3 position = bone.position;
+			position.x = 2 * mirrorPosition.position.x - position.x; // = mirrorPosition + (mirrorPosition - bone.position)
+			bone.position = position;
+
+			Vector3 boneZ = bone.forward;
+			Vector3 boneX = bone.right;
+			boneX.x *= -1;
+
+			bone.rotation = Quaternion.LookRotation(boneZ, Vector3.Cross(boneZ, boneX));
 		}
 
 		void CreateHingeChain () {
-			var utilBoneArr = utilityBone.GetComponentsInChildren<SkeletonUtilityBone>();
-
-			foreach (var utilBone in utilBoneArr) {
-				AttachRigidbody(utilBone);
+			var kinematicParentUtilityBone = utilityBone.transform.parent.GetComponent<SkeletonUtilityBone>();
+			if (kinematicParentUtilityBone == null) {
+				UnityEditor.EditorUtility.DisplayDialog("No parent SkeletonUtilityBone found!", "Please select the first physically moving chain node, having a parent GameObject with a SkeletonUtilityBone component attached.", "OK");
+				return;
 			}
+			
+			SetSkeletonUtilityToFlipByRotation();
+			
+			kinematicParentUtilityBone.mode = SkeletonUtilityBone.Mode.Follow;
+			kinematicParentUtilityBone.position = kinematicParentUtilityBone.rotation = kinematicParentUtilityBone.scale = kinematicParentUtilityBone.zPosition = true;
 
-			utilityBone.GetComponent<Rigidbody>().isKinematic = true;
+			// HingeChain Parent
+			// Needs to be on top hierarchy level (not attached to the moving skeleton at least) for physics to apply proper momentum.
+			GameObject chainParentObject = new GameObject(skeletonUtility.name + " HingeChain Parent " + utilityBone.name);
+			var followRotationComponent = chainParentObject.AddComponent<FollowSkeletonUtilityRootRotation>();
+			followRotationComponent.reference = skeletonUtility.boneRoot;
 
-			foreach (var utilBone in utilBoneArr) {
-				if (utilBone == utilityBone)
-					continue;
+			// Follower Kinematic Rigidbody
+			GameObject followerKinematicObject = new GameObject(kinematicParentUtilityBone.name + " Follower");
+			followerKinematicObject.transform.parent = chainParentObject.transform;
+			var followerRigidbody = followerKinematicObject.AddComponent<Rigidbody>();
+			followerRigidbody.mass = 10;
+			followerRigidbody.isKinematic = true;
+			followerKinematicObject.AddComponent<FollowLocationRigidbody>().reference = kinematicParentUtilityBone.transform;
+			followerKinematicObject.transform.position = kinematicParentUtilityBone.transform.position;
+			followerKinematicObject.transform.rotation = kinematicParentUtilityBone.transform.rotation;
 
-				utilBone.mode = SkeletonUtilityBone.Mode.Override;
-
-				HingeJoint joint = utilBone.gameObject.AddComponent<HingeJoint>();
+			// Child Bones
+			var utilityBones = utilityBone.GetComponentsInChildren<SkeletonUtilityBone>();
+			var childBoneParentReference = followerKinematicObject.transform;
+			foreach (var childBone in utilityBones) {
+				childBone.parentReference = childBoneParentReference;
+				childBone.transform.SetParent(chainParentObject.transform, true); // we need a flat hierarchy of all Joint objects in Unity.
+				AttachRigidbodyAndCollider(childBone);
+				childBone.mode = SkeletonUtilityBone.Mode.Override;
+				
+				HingeJoint joint = childBone.gameObject.AddComponent<HingeJoint>();
 				joint.axis = Vector3.forward;
-				joint.connectedBody = utilBone.transform.parent.GetComponent<Rigidbody>();
+				joint.connectedBody = childBoneParentReference.GetComponent<Rigidbody>();
 				joint.useLimits = true;
 				joint.limits = new JointLimits {
 					min = -20,
 					max = 20
 				};
-				utilBone.GetComponent<Rigidbody>().mass = utilBone.transform.parent.GetComponent<Rigidbody>().mass * 0.75f;
+				childBone.GetComponent<Rigidbody>().mass = childBoneParentReference.transform.GetComponent<Rigidbody>().mass * 0.75f;
+
+				childBoneParentReference = childBone.transform;
+			}
+			UnityEditor.Selection.activeGameObject = chainParentObject;
+		}
+
+		void SetSkeletonUtilityToFlipByRotation () {
+			if (!skeletonUtility.flipBy180DegreeRotation) {
+				skeletonUtility.flipBy180DegreeRotation = true;
+				Debug.Log("Set SkeletonUtility " + skeletonUtility.name + " to flip by rotation instead of negative scale (required).", skeletonUtility);
 			}
 		}
 
-		static void AttachRigidbody (SkeletonUtilityBone utilBone) {
+		static void AttachRigidbodyAndCollider (SkeletonUtilityBone utilBone, bool enableCollider = false) {
 			if (utilBone.GetComponent<Collider>() == null) {
 				if (utilBone.bone.Data.Length == 0) {
 					SphereCollider sphere = utilBone.gameObject.AddComponent<SphereCollider>();
 					sphere.radius = 0.1f;
+					sphere.enabled = enableCollider;
 				} else {
 					float length = utilBone.bone.Data.Length;
 					BoxCollider box = utilBone.gameObject.AddComponent<BoxCollider>();
 					box.size = new Vector3(length, length / 3f, 0.2f);
 					box.center = new Vector3(length / 2f, 0, 0);
+					box.enabled = enableCollider;
 				}
 			}
-
 			utilBone.gameObject.AddComponent<Rigidbody>();
 		}
-	}
 
+		static void AttachRigidbodyAndCollider2D(SkeletonUtilityBone utilBone, bool enableCollider = false) {
+			if (utilBone.GetComponent<Collider2D>() == null) {
+				if (utilBone.bone.Data.Length == 0) {
+					var sphere = utilBone.gameObject.AddComponent<CircleCollider2D>();
+					sphere.radius = 0.1f;
+					sphere.enabled = enableCollider;
+				}
+				else {
+					float length = utilBone.bone.Data.Length;
+					var box = utilBone.gameObject.AddComponent<BoxCollider2D>();
+					box.size = new Vector3(length, length / 3f, 0.2f);
+					box.offset = new Vector3(length / 2f, 0, 0);
+					box.enabled = enableCollider;
+				}
+			}
+			utilBone.gameObject.AddComponent<Rigidbody2D>();
+		}
+	}
 }
