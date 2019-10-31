@@ -52,6 +52,8 @@
 		You can leave this parameter disabled when everything is drawn correctly to save the additional performance cost.
   * **Additional Timeline features.** SpineAnimationStateClip now provides a `Speed Multiplier`, a start time offset parameter `Clip In`, support for blending successive animations by overlapping tracks. An additional `Use Blend Duration` parameter *(defaults to true)* allows for automatic synchronisation of MixDuration with the current overlap blend duration. An additional Spine preferences parameter `Use Blend Duration` has been added which can be disabled to default to the previous behaviour before this update.
   * Additional `SpriteMask and RectMask2D` example scene added for demonstration of mask setup and interaction.
+  * `Real physics hinge chains` for both 2D and 3D physics. The [SkeletonUtilityBone](http://esotericsoftware.com/spine-unity#SkeletonUtilityBone) Inspector provides an interface to create 2D and 3D hinge chains. Previously created chains have only been respecting gravity, but not momentum of the skeleton or parent bones. The new physics rig created when pressing `Create 3D Hinge Chain` and `Create 2D Hinge Chain` creates a more complex setup that also works when flipping the skeleton. Note that the chain root node is no longer parented to bones of the skeleton. This is a requirement in Unity to have momentum applied properly - do not reparent the chain root to bones of your skeleton, or you will loose any momentum applied by the skeleton's movement.
+
 
 * **Changes of default values**
 
