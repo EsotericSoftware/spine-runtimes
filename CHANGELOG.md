@@ -82,6 +82,7 @@
 ## Typescript/Javascript
 * **Breaking changes**
 * Updated runtime to be compatible with TypeScript 3.6.3.
+* Added `AssetManager#setRawDataURI(path, data)`. Allows to set raw data URIs for a specific path, which in turn enables embedding assets into JavaScript/HTML.
 
 * **Additions**
 
