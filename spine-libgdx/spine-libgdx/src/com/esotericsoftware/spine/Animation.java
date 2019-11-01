@@ -115,7 +115,7 @@ public class Animation {
 	}
 
 	/** Binary search using a stride of 1.
-	 * @return The index of the first value less than or equal to the target, else the first value if none. */
+	 * @return The index of the first value <= to the target, else the first value if none. */
 	static int binarySearch (float[] values, float target) {
 		int low = 0, high = values.length - 1, current;
 		while (true) {
@@ -130,11 +130,11 @@ public class Animation {
 
 	/** Binary search using a stride of 2.
 	 * @param target >= the first and < the last value.
-	 * @return The index / 2 of the first value less than or equal to the target. */
+	 * @return The index / 2 of the first value <= to the target. */
 	static int binarySearch2 (float[] values, float target) {
 		int low = 0, high = (values.length >> 1) - 2, current;
 		while (true) {
-			if (low >= high) return low;
+			if (low == high) return low;
 			current = ((low + high) >>> 1) + 1;
 			if (values[current << 1] <= target)
 				low = current;
@@ -144,12 +144,12 @@ public class Animation {
 	}
 
 	/** Binary search using the specified stride.
-	 * @param target After the first and before the last value.
-	 * @return The index / 2 of the first value less than or equal to the target. */
+	 * @param target >= the first and < the last value.
+	 * @return The index / 2 of the first value <= to the target. */
 	static int binarySearch (float[] values, float target, int step) {
 		int low = 0, high = values.length / step - 2, current;
 		while (true) {
-			if (low >= high) return low;
+			if (low == high) return low;
 			current = ((low + high) >>> 1) + 1;
 			if (values[current * step] <= target)
 				low = current;
@@ -159,8 +159,8 @@ public class Animation {
 	}
 
 	/** Linear search using the specified stride. Not used, but for comparison with binary searches.
-	 * @param target After the first and before the last value.
-	 * @return index of first value greater than the target. */
+	 * @param target >= the first and < the last value.
+	 * @return The index / 2 of the first value <= to the target. */
 	static int linearSearch (float[] values, float target, int step) {
 		for (int i = 0, last = values.length - 1; i < last; i += step)
 			if (values[i] > target) return i / step - 1;
@@ -218,7 +218,7 @@ public class Animation {
 		final float[] frames;
 
 		/** @param frameEntries The number of entries stored per frame.
-		 * @param propertyIds Unique identifiers for each property the timeline modifies. */
+		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
 		public Timeline (int frameCount, int frameEntries, String... propertyIds) {
 			if (propertyIds == null) throw new IllegalArgumentException("propertyIds cannot be null.");
 			this.propertyIds = propertyIds;
@@ -284,7 +284,7 @@ public class Animation {
 
 		/** @param frameEntries The number of entries stored per frame.
 		 * @param bezierCount The maximum number of frames that will use Bezier curves. See {@link #shrink(int)}.
-		 * @param propertyIds Unique identifiers for each property the timeline modifies. */
+		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
 		public CurveTimeline (int frameCount, int frameEntries, int bezierCount, String... propertyIds) {
 			super(frameCount, frameEntries, propertyIds);
 			curves = new float[frameCount - 1 + bezierCount * BEZIER_SIZE];
@@ -328,10 +328,10 @@ public class Animation {
 	}
 
 	/** The base class for timelines that use interpolation between key frames for one or more properties using a percentage of the
-	 * difference between values. */
+	 * difference between key frame values. */
 	static public abstract class PercentCurveTimeline extends CurveTimeline {
 		/** @param bezierCount The maximum number of frames that will use Bezier curves. See {@link #shrink(int)}.
-		 * @param propertyIds Unique identifiers for each property the timeline modifies. */
+		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
 		public PercentCurveTimeline (int frameCount, int frameEntries, int bezierCount, String... propertyIds) {
 			super(frameCount, frameEntries, bezierCount, propertyIds);
 		}
@@ -369,11 +369,9 @@ public class Animation {
 			float[] curves = this.curves;
 			int i = (int)curves[frameIndex];
 			if (i < BEZIER) {
-				if (i == LINEAR) {
-					float time1 = frames[timeIndex];
-					return MathUtils.clamp((time - time1) / (frames[timeIndex + entryCount] - time1), 0, 1);
-				}
-				return 0;
+				if (i == STEPPED) return 0;
+				float time1 = frames[timeIndex];
+				return MathUtils.clamp((time - time1) / (frames[timeIndex + entryCount] - time1), 0, 1);
 			}
 			i -= BEZIER;
 			if (curves[i] > time) {
@@ -398,7 +396,7 @@ public class Animation {
 		static final int VALUE1 = 1, VALUE2 = 2, NEXT_VALUE1 = 4, NEXT_VALUE2 = 5;
 
 		/** @param bezierCount The maximum number of frames that will use Bezier curves. See {@link #shrink(int)}.
-		 * @param propertyIds Unique identifiers for each property the timeline modifies. */
+		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
 		public PercentCurveTimeline2 (int frameCount, int bezierCount, String... propertyIds) {
 			super(frameCount, ENTRIES, bezierCount, propertyIds);
 		}
@@ -423,7 +421,7 @@ public class Animation {
 		static final int VALUE = 1, NEXT_VALUE = 3;
 
 		/** @param bezierCount The maximum number of frames that will use Bezier curves. See {@link #shrink(int)}.
-		 * @param propertyIds Unique identifiers for each property the timeline modifies. */
+		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
 		public ValueCurveTimeline (int frameCount, int bezierCount, String... propertyIds) {
 			super(frameCount, 2, bezierCount, propertyIds);
 		}
@@ -474,12 +472,10 @@ public class Animation {
 			int i = (int)curves[frameIndex];
 			if (i < BEZIER) {
 				int frame = frameIndex << 1;
-				if (i == LINEAR) {
-					float value1 = frames[frame + VALUE], time1 = frames[frame];
-					return value1 + (frames[frame + NEXT_VALUE] - value1)
-						* MathUtils.clamp((time - time1) / (frames[frame + ENTRIES] - time1), 0, 1);
-				}
-				return frames[frame + VALUE];
+				if (i == STEPPED) return frames[frame + VALUE];
+				float time1 = frames[frame], value1 = frames[frame + VALUE];
+				return value1 + (frames[frame + NEXT_VALUE] - value1)
+					* MathUtils.clamp((time - time1) / (frames[frame + ENTRIES] - time1), 0, 1);
 			}
 			i -= BEZIER;
 			if (curves[i] > time) {
