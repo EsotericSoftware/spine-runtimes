@@ -33,26 +33,38 @@ import com.badlogic.gdx.graphics.GL20;
 
 /** Determines how images are blended with existing pixels when drawn. */
 public enum BlendMode {
-	normal(GL20.GL_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA), //
-	additive(GL20.GL_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE), //
-	multiply(GL20.GL_DST_COLOR, GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA), //
-	screen(GL20.GL_ONE, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR), //
+	normal(GL20.GL_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE), //
+	additive(GL20.GL_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE, GL20.GL_SRC_ALPHA, GL20.GL_ONE, GL20.GL_ONE), //
+	multiply(GL20.GL_DST_COLOR, GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA, GL20.GL_DST_COLOR, GL20.GL_DST_COLOR, GL20.GL_ONE_MINUS_SRC_ALPHA), //
+	screen(GL20.GL_ONE, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR, GL20.GL_ONE, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR), //
 	;
 
-	int source, sourcePMA, dest;
+	int sourceColor, sourceColorPMA, destColor;
+	int sourceAlpha, sourceAlphaPMA, destAlpha;
 
-	BlendMode (int source, int sourcePremultipledAlpha, int dest) {
-		this.source = source;
-		this.sourcePMA = sourcePremultipledAlpha;
-		this.dest = dest;
+	BlendMode (int sourceColor, int sourceColorPremultipledAlpha, int destColor, int sourceAlpha, int sourceAlphaPremultipliedAlpha, int destAlpha) {
+		this.sourceColor = sourceColor;
+		this.sourceColorPMA = sourceColorPremultipledAlpha;
+		this.destColor = destColor;
+		this.sourceAlpha = sourceAlpha;
+		this.sourceAlphaPMA = sourceAlphaPremultipliedAlpha;
+		this.destAlpha = destAlpha;
 	}
 
 	public int getSource (boolean premultipliedAlpha) {
-		return premultipliedAlpha ? sourcePMA : source;
+		return premultipliedAlpha ? sourceColorPMA : sourceColor;
 	}
 
 	public int getDest () {
-		return dest;
+		return destColor;
+	}
+
+	public int getSourceAlpha (boolean premultipliedAlpha) {
+		return premultipliedAlpha ? sourceAlphaPMA : sourceAlpha;
+	}
+
+	public int getDestAlpha () {
+		return destAlpha;
 	}
 
 	static public final BlendMode[] values = values();

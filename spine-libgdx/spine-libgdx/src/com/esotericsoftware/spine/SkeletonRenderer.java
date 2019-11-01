@@ -107,7 +107,8 @@ public class SkeletonRenderer {
 						alpha = 0;
 					}
 					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
+					batch.setBlendFunctionSeparate(blendMode.getSource(premultipliedAlpha), blendMode.getDest(),
+						blendMode.getSourceAlpha(premultipliedAlpha), blendMode.getDestAlpha());
 				}
 
 				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
@@ -217,7 +218,8 @@ public class SkeletonRenderer {
 						alpha = 0;
 					}
 					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
+					batch.setBlendFunctionSeparate(blendMode.getSource(premultipliedAlpha), blendMode.getDest(),
+						blendMode.getSourceAlpha(premultipliedAlpha), blendMode.getDestAlpha());
 				}
 
 				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
@@ -341,7 +343,8 @@ public class SkeletonRenderer {
 						alpha = 0;
 					}
 					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
+					batch.setBlendFunctionSeparate(blendMode.getSource(premultipliedAlpha), blendMode.getDest(),
+						blendMode.getSourceAlpha(premultipliedAlpha), blendMode.getDestAlpha());
 				}
 
 				float red = r * color.r * multiplier;
