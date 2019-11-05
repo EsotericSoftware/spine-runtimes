@@ -375,8 +375,8 @@ public class Animation {
 			}
 			i -= BEZIER;
 			if (curves[i] > time) {
-				float time1 = frames[timeIndex];
-				return curves[i + 1] * (time - time1) / (curves[i] - time1);
+				float x = frames[timeIndex];
+				return curves[i + 1] * (time - x) / (curves[i] - x);
 			}
 			int n = i + BEZIER_SIZE;
 			for (i += 2; i < n; i += 2) {
@@ -479,8 +479,9 @@ public class Animation {
 			}
 			i -= BEZIER;
 			if (curves[i] > time) {
-				float value1 = frames[(frameIndex << 1) + VALUE];
-				return value1 + (curves[i + 1] - value1) * (time - value1) / (curves[i] - value1);
+				int frame = frameIndex << 1;
+				float x = frames[frame], y = frames[frame + VALUE];
+				return y + (curves[i + 1] - y) * (time - x) / (curves[i] - x);
 			}
 			int n = i + BEZIER_SIZE;
 			for (i += 2; i < n; i += 2) {
