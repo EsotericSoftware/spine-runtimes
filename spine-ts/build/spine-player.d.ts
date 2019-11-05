@@ -1782,6 +1782,7 @@ declare module spine {
 		jsonUrl: string;
 		skelUrl: string;
 		atlasUrl: string;
+		rawDataURIs: Map<string>;
 		animation: string;
 		animations: string[];
 		defaultMix: number;

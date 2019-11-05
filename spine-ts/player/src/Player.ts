@@ -49,6 +49,12 @@ module spine {
 		/* the URL of the skeleton .atlas file. Atlas page images are automatically resolved. */
 		atlasUrl: string
 
+		/* Raw data URIs, mapping from a path to base 64 encoded raw data. When the player
+		   resolves a path of the `jsonUrl`, `skelUrl`, `atlasUrl`, or the image paths
+		   referenced in the atlas, it will first look for that path in this array of
+		   raw data URIs. This allows embedding of resources directly in HTML/JS. */
+		rawDataURIs: Map<string>
+
 		/* Optional: the name of the animation to be played. Default: first animation in the skeleton. */
 		animation: string
 
@@ -421,6 +427,12 @@ module spine {
 
 			// Load the assets
 			this.assetManager = new spine.webgl.AssetManager(this.context);
+			if (config.rawDataURIs) {
+				for (let path in config.rawDataURIs) {
+					let data = config.rawDataURIs[path];
+					this.assetManager.setRawDataURI(path, data);
+				}
+			}
 			if (config.jsonUrl) this.assetManager.loadText(config.jsonUrl);
 			else this.assetManager.loadBinary(config.skelUrl);
 			this.assetManager.loadTextureAtlas(config.atlasUrl);

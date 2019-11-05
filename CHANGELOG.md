@@ -316,6 +316,7 @@
   * Added `Attachment#copy()` to all attachment type implementations. This lets you deep copy an attachment to modify it independently from the original, i.e. when programmatically changing texture coordinates or mesh vertices.
   * Added `MeshAttachment#newLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
   * Added IK softness.
+  * Added `AssetManager.setRawDataURI(path, data)`. Allows to embed data URIs for skeletons, atlases and atlas page images directly in the HTML/JS without needing to load it from a separate file.
 
 ### WebGL backend
 * `Input` can now take a partially defined implementation of `InputListener`.
@@ -328,6 +329,7 @@
 ### Player
 * `SpinePlayer#setAnimation()` can now be called directly to set the animation being displayed.
 * The player supports loading `.skel` binary skeleton files by setting the `SpinePlayerConfig#skelUrl` field instead of `SpinePlayerConfig#jsonUrl`.
+* Added `SpinePlayerConfig#rawDataURIs`. Allows to embed data URIs for skeletons, atlases and atlas page images directly in the HTML/JS without needing to load it from a separate file. See the example for a demonstration.
 
 # 3.7
 
