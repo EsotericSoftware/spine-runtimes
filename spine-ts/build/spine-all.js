@@ -798,6 +798,7 @@ var spine;
 						case MixBlend.replace:
 							for (var i_5 = 0; i_5 < vertexCount; i_5++)
 								deform[i_5] += (lastVertices[i_5] - deform[i_5]) * alpha;
+							break;
 						case MixBlend.add:
 							var vertexAttachment = slotAttachment;
 							if (vertexAttachment.bones == null) {
@@ -1836,6 +1837,7 @@ var spine;
 			entry.interruptAlpha = 1;
 			entry.mixTime = 0;
 			entry.mixDuration = last == null ? 0 : this.data.getMix(last.animation, animation);
+			entry.mixBlend = spine.MixBlend.replace;
 			return entry;
 		};
 		AnimationState.prototype.disposeNext = function (entry) {
@@ -11667,6 +11669,12 @@ var spine;
 				return dom;
 			}
 			this.assetManager = new spine.webgl.AssetManager(this.context);
+			if (config.rawDataURIs) {
+				for (var path in config.rawDataURIs) {
+					var data = config.rawDataURIs[path];
+					this.assetManager.setRawDataURI(path, data);
+				}
+			}
 			if (config.jsonUrl)
 				this.assetManager.loadText(config.jsonUrl);
 			else

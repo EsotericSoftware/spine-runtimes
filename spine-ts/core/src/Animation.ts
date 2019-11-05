@@ -948,6 +948,7 @@ module spine {
 					case MixBlend.replace:
 						for (let i = 0; i < vertexCount; i++)
 							deform[i] += (lastVertices[i] - deform[i]) * alpha;
+						break;
 					case MixBlend.add:
 						let vertexAttachment = slotAttachment as VertexAttachment;
 						if (vertexAttachment.bones == null) {
