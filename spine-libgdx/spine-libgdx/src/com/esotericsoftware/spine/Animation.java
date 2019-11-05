@@ -34,7 +34,6 @@ import static com.esotericsoftware.spine.Animation.MixDirection.*;
 import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.ObjectSet;
@@ -370,8 +369,8 @@ public class Animation {
 			int i = (int)curves[frameIndex];
 			if (i < BEZIER) {
 				if (i == STEPPED) return 0;
-				float time1 = frames[timeIndex];
-				return MathUtils.clamp((time - time1) / (frames[timeIndex + entryCount] - time1), 0, 1);
+				float x = frames[timeIndex];
+				return (time - x) / (frames[timeIndex + entryCount] - x);
 			}
 			i -= BEZIER;
 			if (curves[i] > time) {
@@ -473,9 +472,8 @@ public class Animation {
 			if (i < BEZIER) {
 				int frame = frameIndex << 1;
 				if (i == STEPPED) return frames[frame + VALUE];
-				float time1 = frames[frame], value1 = frames[frame + VALUE];
-				return value1 + (frames[frame + NEXT_VALUE] - value1)
-					* MathUtils.clamp((time - time1) / (frames[frame + ENTRIES] - time1), 0, 1);
+				float x = frames[frame], y = frames[frame + VALUE];
+				return y + (frames[frame + NEXT_VALUE] - y) * (time - x) / (frames[frame + ENTRIES] - x);
 			}
 			i -= BEZIER;
 			if (curves[i] > time) {
