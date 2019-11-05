@@ -93,6 +93,7 @@
 ### Three.js backend
 
 ### Player
+* Added `SpinePlayerConfig#rawDataURIs`. Allows to embed data URIs for skeletons, atlases and atlas page images directly in the HTML/JS without needing to load it from a separate file. See the example for a demonstration.
 
 # 3.8
 
