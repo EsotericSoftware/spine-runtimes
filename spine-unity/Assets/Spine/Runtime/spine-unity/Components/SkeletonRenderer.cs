@@ -117,6 +117,14 @@ namespace Spine.Unity {
 
 		[System.Serializable]
 		public class SpriteMaskInteractionMaterials {
+			public bool AnyMaterialCreated {
+				get {
+					return materialsMaskDisabled.Length > 0 ||
+						materialsInsideMask.Length > 0 ||
+						materialsOutsideMask.Length > 0;
+				}
+			}
+
 			/// <summary>Material references for switching material sets at runtime when <see cref="SkeletonRenderer.maskInteraction"/> changes to <see cref="SpriteMaskInteraction.None"/>.</summary>
 			public Material[] materialsMaskDisabled = new Material[0];
 			/// <summary>Material references for switching material sets at runtime when <see cref="SkeletonRenderer.maskInteraction"/> changes to <see cref="SpriteMaskInteraction.VisibleInsideMask"/>.</summary>
@@ -417,12 +425,16 @@ namespace Spine.Unity {
 
 			rendererBuffers.UpdateSharedMaterials(workingSubmeshInstructions);
 
+			bool materialsChanged = rendererBuffers.MaterialsChangedInLastUpdate();
 			if (updateTriangles) { // Check if the triangles should also be updated.
 				meshGenerator.FillTriangles(currentMesh);
 				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedSharedMaterialsArray();
-			} else if (rendererBuffers.MaterialsChangedInLastUpdate()) {
+			} else if (materialsChanged) {
 				meshRenderer.sharedMaterials = rendererBuffers.GetUpdatedSharedMaterialsArray();
 			}
+			if (materialsChanged && (this.maskMaterials.AnyMaterialCreated)) {
+				this.maskMaterials = new SpriteMaskInteractionMaterials();
+			}	
 
 			meshGenerator.FillLateVertexData(currentMesh);
 
@@ -511,6 +523,11 @@ namespace Spine.Unity {
 				EditorFixStencilCompParameters();
 			}
 			#endif
+
+			if (Application.isPlaying) {
+				if (maskInteraction != SpriteMaskInteraction.None && maskMaterials.materialsMaskDisabled.Length == 0)
+					maskMaterials.materialsMaskDisabled = meshRenderer.sharedMaterials;
+			}
 
 			if (maskMaterials.materialsMaskDisabled.Length > 0 && maskMaterials.materialsMaskDisabled[0] != null &&
 				maskInteraction == SpriteMaskInteraction.None) {

@@ -784,7 +784,7 @@ module spine {
 		}
 
 		readCurve (map: any, timeline: CurveTimeline, frameIndex: number) {
-			if (!map.curve) return;
+			if (!map.hasOwnProperty("curve")) return;
 			if (map.curve == "stepped")
 				timeline.setStepped(frameIndex);
 			else {
