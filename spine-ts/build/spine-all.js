@@ -6147,7 +6147,7 @@ var spine;
 			skeletonData.animations.push(new spine.Animation(name, timelines, duration));
 		};
 		SkeletonJson.prototype.readCurve = function (map, timeline, frameIndex) {
-			if (!map.curve)
+			if (!map.hasOwnProperty("curve"))
 				return;
 			if (map.curve == "stepped")
 				timeline.setStepped(frameIndex);
