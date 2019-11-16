@@ -114,8 +114,36 @@ public class Animation {
 	}
 
 	/** Binary search using a stride of 1.
-	 * @return The index of the first value <= to the target, else the first value if none. */
-	static int binarySearch (float[] values, float target) {
+	 * @param target >= the first value.
+	 * @return The index of the first value <= to the target. */
+	static int search (float[] values, float target) {
+		int n = values.length;
+		for (int i = 1; i < n; i++)
+			if (values[i] > target) return i - 1;
+		return n - 1;
+	}
+
+	/** Binary search using a stride of 2.
+	 * @param target >= the first value and < the last value.
+	 * @return The index / 2 of the first value <= to the target. */
+	static int search2 (float[] values, float target) {
+		int last = values.length - 4;
+		for (int i = 2; i <= last; i += 2)
+			if (values[i] > target) return (i >> 1) - 1;
+		return last >> 1;
+	}
+
+	/** Binary search using the specified stride.
+	 * @param target >= the first and < the last value.
+	 * @return The index / step of the first value <= to the target. */
+	static int searchN (float[] values, float target, int step) {
+		int last = values.length - (step << 1);
+		for (int i = step; i <= last; i += step)
+			if (values[i] > target) return i / step - 1;
+		return last / step;
+	}
+
+	static int search_binary (float[] values, float target) {
 		int low = 0, high = values.length - 1, current;
 		while (true) {
 			if (low == high) return low;
@@ -127,10 +155,7 @@ public class Animation {
 		}
 	}
 
-	/** Binary search using a stride of 2.
-	 * @param target >= the first and < the last value.
-	 * @return The index / 2 of the first value <= to the target. */
-	static int binarySearch2 (float[] values, float target) {
+	static int search2_binary (float[] values, float target) {
 		int low = 0, high = (values.length >> 1) - 2, current;
 		while (true) {
 			if (low == high) return low;
@@ -142,28 +167,16 @@ public class Animation {
 		}
 	}
 
-	/** Binary search using the specified stride.
-	 * @param target >= the first and < the last value.
-	 * @return The index / 2 of the first value <= to the target. */
-	static int binarySearch (float[] values, float target, int step) {
+	static int searchN_binary (float[] values, float target, int step) {
 		int low = 0, high = values.length / step - 2, current;
 		while (true) {
-			if (low == high) return low;
+			if (low >= high) return low;
 			current = ((low + high) >>> 1) + 1;
 			if (values[current * step] <= target)
 				low = current;
 			else
 				high = current - 1;
 		}
-	}
-
-	/** Linear search using the specified stride. Not used, but for comparison with binary searches.
-	 * @param target >= the first and < the last value.
-	 * @return The index / 2 of the first value <= to the target. */
-	static int linearSearch (float[] values, float target, int step) {
-		for (int i = 0, last = values.length - 1; i < last; i += step)
-			if (values[i] > target) return i / step - 1;
-		return step;
 	}
 
 	/** Controls how a timeline value is mixed with the setup pose value or current pose value when a timeline's <code>alpha</code>
@@ -202,7 +215,7 @@ public class Animation {
 		in, out
 	}
 
-	static private enum Property {
+	static enum Property {
 		rotate, translateX, translateY, scaleX, scaleY, shearX, shearY, //
 		rgb, a, rgb2, //
 		attachment, deform, //
@@ -466,7 +479,7 @@ public class Animation {
 		public float getCurveValue (float time) {
 			float[] frames = this.frames;
 			if (time >= frames[frames.length - ENTRIES]) return frames[frames.length - 1];
-			int frameIndex = binarySearch2(frames, time);
+			int frameIndex = search2(frames, time);
 			float[] curves = this.curves;
 			int i = (int)curves[frameIndex];
 			if (i < BEZIER) {
@@ -578,7 +591,7 @@ public class Animation {
 				x = frames[frames.length - ENTRIES + VALUE1];
 				y = frames[frames.length - ENTRIES + VALUE2];
 			} else {
-				int frameIndex = binarySearch(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
+				int frameIndex = searchN(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
 				float percent = getCurvePercent(frameIndex, time, frame, ENTRIES);
 				x = frames[frame + VALUE1];
 				y = frames[frame + VALUE2];
@@ -641,7 +654,7 @@ public class Animation {
 				x = frames[frames.length - ENTRIES + VALUE1] * bone.data.scaleX;
 				y = frames[frames.length - ENTRIES + VALUE2] * bone.data.scaleY;
 			} else {
-				int frameIndex = binarySearch(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
+				int frameIndex = searchN(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
 				float percent = getCurvePercent(frameIndex, time, frame, ENTRIES);
 				x = frames[frame + VALUE1];
 				y = frames[frame + VALUE2];
@@ -745,7 +758,7 @@ public class Animation {
 				x = frames[frames.length - ENTRIES + VALUE1] * bone.data.scaleX;
 				y = frames[frames.length - ENTRIES + VALUE2] * bone.data.scaleY;
 			} else {
-				int frameIndex = binarySearch(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
+				int frameIndex = searchN(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
 				float percent = getCurvePercent(frameIndex, time, frame, ENTRIES);
 				x = frames[frame + VALUE1];
 				y = frames[frame + VALUE2];
@@ -829,7 +842,7 @@ public class Animation {
 				b = frames[i + B];
 				a = frames[i + A];
 			} else {
-				int frameIndex = binarySearch(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
+				int frameIndex = searchN(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
 				float percent = getCurvePercent(frameIndex, time, frame, ENTRIES);
 				r = frames[frame + R];
 				g = frames[frame + G];
@@ -921,7 +934,7 @@ public class Animation {
 				g2 = frames[i + G2];
 				b2 = frames[i + B2];
 			} else {
-				int frameIndex = binarySearch(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
+				int frameIndex = searchN(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
 				float percent = getCurvePercent(frameIndex, time, frame, ENTRIES);
 				r = frames[frame + R];
 				g = frames[frame + G];
@@ -1003,7 +1016,7 @@ public class Animation {
 				return;
 			}
 
-			String attachmentName = attachmentNames[binarySearch(frames, time)];
+			String attachmentName = attachmentNames[search(frames, time)];
 			slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
 		}
 	}
@@ -1151,7 +1164,7 @@ public class Animation {
 				return;
 			}
 
-			int frame = binarySearch(frames, time);
+			int frame = search(frames, time);
 			float percent = getCurvePercent(frame, time, frame, 1);
 			float[] prevVertices = frameVertices[frame];
 			float[] nextVertices = frameVertices[frame + 1];
@@ -1272,7 +1285,7 @@ public class Animation {
 			if (lastTime < frames[0])
 				frame = 0;
 			else {
-				frame = binarySearch(frames, lastTime) + 1;
+				frame = search(frames, lastTime) + 1;
 				float frameTime = frames[frame];
 				while (frame > 0) { // Fire multiple events with the same frame.
 					if (frames[frame - 1] != frameTime) break;
@@ -1326,7 +1339,7 @@ public class Animation {
 				return;
 			}
 
-			int[] drawOrderToSetupIndex = drawOrders[binarySearch(frames, time)];
+			int[] drawOrderToSetupIndex = drawOrders[search(frames, time)];
 			if (drawOrderToSetupIndex == null)
 				arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
 			else {
@@ -1422,7 +1435,7 @@ public class Animation {
 				return;
 			}
 
-			int frameIndex = binarySearch(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
+			int frameIndex = searchN(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
 			float percent = getCurvePercent(frameIndex, time, frame, ENTRIES);
 			float mix = frames[frame + MIX];
 			float softness = frames[frame + SOFTNESS];
@@ -1519,7 +1532,7 @@ public class Animation {
 				scale = frames[i + SCALE];
 				shear = frames[i + SHEAR];
 			} else {
-				int frameIndex = binarySearch(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
+				int frameIndex = searchN(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
 				float percent = getCurvePercent(frameIndex, time, frame, ENTRIES);
 				rotate = frames[frame + ROTATE];
 				translate = frames[frame + TRANSLATE];
@@ -1662,7 +1675,7 @@ public class Animation {
 				rotate = frames[frames.length - ENTRIES + VALUE1];
 				translate = frames[frames.length - ENTRIES + VALUE2];
 			} else {
-				int frameIndex = binarySearch(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
+				int frameIndex = searchN(frames, time, ENTRIES), frame = frameIndex * ENTRIES;
 				float percent = getCurvePercent(frameIndex, time, frame, ENTRIES);
 				rotate = frames[frame + VALUE1];
 				translate = frames[frame + VALUE2];
