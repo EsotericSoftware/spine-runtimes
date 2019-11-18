@@ -15,6 +15,15 @@ Shader "Spine/Skeleton Tint Black" {
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
+
+		// Outline properties are drawn via custom editor.
+		[HideInInspector] _OutlineWidth("Outline Width", Range(0,8)) = 3.0
+		[HideInInspector] _OutlineColor("Outline Color", Color) = (1,1,0,1)
+		[HideInInspector] _OutlineReferenceTexWidth("Reference Texture Width", Int) = 1024
+		[HideInInspector] _ThresholdEnd("Outline Threshold", Range(0,1)) = 0.25
+		[HideInInspector] _OutlineSmoothness("Outline Smoothness", Range(0,1)) = 1.0
+		[HideInInspector][MaterialToggle(_USE8NEIGHBOURHOOD_ON)] _Use8Neighbourhood("Sample 8 Neighbours", Float) = 1
+		[HideInInspector] _OutlineMipLevel("Outline Mip Level", Range(0,3)) = 0
 	}
 
 	SubShader {
@@ -34,6 +43,8 @@ Shader "Spine/Skeleton Tint Black" {
 		}
 
 		Pass {
+			Name "Normal"
+
 			CGPROGRAM
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma vertex vert
@@ -71,7 +82,7 @@ Shader "Spine/Skeleton Tint Black" {
 
 			float4 frag (VertexOutput i) : SV_Target {
 				float4 texColor = tex2D(_MainTex, i.uv);
-				
+
 				#if defined(_STRAIGHT_ALPHA_INPUT)
 				texColor.rgb *= texColor.a;
 				#endif
@@ -98,7 +109,7 @@ Shader "Spine/Skeleton Tint Black" {
 			sampler2D _MainTex;
 			fixed _Cutoff;
 
-			struct v2f { 
+			struct v2f {
 				V2F_SHADOW_CASTER;
 				float4 uvAndAlpha : TEXCOORD1;
 			};
@@ -119,4 +130,5 @@ Shader "Spine/Skeleton Tint Black" {
 			ENDCG
 		}
 	}
+	CustomEditor "SpineShaderWithOutlineGUI"
 }

@@ -13,6 +13,15 @@ Shader "Spine/Blend Modes/Skeleton PMA Additive" {
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
+
+		// Outline properties are drawn via custom editor.
+		[HideInInspector] _OutlineWidth("Outline Width", Range(0,8)) = 3.0
+		[HideInInspector] _OutlineColor("Outline Color", Color) = (1,1,0,1)
+		[HideInInspector] _OutlineReferenceTexWidth("Reference Texture Width", Int) = 1024
+		[HideInInspector] _ThresholdEnd("Outline Threshold", Range(0,1)) = 0.25
+		[HideInInspector] _OutlineSmoothness("Outline Smoothness", Range(0,1)) = 1.0
+		[HideInInspector][MaterialToggle(_USE8NEIGHBOURHOOD_ON)] _Use8Neighbourhood("Sample 8 Neighbours", Float) = 1
+		[HideInInspector] _OutlineMipLevel("Outline Mip Level", Range(0,3)) = 0
 	}
 
 	SubShader {
@@ -32,6 +41,8 @@ Shader "Spine/Blend Modes/Skeleton PMA Additive" {
 		}
 
 		Pass {
+			Name "Normal"
+
 			CGPROGRAM
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma vertex vert
@@ -86,7 +97,7 @@ Shader "Spine/Blend Modes/Skeleton PMA Additive" {
 			#pragma multi_compile_shadowcaster
 			#pragma fragmentoption ARB_precision_hint_fastest
 			#include "UnityCG.cginc"
-			struct v2f { 
+			struct v2f {
 				V2F_SHADOW_CASTER;
 				float4 uvAndAlpha : TEXCOORD1;
 			};
@@ -113,4 +124,5 @@ Shader "Spine/Blend Modes/Skeleton PMA Additive" {
 			ENDCG
 		}
 	}
+	CustomEditor "SpineShaderWithOutlineGUI"
 }

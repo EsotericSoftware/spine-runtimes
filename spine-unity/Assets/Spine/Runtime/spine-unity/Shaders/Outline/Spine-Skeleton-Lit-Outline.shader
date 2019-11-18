@@ -1,8 +1,6 @@
-// - Vertex Lit + ShadowCaster
-// - Premultiplied Alpha Blending (Optional straight alpha input)
-// - Double-sided, no depth
+// Outline shader variant of "Spine/Skeleton Lit"
 
-Shader "Spine/Skeleton Lit" {
+Shader "Spine/Outline/Skeleton Lit" {
 	Properties {
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[NoScaleOffset] _MainTex ("Main Texture", 2D) = "black" {}
@@ -30,48 +28,12 @@ Shader "Spine/Skeleton Lit" {
 			Pass Keep
 		}
 
-		Pass {
-			Name "Normal"
+		UsePass "Spine/Outline/Skeleton/OUTLINE"
 
-			Tags { "LightMode"="Vertex" "Queue"="Transparent" "IgnoreProjector"="true" "RenderType"="Transparent" }
+		UsePass "Spine/Skeleton Lit/NORMAL"
 
-			ZWrite Off
-			Cull Off
-			Blend One OneMinusSrcAlpha
-
-			CGPROGRAM
-			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
-			#pragma vertex vert
-			#pragma fragment frag
-			#pragma target 2.0
-
-			#include "CGIncludes/Spine-Skeleton-Lit-Common.cginc"
-			ENDCG
-
-	 	}
-
-		Pass {
-			Name "Caster"
-			Tags { "LightMode"="ShadowCaster" }
-			Offset 1, 1
-
-			Fog { Mode Off }
-			ZWrite On
-			ZTest LEqual
-			Cull Off
-			Lighting Off
-
-			CGPROGRAM
-			#pragma vertex vertShadow
-			#pragma fragment fragShadow
-			#pragma multi_compile_shadowcaster
-			#pragma fragmentoption ARB_precision_hint_fastest
-
-			#define SHADOW_CUTOFF _Cutoff
-			#include "CGIncludes/Spine-Skeleton-Lit-Common-Shadow.cginc"
-
-			ENDCG
-		}
+		UsePass "Spine/Skeleton Lit/CASTER"
 	}
+	FallBack "Spine/Skeleton Lit"
 	CustomEditor "SpineShaderWithOutlineGUI"
 }
