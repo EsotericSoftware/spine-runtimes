@@ -1,8 +1,6 @@
-// - Vertex Lit + ShadowCaster
-// - Premultiplied Alpha Blending (Optional straight alpha input)
-// - Double-sided, ZWrite
+// Outline shader variant of "Spine/Skeleton Lit ZWrite"
 
-Shader "Spine/Skeleton Lit ZWrite" {
+Shader "Spine/Outline/Skeleton Lit ZWrite" {
 	Properties {
 		_Cutoff ("Depth alpha cutoff", Range(0,1)) = 0.1
 		_ShadowAlphaCutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
@@ -31,49 +29,12 @@ Shader "Spine/Skeleton Lit ZWrite" {
 			Pass Keep
 		}
 
-		Pass {
-			Name "Normal"
+		UsePass "Spine/Outline/Skeleton/OUTLINE"
 
-			Tags { "LightMode"="Vertex" "Queue"="Transparent" "IgnoreProjector"="true" "RenderType"="Transparent" }
+		UsePass "Spine/Skeleton Lit ZWrite/NORMAL"
 
-			ZWrite On
-			Cull Off
-			Blend One OneMinusSrcAlpha
-
-			CGPROGRAM
-			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
-			#pragma vertex vert
-			#pragma fragment frag
-			#pragma target 2.0
-
-			#define _ALPHA_CLIP
-			#include "CGIncludes/Spine-Skeleton-Lit-Common.cginc"
-			ENDCG
-
-	 	}
-
-		Pass {
-			Name "Caster"
-			Tags { "LightMode"="ShadowCaster" }
-			Offset 1, 1
-
-			Fog { Mode Off }
-			ZWrite On
-			ZTest LEqual
-			Cull Off
-			Lighting Off
-
-			CGPROGRAM
-			#pragma vertex vertShadow
-			#pragma fragment fragShadow
-			#pragma multi_compile_shadowcaster
-			#pragma fragmentoption ARB_precision_hint_fastest
-
-			#define SHADOW_CUTOFF _ShadowAlphaCutoff
-			#include "CGIncludes/Spine-Skeleton-Lit-Common-Shadow.cginc"
-
-			ENDCG
-		}
+		UsePass "Spine/Skeleton Lit ZWrite/CASTER"
 	}
+	FallBack "Spine/Skeleton Lit ZWrite"
 	CustomEditor "SpineShaderWithOutlineGUI"
 }

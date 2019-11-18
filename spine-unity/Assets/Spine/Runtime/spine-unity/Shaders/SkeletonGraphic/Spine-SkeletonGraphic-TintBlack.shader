@@ -19,24 +19,33 @@ Shader "Spine/SkeletonGraphic Tint Black"
 		_ColorMask ("Color Mask", Float) = 15
 
 		[Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip ("Use Alpha Clip", Float) = 0
+
+		// Outline properties are drawn via custom editor.
+		[HideInInspector] _OutlineWidth("Outline Width", Range(0,8)) = 3.0
+		[HideInInspector] _OutlineColor("Outline Color", Color) = (1,1,0,1)
+		[HideInInspector] _OutlineReferenceTexWidth("Reference Texture Width", Int) = 1024
+		[HideInInspector] _ThresholdEnd("Outline Threshold", Range(0,1)) = 0.25
+		[HideInInspector] _OutlineSmoothness("Outline Smoothness", Range(0,1)) = 1.0
+		[HideInInspector][MaterialToggle(_USE8NEIGHBOURHOOD_ON)] _Use8Neighbourhood("Sample 8 Neighbours", Float) = 1
+		[HideInInspector] _OutlineMipLevel("Outline Mip Level", Range(0,3)) = 0
 	}
 
 	SubShader
 	{
 		Tags
-		{ 
-			"Queue"="Transparent" 
-			"IgnoreProjector"="True" 
-			"RenderType"="Transparent" 
+		{
+			"Queue"="Transparent"
+			"IgnoreProjector"="True"
+			"RenderType"="Transparent"
 			"PreviewType"="Plane"
 			"CanUseSpriteAtlas"="True"
 		}
-		
+
 		Stencil
 		{
 			Ref [_Stencil]
 			Comp [_StencilComp]
-			Pass [_StencilOp] 
+			Pass [_StencilOp]
 			ReadMask [_StencilReadMask]
 			WriteMask [_StencilWriteMask]
 		}
@@ -51,6 +60,8 @@ Shader "Spine/SkeletonGraphic Tint Black"
 
 		Pass
 		{
+			Name "Normal"
+
 		CGPROGRAM
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma vertex vert
@@ -122,4 +133,5 @@ Shader "Spine/SkeletonGraphic Tint Black"
 		ENDCG
 		}
 	}
+	CustomEditor "SpineShaderWithOutlineGUI"
 }
