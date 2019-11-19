@@ -1,7 +1,6 @@
 #ifndef SPINE_OUTLINE_PASS_INCLUDED
 #define SPINE_OUTLINE_PASS_INCLUDED
 
-#pragma shader_feature _ _USE8NEIGHBOURHOOD_ON
 #include "UnityCG.cginc"
 
 #ifdef SKELETON_GRAPHIC

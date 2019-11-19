@@ -38,6 +38,7 @@ Shader "Spine/Outline/Skeleton" {
 			CGPROGRAM
 			#pragma vertex vertOutline
 			#pragma fragment fragOutline
+			#pragma shader_feature _ _USE8NEIGHBOURHOOD_ON
 			#include "CGIncludes/Spine-Outline-Pass.cginc"
 			ENDCG
 		}

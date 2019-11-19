@@ -12,19 +12,18 @@
 #define LIGHT_LOOP_LIMIT unity_VertexLightParams.x
 #endif
 
-#pragma multi_compile __ POINT SPOT
 
 ////////////////////////////////////////
 // Alpha Clipping
 //
 
-#if defined(_ALPHA_CLIP) 
+#if defined(_ALPHA_CLIP)
 	uniform fixed _Cutoff;
 	#define ALPHA_CLIP(pixel, color) clip((pixel.a * color.a) - _Cutoff);
 #else
 	#define ALPHA_CLIP(pixel, color)
-#endif	
-			
+#endif
+
 half3 computeLighting (int idx, half3 dirToLight, half3 eyeNormal, half4 diffuseColor, half atten) {
 	half NdotL = max(dot(eyeNormal, dirToLight), 0.0);
 	// diffuse
@@ -111,7 +110,7 @@ fixed4 frag (VertexOutput i) : SV_Target {
 	#else
 	col.rgb = tex * i.color;
 	#endif
-				
+
 	col *= 2;
 	col.a = tex.a * i.color.a;
 	return col;

@@ -47,6 +47,7 @@ Shader "Spine/Skeleton Lit ZWrite" {
 			#pragma target 2.0
 
 			#define _ALPHA_CLIP
+			#pragma multi_compile __ POINT SPOT
 			#include "CGIncludes/Spine-Skeleton-Lit-Common.cginc"
 			ENDCG
 
