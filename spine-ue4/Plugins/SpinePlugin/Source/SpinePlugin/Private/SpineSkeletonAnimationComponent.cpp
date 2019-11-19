@@ -40,8 +40,8 @@ void UTrackEntry::SetTrackEntry(TrackEntry* trackEntry) {
 
 void callback(AnimationState* state, spine::EventType type, TrackEntry* entry, Event* event) {
 	USpineSkeletonAnimationComponent* component = (USpineSkeletonAnimationComponent*)state->getRendererObject();
-		
-	if (entry->getRendererObject()) {			
+
+	if (entry->getRendererObject()) {
 		UTrackEntry* uEntry = (UTrackEntry*)entry->getRendererObject();
 		if (type == EventType_Start) {
 			component->AnimationStart.Broadcast(uEntry);
@@ -70,7 +70,7 @@ void callback(AnimationState* state, spine::EventType type, TrackEntry* entry, E
 			uEntry->SetTrackEntry(nullptr);
 			component->GCTrackEntry(uEntry);
 		}
-	}	
+	}
 }
 
 USpineSkeletonAnimationComponent::USpineSkeletonAnimationComponent () {
@@ -154,7 +154,7 @@ void USpineSkeletonAnimationComponent::CheckState () {
 	}
 }
 
-void USpineSkeletonAnimationComponent::DisposeState () {	
+void USpineSkeletonAnimationComponent::DisposeState () {
 	if (state) {
 		delete state;
 		state = nullptr;
@@ -225,14 +225,14 @@ UTrackEntry* USpineSkeletonAnimationComponent::SetAnimation (int trackIndex, FSt
 		trackEntries.Add(uEntry);
 		return uEntry;
 	} else return NewObject<UTrackEntry>();
-	
+
 }
 
 UTrackEntry* USpineSkeletonAnimationComponent::AddAnimation (int trackIndex, FString animationName, bool loop, float delay) {
 	CheckState();
 	if (state && skeleton->getData()->findAnimation(TCHAR_TO_UTF8(*animationName))) {
 		state->disableQueue();
-		TrackEntry* entry = state->addAnimation(trackIndex, TCHAR_TO_UTF8(*animationName), loop, delay);		
+		TrackEntry* entry = state->addAnimation(trackIndex, TCHAR_TO_UTF8(*animationName), loop, delay);
 		state->enableQueue();
 		UTrackEntry* uEntry = NewObject<UTrackEntry>();
 		uEntry->SetTrackEntry(entry);
@@ -265,7 +265,7 @@ UTrackEntry* USpineSkeletonAnimationComponent::AddEmptyAnimation (int trackIndex
 
 UTrackEntry* USpineSkeletonAnimationComponent::GetCurrent (int trackIndex) {
 	CheckState();
-	if (state) {
+	if (state && state->getCurrent(trackIndex)) {
 		TrackEntry* entry = state->getCurrent(trackIndex);
 		if (entry->getRendererObject()) {
 			return (UTrackEntry*)entry->getRendererObject();
