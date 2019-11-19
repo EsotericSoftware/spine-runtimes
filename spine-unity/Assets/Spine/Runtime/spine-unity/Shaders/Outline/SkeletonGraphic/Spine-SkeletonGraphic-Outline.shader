@@ -62,6 +62,7 @@ Shader "Spine/Outline/SkeletonGraphic"
 			#pragma vertex vertOutlineGraphic
 			#pragma fragment fragOutline
 			#define SKELETON_GRAPHIC
+			#pragma shader_feature _ _USE8NEIGHBOURHOOD_ON
 			#include "../CGIncludes/Spine-Outline-Pass.cginc"
 			ENDCG
 		}

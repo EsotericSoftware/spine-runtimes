@@ -45,6 +45,7 @@ Shader "Spine/Skeleton Lit" {
 			#pragma fragment frag
 			#pragma target 2.0
 
+			#pragma multi_compile __ POINT SPOT
 			#include "CGIncludes/Spine-Skeleton-Lit-Common.cginc"
 			ENDCG
 
