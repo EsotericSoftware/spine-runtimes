@@ -766,10 +766,14 @@ namespace spine {
 		return _skeleton->getAttachment(slotName.c_str(), attachmentName.c_str());
 	}
 	bool SkeletonRenderer::setAttachment (const std::string& slotName, const std::string& attachmentName) {
-		return _skeleton->getAttachment(slotName.c_str(), attachmentName.empty() ? 0 : attachmentName.c_str()) ? true : false;
+		bool result = _skeleton->getAttachment(slotName.c_str(), attachmentName.empty() ? 0 : attachmentName.c_str()) ? true : false;
+		_skeleton->setAttachment(slotName.c_str(), attachmentName.empty() ? 0 : attachmentName.c_str());
+		return result;
 	}
 	bool SkeletonRenderer::setAttachment (const std::string& slotName, const char* attachmentName) {
-		return _skeleton->getAttachment(slotName.c_str(), attachmentName) ? true : false;
+		bool result = _skeleton->getAttachment(slotName.c_str(), attachmentName) ? true : false;
+		_skeleton->setAttachment(slotName.c_str(), attachmentName);
+		return result;
 	}
 
 	void SkeletonRenderer::setTwoColorTint(bool enabled) {
