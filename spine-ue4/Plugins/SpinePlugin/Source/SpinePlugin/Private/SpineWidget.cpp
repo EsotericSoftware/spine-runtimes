@@ -436,7 +436,7 @@ UTrackEntry* USpineWidget::AddEmptyAnimation(int trackIndex, float mixDuration, 
 
 UTrackEntry* USpineWidget::GetCurrent(int trackIndex) {
 	CheckState();
-	if (state) {
+	if (state && state->getCurrent(trackIndex)) {
 		TrackEntry* entry = state->getCurrent(trackIndex);
 		if (entry->getRendererObject()) {
 			return (UTrackEntry*)entry->getRendererObject();
