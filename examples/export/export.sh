@@ -159,11 +159,6 @@ if [ -d "$UNITY_BASE_DIR" ]; then
     -i $UNITY_BASE_DIR/gauge/images -o $UNITY_BASE_DIR/gauge/export -n gauge -p atlas-1.0.json \
     -i $UNITY_BASE_DIR/gauge/images -o $UNITY_BASE_DIR/gauge/export -n gauge-pma -p atlas-1.0-pma.json \
     \
-    -i $UNITY_BASE_DIR/hero/hero-pro.spine -o $UNITY_BASE_DIR/hero/export -e json.json \
-    -i $UNITY_BASE_DIR/hero/hero-pro.spine -o $UNITY_BASE_DIR/hero/export -e binary.json \
-    -i $UNITY_BASE_DIR/hero/images -o $UNITY_BASE_DIR/hero/export -n hero -p atlas-1.0.json \
-    -i $UNITY_BASE_DIR/hero/images -o $UNITY_BASE_DIR/hero/export -n hero-pma -p atlas-1.0-pma.json \
-    \
     -i $UNITY_BASE_DIR/raggedyspineboy/raggedyspineboy.spine -o $UNITY_BASE_DIR/raggedyspineboy/export -e json.json \
     -i $UNITY_BASE_DIR/raggedyspineboy/raggedyspineboy.spine -o $UNITY_BASE_DIR/raggedyspineboy/export -e binary.json \
     -i $UNITY_BASE_DIR/raggedyspineboy/images -o $UNITY_BASE_DIR/raggedyspineboy/export -n raggedyspineboy -p atlas-1.0.json \
