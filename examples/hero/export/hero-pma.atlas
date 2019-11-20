@@ -5,141 +5,169 @@ format: RGBA8888
 filter: Linear,Linear
 repeat: none
 body
-  rotate: false
-  xy: 324, 81
+  rotate: true
+  xy: 452, 157
   size: 97, 95
   orig: 97, 95
   offset: 0, 0
   index: -1
 cape
   rotate: false
-  xy: 176, 88
+  xy: 247, 95
   size: 146, 159
   orig: 146, 159
   offset: 0, 0
   index: -1
+chain-ball
+  rotate: false
+  xy: 241, 11
+  size: 64, 68
+  orig: 64, 68
+  offset: 0, 0
+  index: -1
+chain-flat
+  rotate: false
+  xy: 241, 4
+  size: 16, 5
+  orig: 16, 5
+  offset: 0, 0
+  index: -1
+chain-round
+  rotate: true
+  xy: 307, 10
+  size: 17, 14
+  orig: 17, 14
+  offset: 0, 0
+  index: -1
 eyes
   rotate: false
-  xy: 604, 216
+  xy: 68, 5
   size: 82, 31
   orig: 82, 31
   offset: 0, 0
   index: -1
 fingers
-  rotate: true
-  xy: 643, 183
+  rotate: false
+  xy: 2, 3
   size: 31, 33
   orig: 31, 33
   offset: 0, 0
   index: -1
 foot1
   rotate: false
-  xy: 863, 205
+  xy: 483, 2
   size: 50, 42
   orig: 50, 42
   offset: 0, 0
   index: -1
 foot2
   rotate: false
-  xy: 915, 209
+  xy: 185, 41
   size: 53, 38
   orig: 53, 38
   offset: 0, 0
   index: -1
 forearm1
   rotate: true
-  xy: 970, 206
+  xy: 73, 38
   size: 41, 49
   orig: 41, 49
   offset: 0, 0
   index: -1
 forearm2
-  rotate: true
-  xy: 423, 79
+  rotate: false
+  xy: 35, 4
   size: 31, 32
   orig: 31, 32
   offset: 0, 0
   index: -1
 hand1
-  rotate: false
-  xy: 140, 24
+  rotate: true
+  xy: 191, 2
   size: 37, 48
   orig: 37, 48
   offset: 0, 0
   index: -1
 hand2
   rotate: true
-  xy: 604, 183
+  xy: 152, 7
   size: 31, 37
   orig: 31, 37
   offset: 0, 0
   index: -1
+handle
+  rotate: false
+  xy: 323, 13
+  size: 134, 14
+  orig: 134, 14
+  offset: 0, 0
+  index: -1
 head
   rotate: false
-  xy: 2, 74
+  xy: 73, 81
   size: 172, 173
   orig: 172, 173
   offset: 0, 0
   index: -1
 mantles
-  rotate: false
-  xy: 2, 17
+  rotate: true
+  xy: 395, 118
   size: 136, 55
   orig: 136, 55
   offset: 0, 0
   index: -1
 mouth
   rotate: false
-  xy: 2, 2
+  xy: 395, 103
   size: 61, 13
   orig: 61, 13
   offset: 0, 0
   index: -1
 shin1
   rotate: false
-  xy: 482, 119
+  xy: 428, 44
   size: 53, 57
   orig: 53, 57
   offset: 0, 0
   index: -1
 shin2
   rotate: true
-  xy: 807, 196
+  xy: 458, 104
   size: 51, 54
   orig: 51, 54
   offset: 0, 0
   index: -1
 sword
-  rotate: false
-  xy: 324, 178
+  rotate: true
+  xy: 2, 38
   size: 216, 69
   orig: 216, 69
   offset: 0, 0
   index: -1
 thigh1
   rotate: false
-  xy: 542, 184
+  xy: 366, 30
   size: 60, 63
   orig: 60, 63
   offset: 0, 0
   index: -1
 thigh2
   rotate: false
-  xy: 423, 112
+  xy: 307, 29
   size: 57, 64
   orig: 57, 64
   offset: 0, 0
   index: -1
 upper-arm1
-  rotate: true
-  xy: 749, 197
+  rotate: false
+  xy: 483, 46
   size: 50, 56
   orig: 50, 56
   offset: 0, 0
   index: -1
 upper-arm2
   rotate: true
-  xy: 688, 208
+  xy: 124, 40
   size: 39, 59
   orig: 39, 59
   offset: 0, 0

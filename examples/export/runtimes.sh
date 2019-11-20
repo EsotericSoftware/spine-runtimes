@@ -425,10 +425,10 @@ sed -i 's/goblins-pma.png/goblins.png/g' "$UNITY_TARGET_DIR/goblins.atlas.txt"
 cp -f ../goblins/export/goblins-pma.png "$UNITY_TARGET_DIR/goblins.png"
 
 UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/Hero"
-cp -f ../spine-unity/hero/export/hero-pro.json "$UNITY_TARGET_DIR/"
-cp -f ../spine-unity/hero/export/hero-pma.atlas "$UNITY_TARGET_DIR/hero-pro.atlas.txt"
+cp -f ../hero/export/hero-pro.json "$UNITY_TARGET_DIR/"
+cp -f ../hero/export/hero-pma.atlas "$UNITY_TARGET_DIR/hero-pro.atlas.txt"
 sed -i 's/hero-pma.png/hero-pro.png/g' "$UNITY_TARGET_DIR/hero-pro.atlas.txt"
-cp -f ../spine-unity/hero/export/hero-pma.png "$UNITY_TARGET_DIR/hero-pro.png"
+cp -f ../hero/export/hero-pma.png "$UNITY_TARGET_DIR/hero-pro.png"
 
 UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/Raptor"
 cp -f ../raptor/export/raptor-pro.json "$UNITY_TARGET_DIR/raptor.json"
