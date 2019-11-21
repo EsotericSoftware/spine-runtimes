@@ -45,6 +45,15 @@
 
 using namespace spine;
 
+// Workaround for https://github.com/EsotericSoftware/spine-runtimes/issues/1458
+// See issue comments for more information.
+struct SpineSlateMaterialBrush : public FSlateBrush {
+	SpineSlateMaterialBrush(class UMaterialInterface &InMaterial, const FVector2D &InImageSize)
+		: FSlateBrush(ESlateBrushDrawType::Image, FName(TEXT("None")), FMargin(0), ESlateBrushTileType::NoTile, ESlateBrushImageType::FullColor, InImageSize, FLinearColor::White, &InMaterial) {
+		ResourceName = FName(*InMaterial.GetFullName());
+	}
+};
+
 void SSpineWidget::Construct(const FArguments& args) {
 }
 
@@ -196,7 +205,7 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements
 
 	brush = &widget->Brush;
 	if (Material) {
-		renderData.Brush = MakeShareable(new FSlateMaterialBrush(*Material, FVector2D(64, 64)));
+		renderData.Brush = MakeShareable(new SpineSlateMaterialBrush(*Material, FVector2D(64, 64)));
 		renderData.RenderingResourceHandle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(*renderData.Brush);
 	}
 
