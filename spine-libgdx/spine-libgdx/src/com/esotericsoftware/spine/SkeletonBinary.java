@@ -43,6 +43,9 @@ import com.badlogic.gdx.utils.SerializationException;
 
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
 import com.esotericsoftware.spine.Animation.ColorTimeline;
+import com.esotericsoftware.spine.Animation.CurveTimeline;
+import com.esotericsoftware.spine.Animation.CurveTimeline1;
+import com.esotericsoftware.spine.Animation.CurveTimeline2;
 import com.esotericsoftware.spine.Animation.DeformTimeline;
 import com.esotericsoftware.spine.Animation.DrawOrderTimeline;
 import com.esotericsoftware.spine.Animation.EventTimeline;
@@ -50,8 +53,6 @@ import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintMixTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintPositionTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintSpacingTimeline;
-import com.esotericsoftware.spine.Animation.PercentCurveTimeline;
-import com.esotericsoftware.spine.Animation.PercentCurveTimeline2;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.ShearTimeline;
@@ -59,7 +60,6 @@ import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
 import com.esotericsoftware.spine.Animation.TwoColorTimeline;
-import com.esotericsoftware.spine.Animation.ValueCurveTimeline;
 import com.esotericsoftware.spine.BoneData.TransformMode;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
@@ -100,11 +100,9 @@ public class SkeletonBinary {
 	static public final int CURVE_STEPPED = 1;
 	static public final int CURVE_BEZIER = 2;
 
-	static private final Color tempColor1 = new Color(), tempColor2 = new Color();
-
 	private final AttachmentLoader attachmentLoader;
 	private float scale = 1;
-	private Array<LinkedMesh> linkedMeshes = new Array();
+	private final Array<LinkedMesh> linkedMeshes = new Array();
 
 	public SkeletonBinary (TextureAtlas atlas) {
 		attachmentLoader = new AtlasAttachmentLoader(atlas);
@@ -585,19 +583,39 @@ public class SkeletonBinary {
 				switch (timelineType) {
 				case SLOT_ATTACHMENT: {
 					AttachmentTimeline timeline = new AttachmentTimeline(frameCount, slotIndex);
-					for (int frameIndex = 0; frameIndex < frameCount; frameIndex++)
-						timeline.setFrame(frameIndex, input.readFloat(), input.readStringRef());
+					for (int frame = 0; frame < frameCount; frame++)
+						timeline.setFrame(frame, input.readFloat(), input.readStringRef());
 					timelines.add(timeline);
 					break;
 				}
 				case SLOT_COLOR: {
 					ColorTimeline timeline = new ColorTimeline(frameCount, input.readInt(true), slotIndex);
 					float time = input.readFloat();
-					for (int frameIndex = 0, bezierIndex = 0;; frameIndex++) {
-						Color.rgba8888ToColor(tempColor1, input.readInt());
-						timeline.setFrame(frameIndex, time, tempColor1.r, tempColor1.g, tempColor1.b, tempColor1.a);
-						if (frameIndex == frameLast) break;
-						bezierIndex = readCurve(input, timeline, frameIndex, bezierIndex, time, time = input.readFloat());
+					int c1 = input.readInt();
+					float r = ((c1 & 0xff000000) >> 24) / 255f, g = ((c1 & 0x00ff0000) >> 16) / 255f;
+					float b = ((c1 & 0x0000ff00) >> 8) / 255f, a = (c1 & 0x000000ff) / 255f;
+					for (int frame = 0, bezier = 0;; frame++) {
+						timeline.setFrame(frame, time, r, g, b, a);
+						if (frame == frameLast) break;
+						float time2 = input.readFloat();
+						c1 = input.readInt();
+						float r2 = ((c1 & 0xff000000) >> 24) / 255f, g2 = ((c1 & 0x00ff0000) >> 16) / 255f;
+						float b2 = ((c1 & 0x0000ff00) >> 8) / 255f, a2 = (c1 & 0x000000ff) / 255f;
+						switch (input.readByte()) {
+						case CURVE_STEPPED:
+							timeline.setStepped(frame);
+							break;
+						case CURVE_BEZIER:
+							setBezier(input, timeline, bezier++, frame, 0, time, time2, r, r2);
+							setBezier(input, timeline, bezier++, frame, 1, time, time2, g, g2);
+							setBezier(input, timeline, bezier++, frame, 2, time, time2, b, b2);
+							setBezier(input, timeline, bezier++, frame, 3, time, time2, a, a2);
+						}
+						time = time2;
+						r = r2;
+						g = g2;
+						b = b2;
+						a = a2;
 					}
 					timelines.add(timeline);
 					break;
@@ -605,13 +623,42 @@ public class SkeletonBinary {
 				case SLOT_TWO_COLOR: {
 					TwoColorTimeline timeline = new TwoColorTimeline(frameCount, input.readInt(true), slotIndex);
 					float time = input.readFloat();
-					for (int frameIndex = 0, bezierIndex = 0;; frameIndex++) {
-						Color.rgba8888ToColor(tempColor1, input.readInt());
-						Color.rgb888ToColor(tempColor2, input.readInt());
-						timeline.setFrame(frameIndex, time, tempColor1.r, tempColor1.g, tempColor1.b, tempColor1.a, tempColor2.r,
-							tempColor2.g, tempColor2.b);
-						if (frameIndex == frameLast) break;
-						bezierIndex = readCurve(input, timeline, frameIndex, bezierIndex, time, time = input.readFloat());
+					int c1 = input.readInt(), c2 = input.readInt();
+					float r = ((c1 & 0xff000000) >> 24) / 255f, g = ((c1 & 0x00ff0000) >> 16) / 255f;
+					float b = ((c1 & 0x0000ff00) >> 8) / 255f, a = (c1 & 0x000000ff) / 255f;
+					float r2 = ((c2 & 0xff000000) >> 24) / 255f, g2 = ((c2 & 0x00ff0000) >> 16) / 255f;
+					float b2 = ((c2 & 0x0000ff00) >> 8) / 255f;
+					for (int frame = 0, bezier = 0;; frame++) {
+						timeline.setFrame(frame, time, r, g, b, a, r2, g2, b2);
+						if (frame == frameLast) break;
+						float time2 = input.readFloat();
+						c1 = input.readInt();
+						c2 = input.readInt();
+						float nr = ((c1 & 0xff000000) >> 24) / 255f, ng = ((c1 & 0x00ff0000) >> 16) / 255f;
+						float nb = ((c1 & 0x0000ff00) >> 8) / 255f, na = (c1 & 0x000000ff) / 255f;
+						float nr2 = ((c2 & 0xff000000) >> 24) / 255f, ng2 = ((c2 & 0x00ff0000) >> 16) / 255f;
+						float nb2 = ((c2 & 0x0000ff00) >> 8) / 255f;
+						switch (input.readByte()) {
+						case CURVE_STEPPED:
+							timeline.setStepped(frame);
+							break;
+						case CURVE_BEZIER:
+							setBezier(input, timeline, bezier++, frame, 0, time, time2, r, nr);
+							setBezier(input, timeline, bezier++, frame, 1, time, time2, g, ng);
+							setBezier(input, timeline, bezier++, frame, 2, time, time2, b, nb);
+							setBezier(input, timeline, bezier++, frame, 3, time, time2, a, na);
+							setBezier(input, timeline, bezier++, frame, 4, time, time2, r2, nr2);
+							setBezier(input, timeline, bezier++, frame, 5, time, time2, g2, ng2);
+							setBezier(input, timeline, bezier++, frame, 6, time, time2, b2, nb2);
+						}
+						time = time2;
+						r = nr;
+						g = ng;
+						b = nb;
+						a = na;
+						r2 = nr2;
+						g2 = ng2;
+						b2 = nb2;
 					}
 					timelines.add(timeline);
 					break;
@@ -625,23 +672,18 @@ public class SkeletonBinary {
 			int boneIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				switch (input.readByte()) {
-				case BONE_ROTATE: {
+				case BONE_ROTATE:
 					timelines.add(readTimeline(input, new RotateTimeline(input.readInt(true), input.readInt(true), boneIndex), 1));
 					break;
-				}
-				case BONE_TRANSLATE: {
+				case BONE_TRANSLATE:
 					timelines
 						.add(readTimeline(input, new TranslateTimeline(input.readInt(true), input.readInt(true), boneIndex), scale));
 					break;
-				}
-				case BONE_SCALE: {
+				case BONE_SCALE:
 					timelines.add(readTimeline(input, new ScaleTimeline(input.readInt(true), input.readInt(true), boneIndex), 1));
 					break;
-				}
-				case BONE_SHEAR: {
+				case BONE_SHEAR:
 					timelines.add(readTimeline(input, new ShearTimeline(input.readInt(true), input.readInt(true), boneIndex), 1));
-					break;
-				}
 				}
 			}
 		}
@@ -650,12 +692,22 @@ public class SkeletonBinary {
 		for (int i = 0, n = input.readInt(true); i < n; i++) {
 			int index = input.readInt(true), frameCount = input.readInt(true), frameLast = frameCount - 1;
 			IkConstraintTimeline timeline = new IkConstraintTimeline(frameCount, input.readInt(true), index);
-			float time = input.readFloat();
-			for (int frameIndex = 0, bezierIndex = 0;; frameIndex++) {
-				timeline.setFrame(frameIndex, time, input.readFloat(), input.readFloat() * scale, input.readByte(),
-					input.readBoolean(), input.readBoolean());
-				if (frameIndex == frameLast) break;
-				bezierIndex = readCurve(input, timeline, frameIndex, bezierIndex, time, time = input.readFloat());
+			float time = input.readFloat(), mix = input.readFloat(), softness = input.readFloat() * scale;
+			for (int frame = 0, bezier = 0;; frame++) {
+				timeline.setFrame(frame, time, mix, softness, input.readByte(), input.readBoolean(), input.readBoolean());
+				if (frame == frameLast) break;
+				float time2 = input.readFloat(), mix2 = input.readFloat() * scale, softness2 = input.readFloat() * scale;
+				switch (input.readByte()) {
+				case CURVE_STEPPED:
+					timeline.setStepped(frame);
+					break;
+				case CURVE_BEZIER:
+					setBezier(input, timeline, bezier++, frame, 0, time, time2, mix, mix2);
+					setBezier(input, timeline, bezier++, frame, 1, time, time2, softness, softness2);
+				}
+				time = time2;
+				mix = mix2;
+				softness = softness2;
 			}
 			timelines.add(timeline);
 		}
@@ -664,11 +716,28 @@ public class SkeletonBinary {
 		for (int i = 0, n = input.readInt(true); i < n; i++) {
 			int index = input.readInt(true), frameCount = input.readInt(true), frameLast = frameCount - 1;
 			TransformConstraintTimeline timeline = new TransformConstraintTimeline(frameCount, input.readInt(true), index);
-			float time = input.readFloat();
-			for (int frameIndex = 0, bezierIndex = 0;; frameIndex++) {
-				timeline.setFrame(frameIndex, time, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat());
-				if (frameIndex == frameLast) break;
-				bezierIndex = readCurve(input, timeline, frameIndex, bezierIndex, time, time = input.readFloat());
+			float time = input.readFloat(), rotateMix = input.readFloat(), translateMix = input.readFloat(),
+				scaleMix = input.readFloat(), shearMix = input.readFloat();
+			for (int frame = 0, bezier = 0;; frame++) {
+				timeline.setFrame(frame, time, rotateMix, translateMix, scaleMix, shearMix);
+				if (frame == frameLast) break;
+				float time2 = input.readFloat(), rotateMix2 = input.readFloat(), translateMix2 = input.readFloat(),
+					scaleMix2 = input.readFloat(), shearMix2 = input.readFloat();
+				switch (input.readByte()) {
+				case CURVE_STEPPED:
+					timeline.setStepped(frame);
+					break;
+				case CURVE_BEZIER:
+					setBezier(input, timeline, bezier++, frame, 0, time, time2, rotateMix, rotateMix2);
+					setBezier(input, timeline, bezier++, frame, 1, time, time2, translateMix, translateMix2);
+					setBezier(input, timeline, bezier++, frame, 2, time, time2, scaleMix, scaleMix2);
+					setBezier(input, timeline, bezier++, frame, 3, time, time2, shearMix, shearMix2);
+				}
+				time = time2;
+				rotateMix = rotateMix2;
+				translateMix = translateMix2;
+				scaleMix = scaleMix2;
+				shearMix = shearMix2;
 			}
 			timelines.add(timeline);
 		}
@@ -679,23 +748,19 @@ public class SkeletonBinary {
 			PathConstraintData data = skeletonData.pathConstraints.get(index);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				switch (input.readByte()) {
-				case PATH_POSITION: {
+				case PATH_POSITION:
 					timelines
 						.add(readTimeline(input, new PathConstraintSpacingTimeline(input.readInt(true), input.readInt(true), index),
 							data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed ? scale : 1));
 					break;
-				}
-				case PATH_SPACING: {
+				case PATH_SPACING:
 					timelines
 						.add(readTimeline(input, new PathConstraintPositionTimeline(input.readInt(true), input.readInt(true), index),
 							data.positionMode == PositionMode.fixed ? scale : 1));
 					break;
-				}
-				case PATH_MIX: {
+				case PATH_MIX:
 					timelines
 						.add(readTimeline(input, new PathConstraintMixTimeline(input.readInt(true), input.readInt(true), index), 1));
-					break;
-				}
 				}
 			}
 		}
@@ -709,13 +774,13 @@ public class SkeletonBinary {
 					VertexAttachment attachment = (VertexAttachment)skin.getAttachment(slotIndex, input.readStringRef());
 					boolean weighted = attachment.getBones() != null;
 					float[] vertices = attachment.getVertices();
-					int deformLength = weighted ? vertices.length / 3 * 2 : vertices.length;
+					int deformLength = weighted ? (vertices.length / 3) << 1 : vertices.length;
 
 					int frameCount = input.readInt(true), frameLast = frameCount - 1;
 					DeformTimeline timeline = new DeformTimeline(frameCount, input.readInt(true), slotIndex, attachment);
 
 					float time = input.readFloat();
-					for (int frameIndex = 0, bezierIndex = 0;; frameIndex++) {
+					for (int frame = 0, bezier = 0;; frame++) {
 						float[] deform;
 						int end = input.readInt(true);
 						if (end == 0)
@@ -736,9 +801,17 @@ public class SkeletonBinary {
 									deform[v] += vertices[v];
 							}
 						}
-						timeline.setFrame(frameIndex, time, deform);
-						if (frameIndex == frameLast) break;
-						bezierIndex = readCurve(input, timeline, frameIndex, bezierIndex, time, time = input.readFloat());
+						timeline.setFrame(frame, time, deform);
+						if (frame == frameLast) break;
+						float time2 = input.readFloat();
+						switch (input.readByte()) {
+						case CURVE_STEPPED:
+							timeline.setStepped(frame);
+							break;
+						case CURVE_BEZIER:
+							setBezier(input, timeline, bezier++, frame, 0, time, time2, 0, 1);
+						}
+						time = time2;
 					}
 					timelines.add(timeline);
 				}
@@ -803,53 +876,50 @@ public class SkeletonBinary {
 		return new Animation(name, timelines, duration);
 	}
 
-	private Timeline readTimeline (SkeletonInput input, ValueCurveTimeline timeline, float scale) throws IOException {
+	private Timeline readTimeline (SkeletonInput input, CurveTimeline1 timeline, float scale) throws IOException {
 		float time = input.readFloat(), value = input.readFloat() * scale;
-		for (int frameIndex = 0, bezierIndex = 0, frameLast = timeline.getFrameCount() - 1;; frameIndex++) {
-			timeline.setFrame(frameIndex, time, value);
-			if (frameIndex == frameLast) break;
-			bezierIndex = readCurve(input, timeline, frameIndex, bezierIndex, time, value, time = input.readFloat(),
-				value = input.readFloat() * scale);
+		for (int frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
+			timeline.setFrame(frame, time, value);
+			if (frame == frameLast) break;
+			float time2 = input.readFloat(), value2 = input.readFloat() * scale;
+			switch (input.readByte()) {
+			case CURVE_STEPPED:
+				timeline.setStepped(frame);
+				break;
+			case CURVE_BEZIER:
+				setBezier(input, timeline, bezier++, frame, 0, time, time2, value, value2);
+			}
+			time = time2;
+			value = value2;
 		}
 		return timeline;
 	}
 
-	private Timeline readTimeline (SkeletonInput input, PercentCurveTimeline2 timeline, float scale) throws IOException {
-		float time = input.readFloat();
-		for (int frameIndex = 0, bezierIndex = 0, frameLast = timeline.getFrameCount() - 1;; frameIndex++) {
-			timeline.setFrame(frameIndex, time, input.readFloat() * scale, input.readFloat() * scale);
-			if (frameIndex == frameLast) break;
-			bezierIndex = readCurve(input, timeline, frameIndex, bezierIndex, time, time = input.readFloat());
+	private Timeline readTimeline (SkeletonInput input, CurveTimeline2 timeline, float scale) throws IOException {
+		float time = input.readFloat(), value1 = input.readFloat() * scale, value2 = input.readFloat() * scale;
+		for (int frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
+			timeline.setFrame(frame, time, value1, value2);
+			if (frame == frameLast) break;
+			float time2 = input.readFloat(), nvalue1 = input.readFloat() * scale, nvalue2 = input.readFloat() * scale;
+			switch (input.readByte()) {
+			case CURVE_STEPPED:
+				timeline.setStepped(frame);
+				break;
+			case CURVE_BEZIER:
+				setBezier(input, timeline, bezier++, frame, 0, time, time2, value1, nvalue1);
+				setBezier(input, timeline, bezier++, frame, 1, time, time2, value2, nvalue2);
+			}
+			time = time2;
+			value1 = nvalue1;
+			value2 = nvalue2;
 		}
 		return timeline;
 	}
 
-	int readCurve (SkeletonInput input, PercentCurveTimeline timeline, int frameIndex, int bezierIndex, float time1, float time2)
-		throws IOException {
-		switch (input.readByte()) {
-		case CURVE_STEPPED:
-			timeline.setStepped(frameIndex);
-			break;
-		case CURVE_BEZIER:
-			timeline.setBezier(frameIndex, bezierIndex++, time1, input.readFloat(), input.readFloat(), input.readFloat(),
-				input.readFloat(), time2);
-			break;
-		}
-		return bezierIndex;
-	}
-
-	int readCurve (SkeletonInput input, ValueCurveTimeline timeline, int frameIndex, int bezierIndex, float time1, float value1,
-		float time2, float value2) throws IOException {
-		switch (input.readByte()) {
-		case CURVE_STEPPED:
-			timeline.setStepped(frameIndex);
-			break;
-		case CURVE_BEZIER:
-			timeline.setBezier(frameIndex, bezierIndex++, time1, value1, input.readFloat(), input.readFloat(), input.readFloat(),
-				input.readFloat(), time2, value2);
-			break;
-		}
-		return bezierIndex;
+	void setBezier (SkeletonInput input, CurveTimeline timeline, int bezier, int frame, int value, float time1, float time2,
+		float value1, float value2) throws IOException {
+		timeline.setBezier(bezier, frame, value, time1, value1, input.readFloat(), input.readFloat(), input.readFloat(),
+			input.readFloat(), time2, value2);
 	}
 
 	static class Vertices {
