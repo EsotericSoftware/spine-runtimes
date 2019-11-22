@@ -217,12 +217,17 @@ public class AnimationState {
 				mix = 0; // Set to setup pose the last time the entry will be applied.
 
 			// Apply current entry.
-			float animationLast = current.animationLast, animationTime = current.getAnimationTime();
+			float animationLast = current.animationLast, animationTime = current.getAnimationTime(), applyTime = animationTime;
+			Array<Event> applyEvents = events;
+			if (current.reverse) {
+				applyTime = current.animation.duration - applyTime;
+				applyEvents = null;
+			}
 			int timelineCount = current.animation.timelines.size;
 			Object[] timelines = current.animation.timelines.items;
 			if ((i == 0 && mix == 1) || blend == MixBlend.add) {
 				for (int ii = 0; ii < timelineCount; ii++)
-					((Timeline)timelines[ii]).apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.in);
+					((Timeline)timelines[ii]).apply(skeleton, animationLast, applyTime, applyEvents, mix, blend, MixDirection.in);
 			} else {
 				int[] timelineMode = current.timelineMode.items;
 
@@ -234,10 +239,10 @@ public class AnimationState {
 					Timeline timeline = (Timeline)timelines[ii];
 					MixBlend timelineBlend = (timelineMode[ii] & NOT_LAST - 1) == SUBSEQUENT ? blend : MixBlend.setup;
 					if (timeline instanceof RotateTimeline) {
-						applyRotateTimeline((RotateTimeline)timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation,
+						applyRotateTimeline((RotateTimeline)timeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation,
 							ii << 1, firstFrame);
 					} else
-						timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection.in);
+						timeline.apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend, MixDirection.in);
 				}
 			}
 			queueEvents(current, animationTime);
@@ -264,16 +269,21 @@ public class AnimationState {
 			if (blend != MixBlend.first) blend = from.mixBlend; // Track 0 ignores track mix blend.
 		}
 
-		Array<Event> events = mix < from.eventThreshold ? this.events : null;
 		boolean attachments = mix < from.attachmentThreshold, drawOrder = mix < from.drawOrderThreshold;
-		float animationLast = from.animationLast, animationTime = from.getAnimationTime();
 		int timelineCount = from.animation.timelines.size;
 		Object[] timelines = from.animation.timelines.items;
 		float alphaHold = from.alpha * to.interruptAlpha, alphaMix = alphaHold * (1 - mix);
+		float animationLast = from.animationLast, animationTime = from.getAnimationTime(), applyTime = animationTime;
+		Array<Event> events = null;
+		if (from.reverse)
+			applyTime = from.animation.duration - applyTime;
+		else {
+			if (mix < from.eventThreshold) events = this.events;
+		}
 
 		if (blend == MixBlend.add) {
 			for (int i = 0; i < timelineCount; i++)
-				((Timeline)timelines[i]).apply(skeleton, animationLast, animationTime, events, alphaMix, blend, MixDirection.out);
+				((Timeline)timelines[i]).apply(skeleton, animationLast, applyTime, events, alphaMix, blend, MixDirection.out);
 		} else {
 			int[] timelineMode = from.timelineMode.items;
 			Object[] timelineHoldMix = from.timelineHoldMix.items;
@@ -314,8 +324,8 @@ public class AnimationState {
 				}
 				from.totalAlpha += alpha;
 				if (timeline instanceof RotateTimeline) {
-					applyRotateTimeline((RotateTimeline)timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation,
-						i << 1, firstFrame);
+					applyRotateTimeline((RotateTimeline)timeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1,
+						firstFrame);
 				} else {
 					if (timelineBlend == MixBlend.setup) {
 						if (timeline instanceof AttachmentTimeline) {
@@ -324,7 +334,7 @@ public class AnimationState {
 							if (drawOrder) direction = MixDirection.in;
 						}
 					}
-					timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
+					timeline.apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction);
 				}
 			}
 		}
@@ -838,7 +848,7 @@ public class AnimationState {
 		TrackEntry next, mixingFrom, mixingTo;
 		AnimationStateListener listener;
 		int trackIndex;
-		boolean loop, holdPrevious;
+		boolean loop, holdPrevious, reverse;
 		float eventThreshold, attachmentThreshold, drawOrderThreshold;
 		float animationStart, animationEnd, animationLast, nextAnimationLast;
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
@@ -976,6 +986,8 @@ public class AnimationState {
 
 		/** Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or
 		 * faster. Defaults to 1.
+		 * <p>
+		 * Values < 0 are not supported. To play an animation in reverse, use {@link #getReverse()}.
 		 * <p>
 		 * {@link #getMixTime()} is not affected by track entry time scale, so {@link #getMixDuration()} may need to be adjusted to
 		 * match the animation speed.
@@ -1150,6 +1162,15 @@ public class AnimationState {
 		 * long way. TrackEntry chooses the short way the first time it is applied and remembers that direction. */
 		public void resetRotationDirections () {
 			timelinesRotation.clear();
+		}
+
+		public void setReverse (boolean reverse) {
+			this.reverse = reverse;
+		}
+
+		/** If true, the animation will be applied in reverse. Events are not fired when an animation is applied in reverse. */
+		public boolean getReverse () {
+			return reverse;
 		}
 
 		public String toString () {
