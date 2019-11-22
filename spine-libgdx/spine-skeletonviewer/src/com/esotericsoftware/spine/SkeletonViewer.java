@@ -279,6 +279,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 			entry = state.setAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked());
 		}
 		entry.setMixBlend(ui.addCheckbox.isChecked() ? MixBlend.add : MixBlend.replace);
+		entry.setReverse(ui.reverseCheckbox.isChecked());
+		entry.setHoldPrevious(ui.holdPrevCheckbox.isChecked());
 		entry.setAlpha(ui.alphaSlider.getValue());
 	}
 
@@ -479,6 +481,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 		Label speedLabel = new Label("1.0x", skin);
 		TextButton speedResetButton = new TextButton("Reset", skin);
 
+		CheckBox reverseCheckbox = new CheckBox("Reverse", skin);
+		CheckBox holdPrevCheckbox = new CheckBox("Hold previous", skin);
+
 		Slider mixSlider = new Slider(0, 4, 0.01f, false, skin);
 		Label mixLabel = new Label("0.3s", skin);
 
@@ -531,6 +536,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			alphaSlider.setDisabled(true);
 
 			addCheckbox.setDisabled(true);
+			holdPrevCheckbox.setDisabled(true);
 
 			window.setMovable(false);
 			window.setResizable(false);
@@ -616,6 +622,13 @@ public class SkeletonViewer extends ApplicationAdapter {
 				for (TextButton button : trackButtons.getButtons())
 					table.add(button);
 				table.add(loopCheckbox);
+				root.add(table).row();
+			}
+			root.add();
+			{
+				Table table = table();
+				table.add(reverseCheckbox);
+				table.add(holdPrevCheckbox);
 				table.add(addCheckbox);
 				root.add(table).row();
 			}
@@ -628,6 +641,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 			}
 			root.add("Animation:");
 			root.add(animationScroll).grow().minHeight(64).row();
+
+			root.add(new Image(skin.newDrawable("white", new Color(0x4e4e4eff)))).height(1).fillX().colspan(2).pad(1, 0, 1, 0).row();
+
 			root.add("Speed:");
 			{
 				Table table = table();
@@ -844,17 +860,15 @@ public class SkeletonViewer extends ApplicationAdapter {
 			});
 			animationScroll.addListener(scrollFocusListener);
 
-			loopCheckbox.addListener(new ChangeListener() {
+			ChangeListener setAnimation = new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
 					setAnimation();
 				}
-			});
-
-			addCheckbox.addListener(new ChangeListener() {
-				public void changed (ChangeEvent event, Actor actor) {
-					setAnimation();
-				}
-			});
+			};
+			loopCheckbox.addListener(setAnimation);
+			reverseCheckbox.addListener(setAnimation);
+			holdPrevCheckbox.addListener(setAnimation);
+			addCheckbox.addListener(setAnimation);
 
 			linearCheckbox.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
@@ -892,10 +906,13 @@ public class SkeletonViewer extends ApplicationAdapter {
 					alphaSlider.setValue(current == null ? 1 : current.alpha);
 
 					addCheckbox.setDisabled(track == 0);
+					holdPrevCheckbox.setDisabled(track == 0);
 
 					if (current != null) {
 						loopCheckbox.setChecked(current.getLoop());
 						addCheckbox.setChecked(current.getMixBlend() == MixBlend.add);
+						reverseCheckbox.setChecked(current.getReverse());
+						holdPrevCheckbox.setChecked(current.getHoldPrevious());
 					}
 				}
 			};
@@ -954,6 +971,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 			premultipliedCheckbox.addListener(savePrefsListener);
 			loopCheckbox.addListener(savePrefsListener);
 			addCheckbox.addListener(savePrefsListener);
+			holdPrevCheckbox.addListener(savePrefsListener);
+			reverseCheckbox.addListener(savePrefsListener);
 			speedSlider.addListener(savePrefsListener);
 			speedResetButton.addListener(savePrefsListener);
 			mixSlider.addListener(savePrefsListener);
@@ -1019,6 +1038,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 			prefs.putBoolean("premultiplied", premultipliedCheckbox.isChecked());
 			prefs.putBoolean("loop", loopCheckbox.isChecked());
 			prefs.putBoolean("add", addCheckbox.isChecked());
+			prefs.putBoolean("holdPrev", holdPrevCheckbox.isChecked());
+			prefs.putBoolean("reverse", reverseCheckbox.isChecked());
 			prefs.putFloat("speed", speedSlider.getValue());
 			prefs.putFloat("mix", mixSlider.getValue());
 			prefs.putFloat("scale", loadScaleSlider.getValue());
@@ -1049,6 +1070,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 				premultipliedCheckbox.setChecked(prefs.getBoolean("premultiplied", true));
 				loopCheckbox.setChecked(prefs.getBoolean("loop", true));
 				addCheckbox.setChecked(prefs.getBoolean("add", false));
+				holdPrevCheckbox.setChecked(prefs.getBoolean("holdPrev", false));
+				reverseCheckbox.setChecked(prefs.getBoolean("reverse", false));
 				speedSlider.setValue(prefs.getFloat("speed", 0.3f));
 				mixSlider.setValue(prefs.getFloat("mix", 0.3f));
 
