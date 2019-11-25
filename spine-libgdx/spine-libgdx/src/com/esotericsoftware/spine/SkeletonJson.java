@@ -158,7 +158,7 @@ public class SkeletonJson {
 			data.skinRequired = boneMap.getBoolean("skin", false);
 
 			String color = boneMap.getString("color", null);
-			if (color != null) data.getColor().set(Color.valueOf(color));
+			if (color != null) Color.valueOf(color, data.getColor());
 
 			skeletonData.bones.add(data);
 		}
@@ -172,7 +172,7 @@ public class SkeletonJson {
 			SlotData data = new SlotData(skeletonData.slots.size, slotName, boneData);
 
 			String color = slotMap.getString("color", null);
-			if (color != null) data.getColor().set(Color.valueOf(color));
+			if (color != null) Color.valueOf(color, data.getColor());
 
 			String dark = slotMap.getString("dark", null);
 			if (dark != null) data.setDarkColor(Color.valueOf(dark));
@@ -375,7 +375,7 @@ public class SkeletonJson {
 			region.setHeight(map.getFloat("height") * scale);
 
 			String color = map.getString("color", null);
-			if (color != null) region.getColor().set(Color.valueOf(color));
+			if (color != null) Color.valueOf(color, region.getColor());
 
 			region.updateOffset();
 			return region;
@@ -386,7 +386,7 @@ public class SkeletonJson {
 			readVertices(map, box, map.getInt("vertexCount") << 1);
 
 			String color = map.getString("color", null);
-			if (color != null) box.getColor().set(Color.valueOf(color));
+			if (color != null) Color.valueOf(color, box.getColor());
 			return box;
 		}
 		case mesh:
@@ -397,7 +397,7 @@ public class SkeletonJson {
 			mesh.setPath(path);
 
 			String color = map.getString("color", null);
-			if (color != null) mesh.getColor().set(Color.valueOf(color));
+			if (color != null) Color.valueOf(color, mesh.getColor());
 
 			mesh.setWidth(map.getFloat("width", 0) * scale);
 			mesh.setHeight(map.getFloat("height", 0) * scale);
@@ -435,7 +435,7 @@ public class SkeletonJson {
 			path.setLengths(lengths);
 
 			String color = map.getString("color", null);
-			if (color != null) path.getColor().set(Color.valueOf(color));
+			if (color != null) Color.valueOf(color, path.getColor());
 			return path;
 		}
 		case point: {
@@ -446,7 +446,7 @@ public class SkeletonJson {
 			point.setRotation(map.getFloat("rotation", 0));
 
 			String color = map.getString("color", null);
-			if (color != null) point.getColor().set(Color.valueOf(color));
+			if (color != null) Color.valueOf(color, point.getColor());
 			return point;
 		}
 		case clipping: {
@@ -463,7 +463,7 @@ public class SkeletonJson {
 			readVertices(map, clip, map.getInt("vertexCount") << 1);
 
 			String color = map.getString("color", null);
-			if (color != null) clip.getColor().set(Color.valueOf(color));
+			if (color != null) Color.valueOf(color, clip.getColor());
 			return clip;
 		}
 		}
