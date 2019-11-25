@@ -509,7 +509,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		static bool UpdateIfSkinMismatch (SkeletonRenderer skeletonRenderer, string componentSkinName) {
-			if (!skeletonRenderer.valid) return false;
+			if (!skeletonRenderer.valid || skeletonRenderer.EditorSkipSkinSync) return false;
 
 			var skin = skeletonRenderer.Skeleton.Skin;
 			string skeletonSkinName = skin != null ? skin.Name : null;

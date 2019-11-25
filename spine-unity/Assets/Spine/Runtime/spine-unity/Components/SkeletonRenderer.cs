@@ -61,6 +61,15 @@ namespace Spine.Unity {
 		/// <summary>Skin name to use when the Skeleton is initialized.</summary>
 		[SerializeField] [SpineSkin(defaultAsEmptyString:true)] public string initialSkinName;
 
+		/// <summary>Enable this parameter when overwriting the Skeleton's skin from an editor script.
+		/// Otherwise any changes will be overwritten by the next inspector update.</summary>
+		#if UNITY_EDITOR
+		public bool EditorSkipSkinSync {
+			get { return editorSkipSkinSync; }
+			set { editorSkipSkinSync = value; }
+		}
+		protected bool editorSkipSkinSync = false;
+		#endif
 		/// <summary>Flip X and Y to use when the Skeleton is initialized.</summary>
 		[SerializeField] public bool initialFlipX, initialFlipY;
 		#endregion
