@@ -130,8 +130,8 @@ public class Animation {
 	}
 
 	/** Binary search using a stride of 1.
-	 * @param time >= the first value.
-	 * @return The index of the first value <= to the target. */
+	 * @param time Must be >= the first value in <code>frames</code>.
+	 * @return The index of the first value <= <code>time</code>. */
 	static int search (float[] frames, float time) {
 		int n = frames.length;
 		for (int i = 1; i < n; i++)
@@ -140,8 +140,8 @@ public class Animation {
 	}
 
 	/** Binary search using the specified stride.
-	 * @param time >= the first value.
-	 * @return The index of the first value <= to the target. */
+	 * @param time Must be >= the first value in <code>frames</code>.
+	 * @return The index of the first value <= <code>time</code>. */
 	static int search (float[] frames, float time, int step) {
 		int n = frames.length;
 		for (int i = step; i < n; i += step)
@@ -280,19 +280,19 @@ public class Animation {
 		}
 
 		/** Sets the specified frame to linear interpolation.
-		 * @param frame Between 0 and <code>frameCount - 1</code>. */
+		 * @param frame Between 0 and <code>frameCount - 1</code>, inclusive. */
 		public void setLinear (int frame) {
 			curves[frame] = LINEAR;
 		}
 
 		/** Sets the specified frame to stepped interpolation.
-		 * @param frame Between 0 and <code>frameCount - 1</code>. */
+		 * @param frame Between 0 and <code>frameCount - 1</code>, inclusive. */
 		public void setStepped (int frame) {
 			curves[frame] = STEPPED;
 		}
 
 		/** Returns the interpolation type for the specified frame.
-		 * @param frame Between 0 and <code>frameCount - 1</code>.
+		 * @param frame Between 0 and <code>frameCount - 1</code>, inclusive.
 		 * @return {@link #LINEAR}, {@link #STEPPED}, or {@link #BEZIER} + the index of the Bezier segments. */
 		public int getCurveType (int frame) {
 			return (int)curves[frame];
@@ -312,8 +312,8 @@ public class Animation {
 		/** Stores the segments for the specified Bezier curve. For timelines that modify multiple values, there may be more than
 		 * one curve per frame.
 		 * @param bezier The ordinal of this Bezier curve for this timeline, between 0 and <code>bezierCount - 1</code> (specified
-		 *           in the constructor).
-		 * @param frame Between 0 and <code>frameCount - 1</code>.
+		 *           in the constructor), inclusive.
+		 * @param frame Between 0 and <code>frameCount - 1</code>, inclusive.
 		 * @param value The index of the value for this frame that this curve is used for.
 		 * @param time1 The time for the first key.
 		 * @param value1 The value for the first key.
@@ -384,7 +384,7 @@ public class Animation {
 		}
 
 		/** Sets the time and value for the specified frame.
-		 * @param frame Between 0 and <code>frameCount</code>.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 		 * @param time The frame time in seconds. */
 		public void setFrame (int frame, float time, float value) {
 			frame <<= 1;
@@ -431,7 +431,7 @@ public class Animation {
 		}
 
 		/** Sets the time and values for the specified frame.
-		 * @param frame Between 0 and <code>frameCount</code>.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 		 * @param time The frame time in seconds. */
 		public void setFrame (int frame, float time, float value1, float value2) {
 			frame *= ENTRIES;
@@ -765,7 +765,7 @@ public class Animation {
 		}
 
 		/** Sets the time and color for the specified frame.
-		 * @param frame Between 0 and <code>frameCount</code>.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 		 * @param time The frame time in seconds. */
 		public void setFrame (int frame, float time, float r, float g, float b, float a) {
 			frame *= ENTRIES;
@@ -859,7 +859,7 @@ public class Animation {
 		}
 
 		/** Sets the time, light color, and dark color for the specified frame.
-		 * @param frame Between 0 and <code>frameCount</code>.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 		 * @param time The frame time in seconds. */
 		public void setFrame (int frame, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
 			frame <<= 3;
@@ -971,7 +971,7 @@ public class Animation {
 		}
 
 		/** Sets the time and attachment name for the specified frame.
-		 * @param frame Between 0 and <code>frameCount</code>.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 		 * @param time The frame time in seconds. */
 		public void setFrame (int frame, float time, String attachmentName) {
 			frames[frame] = time;
@@ -1034,7 +1034,7 @@ public class Animation {
 		}
 
 		/** Sets the time and vertices for the specified frame.
-		 * @param frame Between 0 and <code>frameCount</code>.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 		 * @param time The frame time in seconds.
 		 * @param vertices Vertex positions for an unweighted VertexAttachment, or deform offsets if it has weights. */
 		public void setFrame (int frame, float time, float[] vertices) {
@@ -1042,8 +1042,8 @@ public class Animation {
 			this.vertices[frame] = vertices;
 		}
 
-		/** @param value1 Ignored.
-		 * @param value2 Ignored. */
+		/** @param value1 Ignored (0 is used for a deform timeline).
+		 * @param value2 Ignored (1 is used for a deform timeline). */
 		public void setBezier (int bezier, int frame, int value, float time1, float value1, float cx1, float cy1, float cx2,
 			float cy2, float time2, float value2) {
 			float[] curves = this.curves;
@@ -1294,7 +1294,7 @@ public class Animation {
 		}
 
 		/** Sets the time and event for the specified frame.
-		 * @param frame Between 0 and <code>frameCount</code>. */
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive. */
 		public void setFrame (int frame, Event event) {
 			frames[frame] = event.time;
 			events[frame] = event;
@@ -1349,7 +1349,7 @@ public class Animation {
 		}
 
 		/** Sets the time and draw order for the specified frame.
-		 * @param frame Between 0 and <code>frameCount</code>.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 		 * @param time The frame time in seconds.
 		 * @param drawOrder For each slot in {@link Skeleton#slots}, the index of the slot in the new draw order. May be null to use
 		 *           setup pose draw order. */
@@ -1408,7 +1408,7 @@ public class Animation {
 		}
 
 		/** Sets the time, mix, softness, bend direction, compress, and stretch for the specified frame.
-		 * @param frame Between 0 and <code>frameCount</code>.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 		 * @param time The frame time in seconds. */
 		public void setFrame (int frame, float time, float mix, float softness, int bendDirection, boolean compress,
 			boolean stretch) {
@@ -1515,7 +1515,7 @@ public class Animation {
 		}
 
 		/** Sets the time, rotate mix, translate mix, scale mix, and shear mix for the specified frame.
-		 * @param frame Between 0 and <code>frameCount</code>.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 		 * @param time The frame time in seconds. */
 		public void setFrame (int frame, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
 			frame *= ENTRIES;
