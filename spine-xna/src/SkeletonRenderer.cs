@@ -86,6 +86,7 @@ namespace Spine {
 				pass.Apply();
 				batcher.Draw(device);
 			}
+			batcher.AfterLastDrawPass();
 		}
 
 		public void Draw(Skeleton skeleton) {
