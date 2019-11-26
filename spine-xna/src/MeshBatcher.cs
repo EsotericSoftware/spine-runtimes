@@ -162,6 +162,9 @@ namespace Spine {
 				freeItems.Enqueue(item);
 			}
 			FlushVertexArray(device, vertexCount, triangleCount);
+		}
+
+		public void AfterLastDrawPass () {
 			items.Clear();
 		}
 
