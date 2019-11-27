@@ -157,14 +157,17 @@ namespace Spine {
 
 				Array.Copy(item.vertices, 0, vertexArray, vertexCount, itemVertexCount);
 				vertexCount += itemVertexCount;
-
-				item.texture = null;
-				freeItems.Enqueue(item);
 			}
 			FlushVertexArray(device, vertexCount, triangleCount);
 		}
 
 		public void AfterLastDrawPass () {
+			int itemCount = items.Count;
+			for (int i = 0; i < itemCount; i++) {
+				var item = items[i];
+				item.texture = null;
+				freeItems.Enqueue(item);
+			}
 			items.Clear();
 		}
 
