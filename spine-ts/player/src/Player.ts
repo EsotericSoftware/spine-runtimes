@@ -794,7 +794,7 @@ module spine {
 				// Draw background image if given
 				if (this.config.backgroundImage && this.config.backgroundImage.url) {
 					let bgImage = this.assetManager.get(this.config.backgroundImage.url);
-					if (!this.config.backgroundImage.x) {
+					if (!(this.config.backgroundImage.hasOwnProperty("x") && this.config.backgroundImage.hasOwnProperty("y") && this.config.backgroundImage.hasOwnProperty("width") && this.config.backgroundImage.hasOwnProperty("height"))) {
 						this.sceneRenderer.drawTexture(bgImage, viewport.x, viewport.y, viewport.width, viewport.height);
 					} else {
 						this.sceneRenderer.drawTexture(bgImage, this.config.backgroundImage.x, this.config.backgroundImage.y, this.config.backgroundImage.width, this.config.backgroundImage.height);
