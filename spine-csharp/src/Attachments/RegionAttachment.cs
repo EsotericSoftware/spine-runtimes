@@ -198,6 +198,10 @@ namespace Spine {
 			copy.height = height;
 			Array.Copy(uvs, 0, copy.uvs, 0, 8);
 			Array.Copy(offset, 0, copy.offset, 0, 8);
+			copy.r = r;
+			copy.g = g;
+			copy.b = b;
+			copy.a = a;
 			return copy;
 		}
 	}
