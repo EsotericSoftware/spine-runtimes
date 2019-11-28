@@ -73,10 +73,14 @@ namespace Spine.Unity.AttachmentTools {
 		public static Skin GetClone (this Skin original) {
 			var newSkin = new Skin(original.name + " clone");
 			var newSkinAttachments = newSkin.Attachments;
+			var newSkinBones = newSkin.Bones;
+			var newSkinConstraints = newSkin.Constraints;
 
 			foreach (var a in original.Attachments)
 				newSkinAttachments[a.Key] = a.Value;
 
+			newSkinBones.AddRange(original.bones);
+			newSkinConstraints.AddRange(original.constraints);
 			return newSkin;
 		}
 
@@ -126,6 +130,8 @@ namespace Spine.Unity.AttachmentTools {
 		public static void CopyTo (this Skin source, Skin destination, bool overwrite, bool cloneAttachments, bool cloneMeshesAsLinked = true) {
 			var sourceAttachments = source.Attachments;
 			var destinationAttachments = destination.Attachments;
+			var destinationBones = destination.Bones;
+			var destinationConstraints = destination.Constraints;
 
 			if (cloneAttachments) {
 				if (overwrite) {
@@ -148,9 +154,12 @@ namespace Spine.Unity.AttachmentTools {
 					}
 				}
 			}
+
+			foreach (BoneData data in source.bones)
+				if (!destinationBones.Contains(data)) destinationBones.Add(data);
+
+			foreach (ConstraintData data in source.constraints)
+				if (!destinationConstraints.Contains(data)) destinationConstraints.Add(data);
 		}
-
-
 	}
-
 }
