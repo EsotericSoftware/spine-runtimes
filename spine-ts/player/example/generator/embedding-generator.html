@@ -130,11 +130,31 @@ body {
 					<th>Fullscreen background color</th>
 					<td><input id="sp_generator_background_fullscreen" class="jscolor {onFineChange:'changeFullscreenBackgroundColor(this)'}'" value="000000"></td>
 				</tr>
-				<tr>
+				<tr style="vertical-align: top;">
 					<th>Background image</th>
 					<td>
 						<select id="sp_generator_background_image">
 						</select>
+					</td>
+					<td id="sp_generator_background_bounds" class="sp_generator_hidden">
+						<table>
+							<tr>
+								<th>X</th>
+								<td><input id="sp_generator_background_x"></td>
+							</tr>
+							<tr>
+								<th>Y</th>
+								<td><input id="sp_generator_background_y"></td>
+							</tr>
+							<tr>
+								<th>Width</th>
+								<td><input id="sp_generator_background_width"></td>
+							</tr>
+							<tr>
+								<th>Height</th>
+								<td><input id="sp_generator_background_height"></td>
+							</tr>
+						</table>
 					</td>
 				</tr>
 			</table>

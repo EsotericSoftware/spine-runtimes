@@ -112,7 +112,10 @@ function setupPlayer(dataUrls, jsonFile, skelFile, atlasFile) {
 				atlasUrl: atlasFile,
 				rawDataURIs: dataUrls,
 				success: setupConfigUI,
-				alpha: true // needed so we can emulate shizzle
+				alpha: true, // needed so we can emulate shizzle
+				viewport: { // needed so we can see viewport bounds
+					debugRender: true
+				}
 			};
 
 			appState.player = new spine.SpinePlayer(player, config);
@@ -190,6 +193,12 @@ function setupConfigUI() {
 			appState.player.assetManager.loadTexture(imageUrl);
 		}
 
+		var boundsTable = document.getElementById("sp_generator_background_bounds");
+		if (imageUrl == "none")
+			boundsTable.classList.add("sp_generator_hidden");
+		else
+			boundsTable.classList.remove("sp_generator_hidden");
+
 		if (appState.player.config.backgroundImage) {
 			appState.player.config.backgroundImage.url = imageUrl != "none" ? imageUrl: null;
 		} else {
@@ -198,6 +207,32 @@ function setupConfigUI() {
 			}
 		}
 	}
+	var backgroundX = document.getElementById("sp_generator_background_x");
+	backgroundX.onkeyup = backgroundX.onchange = function () {
+		var value = Number.parseFloat(backgroundX.value);
+		if (Number.isNaN(value)) return;
+		appState.player.config.backgroundImage.x = value;
+	};
+
+	var backgroundY = document.getElementById("sp_generator_background_y");
+	backgroundY.onkeyup = backgroundY.onchange = function () {
+		var value = Number.parseFloat(backgroundY.value);
+		if (Number.isNaN(value)) return;
+		appState.player.config.backgroundImage.y = value;
+	};
+	var backgroundWidth = document.getElementById("sp_generator_background_width");
+	backgroundWidth.onkeyup = backgroundWidth.onchange = function () {
+		var value = Number.parseFloat(backgroundWidth.value);
+		if (Number.isNaN(value)) return;
+		appState.player.config.backgroundImage.width = value;
+	};
+	var backgroundHeight = document.getElementById("sp_generator_background_height");
+	backgroundHeight.onkeyup = backgroundHeight.onchange = function () {
+		var value = Number.parseFloat(backgroundHeight.value);
+		if (Number.isNaN(value)) return;
+		appState.player.config.backgroundImage.height = value;
+	};
+
 
 	// Fill animations tab
 
