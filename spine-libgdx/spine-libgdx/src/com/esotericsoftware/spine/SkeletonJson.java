@@ -280,6 +280,7 @@ public class SkeletonJson {
 				if (bone == null) throw new SerializationException("Skin bone not found: " + entry);
 				skin.bones.add(bone);
 			}
+			skin.bones.shrink();
 			for (JsonValue entry = skinMap.getChild("ik"); entry != null; entry = entry.next) {
 				IkConstraintData constraint = skeletonData.findIkConstraint(entry.asString());
 				if (constraint == null) throw new SerializationException("Skin IK constraint not found: " + entry);
@@ -295,6 +296,7 @@ public class SkeletonJson {
 				if (constraint == null) throw new SerializationException("Skin path constraint not found: " + entry);
 				skin.constraints.add(constraint);
 			}
+			skin.constraints.shrink();
 			for (JsonValue slotEntry = skinMap.getChild("attachments"); slotEntry != null; slotEntry = slotEntry.next) {
 				SlotData slot = skeletonData.findSlot(slotEntry.name);
 				if (slot == null) throw new SerializationException("Slot not found: " + slotEntry.name);

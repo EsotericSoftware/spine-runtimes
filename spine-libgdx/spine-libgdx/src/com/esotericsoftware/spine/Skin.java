@@ -30,7 +30,8 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.OrderedMap;
+import com.badlogic.gdx.utils.OrderedSet;
+
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 
@@ -40,15 +41,15 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
  * <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
 public class Skin {
 	final String name;
-	final OrderedMap<SkinEntry, SkinEntry> attachments = new OrderedMap();
-	final Array<BoneData> bones = new Array();
-	final Array<ConstraintData> constraints = new Array();
+	final OrderedSet<SkinEntry> attachments = new OrderedSet();
+	final Array<BoneData> bones = new Array(0);
+	final Array<ConstraintData> constraints = new Array(0);
 	private final SkinEntry lookup = new SkinEntry();
 
 	public Skin (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
-		this.attachments.orderedKeys().ordered = false;
+		attachments.orderedItems().ordered = false;
 	}
 
 	/** Adds an attachment to the skin for the specified slot index and name. */
@@ -56,10 +57,7 @@ public class Skin {
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
 		SkinEntry newEntry = new SkinEntry(slotIndex, name, attachment);
-		SkinEntry oldEntry = attachments.put(newEntry, newEntry);
-		if (oldEntry != null) {
-			oldEntry.attachment = attachment;
-		}
+		if (!attachments.add(newEntry)) attachments.get(newEntry).attachment = attachment;
 	}
 
 	/** Adds all attachments, bones, and constraints from the specified skin to this skin. */
@@ -72,7 +70,7 @@ public class Skin {
 		for (ConstraintData data : skin.constraints)
 			if (!constraints.contains(data, true)) constraints.add(data);
 
-		for (SkinEntry entry : skin.attachments.keys())
+		for (SkinEntry entry : skin.attachments.orderedItems())
 			setAttachment(entry.slotIndex, entry.name, entry.attachment);
 	}
 
@@ -87,7 +85,7 @@ public class Skin {
 		for (ConstraintData data : skin.constraints)
 			if (!constraints.contains(data, true)) constraints.add(data);
 
-		for (SkinEntry entry : skin.attachments.keys()) {
+		for (SkinEntry entry : skin.attachments.orderedItems()) {
 			if (entry.attachment instanceof MeshAttachment)
 				setAttachment(entry.slotIndex, entry.name, ((MeshAttachment)entry.attachment).newLinkedMesh());
 			else
@@ -112,14 +110,14 @@ public class Skin {
 
 	/** Returns all attachments in this skin. */
 	public Array<SkinEntry> getAttachments () {
-		return attachments.orderedKeys();
+		return attachments.orderedItems();
 	}
 
 	/** Returns all attachments in this skin for the specified slot index. */
 	public void getAttachments (int slotIndex, Array<SkinEntry> attachments) {
 		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 		if (attachments == null) throw new IllegalArgumentException("attachments cannot be null.");
-		for (SkinEntry entry : this.attachments.keys())
+		for (SkinEntry entry : this.attachments.orderedItems())
 			if (entry.slotIndex == slotIndex) attachments.add(entry);
 	}
 
@@ -149,7 +147,7 @@ public class Skin {
 
 	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
 	void attachAll (Skeleton skeleton, Skin oldSkin) {
-		for (SkinEntry entry : oldSkin.attachments.keys()) {
+		for (SkinEntry entry : oldSkin.attachments.orderedItems()) {
 			int slotIndex = entry.slotIndex;
 			Slot slot = skeleton.slots.get(slotIndex);
 			if (slot.attachment == entry.attachment) {
@@ -179,7 +177,7 @@ public class Skin {
 			if (name == null) throw new IllegalArgumentException("name cannot be null.");
 			this.slotIndex = slotIndex;
 			this.name = name;
-			this.hashCode = name.hashCode() + slotIndex * 37;
+			hashCode = name.hashCode() + slotIndex * 37;
 		}
 
 		public int getSlotIndex () {
@@ -203,8 +201,7 @@ public class Skin {
 			if (object == null) return false;
 			SkinEntry other = (SkinEntry)object;
 			if (slotIndex != other.slotIndex) return false;
-			if (!name.equals(other.name)) return false;
-			return true;
+			return name.equals(other.name);
 		}
 
 		public String toString () {
