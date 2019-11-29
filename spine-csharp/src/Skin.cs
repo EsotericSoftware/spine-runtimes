@@ -70,8 +70,10 @@ namespace Spine {
 			foreach (ConstraintData data in skin.constraints)
 				if (!constraints.Contains(data)) constraints.Add(data);
 
-			foreach (SkinEntry entry in skin.attachments.Values)
-				SetAttachment(entry.SlotIndex, entry.Name, entry.Attachment);
+			for (int i = 0, n = skin.attachments.Count; i < n; i++) {
+				SkinEntry entry = skin.attachments[i];
+				SetAttachment(entry.slotIndex, entry.name, entry.attachment);
+			}
 		}
 
 		///<summary>Adds all attachments from the specified skin to this skin. Attachments are deep copied.</summary>
@@ -82,36 +84,37 @@ namespace Spine {
 			foreach (ConstraintData data in skin.constraints)
 				if (!constraints.Contains(data)) constraints.Add(data);
 
-			foreach (SkinEntry entry in skin.attachments.Values) {
-				if (entry.Attachment is MeshAttachment)
-					SetAttachment(entry.SlotIndex, entry.Name,
-						entry.Attachment != null ? ((MeshAttachment)entry.Attachment).NewLinkedMesh() : null);
-				else
-					SetAttachment(entry.SlotIndex, entry.Name, entry.Attachment != null ? entry.Attachment.Copy() : null);
+			for (int i = 0, n = skin.attachments.Count; i < n; i++) {
+				SkinEntry entry = skin.attachments[i];
+				if (entry.attachment is MeshAttachment) {
+					SetAttachment(entry.slotIndex, entry.name,
+						entry.attachment != null ? ((MeshAttachment)entry.attachment).NewLinkedMesh() : null);
+				} else
+					SetAttachment(entry.slotIndex, entry.name, entry.attachment != null ? entry.attachment.Copy() : null);
 			}
 		}
 
 		/// <summary>Returns the attachment for the specified slot index and name, or null.</summary>
 		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (int slotIndex, string name) {
-			var lookup = new SkinKey(slotIndex, name);
 			SkinEntry entry;
-			bool containsKey = attachments.TryGetValue(lookup, out entry);
-			return containsKey ? entry.Attachment : null;
+			bool containsKey = attachments.TryGetValue(new SkinKey(slotIndex, name), out entry);
+			return containsKey ? entry.attachment : null;
 		}
 
 		/// <summary> Removes the attachment in the skin for the specified slot index and name, if any.</summary>
 		public void RemoveAttachment (int slotIndex, string name) {
 			if (slotIndex < 0) throw new ArgumentOutOfRangeException("slotIndex", "slotIndex must be >= 0");
-			var lookup = new SkinKey(slotIndex, name);
-			attachments.Remove(lookup);
+			attachments.Remove(new SkinKey(slotIndex, name));
 		}
 
 		/// <summary>Returns all attachments in this skin for the specified slot index.</summary>
 		/// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.Skeleton.FindSlotIndex"/> or <see cref="Spine.SkeletonData.FindSlotIndex"/>
 		public void GetAttachments (int slotIndex, List<SkinEntry> attachments) {
-			foreach (SkinEntry entry in this.attachments.Values)
-				if (entry.SlotIndex == slotIndex) attachments.Add(entry);
+			for (int i = 0, n = this.attachments.Count; i < n; i++) {
+				SkinEntry entry = this.attachments[i];
+				if (entry.slotIndex == slotIndex) attachments.Add(entry);
+			}
 		}
 
 		///<summary>Clears all attachments, bones, and constraints.</summary>
@@ -127,11 +130,12 @@ namespace Spine {
 
 		/// <summary>Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.</summary>
 		internal void AttachAll (Skeleton skeleton, Skin oldSkin) {
-			foreach (SkinEntry entry in oldSkin.attachments.Values) {
-				int slotIndex = entry.SlotIndex;
+			for (int i = 0, n = oldSkin.attachments.Count; i < n; i++) {
+				SkinEntry entry = oldSkin.attachments[i];
+				int slotIndex = entry.slotIndex;
 				Slot slot = skeleton.slots.Items[slotIndex];
-				if (slot.Attachment == entry.Attachment) {
-					Attachment attachment = GetAttachment(slotIndex, entry.Name);
+				if (slot.Attachment == entry.attachment) {
+					Attachment attachment = GetAttachment(slotIndex, entry.name);
 					if (attachment != null) slot.Attachment = attachment;
 				}
 			}
@@ -139,9 +143,9 @@ namespace Spine {
 
 		/// <summary>Stores an entry in the skin consisting of the slot index, name, and attachment.</summary>
 		public struct SkinEntry {
-			private readonly int slotIndex;
-			private readonly string name;
-			private readonly Attachment attachment;
+			internal readonly int slotIndex;
+			internal readonly string name;
+			internal readonly Attachment attachment;
 
 			public SkinEntry (int slotIndex, string name, Attachment attachment) {
 				this.slotIndex = slotIndex;
@@ -169,30 +173,13 @@ namespace Spine {
 			}
 		}
 
-		/// Note: not present in libgdx reference implementation.
-		/// SkinKey contains slot index and name only, as a once-added SkinEntry cannot have its Attachment changed
-		/// (SkinEntry is a value type as opposed to the java reference implementation) without removing and
-		/// re-adding it to a dictionary, leading to problems in order and unnecessary operations.
 		private struct SkinKey {
-			private readonly int slotIndex;
-			private readonly string name;
+			internal readonly int slotIndex;
+			internal readonly string name;
 
 			public SkinKey (int slotIndex, string name) {
 				this.slotIndex = slotIndex;
 				this.name = name;
-			}
-
-			public int SlotIndex {
-				get {
-					return slotIndex;
-				}
-			}
-
-			/// <summary>The name the attachment is associated with, equivalent to the skin placeholder name in the Spine editor.</summary>
-			public String Name {
-				get {
-					return name;
-				}
 			}
 		}
 
@@ -200,13 +187,11 @@ namespace Spine {
 			internal static readonly SkinKeyComparer Instance = new SkinKeyComparer();
 
 			bool IEqualityComparer<SkinKey>.Equals (SkinKey e1, SkinKey e2) {
-				if (e1.SlotIndex != e2.SlotIndex) return false;
-				if (!string.Equals(e1.Name, e2.Name, StringComparison.Ordinal)) return false;
-				return true;
+				return e1.slotIndex == e2.slotIndex && string.Equals(e1.name, e2.name, StringComparison.Ordinal);
 			}
 
 			int IEqualityComparer<SkinKey>.GetHashCode (SkinKey e) {
-				return e.Name.GetHashCode() + e.SlotIndex * 37;
+				return e.name.GetHashCode() + e.slotIndex * 37;
 			}
 		}
 	}
