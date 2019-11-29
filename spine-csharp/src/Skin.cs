@@ -1,3 +1,4 @@
+
 /******************************************************************************
  * Spine Runtimes License Agreement
  * Last updated May 1, 2019. Replaces all prior versions.
@@ -39,7 +40,7 @@ namespace Spine {
 	/// </summary>
 	public class Skin {
 		internal string name;
-		private OrderedDictionary<SkinKey, SkinEntry> attachments = new OrderedDictionary<SkinKey, SkinEntry>(SkinKeyComparer.Instance);
+		private Dictionary<SkinKey, SkinEntry> attachments = new Dictionary<SkinKey, SkinEntry>(SkinKeyComparer.Instance);
 		internal readonly ExposedList<BoneData> bones = new ExposedList<BoneData>();
 		internal readonly ExposedList<ConstraintData> constraints = new ExposedList<ConstraintData>();
 
@@ -70,8 +71,8 @@ namespace Spine {
 			foreach (ConstraintData data in skin.constraints)
 				if (!constraints.Contains(data)) constraints.Add(data);
 
-			for (int i = 0, n = skin.attachments.Count; i < n; i++) {
-				SkinEntry entry = skin.attachments[i];
+			foreach (var item in skin.attachments) {
+				SkinEntry entry = item.Value;
 				SetAttachment(entry.slotIndex, entry.name, entry.attachment);
 			}
 		}
@@ -84,11 +85,11 @@ namespace Spine {
 			foreach (ConstraintData data in skin.constraints)
 				if (!constraints.Contains(data)) constraints.Add(data);
 
-			for (int i = 0, n = skin.attachments.Count; i < n; i++) {
-				SkinEntry entry = skin.attachments[i];
+			foreach (var item in skin.attachments) {
+				SkinEntry entry = item.Value;
 				if (entry.attachment is MeshAttachment) {
 					SetAttachment(entry.slotIndex, entry.name,
-						entry.attachment != null ? ((MeshAttachment)entry.attachment).NewLinkedMesh() : null);
+					   entry.attachment != null ? ((MeshAttachment)entry.attachment).NewLinkedMesh() : null);
 				} else
 					SetAttachment(entry.slotIndex, entry.name, entry.attachment != null ? entry.attachment.Copy() : null);
 			}
@@ -111,8 +112,8 @@ namespace Spine {
 		/// <summary>Returns all attachments in this skin for the specified slot index.</summary>
 		/// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.Skeleton.FindSlotIndex"/> or <see cref="Spine.SkeletonData.FindSlotIndex"/>
 		public void GetAttachments (int slotIndex, List<SkinEntry> attachments) {
-			for (int i = 0, n = this.attachments.Count; i < n; i++) {
-				SkinEntry entry = this.attachments[i];
+			foreach (var item in this.attachments) {
+				SkinEntry entry = item.Value;
 				if (entry.slotIndex == slotIndex) attachments.Add(entry);
 			}
 		}
@@ -130,8 +131,8 @@ namespace Spine {
 
 		/// <summary>Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.</summary>
 		internal void AttachAll (Skeleton skeleton, Skin oldSkin) {
-			for (int i = 0, n = oldSkin.attachments.Count; i < n; i++) {
-				SkinEntry entry = oldSkin.attachments[i];
+			foreach (var item in oldSkin.attachments) {
+				SkinEntry entry = item.Value;
 				int slotIndex = entry.slotIndex;
 				Slot slot = skeleton.slots.Items[slotIndex];
 				if (slot.Attachment == entry.attachment) {
@@ -196,3 +197,4 @@ namespace Spine {
 		}
 	}
 }
+
