@@ -44,8 +44,8 @@
 
 * **Breaking changes**
   * Removed all `Spine.Unity.AttachmentTools.SkinUtilities` Skin extension methods. These have become obsoleted and error-prone since the introduction of the new Skin API in 3.8. To fix any compile errors, replace any usage of `Skin` extension methods with their counterparts, e.g. replace occurrances of `skin.AddAttachments()` with `skin.AddSkin()`.
-  * Removed redundant `Spine.Unity.AttachmentTools` extension method `Skin.GetRepackedAttachments()`. Please use `Skin.GetRepackedSkin()` instead.
   * Removed redundant `Spine.Unity.AttachmentTools.AttachmentCloneExtensions` extension methods `Attachment.GetCopy()` and `Attachment.GetLinkedMesh()`. To fix any compile errors, replace any occurrances with `Attachment.Copy()` and `Attachment.NewLinkedMesh()`.
+  * Removed rarely used `Spine.Unity.AttachmentTools.AttachmentRegionExtensions` extension methods `Attachment.GetRegion()`. Use `Attachment.RendererObject as AtlasRegion` instead.
   * Removed redundant `Spine.SkeletonExtensions` extension methods `Skeleton.Set*ToSetupPose()`. Also removed less commonly used extension methods `TrackEntry.AllowImmediateQueue()` and `Attachment.IsRenderable()`.
   * `Skin.Attachments` now replaces `Skin.GetAttachments()`, returning an `ICollection<SkinEntry>`. This makes access more consistent and intuitive. To fix any compile errors, replace any occurrances of `skin.GetAttachments()` by `skin.Attachments`.
 
