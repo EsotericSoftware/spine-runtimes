@@ -180,7 +180,7 @@ namespace Spine.Unity {
 				if (autoReset) {
 					var previousAnimations = this.previousAnimations;
 					for (int i = 0, n = previousAnimations.Count; i < n; i++)
-						previousAnimations[i].SetKeyedItemsToSetupPose(skeleton);
+						previousAnimations[i].Apply(skeleton, 0, 0, false, null, 0, MixBlend.Setup, MixDirection.Out); // SetKeyedItemsToSetupPose
 
 					previousAnimations.Clear();
 					for (int layer = 0, n = animator.layerCount; layer < n; layer++) {

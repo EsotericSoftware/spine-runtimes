@@ -161,7 +161,7 @@ namespace Spine.Unity.Playables {
 					if (!isAnimationTransitionMatch) {
 						dummyAnimationState.ClearTracks();
 						fromTrack = dummyAnimationState.SetAnimation(0, fromAnimation, fromClipLoop);
-						fromTrack.AllowImmediateQueue();
+						if (fromTrack.nextTrackLast < 0) fromTrack.nextTrackLast = 0; // fromTrack.AllowImmediateQueue
 						if (toAnimation != null)
 							toTrack = dummyAnimationState.SetAnimation(0, toAnimation, clipData.loop);
 					}

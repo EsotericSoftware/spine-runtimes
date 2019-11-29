@@ -53,7 +53,7 @@ namespace Spine.Unity.Examples {
 			// OPTIONAL: Add all the attachments from the template skin.
 			var templateSkin = skeletonAnimation.Skeleton.Data.FindSkin(templateSkinName);
 			if (templateSkin != null)
-				equipsSkin.AddAttachments(templateSkin);
+				equipsSkin.AddSkin(templateSkin);
 
 			skeletonAnimation.Skeleton.Skin = equipsSkin;
 			RefreshSkeletonAttachments();
@@ -69,8 +69,8 @@ namespace Spine.Unity.Examples {
 			// 1. Collect all the attachments of all active skins.
 			collectedSkin = collectedSkin ?? new Skin("Collected skin");
 			collectedSkin.Clear();
-			collectedSkin.AddAttachments(skeletonAnimation.Skeleton.Data.DefaultSkin);
-			collectedSkin.AddAttachments(equipsSkin);
+			collectedSkin.AddSkin(skeletonAnimation.Skeleton.Data.DefaultSkin);
+			collectedSkin.AddSkin(equipsSkin);
 
 			// 2. Create a repacked skin.
 			var repackedSkin = collectedSkin.GetRepackedSkin("Repacked skin", skeletonAnimation.SkeletonDataAsset.atlasAssets[0].PrimaryMaterial, out runtimeMaterial, out runtimeAtlas);

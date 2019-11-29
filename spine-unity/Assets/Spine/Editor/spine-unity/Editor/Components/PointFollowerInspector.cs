@@ -112,10 +112,9 @@ namespace Spine.Unity.Editor {
 
 		static void DrawPointsInSkin (Skin skin, Skeleton skeleton, Transform transform) {
 			foreach (var skinEntry in skin.Attachments) {
-				var attachment = skinEntry.Value as PointAttachment;
+				var attachment = skinEntry.Attachment as PointAttachment;
 				if (attachment != null) {
-					var skinKey = (Skin.SkinEntry)skinEntry.Key;
-					var slot = skeleton.Slots.Items[skinKey.SlotIndex];
+					var slot = skeleton.Slots.Items[skinEntry.SlotIndex];
 					DrawPointAttachmentWithLabel(attachment, slot.Bone, transform);
 				}
 			}

@@ -34,44 +34,6 @@ using System.Collections;
 namespace Spine.Unity.AttachmentTools {
 
 	public static class AttachmentCloneExtensions {
-		/// <summary>
-		/// Clones the attachment.</summary>
-		public static Attachment GetCopy (this Attachment o, bool cloneMeshesAsLinked) {
-			var meshAttachment = o as MeshAttachment;
-			if (meshAttachment != null && cloneMeshesAsLinked)
-				return meshAttachment.NewLinkedMesh();
-			return o.Copy();
-		}
-
-		#region Runtime Linked MeshAttachments
-		/// <summary>
-		/// Returns a new linked mesh linked to this MeshAttachment. It will be mapped to the AtlasRegion provided.</summary>
-		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, string newLinkedMeshName, AtlasRegion region) {
-			if (region == null) throw new System.ArgumentNullException("region");
-			MeshAttachment mesh = o.NewLinkedMesh();
-			mesh.SetRegion(region, false);
-			return mesh;
-		}
-
-		/// <summary>
-		/// Returns a new linked mesh linked to this MeshAttachment. It will be mapped to an AtlasRegion generated from a Sprite. The AtlasRegion will be mapped to a new Material based on the shader.
-		/// For better caching and batching, use GetLinkedMesh(string, AtlasRegion, bool)</summary>
-		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, Sprite sprite, Shader shader, Material materialPropertySource = null) {
-			var m = new Material(shader);
-			if (materialPropertySource != null) {
-				m.CopyPropertiesFromMaterial(materialPropertySource);
-				m.shaderKeywords = materialPropertySource.shaderKeywords;
-			}
-			return o.GetLinkedMesh(sprite.name, sprite.ToAtlasRegion());
-		}
-
-		/// <summary>
-		/// Returns a new linked mesh linked to this MeshAttachment. It will be mapped to an AtlasRegion generated from a Sprite. The AtlasRegion will be mapped to a new Material based on the shader.
-		/// For better caching and batching, use GetLinkedMesh(string, AtlasRegion, bool)</summary>
-		public static MeshAttachment GetLinkedMesh (this MeshAttachment o, Sprite sprite, Material materialPropertySource) {
-			return o.GetLinkedMesh(sprite, materialPropertySource.shader, materialPropertySource);
-		}
-		#endregion
 
 		#region RemappedClone Convenience Methods
 		/// <summary>
@@ -115,8 +77,7 @@ namespace Spine.Unity.AttachmentTools {
 					return newAttachment;
 				}
 			}
-
-			return o.GetCopy(true); // Non-renderable Attachments will return as normal cloned attachments.
+			return o.Copy();
 		}
 		#endregion
 	}

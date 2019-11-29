@@ -49,7 +49,7 @@ namespace Spine.Unity.Examples {
 			combinedSkin.Clear();
 			foreach (var skinName in skinsToCombine) {
 				var skin = skeleton.Data.FindSkin(skinName);
-				if (skin != null) combinedSkin.AddAttachments(skin);
+				if (skin != null) combinedSkin.AddSkin(skin);
 			}
 
 			skeleton.SetSkin(combinedSkin);

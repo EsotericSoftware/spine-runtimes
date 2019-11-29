@@ -117,8 +117,8 @@ namespace Spine.Unity.Examples {
 			// 				call Skin.GetRepackedSkin to get a cloned skin with cloned attachments that all use one texture.
 			if (repack)	{
 				var repackedSkin = new Skin("repacked skin");
-				repackedSkin.AddAttachments(skeleton.Data.DefaultSkin);
-				repackedSkin.AddAttachments(customSkin);
+				repackedSkin.AddSkin(skeleton.Data.DefaultSkin);
+				repackedSkin.AddSkin(customSkin);
 				repackedSkin = repackedSkin.GetRepackedSkin("repacked skin", sourceMaterial, out runtimeMaterial, out runtimeAtlas);
 				skeleton.SetSkin(repackedSkin);
 			} else {
