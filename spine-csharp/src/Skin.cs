@@ -31,7 +31,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Spine.Collections;
 
 namespace Spine {
 	/// <summary>Stores attachments by slot index and attachment name.
