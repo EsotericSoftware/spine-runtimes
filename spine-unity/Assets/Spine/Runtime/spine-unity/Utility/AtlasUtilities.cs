@@ -219,6 +219,19 @@ namespace Spine.Unity.AttachmentTools {
 		}
 
 		#region Runtime Repacking
+		/// <summary>
+		/// Fills the outputAttachments list with new attachment objects based on the attachments in sourceAttachments,
+		/// but mapped to a new single texture using the same material.</summary>
+		/// <param name="sourceAttachments">The list of attachments to be repacked.</param>
+		/// <param name = "outputAttachments">The List(Attachment) to populate with the newly created Attachment objects.
+		/// May be equal to <c>sourceAttachments</c> for in-place operation.</param>
+		/// <param name="materialPropertySource">May be null. If no Material property source is provided, a material with
+		/// default parameters using the provided <c>shader</c> will be created.</param>
+		/// <param name="additionalTexturePropertyIDsToCopy">Optional additional textures (such as normal maps) to copy while repacking.
+		/// To copy e.g. the main texture and normal maps, pass 'new int[] { Shader.PropertyToID("_BumpMap") }' at this parameter.</param>
+		/// <param name="additionalOutputTextures">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
+		/// this array will be filled with the resulting repacked texture for every property,
+		/// just as the main repacked texture is assigned to <c>outputTexture</c>.</param>
 		public static void GetRepackedAttachments (List<Attachment> sourceAttachments, List<Attachment> outputAttachments, Material materialPropertySource,
 			out Material outputMaterial, out Texture2D outputTexture,
 			int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps,
@@ -236,9 +249,10 @@ namespace Spine.Unity.AttachmentTools {
 		/// Fills the outputAttachments list with new attachment objects based on the attachments in sourceAttachments,
 		/// but mapped to a new single texture using the same material.</summary>
 		/// <param name="sourceAttachments">The list of attachments to be repacked.</param>
-		/// <param name = "outputAttachments">The List(Attachment) to populate with the newly created Attachment objects.</param>
-		///
-		/// <param name="materialPropertySource">May be null. If no Material property source is provided, no special </param>
+		/// <param name = "outputAttachments">The List(Attachment) to populate with the newly created Attachment objects.
+		/// May be equal to <c>sourceAttachments</c> for in-place operation.</param>
+		/// <param name="materialPropertySource">May be null. If no Material property source is provided, a material with
+		/// default parameters using the provided <c>shader</c> will be created.</param>
 		/// <param name="additionalTexturePropertyIDsToCopy">Optional additional textures (such as normal maps) to copy while repacking.
 		/// To copy e.g. the main texture and normal maps, pass 'new int[] { Shader.PropertyToID("_BumpMap") }' at this parameter.</param>
 		/// <param name="additionalOutputTextures">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
@@ -268,8 +282,10 @@ namespace Spine.Unity.AttachmentTools {
 			}
 			var originalRegions = new List<AtlasRegion>();
 
+			if (!object.ReferenceEquals(sourceAttachments, outputAttachments)) {
 				outputAttachments.Clear();
 				outputAttachments.AddRange(sourceAttachments);
+			}
 
 			int newRegionIndex = 0;
 			for (int attachmentIndex = 0, n = sourceAttachments.Count; attachmentIndex < n; attachmentIndex++) {
@@ -398,102 +414,20 @@ namespace Spine.Unity.AttachmentTools {
 			newSkin.bones.AddRange(o.bones);
 			newSkin.constraints.AddRange(o.constraints);
 
-			// Use these to detect and use shared regions.
-			var existingRegions = new Dictionary<AtlasRegion, int>();
-			var regionIndexes = new List<int>();
-
-			// Collect all textures from the attachments of the original skin.
-			var repackedAttachments = new List<Attachment>();
-			int numTextureParamsToRepack = 1 + (additionalTexturePropertyIDsToCopy == null ? 0 : additionalTexturePropertyIDsToCopy.Length);
-			additionalOutputTextures = (additionalTexturePropertyIDsToCopy == null ? null : new Texture2D[additionalTexturePropertyIDsToCopy.Length]);
-			List<Texture2D>[] texturesToPackAtParam = new List<Texture2D>[numTextureParamsToRepack];
-			for (int i = 0; i < numTextureParamsToRepack; ++i) {
-				texturesToPackAtParam[i] = new List<Texture2D>();
+			var originalAttachments = o.Attachments;
+			int attachmentCount = originalAttachments.Count;
+			List<Attachment> inoutAttachments = new List<Attachment>(attachmentCount);
+			foreach (var entry in o.Attachments) {
+				inoutAttachments.Add(entry.attachment);
 			}
-			var originalRegions = new List<AtlasRegion>();
-			int newRegionIndex = 0;
-
-			foreach (var originalSkinEntry in skinAttachments) {
-				var originalAttachment = originalSkinEntry.Attachment;
-
-				if (originalAttachment is IHasRendererObject) {
-					var originalMeshAttachment = originalAttachment as MeshAttachment;
-					Attachment newAttachment = (originalMeshAttachment != null) ? originalMeshAttachment.NewLinkedMesh() : originalAttachment.Copy();
-					var region = ((IHasRendererObject)newAttachment).RendererObject as AtlasRegion;
-					int existingIndex;
-					if (existingRegions.TryGetValue(region, out existingIndex)) {
-						regionIndexes.Add(existingIndex); // Store the region index for the eventual new attachment.
-					} else {
-						originalRegions.Add(region);
-						for (int i = 0; i < numTextureParamsToRepack; ++i) {
-							Texture2D regionTexture = (i == 0 ? region.ToTexture() : region.ToTexture(texturePropertyId : additionalTexturePropertyIDsToCopy[i - 1]));
-							texturesToPackAtParam[i].Add(regionTexture); // Add the texture to the PackTextures argument
-			}
-						existingRegions.Add(region, newRegionIndex); // Add the region to the dictionary of known regions
-						regionIndexes.Add(newRegionIndex); // Store the region index for the eventual new attachment.
-						newRegionIndex++;
-					}
-
-					repackedAttachments.Add(newAttachment);
+			GetRepackedAttachments(inoutAttachments, inoutAttachments, materialPropertySource, out outputMaterial, out outputTexture,
+				maxAtlasSize, padding, textureFormat, mipmaps, newName, clearCache, useOriginalNonrenderables,
+				additionalTexturePropertyIDsToCopy, additionalOutputTextures);
+			int i = 0;
+			foreach (var originalSkinEntry in o.Attachments) {
+				var newAttachment = inoutAttachments[i++];
 				newSkin.SetAttachment(originalSkinEntry.SlotIndex, originalSkinEntry.Name, newAttachment);
-				} else {
-					newSkin.SetAttachment(originalSkinEntry.SlotIndex, originalSkinEntry.Name, useOriginalNonrenderables ? originalAttachment : originalAttachment.Copy());
-				}
 			}
-
-			// Rehydrate the repacked textures as a Material, Spine atlas and Spine.AtlasAttachments
-			var newMaterial = new Material(shader);
-			if (materialPropertySource != null) {
-				newMaterial.CopyPropertiesFromMaterial(materialPropertySource);
-				newMaterial.shaderKeywords = materialPropertySource.shaderKeywords;
-			}
-			newMaterial.name = newName;
-
-			Rect[] rects = null;
-			for (int i = 0; i < numTextureParamsToRepack; ++i) {
-				// Fill a new texture with the collected attachment textures.
-				var newTexture = new Texture2D(maxAtlasSize, maxAtlasSize, textureFormat, mipmaps);
-				newTexture.mipMapBias = AtlasUtilities.DefaultMipmapBias;
-				var texturesToPack = texturesToPackAtParam[i];
-				if (texturesToPack.Count > 0) {
-					var sourceTexture = texturesToPack[0];
-					newTexture.CopyTextureAttributesFrom(sourceTexture);
-				}
-				newTexture.name = newName;
-				var rectsForTexParam = newTexture.PackTextures(texturesToPack.ToArray(), padding, maxAtlasSize);
-				if (i == 0) {
-					rects = rectsForTexParam;
-					newMaterial.mainTexture = newTexture;
-					outputTexture = newTexture;
-				}
-				else {
-					newMaterial.SetTexture(additionalTexturePropertyIDsToCopy[i - 1], newTexture);
-					additionalOutputTextures[i - 1] = newTexture;
-				}
-			}
-
-			var page = newMaterial.ToSpineAtlasPage();
-			page.name = newName;
-
-			var repackedRegions = new List<AtlasRegion>();
-			for (int i = 0, n = originalRegions.Count; i < n; i++) {
-				var oldRegion = originalRegions[i];
-				var newRegion = UVRectToAtlasRegion(rects[i], oldRegion, page);
-				repackedRegions.Add(newRegion);
-			}
-
-			// Map the cloned attachments to the repacked atlas.
-			for (int i = 0, n = repackedAttachments.Count; i < n; i++) {
-				var a = repackedAttachments[i];
-				if (a is IHasRendererObject)
-					a.SetRegion(repackedRegions[regionIndexes[i]]);
-			}
-
-			// Clean up.
-			if (clearCache)
-				AtlasUtilities.ClearCache();
-
-			outputMaterial = newMaterial;
 			return newSkin;
 		}
 
