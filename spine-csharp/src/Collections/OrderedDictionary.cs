@@ -277,6 +277,7 @@ namespace Spine.Collections
 			set {
 				int index;
 				if (dictionary.TryGetValue(key, out index)) {
+					keys[index] = key;
 					values[index] = value;
 				}
 				else {
