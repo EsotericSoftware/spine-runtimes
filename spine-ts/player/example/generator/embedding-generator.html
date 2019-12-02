@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script src="https://esotericsoftware.com/files/spine-player/3.8/codemirror.js"></script>
+	<script src="jscolor.js"></script>
+	<script src="embedding-generator.js"></script>
+	<link rel="stylesheet" href="https://esotericsoftware.com/files/spine-player/3.8/codemirror.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<style>
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	font-family: sans-serif;
+}
+
+#sp_generator_drop_zone {
+	width: 100%;
+	height: 100vh;
+	background: white;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 100vh;
+	border: none;
+	cursor: pointer;
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.sp_generator_hidden {
+	display: none !important;
+}
+
+#sp_generator_editor {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: 100vh;
+}
+
+.sp_generator_tabs {
+	display: flex;
+	flex-direction: row;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	border-bottom: solid 1px #999999;
+}
+
+.sp_generator_tabs > span {
+	padding: 0.5em;
+	cursor: pointer;
+}
+
+.sp_generator_tabs > span:hover {
+	background:orangered;
+}
+
+.sp_generator_selected_tab {
+	border: solid 1px orangered;
+}
+
+.sp_generator_panel {
+	width: 100%;
+	height: 100%;
+}
+
+.sp_generator_panel TABLE TH {
+	text-align: right;
+	vertical-align: top;
+}
+
+.sp_generator_extra {
+	color: #ccc;
+	padding-left: 0.5em;
+}
+
+</style>
+
+<body>
+<div id="sp_generator_drop_zone" class="drop_zone">
+	<span>Choose .skel/.json, .atlas, and .png files, or drop them here.</span>
+	<input id="sp_generator_file_button" class="sp_generator_hidden" type="file" multiple accept=".json,.skel,.atlas,.png"/>
+</div>
+<div id="sp_generator_editor" class="sp_generator_hidden">
+	<div id="sp_generator_player">
+	</div>
+	<div id="sp_generator_config">
+		<div class="sp_generator_tabs">
+			<span class="sp_generator_selected_tab" data-tab="sp_generator_tab_general">General</span>
+			<span data-tab="sp_generator_tab_animations">Animations</span>
+			<span data-tab="sp_generator_tab_viewports">Viewports</span>
+			<span data-tab="sp_generator_tab_skins">Skins</span>
+			<span data-tab="sp_generator_tab_debug">Debug</span>
+		</div>
+		<div id="sp_generator_tab_general" class="sp_generator_panel">
+			<table>
+				<tr>
+					<th>Show controls</th>
+					<td><input id="sp_generator_show_controls" type="checkbox" checked="true"></td>
+				</tr>
+				<tr>
+					<th>Premultiplied alpha</th>
+					<td><input id="sp_generator_premultiplied_alpha" type="checkbox" checked="false"></td>
+				</tr>
+				<tr>
+					<th>Canvas alpha</th>
+					<td><input id="sp_generator_canvas_alpha" value="FF"></td>
+				</tr>
+				<tr>
+					<th>Background color</th>
+					<td><input id="sp_generator_background" class="jscolor {onFineChange:'changeBackgroundColor(this)'}'" value="000000"></td>
+				</tr>
+				<tr>
+					<th>Fullscreen background color</th>
+					<td><input id="sp_generator_background_fullscreen" class="jscolor {onFineChange:'changeFullscreenBackgroundColor(this)'}'" value="000000"></td>
+				</tr>
+				<tr style="vertical-align: top;">
+					<th>Background image</th>
+					<td>
+						<select id="sp_generator_background_image">
+						</select>
+					</td>
+					<td id="sp_generator_background_bounds" class="sp_generator_hidden">
+						<table>
+							<tr>
+								<th>X</th>
+								<td><input id="sp_generator_background_x"></td>
+							</tr>
+							<tr>
+								<th>Y</th>
+								<td><input id="sp_generator_background_y"></td>
+							</tr>
+							<tr>
+								<th>Width</th>
+								<td><input id="sp_generator_background_width"></td>
+							</tr>
+							<tr>
+								<th>Height</th>
+								<td><input id="sp_generator_background_height"></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div id="sp_generator_tab_animations" class="sp_generator_panel sp_generator_hidden">
+			Animations
+		</div>
+		<div id="sp_generator_tab_viewports" class="sp_generator_panel sp_generator_hidden">
+			Viewports
+		</div>
+		<div id="sp_generator_tab_skins" class="sp_generator_panel sp_generator_hidden">
+			Skins
+		</div>
+		<div id="sp_generator_tab_debug" class="sp_generator_panel sp_generator_hidden">
+			Debug
+		</div>
+	</div>
+</div>
+</body>
+</html>
