@@ -297,17 +297,17 @@ namespace Spine.Unity.AttachmentTools {
 					var region = ((IHasRendererObject)newAttachment).RendererObject as AtlasRegion;
 					int existingIndex;
 					if (existingRegions.TryGetValue(region, out existingIndex)) {
-						regionIndexes.Add(existingIndex); // Store the region index for the eventual new attachment.
+						regionIndexes.Add(existingIndex);
 					}
 					else {
 						originalRegions.Add(region);
 						for (int i = 0; i < numTextureParamsToRepack; ++i) {
 							Texture2D regionTexture = (i == 0 ? region.ToTexture() : region.ToTexture(texturePropertyId: additionalTexturePropertyIDsToCopy[i - 1]));
-							texturesToPackAtParam[i].Add(regionTexture); // Add the texture to the PackTextures argument
+							texturesToPackAtParam[i].Add(regionTexture);
 						}
 
-						existingRegions.Add(region, newRegionIndex); // Add the region to the dictionary of known regions
-						regionIndexes.Add(newRegionIndex); // Store the region index for the eventual new attachment.
+						existingRegions.Add(region, newRegionIndex);
+						regionIndexes.Add(newRegionIndex);
 						newRegionIndex++;
 					}
 
