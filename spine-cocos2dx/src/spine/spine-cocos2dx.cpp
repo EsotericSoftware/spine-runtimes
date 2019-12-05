@@ -76,31 +76,63 @@ void Cocos2dAtlasAttachmentLoader::configureAttachment(Attachment* attachment) {
 	}
 }
 
-GLuint wrap (TextureWrap wrap) {
-	return wrap ==  TextureWrap_ClampToEdge ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+#if COCOS2D_VERSION >= 0x0040000
+
+backend::SamplerAddressMode wrap (TextureWrap wrap) {
+	return wrap ==  TextureWrap_ClampToEdge ? backend::SamplerAddressMode::CLAMP_TO_EDGE : backend::SamplerAddressMode::REPEAT;
 }
 
-GLuint filter (TextureFilter filter) {
+backend::SamplerFilter filter (TextureFilter filter) {
 	switch (filter) {
 	case TextureFilter_Unknown:
 		break;
 	case TextureFilter_Nearest:
-		return GL_NEAREST;
+		return backend::SamplerFilter::NEAREST;
 	case TextureFilter_Linear:
-		return GL_LINEAR;
+		return backend::SamplerFilter::LINEAR;
 	case TextureFilter_MipMap:
-		return GL_LINEAR_MIPMAP_LINEAR;
+		return backend::SamplerFilter::LINEAR;
 	case TextureFilter_MipMapNearestNearest:
-		return GL_NEAREST_MIPMAP_NEAREST;
+		return backend::SamplerFilter::NEAREST;
 	case TextureFilter_MipMapLinearNearest:
-		return GL_LINEAR_MIPMAP_NEAREST;
+        return backend::SamplerFilter::NEAREST;
 	case TextureFilter_MipMapNearestLinear:
-		return GL_NEAREST_MIPMAP_LINEAR;
+        return backend::SamplerFilter::LINEAR;
 	case TextureFilter_MipMapLinearLinear:
-		return GL_LINEAR_MIPMAP_LINEAR;
+        return backend::SamplerFilter::LINEAR;
 	}
-	return GL_LINEAR;
+	return backend::SamplerFilter::LINEAR;
 }
+
+#else
+
+GLuint wrap (TextureWrap wrap) {
+    return wrap ==  TextureWrap_ClampToEdge ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+}
+
+GLuint filter (TextureFilter filter) {
+    switch (filter) {
+        case TextureFilter_Unknown:
+            break;
+        case TextureFilter_Nearest:
+            return GL_NEAREST;
+        case TextureFilter_Linear:
+            return GL_LINEAR;
+        case TextureFilter_MipMap:
+            return GL_LINEAR_MIPMAP_LINEAR;
+        case TextureFilter_MipMapNearestNearest:
+            return GL_NEAREST_MIPMAP_NEAREST;
+        case TextureFilter_MipMapLinearNearest:
+            return GL_LINEAR_MIPMAP_NEAREST;
+        case TextureFilter_MipMapNearestLinear:
+            return GL_NEAREST_MIPMAP_LINEAR;
+        case TextureFilter_MipMapLinearLinear:
+            return GL_LINEAR_MIPMAP_LINEAR;
+    }
+    return GL_LINEAR;
+}
+
+#endif
 
 Cocos2dTextureLoader::Cocos2dTextureLoader() : TextureLoader() { }
 Cocos2dTextureLoader::~Cocos2dTextureLoader() { }
@@ -109,8 +141,11 @@ void Cocos2dTextureLoader::load(AtlasPage& page, const spine::String& path) {
 	Texture2D* texture = Director::getInstance()->getTextureCache()->addImage(path.buffer());
 	CCASSERT(texture != nullptr, "Invalid image");
 	texture->retain();
-	
-	Texture2D::TexParams textureParams = {filter(page.minFilter), filter(page.magFilter), wrap(page.uWrap), wrap(page.vWrap)};
+#if COCOS2D_VERSION >= 0x0040000
+	Texture2D::TexParams textureParams(filter(page.minFilter), filter(page.magFilter), wrap(page.uWrap), wrap(page.vWrap));
+#else
+    Texture2D::TexParams textureParams = {filter(page.minFilter), filter(page.magFilter), wrap(page.uWrap), wrap(page.vWrap)};
+#endif
 	texture->setTexParameters(textureParams);
 	
 	page.setRendererObject(texture);
@@ -148,3 +183,4 @@ char *Cocos2dExtension::_readFile(const spine::String &path, int *length) {
 SpineExtension *spine::getDefaultExtension () {
 	return new Cocos2dExtension();
 }
+
