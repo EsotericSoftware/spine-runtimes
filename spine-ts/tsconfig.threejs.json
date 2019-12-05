@@ -6,16 +6,16 @@
 		"preserveConstEnums": true,
 		"outFile": "build/spine-threejs.js",
 		"sourceMap": true,
-		"declaration": true
+		"declaration": true,
 	},
 	"include": [
-		"core/src/**/*",		
+		"core/src/**/*",
 		"threejs/src/**/*"
 	],
 	"exclude": [
 		"canvas",
 		"webgl",
 		"widget",
-		"build"	 
+		"build"
 	]
 }
