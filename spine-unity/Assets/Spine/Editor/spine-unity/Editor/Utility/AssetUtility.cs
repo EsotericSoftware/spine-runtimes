@@ -243,7 +243,7 @@ namespace Spine.Unity.Editor {
 		}
 #endregion
 
-		public static void ImportSpineContent (string[] imported, List<string> texturesWithoutMetaFile, 
+		public static void ImportSpineContent (string[] imported, List<string> texturesWithoutMetaFile,
 			bool reimport = false) {
 
 			var atlasPaths = new List<string>();
@@ -290,6 +290,8 @@ namespace Spine.Unity.Editor {
 				AtlasAssetBase atlas = IngestSpineAtlas(atlasText, texturesWithoutMetaFile);
 				atlases.Add(atlas);
 			}
+
+			AddDependentSkeletonIfAtlasChanged(skeletonPaths, atlasPaths);
 
 			// Import skeletons and match them with atlases.
 			bool abortSkeletonImport = false;
@@ -352,6 +354,21 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
+		static void AddDependentSkeletonIfAtlasChanged(List<PathAndProblemInfo> skeletonPaths, List<string> atlasPaths) {
+			foreach (var atlasPath in atlasPaths) {
+				string skeletonPathJson = atlasPath.Replace(".atlas.txt", ".json");
+				string skeletonPathBinary =  atlasPath.Replace(".atlas.txt", ".skel.bytes");
+				string usedSkeletonPath = System.IO.File.Exists(skeletonPathJson) ? skeletonPathJson :
+										System.IO.File.Exists(skeletonPathBinary) ? skeletonPathBinary : null;
+				if (usedSkeletonPath == null)
+					continue;
+
+				if (skeletonPaths.FindIndex(p => { return p.Key == usedSkeletonPath; } ) < 0) {
+					skeletonPaths.Add(new PathAndProblemInfo(usedSkeletonPath, null));
+				}
+			}
+		}
+
 		static void ReloadSkeletonData (string skeletonJSONPath, CompatibilityProblemInfo compatibilityProblemInfo) {
 			string dir = Path.GetDirectoryName(skeletonJSONPath).Replace('\\', '/');
 			TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonJSONPath);
@@ -372,7 +389,7 @@ namespace Spine.Unity.Editor {
 							return;
 						}
 
-						Debug.LogFormat("Changes to '{0}' detected. Clearing SkeletonDataAsset: {1}", skeletonJSONPath, localPath);
+						Debug.LogFormat("Changes to '{0}' or atlas detected. Clearing SkeletonDataAsset: {1}", skeletonJSONPath, localPath);
 						skeletonDataAsset.Clear();
 
 						string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(skeletonDataAsset));
@@ -592,7 +609,7 @@ namespace Spine.Unity.Editor {
 				AssetDatabase.CreateAsset(skeletonDataAsset, filePath);
 			}
 			EditorUtility.SetDirty(skeletonDataAsset);
-			
+
 			SkeletonDataCompatibility.DisplayCompatibilityProblem(compatibilityProblemInfo.DescriptionString(), spineJson);
 			return skeletonDataAsset;
 		}
