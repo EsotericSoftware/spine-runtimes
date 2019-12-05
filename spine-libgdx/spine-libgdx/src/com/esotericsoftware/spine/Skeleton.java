@@ -294,8 +294,11 @@ public class Skeleton {
 	}
 
 	private void sortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
-		for (SkinEntry entry : skin.attachments.orderedItems())
-			if (entry.getSlotIndex() == slotIndex) sortPathConstraintAttachment(entry.getAttachment(), slotBone);
+		Object[] entries = skin.attachments.orderedItems().items;
+		for (int i = 0, n = skin.attachments.size; i < n; i++) {
+			SkinEntry entry = (SkinEntry)entries[i];
+			if (entry.slotIndex == slotIndex) sortPathConstraintAttachment(entry.attachment, slotBone);
+		}
 	}
 
 	private void sortPathConstraintAttachment (Attachment attachment, Bone slotBone) {

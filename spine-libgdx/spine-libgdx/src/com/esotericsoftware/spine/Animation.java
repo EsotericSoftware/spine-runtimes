@@ -65,8 +65,8 @@ public class Animation {
 		this.timelines = timelines;
 
 		timelineIds.clear();
-		for (Timeline timeline : timelines)
-			timelineIds.addAll(timeline.getPropertyIds());
+		for (int i = 0, n = timelines.size; i < n; i++)
+			timelineIds.addAll(timelines.get(i).getPropertyIds());
 	}
 
 	/** Returns true if this animation contains a timeline with any of the specified property IDs. **/
