@@ -44,7 +44,7 @@ public class Skin {
 	final OrderedSet<SkinEntry> attachments = new OrderedSet();
 	final Array<BoneData> bones = new Array(0);
 	final Array<ConstraintData> constraints = new Array(0);
-	private final SkinEntry lookup = new SkinEntry();
+	private final SkinEntry lookup = new SkinEntry(0, "", null);
 
 	public Skin (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
@@ -54,10 +54,9 @@ public class Skin {
 
 	/** Adds an attachment to the skin for the specified slot index and name. */
 	public void setAttachment (int slotIndex, String name, Attachment attachment) {
-		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 		if (attachment == null) throw new IllegalArgumentException("attachment cannot be null.");
-		SkinEntry newEntry = new SkinEntry(slotIndex, name, attachment);
-		if (!attachments.add(newEntry)) attachments.get(newEntry).attachment = attachment;
+		SkinEntry entry = new SkinEntry(slotIndex, name, attachment);
+		if (!attachments.add(entry)) attachments.get(entry).attachment = attachment;
 	}
 
 	/** Adds all attachments, bones, and constraints from the specified skin to this skin. */
@@ -95,7 +94,6 @@ public class Skin {
 
 	/** Returns the attachment for the specified slot index and name, or null. */
 	public Attachment getAttachment (int slotIndex, String name) {
-		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 		lookup.set(slotIndex, name);
 		SkinEntry entry = attachments.get(lookup);
 		return entry != null ? entry.attachment : null;
@@ -103,7 +101,6 @@ public class Skin {
 
 	/** Removes the attachment in the skin for the specified slot index and name, if any. */
 	public void removeAttachment (int slotIndex, String name) {
-		if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 		lookup.set(slotIndex, name);
 		attachments.remove(lookup);
 	}
@@ -164,16 +161,14 @@ public class Skin {
 		Attachment attachment;
 		private int hashCode;
 
-		SkinEntry () {
-			set(0, "");
-		}
-
+		/** @param attachment May be null. */
 		SkinEntry (int slotIndex, String name, Attachment attachment) {
 			set(slotIndex, name);
 			this.attachment = attachment;
 		}
 
 		void set (int slotIndex, String name) {
+			if (slotIndex < 0) throw new IllegalArgumentException("slotIndex must be >= 0.");
 			if (name == null) throw new IllegalArgumentException("name cannot be null.");
 			this.slotIndex = slotIndex;
 			this.name = name;
