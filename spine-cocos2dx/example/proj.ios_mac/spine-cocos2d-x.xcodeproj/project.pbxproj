@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1AC6FB21180E996B004C840B /* libcocos2d Mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AC6FAF9180E9839004C840B /* libcocos2d Mac.a */; };
-		1AC6FB30180E99EB004C840B /* libcocos2d iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1AC6FB07180E9839004C840B /* libcocos2d iOS.a */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
@@ -168,6 +166,10 @@
 		763105D820BC1B9700927A1E /* Updatable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A520BC1B5600927A1E /* Updatable.cpp */; };
 		763105D920BC1B9700927A1E /* VertexAttachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7631049220BC1B5500927A1E /* VertexAttachment.cpp */; };
 		763105DA20BC1B9700927A1E /* VertexEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104AE20BC1B5800927A1E /* VertexEffect.cpp */; };
+		764DA17E239AB03500B941CC /* libcocos2d Mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 764DA178239AAFA000B941CC /* libcocos2d Mac.a */; };
+		764DA17F239AB03E00B941CC /* libcocos2d iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 764DA17A239AAFA000B941CC /* libcocos2d iOS.a */; };
+		76967697239AACD9006D2DDB /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76967695239AACD9006D2DDB /* Metal.framework */; };
+		76967698239AACD9006D2DDB /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76967696239AACD9006D2DDB /* MetalKit.framework */; };
 		76AAA3C01D180F7C00C54FCB /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B31D180F7C00C54FCB /* AppDelegate.cpp */; };
 		76AAA3C11D180F7C00C54FCB /* BatchingExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B61D180F7C00C54FCB /* BatchingExample.cpp */; };
 		76AAA3C21D180F7C00C54FCB /* GoblinsExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B81D180F7C00C54FCB /* GoblinsExample.cpp */; };
@@ -227,35 +229,21 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		1AC6FAF8180E9839004C840B /* PBXContainerItemProxy */ = {
+		764DA177239AAFA000B941CC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1AC6FAE5180E9839004C840B /* cocos2d_libs.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 1551A33F158F2AB200E66CFE;
-			remoteInfo = "cocos2dx Mac";
+			remoteInfo = "libcocos2d Mac";
 		};
-		1AC6FB06180E9839004C840B /* PBXContainerItemProxy */ = {
+		764DA179239AAFA000B941CC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1AC6FAE5180E9839004C840B /* cocos2d_libs.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = A07A4D641783777C0073F6A7;
-			remoteInfo = "cocos2dx iOS";
+			remoteInfo = "libcocos2d iOS";
 		};
-		1AC6FB15180E9959004C840B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 1AC6FAE5180E9839004C840B /* cocos2d_libs.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 1551A33E158F2AB200E66CFE;
-			remoteInfo = "cocos2dx Mac";
-		};
-		1AC6FB24180E99E1004C840B /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 1AC6FAE5180E9839004C840B /* cocos2d_libs.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = A07A4C241783777C0073F6A7;
-			remoteInfo = "cocos2dx iOS";
-		};
-		76AAA3B01D180F5D00C54FCB /* PBXContainerItemProxy */ = {
+		764DA17B239AAFA000B941CC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1AC6FAE5180E9839004C840B /* cocos2d_libs.xcodeproj */;
 			proxyType = 2;
@@ -368,6 +356,14 @@
 		763104C020BC1B5E00927A1E /* SkeletonBounds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonBounds.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/SkeletonBounds.cpp"; sourceTree = "<group>"; };
 		763104C120BC1B5E00927A1E /* ShearTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShearTimeline.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/ShearTimeline.cpp"; sourceTree = "<group>"; };
 		763104C220BC1B5E00927A1E /* TranslateTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TranslateTimeline.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/TranslateTimeline.cpp"; sourceTree = "<group>"; };
+		76967695239AACD9006D2DDB /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		76967696239AACD9006D2DDB /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		7696769A239AAE57006D2DDB /* libBulletMultiThreaded.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libBulletMultiThreaded.a; path = ../cocos2d/external/bullet/prebuilt/mac/libBulletMultiThreaded.a; sourceTree = "<group>"; };
+		769676B0239AAE57006D2DDB /* libBulletDynamics.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libBulletDynamics.a; path = ../cocos2d/external/bullet/prebuilt/mac/libBulletDynamics.a; sourceTree = "<group>"; };
+		769676B1239AAE57006D2DDB /* libMiniCL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMiniCL.a; path = ../cocos2d/external/bullet/prebuilt/mac/libMiniCL.a; sourceTree = "<group>"; };
+		769676B2239AAE57006D2DDB /* libBulletCollision.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libBulletCollision.a; path = ../cocos2d/external/bullet/prebuilt/mac/libBulletCollision.a; sourceTree = "<group>"; };
+		769676B3239AAE57006D2DDB /* libLinearMath.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libLinearMath.a; path = ../cocos2d/external/bullet/prebuilt/mac/libLinearMath.a; sourceTree = "<group>"; };
+		769676B4239AAE6D006D2DDB /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = ../cocos2d/external/freetype2/prebuilt/mac/libfreetype.a; sourceTree = "<group>"; };
 		76AAA3B31D180F7C00C54FCB /* AppDelegate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AppDelegate.cpp; sourceTree = "<group>"; };
 		76AAA3B41D180F7C00C54FCB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		76AAA3B51D180F7C00C54FCB /* AppMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppMacros.h; sourceTree = "<group>"; };
@@ -424,10 +420,10 @@
 				7602C5551D7DAA1300C7C674 /* CoreText.framework in Frameworks */,
 				ED545A7C1B68A1F400C3958E /* libiconv.dylib in Frameworks */,
 				52B47A471A53D09C004E4C60 /* Security.framework in Frameworks */,
-				1AC6FB30180E99EB004C840B /* libcocos2d iOS.a in Frameworks */,
 				D6B0611B1803AB670077942B /* CoreMotion.framework in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
+				764DA17F239AB03E00B941CC /* libcocos2d iOS.a in Frameworks */,
 				288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */,
 				BF171245129291EC00B8313A /* OpenGLES.framework in Frameworks */,
 				BF1712471292920000B8313A /* libz.dylib in Frameworks */,
@@ -443,8 +439,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				ED545A7E1B68A1FA00C3958E /* libiconv.dylib in Frameworks */,
-				1AC6FB21180E996B004C840B /* libcocos2d Mac.a in Frameworks */,
+				76967697239AACD9006D2DDB /* Metal.framework in Frameworks */,
+				76967698239AACD9006D2DDB /* MetalKit.framework in Frameworks */,
 				5087E76717EB910900C73F5D /* libz.dylib in Frameworks */,
+				764DA17E239AB03500B941CC /* libcocos2d Mac.a in Frameworks */,
 				8262943E1AAF051F00CB7CF7 /* Security.framework in Frameworks */,
 				503AE11B17EB9C5A00D1A890 /* IOKit.framework in Frameworks */,
 				5087E78B17EB975400C73F5D /* OpenGL.framework in Frameworks */,
@@ -484,16 +482,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		1AC6FAE6180E9839004C840B /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				1AC6FAF9180E9839004C840B /* libcocos2d Mac.a */,
-				1AC6FB07180E9839004C840B /* libcocos2d iOS.a */,
-				76AAA3B11D180F5D00C54FCB /* libcocos2d tvOS.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
@@ -513,6 +501,14 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				769676B4239AAE6D006D2DDB /* libfreetype.a */,
+				769676B2239AAE57006D2DDB /* libBulletCollision.a */,
+				769676B0239AAE57006D2DDB /* libBulletDynamics.a */,
+				7696769A239AAE57006D2DDB /* libBulletMultiThreaded.a */,
+				769676B3239AAE57006D2DDB /* libLinearMath.a */,
+				769676B1239AAE57006D2DDB /* libMiniCL.a */,
+				76967695239AACD9006D2DDB /* Metal.framework */,
+				76967696239AACD9006D2DDB /* MetalKit.framework */,
 				7602C5541D7DAA1300C7C674 /* CoreText.framework */,
 				ED545A7D1B68A1FA00C3958E /* libiconv.dylib */,
 				ED545A7B1B68A1F400C3958E /* libiconv.dylib */,
@@ -617,6 +613,16 @@
 			name = Icons;
 			path = ios;
 			sourceTree = SOURCE_ROOT;
+		};
+		764DA172239AAFA000B941CC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				764DA178239AAFA000B941CC /* libcocos2d Mac.a */,
+				764DA17A239AAFA000B941CC /* libcocos2d iOS.a */,
+				764DA17C239AAFA000B941CC /* libcocos2d tvOS.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
 		};
 		76AAA3B21D180F7300C54FCB /* spine */ = {
 			isa = PBXGroup;
@@ -741,7 +747,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				1AC6FB25180E99E1004C840B /* PBXTargetDependency */,
 			);
 			name = "spine-cocos2d-x-mobile";
 			productName = iphone;
@@ -759,7 +764,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				1AC6FB16180E9959004C840B /* PBXTargetDependency */,
 			);
 			name = "spine-cocos2d-x-desktop";
 			productName = iphone;
@@ -788,7 +792,7 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 1AC6FAE6180E9839004C840B /* Products */;
+					ProductGroup = 764DA172239AAFA000B941CC /* Products */;
 					ProjectRef = 1AC6FAE5180E9839004C840B /* cocos2d_libs.xcodeproj */;
 				},
 			);
@@ -801,25 +805,25 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		1AC6FAF9180E9839004C840B /* libcocos2d Mac.a */ = {
+		764DA178239AAFA000B941CC /* libcocos2d Mac.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = "libcocos2d Mac.a";
-			remoteRef = 1AC6FAF8180E9839004C840B /* PBXContainerItemProxy */;
+			remoteRef = 764DA177239AAFA000B941CC /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		1AC6FB07180E9839004C840B /* libcocos2d iOS.a */ = {
+		764DA17A239AAFA000B941CC /* libcocos2d iOS.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = "libcocos2d iOS.a";
-			remoteRef = 1AC6FB06180E9839004C840B /* PBXContainerItemProxy */;
+			remoteRef = 764DA179239AAFA000B941CC /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		76AAA3B11D180F5D00C54FCB /* libcocos2d tvOS.a */ = {
+		764DA17C239AAFA000B941CC /* libcocos2d tvOS.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = "libcocos2d tvOS.a";
-			remoteRef = 76AAA3B01D180F5D00C54FCB /* PBXContainerItemProxy */;
+			remoteRef = 764DA17B239AAFA000B941CC /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -1049,19 +1053,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXTargetDependency section */
-		1AC6FB16180E9959004C840B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "cocos2dx Mac";
-			targetProxy = 1AC6FB15180E9959004C840B /* PBXContainerItemProxy */;
-		};
-		1AC6FB25180E99E1004C840B /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "cocos2dx iOS";
-			targetProxy = 1AC6FB24180E99E1004C840B /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin XCBuildConfiguration section */
 		1D6058940D05DD3E006BFB54 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -1082,7 +1073,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = ios/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = (
 					"$(_COCOS_LIB_IOS_BEGIN)",
@@ -1112,7 +1103,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = ios/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = (
 					"$(_COCOS_LIB_IOS_BEGIN)",
@@ -1203,9 +1194,10 @@
 					"$(SRCROOT)/../cocos2d/external/chipmunk/include/chipmunk",
 					"$(SRCROOT)/../../../spine-cpp/spine-cpp/include",
 					"$(SRCROOT)/../../src",
+					"$(SRCROOT)/../cocos2d/external/xxhash",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
@@ -1228,9 +1220,10 @@
 					"$(SRCROOT)/../cocos2d/external/chipmunk/include/chipmunk",
 					"$(SRCROOT)/../../../spine-cpp/spine-cpp/include",
 					"$(SRCROOT)/../../src",
+					"$(SRCROOT)/../cocos2d/external/xxhash",
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
