@@ -32,13 +32,13 @@
 #include <vector>
 #include <string>
 
+#include <spine/spine-cocos2dx.h>
 #include "RaptorExample.h"
 #include "BatchingExample.h"
 #include "CoinExample.h"
 #include "SkeletonRendererSeparatorExample.h"
 #include <spine/Debug.h>
 #include "AppMacros.h"
-#include <spine/SkeletonTwoColorBatch.h>
 
 USING_NS_CC;
 using namespace std;

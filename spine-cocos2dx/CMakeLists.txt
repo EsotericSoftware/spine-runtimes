@@ -42,44 +42,6 @@ if (NOT EXISTS ${EXAMPLE_DIR}/cocos2d)
 		COMMAND ${CMAKE_COMMAND} -E remove_directory "${EXAMPLE_DIR}/cocos2d/cocos/editor-support/spine"
 		COMMAND ${CMAKE_COMMAND} -E make_directory "${EXAMPLE_DIR}/cocos2d/cocos/editor-support/spine"
 	)
-	# collect source code path
-	file(GLOB_RECURSE  SPINE_CPP_SRC "../spine-cpp/spine-cpp/*.cpp" "../spine-cpp/spine-cpp/*.c" "../spine-cpp/spine-cpp/*.h")
-	file(GLOB SPINE_COCOS2D "src/spine/*.cpp" "src/spine/*.c" "src/spine/*.h")
-	file(GLOB SPINE_COCOS2D_VERSION_SPECIFIC "src/spine/${COCOS_SHORT_VERSION}/*.cpp" "src/spine/${COCOS_SHORT_VERSION}/*.h")
-
-	# copy to cocos2d-x folder
-	file(COPY ${SPINE_CPP_SRC} DESTINATION "${EXAMPLE_DIR}/cocos2d/cocos/editor-support/spine")
-	file(COPY ${SPINE_COCOS2D} DESTINATION "${EXAMPLE_DIR}/cocos2d/cocos/editor-support/spine")
-	file(COPY ${SPINE_COCOS2D_VERSION_SPECIFIC} DESTINATION "${EXAMPLE_DIR}/cocos2d/cocos/editor-support/spine/")
-
-
-	# collect information to generate cocos2d/cocos/editor-support/spine/CMakeLists.txt
-	file(GLOB SPINE_COCOS2DX_H RELATIVE "${EXAMPLE_DIR}/cocos2d/cocos" "${EXAMPLE_DIR}/cocos2d/cocos/editor-support/spine/*.h")
-	file(GLOB SPINE_COCOS2DX_CPP RELATIVE "${EXAMPLE_DIR}/cocos2d/cocos" "${EXAMPLE_DIR}/cocos2d/cocos/editor-support/spine/*.cpp")
-
-	set(BUILD_CFG_CMAKE "${EXAMPLE_DIR}/cocos2d/cocos/editor-support/spine/CMakeLists.txt")
-
-	# concat list to string
-	set(SRC_HEADER_LIST "")
-	foreach(header ${SPINE_COCOS2DX_H})
-		set(SRC_HEADER_LIST "${SRC_HEADER_LIST}    ${header}\n")
-	endforeach()
-	
-	set(SRC_SOURCE_LIST "")
-	foreach(src ${SPINE_COCOS2DX_CPP})
-		set(SRC_SOURCE_LIST "${SRC_SOURCE_LIST}    ${src}\n")
-	endforeach()
-	
-	# write content into CMakeLists.txt
-	file(WRITE ${BUILD_CFG_CMAKE} "include_directories(editor-support)")
-	file(APPEND ${BUILD_CFG_CMAKE} "\n")
-	file(APPEND ${BUILD_CFG_CMAKE} "\n")
-	file(APPEND ${BUILD_CFG_CMAKE} "set(COCOS_SPINE_HEADER \n${SRC_HEADER_LIST})")
-	file(APPEND ${BUILD_CFG_CMAKE} "\n")
-	file(APPEND ${BUILD_CFG_CMAKE} "\n")
-	file(APPEND ${BUILD_CFG_CMAKE} "set(COCOS_SPINE_SRC \n${SRC_SOURCE_LIST})")
-	file(APPEND ${BUILD_CFG_CMAKE} "\n")
-
 else()
 	message(STATUS "${EXAMPLE_DIR}/cocos2d is already exists, current version ${COCOS_SHORT_VERSION}.")
 endif()

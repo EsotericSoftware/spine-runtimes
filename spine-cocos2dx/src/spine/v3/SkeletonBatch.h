@@ -30,8 +30,10 @@
 #ifndef SPINE_SKELETONBATCH_H_
 #define SPINE_SKELETONBATCH_H_
 
-#include <spine/spine.h>
 #include "cocos2d.h"
+#if COCOS2D_VERSION < 0x00040000
+
+#include <spine/spine.h>
 #include <vector>
 
 namespace spine {
@@ -71,5 +73,7 @@ namespace spine {
     };
 	
 }
+
+#endif
 
 #endif // SPINE_SKELETONBATCH_H_
