@@ -297,12 +297,8 @@ namespace Spine.Unity {
 
 			// Clear
 			{
-				if (meshFilter != null)
-					meshFilter.sharedMesh = null;
-
-				meshRenderer = GetComponent<MeshRenderer>();
-				if (meshRenderer != null && meshRenderer.enabled) meshRenderer.sharedMaterial = null;
-
+				// Note: do not reset meshFilter.sharedMesh or meshRenderer.sharedMaterial to null,
+				// otherwise constant reloading will be triggered at prefabs.
 				currentInstructions.Clear();
 				rendererBuffers.Clear();
 				meshGenerator.Begin();
@@ -352,6 +348,15 @@ namespace Spine.Unity {
 		public virtual void LateUpdate () {
 			if (!valid) return;
 
+			#if UNITY_EDITOR && NEW_PREFAB_SYSTEM
+			// Don't store mesh or material at the prefab, otherwise it will permanently reload
+			var prefabType = UnityEditor.PrefabUtility.GetPrefabAssetType(this);
+			if (!UnityEditor.PrefabUtility.IsPartOfPrefabInstance(this) &&
+				(prefabType == UnityEditor.PrefabAssetType.Regular || prefabType == UnityEditor.PrefabAssetType.Variant)) {
+				return;
+			}
+			#endif
+
 			#if SPINE_OPTIONAL_RENDEROVERRIDE
 			bool doMeshOverride = generateMeshOverride != null;
 			if ((!meshRenderer.enabled)	&& !doMeshOverride) return;
@@ -397,17 +402,17 @@ namespace Spine.Unity {
 				MeshGenerator.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, customSlotMaterials, separatorSlots, doMeshOverride, this.immutableTriangles);
 
 				// STEP 1.9. Post-process workingInstructions. ==================================================================================
-				#if SPINE_OPTIONAL_MATERIALOVERRIDE
+#if SPINE_OPTIONAL_MATERIALOVERRIDE
 				if (customMaterialOverride.Count > 0) // isCustomMaterialOverridePopulated
 					MeshGenerator.TryReplaceMaterials(workingSubmeshInstructions, customMaterialOverride);
-				#endif
+#endif
 
-				#if SPINE_OPTIONAL_RENDEROVERRIDE
+#if SPINE_OPTIONAL_RENDEROVERRIDE
 				if (doMeshOverride) {
 					this.generateMeshOverride(currentInstructions);
 					if (disableRenderingOnOverride) return;
 				}
-				#endif
+#endif
 
 				updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, currentSmartMesh.instructionUsed);
 
@@ -444,7 +449,7 @@ namespace Spine.Unity {
 			}
 			if (materialsChanged && (this.maskMaterials.AnyMaterialCreated)) {
 				this.maskMaterials = new SpriteMaskInteractionMaterials();
-			}	
+			}
 
 			meshGenerator.FillLateVertexData(currentMesh);
 
