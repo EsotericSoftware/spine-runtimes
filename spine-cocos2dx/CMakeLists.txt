@@ -9,6 +9,7 @@ if(USE_COCOS2DX_V4)
 	set(COCOS_FOLDER_NAME "cocos2d-x-4.0")
 	set(COCOS_DOWNLOAD_URL "https://download.cocos.com/Cocos2D-X/${COCOS_FOLDER_NAME}.zip")
 	set(COCOS_SHORT_VERSION "v4")
+	set(EXAMPLE_DIR "${CMAKE_CURRENT_LIST_DIR}/example-v4")
 else()
 	set(COCOS_FOLDER_NAME "cocos2d-x-3.17.2")
 	set(COCOS_DOWNLOAD_URL "http://download.cocos.com/Cocos2D-X/${COCOS_FOLDER_NAME}.zip")
@@ -51,37 +52,6 @@ if (NOT EXISTS ${EXAMPLE_DIR}/cocos2d)
 		COMMAND ${CMAKE_COMMAND} -E remove_directory "${EXAMPLE_DIR}/cocos2d/cocos/editor-support/spine"
 		COMMAND ${CMAKE_COMMAND} -E make_directory "${EXAMPLE_DIR}/cocos2d/cocos/editor-support/spine"
 	)
-	# collect source code path
-	file(GLOB_RECURSE SPINE_CPP_SRC "../spine-cpp/spine-cpp/*.cpp" "../spine-cpp/spine-cpp/*.c" "../spine-cpp/spine-cpp/*.h")
-	file(GLOB_RECURSE SPINE_COCOS2D "src/spine/*.cpp" "src/spine/*.c" "src/spine/*.h")
-
-
-	set(BUILD_CFG_CMAKE "${EXAMPLE_DIR}/cocos2d/cocos/editor-support/spine/CMakeLists.txt")
-
-	# concat list to string
-	set(SRC_HEADER_LIST "")
-
-	set(SRC_SOURCE_LIST "")
-	foreach(src ${SPINE_CPP_SRC} ${SPINE_COCOS2D})
-		file(RELATIVE_PATH relpath "${EXAMPLE_DIR}/cocos2d/cocos" "${src}")
-		get_filename_component(ext_name "${src}" EXT)
-		if("${ext_name}" STREQUAL ".h")
-			set(SRC_HEADER_LIST "${SRC_HEADER_LIST}    \"${relpath}\"\n")
-		else()
-			set(SRC_SOURCE_LIST "${SRC_SOURCE_LIST}    \"${relpath}\"\n")
-		endif()
-	endforeach()
-
-	# write content into CMakeLists.txt
-	file(WRITE ${BUILD_CFG_CMAKE} "include_directories(editor-support)")
-	file(APPEND ${BUILD_CFG_CMAKE} "\n")
-	file(APPEND ${BUILD_CFG_CMAKE} "\n")
-	file(APPEND ${BUILD_CFG_CMAKE} "set(COCOS_SPINE_HEADER \n${SRC_HEADER_LIST})")
-	file(APPEND ${BUILD_CFG_CMAKE} "\n")
-	file(APPEND ${BUILD_CFG_CMAKE} "\n")
-	file(APPEND ${BUILD_CFG_CMAKE} "set(COCOS_SPINE_SRC \n${SRC_SOURCE_LIST})")
-	file(APPEND ${BUILD_CFG_CMAKE} "\n")
-
 else()
 	message(STATUS "${EXAMPLE_DIR}/cocos2d is already exists, current version ${COCOS_SHORT_VERSION}.")
 endif()
