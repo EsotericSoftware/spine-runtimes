@@ -101,7 +101,6 @@ namespace spine {
 		cocos2d::BlendFunc  _blendType;
 		TwoColorTriangles   _triangles;
 		cocos2d::Mat4       _mv;
-		GLuint              _alphaTextureID;
 		bool                _forceFlush;
 	};
 
@@ -148,7 +147,6 @@ namespace spine {
 		
 		
 		// VBO handles & attribute locations
-		GLuint _vertexBufferHandle;
 		V3F_C4B_C4B_T2F* _vertexBuffer;
 		uint32_t _numVerticesBuffer;
         uint32_t _numIndicesBuffer;
