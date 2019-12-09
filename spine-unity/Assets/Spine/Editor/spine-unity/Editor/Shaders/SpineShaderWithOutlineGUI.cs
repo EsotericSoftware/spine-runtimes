@@ -76,16 +76,20 @@ public class SpineShaderWithOutlineGUI : ShaderGUI {
 	#region Virtual Interface
 
 	protected virtual void FindProperties (MaterialProperty[] props) {
-		_OutlineWidth = FindProperty("_OutlineWidth", props);
-		_OutlineReferenceTexWidth = FindProperty("_OutlineReferenceTexWidth", props);
-		_OutlineColor = FindProperty("_OutlineColor", props);
-		_ThresholdEnd = FindProperty("_ThresholdEnd", props);
-		_OutlineSmoothness = FindProperty("_OutlineSmoothness", props);
-		_Use8Neighbourhood = FindProperty("_Use8Neighbourhood", props);
-		_OutlineMipLevel = FindProperty("_OutlineMipLevel", props);
+
+		_OutlineWidth = FindProperty("_OutlineWidth", props, false);
+		_OutlineReferenceTexWidth = FindProperty("_OutlineReferenceTexWidth", props, false);
+		_OutlineColor = FindProperty("_OutlineColor", props, false);
+		_ThresholdEnd = FindProperty("_ThresholdEnd", props, false);
+		_OutlineSmoothness = FindProperty("_OutlineSmoothness", props, false);
+		_Use8Neighbourhood = FindProperty("_Use8Neighbourhood", props, false);
+		_OutlineMipLevel = FindProperty("_OutlineMipLevel", props, false);
 	}
 
 	protected virtual void RenderOutlineProperties () {
+
+		if (_OutlineWidth == null)
+			return; // not an outline shader
 
 		// Use default labelWidth
 		EditorGUIUtility.labelWidth = 0f;
