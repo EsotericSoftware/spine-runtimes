@@ -44,7 +44,16 @@ set(BUILD_JS_LIBS OFF CACHE BOOL "turn off build js related targets")
 
 
 set(BUILD_EDITOR_SPINE ON CACHE BOOL "enable spine")
+
+include_directories(
+  ${CMAKE_CURRENT_LIST_DIR}/../../spine-cpp/spine-cpp/include
+  ${CMAKE_CURRENT_LIST_DIR}/../src
+)
+
 add_subdirectory(${COCOS2D_ROOT})
+
+get_target_property(COCOS2D_X_VERSION cocos2d VERSION)
+set(COCOS2DX_ROOT_PATH ${COCOS2D_ROOT})
 
 # Some macro definitions
 # if(WINDOWS)
@@ -151,10 +160,13 @@ endif()
 target_include_directories(${APP_NAME} PRIVATE Classes)
 target_link_libraries(${APP_NAME} cocos2d)
 
-set(APP_RES_DIR "$<TARGET_FILE_DIR:${APP_NAME}>/Resources")
-
 setup_cocos_app_config(${APP_NAME})
 
+if(COMMAND cocos_get_resource_path)
+  cocos_get_resource_path(APP_RES_DIR ${APP_NAME})
+else()
+  set(APP_RES_DIR "$<TARGET_FILE_DIR:${APP_NAME}>/Resources")
+endif()
 
 if(APPLE)
   set_target_properties(${APP_NAME} PROPERTIES RESOURCE "${API_UI_RES}")
@@ -174,9 +186,15 @@ elseif(WINDOWS)
 endif()
 
 if(LINUX OR WINDOWS)
-  if(COMMAND cocos_copy_res)
-    cocos_copy_res(COPY_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
+  if("${COCOS2D_X_VERSION}" VERSION_LESS "4.0")
+    message(STATUS "APP_RES_DIR[${COCOS2D_X_VERSION}<4.0] ${APP_RES_DIR}")
+    if(COMMAND cocos_copy_res)
+      cocos_copy_res(COPY_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
+    else()
+      cocos_copy_target_res(${APP_NAME} COPY_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
+    endif()
   else()
-    cocos_copy_target_res(${APP_NAME} COPY_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
+    message(STATUS "APP_RES_DIR ${APP_RES_DIR}")
+    cocos_copy_target_res(${APP_NAME} LINK_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
   endif()
 endif()

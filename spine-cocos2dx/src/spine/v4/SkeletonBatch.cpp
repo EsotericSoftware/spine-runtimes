@@ -59,20 +59,30 @@ void SkeletonBatch::destroyInstance () {
 
 SkeletonBatch::SkeletonBatch () {
 
-    _programState = std::make_shared<backend::ProgramState>(positionTextureColor_vert, positionTextureColor_frag);
+    auto program = backend::Device::getInstance()->newProgram(positionTextureColor_vert, positionTextureColor_frag);
+    _programState = std::make_shared<backend::ProgramState>(program);
+    program->autorelease();
 
-    _locMVP     = _programState->getUniformLocation("u_MVPMatrix");
+    auto vertexLayout = _programState->getVertexLayout();
+
+    vertexLayout->setAttribute("a_position", 0, backend::VertexFormat::FLOAT3, offsetof(V3F_C4B_T2F, vertices), false);
+    vertexLayout->setAttribute("a_color", 2, backend::VertexFormat::UBYTE4, offsetof(V3F_C4B_T2F, colors), true);
+    vertexLayout->setAttribute("a_texCoord", 1, backend::VertexFormat::FLOAT2, offsetof(V3F_C4B_T2F, texCoords), false);
+    vertexLayout->setLayout(sizeof(_vertices[0]));
+
+
+    _locMVP = _programState->getUniformLocation("u_MVPMatrix");
     _locTexture = _programState->getUniformLocation("u_texture");
 
-	for (unsigned int i = 0; i < INITIAL_SIZE; i++) {
-		_commandsPool.push_back(createNewTrianglesCommand());
-	}
-	reset ();
-	// callback after drawing is finished so we can clear out the batch state
-	// for the next frame
-	Director::getInstance()->getEventDispatcher()->addCustomEventListener(EVENT_AFTER_DRAW_RESET_POSITION, [this](EventCustom* eventCustom){
-		this->update(0);
-	});;
+    for (unsigned int i = 0; i < INITIAL_SIZE; i++) {
+        _commandsPool.push_back(createNewTrianglesCommand());
+    }
+    reset();
+    // callback after drawing is finished so we can clear out the batch state
+    // for the next frame
+    Director::getInstance()->getEventDispatcher()->addCustomEventListener(EVENT_AFTER_DRAW_RESET_POSITION, [this](EventCustom* eventCustom) {
+        this->update(0);
+        });;
 }
 
 SkeletonBatch::~SkeletonBatch () {
@@ -159,24 +169,19 @@ void SkeletonBatch::reset() {
 }
 
 cocos2d::TrianglesCommand* SkeletonBatch::nextFreeCommand() {
-	if (_commandsPool.size() <= _nextFreeCommand) {
-		unsigned int newSize = _commandsPool.size() * 2 + 1;
-		for (int i = _commandsPool.size();  i < newSize; i++) {
-			_commandsPool.push_back(createNewTrianglesCommand());
-		}
-	}
-	auto *command =  _commandsPool[_nextFreeCommand++];
+    if (_commandsPool.size() <= _nextFreeCommand) {
+        unsigned int newSize = _commandsPool.size() * 2 + 1;
+        for (int i = _commandsPool.size(); i < newSize; i++) {
+            _commandsPool.push_back(createNewTrianglesCommand());
+        }
+    }
+    auto* command = _commandsPool[_nextFreeCommand++];
     auto& pipelineDescriptor = command->getPipelineDescriptor();
     if (pipelineDescriptor.programState == nullptr)
     {
         CCASSERT(_programState, "programState should not be null");
         pipelineDescriptor.programState = _programState->clone();
     }
-	auto& vertexLayout = pipelineDescriptor.vertexLayout;
-    vertexLayout.setAttribute("a_position", 0, backend::VertexFormat::FLOAT3, offsetof(V3F_C4B_T2F, vertices), false);
-    vertexLayout.setAttribute("a_color", 2, backend::VertexFormat::UBYTE4, offsetof(V3F_C4B_T2F, colors), true);
-    vertexLayout.setAttribute("a_texCoord", 1, backend::VertexFormat::FLOAT2, offsetof(V3F_C4B_T2F, texCoords), false);
-    vertexLayout.setLayout(sizeof(_vertices[0]), backend::VertexStepMode::VERTEX);
     return command;
 }
 
