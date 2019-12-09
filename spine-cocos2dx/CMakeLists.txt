@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.6)
 
-project(download_cocos2dx)
+project(spine-cocos2dx-example)
 
 set(EXAMPLE_DIR "${CMAKE_CURRENT_LIST_DIR}/example")
 option(USE_COCOS2DX_V4 "Use cocos2d-x version 4.0+" OFF)
@@ -54,4 +54,8 @@ if (NOT EXISTS ${EXAMPLE_DIR}/cocos2d)
 	)
 else()
 	message(STATUS "${EXAMPLE_DIR}/cocos2d is already exists, current version ${COCOS_SHORT_VERSION}.")
+endif()
+
+if(USE_COCOS2DX_V4)
+	add_subdirectory("${EXAMPLE_DIR}")
 endif()
