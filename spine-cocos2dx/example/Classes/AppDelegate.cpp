@@ -36,7 +36,6 @@
 #include <spine/spine-cocos2dx.h>
 #include <spine/Debug.h>
 #include "AppMacros.h"
-#include <spine/SkeletonTwoColorBatch.h>
 
 USING_NS_CC;
 using namespace std;

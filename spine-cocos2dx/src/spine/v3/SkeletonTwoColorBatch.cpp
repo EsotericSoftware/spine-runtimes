@@ -27,7 +27,9 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/SkeletonTwoColorBatch.h>
+#include <spine/spine-cocos2dx.h>
+#if COCOS2D_VERSION < 0x00040000
+
 #include <spine/Extension.h>
 #include <algorithm>
 
@@ -345,3 +347,5 @@ TwoColorTrianglesCommand* SkeletonTwoColorBatch::nextFreeCommand() {
 	return command;
 }
 }
+
+#endif

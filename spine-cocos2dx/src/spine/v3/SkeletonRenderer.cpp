@@ -28,10 +28,9 @@
  *****************************************************************************/
 
 #include <spine/spine-cocos2dx.h>
-#include <spine/SkeletonRenderer.h>
+#if COCOS2D_VERSION < 0x00040000
+
 #include <spine/Extension.h>
-#include <spine/SkeletonBatch.h>
-#include <spine/SkeletonTwoColorBatch.h>
 #include <spine/AttachmentVertices.h>
 #include <algorithm>
 
@@ -163,8 +162,8 @@ namespace spine {
 	SkeletonRenderer::~SkeletonRenderer () {
 		if (_ownsSkeletonData) delete _skeleton->getData();
 		if (_ownsSkeleton) delete _skeleton;
-		if (_ownsAtlas) delete _atlas;
-		delete _attachmentLoader;
+		if (_ownsAtlas && _atlas) delete _atlas;
+		if (_attachmentLoader) delete _attachmentLoader;
 		delete _clipper;
 	}
 
@@ -1029,3 +1028,5 @@ namespace spine {
 	}
 
 }
+
+#endif
