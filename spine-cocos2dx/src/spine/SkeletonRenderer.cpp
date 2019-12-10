@@ -271,7 +271,7 @@ namespace spine {
 		#if CC_USE_CULLING
 		const cocos2d::Rect bb = computeBoundingRect(worldCoords, coordCount / 2);
 
-		if (cullRectangle(renderer, transform, bb)) {			
+		if (cullRectangle(renderer, transform, bb)) {
 			VLA_FREE(worldCoords);
 			return;
 		}
@@ -1054,7 +1054,7 @@ namespace spine {
 
 		bool cullRectangle(Renderer* renderer, const Mat4& transform, const cocos2d::Rect& rect) {
 			if (Camera::getVisitingCamera() == nullptr)
-				return true;
+				return false;
 			
 			auto director = Director::getInstance();
 			auto scene = director->getRunningScene();
