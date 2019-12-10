@@ -51,9 +51,12 @@ add_library(spine-cpp STATIC ${SPINE_CPP_SOURCE} ${SPINE_CPP_HEADER})
 target_include_directories(spine-cpp PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../spine-cpp/spine-cpp/include/")
 
 # Add spine-cocos2dx library
-# file(GLOB SPINE_COCOS2DX_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/../src/**/*.h")
-# file(GLOB SPINE_COCOS2DX_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/../src/**/*.cpp")
-# add_library(spine-cocos2dx STATIC ${SPINE_COCOS2DX_SOURCE} ${SPINE_COCOS2DX_HEADER})
+file(GLOB_RECURSE SPINE_COCOS2DX_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/../src/**/*.h")
+file(GLOB_RECURSE SPINE_COCOS2DX_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/../src/**/*.cpp")
+add_library(spine-cocos2dx STATIC ${SPINE_COCOS2DX_SOURCE} ${SPINE_COCOS2DX_HEADER})
+target_include_directories(spine-cocos2dx PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../spine-cpp/spine-cpp/include/")
+target_include_directories(spine-cocos2dx PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../src/")
+target_link_libraries(spine-cocos2dx PRIVATE cocos2d)
 
 # record sources, headers, resources...
 set(GAME_RES_FOLDER
@@ -64,9 +67,9 @@ if(APPLE OR WINDOWS)
 endif()
 
 # add cross-platforms source files and header files
-file(GLOB_RECURSE GAME_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/../example/Classes/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/../src/**/*.cpp")
-file(GLOB_RECURSE GAME_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/../example/Classes/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/../src/**/*.h")
-set(GAME_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/../example/Classes" "${CMAKE_CURRENT_SOURCE_DIR}/../src")
+file(GLOB_RECURSE GAME_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/../example/Classes/*.cpp")
+file(GLOB_RECURSE GAME_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/../example/Classes/*.h")
+set(GAME_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/../example/Classes")
 
 if(ANDROID)
     # change APP_NAME to the share library name for Android, it's value depend on AndroidManifest.xml
@@ -127,11 +130,12 @@ set(all_code_files
     )
 if(NOT ANDROID)
     add_executable(${APP_NAME} ${all_code_files})
-	target_link_libraries(${APP_NAME} spine-cpp)
+	target_link_libraries(${APP_NAME} spine-cpp spine-cocos2dx)
 else()
     add_library(${APP_NAME} SHARED ${all_code_files})
     add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos/platform/android ${ENGINE_BINARY_PATH}/cocos/platform)
     target_link_libraries(${APP_NAME} -Wl,--whole-archive cpp_android_spec -Wl,--no-whole-archive)
+	target_link_libraries(${APP_NAME} spine-cpp spine-cocos2dx)
 endif()
 
 target_link_libraries(${APP_NAME} cocos2d)
