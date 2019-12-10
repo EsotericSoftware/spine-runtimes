@@ -46,6 +46,11 @@ namespace Spine.Unity {
 	public class BoneFollower : MonoBehaviour {
 
 		#region Inspector
+		public enum ScaleMode {
+			Local = 0,
+			WorldUniform
+		}
+
 		public SkeletonRenderer skeletonRenderer;
 		public SkeletonRenderer SkeletonRenderer {
 			get { return skeletonRenderer; }
@@ -66,8 +71,12 @@ namespace Spine.Unity {
 		[Tooltip("Follows the skeleton's flip state by controlling this Transform's local scale.")]
 		public bool followSkeletonFlip = true;
 
-		[Tooltip("Follows the target bone's local scale. BoneFollower cannot inherit world/skewed scale because of UnityEngine.Transform property limitations.")]
-		public bool followLocalScale = false;
+		[Tooltip("Follows the target bone's scale.")]
+		[UnityEngine.Serialization.FormerlySerializedAs("followLocalScale")]
+		public bool followScale = false;
+
+		[Tooltip("Follows the target bone's local or uniform world scale. Note: If world scale is non-uniform/skewed, you will receive incorrect results with WorldUniform.")]
+		public ScaleMode followScaleMode = ScaleMode.Local;
 
 		[UnityEngine.Serialization.FormerlySerializedAs("resetOnAwake")]
 		public bool initializeOnAwake = true;
@@ -148,7 +157,10 @@ namespace Spine.Unity {
 														followZPosition ? 0f : thisTransform.localPosition.z);
 				if (followBoneRotation) {
 					float halfRotation = Mathf.Atan2(bone.c, bone.a) * 0.5f;
-					if (followLocalScale && bone.scaleX < 0) // Negate rotation from negative scaleX. Don't use negative determinant. local scaleY doesn't factor into used rotation.
+					if (followScale &&
+						(followScaleMode == ScaleMode.Local ?
+						 (bone.scaleX < 0) :
+						 (bone.WorldScaleX < 0))) // Negate rotation from negative scaleX. Don't use negative determinant. local scaleY doesn't factor into used rotation.
 						halfRotation += Mathf.PI * 0.5f;
 
 					var q = default(Quaternion);
@@ -176,14 +188,20 @@ namespace Spine.Unity {
 
 				if (followBoneRotation) {
 					Vector3 worldRotation = skeletonTransform.rotation.eulerAngles;
-					if (followLocalScale && bone.scaleX < 0) boneWorldRotation += 180f;
+					if (followScale &&
+						(followScaleMode == ScaleMode.Local ?
+						 (bone.scaleX < 0) :
+						 (bone.WorldScaleX < 0))) boneWorldRotation += 180f;
 					thisTransform.SetPositionAndRotation(targetWorldPosition, Quaternion.Euler(worldRotation.x, worldRotation.y, worldRotation.z + boneWorldRotation));
 				} else {
 					thisTransform.position = targetWorldPosition;
 				}
 			}
 
-			Vector3 localScale = followLocalScale ? new Vector3(bone.scaleX, bone.scaleY, 1f) : new Vector3(1f, 1f, 1f);
+			Vector3 localScale = followScale ? (followScaleMode == ScaleMode.Local ?
+				new Vector3(bone.scaleX, bone.scaleY, 1f) :
+				new Vector3(bone.WorldScaleX, bone.WorldScaleY, 1f)) :
+				new Vector3(1f, 1f, 1f);
 			if (followSkeletonFlip) localScale.y *= Mathf.Sign(bone.skeleton.ScaleX * bone.skeleton.ScaleY);
 			thisTransform.localScale = localScale;
 		}

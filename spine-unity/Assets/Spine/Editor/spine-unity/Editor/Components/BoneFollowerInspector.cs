@@ -37,7 +37,7 @@ namespace Spine.Unity.Editor {
 
 	[CustomEditor(typeof(BoneFollower)), CanEditMultipleObjects]
 	public class BoneFollowerInspector : Editor {
-		SerializedProperty boneName, skeletonRenderer, followXYPosition, followZPosition, followBoneRotation, followLocalScale, followSkeletonFlip;
+		SerializedProperty boneName, skeletonRenderer, followXYPosition, followZPosition, followBoneRotation, followScale, followScaleMode, followSkeletonFlip;
 		BoneFollower targetBoneFollower;
 		bool needsReset;
 
@@ -84,7 +84,8 @@ namespace Spine.Unity.Editor {
 			followBoneRotation = serializedObject.FindProperty("followBoneRotation");
 			followXYPosition = serializedObject.FindProperty("followXYPosition");
 			followZPosition = serializedObject.FindProperty("followZPosition");
-			followLocalScale = serializedObject.FindProperty("followLocalScale");
+			followScale = serializedObject.FindProperty("followScale");
+			followScaleMode = serializedObject.FindProperty("followScaleMode");
 			followSkeletonFlip = serializedObject.FindProperty("followSkeletonFlip");
 
 			targetBoneFollower = (BoneFollower)target;
@@ -175,7 +176,12 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.PropertyField(followBoneRotation);
 				EditorGUILayout.PropertyField(followXYPosition);
 				EditorGUILayout.PropertyField(followZPosition);
-				EditorGUILayout.PropertyField(followLocalScale);
+				EditorGUILayout.PropertyField(followScale);
+				if (followScale.boolValue == true || followScale.hasMultipleDifferentValues) {
+					using (new SpineInspectorUtility.IndentScope()) {
+						EditorGUILayout.PropertyField(followScaleMode, new GUIContent("Mode"));
+					}
+				}
 				EditorGUILayout.PropertyField(followSkeletonFlip);
 
 				BoneFollowerInspector.RecommendRigidbodyButton(targetBoneFollower);

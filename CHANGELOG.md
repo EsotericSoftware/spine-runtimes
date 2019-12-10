@@ -48,6 +48,7 @@
   * Removed rarely used `Spine.Unity.AttachmentTools.AttachmentRegionExtensions` extension methods `Attachment.GetRegion()`. Use `Attachment.RendererObject as AtlasRegion` instead.
   * Removed redundant `Spine.SkeletonExtensions` extension methods `Skeleton.Set*ToSetupPose()`. Also removed less commonly used extension methods `TrackEntry.AllowImmediateQueue()` and `Attachment.IsRenderable()`.
   * `Skin.Attachments` now replaces `Skin.GetAttachments()`, returning an `ICollection<SkinEntry>`. This makes access more consistent and intuitive. To fix any compile errors, replace any occurrances of `skin.GetAttachments()` by `skin.Attachments`.
+  * `BoneFollower` property `followLocalScale` has been renamed to `followScale`. Serialized values (scenes and prefabs) will automatically be upgraded, only code accessing `followLocalScale` needs to be adapted.
 
 * **Additions**
   * Additional **Fix Draw Order** parameter at SkeletonRenderer, defaults to `disabled` (previous behaviour).
@@ -62,6 +63,7 @@
   Outline rendering is fully supported on `SkeletonGraphic` shaders as well.
   * Added `SkeletonRenderer.EditorSkipSkinSync` scripting API property to be able to set custom skins in editor scripts. Enable this property when overwriting the Skeleton's skin from an editor script. Without setting this parameter, changes will be overwritten by the next inspector update. Only affects Inspector synchronisation of skin with `initialSkinName`, not startup initialization.
   * `AtlasUtilities.GetRepackedAttachments()` and `AtlasUtilities.GetRepackedSkin()` provide support for additional texture channels such as normal maps via the optional parameter `additionalTexturePropertyIDsToCopy `. See the spine-unity runtime documentation, section [Combining Skins - Advanced - Runtime Repacking with Normalmaps](http://esotericsoftware.com/spine-unity#Combining-Skins) for further info and example usage code.
+  * `BoneFollower` can now optionally follow (uniform) world scale of the reference bone. There is now a `Mode` dropdown selector in the Inspector which can be set to either `Local` or `World Uniform`.
 
 * **Changes of default values**
 
