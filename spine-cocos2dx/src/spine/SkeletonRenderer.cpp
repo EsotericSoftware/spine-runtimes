@@ -1085,7 +1085,7 @@ namespace spine {
 
 
 		Color4B ColorToColor4B(const Color& color) {
-			return { (GLubyte)(color.r * 255.f), (GLubyte)(color.g * 255.f), (GLubyte)(color.b * 255.f), (GLubyte)(color.a * 255.f) };
+			return { (uint8_t)(color.r * 255.f), (uint8_t)(color.g * 255.f), (uint8_t)(color.b * 255.f), (uint8_t)(color.a * 255.f) };
 		}
 	}
 
