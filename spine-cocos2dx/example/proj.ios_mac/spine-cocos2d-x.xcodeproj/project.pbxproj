@@ -209,6 +209,9 @@
 		76D28AD0239FAF2C00FB142D /* SkeletonTwoColorBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D28AC5239FAF0A00FB142D /* SkeletonTwoColorBatch.cpp */; };
 		76D520E61EB362DD00572471 /* CoinExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D520E41EB362DD00572471 /* CoinExample.cpp */; };
 		76D520E71EB3634600572471 /* CoinExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D520E41EB362DD00572471 /* CoinExample.cpp */; };
+		76F10839239FC8DA005B0CE9 /* SkeletonRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76F10836239FC8DA005B0CE9 /* SkeletonRenderer.cpp */; };
+		76F1083A239FC8DA005B0CE9 /* SkeletonTwoColorBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76F10837239FC8DA005B0CE9 /* SkeletonTwoColorBatch.cpp */; };
+		76F1083B239FC8DA005B0CE9 /* SkeletonBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76F10838239FC8DA005B0CE9 /* SkeletonBatch.cpp */; };
 		76F5BD551D2BD7D3005917E5 /* TankExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BD531D2BD7D3005917E5 /* TankExample.cpp */; };
 		76F5BD561D2BD7EF005917E5 /* TankExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BD531D2BD7D3005917E5 /* TankExample.cpp */; };
 		76F5BD571D2BD7EF005917E5 /* TankExample.h in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BD541D2BD7D3005917E5 /* TankExample.h */; };
@@ -392,12 +395,17 @@
 		76D1BFDF2029E35200A0272D /* SkeletonRendererSeparatorExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SkeletonRendererSeparatorExample.cpp; sourceTree = "<group>"; };
 		76D28AC5239FAF0A00FB142D /* SkeletonTwoColorBatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonTwoColorBatch.cpp; path = ../../src/spine/v3/SkeletonTwoColorBatch.cpp; sourceTree = "<group>"; };
 		76D28AC6239FAF0B00FB142D /* SkeletonTwoColorBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonTwoColorBatch.h; path = ../../src/spine/v3/SkeletonTwoColorBatch.h; sourceTree = "<group>"; };
-		76D28AC7239FAF0B00FB142D /* SkeletonRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonRenderer.h; path = ../../src/spine/v3/SkeletonRenderer.h; sourceTree = "<group>"; };
 		76D28AC8239FAF0B00FB142D /* SkeletonBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonBatch.h; path = ../../src/spine/v3/SkeletonBatch.h; sourceTree = "<group>"; };
 		76D28AC9239FAF0B00FB142D /* SkeletonRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonRenderer.cpp; path = ../../src/spine/v3/SkeletonRenderer.cpp; sourceTree = "<group>"; };
 		76D28ACA239FAF0B00FB142D /* SkeletonBatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonBatch.cpp; path = ../../src/spine/v3/SkeletonBatch.cpp; sourceTree = "<group>"; };
 		76D520E41EB362DD00572471 /* CoinExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CoinExample.cpp; sourceTree = "<group>"; };
 		76D520E51EB362DD00572471 /* CoinExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoinExample.h; sourceTree = "<group>"; };
+		76F10834239FC8D9005B0CE9 /* SkeletonBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonBatch.h; path = ../../src/spine/v4/SkeletonBatch.h; sourceTree = "<group>"; };
+		76F10835239FC8DA005B0CE9 /* SkeletonTwoColorBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonTwoColorBatch.h; path = ../../src/spine/v4/SkeletonTwoColorBatch.h; sourceTree = "<group>"; };
+		76F10836239FC8DA005B0CE9 /* SkeletonRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonRenderer.cpp; path = ../../src/spine/v4/SkeletonRenderer.cpp; sourceTree = "<group>"; };
+		76F10837239FC8DA005B0CE9 /* SkeletonTwoColorBatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonTwoColorBatch.cpp; path = ../../src/spine/v4/SkeletonTwoColorBatch.cpp; sourceTree = "<group>"; };
+		76F10838239FC8DA005B0CE9 /* SkeletonBatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonBatch.cpp; path = ../../src/spine/v4/SkeletonBatch.cpp; sourceTree = "<group>"; };
+		76F1083C239FC8E5005B0CE9 /* SkeletonRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonRenderer.h; path = ../../src/spine/SkeletonRenderer.h; sourceTree = "<group>"; };
 		76F5BD531D2BD7D3005917E5 /* TankExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TankExample.cpp; sourceTree = "<group>"; };
 		76F5BD541D2BD7D3005917E5 /* TankExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TankExample.h; sourceTree = "<group>"; };
 		8262943D1AAF051F00CB7CF7 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -689,7 +697,8 @@
 		76AAA3FF1D18102C00C54FCB /* spine-cocos2dx */ = {
 			isa = PBXGroup;
 			children = (
-				76D28AC4239FAEEA00FB142D /* v4 */,
+				76F1083C239FC8E5005B0CE9 /* SkeletonRenderer.h */,
+				76F10833239FC8CB005B0CE9 /* v4 */,
 				76D28AC2239FAED800FB142D /* v3 */,
 				76AAA4001D18106000C54FCB /* AttachmentVertices.cpp */,
 				76AAA4011D18106000C54FCB /* AttachmentVertices.h */,
@@ -707,16 +716,20 @@
 				76D28ACA239FAF0B00FB142D /* SkeletonBatch.cpp */,
 				76D28AC8239FAF0B00FB142D /* SkeletonBatch.h */,
 				76D28AC9239FAF0B00FB142D /* SkeletonRenderer.cpp */,
-				76D28AC7239FAF0B00FB142D /* SkeletonRenderer.h */,
 				76D28AC5239FAF0A00FB142D /* SkeletonTwoColorBatch.cpp */,
 				76D28AC6239FAF0B00FB142D /* SkeletonTwoColorBatch.h */,
 			);
 			name = v3;
 			sourceTree = "<group>";
 		};
-		76D28AC4239FAEEA00FB142D /* v4 */ = {
+		76F10833239FC8CB005B0CE9 /* v4 */ = {
 			isa = PBXGroup;
 			children = (
+				76F10838239FC8DA005B0CE9 /* SkeletonBatch.cpp */,
+				76F10834239FC8D9005B0CE9 /* SkeletonBatch.h */,
+				76F10836239FC8DA005B0CE9 /* SkeletonRenderer.cpp */,
+				76F10837239FC8DA005B0CE9 /* SkeletonTwoColorBatch.cpp */,
+				76F10835239FC8DA005B0CE9 /* SkeletonTwoColorBatch.h */,
 			);
 			name = v4;
 			sourceTree = "<group>";
@@ -869,6 +882,7 @@
 				763104EF20BC1B5E00927A1E /* IkConstraintTimeline.cpp in Sources */,
 				763104D820BC1B5E00927A1E /* AnimationState.cpp in Sources */,
 				763104EE20BC1B5E00927A1E /* SkeletonClipping.cpp in Sources */,
+				76F1083A239FC8DA005B0CE9 /* SkeletonTwoColorBatch.cpp in Sources */,
 				763104E420BC1B5E00927A1E /* ClippingAttachment.cpp in Sources */,
 				76D28ACD239FAF0B00FB142D /* SkeletonBatch.cpp in Sources */,
 				763104C620BC1B5E00927A1E /* CurveTimeline.cpp in Sources */,
@@ -925,6 +939,7 @@
 				763104FB20BC1B5E00927A1E /* DeformTimeline.cpp in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
+				76F1083B239FC8DA005B0CE9 /* SkeletonBatch.cpp in Sources */,
 				763104CC20BC1B5E00927A1E /* RTTI.cpp in Sources */,
 				763104F020BC1B5E00927A1E /* Timeline.cpp in Sources */,
 				763104FE20BC1B5E00927A1E /* ShearTimeline.cpp in Sources */,
@@ -941,6 +956,7 @@
 				763104E220BC1B5E00927A1E /* Updatable.cpp in Sources */,
 				763104D220BC1B5E00927A1E /* RotateTimeline.cpp in Sources */,
 				763104E320BC1B5E00927A1E /* RegionAttachment.cpp in Sources */,
+				76F10839239FC8DA005B0CE9 /* SkeletonRenderer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
