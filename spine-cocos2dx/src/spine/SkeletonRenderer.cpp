@@ -28,8 +28,6 @@
  *****************************************************************************/
 
 #include <spine/spine-cocos2dx.h>
-#if COCOS2D_VERSION < 0x00040000
-
 #include <spine/Extension.h>
 #include <spine/AttachmentVertices.h>
 #include <algorithm>
@@ -45,7 +43,7 @@ namespace spine {
 		int computeTotalCoordCount(Skeleton& skeleton, int startSlotIndex, int endSlotIndex);
 		cocos2d::Rect computeBoundingRect(const float* coords, int vertexCount);
 		void interleaveCoordinates(float* dst, const float* src, int vertexCount, int dstStride);
-		BlendFunc makeBlendFunc(int blendMode, bool premultipliedAlpha);
+		BlendFunc makeBlendFunc(BlendMode blendMode, bool premultipliedAlpha);
 		void transformWorldVertices(float* dstCoord, int coordCount, Skeleton& skeleton, int startSlotIndex, int endSlotIndex);
 		bool cullRectangle(Renderer* renderer, const Mat4& transform, const cocos2d::Rect& rect);
 			Color4B ColorToColor4B(const Color& color);
@@ -95,7 +93,7 @@ namespace spine {
 		_blendFunc = BlendFunc::ALPHA_PREMULTIPLIED;
 		setOpacityModifyRGB(true);
 
-		setupGLProgramState(false);
+		setTwoColorTint(false);
 
 		_skeleton->setToSetupPose();
 		_skeleton->updateWorldTransform();
@@ -103,7 +101,9 @@ namespace spine {
 
 	void SkeletonRenderer::setupGLProgramState (bool twoColorTintEnabled) {
 		if (twoColorTintEnabled) {
+#if COCOS2D_VERSION < 0x00040000
 			setGLProgramState(SkeletonTwoColorBatch::getInstance()->getTwoColorTintProgramState());
+#endif
 			return;
 		}
 
@@ -127,7 +127,9 @@ namespace spine {
 				break;
 			}
 		}
+#if COCOS2D_VERSION < 0x00040000
 		setGLProgramState(GLProgramState::getOrCreateWithGLProgramName(GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP, texture));
+#endif
 	}
 
 	void SkeletonRenderer::setSkeletonData (SkeletonData *skeletonData, bool ownsSkeletonData) {
@@ -136,26 +138,26 @@ namespace spine {
 	}
 
 	SkeletonRenderer::SkeletonRenderer ()
-		: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _timeScale(1), _effect(nullptr), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
+		: _atlas(nullptr), _attachmentLoader(nullptr), _timeScale(1), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _effect(nullptr), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
 	}
 
 	SkeletonRenderer::SkeletonRenderer(Skeleton* skeleton, bool ownsSkeleton, bool ownsSkeletonData, bool ownsAtlas)
-		: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _timeScale(1), _effect(nullptr), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
+		: _atlas(nullptr), _attachmentLoader(nullptr), _timeScale(1), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false),  _effect(nullptr), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
 		initWithSkeleton(skeleton, ownsSkeleton, ownsSkeletonData, ownsAtlas);
 	}
 
 	SkeletonRenderer::SkeletonRenderer (SkeletonData *skeletonData, bool ownsSkeletonData)
-		: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _timeScale(1), _effect(nullptr), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
+		: _atlas(nullptr), _attachmentLoader(nullptr), _timeScale(1), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _effect(nullptr), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
 		initWithData(skeletonData, ownsSkeletonData);
 	}
 
 	SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, Atlas* atlas, float scale)
-		: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _timeScale(1), _effect(nullptr), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
+		: _atlas(nullptr), _attachmentLoader(nullptr), _timeScale(1), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _effect(nullptr), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
 		initWithJsonFile(skeletonDataFile, atlas, scale);
 	}
 
 	SkeletonRenderer::SkeletonRenderer (const std::string& skeletonDataFile, const std::string& atlasFile, float scale)
-		: _atlas(nullptr), _attachmentLoader(nullptr), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _timeScale(1), _effect(nullptr), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
+		: _atlas(nullptr), _attachmentLoader(nullptr), _timeScale(1), _debugSlots(false), _debugBones(false), _debugMeshes(false), _debugBoundingRect(false), _effect(nullptr), _startSlotIndex(0), _endSlotIndex(std::numeric_limits<int>::max()) {
 		initWithJsonFile(skeletonDataFile, atlasFile, scale);
 	}
 
@@ -449,7 +451,11 @@ namespace spine {
 					batch->allocateIndices(triangles.indexCount);
 					memcpy(triangles.indices, _clipper->getClippedTriangles().buffer(), sizeof(unsigned short) * _clipper->getClippedTriangles().size());
 
+#if COCOS2D_VERSION < 0x00040000
 					cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _glProgramState, blendFunc, triangles, transform, transformFlags);
+#else
+					cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, blendFunc, triangles, transform, transformFlags);
+#endif
 
 					const float* verts = _clipper->getClippedVertices().buffer();
 					const float* uvs = _clipper->getClippedUVs().buffer();
@@ -477,8 +483,11 @@ namespace spine {
 					}
 				} else {
 					// Not clipping
-
+#if COCOS2D_VERSION < 0x00040000
 					cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _glProgramState, blendFunc, triangles, transform, transformFlags);
+#else
+					cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, blendFunc, triangles, transform, transformFlags);
+#endif
 
 					if (_effect) {
 						V3F_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
@@ -513,7 +522,11 @@ namespace spine {
 					trianglesTwoColor.indices = twoColorBatch->allocateIndices(trianglesTwoColor.indexCount);
 					memcpy(trianglesTwoColor.indices, _clipper->getClippedTriangles().buffer(), sizeof(unsigned short) * _clipper->getClippedTriangles().size());
 
+#if COCOS2D_VERSION < 0x00040000
 					TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
+#else
+					TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, blendFunc, trianglesTwoColor, transform, transformFlags);
+#endif
 
 					const float* verts = _clipper->getClippedVertices().buffer();
 					const float* uvs = _clipper->getClippedUVs().buffer();
@@ -543,7 +556,12 @@ namespace spine {
 						}
 					}
 				} else {
+					
+#if COCOS2D_VERSION < 0x00040000
 					TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
+#else
+					TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, blendFunc, trianglesTwoColor, transform, transformFlags);
+#endif
 
 					if (_effect) {
 						V3F_C4B_C4B_T2F* vertex = batchedTriangles->getTriangles().verts;
@@ -563,7 +581,7 @@ namespace spine {
 					}
 				}
 			}
-		_clipper->clipEnd(*slot);
+			_clipper->clipEnd(*slot);
 		}
 		_clipper->clipEnd();
 
@@ -616,17 +634,21 @@ namespace spine {
 
 	void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uint32_t transformFlags) {
 
-	 #if !defined(USE_MATRIX_STACK_PROJECTION_ONLY)
+#if !defined(USE_MATRIX_STACK_PROJECTION_ONLY)
 		Director* director = Director::getInstance();
 		director->pushMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
 		director->loadMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW, transform);
-	#endif
+#endif
 
 		DrawNode* drawNode = DrawNode::create();
 
 		// Draw bounding rectangle
 		if (_debugBoundingRect) {
+#if COCOS2D_VERSION < 0x00040000
 			glLineWidth(2);
+#else
+			drawNode->setLineWidth(2.0f);
+#endif
 			const cocos2d::Rect brect = getBoundingBox();
 			const Vec2 points[4] =
 			{
@@ -641,7 +663,11 @@ namespace spine {
 		if (_debugSlots) {
 			// Slots.
 			// DrawPrimitives::setDrawColor4B(0, 0, 255, 255);
-			glLineWidth(1);
+#if COCOS2D_VERSION < 0x00040000
+			glLineWidth(2);
+#else
+			drawNode->setLineWidth(2.0f);
+#endif
 			V3F_C4B_T2F_Quad quad;
 			for (int i = 0, n = _skeleton->getSlots().size(); i < n; i++) {
 				Slot* slot = _skeleton->getDrawOrder()[i];
@@ -669,7 +695,11 @@ namespace spine {
 
 		if (_debugBones) {
 			// Bone lengths.
+#if COCOS2D_VERSION < 0x00040000
 			glLineWidth(2);
+#else
+			drawNode->setLineWidth(2.0f);
+#endif
 			for (int i = 0, n = _skeleton->getBones().size(); i < n; i++) {
 				Bone *bone = _skeleton->getBones()[i];
 				if (!bone->isActive()) continue;
@@ -689,7 +719,11 @@ namespace spine {
 
 		if (_debugMeshes) {
 			// Meshes.
-			glLineWidth(1);
+#if COCOS2D_VERSION < 0x00040000
+			glLineWidth(2);
+#else
+			drawNode->setLineWidth(2.0f);
+#endif
 			for (int i = 0, n = _skeleton->getSlots().size(); i < n; ++i) {
 				Slot* slot = _skeleton->getDrawOrder()[i];
 				if (!slot->getBone().isActive()) continue;
@@ -715,9 +749,9 @@ namespace spine {
 		}
 
 		drawNode->draw(renderer, transform, transformFlags);
-	#if !defined(USE_MATRIX_STACK_PROJECTION_ONLY)
+#if !defined(USE_MATRIX_STACK_PROJECTION_ONLY)
 		director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-	#endif
+#endif
 	}
 
 	cocos2d::Rect SkeletonRenderer::getBoundingBox () const {
@@ -776,11 +810,18 @@ namespace spine {
 	}
 
 	void SkeletonRenderer::setTwoColorTint(bool enabled) {
+#if COCOS2D_VERSION > 0x00040000
+		_twoColorTint = enabled;
+#endif
 		setupGLProgramState(enabled);
 	}
 
 	bool SkeletonRenderer::isTwoColorTint() {
+#if COCOS2D_VERSION < 0x00040000
 		return getGLProgramState() == SkeletonTwoColorBatch::getInstance()->getTwoColorTintProgramState();
+#else
+		return _twoColorTint;
+#endif
 	}
 
 	void SkeletonRenderer::setVertexEffect(VertexEffect *effect) {
@@ -833,17 +874,17 @@ namespace spine {
 	}
 
 	void SkeletonRenderer::onEnter () {
-	#if CC_ENABLE_SCRIPT_BINDING
+#if CC_ENABLE_SCRIPT_BINDING
 		if (_scriptType == kScriptTypeJavascript && ScriptEngineManager::sendNodeEventToJSExtended(this, kNodeOnEnter)) return;
-	#endif
+#endif
 		Node::onEnter();
 		scheduleUpdate();
 	}
 
 	void SkeletonRenderer::onExit () {
-	#if CC_ENABLE_SCRIPT_BINDING
+#if CC_ENABLE_SCRIPT_BINDING
 		if (_scriptType == kScriptTypeJavascript && ScriptEngineManager::sendNodeEventToJSExtended(this, kNodeOnExit)) return;
-	#endif
+#endif
 		Node::onExit();
 		unscheduleUpdate();
 	}
@@ -922,9 +963,9 @@ namespace spine {
 
 		void transformWorldVertices(float* dstCoord, int coordCount, Skeleton& skeleton, int startSlotIndex, int endSlotIndex) {
 			float* dstPtr = dstCoord;
-	#ifndef NDEBUG
+#ifndef NDEBUG
 			float* const dstEnd = dstCoord + coordCount;
-	#endif
+#endif
 			for (size_t i = 0; i < skeleton.getSlots().size(); ++i) {
 				/*const*/ Slot& slot = *skeleton.getDrawOrder()[i]; // match the draw order of SkeletonRenderer::Draw
 				Attachment* const attachment = slot.getAttachment();
@@ -966,8 +1007,10 @@ namespace spine {
 
 		}
 
-		BlendFunc makeBlendFunc(int blendMode, bool premultipliedAlpha) {
+		BlendFunc makeBlendFunc(BlendMode blendMode, bool premultipliedAlpha) {
 			BlendFunc blendFunc;
+			
+#if COCOS2D_VERSION < 0x00040000
 			switch (blendMode) {
 			case BlendMode_Additive:
 				blendFunc.src = premultipliedAlpha ? GL_ONE : GL_SRC_ALPHA;
@@ -986,6 +1029,25 @@ namespace spine {
 				blendFunc.dst = GL_ONE_MINUS_SRC_ALPHA;
 				break;
 			}
+#else
+			switch (blendMode) {
+				case BlendMode_Additive:
+					blendFunc.src = premultipliedAlpha ? backend::BlendFactor::ONE : backend::BlendFactor::SRC_ALPHA;
+					blendFunc.dst = backend::BlendFactor::ONE;
+					break;
+				case BlendMode_Multiply:
+					blendFunc.src = backend::BlendFactor::DST_COLOR;
+					blendFunc.dst = backend::BlendFactor::ONE_MINUS_SRC_ALPHA;
+					break;
+				case BlendMode_Screen:
+					blendFunc.src = backend::BlendFactor::ONE;
+					blendFunc.dst = backend::BlendFactor::ONE_MINUS_SRC_COLOR;
+					break;
+				default:
+					blendFunc.src = premultipliedAlpha ? backend::BlendFactor::ONE : backend::BlendFactor::SRC_ALPHA;
+					blendFunc.dst = backend::BlendFactor::ONE_MINUS_SRC_ALPHA;
+			}
+#endif
 			return blendFunc;
 		}
 
@@ -1028,5 +1090,3 @@ namespace spine {
 	}
 
 }
-
-#endif

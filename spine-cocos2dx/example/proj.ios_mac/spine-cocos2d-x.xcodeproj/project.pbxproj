@@ -166,6 +166,7 @@
 		763105D820BC1B9700927A1E /* Updatable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A520BC1B5600927A1E /* Updatable.cpp */; };
 		763105D920BC1B9700927A1E /* VertexAttachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7631049220BC1B5500927A1E /* VertexAttachment.cpp */; };
 		763105DA20BC1B9700927A1E /* VertexEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104AE20BC1B5800927A1E /* VertexEffect.cpp */; };
+		763A8A98239FDC0400FBEDDC /* SkeletonRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763A8A97239FDC0400FBEDDC /* SkeletonRenderer.cpp */; };
 		76798D1D22A95AB400F77964 /* ConstraintData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76798D1C22A95AB300F77964 /* ConstraintData.cpp */; };
 		76798D1E22A95AEF00F77964 /* ConstraintData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76798D1C22A95AB300F77964 /* ConstraintData.cpp */; };
 		767D80E322B29F22000BD703 /* MixAndMatchExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 767D80E022B29F22000BD703 /* MixAndMatchExample.cpp */; };
@@ -202,14 +203,11 @@
 		76D1BFE02029E35200A0272D /* SkeletonRendererSeparatorExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D1BFDF2029E35200A0272D /* SkeletonRendererSeparatorExample.cpp */; };
 		76D1BFE12029E37700A0272D /* SkeletonRendererSeparatorExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D1BFDF2029E35200A0272D /* SkeletonRendererSeparatorExample.cpp */; };
 		76D28ACB239FAF0B00FB142D /* SkeletonTwoColorBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D28AC5239FAF0A00FB142D /* SkeletonTwoColorBatch.cpp */; };
-		76D28ACC239FAF0B00FB142D /* SkeletonRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D28AC9239FAF0B00FB142D /* SkeletonRenderer.cpp */; };
 		76D28ACD239FAF0B00FB142D /* SkeletonBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D28ACA239FAF0B00FB142D /* SkeletonBatch.cpp */; };
 		76D28ACE239FAF2C00FB142D /* SkeletonBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D28ACA239FAF0B00FB142D /* SkeletonBatch.cpp */; };
-		76D28ACF239FAF2C00FB142D /* SkeletonRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D28AC9239FAF0B00FB142D /* SkeletonRenderer.cpp */; };
 		76D28AD0239FAF2C00FB142D /* SkeletonTwoColorBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D28AC5239FAF0A00FB142D /* SkeletonTwoColorBatch.cpp */; };
 		76D520E61EB362DD00572471 /* CoinExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D520E41EB362DD00572471 /* CoinExample.cpp */; };
 		76D520E71EB3634600572471 /* CoinExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76D520E41EB362DD00572471 /* CoinExample.cpp */; };
-		76F10839239FC8DA005B0CE9 /* SkeletonRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76F10836239FC8DA005B0CE9 /* SkeletonRenderer.cpp */; };
 		76F1083A239FC8DA005B0CE9 /* SkeletonTwoColorBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76F10837239FC8DA005B0CE9 /* SkeletonTwoColorBatch.cpp */; };
 		76F1083B239FC8DA005B0CE9 /* SkeletonBatch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76F10838239FC8DA005B0CE9 /* SkeletonBatch.cpp */; };
 		76F5BD551D2BD7D3005917E5 /* TankExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BD531D2BD7D3005917E5 /* TankExample.cpp */; };
@@ -368,6 +366,7 @@
 		763104C020BC1B5E00927A1E /* SkeletonBounds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonBounds.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/SkeletonBounds.cpp"; sourceTree = "<group>"; };
 		763104C120BC1B5E00927A1E /* ShearTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ShearTimeline.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/ShearTimeline.cpp"; sourceTree = "<group>"; };
 		763104C220BC1B5E00927A1E /* TranslateTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TranslateTimeline.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/TranslateTimeline.cpp"; sourceTree = "<group>"; };
+		763A8A97239FDC0400FBEDDC /* SkeletonRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonRenderer.cpp; path = ../../src/spine/SkeletonRenderer.cpp; sourceTree = "<group>"; };
 		76798D1C22A95AB300F77964 /* ConstraintData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ConstraintData.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/ConstraintData.cpp"; sourceTree = "<group>"; };
 		767D80E022B29F22000BD703 /* MixAndMatchExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MixAndMatchExample.cpp; sourceTree = "<group>"; };
 		767D80E222B29F22000BD703 /* MixAndMatchExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MixAndMatchExample.h; sourceTree = "<group>"; };
@@ -396,13 +395,11 @@
 		76D28AC5239FAF0A00FB142D /* SkeletonTwoColorBatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonTwoColorBatch.cpp; path = ../../src/spine/v3/SkeletonTwoColorBatch.cpp; sourceTree = "<group>"; };
 		76D28AC6239FAF0B00FB142D /* SkeletonTwoColorBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonTwoColorBatch.h; path = ../../src/spine/v3/SkeletonTwoColorBatch.h; sourceTree = "<group>"; };
 		76D28AC8239FAF0B00FB142D /* SkeletonBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonBatch.h; path = ../../src/spine/v3/SkeletonBatch.h; sourceTree = "<group>"; };
-		76D28AC9239FAF0B00FB142D /* SkeletonRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonRenderer.cpp; path = ../../src/spine/v3/SkeletonRenderer.cpp; sourceTree = "<group>"; };
 		76D28ACA239FAF0B00FB142D /* SkeletonBatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonBatch.cpp; path = ../../src/spine/v3/SkeletonBatch.cpp; sourceTree = "<group>"; };
 		76D520E41EB362DD00572471 /* CoinExample.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CoinExample.cpp; sourceTree = "<group>"; };
 		76D520E51EB362DD00572471 /* CoinExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoinExample.h; sourceTree = "<group>"; };
 		76F10834239FC8D9005B0CE9 /* SkeletonBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonBatch.h; path = ../../src/spine/v4/SkeletonBatch.h; sourceTree = "<group>"; };
 		76F10835239FC8DA005B0CE9 /* SkeletonTwoColorBatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonTwoColorBatch.h; path = ../../src/spine/v4/SkeletonTwoColorBatch.h; sourceTree = "<group>"; };
-		76F10836239FC8DA005B0CE9 /* SkeletonRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonRenderer.cpp; path = ../../src/spine/v4/SkeletonRenderer.cpp; sourceTree = "<group>"; };
 		76F10837239FC8DA005B0CE9 /* SkeletonTwoColorBatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonTwoColorBatch.cpp; path = ../../src/spine/v4/SkeletonTwoColorBatch.cpp; sourceTree = "<group>"; };
 		76F10838239FC8DA005B0CE9 /* SkeletonBatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SkeletonBatch.cpp; path = ../../src/spine/v4/SkeletonBatch.cpp; sourceTree = "<group>"; };
 		76F1083C239FC8E5005B0CE9 /* SkeletonRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SkeletonRenderer.h; path = ../../src/spine/SkeletonRenderer.h; sourceTree = "<group>"; };
@@ -697,13 +694,14 @@
 		76AAA3FF1D18102C00C54FCB /* spine-cocos2dx */ = {
 			isa = PBXGroup;
 			children = (
-				76F1083C239FC8E5005B0CE9 /* SkeletonRenderer.h */,
 				76F10833239FC8CB005B0CE9 /* v4 */,
 				76D28AC2239FAED800FB142D /* v3 */,
-				76AAA4001D18106000C54FCB /* AttachmentVertices.cpp */,
-				76AAA4011D18106000C54FCB /* AttachmentVertices.h */,
 				76AAA4041D18106000C54FCB /* SkeletonAnimation.cpp */,
 				76AAA4051D18106000C54FCB /* SkeletonAnimation.h */,
+				763A8A97239FDC0400FBEDDC /* SkeletonRenderer.cpp */,
+				76F1083C239FC8E5005B0CE9 /* SkeletonRenderer.h */,
+				76AAA4001D18106000C54FCB /* AttachmentVertices.cpp */,
+				76AAA4011D18106000C54FCB /* AttachmentVertices.h */,
 				76AAA40A1D18106000C54FCB /* spine-cocos2dx.cpp */,
 				76AAA40B1D18106000C54FCB /* spine-cocos2dx.h */,
 			);
@@ -715,7 +713,6 @@
 			children = (
 				76D28ACA239FAF0B00FB142D /* SkeletonBatch.cpp */,
 				76D28AC8239FAF0B00FB142D /* SkeletonBatch.h */,
-				76D28AC9239FAF0B00FB142D /* SkeletonRenderer.cpp */,
 				76D28AC5239FAF0A00FB142D /* SkeletonTwoColorBatch.cpp */,
 				76D28AC6239FAF0B00FB142D /* SkeletonTwoColorBatch.h */,
 			);
@@ -727,7 +724,6 @@
 			children = (
 				76F10838239FC8DA005B0CE9 /* SkeletonBatch.cpp */,
 				76F10834239FC8D9005B0CE9 /* SkeletonBatch.h */,
-				76F10836239FC8DA005B0CE9 /* SkeletonRenderer.cpp */,
 				76F10837239FC8DA005B0CE9 /* SkeletonTwoColorBatch.cpp */,
 				76F10835239FC8DA005B0CE9 /* SkeletonTwoColorBatch.h */,
 			);
@@ -949,14 +945,13 @@
 				763104EA20BC1B5E00927A1E /* IkConstraintData.cpp in Sources */,
 				763104F420BC1B5E00927A1E /* Attachment.cpp in Sources */,
 				763104E620BC1B5E00927A1E /* TransformConstraintData.cpp in Sources */,
-				76D28ACC239FAF0B00FB142D /* SkeletonRenderer.cpp in Sources */,
 				763104D720BC1B5E00927A1E /* SpineObject.cpp in Sources */,
 				763104CA20BC1B5E00927A1E /* PathConstraintSpacingTimeline.cpp in Sources */,
 				76D520E61EB362DD00572471 /* CoinExample.cpp in Sources */,
 				763104E220BC1B5E00927A1E /* Updatable.cpp in Sources */,
+				763A8A98239FDC0400FBEDDC /* SkeletonRenderer.cpp in Sources */,
 				763104D220BC1B5E00927A1E /* RotateTimeline.cpp in Sources */,
 				763104E320BC1B5E00927A1E /* RegionAttachment.cpp in Sources */,
-				76F10839239FC8DA005B0CE9 /* SkeletonRenderer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -965,7 +960,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				76D28ACE239FAF2C00FB142D /* SkeletonBatch.cpp in Sources */,
-				76D28ACF239FAF2C00FB142D /* SkeletonRenderer.cpp in Sources */,
 				76D28AD0239FAF2C00FB142D /* SkeletonTwoColorBatch.cpp in Sources */,
 				767D80E422B2A003000BD703 /* MixAndMatchExample.cpp in Sources */,
 				76798D1E22A95AEF00F77964 /* ConstraintData.cpp in Sources */,

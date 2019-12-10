@@ -31,8 +31,6 @@
 #define SPINE_SKELETONRENDERER_H_
 
 #include "cocos2d.h"
-#if COCOS2D_VERSION < 0x00040000
-
 #include <spine/spine.h>
 
 namespace spine {
@@ -159,10 +157,9 @@ namespace spine {
 
 		int _startSlotIndex;
 		int _endSlotIndex;
+		bool _twoColorTint;
 	};
 
 }
-
-#endif
 
 #endif /* SPINE_SKELETONRENDERER_H_ */
