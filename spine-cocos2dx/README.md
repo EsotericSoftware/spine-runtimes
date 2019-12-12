@@ -124,20 +124,10 @@ The Spine cocos2d-x example works on Windows, Mac OS X, iOS and Android.
 3. Open a terminal and install CMake via `brew install cmake`
 3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 4. Open a terminal, and `cd` into the `spine-runtimes/spine-cocos2dx` folder
-5. Type `mkdir build && cd build && cmake ../..`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
-6. Delete `spine-runtimes/spine-cocos2dx/example/cocos2d/cocos/editor-support/spine`
-7. Open `spine-runtimes/spine-cocos2dx/example/cocos2d/cocos/Android.mk` and remove the lines `LOCAL_STATIC_LIBRARIES += spine_static` and `$(call import-module,editor-support/spine)
-8. Switch to `spine-runtimes/spine-cocos2dx/example/proj.android/jni` and execute `cocos compile -p android -m debug --ndk-mode debug` to compile the example for Android
-9. In the same directory, execute `cocos run -p android -m debug` to deploy to the device
-10. For debugging, run `ndk-debug` in the `proj.android/jni` folder. This will attach to the running app via GDB.
+5. Type `mkdir build-v4 && cd build-v4 && cmake -DUSE_COCOS2DX_V4=on ..`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
+6. Execute `cocos run -s . -p android`, this will build, deploy and run the APK on a connected device.
 
 ## Notes
 
 * Images are premultiplied by cocos2d-x, so the Spine atlas images should *not* use premultiplied alpha.
 * Two color tinting needs to be enabled on a per-skeleton basis. Call `SkeletonRenderer::setTwoColorTine(true)` or `SkeletonAnimation::setTwoColorTint(true)` after you created the skeleton instance. Note that two color tinting requires a custom shader and vertex format. Skeletons rendered with two color tinting can therefore not be batched with single color tinted skeletons or other 2D cocos2d-x elements like sprites. However, two-color tinted skeletons will be batched if possible when rendered after one another. Attaching a child to a two color tinted skeleton will also break the batch.
-
-## Examples
-
-- [Raptor](example/Classes/RaptorExample.cpp)
-- [Spineboy](example/Classes/SpineboyExample.cpp)
-- [Golbins](example/Classes/GoblinsExample.cpp)
