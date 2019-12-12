@@ -28,6 +28,7 @@ cmake_minimum_required(VERSION 3.6)
 set(APP_NAME spine-cocos2dx-example)
 
 project(${APP_NAME})
+option(BUILD_EDITOR_SPINE "Build editor support for spine" ON)
 
 if(XCODE)
     if(NOT DEFINED CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET)
