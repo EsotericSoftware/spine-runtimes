@@ -171,6 +171,7 @@
 		76798D1E22A95AEF00F77964 /* ConstraintData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76798D1C22A95AB300F77964 /* ConstraintData.cpp */; };
 		767D80E322B29F22000BD703 /* MixAndMatchExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 767D80E022B29F22000BD703 /* MixAndMatchExample.cpp */; };
 		767D80E422B2A003000BD703 /* MixAndMatchExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 767D80E022B29F22000BD703 /* MixAndMatchExample.cpp */; };
+		76A7269023A28F5600A3FA95 /* SkeletonRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763A8A97239FDC0400FBEDDC /* SkeletonRenderer.cpp */; };
 		76AAA3C01D180F7C00C54FCB /* AppDelegate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B31D180F7C00C54FCB /* AppDelegate.cpp */; };
 		76AAA3C11D180F7C00C54FCB /* BatchingExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B61D180F7C00C54FCB /* BatchingExample.cpp */; };
 		76AAA3C21D180F7C00C54FCB /* GoblinsExample.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76AAA3B81D180F7C00C54FCB /* GoblinsExample.cpp */; };
@@ -959,6 +960,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				76A7269023A28F5600A3FA95 /* SkeletonRenderer.cpp in Sources */,
 				76D28ACE239FAF2C00FB142D /* SkeletonBatch.cpp in Sources */,
 				76D28AD0239FAF2C00FB142D /* SkeletonTwoColorBatch.cpp in Sources */,
 				767D80E422B2A003000BD703 /* MixAndMatchExample.cpp in Sources */,
