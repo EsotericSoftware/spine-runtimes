@@ -66,6 +66,8 @@ static void setAttachmentVertices(MeshAttachment* attachment) {
 Cocos2dAtlasAttachmentLoader::Cocos2dAtlasAttachmentLoader(Atlas* atlas): AtlasAttachmentLoader(atlas) {
 }
 
+Cocos2dAtlasAttachmentLoader::~Cocos2dAtlasAttachmentLoader() { }
+
 void Cocos2dAtlasAttachmentLoader::configureAttachment(Attachment* attachment) {
 	if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 		setAttachmentVertices((RegionAttachment*)attachment);
@@ -73,6 +75,36 @@ void Cocos2dAtlasAttachmentLoader::configureAttachment(Attachment* attachment) {
 		setAttachmentVertices((MeshAttachment*)attachment);
 	}
 }
+
+#if COCOS2D_VERSION >= 0x0040000
+
+backend::SamplerAddressMode wrap (TextureWrap wrap) {
+	return wrap ==  TextureWrap_ClampToEdge ? backend::SamplerAddressMode::CLAMP_TO_EDGE : backend::SamplerAddressMode::REPEAT;
+}
+
+backend::SamplerFilter filter (TextureFilter filter) {
+	switch (filter) {
+	case TextureFilter_Unknown:
+		break;
+	case TextureFilter_Nearest:
+		return backend::SamplerFilter::NEAREST;
+	case TextureFilter_Linear:
+		return backend::SamplerFilter::LINEAR;
+	case TextureFilter_MipMap:
+		return backend::SamplerFilter::LINEAR;
+	case TextureFilter_MipMapNearestNearest:
+		return backend::SamplerFilter::NEAREST;
+	case TextureFilter_MipMapLinearNearest:
+        return backend::SamplerFilter::NEAREST;
+	case TextureFilter_MipMapNearestLinear:
+        return backend::SamplerFilter::LINEAR;
+	case TextureFilter_MipMapLinearLinear:
+        return backend::SamplerFilter::LINEAR;
+	}
+	return backend::SamplerFilter::LINEAR;
+}
+
+#else
 
 GLuint wrap (TextureWrap wrap) {
 	return wrap ==  TextureWrap_ClampToEdge ? GL_CLAMP_TO_EDGE : GL_REPEAT;
@@ -100,14 +132,23 @@ GLuint filter (TextureFilter filter) {
 	return GL_LINEAR;
 }
 
+#endif
+
+Cocos2dTextureLoader::Cocos2dTextureLoader() : TextureLoader() { }
+Cocos2dTextureLoader::~Cocos2dTextureLoader() { }
+
 void Cocos2dTextureLoader::load(AtlasPage& page, const spine::String& path) {
 	Texture2D* texture = Director::getInstance()->getTextureCache()->addImage(path.buffer());
 	CCASSERT(texture != nullptr, "Invalid image");
-	if (texture)
-	{
+	if (texture) {
 		texture->retain();
-		Texture2D::TexParams textureParams = { filter(page.minFilter), filter(page.magFilter), wrap(page.uWrap), wrap(page.vWrap) };
+#if COCOS2D_VERSION >= 0x0040000
+		Texture2D::TexParams textureParams(filter(page.minFilter), filter(page.magFilter), wrap(page.uWrap), wrap(page.vWrap));
+#else
+		Texture2D::TexParams textureParams = {filter(page.minFilter), filter(page.magFilter), wrap(page.uWrap), wrap(page.vWrap)};
+#endif
 		texture->setTexParameters(textureParams);
+
 		page.setRendererObject(texture);
 		page.width = texture->getPixelsWide();
 		page.height = texture->getPixelsHigh();
@@ -115,12 +156,15 @@ void Cocos2dTextureLoader::load(AtlasPage& page, const spine::String& path) {
 }
 
 void Cocos2dTextureLoader::unload(void* texture) {
-	if (texture)
-	{
+	if (texture) {
 		((Texture2D*)texture)->release();
 	}
 }
 
+
+Cocos2dExtension::Cocos2dExtension() : DefaultSpineExtension() { }
+
+Cocos2dExtension::~Cocos2dExtension() { }
 
 char *Cocos2dExtension::_readFile(const spine::String &path, int *length) {
 	Data data = FileUtils::getInstance()->getDataFromFile(FileUtils::getInstance()->fullPathForFilename(path.buffer()));

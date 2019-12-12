@@ -43,12 +43,12 @@ module spine.threejs {
 			let indices = this.indices = new Uint16Array(maxVertices * 3);
 			let geo = new THREE.BufferGeometry();
 			let vertexBuffer = this.vertexBuffer = new THREE.InterleavedBuffer(vertices, MeshBatcher.VERTEX_SIZE);
-			vertexBuffer.dynamic = true;
-			geo.addAttribute("position", new THREE.InterleavedBufferAttribute(vertexBuffer, 3, 0, false));
-			geo.addAttribute("color", new THREE.InterleavedBufferAttribute(vertexBuffer, 4, 3, false));
-			geo.addAttribute("uv", new THREE.InterleavedBufferAttribute(vertexBuffer, 2, 7, false));
+			vertexBuffer.usage = WebGLRenderingContext.DYNAMIC_DRAW;
+			geo.setAttribute("position", new THREE.InterleavedBufferAttribute(vertexBuffer, 3, 0, false));
+			geo.setAttribute("color", new THREE.InterleavedBufferAttribute(vertexBuffer, 4, 3, false));
+			geo.setAttribute("uv", new THREE.InterleavedBufferAttribute(vertexBuffer, 2, 7, false));
 			geo.setIndex(new THREE.BufferAttribute(indices, 1));
-			geo.getIndex().dynamic = true;
+			geo.getIndex().usage = WebGLRenderingContext.DYNAMIC_DRAW;;
 			geo.drawRange.start = 0;
 			geo.drawRange.count = 0;
 			this.geometry = geo;
@@ -57,7 +57,15 @@ module spine.threejs {
 
 		dispose () {
 			this.geometry.dispose();
-			this.material.dispose();
+			if (this.material instanceof THREE.Material)
+				this.material.dispose();
+			else if (this.material) {
+				for (let i = 0; i < this.material.length; i++) {
+					let material = this.material[i];
+					if (material instanceof THREE.Material)
+						material.dispose();
+				}
+			}
 		}
 
 		clear () {
