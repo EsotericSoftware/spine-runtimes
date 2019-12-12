@@ -8,7 +8,7 @@ Shader "Spine/Special/SkeletonGhost" {
 		[NoScaleOffset] _MainTex ("Base (RGB) Alpha (A)", 2D) = "white" {}
 		_TextureFade ("Texture Fade Out", Range(0,1)) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
-		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
+		[HideInInspector][Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
     }
     SubShader {
 		Tags {
@@ -26,7 +26,7 @@ Shader "Spine/Special/SkeletonGhost" {
 			Comp[_StencilComp]
 			Pass Keep
 		}
-      
+
 		Pass {
 			CGPROGRAM
 			#pragma vertex vert
@@ -35,7 +35,7 @@ Shader "Spine/Special/SkeletonGhost" {
 			sampler2D _MainTex;
 			fixed4 _Color;
 			fixed _TextureFade;
-			    
+
 			struct VertexInput {
 				float4 vertex : POSITION;
 				float2 uv : TEXCOORD0;

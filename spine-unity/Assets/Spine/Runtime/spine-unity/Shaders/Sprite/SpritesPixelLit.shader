@@ -44,7 +44,7 @@ Shader "Spine/Sprite/Pixel Lit"
 		[HideInInspector] _RenderQueue ("__queue", Float) = 0.0
 		[HideInInspector] _Cull ("__cull", Float) = 0.0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
-		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
+		[HideInInspector][Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
 
 		// Outline properties are drawn via custom editor.
 		[HideInInspector] _OutlineWidth("Outline Width", Range(0,8)) = 3.0

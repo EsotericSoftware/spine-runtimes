@@ -10,13 +10,13 @@ Shader "Spine/Outline/SkeletonGraphic Tint Black"
 		_Color ("Tint", Color) = (1,1,1,1)
 		_Black ("Black Point", Color) = (0,0,0,0)
 
-		_StencilComp ("Stencil Comparison", Float) = 8
-		_Stencil ("Stencil ID", Float) = 0
-		_StencilOp ("Stencil Operation", Float) = 0
-		_StencilWriteMask ("Stencil Write Mask", Float) = 255
-		_StencilReadMask ("Stencil Read Mask", Float) = 255
+		[HideInInspector][Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp ("Stencil Comparison", Float) = 8
+		[HideInInspector] _Stencil ("Stencil ID", Float) = 0
+		[HideInInspector][Enum(UnityEngine.Rendering.StencilOp)] _StencilOp ("Stencil Operation", Float) = 0
+		[HideInInspector] _StencilWriteMask ("Stencil Write Mask", Float) = 255
+		[HideInInspector] _StencilReadMask ("Stencil Read Mask", Float) = 255
 
-		_ColorMask ("Color Mask", Float) = 15
+		[HideInInspector] _ColorMask ("Color Mask", Float) = 15
 
 		[Toggle(UNITY_UI_ALPHACLIP)] _UseUIAlphaClip ("Use Alpha Clip", Float) = 0
 
