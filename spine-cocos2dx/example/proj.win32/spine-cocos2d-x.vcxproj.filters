@@ -27,15 +27,6 @@
     <ClCompile Include="..\..\src\spine\SkeletonAnimation.cpp">
       <Filter>spine-cocos2dx</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\spine\SkeletonBatch.cpp">
-      <Filter>spine-cocos2dx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\spine\SkeletonRenderer.cpp">
-      <Filter>spine-cocos2dx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\spine\SkeletonTwoColorBatch.cpp">
-      <Filter>spine-cocos2dx</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\spine\spine-cocos2dx.cpp">
       <Filter>spine-cocos2dx</Filter>
     </ClCompile>
@@ -249,6 +240,18 @@
     <ClCompile Include="..\Classes\MixAndMatchExample.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\spine\v3\SkeletonBatch.cpp">
+      <Filter>spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\v3\SkeletonTwoColorBatch.cpp">
+      <Filter>spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spine\SkeletonRenderer.cpp">
+      <Filter>spine-cocos2dx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\IKExample.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -258,15 +261,6 @@
       <Filter>spine-cocos2dx</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\spine\SkeletonAnimation.h">
-      <Filter>spine-cocos2dx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\spine\SkeletonBatch.h">
-      <Filter>spine-cocos2dx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\spine\SkeletonRenderer.h">
-      <Filter>spine-cocos2dx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\spine\SkeletonTwoColorBatch.h">
       <Filter>spine-cocos2dx</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\spine\spine-cocos2dx.h">
@@ -537,6 +531,18 @@
       <Filter>spine</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\MixAndMatchExample.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\v3\SkeletonBatch.h">
+      <Filter>spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\v3\SkeletonTwoColorBatch.h">
+      <Filter>spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spine\SkeletonRenderer.h">
+      <Filter>spine-cocos2dx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\IKExample.h">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

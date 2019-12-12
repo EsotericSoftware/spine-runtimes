@@ -301,6 +301,11 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 
 		{
 			EditorGUILayout.Space();
+			RenderStencilProperties();
+		}
+
+		{
+			EditorGUILayout.Space();
 			RenderOutlineProperties();
 		}
 
