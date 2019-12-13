@@ -56,6 +56,4 @@ else()
 	message(STATUS "${EXAMPLE_DIR}/cocos2d is already exists, current version ${COCOS_SHORT_VERSION}.")
 endif()
 
-if(USE_COCOS2DX_V4)
-	add_subdirectory("${EXAMPLE_DIR}")
-endif()
+add_subdirectory("${EXAMPLE_DIR}")

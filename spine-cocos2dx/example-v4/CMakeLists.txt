@@ -28,7 +28,7 @@ cmake_minimum_required(VERSION 3.6)
 set(APP_NAME spine-cocos2dx-example)
 
 project(${APP_NAME})
-option(BUILD_EDITOR_SPINE "Build editor support for spine" ON)
+set(BUILD_EDITOR_SPINE OFF CACHE BOOL "Build editor support for spine" FORCE)
 
 if(XCODE)
     if(NOT DEFINED CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET)
@@ -43,21 +43,6 @@ if(NOT DEFINED BUILD_ENGINE_DONE) # to test spine-cocos2dx-example into root pro
     include(CocosBuildSet)
     add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos ${ENGINE_BINARY_PATH}/cocos/core)
 endif()
-
-
-# Add spine-cpp library
-file(GLOB SPINE_CPP_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/../../spine-cpp/spine-cpp/include/**/*.h")
-file(GLOB SPINE_CPP_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/../../spine-cpp/spine-cpp/src/**/*.cpp")
-add_library(spine-cpp STATIC ${SPINE_CPP_SOURCE} ${SPINE_CPP_HEADER})
-target_include_directories(spine-cpp PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../spine-cpp/spine-cpp/include/")
-
-# Add spine-cocos2dx library
-file(GLOB_RECURSE SPINE_COCOS2DX_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/../src/**/*.h")
-file(GLOB_RECURSE SPINE_COCOS2DX_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/../src/**/*.cpp")
-add_library(spine-cocos2dx STATIC ${SPINE_COCOS2DX_SOURCE} ${SPINE_COCOS2DX_HEADER})
-target_include_directories(spine-cocos2dx PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../spine-cpp/spine-cpp/include/")
-target_include_directories(spine-cocos2dx PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../src/")
-target_link_libraries(spine-cocos2dx PRIVATE cocos2d)
 
 # record sources, headers, resources...
 set(GAME_RES_FOLDER
@@ -131,13 +116,10 @@ set(all_code_files
     )
 if(NOT ANDROID)
     add_executable(${APP_NAME} ${all_code_files})
-	target_link_libraries(${APP_NAME} spine-cpp spine-cocos2dx)
 else()
     add_library(${APP_NAME} SHARED ${all_code_files})
     add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos/platform/android ${ENGINE_BINARY_PATH}/cocos/platform)
 	target_link_libraries(${APP_NAME} -Wl,--whole-archive cpp_android_spec -Wl,--no-whole-archive)
-    target_link_libraries(${APP_NAME} spine-cocos2dx)
-	target_link_libraries(${APP_NAME} spine-cpp)
 endif()
 
 target_link_libraries(${APP_NAME} cocos2d)
@@ -146,15 +128,32 @@ target_include_directories(${APP_NAME}
         PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
 )
 
+# add spine
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../spine-cpp ${PROJECT_BINARY_DIR}/spine-cpp)
+get_target_property(spine_INCLUDE_DIRS spine-cpp INTERFACE_INCLUDE_DIRECTORIES)
+target_link_libraries(${APP_NAME} spine-cpp)
+target_include_directories(${APP_NAME}
+	PRIVATE ${spine_INCLUDE_DIRS}
+)
+
+# spine cocos2d-x specific
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../spine-cocos2dx ${PROJECT_BINARY_DIR}/spine-cocos2dx)
+get_target_property(spine_cocos2dx_INCLUDE_DIRS spine-cocos2dx INTERFACE_INCLUDE_DIRECTORIES)
+target_link_libraries(${APP_NAME} spine-cocos2dx)
+target_include_directories(${APP_NAME}
+	PRIVATE ${spine_cocos2dx_INCLUDE_DIRS}
+)
+
 # mark app resources
 setup_cocos_app_config(${APP_NAME})
+
 if(APPLE)
     set_target_properties(${APP_NAME} PROPERTIES RESOURCE "${APP_UI_RES}")
 
     if(MACOSX)
-        set_xcode_property(${APP_NAME} INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/mac/Info.plist")
+        set_target_properties(${APP_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/mac/Info.plist")
     elseif(IOS)
-        set_xcode_property(${APP_NAME} INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/ios/Info.plist")
+        set_target_properties(${APP_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/ios/Info.plist")
         set_xcode_property(${APP_NAME} ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon")
     endif()
 
