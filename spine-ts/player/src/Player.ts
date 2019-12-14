@@ -320,6 +320,8 @@ module spine {
 		private selectedBones: Bone[];
 		private parent: HTMLElement;
 
+		private stopRequestAnimationFrame = false;
+
 		constructor(parent: HTMLElement | string, private config: SpinePlayerConfig) {
 			if (typeof parent === "string") this.parent = document.getElementById(parent);
 			else this.parent = parent;
@@ -717,7 +719,7 @@ module spine {
 		}
 
 		drawFrame (requestNextFrame = true) {
-			if (requestNextFrame) requestAnimationFrame(() => this.drawFrame());
+			if (requestNextFrame && !this.stopRequestAnimationFrame) requestAnimationFrame(() => this.drawFrame());
 			let ctx = this.context;
 			let gl = ctx.gl;
 
@@ -1231,6 +1233,10 @@ module spine {
 				width: size.x,
 				height: size.y
 			};
+		}
+
+		public stopRendering() {
+			this.stopRequestAnimationFrame = true;
 		}
 	}
 

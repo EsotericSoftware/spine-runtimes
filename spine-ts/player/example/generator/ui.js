@@ -7,7 +7,7 @@ var spineGenerator;
 
 		UI.createElement = function (parent, html) {
 			parent.insertAdjacentHTML("beforeend", html);
-			return parent.lastChild;
+			return parent.lastElementChild;
 		}
 
 		UI.clear = function(element) {

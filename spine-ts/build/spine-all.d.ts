@@ -1949,6 +1949,7 @@ declare module spine {
 		private viewportTransitionStart;
 		private selectedBones;
 		private parent;
+		private stopRequestAnimationFrame;
 		constructor(parent: HTMLElement | string, config: SpinePlayerConfig);
 		validateConfig(config: SpinePlayerConfig): SpinePlayerConfig;
 		showError(error: string): void;
@@ -1968,6 +1969,7 @@ declare module spine {
 		setAnimation(animation: string): void;
 		private percentageToWorldUnit;
 		private calculateAnimationViewport;
+		stopRendering(): void;
 	}
 }
 declare function CodeMirror(el: Element, config: any): void;

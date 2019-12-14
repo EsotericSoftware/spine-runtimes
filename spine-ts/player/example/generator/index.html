@@ -53,6 +53,8 @@ body {
 #config {
 	width: 100%;
 	height: 100%;
+	padding: 1em;
+	background: #f0f0f0;
 }
 
 </style>
@@ -68,6 +70,8 @@ body {
 	<script>
 		var UI;
 		var Loader;
+		var dropZone = document.getElementById("dropzone");
+		var editor = document.getElementById("editor")
 
 		function showError(errorMessage) {
 			alert(errorMessage);
@@ -89,7 +93,7 @@ body {
 					Loader.loadStyle(cssUrl, function () {
 						Loader.loadJavaScript(playerUrl, function () {
 							UI.hide(dropZone)
-							setupEditor(document.getElementById("editor"), data);
+							setupEditor(editor, data);
 						});
 					}, showError);
 				}, showError);
@@ -123,7 +127,23 @@ body {
 		}
 
 		function setupConfig(editor, player, data) {
-			var configElement = UI.createElement(editor, `<div id="config"></div>`);
+			var cfg = UI.createElement(editor, `<div id="config"></div>`);
+
+			var topBar = UI.createElement(cfg, /*html*/`
+				<div style="display: flex; flex-direction: row;">
+					<button type="button">New</button>
+					<button type="button">Download HTML</button>
+				</div>
+			`);
+
+			var newButton = topBar.children[0];
+			newButton.onclick = function() {
+				UI.show(dropZone);
+				UI.hide(editor);
+			}
+			var downloadButton = topBar.children[1];
+
+			UI.createElement(cfg, `<h3>General</h3>`);
 		}
 	</script>
 </body>
