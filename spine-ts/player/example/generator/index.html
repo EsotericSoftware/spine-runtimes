@@ -138,7 +138,9 @@ body {
 
 			var newButton = topBar.children[0];
 			newButton.onclick = function() {
+				player.stopRendering();
 				UI.show(dropZone);
+				UI.clear(editor);
 				UI.hide(editor);
 			}
 			var downloadButton = topBar.children[1];
