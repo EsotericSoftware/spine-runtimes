@@ -10895,6 +10895,7 @@ var spine;
 			this.currentViewport = null;
 			this.previousViewport = null;
 			this.viewportTransitionStart = 0;
+			this.stopRequestAnimationFrame = false;
 			this.cancelId = 0;
 			if (typeof parent === "string")
 				this.parent = document.getElementById(parent);
@@ -11234,7 +11235,7 @@ var spine;
 		SpinePlayer.prototype.drawFrame = function (requestNextFrame) {
 			var _this = this;
 			if (requestNextFrame === void 0) { requestNextFrame = true; }
-			if (requestNextFrame)
+			if (requestNextFrame && !this.stopRequestAnimationFrame)
 				requestAnimationFrame(function () { return _this.drawFrame(); });
 			var ctx = this.context;
 			var gl = ctx.gl;
@@ -11693,6 +11694,9 @@ var spine;
 				width: size.x,
 				height: size.y
 			};
+		};
+		SpinePlayer.prototype.stopRendering = function () {
+			this.stopRequestAnimationFrame = true;
 		};
 		SpinePlayer.HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.25);
 		SpinePlayer.HOVER_COLOR_OUTER = new spine.Color(1, 1, 1, 1);
