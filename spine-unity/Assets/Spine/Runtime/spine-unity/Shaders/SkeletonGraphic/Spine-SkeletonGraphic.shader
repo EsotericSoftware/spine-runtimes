@@ -6,6 +6,7 @@ Shader "Spine/SkeletonGraphic"
 	{
 		[PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
+		[Toggle(_CANVAS_GROUP_COMPATIBLE)] _CanvasGroupCompatible("CanvasGroup Compatible", Int) = 0
 		_Color ("Tint", Color) = (1,1,1,1)
 
 		[HideInInspector][Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp ("Stencil Comparison", Float) = 8
@@ -62,6 +63,7 @@ Shader "Spine/SkeletonGraphic"
 
 		CGPROGRAM
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
+			#pragma shader_feature _ _CANVAS_GROUP_COMPATIBLE
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 2.0
@@ -119,6 +121,10 @@ Shader "Spine/SkeletonGraphic"
 				#endif
 
 				half4 color = (texColor + _TextureSampleAdd) * IN.color;
+				#ifdef _CANVAS_GROUP_COMPATIBLE
+				// CanvasGroup alpha sets vertex color alpha, but does not premultiply it to rgb components.
+				color.rgb *= IN.color.a;
+				#endif
 
 				color *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
 
