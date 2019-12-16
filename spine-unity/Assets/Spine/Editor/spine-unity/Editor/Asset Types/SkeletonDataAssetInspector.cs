@@ -175,7 +175,7 @@ namespace Spine.Unity.Editor {
 			// Header
 			EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(target.name + " (SkeletonDataAsset)", Icons.spine), EditorStyles.whiteLargeLabel);
 			if (targetSkeletonData != null) EditorGUILayout.LabelField("(Drag and Drop to instantiate.)", EditorStyles.miniLabel);
-			
+
 			// Main Serialized Fields
 			using (var changeCheck = new EditorGUI.ChangeCheckScope()) {
 				using (new SpineInspectorUtility.BoxScope())
@@ -201,11 +201,11 @@ namespace Spine.Unity.Editor {
 					}
 				}
 			}
-			
+
 			// Unity Quirk: Some code depends on valid preview. If preview is initialized elsewhere, this can cause contents to change between Layout and Repaint events, causing GUILayout control count errors.
 			if (NoProblems())
 				preview.Initialize(this.Repaint, targetSkeletonDataAsset, this.LastSkinName);
-			
+
 			if (targetSkeletonData != null) {
 				GUILayout.Space(20f);
 
@@ -597,7 +597,7 @@ namespace Spine.Unity.Editor {
 				warnings.Add("Missing Skeleton JSON");
 			} else {
 				var fieldValue = (TextAsset)skeletonJSON.objectReferenceValue;
-				
+
 				if (!AssetUtility.IsSpineData(fieldValue, out compatibilityProblemInfo)) {
 					warnings.Add("Skeleton data file is not a valid Spine JSON or binary file.");
 				} else {
@@ -807,12 +807,12 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
+			const int PreviewLayer = 30;
+			const int PreviewCameraCullingMask = 1 << PreviewLayer;
+
 			if (previewRenderUtility == null) {
 				previewRenderUtility = new PreviewRenderUtility(true);
 				animationLastTime = CurrentTime;
-
-				const int PreviewLayer = 30;
-				const int PreviewCameraCullingMask = 1 << PreviewLayer;
 
 				{
 					var c = this.PreviewUtilityCamera;
@@ -825,32 +825,32 @@ namespace Spine.Unity.Editor {
 				}
 
 				DestroyPreviewGameObject();
+			}
 
-				if (previewGameObject == null) {
-					try {
-						previewGameObject = EditorInstantiation.InstantiateSkeletonAnimation(skeletonDataAsset, skinName).gameObject;
+			if (previewGameObject == null) {
+				try {
+					previewGameObject = EditorInstantiation.InstantiateSkeletonAnimation(skeletonDataAsset, skinName, useObjectFactory:false).gameObject;
 
-						if (previewGameObject != null) {
-							previewGameObject.hideFlags = HideFlags.HideAndDontSave;
-							previewGameObject.layer = PreviewLayer;
-							skeletonAnimation = previewGameObject.GetComponent<SkeletonAnimation>();
-							skeletonAnimation.initialSkinName = skinName;
-							skeletonAnimation.LateUpdate();
-							previewGameObject.GetComponent<Renderer>().enabled = false;
+					if (previewGameObject != null) {
+						previewGameObject.hideFlags = HideFlags.HideAndDontSave;
+						previewGameObject.layer = PreviewLayer;
+						skeletonAnimation = previewGameObject.GetComponent<SkeletonAnimation>();
+						skeletonAnimation.initialSkinName = skinName;
+						skeletonAnimation.LateUpdate();
+						previewGameObject.GetComponent<Renderer>().enabled = false;
 
-							#if SPINE_UNITY_2018_PREVIEW_API
-							previewRenderUtility.AddSingleGO(previewGameObject);
-							#endif
-						}
-
-						if (this.ActiveTrack != null) cameraAdjustEndFrame = EditorApplication.timeSinceStartup + skeletonAnimation.AnimationState.GetCurrent(0).Alpha;
-						AdjustCameraGoals();
-					} catch {
-						DestroyPreviewGameObject();
+						#if SPINE_UNITY_2018_PREVIEW_API
+						previewRenderUtility.AddSingleGO(previewGameObject);
+						#endif
 					}
 
-					RefreshOnNextUpdate();
+					if (this.ActiveTrack != null) cameraAdjustEndFrame = EditorApplication.timeSinceStartup + skeletonAnimation.AnimationState.GetCurrent(0).Alpha;
+					AdjustCameraGoals();
+				} catch {
+					DestroyPreviewGameObject();
 				}
+
+				RefreshOnNextUpdate();
 			}
 		}
 
