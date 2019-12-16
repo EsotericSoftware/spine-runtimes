@@ -64,6 +64,7 @@
   * Added `SkeletonRenderer.EditorSkipSkinSync` scripting API property to be able to set custom skins in editor scripts. Enable this property when overwriting the Skeleton's skin from an editor script. Without setting this parameter, changes will be overwritten by the next inspector update. Only affects Inspector synchronisation of skin with `initialSkinName`, not startup initialization.
   * `AtlasUtilities.GetRepackedAttachments()` and `AtlasUtilities.GetRepackedSkin()` provide support for additional texture channels such as normal maps via the optional parameter `additionalTexturePropertyIDsToCopy `. See the spine-unity runtime documentation, section [Combining Skins - Advanced - Runtime Repacking with Normalmaps](http://esotericsoftware.com/spine-unity#Combining-Skins) for further info and example usage code.
   * `BoneFollower` can now optionally follow (uniform) world scale of the reference bone. There is now a `Mode` dropdown selector in the Inspector which can be set to either `Local` or `World Uniform`.
+  * All `Spine/SkeletonGraphic` shaders now provide a parameter `CanvasGroup Compatible` which can be enabled to support `CanvasGroup` alpha blending. For correct results, you should then disable `Pma Vertex Colors` in the `SkeletonGraphic` Inspector, in section `Advanced` (otherwise Slot alpha will be applied twice).
 
 * **Changes of default values**
 
