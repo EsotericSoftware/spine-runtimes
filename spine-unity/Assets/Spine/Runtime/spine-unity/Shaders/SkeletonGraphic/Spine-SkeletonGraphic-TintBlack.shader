@@ -6,6 +6,7 @@ Shader "Spine/SkeletonGraphic Tint Black"
 	{
 		[PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
+		[Toggle(_CANVAS_GROUP_COMPATIBLE)] _CanvasGroupCompatible("CanvasGroup Compatible", Int) = 0
 
 		_Color ("Tint", Color) = (1,1,1,1)
 		_Black ("Black Point", Color) = (0,0,0,0)
@@ -64,6 +65,7 @@ Shader "Spine/SkeletonGraphic Tint Black"
 
 		CGPROGRAM
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
+			#pragma shader_feature _ _CANVAS_GROUP_COMPATIBLE
 			#pragma vertex vert
 			#pragma fragment frag
 
@@ -128,7 +130,12 @@ Shader "Spine/SkeletonGraphic Tint Black"
 				clip (texColor.a - 0.001);
 				#endif
 
-				return (texColor * IN.color) + float4(((1-texColor.rgb) * (_Black.rgb + float3(IN.uv1.r, IN.uv1.g, IN.uv2.r)) * texColor.a * _Color.a * IN.color.a), 0);
+				half4 color = (texColor * IN.color) + float4(((1-texColor.rgb) * (_Black.rgb + float3(IN.uv1.r, IN.uv1.g, IN.uv2.r)) * texColor.a * _Color.a * IN.color.a), 0);
+				#ifdef _CANVAS_GROUP_COMPATIBLE
+				// CanvasGroup alpha sets vertex color alpha, but does not premultiply it to rgb components.
+				color.rgb *= IN.color.a;
+				#endif
+				return color;
 			}
 		ENDCG
 		}
