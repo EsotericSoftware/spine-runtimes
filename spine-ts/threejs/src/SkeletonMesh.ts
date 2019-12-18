@@ -57,6 +57,7 @@ module spine.threejs {
 				fragmentShader: fragmentShader,
 				side: THREE.DoubleSide,
 				transparent: true,
+				depthWrite: false,
 				alphaTest: 0.5
 			};
 			super(parameters);
