@@ -189,6 +189,7 @@ public class IkConstraint implements Updatable {
 			float ps = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
 			pb = -pc * ps;
 			pd = pa * ps;
+			// Fall through.
 		default:
 			float x = targetX - p.worldX, y = targetY - p.worldY;
 			float d = pa * pd - pb * pc;
