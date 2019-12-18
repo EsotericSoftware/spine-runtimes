@@ -278,26 +278,11 @@ module spine.threejs {
 						batch.begin();
 					}
 
-					// FIXME per slot blending would require multiple material support
-					//let slotBlendMode = slot.data.blendMode;
-					//if (slotBlendMode != blendMode) {
-					//	blendMode = slotBlendMode;
-					//	batcher.setBlendMode(getSourceGLBlendMode(this._gl, blendMode, premultipliedAlpha), getDestGLBlendMode(this._gl, blendMode));
-					//}
+					const slotBlendMode = slot.data.blendMode;
+					const slotTexture = texture.texture;
+					const materialGroup = batch.findMaterialGroup(slotTexture, slotBlendMode);
 
-					let batchMaterial = <SkeletonMeshMaterial>batch.material;
-					if (batchMaterial.uniforms.map.value == null) {
-						batchMaterial.uniforms.map.value = texture.texture;
-					}
-					if (batchMaterial.uniforms.map.value != texture.texture) {
-						batch.end();
-						batch = this.nextBatch();
-						batch.begin();
-						batchMaterial = <SkeletonMeshMaterial>batch.material;
-						batchMaterial.uniforms.map.value = texture.texture;
-					}
-					batchMaterial.needsUpdate = true;
-
+					batch.addMaterialGroup(finalIndicesLength, materialGroup);
 					batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, z);
 					z += zOffset;
 				}
