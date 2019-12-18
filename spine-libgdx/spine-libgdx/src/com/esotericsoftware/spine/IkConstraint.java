@@ -186,12 +186,9 @@ public class IkConstraint implements Updatable {
 			break;
 		case noRotationOrReflection:
 			rotationIK += atan2(pc, pa) * radDeg;
-			float ps = pa * pa + pc * pc;
-			if (ps > 0.0001f) {
-				ps = Math.abs(pa * pd - pb * pc) / ps;
-				pb = -pc * ps;
-				pd = pa * ps;
-			}
+			float ps = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+			pb = -pc * ps;
+			pd = pa * ps;
 		default:
 			float x = targetX - p.worldX, y = targetY - p.worldY;
 			float d = pa * pd - pb * pc;
