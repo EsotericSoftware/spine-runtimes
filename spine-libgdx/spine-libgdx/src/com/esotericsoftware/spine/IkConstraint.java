@@ -177,10 +177,28 @@ public class IkConstraint implements Updatable {
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
 		if (!bone.appliedValid) bone.updateAppliedTransform();
 		Bone p = bone.parent;
-		float id = 1 / (p.a * p.d - p.b * p.c);
-		float x = targetX - p.worldX, y = targetY - p.worldY;
-		float tx = (x * p.d - y * p.b) * id - bone.ax, ty = (y * p.a - x * p.c) * id - bone.ay;
-		float rotationIK = atan2(ty, tx) * radDeg - bone.ashearX - bone.arotation;
+		float pa = p.a, pb = p.b, pc = p.c, pd = p.d;
+		float rotationIK = -bone.ashearX - bone.arotation, tx, ty;
+		switch (bone.data.transformMode) {
+		case onlyTranslation:
+			tx = targetX - bone.worldX;
+			ty = targetY - bone.worldY;
+			break;
+		case noRotationOrReflection:
+			rotationIK += atan2(pc, pa) * radDeg;
+			float ps = pa * pa + pc * pc;
+			if (ps > 0.0001f) {
+				ps = Math.abs(pa * pd - pb * pc) / ps;
+				pb = -pc * ps;
+				pd = pa * ps;
+			}
+		default:
+			float x = targetX - p.worldX, y = targetY - p.worldY;
+			float d = pa * pd - pb * pc;
+			tx = (x * pd - y * pb) / d - bone.ax;
+			ty = (y * pa - x * pc) / d - bone.ay;
+		}
+		rotationIK += atan2(ty, tx) * radDeg;
 		if (bone.ascaleX < 0) rotationIK += 180;
 		if (rotationIK > 180)
 			rotationIK -= 360;
@@ -188,6 +206,12 @@ public class IkConstraint implements Updatable {
 			rotationIK += 360;
 		float sx = bone.ascaleX, sy = bone.ascaleY;
 		if (compress || stretch) {
+			switch (bone.data.transformMode) {
+			case noScale:
+			case noScaleOrReflection:
+				tx = targetX - bone.worldX;
+				ty = targetY - bone.worldY;
+			}
 			float b = bone.data.length * sx, dd = (float)Math.sqrt(tx * tx + ty * ty);
 			if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001f) {
 				float s = (dd / b - 1) * alpha + 1;
