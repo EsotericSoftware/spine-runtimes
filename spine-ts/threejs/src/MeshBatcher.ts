@@ -48,7 +48,7 @@ module spine.threejs {
 			geo.setAttribute("color", new THREE.InterleavedBufferAttribute(vertexBuffer, 4, 3, false));
 			geo.setAttribute("uv", new THREE.InterleavedBufferAttribute(vertexBuffer, 2, 7, false));
 			geo.setIndex(new THREE.BufferAttribute(indices, 1));
-			geo.getIndex().usage = WebGLRenderingContext.DYNAMIC_DRAW;;
+			geo.getIndex().usage = WebGLRenderingContext.DYNAMIC_DRAW;
 			geo.drawRange.start = 0;
 			geo.drawRange.count = 0;
 			this.geometry = geo;
