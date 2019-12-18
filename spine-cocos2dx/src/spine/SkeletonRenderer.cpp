@@ -810,7 +810,7 @@ namespace spine {
 	}
 
 	void SkeletonRenderer::setTwoColorTint(bool enabled) {
-#if COCOS2D_VERSION > 0x00040000
+#if COCOS2D_VERSION >= 0x00040000
 		_twoColorTint = enabled;
 #endif
 		setupGLProgramState(enabled);
