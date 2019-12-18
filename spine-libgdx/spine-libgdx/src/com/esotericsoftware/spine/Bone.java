@@ -539,10 +539,10 @@ public class Bone implements Updatable {
 	/** Transforms a point from world coordinates to the bone's local coordinates. */
 	public Vector2 worldToLocal (Vector2 world) {
 		if (world == null) throw new IllegalArgumentException("world cannot be null.");
-		float invDet = 1 / (a * d - b * c);
+		float det = a * d - b * c;
 		float x = world.x - worldX, y = world.y - worldY;
-		world.x = x * d * invDet - y * b * invDet;
-		world.y = y * a * invDet - x * c * invDet;
+		world.x = (x * d - y * b) / det;
+		world.y = (y * a - x * c) / det;
 		return world;
 	}
 
