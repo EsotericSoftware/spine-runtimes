@@ -107,7 +107,7 @@ namespace {
         }
         auto program = backend::Device::getInstance()->newProgram(TWO_COLOR_TINT_VERTEX_SHADER, TWO_COLOR_TINT_FRAGMENT_SHADER);
         auto* programState = new backend::ProgramState(program);
-        //program->autorelease();
+        program->autorelease();
 
         __locPMatrix = programState->getUniformLocation("u_PMatrix");
         __locTexture = programState->getUniformLocation("u_texture");
