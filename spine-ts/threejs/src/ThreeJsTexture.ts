@@ -68,5 +68,13 @@ module spine.threejs {
 			else if (wrap === TextureWrap.Repeat) return THREE.RepeatWrapping;
 			else throw new Error("Unknown texture wrap: " + wrap);
 		}
+
+		static toThreeJsBlending(blend: BlendMode) {
+			if (blend === BlendMode.Normal) return THREE.NormalBlending;
+			else if (blend === BlendMode.Additive) return THREE.AdditiveBlending;
+			else if (blend === BlendMode.Multiply) return THREE.MultiplyBlending;
+			else if (blend === BlendMode.Screen) throw new Error("BlendMode Screen not supported by Three.js");
+			else throw new Error("Unknown blendMode: " + blend);
+		}
 	}
 }
