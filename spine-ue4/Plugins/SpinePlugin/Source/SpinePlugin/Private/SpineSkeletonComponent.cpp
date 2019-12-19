@@ -41,6 +41,28 @@ USpineSkeletonComponent::USpineSkeletonComponent () {
 	bAutoActivate = true;
 }
 
+bool USpineSkeletonComponent::SetSkins(UPARAM(ref) TArray<FString>& SkinNames) {
+	CheckState();
+	if (skeleton) {
+		spine::Skin* newSkin = new spine::Skin("__spine-ue3_custom_skin");
+		for (auto& skinName : SkinNames) {
+			spine::Skin* skin = skeleton->getData()->findSkin(TCHAR_TO_UTF8(*skinName));
+			if (!skin) {
+				delete newSkin;
+				return false;
+			}
+			newSkin->addSkin(skin);
+		}
+		skeleton->setSkin(newSkin);
+		if (customSkin != nullptr) {
+			delete customSkin;
+		}
+		customSkin = newSkin;
+		return true;
+	}
+	else return false;
+}
+
 bool USpineSkeletonComponent::SetSkin (const FString skinName) {
 	CheckState();
 	if (skeleton) {

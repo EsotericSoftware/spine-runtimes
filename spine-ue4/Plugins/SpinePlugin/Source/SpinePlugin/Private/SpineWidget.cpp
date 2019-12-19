@@ -185,6 +185,11 @@ void USpineWidget::DisposeState() {
 		skeleton = nullptr;
 	}
 
+	if (customSkin) {
+		delete customSkin;
+		customSkin = nullptr;
+	}
+
 	trackEntries.Empty();
 }
 
@@ -199,6 +204,28 @@ bool USpineWidget::SetSkin(const FString skinName) {
 		spine::Skin* skin = skeleton->getData()->findSkin(TCHAR_TO_UTF8(*skinName));
 		if (!skin) return false;
 		skeleton->setSkin(skin);
+		return true;
+	}
+	else return false;
+}
+
+bool USpineWidget::SetSkins(UPARAM(ref) TArray<FString>& SkinNames) {
+	CheckState();
+	if (skeleton) {	
+		spine::Skin* newSkin = new spine::Skin("__spine-ue3_custom_skin");
+		for (auto& skinName : SkinNames) {
+			spine::Skin* skin = skeleton->getData()->findSkin(TCHAR_TO_UTF8(*skinName));
+			if (!skin) {
+				delete newSkin;
+				return false;
+			}
+			newSkin->addSkin(skin);
+		}
+		skeleton->setSkin(newSkin);
+		if (customSkin != nullptr) {
+			delete customSkin;
+		}
+		customSkin = newSkin;
 		return true;
 	}
 	else return false;

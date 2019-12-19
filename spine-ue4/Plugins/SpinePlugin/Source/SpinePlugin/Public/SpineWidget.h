@@ -90,6 +90,9 @@ public:
 	bool SetSkin(const FString SkinName);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool SetSkins(UPARAM(ref) TArray<FString> &SkinNames);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	bool HasSkin(const FString SkinName);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
@@ -222,6 +225,7 @@ protected:
 	USpineAtlasAsset* lastAtlas = nullptr;
 	spine::Atlas* lastSpineAtlas = nullptr;
 	USpineSkeletonDataAsset* lastData = nullptr;
+	spine::Skin* customSkin = nullptr;
 
 	// Need to hold on to the dynamic instances, or the GC will kill us while updating them
 	UPROPERTY()

@@ -55,6 +55,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
 	void GetSkins(TArray<FString> &Skins);
+
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	bool SetSkins(UPARAM(ref) TArray<FString>& SkinNames);
 	
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	bool SetSkin (const FString SkinName);
@@ -138,5 +141,6 @@ protected:
 	spine::Skeleton* skeleton;
 	USpineAtlasAsset* lastAtlas = nullptr;
 	spine::Atlas* lastSpineAtlas = nullptr;
-	USpineSkeletonDataAsset* lastData = nullptr;	
+	USpineSkeletonDataAsset* lastData = nullptr;
+	spine::Skin* customSkin = nullptr;
 };
