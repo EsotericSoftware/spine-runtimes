@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 module spine {
@@ -102,16 +102,40 @@ module spine {
 		apply1 (bone: Bone, targetX: number, targetY: number, compress: boolean, stretch: boolean, uniform: boolean, alpha: number) {
 			if (!bone.appliedValid) bone.updateAppliedTransform();
 			let p = bone.parent;
-			let id = 1 / (p.a * p.d - p.b * p.c);
-			let x = targetX - p.worldX, y = targetY - p.worldY;
-			let tx = (x * p.d - y * p.b) * id - bone.ax, ty = (y * p.a - x * p.c) * id - bone.ay;
-			let rotationIK = Math.atan2(ty, tx) * MathUtils.radDeg - bone.ashearX - bone.arotation;
+
+			let pa = p.a, pb = p.b, pc = p.c, pd = p.d;
+			let rotationIK = -bone.ashearX - bone.arotation, tx = 0, ty = 0;
+
+			switch(bone.data.transformMode) {
+				case TransformMode.OnlyTranslation:
+					tx = targetX - bone.worldX;
+					ty = targetY - bone.worldY;
+					break;
+				case TransformMode.NoRotationOrReflection:
+					rotationIK += Math.atan2(pc, pa) * MathUtils.radDeg;
+					let ps = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+					pb = -pc * ps;
+					pd = pa * ps;
+					// Fall through
+				default:
+					let x = targetX - p.worldX, y = targetY - p.worldY;
+					let d = pa * pd - pb * pc;
+					tx = (x * pd - y * pb) / d - bone.ax;
+					ty = (y * pa - x * pc) / d - bone.ay;
+			}
+			rotationIK += Math.atan2(ty, tx) * MathUtils.radDeg;
 			if (bone.ascaleX < 0) rotationIK += 180;
 			if (rotationIK > 180)
 				rotationIK -= 360;
 			else if (rotationIK < -180) rotationIK += 360;
 			let sx = bone.ascaleX, sy = bone.ascaleY;
 			if (compress || stretch) {
+				switch (bone.data.transformMode) {
+					case TransformMode.NoScale:
+					case TransformMode.NoScaleOrReflection:
+						tx = targetX - bone.worldX;
+						ty = targetY - bone.worldY;
+				}
 				let b = bone.data.length * sx, dd = Math.sqrt(tx * tx + ty * ty);
 				if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001) {
 					let s = (dd / b - 1) * alpha + 1;

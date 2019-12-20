@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package spine {
@@ -108,9 +108,9 @@ package spine {
 			for (i = 0, n = bones.length; i < n; i++) {
 				bone = bones[i];
 				bone._sorted = bone.data.skinRequired;
-				bone.active = !bone._sorted;				
+				bone.active = !bone._sorted;
 			}
-			
+
 			if (skin != null) {
 				var skinBones : Vector.<BoneData> = skin.bones;
 				for (i = 0, n = this.skin.bones.length; i < n; i++) {
@@ -159,8 +159,8 @@ package spine {
 			for (i = 0, n = bones.length; i < n; i++)
 				sortBone(bones[i]);
 		}
-		
-		static function contains(list : Vector.<ConstraintData>, element : ConstraintData) : Boolean {
+
+		private static function contains(list : Vector.<ConstraintData>, element : ConstraintData) : Boolean {
 			for (var i : Number = 0; i < list.length; i++)
 				if  (list[i] == element) return true;
 			return false;
@@ -169,7 +169,7 @@ package spine {
 		private function sortIkConstraint(constraint : IkConstraint) : void {
 			constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin != null && contains(this.skin.constraints, constraint.data)));
 			if (!constraint.active) return;
-			
+
 			var target : Bone = constraint.target;
 			sortBone(target);
 
@@ -191,7 +191,7 @@ package spine {
 		private function sortPathConstraint(constraint : PathConstraint) : void {
 			constraint.active = constraint.target.bone.isActive() && (!constraint.data.skinRequired || (this.skin != null && contains(this.skin.constraints, constraint.data)));
 			if (!constraint.active) return;
-			
+
 			var slot : Slot = constraint.target;
 			var slotIndex : Number = slot.data.index;
 			var slotBone : Bone = slot.bone;
@@ -222,7 +222,7 @@ package spine {
 		private function sortTransformConstraint(constraint : TransformConstraint) : void {
 			constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin != null && contains(this.skin.constraints, constraint.data)));
 			if (!constraint.active) return;
-			
+
 			sortBone(constraint.target);
 
 			var constrained : Vector.<Bone> = constraint.bones;
@@ -323,9 +323,9 @@ package spine {
 			for each (var ikConstraint : IkConstraint in ikConstraints) {
 				ikConstraint.mix = ikConstraint._data.mix;
 				ikConstraint.softness = ikConstraint._data.softness;
-				ikConstraint.bendDirection = ikConstraint._data.bendDirection;				
+				ikConstraint.bendDirection = ikConstraint._data.bendDirection;
 				ikConstraint.compress = ikConstraint._data.compress;
-				ikConstraint.stretch = ikConstraint._data.stretch;				
+				ikConstraint.stretch = ikConstraint._data.stretch;
 			}
 
 			for each (var transformConstraint : TransformConstraint in transformConstraints) {
