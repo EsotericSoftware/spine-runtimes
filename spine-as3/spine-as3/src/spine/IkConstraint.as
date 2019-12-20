@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package spine {
@@ -54,7 +54,7 @@ package spine {
 				bones[bones.length] = skeleton.findBone(boneData.name);
 			target = skeleton.findBone(data.target._name);
 		}
-		
+
 		public function isActive() : Boolean {
 			return active;
 		}
@@ -87,23 +87,46 @@ package spine {
 		static public function apply1(bone : Bone, targetX : Number, targetY : Number, compress: Boolean, stretch : Boolean, uniform: Boolean, alpha : Number) : void {
 			if (!bone.appliedValid) bone.updateAppliedTransform();
 			var p : Bone = bone.parent;
-			var id : Number = 1 / (p.a * p.d - p.b * p.c);
-			var x : Number = targetX - p.worldX, y : Number = targetY - p.worldY;
-			var tx : Number = (x * p.d - y * p.b) * id - bone.ax, ty : Number = (y * p.a - x * p.c) * id - bone.ay;
-			var rotationIK : Number = Math.atan2(ty, tx) * MathUtils.radDeg - bone.ashearX - bone.arotation;
+
+			var pa : Number = p.a, pb : Number = p.b, pc : Number = p.c, pd : Number = p.d;
+			var rotationIK : Number = -bone.ashearX - bone.arotation, tx : Number = 0, ty : Number = 0;
+			switch(bone.data.transformMode) {
+				case TransformMode.onlyTranslation:
+					tx = targetX - bone.worldX;
+					ty = targetY - bone.worldY;
+					break;
+				case TransformMode.noRotationOrReflection:
+					rotationIK += Math.atan2(pc, pa) * MathUtils.radDeg;
+					var ps : Number = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+					pb = -pc * ps;
+					pd = pa * ps;
+				default:
+					var x : Number = targetX - p.worldX, y : Number = targetY - p.worldY;
+					var d : Number = pa * pd - pb * pc;
+					tx = (x * pd - y * pb) / d - bone.ax;
+					ty = (y * pa - x * pc) / d - bone.ay;
+			}
+
+			rotationIK += Math.atan2(ty, tx) * MathUtils.radDeg;
 			if (bone.ascaleX < 0) rotationIK += 180;
 			if (rotationIK > 180)
 				rotationIK -= 360;
 			else if (rotationIK < -180) rotationIK += 360;
 			var sx : Number = bone.ascaleX;
 			var sy : Number = bone.ascaleY;
-			if (stretch) {
+			if (compress || stretch) {
+				switch (bone.data.transformMode) {
+					case TransformMode.noScale:
+					case TransformMode.noScaleOrReflection:
+						tx = targetX - bone.worldX;
+						ty = targetY - bone.worldY;
+				}
 				var b : Number = bone.data.length * sx, dd : Number = Math.sqrt(tx * tx + ty * ty);
 				if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001) {
 					var s : Number = (dd / b - 1) * alpha + 1;
 					sx *= s;
 					if (uniform) sy *= s;
-				}				
+				}
 			}
 			bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY);
 		}

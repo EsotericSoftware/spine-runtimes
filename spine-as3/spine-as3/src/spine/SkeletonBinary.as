@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package spine {
@@ -64,7 +64,7 @@ package spine {
 		public var attachmentLoader : AttachmentLoader;
 		public var scale : Number = 1;
 		private var linkedMeshes : Vector.<LinkedMesh> = new Vector.<LinkedMesh>();
-		
+
 		private static const BONE_ROTATE : int = 0;
 		private static const BONE_TRANSLATE : int = 1;
 		private static const BONE_SCALE : int = 2;
@@ -84,13 +84,13 @@ package spine {
 
 		public function SkeletonBinary(attachmentLoader : AttachmentLoader = null) {
 			this.attachmentLoader = attachmentLoader;
-		}		
+		}
 
 		/** @param object A String or ByteArray. */
 		public function readSkeletonData(object : *) : SkeletonData {
 			if (object == null) throw new ArgumentError("object cannot be null.");
 			if (!(object is ByteArray)) throw new ArgumentError("Object must be a ByteArray");
-			
+
 			var scale : Number = this.scale;
 
 			var skeletonData : SkeletonData = new SkeletonData();
@@ -100,6 +100,8 @@ package spine {
 
 			skeletonData.hash = input.readString();
 			skeletonData.version = input.readString();
+			if ("3.8.75" == skeletonData.version)
+					throw new Error("Unsupported skeleton data, please export with a newer version of Spine.");
 			skeletonData.x = input.readFloat();
 			skeletonData.y = input.readFloat();
 			skeletonData.width = input.readFloat();
@@ -133,7 +135,7 @@ package spine {
 				boneData.scaleY = input.readFloat();
 				boneData.shearX = input.readFloat();
 				boneData.shearY = input.readFloat();
-				boneData.length = input.readFloat() * scale;				
+				boneData.length = input.readFloat() * scale;
 				boneData.transformMode = TransformMode.values[input.readInt(true)];
 				boneData.skinRequired = input.readBoolean();
 				if (nonessential) boneData.color.setFromRgba8888(input.readInt32());
@@ -275,7 +277,7 @@ package spine {
 				skeletonData.animations.push(readAnimation(input, input.readString(), skeletonData));
 			return skeletonData;
 		}
-		
+
 		private function readSkin (input: BinaryInput, skeletonData: SkeletonData, defaultSkin: Boolean, nonessential: Boolean): Skin {
 			var skin : Skin = null;
 			var i : int = 0;
@@ -300,7 +302,7 @@ package spine {
 					skin.constraints.push(skeletonData.transformConstraints[input.readInt(true)]);
 				for (i = 0, n = input.readInt(true); i < n; i++)
 					skin.constraints.push(skeletonData.pathConstraints[input.readInt(true)]);
-					
+
 				slotCount = input.readInt(true);
 			}
 
@@ -314,12 +316,12 @@ package spine {
 			}
 			return skin;
 		}
-		
+
 		private function readAttachment(input: BinaryInput, skeletonData: SkeletonData, skin: Skin, slotIndex: Number, attachmentName: String, nonessential: Boolean): Attachment {
 			var scale : Number = this.scale;
 			var i : int = 0;
 			var n : int = 0;
-			
+
 			var vertexCount : int;
 			var vertices : Vertices;
 			var path: String;
@@ -386,7 +388,7 @@ package spine {
 				var triangles : Vector.<uint> = readUnsignedShortArray(input);
 				vertices = readVertices(input, vertexCount);
 				var hullLength : int = input.readInt(true);
-				var edges : Vector.<int> = null;				
+				var edges : Vector.<int> = null;
 				if (nonessential) {
 					edges = readShortArray(input);
 					width = input.readFloat();
@@ -417,7 +419,7 @@ package spine {
 				color = input.readInt32();
 				var skinName : String = input.readStringRef();
 				var parent : String = input.readStringRef();
-				var inheritDeform : Boolean = input.readBoolean();				
+				var inheritDeform : Boolean = input.readBoolean();
 				if (nonessential) {
 					width = input.readFloat();
 					height = input.readFloat();
@@ -489,7 +491,7 @@ package spine {
 			}
 			return null;
 		}
-		
+
 		private function readVertices (input: BinaryInput, vertexCount: int): Vertices {
 			var verticesLength : int = vertexCount << 1;
 			var vertices : Vertices = new Vertices();
@@ -517,7 +519,7 @@ package spine {
 
 		private function readFloatArray (input: BinaryInput, n: Number, scale: Number): Vector.<Number> {
 			var i : int = 0;
-			var array : Vector.<Number> = new Vector.<Number>();			
+			var array : Vector.<Number> = new Vector.<Number>();
 			array.length = n;
 			if (scale == 1) {
 				for (i = 0; i < n; i++)
@@ -537,7 +539,7 @@ package spine {
 				array[i] = input.readShort();
 			return array;
 		}
-		
+
 		private function readUnsignedShortArray (input: BinaryInput): Vector.<uint> {
 			var n : int = input.readInt(true);
 			var array : Vector.<uint> = new Vector.<uint>();
@@ -546,7 +548,7 @@ package spine {
 				array[i] = input.readShort();
 			return array;
 		}
-		
+
 		private function readAnimation (input: BinaryInput, name: String, skeletonData: SkeletonData): Animation {
 			var timelines : Vector.<Timeline> = new Vector.<Timeline>();
 			var scale : Number = this.scale;
@@ -756,7 +758,7 @@ package spine {
 									deform = new Vector.<Number>();
 									deform.length = deformLength;
 								} else
-									deform = vertices;								
+									deform = vertices;
 							} else {
 								var v : int, vn: int;
 								deform = new Vector.<Number>();
@@ -858,7 +860,7 @@ package spine {
 		public function setCurve (timeline: CurveTimeline, frameIndex: Number, cx1: Number, cy1: Number, cx2: Number, cy2: Number) : void {
 			timeline.setCurve(frameIndex, cx1, cy1, cx2, cy2);
 		}
-		
+
 	}
 }
 

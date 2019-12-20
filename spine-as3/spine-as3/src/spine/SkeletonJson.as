@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 package spine {
@@ -68,7 +68,7 @@ package spine {
 		public function SkeletonJson(attachmentLoader : AttachmentLoader = null) {
 			this.attachmentLoader = attachmentLoader;
 		}
-		
+
 		private function getFloatValue(object : Object, key: String, defaultValue : Number) : Number {;
 			var hasKey : Boolean = object.hasOwnProperty(key);
 			return hasKey ? Number(object[key]) : defaultValue;
@@ -96,6 +96,8 @@ package spine {
 			if (skeletonMap) {
 				skeletonData.hash = skeletonMap["hash"];
 				skeletonData.version = skeletonMap["spine"];
+				if ("3.8.75" == skeletonData.version)
+					throw new Error("Unsupported skeleton data, please export with a newer version of Spine.");
 				skeletonData.x = skeletonMap["x"] || 0;
 				skeletonData.y = skeletonMap["y"] || 0;
 				skeletonData.width = skeletonMap["width"] || 0;
@@ -142,7 +144,7 @@ package spine {
 
 				var dark : String = slotMap["dark"];
 				if (dark) {
-					slotData.darkColor = new Color(toColor(dark, 0), toColor(dark, 1), toColor(dark, 2), 0);					
+					slotData.darkColor = new Color(toColor(dark, 0), toColor(dark, 1), toColor(dark, 2), 0);
 				}
 
 				slotData.attachmentName = slotMap["attachment"];
@@ -238,12 +240,12 @@ package spine {
 			}
 
 			// Skins.
-			var skins : Object = root["skins"];			
+			var skins : Object = root["skins"];
 			for (var i : Number = 0; i < skins.length; i++) {
 				var ii : Number;
 				var skinMap : Object = skins[i];
 				var skin : Skin = new Skin(skinMap["name"]);
-				
+
 				if (skinMap["bones"]) {
 					for (ii = 0; ii < skinMap["bones"].length; ii++) {
 						var boneData : BoneData = skeletonData.findBone(skinMap["bones"][ii]);
@@ -251,7 +253,7 @@ package spine {
 						skin.bones.push(boneData);
 					}
 				}
-				
+
 				if (skinMap["ik"]) {
 					for (ii = 0; ii < skinMap["ik"].length; ii++) {
 						var constraint : ConstraintData = skeletonData.findIkConstraint(skinMap["ik"][ii]);
@@ -259,15 +261,15 @@ package spine {
 						skin.constraints.push(constraint);
 					}
 				}
-				
-				if (skinMap["transform"]) {									
+
+				if (skinMap["transform"]) {
 					for (ii = 0; ii < skinMap["transform"].length; ii++) {
 						var constraint : ConstraintData = skeletonData.findTransformConstraint(skinMap["transform"][ii]);
 						if (constraint == null) throw new Error("Skin transform constraint not found: " + skinMap["transform"][ii]);
 						skin.constraints.push(constraint);
 					}
 				}
-				
+
 				if (skinMap["path"]) {
 					for (ii = 0; ii < skinMap["path"].length; ii++) {
 						var constraint : ConstraintData = skeletonData.findPathConstraint(skinMap["path"][ii]);
@@ -275,7 +277,7 @@ package spine {
 						skin.constraints.push(constraint);
 					}
 				}
-				
+
 				for (slotName in skinMap.attachments) {
 					var slot : SlotData = skeletonData.findSlot(slotName);
 					var slotEntry : Object = skinMap.attachments[slotName];
@@ -417,9 +419,9 @@ package spine {
 						if (slot == null) throw new Error("Clipping end slot not found: " + end);
 						clip.endSlot = slot;
 					}
-					
+
 					vertexCount = int(map["vertexCount"]);
-					readVertices(map, clip, vertexCount << 1);					
+					readVertices(map, clip, vertexCount << 1);
 					color = map["color"];
 					if (color) {
 						clip.color.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
@@ -792,7 +794,7 @@ package spine {
 
 		static private function toColor(hexString : String, colorIndex : int) : Number {
 			if (hexString.length != 8 && hexString.length != 6) throw new ArgumentError("Color hexidecimal length must be 6 or 8, received: " + hexString);
-			return parseInt(hexString.substring(colorIndex * 2, colorIndex * 2 + 2), 16) / 255;			
+			return parseInt(hexString.substring(colorIndex * 2, colorIndex * 2 + 2), 16) / 255;
 		}
 
 		static private function getFloatArray(map : Object, name : String, scale : Number) : Vector.<Number> {
