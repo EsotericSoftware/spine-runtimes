@@ -204,7 +204,7 @@ namespace Spine.Unity.Editor {
 			if (MaterialChecks.IsTextureSetupProblematic(material, PlayerSettings.colorSpace,
 				texImporter. sRGBTexture, texImporter. mipmapEnabled, texImporter. alphaIsTransparency,
 				texturePath, materialPath, ref errorMessage)) {
-				Debug.LogWarning(errorMessage);
+				Debug.LogWarning(errorMessage, material);
 			}
 			return true;
 		}
