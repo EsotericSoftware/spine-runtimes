@@ -6,7 +6,9 @@
 #define SHADER_SHARED_INCLUDED
 
 #if defined(USE_LWRP)
-#include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Core.hlsl"
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+#elif defined(USE_URP)
+#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 #else
 #include "UnityCG.cginc"
 #endif
@@ -42,7 +44,7 @@ inline float4 calculateWorldPos(float4 vertex)
 	return mul(unity_ObjectToWorld, vertex);
 }
 
-#if defined(USE_LWRP)
+#if defined(USE_LWRP) || defined(USE_URP)
 // snaps post-transformed position to screen pixels
 inline float4 UnityPixelSnap(float4 pos)
 {
@@ -61,13 +63,13 @@ inline float4 UnityPixelSnap(float4 pos)
 
 inline float4 calculateLocalPos(float4 vertex)
 {
-#if !defined(USE_LWRP)
+#if !defined(USE_LWRP) && !defined(USE_URP)
 #ifdef UNITY_INSTANCING_ENABLED
     vertex.xy *= _Flip.xy;
 #endif
 #endif
 
-#if defined(USE_LWRP)
+#if defined(USE_LWRP) || defined(USE_URP)
 	float4 pos = TransformObjectToHClip(vertex.xyz);
 #else
 	float4 pos = UnityObjectToClipPos(vertex);
@@ -82,7 +84,7 @@ inline float4 calculateLocalPos(float4 vertex)
 
 inline half3 calculateWorldNormal(float3 normal)
 {
-#if defined(USE_LWRP)
+#if defined(USE_LWRP) || defined(USE_URP)
 	return TransformObjectToWorldNormal(normal);
 #else
 	return UnityObjectToWorldNormal(normal);
@@ -106,7 +108,7 @@ half3 UnpackScaleNormal(half4 packednormal, half bumpScale)
 		half3 normal;
 		normal.xy = (packednormal.wy * 2 - 1);
 		// Note: we allow scaled normals in LWRP since we might be using fewer instructions.
-		#if (SHADER_TARGET >= 30) || defined(USE_LWRP)
+		#if (SHADER_TARGET >= 30) || defined(USE_LWRP) || defined(USE_URP)
 			// SM2.0: instruction count limitation
 			// SM2.0: normal scaler is not supported
 			normal.xy *= bumpScale;
@@ -114,12 +116,12 @@ half3 UnpackScaleNormal(half4 packednormal, half bumpScale)
 		normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
 		return normal;
 	#endif
-}		
+}
 
 
 inline half3 calculateWorldTangent(float4 tangent)
 {
-#if defined(USE_LWRP)
+#if defined(USE_LWRP) || defined(USE_URP)
 	return TransformObjectToWorldDir(tangent.xyz);
 #else
 	return UnityObjectToWorldDir(tangent);
@@ -171,7 +173,7 @@ inline fixed4 prepareLitPixelForOutput(fixed4 finalPixel, fixed4 color) : SV_Tar
 #elif defined(_ADDITIVEBLEND_SOFT)
 	//Additive soft
 	finalPixel.rgb *= finalPixel.a;
-#else 
+#else
 	//Opaque
 	finalPixel.a = 1;
 #endif
@@ -194,7 +196,7 @@ inline fixed4 calculateLitPixel(fixed4 texureColor, fixed3 lighting) : SV_Target
 inline fixed4 calculateAdditiveLitPixel(fixed4 texureColor, fixed4 color, fixed3 lighting) : SV_Target
 {
 	fixed4 finalPixel;
-	
+
 #if defined(_ALPHABLEND_ON)	|| defined(_MULTIPLYBLEND)	|| defined(_MULTIPLYBLEND_X2) || defined(_ADDITIVEBLEND) || defined(_ADDITIVEBLEND_SOFT)
 	//Normal Alpha, Additive and Multiply modes
 	finalPixel.rgb = (texureColor.rgb * lighting * color.rgb) * (texureColor.a * color.a);
@@ -208,14 +210,14 @@ inline fixed4 calculateAdditiveLitPixel(fixed4 texureColor, fixed4 color, fixed3
 	finalPixel.rgb = texureColor.rgb * lighting * color.rgb;
 	finalPixel.a = 1.0;
 #endif
-	
+
 	return finalPixel;
 }
 
 inline fixed4 calculateAdditiveLitPixel(fixed4 texureColor, fixed3 lighting) : SV_Target
 {
 	fixed4 finalPixel;
-	
+
 #if defined(_ALPHABLEND_ON)	|| defined(_MULTIPLYBLEND) || defined(_MULTIPLYBLEND_X2) || defined(_ADDITIVEBLEND) || defined(_ADDITIVEBLEND_SOFT)
 	//Normal Alpha, Additive and Multiply modes
 	finalPixel.rgb = (texureColor.rgb * lighting) * texureColor.a;
@@ -225,7 +227,7 @@ inline fixed4 calculateAdditiveLitPixel(fixed4 texureColor, fixed3 lighting) : S
 	finalPixel.rgb = texureColor.rgb * lighting;
 	finalPixel.a = 1.0;
 #endif
-	
+
 	return finalPixel;
 }
 
@@ -245,7 +247,7 @@ inline fixed4 calculatePixel(fixed4 texureColor) : SV_Target
 // Alpha Clipping
 //
 
-#if defined(_ALPHA_CLIP) 
+#if defined(_ALPHA_CLIP)
 
 uniform fixed _Cutoff;
 
@@ -286,7 +288,7 @@ float3 rgb2hsv(float3 c)
   return float3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
 
-float3 hsv2rgb(float3 c) 
+float3 hsv2rgb(float3 c)
 {
   c = float3(c.x, clamp(c.yz, 0.0, 1.0));
   float4 K = float4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -297,13 +299,13 @@ float3 hsv2rgb(float3 c)
 inline fixed4 adjustColor(fixed4 color)
 {
 	float3 hsv = rgb2hsv(color.rgb);
-	
-	hsv.x += _Hue; 
-	hsv.y *= _Saturation; 
+
+	hsv.x += _Hue;
+	hsv.y *= _Saturation;
 	hsv.z *= _Brightness;
-	
+
 	color.rgb = hsv2rgb(hsv);
-	
+
 	return color;
 }
 
@@ -323,7 +325,7 @@ inline fixed4 adjustColor(fixed4 color)
 
 #if defined(_FOG) && (defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2))
 
-inline fixed4 applyFog(fixed4 pixel, float fogCoordOrFactorAtLWRP) 
+inline fixed4 applyFog(fixed4 pixel, float fogCoordOrFactorAtLWRP)
 {
 #if defined(_ADDITIVEBLEND) || defined(_ADDITIVEBLEND_SOFT)
 	//In additive mode blend from clear to black based on luminance
@@ -344,22 +346,22 @@ inline fixed4 applyFog(fixed4 pixel, float fogCoordOrFactorAtLWRP)
 	//In opaque mode just return fog color;
 	fixed4 fogColor = unity_FogColor;
 #endif
-	
-	#if defined(USE_LWRP)
+
+	#if defined(USE_LWRP) || defined(USE_URP)
 	pixel.rgb = MixFogColor(pixel.rgb, fogColor.rgb, fogCoordOrFactorAtLWRP);
 	#else
 	UNITY_APPLY_FOG_COLOR(fogCoordOrFactorAtLWRP, pixel, fogColor);
 	#endif
-	
+
 	return pixel;
 }
 
 #define APPLY_FOG(pixel, input) pixel = applyFog(pixel, input.fogCoord);
 #define APPLY_FOG_LWRP(pixel, fogFactor) pixel = applyFog(pixel, fogFactor);
-	
+
 #define APPLY_FOG_ADDITIVE(pixel, input) \
 	UNITY_APPLY_FOG_COLOR(input.fogCoord, pixel.rgb, fixed4(0,0,0,0)); // fog towards black in additive pass
-	
+
 #else
 
 #define APPLY_FOG(pixel, input)
@@ -392,7 +394,7 @@ inline fixed4 calculateBlendedTexturePixel(float2 texcoord)
 inline fixed4 calculateTexturePixel(float2 texcoord)
 {
 	fixed4 pixel;
-	
+
 #if _TEXTURE_BLEND
 	pixel = calculateBlendedTexturePixel(texcoord);
 #else
