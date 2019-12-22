@@ -169,17 +169,24 @@ namespace Spine {
 					tx = targetX - bone.worldX;
 					ty = targetY - bone.worldY;
 					break;
-				case TransformMode.NoRotationOrReflection:
-					rotationIK += Math.Atan2(pc, pa) * MathUtils.radDeg;
-					float ps = Math.Abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-					pb = -pc * ps;
-					pd = pa * ps;
-					// Fall through
-				default:
-					let x = targetX - p.worldX, y = targetY - p.worldY;
-					let d = pa * pd - pb * pc;
-					tx = (x * pd - y * pb) / d - bone.ax;
-					ty = (y * pa - x * pc) / d - bone.ay;
+				case TransformMode.NoRotationOrReflection: {
+                        rotationIK += (float)Math.Atan2(pc, pa) * MathUtils.RadDeg;
+                        float ps = Math.Abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+                        pb = -pc * ps;
+                        pd = pa * ps;
+                        float x = targetX - p.worldX, y = targetY - p.worldY;
+                        float d = pa * pd - pb * pc;
+                        tx = (x * pd - y * pb) / d - bone.ax;
+                        ty = (y * pa - x * pc) / d - bone.ay;
+                        break;
+                }                    
+                default: {
+                    float x = targetX - p.worldX, y = targetY - p.worldY;
+                    float d = pa * pd - pb * pc;
+                    tx = (x * pd - y * pb) / d - bone.ax;
+                    ty = (y * pa - x * pc) / d - bone.ay;
+                    break;
+                }
 			}
 
 			rotationIK += (float)Math.Atan2(ty, tx) * MathUtils.RadDeg;
@@ -193,9 +200,13 @@ namespace Spine {
 			if (compress || stretch) {
 				switch (bone.data.transformMode) {
 					case TransformMode.NoScale:
-					case TransformMode.NoScaleOrReflection:
+                        tx = targetX - bone.worldX;
+                        ty = targetY - bone.worldY;
+                        break;
+                    case TransformMode.NoScaleOrReflection:
 						tx = targetX - bone.worldX;
 						ty = targetY - bone.worldY;
+                        break;
 				}
 				float b = bone.data.length * sx, dd = (float)Math.Sqrt(tx * tx + ty * ty);
 				if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001f) {
