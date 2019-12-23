@@ -302,7 +302,9 @@ namespace Spine.Unity.AttachmentTools {
 					else {
 						originalRegions.Add(region);
 						for (int i = 0; i < numTextureParamsToRepack; ++i) {
-							Texture2D regionTexture = (i == 0 ? region.ToTexture() : region.ToTexture(texturePropertyId: additionalTexturePropertyIDsToCopy[i - 1]));
+							Texture2D regionTexture = (i == 0 ?
+								region.ToTexture(mipmaps : mipmaps) :
+								region.ToTexture(mipmaps : mipmaps, texturePropertyId: additionalTexturePropertyIDsToCopy[i - 1]));
 							texturesToPackAtParam[i].Add(regionTexture);
 						}
 
