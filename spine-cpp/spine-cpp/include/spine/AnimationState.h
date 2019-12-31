@@ -37,7 +37,7 @@
 #include <spine/SpineString.h>
 #include <spine/HasRendererObject.h>
 
-#ifdef SPINE_USE_STD_FUNCTION
+#if __cplusplus >= 201103L // c++11
 #include <functional>
 #endif
 
@@ -60,7 +60,7 @@ namespace spine {
 	class Skeleton;
 	class RotateTimeline;
 
-#ifdef SPINE_USE_STD_FUNCTION
+#if __cplusplus >= 201103L
 	typedef std::function<void (AnimationState* state, EventType type, TrackEntry* entry, Event* event)> AnimationStateListener;
 #else
 	typedef void (*AnimationStateListener) (AnimationState* state, EventType type, TrackEntry* entry, Event* event);
