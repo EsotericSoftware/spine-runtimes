@@ -111,12 +111,15 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 		}
 
 		Pass
-        {
-            Tags { "LightMode" = "NormalsRendering"}
-            HLSLPROGRAM
-            #pragma prefer_hlslcc gles
-            #pragma vertex NormalsRenderingVertex
-            #pragma fragment NormalsRenderingFragment
+		{
+			Tags { "LightMode" = "NormalsRendering"}
+
+			Blend SrcAlpha OneMinusSrcAlpha
+
+			HLSLPROGRAM
+			#pragma prefer_hlslcc gles
+			#pragma vertex NormalsRenderingVertex
+			#pragma fragment NormalsRenderingFragment
 
 			// -------------------------------------
 			// Material Keywords
@@ -138,8 +141,8 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 
 			#include "Include/Spine-Sprite-NormalsPass-URP-2D.hlsl"
 
-            ENDHLSL
-        }
+			ENDHLSL
+		}
 
 		UsePass "Universal Render Pipeline/2D/Spine/Skeleton Lit/UNLIT"
 	}

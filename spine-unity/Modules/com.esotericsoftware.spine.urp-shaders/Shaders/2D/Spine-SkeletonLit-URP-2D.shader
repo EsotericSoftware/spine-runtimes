@@ -170,46 +170,50 @@
 		}
 
 		Pass
-        {
+		{
 			Name "Unlit"
-            Tags { "LightMode" = "UniversalForward" "Queue"="Transparent" "RenderType"="Transparent"}
+			Tags { "LightMode" = "UniversalForward" "Queue"="Transparent" "RenderType"="Transparent"}
 
-            HLSLPROGRAM
-            #pragma prefer_hlslcc gles
-            #pragma vertex UnlitVertex
-            #pragma fragment UnlitFragment
+			ZWrite Off
+			Cull Off
+			Blend One OneMinusSrcAlpha
 
-            struct Attributes
-            {
-                float3 positionOS   : POSITION;
-                float4 color		: COLOR;
-                float2 uv			: TEXCOORD0;
-            };
+			HLSLPROGRAM
+			#pragma prefer_hlslcc gles
+			#pragma vertex UnlitVertex
+			#pragma fragment UnlitFragment
 
-            struct Varyings
-            {
-                float4  positionCS		: SV_POSITION;
-                float4  color			: COLOR;
-                float2	uv				: TEXCOORD0;
-            };
+			struct Attributes
+			{
+				float3 positionOS   : POSITION;
+				float4 color		: COLOR;
+				float2 uv			: TEXCOORD0;
+			};
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-            float4 _MainTex_ST;
+			struct Varyings
+			{
+				float4  positionCS		: SV_POSITION;
+				float4  color			: COLOR;
+				float2	uv				: TEXCOORD0;
+			};
 
-            Varyings UnlitVertex(Attributes attributes)
-            {
-                Varyings o = (Varyings)0;
+			TEXTURE2D(_MainTex);
+			SAMPLER(sampler_MainTex);
+			float4 _MainTex_ST;
 
-                o.positionCS = TransformObjectToHClip(attributes.positionOS);
-                o.uv = TRANSFORM_TEX(attributes.uv, _MainTex);
-                o.uv = attributes.uv;
-                o.color = attributes.color;
-                return o;
-            }
+			Varyings UnlitVertex(Attributes attributes)
+			{
+				Varyings o = (Varyings)0;
 
-            float4 UnlitFragment(Varyings i) : SV_Target
-            {
+				o.positionCS = TransformObjectToHClip(attributes.positionOS);
+				o.uv = TRANSFORM_TEX(attributes.uv, _MainTex);
+				o.uv = attributes.uv;
+				o.color = attributes.color;
+				return o;
+			}
+
+			float4 UnlitFragment(Varyings i) : SV_Target
+			{
 				half4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
 				half4 main;
 				#if defined(_STRAIGHT_ALPHA_INPUT)
@@ -219,10 +223,10 @@
 				#endif
 				main.a = tex.a * i.color.a;
 
-                return main;
-            }
-            ENDHLSL
-        }
+				return main;
+			}
+			ENDHLSL
+		}
 	}
 	FallBack "Universal Render Pipeline/2D/Sprite-Lit-Default"
 }
