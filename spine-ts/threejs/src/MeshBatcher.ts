@@ -164,9 +164,7 @@ module spine.threejs {
 					const meshMaterial = this.material[i] as SkeletonMeshMaterial;
 
 					if (meshMaterial.uniforms.map.value === null) {
-						meshMaterial.uniforms.map.value = slotTexture;
-						meshMaterial.blending = blending;
-						meshMaterial.needsUpdate = true;
+						updateMeshMaterial(meshMaterial, slotTexture, blending);
 						return i;
 					}
 
@@ -176,9 +174,7 @@ module spine.threejs {
 				}
 
 				const meshMaterial = new SkeletonMeshMaterial();
-				meshMaterial.uniforms.map.value = slotTexture;
-				meshMaterial.blending = blending;
-				meshMaterial.needsUpdate = true;
+				updateMeshMaterial(meshMaterial, slotTexture, blending);
 				this.material.push(meshMaterial);
 				group = this.material.length - 1;
 			} else {
@@ -187,5 +183,13 @@ module spine.threejs {
 
 			return group;
 		}
+	}
+	
+	function updateMeshMaterial(meshMaterial: SkeletonMeshMaterial, slotTexture: THREE.Texture, blending: THREE.Blending){
+		meshMaterial.uniforms.map.value = slotTexture;
+		meshMaterial.blending = blending;
+		meshMaterial.blendDst = blending === THREE.CustomBlending ? THREE.OneMinusSrcColorFactor : THREE.OneMinusSrcAlphaFactor;
+		meshMaterial.blendSrc = blending === THREE.CustomBlending ? THREE.OneFactor : THREE.SrcAlphaFactor;
+		meshMaterial.needsUpdate = true;
 	}
 }

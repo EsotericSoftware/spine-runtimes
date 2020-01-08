@@ -73,7 +73,7 @@ module spine.threejs {
 			if (blend === BlendMode.Normal) return THREE.NormalBlending;
 			else if (blend === BlendMode.Additive) return THREE.AdditiveBlending;
 			else if (blend === BlendMode.Multiply) return THREE.MultiplyBlending;
-			else if (blend === BlendMode.Screen) throw new Error("BlendMode Screen not supported by Three.js");
+			else if (blend === BlendMode.Screen) return THREE.CustomBlending;
 			else throw new Error("Unknown blendMode: " + blend);
 		}
 	}
