@@ -319,6 +319,10 @@ namespace Spine.Unity.AttachmentTools {
 		/// <param name="additionalOutputTextures">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
 		/// this array will be filled with the resulting repacked texture for every property,
 		/// just as the main repacked texture is assigned to <c>outputTexture</c>.</param>
+		/// <param name="additionalTextureFormats">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
+		/// this array will be used as <c>TextureFormat</c> at the Texture at the respective property.
+		/// When <c>additionalTextureFormats</c> is <c>null</c> or when its array size is smaller,
+		/// <c>textureFormat</c> is used where there exists no corresponding array item.</param>
 		public static Skin GetRepackedSkin (this Skin o, string newName, Material materialPropertySource, out Material outputMaterial, out Texture2D outputTexture,
 			int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps,
 			bool useOriginalNonrenderables = true, bool clearCache = false,
