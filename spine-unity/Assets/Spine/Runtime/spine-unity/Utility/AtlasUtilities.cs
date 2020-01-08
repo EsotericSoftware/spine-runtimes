@@ -232,17 +232,23 @@ namespace Spine.Unity.AttachmentTools {
 		/// <param name="additionalOutputTextures">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
 		/// this array will be filled with the resulting repacked texture for every property,
 		/// just as the main repacked texture is assigned to <c>outputTexture</c>.</param>
+		/// <param name="additionalTextureFormats">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
+		/// this array will be used as <c>TextureFormat</c> at the Texture at the respective property.
+		/// When <c>additionalTextureFormats</c> is <c>null</c> or when its array size is smaller,
+		/// <c>textureFormat</c> is used where there exists no corresponding array item.</param>
 		public static void GetRepackedAttachments (List<Attachment> sourceAttachments, List<Attachment> outputAttachments, Material materialPropertySource,
 			out Material outputMaterial, out Texture2D outputTexture,
 			int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps,
 			string newAssetName = "Repacked Attachments", bool clearCache = false, bool useOriginalNonrenderables = true,
-			int[] additionalTexturePropertyIDsToCopy = null, Texture2D[] additionalOutputTextures = null) {
+			int[] additionalTexturePropertyIDsToCopy = null, Texture2D[] additionalOutputTextures = null,
+			TextureFormat[] additionalTextureFormats = null) {
 
 			Shader shader = materialPropertySource == null ? Shader.Find("Spine/Skeleton") : materialPropertySource.shader;
 			GetRepackedAttachments(sourceAttachments, outputAttachments, shader, out outputMaterial, out outputTexture,
 				maxAtlasSize, padding, textureFormat, mipmaps, newAssetName,
 				materialPropertySource, clearCache, useOriginalNonrenderables,
-				additionalTexturePropertyIDsToCopy, additionalOutputTextures);
+				additionalTexturePropertyIDsToCopy, additionalOutputTextures,
+				additionalTextureFormats);
 		}
 
 		/// <summary>
@@ -258,12 +264,17 @@ namespace Spine.Unity.AttachmentTools {
 		/// <param name="additionalOutputTextures">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
 		/// this array will be filled with the resulting repacked texture for every property,
 		/// just as the main repacked texture is assigned to <c>outputTexture</c>.</param>
+		/// <param name="additionalTextureFormats">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
+		/// this array will be used as <c>TextureFormat</c> at the Texture at the respective property.
+		/// When <c>additionalTextureFormats</c> is <c>null</c> or when its array size is smaller,
+		/// <c>textureFormat</c> is used where there exists no corresponding array item.</param>
 		public static void GetRepackedAttachments (List<Attachment> sourceAttachments, List<Attachment> outputAttachments, Shader shader,
 			out Material outputMaterial, out Texture2D outputTexture,
 			int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps,
 			string newAssetName = "Repacked Attachments",
 			Material materialPropertySource = null, bool clearCache = false, bool useOriginalNonrenderables = true,
-			int[] additionalTexturePropertyIDsToCopy = null, Texture2D[] additionalOutputTextures = null) {
+			int[] additionalTexturePropertyIDsToCopy = null, Texture2D[] additionalOutputTextures = null,
+			TextureFormat[] additionalTextureFormats = null) {
 
 			if (sourceAttachments == null) throw new System.ArgumentNullException("sourceAttachments");
 			if (outputAttachments == null) throw new System.ArgumentNullException("outputAttachments");
@@ -303,8 +314,10 @@ namespace Spine.Unity.AttachmentTools {
 						originalRegions.Add(region);
 						for (int i = 0; i < numTextureParamsToRepack; ++i) {
 							Texture2D regionTexture = (i == 0 ?
-								region.ToTexture(mipmaps : mipmaps) :
-								region.ToTexture(mipmaps : mipmaps, texturePropertyId: additionalTexturePropertyIDsToCopy[i - 1]));
+								region.ToTexture(textureFormat, mipmaps) :
+								region.ToTexture((additionalTextureFormats != null && i - 1 < additionalTextureFormats.Length) ?
+									additionalTextureFormats[i - 1] : textureFormat,
+									mipmaps, additionalTexturePropertyIDsToCopy[i - 1]));
 							texturesToPackAtParam[i].Add(regionTexture);
 						}
 
@@ -332,7 +345,10 @@ namespace Spine.Unity.AttachmentTools {
 			Rect[] rects = null;
 			for (int i = 0; i < numTextureParamsToRepack; ++i) {
 				// Fill a new texture with the collected attachment textures.
-				var newTexture = new Texture2D(maxAtlasSize, maxAtlasSize, textureFormat, mipmaps);
+				var newTexture = new Texture2D(maxAtlasSize, maxAtlasSize,
+									(additionalTextureFormats != null && i - 1 < additionalTextureFormats.Length) ?
+									additionalTextureFormats[i - 1] : textureFormat,
+									mipmaps);
 				newTexture.mipMapBias = AtlasUtilities.DefaultMipmapBias;
 
 				var texturesToPack = texturesToPackAtParam[i];
@@ -387,14 +403,20 @@ namespace Spine.Unity.AttachmentTools {
 		/// <param name="additionalOutputTextures">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
 		/// this array will be filled with the resulting repacked texture for every property,
 		/// just as the main repacked texture is assigned to <c>outputTexture</c>.</param>
+		/// <param name="additionalTextureFormats">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
+		/// this array will be used as <c>TextureFormat</c> at the Texture at the respective property.
+		/// When <c>additionalTextureFormats</c> is <c>null</c> or when its array size is smaller,
+		/// <c>textureFormat</c> is used where there exists no corresponding array item.</param>
 		public static Skin GetRepackedSkin (this Skin o, string newName, Material materialPropertySource, out Material outputMaterial, out Texture2D outputTexture,
 			int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps,
 			bool useOriginalNonrenderables = true, bool clearCache = false,
-			int[] additionalTexturePropertyIDsToCopy = null, Texture2D[] additionalOutputTextures = null) {
+			int[] additionalTexturePropertyIDsToCopy = null, Texture2D[] additionalOutputTextures = null,
+			TextureFormat[] additionalTextureFormats = null) {
 
 			return GetRepackedSkin(o, newName, materialPropertySource.shader, out outputMaterial, out outputTexture,
 				maxAtlasSize, padding, textureFormat, mipmaps, materialPropertySource,
-				clearCache, useOriginalNonrenderables, additionalTexturePropertyIDsToCopy, additionalOutputTextures);
+				clearCache, useOriginalNonrenderables, additionalTexturePropertyIDsToCopy, additionalOutputTextures,
+				additionalTextureFormats);
 		}
 
 		/// <summary>
@@ -405,7 +427,8 @@ namespace Spine.Unity.AttachmentTools {
 		public static Skin GetRepackedSkin (this Skin o, string newName, Shader shader, out Material outputMaterial, out Texture2D outputTexture,
 			int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps,
 			Material materialPropertySource = null, bool clearCache = false, bool useOriginalNonrenderables = true,
-			int[] additionalTexturePropertyIDsToCopy = null, Texture2D[] additionalOutputTextures = null) {
+			int[] additionalTexturePropertyIDsToCopy = null, Texture2D[] additionalOutputTextures = null,
+			TextureFormat[] additionalTextureFormats = null) {
 
 			outputTexture = null;
 
@@ -424,7 +447,7 @@ namespace Spine.Unity.AttachmentTools {
 			}
 			GetRepackedAttachments(inoutAttachments, inoutAttachments, materialPropertySource, out outputMaterial, out outputTexture,
 				maxAtlasSize, padding, textureFormat, mipmaps, newName, clearCache, useOriginalNonrenderables,
-				additionalTexturePropertyIDsToCopy, additionalOutputTextures);
+				additionalTexturePropertyIDsToCopy, additionalOutputTextures, additionalTextureFormats);
 			int i = 0;
 			foreach (var originalSkinEntry in o.Attachments) {
 				var newAttachment = inoutAttachments[i++];
