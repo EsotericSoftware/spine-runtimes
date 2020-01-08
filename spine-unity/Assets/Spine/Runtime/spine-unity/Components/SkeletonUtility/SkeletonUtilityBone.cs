@@ -40,7 +40,7 @@ namespace Spine.Unity {
 	#else
 	[ExecuteInEditMode]
 	#endif
-	[AddComponentMenu("Spine/SkeletonGameObjectsBone")]
+	[AddComponentMenu("Spine/SkeletonUtilityBone")]
 	public class SkeletonUtilityBone : MonoBehaviour {
 		public enum Mode {
 			Follow,
