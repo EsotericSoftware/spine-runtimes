@@ -115,6 +115,7 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 			Tags { "LightMode" = "NormalsRendering"}
 
 			Blend SrcAlpha OneMinusSrcAlpha
+			Cull[_Cull]
 
 			HLSLPROGRAM
 			#pragma prefer_hlslcc gles
