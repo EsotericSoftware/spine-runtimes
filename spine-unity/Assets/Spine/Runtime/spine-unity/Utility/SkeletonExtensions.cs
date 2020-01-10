@@ -458,5 +458,13 @@ namespace Spine {
 			return ((int)mode & (1U << ScaleBit)) == 0;
 		}
 		#endregion
+
+		// Note: This extension method is required by SpineAnimationStateMixerBehaviour,
+		// which is part of the timeline extension package. Thus the internal member variable
+		// nextTrackLast is not accessible. We favor providing this extension method
+		// over exposing nextTrackLast as public property, which would rather confuse users.
+		public static void AllowImmediateQueue (this TrackEntry trackEntry) {
+			if (trackEntry.nextTrackLast < 0) trackEntry.nextTrackLast = 0;
+		}
 	}
 }
