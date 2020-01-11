@@ -114,7 +114,6 @@ module spine {
 			if (!this.queueAsset(clientId, textureLoader, path)) return;
 
 			let img = new Image();
-			img.src = path;
 			img.crossOrigin = "anonymous";
 			img.onload = (ev) => {
 				this.rawAssets[path] = img;
@@ -122,6 +121,7 @@ module spine {
 			img.onerror = (ev) => {
 				this.errors[path] = `Couldn't load image ${path}`;
 			}
+			img.src = path;
 		}
 
 		get (clientId: string, path: string) {
