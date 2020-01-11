@@ -79,6 +79,7 @@ module spine {
 			path = this.pathPrefix + path;
 			if (!this.queueAsset(clientId, null, path)) return;
 			let request = new XMLHttpRequest();
+			request.overrideMimeType("text/html");
 			request.onreadystatechange = () => {
 				if (request.readyState == XMLHttpRequest.DONE) {
 					if (request.status >= 200 && request.status < 300) {
@@ -96,6 +97,7 @@ module spine {
 			path = this.pathPrefix + path;
 			if (!this.queueAsset(clientId, null, path)) return;
 			let request = new XMLHttpRequest();
+			request.overrideMimeType("text/html");
 			request.onreadystatechange = () => {
 				if (request.readyState == XMLHttpRequest.DONE) {
 					if (request.status >= 200 && request.status < 300) {
