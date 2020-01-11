@@ -36,7 +36,7 @@ module spine.threejs {
 		private indices: Uint16Array;
 		private indicesLength = 0;
 
-		constructor (maxVertices: number = 10920) {
+		constructor (maxVertices: number = 10920, materialCustomizer: SkeletonMeshMaterialParametersCustomizer = (parameters) => { }) {
 			super();
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 			let vertices = this.vertices = new Float32Array(maxVertices * MeshBatcher.VERTEX_SIZE);
@@ -52,7 +52,7 @@ module spine.threejs {
 			geo.drawRange.start = 0;
 			geo.drawRange.count = 0;
 			this.geometry = geo;
-			this.material = new SkeletonMeshMaterial();
+			this.material = new SkeletonMeshMaterial(materialCustomizer);
 		}
 
 		dispose () {

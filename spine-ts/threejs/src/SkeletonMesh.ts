@@ -28,8 +28,12 @@
  *****************************************************************************/
 
 module spine.threejs {
+	export interface SkeletonMeshMaterialParametersCustomizer {
+		(materialParameters: THREE.ShaderMaterialParameters): void;
+	}
+
 	export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
-		constructor () {
+		constructor (customizer: SkeletonMeshMaterialParametersCustomizer) {
 			let vertexShader = `
 				attribute vec4 color;
 				varying vec2 vUv;
@@ -59,6 +63,7 @@ module spine.threejs {
 				transparent: true,
 				alphaTest: 0.5
 			};
+			customizer(parameters);
 			super(parameters);
 		};
 	}
@@ -82,10 +87,11 @@ module spine.threejs {
 
 		private vertices = Utils.newFloatArray(1024);
 		private tempColor = new Color();
+		private materialCustomizer: SkeletonMeshMaterialParametersCustomizer;
 
-		constructor (skeletonData: SkeletonData) {
+		constructor (skeletonData: SkeletonData, materialCustomizer: SkeletonMeshMaterialParametersCustomizer = (parameters) => { }) {
 			super();
-
+			this.materialCustomizer = materialCustomizer;
 			this.skeleton = new Skeleton(skeletonData);
 			let animData = new AnimationStateData(skeletonData);
 			this.state = new AnimationState(animData);
@@ -118,7 +124,7 @@ module spine.threejs {
 
 		private nextBatch () {
 			if (this.batches.length == this.nextBatchIndex) {
-				let batch = new MeshBatcher();
+				let batch = new MeshBatcher(10920, this.materialCustomizer);
 				this.add(batch);
 				this.batches.push(batch);
 			}
