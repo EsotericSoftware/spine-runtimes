@@ -102,6 +102,7 @@
 ### Canvas backend
 
 ### Three.js backend
+* `SkeletonMesh` now takes an optional `SkeletonMeshMaterialParametersCustomizer` function that allows you to modify the `ShaderMaterialParameters` before the material is finalized. Use it to modify things like THREEJS' `Material.depthTest` etc. See #1590.
 
 ### Player
 * Added `SpinePlayerConfig#rawDataURIs`. Allows to embed data URIs for skeletons, atlases and atlas page images directly in the HTML/JS without needing to load it from a separate file. See the example for a demonstration.
