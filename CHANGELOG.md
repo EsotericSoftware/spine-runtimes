@@ -452,6 +452,7 @@
 ### Canvas backend
 
 ### Three.js backend
+* `SkeletonMesh` now takes an optional `SkeletonMeshMaterialParametersCustomizer` function that allows you to modify the `ShaderMaterialParameters` before the material is finalized. Use it to modify things like THREEJS' `Material.depthTest` etc. See #1590.
 
 ### Player
 * `SpinePlayer#setAnimation()` can now be called directly to set the animation being displayed.

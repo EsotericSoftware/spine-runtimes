@@ -2819,10 +2819,25 @@ var spine;
 			if (!bone.appliedValid)
 				bone.updateAppliedTransform();
 			var p = bone.parent;
-			var id = 1 / (p.a * p.d - p.b * p.c);
-			var x = targetX - p.worldX, y = targetY - p.worldY;
-			var tx = (x * p.d - y * p.b) * id - bone.ax, ty = (y * p.a - x * p.c) * id - bone.ay;
-			var rotationIK = Math.atan2(ty, tx) * spine.MathUtils.radDeg - bone.ashearX - bone.arotation;
+			var pa = p.a, pb = p.b, pc = p.c, pd = p.d;
+			var rotationIK = -bone.ashearX - bone.arotation, tx = 0, ty = 0;
+			switch (bone.data.transformMode) {
+				case spine.TransformMode.OnlyTranslation:
+					tx = targetX - bone.worldX;
+					ty = targetY - bone.worldY;
+					break;
+				case spine.TransformMode.NoRotationOrReflection:
+					rotationIK += Math.atan2(pc, pa) * spine.MathUtils.radDeg;
+					var ps = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+					pb = -pc * ps;
+					pd = pa * ps;
+				default:
+					var x = targetX - p.worldX, y = targetY - p.worldY;
+					var d = pa * pd - pb * pc;
+					tx = (x * pd - y * pb) / d - bone.ax;
+					ty = (y * pa - x * pc) / d - bone.ay;
+			}
+			rotationIK += Math.atan2(ty, tx) * spine.MathUtils.radDeg;
 			if (bone.ascaleX < 0)
 				rotationIK += 180;
 			if (rotationIK > 180)
@@ -2831,6 +2846,12 @@ var spine;
 				rotationIK += 360;
 			var sx = bone.ascaleX, sy = bone.ascaleY;
 			if (compress || stretch) {
+				switch (bone.data.transformMode) {
+					case spine.TransformMode.NoScale:
+					case spine.TransformMode.NoScaleOrReflection:
+						tx = targetX - bone.worldX;
+						ty = targetY - bone.worldY;
+				}
 				var b = bone.data.length * sx, dd = Math.sqrt(tx * tx + ty * ty);
 				if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001) {
 					var s = (dd / b - 1) * alpha + 1;
@@ -4060,6 +4081,8 @@ var spine;
 			var input = new BinaryInput(binary);
 			skeletonData.hash = input.readString();
 			skeletonData.version = input.readString();
+			if ("3.8.75" == skeletonData.version)
+				throw new Error("Unsupported skeleton data, please export with a newer version of Spine.");
 			skeletonData.x = input.readFloat();
 			skeletonData.y = input.readFloat();
 			skeletonData.width = input.readFloat();
@@ -5470,6 +5493,8 @@ var spine;
 			if (skeletonMap != null) {
 				skeletonData.hash = skeletonMap.hash;
 				skeletonData.version = skeletonMap.spine;
+				if ("3.8.75" == skeletonData.version)
+					throw new Error("Unsupported skeleton data, please export with a newer version of Spine.");
 				skeletonData.x = skeletonMap.x;
 				skeletonData.y = skeletonMap.y;
 				skeletonData.width = skeletonMap.width;
@@ -11043,8 +11068,9 @@ var spine;
 	(function (threejs) {
 		var MeshBatcher = (function (_super) {
 			__extends(MeshBatcher, _super);
-			function MeshBatcher(maxVertices) {
+			function MeshBatcher(maxVertices, materialCustomizer) {
 				if (maxVertices === void 0) { maxVertices = 10920; }
+				if (materialCustomizer === void 0) { materialCustomizer = function (parameters) { }; }
 				var _this = _super.call(this) || this;
 				_this.verticesLength = 0;
 				_this.indicesLength = 0;
@@ -11064,7 +11090,7 @@ var spine;
 				geo.drawRange.start = 0;
 				geo.drawRange.count = 0;
 				_this.geometry = geo;
-				_this.material = new threejs.SkeletonMeshMaterial();
+				_this.material = new threejs.SkeletonMeshMaterial(materialCustomizer);
 				return _this;
 			}
 			MeshBatcher.prototype.dispose = function () {
@@ -11142,7 +11168,7 @@ var spine;
 	(function (threejs) {
 		var SkeletonMeshMaterial = (function (_super) {
 			__extends(SkeletonMeshMaterial, _super);
-			function SkeletonMeshMaterial() {
+			function SkeletonMeshMaterial(customizer) {
 				var _this = this;
 				var vertexShader = "\n\t\t\t\tattribute vec4 color;\n\t\t\t\tvarying vec2 vUv;\n\t\t\t\tvarying vec4 vColor;\n\t\t\t\tvoid main() {\n\t\t\t\t\tvUv = uv;\n\t\t\t\t\tvColor = color;\n\t\t\t\t\tgl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);\n\t\t\t\t}\n\t\t\t";
 				var fragmentShader = "\n\t\t\t\tuniform sampler2D map;\n\t\t\t\tvarying vec2 vUv;\n\t\t\t\tvarying vec4 vColor;\n\t\t\t\tvoid main(void) {\n\t\t\t\t\tgl_FragColor = texture2D(map, vUv)*vColor;\n\t\t\t\t}\n\t\t\t";
@@ -11156,6 +11182,7 @@ var spine;
 					transparent: true,
 					alphaTest: 0.5
 				};
+				customizer(parameters);
 				_this = _super.call(this, parameters) || this;
 				return _this;
 			}
@@ -11165,7 +11192,8 @@ var spine;
 		threejs.SkeletonMeshMaterial = SkeletonMeshMaterial;
 		var SkeletonMesh = (function (_super) {
 			__extends(SkeletonMesh, _super);
-			function SkeletonMesh(skeletonData) {
+			function SkeletonMesh(skeletonData, materialCustomizer) {
+				if (materialCustomizer === void 0) { materialCustomizer = function (parameters) { }; }
 				var _this = _super.call(this) || this;
 				_this.tempPos = new spine.Vector2();
 				_this.tempUv = new spine.Vector2();
@@ -11177,6 +11205,7 @@ var spine;
 				_this.clipper = new spine.SkeletonClipping();
 				_this.vertices = spine.Utils.newFloatArray(1024);
 				_this.tempColor = new spine.Color();
+				_this.materialCustomizer = materialCustomizer;
 				_this.skeleton = new spine.Skeleton(skeletonData);
 				var animData = new spine.AnimationStateData(skeletonData);
 				_this.state = new spine.AnimationState(animData);
@@ -11204,7 +11233,7 @@ var spine;
 			};
 			SkeletonMesh.prototype.nextBatch = function () {
 				if (this.batches.length == this.nextBatchIndex) {
-					var batch_1 = new threejs.MeshBatcher();
+					var batch_1 = new threejs.MeshBatcher(10920, this.materialCustomizer);
 					this.add(batch_1);
 					this.batches.push(batch_1);
 				}
