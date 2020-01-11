@@ -174,10 +174,12 @@ function utils.randomTriangularWith(min, max, mode)
 end
 
 function utils.testBit(value, bit)
+	if (value == nil) then return 0 end
 	return value % (2 * bit) >= bit
 end
 
 function utils.setBit(value, bit)
+	if (value == nil) then return 0 end
 	if value % (2 * bit) >= bit then
 		return value
 	end
@@ -185,6 +187,7 @@ function utils.setBit(value, bit)
 end
 
 function utils.clearBit(value, bit)
+	if (value == nil) then return 0 end
 	if value % (2 * bit) >= bit then
 		return value - bit
 	end
