@@ -2169,6 +2169,7 @@ var spine;
 		}
 		AssetManager.prototype.downloadText = function (url, success, error) {
 			var request = new XMLHttpRequest();
+			request.overrideMimeType("text/html");
 			if (this.rawDataUris[url])
 				url = this.rawDataUris[url];
 			request.open("GET", url, true);
@@ -3510,6 +3511,7 @@ var spine;
 			if (!this.queueAsset(clientId, null, path))
 				return;
 			var request = new XMLHttpRequest();
+			request.overrideMimeType("text/html");
 			request.onreadystatechange = function () {
 				if (request.readyState == XMLHttpRequest.DONE) {
 					if (request.status >= 200 && request.status < 300) {
@@ -3529,6 +3531,7 @@ var spine;
 			if (!this.queueAsset(clientId, null, path))
 				return;
 			var request = new XMLHttpRequest();
+			request.overrideMimeType("text/html");
 			request.onreadystatechange = function () {
 				if (request.readyState == XMLHttpRequest.DONE) {
 					if (request.status >= 200 && request.status < 300) {
@@ -3548,7 +3551,6 @@ var spine;
 			if (!this.queueAsset(clientId, textureLoader, path))
 				return;
 			var img = new Image();
-			img.src = path;
 			img.crossOrigin = "anonymous";
 			img.onload = function (ev) {
 				_this.rawAssets[path] = img;
@@ -3556,6 +3558,7 @@ var spine;
 			img.onerror = function (ev) {
 				_this.errors[path] = "Couldn't load image " + path;
 			};
+			img.src = path;
 		};
 		SharedAssetManager.prototype.get = function (clientId, path) {
 			path = this.pathPrefix + path;

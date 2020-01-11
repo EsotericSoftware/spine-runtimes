@@ -44,6 +44,7 @@ module spine {
 
 		private downloadText (url: string, success: (data: string) => void, error: (status: number, responseText: string) => void) {
 			let request = new XMLHttpRequest();
+			request.overrideMimeType("text/html");
 			if (this.rawDataUris[url]) url = this.rawDataUris[url];
 			request.open("GET", url, true);
 			request.onload = () => {
