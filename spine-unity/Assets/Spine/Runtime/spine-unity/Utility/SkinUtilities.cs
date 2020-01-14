@@ -135,12 +135,15 @@ namespace Spine.Unity.AttachmentTools {
 
 			if (cloneAttachments) {
 				if (overwrite) {
-					foreach (var e in sourceAttachments)
-						destinationAttachments[e.Key] = e.Value.GetCopy(cloneMeshesAsLinked);
+					foreach (var e in sourceAttachments) {
+						Attachment clonedAttachment = e.Value.GetCopy(cloneMeshesAsLinked);
+						destinationAttachments[new Skin.SkinEntry(e.Key.SlotIndex, e.Key.Name, clonedAttachment)] = clonedAttachment;
+					}
 				} else {
 					foreach (var e in sourceAttachments) {
 						if (destinationAttachments.ContainsKey(e.Key)) continue;
-						destinationAttachments.Add(e.Key, e.Value.GetCopy(cloneMeshesAsLinked));
+						Attachment clonedAttachment = e.Value.GetCopy(cloneMeshesAsLinked);
+						destinationAttachments.Add(new Skin.SkinEntry(e.Key.SlotIndex, e.Key.Name, clonedAttachment), clonedAttachment);
 					}
 				}
 			} else {
