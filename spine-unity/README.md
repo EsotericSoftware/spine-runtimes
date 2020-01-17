@@ -20,6 +20,10 @@ spine-unity supports all Spine features.
 
 Unity's physics components do not support dynamically assigned vertices so they cannot be used to mirror bone-weighted and deformed BoundingBoxAttachments. However, BoundingBoxAttachment vertices at runtime will still deform correctly and can be used to perform manual hit detection.
 
+## Unity version
+
+spine-unity is compatible with Unity 2017.1-2019.3.
+
 ## Usage
 
 ### [Please see the spine-unity guide for full documentation](http://esotericsoftware.com/spine-unity).
