@@ -323,16 +323,23 @@ namespace Spine.Unity.AttachmentTools {
 		/// this array will be used as <c>TextureFormat</c> at the Texture at the respective property.
 		/// When <c>additionalTextureFormats</c> is <c>null</c> or when its array size is smaller,
 		/// <c>textureFormat</c> is used where there exists no corresponding array item.</param>
+		/// <param name="additionalTextureIsLinear">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
+		/// this array will be used to determine whether <c>linear</c> or <c>sRGB</c> color space is used at the
+		/// Texture at the respective property. When <c>additionalTextureIsLinear</c> is <c>null</c>, <c>linear</c> color space
+		/// is assumed at every additional Texture element.
+		/// When e.g. packing the main texture and normal maps, pass 'new bool[] { true }' at this parameter, because normal maps use
+		/// linear color space.</param>
+		/// </param>
 		public static Skin GetRepackedSkin (this Skin o, string newName, Material materialPropertySource, out Material outputMaterial, out Texture2D outputTexture,
 			int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps,
 			bool useOriginalNonrenderables = true, bool clearCache = false,
 			int[] additionalTexturePropertyIDsToCopy = null, Texture2D[] additionalOutputTextures = null,
-			TextureFormat[] additionalTextureFormats = null) {
+			TextureFormat[] additionalTextureFormats = null, bool[] additionalTextureIsLinear = null) {
 
 			return GetRepackedSkin(o, newName, materialPropertySource.shader, out outputMaterial, out outputTexture,
 				maxAtlasSize, padding, textureFormat, mipmaps, materialPropertySource,
 				clearCache, useOriginalNonrenderables, additionalTexturePropertyIDsToCopy, additionalOutputTextures,
-				additionalTextureFormats);
+				additionalTextureFormats, additionalTextureIsLinear);
 		}
 
 		/// <summary>
@@ -344,9 +351,15 @@ namespace Spine.Unity.AttachmentTools {
 			int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps,
 			Material materialPropertySource = null, bool clearCache = false, bool useOriginalNonrenderables = true,
 			int[] additionalTexturePropertyIDsToCopy = null, Texture2D[] additionalOutputTextures = null,
-			TextureFormat[] additionalTextureFormats = null) {
+			TextureFormat[] additionalTextureFormats = null, bool[] additionalTextureIsLinear = null) {
 
 			outputTexture = null;
+			if (additionalTexturePropertyIDsToCopy != null && additionalTextureIsLinear == null) {
+				additionalTextureIsLinear = new bool[additionalTexturePropertyIDsToCopy.Length];
+				for (int i = 0; i < additionalTextureIsLinear.Length; ++i) {
+					additionalTextureIsLinear[i] = true;
+				}
+			}
 
 			if (o == null) throw new System.NullReferenceException("Skin was null");
 			var skinAttachments = o.Attachments;
@@ -388,7 +401,7 @@ namespace Spine.Unity.AttachmentTools {
 								region.ToTexture(textureFormat, mipmaps) :
 								region.ToTexture((additionalTextureFormats != null && i - 1 < additionalTextureFormats.Length) ?
 									additionalTextureFormats[i - 1] : textureFormat,
-									mipmaps, additionalTexturePropertyIDsToCopy[i - 1]));
+									mipmaps, additionalTexturePropertyIDsToCopy[i - 1], additionalTextureIsLinear[i - 1]));
 							texturesToPackAtParam[i].Add(regionTexture); // Add the texture to the PackTextures argument
 						}
 						existingRegions.Add(region, newRegionIndex); // Add the region to the dictionary of known regions
@@ -415,9 +428,10 @@ namespace Spine.Unity.AttachmentTools {
 			for (int i = 0; i < numTextureParamsToRepack; ++i) {
 				// Fill a new texture with the collected attachment textures.
 				var newTexture = new Texture2D(maxAtlasSize, maxAtlasSize,
-									(additionalTextureFormats != null && i - 1 < additionalTextureFormats.Length) ?
+									(i > 0 && additionalTextureFormats != null && i - 1 < additionalTextureFormats.Length) ?
 									additionalTextureFormats[i - 1] : textureFormat,
-									mipmaps);
+									mipmaps,
+									(i > 0) ? additionalTextureIsLinear[i - 1] : false);
 				newTexture.mipMapBias = AtlasUtilities.DefaultMipmapBias;
 				var texturesToPack = texturesToPackAtParam[i];
 				if (texturesToPack.Count > 0) {
@@ -489,7 +503,7 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>Creates a new Texture2D object based on an AtlasRegion.
 		/// If applyImmediately is true, Texture2D.Apply is called immediately after the Texture2D is filled with data.</summary>
 		public static Texture2D ToTexture (this AtlasRegion ar, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps,
-			int texturePropertyId = 0) {
+			int texturePropertyId = 0, bool linear = false) {
 
 			Texture2D output;
 
@@ -500,7 +514,7 @@ namespace Spine.Unity.AttachmentTools {
 				Rect r = ar.GetUnityRect();
 				int width = (int)r.width;
 				int height = (int)r.height;
-				output = new Texture2D(width, height, textureFormat, mipmaps) { name = ar.name };
+				output = new Texture2D(width, height, textureFormat, mipmaps, linear) { name = ar.name };
 				output.CopyTextureAttributesFrom(sourceTexture);
 				AtlasUtilities.CopyTexture(sourceTexture, r, output);
 				CachedRegionTextures.Add(cacheKey, output);
@@ -510,17 +524,21 @@ namespace Spine.Unity.AttachmentTools {
 			return output;
 		}
 
-		static Texture2D ToTexture (this Sprite s, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
+		static Texture2D ToTexture (this Sprite s, TextureFormat textureFormat = SpineTextureFormat,
+			bool mipmaps = UseMipMaps, bool linear = false) {
+
 			var spriteTexture = s.texture;
 			var r = s.textureRect;
-			var newTexture = new Texture2D((int)r.width, (int)r.height, textureFormat, mipmaps);
+			var newTexture = new Texture2D((int)r.width, (int)r.height, textureFormat, mipmaps, linear);
 			newTexture.CopyTextureAttributesFrom(spriteTexture);
 			AtlasUtilities.CopyTexture(spriteTexture, r, newTexture);
 			return newTexture;
 		}
 
-		static Texture2D GetClone (this Texture2D t, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps) {
-			var newTexture = new Texture2D((int)t.width, (int)t.height, textureFormat, mipmaps);
+		static Texture2D GetClone (this Texture2D t, TextureFormat textureFormat = SpineTextureFormat,
+			bool mipmaps = UseMipMaps, bool linear = false) {
+
+			var newTexture = new Texture2D((int)t.width, (int)t.height, textureFormat, mipmaps, linear);
 			newTexture.CopyTextureAttributesFrom(t);
 			AtlasUtilities.CopyTexture(t, new Rect(0, 0, t.width, t.height), newTexture);
 			return newTexture;
