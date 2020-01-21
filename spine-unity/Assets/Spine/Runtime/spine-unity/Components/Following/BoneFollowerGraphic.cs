@@ -131,7 +131,7 @@ namespace Spine.Unity {
 
 			var canvas = skeletonGraphic.canvas;
 			if (canvas == null) canvas = skeletonGraphic.GetComponentInParent<Canvas>();
-			float scale = canvas.referencePixelsPerUnit;
+			float scale = canvas != null ? canvas.referencePixelsPerUnit : 100.0f;
 
 			if (skeletonTransformIsParent) {
 				// Recommended setup: Use local transform properties if Spine GameObject is the immediate parent
