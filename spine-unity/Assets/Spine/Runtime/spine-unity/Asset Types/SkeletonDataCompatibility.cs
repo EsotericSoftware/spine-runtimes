@@ -36,10 +36,12 @@ namespace Spine.Unity {
 
 	public static class SkeletonDataCompatibility {
 
+	#if UNITY_EDITOR
 		static readonly int[][] compatibleBinaryVersions = { new[] { 3, 8, 0 } };
 		static readonly int[][] compatibleJsonVersions = { new[] { 3, 8, 0 } };
 
 		static bool wasVersionDialogShown = false;
+	#endif
 
 		public enum SourceType {
 			Json,
@@ -110,7 +112,6 @@ namespace Spine.Unity {
 				}
 			}
 
-			string primaryRuntimeVersionDebugString = compatibleBinaryVersions[0][0] + "." + compatibleBinaryVersions[0][1];
 			if (string.IsNullOrEmpty(fileVersion.rawVersion)) {
 				// very likely not a Spine skeleton json file at all.
 				return null;
@@ -136,7 +137,7 @@ namespace Spine.Unity {
 			info.actualVersion = fileVersion;
 			info.compatibleVersions = (fileVersion.sourceType == SourceType.Binary) ? compatibleBinaryVersions
 				: compatibleJsonVersions;
-			
+
 			foreach (var compatibleVersion in info.compatibleVersions) {
 				bool majorMatch = fileVersion.version[0] == compatibleVersion[0];
 				bool minorMatch = fileVersion.version[1] == compatibleVersion[1];
