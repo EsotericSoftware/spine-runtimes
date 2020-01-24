@@ -493,6 +493,10 @@ namespace Spine.Unity.AttachmentTools {
 				this.i = i;
 				this.region = region;
 			}
+
+			public override int GetHashCode () {
+				return i.GetHashCode() * 23 ^ region.GetHashCode();
+			}
 		}
 		static Dictionary<IntAndAtlasRegionKey, Texture2D> CachedRegionTextures = new Dictionary<IntAndAtlasRegionKey, Texture2D>();
 		static List<Texture2D> CachedRegionTexturesList = new List<Texture2D>();

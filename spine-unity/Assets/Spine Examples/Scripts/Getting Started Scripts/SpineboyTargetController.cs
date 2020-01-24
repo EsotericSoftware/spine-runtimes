@@ -36,7 +36,7 @@ namespace Spine.Unity.Examples {
 
 		[SpineBone(dataField:"skeletonAnimation")]
 		public string boneName;
-		public new Camera camera;
+		public Camera cam;
 
 		Bone bone;
 
@@ -50,7 +50,7 @@ namespace Spine.Unity.Examples {
 
 		void Update () {
 			var mousePosition = Input.mousePosition;
-			var worldMousePosition = camera.ScreenToWorldPoint(mousePosition);
+			var worldMousePosition = cam.ScreenToWorldPoint(mousePosition);
 			var skeletonSpacePoint = skeletonAnimation.transform.InverseTransformPoint(worldMousePosition);
 			skeletonSpacePoint.x *= skeletonAnimation.Skeleton.ScaleX;
 			skeletonSpacePoint.y *= skeletonAnimation.Skeleton.ScaleY;

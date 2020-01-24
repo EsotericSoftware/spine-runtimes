@@ -38,6 +38,9 @@ namespace Spine {
 		public const float RadDeg = 180f / PI;
 		public const float DegRad = PI / 180;
 
+		static Random random = new Random();
+
+	#if USE_FAST_SIN_COS_ATAN2_APPROXIMATIONS
 		const int SIN_BITS = 14; // 16KB. Adjust for accuracy.
 		const int SIN_MASK = ~(-1 << SIN_BITS);
 		const int SIN_COUNT = SIN_MASK + 1;
@@ -47,9 +50,6 @@ namespace Spine {
 		const float DegToIndex = SIN_COUNT / DegFull;
 		static float[] sin = new float[SIN_COUNT];
 
-		static Random random = new Random();
-
-	#if USE_FAST_SIN_COS_ATAN2_APPROXIMATIONS
 		static MathUtils () {
 			for (int i = 0; i < SIN_COUNT; i++)
 				sin[i] = (float)Math.Sin((i + 0.5f) / SIN_COUNT * RadFull);
