@@ -114,7 +114,7 @@ namespace Spine.Unity {
 				Clear();
 				return null;
 			}
-			
+
 			// Disabled to support attachmentless/skinless SkeletonData.
 			//			if (atlasAssets == null) {
 			//				atlasAssets = new AtlasAsset[0];
@@ -161,10 +161,20 @@ namespace Spine.Unity {
 			#endif
 
 			bool isBinary = skeletonJSON.name.ToLower().Contains(".skel");
-			SkeletonData loadedSkeletonData;
+			SkeletonData loadedSkeletonData = null;
+
+			try {
+				if (isBinary)
+					loadedSkeletonData = SkeletonDataAsset.ReadSkeletonData(skeletonJSON.bytes, attachmentLoader, skeletonDataScale);
+				else
+					loadedSkeletonData = SkeletonDataAsset.ReadSkeletonData(skeletonJSON.text, attachmentLoader, skeletonDataScale);
+			} catch (Exception ex) {
+				if (!quiet)
+					Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
+			}
 
 			#if UNITY_EDITOR
-			if (skeletonJSON) {
+			if (loadedSkeletonData == null && !quiet && skeletonJSON != null) {
 				SkeletonDataCompatibility.VersionInfo fileVersion = SkeletonDataCompatibility.GetVersionInfo(skeletonJSON);
 				CompatibilityProblemInfo compatibilityProblemInfo = SkeletonDataCompatibility.GetCompatibilityProblemInfo(fileVersion);
 				if (compatibilityProblemInfo != null) {
@@ -173,19 +183,8 @@ namespace Spine.Unity {
 				}
 			}
 			#endif
-
-			try {
-				if (isBinary)
-					loadedSkeletonData = SkeletonDataAsset.ReadSkeletonData(skeletonJSON.bytes, attachmentLoader, skeletonDataScale);
-				else
-					loadedSkeletonData = SkeletonDataAsset.ReadSkeletonData(skeletonJSON.text, attachmentLoader, skeletonDataScale);
-
-			} catch (Exception ex) {
-				if (!quiet)
-					Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, this);
+			if (loadedSkeletonData == null)
 				return null;
-
-			}
 
 			if (skeletonDataModifiers != null) {
 				foreach (var m in skeletonDataModifiers) {
