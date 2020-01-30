@@ -299,6 +299,7 @@ namespace Spine.Unity.Editor {
 				var eventType = current.type;
 				bool isDraggingEvent = eventType == EventType.DragUpdated;
 				bool isDropEvent = eventType == EventType.DragPerform;
+
 				if (isDraggingEvent || isDropEvent) {
 					var mouseOverWindow = EditorWindow.mouseOverWindow;
 					if (mouseOverWindow != null) {
@@ -312,12 +313,19 @@ namespace Spine.Unity.Editor {
 								// Allow drag-and-dropping anywhere in the Hierarchy Window.
 								// HACK: string-compare because we can't get its type via reflection.
 								const string HierarchyWindow = "UnityEditor.SceneHierarchyWindow";
+								const string GenericDataTargetID = "target";
 								if (HierarchyWindow.Equals(mouseOverWindow.GetType().ToString(), System.StringComparison.Ordinal)) {
 									if (isDraggingEvent) {
 										UnityEditor.DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
-										current.Use();
+
+										var mouseOverTarget = UnityEditor.EditorUtility.InstanceIDToObject(instanceId);
+										if (mouseOverTarget)
+											DragAndDrop.SetGenericData(GenericDataTargetID, mouseOverTarget);
+										// note: do not use the current event, otherwise we lose the nice mouse-over highlighting.
 									} else if (isDropEvent) {
-										DragAndDropInstantiation.ShowInstantiateContextMenu(skeletonDataAsset, Vector3.zero);
+										var parentGameObject = DragAndDrop.GetGenericData(GenericDataTargetID) as UnityEngine.GameObject;
+										Transform parent = parentGameObject != null ? parentGameObject.transform : null;
+										DragAndDropInstantiation.ShowInstantiateContextMenu(skeletonDataAsset, Vector3.zero, parent);
 										UnityEditor.DragAndDrop.AcceptDrag();
 										current.Use();
 										return;

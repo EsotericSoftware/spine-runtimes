@@ -115,6 +115,15 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.LabelField("UI", EditorStyles.boldLabel);
 			EditorGUILayout.PropertyField(raycastTarget);
 
+			EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
+			EditorGUILayout.PrefixLabel("Match RectTransform with Mesh");
+			if (GUILayout.Button("Match", EditorStyles.miniButton, GUILayout.Width(65f))) {
+				foreach (var skeletonGraphic in targets) {
+					MatchRectTransformWithBounds((SkeletonGraphic)skeletonGraphic);
+				}
+			}
+			EditorGUILayout.EndHorizontal();
+
 			bool wasChanged = EditorGUI.EndChangeCheck();
 
 			if (wasChanged)
@@ -125,29 +134,12 @@ namespace Spine.Unity.Editor {
 		[MenuItem("CONTEXT/SkeletonGraphic/Match RectTransform with Mesh Bounds")]
 		static void MatchRectTransformWithBounds (MenuCommand command) {
 			var skeletonGraphic = (SkeletonGraphic)command.context;
-			Mesh mesh = skeletonGraphic.GetLastMesh();
-			if (mesh == null) {
+			MatchRectTransformWithBounds(skeletonGraphic);
+		}
+
+		static void MatchRectTransformWithBounds (SkeletonGraphic skeletonGraphic) {
+			if (!skeletonGraphic.MatchRectTransformWithBounds())
 				Debug.Log("Mesh was not previously generated.");
-				return;
-			}
-
-			if (mesh.vertexCount == 0) {
-				skeletonGraphic.rectTransform.sizeDelta = new Vector2(50f, 50f);
-				skeletonGraphic.rectTransform.pivot = new Vector2(0.5f, 0.5f);
-				return;
-			}
-
-			mesh.RecalculateBounds();
-			var bounds = mesh.bounds;
-			var size = bounds.size;
-			var center = bounds.center;
-			var p = new Vector2(
-				0.5f - (center.x / size.x),
-				0.5f - (center.y / size.y)
-			);
-
-			skeletonGraphic.rectTransform.sizeDelta = size;
-			skeletonGraphic.rectTransform.pivot = p;
 		}
 
 		[MenuItem("GameObject/Spine/SkeletonGraphic (UnityUI)", false, 15)]
@@ -200,7 +192,6 @@ namespace Spine.Unity.Editor {
 			graphic.initialSkinName = skin.Name;
 			graphic.Skeleton.UpdateWorldTransform();
 			graphic.UpdateMesh();
-
 			return graphic;
 		}
 
