@@ -239,6 +239,34 @@ namespace Spine.Unity {
 			return meshBuffers.GetCurrent().mesh;
 		}
 
+		public bool MatchRectTransformWithBounds () {
+			UpdateMesh();
+
+			Mesh mesh = this.GetLastMesh();
+			if (mesh == null) {
+				return false;
+			}
+
+			if (mesh.vertexCount == 0) {
+				this.rectTransform.sizeDelta = new Vector2(50f, 50f);
+				this.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+				return false;
+			}
+
+			mesh.RecalculateBounds();
+			var bounds = mesh.bounds;
+			var size = bounds.size;
+			var center = bounds.center;
+			var p = new Vector2(
+				0.5f - (center.x / size.x),
+				0.5f - (center.y / size.y)
+			);
+
+			this.rectTransform.sizeDelta = size;
+			this.rectTransform.pivot = p;
+			return true;
+		}
+
 		public event UpdateBonesDelegate UpdateLocal;
 		public event UpdateBonesDelegate UpdateWorld;
 		public event UpdateBonesDelegate UpdateComplete;
