@@ -32,5 +32,15 @@ Alternatively, the `spine-lua` and `spine-love/spine-love` directories can be co
  * To enable two color tinting, pass `true` to `SkeletonRenderer.new()`.
 
 ## Examples
+If you want to run and debug the example project, use IntelliJ IDEA with the EmmyLua plugin.
+
+1. Install IntelliJ IDEA and the EmmyLua plugin.
+2. Install LÖVE.
+3. Copy the contents of `spine-lua` to `spine-love/spine-lua`.
+4. Open the `spine-love` folder in IntelliJ IDEA.
+5. Create a new launch configuration of the type `Lua Application`, with the following settings
+    1.  `Program` should point at the `love` or `love.exe` executable, e.g. `/Applications/love.app/Contents/MacOS/love` on macOS.
+    2. `Working directory` should be the `spine-love/` directory.
+    3. `Parameters` should be `./` so LÖVE loads the `main.lua` file from `spine-love/`.
 
 [Simple Example](main.lua)
