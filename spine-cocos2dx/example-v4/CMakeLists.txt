@@ -29,6 +29,7 @@ set(APP_NAME spine-cocos2dx-example)
 
 project(${APP_NAME})
 set(BUILD_EDITOR_SPINE OFF CACHE BOOL "Build editor support for spine" FORCE)
+set(BUILD_EXTENSIONS OFF CACHE BOOL "Build extensions" FORCE)
 
 if(XCODE)
     if(NOT DEFINED CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET)
