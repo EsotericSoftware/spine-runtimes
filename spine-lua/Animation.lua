@@ -1372,7 +1372,7 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 		local scale = 0
 		local shear = 0
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
-			local i = zlen(frames.length)
+			local i = zlen(frames)
 			rotate = frames[i + PREV_ROTATE]
 			translate = frames[i + PREV_TRANSLATE]
 			scale = frames[i + PREV_SCALE]
