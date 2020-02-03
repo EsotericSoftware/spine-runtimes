@@ -87,6 +87,7 @@ Please note the [new prerequisits to compile Cocos2d-x v4 projects on different 
 #### Windows
 1. Install [Visual Studio 2019 Community](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx)
 2. Install CMake via the [Windows installer package](https://cmake.org/download/).
+3. Install Python and make sure the `python.exe` is in your `PATH` environment variable. Python is required by cocos2d-x`s build system.
 3. Download the Spine Runtimes repository using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 4. Run CMake GUI from the start menu
 5. Click `Browse Source` and select the directory `spine-runtimes`
@@ -97,6 +98,8 @@ Please note the [new prerequisits to compile Cocos2d-x v4 projects on different 
 8. Open the `spine-runtimes/spine-cocos2dx/build-v4/spine-cocos2dx-example.sln` file in Visual Studio 2019. Visual Studio may ask you to install the Windows XP/7 SDK, which you should install.
 9. Right click the `spine-cocos2dx-example` project in the solution explorer and select `Set as Startup Project` from the context menu
 10. Click `Local Windows Debugger` to run the example
+
+Make sure to build the example for Windows 32-bit!
 
 #### macOS
 1. Install [Xcode](https://developer.apple.com/xcode/)
