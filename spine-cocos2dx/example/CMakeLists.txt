@@ -26,21 +26,23 @@
 
 cmake_minimum_required(VERSION 3.8)
 
-set(APP_NAME MyGame)
+set(APP_NAME spine-cocos2dx-example)
 project (${APP_NAME})
 
 set(COCOS2D_ROOT ${CMAKE_SOURCE_DIR}/cocos2d)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${COCOS2D_ROOT}/cmake/Modules/")
 
-include(CocosConfigDefine)
-include(CocosBuildHelpers)
+set(COCOS2DX_ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cocos2d)
+set(CMAKE_MODULE_PATH ${COCOS2DX_ROOT_PATH}/cmake/Modules/)
 
 # libcocos2d
-set(BUILD_CPP_EMPTY_TEST OFF CACHE BOOL "turn off build cpp-empty-test")
-set(BUILD_CPP_TESTS OFF CACHE BOOL "turn off build cpp-tests")
-set(BUILD_LUA_LIBS OFF CACHE BOOL "turn off build lua related targets")
-set(BUILD_JS_LIBS OFF CACHE BOOL "turn off build js related targets")
+set(BUILD_CPP_EMPTY_TEST OFF CACHE BOOL "turn off build cpp-empty-test" FORCE)
+set(BUILD_CPP_TESTS OFF CACHE BOOL "turn off build cpp-tests" FORCE)
+set(BUILD_LUA_LIBS OFF CACHE BOOL "turn off build lua related targets" FORCE)
+set(BUILD_JS_LIBS OFF CACHE BOOL "turn off build js related targets" FORCE)
+
+set(BUILD_EDITOR_SPINE OFF CACHE BOOL "Build editor support for spine" FORCE)
 
 
 set(BUILD_EDITOR_SPINE ON CACHE BOOL "enable spine")
@@ -50,51 +52,11 @@ include_directories(
   ${CMAKE_CURRENT_LIST_DIR}/../src
 )
 
-add_subdirectory(${COCOS2D_ROOT})
+include(CocosBuildSet)
+add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos ${ENGINE_BINARY_PATH}/cocos/core)
 
 get_target_property(COCOS2D_X_VERSION cocos2d VERSION)
 set(COCOS2DX_ROOT_PATH ${COCOS2D_ROOT})
-
-# Some macro definitions
-# if(WINDOWS)
-#   if(BUILD_SHARED_LIBS)
-#     ADD_DEFINITIONS (-D_USRDLL -D_EXPORT_DLL_ -D_USEGUIDLL -D_USREXDLL -D_USRSTUDIODLL)
-#   else()
-#     ADD_DEFINITIONS (-DCC_STATIC)
-#   endif()
-
-#   ADD_DEFINITIONS (-DCOCOS2DXWIN32_EXPORTS -D_WINDOWS -DWIN32 -D_WIN32)
-#   set(PLATFORM_FOLDER win32)
-# elseif(MACOSX OR APPLE)
-#   ADD_DEFINITIONS (-DCC_TARGET_OS_MAC)
-#   ADD_DEFINITIONS (-DUSE_FILE32API)
-#   set(PLATFORM_FOLDER mac)
-# elseif(LINUX)
-#   ADD_DEFINITIONS(-DLINUX)
-#   set(PLATFORM_FOLDER linux)
-# elseif(ANDROID)
-#   ADD_DEFINITIONS (-DUSE_FILE32API)
-#   set(PLATFORM_FOLDER android)
-# else()
-#   message( FATAL_ERROR "Unsupported platform, CMake will exit" )
-# endif()
-
-
-# Compiler options
-# if(MSVC)
-#   ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS
-#                   -wd4251 -wd4244 -wd4334 -wd4005 -wd4820 -wd4710
-#                   -wd4514 -wd4056 -wd4996 -wd4099)
-# else()
-#   set(CMAKE_C_FLAGS_DEBUG "-g -Wall -DCOCOS2D_DEBUG=1")
-#   set(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
-#   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
-#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-deprecated-declarations -Wno-reorder")
-#   if(CLANG)
-#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-#   endif()
-# endif(MSVC)
-
 
 set(PLATFORM_SPECIFIC_SRC)
 set(PLATFORM_SPECIFIC_HEADERS)
