@@ -57,6 +57,11 @@ namespace Spine.Unity.Editor {
 		public static class SpineTK2DEditorUtility {
 			const string SPINE_TK2D_DEFINE = "SPINE_TK2D";
 
+			internal static bool IsTK2DInstalled () {
+				return (Shader.Find("tk2d/SolidVertexColor") != null ||
+					Shader.Find("tk2d/AdditiveVertexColor") != null);
+			}
+
 			internal static void EnableTK2D () {
 				SpineBuildEnvUtility.DisableSpineAsmdefFiles();
 				SpineBuildEnvUtility.EnableBuildDefine(SPINE_TK2D_DEFINE);

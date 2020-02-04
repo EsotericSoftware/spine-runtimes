@@ -97,7 +97,7 @@ namespace Spine.Unity.Editor {
 		// Timeline extension module
 		public const bool DEFAULT_TIMELINE_USE_BLEND_DURATION = true;
 		public bool timelineUseBlendDuration = DEFAULT_TIMELINE_USE_BLEND_DURATION;
-		
+
 #if NEW_PREFERENCES_SETTINGS_PROVIDER
 		public static void Load () {
 			GetOrCreateSettings();
@@ -181,14 +181,16 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				GUILayout.Space(20);
-				EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
-				using (new GUILayout.HorizontalScope()) {
-					EditorGUILayout.PrefixLabel("Define TK2D");
-					if (GUILayout.Button("Enable", GUILayout.Width(64)))
-						SpineEditorUtilities.SpineTK2DEditorUtility.EnableTK2D();
-					if (GUILayout.Button("Disable", GUILayout.Width(64)))
-						SpineEditorUtilities.SpineTK2DEditorUtility.DisableTK2D();
+				if (SpineEditorUtilities.SpineTK2DEditorUtility.IsTK2DInstalled()) {
+					GUILayout.Space(20);
+					EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
+					using (new GUILayout.HorizontalScope()) {
+						EditorGUILayout.PrefixLabel("Define TK2D");
+						if (GUILayout.Button("Enable", GUILayout.Width(64)))
+							SpineEditorUtilities.SpineTK2DEditorUtility.EnableTK2D();
+						if (GUILayout.Button("Disable", GUILayout.Width(64)))
+							SpineEditorUtilities.SpineTK2DEditorUtility.DisableTK2D();
+					}
 				}
 
 				GUILayout.Space(20);
