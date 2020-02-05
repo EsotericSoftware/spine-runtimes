@@ -75,6 +75,9 @@ namespace Spine.Unity.Editor {
 		internal const bool DEFAULT_SET_TEXTUREIMPORTER_SETTINGS = true;
 		public bool setTextureImporterSettings = DEFAULT_SET_TEXTUREIMPORTER_SETTINGS;
 
+		internal const string DEFAULT_TEXTURE_SETTINGS_REFERENCE = "";
+		public string textureSettingsReference = DEFAULT_TEXTURE_SETTINGS_REFERENCE;
+
 		internal const bool DEFAULT_ATLASTXT_WARNING = true;
 		public bool atlasTxtImportWarning = DEFAULT_ATLASTXT_WARNING;
 
@@ -146,7 +149,15 @@ namespace Spine.Unity.Editor {
 
 					SpineEditorUtilities.ShaderPropertyField(settings.FindProperty("defaultShader"), new GUIContent("Default Shader"), SpinePreferences.DEFAULT_DEFAULT_SHADER);
 
-					EditorGUILayout.PropertyField(settings.FindProperty("setTextureImporterSettings"), new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."));
+					EditorGUILayout.PropertyField(settings.FindProperty("setTextureImporterSettings"), new GUIContent("Apply Atlas Texture Settings", "Apply reference settings for Texture Importers."));
+					var textureSettingsRef = settings.FindProperty("textureSettingsReference");
+					SpineEditorUtilities.Texture2DPropertyField(textureSettingsRef, new GUIContent("Atlas Texture Reference Settings", "Apply the selected reference texture import settings at newly imported atlas textures. When exporting atlas textures from Spine with \"Premultiply alpha\" enabled (the default), you can leave it at \"PMAPresetTemplate\". If you have disabled \"Premultiply alpha\", set it to \"StraightAlphaPresetTemplate\". You can also create your own reference texture asset and assign it here."));
+					if (string.IsNullOrEmpty(textureSettingsRef.stringValue)) {
+						var pmaTextureSettingsReferenceGUIDS = AssetDatabase.FindAssets("PMAPresetTemplate");
+						if (pmaTextureSettingsReferenceGUIDS.Length > 0) {
+							textureSettingsRef.stringValue = AssetDatabase.GUIDToAssetPath(pmaTextureSettingsReferenceGUIDS[0]);
+						}
+					}
 				}
 
 				EditorGUILayout.Space();

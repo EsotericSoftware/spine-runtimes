@@ -492,7 +492,10 @@ namespace Spine.Unity.Editor {
 				Texture2D texture = (Texture2D)AssetDatabase.LoadAssetAtPath(texturePath, typeof(Texture2D));
 				bool textureIsUninitialized = texturesWithoutMetaFile != null && texturesWithoutMetaFile.Contains(texturePath);
 				if (SpineEditorUtilities.Preferences.setTextureImporterSettings && textureIsUninitialized) {
-					SetDefaultTextureSettings(texturePath, atlasAsset);
+					if (string.IsNullOrEmpty(SpineEditorUtilities.Preferences.textureSettingsReference))
+						SetDefaultTextureSettings(texturePath, atlasAsset);
+					else
+						SetReferenceTextureSettings(texturePath, atlasAsset, SpineEditorUtilities.Preferences.textureSettingsReference);
 				}
 
 				string pageName = Path.GetFileNameWithoutExtension(pageFiles[i]);
@@ -506,6 +509,7 @@ namespace Spine.Unity.Editor {
 
 				if (mat == null) {
 					mat = new Material(Shader.Find(SpineEditorUtilities.Preferences.defaultShader));
+					ApplyPMAOrStraightAlphaSettings(mat, SpineEditorUtilities.Preferences.textureSettingsReference);
 					AssetDatabase.CreateAsset(mat, materialPath);
 				} else {
 					vestigialMaterials.Remove(mat);
@@ -515,8 +519,7 @@ namespace Spine.Unity.Editor {
 					mat.mainTexture = texture;
 
 				EditorUtility.SetDirty(mat);
-				AssetDatabase.SaveAssets();
-
+				// note: don't call AssetDatabase.SaveAssets() since this would trigger OnPostprocessAllAssets() every time unnecessarily.
 				populatingMaterials.Add(mat); //atlasAsset.materials[i] = mat;
 			}
 
@@ -587,9 +590,44 @@ namespace Spine.Unity.Editor {
 			AssetDatabase.SaveAssets();
 			return true;
 		}
-#endregion
 
-#region Import SkeletonData (json or binary)
+		static bool SetReferenceTextureSettings (string texturePath, SpineAtlasAsset atlasAsset, string referenceAssetPath) {
+			TextureImporter reference = TextureImporter.GetAtPath(referenceAssetPath) as TextureImporter;
+			if (reference == null)
+				SetDefaultTextureSettings(texturePath, atlasAsset);
+
+			TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
+			if (texImporter == null) {
+				Debug.LogWarning(string.Format("{0}: Texture asset \"{1}\" not found. Skipping. Please check your atlas file for renamed files.", atlasAsset.name, texturePath), atlasAsset);
+				return false;
+			}
+
+			texImporter.sRGBTexture = reference.sRGBTexture;
+			texImporter.textureCompression = reference.textureCompression;
+			texImporter.alphaSource = reference.alphaSource;
+			texImporter.mipmapEnabled = reference.mipmapEnabled;
+			texImporter.alphaIsTransparency = reference.alphaIsTransparency;
+			texImporter.spriteImportMode = reference.spriteImportMode;
+			texImporter.maxTextureSize = reference.maxTextureSize;
+			texImporter.isReadable = reference.isReadable;
+			texImporter.filterMode = reference.filterMode;
+			texImporter.mipmapFilter = reference.mipmapFilter;
+
+			EditorUtility.SetDirty(texImporter);
+			AssetDatabase.ImportAsset(texturePath);
+			AssetDatabase.SaveAssets();
+			return true;
+		}
+
+		static void ApplyPMAOrStraightAlphaSettings (Material material, string referenceTextureSettings) {
+			bool isUsingPMAWorkflow = string.IsNullOrEmpty(referenceTextureSettings) ||
+				(!referenceTextureSettings.ToLower().Contains("straight") && referenceTextureSettings.ToLower().Contains("pma"));
+
+			MaterialChecks.EnablePMAAtMaterial(material, isUsingPMAWorkflow);
+		}
+		#endregion
+
+		#region Import SkeletonData (json or binary)
 		internal static string GetSkeletonDataAssetFilePath(TextAsset spineJson) {
 			string primaryName = Path.GetFileNameWithoutExtension(spineJson.name);
 			string assetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(spineJson)).Replace('\\', '/');

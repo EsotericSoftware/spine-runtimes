@@ -84,7 +84,10 @@ namespace Spine.Unity.Editor {
 			if (imported.Length == 0)
 				return;
 
-			AssetUtility.HandleOnPostprocessAllAssets(imported, texturesWithoutMetaFile);
+			// we copy the list here to prevent nested calls to OnPostprocessAllAssets() triggering a Clear() of the list
+			// in the middle of execution.
+			var texturesWithoutMetaFileCopy = new List<string>(texturesWithoutMetaFile);
+			AssetUtility.HandleOnPostprocessAllAssets(imported, texturesWithoutMetaFileCopy);
 			texturesWithoutMetaFile.Clear();
 		}
 

@@ -323,6 +323,8 @@
 	  The shaders can be assigned to materials as usual and will respect your settings of the assigned `UniversalRenderPipelineAsset` under `Project Settings - Graphics`.
     * **Restrictions** As all Spine shaders, the URP shaders **do not support `Premultiply alpha` (PMA) atlas textures in Linear color space**. Please export your atlas textures as `straight alpha` textures with disabled `Premultiply alpha` setting when using Linear color space. You can check the current color space via `Project Settings - Player - Other Settings - Color Space.`.
     * **Example:** You can find an example scene in the package under `com.esotericsoftware.spine.urp-shaders-3.8/Examples/URP Shaders.unity` that demonstrates usage of the URP shaders.
+  * Spine Preferences now provide an **`Atlas Texture Reference Settings`** parameter for applying customizable texture import settings at all newly imported Spine atlas textures.
+    When exporting atlas textures from Spine with `Premultiply alpha` enabled (the default), you can leave it at `PMAPresetTemplate`. If you have disabled `Premultiply alpha`, set it to the included `StraightAlphaPresetTemplate` asset. You can also create your own reference `Texture2D` asset and assign it here (include `PMA` or `Straight` in the name). Materials created for imported textures will also have the `Straight Alpha Texture` parameter configured accordingly.
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.MixNext` instead of `MixMode.MixAlways`.
