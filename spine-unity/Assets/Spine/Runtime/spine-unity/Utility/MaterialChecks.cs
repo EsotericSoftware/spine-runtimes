@@ -131,6 +131,18 @@ namespace Spine.Unity {
 			return isProblematic;
 		}
 
+		public static void EnablePMAAtMaterial (Material material, bool enablePMA) {
+			if (material.HasProperty(STRAIGHT_ALPHA_PARAM_ID)) {
+				material.SetInt(STRAIGHT_ALPHA_PARAM_ID, enablePMA ? 0 : 1);
+			}
+			else {
+				if (enablePMA)
+					material.EnableKeyword(ALPHAPREMULTIPLY_ON_KEYWORD);
+				else
+					material.DisableKeyword(ALPHAPREMULTIPLY_ON_KEYWORD);
+			}
+		}
+
 		static bool IsPMAMaterial (Material material) {
 			return (material.HasProperty(STRAIGHT_ALPHA_PARAM_ID) && material.GetInt(STRAIGHT_ALPHA_PARAM_ID) == 0) ||
 					material.IsKeywordEnabled(ALPHAPREMULTIPLY_ON_KEYWORD);
