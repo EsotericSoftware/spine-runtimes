@@ -65,6 +65,23 @@
   * `AtlasUtilities.GetRepackedAttachments()` and `AtlasUtilities.GetRepackedSkin()` provide support for additional texture channels such as normal maps via the optional parameter `additionalTexturePropertyIDsToCopy `. See the spine-unity runtime documentation, section [Combining Skins - Advanced - Runtime Repacking with Normalmaps](http://esotericsoftware.com/spine-unity#Combining-Skins) for further info and example usage code.
   * `BoneFollower` can now optionally follow (uniform) world scale of the reference bone. There is now a `Mode` dropdown selector in the Inspector which can be set to either `Local` or `World Uniform`.
   * All `Spine/SkeletonGraphic` shaders now provide a parameter `CanvasGroup Compatible` which can be enabled to support `CanvasGroup` alpha blending. For correct results, you should then disable `Pma Vertex Colors` in the `SkeletonGraphic` Inspector, in section `Advanced` (otherwise Slot alpha will be applied twice).
+  * **Now supporting Universal Render Pipeline (URP), including the 2D Renderer pipeline, through an additional UPM package.**
+    * **Installation:** You can download the Unity Package Manager (UPM) package via the [download page](http://esotericsoftware.com/spine-unity-download) or find it in the [spine-runtimes/spine-unity/Modules](https://github.com/EsotericSoftware/spine-runtimes/tree/3.8-beta/spine-unity/Modules) subdirectory on the git repository. You can then either unzip (copy if using git) the package to
+      * a) the `Packages` directory in your project where it will automatically be loaded, or
+      * b) to an arbitrary directory outside the Assets directory and then open Package Manager in Unity, select the `+` icon, choose `Add package from disk..` and point it to the package.json file.
+
+      The Project panel should now show an entry `Spine Universal RP Shaders` under `Packages`. If the directory is not yet listed, you will need to close and re-open Unity to have it display the directory and its contents.
+    * **Usage:** The package provides two shaders specifically built for the universal render pipeline:
+      * `Universal Render Pipeline/Spine/Skeleton`, as a universal variant of the `Spine/Skeleton` shader,
+      * `Universal Render Pipeline/Spine/Skeleton Lit`, as a universal variant of the `Spine/Skeleton Lit` shader,
+      * `Universal Render Pipeline/Spine/Sprite`, as a universal variant of the `Spine/Sprite/Vertex Lit` and `Pixel Lit` shaders, which were not functioning in the universal render pipeline,
+	  * `Universal Render Pipeline/2D/Spine/Skeleton Lit`, as a universal 2D Renderer variant of the `Spine/Skeleton Lit` shader, and
+      * `Universal Render Pipeline/2D/Spine/Sprite`, as a universal 2D Renderer variant of the `Spine/Sprite/Vertex Lit` and `Pixel Lit` shaders.
+	  The shaders can be assigned to materials as usual and will respect your settings of the assigned `UniversalRenderPipelineAsset` under `Project Settings - Graphics`.
+    * **Restrictions** As all Spine shaders, the URP shaders **do not support `Premultiply alpha` (PMA) atlas textures in Linear color space**. Please export your atlas textures as `straight alpha` textures with disabled `Premultiply alpha` setting when using Linear color space. You can check the current color space via `Project Settings - Player - Other Settings - Color Space.`.
+    * **Example:** You can find an example scene in the package under `com.esotericsoftware.spine.urp-shaders-3.8/Examples/URP Shaders.unity` that demonstrates usage of the URP shaders.
+  * Spine Preferences now provide an **`Atlas Texture Reference Settings`** parameter for applying customizable texture import settings at all newly imported Spine atlas textures.
+    When exporting atlas textures from Spine with `Premultiply alpha` enabled (the default), you can leave it at `PMAPresetTemplate`. If you have disabled `Premultiply alpha`, set it to the included `StraightAlphaPresetTemplate` asset. You can also create your own reference `Texture2D` asset and assign it here (include `PMA` or `Straight` in the name). Materials created for imported textures will also have the `Straight Alpha Texture` parameter configured accordingly.
 
 * **Changes of default values**
 
