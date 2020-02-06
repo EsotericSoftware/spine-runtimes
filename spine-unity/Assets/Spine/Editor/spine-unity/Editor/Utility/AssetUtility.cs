@@ -594,7 +594,7 @@ namespace Spine.Unity.Editor {
 		static bool SetReferenceTextureSettings (string texturePath, SpineAtlasAsset atlasAsset, string referenceAssetPath) {
 			TextureImporter reference = TextureImporter.GetAtPath(referenceAssetPath) as TextureImporter;
 			if (reference == null)
-				SetDefaultTextureSettings(texturePath, atlasAsset);
+				return SetDefaultTextureSettings(texturePath, atlasAsset);
 
 			TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 			if (texImporter == null) {
@@ -612,6 +612,7 @@ namespace Spine.Unity.Editor {
 			texImporter.isReadable = reference.isReadable;
 			texImporter.filterMode = reference.filterMode;
 			texImporter.mipmapFilter = reference.mipmapFilter;
+			texImporter.textureType = reference.textureType;
 
 			EditorUtility.SetDirty(texImporter);
 			AssetDatabase.ImportAsset(texturePath);
