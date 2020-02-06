@@ -39,6 +39,10 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
+#if UNITY_2018_3_OR_NEWER
+#define NEW_PREFERENCES_SETTINGS_PROVIDER
+#endif
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -591,6 +595,25 @@ namespace Spine.Unity.Editor {
 			return true;
 		}
 
+	#if NEW_PREFERENCES_SETTINGS_PROVIDER
+		static bool SetReferenceTextureSettings (string texturePath, SpineAtlasAsset atlasAsset, string referenceAssetPath) {
+			var texturePreset = AssetDatabase.LoadAssetAtPath<UnityEditor.Presets.Preset>(referenceAssetPath);
+			bool isTexturePreset = texturePreset != null && texturePreset.GetTargetTypeName() == "TextureImporter";
+			if (!isTexturePreset)
+				return SetDefaultTextureSettings(texturePath, atlasAsset);
+
+			TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
+			if (texImporter == null) {
+				Debug.LogWarning(string.Format("{0}: Texture asset \"{1}\" not found. Skipping. Please check your atlas file for renamed files.", atlasAsset.name, texturePath), atlasAsset);
+				return false;
+			}
+
+			texturePreset.ApplyTo(texImporter);
+			AssetDatabase.ImportAsset(texturePath);
+			AssetDatabase.SaveAssets();
+			return true;
+		}
+	#else
 		static bool SetReferenceTextureSettings (string texturePath, SpineAtlasAsset atlasAsset, string referenceAssetPath) {
 			TextureImporter reference = TextureImporter.GetAtPath(referenceAssetPath) as TextureImporter;
 			if (reference == null)
@@ -619,6 +642,7 @@ namespace Spine.Unity.Editor {
 			AssetDatabase.SaveAssets();
 			return true;
 		}
+	#endif
 
 		static void ApplyPMAOrStraightAlphaSettings (Material material, string referenceTextureSettings) {
 			bool isUsingPMAWorkflow = string.IsNullOrEmpty(referenceTextureSettings) ||
