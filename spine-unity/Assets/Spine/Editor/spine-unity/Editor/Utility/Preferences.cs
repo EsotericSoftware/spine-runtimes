@@ -339,9 +339,12 @@ namespace Spine.Unity.Editor {
 		}
 
 
-		public static void Texture2DPropertyField (SerializedProperty property, GUIContent label) {
-			var texture = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Texture2D>(property.stringValue), typeof(UnityEngine.Object), false) as Texture2D);
-			property.stringValue = texture != null ? AssetDatabase.GetAssetPath(texture) : "";
+	#if NEW_PREFERENCES_SETTINGS_PROVIDER
+		public static void PresetAssetPropertyField (SerializedProperty property, GUIContent label) {
+			var texturePreset = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<UnityEditor.Presets.Preset>(property.stringValue), typeof(UnityEditor.Presets.Preset), false) as UnityEditor.Presets.Preset);
+			bool isTexturePreset = texturePreset != null && texturePreset.GetTargetTypeName() == "TextureImporter";
+			property.stringValue = isTexturePreset ? AssetDatabase.GetAssetPath(texturePreset) : "";
 		}
+	#endif
 	}
 }
