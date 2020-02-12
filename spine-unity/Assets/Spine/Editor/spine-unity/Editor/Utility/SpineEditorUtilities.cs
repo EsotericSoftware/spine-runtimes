@@ -302,6 +302,7 @@ namespace Spine.Unity.Editor {
 				var eventType = current.type;
 				bool isDraggingEvent = eventType == EventType.DragUpdated;
 				bool isDropEvent = eventType == EventType.DragPerform;
+				UnityEditor.DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
 
 				if (isDraggingEvent || isDropEvent) {
 					var mouseOverWindow = EditorWindow.mouseOverWindow;
@@ -319,12 +320,10 @@ namespace Spine.Unity.Editor {
 								const string GenericDataTargetID = "target";
 								if (HierarchyWindow.Equals(mouseOverWindow.GetType().ToString(), System.StringComparison.Ordinal)) {
 									if (isDraggingEvent) {
-										UnityEditor.DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
-
 										var mouseOverTarget = UnityEditor.EditorUtility.InstanceIDToObject(instanceId);
 										if (mouseOverTarget)
 											DragAndDrop.SetGenericData(GenericDataTargetID, mouseOverTarget);
-										// note: do not use the current event, otherwise we lose the nice mouse-over highlighting.
+										// Note: do not call current.Use(), otherwise we get the wrong drop-target parent.
 									} else if (isDropEvent) {
 										var parentGameObject = DragAndDrop.GetGenericData(GenericDataTargetID) as UnityEngine.GameObject;
 										Transform parent = parentGameObject != null ? parentGameObject.transform : null;
@@ -334,12 +333,10 @@ namespace Spine.Unity.Editor {
 										return;
 									}
 								}
-
 							}
 						}
 					}
 				}
-
 			}
 		}
 	}
