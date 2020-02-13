@@ -150,7 +150,6 @@ public class SkeletonRenderer {
 	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
 	 * previous blend function is not restored, since that could result in unnecessary flushes, depending on what is rendered
 	 * next. */
-	@SuppressWarnings("null")
 	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
 		if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
@@ -273,7 +272,6 @@ public class SkeletonRenderer {
 	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
 	 * previous blend function is not restored, since that could result in unnecessary flushes, depending on what is rendered
 	 * next. */
-	@SuppressWarnings("null")
 	public void draw (TwoColorPolygonBatch batch, Skeleton skeleton) {
 		if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
