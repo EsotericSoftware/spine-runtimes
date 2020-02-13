@@ -40,6 +40,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
+import com.esotericsoftware.spine.utils.Null;
 
 /** Stores a list of timelines to animate a skeleton's pose over time. */
 public class Animation {
@@ -69,7 +70,7 @@ public class Animation {
 			timelineIds.addAll(timelines.get(i).getPropertyIds());
 	}
 
-	/** Returns true if this animation contains a timeline with any of the specified property IDs. **/
+	/** Returns true if this animation contains a timeline with any of the specified property IDs. */
 	public boolean hasTimeline (String[] propertyIds) {
 		for (String id : propertyIds)
 			if (timelineIds.contains(id)) return true;
@@ -106,7 +107,7 @@ public class Animation {
 	 * @param blend Controls how mixing is applied when <code>alpha</code> < 1.
 	 * @param direction Indicates whether the timelines are mixing in or out. Used by timelines which perform instant transitions,
 	 *           such as {@link DrawOrderTimeline} or {@link AttachmentTimeline}. */
-	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, Array<Event> events, float alpha,
+	public void apply (Skeleton skeleton, float lastTime, float time, boolean loop, @Null Array<Event> events, float alpha,
 		MixBlend blend, MixDirection direction) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
@@ -249,8 +250,8 @@ public class Animation {
 		 * @param blend Controls how mixing is applied when <code>alpha</code> < 1.
 		 * @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions,
 		 *           such as {@link DrawOrderTimeline} or {@link AttachmentTimeline}. */
-		abstract public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
-			MixDirection direction);
+		abstract public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha,
+			MixBlend blend, MixDirection direction);
 	}
 
 	/** An interface for timelines which change the property of a bone. */
@@ -454,7 +455,7 @@ public class Animation {
 			return boneIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			Bone bone = skeleton.bones.get(boneIndex);
@@ -501,7 +502,7 @@ public class Animation {
 			return boneIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			Bone bone = skeleton.bones.get(boneIndex);
@@ -573,7 +574,7 @@ public class Animation {
 			return boneIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			Bone bone = skeleton.bones.get(boneIndex);
@@ -686,7 +687,7 @@ public class Animation {
 			return boneIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			Bone bone = skeleton.bones.get(boneIndex);
@@ -776,7 +777,7 @@ public class Animation {
 			frames[frame + A] = a;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			Slot slot = skeleton.slots.get(slotIndex);
@@ -873,7 +874,7 @@ public class Animation {
 			frames[frame + B2] = b2;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			Slot slot = skeleton.slots.get(slotIndex);
@@ -978,7 +979,7 @@ public class Animation {
 			attachmentNames[frame] = attachmentName;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			Slot slot = skeleton.slots.get(slotIndex);
@@ -1094,7 +1095,7 @@ public class Animation {
 			return y + (1 - y) * (time - x) / (frames[frame + getFrameEntries()] - x);
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			Slot slot = skeleton.slots.get(slotIndex);
@@ -1301,8 +1302,8 @@ public class Animation {
 		}
 
 		/** Fires events for frames > <code>lastTime</code> and <= <code>time</code>. */
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> firedEvents, float alpha, MixBlend blend,
-			MixDirection direction) {
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> firedEvents, float alpha,
+			MixBlend blend, MixDirection direction) {
 
 			if (firedEvents == null) return;
 
@@ -1353,12 +1354,12 @@ public class Animation {
 		 * @param time The frame time in seconds.
 		 * @param drawOrder For each slot in {@link Skeleton#slots}, the index of the slot in the new draw order. May be null to use
 		 *           setup pose draw order. */
-		public void setFrame (int frame, float time, int[] drawOrder) {
+		public void setFrame (int frame, float time, @Null int[] drawOrder) {
 			frames[frame] = time;
 			drawOrders[frame] = drawOrder;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			Array<Slot> drawOrder = skeleton.drawOrder;
@@ -1421,7 +1422,7 @@ public class Animation {
 			frames[frame + STRETCH] = stretch ? 1 : 0;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			IkConstraint constraint = skeleton.ikConstraints.get(ikConstraintIndex);
@@ -1526,7 +1527,7 @@ public class Animation {
 			frames[frame + SHEAR] = shearMix;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			TransformConstraint constraint = skeleton.transformConstraints.get(transformConstraintIndex);
@@ -1609,7 +1610,7 @@ public class Animation {
 			return pathConstraintIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			PathConstraint constraint = skeleton.pathConstraints.get(pathConstraintIndex);
@@ -1649,7 +1650,7 @@ public class Animation {
 			return pathConstraintIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			PathConstraint constraint = skeleton.pathConstraints.get(pathConstraintIndex);
@@ -1690,7 +1691,7 @@ public class Animation {
 			return pathConstraintIndex;
 		}
 
-		public void apply (Skeleton skeleton, float lastTime, float time, Array<Event> events, float alpha, MixBlend blend,
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
 			PathConstraint constraint = skeleton.pathConstraints.get(pathConstraintIndex);

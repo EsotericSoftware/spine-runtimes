@@ -44,6 +44,7 @@ import com.esotericsoftware.spine.attachments.ClippingAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
+import com.esotericsoftware.spine.utils.Null;
 import com.esotericsoftware.spine.utils.SkeletonClipping;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
@@ -450,13 +451,12 @@ public class SkeletonRenderer {
 		this.premultipliedAlpha = premultipliedAlpha;
 	}
 
-	/** @return May be null. */
+	@Null
 	public VertexEffect getVertexEffect () {
 		return vertexEffect;
 	}
 
-	/** @param vertexEffect May be null. */
-	public void setVertexEffect (VertexEffect vertexEffect) {
+	public void setVertexEffect (@Null VertexEffect vertexEffect) {
 		this.vertexEffect = vertexEffect;
 	}
 

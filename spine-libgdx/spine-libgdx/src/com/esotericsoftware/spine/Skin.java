@@ -34,6 +34,7 @@ import com.badlogic.gdx.utils.OrderedSet;
 
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
+import com.esotericsoftware.spine.utils.Null;
 
 /** Stores attachments by slot index and attachment name.
  * <p>
@@ -93,6 +94,7 @@ public class Skin {
 	}
 
 	/** Returns the attachment for the specified slot index and name, or null. */
+	@Null
 	public Attachment getAttachment (int slotIndex, String name) {
 		lookup.set(slotIndex, name);
 		SkinEntry entry = attachments.get(lookup);
@@ -154,15 +156,14 @@ public class Skin {
 		}
 	}
 
-	/** Stores an entry in the skin consisting of the slot index, name, and attachment **/
+	/** Stores an entry in the skin consisting of the slot index and the attachment name. */
 	static public class SkinEntry {
 		int slotIndex;
 		String name;
 		Attachment attachment;
 		private int hashCode;
 
-		/** @param attachment May be null. */
-		SkinEntry (int slotIndex, String name, Attachment attachment) {
+		SkinEntry (int slotIndex, String name, @Null Attachment attachment) {
 			set(slotIndex, name);
 			this.attachment = attachment;
 		}

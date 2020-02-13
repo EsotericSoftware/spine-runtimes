@@ -57,7 +57,8 @@ abstract public class ConstraintData {
 
 	/** When true, {@link Skeleton#updateWorldTransform()} only updates this constraint if the {@link Skeleton#getSkin()} contains
 	 * this constraint.
-	 * @see Skin#getConstraints() */
+	 * <p>
+	 * See {@link Skin#getConstraints()}. */
 	public boolean getSkinRequired () {
 		return skinRequired;
 	}

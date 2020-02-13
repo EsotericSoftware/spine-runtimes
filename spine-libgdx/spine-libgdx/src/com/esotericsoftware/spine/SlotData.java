@@ -31,6 +31,8 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.graphics.Color;
 
+import com.esotericsoftware.spine.utils.Null;
+
 /** Stores the setup pose for a {@link Slot}. */
 public class SlotData {
 	final int index;
@@ -73,21 +75,21 @@ public class SlotData {
 
 	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
 	 * color's alpha is not used. */
+	@Null
 	public Color getDarkColor () {
 		return darkColor;
 	}
 
-	/** @param darkColor May be null. */
-	public void setDarkColor (Color darkColor) {
+	public void setDarkColor (@Null Color darkColor) {
 		this.darkColor = darkColor;
 	}
 
-	/** @param attachmentName May be null. */
-	public void setAttachmentName (String attachmentName) {
+	public void setAttachmentName (@Null String attachmentName) {
 		this.attachmentName = attachmentName;
 	}
 
 	/** The name of the attachment that is visible for this slot in the setup pose, or null if no attachment is visible. */
+	@Null
 	public String getAttachmentName () {
 		return attachmentName;
 	}

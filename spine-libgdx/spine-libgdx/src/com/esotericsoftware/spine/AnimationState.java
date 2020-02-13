@@ -44,6 +44,7 @@ import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.Animation.MixDirection;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
+import com.esotericsoftware.spine.utils.Null;
 
 /** Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
  * multiple animations on top of each other (layering).
@@ -502,7 +503,7 @@ public class AnimationState {
 
 	/** Sets an animation by name.
 	 * <p>
-	 * {@link #setAnimation(int, Animation, boolean)}. */
+	 * See {@link #setAnimation(int, Animation, boolean)}. */
 	public TrackEntry setAnimation (int trackIndex, String animationName, boolean loop) {
 		Animation animation = data.skeletonData.findAnimation(animationName);
 		if (animation == null) throw new IllegalArgumentException("Animation not found: " + animationName);
@@ -649,8 +650,7 @@ public class AnimationState {
 		return null;
 	}
 
-	/** @param last May be null. */
-	private TrackEntry trackEntry (int trackIndex, Animation animation, boolean loop, TrackEntry last) {
+	private TrackEntry trackEntry (int trackIndex, Animation animation, boolean loop, @Null TrackEntry last) {
 		TrackEntry entry = trackEntryPool.obtain();
 		entry.trackIndex = trackIndex;
 		entry.animation = animation;
@@ -772,6 +772,7 @@ public class AnimationState {
 	}
 
 	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
+	@Null
 	public TrackEntry getCurrent (int trackIndex) {
 		if (trackIndex < 0) throw new IllegalArgumentException("trackIndex must be >= 0.");
 		if (trackIndex >= tracks.size) return null;
@@ -1009,12 +1010,12 @@ public class AnimationState {
 		 * <p>
 		 * A track entry returned from {@link AnimationState#setAnimation(int, Animation, boolean)} is already the current animation
 		 * for the track, so the track entry listener {@link AnimationStateListener#start(TrackEntry)} will not be called. */
+		@Null
 		public AnimationStateListener getListener () {
 			return listener;
 		}
 
-		/** @param listener May be null. */
-		public void setListener (AnimationStateListener listener) {
+		public void setListener (@Null AnimationStateListener listener) {
 			this.listener = listener;
 		}
 
@@ -1065,6 +1066,7 @@ public class AnimationState {
 		}
 
 		/** The animation queued to start after this animation, or null. <code>next</code> makes up a linked list. */
+		@Null
 		public TrackEntry getNext () {
 			return next;
 		}
@@ -1124,12 +1126,14 @@ public class AnimationState {
 
 		/** The track entry for the previous animation when mixing from the previous animation to this animation, or null if no
 		 * mixing is currently occuring. When mixing from multiple animations, <code>mixingFrom</code> makes up a linked list. */
+		@Null
 		public TrackEntry getMixingFrom () {
 			return mixingFrom;
 		}
 
 		/** The track entry for the next animation when mixing from this animation to the next animation, or null if no mixing is
 		 * currently occuring. When mixing to multiple animations, <code>mixingTo</code> makes up a linked list. */
+		@Null
 		public TrackEntry getMixingTo () {
 			return mixingTo;
 		}

@@ -30,6 +30,7 @@
 package com.esotericsoftware.spine.attachments;
 
 import com.esotericsoftware.spine.Skin;
+import com.esotericsoftware.spine.utils.Null;
 
 /** The interface which can be implemented to customize creating and populating attachments.
  * <p>
@@ -37,20 +38,26 @@ import com.esotericsoftware.spine.Skin;
  * Runtimes Guide. */
 public interface AttachmentLoader {
 	/** @return May be null to not load the attachment. */
+	@Null
 	public RegionAttachment newRegionAttachment (Skin skin, String name, String path);
 
 	/** @return May be null to not load the attachment. */
+	@Null
 	public MeshAttachment newMeshAttachment (Skin skin, String name, String path);
 
 	/** @return May be null to not load the attachment. */
+	@Null
 	public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name);
-	
+
 	/** @return May be null to not load the attachment. */
+	@Null
 	public ClippingAttachment newClippingAttachment (Skin skin, String name);
 
 	/** @return May be null to not load the attachment. */
+	@Null
 	public PathAttachment newPathAttachment (Skin skin, String name);
 
 	/** @return May be null to not load the attachment. */
+	@Null
 	public PointAttachment newPointAttachment (Skin skin, String name);
 }

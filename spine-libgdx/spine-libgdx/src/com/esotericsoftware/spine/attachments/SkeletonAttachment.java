@@ -30,6 +30,7 @@
 package com.esotericsoftware.spine.attachments;
 
 import com.esotericsoftware.spine.Skeleton;
+import com.esotericsoftware.spine.utils.Null;
 
 /** Attachment that displays a skeleton. */
 public class SkeletonAttachment extends Attachment {
@@ -44,8 +45,7 @@ public class SkeletonAttachment extends Attachment {
 		return skeleton;
 	}
 
-	/** @param skeleton May be null. */
-	public void setSkeleton (Skeleton skeleton) {
+	public void setSkeleton (@Null Skeleton skeleton) {
 		this.skeleton = skeleton;
 	}
 

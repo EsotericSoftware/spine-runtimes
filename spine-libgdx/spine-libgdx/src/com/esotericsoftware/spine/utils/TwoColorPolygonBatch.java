@@ -83,7 +83,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 	private float lightPacked = Color.WHITE.toFloatBits();
 	private float darkPacked = Color.BLACK.toFloatBits();
 
-	/** Number of rendering calls, ever. Will not be reset unless set manually. **/
+	/** Number of rendering calls, ever. Will not be reset unless set manually. */
 	public int totalRenderCalls = 0;
 
 	public TwoColorPolygonBatch () {

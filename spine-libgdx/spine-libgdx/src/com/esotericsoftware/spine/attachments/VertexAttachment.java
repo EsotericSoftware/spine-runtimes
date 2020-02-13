@@ -36,6 +36,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.Bone;
 import com.esotericsoftware.spine.Skeleton;
 import com.esotericsoftware.spine.Slot;
+import com.esotericsoftware.spine.utils.Null;
 
 /** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
  * {@link Slot#getDeform()}. */
@@ -122,24 +123,26 @@ abstract public class VertexAttachment extends Attachment {
 
 	/** Deform keys for the deform attachment are also applied to this attachment.
 	 * @return May be null if no deform keys should be applied. */
+	@Null
 	public VertexAttachment getDeformAttachment () {
 		return deformAttachment;
 	}
 
 	/** @param deformAttachment May be null if no deform keys should be applied. */
-	public void setDeformAttachment (VertexAttachment deformAttachment) {
+	public void setDeformAttachment (@Null VertexAttachment deformAttachment) {
 		this.deformAttachment = deformAttachment;
 	}
 
 	/** The bones which affect the {@link #getVertices()}. The array entries are, for each vertex, the number of bones affecting
 	 * the vertex followed by that many bone indices, which is the index of the bone in {@link Skeleton#getBones()}. Will be null
 	 * if this attachment has no weights. */
+	@Null
 	public int[] getBones () {
 		return bones;
 	}
 
 	/** @param bones May be null if this attachment has no weights. */
-	public void setBones (int[] bones) {
+	public void setBones (@Null int[] bones) {
 		this.bones = bones;
 	}
 
@@ -169,7 +172,7 @@ abstract public class VertexAttachment extends Attachment {
 		return id;
 	}
 
-	/** Does not copy id (generated) or name (set on construction). **/
+	/** Does not copy id (generated) or name (set on construction). */
 	void copyTo (VertexAttachment attachment) {
 		if (bones != null) {
 			attachment.bones = new int[bones.length];

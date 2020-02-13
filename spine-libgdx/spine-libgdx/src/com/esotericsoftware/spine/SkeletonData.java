@@ -31,6 +31,8 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
 
+import com.esotericsoftware.spine.utils.Null;
+
 /** Stores the setup pose and all of the stateless data for a skeleton.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-runtime-architecture#Data-objects">Data objects</a> in the Spine Runtimes
@@ -65,8 +67,8 @@ public class SkeletonData {
 	}
 
 	/** Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it
-	 * multiple times.
-	 * @return May be null. */
+	 * multiple times. */
+	@Null
 	public BoneData findBone (String boneName) {
 		if (boneName == null) throw new IllegalArgumentException("boneName cannot be null.");
 		Array<BoneData> bones = this.bones;
@@ -85,8 +87,8 @@ public class SkeletonData {
 	}
 
 	/** Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
-	 * multiple times.
-	 * @return May be null. */
+	 * multiple times. */
+	@Null
 	public SlotData findSlot (String slotName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Array<SlotData> slots = this.slots;
@@ -101,20 +103,19 @@ public class SkeletonData {
 
 	/** The skeleton's default skin. By default this skin contains all attachments that were not in a skin in Spine.
 	 * <p>
-	 * See {@link Skeleton#getAttachment(int, String)}.
-	 * @return May be null. */
+	 * See {@link Skeleton#getAttachment(int, String)}. */
+	@Null
 	public Skin getDefaultSkin () {
 		return defaultSkin;
 	}
 
-	/** @param defaultSkin May be null. */
-	public void setDefaultSkin (Skin defaultSkin) {
+	public void setDefaultSkin (@Null Skin defaultSkin) {
 		this.defaultSkin = defaultSkin;
 	}
 
 	/** Finds a skin by comparing each skin's name. It is more efficient to cache the results of this method than to call it
-	 * multiple times.
-	 * @return May be null. */
+	 * multiple times. */
+	@Null
 	public Skin findSkin (String skinName) {
 		if (skinName == null) throw new IllegalArgumentException("skinName cannot be null.");
 		for (Skin skin : skins)
@@ -130,8 +131,8 @@ public class SkeletonData {
 	// --- Events.
 
 	/** Finds an event by comparing each events's name. It is more efficient to cache the results of this method than to call it
-	 * multiple times.
-	 * @return May be null. */
+	 * multiple times. */
+	@Null
 	public EventData findEvent (String eventDataName) {
 		if (eventDataName == null) throw new IllegalArgumentException("eventDataName cannot be null.");
 		for (EventData eventData : events)
@@ -152,8 +153,8 @@ public class SkeletonData {
 	}
 
 	/** Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to
-	 * call it multiple times.
-	 * @return May be null. */
+	 * call it multiple times. */
+	@Null
 	public Animation findAnimation (String animationName) {
 		if (animationName == null) throw new IllegalArgumentException("animationName cannot be null.");
 		Array<Animation> animations = this.animations;
@@ -172,8 +173,8 @@ public class SkeletonData {
 	}
 
 	/** Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
-	 * than to call it multiple times.
-	 * @return May be null. */
+	 * than to call it multiple times. */
+	@Null
 	public IkConstraintData findIkConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Array<IkConstraintData> ikConstraints = this.ikConstraints;
@@ -192,8 +193,8 @@ public class SkeletonData {
 	}
 
 	/** Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
-	 * this method than to call it multiple times.
-	 * @return May be null. */
+	 * this method than to call it multiple times. */
+	@Null
 	public TransformConstraintData findTransformConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Array<TransformConstraintData> transformConstraints = this.transformConstraints;
@@ -212,8 +213,8 @@ public class SkeletonData {
 	}
 
 	/** Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
-	 * than to call it multiple times.
-	 * @return May be null. */
+	 * than to call it multiple times. */
+	@Null
 	public PathConstraintData findPathConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Array<PathConstraintData> pathConstraints = this.pathConstraints;
@@ -226,14 +227,13 @@ public class SkeletonData {
 
 	// ---
 
-	/** The skeleton's name, which by default is the name of the skeleton data file, if possible.
-	 * @return May be null. */
+	/** The skeleton's name, which by default is the name of the skeleton data file, if possible. */
+	@Null
 	public String getName () {
 		return name;
 	}
 
-	/** @param name May be null. */
-	public void setName (String name) {
+	public void setName (@Null String name) {
 		this.name = name;
 	}
 
@@ -274,45 +274,42 @@ public class SkeletonData {
 	}
 
 	/** The Spine version used to export the skeleton data, or null. */
+	@Null
 	public String getVersion () {
 		return version;
 	}
 
-	/** @param version May be null. */
-	public void setVersion (String version) {
+	public void setVersion (@Null String version) {
 		this.version = version;
 	}
 
-	/** The skeleton data hash. This value will change if any of the skeleton data has changed.
-	 * @return May be null. */
+	/** The skeleton data hash. This value will change if any of the skeleton data has changed. */
+	@Null
 	public String getHash () {
 		return hash;
 	}
 
-	/** @param hash May be null. */
-	public void setHash (String hash) {
+	public void setHash (@Null String hash) {
 		this.hash = hash;
 	}
 
-	/** The path to the images directory as defined in Spine. Available only when nonessential data was exported.
-	 * @return May be null. */
+	/** The path to the images directory as defined in Spine. Available only when nonessential data was exported. */
+	@Null
 	public String getImagesPath () {
 		return imagesPath;
 	}
 
-	/** @param imagesPath May be null. */
-	public void setImagesPath (String imagesPath) {
+	public void setImagesPath (@Null String imagesPath) {
 		this.imagesPath = imagesPath;
 	}
 
-	/** The path to the audio directory as defined in Spine. Available only when nonessential data was exported.
-	 * @return May be null. */
+	/** The path to the audio directory as defined in Spine. Available only when nonessential data was exported. */
+	@Null
 	public String getAudioPath () {
 		return audioPath;
 	}
 
-	/** @param audioPath May be null. */
-	public void setAudioPath (String audioPath) {
+	public void setAudioPath (@Null String audioPath) {
 		this.audioPath = audioPath;
 	}
 

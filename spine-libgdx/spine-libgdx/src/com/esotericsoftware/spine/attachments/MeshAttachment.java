@@ -33,6 +33,9 @@ import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+
+import com.esotericsoftware.spine.utils.Null;
+
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 /** An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
@@ -218,8 +221,7 @@ public class MeshAttachment extends VertexAttachment {
 		return parentMesh;
 	}
 
-	/** @param parentMesh May be null. */
-	public void setParentMesh (MeshAttachment parentMesh) {
+	public void setParentMesh (@Null MeshAttachment parentMesh) {
 		this.parentMesh = parentMesh;
 		if (parentMesh != null) {
 			bones = parentMesh.bones;
@@ -261,7 +263,7 @@ public class MeshAttachment extends VertexAttachment {
 		return copy;
 	}
 
-	/** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. **/
+	/** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. */
 	public MeshAttachment newLinkedMesh () {
 		MeshAttachment mesh = new MeshAttachment(name);
 		mesh.region = region;

@@ -35,6 +35,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.esotericsoftware.spine.Animation.DeformTimeline;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
+import com.esotericsoftware.spine.utils.Null;
 
 /** Stores a slot's current pose. Slots organize attachments for {@link Skeleton#drawOrder} purposes and provide a place to store
  * state for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared
@@ -92,18 +93,19 @@ public class Slot {
 
 	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
 	 * color's alpha is not used. */
+	@Null
 	public Color getDarkColor () {
 		return darkColor;
 	}
 
 	/** The current attachment for the slot, or null if the slot has no attachment. */
+	@Null
 	public Attachment getAttachment () {
 		return attachment;
 	}
 
-	/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears {@link #deform}.
-	 * @param attachment May be null. */
-	public void setAttachment (Attachment attachment) {
+	/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears {@link #deform}. */
+	public void setAttachment (@Null Attachment attachment) {
 		if (this.attachment == attachment) return;
 		this.attachment = attachment;
 		attachmentTime = bone.skeleton.time;

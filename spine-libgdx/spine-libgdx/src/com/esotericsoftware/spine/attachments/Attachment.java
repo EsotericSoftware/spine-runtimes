@@ -47,6 +47,6 @@ abstract public class Attachment {
 		return name;
 	}
 
-	/** Returns a copy of the attachment. **/
+	/** Returns a copy of the attachment. */
 	abstract public Attachment copy ();
 }

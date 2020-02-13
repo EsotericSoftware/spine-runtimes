@@ -76,6 +76,7 @@ import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
+import com.esotericsoftware.spine.utils.Null;
 
 /** Loads skeleton data in the Spine binary format.
  * <p>
@@ -138,7 +139,7 @@ public class SkeletonBinary {
 		try {
 			skeletonData.hash = input.readString();
 			if (skeletonData.hash.isEmpty()) skeletonData.hash = null;
-			skeletonData.version = input.readString();			
+			skeletonData.version = input.readString();
 			if (skeletonData.version.isEmpty()) skeletonData.version = null;
 			if ("3.8.75".equals(skeletonData.version))
 				throw new RuntimeException("Unsupported skeleton data, please export with a newer version of Spine.");
@@ -330,7 +331,7 @@ public class SkeletonBinary {
 		return skeletonData;
 	}
 
-	/** @return May be null. */
+	@Null
 	private Skin readSkin (SkeletonInput input, SkeletonData skeletonData, boolean defaultSkin, boolean nonessential)
 		throws IOException {
 
@@ -773,7 +774,9 @@ public class SkeletonBinary {
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 				int slotIndex = input.readInt(true);
 				for (int iii = 0, nnn = input.readInt(true); iii < nnn; iii++) {
-					VertexAttachment attachment = (VertexAttachment)skin.getAttachment(slotIndex, input.readStringRef());
+					String attachmentName = input.readStringRef();
+					VertexAttachment attachment = (VertexAttachment)skin.getAttachment(slotIndex, attachmentName);
+					if (attachment == null) throw new SerializationException("Vertex attachment not found: " + attachmentName);
 					boolean weighted = attachment.getBones() != null;
 					float[] vertices = attachment.getVertices();
 					int deformLength = weighted ? (vertices.length / 3) << 1 : vertices.length;
@@ -937,7 +940,7 @@ public class SkeletonBinary {
 			super(file.read(512));
 		}
 
-		/** @return May be null. */
+		@Null
 		public String readStringRef () throws IOException {
 			int index = readInt(true);
 			return index == 0 ? null : strings.get(index - 1);

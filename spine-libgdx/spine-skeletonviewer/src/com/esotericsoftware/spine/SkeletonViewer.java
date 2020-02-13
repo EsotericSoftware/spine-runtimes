@@ -226,7 +226,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		state = new AnimationState(new AnimationStateData(skeletonData));
 		state.addListener(new AnimationStateAdapter() {
-
 			public void event (TrackEntry entry, Event event) {
 				ui.toast(event.getData().getName());
 			}
@@ -243,7 +242,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		ui.window.getTitleLabel().setText(skeletonFile.name());
 		{
-
 			Array<String> items = new Array();
 			for (Skin skin : skeletonData.getSkins())
 				items.add(skin.getName());
@@ -719,6 +717,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			});
 			slotsSetupPoseButton.addListener(new ChangeListener() {
 				public void changed (ChangeEvent event, Actor actor) {
+					skeleton.getRootBone().getChildren();
 					if (skeleton != null) skeleton.setSlotsToSetupPose();
 				}
 			});

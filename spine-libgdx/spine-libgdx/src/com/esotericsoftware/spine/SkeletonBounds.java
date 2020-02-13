@@ -34,6 +34,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Pool;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
+import com.esotericsoftware.spine.utils.Null;
 
 /** Collects each visible {@link BoundingBoxAttachment} and computes the world vertices for its polygon. The polygon vertices are
  * provided along with convenience methods for doing hit detection. */
@@ -141,6 +142,7 @@ public class SkeletonBounds {
 
 	/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
 	 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
+	@Null
 	public BoundingBoxAttachment containsPoint (float x, float y) {
 		Array<FloatArray> polygons = this.polygons;
 		for (int i = 0, n = polygons.size; i < n; i++)
@@ -171,6 +173,7 @@ public class SkeletonBounds {
 	/** Returns the first bounding box attachment that contains any part of the line segment, or null. When doing many checks, it
 	 * is usually more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns
 	 * true. */
+	@Null
 	public BoundingBoxAttachment intersectsSegment (float x1, float y1, float x2, float y2) {
 		Array<FloatArray> polygons = this.polygons;
 		for (int i = 0, n = polygons.size; i < n; i++)
@@ -244,6 +247,7 @@ public class SkeletonBounds {
 	}
 
 	/** Returns the polygon for the specified bounding box, or null. */
+	@Null
 	public FloatArray getPolygon (BoundingBoxAttachment boundingBox) {
 		if (boundingBox == null) throw new IllegalArgumentException("boundingBox cannot be null.");
 		int index = boundingBoxes.indexOf(boundingBox, true);

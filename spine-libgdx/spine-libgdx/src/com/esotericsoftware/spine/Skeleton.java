@@ -41,6 +41,7 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.utils.Null;
 
 /** Stores the current pose for a skeleton.
  * <p>
@@ -472,15 +473,14 @@ public class Skeleton {
 		return updateCache;
 	}
 
-	/** Returns the root bone, or null. */
+	/** Returns the root bone, or null if the skeleton has no bones. */
 	public Bone getRootBone () {
-		if (bones.size == 0) return null;
-		return bones.first();
+		return bones.size == 0 ? null : bones.first();
 	}
 
 	/** Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it
-	 * repeatedly.
-	 * @return May be null. */
+	 * repeatedly. */
+	@Null
 	public Bone findBone (String boneName) {
 		if (boneName == null) throw new IllegalArgumentException("boneName cannot be null.");
 		Array<Bone> bones = this.bones;
@@ -497,8 +497,8 @@ public class Skeleton {
 	}
 
 	/** Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
-	 * repeatedly.
-	 * @return May be null. */
+	 * repeatedly. */
+	@Null
 	public Slot findSlot (String slotName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Array<Slot> slots = this.slots;
@@ -519,8 +519,8 @@ public class Skeleton {
 		this.drawOrder = drawOrder;
 	}
 
-	/** The skeleton's current skin.
-	 * @return May be null. */
+	/** The skeleton's current skin. */
+	@Null
 	public Skin getSkin () {
 		return skin;
 	}
@@ -542,9 +542,9 @@ public class Skeleton {
 	 * <p>
 	 * After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling
 	 * {@link #setSlotsToSetupPose()}. Also, often {@link AnimationState#apply(Skeleton)} is called before the next time the
-	 * skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
-	 * @param newSkin May be null. */
-	public void setSkin (Skin newSkin) {
+	 * skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new
+	 * skin. */
+	public void setSkin (@Null Skin newSkin) {
 		if (newSkin == skin) return;
 		if (newSkin != null) {
 			if (skin != null)
@@ -568,8 +568,8 @@ public class Skeleton {
 	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot name and attachment
 	 * name.
 	 * <p>
-	 * See {@link #getAttachment(int, String)}.
-	 * @return May be null. */
+	 * See {@link #getAttachment(int, String)}. */
+	@Null
 	public Attachment getAttachment (String slotName, String attachmentName) {
 		SlotData slot = data.findSlot(slotName);
 		if (slot == null) throw new IllegalArgumentException("Slot not found: " + slotName);
@@ -579,8 +579,8 @@ public class Skeleton {
 	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot index and
 	 * attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
 	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide.
-	 * @return May be null. */
+	 * See <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
+	@Null
 	public Attachment getAttachment (int slotIndex, String attachmentName) {
 		if (attachmentName == null) throw new IllegalArgumentException("attachmentName cannot be null.");
 		if (skin != null) {
@@ -594,7 +594,7 @@ public class Skeleton {
 	/** A convenience method to set an attachment by finding the slot with {@link #findSlot(String)}, finding the attachment with
 	 * {@link #getAttachment(int, String)}, then setting the slot's {@link Slot#attachment}.
 	 * @param attachmentName May be null to clear the slot's attachment. */
-	public void setAttachment (String slotName, String attachmentName) {
+	public void setAttachment (String slotName, @Null String attachmentName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Slot slot = findSlot(slotName);
 		if (slot == null) throw new IllegalArgumentException("Slot not found: " + slotName);
@@ -613,8 +613,8 @@ public class Skeleton {
 	}
 
 	/** Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
-	 * than to call it repeatedly.
-	 * @return May be null. */
+	 * than to call it repeatedly. */
+	@Null
 	public IkConstraint findIkConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Array<IkConstraint> ikConstraints = this.ikConstraints;
@@ -631,8 +631,8 @@ public class Skeleton {
 	}
 
 	/** Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
-	 * this method than to call it repeatedly.
-	 * @return May be null. */
+	 * this method than to call it repeatedly. */
+	@Null
 	public TransformConstraint findTransformConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Array<TransformConstraint> transformConstraints = this.transformConstraints;
@@ -649,8 +649,8 @@ public class Skeleton {
 	}
 
 	/** Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
-	 * than to call it repeatedly.
-	 * @return May be null. */
+	 * than to call it repeatedly. */
+	@Null
 	public PathConstraint findPathConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Array<PathConstraint> pathConstraints = this.pathConstraints;

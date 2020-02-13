@@ -37,6 +37,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import com.esotericsoftware.spine.BoneData.TransformMode;
+import com.esotericsoftware.spine.utils.Null;
 
 /** Stores a bone's current pose.
  * <p>
@@ -56,8 +57,7 @@ public class Bone implements Updatable {
 
 	boolean sorted, active;
 
-	/** @param parent May be null. */
-	public Bone (BoneData data, Skeleton skeleton, Bone parent) {
+	public Bone (BoneData data, Skeleton skeleton, @Null Bone parent) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.data = data;
@@ -66,9 +66,8 @@ public class Bone implements Updatable {
 		setToSetupPose();
 	}
 
-	/** Copy constructor. Does not copy the children bones.
-	 * @param parent May be null. */
-	public Bone (Bone bone, Skeleton skeleton, Bone parent) {
+	/** Copy constructor. Does not copy the children bones. */
+	public Bone (Bone bone, Skeleton skeleton, @Null Bone parent) {
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.skeleton = skeleton;
@@ -226,6 +225,7 @@ public class Bone implements Updatable {
 	}
 
 	/** The parent bone, or null if this is the root bone. */
+	@Null
 	public Bone getParent () {
 		return parent;
 	}

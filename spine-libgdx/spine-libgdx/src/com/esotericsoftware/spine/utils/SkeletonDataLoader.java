@@ -67,8 +67,7 @@ public class SkeletonDataLoader extends AsynchronousAssetLoader<SkeletonData, Sk
 		super(resolver);
 	}
 
-	/** @param parameter May be null. */
-	public void loadAsync (AssetManager manager, String fileName, FileHandle file, SkeletonDataParameter parameter) {
+	public void loadAsync (AssetManager manager, String fileName, FileHandle file, @Null SkeletonDataParameter parameter) {
 		float scale = 1;
 		AttachmentLoader attachmentLoader = null;
 		if (parameter != null) {
@@ -92,15 +91,13 @@ public class SkeletonDataLoader extends AsynchronousAssetLoader<SkeletonData, Sk
 		}
 	}
 
-	/** @param parameter May be null. */
-	public SkeletonData loadSync (AssetManager manager, String fileName, FileHandle file, SkeletonDataParameter parameter) {
+	public SkeletonData loadSync (AssetManager manager, String fileName, FileHandle file, @Null SkeletonDataParameter parameter) {
 		SkeletonData skeletonData = this.skeletonData;
 		this.skeletonData = null;
 		return skeletonData;
 	}
 
-	/** @param parameter May be null. */
-	public Array<AssetDescriptor> getDependencies (String fileName, FileHandle file, SkeletonDataParameter parameter) {
+	public Array<AssetDescriptor> getDependencies (String fileName, FileHandle file, @Null SkeletonDataParameter parameter) {
 		if (parameter == null) return null;
 		if (parameter.attachmentLoader != null) return null;
 		Array<AssetDescriptor> dependencies = new Array();

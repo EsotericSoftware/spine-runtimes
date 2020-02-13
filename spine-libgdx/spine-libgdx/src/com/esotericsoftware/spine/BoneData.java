@@ -31,6 +31,8 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.graphics.Color;
 
+import com.esotericsoftware.spine.utils.Null;
+
 /** Stores the setup pose for a {@link Bone}. */
 public class BoneData {
 	final int index;
@@ -44,8 +46,7 @@ public class BoneData {
 	// Nonessential.
 	final Color color = new Color(0.61f, 0.61f, 0.61f, 1); // 9b9b9bff
 
-	/** @param parent May be null. */
-	public BoneData (int index, String name, BoneData parent) {
+	public BoneData (int index, String name, @Null BoneData parent) {
 		if (index < 0) throw new IllegalArgumentException("index must be >= 0.");
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.index = index;
@@ -53,9 +54,8 @@ public class BoneData {
 		this.parent = parent;
 	}
 
-	/** Copy constructor.
-	 * @param parent May be null. */
-	public BoneData (BoneData bone, BoneData parent) {
+	/** Copy constructor. */
+	public BoneData (BoneData bone, @Null BoneData parent) {
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
 		index = bone.index;
 		name = bone.name;
@@ -80,7 +80,7 @@ public class BoneData {
 		return name;
 	}
 
-	/** @return May be null. */
+	@Null
 	public BoneData getParent () {
 		return parent;
 	}
@@ -179,7 +179,8 @@ public class BoneData {
 
 	/** When true, {@link Skeleton#updateWorldTransform()} only updates this bone if the {@link Skeleton#getSkin()} contains this
 	 * bone.
-	 * @see Skin#getBones() */
+	 * <p>
+	 * See {@link Skin#getBones()}. */
 	public boolean getSkinRequired () {
 		return skinRequired;
 	}
