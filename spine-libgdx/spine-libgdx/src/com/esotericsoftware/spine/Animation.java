@@ -36,11 +36,11 @@ import static com.esotericsoftware.spine.utils.SpineUtils.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectSet;
 
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
-import com.esotericsoftware.spine.utils.Null;
 
 /** Stores a list of timelines to animate a skeleton's pose over time. */
 public class Animation {
@@ -207,7 +207,7 @@ public class Animation {
 			frames = new float[frameCount * getFrameEntries()];
 		}
 
-		/** Uniquely encodes both the type of this timeline and the skeleton property that it affects. */
+		/** Uniquely encodes both the type of this timeline and the skeleton properties that it affects. */
 		public String[] getPropertyIds () {
 			return propertyIds;
 		}

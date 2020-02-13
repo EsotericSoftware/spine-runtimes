@@ -30,8 +30,7 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.graphics.Color;
-
-import com.esotericsoftware.spine.utils.Null;
+import com.badlogic.gdx.utils.Null;
 
 /** Stores the setup pose for a {@link Bone}. */
 public class BoneData {

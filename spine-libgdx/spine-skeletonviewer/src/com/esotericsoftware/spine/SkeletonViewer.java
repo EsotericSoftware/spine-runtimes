@@ -77,6 +77,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.StringBuilder;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -837,11 +838,11 @@ public class SkeletonViewer extends ApplicationAdapter {
 			});
 
 			InputListener scrollFocusListener = new InputListener() {
-				public void enter (InputEvent event, float x, float y, int pointer, Actor fromActor) {
+				public void enter (InputEvent event, float x, float y, int pointer, @Null Actor fromActor) {
 					if (pointer == -1) stage.setScrollFocus(event.getListenerActor());
 				}
 
-				public void exit (InputEvent event, float x, float y, int pointer, Actor toActor) {
+				public void exit (InputEvent event, float x, float y, int pointer, @Null Actor toActor) {
 					if (pointer == -1 && stage.getScrollFocus() == event.getListenerActor()) stage.setScrollFocus(null);
 				}
 			};

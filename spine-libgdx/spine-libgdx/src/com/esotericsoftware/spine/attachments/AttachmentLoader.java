@@ -29,8 +29,9 @@
 
 package com.esotericsoftware.spine.attachments;
 
+import com.badlogic.gdx.utils.Null;
+
 import com.esotericsoftware.spine.Skin;
-import com.esotericsoftware.spine.utils.Null;
 
 /** The interface which can be implemented to customize creating and populating attachments.
  * <p>

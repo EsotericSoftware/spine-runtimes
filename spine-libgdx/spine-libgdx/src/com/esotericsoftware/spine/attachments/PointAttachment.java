@@ -29,12 +29,11 @@
 
 package com.esotericsoftware.spine.attachments;
 
-import static com.badlogic.gdx.math.MathUtils.cosDeg;
-import static com.badlogic.gdx.math.MathUtils.radDeg;
-import static com.badlogic.gdx.math.MathUtils.sinDeg;
+import static com.badlogic.gdx.math.MathUtils.*;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+
 import com.esotericsoftware.spine.Bone;
 
 /** An attachment which is a single point and a rotation. This can be used to spawn projectiles, particles, etc. A bone can be

@@ -29,8 +29,9 @@
 
 package com.esotericsoftware.spine.attachments;
 
+import com.badlogic.gdx.utils.Null;
+
 import com.esotericsoftware.spine.Skeleton;
-import com.esotericsoftware.spine.utils.Null;
 
 /** Attachment that displays a skeleton. */
 public class SkeletonAttachment extends Attachment {

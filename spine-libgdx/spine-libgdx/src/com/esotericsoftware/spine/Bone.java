@@ -35,9 +35,9 @@ import static com.esotericsoftware.spine.utils.SpineUtils.*;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.BoneData.TransformMode;
-import com.esotericsoftware.spine.utils.Null;
 
 /** Stores a bone's current pose.
  * <p>

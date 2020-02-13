@@ -30,11 +30,11 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.OrderedSet;
 
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
-import com.esotericsoftware.spine.utils.Null;
 
 /** Stores attachments by slot index and attachment name.
  * <p>

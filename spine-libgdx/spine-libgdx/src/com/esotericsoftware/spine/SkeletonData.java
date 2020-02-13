@@ -30,8 +30,7 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
-
-import com.esotericsoftware.spine.utils.Null;
+import com.badlogic.gdx.utils.Null;
 
 /** Stores the setup pose and all of the stateless data for a skeleton.
  * <p>

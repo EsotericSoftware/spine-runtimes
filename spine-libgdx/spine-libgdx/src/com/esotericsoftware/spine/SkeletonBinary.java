@@ -39,6 +39,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.DataInput;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.SerializationException;
 
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
@@ -76,7 +77,6 @@ import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
-import com.esotericsoftware.spine.utils.Null;
 
 /** Loads skeleton data in the Spine binary format.
  * <p>
