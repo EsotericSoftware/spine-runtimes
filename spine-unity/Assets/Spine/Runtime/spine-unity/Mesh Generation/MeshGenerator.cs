@@ -302,11 +302,6 @@ namespace Spine.Unity {
 					}
 				}
 
-				if (clippingEndSlot != null && slot.data == clippingEndSlot && i != clippingAttachmentSource) {
-					clippingEndSlot = null;
-					clippingAttachmentSource = -1;
-				}
-
 				// Create a new SubmeshInstruction when material changes. (or when forced to separate by a submeshSeparator)
 				// Slot with a separator/new material will become the starting slot of the next new instruction.
 				if (hasSeparators) { //current.forceSeparate = hasSeparators && separatorSlots.Contains(slot);
@@ -380,6 +375,11 @@ namespace Spine.Unity {
 					current.rawFirstVertexIndex = totalRawVertexCount;
 					totalRawVertexCount += attachmentVertexCount;
 					#endif
+				}
+
+				if (clippingEndSlot != null && slot.data == clippingEndSlot && i != clippingAttachmentSource) {
+					clippingEndSlot = null;
+					clippingAttachmentSource = -1;
 				}
 			}
 
