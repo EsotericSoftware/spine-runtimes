@@ -101,8 +101,7 @@ namespace Spine.Unity.AttachmentTools {
 				material.CopyPropertiesFromMaterial(materialPropertySource);
 				material.shaderKeywords = materialPropertySource.shaderKeywords;
 			}
-			var newTexture = t.GetClone(textureFormat, mipmaps);
-			newTexture.ApplyPMA(true);
+			var newTexture = t.GetClone(textureFormat, mipmaps, applyPMA : true);
 
 			newTexture.name = t.name + "-pma-";
 			material.name = t.name + shader.name;
@@ -163,9 +162,7 @@ namespace Spine.Unity.AttachmentTools {
 				material.shaderKeywords = materialPropertySource.shaderKeywords;
 			}
 
-			var tex = s.ToTexture(textureFormat, mipmaps);
-			tex.ApplyPMA(true);
-
+			var tex = s.ToTexture(textureFormat, mipmaps, applyPMA : true);
 			tex.name = s.name + "-pma-";
 			material.name = tex.name + shader.name;
 
@@ -512,7 +509,7 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>Creates a new Texture2D object based on an AtlasRegion.
 		/// If applyImmediately is true, Texture2D.Apply is called immediately after the Texture2D is filled with data.</summary>
 		public static Texture2D ToTexture (this AtlasRegion ar, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps,
-			int texturePropertyId = 0, bool linear = false) {
+			int texturePropertyId = 0, bool linear = false, bool applyPMA = false) {
 
 			Texture2D output;
 
@@ -525,7 +522,10 @@ namespace Spine.Unity.AttachmentTools {
 				int height = (int)r.height;
 				output = new Texture2D(width, height, textureFormat, mipmaps, linear) { name = ar.name };
 				output.CopyTextureAttributesFrom(sourceTexture);
-				AtlasUtilities.CopyTexture(sourceTexture, r, output);
+				if (applyPMA)
+					AtlasUtilities.CopyTextureApplyPMA(sourceTexture, r, output);
+				else
+					AtlasUtilities.CopyTexture(sourceTexture, r, output);
 				CachedRegionTextures.Add(cacheKey, output);
 				CachedRegionTexturesList.Add(output);
 			}
@@ -534,22 +534,28 @@ namespace Spine.Unity.AttachmentTools {
 		}
 
 		static Texture2D ToTexture (this Sprite s, TextureFormat textureFormat = SpineTextureFormat,
-			bool mipmaps = UseMipMaps, bool linear = false) {
+			bool mipmaps = UseMipMaps, bool linear = false, bool applyPMA = false) {
 
 			var spriteTexture = s.texture;
 			var r = s.textureRect;
 			var newTexture = new Texture2D((int)r.width, (int)r.height, textureFormat, mipmaps, linear);
 			newTexture.CopyTextureAttributesFrom(spriteTexture);
-			AtlasUtilities.CopyTexture(spriteTexture, r, newTexture);
+			if (applyPMA)
+				AtlasUtilities.CopyTextureApplyPMA(spriteTexture, r, newTexture);
+			else
+				AtlasUtilities.CopyTexture(spriteTexture, r, newTexture);
 			return newTexture;
 		}
 
 		static Texture2D GetClone (this Texture2D t, TextureFormat textureFormat = SpineTextureFormat,
-			bool mipmaps = UseMipMaps, bool linear = false) {
+			bool mipmaps = UseMipMaps, bool linear = false, bool applyPMA = false) {
 
 			var newTexture = new Texture2D((int)t.width, (int)t.height, textureFormat, mipmaps, linear);
 			newTexture.CopyTextureAttributesFrom(t);
-			AtlasUtilities.CopyTexture(t, new Rect(0, 0, t.width, t.height), newTexture);
+			if (applyPMA)
+				AtlasUtilities.CopyTextureApplyPMA(t, new Rect(0, 0, t.width, t.height), newTexture);
+			else
+				AtlasUtilities.CopyTexture(t, new Rect(0, 0, t.width, t.height), newTexture);
 			return newTexture;
 		}
 
@@ -562,6 +568,24 @@ namespace Spine.Unity.AttachmentTools {
 			} else {
 				Graphics.CopyTexture(source, 0, 0, (int)sourceRect.x, (int)sourceRect.y, (int)sourceRect.width, (int)sourceRect.height, destination, 0, 0, 0, 0);
 			}
+		}
+
+		static void CopyTextureApplyPMA (Texture2D source, Rect sourceRect, Texture2D destination) {
+			Color[] pixelBuffer = source.GetPixels((int)sourceRect.x, (int)sourceRect.y, (int)sourceRect.width, (int)sourceRect.height);
+			for (int i = 0, n = pixelBuffer.Length; i < n; i++) {
+				Color p = pixelBuffer[i];
+				float a = p.a;
+				p.r = p.r * a;
+				p.g = p.g * a;
+				p.b = p.b * a;
+				pixelBuffer[i] = p;
+			}
+			destination.SetPixels(pixelBuffer);
+			destination.Apply();
+		}
+
+		static bool IsRenderable (Attachment a) {
+			return a is IHasRendererObject;
 		}
 
 		/// <summary>
@@ -688,21 +712,6 @@ namespace Spine.Unity.AttachmentTools {
 			destination.wrapModeU = source.wrapModeU;
 			destination.wrapModeV = source.wrapModeV;
 			destination.wrapModeW = source.wrapModeW;
-		}
-
-		static void ApplyPMA (this Texture2D texture, bool applyImmediately = true) {
-			var pixels = texture.GetPixels();
-			for (int i = 0, n = pixels.Length; i < n; i++) {
-				Color p = pixels[i];
-				float a = p.a;
-				p.r = p.r * a;
-				p.g = p.g * a;
-				p.b = p.b * a;
-				pixels[i] = p;
-			}
-			texture.SetPixels(pixels);
-			if (applyImmediately)
-				texture.Apply();
 		}
 		#endregion
 
