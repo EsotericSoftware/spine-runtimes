@@ -594,16 +594,14 @@ public class SkeletonBinary {
 				case SLOT_COLOR: {
 					ColorTimeline timeline = new ColorTimeline(frameCount, input.readInt(true), slotIndex);
 					float time = input.readFloat();
-					int c1 = input.readInt();
-					float r = ((c1 & 0xff000000) >> 24) / 255f, g = ((c1 & 0x00ff0000) >> 16) / 255f;
-					float b = ((c1 & 0x0000ff00) >> 8) / 255f, a = (c1 & 0x000000ff) / 255f;
+					float r = input.read() / 255f, g = input.read() / 255f;
+					float b = input.read() / 255f, a = input.read() / 255f;
 					for (int frame = 0, bezier = 0;; frame++) {
 						timeline.setFrame(frame, time, r, g, b, a);
 						if (frame == frameLast) break;
 						float time2 = input.readFloat();
-						c1 = input.readInt();
-						float r2 = ((c1 & 0xff000000) >> 24) / 255f, g2 = ((c1 & 0x00ff0000) >> 16) / 255f;
-						float b2 = ((c1 & 0x0000ff00) >> 8) / 255f, a2 = (c1 & 0x000000ff) / 255f;
+						float r2 = input.read() / 255f, g2 = input.read() / 255f;
+						float b2 = input.read() / 255f, a2 = input.read() / 255f;
 						switch (input.readByte()) {
 						case CURVE_STEPPED:
 							timeline.setStepped(frame);
@@ -626,21 +624,18 @@ public class SkeletonBinary {
 				case SLOT_TWO_COLOR: {
 					TwoColorTimeline timeline = new TwoColorTimeline(frameCount, input.readInt(true), slotIndex);
 					float time = input.readFloat();
-					int c1 = input.readInt(), c2 = input.readInt();
-					float r = ((c1 & 0xff000000) >> 24) / 255f, g = ((c1 & 0x00ff0000) >> 16) / 255f;
-					float b = ((c1 & 0x0000ff00) >> 8) / 255f, a = (c1 & 0x000000ff) / 255f;
-					float r2 = ((c2 & 0xff000000) >> 24) / 255f, g2 = ((c2 & 0x00ff0000) >> 16) / 255f;
-					float b2 = ((c2 & 0x0000ff00) >> 8) / 255f;
+					float r = input.read() / 255f, g = input.read() / 255f;
+					float b = input.read() / 255f, a = input.read() / 255f;
+					float r2 = input.read() / 255f, g2 = input.read() / 255f;
+					float b2 = input.read() / 255f;
 					for (int frame = 0, bezier = 0;; frame++) {
 						timeline.setFrame(frame, time, r, g, b, a, r2, g2, b2);
 						if (frame == frameLast) break;
 						float time2 = input.readFloat();
-						c1 = input.readInt();
-						c2 = input.readInt();
-						float nr = ((c1 & 0xff000000) >> 24) / 255f, ng = ((c1 & 0x00ff0000) >> 16) / 255f;
-						float nb = ((c1 & 0x0000ff00) >> 8) / 255f, na = (c1 & 0x000000ff) / 255f;
-						float nr2 = ((c2 & 0xff000000) >> 24) / 255f, ng2 = ((c2 & 0x00ff0000) >> 16) / 255f;
-						float nb2 = ((c2 & 0x0000ff00) >> 8) / 255f;
+						float nr = input.read() / 255f, ng = input.read() / 255f;
+						float nb = input.read() / 255f, na = input.read() / 255f;
+						float nr2 = input.read() / 255f, ng2 = input.read() / 255f;
+						float nb2 = input.read() / 255f;
 						switch (input.readByte()) {
 						case CURVE_STEPPED:
 							timeline.setStepped(frame);
@@ -753,12 +748,12 @@ public class SkeletonBinary {
 				switch (input.readByte()) {
 				case PATH_POSITION:
 					timelines
-						.add(readTimeline(input, new PathConstraintSpacingTimeline(input.readInt(true), input.readInt(true), index),
+						.add(readTimeline(input, new PathConstraintPositionTimeline(input.readInt(true), input.readInt(true), index),
 							data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed ? scale : 1));
 					break;
 				case PATH_SPACING:
 					timelines
-						.add(readTimeline(input, new PathConstraintPositionTimeline(input.readInt(true), input.readInt(true), index),
+						.add(readTimeline(input, new PathConstraintSpacingTimeline(input.readInt(true), input.readInt(true), index),
 							data.positionMode == PositionMode.fixed ? scale : 1));
 					break;
 				case PATH_MIX:
