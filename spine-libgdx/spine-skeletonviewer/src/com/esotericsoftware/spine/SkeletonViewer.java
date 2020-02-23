@@ -96,6 +96,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 	static float uiScale = 1;
 	static String[] atlasSuffixes = {".atlas", ".atlas.txt", "-pro.atlas", "-pro.atlas.txt", "-ess.atlas", "-ess.atlas.txt"};
 	static String[] args;
+	static final String version = ""; // Replaced by build.
 
 	UI ui;
 
@@ -681,7 +682,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				stage.addActor(table);
 				table.pad(10).top().right();
 				table.defaults().right();
-				table.add(new Label("", skin, "default", Color.LIGHT_GRAY)); // Version.
+				table.add(new Label(version, skin, "default", Color.LIGHT_GRAY));
 			}
 		}
 
