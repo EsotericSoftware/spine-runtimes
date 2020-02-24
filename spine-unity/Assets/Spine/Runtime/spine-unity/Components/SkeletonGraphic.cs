@@ -332,7 +332,7 @@ namespace Spine.Unity {
 			bool updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, smartMesh.instructionUsed);
 
 			meshGenerator.Begin();
-			if (currentInstructions.hasActiveClipping) {
+			if (currentInstructions.hasActiveClipping && currentInstructions.submeshInstructions.Count > 0) {
 				meshGenerator.AddSubmesh(currentInstructions.submeshInstructions.Items[0], updateTriangles);
 			} else {
 				meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
