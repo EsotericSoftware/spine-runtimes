@@ -351,7 +351,7 @@ namespace Spine.Unity {
 			#if UNITY_EDITOR && NEW_PREFAB_SYSTEM
 			// Don't store mesh or material at the prefab, otherwise it will permanently reload
 			var prefabType = UnityEditor.PrefabUtility.GetPrefabAssetType(this);
-			if (!UnityEditor.PrefabUtility.IsPartOfPrefabInstance(this) &&
+			if (UnityEditor.PrefabUtility.IsPartOfPrefabInstance(this) &&
 				(prefabType == UnityEditor.PrefabAssetType.Regular || prefabType == UnityEditor.PrefabAssetType.Variant)) {
 				return;
 			}
