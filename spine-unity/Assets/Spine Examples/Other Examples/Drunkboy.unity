@@ -42,7 +42,7 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 11
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 0
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
-    serializedVersion: 8
+    serializedVersion: 9
     m_Resolution: 2
     m_BakeResolution: 40
     m_TextureWidth: 1024
@@ -71,7 +71,7 @@ LightmapSettings:
     m_FinalGatherFiltering: 1
     m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
-    m_MixedBakeMode: 3
+    m_MixedBakeMode: 2
     m_BakeBackend: 0
     m_PVRSampling: 1
     m_PVRDirectSampleCount: 32
@@ -87,7 +87,7 @@ LightmapSettings:
     m_PVRFilteringAtrousNormalSigma: 1
     m_PVRFilteringAtrousPositionSigma: 1
   m_LightingDataAsset: {fileID: 0}
-  m_ShadowMaskMode: 2
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -188,6 +188,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!65 &21238541
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -219,6 +221,7 @@ MonoBehaviour:
   scale: 0
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 264945302}
 --- !u!1 &43338986
 GameObject:
   m_ObjectHideFlags: 0
@@ -268,6 +271,7 @@ MonoBehaviour:
   scale: 0
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 264945302}
 --- !u!1 &103730714
 GameObject:
   m_ObjectHideFlags: 0
@@ -348,6 +352,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!65 &103730718
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -379,6 +385,7 @@ MonoBehaviour:
   scale: 0
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 264945302}
 --- !u!1 &147153470
 GameObject:
   m_ObjectHideFlags: 0
@@ -601,6 +608,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
 --- !u!4 &253903409
 Transform:
   m_ObjectHideFlags: 0
@@ -829,7 +837,11 @@ MonoBehaviour:
   singleSubmesh: 0
   addNormals: 0
   calculateTangents: 0
-  logErrors: 0
+  maskInteraction: 0
+  maskMaterials:
+    materialsMaskDisabled: []
+    materialsInsideMask: []
+    materialsOutsideMask: []
   disableRenderingOnOverride: 1
   _animationName: idle
   loop: 1
@@ -899,6 +911,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boneRoot: {fileID: 1469977169}
+  flipBy180DegreeRotation: 0
   skeletonRenderer: {fileID: 264945298}
 --- !u!114 &264945303
 MonoBehaviour:
@@ -950,7 +963,6 @@ GameObject:
   m_Component:
   - component: {fileID: 480895076}
   - component: {fileID: 480895075}
-  - component: {fileID: 480895074}
   - component: {fileID: 480895073}
   - component: {fileID: 480895072}
   m_Layer: 0
@@ -968,13 +980,6 @@ AudioListener:
   m_GameObject: {fileID: 480895071}
   m_Enabled: 1
 --- !u!124 &480895073
-Behaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 480895071}
-  m_Enabled: 1
---- !u!92 &480895074
 Behaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -1214,6 +1219,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
 --- !u!4 &841681499
 Transform:
   m_ObjectHideFlags: 0
@@ -1310,6 +1316,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
 --- !u!4 &885175052
 Transform:
   m_ObjectHideFlags: 0
@@ -1372,6 +1379,7 @@ MonoBehaviour:
   scale: 0
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 264945302}
 --- !u!1 &943283501
 GameObject:
   m_ObjectHideFlags: 0
@@ -1464,6 +1472,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!54 &976482695
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1510,6 +1520,7 @@ MonoBehaviour:
   scale: 0
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 264945302}
 --- !u!1 &1052878340
 GameObject:
   m_ObjectHideFlags: 0
@@ -1593,6 +1604,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
 --- !u!4 &1052878343
 Transform:
   m_ObjectHideFlags: 0
@@ -1655,6 +1667,7 @@ MonoBehaviour:
   scale: 0
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 264945302}
 --- !u!1 &1469977168
 GameObject:
   m_ObjectHideFlags: 0
@@ -1841,6 +1854,7 @@ MonoBehaviour:
   scale: 0
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 264945302}
 --- !u!1 &1999119559
 GameObject:
   m_ObjectHideFlags: 0
@@ -1918,3 +1932,4 @@ MonoBehaviour:
   scale: 0
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 264945302}
