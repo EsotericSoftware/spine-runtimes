@@ -538,7 +538,6 @@ GameObject:
   m_Component:
   - component: {fileID: 611702906}
   - component: {fileID: 611702905}
-  - component: {fileID: 611702904}
   - component: {fileID: 611702903}
   - component: {fileID: 611702902}
   m_Layer: 0
@@ -556,13 +555,6 @@ AudioListener:
   m_GameObject: {fileID: 611702901}
   m_Enabled: 1
 --- !u!124 &611702903
-Behaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 611702901}
-  m_Enabled: 1
---- !u!92 &611702904
 Behaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -650,7 +642,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.06853585, y: 0.734}
   m_AnchorMax: {x: 0.9065521, y: 0.96417403}
-  m_AnchoredPosition: {x: 6.3999996, y: 5.054001}
+  m_AnchoredPosition: {x: 6.3999996, y: 5.054016}
   m_SizeDelta: {x: 185.6, y: 19.099998}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &616330780
@@ -825,12 +817,9 @@ MonoBehaviour:
   calculateTangents: 0
   maskInteraction: 2
   maskMaterials:
-    materialsMaskDisabled:
-    - {fileID: 2100000, guid: 3d645292a7b9c7547bf7b14caa569410, type: 2}
-    materialsInsideMask:
-    - {fileID: 0}
-    materialsOutsideMask:
-    - {fileID: 2100000, guid: 4bbf1af7150ed574095b8679b9a72db3, type: 2}
+    materialsMaskDisabled: []
+    materialsInsideMask: []
+    materialsOutsideMask: []
   disableRenderingOnOverride: 1
   _animationName: roar
   loop: 1
@@ -848,7 +837,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 4bbf1af7150ed574095b8679b9a72db3, type: 2}
+  - {fileID: 2100000, guid: 3d645292a7b9c7547bf7b14caa569410, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1127,12 +1116,9 @@ MonoBehaviour:
   calculateTangents: 0
   maskInteraction: 1
   maskMaterials:
-    materialsMaskDisabled:
-    - {fileID: 2100000, guid: 3d645292a7b9c7547bf7b14caa569410, type: 2}
-    materialsInsideMask:
-    - {fileID: 2100000, guid: 11b8e87884357884a8d31758fca91bb7, type: 2}
-    materialsOutsideMask:
-    - {fileID: 0}
+    materialsMaskDisabled: []
+    materialsInsideMask: []
+    materialsOutsideMask: []
   disableRenderingOnOverride: 1
   _animationName: roar
   loop: 1
@@ -1150,7 +1136,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 11b8e87884357884a8d31758fca91bb7, type: 2}
+  - {fileID: 2100000, guid: 3d645292a7b9c7547bf7b14caa569410, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

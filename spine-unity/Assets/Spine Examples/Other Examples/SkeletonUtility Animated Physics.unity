@@ -42,7 +42,7 @@ RenderSettings:
 --- !u!157 &4
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 11
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
-    serializedVersion: 8
+    serializedVersion: 9
     m_Resolution: 1
     m_BakeResolution: 50
     m_TextureWidth: 1024
@@ -87,7 +87,7 @@ LightmapSettings:
     m_PVRFilteringAtrousNormalSigma: 1
     m_PVRFilteringAtrousPositionSigma: 1
   m_LightingDataAsset: {fileID: 0}
-  m_ShadowMaskMode: 2
+  m_UseShadowmask: 1
 --- !u!196 &5
 NavMeshSettings:
   serializedVersion: 2
@@ -182,6 +182,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boneRoot: {fileID: 44654813}
+  flipBy180DegreeRotation: 0
   skeletonRenderer: {fileID: 120294523}
 --- !u!114 &120294523
 MonoBehaviour:
@@ -208,7 +209,11 @@ MonoBehaviour:
   singleSubmesh: 0
   addNormals: 0
   calculateTangents: 0
-  logErrors: 0
+  maskInteraction: 0
+  maskMaterials:
+    materialsMaskDisabled: []
+    materialsInsideMask: []
+    materialsOutsideMask: []
   disableRenderingOnOverride: 1
   _animationName: walk
   loop: 1
@@ -316,6 +321,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!54 &163089578
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -362,6 +369,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!1 &196322038
 GameObject:
   m_ObjectHideFlags: 0
@@ -414,6 +422,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!54 &196322041
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -461,6 +470,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!65 &196322043
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -524,6 +535,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!59 &350419679
 HingeJoint:
   m_ObjectHideFlags: 0
@@ -556,6 +568,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!54 &350419680
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -633,6 +647,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!1 &520760180
 GameObject:
   m_ObjectHideFlags: 0
@@ -685,6 +700,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!54 &520760183
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -732,6 +748,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!65 &520760185
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -782,6 +800,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!4 &574377924
 Transform:
   m_ObjectHideFlags: 0
@@ -827,6 +846,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!54 &574377926
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -919,6 +940,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!54 &682744182
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -965,6 +988,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!1 &733897517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1016,6 +1040,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!59 &733897520
 HingeJoint:
   m_ObjectHideFlags: 0
@@ -1048,6 +1073,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!54 &733897521
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1127,6 +1154,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!59 &871208811
 HingeJoint:
   m_ObjectHideFlags: 0
@@ -1159,6 +1187,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!54 &871208812
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1235,6 +1265,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!1 &976394122
 GameObject:
   m_ObjectHideFlags: 0
@@ -1244,7 +1275,6 @@ GameObject:
   m_Component:
   - component: {fileID: 976394127}
   - component: {fileID: 976394126}
-  - component: {fileID: 976394125}
   - component: {fileID: 976394124}
   - component: {fileID: 976394123}
   m_Layer: 0
@@ -1262,13 +1292,6 @@ AudioListener:
   m_GameObject: {fileID: 976394122}
   m_Enabled: 1
 --- !u!124 &976394124
-Behaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 976394122}
-  m_Enabled: 1
---- !u!92 &976394125
 Behaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -1389,6 +1412,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!54 &1261549072
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1435,6 +1460,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!1 &1285379174
 GameObject:
   m_ObjectHideFlags: 0
@@ -1489,6 +1515,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!54 &1285379177
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1530,6 +1557,7 @@ MonoBehaviour:
   detachedShadow: 0
   parent: {fileID: 0}
   hideShadow: 1
+  physicsSystem: 1
 --- !u!1 &1342167691
 GameObject:
   m_ObjectHideFlags: 0
@@ -1556,7 +1584,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1342167691}
   m_LocalRotation: {x: 0, y: 0, z: 0.9905574, w: 0.13709891}
-  m_LocalPosition: {x: -0.2087, y: 0.0687, z: 0}
+  m_LocalPosition: {x: -0.20879999, y: 0.0686, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 682744180}
@@ -1577,6 +1605,7 @@ MonoBehaviour:
   detachedShadow: 0
   parent: {fileID: 0}
   hideShadow: 1
+  physicsSystem: 1
 --- !u!54 &1342167694
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1623,6 +1652,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!1 &1421488703
 GameObject:
   m_ObjectHideFlags: 0
@@ -1672,6 +1702,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!1 &1524588283
 GameObject:
   m_ObjectHideFlags: 0
@@ -1752,6 +1783,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!65 &1524588287
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1783,6 +1816,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!1 &1714294601
 GameObject:
   m_ObjectHideFlags: 0
@@ -1835,6 +1869,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!54 &1714294604
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1882,6 +1917,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!65 &1714294606
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1946,6 +1983,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!59 &1769886738
 HingeJoint:
   m_ObjectHideFlags: 0
@@ -1978,6 +2016,8 @@ HingeJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!54 &1769886739
 Rigidbody:
   m_ObjectHideFlags: 0

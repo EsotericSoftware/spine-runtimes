@@ -42,7 +42,7 @@ RenderSettings:
 --- !u!157 &4
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 11
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
-    serializedVersion: 8
+    serializedVersion: 9
     m_Resolution: 1
     m_BakeResolution: 50
     m_TextureWidth: 1024
@@ -87,7 +87,7 @@ LightmapSettings:
     m_PVRFilteringAtrousNormalSigma: 1
     m_PVRFilteringAtrousPositionSigma: 1
   m_LightingDataAsset: {fileID: 0}
-  m_ShadowMaskMode: 2
+  m_UseShadowmask: 1
 --- !u!196 &5
 NavMeshSettings:
   serializedVersion: 2
@@ -132,7 +132,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 36219066}
   m_LocalRotation: {x: 0, y: 0, z: -0.52048814, w: 0.8538689}
-  m_LocalPosition: {x: -2.3326, y: 1.2458895, z: 0}
+  m_LocalPosition: {x: -2.3326, y: 1.2458897, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 973814792}
@@ -178,6 +178,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!1 &44654812
 GameObject:
   m_ObjectHideFlags: 0
@@ -254,6 +255,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boneRoot: {fileID: 44654813}
+  flipBy180DegreeRotation: 0
   skeletonRenderer: {fileID: 120294523}
 --- !u!114 &120294523
 MonoBehaviour:
@@ -280,7 +282,11 @@ MonoBehaviour:
   singleSubmesh: 0
   addNormals: 0
   calculateTangents: 0
-  logErrors: 0
+  maskInteraction: 0
+  maskMaterials:
+    materialsMaskDisabled: []
+    materialsInsideMask: []
+    materialsOutsideMask: []
   disableRenderingOnOverride: 1
   _animationName: walk
   loop: 1
@@ -410,6 +416,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!1 &976394122
 GameObject:
   m_ObjectHideFlags: 0
@@ -419,7 +426,6 @@ GameObject:
   m_Component:
   - component: {fileID: 976394127}
   - component: {fileID: 976394126}
-  - component: {fileID: 976394125}
   - component: {fileID: 976394124}
   - component: {fileID: 976394123}
   m_Layer: 0
@@ -437,13 +443,6 @@ AudioListener:
   m_GameObject: {fileID: 976394122}
   m_Enabled: 1
 --- !u!124 &976394124
-Behaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 976394122}
-  m_Enabled: 1
---- !u!92 &976394125
 Behaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -638,6 +637,7 @@ MonoBehaviour:
   scale: 1
   zPosition: 1
   overrideAlpha: 1
+  hierarchy: {fileID: 120294522}
 --- !u!4 &1984548219
 Transform:
   m_ObjectHideFlags: 0
@@ -645,7 +645,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1984548216}
   m_LocalRotation: {x: 0, y: 0, z: -0.00829022, w: 0.99996567}
-  m_LocalPosition: {x: 2.9747999, y: 0.33127287, z: 0}
+  m_LocalPosition: {x: 2.9747999, y: 0.33127284, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 973814792}
