@@ -56,6 +56,10 @@ namespace Spine.Unity.Examples {
 
 		protected override void OnDisable () {
 			if (!Application.isPlaying) return;
+
+			for (int i = 0; i < eyes.Length; i++) {
+				eyes[i].localPosition = origins[i];
+			}
 			base.OnDisable();
 		}
 
