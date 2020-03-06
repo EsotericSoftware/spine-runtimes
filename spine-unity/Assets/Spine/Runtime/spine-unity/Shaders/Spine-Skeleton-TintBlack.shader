@@ -87,7 +87,7 @@ Shader "Spine/Skeleton Tint Black" {
 				texColor.rgb *= texColor.a;
 				#endif
 
-				return (texColor * i.vertexColor) + float4(((1-texColor.rgb) * (_Black.rgb + float3(i.uv1.r, i.uv1.g, i.uv2.r)) * texColor.a*_Color.a*i.vertexColor.a), 0);
+				return (texColor * i.vertexColor) + float4(((1-texColor.rgb) * (_Black.rgb + float3(i.uv1.r, i.uv1.g, i.uv2.r)) * texColor.a*_Color.a), 0);
 			}
 			ENDCG
 		}
