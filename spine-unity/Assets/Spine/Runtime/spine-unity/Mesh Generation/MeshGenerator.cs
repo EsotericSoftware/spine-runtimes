@@ -452,7 +452,7 @@ namespace Spine.Unity {
 			var drawOrderItems = skeleton.drawOrder.Items;
 
 			Color32 color = default(Color32);
-			float skeletonA = skeleton.a * 255, skeletonR = skeleton.r, skeletonG = skeleton.g, skeletonB = skeleton.b;
+			float skeletonA = skeleton.a, skeletonR = skeleton.r, skeletonG = skeleton.g, skeletonB = skeleton.b;
 			Vector2 meshBoundsMin = this.meshBoundsMin, meshBoundsMax = this.meshBoundsMax;
 
 			// Settings
@@ -525,13 +525,13 @@ namespace Spine.Unity {
 				}
 
 				if (pmaVertexColors) {
-					color.a = (byte)(skeletonA * slot.a * c.a);
+					color.a = (byte)(skeletonA * slot.a * c.a * 255);
 					color.r = (byte)(skeletonR * slot.r * c.r * color.a);
 					color.g = (byte)(skeletonG * slot.g * c.g * color.a);
 					color.b = (byte)(skeletonB * slot.b * c.b * color.a);
 					if (slot.data.blendMode == BlendMode.Additive) color.a = 0;
 				} else {
-					color.a = (byte)(skeletonA * slot.a * c.a);
+					color.a = (byte)(skeletonA * slot.a * c.a * 255);
 					color.r = (byte)(skeletonR * slot.r * c.r * 255);
 					color.g = (byte)(skeletonG * slot.g * c.g * 255);
 					color.b = (byte)(skeletonB * slot.b * c.b * 255);
@@ -548,8 +548,18 @@ namespace Spine.Unity {
 
 				// Actually add slot/attachment data into buffers.
 				if (attachmentVertexCount != 0 && attachmentIndexCount != 0) {
-					if (tintBlack)
-						AddAttachmentTintBlack(slot.r2, slot.g2, slot.b2, attachmentVertexCount);
+					if (tintBlack) {
+						float r2 = slot.r2;
+						float g2 = slot.g2;
+						float b2 = slot.b2;
+						if (pmaVertexColors) {
+							float alpha = skeletonA * slot.a * c.a;
+							r2 *= alpha;
+							g2 *= alpha;
+							b2 *= alpha;
+						}
+						AddAttachmentTintBlack(r2, g2, b2, attachmentVertexCount);
+					}
 
 					//AddAttachment(workingVerts, uvs, color, attachmentTriangleIndices, attachmentVertexCount, attachmentIndexCount, ref meshBoundsMin, ref meshBoundsMax, z);
 					int ovc = vertexBuffer.Count;
@@ -682,7 +692,7 @@ namespace Spine.Unity {
 				var submesh = instruction.submeshInstructions.Items[si];
 				var skeleton = submesh.skeleton;
 				var drawOrderItems = skeleton.drawOrder.Items;
-				float a = skeleton.a * 255, r = skeleton.r, g = skeleton.g, b = skeleton.b;
+				float a = skeleton.a, r = skeleton.r, g = skeleton.g, b = skeleton.b;
 
 				int endSlot = submesh.endSlot;
 				int startSlot = submesh.startSlot;
@@ -719,12 +729,24 @@ namespace Spine.Unity {
 
 						var regionAttachment = attachment as RegionAttachment;
 						if (regionAttachment != null) {
+							if (settings.pmaVertexColors) {
+								float alpha = a * slot.a * regionAttachment.a;
+								rg.x *= alpha;
+								rg.y *= alpha;
+								b2.x *= alpha;
+							}
 							uv2i[vi] = rg; uv2i[vi + 1] = rg; uv2i[vi + 2] = rg; uv2i[vi + 3] = rg;
 							uv3i[vi] = b2; uv3i[vi + 1] = b2; uv3i[vi + 2] = b2; uv3i[vi + 3] = b2;
 							vi += 4;
 						} else { //} if (settings.renderMeshes) {
 							var meshAttachment = attachment as MeshAttachment;
 							if (meshAttachment != null) {
+								if (settings.pmaVertexColors) {
+									float alpha = a * slot.a * meshAttachment.a;
+									rg.x *= alpha;
+									rg.y *= alpha;
+									b2.x *= alpha;
+								}
 								int meshVertexCount = meshAttachment.worldVerticesLength;
 								for (int iii = 0; iii < meshVertexCount; iii += 2) {
 									uv2i[vi] = rg;
@@ -756,13 +778,13 @@ namespace Spine.Unity {
 						vbi[vertexIndex + 3].x = x3; vbi[vertexIndex + 3].y = y3;	vbi[vertexIndex + 3].z = z;
 
 						if (settings.pmaVertexColors) {
-							color.a = (byte)(a * slot.a * regionAttachment.a);
+							color.a = (byte)(a * slot.a * regionAttachment.a * 255);
 							color.r = (byte)(r * slot.r * regionAttachment.r * color.a);
 							color.g = (byte)(g * slot.g * regionAttachment.g * color.a);
 							color.b = (byte)(b * slot.b * regionAttachment.b * color.a);
 							if (slot.data.blendMode == BlendMode.Additive) color.a = 0;
 						} else {
-							color.a = (byte)(a * slot.a * regionAttachment.a);
+							color.a = (byte)(a * slot.a * regionAttachment.a * 255);
 							color.r = (byte)(r * slot.r * regionAttachment.r * 255);
 							color.g = (byte)(g * slot.g * regionAttachment.g * 255);
 							color.b = (byte)(b * slot.b * regionAttachment.b * 255);
@@ -803,13 +825,13 @@ namespace Spine.Unity {
 							meshAttachment.ComputeWorldVertices(slot, tempVerts);
 
 							if (settings.pmaVertexColors) {
-								color.a = (byte)(a * slot.a * meshAttachment.a);
+								color.a = (byte)(a * slot.a * meshAttachment.a * 255);
 								color.r = (byte)(r * slot.r * meshAttachment.r * color.a);
 								color.g = (byte)(g * slot.g * meshAttachment.g * color.a);
 								color.b = (byte)(b * slot.b * meshAttachment.b * color.a);
 								if (slot.data.blendMode == BlendMode.Additive) color.a = 0;
 							} else {
-								color.a = (byte)(a * slot.a * meshAttachment.a);
+								color.a = (byte)(a * slot.a * meshAttachment.a * 255);
 								color.r = (byte)(r * slot.r * meshAttachment.r * 255);
 								color.g = (byte)(g * slot.g * meshAttachment.g * 255);
 								color.b = (byte)(b * slot.b * meshAttachment.b * 255);
