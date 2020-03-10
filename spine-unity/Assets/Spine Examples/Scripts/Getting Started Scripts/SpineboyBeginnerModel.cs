@@ -47,6 +47,8 @@ namespace Spine.Unity.Examples {
 
 		float lastShootTime;
 		public event System.Action ShootEvent;	// Lets other scripts know when Spineboy is shooting. Check C# Documentation to learn more about events and delegates.
+		public event System.Action StartAimEvent;   // Lets other scripts know when Spineboy is aiming.
+		public event System.Action StopAimEvent;   // Lets other scripts know when Spineboy is no longer aiming.
 
 		#region API
 		public void TryJump () {
@@ -60,6 +62,14 @@ namespace Spine.Unity.Examples {
 				lastShootTime = currentTime;
 				if (ShootEvent != null) ShootEvent();	// Fire the "ShootEvent" event.
 			}
+		}
+
+		public void StartAim () {
+			if (StartAimEvent != null) StartAimEvent();   // Fire the "StartAimEvent" event.
+		}
+
+		public void StopAim () {
+			if (StopAimEvent != null) StopAimEvent();   // Fire the "StopAimEvent" event.
 		}
 
 		public void TryMove (float speed) {
