@@ -78,6 +78,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		MeshNormals = -1,
 		FixedNormalsViewSpace = 0,
 		FixedNormalsModelSpace = 1,
+		FixedNormalsWorldSpace = 2
 	};
 
 	MaterialProperty _mainTexture = null;
@@ -162,7 +163,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	static GUIContent _pixelSnapText = new GUIContent("Pixel Snap");
 	//static GUIContent _customRenderTypetagsText = new GUIContent("Use Custom RenderType tags");
 	static GUIContent _fixedNormalSpaceText = new GUIContent("Fixed Normal Space");
-	static GUIContent[] _fixedNormalSpaceOptions = { new GUIContent("View-Space"), new GUIContent("Model-Space") };
+	static GUIContent[] _fixedNormalSpaceOptions = { new GUIContent("View-Space"), new GUIContent("Model-Space"), new GUIContent("World-Space") };
 	static GUIContent _rimLightingToggleText = new GUIContent("Rim Lighting", "Enable Rim Lighting.");
 	static GUIContent _rimColorText = new GUIContent("Rim Color");
 	static GUIContent _rimPowerText = new GUIContent("Rim Power");
@@ -1084,6 +1085,8 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	static eNormalsMode GetMaterialNormalsMode (Material material) {
 		if (material.IsKeywordEnabled("_FIXED_NORMALS_VIEWSPACE") || material.IsKeywordEnabled("_FIXED_NORMALS_VIEWSPACE_BACKFACE"))
 			return eNormalsMode.FixedNormalsViewSpace;
+		if (material.IsKeywordEnabled("_FIXED_NORMALS_WORLDSPACE"))
+			return eNormalsMode.FixedNormalsWorldSpace;
 		if (material.IsKeywordEnabled("_FIXED_NORMALS_MODELSPACE") || material.IsKeywordEnabled("_FIXED_NORMALS_MODELSPACE_BACKFACE"))
 			return eNormalsMode.FixedNormalsModelSpace;
 
@@ -1101,6 +1104,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	static void SetNormalsMode (Material material, eNormalsMode normalsMode, bool allowBackFaceRendering) {
 		SetKeyword(material, "_FIXED_NORMALS_VIEWSPACE", normalsMode == eNormalsMode.FixedNormalsViewSpace && !allowBackFaceRendering);
 		SetKeyword(material, "_FIXED_NORMALS_VIEWSPACE_BACKFACE", normalsMode == eNormalsMode.FixedNormalsViewSpace && allowBackFaceRendering);
+		SetKeyword(material, "_FIXED_NORMALS_WORLDSPACE", normalsMode == eNormalsMode.FixedNormalsWorldSpace);
 		SetKeyword(material, "_FIXED_NORMALS_MODELSPACE", normalsMode == eNormalsMode.FixedNormalsModelSpace && !allowBackFaceRendering);
 		SetKeyword(material, "_FIXED_NORMALS_MODELSPACE_BACKFACE", normalsMode == eNormalsMode.FixedNormalsModelSpace && allowBackFaceRendering);
 	}
