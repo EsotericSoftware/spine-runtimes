@@ -35,6 +35,7 @@ namespace Spine.Unity.Examples {
 		#region Inspector
 		public string horizontalAxis = "Horizontal";
 		public string attackButton = "Fire1";
+		public string aimButton = "Fire2";
 		public string jumpButton = "Jump";
 
 		public SpineboyBeginnerModel model;
@@ -53,6 +54,11 @@ namespace Spine.Unity.Examples {
 
 			if (Input.GetButton(attackButton))
 				model.TryShoot();
+
+			if (Input.GetButtonDown(aimButton))
+				model.StartAim();
+			if (Input.GetButtonUp(aimButton))
+				model.StopAim();
 
 			if (Input.GetButtonDown(jumpButton))
 				model.TryJump();
