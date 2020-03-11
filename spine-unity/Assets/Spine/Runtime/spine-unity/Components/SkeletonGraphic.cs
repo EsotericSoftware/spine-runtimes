@@ -227,6 +227,11 @@ namespace Spine.Unity {
 		public SkeletonData SkeletonData { get { return skeleton == null ? null : skeleton.data; } }
 		public bool IsValid { get { return skeleton != null; } }
 
+		public delegate void SkeletonRendererDelegate (SkeletonGraphic skeletonGraphic);
+
+		/// <summary>OnRebuild is raised after the Skeleton is successfully initialized.</summary>
+		public event SkeletonRendererDelegate OnRebuild;
+
 		protected Spine.AnimationState state;
 		public Spine.AnimationState AnimationState { get { return state; } }
 
@@ -320,6 +325,9 @@ namespace Spine.Unity {
 						Update(0f);
 				}
 			}
+
+			if (OnRebuild != null)
+				OnRebuild(this);
 		}
 
 		public void UpdateMesh () {

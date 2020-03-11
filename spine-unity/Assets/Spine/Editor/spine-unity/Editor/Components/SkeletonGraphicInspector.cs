@@ -27,11 +27,16 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#define NEW_PREFAB_SYSTEM
+#endif
+
 using UnityEngine;
 using UnityEditor;
 using Spine;
 
 namespace Spine.Unity.Editor {
+	using Icons = SpineEditorUtilities.Icons;
 
 	[InitializeOnLoad]
 	[CustomEditor(typeof(SkeletonGraphic))]
@@ -45,8 +50,32 @@ namespace Spine.Unity.Editor {
 		SerializedProperty raycastTarget;
 
 		SkeletonGraphic thisSkeletonGraphic;
+		protected bool isInspectingPrefab;
+
+		protected bool TargetIsValid {
+			get {
+				if (serializedObject.isEditingMultipleObjects) {
+					foreach (var o in targets) {
+						var component = (SkeletonGraphic)o;
+						if (!component.IsValid)
+							return false;
+					}
+					return true;
+				}
+				else {
+					var component = (SkeletonGraphic)target;
+					return component.IsValid;
+				}
+			}
+		}
 
 		void OnEnable () {
+#if NEW_PREFAB_SYSTEM
+			isInspectingPrefab = false;
+#else
+			isInspectingPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab);
+#endif
+
 			var so = this.serializedObject;
 			thisSkeletonGraphic = target as SkeletonGraphic;
 
@@ -123,6 +152,17 @@ namespace Spine.Unity.Editor {
 				}
 			}
 			EditorGUILayout.EndHorizontal();
+
+			if (TargetIsValid && !isInspectingPrefab) {
+				EditorGUILayout.Space();
+				if (SpineInspectorUtility.CenteredButton(new GUIContent("Add Skeleton Utility", Icons.skeletonUtility), 21, true, 200f))
+				foreach (var t in targets) {
+					var component = t as Component;
+					if (component.GetComponent<SkeletonUtility>() == null) {
+						component.gameObject.AddComponent<SkeletonUtility>();
+					}
+				}
+			}
 
 			bool wasChanged = EditorGUI.EndChangeCheck();
 

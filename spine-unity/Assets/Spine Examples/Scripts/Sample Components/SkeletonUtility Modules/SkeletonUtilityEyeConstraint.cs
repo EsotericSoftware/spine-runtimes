@@ -75,7 +75,8 @@ namespace Spine.Unity.Examples {
 
 			for (int i = 0; i < eyes.Length; i++) {
 				center = transform.TransformPoint(origins[i]);
-				eyes[i].position = Vector3.MoveTowards(eyes[i].position, center + (dir * radius), speed * Time.deltaTime);
+				eyes[i].position = Vector3.MoveTowards(eyes[i].position, center + (dir * radius * hierarchy.PositionScale),
+					speed * hierarchy.PositionScale * Time.deltaTime);
 			}
 
 		}
