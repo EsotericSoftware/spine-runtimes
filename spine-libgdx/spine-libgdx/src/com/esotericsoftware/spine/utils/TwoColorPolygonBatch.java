@@ -118,7 +118,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 	public void begin () {
 		if (drawing) throw new IllegalStateException("end must be called before begin.");
 		Gdx.gl.glDepthMask(false);
-		shader.begin();
+		shader.bind();
 		setupMatrices();
 		drawing = true;
 	}
@@ -127,7 +127,6 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 	public void end () {
 		if (!drawing) throw new IllegalStateException("begin must be called before end.");
 		if (vertexIndex > 0) flush();
-		shader.end();
 		Gdx.gl.glDepthMask(true);
 		if (isBlendingEnabled()) Gdx.gl.glDisable(GL20.GL_BLEND);
 
@@ -1384,13 +1383,10 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 	@Override
 	public void setShader (ShaderProgram newShader) {
 		if (shader == newShader) return;
-		if (drawing) {
-			flush();
-			shader.end();
-		}
+		if (drawing) flush();
 		shader = newShader == null ? defaultShader : newShader;
 		if (drawing) {
-			shader.begin();
+			shader.bind();
 			setupMatrices();
 		}
 	}

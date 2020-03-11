@@ -250,11 +250,9 @@ public class NormalMapTest extends ApplicationAdapter {
 		ShaderProgram.pedantic = false;
 		if (!program.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + program.getLog());
 
-		program.begin();
+		program.bind();
 		program.setUniformi("u_texture", 0);
 		program.setUniformi("u_normals", 1);
-		program.end();
-
 		return program;
 	}
 
