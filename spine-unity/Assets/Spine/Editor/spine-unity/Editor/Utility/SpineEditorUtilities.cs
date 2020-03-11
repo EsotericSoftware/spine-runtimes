@@ -327,6 +327,9 @@ namespace Spine.Unity.Editor {
 									} else if (isDropEvent) {
 										var parentGameObject = DragAndDrop.GetGenericData(GenericDataTargetID) as UnityEngine.GameObject;
 										Transform parent = parentGameObject != null ? parentGameObject.transform : null;
+										// when dragging into empty space in hierarchy below last node, last node would be parent.
+										if (IsLastNodeInHierarchy(parent))
+											parent = null;
 										DragAndDropInstantiation.ShowInstantiateContextMenu(skeletonDataAsset, Vector3.zero, parent);
 										UnityEditor.DragAndDrop.AcceptDrag();
 										current.Use();
@@ -338,6 +341,21 @@ namespace Spine.Unity.Editor {
 					}
 				}
 			}
+
+			internal static bool IsLastNodeInHierarchy (Transform node) {
+				if (node == null)
+					return false;
+
+				while (node.parent != null) {
+					if (node.GetSiblingIndex() != node.parent.childCount - 1)
+						return false;
+					node = node.parent;
+				}
+
+				var rootNodes = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+				bool isLastNode = (rootNodes.Length > 0 && rootNodes[rootNodes.Length - 1].transform == node);
+				return isLastNode;
+			}
 		}
 	}
 
@@ -347,8 +365,9 @@ namespace Spine.Unity.Editor {
 		{
 			if (SpineEditorUtilities.Preferences.textureImporterWarning) {
 				foreach (string path in paths) {
-					if (path.EndsWith(".png.meta", System.StringComparison.Ordinal) ||
-						path.EndsWith(".jpg.meta", System.StringComparison.Ordinal)) {
+					if ((path != null) &&
+						(path.EndsWith(".png.meta", System.StringComparison.Ordinal) ||
+						 path.EndsWith(".jpg.meta", System.StringComparison.Ordinal))) {
 
 						string texturePath = System.IO.Path.ChangeExtension(path, null); // .meta removed
 						string atlasPath = System.IO.Path.ChangeExtension(texturePath, "atlas.txt");
