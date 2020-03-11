@@ -75,7 +75,7 @@ namespace Spine.Unity {
 		public void Reset () {
 			bone = null;
 			cachedTransform = transform;
-			valid = hierarchy != null && hierarchy.skeletonRenderer != null && hierarchy.skeletonRenderer.valid;
+			valid = hierarchy != null && hierarchy.IsValid;
 			if (!valid)
 				return;
 			skeletonTransform = hierarchy.transform;
@@ -109,7 +109,7 @@ namespace Spine.Unity {
 				return;
 			}
 
-			var skeleton = hierarchy.skeletonRenderer.skeleton;
+			var skeleton = hierarchy.Skeleton;
 
 			if (bone == null) {
 				if (string.IsNullOrEmpty(boneName)) return;
@@ -121,13 +121,15 @@ namespace Spine.Unity {
 			}
 			if (!bone.Active) return;
 
+			float positionScale = hierarchy.PositionScale;
+
 			var thisTransform = cachedTransform;
 			float skeletonFlipRotation = Mathf.Sign(skeleton.ScaleX * skeleton.ScaleY);
 			if (mode == Mode.Follow) {
 				switch (phase) {
 					case UpdatePhase.Local:
 						if (position)
-							thisTransform.localPosition = new Vector3(bone.x, bone.y, 0);
+							thisTransform.localPosition = new Vector3(bone.x * positionScale, bone.y * positionScale, 0);
 
 						if (rotation) {
 							if (bone.data.transformMode.InheritsRotation()) {
@@ -151,7 +153,7 @@ namespace Spine.Unity {
 						}
 
 						if (position)
-							thisTransform.localPosition = new Vector3(bone.ax, bone.ay, 0);
+							thisTransform.localPosition = new Vector3(bone.ax * positionScale, bone.ay * positionScale, 0);
 
 						if (rotation) {
 							if (bone.data.transformMode.InheritsRotation()) {
@@ -175,7 +177,7 @@ namespace Spine.Unity {
 
 				if (parentReference == null) {
 					if (position) {
-						Vector3 clp = thisTransform.localPosition;
+						Vector3 clp = thisTransform.localPosition / positionScale;
 						bone.x = Mathf.Lerp(bone.x, clp.x, overrideAlpha);
 						bone.y = Mathf.Lerp(bone.y, clp.y, overrideAlpha);
 					}
@@ -197,7 +199,7 @@ namespace Spine.Unity {
 						return;
 
 					if (position) {
-						Vector3 pos = parentReference.InverseTransformPoint(thisTransform.position);
+						Vector3 pos = parentReference.InverseTransformPoint(thisTransform.position) / positionScale;
 						bone.x = Mathf.Lerp(bone.x, pos.x, overrideAlpha);
 						bone.y = Mathf.Lerp(bone.y, pos.y, overrideAlpha);
 					}

@@ -47,8 +47,9 @@ namespace Spine.Unity.Editor {
 		SkeletonUtility skeletonUtility;
 		Skeleton skeleton;
 		SkeletonRenderer skeletonRenderer;
+		SkeletonGraphic skeletonGraphic;
 
-		#if !NEW_PREFAB_SYSTEM
+#if !NEW_PREFAB_SYSTEM
 		bool isPrefab;
 		#endif
 
@@ -56,16 +57,24 @@ namespace Spine.Unity.Editor {
 
 		void OnEnable () {
 			skeletonUtility = (SkeletonUtility)target;
-			skeletonRenderer = skeletonUtility.GetComponent<SkeletonRenderer>();
-			skeleton = skeletonRenderer.Skeleton;
+			skeletonRenderer = skeletonUtility.skeletonRenderer;
+			skeletonGraphic = skeletonUtility.skeletonGraphic;
+			skeleton = skeletonUtility.Skeleton;
 
 			if (skeleton == null) {
-				skeletonRenderer.Initialize(false);
-				skeletonRenderer.LateUpdate();
-				skeleton = skeletonRenderer.skeleton;
+				if (skeletonRenderer != null) {
+					skeletonRenderer.Initialize(false);
+					skeletonRenderer.LateUpdate();
+				}
+				else if (skeletonGraphic != null) {
+					skeletonGraphic.Initialize(false);
+					skeletonGraphic.LateUpdate();
+				}
+				skeleton = skeletonUtility.Skeleton;
 			}
 
-			if (!skeletonRenderer.valid) return;
+			if ((skeletonRenderer != null && !skeletonRenderer.valid) ||
+				(skeletonGraphic != null && !skeletonGraphic.IsValid)) return;
 
 			#if !NEW_PREFAB_SYSTEM
 			isPrefab |= PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab;
@@ -83,7 +92,8 @@ namespace Spine.Unity.Editor {
 
 			serializedObject.Update();
 
-			if (!skeletonRenderer.valid) {
+			if ((skeletonRenderer != null && !skeletonRenderer.valid) ||
+				(skeletonGraphic != null && !skeletonGraphic.IsValid)) {
 				GUILayout.Label(new GUIContent("Spine Component invalid. Check Skeleton Data Asset.", Icons.warning));
 				return;
 			}
@@ -131,7 +141,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static void AttachIcon (SkeletonUtilityBone boneComponent) {
-			Skeleton skeleton = boneComponent.hierarchy.skeletonRenderer.skeleton;
+			Skeleton skeleton = boneComponent.hierarchy.Skeleton;
 			Texture2D icon = boneComponent.bone.Data.Length == 0 ? Icons.nullBone : Icons.boneNib;
 
 			foreach (IkConstraint c in skeleton.IkConstraints)

@@ -38,8 +38,8 @@ namespace Spine.Unity {
 	/// do not attempt to use this component for other purposes.
 	/// </summary>
 	public class ActivateBasedOnFlipDirection : MonoBehaviour {
-	
-		public SkeletonRenderer skeletonRenderer;
+
+		public ISkeletonComponent skeletonRenderer;
 		public GameObject activeOnNormalX;
 		public GameObject activeOnFlippedX;
 		HingeJoint2D[] jointsNormalX;

@@ -73,6 +73,8 @@ namespace Spine.Unity.Examples {
 		public override void DoUpdate () {
 			rayOrigin = transform.position + new Vector3(castOffset, castDistance, 0);
 
+			float positionScale = hierarchy.PositionScale;
+			float adjustDistanceThisFrame = adjustSpeed * positionScale * Time.deltaTime;
 			hitY = float.MinValue;
 			if (use2D) {
 				RaycastHit2D hit;
@@ -85,10 +87,10 @@ namespace Spine.Unity.Examples {
 				if (hit.collider != null) {
 					hitY = hit.point.y + groundOffset;
 					if (Application.isPlaying)
-						hitY = Mathf.MoveTowards(lastHitY, hitY, adjustSpeed * Time.deltaTime);
+						hitY = Mathf.MoveTowards(lastHitY, hitY, adjustDistanceThisFrame);
 				} else {
 					if (Application.isPlaying)
-						hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustSpeed * Time.deltaTime);
+						hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustDistanceThisFrame);
 				}
 			} else {
 				RaycastHit hit;
@@ -102,11 +104,11 @@ namespace Spine.Unity.Examples {
 				if (validHit) {
 					hitY = hit.point.y + groundOffset;
 					if (Application.isPlaying)
-						hitY = Mathf.MoveTowards(lastHitY, hitY, adjustSpeed * Time.deltaTime);
+						hitY = Mathf.MoveTowards(lastHitY, hitY, adjustDistanceThisFrame);
 
 				} else {
 					if (Application.isPlaying)
-						hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustSpeed * Time.deltaTime);
+						hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustDistanceThisFrame);
 				}
 			}
 
@@ -114,8 +116,8 @@ namespace Spine.Unity.Examples {
 			v.y = Mathf.Clamp(v.y, Mathf.Min(lastHitY, hitY), float.MaxValue);
 			transform.position = v;
 
-			bone.bone.X = transform.localPosition.x;
-			bone.bone.Y = transform.localPosition.y;
+			bone.bone.X = transform.localPosition.x / hierarchy.PositionScale;
+			bone.bone.Y = transform.localPosition.y / hierarchy.PositionScale;
 
 			lastHitY = hitY;
 		}

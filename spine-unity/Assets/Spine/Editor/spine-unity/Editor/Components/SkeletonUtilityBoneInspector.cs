@@ -72,8 +72,12 @@ namespace Spine.Unity.Editor {
 			skeletonUtility = utilityBone.hierarchy;
 			EvaluateFlags();
 
-			if (!utilityBone.valid && skeletonUtility != null && skeletonUtility.skeletonRenderer != null)
-				skeletonUtility.skeletonRenderer.Initialize(false);
+			if (!utilityBone.valid && skeletonUtility != null) {
+				if (skeletonUtility.skeletonRenderer != null)
+					skeletonUtility.skeletonRenderer.Initialize(false);
+				if (skeletonUtility.skeletonGraphic != null)
+					skeletonUtility.skeletonGraphic.Initialize(false);
+			}
 
 			canCreateHingeChain = CanCreateHingeChain();
 			boundingBoxTable.Clear();
@@ -88,7 +92,7 @@ namespace Spine.Unity.Editor {
 				skin = skeleton.Data.DefaultSkin;
 
 			for(int i = 0; i < slotCount; i++){
-				Slot slot = skeletonUtility.skeletonRenderer.skeleton.Slots.Items[i];
+				Slot slot = skeletonUtility.Skeleton.Slots.Items[i];
 				if (slot.Bone == utilityBone.bone) {
 					var slotAttachments = new List<Skin.SkinEntry>();
 					int slotIndex = skeleton.FindSlotIndex(slot.Data.Name);
@@ -105,7 +109,6 @@ namespace Spine.Unity.Editor {
 						boundingBoxTable.Add(slot, boundingBoxes);
 				}
 			}
-
 		}
 
 		void EvaluateFlags () {
@@ -150,7 +153,7 @@ namespace Spine.Unity.Editor {
 				using (new GUILayout.HorizontalScope()) {
 					EditorGUILayout.PrefixLabel("Bone");
 					if (GUILayout.Button(str, EditorStyles.popup)) {
-						BoneSelectorContextMenu(str, ((SkeletonUtilityBone)target).hierarchy.skeletonRenderer.skeleton.Bones, "<None>", TargetBoneSelected);
+						BoneSelectorContextMenu(str, ((SkeletonUtilityBone)target).hierarchy.Skeleton.Bones, "<None>", TargetBoneSelected);
 					}
 				}
 			}
@@ -316,7 +319,7 @@ namespace Spine.Unity.Editor {
 
 			GameObject commonParentObject = new GameObject(skeletonUtility.name + " HingeChain Parent " + utilityBone.name);
 			var commonParentActivateOnFlip = commonParentObject.AddComponent<ActivateBasedOnFlipDirection>();
-			commonParentActivateOnFlip.skeletonRenderer = skeletonUtility.skeletonRenderer;
+			commonParentActivateOnFlip.skeletonRenderer = skeletonUtility.SkeletonComponent;
 
 			// HingeChain Parent
 			// Needs to be on top hierarchy level (not attached to the moving skeleton at least) for physics to apply proper momentum.
@@ -391,7 +394,7 @@ namespace Spine.Unity.Editor {
 			GameObject mirroredChain = GameObject.Instantiate(normalChainParentObject, normalChainParentObject.transform.position,
 				normalChainParentObject.transform.rotation, commonParentActivateOnFlip.transform);
 			mirroredChain.name = normalChainParentObject.name + " FlippedX";
-			
+
 			commonParentActivateOnFlip.activeOnFlippedX = mirroredChain;
 
 			var followerKinematicObject = mirroredChain.GetComponentInChildren<FollowLocationRigidbody2D>();
@@ -405,7 +408,7 @@ namespace Spine.Unity.Editor {
 				var joint = childBoneJoints[i];
 				FlipBone2DHorizontal(joint.transform, skeletonUtilityRoot);
 				ApplyJoint2DAngleLimits(joint, rotationLimit, parentTransformForAngles, joint.transform);
-				
+
 				GameObject rotatedChild = GameObject.Instantiate(joint.gameObject, joint.transform, true);
 				rotatedChild.name = joint.name + " rotated";
 				var rotationEulerAngles = rotatedChild.transform.localEulerAngles;
@@ -446,9 +449,9 @@ namespace Spine.Unity.Editor {
 				UnityEditor.EditorUtility.DisplayDialog("No parent SkeletonUtilityBone found!", "Please select the first physically moving chain node, having a parent GameObject with a SkeletonUtilityBone component attached.", "OK");
 				return;
 			}
-			
+
 			SetSkeletonUtilityToFlipByRotation();
-			
+
 			kinematicParentUtilityBone.mode = SkeletonUtilityBone.Mode.Follow;
 			kinematicParentUtilityBone.position = kinematicParentUtilityBone.rotation = kinematicParentUtilityBone.scale = kinematicParentUtilityBone.zPosition = true;
 
@@ -476,7 +479,7 @@ namespace Spine.Unity.Editor {
 				childBone.transform.SetParent(chainParentObject.transform, true); // we need a flat hierarchy of all Joint objects in Unity.
 				AttachRigidbodyAndCollider(childBone);
 				childBone.mode = SkeletonUtilityBone.Mode.Override;
-				
+
 				HingeJoint joint = childBone.gameObject.AddComponent<HingeJoint>();
 				joint.axis = Vector3.forward;
 				joint.connectedBody = childBoneParentReference.GetComponent<Rigidbody>();
