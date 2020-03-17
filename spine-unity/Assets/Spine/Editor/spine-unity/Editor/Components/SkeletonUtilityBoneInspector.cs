@@ -319,7 +319,8 @@ namespace Spine.Unity.Editor {
 
 			GameObject commonParentObject = new GameObject(skeletonUtility.name + " HingeChain Parent " + utilityBone.name);
 			var commonParentActivateOnFlip = commonParentObject.AddComponent<ActivateBasedOnFlipDirection>();
-			commonParentActivateOnFlip.skeletonRenderer = skeletonUtility.SkeletonComponent;
+			commonParentActivateOnFlip.skeletonRenderer = skeletonUtility.skeletonRenderer;
+			commonParentActivateOnFlip.skeletonGraphic = skeletonUtility.skeletonGraphic;
 
 			// HingeChain Parent
 			// Needs to be on top hierarchy level (not attached to the moving skeleton at least) for physics to apply proper momentum.
