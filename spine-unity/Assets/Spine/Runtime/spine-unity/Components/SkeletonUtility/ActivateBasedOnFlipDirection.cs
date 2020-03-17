@@ -39,21 +39,24 @@ namespace Spine.Unity {
 	/// </summary>
 	public class ActivateBasedOnFlipDirection : MonoBehaviour {
 
-		public ISkeletonComponent skeletonRenderer;
+		public SkeletonRenderer skeletonRenderer;
+		public SkeletonGraphic skeletonGraphic;
 		public GameObject activeOnNormalX;
 		public GameObject activeOnFlippedX;
 		HingeJoint2D[] jointsNormalX;
 		HingeJoint2D[] jointsFlippedX;
+		ISkeletonComponent skeletonComponent;
 
 		bool wasFlippedXBefore = false;
 
 		private void Start () {
 			jointsNormalX = activeOnNormalX.GetComponentsInChildren<HingeJoint2D>();
 			jointsFlippedX = activeOnFlippedX.GetComponentsInChildren<HingeJoint2D>();
+			skeletonComponent = skeletonRenderer != null ? (ISkeletonComponent)skeletonRenderer : (ISkeletonComponent)skeletonGraphic;
 		}
 
 		private void FixedUpdate () {
-			bool isFlippedX = (skeletonRenderer.Skeleton.ScaleX < 0);
+			bool isFlippedX = (skeletonComponent.Skeleton.ScaleX < 0);
 			if (isFlippedX != wasFlippedXBefore) {
 				HandleFlip(isFlippedX);
 			}
