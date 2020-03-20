@@ -92,6 +92,7 @@
 * **Restructuring (Non-Breaking)**
 
 ### XNA/MonoGame
+* Added normalmap support via `SpineEffectNormalmap` and support for loading multiple texture layers following a suffix-pattern. Please see the example code on how to use them.
 
 ## Java
 * **Breaking changes**
