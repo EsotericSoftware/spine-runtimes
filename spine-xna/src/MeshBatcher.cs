@@ -147,6 +147,10 @@ namespace Spine {
 					triangleCount = 0;
 					lastTexture = item.texture;
 					device.Textures[0] = lastTexture;
+					if (item.textureLayers != null) {
+						for (int layer = 1; layer < item.textureLayers.Length; ++layer)
+							device.Textures[layer] = item.textureLayers[layer];
+					}
 				}
 
 				int[] itemTriangles = item.triangles;
@@ -182,7 +186,8 @@ namespace Spine {
 	}
 
 	public class MeshItem {
-		public Texture2D texture;
+		public Texture2D texture = null;
+		public Texture2D[] textureLayers = null;
 		public int vertexCount, triangleCount;
 		public VertexPositionColorTextureColor[] vertices = { };
 		public int[] triangles = { };

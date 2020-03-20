@@ -36,7 +36,7 @@ using System.Text;
 
 namespace Spine {
 	/// <summary>
-	/// Batch drawing of lines and shapes that can be derrived from lines.
+	/// Batch drawing of lines and shapes that can be derived from lines.
 	///
 	/// Call drawing methods in between Begin()/End()
 	/// </summary>

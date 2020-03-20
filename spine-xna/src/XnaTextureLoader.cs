@@ -35,20 +35,60 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Spine {
 	public class XnaTextureLoader : TextureLoader {
 		GraphicsDevice device;
+		string[] textureLayerSuffixes = null;
 
-		public XnaTextureLoader (GraphicsDevice device) {
+		/// <summary>
+		/// Constructor.
+		/// </summary>
+		/// <param name="device">The graphics device to be used.</param>
+		/// <param name="loadMultipleTextureLayers">If <c>true</c> multiple textures layers
+		/// (e.g. a diffuse/albedo texture and a normal map) are loaded instead of a single texture.
+		/// Names are constructed based on suffixes added according to the <c>textureSuffixes</c> parameter.</param>
+		/// <param name="textureSuffixes">If <c>loadMultipleTextureLayers</c> is <c>true</c>, the strings of this array
+		/// define the path name suffix of each layer to be loaded. Array size must be equal to the number of layers to be loaded.
+		/// The first array entry is the suffix to be <c>replaced</c> (e.g. "_albedo", or "" for a first layer without a suffix),
+		/// subsequent array entries contain the suffix to replace the first entry with (e.g. "_normals").
+		///
+		/// An example would be:
+		/// <code>new string[] { "", "_normals" }</code> for loading a base diffuse texture named "skeletonname.png" and
+		/// a normalmap named "skeletonname_normals.png".</param>
+		public XnaTextureLoader (GraphicsDevice device, bool loadMultipleTextureLayers = false, string[] textureSuffixes = null) {
 			this.device = device;
+			if (loadMultipleTextureLayers)
+				this.textureLayerSuffixes = textureSuffixes;
 		}
 
 		public void Load (AtlasPage page, String path) {
 			Texture2D texture = Util.LoadTexture(device, path);
-			page.rendererObject = texture;
 			page.width = texture.Width;
 			page.height = texture.Height;
+
+			if (textureLayerSuffixes == null) {
+				page.rendererObject = texture;
+			}
+			else {
+				Texture2D[] textureLayersArray = new Texture2D[textureLayerSuffixes.Length];
+				textureLayersArray[0] = texture;
+				for (int layer = 1; layer < textureLayersArray.Length; ++layer) {
+					string layerPath = GetLayerName(path, textureLayerSuffixes[0], textureLayerSuffixes[layer]);
+					textureLayersArray[layer] = Util.LoadTexture(device, layerPath);
+				}
+				page.rendererObject = textureLayersArray;
+			}
 		}
 
 		public void Unload (Object texture) {
 			((Texture2D)texture).Dispose();
+		}
+
+		private string GetLayerName (string firstLayerPath, string firstLayerSuffix, string replacementSuffix) {
+
+			int suffixLocation = firstLayerPath.LastIndexOf(firstLayerSuffix + ".");
+			if (suffixLocation == -1) {
+				throw new Exception(string.Concat("Error composing texture layer name: first texture layer name '", firstLayerPath,
+								"' does not contain suffix to be replaced: '", firstLayerSuffix, "'"));
+			}
+			return firstLayerPath.Remove(suffixLocation, firstLayerSuffix.Length).Insert(suffixLocation, replacementSuffix);
 		}
 	}
 }
