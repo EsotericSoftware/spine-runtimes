@@ -109,7 +109,7 @@ namespace Spine {
 				float attachmentZOffset = zSpacing * i;
 
 				float attachmentColorR, attachmentColorG, attachmentColorB, attachmentColorA;
-				Texture2D texture = null;
+				object textureObject = null;
 				int verticesCount = 0;
 				float[] vertices = this.vertices;
 				int indicesCount = 0;
@@ -120,7 +120,7 @@ namespace Spine {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
 					attachmentColorR = regionAttachment.R; attachmentColorG = regionAttachment.G; attachmentColorB = regionAttachment.B; attachmentColorA = regionAttachment.A;
 					AtlasRegion region = (AtlasRegion)regionAttachment.RendererObject;
-					texture = (Texture2D)region.page.rendererObject;
+					textureObject = region.page.rendererObject;
 					verticesCount = 4;
 					regionAttachment.ComputeWorldVertices(slot.Bone, vertices, 0, 2);
 					indicesCount = 6;
@@ -131,7 +131,7 @@ namespace Spine {
 					MeshAttachment mesh = (MeshAttachment)attachment;
 					attachmentColorR = mesh.R; attachmentColorG = mesh.G; attachmentColorB = mesh.B; attachmentColorA = mesh.A;
 					AtlasRegion region = (AtlasRegion)mesh.RendererObject;
-					texture = (Texture2D)region.page.rendererObject;
+					textureObject = region.page.rendererObject;
 					int vertexCount = mesh.WorldVerticesLength;
 					if (vertices.Length < vertexCount) vertices = new float[vertexCount];
 					verticesCount = vertexCount >> 1;
@@ -196,7 +196,12 @@ namespace Spine {
 
 				// submit to batch
 				MeshItem item = batcher.NextItem(verticesCount, indicesCount);
-				item.texture = texture;
+				if (textureObject is Texture2D)
+					item.texture = (Texture2D) textureObject;
+				else {
+					item.textureLayers = (Texture2D[]) textureObject;
+					item.texture = item.textureLayers[0];
+				}
 				for (int ii = 0, nn = indicesCount; ii < nn; ii++) {
 					item.triangles[ii] = indices[ii];
 				}

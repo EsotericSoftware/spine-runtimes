@@ -255,6 +255,7 @@
 * Updated to latest MonoGame version 3.7.1
 * Rewrote example project to be cleaner and better demonstrate basic Spine features.
 * Added mix-and-match example to demonstrate the new Skin API.
+* Added normalmap support via `SpineEffectNormalmap` and support for loading multiple texture layers following a suffix-pattern. Please see the example code on how to use them.
 
 ## Java
 * **Breaking changes**

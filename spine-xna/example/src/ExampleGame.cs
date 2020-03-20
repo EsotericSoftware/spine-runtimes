@@ -70,8 +70,20 @@ namespace Spine {
 		}
 
 		protected override void LoadContent () {
-			// Two color tint effect, comment line 80 to disable
-			var spineEffect = Content.Load<Effect>("spine-xna-example-content\\SpineEffect");
+
+			bool useNormalmapShader = false;
+			Effect spineEffect;
+			if (!useNormalmapShader) {
+				// Two color tint effect. Note that you can also use the default BasicEffect instead.
+				spineEffect = Content.Load<Effect>("spine-xna-example-content\\SpineEffect");
+			}
+			else {
+				spineEffect = Content.Load<Effect>("spine-xna-example-content\\SpineEffectNormalmap");
+				spineEffect.Parameters["Light0_Direction"].SetValue(new Vector3(-0.5265408f, 0.5735765f, -0.6275069f));
+				spineEffect.Parameters["Light0_Diffuse"].SetValue(new Vector3(1, 0.9607844f, 0.8078432f));
+				spineEffect.Parameters["Light0_Specular"].SetValue(new Vector3(1, 0.9607844f, 0.8078432f));
+				spineEffect.Parameters["Light0_SpecularExponent"].SetValue(2.0f);
+			}
 			spineEffect.Parameters["World"].SetValue(Matrix.Identity);
 			spineEffect.Parameters["View"].SetValue(Matrix.CreateLookAt(new Vector3(0.0f, 0.0f, 1.0f), Vector3.Zero, Vector3.Up));
 
@@ -85,15 +97,23 @@ namespace Spine {
 
 			// String name = "spineboy-ess";
 			// String name = "goblins-pro";
-			// String name = "raptor-pro";
+			String name = "raptor-pro";
 			// String name = "tank-pro";
-			String name = "coin-pro";
+			//String name = "coin-pro";
+			if (useNormalmapShader)
+				name = "raptor-pro"; // we only have normalmaps for raptor
 			String atlasName = name.Replace("-pro", "").Replace("-ess", "");
 			if (name == "goblins-pro") atlasName = "goblins-mesh";
 			bool binaryData = false;
 
-			Atlas atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice));
-
+			Atlas atlas;
+			if (!useNormalmapShader) {
+				atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice));
+			}
+			else {
+				atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice,
+								loadMultipleTextureLayers: true, textureSuffixes: new string[] { "", "_normals" }));
+			}
 			float scale = 1;
 			if (name == "spineboy-ess") scale = 0.6f;
 			if (name == "raptor-pro") scale = 0.5f;
