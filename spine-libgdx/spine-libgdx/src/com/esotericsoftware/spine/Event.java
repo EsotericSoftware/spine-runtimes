@@ -39,7 +39,7 @@ import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
  * AnimationStateListener {@link AnimationStateListener#event(com.esotericsoftware.spine.AnimationState.TrackEntry, Event)}, and
  * <a href="http://esotericsoftware.com/spine-events">Events</a> in the Spine User Guide. */
 public class Event {
-	final private EventData data;
+	private final EventData data;
 	int intValue;
 	float floatValue;
 	String stringValue;
