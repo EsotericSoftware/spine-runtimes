@@ -36,6 +36,7 @@ namespace Spine.Unity {
 
 		[SerializeField] protected MecanimTranslator translator;
 		public MecanimTranslator Translator { get { return translator; } }
+		private bool wasUpdatedAfterInit = true;
 
 		#region Bone Callbacks (ISkeletonAnimation)
 		protected event UpdateBonesDelegate _UpdateLocal;
@@ -61,12 +62,17 @@ namespace Spine.Unity {
 		#endregion
 
 		public override void Initialize (bool overwrite) {
-			if (valid && !overwrite) return;
+			if (valid && !overwrite)
+				return;
+
 			base.Initialize(overwrite);
-			if (!valid) return;
+
+			if (!valid)
+				return;
 
 			if (translator == null) translator = new MecanimTranslator();
 			translator.Initialize(GetComponent<Animator>(), this.skeletonDataAsset);
+			wasUpdatedAfterInit = false;
 		}
 
 		public void Update () {
@@ -106,6 +112,13 @@ namespace Spine.Unity {
 				if (_UpdateComplete != null)
 					_UpdateComplete(this);
 			}
+			wasUpdatedAfterInit = true;
+		}
+
+		public override void LateUpdate () {
+			// instantiation can happen from Update() after this component, leading to a missing Update() call.
+			if (!wasUpdatedAfterInit) Update();
+			base.LateUpdate();
 		}
 
 		[System.Serializable]
