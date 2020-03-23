@@ -1008,7 +1008,7 @@ namespace Spine.Unity.Editor {
 				newSkeletonAnimation.Initialize(false);
 			} catch (System.Exception e) {
 				if (destroyInvalid) {
-					Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.", skeletonDataAsset);
+					Debug.LogWarning("Editor-instantiated SkeletonAnimation threw an Exception. Destroying GameObject to prevent orphaned GameObject.\n" + e.Message, skeletonDataAsset);
 					GameObject.DestroyImmediate(go);
 				}
 				throw e;

@@ -52,6 +52,7 @@ namespace Spine.Unity {
 		/// This is the Spine.AnimationState object of this SkeletonAnimation. You can control animations through it.
 		/// Note that this object, like .skeleton, is not guaranteed to exist in Awake. Do all accesses and caching to it in Start</summary>
 		public Spine.AnimationState AnimationState { get { return this.state; } }
+		private bool wasUpdatedAfterInit = true;
 		#endregion
 
 		#region Bone Callbacks ISkeletonAnimation
@@ -149,13 +150,12 @@ namespace Spine.Unity {
 		public override void Initialize (bool overwrite) {
 			if (valid && !overwrite)
 				return;
-
 			base.Initialize(overwrite);
 
 			if (!valid)
 				return;
-
 			state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
+			wasUpdatedAfterInit = false;
 
 			if (!string.IsNullOrEmpty(_animationName)) {
 				var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
@@ -203,8 +203,14 @@ namespace Spine.Unity {
 			if (_UpdateComplete != null) {
 				_UpdateComplete(this);
 			}
+			wasUpdatedAfterInit = true;
 		}
 
+		public override void LateUpdate () {
+			// instantiation can happen from Update() after this component, leading to a missing Update() call.
+			if (!wasUpdatedAfterInit) Update(0);
+			base.LateUpdate();
+		}
 	}
 
 }
