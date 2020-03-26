@@ -285,7 +285,7 @@ namespace Spine.Unity {
 						for (; c < clipInfoCount; c++) {
 							var info = clipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
 							GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(stateInfo.normalizedTime, info.clip.length, stateInfo.loop, stateInfo.speed < 0), stateInfo.loop, null, 1f, layerBlendMode, MixDirection.In);
-							break;
+							++c; break;
 						}
 						// Mix the rest
 						for (; c < clipInfoCount; c++) {
@@ -300,7 +300,7 @@ namespace Spine.Unity {
 								for (; c < nextClipInfoCount; c++) {
 									var info = nextClipInfo[c]; float weight = info.weight * layerWeight; if (weight == 0) continue;
 									GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(nextStateInfo.normalizedTime, info.clip.length, nextStateInfo.speed < 0), nextStateInfo.loop, null, 1f, layerBlendMode, MixDirection.In);
-									break;
+									++c; break;
 								}
 							}
 							// Mix the rest
@@ -319,7 +319,7 @@ namespace Spine.Unity {
 									float clipWeight = shallInterpolateWeightTo1 ? (info.weight + 1.0f) * 0.5f : info.weight;
 									float weight = clipWeight * layerWeight; if (weight == 0) continue;
 									GetAnimation(info.clip).Apply(skeleton, 0, AnimationTime(interruptingStateInfo.normalizedTime + interruptingClipTimeAddition, info.clip.length, interruptingStateInfo.speed < 0), interruptingStateInfo.loop, null, 1f, layerBlendMode, MixDirection.In);
-									break;
+									++c; break;
 								}
 							}
 							// Mix the rest
