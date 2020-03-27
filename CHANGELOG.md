@@ -355,6 +355,7 @@
     2) Add a `RenderExistingMesh` component, provided in the `Spine Examples/Scripts/Sample Components` directory.
     3) Copy the original material, add *_Outline* to its name and set the shader to `Universal Render Pipeline/Spine/Outline/Skeleton-OutlineOnly`.
     4) Assign this *_Outline* material at the `RenderExistingMesh` component under *Replacement Materials*.
+  * Added `Outline Shaders URP` example scene to URP extension module to demonstrate the above additions.
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.MixNext` instead of `MixMode.MixAlways`.
