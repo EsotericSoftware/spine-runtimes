@@ -94,34 +94,35 @@ namespace Spine.Unity.Examples {
 				skeletonRenderer.OnMeshAndMaterialsUpdated += UpdateOnCallback;
 				updateViaSkeletonCallback = true;
 			}
-			var skeletonGraphic = referenceRenderer.GetComponent<SkeletonGraphic>();
-			if (skeletonGraphic) {
-				skeletonGraphic.OnMeshAndMaterialsUpdated -= UpdateOnCallback;
-				skeletonGraphic.OnMeshAndMaterialsUpdated += UpdateOnCallback;
-				updateViaSkeletonCallback = true;
-			}
-
 			referenceMeshFilter = referenceRenderer.GetComponent<MeshFilter>();
 			ownRenderer = this.GetComponent<MeshRenderer>();
 			ownMeshFilter = this.GetComponent<MeshFilter>();
 
-			for (int i = 0; i < replacementMaterials.Length; ++i) {
-				var entry = replacementMaterials[i];
-				replacementMaterialDict[entry.originalMaterial] = entry.replacementMaterial;
-			}
+			InitializeDict();
 		}
 
+		#if UNITY_EDITOR
+		private void Update () {
+			if (!Application.isPlaying) {
+				InitializeDict();
+			}
+		}
+		#endif
+
 		void LateUpdate () {
+			#if UNITY_EDITOR
+			if (!Application.isPlaying) {
+				UpdateMaterials();
+				return;
+			}
+			#endif
+
 			if (updateViaSkeletonCallback)
 				return;
 			UpdateMaterials();
 		}
 
 		void UpdateOnCallback (SkeletonRenderer r) {
-			UpdateMaterials();
-		}
-
-		void UpdateOnCallback (SkeletonGraphic r) {
 			UpdateMaterials();
 		}
 
@@ -139,6 +140,13 @@ namespace Spine.Unity.Examples {
 				}
 			}
 			ownRenderer.sharedMaterials = sharedMaterials;
+		}
+
+		void InitializeDict () {
+			for (int i = 0; i < replacementMaterials.Length; ++i) {
+				var entry = replacementMaterials[i];
+				replacementMaterialDict[entry.originalMaterial] = entry.replacementMaterial;
+			}
 		}
 	}
 }
