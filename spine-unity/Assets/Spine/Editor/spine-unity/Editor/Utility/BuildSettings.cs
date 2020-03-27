@@ -62,7 +62,15 @@ namespace Spine.Unity.Editor {
 					Shader.Find("tk2d/AdditiveVertexColor") != null);
 			}
 
+			internal static bool IsTK2DAllowed {
+				get {
+					return false; // replace with "return true;" to allow TK2D support
+				}
+			}
+
 			internal static void EnableTK2D () {
+				if (!IsTK2DAllowed)
+					return;
 				SpineBuildEnvUtility.DisableSpineAsmdefFiles();
 				SpineBuildEnvUtility.EnableBuildDefine(SPINE_TK2D_DEFINE);
 			}

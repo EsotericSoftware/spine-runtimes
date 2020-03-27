@@ -278,16 +278,28 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				if (SpineTK2DEditorUtility.IsTK2DInstalled()) {
+				#if SPINE_TK2D_DEFINE
+				bool isTK2DDefineSet = true;
+				#else
+				bool isTK2DDefineSet = false;
+				#endif
+				bool isTK2DAllowed = SpineTK2DEditorUtility.IsTK2DAllowed;
+				if (SpineTK2DEditorUtility.IsTK2DInstalled() || isTK2DDefineSet) {
 					GUILayout.Space(20);
 					EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
 					using (new GUILayout.HorizontalScope()) {
 						EditorGUILayout.PrefixLabel("Define TK2D");
-						if (GUILayout.Button("Enable", GUILayout.Width(64)))
+						if (isTK2DAllowed && GUILayout.Button("Enable", GUILayout.Width(64)))
 							SpineTK2DEditorUtility.EnableTK2D();
 						if (GUILayout.Button("Disable", GUILayout.Width(64)))
 							SpineTK2DEditorUtility.DisableTK2D();
 					}
+					#if !SPINE_TK2D_DEFINE
+					if (!isTK2DAllowed) {
+						EditorGUILayout.LabelField("To allow TK2D support, please modify line 67 in", EditorStyles.boldLabel);
+						EditorGUILayout.LabelField("Spine/Editor/spine-unity/Editor/Util./BuildSettings.cs", EditorStyles.boldLabel);
+					}
+					#endif
 				}
 
 				GUILayout.Space(20);
