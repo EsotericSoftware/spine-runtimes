@@ -218,6 +218,14 @@
     When exporting atlas textures from Spine with `Premultiply alpha` enabled (the default), you can leave it at `PMATexturePreset`. If you have disabled `Premultiply alpha`, set it to the included `StraightAlphaTexturePreset` asset. You can also create your own `TextureImporter` `Preset` asset and assign it here (include `PMA` or `Straight` in the name). In Unity versions before 2018.3 you can use `Texture2D` template assets instead of the newer `Preset` assets. Materials created for imported textures will also have the `Straight Alpha Texture` parameter configured accordingly.
   * All `Sprite` shaders (including URP and LWRP extension packages) now provide an additional `Fixed Normal Space` option `World-Space`. PReviously options were limited to `View-Space` and `Model-Space`.
   * `SkeletonGraphic` now fully supports [`SkeletonUtility`](http://esotericsoftware.com/spine-unity#SkeletonUtility) for generating a hierarchy of [`SkeletonUtilityBones`](http://esotericsoftware.com/spine-unity#SkeletonUtilityBone) in both modes `Follow` and `Override`. This also enables creating hinge chain physics rigs and using `SkeletonUtilityConstraints` such as `SkeletonUtilityGroundConstraint` and `SkeletonUtilityEyeConstraint` on `SkeletonGraphic`.
+  * Added `OnMeshAndMaterialsUpdated` callback event to `SkeletonRenderer` and `SkeletonGraphic`. It is issued at the end of `LateUpdate`, before rendering.
+  * Added `Skeleton-OutlineOnly` single pass shader to LWRP and URP extension modules. It can be assigned to materials as `Universal Render Pipeline/Spine/Outline/Skeleton-OutlineOnly`. This allows for separate outline child *GameObjects* that reference the existing Mesh of their parent, and re-draw the mesh using this outline shader.
+  * Added example component `RenderExistingMesh` to render a mesh again with different materials, as required by the new `Skeleton-OutlineOnly` shaders.
+  In URP the outline has to be rendered via a separate GameObject as URP does not allow multiple render passes. To add an outline to your SkeletenRenderer:
+    1) Add a child GameObject and move it a bit back (e.g. position Z = 0.01).
+    2) Add a `RenderExistingMesh` component, provided in the `Spine Examples/Scripts/Sample Components` directory.
+    3) Copy the original material, add *_Outline* to its name and set the shader to `Universal Render Pipeline/Spine/Outline/Skeleton-OutlineOnly`.
+    4) Assign this *_Outline* material at the `RenderExistingMesh` component under *Replacement Materials*.
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.MixNext` instead of `MixMode.MixAlways`.
