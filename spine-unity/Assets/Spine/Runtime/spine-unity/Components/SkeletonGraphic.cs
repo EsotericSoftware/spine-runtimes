@@ -236,6 +236,10 @@ namespace Spine.Unity {
 		/// <summary>OnRebuild is raised after the Skeleton is successfully initialized.</summary>
 		public event SkeletonRendererDelegate OnRebuild;
 
+		/// <summary>OnMeshAndMaterialsUpdated is at the end of LateUpdate after the Mesh and
+		/// all materials have been updated.</summary>
+		public event SkeletonRendererDelegate OnMeshAndMaterialsUpdated;
+
 		protected Spine.AnimationState state;
 		public Spine.AnimationState AnimationState { get { return state; } }
 
@@ -370,6 +374,8 @@ namespace Spine.Unity {
 			}
 
 			//this.UpdateMaterial(); // TODO: This allocates memory.
+			if (OnMeshAndMaterialsUpdated != null)
+				OnMeshAndMaterialsUpdated(this);
 		}
 		#endregion
 	}
