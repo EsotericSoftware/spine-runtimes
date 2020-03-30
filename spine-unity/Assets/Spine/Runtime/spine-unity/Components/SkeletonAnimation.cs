@@ -182,7 +182,7 @@ namespace Spine.Unity {
 
 		/// <summary>Progresses the AnimationState according to the given deltaTime, and applies it to the Skeleton. Use Time.deltaTime to update manually. Use deltaTime 0 to update without progressing the time.</summary>
 		public void Update (float deltaTime) {
-			if (!valid)
+			if (!valid || state == null)
 				return;
 
 			deltaTime *= timeScale;
