@@ -48,6 +48,8 @@ public class Slot {
 	private float attachmentTime;
 	private FloatArray deform = new FloatArray();
 
+	int attachmentState;
+
 	public Slot (SlotData data, Bone bone) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");

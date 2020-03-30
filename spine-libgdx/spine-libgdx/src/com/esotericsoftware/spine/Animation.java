@@ -249,7 +249,7 @@ public class Animation {
 		 *           apply animations on top of each other (layering).
 		 * @param blend Controls how mixing is applied when <code>alpha</code> < 1.
 		 * @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions,
-		 *           such as {@link DrawOrderTimeline} or {@link AttachmentTimeline}. */
+		 *           such as {@link DrawOrderTimeline} or {@link AttachmentTimeline}, and others such as {@link ScaleTimeline}. */
 		abstract public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha,
 			MixBlend blend, MixDirection direction);
 	}
@@ -985,22 +985,21 @@ public class Animation {
 			Slot slot = skeleton.slots.get(slotIndex);
 			if (!slot.bone.active) return;
 
-			if (direction == out && blend == setup) {
-				String attachmentName = slot.data.attachmentName;
-				slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
+			if (direction == out) {
+				if (blend == setup) setAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
 			}
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				if (blend == setup || blend == first) {
-					String attachmentName = slot.data.attachmentName;
-					slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
-				}
+				if (blend == setup || blend == first) setAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
 			}
 
-			String attachmentName = attachmentNames[search(frames, time)];
+			setAttachment(skeleton, slot, attachmentNames[search(frames, time)]);
+		}
+
+		private void setAttachment (Skeleton skeleton, Slot slot, String attachmentName) {
 			slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slotIndex, attachmentName));
 		}
 	}
@@ -1364,8 +1363,8 @@ public class Animation {
 
 			Array<Slot> drawOrder = skeleton.drawOrder;
 			Array<Slot> slots = skeleton.slots;
-			if (direction == out && blend == setup) {
-				arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
+			if (direction == out) {
+				if (blend == setup) arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
 				return;
 			}
 

@@ -77,12 +77,12 @@ public class AnimationState {
 	 * (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
 	 * place. */
 	static private final int HOLD_MIX = 3;
-	/** 1) An attachment timeline in a subsequent track entry sets the attachment for the same slot as this attachment
-	 * timeline.<br>
-	 * Result: This attachment timeline will not use MixDirection.out, which would otherwise show the setup mode attachment (or
-	 * none if not visible in setup mode). This allows deform timelines to be applied for the subsequent entry to mix from, rather
-	 * than mixing from the setup pose. */
-	static private final int NOT_LAST = 4;
+	/** 1) This is the last attachment timeline to set the attachment for a slot.<br>
+	 * Result: Don't apply this timeline when mixing out. Attachment timelines that are not last are applied when mixing out, so
+	 * any deform timelines are applied and subsequent entries can mix from that deform. */
+	static private final int LAST = 4;
+
+	static private final int SETUP = 1, CURRENT = 2;
 
 	private AnimationStateData data;
 	final Array<TrackEntry> tracks = new Array();
@@ -92,6 +92,7 @@ public class AnimationState {
 	private final ObjectSet<String> propertyIds = new ObjectSet();
 	boolean animationsChanged;
 	private float timeScale = 1;
+	private int unkeyedState;
 
 	final Pool<TrackEntry> trackEntryPool = new Pool() {
 		protected Object newObject () {
@@ -193,8 +194,8 @@ public class AnimationState {
 		return false;
 	}
 
-	/** Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
-	 * animation state can be applied to multiple skeletons to pose them identically.
+	/** Poses the skeleton using the track entry animations. The animation state is not changed, so can be applied to multiple
+	 * skeletons to pose them identically.
 	 * @return True if any animations were applied. */
 	public boolean apply (Skeleton skeleton) {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
@@ -227,8 +228,13 @@ public class AnimationState {
 			int timelineCount = current.animation.timelines.size;
 			Object[] timelines = current.animation.timelines.items;
 			if ((i == 0 && mix == 1) || blend == MixBlend.add) {
-				for (int ii = 0; ii < timelineCount; ii++)
-					((Timeline)timelines[ii]).apply(skeleton, animationLast, applyTime, applyEvents, mix, blend, MixDirection.in);
+				for (int ii = 0; ii < timelineCount; ii++) {
+					Object timeline = timelines[ii];
+					if (timeline instanceof AttachmentTimeline)
+						applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, true);
+					else
+						((Timeline)timeline).apply(skeleton, animationLast, applyTime, applyEvents, mix, blend, MixDirection.in);
+				}
 			} else {
 				int[] timelineMode = current.timelineMode.items;
 
@@ -238,11 +244,13 @@ public class AnimationState {
 
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Timeline timeline = (Timeline)timelines[ii];
-					MixBlend timelineBlend = (timelineMode[ii] & NOT_LAST - 1) == SUBSEQUENT ? blend : MixBlend.setup;
+					MixBlend timelineBlend = (timelineMode[ii] & LAST - 1) == SUBSEQUENT ? blend : MixBlend.setup;
 					if (timeline instanceof RotateTimeline) {
 						applyRotateTimeline((RotateTimeline)timeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation,
 							ii << 1, firstFrame);
-					} else
+					} else if (timeline instanceof AttachmentTimeline)
+						applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, blend, true);
+					else
 						timeline.apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend, MixDirection.in);
 				}
 			}
@@ -251,6 +259,20 @@ public class AnimationState {
 			current.nextAnimationLast = animationTime;
 			current.nextTrackLast = current.trackTime;
 		}
+
+		// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
+		// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
+		// the time is before the first key).
+		int setupState = unkeyedState + SETUP;
+		Object[] slots = skeleton.slots.items;
+		for (int i = 0, n = skeleton.slots.size; i < n; i++) {
+			Slot slot = (Slot)slots[i];
+			if (slot.attachmentState == setupState) {
+				String attachmentName = slot.data.attachmentName;
+				slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName));
+			}
+		}
+		unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
 
 		queue.drain();
 		return applied;
@@ -299,14 +321,10 @@ public class AnimationState {
 				MixDirection direction = MixDirection.out;
 				MixBlend timelineBlend;
 				float alpha;
-				switch (timelineMode[i] & NOT_LAST - 1) {
+				switch (timelineMode[i] & LAST - 1) {
 				case SUBSEQUENT:
-					timelineBlend = blend;
-					if (!attachments && timeline instanceof AttachmentTimeline) {
-						if ((timelineMode[i] & NOT_LAST) == NOT_LAST) continue;
-						timelineBlend = MixBlend.setup;
-					}
 					if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+					timelineBlend = blend;
 					alpha = alphaMix;
 					break;
 				case FIRST:
@@ -327,14 +345,14 @@ public class AnimationState {
 				if (timeline instanceof RotateTimeline) {
 					applyRotateTimeline((RotateTimeline)timeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1,
 						firstFrame);
+				} else if (timeline instanceof AttachmentTimeline) {
+					// If not showing attachments: do nothing if this is the last timeline, else apply the timeline so
+					// subsequent timelines see any deform, but don't set attachmentState to CURRENT.
+					if (!attachments && (timelineMode[i] & LAST) != 0) continue;
+					applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, applyTime, timelineBlend, attachments);
 				} else {
-					if (timelineBlend == MixBlend.setup) {
-						if (timeline instanceof AttachmentTimeline) {
-							if (attachments || (timelineMode[i] & NOT_LAST) == NOT_LAST) direction = MixDirection.in;
-						} else if (timeline instanceof DrawOrderTimeline) {
-							if (drawOrder) direction = MixDirection.in;
-						}
-					}
+					if (drawOrder && timeline instanceof DrawOrderTimeline && timelineBlend == MixBlend.setup)
+						direction = MixDirection.in;
 					timeline.apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction);
 				}
 			}
@@ -348,6 +366,34 @@ public class AnimationState {
 		return mix;
 	}
 
+	/** Applies the attachment timeline and sets {@link Slot#attachmentState}.
+	 * @param attachments False when: 1) the attachment timeline is mixing out, 2) mix < attachmentThreshold, and 3) the timeline
+	 *           is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
+	 *           timelines see any deform. */
+	private void applyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, MixBlend blend,
+		boolean attachments) {
+
+		Slot slot = skeleton.slots.get(timeline.slotIndex);
+		if (!slot.bone.active) return;
+
+		float[] frames = timeline.frames;
+		if (time < frames[0]) { // Time is before first frame.
+			if (blend == MixBlend.setup || blend == MixBlend.first)
+				setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+		} else
+			setAttachment(skeleton, slot, timeline.attachmentNames[Animation.search(frames, time)], attachments);
+
+		// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
+		if (slot.attachmentState <= unkeyedState) slot.attachmentState = unkeyedState + SETUP;
+	}
+
+	private void setAttachment (Skeleton skeleton, Slot slot, String attachmentName, boolean attachments) {
+		slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName));
+		if (attachments) slot.attachmentState = unkeyedState + CURRENT;
+	}
+
+	/** Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
+	 * the first time the mixing was applied. */
 	private void applyRotateTimeline (RotateTimeline timeline, Skeleton skeleton, float time, float alpha, MixBlend blend,
 		float[] timelinesRotation, int i, boolean firstFrame) {
 
@@ -766,7 +812,7 @@ public class AnimationState {
 		for (int i = 0; i < timelinesCount; i++) {
 			if (timelines[i] instanceof AttachmentTimeline) {
 				AttachmentTimeline timeline = (AttachmentTimeline)timelines[i];
-				if (!propertyIds.addAll(timeline.getPropertyIds())) timelineMode[i] |= NOT_LAST;
+				if (propertyIds.addAll(timeline.getPropertyIds())) timelineMode[i] |= LAST;
 			}
 		}
 	}
