@@ -9,7 +9,9 @@ namespace UnrealBuildTool.Rules
 		{
             PrivatePCHHeaderFile = "Private/SpinePluginPrivatePCH.h";
 			PCHUsage = PCHUsageMode.UseSharedPCHs;
-			DefaultBuildSettings = BuildSettingsVersion.V1;
+#if UE_4_24_OR_LATER
+            DefaultBuildSettings = BuildSettingsVersion.V1;
+#endif
 
 			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
 			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public/spine-cpp/include"));
