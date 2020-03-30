@@ -78,7 +78,7 @@ public class AnimationState {
 	 * place. */
 	static private final int HOLD_MIX = 3;
 	/** 1) This is the last attachment timeline to set the attachment for a slot.<br>
-	 * Result: Do not apply this timeline when mixing out. Attachment timelines that are not last are applied when mixing out so
+	 * Result: Don't apply this timeline when mixing out. Attachment timelines that are not last are applied when mixing out, so
 	 * any deform timelines are applied and subsequent entries can mix from that deform. */
 	static private final int LAST = 4;
 
@@ -256,7 +256,7 @@ public class AnimationState {
 		}
 
 		// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
-		// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (they are also mixing out or
+		// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
 		// the time is before the first key).
 		int setupState = unkeyedState + SETUP;
 		Object[] slots = skeleton.slots.items;
@@ -267,7 +267,7 @@ public class AnimationState {
 				slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName));
 			}
 		}
-		unkeyedState += 2;
+		unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
 
 		queue.drain();
 		return applied;
