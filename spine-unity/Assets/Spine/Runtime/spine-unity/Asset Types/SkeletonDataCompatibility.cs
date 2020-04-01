@@ -30,7 +30,10 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+#if UNITY_EDITOR
 using System.Globalization;
+using System.Text.RegularExpressions;
+#endif
 
 namespace Spine.Unity {
 
@@ -41,6 +44,7 @@ namespace Spine.Unity {
 		static readonly int[][] compatibleJsonVersions = { new[] { 3, 8, 0 } };
 
 		static bool wasVersionDialogShown = false;
+		static readonly Regex jsonVersionRegex = new Regex(@"""spine""\s*:\s*""([^""]+)""", RegexOptions.CultureInvariant);
 	#endif
 
 		public enum SourceType {
@@ -92,23 +96,29 @@ namespace Spine.Unity {
 				}
 			}
 			else {
-				object obj = Json.Deserialize(new StringReader(asset.text));
-				if (obj == null) {
-					Debug.LogErrorFormat("'{0}' is not valid JSON.", asset.name);
-					return null;
+				Match match = jsonVersionRegex.Match(asset.text);
+				if (match != null) {
+					fileVersion.rawVersion = match.Groups[1].Value;
 				}
+				else {
+					object obj = Json.Deserialize(new StringReader(asset.text));
+					if (obj == null) {
+						Debug.LogErrorFormat("'{0}' is not valid JSON.", asset.name);
+						return null;
+					}
 
-				var root = obj as Dictionary<string, object>;
-				if (root == null) {
-					Debug.LogErrorFormat("'{0}' is not compatible JSON. Parser returned an incorrect type while parsing version info.", asset.name);
-					return null;
-				}
+					var root = obj as Dictionary<string, object>;
+					if (root == null) {
+						Debug.LogErrorFormat("'{0}' is not compatible JSON. Parser returned an incorrect type while parsing version info.", asset.name);
+						return null;
+					}
 
-				if (root.ContainsKey("skeleton")) {
-					var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
-					object jv;
-					skeletonInfo.TryGetValue("spine", out jv);
-					fileVersion.rawVersion = jv as string;
+					if (root.ContainsKey("skeleton")) {
+						var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
+						object jv;
+						skeletonInfo.TryGetValue("spine", out jv);
+						fileVersion.rawVersion = jv as string;
+					}
 				}
 			}
 
