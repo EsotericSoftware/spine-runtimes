@@ -57,15 +57,15 @@ public class SkeletonBounds {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxes;
 		Array<FloatArray> polygons = this.polygons;
-		Array<Slot> slots = skeleton.slots;
-		int slotCount = slots.size;
+		Object[]  slots = skeleton.slots.items;
+		int slotCount = skeleton.slots.size;
 
 		boundingBoxes.clear();
 		polygonPool.freeAll(polygons);
 		polygons.clear();
 
 		for (int i = 0; i < slotCount; i++) {
-			Slot slot = slots.get(i);
+			Slot slot = (Slot)slots[i];
 			if (!slot.bone.active) continue;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof BoundingBoxAttachment) {
@@ -91,9 +91,9 @@ public class SkeletonBounds {
 
 	private void aabbCompute () {
 		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
-		Array<FloatArray> polygons = this.polygons;
-		for (int i = 0, n = polygons.size; i < n; i++) {
-			FloatArray polygon = polygons.get(i);
+		Object[] polygons = this.polygons.items;
+		for (int i = 0, n = this.polygons.size; i < n; i++) {
+			FloatArray polygon = (FloatArray)polygons[i];
 			float[] vertices = polygon.items;
 			for (int ii = 0, nn = polygon.size; ii < nn; ii += 2) {
 				float x = vertices[ii];
@@ -145,9 +145,9 @@ public class SkeletonBounds {
 	 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
 	@Null
 	public BoundingBoxAttachment containsPoint (float x, float y) {
-		Array<FloatArray> polygons = this.polygons;
-		for (int i = 0, n = polygons.size; i < n; i++)
-			if (containsPoint(polygons.get(i), x, y)) return boundingBoxes.get(i);
+		Object[] polygons = this.polygons.items;
+		for (int i = 0, n = this.polygons.size; i < n; i++)
+			if (containsPoint((FloatArray)polygons[i], x, y)) return boundingBoxes.get(i);
 		return null;
 	}
 
@@ -176,9 +176,9 @@ public class SkeletonBounds {
 	 * true. */
 	@Null
 	public BoundingBoxAttachment intersectsSegment (float x1, float y1, float x2, float y2) {
-		Array<FloatArray> polygons = this.polygons;
-		for (int i = 0, n = polygons.size; i < n; i++)
-			if (intersectsSegment(polygons.get(i), x1, y1, x2, y2)) return boundingBoxes.get(i);
+		Object[] polygons = this.polygons.items;
+		for (int i = 0, n = this.polygons.size; i < n; i++)
+			if (intersectsSegment((FloatArray)polygons[i], x1, y1, x2, y2)) return boundingBoxes.get(i);
 		return null;
 	}
 

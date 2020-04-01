@@ -70,9 +70,9 @@ public class SkeletonData {
 	@Null
 	public BoneData findBone (String boneName) {
 		if (boneName == null) throw new IllegalArgumentException("boneName cannot be null.");
-		Array<BoneData> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++) {
-			BoneData bone = bones.get(i);
+		Object[] bones = this.bones.items;
+		for (int i = 0, n = this.bones.size; i < n; i++) {
+			BoneData bone = (BoneData)bones[i];
 			if (bone.name.equals(boneName)) return bone;
 		}
 		return null;
@@ -90,9 +90,9 @@ public class SkeletonData {
 	@Null
 	public SlotData findSlot (String slotName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
-		Array<SlotData> slots = this.slots;
-		for (int i = 0, n = slots.size; i < n; i++) {
-			SlotData slot = slots.get(i);
+		Object[] slots = this.slots.items;
+		for (int i = 0, n = this.slots.size; i < n; i++) {
+			SlotData slot = (SlotData)slots[i];
 			if (slot.name.equals(slotName)) return slot;
 		}
 		return null;
@@ -156,9 +156,9 @@ public class SkeletonData {
 	@Null
 	public Animation findAnimation (String animationName) {
 		if (animationName == null) throw new IllegalArgumentException("animationName cannot be null.");
-		Array<Animation> animations = this.animations;
-		for (int i = 0, n = animations.size; i < n; i++) {
-			Animation animation = animations.get(i);
+		Object[] animations = this.animations.items;
+		for (int i = 0, n = this.animations.size; i < n; i++) {
+			Animation animation = (Animation)animations[i];
 			if (animation.name.equals(animationName)) return animation;
 		}
 		return null;
@@ -176,9 +176,9 @@ public class SkeletonData {
 	@Null
 	public IkConstraintData findIkConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
-		Array<IkConstraintData> ikConstraints = this.ikConstraints;
-		for (int i = 0, n = ikConstraints.size; i < n; i++) {
-			IkConstraintData constraint = ikConstraints.get(i);
+		Object[] ikConstraints = this.ikConstraints.items;
+		for (int i = 0, n = this.ikConstraints.size; i < n; i++) {
+			IkConstraintData constraint = (IkConstraintData)ikConstraints[i];
 			if (constraint.name.equals(constraintName)) return constraint;
 		}
 		return null;
@@ -196,9 +196,9 @@ public class SkeletonData {
 	@Null
 	public TransformConstraintData findTransformConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
-		Array<TransformConstraintData> transformConstraints = this.transformConstraints;
-		for (int i = 0, n = transformConstraints.size; i < n; i++) {
-			TransformConstraintData constraint = transformConstraints.get(i);
+		Object[] transformConstraints = this.transformConstraints.items;
+		for (int i = 0, n = this.transformConstraints.size; i < n; i++) {
+			TransformConstraintData constraint = (TransformConstraintData)transformConstraints[i];
 			if (constraint.name.equals(constraintName)) return constraint;
 		}
 		return null;
@@ -216,9 +216,9 @@ public class SkeletonData {
 	@Null
 	public PathConstraintData findPathConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
-		Array<PathConstraintData> pathConstraints = this.pathConstraints;
-		for (int i = 0, n = pathConstraints.size; i < n; i++) {
-			PathConstraintData constraint = pathConstraints.get(i);
+		Object[] pathConstraints = this.pathConstraints.items;
+		for (int i = 0, n = this.pathConstraints.size; i < n; i++) {
+			PathConstraintData constraint = (PathConstraintData)pathConstraints[i];
 			if (constraint.name.equals(constraintName)) return constraint;
 		}
 		return null;

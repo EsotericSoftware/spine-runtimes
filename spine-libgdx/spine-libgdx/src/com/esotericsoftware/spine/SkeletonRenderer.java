@@ -34,7 +34,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.NumberUtils;
@@ -89,9 +88,9 @@ public class SkeletonRenderer {
 		float[] vertices = this.vertices.items;
 		Color skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
-		Array<Slot> drawOrder = skeleton.drawOrder;
-		for (int i = 0, n = drawOrder.size; i < n; i++) {
-			Slot slot = drawOrder.get(i);
+		Object[] drawOrder = skeleton.drawOrder.items;
+		for (int i = 0, n = skeleton.drawOrder.size; i < n; i++) {
+			Slot slot = (Slot)drawOrder[i];
 			if (!slot.bone.active) continue;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
@@ -167,9 +166,9 @@ public class SkeletonRenderer {
 		short[] triangles = null;
 		Color color = null, skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
-		Array<Slot> drawOrder = skeleton.drawOrder;
-		for (int i = 0, n = drawOrder.size; i < n; i++) {
-			Slot slot = drawOrder.get(i);
+		Object[] drawOrder = skeleton.drawOrder.items;
+		for (int i = 0, n = skeleton.drawOrder.size; i < n; i++) {
+			Slot slot = (Slot)drawOrder[i];
 			if (!slot.bone.active) continue;
 			Texture texture = null;
 			int vertexSize = clipper.isClipping() ? 2 : 5;
@@ -290,9 +289,9 @@ public class SkeletonRenderer {
 		short[] triangles = null;
 		Color color = null, skeletonColor = skeleton.color;
 		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
-		Array<Slot> drawOrder = skeleton.drawOrder;
-		for (int i = 0, n = drawOrder.size; i < n; i++) {
-			Slot slot = drawOrder.get(i);
+		Object[] drawOrder = skeleton.drawOrder.items;
+		for (int i = 0, n = skeleton.drawOrder.size; i < n; i++) {
+			Slot slot = (Slot)drawOrder[i];
 			if (!slot.bone.active) continue;
 			Texture texture = null;
 			int vertexSize = clipper.isClipping() ? 2 : 6;

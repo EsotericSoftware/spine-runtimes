@@ -66,8 +66,9 @@ public class Animation {
 		this.timelines = timelines;
 
 		timelineIds.clear();
+		Object[] items = timelines.items;
 		for (int i = 0, n = timelines.size; i < n; i++)
-			timelineIds.addAll(timelines.get(i).getPropertyIds());
+			timelineIds.addAll(((Timeline)items[i]).getPropertyIds());
 	}
 
 	/** Returns true if this animation contains a timeline with any of the specified property IDs. */
@@ -1361,25 +1362,25 @@ public class Animation {
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
-			Array<Slot> drawOrder = skeleton.drawOrder;
-			Array<Slot> slots = skeleton.slots;
+			Object[] drawOrder = skeleton.drawOrder.items;
 			if (direction == out) {
-				if (blend == setup) arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
+				if (blend == setup) arraycopy(skeleton.slots.items, 0, drawOrder, 0, skeleton.slots.size);
 				return;
 			}
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				if (blend == setup || blend == first) arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
+				if (blend == setup || blend == first) arraycopy(skeleton.slots.items, 0, drawOrder, 0, skeleton.slots.size);
 				return;
 			}
 
 			int[] drawOrderToSetupIndex = drawOrders[search(frames, time)];
 			if (drawOrderToSetupIndex == null)
-				arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
+				arraycopy(skeleton.slots.items, 0, drawOrder, 0, skeleton.slots.size);
 			else {
+				Object[] slots = skeleton.slots.items;
 				for (int i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
-					drawOrder.set(i, slots.get(drawOrderToSetupIndex[i]));
+					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
 			}
 		}
 	}

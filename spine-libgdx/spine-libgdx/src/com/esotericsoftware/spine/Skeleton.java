@@ -68,22 +68,23 @@ public class Skeleton {
 		this.data = data;
 
 		bones = new Array(data.bones.size);
+		Object[] bones = this.bones.items;
 		for (BoneData boneData : data.bones) {
 			Bone bone;
 			if (boneData.parent == null)
 				bone = new Bone(boneData, this, null);
 			else {
-				Bone parent = bones.get(boneData.parent.index);
+				Bone parent = (Bone)bones[boneData.parent.index];
 				bone = new Bone(boneData, this, parent);
 				parent.children.add(bone);
 			}
-			bones.add(bone);
+			this.bones.add(bone);
 		}
 
 		slots = new Array(data.slots.size);
 		drawOrder = new Array(data.slots.size);
 		for (SlotData slotData : data.slots) {
-			Bone bone = bones.get(slotData.boneData.index);
+			Bone bone = (Bone)bones[slotData.boneData.index];
 			Slot slot = new Slot(slotData, bone);
 			slots.add(slot);
 			drawOrder.add(slot);
@@ -253,17 +254,17 @@ public class Skeleton {
 		Attachment attachment = slot.attachment;
 		if (attachment instanceof PathAttachment) sortPathConstraintAttachment(attachment, slotBone);
 
-		Array<Bone> constrained = constraint.bones;
-		int boneCount = constrained.size;
+		Object[] constrained = constraint.bones.items;
+		int boneCount = constraint.bones.size;
 		for (int i = 0; i < boneCount; i++)
-			sortBone(constrained.get(i));
+			sortBone((Bone)constrained[i]);
 
 		updateCache.add(constraint);
 
 		for (int i = 0; i < boneCount; i++)
-			sortReset(constrained.get(i).children);
+			sortReset(((Bone)constrained[i]).children);
 		for (int i = 0; i < boneCount; i++)
-			constrained.get(i).sorted = true;
+			((Bone)constrained[i]).sorted = true;
 	}
 
 	private void sortTransformConstraint (TransformConstraint constraint) {
@@ -273,25 +274,25 @@ public class Skeleton {
 
 		sortBone(constraint.target);
 
-		Array<Bone> constrained = constraint.bones;
-		int boneCount = constrained.size;
+		Object[] constrained = constraint.bones.items;
+		int boneCount = constraint.bones.size;
 		if (constraint.data.local) {
 			for (int i = 0; i < boneCount; i++) {
-				Bone child = constrained.get(i);
+				Bone child = (Bone)constrained[i];
 				sortBone(child.parent);
 				if (!updateCache.contains(child, true)) updateCacheReset.add(child);
 			}
 		} else {
 			for (int i = 0; i < boneCount; i++)
-				sortBone(constrained.get(i));
+				sortBone((Bone)constrained[i]);
 		}
 
 		updateCache.add(constraint);
 
 		for (int i = 0; i < boneCount; i++)
-			sortReset(constrained.get(i).children);
+			sortReset(((Bone)constrained[i]).children);
 		for (int i = 0; i < boneCount; i++)
-			constrained.get(i).sorted = true;
+			((Bone)constrained[i]).sorted = true;
 	}
 
 	private void sortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
@@ -308,12 +309,12 @@ public class Skeleton {
 		if (pathBones == null)
 			sortBone(slotBone);
 		else {
-			Array<Bone> bones = this.bones;
+			Object[] bones = this.bones.items;
 			for (int i = 0, n = pathBones.length; i < n;) {
 				int nn = pathBones[i++];
 				nn += i;
 				while (i < nn)
-					sortBone(bones.get(pathBones[i++]));
+					sortBone((Bone)bones[pathBones[i++]]);
 			}
 		}
 	}
@@ -327,8 +328,9 @@ public class Skeleton {
 	}
 
 	private void sortReset (Array<Bone> bones) {
+		Object[] items = bones.items;
 		for (int i = 0, n = bones.size; i < n; i++) {
-			Bone bone = bones.get(i);
+			Bone bone = (Bone)items[i];
 			if (!bone.active) continue;
 			if (bone.sorted) sortReset(bone.children);
 			bone.sorted = false;
@@ -343,9 +345,9 @@ public class Skeleton {
 		// This partial update avoids computing the world transform for constrained bones when 1) the bone is not updated
 		// before the constraint, 2) the constraint only needs to access the applied local transform, and 3) the constraint calls
 		// updateWorldTransform.
-		Array<Bone> updateCacheReset = this.updateCacheReset;
-		for (int i = 0, n = updateCacheReset.size; i < n; i++) {
-			Bone bone = updateCacheReset.get(i);
+		Object[] updateCacheReset = this.updateCacheReset.items;
+		for (int i = 0, n = this.updateCacheReset.size; i < n; i++) {
+			Bone bone = (Bone)updateCacheReset[i];
 			bone.ax = bone.x;
 			bone.ay = bone.y;
 			bone.arotation = bone.rotation;
@@ -355,9 +357,9 @@ public class Skeleton {
 			bone.ashearY = bone.shearY;
 			bone.appliedValid = true;
 		}
-		Array<Updatable> updateCache = this.updateCache;
-		for (int i = 0, n = updateCache.size; i < n; i++)
-			updateCache.get(i).update();
+		Object[] updateCache = this.updateCache.items;
+		for (int i = 0, n = this.updateCache.size; i < n; i++)
+			((Updatable)updateCache[i]).update();
 	}
 
 	/** Temporarily sets the root bone as a child of the specified bone, then updates the world transform for each bone and applies
@@ -367,12 +369,13 @@ public class Skeleton {
 	 * Runtimes Guide. */
 	public void updateWorldTransform (Bone parent) {
 		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
-		// This partial update avoids computing the world transform for constrained bones when 1) the bone is not updated
-		// before the constraint, 2) the constraint only needs to access the applied local transform, and 3) the constraint calls
-		// updateWorldTransform.
-		Array<Bone> updateCacheReset = this.updateCacheReset;
-		for (int i = 0, n = updateCacheReset.size; i < n; i++) {
-			Bone bone = updateCacheReset.get(i);
+		// This partial update avoids computing the world transform for constrained bones when:
+		// 1) the bone is not updated before the constraint,
+		// 2) the constraint only needs to access the applied local transform, and
+		// 3) the constraint calls updateWorldTransform.
+		Object[] updateCacheReset = this.updateCacheReset.items;
+		for (int i = 0, n = this.updateCacheReset.size; i < n; i++) {
+			Bone bone = (Bone)updateCacheReset[i];
 			bone.ax = bone.x;
 			bone.ay = bone.y;
 			bone.arotation = bone.rotation;
@@ -400,9 +403,9 @@ public class Skeleton {
 		rootBone.d = (pc * lb + pd * ld) * scaleY;
 
 		// Update everything except root bone.
-		Array<Updatable> updateCache = this.updateCache;
-		for (int i = 0, n = updateCache.size; i < n; i++) {
-			Updatable updatable = updateCache.get(i);
+		Object[] updateCache = this.updateCache.items;
+		for (int i = 0, n = this.updateCache.size; i < n; i++) {
+			Updatable updatable = (Updatable)updateCache[i];
 			if (updatable != rootBone) updatable.update();
 		}
 	}
@@ -415,13 +418,13 @@ public class Skeleton {
 
 	/** Sets the bones and constraints to their setup pose values. */
 	public void setBonesToSetupPose () {
-		Array<Bone> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++)
-			bones.get(i).setToSetupPose();
+		Object[] bones = this.bones.items;
+		for (int i = 0, n = this.bones.size; i < n; i++)
+			((Bone)bones[i]).setToSetupPose();
 
-		Array<IkConstraint> ikConstraints = this.ikConstraints;
-		for (int i = 0, n = ikConstraints.size; i < n; i++) {
-			IkConstraint constraint = ikConstraints.get(i);
+		Object[] ikConstraints = this.ikConstraints.items;
+		for (int i = 0, n = this.ikConstraints.size; i < n; i++) {
+			IkConstraint constraint = (IkConstraint)ikConstraints[i];
 			constraint.mix = constraint.data.mix;
 			constraint.softness = constraint.data.softness;
 			constraint.bendDirection = constraint.data.bendDirection;
@@ -429,9 +432,9 @@ public class Skeleton {
 			constraint.stretch = constraint.data.stretch;
 		}
 
-		Array<TransformConstraint> transformConstraints = this.transformConstraints;
-		for (int i = 0, n = transformConstraints.size; i < n; i++) {
-			TransformConstraint constraint = transformConstraints.get(i);
+		Object[] transformConstraints = this.transformConstraints.items;
+		for (int i = 0, n = this.transformConstraints.size; i < n; i++) {
+			TransformConstraint constraint = (TransformConstraint)transformConstraints[i];
 			TransformConstraintData data = constraint.data;
 			constraint.rotateMix = data.rotateMix;
 			constraint.translateMix = data.translateMix;
@@ -439,9 +442,9 @@ public class Skeleton {
 			constraint.shearMix = data.shearMix;
 		}
 
-		Array<PathConstraint> pathConstraints = this.pathConstraints;
-		for (int i = 0, n = pathConstraints.size; i < n; i++) {
-			PathConstraint constraint = pathConstraints.get(i);
+		Object[] pathConstraints = this.pathConstraints.items;
+		for (int i = 0, n = this.pathConstraints.size; i < n; i++) {
+			PathConstraint constraint = (PathConstraint)pathConstraints[i];
 			PathConstraintData data = constraint.data;
 			constraint.position = data.position;
 			constraint.spacing = data.spacing;
@@ -452,10 +455,11 @@ public class Skeleton {
 
 	/** Sets the slots and draw order to their setup pose values. */
 	public void setSlotsToSetupPose () {
-		Array<Slot> slots = this.slots;
-		arraycopy(slots.items, 0, drawOrder.items, 0, slots.size);
-		for (int i = 0, n = slots.size; i < n; i++)
-			slots.get(i).setToSetupPose();
+		Object[] slots = this.slots.items;
+		int n = this.slots.size;
+		arraycopy(slots, 0, drawOrder.items, 0, n);
+		for (int i = 0; i < n; i++)
+			((Slot)slots[i]).setToSetupPose();
 	}
 
 	/** The skeleton's setup pose data. */
@@ -483,9 +487,9 @@ public class Skeleton {
 	@Null
 	public Bone findBone (String boneName) {
 		if (boneName == null) throw new IllegalArgumentException("boneName cannot be null.");
-		Array<Bone> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++) {
-			Bone bone = bones.get(i);
+		Object[] bones = this.bones.items;
+		for (int i = 0, n = this.bones.size; i < n; i++) {
+			Bone bone = (Bone)bones[i];
 			if (bone.data.name.equals(boneName)) return bone;
 		}
 		return null;
@@ -501,9 +505,9 @@ public class Skeleton {
 	@Null
 	public Slot findSlot (String slotName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
-		Array<Slot> slots = this.slots;
-		for (int i = 0, n = slots.size; i < n; i++) {
-			Slot slot = slots.get(i);
+		Object[] slots = this.slots.items;
+		for (int i = 0, n = this.slots.size; i < n; i++) {
+			Slot slot = (Slot)slots[i];
 			if (slot.data.name.equals(slotName)) return slot;
 		}
 		return null;
@@ -550,9 +554,9 @@ public class Skeleton {
 			if (skin != null)
 				newSkin.attachAll(this, skin);
 			else {
-				Array<Slot> slots = this.slots;
-				for (int i = 0, n = slots.size; i < n; i++) {
-					Slot slot = slots.get(i);
+				Object[] slots = this.slots.items;
+				for (int i = 0, n = this.slots.size; i < n; i++) {
+					Slot slot = (Slot)slots[i];
 					String name = slot.data.attachmentName;
 					if (name != null) {
 						Attachment attachment = newSkin.getAttachment(i, name);
@@ -617,9 +621,9 @@ public class Skeleton {
 	@Null
 	public IkConstraint findIkConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
-		Array<IkConstraint> ikConstraints = this.ikConstraints;
-		for (int i = 0, n = ikConstraints.size; i < n; i++) {
-			IkConstraint ikConstraint = ikConstraints.get(i);
+		Object[] ikConstraints = this.ikConstraints.items;
+		for (int i = 0, n = this.ikConstraints.size; i < n; i++) {
+			IkConstraint ikConstraint = (IkConstraint)ikConstraints[i];
 			if (ikConstraint.data.name.equals(constraintName)) return ikConstraint;
 		}
 		return null;
@@ -635,9 +639,9 @@ public class Skeleton {
 	@Null
 	public TransformConstraint findTransformConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
-		Array<TransformConstraint> transformConstraints = this.transformConstraints;
-		for (int i = 0, n = transformConstraints.size; i < n; i++) {
-			TransformConstraint constraint = transformConstraints.get(i);
+		Object[] transformConstraints = this.transformConstraints.items;
+		for (int i = 0, n = this.transformConstraints.size; i < n; i++) {
+			TransformConstraint constraint = (TransformConstraint)transformConstraints[i];
 			if (constraint.data.name.equals(constraintName)) return constraint;
 		}
 		return null;
@@ -653,9 +657,9 @@ public class Skeleton {
 	@Null
 	public PathConstraint findPathConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
-		Array<PathConstraint> pathConstraints = this.pathConstraints;
-		for (int i = 0, n = pathConstraints.size; i < n; i++) {
-			PathConstraint constraint = pathConstraints.get(i);
+		Object[] pathConstraints = this.pathConstraints.items;
+		for (int i = 0, n = this.pathConstraints.size; i < n; i++) {
+			PathConstraint constraint = (PathConstraint)pathConstraints[i];
 			if (constraint.data.name.equals(constraintName)) return constraint;
 		}
 		return null;
@@ -669,10 +673,10 @@ public class Skeleton {
 		if (offset == null) throw new IllegalArgumentException("offset cannot be null.");
 		if (size == null) throw new IllegalArgumentException("size cannot be null.");
 		if (temp == null) throw new IllegalArgumentException("temp cannot be null.");
-		Array<Slot> drawOrder = this.drawOrder;
+		Object[] drawOrder = this.drawOrder.items;
 		float minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
-		for (int i = 0, n = drawOrder.size; i < n; i++) {
-			Slot slot = drawOrder.get(i);
+		for (int i = 0, n = this.drawOrder.size; i < n; i++) {
+			Slot slot = (Slot)drawOrder[i];
 			if (!slot.bone.active) continue;
 			int verticesLength = 0;
 			float[] vertices = null;

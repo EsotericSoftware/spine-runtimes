@@ -86,13 +86,13 @@ public class IkConstraint implements Updatable {
 
 	public void update () {
 		Bone target = this.target;
-		Array<Bone> bones = this.bones;
-		switch (bones.size) {
+		Object[] bones = this.bones.items;
+		switch (this.bones.size) {
 		case 1:
-			apply(bones.first(), target.worldX, target.worldY, compress, stretch, data.uniform, mix);
+			apply((Bone)bones[0], target.worldX, target.worldY, compress, stretch, data.uniform, mix);
 			break;
 		case 2:
-			apply(bones.first(), bones.get(1), target.worldX, target.worldY, bendDirection, stretch, softness, mix);
+			apply((Bone)bones[0], (Bone)bones[1], target.worldX, target.worldY, bendDirection, stretch, softness, mix);
 			break;
 		}
 	}

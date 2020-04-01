@@ -316,8 +316,9 @@ public class SkeletonJson {
 		}
 
 		// Linked meshes.
+		Object[] items = linkedMeshes.items;
 		for (int i = 0, n = linkedMeshes.size; i < n; i++) {
-			LinkedMesh linkedMesh = linkedMeshes.get(i);
+			LinkedMesh linkedMesh = (LinkedMesh)items[i];
 			Skin skin = linkedMesh.skin == null ? skeletonData.getDefaultSkin() : skeletonData.findSkin(linkedMesh.skin);
 			if (skin == null) throw new SerializationException("Skin not found: " + linkedMesh.skin);
 			Attachment parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
@@ -845,8 +846,9 @@ public class SkeletonJson {
 
 		timelines.shrink();
 		float duration = 0;
+		Object[] items = timelines.items;
 		for (int i = 0, n = timelines.size; i < n; i++)
-			duration = Math.max(duration, timelines.get(i).getDuration());
+			duration = Math.max(duration, ((Timeline)items[i]).getDuration());
 		skeletonData.animations.add(new Animation(name, timelines, duration));
 	}
 

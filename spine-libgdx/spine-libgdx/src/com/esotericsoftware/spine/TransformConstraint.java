@@ -97,14 +97,14 @@ public class TransformConstraint implements Updatable {
 
 	private void applyAbsoluteWorld () {
 		float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
+		if (rotateMix == 0 && translateMix == 0 && scaleMix == 0 && shearMix == 0) return;
 		Bone target = this.target;
 		float ta = target.a, tb = target.b, tc = target.c, td = target.d;
 		float degRadReflect = ta * td - tb * tc > 0 ? degRad : -degRad;
 		float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
-		Array<Bone> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++) {
-			Bone bone = bones.get(i);
-			boolean modified = false;
+		Object[] bones = this.bones.items;
+		for (int i = 0, n = this.bones.size; i < n; i++) {
+			Bone bone = (Bone)bones[i];
 
 			if (rotateMix != 0) {
 				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
@@ -118,7 +118,6 @@ public class TransformConstraint implements Updatable {
 				bone.b = cos * b - sin * d;
 				bone.c = sin * a + cos * c;
 				bone.d = sin * b + cos * d;
-				modified = true;
 			}
 
 			if (translateMix != 0) {
@@ -126,7 +125,6 @@ public class TransformConstraint implements Updatable {
 				target.localToWorld(temp.set(data.offsetX, data.offsetY));
 				bone.worldX += (temp.x - bone.worldX) * translateMix;
 				bone.worldY += (temp.y - bone.worldY) * translateMix;
-				modified = true;
 			}
 
 			if (scaleMix > 0) {
@@ -138,7 +136,6 @@ public class TransformConstraint implements Updatable {
 				if (s != 0) s = (s + ((float)Math.sqrt(tb * tb + td * td) - s + data.offsetScaleY) * scaleMix) / s;
 				bone.b *= s;
 				bone.d *= s;
-				modified = true;
 			}
 
 			if (shearMix > 0) {
@@ -152,23 +149,22 @@ public class TransformConstraint implements Updatable {
 				float s = (float)Math.sqrt(b * b + d * d);
 				bone.b = cos(r) * s;
 				bone.d = sin(r) * s;
-				modified = true;
 			}
 
-			if (modified) bone.appliedValid = false;
+			bone.appliedValid = false;
 		}
 	}
 
 	private void applyRelativeWorld () {
 		float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
+		if (rotateMix == 0 && translateMix == 0 && scaleMix == 0 && shearMix == 0) return;
 		Bone target = this.target;
 		float ta = target.a, tb = target.b, tc = target.c, td = target.d;
 		float degRadReflect = ta * td - tb * tc > 0 ? degRad : -degRad;
 		float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
-		Array<Bone> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++) {
-			Bone bone = bones.get(i);
-			boolean modified = false;
+		Object[] bones = this.bones.items;
+		for (int i = 0, n = this.bones.size; i < n; i++) {
+			Bone bone = (Bone)bones[i];
 
 			if (rotateMix != 0) {
 				float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
@@ -182,7 +178,6 @@ public class TransformConstraint implements Updatable {
 				bone.b = cos * b - sin * d;
 				bone.c = sin * a + cos * c;
 				bone.d = sin * b + cos * d;
-				modified = true;
 			}
 
 			if (translateMix != 0) {
@@ -190,7 +185,6 @@ public class TransformConstraint implements Updatable {
 				target.localToWorld(temp.set(data.offsetX, data.offsetY));
 				bone.worldX += temp.x * translateMix;
 				bone.worldY += temp.y * translateMix;
-				modified = true;
 			}
 
 			if (scaleMix > 0) {
@@ -200,7 +194,6 @@ public class TransformConstraint implements Updatable {
 				s = ((float)Math.sqrt(tb * tb + td * td) - 1 + data.offsetScaleY) * scaleMix + 1;
 				bone.b *= s;
 				bone.d *= s;
-				modified = true;
 			}
 
 			if (shearMix > 0) {
@@ -213,10 +206,9 @@ public class TransformConstraint implements Updatable {
 				float s = (float)Math.sqrt(b * b + d * d);
 				bone.b = cos(r) * s;
 				bone.d = sin(r) * s;
-				modified = true;
 			}
 
-			if (modified) bone.appliedValid = false;
+			bone.appliedValid = false;
 		}
 	}
 
@@ -224,9 +216,9 @@ public class TransformConstraint implements Updatable {
 		float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
 		Bone target = this.target;
 		if (!target.appliedValid) target.updateAppliedTransform();
-		Array<Bone> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++) {
-			Bone bone = bones.get(i);
+		Object[] bones = this.bones.items;
+		for (int i = 0, n = this.bones.size; i < n; i++) {
+			Bone bone = (Bone)bones[i];
 			if (!bone.appliedValid) bone.updateAppliedTransform();
 
 			float rotation = bone.arotation;
@@ -263,9 +255,9 @@ public class TransformConstraint implements Updatable {
 		float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
 		Bone target = this.target;
 		if (!target.appliedValid) target.updateAppliedTransform();
-		Array<Bone> bones = this.bones;
-		for (int i = 0, n = bones.size; i < n; i++) {
-			Bone bone = bones.get(i);
+		Object[] bones = this.bones.items;
+		for (int i = 0, n = this.bones.size; i < n; i++) {
+			Bone bone = (Bone)bones[i];
 			if (!bone.appliedValid) bone.updateAppliedTransform();
 
 			float rotation = bone.arotation;

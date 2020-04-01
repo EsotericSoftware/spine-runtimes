@@ -146,9 +146,10 @@ public class Skin {
 
 	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
 	void attachAll (Skeleton skeleton, Skin oldSkin) {
+		Object[] slots = skeleton.slots.items;
 		for (SkinEntry entry : oldSkin.attachments.orderedItems()) {
 			int slotIndex = entry.slotIndex;
-			Slot slot = skeleton.slots.get(slotIndex);
+			Slot slot = (Slot)slots[slotIndex];
 			if (slot.attachment == entry.attachment) {
 				Attachment attachment = getAttachment(slotIndex, entry.name);
 				if (attachment != null) slot.setAttachment(attachment);

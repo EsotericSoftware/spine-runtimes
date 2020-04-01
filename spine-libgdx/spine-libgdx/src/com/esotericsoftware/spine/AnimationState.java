@@ -112,8 +112,9 @@ public class AnimationState {
 	/** Increments each track entry {@link TrackEntry#getTrackTime()}, setting queued animations as current if needed. */
 	public void update (float delta) {
 		delta *= timeScale;
-		for (int i = 0, n = tracks.size; i < n; i++) {
-			TrackEntry current = tracks.get(i);
+		Object[] tracks = this.tracks.items;
+		for (int i = 0, n = this.tracks.size; i < n; i++) {
+			TrackEntry current = (TrackEntry)tracks[i];
 			if (current == null) continue;
 
 			current.animationLast = current.nextAnimationLast;
@@ -145,7 +146,7 @@ public class AnimationState {
 				}
 			} else if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
 				// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
-				tracks.set(i, null);
+				tracks[i] = null;
 				queue.end(current);
 				disposeNext(current);
 				continue;
@@ -203,8 +204,9 @@ public class AnimationState {
 
 		Array<Event> events = this.events;
 		boolean applied = false;
-		for (int i = 0, n = tracks.size; i < n; i++) {
-			TrackEntry current = tracks.get(i);
+		Object[] tracks = this.tracks.items;
+		for (int i = 0, n = this.tracks.size; i < n; i++) {
+			TrackEntry current = (TrackEntry)tracks[i];
 			if (current == null || current.delay > 0) continue;
 			applied = true;
 
@@ -459,10 +461,10 @@ public class AnimationState {
 		float trackLastWrapped = entry.trackLast % duration;
 
 		// Queue events before complete.
-		Array<Event> events = this.events;
-		int i = 0, n = events.size;
+		Object[] events = this.events.items;
+		int i = 0, n = this.events.size;
 		for (; i < n; i++) {
-			Event event = events.get(i);
+			Event event = (Event)events[i];
 			if (event.time < trackLastWrapped) break;
 			if (event.time > animationEnd) continue; // Discard events outside animation start/end.
 			queue.event(entry, event);
@@ -478,9 +480,9 @@ public class AnimationState {
 
 		// Queue events after complete.
 		for (; i < n; i++) {
-			Event event = events.get(i);
+			Event event = (Event)events[i];
 			if (event.time < animationStart) continue; // Discard events outside animation start/end.
-			queue.event(entry, events.get(i));
+			queue.event(entry, event);
 		}
 	}
 
@@ -681,8 +683,9 @@ public class AnimationState {
 	public void setEmptyAnimations (float mixDuration) {
 		boolean oldDrainDisabled = queue.drainDisabled;
 		queue.drainDisabled = true;
-		for (int i = 0, n = tracks.size; i < n; i++) {
-			TrackEntry current = tracks.get(i);
+		Object[] tracks = this.tracks.items;
+		for (int i = 0, n = this.tracks.size; i < n; i++) {
+			TrackEntry current = (TrackEntry)tracks[i];
 			if (current != null) setEmptyAnimation(current.trackIndex, mixDuration);
 		}
 		queue.drainDisabled = oldDrainDisabled;
@@ -740,8 +743,10 @@ public class AnimationState {
 
 		// Process in the order that animations are applied.
 		propertyIds.clear(2048);
-		for (int i = 0, n = tracks.size; i < n; i++) {
-			TrackEntry entry = tracks.get(i);
+		int n = tracks.size;
+		Object[] tracks = this.tracks.items;
+		for (int i = 0; i < n; i++) {
+			TrackEntry entry = (TrackEntry)tracks[i];
 			if (entry == null) continue;
 			while (entry.mixingFrom != null) // Move to last entry, then iterate in reverse.
 				entry = entry.mixingFrom;
@@ -753,8 +758,8 @@ public class AnimationState {
 
 		// Process in the reverse order that animations are applied.
 		propertyIds.clear(2048);
-		for (int i = tracks.size - 1; i >= 0; i--) {
-			TrackEntry entry = tracks.get(i);
+		for (int i = n - 1; i >= 0; i--) {
+			TrackEntry entry = (TrackEntry)tracks[i];
 			while (entry != null) {
 				computeNotLast(entry);
 				entry = entry.mixingFrom;
@@ -877,8 +882,9 @@ public class AnimationState {
 
 	public String toString () {
 		StringBuilder buffer = new StringBuilder(64);
-		for (int i = 0, n = tracks.size; i < n; i++) {
-			TrackEntry entry = tracks.get(i);
+		Object[] tracks = this.tracks.items;
+		for (int i = 0, n = this.tracks.size; i < n; i++) {
+			TrackEntry entry = (TrackEntry)tracks[i];
 			if (entry == null) continue;
 			if (buffer.length() > 0) buffer.append(", ");
 			buffer.append(entry.toString());
@@ -1269,11 +1275,11 @@ public class AnimationState {
 			if (drainDisabled) return; // Not reentrant.
 			drainDisabled = true;
 
-			Array objects = this.objects;
+			Object[] objects = this.objects.items;
 			SnapshotArray<AnimationStateListener> listenersArray = AnimationState.this.listeners;
-			for (int i = 0; i < objects.size; i += 2) {
-				EventType type = (EventType)objects.get(i);
-				TrackEntry entry = (TrackEntry)objects.get(i + 1);
+			for (int i = 0; i < this.objects.size; i += 2) {
+				EventType type = (EventType)objects[i];
+				TrackEntry entry = (TrackEntry)objects[i + 1];
 				int listenersCount = listenersArray.size;
 				Object[] listeners = listenersArray.begin();
 				switch (type) {
@@ -1304,7 +1310,7 @@ public class AnimationState {
 						((AnimationStateListener)listeners[ii]).complete(entry);
 					break;
 				case event:
-					Event event = (Event)objects.get(i++ + 2);
+					Event event = (Event)objects[i++ + 2];
 					if (entry.listener != null) entry.listener.event(entry, event);
 					for (int ii = 0; ii < listenersCount; ii++)
 						((AnimationStateListener)listeners[ii]).event(entry, event);

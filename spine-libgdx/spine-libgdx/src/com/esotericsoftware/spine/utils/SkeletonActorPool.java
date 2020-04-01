@@ -91,10 +91,10 @@ public class SkeletonActorPool extends Pool<SkeletonActor> {
 
 	/** Each obtained skeleton actor that is no longer playing an animation is removed from the stage and returned to the pool. */
 	public void freeComplete () {
-		Array<SkeletonActor> obtained = this.obtained;
+		Object[] obtained = this.obtained.items;
 		outer:
-		for (int i = obtained.size - 1; i >= 0; i--) {
-			SkeletonActor actor = obtained.get(i);
+		for (int i = this.obtained.size - 1; i >= 0; i--) {
+			SkeletonActor actor = (SkeletonActor)obtained[i];
 			Array<TrackEntry> tracks = actor.state.getTracks();
 			for (int ii = 0, nn = tracks.size; ii < nn; ii++)
 				if (tracks.get(ii) != null) continue outer;
