@@ -37,6 +37,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
@@ -651,13 +652,14 @@ public class AnimationStateTests {
 
 			expect(0, "start", 0, 0.4f), //
 			expect(0, "event 0", 0.1f, 0.5f), //
+
+			expect(1, "end", 0.8f, 0.9f), //
+			expect(1, "dispose", 0.8f, 0.9f), //
+
 			expect(0, "event 14", 0.5f, 0.9f), //
 
 			expect(2, "end", 0.8f, 1.1f), //
 			expect(2, "dispose", 0.8f, 1.1f), //
-
-			expect(1, "end", 0.8f, 1.1f), //
-			expect(1, "dispose", 0.8f, 1.1f), //
 
 			expect(0, "event 30", 1, 1.4f), //
 			expect(0, "complete", 1, 1.4f), //
