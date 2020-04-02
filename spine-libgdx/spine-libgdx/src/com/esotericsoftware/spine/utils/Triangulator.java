@@ -36,8 +36,8 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ShortArray;
 
 class Triangulator {
-	private final Array<FloatArray> convexPolygons = new Array();
-	private final Array<ShortArray> convexPolygonsIndices = new Array();
+	private final Array<FloatArray> convexPolygons = new Array(false, 16);
+	private final Array<ShortArray> convexPolygonsIndices = new Array(false, 16);
 
 	private final ShortArray indicesArray = new ShortArray();
 	private final BooleanArray isConcaveArray = new BooleanArray();
