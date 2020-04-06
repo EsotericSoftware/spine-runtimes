@@ -1,0 +1,20 @@
+{
+	"name": "com.esotericsoftware.spine.spine-unity-examples",
+	"displayName": "spine-unity Runtime Examples",
+	"description": "This plugin provides example scenes and scripts for the spine-unity runtime.",
+	"version": "3.8.0",
+	"unity": "2018.3",
+	"author": {
+		"name": "Esoteric Software",
+		"email": "contact@esotericsoftware.com",
+		"url": "http://esotericsoftware.com/"
+	},
+	"dependencies": {
+		"com.esotericsoftware.spine.spine-unity": "3.8.0"
+	},
+	"keywords": [
+		"spine",
+		"spine-unity",
+		"core"
+	]
+}
