@@ -220,13 +220,12 @@ namespace Spine.Unity.Editor {
 
 		#region Button
 		const float CenterButtonMaxWidth = 270f;
-		const float CenterButtonHeight = 35f;
+		const float CenterButtonHeight = 30f;
 		static GUIStyle spineButtonStyle;
 		static GUIStyle SpineButtonStyle {
 			get {
 				if (spineButtonStyle == null) {
 					spineButtonStyle = new GUIStyle(GUI.skin.button);
-					spineButtonStyle.name = "Spine Button";
 					spineButtonStyle.padding = new RectOffset(10, 10, 10, 10);
 				}
 				return spineButtonStyle;
