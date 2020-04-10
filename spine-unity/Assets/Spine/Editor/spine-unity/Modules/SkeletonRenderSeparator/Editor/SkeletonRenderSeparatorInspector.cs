@@ -182,7 +182,7 @@ namespace Spine.Unity.Examples {
 					if (component.enabled && component.SkeletonRenderer != null && extraRenderersNeeded > 0) {
 						EditorGUILayout.HelpBox(string.Format("Insufficient parts renderers. Some parts will not be rendered."), MessageType.Warning);
 						string addMissingLabel = string.Format("Add the missing renderer{1} ({0}) ", extraRenderersNeeded, SpineInspectorUtility.PluralThenS(extraRenderersNeeded));
-						if (GUILayout.Button(addMissingLabel, GUILayout.Height(40f))) {
+						if (GUILayout.Button(addMissingLabel, GUILayout.Height(30f))) {
 							AddPartsRenderer(extraRenderersNeeded);
 							DetectOrphanedPartsRenderers(component);
 							partsRendererInitRequired = true;
