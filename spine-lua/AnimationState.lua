@@ -227,7 +227,7 @@ function AnimationState:update (delta)
 	delta = delta * self.timeScale
 	local tracks = self.tracks
 	local queue = self.queue
-	local numTracks = #tracks
+	local numTracks = getNumTracks(tracks)
 	local i = 0
 	while i <= numTracks do
 		current = tracks[i]
@@ -333,7 +333,7 @@ function AnimationState:apply (skeleton)
 	local queue = self.queue
 	local applied = false
 
-	local numTracks = #tracks
+	local numTracks = getNumTracks(tracks)
 	local i = 0
 	while i <= numTracks do
 		current = tracks[i]
@@ -612,7 +612,7 @@ function AnimationState:clearTracks ()
 	local tracks = self.tracks
 	local oldDrainDisabled = queue.drainDisabled
 	queue.drainDisabled = true;
-	local numTracks = #tracks
+	local numTracks = getNumTracks(tracks)
 	local i = 0
 	while i <= numTracks do
 		self:clearTrack(i)
@@ -764,7 +764,7 @@ function AnimationState:setEmptyAnimations (mixDuration)
 	local oldDrainDisabled = queue.drainDisabled
 	queue.drainDisabled = true
 	local tracks = self.tracks
-	local numTracks = #tracks
+	local numTracks = getNumTracks(tracks)
 	local i = 0
 	while i <= numTracks do
 		current = tracks[i]
@@ -825,6 +825,18 @@ function AnimationState:disposeNext (entry)
 	entry.next = nil
 end
 
+function getNumTracks(tracks)
+	local numTracks = 0
+	if tracks then
+		for i, track in pairs(tracks) do
+			if i > numTracks then
+				numTracks = i
+			end
+		end
+	end
+	return numTracks
+end
+
 function AnimationState:_animationsChanged ()
 	self.animationsChanged = false
 
@@ -832,11 +844,11 @@ function AnimationState:_animationsChanged ()
 
 	local highestIndex = -1
 	local tracks = self.tracks
-	local numTracks = #tracks
+	local numTracks = getNumTracks(tracks)
 	local i = 0
 	while i <= numTracks do
-		current = tracks[i]
-		if current then
+		entry = tracks[i]
+		if entry then
 			if i > highestIndex then highestIndex = i end
 
 			if entry then

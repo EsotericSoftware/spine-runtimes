@@ -53,7 +53,7 @@ function loadSkeleton (jsonFile, atlasFile, animation, skin, scale, x, y)
 	local stateData = spine.AnimationStateData.new(skeletonData)
 	local state = spine.AnimationState.new(stateData)
 	state:setAnimationByName(0, animation, true)
-	if (jsonFile == "spineboy-ess") then
+	if (jsonFile == "spineboy-pro") then
 		stateData:setMix("walk", "jump", 0.5)
 		stateData:setMix("jump", "run", 0.5)
 		state:addAnimationByName(0, "jump", false, 3)
