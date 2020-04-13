@@ -143,7 +143,7 @@ namespace Spine {
 		///                   apply animations on top of each other (layered).</param>
 		///  <param name="blend"> Controls how mixing is applied when <code>alpha</code> < 1.</param>
 		///  <param name="direction"> Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions,
-		///                   such as <see cref="DrawOrderTimeline"/> or <see cref="AttachmentTimeline"/>.</param>
+		///                   such as <see cref="DrawOrderTimeline"/> or <see cref="AttachmentTimeline"/>, and other such as {@link ScaleTimeline}.</param>
 		void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixBlend blend, MixDirection direction);
 		/// <summary>Uniquely encodes both the type of this timeline and the skeleton property that it affects.</summary>
 		int PropertyId { get; }
@@ -973,18 +973,14 @@ namespace Spine {
 			string attachmentName;
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
-			if (direction == MixDirection.Out && blend == MixBlend.Setup) {
-				attachmentName = slot.data.attachmentName;
-				slot.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
+			if (direction == MixDirection.Out) {
+				if (blend == MixBlend.Setup) SetAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
 			}
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				if (blend == MixBlend.Setup || blend == MixBlend.First) {
-					attachmentName = slot.data.attachmentName;
-					slot.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
-				}
+				if (blend == MixBlend.Setup || blend == MixBlend.First) SetAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
 			}
 
@@ -994,7 +990,10 @@ namespace Spine {
 			else
 				frameIndex = Animation.BinarySearch(frames, time) - 1;
 
-			attachmentName = attachmentNames[frameIndex];
+			SetAttachment(skeleton, slot, attachmentNames[frameIndex]);
+		}
+
+		private void SetAttachment (Skeleton skeleton, Slot slot, string attachmentName) {
 			slot.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
 		}
 	}
@@ -1332,8 +1331,8 @@ namespace Spine {
 							MixDirection direction) {
 			ExposedList<Slot> drawOrder = skeleton.drawOrder;
 			ExposedList<Slot> slots = skeleton.slots;
-			if (direction == MixDirection.Out && blend == MixBlend.Setup) {
-				Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
+			if (direction == MixDirection.Out) {
+				if (blend == MixBlend.Setup) Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
 				return;
 			}
 

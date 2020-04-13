@@ -66,12 +66,12 @@ namespace Spine {
 		/// (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
 		/// place.
 		internal const int HoldMix = 3;
-		/// 1) An attachment timeline in a subsequent track entry sets the attachment for the same slot as this attachment
-		/// timeline.<para />
-		/// Result: This attachment timeline will not use MixDirection.out, which would otherwise show the setup mode attachment (or
-		/// none if not visible in setup mode). This allows deform timelines to be applied for the subsequent entry to mix from, rather
-		/// than mixing from the setup pose.
-		internal const int NotLast = 4;
+		/// 1) This is the last attachment timeline to set the attachment for a slot.<para />
+		/// Result: Don't apply this timeline when mixing out. Attachment timelines that are not last are applied when mixing out so
+		/// any deform timelines are applied and subsequent entries can mix from that deform.
+		internal const int Last = 4;
+
+		internal const int Setup = 1,  Current = 2;
 
 		protected AnimationStateData data;
 		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
@@ -94,6 +94,7 @@ namespace Spine {
 		private readonly HashSet<int> propertyIDs = new HashSet<int>();
 		private bool animationsChanged;
 		private float timeScale = 1;
+		private int unkeyedState;
 
 		private readonly Pool<TrackEntry> trackEntryPool = new Pool<TrackEntry>();
 
@@ -196,8 +197,8 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
-		/// animation state can be applied to multiple skeletons to pose them identically.</summary>
+		/// Poses the skeleton using the track entry animations.  The animation state is not changed, so can be applied to multiple
+		/// skeletons to pose them identically.</summary>
 		/// <returns>True if any animations were applied.</returns>
 		public bool Apply (Skeleton skeleton) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
@@ -227,8 +228,13 @@ namespace Spine {
 				var timelines = current.animation.timelines;
 				var timelinesItems = timelines.Items;
 				if ((i == 0 && mix == 1) || blend == MixBlend.Add) {
-					for (int ii = 0; ii < timelineCount; ii++)
-						timelinesItems[ii].Apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.In);
+					for (int ii = 0; ii < timelineCount; ii++) {
+						var timeline = timelinesItems[ii];
+						if (timeline is AttachmentTimeline)
+							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, animationTime, blend, true);
+						else
+							timeline.Apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.In);
+					}
 				} else {
 					var timelineMode = current.timelineMode.Items;
 
@@ -238,11 +244,13 @@ namespace Spine {
 
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelinesItems[ii];
-						MixBlend timelineBlend = (timelineMode[ii] & AnimationState.NotLast - 1) == AnimationState.Subsequent ? blend : MixBlend.Setup;
+						MixBlend timelineBlend = (timelineMode[ii] & AnimationState.Last - 1) == AnimationState.Subsequent ? blend : MixBlend.Setup;
 						var rotateTimeline = timeline as RotateTimeline;
 						if (rotateTimeline != null)
 							ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation,
 												ii << 1, firstFrame);
+						else if (timeline is AttachmentTimeline)
+							ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, animationTime, blend, true);
 						else
 							timeline.Apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection.In);
 					}
@@ -252,6 +260,20 @@ namespace Spine {
 				current.nextAnimationLast = animationTime;
 				current.nextTrackLast = current.trackTime;
 			}
+
+			// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
+			// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
+			// the time is before the first key).
+			int setupState = unkeyedState + Setup;
+			var slots = skeleton.slots.Items;
+			for (int i = 0, n = skeleton.slots.Count; i < n; i++) {
+				Slot slot = (Slot)slots[i];
+				if (slot.attachmentState == setupState) {
+					string attachmentName = slot.data.attachmentName;
+					slot.Attachment = (attachmentName == null ? null : skeleton.GetAttachment(slot.data.index, attachmentName));
+				}
+			}
+			unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
 
 			queue.Drain();
 			return applied;
@@ -296,14 +318,10 @@ namespace Spine {
 					MixDirection direction = MixDirection.Out;
 					MixBlend timelineBlend;
 					float alpha;
-					switch (timelineMode[i] & AnimationState.NotLast - 1) {
+					switch (timelineMode[i] & AnimationState.Last - 1) {
 						case AnimationState.Subsequent:
-							timelineBlend = blend;
-							if (!attachments && timeline is AttachmentTimeline) {
-								if ((timelineMode[i] & AnimationState.NotLast) == AnimationState.NotLast) continue;
-								timelineBlend = MixBlend.Setup;
-							}
 							if (!drawOrder && timeline is DrawOrderTimeline) continue;
+							timelineBlend = blend;
 							alpha = alphaMix;
 							break;
 						case AnimationState.First:
@@ -321,22 +339,18 @@ namespace Spine {
 							break;
 					}
 					from.totalAlpha += alpha;
-
 					var rotateTimeline = timeline as RotateTimeline;
 					if (rotateTimeline != null) {
 						ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation,
 											i << 1, firstFrame);
+					} else if (timeline is AttachmentTimeline) {
+						// If not showing attachments: do nothing if this is the last timeline, else apply the timeline so
+						// subsequent timelines see any deform, but don't set attachmentState to Current.
+						if (!attachments && (timelineMode[i] & Last) != 0) continue;
+						ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, animationTime, timelineBlend, attachments);
 					} else {
-						if (timelineBlend == MixBlend.Setup) {
-							if (timeline is AttachmentTimeline) {
-								if (attachments || (timelineMode[i] & AnimationState.NotLast) == AnimationState.NotLast) direction = MixDirection.In;
-							} else if (timeline is DrawOrderTimeline) {
-								if (drawOrder) {
-									direction = MixDirection.In;
-								}
-							}
-						}
-
+						if (drawOrder && timeline is DrawOrderTimeline && timelineBlend == MixBlend.Setup)
+							direction = MixDirection.In;
 						timeline.Apply(skeleton, animationLast, animationTime, eventBuffer, alpha, timelineBlend, direction);
 					}
 				}
@@ -350,6 +364,42 @@ namespace Spine {
 			return mix;
 		}
 
+		/// <summary> Applies the attachment timeline and sets <see cref="Slot.attachmentState"/>.</summary>
+		/// <param name="attachments">False when: 1) the attachment timeline is mixing out, 2) mix < attachmentThreshold, and 3) the timeline
+		/// is not the last timeline to set the slot's attachment. In that case the timeline is applied only so subsequent
+		/// timelines see any deform.</param>
+		private void ApplyAttachmentTimeline (AttachmentTimeline timeline, Skeleton skeleton, float time, MixBlend blend,
+			bool attachments) {
+
+			Slot slot = skeleton.slots.Items[timeline.slotIndex];
+			if (!slot.bone.active) return;
+
+			float[] frames = timeline.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (blend == MixBlend.Setup || blend == MixBlend.First)
+					SetAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+			}
+			else {
+				int frameIndex;
+				if (time >= frames[frames.Length - 1]) // Time is after last frame.
+					frameIndex = frames.Length - 1;
+				else
+					frameIndex = Animation.BinarySearch(frames, time) - 1;
+				SetAttachment(skeleton, slot, timeline.attachmentNames[frameIndex], attachments);
+			}
+
+			// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
+			if (slot.attachmentState <= unkeyedState) slot.attachmentState = unkeyedState + Setup;
+		}
+
+		private void SetAttachment (Skeleton skeleton, Slot slot, String attachmentName, bool attachments) {
+			slot.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slot.data.index, attachmentName);
+			if (attachments) slot.attachmentState = unkeyedState + Current;
+		}
+
+		/// <summary>
+		/// Applies the rotate timeline, mixing with the current pose while keeping the same rotation direction chosen as the shortest
+		/// the first time the mixing was applied.</summary>
 		static private void ApplyRotateTimeline (RotateTimeline timeline, Skeleton skeleton, float time, float alpha, MixBlend blend,
 			float[] timelinesRotation, int i, bool firstFrame) {
 
@@ -803,7 +853,7 @@ namespace Spine {
 			for (int i = 0; i < timelinesCount; i++) {
 				if (timelines[i] is AttachmentTimeline) {
 					AttachmentTimeline timeline = (AttachmentTimeline)timelines[i];
-					if (!propertyIDs.Add(timeline.slotIndex)) timelineMode[i] |= AnimationState.NotLast;
+					if (propertyIDs.Add(timeline.slotIndex)) timelineMode[i] |= AnimationState.Last;
 				}
 			}
 		}

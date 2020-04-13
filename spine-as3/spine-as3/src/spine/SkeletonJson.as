@@ -621,7 +621,7 @@ package spine {
 			}
 
 			// Path constraint timelines.
-			var paths : Object = map["paths"];
+			var paths : Object = map["path"];
 			for (var pathName : String in paths) {
 				var index : int = skeletonData.findPathConstraintIndex(pathName);
 				if (index == -1) throw new Error("Path constraint not found: " + pathName);
