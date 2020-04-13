@@ -202,6 +202,8 @@ function SkeletonJson.new (attachmentLoader)
 				data.target = skeletonData:findBone(targetName)
 				if not data.target then error("Transform constraint target bone not found: " .. (targetName or "none"), 2) end
 
+				data.local_ = getValue(constraintMap, "local", false)
+				data.relative = getValue(constraintMap, "relative", false)
 				data.offsetRotation = getValue(constraintMap, "rotation", 0);
 				data.offsetX = getValue(constraintMap, "x", 0) * scale;
 				data.offsetY = getValue(constraintMap, "y", 0) * scale;
