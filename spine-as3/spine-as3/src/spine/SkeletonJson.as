@@ -785,11 +785,16 @@ package spine {
 
 		static private function readCurve(map : Object, timeline : CurveTimeline, frameIndex : int) : void {
 			var curve : Object = map["curve"];
-			if (!curve) return;
+			if (curve == null) return;
 			if (curve == "stepped")
 				timeline.setStepped(frameIndex);
-			else
-				timeline.setCurve(frameIndex, parseFloat(curve.toString()), Number(map["c2"] || 0), Number(map["c3"] || 1), Number(map["c4"] || 1));
+			else {
+				var c1: Number = parseFloat(curve.toString());
+				var c2: Number = map["c2"] == null ? 0 : Number(map["c2"]);
+				var c3: Number = map["c3"] == null ? 1 : Number(map["c3"]);
+				var c4: Number = map["c4"] == null ? 1 : Number(map["c4"]);
+				timeline.setCurve(frameIndex, c1, c2, c3, c4);
+			}
 		}
 
 		static private function toColor(hexString : String, colorIndex : int) : Number {
