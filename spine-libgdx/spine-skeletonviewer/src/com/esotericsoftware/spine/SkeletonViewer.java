@@ -142,9 +142,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 	FileHandle atlasFile (FileHandle skeletonFile) {
 		String atlasFileName = skeletonFile.nameWithoutExtension();
+		if (atlasFileName.endsWith(".bytes")) atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 6);
 		if (atlasFileName.endsWith(".json") || atlasFileName.endsWith(".skel"))
 			atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 5);
+		if (atlasFileName.endsWith(".bytes")) atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 6);
 		FileHandle atlasFile = skeletonFile.sibling(atlasFileName + ".atlas");
+		if (atlasFile.exists()) atlasFile = skeletonFile.sibling(atlasFileName + ".atlas.txt");
 		if (!atlasFile.exists()) {
 			if (atlasFileName.endsWith("-pro") || atlasFileName.endsWith("-ess"))
 				atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 4);
