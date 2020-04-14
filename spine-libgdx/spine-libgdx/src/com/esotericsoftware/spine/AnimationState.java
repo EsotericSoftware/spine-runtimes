@@ -77,10 +77,6 @@ public class AnimationState {
 	 * (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
 	 * place. */
 	static private final int HOLD_MIX = 3;
-	/** 1) This is the last attachment timeline to set the attachment for a slot.<br>
-	 * Result: Don't apply this timeline when mixing out. Attachment timelines that are not last are applied when mixing out, so
-	 * any deform timelines are applied and subsequent entries can mix from that deform. */
-	static private final int LAST = 4;
 
 	static private final int SETUP = 1, CURRENT = 2;
 
@@ -239,7 +235,7 @@ public class AnimationState {
 
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Timeline timeline = (Timeline)timelines[ii];
-					MixBlend timelineBlend = (timelineMode[ii] & LAST - 1) == SUBSEQUENT ? blend : MixBlend.setup;
+					MixBlend timelineBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
 					if (timeline instanceof RotateTimeline) {
 						applyRotateTimeline((RotateTimeline)timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation,
 							ii << 1, firstFrame);
@@ -311,7 +307,7 @@ public class AnimationState {
 				MixDirection direction = MixDirection.out;
 				MixBlend timelineBlend;
 				float alpha;
-				switch (timelineMode[i] & LAST - 1) {
+				switch (timelineMode[i]) {
 				case SUBSEQUENT:
 					if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 					timelineBlend = blend;
@@ -325,7 +321,7 @@ public class AnimationState {
 					timelineBlend = MixBlend.setup;
 					alpha = alphaHold;
 					break;
-				default:
+				default: // HOLD_MIX
 					timelineBlend = MixBlend.setup;
 					TrackEntry holdMix = (TrackEntry)timelineHoldMix[i];
 					alpha = alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
@@ -335,12 +331,9 @@ public class AnimationState {
 				if (timeline instanceof RotateTimeline) {
 					applyRotateTimeline((RotateTimeline)timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation,
 						i << 1, firstFrame);
-				} else if (timeline instanceof AttachmentTimeline) {
-					// If not showing attachments: do nothing if this is the last timeline, else apply the timeline so
-					// subsequent timelines see any deform, but don't set attachmentState to CURRENT.
-					if (!attachments && (timelineMode[i] & LAST) != 0) continue;
+				} else if (timeline instanceof AttachmentTimeline)
 					applyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, animationTime, timelineBlend, attachments);
-				} else {
+				else {
 					if (drawOrder && timeline instanceof DrawOrderTimeline && timelineBlend == MixBlend.setup)
 						direction = MixDirection.in;
 					timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
@@ -762,16 +755,6 @@ public class AnimationState {
 				entry = entry.mixingTo;
 			} while (entry != null);
 		}
-
-		// Process in the reverse order that animations are applied.
-		propertyIDs.clear(2048);
-		for (int i = tracks.size - 1; i >= 0; i--) {
-			TrackEntry entry = tracks.get(i);
-			while (entry != null) {
-				computeNotLast(entry);
-				entry = entry.mixingFrom;
-			}
-		}
 	}
 
 	private void computeHold (TrackEntry entry) {
@@ -811,20 +794,6 @@ public class AnimationState {
 					break;
 				}
 				timelineMode[i] = HOLD;
-			}
-		}
-	}
-
-	private void computeNotLast (TrackEntry entry) {
-		Object[] timelines = entry.animation.timelines.items;
-		int timelinesCount = entry.animation.timelines.size;
-		int[] timelineMode = entry.timelineMode.items;
-		IntSet propertyIDs = this.propertyIDs;
-
-		for (int i = 0; i < timelinesCount; i++) {
-			if (timelines[i] instanceof AttachmentTimeline) {
-				AttachmentTimeline timeline = (AttachmentTimeline)timelines[i];
-				if (propertyIDs.add(timeline.slotIndex)) timelineMode[i] |= LAST;
 			}
 		}
 	}
