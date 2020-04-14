@@ -71,7 +71,10 @@ module spine {
 		 * Result: This attachment timeline will not use MixDirection.out, which would otherwise show the setup mode attachment (or
 		 * none if not visible in setup mode). This allows deform timelines to be applied for the subsequent entry to mix from, rather
 		 * than mixing from the setup pose. */
-		static NOT_LAST = 4;
+		static LAST = 4;
+
+		static SETUP = 1;
+		static CURRENT = 2;
 
 		/** The AnimationStateData to look up mix durations. */
 		data: AnimationStateData;
@@ -84,6 +87,7 @@ module spine {
 		 *
 		 * See TrackEntry {@link TrackEntry#timeScale} for affecting a single animation. */
 		timeScale = 1;
+		unkeyedState = 0;
 
 		events = new Array<Event>();
 		listeners = new Array<AnimationStateListener>();
@@ -216,7 +220,11 @@ module spine {
 						// to sometimes stop rendering when using color correction, as their RGBA values become NaN.
 						// (https://github.com/pixijs/pixi-spine/issues/302)
 						Utils.webkit602BugfixHelper(mix, blend);
-						timelines[ii].apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.mixIn);
+						var timeline = timelines[ii];
+						if (timeline instanceof AttachmentTimeline)
+							this.applyAttachmentTimeline(timeline, skeleton, animationTime, blend, true);
+						else
+							timeline.apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.mixIn);
 					}
 				} else {
 					let timelineMode = current.timelineMode;
@@ -227,9 +235,11 @@ module spine {
 
 					for (let ii = 0; ii < timelineCount; ii++) {
 						let timeline = timelines[ii];
-						let timelineBlend = (timelineMode[ii] & (AnimationState.NOT_LAST - 1)) == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
+						let timelineBlend = (timelineMode[ii] & (AnimationState.LAST - 1)) == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline instanceof RotateTimeline) {
 							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
+						} else if (timeline instanceof AttachmentTimeline) {
+							this.applyAttachmentTimeline(timeline, skeleton, animationTime, blend, true);
 						} else {
 							// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
 							Utils.webkit602BugfixHelper(mix, blend);
@@ -242,6 +252,20 @@ module spine {
 				current.nextAnimationLast = animationTime;
 				current.nextTrackLast = current.trackTime;
 			}
+
+			// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
+			// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
+			// the time is before the first key).
+			var setupState = this.unkeyedState + AnimationState.SETUP;
+			var slots = skeleton.slots;
+			for (var i = 0, n = skeleton.slots.length; i < n; i++) {
+				var slot = slots[i];
+				if (slot.attachmentState == setupState) {
+					var attachmentName = slot.data.attachmentName;
+					slot.attachment = (attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName));
+				}
+			}
+			this.unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
 
 			this.queue.drain();
 			return applied;
@@ -284,14 +308,10 @@ module spine {
 					let direction = MixDirection.mixOut;
 					let timelineBlend: MixBlend;
 					let alpha = 0;
-					switch (timelineMode[i] & (AnimationState.NOT_LAST - 1)) {
+					switch (timelineMode[i] & (AnimationState.LAST - 1)) {
 					case AnimationState.SUBSEQUENT:
-						timelineBlend = blend;
-						if (!attachments && timeline instanceof AttachmentTimeline) {
-							if ((timelineMode[i] & AnimationState.NOT_LAST) == AnimationState.NOT_LAST) continue;
-							timelineBlend = MixBlend.setup;
-						}
 						if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+						timelineBlend = blend;
 						alpha = alphaMix;
 						break;
 					case AnimationState.FIRST:
@@ -309,18 +329,19 @@ module spine {
 						break;
 					}
 					from.totalAlpha += alpha;
+
 					if (timeline instanceof RotateTimeline)
 						this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
-					else {
+					else if (timeline instanceof AttachmentTimeline) {
+						// If not showing attachments: do nothing if this is the last timeline, else apply the timeline so
+						// subsequent timelines see any deform, but don't set attachmentState to Current.
+						if (!attachments && (timelineMode[i] & AnimationState.LAST) != 0) continue;
+						this.applyAttachmentTimeline(timeline, skeleton, animationTime, timelineBlend, attachments);
+					} else {
 						// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
 						Utils.webkit602BugfixHelper(alpha, blend);
-						if (timelineBlend == MixBlend.setup) {
-							if (timeline instanceof AttachmentTimeline) {
-								if (attachments || (timelineMode[i] & AnimationState.NOT_LAST) == AnimationState.NOT_LAST) direction = MixDirection.mixIn;
-							} else if (timeline instanceof DrawOrderTimeline) {
-								if (drawOrder) direction = MixDirection.mixIn;
-							}
-						}
+						if (drawOrder && timeline instanceof DrawOrderTimeline && timelineBlend == MixBlend.setup)
+							direction = MixDirection.mixIn;
 						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
 					}
 				}
@@ -333,6 +354,35 @@ module spine {
 
 			return mix;
 		}
+
+		applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, blend: MixBlend, attachments: boolean) {
+
+			var slot = skeleton.slots[timeline.slotIndex];
+			if (!slot.bone.active) return;
+
+			var frames = timeline.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (blend == MixBlend.setup || blend == MixBlend.first)
+					this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+			}
+			else {
+				var frameIndex;
+				if (time >= frames[frames.length - 1]) // Time is after last frame.
+					frameIndex = frames.length - 1;
+				else
+					frameIndex = Animation.binarySearch(frames, time) - 1;
+				this.setAttachment(skeleton, slot, timeline.attachmentNames[frameIndex], attachments);
+			}
+
+			// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
+			if (slot.attachmentState <= this.unkeyedState) slot.attachmentState = this.unkeyedState + AnimationState.SETUP;
+		}
+
+		setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: string, attachments: boolean) {
+			slot.attachment = attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName);
+			if (attachments) slot.attachmentState = this.unkeyedState + AnimationState.CURRENT;
+		}
+
 
 		applyRotateTimeline (timeline: Timeline, skeleton: Skeleton, time: number, alpha: number, blend: MixBlend,
 			timelinesRotation: Array<number>, i: number, firstFrame: boolean) {
@@ -766,7 +816,7 @@ module spine {
 			for (let i = 0; i < timelinesCount; i++) {
 				if (timelines[i] instanceof AttachmentTimeline) {
 					let timeline = timelines[i] as AttachmentTimeline;
-					if (!propertyIDs.add(timeline.slotIndex)) timelineMode[i] |= AnimationState.NOT_LAST;
+					if (!propertyIDs.add(timeline.slotIndex)) timelineMode[i] |= AnimationState.LAST;
 				}
 			}
 		}
