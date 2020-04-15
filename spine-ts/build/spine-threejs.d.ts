@@ -251,7 +251,6 @@ declare module spine {
 		static FIRST: number;
 		static HOLD: number;
 		static HOLD_MIX: number;
-		static LAST: number;
 		static SETUP: number;
 		static CURRENT: number;
 		data: AnimationStateData;
@@ -288,7 +287,6 @@ declare module spine {
 		disposeNext(entry: TrackEntry): void;
 		_animationsChanged(): void;
 		computeHold(entry: TrackEntry): void;
-		computeNotLast(entry: TrackEntry): void;
 		getCurrent(trackIndex: number): TrackEntry;
 		addListener(listener: AnimationStateListener): void;
 		removeListener(listener: AnimationStateListener): void;

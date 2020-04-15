@@ -65,13 +65,6 @@ module spine {
 		 * (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
 		 * place. */
 		static HOLD_MIX = 3;
-		/** 1. An attachment timeline in a subsequent track entry sets the attachment for the same slot as this attachment
-		 * timeline.
-		 *
-		 * Result: This attachment timeline will not use MixDirection.out, which would otherwise show the setup mode attachment (or
-		 * none if not visible in setup mode). This allows deform timelines to be applied for the subsequent entry to mix from, rather
-		 * than mixing from the setup pose. */
-		static LAST = 4;
 
 		static SETUP = 1;
 		static CURRENT = 2;
@@ -235,7 +228,7 @@ module spine {
 
 					for (let ii = 0; ii < timelineCount; ii++) {
 						let timeline = timelines[ii];
-						let timelineBlend = (timelineMode[ii] & (AnimationState.LAST - 1)) == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
+						let timelineBlend = timelineMode[ii]  == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline instanceof RotateTimeline) {
 							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
 						} else if (timeline instanceof AttachmentTimeline) {
@@ -308,7 +301,7 @@ module spine {
 					let direction = MixDirection.mixOut;
 					let timelineBlend: MixBlend;
 					let alpha = 0;
-					switch (timelineMode[i] & (AnimationState.LAST - 1)) {
+					switch (timelineMode[i]) {
 					case AnimationState.SUBSEQUENT:
 						if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 						timelineBlend = blend;
@@ -332,12 +325,9 @@ module spine {
 
 					if (timeline instanceof RotateTimeline)
 						this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
-					else if (timeline instanceof AttachmentTimeline) {
-						// If not showing attachments: do nothing if this is the last timeline, else apply the timeline so
-						// subsequent timelines see any deform, but don't set attachmentState to Current.
-						if (!attachments && (timelineMode[i] & AnimationState.LAST) != 0) continue;
+					else if (timeline instanceof AttachmentTimeline)
 						this.applyAttachmentTimeline(timeline, skeleton, animationTime, timelineBlend, attachments);
-					} else {
+					else {
 						// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
 						Utils.webkit602BugfixHelper(alpha, blend);
 						if (drawOrder && timeline instanceof DrawOrderTimeline && timelineBlend == MixBlend.setup)
@@ -755,15 +745,6 @@ module spine {
 					entry = entry.mixingTo;
 				} while (entry != null)
 			}
-
-			this.propertyIDs.clear();
-			for (let i = this.tracks.length - 1; i >= 0; i--) {
-				let entry = this.tracks[i];
-				while (entry != null) {
-					this.computeNotLast(entry);
-					entry = entry.mixingFrom;
-				}
-			}
 		}
 
 		computeHold (entry: TrackEntry) {
@@ -803,20 +784,6 @@ module spine {
 						break;
 					}
 					timelineMode[i] = AnimationState.HOLD;
-				}
-			}
-		}
-
-		computeNotLast (entry: TrackEntry) {
-			let timelines = entry.animation.timelines;
-			let timelinesCount = entry.animation.timelines.length;
-			let timelineMode = entry.timelineMode;
-			let propertyIDs = this.propertyIDs;
-
-			for (let i = 0; i < timelinesCount; i++) {
-				if (timelines[i] instanceof AttachmentTimeline) {
-					let timeline = timelines[i] as AttachmentTimeline;
-					if (!propertyIDs.add(timeline.slotIndex)) timelineMode[i] |= AnimationState.LAST;
 				}
 			}
 		}
