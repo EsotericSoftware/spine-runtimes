@@ -819,6 +819,10 @@ void spTwoColorTimeline_setFrame (spTwoColorTimeline* self, int frameIndex, floa
 
 /**/
 
+static void _spSetAttachment(spAttachmentTimeline* timeline, spSkeleton* skeleton, spSlot* slot, const char* attachmentName) {
+    slot->attachment = attachmentName == NULL ? NULL : spSkeleton_getAttachmentForSlotIndex(skeleton, timeline->slotIndex, attachmentName);
+}
+
 void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time,
 		spEvent** firedEvents, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction) {
 	const char* attachmentName;
@@ -827,17 +831,15 @@ void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
 	spSlot* slot = skeleton->slots[self->slotIndex];
 	if (!slot->bone->active) return;
 
-	if (direction == SP_MIX_DIRECTION_OUT && blend == SP_MIX_BLEND_SETUP) {
-		attachmentName = slot->data->attachmentName;
-		spSlot_setAttachment(slot, attachmentName ? spSkeleton_getAttachmentForSlotIndex(skeleton, self->slotIndex, attachmentName) : 0);
+	if (direction == SP_MIX_DIRECTION_OUT) {
+	    if (blend == SP_MIX_BLEND_SETUP)
+	        _spSetAttachment(self, skeleton, slot, slot->data->attachmentName);
 		return;
 	}
 
 	if (time < self->frames[0]) {
 		if (blend == SP_MIX_BLEND_SETUP || blend == SP_MIX_BLEND_FIRST) {
-			attachmentName = slot->data->attachmentName;
-			spSlot_setAttachment(skeleton->slots[self->slotIndex],
-				attachmentName ? spSkeleton_getAttachmentForSlotIndex(skeleton, self->slotIndex, attachmentName) : 0);
+			_spSetAttachment(self, skeleton, slot, slot->data->attachmentName);
 		}
 		return;
 	}
@@ -1230,8 +1232,8 @@ void _spDrawOrderTimeline_apply (const spTimeline* timeline, spSkeleton* skeleto
 	const int* drawOrderToSetupIndex;
 	spDrawOrderTimeline* self = (spDrawOrderTimeline*)timeline;
 
-	if (direction == SP_MIX_DIRECTION_OUT && blend == SP_MIX_BLEND_SETUP) {
-		memcpy(skeleton->drawOrder, skeleton->slots, self->slotsCount * sizeof(spSlot*));
+	if (direction == SP_MIX_DIRECTION_OUT ) {
+		if (blend == SP_MIX_BLEND_SETUP) memcpy(skeleton->drawOrder, skeleton->slots, self->slotsCount * sizeof(spSlot*));
 		return;
 	}
 
