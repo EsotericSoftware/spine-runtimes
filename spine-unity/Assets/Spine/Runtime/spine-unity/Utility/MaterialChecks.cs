@@ -38,6 +38,7 @@ namespace Spine.Unity {
 
 		static readonly int STRAIGHT_ALPHA_PARAM_ID = Shader.PropertyToID("_StraightAlphaInput");
 		static readonly string ALPHAPREMULTIPLY_ON_KEYWORD = "_ALPHAPREMULTIPLY_ON";
+		static readonly string STRAIGHT_ALPHA_KEYWORD = "_STRAIGHT_ALPHA_INPUT";
 
 		public static readonly string kPMANotSupportedLinearMessage =
 			"Warning: Premultiply-alpha atlas textures not supported in Linear color space!\n\nPlease\n"
@@ -134,6 +135,10 @@ namespace Spine.Unity {
 		public static void EnablePMAAtMaterial (Material material, bool enablePMA) {
 			if (material.HasProperty(STRAIGHT_ALPHA_PARAM_ID)) {
 				material.SetInt(STRAIGHT_ALPHA_PARAM_ID, enablePMA ? 0 : 1);
+				if (enablePMA)
+					material.DisableKeyword(STRAIGHT_ALPHA_KEYWORD);
+				else
+					material.EnableKeyword(STRAIGHT_ALPHA_KEYWORD);
 			}
 			else {
 				if (enablePMA)
