@@ -29,7 +29,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
+using System;
 
 namespace Spine.Unity.AttachmentTools {
 
@@ -531,7 +531,24 @@ namespace Spine.Unity.AttachmentTools {
 			bool mipmaps = UseMipMaps, bool linear = false, bool applyPMA = false) {
 
 			var spriteTexture = s.texture;
-			var r = s.textureRect;
+			Rect r;
+			if (!s.packed || s.packingMode == SpritePackingMode.Rectangle) {
+				r = s.textureRect;
+			}
+			else {
+				r = new Rect();
+				r.xMin = Math.Min(s.uv[0].x, s.uv[1].x) * spriteTexture.width;
+				r.xMax = Math.Max(s.uv[0].x, s.uv[1].x) * spriteTexture.width;
+				r.yMin = Math.Min(s.uv[0].y, s.uv[2].y) * spriteTexture.height;
+				r.yMax = Math.Max(s.uv[0].y, s.uv[2].y) * spriteTexture.height;
+			#if UNITY_EDITOR
+				if (s.uv.Length > 4) {
+					Debug.LogError("When using a tightly packed SpriteAtlas with Spine, you may only access Sprites that are packed as 'FullRect' from it! " +
+						"You can either disable 'Tight Packing' at the whole SpriteAtlas, or change the single Sprite's TextureImporter Setting 'MeshType' to 'Full Rect'." +
+						"Sprite Asset: " + s.name, s);
+				}
+			#endif
+			}
 			var newTexture = new Texture2D((int)r.width, (int)r.height, textureFormat, mipmaps, linear);
 			newTexture.CopyTextureAttributesFrom(spriteTexture);
 			if (applyPMA)
