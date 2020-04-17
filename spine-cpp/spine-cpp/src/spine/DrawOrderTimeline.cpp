@@ -66,11 +66,13 @@ void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Ve
 
 	Vector<Slot *> &drawOrder = skeleton._drawOrder;
 	Vector<Slot *> &slots = skeleton._slots;
-	if (direction == MixDirection_Out && blend == MixBlend_Setup) {
-		drawOrder.clear();
-		drawOrder.ensureCapacity(slots.size());
-		for (size_t i = 0, n = slots.size(); i < n; ++i)
-			drawOrder.add(slots[i]);
+	if (direction == MixDirection_Out) {
+	    if (blend == MixBlend_Setup) {
+            drawOrder.clear();
+            drawOrder.ensureCapacity(slots.size());
+            for (size_t i = 0, n = slots.size(); i < n; ++i)
+                drawOrder.add(slots[i]);
+        }
 		return;
 	}
 

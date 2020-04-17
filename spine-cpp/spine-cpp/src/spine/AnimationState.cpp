@@ -43,6 +43,8 @@
 #include <spine/AttachmentTimeline.h>
 #include <spine/DrawOrderTimeline.h>
 #include <spine/EventTimeline.h>
+#include <spine/Slot.h>
+#include <spine/SlotData.h>
 
 #include <float.h>
 
@@ -290,7 +292,9 @@ const int Subsequent = 0;
 const int First = 1;
 const int Hold = 2;
 const int HoldMix = 3;
-const int NotLast = 4;
+
+const int Setup = 1;
+const int Current = 2;
 
 AnimationState::AnimationState(AnimationStateData *data) :
 		_data(data),
@@ -298,6 +302,7 @@ AnimationState::AnimationState(AnimationStateData *data) :
 		_animationsChanged(false),
 		_listener(dummyOnAnimationEventFunc),
 		_listenerObject(NULL),
+		_unkeyedState(0),
 		_timeScale(1) {
 }
 
@@ -418,8 +423,13 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		size_t timelineCount = current._animation->_timelines.size();
 		Vector<Timeline *> &timelines = current._animation->_timelines;
 		if ((i == 0 && mix == 1) || blend == MixBlend_Add) {
-			for (size_t ii = 0; ii < timelineCount; ++ii)
-				timelines[ii]->apply(skeleton, animationLast, animationTime, &_events, mix, blend, MixDirection_In);
+			for (size_t ii = 0; ii < timelineCount; ++ii) {
+                Timeline *timeline = timelines[ii];
+                if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
+                    applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, animationTime, blend, true);
+                else
+                    timeline->apply(skeleton, animationLast, animationTime, &_events, mix, blend, MixDirection_In);
+            }
 		} else {
 			Vector<int> &timelineMode = current._timelineMode;
 
@@ -431,13 +441,12 @@ bool AnimationState::apply(Skeleton &skeleton) {
 				Timeline *timeline = timelines[ii];
 				assert(timeline);
 
-				MixBlend timelineBlend = (timelineMode[ii] & (NotLast - 1)) == Subsequent ? blend : MixBlend_Setup;
+				MixBlend timelineBlend = timelineMode[ii] == Subsequent ? blend : MixBlend_Setup;
 
-				RotateTimeline *rotateTimeline = NULL;
-				if (timeline->getRTTI().isExactly(RotateTimeline::rtti)) rotateTimeline = static_cast<RotateTimeline *>(timeline);
-
-				if (rotateTimeline != NULL)
-					applyRotateTimeline(rotateTimeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
+				if (timeline->getRTTI().isExactly(RotateTimeline::rtti))
+					applyRotateTimeline(static_cast<RotateTimeline *>(timeline), skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
+				else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
+                    applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, animationTime, timelineBlend, true);
 				else
 					timeline->apply(skeleton, animationLast, animationTime, &_events, mix, timelineBlend, MixDirection_In);
 			}
@@ -448,6 +457,17 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		current._nextAnimationLast = animationTime;
 		current._nextTrackLast = current._trackTime;
 	}
+
+    int setupState = _unkeyedState + Setup;
+    Vector<Slot*>& slots = skeleton.getSlots();
+    for (int i = 0, n = slots.size(); i < n; i++) {
+        Slot* slot = slots[i];
+        if (slot->getAttachmentState() == setupState) {
+            const String& attachmentName = slot->getData().getAttachmentName();
+            slot->setAttachment(attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot->getData().getIndex(), attachmentName));
+        }
+    }
+    _unkeyedState += 2;
 
 	_queue->drain();
 	return applied;
@@ -636,6 +656,28 @@ Animation *AnimationState::getEmptyAnimation() {
 	return &ret;
 }
 
+void AnimationState::applyAttachmentTimeline(AttachmentTimeline* attachmentTimeline, Skeleton& skeleton, float time, MixBlend blend, bool attachments) {
+    Slot* slot = skeleton.getSlots()[attachmentTimeline->getSlotIndex()];
+    if (!slot->getBone().isActive()) return;
+
+    Vector<float>& frames = attachmentTimeline->getFrames();
+    if (time < frames[0]) {
+        if (blend == MixBlend_Setup || blend == MixBlend_First)
+            setAttachment(skeleton, *slot, slot->getData().getAttachmentName(), attachments);
+    } else {
+        int frameIndex = 0;
+        if (time >= frames[attachmentTimeline->getFrames().size() - 1])
+            frameIndex = attachmentTimeline->getFrames().size() - 1;
+        else
+            frameIndex = Animation::binarySearch(frames, time) - 1;
+        setAttachment(skeleton, *slot, attachmentTimeline->getAttachmentNames()[frameIndex], attachments);
+    }
+
+    /* If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.*/
+    if (slot->getAttachmentState() <= _unkeyedState) slot->setAttachmentState(_unkeyedState + Setup);
+}
+
+
 void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleton &skeleton, float time, float alpha,
 	MixBlend blend, Vector<float> &timelinesRotation, size_t i, bool firstFrame
 ) {
@@ -784,14 +826,10 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 			MixDirection direction = MixDirection_Out;
 			MixBlend timelineBlend;
 			float alpha;
-			switch (timelineMode[i] & (NotLast - 1)) {
+			switch (timelineMode[i]) {
 				case Subsequent:
-					timelineBlend = blend;
-					if (!attachments && (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))) {
-						if ((timelineMode[i] & NotLast) == NotLast) continue;
-						timelineBlend = MixBlend_Setup;
-					}
 					if (!drawOrder && (timeline->getRTTI().isExactly(DrawOrderTimeline::rtti))) continue;
+                    timelineBlend = blend;
 					alpha = alphaMix;
 					break;
 				case First:
@@ -811,15 +849,12 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 			from->_totalAlpha += alpha;
 			if ((timeline->getRTTI().isExactly(RotateTimeline::rtti))) {
 				applyRotateTimeline((RotateTimeline*)timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
-			} else {
-				if (timelineBlend == MixBlend_Setup) {
-					if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
-						if (attachments || (timelineMode[i] & NotLast) == NotLast) direction = MixDirection_In;
-					} else if (timeline->getRTTI().isExactly(DrawOrderTimeline::rtti)) {
-						if (drawOrder) direction = MixDirection_In;
-					}
-				}
-				timeline->apply(skeleton, animationLast, animationTime, eventBuffer, alpha, timelineBlend, direction);
+			} else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
+                applyAttachmentTimeline(static_cast<AttachmentTimeline*>(timeline), skeleton, animationTime, timelineBlend, attachments);
+            } else {
+			    if (drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) && timelineBlend == MixBlend_Setup)
+			        direction = MixDirection_In;
+			    timeline->apply(skeleton, animationLast, animationTime, eventBuffer, alpha, timelineBlend, direction);
 			}
 		}
 	}
@@ -833,6 +868,11 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 	from->_nextTrackLast = from->_trackTime;
 
 	return mix;
+}
+
+void AnimationState::setAttachment(Skeleton& skeleton, Slot& slot, const String& attachmentName, bool attachments) {
+    slot.setAttachment(attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot.getData().getIndex(), attachmentName));
+    if (attachments) slot.setAttachmentState(_unkeyedState + Current);
 }
 
 void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
@@ -953,15 +993,6 @@ void AnimationState::animationsChanged() {
 			entry = entry->_mixingTo;
 		} while (entry != NULL);
 	}
-
-	_propertyIDs.clear();
-	for (int i = (int)_tracks.size() - 1; i >= 0; i--) {
-		TrackEntry *entry = _tracks[i];
-		while (entry) {
-			computeNotLast(entry);
-			entry = entry->_mixingFrom;
-		}
-	}
 }
 
 void AnimationState::computeHold(TrackEntry *entry) {
@@ -1010,22 +1041,6 @@ void AnimationState::computeHold(TrackEntry *entry) {
 				}
 				timelineMode[i] = Hold;
 			}
-		}
-	}
-}
-
-void AnimationState::computeNotLast(TrackEntry *entry) {
-	Vector<Timeline *> &timelines = entry->_animation->_timelines;
-	size_t timelinesCount = timelines.size();
-	Vector<int> &timelineMode = entry->_timelineMode;
-
-	for (size_t i = 0; i < timelinesCount; i++) {
-		if (timelines[i]->getRTTI().isExactly(AttachmentTimeline::rtti)) {
-			AttachmentTimeline *timeline = static_cast<AttachmentTimeline *>(timelines[i]);
-			if (!_propertyIDs.containsKey(timeline->getSlotIndex()))
-				_propertyIDs.put(timeline->getSlotIndex(), true);
-			else
-				timelineMode[i] |= NotLast;
 		}
 	}
 }
