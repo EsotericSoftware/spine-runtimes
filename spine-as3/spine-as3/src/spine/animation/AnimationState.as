@@ -34,13 +34,16 @@ package spine.animation {
 	import spine.Pool;
 	import spine.Skeleton;
 	import flash.utils.Dictionary;
+	import spine.Slot;
 
 	public class AnimationState {
 		public static var SUBSEQUENT : int = 0;
 		public static var FIRST : int = 1;
 		public static var HOLD : int = 2;
 		public static var HOLD_MIX : int = 3;
-		public static var NOT_LAST : int = 4;
+		public static var SETUP : int = 1;
+		public static var CURRENT : int = 2;
+
 		internal static var emptyAnimation : Animation = new Animation("<empty>", new Vector.<Timeline>(), 0);
 		public var data : AnimationStateData;
 		public var tracks : Vector.<TrackEntry> = new Vector.<TrackEntry>();
@@ -57,6 +60,7 @@ package spine.animation {
 		internal var animationsChanged : Boolean;
 		public var timeScale : Number = 1;
 		internal var trackEntryPool : Pool;
+		internal var unkeyedState : int = 0;
 
 		public function AnimationState(data : AnimationStateData) {
 			if (data == null) throw new ArgumentError("data can not be null");
@@ -178,8 +182,14 @@ package spine.animation {
 				var timelines : Vector.<Timeline> = current.animation.timelines;
 				var ii : int = 0;
 				if ((i == 0 && mix == 1) || blend == MixBlend.add) {
-					for (ii = 0; ii < timelineCount; ii++)
-						Timeline(timelines[ii]).apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.In);
+					for (ii = 0; ii < timelineCount; ii++) {
+						var timeline : Timeline = timelines[ii];
+						if (timeline is AttachmentTimeline) {
+							applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, animationTime, blend, true);
+						} else {
+							timeline.apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.In);
+						}
+					}
 				} else {
 					var timelineMode : Vector.<int> = current.timelineMode;
 
@@ -189,9 +199,11 @@ package spine.animation {
 
 					for (ii = 0; ii < timelineCount; ii++) {
 						var timeline : Timeline = timelines[ii];
-						var timelineBlend : MixBlend = (timelineMode[ii] & (NOT_LAST - 1)) == SUBSEQUENT ? blend : MixBlend.setup;
+						var timelineBlend : MixBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline is RotateTimeline) {
 							applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
+						} else if (timeline is AttachmentTimeline) {
+							applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, animationTime, timelineBlend, true);
 						} else
 							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection.In);
 					}
@@ -201,6 +213,20 @@ package spine.animation {
 				current.nextAnimationLast = animationTime;
 				current.nextTrackLast = current.trackTime;
 			}
+
+			// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
+			// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
+			// the time is before the first key).
+			var setupState : int = unkeyedState + SETUP;
+			var slots : Vector.<Slot> = skeleton.slots;
+			for (var i : int = 0, n : int = skeleton.slots.length; i < n; i++) {
+				var slot : Slot = slots[i];
+				if (slot.attachmentState == setupState) {
+					var attachmentName : String = slot.data.attachmentName;
+					slot.attachment = (attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slot.data.index, attachmentName));
+				}
+			}
+			this.unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
 
 			queue.drain();
 			return applied;
@@ -245,14 +271,10 @@ package spine.animation {
 					var direction : MixDirection = MixDirection.Out;
 					var timelineBlend: MixBlend;
 					var alpha : Number = 0;
-					switch (timelineMode[i] & (NOT_LAST - 1)) {
+					switch (timelineMode[i]) {
 					case SUBSEQUENT:
-						timelineBlend = blend;
-						if (!attachments && timeline is AttachmentTimeline) {
-							if ((timelineMode[i] & NOT_LAST) == NOT_LAST) continue;
-							timelineBlend = MixBlend.setup;
-						}
 						if (!drawOrder && timeline is DrawOrderTimeline) continue;
+						timelineBlend = blend;
 						alpha = alphaMix;
 						break;
 					case FIRST:
@@ -272,14 +294,10 @@ package spine.animation {
 					from.totalAlpha += alpha;
 					if (timeline is RotateTimeline)
 						applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
-					else {
-						if (timelineBlend == MixBlend.setup) {
-							if (timeline is AttachmentTimeline) {
-								if (attachments || ((timelineMode[i] & NOT_LAST) == NOT_LAST)) direction = MixDirection.In;
-							} else if (timeline is DrawOrderTimeline) {
-								if (drawOrder) direction = MixDirection.In;
-							}
-						}
+					else if (timeline is AttachmentTimeline) {
+						applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, animationTime, timelineBlend, attachments);
+					} else {
+						if (drawOrder && timeline is DrawOrderTimeline && timelineBlend == MixBlend.setup) direction = MixDirection.In;
 						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
 					}
 				}
@@ -291,6 +309,33 @@ package spine.animation {
 			from.nextTrackLast = from.trackTime;
 
 			return mix;
+		}
+
+		private function applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: Number, blend: MixBlend, attachments: Boolean) : void {
+			var slot : Slot = skeleton.slots[timeline.slotIndex];
+			if (!slot.bone.active) return;
+
+			var frames : Vector.<Number> = timeline.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (blend == MixBlend.setup || blend == MixBlend.first)
+					setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+			}
+			else {
+				var frameIndex : Number;
+				if (time >= frames[frames.length - 1]) // Time is after last frame.
+					frameIndex = frames.length - 1;
+				else
+					frameIndex = Animation.binarySearch1(frames, time) - 1;
+				setAttachment(skeleton, slot, timeline.attachmentNames[frameIndex], attachments);
+			}
+
+			// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
+			if (slot.attachmentState <= unkeyedState) slot.attachmentState = unkeyedState + SETUP;
+		}
+
+		private function setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: String, attachments: Boolean) : void {
+			slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slot.data.index, attachmentName);
+			if (attachments) slot.attachmentState = unkeyedState + CURRENT;
 		}
 
 		private function applyRotateTimeline(timeline : Timeline, skeleton : Skeleton, time : Number, alpha : Number, blend : MixBlend, timelinesRotation : Vector.<Number>, i : int, firstFrame : Boolean) : void {
@@ -603,35 +648,6 @@ package spine.animation {
 					if (entry.mixingTo == null || entry.mixBlend != MixBlend.add) computeHold(entry);
 					entry = entry.mixingTo;
 				} while (entry != null);
-			}
-
-			propertyIDs = new Dictionary();
-			for (i = tracks.length - 1; i >= 0; i--) {
-				entry = tracks[i];
-				while (entry != null) {
-					computeNotLast(entry);
-					entry = entry.mixingFrom;
-				}
-			}
-		}
-
-		private function computeNotLast (entry: TrackEntry) : void {
-			var timelines : Vector.<Timeline> = entry.animation.timelines;
-			var timelinesCount : int = entry.animation.timelines.length;
-			var timelineMode : Vector.<int> = entry.timelineMode;
-			var propertyIDs : Dictionary = this.propertyIDs;
-
-			for (var i : int = 0; i < timelinesCount; i++) {
-				if (timelines[i] is AttachmentTimeline) {
-					var timeline : AttachmentTimeline = AttachmentTimeline(timelines[i]);
-					var intId : int = timeline.slotIndex;
-					var id : String = intId.toString();
-					var contained : Object = propertyIDs[id];
-					propertyIDs[id] = true;
-					if (contained != null) {
-						timelineMode[i] |= NOT_LAST;
-					}
-				}
 			}
 		}
 

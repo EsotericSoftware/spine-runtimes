@@ -56,9 +56,11 @@ package spine.animation {
 		}
 
 		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
-			if (direction == MixDirection.Out && blend == MixBlend.setup) {
-				for (var ii : int = 0, n : int = skeleton.slots.length; ii < n; ii++)
-					skeleton.drawOrder[ii] = skeleton.slots[ii];
+			if (direction == MixDirection.Out) {
+				if (blend == MixBlend.setup) {
+					for (var ii : int = 0, n : int = skeleton.slots.length; ii < n; ii++)
+						skeleton.drawOrder[ii] = skeleton.slots[ii];
+				}
 				return;
 			}
 
