@@ -40,6 +40,7 @@
 namespace spine {
 
 	class Skeleton;
+	class Slot;
 	class Event;
 
 	class SP_API AttachmentTimeline : public Timeline {
@@ -60,14 +61,16 @@ namespace spine {
 
 		size_t getSlotIndex();
 		void setSlotIndex(size_t inValue);
-		const Vector<float>& getFrames();
-		const Vector<String>& getAttachmentNames();
+		Vector<float>& getFrames();
+		Vector<String>& getAttachmentNames();
 		size_t getFrameCount();
 	private:
 		size_t _slotIndex;
 		Vector<float> _frames;
 		Vector<String> _attachmentNames;
-	};
+
+        void setAttachment(Skeleton& skeleton, Slot& slot, String* attachmentName);
+    };
 }
 
 #endif /* Spine_AttachmentTimeline_h */

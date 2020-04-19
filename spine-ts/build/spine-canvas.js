@@ -1472,7 +1472,7 @@ var spine;
 					var timelinesRotation = current.timelinesRotation;
 					for (var ii = 0; ii < timelineCount; ii++) {
 						var timeline_1 = timelines[ii];
-						var timelineBlend = (timelineMode[ii] & (AnimationState.LAST - 1)) == AnimationState.SUBSEQUENT ? blend : spine.MixBlend.setup;
+						var timelineBlend = timelineMode[ii] == AnimationState.SUBSEQUENT ? blend : spine.MixBlend.setup;
 						if (timeline_1 instanceof spine.RotateTimeline) {
 							this.applyRotateTimeline(timeline_1, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
 						}
@@ -1543,7 +1543,7 @@ var spine;
 					var direction = spine.MixDirection.mixOut;
 					var timelineBlend = void 0;
 					var alpha = 0;
-					switch (timelineMode[i] & (AnimationState.LAST - 1)) {
+					switch (timelineMode[i]) {
 						case AnimationState.SUBSEQUENT:
 							if (!drawOrder && timeline instanceof spine.DrawOrderTimeline)
 								continue;
@@ -1567,11 +1567,8 @@ var spine;
 					from.totalAlpha += alpha;
 					if (timeline instanceof spine.RotateTimeline)
 						this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
-					else if (timeline instanceof spine.AttachmentTimeline) {
-						if (!attachments && (timelineMode[i] & AnimationState.LAST) != 0)
-							continue;
+					else if (timeline instanceof spine.AttachmentTimeline)
 						this.applyAttachmentTimeline(timeline, skeleton, animationTime, timelineBlend, attachments);
-					}
 					else {
 						spine.Utils.webkit602BugfixHelper(alpha, blend);
 						if (drawOrder && timeline instanceof spine.DrawOrderTimeline && timelineBlend == spine.MixBlend.setup)
@@ -1900,14 +1897,6 @@ var spine;
 					entry = entry.mixingTo;
 				} while (entry != null);
 			}
-			this.propertyIDs.clear();
-			for (var i = this.tracks.length - 1; i >= 0; i--) {
-				var entry = this.tracks[i];
-				while (entry != null) {
-					this.computeNotLast(entry);
-					entry = entry.mixingFrom;
-				}
-			}
 		};
 		AnimationState.prototype.computeHold = function (entry) {
 			var to = entry.mixingTo;
@@ -1948,19 +1937,6 @@ var spine;
 				}
 			}
 		};
-		AnimationState.prototype.computeNotLast = function (entry) {
-			var timelines = entry.animation.timelines;
-			var timelinesCount = entry.animation.timelines.length;
-			var timelineMode = entry.timelineMode;
-			var propertyIDs = this.propertyIDs;
-			for (var i = 0; i < timelinesCount; i++) {
-				if (timelines[i] instanceof spine.AttachmentTimeline) {
-					var timeline = timelines[i];
-					if (!propertyIDs.add(timeline.slotIndex))
-						timelineMode[i] |= AnimationState.LAST;
-				}
-			}
-		};
 		AnimationState.prototype.getCurrent = function (trackIndex) {
 			if (trackIndex >= this.tracks.length)
 				return null;
@@ -1987,7 +1963,6 @@ var spine;
 		AnimationState.FIRST = 1;
 		AnimationState.HOLD = 2;
 		AnimationState.HOLD_MIX = 3;
-		AnimationState.LAST = 4;
 		AnimationState.SETUP = 1;
 		AnimationState.CURRENT = 2;
 		return AnimationState;

@@ -94,7 +94,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 	static final float checkModifiedInterval = 0.250f;
 	static final float reloadDelay = 1;
 	static float uiScale = 1;
-	static String[] atlasSuffixes = {".atlas", ".atlas.txt", "-pro.atlas", "-pro.atlas.txt", "-ess.atlas", "-ess.atlas.txt"};
+	static String[] dataSuffixes = {".json", ".skel"};
+	static String[] atlasSuffixes = {".atlas", "-pro.atlas", "-ess.atlas"};
+	static String[] extraSuffixes = {"", ".txt", ".bytes"};
 	static String[] args;
 	static final String version = ""; // Replaced by build.
 
@@ -143,22 +145,27 @@ public class SkeletonViewer extends ApplicationAdapter {
 	}
 
 	FileHandle atlasFile (FileHandle skeletonFile) {
-		String atlasFileName = skeletonFile.nameWithoutExtension();
-		if (atlasFileName.endsWith(".bytes")) atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 6);
-		if (atlasFileName.endsWith(".json") || atlasFileName.endsWith(".skel"))
-			atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 5);
-		if (atlasFileName.endsWith(".bytes")) atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 6);
-		FileHandle atlasFile = skeletonFile.sibling(atlasFileName + ".atlas");
-		if (atlasFile.exists()) atlasFile = skeletonFile.sibling(atlasFileName + ".atlas.txt");
-		if (!atlasFile.exists()) {
-			if (atlasFileName.endsWith("-pro") || atlasFileName.endsWith("-ess"))
-				atlasFileName = atlasFileName.substring(0, atlasFileName.length() - 4);
-			for (String suffix : atlasSuffixes) {
-				atlasFile = skeletonFile.sibling(atlasFileName + suffix);
-				if (atlasFile.exists()) break;
+		String baseName = skeletonFile.name();
+		for (String extraSuffix : extraSuffixes) {
+			for (String dataSuffix : dataSuffixes) {
+				String suffix = dataSuffix + extraSuffix;
+				if (baseName.endsWith(suffix)) {
+					FileHandle file = atlasFile(skeletonFile, baseName.substring(0, baseName.length() - suffix.length()));
+					if (file != null) return file;
+				}
 			}
 		}
-		return atlasFile;
+		return atlasFile(skeletonFile, baseName);
+	}
+
+	private FileHandle atlasFile (FileHandle skeletonFile, String baseName) {
+		for (String extraSuffix : extraSuffixes) {
+			for (String suffix : atlasSuffixes) {
+				FileHandle file = skeletonFile.sibling(baseName + suffix + extraSuffix);
+				if (file.exists()) return file;
+			}
+		}
+		return null;
 	}
 
 	void loadSkeleton (final FileHandle skeletonFile) {
@@ -174,7 +181,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			pixmap.dispose();
 
 			TextureAtlasData atlasData = null;
-			if (atlasFile.exists()) {
+			if (atlasFile != null) {
 				atlasData = new TextureAtlasData(atlasFile, atlasFile.parent(), false);
 				boolean linear = true;
 				for (int i = 0, n = atlasData.getPages().size; i < n; i++) {
@@ -238,7 +245,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		this.skeletonFile = skeletonFile;
 		skeletonModified = skeletonFile.lastModified();
-		atlasModified = atlasFile.lastModified();
+		atlasModified = atlasFile == null ? 0 : atlasFile.lastModified();
 		lastModifiedCheck = checkModifiedInterval;
 		prefs.putString("lastFile", skeletonFile.path());
 		prefs.flush();
@@ -314,7 +321,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 					lastModifiedCheck = checkModifiedInterval;
 					long time = skeletonFile.lastModified();
 					if (time != 0 && skeletonModified != time) reloadTimer = reloadDelay;
-					time = atlasFile(skeletonFile).lastModified();
+					FileHandle atlasFile = atlasFile(skeletonFile);
+					time = atlasFile == null ? 0 : atlasFile.lastModified();
 					if (time != 0 && atlasModified != time) reloadTimer = reloadDelay;
 				}
 			} else {

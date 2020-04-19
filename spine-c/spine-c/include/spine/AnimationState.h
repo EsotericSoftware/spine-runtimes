@@ -107,6 +107,8 @@ struct spAnimationState {
 	void* rendererObject;
 	void* userData;
 
+    int unkeyedState;
+
 #ifdef __cplusplus
 	spAnimationState() :
 		data(0),
@@ -115,7 +117,8 @@ struct spAnimationState {
 		listener(0),
 		timeScale(0),
 		rendererObject(0),
-		userData(0) {
+		userData(0),
+		unkeyedState(0) {
 	}
 #endif
 };

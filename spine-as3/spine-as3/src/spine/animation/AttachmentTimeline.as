@@ -60,16 +60,14 @@ package spine.animation {
 			var attachmentName : String;
 			var slot : Slot = skeleton.slots[slotIndex];
 			if (!slot.bone.active) return;
-			if (direction == MixDirection.Out && blend == MixBlend.setup) {
-				attachmentName = slot.data.attachmentName;
-				slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
+			if (direction == MixDirection.Out) {
+				if (blend == MixBlend.setup) setAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
 			}
 			var frames : Vector.<Number> = this.frames;
 			if (time < frames[0]) {
 				if (blend == MixBlend.setup || blend == MixBlend.first) {
-					attachmentName = slot.data.attachmentName;
-					slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
+					setAttachment(skeleton, slot, slot.data.attachmentName);
 				}
 				return;
 			}
@@ -82,6 +80,10 @@ package spine.animation {
 
 			attachmentName = attachmentNames[frameIndex];
 			skeleton.slots[slotIndex].attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
+		}
+
+		private function setAttachment(skeleton: Skeleton, slot: Slot, attachmentName: String) : void {
+			slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
 		}
 	}
 }

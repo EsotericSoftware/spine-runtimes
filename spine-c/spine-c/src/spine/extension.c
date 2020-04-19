@@ -84,6 +84,7 @@ void _spSetRandom (float (*random) ()) {
 
 char* _spReadFile (const char* path, int* length) {
 	char *data;
+	size_t result;
 	FILE *file = fopen(path, "rb");
 	if (!file) return 0;
 
@@ -92,7 +93,7 @@ char* _spReadFile (const char* path, int* length) {
 	fseek(file, 0, SEEK_SET);
 
 	data = MALLOC(char, *length);
-	size_t result = fread(data, 1, *length, file);
+	result = fread(data, 1, *length, file);
 	UNUSED(result);
 	fclose(file);
 

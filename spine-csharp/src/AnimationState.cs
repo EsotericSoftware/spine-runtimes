@@ -66,10 +66,6 @@ namespace Spine {
 		/// (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
 		/// place.
 		internal const int HoldMix = 3;
-		/// 1) This is the last attachment timeline to set the attachment for a slot.<para />
-		/// Result: Don't apply this timeline when mixing out. Attachment timelines that are not last are applied when mixing out so
-		/// any deform timelines are applied and subsequent entries can mix from that deform.
-		internal const int Last = 4;
 
 		internal const int Setup = 1,  Current = 2;
 
@@ -244,7 +240,7 @@ namespace Spine {
 
 					for (int ii = 0; ii < timelineCount; ii++) {
 						Timeline timeline = timelinesItems[ii];
-						MixBlend timelineBlend = (timelineMode[ii] & AnimationState.Last - 1) == AnimationState.Subsequent ? blend : MixBlend.Setup;
+						MixBlend timelineBlend = timelineMode[ii] == AnimationState.Subsequent ? blend : MixBlend.Setup;
 						var rotateTimeline = timeline as RotateTimeline;
 						if (rotateTimeline != null)
 							ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation,
@@ -318,7 +314,7 @@ namespace Spine {
 					MixDirection direction = MixDirection.Out;
 					MixBlend timelineBlend;
 					float alpha;
-					switch (timelineMode[i] & AnimationState.Last - 1) {
+					switch (timelineMode[i]) {
 						case AnimationState.Subsequent:
 							if (!drawOrder && timeline is DrawOrderTimeline) continue;
 							timelineBlend = blend;
@@ -332,7 +328,7 @@ namespace Spine {
 							timelineBlend = MixBlend.Setup;
 							alpha = alphaHold;
 							break;
-						default:
+						default: // HoldMix
 							timelineBlend = MixBlend.Setup;
 							TrackEntry holdMix = timelineHoldMix[i];
 							alpha = alphaHold * Math.Max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
@@ -344,9 +340,6 @@ namespace Spine {
 						ApplyRotateTimeline(rotateTimeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation,
 											i << 1, firstFrame);
 					} else if (timeline is AttachmentTimeline) {
-						// If not showing attachments: do nothing if this is the last timeline, else apply the timeline so
-						// subsequent timelines see any deform, but don't set attachmentState to Current.
-						if (!attachments && (timelineMode[i] & Last) != 0) continue;
 						ApplyAttachmentTimeline((AttachmentTimeline)timeline, skeleton, animationTime, timelineBlend, attachments);
 					} else {
 						if (drawOrder && timeline is DrawOrderTimeline && timelineBlend == MixBlend.Setup)
@@ -790,16 +783,6 @@ namespace Spine {
 					entry = entry.mixingTo;
 				} while (entry != null);
 			}
-
-			// Process in the reverse order that animations are applied.
-			propertyIDs.Clear();
-			for (int i = tracks.Count - 1; i >= 0; i--) {
-				TrackEntry entry = tracksItems[i];
-				while (entry != null) {
-					ComputeNotLast(entry);
-					entry = entry.mixingFrom;
-				}
-			}
 		}
 
 		private void ComputeHold (TrackEntry entry) {
@@ -841,20 +824,6 @@ namespace Spine {
 					timelineMode[i] = AnimationState.Hold;
 				}
 				continue_outer: {}
-			}
-		}
-
-		private void ComputeNotLast (TrackEntry entry) {
-			var timelines = entry.animation.timelines.Items;
-			int timelinesCount = entry.animation.timelines.Count;
-			int[] timelineMode = entry.timelineMode.Items;
-			var propertyIDs = this.propertyIDs;
-
-			for (int i = 0; i < timelinesCount; i++) {
-				if (timelines[i] is AttachmentTimeline) {
-					AttachmentTimeline timeline = (AttachmentTimeline)timelines[i];
-					if (propertyIDs.Add(timeline.slotIndex)) timelineMode[i] |= AnimationState.Last;
-				}
 			}
 		}
 

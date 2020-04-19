@@ -44,7 +44,8 @@ typedef struct spSlot {
 	spBone* const bone;
 	spColor color;
 	spColor* darkColor;
-	spAttachment* const attachment;
+	spAttachment* attachment;
+	int attachmentState;
 
 	int deformCapacity;
 	int deformCount;
@@ -57,6 +58,7 @@ typedef struct spSlot {
 		color(),
 		darkColor(0),
 		attachment(0),
+		attachmentState(0),
 		deformCapacity(0),
 		deformCount(0),
 		deform(0) {
