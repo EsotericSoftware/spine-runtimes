@@ -805,18 +805,15 @@ module spine {
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let slot = skeleton.slots[this.slotIndex];
 			if (!slot.bone.active) return;
-			if (direction == MixDirection.mixOut && blend == MixBlend.setup) {
-				let attachmentName = slot.data.attachmentName;
-				slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
+			if (direction == MixDirection.mixOut) {
+				if (blend == MixBlend.setup)
+					this.setAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
 			}
 
 			let frames = this.frames;
 			if (time < frames[0]) {
-				if (blend == MixBlend.setup || blend == MixBlend.first) {
-					let attachmentName = slot.data.attachmentName;
-					slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
-				}
+				if (blend == MixBlend.setup || blend == MixBlend.first) this.setAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
 			}
 
@@ -829,6 +826,10 @@ module spine {
 			let attachmentName = this.attachmentNames[frameIndex];
 			skeleton.slots[this.slotIndex]
 				.setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
+		}
+
+		setAttachment(skeleton: Skeleton, slot: Slot, attachmentName: string) {
+			slot.attachment = attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName);
 		}
 	}
 
@@ -1135,8 +1136,8 @@ module spine {
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let drawOrder: Array<Slot> = skeleton.drawOrder;
 			let slots: Array<Slot> = skeleton.slots;
-			if (direction == MixDirection.mixOut && blend == MixBlend.setup) {
-				Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
+			if (direction == MixDirection.mixOut) {
+				if (blend == MixBlend.setup) Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
 				return;
 			}
 

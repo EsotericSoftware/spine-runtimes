@@ -47,9 +47,11 @@ module spine {
 		 * color's alpha is not used. */
 		darkColor: Color;
 
-		private attachment: Attachment;
+		attachment: Attachment;
 
 		private attachmentTime: number;
+
+		attachmentState: number;
 
 		/** Values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
 		 * weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
