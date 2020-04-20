@@ -45,6 +45,7 @@ function Slot.new (data, bone)
 		darkColor = nil,
 		attachment = nil,
 		attachmentTime = 0,
+		attachmentState = 0,
 		deform = {}
 	}
 
