@@ -54,7 +54,9 @@ local SUBSEQUENT = 0
 local FIRST = 1
 local HOLD = 2
 local HOLD_MIX = 3
-local NOT_LAST = 4
+
+local SETUP = 1
+local CURRENT = 2
 
 local EventType = {
 	start = 0,
@@ -214,7 +216,8 @@ function AnimationState.new (data)
 		propertyIDs = {},
 		animationsChanged = false,
 		timeScale = 1,
-		mixingTo = {}
+		mixingTo = {},
+		unkeyedState = 0
 	}
 	self.queue = EventQueue.new(self)
 	setmetatable(self, AnimationState)
@@ -358,7 +361,11 @@ function AnimationState:apply (skeleton)
 				local timelines = current.animation.timelines
 				if (i == 0 and mix == 1) or blend == MixBlend.add then
 					for i,timeline in ipairs(timelines) do
-						timeline:apply(skeleton, animationLast, animationTime, self.events, mix, blend, MixDirection._in)
+						if timeline.type == Animation.TimelineType.attachment then
+							self:applyAttachmentTimeline(timeline, skeleton, animationTime, blend, true)
+						else
+							timeline:apply(skeleton, animationLast, animationTime, self.events, mix, blend, MixDirection._in)
+						end
 					end
 				else
 					local timelineMode = current.timelineMode
@@ -367,11 +374,13 @@ function AnimationState:apply (skeleton)
 
 					for ii,timeline in ipairs(timelines) do
 						local timelineBlend = MixBlend.setup
-						if clearBit(timelineMode[ii], NOT_LAST) == SUBSEQUENT then timelineBlend = blend end
+						if timelineMode[ii] == SUBSEQUENT then timelineBlend = blend end
 
 						if timeline.type == Animation.TimelineType.rotate then
 							self:applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii * 2,
 									firstFrame)
+						elseif timeline.type == Animation.TimelineType.attachment then
+							self:applyAttachmentTimeline(skeleton, animationTime, timelineBlend, true)
 						else
 							timeline:apply(skeleton, animationLast, animationTime, self.events, mix, timelineBlend, MixDirection._in)
 						end
@@ -385,6 +394,24 @@ function AnimationState:apply (skeleton)
 		end
 		i = i + 1
 	end
+
+	-- Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
+	-- subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
+	-- the time is before the first key).
+	local setupState = self.unkeyedState + SETUP
+	local slots = skeleton.slots;
+	for _, slot in ipairs(slots) do
+		if slot.attachmentState == setupState then
+			local attachmentName = slot.data.attachmentName
+			if attachmentName == nil then
+				slot.attachment = nil
+			else
+				slot.attachment = skeleton:getAttachmentByIndex(slot.data.index, attachmentName)
+			end
+		end
+	end
+	self.unkeyedState = self.unkeyedState + 2; -- Increasing after each use avoids the need to reset attachmentState for every slot.
+
 
 	queue:drain()
 	return applied
@@ -432,21 +459,14 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 			local direction = MixDirection.out;
 			local timelineBlend = MixBlend.setup
 			local alpha = 0
-			if clearBit(timelineMode[i], NOT_LAST) == SUBSEQUENT then
-				timelineBlend = blend
-				if not attachments and timeline.type == Animation.TimelineType.attachment then
-					if testBit(timelineMode[i], NOT_LAST) then
-						skipSubsequent = true
-					else
-						timelineBlend = MixBlend.setup
-					end
-				end
+			if timelineMode[i] == SUBSEQUENT then
 				if not drawOrder and timeline.type == Animation.TimelineType.drawOrder then skipSubsequent = true end
+				timelineBlend = blend
 				alpha = alphaMix
-			elseif clearBit(timelineMode[i], NOT_LAST) == FIRST then
+			elseif timelineMode[i] == FIRST then
 				timelineBlend = MixBlend.setup
 				alpha = alphaMix
-			elseif clearBit(timelineMode[i], NOT_LAST) == HOLD then
+			elseif timelineMode[i] == HOLD then
 				timelineBlend = MixBlend.setup
 				alpha = alphaHold
 			else
@@ -459,13 +479,11 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 				from.totalAlpha = from.totalAlpha + alpha
 				if timeline.type == Animation.TimelineType.rotate then
 					self:applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i * 2, firstFrame)
+				elseif timeline.type == Animation.TimelineType.attachment then
+					self:applyAttachmentTimeline(timeline, skeleton, animationTime, timelineBlend, attachments)
 				else
-					if timelineBlend == MixBlend.setup then
-						if timeline.type == Animation.TimelineType.attachment then
-							if attachments or testBit(timelineMode[i], NOT_LAST) then direction = MixDirection._in end
-						elseif timeline.type == Animation.TimelineType.drawOrder then
-							if drawOrder then direction = MixDirection._in end
-						end
+					if (drawOrder and timeline.type == Animation.TimelineType.drawOrder and timelineBlend == MixBlend.setup) then
+						direction = MixDirection._in
 					end
 					timeline:apply(skeleton, animationLast, animationTime, self.events, alpha, timelineBlend, direction)
 				end
@@ -481,6 +499,38 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 	from.nextTrackLast = from.trackTime
 
 	return mix
+end
+
+function AnimationState:applyAttachmentTimeline(timeline, skeleton, time, blend, attachments)
+	local slot = skeleton.slots[timeline.slotIndex];
+	if slot.bone.active == false then return end
+
+	local frames = timeline.frames
+	if time < frames[0] then -- Time is before first frame.
+		if blend == MixBlend.setup or blend == MixBlend.first then
+			self:setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+		end
+	else
+		local frameIndex = 0
+		if (time >= frames[zlen(frames) - 1]) then -- Time is after last frame.
+			frameIndex = zlen(frames) - 1;
+		else
+			frameIndex = Animation.binarySearch(frames, time, 1) - 1;
+			self:setAttachment(skeleton, slot, timeline.attachmentNames[frameIndex], attachments)
+		end
+	end
+
+	-- If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
+	if slot.attachmentState <= self.unkeyedState then slot.attachmentState = self.unkeyedState + SETUP end
+end
+
+function AnimationState:setAttachment(skeleton, slot, attachmentName, attachments)
+	if (attachmentName == nil) then
+		slot.attachment = nil
+	else
+		slot.attachment = skeleton:getAttachmentByIndex(slot.data.index, attachmentName)
+	end
+	if attachments then slot.attachmentState = self.unkeyedState + CURRENT end
 end
 
 function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, blend, timelinesRotation, i, firstFrame)
@@ -862,36 +912,6 @@ function AnimationState:_animationsChanged ()
 					end
 					entry = entry.mixingTo
 				until (entry == nil)
-			end
-		end
-		i = i + 1
-	end
-
-	self.propertyIDs = {}
-	for i = highestIndex, 0, -1 do
-		entry = self.tracks[i]
-		while entry do
-			self:computeNotLast(entry)
-			entry = entry.mixingFrom
-		end
-	end
-end
-
-function AnimationState:computeNotLast(entry)
-	local timelines = entry.animation.timelines
-	local timelinesCount = #entry.animation.timelines
-	local timelineMode = entry.timelineMode
-	local propertyIDs = self.propertyIDs
-
-	local i = 1
-	while i <= timelinesCount do
-		local timeline = timelines[i]
-		if (timeline.type == Animation.TimelineType.attachment) then
-			local slotIndex = timeline.slotIndex
-			if not (propertyIDs[slotIndex] == nil) then
-				timelineMode[i] = setBit(timelineMode[i], NOT_LAST)
-			else
-				propertyIDs[slotIndex] = true
 			end
 		end
 		i = i + 1
