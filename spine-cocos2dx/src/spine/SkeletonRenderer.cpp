@@ -641,6 +641,7 @@ namespace spine {
 #endif
 
 		DrawNode* drawNode = DrawNode::create();
+        drawNode->setGlobalZOrder(getGlobalZOrder()); 
 
 		// Draw bounding rectangle
 		if (_debugBoundingRect) {
