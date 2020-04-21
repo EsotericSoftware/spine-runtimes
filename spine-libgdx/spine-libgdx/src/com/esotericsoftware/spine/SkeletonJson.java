@@ -64,7 +64,6 @@ import com.esotericsoftware.spine.BoneData.TransformMode;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
-import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.AttachmentType;
@@ -78,34 +77,18 @@ import com.esotericsoftware.spine.attachments.VertexAttachment;
 
 /** Loads skeleton data in the Spine JSON format.
  * <p>
+ * JSON is human readable but the binary format is much smaller on disk and faster to load. See {@link SkeletonBinary}.
+ * <p>
  * See <a href="http://esotericsoftware.com/spine-json-format">Spine JSON format</a> and
  * <a href="http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data">JSON and binary data</a> in the Spine
  * Runtimes Guide. */
-public class SkeletonJson {
-	private final AttachmentLoader attachmentLoader;
-	private float scale = 1;
-	private final Array<LinkedMesh> linkedMeshes = new Array();
+public class SkeletonJson extends SkeletonLoader {
+	public SkeletonJson (AttachmentLoader attachmentLoader) {
+		super(attachmentLoader);
+	}
 
 	public SkeletonJson (TextureAtlas atlas) {
-		attachmentLoader = new AtlasAttachmentLoader(atlas);
-	}
-
-	public SkeletonJson (AttachmentLoader attachmentLoader) {
-		if (attachmentLoader == null) throw new IllegalArgumentException("attachmentLoader cannot be null.");
-		this.attachmentLoader = attachmentLoader;
-	}
-
-	/** Scales bone positions, image sizes, and translations as they are loaded. This allows different size images to be used at
-	 * runtime than were used in Spine.
-	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-loading-skeleton-data#Scaling">Scaling</a> in the Spine Runtimes Guide. */
-	public float getScale () {
-		return scale;
-	}
-
-	public void setScale (float scale) {
-		if (scale == 0) throw new IllegalArgumentException("scale cannot be 0.");
-		this.scale = scale;
+		super(atlas);
 	}
 
 	protected JsonValue parse (FileHandle file) {
@@ -128,8 +111,6 @@ public class SkeletonJson {
 		if (skeletonMap != null) {
 			skeletonData.hash = skeletonMap.getString("hash", null);
 			skeletonData.version = skeletonMap.getString("spine", null);
-			if ("3.8.75".equals(skeletonData.version))
-				throw new RuntimeException("Unsupported skeleton data, please export with a newer version of Spine.");
 			skeletonData.x = skeletonMap.getFloat("x", 0);
 			skeletonData.y = skeletonMap.getFloat("y", 0);
 			skeletonData.width = skeletonMap.getFloat("width", 0);
@@ -491,7 +472,7 @@ public class SkeletonJson {
 		for (int i = 0, n = vertices.length; i < n;) {
 			int boneCount = (int)vertices[i++];
 			bones.add(boneCount);
-			for (int nn = i + boneCount * 4; i < nn; i += 4) {
+			for (int nn = i + (boneCount << 2); i < nn; i += 4) {
 				bones.add((int)vertices[i]);
 				weights.add(vertices[i + 1] * scale);
 				weights.add(vertices[i + 2] * scale);
@@ -544,10 +525,10 @@ public class SkeletonJson {
 						float na = Integer.parseInt(color.substring(6, 8), 16) / 255f;
 						JsonValue curve = keyMap.get("curve");
 						if (curve != null) {
-							bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr);
-							bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng);
-							bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb);
-							bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, a, na);
+							bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, a, na, 1);
 						}
 						time = time2;
 						r = nr;
@@ -589,13 +570,13 @@ public class SkeletonJson {
 						float nb2 = Integer.parseInt(color.substring(12, 14), 16) / 255f;
 						JsonValue curve = keyMap.get("curve");
 						if (curve != null) {
-							bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr);
-							bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng);
-							bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb);
-							bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, a, na);
-							bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, r2, nr2);
-							bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, g2, ng2);
-							bezier = readCurve(curve, timeline, bezier, frame, 6, time, time2, b2, nb2);
+							bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, a, na, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, r2, nr2, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, g2, ng2, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 6, time, time2, b2, nb2, 1);
 						}
 						time = time2;
 						r = nr;
@@ -660,8 +641,8 @@ public class SkeletonJson {
 				float mix2 = nextMap.getFloat("mix", 1), softness2 = nextMap.getFloat("softness", 0) * scale;
 				JsonValue curve = keyMap.get("curve");
 				if (curve != null) {
-					bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mix, mix2);
-					bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, softness, softness2);
+					bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mix, mix2, 1);
+					bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, softness, softness2, 1);
 				}
 				time = time2;
 				mix = mix2;
@@ -693,10 +674,10 @@ public class SkeletonJson {
 				float scaleMix2 = nextMap.getFloat("scaleMix", 1), shearMix2 = nextMap.getFloat("shearMix", 1);
 				JsonValue curve = keyMap.get("curve");
 				if (curve != null) {
-					bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, rotateMix, rotateMix2);
-					bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, translateMix, translateMix2);
-					bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, scaleMix, scaleMix2);
-					bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, shearMix, shearMix2);
+					bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, rotateMix, rotateMix2, 1);
+					bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, translateMix, translateMix2, 1);
+					bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, scaleMix, scaleMix2, 1);
+					bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, shearMix, shearMix2, 1);
 				}
 				time = time2;
 				rotateMix = rotateMix2;
@@ -777,7 +758,7 @@ public class SkeletonJson {
 						}
 						float time2 = nextMap.getFloat("time", 0);
 						JsonValue curve = keyMap.get("curve");
-						if (curve != null) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1);
+						if (curve != null) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
 						time = time2;
 						keyMap = nextMap;
 					}
@@ -853,16 +834,16 @@ public class SkeletonJson {
 	}
 
 	private Timeline readTimeline (JsonValue keyMap, CurveTimeline1 timeline, float defaultValue, float scale) {
-		float time = keyMap.getFloat("time", 0), value = keyMap.getFloat("value", defaultValue);
+		float time = keyMap.getFloat("time", 0), value = keyMap.getFloat("value", defaultValue) * scale;
 		int bezier = 0;
 		for (int frame = 0;; frame++) {
 			timeline.setFrame(frame, time, value);
 			JsonValue nextMap = keyMap.next;
 			if (nextMap == null) break;
 			float time2 = nextMap.getFloat("time", 0);
-			float value2 = nextMap.getFloat("value", defaultValue);
+			float value2 = nextMap.getFloat("value", defaultValue) * scale;
 			JsonValue curve = keyMap.get("curve");
-			if (curve != null) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value, value2);
+			if (curve != null) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value, value2, scale);
 			time = time2;
 			value = value2;
 			keyMap = nextMap;
@@ -874,18 +855,18 @@ public class SkeletonJson {
 	private Timeline readTimeline (JsonValue keyMap, CurveTimeline2 timeline, String name1, String name2, float defaultValue,
 		float scale) {
 		float time = keyMap.getFloat("time", 0);
-		float value1 = keyMap.getFloat(name1, defaultValue), value2 = keyMap.getFloat(name2, defaultValue);
+		float value1 = keyMap.getFloat(name1, defaultValue) * scale, value2 = keyMap.getFloat(name2, defaultValue) * scale;
 		int bezier = 0;
 		for (int frame = 0;; frame++) {
 			timeline.setFrame(frame, time, value1, value2);
 			JsonValue nextMap = keyMap.next;
 			if (nextMap == null) break;
 			float time2 = nextMap.getFloat("time", 0);
-			float nvalue1 = nextMap.getFloat(name1, defaultValue), nvalue2 = nextMap.getFloat(name2, defaultValue);
+			float nvalue1 = nextMap.getFloat(name1, defaultValue) * scale, nvalue2 = nextMap.getFloat(name2, defaultValue) * scale;
 			JsonValue curve = keyMap.get("curve");
 			if (curve != null) {
-				bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value1, nvalue1);
-				bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, value2, nvalue2);
+				bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value1, nvalue1, scale);
+				bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, value2, nvalue2, scale);
 			}
 			time = time2;
 			value1 = nvalue1;
@@ -897,18 +878,18 @@ public class SkeletonJson {
 	}
 
 	int readCurve (JsonValue curve, CurveTimeline timeline, int bezier, int frame, int value, float time1, float time2,
-		float value1, float value2) {
+		float value1, float value2, float scale) {
 		if (curve.isString()) {
 			if (value != 0) timeline.setStepped(frame);
 		} else {
-			curve = curve.get(value * 4);
+			curve = curve.get(value << 2);
 			float cx1 = curve.asFloat();
 			curve = curve.next;
-			float cy1 = curve.asFloat();
+			float cy1 = curve.asFloat() * scale;
 			curve = curve.next;
 			float cx2 = curve.asFloat();
 			curve = curve.next;
-			float cy2 = curve.asFloat();
+			float cy2 = curve.asFloat() * scale;
 			setBezier(timeline, frame, value, bezier++, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
 		}
 		return bezier;

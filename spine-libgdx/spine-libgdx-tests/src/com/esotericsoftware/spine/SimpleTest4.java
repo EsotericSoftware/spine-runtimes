@@ -35,6 +35,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 public class SimpleTest4 extends ApplicationAdapter {
@@ -59,7 +60,8 @@ public class SimpleTest4 extends ApplicationAdapter {
 		atlas = new TextureAtlas(Gdx.files.internal("goblins/goblins-pma.atlas"));
 
 		SkeletonJson loader = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
-		loader.setScale(0.6f); // Load the skeleton at 60% the size it was in Spine.
+		// SkeletonLoader loader = new SkeletonBinary(atlas); // Or use SkeletonBinary to load binary data.
+		loader.setScale(1.3f); // Load the skeleton at 130% the size it was in Spine.
 		SkeletonData skeletonData = loader.readSkeletonData(Gdx.files.internal("goblins/goblins-pro.json"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
