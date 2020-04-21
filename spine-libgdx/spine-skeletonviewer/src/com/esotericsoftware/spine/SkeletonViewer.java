@@ -94,9 +94,10 @@ public class SkeletonViewer extends ApplicationAdapter {
 	static final float checkModifiedInterval = 0.250f;
 	static final float reloadDelay = 1;
 	static float uiScale = 1;
+	static String[] startSuffixes = {"", "-pro", "-ess"};
 	static String[] dataSuffixes = {".json", ".skel"};
-	static String[] atlasSuffixes = {".atlas", "-pro.atlas", "-ess.atlas"};
-	static String[] extraSuffixes = {"", ".txt", ".bytes"};
+	static String[] endSuffixes = {"", ".txt", ".bytes"};
+	static String[] atlasSuffixes = {".atlas", "-pma.atlas"};
 	static String[] args;
 	static final String version = ""; // Replaced by build.
 
@@ -146,12 +147,14 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 	FileHandle atlasFile (FileHandle skeletonFile) {
 		String baseName = skeletonFile.name();
-		for (String extraSuffix : extraSuffixes) {
-			for (String dataSuffix : dataSuffixes) {
-				String suffix = dataSuffix + extraSuffix;
-				if (baseName.endsWith(suffix)) {
-					FileHandle file = atlasFile(skeletonFile, baseName.substring(0, baseName.length() - suffix.length()));
-					if (file != null) return file;
+		for (String startSuffix : startSuffixes) {
+			for (String endSuffix : endSuffixes) {
+				for (String dataSuffix : dataSuffixes) {
+					String suffix = startSuffix + dataSuffix + endSuffix;
+					if (baseName.endsWith(suffix)) {
+						FileHandle file = atlasFile(skeletonFile, baseName.substring(0, baseName.length() - suffix.length()));
+						if (file != null) return file;
+					}
 				}
 			}
 		}
@@ -159,10 +162,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 	}
 
 	private FileHandle atlasFile (FileHandle skeletonFile, String baseName) {
-		for (String extraSuffix : extraSuffixes) {
-			for (String suffix : atlasSuffixes) {
-				FileHandle file = skeletonFile.sibling(baseName + suffix + extraSuffix);
-				if (file.exists()) return file;
+		for (String startSuffix : startSuffixes) {
+			for (String endSuffix : endSuffixes) {
+				for (String suffix : atlasSuffixes) {
+					FileHandle file = skeletonFile.sibling(baseName + startSuffix + suffix + endSuffix);
+					if (file.exists()) return file;
+				}
 			}
 		}
 		return null;
@@ -238,6 +243,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		state = new AnimationState(new AnimationStateData(skeletonData));
 		state.addListener(new AnimationStateAdapter() {
+
 			public void event (TrackEntry entry, Event event) {
 				ui.toast(event.getData().getName());
 			}
@@ -254,6 +260,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		ui.window.getTitleLabel().setText(skeletonFile.name());
 		{
+
 			Array<String> items = new Array();
 			for (Skin skin : skeletonData.getSkins())
 				items.add(skin.getName());
