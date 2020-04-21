@@ -34,12 +34,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 public class SimpleTest1 extends ApplicationAdapter {
 	OrthographicCamera camera;
-	SpriteBatch batch;
+	PolygonSpriteBatch batch;
 	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
 
@@ -49,7 +49,7 @@ public class SimpleTest1 extends ApplicationAdapter {
 
 	public void create () {
 		camera = new OrthographicCamera();
-		batch = new SpriteBatch();
+		batch = new PolygonSpriteBatch();
 		renderer = new SkeletonRenderer();
 		renderer.setPremultipliedAlpha(true); // PMA results in correct blending without outlines.
 		debugRenderer = new SkeletonRendererDebug();
@@ -57,9 +57,15 @@ public class SimpleTest1 extends ApplicationAdapter {
 		debugRenderer.setRegionAttachments(false);
 
 		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy-pma.atlas"));
-		SkeletonBinary json = new SkeletonBinary(atlas); // This loads skeleton JSON data, which is stateless.
-		json.setScale(0.6f); // Load the skeleton at 60% the size it was in Spine.
-		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy-pro.skel"));
+
+		SkeletonJson loader = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
+		loader.setScale(0.6f); // Load the skeleton at 60% the size it was in Spine.
+		SkeletonData skeletonData = loader.readSkeletonData(Gdx.files.internal("spineboy/spineboy-pro.json"));
+
+		// Binary would be loaded similarly:
+		// SkeletonBinary loader = new SkeletonBinary(atlas);
+		// loader.setScale(0.6f);
+		// SkeletonData skeletonData = loader.readSkeletonData(Gdx.files.internal("spineboy/spineboy-pro.skel"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
 		skeleton.setPosition(250, 20);
