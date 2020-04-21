@@ -137,8 +137,8 @@ public class SkeletonBinary {
 
 		SkeletonInput input = new SkeletonInput(file);
 		try {
-			skeletonData.hash = input.readString();
-			if (skeletonData.hash.isEmpty()) skeletonData.hash = null;
+			long hash = input.readLong();
+			skeletonData.hash = hash == 0 ? null : Long.toString(hash);
 			skeletonData.version = input.readString();
 			if (skeletonData.version.isEmpty()) skeletonData.version = null;
 			if ("3.8.75".equals(skeletonData.version))
