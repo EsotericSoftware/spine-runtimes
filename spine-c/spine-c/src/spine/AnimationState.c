@@ -385,7 +385,6 @@ int spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		timelines = current->animation->timelines;
 		if ((i == 0 && mix == 1) || blend == SP_MIX_BLEND_ADD) {
 			for (ii = 0; ii < timelineCount; ii++) {
-				timeline = timelines[ii];
 			    if (timeline->type == SP_TIMELINE_ATTACHMENT) {
                     _spAnimationState_applyAttachmentTimeline(self, timeline, skeleton, animationTime, blend, -1);
 			    } else {
