@@ -60,13 +60,9 @@ public class SimpleTest3 extends ApplicationAdapter {
 		atlas = new TextureAtlas(Gdx.files.internal("raptor/raptor-pma.atlas"));
 
 		SkeletonJson loader = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
-		loader.setScale(0.5f); // Load the skeleton at 50% the size it was in Spine.
+		// SkeletonLoader loader = new SkeletonBinary(atlas); // Or use SkeletonBinary to load binary data.
+		loader.setScale(0.1f); // Load the skeleton at 50% the size it was in Spine.
 		SkeletonData skeletonData = loader.readSkeletonData(Gdx.files.internal("raptor/raptor-pro.json"));
-
-		// Binary would be loaded similarly:
-		// SkeletonBinary loader = new SkeletonBinary(atlas);
-		// loader.setScale(0.5f);
-		// SkeletonData skeletonData = loader.readSkeletonData(Gdx.files.internal("raptor/raptor-pro.skel"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
 		skeleton.setPosition(250, 20);

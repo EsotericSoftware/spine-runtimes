@@ -66,7 +66,6 @@ import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
 import com.esotericsoftware.spine.PathConstraintData.SpacingMode;
 import com.esotericsoftware.spine.SkeletonJson.LinkedMesh;
-import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.AttachmentType;
@@ -83,7 +82,7 @@ import com.esotericsoftware.spine.attachments.VertexAttachment;
  * See <a href="http://esotericsoftware.com/spine-binary-format">Spine binary format</a> and
  * <a href="http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data">JSON and binary data</a> in the Spine
  * Runtimes Guide. */
-public class SkeletonBinary {
+public class SkeletonBinary extends SkeletonLoader {
 	static public final int BONE_ROTATE = 0;
 	static public final int BONE_TRANSLATE = 1;
 	static public final int BONE_SCALE = 2;
@@ -101,30 +100,12 @@ public class SkeletonBinary {
 	static public final int CURVE_STEPPED = 1;
 	static public final int CURVE_BEZIER = 2;
 
-	private final AttachmentLoader attachmentLoader;
-	private float scale = 1;
-	private final Array<LinkedMesh> linkedMeshes = new Array();
+	public SkeletonBinary (AttachmentLoader attachmentLoader) {
+		super(attachmentLoader);
+	}
 
 	public SkeletonBinary (TextureAtlas atlas) {
-		attachmentLoader = new AtlasAttachmentLoader(atlas);
-	}
-
-	public SkeletonBinary (AttachmentLoader attachmentLoader) {
-		if (attachmentLoader == null) throw new IllegalArgumentException("attachmentLoader cannot be null.");
-		this.attachmentLoader = attachmentLoader;
-	}
-
-	/** Scales bone positions, image sizes, and translations as they are loaded. This allows different size images to be used at
-	 * runtime than were used in Spine.
-	 * <p>
-	 * See <a href="http://esotericsoftware.com/spine-loading-skeleton-data#Scaling">Scaling</a> in the Spine Runtimes Guide. */
-	public float getScale () {
-		return scale;
-	}
-
-	public void setScale (float scale) {
-		if (scale == 0) throw new IllegalArgumentException("scale cannot be 0.");
-		this.scale = scale;
+		super(atlas);
 	}
 
 	public SkeletonData readSkeletonData (FileHandle file) {
@@ -610,10 +591,10 @@ public class SkeletonBinary {
 							timeline.setStepped(frame);
 							break;
 						case CURVE_BEZIER:
-							setBezier(input, timeline, bezier++, frame, 0, time, time2, r, r2);
-							setBezier(input, timeline, bezier++, frame, 1, time, time2, g, g2);
-							setBezier(input, timeline, bezier++, frame, 2, time, time2, b, b2);
-							setBezier(input, timeline, bezier++, frame, 3, time, time2, a, a2);
+							setBezier(input, timeline, bezier++, frame, 0, time, time2, r, r2, 1);
+							setBezier(input, timeline, bezier++, frame, 1, time, time2, g, g2, 1);
+							setBezier(input, timeline, bezier++, frame, 2, time, time2, b, b2, 1);
+							setBezier(input, timeline, bezier++, frame, 3, time, time2, a, a2, 1);
 						}
 						time = time2;
 						r = r2;
@@ -644,13 +625,13 @@ public class SkeletonBinary {
 							timeline.setStepped(frame);
 							break;
 						case CURVE_BEZIER:
-							setBezier(input, timeline, bezier++, frame, 0, time, time2, r, nr);
-							setBezier(input, timeline, bezier++, frame, 1, time, time2, g, ng);
-							setBezier(input, timeline, bezier++, frame, 2, time, time2, b, nb);
-							setBezier(input, timeline, bezier++, frame, 3, time, time2, a, na);
-							setBezier(input, timeline, bezier++, frame, 4, time, time2, r2, nr2);
-							setBezier(input, timeline, bezier++, frame, 5, time, time2, g2, ng2);
-							setBezier(input, timeline, bezier++, frame, 6, time, time2, b2, nb2);
+							setBezier(input, timeline, bezier++, frame, 0, time, time2, r, nr, 1);
+							setBezier(input, timeline, bezier++, frame, 1, time, time2, g, ng, 1);
+							setBezier(input, timeline, bezier++, frame, 2, time, time2, b, nb, 1);
+							setBezier(input, timeline, bezier++, frame, 3, time, time2, a, na, 1);
+							setBezier(input, timeline, bezier++, frame, 4, time, time2, r2, nr2, 1);
+							setBezier(input, timeline, bezier++, frame, 5, time, time2, g2, ng2, 1);
+							setBezier(input, timeline, bezier++, frame, 6, time, time2, b2, nb2, 1);
 						}
 						time = time2;
 						r = nr;
@@ -703,8 +684,8 @@ public class SkeletonBinary {
 					timeline.setStepped(frame);
 					break;
 				case CURVE_BEZIER:
-					setBezier(input, timeline, bezier++, frame, 0, time, time2, mix, mix2);
-					setBezier(input, timeline, bezier++, frame, 1, time, time2, softness, softness2);
+					setBezier(input, timeline, bezier++, frame, 0, time, time2, mix, mix2, 1);
+					setBezier(input, timeline, bezier++, frame, 1, time, time2, softness, softness2, 1);
 				}
 				time = time2;
 				mix = mix2;
@@ -729,10 +710,10 @@ public class SkeletonBinary {
 					timeline.setStepped(frame);
 					break;
 				case CURVE_BEZIER:
-					setBezier(input, timeline, bezier++, frame, 0, time, time2, rotateMix, rotateMix2);
-					setBezier(input, timeline, bezier++, frame, 1, time, time2, translateMix, translateMix2);
-					setBezier(input, timeline, bezier++, frame, 2, time, time2, scaleMix, scaleMix2);
-					setBezier(input, timeline, bezier++, frame, 3, time, time2, shearMix, shearMix2);
+					setBezier(input, timeline, bezier++, frame, 0, time, time2, rotateMix, rotateMix2, 1);
+					setBezier(input, timeline, bezier++, frame, 1, time, time2, translateMix, translateMix2, 1);
+					setBezier(input, timeline, bezier++, frame, 2, time, time2, scaleMix, scaleMix2, 1);
+					setBezier(input, timeline, bezier++, frame, 3, time, time2, shearMix, shearMix2, 1);
 				}
 				time = time2;
 				rotateMix = rotateMix2;
@@ -812,7 +793,7 @@ public class SkeletonBinary {
 							timeline.setStepped(frame);
 							break;
 						case CURVE_BEZIER:
-							setBezier(input, timeline, bezier++, frame, 0, time, time2, 0, 1);
+							setBezier(input, timeline, bezier++, frame, 0, time, time2, 0, 1, 1);
 						}
 						time = time2;
 					}
@@ -891,7 +872,7 @@ public class SkeletonBinary {
 				timeline.setStepped(frame);
 				break;
 			case CURVE_BEZIER:
-				setBezier(input, timeline, bezier++, frame, 0, time, time2, value, value2);
+				setBezier(input, timeline, bezier++, frame, 0, time, time2, value, value2, 1);
 			}
 			time = time2;
 			value = value2;
@@ -910,8 +891,8 @@ public class SkeletonBinary {
 				timeline.setStepped(frame);
 				break;
 			case CURVE_BEZIER:
-				setBezier(input, timeline, bezier++, frame, 0, time, time2, value1, nvalue1);
-				setBezier(input, timeline, bezier++, frame, 1, time, time2, value2, nvalue2);
+				setBezier(input, timeline, bezier++, frame, 0, time, time2, value1, nvalue1, scale);
+				setBezier(input, timeline, bezier++, frame, 1, time, time2, value2, nvalue2, scale);
 			}
 			time = time2;
 			value1 = nvalue1;
@@ -921,9 +902,9 @@ public class SkeletonBinary {
 	}
 
 	void setBezier (SkeletonInput input, CurveTimeline timeline, int bezier, int frame, int value, float time1, float time2,
-		float value1, float value2) throws IOException {
-		timeline.setBezier(bezier, frame, value, time1, value1, input.readFloat(), input.readFloat(), input.readFloat(),
-			input.readFloat(), time2, value2);
+		float value1, float value2, float scale) throws IOException {
+		timeline.setBezier(bezier, frame, value, time1, value1, input.readFloat(), input.readFloat() * scale, input.readFloat(),
+			input.readFloat() * scale, time2, value2);
 	}
 
 	static class Vertices {
