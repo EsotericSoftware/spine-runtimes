@@ -152,7 +152,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	Json* slots = Json_getItem(root, "slots");
 	Json* ik = Json_getItem(root, "ik");
 	Json* transform = Json_getItem(root, "transform");
-	Json* paths = Json_getItem(root, "paths");
+	Json* paths = Json_getItem(root, "path");
 	Json* deformJson = Json_getItem(root, "deform");
 	Json* drawOrderJson = Json_getItem(root, "drawOrder");
 	Json* events = Json_getItem(root, "events");
