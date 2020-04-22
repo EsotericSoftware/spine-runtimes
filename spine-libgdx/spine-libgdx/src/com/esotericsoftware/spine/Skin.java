@@ -94,8 +94,7 @@ public class Skin {
 	}
 
 	/** Returns the attachment for the specified slot index and name, or null. */
-	@Null
-	public Attachment getAttachment (int slotIndex, String name) {
+	public @Null Attachment getAttachment (int slotIndex, String name) {
 		lookup.set(slotIndex, name);
 		SkinEntry entry = attachments.get(lookup);
 		return entry != null ? entry.attachment : null;

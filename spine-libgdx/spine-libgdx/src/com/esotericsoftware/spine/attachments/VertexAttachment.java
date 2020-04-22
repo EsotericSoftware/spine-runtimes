@@ -123,8 +123,7 @@ abstract public class VertexAttachment extends Attachment {
 
 	/** Deform keys for the deform attachment are also applied to this attachment.
 	 * @return May be null if no deform keys should be applied. */
-	@Null
-	public VertexAttachment getDeformAttachment () {
+	public @Null VertexAttachment getDeformAttachment () {
 		return deformAttachment;
 	}
 
@@ -136,8 +135,7 @@ abstract public class VertexAttachment extends Attachment {
 	/** The bones which affect the {@link #getVertices()}. The array entries are, for each vertex, the number of bones affecting
 	 * the vertex followed by that many bone indices, which is the index of the bone in {@link Skeleton#getBones()}. Will be null
 	 * if this attachment has no weights. */
-	@Null
-	public int[] getBones () {
+	public @Null int[] getBones () {
 		return bones;
 	}
 

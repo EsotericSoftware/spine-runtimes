@@ -39,26 +39,20 @@ import com.esotericsoftware.spine.Skin;
  * Runtimes Guide. */
 public interface AttachmentLoader {
 	/** @return May be null to not load the attachment. */
-	@Null
-	public RegionAttachment newRegionAttachment (Skin skin, String name, String path);
+	public @Null RegionAttachment newRegionAttachment (Skin skin, String name, String path);
 
 	/** @return May be null to not load the attachment. */
-	@Null
-	public MeshAttachment newMeshAttachment (Skin skin, String name, String path);
+	public @Null MeshAttachment newMeshAttachment (Skin skin, String name, String path);
 
 	/** @return May be null to not load the attachment. */
-	@Null
-	public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name);
+	public @Null BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name);
 
 	/** @return May be null to not load the attachment. */
-	@Null
-	public ClippingAttachment newClippingAttachment (Skin skin, String name);
+	public @Null ClippingAttachment newClippingAttachment (Skin skin, String name);
 
 	/** @return May be null to not load the attachment. */
-	@Null
-	public PathAttachment newPathAttachment (Skin skin, String name);
+	public @Null PathAttachment newPathAttachment (Skin skin, String name);
 
 	/** @return May be null to not load the attachment. */
-	@Null
-	public PointAttachment newPointAttachment (Skin skin, String name);
+	public @Null PointAttachment newPointAttachment (Skin skin, String name);
 }

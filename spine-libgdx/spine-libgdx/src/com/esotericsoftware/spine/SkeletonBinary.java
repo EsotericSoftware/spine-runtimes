@@ -312,8 +312,7 @@ public class SkeletonBinary extends SkeletonLoader {
 		return skeletonData;
 	}
 
-	@Null
-	private Skin readSkin (SkeletonInput input, SkeletonData skeletonData, boolean defaultSkin, boolean nonessential)
+	private @Null Skin readSkin (SkeletonInput input, SkeletonData skeletonData, boolean defaultSkin, boolean nonessential)
 		throws IOException {
 
 		Skin skin;
@@ -920,8 +919,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			super(file.read(512));
 		}
 
-		@Null
-		public String readStringRef () throws IOException {
+		public @Null String readStringRef () throws IOException {
 			int index = readInt(true);
 			return index == 0 ? null : strings[index - 1];
 		}

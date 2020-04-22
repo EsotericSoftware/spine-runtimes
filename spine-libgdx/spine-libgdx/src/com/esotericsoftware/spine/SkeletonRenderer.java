@@ -448,8 +448,7 @@ public class SkeletonRenderer {
 		this.premultipliedAlpha = premultipliedAlpha;
 	}
 
-	@Null
-	public VertexEffect getVertexEffect () {
+	public @Null VertexEffect getVertexEffect () {
 		return vertexEffect;
 	}
 

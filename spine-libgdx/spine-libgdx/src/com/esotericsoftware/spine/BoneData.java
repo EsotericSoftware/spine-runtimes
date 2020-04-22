@@ -79,8 +79,7 @@ public class BoneData {
 		return name;
 	}
 
-	@Null
-	public BoneData getParent () {
+	public @Null BoneData getParent () {
 		return parent;
 	}
 

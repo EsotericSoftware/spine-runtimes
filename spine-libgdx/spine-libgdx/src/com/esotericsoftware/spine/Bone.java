@@ -225,8 +225,7 @@ public class Bone implements Updatable {
 	}
 
 	/** The parent bone, or null if this is the root bone. */
-	@Null
-	public Bone getParent () {
+	public @Null Bone getParent () {
 		return parent;
 	}
 

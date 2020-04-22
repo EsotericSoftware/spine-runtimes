@@ -792,8 +792,7 @@ public class AnimationState {
 	}
 
 	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
-	@Null
-	public TrackEntry getCurrent (int trackIndex) {
+	public @Null TrackEntry getCurrent (int trackIndex) {
 		if (trackIndex < 0) throw new IllegalArgumentException("trackIndex must be >= 0.");
 		if (trackIndex >= tracks.size) return null;
 		return tracks.get(trackIndex);
@@ -1031,8 +1030,7 @@ public class AnimationState {
 		 * <p>
 		 * A track entry returned from {@link AnimationState#setAnimation(int, Animation, boolean)} is already the current animation
 		 * for the track, so the track entry listener {@link AnimationStateListener#start(TrackEntry)} will not be called. */
-		@Null
-		public AnimationStateListener getListener () {
+		public @Null AnimationStateListener getListener () {
 			return listener;
 		}
 
@@ -1087,8 +1085,7 @@ public class AnimationState {
 		}
 
 		/** The animation queued to start after this animation, or null. <code>next</code> makes up a linked list. */
-		@Null
-		public TrackEntry getNext () {
+		public @Null TrackEntry getNext () {
 			return next;
 		}
 
@@ -1147,15 +1144,13 @@ public class AnimationState {
 
 		/** The track entry for the previous animation when mixing from the previous animation to this animation, or null if no
 		 * mixing is currently occuring. When mixing from multiple animations, <code>mixingFrom</code> makes up a linked list. */
-		@Null
-		public TrackEntry getMixingFrom () {
+		public @Null TrackEntry getMixingFrom () {
 			return mixingFrom;
 		}
 
 		/** The track entry for the next animation when mixing from this animation to the next animation, or null if no mixing is
 		 * currently occuring. When mixing to multiple animations, <code>mixingTo</code> makes up a linked list. */
-		@Null
-		public TrackEntry getMixingTo () {
+		public @Null TrackEntry getMixingTo () {
 			return mixingTo;
 		}
 

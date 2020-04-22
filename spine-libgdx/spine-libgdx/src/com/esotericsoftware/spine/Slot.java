@@ -95,14 +95,12 @@ public class Slot {
 
 	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
 	 * color's alpha is not used. */
-	@Null
-	public Color getDarkColor () {
+	public @Null Color getDarkColor () {
 		return darkColor;
 	}
 
 	/** The current attachment for the slot, or null if the slot has no attachment. */
-	@Null
-	public Attachment getAttachment () {
+	public @Null Attachment getAttachment () {
 		return attachment;
 	}
 
