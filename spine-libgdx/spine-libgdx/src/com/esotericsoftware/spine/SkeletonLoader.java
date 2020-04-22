@@ -9,7 +9,10 @@ import com.esotericsoftware.spine.SkeletonJson.LinkedMesh;
 import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 
-/** Base class for loading skeleton data from a file. */
+/** Base class for loading skeleton data from a file.
+ * <p>
+ * See <a href="http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data">JSON and binary data</a> in the
+ * Spine Runtimes Guide. */
 abstract public class SkeletonLoader {
 	final AttachmentLoader attachmentLoader;
 	float scale = 1;
