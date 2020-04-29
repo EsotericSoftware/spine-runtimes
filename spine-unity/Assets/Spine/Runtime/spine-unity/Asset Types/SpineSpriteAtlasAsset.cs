@@ -190,6 +190,9 @@ namespace Spine.Unity {
 				texture = AccessPackedTexture(sprites);
 
 			Material material = materials[0];
+		#if !UNITY_EDITOR
+			material.mainTexture = texture;
+		#endif
 
 			Spine.AtlasPage page = new AtlasPage();
 			page.name = spriteAtlas.name;
