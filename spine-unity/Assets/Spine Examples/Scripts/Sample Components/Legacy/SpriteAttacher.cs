@@ -60,6 +60,8 @@ namespace Spine.Unity.Examples {
 
 			if (applyPMA) {
 				try {
+					if (sprite == null)
+						return;
 					sprite.texture.GetPixel(0, 0);
 				} catch (UnityException e) {
 					Debug.LogFormat("Texture of {0} ({1}) is not read/write enabled. SpriteAttacher requires this in order to work with a SkeletonRenderer that renders premultiplied alpha. Please check the texture settings.", sprite.name, sprite.texture.name);
@@ -124,7 +126,10 @@ namespace Spine.Unity.Examples {
 
 				spineSlot = spineSlot ?? skeletonComponent.Skeleton.FindSlot(slot);
 				Shader attachmentShader = applyPMA ? Shader.Find(DefaultPMAShader) : Shader.Find(DefaultStraightAlphaShader);
-				attachment = applyPMA ? sprite.ToRegionAttachmentPMAClone(attachmentShader) : sprite.ToRegionAttachment(SpriteAttacher.GetPageFor(sprite.texture, attachmentShader));
+				if (sprite == null)
+					attachment = null;
+				else
+					attachment = applyPMA ? sprite.ToRegionAttachmentPMAClone(attachmentShader) : sprite.ToRegionAttachment(SpriteAttacher.GetPageFor(sprite.texture, attachmentShader));
 			}
 		}
 

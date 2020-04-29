@@ -981,7 +981,6 @@ namespace Spine {
 
 		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 							MixDirection direction) {
-			string attachmentName;
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
 			if (direction == MixDirection.Out) {
