@@ -775,16 +775,22 @@ function Animation.AttachmentTimeline.new (frameCount)
 		return TimelineType.attachment * SHL_24 + self.slotIndex
 	end
 
+	function self:setAttachment(skeleton, slot, attachmentName)
+		attachmentName = slot.data.attachmentName
+		if not attachmentName then
+			slot:setAttachment(nil)
+		else
+			slot:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
+		end
+	end
+
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local slot = skeleton.slots[self.slotIndex]
 		if not slot.bone.active then return end
 		local attachmentName
-		if direction == MixDirection.out and blend == MixBlend.setup then
-			attachmentName = slot.data.attachmentName
-			if not attachmentName then
-				slot:setAttachment(nil)
-			else
-				slot:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
+		if direction == MixDirection.out then
+			if blend == MixBlend.setup then
+				self:setAttachment(skeleton, slot, slot.data.attachmentName)
 			end
 			return;
 		end
@@ -792,12 +798,7 @@ function Animation.AttachmentTimeline.new (frameCount)
 		local frames = self.frames
 		if time < frames[0] then
 			if blend == MixBlend.setup or blend == MixBlend.first then
-				attachmentName = slot.data.attachmentName
-				if not attachmentName then
-					slot:setAttachment(nil)
-				else
-					slot:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
-				end
+				self:setAttachment(skeleton, slot, slot.data.attachmentName)
 			end
 			return
 		end
@@ -1150,9 +1151,11 @@ function Animation.DrawOrderTimeline.new (frameCount)
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local drawOrder = skeleton.drawOrder
 		local slots = skeleton.slots
-		if direction == MixDirection.out and blend == MixBlend.setup then
-			for i,slot in ipairs(slots) do
-				drawOrder[i] = slots[i]
+		if direction == MixDirection.out then
+			if blend == MixBlend.setup then
+				for i,slot in ipairs(slots) do
+					drawOrder[i] = slots[i]
+				end
 			end
 			return;
 		end
