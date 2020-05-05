@@ -1250,11 +1250,10 @@ public class AnimationState {
 			if (drainDisabled) return; // Not reentrant.
 			drainDisabled = true;
 
-			Object[] objects = this.objects.items;
 			SnapshotArray<AnimationStateListener> listenersArray = AnimationState.this.listeners;
 			for (int i = 0; i < this.objects.size; i += 2) {
-				EventType type = (EventType)objects[i];
-				TrackEntry entry = (TrackEntry)objects[i + 1];
+				EventType type = (EventType)objects.get(i);
+				TrackEntry entry = (TrackEntry)objects.get(i + 1);
 				int listenersCount = listenersArray.size;
 				Object[] listeners = listenersArray.begin();
 				switch (type) {
@@ -1285,7 +1284,7 @@ public class AnimationState {
 						((AnimationStateListener)listeners[ii]).complete(entry);
 					break;
 				case event:
-					Event event = (Event)objects[i++ + 2];
+					Event event = (Event)objects.get(i++ + 2);
 					if (entry.listener != null) entry.listener.event(entry, event);
 					for (int ii = 0; ii < listenersCount; ii++)
 						((AnimationStateListener)listeners[ii]).event(entry, event);
