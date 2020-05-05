@@ -356,6 +356,7 @@
     3) Copy the original material, add *_Outline* to its name and set the shader to `Universal Render Pipeline/Spine/Outline/Skeleton-OutlineOnly`.
     4) Assign this *_Outline* material at the `RenderExistingMesh` component under *Replacement Materials*.
   * Added `Outline Shaders URP` example scene to URP extension module to demonstrate the above additions.
+  * Added support for Unity's [`SpriteAtlas`](https://docs.unity3d.com/Manual/class-SpriteAtlas.html) as atlas provider (as an alternative to `.atlas.txt` and `.png` files) alongside a skeleton data file. There is now an additional `Spine SpriteAtlas Import` tool window accessible via `Window - Spine - SpriteAtlas Import`. Additional information can be found in a new section on the [spine-unity documentation page](http://esotericsoftware.com/spine-unity#Advanced---Using-Unity-SpriteAtlas-as-Atlas-Provider).
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.MixNext` instead of `MixMode.MixAlways`.

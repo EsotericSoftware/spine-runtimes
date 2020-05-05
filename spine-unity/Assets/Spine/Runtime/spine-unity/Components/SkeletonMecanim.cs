@@ -417,9 +417,8 @@ namespace Spine.Unity {
 					var interruptingStateInfo = animator.GetNextAnimatorStateInfo(layer);
 					layerInfos.isLastFrameOfInterruption = interruptingStateInfo.fullPathHash == 0;
 					if (!layerInfos.isLastFrameOfInterruption) {
-						layerInfos.interruptingClipInfoCount = interruptingClipInfos.Count;
-
 						animator.GetNextAnimatorClipInfo(layer, interruptingClipInfos);
+						layerInfos.interruptingClipInfoCount = interruptingClipInfos.Count;
 						float oldTime = layerInfos.interruptingStateInfo.normalizedTime;
 						float newTime = interruptingStateInfo.normalizedTime;
 						layerInfos.interruptingClipTimeAddition = newTime - oldTime;

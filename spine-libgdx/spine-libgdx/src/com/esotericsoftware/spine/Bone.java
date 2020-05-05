@@ -168,7 +168,7 @@ public class Bone implements Updatable {
 			b = pa * lb - pb * ld;
 			c = pc * la + pd * lc;
 			d = pc * lb + pd * ld;
-			break;
+			return;
 		}
 		case noScale:
 		case noScaleOrReflection: {
