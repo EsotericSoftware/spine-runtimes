@@ -522,6 +522,11 @@ public class AnimationState {
 		queue.drain();
 	}
 
+	/** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
+	public void clearNext (TrackEntry entry) {
+		disposeNext(entry.next);
+	}
+
 	private void setCurrent (int index, TrackEntry current, boolean interrupt) {
 		TrackEntry from = expandToIndex(index);
 		tracks.set(index, current);
@@ -1084,9 +1089,15 @@ public class AnimationState {
 			this.drawOrderThreshold = drawOrderThreshold;
 		}
 
-		/** The animation queued to start after this animation, or null. <code>next</code> makes up a linked list. */
+		/** The animation queued to start after this animation, or null if there is none. <code>next</code> makes up a linked list.
+		 * It cannot be set to null, use {@link AnimationState#clearNext(TrackEntry)} instead. */
 		public @Null TrackEntry getNext () {
 			return next;
+		}
+
+		public void setNext (TrackEntry next) {
+			if (next == null) throw new IllegalArgumentException("next cannot be null.");
+			this.next = next;
 		}
 
 		/** Returns true if at least one loop has been completed.
