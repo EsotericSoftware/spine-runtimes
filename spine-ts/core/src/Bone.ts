@@ -219,7 +219,7 @@ module spine {
 				this.b = pa * lb - pb * ld;
 				this.c = pc * la + pd * lc;
 				this.d = pc * lb + pd * ld;
-				break;
+				return;
 			}
 			case TransformMode.NoScale:
 			case TransformMode.NoScaleOrReflection: {

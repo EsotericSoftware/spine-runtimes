@@ -1,0 +1,1 @@
+Add the directory content of 'spine-csharp/tests' as 'tests' here (e.g. using a symlink).

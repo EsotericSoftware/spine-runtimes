@@ -168,7 +168,7 @@ void Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, 
 		_b = pa * lb - pb * ld;
 		_c = pc * la + pd * lc;
 		_d = pc * lb + pd * ld;
-		break;
+		return;
 	}
 	case TransformMode_NoScale:
 	case TransformMode_NoScaleOrReflection: {
