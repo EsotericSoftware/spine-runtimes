@@ -1,0 +1,13 @@
+﻿{
+    "name": "SpineTests",
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "references" : [
+        "spine-unity",
+        "spine-csharp"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ]
+}
