@@ -139,7 +139,7 @@ void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rota
 		CONST_CAST(float, self->b) = pa * lb - pb * ld;
 		CONST_CAST(float, self->c) = pc * la + pd * lc;
 		CONST_CAST(float, self->d) = pc * lb + pd * ld;
-		break;
+		return;
 	}
 	case SP_TRANSFORMMODE_NOSCALE:
 	case SP_TRANSFORMMODE_NOSCALEORREFLECTION: {

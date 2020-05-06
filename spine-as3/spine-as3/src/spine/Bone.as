@@ -57,7 +57,7 @@ package spine {
 		public var worldY : Number;
 		internal var _sorted : Boolean;
 		public var active : Boolean;
-		
+
 
 		/** @param parent May be null. */
 		public function Bone(data : BoneData, skeleton : Skeleton, parent : Bone) {
@@ -68,7 +68,7 @@ package spine {
 			_parent = parent;
 			setToSetupPose();
 		}
-		
+
 		public function isActive() : Boolean {
 			return active;
 		}
@@ -102,8 +102,8 @@ package spine {
 
 			var parent : Bone = _parent;
 			if (!parent) { // Root bone.
-				rotationY = rotation + 90 + shearY;				
-				var skeleton : Skeleton = _skeleton;								
+				rotationY = rotation + 90 + shearY;
+				var skeleton : Skeleton = _skeleton;
 				this.a = MathUtils.cosDeg(rotation + shearX) * scaleX * sx;
 				this.b = MathUtils.cosDeg(rotationY) * scaleY * sx;
 				this.c = MathUtils.sinDeg(rotation + shearX) * scaleX * sy;
@@ -161,7 +161,7 @@ package spine {
 					this.b = pa * lb - pb * ld;
 					this.c = pc * la + pd * lc;
 					this.d = pc * lb + pd * ld;
-					break;
+					return;
 				}
 				case TransformMode.noScale:
 				case TransformMode.noScaleOrReflection: {
@@ -182,11 +182,11 @@ package spine {
 					la = MathUtils.cosDeg(shearX) * scaleX;
 					lb = MathUtils.cosDeg(90 + shearY) * scaleY;
 					lc = MathUtils.sinDeg(shearX) * scaleX;
-					ld = MathUtils.sinDeg(90 + shearY) * scaleY;					
+					ld = MathUtils.sinDeg(90 + shearY) * scaleY;
 					this.a = za * la + zb * lc;
 					this.b = za * lb + zb * ld;
 					this.c = zc * la + zd * lc;
-					this.d = zc * lb + zd * ld;					
+					this.d = zc * lb + zd * ld;
 					break;
 				}
 			}
