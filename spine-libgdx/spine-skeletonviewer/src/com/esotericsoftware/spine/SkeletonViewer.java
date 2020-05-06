@@ -34,6 +34,7 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
 
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.lang.reflect.Field;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -1110,6 +1111,19 @@ public class SkeletonViewer extends ApplicationAdapter {
 	}
 
 	static public void main (String[] args) throws Exception {
+		try { // Try to turn off illegal access log messages.
+			Class loggerClass = Class.forName("jdk.internal.module.IllegalAccessLogger");
+			Field loggerField = loggerClass.getDeclaredField("logger");
+			Class unsafeClass = Class.forName("sun.misc.Unsafe");
+			Field unsafeField = unsafeClass.getDeclaredField("theUnsafe");
+			unsafeField.setAccessible(true);
+			Object unsafe = unsafeField.get(null);
+			Long offset = (Long)unsafeClass.getMethod("staticFieldOffset", Field.class).invoke(unsafe, loggerField);
+			unsafeClass.getMethod("putObjectVolatile", Object.class, long.class, Object.class) //
+				.invoke(unsafe, loggerClass, offset, null);
+		} catch (Throwable ex) {
+		}
+
 		SkeletonViewer.args = args;
 
 		String os = System.getProperty("os.name");

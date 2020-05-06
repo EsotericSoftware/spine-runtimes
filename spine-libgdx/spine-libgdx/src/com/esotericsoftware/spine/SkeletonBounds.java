@@ -143,8 +143,7 @@ public class SkeletonBounds {
 
 	/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
 	 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
-	@Null
-	public BoundingBoxAttachment containsPoint (float x, float y) {
+	public @Null BoundingBoxAttachment containsPoint (float x, float y) {
 		Object[] polygons = this.polygons.items;
 		for (int i = 0, n = this.polygons.size; i < n; i++)
 			if (containsPoint((FloatArray)polygons[i], x, y)) return boundingBoxes.get(i);
@@ -174,8 +173,7 @@ public class SkeletonBounds {
 	/** Returns the first bounding box attachment that contains any part of the line segment, or null. When doing many checks, it
 	 * is usually more efficient to only call this method if {@link #aabbIntersectsSegment(float, float, float, float)} returns
 	 * true. */
-	@Null
-	public BoundingBoxAttachment intersectsSegment (float x1, float y1, float x2, float y2) {
+	public @Null BoundingBoxAttachment intersectsSegment (float x1, float y1, float x2, float y2) {
 		Object[] polygons = this.polygons.items;
 		for (int i = 0, n = this.polygons.size; i < n; i++)
 			if (intersectsSegment((FloatArray)polygons[i], x1, y1, x2, y2)) return boundingBoxes.get(i);
@@ -248,8 +246,7 @@ public class SkeletonBounds {
 	}
 
 	/** Returns the polygon for the specified bounding box, or null. */
-	@Null
-	public FloatArray getPolygon (BoundingBoxAttachment boundingBox) {
+	public @Null FloatArray getPolygon (BoundingBoxAttachment boundingBox) {
 		if (boundingBox == null) throw new IllegalArgumentException("boundingBox cannot be null.");
 		int index = boundingBoxes.indexOf(boundingBox, true);
 		return index == -1 ? null : polygons.get(index);

@@ -484,8 +484,7 @@ public class Skeleton {
 
 	/** Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it
 	 * repeatedly. */
-	@Null
-	public Bone findBone (String boneName) {
+	public @Null Bone findBone (String boneName) {
 		if (boneName == null) throw new IllegalArgumentException("boneName cannot be null.");
 		Object[] bones = this.bones.items;
 		for (int i = 0, n = this.bones.size; i < n; i++) {
@@ -502,8 +501,7 @@ public class Skeleton {
 
 	/** Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
 	 * repeatedly. */
-	@Null
-	public Slot findSlot (String slotName) {
+	public @Null Slot findSlot (String slotName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Object[] slots = this.slots.items;
 		for (int i = 0, n = this.slots.size; i < n; i++) {
@@ -524,8 +522,7 @@ public class Skeleton {
 	}
 
 	/** The skeleton's current skin. */
-	@Null
-	public Skin getSkin () {
+	public @Null Skin getSkin () {
 		return skin;
 	}
 
@@ -573,8 +570,7 @@ public class Skeleton {
 	 * name.
 	 * <p>
 	 * See {@link #getAttachment(int, String)}. */
-	@Null
-	public Attachment getAttachment (String slotName, String attachmentName) {
+	public @Null Attachment getAttachment (String slotName, String attachmentName) {
 		SlotData slot = data.findSlot(slotName);
 		if (slot == null) throw new IllegalArgumentException("Slot not found: " + slotName);
 		return getAttachment(slot.getIndex(), attachmentName);
@@ -584,8 +580,7 @@ public class Skeleton {
 	 * attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
 	 * <p>
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skins">Runtime skins</a> in the Spine Runtimes Guide. */
-	@Null
-	public Attachment getAttachment (int slotIndex, String attachmentName) {
+	public @Null Attachment getAttachment (int slotIndex, String attachmentName) {
 		if (attachmentName == null) throw new IllegalArgumentException("attachmentName cannot be null.");
 		if (skin != null) {
 			Attachment attachment = skin.getAttachment(slotIndex, attachmentName);
@@ -618,8 +613,7 @@ public class Skeleton {
 
 	/** Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
 	 * than to call it repeatedly. */
-	@Null
-	public IkConstraint findIkConstraint (String constraintName) {
+	public @Null IkConstraint findIkConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] ikConstraints = this.ikConstraints.items;
 		for (int i = 0, n = this.ikConstraints.size; i < n; i++) {
@@ -636,8 +630,7 @@ public class Skeleton {
 
 	/** Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
 	 * this method than to call it repeatedly. */
-	@Null
-	public TransformConstraint findTransformConstraint (String constraintName) {
+	public @Null TransformConstraint findTransformConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] transformConstraints = this.transformConstraints.items;
 		for (int i = 0, n = this.transformConstraints.size; i < n; i++) {
@@ -654,8 +647,7 @@ public class Skeleton {
 
 	/** Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
 	 * than to call it repeatedly. */
-	@Null
-	public PathConstraint findPathConstraint (String constraintName) {
+	public @Null PathConstraint findPathConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] pathConstraints = this.pathConstraints.items;
 		for (int i = 0, n = this.pathConstraints.size; i < n; i++) {

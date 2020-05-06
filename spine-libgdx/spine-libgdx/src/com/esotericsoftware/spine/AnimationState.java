@@ -522,6 +522,11 @@ public class AnimationState {
 		queue.drain();
 	}
 
+	/** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
+	public void clearNext (TrackEntry entry) {
+		disposeNext(entry.next);
+	}
+
 	private void setCurrent (int index, TrackEntry current, boolean interrupt) {
 		TrackEntry from = expandToIndex(index);
 		tracks.set(index, current);
@@ -792,8 +797,7 @@ public class AnimationState {
 	}
 
 	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
-	@Null
-	public TrackEntry getCurrent (int trackIndex) {
+	public @Null TrackEntry getCurrent (int trackIndex) {
 		if (trackIndex < 0) throw new IllegalArgumentException("trackIndex must be >= 0.");
 		if (trackIndex >= tracks.size) return null;
 		return tracks.get(trackIndex);
@@ -1031,8 +1035,7 @@ public class AnimationState {
 		 * <p>
 		 * A track entry returned from {@link AnimationState#setAnimation(int, Animation, boolean)} is already the current animation
 		 * for the track, so the track entry listener {@link AnimationStateListener#start(TrackEntry)} will not be called. */
-		@Null
-		public AnimationStateListener getListener () {
+		public @Null AnimationStateListener getListener () {
 			return listener;
 		}
 
@@ -1086,10 +1089,15 @@ public class AnimationState {
 			this.drawOrderThreshold = drawOrderThreshold;
 		}
 
-		/** The animation queued to start after this animation, or null. <code>next</code> makes up a linked list. */
-		@Null
-		public TrackEntry getNext () {
+		/** The animation queued to start after this animation, or null if there is none. <code>next</code> makes up a linked list.
+		 * It cannot be set to null, use {@link AnimationState#clearNext(TrackEntry)} instead. */
+		public @Null TrackEntry getNext () {
 			return next;
+		}
+
+		public void setNext (TrackEntry next) {
+			if (next == null) throw new IllegalArgumentException("next cannot be null.");
+			this.next = next;
 		}
 
 		/** Returns true if at least one loop has been completed.
@@ -1147,15 +1155,13 @@ public class AnimationState {
 
 		/** The track entry for the previous animation when mixing from the previous animation to this animation, or null if no
 		 * mixing is currently occuring. When mixing from multiple animations, <code>mixingFrom</code> makes up a linked list. */
-		@Null
-		public TrackEntry getMixingFrom () {
+		public @Null TrackEntry getMixingFrom () {
 			return mixingFrom;
 		}
 
 		/** The track entry for the next animation when mixing from this animation to the next animation, or null if no mixing is
 		 * currently occuring. When mixing to multiple animations, <code>mixingTo</code> makes up a linked list. */
-		@Null
-		public TrackEntry getMixingTo () {
+		public @Null TrackEntry getMixingTo () {
 			return mixingTo;
 		}
 
@@ -1244,11 +1250,10 @@ public class AnimationState {
 			if (drainDisabled) return; // Not reentrant.
 			drainDisabled = true;
 
-			Object[] objects = this.objects.items;
 			SnapshotArray<AnimationStateListener> listenersArray = AnimationState.this.listeners;
 			for (int i = 0; i < this.objects.size; i += 2) {
-				EventType type = (EventType)objects[i];
-				TrackEntry entry = (TrackEntry)objects[i + 1];
+				EventType type = (EventType)objects.get(i);
+				TrackEntry entry = (TrackEntry)objects.get(i + 1);
 				int listenersCount = listenersArray.size;
 				Object[] listeners = listenersArray.begin();
 				switch (type) {
@@ -1279,7 +1284,7 @@ public class AnimationState {
 						((AnimationStateListener)listeners[ii]).complete(entry);
 					break;
 				case event:
-					Event event = (Event)objects[i++ + 2];
+					Event event = (Event)objects.get(i++ + 2);
 					if (entry.listener != null) entry.listener.event(entry, event);
 					for (int ii = 0; ii < listenersCount; ii++)
 						((AnimationStateListener)listeners[ii]).event(entry, event);

@@ -74,8 +74,7 @@ public class SlotData {
 
 	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
 	 * color's alpha is not used. */
-	@Null
-	public Color getDarkColor () {
+	public @Null Color getDarkColor () {
 		return darkColor;
 	}
 
@@ -88,8 +87,7 @@ public class SlotData {
 	}
 
 	/** The name of the attachment that is visible for this slot in the setup pose, or null if no attachment is visible. */
-	@Null
-	public String getAttachmentName () {
+	public @Null String getAttachmentName () {
 		return attachmentName;
 	}
 

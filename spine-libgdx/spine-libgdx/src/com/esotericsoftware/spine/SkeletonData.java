@@ -67,8 +67,7 @@ public class SkeletonData {
 
 	/** Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it
 	 * multiple times. */
-	@Null
-	public BoneData findBone (String boneName) {
+	public @Null BoneData findBone (String boneName) {
 		if (boneName == null) throw new IllegalArgumentException("boneName cannot be null.");
 		Object[] bones = this.bones.items;
 		for (int i = 0, n = this.bones.size; i < n; i++) {
@@ -87,8 +86,7 @@ public class SkeletonData {
 
 	/** Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
 	 * multiple times. */
-	@Null
-	public SlotData findSlot (String slotName) {
+	public @Null SlotData findSlot (String slotName) {
 		if (slotName == null) throw new IllegalArgumentException("slotName cannot be null.");
 		Object[] slots = this.slots.items;
 		for (int i = 0, n = this.slots.size; i < n; i++) {
@@ -103,8 +101,7 @@ public class SkeletonData {
 	/** The skeleton's default skin. By default this skin contains all attachments that were not in a skin in Spine.
 	 * <p>
 	 * See {@link Skeleton#getAttachment(int, String)}. */
-	@Null
-	public Skin getDefaultSkin () {
+	public @Null Skin getDefaultSkin () {
 		return defaultSkin;
 	}
 
@@ -114,8 +111,7 @@ public class SkeletonData {
 
 	/** Finds a skin by comparing each skin's name. It is more efficient to cache the results of this method than to call it
 	 * multiple times. */
-	@Null
-	public Skin findSkin (String skinName) {
+	public @Null Skin findSkin (String skinName) {
 		if (skinName == null) throw new IllegalArgumentException("skinName cannot be null.");
 		for (Skin skin : skins)
 			if (skin.name.equals(skinName)) return skin;
@@ -131,8 +127,7 @@ public class SkeletonData {
 
 	/** Finds an event by comparing each events's name. It is more efficient to cache the results of this method than to call it
 	 * multiple times. */
-	@Null
-	public EventData findEvent (String eventDataName) {
+	public @Null EventData findEvent (String eventDataName) {
 		if (eventDataName == null) throw new IllegalArgumentException("eventDataName cannot be null.");
 		for (EventData eventData : events)
 			if (eventData.name.equals(eventDataName)) return eventData;
@@ -153,8 +148,7 @@ public class SkeletonData {
 
 	/** Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to
 	 * call it multiple times. */
-	@Null
-	public Animation findAnimation (String animationName) {
+	public @Null Animation findAnimation (String animationName) {
 		if (animationName == null) throw new IllegalArgumentException("animationName cannot be null.");
 		Object[] animations = this.animations.items;
 		for (int i = 0, n = this.animations.size; i < n; i++) {
@@ -173,8 +167,7 @@ public class SkeletonData {
 
 	/** Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
 	 * than to call it multiple times. */
-	@Null
-	public IkConstraintData findIkConstraint (String constraintName) {
+	public @Null IkConstraintData findIkConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] ikConstraints = this.ikConstraints.items;
 		for (int i = 0, n = this.ikConstraints.size; i < n; i++) {
@@ -193,8 +186,7 @@ public class SkeletonData {
 
 	/** Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
 	 * this method than to call it multiple times. */
-	@Null
-	public TransformConstraintData findTransformConstraint (String constraintName) {
+	public @Null TransformConstraintData findTransformConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] transformConstraints = this.transformConstraints.items;
 		for (int i = 0, n = this.transformConstraints.size; i < n; i++) {
@@ -213,8 +205,7 @@ public class SkeletonData {
 
 	/** Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
 	 * than to call it multiple times. */
-	@Null
-	public PathConstraintData findPathConstraint (String constraintName) {
+	public @Null PathConstraintData findPathConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
 		Object[] pathConstraints = this.pathConstraints.items;
 		for (int i = 0, n = this.pathConstraints.size; i < n; i++) {
@@ -227,8 +218,7 @@ public class SkeletonData {
 	// ---
 
 	/** The skeleton's name, which by default is the name of the skeleton data file, if possible. */
-	@Null
-	public String getName () {
+	public @Null String getName () {
 		return name;
 	}
 
@@ -273,8 +263,7 @@ public class SkeletonData {
 	}
 
 	/** The Spine version used to export the skeleton data, or null. */
-	@Null
-	public String getVersion () {
+	public @Null String getVersion () {
 		return version;
 	}
 
@@ -283,8 +272,7 @@ public class SkeletonData {
 	}
 
 	/** The skeleton data hash. This value will change if any of the skeleton data has changed. */
-	@Null
-	public String getHash () {
+	public @Null String getHash () {
 		return hash;
 	}
 
@@ -293,8 +281,7 @@ public class SkeletonData {
 	}
 
 	/** The path to the images directory as defined in Spine. Available only when nonessential data was exported. */
-	@Null
-	public String getImagesPath () {
+	public @Null String getImagesPath () {
 		return imagesPath;
 	}
 
@@ -303,8 +290,7 @@ public class SkeletonData {
 	}
 
 	/** The path to the audio directory as defined in Spine. Available only when nonessential data was exported. */
-	@Null
-	public String getAudioPath () {
+	public @Null String getAudioPath () {
 		return audioPath;
 	}
 

@@ -106,6 +106,13 @@ namespace Spine {
 		/// color tinting.</summary>
 		public float A { get { return a; } set { a = value; } }
 
+		public void ClampColor() {
+			r = MathUtils.Clamp(r, 0, 1);
+			g = MathUtils.Clamp(g, 0, 1);
+			b = MathUtils.Clamp(b, 0, 1);
+			a = MathUtils.Clamp(a, 0, 1);
+		}
+
 		/// <summary>The dark color used to tint the slot's attachment for two color tinting, ignored if two color tinting is not used.</summary>
 		/// <seealso cref="HasSecondColor"/>
 		public float R2 { get { return r2; } set { r2 = value; } }
@@ -117,6 +124,12 @@ namespace Spine {
 		public float B2 { get { return b2; } set { b2 = value; } }
 		/// <summary>Whether R2 G2 B2 are used to tint the slot's attachment for two color tinting. False if two color tinting is not used.</summary>
 		public bool HasSecondColor { get { return data.hasSecondColor; } set { data.hasSecondColor = value; } }
+
+		public void ClampSecondColor () {
+			r2 = MathUtils.Clamp(r2, 0, 1);
+			g2 = MathUtils.Clamp(g2, 0, 1);
+			b2 = MathUtils.Clamp(b2, 0, 1);
+		}
 
 		public Attachment Attachment {
 			/// <summary>The current attachment for the slot, or null if the slot has no attachment.</summary>
