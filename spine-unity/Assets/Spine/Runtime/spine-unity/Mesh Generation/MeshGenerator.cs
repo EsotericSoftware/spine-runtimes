@@ -227,6 +227,35 @@ namespace Spine.Unity {
 			}
 		}
 
+		public static bool RequiresMultipleSubmeshesByDrawOrder (Skeleton skeleton) {
+
+		#if SPINE_TK2D
+			return false;
+		#endif
+			ExposedList<Slot> drawOrder = skeleton.drawOrder;
+			int drawOrderCount = drawOrder.Count;
+			var drawOrderItems = drawOrder.Items;
+
+			Material lastRendererMaterial = null;
+			for (int i = 0; i < drawOrderCount; i++) {
+				Slot slot = drawOrderItems[i];
+				if (!slot.bone.active) continue;
+				Attachment attachment = slot.attachment;
+				var rendererAttachment = attachment as IHasRendererObject;
+				if (rendererAttachment != null) {
+					AtlasRegion atlasRegion = (AtlasRegion)rendererAttachment.RendererObject;
+					Material material = (Material)atlasRegion.page.rendererObject;
+					if (lastRendererMaterial != material) {
+						if (lastRendererMaterial != null)
+							return true;
+						else
+							lastRendererMaterial = material;
+					}
+				}
+			}
+			return false;
+		}
+
 		public static void GenerateSkeletonRendererInstruction (SkeletonRendererInstruction instructionOutput, Skeleton skeleton, Dictionary<Slot, Material> customSlotMaterials, List<Slot> separatorSlots, bool generateMeshOverride, bool immutableTriangles = false) {
 			//			if (skeleton == null) throw new ArgumentNullException("skeleton");
 			//			if (instructionOutput == null) throw new ArgumentNullException("instructionOutput");
