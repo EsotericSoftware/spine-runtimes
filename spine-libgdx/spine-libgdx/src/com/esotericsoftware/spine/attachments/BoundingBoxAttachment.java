@@ -46,8 +46,8 @@ public class BoundingBoxAttachment extends VertexAttachment {
 		super(name);
 	}
 
-	/** The color of the bounding box as it was in Spine. Available only when nonessential data was exported. Bounding boxes are
-	 * not usually rendered at runtime. */
+	/** The color of the bounding box as it was in Spine, or a default color if nonessential data was not exported. Bounding boxes
+	 * are not usually rendered at runtime. */
 	public Color getColor () {
 		return color;
 	}

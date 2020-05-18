@@ -47,10 +47,10 @@ public class MeshAttachment extends VertexAttachment {
 	private short[] triangles;
 	private final Color color = new Color(1, 1, 1, 1);
 	private int hullLength;
-	private MeshAttachment parentMesh;
+	private @Null MeshAttachment parentMesh;
 
 	// Nonessential.
-	private short[] edges;
+	private @Null short[] edges;
 	private float width, height;
 
 	public MeshAttachment (String name) {
@@ -188,13 +188,13 @@ public class MeshAttachment extends VertexAttachment {
 		this.edges = edges;
 	}
 
-	/** Vertex index pairs describing edges for controling triangulation. Mesh triangles will never cross edges. Only available if
-	 * nonessential data was exported. Triangulation is not performed at runtime. */
-	public short[] getEdges () {
+	/** Vertex index pairs describing edges for controlling triangulation, or be null if nonessential data was not exported. Mesh
+	 * triangles will never cross edges. Triangulation is not performed at runtime. */
+	public @Null short[] getEdges () {
 		return edges;
 	}
 
-	/** The width of the mesh's image. Available only when nonessential data was exported. */
+	/** The width of the mesh's image, or zero if nonessential data was not exported. */
 	public float getWidth () {
 		return width;
 	}
@@ -203,7 +203,7 @@ public class MeshAttachment extends VertexAttachment {
 		this.width = width;
 	}
 
-	/** The height of the mesh's image. Available only when nonessential data was exported. */
+	/** The height of the mesh's image, or zero if nonessential data was not exported. */
 	public float getHeight () {
 		return height;
 	}
@@ -215,7 +215,7 @@ public class MeshAttachment extends VertexAttachment {
 	/** The parent mesh if this is a linked mesh, else null. A linked mesh shares the {@link #bones}, {@link #vertices},
 	 * {@link #regionUVs}, {@link #triangles}, {@link #hullLength}, {@link #edges}, {@link #width}, and {@link #height} with the
 	 * parent mesh, but may have a different {@link #name} or {@link #path} (and therefore a different texture). */
-	public MeshAttachment getParentMesh () {
+	public @Null MeshAttachment getParentMesh () {
 		return parentMesh;
 	}
 

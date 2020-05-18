@@ -44,10 +44,10 @@ abstract public class VertexAttachment extends Attachment {
 	static private int nextID;
 
 	private final int id = nextID();
-	int[] bones;
+	@Null int[] bones;
 	float[] vertices;
 	int worldVerticesLength;
-	VertexAttachment deformAttachment = this;
+	@Null VertexAttachment deformAttachment = this;
 
 	public VertexAttachment (String name) {
 		super(name);

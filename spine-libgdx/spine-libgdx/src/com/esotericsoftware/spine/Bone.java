@@ -47,7 +47,7 @@ import com.esotericsoftware.spine.BoneData.TransformMode;
 public class Bone implements Updatable {
 	final BoneData data;
 	final Skeleton skeleton;
-	final Bone parent;
+	@Null final Bone parent;
 	final Array<Bone> children = new Array();
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
@@ -66,7 +66,7 @@ public class Bone implements Updatable {
 		setToSetupPose();
 	}
 
-	/** Copy constructor. Does not copy the children bones. */
+	/** Copy constructor. Does not copy the {@link #getChildren()} bones. */
 	public Bone (Bone bone, Skeleton skeleton, @Null Bone parent) {
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");

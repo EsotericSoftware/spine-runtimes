@@ -36,7 +36,7 @@ import com.badlogic.gdx.utils.Null;
 public class BoneData {
 	final int index;
 	final String name;
-	final BoneData parent;
+	@Null final BoneData parent;
 	float length;
 	float x, y, rotation, scaleX = 1, scaleY = 1, shearX, shearY;
 	TransformMode transformMode = TransformMode.normal;
@@ -187,7 +187,7 @@ public class BoneData {
 		this.skinRequired = skinRequired;
 	}
 
-	/** The color of the bone as it was in Spine. Available only when nonessential data was exported. Bones are not usually
+	/** The color of the bone as it was in Spine, or a default color if nonessential data was not exported. Bones are not usually
 	 * rendered at runtime. */
 	public Color getColor () {
 		return color;

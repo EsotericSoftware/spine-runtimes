@@ -43,8 +43,9 @@ import com.esotericsoftware.spine.attachments.VertexAttachment;
 public class Slot {
 	final SlotData data;
 	final Bone bone;
-	final Color color = new Color(), darkColor;
-	Attachment attachment;
+	final Color color = new Color();
+	@Null final Color darkColor;
+	@Null Attachment attachment;
 	private float attachmentTime;
 	private FloatArray deform = new FloatArray();
 

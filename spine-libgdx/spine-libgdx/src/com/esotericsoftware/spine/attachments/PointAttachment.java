@@ -75,8 +75,8 @@ public class PointAttachment extends Attachment {
 		this.rotation = rotation;
 	}
 
-	/** The color of the point attachment as it was in Spine. Available only when nonessential data was exported. Point attachments
-	 * are not usually rendered at runtime. */
+	/** The color of the point attachment as it was in Spine, or a default clor if nonessential data was not exported. Point
+	 * attachments are not usually rendered at runtime. */
 	public Color getColor () {
 		return color;
 	}

@@ -41,7 +41,7 @@ public interface AttachmentLoader {
 	/** @return May be null to not load the attachment. */
 	public @Null RegionAttachment newRegionAttachment (Skin skin, String name, String path);
 
-	/** @return May be null to not load the attachment. */
+	/** @return May be null to not load the attachment. In that case null should also be returned for child meshes. */
 	public @Null MeshAttachment newMeshAttachment (Skin skin, String name, String path);
 
 	/** @return May be null to not load the attachment. */

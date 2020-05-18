@@ -77,7 +77,7 @@ public class PathAttachment extends VertexAttachment {
 		this.lengths = lengths;
 	}
 
-	/** The color of the path as it was in Spine. Available only when nonessential data was exported. Paths are not usually
+	/** The color of the path as it was in Spine, or a default color if nonessential data was not exported. Paths are not usually
 	 * rendered at runtime. */
 	public Color getColor () {
 		return color;

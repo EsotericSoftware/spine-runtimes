@@ -57,7 +57,7 @@ public class Skeleton {
 	final Array<PathConstraint> pathConstraints;
 	final Array<Updatable> updateCache = new Array();
 	final Array<Bone> updateCacheReset = new Array();
-	Skin skin;
+	@Null Skin skin;
 	final Color color;
 	float time;
 	float scaleX = 1, scaleY = 1;

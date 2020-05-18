@@ -160,7 +160,7 @@ public class Skin {
 	static public class SkinEntry {
 		int slotIndex;
 		String name;
-		Attachment attachment;
+		@Null Attachment attachment;
 		private int hashCode;
 
 		SkinEntry (int slotIndex, String name, @Null Attachment attachment) {

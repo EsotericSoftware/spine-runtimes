@@ -871,8 +871,8 @@ public class AnimationState {
 	 * References to a track entry must not be kept after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	static public class TrackEntry implements Poolable {
 		Animation animation;
-		TrackEntry next, mixingFrom, mixingTo;
-		AnimationStateListener listener;
+		@Null TrackEntry next, mixingFrom, mixingTo;
+		@Null AnimationStateListener listener;
 		int trackIndex;
 		boolean loop, holdPrevious, reverse;
 		float eventThreshold, attachmentThreshold, drawOrderThreshold;

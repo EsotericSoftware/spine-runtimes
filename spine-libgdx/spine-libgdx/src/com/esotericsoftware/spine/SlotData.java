@@ -38,8 +38,8 @@ public class SlotData {
 	final String name;
 	final BoneData boneData;
 	final Color color = new Color(1, 1, 1, 1);
-	Color darkColor;
-	String attachmentName;
+	@Null Color darkColor;
+	@Null String attachmentName;
 	BlendMode blendMode;
 
 	public SlotData (int index, String name, BoneData boneData) {

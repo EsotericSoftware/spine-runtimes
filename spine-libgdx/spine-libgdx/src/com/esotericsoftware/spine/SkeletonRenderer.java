@@ -53,7 +53,7 @@ public class SkeletonRenderer {
 	private boolean premultipliedAlpha;
 	private final FloatArray vertices = new FloatArray(32);
 	private final SkeletonClipping clipper = new SkeletonClipping();
-	private VertexEffect vertexEffect;
+	private @Null VertexEffect vertexEffect;
 	private final Vector2 temp = new Vector2();
 	private final Vector2 temp2 = new Vector2();
 	private final Color temp3 = new Color();
@@ -110,9 +110,9 @@ public class SkeletonRenderer {
 					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				}
 
-				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
-					| ((int)(b * slotColor.b * color.b * multiplier) << 16) //
-					| ((int)(g * slotColor.g * color.g * multiplier) << 8) //
+				float c = NumberUtils.intToFloatColor((int)alpha << 24 //
+					| (int)(b * slotColor.b * color.b * multiplier) << 16 //
+					| (int)(g * slotColor.g * color.g * multiplier) << 8 //
 					| (int)(r * slotColor.r * color.r * multiplier));
 				float[] uvs = region.getUVs();
 				for (int u = 0, v = 2; u < 8; u += 2, v += 5) {
@@ -219,9 +219,9 @@ public class SkeletonRenderer {
 					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
 				}
 
-				float c = NumberUtils.intToFloatColor(((int)alpha << 24) //
-					| ((int)(b * slotColor.b * color.b * multiplier) << 16) //
-					| ((int)(g * slotColor.g * color.g * multiplier) << 8) //
+				float c = NumberUtils.intToFloatColor((int)alpha << 24 //
+					| (int)(b * slotColor.b * color.b * multiplier) << 16 //
+					| (int)(g * slotColor.g * color.g * multiplier) << 8 //
 					| (int)(r * slotColor.r * color.r * multiplier));
 
 				if (clipper.isClipping()) {
@@ -345,9 +345,9 @@ public class SkeletonRenderer {
 				float red = r * color.r * multiplier;
 				float green = g * color.g * multiplier;
 				float blue = b * color.b * multiplier;
-				float light = NumberUtils.intToFloatColor(((int)alpha << 24) //
-					| ((int)(blue * lightColor.b) << 16) //
-					| ((int)(green * lightColor.g) << 8) //
+				float light = NumberUtils.intToFloatColor((int)alpha << 24 //
+					| (int)(blue * lightColor.b) << 16 //
+					| (int)(green * lightColor.g) << 8 //
 					| (int)(red * lightColor.r));
 				Color darkColor = slot.getDarkColor();
 				float dark = darkColor == null ? 0

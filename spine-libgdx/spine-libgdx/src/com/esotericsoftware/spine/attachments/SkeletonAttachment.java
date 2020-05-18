@@ -35,7 +35,7 @@ import com.esotericsoftware.spine.Skeleton;
 
 /** Attachment that displays a skeleton. */
 public class SkeletonAttachment extends Attachment {
-	private Skeleton skeleton;
+	private @Null Skeleton skeleton;
 
 	public SkeletonAttachment (String name) {
 		super(name);

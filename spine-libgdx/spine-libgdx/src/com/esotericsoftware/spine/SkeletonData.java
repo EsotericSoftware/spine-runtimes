@@ -37,22 +37,22 @@ import com.badlogic.gdx.utils.Null;
  * See <a href="http://esotericsoftware.com/spine-runtime-architecture#Data-objects">Data objects</a> in the Spine Runtimes
  * Guide. */
 public class SkeletonData {
-	String name;
+	@Null String name;
 	final Array<BoneData> bones = new Array(); // Ordered parents first.
 	final Array<SlotData> slots = new Array(); // Setup pose draw order.
 	final Array<Skin> skins = new Array();
-	Skin defaultSkin;
+	@Null Skin defaultSkin;
 	final Array<EventData> events = new Array();
 	final Array<Animation> animations = new Array();
 	final Array<IkConstraintData> ikConstraints = new Array();
 	final Array<TransformConstraintData> transformConstraints = new Array();
 	final Array<PathConstraintData> pathConstraints = new Array();
 	float x, y, width, height;
-	String version, hash;
+	@Null String version, hash;
 
 	// Nonessential.
 	float fps = 30;
-	String imagesPath, audioPath;
+	@Null String imagesPath, audioPath;
 
 	// --- Bones.
 
@@ -217,7 +217,8 @@ public class SkeletonData {
 
 	// ---
 
-	/** The skeleton's name, which by default is the name of the skeleton data file, if possible. */
+	/** The skeleton's name, which by default is the name of the skeleton data file when possible, or null when a name hasn't been
+	 * set. */
 	public @Null String getName () {
 		return name;
 	}
@@ -280,7 +281,7 @@ public class SkeletonData {
 		this.hash = hash;
 	}
 
-	/** The path to the images directory as defined in Spine. Available only when nonessential data was exported. */
+	/** The path to the images directory as defined in Spine, or null if nonessential data was not exported. */
 	public @Null String getImagesPath () {
 		return imagesPath;
 	}
@@ -289,7 +290,7 @@ public class SkeletonData {
 		this.imagesPath = imagesPath;
 	}
 
-	/** The path to the audio directory as defined in Spine. Available only when nonessential data was exported. */
+	/** The path to the audio directory as defined in Spine, or null if nonessential data was not exported. */
 	public @Null String getAudioPath () {
 		return audioPath;
 	}
@@ -298,7 +299,7 @@ public class SkeletonData {
 		this.audioPath = audioPath;
 	}
 
-	/** The dopesheet FPS in Spine. Available only when nonessential data was exported. */
+	/** The dopesheet FPS in Spine, or zero if nonessential data was not exported. */
 	public float getFps () {
 		return fps;
 	}
