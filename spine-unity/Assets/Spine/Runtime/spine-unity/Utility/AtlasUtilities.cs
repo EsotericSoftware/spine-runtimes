@@ -219,6 +219,8 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>
 		/// Fills the outputAttachments list with new attachment objects based on the attachments in sourceAttachments,
 		/// but mapped to a new single texture using the same material.</summary>
+		/// <remarks>Returned <c>Material</c> and <c>Texture</c> behave like <c>new Texture2D()</c>, thus you need to call <c>Destroy()</c>
+		/// to free resources.</remarks>
 		/// <param name="sourceAttachments">The list of attachments to be repacked.</param>
 		/// <param name = "outputAttachments">The List(Attachment) to populate with the newly created Attachment objects.
 		/// May be equal to <c>sourceAttachments</c> for in-place operation.</param>
@@ -257,6 +259,8 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>
 		/// Fills the outputAttachments list with new attachment objects based on the attachments in sourceAttachments,
 		/// but mapped to a new single texture using the same material.</summary>
+		/// <remarks>Returned <c>Material</c> and <c>Texture</c> behave like <c>new Texture2D()</c>, thus you need to call <c>Destroy()</c>
+		/// to free resources.</remarks>
 		/// <param name="sourceAttachments">The list of attachments to be repacked.</param>
 		/// <param name = "outputAttachments">The List(Attachment) to populate with the newly created Attachment objects.
 		/// May be equal to <c>sourceAttachments</c> for in-place operation.</param>
@@ -413,7 +417,9 @@ namespace Spine.Unity.AttachmentTools {
 		/// Creates and populates a duplicate skin with cloned attachments that are backed by a new packed texture atlas
 		/// comprised of all the regions from the original skin.</summary>
 		/// <remarks>GetRepackedSkin is an expensive operation, preferably call it at level load time.
-		/// No Spine.Atlas object is created so there is no way to find AtlasRegions except through the Attachments using them.</remarks>
+		/// No Spine.Atlas object is created so there is no way to find AtlasRegions except through the Attachments using them.
+		/// Returned <c>Material</c> and <c>Texture</c> behave like <c>new Texture2D()</c>, thus you need to call <c>Destroy()</c>
+		/// to free resources.</remarks>
 		/// <param name="additionalTexturePropertyIDsToCopy">Optional additional textures (such as normal maps) to copy while repacking.
 		/// To copy e.g. the main texture and normal maps, pass 'new int[] { Shader.PropertyToID("_BumpMap") }' at this parameter.</param>
 		/// <param name="additionalOutputTextures">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,

@@ -201,6 +201,8 @@ module spine {
 				let prx = 0;
 				if (s > 0.0001) {
 					s = Math.abs(pa * pd - pb * pc) / s;
+					pa /= this.skeleton.scaleX;
+					pc /= this.skeleton.scaleY;
 					pb = pc * s;
 					pd = pa * s;
 					prx = Math.atan2(pc, pa) * MathUtils.radDeg;
@@ -219,7 +221,7 @@ module spine {
 				this.b = pa * lb - pb * ld;
 				this.c = pc * la + pd * lc;
 				this.d = pc * lb + pd * ld;
-				return;
+				break;
 			}
 			case TransformMode.NoScale:
 			case TransformMode.NoScaleOrReflection: {

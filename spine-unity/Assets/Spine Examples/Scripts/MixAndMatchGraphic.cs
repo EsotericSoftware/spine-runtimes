@@ -119,6 +119,11 @@ namespace Spine.Unity.Examples {
 				var repackedSkin = new Skin("repacked skin");
 				repackedSkin.AddSkin(skeleton.Data.DefaultSkin);
 				repackedSkin.AddSkin(customSkin);
+				// Note: materials and textures returned by GetRepackedSkin() behave like 'new Texture2D()' and need to be destroyed
+				if (runtimeMaterial)
+					Destroy(runtimeMaterial);
+				if (runtimeAtlas)
+					Destroy(runtimeAtlas);
 				repackedSkin = repackedSkin.GetRepackedSkin("repacked skin", sourceMaterial, out runtimeMaterial, out runtimeAtlas);
 				skeleton.SetSkin(repackedSkin);
 			} else {

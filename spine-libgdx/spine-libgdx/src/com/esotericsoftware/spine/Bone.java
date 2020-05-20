@@ -150,6 +150,8 @@ public class Bone implements Updatable {
 			float s = pa * pa + pc * pc, prx;
 			if (s > 0.0001f) {
 				s = Math.abs(pa * pd - pb * pc) / s;
+				pa /= skeleton.scaleX;
+				pc /= skeleton.scaleY;
 				pb = pc * s;
 				pd = pa * s;
 				prx = atan2(pc, pa) * radDeg;
@@ -168,7 +170,7 @@ public class Bone implements Updatable {
 			b = pa * lb - pb * ld;
 			c = pc * la + pd * lc;
 			d = pc * lb + pd * ld;
-			return;
+			break;
 		}
 		case noScale:
 		case noScaleOrReflection: {
