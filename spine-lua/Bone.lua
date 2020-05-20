@@ -144,6 +144,8 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		local prx = 0
 		if s > 0.0001 then
 			s = math_abs(pa * pd - pb * pc) / s
+			pa = pa / self.skeleton.scaleX
+			pc = pc / self.skeleton.scaleY
 			pb = pc * s
 			pd = pa * s
 			prx = math_deg(math_atan2(pc, pa));
