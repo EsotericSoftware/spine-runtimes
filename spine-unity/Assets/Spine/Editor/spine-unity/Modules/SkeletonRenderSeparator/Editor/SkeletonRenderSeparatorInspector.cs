@@ -27,6 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#define NEW_PREFAB_SYSTEM
+#endif
+
 using UnityEngine;
 using UnityEditor;
 
@@ -81,7 +85,18 @@ namespace Spine.Unity.Examples {
 
 			// Restore mesh part for undo logic after undo of "Add Parts Renderer".
 			// Triggers regeneration and assignment of the mesh filter's mesh.
-			if (component.GetComponent<MeshFilter>() && component.GetComponent<MeshFilter>().sharedMesh == null) {
+
+			bool isMeshFilterAlwaysNull = false;
+			#if UNITY_EDITOR && NEW_PREFAB_SYSTEM
+			// Don't store mesh or material at the prefab, otherwise it will permanently reload
+			var prefabType = UnityEditor.PrefabUtility.GetPrefabAssetType(component);
+			if (UnityEditor.PrefabUtility.IsPartOfPrefabAsset(component) &&
+				(prefabType == UnityEditor.PrefabAssetType.Regular || prefabType == UnityEditor.PrefabAssetType.Variant)) {
+				isMeshFilterAlwaysNull = true;
+			}
+			#endif
+
+			if (!isMeshFilterAlwaysNull && component.GetComponent<MeshFilter>() && component.GetComponent<MeshFilter>().sharedMesh == null) {
 				component.OnDisable();
 				component.OnEnable();
 			}
