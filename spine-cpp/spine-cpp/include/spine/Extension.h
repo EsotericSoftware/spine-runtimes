@@ -61,6 +61,11 @@ public:
 		getInstance()->_free((void *) ptr, file, line);
 	}
 
+	template<typename T>
+	static void beforeFree(T *ptr) {
+		getInstance()->_beforeFree((void *) ptr);
+	}
+	
 	static char *readFile(const String &path, int *length) {
 		return getInstance()->_readFile(path, length);
 	}
@@ -82,6 +87,8 @@ public:
 	virtual void _free(void *mem, const char *file, int line) = 0;
 
 	virtual char *_readFile(const String &path, int *length) = 0;
+
+	virtual void _beforeFree(void *ptr) { SP_UNUSED(ptr); }
 
 protected:
 	SpineExtension();
