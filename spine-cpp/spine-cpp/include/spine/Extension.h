@@ -88,7 +88,7 @@ public:
 
 	virtual char *_readFile(const String &path, int *length) = 0;
 
-	virtual void _beforeFree(void *ptr) {}
+	virtual void _beforeFree(void *ptr) { SP_UNUSED(ptr); }
 
 protected:
 	SpineExtension();
