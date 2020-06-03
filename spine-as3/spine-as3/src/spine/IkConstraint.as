@@ -96,10 +96,13 @@ package spine {
 					ty = targetY - bone.worldY;
 					break;
 				case TransformMode.noRotationOrReflection:
-					rotationIK += Math.atan2(pc, pa) * MathUtils.radDeg;
-					var ps : Number = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-					pb = -pc * ps;
-					pd = pa * ps;
+					var s : Number = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+					var sa : Number = pa / bone.skeleton.scaleX;
+					var sc : Number = pc / bone.skeleton.scaleY;
+					pb = -sc * s * bone.skeleton.scaleX;
+					pd = sa * s * bone.skeleton.scaleY;
+					rotationIK += Math.atan2(sc, sa) * MathUtils.radDeg;
+					// Fall through.
 				default:
 					var x : Number = targetX - p.worldX, y : Number = targetY - p.worldY;
 					var d : Number = pa * pd - pb * pc;
