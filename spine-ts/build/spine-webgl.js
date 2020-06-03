@@ -7506,9 +7506,7 @@ var spine;
 		};
 		Pool.prototype.freeAll = function (items) {
 			for (var i = 0; i < items.length; i++) {
-				if (items[i].reset)
-					items[i].reset();
-				this.items[i] = items[i];
+				this.free(items[i]);
 			}
 		};
 		Pool.prototype.clear = function () {
