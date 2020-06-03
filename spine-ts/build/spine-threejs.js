@@ -8048,7 +8048,7 @@ var spine;
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		};
 		RegionAttachment.prototype.copy = function () {
-			var copy = new RegionAttachment(name);
+			var copy = new RegionAttachment(this.name);
 			copy.region = this.region;
 			copy.rendererObject = this.rendererObject;
 			copy.path = this.path;
