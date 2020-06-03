@@ -63,4 +63,5 @@ void SpineObject::operator delete(void *p) {
 }
 
 SpineObject::~SpineObject() {
+	SpineExtension::beforeFree(this);
 }
