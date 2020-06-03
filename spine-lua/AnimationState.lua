@@ -977,6 +977,14 @@ function AnimationState:getCurrent (trackIndex)
 	return self.tracks[trackIndex]
 end
 
+function AnimationState:getLast (trackIndex)
+	local lastEntry = self.tracks[trackIndex]
+	while lastEntry.next do
+		lastEntry = lastEntry.next
+	end
+	return lastEntry
+end
+
 function AnimationState:clearListeners ()
 	self.onStart = nil
 	self.onInterrupt = nil
