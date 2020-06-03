@@ -45,7 +45,7 @@ package spine.atlas {
 			else if (object is ByteArray)
 				load(ByteArray(object).readUTFBytes(ByteArray(object).length), textureLoader);
 			else
-				throw new ArgumentError("object must be a TextureAtlas or AttachmentLoader.");
+				throw new ArgumentError("object must be a string or ByteArray containing .atlas data.");
 		}
 
 		protected function load(atlasText : String, textureLoader : TextureLoader) : void {
