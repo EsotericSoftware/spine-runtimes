@@ -42,15 +42,20 @@ namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonGraphic))]
 	[CanEditMultipleObjects]
 	public class SkeletonGraphicInspector : UnityEditor.Editor {
+
+		const string SeparatorSlotNamesFieldName = "separatorSlotNames";
+
 		SerializedProperty material, color;
 		SerializedProperty skeletonDataAsset, initialSkinName;
 		SerializedProperty startingAnimation, startingLoop, timeScale, freeze, unscaledTime, tintBlack;
 		SerializedProperty initialFlipX, initialFlipY;
 		SerializedProperty meshGeneratorSettings;
+		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation;
 		SerializedProperty raycastTarget;
 
 		SkeletonGraphic thisSkeletonGraphic;
 		protected bool isInspectingPrefab;
+		protected bool slotsReapplyRequired = false;
 
 		protected bool TargetIsValid {
 			get {
@@ -100,9 +105,17 @@ namespace Spine.Unity.Editor {
 
 			meshGeneratorSettings = so.FindProperty("meshGenerator").FindPropertyRelative("settings");
 			meshGeneratorSettings.isExpanded = SkeletonRendererInspector.advancedFoldout;
+
+			allowMultipleCanvasRenderers = so.FindProperty("allowMultipleCanvasRenderers");
+			updateSeparatorPartLocation = so.FindProperty("updateSeparatorPartLocation");
+			enableSeparatorSlots = so.FindProperty("enableSeparatorSlots");
+
+			separatorSlotNames = so.FindProperty("separatorSlotNames");
+			separatorSlotNames.isExpanded = true;
 		}
 
 		public override void OnInspectorGUI () {
+			bool wasChanged = false;
 			EditorGUI.BeginChangeCheck();
 
 			EditorGUILayout.PropertyField(skeletonDataAsset);
@@ -115,9 +128,56 @@ namespace Spine.Unity.Editor {
 				serializedObject.Update();
 				return;
 			}
+
+			bool isSingleRendererOnly = (!allowMultipleCanvasRenderers.hasMultipleDifferentValues && allowMultipleCanvasRenderers.boolValue == false);
+			bool isSeparationEnabledButNotMultipleRenderers =
+				 isSingleRendererOnly && (!enableSeparatorSlots.hasMultipleDifferentValues && enableSeparatorSlots.boolValue == true);
+			bool meshRendersIncorrectlyWithSingleRenderer =
+				isSingleRendererOnly && SkeletonHasMultipleSubmeshes();
+
+			if (isSeparationEnabledButNotMultipleRenderers || meshRendersIncorrectlyWithSingleRenderer)
+				meshGeneratorSettings.isExpanded = true;
+
 			using (new SpineInspectorUtility.BoxScope()) {
 				EditorGUILayout.PropertyField(meshGeneratorSettings, SpineInspectorUtility.TempContent("Advanced..."), includeChildren: true);
 				SkeletonRendererInspector.advancedFoldout = meshGeneratorSettings.isExpanded;
+
+				if (meshGeneratorSettings.isExpanded) {
+					EditorGUILayout.Space();
+					using (new SpineInspectorUtility.IndentScope()) {
+						EditorGUILayout.BeginHorizontal();
+						EditorGUILayout.PropertyField(allowMultipleCanvasRenderers, SpineInspectorUtility.TempContent("Multiple CanvasRenderers"));
+
+						if (GUILayout.Button(new GUIContent("Trim Renderers", "Remove currently unused CanvasRenderer GameObjects. These will be regenerated whenever needed."),
+							EditorStyles.miniButton, GUILayout.Width(100f))) {
+
+							foreach (var skeletonGraphic in targets) {
+								((SkeletonGraphic)skeletonGraphic).TrimRenderers();
+							}
+						}
+						EditorGUILayout.EndHorizontal();
+
+						// warning box
+						if (isSeparationEnabledButNotMultipleRenderers) {
+							using (new SpineInspectorUtility.BoxScope()) {
+								meshGeneratorSettings.isExpanded = true;
+								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("'Multiple Canvas Renderers' must be enabled\nwhen 'Enable Separation' is enabled.", Icons.warning), GUILayout.Height(42), GUILayout.Width(340));
+							}
+						}
+						else if (meshRendersIncorrectlyWithSingleRenderer) {
+							using (new SpineInspectorUtility.BoxScope()) {
+								meshGeneratorSettings.isExpanded = true;
+								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("This mesh uses multiple atlas pages. You\n" +
+																							"need to enable 'Multiple Canvas Renderers'\n" +
+																							"for correct rendering. Consider packing\n" +
+																							"attachments to a single atlas page if possible.", Icons.warning), GUILayout.Height(60), GUILayout.Width(340));
+							}
+						}
+					}
+
+					EditorGUILayout.Space();
+					SeparatorsField(separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation);
+				}
 			}
 
 			EditorGUILayout.Space();
@@ -164,10 +224,82 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			bool wasChanged = EditorGUI.EndChangeCheck();
+			wasChanged |= EditorGUI.EndChangeCheck();
 
-			if (wasChanged)
+			if (wasChanged) {
 				serializedObject.ApplyModifiedProperties();
+				slotsReapplyRequired = true;
+			}
+
+			if (slotsReapplyRequired && UnityEngine.Event.current.type == EventType.Repaint) {
+				foreach (var target in targets) {
+					var skeletonGraphic = (SkeletonGraphic)target;
+					skeletonGraphic.ReapplySeparatorSlotNames();
+					skeletonGraphic.LateUpdate();
+					SceneView.RepaintAll();
+				}
+				slotsReapplyRequired = false;
+			}
+		}
+
+		protected bool SkeletonHasMultipleSubmeshes () {
+			foreach (var target in targets) {
+				var skeletonGraphic = (SkeletonGraphic)target;
+				if (skeletonGraphic.HasMultipleSubmeshInstructions())
+					return true;
+			}
+			return false;
+		}
+
+		public static void SetSeparatorSlotNames (SkeletonRenderer skeletonRenderer, string[] newSlotNames) {
+			var field = SpineInspectorUtility.GetNonPublicField(typeof(SkeletonRenderer), SeparatorSlotNamesFieldName);
+			field.SetValue(skeletonRenderer, newSlotNames);
+		}
+
+		public static string[] GetSeparatorSlotNames (SkeletonRenderer skeletonRenderer) {
+			var field = SpineInspectorUtility.GetNonPublicField(typeof(SkeletonRenderer), SeparatorSlotNamesFieldName);
+			return field.GetValue(skeletonRenderer) as string[];
+		}
+
+		public static void SeparatorsField (SerializedProperty separatorSlotNames, SerializedProperty enableSeparatorSlots,
+			SerializedProperty updateSeparatorPartLocation) {
+
+			bool multi = separatorSlotNames.serializedObject.isEditingMultipleObjects;
+			bool hasTerminalSlot = false;
+			if (!multi) {
+				var sr = separatorSlotNames.serializedObject.targetObject as ISkeletonComponent;
+				var skeleton = sr.Skeleton;
+				int lastSlot = skeleton.Slots.Count - 1;
+				if (skeleton != null) {
+					for (int i = 0, n = separatorSlotNames.arraySize; i < n; i++) {
+						int index = skeleton.FindSlotIndex(separatorSlotNames.GetArrayElementAtIndex(i).stringValue);
+						if (index == 0 || index == lastSlot) {
+							hasTerminalSlot = true;
+							break;
+						}
+					}
+				}
+			}
+
+			string terminalSlotWarning = hasTerminalSlot ? " (!)" : "";
+
+			using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
+				const string SeparatorsDescription = "Stored names of slots where the Skeleton's render will be split into different batches. This is used by separate components that split the render into different MeshRenderers or GameObjects.";
+				if (separatorSlotNames.isExpanded) {
+					EditorGUILayout.PropertyField(separatorSlotNames, SpineInspectorUtility.TempContent(separatorSlotNames.displayName + terminalSlotWarning, Icons.slotRoot, SeparatorsDescription), true);
+					GUILayout.BeginHorizontal();
+					GUILayout.FlexibleSpace();
+					if (GUILayout.Button("+", GUILayout.MaxWidth(28f), GUILayout.MaxHeight(15f))) {
+						separatorSlotNames.arraySize++;
+					}
+					GUILayout.EndHorizontal();
+				}
+				else
+					EditorGUILayout.PropertyField(separatorSlotNames, new GUIContent(separatorSlotNames.displayName + string.Format("{0} [{1}]", terminalSlotWarning, separatorSlotNames.arraySize), SeparatorsDescription), true);
+
+				EditorGUILayout.PropertyField(enableSeparatorSlots, SpineInspectorUtility.TempContent("Enable Separation", tooltip: "Whether to enable separation at the above separator slots."));
+				EditorGUILayout.PropertyField(updateSeparatorPartLocation, SpineInspectorUtility.TempContent("Update Part Location", tooltip:"Update separator part GameObject location to match the position of the SkeletonGraphic. This can be helpful when re-parenting parts to a different GameObject."));
+			}
 		}
 
 		#region Menus
