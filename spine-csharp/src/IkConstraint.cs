@@ -170,18 +170,16 @@ namespace Spine {
 					ty = targetY - bone.worldY;
 					break;
 				case TransformMode.NoRotationOrReflection: {
-                        rotationIK += (float)Math.Atan2(pc, pa) * MathUtils.RadDeg;
-                        float ps = Math.Abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-                        pb = -pc * ps;
-                        pd = pa * ps;
-                        float x = targetX - p.worldX, y = targetY - p.worldY;
-                        float d = pa * pd - pb * pc;
-                        tx = (x * pd - y * pb) / d - bone.ax;
-                        ty = (y * pa - x * pc) / d - bone.ay;
-                        break;
-                }                    
+					float s = Math.Abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+					float sa = pa / bone.skeleton.ScaleX;
+					float sc = pc / bone.skeleton.ScaleY;
+					pb = -sc * s * bone.skeleton.ScaleX;
+					pd = sa * s * bone.skeleton.ScaleY;
+					rotationIK += (float)Math.Atan2(pc, pa) * MathUtils.RadDeg;
+					goto default; // Fall through.
+                }
                 default: {
-                    float x = targetX - p.worldX, y = targetY - p.worldY;
+					float x = targetX - p.worldX, y = targetY - p.worldY;
                     float d = pa * pd - pb * pc;
                     tx = (x * pd - y * pb) / d - bone.ax;
                     ty = (y * pa - x * pc) / d - bone.ay;

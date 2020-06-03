@@ -112,10 +112,12 @@ module spine {
 					ty = targetY - bone.worldY;
 					break;
 				case TransformMode.NoRotationOrReflection:
-					rotationIK += Math.atan2(pc, pa) * MathUtils.radDeg;
-					let ps = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-					pb = -pc * ps;
-					pd = pa * ps;
+					let s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+					let sa = pa / bone.skeleton.scaleX;
+					let sc = pc / bone.skeleton.scaleY;
+					pb = -sc * s * bone.skeleton.scaleX;
+					pd = sa * s * bone.skeleton.scaleY;
+					rotationIK += Math.atan2(sc, sa) * MathUtils.radDeg;
 					// Fall through
 				default:
 					let x = targetX - p.worldX, y = targetY - p.worldY;

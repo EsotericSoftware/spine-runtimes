@@ -56,10 +56,12 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
             ty = targetY - bone._worldY;
             break;
         case TransformMode_NoRotationOrReflection: {
-            rotationIK += MathUtil::atan2(pc, pa) * MathUtil::Rad_Deg;
-            float ps = MathUtil::abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-            pb = -pc * ps;
-            pd = pa * ps;
+            float s = MathUtil::abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+            float sa = pa / bone._skeleton.getScaleX();
+            float sc = pc / bone._skeleton.getScaleY();
+            pb = -sc * s * bone._skeleton.getScaleX();
+            pd = sa * s * bone._skeleton.getScaleY();
+            rotationIK += MathUtil::atan2(sc, sa) * MathUtil::Rad_Deg;
         }
 	    default:
 	        float x = targetX - p->_worldX, y = targetY - p->_worldY;
