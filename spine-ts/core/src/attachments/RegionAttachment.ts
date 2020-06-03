@@ -214,7 +214,7 @@ module spine {
 		}
 
 		copy (): Attachment {
-			let copy = new RegionAttachment(name);
+			let copy = new RegionAttachment(this.name);
 			copy.region = this.region;
 			copy.rendererObject = this.rendererObject;
 			copy.path = this.path;
