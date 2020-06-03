@@ -2844,10 +2844,12 @@ var spine;
 					ty = targetY - bone.worldY;
 					break;
 				case spine.TransformMode.NoRotationOrReflection:
-					rotationIK += Math.atan2(pc, pa) * spine.MathUtils.radDeg;
-					var ps = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-					pb = -pc * ps;
-					pd = pa * ps;
+					var s = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+					var sa = pa / bone.skeleton.scaleX;
+					var sc = pc / bone.skeleton.scaleY;
+					pb = -sc * s * bone.skeleton.scaleX;
+					pd = sa * s * bone.skeleton.scaleY;
+					rotationIK += Math.atan2(sc, sa) * spine.MathUtils.radDeg;
 				default:
 					var x = targetX - p.worldX, y = targetY - p.worldY;
 					var d = pa * pd - pb * pc;
