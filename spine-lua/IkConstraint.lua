@@ -102,10 +102,14 @@ function IkConstraint:apply1 (bone, targetX, targetY, compress, stretch, uniform
 		tx = targetX - bone.worldX
 		ty = targetY - bone.worldY
 	elseif bone.data.transformMode == TransformMode.noRotationOrReflection then
-		rotationIK = rotationIK + Math.atan2(pc, pa) * MathUtils.radDeg
-		local ps = Math.abs(pa * pd - pb * pc) / (pa * pa + pc * pc)
-		pb = -pc * ps
-		pd = pa * ps
+		local s = math_abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+		local sa = pa / bone.skeleton.scaleX;
+		local sc = pc / bone.skeleton.scaleY;
+		pb = -sc * s * bone.skeleton.scaleX;
+		pd = sa * s * bone.skeleton.scaleY;
+		rotationIK = rotationIK + math_deg(math_atan2(sc, sa));
+
+
 		local x = targetX - p.worldX
 		local y = targetY - p.worldY
 		local d = pa * pd - pb * pc
