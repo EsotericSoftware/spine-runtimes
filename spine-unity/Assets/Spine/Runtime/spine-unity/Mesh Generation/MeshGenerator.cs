@@ -503,7 +503,10 @@ namespace Spine.Unity {
 
 			for (int slotIndex = instruction.startSlot; slotIndex < instruction.endSlot; slotIndex++) {
 				var slot = drawOrderItems[slotIndex];
-				if (!slot.bone.active) continue;
+				if (!slot.bone.active) {
+					clipper.ClipEnd(slot);
+					continue;
+				}
 				var attachment = slot.attachment;
 				float z = zSpacing * slotIndex;
 
