@@ -91,7 +91,10 @@ public class SkeletonRenderer {
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
-			if (!slot.bone.active) continue;
+			if (!slot.bone.active) {
+				clipper.clipEnd(slot);
+				continue;
+			}
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
@@ -170,7 +173,10 @@ public class SkeletonRenderer {
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
-			if (!slot.bone.active) continue;
+			if (!slot.bone.active) {
+				clipper.clipEnd(slot);
+				continue;
+			}
 			Texture texture = null;
 			int vertexSize = clipper.isClipping() ? 2 : 5;
 			Attachment attachment = slot.attachment;
@@ -294,7 +300,10 @@ public class SkeletonRenderer {
 		Array<Slot> drawOrder = skeleton.drawOrder;
 		for (int i = 0, n = drawOrder.size; i < n; i++) {
 			Slot slot = drawOrder.get(i);
-			if (!slot.bone.active) continue;
+			if (!slot.bone.active) {
+				clipper.clipEnd(slot);
+				continue;
+			}
 			Texture texture = null;
 			int vertexSize = clipper.isClipping() ? 2 : 6;
 			Attachment attachment = slot.attachment;
