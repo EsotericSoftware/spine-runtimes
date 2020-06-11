@@ -883,6 +883,7 @@ namespace Spine {
 
 		internal class SkeletonInput {
 			private byte[] chars = new byte[32];
+			private byte[] reverseChars = new byte[4];
 			internal ExposedList<String> strings;
 			Stream input;
 
@@ -905,10 +906,13 @@ namespace Spine {
 			}
 
 			public float ReadFloat () {
-				chars[3] = (byte)input.ReadByte();
-				chars[2] = (byte)input.ReadByte();
-				chars[1] = (byte)input.ReadByte();
-				chars[0] = (byte)input.ReadByte();
+				input.Read(reverseChars, 0, 4);
+				
+				chars[0] = reverseChars[3];
+				chars[1] = reverseChars[2];
+				chars[2] = reverseChars[1];
+				chars[3] = reverseChars[0];
+
 				return BitConverter.ToSingle(chars, 0);
 			}
 
