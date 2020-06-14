@@ -47,6 +47,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Affine2;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.NumberUtils;
 
 /** A batch that renders polygons and performs tinting using a light and dark color.
@@ -66,10 +67,13 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 	private final Matrix4 projectionMatrix = new Matrix4();
 	private final Matrix4 combinedMatrix = new Matrix4();
 	private boolean blendingDisabled;
+
 	private final ShaderProgram defaultShader;
+	private final boolean ownsDefaultShader;
 	private ShaderProgram shader;
+
 	private int vertexIndex, triangleIndex;
-	private Texture lastTexture;
+	private @Null Texture lastTexture;
 	private float invTexWidth = 0, invTexHeight = 0;
 	private boolean drawing;
 	private int blendSrcFunc = GL20.GL_SRC_ALPHA;
@@ -86,15 +90,24 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 	/** Number of rendering calls, ever. Will not be reset unless set manually. */
 	public int totalRenderCalls = 0;
 
+	/** Constructs a new batch with 2000 max vertices, 4000 max triangles, and the default shader. */
 	public TwoColorPolygonBatch () {
 		this(2000);
 	}
 
+	/** Constructs a new batch with the specified max vertices, twice that for the max triangles, and the default shader. */
 	public TwoColorPolygonBatch (int size) {
-		this(size, size * 2);
+		this(size, size << 1, null);
 	}
 
+	/** Constructs a new batch with the specified max vertices and max triangles and the default shader. */
 	public TwoColorPolygonBatch (int maxVertices, int maxTriangles) {
+		this(maxTriangles, maxTriangles, null);
+	}
+
+	/** Constructs a new batch with the specified max vertices, max triangles, and shader. The shader will not be disposed
+	 * automatically when the batch is disposed. */
+	public TwoColorPolygonBatch (int maxVertices, int maxTriangles, @Null ShaderProgram defaultShader) {
 		// 32767 is max vertex index.
 		if (maxVertices > 32767)
 			throw new IllegalArgumentException("Can't have more than 32767 vertices per batch: " + maxTriangles);
@@ -109,8 +122,12 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 
 		vertices = new float[maxVertices * 6];
 		triangles = new short[maxTriangles * 3];
-		defaultShader = createDefaultShader();
+
+		ownsDefaultShader = defaultShader == null;
+		if (ownsDefaultShader) defaultShader = createDefaultShader();
+		this.defaultShader = defaultShader;
 		shader = defaultShader;
+
 		projectionMatrix.setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 
@@ -1327,7 +1344,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 	@Override
 	public void dispose () {
 		mesh.dispose();
-		shader.dispose();
+		if (ownsDefaultShader) defaultShader.dispose();
 	}
 
 	@Override
@@ -1379,12 +1396,14 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 		invTexHeight = 1.0f / texture.getHeight();
 	}
 
-	/** Flushes the batch if the shader was changed. */
+	/** Flushes the batch if the shader was changed.
+	 * @param newShader If null, the default shader is used. */
 	@Override
-	public void setShader (ShaderProgram newShader) {
+	public void setShader (@Null ShaderProgram newShader) {
+		if (newShader == null) newShader = defaultShader;
 		if (shader == newShader) return;
 		if (drawing) flush();
-		shader = newShader == null ? defaultShader : newShader;
+		shader = newShader;
 		if (drawing) {
 			shader.bind();
 			setupMatrices();
@@ -1394,6 +1413,10 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 	@Override
 	public ShaderProgram getShader () {
 		return shader;
+	}
+
+	public ShaderProgram getDefaultShader () {
+		return defaultShader;
 	}
 
 	@Override
@@ -1444,7 +1467,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 		return blendDstFuncAlpha;
 	}
 
-	private ShaderProgram createDefaultShader () {
+	static public ShaderProgram createDefaultShader () {
 		String vertexShader = "attribute vec4 a_position;\n" //
 			+ "attribute vec4 a_light;\n" //
 			+ "attribute vec4 a_dark;\n" //
