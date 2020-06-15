@@ -530,6 +530,7 @@ public class AnimationState {
 	private void setCurrent (int index, TrackEntry current, boolean interrupt) {
 		TrackEntry from = expandToIndex(index);
 		tracks.set(index, current);
+		current.previous = null;
 
 		if (from != null) {
 			if (interrupt) queue.interrupt(from);
@@ -619,17 +620,8 @@ public class AnimationState {
 			queue.drain();
 		} else {
 			last.next = entry;
-			if (delay <= 0) {
-				float duration = last.animationEnd - last.animationStart;
-				if (duration != 0) {
-					if (last.loop)
-						delay += duration * (1 + (int)(last.trackTime / duration)); // Completion of next loop.
-					else
-						delay += Math.max(duration, last.trackTime); // After duration, else next update.
-					delay -= data.getMix(last.animation, animation);
-				} else
-					delay = last.trackTime; // Next update.
-			}
+			entry.previous = last;
+			if (delay <= 0) delay += last.getTrackComplete() - entry.mixDuration;
 		}
 
 		entry.delay = delay;
@@ -669,10 +661,10 @@ public class AnimationState {
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	public TrackEntry addEmptyAnimation (int trackIndex, float mixDuration, float delay) {
-		if (delay <= 0) delay -= mixDuration;
-		TrackEntry entry = addAnimation(trackIndex, emptyAnimation, false, delay);
+		TrackEntry entry = addAnimation(trackIndex, emptyAnimation, false, delay <= 0 ? 1 : delay);
 		entry.mixDuration = mixDuration;
 		entry.trackEnd = mixDuration;
+		if (delay <= 0 && entry.previous != null) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration;
 		return entry;
 	}
 
@@ -871,7 +863,7 @@ public class AnimationState {
 	 * References to a track entry must not be kept after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	static public class TrackEntry implements Poolable {
 		Animation animation;
-		@Null TrackEntry next, mixingFrom, mixingTo;
+		@Null TrackEntry previous, next, mixingFrom, mixingTo;
 		@Null AnimationStateListener listener;
 		int trackIndex;
 		boolean loop, holdPrevious, reverse;
@@ -886,6 +878,7 @@ public class AnimationState {
 		final FloatArray timelinesRotation = new FloatArray();
 
 		public void reset () {
+			previous = null;
 			next = null;
 			mixingFrom = null;
 			mixingTo = null;
@@ -928,7 +921,11 @@ public class AnimationState {
 		 * the start of the previous animation to when this track entry will become the current track entry (ie when the previous
 		 * track entry {@link TrackEntry#getTrackTime()} >= this track entry's <code>delay</code>).
 		 * <p>
-		 * {@link #getTimeScale()} affects the delay. */
+		 * {@link #getTimeScale()} affects the delay.
+		 * <p>
+		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, the delay
+		 * is set using the mix duration from the {@link AnimationStateData}. If {@link #mixDuration} is set afterward, the delay
+		 * may need to be adjusted. */
 		public float getDelay () {
 			return delay;
 		}
@@ -961,6 +958,18 @@ public class AnimationState {
 
 		public void setTrackEnd (float trackEnd) {
 			this.trackEnd = trackEnd;
+		}
+
+		/** If this track entry is non-looping, the track time in seconds when {@link #getAnimationEnd()} is reached, or the current
+		 * {@link #getTrackTime()} if it has already been reached. If this track entry is looping, the track time when this
+		 * animation will reach its next {@link #getAnimationEnd()} (the next loop completion). */
+		public float getTrackComplete () {
+			float duration = animationEnd - animationStart;
+			if (duration != 0) {
+				if (loop) return duration * (1 + (int)(trackTime / duration)); // Completion of next loop.
+				if (trackTime < duration) return duration; // Before duration.
+			}
+			return trackTime; // Next update.
 		}
 
 		/** Seconds when this animation starts, both initially and after looping. Defaults to 0.
@@ -1018,7 +1027,7 @@ public class AnimationState {
 		 * {@link #getMixTime()} is not affected by track entry time scale, so {@link #getMixDuration()} may need to be adjusted to
 		 * match the animation speed.
 		 * <p>
-		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, note the
+		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, the
 		 * {@link #getDelay()} is set using the mix duration from the {@link AnimationStateData}, assuming time scale to be 1. If
 		 * the time scale is not 1, the delay may need to be adjusted.
 		 * <p>
@@ -1089,15 +1098,17 @@ public class AnimationState {
 			this.drawOrderThreshold = drawOrderThreshold;
 		}
 
-		/** The animation queued to start after this animation, or null if there is none. <code>next</code> makes up a linked list.
-		 * It cannot be set to null, use {@link AnimationState#clearNext(TrackEntry)} instead. */
+		/** The animation queued to start after this animation, or null if there is none. <code>next</code> makes up a doubly linked
+		 * list.
+		 * <p>
+		 * See {@link AnimationState#clearNext(TrackEntry)} to truncate the list. */
 		public @Null TrackEntry getNext () {
 			return next;
 		}
 
-		public void setNext (TrackEntry next) {
-			if (next == null) throw new IllegalArgumentException("next cannot be null.");
-			this.next = next;
+		/** The animation queued to play before this animation, or null. <code>previous</code> makes up a doubly linked list. */
+		public @Null TrackEntry getPrevious () {
+			return previous;
 		}
 
 		/** Returns true if at least one loop has been completed.
@@ -1127,9 +1138,10 @@ public class AnimationState {
 		 * {@link AnimationStateData#getMix(Animation, Animation)}. In that case, the <code>mixDuration</code> can be set for a new
 		 * track entry only before {@link AnimationState#update(float)} is first called.
 		 * <p>
-		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, note the
-		 * {@link #getDelay()} is set using the mix duration from the {@link AnimationStateData}, not a mix duration set
-		 * afterward. */
+		 * When using {@link AnimationState#addAnimation(int, Animation, boolean, float)} with a <code>delay</code> <= 0, the
+		 * {@link #getDelay()} is set using the mix duration from the {@link AnimationStateData}. If <code>mixDuration</code> is set
+		 * afterward, the delay may need to be adjusted. For example:
+		 * <code>entry.delay = entry.previous.getTrackComplete() - entry.mixDuration;</code> */
 		public float getMixDuration () {
 			return mixDuration;
 		}
