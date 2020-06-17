@@ -10,8 +10,6 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 		_BumpMap("Normal Map", 2D) = "bump" {}
 
 		[MaterialToggle] PixelSnap("Pixel snap", Float) = 0
-		[PerRendererData] _AlphaTex("External Alpha", 2D) = "white" {}
-		[PerRendererData] _EnableExternalAlpha("Enable External Alpha", Float) = 0
 
 		_EmissionColor("Color", Color) = (0,0,0,0)
 		_EmissionMap("Emission", 2D) = "white" {}
