@@ -82,7 +82,7 @@ namespace Spine.Unity.Editor {
 		const string ReloadButtonString = "Reload";
 		static GUILayoutOption reloadButtonWidth;
 		static GUILayoutOption ReloadButtonWidth { get { return reloadButtonWidth = reloadButtonWidth ?? GUILayout.Width(GUI.skin.label.CalcSize(new GUIContent(ReloadButtonString)).x + 20); } }
-		static GUIStyle ReloadButtonStyle { get { return EditorStyles.miniButtonRight; } }
+		static GUIStyle ReloadButtonStyle { get { return EditorStyles.miniButton; } }
 
 		protected bool TargetIsValid {
 			get {
@@ -174,9 +174,9 @@ namespace Spine.Unity.Editor {
 				AreAnyMaskMaterialsMissing()) {
 				if (!Application.isPlaying) {
 					if (multi) {
-						foreach (var o in targets) EditorForceInitializeComponent((SkeletonRenderer)o);
+						foreach (var o in targets) SpineEditorUtilities.ReinitializeComponent((SkeletonRenderer)o);
 					} else {
-						EditorForceInitializeComponent((SkeletonRenderer)target);
+						SpineEditorUtilities.ReinitializeComponent((SkeletonRenderer)target);
 					}
 					SceneView.RepaintAll();
 				}
@@ -188,25 +188,16 @@ namespace Spine.Unity.Editor {
 			if (Event.current.type == EventType.Layout) {
 				if (forceReloadQueued) {
 					forceReloadQueued = false;
-					if (multi) {
-						foreach (var c in targets)
-							EditorForceReloadSkeletonDataAssetAndComponent(c as SkeletonRenderer);
-					} else {
-						EditorForceReloadSkeletonDataAssetAndComponent(target as SkeletonRenderer);
+					foreach (var c in targets) {
+						SpineEditorUtilities.ReloadSkeletonDataAssetAndComponent(c as SkeletonRenderer);
 					}
 				} else {
-					if (multi) {
-						foreach (var c in targets) {
-							var component = c as SkeletonRenderer;
-							if (!component.valid) {
-								EditorForceInitializeComponent(component);
-								if (!component.valid) continue;
-							}
+					foreach (var c in targets) {
+						var component = c as SkeletonRenderer;
+						if (!component.valid) {
+							SpineEditorUtilities.ReinitializeComponent(component);
+							if (!component.valid) continue;
 						}
-					} else {
-						var component = (SkeletonRenderer)target;
-						if (!component.valid)
-							EditorForceInitializeComponent(component);
 					}
 				}
 
@@ -241,15 +232,8 @@ namespace Spine.Unity.Editor {
 
 #if NO_PREFAB_MESH
 				if (isInspectingPrefab) {
-					if (multi) {
-						foreach (var c in targets) {
-							var component = (SkeletonRenderer)c;
-							MeshFilter meshFilter = component.GetComponent<MeshFilter>();
-							if (meshFilter != null && meshFilter.sharedMesh != null)
-								meshFilter.sharedMesh = null;
-						}
-					} else {
-						var component = (SkeletonRenderer)target;
+					foreach (var c in targets) {
+						var component = (SkeletonRenderer)c;
 						MeshFilter meshFilter = component.GetComponent<MeshFilter>();
 						if (meshFilter != null && meshFilter.sharedMesh != null)
 							meshFilter.sharedMesh = null;
@@ -286,7 +270,7 @@ namespace Spine.Unity.Editor {
 					return;
 				}
 
-				if (!SkeletonDataAssetIsValid(component.skeletonDataAsset)) {
+				if (!SpineEditorUtilities.SkeletonDataAssetIsValid(component.skeletonDataAsset)) {
 					EditorGUILayout.HelpBox("Skeleton Data Asset error. Please check Skeleton Data Asset.", MessageType.Error);
 					return;
 				}
@@ -535,38 +519,6 @@ namespace Spine.Unity.Editor {
 			return false;
 		}
 
-		static void EditorForceReloadSkeletonDataAssetAndComponent (SkeletonRenderer component) {
-			if (component == null) return;
-
-			// Clear all and reload.
-			if (component.skeletonDataAsset != null) {
-				foreach (AtlasAssetBase aa in component.skeletonDataAsset.atlasAssets) {
-					if (aa != null) aa.Clear();
-				}
-				component.skeletonDataAsset.Clear();
-			}
-			component.skeletonDataAsset.GetSkeletonData(true);
-
-			// Reinitialize.
-			EditorForceInitializeComponent(component);
-		}
-
-		static void EditorForceInitializeComponent (SkeletonRenderer component) {
-			if (component == null) return;
-			if (!SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
-			component.Initialize(true);
-
-			#if BUILT_IN_SPRITE_MASK_COMPONENT
-			SpineMaskUtilities.EditorAssignSpriteMaskMaterials(component);
-			#endif
-
-			component.LateUpdate();
-		}
-
-		static bool SkeletonDataAssetIsValid (SkeletonDataAsset asset) {
-			return asset != null && asset.GetSkeletonData(quiet: true) != null;
-		}
-
 		bool AreAnyMaskMaterialsMissing() {
 			#if BUILT_IN_SPRITE_MASK_COMPONENT
 			foreach (var o in targets) {
@@ -584,13 +536,13 @@ namespace Spine.Unity.Editor {
 		static void EditorSetMaskMaterials(SkeletonRenderer component, SpriteMaskInteraction maskType)
 		{
 			if (component == null) return;
-			if (!SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
+			if (!SpineEditorUtilities.SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
 			SpineMaskUtilities.EditorInitMaskMaterials(component, component.maskMaterials, maskType);
 		}
 
 		static void EditorDeleteMaskMaterials(SkeletonRenderer component, SpriteMaskInteraction maskType) {
 			if (component == null) return;
-			if (!SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
+			if (!SpineEditorUtilities.SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
 			SpineMaskUtilities.EditorDeleteMaskMaterials(component.maskMaterials, maskType);
 		}
 		#endif
