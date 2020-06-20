@@ -34,7 +34,6 @@ import static com.esotericsoftware.spine.utils.SpineUtils.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 
 import com.esotericsoftware.spine.Bone;
 
@@ -89,8 +88,8 @@ public class RegionAttachment extends Attachment {
 		localX2 *= scaleX;
 		localY2 *= scaleY;
 		float rotation = getRotation();
-		float cos = (float)Math.cos(MathUtils.degRad * rotation);
-		float sin = (float)Math.sin(MathUtils.degRad * rotation);
+		float cos = (float)Math.cos(degRad * rotation);
+		float sin = (float)Math.sin(degRad * rotation);
 		float x = getX();
 		float y = getY();
 		float localXCos = localX * cos + x;
