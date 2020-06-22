@@ -48,6 +48,7 @@ namespace spine {
 		bool cullRectangle(Renderer* renderer, const Mat4& transform, const cocos2d::Rect& rect);
 			Color4B ColorToColor4B(const Color& color);
 		bool slotIsOutRange(Slot& slot, int startSlotIndex, int endSlotIndex);
+		bool nothingToDraw(Slot& slot, int startSlotIndex, int endSlotIndex);
 	}
 
 // C Variable length array
@@ -301,18 +302,7 @@ namespace spine {
 		for (int i = 0, n = _skeleton->getSlots().size(); i < n; ++i) {
 			Slot* slot = _skeleton->getDrawOrder()[i];;
 
-			if (slotIsOutRange(*slot, _startSlotIndex, _endSlotIndex)) {
-				_clipper->clipEnd(*slot);
-				continue;
-			}
-
-			if (!slot->getAttachment()) {
-				_clipper->clipEnd(*slot);
-				continue;
-			}
-
-			// Early exit if slot is invisible
-			if (slot->getColor().a == 0 || !slot->getBone().isActive()) {
+			if (nothingToDraw(*slot, _startSlotIndex, _endSlotIndex)) {
 				_clipper->clipEnd(*slot);
 				continue;
 			}
@@ -323,12 +313,6 @@ namespace spine {
 			if (slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) {
 				RegionAttachment* attachment = static_cast<RegionAttachment*>(slot->getAttachment());
 				attachmentVertices = static_cast<AttachmentVertices*>(attachment->getRendererObject());
-
-				// Early exit if attachment is invisible
-				if (attachment->getColor().a == 0) {
-					_clipper->clipEnd(*slot);
-					continue;
-				}
 
 				float* dstTriangleVertices = nullptr;
 				int dstStride = 0; // in floats
@@ -556,7 +540,7 @@ namespace spine {
 						}
 					}
 				} else {
-					
+
 #if COCOS2D_VERSION < 0x00040000
 					TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
 #else
@@ -641,7 +625,7 @@ namespace spine {
 #endif
 
 		DrawNode* drawNode = DrawNode::create();
-        drawNode->setGlobalZOrder(getGlobalZOrder()); 
+        drawNode->setGlobalZOrder(getGlobalZOrder());
 
 		// Draw bounding rectangle
 		if (_debugBoundingRect) {
@@ -935,21 +919,28 @@ namespace spine {
 			return startSlotIndex > index || endSlotIndex < index;
 		}
 
+		bool nothingToDraw(Slot& slot, int startSlotIndex, int endSlotIndex) {
+			Attachment *attachment = slot.getAttachment();
+			if (!attachment ||
+				slotIsOutRange(slot, startSlotIndex, endSlotIndex) ||
+				!slot.getBone().isActive() ||
+				slot.getColor().a == 0)
+				return true;
+			if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
+				if (static_cast<RegionAttachment*>(attachment)->getColor().a == 0)
+					return true;
+			}
+			return false;
+		}
+
 		int computeTotalCoordCount(Skeleton& skeleton, int startSlotIndex, int endSlotIndex) {
 			int coordCount = 0;
 			for (size_t i = 0; i < skeleton.getSlots().size(); ++i) {
 				Slot& slot = *skeleton.getSlots()[i];
+				if (nothingToDraw(slot, startSlotIndex, endSlotIndex)) {
+					continue;
+				}
 				Attachment* const attachment = slot.getAttachment();
-				if (!attachment) {
-					continue;
-				}
-				if (slotIsOutRange(slot, startSlotIndex, endSlotIndex)) {
-					continue;
-				}
-					// Early exit if slot is invisible
-				if (slot.getColor().a == 0) {
-					continue;
-				}
 				if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 					coordCount += 8;
 				}
@@ -969,16 +960,10 @@ namespace spine {
 #endif
 			for (size_t i = 0; i < skeleton.getSlots().size(); ++i) {
 				/*const*/ Slot& slot = *skeleton.getDrawOrder()[i]; // match the draw order of SkeletonRenderer::Draw
+				if (nothingToDraw(slot, startSlotIndex, endSlotIndex)) {
+					continue;
+				}
 				Attachment* const attachment = slot.getAttachment();
-				if (!attachment) {
-					continue;
-				}
-				if (slotIsOutRange(slot, startSlotIndex, endSlotIndex)) {
-					continue;
-				}
-				if (slot.getColor().a == 0) {
-					continue;
-				}
 				if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 					RegionAttachment* const regionAttachment = static_cast<RegionAttachment*>(attachment);
 					assert(dstPtr + 8 <= dstEnd);
@@ -1010,7 +995,7 @@ namespace spine {
 
 		BlendFunc makeBlendFunc(BlendMode blendMode, bool premultipliedAlpha) {
 			BlendFunc blendFunc;
-			
+
 #if COCOS2D_VERSION < 0x00040000
 			switch (blendMode) {
 			case BlendMode_Additive:
@@ -1056,15 +1041,15 @@ namespace spine {
 		bool cullRectangle(Renderer* renderer, const Mat4& transform, const cocos2d::Rect& rect) {
 			if (Camera::getVisitingCamera() == nullptr)
 				return false;
-			
+
 			auto director = Director::getInstance();
 			auto scene = director->getRunningScene();
-						
+
 			if (!scene || (scene && Camera::getDefaultCamera() != Camera::getVisitingCamera()))
 				return false;
 
 			Rect visibleRect(director->getVisibleOrigin(), director->getVisibleSize());
-			
+
 			// transform center point to screen space
 			float hSizeX = rect.size.width/2;
 			float hSizeY = rect.size.height/2;
@@ -1075,7 +1060,7 @@ namespace spine {
 			// convert content size to world coordinates
 			float wshw = std::max(fabsf(hSizeX * transform.m[0] + hSizeY * transform.m[4]), fabsf(hSizeX * transform.m[0] - hSizeY * transform.m[4]));
 			float wshh = std::max(fabsf(hSizeX * transform.m[1] + hSizeY * transform.m[5]), fabsf(hSizeX * transform.m[1] - hSizeY * transform.m[5]));
-			
+
 			// enlarge visible rect half size in screen coord
 			visibleRect.origin.x -= wshw;
 			visibleRect.origin.y -= wshh;
