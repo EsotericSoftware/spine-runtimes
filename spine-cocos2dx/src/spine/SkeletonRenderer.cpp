@@ -930,6 +930,10 @@ namespace spine {
 				if (static_cast<RegionAttachment*>(attachment)->getColor().a == 0)
 					return true;
 			}
+			else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
+				if (static_cast<MeshAttachment*>(attachment)->getColor().a == 0)
+					return true;
+			}
 			return false;
 		}
 
