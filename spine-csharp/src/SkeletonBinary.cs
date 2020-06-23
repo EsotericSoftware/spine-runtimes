@@ -64,6 +64,8 @@ namespace Spine {
 		private AttachmentLoader attachmentLoader;
 		private List<SkeletonJson.LinkedMesh> linkedMeshes = new List<SkeletonJson.LinkedMesh>();
 
+		private static readonly Dictionary<int, float[]> emptyFloatBuffer = new Dictionary<int, float[]>();
+
 		public SkeletonBinary (params Atlas[] atlasArray)
 			: this(new AtlasAttachmentLoader(atlasArray)) {
 		}
@@ -574,6 +576,17 @@ namespace Spine {
 			return array;
 		}
 
+		private static float[] GetEmptyFloatBuffer(int size)
+		{
+			if (emptyFloatBuffer.TryGetValue(size, out var result))
+				return result;
+
+			result = new float[size];
+			emptyFloatBuffer.Add(size, result);
+
+			return result;
+		}
+
 		private Animation ReadAnimation (String name, SkeletonInput input, SkeletonData skeletonData) {
 			var timelines = new ExposedList<Timeline>(32);
 			float scale = Scale;
@@ -778,7 +791,7 @@ namespace Spine {
 							float[] deform;
 							int end = input.ReadInt(true);
 							if (end == 0)
-								deform = weighted ? new float[deformLength] : vertices;
+								deform = weighted ? GetEmptyFloatBuffer(deformLength) : vertices;
 							else {
 								deform = new float[deformLength];
 								int start = input.ReadInt(true);
