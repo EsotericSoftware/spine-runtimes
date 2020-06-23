@@ -43,9 +43,7 @@ namespace Spine {
 		public Animation (string name, ExposedList<Timeline> timelines, float duration) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			if (timelines == null) throw new ArgumentNullException("timelines", "timelines cannot be null.");
-			this.timelineIds = new HashSet<int>();
-			foreach (Timeline timeline in timelines)
-				timelineIds.Add(timeline.PropertyId);
+			this.timelineIds = new HashSet<int>(timelines.Select(timeline => timeline.PropertyId).ToArray());
 			this.name = name;
 			this.timelines = timelines;
 			this.duration = duration;
