@@ -178,7 +178,7 @@ char *Cocos2dExtension::_readFile(const spine::String &path, int *length) {
 	return ret;
 #else
 	*length = static_cast<int>(data.getSize());
-	char* bytes = MALLOC(char, *length);
+	auto bytes = SpineExtension::alloc<char>(*length, __FILE__, __LINE__);
 	memcpy(bytes, data.getBytes(), *length);
 	return bytes;
 #endif
