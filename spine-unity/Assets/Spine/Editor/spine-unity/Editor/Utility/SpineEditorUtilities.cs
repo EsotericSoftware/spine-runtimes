@@ -219,7 +219,18 @@ namespace Spine.Unity.Editor {
 		public static void ReinitializeComponent (SkeletonRenderer component) {
 			if (component == null) return;
 			if (!SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
-			component.Initialize(true);
+
+			var stateComponent = component as IAnimationStateComponent;
+			AnimationState oldAnimationState = null;
+			if (stateComponent != null) {
+				oldAnimationState = stateComponent.AnimationState;
+			}
+
+			component.Initialize(true); // implicitly clears any subscribers
+
+			if (oldAnimationState != null) {
+				stateComponent.AnimationState.AssignEventSubscribersFrom(oldAnimationState);
+			}
 
 		#if BUILT_IN_SPRITE_MASK_COMPONENT
 			SpineMaskUtilities.EditorAssignSpriteMaskMaterials(component);
