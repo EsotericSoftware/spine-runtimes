@@ -43,9 +43,13 @@ namespace Spine {
 		public Animation (string name, ExposedList<Timeline> timelines, float duration) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			if (timelines == null) throw new ArgumentNullException("timelines", "timelines cannot be null.");
-			this.timelineIds = new HashSet<int>();
-			foreach (Timeline timeline in timelines)
-				timelineIds.Add(timeline.PropertyId);
+			// Note: avoiding reallocations by adding all hash set entries at
+			// once (EnsureCapacity() is only available in newer .Net versions).
+			int[] propertyIDs = new int[timelines.Count];
+			for (int i = 0; i < timelines.Count; ++i) {
+				propertyIDs[i] = timelines.Items[i].PropertyId;
+			}
+			this.timelineIds = new HashSet<int>(propertyIDs);
 			this.name = name;
 			this.timelines = timelines;
 			this.duration = duration;
