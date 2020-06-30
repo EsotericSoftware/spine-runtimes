@@ -210,6 +210,13 @@ namespace Spine.Unity {
 			if (allowMultipleCanvasRenderers) canvasRenderer.Clear();
 		}
 
+		protected override void OnDisable () {
+			base.OnDisable();
+			foreach (var canvasRenderer in canvasRenderers) {
+				canvasRenderer.Clear();
+			}
+		}
+
 		public virtual void Update () {
 			#if UNITY_EDITOR
 			if (!Application.isPlaying) {
