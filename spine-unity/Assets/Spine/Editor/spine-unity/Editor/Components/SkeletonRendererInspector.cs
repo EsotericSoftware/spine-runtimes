@@ -106,7 +106,6 @@ namespace Spine.Unity.Editor {
 #else
 			isInspectingPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab);
 #endif
-
 			SpineEditorUtilities.ConfirmInitialization();
 
 			// Labels
@@ -395,6 +394,48 @@ namespace Spine.Unity.Editor {
 
 				if (EditorGUI.EndChangeCheck())
 					SceneView.RepaintAll();
+			}
+		}
+
+		protected void SkeletonRootMotionParameter() {
+			SkeletonRootMotionParameter(targets);
+		}
+
+		public static void SkeletonRootMotionParameter(Object[] targets) {
+			int rootMotionComponentCount = 0;
+			foreach (var t in targets) {
+				var component = t as Component;
+				if (component.GetComponent<SkeletonRootMotion>() != null) {
+					++rootMotionComponentCount;
+				}
+			}
+			bool allHaveRootMotion = rootMotionComponentCount == targets.Length;
+			bool anyHaveRootMotion = rootMotionComponentCount > 0;
+
+			using (new GUILayout.HorizontalScope()) {
+				EditorGUILayout.PrefixLabel("Root Motion");
+
+				if (!allHaveRootMotion) {
+					if (GUILayout.Button(SpineInspectorUtility.TempContent("Add Component", Icons.constraintTransform), GUILayout.MaxWidth(130), GUILayout.Height(18))) {
+						foreach (var t in targets) {
+							var component = t as Component;
+							if (component.GetComponent<SkeletonRootMotion>() == null) {
+								component.gameObject.AddComponent<SkeletonRootMotion>();
+							}
+						}
+					}
+				}
+				if (anyHaveRootMotion) {
+					if (GUILayout.Button(SpineInspectorUtility.TempContent("Remove Component", Icons.constraintTransform), GUILayout.MaxWidth(140), GUILayout.Height(18))) {
+						foreach (var t in targets) {
+							var component = t as Component;
+							var rootMotionComponent = component.GetComponent<SkeletonRootMotion>();
+							if (rootMotionComponent  != null) {
+								DestroyImmediate(rootMotionComponent);
+							}
+						}
+					}
+				}
 			}
 		}
 

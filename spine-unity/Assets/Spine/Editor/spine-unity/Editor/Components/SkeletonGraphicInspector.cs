@@ -234,6 +234,8 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(freeze);
 			EditorGUILayout.Space();
+			SkeletonRendererInspector.SkeletonRootMotionParameter(targets);
+			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("UI", EditorStyles.boldLabel);
 			EditorGUILayout.PropertyField(raycastTarget);
 

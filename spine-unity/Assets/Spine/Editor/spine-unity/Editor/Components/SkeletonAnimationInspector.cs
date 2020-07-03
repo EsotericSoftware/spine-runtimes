@@ -72,7 +72,9 @@ namespace Spine.Unity.Editor {
 				var component = o as SkeletonAnimation;
 				component.timeScale = Mathf.Max(component.timeScale, 0);
 			}
+
 			EditorGUILayout.Space();
+			SkeletonRootMotionParameter();
 
 			if (!isInspectingPrefab) {
 				if (requireRepaint) {
