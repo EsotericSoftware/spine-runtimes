@@ -160,6 +160,8 @@ namespace Spine.Unity.Editor {
 
 			}
 
+			if (follower.Slot == null)
+				follower.Initialize(false);
 			bool hasBoneFollower = follower.GetComponent<BoneFollower>() != null;
 			if (!hasBoneFollower) {
 				bool buttonDisabled = follower.Slot == null;
