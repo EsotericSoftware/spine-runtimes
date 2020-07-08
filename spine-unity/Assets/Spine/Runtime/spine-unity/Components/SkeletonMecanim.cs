@@ -198,7 +198,7 @@ namespace Spine.Unity {
 			}
 
 			private bool ApplyAnimation (Skeleton skeleton, AnimatorClipInfo info, AnimatorStateInfo stateInfo,
-										int layerIndex, float layerWeight, MixBlend layerBlendMode, bool useWeight1 = false) {
+										int layerIndex, float layerWeight, MixBlend layerBlendMode, bool useClipWeight1 = false) {
 				float weight = info.weight * layerWeight;
 				if (weight == 0)
 					return false;
@@ -209,7 +209,7 @@ namespace Spine.Unity {
 
 				var time = AnimationTime(stateInfo.normalizedTime, info.clip.length,
 										info.clip.isLooping, stateInfo.speed < 0);
-				weight = useWeight1 ? 1.0f : weight;
+				weight = useClipWeight1 ? layerWeight : weight;
 				clip.Apply(skeleton, 0, time, info.clip.isLooping, null,
 						weight, layerBlendMode, MixDirection.In);
 				if (_OnClipApplied != null)
@@ -220,7 +220,7 @@ namespace Spine.Unity {
 			private bool ApplyInterruptionAnimation (Skeleton skeleton,
 				bool interpolateWeightTo1, AnimatorClipInfo info, AnimatorStateInfo stateInfo,
 				int layerIndex, float layerWeight, MixBlend layerBlendMode, float interruptingClipTimeAddition,
-				bool useWeight1 = false) {
+				bool useClipWeight1 = false) {
 
 				float clipWeight = interpolateWeightTo1 ? (info.weight + 1.0f) * 0.5f : info.weight;
 				float weight = clipWeight * layerWeight;
@@ -233,7 +233,7 @@ namespace Spine.Unity {
 
 				var time = AnimationTime(stateInfo.normalizedTime + interruptingClipTimeAddition,
 										info.clip.length, stateInfo.speed < 0);
-				weight = useWeight1 ? 1.0f : weight;
+				weight = useClipWeight1 ? layerWeight : weight;
 				clip.Apply(skeleton, 0, time, info.clip.isLooping, null,
 							weight, layerBlendMode, MixDirection.In);
 				if (_OnClipApplied != null) {
@@ -256,25 +256,27 @@ namespace Spine.Unity {
 			}
 
 			public void Apply (Skeleton skeleton) {
-				if (layerMixModes.Length < animator.layerCount) {
-					int oldSize = layerMixModes.Length;
-					System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
-					for (int layer = oldSize; layer < animator.layerCount; ++layer) {
-						layerMixModes[layer] = layer == 0 ? MixMode.MixNext : MixMode.AlwaysMix;
-					}
-				}
-
 			#if UNITY_EDITOR
 				if (!Application.isPlaying) {
 					GetLayerBlendModes();
 				}
 			#endif
+
+				if (layerMixModes.Length < animator.layerCount) {
+					int oldSize = layerMixModes.Length;
+					System.Array.Resize<MixMode>(ref layerMixModes, animator.layerCount);
+					for (int layer = oldSize; layer < animator.layerCount; ++layer) {
+						bool isAdditiveLayer = false;
+						if (layer < layerBlendModes.Length)
+							isAdditiveLayer = layerBlendModes[layer] == MixBlend.Add;
+						layerMixModes[layer] = isAdditiveLayer ? MixMode.MixNext : MixMode.AlwaysMix;
+					}
+				}
+
 				InitClipInfosForLayers();
 				for (int layer = 0, n = animator.layerCount; layer < n; layer++) {
 					GetStateUpdatesFromAnimator(layer);
 				}
-
-				//skeleton.Update(Time.deltaTime); // Doesn't actually do anything, currently. (Spine 3.6).
 
 				// Clear Previous
 				if (autoReset) {
@@ -348,8 +350,15 @@ namespace Spine.Unity {
 					GetAnimatorClipInfos(layer, out isInterruptionActive, out clipInfoCount, out nextClipInfoCount, out interruptingClipInfoCount,
 										out clipInfo, out nextClipInfo, out interruptingClipInfo, out interpolateWeightTo1);
 
-					MixMode mode = layerMixModes[layer];
 					MixBlend layerBlendMode = (layer < layerBlendModes.Length) ? layerBlendModes[layer] : MixBlend.Replace;
+					MixMode mode = layerMixModes[layer];
+					// Note: at additive blending it makes no sense to use constant weight 1 at a fadeout anim add1 as
+					// with override layers, so we use AlwaysMix instead to use the proper weights.
+					// AlwaysMix leads to the expected result = lower_layer + lerp(add1, add2, transition_weight).
+					if (layerBlendMode == MixBlend.Add && mode == MixMode.MixNext) {
+						mode = MixMode.AlwaysMix;
+						layerMixModes[layer] = mode;
+					}
 					if (mode == MixMode.AlwaysMix) {
 						// Always use Mix instead of Applying the first non-zero weighted clip.
 						for (int c = 0; c < clipInfoCount; c++) {
@@ -372,7 +381,7 @@ namespace Spine.Unity {
 						// Apply first non-zero weighted clip
 						int c = 0;
 						for (; c < clipInfoCount; c++) {
-							if (!ApplyAnimation(skeleton, clipInfo[c], stateInfo, layer, layerWeight, layerBlendMode, useWeight1:true))
+							if (!ApplyAnimation(skeleton, clipInfo[c], stateInfo, layer, layerWeight, layerBlendMode, useClipWeight1:true))
 								continue;
 							++c; break;
 						}
@@ -386,7 +395,7 @@ namespace Spine.Unity {
 							// Apply next clip directly instead of mixing (ie: no crossfade, ignores mecanim transition weights)
 							if (mode == MixMode.Hard) {
 								for (; c < nextClipInfoCount; c++) {
-									if (!ApplyAnimation(skeleton, nextClipInfo[c], nextStateInfo, layer, layerWeight, layerBlendMode, useWeight1:true))
+									if (!ApplyAnimation(skeleton, nextClipInfo[c], nextStateInfo, layer, layerWeight, layerBlendMode, useClipWeight1:true))
 										continue;
 									++c; break;
 								}
@@ -405,7 +414,7 @@ namespace Spine.Unity {
 								for (; c < interruptingClipInfoCount; c++) {
 									if (ApplyInterruptionAnimation(skeleton, interpolateWeightTo1,
 										interruptingClipInfo[c], interruptingStateInfo,
-										layer, layerWeight, layerBlendMode, interruptingClipTimeAddition, useWeight1:true)) {
+										layer, layerWeight, layerBlendMode, interruptingClipTimeAddition, useClipWeight1:true)) {
 
 										++c; break;
 									}
