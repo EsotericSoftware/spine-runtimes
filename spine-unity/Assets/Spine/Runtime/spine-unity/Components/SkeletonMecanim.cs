@@ -125,6 +125,7 @@ namespace Spine.Unity {
 		public class MecanimTranslator {
 			#region Inspector
 			public bool autoReset = true;
+			public bool useCustomMixMode = true;
 			public MixMode[] layerMixModes = new MixMode[0];
 			public MixBlend[] layerBlendModes = new MixBlend[0];
 			#endregion
@@ -351,14 +352,7 @@ namespace Spine.Unity {
 										out clipInfo, out nextClipInfo, out interruptingClipInfo, out interpolateWeightTo1);
 
 					MixBlend layerBlendMode = (layer < layerBlendModes.Length) ? layerBlendModes[layer] : MixBlend.Replace;
-					MixMode mode = layerMixModes[layer];
-					// Note: at additive blending it makes no sense to use constant weight 1 at a fadeout anim add1 as
-					// with override layers, so we use AlwaysMix instead to use the proper weights.
-					// AlwaysMix leads to the expected result = lower_layer + lerp(add1, add2, transition_weight).
-					if (layerBlendMode == MixBlend.Add && mode == MixMode.MixNext) {
-						mode = MixMode.AlwaysMix;
-						layerMixModes[layer] = mode;
-					}
+					MixMode mode = GetMixMode(layer, layerBlendMode);
 					if (mode == MixMode.AlwaysMix) {
 						// Always use Mix instead of Applying the first non-zero weighted clip.
 						for (int c = 0; c < clipInfoCount; c++) {
@@ -469,7 +463,24 @@ namespace Spine.Unity {
 				}
 			}
 
-		#if UNITY_EDITOR
+			private MixMode GetMixMode (int layer, MixBlend layerBlendMode) {
+				if (useCustomMixMode) {
+					MixMode mode = layerMixModes[layer];
+					// Note: at additive blending it makes no sense to use constant weight 1 at a fadeout anim add1 as
+					// with override layers, so we use AlwaysMix instead to use the proper weights.
+					// AlwaysMix leads to the expected result = lower_layer + lerp(add1, add2, transition_weight).
+					if (layerBlendMode == MixBlend.Add && mode == MixMode.MixNext) {
+						mode = MixMode.AlwaysMix;
+						layerMixModes[layer] = mode;
+					}
+					return mode;
+				}
+				else {
+					return layerBlendMode == MixBlend.Add ? MixMode.AlwaysMix : MixMode.MixNext;
+				}
+			}
+
+#if UNITY_EDITOR
 			void GetLayerBlendModes() {
 				if (layerBlendModes.Length < animator.layerCount) {
 					System.Array.Resize<MixBlend>(ref layerBlendModes, animator.layerCount);

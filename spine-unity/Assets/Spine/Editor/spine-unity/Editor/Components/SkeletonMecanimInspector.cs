@@ -39,6 +39,7 @@ namespace Spine.Unity.Editor {
 		public static bool mecanimSettingsFoldout;
 
 		protected SerializedProperty autoReset;
+		protected SerializedProperty useCustomMixMode;
 		protected SerializedProperty layerMixModes;
 		protected SerializedProperty layerBlendModes;
 
@@ -46,6 +47,7 @@ namespace Spine.Unity.Editor {
 			base.OnEnable();
 			SerializedProperty mecanimTranslator = serializedObject.FindProperty("translator");
 			autoReset = mecanimTranslator.FindPropertyRelative("autoReset");
+			useCustomMixMode = mecanimTranslator.FindPropertyRelative("useCustomMixMode");
 			layerMixModes = mecanimTranslator.FindPropertyRelative("layerMixModes");
 			layerBlendModes = mecanimTranslator.FindPropertyRelative("layerBlendModes");
 		}
@@ -64,9 +66,13 @@ namespace Spine.Unity.Editor {
 						"pose when an animation finishes, according to the " +
 						"animation's keyed items."));
 
-					EditorGUILayout.Space();
-					DrawLayerSettings();
-					EditorGUILayout.Space();
+					EditorGUILayout.PropertyField(useCustomMixMode, new GUIContent("Custom MixMode",
+						"When disabled, the recommended MixMode is used according to the layer blend mode. Enable to specify a custom MixMode for each Mecanim layer."));
+
+					if (useCustomMixMode.hasMultipleDifferentValues || useCustomMixMode.boolValue == true) {
+						DrawLayerSettings();
+						EditorGUILayout.Space();
+					}
 				}
 			}
 		}

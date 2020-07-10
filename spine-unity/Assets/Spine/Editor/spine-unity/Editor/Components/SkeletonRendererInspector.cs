@@ -172,11 +172,8 @@ namespace Spine.Unity.Editor {
 			if (serializedObject.ApplyModifiedProperties() || SpineInspectorUtility.UndoRedoPerformed(Event.current) ||
 				AreAnyMaskMaterialsMissing()) {
 				if (!Application.isPlaying) {
-					if (multi) {
-						foreach (var o in targets) SpineEditorUtilities.ReinitializeComponent((SkeletonRenderer)o);
-					} else {
-						SpineEditorUtilities.ReinitializeComponent((SkeletonRenderer)target);
-					}
+					foreach (var o in targets)
+						SpineEditorUtilities.ReinitializeComponent((SkeletonRenderer)o);
 					SceneView.RepaintAll();
 				}
 			}
