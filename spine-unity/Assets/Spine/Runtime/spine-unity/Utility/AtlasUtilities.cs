@@ -27,9 +27,15 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2019_3_OR_NEWER
+#define CONFIGURABLE_ENTER_PLAY_MODE
+#endif
+
+
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+
 
 namespace Spine.Unity.AttachmentTools {
 
@@ -40,6 +46,14 @@ namespace Spine.Unity.AttachmentTools {
 		internal const float DefaultScale = 0.01f;
 
 		const int NonrenderingRegion = -1;
+
+	#if CONFIGURABLE_ENTER_PLAY_MODE
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+		static void Init () {
+			// handle disabled domain reload
+			AtlasUtilities.ClearCache();
+		}
+	#endif
 
 		public static AtlasRegion ToAtlasRegion (this Texture2D t, Material materialPropertySource, float scale = DefaultScale) {
 			return t.ToAtlasRegion(materialPropertySource.shader, scale, materialPropertySource);
