@@ -145,7 +145,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 		if (!drawing) throw new IllegalStateException("begin must be called before end.");
 		if (vertexIndex > 0) flush();
 		Gdx.gl.glDepthMask(true);
-		if (isBlendingEnabled()) Gdx.gl.glDisable(GL20.GL_BLEND);
+		if (!blendingDisabled) Gdx.gl.glDisable(GL20.GL_BLEND);
 
 		lastTexture = null;
 		drawing = false;
@@ -1321,8 +1321,13 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 		Mesh mesh = this.mesh;
 		mesh.setVertices(vertices, 0, vertexIndex);
 		mesh.setIndices(triangles, 0, triangleIndex);
-		Gdx.gl.glEnable(GL20.GL_BLEND);
-		if (blendSrcFunc != -1) Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
+		if (blendingDisabled)
+			Gdx.gl.glDisable(GL20.GL_BLEND);
+		else {
+			Gdx.gl.glEnable(GL20.GL_BLEND);
+			if (blendSrcFunc != -1) 
+				Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
+		}
 		mesh.render(shader, GL20.GL_TRIANGLES, 0, triangleIndex);
 
 		vertexIndex = 0;
