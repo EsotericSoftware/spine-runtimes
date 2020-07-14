@@ -442,7 +442,7 @@ namespace Spine {
 		}
 	}
 
-	public static class SkeletonExtensions {
+	public static class SpineSkeletonExtensions {
 		public static bool IsWeighted (this VertexAttachment va) {
 			return va.bones != null && va.bones.Length > 0;
 		}
