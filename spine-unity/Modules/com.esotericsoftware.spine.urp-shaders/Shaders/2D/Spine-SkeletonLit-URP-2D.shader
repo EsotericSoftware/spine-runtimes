@@ -119,6 +119,7 @@
 			Tags { "LightMode" = "NormalsRendering"}
 
 			Blend SrcAlpha OneMinusSrcAlpha
+			ZWrite Off
 
 			HLSLPROGRAM
 			#pragma prefer_hlslcc gles

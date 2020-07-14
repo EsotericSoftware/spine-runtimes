@@ -114,6 +114,7 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 
 			Blend SrcAlpha OneMinusSrcAlpha
 			Cull[_Cull]
+			ZWrite[_ZWrite]
 
 			HLSLPROGRAM
 			#pragma prefer_hlslcc gles
