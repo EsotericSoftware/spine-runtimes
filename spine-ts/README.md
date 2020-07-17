@@ -111,9 +111,7 @@ python -m SimpleHTTPServer
 Then navigate to `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example`, `http://localhost:8000/threejs/example` or `http://localhost:8000/player/example`
 
 ### Spine-ts WebGL backend
-By default, the spine-ts WebGL backend supports two-color tinting. This has a neglible effect on performance, as more per vertex data has to be submitted to the GPU, and the fragment shader has to do a few more arithmetic operations.
-
-You can disable two-color tinting like this:
+By default, the spine-ts WebGL backend supports two-color tinting. This requires more per vertex data to be submitted to the GPU and the fragment shader has to do a few more arithmetic operations. It has a neglible effect on performance, but you can disable two-color tinting like this:
 
 ```javascript
 // If you use SceneRenderer, disable two-color tinting via the last constructor argument
