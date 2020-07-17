@@ -169,7 +169,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	static GUIContent _rimPowerText = new GUIContent("Rim Power");
 	static GUIContent _specularToggleText = new GUIContent("Specular", "Enable Specular.");
 	static GUIContent _colorAdjustmentToggleText = new GUIContent("Color Adjustment", "Enable material color adjustment.");
-	static GUIContent _colorAdjustmentColorText = new GUIContent("Overlay Color");
+	static GUIContent _colorAdjustmentColorText = new GUIContent("Overlay Color & Alpha");
 	static GUIContent _colorAdjustmentHueText = new GUIContent("Hue");
 	static GUIContent _colorAdjustmentSaturationText = new GUIContent("Saturation");
 	static GUIContent _colorAdjustmentBrightnessText = new GUIContent("Brightness");
