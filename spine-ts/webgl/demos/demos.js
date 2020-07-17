@@ -4,7 +4,6 @@ $(function () {
 		alert("Error: " + message + "\n" + "URL:" + url + "\nLine: " + lineNo);
 	}
 
-
 	spineDemos.init();
 	spineDemos.assetManager = new spine.SharedAssetManager("assets/");
 
