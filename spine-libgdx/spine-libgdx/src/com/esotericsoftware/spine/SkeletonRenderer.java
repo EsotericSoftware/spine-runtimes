@@ -50,7 +50,7 @@ import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 public class SkeletonRenderer {
 	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
 
-	private boolean premultipliedAlpha;
+	private boolean pmaColors, pmaBlendModes;
 	private final FloatArray vertices = new FloatArray(32);
 	private final SkeletonClipping clipper = new SkeletonClipping();
 	private @Null VertexEffect vertexEffect;
@@ -83,7 +83,7 @@ public class SkeletonRenderer {
 		VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
-		boolean premultipliedAlpha = this.premultipliedAlpha;
+		boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
 		BlendMode blendMode = null;
 		float[] vertices = this.vertices.items;
 		Color skeletonColor = skeleton.color;
@@ -98,16 +98,16 @@ public class SkeletonRenderer {
 				region.computeWorldVertices(slot.getBone(), vertices, 0, 5);
 				Color color = region.getColor(), slotColor = slot.getColor();
 				float alpha = a * slotColor.a * color.a * 255;
-				float multiplier = premultipliedAlpha ? alpha : 255;
+				float multiplier = pmaColors ? alpha : 255;
 
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
-					if (slotBlendMode == BlendMode.additive && premultipliedAlpha) {
+					if (slotBlendMode == BlendMode.additive && pmaBlendModes) {
 						slotBlendMode = BlendMode.normal;
 						alpha = 0;
 					}
 					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
+					batch.setBlendFunction(blendMode.getSource(pmaBlendModes), blendMode.getDest());
 				}
 
 				float c = NumberUtils.intToFloatColor((int)alpha << 24 //
@@ -159,7 +159,7 @@ public class SkeletonRenderer {
 		VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
-		boolean premultipliedAlpha = this.premultipliedAlpha;
+		boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
 		BlendMode blendMode = null;
 		int verticesLength = 0;
 		float[] vertices = null, uvs = null;
@@ -207,16 +207,16 @@ public class SkeletonRenderer {
 			if (texture != null) {
 				Color slotColor = slot.getColor();
 				float alpha = a * slotColor.a * color.a * 255;
-				float multiplier = premultipliedAlpha ? alpha : 255;
+				float multiplier = pmaColors ? alpha : 255;
 
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
-					if (slotBlendMode == BlendMode.additive && premultipliedAlpha) {
+					if (slotBlendMode == BlendMode.additive && pmaBlendModes) {
 						slotBlendMode = BlendMode.normal;
 						alpha = 0;
 					}
 					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
+					batch.setBlendFunction(blendMode.getSource(pmaBlendModes), blendMode.getDest());
 				}
 
 				float c = NumberUtils.intToFloatColor((int)alpha << 24 //
@@ -281,8 +281,8 @@ public class SkeletonRenderer {
 		VertexEffect vertexEffect = this.vertexEffect;
 		if (vertexEffect != null) vertexEffect.begin(skeleton);
 
-		boolean premultipliedAlpha = this.premultipliedAlpha;
-		batch.setPremultipliedAlpha(premultipliedAlpha);
+		boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
+		batch.setPremultipliedAlpha(pmaColors);
 		BlendMode blendMode = null;
 		int verticesLength = 0;
 		float[] vertices = null, uvs = null;
@@ -330,16 +330,16 @@ public class SkeletonRenderer {
 			if (texture != null) {
 				Color lightColor = slot.getColor();
 				float alpha = a * lightColor.a * color.a * 255;
-				float multiplier = premultipliedAlpha ? alpha : 255;
+				float multiplier = pmaColors ? alpha : 255;
 
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
-					if (slotBlendMode == BlendMode.additive && premultipliedAlpha) {
+					if (slotBlendMode == BlendMode.additive && pmaBlendModes) {
 						slotBlendMode = BlendMode.normal;
 						alpha = 0;
 					}
 					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
+					batch.setBlendFunction(blendMode.getSource(pmaBlendModes), blendMode.getDest());
 				}
 
 				float red = r * color.r * multiplier;
@@ -440,12 +440,29 @@ public class SkeletonRenderer {
 		}
 	}
 
-	public boolean getPremultipliedAlpha () {
-		return premultipliedAlpha;
+	public boolean getPremultipliedAlphaColors () {
+		return pmaColors;
 	}
 
-	public void setPremultipliedAlpha (boolean premultipliedAlpha) {
-		this.premultipliedAlpha = premultipliedAlpha;
+	/** If true, colors will be multiplied by alpha before being sent to the GPU. Set to false if premultiplied alpha is not being
+	 * used or if the shader does the multiplication. Default is false. */
+	public void setPremultipliedAlphaColors (boolean pmaColors) {
+		this.pmaColors = pmaColors;
+	}
+
+	public boolean getPremultipliedAlphaBlendModes () {
+		return pmaBlendModes;
+	}
+
+	/** If true, blend modes for premultiplied alpha will be used. Set to false if premultiplied alpha is not being used. Default
+	 * is false. */
+	public void setPremultipliedAlphaBlendModes (boolean pmaBlendModes) {
+		this.pmaBlendModes = pmaBlendModes;
+	}
+
+	public void setPremultipliedAlpha (boolean pmaColorsAndBlendModes) {
+		pmaColors = pmaColorsAndBlendModes;
+		pmaBlendModes = pmaColorsAndBlendModes;
 	}
 
 	public @Null VertexEffect getVertexEffect () {
