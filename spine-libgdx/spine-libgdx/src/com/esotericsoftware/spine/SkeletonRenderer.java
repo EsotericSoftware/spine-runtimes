@@ -444,8 +444,8 @@ public class SkeletonRenderer {
 		return pmaColors;
 	}
 
-	/** If true, colors will be multiplied by alpha before being sent to the GPU. Set to false if premultiplied alpha is not being
-	 * used or if the shader does the multiplication. Default is false. */
+	/** If true, colors will be multiplied by their alpha before being sent to the GPU. Set to false if premultiplied alpha is not
+	 * being used or if the shader does the multiplication (libgdx's default batch shaders do not). Default is false. */
 	public void setPremultipliedAlphaColors (boolean pmaColors) {
 		this.pmaColors = pmaColors;
 	}
@@ -460,6 +460,7 @@ public class SkeletonRenderer {
 		this.pmaBlendModes = pmaBlendModes;
 	}
 
+	/** Sets {@link #setPremultipliedAlphaColors(boolean)} and {@link #setPremultipliedAlphaBlendModes(boolean)}. */
 	public void setPremultipliedAlpha (boolean pmaColorsAndBlendModes) {
 		pmaColors = pmaColorsAndBlendModes;
 		pmaBlendModes = pmaColorsAndBlendModes;
