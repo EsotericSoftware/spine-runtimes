@@ -638,10 +638,11 @@ public class AnimationState {
 	 * 0 still mixes out over one frame.
 	 * <p>
 	 * Mixing in is done by first setting an empty animation, then adding an animation using
-	 * {@link #addAnimation(int, Animation, boolean, float)} and on the returned track entry, set the
-	 * {@link TrackEntry#setMixDuration(float)}. Mixing from an empty animation causes the new animation to be applied more and
-	 * more over the mix duration. Properties keyed in the new animation transition from the value from lower tracks or from the
-	 * setup pose value if no lower tracks key the property to the value keyed in the new animation. */
+	 * {@link #addAnimation(int, Animation, boolean, float)} with the desired delay (an empty animation has a duration of 0) and on
+	 * the returned track entry, set the {@link TrackEntry#setMixDuration(float)}. Mixing from an empty animation causes the new
+	 * animation to be applied more and more over the mix duration. Properties keyed in the new animation transition from the value
+	 * from lower tracks or from the setup pose value if no lower tracks key the property to the value keyed in the new
+	 * animation. */
 	public TrackEntry setEmptyAnimation (int trackIndex, float mixDuration) {
 		TrackEntry entry = setAnimation(trackIndex, emptyAnimation, false);
 		entry.mixDuration = mixDuration;
