@@ -27,44 +27,26 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-//using UnityEngine.Playables;
-
-using Spine;
-using Spine.Unity;
+using UnityEditor;
 using Spine.Unity.Playables;
+using UnityEngine.Timeline;
 
-namespace Spine.Unity.Playables {
+namespace Spine.Unity.Editor {
 
-	[AddComponentMenu("Spine/Playables/SkeletonAnimation Playable Handle (Playables)")]
-	public class SkeletonAnimationPlayableHandle : SpinePlayableHandleBase {
-		#region Inspector
-		public SkeletonAnimation skeletonAnimation;
+	[CustomEditor(typeof(SpineAnimationStateGraphicTrack))]
+	[CanEditMultipleObjects]
+	public class SpineAnimationStateGraphicTrackInspector : UnityEditor.Editor {
 
-		#if UNITY_EDITOR
-		void Reset () {
-			InitializeReference();
+		protected SerializedProperty trackIndexProperty = null;
+
+		public void OnEnable () {
+			trackIndexProperty = serializedObject.FindProperty("trackIndex");
 		}
 
-		void OnValidate () {
-			InitializeReference();
-		}
-		#endif
-
-		#endregion
-
-		public override Skeleton Skeleton {	get { return skeletonAnimation.Skeleton; } }
-		public override SkeletonData SkeletonData { get { return skeletonAnimation.Skeleton.Data; } }
-
-		void Awake () {
-			InitializeReference();
-		}
-
-		void InitializeReference () {
-			if (skeletonAnimation == null)
-				skeletonAnimation = GetComponent<SkeletonAnimation>();
+		public override void OnInspectorGUI () {
+			serializedObject.Update();
+			EditorGUILayout.PropertyField(trackIndexProperty);
+			serializedObject.ApplyModifiedProperties();
 		}
 	}
 }

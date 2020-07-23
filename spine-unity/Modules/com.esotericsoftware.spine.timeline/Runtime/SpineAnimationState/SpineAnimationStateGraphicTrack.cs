@@ -27,44 +27,22 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-//using UnityEngine.Playables;
-
-using Spine;
-using Spine.Unity;
-using Spine.Unity.Playables;
+using UnityEngine.Playables;
+using UnityEngine.Timeline;
 
 namespace Spine.Unity.Playables {
+	[TrackColor(0.9960785f, 0.2509804f, 0.003921569f)]
+	[TrackClipType(typeof(SpineAnimationStateClip))]
+	[TrackBindingType(typeof(SkeletonGraphic))]
+	public class SpineAnimationStateGraphicTrack : TrackAsset {
+		public int trackIndex = 0;
 
-	[AddComponentMenu("Spine/Playables/SkeletonAnimation Playable Handle (Playables)")]
-	public class SkeletonAnimationPlayableHandle : SpinePlayableHandleBase {
-		#region Inspector
-		public SkeletonAnimation skeletonAnimation;
-
-		#if UNITY_EDITOR
-		void Reset () {
-			InitializeReference();
-		}
-
-		void OnValidate () {
-			InitializeReference();
-		}
-		#endif
-
-		#endregion
-
-		public override Skeleton Skeleton {	get { return skeletonAnimation.Skeleton; } }
-		public override SkeletonData SkeletonData { get { return skeletonAnimation.Skeleton.Data; } }
-
-		void Awake () {
-			InitializeReference();
-		}
-
-		void InitializeReference () {
-			if (skeletonAnimation == null)
-				skeletonAnimation = GetComponent<SkeletonAnimation>();
+		public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount) {
+			var scriptPlayable = ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create(graph, inputCount);
+			var mixerBehaviour = scriptPlayable.GetBehaviour();
+			mixerBehaviour.trackIndex = this.trackIndex;
+			return scriptPlayable;
 		}
 	}
 }

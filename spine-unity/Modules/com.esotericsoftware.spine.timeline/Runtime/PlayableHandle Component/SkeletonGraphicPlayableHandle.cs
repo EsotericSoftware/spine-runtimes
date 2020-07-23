@@ -30,29 +30,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 //using UnityEngine.Playables;
+
+using Spine;
+using Spine.Unity;
+using Spine.Unity.Playables;
 
 namespace Spine.Unity.Playables {
 
-	public delegate void SpineEventDelegate (Spine.Event e);
+	[AddComponentMenu("Spine/Playables/SkeletonGraphic Playable Handle (Playables)")]
+	public class SkeletonGraphicPlayableHandle : SpinePlayableHandleBase {
+		#region Inspector
+		public SkeletonGraphic skeletonGraphic;
 
-	/// <summary>Base class for Spine Playable Handle components, commonly for integrating with UnityEngine Timeline.</summary>
-	public abstract class SpinePlayableHandleBase : MonoBehaviour {
-
-		/// <summary>Gets the SkeletonData of the targeted Spine component.</summary>
-		public abstract SkeletonData SkeletonData { get; }
-
-		public abstract Skeleton Skeleton { get; }
-
-		/// <summary>Subscribe to this to handle user events played by the Unity playable</summary>
-		public event SpineEventDelegate AnimationEvents;
-
-		public virtual void HandleEvents (ExposedList<Event> eventBuffer) {
-			if (eventBuffer == null || AnimationEvents == null) return;
-			for (int i = 0, n = eventBuffer.Count; i < n; i++)
-				AnimationEvents.Invoke(eventBuffer.Items[i]);
+		#if UNITY_EDITOR
+		void Reset () {
+			InitializeReference();
 		}
 
+		void OnValidate () {
+			InitializeReference();
+		}
+		#endif
+
+		#endregion
+
+		public override Skeleton Skeleton {	get { return skeletonGraphic.Skeleton; } }
+		public override SkeletonData SkeletonData { get { return skeletonGraphic.Skeleton.Data; } }
+
+		void Awake () {
+			InitializeReference();
+		}
+
+		void InitializeReference () {
+			if (skeletonGraphic == null)
+				skeletonGraphic = GetComponent<SkeletonGraphic>();
+		}
 	}
 }
