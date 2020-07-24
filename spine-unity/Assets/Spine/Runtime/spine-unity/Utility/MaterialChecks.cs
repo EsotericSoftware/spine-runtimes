@@ -53,15 +53,23 @@ namespace Spine.Unity {
 			"Warning: Z Spacing recommended on selected shader configuration!\n\nPlease\n"
 			+ "1) make sure at least minimal 'Z Spacing' is set at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' and\n"
 			+ "2) ensure that the skeleton has overlapping parts on different Z depth. You can adjust this in Spine via draw order.\n";
+		public static readonly string kAddNormalsRequiredMessage =
+			"Warning: 'Add Normals' required on URP shader to receive shadows!\n\nPlease\n"
+			+ "a) enable 'Add Normals' at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' or\n"
+			+ "b) disable 'Receive Shadows' at the Material.";
 
 		public static bool IsMaterialSetupProblematic (SkeletonRenderer renderer, ref string errorMessage) {
 			var materials = renderer.GetComponent<Renderer>().sharedMaterials;
 			bool isProblematic = false;
-			foreach (var mat in materials) {
-				if (mat == null) continue;
-				isProblematic |= IsMaterialSetupProblematic(mat, ref errorMessage);
+			foreach (var material in materials) {
+				if (material == null) continue;
+				isProblematic |= IsMaterialSetupProblematic(material, ref errorMessage);
 				if (renderer.zSpacing == 0) {
-					isProblematic |= IsZSpacingRequired(mat, ref errorMessage);
+					isProblematic |= IsZSpacingRequired(material, ref errorMessage);
+				}
+				if (IsURPMaterial(material) && !AreShadowsDisabled(material) && renderer.addNormals == false) {
+					isProblematic = true;
+					errorMessage += kAddNormalsRequiredMessage;
 				}
 			}
 			return isProblematic;
@@ -101,9 +109,10 @@ namespace Spine.Unity {
 		}
 
 		public static bool IsTextureSetupProblematic (Material material, ColorSpace colorSpace,
-													bool sRGBTexture, bool mipmapEnabled, bool alphaIsTransparency,
-													string texturePath, string materialPath,
-													ref string errorMessage) {
+			bool sRGBTexture, bool mipmapEnabled, bool alphaIsTransparency,
+			string texturePath, string materialPath,
+			ref string errorMessage) {
+
 			if (material == null || !UsesSpineShader(material)) {
 				return false;
 			}
@@ -113,19 +122,34 @@ namespace Spine.Unity {
 				// 'sRGBTexture = true' generates incorrectly weighted mipmaps at PMA textures,
 				// causing white borders due to undesired custom weighting.
 				if (sRGBTexture && mipmapEnabled && colorSpace == ColorSpace.Gamma) {
-					errorMessage += string.Format("`{0}` : Problematic Texture Settings found: When enabling `Generate Mip Maps` in Gamma color space, it is recommended to disable `sRGB (Color Texture)` on `Premultiply alpha` textures. Otherwise you will receive white border artifacts on an atlas exported with default `Premultiply alpha` settings.\n(You can disable this warning in `Edit - Preferences - Spine`)\n", texturePath);
+					errorMessage += string.Format("`{0}` : Problematic Texture Settings found: " +
+						"When enabling `Generate Mip Maps` in Gamma color space, it is recommended " +
+						"to disable `sRGB (Color Texture)` on `Premultiply alpha` textures. Otherwise " +
+						"you will receive white border artifacts on an atlas exported with default " +
+						"`Premultiply alpha` settings.\n" +
+						"(You can disable this warning in `Edit - Preferences - Spine`)\n", texturePath);
 					isProblematic = true;
 				}
 				if (alphaIsTransparency) {
 					string materialName = System.IO.Path.GetFileName(materialPath);
-					errorMessage += string.Format("`{0}` and material `{1}` : Problematic Texture / Material Settings found: It is recommended to disable `Alpha Is Transparency` on `Premultiply alpha` textures.\nAssuming `Premultiply alpha` texture because `Straight Alpha Texture` is disabled at material). (You can disable this warning in `Edit - Preferences - Spine`)\n", texturePath, materialName);
+					errorMessage += string.Format("`{0}` and material `{1}` : Problematic " +
+						"Texture / Material Settings found: It is recommended to disable " +
+						"`Alpha Is Transparency` on `Premultiply alpha` textures.\n" +
+						"Assuming `Premultiply alpha` texture because `Straight Alpha Texture` " +
+						"is disabled at material). " +
+						"(You can disable this warning in `Edit - Preferences - Spine`)\n", texturePath, materialName);
 					isProblematic = true;
 				}
 			}
 			else { // straight alpha texture
 				if (!alphaIsTransparency) {
 					string materialName = System.IO.Path.GetFileName(materialPath);
-					errorMessage += string.Format("`{0}` and material `{1}` : Incorrect Texture / Material Settings found: It is strongly recommended to enable `Alpha Is Transparency` on `Straight alpha` textures.\nAssuming `Straight alpha` texture because `Straight Alpha Texture` is enabled at material). (You can disable this warning in `Edit - Preferences - Spine`)\n", texturePath, materialName);
+					errorMessage += string.Format("`{0}` and material `{1}` : Incorrect" +
+						"Texture / Material Settings found: It is strongly recommended " +
+						"to enable `Alpha Is Transparency` on `Straight alpha` textures.\n" +
+						"Assuming `Straight alpha` texture because `Straight Alpha Texture` " +
+						"is enabled at material). " +
+						"(You can disable this warning in `Edit - Preferences - Spine`)\n", texturePath, materialName);
 					isProblematic = true;
 				}
 			}
@@ -151,6 +175,14 @@ namespace Spine.Unity {
 		static bool IsPMAMaterial (Material material) {
 			return (material.HasProperty(STRAIGHT_ALPHA_PARAM_ID) && material.GetInt(STRAIGHT_ALPHA_PARAM_ID) == 0) ||
 					material.IsKeywordEnabled(ALPHAPREMULTIPLY_ON_KEYWORD);
+		}
+
+		static bool IsURPMaterial (Material material) {
+			return material.shader.name.Contains("Universal Render Pipeline");
+		}
+
+		static bool AreShadowsDisabled (Material material) {
+			return material.IsKeywordEnabled("_RECEIVE_SHADOWS_OFF");
 		}
 	}
 }
