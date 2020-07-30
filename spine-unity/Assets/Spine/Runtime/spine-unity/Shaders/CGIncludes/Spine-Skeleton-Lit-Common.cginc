@@ -83,7 +83,13 @@ VertexOutput vert (appdata v) {
 	float3 eyePos = UnityObjectToViewPos(float4(v.pos, 1)).xyz; //mul(UNITY_MATRIX_MV, float4(v.pos,1)).xyz;
 	half3 fixedNormal = half3(0,0,-1);
 	half3 eyeNormal = normalize(mul((float3x3)UNITY_MATRIX_IT_MV, fixedNormal));
-	//half3 eyeNormal = half3(0,0,1);
+
+#ifdef _DOUBLE_SIDED_LIGHTING
+	// unfortunately we have to compute the sign here in the vertex shader
+	// instead of using VFACE in fragment shader stage.
+	half faceSign = sign(eyeNormal.z);
+	eyeNormal *= faceSign;
+#endif
 
 	// Lights
 	half3 lcolor = half4(0,0,0,1).rgb + color.rgb * glstate_lightmodel_ambient.rgb;
