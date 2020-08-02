@@ -102,7 +102,7 @@ public class SkeletonRenderer {
 
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
-					if (slotBlendMode == BlendMode.additive && pmaBlendModes) {
+					if (slotBlendMode == BlendMode.additive && pmaColors) {
 						slotBlendMode = BlendMode.normal;
 						alpha = 0;
 					}
@@ -211,7 +211,7 @@ public class SkeletonRenderer {
 
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
-					if (slotBlendMode == BlendMode.additive && pmaBlendModes) {
+					if (slotBlendMode == BlendMode.additive && pmaColors) {
 						slotBlendMode = BlendMode.normal;
 						alpha = 0;
 					}
@@ -334,7 +334,7 @@ public class SkeletonRenderer {
 
 				BlendMode slotBlendMode = slot.data.getBlendMode();
 				if (slotBlendMode != blendMode) {
-					if (slotBlendMode == BlendMode.additive && pmaBlendModes) {
+					if (slotBlendMode == BlendMode.additive && pmaColors) {
 						slotBlendMode = BlendMode.normal;
 						alpha = 0;
 					}
