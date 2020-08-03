@@ -35,6 +35,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Spine;
+using System.Linq;
 
 namespace Spine.Unity.Editor {
 	public struct SpineDrawerValuePair {
@@ -177,8 +178,10 @@ namespace Spine.Unity.Editor {
 			if (TargetAttribute.includeNone)
 				menu.AddItem(new GUIContent(NoneString), !property.hasMultipleDifferentValues && string.IsNullOrEmpty(property.stringValue), HandleSelect, new SpineDrawerValuePair(string.Empty, property));
 
-			for (int slotIndex = 0; slotIndex < data.Slots.Count; slotIndex++) {
-				string name = data.Slots.Items[slotIndex].Name;
+			IEnumerable<SlotData> orderedSlots = data.Slots.Items.OrderBy(slotData => slotData.Name);
+			foreach (SlotData slotData in orderedSlots) {
+				int slotIndex = slotData.Index;
+				string name = slotData.Name;
 				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal)) {
 
 					if (targetAttribute.containsBoundingBoxes) {
@@ -521,9 +524,17 @@ namespace Spine.Unity.Editor {
 				menu.AddItem(new GUIContent(NoneString), !property.hasMultipleDifferentValues && string.IsNullOrEmpty(property.stringValue), HandleSelect, new SpineDrawerValuePair(string.Empty, property));
 
 			for (int i = 0; i < data.Bones.Count; i++) {
-				string name = data.Bones.Items[i].Name;
-				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal))
-					menu.AddItem(new GUIContent(name), !property.hasMultipleDifferentValues && name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+				var bone = data.Bones.Items[i];
+				string name = bone.Name;
+				if (name.StartsWith(targetAttribute.startsWith, StringComparison.Ordinal)) {
+					// jointName = "root/hip/bone" to show a hierarchial tree.
+					string jointName = name;
+					var iterator = bone;
+					while ((iterator = iterator.Parent) != null)
+						jointName = string.Format("{0}/{1}", iterator.Name, jointName);
+
+					menu.AddItem(new GUIContent(jointName), !property.hasMultipleDifferentValues && name == property.stringValue, HandleSelect, new SpineDrawerValuePair(name, property));
+				}
 			}
 		}
 
