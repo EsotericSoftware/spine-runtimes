@@ -58,6 +58,16 @@ namespace Spine.Unity {
 		public bool startingLoop;
 		public float timeScale = 1f;
 		public bool freeze;
+
+		/// <summary>Update mode to optionally limit updates to e.g. only apply animations but not update the mesh.</summary>
+		public UpdateMode UpdateMode { get { return updateMode; } set { updateMode = value; } }
+		[SerializeField] protected UpdateMode updateMode = UpdateMode.FullUpdate;
+
+		/// <summary>Update mode used when the MeshRenderer becomes invisible
+		/// (when <c>OnBecameInvisible()</c> is called). Update mode is automatically
+		/// reset to <c>UpdateMode.FullUpdate</c> when the mesh becomes visible again.</summary>
+		public UpdateMode updateWhenInvisible = UpdateMode.FullUpdate;
+
 		public bool unscaledTime;
 		public bool allowMultipleCanvasRenderers = false;
 		public List<CanvasRenderer> canvasRenderers = new List<CanvasRenderer>();
@@ -232,12 +242,27 @@ namespace Spine.Unity {
 		public virtual void Update (float deltaTime) {
 			if (!this.IsValid) return;
 
+			wasUpdatedAfterInit = true;
+			if (updateMode < UpdateMode.OnlyAnimationStatus)
+				return;
+			UpdateAnimationStatus(deltaTime);
+
+			if (updateMode == UpdateMode.OnlyAnimationStatus)
+				return;
+			ApplyAnimation();
+		}
+
+		protected void UpdateAnimationStatus (float deltaTime) {
 			deltaTime *= timeScale;
 			skeleton.Update(deltaTime);
 			state.Update(deltaTime);
+		}
+
+		protected void ApplyAnimation () {
 			state.Apply(skeleton);
 
-			if (UpdateLocal != null) UpdateLocal(this);
+			if (UpdateLocal != null)
+				UpdateLocal(this);
 
 			skeleton.UpdateWorldTransform();
 
@@ -246,16 +271,25 @@ namespace Spine.Unity {
 				skeleton.UpdateWorldTransform();
 			}
 
-			if (UpdateComplete != null) UpdateComplete(this);
-			wasUpdatedAfterInit = true;
+			if (UpdateComplete != null)
+				UpdateComplete(this);
 		}
 
 		public void LateUpdate () {
 			// instantiation can happen from Update() after this component, leading to a missing Update() call.
 			if (!wasUpdatedAfterInit) Update(0);
 			if (freeze) return;
-			//this.SetVerticesDirty(); // Which is better?
+			if (updateMode <= UpdateMode.EverythingExceptMesh) return;
+
 			UpdateMesh();
+		}
+
+		public void OnBecameVisible () {
+			updateMode = UpdateMode.FullUpdate;
+		}
+
+		public void OnBecameInvisible () {
+			updateMode = updateWhenInvisible;
 		}
 
 		public void ReapplySeparatorSlotNames () {
