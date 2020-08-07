@@ -1151,9 +1151,9 @@ public class AnimationState {
 			this.mixDuration = mixDuration;
 		}
 
-		/** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}, which
-		 * replaces the values from the lower tracks with the animation values. {@link MixBlend#add} adds the animation values to
-		 * the values from the lower tracks.
+		/** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}.
+		 * <p>
+		 * Track entries on track 0 ignore this setting and always use {@link MixBlend#first}.
 		 * <p>
 		 * The <code>mixBlend</code> can be set for a new track entry only before {@link AnimationState#apply(Skeleton)} is first
 		 * called. */

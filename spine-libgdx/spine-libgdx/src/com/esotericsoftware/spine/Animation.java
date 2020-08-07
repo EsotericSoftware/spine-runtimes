@@ -1410,7 +1410,8 @@ public class Animation {
 
 		/** Sets the time, mix, softness, bend direction, compress, and stretch for the specified frame.
 		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
-		 * @param time The frame time in seconds. */
+		 * @param time The frame time in seconds.
+		 * @param bendDirection 1 or -1. */
 		public void setFrame (int frame, float time, float mix, float softness, int bendDirection, boolean compress,
 			boolean stretch) {
 			frame *= ENTRIES;
