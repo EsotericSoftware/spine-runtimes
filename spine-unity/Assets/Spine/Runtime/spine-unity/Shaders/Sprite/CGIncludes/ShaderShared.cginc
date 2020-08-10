@@ -1,7 +1,5 @@
 // Upgrade NOTE: upgraded instancing buffer 'PerDrawSprite' to new syntax.
 
-// Upgrade NOTE: upgraded instancing buffer 'PerDrawSprite' to new syntax.
-
 #ifndef SHADER_SHARED_INCLUDED
 #define SHADER_SHARED_INCLUDED
 
@@ -12,28 +10,6 @@
 #else
 #include "UnityCG.cginc"
 #endif
-
-#ifdef UNITY_INSTANCING_ENABLED
-
-    UNITY_INSTANCING_BUFFER_START(PerDrawSprite)
-        // SpriteRenderer.Color while Non-Batched/Instanced.
-        fixed4 unity_SpriteRendererColorArray[UNITY_INSTANCED_ARRAY_SIZE];
-        // this could be smaller but that's how bit each entry is regardless of type
-        float4 unity_SpriteFlipArray[UNITY_INSTANCED_ARRAY_SIZE];
-    UNITY_INSTANCING_BUFFER_END(PerDrawSprite)
-
-    #define _RendererColor unity_SpriteRendererColorArray[unity_InstanceID]
-    #define _Flip unity_SpriteFlipArray[unity_InstanceID]
-
-#endif // instancing
-
-CBUFFER_START(UnityPerDrawSprite)
-#ifndef UNITY_INSTANCING_ENABLED
-    fixed4 _RendererColor;
-    float4 _Flip;
-#endif
-    float _EnableExternalAlpha;
-CBUFFER_END
 
 ////////////////////////////////////////
 // Space functions
@@ -376,11 +352,6 @@ inline fixed4 applyFog(fixed4 pixel, float fogCoordOrFactorAtLWRP)
 
 uniform sampler2D _MainTex;
 
-#if ETC1_EXTERNAL_ALPHA
-//External alpha texture for ETC1 compression
-uniform sampler2D _AlphaTex;
-#endif //ETC1_EXTERNAL_ALPHA
-
 #if _TEXTURE_BLEND
 uniform sampler2D _BlendTex;
 uniform float _BlendAmount;
@@ -400,11 +371,6 @@ inline fixed4 calculateTexturePixel(float2 texcoord)
 #else
 	pixel = tex2D(_MainTex, texcoord);
 #endif // !_TEXTURE_BLEND
-
-#if ETC1_EXTERNAL_ALPHA
-    fixed4 alpha = tex2D (_AlphaTex, texcoord);
-    pixel.a = lerp (pixel.a, alpha.r, _EnableExternalAlpha);
-#endif
 
 #if defined(_COLOR_ADJUST)
 	pixel = adjustColor(pixel);

@@ -883,6 +883,7 @@ namespace Spine {
 
 		internal class SkeletonInput {
 			private byte[] chars = new byte[32];
+			private byte[] bytesBigEndian = new byte[4];
 			internal ExposedList<String> strings;
 			Stream input;
 
@@ -905,15 +906,20 @@ namespace Spine {
 			}
 
 			public float ReadFloat () {
-				chars[3] = (byte)input.ReadByte();
-				chars[2] = (byte)input.ReadByte();
-				chars[1] = (byte)input.ReadByte();
-				chars[0] = (byte)input.ReadByte();
+				input.Read(bytesBigEndian, 0, 4);
+				chars[3] = bytesBigEndian[0];
+				chars[2] = bytesBigEndian[1];
+				chars[1] = bytesBigEndian[2];
+				chars[0] = bytesBigEndian[3];
 				return BitConverter.ToSingle(chars, 0);
 			}
 
 			public int ReadInt () {
-				return (input.ReadByte() << 24) + (input.ReadByte() << 16) + (input.ReadByte() << 8) + input.ReadByte();
+				input.Read(bytesBigEndian, 0, 4);
+				return (bytesBigEndian[0] << 24)
+					+ (bytesBigEndian[1] << 16)
+					+ (bytesBigEndian[2] << 8)
+					+ bytesBigEndian[3];
 			}
 
 			public int ReadInt (bool optimizePositive) {

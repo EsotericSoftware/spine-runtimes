@@ -33,7 +33,6 @@
 
 using UnityEngine;
 using UnityEditor;
-using Spine;
 
 namespace Spine.Unity.Editor {
 	using Icons = SpineEditorUtilities.Icons;
@@ -44,6 +43,11 @@ namespace Spine.Unity.Editor {
 	public class SkeletonGraphicInspector : UnityEditor.Editor {
 
 		const string SeparatorSlotNamesFieldName = "separatorSlotNames";
+		const string ReloadButtonString = "Reload";
+		protected GUIContent SkeletonDataAssetLabel;
+		static GUILayoutOption reloadButtonWidth;
+		static GUILayoutOption ReloadButtonWidth { get { return reloadButtonWidth = reloadButtonWidth ?? GUILayout.Width(GUI.skin.label.CalcSize(new GUIContent(ReloadButtonString)).x + 20); } }
+		static GUIStyle ReloadButtonStyle { get { return EditorStyles.miniButton; } }
 
 		SerializedProperty material, color;
 		SerializedProperty skeletonDataAsset, initialSkinName;
@@ -56,6 +60,7 @@ namespace Spine.Unity.Editor {
 		SkeletonGraphic thisSkeletonGraphic;
 		protected bool isInspectingPrefab;
 		protected bool slotsReapplyRequired = false;
+		protected bool forceReloadQueued = false;
 
 		protected bool TargetIsValid {
 			get {
@@ -80,6 +85,10 @@ namespace Spine.Unity.Editor {
 #else
 			isInspectingPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab);
 #endif
+			SpineEditorUtilities.ConfirmInitialization();
+
+			// Labels
+			SkeletonDataAssetLabel = new GUIContent("SkeletonData Asset", Icons.spine);
 
 			var so = this.serializedObject;
 			thisSkeletonGraphic = target as SkeletonGraphic;
@@ -115,10 +124,34 @@ namespace Spine.Unity.Editor {
 		}
 
 		public override void OnInspectorGUI () {
+
+			if (UnityEngine.Event.current.type == EventType.Layout) {
+				if (forceReloadQueued) {
+					forceReloadQueued = false;
+					foreach (var c in targets) {
+						SpineEditorUtilities.ReloadSkeletonDataAssetAndComponent(c as SkeletonGraphic);
+					}
+				}
+				else {
+					foreach (var c in targets) {
+						var component = c as SkeletonGraphic;
+						if (!component.IsValid) {
+							SpineEditorUtilities.ReinitializeComponent(component);
+							if (!component.IsValid) continue;
+						}
+					}
+				}
+			}
+
 			bool wasChanged = false;
 			EditorGUI.BeginChangeCheck();
 
-			EditorGUILayout.PropertyField(skeletonDataAsset);
+			using (new EditorGUILayout.HorizontalScope(EditorStyles.helpBox)) {
+				SpineInspectorUtility.PropertyFieldFitLabel(skeletonDataAsset, SkeletonDataAssetLabel);
+				if (GUILayout.Button(ReloadButtonString, ReloadButtonStyle, ReloadButtonWidth))
+					forceReloadQueued = true;
+			}
+
 			EditorGUILayout.PropertyField(material);
 			EditorGUILayout.PropertyField(color);
 
@@ -200,6 +233,8 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(unscaledTime, SpineInspectorUtility.TempContent(unscaledTime.displayName, tooltip: "If checked, this will use Time.unscaledDeltaTime to make this update independent of game Time.timeScale. Instance SkeletonGraphic.timeScale will still be applied."));
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(freeze);
+			EditorGUILayout.Space();
+			SkeletonRendererInspector.SkeletonRootMotionParameter(targets);
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("UI", EditorStyles.boldLabel);
 			EditorGUILayout.PropertyField(raycastTarget);

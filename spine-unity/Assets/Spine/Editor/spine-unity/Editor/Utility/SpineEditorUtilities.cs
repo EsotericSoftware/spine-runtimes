@@ -46,6 +46,10 @@
 #define NEW_PREFERENCES_SETTINGS_PROVIDER
 #endif
 
+#if UNITY_2017_1_OR_NEWER
+#define BUILT_IN_SPRITE_MASK_COMPONENT
+#endif
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -187,6 +191,62 @@ namespace Spine.Unity.Editor {
 					continue;
 				}
 			}
+		}
+
+		public static void ReloadSkeletonDataAssetAndComponent (SkeletonRenderer component) {
+			if (component == null) return;
+			ReloadSkeletonDataAsset(component.skeletonDataAsset);
+			ReinitializeComponent(component);
+		}
+
+		public static void ReloadSkeletonDataAssetAndComponent (SkeletonGraphic component) {
+			if (component == null) return;
+			ReloadSkeletonDataAsset(component.skeletonDataAsset);
+			// Reinitialize.
+			ReinitializeComponent(component);
+		}
+
+		public static void ReloadSkeletonDataAsset (SkeletonDataAsset skeletonDataAsset) {
+			if (skeletonDataAsset != null) {
+				foreach (AtlasAssetBase aa in skeletonDataAsset.atlasAssets) {
+					if (aa != null) aa.Clear();
+				}
+				skeletonDataAsset.Clear();
+			}
+			skeletonDataAsset.GetSkeletonData(true);
+		}
+
+		public static void ReinitializeComponent (SkeletonRenderer component) {
+			if (component == null) return;
+			if (!SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
+
+			var stateComponent = component as IAnimationStateComponent;
+			AnimationState oldAnimationState = null;
+			if (stateComponent != null) {
+				oldAnimationState = stateComponent.AnimationState;
+			}
+
+			component.Initialize(true); // implicitly clears any subscribers
+
+			if (oldAnimationState != null) {
+				stateComponent.AnimationState.AssignEventSubscribersFrom(oldAnimationState);
+			}
+
+		#if BUILT_IN_SPRITE_MASK_COMPONENT
+			SpineMaskUtilities.EditorAssignSpriteMaskMaterials(component);
+		#endif
+			component.LateUpdate();
+		}
+
+		public static void ReinitializeComponent (SkeletonGraphic component) {
+			if (component == null) return;
+			if (!SkeletonDataAssetIsValid(component.SkeletonDataAsset)) return;
+			component.Initialize(true);
+			component.LateUpdate();
+		}
+
+		public static bool SkeletonDataAssetIsValid (SkeletonDataAsset asset) {
+			return asset != null && asset.GetSkeletonData(quiet: true) != null;
 		}
 
 		public static bool IssueWarningsForUnrecommendedTextureSettings(string texturePath)

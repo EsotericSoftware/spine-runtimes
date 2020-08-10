@@ -1031,9 +1031,9 @@ void AnimationState::computeHold(TrackEntry *entry) {
 			} else {
 				for (TrackEntry *next = to->_mixingTo; next != NULL; next = next->_mixingTo) {
 					if (next->_animation->hasTimeline(id)) continue;
-					if (entry->_mixDuration > 0) {
+					if (next->_mixDuration > 0) {
 						timelineMode[i] = HoldMix;
-						timelineHoldMix[i] = entry;
+						timelineHoldMix[i] = next;
 						i++;
 						goto continue_outer; // continue outer;
 					}

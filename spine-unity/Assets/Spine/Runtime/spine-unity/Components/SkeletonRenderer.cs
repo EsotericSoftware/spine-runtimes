@@ -529,7 +529,7 @@ namespace Spine.Unity {
 					separatorSlots.Add(slot);
 				}
 				#if UNITY_EDITOR
-				else
+				else if (!string.IsNullOrEmpty(separatorSlotNames[i]))
 				{
 					Debug.LogWarning(separatorSlotNames[i] + " is not a slot in " + skeletonDataAsset.skeletonJSON.name);
 				}

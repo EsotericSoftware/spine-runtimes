@@ -106,7 +106,12 @@ namespace Spine.Unity {
 			)
 				return;
 
-			DisposeColliders();
+			slot = null;
+			currentAttachment = null;
+			currentAttachmentName = null;
+			currentCollider = null;
+			colliderTable.Clear();
+			nameTable.Clear();
 
 			var skeleton = skeletonRenderer.skeleton;
 			slot = skeleton.FindSlot(slotName);
@@ -118,13 +123,16 @@ namespace Spine.Unity {
 				return;
 			}
 
+			int requiredCollidersCount = 0;
+			var colliders = GetComponents<PolygonCollider2D>();
 			if (this.gameObject.activeInHierarchy) {
 				foreach (var skin in skeleton.Data.Skins)
-					AddSkin(skin, slotIndex);
+					AddCollidersForSkin(skin, slotIndex, colliders, ref requiredCollidersCount);
 
 				if (skeleton.skin != null)
-					AddSkin(skeleton.skin, slotIndex);
+					AddCollidersForSkin(skeleton.skin, slotIndex, colliders, ref requiredCollidersCount);
 			}
+			DisposeExcessCollidersAfter(requiredCollidersCount);
 
 			if (BoundingBoxFollower.DebugMessages) {
 				bool valid = colliderTable.Count != 0;
@@ -137,7 +145,7 @@ namespace Spine.Unity {
 			}
 		}
 
-		void AddSkin (Skin skin, int slotIndex) {
+		void AddCollidersForSkin (Skin skin, int slotIndex, PolygonCollider2D[] previousColliders, ref int collidersCount) {
 			if (skin == null) return;
 			var skinEntries = new List<Skin.SkinEntry>();
 			skin.GetAttachments(slotIndex, skinEntries);
@@ -151,8 +159,11 @@ namespace Spine.Unity {
 
 				if (boundingBoxAttachment != null) {
 					if (!colliderTable.ContainsKey(boundingBoxAttachment)) {
-						var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, slot, gameObject, isTrigger);
-
+						var bbCollider = collidersCount < previousColliders.Length ?
+							previousColliders[collidersCount] : gameObject.AddComponent<PolygonCollider2D>();
+						++collidersCount;
+						SkeletonUtility.SetColliderPointsLocal(bbCollider, slot, boundingBoxAttachment);
+						bbCollider.isTrigger = isTrigger;
 						bbCollider.enabled = false;
 						bbCollider.hideFlags = HideFlags.NotEditable;
 						bbCollider.isTrigger = IsTrigger;
@@ -178,33 +189,21 @@ namespace Spine.Unity {
 			currentCollider = null;
 		}
 
-		void DisposeColliders () {
+		void DisposeExcessCollidersAfter (int requiredCount) {
 			var colliders = GetComponents<PolygonCollider2D>();
 			if (colliders.Length == 0) return;
 
-			if (Application.isEditor) {
-				if (Application.isPlaying) {
-					foreach (var c in colliders) {
-						if (c != null)
-							Destroy(c);
-					}
-				} else {
-					foreach (var c in colliders)
-						if (c != null)
-							DestroyImmediate(c);
+			for (int i = requiredCount; i < colliders.Length; ++i) {
+				var collider = colliders[i];
+				if (collider != null) {
+#if UNITY_EDITOR
+					if (Application.isEditor && !Application.isPlaying)
+						DestroyImmediate(collider);
+					else
+#endif
+						Destroy(collider);
 				}
-			} else {
-				foreach (PolygonCollider2D c in colliders)
-					if (c != null)
-						Destroy(c);
 			}
-
-			slot = null;
-			currentAttachment = null;
-			currentAttachmentName = null;
-			currentCollider = null;
-			colliderTable.Clear();
-			nameTable.Clear();
 		}
 
 		void LateUpdate () {

@@ -210,6 +210,13 @@ namespace Spine.Unity {
 			if (allowMultipleCanvasRenderers) canvasRenderer.Clear();
 		}
 
+		protected override void OnDisable () {
+			base.OnDisable();
+			foreach (var canvasRenderer in canvasRenderers) {
+				canvasRenderer.Clear();
+			}
+		}
+
 		public virtual void Update () {
 			#if UNITY_EDITOR
 			if (!Application.isPlaying) {
@@ -426,7 +433,7 @@ namespace Spine.Unity {
 				ScaleY = this.initialFlipY ? -1 : 1
 			};
 
-			meshBuffers = new DoubleBuffered<MeshRendererBuffers.SmartMesh>();
+			InitMeshBuffers();
 			baseTexture = skeletonDataAsset.atlasAssets[0].PrimaryMaterial.mainTexture;
 			canvasRenderer.SetTexture(this.mainTexture); // Needed for overwriting initializations.
 
@@ -477,6 +484,16 @@ namespace Spine.Unity {
 			return MeshGenerator.RequiresMultipleSubmeshesByDrawOrder(skeleton);
 		}
 		#endregion
+
+		protected void InitMeshBuffers () {
+			if (meshBuffers != null) {
+				meshBuffers.GetNext().Clear();
+				meshBuffers.GetNext().Clear();
+			}
+			else {
+				meshBuffers = new DoubleBuffered<MeshRendererBuffers.SmartMesh>();
+			}
+		}
 
 		protected void UpdateMeshSingleCanvasRenderer () {
 			if (canvasRenderers.Count > 0)

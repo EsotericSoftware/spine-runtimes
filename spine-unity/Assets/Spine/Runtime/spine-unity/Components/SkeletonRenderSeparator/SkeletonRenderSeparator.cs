@@ -191,8 +191,10 @@ namespace Spine.Unity {
 
 			skeletonRenderer.LateUpdate();
 
-			foreach (var s in partsRenderers)
-				s.ClearMesh();
+			foreach (var partsRenderer in partsRenderers) {
+				if (partsRenderer != null)
+					partsRenderer.ClearMesh();
+			}
 		}
 
 		MaterialPropertyBlock copiedBlock;
@@ -221,6 +223,8 @@ namespace Spine.Unity {
 			int rendererIndex = 0;
 			var currentRenderer = partsRenderers[rendererIndex];
 			for (int si = 0, start = 0; si <= lastSubmeshInstruction; si++) {
+				if (currentRenderer == null)
+					continue;
 				if (submeshInstructionsItems[si].forceSeparate || si == lastSubmeshInstruction) {
 					// Apply properties
 					var meshGenerator = currentRenderer.MeshGenerator;
@@ -245,7 +249,9 @@ namespace Spine.Unity {
 
 			// Clear extra renderers if they exist.
 			for (; rendererIndex < rendererCount; rendererIndex++) {
-				partsRenderers[rendererIndex].ClearMesh();
+				currentRenderer = partsRenderers[rendererIndex];
+				if (currentRenderer != null)
+					partsRenderers[rendererIndex].ClearMesh();
 			}
 
 		}

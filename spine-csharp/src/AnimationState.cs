@@ -85,6 +85,25 @@ namespace Spine {
 
 		public delegate void TrackEntryEventDelegate (TrackEntry trackEntry, Event e);
 		public event TrackEntryEventDelegate Event;
+
+		public void AssignEventSubscribersFrom (AnimationState src) {
+			Event = src.Event;
+			Start = src.Start;
+			Interrupt = src.Interrupt;
+			End = src.End;
+			Dispose = src.Dispose;
+			Complete = src.Complete;
+		}
+
+		public void AddEventSubscribersFrom (AnimationState src) {
+			Event += src.Event;
+			Start += src.Start;
+			Interrupt += src.Interrupt;
+			End += src.End;
+			Dispose += src.Dispose;
+			Complete += src.Complete;
+		}
+
 		// end of difference
 		private readonly EventQueue queue; // Initialized by constructor.
 		private readonly HashSet<int> propertyIDs = new HashSet<int>();
