@@ -177,6 +177,9 @@ namespace Spine.Unity {
 		void OnDisable () {
 			if (clearStateOnDisable)
 				ClearState();
+
+			if (skeletonRenderer != null)
+				skeletonRenderer.OnRebuild -= HandleRebuild;
 		}
 
 		public void ClearState () {

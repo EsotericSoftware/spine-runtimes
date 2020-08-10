@@ -7,6 +7,7 @@ Shader "Lightweight Render Pipeline/Spine/Skeleton Lit" {
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[NoScaleOffset] _MainTex ("Main Texture", 2D) = "black" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
+		[Toggle(_DOUBLE_SIDED_LIGHTING)] _DoubleSidedLighting("Double-Sided Lighting", Int) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 0.0 // Disabled stencil test by default
 	}
@@ -19,7 +20,7 @@ Shader "Lightweight Render Pipeline/Spine/Skeleton Lit" {
 		Cull Off
 		ZWrite Off
 		Blend One OneMinusSrcAlpha
-		
+
 		Stencil {
 			Ref[_StencilRef]
 			Comp[_StencilComp]
@@ -48,7 +49,7 @@ Shader "Lightweight Render Pipeline/Spine/Skeleton Lit" {
 			#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
 			#pragma multi_compile _ _SHADOWS_SOFT
 			#pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
-			
+
 			// -------------------------------------
 			// Unity defined keywords
 			#pragma multi_compile_fog
@@ -60,6 +61,7 @@ Shader "Lightweight Render Pipeline/Spine/Skeleton Lit" {
 			//--------------------------------------
 			// Spine related keywords
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
+			#pragma shader_feature _ _DOUBLE_SIDED_LIGHTING
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 2.0

@@ -37,7 +37,6 @@ using UnityEditor;
 namespace Spine.Unity.Editor {
 	using Icons = SpineEditorUtilities.Icons;
 
-	[InitializeOnLoad]
 	[CustomEditor(typeof(SkeletonGraphic))]
 	[CanEditMultipleObjects]
 	public class SkeletonGraphicInspector : UnityEditor.Editor {
@@ -51,7 +50,7 @@ namespace Spine.Unity.Editor {
 
 		SerializedProperty material, color;
 		SerializedProperty skeletonDataAsset, initialSkinName;
-		SerializedProperty startingAnimation, startingLoop, timeScale, freeze, unscaledTime, tintBlack;
+		SerializedProperty startingAnimation, startingLoop, timeScale, freeze, updateWhenInvisible, unscaledTime, tintBlack;
 		SerializedProperty initialFlipX, initialFlipY;
 		SerializedProperty meshGeneratorSettings;
 		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation;
@@ -111,6 +110,7 @@ namespace Spine.Unity.Editor {
 			timeScale = so.FindProperty("timeScale");
 			unscaledTime = so.FindProperty("unscaledTime");
 			freeze = so.FindProperty("freeze");
+			updateWhenInvisible = so.FindProperty("updateWhenInvisible");
 
 			meshGeneratorSettings = so.FindProperty("meshGenerator").FindPropertyRelative("settings");
 			meshGeneratorSettings.isExpanded = SkeletonRendererInspector.advancedFoldout;
@@ -172,6 +172,7 @@ namespace Spine.Unity.Editor {
 				meshGeneratorSettings.isExpanded = true;
 
 			using (new SpineInspectorUtility.BoxScope()) {
+
 				EditorGUILayout.PropertyField(meshGeneratorSettings, SpineInspectorUtility.TempContent("Advanced..."), includeChildren: true);
 				SkeletonRendererInspector.advancedFoldout = meshGeneratorSettings.isExpanded;
 
@@ -189,6 +190,8 @@ namespace Spine.Unity.Editor {
 							}
 						}
 						EditorGUILayout.EndHorizontal();
+
+						EditorGUILayout.PropertyField(updateWhenInvisible);
 
 						// warning box
 						if (isSeparationEnabledButNotMultipleRenderers) {

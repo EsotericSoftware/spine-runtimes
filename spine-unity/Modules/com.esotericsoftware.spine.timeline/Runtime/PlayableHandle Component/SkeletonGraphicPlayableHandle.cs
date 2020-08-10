@@ -27,39 +27,44 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Timeline;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+//using UnityEngine.Playables;
 
+using Spine;
 using Spine.Unity;
+using Spine.Unity.Playables;
 
 namespace Spine.Unity.Playables {
 
-	[TrackColor(0.855f, 0.8623f, 0.87f)]
-	[TrackClipType(typeof(SpineSkeletonFlipClip))]
-	[TrackBindingType(typeof(SpinePlayableHandleBase))]
-	public class SpineSkeletonFlipTrack : TrackAsset {
-		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
-			return ScriptPlayable<SpineSkeletonFlipMixerBehaviour>.Create(graph, inputCount);
+	[AddComponentMenu("Spine/Playables/SkeletonGraphic Playable Handle (Playables)")]
+	public class SkeletonGraphicPlayableHandle : SpinePlayableHandleBase {
+		#region Inspector
+		public SkeletonGraphic skeletonGraphic;
+
+		#if UNITY_EDITOR
+		void Reset () {
+			InitializeReference();
 		}
 
-		public override void GatherProperties (PlayableDirector director, IPropertyCollector driver) {
-#if UNITY_EDITOR
-			SpinePlayableHandleBase trackBinding = director.GetGenericBinding(this) as SpinePlayableHandleBase;
-			if (trackBinding == null)
-				return;
+		void OnValidate () {
+			InitializeReference();
+		}
+		#endif
 
-			var serializedObject = new UnityEditor.SerializedObject(trackBinding);
-			var iterator = serializedObject.GetIterator();
-			while (iterator.NextVisible(true)) {
-				if (iterator.hasVisibleChildren)
-					continue;
+		#endregion
 
-				driver.AddFromName<SpinePlayableHandleBase>(trackBinding.gameObject, iterator.propertyPath);
-			}
-#endif
-			base.GatherProperties(director, driver);
+		public override Skeleton Skeleton {	get { return skeletonGraphic.Skeleton; } }
+		public override SkeletonData SkeletonData { get { return skeletonGraphic.Skeleton.Data; } }
+
+		void Awake () {
+			InitializeReference();
+		}
+
+		void InitializeReference () {
+			if (skeletonGraphic == null)
+				skeletonGraphic = GetComponent<SkeletonGraphic>();
 		}
 	}
 }

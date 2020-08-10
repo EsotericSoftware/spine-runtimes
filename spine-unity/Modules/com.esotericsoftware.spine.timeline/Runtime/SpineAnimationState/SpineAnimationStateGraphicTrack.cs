@@ -30,36 +30,19 @@
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
-using System.Collections.Generic;
-
-using Spine.Unity;
 
 namespace Spine.Unity.Playables {
+	[TrackColor(0.9960785f, 0.2509804f, 0.003921569f)]
+	[TrackClipType(typeof(SpineAnimationStateClip))]
+	[TrackBindingType(typeof(SkeletonGraphic))]
+	public class SpineAnimationStateGraphicTrack : TrackAsset {
+		public int trackIndex = 0;
 
-	[TrackColor(0.855f, 0.8623f, 0.87f)]
-	[TrackClipType(typeof(SpineSkeletonFlipClip))]
-	[TrackBindingType(typeof(SpinePlayableHandleBase))]
-	public class SpineSkeletonFlipTrack : TrackAsset {
-		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
-			return ScriptPlayable<SpineSkeletonFlipMixerBehaviour>.Create(graph, inputCount);
-		}
-
-		public override void GatherProperties (PlayableDirector director, IPropertyCollector driver) {
-#if UNITY_EDITOR
-			SpinePlayableHandleBase trackBinding = director.GetGenericBinding(this) as SpinePlayableHandleBase;
-			if (trackBinding == null)
-				return;
-
-			var serializedObject = new UnityEditor.SerializedObject(trackBinding);
-			var iterator = serializedObject.GetIterator();
-			while (iterator.NextVisible(true)) {
-				if (iterator.hasVisibleChildren)
-					continue;
-
-				driver.AddFromName<SpinePlayableHandleBase>(trackBinding.gameObject, iterator.propertyPath);
-			}
-#endif
-			base.GatherProperties(director, driver);
+		public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount) {
+			var scriptPlayable = ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create(graph, inputCount);
+			var mixerBehaviour = scriptPlayable.GetBehaviour();
+			mixerBehaviour.trackIndex = this.trackIndex;
+			return scriptPlayable;
 		}
 	}
 }

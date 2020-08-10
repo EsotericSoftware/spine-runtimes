@@ -28,6 +28,13 @@
  *****************************************************************************/
 
 namespace Spine.Unity {
+	public enum UpdateMode {
+		Nothing = 0,
+		OnlyAnimationStatus,
+		EverythingExceptMesh,
+		FullUpdate
+	};
+
 	public delegate void UpdateBonesDelegate (ISkeletonAnimation animated);
 
 	/// <summary>A Spine-Unity Component that animates a Skeleton but not necessarily with a Spine.AnimationState.</summary>

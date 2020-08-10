@@ -100,6 +100,11 @@ namespace Spine.Unity {
 			}
 		}
 
+		void OnDestroy () {
+			if (skeletonRenderer != null)
+				skeletonRenderer.OnRebuild -= HandleRebuildRenderer;
+		}
+
 		public void LateUpdate () {
 			#if UNITY_EDITOR
 			if (!Application.isPlaying) skeletonTransformIsParent = Transform.ReferenceEquals(skeletonTransform, transform.parent);

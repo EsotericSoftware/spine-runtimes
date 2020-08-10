@@ -44,6 +44,15 @@ VertexOutput vert(appdata v) {
 	float3 positionWS = TransformObjectToWorld(v.pos);
 	half3 fixedNormal = half3(0, 0, -1);
 	half3 normalWS = normalize(mul((float3x3)unity_ObjectToWorld, fixedNormal));
+
+#ifdef _DOUBLE_SIDED_LIGHTING
+	// unfortunately we have to compute the sign here in the vertex shader
+	// instead of using VFACE in fragment shader stage.
+	half3 viewDirWS = UNITY_MATRIX_V[2].xyz;
+	half faceSign = sign(dot(viewDirWS, normalWS));
+	normalWS *= faceSign;
+#endif
+
 	color.rgb = LightweightLightVertexSimplified(positionWS, normalWS);
 
 	// Note: ambient light is also handled via SH.

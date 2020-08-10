@@ -256,7 +256,6 @@ namespace Spine.Unity.Editor {
 			bool reimport = false) {
 
 			var atlasPaths = new List<string>();
-			var spriteAtlasPaths = new List<string>();
 			var imagePaths = new List<string>();
 			var skeletonPaths = new List<PathAndProblemInfo>();
 			CompatibilityProblemInfo compatibilityProblemInfo = null;
@@ -272,9 +271,6 @@ namespace Spine.Unity.Editor {
 					case ".txt":
 						if (str.EndsWith(".atlas.txt", System.StringComparison.Ordinal))
 							atlasPaths.Add(str);
-						break;
-					case ".spriteatlas":
-						spriteAtlasPaths.Add(str);
 						break;
 					case ".png":
 					case ".jpg":
@@ -295,13 +291,13 @@ namespace Spine.Unity.Editor {
 			}
 
 			// Import atlases first.
-			var atlases = new List<AtlasAssetBase>();
+			var newAtlases = new List<AtlasAssetBase>();
 			foreach (string ap in atlasPaths) {
 				if (ap.StartsWith("Packages"))
 					continue;
 				TextAsset atlasText = AssetDatabase.LoadAssetAtPath<TextAsset>(ap);
 				AtlasAssetBase atlas = IngestSpineAtlas(atlasText, texturesWithoutMetaFile);
-				atlases.Add(atlas);
+				newAtlases.Add(atlas);
 			}
 			AddDependentSkeletonIfAtlasChanged(skeletonPaths, atlasPaths);
 
@@ -328,13 +324,14 @@ namespace Spine.Unity.Editor {
 #if SPINE_TK2D
 				IngestSpineProject(loadedAsset, null);
 #else
-				var localAtlases = FindAtlasesAtPath(dir);
+				var atlasesForSkeleton = FindAtlasesAtPath(dir);
+				atlasesForSkeleton.AddRange(newAtlases);
 				var requiredPaths = GetRequiredAtlasRegions(skeletonPath);
-				var atlasMatch = GetMatchingAtlas(requiredPaths, localAtlases);
+				var atlasMatch = GetMatchingAtlas(requiredPaths, atlasesForSkeleton);
 				if (atlasMatch != null || requiredPaths.Count == 0) {
 					IngestSpineProject(loadedAsset, atlasMatch);
 				} else {
-					SkeletonImportDialog(skeletonPath, localAtlases, requiredPaths, ref abortSkeletonImport);
+					SkeletonImportDialog(skeletonPath, atlasesForSkeleton, requiredPaths, ref abortSkeletonImport);
 				}
 
 				if (abortSkeletonImport)
@@ -580,7 +577,10 @@ namespace Spine.Unity.Editor {
 			}
 
 			protectFromStackGarbageCollection.Remove(atlasAsset);
-			return (AtlasAssetBase)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAssetBase));
+			// note: at Asset Pipeline V2 this LoadAssetAtPath of the just created
+			// asset returns null, regardless of refresh calls.
+			var loadedAtlas = (AtlasAssetBase)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(AtlasAssetBase));
+			return loadedAtlas != null ? loadedAtlas : atlasAsset;
 		}
 
 		public static bool SpriteAtlasSettingsNeedAdjustment (UnityEngine.U2D.SpriteAtlas spriteAtlas) {

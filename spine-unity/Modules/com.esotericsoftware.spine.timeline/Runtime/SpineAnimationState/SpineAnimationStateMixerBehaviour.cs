@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #define SPINE_EDITMODEPOSE
@@ -42,15 +42,20 @@ namespace Spine.Unity.Playables {
 
 		// NOTE: This function is called at runtime and edit time. Keep that in mind when setting the values of properties.
 		public override void ProcessFrame (Playable playable, FrameData info, object playerData) {
-			var spineComponent = playerData as SkeletonAnimation;
-			if (spineComponent == null) return;
 
-			var skeleton = spineComponent.Skeleton;
-			var state = spineComponent.AnimationState;
+			var skeletonAnimation = playerData as SkeletonAnimation;
+			var skeletonGraphic = playerData as SkeletonGraphic;
+			var animationStateComponent = playerData as IAnimationStateComponent;
+			var skeletonComponent = playerData as ISkeletonComponent;
+			if (animationStateComponent == null || skeletonComponent == null) return;
+
+			var skeleton = skeletonComponent.Skeleton;
+			var state = animationStateComponent.AnimationState;
 
 			if (!Application.isPlaying) {
 				#if SPINE_EDITMODEPOSE
-				PreviewEditModePose(playable, spineComponent);
+				PreviewEditModePose(playable, skeletonComponent, animationStateComponent,
+					skeletonAnimation, skeletonGraphic);
 				#endif
 				return;
 			}
@@ -97,8 +102,14 @@ namespace Spine.Unity.Playables {
 					}
 
 					// Ensure that the first frame ends with an updated mesh.
-					spineComponent.Update(0);
-					spineComponent.LateUpdate();
+					if (skeletonAnimation) {
+						skeletonAnimation.Update(0);
+						skeletonAnimation.LateUpdate();
+					}
+					else if (skeletonGraphic) {
+						skeletonGraphic.Update(0);
+						skeletonGraphic.LateUpdate();
+					}
 				}
 			}
 		}
@@ -107,9 +118,12 @@ namespace Spine.Unity.Playables {
 
 		AnimationState dummyAnimationState;
 
-		public void PreviewEditModePose (Playable playable, SkeletonAnimation spineComponent) {
+		public void PreviewEditModePose (Playable playable,
+			ISkeletonComponent skeletonComponent, IAnimationStateComponent animationStateComponent,
+			SkeletonAnimation skeletonAnimation, SkeletonGraphic skeletonGraphic) {
+
 			if (Application.isPlaying) return;
-			if (spineComponent == null) return;
+			if (skeletonComponent == null || animationStateComponent == null) return;
 
 			int inputCount = playable.GetInputCount();
 			int lastNonZeroWeightTrack = -1;
@@ -120,14 +134,17 @@ namespace Spine.Unity.Playables {
 			}
 
 			if (lastNonZeroWeightTrack != -1) {
-				ScriptPlayable<SpineAnimationStateBehaviour> inputPlayableClip = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastNonZeroWeightTrack);
+				ScriptPlayable<SpineAnimationStateBehaviour> inputPlayableClip =
+					(ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastNonZeroWeightTrack);
 				SpineAnimationStateBehaviour clipData = inputPlayableClip.GetBehaviour();
 
-				var skeleton = spineComponent.Skeleton;
+				var skeleton = skeletonComponent.Skeleton;
 
-				bool skeletonDataMismatch = clipData.animationReference != null && spineComponent.SkeletonDataAsset.GetSkeletonData(true) != clipData.animationReference.SkeletonDataAsset.GetSkeletonData(true);
+				bool skeletonDataMismatch = clipData.animationReference != null &&
+					skeletonComponent.SkeletonDataAsset.GetSkeletonData(true) != clipData.animationReference.SkeletonDataAsset.GetSkeletonData(true);
 				if (skeletonDataMismatch) {
-					Debug.LogWarningFormat("SpineAnimationStateMixerBehaviour tried to apply an animation for the wrong skeleton. Expected {0}. Was {1}", spineComponent.SkeletonDataAsset, clipData.animationReference.SkeletonDataAsset);
+					Debug.LogWarningFormat("SpineAnimationStateMixerBehaviour tried to apply an animation for the wrong skeleton. Expected {0}. Was {1}",
+						skeletonComponent.SkeletonDataAsset, clipData.animationReference.SkeletonDataAsset);
 				}
 
 				// Getting the from-animation here because it's required to get the mix information from AnimationStateData.
@@ -147,12 +164,15 @@ namespace Spine.Unity.Playables {
 				float mixDuration = clipData.mixDuration;
 
 				if (!clipData.customDuration && fromAnimation != null && toAnimation != null) {
-					mixDuration = spineComponent.AnimationState.Data.GetMix(fromAnimation, toAnimation);
+					mixDuration = animationStateComponent.AnimationState.Data.GetMix(fromAnimation, toAnimation);
 				}
+
+				if (trackIndex == 0)
+					skeleton.SetToSetupPose();
 
 				// Approximate what AnimationState might do at runtime.
 				if (fromAnimation != null && mixDuration > 0 && toClipTime < mixDuration) {
-					dummyAnimationState = dummyAnimationState ?? new AnimationState(spineComponent.skeletonDataAsset.GetAnimationStateData());
+					dummyAnimationState = dummyAnimationState ?? new AnimationState(skeletonComponent.SkeletonDataAsset.GetAnimationStateData());
 
 					var toTrack = dummyAnimationState.GetCurrent(0);
 					var fromTrack = toTrack != null ? toTrack.MixingFrom : null;
@@ -174,15 +194,18 @@ namespace Spine.Unity.Playables {
 					}
 
 					// Apply Pose
-					skeleton.SetToSetupPose();
 					dummyAnimationState.Update(0);
 					dummyAnimationState.Apply(skeleton);
 				} else {
-					skeleton.SetToSetupPose();
 					if (toAnimation != null)
 						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, null, 1f, MixBlend.Setup, MixDirection.In);
 				}
+				skeleton.UpdateWorldTransform();
 
+				if (skeletonAnimation)
+					skeletonAnimation.LateUpdate();
+				else if (skeletonGraphic)
+					skeletonGraphic.LateUpdate();
 			}
 			// Do nothing outside of the first clip and the last clip.
 

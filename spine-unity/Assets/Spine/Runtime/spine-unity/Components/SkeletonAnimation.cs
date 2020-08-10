@@ -185,9 +185,23 @@ namespace Spine.Unity {
 			if (!valid || state == null)
 				return;
 
+			wasUpdatedAfterInit = true;
+			if (updateMode < UpdateMode.OnlyAnimationStatus)
+				return;
+			UpdateAnimationStatus(deltaTime);
+
+			if (updateMode == UpdateMode.OnlyAnimationStatus)
+				return;
+			ApplyAnimation();
+		}
+
+		protected void UpdateAnimationStatus (float deltaTime) {
 			deltaTime *= timeScale;
 			skeleton.Update(deltaTime);
 			state.Update(deltaTime);
+		}
+
+		protected void ApplyAnimation () {
 			state.Apply(skeleton);
 
 			if (_UpdateLocal != null)
@@ -203,7 +217,6 @@ namespace Spine.Unity {
 			if (_UpdateComplete != null) {
 				_UpdateComplete(this);
 			}
-			wasUpdatedAfterInit = true;
 		}
 
 		public override void LateUpdate () {

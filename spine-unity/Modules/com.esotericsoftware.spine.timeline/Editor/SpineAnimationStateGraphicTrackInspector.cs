@@ -27,39 +27,26 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using UnityEngine.Playables;
+using UnityEditor;
+using Spine.Unity.Playables;
 using UnityEngine.Timeline;
-using System.Collections.Generic;
 
-using Spine.Unity;
+namespace Spine.Unity.Editor {
 
-namespace Spine.Unity.Playables {
+	[CustomEditor(typeof(SpineAnimationStateGraphicTrack))]
+	[CanEditMultipleObjects]
+	public class SpineAnimationStateGraphicTrackInspector : UnityEditor.Editor {
 
-	[TrackColor(0.855f, 0.8623f, 0.87f)]
-	[TrackClipType(typeof(SpineSkeletonFlipClip))]
-	[TrackBindingType(typeof(SpinePlayableHandleBase))]
-	public class SpineSkeletonFlipTrack : TrackAsset {
-		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
-			return ScriptPlayable<SpineSkeletonFlipMixerBehaviour>.Create(graph, inputCount);
+		protected SerializedProperty trackIndexProperty = null;
+
+		public void OnEnable () {
+			trackIndexProperty = serializedObject.FindProperty("trackIndex");
 		}
 
-		public override void GatherProperties (PlayableDirector director, IPropertyCollector driver) {
-#if UNITY_EDITOR
-			SpinePlayableHandleBase trackBinding = director.GetGenericBinding(this) as SpinePlayableHandleBase;
-			if (trackBinding == null)
-				return;
-
-			var serializedObject = new UnityEditor.SerializedObject(trackBinding);
-			var iterator = serializedObject.GetIterator();
-			while (iterator.NextVisible(true)) {
-				if (iterator.hasVisibleChildren)
-					continue;
-
-				driver.AddFromName<SpinePlayableHandleBase>(trackBinding.gameObject, iterator.propertyPath);
-			}
-#endif
-			base.GatherProperties(director, driver);
+		public override void OnInspectorGUI () {
+			serializedObject.Update();
+			EditorGUILayout.PropertyField(trackIndexProperty);
+			serializedObject.ApplyModifiedProperties();
 		}
 	}
 }

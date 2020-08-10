@@ -55,11 +55,11 @@ namespace Spine.Unity {
 	[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
 	[HelpURL("http://esotericsoftware.com/spine-unity-rendering")]
 	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent, IHasSkeletonDataAsset {
-		[SerializeField] public SkeletonDataAsset skeletonDataAsset;
+		public SkeletonDataAsset skeletonDataAsset;
 
 		#region Initialization settings
 		/// <summary>Skin name to use when the Skeleton is initialized.</summary>
-		[SerializeField] [SpineSkin(defaultAsEmptyString:true)] public string initialSkinName;
+		[SpineSkin(defaultAsEmptyString:true)] public string initialSkinName;
 
 		/// <summary>Enable this parameter when overwriting the Skeleton's skin from an editor script.
 		/// Otherwise any changes will be overwritten by the next inspector update.</summary>
@@ -71,10 +71,20 @@ namespace Spine.Unity {
 		protected bool editorSkipSkinSync = false;
 		#endif
 		/// <summary>Flip X and Y to use when the Skeleton is initialized.</summary>
-		[SerializeField] public bool initialFlipX, initialFlipY;
+		public bool initialFlipX, initialFlipY;
 		#endregion
 
 		#region Advanced Render Settings
+
+		/// <summary>Update mode to optionally limit updates to e.g. only apply animations but not update the mesh.</summary>
+		public UpdateMode UpdateMode { get { return updateMode; } set { updateMode = value; } }
+		[SerializeField] protected UpdateMode updateMode = UpdateMode.FullUpdate;
+
+		/// <summary>Update mode used when the MeshRenderer becomes invisible
+		/// (when <c>OnBecameInvisible()</c> is called). Update mode is automatically
+		/// reset to <c>UpdateMode.FullUpdate</c> when the mesh becomes visible again.</summary>
+		public UpdateMode updateWhenInvisible = UpdateMode.FullUpdate;
+
 		// Submesh Separation
 		/// <summary>Slot names used to populate separatorSlots list when the Skeleton is initialized. Changing this after initialization does nothing.</summary>
 		[UnityEngine.Serialization.FormerlySerializedAs("submeshSeparators")][SerializeField][SpineSlot] protected string[] separatorSlotNames = new string[0];
@@ -361,6 +371,8 @@ namespace Spine.Unity {
 			}
 			#endif
 
+			if (updateMode <= UpdateMode.EverythingExceptMesh) return;
+
 			#if SPINE_OPTIONAL_RENDEROVERRIDE
 			bool doMeshOverride = generateMeshOverride != null;
 			if ((!meshRenderer.enabled)	&& !doMeshOverride) return;
@@ -475,6 +487,14 @@ namespace Spine.Unity {
 
 			if (OnMeshAndMaterialsUpdated != null)
 				OnMeshAndMaterialsUpdated(this);
+		}
+
+		public void OnBecameVisible () {
+			updateMode = UpdateMode.FullUpdate;
+		}
+
+		public void OnBecameInvisible () {
+			updateMode = updateWhenInvisible;
 		}
 
 		public void FindAndApplySeparatorSlots (string startsWith, bool clearExistingSeparators = true, bool updateStringArray = false) {

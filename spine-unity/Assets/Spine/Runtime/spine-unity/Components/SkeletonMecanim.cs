@@ -78,14 +78,23 @@ namespace Spine.Unity {
 		public void Update () {
 			if (!valid) return;
 
-			#if UNITY_EDITOR
+			wasUpdatedAfterInit = true;
+			// animation status is kept by Mecanim Animator component
+			if (updateMode <= UpdateMode.OnlyAnimationStatus)
+				return;
+			ApplyAnimation();
+		}
+
+		protected void ApplyAnimation () {
+		#if UNITY_EDITOR
 			var translatorAnimator = translator.Animator;
 			if (translatorAnimator != null && !translatorAnimator.isInitialized)
 				translatorAnimator.Rebind();
 
 			if (Application.isPlaying) {
 				translator.Apply(skeleton);
-			} else {
+			}
+			else {
 				if (translatorAnimator != null && translatorAnimator.isInitialized &&
 					translatorAnimator.isActiveAndEnabled && translatorAnimator.runtimeAnimatorController != null) {
 					// Note: Rebind is required to prevent warning "Animator is not playing an AnimatorController" with prefabs
@@ -93,9 +102,9 @@ namespace Spine.Unity {
 					translator.Apply(skeleton);
 				}
 			}
-			#else
+		#else
 			translator.Apply(skeleton);
-			#endif
+		#endif
 
 			// UpdateWorldTransform and Bone Callbacks
 			{
@@ -112,7 +121,6 @@ namespace Spine.Unity {
 				if (_UpdateComplete != null)
 					_UpdateComplete(this);
 			}
-			wasUpdatedAfterInit = true;
 		}
 
 		public override void LateUpdate () {
