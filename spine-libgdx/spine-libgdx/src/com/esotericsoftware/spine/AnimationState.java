@@ -60,12 +60,18 @@ public class AnimationState {
 	 * 2) The next track entry applied after this one does not have a timeline to set this property.<br>
 	 * Result: Mix from the setup pose to the timeline pose. */
 	static private final int FIRST = 1;
+	/** 1) A previously applied timeline has set this property.<br>
+	 * 2) The next track entry to be applied does have a timeline to set this property.<br>
+	 * 3) The next track entry after that one does not have a timeline to set this property.<br>
+	 * Result: Mix from the current pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading
+	 * animations that key the same property. A subsequent timeline will set this property using a mix. */
+	static private final int HOLD_SUBSEQUENT = 2;
 	/** 1) This is the first timeline to set this property.<br>
 	 * 2) The next track entry to be applied does have a timeline to set this property.<br>
 	 * 3) The next track entry after that one does not have a timeline to set this property.<br>
 	 * Result: Mix from the setup pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading animations
 	 * that key the same property. A subsequent timeline will set this property using a mix. */
-	static private final int HOLD = 2;
+	static private final int HOLD_FIRST = 3;
 	/** 1) This is the first timeline to set this property.<br>
 	 * 2) The next track entry to be applied does have a timeline to set this property.<br>
 	 * 3) The next track entry after that one does have a timeline to set this property.<br>
@@ -74,9 +80,9 @@ public class AnimationState {
 	 * 2 track entries in a row have a timeline that sets the same property.<br>
 	 * Eg, A -> B -> C -> D where A, B, and C have a timeline setting same property, but D does not. When A is applied, to avoid
 	 * "dipping" A is not mixed out, however D (the first entry that doesn't set the property) mixing in is used to mix out A
-	 * (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
-	 * place. */
-	static private final int HOLD_MIX = 3;
+	 * (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap to the mixed
+	 * out position. */
+	static private final int HOLD_MIX = 4;
 
 	static private final int SETUP = 1, CURRENT = 2;
 
@@ -329,7 +335,11 @@ public class AnimationState {
 					timelineBlend = MixBlend.setup;
 					alpha = alphaMix;
 					break;
-				case HOLD:
+				case HOLD_SUBSEQUENT:
+					timelineBlend = blend;
+					alpha = alphaHold;
+					break;
+				case HOLD_FIRST:
 					timelineBlend = MixBlend.setup;
 					alpha = alphaHold;
 					break;
@@ -758,10 +768,8 @@ public class AnimationState {
 		ObjectSet<String> propertyIds = this.propertyIds;
 
 		if (to != null && to.holdPrevious) {
-			for (int i = 0; i < timelinesCount; i++) {
-				propertyIds.addAll(((Timeline)timelines[i]).getPropertyIds());
-				timelineMode[i] = HOLD;
-			}
+			for (int i = 0; i < timelinesCount; i++)
+				timelineMode[i] = propertyIds.addAll(((Timeline)timelines[i]).getPropertyIds()) ? HOLD_FIRST : HOLD_SUBSEQUENT;
 			return;
 		}
 
@@ -784,7 +792,7 @@ public class AnimationState {
 					}
 					break;
 				}
-				timelineMode[i] = HOLD;
+				timelineMode[i] = HOLD_FIRST;
 			}
 		}
 	}

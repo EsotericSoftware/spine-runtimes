@@ -157,7 +157,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		new GUIContent("Multiply"),
 		new GUIContent("Multiply x2")
 	};
-	static GUIContent _rendererQueueText = new GUIContent("Renderer Queue");
+	static GUIContent _rendererQueueText = new GUIContent("Render Queue Offset");
 	static GUIContent _cullingModeText = new GUIContent("Culling Mode");
 	static GUIContent[] _cullingModeOptions = { new GUIContent("Off"), new GUIContent("Front"), new GUIContent("Back") };
 	static GUIContent _pixelSnapText = new GUIContent("Pixel Snap");
@@ -169,7 +169,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	static GUIContent _rimPowerText = new GUIContent("Rim Power");
 	static GUIContent _specularToggleText = new GUIContent("Specular", "Enable Specular.");
 	static GUIContent _colorAdjustmentToggleText = new GUIContent("Color Adjustment", "Enable material color adjustment.");
-	static GUIContent _colorAdjustmentColorText = new GUIContent("Overlay Color & Alpha");
+	static GUIContent _colorAdjustmentColorText = new GUIContent("Overlay Color");
 	static GUIContent _colorAdjustmentHueText = new GUIContent("Hue");
 	static GUIContent _colorAdjustmentSaturationText = new GUIContent("Saturation");
 	static GUIContent _colorAdjustmentBrightnessText = new GUIContent("Brightness");
@@ -404,13 +404,13 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 			}
 		}
 
-		//	GUILayout.Label(Styles.advancedText, EditorStyles.boldLabel);
-		//	m_MaterialEditor.RenderQueueField();
-		//	m_MaterialEditor.EnableInstancingField();
+		EditorGUI.BeginDisabledGroup(true);
+		_materialEditor.RenderQueueField();
+		EditorGUI.EndDisabledGroup();
 
 		EditorGUI.BeginChangeCheck();
 		EditorGUI.showMixedValue = _renderQueue.hasMixedValue;
-		int renderQueue = EditorGUILayout.IntSlider(_rendererQueueText, (int)_renderQueue.floatValue, 0, 49);
+		int renderQueue = EditorGUILayout.IntField(_rendererQueueText, (int)_renderQueue.floatValue);
 		if (EditorGUI.EndChangeCheck()) {
 			SetInt("_RenderQueue", renderQueue);
 			dataChanged = true;
