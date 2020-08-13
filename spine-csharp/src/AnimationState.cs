@@ -49,12 +49,18 @@ namespace Spine {
 		/// 2) The next track entry applied after this one does not have a timeline to set this property.<para />
 		/// Result: Mix from the setup pose to the timeline pose.
 		internal const int First = 1;
+		/// 1) A previously applied timeline has set this property.<br>
+		/// 2) The next track entry to be applied does have a timeline to set this property.<br>
+		/// 3) The next track entry after that one does not have a timeline to set this property.<br>
+		/// Result: Mix from the current pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading
+		/// animations that key the same property. A subsequent timeline will set this property using a mix.
+		internal const int HoldSubsequent = 2;
 		/// 1) This is the first timeline to set this property.<para />
 		/// 2) The next track entry to be applied does have a timeline to set this property.<para />
 		/// 3) The next track entry after that one does not have a timeline to set this property.<para />
 		/// Result: Mix from the setup pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading animations
 		/// that key the same property. A subsequent timeline will set this property using a mix.
-		internal const int Hold = 2;
+		internal const int HoldFirst = 3;
 		/// 1) This is the first timeline to set this property.<para />
 		/// 2) The next track entry to be applied does have a timeline to set this property.<para />
 		/// 3) The next track entry after that one does have a timeline to set this property.<para />
@@ -63,9 +69,9 @@ namespace Spine {
 		/// 2 track entries in a row have a timeline that sets the same property.<para />
 		/// Eg, A -> B -> C -> D where A, B, and C have a timeline setting same property, but D does not. When A is applied, to avoid
 		/// "dipping" A is not mixed out, however D (the first entry that doesn't set the property) mixing in is used to mix out A
-		/// (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
-		/// place.
-		internal const int HoldMix = 3;
+		/// (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap to the mixed
+		/// out position.
+		internal const int HoldMix = 4;
 
 		internal const int Setup = 1,  Current = 2;
 
@@ -343,7 +349,11 @@ namespace Spine {
 							timelineBlend = MixBlend.Setup;
 							alpha = alphaMix;
 							break;
-						case AnimationState.Hold:
+						case AnimationState.HoldSubsequent:
+							timelineBlend = blend;
+							alpha = alphaHold;
+							break;
+						case AnimationState.HoldFirst:
 							timelineBlend = MixBlend.Setup;
 							alpha = alphaHold;
 							break;
@@ -814,10 +824,9 @@ namespace Spine {
 			var propertyIDs = this.propertyIDs;
 
 			if (to != null && to.holdPrevious) {
-				for (int i = 0; i < timelinesCount; i++) {
-					propertyIDs.Add(timelines[i].PropertyId);
-					timelineMode[i] = AnimationState.Hold;
-				}
+				for (int i = 0; i < timelinesCount; i++)
+					timelineMode[i] = propertyIDs.Add(timelines[i].PropertyId) ? AnimationState.HoldFirst : AnimationState.HoldSubsequent;
+
 				return;
 			}
 
@@ -840,7 +849,7 @@ namespace Spine {
 						}
 						break;
 					}
-					timelineMode[i] = AnimationState.Hold;
+					timelineMode[i] = AnimationState.HoldFirst;
 				}
 				continue_outer: {}
 			}
