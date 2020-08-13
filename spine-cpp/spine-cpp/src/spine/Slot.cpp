@@ -55,6 +55,7 @@ Slot::Slot(SlotData &data, Bone &bone) :
 
 void Slot::setToSetupPose() {
 	_color.set(_data.getColor());
+	if  (_hasDarkColor) _darkColor.set(_data.getDarkColor());
 
 	const String &attachmentName = _data.getAttachmentName();
 	if (attachmentName.length() > 0) {
