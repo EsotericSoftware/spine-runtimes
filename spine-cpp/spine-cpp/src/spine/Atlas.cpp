@@ -98,6 +98,10 @@ Vector<AtlasPage*> &Atlas::getPages() {
 	return _pages;
 }
 
+Vector<AtlasRegion*> &Atlas::getRegions() {
+    return _regions;
+}
+
 void Atlas::load(const char *begin, int length, const char *dir, bool createTexture) {
 	static const char *formatNames[] = {"", "Alpha", "Intensity", "LuminanceAlpha", "RGB565", "RGBA4444", "RGB888", "RGBA8888"};
 	static const char *textureFilterNames[] = {"", "Nearest", "Linear", "MipMap", "MipMapNearestNearest", "MipMapLinearNearest",
