@@ -249,7 +249,8 @@ declare module spine {
 		static emptyAnimation: Animation;
 		static SUBSEQUENT: number;
 		static FIRST: number;
-		static HOLD: number;
+		static HOLD_SUBSEQUENT: number;
+		static HOLD_FIRST: number;
 		static HOLD_MIX: number;
 		static SETUP: number;
 		static CURRENT: number;

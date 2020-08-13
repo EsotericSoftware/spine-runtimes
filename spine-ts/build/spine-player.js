@@ -1554,7 +1554,11 @@ var spine;
 							timelineBlend = spine.MixBlend.setup;
 							alpha = alphaMix;
 							break;
-						case AnimationState.HOLD:
+						case AnimationState.HOLD_SUBSEQUENT:
+							timelineBlend = blend;
+							alpha = alphaHold;
+							break;
+						case AnimationState.HOLD_FIRST:
 							timelineBlend = spine.MixBlend.setup;
 							alpha = alphaHold;
 							break;
@@ -1908,8 +1912,7 @@ var spine;
 			var propertyIDs = this.propertyIDs;
 			if (to != null && to.holdPrevious) {
 				for (var i = 0; i < timelinesCount; i++) {
-					propertyIDs.add(timelines[i].getPropertyId());
-					timelineMode[i] = AnimationState.HOLD;
+					timelineMode[i] = propertyIDs.add(timelines[i].getPropertyId()) ? AnimationState.HOLD_FIRST : AnimationState.HOLD_SUBSEQUENT;
 				}
 				return;
 			}
@@ -1933,7 +1936,7 @@ var spine;
 						}
 						break;
 					}
-					timelineMode[i] = AnimationState.HOLD;
+					timelineMode[i] = AnimationState.HOLD_FIRST;
 				}
 			}
 		};
@@ -1961,8 +1964,9 @@ var spine;
 		AnimationState.emptyAnimation = new spine.Animation("<empty>", [], 0);
 		AnimationState.SUBSEQUENT = 0;
 		AnimationState.FIRST = 1;
-		AnimationState.HOLD = 2;
-		AnimationState.HOLD_MIX = 3;
+		AnimationState.HOLD_SUBSEQUENT = 2;
+		AnimationState.HOLD_FIRST = 3;
+		AnimationState.HOLD_MIX = 4;
 		AnimationState.SETUP = 1;
 		AnimationState.CURRENT = 2;
 		return AnimationState;
