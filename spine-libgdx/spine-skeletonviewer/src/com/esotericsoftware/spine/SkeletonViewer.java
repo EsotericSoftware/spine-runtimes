@@ -144,6 +144,12 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		ui.loadPrefs();
 		ui.prefsLoaded = true;
+
+		if (false) {
+			ui.animationList.clearListeners();
+			// Test code:
+			// state.setAnimation(0, "walk", true);
+		}
 	}
 
 	FileHandle atlasFile (FileHandle skeletonFile) {
@@ -279,9 +285,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		if (ui.skinList.getSelected() != null) skeleton.setSkin(ui.skinList.getSelected());
 		setAnimation();
-
-		// ui.animationList.clearListeners();
-		// state.setAnimation(0, "walk", true);
 	}
 
 	void setAnimation () {
