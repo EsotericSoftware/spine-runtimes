@@ -39,8 +39,9 @@ package spine.animation {
 	public class AnimationState {
 		public static var SUBSEQUENT : int = 0;
 		public static var FIRST : int = 1;
-		public static var HOLD : int = 2;
-		public static var HOLD_MIX : int = 3;
+		public static var HOLD_SUBSEQUENT : int = 2;
+		public static var HOLD_FIRST : int = 3;
+		public static var HOLD_MIX : int = 4;
 		public static var SETUP : int = 1;
 		public static var CURRENT : int = 2;
 
@@ -281,7 +282,11 @@ package spine.animation {
 						timelineBlend = MixBlend.setup;
 						alpha = alphaMix;
 						break;
-					case HOLD:
+					case HOLD_SUBSEQUENT:
+						timelineBlend = blend;
+						alpha = alphaHold;
+						break;
+					case HOLD_FIRST:
 						timelineBlend = MixBlend.setup;
 						alpha = alphaHold;
 						break;
@@ -664,8 +669,13 @@ package spine.animation {
 			var i : int = 0;
 			if (to != null && to.holdPrevious) {
 				for (i = 0; i < timelinesCount; i++) {
+					if (!propertyIDs[timelines[i].getPropertyId().toString()]) {
+						timelineMode[i] = HOLD_FIRST;
+					} else {
+						timelineMode[i] = HOLD_SUBSEQUENT;
+					}
 					propertyIDs[timelines[i].getPropertyId().toString()] = true;
-					timelineMode[i] = HOLD;
+
 				}
 				return;
 			}
@@ -692,7 +702,7 @@ package spine.animation {
 						}
 						break;
 					}
-					timelineMode[i] = AnimationState.HOLD;
+					timelineMode[i] = AnimationState.HOLD_FIRST;
 				}
 			}
 		}
