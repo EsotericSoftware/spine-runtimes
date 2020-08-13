@@ -33,8 +33,9 @@
 
 #define SUBSEQUENT 0
 #define FIRST 1
-#define HOLD 2
-#define HOLD_MIX 3
+#define HOLD_SUBSEQUENT 2
+#define HOLD_FIRST 3
+#define HOLD_MIX 4
 
 #define SETUP 1
 #define CURRENT 2
@@ -501,7 +502,11 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 					timelineBlend = SP_MIX_BLEND_SETUP;
 					alpha = alphaMix;
 					break;
-				case HOLD:
+			    case HOLD_SUBSEQUENT:
+			        timelineBlend = blend;
+			        alpha = alphaHold;
+			        break;
+				case HOLD_FIRST:
 					timelineBlend = SP_MIX_BLEND_SETUP;
 					alpha = alphaHold;
 					break;
@@ -1024,8 +1029,7 @@ void _spTrackEntry_computeHold(spTrackEntry* entry, spAnimationState* state) {
 	if (to != 0 && to->holdPrevious) {
 		for (i = 0; i < timelinesCount; i++) {
 			int id = spTimeline_getPropertyId(timelines[i]);
-			_spAnimationState_addPropertyID(state, id);
-			timelineMode[i] = HOLD;
+			timelineMode[i] = _spAnimationState_addPropertyID(state, id) ? HOLD_FIRST : HOLD_SUBSEQUENT;
 		}
 		return;
 	}
@@ -1051,7 +1055,7 @@ void _spTrackEntry_computeHold(spTrackEntry* entry, spAnimationState* state) {
 				}
 				break;
 			}
-			timelineMode[i] = HOLD;
+			timelineMode[i] = HOLD_FIRST;
 		}
 	}
 }

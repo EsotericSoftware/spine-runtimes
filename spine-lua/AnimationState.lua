@@ -52,8 +52,9 @@ end
 local EMPTY_ANIMATION = Animation.new("<empty>", {}, 0)
 local SUBSEQUENT = 0
 local FIRST = 1
-local HOLD = 2
-local HOLD_MIX = 3
+local HOLD_SUBSEQUENT = 2
+local HOLD_FIRST = 3
+local HOLD_MIX = 4
 
 local SETUP = 1
 local CURRENT = 2
@@ -466,7 +467,10 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 			elseif timelineMode[i] == FIRST then
 				timelineBlend = MixBlend.setup
 				alpha = alphaMix
-			elseif timelineMode[i] == HOLD then
+			elseif timelineMode[i] == HOLD_SUBSEQUENT then
+				timelineBlend = blend
+				alpha = alphaHold
+			elseif timelineMode[i] == HOLD_FIRST then
 				timelineBlend = MixBlend.setup
 				alpha = alphaHold
 			else
@@ -932,8 +936,10 @@ function AnimationState:computeHold(entry)
 			local id = "" .. timelines[i]:getPropertyId()
 			if propertyIDs[id] == nil then
 				propertyIDs[id] = id
+				timelineMode[i] = HOLD_FIRST
+			else
+				timelineMode[i] = HOLD_SUBSEQUENT
 			end
-			timelineMode[i] = HOLD
 		end
 		return
 	end
@@ -966,7 +972,7 @@ function AnimationState:computeHold(entry)
 					end
 					next = next.mixingTo
 				end
-				if not skip then 	timelineMode[i] = HOLD end
+				if not skip then 	timelineMode[i] = HOLD_FIRST end
 			end
 		end
 		i = i + 1

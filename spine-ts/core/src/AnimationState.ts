@@ -45,13 +45,18 @@ module spine {
 		 *
 		 * Result: Mix from the setup pose to the timeline pose. */
 		static FIRST = 1;
-		/** 1. This is the first timeline to set this property.
-		 * 2. The next track entry to be applied does have a timeline to set this property.
-		 * 3. The next track entry after that one does not have a timeline to set this property.
-		 *
+		/** 1) A previously applied timeline has set this property.<br>
+	 	 * 2) The next track entry to be applied does have a timeline to set this property.<br>
+	 	 * 3) The next track entry after that one does not have a timeline to set this property.<br>
+	 	 * Result: Mix from the current pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading
+	 	 * animations that key the same property. A subsequent timeline will set this property using a mix. */
+		static HOLD_SUBSEQUENT = 2;
+		/** 1) This is the first timeline to set this property.<br>
+		 * 2) The next track entry to be applied does have a timeline to set this property.<br>
+		 * 3) The next track entry after that one does not have a timeline to set this property.<br>
 		 * Result: Mix from the setup pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading animations
 		 * that key the same property. A subsequent timeline will set this property using a mix. */
-		static HOLD = 2;
+		static HOLD_FIRST = 3;
 		/** 1. This is the first timeline to set this property.
 		 * 2. The next track entry to be applied does have a timeline to set this property.
 		 * 3. The next track entry after that one does have a timeline to set this property.
@@ -64,7 +69,7 @@ module spine {
 		 * "dipping" A is not mixed out, however D (the first entry that doesn't set the property) mixing in is used to mix out A
 		 * (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
 		 * place. */
-		static HOLD_MIX = 3;
+		static HOLD_MIX = 4;
 
 		static SETUP = 1;
 		static CURRENT = 2;
@@ -311,7 +316,11 @@ module spine {
 						timelineBlend = MixBlend.setup;
 						alpha = alphaMix;
 						break;
-					case AnimationState.HOLD:
+					case AnimationState.HOLD_SUBSEQUENT:
+						timelineBlend = blend;
+						alpha = alphaHold;
+						break;
+					case AnimationState.HOLD_FIRST:
 						timelineBlend = MixBlend.setup;
 						alpha = alphaHold;
 						break;
@@ -758,8 +767,7 @@ module spine {
 
 			if (to != null && to.holdPrevious) {
 				for (let i = 0; i < timelinesCount; i++) {
-					propertyIDs.add(timelines[i].getPropertyId());
-					timelineMode[i] = AnimationState.HOLD;
+					timelineMode[i] = propertyIDs.add(timelines[i].getPropertyId()) ? AnimationState.HOLD_FIRST : AnimationState.HOLD_SUBSEQUENT;
 				}
 				return;
 			}
@@ -783,7 +791,7 @@ module spine {
 						}
 						break;
 					}
-					timelineMode[i] = AnimationState.HOLD;
+					timelineMode[i] = AnimationState.HOLD_FIRST;
 				}
 			}
 		}
