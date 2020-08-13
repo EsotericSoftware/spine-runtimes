@@ -115,6 +115,8 @@ public:
 
 	Vector<AtlasPage*> &getPages();
 
+    Vector<AtlasRegion*> &getRegions();
+
 private:
 	Vector<AtlasPage *> _pages;
 	Vector<AtlasRegion *> _regions;
@@ -149,8 +151,6 @@ private:
 	static int equals(Str *str, const char *other);
 
 	static int toInt(Str *str);
-
-	static Atlas *abortAtlas(Atlas *atlas);
 };
 }
 
