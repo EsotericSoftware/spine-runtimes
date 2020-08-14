@@ -6,7 +6,7 @@ Shader "Spine/Outline/SkeletonGraphic"
 	{
 		[PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
-		[Toggle(_CANVAS_GROUP_COMPATIBLE)] _CanvasGroupCompatible("CanvasGroup Compatible", Int) = 0
+		[Toggle(_CANVAS_GROUP_COMPATIBLE)] _CanvasGroupCompatible("CanvasGroup Compatible", Int) = 1
 		_Color ("Tint", Color) = (1,1,1,1)
 
 		[HideInInspector][Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp ("Stencil Comparison", Float) = 8
