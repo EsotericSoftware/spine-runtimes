@@ -614,6 +614,8 @@ public class Animation {
 				x = getBezierValue(time, i, VALUE1, curveType - BEZIER);
 				y = getBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
 			}
+			x *= bone.data.scaleX;
+			y *= bone.data.scaleY;
 
 			if (alpha == 1) {
 				if (blend == add) {
