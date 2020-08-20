@@ -267,7 +267,7 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 		a1 = (a1 - os) * RAD_DEG + o1 - parent->arotation;
 		if (a1 > 180) a1 -= 360;
 		else if (a1 < -180) a1 += 360;
-		spBone_updateWorldTransformWith(parent, px, py, parent->rotation + a1 * alpha, sx, parent->ascaleY, 0, 0);
+		spBone_updateWorldTransformWith(parent, px, py, parent->arotation + a1 * alpha, sx, parent->ascaleY, 0, 0);
 		a2 = ((a2 + os) * RAD_DEG - child->ashearX) * s2 + o2 - child->arotation;
 		if (a2 > 180) a2 -= 360;
 		else if (a2 < -180) a2 += 360;
