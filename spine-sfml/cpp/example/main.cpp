@@ -37,7 +37,7 @@ using namespace spine;
 #include <memory>
 
 template<typename T, typename... Args>
-unique_ptr<T> make_unique(Args&&... args) {
+unique_ptr<T> make_unique_test(Args&&... args) {
 	return unique_ptr<T>(new T(forward<Args>(args)...));
 }
 
@@ -95,7 +95,7 @@ void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
 			   const char* jsonName, const char* binaryName, const char* atlasName,
 			   float scale) {
 	SFMLTextureLoader textureLoader;
-	auto atlas = make_unique<Atlas>(atlasName, &textureLoader);
+	auto atlas = make_unique_test<Atlas>(atlasName, &textureLoader);
 
 	auto skeletonData = readSkeletonJsonData(jsonName, atlas.get(), scale);
 	func(skeletonData.get(), atlas.get());

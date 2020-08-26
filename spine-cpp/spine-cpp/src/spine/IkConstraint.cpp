@@ -242,7 +242,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 		a1 = (a1 - os) * MathUtil::Rad_Deg + o1 - parent._arotation;
 		if (a1 > 180) a1 -= 360;
 		else if (a1 < -180) a1 += 360;
-		parent.updateWorldTransform(px, py, parent._rotation + a1 * alpha, sx, parent._ascaleY, 0, 0);
+		parent.updateWorldTransform(px, py, parent._arotation + a1 * alpha, sx, parent._ascaleY, 0, 0);
 		a2 = ((a2 + os) * MathUtil::Rad_Deg - child._ashearX) * s2 + o2 - child._arotation;
 		if (a2 > 180) a2 -= 360;
 		else if (a2 < -180) a2 += 360;
