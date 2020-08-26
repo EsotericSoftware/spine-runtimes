@@ -152,7 +152,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	Json* slots = Json_getItem(root, "slots");
 	Json* ik = Json_getItem(root, "ik");
 	Json* transform = Json_getItem(root, "transform");
-	Json* paths = Json_getItem(root, "paths");
+	Json* path = Json_getItem(root, "path");
 	Json* deformJson = Json_getItem(root, "deform");
 	Json* drawOrderJson = Json_getItem(root, "drawOrder");
 	Json* events = Json_getItem(root, "events");
@@ -165,7 +165,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 		timelinesCount += slotMap->size;
 	timelinesCount += ik ? ik->size : 0;
 	timelinesCount += transform ? transform->size : 0;
-	for (constraintMap = paths ? paths->child : 0; constraintMap; constraintMap = constraintMap->next)
+	for (constraintMap = path ? path->child : 0; constraintMap; constraintMap = constraintMap->next)
 		timelinesCount += constraintMap->size;
 	for (constraintMap = deformJson ? deformJson->child : 0; constraintMap; constraintMap = constraintMap->next)
 		for (slotMap = constraintMap->child; slotMap; slotMap = slotMap->next)
@@ -331,7 +331,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	}
 
 	/** Path constraint timelines. */
-	for(constraintMap = paths ? paths->child : 0; constraintMap; constraintMap = constraintMap->next ) {
+	for(constraintMap = path ? path->child : 0; constraintMap; constraintMap = constraintMap->next ) {
 		int constraintIndex, i;
 		Json* timelineMap;
 
