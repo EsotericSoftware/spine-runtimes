@@ -212,18 +212,12 @@ static void _addAfterPosition (float p, float* temp, int i, float* out, int o) {
 	out[o + 2] = r;
 }
 
-/* Need to pass 0 as an argument, so VC++ doesn't error with C2124 */
-static int _isNan(float value, float zero) {
-	float _nan = (float)0.0 / zero;
-	return 0 == memcmp((void*)&value, (void*)&_nan, sizeof(value));
-}
-
 static void _addCurvePosition (float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2,
 		float* out, int o, int/*bool*/tangents) {
 	float tt, ttt, u, uu, uuu;
 	float ut, ut3, uut3, utt3;
 	float x, y;
-	if (p == 0 || _isNan(p, 0)) {
+	if (p == 0 || ISNAN(p)) {
 		out[o] = x1;
 		out[o + 1] = y1;
 		out[o + 2] = ATAN2(cy1 - y1, cx1 - x1);
