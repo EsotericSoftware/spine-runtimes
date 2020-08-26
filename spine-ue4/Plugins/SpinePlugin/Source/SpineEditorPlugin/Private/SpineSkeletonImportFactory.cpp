@@ -57,7 +57,18 @@ FText USpineSkeletonAssetFactory::GetToolTip () const {
 }
 
 bool USpineSkeletonAssetFactory::FactoryCanImport (const FString& Filename) {
-	return true;
+	if (Filename.Contains(TEXT(".skel"))) return true;
+
+	if (Filename.Contains(TEXT(".json"))) {
+		TArray<uint8> rawData;
+		if (!FFileHelper::LoadFileToArray(rawData, *Filename, 0)) {
+			return false;
+		}
+		if (rawData.Num() == 0) return false;
+		return strcmp((const char*)rawData.GetData(), "skeleton") > 0 && strcmp((const char*)rawData.GetData(), "spine") > 0;
+	}
+	
+	return false;
 }
 
 void LoadAtlas (const FString& Filename, const FString& TargetPath) {
