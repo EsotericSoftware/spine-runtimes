@@ -479,7 +479,7 @@ void Bone::setWorldY(float inValue) {
 }
 
 float Bone::getWorldRotationX() {
-	return MathUtil::atan2(_c, _a) * MathUtil::MathUtil::Rad_Deg;
+	return MathUtil::atan2(_c, _a) * MathUtil::Rad_Deg;
 }
 
 float Bone::getWorldRotationY() {
