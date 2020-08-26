@@ -92,9 +92,17 @@ protected:
 	UPROPERTY()
 	FName skeletonDataFileName;
 
-	spine::SkeletonData* skeletonData;
-	spine::AnimationStateData* animationStateData;
-	spine::Atlas* lastAtlas;
+	// These are created at runtime
+	struct NativeSkeletonData {
+		spine::SkeletonData* skeletonData;
+		spine::AnimationStateData* animationStateData;
+	};
+
+	TMap<spine::Atlas*, NativeSkeletonData> atlasToNativeData;
+
+	void ClearNativeData();
+
+	void SetMixes(spine::AnimationStateData* animationStateData);
 	
 #if WITH_EDITORONLY_DATA
 public:

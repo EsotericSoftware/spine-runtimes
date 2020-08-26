@@ -80,15 +80,17 @@ void USpineSkeletonDataAsset::Serialize (FArchive& Ar) {
 
 #endif
 
+void USpineSkeletonDataAsset::ClearNativeData() {
+	for (auto &pair : atlasToNativeData) {
+		if (pair.Value.skeletonData) delete pair.Value.skeletonData;
+		if (pair.Value.animationStateData) delete pair.Value.animationStateData;
+	}
+	atlasToNativeData.Empty();
+}
+
 void USpineSkeletonDataAsset::BeginDestroy () {
-	if (this->skeletonData) {
-		delete this->skeletonData;
-		this->skeletonData = nullptr;
-	}
-	if (this->animationStateData) {
-		delete this->animationStateData;
-		this->animationStateData = nullptr;
-	}
+	ClearNativeData();
+
 	Super::BeginDestroy();
 }
 
@@ -128,10 +130,7 @@ void USpineSkeletonDataAsset::SetRawData(TArray<uint8> &Data) {
 	this->rawData.Empty();
 	this->rawData.Append(Data);
 
-	if (skeletonData) {
-		delete skeletonData;
-		skeletonData = nullptr;
-	}
+	ClearNativeData();
 
 	LoadInfo();
 }
@@ -273,15 +272,18 @@ void USpineSkeletonDataAsset::LoadInfo() {
 }
 
 SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas) {
-	if (!skeletonData || lastAtlas != Atlas) {
-		if (skeletonData) {
-			delete skeletonData;
-			skeletonData = nullptr;
-		}		
+	SkeletonData* skeletonData = nullptr;
+	AnimationStateData* animationStateData = nullptr;
+	if (atlasToNativeData.Contains(Atlas)) {
+		skeletonData = atlasToNativeData[Atlas].skeletonData;
+		animationStateData = atlasToNativeData[Atlas].animationStateData;
+	}
+
+	if (!skeletonData) {		
 		int dataLen = rawData.Num();
 		if (skeletonDataFileName.GetPlainNameString().Contains(TEXT(".json"))) {
 			SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(Atlas);
-			if (checkJson((const char*)rawData.GetData())) this->skeletonData = json->readSkeletonData((const char*)rawData.GetData());
+			if (checkJson((const char*)rawData.GetData())) skeletonData = json->readSkeletonData((const char*)rawData.GetData());
 			if (!skeletonData) {
 #if WITH_EDITORONLY_DATA
 				FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure the version of your exported data matches your runtime version.\n\n") + skeletonDataFileName.GetPlainNameString() + FString("\n\n") + UTF8_TO_TCHAR(json->getError().buffer())));
@@ -291,7 +293,7 @@ SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas) {
 			delete json;
 		} else {
 			SkeletonBinary* binary = new (__FILE__, __LINE__) SkeletonBinary(Atlas);
-			if (checkBinary((const char*)rawData.GetData(), (int)rawData.Num())) this->skeletonData = binary->readSkeletonData((const unsigned char*)rawData.GetData(), (int)rawData.Num());
+			if (checkBinary((const char*)rawData.GetData(), (int)rawData.Num())) skeletonData = binary->readSkeletonData((const unsigned char*)rawData.GetData(), (int)rawData.Num());
 			if (!skeletonData) {
 #if WITH_EDITORONLY_DATA
 				FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure the version of your exported data matches your runtime version.\n\n") + skeletonDataFileName.GetPlainNameString() + FString("\n\n") + UTF8_TO_TCHAR(binary->getError().buffer())));
@@ -300,21 +302,18 @@ SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas) {
 			}
 			delete binary;
 		}
-		if (animationStateData) {
-			delete animationStateData;
-			animationStateData = nullptr;
-			GetAnimationStateData(Atlas);
+
+		if (skeletonData) {
+			animationStateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
+			SetMixes(animationStateData);
+			atlasToNativeData.Add(Atlas, { skeletonData, animationStateData });
 		}
-		lastAtlas = Atlas;
 	}
-	return this->skeletonData;
+
+	return skeletonData;
 }
 
-AnimationStateData* USpineSkeletonDataAsset::GetAnimationStateData(Atlas* atlas) {
-	if (!animationStateData) {
-		SkeletonData* data = GetSkeletonData(atlas);
-		animationStateData = new (__FILE__, __LINE__) AnimationStateData(data);
-	}
+void USpineSkeletonDataAsset::SetMixes(AnimationStateData* animationStateData) {
 	for (auto& data : MixData) {
 		if (!data.From.IsEmpty() && !data.To.IsEmpty()) {
 			const char* fromChar = TCHAR_TO_UTF8(*data.From);
@@ -323,7 +322,10 @@ AnimationStateData* USpineSkeletonDataAsset::GetAnimationStateData(Atlas* atlas)
 		}
 	}
 	animationStateData->setDefaultMix(DefaultMix);
-	return this->animationStateData;
+}
+
+AnimationStateData* USpineSkeletonDataAsset::GetAnimationStateData(Atlas* atlas) {
+	return atlasToNativeData.Contains(atlas) ? atlasToNativeData[atlas].animationStateData : nullptr;
 }
 
 void USpineSkeletonDataAsset::SetMix(const FString& from, const FString& to, float mix) {
@@ -332,8 +334,8 @@ void USpineSkeletonDataAsset::SetMix(const FString& from, const FString& to, flo
 	data.To = to;
 	data.Mix = mix;	
 	this->MixData.Add(data);
-	if (lastAtlas) {
-		GetAnimationStateData(lastAtlas);
+	for (auto &pair : atlasToNativeData) {
+		SetMixes(pair.Value.animationStateData);
 	}
 }
 
