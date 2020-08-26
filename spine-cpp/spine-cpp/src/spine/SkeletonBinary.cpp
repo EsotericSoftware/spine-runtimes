@@ -380,7 +380,7 @@ char *SkeletonBinary::readString(DataInput *input) {
 
 char* SkeletonBinary::readStringRef(DataInput* input, SkeletonData* skeletonData) {
 	int index = readVarint(input, true);
-	return index == 0 ? nullptr : skeletonData->_strings[index - 1];
+	return index == 0 ? NULL : skeletonData->_strings[index - 1];
 }
 
 float SkeletonBinary::readFloat(DataInput *input) {

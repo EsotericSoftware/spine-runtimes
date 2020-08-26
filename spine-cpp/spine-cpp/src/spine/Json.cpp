@@ -120,7 +120,7 @@ Json::Json(const char *value) :
 }
 
 Json::~Json() {
-    spine::Json* curr = nullptr;
+    spine::Json* curr = NULL;
     spine::Json* next = _child;
     do {
         curr = next;
