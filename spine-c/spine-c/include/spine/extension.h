@@ -110,6 +110,7 @@
 #define SQRT(A) sqrtf(A)
 #define ACOS(A) acosf(A)
 #define POW(A,B) pow(A, B)
+#define ISNAN(A) (int)isnan(A)
 #else
 #define FMOD(A,B) (float)fmod(A, B)
 #define ATAN2(A,B) (float)atan2(A, B)
@@ -118,6 +119,7 @@
 #define SQRT(A) (float)sqrt(A)
 #define ACOS(A) (float)acos(A)
 #define POW(A,B) (float)pow(A, B)
+#define ISNAN(A) (int)isnan(A)
 #endif
 
 #define SIN_DEG(A) SIN((A) * DEG_RAD)
