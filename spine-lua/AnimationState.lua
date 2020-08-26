@@ -520,8 +520,8 @@ function AnimationState:applyAttachmentTimeline(timeline, skeleton, time, blend,
 			frameIndex = zlen(frames) - 1;
 		else
 			frameIndex = Animation.binarySearch(frames, time, 1) - 1;
-			self:setAttachment(skeleton, slot, timeline.attachmentNames[frameIndex], attachments)
 		end
+		self:setAttachment(skeleton, slot, timeline.attachmentNames[frameIndex], attachments)
 	end
 
 	-- If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
