@@ -1032,9 +1032,12 @@ namespace Spine {
 				if (loop) {
 					float duration = animationEnd - animationStart;
 					if (duration == 0) return animationStart;
-					return (trackTime % duration) + animationStart;
+					if (trackTime < 0)
+						return ((trackTime % duration) + duration) + animationStart;
+					else
+						return (trackTime % duration) + animationStart;
 				}
-				return Math.Min(trackTime + animationStart, animationEnd);
+				return Math.Max(Math.Min(trackTime + animationStart, animationEnd), animationStart);
 			}
 		}
 
