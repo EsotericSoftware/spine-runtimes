@@ -77,6 +77,12 @@ namespace Spine.Unity {
 		#endif
 		#endregion
 
+		#region Callback Delegates
+		/// <summary>OnMeshAndMaterialsUpdated is called at the end of LateUpdate after the Mesh and
+		/// all materials have been updated.</summary>
+		public event SkeletonRenderer.SkeletonRendererDelegate OnMeshAndMaterialsUpdated;
+		#endregion
+
 		#region Runtime Instantiation
 		/// <summary>Adds a SkeletonRenderSeparator and child SkeletonPartsRenderer GameObjects to a given SkeletonRenderer.</summary>
 		/// <returns>The to skeleton renderer.</returns>
@@ -246,6 +252,9 @@ namespace Spine.Unity {
 					}
 				}
 			}
+
+			if (OnMeshAndMaterialsUpdated != null)
+				OnMeshAndMaterialsUpdated(this.skeletonRenderer);
 
 			// Clear extra renderers if they exist.
 			for (; rendererIndex < rendererCount; rendererIndex++) {

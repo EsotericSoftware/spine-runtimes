@@ -60,6 +60,14 @@ namespace Spine.Unity {
 		}
 		#endregion
 
+		#region Callback Delegates
+		public delegate void SkeletonPartsRendererDelegate (SkeletonPartsRenderer skeletonPartsRenderer);
+
+		/// <summary>OnMeshAndMaterialsUpdated is called at the end of LateUpdate after the Mesh and
+		/// all materials have been updated.</summary>
+		public event SkeletonPartsRendererDelegate OnMeshAndMaterialsUpdated;
+		#endregion
+
 		MeshRendererBuffers buffers;
 		SkeletonRendererInstruction currentInstructions = new SkeletonRendererInstruction();
 
@@ -121,6 +129,9 @@ namespace Spine.Unity {
 
 			meshFilter.sharedMesh = mesh;
 			smartMesh.instructionUsed.Set(currentInstructions);
+
+			if (OnMeshAndMaterialsUpdated != null)
+				OnMeshAndMaterialsUpdated(this);
 		}
 
 		public void SetPropertyBlock (MaterialPropertyBlock block) {

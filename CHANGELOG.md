@@ -237,6 +237,7 @@
   * Added support for double-sided lighting at all `SkeletonLit` shaders (including URP and LWRP packages).
   * Added frustum culling update mode parameters `Update When Invisible` (Inspector parameter) and `UpdateMode` (available via code) to all Skeleton components. This provides a simple way to disable certain updates when the `Renderer` is no longer visible (outside all cameras, culled in frustum culling). The new `UpdateMode` property allows disabling updates at a finer granularity level than disabling the whole component. Available modes are: `Nothing`, `OnlyAnimationStatus`, `EverythingExceptMesh` and `FullUpdate`.
   * Added a new `Spine/Outline/OutlineOnly-ZWrite` shader to provide correct outline-only rendering. Note: the shader requires two render passes and is therefore not compatible with URP. The `Spine Examples/Other Examples/Outline Shaders` example scene has been updated to demonstrate the new shader.
+  * Added `OnMeshAndMaterialsUpdated` callback event to `SkeletonRenderSeparator` and `SkeletonPartsRenderer`. It is issued at the end of `LateUpdate`, before rendering.
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.MixNext` instead of `MixMode.MixAlways`.
