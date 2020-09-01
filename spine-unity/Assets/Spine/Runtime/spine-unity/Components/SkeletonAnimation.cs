@@ -41,6 +41,7 @@ namespace Spine.Unity {
 	[ExecuteInEditMode]
 	#endif
 	[AddComponentMenu("Spine/SkeletonAnimation")]
+	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonAnimation-Component")]
 	public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation, IAnimationStateComponent {
 
 		#region IAnimationStateComponent

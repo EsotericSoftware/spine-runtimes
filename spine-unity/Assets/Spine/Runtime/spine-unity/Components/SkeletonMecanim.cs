@@ -32,6 +32,7 @@ using System.Collections.Generic;
 
 namespace Spine.Unity {
 	[RequireComponent(typeof(Animator))]
+	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonMecanim-Component")]
 	public class SkeletonMecanim : SkeletonRenderer, ISkeletonAnimation {
 
 		[SerializeField] protected MecanimTranslator translator;

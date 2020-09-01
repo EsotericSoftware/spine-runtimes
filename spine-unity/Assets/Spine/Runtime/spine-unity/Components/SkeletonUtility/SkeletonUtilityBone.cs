@@ -41,6 +41,7 @@ namespace Spine.Unity {
 	[ExecuteInEditMode]
 	#endif
 	[AddComponentMenu("Spine/SkeletonUtilityBone")]
+	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonUtilityBone")]
 	public class SkeletonUtilityBone : MonoBehaviour {
 		public enum Mode {
 			Follow,

@@ -42,7 +42,7 @@ namespace Spine.Unity {
 	#else
 	[ExecuteInEditMode]
 	#endif
-	[HelpURL("http://esotericsoftware.com/spine-unity-skeletonrenderseparator")]
+	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonRenderSeparator")]
 	public class SkeletonRenderSeparator : MonoBehaviour {
 		public const int DefaultSortingOrderIncrement = 5;
 

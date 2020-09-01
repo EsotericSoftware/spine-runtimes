@@ -46,6 +46,7 @@ namespace Spine.Unity {
 	/// For <c>SkeletonMecanim</c> please use
 	/// <see cref="SkeletonMecanimRootMotion">SkeletonMecanimRootMotion</see> instead.
 	/// </remarks>
+	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonRootMotion")]
 	public class SkeletonRootMotion : SkeletonRootMotionBase {
 		#region Inspector
 		const int DefaultAnimationTrackFlags = -1;

@@ -45,6 +45,7 @@ namespace Spine.Unity {
 	/// For <c>SkeletonAnimation</c> or <c>SkeletonGraphic</c> please use
 	/// <see cref="SkeletonRootMotion">SkeletonRootMotion</see> instead.
 	/// </remarks>
+	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonMecanimRootMotion")]
 	public class SkeletonMecanimRootMotion : SkeletonRootMotionBase {
 		#region Inspector
 		const int DefaultMecanimLayerFlags = -1;
