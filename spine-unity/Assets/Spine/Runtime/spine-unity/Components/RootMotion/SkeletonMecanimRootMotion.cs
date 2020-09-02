@@ -61,6 +61,18 @@ namespace Spine.Unity {
 			}
 		}
 
+		public override Vector2 GetRemainingRootMotion (int layerIndex) {
+			var pair = skeletonMecanim.Translator.GetActiveAnimationAndTime(layerIndex);
+			var animation = pair.Key;
+			var time = pair.Value;
+			if (animation == null)
+				return Vector2.zero;
+
+			float start = time;
+			float end = animation.duration;
+			return GetAnimationRootMotion(start, end, animation);
+		}
+
 		protected override void Reset () {
 			base.Reset();
 			mecanimLayerFlags = DefaultMecanimLayerFlags;
@@ -75,18 +87,17 @@ namespace Spine.Unity {
 			}
 		}
 
-		void OnClipApplied(Spine.Animation clip, int layerIndex, float weight,
+		void OnClipApplied(Spine.Animation animation, int layerIndex, float weight,
 				float time, float lastTime, bool playsBackward) {
 
 			if (((mecanimLayerFlags & 1<<layerIndex) == 0) || weight == 0)
 				return;
 
-			var timeline = clip.FindTranslateTimelineForBone(rootMotionBoneIndex);
-			if (timeline != null) {
-				if (!playsBackward)
-					movementDelta += weight * GetTimelineMovementDelta(lastTime, time, timeline, clip);
-				else
-					movementDelta -= weight * GetTimelineMovementDelta(time, lastTime, timeline, clip);
+			if (!playsBackward) {
+				movementDelta += weight * GetAnimationRootMotion(lastTime, time, animation);
+			}
+			else {
+				movementDelta -= weight * GetAnimationRootMotion(time, lastTime, animation);
 			}
 		}
 

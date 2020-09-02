@@ -123,7 +123,6 @@ namespace Spine.Unity.Editor {
 						EditorGUI.indentLevel = 0;
 
 						var mixMode = layerMixModes.GetArrayElementAtIndex(i);
-						var blendMode = layerBlendModes.GetArrayElementAtIndex(i);
 						rect.position += new Vector2(rect.width, 0);
 						rect.width = widthMixColumn;
 						EditorGUI.PropertyField(rect, mixMode, GUIContent.none);

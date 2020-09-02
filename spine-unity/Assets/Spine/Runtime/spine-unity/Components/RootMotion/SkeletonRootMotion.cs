@@ -56,6 +56,17 @@ namespace Spine.Unity {
 		AnimationState animationState;
 		Canvas canvas;
 
+		public override Vector2 GetRemainingRootMotion (int trackIndex) {
+			TrackEntry track = animationState.GetCurrent(trackIndex);
+			if (track == null)
+				return Vector2.zero;
+
+			var animation = track.Animation;
+			float start = track.AnimationTime;
+			float end = animation.duration;
+			return GetAnimationRootMotion(start, end, animation);
+		}
+
 		protected override float AdditionalScale {
 			get {
 				return canvas ? canvas.referencePixelsPerUnit: 1.0f;
@@ -91,28 +102,20 @@ namespace Spine.Unity {
 				TrackEntry next = null;
 				while (track != null) {
 					var animation = track.Animation;
-					var timeline = animation.FindTranslateTimelineForBone(rootMotionBoneIndex);
-					if (timeline != null) {
-						var currentDelta = GetTrackMovementDelta(track, timeline, animation, next);
+					float start = track.animationLast;
+					float end = track.AnimationTime;
+					var currentDelta = GetAnimationRootMotion(start, end, animation);
+					if (currentDelta != Vector2.zero) {
+						ApplyMixAlphaToDelta(ref currentDelta, next, track);
 						localDelta += currentDelta;
 					}
+
 					// Traverse mixingFrom chain.
 					next = track;
 					track = track.mixingFrom;
 				}
 			}
 			return localDelta;
-		}
-
-		Vector2 GetTrackMovementDelta (TrackEntry track, TranslateTimeline timeline,
-			Animation animation, TrackEntry next) {
-
-			float start = track.animationLast;
-			float end = track.AnimationTime;
-			Vector2 currentDelta = GetTimelineMovementDelta(start, end, timeline, animation);
-
-			ApplyMixAlphaToDelta(ref currentDelta, next, track);
-			return currentDelta;
 		}
 
 		void ApplyMixAlphaToDelta (ref Vector2 currentDelta, TrackEntry next, TrackEntry track) {
