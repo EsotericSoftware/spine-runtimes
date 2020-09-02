@@ -278,7 +278,7 @@ namespace Spine.Unity {
 						bool isAdditiveLayer = false;
 						if (layer < layerBlendModes.Length)
 							isAdditiveLayer = layerBlendModes[layer] == MixBlend.Add;
-						layerMixModes[layer] = isAdditiveLayer ? MixMode.MixNext : MixMode.AlwaysMix;
+						layerMixModes[layer] = isAdditiveLayer ? MixMode.AlwaysMix : MixMode.MixNext;
 					}
 				}
 
