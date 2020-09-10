@@ -44,7 +44,7 @@ namespace Spine.Unity {
 	[HelpURL("http://esotericsoftware.com/spine-unity#PointFollower")]
 	public class PointFollower : MonoBehaviour, IHasSkeletonRenderer, IHasSkeletonComponent {
 
-		[SerializeField] public SkeletonRenderer skeletonRenderer;
+		public SkeletonRenderer skeletonRenderer;
 		public SkeletonRenderer SkeletonRenderer { get { return this.skeletonRenderer; } }
 		public ISkeletonComponent SkeletonComponent { get { return skeletonRenderer as ISkeletonComponent; } }
 
