@@ -239,6 +239,7 @@
   * Added a new `Spine/Outline/OutlineOnly-ZWrite` shader to provide correct outline-only rendering. Note: the shader requires two render passes and is therefore not compatible with URP. The `Spine Examples/Other Examples/Outline Shaders` example scene has been updated to demonstrate the new shader.
   * Added `OnMeshAndMaterialsUpdated` callback event to `SkeletonRenderSeparator` and `SkeletonPartsRenderer`. It is issued at the end of `LateUpdate`, before rendering.
   * Added `Root Motion Scale X/Y` parameters to `SkeletonRootMotionBase` subclasses (`SkeletonRootMotion` and `SkeletonMecanimRootMotion`). Also providing `AdjustRootMotionToDistance()` and other methods to allow for easy delta compensation. Delta compensation can be used to e.g. stretch a jump to a given distance. Root motion can be adjusted at the start of an animation or every frame via `skeletonRootMotion.AdjustRootMotionToDistance(targetPosition - transform.position, trackIndex);`.
+  * Now providing a `Canvas Group Tint Black` parameter a `SkeletonGraphic` Inspector in the `Advanced` section. Enable when using Additive blend mode at SkeletonGraphic under a CanvasGroup. Be sure to also have the parameter `CanvasGroup Compatible` enabled at the shader.
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.MixNext` instead of `MixMode.MixAlways`.

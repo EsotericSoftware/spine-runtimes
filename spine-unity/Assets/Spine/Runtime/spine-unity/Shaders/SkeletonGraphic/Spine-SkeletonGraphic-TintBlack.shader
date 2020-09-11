@@ -89,7 +89,7 @@ Shader "Spine/SkeletonGraphic Tint Black"
 				float4 vertex   : SV_POSITION;
 				fixed4 color    : COLOR;
 				half2 texcoord  : TEXCOORD0;
-				float3 darkColor : TEXCOORD1;
+				float4 darkColor : TEXCOORD1;
 				float4 worldPosition : TEXCOORD2;
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
@@ -110,7 +110,7 @@ Shader "Spine/SkeletonGraphic Tint Black"
 				OUT.texcoord = IN.texcoord;
 
 				OUT.color = IN.color * _Color;
-				OUT.darkColor = float3(IN.uv1.r, IN.uv1.g, IN.uv2.r);
+				OUT.darkColor = float4(IN.uv1.r, IN.uv1.g, IN.uv2.r, IN.uv2.g);
 				return OUT;
 			}
 
@@ -125,10 +125,17 @@ Shader "Spine/SkeletonGraphic Tint Black"
 				clip(texColor.a - 0.001);
 				#endif
 
-				float4 fragColor = fragTintedColor(texColor, _Black.rgb + IN.darkColor, IN.color, _Black.a);
+				float4 vertexColor = IN.color;
 			#ifdef _CANVAS_GROUP_COMPATIBLE
-				// CanvasGroup alpha sets vertex color alpha, but does not premultiply it to rgb components.
-				fragColor.rgb *= IN.color.a;
+				// CanvasGroup alpha multiplies existing vertex color alpha, but
+				// does not premultiply it to rgb components. This causes problems
+				// with additive blending (alpha = 0), which is why we store the
+				// alpha value in uv2.g (darkColor.a).
+				vertexColor.a = IN.darkColor.a;
+			#endif
+				float4 fragColor = fragTintedColor(texColor, _Black.rgb + IN.darkColor, vertexColor, _Black.a);
+			#ifdef _CANVAS_GROUP_COMPATIBLE
+				fragColor.rgba *= IN.color.a;
 			#endif
 				return fragColor;
 			}
