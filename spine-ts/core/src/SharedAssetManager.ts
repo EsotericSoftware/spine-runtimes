@@ -32,7 +32,7 @@ module spine {
 		clientId: string;
 		toLoad = new Array<string>();
 		assets: Map<any> = {};
-		textureLoader: (image: HTMLImageElement) => any;
+		textureLoader: (image: HTMLImageElement | ImageBitmap) => any;
 
 		constructor(clientId: string) {
 			this.clientId = clientId;
@@ -56,7 +56,7 @@ module spine {
 			this.pathPrefix = pathPrefix;
 		}
 
-		private queueAsset(clientId: string, textureLoader: (image: HTMLImageElement) => any, path: string): boolean {
+		private queueAsset(clientId: string, textureLoader: (image: HTMLImageElement | ImageBitmap) => any, path: string): boolean {
 			let clientAssets = this.clientAssets[clientId];
 			if (clientAssets === null || clientAssets === undefined) {
 				clientAssets = new Assets(clientId);
@@ -109,18 +109,39 @@ module spine {
 			request.send();
 		}
 
-		loadTexture (clientId: string, textureLoader: (image: HTMLImageElement) => any, path: string) {
+		loadTexture (clientId: string, textureLoader: (image: HTMLImageElement | ImageBitmap) => any, path: string) {
 			path = this.pathPrefix + path;
 			if (!this.queueAsset(clientId, textureLoader, path)) return;
 
-			let img = new Image();
-			img.src = path;
-			img.crossOrigin = "anonymous";
-			img.onload = (ev) => {
-				this.rawAssets[path] = img;
-			}
-			img.onerror = (ev) => {
-				this.errors[path] = `Couldn't load image ${path}`;
+			let isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
+			let isWebWorker = !isBrowser && typeof importScripts !== 'undefined';
+
+			if (isWebWorker) {
+				// For webworker use fetch instead of Image()
+				const options = {mode: <RequestMode>"cors"};
+				fetch(path, options).then( (response) => {
+						if (!response.ok) {
+							this.errors[path] = "Couldn't load image " + path;
+						}
+						return response.blob();
+					}).then( (blob) => {
+						return createImageBitmap(blob, {
+						premultiplyAlpha: 'none',
+						colorSpaceConversion: 'none',
+						});
+					}).then( (bitmap) => {
+						this.rawAssets[path] = bitmap;
+					});
+			} else {
+				let img = new Image();
+				img.src = path;
+				img.crossOrigin = "anonymous";
+				img.onload = (ev) => {
+					this.rawAssets[path] = img;
+				}
+				img.onerror = (ev) => {
+					this.errors[path] = `Couldn't load image ${path}`;
+				}
 			}
 		}
 
@@ -132,16 +153,29 @@ module spine {
 		}
 
 		private updateClientAssets(clientAssets: Assets): void {
+			let isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
+			let isWebWorker = !isBrowser && typeof importScripts !== 'undefined';
+
 			for (let i = 0; i < clientAssets.toLoad.length; i++) {
 				let path = clientAssets.toLoad[i];
 				let asset = clientAssets.assets[path];
 				if (asset === null || asset === undefined) {
 					let rawAsset = this.rawAssets[path];
 					if (rawAsset === null || rawAsset === undefined) continue;
-					if (rawAsset instanceof HTMLImageElement) {
-						clientAssets.assets[path] = clientAssets.textureLoader(<HTMLImageElement>rawAsset);
+
+					if (isWebWorker)
+					{
+						if (rawAsset instanceof ImageBitmap) {
+							clientAssets.assets[path] = clientAssets.textureLoader(<ImageBitmap>rawAsset);
+						} else {
+							clientAssets.assets[path] = rawAsset;
+						}
 					} else {
-						clientAssets.assets[path] = rawAsset;
+						if (rawAsset instanceof HTMLImageElement) {
+							clientAssets.assets[path] = clientAssets.textureLoader(<HTMLImageElement>rawAsset);
+						} else {
+							clientAssets.assets[path] = rawAsset;
+						}						
 					}
 				}
 			}

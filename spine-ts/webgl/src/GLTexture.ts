@@ -34,7 +34,7 @@ module spine.webgl {
 		private boundUnit = 0;
 		private useMipMaps = false;
 
-		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement, useMipMaps: boolean = false) {
+		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap, useMipMaps: boolean = false) {
 			super(image);
 			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
 			this.useMipMaps = useMipMaps;
