@@ -3,9 +3,9 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 cd $SCRIPT_DIR
 
-SPINE_EXE="C:/Program Files (x86)/Spine/Spine.com"
+SPINE_EXE="C:/Program Files/Spine/Spine.com"
 if [ ! -f "$SPINE_EXE" ]; then
-   SPINE_EXE="/mnt/c/Program Files (x86)/Spine/Spine.com"
+   SPINE_EXE="/mnt/c/Program Files/Spine/Spine.com"
 fi
 if [ ! -f "$SPINE_EXE" ]; then
 	SPINE_EXE="/Applications/Spine/Spine.app/Contents/MacOS/Spine"
@@ -13,13 +13,13 @@ fi
 echo "Spine exe: $SPINE_EXE"
 
 if [ "$#" -eq 1 ]; then
-    version=${1%/}
+	version=${1%/}
 else
-    echo "Please enter the Spine editor version to use to clean the examples (e.g. 3.7.58-beta)"
-    read version
+	echo "Enter the Spine editor version to use for the export (eg 3.8.99):"
+	read version
 fi
 
-echo "Cleaning export directories ..."
+echo "Cleaning export directories..."
 rm -rf ../alien/export/*
 rm -rf ../coin/export/*
 rm -rf ../dragon/export/*
@@ -37,7 +37,7 @@ rm -rf ../owl/export/*
 rm -rf ../mix-and-match/export/*
 
 echo ""
-echo "Exporting..."
+echo "Exporting assets..."
 "$SPINE_EXE" \
 -u $version -f \
 -i ../alien/alien-ess.spine -o ../alien/export -e json.json \
@@ -131,61 +131,63 @@ echo "Exporting..."
 # Export Unity Assets
 UNITY_BASE_DIR=../spine-unity
 if [ -d "$UNITY_BASE_DIR" ]; then
-    echo "Cleaning Unity export directories ..."
-    rm -rf $UNITY_BASE_DIR/eyes/export/*
-    rm -rf $UNITY_BASE_DIR/footsoldier/export/*
-    rm -rf $UNITY_BASE_DIR/gauge/export/*
-    rm -rf $UNITY_BASE_DIR/raggedyspineboy/export/*
-    rm -rf $UNITY_BASE_DIR/spineboy-unity/export/*
-    rm -rf $UNITY_BASE_DIR/spineunitygirl/export/*
-    rm -rf $UNITY_BASE_DIR/whirlyblendmodes/export/*
+	echo "Cleaning Unity export directories..."
+	rm -rf $UNITY_BASE_DIR/eyes/export/*
+	rm -rf $UNITY_BASE_DIR/footsoldier/export/*
+	rm -rf $UNITY_BASE_DIR/gauge/export/*
+	rm -rf $UNITY_BASE_DIR/raggedyspineboy/export/*
+	rm -rf $UNITY_BASE_DIR/raptor/export/*
+	rm -rf $UNITY_BASE_DIR/spineboy-pro/export/*
+	rm -rf $UNITY_BASE_DIR/spineboy-unity/export/*
+	rm -rf $UNITY_BASE_DIR/spineunitygirl/export/*
+	rm -rf $UNITY_BASE_DIR/whirlyblendmodes/export/*
 
-    echo ""
-    echo "Exporting Unity Assets..."
-    "$SPINE_EXE" \
-    -u $version -f \
-    -i $UNITY_BASE_DIR/eyes/eyes.spine -o $UNITY_BASE_DIR/eyes/export -e json.json \
-    -i $UNITY_BASE_DIR/eyes/eyes.spine -o $UNITY_BASE_DIR/eyes/export -e binary.json \
-    -i $UNITY_BASE_DIR/eyes/images -o $UNITY_BASE_DIR/eyes/export -n eyes -p atlas-1.0.json \
-    -i $UNITY_BASE_DIR/eyes/images -o $UNITY_BASE_DIR/eyes/export -n eyes-pma -p atlas-1.0-pma.json \
-    \
-    -i $UNITY_BASE_DIR/footsoldier/footsoldier.spine -o $UNITY_BASE_DIR/footsoldier/export -e json.json \
-    -i $UNITY_BASE_DIR/footsoldier/footsoldier.spine -o $UNITY_BASE_DIR/footsoldier/export -e binary.json \
-    -i $UNITY_BASE_DIR/footsoldier/images -o $UNITY_BASE_DIR/footsoldier/export -n footsoldier -p atlas-1.0.json \
-    -i $UNITY_BASE_DIR/footsoldier/images -o $UNITY_BASE_DIR/footsoldier/export -n footsoldier-pma -p atlas-1.0-pma.json \
-    \
-    -i $UNITY_BASE_DIR/gauge/gauge.spine -o $UNITY_BASE_DIR/gauge/export -e json.json \
-    -i $UNITY_BASE_DIR/gauge/gauge.spine -o $UNITY_BASE_DIR/gauge/export -e binary.json \
-    -i $UNITY_BASE_DIR/gauge/images -o $UNITY_BASE_DIR/gauge/export -n gauge -p atlas-1.0.json \
-    -i $UNITY_BASE_DIR/gauge/images -o $UNITY_BASE_DIR/gauge/export -n gauge-pma -p atlas-1.0-pma.json \
-    \
-    -i $UNITY_BASE_DIR/raggedyspineboy/raggedyspineboy.spine -o $UNITY_BASE_DIR/raggedyspineboy/export -e json.json \
-    -i $UNITY_BASE_DIR/raggedyspineboy/raggedyspineboy.spine -o $UNITY_BASE_DIR/raggedyspineboy/export -e binary.json \
-    -i $UNITY_BASE_DIR/raggedyspineboy/images -o $UNITY_BASE_DIR/raggedyspineboy/export -n raggedyspineboy -p atlas-1.0.json \
-    -i $UNITY_BASE_DIR/raggedyspineboy/images -o $UNITY_BASE_DIR/raggedyspineboy/export -n raggedyspineboy-pma -p atlas-1.0-pma.json \
-    \
-    -i $UNITY_BASE_DIR/raptor/raptor.spine -o $UNITY_BASE_DIR/raptor/export -e json.json \
-    -i $UNITY_BASE_DIR/raptor/raptor.spine -o $UNITY_BASE_DIR/raptor/export -e binary.json \
-    -i $UNITY_BASE_DIR/raptor/images -o $UNITY_BASE_DIR/raptor/export -n raptor -p atlas-1.0-square.json \
-    -i $UNITY_BASE_DIR/raptor/images -o $UNITY_BASE_DIR/raptor/export -n raptor-pma -p atlas-1.0-square-pma.json \
-    \
-    -i $UNITY_BASE_DIR/spineboy-pro/spineboy-pro.spine -o $UNITY_BASE_DIR/spineboy-pro/export -e json.json \
-    -i $UNITY_BASE_DIR/spineboy-pro/spineboy-pro.spine -o $UNITY_BASE_DIR/spineboy-pro/export -e binary.json \
-    -i $UNITY_BASE_DIR/spineboy-pro/images -o $UNITY_BASE_DIR/spineboy-pro/export -n spineboy -p atlas-1.0-2048.json \
-    -i $UNITY_BASE_DIR/spineboy-pro/images -o $UNITY_BASE_DIR/spineboy-pro/export -n spineboy-pma -p atlas-1.0-2048-pma.json \
-    \
-    -i $UNITY_BASE_DIR/spineboy-unity/spineboy-unity.spine -o $UNITY_BASE_DIR/spineboy-unity/export -e json.json \
-    -i $UNITY_BASE_DIR/spineboy-unity/spineboy-unity.spine -o $UNITY_BASE_DIR/spineboy-unity/export -e binary.json \
-    -i $UNITY_BASE_DIR/spineboy-unity/images -o $UNITY_BASE_DIR/spineboy-unity/export -n spineboy -p atlas-1.0-square.json \
-    -i $UNITY_BASE_DIR/spineboy-unity/images -o $UNITY_BASE_DIR/spineboy-unity/export -n spineboy-pma -p atlas-1.0-square-pma.json \
-    \
-    -i $UNITY_BASE_DIR/spineunitygirl/doi.spine -o $UNITY_BASE_DIR/spineunitygirl/export -e json.json \
-    -i $UNITY_BASE_DIR/spineunitygirl/doi.spine -o $UNITY_BASE_DIR/spineunitygirl/export -e binary.json \
-    -i $UNITY_BASE_DIR/spineunitygirl/images -o $UNITY_BASE_DIR/spineunitygirl/export -n doi -p atlas-1.0.json \
-    -i $UNITY_BASE_DIR/spineunitygirl/images -o $UNITY_BASE_DIR/spineunitygirl/export -n doi-pma -p atlas-1.0-pma.json \
-    \
-    -i $UNITY_BASE_DIR/whirlyblendmodes/whirlyblendmodes.spine -o $UNITY_BASE_DIR/whirlyblendmodes/export -e json.json \
-    -i $UNITY_BASE_DIR/whirlyblendmodes/whirlyblendmodes.spine -o $UNITY_BASE_DIR/whirlyblendmodes/export -e binary.json \
-    -i $UNITY_BASE_DIR/whirlyblendmodes/images -o $UNITY_BASE_DIR/whirlyblendmodes/export -n whirlyblendmodes -p atlas-1.0.json \
-    -i $UNITY_BASE_DIR/whirlyblendmodes/images -o $UNITY_BASE_DIR/whirlyblendmodes/export -n whirlyblendmodes-pma -p atlas-1.0-pma.json
+	echo ""
+	echo "Exporting Unity assets..."
+	"$SPINE_EXE" \
+	-u $version -f \
+	-i $UNITY_BASE_DIR/eyes/eyes.spine -o $UNITY_BASE_DIR/eyes/export -e json.json \
+	-i $UNITY_BASE_DIR/eyes/eyes.spine -o $UNITY_BASE_DIR/eyes/export -e binary.json \
+	-i $UNITY_BASE_DIR/eyes/images -o $UNITY_BASE_DIR/eyes/export -n eyes -p atlas-1.0.json \
+	-i $UNITY_BASE_DIR/eyes/images -o $UNITY_BASE_DIR/eyes/export -n eyes-pma -p atlas-1.0-pma.json \
+	\
+	-i $UNITY_BASE_DIR/footsoldier/footsoldier.spine -o $UNITY_BASE_DIR/footsoldier/export -e json.json \
+	-i $UNITY_BASE_DIR/footsoldier/footsoldier.spine -o $UNITY_BASE_DIR/footsoldier/export -e binary.json \
+	-i $UNITY_BASE_DIR/footsoldier/images -o $UNITY_BASE_DIR/footsoldier/export -n footsoldier -p atlas-1.0.json \
+	-i $UNITY_BASE_DIR/footsoldier/images -o $UNITY_BASE_DIR/footsoldier/export -n footsoldier-pma -p atlas-1.0-pma.json \
+	\
+	-i $UNITY_BASE_DIR/gauge/gauge.spine -o $UNITY_BASE_DIR/gauge/export -e json.json \
+	-i $UNITY_BASE_DIR/gauge/gauge.spine -o $UNITY_BASE_DIR/gauge/export -e binary.json \
+	-i $UNITY_BASE_DIR/gauge/images -o $UNITY_BASE_DIR/gauge/export -n gauge -p atlas-1.0.json \
+	-i $UNITY_BASE_DIR/gauge/images -o $UNITY_BASE_DIR/gauge/export -n gauge-pma -p atlas-1.0-pma.json \
+	\
+	-i $UNITY_BASE_DIR/raggedyspineboy/raggedyspineboy.spine -o $UNITY_BASE_DIR/raggedyspineboy/export -e json.json \
+	-i $UNITY_BASE_DIR/raggedyspineboy/raggedyspineboy.spine -o $UNITY_BASE_DIR/raggedyspineboy/export -e binary.json \
+	-i $UNITY_BASE_DIR/raggedyspineboy/images -o $UNITY_BASE_DIR/raggedyspineboy/export -n raggedyspineboy -p atlas-1.0.json \
+	-i $UNITY_BASE_DIR/raggedyspineboy/images -o $UNITY_BASE_DIR/raggedyspineboy/export -n raggedyspineboy-pma -p atlas-1.0-pma.json \
+	\
+	-i $UNITY_BASE_DIR/raptor/raptor.spine -o $UNITY_BASE_DIR/raptor/export -e json.json \
+	-i $UNITY_BASE_DIR/raptor/raptor.spine -o $UNITY_BASE_DIR/raptor/export -e binary.json \
+	-i $UNITY_BASE_DIR/raptor/images -o $UNITY_BASE_DIR/raptor/export -n raptor -p atlas-1.0-square.json \
+	-i $UNITY_BASE_DIR/raptor/images -o $UNITY_BASE_DIR/raptor/export -n raptor-pma -p atlas-1.0-square-pma.json \
+	\
+	-i $UNITY_BASE_DIR/spineboy-pro/spineboy-pro.spine -o $UNITY_BASE_DIR/spineboy-pro/export -e json.json \
+	-i $UNITY_BASE_DIR/spineboy-pro/spineboy-pro.spine -o $UNITY_BASE_DIR/spineboy-pro/export -e binary.json \
+	-i $UNITY_BASE_DIR/spineboy-pro/images -o $UNITY_BASE_DIR/spineboy-pro/export -n spineboy -p atlas-1.0-2048.json \
+	-i $UNITY_BASE_DIR/spineboy-pro/images -o $UNITY_BASE_DIR/spineboy-pro/export -n spineboy-pma -p atlas-1.0-2048-pma.json \
+	\
+	-i $UNITY_BASE_DIR/spineboy-unity/spineboy-unity.spine -o $UNITY_BASE_DIR/spineboy-unity/export -e json.json \
+	-i $UNITY_BASE_DIR/spineboy-unity/spineboy-unity.spine -o $UNITY_BASE_DIR/spineboy-unity/export -e binary.json \
+	-i $UNITY_BASE_DIR/spineboy-unity/images -o $UNITY_BASE_DIR/spineboy-unity/export -n spineboy -p atlas-1.0-square.json \
+	-i $UNITY_BASE_DIR/spineboy-unity/images -o $UNITY_BASE_DIR/spineboy-unity/export -n spineboy-pma -p atlas-1.0-square-pma.json \
+	\
+	-i $UNITY_BASE_DIR/spineunitygirl/doi.spine -o $UNITY_BASE_DIR/spineunitygirl/export -e json.json \
+	-i $UNITY_BASE_DIR/spineunitygirl/doi.spine -o $UNITY_BASE_DIR/spineunitygirl/export -e binary.json \
+	-i $UNITY_BASE_DIR/spineunitygirl/images -o $UNITY_BASE_DIR/spineunitygirl/export -n doi -p atlas-1.0.json \
+	-i $UNITY_BASE_DIR/spineunitygirl/images -o $UNITY_BASE_DIR/spineunitygirl/export -n doi-pma -p atlas-1.0-pma.json \
+	\
+	-i $UNITY_BASE_DIR/whirlyblendmodes/whirlyblendmodes.spine -o $UNITY_BASE_DIR/whirlyblendmodes/export -e json.json \
+	-i $UNITY_BASE_DIR/whirlyblendmodes/whirlyblendmodes.spine -o $UNITY_BASE_DIR/whirlyblendmodes/export -e binary.json \
+	-i $UNITY_BASE_DIR/whirlyblendmodes/images -o $UNITY_BASE_DIR/whirlyblendmodes/export -n whirlyblendmodes -p atlas-1.0.json \
+	-i $UNITY_BASE_DIR/whirlyblendmodes/images -o $UNITY_BASE_DIR/whirlyblendmodes/export -n whirlyblendmodes-pma -p atlas-1.0-pma.json
 fi
