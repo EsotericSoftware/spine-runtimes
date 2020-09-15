@@ -29,13 +29,13 @@
 
 module spine {
 	export abstract class Texture {
-		protected _image: HTMLImageElement;
+		protected _image: HTMLImageElement | ImageBitmap;
 
-		constructor (image: HTMLImageElement) {
+		constructor (image: HTMLImageElement | ImageBitmap) {
 			this._image = image;
 		}
 
-		getImage (): HTMLImageElement {
+		getImage (): HTMLImageElement | ImageBitmap {
 			return this._image;
 		}
 
