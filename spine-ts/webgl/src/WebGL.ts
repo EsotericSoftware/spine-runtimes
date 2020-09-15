@@ -34,8 +34,6 @@ module spine.webgl {
 		private restorables = new Array<Restorable>();
 
 		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | WebGL2RenderingContext | OffscreenCanvas, contextConfig: any = { alpha: "true" }) {
-			let isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
-			let isWebWorker = !isBrowser && typeof importScripts !== 'undefined';
 
 			if (!((canvasOrContext instanceof WebGLRenderingContext) || (canvasOrContext instanceof WebGL2RenderingContext))) {
 				let canvas = canvasOrContext;

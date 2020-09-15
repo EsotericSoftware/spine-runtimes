@@ -10710,8 +10710,6 @@ var spine;
                 var _this = this;
                 if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
                 this.restorables = new Array();
-                var isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
-                var isWebWorker = !isBrowser && typeof importScripts !== 'undefined';
                 if (!((canvasOrContext instanceof WebGLRenderingContext) || (canvasOrContext instanceof WebGL2RenderingContext))) {
                     var canvas = canvasOrContext;
                     if (canvas instanceof OffscreenCanvas) {
