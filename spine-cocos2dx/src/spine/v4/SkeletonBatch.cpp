@@ -148,15 +148,49 @@ void SkeletonBatch::deallocateIndices(uint32_t numIndices) {
 }
 
 
-cocos2d::TrianglesCommand* SkeletonBatch::addCommand(cocos2d::Renderer* renderer, float globalOrder, cocos2d::Texture2D* texture, cocos2d::BlendFunc blendType, const cocos2d::TrianglesCommand::Triangles& triangles, const cocos2d::Mat4& mv, uint32_t flags) {
-	TrianglesCommand* command = nextFreeCommand();
+CustomTrianglesCommand* SkeletonBatch::addCommand(cocos2d::Renderer* renderer, float globalOrder, cocos2d::Texture2D* texture, const backend::ProgramState* programState, cocos2d::BlendFunc blendType, const cocos2d::TrianglesCommand::Triangles& triangles, const cocos2d::Mat4& mv, uint32_t flags) {
+	auto* command = nextFreeCommand();
     const cocos2d::Mat4& projectionMat = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);    
 
-    auto programState = command->getPipelineDescriptor().programState;
-    CCASSERT(programState, "programState should not be null");
-
-    programState->setUniform(_locMVP, projectionMat.m, sizeof(projectionMat.m));
-    programState->setTexture(_locTexture, 0, texture->getBackendTexture());
+	auto& pipelineDescriptor = command->getPipelineDescriptor();
+	if (pipelineDescriptor.programState)
+	{
+	    if (programState)
+	    {
+			if (programState->getProgram() != pipelineDescriptor.programState->getProgram())
+			{
+				pipelineDescriptor.programState = programState->clone();
+				command->_locMVP = pipelineDescriptor.programState->getUniformLocation("u_MVPMatrix");
+				command->_locTexture = pipelineDescriptor.programState->getUniformLocation("u_texture");
+			}
+	    }
+		else
+		{
+			if (_programState->getProgram() != pipelineDescriptor.programState->getProgram())
+			{
+				pipelineDescriptor.programState = _programState->clone();
+				command->_locMVP = _locMVP;
+				command->_locTexture = _locTexture;
+			}
+		}
+	}
+	else
+	{
+		if (programState)
+		{
+			pipelineDescriptor.programState = programState->clone();
+			command->_locMVP = pipelineDescriptor.programState->getUniformLocation("u_MVPMatrix");
+			command->_locTexture = pipelineDescriptor.programState->getUniformLocation("u_texture");
+		}
+		else
+		{
+			pipelineDescriptor.programState = _programState->clone();
+			command->_locMVP = _locMVP;
+			command->_locTexture = _locTexture;
+		}
+	}
+	pipelineDescriptor.programState->setUniform(command->_locMVP, projectionMat.m, sizeof(projectionMat.m));
+	pipelineDescriptor.programState->setTexture(command->_locTexture, 0, texture->getBackendTexture());
 
     command->init(globalOrder, texture, blendType, triangles, mv, flags);
     renderer->addCommand(command);
@@ -169,7 +203,7 @@ void SkeletonBatch::reset() {
 	_indices.setSize(0, 0);
 }
 
-cocos2d::TrianglesCommand* SkeletonBatch::nextFreeCommand() {
+CustomTrianglesCommand* SkeletonBatch::nextFreeCommand() {
     if (_commandsPool.size() <= _nextFreeCommand) {
         unsigned int newSize = _commandsPool.size() * 2 + 1;
         for (int i = _commandsPool.size(); i < newSize; i++) {
@@ -177,17 +211,11 @@ cocos2d::TrianglesCommand* SkeletonBatch::nextFreeCommand() {
         }
     }
     auto* command = _commandsPool[_nextFreeCommand++];
-    auto& pipelineDescriptor = command->getPipelineDescriptor();
-    if (pipelineDescriptor.programState == nullptr)
-    {
-        CCASSERT(_programState, "programState should not be null");
-        pipelineDescriptor.programState = _programState->clone();
-    }
     return command;
 }
 
-cocos2d::TrianglesCommand *SkeletonBatch::createNewTrianglesCommand() {
-    auto* command = new TrianglesCommand();
+CustomTrianglesCommand* SkeletonBatch::createNewTrianglesCommand() {
+    auto* command = new CustomTrianglesCommand();
     return command;
 }
 }
