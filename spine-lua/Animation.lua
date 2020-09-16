@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Spine Runtimes License Agreement
--- Last updated May 1, 2019. Replaces all prior versions.
+-- Last updated January 1, 2020. Replaces all prior versions.
 --
--- Copyright (c) 2013-2019, Esoteric Software LLC
+-- Copyright (c) 2013-2020, Esoteric Software LLC
 --
 -- Integration of the Spine Runtimes into software or otherwise creating
 -- derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
 -- Spine Editor license and redistribution of the Products in any form must
 -- include this license and copyright notice.
 --
--- THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
--- OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
--- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
--- NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
--- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
--- BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
--- INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
--- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
--- NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
--- EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+-- EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+-- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+-- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+-- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+-- BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+-- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+-- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+-- THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
 -- FIXME
@@ -775,16 +775,22 @@ function Animation.AttachmentTimeline.new (frameCount)
 		return TimelineType.attachment * SHL_24 + self.slotIndex
 	end
 
+	function self:setAttachment(skeleton, slot, attachmentName)
+		attachmentName = slot.data.attachmentName
+		if not attachmentName then
+			slot:setAttachment(nil)
+		else
+			slot:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
+		end
+	end
+
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local slot = skeleton.slots[self.slotIndex]
 		if not slot.bone.active then return end
 		local attachmentName
-		if direction == MixDirection.out and blend == MixBlend.setup then
-			attachmentName = slot.data.attachmentName
-			if not attachmentName then
-				slot:setAttachment(nil)
-			else
-				slot:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
+		if direction == MixDirection.out then
+			if blend == MixBlend.setup then
+				self:setAttachment(skeleton, slot, slot.data.attachmentName)
 			end
 			return;
 		end
@@ -792,12 +798,7 @@ function Animation.AttachmentTimeline.new (frameCount)
 		local frames = self.frames
 		if time < frames[0] then
 			if blend == MixBlend.setup or blend == MixBlend.first then
-				attachmentName = slot.data.attachmentName
-				if not attachmentName then
-					slot:setAttachment(nil)
-				else
-					slot:setAttachment(skeleton:getAttachmentByIndex(self.slotIndex, attachmentName))
-				end
+				self:setAttachment(skeleton, slot, slot.data.attachmentName)
 			end
 			return
 		end
@@ -1150,9 +1151,11 @@ function Animation.DrawOrderTimeline.new (frameCount)
 	function self:apply (skeleton, lastTime, time, firedEvents, alpha, blend, direction)
 		local drawOrder = skeleton.drawOrder
 		local slots = skeleton.slots
-		if direction == MixDirection.out and blend == MixBlend.setup then
-			for i,slot in ipairs(slots) do
-				drawOrder[i] = slots[i]
+		if direction == MixDirection.out then
+			if blend == MixBlend.setup then
+				for i,slot in ipairs(slots) do
+					drawOrder[i] = slots[i]
+				end
 			end
 			return;
 		end
@@ -1372,7 +1375,7 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 		local scale = 0
 		local shear = 0
 		if time >= frames[zlen(frames) - ENTRIES] then -- Time is after last frame.
-			local i = zlen(frames.length)
+			local i = zlen(frames)
 			rotate = frames[i + PREV_ROTATE]
 			translate = frames[i + PREV_TRANSLATE]
 			scale = frames[i + PREV_SCALE]

@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 // Contributed by: Mitch Thompson
@@ -72,8 +72,12 @@ namespace Spine.Unity.Editor {
 			skeletonUtility = utilityBone.hierarchy;
 			EvaluateFlags();
 
-			if (!utilityBone.valid && skeletonUtility != null && skeletonUtility.skeletonRenderer != null)
-				skeletonUtility.skeletonRenderer.Initialize(false);
+			if (!utilityBone.valid && skeletonUtility != null) {
+				if (skeletonUtility.skeletonRenderer != null)
+					skeletonUtility.skeletonRenderer.Initialize(false);
+				if (skeletonUtility.skeletonGraphic != null)
+					skeletonUtility.skeletonGraphic.Initialize(false);
+			}
 
 			canCreateHingeChain = CanCreateHingeChain();
 			boundingBoxTable.Clear();
@@ -88,7 +92,7 @@ namespace Spine.Unity.Editor {
 				skin = skeleton.Data.DefaultSkin;
 
 			for(int i = 0; i < slotCount; i++){
-				Slot slot = skeletonUtility.skeletonRenderer.skeleton.Slots.Items[i];
+				Slot slot = skeletonUtility.Skeleton.Slots.Items[i];
 				if (slot.Bone == utilityBone.bone) {
 					var slotAttachments = new List<Skin.SkinEntry>();
 					int slotIndex = skeleton.FindSlotIndex(slot.Data.Name);
@@ -105,7 +109,6 @@ namespace Spine.Unity.Editor {
 						boundingBoxTable.Add(slot, boundingBoxes);
 				}
 			}
-
 		}
 
 		void EvaluateFlags () {
@@ -150,7 +153,7 @@ namespace Spine.Unity.Editor {
 				using (new GUILayout.HorizontalScope()) {
 					EditorGUILayout.PrefixLabel("Bone");
 					if (GUILayout.Button(str, EditorStyles.popup)) {
-						BoneSelectorContextMenu(str, ((SkeletonUtilityBone)target).hierarchy.skeletonRenderer.skeleton.Bones, "<None>", TargetBoneSelected);
+						BoneSelectorContextMenu(str, ((SkeletonUtilityBone)target).hierarchy.Skeleton.Bones, "<None>", TargetBoneSelected);
 					}
 				}
 			}
@@ -317,6 +320,7 @@ namespace Spine.Unity.Editor {
 			GameObject commonParentObject = new GameObject(skeletonUtility.name + " HingeChain Parent " + utilityBone.name);
 			var commonParentActivateOnFlip = commonParentObject.AddComponent<ActivateBasedOnFlipDirection>();
 			commonParentActivateOnFlip.skeletonRenderer = skeletonUtility.skeletonRenderer;
+			commonParentActivateOnFlip.skeletonGraphic = skeletonUtility.skeletonGraphic;
 
 			// HingeChain Parent
 			// Needs to be on top hierarchy level (not attached to the moving skeleton at least) for physics to apply proper momentum.
@@ -391,7 +395,7 @@ namespace Spine.Unity.Editor {
 			GameObject mirroredChain = GameObject.Instantiate(normalChainParentObject, normalChainParentObject.transform.position,
 				normalChainParentObject.transform.rotation, commonParentActivateOnFlip.transform);
 			mirroredChain.name = normalChainParentObject.name + " FlippedX";
-			
+
 			commonParentActivateOnFlip.activeOnFlippedX = mirroredChain;
 
 			var followerKinematicObject = mirroredChain.GetComponentInChildren<FollowLocationRigidbody2D>();
@@ -405,7 +409,7 @@ namespace Spine.Unity.Editor {
 				var joint = childBoneJoints[i];
 				FlipBone2DHorizontal(joint.transform, skeletonUtilityRoot);
 				ApplyJoint2DAngleLimits(joint, rotationLimit, parentTransformForAngles, joint.transform);
-				
+
 				GameObject rotatedChild = GameObject.Instantiate(joint.gameObject, joint.transform, true);
 				rotatedChild.name = joint.name + " rotated";
 				var rotationEulerAngles = rotatedChild.transform.localEulerAngles;
@@ -446,9 +450,9 @@ namespace Spine.Unity.Editor {
 				UnityEditor.EditorUtility.DisplayDialog("No parent SkeletonUtilityBone found!", "Please select the first physically moving chain node, having a parent GameObject with a SkeletonUtilityBone component attached.", "OK");
 				return;
 			}
-			
+
 			SetSkeletonUtilityToFlipByRotation();
-			
+
 			kinematicParentUtilityBone.mode = SkeletonUtilityBone.Mode.Follow;
 			kinematicParentUtilityBone.position = kinematicParentUtilityBone.rotation = kinematicParentUtilityBone.scale = kinematicParentUtilityBone.zPosition = true;
 
@@ -476,7 +480,7 @@ namespace Spine.Unity.Editor {
 				childBone.transform.SetParent(chainParentObject.transform, true); // we need a flat hierarchy of all Joint objects in Unity.
 				AttachRigidbodyAndCollider(childBone);
 				childBone.mode = SkeletonUtilityBone.Mode.Override;
-				
+
 				HingeJoint joint = childBone.gameObject.AddComponent<HingeJoint>();
 				joint.axis = Vector3.forward;
 				joint.connectedBody = childBoneParentReference.GetComponent<Rigidbody>();

@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
@@ -41,6 +41,7 @@ namespace Spine.Unity {
 	#else
 	[ExecuteInEditMode]
 	#endif
+	[HelpURL("http://esotericsoftware.com/spine-unity#BoundingBoxFollower")]
 	public class BoundingBoxFollower : MonoBehaviour {
 		internal static bool DebugMessages = true;
 
@@ -106,7 +107,12 @@ namespace Spine.Unity {
 			)
 				return;
 
-			DisposeColliders();
+			slot = null;
+			currentAttachment = null;
+			currentAttachmentName = null;
+			currentCollider = null;
+			colliderTable.Clear();
+			nameTable.Clear();
 
 			var skeleton = skeletonRenderer.skeleton;
 			slot = skeleton.FindSlot(slotName);
@@ -118,13 +124,16 @@ namespace Spine.Unity {
 				return;
 			}
 
+			int requiredCollidersCount = 0;
+			var colliders = GetComponents<PolygonCollider2D>();
 			if (this.gameObject.activeInHierarchy) {
 				foreach (var skin in skeleton.Data.Skins)
-					AddSkin(skin, slotIndex);
+					AddCollidersForSkin(skin, slotIndex, colliders, ref requiredCollidersCount);
 
 				if (skeleton.skin != null)
-					AddSkin(skeleton.skin, slotIndex);
+					AddCollidersForSkin(skeleton.skin, slotIndex, colliders, ref requiredCollidersCount);
 			}
+			DisposeExcessCollidersAfter(requiredCollidersCount);
 
 			if (BoundingBoxFollower.DebugMessages) {
 				bool valid = colliderTable.Count != 0;
@@ -137,7 +146,7 @@ namespace Spine.Unity {
 			}
 		}
 
-		void AddSkin (Skin skin, int slotIndex) {
+		void AddCollidersForSkin (Skin skin, int slotIndex, PolygonCollider2D[] previousColliders, ref int collidersCount) {
 			if (skin == null) return;
 			var skinEntries = new List<Skin.SkinEntry>();
 			skin.GetAttachments(slotIndex, skinEntries);
@@ -151,8 +160,11 @@ namespace Spine.Unity {
 
 				if (boundingBoxAttachment != null) {
 					if (!colliderTable.ContainsKey(boundingBoxAttachment)) {
-						var bbCollider = SkeletonUtility.AddBoundingBoxAsComponent(boundingBoxAttachment, slot, gameObject, isTrigger);
-
+						var bbCollider = collidersCount < previousColliders.Length ?
+							previousColliders[collidersCount] : gameObject.AddComponent<PolygonCollider2D>();
+						++collidersCount;
+						SkeletonUtility.SetColliderPointsLocal(bbCollider, slot, boundingBoxAttachment);
+						bbCollider.isTrigger = isTrigger;
 						bbCollider.enabled = false;
 						bbCollider.hideFlags = HideFlags.NotEditable;
 						bbCollider.isTrigger = IsTrigger;
@@ -166,6 +178,9 @@ namespace Spine.Unity {
 		void OnDisable () {
 			if (clearStateOnDisable)
 				ClearState();
+
+			if (skeletonRenderer != null)
+				skeletonRenderer.OnRebuild -= HandleRebuild;
 		}
 
 		public void ClearState () {
@@ -178,33 +193,21 @@ namespace Spine.Unity {
 			currentCollider = null;
 		}
 
-		void DisposeColliders () {
+		void DisposeExcessCollidersAfter (int requiredCount) {
 			var colliders = GetComponents<PolygonCollider2D>();
 			if (colliders.Length == 0) return;
 
-			if (Application.isEditor) {
-				if (Application.isPlaying) {
-					foreach (var c in colliders) {
-						if (c != null)
-							Destroy(c);
-					}
-				} else {
-					foreach (var c in colliders)
-						if (c != null)
-							DestroyImmediate(c);
+			for (int i = requiredCount; i < colliders.Length; ++i) {
+				var collider = colliders[i];
+				if (collider != null) {
+#if UNITY_EDITOR
+					if (Application.isEditor && !Application.isPlaying)
+						DestroyImmediate(collider);
+					else
+#endif
+						Destroy(collider);
 				}
-			} else {
-				foreach (PolygonCollider2D c in colliders)
-					if (c != null)
-						Destroy(c);
 			}
-
-			slot = null;
-			currentAttachment = null;
-			currentAttachmentName = null;
-			currentCollider = null;
-			colliderTable.Clear();
-			nameTable.Clear();
 		}
 
 		void LateUpdate () {

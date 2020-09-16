@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #ifdef SPINE_UE4
@@ -45,19 +45,44 @@ RTTI_IMPL(IkConstraint, Updatable)
 
 void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress, bool stretch, bool uniform, float alpha) {
 	Bone *p = bone.getParent();
-	float id, x, y, tx, ty, rotationIK;
-	if (!bone._appliedValid) bone.updateAppliedTransform();
-	id = 1 / (p->_a * p->_d - p->_b * p->_c);
-	x = targetX - p->_worldX, y = targetY - p->_worldY;
-	tx = (x * p->_d - y * p->_b) * id - bone._ax;
-	ty = (y * p->_a - x * p->_c) * id - bone._ay;
-	rotationIK = MathUtil::atan2(ty, tx) * MathUtil::Rad_Deg - bone._ashearX - bone._arotation;
+	float pa = p->_a, pb = p->_b, pc = p->_c, pd = p->_d;
+	float rotationIK = -bone._ashearX - bone._arotation;
+	float tx = 0, ty = 0;
+    if (!bone._appliedValid) bone.updateAppliedTransform();
+
+	switch(bone._data.getTransformMode()) {
+        case TransformMode_OnlyTranslation:
+            tx = targetX - bone._worldX;
+            ty = targetY - bone._worldY;
+            break;
+        case TransformMode_NoRotationOrReflection: {
+            float s = MathUtil::abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+            float sa = pa / bone._skeleton.getScaleX();
+            float sc = pc / bone._skeleton.getScaleY();
+            pb = -sc * s * bone._skeleton.getScaleX();
+            pd = sa * s * bone._skeleton.getScaleY();
+            rotationIK += MathUtil::atan2(sc, sa) * MathUtil::Rad_Deg;
+        }
+	    default:
+	        float x = targetX - p->_worldX, y = targetY - p->_worldY;
+	        float d = pa * pd - pb * pc;
+	        tx = (x * pd - y * pb) / d - bone._ax;
+	        ty = (y * pa - x * pc) / d - bone._ay;
+	}
+    rotationIK += MathUtil::atan2(ty, tx) * MathUtil::Rad_Deg;
 	if (bone._ascaleX < 0) rotationIK += 180;
 	if (rotationIK > 180) rotationIK -= 360;
 	else if (rotationIK < -180) rotationIK += 360;
 	float sx = bone._ascaleX;
 	float sy = bone._ascaleY;
 	if (compress || stretch) {
+	    switch(bone._data.getTransformMode()) {
+	        case TransformMode_NoScale:
+	        case TransformMode_NoScaleOrReflection:
+	            tx = targetX - bone._worldX;
+	            ty = targetY - bone._worldY;
+	        default: ;
+	    }
 		float b = bone._data.getLength() * sx, dd = MathUtil::sqrt(tx * tx + ty * ty);
 		if (((compress && dd < b) || (stretch && dd > b)) && (b > 0.0001f)) {
 			float s = (dd / b - 1) * alpha + 1;
@@ -217,7 +242,7 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 		a1 = (a1 - os) * MathUtil::Rad_Deg + o1 - parent._arotation;
 		if (a1 > 180) a1 -= 360;
 		else if (a1 < -180) a1 += 360;
-		parent.updateWorldTransform(px, py, parent._rotation + a1 * alpha, sx, parent._ascaleY, 0, 0);
+		parent.updateWorldTransform(px, py, parent._arotation + a1 * alpha, sx, parent._ascaleY, 0, 0);
 		a2 = ((a2 + os) * MathUtil::Rad_Deg - child._ashearX) * s2 + o2 - child._arotation;
 		if (a2 > 180) a2 -= 360;
 		else if (a2 < -180) a2 += 360;
@@ -331,4 +356,3 @@ float IkConstraint::getSoftness() {
 void IkConstraint::setSoftness(float inValue) {
 	_softness = inValue;
 }
-

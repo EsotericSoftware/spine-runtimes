@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <spine/IkConstraint.h>
@@ -70,19 +70,48 @@ void spIkConstraint_apply(spIkConstraint *self) {
 
 void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, int /*boolean*/ compress, int /*boolean*/ stretch, int /*boolean*/ uniform, float alpha) {
 	spBone* p = bone->parent;
-	float id, x, y, tx, ty, rotationIK, sx, sy, s;
+    float pa = p->a, pb = p->b, pc = p->c, pd = p->d;
+    float rotationIK = -bone->ashearX - bone->arotation;
+    float tx = 0, ty = 0, sx = 0, sy = 0, s = 0, sa = 0, sc = 0;
 	if (!bone->appliedValid) spBone_updateAppliedTransform(bone);
-	id = 1 / (p->a * p->d - p->b * p->c);
-	x = targetX - p->worldX, y = targetY - p->worldY;
-	tx = (x * p->d - y * p->b) * id - bone->ax; ty = (y * p->a - x * p->c) * id - bone->ay;
-	rotationIK = ATAN2(ty, tx) * RAD_DEG - bone->ashearX - bone->arotation;
+
+    switch(bone->data->transformMode) {
+        case SP_TRANSFORMMODE_ONLYTRANSLATION:
+            tx = targetX - bone->worldX;
+            ty = targetY - bone->worldY;
+            break;
+        case SP_TRANSFORMMODE_NOROTATIONORREFLECTION: {
+            s = ABS(pa * pd - pb * pc) / (pa * pa + pc * pc);
+			sa = pa / bone->skeleton->scaleX;
+			sc = pc / bone->skeleton->scaleY;
+			pb = -sc * s * bone->skeleton->scaleX;
+			pd = sa * s * bone->skeleton->scaleY;
+			rotationIK += ATAN2(sc, sa) * RAD_DEG;
+        }
+        default: {
+            float x = targetX - p->worldX, y = targetY - p->worldY;
+            float d = pa * pd - pb * pc;
+            tx = (x * pd - y * pb) / d - bone->ax;
+            ty = (y * pa - x * pc) / d - bone->ay;
+        }
+    }
+    rotationIK += ATAN2(ty, tx) * RAD_DEG;
+
 	if (bone->ascaleX < 0) rotationIK += 180;
 	if (rotationIK > 180) rotationIK -= 360;
 	else if (rotationIK < -180) rotationIK += 360;
 	sx = bone->ascaleX;
 	sy = bone->ascaleY;
 	if (compress || stretch) {
-		float b = bone->data->length * sx, dd = SQRT(tx * tx + ty * ty);
+	    float b, dd;
+        switch(bone->data->transformMode) {
+            case SP_TRANSFORMMODE_NOSCALE:
+            case SP_TRANSFORMMODE_NOSCALEORREFLECTION:
+                tx = targetX - bone->worldX;
+                ty = targetY - bone->worldY;
+            default: ;
+        }
+		b = bone->data->length * sx, dd = SQRT(tx * tx + ty * ty);
 		if ((compress && dd < b) || ((stretch && dd > b) && (b > 0.0001f))) {
 			s = (dd / b - 1) * alpha + 1;
 			sx *= s;
@@ -238,7 +267,7 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 		a1 = (a1 - os) * RAD_DEG + o1 - parent->arotation;
 		if (a1 > 180) a1 -= 360;
 		else if (a1 < -180) a1 += 360;
-		spBone_updateWorldTransformWith(parent, px, py, parent->rotation + a1 * alpha, sx, parent->ascaleY, 0, 0);
+		spBone_updateWorldTransformWith(parent, px, py, parent->arotation + a1 * alpha, sx, parent->ascaleY, 0, 0);
 		a2 = ((a2 + os) * RAD_DEG - child->ashearX) * s2 + o2 - child->arotation;
 		if (a2 > 180) a2 -= 360;
 		else if (a2 < -180) a2 += 360;

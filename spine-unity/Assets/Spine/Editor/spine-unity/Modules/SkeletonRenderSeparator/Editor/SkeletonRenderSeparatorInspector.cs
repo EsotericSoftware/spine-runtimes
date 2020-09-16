@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,17 +15,21 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+
+#if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
+#define NEW_PREFAB_SYSTEM
+#endif
 
 using UnityEngine;
 using UnityEditor;
@@ -81,7 +85,18 @@ namespace Spine.Unity.Examples {
 
 			// Restore mesh part for undo logic after undo of "Add Parts Renderer".
 			// Triggers regeneration and assignment of the mesh filter's mesh.
-			if (component.GetComponent<MeshFilter>() && component.GetComponent<MeshFilter>().sharedMesh == null) {
+
+			bool isMeshFilterAlwaysNull = false;
+			#if UNITY_EDITOR && NEW_PREFAB_SYSTEM
+			// Don't store mesh or material at the prefab, otherwise it will permanently reload
+			var prefabType = UnityEditor.PrefabUtility.GetPrefabAssetType(component);
+			if (UnityEditor.PrefabUtility.IsPartOfPrefabAsset(component) &&
+				(prefabType == UnityEditor.PrefabAssetType.Regular || prefabType == UnityEditor.PrefabAssetType.Variant)) {
+				isMeshFilterAlwaysNull = true;
+			}
+			#endif
+
+			if (!isMeshFilterAlwaysNull && component.GetComponent<MeshFilter>() && component.GetComponent<MeshFilter>().sharedMesh == null) {
 				component.OnDisable();
 				component.OnEnable();
 			}
@@ -182,7 +197,7 @@ namespace Spine.Unity.Examples {
 					if (component.enabled && component.SkeletonRenderer != null && extraRenderersNeeded > 0) {
 						EditorGUILayout.HelpBox(string.Format("Insufficient parts renderers. Some parts will not be rendered."), MessageType.Warning);
 						string addMissingLabel = string.Format("Add the missing renderer{1} ({0}) ", extraRenderersNeeded, SpineInspectorUtility.PluralThenS(extraRenderersNeeded));
-						if (GUILayout.Button(addMissingLabel, GUILayout.Height(40f))) {
+						if (GUILayout.Button(addMissingLabel, GUILayout.Height(30f))) {
 							AddPartsRenderer(extraRenderersNeeded);
 							DetectOrphanedPartsRenderers(component);
 							partsRendererInitRequired = true;

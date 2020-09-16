@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
@@ -73,6 +73,8 @@ namespace Spine.Unity.Examples {
 		public override void DoUpdate () {
 			rayOrigin = transform.position + new Vector3(castOffset, castDistance, 0);
 
+			float positionScale = hierarchy.PositionScale;
+			float adjustDistanceThisFrame = adjustSpeed * positionScale * Time.deltaTime;
 			hitY = float.MinValue;
 			if (use2D) {
 				RaycastHit2D hit;
@@ -85,10 +87,10 @@ namespace Spine.Unity.Examples {
 				if (hit.collider != null) {
 					hitY = hit.point.y + groundOffset;
 					if (Application.isPlaying)
-						hitY = Mathf.MoveTowards(lastHitY, hitY, adjustSpeed * Time.deltaTime);
+						hitY = Mathf.MoveTowards(lastHitY, hitY, adjustDistanceThisFrame);
 				} else {
 					if (Application.isPlaying)
-						hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustSpeed * Time.deltaTime);
+						hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustDistanceThisFrame);
 				}
 			} else {
 				RaycastHit hit;
@@ -102,11 +104,11 @@ namespace Spine.Unity.Examples {
 				if (validHit) {
 					hitY = hit.point.y + groundOffset;
 					if (Application.isPlaying)
-						hitY = Mathf.MoveTowards(lastHitY, hitY, adjustSpeed * Time.deltaTime);
+						hitY = Mathf.MoveTowards(lastHitY, hitY, adjustDistanceThisFrame);
 
 				} else {
 					if (Application.isPlaying)
-						hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustSpeed * Time.deltaTime);
+						hitY = Mathf.MoveTowards(lastHitY, transform.position.y, adjustDistanceThisFrame);
 				}
 			}
 
@@ -114,8 +116,8 @@ namespace Spine.Unity.Examples {
 			v.y = Mathf.Clamp(v.y, Mathf.Min(lastHitY, hitY), float.MaxValue);
 			transform.position = v;
 
-			bone.bone.X = transform.localPosition.x;
-			bone.bone.Y = transform.localPosition.y;
+			bone.bone.X = transform.localPosition.x / hierarchy.PositionScale;
+			bone.bone.Y = transform.localPosition.y / hierarchy.PositionScale;
 
 			lastHitY = hitY;
 		}

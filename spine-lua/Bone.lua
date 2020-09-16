@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Spine Runtimes License Agreement
--- Last updated May 1, 2019. Replaces all prior versions.
+-- Last updated January 1, 2020. Replaces all prior versions.
 --
--- Copyright (c) 2013-2019, Esoteric Software LLC
+-- Copyright (c) 2013-2020, Esoteric Software LLC
 --
 -- Integration of the Spine Runtimes into software or otherwise creating
 -- derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
 -- Spine Editor license and redistribution of the Products in any form must
 -- include this license and copyright notice.
 --
--- THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
--- OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
--- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
--- NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
--- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
--- BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
--- INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
--- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
--- NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
--- EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+-- EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+-- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+-- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+-- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+-- BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+-- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+-- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+-- THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
 local setmetatable = setmetatable
@@ -144,6 +144,8 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		local prx = 0
 		if s > 0.0001 then
 			s = math_abs(pa * pd - pb * pc) / s
+			pa = pa / self.skeleton.scaleX
+			pc = pc / self.skeleton.scaleY
 			pb = pc * s
 			pd = pa * s
 			prx = math_deg(math_atan2(pc, pa));
@@ -162,6 +164,7 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		self.b = pa * lb - pb * ld
 		self.c = pc * la + pd * lc
 		self.d = pc * lb + pd * ld
+		return
 	elseif transformMode == TransformMode.noScale or transformMode == TransformMode.noScaleOrReflection then
 		local cos = math_cos(math_rad(rotation))
 		local sin = math_sin(math_rad(rotation))

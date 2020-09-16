@@ -8,6 +8,10 @@ namespace UnrealBuildTool.Rules
 		public SpineEditorPlugin(ReadOnlyTargetRules Target) : base(Target)
 		{
             PrivatePCHHeaderFile = "Private/SpineEditorPluginPrivatePCH.h";
+            PCHUsage = PCHUsageMode.UseSharedPCHs;
+#if UE_4_24_OR_LATER
+            DefaultBuildSettings = BuildSettingsVersion.V1;
+#endif
 
             PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
 			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "../SpinePlugin/Public/spine-cpp/include"));

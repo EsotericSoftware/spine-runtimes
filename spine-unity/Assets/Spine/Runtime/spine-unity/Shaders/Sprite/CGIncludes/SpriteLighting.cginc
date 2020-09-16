@@ -2,7 +2,7 @@
 #define SPRITE_LIGHTING_INCLUDED
 
 //Check for using mesh normals
-#if !defined(_FIXED_NORMALS_VIEWSPACE) && !defined(_FIXED_NORMALS_VIEWSPACE_BACKFACE) && !defined(_FIXED_NORMALS_MODELSPACE) && !defined(_FIXED_NORMALS_MODELSPACE_BACKFACE)
+#if !defined(_FIXED_NORMALS_VIEWSPACE) && !defined(_FIXED_NORMALS_VIEWSPACE_BACKFACE) && !defined(_FIXED_NORMALS_MODELSPACE) && !defined(_FIXED_NORMALS_MODELSPACE_BACKFACE) && !defined(_FIXED_NORMALS_WORLDSPACE)
 #define MESH_NORMALS
 #endif
 
@@ -53,9 +53,9 @@ inline float calculateBackfacingSign(float3 worldPos)
 inline half3 calculateSpriteWorldNormal(VertexInput vertex, float backFaceSign)
 {
 #if defined(MESH_NORMALS)
-	
+
 	return calculateWorldNormal(vertex.normal);
-	
+
 #else // !MESH_NORMALS
 
 	float3 normal = getFixedNormal();
@@ -65,24 +65,27 @@ inline half3 calculateSpriteWorldNormal(VertexInput vertex, float backFaceSign)
 	//Rotate fixed normal by inverse view matrix to convert the fixed normal into world space
 	float3x3 invView = transpose((float3x3)UNITY_MATRIX_V);
 	return normalize(mul(invView, normal));
+#elif defined (_FIXED_NORMALS_WORLDSPACE)
+	//World space fixed normal
+	return normal;
 #else
-	//Model space fixed normal. 
-#if defined(FIXED_NORMALS_BACKFACE_RENDERING)	
+	//Model space fixed normal.
+#if defined(FIXED_NORMALS_BACKFACE_RENDERING)
 	//If back face rendering is enabled and the sprite is facing away from the camera (ie we're rendering the backface) then need to flip the normal
 	normal *= backFaceSign;
 #endif
 	return calculateWorldNormal(normal);
 #endif
-	
+
 #endif // !MESH_NORMALS
 }
 
 inline half3 calculateSpriteViewNormal(VertexInput vertex, float backFaceSign)
 {
 #if defined(MESH_NORMALS)
-	
+
 	return normalize(mul((float3x3)UNITY_MATRIX_IT_MV, vertex.normal));
-	
+
 #else // !MESH_NORMALS
 
 	float3 normal = getFixedNormal();
@@ -90,15 +93,18 @@ inline half3 calculateSpriteViewNormal(VertexInput vertex, float backFaceSign)
 #if defined(_FIXED_NORMALS_VIEWSPACE) || defined(_FIXED_NORMALS_VIEWSPACE_BACKFACE)
 	//View space fixed normal
 	return normal;
+#elif defined (_FIXED_NORMALS_WORLDSPACE)
+	//World space fixed normal
+	return normalize(mul((float3x3)UNITY_MATRIX_V, normal));
 #else
 	//Model space fixed normal
-#if defined(FIXED_NORMALS_BACKFACE_RENDERING)	
+#if defined(FIXED_NORMALS_BACKFACE_RENDERING)
 	//If back face rendering is enabled and the sprite is facing away from the camera (ie we're rendering the backface) then need to flip the normal
 	normal *= backFaceSign;
 #endif
 	return normalize(mul((float3x3)UNITY_MATRIX_IT_MV, normal));
 #endif
-		
+
 #endif // !MESH_NORMALS
 }
 
@@ -166,11 +172,11 @@ inline fixed3 applyRimLighting(fixed3 posWorld, fixed3 normalWorld, fixed4 pixel
 	float invDot =  1.0 - saturate(dot(normalWorld, viewDir));
 	float rimPower = pow(invDot, _RimPower);
 	float rim = saturate(rimPower * _RimColor.a);
-	
+
 #if defined(_DIFFUSE_RAMP)
 	rim = calculateDiffuseRamp(rim).r;
 #endif
-	
+
 	return lerp(pixel.rgb, _RimColor.xyz * pixel.a, rim);
 }
 

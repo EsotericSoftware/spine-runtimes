@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Spine Runtimes License Agreement
--- Last updated May 1, 2019. Replaces all prior versions.
+-- Last updated January 1, 2020. Replaces all prior versions.
 --
--- Copyright (c) 2013-2019, Esoteric Software LLC
+-- Copyright (c) 2013-2020, Esoteric Software LLC
 --
 -- Integration of the Spine Runtimes into software or otherwise creating
 -- derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
 -- Spine Editor license and redistribution of the Products in any form must
 -- include this license and copyright notice.
 --
--- THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
--- OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
--- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
--- NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
--- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
--- BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
--- INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
--- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
--- NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
--- EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+-- EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+-- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+-- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+-- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+-- BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+-- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+-- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+-- THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
 local setmetatable = setmetatable
@@ -39,6 +39,8 @@ local table_insert = table.insert
 local math_deg = math.deg
 local math_rad = math.rad
 local math_abs = math.abs
+
+local TransformMode = require "spine-lua.TransformMode"
 
 local IkConstraint = {}
 IkConstraint.__index = IkConstraint
@@ -87,21 +89,53 @@ end
 function IkConstraint:apply1 (bone, targetX, targetY, compress, stretch, uniform, alpha)
 	if not bone.appliedValid then bone:updateAppliedTransform() end
 	local p = bone.parent
-	local id = 1 / (p.a * p.d - p.b * p.c)
-	local x = targetX - p.worldX
-	local y = targetY - p.worldY
-	local tx = (x * p.d - y * p.b) * id - bone.ax
-	local ty = (y * p.a - x * p.c) * id - bone.ay
-	local rotationIK = math_deg(math_atan2(ty, tx)) - bone.ashearX - bone.arotation
+
+	local pa = p.a
+	local pb = p.b
+	local pc = p.c
+	local pd = p.d
+	local rotationIK = -bone.ashearX - bone.arotation
+	local tx = 0
+	local ty = 0
+
+	if bone.data.transformMode == TransformMode.onlyTranslation then
+		tx = targetX - bone.worldX
+		ty = targetY - bone.worldY
+	elseif bone.data.transformMode == TransformMode.noRotationOrReflection then
+		local s = math_abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+		local sa = pa / bone.skeleton.scaleX;
+		local sc = pc / bone.skeleton.scaleY;
+		pb = -sc * s * bone.skeleton.scaleX;
+		pd = sa * s * bone.skeleton.scaleY;
+		rotationIK = rotationIK + math_deg(math_atan2(sc, sa));
+
+
+		local x = targetX - p.worldX
+		local y = targetY - p.worldY
+		local d = pa * pd - pb * pc
+		tx = (x * pd - y * pb) / d - bone.ax
+		ty = (y * pa - x * pc) / d - bone.ay
+	else
+		local x = targetX - p.worldX
+		local y = targetY - p.worldY
+		local d = pa * pd - pb * pc
+		tx = (x * pd - y * pb) / d - bone.ax
+		ty = (y * pa - x * pc) / d - bone.ay
+	end
+	rotationIK = rotationIK + math_deg(math_atan2(ty, tx))
 	if bone.ascaleX < 0 then rotationIK = rotationIK + 180 end
 	if rotationIK > 180 then
-		rotationIK = rotationIK - 360
+	rotationIK = rotationIK - 360
 	elseif (rotationIK < -180) then
-		rotationIK = rotationIK + 360
+	rotationIK = rotationIK + 360
 	end
 	local sx = bone.ascaleX
 	local sy = bone.ascaleY
 	if compress or stretch then
+		if bone.data.transformMode == TransformMode.noScale or bone.data.transformMode == TransformMode.noScaleOrReflection then
+			tx = targetX - bone.worldX
+			ty = targetY - bone.worldY
+		end
 		local b = bone.data.length * sx
 		local dd = math_sqrt(tx * tx + ty * ty)
 		if (compress and dd < b) or (stretch and dd > b) and b > 0.0001 then
@@ -111,7 +145,7 @@ function IkConstraint:apply1 (bone, targetX, targetY, compress, stretch, uniform
 		end
 	end
 	bone:updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY)
-end
+	end
 
 function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch, softness, alpha)
 	if alpha == 0 then

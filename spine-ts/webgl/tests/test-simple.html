@@ -1,0 +1,87 @@
+<html>
+<script src="../../build/spine-webgl.js"></script>
+<style>
+	* { margin: 0; padding: 0; }
+	body, html { height: 100% }
+	canvas { position: absolute; width: 100% ;height: 100%; }
+</style>
+<body>
+<canvas id="canvas" style="background: red;"></canvas>
+</body>
+<script>
+
+var FILE = "spineboy-pro";
+var ANIMATION = "walk";
+var SCALE = 0.5;
+
+var canvas, context, gl, renderer, input, assetManager;
+var timeKeeper;
+var skeleton;
+var animationState;
+
+function init() {
+	canvas = document.getElementById("canvas");
+	canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+	context = new spine.webgl.ManagedWebGLRenderingContext(canvas, { alpha: false });
+	gl = context.gl;
+
+	renderer = new spine.webgl.SceneRenderer(canvas, context);
+	assetManager = new spine.webgl.AssetManager(context, "../example/assets/");
+	input = new spine.webgl.Input(canvas);
+
+	assetManager.loadTextureAtlas(FILE.replace("-pro", "").replace("-ess", "") + "-pma.atlas");	
+	assetManager.loadBinary(FILE + ".skel");
+
+	timeKeeper = new spine.TimeKeeper();
+	requestAnimationFrame(load);
+}
+
+var run = true;
+
+function load() {
+	timeKeeper.update();
+	if (assetManager.isLoadingComplete()) {
+		var atlas = assetManager.get(FILE.replace("-pro", "").replace("-ess", "") + "-pma.atlas");
+		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		
+		var skeletonBinary = new spine.SkeletonBinary(atlasLoader);
+		skeletonBinary.scale = SCALE;				
+
+		var time = new spine.TimeKeeper()		
+		var skeletonData = skeletonBinary.readSkeletonData(assetManager.get(FILE + ".skel"));		
+
+		skeleton = new spine.Skeleton(skeletonData);
+		var stateData = new spine.AnimationStateData(skeleton.data);
+		animationState = new spine.AnimationState(stateData);
+		stateData.defaultMix = 0;
+		animationState.setAnimation(0, ANIMATION, true);		
+
+		requestAnimationFrame(render);
+	} else {
+		requestAnimationFrame(load);
+	}
+}
+
+function render() {
+	var start = Date.now()
+	timeKeeper.update();
+	var delta = timeKeeper.delta;
+
+	animationState.update(delta);
+	animationState.apply(skeleton);
+	skeleton.updateWorldTransform();	
+
+	gl.clearColor(0.2, 0.2, 0.2, 1);
+	gl.clear(gl.COLOR_BUFFER_BIT);
+
+	renderer.resize(spine.webgl.ResizeMode.Fit);
+	renderer.begin();
+	renderer.drawSkeleton(skeleton, true);	
+	renderer.end();
+
+	requestAnimationFrame(render)	
+}
+
+init();
+</script>
+</html>

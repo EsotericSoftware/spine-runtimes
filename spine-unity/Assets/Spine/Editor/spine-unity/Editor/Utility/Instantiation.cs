@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #pragma warning disable 0219
@@ -47,6 +47,7 @@ namespace Spine.Unity.Editor {
 		public static class DragAndDropInstantiation {
 			public struct SpawnMenuData {
 				public Vector3 spawnPoint;
+				public Transform parent;
 				public SkeletonDataAsset skeletonDataAsset;
 				public EditorInstantiation.InstantiateDelegate instantiateDelegate;
 				public bool isUI;
@@ -81,7 +82,7 @@ namespace Spine.Unity.Editor {
 								RectTransform rectTransform = (Selection.activeGameObject == null) ? null : Selection.activeGameObject.GetComponent<RectTransform>();
 								Plane plane = (rectTransform == null) ? new Plane(Vector3.back, Vector3.zero) : new Plane(-rectTransform.forward, rectTransform.position);
 								Vector3 spawnPoint = MousePointToWorldPoint2D(mousePos, sceneview.camera, plane);
-								ShowInstantiateContextMenu(skeletonDataAsset, spawnPoint);
+								ShowInstantiateContextMenu(skeletonDataAsset, spawnPoint, null);
 								DragAndDrop.AcceptDrag();
 								current.Use();
 							}
@@ -90,13 +91,14 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			public static void ShowInstantiateContextMenu (SkeletonDataAsset skeletonDataAsset, Vector3 spawnPoint) {
+			public static void ShowInstantiateContextMenu (SkeletonDataAsset skeletonDataAsset, Vector3 spawnPoint, Transform parent) {
 				var menu = new GenericMenu();
 
 				// SkeletonAnimation
 				menu.AddItem(new GUIContent("SkeletonAnimation"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 					skeletonDataAsset = skeletonDataAsset,
 					spawnPoint = spawnPoint,
+					parent = parent,
 					instantiateDelegate = (data) => EditorInstantiation.InstantiateSkeletonAnimation(data),
 					isUI = false
 				});
@@ -109,6 +111,7 @@ namespace Spine.Unity.Editor {
 						menu.AddItem(new GUIContent("SkeletonGraphic (UI)"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 							skeletonDataAsset = skeletonDataAsset,
 							spawnPoint = spawnPoint,
+							parent = parent,
 							instantiateDelegate = System.Delegate.CreateDelegate(typeof(EditorInstantiation.InstantiateDelegate), graphicInstantiateDelegate) as EditorInstantiation.InstantiateDelegate,
 							isUI = true
 						});
@@ -120,7 +123,9 @@ namespace Spine.Unity.Editor {
 				menu.AddItem(new GUIContent("SkeletonMecanim"), false, HandleSkeletonComponentDrop, new SpawnMenuData {
 					skeletonDataAsset = skeletonDataAsset,
 					spawnPoint = spawnPoint,
-					instantiateDelegate = (data) => EditorInstantiation.InstantiateSkeletonMecanim(data)
+					parent = parent,
+					instantiateDelegate = (data) => EditorInstantiation.InstantiateSkeletonMecanim(data),
+					isUI = false
 				});
 #endif
 
@@ -141,16 +146,21 @@ namespace Spine.Unity.Editor {
 				GameObject newGameObject = newSkeletonComponent.gameObject;
 				Transform newTransform = newGameObject.transform;
 
-				var activeGameObject = Selection.activeGameObject;
-				if (isUI && activeGameObject != null)
-					newTransform.SetParent(activeGameObject.transform, false);
+				var usedParent = data.parent != null ? data.parent.gameObject : isUI ? Selection.activeGameObject : null;
+				if (usedParent)
+					newTransform.SetParent(usedParent.transform, false);
 
 				newTransform.position = isUI ? data.spawnPoint : RoundVector(data.spawnPoint, 2);
 
-				if (isUI && (activeGameObject == null || activeGameObject.GetComponent<RectTransform>() == null))
-					Debug.Log("Created a UI Skeleton GameObject not under a RectTransform. It may not be visible until you parent it to a canvas.");
+				if (isUI) {
+					if (usedParent != null && usedParent.GetComponent<RectTransform>() != null) {
+						((SkeletonGraphic)newSkeletonComponent).MatchRectTransformWithBounds();
+					}
+					else
+						Debug.Log("Created a UI Skeleton GameObject not under a RectTransform. It may not be visible until you parent it to a canvas.");
+				}
 
-				if (!isUI && activeGameObject != null && activeGameObject.transform.localScale != Vector3.one)
+				if (!isUI && usedParent != null && usedParent.transform.localScale != Vector3.one)
 					Debug.Log("New Spine GameObject was parented to a scaled Transform. It may not be the intended size.");
 
 				Selection.activeGameObject = newGameObject;

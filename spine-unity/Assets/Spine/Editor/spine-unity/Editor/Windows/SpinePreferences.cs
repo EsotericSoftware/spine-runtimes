@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #if UNITY_2017_2_OR_NEWER
@@ -75,6 +75,9 @@ namespace Spine.Unity.Editor {
 		internal const bool DEFAULT_SET_TEXTUREIMPORTER_SETTINGS = true;
 		public bool setTextureImporterSettings = DEFAULT_SET_TEXTUREIMPORTER_SETTINGS;
 
+		internal const string DEFAULT_TEXTURE_SETTINGS_REFERENCE = "";
+		public string textureSettingsReference = DEFAULT_TEXTURE_SETTINGS_REFERENCE;
+
 		internal const bool DEFAULT_ATLASTXT_WARNING = true;
 		public bool atlasTxtImportWarning = DEFAULT_ATLASTXT_WARNING;
 
@@ -97,7 +100,7 @@ namespace Spine.Unity.Editor {
 		// Timeline extension module
 		public const bool DEFAULT_TIMELINE_USE_BLEND_DURATION = true;
 		public bool timelineUseBlendDuration = DEFAULT_TIMELINE_USE_BLEND_DURATION;
-		
+
 #if NEW_PREFERENCES_SETTINGS_PROVIDER
 		public static void Load () {
 			GetOrCreateSettings();
@@ -146,7 +149,15 @@ namespace Spine.Unity.Editor {
 
 					SpineEditorUtilities.ShaderPropertyField(settings.FindProperty("defaultShader"), new GUIContent("Default Shader"), SpinePreferences.DEFAULT_DEFAULT_SHADER);
 
-					EditorGUILayout.PropertyField(settings.FindProperty("setTextureImporterSettings"), new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."));
+					EditorGUILayout.PropertyField(settings.FindProperty("setTextureImporterSettings"), new GUIContent("Apply Atlas Texture Settings", "Apply reference settings for Texture Importers."));
+					var textureSettingsRef = settings.FindProperty("textureSettingsReference");
+					SpineEditorUtilities.PresetAssetPropertyField(textureSettingsRef, new GUIContent("Atlas Texture Settings", "Apply the selected texture import settings at newly imported atlas textures. When exporting atlas textures from Spine with \"Premultiply alpha\" enabled (the default), you can leave it at \"PMATexturePreset\". If you have disabled \"Premultiply alpha\", set it to \"StraightAlphaTexturePreset\". You can also create your own TextureImporter Preset asset and assign it here."));
+					if (string.IsNullOrEmpty(textureSettingsRef.stringValue)) {
+						var pmaTextureSettingsReferenceGUIDS = AssetDatabase.FindAssets("PMATexturePreset");
+						if (pmaTextureSettingsReferenceGUIDS.Length > 0) {
+							textureSettingsRef.stringValue = AssetDatabase.GUIDToAssetPath(pmaTextureSettingsReferenceGUIDS[0]);
+						}
+					}
 				}
 
 				EditorGUILayout.Space();
@@ -181,14 +192,28 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				GUILayout.Space(20);
-				EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
-				using (new GUILayout.HorizontalScope()) {
-					EditorGUILayout.PrefixLabel("Define TK2D");
-					if (GUILayout.Button("Enable", GUILayout.Width(64)))
-						SpineEditorUtilities.SpineTK2DEditorUtility.EnableTK2D();
-					if (GUILayout.Button("Disable", GUILayout.Width(64)))
-						SpineEditorUtilities.SpineTK2DEditorUtility.DisableTK2D();
+				#if SPINE_TK2D_DEFINE
+				bool isTK2DDefineSet = true;
+				#else
+				bool isTK2DDefineSet = false;
+				#endif
+				bool isTK2DAllowed = SpineEditorUtilities.SpineTK2DEditorUtility.IsTK2DAllowed;
+				if (SpineEditorUtilities.SpineTK2DEditorUtility.IsTK2DInstalled() || isTK2DDefineSet) {
+					GUILayout.Space(20);
+					EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
+					using (new GUILayout.HorizontalScope()) {
+						EditorGUILayout.PrefixLabel("Define TK2D");
+						if (isTK2DAllowed && GUILayout.Button("Enable", GUILayout.Width(64)))
+							SpineEditorUtilities.SpineTK2DEditorUtility.EnableTK2D();
+						if (GUILayout.Button("Disable", GUILayout.Width(64)))
+							SpineEditorUtilities.SpineTK2DEditorUtility.DisableTK2D();
+					}
+					#if !SPINE_TK2D_DEFINE
+					if (!isTK2DAllowed) {
+						EditorGUILayout.LabelField("To allow TK2D support, please modify line 67 in", EditorStyles.boldLabel);
+						EditorGUILayout.LabelField("Spine/Editor/spine-unity/Editor/Util./BuildSettings.cs", EditorStyles.boldLabel);
+					}
+					#endif
 				}
 
 				GUILayout.Space(20);

@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
@@ -53,13 +53,13 @@ namespace Spine.Unity {
 	[ExecuteInEditMode]
 	#endif
 	[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
-	[HelpURL("http://esotericsoftware.com/spine-unity-rendering")]
+	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonRenderer-Component")]
 	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent, IHasSkeletonDataAsset {
-		[SerializeField] public SkeletonDataAsset skeletonDataAsset;
+		public SkeletonDataAsset skeletonDataAsset;
 
 		#region Initialization settings
 		/// <summary>Skin name to use when the Skeleton is initialized.</summary>
-		[SerializeField] [SpineSkin(defaultAsEmptyString:true)] public string initialSkinName;
+		[SpineSkin(defaultAsEmptyString:true)] public string initialSkinName;
 
 		/// <summary>Enable this parameter when overwriting the Skeleton's skin from an editor script.
 		/// Otherwise any changes will be overwritten by the next inspector update.</summary>
@@ -71,10 +71,20 @@ namespace Spine.Unity {
 		protected bool editorSkipSkinSync = false;
 		#endif
 		/// <summary>Flip X and Y to use when the Skeleton is initialized.</summary>
-		[SerializeField] public bool initialFlipX, initialFlipY;
+		public bool initialFlipX, initialFlipY;
 		#endregion
 
 		#region Advanced Render Settings
+
+		/// <summary>Update mode to optionally limit updates to e.g. only apply animations but not update the mesh.</summary>
+		public UpdateMode UpdateMode { get { return updateMode; } set { updateMode = value; } }
+		[SerializeField] protected UpdateMode updateMode = UpdateMode.FullUpdate;
+
+		/// <summary>Update mode used when the MeshRenderer becomes invisible
+		/// (when <c>OnBecameInvisible()</c> is called). Update mode is automatically
+		/// reset to <c>UpdateMode.FullUpdate</c> when the mesh becomes visible again.</summary>
+		public UpdateMode updateWhenInvisible = UpdateMode.FullUpdate;
+
 		// Submesh Separation
 		/// <summary>Slot names used to populate separatorSlots list when the Skeleton is initialized. Changing this after initialization does nothing.</summary>
 		[UnityEngine.Serialization.FormerlySerializedAs("submeshSeparators")][SerializeField][SpineSlot] protected string[] separatorSlotNames = new string[0];
@@ -226,6 +236,10 @@ namespace Spine.Unity {
 		/// <summary>OnRebuild is raised after the Skeleton is successfully initialized.</summary>
 		public event SkeletonRendererDelegate OnRebuild;
 
+		/// <summary>OnMeshAndMaterialsUpdated is called at the end of LateUpdate after the Mesh and
+		/// all materials have been updated.</summary>
+		public event SkeletonRendererDelegate OnMeshAndMaterialsUpdated;
+
 		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } } // ISkeletonComponent
 
 		#region Runtime Instantiation
@@ -351,11 +365,13 @@ namespace Spine.Unity {
 			#if UNITY_EDITOR && NEW_PREFAB_SYSTEM
 			// Don't store mesh or material at the prefab, otherwise it will permanently reload
 			var prefabType = UnityEditor.PrefabUtility.GetPrefabAssetType(this);
-			if (!UnityEditor.PrefabUtility.IsPartOfPrefabInstance(this) &&
+			if (UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this) &&
 				(prefabType == UnityEditor.PrefabAssetType.Regular || prefabType == UnityEditor.PrefabAssetType.Variant)) {
 				return;
 			}
 			#endif
+
+			if (updateMode <= UpdateMode.EverythingExceptMesh) return;
 
 			#if SPINE_OPTIONAL_RENDEROVERRIDE
 			bool doMeshOverride = generateMeshOverride != null;
@@ -468,6 +484,17 @@ namespace Spine.Unity {
 				SetMaterialSettingsToFixDrawOrder();
 			}
 			#endif
+
+			if (OnMeshAndMaterialsUpdated != null)
+				OnMeshAndMaterialsUpdated(this);
+		}
+
+		public void OnBecameVisible () {
+			updateMode = UpdateMode.FullUpdate;
+		}
+
+		public void OnBecameInvisible () {
+			updateMode = updateWhenInvisible;
 		}
 
 		public void FindAndApplySeparatorSlots (string startsWith, bool clearExistingSeparators = true, bool updateStringArray = false) {
@@ -522,7 +549,7 @@ namespace Spine.Unity {
 					separatorSlots.Add(slot);
 				}
 				#if UNITY_EDITOR
-				else
+				else if (!string.IsNullOrEmpty(separatorSlotNames[i]))
 				{
 					Debug.LogWarning(separatorSlotNames[i] + " is not a slot in " + skeletonDataAsset.skeletonJSON.name);
 				}

@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #pragma warning disable 0219
@@ -121,6 +121,9 @@ namespace Spine.Unity.Editor {
 			const string SET_TEXTUREIMPORTER_SETTINGS_KEY = "SPINE_SET_TEXTUREIMPORTER_SETTINGS";
 			public static bool setTextureImporterSettings = SpinePreferences.DEFAULT_SET_TEXTUREIMPORTER_SETTINGS;
 
+			const string TEXTURE_SETTINGS_REFERENCE_KEY = "SPINE_TEXTURE_SETTINGS_REFERENCE";
+			public static string textureSettingsReference = SpinePreferences.DEFAULT_TEXTURE_SETTINGS_REFERENCE;
+
 			const string ATLASTXT_WARNING_KEY = "SPINE_ATLASTXT_WARNING";
 			public static bool atlasTxtImportWarning = SpinePreferences.DEFAULT_ATLASTXT_WARNING;
 
@@ -154,6 +157,7 @@ namespace Spine.Unity.Editor {
 				defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, SpinePreferences.DEFAULT_DEFAULT_SHADER);
 				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, SpinePreferences.DEFAULT_SHOW_HIERARCHY_ICONS);
 				setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, SpinePreferences.DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
+				textureSettingsReference = EditorPrefs.GetString(TEXTURE_SETTINGS_REFERENCE_KEY, SpinePreferences.DEFAULT_TEXTURE_SETTINGS_REFERENCE);
 				autoReloadSceneSkeletons = EditorPrefs.GetBool(AUTO_RELOAD_SCENESKELETONS_KEY, SpinePreferences.DEFAULT_AUTO_RELOAD_SCENESKELETONS);
 				mecanimEventIncludeFolderName = EditorPrefs.GetBool(MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY, SpinePreferences.DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME);
 				atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
@@ -171,6 +175,7 @@ namespace Spine.Unity.Editor {
 				newPreferences.defaultShader = EditorPrefs.GetString(DEFAULT_SHADER_KEY, SpinePreferences.DEFAULT_DEFAULT_SHADER);
 				newPreferences.showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, SpinePreferences.DEFAULT_SHOW_HIERARCHY_ICONS);
 				newPreferences.setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, SpinePreferences.DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
+				newPreferences.textureSettingsReference = EditorPrefs.GetString(TEXTURE_SETTINGS_REFERENCE_KEY, SpinePreferences.DEFAULT_TEXTURE_SETTINGS_REFERENCE);
 				newPreferences.autoReloadSceneSkeletons = EditorPrefs.GetBool(AUTO_RELOAD_SCENESKELETONS_KEY, SpinePreferences.DEFAULT_AUTO_RELOAD_SCENESKELETONS);
 				newPreferences.mecanimEventIncludeFolderName = EditorPrefs.GetBool(MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY, SpinePreferences.DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME);
 				newPreferences.atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
@@ -186,6 +191,7 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetString(DEFAULT_SHADER_KEY, preferences.defaultShader);
 				EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, preferences.showHierarchyIcons);
 				EditorPrefs.SetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, preferences.setTextureImporterSettings);
+				EditorPrefs.SetString(TEXTURE_SETTINGS_REFERENCE_KEY, preferences.textureSettingsReference);
 				EditorPrefs.SetBool(AUTO_RELOAD_SCENESKELETONS_KEY, preferences.autoReloadSceneSkeletons);
 				EditorPrefs.SetBool(MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY, preferences.mecanimEventIncludeFolderName);
 				EditorPrefs.SetBool(ATLASTXT_WARNING_KEY, preferences.atlasTxtImportWarning);
@@ -226,6 +232,14 @@ namespace Spine.Unity.Editor {
 						EditorPrefs.SetString(DEFAULT_SHADER_KEY, defaultShader);
 
 					SpineEditorUtilities.BoolPrefsField(ref setTextureImporterSettings, SET_TEXTUREIMPORTER_SETTINGS_KEY, new GUIContent("Apply Atlas Texture Settings", "Apply the recommended settings for Texture Importers."));
+					SpineEditorUtilities.Texture2DPrefsField(ref textureSettingsReference, TEXTURE_SETTINGS_REFERENCE_KEY, new GUIContent("Atlas Texture Reference Settings", "Apply the selected reference texture import settings at newly imported atlas textures. When exporting atlas textures from Spine with \"Premultiply alpha\" enabled (the default), you can leave it at \"PMAPresetTemplate\". If you have disabled \"Premultiply alpha\", set it to \"StraightAlphaPresetTemplate\". You can also create your own reference texture asset and assign it here."));
+					if (string.IsNullOrEmpty(textureSettingsReference)) {
+						var pmaTextureSettingsReferenceGUIDS = AssetDatabase.FindAssets("PMAPresetTemplate");
+						if (pmaTextureSettingsReferenceGUIDS.Length > 0) {
+							textureSettingsReference = AssetDatabase.GUIDToAssetPath(pmaTextureSettingsReferenceGUIDS[0]);
+							EditorPrefs.SetString(TEXTURE_SETTINGS_REFERENCE_KEY, textureSettingsReference);
+						}
+					}
 				}
 
 				EditorGUILayout.Space();
@@ -264,14 +278,28 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				GUILayout.Space(20);
-				EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
-				using (new GUILayout.HorizontalScope()) {
-					EditorGUILayout.PrefixLabel("Define TK2D");
-					if (GUILayout.Button("Enable", GUILayout.Width(64)))
-						SpineTK2DEditorUtility.EnableTK2D();
-					if (GUILayout.Button("Disable", GUILayout.Width(64)))
-						SpineTK2DEditorUtility.DisableTK2D();
+				#if SPINE_TK2D_DEFINE
+				bool isTK2DDefineSet = true;
+				#else
+				bool isTK2DDefineSet = false;
+				#endif
+				bool isTK2DAllowed = SpineTK2DEditorUtility.IsTK2DAllowed;
+				if (SpineTK2DEditorUtility.IsTK2DInstalled() || isTK2DDefineSet) {
+					GUILayout.Space(20);
+					EditorGUILayout.LabelField("3rd Party Settings", EditorStyles.boldLabel);
+					using (new GUILayout.HorizontalScope()) {
+						EditorGUILayout.PrefixLabel("Define TK2D");
+						if (isTK2DAllowed && GUILayout.Button("Enable", GUILayout.Width(64)))
+							SpineTK2DEditorUtility.EnableTK2D();
+						if (GUILayout.Button("Disable", GUILayout.Width(64)))
+							SpineTK2DEditorUtility.DisableTK2D();
+					}
+					#if !SPINE_TK2D_DEFINE
+					if (!isTK2DAllowed) {
+						EditorGUILayout.LabelField("To allow TK2D support, please modify line 67 in", EditorStyles.boldLabel);
+						EditorGUILayout.LabelField("Spine/Editor/spine-unity/Editor/Util./BuildSettings.cs", EditorStyles.boldLabel);
+					}
+					#endif
 				}
 
 				GUILayout.Space(20);
@@ -299,7 +327,17 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		public static void FloatPropertyField(SerializedProperty property, GUIContent label, float min = float.NegativeInfinity, float max = float.PositiveInfinity) {
+		static void Texture2DPrefsField (ref string currentValue, string editorPrefsKey, GUIContent label) {
+			EditorGUI.BeginChangeCheck();
+			EditorGUIUtility.wideMode = true;
+			var texture = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Texture2D>(currentValue), typeof(Object), false) as Texture2D);
+			currentValue = texture != null ? AssetDatabase.GetAssetPath(texture) : "";
+			if (EditorGUI.EndChangeCheck()) {
+				EditorPrefs.SetString(editorPrefsKey, currentValue);
+			}
+		}
+
+		public static void FloatPropertyField (SerializedProperty property, GUIContent label, float min = float.NegativeInfinity, float max = float.PositiveInfinity) {
 			EditorGUI.BeginChangeCheck();
 			property.floatValue = EditorGUILayout.DelayedFloatField(label, property.floatValue);
 			if (EditorGUI.EndChangeCheck()) {
@@ -307,9 +345,18 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		public static void ShaderPropertyField(SerializedProperty property, GUIContent label, string fallbackShaderName) {
+		public static void ShaderPropertyField (SerializedProperty property, GUIContent label, string fallbackShaderName) {
 			var shader = (EditorGUILayout.ObjectField(label, Shader.Find(property.stringValue), typeof(Shader), false) as Shader);
 			property.stringValue = shader != null ? shader.name : fallbackShaderName;
 		}
+
+
+	#if NEW_PREFERENCES_SETTINGS_PROVIDER
+		public static void PresetAssetPropertyField (SerializedProperty property, GUIContent label) {
+			var texturePreset = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<UnityEditor.Presets.Preset>(property.stringValue), typeof(UnityEditor.Presets.Preset), false) as UnityEditor.Presets.Preset);
+			bool isTexturePreset = texturePreset != null && texturePreset.GetTargetTypeName() == "TextureImporter";
+			property.stringValue = isTexturePreset ? AssetDatabase.GetAssetPath(texturePreset) : "";
+		}
+	#endif
 	}
 }

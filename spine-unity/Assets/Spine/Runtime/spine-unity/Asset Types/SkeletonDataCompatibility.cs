@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,31 +15,37 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+#if UNITY_EDITOR
 using System.Globalization;
+using System.Text.RegularExpressions;
+#endif
 
 namespace Spine.Unity {
 
 	public static class SkeletonDataCompatibility {
 
+	#if UNITY_EDITOR
 		static readonly int[][] compatibleBinaryVersions = { new[] { 3, 8, 0 } };
 		static readonly int[][] compatibleJsonVersions = { new[] { 3, 8, 0 } };
 
 		static bool wasVersionDialogShown = false;
+		static readonly Regex jsonVersionRegex = new Regex(@"""spine""\s*:\s*""([^""]+)""", RegexOptions.CultureInvariant);
+	#endif
 
 		public enum SourceType {
 			Json,
@@ -90,27 +96,32 @@ namespace Spine.Unity {
 				}
 			}
 			else {
-				object obj = Json.Deserialize(new StringReader(asset.text));
-				if (obj == null) {
-					Debug.LogErrorFormat("'{0}' is not valid JSON.", asset.name);
-					return null;
+				Match match = jsonVersionRegex.Match(asset.text);
+				if (match != null) {
+					fileVersion.rawVersion = match.Groups[1].Value;
 				}
+				else {
+					object obj = Json.Deserialize(new StringReader(asset.text));
+					if (obj == null) {
+						Debug.LogErrorFormat("'{0}' is not valid JSON.", asset.name);
+						return null;
+					}
 
-				var root = obj as Dictionary<string, object>;
-				if (root == null) {
-					Debug.LogErrorFormat("'{0}' is not compatible JSON. Parser returned an incorrect type while parsing version info.", asset.name);
-					return null;
-				}
+					var root = obj as Dictionary<string, object>;
+					if (root == null) {
+						Debug.LogErrorFormat("'{0}' is not compatible JSON. Parser returned an incorrect type while parsing version info.", asset.name);
+						return null;
+					}
 
-				if (root.ContainsKey("skeleton")) {
-					var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
-					object jv;
-					skeletonInfo.TryGetValue("spine", out jv);
-					fileVersion.rawVersion = jv as string;
+					if (root.ContainsKey("skeleton")) {
+						var skeletonInfo = (Dictionary<string, object>)root["skeleton"];
+						object jv;
+						skeletonInfo.TryGetValue("spine", out jv);
+						fileVersion.rawVersion = jv as string;
+					}
 				}
 			}
 
-			string primaryRuntimeVersionDebugString = compatibleBinaryVersions[0][0] + "." + compatibleBinaryVersions[0][1];
 			if (string.IsNullOrEmpty(fileVersion.rawVersion)) {
 				// very likely not a Spine skeleton json file at all.
 				return null;
@@ -136,7 +147,7 @@ namespace Spine.Unity {
 			info.actualVersion = fileVersion;
 			info.compatibleVersions = (fileVersion.sourceType == SourceType.Binary) ? compatibleBinaryVersions
 				: compatibleJsonVersions;
-			
+
 			foreach (var compatibleVersion in info.compatibleVersions) {
 				bool majorMatch = fileVersion.version[0] == compatibleVersion[0];
 				bool minorMatch = fileVersion.version[1] == compatibleVersion[1];

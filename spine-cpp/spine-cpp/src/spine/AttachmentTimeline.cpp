@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #ifdef SPINE_UE4
@@ -57,6 +57,10 @@ AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(
 	}
 }
 
+void AttachmentTimeline::setAttachment(Skeleton& skeleton, Slot& slot, String* attachmentName) {
+    slot.setAttachment(attachmentName == NULL || attachmentName->isEmpty() ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName));
+}
+
 void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
 	MixBlend blend, MixDirection direction
 ) {
@@ -71,17 +75,15 @@ void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 	Slot &slot = *slotP;
 	if (!slot._bone.isActive()) return;
 
-	if (direction == MixDirection_Out && blend == MixBlend_Setup) {
-		attachmentName = &slot._data._attachmentName;
-		slot.setAttachment(attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName));
+	if (direction == MixDirection_Out) {
+	    if (blend == MixBlend_Setup) setAttachment(skeleton, slot, &slot._data._attachmentName);
 		return;
 	}
 
 	if (time < _frames[0]) {
 		// Time is before first frame.
 		if (blend == MixBlend_Setup || blend == MixBlend_First) {
-			attachmentName = &slot._data._attachmentName;
-			slot.setAttachment(attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName));
+            setAttachment(skeleton, slot, &slot._data._attachmentName);
 		}
 		return;
 	}
@@ -115,11 +117,11 @@ void AttachmentTimeline::setSlotIndex(size_t inValue) {
 	_slotIndex = inValue;
 }
 
-const Vector<float> &AttachmentTimeline::getFrames() {
+Vector<float> &AttachmentTimeline::getFrames() {
 	return _frames;
 }
 
-const Vector<String> &AttachmentTimeline::getAttachmentNames() {
+Vector<String> &AttachmentTimeline::getAttachmentNames() {
 	return _attachmentNames;
 }
 

@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,17 +15,19 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
+
+//#define USE_FAST_SIN_COS_ATAN2_APPROXIMATIONS
 
 using System;
 
@@ -36,6 +38,9 @@ namespace Spine {
 		public const float RadDeg = 180f / PI;
 		public const float DegRad = PI / 180;
 
+		static Random random = new Random();
+
+	#if USE_FAST_SIN_COS_ATAN2_APPROXIMATIONS
 		const int SIN_BITS = 14; // 16KB. Adjust for accuracy.
 		const int SIN_MASK = ~(-1 << SIN_BITS);
 		const int SIN_COUNT = SIN_MASK + 1;
@@ -45,8 +50,6 @@ namespace Spine {
 		const float DegToIndex = SIN_COUNT / DegFull;
 		static float[] sin = new float[SIN_COUNT];
 
-		static Random random = new Random();
-
 		static MathUtils () {
 			for (int i = 0; i < SIN_COUNT; i++)
 				sin[i] = (float)Math.Sin((i + 0.5f) / SIN_COUNT * RadFull);
@@ -54,22 +57,22 @@ namespace Spine {
 				sin[(int)(i * DegToIndex) & SIN_MASK] = (float)Math.Sin(i * DegRad);
 		}
 
-		/// <summary>Returns the sine in radians from a lookup table.</summary>
+		/// <summary>Returns the sine of a given angle in radians from a lookup table.</summary>
 		static public float Sin (float radians) {
 			return sin[(int)(radians * RadToIndex) & SIN_MASK];
 		}
 
-		/// <summary>Returns the cosine in radians from a lookup table.</summary>
+		/// <summary>Returns the cosine of a given angle in radians from a lookup table.</summary>
 		static public float Cos (float radians) {
 			return sin[(int)((radians + PI / 2) * RadToIndex) & SIN_MASK];
 		}
 
-		/// <summary>Returns the sine in radians from a lookup table.</summary>
+		/// <summary>Returns the sine of a given angle in degrees from a lookup table.</summary>
 		static public float SinDeg (float degrees) {
 			return sin[(int)(degrees * DegToIndex) & SIN_MASK];
 		}
 
-		/// <summary>Returns the cosine in radians from a lookup table.</summary>
+		/// <summary>Returns the cosine of a given angle in degrees from a lookup table.</summary>
 		static public float CosDeg (float degrees) {
 			return sin[(int)((degrees + 90) * DegToIndex) & SIN_MASK];
 		}
@@ -91,7 +94,32 @@ namespace Spine {
 			atan = PI / 2 - z / (z * z + 0.28f);
 			return y < 0f ? atan - PI : atan;
 		}
+	#else
+		/// <summary>Returns the sine of a given angle in radians.</summary>
+		static public float Sin (float radians) {
+			return (float)Math.Sin(radians);
+		}
 
+		/// <summary>Returns the cosine of a given angle in radians.</summary>
+		static public float Cos (float radians) {
+			return (float)Math.Cos(radians);
+		}
+
+		/// <summary>Returns the sine of a given angle in degrees.</summary>
+		static public float SinDeg (float degrees) {
+			return (float)Math.Sin(degrees * DegRad);
+		}
+
+		/// <summary>Returns the cosine of a given angle in degrees.</summary>
+		static public float CosDeg (float degrees) {
+			return (float)Math.Cos(degrees * DegRad);
+		}
+
+		/// <summary>Returns the atan2 using Math.Atan2.</summary>
+		static public float Atan2 (float y, float x) {
+			return (float)Math.Atan2(y, x);
+		}
+	#endif
 		static public float Clamp (float value, float min, float max) {
 			if (value < min) return min;
 			if (value > max) return max;

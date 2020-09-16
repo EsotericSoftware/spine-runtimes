@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #define SPINE_SKELETON_MECANIM
@@ -175,7 +175,7 @@ namespace Spine.Unity.Editor {
 			// Header
 			EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(target.name + " (SkeletonDataAsset)", Icons.spine), EditorStyles.whiteLargeLabel);
 			if (targetSkeletonData != null) EditorGUILayout.LabelField("(Drag and Drop to instantiate.)", EditorStyles.miniLabel);
-			
+
 			// Main Serialized Fields
 			using (var changeCheck = new EditorGUI.ChangeCheckScope()) {
 				using (new SpineInspectorUtility.BoxScope())
@@ -201,11 +201,11 @@ namespace Spine.Unity.Editor {
 					}
 				}
 			}
-			
+
 			// Unity Quirk: Some code depends on valid preview. If preview is initialized elsewhere, this can cause contents to change between Layout and Repaint events, causing GUILayout control count errors.
 			if (NoProblems())
 				preview.Initialize(this.Repaint, targetSkeletonDataAsset, this.LastSkinName);
-			
+
 			if (targetSkeletonData != null) {
 				GUILayout.Space(20f);
 
@@ -597,7 +597,7 @@ namespace Spine.Unity.Editor {
 				warnings.Add("Missing Skeleton JSON");
 			} else {
 				var fieldValue = (TextAsset)skeletonJSON.objectReferenceValue;
-				
+
 				if (!AssetUtility.IsSpineData(fieldValue, out compatibilityProblemInfo)) {
 					warnings.Add("Skeleton data file is not a valid Spine JSON or binary file.");
 				} else {
@@ -807,12 +807,12 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
+			const int PreviewLayer = 30;
+			const int PreviewCameraCullingMask = 1 << PreviewLayer;
+
 			if (previewRenderUtility == null) {
 				previewRenderUtility = new PreviewRenderUtility(true);
 				animationLastTime = CurrentTime;
-
-				const int PreviewLayer = 30;
-				const int PreviewCameraCullingMask = 1 << PreviewLayer;
 
 				{
 					var c = this.PreviewUtilityCamera;
@@ -825,32 +825,32 @@ namespace Spine.Unity.Editor {
 				}
 
 				DestroyPreviewGameObject();
+			}
 
-				if (previewGameObject == null) {
-					try {
-						previewGameObject = EditorInstantiation.InstantiateSkeletonAnimation(skeletonDataAsset, skinName).gameObject;
+			if (previewGameObject == null) {
+				try {
+					previewGameObject = EditorInstantiation.InstantiateSkeletonAnimation(skeletonDataAsset, skinName, useObjectFactory:false).gameObject;
 
-						if (previewGameObject != null) {
-							previewGameObject.hideFlags = HideFlags.HideAndDontSave;
-							previewGameObject.layer = PreviewLayer;
-							skeletonAnimation = previewGameObject.GetComponent<SkeletonAnimation>();
-							skeletonAnimation.initialSkinName = skinName;
-							skeletonAnimation.LateUpdate();
-							previewGameObject.GetComponent<Renderer>().enabled = false;
+					if (previewGameObject != null) {
+						previewGameObject.hideFlags = HideFlags.HideAndDontSave;
+						previewGameObject.layer = PreviewLayer;
+						skeletonAnimation = previewGameObject.GetComponent<SkeletonAnimation>();
+						skeletonAnimation.initialSkinName = skinName;
+						skeletonAnimation.LateUpdate();
+						previewGameObject.GetComponent<Renderer>().enabled = false;
 
-							#if SPINE_UNITY_2018_PREVIEW_API
-							previewRenderUtility.AddSingleGO(previewGameObject);
-							#endif
-						}
-
-						if (this.ActiveTrack != null) cameraAdjustEndFrame = EditorApplication.timeSinceStartup + skeletonAnimation.AnimationState.GetCurrent(0).Alpha;
-						AdjustCameraGoals();
-					} catch {
-						DestroyPreviewGameObject();
+						#if SPINE_UNITY_2018_PREVIEW_API
+						previewRenderUtility.AddSingleGO(previewGameObject);
+						#endif
 					}
 
-					RefreshOnNextUpdate();
+					if (this.ActiveTrack != null) cameraAdjustEndFrame = EditorApplication.timeSinceStartup + skeletonAnimation.AnimationState.GetCurrent(0).Alpha;
+					AdjustCameraGoals();
+				} catch {
+					DestroyPreviewGameObject();
 				}
+
+				RefreshOnNextUpdate();
 			}
 		}
 

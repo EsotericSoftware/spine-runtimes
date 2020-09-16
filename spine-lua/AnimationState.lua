@@ -1,8 +1,8 @@
 -------------------------------------------------------------------------------
 -- Spine Runtimes License Agreement
--- Last updated May 1, 2019. Replaces all prior versions.
+-- Last updated January 1, 2020. Replaces all prior versions.
 --
--- Copyright (c) 2013-2019, Esoteric Software LLC
+-- Copyright (c) 2013-2020, Esoteric Software LLC
 --
 -- Integration of the Spine Runtimes into software or otherwise creating
 -- derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
 -- Spine Editor license and redistribution of the Products in any form must
 -- include this license and copyright notice.
 --
--- THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
--- OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
--- OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
--- NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
--- INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
--- BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
--- INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
--- THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
--- NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
--- EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+-- EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+-- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+-- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+-- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+-- BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+-- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+-- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+-- THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
 local setmetatable = setmetatable
@@ -52,9 +52,12 @@ end
 local EMPTY_ANIMATION = Animation.new("<empty>", {}, 0)
 local SUBSEQUENT = 0
 local FIRST = 1
-local HOLD = 2
-local HOLD_MIX = 3
-local NOT_LAST = 4
+local HOLD_SUBSEQUENT = 2
+local HOLD_FIRST = 3
+local HOLD_MIX = 4
+
+local SETUP = 1
+local CURRENT = 2
 
 local EventType = {
 	start = 0,
@@ -214,7 +217,8 @@ function AnimationState.new (data)
 		propertyIDs = {},
 		animationsChanged = false,
 		timeScale = 1,
-		mixingTo = {}
+		mixingTo = {},
+		unkeyedState = 0
 	}
 	self.queue = EventQueue.new(self)
 	setmetatable(self, AnimationState)
@@ -227,7 +231,10 @@ function AnimationState:update (delta)
 	delta = delta * self.timeScale
 	local tracks = self.tracks
 	local queue = self.queue
-	for i,current in pairs(tracks) do
+	local numTracks = getNumTracks(tracks)
+	local i = 0
+	while i <= numTracks do
+		current = tracks[i]
 		if current then
 			current.animationLast = current.nextAnimationLast
 			current.trackLast = current.nextTrackLast
@@ -290,6 +297,7 @@ function AnimationState:update (delta)
 				end
 			end
 		end
+		i = i + 1
 	end
 
 	queue:drain()
@@ -329,52 +337,82 @@ function AnimationState:apply (skeleton)
 	local queue = self.queue
 	local applied = false
 
-	for i,current in pairs(tracks) do
-		if not (current == nil or current.delay > 0) then
-			applied = true
+	local numTracks = getNumTracks(tracks)
+	local i = 0
+	while i <= numTracks do
+		current = tracks[i]
+		if current then
+			if not (current == nil or current.delay > 0) then
+				applied = true
 
-			local blend = current.mixBlend
-			if i == 0 then blend = MixBlend.first end
+				local blend = current.mixBlend
+				if i == 0 then blend = MixBlend.first end
 
-			-- Apply mixing from entries first.
-			local mix = current.alpha
-			if current.mixingFrom then
-				mix = mix * self:applyMixingFrom(current, skeleton, blend)
-			elseif current.trackTime >= current.trackEnd and current.next == nil then
-				mix = 0
-			end
-
-			-- Apply current entry.
-			local animationLast = current.animationLast
-			local animationTime = current:getAnimationTime()
-			local timelines = current.animation.timelines
-			if (i == 0 and mix == 1) or blend == MixBlend.add then
-				for i,timeline in ipairs(timelines) do
-					timeline:apply(skeleton, animationLast, animationTime, self.events, mix, blend, MixDirection._in)
+				-- Apply mixing from entries first.
+				local mix = current.alpha
+				if current.mixingFrom then
+					mix = mix * self:applyMixingFrom(current, skeleton, blend)
+				elseif current.trackTime >= current.trackEnd and current.next == nil then
+					mix = 0
 				end
-			else
-				local timelineMode = current.timelineMode
-				local firstFrame = #current.timelinesRotation == 0
-				local timelinesRotation = current.timelinesRotation
 
-				for ii,timeline in ipairs(timelines) do
-					local timelineBlend = MixBlend.setup
-					if clearBit(timelineMode[ii], NOT_LAST) == SUBSEQUENT then timelineBlend = blend end
+				-- Apply current entry.
+				local animationLast = current.animationLast
+				local animationTime = current:getAnimationTime()
+				local timelines = current.animation.timelines
+				if (i == 0 and mix == 1) or blend == MixBlend.add then
+					for i,timeline in ipairs(timelines) do
+						if timeline.type == Animation.TimelineType.attachment then
+							self:applyAttachmentTimeline(timeline, skeleton, animationTime, blend, true)
+						else
+							timeline:apply(skeleton, animationLast, animationTime, self.events, mix, blend, MixDirection._in)
+						end
+					end
+				else
+					local timelineMode = current.timelineMode
+					local firstFrame = #current.timelinesRotation == 0
+					local timelinesRotation = current.timelinesRotation
 
-					if timeline.type == Animation.TimelineType.rotate then
-						self:applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii * 2,
-							firstFrame)
-					else
-						timeline:apply(skeleton, animationLast, animationTime, self.events, mix, timelineBlend, MixDirection._in)
+					for ii,timeline in ipairs(timelines) do
+						local timelineBlend = MixBlend.setup
+						if timelineMode[ii] == SUBSEQUENT then timelineBlend = blend end
+
+						if timeline.type == Animation.TimelineType.rotate then
+							self:applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii * 2,
+									firstFrame)
+						elseif timeline.type == Animation.TimelineType.attachment then
+							self:applyAttachmentTimeline(skeleton, animationTime, timelineBlend, true)
+						else
+							timeline:apply(skeleton, animationLast, animationTime, self.events, mix, timelineBlend, MixDirection._in)
+						end
 					end
 				end
+				self:queueEvents(current, animationTime)
+				self.events = {};
+				current.nextAnimationLast = animationTime
+				current.nextTrackLast = current.trackTime
 			end
-			self:queueEvents(current, animationTime)
-			self.events = {};
-			current.nextAnimationLast = animationTime
-			current.nextTrackLast = current.trackTime
+		end
+		i = i + 1
+	end
+
+	-- Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
+	-- subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
+	-- the time is before the first key).
+	local setupState = self.unkeyedState + SETUP
+	local slots = skeleton.slots;
+	for _, slot in ipairs(slots) do
+		if slot.attachmentState == setupState then
+			local attachmentName = slot.data.attachmentName
+			if attachmentName == nil then
+				slot.attachment = nil
+			else
+				slot.attachment = skeleton:getAttachmentByIndex(slot.data.index, attachmentName)
+			end
 		end
 	end
+	self.unkeyedState = self.unkeyedState + 2; -- Increasing after each use avoids the need to reset attachmentState for every slot.
+
 
 	queue:drain()
 	return applied
@@ -422,21 +460,17 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 			local direction = MixDirection.out;
 			local timelineBlend = MixBlend.setup
 			local alpha = 0
-			if clearBit(timelineMode[i], NOT_LAST) == SUBSEQUENT then
-				timelineBlend = blend
-				if not attachments and timeline.type == Animation.TimelineType.attachment then
-					if testBit(timelineMode[i], NOT_LAST) then
-						skipSubsequent = true
-					else
-						timelineBlend = MixBlend.setup
-					end
-				end
+			if timelineMode[i] == SUBSEQUENT then
 				if not drawOrder and timeline.type == Animation.TimelineType.drawOrder then skipSubsequent = true end
+				timelineBlend = blend
 				alpha = alphaMix
-			elseif clearBit(timelineMode[i], NOT_LAST) == FIRST then
+			elseif timelineMode[i] == FIRST then
 				timelineBlend = MixBlend.setup
 				alpha = alphaMix
-			elseif clearBit(timelineMode[i], NOT_LAST) == HOLD then
+			elseif timelineMode[i] == HOLD_SUBSEQUENT then
+				timelineBlend = blend
+				alpha = alphaHold
+			elseif timelineMode[i] == HOLD_FIRST then
 				timelineBlend = MixBlend.setup
 				alpha = alphaHold
 			else
@@ -449,13 +483,11 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 				from.totalAlpha = from.totalAlpha + alpha
 				if timeline.type == Animation.TimelineType.rotate then
 					self:applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i * 2, firstFrame)
+				elseif timeline.type == Animation.TimelineType.attachment then
+					self:applyAttachmentTimeline(timeline, skeleton, animationTime, timelineBlend, attachments)
 				else
-					if timelineBlend == MixBlend.setup then
-						if timeline.type == Animation.TimelineType.attachment then
-							if attachments or testBit(timelineMode[i], NOT_LAST) then direction = MixDirection._in end
-						elseif timeline.type == Animation.TimelineType.drawOrder then
-							if drawOrder then direction = MixDirection._in end
-						end
+					if (drawOrder and timeline.type == Animation.TimelineType.drawOrder and timelineBlend == MixBlend.setup) then
+						direction = MixDirection._in
 					end
 					timeline:apply(skeleton, animationLast, animationTime, self.events, alpha, timelineBlend, direction)
 				end
@@ -471,6 +503,38 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 	from.nextTrackLast = from.trackTime
 
 	return mix
+end
+
+function AnimationState:applyAttachmentTimeline(timeline, skeleton, time, blend, attachments)
+	local slot = skeleton.slots[timeline.slotIndex];
+	if slot.bone.active == false then return end
+
+	local frames = timeline.frames
+	if time < frames[0] then -- Time is before first frame.
+		if blend == MixBlend.setup or blend == MixBlend.first then
+			self:setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+		end
+	else
+		local frameIndex = 0
+		if (time >= frames[zlen(frames) - 1]) then -- Time is after last frame.
+			frameIndex = zlen(frames) - 1;
+		else
+			frameIndex = Animation.binarySearch(frames, time, 1) - 1;
+		end
+		self:setAttachment(skeleton, slot, timeline.attachmentNames[frameIndex], attachments)
+	end
+
+	-- If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
+	if slot.attachmentState <= self.unkeyedState then slot.attachmentState = self.unkeyedState + SETUP end
+end
+
+function AnimationState:setAttachment(skeleton, slot, attachmentName, attachments)
+	if (attachmentName == nil) then
+		slot.attachment = nil
+	else
+		slot.attachment = skeleton:getAttachmentByIndex(slot.data.index, attachmentName)
+	end
+	if attachments then slot.attachmentState = self.unkeyedState + CURRENT end
 end
 
 function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, blend, timelinesRotation, i, firstFrame)
@@ -602,7 +666,9 @@ function AnimationState:clearTracks ()
 	local tracks = self.tracks
 	local oldDrainDisabled = queue.drainDisabled
 	queue.drainDisabled = true;
-	for i,track in pairs(tracks) do
+	local numTracks = getNumTracks(tracks)
+	local i = 0
+	while i <= numTracks do
 		self:clearTrack(i)
 	end
 	tracks = {}
@@ -751,8 +817,13 @@ function AnimationState:setEmptyAnimations (mixDuration)
 	local queue = self.queue
 	local oldDrainDisabled = queue.drainDisabled
 	queue.drainDisabled = true
-	for i,current in pairs(self.tracks) do
+	local tracks = self.tracks
+	local numTracks = getNumTracks(tracks)
+	local i = 0
+	while i <= numTracks do
+		current = tracks[i]
 		if current then self:setEmptyAnimation(current.trackIndex, mixDuration) end
+		i = i + 1
 	end
 	queue.drainDisabled = oldDrainDisabled
 	queue:drain()
@@ -808,54 +879,43 @@ function AnimationState:disposeNext (entry)
 	entry.next = nil
 end
 
+function getNumTracks(tracks)
+	local numTracks = 0
+	if tracks then
+		for i, track in pairs(tracks) do
+			if i > numTracks then
+				numTracks = i
+			end
+		end
+	end
+	return numTracks
+end
+
 function AnimationState:_animationsChanged ()
 	self.animationsChanged = false
 
 	self.propertyIDs = {}
 
 	local highestIndex = -1
-	for i, entry in pairs(self.tracks) do
-		if i > highestIndex then highestIndex = i end
-
+	local tracks = self.tracks
+	local numTracks = getNumTracks(tracks)
+	local i = 0
+	while i <= numTracks do
+		entry = tracks[i]
 		if entry then
-			while entry.mixingFrom do
-				entry = entry.mixingFrom
-			end
+			if i > highestIndex then highestIndex = i end
 
-			repeat
-				if (entry.mixingTo == nil or entry.mixBlend ~= MixBlend.add) then
-					self:computeHold(entry)
+			if entry then
+				while entry.mixingFrom do
+					entry = entry.mixingFrom
 				end
-				entry = entry.mixingTo
-			until (entry == nil)
-		end
-	end
 
-	self.propertyIDs = {}
-	for i = highestIndex, 0, -1 do
-		entry = self.tracks[i]
-		while entry do
-			self:computeNotLast(entry)
-			entry = entry.mixingFrom
-		end
-	end
-end
-
-function AnimationState:computeNotLast(entry)
-	local timelines = entry.animation.timelines
-	local timelinesCount = #entry.animation.timelines
-	local timelineMode = entry.timelineMode
-	local propertyIDs = self.propertyIDs
-
-	local i = 1
-	while i <= timelinesCount do
-		local timeline = timelines[i]
-		if (timeline.type == Animation.TimelineType.attachment) then
-			local slotIndex = timeline.slotIndex
-			if not (propertyIDs[slotIndex] == nil) then
-				timelineMode[i] = setBit(timelineMode[i], NOT_LAST)
-			else
-				propertyIDs[slotIndex] = true
+				repeat
+					if (entry.mixingTo == nil or entry.mixBlend ~= MixBlend.add) then
+						self:computeHold(entry)
+					end
+					entry = entry.mixingTo
+				until (entry == nil)
 			end
 		end
 		i = i + 1
@@ -876,8 +936,10 @@ function AnimationState:computeHold(entry)
 			local id = "" .. timelines[i]:getPropertyId()
 			if propertyIDs[id] == nil then
 				propertyIDs[id] = id
+				timelineMode[i] = HOLD_FIRST
+			else
+				timelineMode[i] = HOLD_SUBSEQUENT
 			end
-			timelineMode[i] = HOLD
 		end
 		return
 	end
@@ -910,7 +972,7 @@ function AnimationState:computeHold(entry)
 					end
 					next = next.mixingTo
 				end
-				if not skip then 	timelineMode[i] = HOLD end
+				if not skip then 	timelineMode[i] = HOLD_FIRST end
 			end
 		end
 		i = i + 1

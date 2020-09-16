@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System;
@@ -159,17 +159,53 @@ namespace Spine {
 								float alpha) {
 			if (!bone.appliedValid) bone.UpdateAppliedTransform();
 			Bone p = bone.parent;
-			float id = 1 / (p.a * p.d - p.b * p.c);
-			float x = targetX - p.worldX, y = targetY - p.worldY;
-			float tx = (x * p.d - y * p.b) * id - bone.ax, ty = (y * p.a - x * p.c) * id - bone.ay;
-			float rotationIK = (float)Math.Atan2(ty, tx) * MathUtils.RadDeg - bone.ashearX - bone.arotation;
+
+			float pa = p.a, pb = p.b, pc = p.c, pd = p.d;
+			float rotationIK = -bone.ashearX - bone.arotation;
+			float tx = 0, ty = 0;
+
+			switch(bone.data.transformMode) {
+				case TransformMode.OnlyTranslation:
+					tx = targetX - bone.worldX;
+					ty = targetY - bone.worldY;
+					break;
+				case TransformMode.NoRotationOrReflection: {
+					float s = Math.Abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
+					float sa = pa / bone.skeleton.ScaleX;
+					float sc = pc / bone.skeleton.ScaleY;
+					pb = -sc * s * bone.skeleton.ScaleX;
+					pd = sa * s * bone.skeleton.ScaleY;
+					rotationIK += (float)Math.Atan2(pc, pa) * MathUtils.RadDeg;
+					goto default; // Fall through.
+                }
+                default: {
+					float x = targetX - p.worldX, y = targetY - p.worldY;
+                    float d = pa * pd - pb * pc;
+                    tx = (x * pd - y * pb) / d - bone.ax;
+                    ty = (y * pa - x * pc) / d - bone.ay;
+                    break;
+                }
+			}
+
+			rotationIK += (float)Math.Atan2(ty, tx) * MathUtils.RadDeg;
 			if (bone.ascaleX < 0) rotationIK += 180;
 			if (rotationIK > 180)
 				rotationIK -= 360;
 			else if (rotationIK < -180) //
 				rotationIK += 360;
+
 			float sx = bone.ascaleX, sy = bone.ascaleY;
 			if (compress || stretch) {
+				switch (bone.data.transformMode) {
+					case TransformMode.NoScale:
+                        tx = targetX - bone.worldX;
+                        ty = targetY - bone.worldY;
+                        break;
+                    case TransformMode.NoScaleOrReflection:
+						tx = targetX - bone.worldX;
+						ty = targetY - bone.worldY;
+                        break;
+				}
 				float b = bone.data.length * sx, dd = (float)Math.Sqrt(tx * tx + ty * ty);
 				if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001f) {
 					float s = (dd / b - 1) * alpha + 1;

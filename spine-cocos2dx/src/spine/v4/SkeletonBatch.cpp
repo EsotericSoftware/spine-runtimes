@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <spine/spine-cocos2dx.h>
@@ -59,15 +59,17 @@ void SkeletonBatch::destroyInstance () {
 
 SkeletonBatch::SkeletonBatch () {
 
-    auto program = backend::Device::getInstance()->newProgram(positionTextureColor_vert, positionTextureColor_frag);
+    auto program = backend::Program::getBuiltinProgram(backend::ProgramType::POSITION_TEXTURE_COLOR);
     _programState = std::make_shared<backend::ProgramState>(program);
-    program->autorelease();
-
+    
     auto vertexLayout = _programState->getVertexLayout();
 
-    vertexLayout->setAttribute("a_position", 0, backend::VertexFormat::FLOAT3, offsetof(V3F_C4B_T2F, vertices), false);
-    vertexLayout->setAttribute("a_color", 2, backend::VertexFormat::UBYTE4, offsetof(V3F_C4B_T2F, colors), true);
-    vertexLayout->setAttribute("a_texCoord", 1, backend::VertexFormat::FLOAT2, offsetof(V3F_C4B_T2F, texCoords), false);
+	auto locPosition = _programState->getAttributeLocation("a_position");
+	auto locTexcoord = _programState->getAttributeLocation("a_texCoord");
+	auto locColor = _programState->getAttributeLocation("a_color");
+    vertexLayout->setAttribute("a_position", locPosition, backend::VertexFormat::FLOAT3, offsetof(V3F_C4B_T2F, vertices), false);
+    vertexLayout->setAttribute("a_color", locColor, backend::VertexFormat::UBYTE4, offsetof(V3F_C4B_T2F, colors), true);
+    vertexLayout->setAttribute("a_texCoord", locTexcoord, backend::VertexFormat::FLOAT2, offsetof(V3F_C4B_T2F, texCoords), false);
     vertexLayout->setLayout(sizeof(_vertices[0]));
 
 

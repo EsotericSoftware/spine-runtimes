@@ -42,7 +42,7 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 11
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 0
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
-    serializedVersion: 8
+    serializedVersion: 9
     m_Resolution: 2
     m_BakeResolution: 40
     m_TextureWidth: 1024
@@ -87,7 +87,7 @@ LightmapSettings:
     m_PVRFilteringAtrousNormalSigma: 1
     m_PVRFilteringAtrousPositionSigma: 1
   m_LightingDataAsset: {fileID: 0}
-  m_ShadowMaskMode: 2
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -164,7 +164,7 @@ GameObject:
   - component: {fileID: 320097520}
   - component: {fileID: 320097519}
   m_Layer: 0
-  m_Name: play mode
+  m_Name: Description play mode bottom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -192,7 +192,8 @@ TextMesh:
   m_GameObject: {fileID: 320097517}
   m_Text: 'Enter <b>PLAY MODE</b> in Unity to see Spineboy animate.
 
-    Try moving, jumping and shooting. (WASD+Spacebar+Left Click, or XBOX Controller)'
+    Try moving, jumping, aiming and shooting. (WASD+Spacebar+Left&Right Click, or
+    XBOX Controller)'
   m_OffsetZ: 0
   m_CharacterSize: 0.12
   m_LineSpacing: 1
@@ -247,7 +248,6 @@ GameObject:
   m_Component:
   - component: {fileID: 611702906}
   - component: {fileID: 611702905}
-  - component: {fileID: 611702904}
   - component: {fileID: 611702903}
   - component: {fileID: 611702902}
   m_Layer: 0
@@ -265,13 +265,6 @@ AudioListener:
   m_GameObject: {fileID: 611702901}
   m_Enabled: 1
 --- !u!124 &611702903
-Behaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 611702901}
-  m_Enabled: 1
---- !u!92 &611702904
 Behaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -358,8 +351,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonDataAsset: {fileID: 11400000, guid: a467507a4ffb1d542a558739b2fede77, type: 2}
-  initialSkinName: base
+  skeletonDataAsset: {fileID: 11400000, guid: af38a3de26ed9b84abc2fe7c7f3b209d, type: 2}
+  initialSkinName: 
   initialFlipX: 0
   initialFlipY: 0
   separatorSlotNames: []
@@ -372,6 +365,11 @@ MonoBehaviour:
   singleSubmesh: 0
   addNormals: 0
   calculateTangents: 0
+  maskInteraction: 0
+  maskMaterials:
+    materialsMaskDisabled: []
+    materialsInsideMask: []
+    materialsOutsideMask: []
   disableRenderingOnOverride: 1
   _animationName: idle
   loop: 1
@@ -389,7 +387,7 @@ MeshRenderer:
   m_LightProbeUsage: 0
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1455e88fdb81ccc45bdeaedd657bad4d, type: 2}
+  - {fileID: 2100000, guid: f89bbf05902e77242a3ad20f3c927353, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -445,11 +443,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   model: {fileID: 299828574}
   skeletonAnimation: {fileID: 816033310}
-  run: {fileID: 11400000, guid: 2d841d20c203ff24a859b8c73f9c3817, type: 2}
-  idle: {fileID: 11400000, guid: 8a71ad90c9e356d4fa476a420aeb259d, type: 2}
-  shoot: {fileID: 11400000, guid: 6d4c548ed1818024bb6ed2ee16dbfc40, type: 2}
-  jump: {fileID: 11400000, guid: 69a6ea3cadcdebb44a8c3b5fa43880e7, type: 2}
-  footstepEvent: {fileID: 11400000, guid: 2657d9f265aa59446b055dc0c1018419, type: 2}
+  run: {fileID: 11400000, guid: d1297f325bf69cc49a8bcea4220abfed, type: 2}
+  idle: {fileID: 11400000, guid: 1002b1f05d1a2f94ab4ed89c14969f2f, type: 2}
+  aim: {fileID: 11400000, guid: 64d274c85f55c6446a74f25d5c7a2a7b, type: 2}
+  shoot: {fileID: 11400000, guid: 29de7da3aa10f4047bb89d253e6cf3af, type: 2}
+  jump: {fileID: 11400000, guid: 8bb8b27ff0842d64da0838b636c45e6b, type: 2}
+  footstepEvent: {fileID: 11400000, guid: 910b84ab2bcf7cc428f4a27a81bbe44b, type: 2}
   footstepPitchOffset: 0.2
   gunsoundPitchOffset: 0.13
   footstepSource: {fileID: 1858851856}
@@ -468,8 +467,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skeletonAnimation: {fileID: 816033310}
-  boneName: shoot target
-  camera: {fileID: 611702905}
+  boneName: crosshair
+  cam: {fileID: 611702905}
 --- !u!1 &1090490184
 GameObject:
   m_ObjectHideFlags: 0
@@ -608,6 +607,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   horizontalAxis: Horizontal
   attackButton: Fire1
+  aimButton: Fire2
   jumpButton: Jump
   model: {fileID: 299828574}
 --- !u!4 &1147196157
@@ -743,7 +743,7 @@ GameObject:
   - component: {fileID: 1447233441}
   - component: {fileID: 1447233440}
   m_Layer: 0
-  m_Name: Description
+  m_Name: Description top
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -846,7 +846,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1573724995}
   m_Layer: 0
-  m_Name: LABELS
+  m_Name: Description
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1065,9 +1065,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 2088845777}
-  - component: {fileID: 2088845780}
-  - component: {fileID: 2088845779}
   - component: {fileID: 2088845778}
+  - component: {fileID: 2088845779}
+  - component: {fileID: 2088845780}
   m_Layer: 0
   m_Name: PARTICLES Gun
   m_TagString: Untagged
@@ -1082,7 +1082,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2088845776}
   m_LocalRotation: {x: 0, y: 0, z: 0.08045987, w: 0.99675786}
-  m_LocalPosition: {x: 2.9171321, y: 3.744694, z: 0}
+  m_LocalPosition: {x: 2.8367755, y: 2.7568526, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 816033313}
@@ -1100,7 +1100,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   skeletonRenderer: {fileID: 816033310}
-  boneName: gunTip
+  boneName: gun-tip
+  followXYPosition: 1
   followZPosition: 0
   followBoneRotation: 0
   followSkeletonFlip: 1
@@ -1108,7 +1109,7 @@ MonoBehaviour:
   initializeOnAwake: 1
 --- !u!199 &2088845779
 ParticleSystemRenderer:
-  serializedVersion: 3
+  serializedVersion: 4
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
@@ -1157,6 +1158,7 @@ ParticleSystemRenderer:
   m_Mesh1: {fileID: 0}
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
+  m_MaskInteraction: 0
 --- !u!198 &2088845780
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -1169,7 +1171,9 @@ ParticleSystem:
   looping: 0
   prewarm: 0
   playOnAwake: 0
+  useUnscaledTime: 0
   autoRandomSeed: 1
+  useRigidbodyForVelocity: 1
   startDelay:
     serializedVersion: 2
     minMaxState: 0
@@ -1202,7 +1206,7 @@ ParticleSystem:
   moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
-  randomSeed: 823379790
+  randomSeed: 255519693
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -1583,14 +1587,29 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
   ShapeModule:
-    serializedVersion: 4
+    serializedVersion: 5
     enabled: 1
     type: 10
     angle: 25
     length: 5
-    boxX: 1
-    boxY: 1
-    boxZ: 1
+    boxThickness: {x: 0, y: 0, z: 0}
+    radiusThickness: 1
+    donutRadius: 0.2
+    m_Position: {x: 0, y: 0, z: 0}
+    m_Rotation: {x: 0, y: 0, z: 0}
+    m_Scale: {x: 1, y: 1, z: 1}
+    placementMode: 0
+    m_Mesh: {fileID: 0}
+    m_MeshRenderer: {fileID: 0}
+    m_SkinnedMeshRenderer: {fileID: 0}
+    m_MeshMaterialIndex: 0
+    m_MeshNormalOffset: 0
+    m_UseMeshMaterialIndex: 0
+    m_UseMeshColors: 1
+    alignToDirection: 0
+    randomDirectionAmount: 0
+    sphericalDirectionAmount: 0
+    randomPositionAmount: 0
     radius:
       value: 1
       mode: 0
@@ -1681,18 +1700,6 @@ ParticleSystem:
           m_PreInfinity: 2
           m_PostInfinity: 2
           m_RotationOrder: 4
-    placementMode: 0
-    m_Mesh: {fileID: 0}
-    m_MeshRenderer: {fileID: 0}
-    m_SkinnedMeshRenderer: {fileID: 0}
-    m_MeshMaterialIndex: 0
-    m_MeshNormalOffset: 0
-    m_MeshScale: 1
-    m_UseMeshMaterialIndex: 0
-    m_UseMeshColors: 1
-    alignToDirection: 0
-    randomDirectionAmount: 0
-    sphericalDirectionAmount: 0
   EmissionModule:
     enabled: 1
     serializedVersion: 4
@@ -2110,6 +2117,7 @@ ParticleSystem:
         m_NumAlphaKeys: 2
   UVModule:
     enabled: 0
+    mode: 0
     frameOverTime:
       serializedVersion: 2
       minMaxState: 1
@@ -2201,6 +2209,8 @@ ParticleSystem:
     flipU: 0
     flipV: 0
     randomRow: 1
+    sprites:
+    - sprite: {fileID: 0}
   VelocityModule:
     enabled: 0
     x:
@@ -2967,6 +2977,129 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     remapEnabled: 0
+    positionAmount:
+      serializedVersion: 2
+      minMaxState: 0
+      scalar: 1
+      minScalar: 1
+      maxCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 2
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        - serializedVersion: 2
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      minCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 2
+          time: 0
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        - serializedVersion: 2
+          time: 1
+          value: 1
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+    rotationAmount:
+      serializedVersion: 2
+      minMaxState: 0
+      scalar: 0
+      minScalar: 0
+      maxCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 2
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        - serializedVersion: 2
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      minCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 2
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        - serializedVersion: 2
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+    sizeAmount:
+      serializedVersion: 2
+      minMaxState: 0
+      scalar: 0
+      minScalar: 0
+      maxCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 2
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        - serializedVersion: 2
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      minCurve:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 2
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        - serializedVersion: 2
+          time: 1
+          value: 0
+          inSlope: 0
+          outSlope: 0
+          tangentMode: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
   SizeBySpeedModule:
     enabled: 0
     curve:
@@ -3292,6 +3425,10 @@ ParticleSystem:
     serializedVersion: 3
     type: 0
     collisionMode: 0
+    colliderForce: 0
+    multiplyColliderForceByParticleSize: 0
+    multiplyColliderForceByParticleSpeed: 0
+    multiplyColliderForceByCollisionAngle: 1
     plane0: {fileID: 0}
     plane1: {fileID: 0}
     plane2: {fileID: 0}
@@ -3595,6 +3732,7 @@ ParticleSystem:
     sizeAffectsWidth: 1
     sizeAffectsLifetime: 0
     inheritParticleColor: 1
+    generateLightingData: 0
     colorOverLifetime:
       serializedVersion: 2
       minMaxState: 0
@@ -4232,7 +4370,7 @@ GameObject:
   - component: {fileID: 2111197922}
   - component: {fileID: 2111197921}
   m_Layer: 0
-  m_Name: New Sprite
+  m_Name: Black bar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4279,6 +4417,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
 --- !u!4 &2111197922
 Transform:
   m_ObjectHideFlags: 0

@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #include <spine/SkeletonJson.h>
@@ -152,7 +152,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	Json* slots = Json_getItem(root, "slots");
 	Json* ik = Json_getItem(root, "ik");
 	Json* transform = Json_getItem(root, "transform");
-	Json* paths = Json_getItem(root, "paths");
+	Json* path = Json_getItem(root, "path");
 	Json* deformJson = Json_getItem(root, "deform");
 	Json* drawOrderJson = Json_getItem(root, "drawOrder");
 	Json* events = Json_getItem(root, "events");
@@ -165,7 +165,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 		timelinesCount += slotMap->size;
 	timelinesCount += ik ? ik->size : 0;
 	timelinesCount += transform ? transform->size : 0;
-	for (constraintMap = paths ? paths->child : 0; constraintMap; constraintMap = constraintMap->next)
+	for (constraintMap = path ? path->child : 0; constraintMap; constraintMap = constraintMap->next)
 		timelinesCount += constraintMap->size;
 	for (constraintMap = deformJson ? deformJson->child : 0; constraintMap; constraintMap = constraintMap->next)
 		for (slotMap = constraintMap->child; slotMap; slotMap = slotMap->next)
@@ -331,7 +331,7 @@ static spAnimation* _spSkeletonJson_readAnimation (spSkeletonJson* self, Json* r
 	}
 
 	/** Path constraint timelines. */
-	for(constraintMap = paths ? paths->child : 0; constraintMap; constraintMap = constraintMap->next ) {
+	for(constraintMap = path ? path->child : 0; constraintMap; constraintMap = constraintMap->next ) {
 		int constraintIndex, i;
 		Json* timelineMap;
 
@@ -607,6 +607,11 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 	if (skeleton) {
 		MALLOC_STR(skeletonData->hash, Json_getString(skeleton, "hash", 0));
 		MALLOC_STR(skeletonData->version, Json_getString(skeleton, "spine", 0));
+        if (strcmp(skeletonData->version, "3.8.75") == 0) {
+            spSkeletonData_dispose(skeletonData);
+            _spSkeletonJson_setError(self, root, "Unsupported skeleton data, please export with a newer version of Spine.", "");
+            return 0;
+        }
 		skeletonData->x = Json_getFloat(skeleton, "x", 0);
 		skeletonData->y = Json_getFloat(skeleton, "y", 0);
 		skeletonData->width = Json_getFloat(skeleton, "width", 0);

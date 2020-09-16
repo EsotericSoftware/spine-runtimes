@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script src="jscolor.js"></script>
+	<script src="ui.js"></script>
+	<script src="loader.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<style>
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	font-family: sans-serif;
+}
+
+#dropzone {
+	width: 100%;
+	height: 100vh;
+	background: #cccccc;
+	text-align: center;
+	line-height: 100vh;
+
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+
+	cursor: pointer;
+}
+
+#editor {
+	display: flex;
+	flex-direction: row-reverse;
+	width: 100%;
+	height: 100vh;
+	background: #aaaaaa;
+}
+
+#player {
+	width: 100%;
+	height: 100%;
+}
+
+#config {
+	width: 100%;
+	height: 100%;
+	padding: 1em;
+	background: #f0f0f0;
+}
+
+</style>
+
+<body>
+	<div id="dropzone">
+		Click to choose .skel/.json, .atlas, and .png files, or drop them here.
+	</div>
+
+	<div id="editor" style="display: none">
+	</div>
+
+	<script>
+		var UI;
+		var Loader;
+		var dropZone = document.getElementById("dropzone");
+		var editor = document.getElementById("editor")
+
+		function showError(errorMessage) {
+			alert(errorMessage);
+		}
+
+		window.addEventListener("load", function(event) {
+			UI = spineGenerator.UI;
+			Loader = spineGenerator.Loader;
+			var dropZone = document.getElementById("dropzone");
+			new UI.DropZone(dropZone, true, ".json,.skel,.atlas,.png", function (files) {
+				spineGenerator.Loader.loadSkeletonFiles(files, function(data) {
+					console.log(`Loaded files ${data.jsonFile} ${data.skelFile} ${data.atlasFile}`);
+					console.log(`${data.version} ${data.majorVersion} ${data.minorVersion} ${data.patchVersion}`);
+
+					spine = null;
+					var cssUrl = `https://esotericsoftware.com/files/spine-player/${data.majorVersion}.${data.minorVersion}/spine-player.css`;
+					var playerUrl = `https://esotericsoftware.com/files/spine-player/${data.majorVersion}.${data.minorVersion}/spine-player.js`;
+
+					Loader.loadStyle(cssUrl, function () {
+						Loader.loadJavaScript(playerUrl, function () {
+							UI.hide(dropZone)
+							setupEditor(editor, data);
+						});
+					}, showError);
+				}, showError);
+			}, showError);
+		});
+
+		function setupEditor(editor, data) {
+			setupPlayer(editor, data, function(player) {
+				setupConfig(editor, player, data);
+				UI.show(editor, "flex");
+			}, showError)
+		}
+
+		function setupPlayer(editor, data, success, error) {
+			var playerElement = UI.createElement(editor, `<div id="player"></div>`);
+
+			var config = {
+				jsonUrl: data.jsonFile,
+				skelUrl: data.skelFile,
+				atlasUrl: data.atlasFile,
+				rawDataURIs: data.dataUrls,
+				success: success,
+				error: error,
+				alpha: true, // needed so we can emulate shizzle
+				viewport: { // needed so we can see viewport bounds
+					debugRender: true
+				}
+			};
+
+			return new spine.SpinePlayer(playerElement, config);
+		}
+
+		function setupConfig(editor, player, data) {
+			var cfg = UI.createElement(editor, `<div id="config"></div>`);
+
+			var topBar = UI.createElement(cfg, /*html*/`
+				<div style="display: flex; flex-direction: row;">
+					<button type="button">New</button>
+					<button type="button">Download HTML</button>
+				</div>
+			`);
+
+			var newButton = topBar.children[0];
+			newButton.onclick = function() {
+				player.stopRendering();
+				UI.show(dropZone);
+				UI.clear(editor);
+				UI.hide(editor);
+			}
+			var downloadButton = topBar.children[1];
+
+			UI.createElement(cfg, `<h3>General</h3>`);
+		}
+	</script>
+</body>
+</html>

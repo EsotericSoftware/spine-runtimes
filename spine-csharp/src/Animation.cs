@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System;
@@ -43,9 +43,13 @@ namespace Spine {
 		public Animation (string name, ExposedList<Timeline> timelines, float duration) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			if (timelines == null) throw new ArgumentNullException("timelines", "timelines cannot be null.");
-			this.timelineIds = new HashSet<int>();
-			foreach (Timeline timeline in timelines)
-				timelineIds.Add(timeline.PropertyId);
+			// Note: avoiding reallocations by adding all hash set entries at
+			// once (EnsureCapacity() is only available in newer .Net versions).
+			int[] propertyIDs = new int[timelines.Count];
+			for (int i = 0; i < timelines.Count; ++i) {
+				propertyIDs[i] = timelines.Items[i].PropertyId;
+			}
+			this.timelineIds = new HashSet<int>(propertyIDs);
 			this.name = name;
 			this.timelines = timelines;
 			this.duration = duration;
@@ -143,7 +147,7 @@ namespace Spine {
 		///                   apply animations on top of each other (layered).</param>
 		///  <param name="blend"> Controls how mixing is applied when <code>alpha</code> < 1.</param>
 		///  <param name="direction"> Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions,
-		///                   such as <see cref="DrawOrderTimeline"/> or <see cref="AttachmentTimeline"/>.</param>
+		///                   such as <see cref="DrawOrderTimeline"/> or <see cref="AttachmentTimeline"/>, and other such as {@link ScaleTimeline}.</param>
 		void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixBlend blend, MixDirection direction);
 		/// <summary>Uniquely encodes both the type of this timeline and the skeleton property that it affects.</summary>
 		int PropertyId { get; }
@@ -725,6 +729,7 @@ namespace Spine {
 					slot.g += (slotData.g - slot.g) * alpha;
 					slot.b += (slotData.b - slot.b) * alpha;
 					slot.a += (slotData.a - slot.a) * alpha;
+					slot.ClampColor();
 					return;
 				}
 				return;
@@ -758,6 +763,7 @@ namespace Spine {
 				slot.g = g;
 				slot.b = b;
 				slot.a = a;
+				slot.ClampColor();
 			} else {
 				float br, bg, bb, ba;
 				if (blend == MixBlend.Setup) {
@@ -775,6 +781,7 @@ namespace Spine {
 				slot.g = bg + ((g - bg) * alpha);
 				slot.b = bb + ((b - bb) * alpha);
 				slot.a = ba + ((a - ba) * alpha);
+				slot.ClampColor();
 			}
 		}
 	}
@@ -839,18 +846,22 @@ namespace Spine {
 					slot.g = slotData.g;
 					slot.b = slotData.b;
 					slot.a = slotData.a;
+					slot.ClampColor();
 					slot.r2 = slotData.r2;
 					slot.g2 = slotData.g2;
 					slot.b2 = slotData.b2;
+					slot.ClampSecondColor();
 					return;
 				case MixBlend.First:
 					slot.r += (slot.r - slotData.r) * alpha;
 					slot.g += (slot.g - slotData.g) * alpha;
 					slot.b += (slot.b - slotData.b) * alpha;
 					slot.a += (slot.a - slotData.a) * alpha;
+					slot.ClampColor();
 					slot.r2 += (slot.r2 - slotData.r2) * alpha;
 					slot.g2 += (slot.g2 - slotData.g2) * alpha;
 					slot.b2 += (slot.b2 - slotData.b2) * alpha;
+					slot.ClampSecondColor();
 					return;
 				}
 				return;
@@ -893,9 +904,11 @@ namespace Spine {
 				slot.g = g;
 				slot.b = b;
 				slot.a = a;
+				slot.ClampColor();
 				slot.r2 = r2;
 				slot.g2 = g2;
 				slot.b2 = b2;
+				slot.ClampSecondColor();
 			} else {
 				float br, bg, bb, ba, br2, bg2, bb2;
 				if (blend == MixBlend.Setup) {
@@ -919,9 +932,11 @@ namespace Spine {
 				slot.g = bg + ((g - bg) * alpha);
 				slot.b = bb + ((b - bb) * alpha);
 				slot.a = ba + ((a - ba) * alpha);
+				slot.ClampColor();
 				slot.r2 = br2 + ((r2 - br2) * alpha);
 				slot.g2 = bg2 + ((g2 - bg2) * alpha);
 				slot.b2 = bb2 + ((b2 - bb2) * alpha);
+				slot.ClampSecondColor();
 			}
 		}
 
@@ -970,21 +985,16 @@ namespace Spine {
 
 		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 							MixDirection direction) {
-			string attachmentName;
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
-			if (direction == MixDirection.Out && blend == MixBlend.Setup) {
-				attachmentName = slot.data.attachmentName;
-				slot.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
+			if (direction == MixDirection.Out) {
+				if (blend == MixBlend.Setup) SetAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
 			}
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				if (blend == MixBlend.Setup || blend == MixBlend.First) {
-					attachmentName = slot.data.attachmentName;
-					slot.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
-				}
+				if (blend == MixBlend.Setup || blend == MixBlend.First) SetAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
 			}
 
@@ -994,7 +1004,10 @@ namespace Spine {
 			else
 				frameIndex = Animation.BinarySearch(frames, time) - 1;
 
-			attachmentName = attachmentNames[frameIndex];
+			SetAttachment(skeleton, slot, attachmentNames[frameIndex]);
+		}
+
+		private void SetAttachment (Skeleton skeleton, Slot slot, string attachmentName) {
 			slot.Attachment = attachmentName == null ? null : skeleton.GetAttachment(slotIndex, attachmentName);
 		}
 	}
@@ -1332,8 +1345,8 @@ namespace Spine {
 							MixDirection direction) {
 			ExposedList<Slot> drawOrder = skeleton.drawOrder;
 			ExposedList<Slot> slots = skeleton.slots;
-			if (direction == MixDirection.Out && blend == MixBlend.Setup) {
-				Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
+			if (direction == MixDirection.Out) {
+				if (blend == MixBlend.Setup) Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
 				return;
 			}
 

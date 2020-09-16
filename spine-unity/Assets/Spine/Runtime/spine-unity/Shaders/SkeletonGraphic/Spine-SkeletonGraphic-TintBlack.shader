@@ -6,9 +6,11 @@ Shader "Spine/SkeletonGraphic Tint Black"
 	{
 		[PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
+		[Toggle(_CANVAS_GROUP_COMPATIBLE)] _CanvasGroupCompatible("CanvasGroup Compatible", Int) = 0
 
-		_Color ("Tint", Color) = (1,1,1,1)
-		_Black ("Black Point", Color) = (0,0,0,0)
+		_Color ("Tint Color", Color) = (1,1,1,1)
+		_Black ("Dark Color", Color) = (0,0,0,0)
+		[Toggle(_DARK_COLOR_ALPHA_ADDITIVE)] _DarkColorAlphaAdditive("Additive DarkColor.A", Int) = 0
 
 		[HideInInspector][Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp ("Stencil Comparison", Float) = 8
 		[HideInInspector] _Stencil ("Stencil ID", Float) = 0
@@ -64,6 +66,8 @@ Shader "Spine/SkeletonGraphic Tint Black"
 
 		CGPROGRAM
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
+			#pragma shader_feature _ _CANVAS_GROUP_COMPATIBLE
+			#pragma shader_feature _ _DARK_COLOR_ALPHA_ADDITIVE
 			#pragma vertex vert
 			#pragma fragment frag
 
@@ -85,9 +89,8 @@ Shader "Spine/SkeletonGraphic Tint Black"
 				float4 vertex   : SV_POSITION;
 				fixed4 color    : COLOR;
 				half2 texcoord  : TEXCOORD0;
-				float2 uv1 : TEXCOORD1;
-				float2 uv2 : TEXCOORD2;
-				float4 worldPosition : TEXCOORD3;
+				float4 darkColor : TEXCOORD1;
+				float4 worldPosition : TEXCOORD2;
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
 
@@ -106,29 +109,35 @@ Shader "Spine/SkeletonGraphic Tint Black"
 				OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
 				OUT.texcoord = IN.texcoord;
 
-				OUT.color = IN.color * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
-				OUT.uv1 = IN.uv1;
-				OUT.uv2 = IN.uv2;
+				OUT.color = IN.color * _Color;
+				OUT.darkColor = float4(IN.uv1.r, IN.uv1.g, IN.uv2.r, IN.uv2.g);
 				return OUT;
 			}
 
 			sampler2D _MainTex;
+			#include "../CGIncludes/Spine-Skeleton-Tint-Common.cginc"
 
 			fixed4 frag (VertexOutput IN) : SV_Target
 			{
 				half4 texColor = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd);
-
-				#if defined(_STRAIGHT_ALPHA_INPUT)
-				texColor.rgb *= texColor.a;
-				#endif
-
 				texColor *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
-
 				#ifdef UNITY_UI_ALPHACLIP
-				clip (texColor.a - 0.001);
+				clip(texColor.a - 0.001);
 				#endif
 
-				return (texColor * IN.color) + float4(((1-texColor.rgb) * (_Black.rgb + float3(IN.uv1.r, IN.uv1.g, IN.uv2.r)) * texColor.a * _Color.a * IN.color.a), 0);
+				float4 vertexColor = IN.color;
+			#ifdef _CANVAS_GROUP_COMPATIBLE
+				// CanvasGroup alpha multiplies existing vertex color alpha, but
+				// does not premultiply it to rgb components. This causes problems
+				// with additive blending (alpha = 0), which is why we store the
+				// alpha value in uv2.g (darkColor.a).
+				vertexColor.a = IN.darkColor.a;
+			#endif
+				float4 fragColor = fragTintedColor(texColor, _Black.rgb + IN.darkColor, vertexColor, _Black.a);
+			#ifdef _CANVAS_GROUP_COMPATIBLE
+				fragColor.rgba *= IN.color.a;
+			#endif
+				return fragColor;
 			}
 		ENDCG
 		}

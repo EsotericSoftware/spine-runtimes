@@ -28,7 +28,8 @@ cmake_minimum_required(VERSION 3.6)
 set(APP_NAME spine-cocos2dx-example)
 
 project(${APP_NAME})
-option(BUILD_EDITOR_SPINE "Build editor support for spine" ON)
+set(BUILD_EDITOR_SPINE OFF CACHE BOOL "Build editor support for spine" FORCE)
+set(BUILD_EXTENSIONS OFF CACHE BOOL "Build extensions" FORCE)
 
 if(XCODE)
     if(NOT DEFINED CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET)
@@ -152,9 +153,9 @@ if(APPLE)
     set_target_properties(${APP_NAME} PROPERTIES RESOURCE "${APP_UI_RES}")
 
     if(MACOSX)
-        set_xcode_property(${APP_NAME} INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/mac/Info.plist")
+        set_target_properties(${APP_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/mac/Info.plist")
     elseif(IOS)
-        set_xcode_property(${APP_NAME} INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/ios/Info.plist")
+        set_target_properties(${APP_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/ios/Info.plist")
         set_xcode_property(${APP_NAME} ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon")
     endif()
 

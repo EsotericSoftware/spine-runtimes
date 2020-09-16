@@ -9,8 +9,6 @@ Shader "Lightweight Render Pipeline/Spine/Sprite"
 		_BumpMap("Normal Map", 2D) = "bump" {}
 
 		[MaterialToggle] PixelSnap("Pixel snap", Float) = 0
-		[PerRendererData] _AlphaTex("External Alpha", 2D) = "white" {} 
-		[PerRendererData] _EnableExternalAlpha("Enable External Alpha", Float) = 0
 
 		_EmissionColor("Color", Color) = (0,0,0,0)
 		_EmissionMap("Emission", 2D) = "white" {}
@@ -83,7 +81,7 @@ Shader "Lightweight Render Pipeline/Spine/Sprite"
 			// -------------------------------------
 			// Material Keywords
 			#pragma shader_feature _ _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON _ADDITIVEBLEND _ADDITIVEBLEND_SOFT _MULTIPLYBLEND _MULTIPLYBLEND_X2
-			#pragma shader_feature _ _FIXED_NORMALS_VIEWSPACE _FIXED_NORMALS_VIEWSPACE_BACKFACE _FIXED_NORMALS_MODELSPACE  _FIXED_NORMALS_MODELSPACE_BACKFACE
+			#pragma shader_feature _ _FIXED_NORMALS_VIEWSPACE _FIXED_NORMALS_VIEWSPACE_BACKFACE _FIXED_NORMALS_MODELSPACE _FIXED_NORMALS_MODELSPACE_BACKFACE _FIXED_NORMALS_WORLDSPACE
 			#pragma shader_feature _ _SPECULAR _SPECULAR_GLOSSMAP
 			#pragma shader_feature _NORMALMAP
 			#pragma shader_feature _ALPHA_CLIP
@@ -99,7 +97,7 @@ Shader "Lightweight Render Pipeline/Spine/Sprite"
 			#pragma multi_compile_fog
 			#pragma multi_compile _ PIXELSNAP_ON
 			#pragma multi_compile _ ETC1_EXTERNAL_ALPHA
-			
+
 			// -------------------------------------
 			// Lightweight Pipeline keywords
 			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
@@ -108,17 +106,17 @@ Shader "Lightweight Render Pipeline/Spine/Sprite"
 			#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
 			#pragma multi_compile _ _SHADOWS_SOFT
 			#pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
-			
+
 			// -------------------------------------
 			// Unity defined keywords
 			#pragma multi_compile _ DIRLIGHTMAP_COMBINED
 			#pragma multi_compile _ LIGHTMAP_ON
 			#pragma multi_compile_fog
-			
+
 			//--------------------------------------
 			// GPU Instancing
 			#pragma multi_compile_instancing
-			
+
 			//--------------------------------------
 			// Spine related keywords
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
@@ -216,7 +214,7 @@ Shader "Lightweight Render Pipeline/Spine/Sprite"
 			ENDHLSL
 		}
 	}
-	
+
 	FallBack "Hidden/InternalErrorShader"
 	CustomEditor "SpineSpriteShaderGUI"
 }

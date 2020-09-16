@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 using System;
@@ -70,8 +70,20 @@ namespace Spine {
 		}
 
 		protected override void LoadContent () {
-			// Two color tint effect, comment line 80 to disable
-			var spineEffect = Content.Load<Effect>("spine-xna-example-content\\SpineEffect");
+
+			bool useNormalmapShader = false;
+			Effect spineEffect;
+			if (!useNormalmapShader) {
+				// Two color tint effect. Note that you can also use the default BasicEffect instead.
+				spineEffect = Content.Load<Effect>("spine-xna-example-content\\SpineEffect");
+			}
+			else {
+				spineEffect = Content.Load<Effect>("spine-xna-example-content\\SpineEffectNormalmap");
+				spineEffect.Parameters["Light0_Direction"].SetValue(new Vector3(-0.5265408f, 0.5735765f, -0.6275069f));
+				spineEffect.Parameters["Light0_Diffuse"].SetValue(new Vector3(1, 0.9607844f, 0.8078432f));
+				spineEffect.Parameters["Light0_Specular"].SetValue(new Vector3(1, 0.9607844f, 0.8078432f));
+				spineEffect.Parameters["Light0_SpecularExponent"].SetValue(2.0f);
+			}
 			spineEffect.Parameters["World"].SetValue(Matrix.Identity);
 			spineEffect.Parameters["View"].SetValue(Matrix.CreateLookAt(new Vector3(0.0f, 0.0f, 1.0f), Vector3.Zero, Vector3.Up));
 
@@ -85,15 +97,23 @@ namespace Spine {
 
 			// String name = "spineboy-ess";
 			// String name = "goblins-pro";
-			// String name = "raptor-pro";
+			String name = "raptor-pro";
 			// String name = "tank-pro";
-			String name = "coin-pro";
+			//String name = "coin-pro";
+			if (useNormalmapShader)
+				name = "raptor-pro"; // we only have normalmaps for raptor
 			String atlasName = name.Replace("-pro", "").Replace("-ess", "");
 			if (name == "goblins-pro") atlasName = "goblins-mesh";
 			bool binaryData = false;
 
-			Atlas atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice));
-
+			Atlas atlas;
+			if (!useNormalmapShader) {
+				atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice));
+			}
+			else {
+				atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice,
+								loadMultipleTextureLayers: true, textureSuffixes: new string[] { "", "_normals" }));
+			}
 			float scale = 1;
 			if (name == "spineboy-ess") scale = 0.6f;
 			if (name == "raptor-pro") scale = 0.5f;

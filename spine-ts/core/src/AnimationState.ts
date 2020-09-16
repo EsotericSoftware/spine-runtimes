@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 module spine {
@@ -45,13 +45,18 @@ module spine {
 		 *
 		 * Result: Mix from the setup pose to the timeline pose. */
 		static FIRST = 1;
-		/** 1. This is the first timeline to set this property.
-		 * 2. The next track entry to be applied does have a timeline to set this property.
-		 * 3. The next track entry after that one does not have a timeline to set this property.
-		 *
+		/** 1) A previously applied timeline has set this property.<br>
+	 	 * 2) The next track entry to be applied does have a timeline to set this property.<br>
+	 	 * 3) The next track entry after that one does not have a timeline to set this property.<br>
+	 	 * Result: Mix from the current pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading
+	 	 * animations that key the same property. A subsequent timeline will set this property using a mix. */
+		static HOLD_SUBSEQUENT = 2;
+		/** 1) This is the first timeline to set this property.<br>
+		 * 2) The next track entry to be applied does have a timeline to set this property.<br>
+		 * 3) The next track entry after that one does not have a timeline to set this property.<br>
 		 * Result: Mix from the setup pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading animations
 		 * that key the same property. A subsequent timeline will set this property using a mix. */
-		static HOLD = 2;
+		static HOLD_FIRST = 3;
 		/** 1. This is the first timeline to set this property.
 		 * 2. The next track entry to be applied does have a timeline to set this property.
 		 * 3. The next track entry after that one does have a timeline to set this property.
@@ -64,14 +69,10 @@ module spine {
 		 * "dipping" A is not mixed out, however D (the first entry that doesn't set the property) mixing in is used to mix out A
 		 * (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
 		 * place. */
-		static HOLD_MIX = 3;
-		/** 1. An attachment timeline in a subsequent track entry sets the attachment for the same slot as this attachment
-		 * timeline.
-		 *
-		 * Result: This attachment timeline will not use MixDirection.out, which would otherwise show the setup mode attachment (or
-		 * none if not visible in setup mode). This allows deform timelines to be applied for the subsequent entry to mix from, rather
-		 * than mixing from the setup pose. */
-		static NOT_LAST = 4;
+		static HOLD_MIX = 4;
+
+		static SETUP = 1;
+		static CURRENT = 2;
 
 		/** The AnimationStateData to look up mix durations. */
 		data: AnimationStateData;
@@ -84,6 +85,7 @@ module spine {
 		 *
 		 * See TrackEntry {@link TrackEntry#timeScale} for affecting a single animation. */
 		timeScale = 1;
+		unkeyedState = 0;
 
 		events = new Array<Event>();
 		listeners = new Array<AnimationStateListener>();
@@ -216,7 +218,11 @@ module spine {
 						// to sometimes stop rendering when using color correction, as their RGBA values become NaN.
 						// (https://github.com/pixijs/pixi-spine/issues/302)
 						Utils.webkit602BugfixHelper(mix, blend);
-						timelines[ii].apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.mixIn);
+						var timeline = timelines[ii];
+						if (timeline instanceof AttachmentTimeline)
+							this.applyAttachmentTimeline(timeline, skeleton, animationTime, blend, true);
+						else
+							timeline.apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.mixIn);
 					}
 				} else {
 					let timelineMode = current.timelineMode;
@@ -227,9 +233,11 @@ module spine {
 
 					for (let ii = 0; ii < timelineCount; ii++) {
 						let timeline = timelines[ii];
-						let timelineBlend = (timelineMode[ii] & (AnimationState.NOT_LAST - 1)) == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
+						let timelineBlend = timelineMode[ii]  == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline instanceof RotateTimeline) {
 							this.applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
+						} else if (timeline instanceof AttachmentTimeline) {
+							this.applyAttachmentTimeline(timeline, skeleton, animationTime, blend, true);
 						} else {
 							// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
 							Utils.webkit602BugfixHelper(mix, blend);
@@ -242,6 +250,20 @@ module spine {
 				current.nextAnimationLast = animationTime;
 				current.nextTrackLast = current.trackTime;
 			}
+
+			// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
+			// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
+			// the time is before the first key).
+			var setupState = this.unkeyedState + AnimationState.SETUP;
+			var slots = skeleton.slots;
+			for (var i = 0, n = skeleton.slots.length; i < n; i++) {
+				var slot = slots[i];
+				if (slot.attachmentState == setupState) {
+					var attachmentName = slot.data.attachmentName;
+					slot.attachment = (attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName));
+				}
+			}
+			this.unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
 
 			this.queue.drain();
 			return applied;
@@ -284,21 +306,21 @@ module spine {
 					let direction = MixDirection.mixOut;
 					let timelineBlend: MixBlend;
 					let alpha = 0;
-					switch (timelineMode[i] & (AnimationState.NOT_LAST - 1)) {
+					switch (timelineMode[i]) {
 					case AnimationState.SUBSEQUENT:
-						timelineBlend = blend;
-						if (!attachments && timeline instanceof AttachmentTimeline) {
-							if ((timelineMode[i] & AnimationState.NOT_LAST) == AnimationState.NOT_LAST) continue;
-							timelineBlend = MixBlend.setup;
-						}
 						if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+						timelineBlend = blend;
 						alpha = alphaMix;
 						break;
 					case AnimationState.FIRST:
 						timelineBlend = MixBlend.setup;
 						alpha = alphaMix;
 						break;
-					case AnimationState.HOLD:
+					case AnimationState.HOLD_SUBSEQUENT:
+						timelineBlend = blend;
+						alpha = alphaHold;
+						break;
+					case AnimationState.HOLD_FIRST:
 						timelineBlend = MixBlend.setup;
 						alpha = alphaHold;
 						break;
@@ -309,18 +331,16 @@ module spine {
 						break;
 					}
 					from.totalAlpha += alpha;
+
 					if (timeline instanceof RotateTimeline)
 						this.applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
+					else if (timeline instanceof AttachmentTimeline)
+						this.applyAttachmentTimeline(timeline, skeleton, animationTime, timelineBlend, attachments);
 					else {
 						// This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
 						Utils.webkit602BugfixHelper(alpha, blend);
-						if (timelineBlend == MixBlend.setup) {
-							if (timeline instanceof AttachmentTimeline) {
-								if (attachments || (timelineMode[i] & AnimationState.NOT_LAST) == AnimationState.NOT_LAST) direction = MixDirection.mixIn;
-							} else if (timeline instanceof DrawOrderTimeline) {
-								if (drawOrder) direction = MixDirection.mixIn;
-							}
-						}
+						if (drawOrder && timeline instanceof DrawOrderTimeline && timelineBlend == MixBlend.setup)
+							direction = MixDirection.mixIn;
 						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
 					}
 				}
@@ -333,6 +353,35 @@ module spine {
 
 			return mix;
 		}
+
+		applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, blend: MixBlend, attachments: boolean) {
+
+			var slot = skeleton.slots[timeline.slotIndex];
+			if (!slot.bone.active) return;
+
+			var frames = timeline.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (blend == MixBlend.setup || blend == MixBlend.first)
+					this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+			}
+			else {
+				var frameIndex;
+				if (time >= frames[frames.length - 1]) // Time is after last frame.
+					frameIndex = frames.length - 1;
+				else
+					frameIndex = Animation.binarySearch(frames, time) - 1;
+				this.setAttachment(skeleton, slot, timeline.attachmentNames[frameIndex], attachments);
+			}
+
+			// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
+			if (slot.attachmentState <= this.unkeyedState) slot.attachmentState = this.unkeyedState + AnimationState.SETUP;
+		}
+
+		setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: string, attachments: boolean) {
+			slot.attachment = attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName);
+			if (attachments) slot.attachmentState = this.unkeyedState + AnimationState.CURRENT;
+		}
+
 
 		applyRotateTimeline (timeline: Timeline, skeleton: Skeleton, time: number, alpha: number, blend: MixBlend,
 			timelinesRotation: Array<number>, i: number, firstFrame: boolean) {
@@ -705,15 +754,6 @@ module spine {
 					entry = entry.mixingTo;
 				} while (entry != null)
 			}
-
-			this.propertyIDs.clear();
-			for (let i = this.tracks.length - 1; i >= 0; i--) {
-				let entry = this.tracks[i];
-				while (entry != null) {
-					this.computeNotLast(entry);
-					entry = entry.mixingFrom;
-				}
-			}
 		}
 
 		computeHold (entry: TrackEntry) {
@@ -727,8 +767,7 @@ module spine {
 
 			if (to != null && to.holdPrevious) {
 				for (let i = 0; i < timelinesCount; i++) {
-					propertyIDs.add(timelines[i].getPropertyId());
-					timelineMode[i] = AnimationState.HOLD;
+					timelineMode[i] = propertyIDs.add(timelines[i].getPropertyId()) ? AnimationState.HOLD_FIRST : AnimationState.HOLD_SUBSEQUENT;
 				}
 				return;
 			}
@@ -752,21 +791,7 @@ module spine {
 						}
 						break;
 					}
-					timelineMode[i] = AnimationState.HOLD;
-				}
-			}
-		}
-
-		computeNotLast (entry: TrackEntry) {
-			let timelines = entry.animation.timelines;
-			let timelinesCount = entry.animation.timelines.length;
-			let timelineMode = entry.timelineMode;
-			let propertyIDs = this.propertyIDs;
-
-			for (let i = 0; i < timelinesCount; i++) {
-				if (timelines[i] instanceof AttachmentTimeline) {
-					let timeline = timelines[i] as AttachmentTimeline;
-					if (!propertyIDs.add(timeline.slotIndex)) timelineMode[i] |= AnimationState.NOT_LAST;
+					timelineMode[i] = AnimationState.HOLD_FIRST;
 				}
 			}
 		}

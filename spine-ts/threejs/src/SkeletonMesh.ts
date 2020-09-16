@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,21 +15,25 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 module spine.threejs {
+	export interface SkeletonMeshMaterialParametersCustomizer {
+		(materialParameters: THREE.ShaderMaterialParameters): void;
+	}
+
 	export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
-		constructor () {
+		constructor (customizer: SkeletonMeshMaterialParametersCustomizer) {
 			let vertexShader = `
 				attribute vec4 color;
 				varying vec2 vUv;
@@ -59,6 +63,7 @@ module spine.threejs {
 				transparent: true,
 				alphaTest: 0.5
 			};
+			customizer(parameters);
 			super(parameters);
 		};
 	}
@@ -82,10 +87,11 @@ module spine.threejs {
 
 		private vertices = Utils.newFloatArray(1024);
 		private tempColor = new Color();
+		private materialCustomizer: SkeletonMeshMaterialParametersCustomizer;
 
-		constructor (skeletonData: SkeletonData) {
+		constructor (skeletonData: SkeletonData, materialCustomizer: SkeletonMeshMaterialParametersCustomizer = (parameters) => { }) {
 			super();
-
+			this.materialCustomizer = materialCustomizer;
 			this.skeleton = new Skeleton(skeletonData);
 			let animData = new AnimationStateData(skeletonData);
 			this.state = new AnimationState(animData);
@@ -118,7 +124,7 @@ module spine.threejs {
 
 		private nextBatch () {
 			if (this.batches.length == this.nextBatchIndex) {
-				let batch = new MeshBatcher();
+				let batch = new MeshBatcher(10920, this.materialCustomizer);
 				this.add(batch);
 				this.batches.push(batch);
 			}

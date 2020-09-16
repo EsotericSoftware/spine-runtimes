@@ -1,0 +1,32 @@
+{
+"skeleton": { "hash": "hj8P+t8L2OIWCj7RHV1Nzql4Y5E", "spine": "3.8.95", "images": "", "audio": "" },
+"bones": [
+	{ "name": "root" }
+],
+"events": {
+	"event": {}
+},
+"animations": {
+	"events0": {
+		"events": [
+			{ "name": "event", "string": "0" },
+			{ "time": 0.4667, "name": "event", "string": "14" },
+			{ "time": 1, "name": "event", "string": "30" }
+		]
+	},
+	"events1": {
+		"events": [
+			{ "name": "event", "string": "0" },
+			{ "time": 0.4667, "name": "event", "string": "14" },
+			{ "time": 1, "name": "event", "string": "30" }
+		]
+	},
+	"events2": {
+		"events": [
+			{ "name": "event", "string": "0" },
+			{ "time": 0.4667, "name": "event", "string": "14" },
+			{ "time": 1, "name": "event", "string": "30" }
+		]
+	}
+}
+}

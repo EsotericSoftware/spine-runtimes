@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #ifndef Spine_AnimationState_h
@@ -36,6 +36,7 @@
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 #include <spine/HasRendererObject.h>
+#include "Slot.h"
 
 #ifdef SPINE_USE_STD_FUNCTION
 #include <functional>
@@ -59,6 +60,7 @@ namespace spine {
 	class AnimationStateData;
 	class Skeleton;
 	class RotateTimeline;
+	class AttachmentTimeline;
 
 #ifdef SPINE_USE_STD_FUNCTION
 	typedef std::function<void (AnimationState* state, EventType type, TrackEntry* entry, Event* event)> AnimationStateListener;
@@ -399,11 +401,14 @@ namespace spine {
 		AnimationStateListener _listener;
 		AnimationStateListenerObject* _listenerObject;
 
+		int _unkeyedState;
+
 		float _timeScale;
 
 		static Animation* getEmptyAnimation();
 
 		static void applyRotateTimeline(RotateTimeline* rotateTimeline, Skeleton& skeleton, float time, float alpha, MixBlend pose, Vector<float>& timelinesRotation, size_t i, bool firstFrame);
+        void applyAttachmentTimeline(AttachmentTimeline* attachmentTimeline, Skeleton& skeleton, float animationTime, MixBlend pose, bool firstFrame);
 
 		/// Returns true when all mixing from entries are complete.
 		bool updateMixingFrom(TrackEntry* to, float delta);
@@ -428,8 +433,8 @@ namespace spine {
 
 		void computeHold(TrackEntry *entry);
 
-		void computeNotLast(TrackEntry *entry);
-	};
+        void setAttachment(Skeleton &skeleton, spine::Slot &slot, const String &attachmentName, bool attachments);
+    };
 }
 
 #endif /* Spine_AnimationState_h */

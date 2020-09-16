@@ -9,8 +9,6 @@ Shader "Spine/Sprite/Vertex Lit"
 		_BumpMap ("Normal Map", 2D) = "bump" {}
 
 		[MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
-		[PerRendererData] _AlphaTex ("External Alpha", 2D) = "white" {}
-		[PerRendererData] _EnableExternalAlpha ("Enable External Alpha", Float) = 0
 
 		_EmissionColor("Color", Color) = (0,0,0,0)
 		_EmissionMap("Emission", 2D) = "white" {}
@@ -82,7 +80,7 @@ Shader "Spine/Sprite/Vertex Lit"
 				#pragma target 3.0
 
 				#pragma shader_feature _ _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON _ADDITIVEBLEND _ADDITIVEBLEND_SOFT _MULTIPLYBLEND _MULTIPLYBLEND_X2
-				#pragma shader_feature _ _FIXED_NORMALS_VIEWSPACE _FIXED_NORMALS_VIEWSPACE_BACKFACE _FIXED_NORMALS_MODELSPACE  _FIXED_NORMALS_MODELSPACE_BACKFACE
+				#pragma shader_feature _ _FIXED_NORMALS_VIEWSPACE _FIXED_NORMALS_VIEWSPACE_BACKFACE _FIXED_NORMALS_MODELSPACE  _FIXED_NORMALS_MODELSPACE_BACKFACE _FIXED_NORMALS_WORLDSPACE
 				#pragma shader_feature _ _SPECULAR _SPECULAR_GLOSSMAP
 				#pragma shader_feature _NORMALMAP
 				#pragma shader_feature _ALPHA_CLIP

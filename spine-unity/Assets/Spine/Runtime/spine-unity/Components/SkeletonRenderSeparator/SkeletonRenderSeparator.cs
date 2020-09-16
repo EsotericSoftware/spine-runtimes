@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated May 1, 2019. Replaces all prior versions.
+ * Last updated January 1, 2020. Replaces all prior versions.
  *
- * Copyright (c) 2013-2019, Esoteric Software LLC
+ * Copyright (c) 2013-2020, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -15,16 +15,16 @@
  * Spine Editor license and redistribution of the Products in any form must
  * include this license and copyright notice.
  *
- * THIS SOFTWARE IS PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- * NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES, BUSINESS
- * INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #if UNITY_2018_3 || UNITY_2019 || UNITY_2018_3_OR_NEWER
@@ -42,7 +42,7 @@ namespace Spine.Unity {
 	#else
 	[ExecuteInEditMode]
 	#endif
-	[HelpURL("http://esotericsoftware.com/spine-unity-skeletonrenderseparator")]
+	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonRenderSeparator")]
 	public class SkeletonRenderSeparator : MonoBehaviour {
 		public const int DefaultSortingOrderIncrement = 5;
 
@@ -75,6 +75,12 @@ namespace Spine.Unity {
 				skeletonRenderer = GetComponent<SkeletonRenderer>();
 		}
 		#endif
+		#endregion
+
+		#region Callback Delegates
+		/// <summary>OnMeshAndMaterialsUpdated is called at the end of LateUpdate after the Mesh and
+		/// all materials have been updated.</summary>
+		public event SkeletonRenderer.SkeletonRendererDelegate OnMeshAndMaterialsUpdated;
 		#endregion
 
 		#region Runtime Instantiation
@@ -191,8 +197,10 @@ namespace Spine.Unity {
 
 			skeletonRenderer.LateUpdate();
 
-			foreach (var s in partsRenderers)
-				s.ClearMesh();
+			foreach (var partsRenderer in partsRenderers) {
+				if (partsRenderer != null)
+					partsRenderer.ClearMesh();
+			}
 		}
 
 		MaterialPropertyBlock copiedBlock;
@@ -221,6 +229,8 @@ namespace Spine.Unity {
 			int rendererIndex = 0;
 			var currentRenderer = partsRenderers[rendererIndex];
 			for (int si = 0, start = 0; si <= lastSubmeshInstruction; si++) {
+				if (currentRenderer == null)
+					continue;
 				if (submeshInstructionsItems[si].forceSeparate || si == lastSubmeshInstruction) {
 					// Apply properties
 					var meshGenerator = currentRenderer.MeshGenerator;
@@ -243,9 +253,14 @@ namespace Spine.Unity {
 				}
 			}
 
+			if (OnMeshAndMaterialsUpdated != null)
+				OnMeshAndMaterialsUpdated(this.skeletonRenderer);
+
 			// Clear extra renderers if they exist.
 			for (; rendererIndex < rendererCount; rendererIndex++) {
-				partsRenderers[rendererIndex].ClearMesh();
+				currentRenderer = partsRenderers[rendererIndex];
+				if (currentRenderer != null)
+					partsRenderers[rendererIndex].ClearMesh();
 			}
 
 		}
