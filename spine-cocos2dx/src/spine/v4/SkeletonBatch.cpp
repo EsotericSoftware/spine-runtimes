@@ -159,6 +159,7 @@ CustomTrianglesCommand* SkeletonBatch::addCommand(cocos2d::Renderer* renderer, f
 	    {
 			if (programState->getProgram() != pipelineDescriptor.programState->getProgram())
 			{
+				CC_SAFE_RELEASE(pipelineDescriptor.programState);
 				pipelineDescriptor.programState = programState->clone();
 				command->_locMVP = pipelineDescriptor.programState->getUniformLocation("u_MVPMatrix");
 				command->_locTexture = pipelineDescriptor.programState->getUniformLocation("u_texture");
@@ -168,6 +169,7 @@ CustomTrianglesCommand* SkeletonBatch::addCommand(cocos2d::Renderer* renderer, f
 		{
 			if (_programState->getProgram() != pipelineDescriptor.programState->getProgram())
 			{
+				CC_SAFE_RELEASE(pipelineDescriptor.programState);
 				pipelineDescriptor.programState = _programState->clone();
 				command->_locMVP = _locMVP;
 				command->_locTexture = _locTexture;
