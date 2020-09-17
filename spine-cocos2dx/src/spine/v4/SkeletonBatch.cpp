@@ -59,19 +59,18 @@ void SkeletonBatch::destroyInstance () {
 
 SkeletonBatch::SkeletonBatch () {
 
-    auto program = backend::Program::getBuiltinProgram(backend::ProgramType::POSITION_TEXTURE_COLOR);
+    auto* program = backend::Program::getBuiltinProgram(backend::ProgramType::POSITION_TEXTURE_COLOR);
     _programState = std::make_shared<backend::ProgramState>(program);
     
     auto vertexLayout = _programState->getVertexLayout();
 
-	auto locPosition = _programState->getAttributeLocation("a_position");
-	auto locTexcoord = _programState->getAttributeLocation("a_texCoord");
-	auto locColor = _programState->getAttributeLocation("a_color");
+	const auto locPosition = _programState->getAttributeLocation("a_position");
+	const auto locTexcoord = _programState->getAttributeLocation("a_texCoord");
+	const auto locColor = _programState->getAttributeLocation("a_color");
     vertexLayout->setAttribute("a_position", locPosition, backend::VertexFormat::FLOAT3, offsetof(V3F_C4B_T2F, vertices), false);
     vertexLayout->setAttribute("a_color", locColor, backend::VertexFormat::UBYTE4, offsetof(V3F_C4B_T2F, colors), true);
     vertexLayout->setAttribute("a_texCoord", locTexcoord, backend::VertexFormat::FLOAT2, offsetof(V3F_C4B_T2F, texCoords), false);
     vertexLayout->setLayout(sizeof(_vertices[0]));
-
 
     _locMVP = _programState->getUniformLocation("u_MVPMatrix");
     _locTexture = _programState->getUniformLocation("u_texture");
@@ -84,7 +83,7 @@ SkeletonBatch::SkeletonBatch () {
     // for the next frame
     Director::getInstance()->getEventDispatcher()->addCustomEventListener(EVENT_AFTER_DRAW_RESET_POSITION, [this](EventCustom* eventCustom) {
         this->update(0);
-        });;
+        });
 }
 
 SkeletonBatch::~SkeletonBatch () {
@@ -163,6 +162,16 @@ CustomTrianglesCommand* SkeletonBatch::addCommand(cocos2d::Renderer* renderer, f
 				pipelineDescriptor.programState = programState->clone();
 				command->_locMVP = pipelineDescriptor.programState->getUniformLocation("u_MVPMatrix");
 				command->_locTexture = pipelineDescriptor.programState->getUniformLocation("u_texture");
+
+				auto vertexLayout = pipelineDescriptor.programState->getVertexLayout();
+
+				const auto locPosition = pipelineDescriptor.programState->getAttributeLocation("a_position");
+				const auto locTexcoord = pipelineDescriptor.programState->getAttributeLocation("a_texCoord");
+				const auto locColor = pipelineDescriptor.programState->getAttributeLocation("a_color");
+				vertexLayout->setAttribute("a_position", locPosition, backend::VertexFormat::FLOAT3, offsetof(V3F_C4B_T2F, vertices), false);
+				vertexLayout->setAttribute("a_color", locColor, backend::VertexFormat::UBYTE4, offsetof(V3F_C4B_T2F, colors), true);
+				vertexLayout->setAttribute("a_texCoord", locTexcoord, backend::VertexFormat::FLOAT2, offsetof(V3F_C4B_T2F, texCoords), false);
+				vertexLayout->setLayout(sizeof(_vertices[0]));
 			}
 	    }
 		else
@@ -183,6 +192,16 @@ CustomTrianglesCommand* SkeletonBatch::addCommand(cocos2d::Renderer* renderer, f
 			pipelineDescriptor.programState = programState->clone();
 			command->_locMVP = pipelineDescriptor.programState->getUniformLocation("u_MVPMatrix");
 			command->_locTexture = pipelineDescriptor.programState->getUniformLocation("u_texture");
+
+			auto vertexLayout = pipelineDescriptor.programState->getVertexLayout();
+
+			const auto locPosition = pipelineDescriptor.programState->getAttributeLocation("a_position");
+			const auto locTexcoord = pipelineDescriptor.programState->getAttributeLocation("a_texCoord");
+			const auto locColor = pipelineDescriptor.programState->getAttributeLocation("a_color");
+			vertexLayout->setAttribute("a_position", locPosition, backend::VertexFormat::FLOAT3, offsetof(V3F_C4B_T2F, vertices), false);
+			vertexLayout->setAttribute("a_color", locColor, backend::VertexFormat::UBYTE4, offsetof(V3F_C4B_T2F, colors), true);
+			vertexLayout->setAttribute("a_texCoord", locTexcoord, backend::VertexFormat::FLOAT2, offsetof(V3F_C4B_T2F, texCoords), false);
+			vertexLayout->setLayout(sizeof(_vertices[0]));
 		}
 		else
 		{
