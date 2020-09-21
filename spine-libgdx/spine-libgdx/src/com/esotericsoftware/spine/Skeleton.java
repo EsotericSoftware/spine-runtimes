@@ -56,7 +56,6 @@ public class Skeleton {
 	final Array<TransformConstraint> transformConstraints;
 	final Array<PathConstraint> pathConstraints;
 	final Array<Updatable> updateCache = new Array();
-	final Array<Bone> updateCacheReset = new Array();
 	@Null Skin skin;
 	final Color color;
 	float time;
@@ -161,7 +160,6 @@ public class Skeleton {
 	public void updateCache () {
 		Array<Updatable> updateCache = this.updateCache;
 		updateCache.clear();
-		updateCacheReset.clear();
 
 		int boneCount = bones.size;
 		Object[] bones = this.bones.items;
@@ -227,16 +225,18 @@ public class Skeleton {
 		Array<Bone> constrained = constraint.bones;
 		Bone parent = constrained.first();
 		sortBone(parent);
-
-		if (constrained.size > 1) {
+		if (constrained.size == 1) {
+			updateCache.add(constraint);
+			sortReset(parent.children);
+		} else {
 			Bone child = constrained.peek();
-			if (!updateCache.contains(child, true)) updateCacheReset.add(child);
+			sortBone(child);
+
+			updateCache.add(constraint);
+
+			sortReset(parent.children);
+			child.sorted = true;
 		}
-
-		updateCache.add(constraint);
-
-		sortReset(parent.children);
-		constrained.peek().sorted = true;
 	}
 
 	private void sortPathConstraint (PathConstraint constraint) {
@@ -280,7 +280,7 @@ public class Skeleton {
 			for (int i = 0; i < boneCount; i++) {
 				Bone child = (Bone)constrained[i];
 				sortBone(child.parent);
-				if (!updateCache.contains(child, true)) updateCacheReset.add(child);
+				sortBone(child);
 			}
 		} else {
 			for (int i = 0; i < boneCount; i++)
@@ -342,21 +342,6 @@ public class Skeleton {
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
 	public void updateWorldTransform () {
-		// This partial update avoids computing the world transform for constrained bones when 1) the bone is not updated
-		// before the constraint, 2) the constraint only needs to access the applied local transform, and 3) the constraint calls
-		// updateWorldTransform.
-		Object[] updateCacheReset = this.updateCacheReset.items;
-		for (int i = 0, n = this.updateCacheReset.size; i < n; i++) {
-			Bone bone = (Bone)updateCacheReset[i];
-			bone.ax = bone.x;
-			bone.ay = bone.y;
-			bone.arotation = bone.rotation;
-			bone.ascaleX = bone.scaleX;
-			bone.ascaleY = bone.scaleY;
-			bone.ashearX = bone.shearX;
-			bone.ashearY = bone.shearY;
-			bone.appliedValid = true;
-		}
 		Object[] updateCache = this.updateCache.items;
 		for (int i = 0, n = this.updateCache.size; i < n; i++)
 			((Updatable)updateCache[i]).update();
@@ -369,22 +354,6 @@ public class Skeleton {
 	 * Runtimes Guide. */
 	public void updateWorldTransform (Bone parent) {
 		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
-		// This partial update avoids computing the world transform for constrained bones when:
-		// 1) the bone is not updated before the constraint,
-		// 2) the constraint only needs to access the applied local transform, and
-		// 3) the constraint calls updateWorldTransform.
-		Object[] updateCacheReset = this.updateCacheReset.items;
-		for (int i = 0, n = this.updateCacheReset.size; i < n; i++) {
-			Bone bone = (Bone)updateCacheReset[i];
-			bone.ax = bone.x;
-			bone.ay = bone.y;
-			bone.arotation = bone.rotation;
-			bone.ascaleX = bone.scaleX;
-			bone.ascaleY = bone.scaleY;
-			bone.ashearX = bone.shearX;
-			bone.ashearY = bone.shearY;
-			bone.appliedValid = true;
-		}
 
 		// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
 		Bone rootBone = getRootBone();

@@ -88,10 +88,6 @@ public class PathConstraint implements Updatable {
 	}
 
 	/** Applies the constraint to the constrained bones. */
-	public void apply () {
-		update();
-	}
-
 	public void update () {
 		Attachment attachment = target.attachment;
 		if (!(attachment instanceof PathAttachment)) return;

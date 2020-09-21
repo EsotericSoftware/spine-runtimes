@@ -77,11 +77,8 @@ public class TransformConstraint implements Updatable {
 	}
 
 	/** Applies the constraint to the constrained bones. */
-	public void apply () {
-		update();
-	}
-
 	public void update () {
+		if (rotateMix == 0 && translateMix == 0 && scaleMix == 0 && shearMix == 0) return;
 		if (data.local) {
 			if (data.relative)
 				applyRelativeLocal();
@@ -97,7 +94,6 @@ public class TransformConstraint implements Updatable {
 
 	private void applyAbsoluteWorld () {
 		float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
-		if (rotateMix == 0 && translateMix == 0 && scaleMix == 0 && shearMix == 0) return;
 		Bone target = this.target;
 		float ta = target.a, tb = target.b, tc = target.c, td = target.d;
 		float degRadReflect = ta * td - tb * tc > 0 ? degRad : -degRad;
@@ -157,7 +153,6 @@ public class TransformConstraint implements Updatable {
 
 	private void applyRelativeWorld () {
 		float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
-		if (rotateMix == 0 && translateMix == 0 && scaleMix == 0 && shearMix == 0) return;
 		Bone target = this.target;
 		float ta = target.a, tb = target.b, tc = target.c, td = target.d;
 		float degRadReflect = ta * td - tb * tc > 0 ? degRad : -degRad;

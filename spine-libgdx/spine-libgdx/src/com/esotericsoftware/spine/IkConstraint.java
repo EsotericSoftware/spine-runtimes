@@ -80,11 +80,8 @@ public class IkConstraint implements Updatable {
 	}
 
 	/** Applies the constraint to the constrained bones. */
-	public void apply () {
-		update();
-	}
-
 	public void update () {
+		if (mix == 0) return;
 		Bone target = this.target;
 		Object[] bones = this.bones.items;
 		switch (this.bones.size) {
@@ -228,10 +225,6 @@ public class IkConstraint implements Updatable {
 		float alpha) {
 		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
 		if (child == null) throw new IllegalArgumentException("child cannot be null.");
-		if (alpha == 0) {
-			child.updateWorldTransform();
-			return;
-		}
 		if (!parent.appliedValid) parent.updateAppliedTransform();
 		if (!child.appliedValid) child.updateAppliedTransform();
 		float px = parent.ax, py = parent.ay, psx = parent.ascaleX, sx = psx, psy = parent.ascaleY, csx = child.ascaleX;
