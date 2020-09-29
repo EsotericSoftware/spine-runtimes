@@ -109,7 +109,7 @@ Shader "Spine/SkeletonGraphic Tint Black"
 				OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
 				OUT.texcoord = IN.texcoord;
 
-				OUT.color = IN.color * _Color;
+				OUT.color = IN.color;
 				OUT.darkColor = float4(IN.uv1.r, IN.uv1.g, IN.uv2.r, IN.uv2.g);
 				return OUT;
 			}
@@ -125,17 +125,19 @@ Shader "Spine/SkeletonGraphic Tint Black"
 				clip(texColor.a - 0.001);
 				#endif
 
-				float4 vertexColor = IN.color;
+				float4 vertexColor = IN.color * float4(_Color.rgb * _Color.a, _Color.a);
 			#ifdef _CANVAS_GROUP_COMPATIBLE
 				// CanvasGroup alpha multiplies existing vertex color alpha, but
 				// does not premultiply it to rgb components. This causes problems
 				// with additive blending (alpha = 0), which is why we store the
 				// alpha value in uv2.g (darkColor.a).
-				vertexColor.a = IN.darkColor.a;
+				float originalAlpha = IN.darkColor.a;
+				float canvasAlpha = (originalAlpha == 0) ? IN.color.a : IN.color.a / originalAlpha;
+				vertexColor.a = originalAlpha * _Color.a;
 			#endif
-				float4 fragColor = fragTintedColor(texColor, _Black.rgb + IN.darkColor, vertexColor, _Black.a);
+				float4 fragColor = fragTintedColor(texColor, _Black.rgb + IN.darkColor, vertexColor, _Color.a, _Black.a);
 			#ifdef _CANVAS_GROUP_COMPATIBLE
-				fragColor.rgba *= IN.color.a;
+				fragColor.rgba *= canvasAlpha;
 			#endif
 				return fragColor;
 			}
