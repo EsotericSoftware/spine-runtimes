@@ -67,7 +67,7 @@ namespace Spine.Unity {
 				if (renderer.zSpacing == 0) {
 					isProblematic |= IsZSpacingRequired(material, ref errorMessage);
 				}
-				if (IsURPMaterial(material) && !AreShadowsDisabled(material) && renderer.addNormals == false) {
+				if (IsURP3DMaterial(material) && !AreShadowsDisabled(material) && renderer.addNormals == false) {
 					isProblematic = true;
 					errorMessage += kAddNormalsRequiredMessage;
 				}
@@ -177,8 +177,8 @@ namespace Spine.Unity {
 					material.IsKeywordEnabled(ALPHAPREMULTIPLY_ON_KEYWORD);
 		}
 
-		static bool IsURPMaterial (Material material) {
-			return material.shader.name.Contains("Universal Render Pipeline");
+		static bool IsURP3DMaterial (Material material) {
+			return material.shader.name.Contains("Universal Render Pipeline/Spine");
 		}
 
 		static bool AreShadowsDisabled (Material material) {
