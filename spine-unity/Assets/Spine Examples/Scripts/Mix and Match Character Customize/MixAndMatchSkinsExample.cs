@@ -155,7 +155,7 @@ namespace Spine.Unity.Examples {
 
 		void UpdateCharacterSkin () {
 			var skeleton = skeletonAnimation.Skeleton;
-			var skeletonData = skeleton.data;
+			var skeletonData = skeleton.Data;
 			characterSkin = new Skin("character-base");
 			// Note that the result Skin returned by calls to skeletonData.FindSkin()
 			// could be cached once in Start() instead of searching for the same skin
@@ -169,7 +169,7 @@ namespace Spine.Unity.Examples {
 
 		void AddEquipmentSkinsTo (Skin combinedSkin) {
 			var skeleton = skeletonAnimation.Skeleton;
-			var skeletonData = skeleton.data;
+			var skeletonData = skeleton.Data;
 			combinedSkin.AddSkin(skeletonData.FindSkin(clothesSkin));
 			combinedSkin.AddSkin(skeletonData.FindSkin(pantsSkin));
 			if (!string.IsNullOrEmpty(bagSkin)) combinedSkin.AddSkin(skeletonData.FindSkin(bagSkin));
