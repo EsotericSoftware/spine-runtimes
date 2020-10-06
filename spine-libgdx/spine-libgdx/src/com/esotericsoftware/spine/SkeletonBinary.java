@@ -732,12 +732,12 @@ public class SkeletonBinary extends SkeletonLoader {
 				case PATH_POSITION:
 					timelines
 						.add(readTimeline(input, new PathConstraintPositionTimeline(input.readInt(true), input.readInt(true), index),
-							data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed ? scale : 1));
+							data.positionMode == PositionMode.fixed ? scale : 1));
 					break;
 				case PATH_SPACING:
 					timelines
 						.add(readTimeline(input, new PathConstraintSpacingTimeline(input.readInt(true), input.readInt(true), index),
-							data.positionMode == PositionMode.fixed ? scale : 1));
+							data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed ? scale : 1));
 					break;
 				case PATH_MIX:
 					timelines
