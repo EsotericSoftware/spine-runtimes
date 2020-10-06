@@ -68,8 +68,8 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 	private final Matrix4 combinedMatrix = new Matrix4();
 	private boolean blendingDisabled;
 
-	private final ShaderProgram defaultShader;
-	private final boolean ownsDefaultShader;
+	private ShaderProgram defaultShader;
+	private boolean ownsDefaultShader;
 	private ShaderProgram shader;
 
 	private int vertexIndex, triangleIndex;
@@ -1317,7 +1317,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 
 		totalRenderCalls++;
 
-		lastTexture.bind();
+		bind(lastTexture);
 		Mesh mesh = this.mesh;
 		mesh.setVertices(vertices, 0, vertexIndex);
 		mesh.setIndices(triangles, 0, triangleIndex);
@@ -1325,13 +1325,16 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 			Gdx.gl.glDisable(GL20.GL_BLEND);
 		else {
 			Gdx.gl.glEnable(GL20.GL_BLEND);
-			if (blendSrcFunc != -1) 
-				Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
+			if (blendSrcFunc != -1) Gdx.gl.glBlendFuncSeparate(blendSrcFunc, blendDstFunc, blendSrcFuncAlpha, blendDstFuncAlpha);
 		}
 		mesh.render(shader, GL20.GL_TRIANGLES, 0, triangleIndex);
 
 		vertexIndex = 0;
 		triangleIndex = 0;
+	}
+
+	protected void bind (Texture texture) {
+		texture.bind();
 	}
 
 	@Override
@@ -1399,6 +1402,20 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 		lastTexture = texture;
 		invTexWidth = 1.0f / texture.getWidth();
 		invTexHeight = 1.0f / texture.getHeight();
+	}
+
+	/** Flushes the batch if the shader was changed. */
+	public void setDefaultShader (ShaderProgram newDefaultShader) {
+		boolean current = shader == defaultShader;
+		boolean flush = current && drawing;
+		if (flush) flush();
+		if (ownsDefaultShader) defaultShader.dispose();
+		defaultShader = newDefaultShader;
+		if (current) shader = newDefaultShader;
+		if (flush) {
+			newDefaultShader.bind();
+			setupMatrices();
+		}
 	}
 
 	/** Flushes the batch if the shader was changed.
