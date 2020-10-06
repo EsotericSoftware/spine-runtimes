@@ -48,7 +48,9 @@ namespace Spine.Unity.Playables {
 		public bool customDuration = false;
 		public bool useBlendDuration = true;
 		[SerializeField]
+		#pragma warning disable 414
 		private bool isInitialized = false; // required to read preferences values from editor side.
+		#pragma warning restore 414
 		public float mixDuration = 0.1f;
 
 		[Range(0, 1f)]

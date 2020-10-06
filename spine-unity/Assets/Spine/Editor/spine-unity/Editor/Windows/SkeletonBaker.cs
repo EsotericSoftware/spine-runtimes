@@ -621,7 +621,7 @@ namespace Spine.Unity.Editor {
 			int[] triangles = attachment.Triangles;
 			Color color = new Color(attachment.R, attachment.G, attachment.B, attachment.A);
 
-			mesh = mesh ?? new Mesh();
+			mesh = (mesh == null) ? new Mesh() : mesh;
 
 			mesh.triangles = new int[0];
 
