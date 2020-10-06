@@ -52,6 +52,7 @@ namespace Spine.Unity.Playables {
 		private bool isInitialized = false; // required to read preferences values from editor side.
 		#pragma warning restore 414
 		public float mixDuration = 0.1f;
+		public bool holdPrevious = false;
 
 		[Range(0, 1f)]
 		public float attachmentThreshold = 0.5f;

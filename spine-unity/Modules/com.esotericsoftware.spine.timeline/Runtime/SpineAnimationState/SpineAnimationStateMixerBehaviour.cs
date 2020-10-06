@@ -94,6 +94,7 @@ namespace Spine.Unity.Playables {
 							trackEntry.TrackTime = (float)inputPlayable.GetTime() * (float)inputPlayable.GetSpeed();
 							trackEntry.TimeScale = (float)inputPlayable.GetSpeed();
 							trackEntry.AttachmentThreshold = clipData.attachmentThreshold;
+							trackEntry.HoldPrevious = clipData.holdPrevious;
 
 							if (clipData.customDuration)
 								trackEntry.MixDuration = clipData.mixDuration;
@@ -182,8 +183,10 @@ namespace Spine.Unity.Playables {
 						dummyAnimationState.ClearTracks();
 						fromTrack = dummyAnimationState.SetAnimation(0, fromAnimation, fromClipLoop);
 						fromTrack.AllowImmediateQueue();
-						if (toAnimation != null)
+						if (toAnimation != null) {
 							toTrack = dummyAnimationState.SetAnimation(0, toAnimation, clipData.loop);
+							toTrack.HoldPrevious = clipData.holdPrevious;
+						}
 					}
 
 					// Update track times.
