@@ -302,7 +302,7 @@ namespace Spine.Unity {
 			var requiredChannels =
 				AdditionalCanvasShaderChannels.TexCoord1 |
 				AdditionalCanvasShaderChannels.TexCoord2;
-			return !canvas.additionalShaderChannels.HasFlag(requiredChannels); // HasFlag returns true if both are set.
+			return (canvas.additionalShaderChannels & requiredChannels) != requiredChannels;
 		}
 	}
 }
