@@ -39,24 +39,58 @@ namespace Spine.Unity {
 		static readonly int STRAIGHT_ALPHA_PARAM_ID = Shader.PropertyToID("_StraightAlphaInput");
 		static readonly string ALPHAPREMULTIPLY_ON_KEYWORD = "_ALPHAPREMULTIPLY_ON";
 		static readonly string STRAIGHT_ALPHA_KEYWORD = "_STRAIGHT_ALPHA_INPUT";
+		static readonly string[] FIXED_NORMALS_KEYWORDS = {
+			"_FIXED_NORMALS_VIEWSPACE",
+			"_FIXED_NORMALS_VIEWSPACE_BACKFACE",
+			"_FIXED_NORMALS_MODELSPACE",
+			"_FIXED_NORMALS_MODELSPACE_BACKFACE",
+			"_FIXED_NORMALS_WORLDSPACE"
+			};
+		static readonly string NORMALMAP_KEYWORD = "_NORMALMAP";
+		static readonly string CANVAS_GROUP_COMPATIBLE_KEYWORD = "_CANVAS_GROUP_COMPATIBLE";
 
 		public static readonly string kPMANotSupportedLinearMessage =
-			"Warning: Premultiply-alpha atlas textures not supported in Linear color space!\n\nPlease\n"
+			"\nWarning: Premultiply-alpha atlas textures not supported in Linear color space!\n\nPlease\n"
 			+ "a) re-export atlas as straight alpha texture with 'premultiply alpha' unchecked\n"
 			+ "   (if you have already done this, please set the 'Straight Alpha Texture' Material parameter to 'true') or\n"
 			+ "b) switch to Gamma color space via\nProject Settings - Player - Other Settings - Color Space.\n";
 		public static readonly string kZSpacingRequiredMessage =
-			"Warning: Z Spacing required on selected shader! Otherwise you will receive incorrect results.\n\nPlease\n"
+			"\nWarning: Z Spacing required on selected shader! Otherwise you will receive incorrect results.\n\nPlease\n"
 			+ "1) make sure at least minimal 'Z Spacing' is set at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' and\n"
 			+ "2) ensure that the skeleton has overlapping parts on different Z depth. You can adjust this in Spine via draw order.\n";
 		public static readonly string kZSpacingRecommendedMessage =
-			"Warning: Z Spacing recommended on selected shader configuration!\n\nPlease\n"
+			"\nWarning: Z Spacing recommended on selected shader configuration!\n\nPlease\n"
 			+ "1) make sure at least minimal 'Z Spacing' is set at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' and\n"
 			+ "2) ensure that the skeleton has overlapping parts on different Z depth. You can adjust this in Spine via draw order.\n";
-		public static readonly string kAddNormalsRequiredMessage =
-			"Warning: 'Add Normals' required on URP shader to receive shadows!\n\nPlease\n"
+		public static readonly string kAddNormalsMessage =
+			"\nWarning: 'Add Normals' required when not using 'Fixed Normals'!\n\nPlease\n"
 			+ "a) enable 'Add Normals' at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' or\n"
-			+ "b) disable 'Receive Shadows' at the Material.";
+			+ "b) enable 'Fixed Normals' at the Material.\n";
+		public static readonly string kAddNormalsRequiredForURPShadowsMessage =
+			"\nWarning: 'Add Normals' required on URP shader to receive shadows!\n\nPlease\n"
+			+ "a) enable 'Add Normals' at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' or\n"
+			+ "b) disable 'Receive Shadows' at the Material.\n";
+		public static readonly string kSolveTangentsMessage =
+			"\nWarning: 'Solve Tangents' required when using a Normal Map!\n\nPlease\n"
+			+ "a) enable 'Solve Tangents' at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' or\n"
+			+ "b) clear the 'Normal Map' parameter at the Material.\n";
+		public static readonly string kNoSkeletonGraphicMaterialMessage =
+			"\nWarning: Normal non-UI shaders other than 'Spine/SkeletonGraphic *' are not compatible with 'SkeletonGraphic' components! "
+			+ "This will lead to incorrect rendering on some devices.\n\n"
+			+ "Please change the assigned Material to e.g. 'SkeletonGraphicDefault' or change the used shader to one of the 'Spine/SkeletonGraphic *' shaders.\n\n"
+			+ "Note that 'Spine/SkeletonGraphic *' shall still be used when using URP.\n";
+		public static readonly string kTintBlackMessage =
+			"\nWarning: 'Advanced - Tint Black' required when using any 'Tint Black' shader!\n\nPlease\n"
+			+ "a) enable 'Tint Black' at the SkeletonRenderer/SkeletonGraphic component under 'Advanced' or\n"
+			+ "b) use a different shader at the Material.\n";
+		public static readonly string kCanvasTintBlackMessage =
+			"\nWarning: Canvas 'Additional Shader Channels' 'uv1' and 'uv2' are required when 'Advanced - Tint Black' is enabled!\n\n"
+			+ "Please enable both 'uv1' and 'uv2' channels at the parent Canvas component parameter 'Additional Shader Channels'.\n";
+		public static readonly string kCanvasGroupCompatibleMessage =
+			"\nWarning: 'Canvas Group Tint Black' is enabled at SkeletonGraphic but not 'CanvasGroup Compatible' at the Material!\n\nPlease\n"
+			+ "a) enable 'CanvasGroup Compatible' at the Material or\n"
+			+ "b) disable 'Canvas Group Tint Black' at the SkeletonGraphic component under 'Advanced'.\n"
+			+ "You may want to duplicate the 'SkeletonGraphicDefault' material and change settings at the duplicate to not affect all instances.";
 
 		public static bool IsMaterialSetupProblematic (SkeletonRenderer renderer, ref string errorMessage) {
 			var materials = renderer.GetComponent<Renderer>().sharedMaterials;
@@ -67,9 +101,51 @@ namespace Spine.Unity {
 				if (renderer.zSpacing == 0) {
 					isProblematic |= IsZSpacingRequired(material, ref errorMessage);
 				}
+				if (renderer.addNormals == false && RequiresMeshNormals(material)) {
+					isProblematic = true;
+					errorMessage += kAddNormalsMessage;
+				}
+				if (renderer.calculateTangents == false && RequiresTangents(material)) {
+					isProblematic = true;
+					errorMessage += kSolveTangentsMessage;
+				}
+				if (renderer.tintBlack == false && RequiresTintBlack(material)) {
+					isProblematic = true;
+					errorMessage += kTintBlackMessage;
+				}
 				if (IsURP3DMaterial(material) && !AreShadowsDisabled(material) && renderer.addNormals == false) {
 					isProblematic = true;
-					errorMessage += kAddNormalsRequiredMessage;
+					errorMessage += kAddNormalsRequiredForURPShadowsMessage;
+				}
+			}
+			return isProblematic;
+		}
+
+		public static bool IsMaterialSetupProblematic(SkeletonGraphic skeletonGraphic, ref string errorMessage)
+		{
+			var material = skeletonGraphic.material;
+			bool isProblematic = false;
+			if (material) {
+				isProblematic |= IsMaterialSetupProblematic(material, ref errorMessage);
+				var settings = skeletonGraphic.MeshGenerator.settings;
+				if (settings.zSpacing == 0) {
+					isProblematic |= IsZSpacingRequired(material, ref errorMessage);
+				}
+				if (IsSpineNonSkeletonGraphicMaterial(material)) {
+					isProblematic = true;
+					errorMessage += kNoSkeletonGraphicMaterialMessage;
+				}
+				if (settings.tintBlack == false && RequiresTintBlack(material)) {
+					isProblematic = true;
+					errorMessage += kTintBlackMessage;
+				}
+				if (settings.tintBlack == true && CanvasNotSetupForTintBlack(skeletonGraphic)) {
+					isProblematic = true;
+					errorMessage += kCanvasTintBlackMessage;
+				}
+				if (settings.canvasGroupTintBlack == true && !IsCanvasGroupCompatible(material)) {
+					isProblematic = true;
+					errorMessage += kCanvasGroupCompatibleMessage;
 				}
 			}
 			return isProblematic;
@@ -181,8 +257,52 @@ namespace Spine.Unity {
 			return material.shader.name.Contains("Universal Render Pipeline/Spine");
 		}
 
+		static bool IsSpineNonSkeletonGraphicMaterial (Material material) {
+			return material.shader.name.Contains("Spine") && !material.shader.name.Contains("SkeletonGraphic");
+		}
+
 		static bool AreShadowsDisabled (Material material) {
 			return material.IsKeywordEnabled("_RECEIVE_SHADOWS_OFF");
+		}
+
+		static bool RequiresMeshNormals (Material material) {
+			bool anyFixedNormalSet = false;
+			foreach (string fixedNormalKeyword in FIXED_NORMALS_KEYWORDS) {
+				if (material.IsKeywordEnabled(fixedNormalKeyword)) {
+					anyFixedNormalSet = true;
+					break;
+				}
+			}
+			bool isShaderWithMeshNormals =
+				material.shader.name.Contains("Spine/Sprite/Pixel Lit") ||
+				material.shader.name.Contains("Spine/Sprite/Vertex Lit") ||
+				material.shader.name.Contains("2D/Spine/Sprite") || // covers both URP and LWRP
+				material.shader.name.Contains("Pipeline/Spine/Sprite"); // covers both URP and LWRP
+			return isShaderWithMeshNormals && !anyFixedNormalSet;
+		}
+
+		static bool RequiresTintBlack (Material material) {
+			bool isTintBlackShader =
+				material.shader.name.Contains("Spine") &&
+				material.shader.name.Contains("Tint Black");
+			return isTintBlackShader;
+		}
+
+		static bool RequiresTangents (Material material) {
+			return material.IsKeywordEnabled(NORMALMAP_KEYWORD);
+		}
+		static bool IsCanvasGroupCompatible (Material material) {
+			return material.IsKeywordEnabled(CANVAS_GROUP_COMPATIBLE_KEYWORD);
+		}
+
+		static bool CanvasNotSetupForTintBlack (SkeletonGraphic skeletonGraphic) {
+			Canvas canvas = skeletonGraphic.canvas;
+			if (!canvas)
+				return false;
+			var requiredChannels =
+				AdditionalCanvasShaderChannels.TexCoord1 |
+				AdditionalCanvasShaderChannels.TexCoord2;
+			return !canvas.additionalShaderChannels.HasFlag(requiredChannels); // HasFlag returns true if both are set.
 		}
 	}
 }

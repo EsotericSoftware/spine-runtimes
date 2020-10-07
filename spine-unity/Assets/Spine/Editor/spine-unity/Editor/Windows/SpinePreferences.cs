@@ -84,6 +84,9 @@ namespace Spine.Unity.Editor {
 		internal const bool DEFAULT_TEXTUREIMPORTER_WARNING = true;
 		public bool textureImporterWarning = DEFAULT_TEXTUREIMPORTER_WARNING;
 
+		internal const bool DEFAULT_COMPONENTMATERIAL_WARNING = true;
+		public bool componentMaterialWarning = DEFAULT_COMPONENTMATERIAL_WARNING;
+
 		public const float DEFAULT_MIPMAPBIAS = -0.5f;
 
 		public const bool DEFAULT_AUTO_RELOAD_SCENESKELETONS = true;
@@ -165,6 +168,7 @@ namespace Spine.Unity.Editor {
 				{
 					EditorGUILayout.PropertyField(settings.FindProperty("atlasTxtImportWarning"), new GUIContent("Atlas Extension Warning", "Log a warning and recommendation whenever a `.atlas` file is found."));
 					EditorGUILayout.PropertyField(settings.FindProperty("textureImporterWarning"), new GUIContent("Texture Settings Warning", "Log a warning and recommendation whenever Texture Import Settings are detected that could lead to undesired effects, e.g. white border artifacts."));
+					EditorGUILayout.PropertyField(settings.FindProperty("componentMaterialWarning"), new GUIContent("Component & Material Warning", "Log a warning and recommendation whenever Component and Material settings are not compatible."));
 				}
 
 				EditorGUILayout.Space();
