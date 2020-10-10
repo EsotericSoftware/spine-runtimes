@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "KzaKKsSONZMiN9P/N5Sy60ksi9M",
-	"spine": "3.8.33-beta",
+	"hash": "WGQ8e/U+7iU",
+	"spine": "4.0.05-beta",
 	"x": -125,
 	"y": -30,
 	"width": 250,
@@ -40,7 +40,10 @@
 		"bones": {
 			"Bar": {
 				"scale": [
-					{ "x": 0.002, "curve": 0.25, "c3": 0.75 },
+					{
+						"x": 0.002,
+						"curve": [ 0.25, 0, 0.75, 1, 0.25, 1, 0.75, 1 ]
+					},
 					{ "time": 1 }
 				]
 			}

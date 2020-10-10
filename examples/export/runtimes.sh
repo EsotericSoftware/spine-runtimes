@@ -4,15 +4,7 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 cd $SCRIPT_DIR
 
-ROOT=${1%/}
-if [ ! -d "$ROOT/" ]; then
-	echo "Please provide the path to the Spine Runtimes root directory."
-	exit -1
-fi
-if [ ! -f "$ROOT/CHANGELOG.md" ]; then
-	echo "Provided path does not look like the Spine Runtimes root directory: $ROOT"
-	exit -1
-fi
+ROOT=$SCRIPT_DIR/../..
 echo "Spine Runtimes path: $ROOT"
 echo "Copying assets to runtimes..."
 echo ""

@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "si5Eo3i8lRP0iYQ+AdTaCXbL1Gg",
-	"spine": "3.8.33-beta",
+	"hash": "M7buRYUnWiw",
+	"spine": "4.0.05-beta",
 	"x": -252.71,
 	"y": -232.55,
 	"width": 456.71,
@@ -58,9 +58,9 @@
 			"_rotation": {
 				"rotate": [
 					{},
-					{ "time": 0.3333, "angle": -120 },
-					{ "time": 0.6667, "angle": 120 },
-					{ "time": 1 }
+					{ "time": 0.3333, "value": -120 },
+					{ "time": 0.6667, "value": -240 },
+					{ "time": 1, "value": -360 }
 				]
 			}
 		}

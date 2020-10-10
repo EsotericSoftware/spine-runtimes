@@ -148,7 +148,7 @@ if [ -d "$UNITY_BASE_DIR" ]; then
 	echo ""
 	echo "Exporting Unity assets..."
 	"$SPINE_EXE" \
-	-u $version -f \
+	-u $version \
 	-i $UNITY_BASE_DIR/eyes/eyes.spine -o $UNITY_BASE_DIR/eyes/export -e json.json \
 	-i $UNITY_BASE_DIR/eyes/eyes.spine -o $UNITY_BASE_DIR/eyes/export -e binary.json \
 	-i $UNITY_BASE_DIR/eyes/images -o $UNITY_BASE_DIR/eyes/export -n eyes -p atlas-1.0.json \
@@ -195,8 +195,10 @@ if [ -d "$UNITY_BASE_DIR" ]; then
 	-i $UNITY_BASE_DIR/whirlyblendmodes/images -o $UNITY_BASE_DIR/whirlyblendmodes/export -n whirlyblendmodes-pma -p atlas-1.0-pma.json
 fi
 
+echo ""
 echo "Optimizing PNGs..."
 cd ..
 find -type f -iname '*.png' -exec oxipng -q --nx -i 0 -o 4 --strip all {} +
 
+echo ""
 echo "Done!"

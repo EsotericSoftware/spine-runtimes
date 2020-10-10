@@ -5,190 +5,190 @@ format: RGBA8888
 filter: Linear,Linear
 repeat: none
 L_eye-closed
-  rotate: false
-  xy: 508, 115
+  rotate: true
+  xy: 512, 5
   size: 90, 86
   orig: 90, 86
   offset: 0, 0
   index: -1
 L_eye-iris
-  rotate: false
-  xy: 826, 183
+  rotate: true
+  xy: 600, 10
   size: 90, 86
   orig: 90, 86
   offset: 0, 0
   index: -1
 L_eye-light
-  rotate: false
-  xy: 1001, 488
+  rotate: true
+  xy: 688, 4
   size: 21, 20
   orig: 21, 20
   offset: 0, 0
   index: -1
 L_eye-pupil
-  rotate: false
-  xy: 752, 154
+  rotate: true
+  xy: 856, 13
   size: 63, 60
   orig: 63, 60
   offset: 0, 0
   index: -1
 L_foot
-  rotate: false
-  xy: 817, 133
+  rotate: true
+  xy: 834, 78
   size: 64, 48
   orig: 64, 48
   offset: 0, 0
   index: -1
 L_wing
-  rotate: false
-  xy: 342, 91
+  rotate: true
+  xy: 349, 4
   size: 81, 110
   orig: 81, 110
   offset: 0, 0
   index: -1
 R_eye-closed
-  rotate: false
-  xy: 508, 27
+  rotate: true
+  xy: 637, 119
   size: 90, 86
   orig: 90, 86
   offset: 0, 0
   index: -1
 R_eye-iris
   rotate: true
-  xy: 600, 111
+  xy: 688, 27
   size: 90, 86
   orig: 90, 86
   offset: 0, 0
   index: -1
 R_eye-light
-  rotate: false
-  xy: 1001, 466
+  rotate: true
+  xy: 710, 4
   size: 21, 20
   orig: 21, 20
   offset: 0, 0
   index: -1
 R_eye-pupil
   rotate: true
-  xy: 691, 72
+  xy: 884, 80
   size: 63, 60
   orig: 63, 60
   offset: 0, 0
   index: -1
 R_foot
-  rotate: false
-  xy: 814, 83
+  rotate: true
+  xy: 845, 145
   size: 64, 48
   orig: 64, 48
   offset: 0, 0
   index: -1
 R_wing
   rotate: false
-  xy: 425, 91
+  xy: 421, 93
   size: 81, 110
   orig: 81, 110
   offset: 0, 0
   index: -1
 beak
   rotate: false
-  xy: 883, 140
+  xy: 776, 2
   size: 39, 41
   orig: 39, 41
   offset: 0, 0
   index: -1
 beak-down
-  rotate: true
-  xy: 753, 53
+  rotate: false
+  xy: 817, 3
   size: 37, 40
   orig: 37, 40
   offset: 0, 0
   index: -1
 body
   rotate: false
-  xy: 2, 5
+  xy: 2, 7
   size: 248, 196
   orig: 248, 196
   offset: 0, 0
   index: -1
 feather-1
   rotate: false
-  xy: 753, 92
+  xy: 918, 18
   size: 59, 60
   orig: 59, 60
   offset: 0, 0
   index: -1
 feather-2
   rotate: false
-  xy: 688, 137
+  xy: 781, 144
   size: 62, 65
   orig: 62, 65
   offset: 0, 0
   index: -1
 feather-3
-  rotate: true
-  xy: 600, 2
+  rotate: false
+  xy: 776, 45
   size: 56, 76
   orig: 56, 76
   offset: 0, 0
   index: -1
 head-base
-  rotate: false
-  xy: 621, 271
+  rotate: true
+  xy: 621, 211
   size: 299, 237
   orig: 299, 237
   offset: 0, 0
   index: -1
 leaf-1
   rotate: false
-  xy: 922, 273
+  xy: 559, 102
   size: 76, 101
   orig: 76, 101
   offset: 0, 0
   index: -1
 leaf-2
   rotate: true
-  xy: 621, 204
+  xy: 252, 4
   size: 65, 95
   orig: 65, 95
   offset: 0, 0
   index: -1
 leaf-3
   rotate: true
-  xy: 922, 376
+  xy: 252, 71
   size: 132, 77
   orig: 132, 77
   offset: 0, 0
   index: -1
 leaf-4
-  rotate: false
-  xy: 600, 60
+  rotate: true
+  xy: 461, 2
   size: 89, 49
   orig: 89, 49
   offset: 0, 0
   index: -1
 leaf-5
-  rotate: true
-  xy: 718, 216
+  rotate: false
+  xy: 504, 97
   size: 53, 106
   orig: 53, 106
   offset: 0, 0
   index: -1
 leaf-6
   rotate: false
-  xy: 252, 85
+  xy: 331, 87
   size: 88, 116
   orig: 88, 116
   offset: 0, 0
   index: -1
 leaf-7
-  rotate: true
-  xy: 252, 29
+  rotate: false
+  xy: 725, 123
   size: 54, 86
   orig: 54, 86
   offset: 0, 0
   index: -1
 wood
   rotate: false
-  xy: 2, 203
+  xy: 2, 205
   size: 617, 305
   orig: 617, 305
   offset: 0, 0

@@ -6,21 +6,21 @@ filter: Linear,Linear
 repeat: none
 belt-ends
   rotate: true
-  xy: 965, 81
+  xy: 648, 5
   size: 45, 56
   orig: 45, 56
   offset: 0, 0
   index: -1
 hair-1
   rotate: false
-  xy: 635, 87
+  xy: 422, 3
   size: 82, 39
   orig: 82, 39
   offset: 0, 0
   index: -1
 hair-2
   rotate: false
-  xy: 719, 83
+  xy: 572, 2
   size: 74, 43
   orig: 74, 43
   offset: 0, 0
@@ -33,162 +33,162 @@ head
   offset: 0, 0
   index: -1
 hood-end1a
-  rotate: true
-  xy: 879, 103
+  rotate: false
+  xy: 377, 42
   size: 23, 84
   orig: 23, 84
   offset: 0, 0
   index: -1
 hood-end1b
-  rotate: true
-  xy: 795, 67
+  rotate: false
+  xy: 572, 47
   size: 28, 79
   orig: 28, 79
   offset: 0, 0
   index: -1
 hood-end1c
   rotate: true
-  xy: 636, 24
+  xy: 120, 3
   size: 31, 70
   orig: 31, 70
   offset: 0, 0
   index: -1
 hood-end1d
-  rotate: true
-  xy: 795, 97
+  rotate: false
+  xy: 447, 44
   size: 29, 82
   orig: 29, 82
   offset: 0, 0
   index: -1
 hood-end1e
   rotate: true
-  xy: 248, 2
+  xy: 264, 4
   size: 35, 78
   orig: 35, 78
   offset: 0, 0
   index: -1
 hood-end1f
-  rotate: true
-  xy: 509, 42
+  rotate: false
+  xy: 657, 55
   size: 39, 71
   orig: 39, 71
   offset: 0, 0
   index: -1
 hood-end2a
   rotate: true
-  xy: 120, 9
+  xy: 344, 9
   size: 30, 76
   orig: 30, 76
   offset: 0, 0
   index: -1
 hood-end2b
-  rotate: true
-  xy: 509, 2
+  rotate: false
+  xy: 698, 55
   size: 38, 71
   orig: 38, 71
   offset: 0, 0
   index: -1
 hood-end2c
-  rotate: false
-  xy: 337, 18
+  rotate: true
+  xy: 506, 2
   size: 42, 64
   orig: 42, 64
   offset: 0, 0
   index: -1
 hood-end2d
-  rotate: true
-  xy: 712, 58
+  rotate: false
+  xy: 602, 50
   size: 23, 76
   orig: 23, 76
   offset: 0, 0
   index: -1
 hood-end2e
-  rotate: true
-  xy: 636, 57
+  rotate: false
+  xy: 627, 52
   size: 28, 74
   orig: 28, 74
   offset: 0, 0
   index: -1
 hood-end2f
   rotate: true
-  xy: 879, 70
+  xy: 192, 3
   size: 31, 70
   orig: 31, 70
   offset: 0, 0
   index: -1
 left-foot
   rotate: true
-  xy: 199, 2
+  xy: 478, 46
   size: 80, 47
   orig: 80, 47
   offset: 0, 0
   index: -1
 left-foot-bent01
-  rotate: false
-  xy: 248, 39
+  rotate: true
+  xy: 208, 39
   size: 87, 43
   orig: 87, 43
   offset: 0, 0
   index: -1
 left-foot-bent02
-  rotate: false
-  xy: 470, 83
+  rotate: true
+  xy: 402, 44
   size: 82, 43
   orig: 82, 43
   offset: 0, 0
   index: -1
 left-foot-side
-  rotate: false
-  xy: 199, 84
+  rotate: true
+  xy: 120, 36
   size: 90, 42
   orig: 90, 42
   offset: 0, 0
   index: -1
 left-hand
   rotate: false
-  xy: 582, 28
+  xy: 796, 73
   size: 52, 53
   orig: 52, 53
   offset: 0, 0
   index: -1
 right-foot
-  rotate: false
-  xy: 381, 25
+  rotate: true
+  xy: 738, 60
   size: 66, 56
   orig: 66, 56
   offset: 0, 0
   index: -1
 right-foot-bent01
-  rotate: false
-  xy: 383, 83
+  rotate: true
+  xy: 332, 41
   size: 85, 43
   orig: 85, 43
   offset: 0, 0
   index: -1
 right-foot-bent02
-  rotate: false
-  xy: 554, 83
+  rotate: true
+  xy: 527, 47
   size: 79, 43
   orig: 79, 43
   offset: 0, 0
   index: -1
 right-foot-side
-  rotate: false
-  xy: 291, 84
+  rotate: true
+  xy: 164, 36
   size: 90, 42
   orig: 90, 42
   offset: 0, 0
   index: -1
 right-hand
   rotate: true
-  xy: 449, 25
+  xy: 738, 2
   size: 56, 58
   orig: 56, 58
   offset: 0, 0
   index: -1
 torso
   rotate: false
-  xy: 120, 41
+  xy: 253, 41
   size: 77, 85
   orig: 77, 85
   offset: 0, 0
