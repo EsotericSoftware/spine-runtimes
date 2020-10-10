@@ -1,7 +1,10 @@
 #!/bin/sh
+
+# Usage: export.sh <version> <one or more parameters to pass to Spine, eg: -f --trace>
+
 set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-cd $SCRIPT_DIR
+cd "$SCRIPT_DIR"
 
 SPINE_EXE="C:/Program Files/Spine/Spine.com"
 if [ ! -f "$SPINE_EXE" ]; then
@@ -12,11 +15,11 @@ if [ ! -f "$SPINE_EXE" ]; then
 fi
 echo "Spine exe: $SPINE_EXE"
 
-if [ "$#" -eq 1 ]; then
-	version=${1%/}
-else
+if [ "$#" -eq 0 ]; then
 	echo "Enter the Spine editor version to use for the export (eg 3.8.99):"
 	read version
+else
+	version=${1%/}
 fi
 
 echo "Cleaning export directories..."
@@ -39,7 +42,7 @@ rm -rf ../mix-and-match/export/*
 echo ""
 echo "Exporting assets..."
 "$SPINE_EXE" \
--u $version -f \
+-u $version ${@:2} --clean-examples \
 -i ../alien/alien-ess.spine -o ../alien/export -e json.json \
 -i ../alien/alien-ess.spine -o ../alien/export -e binary.json \
 -i ../alien/alien-pro.spine -o ../alien/export -e json.json \
@@ -191,3 +194,9 @@ if [ -d "$UNITY_BASE_DIR" ]; then
 	-i $UNITY_BASE_DIR/whirlyblendmodes/images -o $UNITY_BASE_DIR/whirlyblendmodes/export -n whirlyblendmodes -p atlas-1.0.json \
 	-i $UNITY_BASE_DIR/whirlyblendmodes/images -o $UNITY_BASE_DIR/whirlyblendmodes/export -n whirlyblendmodes-pma -p atlas-1.0-pma.json
 fi
+
+echo "Optimizing PNGs..."
+cd ..
+find -type f -iname '*.png' -exec oxipng -q --nx -i 0 -o 4 --strip all {} +
+
+echo "Done!"
