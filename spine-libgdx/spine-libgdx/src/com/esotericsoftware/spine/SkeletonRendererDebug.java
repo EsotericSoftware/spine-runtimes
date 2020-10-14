@@ -47,11 +47,11 @@ import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 
 public class SkeletonRendererDebug {
-	static private final Color boneLineColor = Color.RED;
-	static private final Color boneOriginColor = Color.GREEN;
-	static private final Color attachmentLineColor = new Color(0, 0, 1, 0.5f);
-	static private final Color triangleLineColor = new Color(1, 0.64f, 0, 0.5f); // ffa3007f
-	static private final Color aabbColor = new Color(0, 1, 0, 0.5f);
+	static public final Color boneLineColor = Color.RED;
+	static public final Color boneOriginColor = Color.GREEN;
+	static public final Color attachmentLineColor = new Color(0, 0, 1, 0.5f);
+	static public final Color triangleLineColor = new Color(1, 0.64f, 0, 0.5f); // ffa3007f
+	static public final Color aabbColor = new Color(0, 1, 0, 0.5f);
 
 	private final ShapeRenderer shapes;
 	private boolean drawBones = true, drawRegionAttachments = true, drawBoundingBoxes = true, drawPoints = true;
