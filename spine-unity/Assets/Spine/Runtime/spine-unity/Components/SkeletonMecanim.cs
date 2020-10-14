@@ -40,9 +40,16 @@ namespace Spine.Unity {
 		private bool wasUpdatedAfterInit = true;
 
 		#region Bone Callbacks (ISkeletonAnimation)
+		protected event UpdateBonesDelegate _BeforeApply;
 		protected event UpdateBonesDelegate _UpdateLocal;
 		protected event UpdateBonesDelegate _UpdateWorld;
 		protected event UpdateBonesDelegate _UpdateComplete;
+
+		/// <summary>
+		/// Occurs before the animations are applied.
+		/// Use this callback when you want to change the skeleton state before animations are applied on top.
+		/// </summary>
+		public event UpdateBonesDelegate BeforeApply { add { _BeforeApply += value; } remove { _BeforeApply -= value; } }
 
 		/// <summary>
 		/// Occurs after the animations are applied and before world space values are resolved.
@@ -87,6 +94,9 @@ namespace Spine.Unity {
 		}
 
 		protected void ApplyAnimation () {
+			if (_BeforeApply != null)
+				_BeforeApply(this);
+
 		#if UNITY_EDITOR
 			var translatorAnimator = translator.Animator;
 			if (translatorAnimator != null && !translatorAnimator.isInitialized)

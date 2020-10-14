@@ -243,6 +243,7 @@
   * Added `Mix and Match Skins` example scene to demonstrate how the 3.8 Skin API and combining skins can be used for a wardrobe and equipment use case.
   * Spine Timeline Extensions: Added `Hold Previous` parameter at `SpineAnimationStateClip`.
   * Added more warning messages at incompatible SkeletonRenderer/SkeletonGraphic Component vs Material settings. They appear both as an info box in the Inspector as well as upon initialization in the Console log window. The Inspector box warnings can be disabled via `Edit - Preferences - Spine`.
+  * Now providing `BeforeApply` update callbacks at all skeleton animation components (`SkeletonAnimation`, `SkeletonMecanim` and `SkeletonGraphic`).
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.MixNext` instead of `MixMode.MixAlways`.
