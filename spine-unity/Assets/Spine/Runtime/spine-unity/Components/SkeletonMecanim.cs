@@ -473,8 +473,14 @@ namespace Spine.Unity {
 				return (clipLength - time < EndSnapEpsilon) ? clipLength : time; // return a time snapped to clipLength;
 			}
 
-			static float AnimationTime (float normalizedTime, float clipLength, bool reversed) {
-				if (reversed)
+			static float AnimationTime(float normalizedTime, float clipLength, bool reversed)
+			{
+				bool isTimePositive = (normalizedTime >= 0);
+
+				if (!isTimePositive)
+					normalizedTime *= (-1);
+
+				if (reversed == isTimePositive) // if time is positive and we are reversed, OR if it is negative and we are not reversed
 					normalizedTime = (1 - normalizedTime + (int)normalizedTime) + (int)normalizedTime;
 
 				return normalizedTime * clipLength;
