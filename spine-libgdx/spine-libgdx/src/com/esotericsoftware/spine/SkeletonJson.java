@@ -565,9 +565,9 @@ public class SkeletonJson extends SkeletonLoader {
 						float nb = Integer.parseInt(color.substring(4, 6), 16) / 255f;
 						float na = Integer.parseInt(color.substring(6, 8), 16) / 255f;
 						color = nextMap.getString("dark");
-						float nr2 = Integer.parseInt(color.substring(8, 10), 16) / 255f;
-						float ng2 = Integer.parseInt(color.substring(10, 12), 16) / 255f;
-						float nb2 = Integer.parseInt(color.substring(12, 14), 16) / 255f;
+						float nr2 = Integer.parseInt(color.substring(0, 2), 16) / 255f;
+						float ng2 = Integer.parseInt(color.substring(2, 4), 16) / 255f;
+						float nb2 = Integer.parseInt(color.substring(4, 6), 16) / 255f;
 						JsonValue curve = keyMap.get("curve");
 						if (curve != null) {
 							bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr, 1);
