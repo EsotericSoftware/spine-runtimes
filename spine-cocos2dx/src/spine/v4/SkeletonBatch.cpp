@@ -40,7 +40,6 @@ using std::max;
 
 #include "renderer/ccShaders.h"
 #include "renderer/backend/Device.h"
-#include "renderer/backend/ProgramState.h"
 
 namespace spine {
 

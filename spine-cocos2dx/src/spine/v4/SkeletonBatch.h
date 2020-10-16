@@ -35,12 +35,7 @@
 
 #include <spine/spine.h>
 #include <vector>
-
-namespace cocos2d {
-	namespace backend {
-		class ProgramState;
-	}
-}
+#include "renderer/backend/ProgramState.h"
 
 namespace spine {
     
