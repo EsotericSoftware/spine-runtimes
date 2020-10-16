@@ -201,7 +201,7 @@ void TwoColorTrianglesCommand::updateCommandPipelineDescriptor(cocos2d::backend:
         }
     }
     else {
-        needsUpdateStateLayout = _programState != nullptr && _programState->getProgramType() != __twoColorProgramState->getProgramType();
+        needsUpdateStateLayout = _programState != nullptr && _programState->getProgram() != __twoColorProgramState->getProgram();
         CC_SAFE_RELEASE(_programState);
         _programState = __twoColorProgramState->clone();
     }
