@@ -38,14 +38,14 @@ namespace Spine {
 	public class SkeletonDebugRenderer {
 		ShapeRenderer renderer;
 
-		private static Color boneLineColor = new Color(1f, 0f, 0f, 1f);
-		private static Color boneOriginColor = new Color(0f, 1f, 0f, 1f);
-		private static Color attachmentLineColor = new Color(0f, 0f, 1f, 0.5f);
-		private static Color triangleLineColor = new Color(1f, 0.64f, 0f, 0.5f);
-		private static Color pathColor = new Color(1f, 0.5f, 0f, 1f);
-		private static Color clipColor = new Color(0.8f, 0f, 0f, 1f);
-		private static Color clipDecomposedColor = new Color(0.8f, 0.8f, 0f, 1f);
-		private static Color aabbColor = new Color(0f, 1f, 0f, 0.5f);
+		public static Color boneLineColor = new Color(1f, 0f, 0f, 1f);
+		public static Color boneOriginColor = new Color(0f, 1f, 0f, 1f);
+		public static Color attachmentLineColor = new Color(0f, 0f, 1f, 0.5f);
+		public static Color triangleLineColor = new Color(1f, 0.64f, 0f, 0.5f);
+		public static Color pathColor = new Color(1f, 0.5f, 0f, 1f);
+		public static Color clipColor = new Color(0.8f, 0f, 0f, 1f);
+		public static Color clipDecomposedColor = new Color(0.8f, 0.8f, 0f, 1f);
+		public static Color aabbColor = new Color(0f, 1f, 0f, 0.5f);
 
 		public BasicEffect Effect { get { return renderer.Effect; } set { renderer.Effect = value; } }
 		public bool DrawBones { get; set; }
