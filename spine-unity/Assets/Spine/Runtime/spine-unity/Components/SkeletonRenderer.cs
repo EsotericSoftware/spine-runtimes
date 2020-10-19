@@ -39,6 +39,10 @@
 #define BUILT_IN_SPRITE_MASK_COMPONENT
 #endif
 
+#if UNITY_2019_3_OR_NEWER
+#define CONFIGURABLE_ENTER_PLAY_MODE
+#endif
+
 #define SPINE_OPTIONAL_RENDEROVERRIDE
 #define SPINE_OPTIONAL_MATERIALOVERRIDE
 
@@ -275,6 +279,12 @@ namespace Spine.Unity {
 		public virtual void Awake () {
 			Initialize(false);
 		}
+
+	#if UNITY_EDITOR && CONFIGURABLE_ENTER_PLAY_MODE
+		public virtual void Start () {
+			Initialize(false);
+		}
+	#endif
 
 		void OnDisable () {
 			if (clearStateOnDisable && valid)
