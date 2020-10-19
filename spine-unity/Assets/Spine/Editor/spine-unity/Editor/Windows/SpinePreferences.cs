@@ -111,6 +111,9 @@ namespace Spine.Unity.Editor {
 
 		internal static SpinePreferences GetOrCreateSettings () {
 			var settings = AssetDatabase.LoadAssetAtPath<SpinePreferences>(SPINE_SETTINGS_ASSET_PATH);
+
+			if (settings == null)
+				settings = FindSpinePreferences();
 			if (settings == null)
 			{
 				settings = ScriptableObject.CreateInstance<SpinePreferences>();
@@ -124,6 +127,18 @@ namespace Spine.Unity.Editor {
 					AssetDatabase.CreateAsset(settings, SPINE_SETTINGS_ASSET_PATH);
 			}
 			return settings;
+		}
+
+		static SpinePreferences FindSpinePreferences () {
+			string typeSearchString = " t:SpinePreferences";
+			string[] guids = AssetDatabase.FindAssets(typeSearchString);
+			foreach (string guid in guids) {
+				string path = AssetDatabase.GUIDToAssetPath(guid);
+				var preferences = AssetDatabase.LoadAssetAtPath<SpinePreferences>(path);
+				if (preferences != null)
+					return preferences;
+			}
+			return null;
 		}
 
 		public static void HandlePreferencesGUI (SerializedObject settings) {
