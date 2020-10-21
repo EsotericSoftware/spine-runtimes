@@ -4,7 +4,7 @@
 #define SHADER_SHARED_INCLUDED
 
 #if defined(USE_LWRP)
-#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+#include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Core.hlsl"
 #elif defined(USE_URP)
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 #else
