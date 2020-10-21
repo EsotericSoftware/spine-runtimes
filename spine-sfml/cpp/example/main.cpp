@@ -610,8 +610,9 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
+DebugExtension dbgExtension(SpineExtension::getInstance());
+
 int main () {
-	DebugExtension dbgExtension(SpineExtension::getInstance());
 	SpineExtension::setInstance(&dbgExtension);
 
     testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
