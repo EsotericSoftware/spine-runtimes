@@ -39,6 +39,8 @@ namespace Spine {
 	/// </summary>
 	public class Skin {
 		internal string name;
+		// Difference to reference implementation: using Dictionary<SkinKey, SkinEntry> instead of HashSet<SkinEntry>.
+		// Reason is that there is no efficient way to replace or access an already added element, losing any benefits.
 		private Dictionary<SkinKey, SkinEntry> attachments = new Dictionary<SkinKey, SkinEntry>(SkinKeyComparer.Instance);
 		internal readonly ExposedList<BoneData> bones = new ExposedList<BoneData>();
 		internal readonly ExposedList<ConstraintData> constraints = new ExposedList<ConstraintData>();
@@ -58,7 +60,6 @@ namespace Spine {
 		/// If the name already exists for the slot, the previous value is replaced.</summary>
 		public void SetAttachment (int slotIndex, string name, Attachment attachment) {
 			if (attachment == null) throw new ArgumentNullException("attachment", "attachment cannot be null.");
-			if (slotIndex < 0) throw new ArgumentNullException("slotIndex", "slotIndex must be >= 0.");
 			attachments[new SkinKey(slotIndex, name)] = new SkinEntry(slotIndex, name, attachment);
 		}
 
@@ -104,13 +105,14 @@ namespace Spine {
 
 		/// <summary> Removes the attachment in the skin for the specified slot index and name, if any.</summary>
 		public void RemoveAttachment (int slotIndex, string name) {
-			if (slotIndex < 0) throw new ArgumentOutOfRangeException("slotIndex", "slotIndex must be >= 0");
 			attachments.Remove(new SkinKey(slotIndex, name));
 		}
 
 		/// <summary>Returns all attachments in this skin for the specified slot index.</summary>
 		/// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.Skeleton.FindSlotIndex"/> or <see cref="Spine.SkeletonData.FindSlotIndex"/>
 		public void GetAttachments (int slotIndex, List<SkinEntry> attachments) {
+			if (slotIndex < 0) throw new ArgumentException("slotIndex must be >= 0.");
+			if (attachments == null) throw new ArgumentNullException("attachments", "attachments cannot be null.");
 			foreach (var item in this.attachments) {
 				SkinEntry entry = item.Value;
 				if (entry.slotIndex == slotIndex) attachments.Add(entry);
@@ -176,10 +178,14 @@ namespace Spine {
 		private struct SkinKey {
 			internal readonly int slotIndex;
 			internal readonly string name;
+			internal readonly int hashCode;
 
 			public SkinKey (int slotIndex, string name) {
+				if (slotIndex < 0) throw new ArgumentException("slotIndex must be >= 0.");
+				if (name == null) throw new ArgumentNullException("name", "name cannot be null");
 				this.slotIndex = slotIndex;
 				this.name = name;
+				this.hashCode = name.GetHashCode() + slotIndex * 37;
 			}
 		}
 
@@ -191,7 +197,7 @@ namespace Spine {
 			}
 
 			int IEqualityComparer<SkinKey>.GetHashCode (SkinKey e) {
-				return e.name.GetHashCode() + e.slotIndex * 37;
+				return e.hashCode;
 			}
 		}
 	}

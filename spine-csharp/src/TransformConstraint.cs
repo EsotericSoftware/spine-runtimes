@@ -76,12 +76,8 @@ namespace Spine {
 			shearMix = constraint.shearMix;
 		}
 
-		/// <summary>Applies the constraint to the constrained bones.</summary>
-		public void Apply () {
-			Update();
-		}
-
 		public void Update () {
+			if (rotateMix == 0 && translateMix == 0 && scaleMix == 0 && shearMix == 0) return;
 			if (data.local) {
 				if (data.relative)
 					ApplyRelativeLocal();
@@ -101,10 +97,9 @@ namespace Spine {
 			float ta = target.a, tb = target.b, tc = target.c, td = target.d;
 			float degRadReflect = ta * td - tb * tc > 0 ? MathUtils.DegRad : -MathUtils.DegRad;
 			float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
-			var bones = this.bones;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bones.Items[i];
-				bool modified = false;
+			var bones = this.bones.Items;
+			for (int i = 0, n = this.bones.Count; i < n; i++) {
+				Bone bone = bones[i];
 
 				if (rotateMix != 0) {
 					float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
@@ -118,7 +113,6 @@ namespace Spine {
 					bone.b = cos * b - sin * d;
 					bone.c = sin * a + cos * c;
 					bone.d = sin * b + cos * d;
-					modified = true;
 				}
 
 				if (translateMix != 0) {
@@ -126,7 +120,6 @@ namespace Spine {
 					target.LocalToWorld(data.offsetX, data.offsetY, out tx, out ty); //target.localToWorld(temp.set(data.offsetX, data.offsetY));
 					bone.worldX += (tx - bone.worldX) * translateMix;
 					bone.worldY += (ty - bone.worldY) * translateMix;
-					modified = true;
 				}
 
 				if (scaleMix > 0) {
@@ -138,7 +131,6 @@ namespace Spine {
 					if (s != 0) s = (s + ((float)Math.Sqrt(tb * tb + td * td) - s + data.offsetScaleY) * scaleMix) / s;
 					bone.b *= s;
 					bone.d *= s;
-					modified = true;
 				}
 
 				if (shearMix > 0) {
@@ -152,10 +144,9 @@ namespace Spine {
 					float s = (float)Math.Sqrt(b * b + d * d);
 					bone.b = MathUtils.Cos(r) * s;
 					bone.d = MathUtils.Sin(r) * s;
-					modified = true;
 				}
 
-				if (modified) bone.appliedValid = false;
+				bone.appliedValid = false;
 			}
 		}
 
@@ -165,10 +156,9 @@ namespace Spine {
 			float ta = target.a, tb = target.b, tc = target.c, td = target.d;
 			float degRadReflect = ta * td - tb * tc > 0 ? MathUtils.DegRad : -MathUtils.DegRad;
 			float offsetRotation = data.offsetRotation * degRadReflect, offsetShearY = data.offsetShearY * degRadReflect;
-			var bones = this.bones;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bones.Items[i];
-				bool modified = false;
+			var bones = this.bones.Items;
+			for (int i = 0, n = this.bones.Count; i < n; i++) {
+				Bone bone = bones[i];
 
 				if (rotateMix != 0) {
 					float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
@@ -182,7 +172,6 @@ namespace Spine {
 					bone.b = cos * b - sin * d;
 					bone.c = sin * a + cos * c;
 					bone.d = sin * b + cos * d;
-					modified = true;
 				}
 
 				if (translateMix != 0) {
@@ -190,7 +179,6 @@ namespace Spine {
 					target.LocalToWorld(data.offsetX, data.offsetY, out tx, out ty); //target.localToWorld(temp.set(data.offsetX, data.offsetY));
 					bone.worldX += tx * translateMix;
 					bone.worldY += ty * translateMix;
-					modified = true;
 				}
 
 				if (scaleMix > 0) {
@@ -200,7 +188,6 @@ namespace Spine {
 					s = ((float)Math.Sqrt(tb * tb + td * td) - 1 + data.offsetScaleY) * scaleMix + 1;
 					bone.b *= s;
 					bone.d *= s;
-					modified = true;
 				}
 
 				if (shearMix > 0) {
@@ -213,10 +200,9 @@ namespace Spine {
 					float s = (float)Math.Sqrt(b * b + d * d);
 					bone.b = MathUtils.Cos(r) * s;
 					bone.d = MathUtils.Sin(r) * s;
-					modified = true;
 				}
 
-				if (modified) bone.appliedValid = false;
+				bone.appliedValid = false;
 			}
 		}
 
@@ -224,9 +210,9 @@ namespace Spine {
 			float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
 			Bone target = this.target;
 			if (!target.appliedValid) target.UpdateAppliedTransform();
-			var bonesItems = this.bones.Items;
+			var bones = this.bones.Items;
 			for (int i = 0, n = this.bones.Count; i < n; i++) {
-				Bone bone = bonesItems[i];
+				Bone bone = bones[i];
 				if (!bone.appliedValid) bone.UpdateAppliedTransform();
 
 				float rotation = bone.arotation;
@@ -263,9 +249,9 @@ namespace Spine {
 			float rotateMix = this.rotateMix, translateMix = this.translateMix, scaleMix = this.scaleMix, shearMix = this.shearMix;
 			Bone target = this.target;
 			if (!target.appliedValid) target.UpdateAppliedTransform();
-			var bonesItems = this.bones.Items;
+			var bones = this.bones.Items;
 			for (int i = 0, n = this.bones.Count; i < n; i++) {
-				Bone bone = bonesItems[i];
+				Bone bone = bones[i];
 				if (!bone.appliedValid) bone.UpdateAppliedTransform();
 
 				float rotation = bone.arotation;

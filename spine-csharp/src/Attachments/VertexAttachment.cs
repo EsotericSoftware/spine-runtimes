@@ -56,7 +56,7 @@ namespace Spine {
 
 			deformAttachment = this;
 			lock (VertexAttachment.nextIdLock) {
-				id = (VertexAttachment.nextID++ & 65535) << 11;
+				id = VertexAttachment.nextID++;
 			}
 		}
 

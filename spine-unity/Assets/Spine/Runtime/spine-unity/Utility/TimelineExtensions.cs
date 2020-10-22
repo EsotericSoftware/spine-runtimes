@@ -38,28 +38,28 @@ namespace Spine.Unity.AnimationTools {
 		/// SkeletonData can be accessed from Skeleton.Data or from SkeletonDataAsset.GetSkeletonData.
 		/// If no SkeletonData is given, values are computed relative to setup pose instead of local-absolute.</summary>
 		public static Vector2 Evaluate (this TranslateTimeline timeline, float time, SkeletonData skeletonData = null) {
-			const int PREV_TIME = -3, PREV_X = -2, PREV_Y = -1;
-			const int X = 1, Y = 2;
-
 			var frames = timeline.frames;
 			if (time < frames[0]) return Vector2.zero;
 
 			float x, y;
-			if (time >= frames[frames.Length - TranslateTimeline.ENTRIES]) { // Time is after last frame.
-				x = frames[frames.Length + PREV_X];
-				y = frames[frames.Length + PREV_Y];
-			}
-			else {
-				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.BinarySearch(frames, time, TranslateTimeline.ENTRIES);
-				x = frames[frame + PREV_X];
-				y = frames[frame + PREV_Y];
-				float frameTime = frames[frame];
-				float percent = timeline.GetCurvePercent(frame / TranslateTimeline.ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				x += (frames[frame + X] - x) * percent;
-				y += (frames[frame + Y] - y) * percent;
+			int i = Animation.Search(frames, time, TranslateTimeline.ENTRIES), curveType = (int)timeline.curves[i / TranslateTimeline.ENTRIES];
+			switch (curveType) {
+				case TranslateTimeline.LINEAR:
+					float before = frames[i];
+					x = frames[i + TranslateTimeline.VALUE1];
+					y = frames[i + TranslateTimeline.VALUE2];
+					float t = (time - before) / (frames[i + TranslateTimeline.ENTRIES] - before);
+					x += (frames[i + TranslateTimeline.ENTRIES + TranslateTimeline.VALUE1] - x) * t;
+					y += (frames[i + TranslateTimeline.ENTRIES + TranslateTimeline.VALUE2] - y) * t;
+					break;
+				case TranslateTimeline.STEPPED:
+					x = frames[i + TranslateTimeline.VALUE1];
+					y = frames[i + TranslateTimeline.VALUE2];
+					break;
+				default:
+					x = timeline.GetBezierValue(time, i, TranslateTimeline.VALUE1, curveType - TranslateTimeline.BEZIER);
+					y = timeline.GetBezierValue(time, i, TranslateTimeline.VALUE2, curveType + TranslateTimeline.BEZIER_SIZE - TranslateTimeline.BEZIER);
+					break;
 			}
 
 			Vector2 xy = new Vector2(x, y);
@@ -67,7 +67,7 @@ namespace Spine.Unity.AnimationTools {
 				return xy;
 			}
 			else {
-				var boneData = skeletonData.bones.Items[timeline.boneIndex];
+				var boneData = skeletonData.bones.Items[timeline.BoneIndex];
 				return xy + new Vector2(boneData.x, boneData.y);
 			}
 		}
@@ -82,7 +82,7 @@ namespace Spine.Unity.AnimationTools {
 					continue;
 
 				var translateTimeline = timeline as TranslateTimeline;
-				if (translateTimeline != null && translateTimeline.boneIndex == boneIndex)
+				if (translateTimeline != null && translateTimeline.BoneIndex == boneIndex)
 					return translateTimeline;
 			}
 			return null;

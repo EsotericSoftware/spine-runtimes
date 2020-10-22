@@ -27,51 +27,91 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using NUnit.Framework.Constraints;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Spine {
 
 	/// <summary>
-	/// A simple container for a list of timelines and a name.</summary>
+	/// Stores a list of timelines to animate a skeleton's pose over time.</summary>
 	public class Animation {
 		internal String name;
 		internal ExposedList<Timeline> timelines;
-		internal HashSet<int> timelineIds;
+		internal HashSet<string> timelineIds;
 		internal float duration;
 
 		public Animation (string name, ExposedList<Timeline> timelines, float duration) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
-			if (timelines == null) throw new ArgumentNullException("timelines", "timelines cannot be null.");
-			// Note: avoiding reallocations by adding all hash set entries at
-			// once (EnsureCapacity() is only available in newer .Net versions).
-			int[] propertyIDs = new int[timelines.Count];
-			for (int i = 0; i < timelines.Count; ++i) {
-				propertyIDs[i] = timelines.Items[i].PropertyId;
-			}
-			this.timelineIds = new HashSet<int>(propertyIDs);
+
 			this.name = name;
-			this.timelines = timelines;
+			SetTimelines(timelines);
 			this.duration = duration;
 		}
 
-		public ExposedList<Timeline> Timelines { get { return timelines; } set { timelines = value; } }
+		public ExposedList<Timeline> Timelines {
+			get { return timelines; }
+			set { SetTimelines(value); }
+		}
 
-		/// <summary>The duration of the animation in seconds, which is the highest time of all keys in the timeline.</summary>
+		public void SetTimelines (ExposedList<Timeline> timelines) {
+			if (timelines == null) throw new ArgumentNullException("timelines", "timelines cannot be null.");
+			this.timelines = timelines;
+			// Note: avoiding reallocations by adding all hash set entries at
+			// once (EnsureCapacity() is only available in newer .Net versions).
+			int idCount = 0;
+			int timelinesCount = timelines.Count;
+			var timelinesItems = timelines.Items;
+			for (int t = 0; t < timelinesCount; ++t) {
+				idCount += timelinesItems[t].PropertyIds.Length;
+			}
+			string[] propertyIds = new string[idCount];
+			int currentId = 0;
+			for (int t = 0; t < timelinesCount; ++t) {
+				var ids = timelinesItems[t].PropertyIds;
+				for (int i = 0, idsLength = ids.Length; i < idsLength; ++i) {
+					propertyIds[currentId++] = ids[i];
+				}
+			}
+			this.timelineIds = new HashSet<string>(propertyIds);
+		}
+
+		/// <summary>The duration of the animation in seconds, which is usually the highest time of all frames in the timeline. The duration is
+		/// used to know when it has completed and when it should loop back to the start.</summary>
 		public float Duration { get { return duration; } set { duration = value; } }
 
 		/// <summary>The animation's name, which is unique across all animations in the skeleton.</summary>
 		public string Name { get { return name; } }
 
-		/// <summary>Whether the timeline with the property id is contained in this animation.</summary>
-		public bool HasTimeline (int id) {
-			return timelineIds.Contains(id);
+		/// <summary>Returns true if this animation contains a timeline with any of the specified property IDs.</summary>
+		public bool HasTimeline (string[] propertyIds) {
+			foreach (string id in propertyIds)
+				if (timelineIds.Contains(id)) return true;
+			return false;
 		}
 
-		/// <summary>Applies all the animation's timelines to the specified skeleton.</summary>
+		/// <summary>Applies the animation's timelines to the specified skeleton.</summary>
 		/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList, float, MixBlend, MixDirection)"/>
-		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, ExposedList<Event> events, float alpha, MixBlend blend,
-							MixDirection direction) {
+		/// <param name="skeleton">The skeleton the animation is being applied to. This provides access to the bones, slots, and other skeleton
+		///					components the timelines may change.</param>
+		/// <param name="lastTime">The last time in seconds this animation was applied. Some timelines trigger only at specific times rather
+		///					than every frame. Pass -1 the first time an animation is applied to ensure frame 0 is triggered.</param>
+		/// <param name="time"> The time in seconds the skeleton is being posed for. Most timelines find the frame before and the frame after
+		///					this time and interpolate between the frame values. If beyond the <see cref="Duration"/> and <code>loop</code> is
+		///					true then the animation will repeat, else the last frame will be applied.</param>
+		/// <param name="loop">If true, the animation repeats after the <see cref="Duration"/>.</param>
+		/// <param name="events">If any events are fired, they are added to this list. Can be null to ignore fired events or if no timelines
+		///					fire events.</param>
+		/// <param name="alpha"> 0 applies the current or setup values (depending on <code>blend</code>). 1 applies the timeline values. Between
+		///					0 and 1 applies values between the current or setup values and the timeline values. By adjusting
+		///					<code>alpha</code> over time, an animation can be mixed in or out. <code>alpha</code> can also be useful to apply
+		///					animations on top of each other (layering).</param>
+		/// <param name="blend">Controls how mixing is applied when <code>alpha</code> < 1.</param>
+		/// <param name="direction">Indicates whether the timelines are mixing in or out. Used by timelines which perform instant transitions,
+		///					such as <see cref="DrawOrderTimeline"/> or <see cref="AttachmentTimeline"/>.</param>
+		public void Apply (Skeleton skeleton, float lastTime, float time, bool loop, ExposedList<Event> events, float alpha,
+							MixBlend blend, MixDirection direction) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 
 			if (loop && duration != 0) {
@@ -79,94 +119,51 @@ namespace Spine {
 				if (lastTime > 0) lastTime %= duration;
 			}
 
-			ExposedList<Timeline> timelines = this.timelines;
-			for (int i = 0, n = timelines.Count; i < n; i++)
-				timelines.Items[i].Apply(skeleton, lastTime, time, events, alpha, blend, direction);
+			var timelines = this.timelines.Items;
+			for (int i = 0, n = this.timelines.Count; i < n; i++)
+				timelines[i].Apply(skeleton, lastTime, time, events, alpha, blend, direction);
 		}
 
 		override public string ToString () {
 			return name;
 		}
 
-		/// <param name="target">After the first and before the last entry.</param>
-		/// <returns>Index of first value greater than the target.</returns>
-		internal static int BinarySearch (float[] values, float target, int step) {
-			int low = 0;
-			int high = values.Length / step - 2;
-			if (high == 0) return step;
-			int current = (int)((uint)high >> 1);
-			while (true) {
-				if (values[(current + 1) * step] <= target)
-					low = current + 1;
-				else
-					high = current;
-				if (low == high) return (low + 1) * step;
-				current = (int)((uint)(low + high) >> 1);
-			}
+		/// <summary>Search using a stride of 1.</summary>
+		/// <param name="time">Must be >= the first value in <code>frames</code>.</param>
+		/// <returns>The index of the first value <= <code>time</code>.</returns>
+		internal static int Search (float[] frames, float time) {
+			int n = frames.Length;
+			for (int i = 1; i < n; i++)
+				if (frames[i] > time) return i - 1;
+			return n - 1;
 		}
 
-		/// <param name="target">After the first and before the last entry.</param>
-		internal static int BinarySearch (float[] values, float target) {
-			int low = 0;
-			int high = values.Length - 2;
-			if (high == 0) return 1;
-			int current = (int)((uint)high >> 1);
-			while (true) {
-				if (values[current + 1] <= target)
-					low = current + 1;
-				else
-					high = current;
-				if (low == high) return (low + 1);
-				current = (int)((uint)(low + high) >> 1);
-			}
-		}
-
-		internal static int LinearSearch (float[] values, float target, int step) {
-			for (int i = 0, last = values.Length - step; i <= last; i += step)
-				if (values[i] > target) return i;
-			return -1;
+		/// <summary>Search using the specified stride.</summary>
+		/// <param name="time">Must be >= the first value in <code>frames</code>.</param>
+		/// <returns>The index of the first value <= <code>time</code>.</returns>
+		internal static int Search (float[] frames, float time, int step) {
+			int n = frames.Length;
+			for (int i = step; i < n; i += step)
+				if (frames[i] > time) return i - step;
+			return n - step;
 		}
 	}
 
 	/// <summary>
-	/// The interface for all timelines.</summary>
-	public interface Timeline {
-		/// <summary>Applies this timeline to the skeleton.</summary>
-		/// <param name="skeleton">The skeleton the timeline is being applied to. This provides access to the bones, slots, and other
-		///                   skeleton components the timeline may change.</param>
-		///  <param name="lastTime"> The time this timeline was last applied. Timelines such as <see cref="EventTimeline"/> trigger only at specific
-		///                   times rather than every frame. In that case, the timeline triggers everything between <code>lastTime</code>
-		///                   (exclusive) and <code>time</code> (inclusive).</param>
-		///  <param name="time"> The time within the animation. Most timelines find the key before and the key after this time so they can
-		///                   interpolate between the keys.</param>
-		///  <param name="events"> If any events are fired, they are added to this list. Can be null to ignore firing events or if the
-		///                   timeline does not fire events.</param>
-		///  <param name="alpha"> 0 applies the current or setup value (depending on <code>blend</code>). 1 applies the timeline value.
-		///                   Between 0 and 1 applies a value between the current or setup value and the timeline value. By adjusting
-		///                   <code>alpha</code> over time, an animation can be mixed in or out. <code>alpha</code> can also be useful to
-		///                   apply animations on top of each other (layered).</param>
-		///  <param name="blend"> Controls how mixing is applied when <code>alpha</code> < 1.</param>
-		///  <param name="direction"> Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions,
-		///                   such as <see cref="DrawOrderTimeline"/> or <see cref="AttachmentTimeline"/>, and other such as {@link ScaleTimeline}.</param>
-		void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixBlend blend, MixDirection direction);
-		/// <summary>Uniquely encodes both the type of this timeline and the skeleton property that it affects.</summary>
-		int PropertyId { get; }
-	}
-
-	/// <summary>
-	/// Controls how a timeline is mixed with the setup or current pose.</summary>
+	/// Controls how timeline values are mixed with setup pose values or current pose values when a timeline is applied with
+	/// <code>alpha</code> < 1.</summary>
 	/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList, float, MixBlend, MixDirection)"/>
 	public enum MixBlend {
 
-		/// <summary> Transitions from the setup value to the timeline value (the current value is not used). Before the first key, the setup
-		///           value is set.</summary>
+		/// <summary> Transitions from the setup value to the timeline value (the current value is not used). Before the first frame, the
+		///           setup value is set.</summary>
 		Setup,
 
 		/// <summary>
 		/// <para>
-		/// Transitions from the current value to the timeline value. Before the first key, transitions from the current value to
+		/// Transitions from the current value to the timeline value. Before the first frame, transitions from the current value to
 		/// the setup value. Timelines which perform instant transitions, such as <see cref="DrawOrderTimeline"/> or
-		/// <see cref="AttachmentTimeline"/>, use the setup value before the first key.</para>
+		/// <see cref="AttachmentTimeline"/>, use the setup value before the first frame.</para>
 		/// <para>
 		/// <code>First</code> is intended for the first animations applied, not for animations layered on top of those.</para>
 		/// </summary>
@@ -174,8 +171,8 @@ namespace Spine {
 
 		/// <summary>
 		/// <para>
-		/// Transitions from the current value to the timeline value. No change is made before the first key (the current value is
-		/// kept until the first key).</para>
+		/// Transitions from the current value to the timeline value. No change is made before the first frame (the current value is
+		/// kept until the first frame).</para>
 		/// <para>
 		/// <code>Replace</code> is intended for animations layered on top of others, not for the first animations applied.</para>
 		/// </summary>
@@ -183,275 +180,362 @@ namespace Spine {
 
 		/// <summary>
 		/// <para>
-		/// Transitions from the current value to the current value plus the timeline value. No change is made before the first key
-		/// (the current value is kept until the first key).</para>
+		/// Transitions from the current value to the current value plus the timeline value. No change is made before the first frame
+		/// (the current value is kept until the first frame).</para>
 		/// <para>
-		/// <code>Add</code> is intended for animations layered on top of others, not for the first animations applied.</para>
+		/// <code>Add</code> is intended for animations layered on top of others, not for the first animations applied. Properties
+		/// set by additive animations must be set manually or by another animation before applying the additive animations, else the
+		/// property values will increase each time the additive animations are applied.
+		/// </para>
 		/// </summary>
 		Add
 	}
 
 	/// <summary>
 	/// Indicates whether a timeline's <code>alpha</code> is mixing out over time toward 0 (the setup or current pose value) or
-	/// mixing in toward 1 (the timeline's value).</summary>
+	/// mixing in toward 1 (the timeline's value). Some timelines use this to decide how values are applied.</summary>
 	/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList, float, MixBlend, MixDirection)"/>
 	public enum MixDirection {
 		In,
 		Out
 	}
 
-	internal enum TimelineType {
-		Rotate = 0, Translate, Scale, Shear, //
-		Attachment, Color, Deform, //
+	internal enum Property {
+		Rotate=0, TranslateX, TranslateY, ScaleX, ScaleY, ShearX, ShearY, //
+		RGBA, RGB2, //
+		Attachment, Deform, //
 		Event, DrawOrder, //
 		IkConstraint, TransformConstraint, //
-		PathConstraintPosition, PathConstraintSpacing, PathConstraintMix, //
-		TwoColor
+		PathConstraintPosition, PathConstraintSpacing, PathConstraintMix
+	}
+
+	/// <summary>
+	/// The base class for all timelines.</summary>
+	public abstract class Timeline {
+		private readonly string[] propertyIds;
+		internal readonly float[] frames;
+
+		/// <param name="propertyIds">Unique identifiers for the properties the timeline modifies.</param>
+		public Timeline (int frameCount, params string[] propertyIds) {
+			if (propertyIds == null) throw new System.ArgumentNullException("propertyIds", "propertyIds cannot be null.");
+			this.propertyIds = propertyIds;
+			frames = new float[frameCount * FrameEntries];
+		}
+
+		/// <summary>Uniquely encodes both the type of this timeline and the skeleton properties that it affects.</summary>
+		public string[] PropertyIds {
+			get { return propertyIds; }
+		}
+
+		/// <summary>The time in seconds and any other values for each frame.</summary>
+		public float[] Frames {
+			get { return frames; }
+		}
+
+		/// <summary>The number of entries stored per frame.</summary>
+		public virtual int FrameEntries {
+			get { return 1; }
+		}
+
+		/// <summary>The number of frames for this timeline.</summary>
+		public int FrameCount {
+			get { return frames.Length / FrameEntries; }
+		}
+
+		public float Duration {
+			get {
+				return frames[frames.Length - FrameEntries];
+			}
+		}
+
+		/// <summary>Applies this timeline to the skeleton.</summary>
+		/// <param name="skeleton">The skeleton the timeline is being applied to. This provides access to the bones, slots, and other
+		///					skeleton components the timeline may change.</param>
+		/// <param name="lastTime">The time this timeline was last applied. Timelines such as <see cref="EventTimeline"/> trigger only
+		///					at specific times rather than every frame. In that case, the timeline triggers everything between
+		///					<code>lastTime</code> (exclusive) and <code>time</code> (inclusive). Pass -1 the first time an animation is
+		///					 applied to ensure frame 0 is triggered.</param>
+		/// <param name="time">The time in seconds that the skeleton is being posed for. Most timelines find the frame before and the frame
+		///					after this time and interpolate between the frame values.If beyond the last frame, the last frame will be
+		///					applied.</param>
+		/// <param name="events">If any events are fired, they are added to this list. Can be null to ignore fired events or if the timeline
+		///					does not fire events.</param>
+		/// <param name="alpha">0 applies the current or setup value (depending on <code>blend</code>). 1 applies the timeline value.
+		///					Between 0 and 1 applies a value between the current or setup value and the timeline value.By adjusting
+		///					<code>alpha</code> over time, an animation can be mixed in or out. <code>alpha</code> can also be useful to
+		///					apply animations on top of each other (layering).</param>
+		/// <param name="blend">Controls how mixing is applied when <code>alpha</code> < 1.</param>
+		/// <param name="direction">Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions,
+		///                   such as <see cref="DrawOrderTimeline"/> or <see cref="AttachmentTimeline"/>, and other such as <see cref="ScaleTimeline"/>.</param>
+		public abstract void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha,
+			MixBlend blend, MixDirection direction);
 	}
 
 	/// <summary>An interface for timelines which change the property of a bone.</summary>
 	public interface IBoneTimeline {
-		/// <summary>The index of the bone in <see cref="Skeleton.Bones"/> that will be changed.</summary>
+		/// <summary>The index of the bone in <see cref="Skeleton.Bones"/> that will be changed when this timeline is applied.</summary>
 		int BoneIndex { get; }
 	}
 
 	/// <summary>An interface for timelines which change the property of a slot.</summary>
 	public interface ISlotTimeline {
-		/// <summary>The index of the slot in <see cref="Skeleton.Slots"/> that will be changed.</summary>
+		/// <summary>The index of the slot in <see cref="Skeleton.Slots"/> that will be changed when this timeline is applied.</summary>
 		int SlotIndex { get; }
 	}
 
-	/// <summary>The base class for timelines that use interpolation between key frame values.</summary>
-	abstract public class CurveTimeline : Timeline {
-		protected const float LINEAR = 0, STEPPED = 1, BEZIER = 2;
-		protected const int BEZIER_SIZE = 10 * 2 - 1;
+	/// <summary>The base class for timelines that interpolate between frame values using stepped, linear, or a Bezier curve.</summary>
+	public abstract class CurveTimeline : Timeline {
+		public const int LINEAR = 0, STEPPED = 1, BEZIER = 2, BEZIER_SIZE = 18;
 
-		internal float[] curves; // type, x, y, ...
+		internal float[] curves;
 		/// <summary>The number of key frames for this timeline.</summary>
-		public int FrameCount { get { return curves.Length / BEZIER_SIZE + 1; } }
 
-		public CurveTimeline (int frameCount) {
-			if (frameCount <= 0) throw new ArgumentOutOfRangeException("frameCount must be > 0: ");
-			curves = new float[(frameCount - 1) * BEZIER_SIZE];
+		/// <param name="bezierCount">The maximum number of Bezier curves. See <see cref="Shrink(int)"/>.</param>
+		/// <param name="propertyIds">Unique identifiers for the properties the timeline modifies.</param>
+		public CurveTimeline (int frameCount, int bezierCount, params string[] propertyIds)
+			: base(frameCount, propertyIds) {
+			curves = new float[frameCount + bezierCount * BEZIER_SIZE];
+			curves[frameCount - 1] = STEPPED;
 		}
 
-		abstract public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend, MixDirection direction);
-
-		abstract public int PropertyId { get; }
-
-		/// <summary>Sets the specified key frame to linear interpolation.</summary>
-		public void SetLinear (int frameIndex) {
-			curves[frameIndex * BEZIER_SIZE] = LINEAR;
+		/// <summary>Sets the specified frame to linear interpolation.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount - 1</code>, inclusive.</param>
+		public void SetLinear (int frame) {
+			curves[frame] = LINEAR;
 		}
 
-		/// <summary>Sets the specified key frame to stepped interpolation.</summary>
-		public void SetStepped (int frameIndex) {
-			curves[frameIndex * BEZIER_SIZE] = STEPPED;
+		/// <summary>Sets the specified frame to stepped interpolation.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount - 1</code>, inclusive.</param>
+		public void SetStepped (int frame) {
+			curves[frame] = STEPPED;
 		}
 
-		/// <summary>Returns the interpolation type for the specified key frame.</summary>
-		/// <returns>Linear is 0, stepped is 1, Bezier is 2.</returns>
-		public float GetCurveType (int frameIndex) {
-			int index = frameIndex * BEZIER_SIZE;
-			if (index == curves.Length) return LINEAR;
-			float type = curves[index];
-			if (type == LINEAR) return LINEAR;
-			if (type == STEPPED) return STEPPED;
-			return BEZIER;
+		/// <summary>Returns the interpolation type for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount - 1</code>, inclusive.</param>
+		/// <returns><see cref="LINEAR"/>, <see cref="STEPPED"/> or <see cref="BEZIER"/> + the index of the Bezier segments.</returns>
+		public float GetCurveType (int frame) {
+			return (int)curves[frame];
 		}
 
-		/// <summary>Sets the specified key frame to Bezier interpolation. <code>cx1</code> and <code>cx2</code> are from 0 to 1,
-		/// representing the percent of time between the two key frames. <code>cy1</code> and <code>cy2</code> are the percent of the
-		/// difference between the key frame's values.</summary>
-		public void SetCurve (int frameIndex, float cx1, float cy1, float cx2, float cy2) {
-			float tmpx = (-cx1 * 2 + cx2) * 0.03f, tmpy = (-cy1 * 2 + cy2) * 0.03f;
-			float dddfx = ((cx1 - cx2) * 3 + 1) * 0.006f, dddfy = ((cy1 - cy2) * 3 + 1) * 0.006f;
-			float ddfx = tmpx * 2 + dddfx, ddfy = tmpy * 2 + dddfy;
-			float dfx = cx1 * 0.3f + tmpx + dddfx * 0.16666667f, dfy = cy1 * 0.3f + tmpy + dddfy * 0.16666667f;
+		/// <summary>Shrinks the storage for Bezier curves, for use when <code>bezierCount</code> (specified in the constructor) was larger
+		/// than the actual number of Bezier curves.</summary>
+		public void Shrink (int bezierCount) {
+			int size = FrameCount + bezierCount * BEZIER_SIZE;
+			if (curves.Length > size) {
+				float[] newCurves = new float[size];
+				Array.Copy(curves, 0, newCurves, 0, size);
+				curves = newCurves;
+			}
+		}
 
-			int i = frameIndex * BEZIER_SIZE;
+
+		/// <summary>
+		/// Stores the segments for the specified Bezier curve. For timelines that modify multiple values, there may be more than
+		/// one curve per frame.</summary>
+		/// <param name="bezier">The ordinal of this Bezier curve for this timeline, between 0 and <code>bezierCount - 1</code> (specified
+		///					in the constructor), inclusive.</param>
+		/// <param name="frame">Between 0 and <code>frameCount - 1</code>, inclusive.</param>
+		/// <param name="value">The index of the value for this frame that this curve is used for.</param>
+		/// <param name="time1">The time for the first key.</param>
+		/// <param name="value1">The value for the first key.</param>
+		/// <param name="cx1">The time for the first Bezier handle.</param>
+		/// <param name="cy1">The value for the first Bezier handle.</param>
+		/// <param name="cx2">The time of the second Bezier handle.</param>
+		/// <param name="cy2">The value for the second Bezier handle.</param>
+		/// <param name="time2">The time for the second key.</param>
+		/// <param name="value2">The value for the second key.</param>
+		public void SetBezier (int bezier, int frame, int value, float time1, float value1, float cx1, float cy1, float cx2,
+			float cy2, float time2, float value2) {
+
 			float[] curves = this.curves;
-			curves[i++] = BEZIER;
-
-			float x = dfx, y = dfy;
-			for (int n = i + BEZIER_SIZE - 1; i < n; i += 2) {
+			int i = FrameCount + bezier * BEZIER_SIZE;
+			if (value == 0) curves[frame] = BEZIER + i;
+			float tmpx = (time1 - cx1 * 2 + cx2) * 0.03f, tmpy = (value1 - cy1 * 2 + cy2) * 0.03f;
+			float dddx = ((cx1 - cx2) * 3 - time1 + time2) * 0.006f, dddy = ((cy1 - cy2) * 3 - value1 + value2) * 0.006f;
+			float ddx = tmpx * 2 + dddx, ddy = tmpy * 2 + dddy;
+			float dx = (cx1 - time1) * 0.3f + tmpx + dddx * 0.16666667f, dy = (cy1 - value1) * 0.3f + tmpy + dddy * 0.16666667f;
+			float x = time1 + dx, y = value1 + dy;
+			for (int n = i + BEZIER_SIZE; i < n; i += 2) {
 				curves[i] = x;
 				curves[i + 1] = y;
-				dfx += ddfx;
-				dfy += ddfy;
-				ddfx += dddfx;
-				ddfy += dddfy;
-				x += dfx;
-				y += dfy;
+				dx += ddx;
+				dy += ddy;
+				ddx += dddx;
+				ddy += dddy;
+				x += dx;
+				y += dy;
 			}
 		}
 
-		/// <summary>Returns the interpolated percentage for the specified key frame and linear percentage.</summary>
-		public float GetCurvePercent (int frameIndex, float percent) {
-			percent = MathUtils.Clamp (percent, 0, 1);
+		/// <summary>
+		/// Returns the Bezier interpolated value for the specified time.</summary>
+		/// <param name="frameIndex">The index into <see cref="Frames"/> for the values of the frame before <code>time</code>.</param>
+		/// <param name="valueOffset">The offset from <code>frameIndex</code> to the value this curve is used for.</param>
+		/// <param name="i">The index of the Bezier segments. See <see cref="GetCurveType(int)"/>.</param>
+		public float GetBezierValue (float time, int frameIndex, int valueOffset, int i) {
 			float[] curves = this.curves;
-			int i = frameIndex * BEZIER_SIZE;
-			float type = curves[i];
-			if (type == LINEAR) return percent;
-			if (type == STEPPED) return 0;
-			i++;
-			float x = 0;
-			for (int start = i, n = i + BEZIER_SIZE - 1; i < n; i += 2) {
-				x = curves[i];
-				if (x >= percent) {
-					if (i == start) return curves[i + 1] * percent / x; // First point is 0,0.
-					float prevX = curves[i - 2], prevY = curves[i - 1];
-					return prevY + (curves[i + 1] - prevY) * (percent - prevX) / (x - prevX);
+			if (curves[i] > time) {
+				float x = frames[frameIndex], y = frames[frameIndex + valueOffset];
+				return y + (time - x) / (curves[i] - x) * (curves[i + 1] - y);
+			}
+			int n = i + BEZIER_SIZE;
+			for (i += 2; i < n; i += 2) {
+				if (curves[i] >= time) {
+					float x = curves[i - 2], y = curves[i - 1];
+					return y + (time - x) / (curves[i] - x) * (curves[i + 1] - y);
 				}
 			}
-			float y = curves[i - 1];
-			return y + (1 - y) * (percent - x) / (1 - x); // Last point is 1,1.
+			frameIndex += FrameEntries;
+			{ // scope added to prevent compile error "float x and y declared in enclosing scope"
+				float x = curves[n - 2], y = curves[n - 1];
+				return y + (time - x) / (frames[frameIndex] - x) * (frames[frameIndex + valueOffset] - y);
+			}
+		}
+	}
+
+	/// <summary>The base class for a <see cref="CurveTimeline"/> that sets one property.</summary>
+	public abstract class CurveTimeline1 : CurveTimeline {
+		public const int ENTRIES = 2;
+		internal const int VALUE = 1;
+
+		/// <param name="bezierCount">The maximum number of Bezier curves. See <see cref="Shrink(int)"/>.</param>
+		/// <param name="propertyIds">Unique identifiers for the properties the timeline modifies.</param>
+		public CurveTimeline1 (int frameCount, int bezierCount, params string[] propertyIds)
+			: base(frameCount, bezierCount, propertyIds) {
+		}
+
+		public override int FrameEntries {
+			get { return ENTRIES; }
+		}
+
+		/// <summary>Sets the time and value for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds</param>
+		public void SetFrame (int frame, float time, float value) {
+			frame <<= 1;
+			frames[frame] = time;
+			frames[frame + VALUE] = value;
+		}
+
+		/// <summary>Returns the interpolated value for the specified time.</summary>
+		public float GetCurveValue (float time) {
+			float[] frames = this.frames;
+			int i = frames.Length - 2;
+			for (int ii = 2; ii <= i; ii += 2) {
+				if (frames[ii] > time) {
+					i = ii - 2;
+					break;
+				}
+			}
+
+			int curveType = (int)curves[i >> 1];
+			switch (curveType) {
+			case LINEAR:
+				float before = frames[i], value = frames[i + VALUE];
+				return value + (time - before) / (frames[i + ENTRIES] - before) * (frames[i + ENTRIES + VALUE] - value);
+			case STEPPED:
+				return frames[i + VALUE];
+			}
+			return GetBezierValue(time, i, VALUE, curveType - BEZIER);
+		}
+	}
+
+	/// <summary>The base class for a <see cref="CurveTimeline"/> which sets two properties.</summary>
+	public abstract class CurveTimeline2 : CurveTimeline {
+		public const int ENTRIES = 3;
+		internal const int VALUE1 = 1, VALUE2 = 2;
+
+		/// <param name="bezierCount">The maximum number of Bezier curves. See <see cref="Shrink(int)"/>.</param>
+		/// <param name="propertyIds">Unique identifiers for the properties the timeline modifies.</param>
+		public CurveTimeline2 (int frameCount, int bezierCount, params string[] propertyIds)
+			:base (frameCount, bezierCount, propertyIds) {
+		}
+
+		public override int FrameEntries {
+			get { return ENTRIES; }
+		}
+
+		/// <summary>Sets the time and values for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
+		public void SetFrame (int frame, float time, float value1, float value2) {
+			frame *= ENTRIES;
+			frames[frame] = time;
+			frames[frame + VALUE1] = value1;
+			frames[frame + VALUE2] = value2;
 		}
 	}
 
 	/// <summary>Changes a bone's local <see cref="Bone.Rotation"/>.</summary>
-	public class RotateTimeline : CurveTimeline, IBoneTimeline {
-		public const int ENTRIES = 2;
-		internal const int PREV_TIME = -2, PREV_ROTATION = -1;
-		internal const int ROTATION = 1;
+	public class RotateTimeline : CurveTimeline1, IBoneTimeline {
+		readonly int boneIndex;
 
-		internal int boneIndex;
-		internal float[] frames; // time, degrees, ...
-
-		public RotateTimeline (int frameCount)
-			: base(frameCount) {
-			frames = new float[frameCount << 1];
+		public RotateTimeline (int frameCount, int bezierCount, int boneIndex)
+			: base(frameCount, bezierCount, (int)Property.Rotate + "|" + boneIndex) {
+			this.boneIndex = boneIndex;
 		}
 
-		override public int PropertyId {
-			get { return ((int)TimelineType.Rotate << 24) + boneIndex; }
-		}
-		/// <summary>The index of the bone in <see cref="Skeleton.Bones"/> that will be changed.</summary>
 		public int BoneIndex {
-			set {
-				if (value < 0) throw new ArgumentOutOfRangeException("index must be >= 0.");
-				this.boneIndex = value;
-			}
 			get {
 				return boneIndex;
 			}
-		}
-		/// <summary>The time in seconds and rotation in degrees for each key frame.</summary>
-		public float[] Frames { get { return frames; } set { frames = value; } }
-
-		/// <summary>Sets the time in seconds and the rotation in degrees for the specified key frame.</summary>
-		public void SetFrame (int frameIndex, float time, float degrees) {
-			frameIndex <<= 1;
-			frames[frameIndex] = time;
-			frames[frameIndex + ROTATION] = degrees;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Bone bone = skeleton.bones.Items[boneIndex];
 			if (!bone.active) return;
-			float[] frames = this.frames;
+
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
 				case MixBlend.Setup:
 					bone.rotation = bone.data.rotation;
 					return;
 				case MixBlend.First:
-					float r = bone.data.rotation - bone.rotation;
-					bone.rotation += (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * alpha;
+					bone.rotation += (bone.data.rotation - bone.rotation) * alpha;
 					return;
 				}
 				return;
 			}
 
-			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-				float r = frames[frames.Length + PREV_ROTATION];
-				switch (blend) {
-					case MixBlend.Setup:
-						bone.rotation = bone.data.rotation + r * alpha;
-						break;
-					case MixBlend.First:
-					case MixBlend.Replace:
-						r += bone.data.rotation - bone.rotation;
-						r -= (16384 - (int)(16384.499999999996 - r / 360)) * 360;
-						goto case MixBlend.Add; // Fall through.
-
-					case MixBlend.Add:
-						bone.rotation += r * alpha;
-						break;
-				}
-				return;
-			}
-
-			// Interpolate between the previous frame and the current frame.
-			int frame = Animation.BinarySearch(frames, time, ENTRIES);
-			float prevRotation = frames[frame + PREV_ROTATION];
-			float frameTime = frames[frame];
-			float percent = GetCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-			// scope for 'r' to prevent compile error.
-			{
-				float r = frames[frame + ROTATION] - prevRotation;
-				r = prevRotation + (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * percent;
-				switch (blend) {
-					case MixBlend.Setup:
-						bone.rotation = bone.data.rotation + (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * alpha;
-						break;
-					case MixBlend.First:
-					case MixBlend.Replace:
-						r += bone.data.rotation - bone.rotation;
-						goto case MixBlend.Add; // Fall through.
-					case MixBlend.Add:
-						bone.rotation += (r - (16384 - (int)(16384.499999999996 - r / 360)) * 360) * alpha;
-						break;
-				}
+			float r = GetCurveValue(time);
+			switch (blend) {
+				case MixBlend.Setup:
+					bone.rotation = bone.data.rotation + r * alpha;
+					break;
+				case MixBlend.First:
+				case MixBlend.Replace:
+					r += bone.data.rotation - bone.rotation;
+					goto case MixBlend.Add; // Fall through.
+				case MixBlend.Add:
+					bone.rotation += r * alpha;
+					break;
 			}
 		}
 	}
 
 	/// <summary>Changes a bone's local <see cref"Bone.X"/> and <see cref"Bone.Y"/>.</summary>
-	public class TranslateTimeline : CurveTimeline, IBoneTimeline {
-		public const int ENTRIES = 3;
-		protected const int PREV_TIME = -3, PREV_X = -2, PREV_Y = -1;
-		protected const int X = 1, Y = 2;
+	public class TranslateTimeline : CurveTimeline2, IBoneTimeline {
+		readonly int boneIndex;
 
-		internal int boneIndex;
-		internal float[] frames; // time, x, y, ...
-
-		public TranslateTimeline (int frameCount)
-			: base(frameCount) {
-			frames = new float[frameCount * ENTRIES];
+		public TranslateTimeline (int frameCount, int bezierCount, int boneIndex)
+			: base(frameCount, bezierCount, //
+				(int)Property.TranslateX + "|" + boneIndex, //
+				(int) Property.TranslateY + "|" + boneIndex) {
+			this.boneIndex = boneIndex;
 		}
 
-		override public int PropertyId {
-			get { return ((int)TimelineType.Translate << 24) + boneIndex; }
-		}
-
-		/// <summary>The index of the bone in <see cref="Skeleton.Bones"/> that will be changed.</summary>
 		public int BoneIndex {
-			set {
-				if (value < 0) throw new ArgumentOutOfRangeException("index must be >= 0.");
-				this.boneIndex = value;
-			}
 			get {
 				return boneIndex;
 			}
-		}
-		/// <summary>The time in seconds, x, and y values for each key frame.</summary>
-		public float[] Frames { get { return frames; } set { frames = value; } }
-
-
-		/// <summary>Sets the time in seconds, x, and y values for the specified key frame.</summary>
-		public void SetFrame (int frameIndex, float time, float x, float y) {
-			frameIndex *= ENTRIES;
-			frames[frameIndex] = time;
-			frames[frameIndex + X] = x;
-			frames[frameIndex + Y] = y;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Bone bone = skeleton.bones.Items[boneIndex];
 			if (!bone.active) return;
+
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -468,21 +552,26 @@ namespace Spine {
 			}
 
 			float x, y;
-			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-				x = frames[frames.Length + PREV_X];
-				y = frames[frames.Length + PREV_Y];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.BinarySearch(frames, time, ENTRIES);
-				x = frames[frame + PREV_X];
-				y = frames[frame + PREV_Y];
-				float frameTime = frames[frame];
-				float percent = GetCurvePercent(frame / ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				x += (frames[frame + X] - x) * percent;
-				y += (frames[frame + Y] - y) * percent;
+			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					x = frames[i + VALUE1];
+					y = frames[i + VALUE2];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					x += (frames[i + ENTRIES + VALUE1] - x) * t;
+					y += (frames[i + ENTRIES + VALUE2] - y) * t;
+					break;
+				case STEPPED:
+					x = frames[i + VALUE1];
+					y = frames[i + VALUE2];
+					break;
+				default:
+					x = GetBezierValue(time, i, VALUE1, curveType - BEZIER);
+					y = GetBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
+					break;
 			}
+
 			switch (blend) {
 				case MixBlend.Setup:
 					bone.x = bone.data.x + x * alpha;
@@ -502,19 +591,27 @@ namespace Spine {
 	}
 
 	/// <summary>Changes a bone's local <see cref="Bone.ScaleX"> and <see cref="Bone.ScaleY">.</summary>
-	public class ScaleTimeline : TranslateTimeline, IBoneTimeline {
-		public ScaleTimeline (int frameCount)
-			: base(frameCount) {
+	public class ScaleTimeline : CurveTimeline2, IBoneTimeline {
+		readonly int boneIndex;
+
+		public ScaleTimeline (int frameCount, int bezierCount, int boneIndex)
+			: base(frameCount, bezierCount, //
+				(int)Property.ScaleX + "|" + boneIndex, //
+				(int)Property.ScaleY + "|" + boneIndex) {
+			this.boneIndex = boneIndex;
 		}
 
-		override public int PropertyId {
-			get { return ((int)TimelineType.Scale << 24) + boneIndex; }
+		public int BoneIndex {
+			get {
+				return boneIndex;
+			}
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Bone bone = skeleton.bones.Items[boneIndex];
 			if (!bone.active) return;
+
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -531,21 +628,28 @@ namespace Spine {
 			}
 
 			float x, y;
-			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-				x = frames[frames.Length + PREV_X] * bone.data.scaleX;
-				y = frames[frames.Length + PREV_Y] * bone.data.scaleY;
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.BinarySearch(frames, time, ENTRIES);
-				x = frames[frame + PREV_X];
-				y = frames[frame + PREV_Y];
-				float frameTime = frames[frame];
-				float percent = GetCurvePercent(frame / ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				x = (x + (frames[frame + X] - x) * percent) * bone.data.scaleX;
-				y = (y + (frames[frame + Y] - y) * percent) * bone.data.scaleY;
+			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					x = frames[i + VALUE1];
+					y = frames[i + VALUE2];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					x += (frames[i + ENTRIES + VALUE1] - x) * t;
+					y += (frames[i + ENTRIES + VALUE2] - y) * t;
+					break;
+				case STEPPED:
+					x = frames[i + VALUE1];
+					y = frames[i + VALUE2];
+					break;
+				default:
+					x = GetBezierValue(time, i, VALUE1, curveType - BEZIER);
+					y = GetBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
+					break;
 			}
+			x *= bone.data.scaleX;
+			y *= bone.data.scaleY;
+
 			if (alpha == 1) {
 				if (blend == MixBlend.Add) {
 					bone.scaleX += x - bone.data.scaleX;
@@ -607,19 +711,27 @@ namespace Spine {
 	}
 
 	/// <summary>Changes a bone's local <see cref="Bone.ShearX"/> and <see cref="Bone.ShearY"/>.</summary>
-	public class ShearTimeline : TranslateTimeline, IBoneTimeline {
-		public ShearTimeline (int frameCount)
-			: base(frameCount) {
+	public class ShearTimeline : CurveTimeline2, IBoneTimeline {
+		readonly int boneIndex;
+
+		public ShearTimeline (int frameCount, int bezierCount, int boneIndex)
+			: base(frameCount, bezierCount, //
+				(int)Property.ShearX + "|" + boneIndex, //
+				(int)Property.ShearY + "|" + boneIndex) {
+			this.boneIndex = boneIndex;
 		}
 
-		override public int PropertyId {
-			get { return ((int)TimelineType.Shear << 24) + boneIndex; }
+		public int BoneIndex {
+			get {
+				return boneIndex;
+			}
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Bone bone = skeleton.bones.Items[boneIndex];
 			if (!bone.active) return;
+
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -636,21 +748,27 @@ namespace Spine {
 			}
 
 			float x, y;
-			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-				x = frames[frames.Length + PREV_X];
-				y = frames[frames.Length + PREV_Y];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.BinarySearch(frames, time, ENTRIES);
-				x = frames[frame + PREV_X];
-				y = frames[frame + PREV_Y];
-				float frameTime = frames[frame];
-				float percent = GetCurvePercent(frame / ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				x = x + (frames[frame + X] - x) * percent;
-				y = y + (frames[frame + Y] - y) * percent;
+			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					x = frames[i + VALUE1];
+					y = frames[i + VALUE2];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					x += (frames[i + ENTRIES + VALUE1] - x) * t;
+					y += (frames[i + ENTRIES + VALUE2] - y) * t;
+					break;
+				case STEPPED:
+					x = frames[i + VALUE1];
+					y = frames[i + VALUE2];
+					break;
+				default:
+					x = GetBezierValue(time, i, VALUE1, curveType - BEZIER);
+					y = GetBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
+					break;
 			}
+
+
 			switch (blend) {
 				case MixBlend.Setup:
 					bone.shearX = bone.data.shearX + x * alpha;
@@ -672,48 +790,42 @@ namespace Spine {
 	/// <summary>Changes a slot's <see cref="Slot.Color"/>.</summary>
 	public class ColorTimeline : CurveTimeline, ISlotTimeline {
 		public const int ENTRIES = 5;
-		protected const int PREV_TIME = -5, PREV_R = -4, PREV_G = -3, PREV_B = -2, PREV_A = -1;
 		protected const int R = 1, G = 2, B = 3, A = 4;
 
-		internal int slotIndex;
-		internal float[] frames; // time, r, g, b, a, ...
+		readonly int slotIndex;
 
-		public ColorTimeline (int frameCount)
-			: base(frameCount) {
-			frames = new float[frameCount * ENTRIES];
+		public ColorTimeline (int frameCount, int bezierCount, int slotIndex)
+			: base(frameCount, bezierCount, //
+				(int)Property.RGBA + "|" + slotIndex) {
+			this.slotIndex = slotIndex;
+		}
+		public override int FrameEntries {
+			get { return ENTRIES; }
 		}
 
-		override public int PropertyId {
-			get { return ((int)TimelineType.Color << 24) + slotIndex; }
-		}
-
-		/// <summary>The index of the slot in <see cref="Skeleton.Slots"/> that will be changed.</summary>
 		public int SlotIndex {
-			set {
-				if (value < 0) throw new ArgumentOutOfRangeException("index must be >= 0.");
-				this.slotIndex = value;
-			}
 			get {
 				return slotIndex;
 			}
 		}
-		/// <summary>The time in seconds, red, green, blue, and alpha values for each key frame.</summary>
-		public float[] Frames { get { return frames; } set { frames = value; } }
 
-		/// <summary>Sets the time in seconds, red, green, blue, and alpha for the specified key frame.</summary>
-		public void SetFrame (int frameIndex, float time, float r, float g, float b, float a) {
-			frameIndex *= ENTRIES;
-			frames[frameIndex] = time;
-			frames[frameIndex + R] = r;
-			frames[frameIndex + G] = g;
-			frames[frameIndex + B] = b;
-			frames[frameIndex + A] = a;
+		/// <summary>Sets the time and color for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
+		public void SetFrame (int frame, float time, float r, float g, float b, float a) {
+			frame *= ENTRIES;
+			frames[frame] = time;
+			frames[frame + R] = r;
+			frames[frame + G] = g;
+			frames[frame + B] = b;
+			frames[frame + A] = a;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
+
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				var slotData = slot.data;
@@ -736,28 +848,34 @@ namespace Spine {
 			}
 
 			float r, g, b, a;
-			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-				int i = frames.Length;
-				r = frames[i + PREV_R];
-				g = frames[i + PREV_G];
-				b = frames[i + PREV_B];
-				a = frames[i + PREV_A];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.BinarySearch(frames, time, ENTRIES);
-				r = frames[frame + PREV_R];
-				g = frames[frame + PREV_G];
-				b = frames[frame + PREV_B];
-				a = frames[frame + PREV_A];
-				float frameTime = frames[frame];
-				float percent = GetCurvePercent(frame / ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				r += (frames[frame + R] - r) * percent;
-				g += (frames[frame + G] - g) * percent;
-				b += (frames[frame + B] - b) * percent;
-				a += (frames[frame + A] - a) * percent;
+			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					a = frames[i + A];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
+					a += (frames[i + ENTRIES + A] - a) * t;
+					break;
+				case STEPPED:
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					a = frames[i + A];
+					break;
+				default:
+					r = GetBezierValue(time, i, R, curveType - BEZIER);
+					g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+					b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+					a = GetBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
+					break;
 			}
+
 			if (alpha == 1) {
 				slot.r = r;
 				slot.g = g;
@@ -789,52 +907,52 @@ namespace Spine {
 	/// <summary>Changes a slot's <see cref="Slot.Color"/> and <see cref="Slot.DarkColor"/> for two color tinting.</summary>
 	public class TwoColorTimeline : CurveTimeline, ISlotTimeline {
 		public const int ENTRIES = 8;
-		protected const int PREV_TIME = -8, PREV_R = -7, PREV_G = -6, PREV_B = -5, PREV_A = -4;
-		protected const int PREV_R2 = -3, PREV_G2 = -2, PREV_B2 = -1;
 		protected const int R = 1, G = 2, B = 3, A = 4, R2 = 5, G2 = 6, B2 = 7;
 
-		internal int slotIndex;
-		internal float[] frames; // time, r, g, b, a, r2, g2, b2, ...
+		readonly int slotIndex;
 
-		public TwoColorTimeline (int frameCount) :
-			base(frameCount) {
-			frames = new float[frameCount * ENTRIES];
+		public TwoColorTimeline (int frameCount, int bezierCount, int slotIndex)
+			: base(frameCount, bezierCount, //
+				(int)Property.RGBA + "|" + slotIndex, //
+				(int) Property.RGB2 + "|" + slotIndex) {
+			this.slotIndex = slotIndex;
 		}
 
-		override public int PropertyId {
-			get { return ((int)TimelineType.TwoColor << 24) + slotIndex; }
-		}
-
-		/// <summary> The index of the slot in <see cref="Skeleton.Slots"/> that will be changed.</summary>
-		public int SlotIndex {
-			set {
-				if (value < 0) throw new ArgumentOutOfRangeException("index must be >= 0.");
-				this.slotIndex = value;
+		public override int FrameEntries {
+			get {
+				return ENTRIES;
 			}
+		}
+
+		/// <summary>
+		/// The index of the slot in <see cref="Skeleton.Slots"/> that will be changed when this timeline is applied. The
+		/// <see cref="Slot"/> must have a dark color available.</summary>
+		public int SlotIndex {
 			get {
 				return slotIndex;
 			}
 		}
-		/// <summary>The time in seconds, red, green, blue, and alpha values for each key frame.</summary>
-		public float[] Frames { get { return frames; } }
 
-		/// <summary>Sets the time in seconds, light, and dark colors for the specified key frame..</summary>
-		public void SetFrame (int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
-			frameIndex *= ENTRIES;
-			frames[frameIndex] = time;
-			frames[frameIndex + R] = r;
-			frames[frameIndex + G] = g;
-			frames[frameIndex + B] = b;
-			frames[frameIndex + A] = a;
-			frames[frameIndex + R2] = r2;
-			frames[frameIndex + G2] = g2;
-			frames[frameIndex + B2] = b2;
+		/// <summary>Sets the time, light color, and dark color for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
+		public void SetFrame (int frame, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
+			frame <<= 3;
+			frames[frame] = time;
+			frames[frame + R] = r;
+			frames[frame + G] = g;
+			frames[frame + B] = b;
+			frames[frame + A] = a;
+			frames[frame + R2] = r2;
+			frames[frame + G2] = g2;
+			frames[frame + B2] = b2;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
+
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				var slotData = slot.data;
@@ -868,37 +986,46 @@ namespace Spine {
 			}
 
 			float r, g, b, a, r2, g2, b2;
-			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-				int i = frames.Length;
-				r = frames[i + PREV_R];
-				g = frames[i + PREV_G];
-				b = frames[i + PREV_B];
-				a = frames[i + PREV_A];
-				r2 = frames[i + PREV_R2];
-				g2 = frames[i + PREV_G2];
-				b2 = frames[i + PREV_B2];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.BinarySearch(frames, time, ENTRIES);
-				r = frames[frame + PREV_R];
-				g = frames[frame + PREV_G];
-				b = frames[frame + PREV_B];
-				a = frames[frame + PREV_A];
-				r2 = frames[frame + PREV_R2];
-				g2 = frames[frame + PREV_G2];
-				b2 = frames[frame + PREV_B2];
-				float frameTime = frames[frame];
-				float percent = GetCurvePercent(frame / ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				r += (frames[frame + R] - r) * percent;
-				g += (frames[frame + G] - g) * percent;
-				b += (frames[frame + B] - b) * percent;
-				a += (frames[frame + A] - a) * percent;
-				r2 += (frames[frame + R2] - r2) * percent;
-				g2 += (frames[frame + G2] - g2) * percent;
-				b2 += (frames[frame + B2] - b2) * percent;
+			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i >> 3];
+			switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					a = frames[i + A];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
+					a += (frames[i + ENTRIES + A] - a) * t;
+					r2 += (frames[i + ENTRIES + R2] - r2) * t;
+					g2 += (frames[i + ENTRIES + G2] - g2) * t;
+					b2 += (frames[i + ENTRIES + B2] - b2) * t;
+					break;
+				case STEPPED:
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					a = frames[i + A];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+					break;
+				default:
+					r = GetBezierValue(time, i, R, curveType - BEZIER);
+					g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+					b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+					a = GetBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
+					r2 = GetBezierValue(time, i, R2, curveType + BEZIER_SIZE * 4 - BEZIER);
+					g2 = GetBezierValue(time, i, G2, curveType + BEZIER_SIZE * 5 - BEZIER);
+					b2 = GetBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
+					break;
 			}
+
 			if (alpha == 1) {
 				slot.r = r;
 				slot.g = g;
@@ -944,49 +1071,41 @@ namespace Spine {
 
 	/// <summary>Changes a slot's <see cref="Slot.Attachment"/>.</summary>
 	public class AttachmentTimeline : Timeline, ISlotTimeline {
-		internal int slotIndex;
-		internal float[] frames; // time, ...
-		internal string[] attachmentNames;
+		readonly int slotIndex;
+		readonly string[] attachmentNames;
 
-		public AttachmentTimeline (int frameCount) {
-			frames = new float[frameCount];
+		public AttachmentTimeline (int frameCount, int slotIndex)
+			: base(frameCount, (int)Property.Attachment + "|" + slotIndex) {
+			this.slotIndex = slotIndex;
 			attachmentNames = new String[frameCount];
 		}
 
-		public int PropertyId {
-			get { return ((int)TimelineType.Attachment << 24) + slotIndex; }
-		}
-
-		/// <summary>The number of key frames for this timeline.</summary>
-		public int FrameCount { get { return frames.Length; } }
-
-		/// <summary>The index of the slot in <see cref="Skeleton.Slots"> that will be changed.</summary>
 		public int SlotIndex {
-			set {
-				if (value < 0) throw new ArgumentOutOfRangeException("index must be >= 0.");
-				this.slotIndex = value;
-			}
 			get {
 				return slotIndex;
 			}
 		}
 
-		/// <summary>The time in seconds for each key frame.</summary>
-		public float[] Frames { get { return frames; } set { frames = value; } }
-
-		/// <summary>The attachment name for each key frame. May contain null values to clear the attachment.</summary>
-		public string[] AttachmentNames { get { return attachmentNames; } set { attachmentNames = value; } }
-
-		/// <summary>Sets the time in seconds and the attachment name for the specified key frame.</summary>
-		public void SetFrame (int frameIndex, float time, String attachmentName) {
-			frames[frameIndex] = time;
-			attachmentNames[frameIndex] = attachmentName;
+		/// <summary>The attachment name for each frame. May contain null values to clear the attachment. </summary>
+		public string[] AttachmentNames {
+			get {
+				return attachmentNames;
+			}
 		}
 
-		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
+		/// <summary>Sets the time and attachment name for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
+		public void SetFrame (int frame, float time, String attachmentName) {
+			frames[frame] = time;
+			attachmentNames[frame] = attachmentName;
+		}
+
+		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 							MixDirection direction) {
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
+
 			if (direction == MixDirection.Out) {
 				if (blend == MixBlend.Setup) SetAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
@@ -998,13 +1117,7 @@ namespace Spine {
 				return;
 			}
 
-			int frameIndex;
-			if (time >= frames[frames.Length - 1]) // Time is after last frame.
-				frameIndex = frames.Length - 1;
-			else
-				frameIndex = Animation.BinarySearch(frames, time) - 1;
-
-			SetAttachment(skeleton, slot, attachmentNames[frameIndex]);
+			SetAttachment(skeleton, slot, attachmentNames[Animation.Search(frames, time)]);
 		}
 
 		private void SetAttachment (Skeleton skeleton, Slot slot, string attachmentName) {
@@ -1014,46 +1127,98 @@ namespace Spine {
 
 	/// <summary>Changes a slot's <see cref="Slot.Deform"/> to deform a <see cref="VertexAttachment"/>.</summary>
 	public class DeformTimeline : CurveTimeline, ISlotTimeline {
-		internal int slotIndex;
-		internal VertexAttachment attachment;
-		internal float[] frames; // time, ...
-		internal float[][] frameVertices;
+		readonly int slotIndex;
+		readonly VertexAttachment attachment;
+		internal float[][] vertices;
 
-		public DeformTimeline (int frameCount)
-			: base(frameCount) {
-			frames = new float[frameCount];
-			frameVertices = new float[frameCount][];
+		public DeformTimeline (int frameCount, int bezierCount, int slotIndex, VertexAttachment attachment)
+			: base(frameCount, bezierCount, (int)Property.Deform + "|" + slotIndex + "|" + attachment.Id) {
+			this.slotIndex = slotIndex;
+			this.attachment = attachment;
+			vertices = new float[frameCount][];
 		}
 
-		override public int PropertyId {
-			get { return ((int)TimelineType.Deform << 27) + attachment.id + slotIndex; }
-		}
-
-		/// <summary>The index of the slot in <see cref="Skeleton.Slots"/> that will be changed.</summary>
 		public int SlotIndex {
-			set {
-				if (value < 0) throw new ArgumentOutOfRangeException("index must be >= 0.");
-				this.slotIndex = value;
-			}
 			get {
 				return slotIndex;
 			}
 		}
 		/// <summary>The attachment that will be deformed.</summary>
-		public VertexAttachment Attachment { get { return attachment; } set { attachment = value; } }
+		/// <seealso cref="VertexAttachment.DeformAttachment"/>
+		public VertexAttachment Attachment {
+			get {
+				return attachment;
+			}
+		}
 
-		/// <summary>The time in seconds for each key frame.</summary>
-		public float[] Frames { get { return frames; } set { frames = value; } }
+		/// <summary>The vertices for each frame.</summary>
+		public float[][] Vertices {
+			get {
+				return vertices;
+			}
+		}
 
-		/// <summary>The vertices for each key frame.</summary>
-		public float[][] Vertices { get { return frameVertices; } set { frameVertices = value; } }
-
-
-		/// <summary>Sets the time in seconds and the vertices for the specified key frame.</summary>
+		/// <summary>Sets the time and vertices for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
 		/// <param name="vertices">Vertex positions for an unweighted VertexAttachment, or deform offsets if it has weights.</param>
-		public void SetFrame (int frameIndex, float time, float[] vertices) {
-			frames[frameIndex] = time;
-			frameVertices[frameIndex] = vertices;
+		public void SetFrame (int frame, float time, float[] vertices) {
+			frames[frame] = time;
+			this.vertices[frame] = vertices;
+		}
+
+		/// <param name="value1">Ignored (0 is used for a deform timeline).</param>
+		/// <param name="value2">Ignored (1 is used for a deform timeline).</param>
+		public void setBezier (int bezier, int frame, int value, float time1, float value1, float cx1, float cy1, float cx2,
+			float cy2, float time2, float value2) {
+			float[] curves = this.curves;
+			int i = FrameCount + bezier * BEZIER_SIZE;
+			if (value == 0) curves[frame] = BEZIER + i;
+			float tmpx = (time1 - cx1 * 2 + cx2) * 0.03f, tmpy = cy2 * 0.03f - cy1 * 0.06f;
+			float dddx = ((cx1 - cx2) * 3 - time1 + time2) * 0.006f, dddy = (cy1 - cy2 + 0.33333333f) * 0.018f;
+			float ddx = tmpx * 2 + dddx, ddy = tmpy * 2 + dddy;
+			float dx = (cx1 - time1) * 0.3f + tmpx + dddx * 0.16666667f, dy = cy1 * 0.3f + tmpy + dddy * 0.16666667f;
+			float x = time1 + dx, y = dy;
+			for (int n = i + BEZIER_SIZE; i < n; i += 2) {
+				curves[i] = x;
+				curves[i + 1] = y;
+				dx += ddx;
+				dy += ddy;
+				ddx += dddx;
+				ddy += dddy;
+				x += dx;
+				y += dy;
+			}
+		}
+
+		/// <summary>Returns the interpolated percentage for the specified time.</summary>
+		/// <param name="frame">The frame before <code>time</code>.</param>
+		private float GetCurvePercent (float time, int frame) {
+			float[] curves = this.curves;
+			int i = (int)curves[frame];
+			switch (i) {
+				case LINEAR:
+					float x = frames[frame];
+					return (time - x) / (frames[frame + FrameEntries] - x);
+				case STEPPED:
+					return 0;
+			}
+			i -= BEZIER;
+			if (curves[i] > time) {
+				float x = frames[frame];
+				return curves[i + 1] * (time - x) / (curves[i] - x);
+			}
+			int n = i + BEZIER_SIZE;
+			for (i += 2; i < n; i += 2) {
+				if (curves[i] >= time) {
+					float x = curves[i - 2], y = curves[i - 1];
+					return y + (time - x) / (curves[i] - x) * (curves[i + 1] - y);
+				}
+			}
+			{ // scope added to prevent compile error "float x and y declared in enclosing scope"
+				float x = curves[n - 2], y = curves[n - 1];
+				return y + (1 - y) * (time - x) / (frames[frame + FrameEntries] - x);
+			}
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
@@ -1066,8 +1231,8 @@ namespace Spine {
 			var deformArray = slot.Deform;
 			if (deformArray.Count == 0) blend = MixBlend.Setup;
 
-			float[][] frameVertices = this.frameVertices;
-			int vertexCount = frameVertices[0].Length;
+			float[][] vertices = this.vertices;
+			int vertexCount = vertices[0].Length;
 			float[] frames = this.frames;
 			float[] deform;
 
@@ -1113,7 +1278,7 @@ namespace Spine {
 
 			if (time >= frames[frames.Length - 1]) { // Time is after last frame.
 
-				float[] lastVertices = frameVertices[frames.Length - 1];
+				float[] lastVertices = vertices[frames.Length - 1];
 				if (alpha == 1) {
 					if (blend == MixBlend.Add) {
 						if (vertexAttachment.bones == null) {
@@ -1170,12 +1335,10 @@ namespace Spine {
 				return;
 			}
 
-			// Interpolate between the previous frame and the current frame.
-			int frame = Animation.BinarySearch(frames, time);
-			float[] prevVertices = frameVertices[frame - 1];
-			float[] nextVertices = frameVertices[frame];
-			float frameTime = frames[frame];
-			float percent = GetCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
+			int frame = Animation.Search(frames, time);
+			float percent = GetCurvePercent(time, frame);
+			float[] prevVertices = vertices[frame];
+			float[] nextVertices = vertices[frame + 1];
 
 			if (alpha == 1) {
 				if (blend == MixBlend.Add) {
@@ -1252,37 +1415,34 @@ namespace Spine {
 
 	/// <summary>Fires an <see cref="Event"/> when specific animation times are reached.</summary>
 	public class EventTimeline : Timeline {
-		internal float[] frames; // time, ...
-		private Event[] events;
+		readonly static string[] propertyIds = { ((int)Property.Event).ToString() };
+		readonly Event[] events;
 
-		public EventTimeline (int frameCount) {
-			frames = new float[frameCount];
+		public EventTimeline (int frameCount)
+			: base(frameCount, propertyIds) {
 			events = new Event[frameCount];
 		}
 
-		public int PropertyId {
-			get { return ((int)TimelineType.Event << 24); }
+		/// <summary>The event for each frame.</summary>
+		public Event[] Events {
+			get {
+				return events;
+			}
 		}
 
-		/// <summary>The number of key frames for this timeline.</summary>
-		public int FrameCount { get { return frames.Length; } }
-
-		/// <summary>The time in seconds for each key frame.</summary>
-		public float[] Frames { get { return frames; } set { frames = value; } }
-
-		/// <summary>The event for each key frame.</summary>
-		public Event[] Events { get { return events; } set { events = value; } }
-
-		/// <summary>Sets the time in seconds and the event for the specified key frame.</summary>
-		public void SetFrame (int frameIndex, Event e) {
-			frames[frameIndex] = e.Time;
-			events[frameIndex] = e;
+		/// <summary>Sets the time and event for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		public void SetFrame (int frame, Event e) {
+			frames[frame] = e.time;
+			events [frame] = e;
 		}
 
 		/// <summary>Fires events for frames &gt; <code>lastTime</code> and &lt;= <code>time</code>.</summary>
-		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
-							MixDirection direction) {
+		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha,
+			MixBlend blend, MixDirection direction) {
+
 			if (firedEvents == null) return;
+
 			float[] frames = this.frames;
 			int frameCount = frames.Length;
 
@@ -1293,83 +1453,73 @@ namespace Spine {
 				return;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			int frame;
+			int i;
 			if (lastTime < frames[0])
-				frame = 0;
+				i = 0;
 			else {
-				frame = Animation.BinarySearch(frames, lastTime);
-				float frameTime = frames[frame];
-				while (frame > 0) { // Fire multiple events with the same frame.
-					if (frames[frame - 1] != frameTime) break;
-					frame--;
+				i = Animation.Search(frames, lastTime) + 1;
+				float frameTime = frames[i];
+				while (i > 0) { // Fire multiple events with the same frame.
+					if (frames[i - 1] != frameTime) break;
+					i--;
 				}
 			}
-			for (; frame < frameCount && time >= frames[frame]; frame++)
-				firedEvents.Add(events[frame]);
+			for (; i < frameCount && time >= frames[i]; i++)
+				firedEvents.Add(events[i]);
 		}
 	}
 
 	/// <summary>Changes a skeleton's <see cref="Skeleton.DrawOrder"/>.</summary>
 	public class DrawOrderTimeline : Timeline {
-		internal float[] frames; // time, ...
-		private int[][] drawOrders;
+		static readonly string[] propertyIds = { ((int)Property.DrawOrder).ToString() };
 
-		public DrawOrderTimeline (int frameCount) {
-			frames = new float[frameCount];
+		readonly int[][] drawOrders;
+
+		public DrawOrderTimeline (int frameCount)
+			: base(frameCount, propertyIds) {
 			drawOrders = new int[frameCount][];
 		}
 
-		public int PropertyId {
-			get { return ((int)TimelineType.DrawOrder << 24); }
+		/// <summary>The draw order for each frame. </summary>
+		/// <seealso cref="Timeline.SetFrame(int, float, int[])"/>.
+		public int[][] DrawOrders {
+			get {
+				return drawOrders;
+			}
 		}
 
-		/// <summary>The number of key frames for this timeline.</summary>
-		public int FrameCount { get { return frames.Length; } }
-
-		/// <summary>The time in seconds for each key frame.</summary>
-		public float[] Frames { get { return frames; } set { frames = value; } } // time, ...
-
-		/// <summary>The draw order for each key frame.</summary>
-		/// <seealso cref="Timeline.setFrame(int, float, int[])"/>.
-		public int[][] DrawOrders { get { return drawOrders; } set { drawOrders = value; } }
-
-		/// <summary>Sets the time in seconds and the draw order for the specified key frame.</summary>
-		/// <param name="drawOrder">For each slot in <see cref="Skeleton.Slots"/> the index of the new draw order. May be null to use setup pose
-		///                 draw order..</param>
-		public void SetFrame (int frameIndex, float time, int[] drawOrder) {
-			frames[frameIndex] = time;
-			drawOrders[frameIndex] = drawOrder;
+		/// <summary>Sets the time and draw order for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
+		/// <param name="drawOrder">For each slot in <see cref="Skeleton.Slots"/>, the index of the slot in the new draw order. May be null to use
+		///					 setup pose draw order.</param>
+		public void SetFrame (int frame, float time, int[] drawOrder) {
+			frames[frame] = time;
+			drawOrders[frame] = drawOrder;
 		}
 
-		public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
+		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 							MixDirection direction) {
-			ExposedList<Slot> drawOrder = skeleton.drawOrder;
-			ExposedList<Slot> slots = skeleton.slots;
+
+			var drawOrder = skeleton.drawOrder.Items;
 			if (direction == MixDirection.Out) {
-				if (blend == MixBlend.Setup) Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
+				if (blend == MixBlend.Setup) Array.Copy(skeleton.slots.Items, 0, drawOrder, 0, skeleton.slots.Count);
 				return;
 			}
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				if (blend == MixBlend.Setup || blend == MixBlend.First) Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
+				if (blend == MixBlend.Setup || blend == MixBlend.First) Array.Copy(skeleton.slots.Items, 0, drawOrder, 0, skeleton.slots.Count);
 				return;
 			}
 
-			int frame;
-			if (time >= frames[frames.Length - 1]) // Time is after last frame.
-				frame = frames.Length - 1;
-			else
-				frame = Animation.BinarySearch(frames, time) - 1;
-
-			int[] drawOrderToSetupIndex = drawOrders[frame];
-			if (drawOrderToSetupIndex == null) {
-				Array.Copy(slots.Items, 0, drawOrder.Items, 0, slots.Count);
-			} else {
-				var drawOrderItems = drawOrder.Items;
-				var slotsItems = slots.Items;
+			int[] drawOrderToSetupIndex = drawOrders[Animation.Search(frames, time)];
+			if (drawOrderToSetupIndex == null)
+				Array.Copy(skeleton.slots.Items, 0, drawOrder, 0, skeleton.slots.Count);
+			else {
+				var slots = skeleton.slots.Items;
 				for (int i = 0, n = drawOrderToSetupIndex.Length; i < n; i++)
-					drawOrderItems[i] = slotsItems[drawOrderToSetupIndex[i]];
+					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
 			}
 		}
 	}
@@ -1378,52 +1528,49 @@ namespace Spine {
 	/// <see cref="IkConstraint.BendDirection"/>, <see cref="IkConstraint.Stretch"/>, and <see cref="IkConstraint.Compress"/>.</summary>
 	public class IkConstraintTimeline : CurveTimeline {
 		public const int ENTRIES = 6;
-		private const int PREV_TIME = -6, PREV_MIX = -5, PREV_SOFTNESS = -4, PREV_BEND_DIRECTION = -3, PREV_COMPRESS = -2,
-			PREV_STRETCH = -1;
 		private const int MIX = 1, SOFTNESS = 2, BEND_DIRECTION = 3, COMPRESS = 4, STRETCH = 5;
 
-		internal int ikConstraintIndex;
-		internal float[] frames; // time, mix, softness, bendDirection, compress, stretch, ...
+		readonly int ikConstraintIndex;
 
-		public IkConstraintTimeline (int frameCount)
-			: base(frameCount) {
-			frames = new float[frameCount * ENTRIES];
+		public IkConstraintTimeline (int frameCount, int bezierCount, int ikConstraintIndex)
+			: base(frameCount, bezierCount, (int)Property.IkConstraint + "|" + ikConstraintIndex) {
+			this.ikConstraintIndex = ikConstraintIndex;
 		}
 
-		override public int PropertyId {
-			get { return ((int)TimelineType.IkConstraint << 24) + ikConstraintIndex; }
-		}
-
-		/// <summary>The index of the IK constraint slot in <see cref="Skeleton.IkConstraints"/> that will be changed.</summary>
-		public int IkConstraintIndex {
-			set {
-				if (value < 0) throw new ArgumentOutOfRangeException("index must be >= 0.");
-				this.ikConstraintIndex = value;
+		public override int FrameEntries {
+			get {
+				return ENTRIES;
 			}
+		}
+
+		/// <summary>The index of the IK constraint slot in <see cref="Skeleton.IkConstraints"/> that will be changed when this timeline is
+		/// applied.</summary>
+		public int IkConstraintIndex {
 			get {
 				return ikConstraintIndex;
 			}
 		}
 
-		/// <summary>The time in seconds, mix, softness, bend direction, compress, and stretch for each key frame.</summary>
-		public float[] Frames { get { return frames; } set { frames = value; } }
-
-		/// <summary>Sets the time in seconds, mix, softness, bend direction, compress, and stretch for the specified key frame.</summary>
-		public void SetFrame (int frameIndex, float time, float mix, float softness, int bendDirection, bool compress,
+		/// <summary>Sets the time, mix, softness, bend direction, compress, and stretch for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
+		/// <param name="bendDirection">1 or -1.</param>
+		public void SetFrame (int frame, float time, float mix, float softness, int bendDirection, bool compress,
 			bool stretch) {
-			frameIndex *= ENTRIES;
-			frames[frameIndex] = time;
-			frames[frameIndex + MIX] = mix;
-			frames[frameIndex + SOFTNESS] = softness;
-			frames[frameIndex + BEND_DIRECTION] = bendDirection;
-			frames[frameIndex + COMPRESS] = compress ? 1 : 0;
-			frames[frameIndex + STRETCH] = stretch ? 1 : 0;
+			frame *= ENTRIES;
+			frames[frame] = time;
+			frames[frame + MIX] = mix;
+			frames[frame + SOFTNESS] = softness;
+			frames[frame + BEND_DIRECTION] = bendDirection;
+			frames[frame + COMPRESS] = compress ? 1 : 0;
+			frames[frame + STRETCH] = stretch ? 1 : 0;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			IkConstraint constraint = skeleton.ikConstraints.Items[ikConstraintIndex];
 			if (!constraint.active) return;
+
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -1445,59 +1592,48 @@ namespace Spine {
 				return;
 			}
 
-			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-				if (blend == MixBlend.Setup) {
-					constraint.mix = constraint.data.mix + (frames[frames.Length + PREV_MIX] - constraint.data.mix) * alpha;
-					constraint.softness = constraint.data.softness
-						+ (frames[frames.Length + PREV_SOFTNESS] - constraint.data.softness) * alpha;
-					if (direction == MixDirection.Out) {
-						constraint.bendDirection = constraint.data.bendDirection;
-						constraint.compress = constraint.data.compress;
-						constraint.stretch = constraint.data.stretch;
-					} else {
-						constraint.bendDirection = (int)frames[frames.Length + PREV_BEND_DIRECTION];
-						constraint.compress = frames[frames.Length + PREV_COMPRESS] != 0;
-						constraint.stretch = frames[frames.Length + PREV_STRETCH] != 0;
-					}
-				} else {
-					constraint.mix += (frames[frames.Length + PREV_MIX] - constraint.mix) * alpha;
-					constraint.softness += (frames[frames.Length + PREV_SOFTNESS] - constraint.softness) * alpha;
-					if (direction == MixDirection.In) {
-						constraint.bendDirection = (int)frames[frames.Length + PREV_BEND_DIRECTION];
-						constraint.compress = frames[frames.Length + PREV_COMPRESS] != 0;
-						constraint.stretch = frames[frames.Length + PREV_STRETCH] != 0;
-					}
-				}
-				return;
+			float mix, softness;
+			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					mix = frames[i + MIX];
+					softness = frames[i + SOFTNESS];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					mix += (frames[i + ENTRIES + MIX] - mix) * t;
+					softness += (frames[i + ENTRIES + SOFTNESS] - softness) * t;
+					break;
+				case STEPPED:
+					mix = frames[i + MIX];
+					softness = frames[i + SOFTNESS];
+					break;
+				default:
+					mix = GetBezierValue(time, i, MIX, curveType - BEZIER);
+					softness = GetBezierValue(time, i, SOFTNESS, curveType + BEZIER_SIZE - BEZIER);
+					break;
 			}
 
-			// Interpolate between the previous frame and the current frame.
-			int frame = Animation.BinarySearch(frames, time, ENTRIES);
-			float mix = frames[frame + PREV_MIX];
-			float softness = frames[frame + PREV_SOFTNESS];
-			float frameTime = frames[frame];
-			float percent = GetCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
 			if (blend == MixBlend.Setup) {
-				constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha;
-				constraint.softness = constraint.data.softness
-					+ (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.data.softness) * alpha;
+				constraint.mix = constraint.data.mix + (mix - constraint.data.mix) * alpha;
+				constraint.softness = constraint.data.softness + (softness - constraint.data.softness) * alpha;
 				if (direction == MixDirection.Out) {
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
-				} else {
-					constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
-					constraint.compress = frames[frame + PREV_COMPRESS] != 0;
-					constraint.stretch = frames[frame + PREV_STRETCH] != 0;
 				}
-			} else {
-				constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
-				constraint.softness += (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.softness) * alpha;
+				else {
+					constraint.bendDirection = (int)frames[i + BEND_DIRECTION];
+					constraint.compress = frames[i + COMPRESS] != 0;
+					constraint.stretch = frames[i + STRETCH] != 0;
+				}
+			}
+			else {
+				constraint.mix += (mix - constraint.mix) * alpha;
+				constraint.softness += (softness - constraint.softness) * alpha;
 				if (direction == MixDirection.In) {
-					constraint.bendDirection = (int)frames[frame + PREV_BEND_DIRECTION];
-					constraint.compress = frames[frame + PREV_COMPRESS] != 0;
-					constraint.stretch = frames[frame + PREV_STRETCH] != 0;
+					constraint.bendDirection = (int)frames[i + BEND_DIRECTION];
+					constraint.compress = frames[i + COMPRESS] != 0;
+					constraint.stretch = frames[i + STRETCH] != 0;
 				}
 			}
 		}
@@ -1506,49 +1642,46 @@ namespace Spine {
 	///	<summary>Changes a transform constraint's mixes.</summary>
 	public class TransformConstraintTimeline : CurveTimeline {
 		public const int ENTRIES = 5;
-		private const int PREV_TIME = -5, PREV_ROTATE = -4, PREV_TRANSLATE = -3, PREV_SCALE = -2, PREV_SHEAR = -1;
 		private const int ROTATE = 1, TRANSLATE = 2, SCALE = 3, SHEAR = 4;
 
-		internal int transformConstraintIndex;
-		internal float[] frames; // time, rotate mix, translate mix, scale mix, shear mix, ...
+		readonly int transformConstraintIndex;
 
-		public TransformConstraintTimeline (int frameCount)
-			: base(frameCount) {
-			frames = new float[frameCount * ENTRIES];
+		public TransformConstraintTimeline (int frameCount, int bezierCount, int transformConstraintIndex)
+			: base(frameCount, bezierCount, (int)Property.TransformConstraint + "|" + transformConstraintIndex) {
+			this.transformConstraintIndex = transformConstraintIndex;
 		}
 
-		override public int PropertyId {
-			get { return ((int)TimelineType.TransformConstraint << 24) + transformConstraintIndex; }
-		}
-
-		/// <summary>The index of the transform constraint slot in <see cref="Skeleton.TransformConstraints"/> that will be changed.</summary>
-		public int TransformConstraintIndex {
-			set {
-				if (value < 0) throw new ArgumentOutOfRangeException("index must be >= 0.");
-				this.transformConstraintIndex = value;
+		public override int FrameEntries {
+			get {
+				return ENTRIES;
 			}
+		}
+
+		/// <summary>The index of the transform constraint slot in <see cref="Skeleton.TransformConstraints"/> that will be changed when this
+		/// timeline is applied.</summary>
+		public int TransformConstraintIndex {
 			get {
 				return transformConstraintIndex;
 			}
 		}
 
-		/// <summary>The time in seconds, rotate mix, translate mix, scale mix, and shear mix for each key frame.</summary>
-		public float[] Frames { get { return frames; } set { frames = value; } } // time, rotate mix, translate mix, scale mix, shear mix, ...
-
-		/// <summary>The time in seconds, rotate mix, translate mix, scale mix, and shear mix for the specified key frame.</summary>
-		public void SetFrame (int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
-			frameIndex *= ENTRIES;
-			frames[frameIndex] = time;
-			frames[frameIndex + ROTATE] = rotateMix;
-			frames[frameIndex + TRANSLATE] = translateMix;
-			frames[frameIndex + SCALE] = scaleMix;
-			frames[frameIndex + SHEAR] = shearMix;
+		/// <summary>Sets the time, rotate mix, translate mix, scale mix, and shear mix for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
+		public void SetFrame (int frame, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
+			frame *= ENTRIES;
+			frames[frame] = time;
+			frames[frame + ROTATE] = rotateMix;
+			frames[frame + TRANSLATE] = translateMix;
+			frames[frame + SCALE] = scaleMix;
+			frames[frame + SHEAR] = shearMix;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			TransformConstraint constraint = skeleton.transformConstraints.Items[transformConstraintIndex];
 			if (!constraint.active) return;
+
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				TransformConstraintData data = constraint.data;
@@ -1570,28 +1703,34 @@ namespace Spine {
 			}
 
 			float rotate, translate, scale, shear;
-			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-				int i = frames.Length;
-				rotate = frames[i + PREV_ROTATE];
-				translate = frames[i + PREV_TRANSLATE];
-				scale = frames[i + PREV_SCALE];
-				shear = frames[i + PREV_SHEAR];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.BinarySearch(frames, time, ENTRIES);
-				rotate = frames[frame + PREV_ROTATE];
-				translate = frames[frame + PREV_TRANSLATE];
-				scale = frames[frame + PREV_SCALE];
-				shear = frames[frame + PREV_SHEAR];
-				float frameTime = frames[frame];
-				float percent = GetCurvePercent(frame / ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				rotate += (frames[frame + ROTATE] - rotate) * percent;
-				translate += (frames[frame + TRANSLATE] - translate) * percent;
-				scale += (frames[frame + SCALE] - scale) * percent;
-				shear += (frames[frame + SHEAR] - shear) * percent;
+			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					rotate = frames[i + ROTATE];
+					translate = frames[i + TRANSLATE];
+					scale = frames[i + SCALE];
+					shear = frames[i + SHEAR];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					rotate += (frames[i + ENTRIES + ROTATE] - rotate) * t;
+					translate += (frames[i + ENTRIES + TRANSLATE] - translate) * t;
+					scale += (frames[i + ENTRIES + SCALE] - scale) * t;
+					shear += (frames[i + ENTRIES + SHEAR] - shear) * t;
+					break;
+				case STEPPED:
+					rotate = frames[i + ROTATE];
+					translate = frames[i + TRANSLATE];
+					scale = frames[i + SCALE];
+					shear = frames[i + SHEAR];
+					break;
+				default:
+					rotate = GetBezierValue(time, i, ROTATE, curveType - BEZIER);
+					translate = GetBezierValue(time, i, TRANSLATE, curveType + BEZIER_SIZE - BEZIER);
+					scale = GetBezierValue(time, i, TRANSLATE, curveType + BEZIER_SIZE * 2 - BEZIER);
+					shear = GetBezierValue(time, i, TRANSLATE, curveType + BEZIER_SIZE * 3 - BEZIER);
+					break;
 			}
+
 			if (blend == MixBlend.Setup) {
 				TransformConstraintData data = constraint.data;
 				constraint.rotateMix = data.rotateMix + (rotate - data.rotateMix) * alpha;
@@ -1608,49 +1747,27 @@ namespace Spine {
 	}
 
 	/// <summary>Changes a path constraint's <see cref="PathConstraint.Position"/>.</summary>
-	public class PathConstraintPositionTimeline : CurveTimeline {
-		public const int ENTRIES = 2;
-		protected const int PREV_TIME = -2, PREV_VALUE = -1;
-		protected const int VALUE = 1;
+	public class PathConstraintPositionTimeline : CurveTimeline1 {
+		readonly int pathConstraintIndex;
 
-		internal int pathConstraintIndex;
-		internal float[] frames; // time, position, ...
-
-		public PathConstraintPositionTimeline (int frameCount)
-			: base(frameCount) {
-			frames = new float[frameCount * ENTRIES];
+		public PathConstraintPositionTimeline (int frameCount, int bezierCount, int pathConstraintIndex)
+			:base(frameCount, bezierCount, (int)Property.PathConstraintPosition + "|" + pathConstraintIndex) {
+			this.pathConstraintIndex = pathConstraintIndex;
 		}
 
-		override public int PropertyId {
-			get { return ((int)TimelineType.PathConstraintPosition << 24) + pathConstraintIndex; }
-		}
-
-		/// <summary>The index of the path constraint slot in <see cref="Skeleton.PathConstraints"/> that will be changed.</summary>
+		/// <summary>The index of the path constraint slot in <see cref="Skeleton.PathConstraints"/> that will be changed when this timeline
+		/// is applied.</summary>
 		public int PathConstraintIndex {
-			set {
-				if (value < 0) throw new ArgumentOutOfRangeException("index must be >= 0.");
-				this.pathConstraintIndex = value;
-			}
 			get {
 				return pathConstraintIndex;
 			}
-		}
-
-		/// <summary>The time in seconds and path constraint position for each key frame.</summary>
-		public float[] Frames { get { return frames; } set { frames = value; } } // time, position, ...
-
-		/// <summary>Sets the time in seconds and path constraint position for the specified key frame.</summary>
-		public void SetFrame (int frameIndex, float time, float position) {
-			frameIndex *= ENTRIES;
-			frames[frameIndex] = time;
-			frames[frameIndex + VALUE] = position;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
 			if (!constraint.active) return;
-			float[] frames = this.frames;
+
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
 				case MixBlend.Setup:
@@ -1663,19 +1780,7 @@ namespace Spine {
 				return;
 			}
 
-			float position;
-			if (time >= frames[frames.Length - ENTRIES]) // Time is after last frame.
-				position = frames[frames.Length + PREV_VALUE];
-			else {
-				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.BinarySearch(frames, time, ENTRIES);
-				position = frames[frame + PREV_VALUE];
-				float frameTime = frames[frame];
-				float percent = GetCurvePercent(frame / ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				position += (frames[frame + VALUE] - position) * percent;
-			}
+			float position = GetCurveValue(time);
 			if (blend == MixBlend.Setup)
 				constraint.position = constraint.data.position + (position - constraint.data.position) * alpha;
 			else
@@ -1684,19 +1789,28 @@ namespace Spine {
 	}
 
 	/// <summary>Changes a path constraint's <see cref="PathConstraint.Spacing"/>.</summary>
-	public class PathConstraintSpacingTimeline : PathConstraintPositionTimeline {
-		public PathConstraintSpacingTimeline (int frameCount)
-			: base(frameCount) {
+	public class PathConstraintSpacingTimeline : CurveTimeline1 {
+		readonly int pathConstraintIndex;
+
+		public PathConstraintSpacingTimeline (int frameCount, int bezierCount, int pathConstraintIndex)
+			: base(frameCount, bezierCount, (int)Property.PathConstraintSpacing + "|" + pathConstraintIndex) {
+			this.pathConstraintIndex = pathConstraintIndex;
 		}
 
-		override public int PropertyId {
-			get { return ((int)TimelineType.PathConstraintSpacing << 24) + pathConstraintIndex; }
+		/// <summary>The index of the path constraint slot in <see cref="Skeleton.PathConstraints"/> that will be changed when this timeline
+		/// is applied.</summary>
+		public int PathConstraintIndex {
+			get {
+				return pathConstraintIndex;
+			}
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha, MixBlend blend,
 									MixDirection direction) {
+
 			PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
 			if (!constraint.active) return;
+
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -1710,20 +1824,7 @@ namespace Spine {
 				return;
 			}
 
-			float spacing;
-			if (time >= frames[frames.Length - ENTRIES]) // Time is after last frame.
-				spacing = frames[frames.Length + PREV_VALUE];
-			else {
-				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.BinarySearch(frames, time, ENTRIES);
-				spacing = frames[frame + PREV_VALUE];
-				float frameTime = frames[frame];
-				float percent = GetCurvePercent(frame / ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				spacing += (frames[frame + VALUE] - spacing) * percent;
-			}
-
+			float spacing = GetCurveValue(time);
 			if (blend == MixBlend.Setup)
 				constraint.spacing = constraint.data.spacing + (spacing - constraint.data.spacing) * alpha;
 			else
@@ -1732,49 +1833,27 @@ namespace Spine {
 	}
 
 	/// <summary>Changes a path constraint's mixes.</summary>
-	public class PathConstraintMixTimeline : CurveTimeline {
-		public const int ENTRIES = 3;
-		private const int PREV_TIME = -3, PREV_ROTATE = -2, PREV_TRANSLATE = -1;
-		private const int ROTATE = 1, TRANSLATE = 2;
+	public class PathConstraintMixTimeline : CurveTimeline2 {
+		readonly int pathConstraintIndex;
 
-		internal int pathConstraintIndex;
-		internal float[] frames; // time, rotate mix, translate mix, ...
-
-		public PathConstraintMixTimeline (int frameCount)
-			: base(frameCount) {
-			frames = new float[frameCount * ENTRIES];
+		public PathConstraintMixTimeline (int frameCount, int bezierCount, int pathConstraintIndex)
+			: base(frameCount, bezierCount, (int)Property.PathConstraintMix + "|" + pathConstraintIndex) {
+			this.pathConstraintIndex = pathConstraintIndex;
 		}
 
-		override public int PropertyId {
-			get { return ((int)TimelineType.PathConstraintMix << 24) + pathConstraintIndex; }
-		}
-
-		/// <summary>The index of the path constraint slot in <see cref="Skeleton.PathConstraints"/> that will be changed.</summary>
+		/// <summary>The index of the path constraint slot in <see cref="Skeleton.PathConstraints"/> that will be changed when this timeline
+		/// is applied.</summary>
 		public int PathConstraintIndex {
-			set {
-				if (value < 0) throw new ArgumentOutOfRangeException("index must be >= 0.");
-				this.pathConstraintIndex = value;
-			}
 			get {
 				return pathConstraintIndex;
 			}
-		}
-
-		/// <summary>The time in seconds, rotate mix, and translate mix for each key frame.</summary>
-		public float[] Frames { get { return frames; } set { frames = value; } } // time, rotate mix, translate mix, ...
-
-		/// <summary>The time in seconds, rotate mix, and translate mix for the specified key frame.</summary>
-		public void SetFrame (int frameIndex, float time, float rotateMix, float translateMix) {
-			frameIndex *= ENTRIES;
-			frames[frameIndex] = time;
-			frames[frameIndex + ROTATE] = rotateMix;
-			frames[frameIndex + TRANSLATE] = translateMix;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
 			PathConstraint constraint = skeleton.pathConstraints.Items[pathConstraintIndex];
 			if (!constraint.active) return;
+
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
@@ -1791,20 +1870,24 @@ namespace Spine {
 			}
 
 			float rotate, translate;
-			if (time >= frames[frames.Length - ENTRIES]) { // Time is after last frame.
-				rotate = frames[frames.Length + PREV_ROTATE];
-				translate = frames[frames.Length + PREV_TRANSLATE];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				int frame = Animation.BinarySearch(frames, time, ENTRIES);
-				rotate = frames[frame + PREV_ROTATE];
-				translate = frames[frame + PREV_TRANSLATE];
-				float frameTime = frames[frame];
-				float percent = GetCurvePercent(frame / ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				rotate += (frames[frame + ROTATE] - rotate) * percent;
-				translate += (frames[frame + TRANSLATE] - translate) * percent;
+			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					rotate = frames[i + VALUE1];
+					translate = frames[i + VALUE2];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					rotate += (frames[i + ENTRIES + VALUE1] - rotate) * t;
+					translate += (frames[i + ENTRIES + VALUE2] - translate) * t;
+					break;
+				case STEPPED:
+					rotate = frames[i + VALUE1];
+					translate = frames[i + VALUE2];
+					break;
+				default:
+					rotate = GetBezierValue(time, i, VALUE1, curveType - BEZIER);
+					translate = GetBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
+					break;
 			}
 
 			if (blend == MixBlend.Setup) {

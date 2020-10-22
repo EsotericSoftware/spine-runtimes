@@ -116,6 +116,7 @@ namespace Spine {
 		/// <summary>Returns the magnitide (always positive) of the world scale Y.</summary>
 		public float WorldScaleY { get { return (float)Math.Sqrt(b * b + d * d); } }
 
+		/// <summary>Copy constructor. Does not copy the <see cref="Children"/> bones.</summary>
 		/// <param name="parent">May be null.</param>
 		public Bone (BoneData data, Skeleton skeleton, Bone parent) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
@@ -305,10 +306,10 @@ namespace Spine {
 
 		public void WorldToLocal (float worldX, float worldY, out float localX, out float localY) {
 			float a = this.a, b = this.b, c = this.c, d = this.d;
-			float invDet = 1 / (a * d - b * c);
+			float det = a * d - b * c;
 			float x = worldX - this.worldX, y = worldY - this.worldY;
-			localX = (x * d * invDet - y * b * invDet);
-			localY = (y * a * invDet - x * c * invDet);
+			localX = (x * d - y * b) / det;
+			localY = (y * a - x * c) / det;
 		}
 
 		public void LocalToWorld (float localX, float localY, out float worldX, out float worldY) {

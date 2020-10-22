@@ -50,6 +50,8 @@ namespace Spine {
 		internal float fps;
 		internal string imagesPath, audioPath;
 
+		///<summary>The skeleton's name, which by default is the name of the skeleton data file when possible, or null when a name hasn't been
+		///set.</summary>
 		public string Name { get { return name; } set { name = value; } }
 
 		/// <summary>The skeleton's bones, sorted parent first. The root bone is always the first bone.</summary>
@@ -79,16 +81,18 @@ namespace Spine {
 		public float Height { get { return height; } set { height = value; } }
 		/// <summary>The Spine version used to export this data, or null.</summary>
 		public string Version { get { return version; } set { version = value; } }
+
+		///<summary>The skeleton data hash. This value will change if any of the skeleton data has changed.
+		///May be null.</summary>
 		public string Hash { get { return hash; } set { hash = value; } }
 
-		/// <summary>The path to the images directory as defined in Spine. Available only when nonessential data was exported. May be null</summary>
 		public string ImagesPath { get { return imagesPath; } set { imagesPath = value; } }
 
-		/// <summary>The path to the audio directory defined in Spine. Available only when nonessential data was exported. May be null.</summary>
+		/// <summary> The path to the audio directory as defined in Spine. Available only when nonessential data was exported.
+		/// May be null.</summary>
 		public string AudioPath { get { return audioPath; } set { audioPath = value; } }
 
-		/// <summary>
-		/// The dopesheet FPS in Spine. Available only when nonessential data was exported.</summary>
+		/// <summary>The dopesheet FPS in Spine, or zero if nonessential data was not exported.</summary>
 		public float Fps { get { return fps; } set { fps = value; } }
 
 		// --- Bones.
@@ -99,10 +103,9 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public BoneData FindBone (string boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
-			var bones = this.bones;
-			var bonesItems = bones.Items;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				BoneData bone = bonesItems[i];
+			var bones = this.bones.Items;
+			for (int i = 0, n = this.bones.Count; i < n; i++) {
+				BoneData bone = bones[i];
 				if (bone.name == boneName) return bone;
 			}
 			return null;
@@ -111,10 +114,9 @@ namespace Spine {
 		/// <returns>-1 if the bone was not found.</returns>
 		public int FindBoneIndex (string boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
-			var bones = this.bones;
-			var bonesItems = bones.Items;
-			for (int i = 0, n = bones.Count; i < n; i++)
-				if (bonesItems[i].name == boneName) return i;
+			var bones = this.bones.Items;
+			for (int i = 0, n = this.bones.Count; i < n; i++)
+				if (bones[i].name == boneName) return i;
 			return -1;
 		}
 
@@ -123,9 +125,9 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public SlotData FindSlot (string slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
-			ExposedList<SlotData> slots = this.slots;
-			for (int i = 0, n = slots.Count; i < n; i++) {
-				SlotData slot = slots.Items[i];
+			var slots = this.slots.Items;
+			for (int i = 0, n = this.slots.Count; i < n; i++) {
+				SlotData slot = slots[i];
 				if (slot.name == slotName) return slot;
 			}
 			return null;
@@ -165,9 +167,9 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public Animation FindAnimation (string animationName) {
 			if (animationName == null) throw new ArgumentNullException("animationName", "animationName cannot be null.");
-			ExposedList<Animation> animations = this.animations;
-			for (int i = 0, n = animations.Count; i < n; i++) {
-				Animation animation = animations.Items[i];
+			var animations = this.animations.Items;
+			for (int i = 0, n = this.animations.Count; i < n; i++) {
+				Animation animation = animations[i];
 				if (animation.name == animationName) return animation;
 			}
 			return null;
@@ -178,9 +180,9 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public IkConstraintData FindIkConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			ExposedList<IkConstraintData> ikConstraints = this.ikConstraints;
-			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
-				IkConstraintData ikConstraint = ikConstraints.Items[i];
+			var ikConstraints = this.ikConstraints.Items;
+			for (int i = 0, n = this.ikConstraints.Count; i < n; i++) {
+				IkConstraintData ikConstraint = ikConstraints[i];
 				if (ikConstraint.name == constraintName) return ikConstraint;
 			}
 			return null;
@@ -191,9 +193,9 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public TransformConstraintData FindTransformConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			ExposedList<TransformConstraintData> transformConstraints = this.transformConstraints;
-			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
-				TransformConstraintData transformConstraint = transformConstraints.Items[i];
+			var transformConstraints = this.transformConstraints.Items;
+			for (int i = 0, n = this.transformConstraints.Count; i < n; i++) {
+				TransformConstraintData transformConstraint = transformConstraints[i];
 				if (transformConstraint.name == constraintName) return transformConstraint;
 			}
 			return null;
@@ -204,9 +206,9 @@ namespace Spine {
 		/// <returns>May be null.</returns>
 		public PathConstraintData FindPathConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			ExposedList<PathConstraintData> pathConstraints = this.pathConstraints;
-			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
-				PathConstraintData constraint = pathConstraints.Items[i];
+			var pathConstraints = this.pathConstraints.Items;
+			for (int i = 0, n = this.pathConstraints.Count; i < n; i++) {
+				PathConstraintData constraint = pathConstraints[i];
 				if (constraint.name.Equals(constraintName)) return constraint;
 			}
 			return null;

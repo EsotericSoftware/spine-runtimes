@@ -34,7 +34,7 @@ namespace Spine {
 	/// <summary>
 	/// <para>
 	/// Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
-	/// constrained bones so they follow a {@link PathAttachment}.</para>
+	/// constrained bones so they follow a <see cref="PathAttachment"/>.</para>
 	/// <para>
 	/// See <a href="http://esotericsoftware.com/spine-path-constraints">Path constraints</a> in the Spine User Guide.</para>
 	/// </summary>
@@ -80,11 +80,6 @@ namespace Spine {
 			spacing = constraint.spacing;
 			rotateMix = constraint.rotateMix;
 			translateMix = constraint.translateMix;
-		}
-
-		/// <summary>Applies the constraint to the constrained bones.</summary>
-		public void Apply () {
-			Update();
 		}
 
 		public void Update () {

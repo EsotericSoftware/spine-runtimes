@@ -39,7 +39,7 @@ namespace Spine {
 		private Atlas[] atlasArray;
 
 		public AtlasAttachmentLoader (params Atlas[] atlasArray) {
-			if (atlasArray == null) throw new ArgumentNullException("atlas array cannot be null.");
+			if (atlasArray == null) throw new ArgumentNullException("atlas", "atlas array cannot be null.");
 			this.atlasArray = atlasArray;
 		}
 

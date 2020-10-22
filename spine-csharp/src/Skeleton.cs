@@ -40,7 +40,6 @@ namespace Spine {
 		internal ExposedList<TransformConstraint> transformConstraints;
 		internal ExposedList<PathConstraint> pathConstraints;
 		internal ExposedList<IUpdatable> updateCache = new ExposedList<IUpdatable>();
-		internal ExposedList<Bone> updateCacheReset = new ExposedList<Bone>();
 		internal Skin skin;
 		internal float r = 1, g = 1, b = 1, a = 1;
 		internal float time;
@@ -55,7 +54,13 @@ namespace Spine {
 		public ExposedList<IkConstraint> IkConstraints { get { return ikConstraints; } }
 		public ExposedList<PathConstraint> PathConstraints { get { return pathConstraints; } }
 		public ExposedList<TransformConstraint> TransformConstraints { get { return transformConstraints; } }
-		public Skin Skin { get { return skin; } set { SetSkin(value); } }
+
+		public Skin Skin {
+			/// <summary>The skeleton's current skin. May be null.</summary>
+			get { return skin; }
+			/// <summary>Sets a skin, <see cref="SetSkin(Skin)"/>.</summary>
+			set { SetSkin(value); }
+		}
 		public float R { get { return r; } set { r = value; } }
 		public float G { get { return g; } set { g = value; } }
 		public float B { get { return b; } set { b = value; } }
@@ -72,6 +77,7 @@ namespace Spine {
 		[Obsolete("Use ScaleY instead. FlipY is when ScaleY is negative.")]
 		public bool FlipY { get { return scaleY < 0; } set { scaleY = value ? -1f : 1f; } }
 
+		/// <summary>Returns the root bone, or null if the skeleton has no bones.</summary>
 		public Bone RootBone {
 			get { return bones.Count == 0 ? null : bones.Items[0]; }
 		}
@@ -81,22 +87,23 @@ namespace Spine {
 			this.data = data;
 
 			bones = new ExposedList<Bone>(data.bones.Count);
+			var bonesItems = this.bones.Items;
 			foreach (BoneData boneData in data.bones) {
 				Bone bone;
 				if (boneData.parent == null) {
 					bone = new Bone(boneData, this, null);
 				} else {
-					Bone parent = bones.Items[boneData.parent.index];
+					Bone parent = bonesItems[boneData.parent.index];
 					bone = new Bone(boneData, this, parent);
 					parent.children.Add(bone);
 				}
-				bones.Add(bone);
+				this.bones.Add(bone);
 			}
 
 			slots = new ExposedList<Slot>(data.slots.Count);
 			drawOrder = new ExposedList<Slot>(data.slots.Count);
 			foreach (SlotData slotData in data.slots) {
-				Bone bone = bones.Items[slotData.boneData.index];
+				Bone bone = bonesItems[slotData.boneData.index];
 				Slot slot = new Slot(slotData, bone);
 				slots.Add(slot);
 				drawOrder.Add(slot);
@@ -115,7 +122,7 @@ namespace Spine {
 				pathConstraints.Add(new PathConstraint(pathConstraintData, this));
 
 			UpdateCache();
-			UpdateWorldTransform();
+			//UpdateWorldTransform();
 		}
 
 		/// <summary>Caches information about bones and constraints. Must be called if the <see cref="Skin"/> is modified or if bones, constraints, or
@@ -123,7 +130,6 @@ namespace Spine {
 		public void UpdateCache () {
 			var updateCache = this.updateCache;
 			updateCache.Clear();
-			this.updateCacheReset.Clear();
 
 			int boneCount = this.bones.Items.Length;
 			var bones = this.bones;
@@ -191,16 +197,19 @@ namespace Spine {
 			Bone parent = constrained.Items[0];
 			SortBone(parent);
 
-			if (constrained.Count > 1) {
-				Bone child = constrained.Items[constrained.Count - 1];
-				if (!updateCache.Contains(child))
-					updateCacheReset.Add(child);
+			if (constrained.Count == 1) {
+				updateCache.Add(constraint);
+				SortReset(parent.children);
 			}
+			else {
+				Bone child = constrained.Items[constrained.Count - 1];
+				SortBone(child);
 
-			updateCache.Add(constraint);
+				updateCache.Add(constraint);
 
-			SortReset(parent.children);
-			constrained.Items[constrained.Count - 1].sorted = true;
+				SortReset(parent.children);
+				child.sorted = true;
+			}
 		}
 
 		private void SortPathConstraint (PathConstraint constraint) {
@@ -218,17 +227,17 @@ namespace Spine {
 			Attachment attachment = slot.attachment;
 			if (attachment is PathAttachment) SortPathConstraintAttachment(attachment, slotBone);
 
-			var constrained = constraint.bones;
-			int boneCount = constrained.Count;
+			var constrained = constraint.bones.Items;
+			int boneCount = constraint.bones.Count;
 			for (int i = 0; i < boneCount; i++)
-				SortBone(constrained.Items[i]);
+				SortBone(constrained[i]);
 
 			updateCache.Add(constraint);
 
 			for (int i = 0; i < boneCount; i++)
-				SortReset(constrained.Items[i].children);
+				SortReset(constrained[i].children);
 			for (int i = 0; i < boneCount; i++)
-				constrained.Items[i].sorted = true;
+				constrained[i].sorted = true;
 		}
 
 		private void SortTransformConstraint (TransformConstraint constraint) {
@@ -238,25 +247,25 @@ namespace Spine {
 
 			SortBone(constraint.target);
 
-			var constrained = constraint.bones;
-			int boneCount = constrained.Count;
+			var constrained = constraint.bones.Items;
+			int boneCount = constraint.bones.Count;
 			if (constraint.data.local) {
 				for (int i = 0; i < boneCount; i++) {
-					Bone child = constrained.Items[i];
+					Bone child = constrained[i];
 					SortBone(child.parent);
-					if (!updateCache.Contains(child)) updateCacheReset.Add(child);
+					SortBone(child);
 				}
 			} else {
 				for (int i = 0; i < boneCount; i++)
-					SortBone(constrained.Items[i]);
+					SortBone(constrained[i]);
 			}
 
 			updateCache.Add(constraint);
 
 			for (int i = 0; i < boneCount; i++)
-				SortReset(constrained.Items[i].children);
+				SortReset(constrained[i].children);
 			for (int i = 0; i < boneCount; i++)
-				constrained.Items[i].sorted = true;
+				constrained[i].sorted = true;
 		}
 
 		private void SortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
@@ -271,12 +280,12 @@ namespace Spine {
 			if (pathBones == null)
 				SortBone(slotBone);
 			else {
-				var bones = this.bones;
+				var bones = this.bones.Items;
 				for (int i = 0, n = pathBones.Length; i < n;) {
 					int nn = pathBones[i++];
 					nn += i;
 					while (i < nn)
-						SortBone(bones.Items[pathBones[i++]]);
+						SortBone(bones[pathBones[i++]]);
 				}
 			}
 		}
@@ -299,24 +308,17 @@ namespace Spine {
 			}
 		}
 
-		/// <summary>Updates the world transform for each bone and applies constraints.</summary>
+
+		/// <summary>
+		/// Updates the world transform for each bone and applies all constraints.
+		/// <para>
+		/// See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+		/// Runtimes Guide.</para>
+		/// </summary>
 		public void UpdateWorldTransform () {
-			var updateCacheReset = this.updateCacheReset;
-			var updateCacheResetItems = updateCacheReset.Items;
-			for (int i = 0, n = updateCacheReset.Count; i < n; i++) {
-				Bone bone = updateCacheResetItems[i];
-				bone.ax = bone.x;
-				bone.ay = bone.y;
-				bone.arotation = bone.rotation;
-				bone.ascaleX = bone.scaleX;
-				bone.ascaleY = bone.scaleY;
-				bone.ashearX = bone.shearX;
-				bone.ashearY = bone.shearY;
-				bone.appliedValid = true;
-			}
-			var updateItems = this.updateCache.Items;
-			for (int i = 0, n = updateCache.Count; i < n; i++)
-				updateItems[i].Update();
+			var updateCache = this.updateCache.Items;
+			for (int i = 0, n = this.updateCache.Count; i < n; i++)
+				updateCache[i].Update();
 		}
 
 		/// <summary>
@@ -324,22 +326,7 @@ namespace Spine {
 		/// all constraints.
 	 	/// </summary>
 		public void UpdateWorldTransform (Bone parent) {
-			// This partial update avoids computing the world transform for constrained bones when 1) the bone is not updated
-			// before the constraint, 2) the constraint only needs to access the applied local transform, and 3) the constraint calls
-			// updateWorldTransform.
-			var updateCacheReset = this.updateCacheReset;
-			var updateCacheResetItems = updateCacheReset.Items;
-			for (int i = 0, n = updateCacheReset.Count; i < n; i++) {
-				Bone bone = updateCacheResetItems[i];
-				bone.ax = bone.x;
-				bone.ay = bone.y;
-				bone.arotation = bone.rotation;
-				bone.ascaleX = bone.scaleX;
-				bone.ascaleY = bone.scaleY;
-				bone.ashearX = bone.shearX;
-				bone.ashearY = bone.shearY;
-				bone.appliedValid = true;
-			}
+			if (parent == null) throw new ArgumentNullException("parent", "parent cannot be null.");
 
 			// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
 			Bone rootBone = this.RootBone;
@@ -358,10 +345,9 @@ namespace Spine {
 			rootBone.d = (pc * lb + pd * ld) * scaleY;
 
 			// Update everything except root bone.
-			var updateCache = this.updateCache;
-			var updateCacheItems = updateCache.Items;
-			for (int i = 0, n = updateCache.Count; i < n; i++) {
-				var updatable = updateCacheItems[i];
+			var updateCache = this.updateCache.Items;
+			for (int i = 0, n = this.updateCache.Count; i < n; i++) {
+				var updatable = updateCache[i];
 				if (updatable != rootBone)
 					updatable.Update();
 			}
@@ -375,13 +361,13 @@ namespace Spine {
 
 		/// <summary>Sets the bones and constraints to their setup pose values.</summary>
 		public void SetBonesToSetupPose () {
-			var bonesItems = this.bones.Items;
-			for (int i = 0, n = bones.Count; i < n; i++)
-				bonesItems[i].SetToSetupPose();
+			var bones = this.bones.Items;
+			for (int i = 0, n = this.bones.Count; i < n; i++)
+				bones[i].SetToSetupPose();
 
-			var ikConstraintsItems = this.ikConstraints.Items;
-			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
-				IkConstraint constraint = ikConstraintsItems[i];
+			var ikConstraints = this.ikConstraints.Items;
+			for (int i = 0, n = this.ikConstraints.Count; i < n; i++) {
+				IkConstraint constraint = ikConstraints[i];
 				constraint.mix = constraint.data.mix;
 				constraint.softness = constraint.data.softness;
 				constraint.bendDirection = constraint.data.bendDirection;
@@ -389,9 +375,9 @@ namespace Spine {
 				constraint.stretch = constraint.data.stretch;
 			}
 
-			var transformConstraintsItems = this.transformConstraints.Items;
-			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
-				TransformConstraint constraint = transformConstraintsItems[i];
+			var transformConstraints = this.transformConstraints.Items;
+			for (int i = 0, n = this.transformConstraints.Count; i < n; i++) {
+				TransformConstraint constraint = transformConstraints[i];
 				TransformConstraintData constraintData = constraint.data;
 				constraint.rotateMix = constraintData.rotateMix;
 				constraint.translateMix = constraintData.translateMix;
@@ -399,9 +385,9 @@ namespace Spine {
 				constraint.shearMix = constraintData.shearMix;
 			}
 
-			var pathConstraintItems = this.pathConstraints.Items;
-			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
-				PathConstraint constraint = pathConstraintItems[i];
+			var pathConstraints = this.pathConstraints.Items;
+			for (int i = 0, n = this.pathConstraints.Count; i < n; i++) {
+				PathConstraint constraint = pathConstraints[i];
 				PathConstraintData constraintData = constraint.data;
 				constraint.position = constraintData.position;
 				constraint.spacing = constraintData.spacing;
@@ -411,23 +397,21 @@ namespace Spine {
 		}
 
 		public void SetSlotsToSetupPose () {
-			var slots = this.slots;
-			var slotsItems = slots.Items;
-			drawOrder.Clear();
-			for (int i = 0, n = slots.Count; i < n; i++)
-				drawOrder.Add(slotsItems[i]);
-
-			for (int i = 0, n = slots.Count; i < n; i++)
-				slotsItems[i].SetToSetupPose();
+			var slots = this.slots.Items;
+			int n = this.slots.Count;
+			Array.Copy(slots, 0, drawOrder.Items, 0, n);
+			for (int i = 0; i < n; i++)
+				slots[i].SetToSetupPose();
 		}
 
+		/// <summary>Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it
+		/// repeatedly.</summary>
 		/// <returns>May be null.</returns>
 		public Bone FindBone (string boneName) {
 			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
-			var bones = this.bones;
-			var bonesItems = bones.Items;
-			for (int i = 0, n = bones.Count; i < n; i++) {
-				Bone bone = bonesItems[i];
+			var bones = this.bones.Items;
+			for (int i = 0, n = this.bones.Count; i < n; i++) {
+				Bone bone = bones[i];
 				if (bone.data.name == boneName) return bone;
 			}
 			return null;
@@ -443,13 +427,14 @@ namespace Spine {
 			return -1;
 		}
 
+		/// <summary>Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
+		/// repeatedly.</summary>
 		/// <returns>May be null.</returns>
 		public Slot FindSlot (string slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
-			var slots = this.slots;
-			var slotsItems = slots.Items;
-			for (int i = 0, n = slots.Count; i < n; i++) {
-				Slot slot = slotsItems[i];
+			var slots = this.slots.Items;
+			for (int i = 0, n = this.slots.Count; i < n; i++) {
+				Slot slot = slots[i];
 				if (slot.data.name == slotName) return slot;
 			}
 			return null;
@@ -461,11 +446,11 @@ namespace Spine {
 			var slots = this.slots;
 			var slotsItems = slots.Items;
 			for (int i = 0, n = slots.Count; i < n; i++)
-				if (slotsItems[i].data.name.Equals(slotName)) return i;
+				if (slotsItems[i].data.name == slotName) return i;
 			return -1;
 		}
 
-		/// <summary>Sets a skin by name (see SetSkin).</summary>
+		/// <summary>Sets a skin by name (<see cref="SetSkin(Skin)"/>).</summary>
 		public void SetSkin (string skinName) {
 			Skin foundSkin = data.FindSkin(skinName);
 			if (foundSkin == null) throw new ArgumentException("Skin not found: " + skinName, "skinName");
@@ -506,7 +491,7 @@ namespace Spine {
 			UpdateCache();
 		}
 
-		/// <summary>Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot name and attachment name.</summary>
+		/// <summary>Finds an attachment by looking in the <see cref="Skeleton.Skin"/> and <see cref="SkeletonData.DefaultSkin"/> using the slot name and attachment name.</summary>
 		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (string slotName, string attachmentName) {
 			return GetAttachment(data.FindSlotIndex(slotName), attachmentName);
@@ -543,34 +528,40 @@ namespace Spine {
 			throw new Exception("Slot not found: " + slotName);
 		}
 
+		/// <summary>Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
+		/// than to call it repeatedly.</summary>
 		/// <returns>May be null.</returns>
 		public IkConstraint FindIkConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			ExposedList<IkConstraint> ikConstraints = this.ikConstraints;
-			for (int i = 0, n = ikConstraints.Count; i < n; i++) {
-				IkConstraint ikConstraint = ikConstraints.Items[i];
+			var ikConstraints = this.ikConstraints.Items;
+			for (int i = 0, n = this.ikConstraints.Count; i < n; i++) {
+				IkConstraint ikConstraint = ikConstraints[i];
 				if (ikConstraint.data.name == constraintName) return ikConstraint;
 			}
 			return null;
 		}
 
+		/// <summary>Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
+		/// this method than to call it repeatedly.</summary>
 		/// <returns>May be null.</returns>
 		public TransformConstraint FindTransformConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			ExposedList<TransformConstraint> transformConstraints = this.transformConstraints;
-			for (int i = 0, n = transformConstraints.Count; i < n; i++) {
-				TransformConstraint transformConstraint = transformConstraints.Items[i];
+			var transformConstraints = this.transformConstraints.Items;
+			for (int i = 0, n = this.transformConstraints.Count; i < n; i++) {
+				TransformConstraint transformConstraint = transformConstraints[i];
 				if (transformConstraint.data.Name == constraintName) return transformConstraint;
 			}
 			return null;
 		}
 
+		/// <summary>Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
+		/// than to call it repeatedly.</summary>
 		/// <returns>May be null.</returns>
 		public PathConstraint FindPathConstraint (string constraintName) {
 			if (constraintName == null) throw new ArgumentNullException("constraintName", "constraintName cannot be null.");
-			ExposedList<PathConstraint> pathConstraints = this.pathConstraints;
-			for (int i = 0, n = pathConstraints.Count; i < n; i++) {
-				PathConstraint constraint = pathConstraints.Items[i];
+			var pathConstraints = this.pathConstraints.Items;
+			for (int i = 0, n = this.pathConstraints.Count; i < n; i++) {
+				PathConstraint constraint = pathConstraints[i];
 				if (constraint.data.Name.Equals(constraintName)) return constraint;
 			}
 			return null;
@@ -589,10 +580,10 @@ namespace Spine {
 		public void GetBounds (out float x, out float y, out float width, out float height, ref float[] vertexBuffer) {
 			float[] temp = vertexBuffer;
 			temp = temp ?? new float[8];
-			var drawOrderItems = this.drawOrder.Items;
+			var drawOrder = this.drawOrder.Items;
 			float minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-			for (int i = 0, n = drawOrderItems.Length; i < n; i++) {
-				Slot slot = drawOrderItems[i];
+			for (int i = 0, n = this.drawOrder.Count; i < n; i++) {
+				Slot slot = drawOrder[i];
 				if (!slot.bone.active) continue;
 				int verticesLength = 0;
 				float[] vertices = null;

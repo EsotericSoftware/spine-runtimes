@@ -254,7 +254,6 @@ namespace Spine.Unity {
 			private void OnClipAppliedCallback (Spine.Animation clip, AnimatorStateInfo stateInfo,
 				int layerIndex, float time, bool isLooping, float weight) {
 
-				float clipDuration = clip.duration == 0 ? 1 : clip.duration;
 				float speedFactor = stateInfo.speedMultiplier * stateInfo.speed;
 				float lastTime = time - (Time.deltaTime * speedFactor);
 				if (isLooping && clip.duration != 0) {

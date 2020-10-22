@@ -79,20 +79,16 @@ namespace Spine {
 			stretch = constraint.stretch;
 		}
 
-		/// <summary>Applies the constraint to the constrained bones.</summary>
-		public void Apply () {
-			Update();
-		}
-
 		public void Update () {
+			if (mix == 0) return;
 			Bone target = this.target;
-			ExposedList<Bone> bones = this.bones;
-			switch (bones.Count) {
+			var bones = this.bones.Items;
+			switch (this.bones.Count) {
 			case 1:
-				Apply(bones.Items[0], target.worldX, target.worldY, compress, stretch, data.uniform, mix);
+				Apply(bones[0], target.worldX, target.worldY, compress, stretch, data.uniform, mix);
 				break;
 			case 2:
-				Apply(bones.Items[0], bones.Items[1], target.worldX, target.worldY, bendDirection, stretch, softness, mix);
+				Apply(bones[0], bones[1], target.worldX, target.worldY, bendDirection, stretch, softness, mix);
 				break;
 			}
 		}
@@ -157,6 +153,7 @@ namespace Spine {
 		/// <summary>Applies 1 bone IK. The target is specified in the world coordinate system.</summary>
 		static public void Apply (Bone bone, float targetX, float targetY, bool compress, bool stretch, bool uniform,
 								float alpha) {
+			if (bone == null) throw new ArgumentNullException("bone", "bone cannot be null.");
 			if (!bone.appliedValid) bone.UpdateAppliedTransform();
 			Bone p = bone.parent;
 
@@ -175,16 +172,16 @@ namespace Spine {
 					float sc = pc / bone.skeleton.ScaleY;
 					pb = -sc * s * bone.skeleton.ScaleX;
 					pd = sa * s * bone.skeleton.ScaleY;
-					rotationIK += (float)Math.Atan2(pc, pa) * MathUtils.RadDeg;
+					rotationIK += (float)Math.Atan2(sc, sa) * MathUtils.RadDeg;
 					goto default; // Fall through.
-                }
-                default: {
+				}
+				default: {
 					float x = targetX - p.worldX, y = targetY - p.worldY;
-                    float d = pa * pd - pb * pc;
-                    tx = (x * pd - y * pb) / d - bone.ax;
-                    ty = (y * pa - x * pc) / d - bone.ay;
-                    break;
-                }
+					float d = pa * pd - pb * pc;
+					tx = (x * pd - y * pb) / d - bone.ax;
+					ty = (y * pa - x * pc) / d - bone.ay;
+					break;
+				}
 			}
 
 			rotationIK += (float)Math.Atan2(ty, tx) * MathUtils.RadDeg;
@@ -198,13 +195,10 @@ namespace Spine {
 			if (compress || stretch) {
 				switch (bone.data.transformMode) {
 					case TransformMode.NoScale:
-                        tx = targetX - bone.worldX;
-                        ty = targetY - bone.worldY;
-                        break;
-                    case TransformMode.NoScaleOrReflection:
+					case TransformMode.NoScaleOrReflection:
 						tx = targetX - bone.worldX;
 						ty = targetY - bone.worldY;
-                        break;
+						break;
 				}
 				float b = bone.data.length * sx, dd = (float)Math.Sqrt(tx * tx + ty * ty);
 				if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001f) {
@@ -220,10 +214,8 @@ namespace Spine {
 		/// <param name="child">A direct descendant of the parent bone.</param>
 		static public void Apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, bool stretch, float softness,
 			float alpha) {
-			if (alpha == 0) {
-				child.UpdateWorldTransform();
-				return;
-			}
+			if (parent == null) throw new ArgumentNullException("parent", "parent cannot be null.");
+			if (child == null) throw new ArgumentNullException("child", "child cannot be null.");
 			if (!parent.appliedValid) parent.UpdateAppliedTransform();
 			if (!child.appliedValid) child.UpdateAppliedTransform();
 			float px = parent.ax, py = parent.ay, psx = parent.ascaleX, sx = psx, psy = parent.ascaleY, csx = child.ascaleX;
