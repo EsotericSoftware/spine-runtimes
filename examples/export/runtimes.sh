@@ -449,11 +449,10 @@ cp -f ../hero/export/hero-pma.atlas "$UNITY_TARGET_DIR/hero-pro.atlas.txt"
 sed -i 's/hero-pma.png/hero-pro.png/g' "$UNITY_TARGET_DIR/hero-pro.atlas.txt"
 cp -f ../hero/export/hero-pma.png "$UNITY_TARGET_DIR/hero-pro.png"
 
-UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/Raptor"
-cp -f ../raptor/export/raptor-pro.json "$UNITY_TARGET_DIR/raptor.json"
-cp -f ../raptor/export/raptor-pma.atlas "$UNITY_TARGET_DIR/raptor.atlas.txt"
-sed -i 's/raptor-pma.png/raptor.png/g' "$UNITY_TARGET_DIR/raptor.atlas.txt"
-cp -f ../raptor/export/raptor-pma.png "$UNITY_TARGET_DIR/raptor.png"
+UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/raptor-pro-and-mask"
+cp -f ../raptor/export/raptor-pro.json "$UNITY_TARGET_DIR/raptor-pro.json"
+cp -f ../raptor/export/raptor-pma.atlas "$UNITY_TARGET_DIR/raptor-pma.atlas.txt"
+cp -f ../raptor/export/raptor-pma.png "$UNITY_TARGET_DIR/raptor-pma.png"
 
 UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/spineboy-pro"
 cp -f ../spineboy/export/spineboy-pro.json "$UNITY_TARGET_DIR/spineboy-pro.json"
@@ -463,10 +462,10 @@ cp -f ../spineboy/export/spineboy-pma.png "$UNITY_TARGET_DIR/spineboy-pro.png"
 
 UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/Stretchyman"
 cp -f ../stretchyman/export/stretchyman-pro.json "$UNITY_TARGET_DIR/stretchyman.json"
-cp -f ../stretchyman/export/stretchyman-pma.atlas "$UNITY_TARGET_DIR/stretchyman-diffuse-pma.atlas.txt"
-sed -i 's/stretchyman-pma.png/stretchyman-diffuse-pma.png/g' "$UNITY_TARGET_DIR/stretchyman-diffuse-pma.atlas.txt"
-cp -f ../stretchyman/export/stretchyman-pma.png "$UNITY_TARGET_DIR/stretchyman-diffuse-pma.png"
-# Note: normalmap and emissionmap have been created manually, a recreated version is copied to the target dir.
+# Note: normalmap and emissionmap need to be created manually. Thus we use a separately prepared
+# atlas and diffuse map here so that the maps always match. These atlas textures are copied to the target dir.
+cp -f $UNITY_SOURCE_DIR/stretchyman/stretchyman-diffuse-pma.atlas.txt "$UNITY_TARGET_DIR/stretchyman-diffuse-pma.atlas.txt"
+cp -f $UNITY_SOURCE_DIR/stretchyman/stretchyman-diffuse-pma.png "$UNITY_TARGET_DIR/stretchyman-diffuse-pma.png"
 cp -f $UNITY_SOURCE_DIR/stretchyman/stretchyman-normals.png "$UNITY_TARGET_DIR/"
 cp -f $UNITY_SOURCE_DIR/stretchyman/stretchyman-emission.png "$UNITY_TARGET_DIR/"
 
