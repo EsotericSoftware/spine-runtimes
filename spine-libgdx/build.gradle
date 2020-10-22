@@ -2,10 +2,10 @@ apply plugin: "java"
 apply plugin: "maven"
 
 group = "com.github.EsotericSoftware"
-version = "3.9-beta"
+version = "4.0-beta"
 
 ext {
-    libgdxVersion = "1.9.10"
+    libgdxVersion = "1.9.11"
 }
 
 sourceSets.main.java.srcDirs = ["spine-libgdx/src"]
