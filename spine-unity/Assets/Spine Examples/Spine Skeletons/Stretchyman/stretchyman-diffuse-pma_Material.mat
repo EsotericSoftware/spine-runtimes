@@ -66,6 +66,10 @@ Material:
     - _Glossiness: 0.5
     - _Hue: 0
     - _Metallic: 0
+    - _OutlineMipLevel: 0
+    - _OutlineReferenceTexWidth: 1024
+    - _OutlineSmoothness: 1
+    - _OutlineWidth: 3
     - _RenderQueue: 0
     - _RimPower: 1.79
     - _Saturation: 1
@@ -73,10 +77,13 @@ Material:
     - _SrcBlend: 1
     - _StencilComp: 8
     - _StencilRef: 1
+    - _ThresholdEnd: 0.25
+    - _Use8Neighbourhood: 1
     - _ZWrite: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _FixedNormal: {r: 0, g: 0, b: 1, a: 1}
+    - _OutlineColor: {r: 1, g: 1, b: 0, a: 1}
     - _OverlayColor: {r: 0, g: 0, b: 0, a: 0}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}

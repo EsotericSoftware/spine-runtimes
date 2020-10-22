@@ -24,7 +24,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Cutoff: 0.1
+    - _OutlineMipLevel: 0
+    - _OutlineReferenceTexWidth: 1024
+    - _OutlineSmoothness: 1
+    - _OutlineWidth: 3
     - _StencilComp: 8
     - _StencilRef: 1
     - _StraightAlphaInput: 0
-    m_Colors: []
+    - _ThresholdEnd: 0.25
+    - _Use8Neighbourhood: 1
+    m_Colors:
+    - _OutlineColor: {r: 1, g: 1, b: 0, a: 1}
