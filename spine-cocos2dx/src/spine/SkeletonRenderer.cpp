@@ -197,7 +197,11 @@ void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, At
 }
 
 void SkeletonRenderer::initWithJsonFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale) {
+#if !defined(SPINE_DATA_FORMAT_VERSION) || SPINE_DATA_FORMAT_VERSION >= 0x0308
 	_atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader, true);
+#else
+	_atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader);
+#endif
 	CCASSERT(_atlas, "Error reading atlas file.");
 
 	_attachmentLoader = new (__FILE__, __LINE__) Cocos2dAtlasAttachmentLoader(_atlas);
@@ -229,7 +233,11 @@ void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, 
 }
 
 void SkeletonRenderer::initWithBinaryFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale) {
+#if !defined(SPINE_DATA_FORMAT_VERSION) || SPINE_DATA_FORMAT_VERSION >= 0x0308
 	_atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader, true);
+#else
+	_atlas = new (__FILE__, __LINE__) Atlas(atlasFile.c_str(), &textureLoader);
+#endif
 	CCASSERT(_atlas, "Error reading atlas file.");
 
 	_attachmentLoader = new (__FILE__, __LINE__) Cocos2dAtlasAttachmentLoader(_atlas);
@@ -648,8 +656,9 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
 		V3F_C4B_T2F_Quad quad;
 		for (int i = 0, n = _skeleton->getSlots().size(); i < n; i++) {
 			Slot* slot = _skeleton->getDrawOrder()[i];
-
+#if !defined(SPINE_DATA_FORMAT_VERSION) || SPINE_DATA_FORMAT_VERSION >= 0x0308
 			if (!slot->getBone().isActive()) continue;
+#endif
 			if (!slot->getAttachment() || !slot->getAttachment()->getRTTI().isExactly(RegionAttachment::rtti)) continue;
 
 			if (slotIsOutRange(*slot, _startSlotIndex, _endSlotIndex)) {
@@ -679,7 +688,9 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
 #endif
 		for (int i = 0, n = _skeleton->getBones().size(); i < n; i++) {
 			Bone *bone = _skeleton->getBones()[i];
+#if !defined(SPINE_DATA_FORMAT_VERSION) || SPINE_DATA_FORMAT_VERSION >= 0x0308
 			if (!bone->isActive()) continue;
+#endif
 			float x = bone->getData().getLength() * bone->getA() + bone->getWorldX();
 			float y = bone->getData().getLength() * bone->getC() + bone->getWorldY();
 			drawNode->drawLine(Vec2(bone->getWorldX(), bone->getWorldY()), Vec2(x, y), Color4F::RED);
@@ -688,7 +699,9 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
 		auto color = Color4F::BLUE; // Root bone is blue.
 		for (int i = 0, n = _skeleton->getBones().size(); i < n; i++) {
 			Bone *bone = _skeleton->getBones()[i];
+#if !defined(SPINE_DATA_FORMAT_VERSION) || SPINE_DATA_FORMAT_VERSION >= 0x0308
 			if (!bone->isActive()) continue;
+#endif
 			drawNode->drawPoint(Vec2(bone->getWorldX(), bone->getWorldY()), 4, color);
 			if (i == 0) color = Color4F::GREEN;
 		}
@@ -703,7 +716,9 @@ void SkeletonRenderer::drawDebug (Renderer* renderer, const Mat4 &transform, uin
 #endif
 		for (int i = 0, n = _skeleton->getSlots().size(); i < n; ++i) {
 			Slot* slot = _skeleton->getDrawOrder()[i];
+#if !defined(SPINE_DATA_FORMAT_VERSION) || SPINE_DATA_FORMAT_VERSION >= 0x0308
 			if (!slot->getBone().isActive()) continue;
+#endif
 			if (!slot->getAttachment() || !slot->getAttachment()->getRTTI().isExactly(MeshAttachment::rtti)) continue;
 			MeshAttachment* const mesh = static_cast<MeshAttachment*>(slot->getAttachment());
 			VLA(float, worldCoord, mesh->getWorldVerticesLength());
@@ -915,7 +930,9 @@ namespace {
 		Attachment *attachment = slot.getAttachment();
 		if (!attachment ||
 			slotIsOutRange(slot, startSlotIndex, endSlotIndex) ||
+#if !defined(SPINE_DATA_FORMAT_VERSION) || SPINE_DATA_FORMAT_VERSION >= 0x0308
 			!slot.getBone().isActive() ||
+#endif
 			slot.getColor().a == 0)
 			return true;
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
