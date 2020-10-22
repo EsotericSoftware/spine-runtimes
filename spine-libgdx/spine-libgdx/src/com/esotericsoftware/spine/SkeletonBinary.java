@@ -677,14 +677,14 @@ public class SkeletonBinary extends SkeletonLoader {
 			for (int frame = 0, bezier = 0;; frame++) {
 				timeline.setFrame(frame, time, mix, softness, input.readByte(), input.readBoolean(), input.readBoolean());
 				if (frame == frameLast) break;
-				float time2 = input.readFloat(), mix2 = input.readFloat() * scale, softness2 = input.readFloat() * scale;
+				float time2 = input.readFloat(), mix2 = input.readFloat(), softness2 = input.readFloat() * scale;
 				switch (input.readByte()) {
 				case CURVE_STEPPED:
 					timeline.setStepped(frame);
 					break;
 				case CURVE_BEZIER:
 					setBezier(input, timeline, bezier++, frame, 0, time, time2, mix, mix2, 1);
-					setBezier(input, timeline, bezier++, frame, 1, time, time2, softness, softness2, 1);
+					setBezier(input, timeline, bezier++, frame, 1, time, time2, softness, softness2, scale);
 				}
 				time = time2;
 				mix = mix2;

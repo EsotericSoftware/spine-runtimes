@@ -642,7 +642,7 @@ public class SkeletonJson extends SkeletonLoader {
 				JsonValue curve = keyMap.get("curve");
 				if (curve != null) {
 					bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mix, mix2, 1);
-					bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, softness, softness2, 1);
+					bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, softness, softness2, scale);
 				}
 				time = time2;
 				mix = mix2;
