@@ -162,6 +162,12 @@ namespace Spine.Unity.Editor {
 				return;
 			}
 
+			string errorMessage = null;
+			if (SpineEditorUtilities.Preferences.componentMaterialWarning &&
+				MaterialChecks.IsMaterialSetupProblematic(thisSkeletonGraphic, ref errorMessage)) {
+				EditorGUILayout.HelpBox(errorMessage, MessageType.Error, true);
+			}
+
 			bool isSingleRendererOnly = (!allowMultipleCanvasRenderers.hasMultipleDifferentValues && allowMultipleCanvasRenderers.boolValue == false);
 			bool isSeparationEnabledButNotMultipleRenderers =
 				 isSingleRendererOnly && (!enableSeparatorSlots.hasMultipleDifferentValues && enableSeparatorSlots.boolValue == true);

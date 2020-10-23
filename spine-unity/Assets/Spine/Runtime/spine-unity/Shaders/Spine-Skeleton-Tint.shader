@@ -7,10 +7,11 @@
 Shader "Spine/Skeleton Tint" {
 	Properties {
 		_Color ("Tint Color", Color) = (1,1,1,1)
-		_Black ("Black Point", Color) = (0,0,0,0)
+		_Black ("Dark Color", Color) = (0,0,0,0)
 		[NoScaleOffset] _MainTex ("MainTex", 2D) = "black" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 		_Cutoff("Shadow alpha cutoff", Range(0,1)) = 0.1
+		[Toggle(_DARK_COLOR_ALPHA_ADDITIVE)] _DarkColorAlphaAdditive("Additive DarkColor.A", Int) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[HideInInspector][Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
 
@@ -44,6 +45,7 @@ Shader "Spine/Skeleton Tint" {
 
 			CGPROGRAM
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
+			#pragma shader_feature _ _DARK_COLOR_ALPHA_ADDITIVE
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
@@ -71,14 +73,11 @@ Shader "Spine/Skeleton Tint" {
 				return o;
 			}
 
+			#include "CGIncludes/Spine-Skeleton-Tint-Common.cginc"
+
 			float4 frag (VertexOutput i) : SV_Target {
 				float4 texColor = tex2D(_MainTex, i.uv);
-
-				#if defined(_STRAIGHT_ALPHA_INPUT)
-				texColor.rgb *= texColor.a;
-				#endif
-
-				return (texColor * i.vertexColor) + float4(((1-texColor.rgb) * _Black.rgb * texColor.a*_Color.a*i.vertexColor.a), 0);
+				return fragTintedColor(texColor, _Black.rgb, i.vertexColor, _Color.a, _Black.a);
 			}
 			ENDCG
 		}

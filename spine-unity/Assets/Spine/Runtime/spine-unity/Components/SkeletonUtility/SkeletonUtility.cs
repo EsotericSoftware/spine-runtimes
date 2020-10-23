@@ -42,6 +42,7 @@ namespace Spine.Unity {
 	[ExecuteInEditMode]
 	#endif
 	[RequireComponent(typeof(ISkeletonAnimation))]
+	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonUtility")]
 	public sealed class SkeletonUtility : MonoBehaviour {
 
 		#region BoundingBoxAttachment

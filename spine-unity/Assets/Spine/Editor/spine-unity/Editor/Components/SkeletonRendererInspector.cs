@@ -289,7 +289,8 @@ namespace Spine.Unity.Editor {
 				return;
 
 			string errorMessage = null;
-			if (MaterialChecks.IsMaterialSetupProblematic((SkeletonRenderer)this.target, ref errorMessage)) {
+			if (SpineEditorUtilities.Preferences.componentMaterialWarning &&
+				MaterialChecks.IsMaterialSetupProblematic((SkeletonRenderer)this.target, ref errorMessage)) {
 				EditorGUILayout.HelpBox(errorMessage, MessageType.Error, true);
 			}
 

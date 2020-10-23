@@ -433,7 +433,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 #if COCOS2D_VERSION < 0x00040000
 				cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _glProgramState, blendFunc, triangles, transform, transformFlags);
 #else
-				cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, blendFunc, triangles, transform, transformFlags);
+				cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _programState, blendFunc, triangles, transform, transformFlags);
 #endif
 
 				const float* verts = _clipper->getClippedVertices().buffer();
@@ -465,7 +465,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 #if COCOS2D_VERSION < 0x00040000
 				cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _glProgramState, blendFunc, triangles, transform, transformFlags);
 #else
-				cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, blendFunc, triangles, transform, transformFlags);
+				cocos2d::TrianglesCommand* batchedTriangles = batch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _programState, blendFunc, triangles, transform, transformFlags);
 #endif
 
 				if (_effect) {
@@ -504,7 +504,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 #if COCOS2D_VERSION < 0x00040000
 				TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
 #else
-				TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, blendFunc, trianglesTwoColor, transform, transformFlags);
+				TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _programState, blendFunc, trianglesTwoColor, transform, transformFlags);
 #endif
 
 				const float* verts = _clipper->getClippedVertices().buffer();
@@ -539,7 +539,7 @@ void SkeletonRenderer::draw (Renderer* renderer, const Mat4& transform, uint32_t
 #if COCOS2D_VERSION < 0x00040000
 				TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture->getName(), _glProgramState, blendFunc, trianglesTwoColor, transform, transformFlags);
 #else
-				TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, blendFunc, trianglesTwoColor, transform, transformFlags);
+				TwoColorTrianglesCommand* batchedTriangles = lastTwoColorTrianglesCommand = twoColorBatch->addCommand(renderer, _globalZOrder, attachmentVertices->_texture, _programState, blendFunc, trianglesTwoColor, transform, transformFlags);
 #endif
 
 				if (_effect) {

@@ -43,6 +43,7 @@ namespace Spine.Unity {
 	#endif
 	[RequireComponent(typeof(CanvasRenderer), typeof(RectTransform)), DisallowMultipleComponent]
 	[AddComponentMenu("Spine/SkeletonGraphic (Unity UI Canvas)")]
+	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonGraphic-Component")]
 	public class SkeletonGraphic : MaskableGraphic, ISkeletonComponent, IAnimationStateComponent, ISkeletonAnimation, IHasSkeletonDataAsset {
 
 		#region Inspector
@@ -259,6 +260,9 @@ namespace Spine.Unity {
 		}
 
 		protected void ApplyAnimation () {
+			if (BeforeApply != null)
+				BeforeApply(this);
+
 			state.Apply(skeleton);
 
 			if (UpdateLocal != null)
@@ -412,6 +416,7 @@ namespace Spine.Unity {
 			this.rectTransform.pivot = p;
 		}
 
+		public event UpdateBonesDelegate BeforeApply;
 		public event UpdateBonesDelegate UpdateLocal;
 		public event UpdateBonesDelegate UpdateWorld;
 		public event UpdateBonesDelegate UpdateComplete;

@@ -43,6 +43,7 @@ namespace Spine.Unity {
 	[ExecuteInEditMode]
 	#endif
 	[AddComponentMenu("Spine/BoneFollower")]
+	[HelpURL("http://esotericsoftware.com/spine-unity#BoneFollower")]
 	public class BoneFollower : MonoBehaviour {
 
 		#region Inspector
@@ -62,7 +63,7 @@ namespace Spine.Unity {
 
 		/// <summary>If a bone isn't set in code, boneName is used to find the bone at the beginning. For runtime switching by name, use SetBoneByName. You can also set the BoneFollower.bone field directly.</summary>
 		[SpineBone(dataField: "skeletonRenderer")]
-		[SerializeField] public string boneName;
+		public string boneName;
 
 		public bool followXYPosition = true;
 		public bool followZPosition = true;

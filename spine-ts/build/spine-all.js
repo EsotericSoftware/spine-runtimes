@@ -2,7 +2,7 @@ var __extends = (this && this.__extends) || (function () {
 	var extendStatics = function (d, b) {
 		extendStatics = Object.setPrototypeOf ||
 			({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-			function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+			function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
 		return extendStatics(d, b);
 	};
 	return function (d, b) {
@@ -3572,15 +3572,35 @@ var spine;
 			path = this.pathPrefix + path;
 			if (!this.queueAsset(clientId, textureLoader, path))
 				return;
-			var img = new Image();
-			img.crossOrigin = "anonymous";
-			img.onload = function (ev) {
-				_this.rawAssets[path] = img;
-			};
-			img.onerror = function (ev) {
-				_this.errors[path] = "Couldn't load image " + path;
-			};
-			img.src = path;
+			var isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
+			var isWebWorker = !isBrowser && typeof importScripts !== 'undefined';
+			if (isWebWorker) {
+				var options = { mode: "cors" };
+				fetch(path, options).then(function (response) {
+					if (!response.ok) {
+						_this.errors[path] = "Couldn't load image " + path;
+					}
+					return response.blob();
+				}).then(function (blob) {
+					return createImageBitmap(blob, {
+						premultiplyAlpha: 'none',
+						colorSpaceConversion: 'none'
+					});
+				}).then(function (bitmap) {
+					_this.rawAssets[path] = bitmap;
+				});
+			}
+			else {
+				var img_1 = new Image();
+				img_1.crossOrigin = "anonymous";
+				img_1.onload = function (ev) {
+					_this.rawAssets[path] = img_1;
+				};
+				img_1.onerror = function (ev) {
+					_this.errors[path] = "Couldn't load image " + path;
+				};
+				img_1.src = path;
+			}
 		};
 		SharedAssetManager.prototype.get = function (clientId, path) {
 			path = this.pathPrefix + path;
@@ -3590,6 +3610,8 @@ var spine;
 			return clientAssets.assets[path];
 		};
 		SharedAssetManager.prototype.updateClientAssets = function (clientAssets) {
+			var isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
+			var isWebWorker = !isBrowser && typeof importScripts !== 'undefined';
 			for (var i = 0; i < clientAssets.toLoad.length; i++) {
 				var path = clientAssets.toLoad[i];
 				var asset = clientAssets.assets[path];
@@ -3597,11 +3619,21 @@ var spine;
 					var rawAsset = this.rawAssets[path];
 					if (rawAsset === null || rawAsset === undefined)
 						continue;
-					if (rawAsset instanceof HTMLImageElement) {
-						clientAssets.assets[path] = clientAssets.textureLoader(rawAsset);
+					if (isWebWorker) {
+						if (rawAsset instanceof ImageBitmap) {
+							clientAssets.assets[path] = clientAssets.textureLoader(rawAsset);
+						}
+						else {
+							clientAssets.assets[path] = rawAsset;
+						}
 					}
 					else {
-						clientAssets.assets[path] = rawAsset;
+						if (rawAsset instanceof HTMLImageElement) {
+							clientAssets.assets[path] = clientAssets.textureLoader(rawAsset);
+						}
+						else {
+							clientAssets.assets[path] = rawAsset;
+						}
 					}
 				}
 			}
@@ -11000,7 +11032,7 @@ var spine;
 				var _this = this;
 				if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
 				this.restorables = new Array();
-				if (canvasOrContext instanceof HTMLCanvasElement) {
+				if (!((canvasOrContext instanceof WebGLRenderingContext) || (canvasOrContext instanceof WebGL2RenderingContext))) {
 					var canvas_1 = canvasOrContext;
 					this.gl = (canvas_1.getContext("webgl2", contextConfig) || canvas_1.getContext("webgl", contextConfig));
 					this.canvas = canvas_1;

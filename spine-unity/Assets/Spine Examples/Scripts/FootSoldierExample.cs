@@ -70,7 +70,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		void Apply (SkeletonRenderer skeletonRenderer) {
-			StartCoroutine("Blink");
+			StartCoroutine(Blink());
 		}
 
 		void Update () {

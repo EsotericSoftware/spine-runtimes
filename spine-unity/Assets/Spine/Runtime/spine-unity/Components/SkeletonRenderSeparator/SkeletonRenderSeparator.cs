@@ -42,7 +42,7 @@ namespace Spine.Unity {
 	#else
 	[ExecuteInEditMode]
 	#endif
-	[HelpURL("http://esotericsoftware.com/spine-unity-skeletonrenderseparator")]
+	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonRenderSeparator")]
 	public class SkeletonRenderSeparator : MonoBehaviour {
 		public const int DefaultSortingOrderIncrement = 5;
 
@@ -75,6 +75,12 @@ namespace Spine.Unity {
 				skeletonRenderer = GetComponent<SkeletonRenderer>();
 		}
 		#endif
+		#endregion
+
+		#region Callback Delegates
+		/// <summary>OnMeshAndMaterialsUpdated is called at the end of LateUpdate after the Mesh and
+		/// all materials have been updated.</summary>
+		public event SkeletonRenderer.SkeletonRendererDelegate OnMeshAndMaterialsUpdated;
 		#endregion
 
 		#region Runtime Instantiation
@@ -246,6 +252,9 @@ namespace Spine.Unity {
 					}
 				}
 			}
+
+			if (OnMeshAndMaterialsUpdated != null)
+				OnMeshAndMaterialsUpdated(this.skeletonRenderer);
 
 			// Clear extra renderers if they exist.
 			for (; rendererIndex < rendererCount; rendererIndex++) {

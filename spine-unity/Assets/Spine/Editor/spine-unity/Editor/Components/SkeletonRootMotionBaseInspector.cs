@@ -37,12 +37,16 @@ namespace Spine.Unity.Editor {
 		protected SerializedProperty rootMotionBoneName;
 		protected SerializedProperty transformPositionX;
 		protected SerializedProperty transformPositionY;
+		protected SerializedProperty rootMotionScaleX;
+		protected SerializedProperty rootMotionScaleY;
 		protected SerializedProperty rigidBody2D;
 		protected SerializedProperty rigidBody;
 
 		protected GUIContent rootMotionBoneNameLabel;
 		protected GUIContent transformPositionXLabel;
 		protected GUIContent transformPositionYLabel;
+		protected GUIContent rootMotionScaleXLabel;
+		protected GUIContent rootMotionScaleYLabel;
 		protected GUIContent rigidBody2DLabel;
 		protected GUIContent rigidBodyLabel;
 
@@ -51,12 +55,16 @@ namespace Spine.Unity.Editor {
 			rootMotionBoneName = serializedObject.FindProperty("rootMotionBoneName");
 			transformPositionX = serializedObject.FindProperty("transformPositionX");
 			transformPositionY = serializedObject.FindProperty("transformPositionY");
+			rootMotionScaleX = serializedObject.FindProperty("rootMotionScaleX");
+			rootMotionScaleY = serializedObject.FindProperty("rootMotionScaleY");
 			rigidBody2D = serializedObject.FindProperty("rigidBody2D");
 			rigidBody = serializedObject.FindProperty("rigidBody");
 
 			rootMotionBoneNameLabel = new UnityEngine.GUIContent("Root Motion Bone", "The bone to take the motion from.");
 			transformPositionXLabel = new UnityEngine.GUIContent("X", "Root transform position (X)");
 			transformPositionYLabel = new UnityEngine.GUIContent("Y", "Use the Y-movement of the bone.");
+			rootMotionScaleXLabel = new UnityEngine.GUIContent("Root Motion Scale (X)", "Scale applied to the horizontal root motion delta. Can be used for delta compensation to e.g. stretch a jump to the desired distance.");
+			rootMotionScaleYLabel = new UnityEngine.GUIContent("Root Motion Scale (Y)", "Scale applied to the vertical root motion delta. Can be used for delta compensation to e.g. stretch a jump to the desired distance.");
 			rigidBody2DLabel = new UnityEngine.GUIContent("Rigidbody2D",
 				"Optional Rigidbody2D: Assign a Rigidbody2D here if you want " +
 				" to apply the root motion to the rigidbody instead of the Transform." +
@@ -81,6 +89,9 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(rootMotionBoneName, rootMotionBoneNameLabel);
 			EditorGUILayout.PropertyField(transformPositionX, transformPositionXLabel);
 			EditorGUILayout.PropertyField(transformPositionY, transformPositionYLabel);
+
+			EditorGUILayout.PropertyField(rootMotionScaleX, rootMotionScaleXLabel);
+			EditorGUILayout.PropertyField(rootMotionScaleY, rootMotionScaleYLabel);
 		}
 
 		protected virtual void OptionalPropertyFields () {

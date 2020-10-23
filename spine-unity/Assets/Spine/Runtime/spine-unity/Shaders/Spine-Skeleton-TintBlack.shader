@@ -9,10 +9,11 @@
 Shader "Spine/Skeleton Tint Black" {
 	Properties {
 		_Color ("Tint Color", Color) = (1,1,1,1)
-		_Black ("Black Point", Color) = (0,0,0,0)
+		_Black ("Dark Color", Color) = (0,0,0,0)
 		[NoScaleOffset] _MainTex ("MainTex", 2D) = "black" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
+		[Toggle(_DARK_COLOR_ALPHA_ADDITIVE)] _DarkColorAlphaAdditive("Additive DarkColor.A", Int) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[HideInInspector][Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Float) = 8 // Set to Always as default
 
@@ -47,6 +48,7 @@ Shader "Spine/Skeleton Tint Black" {
 
 			CGPROGRAM
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
+			#pragma shader_feature _ _DARK_COLOR_ALPHA_ADDITIVE
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
@@ -65,8 +67,7 @@ Shader "Spine/Skeleton Tint Black" {
 			struct VertexOutput {
 				float4 pos : SV_POSITION;
 				float2 uv : TEXCOORD0;
-				float2 uv1 : TEXCOORD1;
-				float2 uv2 : TEXCOORD2;
+				float3 darkColor : TEXCOORD1;
 				float4 vertexColor : COLOR;
 			};
 
@@ -75,19 +76,15 @@ Shader "Spine/Skeleton Tint Black" {
 				o.pos = UnityObjectToClipPos(v.vertex); // Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 				o.uv = v.uv;
 				o.vertexColor = v.vertexColor * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
-				o.uv1 = v.uv1;
-				o.uv2 = v.uv2;
+				o.darkColor = float3(v.uv1.r, v.uv1.g, v.uv2.r);
 				return o;
 			}
 
+			#include "CGIncludes/Spine-Skeleton-Tint-Common.cginc"
+
 			float4 frag (VertexOutput i) : SV_Target {
 				float4 texColor = tex2D(_MainTex, i.uv);
-
-				#if defined(_STRAIGHT_ALPHA_INPUT)
-				texColor.rgb *= texColor.a;
-				#endif
-
-				return (texColor * i.vertexColor) + float4(((1-texColor.rgb) * (_Black.rgb + float3(i.uv1.r, i.uv1.g, i.uv2.r)) * texColor.a*_Color.a), 0);
+				return fragTintedColor(texColor, _Black.rgb + i.darkColor, i.vertexColor, _Color.a, _Black.a);
 			}
 			ENDCG
 		}
