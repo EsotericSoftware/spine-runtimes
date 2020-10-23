@@ -460,6 +460,11 @@ cp -f ../spineboy/export/spineboy-pma.atlas "$UNITY_TARGET_DIR/spineboy-pro.atla
 sed -i 's/spineboy-pma.png/spineboy-pro.png/g' "$UNITY_TARGET_DIR/spineboy-pro.atlas.txt"
 cp -f ../spineboy/export/spineboy-pma.png "$UNITY_TARGET_DIR/spineboy-pro.png"
 
+UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/mix-and-match"
+cp -f ../mix-and-match/export/mix-and-match-pro.json "$UNITY_TARGET_DIR/"
+cp -f ../mix-and-match/export/mix-and-match-pma.atlas "$UNITY_TARGET_DIR/mix-and-match-pma.atlas.txt"
+cp -f ../mix-and-match/export/mix-and-match-pma.png "$UNITY_TARGET_DIR/"
+
 UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/Stretchyman"
 cp -f ../stretchyman/export/stretchyman-pro.json "$UNITY_TARGET_DIR/stretchyman.json"
 # Note: normalmap and emissionmap need to be created manually. Thus we use a separately prepared
