@@ -131,7 +131,7 @@ public class Animation {
 		return name;
 	}
 
-	/** Binary search using a stride of 1.
+	/** Linear search using a stride of 1.
 	 * @param time Must be >= the first value in <code>frames</code>.
 	 * @return The index of the first value <= <code>time</code>. */
 	static int search (float[] frames, float time) {
@@ -141,7 +141,7 @@ public class Animation {
 		return n - 1;
 	}
 
-	/** Binary search using the specified stride.
+	/** Linear search using the specified stride.
 	 * @param time Must be >= the first value in <code>frames</code>.
 	 * @return The index of the first value <= <code>time</code>. */
 	static int search (float[] frames, float time, int step) {
