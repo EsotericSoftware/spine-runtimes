@@ -108,7 +108,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			serializedObject.Update();
-			atlasAsset = atlasAsset ?? (SpineAtlasAsset)target;
+			atlasAsset = (atlasAsset == null) ? (SpineAtlasAsset)target : atlasAsset;
 			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(atlasFile);
 			EditorGUILayout.PropertyField(materials, true);

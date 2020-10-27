@@ -38,7 +38,7 @@ using Spine.Unity.Editor;
 public class SpineAnimationStateDrawer : PropertyDrawer {
 
 	public override float GetPropertyHeight (SerializedProperty property, GUIContent label) {
-		const int fieldCount = 10;
+		const int fieldCount = 11;
 		return fieldCount * EditorGUIUtility.singleLineHeight;
 	}
 
@@ -49,6 +49,7 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		SerializedProperty customDurationProp = property.FindPropertyRelative("customDuration");
 		SerializedProperty useBlendDurationProp = property.FindPropertyRelative("useBlendDuration");
 		SerializedProperty mixDurationProp = property.FindPropertyRelative("mixDuration");
+		SerializedProperty holdPreviousProp = property.FindPropertyRelative("holdPrevious");
 		SerializedProperty eventProp = property.FindPropertyRelative("eventThreshold");
 		SerializedProperty attachmentProp = property.FindPropertyRelative("attachmentThreshold");
 		SerializedProperty drawOrderProp = property.FindPropertyRelative("drawOrderThreshold");
@@ -86,6 +87,9 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 			singleFieldRect.y += lineHeightWithSpacing;
 			EditorGUI.PropertyField(singleFieldRect, mixDurationProp);
 		}
+
+		singleFieldRect.y += lineHeightWithSpacing;
+		EditorGUI.PropertyField(singleFieldRect, holdPreviousProp);
 
 		singleFieldRect.y += lineHeightWithSpacing;
 		EditorGUI.PropertyField(singleFieldRect, eventProp);

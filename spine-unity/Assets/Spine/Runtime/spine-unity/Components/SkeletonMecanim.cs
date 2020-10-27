@@ -40,9 +40,16 @@ namespace Spine.Unity {
 		private bool wasUpdatedAfterInit = true;
 
 		#region Bone Callbacks (ISkeletonAnimation)
+		protected event UpdateBonesDelegate _BeforeApply;
 		protected event UpdateBonesDelegate _UpdateLocal;
 		protected event UpdateBonesDelegate _UpdateWorld;
 		protected event UpdateBonesDelegate _UpdateComplete;
+
+		/// <summary>
+		/// Occurs before the animations are applied.
+		/// Use this callback when you want to change the skeleton state before animations are applied on top.
+		/// </summary>
+		public event UpdateBonesDelegate BeforeApply { add { _BeforeApply += value; } remove { _BeforeApply -= value; } }
 
 		/// <summary>
 		/// Occurs after the animations are applied and before world space values are resolved.
@@ -87,6 +94,9 @@ namespace Spine.Unity {
 		}
 
 		protected void ApplyAnimation () {
+			if (_BeforeApply != null)
+				_BeforeApply(this);
+
 		#if UNITY_EDITOR
 			var translatorAnimator = translator.Animator;
 			if (translatorAnimator != null && !translatorAnimator.isInitialized)
@@ -218,7 +228,7 @@ namespace Spine.Unity {
 					return false;
 
 				var time = AnimationTime(stateInfo.normalizedTime, info.clip.length,
-										info.clip.isLooping, stateInfo.speed < 0);
+										info.clip.isLooping);
 				weight = useClipWeight1 ? layerWeight : weight;
 				clip.Apply(skeleton, 0, time, info.clip.isLooping, null,
 						weight, layerBlendMode, MixDirection.In);
@@ -242,7 +252,7 @@ namespace Spine.Unity {
 					return false;
 
 				var time = AnimationTime(stateInfo.normalizedTime + interruptingClipTimeAddition,
-										info.clip.length, stateInfo.speed < 0);
+										info.clip.length);
 				weight = useClipWeight1 ? layerWeight : weight;
 				clip.Apply(skeleton, 0, time, info.clip.isLooping, null,
 							weight, layerBlendMode, MixDirection.In);
@@ -452,21 +462,20 @@ namespace Spine.Unity {
 				}
 				animation = GetAnimation(clip);
 				float time = AnimationTime(stateInfo.normalizedTime, clip.length,
-										clip.isLooping, stateInfo.speed < 0);
+										clip.isLooping);
 				return new KeyValuePair<Animation, float>(animation, time);
 			}
 
-			static float AnimationTime (float normalizedTime, float clipLength, bool loop, bool reversed) {
-				float time = AnimationTime(normalizedTime, clipLength, reversed);
+			static float AnimationTime (float normalizedTime, float clipLength, bool loop) {
+				float time = AnimationTime(normalizedTime, clipLength);
 				if (loop) return time;
 				const float EndSnapEpsilon = 1f / 30f; // Workaround for end-duration keys not being applied.
 				return (clipLength - time < EndSnapEpsilon) ? clipLength : time; // return a time snapped to clipLength;
 			}
 
-			static float AnimationTime (float normalizedTime, float clipLength, bool reversed) {
-				if (reversed)
-					normalizedTime = (1 - normalizedTime + (int)normalizedTime) + (int)normalizedTime;
-
+			static float AnimationTime (float normalizedTime, float clipLength) {
+				if (normalizedTime < 0.0f)
+					normalizedTime = (normalizedTime % 1.0f) + 1.0f;
 				return normalizedTime * clipLength;
 			}
 

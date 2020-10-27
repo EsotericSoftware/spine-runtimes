@@ -75,7 +75,7 @@ Shader "Spine/Skeleton Tint Black" {
 				VertexOutput o;
 				o.pos = UnityObjectToClipPos(v.vertex); // Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 				o.uv = v.uv;
-				o.vertexColor = v.vertexColor * _Color;
+				o.vertexColor = v.vertexColor * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
 				o.darkColor = float3(v.uv1.r, v.uv1.g, v.uv2.r);
 				return o;
 			}
@@ -84,7 +84,7 @@ Shader "Spine/Skeleton Tint Black" {
 
 			float4 frag (VertexOutput i) : SV_Target {
 				float4 texColor = tex2D(_MainTex, i.uv);
-				return fragTintedColor(texColor, _Black.rgb + i.darkColor, i.vertexColor, _Black.a);
+				return fragTintedColor(texColor, _Black.rgb + i.darkColor, i.vertexColor, _Color.a, _Black.a);
 			}
 			ENDCG
 		}

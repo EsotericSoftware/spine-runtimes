@@ -99,16 +99,7 @@ namespace {
     backend::UniformLocation                __locPMatrix;
     backend::UniformLocation                __locTexture;
 
-    void initTwoColorProgramState()
-    {
-        if (__twoColorProgramState)
-        {
-            return;
-        }
-        auto program = backend::Device::getInstance()->newProgram(TWO_COLOR_TINT_VERTEX_SHADER, TWO_COLOR_TINT_FRAGMENT_SHADER);
-        auto* programState = new backend::ProgramState(program);
-        program->autorelease();
-
+    static void updateProgramStateLayout(backend::ProgramState* programState) {
         __locPMatrix = programState->getUniformLocation("u_PMatrix");
         __locTexture = programState->getUniformLocation("u_texture");
 
@@ -124,6 +115,19 @@ namespace {
         layout->setAttribute("a_color2", locColor2, backend::VertexFormat::UBYTE4, offsetof(spine::V3F_C4B_C4B_T2F, color2), true);
         layout->setAttribute("a_texCoords", locTexcoord, backend::VertexFormat::FLOAT2, offsetof(spine::V3F_C4B_C4B_T2F, texCoords), false);
         layout->setLayout(sizeof(spine::V3F_C4B_C4B_T2F));
+    }
+
+    static void initTwoColorProgramState()
+    {
+        if (__twoColorProgramState)
+        {
+            return;
+        }
+        auto program = backend::Device::getInstance()->newProgram(TWO_COLOR_TINT_VERTEX_SHADER, TWO_COLOR_TINT_FRAGMENT_SHADER);
+        auto* programState = new backend::ProgramState(program);
+        program->release();
+
+        updateProgramStateLayout(programState);
 
         __twoColorProgramState = std::shared_ptr<backend::ProgramState>(programState);
     }
@@ -136,9 +140,9 @@ TwoColorTrianglesCommand::TwoColorTrianglesCommand() :_materialID(0), _texture(n
 	_type = RenderCommand::Type::CUSTOM_COMMAND;
 }
 
-void TwoColorTrianglesCommand::init(float globalOrder, cocos2d::Texture2D *texture, BlendFunc blendType, const TwoColorTriangles& triangles, const Mat4& mv, uint32_t flags) {
+void TwoColorTrianglesCommand::init(float globalOrder, cocos2d::Texture2D *texture, cocos2d::backend::ProgramState* programState, BlendFunc blendType, const TwoColorTriangles& triangles, const Mat4& mv, uint32_t flags) {
 
-    updateCommandPipelineDescriptor();
+    updateCommandPipelineDescriptor(programState);
     const cocos2d::Mat4& projectionMat = Director::getInstance()->getMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
 
     auto finalMatrix = projectionMat * mv;
@@ -177,18 +181,39 @@ void TwoColorTrianglesCommand::init(float globalOrder, cocos2d::Texture2D *textu
 
 
 
-void TwoColorTrianglesCommand::updateCommandPipelineDescriptor()
+void TwoColorTrianglesCommand::updateCommandPipelineDescriptor(cocos2d::backend::ProgramState* programState)
 {
+    // OPTIMIZE ME: all commands belong a same Node should share a same programState like SkeletonBatch
     if (!__twoColorProgramState)
     {
         initTwoColorProgramState();
     }
 
-    CC_SAFE_RELEASE_NULL(_programState);
-    _programState = __twoColorProgramState->clone();
+    bool needsUpdateStateLayout = false;
+    auto& pipelinePS = _pipelineDescriptor.programState;
+    if (programState != nullptr)
+    {
+        if (_programState != programState) {
+            CC_SAFE_RELEASE(_programState);
+            _programState = programState; // Because the programState belong to Node, so no need to clone
+            CC_SAFE_RETAIN(_programState);
+            needsUpdateStateLayout = true;
+        }
+    }
+    else {
+        needsUpdateStateLayout = _programState != nullptr && _programState->getProgram() != __twoColorProgramState->getProgram();
+        CC_SAFE_RELEASE(_programState);
+        _programState = __twoColorProgramState->clone();
+    }
+
+    CCASSERT(_programState, "programState should not be null");
+    pipelinePS = _programState;
+
+    if (needsUpdateStateLayout)
+        updateProgramStateLayout(pipelinePS);
+
     _locPMatrix = __locPMatrix;
     _locTexture = __locTexture;
-    _pipelineDescriptor.programState = _programState;
 }
 
 TwoColorTrianglesCommand::~TwoColorTrianglesCommand()
@@ -330,9 +355,9 @@ void SkeletonTwoColorBatch::deallocateIndices(uint32_t numIndices) {
 	_indices.setSize(_indices.size() - numIndices, 0);
 }
 
-TwoColorTrianglesCommand* SkeletonTwoColorBatch::addCommand(cocos2d::Renderer* renderer, float globalOrder, cocos2d::Texture2D* texture, cocos2d::BlendFunc blendType, const TwoColorTriangles& triangles, const cocos2d::Mat4& mv, uint32_t flags) {
+TwoColorTrianglesCommand* SkeletonTwoColorBatch::addCommand(cocos2d::Renderer* renderer, float globalOrder, cocos2d::Texture2D* texture, backend::ProgramState* programState, cocos2d::BlendFunc blendType, const TwoColorTriangles& triangles, const cocos2d::Mat4& mv, uint32_t flags) {
 	TwoColorTrianglesCommand* command = nextFreeCommand();
-	command->init(globalOrder, texture, blendType, triangles, mv, flags);
+	command->init(globalOrder, texture, programState, blendType, triangles, mv, flags);
     command->updateVertexAndIndexBuffer(renderer, triangles.verts, triangles.vertCount, triangles.indices, triangles.indexCount);
 	renderer->addCommand(command);
 	return command;

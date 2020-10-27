@@ -48,27 +48,27 @@ public:
 	/// The name of the event, which is unique within the skeleton.
 	const String &getName() const;
 
-	int getIntValue();
+	int getIntValue() const;
 
 	void setIntValue(int inValue);
 
-	float getFloatValue();
+	float getFloatValue()  const;
 
 	void setFloatValue(float inValue);
 
-	const String &getStringValue();
+	const String &getStringValue()  const;
 
 	void setStringValue(const String &inValue);
 
-	const String &getAudioPath();
+	const String &getAudioPath()  const;
 
 	void setAudioPath(const String &inValue);
 
-	float getVolume();
+	float getVolume() const;
 
 	void setVolume(float inValue);
 
-	float getBalance();
+	float getBalance() const;
 
 	void setBalance(float inValue);
 

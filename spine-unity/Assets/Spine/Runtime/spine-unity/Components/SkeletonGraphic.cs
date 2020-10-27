@@ -260,6 +260,9 @@ namespace Spine.Unity {
 		}
 
 		protected void ApplyAnimation () {
+			if (BeforeApply != null)
+				BeforeApply(this);
+
 			state.Apply(skeleton);
 
 			if (UpdateLocal != null)
@@ -413,6 +416,7 @@ namespace Spine.Unity {
 			this.rectTransform.pivot = p;
 		}
 
+		public event UpdateBonesDelegate BeforeApply;
 		public event UpdateBonesDelegate UpdateLocal;
 		public event UpdateBonesDelegate UpdateWorld;
 		public event UpdateBonesDelegate UpdateComplete;
