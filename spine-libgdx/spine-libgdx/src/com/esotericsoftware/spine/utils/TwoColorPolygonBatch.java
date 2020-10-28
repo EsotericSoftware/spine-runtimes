@@ -1390,7 +1390,7 @@ public class TwoColorPolygonBatch implements PolygonBatch {
 		if (drawing) setupMatrices();
 	}
 
-	private void setupMatrices () {
+	protected void setupMatrices () {
 		combinedMatrix.set(projectionMatrix).mul(transformMatrix);
 		shader.setUniformf("u_pma", premultipliedAlpha ? 1 : 0);
 		shader.setUniformMatrix("u_projTrans", combinedMatrix);
