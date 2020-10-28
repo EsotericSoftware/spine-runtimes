@@ -152,15 +152,19 @@ namespace Spine.Unity.Editor {
 					forceReloadQueued = true;
 			}
 
-			EditorGUILayout.PropertyField(material);
-			EditorGUILayout.PropertyField(color);
-
 			if (thisSkeletonGraphic.skeletonDataAsset == null) {
 				EditorGUILayout.HelpBox("You need to assign a SkeletonDataAsset first.", MessageType.Info);
 				serializedObject.ApplyModifiedProperties();
 				serializedObject.Update();
 				return;
 			}
+			if (!SpineEditorUtilities.SkeletonDataAssetIsValid(thisSkeletonGraphic.skeletonDataAsset)) {
+				EditorGUILayout.HelpBox("Skeleton Data Asset error. Please check Skeleton Data Asset.", MessageType.Error);
+				return;
+			}
+
+			EditorGUILayout.PropertyField(material);
+			EditorGUILayout.PropertyField(color);
 
 			string errorMessage = null;
 			if (SpineEditorUtilities.Preferences.componentMaterialWarning &&

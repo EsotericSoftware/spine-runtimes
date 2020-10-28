@@ -602,12 +602,12 @@ namespace Spine.Unity.Editor {
 					warnings.Add("Skeleton data file is not a valid Spine JSON or binary file.");
 				} else {
 					#if SPINE_TK2D
-					bool searchForSpineAtlasAssets = true;
+					bool searchForSpineAtlasAssets = (compatibilityProblemInfo == null);
 					bool isSpriteCollectionNull = spriteCollection.objectReferenceValue == null;
 					if (!isSpriteCollectionNull) searchForSpineAtlasAssets = false;
 					#else
 					// Analysis disable once ConvertToConstant.Local
-					bool searchForSpineAtlasAssets = true;
+					bool searchForSpineAtlasAssets = (compatibilityProblemInfo == null);
 					#endif
 
 					if (searchForSpineAtlasAssets) {

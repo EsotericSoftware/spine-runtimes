@@ -122,8 +122,8 @@ namespace Spine {
 			skeletonData.hash = hash == 0 ? null : hash.ToString();
 			skeletonData.version = input.ReadString();
 			if (skeletonData.version.Length == 0) skeletonData.version = null;
-			if ("3.8.75" == skeletonData.version)
-					throw new Exception("Unsupported skeleton data, please export with a newer version of Spine.");
+			// early return for old 3.8 format instead of reading past the end
+			if (skeletonData.version.Length > 13) return null;
 			skeletonData.x = input.ReadFloat();
 			skeletonData.y = input.ReadFloat();
 			skeletonData.width = input.ReadFloat();
@@ -1049,12 +1049,41 @@ namespace Spine {
 			/// <summary>Returns the version string of binary skeleton data.</summary>
 			public string GetVersionString () {
 				try {
+					// try reading 4.0+ format
+					var initialPosition = input.Position;
 					ReadLong(); // long hash
-					string version = ReadString();
-					return version;
+
+					var stringPosition = input.Position;
+					int stringByteCount = ReadInt(true);
+					input.Position = stringPosition;
+					if (stringByteCount <= 13) {
+						string version = ReadString();
+						if (char.IsDigit(version[0]))
+							return version;
+					}
+					// fallback to old version format
+					input.Position = initialPosition;
+					return GetVersionStringOld3X();
 				} catch (Exception e) {
 					throw new ArgumentException("Stream does not contain a valid binary Skeleton Data.\n" + e, "input");
 				}
+			}
+
+			/// <summary>Returns old 3.8 and earlier format version string of binary skeleton data.</summary>
+			public string GetVersionStringOld3X () {
+				// Hash.
+				int byteCount = ReadInt(true);
+				if (byteCount > 1) input.Position += byteCount - 1;
+
+				// Version.
+				byteCount = ReadInt(true);
+				if (byteCount > 1) {
+					byteCount--;
+					var buffer = new byte[byteCount];
+					ReadFully(buffer, 0, byteCount);
+					return System.Text.Encoding.UTF8.GetString(buffer, 0, byteCount);
+				}
+				return null;
 			}
 		}
 	}

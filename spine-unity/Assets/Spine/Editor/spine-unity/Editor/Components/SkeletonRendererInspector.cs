@@ -54,6 +54,7 @@ namespace Spine.Unity.Editor {
 	[CanEditMultipleObjects]
 	public class SkeletonRendererInspector : UnityEditor.Editor {
 		public static bool advancedFoldout;
+		protected bool loadingFailed = false;
 
 		const string SeparatorSlotNamesFieldName = "separatorSlotNames";
 
@@ -107,6 +108,7 @@ namespace Spine.Unity.Editor {
 			isInspectingPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab);
 #endif
 			SpineEditorUtilities.ConfirmInitialization();
+			loadingFailed = false;
 
 			// Labels
 			SkeletonDataAssetLabel = new GUIContent("SkeletonData Asset", Icons.spine);
@@ -160,7 +162,14 @@ namespace Spine.Unity.Editor {
 
 		public void OnSceneGUI () {
 			var skeletonRenderer = (SkeletonRenderer)target;
+			if (loadingFailed)
+				return;
+
 			var skeleton = skeletonRenderer.Skeleton;
+			if (skeleton == null) {
+				loadingFailed = true;
+				return;
+			}
 			var transform = skeletonRenderer.transform;
 			if (skeleton == null) return;
 

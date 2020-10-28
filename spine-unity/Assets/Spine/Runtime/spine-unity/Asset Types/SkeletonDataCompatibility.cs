@@ -91,7 +91,8 @@ namespace Spine.Unity {
 					}
 				}
 				catch (System.Exception e) {
-					Debug.LogErrorFormat("Failed to read '{0}'. It is likely not a binary Spine SkeletonData file.\n{1}", asset.name, e);
+					Debug.LogError(string.Format("Failed to read '{0}'. It is likely not a binary Spine SkeletonData file.\n{1}",
+						asset.name, e), asset);
 					return null;
 				}
 			}
@@ -103,13 +104,13 @@ namespace Spine.Unity {
 				else {
 					object obj = Json.Deserialize(new StringReader(asset.text));
 					if (obj == null) {
-						Debug.LogErrorFormat("'{0}' is not valid JSON.", asset.name);
+						Debug.LogError(string.Format("'{0}' is not valid JSON.", asset.name), asset);
 						return null;
 					}
 
 					var root = obj as Dictionary<string, object>;
 					if (root == null) {
-						Debug.LogErrorFormat("'{0}' is not compatible JSON. Parser returned an incorrect type while parsing version info.", asset.name);
+						Debug.LogError(string.Format("'{0}' is not compatible JSON. Parser returned an incorrect type while parsing version info.", asset.name), asset);
 						return null;
 					}
 
@@ -133,7 +134,8 @@ namespace Spine.Unity {
 									int.Parse(versionSplit[1], CultureInfo.InvariantCulture) };
 			}
 			catch (System.Exception e) {
-				Debug.LogErrorFormat("Failed to read version info at skeleton '{0}'. It is likely not a valid Spine SkeletonData file.\n{1}", asset.name, e);
+				Debug.LogError(string.Format("Failed to read version info at skeleton '{0}'. It is likely not a valid Spine SkeletonData file.\n{1}",
+					asset.name, e), asset);
 				return null;
 			}
 			return fileVersion;
