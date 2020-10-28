@@ -657,6 +657,9 @@ namespace Spine.Unity {
 				go.transform.localPosition = Vector3.zero;
 				var canvasRenderer = go.AddComponent<CanvasRenderer>();
 				canvasRenderers.Add(canvasRenderer);
+				var rawImage = go.AddComponent<RawImage>();
+				rawImage.maskable = this.maskable;
+				rawImage.raycastTarget = false;
 			}
 		}
 
