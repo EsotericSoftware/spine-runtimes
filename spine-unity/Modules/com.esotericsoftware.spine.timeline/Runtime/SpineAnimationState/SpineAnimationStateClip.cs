@@ -47,7 +47,7 @@ namespace Spine.Unity.Playables {
 
 		public override double duration {
 			get {
-				if (template.animationReference == null)
+				if (template.animationReference == null || template.animationReference.Animation == null)
 					return 0;
 				return template.animationReference.Animation.Duration;
 			}
