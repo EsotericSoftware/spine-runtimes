@@ -95,15 +95,14 @@ namespace Spine {
 			skeletonDebugRenderer.DisableAll();
 			skeletonDebugRenderer.DrawClipping = true;
 
-			// String name = "spineboy-ess";
-			// String name = "goblins-pro";
+			// String name = "spineboy-pro";
 			String name = "raptor-pro";
 			// String name = "tank-pro";
 			//String name = "coin-pro";
 			if (useNormalmapShader)
 				name = "raptor-pro"; // we only have normalmaps for raptor
 			String atlasName = name.Replace("-pro", "").Replace("-ess", "");
-			if (name == "goblins-pro") atlasName = "goblins-mesh";
+
 			bool binaryData = false;
 
 			Atlas atlas;
@@ -115,7 +114,7 @@ namespace Spine {
 								loadMultipleTextureLayers: true, textureSuffixes: new string[] { "", "_normals" }));
 			}
 			float scale = 1;
-			if (name == "spineboy-ess") scale = 0.6f;
+			if (name == "spineboy-pro") scale = 0.6f;
 			if (name == "raptor-pro") scale = 0.5f;
 			if (name == "tank-pro") scale = 0.3f;
 			if (name == "coin-pro") scale = 1;
@@ -137,7 +136,7 @@ namespace Spine {
 			AnimationStateData stateData = new AnimationStateData(skeleton.Data);
 			state = new AnimationState(stateData);
 
-			if (name == "spineboy-ess") {
+			if (name == "spineboy-pro") {
 				skeleton.SetAttachment("head-bb", "head");
 
 				stateData.SetMix("run", "jump", 0.2f);
