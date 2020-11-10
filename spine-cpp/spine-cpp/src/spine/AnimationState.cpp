@@ -288,6 +288,7 @@ void EventQueue::drain() {
 	_drainDisabled = false;
 }
 
+namespace TimelineMode {
 const int Subsequent = 0;
 const int First = 1;
 const int HoldSubsequent = 2;
@@ -296,6 +297,7 @@ const int HoldMix = 4;
 
 const int Setup = 1;
 const int Current = 2;
+}
 
 AnimationState::AnimationState(AnimationStateData *data) :
 		_data(data),
@@ -442,7 +444,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 				Timeline *timeline = timelines[ii];
 				assert(timeline);
 
-				MixBlend timelineBlend = timelineMode[ii] == Subsequent ? blend : MixBlend_Setup;
+				MixBlend timelineBlend = timelineMode[ii] == TimelineMode::Subsequent ? blend : MixBlend_Setup;
 
 				if (timeline->getRTTI().isExactly(RotateTimeline::rtti))
 					applyRotateTimeline(static_cast<RotateTimeline *>(timeline), skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
@@ -459,7 +461,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		current._nextTrackLast = current._trackTime;
 	}
 
-    int setupState = _unkeyedState + Setup;
+    int setupState = _unkeyedState + TimelineMode::Setup;
     Vector<Slot*>& slots = skeleton.getSlots();
     for (int i = 0, n = slots.size(); i < n; i++) {
         Slot* slot = slots[i];
@@ -675,7 +677,7 @@ void AnimationState::applyAttachmentTimeline(AttachmentTimeline* attachmentTimel
     }
 
     /* If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.*/
-    if (slot->getAttachmentState() <= _unkeyedState) slot->setAttachmentState(_unkeyedState + Setup);
+    if (slot->getAttachmentState() <= _unkeyedState) slot->setAttachmentState(_unkeyedState + TimelineMode::Setup);
 }
 
 
@@ -828,20 +830,20 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 			MixBlend timelineBlend;
 			float alpha;
 			switch (timelineMode[i]) {
-				case Subsequent:
+				case TimelineMode::Subsequent:
 					if (!drawOrder && (timeline->getRTTI().isExactly(DrawOrderTimeline::rtti))) continue;
                     timelineBlend = blend;
 					alpha = alphaMix;
 					break;
-				case First:
+				case TimelineMode::First:
 					timelineBlend = MixBlend_Setup;
 					alpha = alphaMix;
 					break;
-			    case HoldSubsequent:
+			    case TimelineMode::HoldSubsequent:
 			        timelineBlend = blend;
 			        alpha = alphaHold;
 			        break;
-				case HoldFirst:
+				case TimelineMode::HoldFirst:
 					timelineBlend = MixBlend_Setup;
 					alpha = alphaHold;
 					break;
@@ -877,7 +879,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 
 void AnimationState::setAttachment(Skeleton& skeleton, Slot& slot, const String& attachmentName, bool attachments) {
     slot.setAttachment(attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot.getData().getIndex(), attachmentName));
-    if (attachments) slot.setAttachmentState(_unkeyedState + Current);
+    if (attachments) slot.setAttachmentState(_unkeyedState + TimelineMode::Current);
 }
 
 void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
@@ -1014,9 +1016,9 @@ void AnimationState::computeHold(TrackEntry *entry) {
 			int id = timelines[i]->getPropertyId();
 			if (!_propertyIDs.containsKey(id)) {
 			    _propertyIDs.put(id, true);
-                timelineMode[i] = HoldFirst;
+                timelineMode[i] = TimelineMode::HoldFirst;
 			} else {
-                timelineMode[i] = HoldSubsequent;
+                timelineMode[i] = TimelineMode::HoldSubsequent;
             }
 		}
 		return;
@@ -1029,26 +1031,26 @@ void AnimationState::computeHold(TrackEntry *entry) {
 		Timeline *timeline = timelines[i];
 		int id = timeline->getPropertyId();
 		if (_propertyIDs.containsKey(id)) {
-			timelineMode[i] = Subsequent;
+			timelineMode[i] = TimelineMode::Subsequent;
 		} else {
 			_propertyIDs.put(id, true);
 
 			if (to == NULL || timeline->getRTTI().isExactly(AttachmentTimeline::rtti) ||
 					timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) ||
 					timeline->getRTTI().isExactly(EventTimeline::rtti) || !to->_animation->hasTimeline(id)) {
-				timelineMode[i] = First;
+				timelineMode[i] = TimelineMode::First;
 			} else {
 				for (TrackEntry *next = to->_mixingTo; next != NULL; next = next->_mixingTo) {
 					if (next->_animation->hasTimeline(id)) continue;
 					if (next->_mixDuration > 0) {
-						timelineMode[i] = HoldMix;
+						timelineMode[i] = TimelineMode::HoldMix;
 						timelineHoldMix[i] = next;
 						i++;
 						goto continue_outer; // continue outer;
 					}
 					break;
 				}
-				timelineMode[i] = HoldFirst;
+				timelineMode[i] = TimelineMode::HoldFirst;
 			}
 		}
 	}
