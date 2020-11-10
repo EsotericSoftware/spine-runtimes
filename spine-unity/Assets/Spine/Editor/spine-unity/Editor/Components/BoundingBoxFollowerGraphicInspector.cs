@@ -33,16 +33,16 @@
 
 using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
+using Boo.Lang;
 
 namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
 	using Icons = SpineEditorUtilities.Icons;
 
-	[CustomEditor(typeof(BoundingBoxFollower))]
-	public class BoundingBoxFollowerInspector : UnityEditor.Editor {
-		SerializedProperty skeletonRenderer, slotName, isTrigger, clearStateOnDisable;
-		BoundingBoxFollower follower;
+	[CustomEditor(typeof(BoundingBoxFollowerGraphic))]
+	public class BoundingBoxFollowerGraphicInspector : UnityEditor.Editor {
+		SerializedProperty skeletonGraphic, slotName, isTrigger, clearStateOnDisable;
+		BoundingBoxFollowerGraphic follower;
 		bool rebuildRequired = false;
 		bool addBoneFollower = false;
 		bool sceneRepaintRequired = false;
@@ -57,11 +57,11 @@ namespace Spine.Unity.Editor {
 		}
 
 		void InitializeEditor () {
-			skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
+			skeletonGraphic = serializedObject.FindProperty("skeletonGraphic");
 			slotName = serializedObject.FindProperty("slotName");
 			isTrigger = serializedObject.FindProperty("isTrigger");
 			clearStateOnDisable = serializedObject.FindProperty("clearStateOnDisable");
-			follower = (BoundingBoxFollower)target;
+			follower = (BoundingBoxFollowerGraphic)target;
 		}
 
 		public override void OnInspectorGUI () {
@@ -76,26 +76,26 @@ namespace Spine.Unity.Editor {
 			// "SerializedObjectNotCreatableException: Object at index 0 is null".
 			InitializeEditor();
 
-			// Try to auto-assign SkeletonRenderer field.
-			if (skeletonRenderer.objectReferenceValue == null) {
-				var foundSkeletonRenderer = follower.GetComponentInParent<SkeletonRenderer>();
-				if (foundSkeletonRenderer != null)
-					Debug.Log("BoundingBoxFollower automatically assigned: " + foundSkeletonRenderer.gameObject.name);
+			// Try to auto-assign SkeletonGraphic field.
+			if (skeletonGraphic.objectReferenceValue == null) {
+				var foundSkeletonGraphic = follower.GetComponentInParent<SkeletonGraphic>();
+				if (foundSkeletonGraphic != null)
+					Debug.Log("BoundingBoxFollowerGraphic automatically assigned: " + foundSkeletonGraphic.gameObject.name);
 				else if (Event.current.type == EventType.Repaint)
-					Debug.Log("No Spine GameObject detected. Make sure to set this GameObject as a child of the Spine GameObject; or set BoundingBoxFollower's 'Skeleton Renderer' field in the inspector.");
+					Debug.Log("No Spine GameObject detected. Make sure to set this GameObject as a child of the Spine GameObject; or set BoundingBoxFollowerGraphic's 'Skeleton Graphic' field in the inspector.");
 
-				skeletonRenderer.objectReferenceValue = foundSkeletonRenderer;
+				skeletonGraphic.objectReferenceValue = foundSkeletonGraphic;
 				serializedObject.ApplyModifiedProperties();
 				InitializeEditor();
 			}
 
-			var skeletonRendererValue = skeletonRenderer.objectReferenceValue as SkeletonRenderer;
-			if (skeletonRendererValue != null && skeletonRendererValue.gameObject == follower.gameObject) {
+			var skeletonGraphicValue = skeletonGraphic.objectReferenceValue as SkeletonGraphic;
+			if (skeletonGraphicValue != null && skeletonGraphicValue.gameObject == follower.gameObject) {
 				using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox)) {
-					EditorGUILayout.HelpBox("It's ideal to add BoundingBoxFollower to a separate child GameObject of the Spine GameObject.", MessageType.Warning);
+					EditorGUILayout.HelpBox("It's ideal to add BoundingBoxFollowerGraphic to a separate child GameObject of the Spine GameObject.", MessageType.Warning);
 
-					if (GUILayout.Button(new GUIContent("Move BoundingBoxFollower to new GameObject", Icons.boundingBox), GUILayout.Height(30f))) {
-						AddBoundingBoxFollowerChild(skeletonRendererValue, follower);
+					if (GUILayout.Button(new GUIContent("Move BoundingBoxFollowerGraphic to new GameObject", Icons.boundingBox), GUILayout.Height(30f))) {
+						AddBoundingBoxFollowerGraphicChild(skeletonGraphicValue, follower);
 						DestroyImmediate(follower);
 						return;
 					}
@@ -104,7 +104,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			EditorGUI.BeginChangeCheck();
-			EditorGUILayout.PropertyField(skeletonRenderer);
+			EditorGUILayout.PropertyField(skeletonGraphic);
 			EditorGUILayout.PropertyField(slotName, new GUIContent("Slot"));
 			if (EditorGUI.EndChangeCheck()) {
 				serializedObject.ApplyModifiedProperties();
@@ -140,7 +140,7 @@ namespace Spine.Unity.Editor {
 
 				// How do you prevent components from being saved into the prefab? No such HideFlag. DontSaveInEditor | DontSaveInBuild does not work. DestroyImmediate does not work.
 				var collider = follower.GetComponent<PolygonCollider2D>();
-				if (collider != null) Debug.LogWarning("Found BoundingBoxFollower collider components in prefab. These are disposed and regenerated at runtime.");
+				if (collider != null) Debug.LogWarning("Found BoundingBoxFollowerGraphic collider components in prefab. These are disposed and regenerated at runtime.");
 
 			} else {
 				using (new SpineInspectorUtility.BoxScope()) {
@@ -163,7 +163,7 @@ namespace Spine.Unity.Editor {
 
 			if (follower.Slot == null)
 				follower.Initialize(false);
-			bool hasBoneFollower = follower.GetComponent<BoneFollower>() != null;
+			bool hasBoneFollower = follower.GetComponent<BoneFollowerGraphic>() != null;
 			if (!hasBoneFollower) {
 				bool buttonDisabled = follower.Slot == null;
 				using (new EditorGUI.DisabledGroupScope(buttonDisabled)) {
@@ -175,8 +175,8 @@ namespace Spine.Unity.Editor {
 
 			if (Event.current.type == EventType.Repaint) {
 				if (addBoneFollower) {
-					var boneFollower = follower.gameObject.AddComponent<BoneFollower>();
-					boneFollower.skeletonRenderer = skeletonRendererValue;
+					var boneFollower = follower.gameObject.AddComponent<BoneFollowerGraphic>();
+					boneFollower.skeletonGraphic = skeletonGraphicValue;
 					boneFollower.SetBone(follower.Slot.Data.BoneData.Name);
 					addBoneFollower = false;
 				}
@@ -194,27 +194,28 @@ namespace Spine.Unity.Editor {
 		}
 
 		#region Menus
-		[MenuItem("CONTEXT/SkeletonRenderer/Add BoundingBoxFollower GameObject")]
-		static void AddBoundingBoxFollowerChild (MenuCommand command) {
-			var go = AddBoundingBoxFollowerChild((SkeletonRenderer)command.context);
-			Undo.RegisterCreatedObjectUndo(go, "Add BoundingBoxFollower");
+		[MenuItem("CONTEXT/SkeletonGraphic/Add BoundingBoxFollowerGraphic GameObject")]
+		static void AddBoundingBoxFollowerGraphicChild (MenuCommand command) {
+			var go = AddBoundingBoxFollowerGraphicChild((SkeletonGraphic)command.context);
+			Undo.RegisterCreatedObjectUndo(go, "Add BoundingBoxFollowerGraphic");
 		}
 
-		[MenuItem("CONTEXT/SkeletonRenderer/Add all BoundingBoxFollower GameObjects")]
-		static void AddAllBoundingBoxFollowerChildren (MenuCommand command) {
-			var objects = AddAllBoundingBoxFollowerChildren((SkeletonRenderer)command.context);
+		[MenuItem("CONTEXT/SkeletonGraphic/Add all BoundingBoxFollowerGraphic GameObjects")]
+		static void AddAllBoundingBoxFollowerGraphicChildren (MenuCommand command) {
+			var objects = AddAllBoundingBoxFollowerGraphicChildren((SkeletonGraphic)command.context);
 			foreach (var go in objects)
-				Undo.RegisterCreatedObjectUndo(go, "Add BoundingBoxFollower");
+				Undo.RegisterCreatedObjectUndo(go, "Add BoundingBoxFollowerGraphic");
 		}
 		#endregion
 
-		public static GameObject AddBoundingBoxFollowerChild (SkeletonRenderer skeletonRenderer,
-			BoundingBoxFollower original = null, string name = "BoundingBoxFollower",
+		public static GameObject AddBoundingBoxFollowerGraphicChild (SkeletonGraphic skeletonGraphic,
+			BoundingBoxFollowerGraphic original = null, string name = "BoundingBoxFollowerGraphic",
 			string slotName = null) {
 
 			var go = EditorInstantiation.NewGameObject(name, true);
-			go.transform.SetParent(skeletonRenderer.transform, false);
-			var newFollower = go.AddComponent<BoundingBoxFollower>();
+			go.transform.SetParent(skeletonGraphic.transform, false);
+			go.AddComponent<RectTransform>();
+			var newFollower = go.AddComponent<BoundingBoxFollowerGraphic>();
 
 			if (original != null) {
 				newFollower.slotName = original.slotName;
@@ -224,7 +225,7 @@ namespace Spine.Unity.Editor {
 			if (slotName != null)
 				newFollower.slotName = slotName;
 
-			newFollower.skeletonRenderer = skeletonRenderer;
+			newFollower.skeletonGraphic = skeletonGraphic;
 			newFollower.Initialize();
 
 			Selection.activeGameObject = go;
@@ -232,23 +233,23 @@ namespace Spine.Unity.Editor {
 			return go;
 		}
 
-		public static List<GameObject> AddAllBoundingBoxFollowerChildren (
-			SkeletonRenderer skeletonRenderer, BoundingBoxFollower original = null) {
+		public static List<GameObject> AddAllBoundingBoxFollowerGraphicChildren (
+			SkeletonGraphic skeletonGraphic, BoundingBoxFollowerGraphic original = null) {
 
 			List<GameObject> createdGameObjects = new List<GameObject>();
-			foreach (var skin in skeletonRenderer.Skeleton.Data.Skins) {
+			foreach (var skin in skeletonGraphic.Skeleton.Data.Skins) {
 				var attachments = skin.Attachments;
 				foreach (var entry in attachments) {
 					var boundingBoxAttachment = entry.Value as BoundingBoxAttachment;
 					if (boundingBoxAttachment == null)
 						continue;
 					int slotIndex = entry.Key.SlotIndex;
-					var slot = skeletonRenderer.Skeleton.Slots.Items[slotIndex];
+					var slot = skeletonGraphic.Skeleton.Slots.Items[slotIndex];
 					string slotName = slot.Data.Name;
-					GameObject go = AddBoundingBoxFollowerChild(skeletonRenderer,
+					GameObject go = AddBoundingBoxFollowerGraphicChild(skeletonGraphic,
 						original, boundingBoxAttachment.Name, slotName);
-					var boneFollower = go.AddComponent<BoneFollower>();
-					boneFollower.skeletonRenderer = skeletonRenderer;
+					var boneFollower = go.AddComponent<BoneFollowerGraphic>();
+					boneFollower.skeletonGraphic = skeletonGraphic;
 					boneFollower.SetBone(slot.Data.BoneData.Name);
 					createdGameObjects.Add(go);
 				}

@@ -91,10 +91,14 @@ namespace Spine.Unity {
 			return collider;
 		}
 
-		public static void SetColliderPointsLocal (PolygonCollider2D collider, Slot slot, BoundingBoxAttachment box) {
+		public static void SetColliderPointsLocal (PolygonCollider2D collider, Slot slot, BoundingBoxAttachment box, float scale = 1.0f) {
 			if (box == null) return;
 			if (box.IsWeighted()) Debug.LogWarning("UnityEngine.PolygonCollider2D does not support weighted or animated points. Collider points will not be animated and may have incorrect orientation. If you want to use it as a collider, please remove weights and animations from the bounding box in Spine editor.");
 			var verts = box.GetLocalVertices(slot, null);
+			if (scale != 1.0f) {
+				for (int i = 0, n = verts.Length; i < n; ++i)
+					verts[i] *= scale;
+			}
 			collider.SetPath(0, verts);
 		}
 
