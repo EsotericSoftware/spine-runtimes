@@ -79,10 +79,10 @@ module spine {
 
 			let input = new BinaryInput(binary);
 
-			skeletonData.hash = input.readString();
+			let lowHash = input.readInt(false);
+			let highHash = input.readInt(false);
+			skeletonData.hash = highHash == 0 && lowHash == 0 ? null : highHash.toString(16) + lowHash.toString(16);
 			skeletonData.version = input.readString();
-			if ("3.8.75" == skeletonData.version)
-					throw new Error("Unsupported skeleton data, please export with a newer version of Spine.");
 			skeletonData.x = input.readFloat();
 			skeletonData.y = input.readFloat();
 			skeletonData.width = input.readFloat();
@@ -298,8 +298,7 @@ module spine {
 			if (name == null) name = attachmentName;
 
 			let typeIndex = input.readByte();
-			let type = SkeletonBinary.AttachmentTypeValues[typeIndex];
-			switch (type) {
+			switch (SkeletonBinary.AttachmentTypeValues[typeIndex]) {
 			case AttachmentType.Region: {
 				let path = input.readStringRef();
 				let rotation = input.readFloat();
@@ -453,9 +452,9 @@ module spine {
 		}
 
 		private readVertices (input: BinaryInput, vertexCount: number): Vertices {
+			let scale = this.scale;
 			let verticesLength = vertexCount << 1;
 			let vertices = new Vertices();
-			let scale = this.scale;
 			if (!input.readBoolean()) {
 				vertices.vertices = this.readFloatArray(input, verticesLength, scale);
 				return vertices;
@@ -498,9 +497,9 @@ module spine {
 		}
 
 		private readAnimation (input: BinaryInput, name: string, skeletonData: SkeletonData): Animation {
+			let numTimelines = input.readInt(true);
 			let timelines = new Array<Timeline>();
 			let scale = this.scale;
-			let duration = 0;
 			let tempColor1 = new Color();
 			let tempColor2 = new Color();
 
@@ -510,44 +509,104 @@ module spine {
 				for (let ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					let timelineType = input.readByte();
 					let frameCount = input.readInt(true);
+					let frameLast = frameCount - 1;
 					switch (timelineType) {
-					case SkeletonBinary.SLOT_ATTACHMENT: {
-						let timeline = new AttachmentTimeline(frameCount);
-						timeline.slotIndex = slotIndex;
-						for (let frameIndex = 0; frameIndex < frameCount; frameIndex++)
-							timeline.setFrame(frameIndex, input.readFloat(), input.readStringRef());
-						timelines.push(timeline);
-						duration = Math.max(duration, timeline.frames[frameCount - 1]);
-						break;
-					}
-					case SkeletonBinary.SLOT_COLOR: {
-						let timeline = new ColorTimeline(frameCount);
-						timeline.slotIndex = slotIndex;
-						for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-							let time = input.readFloat();
-							Color.rgba8888ToColor(tempColor1, input.readInt32());
-							timeline.setFrame(frameIndex, time, tempColor1.r, tempColor1.g, tempColor1.b, tempColor1.a);
-							if (frameIndex < frameCount - 1) this.readCurve(input, frameIndex, timeline);
+						case SkeletonBinary.SLOT_ATTACHMENT: {
+							let timeline = new AttachmentTimeline(frameCount, slotIndex);
+							for (let frameIndex = 0; frameIndex < frameCount; frameIndex++)
+								timeline.setFrame(frameIndex, input.readFloat(), input.readStringRef());
+							timelines.push(timeline);
+							break;
 						}
-						timelines.push(timeline);
-						duration = Math.max(duration, timeline.frames[(frameCount - 1) * ColorTimeline.ENTRIES]);
-						break;
-					}
-					case SkeletonBinary.SLOT_TWO_COLOR: {
-						let timeline = new TwoColorTimeline(frameCount);
-						timeline.slotIndex = slotIndex;
-						for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
+						case SkeletonBinary.SLOT_COLOR: {
+							let bezierCount = input.readInt(true);
+							let timeline = new ColorTimeline(frameCount, bezierCount, slotIndex);
+
 							let time = input.readFloat();
-							Color.rgba8888ToColor(tempColor1, input.readInt32());
-							Color.rgb888ToColor(tempColor2, input.readInt32());
-							timeline.setFrame(frameIndex, time, tempColor1.r, tempColor1.g, tempColor1.b, tempColor1.a, tempColor2.r,
-								tempColor2.g, tempColor2.b);
-							if (frameIndex < frameCount - 1) this.readCurve(input, frameIndex, timeline);
+							let r = input.readUnsignedByte() / 255.0;
+							let g = input.readUnsignedByte() / 255.0;
+							let b = input.readUnsignedByte() / 255.0;
+							let a = input.readUnsignedByte() / 255.0;
+
+							for (let frame = 0, bezier = 0;; frame++) {
+								timeline.setFrame(frame, time, r, g, b, a);
+								if (frame == frameLast) break;
+
+								let time2 = input.readFloat();
+								let r2 = input.readUnsignedByte() / 255.0;
+								let g2 = input.readUnsignedByte() / 255.0;
+								let b2 = input.readUnsignedByte() / 255.0;
+								let a2 = input.readUnsignedByte() / 255.0;
+
+								switch (input.readByte()) {
+									case SkeletonBinary.CURVE_STEPPED:
+										timeline.setStepped(frame);
+										break;
+									case SkeletonBinary.CURVE_BEZIER:
+										SkeletonBinary.setBezier(input, timeline, bezier++, frame, 0, time, time2, r, r2, 1);
+										SkeletonBinary.setBezier(input, timeline, bezier++, frame, 1, time, time2, g, g2, 1);
+										SkeletonBinary.setBezier(input, timeline, bezier++, frame, 2, time, time2, b, b2, 1);
+										SkeletonBinary.setBezier(input, timeline, bezier++, frame, 3, time, time2, a, a2, 1);
+								}
+								time = time2;
+								r = r2;
+								g = g2;
+								b = b2;
+								a = a2;
+							}
+							timelines.push(timeline);
+							break;
 						}
-						timelines.push(timeline);
-						duration = Math.max(duration, timeline.frames[(frameCount - 1) * TwoColorTimeline.ENTRIES]);
-						break;
-					}
+						case SkeletonBinary.SLOT_TWO_COLOR: {
+							let bezierCount = input.readInt(true);
+							let timeline = new TwoColorTimeline(frameCount, bezierCount, slotIndex);
+
+							let time = input.readFloat();
+							let r = input.readUnsignedByte() / 255.0;
+							let g = input.readUnsignedByte() / 255.0;
+							let b = input.readUnsignedByte() / 255.0;
+							let a = input.readUnsignedByte() / 255.0;
+							let r2 = input.readUnsignedByte() / 255.0;
+							let g2 = input.readUnsignedByte() / 255.0;
+							let b2 = input.readUnsignedByte() / 255.0;
+
+							for (let frame = 0, bezier = 0;; frame++) {
+								timeline.setFrame(frame, time, r, g, b, a, r2, g2, b2);
+								if (frame == frameLast) break;
+								let time2 = input.readFloat();
+								let nr = input.readUnsignedByte() / 255.0;
+								let ng = input.readUnsignedByte() / 255.0;
+								let nb = input.readUnsignedByte() / 255.0;
+								let na = input.readUnsignedByte() / 255.0;
+								let nr2 = input.readUnsignedByte() / 255.0;
+								let ng2 = input.readUnsignedByte() / 255.0;
+								let nb2 = input.readUnsignedByte() / 255.0;
+
+								switch (input.readByte()) {
+									case SkeletonBinary.CURVE_STEPPED:
+										timeline.setStepped(frame);
+										break;
+									case SkeletonBinary.CURVE_BEZIER:
+										SkeletonBinary.setBezier(input, timeline, bezier++, frame, 0, time, time2, r, nr, 1);
+										SkeletonBinary.setBezier(input, timeline, bezier++, frame, 1, time, time2, g, ng, 1);
+										SkeletonBinary.setBezier(input, timeline, bezier++, frame, 2, time, time2, b, nb, 1);
+										SkeletonBinary.setBezier(input, timeline, bezier++, frame, 3, time, time2, a, na, 1);
+										SkeletonBinary.setBezier(input, timeline, bezier++, frame, 4, time, time2, r2, nr2, 1);
+										SkeletonBinary.setBezier(input, timeline, bezier++, frame, 5, time, time2, g2, ng2, 1);
+										SkeletonBinary.setBezier(input, timeline, bezier++, frame, 6, time, time2, b2, nb2, 1);
+								}
+								time = time2;
+								r = nr;
+								g = ng;
+								b = nb;
+								a = na;
+								r2 = nr2;
+								g2 = ng2;
+								b2 = nb2;
+							}
+							timelines.push(timeline);
+							break;
+						}
 					}
 				}
 			}
@@ -558,41 +617,23 @@ module spine {
 				for (let ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					let timelineType = input.readByte();
 					let frameCount = input.readInt(true);
+					let bezierCount = input.readInt(true);
 					switch (timelineType) {
-					case SkeletonBinary.BONE_ROTATE: {
-						let timeline = new RotateTimeline(frameCount);
-						timeline.boneIndex = boneIndex;
-						for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat());
-							if (frameIndex < frameCount - 1) this.readCurve(input, frameIndex, timeline);
+						case SkeletonBinary.BONE_ROTATE: {
+							timelines.push(SkeletonBinary.readTimeline(input, new RotateTimeline(frameCount, bezierCount, boneIndex), 1));
+							break;
 						}
-						timelines.push(timeline);
-						duration = Math.max(duration, timeline.frames[(frameCount - 1) * RotateTimeline.ENTRIES]);
-						break;
-					}
-					case SkeletonBinary.BONE_TRANSLATE:
-					case SkeletonBinary.BONE_SCALE:
-					case SkeletonBinary.BONE_SHEAR: {
-						let timeline;
-						let timelineScale = 1;
-						if (timelineType == SkeletonBinary.BONE_SCALE)
-							timeline = new ScaleTimeline(frameCount);
-						else if (timelineType == SkeletonBinary.BONE_SHEAR)
-							timeline = new ShearTimeline(frameCount);
-						else {
-							timeline = new TranslateTimeline(frameCount);
-							timelineScale = scale;
+						case SkeletonBinary.BONE_TRANSLATE: {
+							timelines.push(SkeletonBinary.readTimeline2(input, new TranslateTimeline(frameCount, bezierCount, boneIndex), scale));
+							break;
 						}
-						timeline.boneIndex = boneIndex;
-						for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat() * timelineScale,
-								input.readFloat() * timelineScale);
-							if (frameIndex < frameCount - 1) this.readCurve(input, frameIndex, timeline);
+						case SkeletonBinary.BONE_SCALE: {
+							timelines.push(SkeletonBinary.readTimeline2(input, new ScaleTimeline(frameCount, bezierCount, boneIndex), 1));
+							break;
 						}
-						timelines.push(timeline);
-						duration = Math.max(duration, timeline.frames[(frameCount - 1) * TranslateTimeline.ENTRIES]);
-						break;
-					}
+						case SkeletonBinary.BONE_SHEAR: {
+							timelines.push(SkeletonBinary.readTimeline2(input, new ShearTimeline(frameCount, bezierCount, boneIndex), 1));
+						}
 					}
 				}
 			}
@@ -601,30 +642,73 @@ module spine {
 			for (let i = 0, n = input.readInt(true); i < n; i++) {
 				let index = input.readInt(true);
 				let frameCount = input.readInt(true);
-				let timeline = new IkConstraintTimeline(frameCount);
-				timeline.ikConstraintIndex = index;
-				for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat() * scale, input.readByte(), input.readBoolean(),
-						input.readBoolean());
-					if (frameIndex < frameCount - 1) this.readCurve(input, frameIndex, timeline);
+				let bezierCount = input.readInt(true);
+				let frameLast = frameCount - 1;
+				let timeline = new IkConstraintTimeline(frameCount, bezierCount, index);
+
+				let time = input.readFloat();
+				let mix = input.readFloat();
+				let softness = input.readFloat() * scale;
+
+				for (let frame = 0, bezier = 0;; frame++) {
+					timeline.setFrame(frame, time, mix, softness, input.readByte(), input.readBoolean(), input.readBoolean());
+					if (frame == frameLast) break;
+					let time2 = input.readFloat();
+					let mix2 = input.readFloat();
+					let softness2 = input.readFloat() * scale;
+					switch (input.readByte()) {
+						case SkeletonBinary.CURVE_STEPPED:
+							timeline.setStepped(frame);
+							break;
+						case SkeletonBinary.CURVE_BEZIER:
+							SkeletonBinary.setBezier(input, timeline, bezier++, frame, 0, time, time2, mix, mix2, 1);
+							SkeletonBinary.setBezier(input, timeline, bezier++, frame, 1, time, time2, softness, softness2, scale);
+					}
+					time = time2;
+					mix = mix2;
+					softness = softness2;
 				}
 				timelines.push(timeline);
-				duration = Math.max(duration, timeline.frames[(frameCount - 1) * IkConstraintTimeline.ENTRIES]);
 			}
 
 			// Transform constraint timelines.
 			for (let i = 0, n = input.readInt(true); i < n; i++) {
 				let index = input.readInt(true);
 				let frameCount = input.readInt(true);
-				let timeline = new TransformConstraintTimeline(frameCount);
-				timeline.transformConstraintIndex = index;
-				for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-					timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat(),
-						input.readFloat());
-					if (frameIndex < frameCount - 1) this.readCurve(input, frameIndex, timeline);
+				let bezierCount = input.readInt(true);
+				let frameLast = frameCount - 1;
+				let timeline = new TransformConstraintTimeline(frameCount, bezierCount, index);
+
+				let time = input.readFloat();
+				let rotateMix = input.readFloat();
+				let translateMix = input.readFloat();
+				let scaleMix = input.readFloat();
+				let shearMix = input.readFloat();
+				for (let frame = 0, bezier = 0;; frame++) {
+					timeline.setFrame(frame, time, rotateMix, translateMix, scaleMix, shearMix);
+					if (frame == frameLast) break;
+					let time2 = input.readFloat();
+					let rotateMix2 = input.readFloat();
+					let translateMix2 = input.readFloat();
+					let scaleMix2 = input.readFloat();
+					let shearMix2 = input.readFloat();
+					switch (input.readByte()) {
+						case SkeletonBinary.CURVE_STEPPED:
+							timeline.setStepped(frame);
+							break;
+						case SkeletonBinary.CURVE_BEZIER:
+							SkeletonBinary.setBezier(input, timeline, bezier++, frame, 0, time, time2, rotateMix, rotateMix2, 1);
+							SkeletonBinary.setBezier(input, timeline, bezier++, frame, 1, time, time2, translateMix, translateMix2, 1);
+							SkeletonBinary.setBezier(input, timeline, bezier++, frame, 2, time, time2, scaleMix, scaleMix2, 1);
+							SkeletonBinary.setBezier(input, timeline, bezier++, frame, 3, time, time2, shearMix, shearMix2, 1);
+					}
+					time = time2;
+					rotateMix = rotateMix2;
+					translateMix = translateMix2;
+					scaleMix = scaleMix2;
+					shearMix = shearMix2;
 				}
 				timelines.push(timeline);
-				duration = Math.max(duration, timeline.frames[(frameCount - 1) * TransformConstraintTimeline.ENTRIES]);
 			}
 
 			// Path constraint timelines.
@@ -632,41 +716,21 @@ module spine {
 				let index = input.readInt(true);
 				let data = skeletonData.pathConstraints[index];
 				for (let ii = 0, nn = input.readInt(true); ii < nn; ii++) {
-					let timelineType = input.readByte();
-					let frameCount = input.readInt(true);
-					switch (timelineType) {
-					case SkeletonBinary.PATH_POSITION:
-					case SkeletonBinary.PATH_SPACING: {
-						let timeline;
-						let timelineScale = 1;
-						if (timelineType == SkeletonBinary.PATH_SPACING) {
-							timeline = new PathConstraintSpacingTimeline(frameCount);
-							if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed) timelineScale = scale;
-						} else {
-							timeline = new PathConstraintPositionTimeline(frameCount);
-							if (data.positionMode == PositionMode.Fixed) timelineScale = scale;
+					switch (input.readByte()) {
+						case SkeletonBinary.PATH_POSITION:
+							timelines
+								.push(SkeletonBinary.readTimeline(input, new PathConstraintPositionTimeline(input.readInt(true), input.readInt(true), index),
+									data.positionMode == PositionMode.Fixed ? scale : 1));
+							break;
+						case SkeletonBinary.PATH_SPACING:
+							timelines
+								.push(SkeletonBinary.readTimeline(input, new PathConstraintSpacingTimeline(input.readInt(true), input.readInt(true), index),
+									data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
+							break;
+						case SkeletonBinary.PATH_MIX:
+							timelines
+								.push(SkeletonBinary.readTimeline2(input, new PathConstraintMixTimeline(input.readInt(true), input.readInt(true), index), 1));
 						}
-						timeline.pathConstraintIndex = index;
-						for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat() * timelineScale);
-							if (frameIndex < frameCount - 1) this.readCurve(input, frameIndex, timeline);
-						}
-						timelines.push(timeline);
-						duration = Math.max(duration, timeline.frames[(frameCount - 1) * PathConstraintPositionTimeline.ENTRIES]);
-						break;
-					}
-					case SkeletonBinary.PATH_MIX: {
-						let timeline = new PathConstraintMixTimeline(frameCount);
-						timeline.pathConstraintIndex = index;
-						for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-							timeline.setFrame(frameIndex, input.readFloat(), input.readFloat(), input.readFloat());
-							if (frameIndex < frameCount - 1) this.readCurve(input, frameIndex, timeline);
-						}
-						timelines.push(timeline);
-						duration = Math.max(duration, timeline.frames[(frameCount - 1) * PathConstraintMixTimeline.ENTRIES]);
-						break;
-					}
-					}
 				}
 			}
 
@@ -676,18 +740,20 @@ module spine {
 				for (let ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					let slotIndex = input.readInt(true);
 					for (let iii = 0, nnn = input.readInt(true); iii < nnn; iii++) {
-						let attachment = skin.getAttachment(slotIndex, input.readStringRef()) as VertexAttachment;
+						let attachmentName = input.readStringRef();
+						let attachment = skin.getAttachment(slotIndex, attachmentName) as VertexAttachment;
+						if (attachment == null) throw Error("Vertex attachment not found: " + attachmentName);
 						let weighted = attachment.bones != null;
 						let vertices = attachment.vertices;
 						let deformLength = weighted ? vertices.length / 3 * 2 : vertices.length;
 
 						let frameCount = input.readInt(true);
-						let timeline = new DeformTimeline(frameCount);
-						timeline.slotIndex = slotIndex;
-						timeline.attachment = attachment;
+						let frameLast = frameCount - 1;
+						let bezierCount = input.readInt(true);
+						let timeline = new DeformTimeline(frameCount, bezierCount, slotIndex, attachment);
 
-						for (let frameIndex = 0; frameIndex < frameCount; frameIndex++) {
-							let time = input.readFloat();
+						let time = input.readFloat();
+						for (let frame = 0, bezier = 0;; frame++) {
 							let deform;
 							let end = input.readInt(true);
 							if (end == 0)
@@ -709,11 +775,19 @@ module spine {
 								}
 							}
 
-							timeline.setFrame(frameIndex, time, deform);
-							if (frameIndex < frameCount - 1) this.readCurve(input, frameIndex, timeline);
+							timeline.setFrame(frame, time, deform);
+							if (frame == frameLast) break;
+							let time2 = input.readFloat();
+							switch(input.readByte()) {
+								case SkeletonBinary.CURVE_STEPPED:
+									timeline.setStepped(frame);
+									break;
+								case SkeletonBinary.CURVE_BEZIER:
+									SkeletonBinary.setBezier(input, timeline, bezier++, frame, 0, time, time2, 0, 1, 1);
+							}
+							time = time2;
 						}
 						timelines.push(timeline);
-						duration = Math.max(duration, timeline.frames[frameCount - 1]);
 					}
 				}
 			}
@@ -748,7 +822,6 @@ module spine {
 					timeline.setFrame(i, time, drawOrder);
 				}
 				timelines.push(timeline);
-				duration = Math.max(duration, timeline.frames[drawOrderCount - 1]);
 			}
 
 			// Event timeline.
@@ -769,25 +842,56 @@ module spine {
 					timeline.setFrame(i, event);
 				}
 				timelines.push(timeline);
-				duration = Math.max(duration, timeline.frames[eventCount - 1]);
 			}
 
+			let duration = 0;
+			for (let i = 0, n = timelines.length; i < n; i++)
+				duration = Math.max(duration, (timelines[i]).getDuration());
 			return new Animation(name, timelines, duration);
 		}
 
-		private readCurve (input: BinaryInput, frameIndex: number, timeline: CurveTimeline) {
-			switch (input.readByte()) {
-			case SkeletonBinary.CURVE_STEPPED:
-				timeline.setStepped(frameIndex);
-				break;
-			case SkeletonBinary.CURVE_BEZIER:
-				this.setCurve(timeline, frameIndex, input.readFloat(), input.readFloat(), input.readFloat(), input.readFloat());
-				break;
+		static readTimeline (input: BinaryInput, timeline: CurveTimeline1, scale: number): Timeline {
+			let time = input.readFloat(), value = input.readFloat() * scale;
+			for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
+				timeline.setFrame(frame, time, value);
+				if (frame == frameLast) break;
+				let time2 = input.readFloat(), value2 = input.readFloat() * scale;
+				switch (input.readByte()) {
+				case SkeletonBinary.CURVE_STEPPED:
+					timeline.setStepped(frame);
+					break;
+				case SkeletonBinary.CURVE_BEZIER:
+					SkeletonBinary.setBezier(input, timeline, bezier++, frame, 0, time, time2, value, value2, 1);
+				}
+				time = time2;
+				value = value2;
 			}
+			return timeline;
 		}
 
-		setCurve (timeline: CurveTimeline, frameIndex: number, cx1: number, cy1: number, cx2: number, cy2: number) {
-			timeline.setCurve(frameIndex, cx1, cy1, cx2, cy2);
+		static readTimeline2 (input: BinaryInput, timeline: CurveTimeline2, scale: number): Timeline {
+			let time = input.readFloat(), value1 = input.readFloat() * scale, value2 = input.readFloat() * scale;
+			for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
+				timeline.setFrame(frame, time, value1, value2);
+				if (frame == frameLast) break;
+				let time2 = input.readFloat(), nvalue1 = input.readFloat() * scale, nvalue2 = input.readFloat() * scale;
+				switch (input.readByte()) {
+				case SkeletonBinary.CURVE_STEPPED:
+					timeline.setStepped(frame);
+					break;
+				case SkeletonBinary.CURVE_BEZIER:
+					this.setBezier(input, timeline, bezier++, frame, 0, time, time2, value1, nvalue1, scale);
+					this.setBezier(input, timeline, bezier++, frame, 1, time, time2, value2, nvalue2, scale);
+				}
+				time = time2;
+				value1 = nvalue1;
+				value2 = nvalue2;
+			}
+			return timeline;
+		}
+
+		static setBezier (input: BinaryInput, timeline: CurveTimeline, bezier: number, frame: number, value: number, time1: number, time2: number, value1: number, value2: number, scale: number) {
+			timeline.setBezier(bezier, frame, value, time1, value1, input.readFloat(), input.readFloat() * scale, input.readFloat(), input.readFloat() * scale, time2, value2);
 		}
 	}
 
@@ -798,6 +902,10 @@ module spine {
 
 		readByte(): number {
 			return this.buffer.getInt8(this.index++);
+		}
+
+		readUnsignedByte(): number {
+			return this.buffer.getUint8(this.index++);
 		}
 
 		readShort(): number {

@@ -56,7 +56,6 @@ module spine {
 
 		/** The list of bones and constraints, sorted in the order they should be updated, as computed by {@link #updateCache()}. */
 		_updateCache = new Array<Updatable>();
-		updateCacheReset = new Array<Updatable>();
 
 		/** The skeleton's current skin. May be null. */
 		skin: Skin;
@@ -138,7 +137,6 @@ module spine {
 		updateCache () {
 			let updateCache = this._updateCache;
 			updateCache.length = 0;
-			this.updateCacheReset.length = 0;
 
 			let bones = this.bones;
 			for (let i = 0, n = bones.length; i < n; i++) {
@@ -206,15 +204,18 @@ module spine {
 			let parent = constrained[0];
 			this.sortBone(parent);
 
-			if (constrained.length > 1) {
+			if (constrained.length == 1) {
+				this._updateCache.push(constraint);
+				this.sortReset(parent.children);
+			} else {
 				let child = constrained[constrained.length - 1];
-				if (!(this._updateCache.indexOf(child) > -1)) this.updateCacheReset.push(child);
+				this.sortBone(child);
+
+				this._updateCache.push(constraint);
+
+				this.sortReset(parent.children);
+				child.sorted = true;
 			}
-
-			this._updateCache.push(constraint);
-
-			this.sortReset(parent.children);
-			constrained[constrained.length - 1].sorted = true;
 		}
 
 		sortPathConstraint (constraint: PathConstraint) {
@@ -258,7 +259,7 @@ module spine {
 				for (let i = 0; i < boneCount; i++) {
 					let child = constrained[i];
 					this.sortBone(child.parent);
-					if (!(this._updateCache.indexOf(child) > -1)) this.updateCacheReset.push(child);
+					this.sortBone(child);
 				}
 			} else {
 				for (let i = 0; i < boneCount; i++) {
@@ -322,21 +323,34 @@ module spine {
 		 * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
 		 * Runtimes Guide. */
 		updateWorldTransform () {
-			let updateCacheReset = this.updateCacheReset;
-			for (let i = 0, n = updateCacheReset.length; i < n; i++) {
-				let bone = updateCacheReset[i] as Bone;
-				bone.ax = bone.x;
-				bone.ay = bone.y;
-				bone.arotation = bone.rotation;
-				bone.ascaleX = bone.scaleX;
-				bone.ascaleY = bone.scaleY;
-				bone.ashearX = bone.shearX;
-				bone.ashearY = bone.shearY;
-				bone.appliedValid = true;
-			}
 			let updateCache = this._updateCache;
 			for (let i = 0, n = updateCache.length; i < n; i++)
 				updateCache[i].update();
+		}
+
+		updateWorldTransformWith (parent: Bone) {
+			// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
+			let rootBone = this.getRootBone();
+			let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
+			rootBone.worldX = pa * this.x + pb * this.y + parent.worldX;
+			rootBone.worldY = pc * this.x + pd * this.y + parent.worldY;
+
+			let rotationY = rootBone.rotation + 90 + rootBone.shearY;
+			let la = MathUtils.cosDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
+			let lb = MathUtils.cosDeg(rotationY) * rootBone.scaleY;
+			let lc = MathUtils.sinDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
+			let ld = MathUtils.sinDeg(rotationY) * rootBone.scaleY;
+			rootBone.a = (pa * la + pb * lc) * this.scaleX;
+			rootBone.b = (pa * lb + pb * ld) * this.scaleX;
+			rootBone.c = (pc * la + pd * lc) * this.scaleY;
+			rootBone.d = (pc * lb + pd * ld) * this.scaleY;
+
+			// Update everything except root bone.
+			let updateCache = this._updateCache;
+			for (let i = 0, n = updateCache.length; i < n; i++) {
+				let updatable = updateCache[i];
+				if (updatable != rootBone) updatable.update();
+			}
 		}
 
 		/** Sets the bones, constraints, and slots to their setup pose values. */

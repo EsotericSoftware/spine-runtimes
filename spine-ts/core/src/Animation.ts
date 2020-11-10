@@ -34,7 +34,7 @@ module spine {
 		/** The animation's name, which is unique across all animations in the skeleton. */
 		name: string;
 		timelines: Array<Timeline>;
-		timelineIds: Array<boolean>;
+		timelineIds: StringSet;
 
 		/** The duration of the animation in seconds, which is the highest time of all keys in the timeline. */
 		duration: number;
@@ -44,14 +44,17 @@ module spine {
 			if (timelines == null) throw new Error("timelines cannot be null.");
 			this.name = name;
 			this.timelines = timelines;
-			this.timelineIds = [];
+			this.timelineIds = new StringSet();
 			for (var i = 0; i < timelines.length; i++)
-				this.timelineIds[timelines[i].getPropertyId()] = true;
+				this.timelineIds.addAll(timelines[i].getPropertyIds());
 			this.duration = duration;
 		}
 
-		hasTimeline (id: number) {
-			return this.timelineIds[id] == true;
+		hasTimeline(ids: string[]) {
+			for (let i = 0; i < ids.length; i++) {
+				if (this.timelineIds.contains(ids[i])) return true;
+			}
+			return false;
 		}
 
 		/** Applies all the animation's timelines to the specified skeleton.
@@ -72,53 +75,18 @@ module spine {
 				timelines[i].apply(skeleton, lastTime, time, events, alpha, blend, direction);
 		}
 
-		/** @param target After the first and before the last value.
-	 	 * @returns index of first value greater than the target. */
-		static binarySearch (values: ArrayLike<number>, target: number, step: number = 1) {
-			let low = 0;
-			let high = values.length / step - 2;
-			if (high == 0) return step;
-			let current = high >>> 1;
-			while (true) {
-				if (values[(current + 1) * step] <= target)
-					low = current + 1;
-				else
-					high = current;
-				if (low == high) return (low + 1) * step;
-				current = (low + high) >>> 1;
-			}
+		static search (frames: ArrayLike<number>, time: number) {
+			let n = frames.length;
+			for (let i = 1; i < n; i++)
+				if (frames[i] > time) return i - 1;
+			return n - 1;
 		}
 
-		static linearSearch (values: ArrayLike<number>, target: number, step: number) {
+		static search2 (values: ArrayLike<number>, target: number, step: number) {
 			for (let i = 0, last = values.length - step; i <= last; i += step)
 				if (values[i] > target) return i;
 			return -1;
 		}
-	}
-
-	/** The interface for all timelines. */
-	export interface Timeline {
-		/** Applies this timeline to the skeleton.
-		 * @param skeleton The skeleton the timeline is being applied to. This provides access to the bones, slots, and other
-		 *           skeleton components the timeline may change.
-		 * @param lastTime The time this timeline was last applied. Timelines such as {@link EventTimeline}} trigger only at specific
-		 *           times rather than every frame. In that case, the timeline triggers everything between `lastTime`
-		 *           (exclusive) and `time` (inclusive).
-		 * @param time The time within the animation. Most timelines find the key before and the key after this time so they can
-		 *           interpolate between the keys.
-		 * @param events If any events are fired, they are added to this list. Can be null to ignore fired events or if the timeline
-		 *           does not fire events.
-		 * @param alpha 0 applies the current or setup value (depending on `blend`). 1 applies the timeline value.
-		 *           Between 0 and 1 applies a value between the current or setup value and the timeline value. By adjusting
-		 *           `alpha` over time, an animation can be mixed in or out. `alpha` can also be useful to
-		 *           apply animations on top of each other (layering).
-		 * @param blend Controls how mixing is applied when `alpha` < 1.
-		 * @param direction Indicates whether the timeline is mixing in or out. Used by timelines which perform instant transitions,
-		 *           such as {@link DrawOrderTimeline} or {@link AttachmentTimeline}. */
-		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection): void;
-
-		/** Uniquely encodes both the type of this timeline and the skeleton property that it affects. */
-		getPropertyId (): number;
 	}
 
 	/** Controls how a timeline value is mixed with the setup pose value or current pose value when a timeline's `alpha`
@@ -157,138 +125,231 @@ module spine {
 		mixIn, mixOut
 	}
 
-	export enum TimelineType {
-		rotate, translate, scale, shear,
-		attachment, color, deform,
-		event, drawOrder,
-		ikConstraint, transformConstraint,
-		pathConstraintPosition, pathConstraintSpacing, pathConstraintMix,
-		twoColor
+	export enum Property {
+		rotate, translateX, translateY, scaleX, scaleY, shearX, shearY, //
+		rgba, rgb2, //
+		attachment, deform, //
+		event, drawOrder, //
+		ikConstraint, transformConstraint, //
+		pathConstraintPosition, pathConstraintSpacing, pathConstraintMix
+
 	}
 
-	/** The base class for timelines that use interpolation between key frame values. */
-	export abstract class CurveTimeline implements Timeline {
-		static LINEAR = 0; static STEPPED = 1; static BEZIER = 2;
-		static BEZIER_SIZE = 10 * 2 - 1;
+	/** The interface for all timelines. */
+	export abstract class Timeline {
+		propertyIds: string[];
+		frames: ArrayLike<number>;
 
-		private curves: ArrayLike<number>; // type, x, y, ...
-
-		abstract getPropertyId(): number;
-
-		constructor (frameCount: number) {
-			if (frameCount <= 0) throw new Error("frameCount must be > 0: " + frameCount);
-			this.curves = Utils.newFloatArray((frameCount - 1) * CurveTimeline.BEZIER_SIZE);
+		constructor(frameCount: number, propertyIds: string[]) {
+			this.propertyIds = propertyIds;
+			this.frames = Utils.newFloatArray(frameCount * this.getFrameEntries());
 		}
 
-		/** The number of key frames for this timeline. */
+		abstract getFrameEntries (): number;
+
 		getFrameCount () {
-			return this.curves.length / CurveTimeline.BEZIER_SIZE + 1;
+			return this.frames.length / this.getFrameEntries();
 		}
 
-		/** Sets the specified key frame to linear interpolation. */
-		setLinear (frameIndex: number) {
-			this.curves[frameIndex * CurveTimeline.BEZIER_SIZE] = CurveTimeline.LINEAR;
-		}
-
-		/** Sets the specified key frame to stepped interpolation. */
-		setStepped (frameIndex: number) {
-			this.curves[frameIndex * CurveTimeline.BEZIER_SIZE] = CurveTimeline.STEPPED;
-		}
-
-		/** Returns the interpolation type for the specified key frame.
-		 * @returns Linear is 0, stepped is 1, Bezier is 2. */
-		getCurveType (frameIndex: number): number {
-			let index = frameIndex * CurveTimeline.BEZIER_SIZE;
-			if (index == this.curves.length) return CurveTimeline.LINEAR;
-			let type = this.curves[index];
-			if (type == CurveTimeline.LINEAR) return CurveTimeline.LINEAR;
-			if (type == CurveTimeline.STEPPED) return CurveTimeline.STEPPED;
-			return CurveTimeline.BEZIER;
-		}
-
-		/** Sets the specified key frame to Bezier interpolation. `cx1` and `cx2` are from 0 to 1,
-		 * representing the percent of time between the two key frames. `cy1` and `cy2` are the percent of the
-		 * difference between the key frame's values. */
-		setCurve (frameIndex: number, cx1: number, cy1: number, cx2: number, cy2: number) {
-			let tmpx = (-cx1 * 2 + cx2) * 0.03, tmpy = (-cy1 * 2 + cy2) * 0.03;
-			let dddfx = ((cx1 - cx2) * 3 + 1) * 0.006, dddfy = ((cy1 - cy2) * 3 + 1) * 0.006;
-			let ddfx = tmpx * 2 + dddfx, ddfy = tmpy * 2 + dddfy;
-			let dfx = cx1 * 0.3 + tmpx + dddfx * 0.16666667, dfy = cy1 * 0.3 + tmpy + dddfy * 0.16666667;
-
-			let i = frameIndex * CurveTimeline.BEZIER_SIZE;
-			let curves = this.curves;
-			curves[i++] = CurveTimeline.BEZIER;
-
-			let x = dfx, y = dfy;
-			for (let n = i + CurveTimeline.BEZIER_SIZE - 1; i < n; i += 2) {
-				curves[i] = x;
-				curves[i + 1] = y;
-				dfx += ddfx;
-				dfy += ddfy;
-				ddfx += dddfx;
-				ddfy += dddfy;
-				x += dfx;
-				y += dfy;
-			}
-		}
-
-		/** Returns the interpolated percentage for the specified key frame and linear percentage. */
-		getCurvePercent (frameIndex: number, percent: number) {
-			percent = MathUtils.clamp(percent, 0, 1);
-			let curves = this.curves;
-			let i = frameIndex * CurveTimeline.BEZIER_SIZE;
-			let type = curves[i];
-			if (type == CurveTimeline.LINEAR) return percent;
-			if (type == CurveTimeline.STEPPED) return 0;
-			i++;
-			let x = 0;
-			for (let start = i, n = i + CurveTimeline.BEZIER_SIZE - 1; i < n; i += 2) {
-				x = curves[i];
-				if (x >= percent) {
-					let prevX: number, prevY: number;
-					if (i == start) {
-						prevX = 0;
-						prevY = 0;
-					} else {
-						prevX = curves[i - 2];
-						prevY = curves[i - 1];
-					}
-					return prevY + (curves[i + 1] - prevY) * (percent - prevX) / (x - prevX);
-				}
-			}
-			let y = curves[i - 1];
-			return y + (1 - y) * (percent - x) / (1 - x); // Last point is 1,1.
+		getDuration (): number {
+			return this.frames[this.frames.length - this.getFrameEntries()];
 		}
 
 		abstract apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection): void;
+
+		getPropertyIds () {
+			return this.propertyIds;
+		}
+	}
+
+	export interface BoneTimeline {
+		/** The index of the bone in {@link Skeleton#bones} that will be changed. */
+		boneIndex: number;
+	}
+
+	export interface SlotTimeline {
+		/** The index of the slot in {@link Skeleton#slots} that will be changed. */
+		slotIndex: number;
+	}
+
+	/** The base class for timelines that use interpolation between key frame values. */
+	export abstract class CurveTimeline extends Timeline {
+		static LINEAR = 0; static STEPPED = 1; static BEZIER = 2;
+		static BEZIER_SIZE = 18;
+
+		protected curves: ArrayLike<number>; // type, x, y, ...
+
+		constructor (frameCount: number, bezierCount: number, propertyIds: string[]) {
+			super(frameCount, propertyIds);
+			this.curves = Utils.newFloatArray(frameCount + bezierCount * CurveTimeline.BEZIER_SIZE);
+			this.curves[frameCount - 1] = CurveTimeline.STEPPED;
+		}
+
+		/** Sets the specified key frame to linear interpolation. */
+		setLinear (frame: number) {
+			this.curves[frame] = CurveTimeline.LINEAR;
+		}
+
+		/** Sets the specified key frame to stepped interpolation. */
+		setStepped (frame: number) {
+			this.curves[frame] = CurveTimeline.STEPPED;
+		}
+
+		/** Shrinks the storage for Bezier curves, for use when <code>bezierCount</code> (specified in the constructor) was larger
+		 * than the actual number of Bezier curves. */
+		shrink (bezierCount: number) {
+			let size = this.getFrameCount() + bezierCount * CurveTimeline.BEZIER_SIZE;
+			if (this.curves.length > size) {
+				let newCurves = Utils.newFloatArray(size);
+				Utils.arrayCopy(this.curves, 0, newCurves, 0, size);
+				this.curves = newCurves;
+			}
+		}
+
+		/** Stores the segments for the specified Bezier curve. For timelines that modify multiple values, there may be more than
+		 * one curve per frame.
+		 * @param bezier The ordinal of this Bezier curve for this timeline, between 0 and <code>bezierCount - 1</code> (specified
+		 *           in the constructor), inclusive.
+		 * @param frame Between 0 and <code>frameCount - 1</code>, inclusive.
+		 * @param value The index of the value for this frame that this curve is used for.
+		 * @param time1 The time for the first key.
+		 * @param value1 The value for the first key.
+		 * @param cx1 The time for the first Bezier handle.
+		 * @param cy1 The value for the first Bezier handle.
+		 * @param cx2 The time of the second Bezier handle.
+		 * @param cy2 The value for the second Bezier handle.
+		 * @param time2 The time for the second key.
+		 * @param value2 The value for the second key. */
+		setBezier (bezier: number, frame: number, value: number, time1: number, value1: number, cx1: number, cy1: number, cx2: number,
+			cy2: number, time2: number, value2: number) {
+			let curves = this.curves;
+			let i = this.getFrameCount() + bezier * CurveTimeline.BEZIER_SIZE;
+			if (value == 0) curves[frame] =CurveTimeline.BEZIER + i;
+			let tmpx = (time1 - cx1 * 2 + cx2) * 0.03, tmpy = (value1 - cy1 * 2 + cy2) * 0.03;
+			let dddx = ((cx1 - cx2) * 3 - time1 + time2) * 0.006, dddy = ((cy1 - cy2) * 3 - value1 + value2) * 0.006;
+			let ddx = tmpx * 2 + dddx, ddy = tmpy * 2 + dddy;
+			let dx = (cx1 - time1) * 0.3 + tmpx + dddx * 0.16666667, dy = (cy1 - value1) * 0.3 + tmpy + dddy * 0.16666667;
+			let x = time1 + dx, y = value1 + dy;
+			for (let n = i + CurveTimeline.BEZIER_SIZE; i < n; i += 2) {
+				curves[i] = x;
+				curves[i + 1] = y;
+				dx += ddx;
+				dy += ddy;
+				ddx += dddx;
+				ddy += dddy;
+				x += dx;
+				y += dy;
+			}
+		}
+
+		/** Returns the Bezier interpolated value for the specified time.
+		 * @param frameIndex The index into {@link #getFrames()} for the values of the frame before <code>time</code>.
+		 * @param valueOffset The offset from <code>frameIndex</code> to the value this curve is used for.
+		 * @param i The index of the Bezier segments. See {@link #getCurveType(int)}. */
+		getBezierValue (time: number, frameIndex: number, valueOffset: number, i: number) {
+			let curves = this.curves;
+			let frames = this.frames;
+			if (curves[i] > time) {
+				let x = frames[frameIndex], y = frames[frameIndex + valueOffset];
+				return y + (time - x) / (curves[i] - x) * (curves[i + 1] - y);
+			}
+			let n = i + CurveTimeline.BEZIER_SIZE;
+			for (i += 2; i < n; i += 2) {
+				if (curves[i] >= time) {
+					let x = curves[i - 2], y = curves[i - 1];
+					return y + (time - x) / (curves[i] - x) * (curves[i + 1] - y);
+
+
+
+				}
+			}
+			frameIndex += this.getFrameEntries();
+			let x = curves[n - 2], y = curves[n - 1];
+			return y + (time - x) / (frames[frameIndex] - x) * (frames[frameIndex + valueOffset] - y);
+		}
+	}
+
+	export abstract class CurveTimeline1 extends CurveTimeline {
+		static ENTRIES = 2;
+		static VALUE = 1;
+
+		constructor(frameCount: number, bezierCount: number, propertyIds: string[]) {
+			super(frameCount, bezierCount, propertyIds);
+		}
+
+		getFrameEntries() {
+			return CurveTimeline1.ENTRIES;
+		}
+
+		/** Sets the time and value for the specified frame.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+		 * @param time The frame time in seconds. */
+		setFrame (frame: number, time: number, value: number) {
+			frame <<= 1;
+			this.frames[frame] = time;
+			this.frames[frame + CurveTimeline1.VALUE] = value;
+		}
+
+		/** Returns the interpolated value for the specified time. */
+		getCurveValue (time: number) {
+			let frames = this.frames;
+			let i = frames.length - 2;
+			for (let ii = 2; ii <= i; ii += 2) {
+				if (frames[ii] > time) {
+					i = ii - 2;
+					break;
+				}
+			}
+
+			let curveType = this.curves[i >> 1];
+			switch (curveType) {
+			case CurveTimeline.LINEAR:
+				let before = frames[i], value = frames[i + CurveTimeline1.VALUE];
+				return value + (time - before) / (frames[i + CurveTimeline1.ENTRIES] - before) * (frames[i + CurveTimeline1.ENTRIES + CurveTimeline1.VALUE] - value);
+			case CurveTimeline.STEPPED:
+				return frames[i + CurveTimeline1.VALUE];
+			}
+			return this.getBezierValue(time, i, CurveTimeline1.VALUE, curveType - CurveTimeline1.BEZIER);
+		}
+	}
+
+	/** The base class for a {@link CurveTimeline} which sets two properties. */
+	export abstract class CurveTimeline2 extends CurveTimeline {
+		static ENTRIES = 3;
+		static VALUE1 = 1;
+		static VALUE2 = 2;
+
+		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
+		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
+		constructor (frameCount: number, bezierCount: number, propertyIds: string[]) {
+			super(frameCount, bezierCount, propertyIds);
+		}
+
+		getFrameEntries () {
+			return CurveTimeline2.ENTRIES;
+		}
+
+		/** Sets the time and values for the specified frame.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+		 * @param time The frame time in seconds. */
+		setFrame (frame: number, time: number, value1: number, value2: number) {
+			frame *= CurveTimeline2.ENTRIES;
+			let frames = this.frames;
+			frames[frame] = time;
+			frames[frame + CurveTimeline2.VALUE1] = value1;
+			frames[frame + CurveTimeline2.VALUE2] = value2;
+		}
 	}
 
 	/** Changes a bone's local {@link Bone#rotation}. */
-	export class RotateTimeline extends CurveTimeline {
-		static ENTRIES = 2;
-		static PREV_TIME = -2; static PREV_ROTATION = -1;
-		static ROTATION = 1;
+	export class RotateTimeline extends CurveTimeline1 implements BoneTimeline {
+		boneIndex = 0;
 
-		/** The index of the bone in {@link Skeleton#bones} that will be changed. */
-		boneIndex: number;
-
-		/** The time in seconds and rotation in degrees for each key frame. */
-		frames: ArrayLike<number>; // time, degrees, ...
-
-		constructor (frameCount: number) {
-			super(frameCount);
-			this.frames = Utils.newFloatArray(frameCount << 1);
-		}
-
-		getPropertyId () {
-			return (TimelineType.rotate << 24) + this.boneIndex;
-		}
-
-		/** Sets the time and angle of the specified keyframe. */
-		setFrame (frameIndex: number, time: number, degrees: number) {
-			frameIndex <<= 1;
-			this.frames[frameIndex] = time;
-			this.frames[frameIndex + RotateTimeline.ROTATION] = degrees;
+		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
+			super(frameCount, bezierCount, [
+				Property.rotate + "|" + boneIndex
+			]);
+			this.boneIndex = boneIndex;
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
@@ -296,83 +357,42 @@ module spine {
 
 			let bone = skeleton.bones[this.boneIndex];
 			if (!bone.active) return;
+
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
 					bone.rotation = bone.data.rotation;
 					return;
 				case MixBlend.first:
-					let r = bone.data.rotation - bone.rotation;
-					bone.rotation += (r - (16384 - ((16384.499999999996 - r / 360) | 0)) * 360) * alpha;
+					bone.rotation += (bone.data.rotation - bone.rotation) * alpha;
 				}
 				return;
 			}
 
-			if (time >= frames[frames.length - RotateTimeline.ENTRIES]) { // Time is after last frame.
-				let r = frames[frames.length + RotateTimeline.PREV_ROTATION];
-				switch (blend) {
-				case MixBlend.setup:
-					bone.rotation = bone.data.rotation + r * alpha;
-					break;
-				case MixBlend.first:
-				case MixBlend.replace:
-					r += bone.data.rotation - bone.rotation;
-					r -= (16384 - ((16384.499999999996 - r / 360) | 0)) * 360; // Wrap within -180 and 180.
-				case MixBlend.add:
-					bone.rotation += r * alpha;
-				}
-				return;
-			}
-
-			// Interpolate between the previous frame and the current frame.
-			let frame = Animation.binarySearch(frames, time, RotateTimeline.ENTRIES);
-			let prevRotation = frames[frame + RotateTimeline.PREV_ROTATION];
-			let frameTime = frames[frame];
-			let percent = this.getCurvePercent((frame >> 1) - 1,
-				1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
-
-			let r = frames[frame + RotateTimeline.ROTATION] - prevRotation;
-			r = prevRotation + (r - (16384 - ((16384.499999999996 - r / 360) | 0)) * 360) * percent;
+			let r = this.getCurveValue(time);
 			switch (blend) {
 			case MixBlend.setup:
-				bone.rotation = bone.data.rotation + (r - (16384 - ((16384.499999999996 - r / 360) | 0)) * 360) * alpha;
+				bone.rotation = bone.data.rotation + r * alpha;
 				break;
 			case MixBlend.first:
 			case MixBlend.replace:
 				r += bone.data.rotation - bone.rotation;
 			case MixBlend.add:
-				bone.rotation += (r - (16384 - ((16384.499999999996 - r / 360) | 0)) * 360) * alpha;
+				bone.rotation += r * alpha;
 			}
 		}
 	}
 
 	/** Changes a bone's local {@link Bone#x} and {@link Bone#y}. */
-	export class TranslateTimeline extends CurveTimeline {
-		static ENTRIES = 3;
-		static PREV_TIME = -3; static PREV_X = -2; static PREV_Y = -1;
-		static X = 1; static Y = 2;
+	export class TranslateTimeline extends CurveTimeline2 implements BoneTimeline {
+		boneIndex = 0;
 
-		/** The index of the bone in {@link Skeleton#bones} that will be changed. */
-		boneIndex: number;
-
-		/** The time in seconds, x, and y values for each key frame. */
-		frames: ArrayLike<number>; // time, x, y, ...
-
-		constructor (frameCount: number) {
-			super(frameCount);
-			this.frames = Utils.newFloatArray(frameCount * TranslateTimeline.ENTRIES);
-		}
-
-		getPropertyId () {
-			return (TimelineType.translate << 24) + this.boneIndex;
-		}
-
-		/** Sets the time in seconds, x, and y values for the specified key frame. */
-		setFrame (frameIndex: number, time: number, x: number, y: number) {
-			frameIndex *= TranslateTimeline.ENTRIES;
-			this.frames[frameIndex] = time;
-			this.frames[frameIndex + TranslateTimeline.X] = x;
-			this.frames[frameIndex + TranslateTimeline.Y] = y;
+		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
+			super(frameCount, bezierCount, [
+				Property.translateX + "|" + boneIndex,
+				Property.translateY + "|" + boneIndex,
+			]);
+			this.boneIndex = boneIndex;
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
@@ -380,6 +400,7 @@ module spine {
 
 			let bone = skeleton.bones[this.boneIndex];
 			if (!bone.active) return;
+
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -394,21 +415,26 @@ module spine {
 			}
 
 			let x = 0, y = 0;
-			if (time >= frames[frames.length - TranslateTimeline.ENTRIES]) { // Time is after last frame.
-				x = frames[frames.length + TranslateTimeline.PREV_X];
-				y = frames[frames.length + TranslateTimeline.PREV_Y];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				let frame = Animation.binarySearch(frames, time, TranslateTimeline.ENTRIES);
-				x = frames[frame + TranslateTimeline.PREV_X];
-				y = frames[frame + TranslateTimeline.PREV_Y];
-				let frameTime = frames[frame];
-				let percent = this.getCurvePercent(frame / TranslateTimeline.ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + TranslateTimeline.PREV_TIME] - frameTime));
-
-				x += (frames[frame + TranslateTimeline.X] - x) * percent;
-				y += (frames[frame + TranslateTimeline.Y] - y) * percent;
+			let i = Animation.search2(frames, time, CurveTimeline2.ENTRIES);
+			let curveType = this.curves[i / CurveTimeline2.ENTRIES];
+			switch (curveType) {
+			case CurveTimeline.LINEAR:
+				let before = frames[i];
+				x = frames[i + CurveTimeline2.VALUE1];
+				y = frames[i + CurveTimeline2.VALUE2];
+				let t = (time - before) / (frames[i + CurveTimeline2.ENTRIES] - before);
+				x += (frames[i + CurveTimeline2.ENTRIES + CurveTimeline2.VALUE1] - x) * t;
+				y += (frames[i + CurveTimeline2.ENTRIES + CurveTimeline2.VALUE2] - y) * t;
+				break;
+			case CurveTimeline.STEPPED:
+				x = frames[i + CurveTimeline2.VALUE1];
+				y = frames[i + CurveTimeline2.VALUE2];
+				break;
+			default:
+				x = this.getBezierValue(time, i, CurveTimeline2.VALUE1, curveType - CurveTimeline.BEZIER);
+				y = this.getBezierValue(time, i, CurveTimeline2.VALUE2, curveType + CurveTimeline.BEZIER_SIZE - CurveTimeline.BEZIER);
 			}
+
 			switch (blend) {
 			case MixBlend.setup:
 				bone.x = bone.data.x + x * alpha;
@@ -427,13 +453,15 @@ module spine {
 	}
 
 	/** Changes a bone's local {@link Bone#scaleX)} and {@link Bone#scaleY}. */
-	export class ScaleTimeline extends TranslateTimeline {
-		constructor (frameCount: number) {
-			super(frameCount);
-		}
+	export class ScaleTimeline extends CurveTimeline2 implements BoneTimeline {
+		boneIndex = 0;
 
-		getPropertyId () {
-			return (TimelineType.scale << 24) + this.boneIndex;
+		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
+			super(frameCount, bezierCount, [
+				Property.scaleX + "|" + boneIndex,
+				Property.scaleY + "|" + boneIndex
+			]);
+			this.boneIndex = boneIndex;
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
@@ -441,6 +469,7 @@ module spine {
 
 			let bone = skeleton.bones[this.boneIndex];
 			if (!bone.active) return;
+
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -455,21 +484,28 @@ module spine {
 			}
 
 			let x = 0, y = 0;
-			if (time >= frames[frames.length - ScaleTimeline.ENTRIES]) { // Time is after last frame.
-				x = frames[frames.length + ScaleTimeline.PREV_X] * bone.data.scaleX;
-				y = frames[frames.length + ScaleTimeline.PREV_Y] * bone.data.scaleY;
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				let frame = Animation.binarySearch(frames, time, ScaleTimeline.ENTRIES);
-				x = frames[frame + ScaleTimeline.PREV_X];
-				y = frames[frame + ScaleTimeline.PREV_Y];
-				let frameTime = frames[frame];
-				let percent = this.getCurvePercent(frame / ScaleTimeline.ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + ScaleTimeline.PREV_TIME] - frameTime));
-
-				x = (x + (frames[frame + ScaleTimeline.X] - x) * percent) * bone.data.scaleX;
-				y = (y + (frames[frame + ScaleTimeline.Y] - y) * percent) * bone.data.scaleY;
+			let i = Animation.search2(frames, time, CurveTimeline2.ENTRIES);
+			let curveType = this.curves[i / CurveTimeline2.ENTRIES];
+			switch (curveType) {
+			case CurveTimeline.LINEAR:
+				let before = frames[i];
+				x = frames[i + CurveTimeline2.VALUE1];
+				y = frames[i + CurveTimeline2.VALUE2];
+				let t = (time - before) / (frames[i + CurveTimeline2.ENTRIES] - before);
+				x += (frames[i + CurveTimeline2.ENTRIES + CurveTimeline2.VALUE1] - x) * t;
+				y += (frames[i + CurveTimeline2.ENTRIES + CurveTimeline2.VALUE2] - y) * t;
+				break;
+			case CurveTimeline.STEPPED:
+				x = frames[i + CurveTimeline2.VALUE1];
+				y = frames[i + CurveTimeline2.VALUE2];
+				break;
+			default:
+				x = this.getBezierValue(time, i,CurveTimeline2.VALUE1, curveType - CurveTimeline2.BEZIER);
+				y = this.getBezierValue(time, i, CurveTimeline2.VALUE2, curveType + CurveTimeline2.BEZIER_SIZE - CurveTimeline2.BEZIER);
 			}
+			x *= bone.data.scaleX;
+			y *= bone.data.scaleY;
+
 			if (alpha == 1) {
 				if (blend == MixBlend.add) {
 					bone.scaleX += x - bone.data.scaleX;
@@ -528,13 +564,15 @@ module spine {
 	}
 
 	/** Changes a bone's local {@link Bone#shearX} and {@link Bone#shearY}. */
-	export class ShearTimeline extends TranslateTimeline {
-		constructor (frameCount: number) {
-			super(frameCount);
-		}
+	export class ShearTimeline extends CurveTimeline2 implements BoneTimeline {
+		boneIndex = 0;
 
-		getPropertyId () {
-			return (TimelineType.shear << 24) + this.boneIndex;
+		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
+			super(frameCount, bezierCount, [
+				Property.shearX + "|" + boneIndex,
+				Property.shearY + "|" + boneIndex
+			]);
+			this.boneIndex = boneIndex;
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
@@ -542,6 +580,7 @@ module spine {
 
 			let bone = skeleton.bones[this.boneIndex];
 			if (!bone.active) return;
+
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -556,21 +595,26 @@ module spine {
 			}
 
 			let x = 0, y = 0;
-			if (time >= frames[frames.length - ShearTimeline.ENTRIES]) { // Time is after last frame.
-				x = frames[frames.length + ShearTimeline.PREV_X];
-				y = frames[frames.length + ShearTimeline.PREV_Y];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				let frame = Animation.binarySearch(frames, time, ShearTimeline.ENTRIES);
-				x = frames[frame + ShearTimeline.PREV_X];
-				y = frames[frame + ShearTimeline.PREV_Y];
-				let frameTime = frames[frame];
-				let percent = this.getCurvePercent(frame / ShearTimeline.ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + ShearTimeline.PREV_TIME] - frameTime));
-
-				x = x + (frames[frame + ShearTimeline.X] - x) * percent;
-				y = y + (frames[frame + ShearTimeline.Y] - y) * percent;
+			let i = Animation.search2(frames, time, CurveTimeline2.ENTRIES);
+			let curveType = this.curves[i / CurveTimeline2.ENTRIES];
+			switch (curveType) {
+			case CurveTimeline2.LINEAR:
+				let before = frames[i];
+				x = frames[i + CurveTimeline2.VALUE1];
+				y = frames[i + CurveTimeline2.VALUE2];
+				let t = (time - before) / (frames[i + CurveTimeline2.ENTRIES] - before);
+				x += (frames[i + CurveTimeline2.ENTRIES + CurveTimeline2.VALUE1] - x) * t;
+				y += (frames[i + CurveTimeline2.ENTRIES + CurveTimeline2.VALUE2] - y) * t;
+				break;
+			case CurveTimeline2.STEPPED:
+				x = frames[i + CurveTimeline2.VALUE1];
+				y = frames[i + CurveTimeline2.VALUE2];
+				break;
+			default:
+				x = this.getBezierValue(time, i, CurveTimeline2.VALUE1, curveType - CurveTimeline2.BEZIER);
+				y = this.getBezierValue(time, i, CurveTimeline2.VALUE2, curveType + CurveTimeline2.BEZIER_SIZE - CurveTimeline2.BEZIER);
 			}
+
 			switch (blend) {
 			case MixBlend.setup:
 				bone.shearX = bone.data.shearX + x * alpha;
@@ -589,24 +633,22 @@ module spine {
 	}
 
 	/** Changes a slot's {@link Slot#color}. */
-	export class ColorTimeline extends CurveTimeline {
+	export class ColorTimeline extends CurveTimeline implements SlotTimeline {
 		static ENTRIES = 5;
-		static PREV_TIME = -5; static PREV_R = -4; static PREV_G = -3; static PREV_B = -2; static PREV_A = -1;
+
 		static R = 1; static G = 2; static B = 3; static A = 4;
 
-		/** The index of the slot in {@link Skeleton#slots} that will be changed. */
-		slotIndex: number;
+		slotIndex = 0;
 
-		/** The time in seconds, red, green, blue, and alpha values for each key frame. */
-		frames: ArrayLike<number>; // time, r, g, b, a, ...
-
-		constructor (frameCount: number) {
-			super(frameCount);
-			this.frames = Utils.newFloatArray(frameCount * ColorTimeline.ENTRIES);
+		constructor (frameCount: number, bezierCount: number, slotIndex: number) {
+			super(frameCount, bezierCount, [
+				Property.rgba + "|" + slotIndex
+			]);
+			this.slotIndex = slotIndex;
 		}
 
-		getPropertyId () {
-			return (TimelineType.color << 24) + this.slotIndex;
+		getFrameEntries () {
+			return ColorTimeline.ENTRIES;
 		}
 
 		/** Sets the time in seconds, red, green, blue, and alpha for the specified key frame. */
@@ -622,6 +664,7 @@ module spine {
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let slot = skeleton.slots[this.slotIndex];
 			if (!slot.bone.active) return;
+
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
@@ -637,27 +680,32 @@ module spine {
 			}
 
 			let r = 0, g = 0, b = 0, a = 0;
-			if (time >= frames[frames.length - ColorTimeline.ENTRIES]) { // Time is after last frame.
-				let i = frames.length;
-				r = frames[i + ColorTimeline.PREV_R];
-				g = frames[i + ColorTimeline.PREV_G];
-				b = frames[i + ColorTimeline.PREV_B];
-				a = frames[i + ColorTimeline.PREV_A];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				let frame = Animation.binarySearch(frames, time, ColorTimeline.ENTRIES);
-				r = frames[frame + ColorTimeline.PREV_R];
-				g = frames[frame + ColorTimeline.PREV_G];
-				b = frames[frame + ColorTimeline.PREV_B];
-				a = frames[frame + ColorTimeline.PREV_A];
-				let frameTime = frames[frame];
-				let percent = this.getCurvePercent(frame / ColorTimeline.ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + ColorTimeline.PREV_TIME] - frameTime));
-
-				r += (frames[frame + ColorTimeline.R] - r) * percent;
-				g += (frames[frame + ColorTimeline.G] - g) * percent;
-				b += (frames[frame + ColorTimeline.B] - b) * percent;
-				a += (frames[frame + ColorTimeline.A] - a) * percent;
+			let i = Animation.search2(frames, time, ColorTimeline.ENTRIES);
+			let curveType = this.curves[i / ColorTimeline.ENTRIES];
+			switch (curveType) {
+			case ColorTimeline.LINEAR:
+				let before = frames[i];
+				r = frames[i + ColorTimeline.R];
+				g = frames[i + ColorTimeline.G];
+				b = frames[i + ColorTimeline.B];
+				a = frames[i + ColorTimeline.A];
+				let t = (time - before) / (frames[i + ColorTimeline.ENTRIES] - before);
+				r += (frames[i + ColorTimeline.ENTRIES + ColorTimeline.R] - r) * t;
+				g += (frames[i + ColorTimeline.ENTRIES + ColorTimeline.G] - g) * t;
+				b += (frames[i + ColorTimeline.ENTRIES + ColorTimeline.B] - b) * t;
+				a += (frames[i + ColorTimeline.ENTRIES + ColorTimeline.A] - a) * t;
+				break;
+			case ColorTimeline.STEPPED:
+				r = frames[i + ColorTimeline.R];
+				g = frames[i + ColorTimeline.G];
+				b = frames[i + ColorTimeline.B];
+				a = frames[i + ColorTimeline.A];
+				break;
+			default:
+				r = this.getBezierValue(time, i, ColorTimeline.R, curveType - ColorTimeline.BEZIER);
+				g = this.getBezierValue(time, i, ColorTimeline.G, curveType + ColorTimeline.BEZIER_SIZE - ColorTimeline.BEZIER);
+				b = this.getBezierValue(time, i, ColorTimeline.B, curveType + ColorTimeline.BEZIER_SIZE * 2 - ColorTimeline.BEZIER);
+				a = this.getBezierValue(time, i, ColorTimeline.A, curveType + ColorTimeline.BEZIER_SIZE * 3 - ColorTimeline.BEZIER);
 			}
 			if (alpha == 1)
 				slot.color.set(r, g, b, a);
@@ -670,26 +718,23 @@ module spine {
 	}
 
 	/** Changes a slot's {@link Slot#color} and {@link Slot#darkColor} for two color tinting. */
-	export class TwoColorTimeline extends CurveTimeline {
+	export class TwoColorTimeline extends CurveTimeline implements SlotTimeline{
 		static ENTRIES = 8;
-		static PREV_TIME = -8; static PREV_R = -7; static PREV_G = -6; static PREV_B = -5; static PREV_A = -4;
-		static PREV_R2 = -3; static PREV_G2 = -2; static PREV_B2 = -1;
+
 		static R = 1; static G = 2; static B = 3; static A = 4; static R2 = 5; static G2 = 6; static B2 = 7;
 
-		/** The index of the slot in {@link Skeleton#slots()} that will be changed. The {@link Slot#darkColor()} must not be
-		 * null. */
-		slotIndex: number;
+		slotIndex = 0;
 
-		/** The time in seconds, red, green, blue, and alpha values of the color, red, green, blue of the dark color, for each key frame. */
-		frames: ArrayLike<number>; // time, r, g, b, a, r2, g2, b2, ...
-
-		constructor (frameCount: number) {
-			super(frameCount);
-			this.frames = Utils.newFloatArray(frameCount * TwoColorTimeline.ENTRIES);
+		constructor (frameCount: number, bezierCount: number, slotIndex: number) {
+			super(frameCount, bezierCount, [
+				Property.rgba + "|" + slotIndex,
+				Property.rgb2 + "|" + slotIndex
+			]);
+			this.slotIndex = slotIndex;
 		}
 
-		getPropertyId () {
-			return (TimelineType.twoColor << 24) + this.slotIndex;
+		getFrameEntries () {
+			return TwoColorTimeline.ENTRIES;
 		}
 
 		/** Sets the time in seconds, light, and dark colors for the specified key frame. */
@@ -708,6 +753,7 @@ module spine {
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let slot = skeleton.slots[this.slotIndex];
 			if (!slot.bone.active) return;
+
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
@@ -725,37 +771,46 @@ module spine {
 			}
 
 			let r = 0, g = 0, b = 0, a = 0, r2 = 0, g2 = 0, b2 = 0;
-			if (time >= frames[frames.length - TwoColorTimeline.ENTRIES]) { // Time is after last frame.
-				let i = frames.length;
-				r = frames[i + TwoColorTimeline.PREV_R];
-				g = frames[i + TwoColorTimeline.PREV_G];
-				b = frames[i + TwoColorTimeline.PREV_B];
-				a = frames[i + TwoColorTimeline.PREV_A];
-				r2 = frames[i + TwoColorTimeline.PREV_R2];
-				g2 = frames[i + TwoColorTimeline.PREV_G2];
-				b2 = frames[i + TwoColorTimeline.PREV_B2];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				let frame = Animation.binarySearch(frames, time, TwoColorTimeline.ENTRIES);
-				r = frames[frame + TwoColorTimeline.PREV_R];
-				g = frames[frame + TwoColorTimeline.PREV_G];
-				b = frames[frame + TwoColorTimeline.PREV_B];
-				a = frames[frame + TwoColorTimeline.PREV_A];
-				r2 = frames[frame + TwoColorTimeline.PREV_R2];
-				g2 = frames[frame + TwoColorTimeline.PREV_G2];
-				b2 = frames[frame + TwoColorTimeline.PREV_B2];
-				let frameTime = frames[frame];
-				let percent = this.getCurvePercent(frame / TwoColorTimeline.ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + TwoColorTimeline.PREV_TIME] - frameTime));
-
-				r += (frames[frame + TwoColorTimeline.R] - r) * percent;
-				g += (frames[frame + TwoColorTimeline.G] - g) * percent;
-				b += (frames[frame + TwoColorTimeline.B] - b) * percent;
-				a += (frames[frame + TwoColorTimeline.A] - a) * percent;
-				r2 += (frames[frame + TwoColorTimeline.R2] - r2) * percent;
-				g2 += (frames[frame + TwoColorTimeline.G2] - g2) * percent;
-				b2 += (frames[frame + TwoColorTimeline.B2] - b2) * percent;
+			let i = Animation.search2(frames, time, TwoColorTimeline.ENTRIES);
+			let curveType = this.curves[i >> 3];
+			switch (curveType) {
+			case TwoColorTimeline.LINEAR:
+				let before = frames[i];
+				r = frames[i + TwoColorTimeline.R];
+				g = frames[i + TwoColorTimeline.G];
+				b = frames[i + TwoColorTimeline.B];
+				a = frames[i + TwoColorTimeline.A];
+				r2 = frames[i + TwoColorTimeline.R2];
+				g2 = frames[i + TwoColorTimeline.G2];
+				b2 = frames[i + TwoColorTimeline.B2];
+				let t = (time - before) / (frames[i + TwoColorTimeline.ENTRIES] - before);
+				r += (frames[i + TwoColorTimeline.ENTRIES + TwoColorTimeline.R] - r) * t;
+				g += (frames[i + TwoColorTimeline.ENTRIES + TwoColorTimeline.G] - g) * t;
+				b += (frames[i + TwoColorTimeline.ENTRIES + TwoColorTimeline.B] - b) * t;
+				a += (frames[i + TwoColorTimeline.ENTRIES + TwoColorTimeline.A] - a) * t;
+				r2 += (frames[i + TwoColorTimeline.ENTRIES + TwoColorTimeline.R2] - r2) * t;
+				g2 += (frames[i + TwoColorTimeline.ENTRIES + TwoColorTimeline.G2] - g2) * t;
+				b2 += (frames[i + TwoColorTimeline.ENTRIES + TwoColorTimeline.B2] - b2) * t;
+				break;
+			case TwoColorTimeline.STEPPED:
+				r = frames[i + TwoColorTimeline.R];
+				g = frames[i + TwoColorTimeline.G];
+				b = frames[i + TwoColorTimeline.B];
+				a = frames[i + TwoColorTimeline.A];
+				r2 = frames[i + TwoColorTimeline.R2];
+				g2 = frames[i + TwoColorTimeline.G2];
+				b2 = frames[i + TwoColorTimeline.B2];
+				break;
+			default:
+				r = this.getBezierValue(time, i, TwoColorTimeline.R, curveType - TwoColorTimeline.BEZIER);
+				g = this.getBezierValue(time, i, TwoColorTimeline.G, curveType + TwoColorTimeline.BEZIER_SIZE - TwoColorTimeline.BEZIER);
+				b = this.getBezierValue(time, i, TwoColorTimeline.B, curveType + TwoColorTimeline.BEZIER_SIZE * 2 - TwoColorTimeline.BEZIER);
+				a = this.getBezierValue(time, i, TwoColorTimeline.A, curveType + TwoColorTimeline.BEZIER_SIZE * 3 - TwoColorTimeline.BEZIER);
+				r2 = this.getBezierValue(time, i, TwoColorTimeline.R2, curveType + TwoColorTimeline.BEZIER_SIZE * 4 - TwoColorTimeline.BEZIER);
+				g2 = this.getBezierValue(time, i, TwoColorTimeline.G2, curveType + TwoColorTimeline.BEZIER_SIZE * 5 - TwoColorTimeline.BEZIER);
+				b2 = this.getBezierValue(time, i, TwoColorTimeline.B2, curveType + TwoColorTimeline.BEZIER_SIZE * 6 - TwoColorTimeline.BEZIER);
 			}
+
 			if (alpha == 1) {
 				slot.color.set(r, g, b, a);
 				slot.darkColor.set(r2, g2, b2, 1);
@@ -772,23 +827,22 @@ module spine {
 	}
 
 	/** Changes a slot's {@link Slot#attachment}. */
-	export class AttachmentTimeline implements Timeline {
-		/** The index of the slot in {@link Skeleton#slots} that will be changed. */
-		slotIndex: number;
-
-		/** The time in seconds for each key frame. */
-		frames: ArrayLike<number> // time, ...
+	export class AttachmentTimeline extends Timeline implements SlotTimeline {
+		slotIndex = 0;
 
 		/** The attachment name for each key frame. May contain null values to clear the attachment. */
 		attachmentNames: Array<string>;
 
-		constructor (frameCount: number) {
-			this.frames = Utils.newFloatArray(frameCount);
+		constructor (frameCount: number, slotIndex: number) {
+			super(frameCount, [
+				Property.attachment + "|" + slotIndex
+			]);
+			this.slotIndex = slotIndex;
 			this.attachmentNames = new Array<string>(frameCount);
 		}
 
-		getPropertyId () {
-			return (TimelineType.attachment << 24) + this.slotIndex;
+		getFrameEntries () {
+			return 1;
 		}
 
 		/** The number of key frames for this timeline. */
@@ -805,6 +859,7 @@ module spine {
 		apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let slot = skeleton.slots[this.slotIndex];
 			if (!slot.bone.active) return;
+
 			if (direction == MixDirection.mixOut) {
 				if (blend == MixBlend.setup)
 					this.setAttachment(skeleton, slot, slot.data.attachmentName);
@@ -817,15 +872,7 @@ module spine {
 				return;
 			}
 
-			let frameIndex = 0;
-			if (time >= frames[frames.length - 1]) // Time is after last frame.
-				frameIndex = frames.length - 1;
-			else
-				frameIndex = Animation.binarySearch(frames, time, 1) - 1;
-
-			let attachmentName = this.attachmentNames[frameIndex];
-			skeleton.slots[this.slotIndex]
-				.setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
+			this.setAttachment(skeleton, slot, this.attachmentNames[Animation.search(frames, time)]);
 		}
 
 		setAttachment(skeleton: Skeleton, slot: Slot, attachmentName: string) {
@@ -836,35 +883,85 @@ module spine {
 	let zeros : ArrayLike<number> = null;
 
 	/** Changes a slot's {@link Slot#deform} to deform a {@link VertexAttachment}. */
-	export class DeformTimeline extends CurveTimeline {
-		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed. */
-		slotIndex: number;
+	export class DeformTimeline extends CurveTimeline implements SlotTimeline {
+		slotIndex = 0;
 
 		/** The attachment that will be deformed. */
 		attachment: VertexAttachment;
 
-		/** The time in seconds for each key frame. */
-		frames: ArrayLike<number>; // time, ...
-
 		/** The vertices for each key frame. */
-		frameVertices: Array<ArrayLike<number>>;
+		vertices: Array<ArrayLike<number>>;
 
-		constructor (frameCount: number) {
-			super(frameCount);
-			this.frames = Utils.newFloatArray(frameCount);
-			this.frameVertices = new Array<ArrayLike<number>>(frameCount);
+		constructor (frameCount: number, bezierCount: number, slotIndex: number, attachment: VertexAttachment) {
+			super(frameCount, bezierCount, [
+				Property.deform + "|" + slotIndex + "|" + attachment.id
+			]);
+			this.slotIndex = slotIndex;
+			this.attachment = attachment;
+			this.vertices = new Array<ArrayLike<number>>(frameCount);
 			if (zeros == null) zeros = Utils.newFloatArray(64);
 		}
 
-		getPropertyId () {
-			return (TimelineType.deform << 27) + + this.attachment.id + this.slotIndex;
+		getFrameEntries () {
+			return 1;
 		}
 
 		/** Sets the time in seconds and the vertices for the specified key frame.
 		 * @param vertices Vertex positions for an unweighted VertexAttachment, or deform offsets if it has weights. */
 		setFrame (frameIndex: number, time: number, vertices: ArrayLike<number>) {
 			this.frames[frameIndex] = time;
-			this.frameVertices[frameIndex] = vertices;
+			this.vertices[frameIndex] = vertices;
+		}
+
+		/** @param value1 Ignored (0 is used for a deform timeline).
+		 * @param value2 Ignored (1 is used for a deform timeline). */
+		setBezier (bezier: number, frame: number, value: number, time1: number, value1: number, cx1: number, cy1: number, cx2: number,
+			cy2: number, time2: number, value2: number) {
+			let curves = this.curves;
+			let i = this.getFrameCount() + bezier * DeformTimeline.BEZIER_SIZE;
+			if (value == 0) curves[frame] = DeformTimeline.BEZIER + i;
+			let tmpx = (time1 - cx1 * 2 + cx2) * 0.03, tmpy = cy2 * 0.03 - cy1 * 0.06;
+			let dddx = ((cx1 - cx2) * 3 - time1 + time2) * 0.006, dddy = (cy1 - cy2 + 0.33333333) * 0.018;
+			let ddx = tmpx * 2 + dddx, ddy = tmpy * 2 + dddy;
+			let dx = (cx1 - time1) * 0.3 + tmpx + dddx * 0.16666667, dy = cy1 * 0.3 + tmpy + dddy * 0.16666667;
+			let x = time1 + dx, y = dy;
+			for (let n = i + DeformTimeline.BEZIER_SIZE; i < n; i += 2) {
+				curves[i] = x;
+				curves[i + 1] = y;
+				dx += ddx;
+				dy += ddy;
+				ddx += dddx;
+				ddy += dddy;
+				x += dx;
+				y += dy;
+			}
+		}
+
+		getCurvePercent (time: number, frame: number) {
+			let curves = this.curves;
+			let frames = this.frames;
+			let i = curves[frame];
+			switch (i) {
+			case DeformTimeline.LINEAR:
+				let x = frames[frame];
+				return (time - x) / (frames[frame + this.getFrameEntries()] - x);
+			case DeformTimeline.STEPPED:
+				return 0;
+			}
+			i -= DeformTimeline.BEZIER;
+			if (curves[i] > time) {
+				let x = frames[frame];
+				return curves[i + 1] * (time - x) / (curves[i] - x);
+			}
+			let n = i + DeformTimeline.BEZIER_SIZE;
+			for (i += 2; i < n; i += 2) {
+				if (curves[i] >= time) {
+					let x = curves[i - 2], y = curves[i - 1];
+					return y + (time - x) / (curves[i] - x) * (curves[i + 1] - y);
+				}
+			}
+			let x = curves[n - 2], y = curves[n - 1];
+			return y + (1 - y) * (time - x) / (frames[frame + this.getFrameEntries()] - x);
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
@@ -876,8 +973,8 @@ module spine {
 			let deformArray: Array<number> = slot.deform;
 			if (deformArray.length == 0) blend = MixBlend.setup;
 
-			let frameVertices = this.frameVertices;
-			let vertexCount = frameVertices[0].length;
+			let vertices = this.vertices;
+			let vertexCount = vertices[0].length;
 
 			let frames = this.frames;
 			if (time < frames[0]) {
@@ -909,7 +1006,7 @@ module spine {
 
 			let deform: Array<number> = Utils.setArraySize(deformArray, vertexCount);
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
-				let lastVertices = frameVertices[frames.length - 1];
+				let lastVertices = vertices[frames.length - 1];
 				if (alpha == 1) {
 					if (blend == MixBlend.add) {
 						let vertexAttachment = slotAttachment as VertexAttachment;
@@ -969,11 +1066,10 @@ module spine {
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			let frame = Animation.binarySearch(frames, time);
-			let prevVertices = frameVertices[frame - 1];
-			let nextVertices = frameVertices[frame];
-			let frameTime = frames[frame];
-			let percent = this.getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
+			let frame = Animation.search(frames, time);
+			let percent = this.getCurvePercent(time, frame);
+			let prevVertices = vertices[frame];
+			let nextVertices = vertices[frame + 1];
 
 			if (alpha == 1) {
 				if (blend == MixBlend.add) {
@@ -1047,25 +1143,20 @@ module spine {
 	}
 
 	/** Fires an {@link Event} when specific animation times are reached. */
-	export class EventTimeline implements Timeline {
-		/** The time in seconds for each key frame. */
-		frames: ArrayLike<number>; // time, ...
+	export class EventTimeline extends Timeline {
+		static propertyIds = [ "" + Property.event ];
 
 		/** The event for each key frame. */
 		events: Array<Event>;
 
 		constructor (frameCount: number) {
-			this.frames = Utils.newFloatArray(frameCount);
+			super(frameCount, EventTimeline.propertyIds);
+
 			this.events = new Array<Event>(frameCount);
 		}
 
-		getPropertyId () {
-			return TimelineType.event << 24;
-		}
-
-		/** The number of key frames for this timeline. */
-		getFrameCount () {
-			return this.frames.length;
+		getFrameEntries () {
+			return 1;
 		}
 
 		/** Sets the time in seconds and the event for the specified key frame. */
@@ -1077,6 +1168,7 @@ module spine {
 		/** Fires events for frames > `lastTime` and <= `time`. */
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			if (firedEvents == null) return;
+
 			let frames = this.frames;
 			let frameCount = this.frames.length;
 
@@ -1087,42 +1179,36 @@ module spine {
 				return;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			let frame = 0;
+			let i = 0;
 			if (lastTime < frames[0])
-				frame = 0;
+				i = 0;
 			else {
-				frame = Animation.binarySearch(frames, lastTime);
-				let frameTime = frames[frame];
-				while (frame > 0) { // Fire multiple events with the same frame.
-					if (frames[frame - 1] != frameTime) break;
-					frame--;
+				i = Animation.search(frames, lastTime);
+				let frameTime = frames[i];
+				while (i > 0) { // Fire multiple events with the same frame.
+					if (frames[i - 1] != frameTime) break;
+					i--;
 				}
 			}
-			for (; frame < frameCount && time >= frames[frame]; frame++)
-				firedEvents.push(this.events[frame]);
+			for (; i < frameCount && time >= frames[i]; i++)
+				firedEvents.push(this.events[i]);
 		}
 	}
 
 	/** Changes a skeleton's {@link Skeleton#drawOrder}. */
-	export class DrawOrderTimeline implements Timeline {
-		/** The time in seconds for each key frame. */
-		frames: ArrayLike<number>; // time, ...
+	export class DrawOrderTimeline extends Timeline {
+		static propertyIds = [ "" + Property.drawOrder ];
 
 		/** The draw order for each key frame. See {@link #setFrame(int, float, int[])}. */
 		drawOrders: Array<Array<number>>;
 
 		constructor (frameCount: number) {
-			this.frames = Utils.newFloatArray(frameCount);
+			super(frameCount, DrawOrderTimeline.propertyIds);
 			this.drawOrders = new Array<Array<number>>(frameCount);
 		}
 
-		getPropertyId () {
-			return TimelineType.drawOrder << 24;
-		}
-
-		/** The number of key frames for this timeline. */
-		getFrameCount () {
-			return this.frames.length;
+		getFrameEntries () {
+			return 1;
 		}
 
 		/** Sets the time in seconds and the draw order for the specified key frame.
@@ -1147,13 +1233,7 @@ module spine {
 				return;
 			}
 
-			let frame = 0;
-			if (time >= frames[frames.length - 1]) // Time is after last frame.
-				frame = frames.length - 1;
-			else
-				frame = Animation.binarySearch(frames, time) - 1;
-
-			let drawOrderToSetupIndex = this.drawOrders[frame];
+			let drawOrderToSetupIndex = this.drawOrders[Animation.search(frames, time)];
 			if (drawOrderToSetupIndex == null)
 				Utils.arrayCopy(slots, 0, drawOrder, 0, slots.length);
 			else {
@@ -1167,39 +1247,39 @@ module spine {
 	 * {@link IkConstraint#bendDirection}, {@link IkConstraint#stretch}, and {@link IkConstraint#compress}. */
 	export class IkConstraintTimeline extends CurveTimeline {
 		static ENTRIES = 6;
-		static PREV_TIME = -6; static PREV_MIX = -5; static PREV_SOFTNESS = -4; static PREV_BEND_DIRECTION = -3; static PREV_COMPRESS = -2; static PREV_STRETCH = -1;
+
 		static MIX = 1; static SOFTNESS = 2; static BEND_DIRECTION = 3; static COMPRESS = 4; static STRETCH = 5;
 
 		/** The index of the IK constraint slot in {@link Skeleton#ikConstraints} that will be changed. */
 		ikConstraintIndex: number;
 
-		/** The time in seconds, mix, softness, bend direction, compress, and stretch for each key frame. */
-		frames: ArrayLike<number>; // time, mix, softness, bendDirection, compress, stretch, ...
-
-		constructor (frameCount: number) {
-			super(frameCount);
-			this.frames = Utils.newFloatArray(frameCount * IkConstraintTimeline.ENTRIES);
+		constructor (frameCount: number, bezierCount: number, ikConstraintIndex: number) {
+			super(frameCount, bezierCount, [
+				Property.ikConstraint + "|" + ikConstraintIndex
+			]);
+			this.ikConstraintIndex = ikConstraintIndex;
 		}
 
-		getPropertyId () {
-			return (TimelineType.ikConstraint << 24) + this.ikConstraintIndex;
+		getFrameEntries () {
+			return IkConstraintTimeline.ENTRIES;
 		}
 
 		/** Sets the time in seconds, mix, softness, bend direction, compress, and stretch for the specified key frame. */
-		setFrame (frameIndex: number, time: number, mix: number, softness: number, bendDirection: number, compress: boolean, stretch: boolean) {
-			frameIndex *= IkConstraintTimeline.ENTRIES;
-			this.frames[frameIndex] = time;
-			this.frames[frameIndex + IkConstraintTimeline.MIX] = mix;
-			this.frames[frameIndex + IkConstraintTimeline.SOFTNESS] = softness;
-			this.frames[frameIndex + IkConstraintTimeline.BEND_DIRECTION] = bendDirection;
-			this.frames[frameIndex + IkConstraintTimeline.COMPRESS] = compress ? 1 : 0;
-			this.frames[frameIndex + IkConstraintTimeline.STRETCH] = stretch ? 1 : 0;
+		setFrame (frame: number, time: number, mix: number, softness: number, bendDirection: number, compress: boolean, stretch: boolean) {
+			frame *= IkConstraintTimeline.ENTRIES;
+			this.frames[frame] = time;
+			this.frames[frame + IkConstraintTimeline.MIX] = mix;
+			this.frames[frame + IkConstraintTimeline.SOFTNESS] = softness;
+			this.frames[frame + IkConstraintTimeline.BEND_DIRECTION] = bendDirection;
+			this.frames[frame + IkConstraintTimeline.COMPRESS] = compress ? 1 : 0;
+			this.frames[frame + IkConstraintTimeline.STRETCH] = stretch ? 1 : 0;
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let frames = this.frames;
 			let constraint: IkConstraint = skeleton.ikConstraints[this.ikConstraintIndex];
 			if (!constraint.active) return;
+
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -1219,60 +1299,47 @@ module spine {
 				return;
 			}
 
-			if (time >= frames[frames.length - IkConstraintTimeline.ENTRIES]) { // Time is after last frame.
-				if (blend == MixBlend.setup) {
-					constraint.mix = constraint.data.mix + (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.data.mix) * alpha;
-					constraint.softness = constraint.data.softness
-						+ (frames[frames.length + IkConstraintTimeline.PREV_SOFTNESS] - constraint.data.softness) * alpha;
-					if (direction == MixDirection.mixOut) {
-						constraint.bendDirection = constraint.data.bendDirection;
-						constraint.compress = constraint.data.compress;
-						constraint.stretch = constraint.data.stretch;
-					} else {
-						constraint.bendDirection = frames[frames.length + IkConstraintTimeline.PREV_BEND_DIRECTION]
-						constraint.compress = frames[frames.length + IkConstraintTimeline.PREV_COMPRESS] != 0;
-						constraint.stretch = frames[frames.length + IkConstraintTimeline.PREV_STRETCH] != 0;
-					}
-				} else {
-					constraint.mix += (frames[frames.length + IkConstraintTimeline.PREV_MIX] - constraint.mix) * alpha;
-					constraint.softness += (frames[frames.length + IkConstraintTimeline.PREV_SOFTNESS] - constraint.softness) * alpha;
-					if (direction == MixDirection.mixIn) {
-						constraint.bendDirection = frames[frames.length + IkConstraintTimeline.PREV_BEND_DIRECTION];
-						constraint.compress = frames[frames.length + IkConstraintTimeline.PREV_COMPRESS] != 0;
-						constraint.stretch = frames[frames.length + IkConstraintTimeline.PREV_STRETCH] != 0;
-					}
-				}
-				return;
+			let mix = 0, softness = 0;
+			let i = Animation.search2(frames, time, IkConstraintTimeline.ENTRIES)
+			let curveType = this.curves[i / IkConstraintTimeline.ENTRIES];
+			switch (curveType) {
+			case IkConstraintTimeline.LINEAR:
+				let before = frames[i];
+				mix = frames[i + IkConstraintTimeline.MIX];
+				softness = frames[i + IkConstraintTimeline.SOFTNESS];
+				let t = (time - before) / (frames[i + IkConstraintTimeline.ENTRIES] - before);
+				mix += (frames[i + IkConstraintTimeline.ENTRIES + IkConstraintTimeline.MIX] - mix) * t;
+				softness += (frames[i + IkConstraintTimeline.ENTRIES + IkConstraintTimeline.SOFTNESS] - softness) * t;
+				break;
+			case IkConstraintTimeline.STEPPED:
+				mix = frames[i + IkConstraintTimeline.MIX];
+				softness = frames[i + IkConstraintTimeline.SOFTNESS];
+				break;
+			default:
+				mix = this.getBezierValue(time, i, IkConstraintTimeline.MIX, curveType - IkConstraintTimeline.BEZIER);
+				softness = this.getBezierValue(time, i, IkConstraintTimeline.SOFTNESS, curveType + IkConstraintTimeline.BEZIER_SIZE - IkConstraintTimeline.BEZIER);
 			}
 
-			// Interpolate between the previous frame and the current frame.
-			let frame = Animation.binarySearch(frames, time, IkConstraintTimeline.ENTRIES);
-			let mix = frames[frame + IkConstraintTimeline.PREV_MIX];
-			let softness = frames[frame + IkConstraintTimeline.PREV_SOFTNESS];
-			let frameTime = frames[frame];
-			let percent = this.getCurvePercent(frame / IkConstraintTimeline.ENTRIES - 1,
-				1 - (time - frameTime) / (frames[frame + IkConstraintTimeline.PREV_TIME] - frameTime));
-
 			if (blend == MixBlend.setup) {
-				constraint.mix = constraint.data.mix + (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.data.mix) * alpha;
-				constraint.softness = constraint.data.softness
-					+ (softness + (frames[frame + IkConstraintTimeline.SOFTNESS] - softness) * percent - constraint.data.softness) * alpha;
+				constraint.mix = constraint.data.mix + (mix - constraint.data.mix) * alpha;
+				constraint.softness = constraint.data.softness + (softness - constraint.data.softness) * alpha;
+
 				if (direction == MixDirection.mixOut) {
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 				} else {
-					constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
-					constraint.compress = frames[frame + IkConstraintTimeline.PREV_COMPRESS] != 0;
-					constraint.stretch = frames[frame + IkConstraintTimeline.PREV_STRETCH] != 0;
+					constraint.bendDirection = frames[i + IkConstraintTimeline.BEND_DIRECTION];
+					constraint.compress = frames[i + IkConstraintTimeline.COMPRESS] != 0;
+					constraint.stretch = frames[i + IkConstraintTimeline.STRETCH] != 0;
 				}
 			} else {
-				constraint.mix += (mix + (frames[frame + IkConstraintTimeline.MIX] - mix) * percent - constraint.mix) * alpha;
-				constraint.softness += (softness + (frames[frame + IkConstraintTimeline.SOFTNESS] - softness) * percent - constraint.softness) * alpha;
+				constraint.mix += (mix - constraint.mix) * alpha;
+				constraint.softness += (softness - constraint.softness) * alpha;
 				if (direction == MixDirection.mixIn) {
-					constraint.bendDirection = frames[frame + IkConstraintTimeline.PREV_BEND_DIRECTION];
-					constraint.compress = frames[frame + IkConstraintTimeline.PREV_COMPRESS] != 0;
-					constraint.stretch = frames[frame + IkConstraintTimeline.PREV_STRETCH] != 0;
+					constraint.bendDirection = frames[i + IkConstraintTimeline.BEND_DIRECTION];
+					constraint.compress = frames[i + IkConstraintTimeline.COMPRESS] != 0;
+					constraint.stretch = frames[i + IkConstraintTimeline.STRETCH] != 0;
 				}
 			}
 		}
@@ -1282,32 +1349,31 @@ module spine {
 	 * {@link TransformConstraint#scaleMix}, and {@link TransformConstraint#shearMix}. */
 	export class TransformConstraintTimeline extends CurveTimeline {
 		static ENTRIES = 5;
-		static PREV_TIME = -5; static PREV_ROTATE = -4; static PREV_TRANSLATE = -3; static PREV_SCALE = -2; static PREV_SHEAR = -1;
+
 		static ROTATE = 1; static TRANSLATE = 2; static SCALE = 3; static SHEAR = 4;
 
 		/** The index of the transform constraint slot in {@link Skeleton#transformConstraints} that will be changed. */
 		transformConstraintIndex: number;
 
-		/** The time in seconds, rotate mix, translate mix, scale mix, and shear mix for each key frame. */
-		frames: ArrayLike<number>; // time, rotate mix, translate mix, scale mix, shear mix, ...
-
-		constructor (frameCount: number) {
-			super(frameCount);
-			this.frames = Utils.newFloatArray(frameCount * TransformConstraintTimeline.ENTRIES);
+		constructor (frameCount: number, bezierCount: number, transformConstraintIndex: number) {
+			super(frameCount, bezierCount, [
+				Property.transformConstraint + "|" + transformConstraintIndex
+			]);
+			this.transformConstraintIndex = transformConstraintIndex;
 		}
 
-		getPropertyId () {
-			return (TimelineType.transformConstraint << 24) + this.transformConstraintIndex;
+		getFrameEntries () {
+			return TransformConstraintTimeline.ENTRIES;
 		}
 
 		/** The time in seconds, rotate mix, translate mix, scale mix, and shear mix for the specified key frame. */
-		setFrame (frameIndex: number, time: number, rotateMix: number, translateMix: number, scaleMix: number, shearMix: number) {
-			frameIndex *= TransformConstraintTimeline.ENTRIES;
-			this.frames[frameIndex] = time;
-			this.frames[frameIndex + TransformConstraintTimeline.ROTATE] = rotateMix;
-			this.frames[frameIndex + TransformConstraintTimeline.TRANSLATE] = translateMix;
-			this.frames[frameIndex + TransformConstraintTimeline.SCALE] = scaleMix;
-			this.frames[frameIndex + TransformConstraintTimeline.SHEAR] = shearMix;
+		setFrame (frame: number, time: number, rotateMix: number, translateMix: number, scaleMix: number, shearMix: number) {
+			frame *= TransformConstraintTimeline.ENTRIES;
+			this.frames[frame] = time;
+			this.frames[frame + TransformConstraintTimeline.ROTATE] = rotateMix;
+			this.frames[frame + TransformConstraintTimeline.TRANSLATE] = translateMix;
+			this.frames[frame + TransformConstraintTimeline.SCALE] = scaleMix;
+			this.frames[frame + TransformConstraintTimeline.SHEAR] = shearMix;
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
@@ -1315,6 +1381,7 @@ module spine {
 
 			let constraint: TransformConstraint = skeleton.transformConstraints[this.transformConstraintIndex];
 			if (!constraint.active) return;
+
 			if (time < frames[0]) {
 				let data = constraint.data;
 				switch (blend) {
@@ -1334,28 +1401,34 @@ module spine {
 			}
 
 			let rotate = 0, translate = 0, scale = 0, shear = 0;
-			if (time >= frames[frames.length - TransformConstraintTimeline.ENTRIES]) { // Time is after last frame.
-				let i = frames.length;
-				rotate = frames[i + TransformConstraintTimeline.PREV_ROTATE];
-				translate = frames[i + TransformConstraintTimeline.PREV_TRANSLATE];
-				scale = frames[i + TransformConstraintTimeline.PREV_SCALE];
-				shear = frames[i + TransformConstraintTimeline.PREV_SHEAR];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				let frame = Animation.binarySearch(frames, time, TransformConstraintTimeline.ENTRIES);
-				rotate = frames[frame + TransformConstraintTimeline.PREV_ROTATE];
-				translate = frames[frame + TransformConstraintTimeline.PREV_TRANSLATE];
-				scale = frames[frame + TransformConstraintTimeline.PREV_SCALE];
-				shear = frames[frame + TransformConstraintTimeline.PREV_SHEAR];
-				let frameTime = frames[frame];
-				let percent = this.getCurvePercent(frame / TransformConstraintTimeline.ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + TransformConstraintTimeline.PREV_TIME] - frameTime));
-
-				rotate += (frames[frame + TransformConstraintTimeline.ROTATE] - rotate) * percent;
-				translate += (frames[frame + TransformConstraintTimeline.TRANSLATE] - translate) * percent;
-				scale += (frames[frame + TransformConstraintTimeline.SCALE] - scale) * percent;
-				shear += (frames[frame + TransformConstraintTimeline.SHEAR] - shear) * percent;
+			let i = Animation.search2(frames, time, TransformConstraintTimeline.ENTRIES);
+			let curveType = this.curves[i / TransformConstraintTimeline.ENTRIES];
+			switch (curveType) {
+			case TransformConstraintTimeline.LINEAR:
+				let before = frames[i];
+				rotate = frames[i + TransformConstraintTimeline.ROTATE];
+				translate = frames[i + TransformConstraintTimeline.TRANSLATE];
+				scale = frames[i + TransformConstraintTimeline.SCALE];
+				shear = frames[i + TransformConstraintTimeline.SHEAR];
+				let t = (time - before) / (frames[i + TransformConstraintTimeline.ENTRIES] - before);
+				rotate += (frames[i + TransformConstraintTimeline.ENTRIES + TransformConstraintTimeline.ROTATE] - rotate) * t;
+				translate += (frames[i + TransformConstraintTimeline.ENTRIES + TransformConstraintTimeline.TRANSLATE] - translate) * t;
+				scale += (frames[i + TransformConstraintTimeline.ENTRIES + TransformConstraintTimeline.SCALE] - scale) * t;
+				shear += (frames[i + TransformConstraintTimeline.ENTRIES + TransformConstraintTimeline.SHEAR] - shear) * t;
+				break;
+			case TransformConstraintTimeline.STEPPED:
+				rotate = frames[i + TransformConstraintTimeline.ROTATE];
+				translate = frames[i + TransformConstraintTimeline.TRANSLATE];
+				scale = frames[i + TransformConstraintTimeline.SCALE];
+				shear = frames[i + TransformConstraintTimeline.SHEAR];
+				break;
+			default:
+				rotate = this.getBezierValue(time, i, TransformConstraintTimeline.ROTATE, curveType - TransformConstraintTimeline.BEZIER);
+				translate = this.getBezierValue(time, i, TransformConstraintTimeline.TRANSLATE, curveType + TransformConstraintTimeline.BEZIER_SIZE - TransformConstraintTimeline.BEZIER);
+				scale = this.getBezierValue(time, i, TransformConstraintTimeline.TRANSLATE, curveType + TransformConstraintTimeline.BEZIER_SIZE * 2 - TransformConstraintTimeline.BEZIER);
+				shear = this.getBezierValue(time, i, TransformConstraintTimeline.TRANSLATE, curveType + TransformConstraintTimeline.BEZIER_SIZE * 3 - TransformConstraintTimeline.BEZIER);
 			}
+
 			if (blend == MixBlend.setup) {
 				let data = constraint.data;
 				constraint.rotateMix = data.rotateMix + (rotate - data.rotateMix) * alpha;
@@ -1372,24 +1445,16 @@ module spine {
 	}
 
 	/** Changes a path constraint's {@link PathConstraint#position}. */
-	export class PathConstraintPositionTimeline extends CurveTimeline {
-		static ENTRIES = 2;
-		static PREV_TIME = -2; static PREV_VALUE = -1;
-		static VALUE = 1;
+	export class PathConstraintPositionTimeline extends CurveTimeline1 {
 
 		/** The index of the path constraint slot in {@link Skeleton#pathConstraints} that will be changed. */
 		pathConstraintIndex: number;
 
-		/** The time in seconds and path constraint position for each key frame. */
-		frames: ArrayLike<number>; // time, position, ...
-
-		constructor (frameCount: number) {
-			super(frameCount);
-			this.frames = Utils.newFloatArray(frameCount * PathConstraintPositionTimeline.ENTRIES);
-		}
-
-		getPropertyId () {
-			return (TimelineType.pathConstraintPosition << 24) + this.pathConstraintIndex;
+		constructor (frameCount: number, bezierCount: number, pathConstraintIndex: number) {
+			super(frameCount, bezierCount, [
+				Property.pathConstraintPosition + "|" + pathConstraintIndex
+			]);
+			this.pathConstraintIndex = pathConstraintIndex;
 		}
 
 		/** Sets the time in seconds and path constraint position for the specified key frame. */
@@ -1403,6 +1468,7 @@ module spine {
 			let frames = this.frames;
 			let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
 			if (!constraint.active) return;
+
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -1414,19 +1480,8 @@ module spine {
 				return;
 			}
 
-			let position = 0;
-			if (time >= frames[frames.length - PathConstraintPositionTimeline.ENTRIES]) // Time is after last frame.
-				position = frames[frames.length + PathConstraintPositionTimeline.PREV_VALUE];
-			else {
-				// Interpolate between the previous frame and the current frame.
-				let frame = Animation.binarySearch(frames, time, PathConstraintPositionTimeline.ENTRIES);
-				position = frames[frame + PathConstraintPositionTimeline.PREV_VALUE];
-				let frameTime = frames[frame];
-				let percent = this.getCurvePercent(frame / PathConstraintPositionTimeline.ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PathConstraintPositionTimeline.PREV_TIME] - frameTime));
+			let position = this.getCurveValue(time);
 
-				position += (frames[frame + PathConstraintPositionTimeline.VALUE] - position) * percent;
-			}
 			if (blend == MixBlend.setup)
 				constraint.position = constraint.data.position + (position - constraint.data.position) * alpha;
 			else
@@ -1435,19 +1490,22 @@ module spine {
 	}
 
 	/** Changes a path constraint's {@link PathConstraint#spacing}. */
-	export class PathConstraintSpacingTimeline extends PathConstraintPositionTimeline {
-		constructor (frameCount: number) {
-			super(frameCount);
-		}
+	export class PathConstraintSpacingTimeline extends CurveTimeline1 {
+		/** The index of the path constraint slot in {@link Skeleton#getPathConstraints()} that will be changed. */
+		pathConstraintIndex = 0;
 
-		getPropertyId () {
-			return (TimelineType.pathConstraintSpacing << 24) + this.pathConstraintIndex;
+		constructor (frameCount: number, bezierCount: number, pathConstraintIndex: number) {
+			super(frameCount, bezierCount, [
+				Property.pathConstraintSpacing + "|" + pathConstraintIndex
+			]);
+			this.pathConstraintIndex = pathConstraintIndex;
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let frames = this.frames;
 			let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
 			if (!constraint.active) return;
+
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -1459,19 +1517,7 @@ module spine {
 				return;
 			}
 
-			let spacing = 0;
-			if (time >= frames[frames.length - PathConstraintSpacingTimeline.ENTRIES]) // Time is after last frame.
-				spacing = frames[frames.length + PathConstraintSpacingTimeline.PREV_VALUE];
-			else {
-				// Interpolate between the previous frame and the current frame.
-				let frame = Animation.binarySearch(frames, time, PathConstraintSpacingTimeline.ENTRIES);
-				spacing = frames[frame + PathConstraintSpacingTimeline.PREV_VALUE];
-				let frameTime = frames[frame];
-				let percent = this.getCurvePercent(frame / PathConstraintSpacingTimeline.ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PathConstraintSpacingTimeline.PREV_TIME] - frameTime));
-
-				spacing += (frames[frame + PathConstraintSpacingTimeline.VALUE] - spacing) * percent;
-			}
+			let spacing = this.getCurveValue(time);
 
 			if (blend == MixBlend.setup)
 				constraint.spacing = constraint.data.spacing + (spacing - constraint.data.spacing) * alpha;
@@ -1482,38 +1528,22 @@ module spine {
 
 	/** Changes a transform constraint's {@link PathConstraint#rotateMix} and
 	 * {@link TransformConstraint#translateMix}. */
-	export class PathConstraintMixTimeline extends CurveTimeline {
-		static ENTRIES = 3;
-		static PREV_TIME = -3; static PREV_ROTATE = -2; static PREV_TRANSLATE = -1;
-		static ROTATE = 1; static TRANSLATE = 2;
-
+	export class PathConstraintMixTimeline extends CurveTimeline2 {
 		/** The index of the path constraint slot in {@link Skeleton#getPathConstraints()} that will be changed. */
-		pathConstraintIndex: number;
+		pathConstraintIndex = 0;
 
-		/** The time in seconds, rotate mix, and translate mix for each key frame. */
-		frames: ArrayLike<number>; // time, rotate mix, translate mix, ...
-
-		constructor (frameCount: number) {
-			super(frameCount);
-			this.frames = Utils.newFloatArray(frameCount * PathConstraintMixTimeline.ENTRIES);
-		}
-
-		getPropertyId () {
-			return (TimelineType.pathConstraintMix << 24) + this.pathConstraintIndex;
-		}
-
-		/** The time in seconds, rotate mix, and translate mix for the specified key frame. */
-		setFrame (frameIndex: number, time: number, rotateMix: number, translateMix: number) {
-			frameIndex *= PathConstraintMixTimeline.ENTRIES;
-			this.frames[frameIndex] = time;
-			this.frames[frameIndex + PathConstraintMixTimeline.ROTATE] = rotateMix;
-			this.frames[frameIndex + PathConstraintMixTimeline.TRANSLATE] = translateMix;
+		constructor (frameCount: number, bezierCount: number, pathConstraintIndex: number) {
+			super(frameCount, bezierCount, [
+				Property.pathConstraintMix + "|" + pathConstraintIndex
+			]);
+			this.pathConstraintIndex = pathConstraintIndex;
 		}
 
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 			let frames = this.frames;
 			let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
 			if (!constraint.active) return;
+
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -1528,20 +1558,24 @@ module spine {
 			}
 
 			let rotate = 0, translate = 0;
-			if (time >= frames[frames.length - PathConstraintMixTimeline.ENTRIES]) { // Time is after last frame.
-				rotate = frames[frames.length + PathConstraintMixTimeline.PREV_ROTATE];
-				translate = frames[frames.length + PathConstraintMixTimeline.PREV_TRANSLATE];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				let frame = Animation.binarySearch(frames, time, PathConstraintMixTimeline.ENTRIES);
-				rotate = frames[frame + PathConstraintMixTimeline.PREV_ROTATE];
-				translate = frames[frame + PathConstraintMixTimeline.PREV_TRANSLATE];
-				let frameTime = frames[frame];
-				let percent = this.getCurvePercent(frame / PathConstraintMixTimeline.ENTRIES - 1,
-					1 - (time - frameTime) / (frames[frame + PathConstraintMixTimeline.PREV_TIME] - frameTime));
-
-				rotate += (frames[frame + PathConstraintMixTimeline.ROTATE] - rotate) * percent;
-				translate += (frames[frame + PathConstraintMixTimeline.TRANSLATE] - translate) * percent;
+			let i = Animation.search2(frames, time, PathConstraintMixTimeline.ENTRIES);
+			let curveType = this.curves[i / PathConstraintMixTimeline.ENTRIES];
+			switch (curveType) {
+			case PathConstraintMixTimeline.LINEAR:
+				let before = frames[i];
+				rotate = frames[i + PathConstraintMixTimeline.VALUE1];
+				translate = frames[i + PathConstraintMixTimeline.VALUE2];
+				let t = (time - before) / (frames[i + PathConstraintMixTimeline.ENTRIES] - before);
+				rotate += (frames[i + PathConstraintMixTimeline.ENTRIES + PathConstraintMixTimeline.VALUE1] - rotate) * t;
+				translate += (frames[i + PathConstraintMixTimeline.ENTRIES + PathConstraintMixTimeline.VALUE2] - translate) * t;
+				break;
+			case PathConstraintMixTimeline.STEPPED:
+				rotate = frames[i + PathConstraintMixTimeline.VALUE1];
+				translate = frames[i + PathConstraintMixTimeline.VALUE2];
+				break;
+			default:
+				rotate = this.getBezierValue(time, i, PathConstraintMixTimeline.VALUE1, curveType - PathConstraintMixTimeline.BEZIER);
+				translate = this.getBezierValue(time, i, PathConstraintMixTimeline.VALUE2, curveType + PathConstraintMixTimeline.BEZIER_SIZE - PathConstraintMixTimeline.BEZIER);
 			}
 
 			if (blend == MixBlend.setup) {

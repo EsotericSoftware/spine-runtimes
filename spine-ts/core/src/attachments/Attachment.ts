@@ -46,7 +46,7 @@ module spine {
 		private static nextID = 0;
 
 		/** The unique ID for this attachment. */
-		id = (VertexAttachment.nextID++ & 65535) << 11;
+		id = VertexAttachment.nextID++;
 
 		/** The bones which affect the {@link #getVertices()}. The array entries are, for each vertex, the number of bones affecting
 		 * the vertex followed by that many bone indices, which is the index of the bone in {@link Skeleton#bones}. Will be null

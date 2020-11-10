@@ -54,6 +54,36 @@ module spine {
 		}
 	}
 
+	export class StringSet {
+		entries: Map<boolean> = {};
+		size = 0;
+
+		add (value: string): boolean {
+			let contains = this.entries[value];
+			this.entries[value] = true;
+			if (!contains) this.size++;
+			return contains != true;
+		}
+
+		addAll (values: string[]): boolean {
+			let oldSize = this.size;
+			for (var i = 0, n = values.length; i < n; i++) {
+				this.add(values[i]);
+			}
+			return oldSize != this.size;
+		}
+
+		contains (value: string) {
+			let contains = this.entries[value];
+			return contains == true;
+		}
+
+		clear () {
+			this.entries = {};
+			this.size = 0;
+		}
+	}
+
 	export interface Disposable {
 		dispose (): void;
 	}

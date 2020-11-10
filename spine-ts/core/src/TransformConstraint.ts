@@ -77,12 +77,9 @@ module spine {
 			return this.active;
 		}
 
-		/** Applies the constraint to the constrained bones. */
-		apply () {
-			this.update();
-		}
-
 		update () {
+			if (this.rotateMix == 0 && this.translateMix == 0 && this.scaleMix == 0 && this.shearMix == 0) return;
+
 			if (this.data.local) {
 				if (this.data.relative)
 					this.applyRelativeLocal();
@@ -107,7 +104,6 @@ module spine {
 			let bones = this.bones;
 			for (let i = 0, n = bones.length; i < n; i++) {
 				let bone = bones[i];
-				let modified = false;
 
 				if (rotateMix != 0) {
 					let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
@@ -122,7 +118,6 @@ module spine {
 					bone.b = cos * b - sin * d;
 					bone.c = sin * a + cos * c;
 					bone.d = sin * b + cos * d;
-					modified = true;
 				}
 
 				if (translateMix != 0) {
@@ -130,7 +125,6 @@ module spine {
 					target.localToWorld(temp.set(this.data.offsetX, this.data.offsetY));
 					bone.worldX += (temp.x - bone.worldX) * translateMix;
 					bone.worldY += (temp.y - bone.worldY) * translateMix;
-					modified = true;
 				}
 
 				if (scaleMix > 0) {
@@ -144,7 +138,6 @@ module spine {
 					if (s > 0.00001) s = (s + (ts - s + this.data.offsetScaleY) * scaleMix) / s;
 					bone.b *= s;
 					bone.d *= s;
-					modified = true;
 				}
 
 				if (shearMix > 0) {
@@ -159,10 +152,9 @@ module spine {
 					let s = Math.sqrt(b * b + d * d);
 					bone.b = Math.cos(r) * s;
 					bone.d = Math.sin(r) * s;
-					modified = true;
 				}
 
-				if (modified) bone.appliedValid = false;
+				bone.appliedValid = false;
 			}
 		}
 
@@ -175,7 +167,6 @@ module spine {
 			let bones = this.bones;
 			for (let i = 0, n = bones.length; i < n; i++) {
 				let bone = bones[i];
-				let modified = false;
 
 				if (rotateMix != 0) {
 					let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
@@ -189,7 +180,6 @@ module spine {
 					bone.b = cos * b - sin * d;
 					bone.c = sin * a + cos * c;
 					bone.d = sin * b + cos * d;
-					modified = true;
 				}
 
 				if (translateMix != 0) {
@@ -197,7 +187,6 @@ module spine {
 					target.localToWorld(temp.set(this.data.offsetX, this.data.offsetY));
 					bone.worldX += temp.x * translateMix;
 					bone.worldY += temp.y * translateMix;
-					modified = true;
 				}
 
 				if (scaleMix > 0) {
@@ -207,7 +196,6 @@ module spine {
 					s = (Math.sqrt(tb * tb + td * td) - 1 + this.data.offsetScaleY) * scaleMix + 1;
 					bone.b *= s;
 					bone.d *= s;
-					modified = true;
 				}
 
 				if (shearMix > 0) {
@@ -220,10 +208,9 @@ module spine {
 					let s = Math.sqrt(b * b + d * d);
 					bone.b = Math.cos(r) * s;
 					bone.d = Math.sin(r) * s;
-					modified = true;
 				}
 
-				if (modified) bone.appliedValid = false;
+				bone.appliedValid = false;
 			}
 		}
 

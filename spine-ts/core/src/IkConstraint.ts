@@ -86,6 +86,7 @@ module spine {
 		}
 
 		update () {
+			if (this.mix == 0) return;
 			let target = this.target;
 			let bones = this.bones;
 			switch (bones.length) {
@@ -152,10 +153,6 @@ module spine {
 		/** Applies 2 bone IK. The target is specified in the world coordinate system.
 		 * @param child A direct descendant of the parent bone. */
 		apply2 (parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, softness: number, alpha: number) {
-			if (alpha == 0) {
-				child.updateWorldTransform();
-				return;
-			}
 			if (!parent.appliedValid) parent.updateAppliedTransform();
 			if (!child.appliedValid) child.updateAppliedTransform();
 			let px = parent.ax, py = parent.ay, psx = parent.ascaleX, sx = psx, psy = parent.ascaleY, csx = child.ascaleX;

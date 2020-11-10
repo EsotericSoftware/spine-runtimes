@@ -82,11 +82,6 @@ module spine {
 			return this.active;
 		}
 
-		/** Applies the constraint to the constrained bones. */
-		apply () {
-			this.update();
-		}
-
 		update () {
 			let attachment = this.target.getAttachment();
 			if (!(attachment instanceof PathAttachment)) return;

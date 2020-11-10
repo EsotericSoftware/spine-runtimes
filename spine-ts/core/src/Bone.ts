@@ -340,10 +340,10 @@ module spine {
 		/** Transforms a point from world coordinates to the bone's local coordinates. */
 		worldToLocal (world: Vector2) {
 			let a = this.a, b = this.b, c = this.c, d = this.d;
-			let invDet = 1 / (a * d - b * c);
+			let det = a * d - b * c;
 			let x = world.x - this.worldX, y = world.y - this.worldY;
-			world.x = (x * d * invDet - y * b * invDet);
-			world.y = (y * a * invDet - x * c * invDet);
+			world.x = (x * d - y * b) / det;
+			world.y = (y * a - x * c) / det;
 			return world;
 		}
 
