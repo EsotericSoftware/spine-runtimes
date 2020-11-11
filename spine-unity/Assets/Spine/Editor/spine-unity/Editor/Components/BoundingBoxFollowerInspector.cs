@@ -239,10 +239,10 @@ namespace Spine.Unity.Editor {
 			foreach (var skin in skeletonRenderer.Skeleton.Data.Skins) {
 				var attachments = skin.Attachments;
 				foreach (var entry in attachments) {
-					var boundingBoxAttachment = entry.Value as BoundingBoxAttachment;
+					var boundingBoxAttachment = entry.Attachment as BoundingBoxAttachment;
 					if (boundingBoxAttachment == null)
 						continue;
-					int slotIndex = entry.Key.SlotIndex;
+					int slotIndex = entry.SlotIndex;
 					var slot = skeletonRenderer.Skeleton.Slots.Items[slotIndex];
 					string slotName = slot.Data.Name;
 					GameObject go = AddBoundingBoxFollowerChild(skeletonRenderer,
