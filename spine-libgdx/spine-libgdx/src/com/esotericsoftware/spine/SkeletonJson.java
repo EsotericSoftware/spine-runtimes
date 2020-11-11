@@ -41,8 +41,8 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.SerializationException;
 
+import com.esotericsoftware.spine.Animation.AlphaTimeline;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
-import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline1;
 import com.esotericsoftware.spine.Animation.CurveTimeline2;
@@ -53,13 +53,22 @@ import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintMixTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintPositionTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintSpacingTimeline;
+import com.esotericsoftware.spine.Animation.RGB2Timeline;
+import com.esotericsoftware.spine.Animation.RGBA2Timeline;
+import com.esotericsoftware.spine.Animation.RGBATimeline;
+import com.esotericsoftware.spine.Animation.RGBTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
+import com.esotericsoftware.spine.Animation.ScaleXTimeline;
+import com.esotericsoftware.spine.Animation.ScaleYTimeline;
 import com.esotericsoftware.spine.Animation.ShearTimeline;
+import com.esotericsoftware.spine.Animation.ShearXTimeline;
+import com.esotericsoftware.spine.Animation.ShearYTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
-import com.esotericsoftware.spine.Animation.TwoColorTimeline;
+import com.esotericsoftware.spine.Animation.TranslateXTimeline;
+import com.esotericsoftware.spine.Animation.TranslateYTimeline;
 import com.esotericsoftware.spine.BoneData.TransformMode;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
@@ -435,7 +444,7 @@ public class SkeletonJson extends SkeletonLoader {
 			if (color != null) Color.valueOf(color, point.getColor());
 			return point;
 		}
-		case clipping: {
+		case clipping:
 			ClippingAttachment clip = attachmentLoader.newClippingAttachment(skin, name);
 			if (clip == null) return null;
 
@@ -451,7 +460,6 @@ public class SkeletonJson extends SkeletonLoader {
 			String color = map.getString("color", null);
 			if (color != null) Color.valueOf(color, clip.getColor());
 			return clip;
-		}
 		}
 		return null;
 	}
@@ -502,10 +510,10 @@ public class SkeletonJson extends SkeletonLoader {
 						timeline.setFrame(frame, keyMap.getFloat("time", 0), keyMap.getString("name"));
 					timelines.add(timeline);
 
-				} else if (timelineName.equals("color")) {
-					ColorTimeline timeline = new ColorTimeline(timelineMap.size, timelineMap.size << 2, slot.index);
+				} else if (timelineName.equals("rgba")) {
+					RGBATimeline timeline = new RGBATimeline(timelineMap.size, timelineMap.size << 2, slot.index);
 					float time = keyMap.getFloat("time", 0);
-					String color = keyMap.getString("color");
+					String color = keyMap.getString("rgba");
 					float r = Integer.parseInt(color.substring(0, 2), 16) / 255f;
 					float g = Integer.parseInt(color.substring(2, 4), 16) / 255f;
 					float b = Integer.parseInt(color.substring(4, 6), 16) / 255f;
@@ -518,7 +526,7 @@ public class SkeletonJson extends SkeletonLoader {
 							break;
 						}
 						float time2 = nextMap.getFloat("time", 0);
-						color = nextMap.getString("color");
+						color = nextMap.getString("rgba");
 						float nr = Integer.parseInt(color.substring(0, 2), 16) / 255f;
 						float ng = Integer.parseInt(color.substring(2, 4), 16) / 255f;
 						float nb = Integer.parseInt(color.substring(4, 6), 16) / 255f;
@@ -539,8 +547,44 @@ public class SkeletonJson extends SkeletonLoader {
 					}
 					timelines.add(timeline);
 
-				} else if (timelineName.equals("twoColor")) {
-					TwoColorTimeline timeline = new TwoColorTimeline(timelineMap.size, timelineMap.size * 7, slot.index);
+				} else if (timelineName.equals("rgb")) {
+					RGBTimeline timeline = new RGBTimeline(timelineMap.size, timelineMap.size * 3, slot.index);
+					float time = keyMap.getFloat("time", 0);
+					String color = keyMap.getString("rgb");
+					float r = Integer.parseInt(color.substring(0, 2), 16) / 255f;
+					float g = Integer.parseInt(color.substring(2, 4), 16) / 255f;
+					float b = Integer.parseInt(color.substring(4, 6), 16) / 255f;
+					for (int frame = 0, bezier = 0;; frame++) {
+						timeline.setFrame(frame, time, r, g, b);
+						JsonValue nextMap = keyMap.next;
+						if (nextMap == null) {
+							timeline.shrink(bezier);
+							break;
+						}
+						float time2 = nextMap.getFloat("time", 0);
+						color = nextMap.getString("rgb");
+						float nr = Integer.parseInt(color.substring(0, 2), 16) / 255f;
+						float ng = Integer.parseInt(color.substring(2, 4), 16) / 255f;
+						float nb = Integer.parseInt(color.substring(4, 6), 16) / 255f;
+						JsonValue curve = keyMap.get("curve");
+						if (curve != null) {
+							bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb, 1);
+						}
+						time = time2;
+						r = nr;
+						g = ng;
+						b = nb;
+						keyMap = nextMap;
+					}
+					timelines.add(timeline);
+
+				} else if (timelineName.equals("alpha")) {
+					timelines.add(readTimeline(keyMap, new AlphaTimeline(timelineMap.size, timelineMap.size, slot.index), 0, 1));
+
+				} else if (timelineName.equals("rgba2")) {
+					RGBA2Timeline timeline = new RGBA2Timeline(timelineMap.size, timelineMap.size * 7, slot.index);
 					float time = keyMap.getFloat("time", 0);
 					String color = keyMap.getString("light");
 					float r = Integer.parseInt(color.substring(0, 2), 16) / 255f;
@@ -590,6 +634,53 @@ public class SkeletonJson extends SkeletonLoader {
 					}
 					timelines.add(timeline);
 
+				} else if (timelineName.equals("rgb2")) {
+					RGB2Timeline timeline = new RGB2Timeline(timelineMap.size, timelineMap.size * 6, slot.index);
+					float time = keyMap.getFloat("time", 0);
+					String color = keyMap.getString("light");
+					float r = Integer.parseInt(color.substring(0, 2), 16) / 255f;
+					float g = Integer.parseInt(color.substring(2, 4), 16) / 255f;
+					float b = Integer.parseInt(color.substring(4, 6), 16) / 255f;
+					color = keyMap.getString("dark");
+					float r2 = Integer.parseInt(color.substring(0, 2), 16) / 255f;
+					float g2 = Integer.parseInt(color.substring(2, 4), 16) / 255f;
+					float b2 = Integer.parseInt(color.substring(4, 6), 16) / 255f;
+					for (int frame = 0, bezier = 0;; frame++) {
+						timeline.setFrame(frame, time, r, g, b, r2, g2, b2);
+						JsonValue nextMap = keyMap.next;
+						if (nextMap == null) {
+							timeline.shrink(bezier);
+							break;
+						}
+						float time2 = nextMap.getFloat("time", 0);
+						color = nextMap.getString("light");
+						float nr = Integer.parseInt(color.substring(0, 2), 16) / 255f;
+						float ng = Integer.parseInt(color.substring(2, 4), 16) / 255f;
+						float nb = Integer.parseInt(color.substring(4, 6), 16) / 255f;
+						color = nextMap.getString("dark");
+						float nr2 = Integer.parseInt(color.substring(0, 2), 16) / 255f;
+						float ng2 = Integer.parseInt(color.substring(2, 4), 16) / 255f;
+						float nb2 = Integer.parseInt(color.substring(4, 6), 16) / 255f;
+						JsonValue curve = keyMap.get("curve");
+						if (curve != null) {
+							bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, r2, nr2, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, g2, ng2, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 6, time, time2, b2, nb2, 1);
+						}
+						time = time2;
+						r = nr;
+						g = ng;
+						b = nb;
+						r2 = nr2;
+						g2 = ng2;
+						b2 = nb2;
+						keyMap = nextMap;
+					}
+					timelines.add(timeline);
+
 				} else
 					throw new RuntimeException("Invalid timeline type for a slot: " + timelineName + " (" + slotMap.name + ")");
 			}
@@ -609,13 +700,27 @@ public class SkeletonJson extends SkeletonLoader {
 				else if (timelineName.equals("translate")) {
 					TranslateTimeline timeline = new TranslateTimeline(timelineMap.size, timelineMap.size << 1, bone.index);
 					timelines.add(readTimeline(keyMap, timeline, "x", "y", 0, scale));
+				} else if (timelineName.equals("translatex")) {
+					timelines
+						.add(readTimeline(keyMap, new TranslateXTimeline(timelineMap.size, timelineMap.size, bone.index), 0, scale));
+				} else if (timelineName.equals("translatey")) {
+					timelines
+						.add(readTimeline(keyMap, new TranslateYTimeline(timelineMap.size, timelineMap.size, bone.index), 0, scale));
 				} else if (timelineName.equals("scale")) {
 					ScaleTimeline timeline = new ScaleTimeline(timelineMap.size, timelineMap.size << 1, bone.index);
 					timelines.add(readTimeline(keyMap, timeline, "x", "y", 1, 1));
-				} else if (timelineName.equals("shear")) {
+				} else if (timelineName.equals("scalex"))
+					timelines.add(readTimeline(keyMap, new ScaleXTimeline(timelineMap.size, timelineMap.size, bone.index), 1, 1));
+				else if (timelineName.equals("scaley"))
+					timelines.add(readTimeline(keyMap, new ScaleYTimeline(timelineMap.size, timelineMap.size, bone.index), 1, 1));
+				else if (timelineName.equals("shear")) {
 					ShearTimeline timeline = new ShearTimeline(timelineMap.size, timelineMap.size << 1, bone.index);
 					timelines.add(readTimeline(keyMap, timeline, "x", "y", 0, 1));
-				} else
+				} else if (timelineName.equals("shearx"))
+					timelines.add(readTimeline(keyMap, new ShearXTimeline(timelineMap.size, timelineMap.size, bone.index), 0, 1));
+				else if (timelineName.equals("sheary"))
+					timelines.add(readTimeline(keyMap, new ShearYTimeline(timelineMap.size, timelineMap.size, bone.index), 0, 1));
+				else
 					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneMap.name + ")");
 			}
 		}

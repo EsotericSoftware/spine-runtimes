@@ -42,8 +42,8 @@ import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.SerializationException;
 
+import com.esotericsoftware.spine.Animation.AlphaTimeline;
 import com.esotericsoftware.spine.Animation.AttachmentTimeline;
-import com.esotericsoftware.spine.Animation.ColorTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline;
 import com.esotericsoftware.spine.Animation.CurveTimeline1;
 import com.esotericsoftware.spine.Animation.CurveTimeline2;
@@ -54,13 +54,22 @@ import com.esotericsoftware.spine.Animation.IkConstraintTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintMixTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintPositionTimeline;
 import com.esotericsoftware.spine.Animation.PathConstraintSpacingTimeline;
+import com.esotericsoftware.spine.Animation.RGB2Timeline;
+import com.esotericsoftware.spine.Animation.RGBA2Timeline;
+import com.esotericsoftware.spine.Animation.RGBATimeline;
+import com.esotericsoftware.spine.Animation.RGBTimeline;
 import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
+import com.esotericsoftware.spine.Animation.ScaleXTimeline;
+import com.esotericsoftware.spine.Animation.ScaleYTimeline;
 import com.esotericsoftware.spine.Animation.ShearTimeline;
+import com.esotericsoftware.spine.Animation.ShearXTimeline;
+import com.esotericsoftware.spine.Animation.ShearYTimeline;
 import com.esotericsoftware.spine.Animation.Timeline;
 import com.esotericsoftware.spine.Animation.TransformConstraintTimeline;
 import com.esotericsoftware.spine.Animation.TranslateTimeline;
-import com.esotericsoftware.spine.Animation.TwoColorTimeline;
+import com.esotericsoftware.spine.Animation.TranslateXTimeline;
+import com.esotericsoftware.spine.Animation.TranslateYTimeline;
 import com.esotericsoftware.spine.BoneData.TransformMode;
 import com.esotericsoftware.spine.PathConstraintData.PositionMode;
 import com.esotericsoftware.spine.PathConstraintData.RotateMode;
@@ -85,12 +94,21 @@ import com.esotericsoftware.spine.attachments.VertexAttachment;
 public class SkeletonBinary extends SkeletonLoader {
 	static public final int BONE_ROTATE = 0;
 	static public final int BONE_TRANSLATE = 1;
-	static public final int BONE_SCALE = 2;
-	static public final int BONE_SHEAR = 3;
+	static public final int BONE_TRANSLATEX = 2;
+	static public final int BONE_TRANSLATEY = 3;
+	static public final int BONE_SCALE = 4;
+	static public final int BONE_SCALEX = 5;
+	static public final int BONE_SCALEY = 6;
+	static public final int BONE_SHEAR = 7;
+	static public final int BONE_SHEARX = 8;
+	static public final int BONE_SHEARY = 9;
 
 	static public final int SLOT_ATTACHMENT = 0;
-	static public final int SLOT_COLOR = 1;
-	static public final int SLOT_TWO_COLOR = 2;
+	static public final int SLOT_RGBA = 1;
+	static public final int SLOT_RGB = 2;
+	static public final int SLOT_ALPHA = 3;
+	static public final int SLOT_RGBA2 = 4;
+	static public final int SLOT_RGB2 = 5;
 
 	static public final int PATH_POSITION = 0;
 	static public final int PATH_SPACING = 1;
@@ -493,7 +511,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			if (nonessential) Color.rgba8888ToColor(point.getColor(), color);
 			return point;
 		}
-		case clipping: {
+		case clipping:
 			int endSlotIndex = input.readInt(true);
 			int vertexCount = input.readInt(true);
 			Vertices vertices = readVertices(input, vertexCount);
@@ -507,7 +525,6 @@ public class SkeletonBinary extends SkeletonLoader {
 			clip.setBones(vertices.bones);
 			if (nonessential) Color.rgba8888ToColor(clip.getColor(), color);
 			return clip;
-		}
 		}
 		return null;
 	}
@@ -574,8 +591,8 @@ public class SkeletonBinary extends SkeletonLoader {
 					timelines.add(timeline);
 					break;
 				}
-				case SLOT_COLOR: {
-					ColorTimeline timeline = new ColorTimeline(frameCount, input.readInt(true), slotIndex);
+				case SLOT_RGBA: {
+					RGBATimeline timeline = new RGBATimeline(frameCount, input.readInt(true), slotIndex);
 					float time = input.readFloat();
 					float r = input.read() / 255f, g = input.read() / 255f;
 					float b = input.read() / 255f, a = input.read() / 255f;
@@ -604,21 +621,48 @@ public class SkeletonBinary extends SkeletonLoader {
 					timelines.add(timeline);
 					break;
 				}
-				case SLOT_TWO_COLOR: {
-					TwoColorTimeline timeline = new TwoColorTimeline(frameCount, input.readInt(true), slotIndex);
+				case SLOT_ALPHA:
+					timelines.add(readTimeline(input, new AlphaTimeline(frameCount, input.readInt(true), input.readInt(true)), 1));
+					break;
+				case SLOT_RGB: {
+					RGBTimeline timeline = new RGBTimeline(frameCount, input.readInt(true), slotIndex);
+					float time = input.readFloat();
+					float r = input.read() / 255f, g = input.read() / 255f, b = input.read() / 255f;
+					for (int frame = 0, bezier = 0;; frame++) {
+						timeline.setFrame(frame, time, r, g, b);
+						if (frame == frameLast) break;
+						float time2 = input.readFloat();
+						float r2 = input.read() / 255f, g2 = input.read() / 255f, b2 = input.read() / 255f;
+						switch (input.readByte()) {
+						case CURVE_STEPPED:
+							timeline.setStepped(frame);
+							break;
+						case CURVE_BEZIER:
+							setBezier(input, timeline, bezier++, frame, 0, time, time2, r, r2, 1);
+							setBezier(input, timeline, bezier++, frame, 1, time, time2, g, g2, 1);
+							setBezier(input, timeline, bezier++, frame, 2, time, time2, b, b2, 1);
+						}
+						time = time2;
+						r = r2;
+						g = g2;
+						b = b2;
+					}
+					timelines.add(timeline);
+					break;
+				}
+				case SLOT_RGBA2: {
+					RGBA2Timeline timeline = new RGBA2Timeline(frameCount, input.readInt(true), slotIndex);
 					float time = input.readFloat();
 					float r = input.read() / 255f, g = input.read() / 255f;
 					float b = input.read() / 255f, a = input.read() / 255f;
-					float r2 = input.read() / 255f, g2 = input.read() / 255f;
-					float b2 = input.read() / 255f;
+					float r2 = input.read() / 255f, g2 = input.read() / 255f, b2 = input.read() / 255f;
 					for (int frame = 0, bezier = 0;; frame++) {
 						timeline.setFrame(frame, time, r, g, b, a, r2, g2, b2);
 						if (frame == frameLast) break;
 						float time2 = input.readFloat();
 						float nr = input.read() / 255f, ng = input.read() / 255f;
 						float nb = input.read() / 255f, na = input.read() / 255f;
-						float nr2 = input.read() / 255f, ng2 = input.read() / 255f;
-						float nb2 = input.read() / 255f;
+						float nr2 = input.read() / 255f, ng2 = input.read() / 255f, nb2 = input.read() / 255f;
 						switch (input.readByte()) {
 						case CURVE_STEPPED:
 							timeline.setStepped(frame);
@@ -644,6 +688,39 @@ public class SkeletonBinary extends SkeletonLoader {
 					timelines.add(timeline);
 					break;
 				}
+				case SLOT_RGB2:
+					RGB2Timeline timeline = new RGB2Timeline(frameCount, input.readInt(true), slotIndex);
+					float time = input.readFloat();
+					float r = input.read() / 255f, g = input.read() / 255f, b = input.read() / 255f;
+					float r2 = input.read() / 255f, g2 = input.read() / 255f, b2 = input.read() / 255f;
+					for (int frame = 0, bezier = 0;; frame++) {
+						timeline.setFrame(frame, time, r, g, b, r2, g2, b2);
+						if (frame == frameLast) break;
+						float time2 = input.readFloat();
+						float nr = input.read() / 255f, ng = input.read() / 255f, nb = input.read() / 255f;
+						float nr2 = input.read() / 255f, ng2 = input.read() / 255f, nb2 = input.read() / 255f;
+						switch (input.readByte()) {
+						case CURVE_STEPPED:
+							timeline.setStepped(frame);
+							break;
+						case CURVE_BEZIER:
+							setBezier(input, timeline, bezier++, frame, 0, time, time2, r, nr, 1);
+							setBezier(input, timeline, bezier++, frame, 1, time, time2, g, ng, 1);
+							setBezier(input, timeline, bezier++, frame, 2, time, time2, b, nb, 1);
+							setBezier(input, timeline, bezier++, frame, 4, time, time2, r2, nr2, 1);
+							setBezier(input, timeline, bezier++, frame, 5, time, time2, g2, ng2, 1);
+							setBezier(input, timeline, bezier++, frame, 6, time, time2, b2, nb2, 1);
+						}
+						time = time2;
+						r = nr;
+						g = ng;
+						b = nb;
+						r2 = nr2;
+						g2 = ng2;
+						b2 = nb2;
+					}
+					timelines.add(timeline);
+					break;
 				}
 			}
 		}
@@ -652,19 +729,37 @@ public class SkeletonBinary extends SkeletonLoader {
 		for (int i = 0, n = input.readInt(true); i < n; i++) {
 			int boneIndex = input.readInt(true);
 			for (int ii = 0, nn = input.readInt(true); ii < nn; ii++) {
-				switch (input.readByte()) {
+				int type = input.readByte(), frameCount = input.readInt(true), bezierCount = input.readInt(true);
+				switch (type) {
 				case BONE_ROTATE:
-					timelines.add(readTimeline(input, new RotateTimeline(input.readInt(true), input.readInt(true), boneIndex), 1));
+					timelines.add(readTimeline(input, new RotateTimeline(frameCount, bezierCount, boneIndex), 1));
 					break;
 				case BONE_TRANSLATE:
-					timelines
-						.add(readTimeline(input, new TranslateTimeline(input.readInt(true), input.readInt(true), boneIndex), scale));
+					timelines.add(readTimeline(input, new TranslateTimeline(frameCount, bezierCount, boneIndex), scale));
+					break;
+				case BONE_TRANSLATEX:
+					timelines.add(readTimeline(input, new TranslateXTimeline(frameCount, bezierCount, boneIndex), scale));
+					break;
+				case BONE_TRANSLATEY:
+					timelines.add(readTimeline(input, new TranslateYTimeline(frameCount, bezierCount, boneIndex), scale));
 					break;
 				case BONE_SCALE:
-					timelines.add(readTimeline(input, new ScaleTimeline(input.readInt(true), input.readInt(true), boneIndex), 1));
+					timelines.add(readTimeline(input, new ScaleTimeline(frameCount, bezierCount, boneIndex), 1));
+					break;
+				case BONE_SCALEX:
+					timelines.add(readTimeline(input, new ScaleXTimeline(frameCount, bezierCount, boneIndex), 1));
+					break;
+				case BONE_SCALEY:
+					timelines.add(readTimeline(input, new ScaleYTimeline(frameCount, bezierCount, boneIndex), 1));
 					break;
 				case BONE_SHEAR:
-					timelines.add(readTimeline(input, new ShearTimeline(input.readInt(true), input.readInt(true), boneIndex), 1));
+					timelines.add(readTimeline(input, new ShearTimeline(frameCount, bezierCount, boneIndex), 1));
+					break;
+				case BONE_SHEARX:
+					timelines.add(readTimeline(input, new ShearXTimeline(frameCount, bezierCount, boneIndex), 1));
+					break;
+				case BONE_SHEARY:
+					timelines.add(readTimeline(input, new ShearYTimeline(frameCount, bezierCount, boneIndex), 1));
 				}
 			}
 		}

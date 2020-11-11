@@ -187,9 +187,9 @@ public class Animation {
 		in, out
 	}
 
-	static enum Property {
+	static private enum Property {
 		rotate, translateX, translateY, scaleX, scaleY, shearX, shearY, //
-		rgba, rgb2, //
+		rgb, alpha, rgb2, //
 		attachment, deform, //
 		event, drawOrder, //
 		ikConstraint, transformConstraint, //
@@ -560,6 +560,98 @@ public class Animation {
 		}
 	}
 
+	/** Changes a bone's local {@link Bone#getX()}. */
+	static public class TranslateXTimeline extends CurveTimeline1 implements BoneTimeline {
+		final int boneIndex;
+
+		public TranslateXTimeline (int frameCount, int bezierCount, int boneIndex) {
+			super(frameCount, bezierCount, Property.translateX.ordinal() + "|" + boneIndex);
+			this.boneIndex = boneIndex;
+		}
+
+		public int getBoneIndex () {
+			return boneIndex;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction) {
+
+			Bone bone = skeleton.bones.get(boneIndex);
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+				case setup:
+					bone.x = bone.data.x;
+					return;
+				case first:
+					bone.x += (bone.data.x - bone.x) * alpha;
+				}
+				return;
+			}
+
+			float x = getCurveValue(time);
+			switch (blend) {
+			case setup:
+				bone.x = bone.data.x + x * alpha;
+				break;
+			case first:
+			case replace:
+				bone.x += (bone.data.x + x - bone.x) * alpha;
+				break;
+			case add:
+				bone.x += x * alpha;
+			}
+		}
+	}
+
+	/** Changes a bone's local {@link Bone#getY()}. */
+	static public class TranslateYTimeline extends CurveTimeline1 implements BoneTimeline {
+		final int boneIndex;
+
+		public TranslateYTimeline (int frameCount, int bezierCount, int boneIndex) {
+			super(frameCount, bezierCount, Property.translateY.ordinal() + "|" + boneIndex);
+			this.boneIndex = boneIndex;
+		}
+
+		public int getBoneIndex () {
+			return boneIndex;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction) {
+
+			Bone bone = skeleton.bones.get(boneIndex);
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+				case setup:
+					bone.y = bone.data.y;
+					return;
+				case first:
+					bone.y += (bone.data.y - bone.y) * alpha;
+				}
+				return;
+			}
+
+			float y = getCurveValue(time);
+			switch (blend) {
+			case setup:
+				bone.y = bone.data.y + y * alpha;
+				break;
+			case first:
+			case replace:
+				bone.y += (bone.data.y + y - bone.y) * alpha;
+				break;
+			case add:
+				bone.y += y * alpha;
+			}
+		}
+	}
+
 	/** Changes a bone's local {@link Bone#getScaleX()} and {@link Bone#getScaleY()}. */
 	static public class ScaleTimeline extends CurveTimeline2 implements BoneTimeline {
 		final int boneIndex;
@@ -675,6 +767,156 @@ public class Animation {
 		}
 	}
 
+	/** Changes a bone's local {@link Bone#getScaleX()}. */
+	static public class ScaleXTimeline extends CurveTimeline1 implements BoneTimeline {
+		final int boneIndex;
+
+		public ScaleXTimeline (int frameCount, int bezierCount, int boneIndex) {
+			super(frameCount, bezierCount, Property.scaleX.ordinal() + "|" + boneIndex);
+			this.boneIndex = boneIndex;
+		}
+
+		public int getBoneIndex () {
+			return boneIndex;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction) {
+
+			Bone bone = skeleton.bones.get(boneIndex);
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+				case setup:
+					bone.scaleX = bone.data.scaleX;
+					return;
+				case first:
+					bone.scaleX += (bone.data.scaleX - bone.scaleX) * alpha;
+				}
+				return;
+			}
+
+			float x = getCurveValue(time) * bone.data.scaleX;
+			if (alpha == 1) {
+				if (blend == add)
+					bone.scaleX += x - bone.data.scaleX;
+				else
+					bone.scaleX = x;
+			} else {
+				// Mixing out uses sign of setup or current pose, else use sign of key.
+				float bx;
+				if (direction == out) {
+					switch (blend) {
+					case setup:
+						bx = bone.data.scaleX;
+						bone.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bx) * alpha;
+						break;
+					case first:
+					case replace:
+						bx = bone.scaleX;
+						bone.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bx) * alpha;
+						break;
+					case add:
+						bx = bone.scaleX;
+						bone.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bone.data.scaleX) * alpha;
+					}
+				} else {
+					switch (blend) {
+					case setup:
+						bx = Math.abs(bone.data.scaleX) * Math.signum(x);
+						bone.scaleX = bx + (x - bx) * alpha;
+						break;
+					case first:
+					case replace:
+						bx = Math.abs(bone.scaleX) * Math.signum(x);
+						bone.scaleX = bx + (x - bx) * alpha;
+						break;
+					case add:
+						bx = Math.signum(x);
+						bone.scaleX = Math.abs(bone.scaleX) * bx + (x - Math.abs(bone.data.scaleX) * bx) * alpha;
+					}
+				}
+			}
+		}
+	}
+
+	/** Changes a bone's local {@link Bone#getScaleY()}. */
+	static public class ScaleYTimeline extends CurveTimeline1 implements BoneTimeline {
+		final int boneIndex;
+
+		public ScaleYTimeline (int frameCount, int bezierCount, int boneIndex) {
+			super(frameCount, bezierCount, Property.scaleY.ordinal() + "|" + boneIndex);
+			this.boneIndex = boneIndex;
+		}
+
+		public int getBoneIndex () {
+			return boneIndex;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction) {
+
+			Bone bone = skeleton.bones.get(boneIndex);
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+				case setup:
+					bone.scaleY = bone.data.scaleY;
+					return;
+				case first:
+					bone.scaleY += (bone.data.scaleY - bone.scaleY) * alpha;
+				}
+				return;
+			}
+
+			float y = getCurveValue(time) * bone.data.scaleY;
+			if (alpha == 1) {
+				if (blend == add)
+					bone.scaleY += y - bone.data.scaleY;
+				else
+					bone.scaleY = y;
+			} else {
+				// Mixing out uses sign of setup or current pose, else use sign of key.
+				float by;
+				if (direction == out) {
+					switch (blend) {
+					case setup:
+						by = bone.data.scaleY;
+						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
+						break;
+					case first:
+					case replace:
+						by = bone.scaleY;
+						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
+						break;
+					case add:
+						by = bone.scaleY;
+						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - bone.data.scaleY) * alpha;
+					}
+				} else {
+					switch (blend) {
+					case setup:
+						by = Math.abs(bone.data.scaleY) * Math.signum(y);
+						bone.scaleY = by + (y - by) * alpha;
+						break;
+					case first:
+					case replace:
+						by = Math.abs(bone.scaleY) * Math.signum(y);
+						bone.scaleY = by + (y - by) * alpha;
+						break;
+					case add:
+						by = Math.signum(y);
+						bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
+					}
+				}
+			}
+		}
+	}
+
 	/** Changes a bone's local {@link Bone#getShearX()} and {@link Bone#getShearY()}. */
 	static public class ShearTimeline extends CurveTimeline2 implements BoneTimeline {
 		final int boneIndex;
@@ -747,16 +989,109 @@ public class Animation {
 		}
 	}
 
+	/** Changes a bone's local {@link Bone#getShearX()}. */
+	static public class ShearXTimeline extends CurveTimeline1 implements BoneTimeline {
+		final int boneIndex;
+
+		public ShearXTimeline (int frameCount, int bezierCount, int boneIndex) {
+			super(frameCount, bezierCount, Property.shearX.ordinal() + "|" + boneIndex);
+			this.boneIndex = boneIndex;
+		}
+
+		public int getBoneIndex () {
+			return boneIndex;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction) {
+
+			Bone bone = skeleton.bones.get(boneIndex);
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+				case setup:
+					bone.shearX = bone.data.shearX;
+					return;
+				case first:
+					bone.shearX += (bone.data.shearX - bone.shearX) * alpha;
+				}
+				return;
+			}
+
+			float x = getCurveValue(time);
+			switch (blend) {
+			case setup:
+				bone.shearX = bone.data.shearX + x * alpha;
+				break;
+			case first:
+			case replace:
+				bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
+				break;
+			case add:
+				bone.shearX += x * alpha;
+			}
+		}
+	}
+
+	/** Changes a bone's local {@link Bone#getShearY()}. */
+	static public class ShearYTimeline extends CurveTimeline1 implements BoneTimeline {
+		final int boneIndex;
+
+		public ShearYTimeline (int frameCount, int bezierCount, int boneIndex) {
+			super(frameCount, bezierCount, Property.shearY.ordinal() + "|" + boneIndex);
+			this.boneIndex = boneIndex;
+		}
+
+		public int getBoneIndex () {
+			return boneIndex;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction) {
+
+			Bone bone = skeleton.bones.get(boneIndex);
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+				case setup:
+					bone.shearY = bone.data.shearY;
+					return;
+				case first:
+					bone.shearY += (bone.data.shearY - bone.shearY) * alpha;
+				}
+				return;
+			}
+
+			float y = getCurveValue(time);
+			switch (blend) {
+			case setup:
+				bone.shearY = bone.data.shearY + y * alpha;
+				break;
+			case first:
+			case replace:
+				bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
+				break;
+			case add:
+				bone.shearY += y * alpha;
+			}
+		}
+	}
+
 	/** Changes a slot's {@link Slot#getColor()}. */
-	static public class ColorTimeline extends CurveTimeline implements SlotTimeline {
+	static public class RGBATimeline extends CurveTimeline implements SlotTimeline {
 		static public final int ENTRIES = 5;
 		static private final int R = 1, G = 2, B = 3, A = 4;
 
 		final int slotIndex;
 
-		public ColorTimeline (int frameCount, int bezierCount, int slotIndex) {
+		public RGBATimeline (int frameCount, int bezierCount, int slotIndex) {
 			super(frameCount, bezierCount, //
-				Property.rgba.ordinal() + "|" + slotIndex);
+				Property.rgb.ordinal() + "|" + slotIndex, //
+				Property.alpha.ordinal() + "|" + slotIndex);
 			this.slotIndex = slotIndex;
 		}
 
@@ -788,12 +1123,12 @@ public class Animation {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
+				Color color = slot.color, setup = slot.data.color;
 				switch (blend) {
 				case setup:
-					slot.color.set(slot.data.color);
+					color.set(setup);
 					return;
 				case first:
-					Color color = slot.color, setup = slot.data.color;
 					color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
 						(setup.a - color.a) * alpha);
 				}
@@ -828,26 +1163,170 @@ public class Animation {
 				a = getBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
 			}
 
+			Color color = slot.color;
 			if (alpha == 1)
 				slot.color.set(r, g, b, a);
 			else {
-				Color color = slot.color;
 				if (blend == setup) color.set(slot.data.color);
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
 			}
 		}
 	}
 
+	/** Changes the RGB for a slot's {@link Slot#getColor()}. */
+	static public class RGBTimeline extends CurveTimeline implements SlotTimeline {
+		static public final int ENTRIES = 4;
+		static private final int R = 1, G = 2, B = 3;
+
+		final int slotIndex;
+
+		public RGBTimeline (int frameCount, int bezierCount, int slotIndex) {
+			super(frameCount, bezierCount, Property.rgb.ordinal() + "|" + slotIndex);
+			this.slotIndex = slotIndex;
+		}
+
+		public int getFrameEntries () {
+			return ENTRIES;
+		}
+
+		public int getSlotIndex () {
+			return slotIndex;
+		}
+
+		/** Sets the time and color for the specified frame.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+		 * @param time The frame time in seconds. */
+		public void setFrame (int frame, float time, float r, float g, float b) {
+			frame <<= 2;
+			frames[frame] = time;
+			frames[frame + R] = r;
+			frames[frame + G] = g;
+			frames[frame + B] = b;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction) {
+
+			Slot slot = skeleton.slots.get(slotIndex);
+			if (!slot.bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				Color color = slot.color, setup = slot.data.color;
+				switch (blend) {
+				case setup:
+					color.r = setup.r;
+					color.g = setup.g;
+					color.b = setup.b;
+					return;
+				case first:
+					color.r += (setup.r - color.r) * alpha;
+					color.g += (setup.g - color.g) * alpha;
+					color.b += (setup.b - color.b) * alpha;
+				}
+				return;
+			}
+
+			float r, g, b;
+			int i = search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
+			switch (curveType) {
+			case LINEAR:
+				float before = frames[i];
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				r += (frames[i + ENTRIES + R] - r) * t;
+				g += (frames[i + ENTRIES + G] - g) * t;
+				b += (frames[i + ENTRIES + B] - b) * t;
+				break;
+			case STEPPED:
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				break;
+			default:
+				r = getBezierValue(time, i, R, curveType - BEZIER);
+				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+			}
+
+			Color color = slot.color;
+			if (alpha == 1) {
+				color.r = r;
+				color.g = g;
+				color.b = b;
+			} else {
+				if (blend == setup) {
+					Color setup = slot.data.color;
+					color.r = setup.r;
+					color.g = setup.g;
+					color.b = setup.b;
+				}
+				color.r += (r - color.r) * alpha;
+				color.g += (g - color.g) * alpha;
+				color.b += (b - color.b) * alpha;
+			}
+		}
+	}
+
+	/** Changes the alpha for a slot's {@link Slot#getColor()}. */
+	static public class AlphaTimeline extends CurveTimeline1 implements SlotTimeline {
+		final int slotIndex;
+
+		public AlphaTimeline (int frameCount, int bezierCount, int slotIndex) {
+			super(frameCount, bezierCount, Property.alpha.ordinal() + "|" + slotIndex);
+			this.slotIndex = slotIndex;
+		}
+
+		public int getSlotIndex () {
+			return slotIndex;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction) {
+
+			Slot slot = skeleton.slots.get(slotIndex);
+			if (!slot.bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				Color color = slot.color, setup = slot.data.color;
+				switch (blend) {
+				case setup:
+					color.r = setup.r;
+					color.g = setup.g;
+					color.b = setup.b;
+					return;
+				case first:
+					color.r += (setup.r - color.r) * alpha;
+					color.g += (setup.g - color.g) * alpha;
+					color.b += (setup.b - color.b) * alpha;
+				}
+				return;
+			}
+
+			float a = getCurveValue(time);
+			if (alpha == 1)
+				slot.color.a = a;
+			else {
+				if (blend == setup) slot.color.a = slot.data.color.a;
+				slot.color.a += (a - slot.color.a) * alpha;
+			}
+		}
+	}
+
 	/** Changes a slot's {@link Slot#getColor()} and {@link Slot#getDarkColor()} for two color tinting. */
-	static public class TwoColorTimeline extends CurveTimeline implements SlotTimeline {
+	static public class RGBA2Timeline extends CurveTimeline implements SlotTimeline {
 		static public final int ENTRIES = 8;
 		static private final int R = 1, G = 2, B = 3, A = 4, R2 = 5, G2 = 6, B2 = 7;
 
 		final int slotIndex;
 
-		public TwoColorTimeline (int frameCount, int bezierCount, int slotIndex) {
+		public RGBA2Timeline (int frameCount, int bezierCount, int slotIndex) {
 			super(frameCount, bezierCount, //
-				Property.rgba.ordinal() + "|" + slotIndex, //
+				Property.rgb.ordinal() + "|" + slotIndex, //
+				Property.alpha.ordinal() + "|" + slotIndex, //
 				Property.rgb2.ordinal() + "|" + slotIndex);
 			this.slotIndex = slotIndex;
 		}
@@ -885,16 +1364,20 @@ public class Animation {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
+				Color light = slot.color, dark = slot.darkColor, setupLight = slot.data.color, setupDark = slot.data.darkColor;
 				switch (blend) {
 				case setup:
-					slot.color.set(slot.data.color);
-					slot.darkColor.set(slot.data.darkColor);
+					light.set(setupLight);
+					dark.r = setupDark.r;
+					dark.g = setupDark.g;
+					dark.b = setupDark.b;
 					return;
 				case first:
-					Color light = slot.color, dark = slot.darkColor, setupLight = slot.data.color, setupDark = slot.data.darkColor;
 					light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
 						(setupLight.a - light.a) * alpha);
-					dark.add((setupDark.r - dark.r) * alpha, (setupDark.g - dark.g) * alpha, (setupDark.b - dark.b) * alpha, 0);
+					dark.r += (setupDark.r - dark.r) * alpha;
+					dark.g += (setupDark.g - dark.g) * alpha;
+					dark.b += (setupDark.b - dark.b) * alpha;
 				}
 				return;
 			}
@@ -939,17 +1422,152 @@ public class Animation {
 				b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
 			}
 
+			Color light = slot.color, dark = slot.darkColor;
 			if (alpha == 1) {
 				slot.color.set(r, g, b, a);
-				slot.darkColor.set(r2, g2, b2, 1);
+				dark.r = r2;
+				dark.g = g2;
+				dark.b = b2;
 			} else {
-				Color light = slot.color, dark = slot.darkColor;
 				if (blend == setup) {
 					light.set(slot.data.color);
 					dark.set(slot.data.darkColor);
 				}
 				light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
-				dark.add((r2 - dark.r) * alpha, (g2 - dark.g) * alpha, (b2 - dark.b) * alpha, 0);
+				dark.r += (r2 - dark.r) * alpha;
+				dark.g += (g2 - dark.g) * alpha;
+				dark.b += (b2 - dark.b) * alpha;
+			}
+		}
+	}
+
+	/** Changes the RGB for a slot's {@link Slot#getColor()} and {@link Slot#getDarkColor()} for two color tinting. */
+	static public class RGB2Timeline extends CurveTimeline implements SlotTimeline {
+		static public final int ENTRIES = 7;
+		static private final int R = 1, G = 2, B = 3, R2 = 5, G2 = 6, B2 = 7;
+
+		final int slotIndex;
+
+		public RGB2Timeline (int frameCount, int bezierCount, int slotIndex) {
+			super(frameCount, bezierCount, //
+				Property.rgb.ordinal() + "|" + slotIndex, //
+				Property.rgb2.ordinal() + "|" + slotIndex);
+			this.slotIndex = slotIndex;
+		}
+
+		public int getFrameEntries () {
+			return ENTRIES;
+		}
+
+		/** The index of the slot in {@link Skeleton#getSlots()} that will be changed when this timeline is applied. The
+		 * {@link Slot#getDarkColor()} must not be null. */
+		public int getSlotIndex () {
+			return slotIndex;
+		}
+
+		/** Sets the time, light color, and dark color for the specified frame.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+		 * @param time The frame time in seconds. */
+		public void setFrame (int frame, float time, float r, float g, float b, float r2, float g2, float b2) {
+			frame *= ENTRIES;
+			frames[frame] = time;
+			frames[frame + R] = r;
+			frames[frame + G] = g;
+			frames[frame + B] = b;
+			frames[frame + R2] = r2;
+			frames[frame + G2] = g2;
+			frames[frame + B2] = b2;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction) {
+
+			Slot slot = skeleton.slots.get(slotIndex);
+			if (!slot.bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				Color light = slot.color, dark = slot.darkColor, setupLight = slot.data.color, setupDark = slot.data.darkColor;
+				switch (blend) {
+				case setup:
+					light.r = setupLight.r;
+					light.g = setupLight.g;
+					light.b = setupLight.b;
+					dark.r = setupDark.r;
+					dark.g = setupDark.g;
+					dark.b = setupDark.b;
+					return;
+				case first:
+					light.r += (setupLight.r - light.r) * alpha;
+					light.g += (setupLight.g - light.g) * alpha;
+					light.b += (setupLight.b - light.b) * alpha;
+					dark.r += (setupDark.r - dark.r) * alpha;
+					dark.g += (setupDark.g - dark.g) * alpha;
+					dark.b += (setupDark.b - dark.b) * alpha;
+				}
+				return;
+			}
+
+			float r, g, b, r2, g2, b2;
+			int i = search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			switch (curveType) {
+			case LINEAR:
+				float before = frames[i];
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				r2 = frames[i + R2];
+				g2 = frames[i + G2];
+				b2 = frames[i + B2];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				r += (frames[i + ENTRIES + R] - r) * t;
+				g += (frames[i + ENTRIES + G] - g) * t;
+				b += (frames[i + ENTRIES + B] - b) * t;
+				r2 += (frames[i + ENTRIES + R2] - r2) * t;
+				g2 += (frames[i + ENTRIES + G2] - g2) * t;
+				b2 += (frames[i + ENTRIES + B2] - b2) * t;
+				break;
+			case STEPPED:
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				r2 = frames[i + R2];
+				g2 = frames[i + G2];
+				b2 = frames[i + B2];
+				break;
+			default:
+				r = getBezierValue(time, i, R, curveType - BEZIER);
+				g = getBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				r2 = getBezierValue(time, i, R2, curveType + BEZIER_SIZE * 3 - BEZIER);
+				g2 = getBezierValue(time, i, G2, curveType + BEZIER_SIZE * 4 - BEZIER);
+				b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
+			}
+
+			Color light = slot.color, dark = slot.darkColor;
+			if (alpha == 1) {
+				light.r = r;
+				light.g = g;
+				light.b = b;
+				dark.r = r2;
+				dark.g = g2;
+				dark.b = b2;
+			} else {
+				if (blend == setup) {
+					Color setupLight = slot.data.color, setupDark = slot.data.darkColor;
+					light.r = setupLight.r;
+					light.g = setupLight.g;
+					light.b = setupLight.b;
+					dark.r = setupDark.r;
+					dark.g = setupDark.g;
+					dark.b = setupDark.b;
+				}
+				light.r += (r - light.r) * alpha;
+				light.g += (g - light.g) * alpha;
+				light.b += (b - light.b) * alpha;
+				dark.r += (r2 - dark.r) * alpha;
+				dark.g += (g2 - dark.g) * alpha;
+				dark.b += (b2 - dark.b) * alpha;
 			}
 		}
 	}
