@@ -33,7 +33,7 @@
 
 using UnityEngine;
 using UnityEditor;
-using Boo.Lang;
+using System.Collections.Generic;
 
 namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
