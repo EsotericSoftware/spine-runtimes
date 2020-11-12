@@ -666,9 +666,9 @@ public class SkeletonJson extends SkeletonLoader {
 							bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr, 1);
 							bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng, 1);
 							bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb, 1);
-							bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, r2, nr2, 1);
-							bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, g2, ng2, 1);
-							bezier = readCurve(curve, timeline, bezier, frame, 6, time, time2, b2, nb2, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, r2, nr2, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, g2, ng2, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, b2, nb2, 1);
 						}
 						time = time2;
 						r = nr;

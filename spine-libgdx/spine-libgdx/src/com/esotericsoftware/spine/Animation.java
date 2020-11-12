@@ -1294,14 +1294,10 @@ public class Animation {
 				Color color = slot.color, setup = slot.data.color;
 				switch (blend) {
 				case setup:
-					color.r = setup.r;
-					color.g = setup.g;
-					color.b = setup.b;
+					color.a = setup.a;
 					return;
 				case first:
-					color.r += (setup.r - color.r) * alpha;
-					color.g += (setup.g - color.g) * alpha;
-					color.b += (setup.b - color.b) * alpha;
+					color.a += (setup.a - color.a) * alpha;
 				}
 				return;
 			}
