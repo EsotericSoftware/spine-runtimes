@@ -1444,7 +1444,7 @@ public class Animation {
 	/** Changes the RGB for a slot's {@link Slot#getColor()} and {@link Slot#getDarkColor()} for two color tinting. */
 	static public class RGB2Timeline extends CurveTimeline implements SlotTimeline {
 		static public final int ENTRIES = 7;
-		static private final int R = 1, G = 2, B = 3, R2 = 5, G2 = 6, B2 = 7;
+		static private final int R = 1, G = 2, B = 3, R2 = 4, G2 = 5, B2 = 6;
 
 		final int slotIndex;
 

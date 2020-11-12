@@ -106,9 +106,9 @@ public class SkeletonBinary extends SkeletonLoader {
 	static public final int SLOT_ATTACHMENT = 0;
 	static public final int SLOT_RGBA = 1;
 	static public final int SLOT_RGB = 2;
-	static public final int SLOT_ALPHA = 3;
-	static public final int SLOT_RGBA2 = 4;
-	static public final int SLOT_RGB2 = 5;
+	static public final int SLOT_RGBA2 = 3;
+	static public final int SLOT_RGB2 = 4;
+	static public final int SLOT_ALPHA = 5;
 
 	static public final int PATH_POSITION = 0;
 	static public final int PATH_SPACING = 1;
@@ -621,9 +621,6 @@ public class SkeletonBinary extends SkeletonLoader {
 					timelines.add(timeline);
 					break;
 				}
-				case SLOT_ALPHA:
-					timelines.add(readTimeline(input, new AlphaTimeline(frameCount, input.readInt(true), input.readInt(true)), 1));
-					break;
 				case SLOT_RGB: {
 					RGBTimeline timeline = new RGBTimeline(frameCount, input.readInt(true), slotIndex);
 					float time = input.readFloat();
@@ -688,7 +685,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					timelines.add(timeline);
 					break;
 				}
-				case SLOT_RGB2:
+				case SLOT_RGB2: {
 					RGB2Timeline timeline = new RGB2Timeline(frameCount, input.readInt(true), slotIndex);
 					float time = input.readFloat();
 					float r = input.read() / 255f, g = input.read() / 255f, b = input.read() / 255f;
@@ -718,6 +715,27 @@ public class SkeletonBinary extends SkeletonLoader {
 						r2 = nr2;
 						g2 = ng2;
 						b2 = nb2;
+					}
+					timelines.add(timeline);
+					break;
+				}
+				case SLOT_ALPHA:
+					AlphaTimeline timeline = new AlphaTimeline(frameCount, input.readInt(true), slotIndex);
+					float time = input.readFloat(), a = input.read() / 255f;
+					for (int frame = 0, bezier = 0;; frame++) {
+						timeline.setFrame(frame, time, a);
+						if (frame == frameLast) break;
+						float time2 = input.readFloat();
+						float a2 = input.read() / 255f;
+						switch (input.readByte()) {
+						case CURVE_STEPPED:
+							timeline.setStepped(frame);
+							break;
+						case CURVE_BEZIER:
+							setBezier(input, timeline, bezier++, frame, 0, time, time2, a, a2, 1);
+						}
+						time = time2;
+						a = a2;
 					}
 					timelines.add(timeline);
 					break;
