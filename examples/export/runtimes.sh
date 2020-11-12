@@ -463,6 +463,10 @@ cp -f ../raptor/export/raptor-pro.json "$UNITY_TARGET_DIR/raptor-pro.json"
 cp -f ../raptor/export/raptor-pma.atlas "$UNITY_TARGET_DIR/raptor-pma.atlas.txt"
 cp -f ../raptor/export/raptor-pma.png "$UNITY_TARGET_DIR/raptor-pma.png"
 
+cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-unity/Modules/com.esotericsoftware.spine.urp-shaders/Examples/2D/Spine Skeletons/RaptorURP/"
+cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-unity/Modules/com.esotericsoftware.spine.urp-shaders/Examples/3D/Spine Skeletons/RaptorURP/"
+cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-unity/Modules/com.esotericsoftware.spine.lwrp-shaders/Spine Skeletons/RaptorLWRP/"
+
 UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/spineboy-pro"
 cp -f ../spineboy/export/spineboy-pro.json "$UNITY_TARGET_DIR/spineboy-pro.json"
 cp -f ../spineboy/export/spineboy-pma.atlas "$UNITY_TARGET_DIR/spineboy-pro.atlas.txt"
@@ -482,6 +486,10 @@ cp -f $UNITY_SOURCE_DIR/stretchyman/stretchyman-diffuse-pma.atlas.txt "$UNITY_TA
 cp -f $UNITY_SOURCE_DIR/stretchyman/stretchyman-diffuse-pma.png "$UNITY_TARGET_DIR/stretchyman-diffuse-pma.png"
 cp -f $UNITY_SOURCE_DIR/stretchyman/stretchyman-normals.png "$UNITY_TARGET_DIR/"
 cp -f $UNITY_SOURCE_DIR/stretchyman/stretchyman-emission.png "$UNITY_TARGET_DIR/"
+
+cp -f ../stretchyman/export/stretchyman-pro.json "$ROOT/spine-unity/Modules/com.esotericsoftware.spine.urp-shaders/Examples/2D/Spine Skeletons/StretchymanURP/stretchyman.json"
+cp -f ../stretchyman/export/stretchyman-pro.json "$ROOT/spine-unity/Modules/com.esotericsoftware.spine.urp-shaders/Examples/3D/Spine Skeletons/StretchymanURP/stretchyman.json"
+cp -f ../stretchyman/export/stretchyman-pro.json "$ROOT/spine-unity/Modules/com.esotericsoftware.spine.lwrp-shaders/Spine Skeletons/StretchymanLWRP/stretchyman.json"
 
 UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/Eyes"
 cp -f $UNITY_SOURCE_DIR/eyes/export/eyes.json "$UNITY_TARGET_DIR/eyes.json"
