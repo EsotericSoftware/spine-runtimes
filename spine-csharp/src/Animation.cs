@@ -200,7 +200,7 @@ namespace Spine {
 
 	internal enum Property {
 		Rotate=0, TranslateX, TranslateY, ScaleX, ScaleY, ShearX, ShearY, //
-		RGBA, RGB2, //
+		RGB, Alpha, RGB2, //
 		Attachment, Deform, //
 		Event, DrawOrder, //
 		IkConstraint, TransformConstraint, //
@@ -588,6 +588,104 @@ namespace Spine {
 		}
 	}
 
+	/// <summary>Changes a bone's local <see cref"Bone.X"/>.</summary>
+	public class TranslateXTimeline : CurveTimeline1, IBoneTimeline {
+		readonly int boneIndex;
+
+		public TranslateXTimeline (int frameCount, int bezierCount, int boneIndex)
+			: base(frameCount, bezierCount, (int)Property.TranslateX + "|" + boneIndex) {
+			this.boneIndex = boneIndex;
+		}
+
+		public int BoneIndex {
+			get {
+				return boneIndex;
+			}
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
+									MixDirection direction) {
+			Bone bone = skeleton.bones.Items[boneIndex];
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+					case MixBlend.Setup:
+						bone.x = bone.data.x;
+						return;
+					case MixBlend.First:
+						bone.x += (bone.data.x - bone.x) * alpha;
+						break;
+				}
+				return;
+			}
+
+			float x = GetCurveValue(time);
+			switch (blend) {
+				case MixBlend.Setup:
+					bone.x = bone.data.x + x * alpha;
+					break;
+				case MixBlend.First:
+				case MixBlend.Replace:
+					bone.x += (bone.data.x + x - bone.x) * alpha;
+					break;
+				case MixBlend.Add:
+					bone.x += x * alpha;
+					break;
+			}
+		}
+	}
+
+	/// <summary>Changes a bone's local <see cref"Bone.Y"/>.</summary>
+	public class TranslateYTimeline : CurveTimeline1, IBoneTimeline {
+		readonly int boneIndex;
+
+		public TranslateYTimeline (int frameCount, int bezierCount, int boneIndex)
+			: base(frameCount, bezierCount, (int)Property.TranslateY + "|" + boneIndex) {
+			this.boneIndex = boneIndex;
+		}
+
+		public int BoneIndex {
+			get {
+				return boneIndex;
+			}
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
+									MixDirection direction) {
+			Bone bone = skeleton.bones.Items[boneIndex];
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+				case MixBlend.Setup:
+					bone.y = bone.data.y;
+					return;
+				case MixBlend.First:
+					bone.y += (bone.data.y - bone.y) * alpha;
+					break;
+				}
+				return;
+			}
+
+			float y = GetCurveValue(time);
+			switch (blend) {
+			case MixBlend.Setup:
+				bone.y = bone.data.y + y * alpha;
+				break;
+			case MixBlend.First:
+			case MixBlend.Replace:
+				bone.y += (bone.data.y + y - bone.y) * alpha;
+				break;
+			case MixBlend.Add:
+				bone.y += y * alpha;
+				break;
+			}
+		}
+	}
+
 	/// <summary>Changes a bone's local <see cref="Bone.ScaleX"> and <see cref="Bone.ScaleY">.</summary>
 	public class ScaleTimeline : CurveTimeline2, IBoneTimeline {
 		readonly int boneIndex;
@@ -708,6 +806,164 @@ namespace Spine {
 		}
 	}
 
+	/// <summary>Changes a bone's local <see cref="Bone.ScaleX">.</summary>
+	public class ScaleXTimeline : CurveTimeline1, IBoneTimeline {
+		readonly int boneIndex;
+
+		public ScaleXTimeline (int frameCount, int bezierCount, int boneIndex)
+			: base(frameCount, bezierCount, (int)Property.ScaleX + "|" + boneIndex) {
+			this.boneIndex = boneIndex;
+		}
+
+		public int BoneIndex {
+			get {
+				return boneIndex;
+			}
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
+									MixDirection direction) {
+			Bone bone = skeleton.bones.Items[boneIndex];
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+				case MixBlend.Setup:
+					bone.scaleX = bone.data.scaleX;
+					return;
+				case MixBlend.First:
+					bone.scaleX += (bone.data.scaleX - bone.scaleX) * alpha;
+					break;
+				}
+				return;
+			}
+
+			float x = GetCurveValue(time) * bone.data.scaleX;
+			if (alpha == 1) {
+				if (blend == MixBlend.Add)
+					bone.scaleX += x - bone.data.scaleX;
+				else
+					bone.scaleX = x;
+			} else {
+				// Mixing out uses sign of setup or current pose, else use sign of key.
+				float bx;
+				if (direction == MixDirection.Out) {
+					switch (blend) {
+					case MixBlend.Setup:
+						bx = bone.data.scaleX;
+						bone.scaleX = bx + (Math.Abs(x) * Math.Sign(bx) - bx) * alpha;
+						break;
+					case MixBlend.First:
+					case MixBlend.Replace:
+						bx = bone.scaleX;
+						bone.scaleX = bx + (Math.Abs(x) * Math.Sign(bx) - bx) * alpha;
+						break;
+					case MixBlend.Add:
+						bx = bone.scaleX;
+						bone.scaleX = bx + (Math.Abs(x) * Math.Sign(bx) - bone.data.scaleX) * alpha;
+						break;
+					}
+				} else {
+					switch (blend) {
+					case MixBlend.Setup:
+						bx = Math.Abs(bone.data.scaleX) * Math.Sign(x);
+						bone.scaleX = bx + (x - bx) * alpha;
+						break;
+					case MixBlend.First:
+					case MixBlend.Replace:
+						bx = Math.Abs(bone.scaleX) * Math.Sign(x);
+						bone.scaleX = bx + (x - bx) * alpha;
+						break;
+					case MixBlend.Add:
+						bx = Math.Sign(x);
+						bone.scaleX = Math.Abs(bone.scaleX) * bx + (x - Math.Abs(bone.data.scaleX) * bx) * alpha;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	/// <summary>Changes a bone's local <see cref="Bone.ScaleY">.</summary>
+	public class ScaleYTimeline : CurveTimeline1, IBoneTimeline {
+		readonly int boneIndex;
+
+		public ScaleYTimeline (int frameCount, int bezierCount, int boneIndex)
+			: base(frameCount, bezierCount, (int)Property.ScaleY + "|" + boneIndex) {
+			this.boneIndex = boneIndex;
+		}
+
+		public int BoneIndex {
+			get {
+				return boneIndex;
+			}
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
+									MixDirection direction) {
+			Bone bone = skeleton.bones.Items[boneIndex];
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+				case MixBlend.Setup:
+					bone.scaleY = bone.data.scaleY;
+					return;
+				case MixBlend.First:
+					bone.scaleY += (bone.data.scaleY - bone.scaleY) * alpha;
+					break;
+				}
+				return;
+			}
+
+			float y = GetCurveValue(time) * bone.data.scaleY;
+			if (alpha == 1) {
+				if (blend == MixBlend.Add)
+					bone.scaleY += y - bone.data.scaleY;
+				else
+					bone.scaleY = y;
+			} else {
+				// Mixing out uses sign of setup or current pose, else use sign of key.
+				float by;
+				if (direction == MixDirection.Out) {
+					switch (blend) {
+					case MixBlend.Setup:
+						by = bone.data.scaleY;
+						bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - by) * alpha;
+						break;
+					case MixBlend.First:
+					case MixBlend.Replace:
+						by = bone.scaleY;
+						bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - by) * alpha;
+						break;
+					case MixBlend.Add:
+						by = bone.scaleY;
+						bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - bone.data.scaleY) * alpha;
+						break;
+					}
+				} else {
+					switch (blend) {
+					case MixBlend.Setup:
+						by = Math.Abs(bone.data.scaleY) * Math.Sign(y);
+						bone.scaleY = by + (y - by) * alpha;
+						break;
+					case MixBlend.First:
+					case MixBlend.Replace:
+						by = Math.Abs(bone.scaleY) * Math.Sign(y);
+						bone.scaleY = by + (y - by) * alpha;
+						break;
+					case MixBlend.Add:
+						by = Math.Sign(y);
+						bone.scaleY = Math.Abs(bone.scaleY) * by + (y - Math.Abs(bone.data.scaleY) * by) * alpha;
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	/// <summary>Changes a bone's local <see cref="Bone.ShearX"/> and <see cref="Bone.ShearY"/>.</summary>
 	public class ShearTimeline : CurveTimeline2, IBoneTimeline {
 		readonly int boneIndex;
@@ -785,16 +1041,115 @@ namespace Spine {
 		}
 	}
 
+	/// <summary>Changes a bone's local <see cref="Bone.ShearX"/>.</summary>
+	public class ShearXTimeline : CurveTimeline1, IBoneTimeline {
+		readonly int boneIndex;
+
+		public ShearXTimeline (int frameCount, int bezierCount, int boneIndex)
+			: base(frameCount, bezierCount, (int)Property.ShearX + "|" + boneIndex) {
+			this.boneIndex = boneIndex;
+		}
+
+		public int BoneIndex {
+			get {
+				return boneIndex;
+			}
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
+									MixDirection direction) {
+			Bone bone = skeleton.bones.Items[boneIndex];
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+				case MixBlend.Setup:
+					bone.shearX = bone.data.shearX;
+					return;
+				case MixBlend.First:
+					bone.shearX += (bone.data.shearX - bone.shearX) * alpha;
+					break;
+				}
+				return;
+			}
+
+			float x = GetCurveValue(time);
+			switch (blend) {
+			case MixBlend.Setup:
+				bone.shearX = bone.data.shearX + x * alpha;
+				break;
+			case MixBlend.First:
+			case MixBlend.Replace:
+				bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
+				break;
+			case MixBlend.Add:
+				bone.shearX += x * alpha;
+				break;
+			}
+		}
+	}
+
+	/// <summary>Changes a bone's local <see cref="Bone.ShearY"/>.</summary>
+	public class ShearYTimeline : CurveTimeline1, IBoneTimeline {
+		readonly int boneIndex;
+
+		public ShearYTimeline (int frameCount, int bezierCount, int boneIndex)
+			: base(frameCount, bezierCount, (int)Property.ShearY + "|" + boneIndex) {
+			this.boneIndex = boneIndex;
+		}
+
+		public int BoneIndex {
+			get {
+				return boneIndex;
+			}
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
+									MixDirection direction) {
+			Bone bone = skeleton.bones.Items[boneIndex];
+			if (!bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				switch (blend) {
+				case MixBlend.Setup:
+					bone.shearY = bone.data.shearY;
+					return;
+				case MixBlend.First:
+					bone.shearY += (bone.data.shearY - bone.shearY) * alpha;
+					break;
+				}
+				return;
+			}
+
+			float y = GetCurveValue(time);
+			switch (blend) {
+			case MixBlend.Setup:
+				bone.shearY = bone.data.shearY + y * alpha;
+				break;
+			case MixBlend.First:
+			case MixBlend.Replace:
+				bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
+				break;
+			case MixBlend.Add:
+				bone.shearY += y * alpha;
+				break;
+			}
+		}
+	}
+
 	/// <summary>Changes a slot's <see cref="Slot.Color"/>.</summary>
-	public class ColorTimeline : CurveTimeline, ISlotTimeline {
+	public class RGBATimeline : CurveTimeline, ISlotTimeline {
 		public const int ENTRIES = 5;
 		protected const int R = 1, G = 2, B = 3, A = 4;
 
 		readonly int slotIndex;
 
-		public ColorTimeline (int frameCount, int bezierCount, int slotIndex)
+		public RGBATimeline (int frameCount, int bezierCount, int slotIndex)
 			: base(frameCount, bezierCount, //
-				(int)Property.RGBA + "|" + slotIndex) {
+				(int)Property.RGB + "|" + slotIndex, //
+				(int)Property.Alpha + "|" + slotIndex) {
 			this.slotIndex = slotIndex;
 		}
 		public override int FrameEntries {
@@ -826,19 +1181,19 @@ namespace Spine {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				var slotData = slot.data;
+				var setup = slot.data;
 				switch (blend) {
 				case MixBlend.Setup:
-					slot.r = slotData.r;
-					slot.g = slotData.g;
-					slot.b = slotData.b;
-					slot.a = slotData.a;
+					slot.r = setup.r;
+					slot.g = setup.g;
+					slot.b = setup.b;
+					slot.a = setup.a;
 					return;
 				case MixBlend.First:
-					slot.r += (slotData.r - slot.r) * alpha;
-					slot.g += (slotData.g - slot.g) * alpha;
-					slot.b += (slotData.b - slot.b) * alpha;
-					slot.a += (slotData.a - slot.a) * alpha;
+					slot.r += (setup.r - slot.r) * alpha;
+					slot.g += (setup.g - slot.g) * alpha;
+					slot.b += (setup.b - slot.b) * alpha;
+					slot.a += (setup.a - slot.a) * alpha;
 					slot.ClampColor();
 					return;
 				}
@@ -902,17 +1257,175 @@ namespace Spine {
 		}
 	}
 
+	/// <summary>Changes the RGB for a slot's <see cref="Slot.Color"/>.</summary>
+	public class RGBTimeline : CurveTimeline, ISlotTimeline {
+		public const int ENTRIES = 4;
+		protected const int R = 1, G = 2, B = 3;
+
+		readonly int slotIndex;
+
+		public RGBTimeline (int frameCount, int bezierCount, int slotIndex)
+			: base(frameCount, bezierCount, //
+				(int)Property.RGB + "|" + slotIndex) {
+			this.slotIndex = slotIndex;
+		}
+		public override int FrameEntries {
+			get { return ENTRIES; }
+		}
+
+		public int SlotIndex {
+			get {
+				return slotIndex;
+			}
+		}
+
+		/// <summary>Sets the time and color for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
+		public void SetFrame (int frame, float time, float r, float g, float b) {
+			frame <<= 2;
+			frames[frame] = time;
+			frames[frame + R] = r;
+			frames[frame + G] = g;
+			frames[frame + B] = b;
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
+									MixDirection direction) {
+			Slot slot = skeleton.slots.Items[slotIndex];
+			if (!slot.bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				var setup = slot.data;
+				switch (blend) {
+					case MixBlend.Setup:
+						slot.r = setup.r;
+						slot.g = setup.g;
+						slot.b = setup.b;
+						return;
+					case MixBlend.First:
+						slot.r += (setup.r - slot.r) * alpha;
+						slot.g += (setup.g - slot.g) * alpha;
+						slot.b += (setup.b - slot.b) * alpha;
+						slot.ClampColor();
+						return;
+				}
+				return;
+			}
+
+			float r, g, b;
+			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
+			switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
+					break;
+				case STEPPED:
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					break;
+				default:
+					r = GetBezierValue(time, i, R, curveType - BEZIER);
+					g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+					b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+					break;
+			}
+
+			if (alpha == 1) {
+				slot.r = r;
+				slot.g = g;
+				slot.b = b;
+				slot.ClampColor();
+			}
+			else {
+				float br, bg, bb;
+				if (blend == MixBlend.Setup) {
+					var setup = slot.data;
+					br = setup.r;
+					bg = setup.g;
+					bb = setup.b;
+				}
+				else {
+					br = slot.r;
+					bg = slot.g;
+					bb = slot.b;
+				}
+				slot.r = br + ((r - br) * alpha);
+				slot.g = bg + ((g - bg) * alpha);
+				slot.b = bb + ((b - bb) * alpha);
+				slot.ClampColor();
+			}
+		}
+	}
+
+	/// <summary>Changes the alpha for a slot's <see cref="Slot.Color"/>.</summary>
+	public class AlphaTimeline : CurveTimeline1, ISlotTimeline {
+		readonly int slotIndex;
+
+		public AlphaTimeline (int frameCount, int bezierCount, int slotIndex)
+			: base(frameCount, bezierCount, (int)Property.Alpha + "|" + slotIndex) {
+			this.slotIndex = slotIndex;
+		}
+
+		public int SlotIndex {
+			get {
+				return slotIndex;
+			}
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
+									MixDirection direction) {
+			Slot slot = skeleton.slots.Items[slotIndex];
+			if (!slot.bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				var setup = slot.data;
+				switch (blend) {
+					case MixBlend.Setup:
+						slot.a = setup.a;
+						return;
+					case MixBlend.First:
+						slot.a += (setup.a - slot.a) * alpha;
+						slot.ClampColor();
+						return;
+				}
+				return;
+			}
+
+			float a = GetCurveValue(time);
+			if (alpha == 1) {
+				slot.a = a;
+				slot.ClampColor();
+			}
+			else {
+				if (blend == MixBlend.Setup) slot.a = slot.data.a;
+				slot.a += (a - slot.a) * alpha;
+				slot.ClampColor();
+			}
+		}
+	}
+
 	/// <summary>Changes a slot's <see cref="Slot.Color"/> and <see cref="Slot.DarkColor"/> for two color tinting.</summary>
-	public class TwoColorTimeline : CurveTimeline, ISlotTimeline {
+	public class RGBA2Timeline : CurveTimeline, ISlotTimeline {
 		public const int ENTRIES = 8;
 		protected const int R = 1, G = 2, B = 3, A = 4, R2 = 5, G2 = 6, B2 = 7;
 
 		readonly int slotIndex;
 
-		public TwoColorTimeline (int frameCount, int bezierCount, int slotIndex)
+		public RGBA2Timeline (int frameCount, int bezierCount, int slotIndex)
 			: base(frameCount, bezierCount, //
-				(int)Property.RGBA + "|" + slotIndex, //
-				(int) Property.RGB2 + "|" + slotIndex) {
+				(int)Property.RGB + "|" + slotIndex, //
+				(int)Property.Alpha + "|" + slotIndex, //
+				(int)Property.RGB2 + "|" + slotIndex) {
 			this.slotIndex = slotIndex;
 		}
 
@@ -1064,7 +1577,163 @@ namespace Spine {
 				slot.ClampSecondColor();
 			}
 		}
+	}
 
+	/// <summary>Changes the RGB for a slot's <see cref="Slot.Color"/> and <see cref="Slot.DarkColor"/> for two color tinting.</summary>
+	public class RGB2Timeline : CurveTimeline, ISlotTimeline {
+		public const int ENTRIES = 7;
+		protected const int R = 1, G = 2, B = 3, R2 = 4, G2 = 5, B2 = 6;
+
+		readonly int slotIndex;
+
+		public RGB2Timeline (int frameCount, int bezierCount, int slotIndex)
+			: base(frameCount, bezierCount, //
+				(int)Property.RGB + "|" + slotIndex, //
+				(int)Property.RGB2 + "|" + slotIndex) {
+			this.slotIndex = slotIndex;
+		}
+
+		public override int FrameEntries {
+			get {
+				return ENTRIES;
+			}
+		}
+
+		/// <summary>
+		/// The index of the slot in <see cref="Skeleton.Slots"/> that will be changed when this timeline is applied. The
+		/// <see cref="Slot"/> must have a dark color available.</summary>
+		public int SlotIndex {
+			get {
+				return slotIndex;
+			}
+		}
+
+		/// <summary>Sets the time, light color, and dark color for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
+		public void SetFrame (int frame, float time, float r, float g, float b, float r2, float g2, float b2) {
+			frame *= ENTRIES;
+			frames[frame] = time;
+			frames[frame + R] = r;
+			frames[frame + G] = g;
+			frames[frame + B] = b;
+			frames[frame + R2] = r2;
+			frames[frame + G2] = g2;
+			frames[frame + B2] = b2;
+		}
+
+		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
+									MixDirection direction) {
+			Slot slot = skeleton.slots.Items[slotIndex];
+			if (!slot.bone.active) return;
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				var slotData = slot.data;
+				switch (blend) {
+					case MixBlend.Setup:
+						//	slot.color.set(slot.data.color);
+						//	slot.darkColor.set(slot.data.darkColor);
+						slot.r = slotData.r;
+						slot.g = slotData.g;
+						slot.b = slotData.b;
+						slot.ClampColor();
+						slot.r2 = slotData.r2;
+						slot.g2 = slotData.g2;
+						slot.b2 = slotData.b2;
+						slot.ClampSecondColor();
+						return;
+					case MixBlend.First:
+						slot.r += (slot.r - slotData.r) * alpha;
+						slot.g += (slot.g - slotData.g) * alpha;
+						slot.b += (slot.b - slotData.b) * alpha;
+						slot.ClampColor();
+						slot.r2 += (slot.r2 - slotData.r2) * alpha;
+						slot.g2 += (slot.g2 - slotData.g2) * alpha;
+						slot.b2 += (slot.b2 - slotData.b2) * alpha;
+						slot.ClampSecondColor();
+						return;
+				}
+				return;
+			}
+
+			float r, g, b, r2, g2, b2;
+			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			switch (curveType) {
+				case LINEAR:
+					float before = frames[i];
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+					float t = (time - before) / (frames[i + ENTRIES] - before);
+					r += (frames[i + ENTRIES + R] - r) * t;
+					g += (frames[i + ENTRIES + G] - g) * t;
+					b += (frames[i + ENTRIES + B] - b) * t;
+					r2 += (frames[i + ENTRIES + R2] - r2) * t;
+					g2 += (frames[i + ENTRIES + G2] - g2) * t;
+					b2 += (frames[i + ENTRIES + B2] - b2) * t;
+					break;
+				case STEPPED:
+					r = frames[i + R];
+					g = frames[i + G];
+					b = frames[i + B];
+					r2 = frames[i + R2];
+					g2 = frames[i + G2];
+					b2 = frames[i + B2];
+					break;
+				default:
+					r = GetBezierValue(time, i, R, curveType - BEZIER);
+					g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+					b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+					r2 = GetBezierValue(time, i, R2, curveType + BEZIER_SIZE * 3 - BEZIER);
+					g2 = GetBezierValue(time, i, G2, curveType + BEZIER_SIZE * 4 - BEZIER);
+					b2 = GetBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
+					break;
+			}
+
+			if (alpha == 1) {
+				slot.r = r;
+				slot.g = g;
+				slot.b = b;
+				slot.ClampColor();
+				slot.r2 = r2;
+				slot.g2 = g2;
+				slot.b2 = b2;
+				slot.ClampSecondColor();
+			}
+			else {
+				float br, bg, bb, ba, br2, bg2, bb2;
+				if (blend == MixBlend.Setup) {
+					br = slot.data.r;
+					bg = slot.data.g;
+					bb = slot.data.b;
+					ba = slot.data.a;
+					br2 = slot.data.r2;
+					bg2 = slot.data.g2;
+					bb2 = slot.data.b2;
+				}
+				else {
+					br = slot.r;
+					bg = slot.g;
+					bb = slot.b;
+					ba = slot.a;
+					br2 = slot.r2;
+					bg2 = slot.g2;
+					bb2 = slot.b2;
+				}
+				slot.r = br + ((r - br) * alpha);
+				slot.g = bg + ((g - bg) * alpha);
+				slot.b = bb + ((b - bb) * alpha);
+				slot.ClampColor();
+				slot.r2 = br2 + ((r2 - br2) * alpha);
+				slot.g2 = bg2 + ((g2 - bg2) * alpha);
+				slot.b2 = bb2 + ((b2 - bb2) * alpha);
+				slot.ClampSecondColor();
+			}
+		}
 	}
 
 	/// <summary>Changes a slot's <see cref="Slot.Attachment"/>.</summary>

@@ -542,8 +542,8 @@ namespace Spine {
 							}
 							timelines.Add(timeline);
 
-						} else if (timelineName == "color") {
-							var timeline = new ColorTimeline(values.Count, values.Count << 2, slotIndex);
+						} else if (timelineName == "rgba") {
+							var timeline = new RGBATimeline(values.Count, values.Count << 2, slotIndex);
 
 							var keyMapEnumerator = values.GetEnumerator();
 							keyMapEnumerator.MoveNext();
@@ -586,8 +586,54 @@ namespace Spine {
 							}
 							timelines.Add(timeline);
 
-						} else if (timelineName == "twoColor") {
-							var timeline = new TwoColorTimeline(values.Count, values.Count * 7, slotIndex);
+						}
+						else if (timelineName == "rgb") {
+							var timeline = new RGBTimeline(values.Count, values.Count * 3, slotIndex);
+
+							var keyMapEnumerator = values.GetEnumerator();
+							keyMapEnumerator.MoveNext();
+							var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
+							float time = GetFloat(keyMap, "time", 0);
+							string color = (string)keyMap["color"];
+							float r = ToColor(color, 0);
+							float g = ToColor(color, 1);
+							float b = ToColor(color, 2);
+							for (int frame = 0, bezier = 0; ; frame++) {
+								timeline.SetFrame(frame, time, r, g, b);
+								bool hasNext = keyMapEnumerator.MoveNext();
+								if (!hasNext) {
+									timeline.Shrink(bezier);
+									break;
+								}
+								var nextMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
+
+								float time2 = GetFloat(nextMap, "time", 0);
+								color = (string)nextMap["color"];
+								float nr = ToColor(color, 0);
+								float ng = ToColor(color, 1);
+								float nb = ToColor(color, 2);
+
+								if (keyMap.ContainsKey("curve")) {
+									object curve = keyMap["curve"];
+									bezier = ReadCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr, 1);
+									bezier = ReadCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng, 1);
+									bezier = ReadCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb, 1);
+								}
+								time = time2;
+								r = nr;
+								g = ng;
+								b = nb;
+								keyMap = nextMap;
+							}
+							timelines.Add(timeline);
+
+						} else if (timelineName == "alpha") {
+							var keyMapEnumerator = values.GetEnumerator();
+							keyMapEnumerator.MoveNext();
+							timelines.Add(ReadTimeline(ref keyMapEnumerator, new AlphaTimeline(values.Count, values.Count, slotIndex), 0, 1));
+
+						}  else if (timelineName == "rgba2") {
+							var timeline = new RGBA2Timeline(values.Count, values.Count * 7, slotIndex);
 
 							var keyMapEnumerator = values.GetEnumerator();
 							keyMapEnumerator.MoveNext();
@@ -644,6 +690,60 @@ namespace Spine {
 							}
 							timelines.Add(timeline);
 
+						} else if (timelineName == "rgb2") {
+							var timeline = new RGB2Timeline(values.Count, values.Count * 6, slotIndex);
+
+							var keyMapEnumerator = values.GetEnumerator();
+							keyMapEnumerator.MoveNext();
+							var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
+							float time = GetFloat(keyMap, "time", 0);
+							string color = (string)keyMap["light"];
+							float r = ToColor(color, 0);
+							float g = ToColor(color, 1);
+							float b = ToColor(color, 2);
+							color = (string)keyMap["dark"];
+							float r2 = ToColor(color, 0);
+							float g2 = ToColor(color, 1);
+							float b2 = ToColor(color, 2);
+							for (int frame = 0, bezier = 0; ; frame++) {
+								timeline.SetFrame(frame, time, r, g, b, r2, g2, b2);
+								bool hasNext = keyMapEnumerator.MoveNext();
+								if (!hasNext) {
+									timeline.Shrink(bezier);
+									break;
+								}
+								var nextMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
+
+								float time2 = GetFloat(nextMap, "time", 0);
+								color = (string)nextMap["light"];
+								float nr = ToColor(color, 0);
+								float ng = ToColor(color, 1);
+								float nb = ToColor(color, 2);
+								color = (string)nextMap["dark"];
+								float nr2 = ToColor(color, 0);
+								float ng2 = ToColor(color, 1);
+								float nb2 = ToColor(color, 2);
+
+								if (keyMap.ContainsKey("curve")) {
+									object curve = keyMap["curve"];
+									bezier = ReadCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr, 1);
+									bezier = ReadCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng, 1);
+									bezier = ReadCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb, 1);
+									bezier = ReadCurve(curve, timeline, bezier, frame, 3, time, time2, r2, nr2, 1);
+									bezier = ReadCurve(curve, timeline, bezier, frame, 4, time, time2, g2, ng2, 1);
+									bezier = ReadCurve(curve, timeline, bezier, frame, 5, time, time2, b2, nb2, 1);
+								}
+								time = time2;
+								r = nr;
+								g = ng;
+								b = nb;
+								r2 = nr2;
+								g2 = ng2;
+								b2 = nb2;
+								keyMap = nextMap;
+							}
+							timelines.Add(timeline);
+
 						} else
 							throw new Exception("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
 					}
@@ -669,14 +769,31 @@ namespace Spine {
 							TranslateTimeline timeline = new TranslateTimeline(values.Count, values.Count << 1, boneIndex);
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, "x", "y", 0, scale));
 						}
+						else if (timelineName == "translatex") {
+							timelines
+								.Add(ReadTimeline(ref keyMapEnumerator, new TranslateXTimeline(values.Count, values.Count, boneIndex), 0, scale));
+						}
+						else if (timelineName == "translatey") {
+							timelines
+								.Add(ReadTimeline(ref keyMapEnumerator, new TranslateYTimeline(values.Count, values.Count, boneIndex), 0, scale));
+						}
 						else if (timelineName == "scale") {
 							ScaleTimeline timeline = new ScaleTimeline(values.Count, values.Count << 1, boneIndex);
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, "x", "y", 1, 1));
 						}
+						else if (timelineName == "scalex")
+							timelines.Add(ReadTimeline(ref keyMapEnumerator, new ScaleXTimeline(values.Count, values.Count, boneIndex), 1, 1));
+						else if (timelineName == "scaley")
+							timelines.Add(ReadTimeline(ref keyMapEnumerator, new ScaleYTimeline(values.Count, values.Count, boneIndex), 1, 1));
 						else if (timelineName == "shear") {
 							ShearTimeline timeline = new ShearTimeline(values.Count, values.Count << 1, boneIndex);
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, "x", "y", 0, 1));
-						} else
+						}
+						else if (timelineName == "shearx")
+							timelines.Add(ReadTimeline(ref keyMapEnumerator, new ShearXTimeline(values.Count, values.Count, boneIndex), 0, 1));
+						else if (timelineName == "sheary")
+							timelines.Add(ReadTimeline(ref keyMapEnumerator, new ShearYTimeline(values.Count, values.Count, boneIndex), 0, 1));
+						else
 							throw new Exception("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
 					}
 				}

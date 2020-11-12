@@ -45,12 +45,21 @@ namespace Spine {
 	public class SkeletonBinary : SkeletonLoader {
 		public const int BONE_ROTATE = 0;
 		public const int BONE_TRANSLATE = 1;
-		public const int BONE_SCALE = 2;
-		public const int BONE_SHEAR = 3;
+		public const int BONE_TRANSLATEX = 2;
+		public const int BONE_TRANSLATEY = 3;
+		public const int BONE_SCALE = 4;
+		public const int BONE_SCALEX = 5;
+		public const int BONE_SCALEY = 6;
+		public const int BONE_SHEAR = 7;
+		public const int BONE_SHEARX = 8;
+		public const int BONE_SHEARY = 9;
 
 		public const int SLOT_ATTACHMENT = 0;
-		public const int SLOT_COLOR = 1;
-		public const int SLOT_TWO_COLOR = 2;
+		public const int SLOT_RGBA = 1;
+		public const int SLOT_RGB = 2;
+		public const int SLOT_ALPHA = 3;
+		public const int SLOT_RGBA2 = 4;
+		public const int SLOT_RGB2 = 5;
 
 		public const int PATH_POSITION = 0;
 		public const int PATH_SPACING = 1;
@@ -589,8 +598,8 @@ namespace Spine {
 								timelines.Add(timeline);
 								break;
 							}
-						case SLOT_COLOR: {
-								ColorTimeline timeline = new ColorTimeline(frameCount, input.ReadInt(true), slotIndex);
+						case SLOT_RGBA: {
+								RGBATimeline timeline = new RGBATimeline(frameCount, input.ReadInt(true), slotIndex);
 								float time = input.ReadFloat();
 								float r = input.Read() / 255f, g = input.Read() / 255f;
 								float b = input.Read() / 255f, a = input.Read() / 255f;
@@ -620,21 +629,47 @@ namespace Spine {
 								timelines.Add(timeline);
 								break;
 							}
-						case SLOT_TWO_COLOR: {
-								TwoColorTimeline timeline = new TwoColorTimeline(frameCount, input.ReadInt(true), slotIndex);
+						case SLOT_RGB: {
+								RGBTimeline timeline = new RGBTimeline(frameCount, input.ReadInt(true), slotIndex);
+								float time = input.ReadFloat();
+								float r = input.Read() / 255f, g = input.Read() / 255f, b = input.Read() / 255f;
+								for (int frame = 0, bezier = 0; ; frame++) {
+									timeline.SetFrame(frame, time, r, g, b);
+									if (frame == frameLast) break;
+									float time2 = input.ReadFloat();
+									float r2 = input.Read() / 255f, g2 = input.Read() / 255f;
+									float b2 = input.Read() / 255f, a2 = input.Read() / 255f;
+									switch (input.ReadByte()) {
+										case CURVE_STEPPED:
+											timeline.SetStepped(frame);
+											break;
+										case CURVE_BEZIER:
+											SetBezier(input, timeline, bezier++, frame, 0, time, time2, r, r2, 1);
+											SetBezier(input, timeline, bezier++, frame, 1, time, time2, g, g2, 1);
+											SetBezier(input, timeline, bezier++, frame, 2, time, time2, b, b2, 1);
+											break;
+									}
+									time = time2;
+									r = r2;
+									g = g2;
+									b = b2;
+								}
+								timelines.Add(timeline);
+								break;
+							}
+						case SLOT_RGBA2: {
+								RGBA2Timeline timeline = new RGBA2Timeline(frameCount, input.ReadInt(true), slotIndex);
 								float time = input.ReadFloat();
 								float r = input.Read() / 255f, g = input.Read() / 255f;
 								float b = input.Read() / 255f, a = input.Read() / 255f;
-								float r2 = input.Read() / 255f, g2 = input.Read() / 255f;
-								float b2 = input.Read() / 255f;
+								float r2 = input.Read() / 255f, g2 = input.Read() / 255f, b2 = input.Read() / 255f;
 								for (int frame = 0, bezier = 0; ; frame++) {
 									timeline.SetFrame(frame, time, r, g, b, a, r2, g2, b2);
 									if (frame == frameLast) break;
 									float time2 = input.ReadFloat();
 									float nr = input.Read() / 255f, ng = input.Read() / 255f;
 									float nb = input.Read() / 255f, na = input.Read() / 255f;
-									float nr2 = input.Read() / 255f, ng2 = input.Read() / 255f;
-									float nb2 = input.Read() / 255f;
+									float nr2 = input.Read() / 255f, ng2 = input.Read() / 255f, nb2 = input.Read() / 255f;
 									switch (input.ReadByte()) {
 										case CURVE_STEPPED:
 											timeline.SetStepped(frame);
@@ -661,6 +696,63 @@ namespace Spine {
 								timelines.Add(timeline);
 								break;
 							}
+						case SLOT_RGB2: {
+								RGB2Timeline timeline = new RGB2Timeline(frameCount, input.ReadInt(true), slotIndex);
+								float time = input.ReadFloat();
+								float r = input.Read() / 255f, g = input.Read() / 255f, b = input.Read() / 255f;
+								float r2 = input.Read() / 255f, g2 = input.Read() / 255f, b2 = input.Read() / 255f;
+								for (int frame = 0, bezier = 0; ; frame++) {
+									timeline.SetFrame(frame, time, r, g, b, r2, g2, b2);
+									if (frame == frameLast) break;
+									float time2 = input.ReadFloat();
+									float nr = input.Read() / 255f, ng = input.Read() / 255f, nb = input.Read() / 255f;
+									float nr2 = input.Read() / 255f, ng2 = input.Read() / 255f, nb2 = input.Read() / 255f;
+									switch (input.ReadByte()) {
+										case CURVE_STEPPED:
+											timeline.SetStepped(frame);
+											break;
+										case CURVE_BEZIER:
+											SetBezier(input, timeline, bezier++, frame, 0, time, time2, r, nr, 1);
+											SetBezier(input, timeline, bezier++, frame, 1, time, time2, g, ng, 1);
+											SetBezier(input, timeline, bezier++, frame, 2, time, time2, b, nb, 1);
+											SetBezier(input, timeline, bezier++, frame, 3, time, time2, r2, nr2, 1);
+											SetBezier(input, timeline, bezier++, frame, 4, time, time2, g2, ng2, 1);
+											SetBezier(input, timeline, bezier++, frame, 5, time, time2, b2, nb2, 1);
+											break;
+									}
+									time = time2;
+									r = nr;
+									g = ng;
+									b = nb;
+									r2 = nr2;
+									g2 = ng2;
+									b2 = nb2;
+								}
+								timelines.Add(timeline);
+								break;
+							}
+						case SLOT_ALPHA: {
+								AlphaTimeline timeline = new AlphaTimeline(frameCount, input.ReadInt(true), slotIndex);
+								float time = input.ReadFloat(), a = input.Read() / 255f;
+								for (int frame = 0, bezier = 0; ; frame++) {
+									timeline.SetFrame(frame, time, a);
+									if (frame == frameLast) break;
+									float time2 = input.ReadFloat();
+									float a2 = input.Read() / 255f;
+									switch (input.ReadByte()) {
+										case CURVE_STEPPED:
+											timeline.SetStepped(frame);
+											break;
+										case CURVE_BEZIER:
+											SetBezier(input, timeline, bezier++, frame, 0, time, time2, a, a2, 1);
+											break;
+									}
+									time = time2;
+									a = a2;
+								}
+								timelines.Add(timeline);
+								break;
+							}
 					}
 				}
 			}
@@ -669,19 +761,37 @@ namespace Spine {
 			for (int i = 0, n = input.ReadInt(true); i < n; i++) {
 				int boneIndex = input.ReadInt(true);
 				for (int ii = 0, nn = input.ReadInt(true); ii < nn; ii++) {
-					switch (input.ReadByte()) {
+					int type = input.ReadByte(), frameCount = input.ReadInt(true), bezierCount = input.ReadInt(true);
+					switch (type) {
 						case BONE_ROTATE:
-							timelines.Add(ReadTimeline(input, new RotateTimeline(input.ReadInt(true), input.ReadInt(true), boneIndex), 1));
+							timelines.Add(ReadTimeline(input, new RotateTimeline(frameCount, bezierCount, boneIndex), 1));
 							break;
 						case BONE_TRANSLATE:
-							timelines
-								.Add(ReadTimeline(input, new TranslateTimeline(input.ReadInt(true), input.ReadInt(true), boneIndex), scale));
+							timelines.Add(ReadTimeline(input, new TranslateTimeline(frameCount, bezierCount, boneIndex), scale));
+							break;
+						case BONE_TRANSLATEX:
+							timelines.Add(ReadTimeline(input, new TranslateXTimeline(frameCount, bezierCount, boneIndex), scale));
+							break;
+						case BONE_TRANSLATEY:
+							timelines.Add(ReadTimeline(input, new TranslateYTimeline(frameCount, bezierCount, boneIndex), scale));
 							break;
 						case BONE_SCALE:
-							timelines.Add(ReadTimeline(input, new ScaleTimeline(input.ReadInt(true), input.ReadInt(true), boneIndex), 1));
+							timelines.Add(ReadTimeline(input, new ScaleTimeline(frameCount, bezierCount, boneIndex), 1));
+							break;
+						case BONE_SCALEX:
+							timelines.Add(ReadTimeline(input, new ScaleXTimeline(frameCount, bezierCount, boneIndex), 1));
+							break;
+						case BONE_SCALEY:
+							timelines.Add(ReadTimeline(input, new ScaleYTimeline(frameCount, bezierCount, boneIndex), 1));
 							break;
 						case BONE_SHEAR:
-							timelines.Add(ReadTimeline(input, new ShearTimeline(input.ReadInt(true), input.ReadInt(true), boneIndex), 1));
+							timelines.Add(ReadTimeline(input, new ShearTimeline(frameCount, bezierCount, boneIndex), 1));
+							break;
+						case BONE_SHEARX:
+							timelines.Add(ReadTimeline(input, new ShearXTimeline(frameCount, bezierCount, boneIndex), 1));
+							break;
+						case BONE_SHEARY:
+							timelines.Add(ReadTimeline(input, new ShearYTimeline(frameCount, bezierCount, boneIndex), 1));
 							break;
 					}
 				}

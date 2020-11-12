@@ -113,10 +113,10 @@ namespace Spine.Unity.Examples {
 					return GetFillerTimeline((ShearTimeline)timeline, skeletonData);
 				if (timeline is AttachmentTimeline)
 					return GetFillerTimeline((AttachmentTimeline)timeline, skeletonData);
-				if (timeline is ColorTimeline)
-					return GetFillerTimeline((ColorTimeline)timeline, skeletonData);
-				if (timeline is TwoColorTimeline)
-					return GetFillerTimeline((TwoColorTimeline)timeline, skeletonData);
+				if (timeline is RGBATimeline)
+					return GetFillerTimeline((RGBATimeline)timeline, skeletonData);
+				if (timeline is RGBA2Timeline)
+					return GetFillerTimeline((RGBA2Timeline)timeline, skeletonData);
 				if (timeline is DeformTimeline)
 					return GetFillerTimeline((DeformTimeline)timeline, skeletonData);
 				if (timeline is DrawOrderTimeline)
@@ -165,15 +165,15 @@ namespace Spine.Unity.Examples {
 				return t;
 			}
 
-			static ColorTimeline GetFillerTimeline (ColorTimeline timeline, SkeletonData skeletonData) {
-				var t = new ColorTimeline(1, 0, timeline.SlotIndex);
+			static RGBATimeline GetFillerTimeline (RGBATimeline timeline, SkeletonData skeletonData) {
+				var t = new RGBATimeline(1, 0, timeline.SlotIndex);
 				var slotData = skeletonData.Slots.Items[t.SlotIndex];
 				t.SetFrame(0, 0, slotData.R, slotData.G, slotData.B, slotData.A);
 				return t;
 			}
 
-			static TwoColorTimeline GetFillerTimeline (TwoColorTimeline timeline, SkeletonData skeletonData) {
-				var t = new TwoColorTimeline(1, 0, timeline.SlotIndex);
+			static RGBA2Timeline GetFillerTimeline (RGBA2Timeline timeline, SkeletonData skeletonData) {
+				var t = new RGBA2Timeline(1, 0, timeline.SlotIndex);
 				var slotData = skeletonData.Slots.Items[t.SlotIndex];
 				t.SetFrame(0, 0, slotData.R, slotData.G, slotData.B, slotData.A, slotData.R2, slotData.G2, slotData.B2);
 				return t;
