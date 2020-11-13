@@ -246,6 +246,7 @@
   * Now providing `BeforeApply` update callbacks at all skeleton animation components (`SkeletonAnimation`, `SkeletonMecanim` and `SkeletonGraphic`).
   * Added `BoundingBoxFollowerGraphic` component. This class is a counterpart of `BoundingBoxFollower` that can be used with `SkeletonGraphic`.
   * Added Inspector context menu functions `SkeletonRenderer - Add all BoundingBoxFollower GameObjects` and `SkeletonGraphic - Add all BoundingBoxFollowerGraphic GameObjects` that automatically generate bounding box follower GameObjects for every `BoundingBoxAttachment` for all skins of a skeleton.
+  * `GetRemappedClone()` now provides an additional parameter `pivotShiftsMeshUVCoords` for `MeshAttachment` to prevent uv shifts at a non-central Sprite pivot. This parameter defaults to `true` to maintain previous behaviour.
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.MixNext` instead of `MixMode.MixAlways`.
