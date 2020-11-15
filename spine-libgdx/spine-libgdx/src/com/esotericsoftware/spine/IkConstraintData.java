@@ -60,7 +60,7 @@ public class IkConstraintData extends ConstraintData {
 		this.target = target;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotation. */
 	public float getMix () {
 		return mix;
 	}

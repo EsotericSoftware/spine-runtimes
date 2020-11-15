@@ -37,7 +37,7 @@ import com.badlogic.gdx.utils.Array;
 public class TransformConstraintData extends ConstraintData {
 	final Array<BoneData> bones = new Array();
 	BoneData target;
-	float rotateMix, translateMix, scaleMix, shearMix;
+	float mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY;
 	float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
 	boolean relative, local;
 
@@ -60,40 +60,58 @@ public class TransformConstraintData extends ConstraintData {
 		this.target = target;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
-	public float getRotateMix () {
-		return rotateMix;
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotation. */
+	public float getMixRotate () {
+		return mixRotate;
 	}
 
-	public void setRotateMix (float rotateMix) {
-		this.rotateMix = rotateMix;
+	public void setMixRotate (float mixRotate) {
+		this.mixRotate = mixRotate;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translations. */
-	public float getTranslateMix () {
-		return translateMix;
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translation X. */
+	public float getMixX () {
+		return mixX;
 	}
 
-	public void setTranslateMix (float translateMix) {
-		this.translateMix = translateMix;
+	public void setMixX (float mixX) {
+		this.mixX = mixX;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained scales. */
-	public float getScaleMix () {
-		return scaleMix;
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y. */
+	public float getMixY () {
+		return mixY;
 	}
 
-	public void setScaleMix (float scaleMix) {
-		this.scaleMix = scaleMix;
+	public void setMixY (float mixY) {
+		this.mixY = mixY;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained shears. */
-	public float getShearMix () {
-		return shearMix;
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained scale X. */
+	public float getMixScaleX () {
+		return mixScaleX;
 	}
 
-	public void setShearMix (float shearMix) {
-		this.shearMix = shearMix;
+	public void setMixScaleX (float mixScaleX) {
+		this.mixScaleX = mixScaleX;
+	}
+
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained scale Y. */
+	public float getMixScaleY () {
+		return mixScaleY;
+	}
+
+	public void setMixScaleY (float mixScaleY) {
+		this.mixScaleY = mixScaleY;
+	}
+
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained shear Y. */
+	public float getMixShearY () {
+		return mixShearY;
+	}
+
+	public void setMixShearY (float mixShearY) {
+		this.mixShearY = mixShearY;
 	}
 
 	/** An offset added to the constrained bone rotation. */

@@ -57,7 +57,7 @@ public class SkeletonBounds {
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		Array<BoundingBoxAttachment> boundingBoxes = this.boundingBoxes;
 		Array<FloatArray> polygons = this.polygons;
-		Object[]  slots = skeleton.slots.items;
+		Object[] slots = skeleton.slots.items;
 		int slotCount = skeleton.slots.size;
 
 		boundingBoxes.clear();

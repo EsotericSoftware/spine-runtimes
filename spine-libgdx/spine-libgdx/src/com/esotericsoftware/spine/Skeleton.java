@@ -405,10 +405,12 @@ public class Skeleton {
 		for (int i = 0, n = this.transformConstraints.size; i < n; i++) {
 			TransformConstraint constraint = (TransformConstraint)transformConstraints[i];
 			TransformConstraintData data = constraint.data;
-			constraint.rotateMix = data.rotateMix;
-			constraint.translateMix = data.translateMix;
-			constraint.scaleMix = data.scaleMix;
-			constraint.shearMix = data.shearMix;
+			constraint.mixRotate = data.mixRotate;
+			constraint.mixX = data.mixX;
+			constraint.mixY = data.mixY;
+			constraint.mixScaleX = data.mixScaleX;
+			constraint.mixScaleY = data.mixScaleY;
+			constraint.mixShearY = data.mixShearY;
 		}
 
 		Object[] pathConstraints = this.pathConstraints.items;
@@ -417,8 +419,8 @@ public class Skeleton {
 			PathConstraintData data = constraint.data;
 			constraint.position = data.position;
 			constraint.spacing = data.spacing;
-			constraint.rotateMix = data.rotateMix;
-			constraint.translateMix = data.translateMix;
+			constraint.mixRotate = data.mixRotate;
+			constraint.mixTranslate = data.mixTranslate;
 		}
 	}
 

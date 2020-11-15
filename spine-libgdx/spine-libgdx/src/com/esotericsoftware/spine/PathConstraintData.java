@@ -41,7 +41,7 @@ public class PathConstraintData extends ConstraintData {
 	SpacingMode spacingMode;
 	RotateMode rotateMode;
 	float offsetRotation;
-	float position, spacing, rotateMix, translateMix;
+	float position, spacing, mixRotate, mixTranslate;
 
 	public PathConstraintData (String name) {
 		super(name);
@@ -119,22 +119,22 @@ public class PathConstraintData extends ConstraintData {
 		this.spacing = spacing;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
-	public float getRotateMix () {
-		return rotateMix;
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotation. */
+	public float getMixRotate () {
+		return mixRotate;
 	}
 
-	public void setRotateMix (float rotateMix) {
-		this.rotateMix = rotateMix;
+	public void setMixRotate (float mixRotate) {
+		this.mixRotate = mixRotate;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translations. */
-	public float getTranslateMix () {
-		return translateMix;
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translation. */
+	public float getMixTranslate () {
+		return mixTranslate;
 	}
 
-	public void setTranslateMix (float translateMix) {
-		this.translateMix = translateMix;
+	public void setMixTranslate (float mixTranslate) {
+		this.mixTranslate = mixTranslate;
 	}
 
 	/** Controls how the first bone is positioned along the path.

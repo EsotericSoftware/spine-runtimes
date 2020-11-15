@@ -226,10 +226,12 @@ public class SkeletonJson extends SkeletonLoader {
 			data.offsetScaleY = constraintMap.getFloat("scaleY", 0);
 			data.offsetShearY = constraintMap.getFloat("shearY", 0);
 
-			data.rotateMix = constraintMap.getFloat("rotateMix", 1);
-			data.translateMix = constraintMap.getFloat("translateMix", 1);
-			data.scaleMix = constraintMap.getFloat("scaleMix", 1);
-			data.shearMix = constraintMap.getFloat("shearMix", 1);
+			data.mixRotate = constraintMap.getFloat("mixRotate", 1);
+			data.mixX = constraintMap.getFloat("mixX", 1);
+			data.mixY = constraintMap.getFloat("mixY", data.mixX);
+			data.mixScaleX = constraintMap.getFloat("mixScaleX", 1);
+			data.mixScaleY = constraintMap.getFloat("mixScaleY", data.mixScaleX);
+			data.mixShearY = constraintMap.getFloat("mixShearY", 1);
 
 			skeletonData.transformConstraints.add(data);
 		}
@@ -258,8 +260,8 @@ public class SkeletonJson extends SkeletonLoader {
 			if (data.positionMode == PositionMode.fixed) data.position *= scale;
 			data.spacing = constraintMap.getFloat("spacing", 0);
 			if (data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed) data.spacing *= scale;
-			data.rotateMix = constraintMap.getFloat("rotateMix", 1);
-			data.translateMix = constraintMap.getFloat("translateMix", 1);
+			data.mixRotate = constraintMap.getFloat("mixRotate", 1);
+			data.mixTranslate = constraintMap.getFloat("mixTranslate", 1);
 
 			skeletonData.pathConstraints.add(data);
 		}
@@ -765,30 +767,36 @@ public class SkeletonJson extends SkeletonLoader {
 			TransformConstraintTimeline timeline = new TransformConstraintTimeline(timelineMap.size, timelineMap.size << 2,
 				skeletonData.getTransformConstraints().indexOf(constraint, true));
 			float time = keyMap.getFloat("time", 0);
-			float rotateMix = keyMap.getFloat("rotateMix", 1), translateMix = keyMap.getFloat("translateMix", 1);
-			float scaleMix = keyMap.getFloat("scaleMix", 1), shearMix = keyMap.getFloat("shearMix", 1);
+			float mixRotate = keyMap.getFloat("mixRotate", 1), mixShearY = keyMap.getFloat("mixShearY", 1);
+			float mixX = keyMap.getFloat("mixX", 1), mixY = keyMap.getFloat("mixY", mixX);
+			float mixScaleX = keyMap.getFloat("mixScaleX", 1), mixScaleY = keyMap.getFloat("mixScaleY", mixScaleX);
 			for (int frame = 0, bezier = 0;; frame++) {
-				timeline.setFrame(frame, time, rotateMix, translateMix, scaleMix, shearMix);
+				timeline.setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
 				JsonValue nextMap = keyMap.next;
 				if (nextMap == null) {
 					timeline.shrink(bezier);
 					break;
 				}
 				float time2 = nextMap.getFloat("time", 0);
-				float rotateMix2 = nextMap.getFloat("rotateMix", 1), translateMix2 = nextMap.getFloat("translateMix", 1);
-				float scaleMix2 = nextMap.getFloat("scaleMix", 1), shearMix2 = nextMap.getFloat("shearMix", 1);
+				float mixRotate2 = nextMap.getFloat("mixRotate", 1), mixShearY2 = nextMap.getFloat("mixShearY", 1);
+				float mixX2 = nextMap.getFloat("mixX", 1), mixY2 = nextMap.getFloat("mixY", mixX2);
+				float mixScaleX2 = nextMap.getFloat("mixScaleX", 1), mixScaleY2 = nextMap.getFloat("mixScaleY", mixScaleX2);
 				JsonValue curve = keyMap.get("curve");
 				if (curve != null) {
-					bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, rotateMix, rotateMix2, 1);
-					bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, translateMix, translateMix2, 1);
-					bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, scaleMix, scaleMix2, 1);
-					bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, shearMix, shearMix2, 1);
+					bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+					bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1);
+					bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1);
+					bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, mixScaleX, mixScaleX2, 1);
+					bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, mixScaleY, mixScaleY2, 1);
+					bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, mixShearY, mixShearY2, 1);
 				}
 				time = time2;
-				rotateMix = rotateMix2;
-				translateMix = translateMix2;
-				scaleMix = scaleMix2;
-				shearMix = shearMix2;
+				mixRotate = mixRotate2;
+				mixX = mixX2;
+				mixY = mixY2;
+				mixScaleX = mixScaleX2;
+				mixScaleY = mixScaleY2;
+				mixScaleX = mixScaleX2;
 				keyMap = nextMap;
 			}
 			timelines.add(timeline);
@@ -812,7 +820,7 @@ public class SkeletonJson extends SkeletonLoader {
 						data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed ? scale : 1));
 				} else if (timelineName.equals("mix")) {
 					CurveTimeline2 timeline = new PathConstraintMixTimeline(timelineMap.size, timelineMap.size << 1, index);
-					timelines.add(readTimeline(keyMap, timeline, "rotateMix", "translateMix", 1, 1));
+					timelines.add(readTimeline(keyMap, timeline, "mixRotate", "mixTranslate", 1, 1));
 				}
 			}
 		}

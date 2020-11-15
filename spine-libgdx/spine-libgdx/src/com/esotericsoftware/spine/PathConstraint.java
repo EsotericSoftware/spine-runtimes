@@ -50,7 +50,7 @@ public class PathConstraint implements Updatable {
 	final PathConstraintData data;
 	final Array<Bone> bones;
 	Slot target;
-	float position, spacing, rotateMix, translateMix;
+	float position, spacing, mixRotate, mixTranslate;
 
 	boolean active;
 
@@ -68,8 +68,8 @@ public class PathConstraint implements Updatable {
 		target = skeleton.findSlot(data.target.name);
 		position = data.position;
 		spacing = data.spacing;
-		rotateMix = data.rotateMix;
-		translateMix = data.translateMix;
+		mixRotate = data.mixRotate;
+		mixTranslate = data.mixTranslate;
 	}
 
 	/** Copy constructor. */
@@ -83,8 +83,8 @@ public class PathConstraint implements Updatable {
 		target = skeleton.slots.get(constraint.target.data.index);
 		position = constraint.position;
 		spacing = constraint.spacing;
-		rotateMix = constraint.rotateMix;
-		translateMix = constraint.translateMix;
+		mixRotate = constraint.mixRotate;
+		mixTranslate = constraint.mixTranslate;
 	}
 
 	/** Applies the constraint to the constrained bones. */
@@ -92,8 +92,8 @@ public class PathConstraint implements Updatable {
 		Attachment attachment = target.attachment;
 		if (!(attachment instanceof PathAttachment)) return;
 
-		float rotateMix = this.rotateMix, translateMix = this.translateMix;
-		boolean translate = translateMix > 0, rotate = rotateMix > 0;
+		float mixRotate = this.mixRotate, mixTranslate = this.mixTranslate;
+		boolean translate = mixTranslate > 0, rotate = mixRotate > 0;
 		if (!translate && !rotate) return;
 
 		PathConstraintData data = this.data;
@@ -145,13 +145,13 @@ public class PathConstraint implements Updatable {
 		}
 		for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 			Bone bone = (Bone)bones[i];
-			bone.worldX += (boneX - bone.worldX) * translateMix;
-			bone.worldY += (boneY - bone.worldY) * translateMix;
+			bone.worldX += (boneX - bone.worldX) * mixTranslate;
+			bone.worldY += (boneY - bone.worldY) * mixTranslate;
 			float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 			if (scale) {
 				float length = lengths[i];
 				if (length >= epsilon) {
-					float s = ((float)Math.sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
+					float s = ((float)Math.sqrt(dx * dx + dy * dy) / length - 1) * mixRotate + 1;
 					bone.a *= s;
 					bone.c *= s;
 				}
@@ -171,15 +171,15 @@ public class PathConstraint implements Updatable {
 					cos = (float)Math.cos(r);
 					sin = (float)Math.sin(r);
 					float length = bone.data.length;
-					boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
-					boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
+					boneX += (length * (cos * a - sin * c) - dx) * mixRotate;
+					boneY += (length * (sin * a + cos * c) - dy) * mixRotate;
 				} else
 					r += offsetRotation;
 				if (r > SpineUtils.PI)
 					r -= SpineUtils.PI2;
 				else if (r < -SpineUtils.PI) //
 					r += SpineUtils.PI2;
-				r *= rotateMix;
+				r *= mixRotate;
 				cos = (float)Math.cos(r);
 				sin = (float)Math.sin(r);
 				bone.a = cos * a - sin * c;
@@ -464,22 +464,22 @@ public class PathConstraint implements Updatable {
 		this.spacing = spacing;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
-	public float getRotateMix () {
-		return rotateMix;
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotation. */
+	public float getMixRotate () {
+		return mixRotate;
 	}
 
-	public void setRotateMix (float rotateMix) {
-		this.rotateMix = rotateMix;
+	public void setMixRotate (float mixRotate) {
+		this.mixRotate = mixRotate;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translations. */
-	public float getTranslateMix () {
-		return translateMix;
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translation. */
+	public float getMixTranslate () {
+		return mixTranslate;
 	}
 
-	public void setTranslateMix (float translateMix) {
-		this.translateMix = translateMix;
+	public void setMixTranslate (float mixTranslate) {
+		this.mixTranslate = mixTranslate;
 	}
 
 	/** The bones that will be modified by this path constraint. */

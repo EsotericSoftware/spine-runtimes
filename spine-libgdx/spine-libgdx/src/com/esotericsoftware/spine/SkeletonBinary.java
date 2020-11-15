@@ -239,10 +239,12 @@ public class SkeletonBinary extends SkeletonLoader {
 				data.offsetScaleX = input.readFloat();
 				data.offsetScaleY = input.readFloat();
 				data.offsetShearY = input.readFloat();
-				data.rotateMix = input.readFloat();
-				data.translateMix = input.readFloat();
-				data.scaleMix = input.readFloat();
-				data.shearMix = input.readFloat();
+				data.mixRotate = input.readFloat();
+				data.mixX = input.readFloat();
+				data.mixY = input.readFloat();
+				data.mixScaleX = input.readFloat();
+				data.mixScaleY = input.readFloat();
+				data.mixShearY = input.readFloat();
 				o[i] = data;
 			}
 
@@ -264,8 +266,8 @@ public class SkeletonBinary extends SkeletonLoader {
 				if (data.positionMode == PositionMode.fixed) data.position *= scale;
 				data.spacing = input.readFloat();
 				if (data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed) data.spacing *= scale;
-				data.rotateMix = input.readFloat();
-				data.translateMix = input.readFloat();
+				data.mixRotate = input.readFloat();
+				data.mixTranslate = input.readFloat();
 				o[i] = data;
 			}
 
@@ -810,28 +812,32 @@ public class SkeletonBinary extends SkeletonLoader {
 		for (int i = 0, n = input.readInt(true); i < n; i++) {
 			int index = input.readInt(true), frameCount = input.readInt(true), frameLast = frameCount - 1;
 			TransformConstraintTimeline timeline = new TransformConstraintTimeline(frameCount, input.readInt(true), index);
-			float time = input.readFloat(), rotateMix = input.readFloat(), translateMix = input.readFloat(),
-				scaleMix = input.readFloat(), shearMix = input.readFloat();
+			float time = input.readFloat(), mixRotate = input.readFloat(), mixX = input.readFloat(), mixY = input.readFloat(),
+				mixScaleX = input.readFloat(), mixScaleY = input.readFloat(), mixShearY = input.readFloat();
 			for (int frame = 0, bezier = 0;; frame++) {
-				timeline.setFrame(frame, time, rotateMix, translateMix, scaleMix, shearMix);
+				timeline.setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
 				if (frame == frameLast) break;
-				float time2 = input.readFloat(), rotateMix2 = input.readFloat(), translateMix2 = input.readFloat(),
-					scaleMix2 = input.readFloat(), shearMix2 = input.readFloat();
+				float time2 = input.readFloat(), mixRotate2 = input.readFloat(), mixX2 = input.readFloat(), mixY2 = input.readFloat(),
+					mixScaleX2 = input.readFloat(), mixScaleY2 = input.readFloat(), mixShearY2 = input.readFloat();
 				switch (input.readByte()) {
 				case CURVE_STEPPED:
 					timeline.setStepped(frame);
 					break;
 				case CURVE_BEZIER:
-					setBezier(input, timeline, bezier++, frame, 0, time, time2, rotateMix, rotateMix2, 1);
-					setBezier(input, timeline, bezier++, frame, 1, time, time2, translateMix, translateMix2, 1);
-					setBezier(input, timeline, bezier++, frame, 2, time, time2, scaleMix, scaleMix2, 1);
-					setBezier(input, timeline, bezier++, frame, 3, time, time2, shearMix, shearMix2, 1);
+					setBezier(input, timeline, bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+					setBezier(input, timeline, bezier++, frame, 1, time, time2, mixX, mixX2, 1);
+					setBezier(input, timeline, bezier++, frame, 2, time, time2, mixY, mixY2, 1);
+					setBezier(input, timeline, bezier++, frame, 3, time, time2, mixScaleX, mixScaleX2, 1);
+					setBezier(input, timeline, bezier++, frame, 4, time, time2, mixScaleY, mixScaleY2, 1);
+					setBezier(input, timeline, bezier++, frame, 5, time, time2, mixShearY, mixShearY2, 1);
 				}
 				time = time2;
-				rotateMix = rotateMix2;
-				translateMix = translateMix2;
-				scaleMix = scaleMix2;
-				shearMix = shearMix2;
+				mixRotate = mixRotate2;
+				mixX = mixX2;
+				mixY = mixY2;
+				mixScaleX = mixScaleX2;
+				mixScaleY = mixScaleY2;
+				mixShearY = mixShearY2;
 			}
 			timelines.add(timeline);
 		}

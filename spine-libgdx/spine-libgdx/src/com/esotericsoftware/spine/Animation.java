@@ -188,7 +188,7 @@ public class Animation {
 	}
 
 	static private enum Property {
-		rotate, translateX, translateY, scaleX, scaleY, shearX, shearY, //
+		rotate, x, y, scaleX, scaleY, shearX, shearY, //
 		rgb, alpha, rgb2, //
 		attachment, deform, //
 		event, drawOrder, //
@@ -316,7 +316,7 @@ public class Animation {
 		 * @param bezier The ordinal of this Bezier curve for this timeline, between 0 and <code>bezierCount - 1</code> (specified
 		 *           in the constructor), inclusive.
 		 * @param frame Between 0 and <code>frameCount - 1</code>, inclusive.
-		 * @param value The index of the value for this frame that this curve is used for.
+		 * @param value The index of the value for the frame this curve is used for.
 		 * @param time1 The time for the first key.
 		 * @param value1 The value for the first key.
 		 * @param cx1 The time for the first Bezier handle.
@@ -494,8 +494,8 @@ public class Animation {
 
 		public TranslateTimeline (int frameCount, int bezierCount, int boneIndex) {
 			super(frameCount, bezierCount, //
-				Property.translateX.ordinal() + "|" + boneIndex, //
-				Property.translateY.ordinal() + "|" + boneIndex);
+				Property.x.ordinal() + "|" + boneIndex, //
+				Property.y.ordinal() + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 
@@ -565,7 +565,7 @@ public class Animation {
 		final int boneIndex;
 
 		public TranslateXTimeline (int frameCount, int bezierCount, int boneIndex) {
-			super(frameCount, bezierCount, Property.translateX.ordinal() + "|" + boneIndex);
+			super(frameCount, bezierCount, Property.x.ordinal() + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 
@@ -611,7 +611,7 @@ public class Animation {
 		final int boneIndex;
 
 		public TranslateYTimeline (int frameCount, int bezierCount, int boneIndex) {
-			super(frameCount, bezierCount, Property.translateY.ordinal() + "|" + boneIndex);
+			super(frameCount, bezierCount, Property.y.ordinal() + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 
@@ -2109,11 +2109,12 @@ public class Animation {
 		}
 	}
 
-	/** Changes a transform constraint's {@link TransformConstraint#getRotateMix()}, {@link TransformConstraint#getTranslateMix()},
-	 * {@link TransformConstraint#getScaleMix()}, and {@link TransformConstraint#getShearMix()}. */
+	/** Changes a transform constraint's {@link TransformConstraint#getMixRotate()}, {@link TransformConstraint#getMixX()},
+	 * {@link TransformConstraint#getMixY()}, {@link TransformConstraint#getMixScaleX()},
+	 * {@link TransformConstraint#getMixScaleY()}, and {@link TransformConstraint#getMixShearY()}. */
 	static public class TransformConstraintTimeline extends CurveTimeline {
-		static public final int ENTRIES = 5;
-		static private final int ROTATE = 1, TRANSLATE = 2, SCALE = 3, SHEAR = 4;
+		static public final int ENTRIES = 7;
+		static private final int ROTATE = 1, X = 2, Y = 3, SCALEX = 4, SCALEY = 5, SHEARY = 6;
 
 		final int transformConstraintIndex;
 
@@ -2135,13 +2136,16 @@ public class Animation {
 		/** Sets the time, rotate mix, translate mix, scale mix, and shear mix for the specified frame.
 		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 		 * @param time The frame time in seconds. */
-		public void setFrame (int frame, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
+		public void setFrame (int frame, float time, float mixRotate, float mixX, float mixY, float mixScaleX, float mixScaleY,
+			float mixShearY) {
 			frame *= ENTRIES;
 			frames[frame] = time;
-			frames[frame + ROTATE] = rotateMix;
-			frames[frame + TRANSLATE] = translateMix;
-			frames[frame + SCALE] = scaleMix;
-			frames[frame + SHEAR] = shearMix;
+			frames[frame + ROTATE] = mixRotate;
+			frames[frame + X] = mixX;
+			frames[frame + Y] = mixY;
+			frames[frame + SCALEX] = mixScaleX;
+			frames[frame + SCALEY] = mixScaleY;
+			frames[frame + SHEARY] = mixShearY;
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
@@ -2155,59 +2159,75 @@ public class Animation {
 				TransformConstraintData data = constraint.data;
 				switch (blend) {
 				case setup:
-					constraint.rotateMix = data.rotateMix;
-					constraint.translateMix = data.translateMix;
-					constraint.scaleMix = data.scaleMix;
-					constraint.shearMix = data.shearMix;
+					constraint.mixRotate = data.mixRotate;
+					constraint.mixX = data.mixX;
+					constraint.mixY = data.mixY;
+					constraint.mixScaleX = data.mixScaleX;
+					constraint.mixScaleY = data.mixScaleY;
+					constraint.mixShearY = data.mixShearY;
 					return;
 				case first:
-					constraint.rotateMix += (data.rotateMix - constraint.rotateMix) * alpha;
-					constraint.translateMix += (data.translateMix - constraint.translateMix) * alpha;
-					constraint.scaleMix += (data.scaleMix - constraint.scaleMix) * alpha;
-					constraint.shearMix += (data.shearMix - constraint.shearMix) * alpha;
+					constraint.mixRotate += (data.mixRotate - constraint.mixRotate) * alpha;
+					constraint.mixX += (data.mixX - constraint.mixX) * alpha;
+					constraint.mixY += (data.mixY - constraint.mixY) * alpha;
+					constraint.mixScaleX += (data.mixScaleX - constraint.mixScaleX) * alpha;
+					constraint.mixScaleY += (data.mixScaleY - constraint.mixScaleY) * alpha;
+					constraint.mixShearY += (data.mixShearY - constraint.mixShearY) * alpha;
 				}
 				return;
 			}
 
-			float rotate, translate, scale, shear;
+			float rotate, x, y, scaleX, scaleY, shearY;
 			int i = search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
 			switch (curveType) {
 			case LINEAR:
 				float before = frames[i];
 				rotate = frames[i + ROTATE];
-				translate = frames[i + TRANSLATE];
-				scale = frames[i + SCALE];
-				shear = frames[i + SHEAR];
+				x = frames[i + X];
+				y = frames[i + Y];
+				scaleX = frames[i + SCALEX];
+				scaleY = frames[i + SCALEY];
+				shearY = frames[i + SHEARY];
 				float t = (time - before) / (frames[i + ENTRIES] - before);
 				rotate += (frames[i + ENTRIES + ROTATE] - rotate) * t;
-				translate += (frames[i + ENTRIES + TRANSLATE] - translate) * t;
-				scale += (frames[i + ENTRIES + SCALE] - scale) * t;
-				shear += (frames[i + ENTRIES + SHEAR] - shear) * t;
+				x += (frames[i + ENTRIES + X] - x) * t;
+				y += (frames[i + ENTRIES + Y] - y) * t;
+				scaleX += (frames[i + ENTRIES + SCALEX] - scaleX) * t;
+				scaleY += (frames[i + ENTRIES + SCALEY] - scaleY) * t;
+				shearY += (frames[i + ENTRIES + SHEARY] - shearY) * t;
 				break;
 			case STEPPED:
 				rotate = frames[i + ROTATE];
-				translate = frames[i + TRANSLATE];
-				scale = frames[i + SCALE];
-				shear = frames[i + SHEAR];
+				x = frames[i + X];
+				y = frames[i + Y];
+				scaleX = frames[i + SCALEX];
+				scaleY = frames[i + SCALEY];
+				shearY = frames[i + SHEARY];
 				break;
 			default:
 				rotate = getBezierValue(time, i, ROTATE, curveType - BEZIER);
-				translate = getBezierValue(time, i, TRANSLATE, curveType + BEZIER_SIZE - BEZIER);
-				scale = getBezierValue(time, i, TRANSLATE, curveType + BEZIER_SIZE * 2 - BEZIER);
-				shear = getBezierValue(time, i, TRANSLATE, curveType + BEZIER_SIZE * 3 - BEZIER);
+				x = getBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER);
+				y = getBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER);
+				scaleX = getBezierValue(time, i, SCALEX, curveType + BEZIER_SIZE * 3 - BEZIER);
+				scaleY = getBezierValue(time, i, SCALEY, curveType + BEZIER_SIZE * 4 - BEZIER);
+				shearY = getBezierValue(time, i, SHEARY, curveType + BEZIER_SIZE * 5 - BEZIER);
 			}
 
 			if (blend == setup) {
 				TransformConstraintData data = constraint.data;
-				constraint.rotateMix = data.rotateMix + (rotate - data.rotateMix) * alpha;
-				constraint.translateMix = data.translateMix + (translate - data.translateMix) * alpha;
-				constraint.scaleMix = data.scaleMix + (scale - data.scaleMix) * alpha;
-				constraint.shearMix = data.shearMix + (shear - data.shearMix) * alpha;
+				constraint.mixRotate = data.mixRotate + (rotate - data.mixRotate) * alpha;
+				constraint.mixX = data.mixX + (x - data.mixX) * alpha;
+				constraint.mixY = data.mixY + (y - data.mixY) * alpha;
+				constraint.mixScaleX = data.mixScaleX + (scaleX - data.mixScaleX) * alpha;
+				constraint.mixScaleY = data.mixScaleY + (scaleY - data.mixScaleY) * alpha;
+				constraint.mixShearY = data.mixShearY + (shearY - data.mixShearY) * alpha;
 			} else {
-				constraint.rotateMix += (rotate - constraint.rotateMix) * alpha;
-				constraint.translateMix += (translate - constraint.translateMix) * alpha;
-				constraint.scaleMix += (scale - constraint.scaleMix) * alpha;
-				constraint.shearMix += (shear - constraint.shearMix) * alpha;
+				constraint.mixRotate += (rotate - constraint.mixRotate) * alpha;
+				constraint.mixX += (x - constraint.mixX) * alpha;
+				constraint.mixY += (y - constraint.mixY) * alpha;
+				constraint.mixScaleX += (scaleX - constraint.mixScaleX) * alpha;
+				constraint.mixScaleY += (scaleY - constraint.mixScaleY) * alpha;
+				constraint.mixShearY += (shearY - constraint.mixShearY) * alpha;
 			}
 		}
 	}
@@ -2292,8 +2312,7 @@ public class Animation {
 		}
 	}
 
-	/** Changes a transform constraint's {@link PathConstraint#getRotateMix()} and
-	 * {@link TransformConstraint#getTranslateMix()}. */
+	/** Changes a transform constraint's {@link PathConstraint#getMixRotate()} and {@link PathConstraint#getMixTranslate()}. */
 	static public class PathConstraintMixTimeline extends CurveTimeline2 {
 		final int pathConstraintIndex;
 
@@ -2318,12 +2337,12 @@ public class Animation {
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
 				case setup:
-					constraint.rotateMix = constraint.data.rotateMix;
-					constraint.translateMix = constraint.data.translateMix;
+					constraint.mixRotate = constraint.data.mixRotate;
+					constraint.mixTranslate = constraint.data.mixTranslate;
 					return;
 				case first:
-					constraint.rotateMix += (constraint.data.rotateMix - constraint.rotateMix) * alpha;
-					constraint.translateMix += (constraint.data.translateMix - constraint.translateMix) * alpha;
+					constraint.mixRotate += (constraint.data.mixRotate - constraint.mixRotate) * alpha;
+					constraint.mixTranslate += (constraint.data.mixTranslate - constraint.mixTranslate) * alpha;
 				}
 				return;
 			}
@@ -2349,11 +2368,11 @@ public class Animation {
 			}
 
 			if (blend == setup) {
-				constraint.rotateMix = constraint.data.rotateMix + (rotate - constraint.data.rotateMix) * alpha;
-				constraint.translateMix = constraint.data.translateMix + (translate - constraint.data.translateMix) * alpha;
+				constraint.mixRotate = constraint.data.mixRotate + (rotate - constraint.data.mixRotate) * alpha;
+				constraint.mixTranslate = constraint.data.mixTranslate + (translate - constraint.data.mixTranslate) * alpha;
 			} else {
-				constraint.rotateMix += (rotate - constraint.rotateMix) * alpha;
-				constraint.translateMix += (translate - constraint.translateMix) * alpha;
+				constraint.mixRotate += (rotate - constraint.mixRotate) * alpha;
+				constraint.mixTranslate += (translate - constraint.mixTranslate) * alpha;
 			}
 		}
 	}
