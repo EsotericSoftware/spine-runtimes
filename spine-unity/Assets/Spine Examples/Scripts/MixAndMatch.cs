@@ -94,13 +94,13 @@ namespace Spine.Unity.Examples {
 			// Let's do this for the visor.
 			int visorSlotIndex = skeleton.FindSlotIndex(visorSlot); // You can access GetAttachment and SetAttachment via string, but caching the slotIndex is faster.
 			Attachment templateAttachment = templateSkin.GetAttachment(visorSlotIndex, visorKey); // STEP 1.1
-			Attachment newAttachment = templateAttachment.GetRemappedClone(visorSprite, sourceMaterial); // STEP 1.2 - 1.3
+			Attachment newAttachment = templateAttachment.GetRemappedClone(visorSprite, sourceMaterial, pivotShiftsMeshUVCoords : false); // STEP 1.2 - 1.3
 			customSkin.SetAttachment(visorSlotIndex, visorKey, newAttachment); // STEP 1.4
 
 			// And now for the gun.
 			int gunSlotIndex = skeleton.FindSlotIndex(gunSlot);
 			Attachment templateGun = templateSkin.GetAttachment(gunSlotIndex, gunKey); // STEP 1.1
-			Attachment newGun = templateGun.GetRemappedClone(gunSprite, sourceMaterial); // STEP 1.2 - 1.3
+			Attachment newGun = templateGun.GetRemappedClone(gunSprite, sourceMaterial, pivotShiftsMeshUVCoords: false); // STEP 1.2 - 1.3
 			if (newGun != null) customSkin.SetAttachment(gunSlotIndex, gunKey, newGun); // STEP 1.4
 
 			// customSkin.RemoveAttachment(gunSlotIndex, gunKey); // To remove an item.
