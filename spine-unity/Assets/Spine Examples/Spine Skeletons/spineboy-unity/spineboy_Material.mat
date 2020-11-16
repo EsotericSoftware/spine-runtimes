@@ -26,6 +26,7 @@ Material:
     - PixelSnap: 0
     - _CloakPhase: 0
     - _Cutoff: 0.1
+    - _DarkColorAlphaAdditive: 0
     - _FillPhase: 0
     - _OutlineMipLevel: 0
     - _OutlineReferenceTexWidth: 1024

@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "OByFm07eTFQ",
-	"spine": "4.0.24-beta",
+	"hash": "AoTf9x6x3Do",
+	"spine": "4.0.27-beta",
 	"x": -190.61,
 	"y": -7.99,
 	"width": 419.76,
@@ -370,10 +370,12 @@
 		"bones": [ "front-upper-arm" ],
 		"target": "aim-constraint-target",
 		"rotation": -180,
-		"rotateMix": 0,
-		"translateMix": 0,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0,
+		"mixY": 0,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "aim-head-transform",
@@ -381,10 +383,12 @@
 		"bones": [ "head" ],
 		"target": "aim-constraint-target",
 		"rotation": 84.3,
-		"rotateMix": 0,
-		"translateMix": 0,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0,
+		"mixY": 0,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "aim-rear-arm-transform",
@@ -393,10 +397,12 @@
 		"target": "aim-constraint-target",
 		"x": 57.7,
 		"y": 56.4,
-		"rotateMix": 0,
-		"translateMix": 0,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0,
+		"mixY": 0,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "aim-torso-transform",
@@ -405,10 +411,12 @@
 		"target": "aim-constraint-target",
 		"rotation": 69.5,
 		"shearY": -36,
-		"rotateMix": 0,
-		"translateMix": 0,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0,
+		"mixY": 0,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "front-foot-board",
@@ -417,10 +425,12 @@
 		"target": "hoverboard-controller",
 		"x": -69.8,
 		"y": 20.7,
-		"rotateMix": 0,
-		"translateMix": 0,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0,
+		"mixY": 0,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "rear-foot-board",
@@ -429,20 +439,24 @@
 		"target": "hoverboard-controller",
 		"x": 86.6,
 		"y": 21.3,
-		"rotateMix": 0,
-		"translateMix": 0,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0,
+		"mixY": 0,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "toes-board",
 		"order": 13,
 		"bones": [ "front-foot-tip", "back-foot-tip" ],
 		"target": "hoverboard-controller",
-		"rotateMix": 0,
-		"translateMix": 0,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0,
+		"mixY": 0,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	}
 ],
 "skins": [
@@ -820,13 +834,13 @@
 		},
 		"transform": {
 			"aim-front-arm-transform": [
-				{ "rotateMix": 0.784, "translateMix": 0, "scaleMix": 0, "shearMix": 0 }
+				{ "mixRotate": 0.784, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 }
 			],
 			"aim-head-transform": [
-				{ "rotateMix": 0.659, "translateMix": 0, "scaleMix": 0, "shearMix": 0 }
+				{ "mixRotate": 0.659, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 }
 			],
 			"aim-torso-transform": [
-				{ "rotateMix": 0.423, "translateMix": 0, "scaleMix": 0, "shearMix": 0 }
+				{ "mixRotate": 0.423, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 }
 			]
 		},
 		"deform": {
@@ -1666,7 +1680,7 @@
 				{}
 			],
 			"toes-board": [
-				{ "translateMix": 0, "scaleMix": 0, "shearMix": 0 }
+				{ "mixX": 0, "mixScaleX": 0, "mixShearY": 0 }
 			]
 		},
 		"deform": {
