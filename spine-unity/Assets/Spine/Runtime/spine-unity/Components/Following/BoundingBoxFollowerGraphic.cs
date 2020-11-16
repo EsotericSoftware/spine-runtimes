@@ -115,6 +115,8 @@ namespace Spine.Unity {
 			nameTable.Clear();
 
 			var skeleton = skeletonGraphic.Skeleton;
+			if (skeleton == null)
+				return;
 			slot = skeleton.FindSlot(slotName);
 			int slotIndex = skeleton.FindSlotIndex(slotName);
 
