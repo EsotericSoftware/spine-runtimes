@@ -359,8 +359,9 @@ namespace Spine.Unity.Editor {
 				var targetBone = tc.Target;
 				targetPos = targetBone.GetWorldPosition(transform, skeletonRenderScale);
 
-				if (tc.TranslateMix > 0) {
-					if (tc.TranslateMix != 1f) {
+				if (tc.MixX > 0 || tc.MixY > 0) {
+					if ((tc.MixX > 0 && tc.MixX != 1f) ||
+						(tc.MixY > 0 && tc.MixY != 1f)) {
 						Handles.color = handleColor;
 						foreach (var b in tc.Bones) {
 							pos = b.GetWorldPosition(transform, skeletonRenderScale);
@@ -416,7 +417,7 @@ namespace Spine.Unity.Editor {
 			// Path Constraints
 			handleColor = SpineHandles.PathColor;
 			foreach (var pc in skeleton.PathConstraints) {
-				active = pc.TranslateMix > 0;
+				active = pc.MixX > 0 || pc.MixY > 0 || pc.MixRotate > 0;
 				if (active)
 					foreach (var b in pc.Bones)
 						SpineHandles.DrawBoneCircle(b.GetWorldPosition(transform, skeletonRenderScale), handleColor, normal, 1f * skeletonRenderScale);

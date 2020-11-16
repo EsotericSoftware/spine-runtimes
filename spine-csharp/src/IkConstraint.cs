@@ -104,7 +104,7 @@ namespace Spine {
 			set { target = value; }
 		}
 
-		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained rotations.</summary>
+		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.</summary>
 		public float Mix {
 			get { return mix; }
 			set { mix = value; }

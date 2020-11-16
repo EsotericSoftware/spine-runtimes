@@ -206,7 +206,7 @@ namespace Spine.Unity.Examples {
 			static TransformConstraintTimeline GetFillerTimeline (TransformConstraintTimeline timeline, SkeletonData skeletonData) {
 				var t = new TransformConstraintTimeline(1, 0, timeline.TransformConstraintIndex);
 				var data = skeletonData.TransformConstraints.Items[timeline.TransformConstraintIndex];
-				t.SetFrame(0, 0, data.RotateMix, data.TranslateMix, data.ScaleMix, data.ShearMix);
+				t.SetFrame(0, 0, data.MixRotate, data.MixX, data.MixY, data.MixScaleX, data.MixScaleY, data.MixShearY);
 				return t;
 			}
 
@@ -227,7 +227,7 @@ namespace Spine.Unity.Examples {
 			static PathConstraintMixTimeline GetFillerTimeline (PathConstraintMixTimeline timeline, SkeletonData skeletonData) {
 				var t = new PathConstraintMixTimeline(1, 0, timeline.PathConstraintIndex);
 				var data = skeletonData.PathConstraints.Items[timeline.PathConstraintIndex];
-				t.SetFrame(0, 0, data.RotateMix, data.TranslateMix);
+				t.SetFrame(0, 0, data.RotateMix, data.MixX, data.MixY);
 				return t;
 			}
 			#endregion

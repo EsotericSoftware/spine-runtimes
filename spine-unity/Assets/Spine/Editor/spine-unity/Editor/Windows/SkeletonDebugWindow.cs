@@ -419,10 +419,12 @@ namespace Spine.Unity.Editor {
 										EditorGUI.EndDisabledGroup();
 
 										EditorGUI.BeginChangeCheck();
-										c.TranslateMix = EditorGUILayout.Slider("TranslateMix", c.TranslateMix, MixMin, MixMax);
-										c.RotateMix = EditorGUILayout.Slider("RotateMix", c.RotateMix, MixMin, MixMax);
-										c.ScaleMix = EditorGUILayout.Slider("ScaleMix", c.ScaleMix, MixMin, MixMax);
-										c.ShearMix = EditorGUILayout.Slider("ShearMix", c.ShearMix, MixMin, MixMax);
+										c.MixX = EditorGUILayout.Slider("Mix Translate X", c.MixX, MixMin, MixMax);
+										c.MixY = EditorGUILayout.Slider("Mix Translate Y", c.MixY, MixMin, MixMax);
+										c.MixRotate = EditorGUILayout.Slider("Mix Rotate", c.MixRotate, MixMin, MixMax);
+										c.MixScaleX = EditorGUILayout.Slider("Mix Scale X", c.MixScaleX, MixMin, MixMax);
+										c.MixScaleY = EditorGUILayout.Slider("Mix Scale Y", c.MixScaleY, MixMin, MixMax);
+										c.MixShearY = EditorGUILayout.Slider("Mix Shear Y", c.MixShearY, MixMin, MixMax);
 										if (EditorGUI.EndChangeCheck()) requireRepaint = true;
 
 										EditorGUILayout.Space();
@@ -452,8 +454,9 @@ namespace Spine.Unity.Editor {
 										EditorGUI.EndDisabledGroup();
 
 										EditorGUI.BeginChangeCheck();
-										c.RotateMix = EditorGUILayout.Slider("RotateMix", c.RotateMix, MixMin, MixMax);
-										c.TranslateMix = EditorGUILayout.Slider("TranslateMix", c.TranslateMix, MixMin, MixMax);
+										c.MixRotate = EditorGUILayout.Slider("Mix Rotate", c.MixRotate, MixMin, MixMax);
+										c.MixX = EditorGUILayout.Slider("Mix Translate X", c.MixX, MixMin, MixMax);
+										c.MixY = EditorGUILayout.Slider("Mix Translate Y", c.MixY, MixMin, MixMax);
 										c.Position = EditorGUILayout.FloatField("Position", c.Position);
 										c.Spacing = EditorGUILayout.FloatField("Spacing", c.Spacing);
 										if (EditorGUI.EndChangeCheck()) requireRepaint = true;

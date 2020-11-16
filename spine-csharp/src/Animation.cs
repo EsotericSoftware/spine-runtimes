@@ -199,7 +199,7 @@ namespace Spine {
 	}
 
 	internal enum Property {
-		Rotate=0, TranslateX, TranslateY, ScaleX, ScaleY, ShearX, ShearY, //
+		Rotate=0, X, Y, ScaleX, ScaleY, ShearX, ShearY, //
 		RGB, Alpha, RGB2, //
 		Attachment, Deform, //
 		Event, DrawOrder, //
@@ -333,7 +333,7 @@ namespace Spine {
 		/// <param name="bezier">The ordinal of this Bezier curve for this timeline, between 0 and <code>bezierCount - 1</code> (specified
 		///					in the constructor), inclusive.</param>
 		/// <param name="frame">Between 0 and <code>frameCount - 1</code>, inclusive.</param>
-		/// <param name="value">The index of the value for this frame that this curve is used for.</param>
+		/// <param name="value">The index of the value for the frame this curve is used for.</param>
 		/// <param name="time1">The time for the first key.</param>
 		/// <param name="value1">The value for the first key.</param>
 		/// <param name="cx1">The time for the first Bezier handle.</param>
@@ -518,8 +518,8 @@ namespace Spine {
 
 		public TranslateTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, //
-				(int)Property.TranslateX + "|" + boneIndex, //
-				(int) Property.TranslateY + "|" + boneIndex) {
+				(int)Property.X + "|" + boneIndex, //
+				(int) Property.Y + "|" + boneIndex) {
 			this.boneIndex = boneIndex;
 		}
 
@@ -593,7 +593,7 @@ namespace Spine {
 		readonly int boneIndex;
 
 		public TranslateXTimeline (int frameCount, int bezierCount, int boneIndex)
-			: base(frameCount, bezierCount, (int)Property.TranslateX + "|" + boneIndex) {
+			: base(frameCount, bezierCount, (int)Property.X + "|" + boneIndex) {
 			this.boneIndex = boneIndex;
 		}
 
@@ -642,7 +642,7 @@ namespace Spine {
 		readonly int boneIndex;
 
 		public TranslateYTimeline (int frameCount, int bezierCount, int boneIndex)
-			: base(frameCount, bezierCount, (int)Property.TranslateY + "|" + boneIndex) {
+			: base(frameCount, bezierCount, (int)Property.Y + "|" + boneIndex) {
 			this.boneIndex = boneIndex;
 		}
 
@@ -1705,12 +1705,11 @@ namespace Spine {
 				slot.ClampSecondColor();
 			}
 			else {
-				float br, bg, bb, ba, br2, bg2, bb2;
+				float br, bg, bb, br2, bg2, bb2;
 				if (blend == MixBlend.Setup) {
 					br = slot.data.r;
 					bg = slot.data.g;
 					bb = slot.data.b;
-					ba = slot.data.a;
 					br2 = slot.data.r2;
 					bg2 = slot.data.g2;
 					bb2 = slot.data.b2;
@@ -1719,7 +1718,6 @@ namespace Spine {
 					br = slot.r;
 					bg = slot.g;
 					bb = slot.b;
-					ba = slot.a;
 					br2 = slot.r2;
 					bg2 = slot.g2;
 					bb2 = slot.b2;
@@ -2308,8 +2306,8 @@ namespace Spine {
 
 	///	<summary>Changes a transform constraint's mixes.</summary>
 	public class TransformConstraintTimeline : CurveTimeline {
-		public const int ENTRIES = 5;
-		private const int ROTATE = 1, TRANSLATE = 2, SCALE = 3, SHEAR = 4;
+		public const int ENTRIES = 7;
+		private const int ROTATE = 1, X = 2, Y = 3, SCALEX = 4, SCALEY = 5, SHEARY = 6;
 
 		readonly int transformConstraintIndex;
 
@@ -2335,13 +2333,16 @@ namespace Spine {
 		/// <summary>Sets the time, rotate mix, translate mix, scale mix, and shear mix for the specified frame.</summary>
 		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
 		/// <param name="time">The frame time in seconds.</param>
-		public void SetFrame (int frame, float time, float rotateMix, float translateMix, float scaleMix, float shearMix) {
+		public void SetFrame (int frame, float time, float mixRotate, float mixX, float mixY, float mixScaleX, float mixScaleY,
+			float mixShearY) {
 			frame *= ENTRIES;
 			frames[frame] = time;
-			frames[frame + ROTATE] = rotateMix;
-			frames[frame + TRANSLATE] = translateMix;
-			frames[frame + SCALE] = scaleMix;
-			frames[frame + SHEAR] = shearMix;
+			frames[frame + ROTATE] = mixRotate;
+			frames[frame + X] = mixX;
+			frames[frame + Y] = mixY;
+			frames[frame + SCALEX] = mixScaleX;
+			frames[frame + SCALEY] = mixScaleY;
+			frames[frame + SHEARY] = mixShearY;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
@@ -2354,61 +2355,77 @@ namespace Spine {
 				TransformConstraintData data = constraint.data;
 				switch (blend) {
 				case MixBlend.Setup:
-					constraint.rotateMix = data.rotateMix;
-					constraint.translateMix = data.translateMix;
-					constraint.scaleMix = data.scaleMix;
-					constraint.shearMix = data.shearMix;
+					constraint.mixRotate = data.mixRotate;
+					constraint.mixX = data.mixX;
+					constraint.mixY = data.mixY;
+					constraint.mixScaleX = data.mixScaleX;
+					constraint.mixScaleY = data.mixScaleY;
+					constraint.mixShearY = data.mixShearY;
 					return;
 				case MixBlend.First:
-					constraint.rotateMix += (data.rotateMix - constraint.rotateMix) * alpha;
-					constraint.translateMix += (data.translateMix - constraint.translateMix) * alpha;
-					constraint.scaleMix += (data.scaleMix - constraint.scaleMix) * alpha;
-					constraint.shearMix += (data.shearMix - constraint.shearMix) * alpha;
+					constraint.mixRotate += (data.mixRotate - constraint.mixRotate) * alpha;
+					constraint.mixX += (data.mixX - constraint.mixX) * alpha;
+					constraint.mixY += (data.mixY - constraint.mixY) * alpha;
+					constraint.mixScaleX += (data.mixScaleX - constraint.mixScaleX) * alpha;
+					constraint.mixScaleY += (data.mixScaleY - constraint.mixScaleY) * alpha;
+					constraint.mixShearY += (data.mixShearY - constraint.mixShearY) * alpha;
 					return;
 				}
 				return;
 			}
 
-			float rotate, translate, scale, shear;
+			float rotate, x, y, scaleX, scaleY, shearY;
 			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
 			switch (curveType) {
 				case LINEAR:
 					float before = frames[i];
 					rotate = frames[i + ROTATE];
-					translate = frames[i + TRANSLATE];
-					scale = frames[i + SCALE];
-					shear = frames[i + SHEAR];
+					x = frames[i + X];
+					y = frames[i + Y];
+					scaleX = frames[i + SCALEX];
+					scaleY = frames[i + SCALEY];
+					shearY = frames[i + SHEARY];
 					float t = (time - before) / (frames[i + ENTRIES] - before);
 					rotate += (frames[i + ENTRIES + ROTATE] - rotate) * t;
-					translate += (frames[i + ENTRIES + TRANSLATE] - translate) * t;
-					scale += (frames[i + ENTRIES + SCALE] - scale) * t;
-					shear += (frames[i + ENTRIES + SHEAR] - shear) * t;
+					x += (frames[i + ENTRIES + X] - x) * t;
+					y += (frames[i + ENTRIES + Y] - y) * t;
+					scaleX += (frames[i + ENTRIES + SCALEX] - scaleX) * t;
+					scaleY += (frames[i + ENTRIES + SCALEY] - scaleY) * t;
+					shearY += (frames[i + ENTRIES + SHEARY] - shearY) * t;
 					break;
 				case STEPPED:
 					rotate = frames[i + ROTATE];
-					translate = frames[i + TRANSLATE];
-					scale = frames[i + SCALE];
-					shear = frames[i + SHEAR];
+					x = frames[i + X];
+					y = frames[i + Y];
+					scaleX = frames[i + SCALEX];
+					scaleY = frames[i + SCALEY];
+					shearY = frames[i + SHEARY];
 					break;
 				default:
 					rotate = GetBezierValue(time, i, ROTATE, curveType - BEZIER);
-					translate = GetBezierValue(time, i, TRANSLATE, curveType + BEZIER_SIZE - BEZIER);
-					scale = GetBezierValue(time, i, TRANSLATE, curveType + BEZIER_SIZE * 2 - BEZIER);
-					shear = GetBezierValue(time, i, TRANSLATE, curveType + BEZIER_SIZE * 3 - BEZIER);
+					x = GetBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER);
+					y = GetBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER);
+					scaleX = GetBezierValue(time, i, SCALEX, curveType + BEZIER_SIZE * 3 - BEZIER);
+					scaleY = GetBezierValue(time, i, SCALEY, curveType + BEZIER_SIZE * 4 - BEZIER);
+					shearY = GetBezierValue(time, i, SHEARY, curveType + BEZIER_SIZE * 5 - BEZIER);
 					break;
 			}
 
 			if (blend == MixBlend.Setup) {
 				TransformConstraintData data = constraint.data;
-				constraint.rotateMix = data.rotateMix + (rotate - data.rotateMix) * alpha;
-				constraint.translateMix = data.translateMix + (translate - data.translateMix) * alpha;
-				constraint.scaleMix = data.scaleMix + (scale - data.scaleMix) * alpha;
-				constraint.shearMix = data.shearMix + (shear - data.shearMix) * alpha;
+				constraint.mixRotate = data.mixRotate + (rotate - data.mixRotate) * alpha;
+				constraint.mixX = data.mixX + (x - data.mixX) * alpha;
+				constraint.mixY = data.mixY + (y - data.mixY) * alpha;
+				constraint.mixScaleX = data.mixScaleX + (scaleX - data.mixScaleX) * alpha;
+				constraint.mixScaleY = data.mixScaleY + (scaleY - data.mixScaleY) * alpha;
+				constraint.mixShearY = data.mixShearY + (shearY - data.mixShearY) * alpha;
 			} else {
-				constraint.rotateMix += (rotate - constraint.rotateMix) * alpha;
-				constraint.translateMix += (translate - constraint.translateMix) * alpha;
-				constraint.scaleMix += (scale - constraint.scaleMix) * alpha;
-				constraint.shearMix += (shear - constraint.shearMix) * alpha;
+				constraint.mixRotate += (rotate - constraint.mixRotate) * alpha;
+				constraint.mixX += (x - constraint.mixX) * alpha;
+				constraint.mixY += (y - constraint.mixY) * alpha;
+				constraint.mixScaleX += (scaleX - constraint.mixScaleX) * alpha;
+				constraint.mixScaleY += (scaleY - constraint.mixScaleY) * alpha;
+				constraint.mixShearY += (shearY - constraint.mixShearY) * alpha;
 			}
 		}
 	}
@@ -2499,13 +2516,21 @@ namespace Spine {
 		}
 	}
 
-	/// <summary>Changes a path constraint's mixes.</summary>
-	public class PathConstraintMixTimeline : CurveTimeline2 {
+	/// <summary> Changes a transform constraint's <see cref="PathConstraint.MixRotate"/>, <see cref="PathConstraint.MixX"/>, and
+	/// <see cref="PathConstraint.MixY"/>.</summary>
+	public class PathConstraintMixTimeline : CurveTimeline {
+		public const int ENTRIES = 4;
+		private const int ROTATE = 1, X = 2, Y = 3;
+
 		readonly int pathConstraintIndex;
 
 		public PathConstraintMixTimeline (int frameCount, int bezierCount, int pathConstraintIndex)
 			: base(frameCount, bezierCount, (int)Property.PathConstraintMix + "|" + pathConstraintIndex) {
 			this.pathConstraintIndex = pathConstraintIndex;
+		}
+
+		public override int FrameEntries {
+			get { return ENTRIES; }
 		}
 
 		/// <summary>The index of the path constraint slot in <see cref="Skeleton.PathConstraints"/> that will be changed when this timeline
@@ -2514,6 +2539,17 @@ namespace Spine {
 			get {
 				return pathConstraintIndex;
 			}
+		}
+
+		/// <summary>Sets the time and color for the specified frame.</summary>
+		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
+		/// <param name="time">The frame time in seconds.</param>
+		public void SetFrame (int frame, float time, float mixRotate, float mixX, float mixY) {
+			frame <<= 2;
+			frames[frame] = time;
+			frames[frame + ROTATE] = mixRotate;
+			frames[frame + X] = mixX;
+			frames[frame + Y] = mixY;
 		}
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
@@ -2525,44 +2561,53 @@ namespace Spine {
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
 				case MixBlend.Setup:
-					constraint.rotateMix = constraint.data.rotateMix;
-					constraint.translateMix = constraint.data.translateMix;
+					constraint.mixRotate = constraint.data.mixRotate;
+					constraint.mixX = constraint.data.mixX;
+					constraint.mixY = constraint.data.mixY;
 					return;
 				case MixBlend.First:
-					constraint.rotateMix += (constraint.data.rotateMix - constraint.rotateMix) * alpha;
-					constraint.translateMix += (constraint.data.translateMix - constraint.translateMix) * alpha;
+					constraint.mixRotate += (constraint.data.mixRotate - constraint.mixRotate) * alpha;
+					constraint.mixX += (constraint.data.mixX - constraint.mixX) * alpha;
+					constraint.mixY += (constraint.data.mixY - constraint.mixY) * alpha;
 					return;
 				}
 				return;
 			}
 
-			float rotate, translate;
-			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			float rotate, x, y;
+			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
 			switch (curveType) {
 				case LINEAR:
 					float before = frames[i];
-					rotate = frames[i + VALUE1];
-					translate = frames[i + VALUE2];
+					rotate = frames[i + ROTATE];
+					x = frames[i + X];
+					y = frames[i + Y];
 					float t = (time - before) / (frames[i + ENTRIES] - before);
-					rotate += (frames[i + ENTRIES + VALUE1] - rotate) * t;
-					translate += (frames[i + ENTRIES + VALUE2] - translate) * t;
+					rotate += (frames[i + ENTRIES + ROTATE] - rotate) * t;
+					x += (frames[i + ENTRIES + X] - x) * t;
+					y += (frames[i + ENTRIES + Y] - y) * t;
 					break;
 				case STEPPED:
-					rotate = frames[i + VALUE1];
-					translate = frames[i + VALUE2];
+					rotate = frames[i + ROTATE];
+					x = frames[i + X];
+					y = frames[i + Y];
 					break;
 				default:
-					rotate = GetBezierValue(time, i, VALUE1, curveType - BEZIER);
-					translate = GetBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
+					rotate = GetBezierValue(time, i, ROTATE, curveType - BEZIER);
+					x = GetBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER);
+					y = GetBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER);
 					break;
 			}
 
 			if (blend == MixBlend.Setup) {
-				constraint.rotateMix = constraint.data.rotateMix + (rotate - constraint.data.rotateMix) * alpha;
-				constraint.translateMix = constraint.data.translateMix + (translate - constraint.data.translateMix) * alpha;
+				PathConstraintData data = constraint.data;
+				constraint.mixRotate = data.mixRotate + (rotate - data.mixRotate) * alpha;
+				constraint.mixX = data.mixX + (x - data.mixX) * alpha;
+				constraint.mixY = data.mixY + (y - data.mixY) * alpha;
 			} else {
-				constraint.rotateMix += (rotate - constraint.rotateMix) * alpha;
-				constraint.translateMix += (translate - constraint.translateMix) * alpha;
+				constraint.mixRotate += (rotate - constraint.mixRotate) * alpha;
+				constraint.mixX += (x - constraint.mixX) * alpha;
+				constraint.mixY += (y - constraint.mixY) * alpha;
 			}
 		}
 	}

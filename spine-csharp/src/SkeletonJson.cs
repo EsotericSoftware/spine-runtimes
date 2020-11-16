@@ -231,10 +231,12 @@ namespace Spine {
 					data.offsetScaleY = GetFloat(constraintMap, "scaleY", 0);
 					data.offsetShearY = GetFloat(constraintMap, "shearY", 0);
 
-					data.rotateMix = GetFloat(constraintMap, "rotateMix", 1);
-					data.translateMix = GetFloat(constraintMap, "translateMix", 1);
-					data.scaleMix = GetFloat(constraintMap, "scaleMix", 1);
-					data.shearMix = GetFloat(constraintMap, "shearMix", 1);
+					data.mixRotate = GetFloat(constraintMap, "mixRotate", 1);
+					data.mixX = GetFloat(constraintMap, "mixX", 1);
+					data.mixY = GetFloat(constraintMap, "mixY", data.mixX);
+					data.mixScaleX = GetFloat(constraintMap, "mixScaleX", 1);
+					data.mixScaleY = GetFloat(constraintMap, "mixScaleY", data.mixScaleX);
+					data.mixShearY = GetFloat(constraintMap, "mixShearY", 1);
 
 					skeletonData.transformConstraints.Add(data);
 				}
@@ -267,8 +269,10 @@ namespace Spine {
 					if (data.positionMode == PositionMode.Fixed) data.position *= scale;
 					data.spacing = GetFloat(constraintMap, "spacing", 0);
 					if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed) data.spacing *= scale;
-					data.rotateMix = GetFloat(constraintMap, "rotateMix", 1);
-					data.translateMix = GetFloat(constraintMap, "translateMix", 1);
+					data.mixRotate = GetFloat(constraintMap, "mixRotate", 1);
+					data.mixX = GetFloat(constraintMap, "mixX", 1);
+					data.mixY = GetFloat(constraintMap, "mixY", 1);
+
 
 					skeletonData.pathConstraints.Add(data);
 				}
@@ -595,9 +599,9 @@ namespace Spine {
 							var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 							float time = GetFloat(keyMap, "time", 0);
 							string color = (string)keyMap["color"];
-							float r = ToColor(color, 0);
-							float g = ToColor(color, 1);
-							float b = ToColor(color, 2);
+							float r = ToColor(color, 0, 6);
+							float g = ToColor(color, 1, 6);
+							float b = ToColor(color, 2, 6);
 							for (int frame = 0, bezier = 0; ; frame++) {
 								timeline.SetFrame(frame, time, r, g, b);
 								bool hasNext = keyMapEnumerator.MoveNext();
@@ -609,9 +613,9 @@ namespace Spine {
 
 								float time2 = GetFloat(nextMap, "time", 0);
 								color = (string)nextMap["color"];
-								float nr = ToColor(color, 0);
-								float ng = ToColor(color, 1);
-								float nb = ToColor(color, 2);
+								float nr = ToColor(color, 0, 6);
+								float ng = ToColor(color, 1, 6);
+								float nb = ToColor(color, 2, 6);
 
 								if (keyMap.ContainsKey("curve")) {
 									object curve = keyMap["curve"];
@@ -645,9 +649,9 @@ namespace Spine {
 							float b = ToColor(color, 2);
 							float a = ToColor(color, 3);
 							color = (string)keyMap["dark"];
-							float r2 = ToColor(color, 0);
-							float g2 = ToColor(color, 1);
-							float b2 = ToColor(color, 2);
+							float r2 = ToColor(color, 0, 6);
+							float g2 = ToColor(color, 1, 6);
+							float b2 = ToColor(color, 2, 6);
 							for (int frame = 0, bezier = 0; ; frame++) {
 								timeline.SetFrame(frame, time, r, g, b, a, r2, g2, b2);
 								bool hasNext = keyMapEnumerator.MoveNext();
@@ -664,9 +668,9 @@ namespace Spine {
 								float nb = ToColor(color, 2);
 								float na = ToColor(color, 3);
 								color = (string)nextMap["dark"];
-								float nr2 = ToColor(color, 0);
-								float ng2 = ToColor(color, 1);
-								float nb2 = ToColor(color, 2);
+								float nr2 = ToColor(color, 0, 6);
+								float ng2 = ToColor(color, 1, 6);
+								float nb2 = ToColor(color, 2, 6);
 
 								if (keyMap.ContainsKey("curve")) {
 									object curve = keyMap["curve"];
@@ -698,13 +702,13 @@ namespace Spine {
 							var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 							float time = GetFloat(keyMap, "time", 0);
 							string color = (string)keyMap["light"];
-							float r = ToColor(color, 0);
-							float g = ToColor(color, 1);
-							float b = ToColor(color, 2);
+							float r = ToColor(color, 0, 6);
+							float g = ToColor(color, 1, 6);
+							float b = ToColor(color, 2, 6);
 							color = (string)keyMap["dark"];
-							float r2 = ToColor(color, 0);
-							float g2 = ToColor(color, 1);
-							float b2 = ToColor(color, 2);
+							float r2 = ToColor(color, 0, 6);
+							float g2 = ToColor(color, 1, 6);
+							float b2 = ToColor(color, 2, 6);
 							for (int frame = 0, bezier = 0; ; frame++) {
 								timeline.SetFrame(frame, time, r, g, b, r2, g2, b2);
 								bool hasNext = keyMapEnumerator.MoveNext();
@@ -716,13 +720,13 @@ namespace Spine {
 
 								float time2 = GetFloat(nextMap, "time", 0);
 								color = (string)nextMap["light"];
-								float nr = ToColor(color, 0);
-								float ng = ToColor(color, 1);
-								float nb = ToColor(color, 2);
+								float nr = ToColor(color, 0, 6);
+								float ng = ToColor(color, 1, 6);
+								float nb = ToColor(color, 2, 6);
 								color = (string)nextMap["dark"];
-								float nr2 = ToColor(color, 0);
-								float ng2 = ToColor(color, 1);
-								float nb2 = ToColor(color, 2);
+								float nr2 = ToColor(color, 0, 6);
+								float ng2 = ToColor(color, 1, 6);
+								float nb2 = ToColor(color, 2, 6);
 
 								if (keyMap.ContainsKey("curve")) {
 									object curve = keyMap["curve"];
@@ -849,10 +853,11 @@ namespace Spine {
 					TransformConstraintTimeline timeline = new TransformConstraintTimeline(timelineMapValues.Count, timelineMapValues.Count << 2,
 						skeletonData.TransformConstraints.IndexOf(constraint));
 					float time = GetFloat(keyMap, "time", 0);
-					float rotateMix = GetFloat(keyMap, "rotateMix", 1), translateMix = GetFloat(keyMap, "translateMix", 1);
-					float scaleMix = GetFloat(keyMap, "scaleMix", 1), shearMix = GetFloat(keyMap, "shearMix", 1);
+					float mixRotate = GetFloat(keyMap, "mixRotate", 1), mixShearY = GetFloat(keyMap, "mixShearY", 1);
+					float mixX = GetFloat(keyMap, "mixX", 1), mixY = GetFloat(keyMap, "mixY", mixX);
+					float mixScaleX = GetFloat(keyMap, "mixScaleX", 1), mixScaleY = GetFloat(keyMap, "mixScaleY", mixScaleX);
 					for (int frame = 0, bezier = 0; ; frame++) {
-						timeline.SetFrame(frame, time, rotateMix, translateMix, scaleMix, shearMix);
+						timeline.SetFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
 						hasNext = keyMapEnumerator.MoveNext();
 						if (!hasNext) {
 							timeline.Shrink(bezier);
@@ -860,20 +865,25 @@ namespace Spine {
 						}
 						var nextMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 						float time2 = GetFloat(nextMap, "time", 0);
-						float rotateMix2 = GetFloat(nextMap, "rotateMix", 1), translateMix2 = GetFloat(nextMap, "translateMix", 1);
-						float scaleMix2 = GetFloat(nextMap, "scaleMix", 1), shearMix2 = GetFloat(nextMap, "shearMix", 1);
+						float mixRotate2 = GetFloat(nextMap, "mixRotate", 1), mixShearY2 = GetFloat(nextMap, "mixShearY", 1);
+						float mixX2 = GetFloat(nextMap, "mixX", 1), mixY2 = GetFloat(nextMap, "mixY", mixX2);
+						float mixScaleX2 = GetFloat(nextMap, "mixScaleX", 1), mixScaleY2 = GetFloat(nextMap, "mixScaleY", mixScaleX2);
 						if (keyMap.ContainsKey("curve")) {
 							object curve = keyMap["curve"];
-							bezier = ReadCurve(curve, timeline, bezier, frame, 0, time, time2, rotateMix, rotateMix2, 1);
-							bezier = ReadCurve(curve, timeline, bezier, frame, 1, time, time2, translateMix, translateMix2, 1);
-							bezier = ReadCurve(curve, timeline, bezier, frame, 2, time, time2, scaleMix, scaleMix2, 1);
-							bezier = ReadCurve(curve, timeline, bezier, frame, 3, time, time2, shearMix, shearMix2, 1);
+							bezier = ReadCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+							bezier = ReadCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1);
+							bezier = ReadCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1);
+							bezier = ReadCurve(curve, timeline, bezier, frame, 3, time, time2, mixScaleX, mixScaleX2, 1);
+							bezier = ReadCurve(curve, timeline, bezier, frame, 4, time, time2, mixScaleY, mixScaleY2, 1);
+							bezier = ReadCurve(curve, timeline, bezier, frame, 5, time, time2, mixShearY, mixShearY2, 1);
 						}
 						time = time2;
-						rotateMix = rotateMix2;
-						translateMix = translateMix2;
-						scaleMix = scaleMix2;
-						shearMix = shearMix2;
+						mixRotate = mixRotate2;
+						mixX = mixX2;
+						mixY = mixY2;
+						mixScaleX = mixScaleX2;
+						mixScaleY = mixScaleY2;
+						mixScaleX = mixScaleX2;
 						keyMap = nextMap;
 					}
 					timelines.Add(timeline);
@@ -903,8 +913,35 @@ namespace Spine {
 								data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
 						}
 						else if (timelineName == "mix") {
-							CurveTimeline2 timeline = new PathConstraintMixTimeline(values.Count, values.Count << 1, index);
-							timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, "rotateMix", "translateMix", 1, 1));
+							PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(values.Count, values.Count * 3, index);
+							var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
+							float time = GetFloat(keyMap, "time", 0);
+							float mixRotate = GetFloat(keyMap, "mixRotate", 1);
+							float mixX = GetFloat(keyMap, "mixX", 1), mixY = GetFloat(keyMap, "mixY", mixX);
+							for (int frame = 0, bezier = 0; ; frame++) {
+								timeline.SetFrame(frame, time, mixRotate, mixX, mixY);
+								hasNext = keyMapEnumerator.MoveNext();
+								if (!hasNext) {
+									timeline.Shrink(bezier);
+									break;
+								}
+								var nextMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
+								float time2 = GetFloat(nextMap, "time", 0);
+								float mixRotate2 = GetFloat(nextMap, "mixRotate", 1);
+								float mixX2 = GetFloat(nextMap, "mixX", 1), mixY2 = GetFloat(nextMap, "mixY", mixX2);
+								if (keyMap.ContainsKey("curve")) {
+									object curve = keyMap["curve"];
+									bezier = ReadCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+									bezier = ReadCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1);
+									bezier = ReadCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1);
+								}
+								time = time2;
+								mixRotate = mixRotate2;
+								mixX = mixX2;
+								mixY = mixY2;
+								keyMap = nextMap;
+							}
+							timelines.Add(timeline);
 						}
 					}
 				}

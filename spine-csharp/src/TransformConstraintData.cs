@@ -33,16 +33,24 @@ namespace Spine {
 	public class TransformConstraintData : ConstraintData {
 		internal ExposedList<BoneData> bones = new ExposedList<BoneData>();
 		internal BoneData target;
-		internal float rotateMix, translateMix, scaleMix, shearMix;
+		internal float mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY;
 		internal float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
 		internal bool relative, local;
 
 		public ExposedList<BoneData> Bones { get { return bones; } }
 		public BoneData Target { get { return target; } set { target = value; } }
-		public float RotateMix { get { return rotateMix; } set { rotateMix = value; } }
-		public float TranslateMix { get { return translateMix; } set { translateMix = value; } }
-		public float ScaleMix { get { return scaleMix; } set { scaleMix = value; } }
-		public float ShearMix { get { return shearMix; } set { shearMix = value; } }
+		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.</summary>
+		public float MixRotate { get { return mixRotate; } set { mixRotate = value; } }
+		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained translation X.</summary>
+		public float MixX { get { return mixX; } set { mixX = value; } }
+		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y.</summary>
+		public float MixY { get { return mixY; } set { mixY = value; } }
+		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained scale X.</summary>
+		public float MixScaleX { get { return mixScaleX; } set { mixScaleX = value; } }
+		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained scale Y.</summary>
+		public float MixScaleY { get { return mixScaleY; } set { mixScaleY = value; } }
+		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained shear Y.</summary>
+		public float MixShearY { get { return mixShearY; } set { mixShearY = value; } }
 
 		public float OffsetRotation { get { return offsetRotation; } set { offsetRotation = value; } }
 		public float OffsetX { get { return offsetX; } set { offsetX = value; } }

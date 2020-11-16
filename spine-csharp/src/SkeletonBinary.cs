@@ -57,9 +57,9 @@ namespace Spine {
 		public const int SLOT_ATTACHMENT = 0;
 		public const int SLOT_RGBA = 1;
 		public const int SLOT_RGB = 2;
-		public const int SLOT_ALPHA = 3;
-		public const int SLOT_RGBA2 = 4;
-		public const int SLOT_RGB2 = 5;
+		public const int SLOT_RGBA2 = 3;
+		public const int SLOT_RGB2 = 4;
+		public const int SLOT_ALPHA = 5;
 
 		public const int PATH_POSITION = 0;
 		public const int PATH_SPACING = 1;
@@ -240,10 +240,12 @@ namespace Spine {
 				data.offsetScaleX = input.ReadFloat();
 				data.offsetScaleY = input.ReadFloat();
 				data.offsetShearY = input.ReadFloat();
-				data.rotateMix = input.ReadFloat();
-				data.translateMix = input.ReadFloat();
-				data.scaleMix = input.ReadFloat();
-				data.shearMix = input.ReadFloat();
+				data.mixRotate = input.ReadFloat();
+				data.mixX = input.ReadFloat();
+				data.mixY = input.ReadFloat();
+				data.mixScaleX = input.ReadFloat();
+				data.mixScaleY = input.ReadFloat();
+				data.mixShearY = input.ReadFloat();
 				o[i] = data;
 			}
 
@@ -265,8 +267,9 @@ namespace Spine {
 				if (data.positionMode == PositionMode.Fixed) data.position *= scale;
 				data.spacing = input.ReadFloat();
 				if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed) data.spacing *= scale;
-				data.rotateMix = input.ReadFloat();
-				data.translateMix = input.ReadFloat();
+				data.mixRotate = input.ReadFloat();
+				data.mixX = input.ReadFloat();
+				data.mixY = input.ReadFloat();
 				o[i] = data;
 			}
 
@@ -637,8 +640,7 @@ namespace Spine {
 									timeline.SetFrame(frame, time, r, g, b);
 									if (frame == frameLast) break;
 									float time2 = input.ReadFloat();
-									float r2 = input.Read() / 255f, g2 = input.Read() / 255f;
-									float b2 = input.Read() / 255f, a2 = input.Read() / 255f;
+									float r2 = input.Read() / 255f, g2 = input.Read() / 255f, b2 = input.Read() / 255f;
 									switch (input.ReadByte()) {
 										case CURVE_STEPPED:
 											timeline.SetStepped(frame);
@@ -826,29 +828,33 @@ namespace Spine {
 			for (int i = 0, n = input.ReadInt(true); i < n; i++) {
 				int index = input.ReadInt(true), frameCount = input.ReadInt(true), frameLast = frameCount - 1;
 				TransformConstraintTimeline timeline = new TransformConstraintTimeline(frameCount, input.ReadInt(true), index);
-				float time = input.ReadFloat(), rotateMix = input.ReadFloat(), translateMix = input.ReadFloat(),
-					scaleMix = input.ReadFloat(), shearMix = input.ReadFloat();
+				float time = input.ReadFloat(), mixRotate = input.ReadFloat(), mixX = input.ReadFloat(), mixY = input.ReadFloat(),
+				mixScaleX = input.ReadFloat(), mixScaleY = input.ReadFloat(), mixShearY = input.ReadFloat();
 				for (int frame = 0, bezier = 0; ; frame++) {
-					timeline.SetFrame(frame, time, rotateMix, translateMix, scaleMix, shearMix);
+					timeline.SetFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
 					if (frame == frameLast) break;
-					float time2 = input.ReadFloat(), rotateMix2 = input.ReadFloat(), translateMix2 = input.ReadFloat(),
-						scaleMix2 = input.ReadFloat(), shearMix2 = input.ReadFloat();
+					float time2 = input.ReadFloat(), mixRotate2 = input.ReadFloat(), mixX2 = input.ReadFloat(), mixY2 = input.ReadFloat(),
+					mixScaleX2 = input.ReadFloat(), mixScaleY2 = input.ReadFloat(), mixShearY2 = input.ReadFloat();
 					switch (input.ReadByte()) {
 						case CURVE_STEPPED:
 							timeline.SetStepped(frame);
 							break;
 						case CURVE_BEZIER:
-							SetBezier(input, timeline, bezier++, frame, 0, time, time2, rotateMix, rotateMix2, 1);
-							SetBezier(input, timeline, bezier++, frame, 1, time, time2, translateMix, translateMix2, 1);
-							SetBezier(input, timeline, bezier++, frame, 2, time, time2, scaleMix, scaleMix2, 1);
-							SetBezier(input, timeline, bezier++, frame, 3, time, time2, shearMix, shearMix2, 1);
+							SetBezier(input, timeline, bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+							SetBezier(input, timeline, bezier++, frame, 1, time, time2, mixX, mixX2, 1);
+							SetBezier(input, timeline, bezier++, frame, 2, time, time2, mixY, mixY2, 1);
+							SetBezier(input, timeline, bezier++, frame, 3, time, time2, mixScaleX, mixScaleX2, 1);
+							SetBezier(input, timeline, bezier++, frame, 4, time, time2, mixScaleY, mixScaleY2, 1);
+							SetBezier(input, timeline, bezier++, frame, 5, time, time2, mixShearY, mixShearY2, 1);
 							break;
 					}
 					time = time2;
-					rotateMix = rotateMix2;
-					translateMix = translateMix2;
-					scaleMix = scaleMix2;
-					shearMix = shearMix2;
+					mixRotate = mixRotate2;
+					mixX = mixX2;
+					mixY = mixY2;
+					mixScaleX = mixScaleX2;
+					mixScaleY = mixScaleY2;
+					mixShearY = mixShearY2;
 				}
 				timelines.Add(timeline);
 			}
@@ -870,8 +876,30 @@ namespace Spine {
 									data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
 							break;
 						case PATH_MIX:
-							timelines
-								.Add(ReadTimeline(input, new PathConstraintMixTimeline(input.ReadInt(true), input.ReadInt(true), index), 1));
+							PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(input.ReadInt(true), input.ReadInt(true),
+								index);
+							float time = input.ReadFloat(), mixRotate = input.ReadFloat(), mixX = input.ReadFloat(), mixY = input.ReadFloat();
+							for (int frame = 0, bezier = 0, frameLast = nn - 1; ; frame++) {
+								timeline.SetFrame(frame, time, mixRotate, mixX, mixY);
+								if (frame == frameLast) break;
+								float time2 = input.ReadFloat(), mixRotate2 = input.ReadFloat(), mixX2 = input.ReadFloat(),
+									mixY2 = input.ReadFloat();
+								switch (input.ReadByte()) {
+									case CURVE_STEPPED:
+										timeline.SetStepped(frame);
+										break;
+									case CURVE_BEZIER:
+										SetBezier(input, timeline, bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+										SetBezier(input, timeline, bezier++, frame, 1, time, time2, mixX, mixX2, 1);
+										SetBezier(input, timeline, bezier++, frame, 2, time, time2, mixY, mixY2, 1);
+										break;
+								}
+								time = time2;
+								mixRotate = mixRotate2;
+								mixX = mixX2;
+								mixY = mixY2;
+							}
+							timelines.Add(timeline);
 							break;
 					}
 				}

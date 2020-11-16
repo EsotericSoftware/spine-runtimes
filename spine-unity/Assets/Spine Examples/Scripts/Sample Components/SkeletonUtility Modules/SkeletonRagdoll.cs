@@ -212,16 +212,19 @@ namespace Spine.Unity.Examples {
 			if (disableOtherConstraints) {
 				var transformConstraints = skeleton.TransformConstraints;
 				for (int i = 0, n = transformConstraints.Count; i < n; i++) {
-					transformConstraints.Items[i].RotateMix = 0;
-					transformConstraints.Items[i].ScaleMix = 0;
-					transformConstraints.Items[i].ShearMix = 0;
-					transformConstraints.Items[i].TranslateMix = 0;
+					transformConstraints.Items[i].MixRotate = 0;
+					transformConstraints.Items[i].MixScaleX = 0;
+					transformConstraints.Items[i].MixScaleY = 0;
+					transformConstraints.Items[i].MixShearY = 0;
+					transformConstraints.Items[i].MixX = 0;
+					transformConstraints.Items[i].MixY = 0;
 				}
 
 				var pathConstraints = skeleton.PathConstraints;
 				for (int i = 0, n = pathConstraints.Count; i < n; i++) {
-					pathConstraints.Items[i].RotateMix = 0;
-					pathConstraints.Items[i].TranslateMix = 0;
+					pathConstraints.Items[i].MixRotate = 0;
+					pathConstraints.Items[i].MixX = 0;
+					pathConstraints.Items[i].MixY = 0;
 				}
 			}
 

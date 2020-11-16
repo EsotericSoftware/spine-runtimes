@@ -379,10 +379,12 @@ namespace Spine {
 			for (int i = 0, n = this.transformConstraints.Count; i < n; i++) {
 				TransformConstraint constraint = transformConstraints[i];
 				TransformConstraintData constraintData = constraint.data;
-				constraint.rotateMix = constraintData.rotateMix;
-				constraint.translateMix = constraintData.translateMix;
-				constraint.scaleMix = constraintData.scaleMix;
-				constraint.shearMix = constraintData.shearMix;
+				constraint.mixRotate = constraintData.mixRotate;
+				constraint.mixX = constraintData.mixX;
+				constraint.mixY = constraintData.mixY;
+				constraint.mixScaleX = constraintData.mixScaleX;
+				constraint.mixScaleY = constraintData.mixScaleY;
+				constraint.mixShearY = constraintData.mixShearY;
 			}
 
 			var pathConstraints = this.pathConstraints.Items;
@@ -391,8 +393,9 @@ namespace Spine {
 				PathConstraintData constraintData = constraint.data;
 				constraint.position = constraintData.position;
 				constraint.spacing = constraintData.spacing;
-				constraint.rotateMix = constraintData.rotateMix;
-				constraint.translateMix = constraintData.translateMix;
+				constraint.mixRotate = constraintData.mixRotate;
+				constraint.mixX = constraintData.mixX;
+				constraint.mixY = constraintData.mixY;
 			}
 		}
 
