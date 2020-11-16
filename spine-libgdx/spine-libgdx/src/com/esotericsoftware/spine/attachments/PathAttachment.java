@@ -58,8 +58,8 @@ public class PathAttachment extends VertexAttachment {
 		this.closed = closed;
 	}
 
-	/** If true, additional calculations are performed to make calculating positions along the path more accurate. If false, fewer
-	 * calculations are performed but calculating positions along the path is less accurate. */
+	/** If true, additional calculations are performed to make computing positions along the path more accurate and movement along
+	 * the path have a constant speed. */
 	public boolean getConstantSpeed () {
 		return constantSpeed;
 	}

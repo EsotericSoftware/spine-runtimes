@@ -346,10 +346,7 @@ public class PathConstraint implements Updatable {
 			y1 = y2;
 		}
 
-		if (data.positionMode == PositionMode.percent)
-			position *= pathLength;
-		else
-			position *= pathLength / path.getLengths()[curveCount - 1];
+		if (data.positionMode == PositionMode.percent) position *= pathLength;
 
 		float multiplier;
 		switch (data.spacingMode) {
