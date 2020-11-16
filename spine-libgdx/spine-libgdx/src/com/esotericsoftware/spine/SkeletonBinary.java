@@ -267,7 +267,8 @@ public class SkeletonBinary extends SkeletonLoader {
 				data.spacing = input.readFloat();
 				if (data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed) data.spacing *= scale;
 				data.mixRotate = input.readFloat();
-				data.mixTranslate = input.readFloat();
+				data.mixX = input.readFloat();
+				data.mixY = input.readFloat();
 				o[i] = data;
 			}
 
@@ -859,8 +860,29 @@ public class SkeletonBinary extends SkeletonLoader {
 							data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed ? scale : 1));
 					break;
 				case PATH_MIX:
-					timelines
-						.add(readTimeline(input, new PathConstraintMixTimeline(input.readInt(true), input.readInt(true), index), 1));
+					PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(input.readInt(true), input.readInt(true),
+						index);
+					float time = input.readFloat(), mixRotate = input.readFloat(), mixX = input.readFloat(), mixY = input.readFloat();
+					for (int frame = 0, bezier = 0, frameLast = nn - 1;; frame++) {
+						timeline.setFrame(frame, time, mixRotate, mixX, mixY);
+						if (frame == frameLast) break;
+						float time2 = input.readFloat(), mixRotate2 = input.readFloat(), mixX2 = input.readFloat(),
+							mixY2 = input.readFloat();
+						switch (input.readByte()) {
+						case CURVE_STEPPED:
+							timeline.setStepped(frame);
+							break;
+						case CURVE_BEZIER:
+							setBezier(input, timeline, bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+							setBezier(input, timeline, bezier++, frame, 1, time, time2, mixX, mixX2, 1);
+							setBezier(input, timeline, bezier++, frame, 2, time, time2, mixY, mixY2, 1);
+						}
+						time = time2;
+						mixRotate = mixRotate2;
+						mixX = mixX2;
+						mixY = mixY2;
+					}
+					timelines.add(timeline);
 				}
 			}
 		}

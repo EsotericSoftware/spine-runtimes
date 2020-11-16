@@ -420,7 +420,8 @@ public class Skeleton {
 			constraint.position = data.position;
 			constraint.spacing = data.spacing;
 			constraint.mixRotate = data.mixRotate;
-			constraint.mixTranslate = data.mixTranslate;
+			constraint.mixX = data.mixX;
+			constraint.mixY = data.mixY;
 		}
 	}
 

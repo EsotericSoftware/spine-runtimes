@@ -50,7 +50,7 @@ public class PathConstraint implements Updatable {
 	final PathConstraintData data;
 	final Array<Bone> bones;
 	Slot target;
-	float position, spacing, mixRotate, mixTranslate;
+	float position, spacing, mixRotate, mixX, mixY;
 
 	boolean active;
 
@@ -69,7 +69,8 @@ public class PathConstraint implements Updatable {
 		position = data.position;
 		spacing = data.spacing;
 		mixRotate = data.mixRotate;
-		mixTranslate = data.mixTranslate;
+		mixX = data.mixX;
+		mixY = data.mixY;
 	}
 
 	/** Copy constructor. */
@@ -84,7 +85,8 @@ public class PathConstraint implements Updatable {
 		position = constraint.position;
 		spacing = constraint.spacing;
 		mixRotate = constraint.mixRotate;
-		mixTranslate = constraint.mixTranslate;
+		mixX = constraint.mixX;
+		mixY = constraint.mixY;
 	}
 
 	/** Applies the constraint to the constrained bones. */
@@ -92,9 +94,8 @@ public class PathConstraint implements Updatable {
 		Attachment attachment = target.attachment;
 		if (!(attachment instanceof PathAttachment)) return;
 
-		float mixRotate = this.mixRotate, mixTranslate = this.mixTranslate;
-		boolean translate = mixTranslate > 0, rotate = mixRotate > 0;
-		if (!translate && !rotate) return;
+		float mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY;
+		if (mixRotate == 0 && mixX == 0 && mixY == 0) return;
 
 		PathConstraintData data = this.data;
 		boolean percentSpacing = data.spacingMode == SpacingMode.percent;
@@ -145,8 +146,8 @@ public class PathConstraint implements Updatable {
 		}
 		for (int i = 0, p = 3; i < boneCount; i++, p += 3) {
 			Bone bone = (Bone)bones[i];
-			bone.worldX += (boneX - bone.worldX) * mixTranslate;
-			bone.worldY += (boneY - bone.worldY) * mixTranslate;
+			bone.worldX += (boneX - bone.worldX) * mixX;
+			bone.worldY += (boneY - bone.worldY) * mixY;
 			float x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 			if (scale) {
 				float length = lengths[i];
@@ -158,7 +159,7 @@ public class PathConstraint implements Updatable {
 			}
 			boneX = x;
 			boneY = y;
-			if (rotate) {
+			if (mixRotate > 0) {
 				float a = bone.a, b = bone.b, c = bone.c, d = bone.d, r, cos, sin;
 				if (tangents)
 					r = positions[p - 1];
@@ -473,13 +474,22 @@ public class PathConstraint implements Updatable {
 		this.mixRotate = mixRotate;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translation. */
-	public float getMixTranslate () {
-		return mixTranslate;
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translation X. */
+	public float getMixX () {
+		return mixX;
 	}
 
-	public void setMixTranslate (float mixTranslate) {
-		this.mixTranslate = mixTranslate;
+	public void setMixX (float mixX) {
+		this.mixX = mixX;
+	}
+
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained translation Y. */
+	public float getMixY () {
+		return mixY;
+	}
+
+	public void setMixY (float mixY) {
+		this.mixY = mixY;
 	}
 
 	/** The bones that will be modified by this path constraint. */

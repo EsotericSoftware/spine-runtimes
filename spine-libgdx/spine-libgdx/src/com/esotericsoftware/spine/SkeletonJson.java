@@ -261,7 +261,8 @@ public class SkeletonJson extends SkeletonLoader {
 			data.spacing = constraintMap.getFloat("spacing", 0);
 			if (data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed) data.spacing *= scale;
 			data.mixRotate = constraintMap.getFloat("mixRotate", 1);
-			data.mixTranslate = constraintMap.getFloat("mixTranslate", 1);
+			data.mixX = constraintMap.getFloat("mixX", 1);
+			data.mixY = constraintMap.getFloat("mixY", 1);
 
 			skeletonData.pathConstraints.add(data);
 		}
@@ -819,8 +820,33 @@ public class SkeletonJson extends SkeletonLoader {
 					timelines.add(readTimeline(keyMap, timeline, 0,
 						data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed ? scale : 1));
 				} else if (timelineName.equals("mix")) {
-					CurveTimeline2 timeline = new PathConstraintMixTimeline(timelineMap.size, timelineMap.size << 1, index);
-					timelines.add(readTimeline(keyMap, timeline, "mixRotate", "mixTranslate", 1, 1));
+					PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(timelineMap.size, timelineMap.size * 3, index);
+					float time = keyMap.getFloat("time", 0);
+					float mixRotate = keyMap.getFloat("mixRotate", 1);
+					float mixX = keyMap.getFloat("mixX", 1), mixY = keyMap.getFloat("mixY", mixX);
+					for (int frame = 0, bezier = 0;; frame++) {
+						timeline.setFrame(frame, time, mixRotate, mixX, mixY);
+						JsonValue nextMap = keyMap.next;
+						if (nextMap == null) {
+							timeline.shrink(bezier);
+							break;
+						}
+						float time2 = nextMap.getFloat("time", 0);
+						float mixRotate2 = nextMap.getFloat("mixRotate", 1);
+						float mixX2 = nextMap.getFloat("mixX", 1), mixY2 = nextMap.getFloat("mixY", mixX2);
+						JsonValue curve = keyMap.get("curve");
+						if (curve != null) {
+							bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1);
+							bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1);
+						}
+						time = time2;
+						mixRotate = mixRotate2;
+						mixX = mixX2;
+						mixY = mixY2;
+						keyMap = nextMap;
+					}
+					timelines.add(timeline);
 				}
 			}
 		}

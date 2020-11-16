@@ -2312,8 +2312,12 @@ public class Animation {
 		}
 	}
 
-	/** Changes a transform constraint's {@link PathConstraint#getMixRotate()} and {@link PathConstraint#getMixTranslate()}. */
-	static public class PathConstraintMixTimeline extends CurveTimeline2 {
+	/** Changes a transform constraint's {@link PathConstraint#getMixRotate()}, {@link PathConstraint#getMixX()}, and
+	 * {@link PathConstraint#getMixY()}. */
+	static public class PathConstraintMixTimeline extends CurveTimeline {
+		static public final int ENTRIES = 4;
+		static private final int ROTATE = 1, X = 2, Y = 3;
+
 		final int pathConstraintIndex;
 
 		public PathConstraintMixTimeline (int frameCount, int bezierCount, int pathConstraintIndex) {
@@ -2321,10 +2325,25 @@ public class Animation {
 			this.pathConstraintIndex = pathConstraintIndex;
 		}
 
+		public int getFrameEntries () {
+			return ENTRIES;
+		}
+
 		/** The index of the path constraint slot in {@link Skeleton#getPathConstraints()} that will be changed when this timeline
 		 * is applied. */
 		public int getPathConstraintIndex () {
 			return pathConstraintIndex;
+		}
+
+		/** Sets the time and color for the specified frame.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+		 * @param time The frame time in seconds. */
+		public void setFrame (int frame, float time, float mixRotate, float mixX, float mixY) {
+			frame <<= 2;
+			frames[frame] = time;
+			frames[frame + ROTATE] = mixRotate;
+			frames[frame + X] = mixX;
+			frames[frame + Y] = mixY;
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
@@ -2338,41 +2357,50 @@ public class Animation {
 				switch (blend) {
 				case setup:
 					constraint.mixRotate = constraint.data.mixRotate;
-					constraint.mixTranslate = constraint.data.mixTranslate;
+					constraint.mixX = constraint.data.mixX;
+					constraint.mixY = constraint.data.mixY;
 					return;
 				case first:
 					constraint.mixRotate += (constraint.data.mixRotate - constraint.mixRotate) * alpha;
-					constraint.mixTranslate += (constraint.data.mixTranslate - constraint.mixTranslate) * alpha;
+					constraint.mixX += (constraint.data.mixX - constraint.mixX) * alpha;
+					constraint.mixY += (constraint.data.mixY - constraint.mixY) * alpha;
 				}
 				return;
 			}
 
-			float rotate, translate;
-			int i = search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			float rotate, x, y;
+			int i = search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
 			switch (curveType) {
 			case LINEAR:
 				float before = frames[i];
-				rotate = frames[i + VALUE1];
-				translate = frames[i + VALUE2];
+				rotate = frames[i + ROTATE];
+				x = frames[i + X];
+				y = frames[i + Y];
 				float t = (time - before) / (frames[i + ENTRIES] - before);
-				rotate += (frames[i + ENTRIES + VALUE1] - rotate) * t;
-				translate += (frames[i + ENTRIES + VALUE2] - translate) * t;
+				rotate += (frames[i + ENTRIES + ROTATE] - rotate) * t;
+				x += (frames[i + ENTRIES + X] - x) * t;
+				y += (frames[i + ENTRIES + Y] - y) * t;
 				break;
 			case STEPPED:
-				rotate = frames[i + VALUE1];
-				translate = frames[i + VALUE2];
+				rotate = frames[i + ROTATE];
+				x = frames[i + X];
+				y = frames[i + Y];
 				break;
 			default:
-				rotate = getBezierValue(time, i, VALUE1, curveType - BEZIER);
-				translate = getBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
+				rotate = getBezierValue(time, i, ROTATE, curveType - BEZIER);
+				x = getBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER);
+				y = getBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER);
 			}
 
 			if (blend == setup) {
-				constraint.mixRotate = constraint.data.mixRotate + (rotate - constraint.data.mixRotate) * alpha;
-				constraint.mixTranslate = constraint.data.mixTranslate + (translate - constraint.data.mixTranslate) * alpha;
+				PathConstraintData data = constraint.data;
+				constraint.mixRotate = data.mixRotate + (rotate - data.mixRotate) * alpha;
+				constraint.mixX = data.mixX + (x - data.mixX) * alpha;
+				constraint.mixY = data.mixY + (y - data.mixY) * alpha;
 			} else {
 				constraint.mixRotate += (rotate - constraint.mixRotate) * alpha;
-				constraint.mixTranslate += (translate - constraint.mixTranslate) * alpha;
+				constraint.mixX += (x - constraint.mixX) * alpha;
+				constraint.mixY += (y - constraint.mixY) * alpha;
 			}
 		}
 	}
