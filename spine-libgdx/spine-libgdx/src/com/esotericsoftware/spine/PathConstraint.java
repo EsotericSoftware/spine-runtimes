@@ -98,15 +98,50 @@ public class PathConstraint implements Updatable {
 		if (mixRotate == 0 && mixX == 0 && mixY == 0) return;
 
 		PathConstraintData data = this.data;
-		boolean percentSpacing = data.spacingMode == SpacingMode.percent;
-		RotateMode rotateMode = data.rotateMode;
-		boolean tangents = rotateMode == RotateMode.tangent, scale = rotateMode == RotateMode.chainScale;
+		boolean tangents = data.rotateMode == RotateMode.tangent, scale = data.rotateMode == RotateMode.chainScale;
 		int boneCount = this.bones.size, spacesCount = tangents ? boneCount : boneCount + 1;
 		Object[] bones = this.bones.items;
-		float[] spaces = this.spaces.setSize(spacesCount), lengths = null;
+		float[] spaces = this.spaces.setSize(spacesCount), lengths = scale ? this.lengths.setSize(boneCount) : null;
 		float spacing = this.spacing;
-		if (scale || !percentSpacing) {
-			if (scale) lengths = this.lengths.setSize(boneCount);
+
+		switch (data.spacingMode) {
+		case percent:
+			for (int i = 0, n = spacesCount - 1; i < n;) {
+				Bone bone = (Bone)bones[i];
+				float setupLength = bone.data.length;
+				if (setupLength < epsilon) {
+					if (scale) lengths[i] = 0;
+					spaces[++i] = 0;
+				} else {
+					if (scale) {
+						float x = setupLength * bone.a, y = setupLength * bone.c;
+						lengths[i] = (float)Math.sqrt(x * x + y * y);
+					}
+					spaces[++i] = spacing;
+				}
+			}
+			break;
+		case proportional:
+			float sum = 0;
+			for (int i = 0; i < boneCount;) {
+				Bone bone = (Bone)bones[i];
+				float setupLength = bone.data.length;
+				if (setupLength < epsilon) {
+					if (scale) lengths[i] = 0;
+					spaces[++i] = 0;
+				} else {
+					float x = setupLength * bone.a, y = setupLength * bone.c;
+					float length = (float)Math.sqrt(x * x + y * y);
+					if (scale) lengths[i] = length;
+					spaces[++i] = length;
+					sum += length;
+				}
+			}
+			sum = spacesCount / sum * spacing;
+			for (int i = 1; i < spacesCount; i++)
+				spaces[i] *= sum;
+			break;
+		default:
 			boolean lengthSpacing = data.spacingMode == SpacingMode.length;
 			for (int i = 0, n = spacesCount - 1; i < n;) {
 				Bone bone = (Bone)bones[i];
@@ -114,13 +149,6 @@ public class PathConstraint implements Updatable {
 				if (setupLength < epsilon) {
 					if (scale) lengths[i] = 0;
 					spaces[++i] = 0;
-				} else if (percentSpacing) {
-					if (scale) {
-						float x = setupLength * bone.a, y = setupLength * bone.c;
-						float length = (float)Math.sqrt(x * x + y * y);
-						lengths[i] = length;
-					}
-					spaces[++i] = spacing;
 				} else {
 					float x = setupLength * bone.a, y = setupLength * bone.c;
 					float length = (float)Math.sqrt(x * x + y * y);
@@ -128,17 +156,13 @@ public class PathConstraint implements Updatable {
 					spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
 				}
 			}
-		} else {
-			for (int i = 1; i < spacesCount; i++)
-				spaces[i] = spacing;
 		}
 
-		float[] positions = computeWorldPositions((PathAttachment)attachment, spacesCount, tangents,
-			data.positionMode == PositionMode.percent, percentSpacing);
+		float[] positions = computeWorldPositions((PathAttachment)attachment, spacesCount, tangents);
 		float boneX = positions[0], boneY = positions[1], offsetRotation = data.offsetRotation;
 		boolean tip;
 		if (offsetRotation == 0)
-			tip = rotateMode == RotateMode.chain;
+			tip = data.rotateMode == RotateMode.chain;
 		else {
 			tip = false;
 			Bone p = target.bone;
@@ -192,8 +216,7 @@ public class PathConstraint implements Updatable {
 		}
 	}
 
-	float[] computeWorldPositions (PathAttachment path, int spacesCount, boolean tangents, boolean percentPosition,
-		boolean percentSpacing) {
+	float[] computeWorldPositions (PathAttachment path, int spacesCount, boolean tangents) {
 		Slot target = this.target;
 		float position = this.position;
 		float[] spaces = this.spaces.items, out = this.positions.setSize(spacesCount * 3 + 2), world;
@@ -204,14 +227,24 @@ public class PathConstraint implements Updatable {
 			float[] lengths = path.getLengths();
 			curveCount -= closed ? 1 : 2;
 			float pathLength = lengths[curveCount];
-			if (percentPosition) position *= pathLength;
-			if (percentSpacing) {
-				for (int i = 1; i < spacesCount; i++)
-					spaces[i] *= pathLength;
+
+			if (data.positionMode == PositionMode.percent) position *= pathLength;
+
+			float multiplier;
+			switch (data.spacingMode) {
+			case percent:
+				multiplier = pathLength;
+				break;
+			case proportional:
+				multiplier = pathLength / spacesCount;
+				break;
+			default:
+				multiplier = 1;
 			}
+
 			world = this.world.setSize(8);
 			for (int i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
-				float space = spaces[i];
+				float space = spaces[i] * multiplier;
 				position += space;
 				float p = position;
 
@@ -312,19 +345,28 @@ public class PathConstraint implements Updatable {
 			x1 = x2;
 			y1 = y2;
 		}
-		if (percentPosition)
+
+		if (data.positionMode == PositionMode.percent)
 			position *= pathLength;
 		else
 			position *= pathLength / path.getLengths()[curveCount - 1];
-		if (percentSpacing) {
-			for (int i = 1; i < spacesCount; i++)
-				spaces[i] *= pathLength;
+
+		float multiplier;
+		switch (data.spacingMode) {
+		case percent:
+			multiplier = pathLength;
+			break;
+		case proportional:
+			multiplier = pathLength / spacesCount;
+			break;
+		default:
+			multiplier = 1;
 		}
 
 		float[] segments = this.segments;
 		float curveLength = 0;
 		for (int i = 0, o = 0, curve = 0, segment = 0; i < spacesCount; i++, o += 3) {
-			float space = spaces[i];
+			float space = spaces[i] * multiplier;
 			position += space;
 			float p = position;
 

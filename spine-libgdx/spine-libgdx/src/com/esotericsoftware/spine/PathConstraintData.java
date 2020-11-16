@@ -159,7 +159,7 @@ public class PathConstraintData extends ConstraintData {
 	 * <p>
 	 * See <a href="http://esotericsoftware.com/spine-path-constraints#Spacing-mode">Spacing mode</a> in the Spine User Guide. */
 	static public enum SpacingMode {
-		length, fixed, percent;
+		length, fixed, percent, proportional;
 
 		static public final SpacingMode[] values = SpacingMode.values();
 	}
