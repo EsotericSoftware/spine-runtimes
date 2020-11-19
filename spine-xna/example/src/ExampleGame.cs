@@ -124,7 +124,8 @@ namespace Spine {
 				SkeletonBinary binary = new SkeletonBinary(atlas);
 				binary.Scale = scale;
 				skeletonData = binary.ReadSkeletonData(assetsFolder + name + ".skel");
-			} else {
+			}
+			else {
 				SkeletonJson json = new SkeletonJson(atlas);
 				json.Scale = scale;
 				skeletonData = json.ReadSkeletonData(assetsFolder + name + ".json");
