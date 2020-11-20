@@ -680,6 +680,11 @@ public class Skeleton {
 		this.color.set(color);
 	}
 
+	/** A convenience method for setting the skeleton color. The color can also be set by modifying {@link #getColor()}. */
+	public void setColor (float r, float g, float b, float a) {
+		color.set(r, g, b, a);
+	}
+
 	/** Scales the entire skeleton on the X axis. This affects all bones, even if the bone's transform mode disallows scale
 	 * inheritance. */
 	public float getScaleX () {
