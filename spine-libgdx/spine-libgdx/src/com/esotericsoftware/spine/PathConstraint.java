@@ -29,6 +29,8 @@
 
 package com.esotericsoftware.spine;
 
+import java.util.Arrays;
+
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 
@@ -106,20 +108,19 @@ public class PathConstraint implements Updatable {
 
 		switch (data.spacingMode) {
 		case percent:
-			for (int i = 0, n = spacesCount - 1; i < n;) {
-				Bone bone = (Bone)bones[i];
-				float setupLength = bone.data.length;
-				if (setupLength < epsilon) {
-					if (scale) lengths[i] = 0;
-					spaces[++i] = 0;
-				} else {
-					if (scale) {
+			if (scale) {
+				for (int i = 0, n = spacesCount - 1; i < n;) {
+					Bone bone = (Bone)bones[i];
+					float setupLength = bone.data.length;
+					if (setupLength < epsilon)
+						lengths[i] = 0;
+					else {
 						float x = setupLength * bone.a, y = setupLength * bone.c;
 						lengths[i] = (float)Math.sqrt(x * x + y * y);
 					}
-					spaces[++i] = spacing;
 				}
 			}
+			Arrays.fill(spaces, 1, spacesCount, spacing);
 			break;
 		case proportional:
 			float sum = 0;
@@ -128,7 +129,7 @@ public class PathConstraint implements Updatable {
 				float setupLength = bone.data.length;
 				if (setupLength < epsilon) {
 					if (scale) lengths[i] = 0;
-					spaces[++i] = 0;
+					spaces[++i] = spacing;
 				} else {
 					float x = setupLength * bone.a, y = setupLength * bone.c;
 					float length = (float)Math.sqrt(x * x + y * y);
@@ -137,9 +138,11 @@ public class PathConstraint implements Updatable {
 					sum += length;
 				}
 			}
-			sum = spacesCount / sum * spacing;
-			for (int i = 1; i < spacesCount; i++)
-				spaces[i] *= sum;
+			if (sum > 0) {
+				sum = spacesCount / sum * spacing;
+				for (int i = 1; i < spacesCount; i++)
+					spaces[i] *= sum;
+			}
 			break;
 		default:
 			boolean lengthSpacing = data.spacingMode == SpacingMode.length;
@@ -148,7 +151,7 @@ public class PathConstraint implements Updatable {
 				float setupLength = bone.data.length;
 				if (setupLength < epsilon) {
 					if (scale) lengths[i] = 0;
-					spaces[++i] = 0;
+					spaces[++i] = spacing;
 				} else {
 					float x = setupLength * bone.a, y = setupLength * bone.c;
 					float length = (float)Math.sqrt(x * x + y * y);

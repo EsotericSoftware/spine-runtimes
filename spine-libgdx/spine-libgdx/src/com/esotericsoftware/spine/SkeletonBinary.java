@@ -140,8 +140,6 @@ public class SkeletonBinary extends SkeletonLoader {
 			skeletonData.hash = hash == 0 ? null : Long.toString(hash);
 			skeletonData.version = input.readString();
 			if (skeletonData.version.isEmpty()) skeletonData.version = null;
-			if ("3.8.75".equals(skeletonData.version))
-				throw new RuntimeException("Unsupported skeleton data, please export with a newer version of Spine.");
 			skeletonData.x = input.readFloat();
 			skeletonData.y = input.readFloat();
 			skeletonData.width = input.readFloat();
