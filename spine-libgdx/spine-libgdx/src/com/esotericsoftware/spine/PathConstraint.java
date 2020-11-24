@@ -109,7 +109,7 @@ public class PathConstraint implements Updatable {
 		switch (data.spacingMode) {
 		case percent:
 			if (scale) {
-				for (int i = 0, n = spacesCount - 1; i < n;) {
+				for (int i = 0, n = spacesCount - 1; i < n; i++) {
 					Bone bone = (Bone)bones[i];
 					float setupLength = bone.data.length;
 					if (setupLength < epsilon)
