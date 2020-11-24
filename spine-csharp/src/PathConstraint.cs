@@ -84,6 +84,11 @@ namespace Spine {
 			mixY = constraint.mixY;
 		}
 
+		public static void ArraysFill (float[] a, int fromIndex, int toIndex, float val) {
+			for (int i = fromIndex; i < toIndex; i++)
+				a[i] = val;
+		}
+
 		public void Update () {
 			PathAttachment attachment = target.Attachment as PathAttachment;
 			if (attachment == null) return;
@@ -99,20 +104,19 @@ namespace Spine {
 			float spacing = this.spacing;
 			switch (data.spacingMode) {
 				case SpacingMode.Percent:
-					for (int i = 0, n = spacesCount - 1; i < n;) {
-						Bone bone = bonesItems[i];
-						float setupLength = bone.data.length;
-						if (setupLength < PathConstraint.Epsilon) {
-							if (scale) lengths[i] = 0;
-							spaces[++i] = 0;
-						} else {
-							if (scale) {
+					if (scale) {
+						for (int i = 0, n = spacesCount - 1; i < n; i++) {
+							Bone bone = bonesItems[i];
+							float setupLength = bone.data.length;
+							if (setupLength < PathConstraint.Epsilon)
+								lengths[i] = 0;
+							else {
 								float x = setupLength * bone.a, y = setupLength * bone.c;
 								lengths[i] = (float)Math.Sqrt(x * x + y * y);
 							}
-							spaces[++i] = spacing;
 						}
 					}
+					ArraysFill(spaces, 1, spacesCount, spacing);
 					break;
 				case SpacingMode.Proportional: {
 					float sum = 0;
@@ -121,7 +125,7 @@ namespace Spine {
 						float setupLength = bone.data.length;
 						if (setupLength < PathConstraint.Epsilon) {
 							if (scale) lengths[i] = 0;
-							spaces[++i] = 0;
+							spaces[++i] = spacing;
 						} else {
 							float x = setupLength * bone.a, y = setupLength * bone.c;
 							float length = (float)Math.Sqrt(x * x + y * y);
@@ -130,9 +134,11 @@ namespace Spine {
 							sum += length;
 						}
 					}
-					sum = spacesCount / sum * spacing;
-					for (int i = 1; i < spacesCount; i++)
-						spaces[i] *= sum;
+					if (sum > 0) {
+						sum = spacesCount / sum * spacing;
+						for (int i = 1; i < spacesCount; i++)
+							spaces[i] *= sum;
+					}
 					break;
 				}
 				default: {
@@ -143,7 +149,7 @@ namespace Spine {
 						float setupLength = bone.data.length;
 						if (setupLength < PathConstraint.Epsilon) {
 							if (scale) lengths[i] = 0;
-							spaces[++i] = 0;
+							spaces[++i] = spacing;
 						}
 						else {
 							float x = setupLength * bone.a, y = setupLength * bone.c;
