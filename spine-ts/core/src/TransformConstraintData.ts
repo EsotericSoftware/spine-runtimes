@@ -40,17 +40,12 @@ module spine {
 		/** The target bone whose world transform will be copied to the constrained bones. */
 		target: BoneData;
 
-		/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
-		rotateMix = 0;
-
-		/** A percentage (0-1) that controls the mix between the constrained and unconstrained translations. */
-		translateMix = 0;
-
-		/** A percentage (0-1) that controls the mix between the constrained and unconstrained scales. */
-		scaleMix = 0;
-
-		/** A percentage (0-1) that controls the mix between the constrained and unconstrained shears. */
-		shearMix = 0;
+		mixRotate = 0;
+		mixX = 0;
+		mixY = 0;
+		mixScaleX = 0;
+		mixScaleY = 0;
+		mixShearY = 0;
 
 		/** An offset added to the constrained bone rotation. */
 		offsetRotation = 0;

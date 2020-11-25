@@ -269,10 +269,10 @@ module spine {
 
 			this._updateCache.push(constraint);
 
-			for (let ii = 0; ii < boneCount; ii++)
-				this.sortReset(constrained[ii].children);
-			for (let ii = 0; ii < boneCount; ii++)
-				constrained[ii].sorted = true;
+			for (let i = 0; i < boneCount; i++)
+				this.sortReset(constrained[i].children);
+			for (let i = 0; i < boneCount; i++)
+				constrained[i].sorted = true;
 		}
 
 		sortPathConstraintAttachment (skin: Skin, slotIndex: number, slotBone: Bone) {
@@ -290,13 +290,11 @@ module spine {
 				this.sortBone(slotBone);
 			else {
 				let bones = this.bones;
-				let i = 0;
-				while (i < pathBones.length) {
-					let boneCount = pathBones[i++];
-					for (let n = i + boneCount; i < n; i++) {
-						let boneIndex = pathBones[i];
-						this.sortBone(bones[boneIndex]);
-					}
+				for (let i = 0, n = pathBones.length; i < n;) {
+					let nn = pathBones[i++];
+					nn += i;
+					while (i < nn)
+						this.sortBone(bones[pathBones[i++]]);
 				}
 			}
 		}
@@ -379,10 +377,12 @@ module spine {
 			for (let i = 0, n = transformConstraints.length; i < n; i++) {
 				let constraint = transformConstraints[i];
 				let data = constraint.data;
-				constraint.rotateMix = data.rotateMix;
-				constraint.translateMix = data.translateMix;
-				constraint.scaleMix = data.scaleMix;
-				constraint.shearMix = data.shearMix;
+				constraint.mixRotate = data.mixRotate;
+				constraint.mixX = data.mixX;
+				constraint.mixY = data.mixY;
+				constraint.mixScaleX = data.mixScaleX;
+				constraint.mixScaleY = data.mixScaleY;
+				constraint.mixShearY = data.mixShearY;
 			}
 
 			let pathConstraints = this.pathConstraints;
@@ -391,8 +391,9 @@ module spine {
 				let data = constraint.data;
 				constraint.position = data.position;
 				constraint.spacing = data.spacing;
-				constraint.rotateMix = data.rotateMix;
-				constraint.translateMix = data.translateMix;
+				constraint.mixRotate = data.mixRotate;
+				constraint.mixX = data.mixX;
+				constraint.mixY = data.mixY;
 			}
 		}
 

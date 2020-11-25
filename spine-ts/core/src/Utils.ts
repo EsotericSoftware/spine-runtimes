@@ -253,6 +253,11 @@ module spine {
 			}
 		}
 
+		static arrayFill<T> (array: ArrayLike<T>, fromIndex: number, toIndex: number, value: T) {
+			for (let i = fromIndex; i < toIndex; i++)
+				array[i] = value;
+		}
+
 		static setArraySize<T> (array: Array<T>, size: number, value: any = 0): Array<T> {
 			let oldSize = array.length;
 			if (oldSize == size) return array;

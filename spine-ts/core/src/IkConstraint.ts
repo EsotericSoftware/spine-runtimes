@@ -80,11 +80,6 @@ module spine {
 			return this.active;
 		}
 
-		/** Applies the constraint to the constrained bones. */
-		apply () {
-			this.update();
-		}
-
 		update () {
 			if (this.mix == 0) return;
 			let target = this.target;

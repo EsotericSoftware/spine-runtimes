@@ -58,11 +58,9 @@ module spine {
 		/** The spacing between bones. */
 		spacing: number;
 
-		/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
-		rotateMix: number;
-
-		/** A percentage (0-1) that controls the mix between the constrained and unconstrained translations. */
-		translateMix: number;
+		mixRotate = 0;
+		mixX = 0;
+		mixY = 0;
 
 		constructor (name: string) {
 			super(name, 0, false);
@@ -80,7 +78,7 @@ module spine {
 	 *
 	 * [Spacing mode](http://esotericsoftware.com/spine-path-constraints#Spacing-mode) in the Spine User Guide. */
 	export enum SpacingMode {
-		Length, Fixed, Percent
+		Length, Fixed, Percent, Proportional
 	}
 
 	/** Controls how bones are rotated, translated, and scaled to match the path.

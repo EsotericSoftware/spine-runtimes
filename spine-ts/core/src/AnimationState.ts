@@ -406,9 +406,9 @@ module spine {
 			}
 
 			let rotateTimeline = timeline as RotateTimeline;
-			let frames = rotateTimeline.frames;
 			let bone = skeleton.bones[rotateTimeline.boneIndex];
 			if (!bone.active) return;
+			let frames = rotateTimeline.frames;
 			let r1 = 0, r2 = 0;
 			if (time < frames[0]) {
 				switch (blend) {
@@ -481,7 +481,7 @@ module spine {
 			for (; i < n; i++) {
 				let event = events[i];
 				if (event.time < animationStart) continue; // Discard events outside animation start/end.
-				this.queue.event(entry, events[i]);
+				this.queue.event(entry, event);
 			}
 		}
 
@@ -1029,7 +1029,7 @@ module spine {
 		getTrackComplete() {
 			let duration = this.animationEnd - this.animationStart;
 			if (duration != 0) {
-				if (this.loop) return duration * (1 + Math.floor(this.trackTime / duration)); // Completion of next loop.
+				if (this.loop) return duration * (1 + ((this.trackTime / duration) | 0)); // Completion of next loop.
 				if (this.trackTime < duration) return duration; // Before duration.
 			}
 			return this.trackTime; // Next update.
