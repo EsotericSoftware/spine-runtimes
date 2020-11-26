@@ -1052,7 +1052,7 @@ module spine {
 		}
 
 		/** Sets the time in seconds, red, green, blue, and alpha for the specified key frame. */
-		setFrame (frame: number, time: number, r: number, g: number, b: number, a: number) {
+		setFrame (frame: number, time: number, r: number, g: number, b: number) {
 			frame *= RGBTimeline.ENTRIES;
 			this.frames[frame] = time;
 			this.frames[frame + RGBTimeline.R] = r;
@@ -1302,7 +1302,7 @@ module spine {
 		}
 
 		/** Sets the time in seconds, light, and dark colors for the specified key frame. */
-		setFrame (frame: number, time: number, r: number, g: number, b: number, a: number, r2: number, g2: number, b2: number) {
+		setFrame (frame: number, time: number, r: number, g: number, b: number, r2: number, g2: number, b2: number) {
 			frame *= RGB2Timeline.ENTRIES;
 			this.frames[frame] = time;
 			this.frames[frame + RGB2Timeline.R] = r;
