@@ -213,7 +213,10 @@ namespace Spine.Unity {
 			if (_BeforeApply != null)
 				_BeforeApply(this);
 
-			state.Apply(skeleton);
+			if (updateMode != UpdateMode.OnlyEventTimelines)
+				state.Apply(skeleton);
+			else
+				state.ApplyEventTimelinesOnly(skeleton);
 
 			if (_UpdateLocal != null)
 				_UpdateLocal(this);

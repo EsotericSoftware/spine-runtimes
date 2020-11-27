@@ -58,6 +58,9 @@ namespace Spine {
 		}
 		#endregion
 
+		public List<AtlasRegion> Regions { get { return regions; } }
+		public List<AtlasPage> Pages { get { return pages; } }
+
 		#if !(IS_UNITY)
 		#if WINDOWS_STOREAPP
 		private async Task ReadFile(string path, TextureLoader textureLoader) {
