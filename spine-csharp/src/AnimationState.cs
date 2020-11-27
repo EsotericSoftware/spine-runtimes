@@ -300,6 +300,43 @@ namespace Spine {
 			return applied;
 		}
 
+		/// <summary>Version of <see cref="Apply"/> only applying EventTimelines for lightweight off-screen updates.</summary>
+		// Note: This method is not part of the libgdx reference implementation.
+		public bool ApplyEventTimelinesOnly (Skeleton skeleton) {
+			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
+
+			var events = this.events;
+			bool applied = false;
+			var tracksItems = tracks.Items;
+			for (int i = 0, n = tracks.Count; i < n; i++) {
+				TrackEntry current = tracksItems[i];
+				if (current == null || current.delay > 0) continue;
+				applied = true;
+
+				// Apply mixing from entries first.
+				if (current.mixingFrom != null)
+					ApplyMixingFromEventTimelinesOnly(current, skeleton);
+
+				// Apply current entry.
+				float animationLast = current.animationLast, animationTime = current.AnimationTime;
+				int timelineCount = current.animation.timelines.Count;
+				var timelines = current.animation.timelines;
+				var timelinesItems = timelines.Items;
+				for (int ii = 0; ii < timelineCount; ii++) {
+					Timeline timeline = timelinesItems[ii];
+					if (timeline is EventTimeline)
+						timeline.Apply(skeleton, animationLast, animationTime, events, 1.0f, MixBlend.Setup, MixDirection.In);
+				}
+				QueueEvents(current, animationTime);
+				events.Clear(false);
+				current.nextAnimationLast = animationTime;
+				current.nextTrackLast = current.trackTime;
+			}
+
+			queue.Drain();
+			return applied;
+		}
+
 		private float ApplyMixingFrom (TrackEntry to, Skeleton skeleton, MixBlend blend) {
 			TrackEntry from = to.mixingFrom;
 			if (from.mixingFrom != null) ApplyMixingFrom(from, skeleton, blend);
@@ -376,6 +413,43 @@ namespace Spine {
 						timeline.Apply(skeleton, animationLast, animationTime, eventBuffer, alpha, timelineBlend, direction);
 					}
 				}
+			}
+
+			if (to.mixDuration > 0) QueueEvents(from, animationTime);
+			this.events.Clear(false);
+			from.nextAnimationLast = animationTime;
+			from.nextTrackLast = from.trackTime;
+
+			return mix;
+		}
+
+		/// <summary>Version of <see cref="ApplyMixingFrom"/> only applying EventTimelines for lightweight off-screen updates.</summary>
+		// Note: This method is not part of the libgdx reference implementation.
+		private float ApplyMixingFromEventTimelinesOnly (TrackEntry to, Skeleton skeleton) {
+			TrackEntry from = to.mixingFrom;
+			if (from.mixingFrom != null) ApplyMixingFromEventTimelinesOnly(from, skeleton);
+
+			float mix;
+			if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
+				mix = 1;
+			}
+			else {
+				mix = to.mixTime / to.mixDuration;
+				if (mix > 1) mix = 1;
+			}
+
+			var eventBuffer = mix < from.eventThreshold ? this.events : null;
+			if (eventBuffer == null)
+				return mix;
+
+			float animationLast = from.animationLast, animationTime = from.AnimationTime;
+			var timelines = from.animation.timelines;
+			int timelineCount = timelines.Count;
+			var timelinesItems = timelines.Items;
+			for (int i = 0; i < timelineCount; i++) {
+				var timeline = timelinesItems[i];
+				if (timeline is EventTimeline)
+					timeline.Apply(skeleton, animationLast, animationTime, eventBuffer, 0, MixBlend.Setup, MixDirection.Out);
 			}
 
 			if (to.mixDuration > 0) QueueEvents(from, animationTime);
