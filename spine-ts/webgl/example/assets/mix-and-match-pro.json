@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "nE4g85mprlE",
-	"spine": "4.0.05-beta",
+	"hash": "EedJfu7UJ/I",
+	"spine": "4.0.34-beta",
 	"x": -240.58,
 	"y": -3.38,
 	"width": 410.36,
@@ -838,30 +838,36 @@
 		"order": 12,
 		"bones": [ "eye-back-iris" ],
 		"target": "eye-back-pupil",
-		"rotateMix": 0,
-		"translateMix": 0.4,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0.4,
+		"mixY": 0.4,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "eye-front-pupil",
 		"order": 11,
 		"bones": [ "eye-front-iris" ],
 		"target": "eye-front-pupil",
-		"rotateMix": 0,
-		"translateMix": 0.4,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0.4,
+		"mixY": 0.4,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "eye-transform",
 		"order": 7,
 		"bones": [ "features-control" ],
 		"target": "head-control",
-		"rotateMix": 0,
-		"translateMix": 0.2,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0.2,
+		"mixY": 0.2,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "hair-side-back",
@@ -871,10 +877,12 @@
 		"rotation": -62.21,
 		"x": 132.47,
 		"y": 46.72,
-		"rotateMix": 0,
-		"translateMix": 0.05,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0.05,
+		"mixY": 0.05,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "hair-side-front-control",
@@ -884,10 +892,12 @@
 		"rotation": -80.89,
 		"x": -102.78,
 		"y": 27.17,
-		"rotateMix": 0,
-		"translateMix": 0.15,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0.15,
+		"mixY": 0.15,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "hat-control",
@@ -899,10 +909,12 @@
 		"x": -78.91,
 		"y": 123.01,
 		"shearY": -36,
-		"rotateMix": 0,
-		"translateMix": 0.6,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": 0.6,
+		"mixY": 0.6,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "head-control",
@@ -910,10 +922,12 @@
 		"bones": [ "head-back-control" ],
 		"target": "head-control",
 		"x": -88.92,
-		"rotateMix": 0,
-		"translateMix": -1,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": -1,
+		"mixY": -1,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "leg-down-back",
@@ -923,8 +937,9 @@
 		"target": "leg-down-back",
 		"x": 132.85,
 		"y": 58.02,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "leg-down-back-up",
@@ -934,8 +949,9 @@
 		"target": "leg-down-back",
 		"x": 17.25,
 		"y": 41.79,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "leg-down-down",
@@ -945,8 +961,9 @@
 		"target": "leg-down",
 		"x": 147.87,
 		"y": -60.85,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "leg-down-front",
@@ -956,8 +973,9 @@
 		"target": "leg-down",
 		"x": 23.51,
 		"y": -48.52,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "leg-up",
@@ -967,8 +985,9 @@
 		"target": "leg-up",
 		"x": 130.03,
 		"y": -50.13,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "leg-up-back",
@@ -978,8 +997,9 @@
 		"target": "leg-up-back",
 		"x": 129.36,
 		"y": 40.42,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "shoulder-back",
@@ -989,10 +1009,12 @@
 		"rotation": 180,
 		"x": -14.41,
 		"y": -46.12,
-		"rotateMix": 0.18,
-		"translateMix": 0,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0.18,
+		"mixX": 0,
+		"mixY": 0,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "shoulder-front",
@@ -1002,10 +1024,12 @@
 		"rotation": 90,
 		"x": -24.78,
 		"y": 29.54,
-		"rotateMix": 0.186,
-		"translateMix": 0,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0.186,
+		"mixX": 0,
+		"mixY": 0,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "skirt-rotation-back",
@@ -1017,9 +1041,11 @@
 		"x": 148.43,
 		"y": -0.72,
 		"shearY": -36,
-		"translateMix": 0.7,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixX": 0.7,
+		"mixY": 0.7,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	},
 	{
 		"name": "skirt-rotation-front",
@@ -1031,9 +1057,11 @@
 		"x": 141.99,
 		"y": 2.23,
 		"shearY": -36,
-		"translateMix": 0.7,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixX": 0.7,
+		"mixY": 0.7,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	}
 ],
 "path": [
@@ -6017,10 +6045,10 @@
 		},
 		"transform": {
 			"leg-down-back": [
-				{ "rotateMix": 0.269, "translateMix": 0.234, "scaleMix": 0, "shearMix": 0 }
+				{ "mixRotate": 0.269, "mixX": 0.234, "mixScaleX": 0, "mixShearY": 0 }
 			],
 			"leg-down-down": [
-				{ "rotateMix": 0.394, "translateMix": 0.177, "scaleMix": 0, "shearMix": 0 }
+				{ "mixRotate": 0.394, "mixX": 0.177, "mixScaleX": 0, "mixShearY": 0 }
 			]
 		}
 	},
@@ -6917,29 +6945,29 @@
 		},
 		"transform": {
 			"leg-down-back": [
-				{ "scaleMix": 0, "shearMix": 0 },
-				{ "time": 0.1333, "rotateMix": 0, "translateMix": 0.026, "scaleMix": 0, "shearMix": 0, "curve": "stepped" },
-				{ "time": 1.1667, "rotateMix": 0, "translateMix": 0.026, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 1.2667, "rotateMix": 0.1905, "translateMix": 0.2115, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 1.5333, "scaleMix": 0, "shearMix": 0, "curve": "stepped" },
-				{ "time": 2.0667, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 2.1, "rotateMix": 0.217, "translateMix": 0.078, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 2.4667, "scaleMix": 0, "shearMix": 0 }
+				{ "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 0.1333, "mixRotate": 0, "mixX": 0.026, "mixScaleX": 0, "mixShearY": 0, "curve": "stepped" },
+				{ "time": 1.1667, "mixRotate": 0, "mixX": 0.026, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 1.2667, "mixRotate": 0.1905, "mixX": 0.2115, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 1.5333, "mixScaleX": 0, "mixShearY": 0, "curve": "stepped" },
+				{ "time": 2.0667, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 2.1, "mixRotate": 0.217, "mixX": 0.078, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 2.4667, "mixScaleX": 0, "mixShearY": 0 }
 			],
 			"leg-down-down": [
-				{ "scaleMix": 0, "shearMix": 0 },
-				{ "time": 0.0667, "translateMix": 0, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 0.3333, "scaleMix": 0, "shearMix": 0, "curve": "stepped" },
-				{ "time": 1.0667, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 1.3667, "translateMix": 0.774, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 2.7667, "scaleMix": 0, "shearMix": 0 }
+				{ "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 0.0667, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 0.3333, "mixScaleX": 0, "mixShearY": 0, "curve": "stepped" },
+				{ "time": 1.0667, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 1.3667, "mixX": 0.774, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 2.7667, "mixScaleX": 0, "mixShearY": 0 }
 			],
 			"leg-down-front": [
-				{ "scaleMix": 0, "shearMix": 0 },
-				{ "time": 0.2333, "translateMix": 0.609, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 0.3667, "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0, "curve": "stepped" },
-				{ "time": 2.1, "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 2.5, "scaleMix": 0, "shearMix": 0 }
+				{ "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 0.2333, "mixX": 0.609, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 0.3667, "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0, "curve": "stepped" },
+				{ "time": 2.1, "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 2.5, "mixScaleX": 0, "mixShearY": 0 }
 			]
 		}
 	},
@@ -7970,30 +7998,30 @@
 		},
 		"transform": {
 			"leg-down-back": [
-				{ "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0, "curve": "stepped" },
-				{ "time": 0.1, "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 0.3333, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 0.5667, "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0 }
+				{ "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0, "curve": "stepped" },
+				{ "time": 0.1, "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 0.3333, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 0.5667, "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 }
 			],
 			"leg-down-back-up": [
-				{ "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0, "curve": "stepped" },
-				{ "time": 0.1, "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 0.3333, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 0.5667, "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0 }
+				{ "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0, "curve": "stepped" },
+				{ "time": 0.1, "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 0.3333, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 0.5667, "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 }
 			],
 			"leg-down-down": [
-				{ "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0 }
+				{ "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 }
 			],
 			"leg-down-front": [
-				{ "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0 }
+				{ "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 }
 			],
 			"leg-up": [
-				{ "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0 }
+				{ "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 }
 			],
 			"leg-up-back": [
-				{ "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 0.3333, "scaleMix": 0, "shearMix": 0 },
-				{ "time": 0.5667, "rotateMix": 0, "translateMix": 0, "scaleMix": 0, "shearMix": 0 }
+				{ "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 0.3333, "mixScaleX": 0, "mixShearY": 0 },
+				{ "time": 0.5667, "mixRotate": 0, "mixX": 0, "mixScaleX": 0, "mixShearY": 0 }
 			]
 		}
 	}

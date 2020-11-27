@@ -89,6 +89,9 @@ module spine {
 					data.transformMode = SkeletonJson.transformModeFromString(this.getValue(boneMap, "transform", "normal"));
 					data.skinRequired = this.getValue(boneMap, "skin", false);
 
+					let color = this.getValue(boneMap, "color", null);
+					if (color) data.color.setFromString(color);
+
 					skeletonData.bones.push(data);
 				}
 			}
@@ -176,10 +179,12 @@ module spine {
 					data.offsetScaleY = this.getValue(constraintMap, "scaleY", 0);
 					data.offsetShearY = this.getValue(constraintMap, "shearY", 0);
 
-					data.rotateMix = this.getValue(constraintMap, "rotateMix", 1);
-					data.translateMix = this.getValue(constraintMap, "translateMix", 1);
-					data.scaleMix = this.getValue(constraintMap, "scaleMix", 1);
-					data.shearMix = this.getValue(constraintMap, "shearMix", 1);
+					data.mixRotate = this.getValue(constraintMap, "mixRotate", 1);
+					data.mixX = this.getValue(constraintMap, "mixX", 1);
+					data.mixY = this.getValue(constraintMap, "mixY", data.mixX);
+					data.mixScaleX = this.getValue(constraintMap, "mixScaleX", 1);
+					data.mixScaleY = this.getValue(constraintMap, "mixScaleY", data.mixScaleX);
+					data.mixShearY = this.getValue(constraintMap, "mixShearY", 1);
 
 					skeletonData.transformConstraints.push(data);
 				}
@@ -212,8 +217,9 @@ module spine {
 					if (data.positionMode == PositionMode.Fixed) data.position *= scale;
 					data.spacing = this.getValue(constraintMap, "spacing", 0);
 					if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed) data.spacing *= scale;
-					data.rotateMix = this.getValue(constraintMap, "rotateMix", 1);
-					data.translateMix = this.getValue(constraintMap, "translateMix", 1);
+					data.mixRotate = this.getValue(constraintMap, "mixRotate", 1);
+					data.mixX = this.getValue(constraintMap, "mixX", 1);
+					data.mixY = this.getValue(constraintMap, "mixY", 1);
 
 					skeletonData.pathConstraints.push(data);
 				}
@@ -316,9 +322,7 @@ module spine {
 			let scale = this.scale;
 			name = this.getValue(map, "name", name);
 
-			let type = this.getValue(map, "type", "region");
-
-			switch (type) {
+			switch (this.getValue(map, "type", "region")) {
 				case "region": {
 					let path = this.getValue(map, "path", name);
 					let region = this.attachmentLoader.newRegionAttachment(skin, name, path);
@@ -470,15 +474,14 @@ module spine {
 						if (!timelineMap) continue;
 						if (timelineName == "attachment") {
 							let timeline = new AttachmentTimeline(timelineMap.length, slotIndex);
-
-							let frame = 0;
-							for (let i = 0; i < timelineMap.length; i++) {
-								let keyMap = timelineMap[i];
-								timeline.setFrame(frame++, this.getValue(keyMap, "time", 0), keyMap.name);
+							for (let frame = 0; frame < timelineMap.length; frame++) {
+								let keyMap = timelineMap[frame];
+								timeline.setFrame(frame, this.getValue(keyMap, "time", 0), keyMap.name);
 							}
 							timelines.push(timeline);
-						} else if (timelineName == "color") {
-							let timeline = new ColorTimeline(timelineMap.length, timelineMap.length << 2, slotIndex);
+
+						} else if (timelineName == "rgba") {
+							let timeline = new RGBATimeline(timelineMap.length, timelineMap.length << 2, slotIndex);
 							let keyMap = timelineMap[0];
 							let time = this.getValue(keyMap, "time", 0);
 							let color = new Color().setFromString(keyMap.color);
@@ -505,8 +508,37 @@ module spine {
 
 							timelines.push(timeline);
 
-						} else if (timelineName == "twoColor") {
-							let timeline = new TwoColorTimeline(timelineMap.length, timelineMap.length * 7, slotIndex);
+						} else if (timelineName == "rgb") {
+							let timeline = new RGBTimeline(timelineMap.length, timelineMap.length * 3, slotIndex);
+							let keyMap = timelineMap[0];
+							let time = this.getValue(keyMap, "time", 0);
+							let color = new Color().setFromString(keyMap.color);
+
+							for (let frame = 0, bezier = 0;; frame++) {
+								timeline.setFrame(frame, time, color.r, color.g, color.b);
+								if (timelineMap.length == frame + 1) {
+									break;
+								}
+								let nextMap = timelineMap[frame + 1];
+								let time2 = this.getValue(nextMap, "time", 0);
+								let newColor = new Color().setFromString(nextMap.color);
+								let curve = keyMap.curve;
+								if (curve) {
+									bezier = this.readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
+									bezier = this.readCurve(curve, timeline, bezier, frame, 1, time, time2, color.g, newColor.g, 1);
+									bezier = this.readCurve(curve, timeline, bezier, frame, 2, time, time2, color.b, newColor.b, 1);
+								}
+								time = time2;
+								color = newColor;
+								keyMap = nextMap;
+							}
+
+							timelines.push(timeline);
+
+						} else if (timelineName == "alpha") {
+							timelines.push(this.readTimeline(timelineMap, new AlphaTimeline(timelineMap.length, timelineMap.length, slotIndex), 0, 1));
+						} else if (timelineName == "rgba2") {
+							let timeline = new RGBA2Timeline(timelineMap.length, timelineMap.length * 7, slotIndex);
 
 							let keyMap = timelineMap[0];
 							let time = this.getValue(keyMap, "time", 0);
@@ -540,6 +572,40 @@ module spine {
 
 							timelines.push(timeline);
 
+						} else if (timelineName == "rgb2") {
+							let timeline = new RGB2Timeline(timelineMap.length, timelineMap.length * 6, slotIndex);
+
+							let keyMap = timelineMap[0];
+							let time = this.getValue(keyMap, "time", 0);
+							let color = new Color().setFromString(keyMap.light);
+							let color2 = new Color().setFromString(keyMap.dark);
+
+							for (let frame = 0, bezier = 0;; frame++) {
+								timeline.setFrame(frame, time, color.r, color.g, color.b, color2.r, color2.g, color2.b);
+								if (timelineMap.length == frame + 1) {
+									break;
+								}
+								let nextMap = timelineMap[frame + 1];
+								let time2 = this.getValue(nextMap, "time", 0);
+								let newColor = new Color().setFromString(nextMap.light);
+								let newColor2 = new Color().setFromString(nextMap.dark);
+								let curve = keyMap.curve;
+								if (curve) {
+									bezier = this.readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
+									bezier = this.readCurve(curve, timeline, bezier, frame, 1, time, time2, color.g, newColor.g, 1);
+									bezier = this.readCurve(curve, timeline, bezier, frame, 2, time, time2, color.b, newColor.b, 1);
+									bezier = this.readCurve(curve, timeline, bezier, frame, 3, time, time2, color2.r, newColor2.r, 1);
+									bezier = this.readCurve(curve, timeline, bezier, frame, 4, time, time2, color2.g, newColor2.g, 1);
+									bezier = this.readCurve(curve, timeline, bezier, frame, 5, time, time2, color2.b, newColor2.b, 1);
+								}
+								time = time2;
+								color = newColor;
+								color2 = newColor2;
+								keyMap = nextMap;
+							}
+
+							timelines.push(timeline);
+
 						} else
 							throw new Error("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
 					}
@@ -554,20 +620,37 @@ module spine {
 					if (boneIndex == -1) throw new Error("Bone not found: " + boneName);
 					for (let timelineName in boneMap) {
 						let timelineMap = boneMap[timelineName];
-						let keyMap = timelineMap[0];
-						if (!keyMap) continue;
+						if (timelineMap.length == 0) continue;
 
 						if (timelineName === "rotate") {
 							timelines.push(this.readTimeline(timelineMap, new RotateTimeline(timelineMap.length, timelineMap.length, boneIndex), 0, 1));
 						} else if (timelineName === "translate") {
 							let timeline = new TranslateTimeline(timelineMap.length, timelineMap.length << 1, boneIndex);
 							timelines.push(this.readTimeline2(timelineMap, timeline, "x", "y", 0, scale));
+						} else if (timelineName === "translatex") {
+							let timeline = new TranslateXTimeline(timelineMap.length, timelineMap.length, boneIndex);
+							timelines.push(this.readTimeline(timelineMap, timeline, 0, scale));
+						} else if (timelineName === "translatey") {
+							let timeline = new TranslateYTimeline(timelineMap.length, timelineMap.length, boneIndex);
+							timelines.push(this.readTimeline(timelineMap, timeline, 0, scale));
 						} else if (timelineName === "scale") {
 							let timeline = new ScaleTimeline(timelineMap.length, timelineMap.length << 1, boneIndex);
 							timelines.push(this.readTimeline2(timelineMap, timeline, "x", "y", 1, 1));
+						} else if (timelineName === "scalex") {
+							let timeline = new ScaleXTimeline(timelineMap.length, timelineMap.length, boneIndex);
+							timelines.push(this.readTimeline(timelineMap, timeline, 1, 1));
+						} else if (timelineName === "scaley") {
+							let timeline = new ScaleYTimeline(timelineMap.length, timelineMap.length, boneIndex);
+							timelines.push(this.readTimeline(timelineMap, timeline, 1, 1));
 						} else if (timelineName === "shear") {
 							let timeline = new ShearTimeline(timelineMap.length, timelineMap.length << 1, boneIndex);
 							timelines.push(this.readTimeline2(timelineMap, timeline, "x", "y", 0, 1));
+						} else if (timelineName === "shearx") {
+							let timeline = new ShearXTimeline(timelineMap.length, timelineMap.length, boneIndex);
+							timelines.push(this.readTimeline(timelineMap, timeline, 0, 1));
+						} else if (timelineName === "sheary") {
+							let timeline = new ShearYTimeline(timelineMap.length, timelineMap.length, boneIndex);
+							timelines.push(this.readTimeline(timelineMap, timeline, 0, 1));
 						} else {
 							throw new Error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
 						}
@@ -600,7 +683,6 @@ module spine {
 						let time2 = this.getValue(nextMap, "time", 0);
 						let mix2 = this.getValue(nextMap, "mix", 1);
 						let softness2 = this.getValue(nextMap, "softness", 0) * scale;
-
 						let curve = keyMap.curve;
 						if (curve) {
 							bezier = this.readCurve(curve, timeline, bezier, frame, 0, time, time2, mix, mix2, 1);
@@ -619,46 +701,53 @@ module spine {
 			// Transform constraint timelines.
 			if (map.transform) {
 				for (let constraintName in map.transform) {
-					let constraintMap = map.transform[constraintName];
-					let keyMap = constraintMap[0];
+					let timelineMap = map.transform[constraintName];
+					let keyMap = timelineMap[0];
 					if (!keyMap) continue;
 
 					let constraint = skeletonData.findTransformConstraint(constraintName);
 					let constraintIndex = skeletonData.transformConstraints.indexOf(constraint);
-					let timeline = new TransformConstraintTimeline(constraintMap.length, constraintMap.length << 2, constraintIndex);
+					let timeline = new TransformConstraintTimeline(timelineMap.length, timelineMap.length << 2, constraintIndex);
 
 					let time = this.getValue(keyMap, "time", 0);
-					let rotateMix = this.getValue(keyMap, "rotateMix", 1);
-					let translateMix = this.getValue(keyMap, "translateMix", 1);
-					let scaleMix = this.getValue(keyMap, "scaleMix", 1);
-					let shearMix = this.getValue(keyMap, "shearMix", 1);
+					let mixRotate = this.getValue(keyMap, "mixRotate", 1);
+					let mixShearY = this.getValue(keyMap, "mixShearY", 1);
+					let mixX = this.getValue(keyMap, "mixX", 1);
+					let mixY = this.getValue(keyMap, "mixY", mixX);
+					let mixScaleX = this.getValue(keyMap, "mixScaleX", 1);
+					let mixScaleY = this.getValue(keyMap, "mixScaleY", mixScaleX);
 
 					for (let frame = 0, bezier = 0;; frame++) {
-						timeline.setFrame(frame, time, rotateMix, translateMix, scaleMix, shearMix);
-						let nextMap = constraintMap[frame + 1];
+						timeline.setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
+						let nextMap = timelineMap[frame + 1];
 						if (!nextMap) {
 							break;
 						}
 
 						let time2 = this.getValue(nextMap, "time", 0);
-						let rotateMix2 = this.getValue(nextMap, "rotateMix", 1);
-						let translateMix2 = this.getValue(nextMap, "translateMix", 1);
-						let scaleMix2 = this.getValue(nextMap, "scaleMix", 1);
-						let shearMix2 = this.getValue(nextMap, "shearMix", 1);
-
+						let mixRotate2 = this.getValue(nextMap, "mixRotate", 1);
+						let mixShearY2 = this.getValue(nextMap, "mixShearY", 1);
+						let mixX2 = this.getValue(nextMap, "mixX", 1);
+						let mixY2 = this.getValue(nextMap, "mixY", mixX2);
+						let mixScaleX2 = this.getValue(nextMap, "mixScaleX", 1);
+						let mixScaleY2 = this.getValue(nextMap, "mixScaleY", mixScaleX2);
 						let curve = keyMap.curve;
 						if (curve) {
-							bezier = this.readCurve(curve, timeline, bezier, frame, 0, time, time2, rotateMix, rotateMix2, 1);
-							bezier = this.readCurve(curve, timeline, bezier, frame, 1, time, time2, translateMix, translateMix2, 1);
-							bezier = this.readCurve(curve, timeline, bezier, frame, 2, time, time2, scaleMix, scaleMix2, 1);
-							bezier = this.readCurve(curve, timeline, bezier, frame, 3, time, time2, shearMix, shearMix2, 1);
+							bezier = this.readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+							bezier = this.readCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1);
+							bezier = this.readCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1);
+							bezier = this.readCurve(curve, timeline, bezier, frame, 3, time, time2, mixScaleX, mixScaleX2, 1);
+							bezier = this.readCurve(curve, timeline, bezier, frame, 4, time, time2, mixScaleY, mixScaleY2, 1);
+							bezier = this.readCurve(curve, timeline, bezier, frame, 5, time, time2, mixShearY, mixShearY2, 1);
 						}
 
 						time = time2;
-						rotateMix = rotateMix2;
-						translateMix = translateMix2;
-						scaleMix = scaleMix2;
-						shearMix = shearMix2;
+						mixRotate = mixRotate2;
+						mixX = mixX2;
+						mixY = mixY2;
+						mixScaleX = mixScaleX2;
+						mixScaleY = mixScaleY2;
+						mixScaleX = mixScaleX2;
 						keyMap = nextMap;
 					}
 					timelines.push(timeline);
@@ -674,7 +763,7 @@ module spine {
 					let data = skeletonData.pathConstraints[index];
 					for (let timelineName in constraintMap) {
 						let timelineMap = constraintMap[timelineName];
-						let keyMap = constraintMap[0];
+						let keyMap = timelineMap[0];
 						if (!keyMap) continue;
 
 						if (timelineName === "position") {
@@ -684,8 +773,34 @@ module spine {
 							let timeline = new PathConstraintSpacingTimeline(timelineMap.length, timelineMap.length, index);
 							timelines.push(this.readTimeline(timelineMap, timeline, 0, data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
 						} else if (timelineName === "mix") {
-							let timeline = new PathConstraintMixTimeline(timelineMap.size, timelineMap.size << 1, index);
-							timelines.push(this.readTimeline2(timelineMap, timeline, "rotateMix", "translateMix", 1, 1));
+							let timeline = new PathConstraintMixTimeline(timelineMap.size, timelineMap.size * 3, index);
+							let time = this.getValue(keyMap, "time", 0);
+							let mixRotate = this.getValue(keyMap, "mixRotate", 1);
+							let mixX = this.getValue(keyMap, "mixX", 1);
+							let mixY = this.getValue(keyMap, "mixY", mixX);
+							for (let frame = 0, bezier = 0;; frame++) {
+								timeline.setFrame(frame, time, mixRotate, mixX, mixY);
+								let nextMap = timelineMap[frame + 1];
+								if (!nextMap) {
+									break;
+								}
+								let time2 = this.getValue(nextMap, "time", 0);
+								let mixRotate2 = this.getValue(nextMap, "mixRotate", 1);
+								let mixX2 = this.getValue(nextMap, "mixX", 1);
+								let mixY2 = this.getValue(nextMap, "mixY", mixX2);
+								let curve = keyMap.curve;
+								if (curve != null) {
+									bezier = this.readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+									bezier = this.readCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1);
+									bezier = this.readCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1);
+								}
+								time = time2;
+								mixRotate = mixRotate2;
+								mixX = mixX2;
+								mixY = mixY2;
+								keyMap = nextMap;
+							}
+							timelines.push(timeline);
 						}
 					}
 				}
@@ -811,9 +926,8 @@ module spine {
 			}
 
 			let duration = 0;
-			for (let i = 0, n = timelines.length; i < n; i++) {
-				duration = Math.max(duration, timelines[i].getDuration());
-			}
+			for (let i = 0, n = timelines.length; i < n; i++)
+				duration = Math.max(duration, (timelines[i]).getDuration());
 
 			if (isNaN(duration)) {
 				throw new Error("Error while parsing animation, duration is NaN");
