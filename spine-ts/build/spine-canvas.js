@@ -7781,7 +7781,7 @@ var spine;
 			return _this;
 		}
 		BoundingBoxAttachment.prototype.copy = function () {
-			var copy = new BoundingBoxAttachment(name);
+			var copy = new BoundingBoxAttachment(this.name);
 			this.copyTo(copy);
 			copy.color.setFromColor(this.color);
 			return copy;
@@ -7800,7 +7800,7 @@ var spine;
 			return _this;
 		}
 		ClippingAttachment.prototype.copy = function () {
-			var copy = new ClippingAttachment(name);
+			var copy = new ClippingAttachment(this.name);
 			this.copyTo(copy);
 			copy.endSlot = this.endSlot;
 			copy.color.setFromColor(this.color);
@@ -7944,7 +7944,7 @@ var spine;
 			return _this;
 		}
 		PathAttachment.prototype.copy = function () {
-			var copy = new PathAttachment(name);
+			var copy = new PathAttachment(this.name);
 			this.copyTo(copy);
 			copy.lengths = new Array(this.lengths.length);
 			spine.Utils.arrayCopy(this.lengths, 0, copy.lengths, 0, this.lengths.length);
@@ -7978,7 +7978,7 @@ var spine;
 			return Math.atan2(y, x) * spine.MathUtils.radDeg;
 		};
 		PointAttachment.prototype.copy = function () {
-			var copy = new PointAttachment(name);
+			var copy = new PointAttachment(this.name);
 			copy.x = this.x;
 			copy.y = this.y;
 			copy.rotation = this.rotation;
