@@ -79,6 +79,12 @@ namespace Spine.Unity {
 			+ "This will lead to incorrect rendering on some devices.\n\n"
 			+ "Please change the assigned Material to e.g. 'SkeletonGraphicDefault' or change the used shader to one of the 'Spine/SkeletonGraphic *' shaders.\n\n"
 			+ "Note that 'Spine/SkeletonGraphic *' shall still be used when using URP.\n";
+		public static readonly string kNoSkeletonGraphicTintBlackMaterialMessage =
+			"\nWarning: Only enable 'Canvas Group Tint Black' when using a 'SkeletonGraphic Tint Black' shader!\n"
+			+ "This will lead to incorrect rendering.\n\nPlease\n"
+			+ "a) disable 'Canvas Group Tint Black' under 'Advanced' or\n"
+			+ "b) use a 'SkeletonGraphic Tint Black' Material if you need Tint Black on a CanvasGroup.\n";
+
 		public static readonly string kTintBlackMessage =
 			"\nWarning: 'Advanced - Tint Black' required when using any 'Tint Black' shader!\n\nPlease\n"
 			+ "a) enable 'Tint Black' at the SkeletonRenderer/SkeletonGraphic component under 'Advanced' or\n"
@@ -142,6 +148,10 @@ namespace Spine.Unity {
 				if (settings.tintBlack == true && CanvasNotSetupForTintBlack(skeletonGraphic)) {
 					isProblematic = true;
 					errorMessage += kCanvasTintBlackMessage;
+				}
+				if (settings.canvasGroupTintBlack == true && !IsSkeletonGraphicTintBlackMaterial(material)) {
+					isProblematic = true;
+					errorMessage += kNoSkeletonGraphicTintBlackMaterialMessage;
 				}
 				if (settings.canvasGroupTintBlack == true && !IsCanvasGroupCompatible(material)) {
 					isProblematic = true;
@@ -259,6 +269,11 @@ namespace Spine.Unity {
 
 		static bool IsSpineNonSkeletonGraphicMaterial (Material material) {
 			return material.shader.name.Contains("Spine") && !material.shader.name.Contains("SkeletonGraphic");
+		}
+
+		static bool IsSkeletonGraphicTintBlackMaterial (Material material) {
+			return material.shader.name.Contains("Spine") && material.shader.name.Contains("SkeletonGraphic")
+				&& material.shader.name.Contains("Black");
 		}
 
 		static bool AreShadowsDisabled (Material material) {

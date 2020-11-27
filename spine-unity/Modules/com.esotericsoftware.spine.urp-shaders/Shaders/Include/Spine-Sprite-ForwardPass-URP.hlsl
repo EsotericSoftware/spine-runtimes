@@ -5,6 +5,10 @@
 
 #include "SpineCoreShaders/SpriteLighting.cginc"
 
+#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)
+	#define NEEDS_POSITION_WS
+#endif
+
 ////////////////////////////////////////
 // Vertex output struct
 //
@@ -26,10 +30,10 @@ struct VertexOutputLWRP
 #else
 	half3 normalWorld : TEXCOORD4;
 #endif
-#if defined(_MAIN_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+#if (defined(_MAIN_LIGHT_SHADOWS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)) && !defined(_RECEIVE_SHADOWS_OFF)
 	float4 shadowCoord : TEXCOORD7;
 #endif
-#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS)
+#if defined(NEEDS_POSITION_WS)
 	float4 positionWS : TEXCOORD8;
 #endif
 	UNITY_VERTEX_OUTPUT_STEREO
@@ -80,7 +84,7 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 	brdfData.specular *= albedo.a;
 
 #ifndef _MAIN_LIGHT_VERTEX
-#if defined(_MAIN_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+#if (defined(_MAIN_LIGHT_SHADOWS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)) && !defined(_RECEIVE_SHADOWS_OFF)
 	Light mainLight = GetMainLight(inputData.shadowCoord);
 #else
 	Light mainLight = GetMainLight();
@@ -115,7 +119,7 @@ half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiff
 	half4 diffuse = texDiffuseAlpha * vertexColor;
 
 #ifndef _MAIN_LIGHT_VERTEX
-#if defined(_MAIN_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+#if (defined(_MAIN_LIGHT_SHADOWS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)) && !defined(_RECEIVE_SHADOWS_OFF)
 	Light mainLight = GetMainLight(inputData.shadowCoord);
 #else
 	Light mainLight = GetMainLight();
@@ -170,12 +174,12 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 	backFaceSign = calculateBackfacingSign(positionWS.xyz);
 #endif
 	output.viewDirectionWS = GetCameraPositionWS() - positionWS;
+#if defined(NEEDS_POSITION_WS)
+	output.positionWS = float4(positionWS, 1);
+#endif
 
 #if defined(PER_PIXEL_LIGHTING)
 
-#if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS)
-	output.positionWS = float4(positionWS, 1);
-#endif
 	half3 normalWS = calculateSpriteWorldNormal(input, -backFaceSign);
 	output.normalWorld.xyz = normalWS;
 
@@ -191,7 +195,8 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 #endif // !PER_PIXEL_LIGHTING
 	output.fogFactorAndVertexLight.yzw = LightweightLightVertexSimplified(positionWS, normalWS);
 
-#if defined(_MAIN_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+
+#if (defined(_MAIN_LIGHT_SHADOWS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)) && !defined(_RECEIVE_SHADOWS_OFF)
 	VertexPositionInputs vertexInput;
 	vertexInput.positionWS = positionWS;
 	vertexInput.positionCS = output.pos;
@@ -216,8 +221,16 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input) : SV_Target
 
 	// fill out InputData struct
 	InputData inputData;
-#if defined(_MAIN_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
-	inputData.shadowCoord = input.shadowCoord;
+#if !defined(_RECEIVE_SHADOWS_OFF)
+	#if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
+		inputData.shadowCoord = input.shadowCoord;
+	#elif defined(MAIN_LIGHT_CALCULATE_SHADOWS)
+		inputData.shadowCoord = TransformWorldToShadowCoord(input.positionWS);
+	#elif defined(_MAIN_LIGHT_SHADOWS)
+		inputData.shadowCoord = input.shadowCoord;
+	#else
+		inputData.shadowCoord = float4(0, 0, 0, 0);
+	#endif
 #endif
 
 	inputData.viewDirectionWS = input.viewDirectionWS;
