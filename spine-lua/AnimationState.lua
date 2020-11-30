@@ -863,7 +863,7 @@ function AnimationState:trackEntry (trackIndex, animation, loop, last)
 	if not last then
 		entry.mixDuration = 0
 	else
-		entry.mixDuration = data:getMix(last.animation, animation)
+		entry.mixDuration = data:getMix(last.animation.name, animation.name)
 	end
 	entry.mixBlend = MixBlend.replace
 	return entry
