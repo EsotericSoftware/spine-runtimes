@@ -324,9 +324,13 @@ namespace Spine.Unity.Editor {
 #if SPINE_TK2D
 				IngestSpineProject(loadedAsset, null);
 #else
+				string skeletonName = Path.GetFileNameWithoutExtension(skeletonPath);
 				var atlasesForSkeleton = FindAtlasesAtPath(dir);
-				atlasesForSkeleton.AddRange(newAtlases);
+				atlasesForSkeleton = atlasesForSkeleton.Union(newAtlases).ToList();
 				var requiredPaths = GetRequiredAtlasRegions(skeletonPath);
+				atlasesForSkeleton.Sort((a, b) => (
+					string.CompareOrdinal(b.name, skeletonName)
+					- string.CompareOrdinal(a.name, skeletonName)));
 				var atlasMatch = GetMatchingAtlas(requiredPaths, atlasesForSkeleton);
 				if (atlasMatch != null || requiredPaths.Count == 0) {
 					IngestSpineProject(loadedAsset, atlasMatch);
