@@ -127,11 +127,7 @@ Shader "Lightweight Render Pipeline/Spine/Sprite"
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-
-			#include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Core.hlsl"
-			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
-
-			#include "CGIncludes/Spine-Input-LW.hlsl"
+			#include "CGIncludes/Spine-Input-Sprite-LW.hlsl"
 			#include "CGIncludes/Spine-Sprite-ForwardPass-LW.hlsl"
 			ENDHLSL
 		}
@@ -163,14 +159,11 @@ Shader "Lightweight Render Pipeline/Spine/Sprite"
 			#pragma vertex ShadowPassVertexSprite
 			#pragma fragment ShadowPassFragmentSprite
 
-			#include "Packages/com.unity.render-pipelines.lightweight/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.lightweight/Shaders/ShadowCasterPass.hlsl"
-
 			#define USE_LWRP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-			#include "CGIncludes/Spine-Input-LW.hlsl"
+			#include "CGIncludes/Spine-Input-Sprite-LW.hlsl"
 			#include "CGIncludes/Spine-Sprite-ShadowCasterPass-LW.hlsl"
 			ENDHLSL
 		}
@@ -202,15 +195,12 @@ Shader "Lightweight Render Pipeline/Spine/Sprite"
 			// GPU Instancing
 			#pragma multi_compile_instancing
 
-			#include "Packages/com.unity.render-pipelines.lightweight/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.lightweight/Shaders/DepthOnlyPass.hlsl"
-
 			#define USE_LWRP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-			#include "CGIncludes/Spine-Input-LW.hlsl"
-			#include "CGIncludes/Spine-DepthOnlyPass-LW.hlsl"
+			#include "CGIncludes/Spine-Input-Sprite-LW.hlsl"
+			#include "CGIncludes/Spine-Sprite-DepthOnlyPass-LW.hlsl"
 			ENDHLSL
 		}
 	}

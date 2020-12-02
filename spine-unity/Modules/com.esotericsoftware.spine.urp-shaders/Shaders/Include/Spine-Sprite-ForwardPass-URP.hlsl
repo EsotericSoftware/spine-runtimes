@@ -1,8 +1,8 @@
 #ifndef VERTEX_LIT_FORWARD_PASS_URP_INCLUDED
 #define VERTEX_LIT_FORWARD_PASS_URP_INCLUDED
 
+#include "Include/Spine-Sprite-Common-URP.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-
 #include "SpineCoreShaders/SpriteLighting.cginc"
 
 #if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)

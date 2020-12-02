@@ -1,6 +1,10 @@
 ﻿#ifndef SKELETONLIT_FORWARD_PASS_LW_INCLUDED
 #define SKELETONLIT_FORWARD_PASS_LW_INCLUDED
 
+#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
+#include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Core.hlsl"
+#include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Lighting.hlsl"
+
 struct appdata {
 	float3 pos : POSITION;
 	float3 normal : NORMAL;
@@ -65,8 +69,6 @@ VertexOutput vert(appdata v) {
 	o.pos = TransformWorldToHClip(positionWS);
 	return o;
 }
-
-sampler2D _MainTex;
 
 half4 frag(VertexOutput i) : SV_Target{
 	half4 tex = tex2D(_MainTex, i.uv0);
