@@ -8068,6 +8068,12 @@ var spine;
 					bone.c = sin * a + cos * c;
 					bone.d = sin * b + cos * d;
 				}
+				if (translate) {
+					var temp = this.temp;
+					target.localToWorld(temp.set(this.data.offsetX, this.data.offsetY));
+					bone.worldX += temp.x * mixX;
+					bone.worldY += temp.y * mixY;
+				}
 				if (mixScaleX != 0) {
 					var s = (Math.sqrt(ta * ta + tc * tc) - 1 + this.data.offsetScaleX) * mixScaleX + 1;
 					bone.a *= s;

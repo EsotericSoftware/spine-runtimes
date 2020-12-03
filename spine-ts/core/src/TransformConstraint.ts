@@ -182,7 +182,13 @@ module spine {
 					bone.b = cos * b - sin * d;
 					bone.c = sin * a + cos * c;
 					bone.d = sin * b + cos * d;
+				}
 
+				if (translate) {
+					let temp = this.temp;
+					target.localToWorld(temp.set(this.data.offsetX, this.data.offsetY));
+					bone.worldX += temp.x * mixX;
+					bone.worldY += temp.y * mixY;
 				}
 
 				if (mixScaleX != 0) {
@@ -194,7 +200,6 @@ module spine {
 					let s = (Math.sqrt(tb * tb + td * td) - 1 + this.data.offsetScaleY) * mixScaleY + 1;
 					bone.b *= s;
 					bone.d *= s;
-
 				}
 
 				if (mixShearY > 0) {
@@ -208,7 +213,6 @@ module spine {
 					let s = Math.sqrt(b * b + d * d);
 					bone.b = Math.cos(r) * s;
 					bone.d = Math.sin(r) * s;
-
 				}
 
 				bone.appliedValid = false;
