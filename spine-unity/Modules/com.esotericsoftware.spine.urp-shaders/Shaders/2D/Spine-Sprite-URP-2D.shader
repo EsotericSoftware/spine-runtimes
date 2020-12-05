@@ -104,6 +104,7 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/LightingUtility.hlsl"
 
+			#include "../Include/Spine-Input-Sprite-URP.hlsl"
 			#include "Include/Spine-Sprite-StandardPass-URP-2D.hlsl"
 			ENDHLSL
 		}
@@ -139,6 +140,7 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 			#define fixed3 half3
 			#define fixed half
 
+			#include "../Include/Spine-Input-Sprite-URP.hlsl"
 			#include "Include/Spine-Sprite-NormalsPass-URP-2D.hlsl"
 
 			ENDHLSL

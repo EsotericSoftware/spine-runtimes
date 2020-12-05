@@ -33,7 +33,9 @@ struct VertexInput
 // Normal functions
 //
 
+#if !defined(USE_LWRP) && !defined(USE_URP)
 uniform float4 _FixedNormal = float4(0, 0, 1, 1);
+#endif
 
 inline float3 getFixedNormal()
 {
@@ -189,8 +191,11 @@ inline fixed3 applyRimLighting(fixed3 posWorld, fixed3 normalWorld, fixed4 pixel
 #ifdef _EMISSION
 
 uniform sampler2D _EmissionMap;
+
+#if !defined(USE_LWRP) && !defined(USE_URP)
 uniform fixed4 _EmissionColor;
 uniform float _EmissionPower;
+#endif
 
 
 #define APPLY_EMISSION(diffuse, uv) diffuse += tex2D(_EmissionMap, uv).rgb * _EmissionColor.rgb * _EmissionPower;
