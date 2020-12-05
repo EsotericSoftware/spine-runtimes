@@ -109,9 +109,13 @@ namespace Spine.Unity.Editor {
 			GetOrCreateSettings();
 		}
 
-		internal static SpinePreferences GetOrCreateSettings () {
-			var settings = AssetDatabase.LoadAssetAtPath<SpinePreferences>(SPINE_SETTINGS_ASSET_PATH);
+		static SpinePreferences settings = null;
 
+		internal static SpinePreferences GetOrCreateSettings () {
+			if (settings != null)
+				return settings;
+
+			settings = AssetDatabase.LoadAssetAtPath<SpinePreferences>(SPINE_SETTINGS_ASSET_PATH);
 			if (settings == null)
 				settings = FindSpinePreferences();
 			if (settings == null)

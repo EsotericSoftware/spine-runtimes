@@ -96,7 +96,8 @@ namespace Spine.Unity.Editor {
 		public void UpdateSkeletonData () {
 			preview.Clear();
 			InitializeEditor();
-			EditorUtility.SetDirty(targetSkeletonDataAsset);
+			if (targetSkeletonDataAsset)
+				EditorUtility.SetDirty(targetSkeletonDataAsset);
 		}
 
 		void InitializeEditor () {

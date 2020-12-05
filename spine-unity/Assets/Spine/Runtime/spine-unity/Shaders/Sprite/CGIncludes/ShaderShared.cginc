@@ -74,7 +74,10 @@ inline half3 calculateWorldNormal(float3 normal)
 #if defined(_NORMALMAP)
 
 uniform sampler2D _BumpMap;
+
+#if !defined(USE_LWRP) && !defined(USE_URP)
 uniform half _BumpScale;
+#endif
 
 half3 UnpackScaleNormal(half4 packednormal, half bumpScale)
 {
@@ -225,7 +228,9 @@ inline fixed4 calculatePixel(fixed4 texureColor) : SV_Target
 
 #if defined(_ALPHA_CLIP)
 
+#if !defined(USE_LWRP) && !defined(USE_URP)
 uniform fixed _Cutoff;
+#endif
 
 #define ALPHA_CLIP(pixel, color) clip((pixel.a * color.a) - _Cutoff);
 
@@ -239,7 +244,9 @@ uniform fixed _Cutoff;
 // Color functions
 //
 
+#if !defined(USE_LWRP) && !defined(USE_URP)
 uniform fixed4 _Color;
+#endif
 
 inline fixed4 calculateVertexColor(fixed4 color)
 {
@@ -248,10 +255,12 @@ inline fixed4 calculateVertexColor(fixed4 color)
 
 #if defined(_COLOR_ADJUST)
 
+#if !defined(USE_LWRP) && !defined(USE_URP)
 uniform float _Hue;
 uniform float _Saturation;
 uniform float _Brightness;
 uniform fixed4 _OverlayColor;
+#endif
 
 float3 rgb2hsv(float3 c)
 {
@@ -354,7 +363,9 @@ uniform sampler2D _MainTex;
 
 #if _TEXTURE_BLEND
 uniform sampler2D _BlendTex;
+#if !defined(USE_LWRP) && !defined(USE_URP)
 uniform float _BlendAmount;
+#endif
 
 inline fixed4 calculateBlendedTexturePixel(float2 texcoord)
 {
@@ -379,11 +390,14 @@ inline fixed4 calculateTexturePixel(float2 texcoord)
 	return pixel;
 }
 
+#if !defined(USE_LWRP) && !defined(USE_URP)
 uniform fixed4 _MainTex_ST;
+#endif
 
 inline float2 calculateTextureCoord(float4 texcoord)
 {
 	return TRANSFORM_TEX(texcoord, _MainTex);
 }
+
 
 #endif // SHADER_SHARED_INCLUDED
