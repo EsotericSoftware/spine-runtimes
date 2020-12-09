@@ -88,7 +88,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		OldHard = 2,
 		OldSoft = 3,
 
-		DefaultRampMode = OldHard
+		DefaultRampMode = FullRangeHard
 	};
 
 	MaterialProperty _mainTexture = null;
@@ -643,7 +643,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 
 		if (EditorGUI.EndChangeCheck()) {
 			if (rampMode == eDiffuseRampMode.NoRampSpecified)
-				rampMode = eDiffuseRampMode.DefaultRampMode;
+				rampMode = eDiffuseRampMode.OldHard;
 
 			SetDiffuseRampMode(_materialEditor, rampMode);
 			mixedRampMode = false;
