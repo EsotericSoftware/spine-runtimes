@@ -86,6 +86,7 @@ Shader "Spine/Sprite/Pixel Lit"
 				#pragma shader_feature _EMISSION
 				#pragma shader_feature _RIM_LIGHTING
 				#pragma shader_feature _DIFFUSE_RAMP
+				#pragma shader_feature _ _FULLRANGE_HARD_RAMP _FULLRANGE_SOFT_RAMP _OLD_HARD_RAMP _OLD_SOFT_RAMP
 				#pragma shader_feature _COLOR_ADJUST
 				#pragma shader_feature _TEXTURE_BLEND
 				#pragma shader_feature _SPHERICAL_HARMONICS
@@ -121,6 +122,7 @@ Shader "Spine/Sprite/Pixel Lit"
 				#pragma shader_feature _NORMALMAP
 				#pragma shader_feature _ALPHA_CLIP
 				#pragma shader_feature _DIFFUSE_RAMP
+				#pragma shader_feature _ _FULLRANGE_HARD_RAMP _FULLRANGE_SOFT_RAMP _OLD_HARD_RAMP _OLD_SOFT_RAMP
 				#pragma shader_feature _COLOR_ADJUST
 				#pragma shader_feature _TEXTURE_BLEND
 				#pragma shader_feature _FOG
