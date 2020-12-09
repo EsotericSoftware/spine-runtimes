@@ -110,7 +110,7 @@ public class SkeletonRenderer {
 						alpha = 0;
 					}
 					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(pmaBlendModes), blendMode.getDest());
+					blendMode.apply(batch, pmaBlendModes);
 				}
 
 				float c = NumberUtils.intToFloatColor((int)alpha << 24 //
@@ -222,7 +222,7 @@ public class SkeletonRenderer {
 						alpha = 0;
 					}
 					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(pmaBlendModes), blendMode.getDest());
+					blendMode.apply(batch, pmaBlendModes);
 				}
 
 				float c = NumberUtils.intToFloatColor((int)alpha << 24 //
@@ -348,7 +348,7 @@ public class SkeletonRenderer {
 						alpha = 0;
 					}
 					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(pmaBlendModes), blendMode.getDest());
+					blendMode.apply(batch, pmaBlendModes);
 				}
 
 				float red = r * color.r * multiplier;
