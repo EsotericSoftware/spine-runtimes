@@ -164,9 +164,10 @@ inline fixed3 calculateRampedDiffuse(fixed3 lightColor, float attenuation, float
 //
 
 #ifdef _RIM_LIGHTING
-
+#if !defined(USE_LWRP) && !defined(USE_URP)
 uniform float _RimPower;
 uniform fixed4 _RimColor;
+#endif
 
 inline fixed3 applyRimLighting(fixed3 posWorld, fixed3 normalWorld, fixed4 pixel) : SV_Target
 {
