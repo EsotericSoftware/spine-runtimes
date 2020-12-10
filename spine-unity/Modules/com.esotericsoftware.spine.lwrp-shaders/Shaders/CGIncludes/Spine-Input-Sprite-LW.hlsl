@@ -28,6 +28,9 @@ float _EmissionPower;
 
 float4 _FixedNormal;
 
+float _RimPower;
+half4 _RimColor;
+
 CBUFFER_END
 
 #endif // LIGHTWEIGHT_INPUT_SPRITE_INCLUDED

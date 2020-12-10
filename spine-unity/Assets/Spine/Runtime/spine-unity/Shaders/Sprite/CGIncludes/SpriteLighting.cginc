@@ -136,9 +136,6 @@ inline half3 calculateSpriteWorldBinormal(VertexInput vertex, half3 normalWorld,
 // Diffuse ramp functions
 //
 
-//Disable for softer, more traditional diffuse ramping
-#define HARD_DIFFUSE_RAMP
-
 uniform sampler2D _DiffuseRamp;
 
 inline fixed3 calculateDiffuseRamp(float ramp)
@@ -148,13 +145,29 @@ inline fixed3 calculateDiffuseRamp(float ramp)
 
 inline fixed3 calculateRampedDiffuse(fixed3 lightColor, float attenuation, float angleDot)
 {
-	float d = angleDot * 0.5 + 0.5;
-#if defined(HARD_DIFFUSE_RAMP)
-	half3 ramp = calculateDiffuseRamp(d * attenuation * 2);
+#if defined(_FULLRANGE_HARD_RAMP)
+	float d = angleDot;
+	half3 ramp = calculateDiffuseRamp(d);
+	return lightColor * ramp * attenuation;
+#elif defined(_FULLRANGE_SOFT_RAMP)
+	float d = angleDot;
+	half3 ramp = calculateDiffuseRamp(d * attenuation);
 	return lightColor * ramp;
-#else
+#elif defined(_OLD_SOFT_RAMP)
+	// for unmodified behaviour with existing projects when
+	// the HARD_DIFFUSE_RAMP define was disabled in this file.
+	// uses only the right half of the ramp texture, as
+	// negative angleDot is clamped to [0,1] before.
+	float d = angleDot * 0.5 + 0.5;
 	half3 ramp = calculateDiffuseRamp(d);
 	return lightColor * ramp * (attenuation * 2);
+#else // _OLD_HARD_RAMP
+	// old default, for unmodified behaviour with existing projects,
+	// uses only the right half of the ramp texture, as
+	// negative angleDot is clamped to [0,1] before.
+	float d = angleDot * 0.5 + 0.5;
+	half3 ramp = calculateDiffuseRamp(d * attenuation * 2);
+	return lightColor * ramp;
 #endif
 }
 #endif // _DIFFUSE_RAMP
@@ -164,9 +177,10 @@ inline fixed3 calculateRampedDiffuse(fixed3 lightColor, float attenuation, float
 //
 
 #ifdef _RIM_LIGHTING
-
+#if !defined(USE_LWRP) && !defined(USE_URP)
 uniform float _RimPower;
 uniform fixed4 _RimColor;
+#endif
 
 inline fixed3 applyRimLighting(fixed3 posWorld, fixed3 normalWorld, fixed4 pixel) : SV_Target
 {
