@@ -30,9 +30,10 @@
 "premultiplyAlpha": false,
 "useIndexes": false,
 "bleed": false,
-"limitMemory": false,
+"limitMemory": true,
 "grid": false,
 "scale": [ 1 ],
 "scaleSuffix": [ "" ],
-"atlasExtension": ".atlas"
+"atlasExtension": ".atlas",
+"prettyPrint": true
 }
