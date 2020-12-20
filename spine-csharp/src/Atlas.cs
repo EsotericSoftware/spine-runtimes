@@ -134,7 +134,7 @@ namespace Spine {
 				page.pma = entry[1] == "true";
 			});
 
-			var regionFields = new Dictionary<string, Action>(4);
+			var regionFields = new Dictionary<string, Action>(8);
 			regionFields.Add("xy", () => { // Deprecated, use bounds.
 				region.x = int.Parse(entry[1], CultureInfo.InvariantCulture);
 				region.y = int.Parse(entry[2], CultureInfo.InvariantCulture);
