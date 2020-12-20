@@ -132,7 +132,6 @@ namespace Spine.Unity {
 				var page = region.page;
 
 				region.degrees = savedRegion.packingRotation == SpritePackingRotation.None ? 0 : 90;
-				region.rotate = region.degrees != 0;
 
 				float x = savedRegion.x;
 				float y = savedRegion.y;
@@ -141,11 +140,10 @@ namespace Spine.Unity {
 
 				region.u = x / (float)page.width;
 				region.v = y / (float)page.height;
-				if (region.rotate) {
+				if (region.degrees == 90) {
 					region.u2 = (x + height) / (float)page.width;
 					region.v2 = (y + width) / (float)page.height;
-				}
-				else {
+				} else {
 					region.u2 = (x + width) / (float)page.width;
 					region.v2 = (y + height) / (float)page.height;
 				}
@@ -216,7 +214,6 @@ namespace Spine.Unity {
 				region.name = sprite.name.Replace("(Clone)", "");
 				region.page = page;
 				region.degrees = sprite.packingRotation == SpritePackingRotation.None ? 0 : 90;
-				region.rotate = region.degrees != 0;
 
 				region.u2 = 1;
 				region.v2 = 1;

@@ -178,16 +178,16 @@ namespace Spine.Unity {
 				u2 = region.u2;
 				v2 = region.v2;
 
-				if (!region.rotate) {
-					uvs[0] = new Vector2(u, v2);
-					uvs[1] = new Vector2(u, v);
-					uvs[2] = new Vector2(u2, v);
-					uvs[3] = new Vector2(u2, v2);
-				} else {
+				if (region.degrees == 90) {
 					uvs[0] = new Vector2(u2, v2);
 					uvs[1] = new Vector2(u, v2);
 					uvs[2] = new Vector2(u, v);
 					uvs[3] = new Vector2(u2, v);
+				} else {
+					uvs[0] = new Vector2(u, v2);
+					uvs[1] = new Vector2(u, v);
+					uvs[2] = new Vector2(u2, v);
+					uvs[3] = new Vector2(u2, v2);
 				}
 
 				mesh.triangles = new int[0];

@@ -118,10 +118,10 @@ namespace Spine {
 			offset[BRY] = localYCos + localX2Sin;
 		}
 
-		public void SetUVs (float u, float v, float u2, float v2, bool rotate) {
+		public void SetUVs (float u, float v, float u2, float v2, int degrees) {
 			float[] uvs = this.uvs;
-			// UV values differ from RegionAttachment.java
-			if (rotate) {
+			// UV values differ from spine-libgdx.
+			if (degrees == 90) {
 				uvs[URX] = u;
 				uvs[URY] = v2;
 				uvs[BRX] = u;

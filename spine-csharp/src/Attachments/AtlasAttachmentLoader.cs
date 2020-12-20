@@ -48,7 +48,7 @@ namespace Spine {
 			if (region == null) throw new ArgumentException(string.Format("Region not found in atlas: {0} (region attachment: {1})", path, name));
 			RegionAttachment attachment = new RegionAttachment(name);
 			attachment.RendererObject = region;
-			attachment.SetUVs(region.u, region.v, region.u2, region.v2, region.rotate);
+			attachment.SetUVs(region.u, region.v, region.u2, region.v2, region.degrees);
 			attachment.regionOffsetX = region.offsetX;
 			attachment.regionOffsetY = region.offsetY;
 			attachment.regionWidth = region.width;
@@ -67,7 +67,6 @@ namespace Spine {
 			attachment.RegionV = region.v;
 			attachment.RegionU2 = region.u2;
 			attachment.RegionV2 = region.v2;
-			attachment.RegionRotate = region.rotate;
 			attachment.RegionDegrees = region.degrees;
 			attachment.regionOffsetX = region.offsetX;
 			attachment.regionOffsetY = region.offsetY;

@@ -73,7 +73,7 @@ public class RegionAttachment extends Attachment {
 			AtlasRegion region = (AtlasRegion)this.region;
 			localX += region.offsetX / region.originalWidth * width;
 			localY += region.offsetY / region.originalHeight * height;
-			if (region.rotate) {
+			if (region.degrees == 90) {
 				localX2 -= (region.originalWidth - region.offsetX - region.packedHeight) / region.originalWidth * width;
 				localY2 -= (region.originalHeight - region.offsetY - region.packedWidth) / region.originalHeight * height;
 			} else {
@@ -115,7 +115,7 @@ public class RegionAttachment extends Attachment {
 		if (region == null) throw new IllegalArgumentException("region cannot be null.");
 		this.region = region;
 		float[] uvs = this.uvs;
-		if (region instanceof AtlasRegion && ((AtlasRegion)region).rotate) {
+		if (region instanceof AtlasRegion && ((AtlasRegion)region).degrees == 90) {
 			uvs[URX] = region.getU();
 			uvs[URY] = region.getV2();
 			uvs[BRX] = region.getU();

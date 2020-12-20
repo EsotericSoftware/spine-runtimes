@@ -342,7 +342,7 @@ namespace Spine.Unity.Editor {
 				if (pageMatch) {
 					Rect spriteRect = new Rect();
 
-					if (r.rotate) {
+					if (r.degrees == 90) {
 						spriteRect.width = r.height;
 						spriteRect.height = r.width;
 					} else {

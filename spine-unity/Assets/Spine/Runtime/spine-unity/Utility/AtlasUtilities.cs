@@ -74,8 +74,6 @@ namespace Spine.Unity.AttachmentTools {
 
 			var region = new AtlasRegion();
 			region.name = t.name;
-			region.index = -1;
-			region.rotate = false;
 
 			// World space units
 			Vector2 boundsMin = Vector2.zero, boundsMax = new Vector2(width, height) * scale;
@@ -193,7 +191,7 @@ namespace Spine.Unity.AttachmentTools {
 			var region = new AtlasRegion();
 			region.name = s.name;
 			region.index = -1;
-			region.rotate = s.packed && s.packingRotation != SpritePackingRotation.None;
+			region.degrees = s.packed && s.packingRotation != SpritePackingRotation.None ? 90 : 0;
 
 			// World space units
 			Bounds bounds = s.bounds;
@@ -648,7 +646,7 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>
 		/// Returns a Rect of the AtlasRegion according to Spine texture coordinates. (x-right, y-down)</summary>
 		static Rect GetSpineAtlasRect (this AtlasRegion region, bool includeRotate = true) {
-			if (includeRotate && region.rotate)
+			if (includeRotate && region.degrees == 90)
 				return new Rect(region.x, region.y, region.height, region.width);
 			else
 				return new Rect(region.x, region.y, region.width, region.height);
@@ -682,7 +680,7 @@ namespace Spine.Unity.AttachmentTools {
 
 			int x = (int)rr.x, y = (int)rr.y;
 			int w, h;
-			if (referenceRegion.rotate) {
+			if (referenceRegion.degrees == 90) {
 				w = (int)rr.height;
 				h = (int)rr.width;
 			} else {
@@ -715,7 +713,7 @@ namespace Spine.Unity.AttachmentTools {
 				x = x,
 				y = y,
 
-				rotate = referenceRegion.rotate
+				degrees = referenceRegion.degrees
 			};
 		}
 
