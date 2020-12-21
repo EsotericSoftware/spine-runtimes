@@ -487,18 +487,14 @@ namespace Spine.Unity.Editor {
 			protectFromStackGarbageCollection.Add(atlasAsset);
 			atlasAsset.atlasFile = atlasText;
 
-			//strip CR
-			string atlasStr = atlasText.text;
-			atlasStr = atlasStr.Replace("\r", "");
-
-			string[] atlasLines = atlasStr.Split('\n');
 			List<string> pageFiles = new List<string>();
-			for (int i = 0; i < atlasLines.Length - 1; i++) {
-				if (atlasLines[i].Trim().Length == 0)
-					pageFiles.Add(atlasLines[i + 1].Trim());
+			Atlas atlas = atlasAsset.GetAtlas(onlyMetaData : true);
+			if (atlas != null) {
+				foreach (var page in atlas.Pages)
+					pageFiles.Add(page.name);
 			}
 
-			var populatingMaterials = new List<Material>(pageFiles.Count);//atlasAsset.materials = new Material[pageFiles.Count];
+			var populatingMaterials = new List<Material>(pageFiles.Count);
 
 			for (int i = 0; i < pageFiles.Count; i++) {
 				string texturePath = assetPath + "/" + pageFiles[i];
@@ -555,7 +551,8 @@ namespace Spine.Unity.Editor {
 				Debug.Log(string.Format("{0} :: Imported with {1} material", atlasAsset.name, atlasAsset.materials.Length), atlasAsset);
 
 			// Iterate regions and bake marked.
-			Atlas atlas = atlasAsset.GetAtlas();
+			atlasAsset.Clear();
+			atlas = atlasAsset.GetAtlas(onlyMetaData: false);
 			if (atlas != null) {
 				FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
 				var regions = (List<AtlasRegion>)field.GetValue(atlas);

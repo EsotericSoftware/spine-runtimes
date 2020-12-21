@@ -97,14 +97,14 @@ namespace Spine.Unity {
 		}
 
 		/// <returns>The atlas or null if it could not be loaded.</returns>
-		public override Atlas GetAtlas () {
+		public override Atlas GetAtlas (bool onlyMetaData = false) {
 			if (spriteAtlasFile == null) {
 				Debug.LogError("SpriteAtlas file not set for SpineSpriteAtlasAsset: " + name, this);
 				Clear();
 				return null;
 			}
 
-			if (materials == null || materials.Length == 0) {
+			if (!onlyMetaData && (materials == null || materials.Length == 0)) {
 				Debug.LogError("Materials not set for SpineSpriteAtlasAsset: " + name, this);
 				Clear();
 				return null;
