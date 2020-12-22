@@ -650,7 +650,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 			dataChanged = true;
 		}
 
-		if (_diffuseRamp.textureValue != null) {
+		if (_diffuseRamp != null && _diffuseRamp.textureValue != null) {
 			//Show drop down for ramp mode
 			EditorGUI.BeginChangeCheck();
 			EditorGUI.showMixedValue = mixedRampMode;

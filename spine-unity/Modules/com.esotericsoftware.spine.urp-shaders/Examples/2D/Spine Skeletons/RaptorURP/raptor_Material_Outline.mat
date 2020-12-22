@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: raptor-pma_Material_Outline
+  m_Name: raptor_Material_Outline
   m_Shader: {fileID: 4800000, guid: 0c26b8f3f8867ba41ac82baf19d8ff91, type: 3}
   m_ShaderKeywords: _USE8NEIGHBOURHOOD_ON
   m_LightmapFlags: 4
