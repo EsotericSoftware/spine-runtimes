@@ -1,0 +1,272 @@
+
+raptor-pma.png
+size: 1024,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+back-arm
+  rotate: true
+  xy: 829, 88
+  size: 46, 25
+  orig: 46, 25
+  offset: 0, 0
+  index: -1
+back-bracer
+  rotate: true
+  xy: 195, 238
+  size: 39, 28
+  orig: 39, 28
+  offset: 0, 0
+  index: -1
+back-hand
+  rotate: true
+  xy: 724, 140
+  size: 36, 34
+  orig: 36, 34
+  offset: 0, 0
+  index: -1
+back-knee
+  rotate: true
+  xy: 760, 131
+  size: 49, 67
+  orig: 49, 67
+  offset: 0, 0
+  index: -1
+back-thigh
+  rotate: true
+  xy: 225, 238
+  size: 39, 24
+  orig: 39, 24
+  offset: 0, 0
+  index: -1
+eyes-open
+  rotate: false
+  xy: 975, 204
+  size: 47, 45
+  orig: 47, 45
+  offset: 0, 0
+  index: -1
+front-arm
+  rotate: false
+  xy: 969, 112
+  size: 48, 26
+  orig: 48, 26
+  offset: 0, 0
+  index: -1
+front-bracer
+  rotate: true
+  xy: 724, 97
+  size: 41, 29
+  orig: 41, 29
+  offset: 0, 0
+  index: -1
+front-hand
+  rotate: false
+  xy: 251, 239
+  size: 41, 38
+  orig: 41, 38
+  offset: 0, 0
+  index: -1
+front-open-hand
+  rotate: true
+  xy: 856, 76
+  size: 43, 44
+  orig: 43, 44
+  offset: 0, 0
+  index: -1
+front-thigh
+  rotate: true
+  xy: 729, 178
+  size: 57, 29
+  orig: 57, 29
+  offset: 0, 0
+  index: -1
+gun
+  rotate: false
+  xy: 894, 251
+  size: 107, 103
+  orig: 107, 103
+  offset: 0, 0
+  index: -1
+gun-nohand
+  rotate: false
+  xy: 764, 241
+  size: 105, 102
+  orig: 105, 102
+  offset: 0, 0
+  index: -1
+head
+  rotate: false
+  xy: 756, 345
+  size: 136, 149
+  orig: 136, 149
+  offset: 0, 0
+  index: -1
+lower-leg
+  rotate: true
+  xy: 475, 237
+  size: 73, 98
+  orig: 73, 98
+  offset: 0, 0
+  index: -1
+mouth-grind
+  rotate: false
+  xy: 975, 172
+  size: 47, 30
+  orig: 47, 30
+  offset: 0, 0
+  index: -1
+mouth-smile
+  rotate: false
+  xy: 975, 140
+  size: 47, 30
+  orig: 47, 30
+  offset: 0, 0
+  index: -1
+neck
+  rotate: false
+  xy: 366, 282
+  size: 18, 21
+  orig: 18, 21
+  offset: 0, 0
+  index: -1
+raptor-back-arm
+  rotate: true
+  xy: 636, 97
+  size: 82, 86
+  orig: 82, 86
+  offset: 0, 0
+  index: -1
+raptor-body
+  rotate: false
+  xy: 2, 2
+  size: 632, 233
+  orig: 632, 233
+  offset: 0, 0
+  index: -1
+raptor-front-arm
+  rotate: true
+  xy: 871, 168
+  size: 81, 102
+  orig: 81, 102
+  offset: 0, 0
+  index: -1
+raptor-front-leg
+  rotate: false
+  xy: 2, 237
+  size: 191, 257
+  orig: 191, 257
+  offset: 0, 0
+  index: -1
+raptor-hindleg-back
+  rotate: false
+  xy: 195, 279
+  size: 169, 215
+  orig: 169, 215
+  offset: 0, 0
+  index: -1
+raptor-horn
+  rotate: true
+  xy: 431, 312
+  size: 182, 80
+  orig: 182, 80
+  offset: 0, 0
+  index: -1
+raptor-horn-back
+  rotate: true
+  xy: 513, 318
+  size: 176, 77
+  orig: 176, 77
+  offset: 0, 0
+  index: -1
+raptor-jaw
+  rotate: false
+  xy: 894, 356
+  size: 126, 138
+  orig: 126, 138
+  offset: 0, 0
+  index: -1
+raptor-jaw-tooth
+  rotate: true
+  xy: 294, 240
+  size: 37, 48
+  orig: 37, 48
+  offset: 0, 0
+  index: -1
+raptor-mouth-inside
+  rotate: true
+  xy: 344, 241
+  size: 36, 41
+  orig: 36, 41
+  offset: 0, 0
+  index: -1
+raptor-saddle-strap-back
+  rotate: false
+  xy: 575, 242
+  size: 54, 74
+  orig: 54, 74
+  offset: 0, 0
+  index: -1
+raptor-saddle-strap-front
+  rotate: true
+  xy: 764, 182
+  size: 57, 95
+  orig: 57, 95
+  offset: 0, 0
+  index: -1
+raptor-saddle-w-shadow
+  rotate: false
+  xy: 592, 323
+  size: 162, 171
+  orig: 162, 171
+  offset: 0, 0
+  index: -1
+raptor-tail-shadow
+  rotate: true
+  xy: 366, 305
+  size: 189, 63
+  orig: 189, 63
+  offset: 0, 0
+  index: -1
+raptor-tongue
+  rotate: false
+  xy: 387, 239
+  size: 86, 64
+  orig: 86, 64
+  offset: 0, 0
+  index: -1
+stirrup-back
+  rotate: true
+  xy: 829, 136
+  size: 44, 35
+  orig: 44, 35
+  offset: 0, 0
+  index: -1
+stirrup-front
+  rotate: true
+  xy: 866, 121
+  size: 45, 50
+  orig: 45, 50
+  offset: 0, 0
+  index: -1
+stirrup-strap
+  rotate: false
+  xy: 918, 120
+  size: 49, 46
+  orig: 49, 46
+  offset: 0, 0
+  index: -1
+torso
+  rotate: true
+  xy: 636, 181
+  size: 54, 91
+  orig: 54, 91
+  offset: 0, 0
+  index: -1
+visor
+  rotate: false
+  xy: 631, 237
+  size: 131, 84
+  orig: 131, 84
+  offset: 0, 0
+  index: -1
