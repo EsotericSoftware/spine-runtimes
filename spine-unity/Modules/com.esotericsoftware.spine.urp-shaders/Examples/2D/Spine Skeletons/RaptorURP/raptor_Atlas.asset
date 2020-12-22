@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a6b194f808b1af6499c93410e504af42, type: 3}
-  m_Name: stretchyman-diffuse-pma_Atlas
+  m_Name: raptor_Atlas
   m_EditorClassIdentifier: 
-  atlasFile: {fileID: 4900000, guid: 8f39bee4dcc40854d97cd3aaa9423201, type: 3}
+  atlasFile: {fileID: 4900000, guid: 7319ea80af39a3143a01540fb68aac6e, type: 3}
   materials:
-  - {fileID: 2100000, guid: d0bb1df72b79cec4e966733b038217e0, type: 2}
+  - {fileID: 2100000, guid: 4e6ba50fbf623e34cb9aba576e61625d, type: 2}
