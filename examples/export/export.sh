@@ -198,7 +198,7 @@ fi
 echo ""
 echo "Optimizing PNGs..."
 cd ..
-find -type f -iname '*.png' -exec oxipng -q --nx -i 0 -o 4 --strip all {} +
+find . -iname '*.png' -exec oxipng -q --nx -i 0 -o 4 --strip all {} +
 
 echo ""
 echo "Done!"
