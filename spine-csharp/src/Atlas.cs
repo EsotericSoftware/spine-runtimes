@@ -124,7 +124,7 @@ namespace Spine {
 			});
 			pageFields.Add("filter", () => {
 				page.minFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), entry[1], false);
-				page.magFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), entry[1], false);
+				page.magFilter = (TextureFilter)Enum.Parse(typeof(TextureFilter), entry[2], false);
 			});
 			pageFields.Add("repeat", () => {
 				if (entry[1].IndexOf('x') != -1) page.uWrap = TextureWrap.Repeat;
@@ -210,7 +210,7 @@ namespace Spine {
 						int count = ReadEntry(entry, line = reader.ReadLine());
 						if (count == 0) break;
 						Action field;
-						if (regionFields.TryGetValue(entry[0], out field)) 
+						if (regionFields.TryGetValue(entry[0], out field))
 							field();
 						else {
 							if (names == null) {
