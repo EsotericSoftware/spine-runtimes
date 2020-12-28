@@ -1,286 +1,101 @@
-
 spineboy-pma.png
-size: 1024,256
-format: RGBA8888
-filter: Linear,Linear
-repeat: none
+	size: 1024, 256
+	filter: Linear, Linear
+	pma: true
 crosshair
-  rotate: false
-  xy: 813, 160
-  size: 45, 45
-  orig: 45, 45
-  offset: 0, 0
-  index: -1
+	bounds: 813, 160, 45, 45
 eye-indifferent
-  rotate: false
-  xy: 569, 2
-  size: 47, 45
-  orig: 47, 45
-  offset: 0, 0
-  index: -1
+	bounds: 569, 2, 47, 45
 eye-surprised
-  rotate: true
-  xy: 643, 7
-  size: 47, 45
-  orig: 47, 45
-  offset: 0, 0
-  index: -1
+	bounds: 643, 7, 47, 45
+	rotate: 90
 front-bracer
-  rotate: false
-  xy: 811, 51
-  size: 29, 40
-  orig: 29, 40
-  offset: 0, 0
-  index: -1
+	bounds: 811, 51, 29, 40
 front-fist-closed
-  rotate: false
-  xy: 807, 93
-  size: 38, 41
-  orig: 38, 41
-  offset: 0, 0
-  index: -1
+	bounds: 807, 93, 38, 41
 front-fist-open
-  rotate: false
-  xy: 815, 210
-  size: 43, 44
-  orig: 43, 44
-  offset: 0, 0
-  index: -1
+	bounds: 815, 210, 43, 44
 front-foot
-  rotate: true
-  xy: 706, 64
-  size: 63, 35
-  orig: 63, 35
-  offset: 0, 0
-  index: -1
+	bounds: 706, 64, 63, 35
+	rotate: 90
 front-shin
-  rotate: false
-  xy: 80, 11
-  size: 41, 92
-  orig: 41, 92
-  offset: 0, 0
-  index: -1
+	bounds: 80, 11, 41, 92
 front-thigh
-  rotate: false
-  xy: 754, 12
-  size: 23, 56
-  orig: 23, 56
-  offset: 0, 0
-  index: -1
+	bounds: 754, 12, 23, 56
 front-upper-arm
-  rotate: false
-  xy: 618, 5
-  size: 23, 49
-  orig: 23, 49
-  offset: 0, 0
-  index: -1
+	bounds: 618, 5, 23, 49
 goggles
-  rotate: false
-  xy: 214, 20
-  size: 131, 83
-  orig: 131, 83
-  offset: 0, 0
-  index: -1
+	bounds: 214, 20, 131, 83
 gun
-  rotate: true
-  xy: 347, 14
-  size: 105, 102
-  orig: 105, 102
-  offset: 0, 0
-  index: -1
+	bounds: 347, 14, 105, 102
+	rotate: 90
 head
-  rotate: false
-  xy: 80, 105
-  size: 136, 149
-  orig: 136, 149
-  offset: 0, 0
-  index: -1
+	bounds: 80, 105, 136, 149
 hoverboard-board
-  rotate: true
-  xy: 2, 8
-  size: 246, 76
-  orig: 246, 76
-  offset: 0, 0
-  index: -1
+	bounds: 2, 8, 246, 76
+	rotate: 90
 hoverboard-thruster
-  rotate: false
-  xy: 478, 2
-  size: 30, 32
-  orig: 30, 32
-  offset: 0, 0
-  index: -1
+	bounds: 478, 2, 30, 32
 hoverglow-small
-  rotate: true
-  xy: 218, 117
-  size: 137, 38
-  orig: 137, 38
-  offset: 0, 0
-  index: -1
+	bounds: 218, 117, 137, 38
+	rotate: 90
 mouth-grind
-  rotate: true
-  xy: 775, 80
-  size: 47, 30
-  orig: 47, 30
-  offset: 0, 0
-  index: -1
+	bounds: 775, 80, 47, 30
+	rotate: 90
 mouth-oooo
-  rotate: true
-  xy: 779, 31
-  size: 47, 30
-  orig: 47, 30
-  offset: 0, 0
-  index: -1
+	bounds: 779, 31, 47, 30
+	rotate: 90
 mouth-smile
-  rotate: true
-  xy: 783, 207
-  size: 47, 30
-  orig: 47, 30
-  offset: 0, 0
-  index: -1
+	bounds: 783, 207, 47, 30
+	rotate: 90
 muzzle-glow
-  rotate: false
-  xy: 779, 4
-  size: 25, 25
-  orig: 25, 25
-  offset: 0, 0
-  index: -1
+	bounds: 779, 4, 25, 25
 muzzle-ring
-  rotate: false
-  xy: 451, 14
-  size: 25, 105
-  orig: 25, 105
-  offset: 0, 0
-  index: -1
+	bounds: 451, 14, 25, 105
 muzzle01
-  rotate: true
-  xy: 664, 60
-  size: 67, 40
-  orig: 67, 40
-  offset: 0, 0
-  index: -1
+	bounds: 664, 60, 67, 40
+	rotate: 90
 muzzle02
-  rotate: true
-  xy: 580, 56
-  size: 68, 42
-  orig: 68, 42
-  offset: 0, 0
-  index: -1
+	bounds: 580, 56, 68, 42
+	rotate: 90
 muzzle03
-  rotate: true
-  xy: 478, 36
-  size: 83, 53
-  orig: 83, 53
-  offset: 0, 0
-  index: -1
+	bounds: 478, 36, 83, 53
+	rotate: 90
 muzzle04
-  rotate: true
-  xy: 533, 49
-  size: 75, 45
-  orig: 75, 45
-  offset: 0, 0
-  index: -1
+	bounds: 533, 49, 75, 45
+	rotate: 90
 muzzle05
-  rotate: true
-  xy: 624, 56
-  size: 68, 38
-  orig: 68, 38
-  offset: 0, 0
-  index: -1
+	bounds: 624, 56, 68, 38
+	rotate: 90
 neck
-  rotate: false
-  xy: 806, 8
-  size: 18, 21
-  orig: 18, 21
-  offset: 0, 0
-  index: -1
+	bounds: 806, 8, 18, 21
 portal-bg
-  rotate: false
-  xy: 258, 121
-  size: 133, 133
-  orig: 133, 133
-  offset: 0, 0
-  index: -1
+	bounds: 258, 121, 133, 133
 portal-flare1
-  rotate: true
-  xy: 690, 2
-  size: 56, 30
-  orig: 56, 30
-  offset: 0, 0
-  index: -1
+	bounds: 690, 2, 56, 30
+	rotate: 90
 portal-flare2
-  rotate: false
-  xy: 510, 3
-  size: 57, 31
-  orig: 57, 31
-  offset: 0, 0
-  index: -1
+	bounds: 510, 3, 57, 31
 portal-flare3
-  rotate: true
-  xy: 722, 4
-  size: 58, 30
-  orig: 58, 30
-  offset: 0, 0
-  index: -1
+	bounds: 722, 4, 58, 30
+	rotate: 90
 portal-shade
-  rotate: false
-  xy: 393, 121
-  size: 133, 133
-  orig: 133, 133
-  offset: 0, 0
-  index: -1
+	bounds: 393, 121, 133, 133
 portal-streaks1
-  rotate: false
-  xy: 528, 126
-  size: 126, 128
-  orig: 126, 128
-  offset: 0, 0
-  index: -1
+	bounds: 528, 126, 126, 128
 portal-streaks2
-  rotate: false
-  xy: 656, 129
-  size: 125, 125
-  orig: 125, 125
-  offset: 0, 0
-  index: -1
+	bounds: 656, 129, 125, 125
 rear-bracer
-  rotate: false
-  xy: 826, 13
-  size: 28, 36
-  orig: 28, 36
-  offset: 0, 0
-  index: -1
+	bounds: 826, 13, 28, 36
 rear-foot
-  rotate: true
-  xy: 743, 70
-  size: 57, 30
-  orig: 57, 30
-  offset: 0, 0
-  index: -1
+	bounds: 743, 70, 57, 30
+	rotate: 90
 rear-shin
-  rotate: false
-  xy: 174, 14
-  size: 38, 89
-  orig: 38, 89
-  offset: 0, 0
-  index: -1
+	bounds: 174, 14, 38, 89
 rear-thigh
-  rotate: false
-  xy: 783, 158
-  size: 28, 47
-  orig: 28, 47
-  offset: 0, 0
-  index: -1
+	bounds: 783, 158, 28, 47
 rear-upper-arm
-  rotate: true
-  xy: 783, 136
-  size: 20, 44
-  orig: 20, 44
-  offset: 0, 0
-  index: -1
+	bounds: 783, 136, 20, 44
+	rotate: 90
 torso
-  rotate: false
-  xy: 123, 13
-  size: 49, 90
-  orig: 49, 90
-  offset: 0, 0
-  index: -1
+	bounds: 123, 13, 49, 90

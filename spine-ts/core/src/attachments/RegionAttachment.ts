@@ -155,7 +155,7 @@ module spine {
 		setRegion (region: TextureRegion) : void {
 			this.region = region;
 			let uvs = this.uvs;
-			if (region.rotate) {
+			if (region.degrees == 90) {
 				uvs[2] = region.u;
 				uvs[3] = region.v2;
 				uvs[4] = region.u;

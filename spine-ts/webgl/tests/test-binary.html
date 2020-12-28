@@ -68,6 +68,7 @@ function load() {
 		console.log("Json: " + time.totalTime);*/
 
 		skeleton = new spine.Skeleton(skeletonData);
+		skeleton.y = -150;
 		var stateData = new spine.AnimationStateData(skeleton.data);
 		state = new spine.AnimationState(stateData);
 		stateData.defaultMix = 0;
