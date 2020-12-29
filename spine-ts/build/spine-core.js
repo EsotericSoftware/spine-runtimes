@@ -7750,7 +7750,7 @@ var spine;
 			this.v2 = 0;
 			this.width = 0;
 			this.height = 0;
-			this.rotate = false;
+			this.degrees = 0;
 			this.offsetX = 0;
 			this.offsetY = 0;
 			this.originalWidth = 0;
@@ -7783,88 +7783,145 @@ var spine;
 			if (textureLoader == null)
 				throw new Error("textureLoader cannot be null.");
 			var reader = new TextureAtlasReader(atlasText);
-			var tuple = new Array(4);
+			var entry = new Array(4);
 			var page = null;
+			var region = null;
+			var pageFields = {};
+			pageFields["size"] = function () {
+				page.width = parseInt(entry[1]);
+				page.height = parseInt(entry[2]);
+			};
+			pageFields["format"] = function () {
+			};
+			pageFields["filter"] = function () {
+				page.minFilter = spine.Texture.filterFromString(entry[1]);
+				page.magFilter = spine.Texture.filterFromString(entry[2]);
+			};
+			pageFields["repeat"] = function () {
+				if (entry[1].indexOf('x') != -1)
+					page.uWrap = spine.TextureWrap.Repeat;
+				if (entry[1].indexOf('y') != -1)
+					page.vWrap = spine.TextureWrap.Repeat;
+			};
+			pageFields["pma"] = function () {
+				page.pma = entry[1] == "true";
+			};
+			var regionFields = {};
+			regionFields["xy"] = function () {
+				region.x = parseInt(entry[1]);
+				region.y = parseInt(entry[2]);
+			};
+			regionFields["size"] = function () {
+				region.width = parseInt(entry[1]);
+				region.height = parseInt(entry[2]);
+			};
+			regionFields["bounds"] = function () {
+				region.x = parseInt(entry[1]);
+				region.y = parseInt(entry[2]);
+				region.width = parseInt(entry[3]);
+				region.height = parseInt(entry[4]);
+			};
+			regionFields["offset"] = function () {
+				region.offsetX = parseInt(entry[1]);
+				region.offsetY = parseInt(entry[2]);
+			};
+			regionFields["orig"] = function () {
+				region.originalWidth = parseInt(entry[1]);
+				region.originalHeight = parseInt(entry[2]);
+			};
+			regionFields["offsets"] = function () {
+				region.offsetX = parseInt(entry[1]);
+				region.offsetY = parseInt(entry[2]);
+				region.originalWidth = parseInt(entry[3]);
+				region.originalHeight = parseInt(entry[4]);
+			};
+			regionFields["rotate"] = function () {
+				var value = entry[1];
+				if (value == "true")
+					region.degrees = 90;
+				else if (value != "false")
+					region.degrees = parseInt(value);
+			};
+			regionFields["index"] = function () {
+				region.index = parseInt(entry[1]);
+			};
+			var line = reader.readLine();
+			while (line != null && line.trim().length == 0)
+				line = reader.readLine();
 			while (true) {
-				var line = reader.readLine();
+				if (line == null || line.trim().length == 0)
+					break;
+				if (reader.readEntry(entry, line) == 0)
+					break;
+				line = reader.readLine();
+			}
+			var names = null;
+			var values = null;
+			while (true) {
 				if (line == null)
 					break;
-				line = line.trim();
-				if (line.length == 0)
+				if (line.trim().length == 0) {
 					page = null;
-				else if (!page) {
+					line = reader.readLine();
+				}
+				else if (page == null) {
 					page = new TextureAtlasPage();
-					page.name = line;
-					if (reader.readTuple(tuple) == 2) {
-						page.width = parseInt(tuple[0]);
-						page.height = parseInt(tuple[1]);
-						reader.readTuple(tuple);
+					page.name = line.trim();
+					while (true) {
+						if (reader.readEntry(entry, line = reader.readLine()) == 0)
+							break;
+						var field = pageFields[entry[0]];
+						if (field)
+							field();
 					}
-					reader.readTuple(tuple);
-					page.minFilter = spine.Texture.filterFromString(tuple[0]);
-					page.magFilter = spine.Texture.filterFromString(tuple[1]);
-					var direction = reader.readValue();
-					page.uWrap = spine.TextureWrap.ClampToEdge;
-					page.vWrap = spine.TextureWrap.ClampToEdge;
-					if (direction == "x")
-						page.uWrap = spine.TextureWrap.Repeat;
-					else if (direction == "y")
-						page.vWrap = spine.TextureWrap.Repeat;
-					else if (direction == "xy")
-						page.uWrap = page.vWrap = spine.TextureWrap.Repeat;
-					page.texture = textureLoader(line);
+					page.texture = textureLoader(page.name);
 					page.texture.setFilters(page.minFilter, page.magFilter);
 					page.texture.setWraps(page.uWrap, page.vWrap);
-					page.width = page.texture.getImage().width;
-					page.height = page.texture.getImage().height;
 					this.pages.push(page);
 				}
 				else {
-					var region = new TextureAtlasRegion();
-					region.name = line;
+					region = new TextureAtlasRegion();
 					region.page = page;
-					var rotateValue = reader.readValue();
-					if (rotateValue.toLocaleLowerCase() == "true") {
-						region.degrees = 90;
-					}
-					else if (rotateValue.toLocaleLowerCase() == "false") {
-						region.degrees = 0;
-					}
-					else {
-						region.degrees = parseFloat(rotateValue);
-					}
-					region.rotate = region.degrees == 90;
-					reader.readTuple(tuple);
-					var x = parseInt(tuple[0]);
-					var y = parseInt(tuple[1]);
-					reader.readTuple(tuple);
-					var width = parseInt(tuple[0]);
-					var height = parseInt(tuple[1]);
-					region.u = x / page.width;
-					region.v = y / page.height;
-					if (region.rotate) {
-						region.u2 = (x + height) / page.width;
-						region.v2 = (y + width) / page.height;
-					}
-					else {
-						region.u2 = (x + width) / page.width;
-						region.v2 = (y + height) / page.height;
-					}
-					region.x = x;
-					region.y = y;
-					region.width = Math.abs(width);
-					region.height = Math.abs(height);
-					if (reader.readTuple(tuple) == 4) {
-						if (reader.readTuple(tuple) == 4) {
-							reader.readTuple(tuple);
+					region.name = line;
+					while (true) {
+						var count = reader.readEntry(entry, line = reader.readLine());
+						if (count == 0)
+							break;
+						var field = regionFields[entry[0]];
+						if (field)
+							field();
+						else {
+							if (names == null) {
+								names = [];
+								values = [];
+							}
+							names.push(entry[0]);
+							var entryValues = [];
+							for (var i = 0; i < count; i++)
+								entryValues.push(parseInt(entry[i + 1]));
+							values.push(entryValues);
 						}
 					}
-					region.originalWidth = parseInt(tuple[0]);
-					region.originalHeight = parseInt(tuple[1]);
-					reader.readTuple(tuple);
-					region.offsetX = parseInt(tuple[0]);
-					region.offsetY = parseInt(tuple[1]);
-					region.index = parseInt(reader.readValue());
+					if (region.originalWidth == 0 && region.originalHeight == 0) {
+						region.originalWidth = region.width;
+						region.originalHeight = region.height;
+					}
+					if (names != null && names.length > 0) {
+						region.names = names;
+						region.values = values;
+						names = null;
+						values = null;
+					}
+					region.u = region.x / page.width;
+					region.v = region.y / page.height;
+					if (region.degrees == 90) {
+						region.u2 = (region.x + region.height) / page.width;
+						region.v2 = (region.y + region.width) / page.height;
+					}
+					else {
+						region.u2 = (region.x + region.width) / page.width;
+						region.v2 = (region.y + region.height) / page.height;
+					}
 					region.texture = page.texture;
 					this.regions.push(region);
 				}
@@ -7896,33 +7953,36 @@ var spine;
 				return null;
 			return this.lines[this.index++];
 		};
-		TextureAtlasReader.prototype.readValue = function () {
-			var line = this.readLine();
-			var colon = line.indexOf(":");
+		TextureAtlasReader.prototype.readEntry = function (entry, line) {
+			if (line == null)
+				return 0;
+			line = line.trim();
+			if (line.length == 0)
+				return 0;
+			var colon = line.indexOf(':');
 			if (colon == -1)
-				throw new Error("Invalid line: " + line);
-			return line.substring(colon + 1).trim();
-		};
-		TextureAtlasReader.prototype.readTuple = function (tuple) {
-			var line = this.readLine();
-			var colon = line.indexOf(":");
-			if (colon == -1)
-				throw new Error("Invalid line: " + line);
-			var i = 0, lastMatch = colon + 1;
-			for (; i < 3; i++) {
-				var comma = line.indexOf(",", lastMatch);
-				if (comma == -1)
-					break;
-				tuple[i] = line.substr(lastMatch, comma - lastMatch).trim();
+				return 0;
+			entry[0] = line.substr(0, colon).trim();
+			for (var i = 1, lastMatch = colon + 1;; i++) {
+				var comma = line.indexOf(',', lastMatch);
+				if (comma == -1) {
+					entry[i] = line.substr(lastMatch).trim();
+					return i;
+				}
+				entry[i] = line.substr(lastMatch, comma - lastMatch).trim();
 				lastMatch = comma + 1;
+				if (i == 4)
+					return 4;
 			}
-			tuple[i] = line.substring(lastMatch).trim();
-			return i + 1;
 		};
 		return TextureAtlasReader;
 	}());
 	var TextureAtlasPage = (function () {
 		function TextureAtlasPage() {
+			this.minFilter = spine.TextureFilter.Nearest;
+			this.magFilter = spine.TextureFilter.Nearest;
+			this.uWrap = spine.TextureWrap.ClampToEdge;
+			this.vWrap = spine.TextureWrap.ClampToEdge;
 		}
 		return TextureAtlasPage;
 	}());
@@ -9208,7 +9268,7 @@ var spine;
 		RegionAttachment.prototype.setRegion = function (region) {
 			this.region = region;
 			var uvs = this.uvs;
-			if (region.rotate) {
+			if (region.degrees == 90) {
 				uvs[2] = region.u;
 				uvs[3] = region.v2;
 				uvs[4] = region.u;

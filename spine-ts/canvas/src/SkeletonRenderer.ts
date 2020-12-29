@@ -91,7 +91,7 @@ module spine.canvas {
 				let atlasScale = att.width / w;
 				ctx.scale(atlasScale * attachment.scaleX, atlasScale * attachment.scaleY);
 				ctx.translate(w / 2, h / 2);
-				if (attachment.region.rotate) {
+				if (attachment.region.degrees == 90) {
 					let t = w;
 					w = h;
 					h = t;

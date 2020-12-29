@@ -87,7 +87,7 @@ module spine {
 		u = 0; v = 0;
 		u2 = 0; v2 = 0;
 		width = 0; height = 0;
-		degrees = 90;
+		degrees = 0;
 		offsetX = 0; offsetY = 0;
 		originalWidth = 0; originalHeight = 0;
 	}

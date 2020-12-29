@@ -982,7 +982,7 @@ declare module spine {
 		v2: number;
 		width: number;
 		height: number;
-		rotate: boolean;
+		degrees: number;
 		offsetX: number;
 		offsetY: number;
 		originalWidth: number;
@@ -1012,6 +1012,7 @@ declare module spine {
 		texture: Texture;
 		width: number;
 		height: number;
+		pma: boolean;
 	}
 	class TextureAtlasRegion extends TextureRegion {
 		page: TextureAtlasPage;
@@ -1022,6 +1023,8 @@ declare module spine {
 		rotate: boolean;
 		degrees: number;
 		texture: Texture;
+		names: string[];
+		values: number[][];
 	}
 }
 declare module spine {
