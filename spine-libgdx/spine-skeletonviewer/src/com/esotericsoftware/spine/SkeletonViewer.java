@@ -178,8 +178,10 @@ public class SkeletonViewer extends ApplicationAdapter {
 			final AtlasRegion fake = new AtlasRegion(new Texture(pixmap), 0, 0, 32, 32);
 			pixmap.dispose();
 
-			TextureAtlasData atlasData = null;
-			if (atlasFile != null) {
+			TextureAtlasData atlasData;
+			if (atlasFile == null)
+				atlasData = new TextureAtlasData();
+			else {
 				atlasData = new TextureAtlasData(atlasFile, atlasFile.parent(), false);
 				boolean linear = true;
 				for (int i = 0, n = atlasData.getPages().size; i < n; i++) {
