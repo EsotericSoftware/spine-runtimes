@@ -849,7 +849,7 @@ public class AnimationState {
 		this.data = data;
 	}
 
-	/** The list of tracks that currently have animations, which may contain null entries. */
+	/** The list of tracks that have had animations, which may contain null entries for tracks that currently have no animation. */
 	public Array<TrackEntry> getTracks () {
 		return tracks;
 	}
