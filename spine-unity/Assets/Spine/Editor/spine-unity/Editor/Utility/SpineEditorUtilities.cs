@@ -69,7 +69,6 @@ namespace Spine.Unity.Editor {
 		public static string editorPath = "";
 		public static string editorGUIPath = "";
 		public static bool initialized;
-		private static int numFramesToDelayInit = 1;
 		private static List<string> texturesWithoutMetaFile = new List<string>();
 
 		// Auto-import entry point for textures
@@ -97,16 +96,11 @@ namespace Spine.Unity.Editor {
 		}
 
 #region Initialization
-
 		static SpineEditorUtilities () {
-			EditorApplication.update += Initialize; // delayed so that AssetDatabase is ready.
+			EditorApplication.delayCall += Initialize; // delayed so that AssetDatabase is ready.
 		}
 
 		static void Initialize () {
-			if (numFramesToDelayInit-- > 0)
-				return;
-			EditorApplication.update -= Initialize;
-
 			// Note: Preferences need to be loaded when changing play mode
 			// to initialize handle scale correctly.
 			#if !NEW_PREFERENCES_SETTINGS_PROVIDER
