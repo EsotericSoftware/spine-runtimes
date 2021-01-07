@@ -29,6 +29,8 @@
 
 package com.esotericsoftware.spine;
 
+import java.io.BufferedWriter;
+
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
@@ -38,7 +40,9 @@ import com.badlogic.gdx.utils.JsonWriter.OutputType;
 
 /** Takes Spine JSON data and transforms it to work with an older version of Spine. Target versions:<br>
  * 2.1: supports going from version 3.3.xx to 2.1.27.<br>
- * 3.7: supports going from version 3.8.xx to 3.7.94.
+ * 3.7: supports going from version 3.8.xx to 3.7.94.<br>
+ * 3.8: supports going from version 4.0.xx to 3.8.99 (all curves become linear, separate timelines are lost, constraint translate
+ * Y and shear Y are lost).
  * <p>
  * Data can be exported from a Spine project, processed with JsonRollback, then imported into an older version of Spine. However,
  * JsonRollback may remove data for features not supported by the older Spine version. Because of this, JsonRollback is only
@@ -55,8 +59,8 @@ public class JsonRollback {
 		}
 
 		String version = args[1];
-		if (!version.equals("2.1") && !version.equals("3.7")) {
-			System.out.println("ERROR: Target version must be: 2.1 or 3.7");
+		if (!version.equals("2.1") && !version.equals("3.7") && !version.equals("3.8")) {
+			System.out.println("ERROR: Target version must be: 2.1, 3.7, or 3.8");
 			System.out.println("Usage: <inputFile> <toVersion> [outputFile]");
 			System.exit(0);
 		}
@@ -124,12 +128,74 @@ public class JsonRollback {
 			}
 
 			rollbackCurves(root.get("animations"));
+		} else if (version.equals("3.8")) {
+			linearCurves(root.get("animations"));
+			rename(root, "angle", "animations", "*", "bones", "*", "rotate", "value");
+			constraintNames(root, "transform");
+			constraintNames(root, "path");
+			constraintNames(root, "animations", "*", "transform", "*");
+			constraintNames(root, "animations", "*", "path", "*");
 		}
 
-		if (args.length == 3)
-			new FileHandle(args[2]).writeString(root.prettyPrint(OutputType.json, 130), false, "UTF-8");
-		else
+		if (args.length == 3) {
+			BufferedWriter fileWriter = new BufferedWriter(new FileHandle(args[2]).writer(false, "UTF-8"), 16 * 1024);
+			root.prettyPrint(OutputType.json, fileWriter);
+			fileWriter.close();
+		} else
 			System.out.println(root.prettyPrint(OutputType.json, 130));
+	}
+
+	static private void log (String message) {
+		System.out.println(message);
+	}
+
+	static private void constraintNames (JsonValue root, String... path) {
+		for (JsonValue map : find(root, new Array<JsonValue>(), 0, path)) {
+			for (JsonValue constraint = map.child; constraint != null; constraint = constraint.next) {
+				for (JsonValue child = constraint.child; child != null; child = child.next) {
+					if (child.name.equals("mixRotate"))
+						child.name = "rotateMix";
+					else if (child.name.equals("mixX") || child.name.equals("mixY"))
+						child.name = "translateMix";
+					else if (child.name.equals("mixScaleX") || child.name.equals("mixScaleY")) {
+						child.name = "scaleMix";
+					} else if (child.name.equals("mixShearX") || child.name.equals("mixShearY")) //
+						child.name = "shearMix";
+				}
+			}
+		}
+	}
+
+	static private void linearCurves (JsonValue map) {
+		if (map == null) return;
+
+		if (map.isObject() && map.parent.isArray()) { // Probably a key.
+			if (map.parent.name != null) {
+				String name = map.parent.name;
+				if (name.equals("translatex") || name.equals("translatey") //
+					|| name.equals("scalex") || name.equals("scaley") //
+					|| name.equals("shearx") || name.equals("sheary") //
+					|| name.equals("rgb") || name.equals("rgb2") || name.equals("alpha")) {
+					map.parent.remove();
+					log("Separate timelines removed: " + name);
+				}
+				if (name.equals("rgba"))
+					map.parent.name = "color";
+				else if (name.equals("rgba")) //
+					map.parent.name = "twoColor";
+			}
+		}
+
+		JsonValue curve = map.get("curve");
+		if (curve == null) {
+			for (JsonValue child = map.child; child != null; child = child.next)
+				linearCurves(child);
+			return;
+		}
+		if (!curve.isString()) {
+			curve.remove();
+			log("Bezier curve changed to linear.");
+		}
 	}
 
 	static private void rollbackCurves (JsonValue map) {
