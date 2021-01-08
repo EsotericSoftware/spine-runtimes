@@ -258,8 +258,15 @@ namespace Spine.Unity {
 
 		protected void SyncRawImagesWithCanvasRenderers () {
 			rawImages.Clear();
-			foreach (var canvasRenderer in canvasRenderers)
-				rawImages.Add(canvasRenderer.GetComponent<RawImage>());
+			foreach (var canvasRenderer in canvasRenderers) {
+				var rawImage = canvasRenderer.GetComponent<RawImage>();
+				if (rawImage == null) {
+					rawImage = canvasRenderer.gameObject.AddComponent<RawImage>();
+					rawImage.maskable = this.maskable;
+					rawImage.raycastTarget = false;
+				}
+				rawImages.Add(rawImage);
+			}
 		}
 
 		protected void UpdateAnimationStatus (float deltaTime) {
