@@ -332,12 +332,23 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 			colors.Add(FColor(r, g, b, a));
 			darkColors.Add(FVector(dr, dg, db));
 			vertices.Add(FVector(verticesPtr[j], depthOffset, verticesPtr[j + 1]));
-			normals.Add(FVector(0, -1, 0));
 			uvs.Add(FVector2D(attachmentUvs[j], attachmentUvs[j + 1]));
 		}
 
+		int firstIndex = indices.Num();
 		for (int j = 0; j < numIndices; j++) {
 			indices.Add(idx + attachmentIndices[j]);
+		}
+
+		FVector normal = FVector(0, -1, 0);
+		if (numVertices > 2 &&
+			FVector::CrossProduct(
+				vertices[indices[firstIndex + 2]] - vertices[indices[firstIndex]],
+				vertices[indices[firstIndex + 1]] - vertices[indices[firstIndex]]).Y > 0.f) {
+			normal.Y = 1;
+		}
+		for (int j = 0; j < numVertices; j++) {
+			normals.Add(normal);
 		}
 
 		idx += numVertices;
