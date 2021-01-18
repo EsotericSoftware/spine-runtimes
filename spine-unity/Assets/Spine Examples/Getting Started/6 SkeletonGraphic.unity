@@ -733,7 +733,13 @@ MonoBehaviour:
 
 
     Enter <b>PLAY</b> Mode, and try scrolling up and down, or tap and drag the scroll
-    view.'
+    view.
+
+
+    The <i>SkeletonGraphic''s</i> <b>RectTransform</b> shall not be smaller than the
+    mesh, otherwise a <i>RectMask2D</i> will omit drawing the skeleton when the <i>RectTransform</i>
+    is completely outside. You can fit the <i>RectTransform</i> to the current pose
+    via the Inspector button <b>Match RectTransform with Mesh</b>.'
 --- !u!222 &774800196
 CanvasRenderer:
   m_ObjectHideFlags: 0
