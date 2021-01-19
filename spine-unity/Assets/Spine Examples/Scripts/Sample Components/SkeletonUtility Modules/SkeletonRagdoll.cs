@@ -334,7 +334,7 @@ namespace Spine.Unity.Examples {
 
 				parentSpaceHelper.position = parentTransformWorldPosition;
 				parentSpaceHelper.rotation = parentTransformWorldRotation;
-				parentSpaceHelper.localScale = parentTransform.localScale;
+				parentSpaceHelper.localScale = parentTransform.lossyScale;
 
 				Vector3 boneWorldPosition = t.position;
 				Vector3 right = parentSpaceHelper.InverseTransformDirection(t.right);
