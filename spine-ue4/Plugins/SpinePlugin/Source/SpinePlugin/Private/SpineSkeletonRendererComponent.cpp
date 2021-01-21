@@ -36,7 +36,7 @@
 
 using namespace spine;
 
-USpineSkeletonRendererComponent::USpineSkeletonRendererComponent (const FObjectInitializer& ObjectInitializer) 
+USpineSkeletonRendererComponent::USpineSkeletonRendererComponent (const FObjectInitializer& ObjectInitializer)
 : UProceduralMeshComponent(ObjectInitializer) {
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
@@ -44,16 +44,16 @@ USpineSkeletonRendererComponent::USpineSkeletonRendererComponent (const FObjectI
 
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> NormalMaterialRef(TEXT("/SpinePlugin/SpineUnlitNormalMaterial"));
 	NormalBlendMaterial = NormalMaterialRef.Object;
-	
+
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> AdditiveMaterialRef(TEXT("/SpinePlugin/SpineUnlitAdditiveMaterial"));
 	AdditiveBlendMaterial = AdditiveMaterialRef.Object;
-	
+
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MultiplyMaterialRef(TEXT("/SpinePlugin/SpineUnlitMultiplyMaterial"));
 	MultiplyBlendMaterial = MultiplyMaterialRef.Object;
-	
+
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> ScreenMaterialRef(TEXT("/SpinePlugin/SpineUnlitScreenMaterial"));
 	ScreenBlendMaterial = ScreenMaterialRef.Object;
-	
+
 	TextureParameterName = FName(TEXT("SpriteTexture"));
 
 	worldVertices.ensureCapacity(1024 * 2);
@@ -69,12 +69,12 @@ void USpineSkeletonRendererComponent::BeginPlay () {
 
 void USpineSkeletonRendererComponent::TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
+
 	AActor* owner = GetOwner();
 	if (owner) {
 		UClass* skeletonClass = USpineSkeletonComponent::StaticClass();
 		USpineSkeletonComponent* skeleton = Cast<USpineSkeletonComponent>(owner->GetComponentByClass(skeletonClass));
-		
+
 		UpdateRenderer(skeleton);
 	}
 }
@@ -126,41 +126,12 @@ void USpineSkeletonRendererComponent::UpdateRenderer(USpineSkeletonComponent* sk
 
 			for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
 				AtlasPage* currPage = skeleton->Atlas->GetAtlas()->getPages()[i];
-
 				UTexture2D* texture = skeleton->Atlas->atlasPages[i];
-				UTexture* oldTexture = nullptr;
 
-				UMaterialInstanceDynamic* current = atlasNormalBlendMaterials[i];
-				if (!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
-					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(NormalBlendMaterial, this);
-					material->SetTextureParameterValue(TextureParameterName, texture);
-					atlasNormalBlendMaterials[i] = material;
-				}
-				pageToNormalBlendMaterial.Add(currPage, atlasNormalBlendMaterials[i]);
-
-				current = atlasAdditiveBlendMaterials[i];
-				if (!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
-					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(AdditiveBlendMaterial, this);
-					material->SetTextureParameterValue(TextureParameterName, texture);
-					atlasAdditiveBlendMaterials[i] = material;
-				}
-				pageToAdditiveBlendMaterial.Add(currPage, atlasAdditiveBlendMaterials[i]);
-
-				current = atlasMultiplyBlendMaterials[i];
-				if (!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
-					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(MultiplyBlendMaterial, this);
-					material->SetTextureParameterValue(TextureParameterName, texture);
-					atlasMultiplyBlendMaterials[i] = material;
-				}
-				pageToMultiplyBlendMaterial.Add(currPage, atlasMultiplyBlendMaterials[i]);
-
-				current = atlasScreenBlendMaterials[i];
-				if (!current || !current->GetTextureParameterValue(TextureParameterName, oldTexture) || oldTexture != texture) {
-					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(ScreenBlendMaterial, this);
-					material->SetTextureParameterValue(TextureParameterName, texture);
-					atlasScreenBlendMaterials[i] = material;
-				}
-				pageToScreenBlendMaterial.Add(currPage, atlasScreenBlendMaterials[i]);
+				UpdateRendererMaterial(currPage, texture, atlasNormalBlendMaterials[i], NormalBlendMaterial, pageToNormalBlendMaterial);
+				UpdateRendererMaterial(currPage, texture, atlasAdditiveBlendMaterials[i], AdditiveBlendMaterial, pageToAdditiveBlendMaterial);
+				UpdateRendererMaterial(currPage, texture, atlasMultiplyBlendMaterials[i], MultiplyBlendMaterial, pageToMultiplyBlendMaterial);
+				UpdateRendererMaterial(currPage, texture, atlasScreenBlendMaterials[i], ScreenBlendMaterial, pageToScreenBlendMaterial);
 			}
 		}
 		UpdateMesh(skeleton->GetSkeleton());
@@ -168,6 +139,21 @@ void USpineSkeletonRendererComponent::UpdateRenderer(USpineSkeletonComponent* sk
 	else {
 		ClearAllMeshSections();
 	}
+}
+
+void USpineSkeletonRendererComponent::UpdateRendererMaterial (spine::AtlasPage *CurrentPage, UTexture2D *Texture,
+	UMaterialInstanceDynamic *&CurrentInstance, UMaterialInterface *ParentMaterial,
+	TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> &PageToBlendMaterial) {
+
+	UTexture* oldTexture = nullptr;
+	if (!CurrentInstance || !CurrentInstance->GetTextureParameterValue(TextureParameterName, oldTexture) ||
+		oldTexture != Texture || CurrentInstance->Parent != ParentMaterial) {
+
+		UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(ParentMaterial, this);
+		material->SetTextureParameterValue(TextureParameterName, Texture);
+		CurrentInstance = material;
+	}
+	PageToBlendMaterial.Add(CurrentPage, CurrentInstance);
 }
 
 void USpineSkeletonRendererComponent::Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector> &Normals, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector>& Colors2, UMaterialInstanceDynamic* Material) {
@@ -192,7 +178,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 	TArray<FVector2D> uvs;
 	TArray<FColor> colors;
 	TArray<FVector> darkColors;
-	
+
 	int idx = 0;
 	int meshSection = 0;
 	UMaterialInstanceDynamic* lastMaterial = nullptr;
@@ -231,7 +217,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 			clipper.clipEnd(*slot);
 			continue;
 		}
-		
+
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
 
@@ -258,7 +244,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 			}
 
 			attachmentColor.set(mesh->getColor());
-			attachmentAtlasRegion = (AtlasRegion*)mesh->getRendererObject();			
+			attachmentAtlasRegion = (AtlasRegion*)mesh->getRendererObject();
 			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), *attachmentVertices, 0, 2);
 			attachmentIndices = mesh->getTriangles().buffer();
 			attachmentUvs = mesh->getUVs().buffer();
@@ -339,27 +325,38 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 
 		float dr = slot->hasDarkColor() ? slot->getDarkColor().r : 0.0f;
 		float dg = slot->hasDarkColor() ? slot->getDarkColor().g : 0.0f;
-		float db = slot->hasDarkColor() ? slot->getDarkColor().b : 0.0f;		
+		float db = slot->hasDarkColor() ? slot->getDarkColor().b : 0.0f;
 
 		float* verticesPtr = attachmentVertices->buffer();
 		for (int j = 0; j < numVertices << 1; j += 2) {
 			colors.Add(FColor(r, g, b, a));
 			darkColors.Add(FVector(dr, dg, db));
 			vertices.Add(FVector(verticesPtr[j], depthOffset, verticesPtr[j + 1]));
-			normals.Add(FVector(0, -1, 0));
 			uvs.Add(FVector2D(attachmentUvs[j], attachmentUvs[j + 1]));
 		}
 
+		int firstIndex = indices.Num();
 		for (int j = 0; j < numIndices; j++) {
 			indices.Add(idx + attachmentIndices[j]);
+		}
+
+		FVector normal = FVector(0, -1, 0);
+		if (numVertices > 2 &&
+			FVector::CrossProduct(
+				vertices[indices[firstIndex + 2]] - vertices[indices[firstIndex]],
+				vertices[indices[firstIndex + 1]] - vertices[indices[firstIndex]]).Y > 0.f) {
+			normal.Y = 1;
+		}
+		for (int j = 0; j < numVertices; j++) {
+			normals.Add(normal);
 		}
 
 		idx += numVertices;
 		depthOffset += this->DepthOffset;
 
-		clipper.clipEnd(*slot);			
+		clipper.clipEnd(*slot);
 	}
-	
+
 	Flush(meshSection, vertices, indices, normals, uvs, colors, darkColors, lastMaterial);
 	clipper.clipEnd();
 }
