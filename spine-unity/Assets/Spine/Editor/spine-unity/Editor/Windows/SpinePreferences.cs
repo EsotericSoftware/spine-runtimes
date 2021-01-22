@@ -240,9 +240,9 @@ namespace Spine.Unity.Editor {
 						}
 					}
 
+					EditorGUILayout.PropertyField(settings.FindProperty("blendModeMaterialAdditive"), new GUIContent("Additive Material", "Additive blend mode Material template."));
 					EditorGUILayout.PropertyField(settings.FindProperty("blendModeMaterialMultiply"), new GUIContent("Multiply Material", "Multiply blend mode Material template."));
 					EditorGUILayout.PropertyField(settings.FindProperty("blendModeMaterialScreen"), new GUIContent("Screen Material", "Screen blend mode Material template."));
-					EditorGUILayout.PropertyField(settings.FindProperty("blendModeMaterialAdditive"), new GUIContent("Additive Material", "Additive blend mode Material template."));
 				}
 
 				EditorGUILayout.Space();
