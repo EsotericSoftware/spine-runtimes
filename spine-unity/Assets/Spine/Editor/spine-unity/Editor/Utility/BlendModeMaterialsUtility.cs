@@ -27,9 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if UNITY_2020_1_OR_NEWER
+// from spine-unity 4.0 onward BlendModeMaterialAssets are obsolete and shall be upgraded.
 #define UPGRADE_ALL_BLEND_MODE_MATERIALS
-#endif
 
 using UnityEngine;
 using UnityEditor;
