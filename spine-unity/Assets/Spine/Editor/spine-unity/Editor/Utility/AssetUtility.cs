@@ -427,6 +427,8 @@ namespace Spine.Unity.Editor {
 						}
 
 						SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
+						BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonDataAsset, ref skeletonData);
+
 						string currentHash = skeletonData != null ? skeletonData.Hash : null;
 
 #if SPINE_SKELETONMECANIM
@@ -887,6 +889,7 @@ namespace Spine.Unity.Editor {
 						skeletonDataAsset.skeletonJSON = spineJson;
 						skeletonDataAsset.defaultMix = SpineEditorUtilities.Preferences.defaultMix;
 						skeletonDataAsset.scale = SpineEditorUtilities.Preferences.defaultScale;
+						skeletonDataAsset.blendModeMaterials.applyAdditiveMaterial = !SpineEditorUtilities.Preferences.UsesPMAWorkflow;
 					}
 
 					AssetDatabase.CreateAsset(skeletonDataAsset, filePath);
@@ -894,7 +897,8 @@ namespace Spine.Unity.Editor {
 				} else {
 					skeletonDataAsset.atlasAssets = atlasAssets;
 					skeletonDataAsset.Clear();
-					skeletonDataAsset.GetSkeletonData(true);
+					var skeletonData = skeletonDataAsset.GetSkeletonData(true);
+					BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonDataAsset, ref skeletonData);
 				}
 
 				return skeletonDataAsset;

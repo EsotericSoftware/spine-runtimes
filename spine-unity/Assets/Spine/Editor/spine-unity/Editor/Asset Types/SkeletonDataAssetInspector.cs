@@ -56,6 +56,7 @@ namespace Spine.Unity.Editor {
 
 		SerializedProperty atlasAssets, skeletonJSON, scale, fromAnimation, toAnimation, duration, defaultMix;
 		SerializedProperty skeletonDataModifiers;
+		SerializedProperty blendModeMaterials;
 		#if SPINE_TK2D
 		SerializedProperty spriteCollection;
 		#endif
@@ -114,6 +115,7 @@ namespace Spine.Unity.Editor {
 			defaultMix = serializedObject.FindProperty("defaultMix");
 
 			skeletonDataModifiers = serializedObject.FindProperty("skeletonDataModifiers");
+			blendModeMaterials = serializedObject.FindProperty("blendModeMaterials");
 
 			#if SPINE_SKELETON_MECANIM
 			controller = serializedObject.FindProperty("controller");
@@ -125,7 +127,7 @@ namespace Spine.Unity.Editor {
 			#else
 			// Analysis disable once ConvertIfToOrExpression
 			if (newAtlasAssets) atlasAssets.isExpanded = true;
-#endif
+			#endif
 
 			// This handles the case where the managed editor assembly is unloaded before recompilation when code changes.
 			AppDomain.CurrentDomain.DomainUnload -= OnDomainUnload;
@@ -286,6 +288,8 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.DelayedFloatField(scale); //EditorGUILayout.PropertyField(scale);
 				EditorGUILayout.Space();
 				EditorGUILayout.PropertyField(skeletonDataModifiers, true);
+
+				DrawBlendModeMaterialProperties();
 			}
 
 			// Texture source field.
@@ -311,6 +315,27 @@ namespace Spine.Unity.Editor {
 
 		}
 
+		void DrawBlendModeMaterialProperties () {
+			if (skeletonDataModifiers.arraySize > 0) {
+				EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
+				EditorGUILayout.PrefixLabel("Blend Modes");
+				if (GUILayout.Button(new GUIContent("Upgrade", "Upgrade BlendModeMaterialAsset to built-in BlendModeMaterials."), EditorStyles.miniButton, GUILayout.Width(65f))) {
+					foreach (SkeletonDataAsset skeletonData in targets) {
+						BlendModeMaterialsUtility.UpgradeBlendModeMaterials(skeletonData);
+					}
+				}
+				EditorGUILayout.EndHorizontal();
+			}
+			EditorGUI.BeginChangeCheck();
+			EditorGUILayout.PropertyField(blendModeMaterials, true);
+			if (EditorGUI.EndChangeCheck()) {
+				serializedObject.ApplyModifiedProperties();
+				foreach (SkeletonDataAsset skeletonData in targets) {
+					BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonData);
+				}
+			}
+		}
+
 		void DrawSkeletonDataFields () {
 			using (new EditorGUILayout.HorizontalScope()) {
 				EditorGUILayout.LabelField("SkeletonData", EditorStyles.boldLabel);
@@ -331,6 +356,8 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.DelayedFloatField(scale); //EditorGUILayout.PropertyField(scale);
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(skeletonDataModifiers, true);
+
+			DrawBlendModeMaterialProperties();
 		}
 
 		void DrawAtlasAssetsFields () {
