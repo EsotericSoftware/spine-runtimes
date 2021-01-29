@@ -122,7 +122,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		void Update () {
-			if (!ghostingEnabled)
+			if (!ghostingEnabled || poolIndex >= pool.Length)
 				return;
 
 			if (Time.time >= nextSpawnTime) {
