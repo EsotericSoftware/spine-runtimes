@@ -276,6 +276,13 @@ namespace Spine.Unity.Editor {
 						}
 					}
 
+					SpineEditorUtilities.MaterialPrefsField(ref blendModeMaterialAdditive, BLEND_MODE_MATERIAL_ADDITIVE_KEY, new GUIContent("Additive Material", "Additive blend mode Material template."));
+					if (string.IsNullOrEmpty(blendModeMaterialAdditive)) {
+						var blendModeMaterialAdditiveGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_ADDITIVE_MATERIAL);
+						if (blendModeMaterialAdditiveGUIDS.Length > 0) {
+							blendModeMaterialAdditive = AssetDatabase.GUIDToAssetPath(blendModeMaterialAdditiveGUIDS[0]);
+						}
+					}
 					SpineEditorUtilities.MaterialPrefsField(ref blendModeMaterialMultiply, BLEND_MODE_MATERIAL_MULTIPLY_KEY, new GUIContent("Multiply Material", "Multiply blend mode Material template."));
 					if (string.IsNullOrEmpty(blendModeMaterialMultiply)) {
 						var blendModeMaterialMultiplyGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_MULTIPLY_MATERIAL);
@@ -288,13 +295,6 @@ namespace Spine.Unity.Editor {
 						var blendModeMaterialScreenGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_SCREEN_MATERIAL);
 						if (blendModeMaterialScreenGUIDS.Length > 0) {
 							blendModeMaterialScreen = AssetDatabase.GUIDToAssetPath(blendModeMaterialScreenGUIDS[0]);
-						}
-					}
-					SpineEditorUtilities.MaterialPrefsField(ref blendModeMaterialAdditive, BLEND_MODE_MATERIAL_ADDITIVE_KEY, new GUIContent("Additive Material", "Additive blend mode Material template."));
-					if (string.IsNullOrEmpty(blendModeMaterialAdditive)) {
-						var blendModeMaterialAdditiveGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_ADDITIVE_MATERIAL);
-						if (blendModeMaterialAdditiveGUIDS.Length > 0) {
-							blendModeMaterialAdditive = AssetDatabase.GUIDToAssetPath(blendModeMaterialAdditiveGUIDS[0]);
 						}
 					}
 				}

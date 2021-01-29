@@ -119,7 +119,7 @@ namespace Spine.Unity.Editor {
 
 				// Reflect animationName serialized property in the inspector even if SetAnimation API was used.
 				if (Application.isPlaying) {
-					if (current != null) {
+					if (current != null && current.Animation != null) {
 						if (skeletonAnimation.AnimationName != animationName.stringValue)
 							animationName.stringValue = current.Animation.Name;
 					}
