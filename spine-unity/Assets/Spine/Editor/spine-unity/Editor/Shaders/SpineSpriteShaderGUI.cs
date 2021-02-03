@@ -679,9 +679,6 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 			IsURP3DShader(_materialEditor, out areMixedShaders);
 
 		if (hasReceiveShadowsParameter) {
-			bool forceDisableReceiveShadows = !_writeToDepth.hasMixedValue && _writeToDepth.floatValue == 0;
-			EditorGUI.BeginDisabledGroup(forceDisableReceiveShadows);
-
 			EditorGUI.BeginChangeCheck();
 			bool mixedValue;
 			bool enableReceive = !IsKeywordEnabled(_materialEditor, "_RECEIVE_SHADOWS_OFF", out mixedValue);
@@ -690,11 +687,10 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 
 			EditorGUI.showMixedValue = false;
 
-			if (EditorGUI.EndChangeCheck() || forceDisableReceiveShadows) {
-				SetKeyword(_materialEditor, "_RECEIVE_SHADOWS_OFF", !enableReceive || forceDisableReceiveShadows);
+			if (EditorGUI.EndChangeCheck()) {
+				SetKeyword(_materialEditor, "_RECEIVE_SHADOWS_OFF", !enableReceive);
 				dataChanged = true;
 			}
-			EditorGUI.EndDisabledGroup(); // forceDisableReceiveShadows
 		}
 
 		return dataChanged;
