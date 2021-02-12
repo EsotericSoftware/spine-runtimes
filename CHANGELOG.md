@@ -48,7 +48,7 @@
   * Removed rarely used `Spine.Unity.AttachmentTools.AttachmentRegionExtensions` extension methods `Attachment.GetRegion()`. Use `Attachment.RendererObject as AtlasRegion` instead.
   * Removed redundant `Spine.SkeletonExtensions` extension methods `Skeleton.Set*ToSetupPose()`. Also removed less commonly used extension methods `TrackEntry.AllowImmediateQueue()` and `Attachment.IsRenderable()`.
   * `Skin.Attachments` now replaces `Skin.GetAttachments()`, returning an `ICollection<SkinEntry>`. This makes access more consistent and intuitive. To fix any compile errors, replace any occurrances of `skin.GetAttachments()` by `skin.Attachments`.
-  * `BoneFollower` property `followLocalScale` has been renamed to `followScale`. Serialized values (scenes and prefabs) will automatically be upgraded, only code accessing `followLocalScale` needs to be adapted.
+  * Reverted changes: `BoneFollower` property `followLocalScale` has intermediately been renamed to `followScale` but was renamed back to `followLocalScale`. Serialized values (scenes and prefabs) will automatically be upgraded, only code accessing `followScale` needs to be adapted.
 
 * **Additions**
   * Additional **Fix Draw Order** parameter at SkeletonRenderer, defaults to `disabled` (previous behaviour).
