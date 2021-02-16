@@ -90,7 +90,7 @@ namespace Spine.Unity.Editor {
 
 		protected void TrySetAnimation (SkeletonAnimation skeletonAnimation) {
 			if (skeletonAnimation == null) return;
-			if (!skeletonAnimation.valid)
+			if (!skeletonAnimation.valid || skeletonAnimation.AnimationState == null)
 				return;
 
 			TrackEntry current = skeletonAnimation.AnimationState.GetCurrent(0);
