@@ -288,15 +288,6 @@ void EventQueue::drain() {
 	_drainDisabled = false;
 }
 
-const int Subsequent = 0;
-const int First = 1;
-const int HoldSubsequent = 2;
-const int HoldFirst = 3;
-const int HoldMix = 4;
-
-const int Setup = 1;
-const int Current = 2;
-
 AnimationState::AnimationState(AnimationStateData *data) :
 		_data(data),
 		_queue(EventQueue::newEventQueue(*this, _trackEntryPool)),
