@@ -66,10 +66,6 @@ namespace Spine.Unity {
 			"\nWarning: 'Add Normals' required when not using 'Fixed Normals'!\n\nPlease\n"
 			+ "a) enable 'Add Normals' at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' or\n"
 			+ "b) enable 'Fixed Normals' at the Material.\n";
-		public static readonly string kAddNormalsRequiredForURPShadowsMessage =
-			"\nWarning: 'Add Normals' required on URP shader to receive shadows!\n\nPlease\n"
-			+ "a) enable 'Add Normals' at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' or\n"
-			+ "b) disable 'Receive Shadows' at the Material.\n";
 		public static readonly string kSolveTangentsMessage =
 			"\nWarning: 'Solve Tangents' required when using a Normal Map!\n\nPlease\n"
 			+ "a) enable 'Solve Tangents' at the SkeletonRenderer/SkeletonAnimation component under 'Advanced' or\n"
@@ -118,10 +114,6 @@ namespace Spine.Unity {
 				if (renderer.tintBlack == false && RequiresTintBlack(material)) {
 					isProblematic = true;
 					errorMessage += kTintBlackMessage;
-				}
-				if (IsURP3DMaterial(material) && !AreShadowsDisabled(material) && renderer.addNormals == false) {
-					isProblematic = true;
-					errorMessage += kAddNormalsRequiredForURPShadowsMessage;
 				}
 			}
 			return isProblematic;

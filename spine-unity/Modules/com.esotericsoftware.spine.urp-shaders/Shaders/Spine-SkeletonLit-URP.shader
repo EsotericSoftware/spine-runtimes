@@ -96,6 +96,7 @@
 			// GPU Instancing
 			#pragma multi_compile_instancing
 			#pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+			#pragma shader_feature _ _DOUBLE_SIDED_LIGHTING
 
 			#pragma vertex ShadowPassVertexSkeletonLit
 			#pragma fragment ShadowPassFragmentSkeletonLit
