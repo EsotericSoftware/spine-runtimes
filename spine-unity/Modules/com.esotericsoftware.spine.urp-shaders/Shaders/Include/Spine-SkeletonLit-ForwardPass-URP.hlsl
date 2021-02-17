@@ -5,6 +5,10 @@
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
+#if (defined(_MAIN_LIGHT_SHADOWS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)) && !defined(_RECEIVE_SHADOWS_OFF)
+#define SKELETONLIT_RECEIVE_SHADOWS
+#endif
+
 struct appdata {
 	float3 pos : POSITION;
 	float3 normal : NORMAL;
@@ -18,25 +22,32 @@ struct VertexOutput {
 	half4 color : COLOR0;
 	float2 uv0 : TEXCOORD0;
 	float4 pos : SV_POSITION;
+
+#if defined(SKELETONLIT_RECEIVE_SHADOWS)
+	float4 shadowCoord : TEXCOORD1;
+	half3 shadowedColor : TEXCOORD2;
+#endif
+
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
-half3 LightweightLightVertexSimplified(float3 positionWS, half3 normalWS) {
+half3 LightweightLightVertexSimplified(float3 positionWS, half3 normalWS, out half3 shadowedColor) {
 	Light mainLight = GetMainLight();
-
 	half3 attenuatedLightColor = mainLight.color * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);
-	half3 diffuseLightColor = LightingLambert(attenuatedLightColor, mainLight.direction, normalWS);
+	half3 mainLightColor = LightingLambert(attenuatedLightColor, mainLight.direction, normalWS);
 
+	half3 additionalLightColor = half3(0, 0, 0);
 	// Note: we don't add any lighting in the fragment shader, thus we include both variants below
 #if defined(_ADDITIONAL_LIGHTS) || defined(_ADDITIONAL_LIGHTS_VERTEX)
 	for (int i = 0; i < GetAdditionalLightsCount(); ++i)
 	{
 		Light light = GetAdditionalLight(i, positionWS);
 		half3 attenuatedLightColor = light.color * (light.distanceAttenuation * light.shadowAttenuation);
-		diffuseLightColor += LightingLambert(attenuatedLightColor, light.direction, normalWS);
+		additionalLightColor += LightingLambert(attenuatedLightColor, light.direction, normalWS);
 	}
 #endif
-	return diffuseLightColor;
+	shadowedColor = additionalLightColor;
+	return mainLightColor + additionalLightColor;
 }
 
 VertexOutput vert(appdata v) {
@@ -57,7 +68,11 @@ VertexOutput vert(appdata v) {
 	normalWS *= faceSign;
 #endif
 
-	color.rgb = LightweightLightVertexSimplified(positionWS, normalWS);
+	half3 shadowedColor;
+	color.rgb = LightweightLightVertexSimplified(positionWS, normalWS, shadowedColor);
+#if defined(SKELETONLIT_RECEIVE_SHADOWS)
+	o.shadowedColor = shadowedColor;
+#endif
 
 	// Note: ambient light is also handled via SH.
 	half3 vertexSH;
@@ -67,6 +82,13 @@ VertexOutput vert(appdata v) {
 	o.color = color;
 	o.uv0 = v.uv0;
 	o.pos = TransformWorldToHClip(positionWS);
+
+#if defined(SKELETONLIT_RECEIVE_SHADOWS)
+	VertexPositionInputs vertexInput;
+	vertexInput.positionWS = positionWS;
+	vertexInput.positionCS = o.pos;
+	o.shadowCoord = GetShadowCoord(vertexInput);
+#endif
 	return o;
 }
 
@@ -74,11 +96,17 @@ half4 frag(VertexOutput i) : SV_Target{
 	half4 tex = tex2D(_MainTex, i.uv0);
 	half4 col;
 
+#if defined(SKELETONLIT_RECEIVE_SHADOWS)
+	half shadowAttenuation = MainLightRealtimeShadow(i.shadowCoord);
+	i.color.rgb = lerp(i.shadowedColor, i.color.rgb, shadowAttenuation);
+#endif
+
 	#if defined(_STRAIGHT_ALPHA_INPUT)
 	col.rgb = tex.rgb * i.color.rgb * tex.a;
 	#else
 	col.rgb = tex.rgb * i.color.rgb;
 	#endif
+
 
 	col.a = tex.a * i.color.a;
 	return col;
