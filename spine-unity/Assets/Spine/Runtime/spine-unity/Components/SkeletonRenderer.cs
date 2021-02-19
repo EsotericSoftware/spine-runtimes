@@ -39,6 +39,10 @@
 #define BUILT_IN_SPRITE_MASK_COMPONENT
 #endif
 
+#if UNITY_2019_3_OR_NEWER
+#define CONFIGURABLE_ENTER_PLAY_MODE
+#endif
+
 #define SPINE_OPTIONAL_RENDEROVERRIDE
 #define SPINE_OPTIONAL_MATERIALOVERRIDE
 
@@ -78,7 +82,7 @@ namespace Spine.Unity {
 
 		/// <summary>Update mode to optionally limit updates to e.g. only apply animations but not update the mesh.</summary>
 		public UpdateMode UpdateMode { get { return updateMode; } set { updateMode = value; } }
-		[SerializeField] protected UpdateMode updateMode = UpdateMode.FullUpdate;
+		protected UpdateMode updateMode = UpdateMode.FullUpdate;
 
 		/// <summary>Update mode used when the MeshRenderer becomes invisible
 		/// (when <c>OnBecameInvisible()</c> is called). Update mode is automatically
@@ -276,6 +280,12 @@ namespace Spine.Unity {
 			Initialize(false);
 		}
 
+	#if UNITY_EDITOR && CONFIGURABLE_ENTER_PLAY_MODE
+		public virtual void Start () {
+			Initialize(false);
+		}
+	#endif
+
 		void OnDisable () {
 			if (clearStateOnDisable && valid)
 				ClearState();
@@ -371,7 +381,7 @@ namespace Spine.Unity {
 			}
 			#endif
 
-			if (updateMode <= UpdateMode.EverythingExceptMesh) return;
+			if (updateMode != UpdateMode.FullUpdate) return;
 
 			#if SPINE_OPTIONAL_RENDEROVERRIDE
 			bool doMeshOverride = generateMeshOverride != null;

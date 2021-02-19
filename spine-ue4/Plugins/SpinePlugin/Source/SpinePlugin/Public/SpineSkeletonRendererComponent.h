@@ -39,11 +39,11 @@ UCLASS(ClassGroup=(Spine), meta=(BlueprintSpawnableComponent))
 class SPINEPLUGIN_API USpineSkeletonRendererComponent: public UProceduralMeshComponent {
 	GENERATED_BODY()
 
-public: 
+public:
 	USpineSkeletonRendererComponent (const FObjectInitializer& ObjectInitializer);
-	
+
 	virtual void BeginPlay () override;
-		
+
 	virtual void TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	/* Updates this skeleton renderer using the provided skeleton animation component. */
@@ -52,13 +52,13 @@ public:
 	// Material Instance parents
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* NormalBlendMaterial;
-	
+
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* AdditiveBlendMaterial;
-	
+
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* MultiplyBlendMaterial;
-	
+
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	UMaterialInterface* ScreenBlendMaterial;
 
@@ -66,22 +66,22 @@ public:
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterialInstanceDynamic*> atlasNormalBlendMaterials;
 	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToNormalBlendMaterial;
-	
+
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterialInstanceDynamic*> atlasAdditiveBlendMaterials;
 	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToAdditiveBlendMaterial;
-	
+
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterialInstanceDynamic*> atlasMultiplyBlendMaterials;
 	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToMultiplyBlendMaterial;
-	
+
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	TArray<UMaterialInstanceDynamic*> atlasScreenBlendMaterials;
 	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToScreenBlendMaterial;
-	
+
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	float DepthOffset = 0.1f;
-	
+
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	FName TextureParameterName;
 
@@ -93,12 +93,16 @@ public:
 	bool bCreateCollision;
 
 	virtual void FinishDestroy() override;
-	
+
 protected:
+	void UpdateRendererMaterial (spine::AtlasPage *CurrentPage, UTexture2D *Texture,
+		UMaterialInstanceDynamic *&CurrentInstance, UMaterialInterface *ParentMaterial,
+		TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> &PageToBlendMaterial);
+
 	void UpdateMesh (spine::Skeleton* Skeleton);
 
 	void Flush (int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector> &Normals, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector> &Colors2, UMaterialInstanceDynamic* Material);
-	
+
 	spine::Vector<float> worldVertices;
 	spine::SkeletonClipping clipper;
 };

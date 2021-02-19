@@ -193,7 +193,6 @@ function Skin:attachAll(skeleton, oldSkin)
 					if slotAttachment == skinAttachment then
 						local attachment = self:getAttachment(i, key)
 						if attachment then
-							print("Set attachment " .. attachment.name .. " on slot " .. slot.data.name)
 							slot:setAttachment(attachment)
 						end
 						break

@@ -62,6 +62,10 @@ namespace Spine {
 		private float zSpacing = 0.0f;
 		public float ZSpacing { get { return zSpacing; } set { zSpacing = value; } }
 
+		/// <summary>A Z position offset added at each vertex.</summary>
+		private float z = 0.0f;
+		public float Z { get { return z; } set { z = value; } }
+
 		public SkeletonRenderer (GraphicsDevice device) {
 			this.device = device;
 
@@ -106,7 +110,7 @@ namespace Spine {
 			for (int i = 0, n = drawOrder.Count; i < n; i++) {
 				Slot slot = drawOrderItems[i];
 				Attachment attachment = slot.Attachment;
-				float attachmentZOffset = zSpacing * i;
+				float attachmentZOffset = z + zSpacing * i;
 
 				float attachmentColorR, attachmentColorG, attachmentColorB, attachmentColorA;
 				object textureObject = null;

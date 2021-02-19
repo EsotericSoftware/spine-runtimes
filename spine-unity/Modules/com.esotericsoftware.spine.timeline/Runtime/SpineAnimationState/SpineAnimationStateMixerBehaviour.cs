@@ -94,6 +94,7 @@ namespace Spine.Unity.Playables {
 							trackEntry.TrackTime = (float)inputPlayable.GetTime() * (float)inputPlayable.GetSpeed();
 							trackEntry.TimeScale = (float)inputPlayable.GetSpeed();
 							trackEntry.AttachmentThreshold = clipData.attachmentThreshold;
+							trackEntry.HoldPrevious = clipData.holdPrevious;
 
 							if (clipData.customDuration)
 								trackEntry.MixDuration = clipData.mixDuration;
@@ -140,7 +141,7 @@ namespace Spine.Unity.Playables {
 
 				var skeleton = skeletonComponent.Skeleton;
 
-				bool skeletonDataMismatch = clipData.animationReference != null &&
+				bool skeletonDataMismatch = clipData.animationReference != null && clipData.animationReference.SkeletonDataAsset &&
 					skeletonComponent.SkeletonDataAsset.GetSkeletonData(true) != clipData.animationReference.SkeletonDataAsset.GetSkeletonData(true);
 				if (skeletonDataMismatch) {
 					Debug.LogWarningFormat("SpineAnimationStateMixerBehaviour tried to apply an animation for the wrong skeleton. Expected {0}. Was {1}",
@@ -182,8 +183,10 @@ namespace Spine.Unity.Playables {
 						dummyAnimationState.ClearTracks();
 						fromTrack = dummyAnimationState.SetAnimation(0, fromAnimation, fromClipLoop);
 						fromTrack.AllowImmediateQueue();
-						if (toAnimation != null)
+						if (toAnimation != null) {
 							toTrack = dummyAnimationState.SetAnimation(0, toAnimation, clipData.loop);
+							toTrack.HoldPrevious = clipData.holdPrevious;
+						}
 					}
 
 					// Update track times.

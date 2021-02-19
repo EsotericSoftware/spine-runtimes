@@ -33,27 +33,30 @@ module spine.webgl {
 		public gl: WebGLRenderingContext;
 		private restorables = new Array<Restorable>();
 
-		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext, contextConfig: any = { alpha: "true" }) {
-			if (canvasOrContext instanceof HTMLCanvasElement) {
-				let canvas = canvasOrContext;
-				this.gl = <WebGLRenderingContext> (canvas.getContext("webgl2", contextConfig) || canvas.getContext("webgl", contextConfig));
-				this.canvas = canvas;
-				canvas.addEventListener("webglcontextlost", (e: any) => {
-					let event = <WebGLContextEvent>e;
-					if (e) {
-						e.preventDefault();
-					}
-				});
-
-				canvas.addEventListener("webglcontextrestored", (e: any) => {
-					for (let i = 0, n = this.restorables.length; i < n; i++) {
-						this.restorables[i].restore();
-					}
-				});
+		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget | WebGL2RenderingContext, contextConfig: any = { alpha: "true" }) {
+			if (canvasOrContext instanceof HTMLCanvasElement || canvasOrContext instanceof EventTarget) {
+				this.setupCanvas(canvasOrContext, contextConfig);
 			} else {
 				this.gl = canvasOrContext;
 				this.canvas = this.gl.canvas;
 			}
+		}
+
+		private setupCanvas(canvas: any, contextConfig: any) {
+			this.gl = <WebGLRenderingContext> (canvas.getContext("webgl2", contextConfig) || canvas.getContext("webgl", contextConfig));
+			this.canvas = canvas;
+			canvas.addEventListener("webglcontextlost", (e: any) => {
+				let event = <WebGLContextEvent>e;
+				if (e) {
+					e.preventDefault();
+				}
+			});
+
+			canvas.addEventListener("webglcontextrestored", (e: any) => {
+				for (let i = 0, n = this.restorables.length; i < n; i++) {
+					this.restorables[i].restore();
+				}
+			});
 		}
 
 		addRestorable(restorable: Restorable) {

@@ -7,6 +7,8 @@
 #include "UnityUI.cginc"
 #endif
 
+#include "../../CGIncludes/Spine-Outline-Common.cginc"
+
 sampler2D _MainTex;
 
 float _OutlineWidth;
@@ -76,38 +78,9 @@ VertexOutput vertOutline(VertexInput v) {
 
 float4 fragOutline(VertexOutput i) : SV_Target {
 
-	float4 texColor = fixed4(0,0,0,0);
-
-	float outlineWidthCompensated = _OutlineWidth / (_OutlineReferenceTexWidth * _MainTex_TexelSize.x);
-	float xOffset = _MainTex_TexelSize.x * outlineWidthCompensated;
-	float yOffset = _MainTex_TexelSize.y * outlineWidthCompensated;
-	float xOffsetDiagonal = _MainTex_TexelSize.x * outlineWidthCompensated * 0.7;
-	float yOffsetDiagonal = _MainTex_TexelSize.y * outlineWidthCompensated * 0.7;
-
-	float pixelCenter = tex2D(_MainTex, i.uv).a;
-
-	float4 uvCenterWithLod = float4(i.uv, 0, _OutlineMipLevel);
-	float pixelTop = tex2Dlod(_MainTex, uvCenterWithLod + float4(0,  yOffset, 0, 0)).a;
-	float pixelBottom = tex2Dlod(_MainTex, uvCenterWithLod + float4(0, -yOffset, 0, 0)).a;
-	float pixelLeft = tex2Dlod(_MainTex, uvCenterWithLod + float4(-xOffset, 0, 0, 0)).a;
-	float pixelRight = tex2Dlod(_MainTex, uvCenterWithLod + float4(xOffset, 0, 0, 0)).a;
-#if _USE8NEIGHBOURHOOD_ON
-	float numSamples = 8;
-	float pixelTopLeft = tex2Dlod(_MainTex, uvCenterWithLod + float4(-xOffsetDiagonal, yOffsetDiagonal, 0, 0)).a;
-	float pixelTopRight = tex2Dlod(_MainTex, uvCenterWithLod + float4(xOffsetDiagonal, yOffsetDiagonal, 0, 0)).a;
-	float pixelBottomLeft = tex2Dlod(_MainTex, uvCenterWithLod + float4(-xOffsetDiagonal, -yOffsetDiagonal, 0, 0)).a;
-	float pixelBottomRight = tex2Dlod(_MainTex, uvCenterWithLod + float4(xOffsetDiagonal, -yOffsetDiagonal, 0, 0)).a;
-	float average = (pixelTop + pixelBottom + pixelLeft + pixelRight +
-		pixelTopLeft + pixelTopRight + pixelBottomLeft + pixelBottomRight)
-		* i.vertexColorAlpha / numSamples;
-#else // 4 neighbourhood
-	float numSamples = 1;
-	float average = (pixelTop + pixelBottom + pixelLeft + pixelRight) * i.vertexColorAlpha / numSamples;
-#endif
-
-	float thresholdStart = _ThresholdEnd * (1.0 - _OutlineSmoothness);
-	float outlineAlpha = saturate((average - thresholdStart) / (_ThresholdEnd - thresholdStart)) - pixelCenter;
-	texColor.rgba = lerp(texColor, _OutlineColor, outlineAlpha);
+	float4 texColor = computeOutlinePixel(_MainTex, _MainTex_TexelSize.xy, i.uv, i.vertexColorAlpha,
+		_OutlineWidth, _OutlineReferenceTexWidth, _OutlineMipLevel,
+		_OutlineSmoothness, _ThresholdEnd, _OutlineColor);
 
 #ifdef SKELETON_GRAPHIC
 	texColor *= UnityGet2DClipping(i.worldPosition.xy, _ClipRect);

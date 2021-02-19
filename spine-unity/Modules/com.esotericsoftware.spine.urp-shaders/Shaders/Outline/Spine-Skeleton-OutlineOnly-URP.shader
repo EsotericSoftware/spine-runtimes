@@ -29,7 +29,29 @@ Shader "Universal Render Pipeline/Spine/Outline/Skeleton-OutlineOnly" {
 			Pass Keep
 		}
 
-		UsePass "Spine/Outline/Skeleton/OUTLINE"
+		Pass {
+			Name "Outline"
+			HLSLPROGRAM
+			// Required to compile gles 2.0 with standard srp library
+			#pragma prefer_hlslcc gles
+			#pragma exclude_renderers d3d11_9x
+
+			//--------------------------------------
+			// GPU Instancing
+			#pragma multi_compile_instancing
+
+			#pragma vertex vertOutline
+			#pragma fragment fragOutline
+			#pragma shader_feature _ _USE8NEIGHBOURHOOD_ON
+
+			#define USE_URP
+			#define fixed4 half4
+			#define fixed3 half3
+			#define fixed half
+			#include "../Include/Spine-Input-Outline-URP.hlsl"
+			#include "../Include/Spine-Outline-Pass-URP.hlsl"
+			ENDHLSL
+		}
 	}
 
 	FallBack "Hidden/InternalErrorShader"

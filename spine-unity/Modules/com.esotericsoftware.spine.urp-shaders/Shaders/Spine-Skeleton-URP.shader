@@ -58,13 +58,11 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 
 			#undef LIGHTMAP_ON
 
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-
 			#define USE_URP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
+			#include "Include/Spine-Input-URP.hlsl"
 			#include "Include/Spine-Skeleton-ForwardPass-URP.hlsl"
 			ENDHLSL
 	 	}
@@ -96,9 +94,6 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			#pragma vertex ShadowPassVertexSkeletonLit
 			#pragma fragment ShadowPassFragmentSkeletonLit
 
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
-
 			#define USE_URP
 			#define fixed4 half4
 			#define fixed3 half3
@@ -123,8 +118,8 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			#pragma prefer_hlslcc gles
 			#pragma exclude_renderers d3d11_9x
 
-			#pragma vertex DepthOnlyVertexSprite
-			#pragma fragment DepthOnlyFragmentSprite
+			#pragma vertex DepthOnlyVertex
+			#pragma fragment DepthOnlyFragment
 
 			// -------------------------------------
 			// Material Keywords
@@ -134,9 +129,6 @@ Shader "Universal Render Pipeline/Spine/Skeleton" {
 			//--------------------------------------
 			// GPU Instancing
 			#pragma multi_compile_instancing
-
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
 
 			#define USE_URP
 			#define fixed4 half4

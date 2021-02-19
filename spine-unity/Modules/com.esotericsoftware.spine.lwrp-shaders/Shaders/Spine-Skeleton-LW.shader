@@ -15,7 +15,7 @@ Shader "Lightweight Render Pipeline/Spine/Skeleton" {
 		Cull Off
 		ZWrite Off
 		Blend One OneMinusSrcAlpha
-		
+
 		Stencil {
 			Ref[_StencilRef]
 			Comp[_StencilComp]
@@ -42,7 +42,7 @@ Shader "Lightweight Render Pipeline/Spine/Skeleton" {
 			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
 			#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
 			#pragma multi_compile _ _SHADOWS_SOFT
-			
+
 			// -------------------------------------
 			// Unity defined keywords
 			#pragma multi_compile_fog
@@ -60,13 +60,11 @@ Shader "Lightweight Render Pipeline/Spine/Skeleton" {
 
 			#undef LIGHTMAP_ON
 
-			#include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Core.hlsl"
-			#include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Lighting.hlsl"
-
 			#define USE_LWRP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
+			#include "CGIncludes/Spine-Input-LW.hlsl"
 			#include "CGIncludes/Spine-Skeleton-ForwardPass-LW.hlsl"
 			ENDHLSL
 	 	}
@@ -98,9 +96,6 @@ Shader "Lightweight Render Pipeline/Spine/Skeleton" {
 			#pragma vertex ShadowPassVertexSkeletonLit
 			#pragma fragment ShadowPassFragmentSkeletonLit
 
-			#include "Packages/com.unity.render-pipelines.lightweight/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.lightweight/Shaders/ShadowCasterPass.hlsl"
-
 			#define USE_LWRP
 			#define fixed4 half4
 			#define fixed3 half3
@@ -126,8 +121,8 @@ Shader "Lightweight Render Pipeline/Spine/Skeleton" {
 			#pragma exclude_renderers d3d11_9x
 			#pragma target 2.0
 
-			#pragma vertex DepthOnlyVertexSprite
-			#pragma fragment DepthOnlyFragmentSprite
+			#pragma vertex DepthOnlyVertex
+			#pragma fragment DepthOnlyFragment
 
 			// -------------------------------------
 			// Material Keywords
@@ -137,9 +132,6 @@ Shader "Lightweight Render Pipeline/Spine/Skeleton" {
 			//--------------------------------------
 			// GPU Instancing
 			#pragma multi_compile_instancing
-
-			#include "Packages/com.unity.render-pipelines.lightweight/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.lightweight/Shaders/DepthOnlyPass.hlsl"
 
 			#define USE_LWRP
 			#define fixed4 half4

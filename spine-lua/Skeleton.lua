@@ -114,7 +114,6 @@ function Skeleton:updateCache ()
 
 	local bones = self.bones
 	for _, bone in ipairs(bones) do
-		print("reset " .. bone.data.name)
 		bone.sorted = bone.data.skinRequired
 		bone.active = not bone.sorted
 	end
@@ -124,7 +123,6 @@ function Skeleton:updateCache ()
 		for i, boneData in ipairs(skinBones) do
 			local bone = bones[boneData.index]
 			while bone do
-				print("skin bone reset " .. bone.data.name)
 				bone.sorted = false
 				bone.active = true
 				bone = bone.parent

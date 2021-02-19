@@ -124,11 +124,40 @@ namespace Spine.Unity.Editor {
 			const string TEXTURE_SETTINGS_REFERENCE_KEY = "SPINE_TEXTURE_SETTINGS_REFERENCE";
 			public static string textureSettingsReference = SpinePreferences.DEFAULT_TEXTURE_SETTINGS_REFERENCE;
 
+			public static bool UsesPMAWorkflow {
+				get {
+					return SpinePreferences.IsPMAWorkflow(textureSettingsReference);
+				}
+			}
+
+			const string BLEND_MODE_MATERIAL_MULTIPLY_KEY = "SPINE_BLENDMODE_MATERIAL_MULTIPLY";
+			const string BLEND_MODE_MATERIAL_SCREEN_KEY = "SPINE_BLENDMODE_MATERIAL_SCREEN";
+			const string BLEND_MODE_MATERIAL_ADDITIVE_KEY = "SPINE_BLENDMODE_MATERIAL_ADDITIVE";
+			public static string blendModeMaterialMultiply = "";
+			public static string blendModeMaterialScreen = "";
+			public static string blendModeMaterialAdditive = "";
+			public const string DEFAULT_BLEND_MODE_MULTIPLY_MATERIAL = SpinePreferences.DEFAULT_BLEND_MODE_MULTIPLY_MATERIAL;
+			public const string DEFAULT_BLEND_MODE_SCREEN_MATERIAL = SpinePreferences.DEFAULT_BLEND_MODE_SCREEN_MATERIAL;
+			public const string DEFAULT_BLEND_MODE_ADDITIVE_MATERIAL = SpinePreferences.DEFAULT_BLEND_MODE_ADDITIVE_MATERIAL;
+
+			public static Material BlendModeMaterialMultiply {
+				get { return AssetDatabase.LoadAssetAtPath<Material>(blendModeMaterialMultiply); }
+			}
+			public static Material BlendModeMaterialScreen {
+				get { return AssetDatabase.LoadAssetAtPath<Material>(blendModeMaterialScreen); }
+			}
+			public static Material BlendModeMaterialAdditive {
+				get { return AssetDatabase.LoadAssetAtPath<Material>(blendModeMaterialAdditive); }
+			}
+
 			const string ATLASTXT_WARNING_KEY = "SPINE_ATLASTXT_WARNING";
 			public static bool atlasTxtImportWarning = SpinePreferences.DEFAULT_ATLASTXT_WARNING;
 
 			const string TEXTUREIMPORTER_WARNING_KEY = "SPINE_TEXTUREIMPORTER_WARNING";
 			public static bool textureImporterWarning = SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING;
+
+			const string COMPONENTMATERIAL_WARNING_KEY = "SPINE_COMPONENTMATERIAL_WARNING";
+			public static bool componentMaterialWarning = SpinePreferences.DEFAULT_COMPONENTMATERIAL_WARNING;
 
 			public const float DEFAULT_MIPMAPBIAS = SpinePreferences.DEFAULT_MIPMAPBIAS;
 
@@ -158,10 +187,14 @@ namespace Spine.Unity.Editor {
 				showHierarchyIcons = EditorPrefs.GetBool(SHOW_HIERARCHY_ICONS_KEY, SpinePreferences.DEFAULT_SHOW_HIERARCHY_ICONS);
 				setTextureImporterSettings = EditorPrefs.GetBool(SET_TEXTUREIMPORTER_SETTINGS_KEY, SpinePreferences.DEFAULT_SET_TEXTUREIMPORTER_SETTINGS);
 				textureSettingsReference = EditorPrefs.GetString(TEXTURE_SETTINGS_REFERENCE_KEY, SpinePreferences.DEFAULT_TEXTURE_SETTINGS_REFERENCE);
+				blendModeMaterialMultiply = EditorPrefs.GetString(BLEND_MODE_MATERIAL_MULTIPLY_KEY, "");
+				blendModeMaterialScreen = EditorPrefs.GetString(BLEND_MODE_MATERIAL_SCREEN_KEY, "");
+				blendModeMaterialAdditive = EditorPrefs.GetString(BLEND_MODE_MATERIAL_ADDITIVE_KEY, "");
 				autoReloadSceneSkeletons = EditorPrefs.GetBool(AUTO_RELOAD_SCENESKELETONS_KEY, SpinePreferences.DEFAULT_AUTO_RELOAD_SCENESKELETONS);
 				mecanimEventIncludeFolderName = EditorPrefs.GetBool(MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY, SpinePreferences.DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME);
 				atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
 				textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
+				componentMaterialWarning = EditorPrefs.GetBool(COMPONENTMATERIAL_WARNING_KEY, SpinePreferences.DEFAULT_COMPONENTMATERIAL_WARNING);
 				timelineUseBlendDuration = EditorPrefs.GetBool(TIMELINE_USE_BLEND_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION);
 				handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, SpinePreferences.DEFAULT_SCENE_ICONS_SCALE);
 				preferencesLoaded = true;
@@ -180,6 +213,7 @@ namespace Spine.Unity.Editor {
 				newPreferences.mecanimEventIncludeFolderName = EditorPrefs.GetBool(MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY, SpinePreferences.DEFAULT_MECANIM_EVENT_INCLUDE_FOLDERNAME);
 				newPreferences.atlasTxtImportWarning = EditorPrefs.GetBool(ATLASTXT_WARNING_KEY, SpinePreferences.DEFAULT_ATLASTXT_WARNING);
 				newPreferences.textureImporterWarning = EditorPrefs.GetBool(TEXTUREIMPORTER_WARNING_KEY, SpinePreferences.DEFAULT_TEXTUREIMPORTER_WARNING);
+				newPreferences.componentMaterialWarning = EditorPrefs.GetBool(COMPONENTMATERIAL_WARNING_KEY, SpinePreferences.DEFAULT_COMPONENTMATERIAL_WARNING);
 				newPreferences.timelineUseBlendDuration = EditorPrefs.GetBool(TIMELINE_USE_BLEND_DURATION_KEY, SpinePreferences.DEFAULT_TIMELINE_USE_BLEND_DURATION);
 				newPreferences.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, SpinePreferences.DEFAULT_SCENE_ICONS_SCALE);
 			}
@@ -196,6 +230,7 @@ namespace Spine.Unity.Editor {
 				EditorPrefs.SetBool(MECANIM_EVENT_INCLUDE_FOLDERNAME_KEY, preferences.mecanimEventIncludeFolderName);
 				EditorPrefs.SetBool(ATLASTXT_WARNING_KEY, preferences.atlasTxtImportWarning);
 				EditorPrefs.SetBool(TEXTUREIMPORTER_WARNING_KEY, preferences.textureImporterWarning);
+				EditorPrefs.SetBool(COMPONENTMATERIAL_WARNING_KEY, preferences.componentMaterialWarning);
 				EditorPrefs.SetBool(TIMELINE_USE_BLEND_DURATION_KEY, preferences.timelineUseBlendDuration);
 				EditorPrefs.SetFloat(SCENE_ICONS_SCALE_KEY, preferences.handleScale);
 			}
@@ -210,11 +245,11 @@ namespace Spine.Unity.Editor {
 				showHierarchyIcons = EditorGUILayout.Toggle(new GUIContent("Show Hierarchy Icons", "Show relevant icons on GameObjects with Spine Components on them. Disable this if you have large, complex scenes."), showHierarchyIcons);
 				if (EditorGUI.EndChangeCheck()) {
 					EditorPrefs.SetBool(SHOW_HIERARCHY_ICONS_KEY, showHierarchyIcons);
-				#if NEWPLAYMODECALLBACKS
+#if NEWPLAYMODECALLBACKS
 					HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-				#else
+#else
 					HierarchyHandler.IconsOnPlaymodeStateChanged();
-				#endif
+#endif
 				}
 
 				BoolPrefsField(ref autoReloadSceneSkeletons, AUTO_RELOAD_SCENESKELETONS_KEY, new GUIContent("Auto-reload scene components", "Reloads Skeleton components in the scene whenever their SkeletonDataAsset is modified. This makes it so changes in the SkeletonDataAsset inspector are immediately reflected. This may be slow when your scenes have large numbers of SkeletonRenderers or SkeletonGraphic."));
@@ -240,6 +275,28 @@ namespace Spine.Unity.Editor {
 							EditorPrefs.SetString(TEXTURE_SETTINGS_REFERENCE_KEY, textureSettingsReference);
 						}
 					}
+
+					SpineEditorUtilities.MaterialPrefsField(ref blendModeMaterialAdditive, BLEND_MODE_MATERIAL_ADDITIVE_KEY, new GUIContent("Additive Material", "Additive blend mode Material template."));
+					if (string.IsNullOrEmpty(blendModeMaterialAdditive)) {
+						var blendModeMaterialAdditiveGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_ADDITIVE_MATERIAL);
+						if (blendModeMaterialAdditiveGUIDS.Length > 0) {
+							blendModeMaterialAdditive = AssetDatabase.GUIDToAssetPath(blendModeMaterialAdditiveGUIDS[0]);
+						}
+					}
+					SpineEditorUtilities.MaterialPrefsField(ref blendModeMaterialMultiply, BLEND_MODE_MATERIAL_MULTIPLY_KEY, new GUIContent("Multiply Material", "Multiply blend mode Material template."));
+					if (string.IsNullOrEmpty(blendModeMaterialMultiply)) {
+						var blendModeMaterialMultiplyGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_MULTIPLY_MATERIAL);
+						if (blendModeMaterialMultiplyGUIDS.Length > 0) {
+							blendModeMaterialMultiply = AssetDatabase.GUIDToAssetPath(blendModeMaterialMultiplyGUIDS[0]);
+						}
+					}
+					SpineEditorUtilities.MaterialPrefsField(ref blendModeMaterialScreen, BLEND_MODE_MATERIAL_SCREEN_KEY, new GUIContent("Screen Material", "Screen blend mode Material template."));
+					if (string.IsNullOrEmpty(blendModeMaterialScreen)) {
+						var blendModeMaterialScreenGUIDS = AssetDatabase.FindAssets(DEFAULT_BLEND_MODE_SCREEN_MATERIAL);
+						if (blendModeMaterialScreenGUIDS.Length > 0) {
+							blendModeMaterialScreen = AssetDatabase.GUIDToAssetPath(blendModeMaterialScreenGUIDS[0]);
+						}
+					}
 				}
 
 				EditorGUILayout.Space();
@@ -247,6 +304,7 @@ namespace Spine.Unity.Editor {
 				{
 					SpineEditorUtilities.BoolPrefsField(ref atlasTxtImportWarning, ATLASTXT_WARNING_KEY, new GUIContent("Atlas Extension Warning", "Log a warning and recommendation whenever a `.atlas` file is found."));
 					SpineEditorUtilities.BoolPrefsField(ref textureImporterWarning, TEXTUREIMPORTER_WARNING_KEY, new GUIContent("Texture Settings Warning", "Log a warning and recommendation whenever Texture Import Settings are detected that could lead to undesired effects, e.g. white border artifacts."));
+					SpineEditorUtilities.BoolPrefsField(ref componentMaterialWarning, COMPONENTMATERIAL_WARNING_KEY, new GUIContent("Component & Material Warning", "Log a warning and recommendation whenever Component and Material settings are not compatible."));
 				}
 
 				EditorGUILayout.Space();
@@ -278,11 +336,11 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				#if SPINE_TK2D_DEFINE
+#if SPINE_TK2D_DEFINE
 				bool isTK2DDefineSet = true;
-				#else
+#else
 				bool isTK2DDefineSet = false;
-				#endif
+#endif
 				bool isTK2DAllowed = SpineTK2DEditorUtility.IsTK2DAllowed;
 				if (SpineTK2DEditorUtility.IsTK2DInstalled() || isTK2DDefineSet) {
 					GUILayout.Space(20);
@@ -294,12 +352,12 @@ namespace Spine.Unity.Editor {
 						if (GUILayout.Button("Disable", GUILayout.Width(64)))
 							SpineTK2DEditorUtility.DisableTK2D();
 					}
-					#if !SPINE_TK2D_DEFINE
+#if !SPINE_TK2D_DEFINE
 					if (!isTK2DAllowed) {
 						EditorGUILayout.LabelField("To allow TK2D support, please modify line 67 in", EditorStyles.boldLabel);
 						EditorGUILayout.LabelField("Spine/Editor/spine-unity/Editor/Util./BuildSettings.cs", EditorStyles.boldLabel);
 					}
-					#endif
+#endif
 				}
 
 				GUILayout.Space(20);
@@ -308,7 +366,7 @@ namespace Spine.Unity.Editor {
 					SpineEditorUtilities.BoolPrefsField(ref timelineUseBlendDuration, TIMELINE_USE_BLEND_DURATION_KEY, new GUIContent("Use Blend Duration", "When enabled, MixDuration will be synced with timeline clip transition duration 'Ease In Duration'."));
 				}
 			}
-		#endif // !NEW_PREFERENCES_SETTINGS_PROVIDER
+#endif // !NEW_PREFERENCES_SETTINGS_PROVIDER
 		}
 
 		static void BoolPrefsField (ref bool currentValue, string editorPrefsKey, GUIContent label) {
@@ -337,6 +395,16 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
+		static void MaterialPrefsField (ref string currentValue, string editorPrefsKey, GUIContent label) {
+			EditorGUI.BeginChangeCheck();
+			EditorGUIUtility.wideMode = true;
+			var material = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Material>(currentValue), typeof(Object), false) as Material);
+			currentValue = material != null ? AssetDatabase.GetAssetPath(material) : "";
+			if (EditorGUI.EndChangeCheck()) {
+				EditorPrefs.SetString(editorPrefsKey, currentValue);
+			}
+		}
+
 		public static void FloatPropertyField (SerializedProperty property, GUIContent label, float min = float.NegativeInfinity, float max = float.PositiveInfinity) {
 			EditorGUI.BeginChangeCheck();
 			property.floatValue = EditorGUILayout.DelayedFloatField(label, property.floatValue);
@@ -350,6 +418,10 @@ namespace Spine.Unity.Editor {
 			property.stringValue = shader != null ? shader.name : fallbackShaderName;
 		}
 
+		public static void MaterialPropertyField (SerializedProperty property, GUIContent label) {
+			var material = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<Material>(property.stringValue), typeof(Material), false) as Material);
+			property.stringValue = material ? AssetDatabase.GetAssetPath(material) : "";
+		}
 
 	#if NEW_PREFERENCES_SETTINGS_PROVIDER
 		public static void PresetAssetPropertyField (SerializedProperty property, GUIContent label) {

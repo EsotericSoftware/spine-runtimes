@@ -37,7 +37,7 @@ namespace Spine.Unity.Editor {
 	[CanEditMultipleObjects]
 	public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		protected SerializedProperty animationName, loop, timeScale, autoReset;
-		protected bool wasAnimationNameChanged;
+		protected bool wasAnimationParameterChanged = false;
 		protected bool requireRepaint;
 		readonly GUIContent LoopLabel = new GUIContent("Loop", "Whether or not .AnimationName should loop. This only applies to the initial animation specified in the inspector, or any subsequent Animations played through .AnimationName. Animations set through state.SetAnimation are unaffected.");
 		readonly GUIContent TimeScaleLabel = new GUIContent("Time Scale", "The rate at which animations progress over time. 1 means normal speed. 0.5 means 50% speed.");
@@ -55,8 +55,7 @@ namespace Spine.Unity.Editor {
 			bool sameData = SpineInspectorUtility.TargetsUseSameData(serializedObject);
 
 			foreach (var o in targets)
-				TrySetAnimation(o as SkeletonAnimation, multi);
-			wasAnimationNameChanged = false;
+				TrySetAnimation(o as SkeletonAnimation);
 
 			EditorGUILayout.Space();
 			if (!sameData) {
@@ -64,9 +63,12 @@ namespace Spine.Unity.Editor {
 			} else {
 				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(animationName);
-				wasAnimationNameChanged |= EditorGUI.EndChangeCheck(); // Value used in the next update.
+				wasAnimationParameterChanged |= EditorGUI.EndChangeCheck(); // Value used in the next update.
 			}
+
+			EditorGUI.BeginChangeCheck();
 			EditorGUILayout.PropertyField(loop, LoopLabel);
+			wasAnimationParameterChanged |= EditorGUI.EndChangeCheck(); // Value used in the next update.
 			EditorGUILayout.PropertyField(timeScale, TimeScaleLabel);
 			foreach (var o in targets) {
 				var component = o as SkeletonAnimation;
@@ -76,21 +78,29 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.Space();
 			SkeletonRootMotionParameter();
 
+			serializedObject.ApplyModifiedProperties();
+
 			if (!isInspectingPrefab) {
 				if (requireRepaint) {
-					SceneView.RepaintAll();
+					UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
 					requireRepaint = false;
 				}
 			}
 		}
 
-		protected void TrySetAnimation (SkeletonAnimation skeletonAnimation, bool multi) {
+		protected void TrySetAnimation (SkeletonAnimation skeletonAnimation) {
 			if (skeletonAnimation == null) return;
-			if (!skeletonAnimation.valid)
+			if (!skeletonAnimation.valid || skeletonAnimation.AnimationState == null)
 				return;
 
+			TrackEntry current = skeletonAnimation.AnimationState.GetCurrent(0);
 			if (!isInspectingPrefab) {
-				if (wasAnimationNameChanged) {
+				string activeAnimation = (current != null) ? current.Animation.Name : "";
+				bool activeLoop = (current != null) ? current.Loop : false;
+				bool animationParameterChanged = this.wasAnimationParameterChanged &&
+					((activeAnimation != animationName.stringValue) || (activeLoop != loop.boolValue));
+				if (animationParameterChanged) {
+					this.wasAnimationParameterChanged = false;
 					var skeleton = skeletonAnimation.Skeleton;
 					var state = skeletonAnimation.AnimationState;
 
@@ -105,7 +115,7 @@ namespace Spine.Unity.Editor {
 						if (animationToUse != null) {
 							skeletonAnimation.AnimationState.SetAnimation(0, animationToUse, loop.boolValue);
 						}
-						skeleton.UpdateWorldTransform();
+						skeletonAnimation.Update(0);
 						skeletonAnimation.LateUpdate();
 						requireRepaint = true;
 					} else {
@@ -118,8 +128,7 @@ namespace Spine.Unity.Editor {
 
 				// Reflect animationName serialized property in the inspector even if SetAnimation API was used.
 				if (Application.isPlaying) {
-					TrackEntry current = skeletonAnimation.AnimationState.GetCurrent(0);
-					if (current != null) {
+					if (current != null && current.Animation != null) {
 						if (skeletonAnimation.AnimationName != animationName.stringValue)
 							animationName.stringValue = current.Animation.Name;
 					}

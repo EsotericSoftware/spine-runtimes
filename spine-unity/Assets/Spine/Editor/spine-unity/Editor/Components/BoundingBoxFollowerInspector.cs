@@ -33,6 +33,7 @@
 
 using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
@@ -198,11 +199,21 @@ namespace Spine.Unity.Editor {
 			var go = AddBoundingBoxFollowerChild((SkeletonRenderer)command.context);
 			Undo.RegisterCreatedObjectUndo(go, "Add BoundingBoxFollower");
 		}
+
+		[MenuItem("CONTEXT/SkeletonRenderer/Add all BoundingBoxFollower GameObjects")]
+		static void AddAllBoundingBoxFollowerChildren (MenuCommand command) {
+			var objects = AddAllBoundingBoxFollowerChildren((SkeletonRenderer)command.context);
+			foreach (var go in objects)
+				Undo.RegisterCreatedObjectUndo(go, "Add BoundingBoxFollower");
+		}
 		#endregion
 
-		static GameObject AddBoundingBoxFollowerChild (SkeletonRenderer sr, BoundingBoxFollower original = null) {
-			var go = EditorInstantiation.NewGameObject("BoundingBoxFollower", true);
-			go.transform.SetParent(sr.transform, false);
+		public static GameObject AddBoundingBoxFollowerChild (SkeletonRenderer skeletonRenderer,
+			BoundingBoxFollower original = null, string name = "BoundingBoxFollower",
+			string slotName = null) {
+
+			var go = EditorInstantiation.NewGameObject(name, true);
+			go.transform.SetParent(skeletonRenderer.transform, false);
 			var newFollower = go.AddComponent<BoundingBoxFollower>();
 
 			if (original != null) {
@@ -210,16 +221,40 @@ namespace Spine.Unity.Editor {
 				newFollower.isTrigger = original.isTrigger;
 				newFollower.clearStateOnDisable = original.clearStateOnDisable;
 			}
+			if (slotName != null)
+				newFollower.slotName = slotName;
 
-			newFollower.skeletonRenderer = sr;
+			newFollower.skeletonRenderer = skeletonRenderer;
 			newFollower.Initialize();
-
 
 			Selection.activeGameObject = go;
 			EditorGUIUtility.PingObject(go);
 			return go;
 		}
 
+		public static List<GameObject> AddAllBoundingBoxFollowerChildren (
+			SkeletonRenderer skeletonRenderer, BoundingBoxFollower original = null) {
+
+			List<GameObject> createdGameObjects = new List<GameObject>();
+			foreach (var skin in skeletonRenderer.Skeleton.Data.Skins) {
+				var attachments = skin.Attachments;
+				foreach (var entry in attachments) {
+					var boundingBoxAttachment = entry.Value as BoundingBoxAttachment;
+					if (boundingBoxAttachment == null)
+						continue;
+					int slotIndex = entry.Key.SlotIndex;
+					var slot = skeletonRenderer.Skeleton.Slots.Items[slotIndex];
+					string slotName = slot.Data.Name;
+					GameObject go = AddBoundingBoxFollowerChild(skeletonRenderer,
+						original, boundingBoxAttachment.Name, slotName);
+					var boneFollower = go.AddComponent<BoneFollower>();
+					boneFollower.skeletonRenderer = skeletonRenderer;
+					boneFollower.SetBone(slot.Data.BoneData.Name);
+					createdGameObjects.Add(go);
+				}
+			}
+			return createdGameObjects;
+		}
 	}
 
 }

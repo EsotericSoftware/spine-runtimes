@@ -71,7 +71,7 @@ namespace Spine.Unity.Editor {
 			}
 
 			serializedObject.Update();
-			atlasAsset = atlasAsset ?? (SpineSpriteAtlasAsset)target;
+			atlasAsset = (atlasAsset == null) ? (SpineSpriteAtlasAsset)target : atlasAsset;
 
 			if (atlasAsset.RegionsNeedLoading) {
 				if (GUILayout.Button(SpineInspectorUtility.TempContent("Load regions by entering Play mode"), GUILayout.Height(20))) {

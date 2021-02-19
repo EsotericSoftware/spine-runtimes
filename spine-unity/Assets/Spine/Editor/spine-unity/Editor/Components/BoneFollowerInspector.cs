@@ -37,7 +37,8 @@ namespace Spine.Unity.Editor {
 
 	[CustomEditor(typeof(BoneFollower)), CanEditMultipleObjects]
 	public class BoneFollowerInspector : Editor {
-		SerializedProperty boneName, skeletonRenderer, followXYPosition, followZPosition, followBoneRotation, followLocalScale, followSkeletonFlip;
+		SerializedProperty boneName, skeletonRenderer, followXYPosition, followZPosition, followBoneRotation,
+			followLocalScale, followSkeletonFlip, maintainedAxisOrientation;
 		BoneFollower targetBoneFollower;
 		bool needsReset;
 
@@ -86,6 +87,7 @@ namespace Spine.Unity.Editor {
 			followZPosition = serializedObject.FindProperty("followZPosition");
 			followLocalScale = serializedObject.FindProperty("followLocalScale");
 			followSkeletonFlip = serializedObject.FindProperty("followSkeletonFlip");
+			maintainedAxisOrientation = serializedObject.FindProperty("maintainedAxisOrientation");
 
 			targetBoneFollower = (BoneFollower)target;
 			if (targetBoneFollower.SkeletonRenderer != null)
@@ -177,6 +179,11 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.PropertyField(followZPosition);
 				EditorGUILayout.PropertyField(followLocalScale);
 				EditorGUILayout.PropertyField(followSkeletonFlip);
+				if ((followSkeletonFlip.hasMultipleDifferentValues || followSkeletonFlip.boolValue == false) &&
+					(followBoneRotation.hasMultipleDifferentValues || followBoneRotation.boolValue == true)) {
+					using (new SpineInspectorUtility.IndentScope())
+						EditorGUILayout.PropertyField(maintainedAxisOrientation);
+				}
 
 				BoneFollowerInspector.RecommendRigidbodyButton(targetBoneFollower);
 			} else {
