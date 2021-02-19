@@ -1,8 +1,8 @@
 #ifndef VERTEX_LIT_FORWARD_PASS_LW_INCLUDED
 #define VERTEX_LIT_FORWARD_PASS_LW_INCLUDED
 
+#include "CGIncludes/Spine-Sprite-Common-LW.hlsl"
 #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Lighting.hlsl"
-
 #include "SpineCoreShaders/SpriteLighting.cginc"
 
 ////////////////////////////////////////

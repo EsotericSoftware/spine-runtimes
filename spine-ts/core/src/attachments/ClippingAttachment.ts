@@ -44,7 +44,7 @@ module spine {
 		}
 
 		copy (): Attachment {
-			let copy = new ClippingAttachment(name);
+			let copy = new ClippingAttachment(this.name);
 			this.copyTo(copy);
 			copy.endSlot = this.endSlot;
 			copy.color.setFromColor(this.color);

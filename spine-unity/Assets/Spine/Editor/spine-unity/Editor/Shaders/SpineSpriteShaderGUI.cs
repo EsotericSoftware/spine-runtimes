@@ -81,6 +81,16 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		FixedNormalsWorldSpace = 2
 	};
 
+	private enum eDiffuseRampMode {
+		NoRampSpecified = -1,
+		FullRangeHard = 0,
+		FullRangeSoft = 1,
+		OldHard = 2,
+		OldSoft = 3,
+
+		DefaultRampMode = OldHard
+	};
+
 	MaterialProperty _mainTexture = null;
 	MaterialProperty _color = null;
 	MaterialProperty _maskTexture = null;
@@ -177,6 +187,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	static GUIContent _meshRequiresTangentsText = new GUIContent("Note: Material requires a mesh with tangents.");
 	static GUIContent _meshRequiresNormalsText = new GUIContent("Note: Material requires a mesh with normals.");
 	static GUIContent _meshRequiresNormalsAndTangentsText = new GUIContent("Note: Material requires a mesh with Normals and Tangents.");
+	static GUIContent[] _fixedDiffuseRampModeOptions = { new GUIContent("Hard"), new GUIContent("Soft"), new GUIContent("Old Hard"), new GUIContent("Old Soft") };
 
 	const string _primaryMapsText = "Main Maps";
 	const string _depthLabelText = "Depth";
@@ -447,8 +458,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		if (_maskTexture != null)
 			_materialEditor.TexturePropertySingleLine(_maskText, _maskTexture);
 
-		if (_diffuseRamp != null)
-			_materialEditor.TexturePropertySingleLine(_diffuseRampText, _diffuseRamp);
+		dataChanged |= RenderDiffuseRampProperties();
 
 		dataChanged |= EditorGUI.EndChangeCheck();
 
@@ -612,6 +622,52 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		return dataChanged;
 	}
 
+	protected virtual bool RenderDiffuseRampProperties () {
+		bool dataChanged = false;
+
+		eDiffuseRampMode rampMode = GetMaterialDiffuseRampMode((Material)_materialEditor.target);
+		bool mixedRampMode = false;
+		foreach (Material material in _materialEditor.targets) {
+			if (rampMode != GetMaterialDiffuseRampMode(material)) {
+				mixedRampMode = true;
+				break;
+			}
+		}
+
+		EditorGUI.BeginChangeCheck();
+		EditorGUI.showMixedValue = mixedRampMode;
+		EditorGUILayout.BeginHorizontal();
+
+		if (_diffuseRamp != null)
+			_materialEditor.TexturePropertySingleLine(_diffuseRampText, _diffuseRamp);
+
+		if (EditorGUI.EndChangeCheck()) {
+			if (rampMode == eDiffuseRampMode.NoRampSpecified)
+				rampMode = eDiffuseRampMode.DefaultRampMode;
+
+			SetDiffuseRampMode(_materialEditor, rampMode);
+			mixedRampMode = false;
+			dataChanged = true;
+		}
+
+		if (_diffuseRamp != null && _diffuseRamp.textureValue != null) {
+			//Show drop down for ramp mode
+			EditorGUI.BeginChangeCheck();
+			EditorGUI.showMixedValue = mixedRampMode;
+			rampMode = (eDiffuseRampMode)EditorGUILayout.Popup((int)rampMode, _fixedDiffuseRampModeOptions);
+			if (EditorGUI.EndChangeCheck()) {
+				SetDiffuseRampMode(_materialEditor, rampMode);
+				mixedRampMode = false;
+				dataChanged = true;
+			}
+		}
+		EditorGUILayout.EndHorizontal();
+
+		EditorGUI.showMixedValue = false;
+
+		return dataChanged;
+	}
+
 	protected virtual bool RenderShadowsProperties () {
 		bool dataChanged = false;
 
@@ -623,9 +679,6 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 			IsURP3DShader(_materialEditor, out areMixedShaders);
 
 		if (hasReceiveShadowsParameter) {
-			bool forceDisableReceiveShadows = !_writeToDepth.hasMixedValue && _writeToDepth.floatValue == 0;
-			EditorGUI.BeginDisabledGroup(forceDisableReceiveShadows);
-
 			EditorGUI.BeginChangeCheck();
 			bool mixedValue;
 			bool enableReceive = !IsKeywordEnabled(_materialEditor, "_RECEIVE_SHADOWS_OFF", out mixedValue);
@@ -634,11 +687,10 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 
 			EditorGUI.showMixedValue = false;
 
-			if (EditorGUI.EndChangeCheck() || forceDisableReceiveShadows) {
-				SetKeyword(_materialEditor, "_RECEIVE_SHADOWS_OFF", !enableReceive || forceDisableReceiveShadows);
+			if (EditorGUI.EndChangeCheck()) {
+				SetKeyword(_materialEditor, "_RECEIVE_SHADOWS_OFF", !enableReceive);
 				dataChanged = true;
 			}
-			EditorGUI.EndDisabledGroup(); // forceDisableReceiveShadows
 		}
 
 		return dataChanged;
@@ -844,6 +896,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		SetKeyword(material, "_EMISSION", false);
 		//Start with preMultiply alpha by default
 		SetBlendMode(material, eBlendMode.PreMultipliedAlpha);
+		SetDiffuseRampMode(material, eDiffuseRampMode.DefaultRampMode);
 		//Start with mesh normals by default
 		SetNormalsMode(material, eNormalsMode.MeshNormals, false);
 		if (_fixedNormal != null)
@@ -1093,9 +1146,8 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		return eNormalsMode.MeshNormals;
 	}
 
-	static void SetNormalsMode (MaterialEditor materialEditor, eNormalsMode normalsMode, bool allowBackFaceRendering) {
-		SetNormalsMode((Material)materialEditor.target, normalsMode, allowBackFaceRendering);
 
+	static void SetNormalsMode (MaterialEditor materialEditor, eNormalsMode normalsMode, bool allowBackFaceRendering) {
 		foreach (Material material in materialEditor.targets) {
 			SetNormalsMode(material, normalsMode, allowBackFaceRendering);
 		}
@@ -1111,6 +1163,32 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 
 	static bool GetMaterialFixedNormalsBackfaceRenderingOn (Material material) {
 		return material.IsKeywordEnabled("_FIXED_NORMALS_VIEWSPACE_BACKFACE") || material.IsKeywordEnabled("_FIXED_NORMALS_MODELSPACE_BACKFACE");
+	}
+
+	static eDiffuseRampMode GetMaterialDiffuseRampMode (Material material) {
+		if (material.IsKeywordEnabled("_FULLRANGE_HARD_RAMP"))
+			return eDiffuseRampMode.FullRangeHard;
+		if (material.IsKeywordEnabled("_FULLRANGE_SOFT_RAMP"))
+			return eDiffuseRampMode.FullRangeSoft;
+		if (material.IsKeywordEnabled("_OLD_HARD_RAMP"))
+			return eDiffuseRampMode.OldHard;
+		if (material.IsKeywordEnabled("_OLD_SOFT_RAMP"))
+			return eDiffuseRampMode.OldSoft;
+
+		return eDiffuseRampMode.NoRampSpecified;
+	}
+
+	static void SetDiffuseRampMode (MaterialEditor materialEditor, eDiffuseRampMode rampMode) {
+		foreach (Material material in materialEditor.targets) {
+			SetDiffuseRampMode(material, rampMode);
+		}
+	}
+
+	static void SetDiffuseRampMode (Material material, eDiffuseRampMode rampMode) {
+		SetKeyword(material, "_FULLRANGE_HARD_RAMP", rampMode == eDiffuseRampMode.FullRangeHard);
+		SetKeyword(material, "_FULLRANGE_SOFT_RAMP", rampMode == eDiffuseRampMode.FullRangeSoft);
+		SetKeyword(material, "_OLD_HARD_RAMP", rampMode == eDiffuseRampMode.OldHard);
+		SetKeyword(material, "_OLD_SOFT_RAMP", rampMode == eDiffuseRampMode.OldSoft);
 	}
 
 	static bool HasZWriteEnabled (Material material) {

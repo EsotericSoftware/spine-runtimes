@@ -31,8 +31,10 @@ namespace Spine.Unity {
 	public enum UpdateMode {
 		Nothing = 0,
 		OnlyAnimationStatus,
-		EverythingExceptMesh,
-		FullUpdate
+		OnlyEventTimelines = 4, // added as index 4 to keep scene behavior unchanged.
+		EverythingExceptMesh = 2,
+		FullUpdate,
+		//Reserved 4 for OnlyEventTimelines
 	};
 
 	public delegate void UpdateBonesDelegate (ISkeletonAnimation animated);

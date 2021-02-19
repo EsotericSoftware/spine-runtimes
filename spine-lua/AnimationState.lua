@@ -381,7 +381,7 @@ function AnimationState:apply (skeleton)
 							self:applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii * 2,
 									firstFrame)
 						elseif timeline.type == Animation.TimelineType.attachment then
-							self:applyAttachmentTimeline(skeleton, animationTime, timelineBlend, true)
+							self:applyAttachmentTimeline(timeline, skeleton, animationTime, timelineBlend, true)
 						else
 							timeline:apply(skeleton, animationLast, animationTime, self.events, mix, timelineBlend, MixDirection._in)
 						end
@@ -863,7 +863,7 @@ function AnimationState:trackEntry (trackIndex, animation, loop, last)
 	if not last then
 		entry.mixDuration = 0
 	else
-		entry.mixDuration = data:getMix(last.animation, animation)
+		entry.mixDuration = data:getMix(last.animation.name, animation.name)
 	end
 	entry.mixBlend = MixBlend.replace
 	return entry

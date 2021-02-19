@@ -49,6 +49,9 @@ namespace Spine.Unity {
 		#endif
 		public TextAsset skeletonJSON;
 
+		public bool isUpgradingBlendModeMaterials = false;
+		public BlendModeMaterials blendModeMaterials = new BlendModeMaterials();
+
 		[Tooltip("Use SkeletonDataModifierAssets to apply changes to the SkeletonData after being loaded, such as apply blend mode Materials to Attachments under slots with special blend modes.")]
 		public List<SkeletonDataModifierAsset> skeletonDataModifiers = new List<SkeletonDataModifierAsset>();
 
@@ -187,10 +190,14 @@ namespace Spine.Unity {
 				return null;
 
 			if (skeletonDataModifiers != null) {
-				foreach (var m in skeletonDataModifiers) {
-					if (m != null) m.Apply(loadedSkeletonData);
+				foreach (var modifier in skeletonDataModifiers) {
+					if (modifier != null && !(isUpgradingBlendModeMaterials && modifier is BlendModeMaterialsAsset)) {
+						modifier.Apply(loadedSkeletonData);
+					}
 				}
 			}
+			if (!isUpgradingBlendModeMaterials)
+				blendModeMaterials.ApplyMaterials(loadedSkeletonData);
 
 			this.InitializeWithData(loadedSkeletonData);
 

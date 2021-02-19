@@ -3,6 +3,7 @@
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[NoScaleOffset] _MainTex ("Main Texture", 2D) = "black" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
+		[Toggle(_RECEIVE_SHADOWS)] _ReceiveShadows("Receive Shadows", Int) = 0
 		[Toggle(_DOUBLE_SIDED_LIGHTING)] _DoubleSidedLighting("Double-Sided Lighting", Int) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 0.0 // Disabled stencil test by default
@@ -57,18 +58,17 @@
 			// Spine related keywords
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma shader_feature _ _DOUBLE_SIDED_LIGHTING
+			#pragma shader_feature _RECEIVE_SHADOWS_OFF _RECEIVE_SHADOWS
 			#pragma vertex vert
 			#pragma fragment frag
 
 			#undef LIGHTMAP_ON
 
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-
 			#define USE_URP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
+			#include "Include/Spine-Input-URP.hlsl"
 			#include "Include/Spine-SkeletonLit-ForwardPass-URP.hlsl"
 			ENDHLSL
 	 	}
@@ -96,12 +96,10 @@
 			// GPU Instancing
 			#pragma multi_compile_instancing
 			#pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+			#pragma shader_feature _ _DOUBLE_SIDED_LIGHTING
 
 			#pragma vertex ShadowPassVertexSkeletonLit
 			#pragma fragment ShadowPassFragmentSkeletonLit
-
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
 
 			#define USE_URP
 			#define fixed4 half4
@@ -113,7 +111,7 @@
 			ENDHLSL
 		}
 
-		Pass
+			Pass
 		{
 			Name "DepthOnly"
 			Tags{"LightMode" = "DepthOnly"}
@@ -127,8 +125,8 @@
 			#pragma prefer_hlslcc gles
 			#pragma exclude_renderers d3d11_9x
 
-			#pragma vertex DepthOnlyVertexSprite
-			#pragma fragment DepthOnlyFragmentSprite
+			#pragma vertex DepthOnlyVertex
+			#pragma fragment DepthOnlyFragment
 
 			// -------------------------------------
 			// Material Keywords
@@ -138,9 +136,6 @@
 			//--------------------------------------
 			// GPU Instancing
 			#pragma multi_compile_instancing
-
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
 
 			#define USE_URP
 			#define fixed4 half4

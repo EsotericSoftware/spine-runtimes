@@ -141,7 +141,7 @@ namespace Spine.Unity.Playables {
 
 				var skeleton = skeletonComponent.Skeleton;
 
-				bool skeletonDataMismatch = clipData.animationReference != null &&
+				bool skeletonDataMismatch = clipData.animationReference != null && clipData.animationReference.SkeletonDataAsset &&
 					skeletonComponent.SkeletonDataAsset.GetSkeletonData(true) != clipData.animationReference.SkeletonDataAsset.GetSkeletonData(true);
 				if (skeletonDataMismatch) {
 					Debug.LogWarningFormat("SpineAnimationStateMixerBehaviour tried to apply an animation for the wrong skeleton. Expected {0}. Was {1}",

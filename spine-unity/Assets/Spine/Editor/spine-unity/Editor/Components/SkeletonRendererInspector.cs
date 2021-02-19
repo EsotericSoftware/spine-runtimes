@@ -530,7 +530,7 @@ namespace Spine.Unity.Editor {
 
 				if (mismatchDetected) {
 					mismatchDetected = false;
-					SceneView.RepaintAll();
+					UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
 				}
 			}
 		}

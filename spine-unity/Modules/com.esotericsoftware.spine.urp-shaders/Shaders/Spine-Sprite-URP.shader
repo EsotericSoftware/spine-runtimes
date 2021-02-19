@@ -86,6 +86,7 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			#pragma shader_feature _ALPHA_CLIP
 			#pragma shader_feature _EMISSION
 			#pragma shader_feature _DIFFUSE_RAMP
+			#pragma shader_feature _ _FULLRANGE_HARD_RAMP _FULLRANGE_SOFT_RAMP _OLD_HARD_RAMP _OLD_SOFT_RAMP
 			#pragma shader_feature _COLOR_ADJUST
 			#pragma shader_feature _RIM_LIGHTING
 			#pragma shader_feature _TEXTURE_BLEND
@@ -100,6 +101,8 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			// -------------------------------------
 			// Universal Pipeline keywords
 			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+			#pragma multi_compile _ MAIN_LIGHT_CALCULATE_SHADOWS
+			#pragma multi_compile _ REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR
 			#pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
 			#pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
 			#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
@@ -126,11 +129,7 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-
-			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
-
-			#include "Include/Spine-Input-URP.hlsl"
+			#include "Include/Spine-Input-Sprite-URP.hlsl"
 			#include "Include/Spine-Sprite-ForwardPass-URP.hlsl"
 			ENDHLSL
 		}
@@ -162,14 +161,11 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			#pragma vertex ShadowPassVertexSprite
 			#pragma fragment ShadowPassFragmentSprite
 
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
-
 			#define USE_URP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-			#include "Include/Spine-Input-URP.hlsl"
+			#include "Include/Spine-Input-Sprite-URP.hlsl"
 			#include "Include/Spine-Sprite-ShadowCasterPass-URP.hlsl"
 			ENDHLSL
 		}
@@ -200,15 +196,12 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			// GPU Instancing
 			#pragma multi_compile_instancing
 
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
-
 			#define USE_URP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-			#include "Include/Spine-Input-URP.hlsl"
-			#include "Include/Spine-DepthOnlyPass-URP.hlsl"
+			#include "Include/Spine-Input-Sprite-URP.hlsl"
+			#include "Include/Spine-Sprite-DepthOnlyPass-URP.hlsl"
 			ENDHLSL
 		}
 	}

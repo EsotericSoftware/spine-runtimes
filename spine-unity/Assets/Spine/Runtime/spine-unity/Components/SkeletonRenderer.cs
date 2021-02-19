@@ -82,7 +82,7 @@ namespace Spine.Unity {
 
 		/// <summary>Update mode to optionally limit updates to e.g. only apply animations but not update the mesh.</summary>
 		public UpdateMode UpdateMode { get { return updateMode; } set { updateMode = value; } }
-		[SerializeField] protected UpdateMode updateMode = UpdateMode.FullUpdate;
+		protected UpdateMode updateMode = UpdateMode.FullUpdate;
 
 		/// <summary>Update mode used when the MeshRenderer becomes invisible
 		/// (when <c>OnBecameInvisible()</c> is called). Update mode is automatically
@@ -381,7 +381,7 @@ namespace Spine.Unity {
 			}
 			#endif
 
-			if (updateMode <= UpdateMode.EverythingExceptMesh) return;
+			if (updateMode != UpdateMode.FullUpdate) return;
 
 			#if SPINE_OPTIONAL_RENDEROVERRIDE
 			bool doMeshOverride = generateMeshOverride != null;

@@ -228,7 +228,7 @@ namespace Spine.Unity {
 					return false;
 
 				var time = AnimationTime(stateInfo.normalizedTime, info.clip.length,
-										info.clip.isLooping);
+										info.clip.isLooping, stateInfo.speed < 0);
 				weight = useClipWeight1 ? layerWeight : weight;
 				clip.Apply(skeleton, 0, time, info.clip.isLooping, null,
 						weight, layerBlendMode, MixDirection.In);
@@ -252,7 +252,7 @@ namespace Spine.Unity {
 					return false;
 
 				var time = AnimationTime(stateInfo.normalizedTime + interruptingClipTimeAddition,
-										info.clip.length);
+										info.clip.length, stateInfo.speed < 0);
 				weight = useClipWeight1 ? layerWeight : weight;
 				clip.Apply(skeleton, 0, time, info.clip.isLooping, null,
 							weight, layerBlendMode, MixDirection.In);
@@ -462,18 +462,20 @@ namespace Spine.Unity {
 				}
 				animation = GetAnimation(clip);
 				float time = AnimationTime(stateInfo.normalizedTime, clip.length,
-										clip.isLooping);
+										clip.isLooping, stateInfo.speed < 0);
 				return new KeyValuePair<Animation, float>(animation, time);
 			}
 
-			static float AnimationTime (float normalizedTime, float clipLength, bool loop) {
-				float time = AnimationTime(normalizedTime, clipLength);
+			static float AnimationTime (float normalizedTime, float clipLength, bool loop, bool reversed) {
+				float time = AnimationTime(normalizedTime, clipLength, reversed);
 				if (loop) return time;
 				const float EndSnapEpsilon = 1f / 30f; // Workaround for end-duration keys not being applied.
 				return (clipLength - time < EndSnapEpsilon) ? clipLength : time; // return a time snapped to clipLength;
 			}
 
-			static float AnimationTime (float normalizedTime, float clipLength) {
+			static float AnimationTime (float normalizedTime, float clipLength, bool reversed) {
+				if (reversed)
+					normalizedTime = (1 - normalizedTime);
 				if (normalizedTime < 0.0f)
 					normalizedTime = (normalizedTime % 1.0f) + 1.0f;
 				return normalizedTime * clipLength;

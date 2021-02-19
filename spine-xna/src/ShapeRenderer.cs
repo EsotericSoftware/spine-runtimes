@@ -119,13 +119,12 @@ namespace Spine {
 			if (count< 3) throw new ArgumentException("Polygon must contain at least 3 vertices");
 
 			offset <<= 1;
-			count <<= 1;
 
 			var firstX = polygonVertices[offset];
 			var firstY = polygonVertices[offset + 1];
 			var last = offset + count;
 
-			for (int i = offset, n = offset + count - 2; i<n; i += 2) {
+			for (int i = offset, n = offset + count; i < n; i += 2) {
 				var x1 = polygonVertices[i];
 				var y1 = polygonVertices[i + 1];
 

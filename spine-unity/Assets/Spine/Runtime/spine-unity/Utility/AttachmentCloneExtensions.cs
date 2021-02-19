@@ -83,8 +83,18 @@ namespace Spine.Unity.AttachmentTools {
 		/// <param name="premultiplyAlpha">If <c>true</c>, a premultiply alpha clone of the original texture will be created.</param>
 		/// <param name="cloneMeshAsLinked">If <c>true</c> MeshAttachments will be cloned as linked meshes and will inherit animation from the original attachment.</param>
 		/// <param name="useOriginalRegionSize">If <c>true</c> the size of the original attachment will be followed, instead of using the Sprite size.</param>
-		public static Attachment GetRemappedClone (this Attachment o, Sprite sprite, Material sourceMaterial, bool premultiplyAlpha = true, bool cloneMeshAsLinked = true, bool useOriginalRegionSize = false) {
+		/// <param name="pivotShiftsMeshUVCoords">If <c>true</c> and the original Attachment is a MeshAttachment, then
+		///	a non-central sprite pivot will shift uv coords in the opposite direction. Vertices will not be offset in
+		///	any case when the original Attachment is a MeshAttachment.</param>
+		public static Attachment GetRemappedClone (this Attachment o, Sprite sprite, Material sourceMaterial,
+			bool premultiplyAlpha = true, bool cloneMeshAsLinked = true, bool useOriginalRegionSize = false,
+			bool pivotShiftsMeshUVCoords = true) {
 			var atlasRegion = premultiplyAlpha ? sprite.ToAtlasRegionPMAClone(sourceMaterial) : sprite.ToAtlasRegion(new Material(sourceMaterial) { mainTexture = sprite.texture } );
+			if (!pivotShiftsMeshUVCoords && o is MeshAttachment) {
+				// prevent non-central sprite pivot setting offsetX/Y and shifting uv coords out of mesh bounds
+				atlasRegion.offsetX = 0;
+				atlasRegion.offsetY = 0;
+			}
 			return o.GetRemappedClone(atlasRegion, cloneMeshAsLinked, useOriginalRegionSize, 1f/sprite.pixelsPerUnit);
 		}
 

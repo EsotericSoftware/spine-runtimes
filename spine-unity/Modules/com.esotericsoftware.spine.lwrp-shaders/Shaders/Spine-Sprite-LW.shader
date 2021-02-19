@@ -87,6 +87,7 @@ Shader "Lightweight Render Pipeline/Spine/Sprite"
 			#pragma shader_feature _ALPHA_CLIP
 			#pragma shader_feature _EMISSION
 			#pragma shader_feature _DIFFUSE_RAMP
+			#pragma shader_feature _ _FULLRANGE_HARD_RAMP _FULLRANGE_SOFT_RAMP _OLD_HARD_RAMP _OLD_SOFT_RAMP
 			#pragma shader_feature _COLOR_ADJUST
 			#pragma shader_feature _RIM_LIGHTING
 			#pragma shader_feature _TEXTURE_BLEND
@@ -127,11 +128,7 @@ Shader "Lightweight Render Pipeline/Spine/Sprite"
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-
-			#include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Core.hlsl"
-			#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
-
-			#include "CGIncludes/Spine-Input-LW.hlsl"
+			#include "CGIncludes/Spine-Input-Sprite-LW.hlsl"
 			#include "CGIncludes/Spine-Sprite-ForwardPass-LW.hlsl"
 			ENDHLSL
 		}
@@ -163,14 +160,11 @@ Shader "Lightweight Render Pipeline/Spine/Sprite"
 			#pragma vertex ShadowPassVertexSprite
 			#pragma fragment ShadowPassFragmentSprite
 
-			#include "Packages/com.unity.render-pipelines.lightweight/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.lightweight/Shaders/ShadowCasterPass.hlsl"
-
 			#define USE_LWRP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-			#include "CGIncludes/Spine-Input-LW.hlsl"
+			#include "CGIncludes/Spine-Input-Sprite-LW.hlsl"
 			#include "CGIncludes/Spine-Sprite-ShadowCasterPass-LW.hlsl"
 			ENDHLSL
 		}
@@ -202,15 +196,12 @@ Shader "Lightweight Render Pipeline/Spine/Sprite"
 			// GPU Instancing
 			#pragma multi_compile_instancing
 
-			#include "Packages/com.unity.render-pipelines.lightweight/Shaders/LitInput.hlsl"
-			#include "Packages/com.unity.render-pipelines.lightweight/Shaders/DepthOnlyPass.hlsl"
-
 			#define USE_LWRP
 			#define fixed4 half4
 			#define fixed3 half3
 			#define fixed half
-			#include "CGIncludes/Spine-Input-LW.hlsl"
-			#include "CGIncludes/Spine-DepthOnlyPass-LW.hlsl"
+			#include "CGIncludes/Spine-Input-Sprite-LW.hlsl"
+			#include "CGIncludes/Spine-Sprite-DepthOnlyPass-LW.hlsl"
 			ENDHLSL
 		}
 	}
