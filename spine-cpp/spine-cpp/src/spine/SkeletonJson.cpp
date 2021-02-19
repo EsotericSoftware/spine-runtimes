@@ -84,8 +84,8 @@ SkeletonJson::SkeletonJson(Atlas *atlas) : _attachmentLoader(new(__FILE__, __LIN
 	_scale(1), _ownsLoader(true)
 {}
 
-SkeletonJson::SkeletonJson(AttachmentLoader *attachmentLoader) : _attachmentLoader(attachmentLoader), _scale(1),
-	_ownsLoader(false)
+SkeletonJson::SkeletonJson(AttachmentLoader *attachmentLoader, bool ownsLoader) : _attachmentLoader(attachmentLoader), _scale(1),
+	_ownsLoader(ownsLoader)
 {
 	assert(_attachmentLoader != NULL);
 }
