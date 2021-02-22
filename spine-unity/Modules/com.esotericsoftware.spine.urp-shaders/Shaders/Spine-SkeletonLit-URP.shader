@@ -3,6 +3,7 @@
 		_Cutoff ("Shadow alpha cutoff", Range(0,1)) = 0.1
 		[NoScaleOffset] _MainTex ("Main Texture", 2D) = "black" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
+		[Toggle(_RECEIVE_SHADOWS)] _ReceiveShadows("Receive Shadows", Int) = 0
 		[Toggle(_DOUBLE_SIDED_LIGHTING)] _DoubleSidedLighting("Double-Sided Lighting", Int) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 0.0 // Disabled stencil test by default
@@ -57,6 +58,7 @@
 			// Spine related keywords
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma shader_feature _ _DOUBLE_SIDED_LIGHTING
+			#pragma shader_feature _RECEIVE_SHADOWS_OFF _RECEIVE_SHADOWS
 			#pragma vertex vert
 			#pragma fragment frag
 
@@ -94,6 +96,7 @@
 			// GPU Instancing
 			#pragma multi_compile_instancing
 			#pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+			#pragma shader_feature _ _DOUBLE_SIDED_LIGHTING
 
 			#pragma vertex ShadowPassVertexSkeletonLit
 			#pragma fragment ShadowPassFragmentSkeletonLit

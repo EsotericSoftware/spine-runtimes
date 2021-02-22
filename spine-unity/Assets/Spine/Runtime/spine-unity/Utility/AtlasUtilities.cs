@@ -601,7 +601,7 @@ namespace Spine.Unity.AttachmentTools {
 				destination.SetPixels(pixelBuffer);
 				destination.Apply();
 			} else {
-				Graphics.CopyTexture(source, 0, 0, (int)sourceRect.x, (int)sourceRect.y, (int)sourceRect.width, (int)sourceRect.height, destination, 0, 0, 0, 0);
+			 	Graphics.CopyTexture(source, 0, 0, (int)sourceRect.x, (int)sourceRect.y, (int)sourceRect.width, (int)sourceRect.height, destination, 0, 0, 0, 0);
 			}
 		}
 
@@ -646,7 +646,7 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>
 		/// Returns a Rect of the AtlasRegion according to Spine texture coordinates. (x-right, y-down)</summary>
 		static Rect GetSpineAtlasRect (this AtlasRegion region, bool includeRotate = true) {
-			if (includeRotate && region.degrees == 90)
+			if (includeRotate && (region.degrees == 90 || region.degrees == 270))
 				return new Rect(region.x, region.y, region.height, region.width);
 			else
 				return new Rect(region.x, region.y, region.width, region.height);
@@ -680,7 +680,7 @@ namespace Spine.Unity.AttachmentTools {
 
 			int x = (int)rr.x, y = (int)rr.y;
 			int w, h;
-			if (referenceRegion.degrees == 90) {
+			if (referenceRegion.degrees == 90 || referenceRegion.degrees == 270) {
 				w = (int)rr.height;
 				h = (int)rr.width;
 			} else {
@@ -693,14 +693,24 @@ namespace Spine.Unity.AttachmentTools {
 			int offsetX = Mathf.RoundToInt((float)referenceRegion.offsetX * ((float)w / (float)referenceRegion.width));
 			int offsetY = Mathf.RoundToInt((float)referenceRegion.offsetY * ((float)h / (float)referenceRegion.height));
 
+			if (referenceRegion.degrees == 270) {
+				w = (int)rr.width;
+				h = (int)rr.height;
+			}
+
+			float u = uvRect.xMin;
+			float u2 = uvRect.xMax;
+			float v = uvRect.yMax;
+			float v2 = uvRect.yMin;
+
 			return new AtlasRegion {
 				page = page,
 				name = referenceRegion.name,
 
-				u = uvRect.xMin,
-				u2 = uvRect.xMax,
-				v = uvRect.yMax,
-				v2 = uvRect.yMin,
+				u = u,
+				u2 = u2,
+				v = v,
+				v2 = v2,
 
 				index = -1,
 
@@ -713,6 +723,7 @@ namespace Spine.Unity.AttachmentTools {
 				x = x,
 				y = y,
 
+				rotate = referenceRegion.rotate,
 				degrees = referenceRegion.degrees
 			};
 		}
