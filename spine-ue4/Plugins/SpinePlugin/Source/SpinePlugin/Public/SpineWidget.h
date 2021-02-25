@@ -52,6 +52,9 @@ public:
 #endif
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
+	FString InitialSkin;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
 	USpineAtlasAsset* Atlas;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
@@ -216,7 +219,7 @@ protected:
 	virtual void CheckState();
 	virtual void DisposeState();
 
-	TSharedPtr<SSpineWidget> slateWidget;	
+	TSharedPtr<SSpineWidget> slateWidget;
 
 	spine::Skeleton* skeleton;
 	spine::AnimationState* state;
@@ -254,4 +257,5 @@ private:
 	/* If the animation should update automatically. */
 	UPROPERTY()
 	bool bAutoPlaying;
+	bool bSkinInitialized = false;
 };

@@ -99,6 +99,15 @@ void USpineWidget::SynchronizeProperties() {
 	if (slateWidget.IsValid()) {
 		CheckState();
 		if (skeleton) {
+			if (!bSkinInitialized) { // blueprint On Initialized may be called beforehand
+				if (InitialSkin != "") SetSkin(InitialSkin);
+#if WITH_EDITOR
+				if (IsDesignTime()) {
+					if (InitialSkin == "") SetSkin("default");
+					bSkinInitialized = false; // allow multiple edits in editor
+				}
+#endif
+			}
 			Tick(0, false);
 			slateWidget->SetData(this);
 		} else {
@@ -204,6 +213,7 @@ bool USpineWidget::SetSkin(const FString skinName) {
 		spine::Skin* skin = skeleton->getData()->findSkin(TCHAR_TO_UTF8(*skinName));
 		if (!skin) return false;
 		skeleton->setSkin(skin);
+		bSkinInitialized = true;
 		return true;
 	}
 	else return false;
@@ -211,7 +221,7 @@ bool USpineWidget::SetSkin(const FString skinName) {
 
 bool USpineWidget::SetSkins(UPARAM(ref) TArray<FString>& SkinNames) {
 	CheckState();
-	if (skeleton) {	
+	if (skeleton) {
 		spine::Skin* newSkin = new spine::Skin("__spine-ue3_custom_skin");
 		for (auto& skinName : SkinNames) {
 			spine::Skin* skin = skeleton->getData()->findSkin(TCHAR_TO_UTF8(*skinName));
@@ -222,6 +232,7 @@ bool USpineWidget::SetSkins(UPARAM(ref) TArray<FString>& SkinNames) {
 			newSkin->addSkin(skin);
 		}
 		skeleton->setSkin(newSkin);
+		bSkinInitialized = true;
 		if (customSkin != nullptr) {
 			delete customSkin;
 		}

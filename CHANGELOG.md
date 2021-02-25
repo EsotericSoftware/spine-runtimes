@@ -240,7 +240,8 @@
 * Removed dependency on `RHI`, `RenderCore`, and `ShaderCore`.
 * Re-importing atlases and their textures now works consistently in all situations.
 * Added mix-and-match example to demonstrate the new Skin API.
-* Materials on `SkeletonRendererComponent` are now blueprint read and writeable. This allows setting dynamic material instances at runtime
+* Materials on `SkeletonRendererComponent` are now blueprint read and writeable. This allows setting dynamic material instances at runtime.
+* Added `InitialSkin` property to `USpineWidget`. This allows previewing different skins in the UMG Designer. Initial skins can still be overridden via blueprint events such as `On Initialized`.
 
 ## C# ##
 * **Breaking changes**
