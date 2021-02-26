@@ -118,6 +118,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 	void loadSkeleton (final @Null FileHandle skeletonFile) {
 		if (skeletonFile == null) return;
+		this.skeletonFile = skeletonFile;
 
 		try {
 			atlas = new SkeletonViewAtlas(this, skeletonFile);
@@ -137,6 +138,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			ex.printStackTrace();
 			ui.toast("Error loading skeleton: " + skeletonFile.name());
 			lastModifiedCheck = 5;
+			this.skeletonFile = null;
 			return;
 		}
 
@@ -154,7 +156,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 			}
 		});
 
-		this.skeletonFile = skeletonFile;
 		skeletonModified = skeletonFile.lastModified();
 		atlasModified = atlas.lastModified();
 		lastModifiedCheck = checkModifiedInterval;
