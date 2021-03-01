@@ -331,8 +331,7 @@ class SkeletonViewerUI {
 				String name = fileDialog.getFile();
 				String dir = fileDialog.getDirectory();
 				if (name == null || dir == null) return;
-				viewer.loadSkeleton(new FileHandle(new File(dir, name).getAbsolutePath()));
-				toast("Loaded.");
+				if (viewer.loadSkeleton(new FileHandle(new File(dir, name).getAbsolutePath()))) toast("Loaded.");
 			}
 		});
 

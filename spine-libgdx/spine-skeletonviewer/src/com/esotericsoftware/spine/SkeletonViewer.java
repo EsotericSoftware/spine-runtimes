@@ -116,9 +116,11 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 	}
 
-	void loadSkeleton (final @Null FileHandle skeletonFile) {
-		if (skeletonFile == null) return;
+	boolean loadSkeleton (final @Null FileHandle skeletonFile) {
+		if (skeletonFile == null) return false;
+		FileHandle oldSkeletonFile = this.skeletonFile;
 		this.skeletonFile = skeletonFile;
+		reloadTimer = 0;
 
 		try {
 			atlas = new SkeletonViewAtlas(this, skeletonFile);
@@ -137,9 +139,8 @@ public class SkeletonViewer extends ApplicationAdapter {
 			System.out.println("Error loading skeleton: " + skeletonFile.file().getAbsolutePath());
 			ex.printStackTrace();
 			ui.toast("Error loading skeleton: " + skeletonFile.name());
-			lastModifiedCheck = 5;
-			this.skeletonFile = null;
-			return;
+			this.skeletonFile = oldSkeletonFile;
+			return false;
 		}
 
 		skeleton = new Skeleton(skeletonData);
@@ -150,7 +151,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		state = new AnimationState(new AnimationStateData(skeletonData));
 		state.addListener(new AnimationStateAdapter() {
-
 			public void event (TrackEntry entry, Event event) {
 				ui.toast(event.getData().getName());
 			}
@@ -166,7 +166,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		ui.window.getTitleLabel().setText(skeletonFile.name());
 		{
-
 			Array<String> items = new Array();
 			for (Skin skin : skeletonData.getSkins())
 				items.add(skin.getName());
@@ -184,6 +183,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		if (ui.skinList.getSelected() != null) skeleton.setSkin(ui.skinList.getSelected());
 		setAnimation();
+		return true;
 	}
 
 	void setAnimation () {
@@ -232,7 +232,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 					long time = skeletonFile.lastModified();
 					if (time != 0 && skeletonModified != time) reloadTimer = reloadDelay;
 					time = atlas.lastModified();
-					if (time != 0 && atlasModified != time) reloadTimer = reloadDelay;
+					if (time != 0 && atlasModified != 0 && atlasModified != time) reloadTimer = reloadDelay;
 				}
 			} else {
 				reloadTimer -= delta;
