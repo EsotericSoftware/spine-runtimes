@@ -879,7 +879,7 @@ namespace Spine {
 							PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(input.ReadInt(true), input.ReadInt(true),
 								index);
 							float time = input.ReadFloat(), mixRotate = input.ReadFloat(), mixX = input.ReadFloat(), mixY = input.ReadFloat();
-							for (int frame = 0, bezier = 0, frameLast = nn - 1; ; frame++) {
+							for (int frame = 0, bezier = 0, frameLast = timeline.FrameCount - 1; ; frame++) {
 								timeline.SetFrame(frame, time, mixRotate, mixX, mixY);
 								if (frame == frameLast) break;
 								float time2 = input.ReadFloat(), mixRotate2 = input.ReadFloat(), mixX2 = input.ReadFloat(),

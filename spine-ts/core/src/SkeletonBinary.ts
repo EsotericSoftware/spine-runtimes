@@ -842,7 +842,7 @@ module spine {
 						let timeline = new PathConstraintMixTimeline(input.readInt(true), input.readInt(true),
 							index);
 						let time = input.readFloat(), mixRotate = input.readFloat(), mixX = input.readFloat(), mixY = input.readFloat();
-						for (let frame = 0, bezier = 0, frameLast = nn - 1;; frame++) {
+						for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
 							timeline.setFrame(frame, time, mixRotate, mixX, mixY);
 							if (frame == frameLast) break;
 							let time2 = input.readFloat(), mixRotate2 = input.readFloat(), mixX2 = input.readFloat(),

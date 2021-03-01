@@ -861,7 +861,7 @@ public class SkeletonBinary extends SkeletonLoader {
 					PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(input.readInt(true), input.readInt(true),
 						index);
 					float time = input.readFloat(), mixRotate = input.readFloat(), mixX = input.readFloat(), mixY = input.readFloat();
-					for (int frame = 0, bezier = 0, frameLast = nn - 1;; frame++) {
+					for (int frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
 						timeline.setFrame(frame, time, mixRotate, mixX, mixY);
 						if (frame == frameLast) break;
 						float time2 = input.readFloat(), mixRotate2 = input.readFloat(), mixX2 = input.readFloat(),
