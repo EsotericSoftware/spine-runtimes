@@ -1,195 +1,72 @@
-
 speedy.png
-size: 1024,128
-format: RGBA8888
-filter: Linear,Linear
-repeat: none
+	size: 1024, 128
+	filter: Linear, Linear
 belt-ends
-  rotate: true
-  xy: 648, 5
-  size: 45, 56
-  orig: 45, 56
-  offset: 0, 0
-  index: -1
+	bounds: 648, 5, 45, 56
+	rotate: 90
 hair-1
-  rotate: false
-  xy: 422, 3
-  size: 82, 39
-  orig: 82, 39
-  offset: 0, 0
-  index: -1
+	bounds: 422, 3, 82, 39
 hair-2
-  rotate: false
-  xy: 572, 2
-  size: 74, 43
-  orig: 74, 43
-  offset: 0, 0
-  index: -1
+	bounds: 572, 2, 74, 43
 head
-  rotate: false
-  xy: 2, 2
-  size: 116, 124
-  orig: 116, 124
-  offset: 0, 0
-  index: -1
+	bounds: 2, 2, 116, 124
 hood-end1a
-  rotate: false
-  xy: 377, 42
-  size: 23, 84
-  orig: 23, 84
-  offset: 0, 0
-  index: -1
+	bounds: 377, 42, 23, 84
 hood-end1b
-  rotate: false
-  xy: 572, 47
-  size: 28, 79
-  orig: 28, 79
-  offset: 0, 0
-  index: -1
+	bounds: 572, 47, 28, 79
 hood-end1c
-  rotate: true
-  xy: 120, 3
-  size: 31, 70
-  orig: 31, 70
-  offset: 0, 0
-  index: -1
+	bounds: 120, 3, 31, 70
+	rotate: 90
 hood-end1d
-  rotate: false
-  xy: 447, 44
-  size: 29, 82
-  orig: 29, 82
-  offset: 0, 0
-  index: -1
+	bounds: 447, 44, 29, 82
 hood-end1e
-  rotate: true
-  xy: 264, 4
-  size: 35, 78
-  orig: 35, 78
-  offset: 0, 0
-  index: -1
+	bounds: 264, 4, 35, 78
+	rotate: 90
 hood-end1f
-  rotate: false
-  xy: 657, 55
-  size: 39, 71
-  orig: 39, 71
-  offset: 0, 0
-  index: -1
+	bounds: 657, 55, 39, 71
 hood-end2a
-  rotate: true
-  xy: 344, 9
-  size: 30, 76
-  orig: 30, 76
-  offset: 0, 0
-  index: -1
+	bounds: 344, 9, 30, 76
+	rotate: 90
 hood-end2b
-  rotate: false
-  xy: 698, 55
-  size: 38, 71
-  orig: 38, 71
-  offset: 0, 0
-  index: -1
+	bounds: 698, 55, 38, 71
 hood-end2c
-  rotate: true
-  xy: 506, 2
-  size: 42, 64
-  orig: 42, 64
-  offset: 0, 0
-  index: -1
+	bounds: 506, 2, 42, 64
+	rotate: 90
 hood-end2d
-  rotate: false
-  xy: 602, 50
-  size: 23, 76
-  orig: 23, 76
-  offset: 0, 0
-  index: -1
+	bounds: 602, 50, 23, 76
 hood-end2e
-  rotate: false
-  xy: 627, 52
-  size: 28, 74
-  orig: 28, 74
-  offset: 0, 0
-  index: -1
+	bounds: 627, 52, 28, 74
 hood-end2f
-  rotate: true
-  xy: 192, 3
-  size: 31, 70
-  orig: 31, 70
-  offset: 0, 0
-  index: -1
+	bounds: 192, 3, 31, 70
+	rotate: 90
 left-foot
-  rotate: true
-  xy: 478, 46
-  size: 80, 47
-  orig: 80, 47
-  offset: 0, 0
-  index: -1
+	bounds: 478, 46, 80, 47
+	rotate: 90
 left-foot-bent01
-  rotate: true
-  xy: 208, 39
-  size: 87, 43
-  orig: 87, 43
-  offset: 0, 0
-  index: -1
+	bounds: 208, 39, 87, 43
+	rotate: 90
 left-foot-bent02
-  rotate: true
-  xy: 402, 44
-  size: 82, 43
-  orig: 82, 43
-  offset: 0, 0
-  index: -1
+	bounds: 402, 44, 82, 43
+	rotate: 90
 left-foot-side
-  rotate: true
-  xy: 120, 36
-  size: 90, 42
-  orig: 90, 42
-  offset: 0, 0
-  index: -1
+	bounds: 120, 36, 90, 42
+	rotate: 90
 left-hand
-  rotate: false
-  xy: 796, 73
-  size: 52, 53
-  orig: 52, 53
-  offset: 0, 0
-  index: -1
+	bounds: 796, 73, 52, 53
 right-foot
-  rotate: true
-  xy: 738, 60
-  size: 66, 56
-  orig: 66, 56
-  offset: 0, 0
-  index: -1
+	bounds: 738, 60, 66, 56
+	rotate: 90
 right-foot-bent01
-  rotate: true
-  xy: 332, 41
-  size: 85, 43
-  orig: 85, 43
-  offset: 0, 0
-  index: -1
+	bounds: 332, 41, 85, 43
+	rotate: 90
 right-foot-bent02
-  rotate: true
-  xy: 527, 47
-  size: 79, 43
-  orig: 79, 43
-  offset: 0, 0
-  index: -1
+	bounds: 527, 47, 79, 43
+	rotate: 90
 right-foot-side
-  rotate: true
-  xy: 164, 36
-  size: 90, 42
-  orig: 90, 42
-  offset: 0, 0
-  index: -1
+	bounds: 164, 36, 90, 42
+	rotate: 90
 right-hand
-  rotate: true
-  xy: 738, 2
-  size: 56, 58
-  orig: 56, 58
-  offset: 0, 0
-  index: -1
+	bounds: 738, 2, 56, 58
+	rotate: 90
 torso
-  rotate: false
-  xy: 253, 41
-  size: 77, 85
-  orig: 77, 85
-  offset: 0, 0
-  index: -1
+	bounds: 253, 41, 77, 85

@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "Px3F6YZd0YY",
-	"spine": "4.0.05-beta",
+	"hash": "HV648sya8jg",
+	"spine": "4.0.58-beta",
 	"x": -644,
 	"y": -274,
 	"width": 1350.84,
@@ -129,10 +129,12 @@
 		"name": "control-back",
 		"bones": [ "control-back" ],
 		"target": "control",
-		"rotateMix": 0,
-		"translateMix": -1,
-		"scaleMix": 0,
-		"shearMix": 0
+		"mixRotate": 0,
+		"mixX": -1,
+		"mixY": -1,
+		"mixScaleX": 0,
+		"mixScaleY": 0,
+		"mixShearY": 0
 	}
 ],
 "skins": [

@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "wfV4yMsG1EU",
-	"spine": "4.0.05-beta",
+	"hash": "1WHGXJIHCvk",
+	"spine": "4.0.58-beta",
 	"x": -208.76,
 	"y": 119.41,
 	"width": 414.65,
@@ -124,42 +124,42 @@
 	"bounce": {
 		"slots": {
 			"star": {
-				"color": [
+				"rgba": [
 					{ "color": "ffffff00" },
 					{ "time": 0.5667, "color": "ffffffff" },
 					{ "time": 0.7, "color": "ffffff00" }
 				]
 			},
 			"star1": {
-				"color": [
+				"rgba": [
 					{ "time": 0.2667, "color": "fff9f600" },
 					{ "time": 0.8333, "color": "ffffffff" },
 					{ "time": 0.9667, "color": "fff0f200" }
 				]
 			},
 			"star2": {
-				"color": [
+				"rgba": [
 					{ "time": 0.1333, "color": "ffffff00" },
 					{ "time": 0.7, "color": "ffffffff" },
 					{ "time": 0.8333, "color": "ffffff00" }
 				]
 			},
 			"star3": {
-				"color": [
+				"rgba": [
 					{ "time": 0.4333, "color": "ffffff00" },
 					{ "time": 1, "color": "ffffffff" },
 					{ "time": 1.1333, "color": "ffffff00" }
 				]
 			},
 			"star4": {
-				"color": [
+				"rgba": [
 					{ "time": 0.6333, "color": "ffffff00" },
 					{ "time": 1.2, "color": "ffffffff" },
 					{ "time": 1.3333, "color": "ffffff00" }
 				]
 			},
 			"star5": {
-				"color": [
+				"rgba": [
 					{ "color": "ffffff9e" },
 					{ "time": 0.2333, "color": "ffffffff" },
 					{ "time": 0.3667, "color": "ffffff00", "curve": "stepped" },
@@ -168,7 +168,7 @@
 				]
 			},
 			"star6": {
-				"color": [
+				"rgba": [
 					{ "color": "ffffffff", "curve": "stepped" },
 					{ "time": 0.2667, "color": "ffffffff" },
 					{ "time": 0.4333, "color": "ffffff00", "curve": "stepped" },
@@ -177,14 +177,14 @@
 				]
 			},
 			"star7": {
-				"color": [
+				"rgba": [
 					{ "time": 0.6667, "color": "ffffff00" },
 					{ "time": 1.2333, "color": "ffffffff" },
 					{ "time": 1.3667, "color": "ffffff00" }
 				]
 			},
 			"star8": {
-				"color": [
+				"rgba": [
 					{ "color": "ffffffbe" },
 					{ "time": 0.1333, "color": "ffffffff" },
 					{ "time": 0.2667, "color": "ffffff00", "curve": "stepped" },
@@ -193,7 +193,7 @@
 				]
 			},
 			"star9": {
-				"color": [
+				"rgba": [
 					{ "color": "ffffffff" },
 					{ "time": 0.1333, "color": "ffffff00", "curve": "stepped" },
 					{ "time": 0.8333, "color": "ffffff00" },
@@ -449,49 +449,49 @@
 					{
 						"x": 1.239,
 						"y": 0.71,
-						"curve": [ 0.067, 1.24, 0.1, 0.9, 0.067, 0.71, 0.1, 1.14 ]
+						"curve": [ 0.067, 1.238, 0.1, 0.897, 0.067, 0.712, 0.1, 1.136 ]
 					},
 					{
 						"time": 0.1333,
 						"x": 0.897,
 						"y": 1.136,
-						"curve": [ 0.183, 0.9, 0.311, 1.16, 0.183, 1.14, 0.311, 0.88 ]
+						"curve": [ 0.183, 0.897, 0.311, 1.165, 0.183, 1.136, 0.311, 0.877 ]
 					},
 					{
 						"time": 0.3333,
 						"x": 1.397,
 						"y": 0.651,
-						"curve": [ 0.367, 1.4, 0.433, 0.9, 0.367, 0.65, 0.433, 1.14 ]
+						"curve": [ 0.367, 1.397, 0.433, 0.897, 0.367, 0.651, 0.433, 1.136 ]
 					},
 					{
 						"time": 0.4667,
 						"x": 0.897,
 						"y": 1.136,
-						"curve": [ 0.525, 0.9, 0.642, 1.24, 0.525, 1.14, 0.642, 0.71 ]
+						"curve": [ 0.525, 0.897, 0.642, 1.239, 0.525, 1.136, 0.642, 0.71 ]
 					},
 					{
 						"time": 0.7,
 						"x": 1.239,
 						"y": 0.71,
-						"curve": [ 0.733, 1.24, 0.8, 0.9, 0.733, 0.71, 0.8, 1.14 ]
+						"curve": [ 0.733, 1.239, 0.8, 0.897, 0.733, 0.71, 0.8, 1.136 ]
 					},
 					{
 						"time": 0.8333,
 						"x": 0.897,
 						"y": 1.136,
-						"curve": [ 0.883, 0.9, 1.011, 1.16, 0.883, 1.14, 1.011, 0.88 ]
+						"curve": [ 0.883, 0.897, 1.011, 1.165, 0.883, 1.136, 1.011, 0.877 ]
 					},
 					{
 						"time": 1.0333,
 						"x": 1.397,
 						"y": 0.651,
-						"curve": [ 1.067, 1.4, 1.133, 0.9, 1.067, 0.65, 1.133, 1.14 ]
+						"curve": [ 1.067, 1.397, 1.133, 0.897, 1.067, 0.651, 1.133, 1.136 ]
 					},
 					{
 						"time": 1.1667,
 						"x": 0.897,
 						"y": 1.136,
-						"curve": [ 1.225, 0.9, 1.342, 1.24, 1.225, 1.14, 1.342, 0.71 ]
+						"curve": [ 1.225, 0.897, 1.342, 1.239, 1.225, 1.136, 1.342, 0.71 ]
 					},
 					{ "time": 1.4, "x": 1.239, "y": 0.71 }
 				]

@@ -1,195 +1,66 @@
-
 alien.png
-size: 1024,1024
-format: RGBA8888
-filter: Linear,Linear
-repeat: none
+	size: 1024, 1024
+	filter: Linear, Linear
 back-foot
-  rotate: false
-  xy: 1013, 577
-  size: 8, 6
-  orig: 8, 6
-  offset: 0, 0
-  index: -1
+	bounds: 1013, 577, 8, 6
 back-shin
-  rotate: false
-  xy: 712, 387
-  size: 21, 24
-  orig: 21, 24
-  offset: 0, 0
-  index: -1
+	bounds: 712, 387, 21, 24
 back-thigh
-  rotate: false
-  xy: 971, 135
-  size: 24, 24
-  orig: 24, 24
-  offset: 0, 0
-  index: -1
+	bounds: 971, 135, 24, 24
 backarmor
-  rotate: true
-  xy: 159, 61
-  size: 81, 91
-  orig: 81, 91
-  offset: 0, 0
-  index: -1
+	bounds: 159, 61, 81, 91
+	rotate: 90
 blown-up-neck
-  rotate: false
-  xy: 252, 90
-  size: 77, 52
-  orig: 77, 52
-  offset: 0, 0
-  index: -1
+	bounds: 252, 90, 77, 52
 body
-  rotate: true
-  xy: 516, 2
-  size: 98, 118
-  orig: 98, 118
-  offset: 0, 0
-  index: -1
+	bounds: 516, 2, 98, 118
+	rotate: 90
 burst01
-  rotate: true
-  xy: 2, 48
-  size: 143, 155
-  orig: 143, 155
-  offset: 0, 0
-  index: -1
+	bounds: 2, 48, 143, 155
+	rotate: 90
 burst02
-  rotate: false
-  xy: 207, 144
-  size: 156, 181
-  orig: 156, 181
-  offset: 0, 0
-  index: -1
+	bounds: 207, 144, 156, 181
 burst03-bg
-  rotate: false
-  xy: 735, 356
-  size: 276, 227
-  orig: 276, 227
-  offset: 0, 0
-  index: -1
+	bounds: 735, 356, 276, 227
 burst03-fg
-  rotate: false
-  xy: 371, 190
-  size: 339, 221
-  orig: 339, 221
-  offset: 0, 0
-  index: -1
+	bounds: 371, 190, 339, 221
 eye
-  rotate: false
-  xy: 252, 13
-  size: 75, 75
-  orig: 75, 75
-  offset: 0, 0
-  index: -1
+	bounds: 252, 13, 75, 75
 eye-highlight
-  rotate: false
-  xy: 1000, 166
-  size: 22, 22
-  orig: 22, 22
-  offset: 0, 0
-  index: -1
+	bounds: 1000, 166, 22, 22
 eye-pupil
-  rotate: false
-  xy: 712, 367
-  size: 18, 18
-  orig: 18, 18
-  offset: 0, 0
-  index: -1
+	bounds: 712, 367, 18, 18
 eye-stalk
-  rotate: true
-  xy: 640, 114
-  size: 74, 66
-  orig: 74, 66
-  offset: 0, 0
-  index: -1
+	bounds: 640, 114, 74, 66
+	rotate: 90
 front-foot
-  rotate: true
-  xy: 1013, 565
-  size: 10, 6
-  orig: 10, 6
-  offset: 0, 0
-  index: -1
+	bounds: 1013, 565, 10, 6
+	rotate: 90
 front-lower-arm
-  rotate: true
-  xy: 640, 57
-  size: 55, 63
-  orig: 55, 63
-  offset: 0, 0
-  index: -1
+	bounds: 640, 57, 55, 63
+	rotate: 90
 front-shin
-  rotate: true
-  xy: 971, 190
-  size: 25, 28
-  orig: 25, 28
-  offset: 0, 0
-  index: -1
+	bounds: 971, 190, 25, 28
+	rotate: 90
 front-thigh
-  rotate: false
-  xy: 971, 161
-  size: 27, 27
-  orig: 27, 27
-  offset: 0, 0
-  index: -1
+	bounds: 971, 161, 27, 27
 front-upper-arm
-  rotate: true
-  xy: 971, 217
-  size: 57, 28
-  orig: 57, 28
-  offset: 0, 0
-  index: -1
+	bounds: 971, 217, 57, 28
+	rotate: 90
 head
-  rotate: false
-  xy: 365, 52
-  size: 149, 136
-  orig: 149, 136
-  offset: 0, 0
-  index: -1
+	bounds: 365, 52, 149, 136
 lower-back-arm
-  rotate: false
-  xy: 971, 308
-  size: 51, 46
-  orig: 51, 46
-  offset: 0, 0
-  index: -1
+	bounds: 971, 308, 51, 46
 metaljaw
-  rotate: false
-  xy: 516, 102
-  size: 122, 86
-  orig: 122, 86
-  offset: 0, 0
-  index: -1
+	bounds: 516, 102, 122, 86
 splat01
-  rotate: false
-  xy: 712, 102
-  size: 257, 252
-  orig: 257, 252
-  offset: 0, 0
-  index: -1
+	bounds: 712, 102, 257, 252
 splat01-fg
-  rotate: false
-  xy: 2, 193
-  size: 203, 132
-  orig: 203, 132
-  offset: 0, 0
-  index: -1
+	bounds: 2, 193, 203, 132
 splat02
-  rotate: false
-  xy: 2, 327
-  size: 367, 256
-  orig: 367, 256
-  offset: 0, 0
-  index: -1
+	bounds: 2, 327, 367, 256
 splat03
-  rotate: false
-  xy: 371, 413
-  size: 362, 170
-  orig: 362, 170
-  offset: 0, 0
-  index: -1
+	bounds: 371, 413, 362, 170
 upper-back-arm
-  rotate: true
-  xy: 971, 276
-  size: 30, 43
-  orig: 30, 43
-  offset: 0, 0
-  index: -1
+	bounds: 971, 276, 30, 43
+	rotate: 90

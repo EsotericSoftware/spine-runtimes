@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "JOQzRAN+eYU",
-	"spine": "4.0.05-beta",
+	"hash": "tBKgYacI7e4",
+	"spine": "4.0.58-beta",
 	"x": -564.6,
 	"y": -335.4,
 	"width": 1124.2,
@@ -926,7 +926,7 @@
 	"animation": {
 		"slots": {
 			"heat": {
-				"color": [
+				"rgba": [
 					{ "color": "ffffff00" },
 					{ "time": 1, "color": "ffffffff", "curve": "stepped" },
 					{ "time": 4, "color": "ffffffff" },
@@ -934,7 +934,7 @@
 				]
 			},
 			"heat2": {
-				"color": [
+				"rgba": [
 					{ "time": 0.3333, "color": "ffffffff" },
 					{ "time": 1.6667, "color": "ffffff00", "curve": "stepped" },
 					{ "time": 1.7, "color": "ffffff00" },
@@ -942,7 +942,7 @@
 				]
 			},
 			"heat3": {
-				"color": [
+				"rgba": [
 					{ "time": 2.0333, "color": "ffffffff" },
 					{ "time": 3.3333, "color": "ffffff00", "curve": "stepped" },
 					{ "time": 3.3667, "color": "ffffff00" },

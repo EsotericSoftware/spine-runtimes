@@ -1,55 +1,18 @@
-
 coin.png
-size: 1024,1024
-format: RGBA8888
-filter: Linear,Linear
-repeat: none
+	size: 1024, 1024
+	filter: Linear, Linear
 coin-front-logo
-  rotate: false
-  xy: 2, 570
-  size: 305, 302
-  orig: 305, 302
-  offset: 0, 0
-  index: -1
+	bounds: 2, 570, 305, 302
 coin-front-shine-logo
-  rotate: false
-  xy: 2, 286
-  size: 282, 282
-  orig: 282, 282
-  offset: 0, 0
-  index: -1
+	bounds: 2, 286, 282, 282
 coin-front-shine-spineboy
-  rotate: false
-  xy: 305, 283
-  size: 282, 282
-  orig: 282, 282
-  offset: 0, 0
-  index: -1
+	bounds: 305, 283, 282, 282
 coin-front-spineboy
-  rotate: true
-  xy: 309, 567
-  size: 305, 302
-  orig: 305, 302
-  offset: 0, 0
-  index: -1
+	bounds: 309, 567, 305, 302
+	rotate: 90
 coin-side-round
-  rotate: false
-  xy: 2, 2
-  size: 144, 282
-  orig: 144, 282
-  offset: 0, 0
-  index: -1
+	bounds: 2, 2, 144, 282
 coin-side-straight
-  rotate: false
-  xy: 286, 286
-  size: 17, 282
-  orig: 17, 282
-  offset: 0, 0
-  index: -1
+	bounds: 286, 286, 17, 282
 shine
-  rotate: false
-  xy: 148, 39
-  size: 72, 245
-  orig: 72, 245
-  offset: 0, 0
-  index: -1
+	bounds: 148, 39, 72, 245

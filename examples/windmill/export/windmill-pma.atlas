@@ -1,188 +1,68 @@
-
 windmill-pma.png
-size: 1024,512
-format: RGBA8888
-filter: Linear,Linear
-repeat: none
+	size: 1024, 512
+	filter: Linear, Linear
+	pma: true
 bush1
-  rotate: false
-  xy: 398, 8
-  size: 56, 38
-  orig: 56, 38
-  offset: 0, 0
-  index: -1
+	bounds: 398, 8, 56, 38
 bush2
-  rotate: true
-  xy: 558, 85
-  size: 67, 45
-  orig: 67, 45
-  offset: 0, 0
-  index: -1
+	bounds: 558, 85, 67, 45
+	rotate: 90
 flower-leaf-back
-  rotate: false
-  xy: 27, 5
-  size: 16, 11
-  orig: 16, 11
-  offset: 0, 0
-  index: -1
+	bounds: 27, 5, 16, 11
 flower-leaf-front
-  rotate: false
-  xy: 45, 5
-  size: 16, 11
-  orig: 16, 11
-  offset: 0, 0
-  index: -1
+	bounds: 45, 5, 16, 11
 flower-shadow
-  rotate: false
-  xy: 2, 7
-  size: 23, 9
-  orig: 23, 9
-  offset: 0, 0
-  index: -1
+	bounds: 2, 7, 23, 9
 flower-stem
-  rotate: true
-  xy: 63, 11
-  size: 5, 27
-  orig: 5, 27
-  offset: 0, 0
-  index: -1
+	bounds: 63, 11, 5, 27
+	rotate: 90
 flower1
-  rotate: true
-  xy: 558, 61
-  size: 22, 19
-  orig: 22, 19
-  offset: 0, 0
-  index: -1
+	bounds: 558, 61, 22, 19
+	rotate: 90
 flower2
-  rotate: true
-  xy: 579, 63
-  size: 20, 17
-  orig: 20, 17
-  offset: 0, 0
-  index: -1
+	bounds: 579, 63, 20, 17
+	rotate: 90
 flower3
-  rotate: false
-  xy: 598, 67
-  size: 15, 16
-  orig: 15, 16
-  offset: 0, 0
-  index: -1
+	bounds: 598, 67, 15, 16
 heat
-  rotate: false
-  xy: 624, 185
-  size: 48, 52
-  orig: 48, 52
-  offset: 0, 0
-  index: -1
+	bounds: 624, 185, 48, 52
 rooster
-  rotate: true
-  xy: 274, 4
-  size: 27, 25
-  orig: 27, 25
-  offset: 0, 0
-  index: -1
+	bounds: 274, 4, 27, 25
+	rotate: 90
 tree1-leaves1
-  rotate: false
-  xy: 605, 99
-  size: 49, 53
-  orig: 49, 53
-  offset: 0, 0
-  index: -1
+	bounds: 605, 99, 49, 53
 tree1-leaves2
-  rotate: false
-  xy: 640, 47
-  size: 48, 50
-  orig: 48, 50
-  offset: 0, 0
-  index: -1
+	bounds: 640, 47, 48, 50
 tree1-leaves3
-  rotate: true
-  xy: 500, 3
-  size: 43, 42
-  orig: 43, 42
-  offset: 0, 0
-  index: -1
+	bounds: 500, 3, 43, 42
+	rotate: 90
 tree1-leaves4
-  rotate: true
-  xy: 544, 3
-  size: 43, 42
-  orig: 43, 42
-  offset: 0, 0
-  index: -1
+	bounds: 544, 3, 43, 42
+	rotate: 90
 tree1-trunk
-  rotate: false
-  xy: 558, 154
-  size: 64, 83
-  orig: 64, 83
-  offset: 0, 0
-  index: -1
+	bounds: 558, 154, 64, 83
 tree2-leaves1
-  rotate: false
-  xy: 588, 8
-  size: 50, 53
-  orig: 50, 53
-  offset: 0, 0
-  index: -1
+	bounds: 588, 8, 50, 53
 tree2-leaves2
-  rotate: false
-  xy: 656, 133
-  size: 48, 50
-  orig: 48, 50
-  offset: 0, 0
-  index: -1
+	bounds: 656, 133, 48, 50
 tree2-leaves3
-  rotate: true
-  xy: 456, 2
-  size: 44, 42
-  orig: 44, 42
-  offset: 0, 0
-  index: -1
+	bounds: 456, 2, 44, 42
+	rotate: 90
 tree2-leaves4
-  rotate: true
-  xy: 640, 2
-  size: 43, 42
-  orig: 43, 42
-  offset: 0, 0
-  index: -1
+	bounds: 640, 2, 43, 42
+	rotate: 90
 tree2-leaves5
-  rotate: false
-  xy: 684, 3
-  size: 42, 42
-  orig: 42, 42
-  offset: 0, 0
-  index: -1
+	bounds: 684, 3, 42, 42
 tree2-trunk
-  rotate: true
-  xy: 301, 7
-  size: 39, 95
-  orig: 39, 95
-  offset: 0, 0
-  index: -1
+	bounds: 301, 7, 39, 95
+	rotate: 90
 windmill-base
-  rotate: false
-  xy: 2, 48
-  size: 554, 462
-  orig: 554, 462
-  offset: 0, 0
-  index: -1
+	bounds: 2, 48, 554, 462
 windmill-blades
-  rotate: true
-  xy: 558, 239
-  size: 271, 270
-  orig: 271, 270
-  offset: 0, 0
-  index: -1
+	bounds: 558, 239, 271, 270
+	rotate: 90
 windmill-blades-wood-h
-  rotate: false
-  xy: 2, 33
-  size: 271, 13
-  orig: 271, 13
-  offset: 0, 0
-  index: -1
+	bounds: 2, 33, 271, 13
 windmill-blades-wood-v
-  rotate: true
-  xy: 2, 18
-  size: 13, 270
-  orig: 13, 270
-  offset: 0, 0
-  index: -1
+	bounds: 2, 18, 13, 270
+	rotate: 90
