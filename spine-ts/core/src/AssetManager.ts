@@ -122,25 +122,37 @@ module spine {
 
 		loadTexture (path: string,
 			success: (path: string, image: HTMLImageElement) => void = null,
-			error: (path: string, error: string) => void = null) {
+			error: (path: string, error: string) => void = null,
+			bitmapOptions: object = null) {
 			path = this.pathPrefix + path;
 			let storagePath = path;
 			this.toLoad++;
 			let img = new Image();
+
 			img.crossOrigin = "anonymous";
 			img.onload = (ev) => {
-				let texture = this.textureLoader(img);
-				this.assets[storagePath] = texture;
-				this.toLoad--;
-				this.loaded++;
-				if (success) success(path, img);
-			}
+				if (bitmapOptions) {
+					var this_  = this;
+					createImageBitmap(img, bitmapOptions).then(function(sprite: any) {
+						this_.assets[storagePath] = this_.textureLoader(sprite);
+						this_.toLoad--;
+						this_.loaded++;
+						if (success) success(path, img);
+					}.bind(this_));
+				}
+				else {
+					this.assets[storagePath] = this.textureLoader(img);
+					this.toLoad--;
+					this.loaded++;
+					if (success) success(path, img);
+				}
+			};
 			img.onerror = (ev) => {
 				this.errors[path] = `Couldn't load image ${path}`;
 				this.toLoad--;
 				this.loaded++;
 				if (error) error(path, `Couldn't load image ${path}`);
-			}
+			};
 			if (this.rawDataUris[path]) path = this.rawDataUris[path];
 			img.src = path;
 		}

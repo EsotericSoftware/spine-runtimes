@@ -6,6 +6,8 @@ var __extends = (this && this.__extends) || (function () {
 		return extendStatics(d, b);
 	};
 	return function (d, b) {
+		if (typeof b !== "function" && b !== null)
+			throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
 		d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -2266,22 +2268,34 @@ var spine;
 				_this.loaded++;
 			});
 		};
-		AssetManager.prototype.loadTexture = function (path, success, error) {
+		AssetManager.prototype.loadTexture = function (path, success, error, bitmapOptions) {
 			var _this = this;
 			if (success === void 0) { success = null; }
 			if (error === void 0) { error = null; }
+			if (bitmapOptions === void 0) { bitmapOptions = null; }
 			path = this.pathPrefix + path;
 			var storagePath = path;
 			this.toLoad++;
 			var img = new Image();
 			img.crossOrigin = "anonymous";
 			img.onload = function (ev) {
-				var texture = _this.textureLoader(img);
-				_this.assets[storagePath] = texture;
-				_this.toLoad--;
-				_this.loaded++;
-				if (success)
-					success(path, img);
+				if (bitmapOptions) {
+					var this_ = _this;
+					createImageBitmap(img, bitmapOptions).then(function (sprite) {
+						this_.assets[storagePath] = this_.textureLoader(sprite);
+						this_.toLoad--;
+						this_.loaded++;
+						if (success)
+							success(path, img);
+					}.bind(this_));
+				}
+				else {
+					_this.assets[storagePath] = _this.textureLoader(img);
+					_this.toLoad--;
+					_this.loaded++;
+					if (success)
+						success(path, img);
+				}
 			};
 			img.onerror = function (ev) {
 				_this.errors[path] = "Couldn't load image " + path;
