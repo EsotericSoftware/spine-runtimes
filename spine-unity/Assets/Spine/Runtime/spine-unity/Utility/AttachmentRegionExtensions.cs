@@ -95,6 +95,7 @@ namespace Spine.Unity.AttachmentTools {
 			attachment.RegionU2 = region.u2;
 			attachment.RegionV2 = region.v2;
 			attachment.RegionRotate = region.rotate;
+			attachment.RegionDegrees = region.degrees;
 			attachment.regionOffsetX = region.offsetX;
 			attachment.regionOffsetY = region.offsetY;
 			attachment.regionWidth = region.width;
