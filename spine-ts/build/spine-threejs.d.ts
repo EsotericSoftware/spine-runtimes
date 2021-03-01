@@ -390,7 +390,7 @@ declare module spine {
 		private toLoad;
 		private loaded;
 		private rawDataUris;
-		constructor(textureLoader: (image: HTMLImageElement) => any, pathPrefix?: string);
+		constructor(textureLoader: (image: HTMLImageElement | ImageBitmap) => any, pathPrefix?: string);
 		private downloadText;
 		private downloadBinary;
 		setRawDataURI(path: string, data: string): void;

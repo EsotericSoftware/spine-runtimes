@@ -2279,7 +2279,9 @@ var spine;
 			var img = new Image();
 			img.crossOrigin = "anonymous";
 			img.onload = function (ev) {
-				if (bitmapOptions) {
+				if (bitmapOptions &&
+					!(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) &&
+					!(navigator.userAgent.toLowerCase().indexOf('Trident') > -1)) {
 					var this_ = _this;
 					createImageBitmap(img, bitmapOptions).then(function (sprite) {
 						this_.assets[storagePath] = this_.textureLoader(sprite);

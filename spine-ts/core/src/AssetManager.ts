@@ -30,14 +30,14 @@
 module spine {
 	export class AssetManager implements Disposable {
 		private pathPrefix: string;
-		private textureLoader: (image: HTMLImageElement) => any;
+		private textureLoader: (image: HTMLImageElement | ImageBitmap) => any;
 		private assets: Map<any> = {};
 		private errors: Map<string> = {};
 		private toLoad = 0;
 		private loaded = 0;
 		private rawDataUris: Map<string> = {};
 
-		constructor (textureLoader: (image: HTMLImageElement) => any, pathPrefix: string = "") {
+		constructor (textureLoader: (image: HTMLImageElement | ImageBitmap) => any, pathPrefix: string = "") {
 			this.textureLoader = textureLoader;
 			this.pathPrefix = pathPrefix;
 		}
@@ -131,8 +131,12 @@ module spine {
 
 			img.crossOrigin = "anonymous";
 			img.onload = (ev) => {
-				if (bitmapOptions) {
+				// if not in Firefox and not in IE and bitmapOptions call createImageBitmap
+				if (bitmapOptions &&
+				    !(navigator.userAgent.toLowerCase().indexOf('firefox') > -1) &&
+				    !(navigator.userAgent.toLowerCase().indexOf('Trident') > -1) ) {
 					var this_  = this;
+
 					createImageBitmap(img, bitmapOptions).then(function(sprite: any) {
 						this_.assets[storagePath] = this_.textureLoader(sprite);
 						this_.toLoad--;
