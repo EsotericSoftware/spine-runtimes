@@ -445,9 +445,9 @@ UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/Dragon
 cp -f ../dragon/export/dragon-ess.json "$UNITY_TARGET_DIR/dragon.json"
 cp -f ../dragon/export/dragon-pma.atlas "$UNITY_TARGET_DIR/dragon.atlas.txt"
 sed -i 's/dragon-pma.png/dragon.png/g' "$UNITY_TARGET_DIR/dragon.atlas.txt"
-sed -i 's/dragon-pma2.png/dragon2.png/g' "$UNITY_TARGET_DIR/dragon.atlas.txt"
+sed -i 's/dragon-pma_2.png/dragon2.png/g' "$UNITY_TARGET_DIR/dragon.atlas.txt"
 cp -f ../dragon/export/dragon-pma.png "$UNITY_TARGET_DIR/dragon.png"
-cp -f ../dragon/export/dragon-pma2.png "$UNITY_TARGET_DIR/dragon2.png"
+cp -f ../dragon/export/dragon-pma_2.png "$UNITY_TARGET_DIR/dragon2.png"
 
 UNITY_TARGET_DIR="$ROOT/spine-unity/Assets/Spine Examples/Spine Skeletons/Goblins"
 cp -f ../goblins/export/goblins-pro.json "$UNITY_TARGET_DIR/goblins.json"
