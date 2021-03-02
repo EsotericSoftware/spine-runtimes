@@ -36,6 +36,7 @@
 #include <spine/MixDirection.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
+#include <spine/Property.h>
 
 namespace spine {
 class Timeline;
@@ -79,6 +80,10 @@ class SP_API Animation : public SpineObject {
 
 	friend class TranslateTimeline;
 
+    friend class TranslateXTimeline;
+
+    friend class TranslateYTimeline;
+
 	friend class TwoColorTimeline;
 
 public:
@@ -95,27 +100,22 @@ public:
 
 	Vector<Timeline *> &getTimelines();
 
-	bool hasTimeline(int id);
+	bool hasTimeline(Vector<PropertyId> ids);
 
 	float getDuration();
 
 	void setDuration(float inValue);
 
-
-
 private:
 	Vector<Timeline *> _timelines;
-	HashMap<int, bool> _timelineIds;
+	HashMap<PropertyId, bool> _timelineIds;
 	float _duration;
 	String _name;
 
 	/// @param target After the first and before the last entry.
-	static int binarySearch(Vector<float> &values, float target, int step);
+	static int search(Vector<float> &values, float target);
 
-	/// @param target After the first and before the last entry.
-	static int binarySearch(Vector<float> &values, float target);
-
-	static int linearSearch(Vector<float> &values, float target, int step);
+	static int search(Vector<float> &values, float target, int step);
 };
 }
 

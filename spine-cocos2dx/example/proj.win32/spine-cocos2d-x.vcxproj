@@ -286,7 +286,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\String.h" />
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\TextureLoader.h" />
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\Timeline.h" />
-    <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\TimelineType.h" />
+    <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\Property.h" />
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\TransformConstraint.h" />
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\TransformConstraintData.h" />
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\TransformConstraintTimeline.h" />

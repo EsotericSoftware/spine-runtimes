@@ -103,8 +103,8 @@ void RegionAttachment::updateOffset() {
 	_vertexOffset[BRY] = localYCos + localX2Sin;
 }
 
-void RegionAttachment::setUVs(float u, float v, float u2, float v2, bool rotate) {
-	if (rotate) {
+void RegionAttachment::setUVs(float u, float v, float u2, float v2, float degrees) {
+	if (degrees == 90) {
 		_uvs[URX] = u;
 		_uvs[URY] = v2;
 		_uvs[BRX] = u;

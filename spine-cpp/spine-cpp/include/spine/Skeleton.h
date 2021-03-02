@@ -82,11 +82,21 @@ class SP_API Skeleton : public SpineObject {
 
 	friend class ScaleTimeline;
 
+    friend class ScaleXTimeline;
+
+    friend class ScaleYTimeline;
+
 	friend class ShearTimeline;
 
 	friend class TransformConstraintTimeline;
 
+    friend class RotateTimeline;
+
 	friend class TranslateTimeline;
+
+    friend class TranslateXTimeline;
+
+    friend class TranslateYTimeline;
 
 	friend class TwoColorTimeline;
 
@@ -103,6 +113,8 @@ public:
 
 	/// Updates the world transform for each bone and applies constraints.
 	void updateWorldTransform();
+
+	void updateWorldTransform(Bone* parent);
 
 	/// Sets the bones, constraints, and slots to their setup pose values.
 	void setToSetupPose();
@@ -217,7 +229,6 @@ private:
 	Vector<TransformConstraint *> _transformConstraints;
 	Vector<PathConstraint *> _pathConstraints;
 	Vector<Updatable *> _updateCache;
-	Vector<Bone *> _updateCacheReset;
 	Skin *_skin;
 	Color _color;
 	float _time;

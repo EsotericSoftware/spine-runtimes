@@ -157,8 +157,7 @@ void VertexAttachment::setDeformAttachment(VertexAttachment* attachment) {
 
 int VertexAttachment::getNextID() {
 	static int nextID = 0;
-
-	return (nextID++ & 65535) << 11;
+	return nextID++;
 }
 
 void VertexAttachment::copyTo(VertexAttachment* other) {

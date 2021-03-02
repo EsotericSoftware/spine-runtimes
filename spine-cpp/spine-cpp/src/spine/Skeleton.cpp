@@ -134,7 +134,6 @@ Skeleton::~Skeleton() {
 
 void Skeleton::updateCache() {
 	_updateCache.clear();
-	_updateCacheReset.clear();
 
 	for (size_t i = 0, n = _bones.size(); i < n; ++i) {
 		Bone* bone = _bones[i];
@@ -213,22 +212,34 @@ void Skeleton::printUpdateCache() {
 }
 
 void Skeleton::updateWorldTransform() {
-	for (size_t i = 0, n = _updateCacheReset.size(); i < n; ++i) {
-		Bone *boneP = _updateCacheReset[i];
-		Bone &bone = *boneP;
-		bone._ax = bone._x;
-		bone._ay = bone._y;
-		bone._arotation = bone._rotation;
-		bone._ascaleX = bone._scaleX;
-		bone._ascaleY = bone._scaleY;
-		bone._ashearX = bone._shearX;
-		bone._ashearY = bone._shearY;
-		bone._appliedValid = true;
-	}
-
 	for (size_t i = 0, n = _updateCache.size(); i < n; ++i) {
 		_updateCache[i]->update();
 	}
+}
+
+void Skeleton::updateWorldTransform(Bone* parent) {
+    // Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
+    Bone& rootBone = *getRootBone();
+    float pa = parent->_a, pb = parent->_b, pc = parent->_c, pd = parent->_d;
+    rootBone._worldX = pa * _x + pb * _y + parent->_worldX;
+    rootBone._worldY = pc * _x + pd * _y + parent->_worldY;
+
+    float rotationY = rootBone._rotation + 90 + rootBone._shearY;
+    float la = MathUtil::cosDeg(rootBone._rotation + rootBone._shearX) * rootBone._scaleX;
+    float lb = MathUtil::cosDeg(rotationY) * rootBone._scaleY;
+    float lc = MathUtil::sinDeg(rootBone._rotation + rootBone._shearX) * rootBone._scaleX;
+    float ld = MathUtil::sinDeg(rotationY) * rootBone._scaleY;
+    rootBone._a = (pa * la + pb * lc) * _scaleX;
+    rootBone._b = (pa * lb + pb * ld) * _scaleX;
+    rootBone._c = (pc * la + pd * lc) * _scaleY;
+    rootBone._d = (pc * lb + pd * ld) * _scaleY;
+
+    // Update everything except root bone.
+    Bone *rb = getRootBone();
+    for (size_t i = 0, n = _updateCache.size(); i < n; i++) {
+        Updatable *updatable = _updateCache[i];
+        if (updatable != rb) updatable->update();
+    }
 }
 
 void Skeleton::setToSetupPose() {
@@ -257,10 +268,12 @@ void Skeleton::setBonesToSetupPose() {
 		TransformConstraint &constraint = *constraintP;
 		TransformConstraintData &constraintData = constraint._data;
 
-		constraint._rotateMix = constraintData._rotateMix;
-		constraint._translateMix = constraintData._translateMix;
-		constraint._scaleMix = constraintData._scaleMix;
-		constraint._shearMix = constraintData._shearMix;
+		constraint._mixRotate = constraintData._mixRotate;
+		constraint._mixX = constraintData._mixX;
+		constraint._mixY = constraintData._mixY;
+		constraint._mixScaleX = constraintData._mixScaleX;
+		constraint._mixScaleY = constraintData._mixScaleY;
+        constraint._mixShearY = constraintData._mixShearY;
 	}
 
 	for (size_t i = 0, n = _pathConstraints.size(); i < n; ++i) {
@@ -270,8 +283,9 @@ void Skeleton::setBonesToSetupPose() {
 
 		constraint._position = constraintData._position;
 		constraint._spacing = constraintData._spacing;
-		constraint._rotateMix = constraintData._rotateMix;
-		constraint._translateMix = constraintData._translateMix;
+		constraint._mixRotate = constraintData._mixRotate;
+        constraint._mixX = constraintData._mixX;
+        constraint._mixY = constraintData._mixY;
 	}
 }
 
@@ -563,15 +577,18 @@ void Skeleton::sortIkConstraint(IkConstraint *constraint) {
 	Bone *parent = constrained[0];
 	sortBone(parent);
 
-	if (constrained.size() > 1) {
-		Bone *child = constrained[constrained.size() - 1];
-		if (!_updateCache.contains(child)) _updateCacheReset.add(child);
+	if (constrained.size() == 1) {
+	    _updateCache.add(constraint);
+	    sortReset(parent->_children);
+	} else {
+        Bone* child = constrained[constrained.size() - 1];
+        sortBone(child);
+
+        _updateCache.add(constraint);
+
+        sortReset(parent->_children);
+        child->_sorted = true;
 	}
-
-	_updateCache.add(constraint);
-
-	sortReset(parent->getChildren());
-	constrained[constrained.size() - 1]->_sorted = true;
 }
 
 void Skeleton::sortPathConstraint(PathConstraint *constraint) {
@@ -617,7 +634,7 @@ void Skeleton::sortTransformConstraint(TransformConstraint *constraint) {
 		for (size_t i = 0; i < boneCount; i++) {
 			Bone *child = constrained[i];
 			sortBone(child->getParent());
-			if (!_updateCache.contains(child)) _updateCacheReset.add(child);
+			sortBone(child);
 		}
 	} else {
 		for (size_t i = 0; i < boneCount; ++i) {

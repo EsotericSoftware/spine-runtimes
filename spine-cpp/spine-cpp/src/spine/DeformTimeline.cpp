@@ -39,7 +39,7 @@
 #include <spine/VertexAttachment.h>
 
 #include <spine/Animation.h>
-#include <spine/TimelineType.h>
+#include <spine/Property.h>
 #include <spine/Slot.h>
 #include <spine/Bone.h>
 #include <spine/SlotData.h>

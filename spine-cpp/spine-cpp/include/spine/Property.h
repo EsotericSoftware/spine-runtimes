@@ -27,27 +27,32 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_TimelineType_h
-#define Spine_TimelineType_h
+#ifndef Spine_Property_h
+#define Spine_Property_h
 
 namespace spine {
-enum TimelineType {
-	TimelineType_Rotate = 0,
-	TimelineType_Translate,
-	TimelineType_Scale,
-	TimelineType_Shear,
-	TimelineType_Attachment,
-	TimelineType_Color,
-	TimelineType_Deform,
-	TimelineType_Event,
-	TimelineType_DrawOrder,
-	TimelineType_IkConstraint,
-	TimelineType_TransformConstraint,
-	TimelineType_PathConstraintPosition,
-	TimelineType_PathConstraintSpacing,
-	TimelineType_PathConstraintMix,
-	TimelineType_TwoColor
+typedef long long PropertyId;
+enum Property {
+	Property_Rotate = 1 << 0,
+    Property_X = 1 << 1,
+    Property_Y = 1 << 2,
+    Property_ScaleX = 1 << 3,
+    Property_ScaleY = 1 << 4,
+    Property_ShearX = 1 << 5,
+    Property_ShearY = 1 << 6,
+    Property_Rgb = 1 << 7,
+    Property_Alpha = 1 << 8,
+    Property_Rgb2 = 1 << 9,
+    Property_Attachment = 1 << 10,
+    Property_Deform = 1 << 11,
+    Property_Event = 1 << 12,
+    Property_DrawOrder = 1 << 13,
+    Property_IkConstraint = 1 << 14,
+    Property_TransformConstraint = 1 << 15,
+    Property_PathConstraintPosition = 1 << 16,
+    Property_PathConstraintSpacing = 1 << 17,
+    Property_OathConstraintMix = 1 << 18
 };
 }
 
-#endif /* Spine_TimelineType_h */
+#endif /* Spine_Property_h */

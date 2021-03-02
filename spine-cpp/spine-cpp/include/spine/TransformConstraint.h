@@ -48,8 +48,6 @@ namespace spine {
 	public:
 		TransformConstraint(TransformConstraintData& data, Skeleton& skeleton);
 
-		void apply();
-
 		virtual void update();
 
 		virtual int getOrder();
@@ -61,17 +59,23 @@ namespace spine {
 		Bone* getTarget();
 		void setTarget(Bone* inValue);
 
-		float getRotateMix();
-		void setRotateMix(float inValue);
+		float getMixRotate();
+		void setMixRotate(float inValue);
 
-		float getTranslateMix();
-		void setTranslateMix(float inValue);
+		float getMixX();
+		void setMixX(float inValue);
 
-		float getScaleMix();
-		void setScaleMix(float inValue);
+		float getMixY();
+		void setMixY(float inValue);
 
-		float getShearMix();
-		void setShearMix(float inValue);
+		float getMixScaleX();
+		void setMixScaleX(float inValue);
+
+        float getMixScaleY();
+        void setMixScaleY(float inValue);
+
+        float getMixShearY();
+        void setMixShearY(float inValue);
 
 		bool isActive();
 
@@ -81,8 +85,8 @@ namespace spine {
 		TransformConstraintData& _data;
 		Vector<Bone*> _bones;
 		Bone* _target;
-		float _rotateMix, _translateMix, _scaleMix, _shearMix;
-		bool _active;
+        float _mixRotate, _mixX, _mixY, _mixScaleX, _mixScaleY, _mixShearY;
+        bool _active;
 
 		void applyAbsoluteWorld();
 

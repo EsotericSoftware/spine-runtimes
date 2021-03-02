@@ -54,7 +54,7 @@ namespace spine {
 
 		void updateOffset();
 
-		void setUVs(float u, float v, float u2, float v2, bool rotate);
+		void setUVs(float u, float v, float u2, float v2, float degrees);
 
 		/// Transforms the attachment's four vertices to world coordinates.
 		/// @param bone The parent bone.

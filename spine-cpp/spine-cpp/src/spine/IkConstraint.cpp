@@ -101,10 +101,6 @@ void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY
 	Bone *pp = parent.getParent();
 	float tx, ty, dx, dy, dd, l1, l2, a1, a2, r, td, sd, p;
 	float id, x, y;
-	if (alpha == 0) {
-		child.updateWorldTransform();
-		return;
-	}
 	if (!parent._appliedValid) parent.updateAppliedTransform();
 	if (!child._appliedValid) child.updateAppliedTransform();
 	px = parent._ax;
@@ -268,12 +264,8 @@ IkConstraint::IkConstraint(IkConstraintData &data, Skeleton &skeleton) : Updatab
 	}
 }
 
-/// Applies the constraint to the constrained bones.
-void IkConstraint::apply() {
-	update();
-}
-
 void IkConstraint::update() {
+    if (_mix == 0) return;
 	switch (_bones.size()) {
 	case 1: {
 		Bone *bone0 = _bones[0];

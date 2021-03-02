@@ -95,7 +95,7 @@
 #include <spine/SpineString.h>
 #include <spine/TextureLoader.h>
 #include <spine/Timeline.h>
-#include <spine/TimelineType.h>
+#include <spine/Property.h>
 #include <spine/TransformConstraint.h>
 #include <spine/TransformConstraintData.h>
 #include <spine/TransformConstraintTimeline.h>

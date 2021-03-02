@@ -65,9 +65,17 @@ class SP_API Bone : public Updatable {
 
 	friend class ScaleTimeline;
 
+    friend class ScaleXTimeline;
+
+    friend class ScaleYTimeline;
+
 	friend class ShearTimeline;
 
 	friend class TranslateTimeline;
+
+    friend class TranslateXTimeline;
+
+    friend class TranslateYTimeline;
 
 RTTI_DECL
 

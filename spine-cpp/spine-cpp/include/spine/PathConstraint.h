@@ -65,11 +65,14 @@ namespace spine {
 		float getSpacing();
 		void setSpacing(float inValue);
 
-		float getRotateMix();
-		void setRotateMix(float inValue);
+		float getMixRotate();
+		void setMixRotate(float inValue);
 
-		float getTranslateMix();
-		void setTranslateMix(float inValue);
+        float getMixX();
+        void setMixX(float inValue);
+
+        float getMixY();
+        void setMixY(float inValue);
 
 		Vector<Bone*>& getBones();
 
@@ -91,7 +94,8 @@ namespace spine {
 		PathConstraintData& _data;
 		Vector<Bone*> _bones;
 		Slot* _target;
-		float _position, _spacing, _rotateMix, _translateMix;
+		float _position, _spacing;
+		float _mixRotate, _mixX, _mixY;
 
 		Vector<float> _spaces;
 		Vector<float> _positions;
@@ -102,7 +106,7 @@ namespace spine {
 
 		bool _active;
 
-		Vector<float>& computeWorldPositions(PathAttachment& path, int spacesCount, bool tangents, bool percentPosition, bool percentSpacing);
+		Vector<float>& computeWorldPositions(PathAttachment& path, int spacesCount, bool tangents);
 
 		static void addBeforePosition(float p, Vector<float>& temp, int i, Vector<float>& output, int o);
 

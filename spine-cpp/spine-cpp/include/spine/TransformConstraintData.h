@@ -51,10 +51,12 @@ namespace spine {
 
 		Vector<BoneData*>& getBones();
 		BoneData* getTarget();
-		float getRotateMix();
-		float getTranslateMix();
-		float getScaleMix();
-		float getShearMix();
+        float getMixRotate();
+        float getMixX();
+        float getMixY();
+        float getMixScaleX();
+        float getMixScaleY();
+        float getMixShearY();
 
 		float getOffsetRotation();
 		float getOffsetX();
@@ -69,7 +71,7 @@ namespace spine {
 	private:
 		Vector<BoneData*> _bones;
 		BoneData* _target;
-		float _rotateMix, _translateMix, _scaleMix, _shearMix;
+        float _mixRotate, _mixX, _mixY, _mixScaleX, _mixScaleY, _mixShearY;
 		float _offsetRotation, _offsetX, _offsetY, _offsetScaleX, _offsetScaleY, _offsetShearY;
 		bool _relative, _local;
 	};

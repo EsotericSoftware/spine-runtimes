@@ -39,38 +39,59 @@ namespace spine {
 		RTTI_DECL
 
 	public:
-		explicit CurveTimeline(int frameCount);
+		explicit CurveTimeline(size_t frameCount, size_t frameEntries, size_t bezierCount);
 
 		virtual ~CurveTimeline();
 
-		virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction) = 0;
+		void setLinear(size_t frame);
 
-		virtual int getPropertyId() = 0;
+		void setStepped(size_t frame);
 
-		size_t getFrameCount();
+        void setBezier (size_t bezier, size_t frame, float value, float time1, float value1, float cx1, float cy1, float cx2, float cy2, float time2, float value2);
 
-		void setLinear(size_t frameIndex);
-
-		void setStepped(size_t frameIndex);
-
-		/// Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
-		/// cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
-		/// the difference between the keyframe's values.
-		void setCurve(size_t frameIndex, float cx1, float cy1, float cx2, float cy2);
-
-		float getCurvePercent(size_t frameIndex, float percent);
-
-		float getCurveType(size_t frameIndex);
+        float getBezierValue(float time, size_t frame, size_t valueOffset, size_t i);
 
 	protected:
-		static const float LINEAR;
-		static const float STEPPED;
-		static const float BEZIER;
-		static const int BEZIER_SIZE;
+		static const int LINEAR = 0;
+		static const int STEPPED = 1;
+		static const int BEZIER = 2;
+		static const int BEZIER_SIZE = 18;
 
-	private:
 		Vector<float> _curves; // type, x, y, ...
 	};
+
+    class SP_API CurveTimeline1 : public CurveTimeline {
+        RTTI_DECL
+
+    public:
+        explicit CurveTimeline1(size_t frameCount, size_t bezierCount);
+
+        virtual ~CurveTimeline1();
+
+        void setFrame(size_t frame, float time, float value);
+
+        float getCurveValue(float time);
+    protected:
+        static const int ENTRIES;
+        static const int VALUE;
+    };
+
+    class SP_API CurveTimeline2 : public CurveTimeline {
+        RTTI_DECL
+
+    public:
+        explicit CurveTimeline2(size_t frameCount, size_t bezierCount);
+
+        virtual ~CurveTimeline2();
+
+        void setFrame(size_t frame, float time, float value1, float value2);
+
+        float getCurveValue(float time);
+    protected:
+        static const int ENTRIES;
+        static const int VALUE1;
+        static const int VALUE2;
+    };
 }
 
 #endif /* Spine_CurveTimeline_h */

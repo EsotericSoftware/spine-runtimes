@@ -491,7 +491,7 @@
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\Timeline.h">
       <Filter>spine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\TimelineType.h">
+    <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\Property.h">
       <Filter>spine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\spine-cpp\spine-cpp\include\spine\TransformConstraint.h">

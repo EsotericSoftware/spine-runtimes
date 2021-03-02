@@ -78,11 +78,14 @@ namespace spine {
 		float getSpacing();
 		void setSpacing(float inValue);
 
-		float getRotateMix();
-		void setRotateMix(float inValue);
+		float getMixRotate();
+		void setMixRotate(float inValue);
 
-		float getTranslateMix();
-		void setTranslateMix(float inValue);
+        float getMixX();
+        void setMixX(float inValue);
+
+        float getMixY();
+        void setMixY(float inValue);
 
 	private:
 		Vector<BoneData*> _bones;
@@ -91,7 +94,8 @@ namespace spine {
 		SpacingMode _spacingMode;
 		RotateMode _rotateMode;
 		float _offsetRotation;
-		float _position, _spacing, _rotateMix, _translateMix;
+		float _position, _spacing;
+		float _mixRotate, _mixX, _mixY;
 	};
 }
 

@@ -46,9 +46,17 @@ class SP_API BoneData : public SpineObject {
 
 	friend class ScaleTimeline;
 
+    friend class ScaleXTimeline;
+
+    friend class ScaleYTimeline;
+
 	friend class ShearTimeline;
 
 	friend class TranslateTimeline;
+
+    friend class TranslateXTimeline;
+
+    friend class TranslateYTimeline;
 
 public:
 	BoneData(int index, const String &name, BoneData *parent = NULL);
