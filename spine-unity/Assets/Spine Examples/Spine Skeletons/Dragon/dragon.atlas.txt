@@ -1,4 +1,4 @@
-dragon-pma.png
+dragon.png
 	size: 1024, 1024
 	filter: Linear, Linear
 	pma: true
@@ -87,7 +87,7 @@ tail06
 thiagobrayner
 	bounds: 54, 912, 350, 31
 
-dragon-pma2.png
+dragon2.png
 	size: 1024, 512
 	filter: Linear, Linear
 	pma: true
