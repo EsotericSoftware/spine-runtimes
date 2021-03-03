@@ -34,7 +34,7 @@
 
 namespace spine {
 
-	class SP_API PathConstraintPositionTimeline : public CurveTimeline {
+	class SP_API PathConstraintPositionTimeline : public CurveTimeline1 {
 		friend class SkeletonBinary;
 		friend class SkeletonJson;
 
@@ -43,23 +43,16 @@ namespace spine {
 	public:
 		static const int ENTRIES;
 
-		explicit PathConstraintPositionTimeline(int frameCount);
+		explicit PathConstraintPositionTimeline(size_t frameCount, size_t bezierCount, int pathConstraintIndex);
 
 		virtual ~PathConstraintPositionTimeline();
 
 		virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
 
-		virtual int getPropertyId();
+        int getPathConstraintIndex() { return _pathConstraintIndex; }
 
-		/// Sets the time and value of the specified keyframe.
-		void setFrame(int frameIndex, float time, float value);
-
+        void setPathConstraintIndex(int inValue) { _pathConstraintIndex = inValue; }
 	protected:
-		static const int PREV_TIME;
-		static const int PREV_VALUE;
-		static const int VALUE;
-
-		Vector<float> _frames;
 		int _pathConstraintIndex;
 	};
 }

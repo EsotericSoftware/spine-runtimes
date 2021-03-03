@@ -43,9 +43,15 @@
 
 using namespace spine;
 
-RTTI_IMPL(ShearTimeline, TranslateTimeline)
+RTTI_IMPL(ShearTimeline, CurveTimeline2)
 
-ShearTimeline::ShearTimeline(int frameCount) : TranslateTimeline(frameCount) {
+ShearTimeline::ShearTimeline(size_t frameCount, size_t bezierCount, int boneIndex) : CurveTimeline2(frameCount, bezierCount), _boneIndex(boneIndex) {
+    PropertyId ids[] = { ((PropertyId)Property_ShearX << 32) | boneIndex,
+                         ((PropertyId)Property_ShearY << 32) | boneIndex};
+    setPropertyIds(ids, 2);
+}
+
+ShearTimeline::~ShearTimeline() {
 }
 
 void ShearTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
@@ -55,58 +61,152 @@ void ShearTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
 
-	Bone *boneP = skeleton._bones[_boneIndex];
-	Bone &bone = *boneP;
-	if (!bone._active) return;
+	Bone *bone = skeleton._bones[_boneIndex];
+	if (!bone->_active) return;
 
-	if (time < _frames[0]) {
-		switch (blend) {
-		case MixBlend_Setup:
-			bone._shearX = bone._data._shearX;
-			bone._shearY = bone._data._shearY;
-			return;
-		case MixBlend_First:
-			bone._shearX += (bone._data._shearX - bone._shearX) * alpha;
-			bone._shearY += (bone._data._shearY - bone._shearY) * alpha;
-		default: {}
-		}
-		return;
-	}
+    if (time < _frames[0]) {
+        switch (blend) {
+            case MixBlend_Setup:
+                bone->_shearX = bone->_data._shearX;
+                bone->_shearY = bone->_data._shearY;
+                return;
+            case MixBlend_First:
+                bone->_shearX += (bone->_data._shearX - bone->_shearX) * alpha;
+                bone->_shearY += (bone->_data._shearY - bone->_shearY) * alpha;
+            default: {}
+        }
+        return;
+    }
 
-	float x, y;
-	if (time >= _frames[_frames.size() - ENTRIES]) {
-		// Time is after last frame.
-		x = _frames[_frames.size() + PREV_X];
-		y = _frames[_frames.size() + PREV_Y];
-	} else {
-		// Interpolate between the previous frame and the current frame.
-		int frame = Animation::binarySearch(_frames, time, ENTRIES);
-		x = _frames[frame + PREV_X];
-		y = _frames[frame + PREV_Y];
-		float frameTime = _frames[frame];
-		float percent = getCurvePercent(frame / ENTRIES - 1,
-			1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+    float x, y;
+    int i = Animation::search(_frames, time, CurveTimeline2::ENTRIES);
+    int curveType = (int)_curves[i / CurveTimeline2::ENTRIES];
+    switch (curveType) {
+        case CurveTimeline2::LINEAR: {
+            float before = _frames[i];
+            x = _frames[i + CurveTimeline2::VALUE1];
+            y = _frames[i + CurveTimeline2::VALUE2];
+            float t = (time - before) / (_frames[i + CurveTimeline2::ENTRIES] - before);
+            x += (_frames[i + CurveTimeline2::ENTRIES + CurveTimeline2::VALUE1] - x) * t;
+            y += (_frames[i + CurveTimeline2::ENTRIES + CurveTimeline2::VALUE2] - y) * t;
+            break;
+        }
+        case CurveTimeline2::STEPPED: {
+            x = _frames[i + CurveTimeline2::VALUE1];
+            y = _frames[i + CurveTimeline2::VALUE2];
+            break;
+        }
+        default: {
+            x = getBezierValue(time, i, CurveTimeline2::VALUE1, curveType - CurveTimeline2::BEZIER);
+            y = getBezierValue(time, i, CurveTimeline2::VALUE2,
+                               curveType + CurveTimeline2::BEZIER_SIZE - CurveTimeline2::BEZIER);
+        }
+    }
 
-		x = x + (_frames[frame + X] - x) * percent;
-		y = y + (_frames[frame + Y] - y) * percent;
-	}
-
-	switch (blend) {
-		case MixBlend_Setup:
-			bone._shearX = bone._data._shearX + x * alpha;
-			bone._shearY = bone._data._shearY + y * alpha;
-			break;
-		case MixBlend_First:
-		case MixBlend_Replace:
-			bone._shearX += (bone._data._shearX + x - bone._shearX) * alpha;
-			bone._shearY += (bone._data._shearY + y - bone._shearY) * alpha;
-			break;
-		case MixBlend_Add:
-			bone._shearX += x * alpha;
-			bone._shearY += y * alpha;
-	}
+    switch (blend) {
+        case MixBlend_Setup:
+            bone->_shearX = bone->_data._shearX + x * alpha;
+            bone->_shearY = bone->_data._shearY + y * alpha;
+            break;
+        case MixBlend_First:
+        case MixBlend_Replace:
+            bone->_shearX += (bone->_data._shearX + x - bone->_shearX) * alpha;
+            bone->_shearY += (bone->_data._shearY + y - bone->_shearY) * alpha;
+            break;
+        case MixBlend_Add:
+            bone->_shearX += x * alpha;
+            bone->_shearY += y * alpha;
+    }
 }
 
-int ShearTimeline::getPropertyId() {
-	return ((int) TimelineType_Shear << 24) + _boneIndex;
+RTTI_IMPL(ShearXTimeline, CurveTimeline1)
+
+ShearXTimeline::ShearXTimeline(size_t frameCount, size_t bezierCount, int boneIndex) : CurveTimeline1(frameCount, bezierCount), _boneIndex(boneIndex) {
+    PropertyId ids[] = { ((PropertyId)Property_ShearX << 32) | boneIndex };
+    setPropertyIds(ids, 1);
+}
+
+ShearXTimeline::~ShearXTimeline() {
+}
+
+void ShearXTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
+                          MixBlend blend, MixDirection direction
+) {
+    SP_UNUSED(lastTime);
+    SP_UNUSED(pEvents);
+    SP_UNUSED(direction);
+
+    Bone *bone = skeleton._bones[_boneIndex];
+    if (!bone->_active) return;
+
+    if (time < _frames[0]) {
+        switch (blend) {
+            case MixBlend_Setup:
+                bone->_shearX = bone->_data._shearX;
+                return;
+            case MixBlend_First:
+                bone->_shearX += (bone->_data._shearX - bone->_shearX) * alpha;
+            default: {}
+        }
+        return;
+    }
+
+    float x = getCurveValue(time);
+    switch (blend) {
+        case MixBlend_Setup:
+            bone->_shearX = bone->_data._shearX + x * alpha;
+            break;
+        case MixBlend_First:
+        case MixBlend_Replace:
+            bone->_shearX += (bone->_data._shearX + x - bone->_shearX) * alpha;
+            break;
+        case MixBlend_Add:
+            bone->_shearX += x * alpha;
+    }
+}
+
+RTTI_IMPL(ShearYTimeline, CurveTimeline1)
+
+ShearYTimeline::ShearYTimeline(size_t frameCount, size_t bezierCount, int boneIndex) : CurveTimeline1(frameCount, bezierCount), _boneIndex(boneIndex) {
+    PropertyId ids[] = { ((PropertyId)Property_ShearX << 32) | boneIndex };
+    setPropertyIds(ids, 1);
+}
+
+ShearYTimeline::~ShearYTimeline() {
+}
+
+void ShearYTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
+                           MixBlend blend, MixDirection direction
+) {
+    SP_UNUSED(lastTime);
+    SP_UNUSED(pEvents);
+    SP_UNUSED(direction);
+
+    Bone *bone = skeleton._bones[_boneIndex];
+    if (!bone->_active) return;
+
+    if (time < _frames[0]) {
+        switch (blend) {
+            case MixBlend_Setup:
+                bone->_shearY = bone->_data._shearY;
+                return;
+            case MixBlend_First:
+                bone->_shearY += (bone->_data._shearY - bone->_shearY) * alpha;
+            default: {}
+        }
+        return;
+    }
+
+    float y = getCurveValue(time);
+    switch (blend) {
+        case MixBlend_Setup:
+            bone->_shearY = bone->_data._shearY + y * alpha;
+            break;
+        case MixBlend_First:
+        case MixBlend_Replace:
+            bone->_shearY += (bone->_data._shearY + y - bone->_shearY) * alpha;
+            break;
+        case MixBlend_Add:
+            bone->_shearY += y * alpha;
+    }
 }

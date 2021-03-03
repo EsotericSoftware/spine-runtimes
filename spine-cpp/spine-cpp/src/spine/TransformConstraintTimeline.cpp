@@ -47,21 +47,10 @@ using namespace spine;
 
 RTTI_IMPL(TransformConstraintTimeline, CurveTimeline)
 
-const int TransformConstraintTimeline::ENTRIES = 5;
-const int TransformConstraintTimeline::PREV_TIME = -5;
-const int TransformConstraintTimeline::PREV_ROTATE = -4;
-const int TransformConstraintTimeline::PREV_TRANSLATE = -3;
-const int TransformConstraintTimeline::PREV_SCALE = -2;
-const int TransformConstraintTimeline::PREV_SHEAR = -1;
-const int TransformConstraintTimeline::ROTATE = 1;
-const int TransformConstraintTimeline::TRANSLATE = 2;
-const int TransformConstraintTimeline::SCALE = 3;
-const int TransformConstraintTimeline::SHEAR = 4;
-
-TransformConstraintTimeline::TransformConstraintTimeline(int frameCount) : CurveTimeline(frameCount),
-	_transformConstraintIndex(0)
-{
-	_frames.setSize(frameCount * ENTRIES, 0);
+TransformConstraintTimeline::TransformConstraintTimeline(size_t frameCount, size_t bezierCount, int transformConstraintIndex) : CurveTimeline(frameCount, TransformConstraintTimeline::ENTRIES, bezierCount),
+	_transformConstraintIndex(transformConstraintIndex) {
+    PropertyId ids[] = { ((PropertyId)Property_TransformConstraint << 32) | transformConstraintIndex };
+    setPropertyIds(ids, 1);
 }
 
 void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents,
@@ -74,75 +63,94 @@ void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, floa
 	TransformConstraint &constraint = *constraintP;
 	if (!constraint.isActive()) return;
 
+	TransformConstraintData &data = constraint._data;
 	if (time < _frames[0]) {
 		switch (blend) {
 		case MixBlend_Setup:
-			constraint._rotateMix = constraint._data._rotateMix;
-			constraint._translateMix = constraint._data._translateMix;
-			constraint._scaleMix = constraint._data._scaleMix;
-			constraint._shearMix = constraint._data._shearMix;
+            constraint._mixRotate = data._mixRotate;
+            constraint._mixX = data._mixX;
+            constraint._mixY = data._mixY;
+            constraint._mixScaleX = data._mixScaleX;
+            constraint._mixScaleY = data._mixScaleY;
+            constraint._mixShearY = data._mixShearY;
 			return;
 		case MixBlend_First:
-			constraint._rotateMix += (constraint._data._rotateMix - constraint._rotateMix) * alpha;
-			constraint._translateMix += (constraint._data._translateMix - constraint._translateMix) * alpha;
-			constraint._scaleMix += (constraint._data._scaleMix - constraint._scaleMix) * alpha;
-			constraint._shearMix += (constraint._data._shearMix - constraint._shearMix) * alpha;
+            constraint._mixRotate += (data._mixRotate - constraint._mixRotate) * alpha;
+            constraint._mixX += (data._mixX - constraint._mixX) * alpha;
+            constraint._mixY += (data._mixY - constraint._mixY) * alpha;
+            constraint._mixScaleX += (data._mixScaleX - constraint._mixScaleX) * alpha;
+            constraint._mixScaleY += (data._mixScaleY - constraint._mixScaleY) * alpha;
+            constraint._mixShearY += (data._mixShearY - constraint._mixShearY) * alpha;
 			return;
 		default:
 			return;
 		}
 	}
 
-	float rotate, translate, scale, shear;
-	if (time >= _frames[_frames.size() - ENTRIES]) {
-		// Time is after last frame.
-		size_t i = _frames.size();
-		rotate = _frames[i + PREV_ROTATE];
-		translate = _frames[i + PREV_TRANSLATE];
-		scale = _frames[i + PREV_SCALE];
-		shear = _frames[i + PREV_SHEAR];
-	} else {
-		// Interpolate between the previous frame and the current frame.
-		int frame = Animation::binarySearch(_frames, time, ENTRIES);
-		rotate = _frames[frame + PREV_ROTATE];
-		translate = _frames[frame + PREV_TRANSLATE];
-		scale = _frames[frame + PREV_SCALE];
-		shear = _frames[frame + PREV_SHEAR];
-		float frameTime = _frames[frame];
-		float percent = getCurvePercent(frame / ENTRIES - 1,
-			1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+    float rotate, x, y, scaleX, scaleY, shearY;
+	int i = Animation::search(_frames, time, TransformConstraintTimeline::ENTRIES);
+    int curveType = (int)_curves[i / TransformConstraintTimeline::ENTRIES];
+    switch (curveType) {
+        case TransformConstraintTimeline::LINEAR: {
+            float before = _frames[i];
+            rotate = _frames[i + ROTATE];
+            x = _frames[i + X];
+            y = _frames[i + Y];
+            scaleX = _frames[i + SCALEX];
+            scaleY = _frames[i + SCALEY];
+            shearY = _frames[i + SHEARY];
+            float t = (time - before) / (_frames[i + ENTRIES] - before);
+            rotate += (_frames[i + ENTRIES + ROTATE] - rotate) * t;
+            x += (_frames[i + ENTRIES + X] - x) * t;
+            y += (_frames[i + ENTRIES + Y] - y) * t;
+            scaleX += (_frames[i + ENTRIES + SCALEX] - scaleX) * t;
+            scaleY += (_frames[i + ENTRIES + SCALEY] - scaleY) * t;
+            shearY += (_frames[i + ENTRIES + SHEARY] - shearY) * t;
+            break;
+        }
+        case TransformConstraintTimeline::STEPPED: {
+            rotate = _frames[i + ROTATE];
+            x = _frames[i + X];
+            y = _frames[i + Y];
+            scaleX = _frames[i + SCALEX];
+            scaleY = _frames[i + SCALEY];
+            shearY = _frames[i + SHEARY];
+            break;
+        }
+        default: {
+            rotate = getBezierValue(time, i, ROTATE, curveType - BEZIER);
+            x = getBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER);
+            y = getBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER);
+            scaleX = getBezierValue(time, i, SCALEX, curveType + BEZIER_SIZE * 3 - BEZIER);
+            scaleY = getBezierValue(time, i, SCALEY, curveType + BEZIER_SIZE * 4 - BEZIER);
+            shearY = getBezierValue(time, i, SHEARY, curveType + BEZIER_SIZE * 5 - BEZIER);
+        }
+    }
 
-		rotate += (_frames[frame + ROTATE] - rotate) * percent;
-		translate += (_frames[frame + TRANSLATE] - translate) * percent;
-		scale += (_frames[frame + SCALE] - scale) * percent;
-		shear += (_frames[frame + SHEAR] - shear) * percent;
-	}
-
-	if (blend == MixBlend_Setup) {
-		TransformConstraintData &data = constraint._data;
-		constraint._rotateMix = data._rotateMix + (rotate - data._rotateMix) * alpha;
-		constraint._translateMix = data._translateMix + (translate - data._translateMix) * alpha;
-		constraint._scaleMix = data._scaleMix + (scale - data._scaleMix) * alpha;
-		constraint._shearMix = data._shearMix + (shear - data._shearMix) * alpha;
-	} else {
-		constraint._rotateMix += (rotate - constraint._rotateMix) * alpha;
-		constraint._translateMix += (translate - constraint._translateMix) * alpha;
-		constraint._scaleMix += (scale - constraint._scaleMix) * alpha;
-		constraint._shearMix += (shear - constraint._shearMix) * alpha;
-	}
+    if (blend == MixBlend_Setup) {
+        constraint._mixRotate = data._mixRotate + (rotate - data._mixRotate) * alpha;
+        constraint._mixX = data._mixX + (x - data._mixX) * alpha;
+        constraint._mixY = data._mixY + (y - data._mixY) * alpha;
+        constraint._mixScaleX = data._mixScaleX + (scaleX - data._mixScaleX) * alpha;
+        constraint._mixScaleY = data._mixScaleY + (scaleY - data._mixScaleY) * alpha;
+        constraint._mixShearY = data._mixShearY + (shearY - data._mixShearY) * alpha;
+    } else {
+        constraint._mixRotate += (rotate - constraint._mixRotate) * alpha;
+        constraint._mixX += (x - constraint._mixX) * alpha;
+        constraint._mixY += (y - constraint._mixY) * alpha;
+        constraint._mixScaleX += (scaleX - constraint._mixScaleX) * alpha;
+        constraint._mixScaleY += (scaleY - constraint._mixScaleY) * alpha;
+        constraint._mixShearY += (shearY - constraint._mixShearY) * alpha;
+    }
 }
 
-int TransformConstraintTimeline::getPropertyId() {
-	return ((int) TimelineType_TransformConstraint << 24) + _transformConstraintIndex;
-}
-
-void TransformConstraintTimeline::setFrame(size_t frameIndex, float time, float rotateMix, float translateMix, float scaleMix,
-	float shearMix
-) {
+void TransformConstraintTimeline::setFrame(size_t frameIndex, float time, float mixRotate, float mixX, float mixY, float mixScaleX, float mixScaleY, float mixShearY) {
 	frameIndex *= ENTRIES;
 	_frames[frameIndex] = time;
-	_frames[frameIndex + ROTATE] = rotateMix;
-	_frames[frameIndex + TRANSLATE] = translateMix;
-	_frames[frameIndex + SCALE] = scaleMix;
-	_frames[frameIndex + SHEAR] = shearMix;
+	_frames[frameIndex + ROTATE] = mixRotate;
+	_frames[frameIndex + X] = mixX;
+    _frames[frameIndex + Y] = mixY;
+    _frames[frameIndex + SCALEX] = mixScaleX;
+    _frames[frameIndex + SCALEY] = mixScaleY;
+    _frames[frameIndex + SHEARY] = mixShearY;
 }

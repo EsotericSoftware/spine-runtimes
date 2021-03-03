@@ -47,21 +47,9 @@ using namespace spine;
 
 RTTI_IMPL(IkConstraintTimeline, CurveTimeline)
 
-const int IkConstraintTimeline::ENTRIES = 6;
-const int IkConstraintTimeline::PREV_TIME = -6;
-const int IkConstraintTimeline::PREV_MIX = -5;
-const int IkConstraintTimeline::PREV_SOFTNESS = -4;
-const int IkConstraintTimeline::PREV_BEND_DIRECTION = -3;
-const int IkConstraintTimeline::PREV_COMPRESS = -2;
-const int IkConstraintTimeline::PREV_STRETCH = -1;
-const int IkConstraintTimeline::MIX = 1;
-const int IkConstraintTimeline::SOFTNESS = 2;
-const int IkConstraintTimeline::BEND_DIRECTION = 3;
-const int IkConstraintTimeline::COMPRESS = 4;
-const int IkConstraintTimeline::STRETCH = 5;
-
-IkConstraintTimeline::IkConstraintTimeline(int frameCount) : CurveTimeline(frameCount), _ikConstraintIndex(0) {
-	_frames.setSize(frameCount * ENTRIES, 0);
+IkConstraintTimeline::IkConstraintTimeline(size_t frameCount, size_t bezierCount, int ikConstraintIndex) : CurveTimeline(frameCount, IkConstraintTimeline::ENTRIES, bezierCount), _ikConstraintIndex(ikConstraintIndex) {
+    PropertyId ids[] = { ((PropertyId)Property_IkConstraint << 32) | ikConstraintIndex };
+    setPropertyIds(ids, 1);
 }
 
 void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
@@ -94,77 +82,62 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 		}
 	}
 
-	if (time >= _frames[_frames.size() - ENTRIES]) {
-		// Time is after last frame.
-		if (blend == MixBlend_Setup) {
-			constraint._mix =
-					constraint._data._mix + (_frames[_frames.size() + PREV_MIX] - constraint._data._mix) * alpha;
-			constraint._softness = constraint._data._softness
-				+ (_frames[_frames.size() + PREV_SOFTNESS] - constraint._data._softness) * alpha;
-			if (direction == MixDirection_Out) {
-				constraint._bendDirection = constraint._data._bendDirection;
-				constraint._compress = constraint._data._compress;
-				constraint._stretch = constraint._data._stretch;
-			} else {
-				constraint._bendDirection = (int) _frames[_frames.size() + PREV_BEND_DIRECTION];
-				constraint._compress = _frames[_frames.size() + PREV_COMPRESS] != 0;
-				constraint._stretch = _frames[_frames.size() + PREV_STRETCH] != 0;
-			}
-		} else {
-			constraint._mix += (_frames[_frames.size() + PREV_MIX] - constraint._mix) * alpha;
-			constraint._softness += (_frames[_frames.size() + PREV_SOFTNESS] - constraint._softness) * alpha;
-			if (direction == MixDirection_In) {
-				constraint._bendDirection = (int) _frames[_frames.size() + PREV_BEND_DIRECTION];
-				constraint._compress = _frames[_frames.size() + PREV_COMPRESS] != 0;
-				constraint._stretch = _frames[_frames.size() + PREV_STRETCH] != 0;
-			}
-		}
-		return;
-	}
+    float mix = 0, softness = 0;
+	int i = Animation::search(_frames, time, IkConstraintTimeline::ENTRIES);
+    int curveType = (int)_curves[i / IkConstraintTimeline::ENTRIES];
+    switch (curveType) {
+        case IkConstraintTimeline::LINEAR: {
+            float before = _frames[i];
+            mix = _frames[i + IkConstraintTimeline::MIX];
+            softness = _frames[i + IkConstraintTimeline::SOFTNESS];
+            float t = (time - before) / (_frames[i + IkConstraintTimeline::ENTRIES] - before);
+            mix += (_frames[i + IkConstraintTimeline::ENTRIES + IkConstraintTimeline::MIX] - mix) * t;
+            softness += (_frames[i + IkConstraintTimeline::ENTRIES + IkConstraintTimeline::SOFTNESS] - softness) * t;
+            break;
+        }
+        case IkConstraintTimeline::STEPPED: {
+            mix = _frames[i + IkConstraintTimeline::MIX];
+            softness = _frames[i + IkConstraintTimeline::SOFTNESS];
+            break;
+        }
+        default: {
+            mix = getBezierValue(time, i, IkConstraintTimeline::MIX, curveType - IkConstraintTimeline::BEZIER);
+            softness = getBezierValue(time, i, IkConstraintTimeline::SOFTNESS,
+                                           curveType + IkConstraintTimeline::BEZIER_SIZE -
+                                           IkConstraintTimeline::BEZIER);
+        }
+    }
 
-	// Interpolate between the previous frame and the current frame.
-	int frame = Animation::binarySearch(_frames, time, ENTRIES);
-	float mix = _frames[frame + PREV_MIX];
-	float softness = _frames[frame + PREV_SOFTNESS];
-	float frameTime = _frames[frame];
-	float percent = getCurvePercent(frame / ENTRIES - 1,
-									1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+    if (blend == MixBlend_Setup) {
+        constraint._mix = constraint._data._mix + (mix - constraint._data._mix) * alpha;
+        constraint._softness = constraint._data._softness + (softness - constraint._data._softness) * alpha;
 
-	if (blend == MixBlend_Setup) {
-		constraint._mix =
-				constraint._data._mix + (mix + (_frames[frame + MIX] - mix) * percent - constraint._data._mix) * alpha;
-		constraint._softness = constraint._data._softness
-			+ (softness + (_frames[frame + SOFTNESS] - softness) * percent - constraint._data._softness) * alpha;
-		if (direction == MixDirection_Out) {
-			constraint._bendDirection = constraint._data._bendDirection;
-			constraint._compress = constraint._data._compress;
-			constraint._stretch = constraint._data._stretch;
-		} else {
-			constraint._bendDirection = (int) _frames[_frames.size() + PREV_BEND_DIRECTION];
-			constraint._compress = _frames[frame + PREV_COMPRESS] != 0;
-			constraint._stretch = _frames[frame + PREV_STRETCH] != 0;
-		}
-	} else {
-		constraint._mix += (mix + (_frames[frame + MIX] - mix) * percent - constraint._mix) * alpha;
-		constraint._softness += (softness + (_frames[frame + SOFTNESS] - softness) * percent - constraint._softness) * alpha;
-		if (direction == MixDirection_In) {
-			constraint._bendDirection = (int) _frames[frame + PREV_BEND_DIRECTION];
-			constraint._compress = _frames[frame + PREV_COMPRESS] != 0;
-			constraint._stretch = _frames[frame + PREV_STRETCH] != 0;
-		}
-	}
+        if (direction == MixDirection_Out) {
+            constraint._bendDirection = constraint._data._bendDirection;
+            constraint._compress = constraint._data._compress;
+            constraint._stretch = constraint._data._stretch;
+        } else {
+            constraint._bendDirection = _frames[i + IkConstraintTimeline::BEND_DIRECTION];
+            constraint._compress = _frames[i + IkConstraintTimeline::COMPRESS] != 0;
+            constraint._stretch = _frames[i + IkConstraintTimeline::STRETCH] != 0;
+        }
+    } else {
+        constraint._mix += (mix - constraint._mix) * alpha;
+        constraint._softness += (softness - constraint._softness) * alpha;
+        if (direction == MixDirection_In) {
+            constraint._bendDirection = _frames[i + IkConstraintTimeline::BEND_DIRECTION];
+            constraint._compress = _frames[i + IkConstraintTimeline::COMPRESS] != 0;
+            constraint._stretch = _frames[i + IkConstraintTimeline::STRETCH] != 0;
+        }
+    }
 }
 
-int IkConstraintTimeline::getPropertyId() {
-	return ((int) TimelineType_IkConstraint << 24) + _ikConstraintIndex;
-}
-
-void IkConstraintTimeline::setFrame(int frameIndex, float time, float mix, float softness, int bendDirection, bool compress, bool stretch) {
-	frameIndex *= ENTRIES;
-	_frames[frameIndex] = time;
-	_frames[frameIndex + MIX] = mix;
-	_frames[frameIndex + SOFTNESS] = softness;
-	_frames[frameIndex + BEND_DIRECTION] = (float)bendDirection;
-	_frames[frameIndex + COMPRESS] = compress ? 1 : 0;
-	_frames[frameIndex + STRETCH] = stretch ? 1 : 0;
+void IkConstraintTimeline::setFrame(int frame, float time, float mix, float softness, int bendDirection, bool compress, bool stretch) {
+    frame *= ENTRIES;
+	_frames[frame] = time;
+	_frames[frame + MIX] = mix;
+	_frames[frame + SOFTNESS] = softness;
+	_frames[frame + BEND_DIRECTION] = (float)bendDirection;
+	_frames[frame + COMPRESS] = compress ? 1 : 0;
+	_frames[frame + STRETCH] = stretch ? 1 : 0;
 }

@@ -46,13 +46,12 @@ using namespace spine;
 
 RTTI_IMPL(AttachmentTimeline, Timeline)
 
-AttachmentTimeline::AttachmentTimeline(int frameCount) : Timeline(), _slotIndex(0) {
-	_frames.ensureCapacity(frameCount);
+AttachmentTimeline::AttachmentTimeline(size_t frameCount, int slotIndex) : Timeline(frameCount, 1), _slotIndex(slotIndex) {
+    PropertyId ids[] = {((PropertyId) Property_Attachment << 32) | slotIndex };
+    setPropertyIds(ids, 1);
+
 	_attachmentNames.ensureCapacity(frameCount);
-
-	_frames.setSize(frameCount, 0);
-
-	for (int i = 0; i < frameCount; ++i) {
+	for (size_t i = 0; i < frameCount; ++i) {
 		_attachmentNames.add(String());
 	}
 }
@@ -68,63 +67,37 @@ void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 	SP_UNUSED(pEvents);
 	SP_UNUSED(alpha);
 
-	assert(_slotIndex < skeleton._slots.size());
-
 	String *attachmentName;
-	Slot *slotP = skeleton._slots[_slotIndex];
-	Slot &slot = *slotP;
-	if (!slot._bone.isActive()) return;
+	Slot *slot = skeleton._slots[_slotIndex];
+	if (!slot->_bone._active) return;
 
 	if (direction == MixDirection_Out) {
-	    if (blend == MixBlend_Setup) setAttachment(skeleton, slot, &slot._data._attachmentName);
+	    if (blend == MixBlend_Setup) setAttachment(skeleton, *slot, &slot->_data._attachmentName);
 		return;
 	}
 
 	if (time < _frames[0]) {
 		// Time is before first frame.
 		if (blend == MixBlend_Setup || blend == MixBlend_First) {
-            setAttachment(skeleton, slot, &slot._data._attachmentName);
+            setAttachment(skeleton, *slot, &slot->_data._attachmentName);
 		}
 		return;
 	}
 
 	size_t frameIndex;
-	if (time >= _frames[_frames.size() - 1]) {
-		// Time is after last frame.
-		frameIndex = _frames.size() - 1;
-	} else {
-		frameIndex = Animation::binarySearch(_frames, time, 1) - 1;
-	}
+    if (time < _frames[0]) {
+        if (blend == MixBlend_Setup || blend == MixBlend_First) setAttachment(skeleton, *slot, &slot->_data._attachmentName);
+        return;
+    }
 
-	attachmentName = &_attachmentNames[frameIndex];
-	slot.setAttachment(attachmentName->length() == 0 ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName));
+    setAttachment(skeleton, *slot, &_attachmentNames[Animation::search(_frames, time)]);
 }
 
-int AttachmentTimeline::getPropertyId() {
-	return ((int) TimelineType_Attachment << 24) + _slotIndex;
-}
-
-void AttachmentTimeline::setFrame(int frameIndex, float time, const String &attachmentName) {
-	_frames[frameIndex] = time;
-	_attachmentNames[frameIndex] = attachmentName;
-}
-
-size_t AttachmentTimeline::getSlotIndex() {
-	return _slotIndex;
-}
-
-void AttachmentTimeline::setSlotIndex(size_t inValue) {
-	_slotIndex = inValue;
-}
-
-Vector<float> &AttachmentTimeline::getFrames() {
-	return _frames;
+void AttachmentTimeline::setFrame(int frame, float time, const String &attachmentName) {
+	_frames[frame] = time;
+	_attachmentNames[frame] = attachmentName;
 }
 
 Vector<String> &AttachmentTimeline::getAttachmentNames() {
 	return _attachmentNames;
-}
-
-size_t AttachmentTimeline::getFrameCount() {
-	return _frames.size();
 }

@@ -64,7 +64,15 @@ class SP_API Skeleton : public SpineObject {
 
 	friend class AttachmentTimeline;
 
-	friend class ColorTimeline;
+	friend class RGBATimeline;
+
+    friend class RGBTimeline;
+
+    friend class AlphaTimeline;
+
+    friend class RGBA2Timeline;
+
+    friend class RGB2Timeline;
 
 	friend class DeformTimeline;
 
@@ -87,6 +95,10 @@ class SP_API Skeleton : public SpineObject {
     friend class ScaleYTimeline;
 
 	friend class ShearTimeline;
+
+    friend class ShearXTimeline;
+
+    friend class ShearYTimeline;
 
 	friend class TransformConstraintTimeline;
 

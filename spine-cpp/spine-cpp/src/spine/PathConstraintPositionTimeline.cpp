@@ -45,17 +45,12 @@
 
 using namespace spine;
 
-RTTI_IMPL(PathConstraintPositionTimeline, CurveTimeline)
+RTTI_IMPL(PathConstraintPositionTimeline, CurveTimeline1)
 
-const int PathConstraintPositionTimeline::ENTRIES = 2;
-const int PathConstraintPositionTimeline::PREV_TIME = -2;
-const int PathConstraintPositionTimeline::PREV_VALUE = -1;
-const int PathConstraintPositionTimeline::VALUE = 1;
-
-PathConstraintPositionTimeline::PathConstraintPositionTimeline(int frameCount) : CurveTimeline(frameCount),
-	_pathConstraintIndex(0)
-{
-	_frames.setSize(frameCount * ENTRIES, 0);
+PathConstraintPositionTimeline::PathConstraintPositionTimeline(size_t frameCount, size_t bezierCount, int pathConstraintIndex) : CurveTimeline1(frameCount, bezierCount),
+	_pathConstraintIndex(pathConstraintIndex) {
+	PropertyId ids[] = { ((PropertyId)Property_PathConstraintPosition << 32) | pathConstraintIndex };
+	setPropertyIds(ids, 1);
 }
 
 PathConstraintPositionTimeline::~PathConstraintPositionTimeline() {
@@ -85,32 +80,10 @@ void PathConstraintPositionTimeline::apply(Skeleton &skeleton, float lastTime, f
 		}
 	}
 
-	float position;
-	if (time >= _frames[_frames.size() - ENTRIES]) {
-		// Time is after last frame.
-		position = _frames[_frames.size() + PREV_VALUE];
-	} else {
-		// Interpolate between the previous frame and the current frame.
-		int frame = Animation::binarySearch(_frames, time, ENTRIES);
-		position = _frames[frame + PREV_VALUE];
-		float frameTime = _frames[frame];
-		float percent = getCurvePercent(frame / ENTRIES - 1,
-			1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+	float position = getCurveValue(time);
 
-		position += (_frames[frame + VALUE] - position) * percent;
-	}
 	if (blend == MixBlend_Setup)
 		constraint._position = constraint._data._position + (position - constraint._data._position) * alpha;
 	else
 		constraint._position += (position - constraint._position) * alpha;
-}
-
-int PathConstraintPositionTimeline::getPropertyId() {
-	return ((int) TimelineType_PathConstraintPosition << 24) + _pathConstraintIndex;
-}
-
-void PathConstraintPositionTimeline::setFrame(int frameIndex, float time, float value) {
-	frameIndex *= ENTRIES;
-	_frames[frameIndex] = time;
-	_frames[frameIndex + VALUE] = value;
 }

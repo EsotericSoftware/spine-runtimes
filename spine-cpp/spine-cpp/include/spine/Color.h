@@ -51,6 +51,14 @@ public:
 		return *this;
 	}
 
+    inline Color &set(float _r, float _g, float _b) {
+        this->r = _r;
+        this->g = _g;
+        this->b = _b;
+        clamp();
+        return *this;
+    }
+
 	inline Color &set(const Color &other) {
 		r = other.r;
 		g = other.g;
@@ -68,6 +76,14 @@ public:
 		clamp();
 		return *this;
 	}
+
+    inline Color &add(float _r, float _g, float _b) {
+        this->r += _r;
+        this->g += _g;
+        this->b += _b;
+        clamp();
+        return *this;
+    }
 
 	inline Color &add(const Color &other) {
 		r += other.r;

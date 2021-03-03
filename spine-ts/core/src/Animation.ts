@@ -1034,7 +1034,7 @@ module spine {
 
 	/** Changes a slot's {@link Slot#color}. */
 	export class RGBTimeline extends CurveTimeline implements SlotTimeline {
-		static ENTRIES = 5;
+		static ENTRIES = 4;
 
 		static R = 1; static G = 2; static B = 3;
 
@@ -1264,7 +1264,7 @@ module spine {
 
 			let light = slot.color, dark = slot.darkColor;
 			if (alpha == 1) {
-				slot.color.set(r, g, b, a);
+				light.set(r, g, b, a);
 				dark.r = r2;
 				dark.g = g2;
 				dark.b = b2;

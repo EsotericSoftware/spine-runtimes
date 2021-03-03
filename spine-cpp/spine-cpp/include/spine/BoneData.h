@@ -52,6 +52,10 @@ class SP_API BoneData : public SpineObject {
 
 	friend class ShearTimeline;
 
+    friend class ShearXTimeline;
+
+    friend class ShearYTimeline;
+
 	friend class TranslateTimeline;
 
     friend class TranslateXTimeline;

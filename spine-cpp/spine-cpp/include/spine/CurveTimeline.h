@@ -72,8 +72,8 @@ namespace spine {
 
         float getCurveValue(float time);
     protected:
-        static const int ENTRIES;
-        static const int VALUE;
+        static const int ENTRIES = 2;
+        static const int VALUE = 1;
     };
 
     class SP_API CurveTimeline2 : public CurveTimeline {
@@ -88,9 +88,9 @@ namespace spine {
 
         float getCurveValue(float time);
     protected:
-        static const int ENTRIES;
-        static const int VALUE1;
-        static const int VALUE2;
+        static const int ENTRIES = 3;
+        static const int VALUE1 = 1;
+        static const int VALUE2 = 2;
     };
 }
 

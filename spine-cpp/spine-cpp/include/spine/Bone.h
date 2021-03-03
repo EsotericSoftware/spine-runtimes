@@ -63,6 +63,18 @@ class SP_API Bone : public Updatable {
 
 	friend class PointAttachment;
 
+	friend class AttachmentTimeline;
+
+    friend class RGBATimeline;
+
+    friend class RGBTimeline;
+
+    friend class AlphaTimeline;
+
+    friend class RGBA2Timeline;
+
+    friend class RGB2Timeline;
+
 	friend class ScaleTimeline;
 
     friend class ScaleXTimeline;
@@ -70,6 +82,10 @@ class SP_API Bone : public Updatable {
     friend class ScaleYTimeline;
 
 	friend class ShearTimeline;
+
+    friend class ShearXTimeline;
+
+    friend class ShearYTimeline;
 
 	friend class TranslateTimeline;
 

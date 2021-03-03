@@ -50,23 +50,24 @@ namespace spine {
 		RTTI_DECL
 
 	public:
-		explicit AttachmentTimeline(int frameCount);
+		explicit AttachmentTimeline(size_t frameCount, int slotIndex);
+
+		virtual ~AttachmentTimeline();
 
 		virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
 
-		virtual int getPropertyId();
-
 		/// Sets the time and value of the specified keyframe.
-		void setFrame(int frameIndex, float time, const String& attachmentName);
+		void setFrame(int frame, float time, const String& attachmentName);
 
-		size_t getSlotIndex();
-		void setSlotIndex(size_t inValue);
-		Vector<float>& getFrames();
 		Vector<String>& getAttachmentNames();
-		size_t getFrameCount();
-	private:
-		size_t _slotIndex;
-		Vector<float> _frames;
+
+        int getSlotIndex() { return _slotIndex; }
+
+        void setSlotIndex(int inValue) { _slotIndex = inValue; }
+
+    protected:
+        int _slotIndex;
+
 		Vector<String> _attachmentNames;
 
         void setAttachment(Skeleton& skeleton, Slot& slot, String* attachmentName);

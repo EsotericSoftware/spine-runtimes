@@ -93,8 +93,7 @@ float CurveTimeline::getBezierValue(float time, size_t frame, size_t valueOffset
 }
 
 RTTI_IMPL(CurveTimeline1, CurveTimeline)
-const int CurveTimeline1::ENTRIES = 2;
-const int CurveTimeline1::VALUE = 1;
+
 
 CurveTimeline1::CurveTimeline1(size_t frameCount, size_t bezierCount): CurveTimeline(frameCount, CurveTimeline1::ENTRIES, bezierCount) {
 }
@@ -131,9 +130,6 @@ float CurveTimeline1::getCurveValue(float time) {
 }
 
 RTTI_IMPL(CurveTimeline2, CurveTimeline)
-const int CurveTimeline2::ENTRIES = 3;
-const int CurveTimeline2::VALUE1 = 1;
-const int CurveTimeline2::VALUE2 = 2;
 
 CurveTimeline2::CurveTimeline2(size_t frameCount, size_t bezierCount): CurveTimeline(frameCount, CurveTimeline2::ENTRIES, bezierCount) {
 }

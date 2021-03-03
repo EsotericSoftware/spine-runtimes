@@ -33,37 +33,47 @@
 #include <spine/CurveTimeline.h>
 
 namespace spine {
-	class VertexAttachment;
+    class VertexAttachment;
 
-	class SP_API DeformTimeline : public CurveTimeline {
-		friend class SkeletonBinary;
-		friend class SkeletonJson;
+    class SP_API DeformTimeline : public CurveTimeline {
+        friend class SkeletonBinary;
 
-		RTTI_DECL
+        friend class SkeletonJson;
 
-	public:
-		explicit DeformTimeline(int frameCount);
+    RTTI_DECL
 
-		virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
+    public:
+        explicit DeformTimeline(size_t frameCount, size_t bezierCount, int slotIndex, VertexAttachment *attachment);
 
-		virtual int getPropertyId();
+        virtual void
+        apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixBlend blend,
+              MixDirection direction);
 
-		/// Sets the time and value of the specified keyframe.
-		void setFrame(int frameIndex, float time, Vector<float>& vertices);
+        /// Sets the time and value of the specified keyframe.
+        void setFrame(int frameIndex, float time, Vector<float> &vertices);
 
-		int getSlotIndex();
-		void setSlotIndex(int inValue);
-		Vector<float>& getFrames();
-		Vector< Vector<float> >& getVertices();
-		VertexAttachment* getAttachment();
-		void setAttachment(VertexAttachment* inValue);
+        Vector <Vector<float>> &getVertices();
 
-	private:
-		int _slotIndex;
-		Vector<float> _frames;
-		Vector< Vector<float> > _frameVertices;
-		VertexAttachment* _attachment;
-	};
+        VertexAttachment *getAttachment();
+
+        void setAttachment(VertexAttachment *inValue);
+
+        void setBezier(int bezier, int frame, float value, float time1, float value1, float cx1, float cy1,
+                  float cx2, float cy2, float time2, float value2);
+
+        float getCurvePercent(float time, int frame);
+
+        int getSlotIndex() { return _slotIndex; }
+
+        void setSlotIndex(int inValue) { _slotIndex = inValue; }
+
+    protected:
+        int _slotIndex;
+
+        Vector <Vector<float>> _vertices;
+
+        VertexAttachment *_attachment;
+    };
 }
 
 #endif /* Spine_DeformTimeline_h */

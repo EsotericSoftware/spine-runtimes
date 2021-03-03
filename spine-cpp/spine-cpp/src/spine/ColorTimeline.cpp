@@ -44,102 +44,461 @@
 
 using namespace spine;
 
-RTTI_IMPL(ColorTimeline, CurveTimeline)
+RTTI_IMPL(RGBATimeline, CurveTimeline)
 
-const int ColorTimeline::ENTRIES = 5;
-const int ColorTimeline::PREV_TIME = -5;
-const int ColorTimeline::PREV_R = -4;
-const int ColorTimeline::PREV_G = -3;
-const int ColorTimeline::PREV_B = -2;
-const int ColorTimeline::PREV_A = -1;
-const int ColorTimeline::R = 1;
-const int ColorTimeline::G = 2;
-const int ColorTimeline::B = 3;
-const int ColorTimeline::A = 4;
-
-ColorTimeline::ColorTimeline(int frameCount) : CurveTimeline(frameCount), _slotIndex(0) {
-	_frames.setSize(frameCount * ENTRIES, 0);
+RGBATimeline::RGBATimeline(size_t frameCount, size_t bezierCount, int slotIndex) : CurveTimeline(frameCount,
+                                                                                                 RGBATimeline::ENTRIES,
+                                                                                                 bezierCount),
+                                                                                   _slotIndex(slotIndex) {
+    PropertyId ids[] = {((PropertyId) Property_Rgb << 32) | slotIndex,
+                        ((PropertyId) Property_Alpha << 32) | slotIndex};
+    setPropertyIds(ids, 2);
 }
 
-void ColorTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-	MixBlend blend, MixDirection direction
+RGBATimeline::~RGBATimeline() {
+}
+
+void RGBATimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
+                         MixBlend blend, MixDirection direction
 ) {
-	SP_UNUSED(lastTime);
-	SP_UNUSED(pEvents);
-	SP_UNUSED(direction);
+    SP_UNUSED(lastTime);
+    SP_UNUSED(pEvents);
+    SP_UNUSED(direction);
 
-	Slot *slotP = skeleton._slots[_slotIndex];
-	Slot &slot = *slotP;
-	if (!slot._bone.isActive()) return;
-	if (time < _frames[0]) {
-		switch (blend) {
-		case MixBlend_Setup:
-			slot._color.set(slot._data._color);
-			return;
-		case MixBlend_First: {
-			Color &color = slot._color, setup = slot._data._color;
-			color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
-				(setup.a - color.a) * alpha);
-		}
-		default: ;
-		}
-		return;
-	}
+    Slot *slot = skeleton._slots[_slotIndex];
+    if (!slot->_bone._active) return;
 
-	float r, g, b, a;
-	if (time >= _frames[_frames.size() - ENTRIES]) {
-		// Time is after last frame.
-		size_t i = _frames.size();
-		r = _frames[i + PREV_R];
-		g = _frames[i + PREV_G];
-		b = _frames[i + PREV_B];
-		a = _frames[i + PREV_A];
-	} else {
-		// Interpolate between the previous frame and the current frame.
-		size_t frame = (size_t)Animation::binarySearch(_frames, time, ENTRIES);
-		r = _frames[frame + PREV_R];
-		g = _frames[frame + PREV_G];
-		b = _frames[frame + PREV_B];
-		a = _frames[frame + PREV_A];
-		float frameTime = _frames[frame];
-		float percent = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (_frames[frame + PREV_TIME] - frameTime));
+    if (time < _frames[0]) {
+        Color &color = slot->_color, &setup = slot->_data._color;
+        switch (blend) {
+            case MixBlend_Setup:
+                color.set(setup);
+                return;
+            case MixBlend_First:
+                color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
+                          (setup.a - color.a) * alpha);
+            default: {
+            }
+        }
+        return;
+    }
 
-		r += (_frames[frame + R] - r) * percent;
-		g += (_frames[frame + G] - g) * percent;
-		b += (_frames[frame + B] - b) * percent;
-		a += (_frames[frame + A] - a) * percent;
-	}
-
-	if (alpha == 1) {
-		slot.getColor().set(r, g, b, a);
-	} else {
-		Color &color = slot.getColor();
-		if (blend == MixBlend_Setup) color.set(slot.getData().getColor());
-		color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
-	}
+    float r = 0, g = 0, b = 0, a = 0;
+    int i = Animation::search(_frames, time, RGBATimeline::ENTRIES);
+    int curveType = (int) _curves[i / RGBATimeline::ENTRIES];
+    switch (curveType) {
+        case RGBATimeline::LINEAR: {
+            float before = _frames[i];
+            r = _frames[i + RGBATimeline::R];
+            g = _frames[i + RGBATimeline::G];
+            b = _frames[i + RGBATimeline::B];
+            a = _frames[i + RGBATimeline::A];
+            float t = (time - before) / (_frames[i + RGBATimeline::ENTRIES] - before);
+            r += (_frames[i + RGBATimeline::ENTRIES + RGBATimeline::R] - r) * t;
+            g += (_frames[i + RGBATimeline::ENTRIES + RGBATimeline::G] - g) * t;
+            b += (_frames[i + RGBATimeline::ENTRIES + RGBATimeline::B] - b) * t;
+            a += (_frames[i + RGBATimeline::ENTRIES + RGBATimeline::A] - a) * t;
+            break;
+        }
+        case RGBATimeline::STEPPED: {
+            r = _frames[i + RGBATimeline::R];
+            g = _frames[i + RGBATimeline::G];
+            b = _frames[i + RGBATimeline::B];
+            a = _frames[i + RGBATimeline::A];
+            break;
+        }
+        default: {
+            r = getBezierValue(time, i, RGBATimeline::R, curveType - RGBATimeline::BEZIER);
+            g = getBezierValue(time, i, RGBATimeline::G,
+                               curveType + RGBATimeline::BEZIER_SIZE - RGBATimeline::BEZIER);
+            b = getBezierValue(time, i, RGBATimeline::B,
+                               curveType + RGBATimeline::BEZIER_SIZE * 2 - RGBATimeline::BEZIER);
+            a = getBezierValue(time, i, RGBATimeline::A,
+                               curveType + RGBATimeline::BEZIER_SIZE * 3 - RGBATimeline::BEZIER);
+        }
+    }
+    Color &color = slot->_color;
+    if (alpha == 1)
+        color.set(r, g, b, a);
+    else {
+        if (blend == MixBlend_Setup) color.set(slot->_data._color);
+        color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
+    }
 }
 
-int ColorTimeline::getPropertyId() {
-	return ((int) TimelineType_Color << 24) + _slotIndex;
+void RGBATimeline::setFrame(int frame, float time, float r, float g, float b, float a) {
+    frame *= ENTRIES;
+    _frames[frame] = time;
+    _frames[frame + R] = r;
+    _frames[frame + G] = g;
+    _frames[frame + B] = b;
+    _frames[frame + A] = a;
 }
 
-void ColorTimeline::setFrame(int frameIndex, float time, float r, float g, float b, float a) {
-	frameIndex *= ENTRIES;
-	_frames[frameIndex] = time;
-	_frames[frameIndex + R] = r;
-	_frames[frameIndex + G] = g;
-	_frames[frameIndex + B] = b;
-	_frames[frameIndex + A] = a;
+RTTI_IMPL(RGBTimeline, CurveTimeline)
+
+RGBTimeline::RGBTimeline(size_t frameCount, size_t bezierCount, int slotIndex) : CurveTimeline(frameCount,
+                                                                                               RGBTimeline::ENTRIES,
+                                                                                               bezierCount),
+                                                                                 _slotIndex(slotIndex) {
+    PropertyId ids[] = {((PropertyId) Property_Rgb << 32) | slotIndex};
+    setPropertyIds(ids, 1);
 }
 
-int ColorTimeline::getSlotIndex() {
-	return _slotIndex;
+RGBTimeline::~RGBTimeline() {
 }
 
-void ColorTimeline::setSlotIndex(int inValue) {
-	_slotIndex = inValue;
+void RGBTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
+                        MixBlend blend, MixDirection direction
+) {
+    SP_UNUSED(lastTime);
+    SP_UNUSED(pEvents);
+    SP_UNUSED(direction);
+
+    Slot *slot = skeleton._slots[_slotIndex];
+    if (!slot->_bone._active) return;
+
+    if (time < _frames[0]) {
+        Color &color = slot->_color, &setup = slot->_data._color;
+        switch (blend) {
+            case MixBlend_Setup:
+                color.set(setup);
+                return;
+            case MixBlend_First:
+                color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
+                          (setup.a - color.a) * alpha);
+            default: {
+            }
+        }
+        return;
+    }
+
+    float r = 0, g = 0, b = 0;
+    int i = Animation::search(_frames, time, RGBTimeline::ENTRIES);
+    int curveType = (int) _curves[i / RGBTimeline::ENTRIES];
+    switch (curveType) {
+        case RGBTimeline::LINEAR: {
+            float before = _frames[i];
+            r = _frames[i + RGBTimeline::R];
+            g = _frames[i + RGBTimeline::G];
+            b = _frames[i + RGBTimeline::B];
+            float t = (time - before) / (_frames[i + RGBTimeline::ENTRIES] - before);
+            r += (_frames[i + RGBTimeline::ENTRIES + RGBTimeline::R] - r) * t;
+            g += (_frames[i + RGBTimeline::ENTRIES + RGBTimeline::G] - g) * t;
+            b += (_frames[i + RGBTimeline::ENTRIES + RGBTimeline::B] - b) * t;
+            break;
+        }
+        case RGBTimeline::STEPPED: {
+            r = _frames[i + RGBTimeline::R];
+            g = _frames[i + RGBTimeline::G];
+            b = _frames[i + RGBTimeline::B];
+            break;
+        }
+        default: {
+            r = getBezierValue(time, i, RGBTimeline::R, curveType - RGBTimeline::BEZIER);
+            g = getBezierValue(time, i, RGBTimeline::G,
+                               curveType + RGBTimeline::BEZIER_SIZE - RGBTimeline::BEZIER);
+            b = getBezierValue(time, i, RGBTimeline::B,
+                               curveType + RGBTimeline::BEZIER_SIZE * 2 - RGBTimeline::BEZIER);
+        }
+    }
+    Color &color = slot->_color;
+    if (alpha == 1)
+        color.set(r, g, b);
+    else {
+        Color &setup = slot->_data._color;
+        if (blend == MixBlend_Setup) color.set(setup.r, setup.g, setup.b);
+        color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha);
+    }
 }
 
-Vector<float> &ColorTimeline::getFrames() {
-	return _frames;
+void RGBTimeline::setFrame(int frame, float time, float r, float g, float b) {
+    frame *= ENTRIES;
+    _frames[frame] = time;
+    _frames[frame + R] = r;
+    _frames[frame + G] = g;
+    _frames[frame + B] = b;
+}
+
+RTTI_IMPL(AlphaTimeline, CurveTimeline1)
+
+AlphaTimeline::AlphaTimeline(size_t frameCount, size_t bezierCount, int slotIndex) : CurveTimeline1(frameCount,
+                                                                                                    bezierCount),
+                                                                                     _slotIndex(slotIndex) {
+    PropertyId ids[] = {((PropertyId) Property_Alpha << 32) | slotIndex};
+    setPropertyIds(ids, 1);
+}
+
+AlphaTimeline::~AlphaTimeline() {
+}
+
+void AlphaTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
+                          MixBlend blend, MixDirection direction
+) {
+    SP_UNUSED(lastTime);
+    SP_UNUSED(pEvents);
+    SP_UNUSED(direction);
+
+    Slot *slot = skeleton._slots[_slotIndex];
+    if (!slot->_bone._active) return;
+
+    if (time < _frames[0]) { // Time is before first frame.
+        Color &color = slot->_color, &setup = slot->_data._color;
+        switch (blend) {
+            case MixBlend_Setup:
+                color.a = setup.a;
+                return;
+            case MixBlend_First:
+                color.a += (setup.a - color.a) * alpha;
+            default: {
+            }
+        }
+        return;
+    }
+
+    float a = getCurveValue(time);
+    if (alpha == 1)
+        slot->_color.a = a;
+    else {
+        if (blend == MixBlend_Setup) slot->_color.a = slot->_data._color.a;
+        slot->_color.a += (a - slot->_color.a) * alpha;
+    }
+}
+
+RTTI_IMPL(RGBA2Timeline, CurveTimeline)
+
+RGBA2Timeline::RGBA2Timeline(size_t frameCount, size_t bezierCount, int slotIndex) : CurveTimeline(frameCount,
+                                                                                                   RGBA2Timeline::ENTRIES,
+                                                                                                   bezierCount),
+                                                                                     _slotIndex(slotIndex) {
+    PropertyId ids[] = {((PropertyId) Property_Rgb << 32) | slotIndex,
+                        ((PropertyId) Property_Alpha << 32) | slotIndex,
+                        ((PropertyId) Property_Rgb2 << 32) | slotIndex};
+    setPropertyIds(ids, 3);
+}
+
+RGBA2Timeline::~RGBA2Timeline() {
+}
+
+void RGBA2Timeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
+                          MixBlend blend, MixDirection direction
+) {
+    SP_UNUSED(lastTime);
+    SP_UNUSED(pEvents);
+    SP_UNUSED(direction);
+
+    Slot *slot = skeleton._slots[_slotIndex];
+    if (!slot->_bone._active) return;
+
+    if (time < _frames[0]) {
+        Color &light = slot->_color, &dark = slot->_darkColor, &setupLight = slot->_data._color, &setupDark = slot->_data._darkColor;
+        switch (blend) {
+            case MixBlend_Setup:
+                light.set(setupLight);
+                dark.set(setupDark.r, setupDark.g, setupDark.b);
+                return;
+            case MixBlend_First:
+                light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha,
+                          (setupLight.b - light.b) * alpha,
+                          (setupLight.a - light.a) * alpha);
+                dark.r += (setupDark.r - dark.r) * alpha;
+                dark.g += (setupDark.g - dark.g) * alpha;
+                dark.b += (setupDark.b - dark.b) * alpha;
+            default: {
+            }
+        }
+        return;
+    }
+
+    float r = 0, g = 0, b = 0, a = 0, r2 = 0, g2 = 0, b2 = 0;
+    int i = Animation::search(_frames, time, RGBA2Timeline::ENTRIES);
+    int curveType = (int) _curves[i / RGBA2Timeline::ENTRIES];
+    switch (curveType) {
+        case RGBA2Timeline::LINEAR: {
+            float before = _frames[i];
+            r = _frames[i + RGBA2Timeline::R];
+            g = _frames[i + RGBA2Timeline::G];
+            b = _frames[i + RGBA2Timeline::B];
+            a = _frames[i + RGBA2Timeline::A];
+            r2 = _frames[i + RGBA2Timeline::R2];
+            g2 = _frames[i + RGBA2Timeline::G2];
+            b2 = _frames[i + RGBA2Timeline::B2];
+            float t = (time - before) / (_frames[i + RGBA2Timeline::ENTRIES] - before);
+            r += (_frames[i + RGBA2Timeline::ENTRIES + RGBA2Timeline::R] - r) * t;
+            g += (_frames[i + RGBA2Timeline::ENTRIES + RGBA2Timeline::G] - g) * t;
+            b += (_frames[i + RGBA2Timeline::ENTRIES + RGBA2Timeline::B] - b) * t;
+            a += (_frames[i + RGBA2Timeline::ENTRIES + RGBA2Timeline::A] - a) * t;
+            r2 += (_frames[i + RGBA2Timeline::ENTRIES + RGBA2Timeline::R2] - r2) * t;
+            g2 += (_frames[i + RGBA2Timeline::ENTRIES + RGBA2Timeline::G2] - g2) * t;
+            b2 += (_frames[i + RGBA2Timeline::ENTRIES + RGBA2Timeline::B2] - b2) * t;
+            break;
+        }
+        case RGBA2Timeline::STEPPED: {
+            r = _frames[i + RGBA2Timeline::R];
+            g = _frames[i + RGBA2Timeline::G];
+            b = _frames[i + RGBA2Timeline::B];
+            a = _frames[i + RGBA2Timeline::A];
+            r2 = _frames[i + RGBA2Timeline::R2];
+            g2 = _frames[i + RGBA2Timeline::G2];
+            b2 = _frames[i + RGBA2Timeline::B2];
+            break;
+        }
+        default: {
+            r = getBezierValue(time, i, RGBA2Timeline::R, curveType - RGBA2Timeline::BEZIER);
+            g = getBezierValue(time, i, RGBA2Timeline::G,
+                               curveType + RGBA2Timeline::BEZIER_SIZE - RGBA2Timeline::BEZIER);
+            b = getBezierValue(time, i, RGBA2Timeline::B,
+                               curveType + RGBA2Timeline::BEZIER_SIZE * 2 - RGBA2Timeline::BEZIER);
+            a = getBezierValue(time, i, RGBA2Timeline::A,
+                               curveType + RGBA2Timeline::BEZIER_SIZE * 3 - RGBA2Timeline::BEZIER);
+            r2 = getBezierValue(time, i, RGBA2Timeline::R2,
+                                curveType + RGBA2Timeline::BEZIER_SIZE * 4 - RGBA2Timeline::BEZIER);
+            g2 = getBezierValue(time, i, RGBA2Timeline::G2,
+                                curveType + RGBA2Timeline::BEZIER_SIZE * 5 - RGBA2Timeline::BEZIER);
+            b2 = getBezierValue(time, i, RGBA2Timeline::B2,
+                                curveType + RGBA2Timeline::BEZIER_SIZE * 6 - RGBA2Timeline::BEZIER);
+        }
+    }
+    Color &light = slot->_color, &dark = slot->_darkColor;
+    if (alpha == 1) {
+        light.set(r, g, b, a);
+        dark.set(r2, g2, b2);
+    } else {
+        if (blend == MixBlend_Setup) {
+            light.set(slot->_data._color);
+            dark.set(slot->_data._darkColor);
+        }
+        light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
+        dark.r += (r2 - dark.r) * alpha;
+        dark.g += (g2 - dark.g) * alpha;
+        dark.b += (b2 - dark.b) * alpha;
+    }
+}
+
+void
+RGBA2Timeline::setFrame(int frame, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
+    frame *= ENTRIES;
+    _frames[frame] = time;
+    _frames[frame + R] = r;
+    _frames[frame + G] = g;
+    _frames[frame + B] = b;
+    _frames[frame + A] = a;
+    _frames[frame + R2] = r2;
+    _frames[frame + G2] = g2;
+    _frames[frame + B2] = b2;
+}
+
+RTTI_IMPL(RGB2Timeline, CurveTimeline)
+
+RGB2Timeline::RGB2Timeline(size_t frameCount, size_t bezierCount, int slotIndex) : CurveTimeline(frameCount,
+                                                                                                   RGB2Timeline::ENTRIES,
+                                                                                                   bezierCount),
+                                                                                     _slotIndex(slotIndex) {
+    PropertyId ids[] = {((PropertyId) Property_Rgb << 32) | slotIndex,
+                        ((PropertyId) Property_Rgb2 << 32) | slotIndex};
+    setPropertyIds(ids, 2);
+}
+
+RGB2Timeline::~RGB2Timeline() {
+}
+
+void RGB2Timeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
+                          MixBlend blend, MixDirection direction
+) {
+    SP_UNUSED(lastTime);
+    SP_UNUSED(pEvents);
+    SP_UNUSED(direction);
+
+    Slot *slot = skeleton._slots[_slotIndex];
+    if (!slot->_bone._active) return;
+
+    if (time < _frames[0]) {
+        Color &light = slot->_color, &dark = slot->_darkColor, &setupLight = slot->_data._color, &setupDark = slot->_data._darkColor;
+        switch (blend) {
+            case MixBlend_Setup:
+                light.set(setupLight.r, setupLight.g, setupLight.b);
+                dark.set(setupDark.r, setupDark.g, setupDark.b);
+                return;
+            case MixBlend_First:
+                light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha,
+                          (setupLight.b - light.b) * alpha);
+                dark.r += (setupDark.r - dark.r) * alpha;
+                dark.g += (setupDark.g - dark.g) * alpha;
+                dark.b += (setupDark.b - dark.b) * alpha;
+            default: {
+            }
+        }
+        return;
+    }
+
+    float r = 0, g = 0, b = 0, r2 = 0, g2 = 0, b2 = 0;
+    int i = Animation::search(_frames, time, RGB2Timeline::ENTRIES);
+    int curveType = (int) _curves[i / RGB2Timeline::ENTRIES];
+    switch (curveType) {
+        case RGB2Timeline::LINEAR: {
+            float before = _frames[i];
+            r = _frames[i + RGB2Timeline::R];
+            g = _frames[i + RGB2Timeline::G];
+            b = _frames[i + RGB2Timeline::B];
+            r2 = _frames[i + RGB2Timeline::R2];
+            g2 = _frames[i + RGB2Timeline::G2];
+            b2 = _frames[i + RGB2Timeline::B2];
+            float t = (time - before) / (_frames[i + RGB2Timeline::ENTRIES] - before);
+            r += (_frames[i + RGB2Timeline::ENTRIES + RGB2Timeline::R] - r) * t;
+            g += (_frames[i + RGB2Timeline::ENTRIES + RGB2Timeline::G] - g) * t;
+            b += (_frames[i + RGB2Timeline::ENTRIES + RGB2Timeline::B] - b) * t;
+            r2 += (_frames[i + RGB2Timeline::ENTRIES + RGB2Timeline::R2] - r2) * t;
+            g2 += (_frames[i + RGB2Timeline::ENTRIES + RGB2Timeline::G2] - g2) * t;
+            b2 += (_frames[i + RGB2Timeline::ENTRIES + RGB2Timeline::B2] - b2) * t;
+            break;
+        }
+        case RGB2Timeline::STEPPED: {
+            r = _frames[i + RGB2Timeline::R];
+            g = _frames[i + RGB2Timeline::G];
+            b = _frames[i + RGB2Timeline::B];
+            r2 = _frames[i + RGB2Timeline::R2];
+            g2 = _frames[i + RGB2Timeline::G2];
+            b2 = _frames[i + RGB2Timeline::B2];
+            break;
+        }
+        default: {
+            r = getBezierValue(time, i, RGB2Timeline::R, curveType - RGB2Timeline::BEZIER);
+            g = getBezierValue(time, i, RGB2Timeline::G,
+                               curveType + RGB2Timeline::BEZIER_SIZE - RGB2Timeline::BEZIER);
+            b = getBezierValue(time, i, RGB2Timeline::B,
+                               curveType + RGB2Timeline::BEZIER_SIZE * 2 - RGB2Timeline::BEZIER);
+            r2 = getBezierValue(time, i, RGB2Timeline::R2,
+                                curveType + RGB2Timeline::BEZIER_SIZE * 4 - RGB2Timeline::BEZIER);
+            g2 = getBezierValue(time, i, RGB2Timeline::G2,
+                                curveType + RGB2Timeline::BEZIER_SIZE * 5 - RGB2Timeline::BEZIER);
+            b2 = getBezierValue(time, i, RGB2Timeline::B2,
+                                curveType + RGB2Timeline::BEZIER_SIZE * 6 - RGB2Timeline::BEZIER);
+        }
+    }
+    Color &light = slot->_color, &dark = slot->_darkColor;
+    if (alpha == 1) {
+        light.set(r, g, b);
+        dark.set(r2, g2, b2);
+    } else {
+        if (blend == MixBlend_Setup) {
+            light.set(slot->_data._color.r, slot->_data._color.g, slot->_data._color.b);
+            dark.set(slot->_data._darkColor);
+        }
+        light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha);
+        dark.r += (r2 - dark.r) * alpha;
+        dark.g += (g2 - dark.g) * alpha;
+        dark.b += (b2 - dark.b) * alpha;
+    }
+}
+
+void
+RGB2Timeline::setFrame(int frame, float time, float r, float g, float b, float r2, float g2, float b2) {
+    frame *= ENTRIES;
+    _frames[frame] = time;
+    _frames[frame + R] = r;
+    _frames[frame + G] = g;
+    _frames[frame + B] = b;
+    _frames[frame + R2] = r2;
+    _frames[frame + G2] = g2;
+    _frames[frame + B2] = b2;
 }

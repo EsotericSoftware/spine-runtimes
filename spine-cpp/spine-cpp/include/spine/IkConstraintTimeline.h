@@ -41,32 +41,25 @@ namespace spine {
 		RTTI_DECL
 
 	public:
-		static const int ENTRIES;
-
-		explicit IkConstraintTimeline(int frameCount);
+		explicit IkConstraintTimeline(size_t frameCount, size_t bezierCount, int ikConstraintIndex);
 
 		virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
 
-		virtual int getPropertyId();
-
 		/// Sets the time, mix and bend direction of the specified keyframe.
-		void setFrame (int frameIndex, float time, float mix, float softness, int bendDirection, bool compress, bool stretch);
+		void setFrame (int frame, float time, float mix, float softness, int bendDirection, bool compress, bool stretch);
 
+        int getIkConstraintIndex() { return _ikConstraintIndex; }
+
+        void setIkConstraintIndex(int inValue) { _ikConstraintIndex = inValue; }
 	private:
-		static const int PREV_TIME;
-		static const int PREV_MIX;
-		static const int PREV_SOFTNESS;
-		static const int PREV_BEND_DIRECTION;
-		static const int PREV_COMPRESS;
-		static const int PREV_STRETCH;
-		static const int MIX;
-		static const int SOFTNESS;
-		static const int BEND_DIRECTION;
-		static const int COMPRESS;
-		static const int STRETCH;
+        int _ikConstraintIndex;
 
-		Vector<float> _frames;
-		int _ikConstraintIndex;
+	    static const int ENTRIES = 6;
+		static const int MIX = 1;
+		static const int SOFTNESS = 2;
+		static const int BEND_DIRECTION = 3;
+		static const int COMPRESS = 4;
+		static const int STRETCH = 5;
 	};
 }
 

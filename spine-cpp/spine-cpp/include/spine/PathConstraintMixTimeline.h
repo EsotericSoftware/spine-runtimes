@@ -42,26 +42,23 @@ namespace spine {
 		RTTI_DECL
 
 	public:
-		static const int ENTRIES;
-
-		explicit PathConstraintMixTimeline(int frameCount);
+		explicit PathConstraintMixTimeline(size_t frameCount, size_t bezierCount, int pathConstraintIndex);
 
 		virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
 
-		virtual int getPropertyId();
+        /// Sets the time and mixes of the specified keyframe.
+        void setFrame(int frameIndex, float time, float mixRotate, float mixX, float mixY);
 
+        int getPathConstraintIndex() { return _pathConstraintIndex; }
+
+        void setPathConstraintIndex(int inValue) { _pathConstraintIndex = inValue; }
 	private:
-		static const int PREV_TIME;
-		static const int PREV_ROTATE;
-		static const int PREV_TRANSLATE;
-		static const int ROTATE;
-		static const int TRANSLATE;
+        int _pathConstraintIndex;
 
-		Vector<float> _frames;
-		int _pathConstraintIndex;
-
-		/// Sets the time and mixes of the specified keyframe.
-		void setFrame(int frameIndex, float time, float rotateMix, float translateMix);
+		static const int ENTRIES = 4;
+		static const int ROTATE = 1;
+		static const int X = 2;
+        static const int Y = 2;
 	};
 }
 
