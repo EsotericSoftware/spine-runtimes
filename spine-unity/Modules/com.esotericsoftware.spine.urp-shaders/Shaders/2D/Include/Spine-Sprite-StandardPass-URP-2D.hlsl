@@ -89,6 +89,10 @@ half4 CombinedShapeLightFragment(VertexOutputSpriteURP2D input) : SV_Target
 	fixed4 texureColor = calculateTexturePixel(input.texcoord.xy);
 	ALPHA_CLIP(texureColor, input.vertexColor)
 	texureColor *= input.vertexColor;
+#if !defined(_MULTIPLYBLEND) && !defined(_MULTIPLYBLEND_X2)
+	if (input.vertexColor.a == 0)
+		return texureColor;
+#endif
 
 	half4 mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, input.texcoord.xy);
 	half4 pixel = CombinedShapeLightShared(texureColor, mask, input.lightingUV);

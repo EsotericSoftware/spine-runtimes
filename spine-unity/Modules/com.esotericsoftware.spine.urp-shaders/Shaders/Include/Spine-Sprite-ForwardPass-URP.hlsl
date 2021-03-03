@@ -223,6 +223,10 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input) : SV_Target
 
 	fixed4 texureColor = calculateTexturePixel(input.texcoord.xy);
 	ALPHA_CLIP(texureColor, input.vertexColor)
+#if !defined(_MULTIPLYBLEND) && !defined(_MULTIPLYBLEND_X2)
+	if (input.vertexColor.a == 0)
+		return texureColor * input.vertexColor;
+#endif
 
 	// fill out InputData struct
 	InputData inputData;
