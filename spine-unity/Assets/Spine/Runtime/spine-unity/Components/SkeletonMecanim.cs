@@ -69,11 +69,11 @@ namespace Spine.Unity {
 		public event UpdateBonesDelegate UpdateComplete { add { _UpdateComplete += value; } remove { _UpdateComplete -= value; } }
 		#endregion
 
-		public override void Initialize (bool overwrite) {
+		public override void Initialize (bool overwrite, bool quiet = false) {
 			if (valid && !overwrite)
 				return;
 
-			base.Initialize(overwrite);
+			base.Initialize(overwrite, quiet);
 
 			if (!valid)
 				return;
