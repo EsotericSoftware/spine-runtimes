@@ -50,6 +50,7 @@
   * Removed redundant `Spine.SkeletonExtensions` extension methods `Skeleton.Set*ToSetupPose()`. Also removed less commonly used extension methods `TrackEntry.AllowImmediateQueue()` and `Attachment.IsRenderable()`.
   * `Skin.Attachments` now replaces `Skin.GetAttachments()`, returning an `ICollection<SkinEntry>`. This makes access more consistent and intuitive. To fix any compile errors, replace any occurrances of `skin.GetAttachments()` by `skin.Attachments`.
   * Reverted changes: `BoneFollower` property `followLocalScale` has intermediately been renamed to `followScale` but was renamed back to `followLocalScale`. Serialized values (scenes and prefabs) will automatically be upgraded, only code accessing `followScale` needs to be adapted.
+  * Corrected blending behaviour of all `Sprite` shaders in `Premultiply Alpha` blend mode (including URP and LWRP packages). Previously vertex color alpha was premultiplied again, even though `Premultiply Alpha` blend mode assumes PMA texture and PMA vertex color input. Slot-alpha blending will thus be correctly lighter after upgrading to 4.0. If you have compensated this problem by disabling `Advanced - PMA Vertex Colors` you can now re-enable this parameter, also allowing for rendering Additive slots in a single pass.
 
 * **Additions**
   * Additional **Fix Draw Order** parameter at SkeletonRenderer, defaults to `disabled` (previous behaviour).

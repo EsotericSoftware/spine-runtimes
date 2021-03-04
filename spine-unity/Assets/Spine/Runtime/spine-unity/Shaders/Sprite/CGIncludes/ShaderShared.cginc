@@ -137,7 +137,7 @@ inline fixed4 prepareLitPixelForOutput(fixed4 finalPixel, fixed4 color) : SV_Tar
 	finalPixel.rgb *= finalPixel.a;
 #elif defined(_ALPHAPREMULTIPLY_ON)
 	//Pre multiplied alpha
-	finalPixel.rgb *= color.a;
+	// texture and vertex colors are premultiplied already
 #elif defined(_MULTIPLYBLEND)
 	//Multiply
 	finalPixel = lerp(fixed4(1,1,1,1), finalPixel, finalPixel.a);
