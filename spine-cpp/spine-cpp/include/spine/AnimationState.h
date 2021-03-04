@@ -32,6 +32,7 @@
 
 #include <spine/Vector.h>
 #include <spine/Pool.h>
+#include <spine/Property.h>
 #include <spine/MixBlend.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
@@ -94,6 +95,8 @@ namespace spine {
 		/// The animation to apply for this track entry.
 		Animation* getAnimation();
 
+		TrackEntry* getPrevious();
+
 		/// If true, the animation will repeat. If false, it will not, instead its last frame is applied if played beyond its duration.
 		bool getLoop();
 		void setLoop(bool inValue);
@@ -111,6 +114,9 @@ namespace spine {
 		/// previous animation.
 		bool getHoldPrevious();
 		void setHoldPrevious(bool inValue);
+
+		bool getReverse();
+		void setReverse(bool inValue);
 
 		/// Seconds to postpone playing the animation. When a track entry is the current track entry, delay postpones incrementing
 		/// the track time. When a track entry is queued, delay is the time from the start of the previous animation to when the
@@ -228,19 +234,21 @@ namespace spine {
 		/// TrackEntry chooses the short way the first time it is applied and remembers that direction.
 		void resetRotationDirections();
 
+        float getTrackComplete();
+
 		void setListener(AnimationStateListener listener);
 
 		void setListener(AnimationStateListenerObject* listener);
 
 	private:
 		Animation* _animation;
-
+        TrackEntry* _previous;
 		TrackEntry* _next;
 		TrackEntry* _mixingFrom;
 		TrackEntry* _mixingTo;
 		int _trackIndex;
 
-		bool _loop, _holdPrevious;
+		bool _loop, _holdPrevious, _reverse;
 		float _eventThreshold, _attachmentThreshold, _drawOrderThreshold;
 		float _animationStart, _animationEnd, _animationLast, _nextAnimationLast;
 		float _delay, _trackTime, _trackLast, _nextTrackLast, _trackEnd, _timeScale;
@@ -403,7 +411,7 @@ namespace spine {
 		Vector<Event*> _events;
 		EventQueue* _queue;
 
-		HashMap<int, bool> _propertyIDs;
+		HashMap<PropertyId, bool> _propertyIDs;
 		bool _animationsChanged;
 
 		AnimationStateListener _listener;
@@ -427,6 +435,9 @@ namespace spine {
 
 		/// Sets the active TrackEntry for a given track number.
 		void setCurrent(size_t index, TrackEntry *current, bool interrupt);
+
+        /// Removes the next entry and all entries after it for the specified entry. */
+        void clearNext(TrackEntry *entry);
 
 		TrackEntry* expandToIndex(size_t index);
 

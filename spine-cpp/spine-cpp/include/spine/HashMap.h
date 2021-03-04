@@ -129,6 +129,14 @@ public:
 		}
 	}
 
+	bool addAll(Vector<K> &keys, const V &value) {
+		size_t oldSize = _size;
+		for (size_t i = 0; i < keys.size(); i++) {
+			put(keys[i], value);
+		}
+		return _size != oldSize;
+	}
+
 	bool containsKey(const K &key) {
 		return find(key) != NULL;
 	}

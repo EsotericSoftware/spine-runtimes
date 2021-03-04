@@ -67,7 +67,6 @@ void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 	SP_UNUSED(pEvents);
 	SP_UNUSED(alpha);
 
-	String *attachmentName;
 	Slot *slot = skeleton._slots[_slotIndex];
 	if (!slot->_bone._active) return;
 
@@ -84,7 +83,6 @@ void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 		return;
 	}
 
-	size_t frameIndex;
     if (time < _frames[0]) {
         if (blend == MixBlend_Setup || blend == MixBlend_First) setAttachment(skeleton, *slot, &slot->_data._attachmentName);
         return;

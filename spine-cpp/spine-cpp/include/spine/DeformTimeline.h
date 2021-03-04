@@ -52,7 +52,7 @@ namespace spine {
         /// Sets the time and value of the specified keyframe.
         void setFrame(int frameIndex, float time, Vector<float> &vertices);
 
-        Vector <Vector<float>> &getVertices();
+        Vector <Vector<float> > &getVertices();
 
         VertexAttachment *getAttachment();
 
@@ -70,7 +70,7 @@ namespace spine {
     protected:
         int _slotIndex;
 
-        Vector <Vector<float>> _vertices;
+        Vector <Vector<float> > _vertices;
 
         VertexAttachment *_attachment;
     };

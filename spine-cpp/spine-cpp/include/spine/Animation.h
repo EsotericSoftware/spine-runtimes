@@ -45,6 +45,8 @@ class Skeleton;
 
 class Event;
 
+class AnimationState;
+
 class SP_API Animation : public SpineObject {
 	friend class AnimationState;
 
@@ -115,8 +117,8 @@ public:
 	void setDuration(float inValue);
 
 private:
-	Vector<Timeline *> _timelines;
-	HashMap<PropertyId, bool> _timelineIds;
+    Vector<Timeline *> _timelines;
+    HashMap<PropertyId, bool> _timelineIds;
 	float _duration;
 	String _name;
 
