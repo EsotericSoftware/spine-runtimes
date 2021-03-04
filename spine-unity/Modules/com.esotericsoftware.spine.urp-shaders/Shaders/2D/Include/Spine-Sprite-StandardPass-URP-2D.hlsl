@@ -87,7 +87,9 @@ VertexOutputSpriteURP2D CombinedShapeLightVertex(VertexInput input)
 half4 CombinedShapeLightFragment(VertexOutputSpriteURP2D input) : SV_Target
 {
 	fixed4 texureColor = calculateTexturePixel(input.texcoord.xy);
+	RETURN_UNLIT_IF_ADDITIVE_SLOT(texureColor, input.vertexColor) // shall be called before ALPHA_CLIP
 	ALPHA_CLIP(texureColor, input.vertexColor)
+
 	texureColor *= input.vertexColor;
 
 	half4 mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, input.texcoord.xy);

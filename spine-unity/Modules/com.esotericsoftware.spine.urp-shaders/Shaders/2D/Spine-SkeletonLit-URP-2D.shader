@@ -98,14 +98,13 @@
 			half4 CombinedShapeLightFragment(Varyings i) : SV_Target
 			{
 				half4 tex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
-
-				half4 main;
 				#if defined(_STRAIGHT_ALPHA_INPUT)
-				main.rgb = tex.rgb * i.color.rgb * tex.a;
-				#else
-				main.rgb = tex.rgb * i.color.rgb;
+				tex.rgb *= tex.a;
 				#endif
-				main.a = tex.a * i.color.a;
+
+				half4 main = tex * i.color;
+				if (i.color.a == 0)
+					return main;
 
 				half4 mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, i.uv);
 				return CombinedShapeLightShared(main, mask, i.lightingUV);

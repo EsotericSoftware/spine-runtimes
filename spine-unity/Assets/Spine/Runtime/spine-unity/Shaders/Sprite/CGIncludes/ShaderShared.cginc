@@ -137,7 +137,7 @@ inline fixed4 prepareLitPixelForOutput(fixed4 finalPixel, fixed4 color) : SV_Tar
 	finalPixel.rgb *= finalPixel.a;
 #elif defined(_ALPHAPREMULTIPLY_ON)
 	//Pre multiplied alpha
-	finalPixel.rgb *= color.a;
+	// texture and vertex colors are premultiplied already
 #elif defined(_MULTIPLYBLEND)
 	//Multiply
 	finalPixel = lerp(fixed4(1,1,1,1), finalPixel, finalPixel.a);
@@ -238,6 +238,20 @@ uniform fixed _Cutoff;
 
 #define ALPHA_CLIP(pixel, color)
 
+#endif
+
+////////////////////////////////////////
+// Additive Slot blend mode
+// return unlit textureColor, alpha clip textureColor.a only
+//
+#if defined(_ALPHAPREMULTIPLY_ON)
+	#define RETURN_UNLIT_IF_ADDITIVE_SLOT(textureColor, vertexColor) \
+	if (vertexColor.a == 0 && (vertexColor.r || vertexColor.g || vertexColor.b)) {\
+		ALPHA_CLIP(texureColor, fixed4(1, 1, 1, 1))\
+			return texureColor * vertexColor;\
+	}
+#else
+	#define RETURN_UNLIT_IF_ADDITIVE_SLOT(textureColor, vertexColor)
 #endif
 
 ////////////////////////////////////////

@@ -399,10 +399,10 @@ VertexOutput vert(VertexInput input)
 ////////////////////////////////////////
 // Fragment program
 //
-
 fixed4 frag(VertexOutput input) : SV_Target
 {
 	fixed4 texureColor = calculateTexturePixel(input.texcoord.xy);
+	RETURN_UNLIT_IF_ADDITIVE_SLOT(texureColor, input.color) // shall be called before ALPHA_CLIP
 	ALPHA_CLIP(texureColor, input.color)
 
 #if defined(PER_PIXEL_LIGHTING)
