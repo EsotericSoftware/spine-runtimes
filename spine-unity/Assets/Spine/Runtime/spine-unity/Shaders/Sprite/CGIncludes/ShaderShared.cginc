@@ -241,6 +241,20 @@ uniform fixed _Cutoff;
 #endif
 
 ////////////////////////////////////////
+// Additive Slot blend mode
+// return unlit textureColor, alpha clip textureColor.a only
+//
+#if defined(_ALPHAPREMULTIPLY_ON)
+	#define RETURN_UNLIT_IF_ADDITIVE_SLOT(textureColor, vertexColor) \
+	if (vertexColor.a == 0 && (vertexColor.r || vertexColor.g || vertexColor.b)) {\
+		ALPHA_CLIP(texureColor, fixed4(1, 1, 1, 1))\
+			return texureColor * vertexColor;\
+	}
+#else
+	#define RETURN_UNLIT_IF_ADDITIVE_SLOT(textureColor, vertexColor)
+#endif
+
+////////////////////////////////////////
 // Color functions
 //
 
