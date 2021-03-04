@@ -58,7 +58,6 @@
 #include <spine/EventData.h>
 #include <spine/AttachmentTimeline.h>
 #include <spine/ColorTimeline.h>
-#include <spine/TwoColorTimeline.h>
 #include <spine/RotateTimeline.h>
 #include <spine/TranslateTimeline.h>
 #include <spine/ScaleTimeline.h>

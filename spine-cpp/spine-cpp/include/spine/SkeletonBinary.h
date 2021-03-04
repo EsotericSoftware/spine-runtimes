@@ -45,26 +45,38 @@ namespace spine {
 	class Attachment;
 	class VertexAttachment;
 	class Animation;
+	class Timeline;
 	class CurveTimeline;
+    class CurveTimeline1;
+    class CurveTimeline2;
 
 	class SP_API SkeletonBinary : public SpineObject {
 	public:
-		static const int BONE_ROTATE;
-		static const int BONE_TRANSLATE;
-		static const int BONE_SCALE;
-		static const int BONE_SHEAR;
+        static const int BONE_ROTATE = 0;
+        static const int BONE_TRANSLATE = 1;
+        static const int BONE_TRANSLATEX = 2;
+        static const int BONE_TRANSLATEY = 3;
+        static const int BONE_SCALE = 4;
+        static const int BONE_SCALEX = 5;
+        static const int BONE_SCALEY = 6;
+        static const int BONE_SHEAR = 7;
+        static const int BONE_SHEARX = 8;
+        static const int BONE_SHEARY = 9;
 
-		static const int SLOT_ATTACHMENT;
-		static const int SLOT_COLOR;
-		static const int SLOT_TWO_COLOR;
+        static const int SLOT_ATTACHMENT = 0;
+        static const int SLOT_RGBA = 1;
+        static const int SLOT_RGB = 2;
+        static const int SLOT_RGBA2 = 3;
+        static const int SLOT_RGB2 = 4;
+        static const int SLOT_ALPHA = 5;
 
-		static const int PATH_POSITION;
-		static const int PATH_SPACING;
-		static const int PATH_MIX;
+        static const int PATH_POSITION = 0;
+        static const int PATH_SPACING = 1;
+        static const int PATH_MIX = 2;
 
-		static const int CURVE_LINEAR;
-		static const int CURVE_STEPPED;
-		static const int CURVE_BEZIER;
+        static const int CURVE_LINEAR = 0;
+        static const int CURVE_STEPPED = 1;
+        static const int CURVE_BEZIER = 2;
 
 		explicit SkeletonBinary(Atlas* atlasArray);
 
@@ -124,7 +136,12 @@ namespace spine {
 
 		Animation* readAnimation(const String& name, DataInput* input, SkeletonData *skeletonData);
 
-		void readCurve(DataInput* input, int frameIndex, CurveTimeline* timeline);
+		void setBezier(DataInput* input, CurveTimeline* timeline, int bezier, int frame, int value, float time1, float time2,
+                       float value1, float value2, float scale);
+
+		Timeline *readTimeline (DataInput *input, CurveTimeline1 *timeline, float scale);
+
+        Timeline *readTimeline2 (DataInput *input, CurveTimeline2 *timeline, float scale);
 	};
 }
 
