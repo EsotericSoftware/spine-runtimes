@@ -212,11 +212,8 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input) : SV_Target
 	UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
 	fixed4 texureColor = calculateTexturePixel(input.texcoord.xy);
+	RETURN_UNLIT_IF_ADDITIVE_SLOT(texureColor, input.vertexColor) // shall be called before ALPHA_CLIP
 	ALPHA_CLIP(texureColor, input.vertexColor)
-#if !defined(_MULTIPLYBLEND) && !defined(_MULTIPLYBLEND_X2)
-	if (input.vertexColor.a == 0)
-		return texureColor * input.vertexColor;
-#endif
 
 	// fill out InputData struct
 	InputData inputData;
