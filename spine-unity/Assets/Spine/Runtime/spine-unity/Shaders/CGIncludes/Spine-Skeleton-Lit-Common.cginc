@@ -109,16 +109,11 @@ sampler2D _MainTex;
 fixed4 frag (VertexOutput i) : SV_Target {
 	fixed4 tex = tex2D(_MainTex, i.uv0);
 	ALPHA_CLIP(tex, i.color);
-
-	fixed4 col;
-	#if defined(_STRAIGHT_ALPHA_INPUT)
-	col.rgb = tex * i.color * tex.a;
-	#else
-	col.rgb = tex * i.color;
-	#endif
-
-	col *= 2;
-	col.a = tex.a * i.color.a;
+#if defined(_STRAIGHT_ALPHA_INPUT)
+	tex.rgb *= tex.a;
+#endif
+	fixed4 col = tex * i.color;
+	col.rgb *= 2;
 	return col;
 }
 

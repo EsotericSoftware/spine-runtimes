@@ -59,6 +59,8 @@ VertexOutput vert(appdata v) {
 	float3 positionWS = TransformObjectToWorld(v.pos);
 	half3 fixedNormal = half3(0, 0, -1);
 	half3 normalWS = normalize(mul((float3x3)unity_ObjectToWorld, fixedNormal));
+	o.uv0 = v.uv0;
+	o.pos = TransformWorldToHClip(positionWS);
 
 #ifdef _DOUBLE_SIDED_LIGHTING
 	// unfortunately we have to compute the sign here in the vertex shader
@@ -69,7 +71,16 @@ VertexOutput vert(appdata v) {
 #endif
 
 	half3 shadowedColor;
-	color.rgb = LightweightLightVertexSimplified(positionWS, normalWS, shadowedColor);
+	if (color.a == 0) {
+		o.color = color;
+#if defined(SKELETONLIT_RECEIVE_SHADOWS)
+		o.shadowedColor = color;
+		o.shadowCoord = float4(0, 0, 0, 0);
+#endif
+		return o;
+	}
+
+	color.rgb *= LightweightLightVertexSimplified(positionWS, normalWS, shadowedColor);
 #if defined(SKELETONLIT_RECEIVE_SHADOWS)
 	o.shadowedColor = shadowedColor;
 #endif
@@ -78,10 +89,7 @@ VertexOutput vert(appdata v) {
 	half3 vertexSH;
 	OUTPUT_SH(normalWS.xyz, vertexSH);
 	color.rgb += SAMPLE_GI(input.lightmapUV, vertexSH, normalWS);
-
 	o.color = color;
-	o.uv0 = v.uv0;
-	o.pos = TransformWorldToHClip(positionWS);
 
 #if defined(SKELETONLIT_RECEIVE_SHADOWS)
 	VertexPositionInputs vertexInput;
@@ -94,22 +102,18 @@ VertexOutput vert(appdata v) {
 
 half4 frag(VertexOutput i) : SV_Target{
 	half4 tex = tex2D(_MainTex, i.uv0);
-	half4 col;
+	#if defined(_STRAIGHT_ALPHA_INPUT)
+	tex.rgb *= tex.a;
+	#endif
+
+	if (i.color.a == 0)
+		return tex * i.color;
 
 #if defined(SKELETONLIT_RECEIVE_SHADOWS)
 	half shadowAttenuation = MainLightRealtimeShadow(i.shadowCoord);
 	i.color.rgb = lerp(i.shadowedColor, i.color.rgb, shadowAttenuation);
 #endif
-
-	#if defined(_STRAIGHT_ALPHA_INPUT)
-	col.rgb = tex.rgb * i.color.rgb * tex.a;
-	#else
-	col.rgb = tex.rgb * i.color.rgb;
-	#endif
-
-
-	col.a = tex.a * i.color.a;
-	return col;
+	return tex * i.color;
 }
 
 #endif
