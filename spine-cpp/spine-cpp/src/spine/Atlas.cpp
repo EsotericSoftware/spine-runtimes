@@ -102,232 +102,252 @@ Vector<AtlasRegion*> &Atlas::getRegions() {
     return _regions;
 }
 
+struct SimpleString {
+    char* start;
+    char* end;
+    int length;
+
+    SimpleString trim() {
+        while (isspace((unsigned char) *start) && start < end)
+            start++;
+        if (start == end) return *this;
+        end--;
+        while (((unsigned char)*end == '\r') && end >= start)
+            end--;
+        end++;
+        length = end - start;
+        return *this;
+    }
+
+    int indexOf(char needle) {
+        char *c = start;
+        while (c < end) {
+            if (*c == needle) return c - start;
+            c++;
+        }
+        return -1;
+    }
+
+    int indexOf(char needle, int at) {
+        char *c = start + at;
+        while (c < end) {
+            if (*c == needle) return c - start;
+            c++;
+        }
+        return -1;
+    }
+
+    SimpleString substr(int s, int e) {
+        e = s + e;
+        SimpleString result;
+        result.start = start + s;
+        result.end = start + e;
+        result.length = e - s;
+        return result;
+    }
+
+    SimpleString substr(int s) {
+        SimpleString result;
+        result.start = start + s;
+        result.end = end;
+        result.length = result.end - result.start;
+        return result;
+    }
+
+    bool equals(const char *str) {
+        int otherLen = strlen(str);
+        if (length != otherLen) return false;
+        for (int i = 0; i < length; i++) {
+            if (start[i] != str[i]) return false;
+        }
+        return true;
+    }
+
+    char *copy() {
+        char *string = SpineExtension::calloc<char>(length + 1, __FILE__, __LINE__);
+        memcpy(string, start, length);
+        string[length] = '\0';
+        return string;
+    }
+
+    int toInt() {
+        return (int) strtol(start, &end, 10);
+    }
+};
+
+struct AtlasInput {
+    const char *start;
+    const char *end;
+    char *index;
+    int length;
+    SimpleString line;
+
+    AtlasInput(const char *data, int length) : start(data), end(data + length), index((char*)data), length(length) {}
+
+    SimpleString *readLine() {
+        if (index >= end) return 0;
+        line.start = index;
+        while (index < end && *index != '\n')
+            index++;
+        line.end = index;
+        if (index != end) index++;
+        line = line.trim();
+        line.length = end - start;
+        return &line;
+    }
+
+    static int readEntry(SimpleString entry[5], SimpleString *line) {
+        if (line == NULL) return 0;
+        line->trim();
+        if (line->length == 0) return 0;
+
+        int colon = line->indexOf(':');
+        if (colon == -1) return 0;
+        entry[0] = line->substr(0, colon).trim();
+        for (int i = 1, lastMatch = colon + 1;; i++) {
+            int comma = line->indexOf(',', lastMatch);
+            if (comma == -1) {
+                entry[i] = line->substr(lastMatch).trim();
+                return i;
+            }
+            entry[i] = line->substr(lastMatch, comma - lastMatch).trim();
+            lastMatch = comma + 1;
+            if (i == 4) return 4;
+        }
+    }
+};
+
+int indexOf(const char **array, int count, SimpleString *str) {
+    for (int i = 0; i < count; i++)
+        if (str->equals(array[i])) return i;
+    return 0;
+}
+
 void Atlas::load(const char *begin, int length, const char *dir, bool createTexture) {
-	static const char *formatNames[] = {"", "Alpha", "Intensity", "LuminanceAlpha", "RGB565", "RGBA4444", "RGB888", "RGBA8888"};
-	static const char *textureFilterNames[] = {"", "Nearest", "Linear", "MipMap", "MipMapNearestNearest", "MipMapLinearNearest",
-		"MipMapNearestLinear", "MipMapLinearLinear"};
+    static const char *formatNames[] = {"", "Alpha", "Intensity", "LuminanceAlpha", "RGB565", "RGBA4444", "RGB888",
+                                        "RGBA8888"};
+    static const char *textureFilterNames[] = {"", "Nearest", "Linear", "MipMap", "MipMapNearestNearest",
+                                               "MipMapLinearNearest",
+                                               "MipMapNearestLinear", "MipMapLinearLinear"};
 
-	int count;
-	const char *end = begin + length;
-	int dirLength = (int) strlen(dir);
-	int needsSlash = dirLength > 0 && dir[dirLength - 1] != '/' && dir[dirLength - 1] != '\\';
+    int dirLength = (int) strlen(dir);
+    int needsSlash = dirLength > 0 && dir[dirLength - 1] != '/' && dir[dirLength - 1] != '\\';
+    AtlasInput reader(begin, length);
+    SimpleString entry[5];
+    AtlasPage *page = NULL;
 
-	AtlasPage *page = NULL;
-	Str str;
-	Str tuple[4];
+    SimpleString *line = reader.readLine();
+    while (line != NULL && line->length == 0)
+        line = reader.readLine();
 
-	while (readLine(&begin, end, &str)) {
-		if (str.end - str.begin == 0) {
-			page = 0;
-		} else if (!page) {
-			char *name = mallocString(&str);
-			char *path = SpineExtension::calloc<char>(dirLength + needsSlash + strlen(name) + 1, __FILE__, __LINE__);
-			memcpy(path, dir, dirLength);
-			if (needsSlash) path[dirLength] = '/';
-			strcpy(path + dirLength + needsSlash, name);
+    while (true) {
+        if (line == NULL || line->length == 0) break;
+        if (reader.readEntry(entry, line) == 0) break;
+        line = reader.readLine();
+    }
 
-			page = new(__FILE__, __LINE__) AtlasPage(String(name, true));
+    while (true) {
+        if (line == NULL) break;
+        if (line->trim().length == 0) {
+            page = NULL;
+            line = reader.readLine();
+        } else if (page == NULL) {
+            char *name = line->copy();
+            char *path = SpineExtension::calloc<char>(dirLength + needsSlash + strlen(name) + 1, __FILE__, __LINE__);
+            memcpy(path, dir, dirLength);
+            if (needsSlash) path[dirLength] = '/';
+            strcpy(path + dirLength + needsSlash, name);
+            page = new(__FILE__, __LINE__) AtlasPage(String(name, true));
 
-			int tupleVal = readTuple(&begin, end, tuple);
-			assert(tupleVal == 2);
+            while (true) {
+                line = line = reader.readLine();
+                if (reader.readEntry(entry, line) == 0) break;
+                if (entry[0].equals("size")) {
+                    page->width = entry[1].toInt();
+                    page->height = entry[2].toInt();
+                } else if (entry[0].equals("format")) {
+                    page->format = (Format) indexOf(formatNames, 8, &entry[1]);
+                } else if (entry[0].equals("filter")) {
+                    page->minFilter = (TextureFilter) indexOf(textureFilterNames, 8, &entry[1]);
+                    page->magFilter = (TextureFilter) indexOf(textureFilterNames, 8, &entry[2]);
+                } else if (entry[0].equals("repeat")) {
+                    page->uWrap = TextureWrap_ClampToEdge;
+                    page->vWrap = TextureWrap_ClampToEdge;
+                    if (entry[1].indexOf('x') != -1) page->uWrap = TextureWrap_Repeat;
+                    if (entry[1].indexOf('y') != -1) page->vWrap = TextureWrap_Repeat;
+                } else if (entry[0].equals("pma")) {
+                    page->pma = entry[1].equals("true");
+                }
+            }
 
-			/* size is only optional for an atlas packed with an old TexturePacker. */
-			page->width = toInt(tuple);
-			page->height = toInt(tuple + 1);
-			readTuple(&begin, end, tuple);
+            if (createTexture) {
+                if (_textureLoader) _textureLoader->load(*page, String(path));
+                SpineExtension::free(path, __FILE__, __LINE__);
+            } else {
+                page->texturePath = String(path, true);
+            }
+            _pages.add(page);
+        } else {
+            AtlasRegion *region = new(__FILE__, __LINE__) AtlasRegion();
+            region->page = page;
+            region->name = String(line->copy(), true);
+            while (true) {
+                line = line = reader.readLine();
+                int count = reader.readEntry(entry, line);
+                if (count == 0) break;
+                if (entry[0].equals("xy")) {
+                    region->x = entry[1].toInt();
+                    region->y = entry[2].toInt();
+                } else if (entry[0].equals("size")) {
+                    region->width = entry[1].toInt();
+                    region->height = entry[2].toInt();
+                } else if (entry[0].equals("bounds")) {
+                    region->x = entry[1].toInt();
+                    region->y = entry[2].toInt();
+                    region->width = entry[3].toInt();
+                    region->height = entry[4].toInt();
+                } else if (entry[0].equals("offset")) {
+                    region->offsetX = entry[1].toInt();
+                    region->offsetY = entry[2].toInt();
+                } else if (entry[0].equals("orig")) {
+                    region->originalWidth = entry[1].toInt();
+                    region->originalHeight = entry[2].toInt();
+                } else if (entry[0].equals("offsets")) {
+                    region->offsetX = entry[1].toInt();
+                    region->offsetY = entry[2].toInt();
+                    region->originalWidth = entry[3].toInt();
+                    region->originalHeight = entry[4].toInt();
+                } else if (entry[0].equals("rotate")) {
+                    if (entry[1].equals("true")) {
+                        region->degrees = 90;
+                    } else if (!entry[1].equals("false")) {
+                        region->degrees = entry[1].toInt();
+                    }
+                } else if (entry[0].equals("index")) {
+                    region->index = entry[1].toInt();
+                } else {
+                    region->names.add(String(entry[0].copy()));
+                    for (int i = 0; i < count; i++) {
+                        region->values.add(entry[i + 1].toInt());
+                    }
+                }
+            }
+            if (region->originalWidth == 0 && region->originalHeight == 0) {
+                region->originalWidth = region->width;
+                region->originalHeight = region->height;
+            }
 
-			page->format = (Format) indexOf(formatNames, 8, tuple);
-
-			readTuple(&begin, end, tuple);
-			page->minFilter = (TextureFilter) indexOf(textureFilterNames, 8, tuple);
-			page->magFilter = (TextureFilter) indexOf(textureFilterNames, 8, tuple + 1);
-
-			readValue(&begin, end, &str);
-
-			page->uWrap = TextureWrap_ClampToEdge;
-			page->vWrap = TextureWrap_ClampToEdge;
-			if (!equals(&str, "none")) {
-				if (str.end - str.begin == 1) {
-					if (*str.begin == 'x') {
-						page->uWrap = TextureWrap_Repeat;
-					} else if (*str.begin == 'y') {
-						page->vWrap = TextureWrap_Repeat;
-					}
-				} else if (equals(&str, "xy")) {
-					page->uWrap = TextureWrap_Repeat;
-					page->vWrap = TextureWrap_Repeat;
-				}
-			}
-
-			if (createTexture) {
-				if (_textureLoader) _textureLoader->load(*page, String(path));
-				SpineExtension::free(path, __FILE__, __LINE__);
-			} else
-				page->texturePath = String(path, true);
-
-			_pages.add(page);
-		} else {
-			AtlasRegion *region = new(__FILE__, __LINE__) AtlasRegion();
-
-			region->page = page;
-			region->name = String(mallocString(&str), true);
-
-			readValue(&begin, end, &str);
-			if (equals(&str, "true")) region->degrees = 90;
-			else if (equals(&str, "false")) region->degrees = 0;
-			else region->degrees = toInt(&str);
-			region->rotate = region->degrees == 90;
-
-			readTuple(&begin, end, tuple);
-			region->x = toInt(tuple);
-			region->y = toInt(tuple + 1);
-
-			readTuple(&begin, end, tuple);
-			region->width = toInt(tuple);
-			region->height = toInt(tuple + 1);
-
-			region->u = region->x / (float) page->width;
-			region->v = region->y / (float) page->height;
-			if (region->rotate) {
-				region->u2 = (region->x + region->height) / (float) page->width;
-				region->v2 = (region->y + region->width) / (float) page->height;
-			} else {
-				region->u2 = (region->x + region->width) / (float) page->width;
-				region->v2 = (region->y + region->height) / (float) page->height;
-			}
-
-			count = readTuple(&begin, end, tuple);
-			assert(count);
-
-			if (count == 4) {
-				/* split is optional */
-				region->splits.setSize(4, 0);
-				region->splits[0] = toInt(tuple);
-				region->splits[1] = toInt(tuple + 1);
-				region->splits[2] = toInt(tuple + 2);
-				region->splits[3] = toInt(tuple + 3);
-
-				count = readTuple(&begin, end, tuple);
-				assert(count);
-
-				if (count == 4) {
-					/* pad is optional, but only present with splits */
-					region->pads.setSize(4, 0);
-					region->pads[0] = toInt(tuple);
-					region->pads[1] = toInt(tuple + 1);
-					region->pads[2] = toInt(tuple + 2);
-					region->pads[3] = toInt(tuple + 3);
-
-					readTuple(&begin, end, tuple);
-				}
-			}
-
-			region->originalWidth = toInt(tuple);
-			region->originalHeight = toInt(tuple + 1);
-
-			readTuple(&begin, end, tuple);
-			region->offsetX = (float)toInt(tuple);
-			region->offsetY = (float)toInt(tuple + 1);
-
-			readValue(&begin, end, &str);
-
-			region->index = toInt(&str);
-
-			_regions.add(region);
-		}
-	}
+            region->u = region->x / page->width;
+            region->v = region->y / page->height;
+            if (region->degrees == 90) {
+                region->u2 = (region->x + region->height) / page->width;
+                region->v2 = (region->y + region->width) / page->height;
+            } else {
+                region->u2 = (region->x + region->width) / page->width;
+                region->v2 = (region->y + region->height) / page->height;
+            }
+            _regions.add(region);
+        }
+    }
 }
 
-void Atlas::trim(Str *str) {
-	while (isspace((unsigned char) *str->begin) && str->begin < str->end)
-		(str->begin)++;
-
-	if (str->begin == str->end) return;
-
-	str->end--;
-
-	while (((unsigned char)*str->end == '\r') && str->end >= str->begin)
-		str->end--;
-
-	str->end++;
-}
-
-int Atlas::readLine(const char **begin, const char *end, Str *str) {
-	if (*begin == end) return 0;
-
-	str->begin = *begin;
-
-	/* Find next delimiter. */
-	while (*begin != end && **begin != '\n')
-		(*begin)++;
-
-	str->end = *begin;
-	trim(str);
-
-	if (*begin != end) (*begin)++;
-
-	return 1;
-}
-
-int Atlas::beginPast(Str *str, char c) {
-	const char *begin = str->begin;
-	while (true) {
-		char lastSkippedChar = *begin;
-		if (begin == str->end) return 0;
-		begin++;
-		if (lastSkippedChar == c) break;
-	}
-	str->begin = begin;
-	return 1;
-}
-
-int Atlas::readValue(const char **begin, const char *end, Str *str) {
-	readLine(begin, end, str);
-	if (!beginPast(str, ':')) return 0;
-	trim(str);
-	return 1;
-}
-
-int Atlas::readTuple(const char **begin, const char *end, Str tuple[]) {
-	int i;
-	Str str = {NULL, NULL};
-	readLine(begin, end, &str);
-	if (!beginPast(&str, ':')) return 0;
-
-	for (i = 0; i < 3; ++i) {
-		tuple[i].begin = str.begin;
-		if (!beginPast(&str, ',')) break;
-		tuple[i].end = str.begin - 2;
-		trim(&tuple[i]);
-	}
-
-	tuple[i].begin = str.begin;
-	tuple[i].end = str.end;
-	trim(&tuple[i]);
-
-	return i + 1;
-}
-
-char *Atlas::mallocString(Str *str) {
-	int length = (int) (str->end - str->begin);
-	char *string = SpineExtension::calloc<char>(length + 1, __FILE__, __LINE__);
-	memcpy(string, str->begin, length);
-	string[length] = '\0';
-	return string;
-}
-
-int Atlas::indexOf(const char **array, int count, Str *str) {
-	int length = (int) (str->end - str->begin);
-	int i;
-	for (i = count - 1; i >= 0; i--)
-		if (strncmp(array[i], str->begin, length) == 0) return i;
-	return 0;
-}
-
-int Atlas::equals(Str *str, const char *other) {
-	return strncmp(other, str->begin, str->end - str->begin) == 0;
-}
-
-int Atlas::toInt(Str *str) {
-	return (int) strtol(str->begin, (char **) &str->end, 10);
-}

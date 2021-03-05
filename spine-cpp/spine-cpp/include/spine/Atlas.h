@@ -74,10 +74,11 @@ public:
 	TextureWrap uWrap;
 	TextureWrap vWrap;
 	int width, height;
+	bool pma;
 
 	explicit AtlasPage(const String &inName) : name(inName), format(Format_RGBA8888), minFilter(TextureFilter_Nearest),
 		magFilter(TextureFilter_Nearest), uWrap(TextureWrap_ClampToEdge),
-		vWrap(TextureWrap_ClampToEdge), width(0), height(0) {
+		vWrap(TextureWrap_ClampToEdge), width(0), height(0), pma(false) {
 	}
 };
 
@@ -94,6 +95,8 @@ public:
 	int degrees;
 	Vector<int> splits;
 	Vector<int> pads;
+	Vector<String> names;
+	Vector<float> values;
 };
 
 class TextureLoader;
@@ -123,34 +126,6 @@ private:
 	TextureLoader *_textureLoader;
 
 	void load(const char *begin, int length, const char *dir, bool createTexture);
-
-	class Str {
-	public:
-		const char *begin;
-		const char *end;
-	};
-
-	static void trim(Str *str);
-
-	/// Tokenize string without modification. Returns 0 on failure
-	static int readLine(const char **begin, const char *end, Str *str);
-
-	/// Moves str->begin past the first occurence of c. Returns 0 on failure
-	static int beginPast(Str *str, char c);
-
-	/// Returns 0 on failure
-	static int readValue(const char **begin, const char *end, Str *str);
-
-	/// Returns the number of tuple values read (1, 2, 4, or 0 for failure)
-	static int readTuple(const char **begin, const char *end, Str tuple[]);
-
-	static char *mallocString(Str *str);
-
-	static int indexOf(const char **array, int count, Str *str);
-
-	static int equals(Str *str, const char *other);
-
-	static int toInt(Str *str);
 };
 }
 

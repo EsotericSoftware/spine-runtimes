@@ -60,8 +60,6 @@ namespace spine {
 		static const int SCALEX = 4;
         static const int SCALEY = 5;
 		static const int SHEARY = 6;
-
-		Vector<float> _frames;
 	};
 }
 
