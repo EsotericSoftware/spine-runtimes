@@ -105,7 +105,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 
 	skeletonData = new(__FILE__, __LINE__) SkeletonData();
 
-	char buffer[8] = { 0 };
+	char buffer[16] = { 0 };
 	int lowHash = readInt(input);
 	int hightHash = readInt(input);
 	String hashString;
@@ -745,8 +745,9 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 	Vector<Timeline *> timelines;
 	float scale = _scale;
     int numTimelines = readVarint(input, true);
+    SP_UNUSED(numTimelines);
 	// Slot timelines.
-	for (int i = 0, n = numTimelines; i < n; ++i) {
+	for (int i = 0, n = readVarint(input, true); i < n; ++i) {
 		int slotIndex = readVarint(input, true);
 		for (int ii = 0, nn = readVarint(input, true); ii < nn; ++ii) {
 			unsigned char timelineType = readByte(input);
