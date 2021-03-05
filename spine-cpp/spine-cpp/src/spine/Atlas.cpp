@@ -337,14 +337,14 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
                 region->originalHeight = region->height;
             }
 
-            region->u = region->x / page->width;
-            region->v = region->y / page->height;
+            region->u = (float)region->x / page->width;
+            region->v = (float)region->y / page->height;
             if (region->degrees == 90) {
-                region->u2 = (region->x + region->height) / page->width;
-                region->v2 = (region->y + region->width) / page->height;
+                region->u2 = (float)(region->x + region->height) / page->width;
+                region->v2 = (float)(region->y + region->width) / page->height;
             } else {
-                region->u2 = (region->x + region->width) / page->width;
-                region->v2 = (region->y + region->height) / page->height;
+                region->u2 = (float)(region->x + region->width) / page->width;
+                region->v2 = (float)(region->y + region->height) / page->height;
             }
             _regions.add(region);
         }
