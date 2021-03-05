@@ -51,6 +51,8 @@ ScaleTimeline::ScaleTimeline(size_t frameCount, size_t bezierCount, int boneInde
     setPropertyIds(ids, 2);
 }
 
+ScaleTimeline::~ScaleTimeline() {}
+
 void ScaleTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
 	MixBlend blend, MixDirection direction
 ) {
@@ -164,6 +166,8 @@ ScaleXTimeline::ScaleXTimeline(size_t frameCount, size_t bezierCount, int boneIn
     setPropertyIds(ids, 1);
 }
 
+ScaleXTimeline::~ScaleXTimeline() {}
+
 void ScaleXTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
                           MixBlend blend, MixDirection direction
 ) {
@@ -234,6 +238,8 @@ ScaleYTimeline::ScaleYTimeline(size_t frameCount, size_t bezierCount, int boneIn
     PropertyId ids[] = { ((PropertyId)Property_ScaleY << 32) | boneIndex };
     setPropertyIds(ids, 1);
 }
+
+ScaleYTimeline::~ScaleYTimeline() {}
 
 void ScaleYTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
                            MixBlend blend, MixDirection direction

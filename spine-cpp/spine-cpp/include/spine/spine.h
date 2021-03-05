@@ -102,7 +102,6 @@
 #include <spine/TransformMode.h>
 #include <spine/TranslateTimeline.h>
 #include <spine/Triangulator.h>
-#include <spine/TwoColorTimeline.h>
 #include <spine/Updatable.h>
 #include <spine/Vector.h>
 #include <spine/VertexAttachment.h>

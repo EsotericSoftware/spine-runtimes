@@ -65,6 +65,15 @@ Json *Json::getItem(Json *object, const char *string) {
 	return c;
 }
 
+Json *Json::getItem(Json *object, int childIndex) {
+    Json *current = object->_child;
+    while (current != NULL && childIndex > 0) {
+        childIndex--;
+        current = current->_next;
+    }
+    return current;
+}
+
 const char *Json::getString(Json *object, const char *name, const char *defaultValue) {
 	object = getItem(object, name);
 	if (object) {

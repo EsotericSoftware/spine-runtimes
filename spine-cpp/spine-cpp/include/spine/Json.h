@@ -54,6 +54,8 @@ public:
 	/* Get item "string" from object. Case insensitive. */
 	static Json *getItem(Json *object, const char *string);
 
+	static Json *getItem(Json *object, int childIndex);
+
 	static const char *getString(Json *object, const char *name, const char *defaultValue);
 
 	static float getFloat(Json *object, const char *name, float defaultValue);
