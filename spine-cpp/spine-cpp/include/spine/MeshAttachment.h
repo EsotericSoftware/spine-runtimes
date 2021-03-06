@@ -78,9 +78,6 @@ namespace spine {
 		float getRegionV2();
 		void setRegionV2(float inValue);
 
-		bool getRegionRotate();
-		void setRegionRotate(bool inValue);
-
 		int getRegionDegrees();
 		void setRegionDegrees(int inValue);
 
@@ -135,7 +132,6 @@ namespace spine {
 		float _height;
 		Color _color;
 		int _hullLength;
-		bool _regionRotate;
 		int _regionDegrees;
 	};
 }

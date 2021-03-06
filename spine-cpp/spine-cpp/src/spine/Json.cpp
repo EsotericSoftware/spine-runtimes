@@ -99,6 +99,8 @@ bool Json::getBoolean(spine::Json *value, const char *name, bool defaultValue) {
 		if (value->_valueString) return strcmp(value->_valueString, "true") == 0;
 		if (value->_type == JSON_NULL) return false;
 		if (value->_type == JSON_NUMBER) return value->_valueFloat != 0;
+		if (value->_type == JSON_FALSE) return false;
+		if (value->_type == JSON_TRUE) return true;
 		return defaultValue;
 	} else {
 		return defaultValue;

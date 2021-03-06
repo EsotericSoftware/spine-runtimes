@@ -55,7 +55,6 @@ MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name), Has
 	_height(0),
 	_color(1, 1, 1, 1),
 	_hullLength(0),
-	_regionRotate(false),
 	_regionDegrees(0)
 {}
 
@@ -185,14 +184,6 @@ void MeshAttachment::setRegionV2(float inValue) {
 	_regionV2 = inValue;
 }
 
-bool MeshAttachment::getRegionRotate() {
-	return _regionRotate;
-}
-
-void MeshAttachment::setRegionRotate(bool inValue) {
-	_regionRotate = inValue;
-}
-
 int MeshAttachment::getRegionDegrees() {
 	return _regionDegrees;
 }
@@ -301,7 +292,6 @@ Attachment* MeshAttachment::copy() {
 	copy->_regionV = _regionV;
 	copy->_regionU2 = _regionU2;
 	copy->_regionV2 = _regionV2;
-	copy->_regionRotate = _regionRotate;
 	copy->_regionDegrees = _regionDegrees;
 	copy->_regionOffsetX = _regionOffsetX;
 	copy->_regionOffsetY = _regionOffsetY;
@@ -332,7 +322,6 @@ MeshAttachment* MeshAttachment::newLinkedMesh() {
 	copy->_regionV = _regionV;
 	copy->_regionU2 = _regionU2;
 	copy->_regionV2 = _regionV2;
-	copy->_regionRotate = _regionRotate;
 	copy->_regionDegrees = _regionDegrees;
 	copy->_regionOffsetX = _regionOffsetX;
 	copy->_regionOffsetY = _regionOffsetY;

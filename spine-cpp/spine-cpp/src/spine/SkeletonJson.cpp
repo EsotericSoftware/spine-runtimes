@@ -100,7 +100,7 @@ static float toColor(const char *value, size_t index) {
 static void toColor(Color &color, const char *value, bool hasAlpha) {
     color.r = toColor(value, 0);
     color.g = toColor(value, 1);
-    color.g = toColor(value, 2);
+    color.b = toColor(value, 2);
     if (hasAlpha) color.a = toColor(value, 3);
 }
 
@@ -1036,7 +1036,8 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
         float softness = Json::getFloat(keyMap, "softness", 0) * _scale;
 
         for (frame = 0, bezier = 0;; frame++) {
-            timeline->setFrame(frame, time, mix, softness, Json::getBoolean(keyMap, "bendPositive", true) ? 1 : -1, Json::getBoolean(keyMap, "compress", false), Json::getBoolean(keyMap, "stretch", false));
+            int bendDirection = Json::getBoolean(keyMap, "bendPositive", true) ? 1 : -1;
+            timeline->setFrame(frame, time, mix, softness, bendDirection, Json::getBoolean(keyMap, "compress", false), Json::getBoolean(keyMap, "stretch", false));
             nextMap = keyMap->_next;
             if (!nextMap) break;
 
