@@ -186,14 +186,16 @@ namespace Spine.Unity {
 				generateMeshOverride += value;
 				if (disableRenderingOnOverride && generateMeshOverride != null) {
 					Initialize(false);
-					meshRenderer.enabled = false;
+					if (meshRenderer)
+						meshRenderer.enabled = false;
 				}
 			}
 			remove {
 				generateMeshOverride -= value;
 				if (disableRenderingOnOverride && generateMeshOverride == null) {
 					Initialize(false);
-					meshRenderer.enabled = true;
+					if (meshRenderer)
+						meshRenderer.enabled = true;
 				}
 			}
 		}

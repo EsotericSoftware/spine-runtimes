@@ -251,8 +251,11 @@ namespace Spine.Unity {
 		}
 
 		static bool IsPMAMaterial (Material material) {
-			return (material.HasProperty(STRAIGHT_ALPHA_PARAM_ID) && material.GetInt(STRAIGHT_ALPHA_PARAM_ID) == 0) ||
-					material.IsKeywordEnabled(ALPHAPREMULTIPLY_ON_KEYWORD);
+			bool usesAlphaPremultiplyKeyword = IsSpriteShader(material);
+			if (usesAlphaPremultiplyKeyword)
+				return material.IsKeywordEnabled(ALPHAPREMULTIPLY_ON_KEYWORD);
+			else
+				return material.HasProperty(STRAIGHT_ALPHA_PARAM_ID) && material.GetInt(STRAIGHT_ALPHA_PARAM_ID) == 0;
 		}
 
 		static bool IsURP3DMaterial (Material material) {
@@ -280,12 +283,16 @@ namespace Spine.Unity {
 					break;
 				}
 			}
-			bool isShaderWithMeshNormals =
-				material.shader.name.Contains("Spine/Sprite/Pixel Lit") ||
-				material.shader.name.Contains("Spine/Sprite/Vertex Lit") ||
-				material.shader.name.Contains("2D/Spine/Sprite") || // covers both URP and LWRP
-				material.shader.name.Contains("Pipeline/Spine/Sprite"); // covers both URP and LWRP
+			bool isShaderWithMeshNormals = IsSpriteShader(material);
 			return isShaderWithMeshNormals && !anyFixedNormalSet;
+		}
+
+		static bool IsSpriteShader (Material material) {
+			string shaderName = material.shader.name;
+			return shaderName.Contains("Spine/Sprite/Pixel Lit") ||
+				shaderName.Contains("Spine/Sprite/Vertex Lit") ||
+				shaderName.Contains("2D/Spine/Sprite") || // covers both URP and LWRP
+				shaderName.Contains("Pipeline/Spine/Sprite"); // covers both URP and LWRP
 		}
 
 		static bool RequiresTintBlack (Material material) {

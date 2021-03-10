@@ -341,7 +341,15 @@ namespace Spine.Unity {
 
 		#region API
 		protected Skeleton skeleton;
-		public Skeleton Skeleton { get { return skeleton; } set { skeleton = value; } }
+		public Skeleton Skeleton {
+			get {
+				Initialize(false);
+				return skeleton;
+			}
+			set {
+				skeleton = value;
+			}
+		}
 		public SkeletonData SkeletonData { get { return skeleton == null ? null : skeleton.data; } }
 		public bool IsValid { get { return skeleton != null; } }
 
@@ -474,7 +482,6 @@ namespace Spine.Unity {
 		public void Initialize (bool overwrite) {
 			if (this.IsValid && !overwrite) return;
 
-			// Make sure none of the stuff is null
 			if (this.skeletonDataAsset == null) return;
 			var skeletonData = this.skeletonDataAsset.GetSkeletonData(false);
 			if (skeletonData == null) return;
