@@ -10,7 +10,7 @@
 		"url": "http://esotericsoftware.com/"
 	},
 	"dependencies": {
-		"com.unity.timeline": "1.0.0"
+		"com.unity.timeline": "1.2.10"
 	},
 	"keywords": [
 		"spine",
