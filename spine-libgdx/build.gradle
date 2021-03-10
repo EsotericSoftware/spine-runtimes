@@ -5,7 +5,7 @@ group = "com.github.EsotericSoftware"
 version = "4.0-beta"
 
 ext {
-    libgdxVersion = "1.9.11"
+    libgdxVersion = "1.9.14"
 }
 
 sourceSets.main.java.srcDirs = ["spine-libgdx/src"]
