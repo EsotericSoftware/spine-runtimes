@@ -1,6 +1,8 @@
 
 package com.esotericsoftware.spine;
 
+import java.io.InputStream;
+
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
@@ -46,4 +48,6 @@ abstract public class SkeletonLoader {
 	}
 
 	abstract public SkeletonData readSkeletonData (FileHandle file);
+
+	abstract public SkeletonData readSkeletonData (InputStream input);
 }
