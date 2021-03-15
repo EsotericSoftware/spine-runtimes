@@ -33,11 +33,12 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.utils.ScreenUtils;
+
 import com.esotericsoftware.spine.vertexeffects.SwirlEffect;
 
 public class VertexEffectTest extends ApplicationAdapter {
@@ -74,7 +75,7 @@ public class VertexEffectTest extends ApplicationAdapter {
 		// Queue animations on tracks 0 and 1.
 		state.setAnimation(0, "walk", true);
 		state.addAnimation(1, "gun-grab", false, 2); // Keys in higher tracks override the pose from lower tracks.
-		
+
 		swirl = new SwirlEffect(400);
 		swirl.setCenter(0, 200);
 		renderer.setVertexEffect(swirl);
@@ -92,7 +93,7 @@ public class VertexEffectTest extends ApplicationAdapter {
 		if (percent > 1) percent = 1 - (percent - 1);
 		swirl.setAngle(Interpolation.pow2.apply(-60, 60, percent));
 
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		ScreenUtils.clear(0, 0, 0, 0);
 
 		state.apply(skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.
 		skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.

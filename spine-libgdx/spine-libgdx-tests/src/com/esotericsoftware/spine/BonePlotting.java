@@ -30,15 +30,16 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.esotericsoftware.spine.Animation.MixDirection;
+
 import com.esotericsoftware.spine.Animation.MixBlend;
+import com.esotericsoftware.spine.Animation.MixDirection;
 import com.esotericsoftware.spine.attachments.AttachmentLoader;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.attachments.ClippingAttachment;
-import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
+import com.esotericsoftware.spine.attachments.RegionAttachment;
 
 public class BonePlotting {
 	static public void main (String[] args) throws Exception {

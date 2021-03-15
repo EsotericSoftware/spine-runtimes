@@ -29,13 +29,14 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.Animation.EventTimeline;
-import com.esotericsoftware.spine.Animation.MixDirection;
-import com.esotericsoftware.spine.Animation.MixBlend;
+import java.util.Arrays;
+
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 
-import java.util.Arrays;
+import com.esotericsoftware.spine.Animation.EventTimeline;
+import com.esotericsoftware.spine.Animation.MixBlend;
+import com.esotericsoftware.spine.Animation.MixDirection;
 
 /** Unit tests for {@link EventTimeline}. */
 public class EventTimelineTests {

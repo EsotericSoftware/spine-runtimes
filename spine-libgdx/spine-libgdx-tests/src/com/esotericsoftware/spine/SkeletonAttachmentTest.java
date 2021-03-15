@@ -32,10 +32,11 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.utils.ScreenUtils;
+
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
 
 public class SkeletonAttachmentTest extends ApplicationAdapter {
@@ -97,7 +98,7 @@ public class SkeletonAttachmentTest extends ApplicationAdapter {
 		goblinState.apply(goblin);
 		goblin.updateWorldTransform(attachmentBone);
 
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		ScreenUtils.clear(0, 0, 0, 0);
 
 		camera.update();
 		batch.getProjectionMatrix().set(camera.combined);

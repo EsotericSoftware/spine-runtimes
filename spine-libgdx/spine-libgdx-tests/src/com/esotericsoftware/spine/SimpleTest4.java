@@ -32,9 +32,9 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
@@ -85,7 +85,7 @@ public class SimpleTest4 extends ApplicationAdapter {
 	public void render () {
 		state.update(Gdx.graphics.getDeltaTime()); // Update the animation time.
 
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		ScreenUtils.clear(0, 0, 0, 0);
 
 		state.apply(skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.
 		skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
