@@ -35,6 +35,7 @@ public class FboTest extends ApplicationAdapter {
 		renderer = new SkeletonRenderer();
 		renderer.setPremultipliedAlpha(true);
 		font = new BitmapFont();
+		font.setColor(Color.BLACK);
 
 		// Load the atlas and skeleton.
 		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy-pma.atlas"));
@@ -84,7 +85,6 @@ public class FboTest extends ApplicationAdapter {
 			renderer.draw(batch, skeleton);
 		}
 
-		font.setColor(Color.BLACK);
 		font.draw(batch, drawFbo ? "Drawing FBO." : "Not drawing FBO.", 10, 10 + font.getCapHeight());
 		batch.end();
 
