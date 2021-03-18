@@ -55,23 +55,6 @@ struct spBone {
 
 	int/*bool*/ sorted;
 	int/*bool*/ active;
-
-#ifdef __cplusplus
-	spBone() :
-		data(0),
-		skeleton(0),
-		parent(0),
-		childrenCount(0), children(0),
-		x(0), y(0), rotation(0), scaleX(0), scaleY(0),
-		ax(0), ay(0), arotation(0), ascaleX(0), ascaleY(0), ashearX(0), ashearY(0),
-		appliedValid(0),
-
-		a(0), b(0), worldX(0),
-		c(0), d(0), worldY(0),
-
-		sorted(0), active(0) {
-	}
-#endif
 };
 
 SP_API void spBone_setYDown (int/*bool*/yDown);

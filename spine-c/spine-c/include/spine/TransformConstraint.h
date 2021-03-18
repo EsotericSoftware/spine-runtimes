@@ -45,14 +45,14 @@ typedef struct spTransformConstraint {
 	int bonesCount;
 	spBone** const bones;
 	spBone* target;
-	float rotateMix, translateMix, scaleMix, shearMix;
+	float mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY;
 	int /*boolean*/ active;
 } spTransformConstraint;
 
 SP_API spTransformConstraint* spTransformConstraint_create (spTransformConstraintData* data, const struct spSkeleton* skeleton);
 SP_API void spTransformConstraint_dispose (spTransformConstraint* self);
 
-SP_API void spTransformConstraint_apply (spTransformConstraint* self);
+SP_API void spTransformConstraint_update (spTransformConstraint* self);
 
 #ifdef __cplusplus
 }

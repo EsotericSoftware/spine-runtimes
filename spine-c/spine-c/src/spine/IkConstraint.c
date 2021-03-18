@@ -57,7 +57,8 @@ void spIkConstraint_dispose(spIkConstraint *self) {
 	FREE(self);
 }
 
-void spIkConstraint_apply(spIkConstraint *self) {
+void spIkConstraint_update(spIkConstraint *self) {
+    if (self->mix == 0) return;
 	switch (self->bonesCount) {
 	case 1:
 		spIkConstraint_apply1(self->bones[0], self->target->worldX, self->target->worldY, self->compress, self->stretch, self->data->uniform, self->mix);
@@ -131,10 +132,7 @@ void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float 
 	float tx, ty, dd, dx, dy, l1, l2, a1, a2, r, td, sd, p;
 	float id, x, y;
 	float aa, bb, ll, ta, c0, c1, c2;
-	if (alpha == 0) {
-		spBone_updateWorldTransform(child);
-		return;
-	}
+
 	if (!parent->appliedValid) spBone_updateAppliedTransform(parent);
 	if (!child->appliedValid) spBone_updateAppliedTransform(child);
 	px = parent->ax; py = parent->ay; psx = parent->ascaleX; sx = psx; psy = parent->ascaleY; csx = child->ascaleX;

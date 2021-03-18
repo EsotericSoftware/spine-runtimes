@@ -47,10 +47,6 @@ typedef struct {
 	int updateCacheCount;
 	int updateCacheCapacity;
 	_spUpdate* updateCache;
-
-	int updateCacheResetCount;
-	int updateCacheResetCapacity;
-	spBone** updateCacheReset;
 } _spSkeleton;
 
 spSkeleton* spSkeleton_create (spSkeletonData* data) {
@@ -133,7 +129,6 @@ void spSkeleton_dispose (spSkeleton* self) {
 	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
 
 	FREE(internal->updateCache);
-	FREE(internal->updateCacheReset);
 
 	for (i = 0; i < self->bonesCount; ++i)
 		spBone_dispose(self->bones[i]);
@@ -171,15 +166,6 @@ static void _addToUpdateCache(_spSkeleton* const internal, _spUpdateType type, v
 	++internal->updateCacheCount;
 }
 
-static void _addToUpdateCacheReset(_spSkeleton* const internal, spBone* bone) {
-	if (internal->updateCacheResetCount == internal->updateCacheResetCapacity) {
-		internal->updateCacheResetCapacity *= 2;
-		internal->updateCacheReset = (spBone**)realloc(internal->updateCacheReset, sizeof(spBone*) * internal->updateCacheResetCapacity);
-	}
-	internal->updateCacheReset[internal->updateCacheResetCount] = bone;
-	++internal->updateCacheResetCount;
-}
-
 static void _sortBone(_spSkeleton* const internal, spBone* bone) {
 	if (bone->sorted) return;
 	if (bone->parent) _sortBone(internal, bone->parent);
@@ -199,11 +185,13 @@ static void _sortPathConstraintAttachmentBones(_spSkeleton* const internal, spAt
 	else {
 		spBone** bones = internal->super.bones;
 		int i = 0, n;
-		while (i < pathBonesCount) {
-			int boneCount = pathBones[i++];
-			for (n = i + boneCount; i < n; i++)
-				_sortBone(internal, bones[pathBones[i]]);
-		}
+
+        for (i = 0, n = pathBonesCount; i < n;) {
+            int nn = pathBones[i++];
+            nn += i;
+            while (i < nn)
+                _sortBone(internal, bones[pathBones[i++]]);
+        }
 	}
 }
 
@@ -241,23 +229,18 @@ static void _sortIkConstraint (_spSkeleton* const internal, spIkConstraint* cons
 	parent = constrained[0];
 	_sortBone(internal, parent);
 
-	if (constraint->bonesCount > 1) {
+	if (constraint->bonesCount == 1) {
+	    _addToUpdateCache(internal, SP_UPDATE_IK_CONSTRAINT, constraint);
+	    _sortReset(parent->children, parent->childrenCount);
+    } else {
 		spBone* child = constrained[constraint->bonesCount - 1];
-		contains = 0;
-		for (i = 0; i < internal->updateCacheCount; i++) {
-			_spUpdate update = internal->updateCache[i];
-			if (update.object == child) {
-				contains = -1;
-				break;
-			}
-		}
-		if (!contains) _addToUpdateCacheReset(internal, child);
+		_sortBone(internal, child);
+
+        _addToUpdateCache(internal, SP_UPDATE_IK_CONSTRAINT, constraint);
+
+        _sortReset(parent->children, parent->childrenCount);
+        child->sorted = 1;
 	}
-
-	_addToUpdateCache(internal, SP_UPDATE_IK_CONSTRAINT, constraint);
-
-	_sortReset(parent->children, parent->childrenCount);
-	constrained[constraint->bonesCount-1]->sorted = 1;
 }
 
 static void _sortPathConstraint(_spSkeleton* const internal, spPathConstraint* constraint) {
@@ -310,16 +293,8 @@ static void _sortTransformConstraint(_spSkeleton* const internal, spTransformCon
 	if (constraint->data->local) {
 		for (i = 0; i < boneCount; i++) {
 			child = constrained[i];
+			_sortBone(internal, child->parent);
 			_sortBone(internal, child);
-			contains = 0;
-			for (i = 0; i < internal->updateCacheCount; i++) {
-				_spUpdate update = internal->updateCache[i];
-				if (update.object == child) {
-					contains = -1;
-					break;
-				}
-			}
-			if (!contains) _addToUpdateCacheReset(internal, child);
 		}
 	} else {
 		for (i = 0; i < boneCount; i++)
@@ -347,11 +322,6 @@ void spSkeleton_updateCache (spSkeleton* self) {
 	FREE(internal->updateCache);
 	internal->updateCache = MALLOC(_spUpdate, internal->updateCacheCapacity);
 	internal->updateCacheCount = 0;
-
-	internal->updateCacheResetCapacity = self->bonesCount;
-	FREE(internal->updateCacheReset);
-	internal->updateCacheReset = MALLOC(spBone*, internal->updateCacheResetCapacity);
-	internal->updateCacheResetCount = 0;
 
 	bones = self->bones;
 	for (i = 0; i < self->bonesCount; ++i) {
@@ -417,19 +387,6 @@ void spSkeleton_updateCache (spSkeleton* self) {
 void spSkeleton_updateWorldTransform (const spSkeleton* self) {
 	int i;
 	_spSkeleton* internal = SUB_CAST(_spSkeleton, self);
-	spBone** updateCacheReset = internal->updateCacheReset;
-	for (i = 0; i < internal->updateCacheResetCount; i++) {
-		spBone* bone = updateCacheReset[i];
-		CONST_CAST(float, bone->ax) = bone->x;
-		CONST_CAST(float, bone->ay) = bone->y;
-		CONST_CAST(float, bone->arotation) = bone->rotation;
-		CONST_CAST(float, bone->ascaleX) = bone->scaleX;
-		CONST_CAST(float, bone->ascaleY) = bone->scaleY;
-		CONST_CAST(float, bone->ashearX) = bone->shearX;
-		CONST_CAST(float, bone->ashearY) = bone->shearY;
-		CONST_CAST(int, bone->appliedValid) = 1;
-	}
-
 	for (i = 0; i < internal->updateCacheCount; ++i) {
 		_spUpdate* update = internal->updateCache + i;
 		switch (update->type) {
@@ -437,16 +394,58 @@ void spSkeleton_updateWorldTransform (const spSkeleton* self) {
 			spBone_updateWorldTransform((spBone*)update->object);
 			break;
 		case SP_UPDATE_IK_CONSTRAINT:
-			spIkConstraint_apply((spIkConstraint*)update->object);
+            spIkConstraint_update((spIkConstraint *) update->object);
 			break;
 		case SP_UPDATE_TRANSFORM_CONSTRAINT:
-			spTransformConstraint_apply((spTransformConstraint*)update->object);
+            spTransformConstraint_update((spTransformConstraint *) update->object);
 			break;
 		case SP_UPDATE_PATH_CONSTRAINT:
-			spPathConstraint_apply((spPathConstraint*)update->object);
+            spPathConstraint_update((spPathConstraint *) update->object);
 			break;
 		}
 	}
+}
+
+void spSkeleton_updateWorldTransformWith (const spSkeleton* self, const spBone *parent) {
+/* Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection. */
+    int i, n;
+    float rotationY, la, lb, lc, ld;
+    _spUpdate *updateCache;
+    _spSkeleton* internal = SUB_CAST(_spSkeleton, self);
+    spBone *rootBone = self->root;
+    float pa = parent->a, pb = parent->b, pc = parent->c, pd = parent->d;
+    CONST_CAST(float, rootBone->worldX) = pa * self->x + pb * self->y + parent->worldX;
+    CONST_CAST(float, rootBone->worldY) = pc * self->x + pd * self->y + parent->worldY;
+
+    rotationY = rootBone->rotation + 90 + rootBone->shearY;
+    la = COS_DEG(rootBone->rotation + rootBone->shearX) * rootBone->scaleX;
+    lb = COS_DEG(rotationY) * rootBone->scaleY;
+    lc = SIN_DEG(rootBone->rotation + rootBone->shearX) * rootBone->scaleX;
+    ld = SIN_DEG(rotationY) * rootBone->scaleY;
+    CONST_CAST(float, rootBone->a) = (pa * la + pb * lc) * self->scaleX;
+    CONST_CAST(float, rootBone->b) = (pa * lb + pb * ld) * self->scaleX;
+    CONST_CAST(float, rootBone->c) = (pc * la + pd * lc) * self->scaleY;
+    CONST_CAST(float, rootBone->d) = (pc * lb + pd * ld) * self->scaleY;
+
+    /* Update everything except root bone. */
+    updateCache = internal->updateCache;
+    for (i = 0; i < internal->updateCacheCount; ++i) {
+        _spUpdate* update = internal->updateCache + i;
+        switch (update->type) {
+            case SP_UPDATE_BONE:
+                if ((spBone*)update->object != rootBone) spBone_updateWorldTransform((spBone*)update->object);
+                break;
+            case SP_UPDATE_IK_CONSTRAINT:
+                spIkConstraint_update((spIkConstraint *) update->object);
+                break;
+            case SP_UPDATE_TRANSFORM_CONSTRAINT:
+                spTransformConstraint_update((spTransformConstraint *) update->object);
+                break;
+            case SP_UPDATE_PATH_CONSTRAINT:
+                spPathConstraint_update((spPathConstraint *) update->object);
+                break;
+        }
+    }
 }
 
 void spSkeleton_setToSetupPose (const spSkeleton* self) {
@@ -471,10 +470,12 @@ void spSkeleton_setBonesToSetupPose (const spSkeleton* self) {
 	for (i = 0; i < self->transformConstraintsCount; ++i) {
 		spTransformConstraint* constraint = self->transformConstraints[i];
 		spTransformConstraintData* data = constraint->data;
-		constraint->rotateMix = data->rotateMix;
-		constraint->translateMix = data->translateMix;
-		constraint->scaleMix = data->scaleMix;
-		constraint->shearMix = data->shearMix;
+        constraint->mixRotate = data->mixRotate;
+        constraint->mixX = data->mixX;
+        constraint->mixY = data->mixY;
+        constraint->mixScaleX = data->mixScaleX;
+        constraint->mixScaleY = data->mixScaleY;
+        constraint->mixShearY = data->mixShearY;
 	}
 
 	for (i = 0; i < self->pathConstraintsCount; ++i) {
@@ -482,8 +483,9 @@ void spSkeleton_setBonesToSetupPose (const spSkeleton* self) {
 		spPathConstraintData* data = constraint->data;
 		constraint->position = data->position;
 		constraint->spacing = data->spacing;
-		constraint->rotateMix = data->rotateMix;
-		constraint->translateMix = data->translateMix;
+        constraint->mixRotate = data->mixRotate;
+        constraint->mixX = data->mixX;
+        constraint->mixY = data->mixY;
 	}
 }
 

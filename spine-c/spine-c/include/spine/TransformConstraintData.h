@@ -44,7 +44,7 @@ typedef struct spTransformConstraintData {
 	int bonesCount;
 	spBoneData** const bones;
 	spBoneData* target;
-	float rotateMix, translateMix, scaleMix, shearMix;
+    float mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY;
 	float offsetRotation, offsetX, offsetY, offsetScaleX, offsetScaleY, offsetShearY;
 	int /*boolean*/ relative;
 	int /*boolean*/ local;

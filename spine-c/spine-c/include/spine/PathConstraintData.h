@@ -43,7 +43,7 @@ typedef enum {
 } spPositionMode;
 
 typedef enum {
-	SP_SPACING_MODE_LENGTH, SP_SPACING_MODE_FIXED, SP_SPACING_MODE_PERCENT
+	SP_SPACING_MODE_LENGTH, SP_SPACING_MODE_FIXED, SP_SPACING_MODE_PERCENT, SP_SPACING_MODE_PROPORTIONAL
 } spSpacingMode;
 
 typedef enum {
@@ -61,7 +61,8 @@ typedef struct spPathConstraintData {
 	spSpacingMode spacingMode;
 	spRotateMode rotateMode;
 	float offsetRotation;
-	float position, spacing, rotateMix, translateMix;
+	float position, spacing;
+	float mixRotate, mixX, mixY;
 } spPathConstraintData;
 
 SP_API spPathConstraintData* spPathConstraintData_create (const char* name);

@@ -47,7 +47,8 @@ typedef struct spPathConstraint {
 	int bonesCount;
 	spBone** const bones;
 	spSlot* target;
-	float position, spacing, rotateMix, translateMix;
+	float position, spacing;
+	float mixRotate, mixX, mixY;
 
 	int spacesCount;
 	float* spaces;
@@ -74,8 +75,8 @@ typedef struct spPathConstraint {
 SP_API spPathConstraint* spPathConstraint_create (spPathConstraintData* data, const struct spSkeleton* skeleton);
 SP_API void spPathConstraint_dispose (spPathConstraint* self);
 
-SP_API void spPathConstraint_apply (spPathConstraint* self);
-SP_API float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAttachment* path, int spacesCount, int/*bool*/ tangents, int/*bool*/percentPosition, int/**/percentSpacing);
+SP_API void spPathConstraint_update (spPathConstraint* self);
+SP_API float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAttachment* path, int spacesCount, int/*bool*/ tangents);
 
 #ifdef __cplusplus
 }

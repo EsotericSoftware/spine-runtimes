@@ -47,8 +47,9 @@ spPathConstraint* spPathConstraint_create (spPathConstraintData* data, const spS
 	self->target = spSkeleton_findSlot(skeleton, self->data->target->name);
 	self->position = data->position;
 	self->spacing = data->spacing;
-	self->rotateMix = data->rotateMix;
-	self->translateMix = data->translateMix;
+	self->mixRotate = data->mixRotate;
+	self->mixX = data->mixX;
+	self->mixY = data->mixY;
 	self->spacesCount = 0;
 	self->spaces = 0;
 	self->positionsCount = 0;
@@ -72,26 +73,23 @@ void spPathConstraint_dispose (spPathConstraint* self) {
 	FREE(self);
 }
 
-void spPathConstraint_apply (spPathConstraint* self) {
+void spPathConstraint_update (spPathConstraint* self) {
 	int i, p, n;
-	float length, setupLength, x, y, dx, dy, s;
+	float length, setupLength, x, y, dx, dy, s, sum;
 	float* spaces, *lengths, *positions;
 	float spacing;
 	float boneX, boneY, offsetRotation;
 	int/*bool*/tip;
-	float rotateMix = self->rotateMix, translateMix = self->translateMix;
-	int/*bool*/ translate = translateMix > 0, rotate = rotateMix > 0;
+    float mixRotate = self->mixRotate, mixX = self->mixX, mixY = self->mixY;
 	int lengthSpacing;
 	spPathAttachment* attachment = (spPathAttachment*)self->target->attachment;
 	spPathConstraintData* data = self->data;
-	int percentSpacing = data->spacingMode == SP_SPACING_MODE_PERCENT;
-	spRotateMode rotateMode = data->rotateMode;
-	int tangents = rotateMode == SP_ROTATE_MODE_TANGENT, scale = rotateMode == SP_ROTATE_MODE_CHAIN_SCALE;
+	int tangents = data->rotateMode == SP_ROTATE_MODE_TANGENT, scale = data->rotateMode == SP_ROTATE_MODE_CHAIN_SCALE;
 	int boneCount = self->bonesCount, spacesCount = tangents ? boneCount : boneCount + 1;
 	spBone** bones = self->bones;
 	spBone* pa;
 
-	if (!translate && !rotate) return;
+	if (mixRotate == 0 && mixX == 0 && mixY == 0) return;
 	if ((attachment == 0) || (attachment->super.super.type != SP_ATTACHMENT_PATH)) return;
 
 	if (self->spacesCount != spacesCount) {
@@ -103,48 +101,77 @@ void spPathConstraint_apply (spPathConstraint* self) {
 	spaces[0] = 0;
 	lengths = 0;
 	spacing = self->spacing;
-	if (scale || !percentSpacing) {
-		if (scale) {
-			if (self->lengthsCount != boneCount) {
-				if (self->lengths) FREE(self->lengths);
-				self->lengths = MALLOC(float, boneCount);
-				self->lengthsCount = boneCount;
-			}
-			lengths = self->lengths;
-		}
-		lengthSpacing = data->spacingMode == SP_SPACING_MODE_LENGTH;
-		for (i = 0, n = spacesCount - 1; i < n;) {
-			spBone *bone = bones[i];
-			setupLength = bone->data->length;
-			if (setupLength < EPSILON) {
-				if (scale) lengths[i] = 0;
-				spaces[++i] = 0;
-			} else if (percentSpacing) {
-				if (scale) {
-					x = setupLength * bone->a, y = setupLength * bone->c;
-					length = SQRT(x * x + y * y);
-					lengths[i] = length;
-				}
-				spaces[++i] = spacing;
-			} else {
-				x = setupLength * bone->a, y = setupLength * bone->c;
-				length = SQRT(x * x + y * y);
-				if (scale) lengths[i] = length;
-				spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
-			}
-		}
-	} else {
-		for (i = 1; i < spacesCount; i++) {
-			spaces[i] = spacing;
-		}
-	}
 
-	positions = spPathConstraint_computeWorldPositions(self, attachment, spacesCount, tangents,
-		data->positionMode == SP_POSITION_MODE_PERCENT, percentSpacing);
+    if (scale) {
+        if (self->lengthsCount != boneCount) {
+            if (self->lengths) FREE(self->lengths);
+            self->lengths = MALLOC(float, boneCount);
+            self->lengthsCount = boneCount;
+        }
+        lengths = self->lengths;
+    }
+
+    switch (data->spacingMode) {
+        case SP_SPACING_MODE_PERCENT:
+            if (scale) {
+                for (i = 0, n = spacesCount - 1; i < n; i++) {
+                    spBone* bone = bones[i];
+                    setupLength = bone->data->length;
+                    if (setupLength < EPSILON)
+                        lengths[i] = 0;
+                    else {
+                        x = setupLength * bone->a;
+                        y = setupLength * bone->c;
+                        lengths[i] = SQRT(x * x + y * y);
+                    }
+                }
+            }
+            for (i = 1, n = spacesCount; i < n; i++) spaces[i] = spacing;
+            break;
+        case SP_SPACING_MODE_PROPORTIONAL:
+            sum = 0;
+            for (i = 0; i < boneCount;) {
+                spBone* bone = bones[i];
+                setupLength = bone->data->length;
+                if (setupLength < EPSILON) {
+                    if (scale) lengths[i] = 0;
+                    spaces[++i] = spacing;
+                } else {
+                    x = setupLength * bone->a, y = setupLength * bone->c;
+                    length = SQRT(x * x + y * y);
+                    if (scale) lengths[i] = length;
+                    spaces[++i] = length;
+                    sum += length;
+                }
+            }
+            if (sum > 0) {
+                sum = spacesCount / sum * spacing;
+                for (i = 1; i < spacesCount; i++)
+                    spaces[i] *= sum;
+            }
+            break;
+        default:
+            lengthSpacing = data->spacingMode == SP_SPACING_MODE_LENGTH;
+            for (i = 0, n = spacesCount - 1; i < n;) {
+                spBone* bone = bones[i];
+                setupLength = bone->data->length;
+                if (setupLength < EPSILON) {
+                    if (scale) lengths[i] = 0;
+                    spaces[++i] = spacing;
+                } else {
+                    x = setupLength * bone->a, y = setupLength * bone->c;
+                    length = SQRT(x * x + y * y);
+                    if (scale) lengths[i] = length;
+                    spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+                }
+            }
+    }
+
+	positions = spPathConstraint_computeWorldPositions(self, attachment, spacesCount, tangents);
 	boneX = positions[0], boneY = positions[1], offsetRotation = self->data->offsetRotation;
 	tip = 0;
 	if (offsetRotation == 0)
-		tip = rotateMode == SP_ROTATE_MODE_CHAIN;
+		tip = data->rotateMode == SP_ROTATE_MODE_CHAIN;
 	else {
 		tip = 0;
 		pa = self->target->bone;
@@ -152,20 +179,20 @@ void spPathConstraint_apply (spPathConstraint* self) {
 	}
 	for (i = 0, p = 3; i < boneCount; i++, p += 3) {
 		spBone* bone = bones[i];
-		CONST_CAST(float, bone->worldX) += (boneX - bone->worldX) * translateMix;
-		CONST_CAST(float, bone->worldY) += (boneY - bone->worldY) * translateMix;
+		CONST_CAST(float, bone->worldX) += (boneX - bone->worldX) * mixX;
+		CONST_CAST(float, bone->worldY) += (boneY - bone->worldY) * mixY;
 		x = positions[p], y = positions[p + 1], dx = x - boneX, dy = y - boneY;
 		if (scale) {
 			length = lengths[i];
 			if (length != 0) {
-				s = (SQRT(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
+				s = (SQRT(dx * dx + dy * dy) / length - 1) * mixRotate + 1;
 				CONST_CAST(float, bone->a) *= s;
 				CONST_CAST(float, bone->c) *= s;
 			}
 		}
 		boneX = x;
 		boneY = y;
-		if (rotate) {
+		if (mixRotate > 0) {
 			float a = bone->a, b = bone->b, c = bone->c, d = bone->d, r, cosine, sine;
 			if (tangents)
 				r = positions[p - 1];
@@ -178,15 +205,15 @@ void spPathConstraint_apply (spPathConstraint* self) {
 				cosine = COS(r);
 				sine = SIN(r);
 				length = bone->data->length;
-				boneX += (length * (cosine * a - sine * c) - dx) * rotateMix;
-				boneY += (length * (sine * a + cosine * c) - dy) * rotateMix;
+				boneX += (length * (cosine * a - sine * c) - dx) * mixRotate;
+				boneY += (length * (sine * a + cosine * c) - dy) * mixRotate;
 			} else
 				r += offsetRotation;
 			if (r > PI)
 				r -= PI2;
 			else if (r < -PI)
 				r += PI2;
-			r *= rotateMix;
+			r *= mixRotate;
 			cosine = COS(r);
 			sine = SIN(r);
 			CONST_CAST(float, bone->a) = cosine * a - sine * c;
@@ -236,11 +263,11 @@ static void _addCurvePosition (float p, float x1, float y1, float cx1, float cy1
 	}
 }
 
-float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAttachment* path, int spacesCount, int/*bool*/ tangents, int/*bool*/percentPosition, int/**/percentSpacing) {
+float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAttachment* path, int spacesCount, int/*bool*/ tangents) {
 	int i, o, w, curve, segment, /*bool*/closed, verticesLength, curveCount, prevCurve;
 	float* out, *curves, *segments;
 	float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy, pathLength, curveLength, p;
-	float x1, y1, cx1, cy1, cx2, cy2, x2, y2;
+	float x1, y1, cx1, cy1, cx2, cy2, x2, y2, multiplier;
 	spSlot* target = self->target;
 	float position = self->position;
 	float* spaces = self->spaces, *world = 0;
@@ -257,11 +284,18 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 		float* lengths = path->lengths;
 		curveCount -= closed ? 1 : 2;
 		pathLength = lengths[curveCount];
-		if (percentPosition) position *= pathLength;
-		if (percentSpacing) {
-			for (i = 1; i < spacesCount; i++)
-				spaces[i] *= pathLength;
-		}
+		if (self->data->positionMode == SP_POSITION_MODE_PERCENT) position += pathLength;
+        switch (self->data->spacingMode) {
+            case SP_SPACING_MODE_PERCENT:
+                multiplier = pathLength;
+                break;
+            case SP_SPACING_MODE_PROPORTIONAL:
+                multiplier = pathLength / spacesCount;
+                break;
+            default:
+                multiplier = 1;
+        }
+
 		if (self->worldCount != 8) {
 			if (self->world) FREE(self->world);
 			self->world = MALLOC(float, 8);
@@ -269,7 +303,7 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 		}
 		world = self->world;
 		for (i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
-			float space = spaces[i];
+			float space = spaces[i] * multiplier;
 			position += space;
 			p = position;
 
@@ -384,19 +418,24 @@ float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAtta
 		x1 = x2;
 		y1 = y2;
 	}
-	if (percentPosition)
-		position *= pathLength;
-	else
-		position *= pathLength / path->lengths[curveCount - 1];
-	if (percentSpacing) {
-		for (i = 1; i < spacesCount; i++)
-			spaces[i] *= pathLength;
-	}
+
+    if (self->data->positionMode == SP_POSITION_MODE_PERCENT) position *= pathLength;
+
+    switch (self->data->spacingMode) {
+        case SP_SPACING_MODE_PERCENT:
+            multiplier = pathLength;
+            break;
+        case SP_SPACING_MODE_PROPORTIONAL:
+            multiplier = pathLength / spacesCount;
+            break;
+        default:
+            multiplier = 1;
+    }
 
 	segments = self->segments;
 	curveLength = 0;
 	for (i = 0, o = 0, curve = 0, segment = 0; i < spacesCount; i++, o += 3) {
-		float space = spaces[i];
+		float space = spaces[i] * multiplier;
 		position += space;
 		p = position;
 
