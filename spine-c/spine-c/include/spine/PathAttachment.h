@@ -49,12 +49,6 @@ typedef struct spPathAttachment {
 
 SP_API spPathAttachment* spPathAttachment_create (const char* name);
 
-#ifdef SPINE_SHORT_NAMES
-typedef spPathAttachment PathAttachment;
-#define PathAttachment_create(...) spPathAttachment_create(__VA_ARGS__)
-#define PathAttachment_computeWorldVertices(...) spPathAttachment_computeWorldVertices(__VA_ARGS__)
-#endif
-
 #ifdef __cplusplus
 }
 #endif

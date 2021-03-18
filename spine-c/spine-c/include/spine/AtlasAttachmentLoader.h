@@ -45,11 +45,6 @@ typedef struct spAtlasAttachmentLoader {
 
 SP_API spAtlasAttachmentLoader* spAtlasAttachmentLoader_create (spAtlas* atlas);
 
-#ifdef SPINE_SHORT_NAMES
-typedef spAtlasAttachmentLoader AtlasAttachmentLoader;
-#define AtlasAttachmentLoader_create(...) spAtlasAttachmentLoader_create(__VA_ARGS__)
-#endif
-
 #ifdef __cplusplus
 }
 #endif

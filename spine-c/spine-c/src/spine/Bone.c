@@ -250,11 +250,10 @@ void spBone_updateAppliedTransform (spBone* self) {
 }
 
 void spBone_worldToLocal (spBone* self, float worldX, float worldY, float* localX, float* localY) {
-	float a = self->a, b = self->b, c = self->c, d = self->d;
-	float invDet = 1 / (a * d - b * c);
+	float invDet = 1 / (self->a * self->d - self->b * self->c);
 	float x = worldX - self->worldX, y = worldY - self->worldY;
-	*localX = (x * d * invDet - y * b * invDet);
-	*localY = (y * a * invDet - x * c * invDet);
+	*localX = (x * self->d * invDet - y * self->b * invDet);
+	*localY = (y * self->a * invDet - x * self->c * invDet);
 }
 
 void spBone_localToWorld (spBone* self, float localX, float localY, float* worldX, float* worldY) {

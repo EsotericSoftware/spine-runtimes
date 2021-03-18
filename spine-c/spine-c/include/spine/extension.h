@@ -54,7 +54,6 @@
 
  - OOP in C tends to lose type safety. Macros for casting are provided in extension.h to give context for why a cast is being done.
 
- - If SPINE_SHORT_NAMES is defined, the "sp" prefix for all class names is optional.
  */
 
 #ifndef SPINE_EXTENSION_H_
@@ -162,12 +161,6 @@ void _spAtlasPage_createTexture (spAtlasPage* self, const char* path);
 void _spAtlasPage_disposeTexture (spAtlasPage* self);
 char* _spUtil_readFile (const char* path, int* length);
 
-#ifdef SPINE_SHORT_NAMES
-#define _AtlasPage_createTexture(...) _spAtlasPage_createTexture(__VA_ARGS__)
-#define _AtlasPage_disposeTexture(...) _spAtlasPage_disposeTexture(__VA_ARGS__)
-#define _Util_readFile(...) _spUtil_readFile(__VA_ARGS__)
-#endif
-
 /*
  * Internal API available for extension:
  */
@@ -213,16 +206,6 @@ typedef struct _spEventQueue {
 	int objectsCount;
 	int objectsCapacity;
 	int /*boolean*/ drainDisabled;
-
-#ifdef __cplusplus
-	_spEventQueue() :
-		state(0),
-		objects(0),
-		objectsCount(0),
-		objectsCapacity(0),
-		drainDisabled(0) {
-	}
-#endif
 } _spEventQueue;
 
 struct _spAnimationState {
@@ -238,19 +221,6 @@ struct _spAnimationState {
 	int propertyIDsCapacity;
 
 	int /*boolean*/ animationsChanged;
-
-#ifdef __cplusplus
-	_spAnimationState() :
-		super(),
-		eventsCount(0),
-		events(0),
-		queue(0),
-		propertyIDs(0),
-		propertyIDsCount(0),
-		propertyIDsCapacity(0),
-		animationsChanged(0) {
-	}
-#endif
 };
 
 
@@ -269,13 +239,6 @@ void _spAttachmentLoader_deinit (spAttachmentLoader* self);
 void _spAttachmentLoader_setError (spAttachmentLoader* self, const char* error1, const char* error2);
 void _spAttachmentLoader_setUnknownTypeError (spAttachmentLoader* self, spAttachmentType type);
 
-#ifdef SPINE_SHORT_NAMES
-#define _AttachmentLoader_init(...) _spAttachmentLoader_init(__VA_ARGS__)
-#define _AttachmentLoader_deinit(...) _spAttachmentLoader_deinit(__VA_ARGS__)
-#define _AttachmentLoader_setError(...) _spAttachmentLoader_setError(__VA_ARGS__)
-#define _AttachmentLoader_setUnknownTypeError(...) _spAttachmentLoader_setUnknownTypeError(__VA_ARGS__)
-#endif
-
 /**/
 
 void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType type,
@@ -283,12 +246,6 @@ void (*dispose) (spAttachment* self), spAttachment* (*copy) (spAttachment* self)
 void _spAttachment_deinit (spAttachment* self);
 void _spVertexAttachment_init (spVertexAttachment* self);
 void _spVertexAttachment_deinit (spVertexAttachment* self);
-
-#ifdef SPINE_SHORT_NAMES
-#define _Attachment_init(...) _spAttachment_init(__VA_ARGS__)
-#define _Attachment_deinit(...) _spAttachment_deinit(__VA_ARGS__)
-#define _VertexAttachment_deinit(...) _spVertexAttachment_deinit(__VA_ARGS__)
-#endif
 
 /**/
 
@@ -299,11 +256,6 @@ void _spTimeline_init (spTimeline* self, spTimelineType type,
 	int (*getPropertyId) (const spTimeline* self));
 void _spTimeline_deinit (spTimeline* self);
 
-#ifdef SPINE_SHORT_NAMES
-#define _Timeline_init(...) _spTimeline_init(__VA_ARGS__)
-#define _Timeline_deinit(...) _spTimeline_deinit(__VA_ARGS__)
-#endif
-
 /**/
 
 void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int framesCount,
@@ -312,12 +264,6 @@ void _spCurveTimeline_init (spCurveTimeline* self, spTimelineType type, int fram
 	int (*getPropertyId) (const spTimeline* self));
 void _spCurveTimeline_deinit (spCurveTimeline* self);
 int _spCurveTimeline_binarySearch (float *values, int valuesLength, float target, int step);
-
-#ifdef SPINE_SHORT_NAMES
-#define _CurveTimeline_init(...) _spCurveTimeline_init(__VA_ARGS__)
-#define _CurveTimeline_deinit(...) _spCurveTimeline_deinit(__VA_ARGS__)
-#define _CurveTimeline_binarySearch(...) _spCurveTimeline_binarySearch(__VA_ARGS__)
-#endif
 
 #ifdef __cplusplus
 }

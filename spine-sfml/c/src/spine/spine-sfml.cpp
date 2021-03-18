@@ -27,7 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#define SPINE_SHORT_NAMES
 #include <spine/spine-sfml.h>
 
 #ifndef SPINE_MESH_VERTEX_COUNT_MAX
@@ -48,7 +47,7 @@ sf::BlendMode screenPma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMi
 
 _SP_ARRAY_IMPLEMENT_TYPE(spColorArray, spColor)
 
-void _AtlasPage_createTexture (AtlasPage* self, const char* path){
+void _spAtlasPage_createTexture (spAtlasPage* self, const char* path){
 	Texture* texture = new Texture();
 	if (!texture->loadFromFile(path)) return;
 
@@ -61,11 +60,11 @@ void _AtlasPage_createTexture (AtlasPage* self, const char* path){
 	self->height = size.y;
 }
 
-void _AtlasPage_disposeTexture (AtlasPage* self){
+void _spAtlasPage_disposeTexture (spAtlasPage* self){
 	delete (Texture*)self->rendererObject;
 }
 
-char* _Util_readFile (const char* path, int* length){
+char* _spUtil_readFile (const char* path, int* length){
 	return _spReadFile(path, length);
 }
 
@@ -73,21 +72,21 @@ char* _Util_readFile (const char* path, int* length){
 
 namespace spine {
 
-SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateData* stateData) :
+SkeletonDrawable::SkeletonDrawable (spSkeletonData* skeletonData, spAnimationStateData* stateData) :
 		timeScale(1),
 		vertexArray(new VertexArray(Triangles, skeletonData->bonesCount * 4)),
 		vertexEffect(0),
 		worldVertices(0), clipper(0) {
-	Bone_setYDown(true);
+	spBone_setYDown(true);
 	worldVertices = MALLOC(float, SPINE_MESH_VERTEX_COUNT_MAX);
-	skeleton = Skeleton_create(skeletonData);
+	skeleton = spSkeleton_create(skeletonData);
 	tempUvs = spFloatArray_create(16);
 	tempColors = spColorArray_create(16);
 
 	ownsAnimationStateData = stateData == 0;
-	if (ownsAnimationStateData) stateData = AnimationStateData_create(skeletonData);
+	if (ownsAnimationStateData) stateData = spAnimationStateData_create(skeletonData);
 
-	state = AnimationState_create(stateData);
+	state = spAnimationState_create(stateData);
 
 	clipper = spSkeletonClipping_create();
 }
@@ -95,19 +94,19 @@ SkeletonDrawable::SkeletonDrawable (SkeletonData* skeletonData, AnimationStateDa
 SkeletonDrawable::~SkeletonDrawable () {
 	delete vertexArray;
 	FREE(worldVertices);
-	if (ownsAnimationStateData) AnimationStateData_dispose(state->data);
-	AnimationState_dispose(state);
-	Skeleton_dispose(skeleton);
+	if (ownsAnimationStateData) spAnimationStateData_dispose(state->data);
+	spAnimationState_dispose(state);
+	spSkeleton_dispose(skeleton);
 	spSkeletonClipping_dispose(clipper);
 	spFloatArray_dispose(tempUvs);
 	spColorArray_dispose(tempColors);
 }
 
 void SkeletonDrawable::update (float deltaTime) {
-	Skeleton_update(skeleton, deltaTime);
-	AnimationState_update(state, deltaTime * timeScale);
-	AnimationState_apply(state, skeleton);
-	Skeleton_updateWorldTransform(skeleton);
+	spSkeleton_update(skeleton, deltaTime);
+	spAnimationState_update(state, deltaTime * timeScale);
+	spAnimationState_apply(state, skeleton);
+	spSkeleton_updateWorldTransform(skeleton);
 }
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
@@ -123,8 +122,8 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 	sf::Vertex vertex;
 	Texture* texture = 0;
 	for (int i = 0; i < skeleton->slotsCount; ++i) {
-		Slot* slot = skeleton->drawOrder[i];
-		Attachment* attachment = slot->attachment;
+		spSlot* slot = skeleton->drawOrder[i];
+		spAttachment* attachment = slot->attachment;
 		if (!attachment) continue;
 
 		// Early out if slot is invisible
@@ -140,8 +139,8 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		int indicesCount = 0;
 		spColor* attachmentColor;
 
-		if (attachment->type == ATTACHMENT_REGION) {
-			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
+		if (attachment->type == SP_ATTACHMENT_REGION) {
+			spRegionAttachment* regionAttachment = (spRegionAttachment*)attachment;
 			attachmentColor = &regionAttachment->color;
 
 			// Early out if slot is invisible
@@ -155,10 +154,10 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			uvs = regionAttachment->uvs;
 			indices = quadIndices;
 			indicesCount = 6;
-			texture = (Texture*)((AtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
+			texture = (Texture*)((spAtlasRegion*)regionAttachment->rendererObject)->page->rendererObject;
 
-		} else if (attachment->type == ATTACHMENT_MESH) {
-			MeshAttachment* mesh = (MeshAttachment*)attachment;
+		} else if (attachment->type == SP_ATTACHMENT_MESH) {
+			spMeshAttachment* mesh = (spMeshAttachment*)attachment;
 			attachmentColor = &mesh->color;
 
 			// Early out if slot is invisible
@@ -168,7 +167,7 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			}
 
 			if (mesh->super.worldVerticesLength > SPINE_MESH_VERTEX_COUNT_MAX) continue;
-			texture = (Texture*)((AtlasRegion*)mesh->rendererObject)->page->rendererObject;
+			texture = (Texture*)((spAtlasRegion*)mesh->rendererObject)->page->rendererObject;
 			spVertexAttachment_computeWorldVertices(SUPER(mesh), slot, 0, mesh->super.worldVerticesLength, worldVertices, 0, 2);
 			verticesCount = mesh->super.worldVerticesLength >> 1;
 			uvs = mesh->uvs;
@@ -199,16 +198,16 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 		sf::BlendMode blend;
 		if (!usePremultipliedAlpha) {
 			switch (slot->data->blendMode) {
-			case BLEND_MODE_NORMAL:
+			case SP_BLEND_MODE_NORMAL:
 				blend = normal;
 				break;
-			case BLEND_MODE_ADDITIVE:
+			case SP_BLEND_MODE_ADDITIVE:
 				blend = additive;
 				break;
-			case BLEND_MODE_MULTIPLY:
+			case SP_BLEND_MODE_MULTIPLY:
 				blend = multiply;
 				break;
-			case BLEND_MODE_SCREEN:
+			case SP_BLEND_MODE_SCREEN:
 				blend = screen;
 				break;
 			default:
@@ -216,16 +215,16 @@ void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {
 			}
 		} else {
 			switch (slot->data->blendMode) {
-			case BLEND_MODE_NORMAL:
+			case SP_BLEND_MODE_NORMAL:
 				blend = normalPma;
 				break;
-			case BLEND_MODE_ADDITIVE:
+			case SP_BLEND_MODE_ADDITIVE:
 				blend = additivePma;
 				break;
-			case BLEND_MODE_MULTIPLY:
+			case SP_BLEND_MODE_MULTIPLY:
 				blend = multiplyPma;
 				break;
-			case BLEND_MODE_SCREEN:
+			case SP_BLEND_MODE_SCREEN:
 				blend = screenPma;
 				break;
 			default:

@@ -50,20 +50,6 @@ typedef struct spSlot {
 	int deformCapacity;
 	int deformCount;
 	float* deform;
-
-#ifdef __cplusplus
-	spSlot() :
-		data(0),
-		bone(0),
-		color(),
-		darkColor(0),
-		attachment(0),
-		attachmentState(0),
-		deformCapacity(0),
-		deformCount(0),
-		deform(0) {
-	}
-#endif
 } spSlot;
 
 SP_API spSlot* spSlot_create (spSlotData* data, spBone* bone);
@@ -76,16 +62,6 @@ SP_API void spSlot_setAttachmentTime (spSlot* self, float time);
 SP_API float spSlot_getAttachmentTime (const spSlot* self);
 
 SP_API void spSlot_setToSetupPose (spSlot* self);
-
-#ifdef SPINE_SHORT_NAMES
-typedef spSlot Slot;
-#define Slot_create(...) spSlot_create(__VA_ARGS__)
-#define Slot_dispose(...) spSlot_dispose(__VA_ARGS__)
-#define Slot_setAttachment(...) spSlot_setAttachment(__VA_ARGS__)
-#define Slot_setAttachmentTime(...) spSlot_setAttachmentTime(__VA_ARGS__)
-#define Slot_getAttachmentTime(...) spSlot_getAttachmentTime(__VA_ARGS__)
-#define Slot_setToSetupPose(...) spSlot_setToSetupPose(__VA_ARGS__)
-#endif
 
 #ifdef __cplusplus
 }

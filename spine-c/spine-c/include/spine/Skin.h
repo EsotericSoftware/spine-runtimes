@@ -58,16 +58,6 @@ typedef struct spSkin {
 	spIkConstraintDataArray* ikConstraints;
 	spTransformConstraintDataArray* transformConstraints;
 	spPathConstraintDataArray* pathConstraints;
-
-#ifdef __cplusplus
-	spSkin() :
-		name(0),
-		bones(0),
-		ikConstraints(0),
-		transformConstraints(0),
-		pathConstraints(0) {
-	}
-#endif
 } spSkin;
 
 /* Private structs, needed by Skeleton */
@@ -117,16 +107,6 @@ SP_API spSkinEntry* spSkin_getAttachments(const spSkin* self);
 
 /** Clears all attachments, bones, and constraints. */
 SP_API void spSkin_clear(spSkin* self);
-
-#ifdef SPINE_SHORT_NAMES
-typedef spSkin Skin;
-#define Skin_create(...) spSkin_create(__VA_ARGS__)
-#define Skin_dispose(...) spSkin_dispose(__VA_ARGS__)
-#define Skin_setAttachment(...) spSkin_addAttachment(__VA_ARGS__)
-#define Skin_getAttachment(...) spSkin_getAttachment(__VA_ARGS__)
-#define Skin_getAttachmentName(...) spSkin_getAttachmentName(__VA_ARGS__)
-#define Skin_attachAll(...) spSkin_attachAll(__VA_ARGS__)
-#endif
 
 #ifdef __cplusplus
 }

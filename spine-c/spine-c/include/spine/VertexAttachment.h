@@ -59,11 +59,6 @@ SP_API void spVertexAttachment_computeWorldVertices (spVertexAttachment* self, s
 
 void spVertexAttachment_copyTo(spVertexAttachment* self, spVertexAttachment* other);
 
-#ifdef SPINE_SHORT_NAMES
-typedef spVertexAttachment VertexAttachment;
-#define VertexAttachment_computeWorldVertices(...) spVertexAttachment_computeWorldVertices(__VA_ARGS__)
-#endif
-
 #ifdef __cplusplus
 }
 #endif

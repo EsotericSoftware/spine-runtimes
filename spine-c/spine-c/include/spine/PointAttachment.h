@@ -50,13 +50,6 @@ SP_API spPointAttachment* spPointAttachment_create (const char* name);
 SP_API void spPointAttachment_computeWorldPosition (spPointAttachment* self, spBone* bone, float* x, float* y);
 SP_API float spPointAttachment_computeWorldRotation (spPointAttachment* self, spBone* bone);
 
-#ifdef SPINE_SHORT_NAMES
-typedef spPointAttachment PointAttachment;
-#define PointAttachment_create(...) spPointAttachment_create(__VA_ARGS__)
-#define PointAttachment_computeWorldPosition(...) spPointAttachment_computeWorldPosition(__VA_ARGS__)
-#define PointAttachment_computeWorldRotation(...) spPointAttachment_computeWorldRotation(__VA_ARGS__)
-#endif
-
 #ifdef __cplusplus
 }
 #endif

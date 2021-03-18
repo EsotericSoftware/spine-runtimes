@@ -99,19 +99,6 @@ SP_API spTransformConstraintData* spSkeletonData_findTransformConstraint (const 
 
 SP_API spPathConstraintData* spSkeletonData_findPathConstraint (const spSkeletonData* self, const char* constraintName);
 
-#ifdef SPINE_SHORT_NAMES
-typedef spSkeletonData SkeletonData;
-#define SkeletonData_create(...) spSkeletonData_create(__VA_ARGS__)
-#define SkeletonData_dispose(...) spSkeletonData_dispose(__VA_ARGS__)
-#define SkeletonData_findBone(...) spSkeletonData_findBone(__VA_ARGS__)
-#define SkeletonData_findBoneIndex(...) spSkeletonData_findBoneIndex(__VA_ARGS__)
-#define SkeletonData_findSlot(...) spSkeletonData_findSlot(__VA_ARGS__)
-#define SkeletonData_findSlotIndex(...) spSkeletonData_findSlotIndex(__VA_ARGS__)
-#define SkeletonData_findSkin(...) spSkeletonData_findSkin(__VA_ARGS__)
-#define SkeletonData_findEvent(...) spSkeletonData_findEvent(__VA_ARGS__)
-#define SkeletonData_findAnimation(...) spSkeletonData_findAnimation(__VA_ARGS__)
-#endif
-
 #ifdef __cplusplus
 }
 #endif

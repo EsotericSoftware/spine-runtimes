@@ -67,31 +67,6 @@ typedef struct spSkeleton {
 	float time;
 	float scaleX, scaleY;
 	float x, y;
-
-#ifdef __cplusplus
-	spSkeleton() :
-		data(0),
-		bonesCount(0),
-		bones(0),
-		root(0),
-		slotsCount(0),
-		slots(0),
-		drawOrder(0),
-
-		ikConstraintsCount(0),
-		ikConstraints(0),
-
-		transformConstraintsCount(0),
-		transformConstraints(0),
-
-		skin(0),
-		color(),
-		time(0),
-		scaleX(1),
-		scaleY(1),
-		x(0), y(0) {
-	}
-#endif
 } spSkeleton;
 
 SP_API spSkeleton* spSkeleton_create (spSkeletonData* data);
@@ -145,26 +120,6 @@ SP_API spTransformConstraint* spSkeleton_findTransformConstraint (const spSkelet
 SP_API spPathConstraint* spSkeleton_findPathConstraint (const spSkeleton* self, const char* constraintName);
 
 SP_API void spSkeleton_update (spSkeleton* self, float deltaTime);
-
-#ifdef SPINE_SHORT_NAMES
-typedef spSkeleton Skeleton;
-#define Skeleton_create(...) spSkeleton_create(__VA_ARGS__)
-#define Skeleton_dispose(...) spSkeleton_dispose(__VA_ARGS__)
-#define Skeleton_updateWorldTransform(...) spSkeleton_updateWorldTransform(__VA_ARGS__)
-#define Skeleton_setToSetupPose(...) spSkeleton_setToSetupPose(__VA_ARGS__)
-#define Skeleton_setBonesToSetupPose(...) spSkeleton_setBonesToSetupPose(__VA_ARGS__)
-#define Skeleton_setSlotsToSetupPose(...) spSkeleton_setSlotsToSetupPose(__VA_ARGS__)
-#define Skeleton_findBone(...) spSkeleton_findBone(__VA_ARGS__)
-#define Skeleton_findBoneIndex(...) spSkeleton_findBoneIndex(__VA_ARGS__)
-#define Skeleton_findSlot(...) spSkeleton_findSlot(__VA_ARGS__)
-#define Skeleton_findSlotIndex(...) spSkeleton_findSlotIndex(__VA_ARGS__)
-#define Skeleton_setSkin(...) spSkeleton_setSkin(__VA_ARGS__)
-#define Skeleton_setSkinByName(...) spSkeleton_setSkinByName(__VA_ARGS__)
-#define Skeleton_getAttachmentForSlotName(...) spSkeleton_getAttachmentForSlotName(__VA_ARGS__)
-#define Skeleton_getAttachmentForSlotIndex(...) spSkeleton_getAttachmentForSlotIndex(__VA_ARGS__)
-#define Skeleton_setAttachment(...) spSkeleton_setAttachment(__VA_ARGS__)
-#define Skeleton_update(...) spSkeleton_update(__VA_ARGS__)
-#endif
 
 #ifdef __cplusplus
 }

@@ -77,13 +77,6 @@ SP_API void spMeshAttachment_updateUVs (spMeshAttachment* self);
 SP_API void spMeshAttachment_setParentMesh (spMeshAttachment* self, spMeshAttachment* parentMesh);
 SP_API spMeshAttachment* spMeshAttachment_newLinkedMesh (spMeshAttachment* self);
 
-#ifdef SPINE_SHORT_NAMES
-typedef spMeshAttachment MeshAttachment;
-#define MeshAttachment_create(...) spMeshAttachment_create(__VA_ARGS__)
-#define MeshAttachment_updateUVs(...) spMeshAttachment_updateUVs(__VA_ARGS__)
-#define MeshAttachment_setParentMesh(...) spMeshAttachment_setParentMesh(__VA_ARGS__)
-#endif
-
 #ifdef __cplusplus
 }
 #endif

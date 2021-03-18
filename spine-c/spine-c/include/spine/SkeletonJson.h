@@ -56,15 +56,6 @@ SP_API void spSkeletonJson_dispose (spSkeletonJson* self);
 SP_API spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const char* json);
 SP_API spSkeletonData* spSkeletonJson_readSkeletonDataFile (spSkeletonJson* self, const char* path);
 
-#ifdef SPINE_SHORT_NAMES
-typedef spSkeletonJson SkeletonJson;
-#define SkeletonJson_createWithLoader(...) spSkeletonJson_createWithLoader(__VA_ARGS__)
-#define SkeletonJson_create(...) spSkeletonJson_create(__VA_ARGS__)
-#define SkeletonJson_dispose(...) spSkeletonJson_dispose(__VA_ARGS__)
-#define SkeletonJson_readSkeletonData(...) spSkeletonJson_readSkeletonData(__VA_ARGS__)
-#define SkeletonJson_readSkeletonDataFile(...) spSkeletonJson_readSkeletonDataFile(__VA_ARGS__)
-#endif
-
 #ifdef __cplusplus
 }
 #endif

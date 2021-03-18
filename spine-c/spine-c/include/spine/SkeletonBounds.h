@@ -50,14 +50,6 @@ SP_API void spPolygon_dispose (spPolygon* self);
 SP_API int/*bool*/spPolygon_containsPoint (spPolygon* polygon, float x, float y);
 SP_API int/*bool*/spPolygon_intersectsSegment (spPolygon* polygon, float x1, float y1, float x2, float y2);
 
-#ifdef SPINE_SHORT_NAMES
-typedef spPolygon Polygon;
-#define Polygon_create(...) spPolygon_create(__VA_ARGS__)
-#define Polygon_dispose(...) spPolygon_dispose(__VA_ARGS__)
-#define Polygon_containsPoint(...) spPolygon_containsPoint(__VA_ARGS__)
-#define Polygon_intersectsSegment(...) spPolygon_intersectsSegment(__VA_ARGS__)
-#endif
-
 /**/
 
 typedef struct spSkeletonBounds {
@@ -91,19 +83,6 @@ SP_API spBoundingBoxAttachment* spSkeletonBounds_intersectsSegment (spSkeletonBo
 
 /** Returns the polygon for the specified bounding box, or null. */
 SP_API spPolygon* spSkeletonBounds_getPolygon (spSkeletonBounds* self, spBoundingBoxAttachment* boundingBox);
-
-#ifdef SPINE_SHORT_NAMES
-typedef spSkeletonBounds SkeletonBounds;
-#define SkeletonBounds_create(...) spSkeletonBounds_create(__VA_ARGS__)
-#define SkeletonBounds_dispose(...) spSkeletonBounds_dispose(__VA_ARGS__)
-#define SkeletonBounds_update(...) spSkeletonBounds_update(__VA_ARGS__)
-#define SkeletonBounds_aabbContainsPoint(...) spSkeletonBounds_aabbContainsPoint(__VA_ARGS__)
-#define SkeletonBounds_aabbIntersectsSegment(...) spSkeletonBounds_aabbIntersectsSegment(__VA_ARGS__)
-#define SkeletonBounds_aabbIntersectsSkeleton(...) spSkeletonBounds_aabbIntersectsSkeleton(__VA_ARGS__)
-#define SkeletonBounds_containsPoint(...) spSkeletonBounds_containsPoint(__VA_ARGS__)
-#define SkeletonBounds_intersectsSegment(...) spSkeletonBounds_intersectsSegment(__VA_ARGS__)
-#define SkeletonBounds_getPolygon(...) spSkeletonBounds_getPolygon(__VA_ARGS__)
-#endif
 
 #ifdef __cplusplus
 }

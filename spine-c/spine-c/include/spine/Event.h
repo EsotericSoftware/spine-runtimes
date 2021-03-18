@@ -62,12 +62,6 @@ typedef struct spEvent {
 SP_API spEvent* spEvent_create (float time, spEventData* data);
 SP_API void spEvent_dispose (spEvent* self);
 
-#ifdef SPINE_SHORT_NAMES
-typedef spEvent Event;
-#define Event_create(...) spEvent_create(__VA_ARGS__)
-#define Event_dispose(...) spEvent_dispose(__VA_ARGS__)
-#endif
-
 #ifdef __cplusplus
 }
 #endif
