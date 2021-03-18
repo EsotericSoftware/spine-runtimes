@@ -32,12 +32,13 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.Array;
-import com.esotericsoftware.spine.Animation.MixDirection;
+import com.badlogic.gdx.utils.ScreenUtils;
+
 import com.esotericsoftware.spine.Animation.MixBlend;
+import com.esotericsoftware.spine.Animation.MixDirection;
 
 public class MixTest extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -95,7 +96,7 @@ public class MixTest extends ApplicationAdapter {
 		if (time > beforeJump + blendIn && time < blendOutStart) speed = 360;
 		skeleton.setX(skeleton.getX() + speed * delta);
 
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		ScreenUtils.clear(0, 0, 0, 0);
 
 		// This shows how to manage state manually. See SimpleTest1 for a higher level API using AnimationState.
 		if (time > total) {

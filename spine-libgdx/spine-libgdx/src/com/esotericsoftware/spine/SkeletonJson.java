@@ -31,6 +31,8 @@ package com.esotericsoftware.spine;
 
 import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
+import java.io.InputStream;
+
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -100,22 +102,25 @@ public class SkeletonJson extends SkeletonLoader {
 		super(atlas);
 	}
 
-	protected JsonValue parse (FileHandle file) {
-		if (file == null) throw new IllegalArgumentException("file cannot be null.");
-		return new JsonReader().parse(file);
-	}
-
 	public SkeletonData readSkeletonData (FileHandle file) {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
+		SkeletonData skeletonData = readSkeletonData(new JsonReader().parse(file));
+		skeletonData.name = file.nameWithoutExtension();
+		return skeletonData;
+	}
+
+	public SkeletonData readSkeletonData (InputStream input) {
+		if (input == null) throw new IllegalArgumentException("dataInput cannot be null.");
+		return readSkeletonData(new JsonReader().parse(input));
+	}
+
+	public SkeletonData readSkeletonData (JsonValue root) {
+		if (root == null) throw new IllegalArgumentException("root cannot be null.");
 
 		float scale = this.scale;
 
-		SkeletonData skeletonData = new SkeletonData();
-		skeletonData.name = file.nameWithoutExtension();
-
-		JsonValue root = parse(file);
-
 		// Skeleton.
+		SkeletonData skeletonData = new SkeletonData();
 		JsonValue skeletonMap = root.get("skeleton");
 		if (skeletonMap != null) {
 			skeletonData.hash = skeletonMap.getString("hash", null);

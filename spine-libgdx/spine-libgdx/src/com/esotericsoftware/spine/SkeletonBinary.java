@@ -31,6 +31,7 @@ package com.esotericsoftware.spine;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -128,13 +129,18 @@ public class SkeletonBinary extends SkeletonLoader {
 
 	public SkeletonData readSkeletonData (FileHandle file) {
 		if (file == null) throw new IllegalArgumentException("file cannot be null.");
+		SkeletonData skeletonData = readSkeletonData(file.read());
+		skeletonData.name = file.nameWithoutExtension();
+		return skeletonData;
+	}
+
+	public SkeletonData readSkeletonData (InputStream dataInput) {
+		if (dataInput == null) throw new IllegalArgumentException("dataInput cannot be null.");
 
 		float scale = this.scale;
 
+		SkeletonInput input = new SkeletonInput(dataInput);
 		SkeletonData skeletonData = new SkeletonData();
-		skeletonData.name = file.nameWithoutExtension();
-
-		SkeletonInput input = new SkeletonInput(file);
 		try {
 			long hash = input.readLong();
 			skeletonData.hash = hash == 0 ? null : Long.toString(hash);
@@ -1053,6 +1059,10 @@ public class SkeletonBinary extends SkeletonLoader {
 	static class SkeletonInput extends DataInput {
 		private char[] chars = new char[32];
 		String[] strings;
+
+		public SkeletonInput (InputStream input) {
+			super(input);
+		}
 
 		public SkeletonInput (FileHandle file) {
 			super(file.read(512));
