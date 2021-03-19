@@ -142,6 +142,9 @@ namespace Spine.Unity {
 
 		[System.Serializable]
 		public class MecanimTranslator {
+
+			const float WeightEpsilon = 0.0001f;
+
 			#region Inspector
 			public bool autoReset = true;
 			public bool useCustomMixMode = true;
@@ -220,7 +223,7 @@ namespace Spine.Unity {
 			private bool ApplyAnimation (Skeleton skeleton, AnimatorClipInfo info, AnimatorStateInfo stateInfo,
 										int layerIndex, float layerWeight, MixBlend layerBlendMode, bool useClipWeight1 = false) {
 				float weight = info.weight * layerWeight;
-				if (weight == 0)
+				if (weight < WeightEpsilon)
 					return false;
 
 				var clip = GetAnimation(info.clip);
@@ -244,7 +247,7 @@ namespace Spine.Unity {
 
 				float clipWeight = interpolateWeightTo1 ? (info.weight + 1.0f) * 0.5f : info.weight;
 				float weight = clipWeight * layerWeight;
-				if (weight == 0)
+				if (weight < WeightEpsilon)
 					return false;
 
 				var clip = GetAnimation(info.clip);
@@ -320,7 +323,7 @@ namespace Spine.Unity {
 
 						for (int c = 0; c < clipInfoCount; c++) {
 							var info = clipInfo[c];
-							float weight = info.weight * layerWeight; if (weight == 0) continue;
+							float weight = info.weight * layerWeight; if (weight < WeightEpsilon) continue;
 							var clip = GetAnimation(info.clip);
 							if (clip != null)
 								previousAnimations.Add(clip);
@@ -329,7 +332,7 @@ namespace Spine.Unity {
 						if (hasNext) {
 							for (int c = 0; c < nextClipInfoCount; c++) {
 								var info = nextClipInfo[c];
-								float weight = info.weight * layerWeight; if (weight == 0) continue;
+								float weight = info.weight * layerWeight; if (weight < WeightEpsilon) continue;
 								var clip = GetAnimation(info.clip);
 								if (clip != null)
 									previousAnimations.Add(clip);
@@ -341,7 +344,7 @@ namespace Spine.Unity {
 							{
 								var info = interruptingClipInfo[c];
 								float clipWeight = shallInterpolateWeightTo1 ? (info.weight + 1.0f) * 0.5f : info.weight;
-								float weight = clipWeight * layerWeight; if (weight == 0) continue;
+								float weight = clipWeight * layerWeight; if (weight < WeightEpsilon) continue;
 								var clip = GetAnimation(info.clip);
 								if (clip != null)
 									previousAnimations.Add(clip);
