@@ -4,7 +4,8 @@
         "spine-unity",
         "spine-unity-editor",
         "spine-timeline",
-        "Unity.Timeline"
+        "Unity.Timeline",
+        "Unity.Timeline.Editor"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [
