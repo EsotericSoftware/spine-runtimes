@@ -363,7 +363,7 @@ namespace Spine.Unity {
 			#if UNITY_EDITOR
 			if (!Application.isPlaying) {
 				string errorMessage = null;
-				if (quiet || MaterialChecks.IsMaterialSetupProblematic(this, ref errorMessage))
+				if (!quiet && MaterialChecks.IsMaterialSetupProblematic(this, ref errorMessage))
 					Debug.LogWarningFormat(this, "Problematic material setup at {0}: {1}", this.name, errorMessage);
 			}
 			#endif

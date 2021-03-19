@@ -625,9 +625,12 @@ namespace Spine.Unity.Editor {
 				warnings.Add("Missing Skeleton JSON");
 			} else {
 				var fieldValue = (TextAsset)skeletonJSON.objectReferenceValue;
-
-				if (!AssetUtility.IsSpineData(fieldValue, out compatibilityProblemInfo)) {
-					warnings.Add("Skeleton data file is not a valid Spine JSON or binary file.");
+				string problemDescription = null;
+				if (!AssetUtility.IsSpineData(fieldValue, out compatibilityProblemInfo, ref problemDescription)) {
+					if (problemDescription != null)
+						warnings.Add(problemDescription);
+					else
+						warnings.Add("Skeleton data file is not a valid Spine JSON or binary file.");
 				} else {
 					#if SPINE_TK2D
 					bool searchForSpineAtlasAssets = (compatibilityProblemInfo == null);
@@ -644,11 +647,12 @@ namespace Spine.Unity.Editor {
 						var actualAtlasAssets = targetSkeletonDataAsset.atlasAssets;
 
 						for (int i = 0; i < actualAtlasAssets.Length; i++) {
-							if (targetSkeletonDataAsset.atlasAssets[i] == null) {
+							if (actualAtlasAssets[i] == null) {
 								detectedNullAtlasEntry = true;
 								break;
 							} else {
-								atlasList.Add(actualAtlasAssets[i].GetAtlas());
+								if (actualAtlasAssets[i].MaterialCount > 0)
+									atlasList.Add(actualAtlasAssets[i].GetAtlas());
 							}
 						}
 
@@ -658,8 +662,9 @@ namespace Spine.Unity.Editor {
 							List<string> missingPaths = null;
 							if (atlasAssets.arraySize > 0) {
 								missingPaths = AssetUtility.GetRequiredAtlasRegions(AssetDatabase.GetAssetPath(skeletonJSON.objectReferenceValue));
-
 								foreach (var atlas in atlasList) {
+									if (atlas == null)
+										continue;
 									for (int i = 0; i < missingPaths.Count; i++) {
 										if (atlas.FindRegion(missingPaths[i]) != null) {
 											missingPaths.RemoveAt(i);

@@ -58,7 +58,18 @@ using System.Reflection;
 using CompatibilityProblemInfo = Spine.Unity.SkeletonDataCompatibility.CompatibilityProblemInfo;
 
 namespace Spine.Unity.Editor {
-	using PathAndProblemInfo = System.Collections.Generic.KeyValuePair<string, CompatibilityProblemInfo>;
+
+	public class PathAndProblemInfo {
+		public string path;
+		public CompatibilityProblemInfo compatibilityProblems;
+		public string otherProblemDescription;
+
+		public PathAndProblemInfo (string path, CompatibilityProblemInfo compatibilityInfo, string otherProblemDescription) {
+			this.path = path;
+			this.compatibilityProblems = compatibilityInfo;
+			this.otherProblemDescription = otherProblemDescription;
+		}
+	}
 
 	public static class AssetUtility {
 
@@ -276,17 +287,26 @@ namespace Spine.Unity.Editor {
 					case ".jpg":
 						imagePaths.Add(str);
 						break;
-					case ".json":
+					case ".json": {
 						var jsonAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(str);
-						if (jsonAsset != null && IsSpineData(jsonAsset, out compatibilityProblemInfo))
-							skeletonPaths.Add(new PathAndProblemInfo(str, compatibilityProblemInfo));
+						string problemDescription = null;
+						if (jsonAsset != null && IsSpineData(jsonAsset, out compatibilityProblemInfo, ref problemDescription))
+							skeletonPaths.Add(new PathAndProblemInfo(str, compatibilityProblemInfo, problemDescription));
+						if (problemDescription != null)
+							Debug.LogError(problemDescription, jsonAsset);
 						break;
-					case ".bytes":
+					}
+					case ".bytes": {
 						if (str.ToLower().EndsWith(".skel.bytes", System.StringComparison.Ordinal)) {
-							if (IsSpineData(AssetDatabase.LoadAssetAtPath<TextAsset>(str), out compatibilityProblemInfo))
-								skeletonPaths.Add(new PathAndProblemInfo(str, compatibilityProblemInfo));
+							var binaryAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(str);
+							string problemDescription = null;
+							if (IsSpineData(binaryAsset, out compatibilityProblemInfo, ref problemDescription))
+								skeletonPaths.Add(new PathAndProblemInfo(str, compatibilityProblemInfo, problemDescription));
+							if (problemDescription != null)
+								Debug.LogError(problemDescription, binaryAsset);
 						}
 						break;
+					}
 				}
 			}
 
@@ -304,8 +324,9 @@ namespace Spine.Unity.Editor {
 			// Import skeletons and match them with atlases.
 			bool abortSkeletonImport = false;
 			foreach (var skeletonPathEntry in skeletonPaths) {
-				string skeletonPath = skeletonPathEntry.Key;
-				var compatibilityProblems = skeletonPathEntry.Value;
+				string skeletonPath = skeletonPathEntry.path;
+				var compatibilityProblems = skeletonPathEntry.compatibilityProblems;
+				string otherProblemDescription = skeletonPathEntry.otherProblemDescription;
 				if (skeletonPath.StartsWith("Packages"))
 					continue;
 				if (!reimport && CheckForValidSkeletonData(skeletonPath)) {
@@ -316,6 +337,9 @@ namespace Spine.Unity.Editor {
 				var loadedAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath);
 				if (compatibilityProblems != null) {
 					IngestIncompatibleSpineProject(loadedAsset, compatibilityProblems);
+					continue;
+				}
+				if (otherProblemDescription != null) {
 					continue;
 				}
 
@@ -378,8 +402,12 @@ namespace Spine.Unity.Editor {
 				if (usedSkeletonPath == null)
 					continue;
 
-				if (skeletonPaths.FindIndex(p => { return p.Key == usedSkeletonPath; } ) < 0) {
-					skeletonPaths.Add(new PathAndProblemInfo(usedSkeletonPath, null));
+				if (skeletonPaths.FindIndex(p => { return p.path == usedSkeletonPath; } ) < 0) {
+					string problemDescription = null;
+					CompatibilityProblemInfo compatibilityProblemInfo = null;
+					TextAsset textAsset = AssetDatabase.LoadAssetAtPath<TextAsset>(usedSkeletonPath);
+					if (textAsset != null && IsSpineData(textAsset, out compatibilityProblemInfo, ref problemDescription))
+						skeletonPaths.Add(new PathAndProblemInfo(usedSkeletonPath, compatibilityProblemInfo, problemDescription));
 				}
 			}
 		}
@@ -427,7 +455,8 @@ namespace Spine.Unity.Editor {
 						}
 
 						SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
-						BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonDataAsset, ref skeletonData);
+						if (skeletonData != null)
+							BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonDataAsset, ref skeletonData);
 
 						string currentHash = skeletonData != null ? skeletonData.Hash : null;
 
@@ -831,11 +860,10 @@ namespace Spine.Unity.Editor {
 		internal static SkeletonDataAsset IngestIncompatibleSpineProject(TextAsset spineJson,
 			CompatibilityProblemInfo compatibilityProblemInfo) {
 
-			string filePath = GetSkeletonDataAssetFilePath(spineJson);
-
 			if (spineJson == null)
 				return null;
 
+			string filePath = GetSkeletonDataAssetFilePath(spineJson);
 			SkeletonDataAsset skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath(filePath, typeof(SkeletonDataAsset));
 			if (skeletonDataAsset == null) {
 				skeletonDataAsset = SkeletonDataAsset.CreateInstance<SkeletonDataAsset>();
@@ -921,14 +949,14 @@ namespace Spine.Unity.Editor {
 				if (skeletonDataAsset != null && skeletonDataAsset.skeletonJSON == textAsset)
 					return true;
 			}
-
 			return false;
 		}
 
-		public static bool IsSpineData (TextAsset asset, out CompatibilityProblemInfo compatibilityProblemInfo) {
-			SkeletonDataCompatibility.VersionInfo fileVersion = SkeletonDataCompatibility.GetVersionInfo(asset);
+		public static bool IsSpineData (TextAsset asset, out CompatibilityProblemInfo compatibilityProblemInfo, ref string problemDescription) {
+			bool isSpineSkeletonData;
+			SkeletonDataCompatibility.VersionInfo fileVersion = SkeletonDataCompatibility.GetVersionInfo(asset, out isSpineSkeletonData, ref problemDescription);
 			compatibilityProblemInfo = SkeletonDataCompatibility.GetCompatibilityProblemInfo(fileVersion);
-			return fileVersion != null;
+			return isSpineSkeletonData;
 		}
 #endregion
 

@@ -30,6 +30,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using System;
 #if UNITY_EDITOR
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -63,8 +64,12 @@ namespace Spine.Unity {
 		public class CompatibilityProblemInfo {
 			public VersionInfo actualVersion;
 			public int[][] compatibleVersions;
+			public string explicitProblemDescription = null;
 
 			public string DescriptionString () {
+				if (!string.IsNullOrEmpty(explicitProblemDescription))
+					return explicitProblemDescription;
+
 				string compatibleVersionString = "";
 				string optionalOr = null;
 				foreach (int[] version in compatibleVersions) {
@@ -77,12 +82,28 @@ namespace Spine.Unity {
 		}
 
 	#if UNITY_EDITOR
-		public static VersionInfo GetVersionInfo (TextAsset asset) {
+		public static VersionInfo GetVersionInfo (TextAsset asset, out bool isSpineSkeletonData, ref string problemDescription) {
+			isSpineSkeletonData = false;
 			if (asset == null)
 				return null;
 
 			VersionInfo fileVersion = new VersionInfo();
-			fileVersion.sourceType = asset.name.Contains(".skel") ? SourceType.Binary : SourceType.Json;
+			bool hasBinaryExtension = asset.name.Contains(".skel");
+			fileVersion.sourceType = hasBinaryExtension ? SourceType.Binary : SourceType.Json;
+
+			bool isJsonFileByContent = IsJsonFile(asset);
+			if (hasBinaryExtension == isJsonFileByContent) {
+				if (hasBinaryExtension) {
+					problemDescription = string.Format("Failed to read '{0}'. Extension is '.skel.bytes' but content looks like a '.json' file.\n"
+						+ "Did you choose the wrong extension upon export?\n", asset.name);
+				}
+				else {
+					problemDescription = string.Format("Failed to read '{0}'. Extension is '.json' but content looks like binary 'skel.bytes' file.\n"
+						+ "Did you choose the wrong extension upon export?\n", asset.name);
+				}
+				isSpineSkeletonData = false;
+				return null;
+			}
 
 			if (fileVersion.sourceType == SourceType.Binary) {
 				try {
@@ -91,8 +112,8 @@ namespace Spine.Unity {
 					}
 				}
 				catch (System.Exception e) {
-					Debug.LogError(string.Format("Failed to read '{0}'. It is likely not a binary Spine SkeletonData file.\n{1}",
-						asset.name, e), asset);
+					problemDescription = string.Format("Failed to read '{0}'. It is likely not a binary Spine SkeletonData file.\n{1}", asset.name, e);
+					isSpineSkeletonData = false;
 					return null;
 				}
 			}
@@ -104,13 +125,15 @@ namespace Spine.Unity {
 				else {
 					object obj = Json.Deserialize(new StringReader(asset.text));
 					if (obj == null) {
-						Debug.LogError(string.Format("'{0}' is not valid JSON.", asset.name), asset);
+						problemDescription = string.Format("'{0}' is not valid JSON.", asset.name);
+						isSpineSkeletonData = false;
 						return null;
 					}
 
 					var root = obj as Dictionary<string, object>;
 					if (root == null) {
-						Debug.LogError(string.Format("'{0}' is not compatible JSON. Parser returned an incorrect type while parsing version info.", asset.name), asset);
+						problemDescription = string.Format("'{0}' is not compatible JSON. Parser returned an incorrect type while parsing version info.", asset.name);
+						isSpineSkeletonData = false;
 						return null;
 					}
 
@@ -124,7 +147,8 @@ namespace Spine.Unity {
 			}
 
 			if (string.IsNullOrEmpty(fileVersion.rawVersion)) {
-				// very likely not a Spine skeleton json file at all.
+				// very likely not a Spine skeleton json file at all. Could be another valid json file, don't report errors.
+				isSpineSkeletonData = false;
 				return null;
 			}
 
@@ -134,16 +158,39 @@ namespace Spine.Unity {
 									int.Parse(versionSplit[1], CultureInfo.InvariantCulture) };
 			}
 			catch (System.Exception e) {
-				Debug.LogError(string.Format("Failed to read version info at skeleton '{0}'. It is likely not a valid Spine SkeletonData file.\n{1}",
-					asset.name, e), asset);
+				problemDescription = string.Format("Failed to read version info at skeleton '{0}'. It is likely not a valid Spine SkeletonData file.\n{1}", asset.name, e);
+				isSpineSkeletonData = false;
 				return null;
 			}
+			isSpineSkeletonData = true;
 			return fileVersion;
 		}
 
+		public static bool IsJsonFile (TextAsset file) {
+			string fileText = file.text;
+			const int maxCharsToCheck = 256;
+			int numCharsToCheck = Math.Min(fileText.Length, maxCharsToCheck);
+			if (fileText.IndexOf("\"skeleton\"", 0, numCharsToCheck) != -1 ||
+				fileText.IndexOf("\"hash\"", 0, numCharsToCheck) != -1 ||
+				fileText.IndexOf("\"spine\"", 0, numCharsToCheck) != -1)
+				return true;
+
+			int jsonCharCount = 0;
+			const string jsonChars = "{}:\",";
+			for (int i = 0; i < numCharsToCheck; ++i) {
+				char c = fileText[i];
+				if (jsonChars.IndexOf(c) != -1 || char.IsWhiteSpace(c))
+					++jsonCharCount;
+			}
+			if (jsonCharCount > numCharsToCheck / 10)
+				return true;
+			return false;
+		}
+
 		public static CompatibilityProblemInfo GetCompatibilityProblemInfo (VersionInfo fileVersion) {
-			if (fileVersion == null)
-				return null;
+			if (fileVersion == null) {
+				return null; // it's most likely not a Spine skeleton file, e.g. another json file. don't report problems.
+			}
 
 			CompatibilityProblemInfo info = new CompatibilityProblemInfo();
 			info.actualVersion = fileVersion;
