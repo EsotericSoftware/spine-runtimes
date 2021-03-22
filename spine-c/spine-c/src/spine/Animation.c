@@ -32,27 +32,43 @@
 #include <limits.h>
 #include <spine/extension.h>
 
-spAnimation* spAnimation_create (const char* name, int timelinesCount) {
+_SP_ARRAY_IMPLEMENT_TYPE(spPropertyIdArray, spPropertyId)
+_SP_ARRAY_IMPLEMENT_TYPE(spTimelineArray, spTimeline*)
+
+spAnimation* spAnimation_create (const char* name, spTimelineArray* timelines) {
+    int i, n;
 	spAnimation* self = NEW(spAnimation);
 	MALLOC_STR(self->name, name);
-	self->timelinesCount = timelinesCount;
-	self->timelines = MALLOC(spTimeline*, timelinesCount);
+	for (i = 0, n = timelines->size; i < n; i++) {
+	    spPropertyIdArray_addAllValues(self->timelineIds, timelines->items[i]->propertyIds, 0, timelines->items[i]->propertyIdsCount);
+	}
 	return self;
 }
 
 void spAnimation_dispose (spAnimation* self) {
 	int i;
-	for (i = 0; i < self->timelinesCount; ++i)
-		spTimeline_dispose(self->timelines[i]);
-	FREE(self->timelines);
+	for (i = 0; i < self->timelines->size; ++i)
+		spTimeline_dispose(self->timelines->items[i]);
+	spTimelineArray_dispose(self->timelines);
+	spPropertyIdArray_dispose(self->timelineIds);
 	FREE(self->name);
 	FREE(self);
+}
+
+int /*bool*/ spAnimation_hasTimeline(spAnimation* self, spPropertyId* ids, int idsCount) {
+    int i, n, ii, nn;
+    for (i = 0, n = self->timelineIds->size; i < n; i++) {
+        for (ii = 0, nn = idsCount; ii < nn; ii++) {
+            if (self->timelineIds->items[i] == ids[ii]) return 1;
+        }
+    }
+    return 0;
 }
 
 void spAnimation_apply (const spAnimation* self, spSkeleton* skeleton, float lastTime, float time, int loop, spEvent** events,
 	int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
 ) {
-	int i, n = self->timelinesCount;
+	int i, n = self->timelines->size;
 
 	if (loop && self->duration) {
 		time = FMOD(time, self->duration);
@@ -60,7 +76,7 @@ void spAnimation_apply (const spAnimation* self, spSkeleton* skeleton, float las
 	}
 
 	for (i = 0; i < n; ++i)
-		spTimeline_apply(self->timelines[i], skeleton, lastTime, time, events, eventsCount, alpha, blend, direction);
+		spTimeline_apply(self->timelines->items[i], skeleton, lastTime, time, events, eventsCount, alpha, blend, direction);
 }
 
 /**/
@@ -68,21 +84,25 @@ void spAnimation_apply (const spAnimation* self, spSkeleton* skeleton, float las
 typedef struct _spTimelineVtable {
 	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction);
-	int (*getPropertyId) (const spTimeline* self);
+	int (*getFrameEntries) (const spTimeline* self);
 	void (*dispose) (spTimeline* self);
 } _spTimelineVtable;
 
-void _spTimeline_init (spTimeline* self, spTimelineType type, /**/
+void _spTimeline_init (spTimeline* self, /**/
 	void (*dispose) (spTimeline* self), /**/
 	void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction),
-	int (*getPropertyId) (const spTimeline* self)
+    int (*getFrameEntries) (const spTimeline* self),
+    spPropertyId* propertyIds,
+    int propertyIdsCount
 ) {
-	CONST_CAST(spTimelineType, self->type) = type;
+    int i, n;
 	CONST_CAST(_spTimelineVtable*, self->vtable) = NEW(_spTimelineVtable);
 	VTABLE(spTimeline, self)->dispose = dispose;
 	VTABLE(spTimeline, self)->apply = apply;
-	VTABLE(spTimeline, self)->getPropertyId = getPropertyId;
+	VTABLE(spTimeline, self)->getFrameEntries = getFrameEntries;
+	for (i = 0, n = propertyIdsCount; i < n; i++)
+	    self->propertyIds[i] = propertyIds[i];
 }
 
 void _spTimeline_deinit (spTimeline* self) {
@@ -98,8 +118,17 @@ void spTimeline_apply (const spTimeline* self, spSkeleton* skeleton, float lastT
 	VTABLE(spTimeline, self)->apply(self, skeleton, lastTime, time, firedEvents, eventsCount, alpha, blend, direction);
 }
 
-int spTimeline_getPropertyId (const spTimeline* self) {
-	return VTABLE(spTimeline, self)->getPropertyId(self);
+
+int spTimeline_getFrameEntries (const spTimeline* self) {
+    return VTABLE(spTimeline, self)->getFrameEntries(self);
+}
+
+int spTimeline_getFrameCount (const spTimeline* self) {
+    return self->frames.size / VTABLE(spTimeline, self)->getFrameEntries(self);
+}
+
+float spTimeline_getDuration (const spTimeline* self) {
+    return self->frames.items[self->frames.size - VTABLE(spTimeline, self)->getFrameEntries(self)];
 }
 
 /**/

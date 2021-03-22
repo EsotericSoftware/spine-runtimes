@@ -245,9 +245,6 @@ static void _spSkeletonBinary_addLinkedMesh (spSkeletonBinary* self, spMeshAttac
 	linkedMesh->inheritDeform = inheritDeform;
 }
 
-_SP_ARRAY_DECLARE_TYPE(spTimelineArray, spTimeline*)
-_SP_ARRAY_IMPLEMENT_TYPE(spTimelineArray, spTimeline*)
-
 static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, const char* name,
 		_dataInput* input, spSkeletonData *skeletonData) {
 	spTimelineArray* timelines = spTimelineArray_create(18);

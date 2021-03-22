@@ -33,6 +33,7 @@
 #include <spine/dll.h>
 #include <spine/Event.h>
 #include <spine/Attachment.h>
+#include <spine/Array.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,13 +41,17 @@ extern "C" {
 
 typedef struct spTimeline spTimeline;
 struct spSkeleton;
+typedef unsigned long long spPropertyId;
+
+_SP_ARRAY_DECLARE_TYPE(spPropertyIdArray, spPropertyId)
+_SP_ARRAY_DECLARE_TYPE(spTimelineArray, spTimeline*)
 
 typedef struct spAnimation {
 	const char* const name;
 	float duration;
 
-	int timelinesCount;
-	spTimeline** timelines;
+	spTimelineArray *timelines;
+    spPropertyIdArray *timelineIds;
 } spAnimation;
 
 typedef enum {
@@ -61,8 +66,9 @@ typedef enum {
 	SP_MIX_DIRECTION_OUT
 } spMixDirection;
 
-SP_API spAnimation* spAnimation_create (const char* name, int timelinesCount);
+SP_API spAnimation* spAnimation_create (const char* name, spTimelineArray* timelines);
 SP_API void spAnimation_dispose (spAnimation* self);
+SP_API int /*bool*/ spAnimation_hasTimeline(spAnimation* self, spPropertyId* ids, int idsCount);
 
 /** Poses the skeleton at the specified time for this animation.
  * @param lastTime The last time the animation was applied.
@@ -73,32 +79,42 @@ SP_API void spAnimation_apply (const spAnimation* self, struct spSkeleton* skele
 /**/
 
 typedef enum {
-	SP_TIMELINE_ROTATE,
-	SP_TIMELINE_TRANSLATE,
-	SP_TIMELINE_SCALE,
-	SP_TIMELINE_SHEAR,
-	SP_TIMELINE_ATTACHMENT,
-	SP_TIMELINE_COLOR,
-	SP_TIMELINE_DEFORM,
-	SP_TIMELINE_EVENT,
-	SP_TIMELINE_DRAWORDER,
-	SP_TIMELINE_IKCONSTRAINT,
-	SP_TIMELINE_TRANSFORMCONSTRAINT,
-	SP_TIMELINE_PATHCONSTRAINTPOSITION,
-	SP_TIMELINE_PATHCONSTRAINTSPACING,
-	SP_TIMELINE_PATHCONSTRAINTMIX,
-	SP_TIMELINE_TWOCOLOR
-} spTimelineType;
+    SP_PROPERTY_ROTATE = 1 << 0,
+    SP_PROPERTY_X = 1 << 1,
+    SP_PROPERTY_Y = 1 << 2,
+    SP_PROPERTY_SCALEX = 1 << 3,
+    SP_PROPERTY_SCALEY = 1 << 4,
+    SP_PROPERTY_SHEARX = 1 << 5,
+    SP_PROPERTY_SHEARY = 1 << 6,
+    SP_PROPERTY_RGB = 1 << 7,
+    SP_PROPERTY_ALPHA = 1 << 8,
+    SP_PROPERTY_RGB2 = 1 << 9,
+    SP_PROPERTY_ATTACHMENT = 1 << 10,
+    SP_PROPERTY_DEFORM = 1 << 11,
+    SP_PROPERTY_EVENT = 1 << 12,
+    SP_PROPERTY_DRAWORDER = 1 << 13,
+    SP_PROPERTY_IKCONSTRAINT = 1 << 14,
+    SP_PROPERTY_TRANSFORMCONSTRAINT = 1 << 15,
+    SP_PROPERTY_PATHCONSTRAINT_POSITION = 1 << 16,
+    SP_PROPERTY_PATHCONSTRAINT_SPACING = 1 << 17,
+    SP_PROPERTY_PATHCONSTRAINT_MIX = 1 << 18
+} spProperty;
+
+#define SP_MAX_PROPERTY_IDS 2
 
 struct spTimeline {
-	const spTimelineType type;
 	const void* const vtable;
+	spPropertyId propertyIds[SP_MAX_PROPERTY_IDS];
+	int propertyIdsCount;
+	spFloatArray frames;
 };
 
 SP_API void spTimeline_dispose (spTimeline* self);
 SP_API void spTimeline_apply (const spTimeline* self, struct spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction);
-SP_API int spTimeline_getPropertyId (const spTimeline* self);
+SP_API int spTimeline_getFrameEntries (const spTimeline* self);
+SP_API int spTimeline_getFrameCount (const spTimeline* self);
+SP_API float spTimeline_getDuration (const spTimeline* self);
 
 /**/
 
