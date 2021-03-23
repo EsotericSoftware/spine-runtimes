@@ -102,17 +102,23 @@ typedef enum {
 
 #define SP_MAX_PROPERTY_IDS 2
 
+typedef struct _spTimelineVtable {
+    void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+                   int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction);
+    void (*dispose) (spTimeline* self);
+} _spTimelineVtable;
+
 struct spTimeline {
-	const void* const vtable;
+	_spTimelineVtable vtable;
 	spPropertyId propertyIds[SP_MAX_PROPERTY_IDS];
 	int propertyIdsCount;
-	spFloatArray frames;
+	spFloatArray *frames;
+	int frameEntries;
 };
 
 SP_API void spTimeline_dispose (spTimeline* self);
 SP_API void spTimeline_apply (const spTimeline* self, struct spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction);
-SP_API int spTimeline_getFrameEntries (const spTimeline* self);
 SP_API int spTimeline_getFrameCount (const spTimeline* self);
 SP_API float spTimeline_getDuration (const spTimeline* self);
 
@@ -120,7 +126,7 @@ SP_API float spTimeline_getDuration (const spTimeline* self);
 
 typedef struct spCurveTimeline {
 	spTimeline super;
-	float* curves; /* type, x, y, ... */
+	spFloatArray* curves; /* type, x, y, ... */
 } spCurveTimeline;
 
 SP_API void spCurveTimeline_setLinear (spCurveTimeline* self, int frameIndex);
@@ -132,44 +138,91 @@ SP_API void spCurveTimeline_setStepped (spCurveTimeline* self, int frameIndex);
 SP_API void spCurveTimeline_setCurve (spCurveTimeline* self, int frameIndex, float cx1, float cy1, float cx2, float cy2);
 SP_API float spCurveTimeline_getCurvePercent (const spCurveTimeline* self, int frameIndex, float percent);
 
+typedef struct spCurveTimeline spCurveTimeline1;
+
+SP_API void spCurveTimeline1_setFrame(spCurveTimeline1* self, int frame, float time, float value);
+SP_API float spCurveTimeline1_getCurveValue(spCurveTimeline1* self, float time);
+
+typedef struct spCurveTimeline spCurveTimeline2;
+
+SP_API void spCurveTimeline2_setFrame(spCurveTimeline1* self, int frame, float time, float value1, float value2);
+
 /**/
 
-typedef struct spBaseTimeline {
-	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, angle, ... for rotate. time, x, y, ... for translate and scale. */
-	int boneIndex;
-} spBaseTimeline;
+typedef struct spRotateTimeline {
+    spCurveTimeline1 super;
+    int boneIndex;
+} spRotateTimeline;
 
-/**/
-
-static const int ROTATE_PREV_TIME = -2, ROTATE_PREV_ROTATION = -1;
-static const int ROTATE_ROTATION = 1;
-static const int ROTATE_ENTRIES = 2;
-
-typedef struct spBaseTimeline spRotateTimeline;
-
-SP_API spRotateTimeline* spRotateTimeline_create (int framesCount);
+SP_API spRotateTimeline* spRotateTimeline_create (int frameCount, int bezierCount, int boneIndex);
 
 SP_API void spRotateTimeline_setFrame (spRotateTimeline* self, int frameIndex, float time, float angle);
 
 /**/
 
-static const int TRANSLATE_ENTRIES = 3;
+typedef struct spTranslateTimeline {
+    spCurveTimeline2 super;
+    int boneIndex;
+} spTranslateTimeline;
 
-typedef struct spBaseTimeline spTranslateTimeline;
-
-SP_API spTranslateTimeline* spTranslateTimeline_create (int framesCount);
+SP_API spTranslateTimeline* spTranslateTimeline_create (int frameCount, int bezierCount, int boneIndex);
 
 SP_API void spTranslateTimeline_setFrame (spTranslateTimeline* self, int frameIndex, float time, float x, float y);
 
 /**/
 
-typedef struct spBaseTimeline spScaleTimeline;
+typedef struct spTranslateXTimeline {
+    spCurveTimeline1 super;
+    int boneIndex;
+} spTranslateXTimeline;
 
-SP_API spScaleTimeline* spScaleTimeline_create (int framesCount);
+SP_API spTranslateXTimeline* spTranslateXTimeline_create (int frameCount, int bezierCount, int boneIndex);
+
+SP_API void spTranslateXTimeline_setFrame (spTranslateXTimeline* self, int frame, float time, float x);
+
+/**/
+
+typedef struct spTranslateYTimeline {
+    spCurveTimeline1 super;
+    int boneIndex;
+} spTranslateYTimeline;
+
+SP_API spTranslateYTimeline* spTranslateYTimeline_create (int frameCount, int bezierCount, int boneIndex);
+
+SP_API void spTranslateYTimeline_setFrame (spTranslateYTimeline* self, int frame, float time, float y);
+
+/**/
+
+typedef struct spScaleTimeline {
+    spCurveTimeline2 super;
+    int boneIndex;
+} spScaleTimeline;
+
+SP_API spScaleTimeline* spScaleTimeline_create (int frameCount, int bezierCount, int boneIndex);
 
 SP_API void spScaleTimeline_setFrame (spScaleTimeline* self, int frameIndex, float time, float x, float y);
+
+/**/
+
+typedef struct spScaleXTimeline {
+    spCurveTimeline1 super;
+    int boneIndex;
+} spScaleXTimeline;
+
+SP_API spScaleXTimeline* spScaleXTimeline_create (int frameCount, int bezierCount, int boneIndex);
+
+SP_API void spScaleXTimeline_setFrame (spScaleXTimeline* self, int frame, float time, float x);
+
+/**/
+
+typedef struct spScaleYTimeline {
+    spCurveTimeline1 super;
+    int boneIndex;
+} spScaleYTimeline;
+
+SP_API spScaleYTimeline* spScaleYTimeline_create (int frameCount, int bezierCount, int boneIndex);
+
+SP_API void spScaleYTimeline_setFrame (spScaleYTimeline* self, int frame, float time, float y);
 
 /**/
 
