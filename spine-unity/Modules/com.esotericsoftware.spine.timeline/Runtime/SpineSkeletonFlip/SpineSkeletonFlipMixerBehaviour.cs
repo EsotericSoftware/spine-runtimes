@@ -27,6 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2018_1_OR_NEWER
+#define PLAYABLE_DIRECTOR_HAS_STOPPED_EVENT
+#endif
+
 using System;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -41,6 +45,31 @@ namespace Spine.Unity.Playables {
 
 		SpinePlayableHandleBase playableHandle;
 		bool m_FirstFrameHappened;
+
+#if PLAYABLE_DIRECTOR_HAS_STOPPED_EVENT
+		PlayableDirector director = null;
+
+		public override void OnPlayableCreate (Playable playable) {
+			director = playable.GetGraph().GetResolver() as PlayableDirector;
+			if (director)
+				director.stopped += OnDirectorStopped;
+		}
+
+		public override void OnPlayableDestroy (Playable playable) {
+			if (director)
+				director.stopped -= OnDirectorStopped;
+
+			base.OnPlayableDestroy(playable);
+		}
+
+		void OnDirectorStopped (PlayableDirector obj) {
+			OnStop();
+		}
+#else
+		public override void OnGraphStop (Playable playable) {
+			OnStop();
+		}
+#endif
 
 		public override void ProcessFrame (Playable playable, FrameData info, object playerData) {
 			playableHandle = playerData as SpinePlayableHandleBase;
@@ -91,7 +120,7 @@ namespace Spine.Unity.Playables {
 			skeleton.ScaleY = flipY ? -baseScaleY : baseScaleY;
 		}
 
-		public override void OnGraphStop (Playable playable) {
+		public void OnStop () {
 			m_FirstFrameHappened = false;
 
 			if (playableHandle == null)
