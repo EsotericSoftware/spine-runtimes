@@ -170,21 +170,13 @@ namespace Spine.Unity {
 			string fileText = file.text;
 			const int maxCharsToCheck = 256;
 			int numCharsToCheck = Math.Min(fileText.Length, maxCharsToCheck);
-			if (fileText.IndexOf("\"skeleton\"", 0, numCharsToCheck) != -1 ||
-				fileText.IndexOf("\"hash\"", 0, numCharsToCheck) != -1 ||
-				fileText.IndexOf("\"spine\"", 0, numCharsToCheck) != -1)
-				return true;
-
-			int jsonCharCount = 0;
-			const string jsonChars = "{}:\",";
 			for (int i = 0; i < numCharsToCheck; ++i) {
 				char c = fileText[i];
-				if (jsonChars.IndexOf(c) != -1 || char.IsWhiteSpace(c))
-					++jsonCharCount;
+				if (char.IsWhiteSpace(c))
+					continue;
+				return c == '{';
 			}
-			if (jsonCharCount > numCharsToCheck / 10)
-				return true;
-			return false;
+			return true;
 		}
 
 		public static CompatibilityProblemInfo GetCompatibilityProblemInfo (VersionInfo fileVersion) {
