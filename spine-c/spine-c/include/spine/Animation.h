@@ -259,18 +259,25 @@ SP_API void spShearYTimeline_setFrame (spShearYTimeline* self, int frame, float 
 
 /**/
 
-static const int COLOR_ENTRIES = 5;
+typedef struct spRGBATimeline {
+    spCurveTimeline2 super;
+    int slotIndex;
+} spRGBATimeline;
 
-typedef struct spColorTimeline {
-	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, r, g, b, a, ... */
-	int slotIndex;
-} spColorTimeline;
+SP_API spRGBATimeline* spRGBATimeline_create (int framesCount, int bezierCount, int slotIndex);
 
-SP_API spColorTimeline* spColorTimeline_create (int framesCount);
+SP_API void spRGBATimeline_setFrame (spRGBATimeline* self, int frameIndex, float time, float r, float g, float b, float a);
 
-SP_API void spColorTimeline_setFrame (spColorTimeline* self, int frameIndex, float time, float r, float g, float b, float a);
+/**/
+
+typedef struct spRGBTimeline {
+    spCurveTimeline2 super;
+    int slotIndex;
+} spRGBTimeline;
+
+SP_API spRGBTimeline* spRGBTimeline_create (int framesCount, int bezierCount, int slotIndex);
+
+SP_API void spRGBTimeline_setFrame (spRGBATimeline* self, int frameIndex, float time, float r, float g, float b);
 
 /**/
 
