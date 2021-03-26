@@ -47,6 +47,7 @@ void GetLightContributionBlinnPhong(inout float3 diffuseResult, inout float3 spe
 	diffuseResult += lightDiffuse * max(0.0, dot(normal, -lightDirection));
 	half3 halfVector = normalize(-lightDirection + viewDirection);
 	float nDotH = max(0, dot(normal, halfVector));
+	specularExponent = max(0.00001, specularExponent); // prevent fx compiler error at pow() below
 	specularResult += lightSpecular * pow(nDotH, specularExponent);
 }
 
