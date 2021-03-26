@@ -226,11 +226,36 @@ SP_API void spScaleYTimeline_setFrame (spScaleYTimeline* self, int frame, float 
 
 /**/
 
-typedef struct spBaseTimeline spShearTimeline;
+typedef struct spShearTimeline {
+    spCurveTimeline2 super;
+    int boneIndex;
+} spShearTimeline;
 
-SP_API spShearTimeline* spShearTimeline_create (int framesCount);
+SP_API spShearTimeline* spShearTimeline_create (int frameCount, int bezierCount, int boneIndex);
 
 SP_API void spShearTimeline_setFrame (spShearTimeline* self, int frameIndex, float time, float x, float y);
+
+/**/
+
+typedef struct spShearXTimeline {
+    spCurveTimeline1 super;
+    int boneIndex;
+} spShearXTimeline;
+
+SP_API spShearXTimeline* spShearXTimeline_create (int frameCount, int bezierCount, int boneIndex);
+
+SP_API void spShearXTimeline_setFrame (spShearXTimeline* self, int frame, float time, float x);
+
+/**/
+
+typedef struct spShearYTimeline {
+    spCurveTimeline1 super;
+    int boneIndex;
+} spShearYTimeline;
+
+SP_API spShearYTimeline* spShearYTimeline_create (int frameCount, int bezierCount, int boneIndex);
+
+SP_API void spShearYTimeline_setFrame (spShearYTimeline* self, int frame, float time, float x);
 
 /**/
 
