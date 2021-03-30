@@ -46,11 +46,24 @@ void spColor_setFromFloats(spColor* self, float r, float g, float b, float a) {
 	spColor_clamp(self);
 }
 
+void spColor_setFromFloats3(spColor* self, float r, float g, float b) {
+    self->r = r;
+    self->g = g;
+    self->b = b;
+    spColor_clamp(self);
+}
+
 void spColor_setFromColor(spColor* self, spColor* otherColor) {
 	self->r = otherColor->r;
 	self->g = otherColor->g;
 	self->b = otherColor->b;
 	self->a = otherColor->a;
+}
+
+void spColor_setFromColor3(spColor* self, spColor* otherColor) {
+    self->r = otherColor->r;
+    self->g = otherColor->g;
+    self->b = otherColor->b;
 }
 
 void spColor_addColor(spColor* self, spColor* otherColor) {
@@ -67,6 +80,13 @@ void spColor_addFloats(spColor* self, float r, float g, float b, float a) {
 	self->b += b;
 	self->a += a;
 	spColor_clamp(self);
+}
+
+void spColor_addFloats3(spColor* self, float r, float g, float b) {
+    self->r += r;
+    self->g += g;
+    self->b += b;
+    spColor_clamp(self);
 }
 
 void spColor_clamp(spColor* self) {

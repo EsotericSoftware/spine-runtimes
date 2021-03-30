@@ -44,8 +44,11 @@ typedef struct spColor {
 SP_API spColor* spColor_create();
 SP_API void spColor_dispose(spColor* self);
 SP_API void spColor_setFromFloats(spColor* color, float r, float g, float b, float a);
+SP_API void spColor_setFromFloats3(spColor* self, float r, float g, float b);
 SP_API void spColor_setFromColor(spColor* color, spColor* otherColor);
+SP_API void spColor_setFromColor3(spColor* self, spColor* otherColor);
 SP_API void spColor_addFloats(spColor* color, float r, float g, float b, float a);
+SP_API void spColor_addFloats3(spColor* color, float r, float g, float b);
 SP_API void spColor_addColor(spColor* color, spColor* otherColor);
 SP_API void spColor_clamp(spColor* color);
 

@@ -34,6 +34,7 @@
 #include <spine/Event.h>
 #include <spine/Attachment.h>
 #include <spine/Array.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,7 +42,7 @@ extern "C" {
 
 typedef struct spTimeline spTimeline;
 struct spSkeleton;
-typedef unsigned long long spPropertyId;
+typedef uint64_t spPropertyId;
 
 _SP_ARRAY_DECLARE_TYPE(spPropertyIdArray, spPropertyId)
 _SP_ARRAY_DECLARE_TYPE(spTimelineArray, spTimeline*)
@@ -100,10 +101,10 @@ typedef enum {
     SP_PROPERTY_PATHCONSTRAINT_MIX = 1 << 18
 } spProperty;
 
-#define SP_MAX_PROPERTY_IDS 2
+#define SP_MAX_PROPERTY_IDS 3
 
 typedef struct _spTimelineVtable {
-    void (*apply) (const spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+    void (*apply) (const spTimeline* self, struct spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
                    int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction);
     void (*dispose) (spTimeline* self);
 } _spTimelineVtable;
@@ -281,33 +282,63 @@ SP_API void spRGBTimeline_setFrame (spRGBATimeline* self, int frameIndex, float 
 
 /**/
 
-static const int TWOCOLOR_ENTRIES = 8;
+typedef struct spAlphaTimeline {
+    spCurveTimeline1 super;
+    int slotIndex;
+} spAlphaTimeline;
 
-typedef struct spTwoColorTimeline {
-	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, r, g, b, a, ... */
-	int slotIndex;
-} spTwoColorTimeline;
+SP_API spAlphaTimeline* spAlphaTimeline_create (int frameCount, int bezierCount, int slotIndex);
 
-SP_API spTwoColorTimeline* spTwoColorTimeline_create (int framesCount);
+SP_API void spAlphaTimeline_setFrame (spAlphaTimeline* self, int frame, float time, float x);
 
-SP_API void spTwoColorTimeline_setFrame (spTwoColorTimeline* self, int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2);
+/**/
+
+typedef struct spRGBA2Timeline {
+    spCurveTimeline super;
+    int slotIndex;
+} spRGBA2Timeline;
+
+SP_API spRGBA2Timeline* spRGBA2Timeline_create (int framesCount, int bezierCount, int slotIndex);
+
+SP_API void spRGBA2Timeline_setFrame (spRGBA2Timeline* self, int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2);
+
+/**/
+
+typedef struct spRGB2Timeline {
+    spCurveTimeline super;
+    int slotIndex;
+} spRGB2Timeline;
+
+SP_API spRGB2Timeline* spRGB2Timeline_create (int framesCount, int bezierCount, int slotIndex);
+
+SP_API void spRGB2Timeline_setFrame (spRGB2Timeline* self, int frameIndex, float time, float r, float g, float b, float r2, float g2, float b2);
 
 /**/
 
 typedef struct spAttachmentTimeline {
 	spTimeline super;
-	int const framesCount;
-	float* const frames; /* time, ... */
 	int slotIndex;
 	const char** const attachmentNames;
 } spAttachmentTimeline;
 
-SP_API spAttachmentTimeline* spAttachmentTimeline_create (int framesCount);
+SP_API spAttachmentTimeline* spAttachmentTimeline_create (int framesCount, int SlotIndex);
 
 /* @param attachmentName May be 0. */
 SP_API void spAttachmentTimeline_setFrame (spAttachmentTimeline* self, int frameIndex, float time, const char* attachmentName);
+
+/**/
+
+typedef struct spDeformTimeline {
+    spCurveTimeline super;
+    int const frameVerticesCount;
+    const float** const frameVertices;
+    int slotIndex;
+    spAttachment* attachment;
+} spDeformTimeline;
+
+SP_API spDeformTimeline* spDeformTimeline_create (int framesCount, int frameVerticesCount);
+
+SP_API void spDeformTimeline_setFrame (spDeformTimeline* self, int frameIndex, float time, float* vertices);
 
 /**/
 
@@ -335,22 +366,6 @@ typedef struct spDrawOrderTimeline {
 SP_API spDrawOrderTimeline* spDrawOrderTimeline_create (int framesCount, int slotsCount);
 
 SP_API void spDrawOrderTimeline_setFrame (spDrawOrderTimeline* self, int frameIndex, float time, const int* drawOrder);
-
-/**/
-
-typedef struct spDeformTimeline {
-	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, ... */
-	int const frameVerticesCount;
-	const float** const frameVertices;
-	int slotIndex;
-	spAttachment* attachment;
-} spDeformTimeline;
-
-SP_API spDeformTimeline* spDeformTimeline_create (int framesCount, int frameVerticesCount);
-
-SP_API void spDeformTimeline_setFrame (spDeformTimeline* self, int frameIndex, float time, float* vertices);
 
 /**/
 

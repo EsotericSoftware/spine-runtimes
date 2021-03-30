@@ -406,12 +406,10 @@ void _spTranslateXTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
                                   spEvent** firedEvents, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
 ) {
     spBone *bone;
-    float x, t;
-    int i, curveType;
+    float x;
 
     spTranslateXTimeline* self = SUB_CAST(spTranslateXTimeline, timeline);
     float *frames = self->super.super.frames->items;
-    float *curves = self->super.curves->items;
 
     bone = skeleton->bones[self->boneIndex];
     if (!bone->active) return;
@@ -466,13 +464,10 @@ void _spTranslateYTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
                                   spEvent** firedEvents, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
 ) {
     spBone *bone;
-    int frame;
-    float y, t;
-    int i, curveType;
+    float y;
 
-    spTranslateXTimeline* self = SUB_CAST(spTranslateXTimeline, timeline);
+    spTranslateYTimeline* self = SUB_CAST(spTranslateYTimeline, timeline);
     float *frames = self->super.super.frames->items;
-    float *curves = self->super.curves->items;
 
     bone = skeleton->bones[self->boneIndex];
     if (!bone->active) return;
@@ -505,6 +500,7 @@ void _spTranslateYTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
     UNUSED(lastTime);
     UNUSED(firedEvents);
     UNUSED(eventsCount);
+    UNUSED(direction);
 }
 
 spTranslateYTimeline* spTranslateYTimeline_create (int frameCount, int bezierCount, int boneIndex) {
@@ -654,13 +650,10 @@ void _spScaleXTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
                               spEvent** firedEvents, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
 ) {
     spBone *bone;
-    int frame;
-    float x, t;
-    int i, curveType;
+    float x;
 
-    spTranslateXTimeline* self = SUB_CAST(spTranslateXTimeline, timeline);
+    spScaleXTimeline* self = SUB_CAST(spScaleXTimeline, timeline);
     float *frames = self->super.super.frames->items;
-    float *curves = self->super.curves->items;
 
     bone = skeleton->bones[self->boneIndex];
     if (!bone->active) return;
@@ -743,13 +736,10 @@ void _spScaleYTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
                                   spEvent** firedEvents, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
 ) {
     spBone *bone;
-    int frame;
-    float y, t;
-    int i, curveType;
+    float y;
 
-    spTranslateXTimeline* self = SUB_CAST(spTranslateXTimeline, timeline);
+    spScaleYTimeline* self = SUB_CAST(spScaleYTimeline, timeline);
     float *frames = self->super.super.frames->items;
-    float *curves = self->super.curves->items;
 
     bone = skeleton->bones[self->boneIndex];
     if (!bone->active) return;
@@ -832,7 +822,6 @@ void _spShearTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, f
 	int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
 ) {
 	spBone *bone;
-	int frame;
 	float x, y, t;
 	int i, curveType;
 
@@ -920,13 +909,10 @@ void _spShearXTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
                               spEvent** firedEvents, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
 ) {
     spBone *bone;
-    int frame;
     float x;
-    int curveType;
 
-    spTranslateXTimeline* self = SUB_CAST(spTranslateXTimeline, timeline);
+    spShearXTimeline* self = SUB_CAST(spShearXTimeline, timeline);
     float *frames = self->super.super.frames->items;
-    float *curves = self->super.curves->items;
 
     bone = skeleton->bones[self->boneIndex];
     if (!bone->active) return;
@@ -958,6 +944,7 @@ void _spShearXTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
     UNUSED(lastTime);
     UNUSED(firedEvents);
     UNUSED(eventsCount);
+    UNUSED(direction);
 }
 
 spShearXTimeline* spShearXTimeline_create (int frameCount, int bezierCount, int boneIndex) {
@@ -979,13 +966,10 @@ void _spShearYTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
                               spEvent** firedEvents, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
 ) {
     spBone *bone;
-    int frame;
-    float y, t;
-    int i, curveType;
+    float y;
 
-    spTranslateXTimeline* self = SUB_CAST(spTranslateXTimeline, timeline);
+    spShearYTimeline* self = SUB_CAST(spShearYTimeline, timeline);
     float *frames = self->super.super.frames->items;
-    float *curves = self->super.curves->items;
 
     bone = skeleton->bones[self->boneIndex];
     if (!bone->active) return;
@@ -1018,6 +1002,7 @@ void _spShearYTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
     UNUSED(lastTime);
     UNUSED(firedEvents);
     UNUSED(eventsCount);
+    UNUSED(direction);
 }
 
 spShearYTimeline* spShearYTimeline_create (int frameCount, int bezierCount, int boneIndex) {
@@ -1041,7 +1026,7 @@ void _spRGBATimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, fl
 	int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
 ) {
 	spSlot *slot;
-	int frame, i, curveType;
+	int i, curveType;
 	float r, g, b, a, t;
 	spColor* color;
 	spColor* setup;
@@ -1143,11 +1128,11 @@ void _spRGBTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, flo
                             int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
 ) {
     spSlot *slot;
-    int frame, i, curveType;
+    int i, curveType;
     float r, g, b, t;
     spColor* color;
     spColor* setup;
-    spRGBATimeline* self = (spRGBATimeline*)timeline;
+    spRGBTimeline* self = (spRGBTimeline*)timeline;
     float *frames = self->super.super.frames->items;
     float *curves = self->super.curves->items;
 
@@ -1238,117 +1223,319 @@ void spRGBTimeline_setFrame (spRGBATimeline* self, int frameIndex, float time, f
 
 /**/
 
-static const int TWOCOLOR_PREV_TIME = -8, TWOCOLOR_PREV_R = -7, TWOCOLOR_PREV_G = -6, TWOCOLOR_PREV_B = -5, TWOCOLOR_PREV_A = -4;
-static const int TWOCOLOR_PREV_R2 = -3, TWOCOLOR_PREV_G2 = -2, TWOCOLOR_PREV_B2 = -1;
-static const int TWOCOLOR_R = 1, TWOCOLOR_G = 2, TWOCOLOR_B = 3, TWOCOLOR_A = 4, TWOCOLOR_R2 = 5, TWOCOLOR_G2 = 6, TWOCOLOR_B2 = 7;
-
-void _spTwoColorTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
-	int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
+void _spAlphaTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time,
+                              spEvent** firedEvents, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
 ) {
-	spSlot *slot;
-	int frame;
-	float percent, frameTime;
-	float r, g, b, a, r2, g2, b2;
-	spColor* light;
-	spColor* dark;
-	spColor* setupLight;
-	spColor* setupDark;
-	spColorTimeline* self = (spColorTimeline*)timeline;
-	slot = skeleton->slots[self->slotIndex];
-	if (!slot->bone->active) return;
+    spSlot *slot;
+    float a;
+    spColor* color;
+    spColor* setup;
+    spAlphaTimeline* self = (spAlphaTimeline*)timeline;
+    float *frames = self->super.super.frames->items;
 
-	if (time < self->frames[0]) {
-		switch (blend) {
-		case SP_MIX_BLEND_SETUP:
-			spColor_setFromColor(&slot->color, &slot->data->color);
-			spColor_setFromColor(slot->darkColor, slot->data->darkColor);
-			return;
-		case SP_MIX_BLEND_FIRST:
-			light = &slot->color;
-			dark = slot->darkColor;
-			setupLight = &slot->data->color;
-			setupDark = slot->data->darkColor;
-			spColor_addFloats(light, (setupLight->r - light->r) * alpha, (setupLight->g - light->g) * alpha, (setupLight->b - light->b) * alpha,
-				(setupLight->a - light->a) * alpha);
-			spColor_addFloats(dark, (setupDark->r - dark->r) * alpha, (setupDark->g - dark->g) * alpha, (setupDark->b - dark->b) * alpha, 0);
-		case SP_MIX_BLEND_REPLACE:
-		case SP_MIX_BLEND_ADD:
-			; /* to appease compiler */
-		}
-		return;
-	}
+    slot = skeleton->slots[self->slotIndex];
+    if (!slot->bone->active) return;
 
-	if (time >= self->frames[self->framesCount - TWOCOLOR_ENTRIES]) { /* Time is after last frame */
-		int i = self->framesCount;
-		r = self->frames[i + TWOCOLOR_PREV_R];
-		g = self->frames[i + TWOCOLOR_PREV_G];
-		b = self->frames[i + TWOCOLOR_PREV_B];
-		a = self->frames[i + TWOCOLOR_PREV_A];
-		r2 = self->frames[i + TWOCOLOR_PREV_R2];
-		g2 = self->frames[i + TWOCOLOR_PREV_G2];
-		b2 = self->frames[i + TWOCOLOR_PREV_B2];
-	} else {
-		/* Interpolate between the previous frame and the current frame. */
-		frame = binarySearch(self->frames, self->framesCount, time, TWOCOLOR_ENTRIES);
+    if (time < frames[0]) { /* Time is before first frame-> */
+        color = &slot->color; setup = &slot->data->color;
+        switch (blend) {
+            case SP_MIX_BLEND_SETUP:
+                color->a = setup->a;
+                return;
+            case SP_MIX_BLEND_FIRST:
+                color->a += (setup->a - color->a) * alpha;
+            default: {
+            }
+        }
+        return;
+    }
 
-		r = self->frames[frame + TWOCOLOR_PREV_R];
-		g = self->frames[frame + TWOCOLOR_PREV_G];
-		b = self->frames[frame + TWOCOLOR_PREV_B];
-		a = self->frames[frame + TWOCOLOR_PREV_A];
-		r2 = self->frames[frame + TWOCOLOR_PREV_R2];
-		g2 = self->frames[frame + TWOCOLOR_PREV_G2];
-		b2 = self->frames[frame + TWOCOLOR_PREV_B2];
-
-		frameTime = self->frames[frame];
-		percent = spCurveTimeline_getCurvePercent(SUPER(self), frame / TWOCOLOR_ENTRIES - 1,
-			1 - (time - frameTime) / (self->frames[frame + TWOCOLOR_PREV_TIME] - frameTime));
-
-		r += (self->frames[frame + TWOCOLOR_R] - r) * percent;
-		g += (self->frames[frame + TWOCOLOR_G] - g) * percent;
-		b += (self->frames[frame + TWOCOLOR_B] - b) * percent;
-		a += (self->frames[frame + TWOCOLOR_A] - a) * percent;
-		r2 += (self->frames[frame + TWOCOLOR_R2] - r2) * percent;
-		g2 += (self->frames[frame + TWOCOLOR_G2] - g2) * percent;
-		b2 += (self->frames[frame + TWOCOLOR_B2] - b2) * percent;
-	}
-	if (alpha == 1) {
-		spColor_setFromFloats(&slot->color, r, g, b, a);
-		spColor_setFromFloats(slot->darkColor, r2, g2, b2, 1);
-	} else {
-		light = &slot->color;
-		dark = slot->darkColor;
-		if (blend == SP_MIX_BLEND_SETUP) {
-			spColor_setFromColor(light, &slot->data->color);
-			spColor_setFromColor(dark, slot->data->darkColor);
-		}
-		spColor_addFloats(light, (r - light->r) * alpha, (g - light->g) * alpha, (b - light->b) * alpha, (a - light->a) * alpha);
-		spColor_addFloats(dark, (r2 - dark->r) * alpha, (g2 - dark->g) * alpha, (b2 - dark->b) * alpha, 0);
-	}
-
-	UNUSED(lastTime);
-	UNUSED(firedEvents);
-	UNUSED(eventsCount);
-	UNUSED(direction);
+    a = spCurveTimeline1_getCurveValue(SUPER(self), time);
+    if (alpha == 1)
+        slot->color.a = a;
+    else {
+        if (blend == SP_MIX_BLEND_SETUP) slot->color.a = slot->data->color.a;
+        slot->color.a += (a - slot->color.a) * alpha;
+    }
+    
+    UNUSED(lastTime);
+    UNUSED(firedEvents);
+    UNUSED(eventsCount);
+    UNUSED(direction);
 }
 
-int _spTwoColorTimeline_getPropertyId (const spTimeline* timeline) {
-	return (SP_TIMELINE_TWOCOLOR << 24) + SUB_CAST(spTwoColorTimeline, timeline)->slotIndex;
+spAlphaTimeline* spAlphaTimeline_create (int frameCount, int bezierCount, int slotIndex) {
+    spAlphaTimeline* timeline = NEW(spAlphaTimeline);
+    spPropertyId ids[1];
+    ids[0] = ((spPropertyId)SP_PROPERTY_ALPHA << 32) | slotIndex;
+    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spAlphaTimeline_apply);
+    timeline->slotIndex = slotIndex;
+    return timeline;
 }
 
-spTwoColorTimeline* spTwoColorTimeline_create (int framesCount) {
-	return (spTwoColorTimeline*)_spBaseTimeline_create(framesCount, SP_TIMELINE_TWOCOLOR, TWOCOLOR_ENTRIES, _spTwoColorTimeline_apply, _spTwoColorTimeline_getPropertyId);
+void spAlphaTimeline_setFrame (spAlphaTimeline* self, int frame, float time, float alpha) {
+    spCurveTimeline1_setFrame(SUPER(self), frame, time, alpha);
 }
 
-void spTwoColorTimeline_setFrame (spTwoColorTimeline* self, int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
-	frameIndex *= TWOCOLOR_ENTRIES;
-	self->frames[frameIndex] = time;
-	self->frames[frameIndex + TWOCOLOR_R] = r;
-	self->frames[frameIndex + TWOCOLOR_G] = g;
-	self->frames[frameIndex + TWOCOLOR_B] = b;
-	self->frames[frameIndex + TWOCOLOR_A] = a;
-	self->frames[frameIndex + TWOCOLOR_R2] = r2;
-	self->frames[frameIndex + TWOCOLOR_G2] = g2;
-	self->frames[frameIndex + TWOCOLOR_B2] = b2;
+/**/
+
+static const int RGBA2_ENTRIES = 8, COLOR_R2 = 5, COLOR_G2 = 6, COLOR_B2 = 7;
+
+void _spRGBA2Timeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+                            int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
+) {
+    spSlot *slot;
+    int i, curveType;
+    float r, g, b, a, r2, g2, b2, t;
+    spColor* light, *setupLight;
+    spColor* dark, *setupDark;
+    spRGBA2Timeline* self = (spRGBA2Timeline*)timeline;
+    float *frames = self->super.super.frames->items;
+    float *curves = self->super.curves->items;
+
+    slot = skeleton->slots[self->slotIndex];
+    if (!slot->bone->active) return;
+
+    if (time < frames[0]) {
+        light = &slot->color; dark = slot->darkColor; setupLight = &slot->data->color; setupDark = slot->data->darkColor;
+        switch (blend) {
+            case SP_MIX_BLEND_SETUP:
+                spColor_setFromColor(light, setupLight);
+                spColor_setFromFloats3(dark, setupDark->r, setupDark->g, setupDark->b);
+                return;
+            case SP_MIX_BLEND_FIRST:
+                spColor_addFloats(light, (setupLight->r - light->r) * alpha, (setupLight->g - light->g) * alpha,
+                          (setupLight->b - light->b) * alpha,
+                          (setupLight->a - light->a) * alpha);
+                dark->r += (setupDark->r - dark->r) * alpha;
+                dark->g += (setupDark->g - dark->g) * alpha;
+                dark->b += (setupDark->b - dark->b) * alpha;
+            default: {
+            }
+        }
+        return;
+    }
+
+    r = 0, g = 0, b = 0, a = 0, r2 = 0, g2 = 0, b2 = 0;
+    i = search(frames, time, RGBA2_ENTRIES);
+    curveType = (int) curves[i / RGBA2_ENTRIES];
+    switch (curveType) {
+        case CURVE_LINEAR: {
+            float before = frames[i];
+            r = frames[i + COLOR_R];
+            g = frames[i + COLOR_G];
+            b = frames[i + COLOR_B];
+            a = frames[i + COLOR_A];
+            r2 = frames[i + COLOR_R2];
+            g2 = frames[i + COLOR_G2];
+            b2 = frames[i + COLOR_B2];
+            t = (time - before) / (frames[i + RGBA2_ENTRIES] - before);
+            r += (frames[i + RGBA2_ENTRIES + COLOR_R] - r) * t;
+            g += (frames[i + RGBA2_ENTRIES + COLOR_G] - g) * t;
+            b += (frames[i + RGBA2_ENTRIES + COLOR_B] - b) * t;
+            a += (frames[i + RGBA2_ENTRIES + COLOR_A] - a) * t;
+            r2 += (frames[i + RGBA2_ENTRIES + COLOR_R2] - r2) * t;
+            g2 += (frames[i + RGBA2_ENTRIES + COLOR_G2] - g2) * t;
+            b2 += (frames[i + RGBA2_ENTRIES + COLOR_B2] - b2) * t;
+            break;
+        }
+        case CURVE_STEPPED: {
+            r = frames[i + COLOR_R];
+            g = frames[i + COLOR_G];
+            b = frames[i + COLOR_B];
+            a = frames[i + COLOR_A];
+            r2 = frames[i + COLOR_R2];
+            g2 = frames[i + COLOR_G2];
+            b2 = frames[i + COLOR_B2];
+            break;
+        }
+        default: {
+            r = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR_R, curveType - CURVE_BEZIER);
+            g = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR_G,
+                               curveType + BEZIER_SIZE - CURVE_BEZIER);
+            b = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR_B,
+                               curveType + BEZIER_SIZE * 2 - CURVE_BEZIER);
+            a = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR_A,
+                               curveType + BEZIER_SIZE * 3 - CURVE_BEZIER);
+            r2 = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR_R2,
+                                curveType + BEZIER_SIZE * 4 - CURVE_BEZIER);
+            g2 = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR_G2,
+                                curveType + BEZIER_SIZE * 5 - CURVE_BEZIER);
+            b2 = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR_B2,
+                                curveType + BEZIER_SIZE * 6 - CURVE_BEZIER);
+        }
+    }
+    
+    light = &slot->color, dark = slot->darkColor;
+    if (alpha == 1) {
+        spColor_setFromFloats(light, r, g, b, a);
+        spColor_setFromFloats3(dark, r2, g2, b2);
+    } else {
+        if (blend == SP_MIX_BLEND_SETUP) {
+            spColor_setFromColor(light, &slot->data->color);
+            spColor_setFromColor(dark, slot->data->darkColor);
+        }
+        spColor_addFloats(light, (r - light->r) * alpha, (g - light->g) * alpha, (b - light->b) * alpha, (a - light->a) * alpha);
+        dark->r += (r2 - dark->r) * alpha;
+        dark->g += (g2 - dark->g) * alpha;
+        dark->b += (b2 - dark->b) * alpha;
+    }
+
+    UNUSED(lastTime);
+    UNUSED(firedEvents);
+    UNUSED(eventsCount);
+    UNUSED(direction);
+}
+
+spRGBA2Timeline* spRGBA2Timeline_create (int framesCount, int bezierCount, int slotIndex) {
+    spRGBA2Timeline* timeline = NEW(spRGBA2Timeline);
+    spPropertyId ids[3];
+    ids[0] = ((spPropertyId)SP_PROPERTY_RGB << 32) | slotIndex;
+    ids[1] = ((spPropertyId)SP_PROPERTY_ALPHA << 32) | slotIndex;
+    ids[2] = ((spPropertyId)SP_PROPERTY_RGB2 << 32) | slotIndex;
+    _spCurveTimeline_init(SUPER(timeline), framesCount, RGBA2_ENTRIES, bezierCount, ids, 3, _spCurveTimeline_dispose, _spRGBA2Timeline_apply);
+    timeline->slotIndex = slotIndex;
+    return timeline;
+}
+
+void spRGBA2Timeline_setFrame (spRGBA2Timeline* self, int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
+    float *frames = self->super.super.frames->items;
+    frameIndex *= RGBA_ENTRIES;
+    frames[frameIndex] = time;
+    frames[frameIndex + COLOR_R] = r;
+    frames[frameIndex + COLOR_G] = g;
+    frames[frameIndex + COLOR_B] = b;
+    frames[frameIndex + COLOR_A] = a;
+    frames[frameIndex + COLOR_R2] = r2;
+    frames[frameIndex + COLOR_G2] = g2;
+    frames[frameIndex + COLOR_B2] = b2;
+}
+
+/**/
+
+static const int RGB2_ENTRIES = 7, COLOR2_R2 = 5, COLOR2_G2 = 6, COLOR2_B2 = 7;
+
+
+void _spRGB2Timeline_apply (const spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+                             int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
+) {
+    spSlot *slot;
+    int i, curveType;
+    float r, g, b, r2, g2, b2, t;
+    spColor* light, *setupLight;
+    spColor* dark, *setupDark;
+    spRGB2Timeline* self = (spRGB2Timeline*)timeline;
+    float *frames = self->super.super.frames->items;
+    float *curves = self->super.curves->items;
+
+    slot = skeleton->slots[self->slotIndex];
+    if (!slot->bone->active) return;
+
+    if (time < frames[0]) {
+        light = &slot->color; dark = slot->darkColor; setupLight = &slot->data->color; setupDark = slot->data->darkColor;
+        switch (blend) {
+            case SP_MIX_BLEND_SETUP:
+                spColor_setFromColor3(light, setupLight);
+                spColor_setFromColor3(dark, setupDark);
+                return;
+            case SP_MIX_BLEND_FIRST:
+                spColor_addFloats3(light, (setupLight->r - light->r) * alpha, (setupLight->g - light->g) * alpha,
+                                  (setupLight->b - light->b) * alpha);
+                dark->r += (setupDark->r - dark->r) * alpha;
+                dark->g += (setupDark->g - dark->g) * alpha;
+                dark->b += (setupDark->b - dark->b) * alpha;
+            default: {
+            }
+        }
+        return;
+    }
+
+    r = 0, g = 0, b = 0, r2 = 0, g2 = 0, b2 = 0;
+    i = search(frames, time, RGB2_ENTRIES);
+    curveType = (int) curves[i / RGB2_ENTRIES];
+    switch (curveType) {
+        case CURVE_LINEAR: {
+            float before = frames[i];
+            r = frames[i + COLOR_R];
+            g = frames[i + COLOR_G];
+            b = frames[i + COLOR_B];
+            r2 = frames[i + COLOR2_R2];
+            g2 = frames[i + COLOR2_G2];
+            b2 = frames[i + COLOR2_B2];
+            t = (time - before) / (frames[i + RGB2_ENTRIES] - before);
+            r += (frames[i + RGBA2_ENTRIES + COLOR_R] - r) * t;
+            g += (frames[i + RGBA2_ENTRIES + COLOR_G] - g) * t;
+            b += (frames[i + RGBA2_ENTRIES + COLOR_B] - b) * t;
+            r2 += (frames[i + RGBA2_ENTRIES + COLOR2_R2] - r2) * t;
+            g2 += (frames[i + RGBA2_ENTRIES + COLOR2_G2] - g2) * t;
+            b2 += (frames[i + RGBA2_ENTRIES + COLOR2_B2] - b2) * t;
+            break;
+        }
+        case CURVE_STEPPED: {
+            r = frames[i + COLOR_R];
+            g = frames[i + COLOR_G];
+            b = frames[i + COLOR_B];
+            r2 = frames[i + COLOR2_R2];
+            g2 = frames[i + COLOR2_G2];
+            b2 = frames[i + COLOR2_B2];
+            break;
+        }
+        default: {
+            r = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR_R, curveType - CURVE_BEZIER);
+            g = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR_G,
+                                                curveType + BEZIER_SIZE - CURVE_BEZIER);
+            b = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR_B,
+                                                curveType + BEZIER_SIZE * 2 - CURVE_BEZIER);
+            r2 = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR2_R2,
+                                                 curveType + BEZIER_SIZE * 3 - CURVE_BEZIER);
+            g2 = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR2_G2,
+                                                 curveType + BEZIER_SIZE * 4 - CURVE_BEZIER);
+            b2 = _spCurveTimeline_getBezierValue(SUPER(self), time, i, COLOR2_B2,
+                                                 curveType + BEZIER_SIZE * 5 - CURVE_BEZIER);
+        }
+    }
+
+    light = &slot->color, dark = slot->darkColor;
+    if (alpha == 1) {
+        spColor_setFromFloats3(light, r, g, b);
+        spColor_setFromFloats3(dark, r2, g2, b2);
+    } else {
+        if (blend == SP_MIX_BLEND_SETUP) {
+            spColor_setFromColor3(light, &slot->data->color);
+            spColor_setFromColor3(dark, slot->data->darkColor);
+        }
+        spColor_addFloats3(light, (r - light->r) * alpha, (g - light->g) * alpha, (b - light->b) * alpha);
+        dark->r += (r2 - dark->r) * alpha;
+        dark->g += (g2 - dark->g) * alpha;
+        dark->b += (b2 - dark->b) * alpha;
+    }
+
+    UNUSED(lastTime);
+    UNUSED(firedEvents);
+    UNUSED(eventsCount);
+    UNUSED(direction);
+}
+
+spRGB2Timeline* spRGB2Timeline_create (int framesCount, int bezierCount, int slotIndex) {
+    spRGB2Timeline* timeline = NEW(spRGB2Timeline);
+    spPropertyId ids[2];
+    ids[0] = ((spPropertyId)SP_PROPERTY_RGB << 32) | slotIndex;
+    ids[1] = ((spPropertyId)SP_PROPERTY_RGB2 << 32) | slotIndex;
+    _spCurveTimeline_init(SUPER(timeline), framesCount, RGB2_ENTRIES, bezierCount, ids, 2, _spCurveTimeline_dispose, _spRGB2Timeline_apply);
+    timeline->slotIndex = slotIndex;
+    return timeline;
+}
+
+void spRGB2Timeline_setFrame (spRGB2Timeline* self, int frameIndex, float time, float r, float g, float b, float r2, float g2, float b2) {
+    float *frames = self->super.super.frames->items;
+    frameIndex *= RGBA_ENTRIES;
+    frames[frameIndex] = time;
+    frames[frameIndex + COLOR_R] = r;
+    frames[frameIndex + COLOR_G] = g;
+    frames[frameIndex + COLOR_B] = b;
+    frames[frameIndex + COLOR2_R2] = r2;
+    frames[frameIndex + COLOR2_G2] = g2;
+    frames[frameIndex + COLOR2_B2] = b2;
 }
 
 /**/
@@ -1362,30 +1549,31 @@ void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
 	const char* attachmentName;
 	spAttachmentTimeline* self = (spAttachmentTimeline*)timeline;
 	int frameIndex;
+	float* frames = self->super.frames->items;
 	spSlot* slot = skeleton->slots[self->slotIndex];
 	if (!slot->bone->active) return;
 
 	if (direction == SP_MIX_DIRECTION_OUT) {
-	    if (blend == SP_MIX_BLEND_SETUP)
-	        _spSetAttachment(self, skeleton, slot, slot->data->attachmentName);
+	    if (blend == SP_MIX_BLEND_SETUP) {
+            _spSetAttachment(self, skeleton, slot, slot->data->attachmentName);
+        }
 		return;
 	}
 
-	if (time < self->frames[0]) {
+	if (time < frames[0]) {
 		if (blend == SP_MIX_BLEND_SETUP || blend == SP_MIX_BLEND_FIRST) {
 			_spSetAttachment(self, skeleton, slot, slot->data->attachmentName);
 		}
 		return;
 	}
 
-	if (time >= self->frames[self->framesCount - 1])
-		frameIndex = self->framesCount - 1;
-	else
-		frameIndex = binarySearch1(self->frames, self->framesCount, time) - 1;
+    if (time < frames[0]) {
+        if (blend == SP_MIX_BLEND_SETUP || blend == SP_MIX_BLEND_FIRST) _spSetAttachment(self, skeleton, slot, slot->data->attachmentName);
+        return;
+    }
 
-	attachmentName = self->attachmentNames[frameIndex];
-	spSlot_setAttachment(skeleton->slots[self->slotIndex],
-		attachmentName ? spSkeleton_getAttachmentForSlotIndex(skeleton, self->slotIndex, attachmentName) : 0);
+	attachmentName = self->attachmentNames[search(frames, self->super.frames->size, time)];
+    _spSetAttachment(self, skeleton, slot, attachmentName);
 
 	UNUSED(lastTime);
 	UNUSED(firedEvents);
@@ -1393,36 +1581,25 @@ void _spAttachmentTimeline_apply (const spTimeline* timeline, spSkeleton* skelet
 	UNUSED(alpha);
 }
 
-int _spAttachmentTimeline_getPropertyId (const spTimeline* timeline) {
-	return (SP_TIMELINE_ATTACHMENT << 24) + SUB_CAST(spAttachmentTimeline, timeline)->slotIndex;
-}
-
 void _spAttachmentTimeline_dispose (spTimeline* timeline) {
-	spAttachmentTimeline* self = SUB_CAST(spAttachmentTimeline, timeline);
-	int i;
-
-	_spTimeline_deinit(timeline);
-
-	for (i = 0; i < self->framesCount; ++i)
-		FREE(self->attachmentNames[i]);
-	FREE(self->attachmentNames);
-	FREE(self->frames);
-	FREE(self);
+    spAttachmentTimeline* self = SUB_CAST(spAttachmentTimeline, timeline);
+    int i;
+    for (i = 0; i < self->super.frames->size; ++i)
+        FREE(self->attachmentNames[i]);
+    FREE(self->attachmentNames);
 }
 
-spAttachmentTimeline* spAttachmentTimeline_create (int framesCount) {
+spAttachmentTimeline* spAttachmentTimeline_create (int framesCount, int slotIndex) {
 	spAttachmentTimeline* self = NEW(spAttachmentTimeline);
-	_spTimeline_init(SUPER(self), SP_TIMELINE_ATTACHMENT, _spAttachmentTimeline_dispose, _spAttachmentTimeline_apply, _spAttachmentTimeline_getPropertyId);
-
-	CONST_CAST(int, self->framesCount) = framesCount;
-	CONST_CAST(float*, self->frames) = CALLOC(float, framesCount);
-	CONST_CAST(char**, self->attachmentNames) = CALLOC(char*, framesCount);
-
+    spPropertyId ids[1];
+    ids[0] = ((spPropertyId)SP_PROPERTY_ATTACHMENT << 32) | slotIndex;
+	_spTimeline_init(SUPER(self), framesCount, 1, ids, 1, _spAttachmentTimeline_dispose, _spAttachmentTimeline_apply);
+    CONST_CAST(char**, self->attachmentNames) = CALLOC(char*, framesCount);
 	return self;
 }
 
 void spAttachmentTimeline_setFrame (spAttachmentTimeline* self, int frameIndex, float time, const char* attachmentName) {
-	self->frames[frameIndex] = time;
+	self->super.frames->items[frameIndex] = time;
 
 	FREE(self->attachmentNames[frameIndex]);
 	if (attachmentName)
@@ -1463,8 +1640,8 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 			return;
 	}
 
-	frames = self->frames;
-	framesCount = self->framesCount;
+	frames = self->super.super.frames->items;
+	framesCount =  self->super.super.frames->size;
 	vertexCount = self->frameVerticesCount;
 	if (slot->deformCount < vertexCount) {
 		if (slot->deformCapacity < vertexCount) {
@@ -1570,7 +1747,7 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	}
 
 	/* Interpolate between the previous frame and the current frame. */
-	frame = binarySearch(frames, framesCount, time, 1);
+	frame = search2(frames, framesCount, time, 1);
 	prevVertices = frameVertices[frame - 1];
 	nextVertices = frameVertices[frame];
 	frameTime = frames[frame];
@@ -1643,10 +1820,6 @@ void _spDeformTimeline_apply (const spTimeline* timeline, spSkeleton* skeleton, 
 	UNUSED(firedEvents);
 	UNUSED(eventsCount);
 	UNUSED(direction);
-}
-
-int _spDeformTimeline_getPropertyId (const spTimeline* timeline) {
-	return (SP_TIMELINE_DEFORM << 27) + SUB_CAST(spVertexAttachment, SUB_CAST(spDeformTimeline, timeline)->attachment)->id + SUB_CAST(spDeformTimeline, timeline)->slotIndex;
 }
 
 void _spDeformTimeline_dispose (spTimeline* timeline) {

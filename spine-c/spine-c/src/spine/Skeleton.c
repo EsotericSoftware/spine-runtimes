@@ -214,8 +214,6 @@ static void _sortReset(spBone** bones, int bonesCount) {
 }
 
 static void _sortIkConstraint (_spSkeleton* const internal, spIkConstraint* constraint) {
-	int /*bool*/ contains = 0;
-	int i;
 	spBone* target = constraint->target;
 	spBone** constrained;
 	spBone* parent;
@@ -281,7 +279,6 @@ static void _sortTransformConstraint(_spSkeleton* const internal, spTransformCon
 	int i, boneCount;
 	spBone** constrained;
 	spBone* child;
-	int /*boolean*/ contains = 0;
 
 	constraint->active = constraint->target->active && (!constraint->data->skinRequired || (internal->super.skin != 0 && spTransformConstraintDataArray_contains(internal->super.skin->transformConstraints, constraint->data)));
 	if (!constraint->active) return;
@@ -408,7 +405,7 @@ void spSkeleton_updateWorldTransform (const spSkeleton* self) {
 
 void spSkeleton_updateWorldTransformWith (const spSkeleton* self, const spBone *parent) {
 /* Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection. */
-    int i, n;
+    int i;
     float rotationY, la, lb, lc, ld;
     _spUpdate *updateCache;
     _spSkeleton* internal = SUB_CAST(_spSkeleton, self);
