@@ -42,6 +42,7 @@ Shader "Spine/Special/Skeleton Grayscale" {
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
+			#include "CGIncludes/Spine-Common.cginc"
 			sampler2D _MainTex;
 			float _GrayPhase;
 
@@ -60,18 +61,17 @@ Shader "Spine/Special/Skeleton Grayscale" {
 			VertexOutput vert (VertexInput v) {
 				VertexOutput o = (VertexOutput)0;
 				o.uv = v.uv;
-				o.vertexColor = v.vertexColor;
+				o.vertexColor = PMAGammaToTargetSpace(v.vertexColor);
 				o.pos = UnityObjectToClipPos(v.vertex);
 				return o;
 			}
 
 			float4 frag (VertexOutput i) : SV_Target {
 				float4 rawColor = tex2D(_MainTex,i.uv);
-				float finalAlpha = (rawColor.a * i.vertexColor.a);
-
-				#if defined(_STRAIGHT_ALPHA_INPUT)
+			#if defined(_STRAIGHT_ALPHA_INPUT)
 				rawColor.rgb *= rawColor.a;
-				#endif
+			#endif
+				float finalAlpha = (rawColor.a * i.vertexColor.a);
 
 				rawColor.rgb *= i.vertexColor.rgb;
 

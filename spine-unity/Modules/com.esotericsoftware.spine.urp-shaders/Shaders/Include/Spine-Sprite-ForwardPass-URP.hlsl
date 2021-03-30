@@ -4,6 +4,7 @@
 #include "Include/Spine-Sprite-Common-URP.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 #include "SpineCoreShaders/SpriteLighting.cginc"
+#include "SpineCoreShaders/Spine-Common.cginc"
 
 #if defined(_RIM_LIGHTING) || defined(_ADDITIONAL_LIGHTS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)
 	#define NEEDS_POSITION_WS
@@ -109,7 +110,7 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 	finalColor += inputData.vertexLighting * brdfData.diffuse;
 #endif
 	finalColor += emission;
-	return prepareLitPixelForOutput(half4(finalColor, albedo.a), vertexColor);
+	return prepareLitPixelForOutput(half4(finalColor, albedo.a), texAlbedoAlpha.a, vertexColor.a);
 }
 
 #else // !SPECULAR
@@ -157,7 +158,7 @@ half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiff
 	diffuseLighting += emission;
 	//half3 finalColor = diffuseLighting * diffuse + emission;
 	half3 finalColor = diffuseLighting * diffuse.rgb;
-	return prepareLitPixelForOutput(half4(finalColor, diffuse.a), vertexColor);
+	return prepareLitPixelForOutput(half4(finalColor, diffuse.a), texDiffuseAlpha.a, vertexColor.a);
 }
 #endif // SPECULAR
 

@@ -3,6 +3,7 @@
 
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
+#include "SpineCoreShaders/Spine-Common.cginc"
 
 struct appdata {
 	float3 pos : POSITION;
@@ -27,7 +28,7 @@ VertexOutput vert(appdata v) {
 	float3 positionWS = TransformObjectToWorld(v.pos);
 	o.pos = TransformWorldToHClip(positionWS);
 	o.uv0 = v.uv0;
-	o.color = v.color;
+	o.color = PMAGammaToTargetSpace(v.color);
 	return o;
 }
 

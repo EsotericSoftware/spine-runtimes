@@ -4,6 +4,7 @@
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
 #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Core.hlsl"
 #include "Packages/com.unity.render-pipelines.lightweight/ShaderLibrary/Lighting.hlsl"
+#include "SpineCoreShaders/Spine-Common.cginc"
 
 #if (defined(_MAIN_LIGHT_SHADOWS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)) && !defined(_RECEIVE_SHADOWS_OFF)
 #define SKELETONLIT_RECEIVE_SHADOWS
@@ -55,7 +56,7 @@ VertexOutput vert(appdata v) {
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-	half4 color = v.color;
+	half4 color = PMAGammaToTargetSpace(v.color);
 	float3 positionWS = TransformObjectToWorld(v.pos);
 	half3 fixedNormal = half3(0, 0, -1);
 	half3 normalWS = normalize(mul((float3x3)unity_ObjectToWorld, fixedNormal));

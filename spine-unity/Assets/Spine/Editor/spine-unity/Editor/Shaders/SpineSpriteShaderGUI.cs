@@ -51,6 +51,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 
 	private enum eBlendMode {
 		PreMultipliedAlpha,
+		PreMultipliedVertexAlpha,
 		StandardAlpha,
 		Opaque,
 		Additive,
@@ -159,7 +160,8 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	};
 	static GUIContent _blendModeText = new GUIContent("Blend Mode", "Blend Mode");
 	static GUIContent[] _blendModeOptions = {
-		new GUIContent("Pre-Multiplied Alpha"),
+		new GUIContent("PMA Vertex, PMA Texture"),
+		new GUIContent("PMA Vertex, Straight Texture"),
 		new GUIContent("Standard Alpha"),
 		new GUIContent("Opaque"),
 		new GUIContent("Additive"),
@@ -895,7 +897,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		//Disable emission by default (is set on by default in standard shader)
 		SetKeyword(material, "_EMISSION", false);
 		//Start with preMultiply alpha by default
-		SetBlendMode(material, eBlendMode.PreMultipliedAlpha);
+		SetBlendMode(material, eBlendMode.PreMultipliedVertexAlpha);
 		SetDiffuseRampMode(material, eDiffuseRampMode.DefaultRampMode);
 		//Start with mesh normals by default
 		SetNormalsMode(material, eNormalsMode.MeshNormals, false);
@@ -1052,6 +1054,8 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 			return eBlendMode.StandardAlpha;
 		if (material.IsKeywordEnabled("_ALPHAPREMULTIPLY_ON"))
 			return eBlendMode.PreMultipliedAlpha;
+		if (material.IsKeywordEnabled("_ALPHAPREMULTIPLY_VERTEX_ONLY"))
+			return eBlendMode.PreMultipliedVertexAlpha;
 		if (material.IsKeywordEnabled("_MULTIPLYBLEND"))
 			return eBlendMode.Multiply;
 		if (material.IsKeywordEnabled("_MULTIPLYBLEND_X2"))
@@ -1067,6 +1071,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	static void SetBlendMode (Material material, eBlendMode blendMode) {
 		SetKeyword(material, "_ALPHABLEND_ON", blendMode == eBlendMode.StandardAlpha);
 		SetKeyword(material, "_ALPHAPREMULTIPLY_ON", blendMode == eBlendMode.PreMultipliedAlpha);
+		SetKeyword(material, "_ALPHAPREMULTIPLY_VERTEX_ONLY", blendMode == eBlendMode.PreMultipliedVertexAlpha);
 		SetKeyword(material, "_MULTIPLYBLEND", blendMode == eBlendMode.Multiply);
 		SetKeyword(material, "_MULTIPLYBLEND_X2", blendMode == eBlendMode.Multiplyx2);
 		SetKeyword(material, "_ADDITIVEBLEND", blendMode == eBlendMode.Additive);

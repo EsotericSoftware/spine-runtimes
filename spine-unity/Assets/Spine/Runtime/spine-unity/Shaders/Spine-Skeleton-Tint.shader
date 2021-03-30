@@ -49,6 +49,7 @@ Shader "Spine/Skeleton Tint" {
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
+			#include "CGIncludes/Spine-Common.cginc"
 			sampler2D _MainTex;
 			float4 _Color;
 			float4 _Black;
@@ -69,7 +70,7 @@ Shader "Spine/Skeleton Tint" {
 				VertexOutput o;
 				o.pos = UnityObjectToClipPos(v.vertex);
 				o.uv = v.uv;
-				o.vertexColor = v.vertexColor * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
+				o.vertexColor = PMAGammaToTargetSpace(v.vertexColor) * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
 				return o;
 			}
 

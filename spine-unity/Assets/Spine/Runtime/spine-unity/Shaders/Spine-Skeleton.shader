@@ -39,6 +39,7 @@ Shader "Spine/Skeleton" {
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
+			#include "CGIncludes/Spine-Common.cginc"
 			sampler2D _MainTex;
 
 			struct VertexInput {
@@ -57,7 +58,7 @@ Shader "Spine/Skeleton" {
 				VertexOutput o;
 				o.pos = UnityObjectToClipPos(v.vertex);
 				o.uv = v.uv;
-				o.vertexColor = v.vertexColor;
+				o.vertexColor = PMAGammaToTargetSpace(v.vertexColor);
 				return o;
 			}
 

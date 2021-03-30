@@ -846,7 +846,7 @@ namespace Spine.Unity.Editor {
 			bool isUsingPMAWorkflow = string.IsNullOrEmpty(referenceTextureSettings) ||
 				(!referenceTextureSettings.ToLower().Contains("straight") && referenceTextureSettings.ToLower().Contains("pma"));
 
-			MaterialChecks.EnablePMAAtMaterial(material, isUsingPMAWorkflow);
+			MaterialChecks.EnablePMATextureAtMaterial(material, isUsingPMAWorkflow);
 		}
 #endregion
 

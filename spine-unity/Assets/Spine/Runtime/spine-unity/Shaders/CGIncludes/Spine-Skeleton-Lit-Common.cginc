@@ -2,6 +2,7 @@
 #define SKELETON_LIT_COMMON_INCLUDED
 
 #include "UnityCG.cginc"
+#include "CGIncludes/Spine-Common.cginc"
 
 // ES2.0/WebGL/3DS can not do loops with non-constant-expression iteration counts :(
 #if defined(SHADER_API_GLES)
@@ -79,7 +80,7 @@ VertexOutput vert (appdata v) {
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-	half4 color = v.color;
+	half4 color = PMAGammaToTargetSpace(v.color);
 	float3 eyePos = UnityObjectToViewPos(float4(v.pos, 1)).xyz; //mul(UNITY_MATRIX_MV, float4(v.pos,1)).xyz;
 	half3 fixedNormal = half3(0,0,-1);
 	half3 eyeNormal = normalize(mul((float3x3)UNITY_MATRIX_IT_MV, fixedNormal));

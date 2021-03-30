@@ -42,6 +42,7 @@ Shader "Spine/Skeleton Fill" {
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
+			#include "CGIncludes/Spine-Common.cginc"
 			sampler2D _MainTex;
 			float4 _FillColor;
 			float _FillPhase;
@@ -61,7 +62,7 @@ Shader "Spine/Skeleton Fill" {
 			VertexOutput vert (VertexInput v) {
 				VertexOutput o = (VertexOutput)0;
 				o.uv = v.uv;
-				o.vertexColor = v.vertexColor;
+				o.vertexColor = PMAGammaToTargetSpace(v.vertexColor);
 				o.pos = UnityObjectToClipPos(v.vertex);
 				return o;
 			}

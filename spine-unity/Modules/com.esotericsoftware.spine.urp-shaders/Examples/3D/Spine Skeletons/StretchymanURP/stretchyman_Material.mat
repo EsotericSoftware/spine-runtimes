@@ -9,8 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: stretchyman_Material
   m_Shader: {fileID: 4800000, guid: 9f253724b2d29a3438eeea48277c25cb, type: 3}
-  m_ShaderKeywords: _ALPHABLEND_ON _EMISSION _FIXED_NORMALS_VIEWSPACE _NORMALMAP
-    _RECEIVE_SHADOWS_OFF
+  m_ShaderKeywords: _ALPHAPREMULTIPLY_VERTEX_ONLY _EMISSION _FIXED_NORMALS_VIEWSPACE
+    _NORMALMAP _RECEIVE_SHADOWS_OFF
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -81,3 +81,4 @@ Material:
     - _FixedNormal: {r: 0, g: 0, b: 1, a: 1}
     - _OverlayColor: {r: 0.18118013, g: 1, b: 0.033018887, a: 0}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []

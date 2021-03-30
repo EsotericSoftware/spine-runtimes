@@ -48,6 +48,7 @@ Shader "Spine/Blend Modes/Skeleton PMA Multiply" {
 			#pragma vertex vert
 			#pragma fragment frag
 			#include "UnityCG.cginc"
+			#include "../CGIncludes/Spine-Common.cginc"
 			uniform sampler2D _MainTex;
 			uniform float4 _Color;
 
@@ -67,7 +68,7 @@ Shader "Spine/Blend Modes/Skeleton PMA Multiply" {
 				VertexOutput o;
 				o.pos = UnityObjectToClipPos(v.vertex);
 				o.uv = v.uv;
-				o.vertexColor = v.vertexColor * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
+				o.vertexColor = PMAGammaToTargetSpace(v.vertexColor) * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
 				return o;
 			}
 

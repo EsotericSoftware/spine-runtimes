@@ -70,6 +70,7 @@ Shader "Spine/SkeletonGraphic"
 
 			#include "UnityCG.cginc"
 			#include "UnityUI.cginc"
+			#include "../CGIncludes/Spine-Common.cginc"
 
 			#pragma multi_compile __ UNITY_UI_ALPHACLIP
 
@@ -106,7 +107,18 @@ Shader "Spine/SkeletonGraphic"
 				OUT.vertex.xy += (_ScreenParams.zw-1.0) * float2(-1,1);
 				#endif
 
-				OUT.color = IN.color * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
+			#ifdef _CANVAS_GROUP_COMPATIBLE
+				half4 vertexColor = IN.color;
+				// CanvasGroup alpha sets vertex color alpha, but does not premultiply it to rgb components.
+				vertexColor.rgb *= vertexColor.a;
+				// Unfortunately we cannot perform the TargetToGamma and PMAGammaToTarget transformations,
+				// as these would be wrong with modified alpha.
+			#else
+				// Note: CanvasRenderer performs a GammaToTargetSpace conversion on vertex color already,
+				// however incorrectly assuming straight alpha color.
+				float4 vertexColor = PMAGammaToTargetSpace(half4(TargetToGammaSpace(IN.color.rgb), IN.color.a));
+			#endif
+				OUT.color = vertexColor * float4(_Color.rgb * _Color.a, _Color.a); // Combine a PMA version of _Color with vertexColor.
 				return OUT;
 			}
 
@@ -121,11 +133,6 @@ Shader "Spine/SkeletonGraphic"
 				#endif
 
 				half4 color = (texColor + _TextureSampleAdd) * IN.color;
-				#ifdef _CANVAS_GROUP_COMPATIBLE
-				// CanvasGroup alpha sets vertex color alpha, but does not premultiply it to rgb components.
-				color.rgb *= IN.color.a;
-				#endif
-
 				color *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
 
 				#ifdef UNITY_UI_ALPHACLIP

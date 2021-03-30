@@ -58,7 +58,10 @@
 			#pragma vertex CombinedShapeLightVertex
 			#pragma fragment CombinedShapeLightFragment
 
+
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/LightingUtility.hlsl"
+			#define USE_URP
+			#include "../Include/SpineCoreShaders/Spine-Common.cginc"
 
 			TEXTURE2D(_MainTex);
 			SAMPLER(sampler_MainTex);
@@ -89,7 +92,7 @@
 				o.uv = v.uv;
 				float4 clipVertex = o.positionCS / o.positionCS.w;
 				o.lightingUV = ComputeScreenPos(clipVertex).xy;
-				o.color = v.color;
+				o.color = PMAGammaToTargetSpace(v.color);
 				return o;
 			}
 
