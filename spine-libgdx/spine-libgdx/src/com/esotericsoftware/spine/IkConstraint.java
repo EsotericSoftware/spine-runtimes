@@ -248,7 +248,7 @@ public class IkConstraint implements Updatable {
 			os2 = 0;
 		float cx = child.ax, cy, cwx, cwy, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
 		boolean u = Math.abs(psx - psy) <= 0.0001f;
-		if (!u) {
+		if (!u || stretch) {
 			cy = 0;
 			cwx = a * cx + parent.worldX;
 			cwy = c * cx + parent.worldY;
@@ -275,7 +275,7 @@ public class IkConstraint implements Updatable {
 		float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
 		float dd = tx * tx + ty * ty;
 		if (softness != 0) {
-			softness *= psx * (csx + 1) / 2;
+			softness *= psx * (csx + 1) * 0.5f;
 			float td = (float)Math.sqrt(dd), sd = td - l1 - l2 * psx + softness;
 			if (sd > 0) {
 				float p = Math.min(1, sd / (softness * 2)) - 1;
@@ -289,13 +289,15 @@ public class IkConstraint implements Updatable {
 		if (u) {
 			l2 *= psx;
 			float cos = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-			if (cos < -1)
+			if (cos < -1) {
 				cos = -1;
-			else if (cos > 1) {
+				a2 = PI * bendDir;
+			} else if (cos > 1) {
 				cos = 1;
+				a2 = 0;
 				if (stretch) sx *= ((float)Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
-			}
-			a2 = (float)Math.acos(cos) * bendDir;
+			} else
+				a2 = (float)Math.acos(cos) * bendDir;
 			a = l1 + l2 * cos;
 			b = l2 * sin(a2);
 			a1 = atan2(ty * a - tx * b, tx * a + ty * b);
@@ -309,7 +311,7 @@ public class IkConstraint implements Updatable {
 			if (d >= 0) {
 				float q = (float)Math.sqrt(d);
 				if (c1 < 0) q = -q;
-				q = -(c1 + q) / 2;
+				q = -(c1 + q) * 0.5f;
 				float r0 = q / c2, r1 = c / q;
 				float r = Math.abs(r0) < Math.abs(r1) ? r0 : r1;
 				if (r * r <= dd) {
@@ -340,7 +342,7 @@ public class IkConstraint implements Updatable {
 					maxY = y;
 				}
 			}
-			if (dd <= (minDist + maxDist) / 2) {
+			if (dd <= (minDist + maxDist) * 0.5f) {
 				a1 = ta - atan2(minY * bendDir, minX);
 				a2 = minAngle * bendDir;
 			} else {
