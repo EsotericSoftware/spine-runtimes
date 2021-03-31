@@ -60,7 +60,9 @@ public class IkConstraintData extends ConstraintData {
 		this.target = target;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotation. */
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
+	 * <p>
+	 * For two bone IK: if the parent bone has local nonuniform scale, the child bone's local Y translation is set to 0. */
 	public float getMix () {
 		return mix;
 	}
@@ -69,7 +71,8 @@ public class IkConstraintData extends ConstraintData {
 		this.mix = mix;
 	}
 
-	/** For two bone IK, the distance from the maximum reach of the bones that rotation will slow. */
+	/** For two bone IK, the target bone's distance from the maximum reach of the bones where rotation begins to slow. The bones
+	 * will not straighten completely until the target is this far out of range. */
 	public float getSoftness () {
 		return softness;
 	}
@@ -78,7 +81,7 @@ public class IkConstraintData extends ConstraintData {
 		this.softness = softness;
 	}
 
-	/** Controls the bend direction of the IK bones, either 1 or -1. */
+	/** For two bone IK, controls the bend direction of the IK bones, either 1 or -1. */
 	public int getBendDirection () {
 		return bendDirection;
 	}
@@ -87,7 +90,7 @@ public class IkConstraintData extends ConstraintData {
 		this.bendDirection = bendDirection;
 	}
 
-	/** When true and only a single bone is being constrained, if the target is too close, the bone is scaled to reach it. */
+	/** For one bone IK, when true and the target is too close, the bone is scaled to reach it. */
 	public boolean getCompress () {
 		return compress;
 	}
@@ -96,8 +99,10 @@ public class IkConstraintData extends ConstraintData {
 		this.compress = compress;
 	}
 
-	/** When true, if the target is out of range, the parent bone is scaled to reach it. If more than one bone is being constrained
-	 * and the parent bone has local nonuniform scale, stretch is not applied. */
+	/** When true and the target is out of range, the parent bone is scaled to reach it.
+	 * <p>
+	 * For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not applied if {@link #getSoftness()} is
+	 * > 0, and 3) if the parent bone has local nonuniform scale, stretch is not applied. */
 	public boolean getStretch () {
 		return stretch;
 	}
@@ -106,8 +111,7 @@ public class IkConstraintData extends ConstraintData {
 		this.stretch = stretch;
 	}
 
-	/** When true, only a single bone is being constrained, and {@link #getCompress()} or {@link #getStretch()} is used, the bone
-	 * is scaled on both the X and Y axes. */
+	/** When true and {@link #getCompress()} or {@link #getStretch()} is used, the bone is scaled on both the X and Y axes. */
 	public boolean getUniform () {
 		return uniform;
 	}

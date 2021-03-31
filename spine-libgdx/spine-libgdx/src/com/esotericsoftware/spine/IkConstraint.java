@@ -89,7 +89,7 @@ public class IkConstraint implements Updatable {
 			apply((Bone)bones[0], target.worldX, target.worldY, compress, stretch, data.uniform, mix);
 			break;
 		case 2:
-			apply((Bone)bones[0], (Bone)bones[1], target.worldX, target.worldY, bendDirection, stretch, softness, mix);
+			apply((Bone)bones[0], (Bone)bones[1], target.worldX, target.worldY, bendDirection, stretch, data.uniform, softness, mix);
 			break;
 		}
 	}
@@ -109,7 +109,9 @@ public class IkConstraint implements Updatable {
 		this.target = target;
 	}
 
-	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotation. */
+	/** A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
+	 * <p>
+	 * For two bone IK: if the parent bone has local nonuniform scale, the child bone's local Y translation is set to 0. */
 	public float getMix () {
 		return mix;
 	}
@@ -118,7 +120,8 @@ public class IkConstraint implements Updatable {
 		this.mix = mix;
 	}
 
-	/** For two bone IK, the distance from the maximum reach of the bones that rotation will slow. */
+	/** For two bone IK, the target bone's distance from the maximum reach of the bones where rotation begins to slow. The bones
+	 * will not straighten completely until the target is this far out of range. */
 	public float getSoftness () {
 		return softness;
 	}
@@ -127,7 +130,7 @@ public class IkConstraint implements Updatable {
 		this.softness = softness;
 	}
 
-	/** Controls the bend direction of the IK bones, either 1 or -1. */
+	/** For two bone IK, controls the bend direction of the IK bones, either 1 or -1. */
 	public int getBendDirection () {
 		return bendDirection;
 	}
@@ -136,7 +139,7 @@ public class IkConstraint implements Updatable {
 		this.bendDirection = bendDirection;
 	}
 
-	/** When true and only a single bone is being constrained, if the target is too close, the bone is scaled to reach it. */
+	/** For one bone IK, when true and the target is too close, the bone is scaled to reach it. */
 	public boolean getCompress () {
 		return compress;
 	}
@@ -145,8 +148,10 @@ public class IkConstraint implements Updatable {
 		this.compress = compress;
 	}
 
-	/** When true, if the target is out of range, the parent bone is scaled to reach it. If more than one bone is being constrained
-	 * and the parent bone has local nonuniform scale, stretch is not applied. */
+	/** When true and the target is out of range, the parent bone is scaled to reach it.
+	 * <p>
+	 * For two bone IK: 1) the child bone's local Y translation is set to 0, 2) stretch is not applied if {@link #getSoftness()} is
+	 * > 0, and 3) if the parent bone has local nonuniform scale, stretch is not applied. */
 	public boolean getStretch () {
 		return stretch;
 	}
@@ -221,13 +226,13 @@ public class IkConstraint implements Updatable {
 
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
-	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, boolean stretch, float softness,
-		float alpha) {
+	static public void apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, boolean stretch, boolean uniform,
+		float softness, float alpha) {
 		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
 		if (child == null) throw new IllegalArgumentException("child cannot be null.");
 		if (!parent.appliedValid) parent.updateAppliedTransform();
 		if (!child.appliedValid) child.updateAppliedTransform();
-		float px = parent.ax, py = parent.ay, psx = parent.ascaleX, sx = psx, psy = parent.ascaleY, csx = child.ascaleX;
+		float px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, sx = psx, sy = psy, csx = child.ascaleX;
 		int os1, os2, s2;
 		if (psx < 0) {
 			psx = -psx;
@@ -295,7 +300,11 @@ public class IkConstraint implements Updatable {
 			} else if (cos > 1) {
 				cos = 1;
 				a2 = 0;
-				if (stretch) sx *= ((float)Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+				if (stretch) {
+					a = ((float)Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+					sx *= a;
+					if (uniform) sy *= a;
+				}
 			} else
 				a2 = (float)Math.acos(cos) * bendDir;
 			a = l1 + l2 * cos;
@@ -355,13 +364,15 @@ public class IkConstraint implements Updatable {
 		a1 = (a1 - os) * radDeg + os1 - rotation;
 		if (a1 > 180)
 			a1 -= 360;
-		else if (a1 < -180) a1 += 360;
-		parent.updateWorldTransform(px, py, rotation + a1 * alpha, sx, parent.ascaleY, 0, 0);
+		else if (a1 < -180) //
+			a1 += 360;
+		parent.updateWorldTransform(px, py, rotation + a1 * alpha, sx, sy, 0, 0);
 		rotation = child.arotation;
 		a2 = ((a2 + os) * radDeg - child.ashearX) * s2 + os2 - rotation;
 		if (a2 > 180)
 			a2 -= 360;
-		else if (a2 < -180) a2 += 360;
+		else if (a2 < -180) //
+			a2 += 360;
 		child.updateWorldTransform(cx, cy, rotation + a2 * alpha, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
 	}
 }
