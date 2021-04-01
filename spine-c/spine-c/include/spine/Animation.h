@@ -358,8 +358,6 @@ SP_API void spEventTimeline_setFrame (spEventTimeline* self, int frameIndex, spE
 
 typedef struct spDrawOrderTimeline {
 	spTimeline super;
-	int const framesCount;
-	float* const frames; /* time, ... */
 	const int** const drawOrders;
 	int const slotsCount;
 } spDrawOrderTimeline;
@@ -370,16 +368,12 @@ SP_API void spDrawOrderTimeline_setFrame (spDrawOrderTimeline* self, int frameIn
 
 /**/
 
-static const int IKCONSTRAINT_ENTRIES = 6;
-
 typedef struct spIkConstraintTimeline {
 	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, mix, bendDirection, ... */
 	int ikConstraintIndex;
 } spIkConstraintTimeline;
 
-SP_API spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount);
+SP_API spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount, int bezierCount, int ikConstraintIndex);
 
 SP_API void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameIndex, float time, float mix, float softness, int bendDirection, int /*boolean*/ compress, int /**boolean**/ stretch);
 

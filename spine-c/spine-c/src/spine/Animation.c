@@ -1992,23 +1992,20 @@ void _spDrawOrderTimeline_apply (spTimeline* timeline, spSkeleton* skeleton, flo
 	int frame;
 	const int* drawOrderToSetupIndex;
 	spDrawOrderTimeline* self = (spDrawOrderTimeline*)timeline;
+	float* frames = self->super.frames->items;
+	int framesCount = self->super.frames->size;
 
 	if (direction == SP_MIX_DIRECTION_OUT ) {
 		if (blend == SP_MIX_BLEND_SETUP) memcpy(skeleton->drawOrder, skeleton->slots, self->slotsCount * sizeof(spSlot*));
 		return;
 	}
 
-	if (time < self->frames[0]) {
+	if (time < frames[0]) {
 		if (blend == SP_MIX_BLEND_SETUP || blend == SP_MIX_BLEND_FIRST) memcpy(skeleton->drawOrder, skeleton->slots, self->slotsCount * sizeof(spSlot*));
 		return;
 	}
 
-	if (time >= self->frames[self->framesCount - 1]) /* Time is after last frame. */
-		frame = self->framesCount - 1;
-	else
-		frame = binarySearch1(self->frames, self->framesCount, time) - 1;
-
-	drawOrderToSetupIndex = self->drawOrders[frame];
+	drawOrderToSetupIndex = self->drawOrders[search(frames, framesCount, time)];
 	if (!drawOrderToSetupIndex)
 		memcpy(skeleton->drawOrder, skeleton->slots, self->slotsCount * sizeof(spSlot*));
 	else {
@@ -2022,30 +2019,21 @@ void _spDrawOrderTimeline_apply (spTimeline* timeline, spSkeleton* skeleton, flo
 	UNUSED(alpha);
 }
 
-int _spDrawOrderTimeline_getPropertyId (spTimeline* timeline) {
-	return SP_TIMELINE_DRAWORDER << 24;
-	UNUSED(timeline);
-}
-
 void _spDrawOrderTimeline_dispose (spTimeline* timeline) {
 	spDrawOrderTimeline* self = SUB_CAST(spDrawOrderTimeline, timeline);
 	int i;
 
-	_spTimeline_deinit(timeline);
-
-	for (i = 0; i < self->framesCount; ++i)
+	for (i = 0; i < self->super.frames->size; ++i)
 		FREE(self->drawOrders[i]);
 	FREE(self->drawOrders);
-	FREE(self->frames);
-	FREE(self);
 }
 
 spDrawOrderTimeline* spDrawOrderTimeline_create (int framesCount, int slotsCount) {
 	spDrawOrderTimeline* self = NEW(spDrawOrderTimeline);
-	_spTimeline_init(SUPER(self), SP_TIMELINE_DRAWORDER, _spDrawOrderTimeline_dispose, _spDrawOrderTimeline_apply, _spDrawOrderTimeline_getPropertyId);
+  spPropertyId ids[1];
+  ids[0] = (spPropertyId)SP_PROPERTY_DRAWORDER << 32;
+	_spTimeline_init(SUPER(self), framesCount, 1, ids, 1, _spDrawOrderTimeline_dispose, _spDrawOrderTimeline_apply, 0);
 
-	CONST_CAST(int, self->framesCount) = framesCount;
-	CONST_CAST(float*, self->frames) = CALLOC(float, framesCount);
 	CONST_CAST(int**, self->drawOrders) = CALLOC(int*, framesCount);
 	CONST_CAST(int, self->slotsCount) = slotsCount;
 
@@ -2053,7 +2041,7 @@ spDrawOrderTimeline* spDrawOrderTimeline_create (int framesCount, int slotsCount
 }
 
 void spDrawOrderTimeline_setFrame (spDrawOrderTimeline* self, int frameIndex, float time, const int* drawOrder) {
-	self->frames[frameIndex] = time;
+	self->super.frames->items[frameIndex] = time;
 
 	FREE(self->drawOrders[frameIndex]);
 	if (!drawOrder)
@@ -2066,7 +2054,7 @@ void spDrawOrderTimeline_setFrame (spDrawOrderTimeline* self, int frameIndex, fl
 
 /**/
 
-static const int IKCONSTRAINT_PREV_TIME = -6, IKCONSTRAINT_PREV_MIX = -5, IKCONSTRAINT_PREV_SOFTNESS = -4, IKCONSTRAINT_PREV_BEND_DIRECTION = -3, IKCONSTRAINT_PREV_COMPRESS = -2, IKCONSTRAINT_PREV_STRETCH = -1;
+static const int IKCONSTRAINT_ENTRIES = 6;
 static const int IKCONSTRAINT_MIX = 1, IKCONSTRAINT_SOFTNESS = 2, IKCONSTRAINT_BEND_DIRECTION = 3, IKCONSTRAINT_COMPRESS = 4, IKCONSTRAINT_STRETCH = 5;
 
 void _spIkConstraintTimeline_apply (spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time,
@@ -2167,12 +2155,13 @@ void _spIkConstraintTimeline_apply (spTimeline* timeline, spSkeleton* skeleton, 
 	UNUSED(eventsCount);
 }
 
-int _spIkConstraintTimeline_getPropertyId (spTimeline* timeline) {
-	return (SP_TIMELINE_IKCONSTRAINT << 24) + SUB_CAST(spIkConstraintTimeline, timeline)->ikConstraintIndex;
-}
-
-spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount) {
-	return (spIkConstraintTimeline*)_spBaseTimeline_create(framesCount, SP_TIMELINE_IKCONSTRAINT, IKCONSTRAINT_ENTRIES, _spIkConstraintTimeline_apply, _spIkConstraintTimeline_getPropertyId);
+spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount, int bezierCount, int ikConstraintIndex) {
+  spIkConstraintTimeline* timeline = NEW(spIkConstraintTimeline);
+  spPropertyId ids[1];
+  ids[0] = ((spPropertyId)SP_PROPERTY_IKCONSTRAINT << 32) | ikConstraintIndex;
+  _spCurveTimeline_init(SUPER(timeline), framesCount, IKCONSTRAINT_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spIkConstraintTimeline_apply, _spCurveTimeline_setBezier);
+  timeline->ikConstraintIndex = ikConstraintIndex;
+  return timeline;
 }
 
 void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameIndex, float time, float mix, float softness,
