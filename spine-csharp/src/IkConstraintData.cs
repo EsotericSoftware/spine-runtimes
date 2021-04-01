@@ -54,43 +54,47 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// A percentage (0-1) that controls the mix between the constraint and unconstrained rotation.</summary>
+		/// A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
+		/// <para>
+		/// For two bone IK: if the parent bone has local nonuniform scale, the child bone's local Y translation is set to 0.
+		/// </para></summary>
 		public float Mix {
 			get { return mix; }
 			set { mix = value; }
 		}
 
-		///<summary>For two bone IK, the distance from the maximum reach of the bones that rotation will slow.</summary>
+		/// <summary>For two bone IK, the target bone's distance from the maximum reach of the bones where rotation begins to slow. The bones
+		/// will not straighten completely until the target is this far out of range.</summary>
 		public float Softness {
 			get { return softness; }
 			set { softness = value; }
 		}
 
-		/// <summary>Controls the bend direction of the IK bones, either 1 or -1.</summary>
+		/// <summary>For two bone IK, controls the bend direction of the IK bones, either 1 or -1.</summary>
 		public int BendDirection {
 			get { return bendDirection; }
 			set { bendDirection = value; }
 		}
 
-		/// <summary>
-		/// When true, and only a single bone is being constrained,
-		/// if the target is too close, the bone is scaled to reach it. </summary>
+		/// <summary>For one bone IK, when true and the target is too close, the bone is scaled to reach it.</summary>
 		public bool Compress {
 			get { return compress; }
 			set { compress = value; }
 		}
 
-		/// <summary>
-		/// When true, if the target is out of range, the parent bone is scaled on the X axis to reach it.
-		/// If the bone has local nonuniform scale, stretching is not applied.</summary>
+		/// <summary>When true and the target is out of range, the parent bone is scaled to reach it.
+		/// <para>
+		/// For two bone IK: 1) the child bone's local Y translation is set to 0,
+		/// 2) stretch is not applied if <see cref="Softness"/> is > 0,
+		/// and 3) if the parent bone has local nonuniform scale, stretch is not applied.</para></summary>
 		public bool Stretch {
 			get { return stretch; }
 			set { stretch = value; }
 		}
 
 		/// <summary>
-		/// When true, only a single bone is being constrained and Compress or Stretch is used,
-		/// the bone is scaled both on the X and Y axes.</summary>
+		/// When true and <see cref="Compress"/> or <see cref="Stretch"/> is used, the bone is scaled on both the X and Y axes.
+		/// </summary>
 		public bool Uniform {
 			get { return uniform; }
 			set { uniform = value; }

@@ -88,7 +88,7 @@ namespace Spine {
 				Apply(bones[0], target.worldX, target.worldY, compress, stretch, data.uniform, mix);
 				break;
 			case 2:
-				Apply(bones[0], bones[1], target.worldX, target.worldY, bendDirection, stretch, softness, mix);
+				Apply(bones[0], bones[1], target.worldX, target.worldY, bendDirection, stretch, data.uniform, softness, mix);
 				break;
 			}
 		}
@@ -104,34 +104,40 @@ namespace Spine {
 			set { target = value; }
 		}
 
-		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.</summary>
+		/// <summary>A percentage (0-1) that controls the mix between the constrained and unconstrained rotation.
+		/// <para>
+		/// For two bone IK: if the parent bone has local nonuniform scale, the child bone's local Y translation is set to 0.
+		/// </para></summary>
 		public float Mix {
 			get { return mix; }
 			set { mix = value; }
 		}
 
-		///<summary>For two bone IK, the distance from the maximum reach of the bones that rotation will slow.</summary>
+		/// <summary>For two bone IK, the target bone's distance from the maximum reach of the bones where rotation begins to slow. The bones
+		/// will not straighten completely until the target is this far out of range.</summary>
 		public float Softness {
 			get { return softness; }
 			set { softness = value; }
 		}
 
-		/// <summary>Controls the bend direction of the IK bones, either 1 or -1.</summary>
+		/// <summary>For two bone IK, controls the bend direction of the IK bones, either 1 or -1.</summary>
 		public int BendDirection {
 			get { return bendDirection; }
 			set { bendDirection = value; }
 		}
 
-		/// <summary>
-		/// When true and only a single bone is being constrained, if the target is too close, the bone is scaled to reach it.</summary>
+		/// <summary>For one bone IK, when true and the target is too close, the bone is scaled to reach it.</summary>
 		public bool Compress {
 			get { return compress; }
 			set { compress = value; }
 		}
 
-		/// <summary>
-		///  When true, if the target is out of range, the parent bone is scaled to reach it. If more than one bone is being constrained
-		///  and the parent bone has local nonuniform scale, stretch is not applied.</summary>
+		/// <summary>When true and the target is out of range, the parent bone is scaled to reach it.
+		/// <para>
+		/// For two bone IK: 1) the child bone's local Y translation is set to 0,
+		/// 2) stretch is not applied if <see cref="Softness"/> is > 0,
+		/// and 3) if the parent bone has local nonuniform scale, stretch is not applied.
+		/// </para></summary>
 		public bool Stretch {
 			get { return stretch; }
 			set { stretch = value; }
@@ -212,13 +218,13 @@ namespace Spine {
 
 		/// <summary>Applies 2 bone IK. The target is specified in the world coordinate system.</summary>
 		/// <param name="child">A direct descendant of the parent bone.</param>
-		static public void Apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, bool stretch, float softness,
-			float alpha) {
+		static public void Apply (Bone parent, Bone child, float targetX, float targetY, int bendDir, bool stretch, bool uniform,
+			float softness, float alpha) {
 			if (parent == null) throw new ArgumentNullException("parent", "parent cannot be null.");
 			if (child == null) throw new ArgumentNullException("child", "child cannot be null.");
 			if (!parent.appliedValid) parent.UpdateAppliedTransform();
 			if (!child.appliedValid) child.UpdateAppliedTransform();
-			float px = parent.ax, py = parent.ay, psx = parent.ascaleX, sx = psx, psy = parent.ascaleY, csx = child.ascaleX;
+			float px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, sx = psx, sy = psy, csx = child.ascaleX;
 			int os1, os2, s2;
 			if (psx < 0) {
 				psx = -psx;
@@ -239,7 +245,7 @@ namespace Spine {
 				os2 = 0;
 			float cx = child.ax, cy, cwx, cwy, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
 			bool u = Math.Abs(psx - psy) <= 0.0001f;
-			if (!u) {
+			if (!u || stretch) {
 				cy = 0;
 				cwx = a * cx + parent.worldX;
 				cwy = c * cx + parent.worldY;
@@ -266,7 +272,7 @@ namespace Spine {
 			float tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
 			float dd = tx * tx + ty * ty;
 			if (softness != 0) {
-				softness *= psx * (csx + 1) / 2;
+				softness *= psx * (csx + 1) * 0.5f;
 				float td = (float)Math.Sqrt(dd), sd = td - l1 - l2 * psx + softness;
 				if (sd > 0) {
 					float p = Math.Min(1, sd / (softness * 2)) - 1;
@@ -279,13 +285,21 @@ namespace Spine {
 			if (u) {
 				l2 *= psx;
 				float cos = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-				if (cos < -1)
+				if (cos < -1) {
 					cos = -1;
+					a2 = MathUtils.PI * bendDir;
+				}
 				else if (cos > 1) {
 					cos = 1;
-					if (stretch) sx *= ((float)Math.Sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+					a2 = 0;
+					if (stretch) {
+						a = ((float)Math.Sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+						sx *= a;
+						if (uniform) sy *= a;
+					}
 				}
-				a2 = (float)Math.Acos(cos) * bendDir;
+				else
+					a2 = (float)Math.Acos(cos) * bendDir;
 				a = l1 + l2 * cos;
 				b = l2 * (float)Math.Sin(a2);
 				a1 = (float)Math.Atan2(ty * a - tx * b, tx * a + ty * b);
@@ -299,7 +313,7 @@ namespace Spine {
 				if (d >= 0) {
 					float q = (float)Math.Sqrt(d);
 					if (c1 < 0) q = -q;
-					q = -(c1 + q) / 2;
+					q = -(c1 + q) * 0.5f;
 					float r0 = q / c2, r1 = c / q;
 					float r = Math.Abs(r0) < Math.Abs(r1) ? r0 : r1;
 					if (r * r <= dd) {
@@ -330,7 +344,7 @@ namespace Spine {
 						maxY = y;
 					}
 				}
-				if (dd <= (minDist + maxDist) / 2) {
+				if (dd <= (minDist + maxDist) * 0.5f) {
 					a1 = ta - (float)Math.Atan2(minY * bendDir, minX);
 					a2 = minAngle * bendDir;
 				} else {
@@ -344,13 +358,15 @@ namespace Spine {
 			a1 = (a1 - os) * MathUtils.RadDeg + os1 - rotation;
 			if (a1 > 180)
 				a1 -= 360;
-			else if (a1 < -180) a1 += 360;
-			parent.UpdateWorldTransform(px, py, rotation + a1 * alpha, sx, parent.ascaleY, 0, 0);
+			else if (a1 < -180)
+				a1 += 360;
+			parent.UpdateWorldTransform(px, py, rotation + a1 * alpha, sx, sy, 0, 0);
 			rotation = child.arotation;
 			a2 = ((a2 + os) * MathUtils.RadDeg - child.ashearX) * s2 + os2 - rotation;
 			if (a2 > 180)
 				a2 -= 360;
-			else if (a2 < -180) a2 += 360;
+			else if (a2 < -180)
+				a2 += 360;
 			child.UpdateWorldTransform(cx, cy, rotation + a2 * alpha, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
 		}
 	}
