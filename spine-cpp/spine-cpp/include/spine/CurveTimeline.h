@@ -47,7 +47,7 @@ namespace spine {
 
 		void setStepped(size_t frame);
 
-        void setBezier (size_t bezier, size_t frame, float value, float time1, float value1, float cx1, float cy1, float cx2, float cy2, float time2, float value2);
+        virtual void setBezier (size_t bezier, size_t frame, float value, float time1, float value1, float cx1, float cy1, float cx2, float cy2, float time2, float value2);
 
         float getBezierValue(float time, size_t frame, size_t valueOffset, size_t i);
 

@@ -261,8 +261,7 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
     }
 }
 
-void DeformTimeline::setBezier(int bezier, int frame, float value, float time1, float value1, float cx1, float cy1,
-                               float cx2, float cy2, float time2, float value2) {
+void DeformTimeline::setBezier (size_t bezier, size_t frame, float value, float time1, float value1, float cx1, float cy1, float cx2, float cy2, float time2, float value2) {
     SP_UNUSED(value1);
     SP_UNUSED(value2);
     size_t i = getFrameCount() + bezier * DeformTimeline::BEZIER_SIZE;

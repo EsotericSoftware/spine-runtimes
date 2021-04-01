@@ -33,6 +33,7 @@
 #include <spine/dll.h>
 #include <spine/Event.h>
 #include <spine/Attachment.h>
+#include <spine/VertexAttachment.h>
 #include <spine/Array.h>
 #include <stdint.h>
 
@@ -104,9 +105,11 @@ typedef enum {
 #define SP_MAX_PROPERTY_IDS 3
 
 typedef struct _spTimelineVtable {
-    void (*apply) (const spTimeline* self, struct spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+    void (*apply) (spTimeline* self, struct spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
                    int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction);
     void (*dispose) (spTimeline* self);
+    void (*setBezier) (spTimeline* self, int bezier, int frame, float value, float time1, float value1, float cx1, float cy1,
+                       float cx2, float cy2, float time2, float value2);
 } _spTimelineVtable;
 
 struct spTimeline {
@@ -118,7 +121,7 @@ struct spTimeline {
 };
 
 SP_API void spTimeline_dispose (spTimeline* self);
-SP_API void spTimeline_apply (const spTimeline* self, struct spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
+SP_API void spTimeline_apply (spTimeline* self, struct spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction);
 SP_API int spTimeline_getFrameCount (const spTimeline* self);
 SP_API float spTimeline_getDuration (const spTimeline* self);
@@ -336,7 +339,7 @@ typedef struct spDeformTimeline {
     spAttachment* attachment;
 } spDeformTimeline;
 
-SP_API spDeformTimeline* spDeformTimeline_create (int framesCount, int frameVerticesCount);
+SP_API spDeformTimeline* spDeformTimeline_create (int framesCount, int frameVerticesCount, int bezierCount, int slotIndex, spVertexAttachment* attachment);
 
 SP_API void spDeformTimeline_setFrame (spDeformTimeline* self, int frameIndex, float time, float* vertices);
 
@@ -344,8 +347,6 @@ SP_API void spDeformTimeline_setFrame (spDeformTimeline* self, int frameIndex, f
 
 typedef struct spEventTimeline {
 	spTimeline super;
-	int const framesCount;
-	float* const frames; /* time, ... */
 	spEvent** const events;
 } spEventTimeline;
 
