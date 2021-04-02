@@ -288,8 +288,7 @@ namespace Spine {
 				if (cos < -1) {
 					cos = -1;
 					a2 = MathUtils.PI * bendDir;
-				}
-				else if (cos > 1) {
+				} else if (cos > 1) {
 					cos = 1;
 					a2 = 0;
 					if (stretch) {
