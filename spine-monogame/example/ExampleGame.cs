@@ -294,7 +294,7 @@ namespace Spine {
 		}
 
 		protected override void Draw(GameTime gameTime) {
-			currentScreen.Render(gameTime.ElapsedGameTime.Milliseconds / 1000.0f);
+			currentScreen.Render((float)(gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0));
 		}
 	}
 }

@@ -192,7 +192,7 @@ namespace Spine {
 		protected override void Draw (GameTime gameTime) {
 			GraphicsDevice.Clear(Color.Black);
 
-			state.Update(gameTime.ElapsedGameTime.Milliseconds / 1000f);
+			state.Update((float)(gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0));
 			state.Apply(skeleton);
 			skeleton.UpdateWorldTransform();
 			if (skeletonRenderer.Effect is BasicEffect) {
