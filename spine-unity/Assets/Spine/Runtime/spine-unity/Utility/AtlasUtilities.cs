@@ -230,6 +230,14 @@ namespace Spine.Unity.AttachmentTools {
 		}
 
 		#region Runtime Repacking
+		static readonly Dictionary<AtlasRegion, int> existingRegions = new Dictionary<AtlasRegion, int>();
+		static readonly List<int> regionIndices = new List<int>();
+		static readonly List<Texture2D> texturesToPack = new List<Texture2D>();
+		static readonly List<AtlasRegion> originalRegions = new List<AtlasRegion>();
+		static readonly List<AtlasRegion> repackedRegions = new List<AtlasRegion>();
+		static readonly List<Attachment> repackedAttachments = new List<Attachment>();
+		static List<Texture2D>[] texturesToPackAtParam = new List<Texture2D>[1];
+
 		/// <summary>
 		/// Fills the outputAttachments list with new attachment objects based on the attachments in sourceAttachments,
 		/// but mapped to a new single texture using the same material.</summary>
@@ -243,11 +251,11 @@ namespace Spine.Unity.AttachmentTools {
 			if (sourceAttachments == null) throw new System.ArgumentNullException("sourceAttachments");
 			if (outputAttachments == null) throw new System.ArgumentNullException("outputAttachments");
 
-			// Use these to detect and use shared regions.
-			var existingRegions = new Dictionary<AtlasRegion, int>();
-			var regionIndexes = new List<int>();
-			var texturesToPack = new List<Texture2D>();
-			var originalRegions = new List<AtlasRegion>();
+			// Use shared lists to detect and use shared regions.
+			existingRegions.Clear();
+			regionIndices.Clear();
+			texturesToPack.Clear();
+			originalRegions.Clear();
 
 			outputAttachments.Clear();
 			outputAttachments.AddRange(sourceAttachments);
@@ -261,19 +269,19 @@ namespace Spine.Unity.AttachmentTools {
 					var region = newAttachment.GetRegion();
 					int existingIndex;
 					if (existingRegions.TryGetValue(region, out existingIndex)) {
-						regionIndexes.Add(existingIndex); // Store the region index for the eventual new attachment.
+						regionIndices.Add(existingIndex); // Store the region index for the eventual new attachment.
 					} else {
 						originalRegions.Add(region);
 						texturesToPack.Add(region.ToTexture(textureFormat, mipmaps)); // Add the texture to the PackTextures argument
 						existingRegions.Add(region, newRegionIndex); // Add the region to the dictionary of known regions
-						regionIndexes.Add(newRegionIndex); // Store the region index for the eventual new attachment.
+						regionIndices.Add(newRegionIndex); // Store the region index for the eventual new attachment.
 						newRegionIndex++;
 					}
 
 					outputAttachments[i] = newAttachment;
 				} else {
 					outputAttachments[i] = useOriginalNonrenderables ? originalAttachment : originalAttachment.GetCopy(true);
-					regionIndexes.Add(NonrenderingRegion); // Output attachments pairs with regionIndexes list 1:1. Pad with a sentinel if the attachment doesn't have a region.
+					regionIndices.Add(NonrenderingRegion); // Output attachments pairs with regionIndexes list 1:1. Pad with a sentinel if the attachment doesn't have a region.
 				}
 			}
 
@@ -301,7 +309,7 @@ namespace Spine.Unity.AttachmentTools {
 			var page = newMaterial.ToSpineAtlasPage();
 			page.name = newAssetName;
 
-			var repackedRegions = new List<AtlasRegion>();
+			repackedRegions.Clear();
 			for (int i = 0, n = originalRegions.Count; i < n; i++) {
 				var oldRegion = originalRegions[i];
 				var newRegion = UVRectToAtlasRegion(rects[i], oldRegion, page);
@@ -312,7 +320,7 @@ namespace Spine.Unity.AttachmentTools {
 			for (int i = 0, n = outputAttachments.Count; i < n; i++) {
 				var a = outputAttachments[i];
 				if (IsRenderable(a))
-					a.SetRegion(repackedRegions[regionIndexes[i]]);
+					a.SetRegion(repackedRegions[regionIndices[i]]);
 			}
 
 			// Clean up.
@@ -386,18 +394,22 @@ namespace Spine.Unity.AttachmentTools {
 			newSkin.constraints.AddRange(o.constraints);
 
 			// Use these to detect and use shared regions.
-			var existingRegions = new Dictionary<AtlasRegion, int>();
-			var regionIndexes = new List<int>();
+			existingRegions.Clear();
+			regionIndices.Clear();
 
 			// Collect all textures from the attachments of the original skin.
-			var repackedAttachments = new List<Attachment>();
+			repackedAttachments.Clear();
 			int numTextureParamsToRepack = 1 + (additionalTexturePropertyIDsToCopy == null ? 0 : additionalTexturePropertyIDsToCopy.Length);
 			additionalOutputTextures = (additionalTexturePropertyIDsToCopy == null ? null : new Texture2D[additionalTexturePropertyIDsToCopy.Length]);
-			List<Texture2D>[] texturesToPackAtParam = new List<Texture2D>[numTextureParamsToRepack];
+			if (texturesToPackAtParam.Length < numTextureParamsToRepack)
+				Array.Resize(ref texturesToPackAtParam, numTextureParamsToRepack);
 			for (int i = 0; i < numTextureParamsToRepack; ++i) {
-				texturesToPackAtParam[i] = new List<Texture2D>();
+				if (texturesToPackAtParam[i] != null)
+					texturesToPackAtParam[i].Clear();
+				else
+					texturesToPackAtParam[i] = new List<Texture2D>();
 			}
-			var originalRegions = new List<AtlasRegion>();
+			originalRegions.Clear();
 			int newRegionIndex = 0;
 
 			foreach (var skinEntry in skinAttachments) {
@@ -410,7 +422,7 @@ namespace Spine.Unity.AttachmentTools {
 					var region = newAttachment.GetRegion();
 					int existingIndex;
 					if (existingRegions.TryGetValue(region, out existingIndex)) {
-						regionIndexes.Add(existingIndex); // Store the region index for the eventual new attachment.
+						regionIndices.Add(existingIndex); // Store the region index for the eventual new attachment.
 					} else {
 						originalRegions.Add(region);
 						for (int i = 0; i < numTextureParamsToRepack; ++i) {
@@ -422,7 +434,7 @@ namespace Spine.Unity.AttachmentTools {
 							texturesToPackAtParam[i].Add(regionTexture); // Add the texture to the PackTextures argument
 						}
 						existingRegions.Add(region, newRegionIndex); // Add the region to the dictionary of known regions
-						regionIndexes.Add(newRegionIndex); // Store the region index for the eventual new attachment.
+						regionIndices.Add(newRegionIndex); // Store the region index for the eventual new attachment.
 						newRegionIndex++;
 					}
 
@@ -471,7 +483,7 @@ namespace Spine.Unity.AttachmentTools {
 			var page = newMaterial.ToSpineAtlasPage();
 			page.name = newName;
 
-			var repackedRegions = new List<AtlasRegion>();
+			repackedRegions.Clear();
 			for (int i = 0, n = originalRegions.Count; i < n; i++) {
 				var oldRegion = originalRegions[i];
 				var newRegion = UVRectToAtlasRegion(rects[i], oldRegion, page);
@@ -482,7 +494,7 @@ namespace Spine.Unity.AttachmentTools {
 			for (int i = 0, n = repackedAttachments.Count; i < n; i++) {
 				var a = repackedAttachments[i];
 				if (IsRenderable(a))
-					a.SetRegion(repackedRegions[regionIndexes[i]]);
+					a.SetRegion(repackedRegions[regionIndices[i]]);
 			}
 
 			// Clean up.
