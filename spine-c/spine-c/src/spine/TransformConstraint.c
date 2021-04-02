@@ -63,7 +63,7 @@ void _spTransformConstraint_applyAbsoluteWorld (spTransformConstraint* self) {
 	float degRadReflect = ta * td - tb * tc > 0 ? DEG_RAD : -DEG_RAD;
 	float offsetRotation = self->data->offsetRotation * degRadReflect, offsetShearY = self->data->offsetShearY * degRadReflect;
 	int i;
-	float a, b, c, d, r, cosine, sine, x, y, s, ts, by;
+	float a, b, c, d, r, cosine, sine, x, y, s, by;
 	for (i = 0; i < self->bonesCount; ++i) {
 		spBone* bone = self->bones[i];
 

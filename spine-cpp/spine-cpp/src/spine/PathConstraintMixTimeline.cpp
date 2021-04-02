@@ -125,5 +125,5 @@ void PathConstraintMixTimeline::setFrame(int frameIndex, float time, float mixRo
 	_frames[frameIndex] = time;
 	_frames[frameIndex + ROTATE] = mixRotate;
 	_frames[frameIndex + X] = mixX;
-    _frames[frameIndex + Y] = mixY;
+	_frames[frameIndex + Y] = mixY;
 }

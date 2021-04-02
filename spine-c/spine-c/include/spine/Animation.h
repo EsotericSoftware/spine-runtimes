@@ -373,69 +373,53 @@ typedef struct spIkConstraintTimeline {
 	int ikConstraintIndex;
 } spIkConstraintTimeline;
 
-SP_API spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount, int bezierCount, int ikConstraintIndex);
+SP_API spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount, int bezierCount, int transformConstraintIndex);
 
 SP_API void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameIndex, float time, float mix, float softness, int bendDirection, int /*boolean*/ compress, int /**boolean**/ stretch);
 
 /**/
 
-static const int TRANSFORMCONSTRAINT_ENTRIES = 5;
-
 typedef struct spTransformConstraintTimeline {
 	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
 	int transformConstraintIndex;
 } spTransformConstraintTimeline;
 
-SP_API spTransformConstraintTimeline* spTransformConstraintTimeline_create (int framesCount);
+SP_API spTransformConstraintTimeline* spTransformConstraintTimeline_create (int framesCount, int bezierCount, int ikConstraintIndex);
 
-SP_API void spTransformConstraintTimeline_setFrame (spTransformConstraintTimeline* self, int frameIndex, float time, float rotateMix, float translateMix, float scaleMix, float shearMix);
+SP_API void spTransformConstraintTimeline_setFrame (spTransformConstraintTimeline* self, int frameIndex, float time, float mixRotate, float mixX, float mixY, float mixScaleX, float mixScaleY, float mixShearY);
 
 /**/
 
-static const int PATHCONSTRAINTPOSITION_ENTRIES = 2;
-
 typedef struct spPathConstraintPositionTimeline {
 	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
 	int pathConstraintIndex;
 } spPathConstraintPositionTimeline;
 
-SP_API spPathConstraintPositionTimeline* spPathConstraintPositionTimeline_create (int framesCount);
+SP_API spPathConstraintPositionTimeline* spPathConstraintPositionTimeline_create (int framesCount, int bezierCount, int pathConstraintIndex);
 
 SP_API void spPathConstraintPositionTimeline_setFrame (spPathConstraintPositionTimeline* self, int frameIndex, float time, float value);
 
 /**/
 
-static const int PATHCONSTRAINTSPACING_ENTRIES = 2;
-
 typedef struct spPathConstraintSpacingTimeline {
 	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
 	int pathConstraintIndex;
 } spPathConstraintSpacingTimeline;
 
-SP_API spPathConstraintSpacingTimeline* spPathConstraintSpacingTimeline_create (int framesCount);
+SP_API spPathConstraintSpacingTimeline* spPathConstraintSpacingTimeline_create (int framesCount, int bezierCount, int pathConstraintIndex);
 
 SP_API void spPathConstraintSpacingTimeline_setFrame (spPathConstraintSpacingTimeline* self, int frameIndex, float time, float value);
 
 /**/
 
-static const int PATHCONSTRAINTMIX_ENTRIES = 3;
-
 typedef struct spPathConstraintMixTimeline {
 	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
 	int pathConstraintIndex;
 } spPathConstraintMixTimeline;
 
-SP_API spPathConstraintMixTimeline* spPathConstraintMixTimeline_create (int framesCount);
+SP_API spPathConstraintMixTimeline* spPathConstraintMixTimeline_create (int framesCount, int bezierCount, int pathConstraintIndex);
 
-SP_API void spPathConstraintMixTimeline_setFrame (spPathConstraintMixTimeline* self, int frameIndex, float time, float rotateMix, float translateMix);
+SP_API void spPathConstraintMixTimeline_setFrame (spPathConstraintMixTimeline* self, int frameIndex, float time, float mixRotate, float mixX, float mixY);
 
 /**/
 

@@ -47,19 +47,19 @@ namespace spine {
 
 		void setFrame(size_t frameIndex, float time, float mixRotate, float mixX, float mixY, float mixScaleX, float mixScaleY, float mixShearY);
 
-        int getTransformConstraintIndex() { return _transformConstraintIndex; }
+    int getTransformConstraintIndex() { return _transformConstraintIndex; }
 
-        void setTransformConstraintIndex(int inValue) { _transformConstraintIndex = inValue; }
-    private:
-        int _transformConstraintIndex;
+    void setTransformConstraintIndex(int inValue) { _transformConstraintIndex = inValue; }
+	private:
+    int _transformConstraintIndex;
 
-        static const int ENTRIES = 7;
-		static const int ROTATE = 1;
-		static const int X = 2;
-        static const int Y = 3;
-		static const int SCALEX = 4;
-        static const int SCALEY = 5;
-		static const int SHEARY = 6;
+    static const int ENTRIES = 7;
+    static const int ROTATE = 1;
+    static const int X = 2;
+    static const int Y = 3;
+    static const int SCALEX = 4;
+    static const int SCALEY = 5;
+    static const int SHEARY = 6;
 	};
 }
 

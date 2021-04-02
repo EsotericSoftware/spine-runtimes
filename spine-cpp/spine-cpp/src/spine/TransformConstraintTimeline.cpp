@@ -149,8 +149,8 @@ void TransformConstraintTimeline::setFrame(size_t frameIndex, float time, float 
 	_frames[frameIndex] = time;
 	_frames[frameIndex + ROTATE] = mixRotate;
 	_frames[frameIndex + X] = mixX;
-    _frames[frameIndex + Y] = mixY;
-    _frames[frameIndex + SCALEX] = mixScaleX;
-    _frames[frameIndex + SCALEY] = mixScaleY;
-    _frames[frameIndex + SHEARY] = mixShearY;
+  _frames[frameIndex + Y] = mixY;
+  _frames[frameIndex + SCALEX] = mixScaleX;
+  _frames[frameIndex + SCALEY] = mixScaleY;
+  _frames[frameIndex + SHEARY] = mixShearY;
 }

@@ -82,7 +82,7 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 		}
 	}
 
-    float mix = 0, softness = 0;
+	float mix = 0, softness = 0;
 	int i = Animation::search(_frames, time, IkConstraintTimeline::ENTRIES);
     int curveType = (int)_curves[i / IkConstraintTimeline::ENTRIES];
     switch (curveType) {
