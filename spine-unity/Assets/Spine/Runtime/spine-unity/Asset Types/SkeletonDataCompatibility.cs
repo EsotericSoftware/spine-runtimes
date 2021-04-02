@@ -167,11 +167,14 @@ namespace Spine.Unity {
 		}
 
 		public static bool IsJsonFile (TextAsset file) {
-			string fileText = file.text;
+			byte[] content = file.bytes;
 			const int maxCharsToCheck = 256;
-			int numCharsToCheck = Math.Min(fileText.Length, maxCharsToCheck);
-			for (int i = 0; i < numCharsToCheck; ++i) {
-				char c = fileText[i];
+			int numCharsToCheck = Math.Min(content.Length, maxCharsToCheck);
+			int i = 0;
+			if (content.Length >= 3 && content[0] == 0xEF && content[1] == 0xBB && content[2] == 0xBF) // skip potential BOM
+				i = 3;
+			for (; i < numCharsToCheck; ++i) {
+				char c = (char)content[i];
 				if (char.IsWhiteSpace(c))
 					continue;
 				return c == '{';
