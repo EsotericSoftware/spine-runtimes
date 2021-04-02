@@ -533,6 +533,15 @@ namespace Spine.Unity.AttachmentTools {
 			if (output == null) {
 				Texture2D sourceTexture = texturePropertyId == 0 ? ar.GetMainTexture() : ar.GetTexture(texturePropertyId);
 				Rect r = ar.GetUnityRect();
+				// Compensate any image resizing due to Texture 'Max Size' import settings.
+				// sourceTexture.width returns the resized image dimensions, at least in newer Unity versions.
+				if (sourceTexture.width < ar.page.width) {
+					float scaleX = (float)(sourceTexture.width) / (float)(ar.page.width);
+					float scaleY = (float)(sourceTexture.height) / (float)(ar.page.height);
+					var scale = new Vector2(scaleX, scaleY);
+					r = new Rect(r.position * scale, r.size * scale);
+				}
+
 				int width = (int)r.width;
 				int height = (int)r.height;
 				output = new Texture2D(width, height, textureFormat, mipmaps, linear) { name = ar.name };
