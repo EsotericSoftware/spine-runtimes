@@ -539,7 +539,7 @@ namespace Spine.Unity.AttachmentTools {
 					float scaleX = (float)(sourceTexture.width) / (float)(ar.page.width);
 					float scaleY = (float)(sourceTexture.height) / (float)(ar.page.height);
 					var scale = new Vector2(scaleX, scaleY);
-					r = new Rect(r.position * scale, r.size * scale);
+					r = new Rect(Vector2.Scale(r.position, scale), Vector2.Scale(r.size, scale));
 				}
 
 				int width = (int)r.width;
