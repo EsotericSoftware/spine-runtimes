@@ -993,7 +993,7 @@ var spine;
 				color.b += (b - color.b) * alpha;
 			}
 		};
-		RGBTimeline.ENTRIES = 5;
+		RGBTimeline.ENTRIES = 4;
 		RGBTimeline.R = 1;
 		RGBTimeline.G = 2;
 		RGBTimeline.B = 3;
@@ -1128,7 +1128,7 @@ var spine;
 			}
 			var light = slot.color, dark = slot.darkColor;
 			if (alpha == 1) {
-				slot.color.set(r, g, b, a);
+				light.set(r, g, b, a);
 				dark.r = r2;
 				dark.g = g2;
 				dark.b = b2;
@@ -5571,7 +5571,7 @@ var spine;
 						case SkeletonBinary.PATH_MIX:
 							var timeline = new spine.PathConstraintMixTimeline(input.readInt(true), input.readInt(true), index);
 							var time = input.readFloat(), mixRotate = input.readFloat(), mixX = input.readFloat(), mixY = input.readFloat();
-							for (var frame = 0, bezier = 0, frameLast = nn - 1;; frame++) {
+							for (var frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
 								timeline.setFrame(frame, time, mixRotate, mixX, mixY);
 								if (frame == frameLast)
 									break;
