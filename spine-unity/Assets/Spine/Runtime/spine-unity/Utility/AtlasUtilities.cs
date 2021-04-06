@@ -233,6 +233,7 @@ namespace Spine.Unity.AttachmentTools {
 		static readonly List<AtlasRegion> originalRegions = new List<AtlasRegion>();
 		static readonly List<AtlasRegion> repackedRegions = new List<AtlasRegion>();
 		static List<Texture2D>[] texturesToPackAtParam = new List<Texture2D>[1];
+		static List<Attachment> inoutAttachments = new List<Attachment>();
 
 		/// <summary>
 		/// Fills the outputAttachments list with new attachment objects based on the attachments in sourceAttachments,
@@ -489,9 +490,7 @@ namespace Spine.Unity.AttachmentTools {
 			newSkin.bones.AddRange(o.bones);
 			newSkin.constraints.AddRange(o.constraints);
 
-			var originalAttachments = o.Attachments;
-			int attachmentCount = originalAttachments.Count;
-			List<Attachment> inoutAttachments = new List<Attachment>(attachmentCount);
+			inoutAttachments.Clear();
 			foreach (var entry in o.Attachments) {
 				inoutAttachments.Add(entry.attachment);
 			}
