@@ -1216,10 +1216,14 @@ module spine {
 				this.skeleton.updateWorldTransform();
 				this.skeleton.getBounds(offset, size);
 
-				minX = Math.min(offset.x, minX);
-				maxX = Math.max(offset.x + size.x, maxX);
-				minY = Math.min(offset.y, minY);
-				maxY = Math.max(offset.y + size.y, maxY);
+				if (!isNaN(offset.x) && !isNaN(offset.y) && !isNaN(size.x) && !isNaN(size.y)) {
+					minX = Math.min(offset.x, minX);
+					maxX = Math.max(offset.x + size.x, maxX);
+					minY = Math.min(offset.y, minY);
+					maxY = Math.max(offset.y + size.y, maxY);
+				} else {
+					console.log("Bounds of animation " + animationName + " are NaN");
+				}
 			}
 
 			offset.x = minX;
