@@ -72,6 +72,7 @@ VertexOutput vert(appdata v) {
 #endif
 
 	half3 shadowedColor;
+#if !defined(_LIGHT_AFFECTS_ADDITIVE)
 	if (color.a == 0) {
 		o.color = color;
 #if defined(SKELETONLIT_RECEIVE_SHADOWS)
@@ -80,6 +81,7 @@ VertexOutput vert(appdata v) {
 #endif
 		return o;
 	}
+#endif // !defined(_LIGHT_AFFECTS_ADDITIVE)
 
 	color.rgb *= LightweightLightVertexSimplified(positionWS, normalWS, shadowedColor);
 #if defined(SKELETONLIT_RECEIVE_SHADOWS)

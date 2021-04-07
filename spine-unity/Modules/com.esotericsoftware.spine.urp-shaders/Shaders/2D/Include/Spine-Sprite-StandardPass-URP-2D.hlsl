@@ -28,7 +28,7 @@ SAMPLER(sampler_MaskTex);
 struct VertexOutputSpriteURP2D
 {
 	float4 pos : SV_POSITION;
-	fixed4 vertexColor : COLOR;
+	half4 vertexColor : COLOR;
 	float3 texcoord : TEXCOORD0;
 	float2 lightingUV : TEXCOORD1;
 
@@ -89,11 +89,10 @@ half4 CombinedShapeLightFragment(VertexOutputSpriteURP2D input) : SV_Target
 	fixed4 texureColor = calculateTexturePixel(input.texcoord.xy);
 	RETURN_UNLIT_IF_ADDITIVE_SLOT(texureColor, input.vertexColor) // shall be called before ALPHA_CLIP
 	ALPHA_CLIP(texureColor, input.vertexColor)
-
-	texureColor *= input.vertexColor;
+	half4 main = texureColor * input.vertexColor;
 
 	half4 mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, input.texcoord.xy);
-	half4 pixel = CombinedShapeLightShared(texureColor, mask, input.lightingUV);
+	half4 pixel = half4(CombinedShapeLightShared(half4(main.rgb, 1), mask, input.lightingUV).rgb, main.a);
 
 #if defined(_RIM_LIGHTING)
 	#if defined(_NORMALMAP)

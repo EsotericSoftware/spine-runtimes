@@ -3,6 +3,7 @@
 		[NoScaleOffset] _MainTex ("Main Texture", 2D) = "black" {}
 		[NoScaleOffset] _MaskTex("Mask", 2D) = "white" {}
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
+		[MaterialToggle(_LIGHT_AFFECTS_ADDITIVE)] _LightAffectsAdditive("Light Affects Additive", Float) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 0.0 // Disabled stencil test by default
 	}
@@ -39,6 +40,7 @@
 			#pragma multi_compile USE_SHAPE_LIGHT_TYPE_1 __
 			#pragma multi_compile USE_SHAPE_LIGHT_TYPE_2 __
 			#pragma multi_compile USE_SHAPE_LIGHT_TYPE_3 __
+			#pragma multi_compile _ _LIGHT_AFFECTS_ADDITIVE
 
 			struct Attributes {
 				float3 positionOS : POSITION;
@@ -57,7 +59,6 @@
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma vertex CombinedShapeLightVertex
 			#pragma fragment CombinedShapeLightFragment
-
 
 			#include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/LightingUtility.hlsl"
 			#define USE_URP
@@ -106,11 +107,12 @@
 				#endif
 
 				half4 main = tex * i.color;
+			#if !defined(_LIGHT_AFFECTS_ADDITIVE)
 				if (i.color.a == 0)
 					return main;
-
+			#endif
 				half4 mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, i.uv);
-				return CombinedShapeLightShared(main, mask, i.lightingUV);
+				return half4(CombinedShapeLightShared(half4(main.rgb, 1), mask, i.lightingUV).rgb, main.a);
 			}
 
 			ENDHLSL

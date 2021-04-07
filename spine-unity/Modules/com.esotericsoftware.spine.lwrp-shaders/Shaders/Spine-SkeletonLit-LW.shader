@@ -9,6 +9,7 @@ Shader "Lightweight Render Pipeline/Spine/Skeleton Lit" {
 		[Toggle(_STRAIGHT_ALPHA_INPUT)] _StraightAlphaInput("Straight Alpha Texture", Int) = 0
 		[Toggle(_RECEIVE_SHADOWS)] _ReceiveShadows("Receive Shadows", Int) = 0
 		[Toggle(_DOUBLE_SIDED_LIGHTING)] _DoubleSidedLighting("Double-Sided Lighting", Int) = 0
+		[MaterialToggle(_LIGHT_AFFECTS_ADDITIVE)] _LightAffectsAdditive("Light Affects Additive", Float) = 0
 		[HideInInspector] _StencilRef("Stencil Reference", Float) = 1.0
 		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Compare", Float) = 0.0 // Disabled stencil test by default
 	}
@@ -64,6 +65,7 @@ Shader "Lightweight Render Pipeline/Spine/Skeleton Lit" {
 			#pragma shader_feature _ _STRAIGHT_ALPHA_INPUT
 			#pragma shader_feature _ _DOUBLE_SIDED_LIGHTING
 			#pragma shader_feature _RECEIVE_SHADOWS_OFF _RECEIVE_SHADOWS
+			#pragma multi_compile _ _LIGHT_AFFECTS_ADDITIVE
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 2.0

@@ -130,6 +130,8 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	MaterialProperty _smoothness = null;
 	MaterialProperty _smoothnessScale = null;
 
+	MaterialProperty _lightAffectsAdditive = null;
+
 	static GUIContent _albedoText = new GUIContent("Albedo", "Albedo (RGB) and Transparency (A)");
 	static GUIContent _maskText = new GUIContent("Light Mask", "Light mask texture (secondary Sprite texture)");
 	static GUIContent _altAlbedoText = new GUIContent("Secondary Albedo", "When a secondary albedo texture is set the albedo will be a blended mix of the two textures based on the blend value.");
@@ -190,6 +192,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	static GUIContent _meshRequiresNormalsText = new GUIContent("Note: Material requires a mesh with normals.");
 	static GUIContent _meshRequiresNormalsAndTangentsText = new GUIContent("Note: Material requires a mesh with Normals and Tangents.");
 	static GUIContent[] _fixedDiffuseRampModeOptions = { new GUIContent("Hard"), new GUIContent("Soft"), new GUIContent("Old Hard"), new GUIContent("Old Soft") };
+	static GUIContent _lightAffectsAdditiveText = new GUIContent("Light Affects Additive", "For PMA Additive Slots: When enabled, additive Slots are lit normally before the additive color is written to the target buffer. When disabled, the additive color is directly written with intensity 1.");
 
 	const string _primaryMapsText = "Main Maps";
 	const string _depthLabelText = "Depth";
@@ -262,6 +265,8 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		_metallicGlossMap = FindProperty("_MetallicGlossMap", props, false);
 		_smoothness = FindProperty("_Glossiness", props, false);
 		_smoothnessScale = FindProperty("_GlossMapScale", props, false);
+
+		_lightAffectsAdditive = FindProperty("_LightAffectsAdditive", props, false);
 	}
 
 	static bool BoldToggleField (GUIContent label, bool value) {
@@ -844,6 +849,11 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 			dataChanged |= EditorGUI.EndChangeCheck();
 		}
 
+		if (_lightAffectsAdditive != null) {
+			EditorGUI.BeginChangeCheck();
+			_materialEditor.ShaderProperty(_lightAffectsAdditive, _lightAffectsAdditiveText);
+			dataChanged |= EditorGUI.EndChangeCheck();
+		}
 		return dataChanged;
 	}
 

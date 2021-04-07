@@ -38,6 +38,8 @@ Shader "Spine/Sprite/Vertex Lit"
 		_BlendTex ("Blend Texture", 2D) = "white" {}
 		_BlendAmount ("Blend", Range(0,1)) = 0.0
 
+		[MaterialToggle(_LIGHT_AFFECTS_ADDITIVE)] _LightAffectsAdditive("Light Affects Additive", Float) = 0
+
 		[HideInInspector] _SrcBlend ("__src", Float) = 1.0
 		[HideInInspector] _DstBlend ("__dst", Float) = 0.0
 		[HideInInspector] _RenderQueue ("__queue", Float) = 0.0
@@ -92,7 +94,7 @@ Shader "Spine/Sprite/Vertex Lit"
 				#pragma shader_feature _TEXTURE_BLEND
 				#pragma shader_feature _SPHERICAL_HARMONICS
 				#pragma shader_feature _FOG
-
+				#pragma shader_feature _LIGHT_AFFECTS_ADDITIVE
 
 				#pragma fragmentoption ARB_precision_hint_fastest
 				#pragma multi_compile_fog
