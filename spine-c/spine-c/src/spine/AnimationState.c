@@ -580,7 +580,6 @@ static int binarySearch1 (float *values, int valuesLength, float target) {
 void _spAnimationState_applyAttachmentTimeline(spAnimationState* self, spTimeline* timeline, spSkeleton* skeleton, float time, spMixBlend blend, int /*bool*/ attachments) {
     spAttachmentTimeline* attachmentTimeline;
     spSlot* slot;
-    int frameIndex;
     float* frames;
 
     attachmentTimeline = SUB_CAST(spAttachmentTimeline, timeline);
@@ -606,10 +605,6 @@ void _spAnimationState_applyRotateTimeline (spAnimationState* self, spTimeline* 
 	float *frames;
 	spBone* bone;
 	float r1, r2;
-	int frame;
-	float prevRotation;
-	float frameTime;
-	float percent;
 	float total, diff;
 	int /*boolean*/ current, dir;
 	UNUSED(self);
