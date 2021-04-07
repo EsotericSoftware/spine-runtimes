@@ -53,6 +53,7 @@ _SP_ARRAY_DECLARE_TYPE(spTrackEntryArray, spTrackEntry*)
 
 struct spTrackEntry {
 	spAnimation* animation;
+	spTrackEntry* previous;
 	spTrackEntry* next;
 	spTrackEntry* mixingFrom;
 	spTrackEntry* mixingTo;
@@ -60,6 +61,7 @@ struct spTrackEntry {
 	int trackIndex;
 	int /*boolean*/ loop;
 	int /*boolean*/ holdPrevious;
+	int /*boolean*/ reverse;
 	float eventThreshold, attachmentThreshold, drawOrderThreshold;
 	float animationStart, animationEnd, animationLast, nextAnimationLast;
 	float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
@@ -119,6 +121,8 @@ SP_API spTrackEntry* spAnimationState_getCurrent (spAnimationState* self, int tr
 SP_API void spAnimationState_clearListenerNotifications(spAnimationState* self);
 
 SP_API float spTrackEntry_getAnimationTime (spTrackEntry* entry);
+
+SP_API float spTrackEntry_getTrackComplete(spTrackEntry* entry);
 
 /** Use this to dispose static memory before your app exits to appease your memory leak detector*/
 SP_API void spAnimationState_disposeStatics ();

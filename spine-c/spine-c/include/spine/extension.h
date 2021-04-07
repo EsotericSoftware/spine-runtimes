@@ -216,7 +216,7 @@ struct _spAnimationState {
 
 	_spEventQueue* queue;
 
-	int* propertyIDs;
+	spPropertyId* propertyIDs;
 	int propertyIDsCount;
 	int propertyIDsCapacity;
 
