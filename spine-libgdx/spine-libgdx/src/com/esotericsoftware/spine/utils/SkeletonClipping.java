@@ -47,10 +47,10 @@ public class SkeletonClipping {
 	private ClippingAttachment clipAttachment;
 	private Array<FloatArray> clippingPolygons;
 
-	public int clipStart (Slot slot, ClippingAttachment clip) {
-		if (clipAttachment != null) return 0;
+	public void clipStart (Slot slot, ClippingAttachment clip) {
+		if (clipAttachment != null) return;
 		int n = clip.getWorldVerticesLength();
-		if (n < 6) return 0;
+		if (n < 6) return;
 		clipAttachment = clip;
 
 		float[] vertices = clippingPolygon.setSize(n);
@@ -63,7 +63,6 @@ public class SkeletonClipping {
 			polygon.add(polygon.items[0]);
 			polygon.add(polygon.items[1]);
 		}
-		return clippingPolygons.size;
 	}
 
 	public void clipEnd (Slot slot) {

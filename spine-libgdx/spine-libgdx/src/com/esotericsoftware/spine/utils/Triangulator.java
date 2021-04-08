@@ -179,11 +179,9 @@ class Triangulator {
 				if (polygon.size > 0) {
 					convexPolygons.add(polygon);
 					convexPolygonsIndices.add(polygonIndices);
-				} else {
-					polygonPool.free(polygon);
-					polygonIndicesPool.free(polygonIndices);
+					polygon = polygonPool.obtain();
+					polygonIndices = polygonIndicesPool.obtain();
 				}
-				polygon = polygonPool.obtain();
 				polygon.clear();
 				polygon.add(x1);
 				polygon.add(y1);
@@ -191,7 +189,6 @@ class Triangulator {
 				polygon.add(y2);
 				polygon.add(x3);
 				polygon.add(y3);
-				polygonIndices = polygonIndicesPool.obtain();
 				polygonIndices.clear();
 				polygonIndices.add(t1);
 				polygonIndices.add(t2);
