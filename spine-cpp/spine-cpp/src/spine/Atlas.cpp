@@ -260,7 +260,7 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
             page = new(__FILE__, __LINE__) AtlasPage(String(name, true));
 
             while (true) {
-                line = line = reader.readLine();
+                line = reader.readLine();
                 if (reader.readEntry(entry, line) == 0) break;
                 if (entry[0].equals("size")) {
                     page->width = entry[1].toInt();

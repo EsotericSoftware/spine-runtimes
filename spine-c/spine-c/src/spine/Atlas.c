@@ -51,107 +51,136 @@ spAtlasRegion* spAtlasRegion_create() {
 }
 
 void spAtlasRegion_dispose(spAtlasRegion* self) {
+  int i, n;
 	FREE(self->name);
 	FREE(self->splits);
 	FREE(self->pads);
+	for (i = 0, n = self->numValues; i < n; i++) {
+    FREE(self->names[i]);
+  }
+	FREE(self->names);
+	FREE(self->values);
 	FREE(self);
 }
 
 /**/
 
-typedef struct {
-	const char* begin;
-	const char* end;
-} Str;
+typedef struct SimpleString {
+    char *start;
+    char* end;
+    int length;
+} SimpleString;
 
-static void trim(Str* str) {
-	while (isspace((unsigned char)*str->begin) && str->begin < str->end)
-		(str->begin)++;
-	if (str->begin == str->end) return;
-	str->end--;
-	while (((unsigned char)*str->end == '\r') && str->end >= str->begin)
-		str->end--;
-	str->end++;
+static SimpleString *ss_trim(SimpleString *self) {
+  while (isspace((unsigned char) *self->start) && self->start < self->end)
+    self->start++;
+  if (self->start == self->end) return self;
+  self->end--;
+  while (((unsigned char)*self->end == '\r') && self->end >= self->start)
+    self->end--;
+  self->end++;
+  self->length = self->end - self->start;
+  return self;
 }
 
-/* Tokenize string without modification. Returns 0 on failure. */
-static int readLine(const char** begin, const char* end, Str* str) {
-	if (*begin == end) return 0;
-	str->begin = *begin;
-
-	/* Find next delimiter. */
-	while (*begin != end && **begin != '\n')
-		(*begin)++;
-
-	str->end = *begin;
-	trim(str);
-
-	if (*begin != end) (*begin)++;
-	return 1;
+static int ss_indexOf(SimpleString *self, char needle) {
+  char *c = self->start;
+  while (c < self->end) {
+    if (*c == needle) return c - self->start;
+    c++;
+  }
+  return -1;
 }
 
-/* Moves str->begin past the first occurence of c. Returns 0 on failure. */
-static int beginPast(Str* str, char c) {
-	const char* begin = str->begin;
-	while (1) {
-		char lastSkippedChar = *begin;
-		if (begin == str->end) return 0;
-		begin++;
-		if (lastSkippedChar == c) break;
-	}
-	str->begin = begin;
-	return 1;
+static int ss_indexOf2(SimpleString *self, char needle, int at) {
+  char *c = self->start + at;
+  while (c < self->end) {
+    if (*c == needle) return c - self->start;
+    c++;
+  }
+  return -1;
 }
 
-/* Returns 0 on failure. */
-static int readValue(const char** begin, const char* end, Str* str) {
-	readLine(begin, end, str);
-	if (!beginPast(str, ':')) return 0;
-	trim(str);
-	return 1;
+static SimpleString ss_substr(SimpleString *self, int s, int e) {
+  SimpleString result;
+  e = s + e;
+  result.start = self->start + s;
+  result.end = self->start + e;
+  result.length = e - s;
+  return result;
 }
 
-/* Returns the number of tuple values read (1, 2, 4, or 0 for failure). */
-static int readTuple(const char** begin, const char* end, Str tuple[]) {
-	int i;
-	Str str = { NULL, NULL };
-	readLine(begin, end, &str);
-	if (!beginPast(&str, ':')) return 0;
-
-	for (i = 0; i < 3; ++i) {
-		tuple[i].begin = str.begin;
-		if (!beginPast(&str, ',')) break;
-		tuple[i].end = str.begin - 2;
-		trim(&tuple[i]);
-	}
-	tuple[i].begin = str.begin;
-	tuple[i].end = str.end;
-	trim(&tuple[i]);
-	return i + 1;
+static SimpleString ss_substr2(SimpleString *self, int s) {
+  SimpleString result;
+  result.start = self->start + s;
+  result.end = self->end;
+  result.length = result.end - result.start;
+  return result;
+}
+static int /*boolean*/ ss_equals(SimpleString *self, const char *str) {
+  int i;
+  int otherLen = strlen(str);
+  if (self->length != otherLen) return 0;
+  for (i = 0; i < self->length; i++) {
+    if (self->start[i] != str[i]) return 0;
+  }
+  return -1;
 }
 
-static char* mallocString(Str* str) {
-	int length = (int)(str->end - str->begin);
-	char* string = MALLOC(char, length + 1);
-	memcpy(string, str->begin, length);
-	string[length] = '\0';
-	return string;
+static char *ss_copy(SimpleString *self) {
+  char *string = CALLOC(char, self->length + 1);
+  memcpy(string, self->start, self->length);
+  string[self->length] = '\0';
+  return string;
 }
 
-static int indexOf(const char** array, int count, Str* str) {
-	int length = (int)(str->end - str->begin);
-	int i;
-	for (i = count - 1; i >= 0; i--)
-		if (strncmp(array[i], str->begin, length) == 0) return i;
-	return 0;
+static int ss_toInt(SimpleString *self) {
+  return (int) strtol(self->start, &self->end, 10);
 }
 
-static int equals(Str* str, const char* other) {
-	return strncmp(other, str->begin, str->end - str->begin) == 0;
+typedef struct AtlasInput {
+    const char *start;
+    const char *end;
+    char *index;
+    int length;
+    SimpleString line;
+} AtlasInput;
+
+static SimpleString *ai_readLine(AtlasInput *self) {
+  if (self->index >= self->end) return 0;
+  self->line.start = self->index;
+  while (self->index < self->end && *self->index != '\n')
+    self->index++;
+  self->line.end = self->index;
+  if (self->index != self->end) self->index++;
+  self->line = *ss_trim(&self->line);
+  self->line.length = self->end - self->start;
+  return &self->line;
 }
 
-static int toInt(Str* str) {
-	return (int)strtol(str->begin, (char**)&str->end, 10);
+static int ai_readEntry(SimpleString entry[5], SimpleString *line) {
+  int colon, i, lastMatch;
+  SimpleString substr;
+  if (line == NULL) return 0;
+  ss_trim(line);
+  if (line->length == 0) return 0;
+
+  colon = ss_indexOf(line, ':');
+  if (colon == -1) return 0;
+  substr = ss_substr(line, 0, colon);
+  entry[0] = *ss_trim(&substr);
+  for (i = 1, lastMatch = colon + 1;; i++) {
+    int comma = ss_indexOf2(line, ',', lastMatch);
+    if (comma == -1) {
+      substr = ss_substr2(line, lastMatch);
+      entry[i] = *ss_trim(&substr);
+      return i;
+    }
+    substr = ss_substr(line, lastMatch, comma - lastMatch);
+    entry[i] = *ss_trim(&substr);
+    lastMatch = comma + 1;
+    if (i == 4) return 4;
+  }
 }
 
 static spAtlas* abortAtlas(spAtlas* self) {
@@ -159,9 +188,11 @@ static spAtlas* abortAtlas(spAtlas* self) {
 	return 0;
 }
 
-static const char* formatNames[] = { "", "Alpha", "Intensity", "LuminanceAlpha", "RGB565", "RGBA4444", "RGB888", "RGBA8888" };
-static const char* textureFilterNames[] = { "", "Nearest", "Linear", "MipMap", "MipMapNearestNearest", "MipMapLinearNearest",
-"MipMapNearestLinear", "MipMapLinearLinear" };
+static const char *formatNames[] = {"", "Alpha", "Intensity", "LuminanceAlpha", "RGB565", "RGBA4444", "RGB888",
+                                    "RGBA8888"};
+static const char *textureFilterNames[] = {"", "Nearest", "Linear", "MipMap", "MipMapNearestNearest",
+                                           "MipMapLinearNearest",
+                                           "MipMapNearestLinear", "MipMapLinearLinear"};
 
 spAtlas* spAtlas_create(const char* begin, int length, const char* dir, void* rendererObject) {
 	spAtlas* self;

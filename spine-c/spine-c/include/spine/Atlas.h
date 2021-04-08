@@ -76,6 +76,7 @@ struct spAtlasPage {
 
 	void* rendererObject;
 	int width, height;
+	int /*boolean*/ pma;
 
 	spAtlasPage* next;
 };
@@ -84,7 +85,6 @@ SP_API spAtlasPage* spAtlasPage_create (spAtlas* atlas, const char* name);
 SP_API void spAtlasPage_dispose (spAtlasPage* self);
 
 /**/
-
 typedef struct spAtlasRegion spAtlasRegion;
 struct spAtlasRegion {
 	const char* name;
@@ -93,11 +93,12 @@ struct spAtlasRegion {
 	int offsetX, offsetY;
 	int originalWidth, originalHeight;
 	int index;
-	int/*bool*/rotate;
 	int degrees;
-	int/*bool*/flip;
 	int* splits;
 	int* pads;
+	char** names;
+	float* values;
+	int numValues;
 
 	spAtlasPage* page;
 
