@@ -198,7 +198,7 @@ namespace Spine.Unity {
 				parentBoneScale.x *= scaleBone.ScaleX;
 				parentBoneScale.y *= scaleBone.ScaleY;
 			}
-			localDelta *= parentBoneScale;
+			localDelta = Vector2.Scale(localDelta, parentBoneScale);
 
 			localDelta *= AdditionalScale;
 			localDelta.x *= rootMotionScaleX;
