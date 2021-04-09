@@ -61,6 +61,7 @@ namespace Spine.Unity {
 		protected Bone rootMotionBone;
 		protected int rootMotionBoneIndex;
 		protected List<Bone> topLevelBones = new List<Bone>();
+		protected Vector2 initialOffset = Vector2.zero;
 		protected Vector2 rigidbodyDisplacement;
 
 		protected virtual void Reset () {
@@ -71,10 +72,14 @@ namespace Spine.Unity {
 			skeletonComponent = GetComponent<ISkeletonComponent>();
 			GatherTopLevelBones();
 			SetRootMotionBone(rootMotionBoneName);
+			if (rootMotionBone != null)
+				initialOffset = new Vector2(rootMotionBone.x, rootMotionBone.y);
 
 			var skeletonAnimation = skeletonComponent as ISkeletonAnimation;
-			if (skeletonAnimation != null)
+			if (skeletonAnimation != null) {
+				skeletonAnimation.UpdateLocal -= HandleUpdateLocal;
 				skeletonAnimation.UpdateLocal += HandleUpdateLocal;
+			}
 		}
 
 		protected virtual void FixedUpdate () {
@@ -178,36 +183,51 @@ namespace Spine.Unity {
 				return; // Root motion is only applied when component is enabled.
 
 			var movementDelta = CalculateAnimationsMovementDelta();
-			AdjustMovementDeltaToConfiguration(ref movementDelta, animatedSkeletonComponent.Skeleton);
-			ApplyRootMotion(movementDelta);
+			Vector2 parentBoneScale;
+			AdjustMovementDeltaToConfiguration(ref movementDelta, out parentBoneScale, animatedSkeletonComponent.Skeleton);
+			ApplyRootMotion(movementDelta, parentBoneScale);
 		}
 
-		void AdjustMovementDeltaToConfiguration (ref Vector2 localDelta, Skeleton skeleton) {
-			if (skeleton.ScaleX < 0) localDelta.x = -localDelta.x;
-			if (skeleton.ScaleY < 0) localDelta.y = -localDelta.y;
-			if (!transformPositionX) localDelta.x = 0f;
-			if (!transformPositionY) localDelta.y = 0f;
-		}
+		void AdjustMovementDeltaToConfiguration (ref Vector2 localDelta, out Vector2 parentBoneScale, Skeleton skeleton) {
+			localDelta.x *= skeleton.ScaleX;
+			localDelta.y *= skeleton.ScaleY;
 
-		void ApplyRootMotion (Vector2 localDelta) {
+			parentBoneScale = Vector2.one;
+			Bone scaleBone = rootMotionBone;
+			while ((scaleBone = scaleBone.parent) != null) {
+				parentBoneScale.x *= scaleBone.ScaleX;
+				parentBoneScale.y *= scaleBone.ScaleY;
+			}
+			localDelta *= parentBoneScale;
+
 			localDelta *= AdditionalScale;
 			localDelta.x *= rootMotionScaleX;
 			localDelta.y *= rootMotionScaleY;
 
+			if (!transformPositionX) localDelta.x = 0f;
+			if (!transformPositionY) localDelta.y = 0f;
+		}
+
+		void ApplyRootMotion (Vector2 localDelta, Vector2 parentBoneScale) {
 			// Apply root motion to Transform or RigidBody;
 			if (UsesRigidbody) {
 				rigidbodyDisplacement += (Vector2)transform.TransformVector(localDelta);
 				// Accumulated displacement is applied on the next Physics update (FixedUpdate)
 			}
 			else {
-
 				transform.position += transform.TransformVector(localDelta);
 			}
 
 			// Move top level bones in opposite direction of the root motion bone
 			foreach (var topLevelBone in topLevelBones) {
-				if (transformPositionX) topLevelBone.x -= rootMotionBone.x;
-				if (transformPositionY) topLevelBone.y -= rootMotionBone.y;
+				if (topLevelBone == rootMotionBone) {
+					if (transformPositionX) topLevelBone.x = 0;
+					if (transformPositionY) topLevelBone.y = 0;
+				}
+				else {
+					if (transformPositionX) topLevelBone.x = -(rootMotionBone.x - initialOffset.x) * parentBoneScale.x;
+					if (transformPositionY) topLevelBone.y = -(rootMotionBone.y - initialOffset.y) * parentBoneScale.y;
+				}
 			}
 		}
 	}
