@@ -94,6 +94,7 @@
   * **Linear color space:** Previously Slot colors were not displayed the same in Unity as in the Spine Editor (when configured to display as `Linear` color space in Spine Editor Settings). This is now fixed at all shaders, including URP and LWRP shaders.
   * All Spine shaders (also including URP and LWRP shaders) now support `PMA Vertex Colors` in combination with `Linear` color space. Thus when using Spine shaders, you should always enable `PMA Vertex Colors` at the `SkeletonRenderer` component. This allows using single pass `Additive` Slots rendering. Note that textures shall still be exported as `Straight alpha` when using `Linear` color space, so combine `PMA Vertex Colors` with `Straight Texture`. All `Sprite` shaders now provide an additional blend mode for this, named `PMA Vertex, Straight Texture` which shall be the preferred Sprite shader blend mode in `Linear` color space.
   * Additive Slots have always been lit before they were written to the target buffer. Now all lit shaders provide an additional parameter `Light Affects Additive` which defaults to `false`, as it is the more intuitive default value. You can enable the old behaviour by setting this parameter to `true`.
+  * `SkeletonRootMotion` and `SkeletonMecanimRootMotion` components now support arbitrary bones in the hierarchy as `Root Motion Bone`. Previously there were problems when selecting a non-root bone as `Root Motion Bone`. `Skeleton.ScaleX` and `.ScaleY` and parent bone scale is now respected as well.
 
 * **Changes of default values**
 
