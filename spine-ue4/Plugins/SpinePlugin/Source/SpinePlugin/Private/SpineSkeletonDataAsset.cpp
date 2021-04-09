@@ -38,6 +38,9 @@
 
 using namespace spine;
 
+#define SPINE_MAJOR_VERSION 4
+#define SPINE_MINOR_VERSION 0
+
 FName USpineSkeletonDataAsset::GetSkeletonDataFileName () const {
 #if WITH_EDITORONLY_DATA
 	TArray<FString> files;
@@ -156,7 +159,7 @@ static bool checkVersion(const char* version) {
 	for (int i = 0; i < 3; i++)
 		versionNumber[i] = atoi(tokens[i].buffer());
 
-	return versionNumber[0] >= 3 && versionNumber[1] >= 8 && versionNumber[2] >= 12;
+	return versionNumber[0] >= SPINE_MAJOR_VERSION && versionNumber[1] >= SPINE_MINOR_VERSION;
 }
 
 static bool checkJson(const char* jsonData) {
