@@ -8,6 +8,8 @@ namespace Spine.Unity.Examples {
 		protected SkeletonRootMotionBase rootMotion;
 		public Transform targetPosition;
 		public int trackIndex = 0;
+		public bool adjustX = true;
+		public bool adjustY = true;
 
 		void Start () {
 			rootMotion = this.GetComponent<SkeletonRootMotionBase>();
@@ -23,7 +25,7 @@ namespace Spine.Unity.Examples {
 
 		void AdjustDelta() {
 			Vector3 toTarget = targetPosition.position - this.transform.position;
-			rootMotion.AdjustRootMotionToDistance(toTarget, trackIndex);
+			rootMotion.AdjustRootMotionToDistance(toTarget, trackIndex, adjustX, adjustY);
 		}
 	}
 }

@@ -131,14 +131,16 @@ namespace Spine.Unity {
 			}
 		}
 
-		public void AdjustRootMotionToDistance (Vector2 distanceToTarget, int trackIndex = 0) {
+		public void AdjustRootMotionToDistance (Vector2 distanceToTarget, int trackIndex = 0, bool adjustX = true, bool adjustY = true) {
 			Vector2 remainingRootMotion = GetRemainingRootMotion(trackIndex);
 			if (remainingRootMotion.x == 0)
 				remainingRootMotion.x = 0.0001f;
 			if (remainingRootMotion.y == 0)
 				remainingRootMotion.y = 0.0001f;
-			rootMotionScaleX = distanceToTarget.x / remainingRootMotion.x;
-			rootMotionScaleY = distanceToTarget.y / remainingRootMotion.y;
+			if (adjustX)
+				rootMotionScaleX = distanceToTarget.x / remainingRootMotion.x;
+			if (adjustY)
+				rootMotionScaleY = distanceToTarget.y / remainingRootMotion.y;
 		}
 
 		public Vector2 GetAnimationRootMotion (Animation animation) {
