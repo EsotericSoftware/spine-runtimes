@@ -889,7 +889,7 @@ declare module spine {
 		getValue(map: any, prop: string, defaultValue: any): any;
 		static blendModeFromString(str: string): BlendMode;
 		static positionModeFromString(str: string): PositionMode;
-		static spacingModeFromString(str: string): SpacingMode.Length | SpacingMode.Fixed | SpacingMode.Percent;
+		static spacingModeFromString(str: string): SpacingMode;
 		static rotateModeFromString(str: string): RotateMode;
 		static transformModeFromString(str: string): TransformMode;
 	}
@@ -1487,7 +1487,7 @@ declare module spine.webgl {
 		static DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL: boolean;
 		constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap, useMipMaps?: boolean);
 		setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
-		static validateMagFilter(magFilter: TextureFilter): TextureFilter.Nearest | TextureFilter.Linear | TextureFilter.Linear;
+		static validateMagFilter(magFilter: TextureFilter): TextureFilter.Nearest | TextureFilter.Linear;
 		setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
 		update(useMipMaps: boolean): void;
 		restore(): void;

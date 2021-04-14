@@ -889,7 +889,7 @@ declare module spine {
 		getValue(map: any, prop: string, defaultValue: any): any;
 		static blendModeFromString(str: string): BlendMode;
 		static positionModeFromString(str: string): PositionMode;
-		static spacingModeFromString(str: string): SpacingMode.Length | SpacingMode.Fixed | SpacingMode.Percent;
+		static spacingModeFromString(str: string): SpacingMode;
 		static rotateModeFromString(str: string): RotateMode;
 		static transformModeFromString(str: string): TransformMode;
 	}

@@ -6,6 +6,8 @@ var __extends = (this && this.__extends) || (function () {
 		return extendStatics(d, b);
 	};
 	return function (d, b) {
+		if (typeof b !== "function" && b !== null)
+			throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
 		d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -7423,7 +7425,9 @@ var spine;
 				return spine.SpacingMode.Fixed;
 			if (str == "percent")
 				return spine.SpacingMode.Percent;
-			throw new Error("Unknown position mode: " + str);
+			if (str == "proportional")
+				return spine.SpacingMode.Proportional;
+			throw new Error("Unknown spacing mode: " + str);
 		};
 		SkeletonJson.rotateModeFromString = function (str) {
 			str = str.toLowerCase();

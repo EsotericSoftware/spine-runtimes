@@ -1028,7 +1028,8 @@ module spine {
 			if (str == "length") return SpacingMode.Length;
 			if (str == "fixed") return SpacingMode.Fixed;
 			if (str == "percent") return SpacingMode.Percent;
-			throw new Error(`Unknown position mode: ${str}`);
+			if (str == "proportional") return SpacingMode.Proportional;
+			throw new Error(`Unknown spacing mode: ${str}`);
 		}
 
 		static rotateModeFromString (str: string) {
