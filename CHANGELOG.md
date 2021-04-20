@@ -95,6 +95,9 @@
   * All Spine shaders (also including URP and LWRP shaders) now support `PMA Vertex Colors` in combination with `Linear` color space. Thus when using Spine shaders, you should always enable `PMA Vertex Colors` at the `SkeletonRenderer` component. This allows using single pass `Additive` Slots rendering. Note that textures shall still be exported as `Straight alpha` when using `Linear` color space, so combine `PMA Vertex Colors` with `Straight Texture`. All `Sprite` shaders now provide an additional blend mode for this, named `PMA Vertex, Straight Texture` which shall be the preferred Sprite shader blend mode in `Linear` color space.
   * Additive Slots have always been lit before they were written to the target buffer. Now all lit shaders provide an additional parameter `Light Affects Additive` which defaults to `false`, as it is the more intuitive default value. You can enable the old behaviour by setting this parameter to `true`.
   * `SkeletonRootMotion` and `SkeletonMecanimRootMotion` components now support arbitrary bones in the hierarchy as `Root Motion Bone`. Previously there were problems when selecting a non-root bone as `Root Motion Bone`. `Skeleton.ScaleX` and `.ScaleY` and parent bone scale is now respected as well.
+  * URP and LWRP `Sprite` and `SkeletonLit` shaders no longer require `Advanced - Add Normals` enabled to properly cast and receive shadows. It is recommended to disable `Add Normals` if normals are otherwise not needed.
+  * Added an example component `RootMotionDeltaCompensation` located in `Spine Examples/Scripts/Sample Components` which can be used for applying simple delta compensation. You can enable and disable the component to toggle delta compensation of the currently playing animation on and off.
+  * `SkeletonRagdoll` and `SkeletonRagdoll2D` now support bone scale at any bone in the skeleton hierarchy. This includes negative scale and root bone scale.
 
 * **Changes of default values**
 
