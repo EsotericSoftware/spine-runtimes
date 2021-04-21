@@ -67,6 +67,16 @@ namespace Spine.Unity {
 			return GetAnimationRootMotion(start, end, animation);
 		}
 
+		public override RootMotionInfo GetRootMotionInfo (int trackIndex) {
+			TrackEntry track = animationState.GetCurrent(trackIndex);
+			if (track == null)
+				return new RootMotionInfo();
+
+			var animation = track.Animation;
+			float time = track.AnimationTime;
+			return GetAnimationRootMotionInfo(track.Animation, time);
+		}
+
 		protected override float AdditionalScale {
 			get {
 				return canvas ? canvas.referencePixelsPerUnit: 1.0f;

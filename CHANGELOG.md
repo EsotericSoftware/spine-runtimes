@@ -399,6 +399,8 @@
   * `BoneFollower` and `BoneFollowerGraphic` components now provide better support for following bones when the skeleton's Transform is not the parent of the follower's Transform. Previously e.g. rotating a common parent Transform did not lead to the desired result, as well as negatively scaling a skeleton's Transform when it is not a parent of the follower's Transform.
   * URP and LWRP `Sprite` and `SkeletonLit` shaders no longer require `Advanced - Add Normals` enabled to properly cast and receive shadows. It is recommended to disable `Add Normals` if normals are otherwise not needed.
   * Added an example component `RootMotionDeltaCompensation` located in `Spine Examples/Scripts/Sample Components` which can be used for applying simple delta compensation. You can enable and disable the component to toggle delta compensation of the currently playing animation on and off.
+  * Root motion delta compensation now allows to only adjust X or Y components instead of both. Adds two parameters to `SkeletonRootMotionBase.AdjustRootMotionToDistance()` which default to adjusting both X and Y as before. The `RootMotionDeltaCompensation` example component exposes these parameters as public attributes.
+  * Root motion delta compensation now allows to also add translation root motion to e.g. adjust a horizontal jump upwards or downwards over time. This is necessary because a Y root motion of zero cannot be scaled to become non-zero.
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.MixNext` instead of `MixMode.MixAlways`.
