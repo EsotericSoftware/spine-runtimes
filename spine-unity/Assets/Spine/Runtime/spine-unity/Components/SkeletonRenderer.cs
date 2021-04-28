@@ -280,6 +280,7 @@ namespace Spine.Unity {
 
 		public virtual void Awake () {
 			Initialize(false);
+			updateMode = updateWhenInvisible;
 		}
 
 	#if UNITY_EDITOR && CONFIGURABLE_ENTER_PLAY_MODE
