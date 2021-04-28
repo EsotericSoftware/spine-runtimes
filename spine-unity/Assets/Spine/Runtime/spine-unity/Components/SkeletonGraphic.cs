@@ -202,6 +202,7 @@ namespace Spine.Unity {
 		protected override void Awake () {
 
 			base.Awake ();
+			updateMode = updateWhenInvisible;
 			SyncRawImagesWithCanvasRenderers();
 			if (!this.IsValid) {
 #if UNITY_EDITOR
