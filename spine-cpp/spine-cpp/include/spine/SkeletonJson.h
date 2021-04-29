@@ -63,7 +63,7 @@ class SP_API SkeletonJson : public SpineObject {
 public:
 	explicit SkeletonJson(Atlas *atlas);
 
-	explicit SkeletonJson(AttachmentLoader *attachmentLoader);
+	explicit SkeletonJson(AttachmentLoader *attachmentLoader, bool ownsLoader = false);
 
 	~SkeletonJson();
 
