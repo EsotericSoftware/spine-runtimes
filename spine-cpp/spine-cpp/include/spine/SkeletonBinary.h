@@ -68,7 +68,7 @@ namespace spine {
 
 		explicit SkeletonBinary(Atlas* atlasArray);
 
-		explicit SkeletonBinary(AttachmentLoader* attachmentLoader);
+		explicit SkeletonBinary(AttachmentLoader* attachmentLoader, bool ownsLoader = false);
 
 		~SkeletonBinary();
 
