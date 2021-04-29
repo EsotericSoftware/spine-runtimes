@@ -69,7 +69,7 @@ module spine {
 			super(name);
 		}
 
-		/** Transforms the attachment's local {@link vertices} to world coordinates. If the slot's {@link Slot#deform} is
+		/** Transforms the attachment's local {@link #vertices} to world coordinates. If the slot's {@link Slot#deform} is
 		 * not empty, it is used to deform the vertices.
 		 *
 		 * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
