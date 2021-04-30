@@ -98,6 +98,7 @@
   * URP and LWRP `Sprite` and `SkeletonLit` shaders no longer require `Advanced - Add Normals` enabled to properly cast and receive shadows. It is recommended to disable `Add Normals` if normals are otherwise not needed.
   * Added an example component `RootMotionDeltaCompensation` located in `Spine Examples/Scripts/Sample Components` which can be used for applying simple delta compensation. You can enable and disable the component to toggle delta compensation of the currently playing animation on and off.
   * `SkeletonRagdoll` and `SkeletonRagdoll2D` now support bone scale at any bone in the skeleton hierarchy. This includes negative scale and root bone scale.
+  * `Attachment.GetRemappedClone(Sprite)` method now provides an additional optional parameter `useOriginalRegionScale`. When set to `true`, the replaced attachment's scale is used instead of the Sprite's `Pixel per Unity` setting, allowing for more consistent scaling. *Note:* When remapping Sprites, be sure to set the Sprite's `Mesh Type` to `Full Rect` and not `Tight`, otherwise the scale will be wrong.
 
 * **Changes of default values**
 
