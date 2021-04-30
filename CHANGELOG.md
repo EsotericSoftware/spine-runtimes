@@ -401,6 +401,7 @@
   * Added an example component `RootMotionDeltaCompensation` located in `Spine Examples/Scripts/Sample Components` which can be used for applying simple delta compensation. You can enable and disable the component to toggle delta compensation of the currently playing animation on and off.
   * Root motion delta compensation now allows to only adjust X or Y components instead of both. Adds two parameters to `SkeletonRootMotionBase.AdjustRootMotionToDistance()` which default to adjusting both X and Y as before. The `RootMotionDeltaCompensation` example component exposes these parameters as public attributes.
   * Root motion delta compensation now allows to also add translation root motion to e.g. adjust a horizontal jump upwards or downwards over time. This is necessary because a Y root motion of zero cannot be scaled to become non-zero.
+  * `Attachment.GetRemappedClone(Sprite)` method now provides an additional optional parameter `useOriginalRegionScale`. When set to `true`, the replaced attachment's scale is used instead of the Sprite's `Pixel per Unity` setting, allowing for more consistent scaling. *Note:* When remapping Sprites, be sure to set the Sprite's `Mesh Type` to `Full Rect` and not `Tight`, otherwise the scale will be wrong.
 
 * **Changes of default values**
   * `SkeletonMecanim`'s `Layer Mix Mode` now defaults to `MixMode.MixNext` instead of `MixMode.MixAlways`.
