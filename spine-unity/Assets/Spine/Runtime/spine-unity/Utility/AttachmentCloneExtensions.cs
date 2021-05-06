@@ -86,16 +86,25 @@ namespace Spine.Unity.AttachmentTools {
 		/// <param name="pivotShiftsMeshUVCoords">If <c>true</c> and the original Attachment is a MeshAttachment, then
 		///	a non-central sprite pivot will shift uv coords in the opposite direction. Vertices will not be offset in
 		///	any case when the original Attachment is a MeshAttachment.</param>
+		///	<param name="useOriginalRegionScale">If <c>true</c> and the original Attachment is a RegionAttachment, then
+		///	the original region's scale value is used instead of the Sprite's pixels per unit property. Since uniform scale is used,
+		///	x scale of the original attachment (width scale) is used, scale in y direction (height scale) is ignored.</param>
 		public static Attachment GetRemappedClone (this Attachment o, Sprite sprite, Material sourceMaterial,
 			bool premultiplyAlpha = true, bool cloneMeshAsLinked = true, bool useOriginalRegionSize = false,
-			bool pivotShiftsMeshUVCoords = true) {
+			bool pivotShiftsMeshUVCoords = true, bool useOriginalRegionScale = false) {
 			var atlasRegion = premultiplyAlpha ? sprite.ToAtlasRegionPMAClone(sourceMaterial) : sprite.ToAtlasRegion(new Material(sourceMaterial) { mainTexture = sprite.texture } );
 			if (!pivotShiftsMeshUVCoords && o is MeshAttachment) {
 				// prevent non-central sprite pivot setting offsetX/Y and shifting uv coords out of mesh bounds
 				atlasRegion.offsetX = 0;
 				atlasRegion.offsetY = 0;
 			}
-			return o.GetRemappedClone(atlasRegion, cloneMeshAsLinked, useOriginalRegionSize, 1f/sprite.pixelsPerUnit);
+			float scale = 1f / sprite.pixelsPerUnit;
+			if (useOriginalRegionScale) {
+				var regionAttachment = o as RegionAttachment;
+				if (regionAttachment != null)
+					scale = regionAttachment.width / regionAttachment.regionOriginalWidth;
+			}
+			return o.GetRemappedClone(atlasRegion, cloneMeshAsLinked, useOriginalRegionSize, scale);
 		}
 
 		/// <summary>

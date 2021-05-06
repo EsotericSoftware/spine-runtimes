@@ -73,6 +73,15 @@ namespace Spine.Unity {
 			return GetAnimationRootMotion(start, end, animation);
 		}
 
+		public override RootMotionInfo GetRootMotionInfo (int layerIndex) {
+			var pair = skeletonMecanim.Translator.GetActiveAnimationAndTime(layerIndex);
+			var animation = pair.Key;
+			var time = pair.Value;
+			if (animation == null)
+				return new RootMotionInfo();
+			return GetAnimationRootMotionInfo(animation, time);
+		}
+
 		protected override void Reset () {
 			base.Reset();
 			mecanimLayerFlags = DefaultMecanimLayerFlags;

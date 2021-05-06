@@ -98,8 +98,8 @@ SkeletonBinary::SkeletonBinary(Atlas *atlasArray) : _attachmentLoader(
 
 }
 
-SkeletonBinary::SkeletonBinary(AttachmentLoader *attachmentLoader) : _attachmentLoader(attachmentLoader), _error(),
-	_scale(1), _ownsLoader(false)
+SkeletonBinary::SkeletonBinary(AttachmentLoader* attachmentLoader, bool ownsLoader) : _attachmentLoader(attachmentLoader), _error(),
+_scale(1), _ownsLoader(ownsLoader)
 {
 	assert(_attachmentLoader != NULL);
 }
