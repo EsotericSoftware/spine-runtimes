@@ -32,14 +32,14 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 public class SimpleTest1 extends ApplicationAdapter {
 	OrthographicCamera camera;
-	PolygonSpriteBatch batch;
+	TwoColorPolygonBatch batch;
 	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
 
@@ -49,7 +49,7 @@ public class SimpleTest1 extends ApplicationAdapter {
 
 	public void create () {
 		camera = new OrthographicCamera();
-		batch = new PolygonSpriteBatch();
+		batch = new TwoColorPolygonBatch();
 		renderer = new SkeletonRenderer();
 		renderer.setPremultipliedAlpha(true); // PMA results in correct blending without outlines.
 		debugRenderer = new SkeletonRendererDebug();
@@ -57,11 +57,9 @@ public class SimpleTest1 extends ApplicationAdapter {
 		debugRenderer.setRegionAttachments(false);
 
 		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy-pma.atlas"));
-
-		SkeletonLoader loader = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
-		// SkeletonLoader loader = new SkeletonBinary(atlas); // Or use SkeletonBinary to load binary data.
-		loader.setScale(0.6f); // Load the skeleton at 60% the size it was in Spine.
-		SkeletonData skeletonData = loader.readSkeletonData(Gdx.files.internal("spineboy/spineboy-pro.json"));
+		SkeletonBinary json = new SkeletonBinary(atlas); // This loads skeleton JSON data, which is stateless.
+		json.setScale(0.6f); // Load the skeleton at 60% the size it was in Spine.
+		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("spineboy/spineboy-pro.skel"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
 		skeleton.setPosition(250, 20);
@@ -82,7 +80,7 @@ public class SimpleTest1 extends ApplicationAdapter {
 	public void render () {
 		state.update(Gdx.graphics.getDeltaTime()); // Update the animation time.
 
-		ScreenUtils.clear(0, 0, 0, 0);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		state.apply(skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.
 		skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
