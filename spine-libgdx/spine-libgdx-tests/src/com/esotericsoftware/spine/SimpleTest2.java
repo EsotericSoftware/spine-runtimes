@@ -29,10 +29,6 @@
 
 package com.esotericsoftware.spine;
 
-import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
-import com.esotericsoftware.spine.AnimationState.TrackEntry;
-import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -40,13 +36,16 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
+import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
+import com.esotericsoftware.spine.AnimationState.TrackEntry;
+import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
+import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 public class SimpleTest2 extends ApplicationAdapter {
 	OrthographicCamera camera;
-	SpriteBatch batch;
+	TwoColorPolygonBatch batch;
 	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
 
@@ -57,7 +56,7 @@ public class SimpleTest2 extends ApplicationAdapter {
 
 	public void create () {
 		camera = new OrthographicCamera();
-		batch = new SpriteBatch();
+		batch = new TwoColorPolygonBatch();
 		renderer = new SkeletonRenderer();
 		renderer.setPremultipliedAlpha(true);
 		debugRenderer = new SkeletonRendererDebug();
