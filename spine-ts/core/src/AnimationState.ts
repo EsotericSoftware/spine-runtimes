@@ -378,7 +378,7 @@ module spine {
 		}
 
 		setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: string, attachments: boolean) {
-			slot.attachment = attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName);
+			slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName));
 			if (attachments) slot.attachmentState = this.unkeyedState + AnimationState.CURRENT;
 		}
 
