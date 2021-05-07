@@ -218,6 +218,11 @@ namespace Spine.Unity {
 			}
 		}
 
+		protected override void OnDestroy () {
+			Clear();
+			base.OnDestroy();
+		}
+
 		public override void Rebuild (CanvasUpdate update) {
 			base.Rebuild(update);
 			if (canvasRenderer.cull) return;
@@ -458,9 +463,8 @@ namespace Spine.Unity {
 
 			for (int i = 0; i < canvasRenderers.Count; ++i)
 				canvasRenderers[i].Clear();
-			foreach (var mesh in meshes)
-				Destroy(mesh);
-			meshes.Clear();
+			DestroyMeshes();
+			DisposeMeshBuffers();
 		}
 
 		public void TrimRenderers () {
@@ -559,6 +563,14 @@ namespace Spine.Unity {
 			}
 			else {
 				meshBuffers = new DoubleBuffered<MeshRendererBuffers.SmartMesh>();
+			}
+		}
+
+		protected void DisposeMeshBuffers () {
+			if (meshBuffers != null) {
+				meshBuffers.GetNext().Dispose();
+				meshBuffers.GetNext().Dispose();
+				meshBuffers = null;
 			}
 		}
 
@@ -724,9 +736,22 @@ namespace Spine.Unity {
 		protected void EnsureMeshesCount (int targetCount) {
 			int oldCount = meshes.Count;
 			meshes.EnsureCapacity(targetCount);
-			var meshesItems = meshes.Items;
 			for (int i = oldCount; i < targetCount; i++)
-				if (meshesItems[i] == null) meshesItems[i] = new Mesh();
+				meshes.Add(SpineMesh.NewSkeletonMesh());
+		}
+
+		protected void DestroyMeshes () {
+			foreach (var mesh in meshes) {
+#if UNITY_EDITOR
+				if (Application.isEditor && !Application.isPlaying)
+					UnityEngine.Object.DestroyImmediate(mesh);
+				else
+					UnityEngine.Object.Destroy(mesh);
+#else
+					UnityEngine.Object.Destroy(mesh);
+#endif
+			}
+			meshes.Clear();
 		}
 
 		protected void EnsureSeparatorPartCount () {
