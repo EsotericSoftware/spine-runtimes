@@ -31,6 +31,7 @@
 #define SPINE_ATLAS_H_
 
 #include <spine/dll.h>
+#include <spine/Array.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -85,6 +86,13 @@ SP_API spAtlasPage* spAtlasPage_create (spAtlas* atlas, const char* name);
 SP_API void spAtlasPage_dispose (spAtlasPage* self);
 
 /**/
+typedef struct spKeyValue {
+    char *name;
+    float values[5];
+} spKeyValue;
+_SP_ARRAY_DECLARE_TYPE(spKeyValueArray, spKeyValue)
+
+/**/
 typedef struct spAtlasRegion spAtlasRegion;
 struct spAtlasRegion {
 	const char* name;
@@ -96,9 +104,7 @@ struct spAtlasRegion {
 	int degrees;
 	int* splits;
 	int* pads;
-	char** names;
-	float* values;
-	int numValues;
+	spKeyValueArray *keyValues;
 
 	spAtlasPage* page;
 

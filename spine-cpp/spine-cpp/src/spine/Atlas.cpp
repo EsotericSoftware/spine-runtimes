@@ -292,7 +292,7 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
             region->page = page;
             region->name = String(line->copy(), true);
             while (true) {
-                line = line = reader.readLine();
+                line = reader.readLine();
                 int count = reader.readEntry(entry, line);
                 if (count == 0) break;
                 if (entry[0].equals("xy")) {
