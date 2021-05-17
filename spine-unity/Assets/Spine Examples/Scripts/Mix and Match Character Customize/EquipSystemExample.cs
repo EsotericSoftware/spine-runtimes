@@ -82,6 +82,8 @@ namespace Spine.Unity.Examples {
 				var templateSkin = skeletonData.FindSkin(templateSkinName);
 				Attachment templateAttachment = templateSkin.GetAttachment(slotIndex, templateAttachmentName);
 				attachment = templateAttachment.GetRemappedClone(asset.sprite, sourceMaterial, premultiplyAlpha: this.applyPMA);
+				// Note: Each call to `GetRemappedClone()` with parameter `premultiplyAlpha` set to `true` creates
+				// a cached Texture copy which can be cleared by calling AtlasUtilities.ClearCache() as shown in the method below.
 
 				cachedAttachments.Add(asset, attachment); // Cache this value for next time this asset is used.
 			}
@@ -91,6 +93,14 @@ namespace Spine.Unity.Examples {
 
 		public void Done () {
 			target.OptimizeSkin();
+			// `GetRepackedSkin()` and each call to `GetRemappedClone()` with parameter `premultiplyAlpha` set to `true`
+			// creates cached Texture copies which can be cleared by calling AtlasUtilities.ClearCache().
+			// You can optionally clear the textures cache after multiple repack operations.
+			// Just be aware that while this cleanup frees up memory, it is also a costly operation
+			// and will likely cause a spike in the framerate.
+
+			//AtlasUtilities.ClearCache();
+			//Resources.UnloadUnusedAssets();
 		}
 
 	}
