@@ -239,12 +239,19 @@ namespace Spine.Unity.AttachmentTools {
 		/// Fills the outputAttachments list with new attachment objects based on the attachments in sourceAttachments,
 		/// but mapped to a new single texture using the same material.</summary>
 		/// <remarks>Returned <c>Material</c> and <c>Texture</c> behave like <c>new Texture2D()</c>, thus you need to call <c>Destroy()</c>
-		/// to free resources.</remarks>
+		/// to free resources.
+		/// This method caches necessary Texture copies for later re-use, which might steadily increase the texture memory
+		/// footprint when used excessively. Set <paramref name="clearCache"/> to <c>true</c>
+		/// or call <see cref="AtlasUtilities.ClearCache()"/> to clear this texture cache.
+		/// You may want to call <c>Resources.UnloadUnusedAssets()</c> after that.
+		/// </remarks>
 		/// <param name="sourceAttachments">The list of attachments to be repacked.</param>
 		/// <param name = "outputAttachments">The List(Attachment) to populate with the newly created Attachment objects.
 		/// May be equal to <c>sourceAttachments</c> for in-place operation.</param>
 		/// <param name="materialPropertySource">May be null. If no Material property source is provided, a material with
 		/// default parameters using the provided <c>shader</c> will be created.</param>
+		/// <param name="clearCache">When set to <c>true</c>, <see cref="AtlasUtilities.ClearCache()"/> is called after
+		/// repacking to clear the texture cache. See remarks for additional info.</param>
 		/// <param name="additionalTexturePropertyIDsToCopy">Optional additional textures (such as normal maps) to copy while repacking.
 		/// To copy e.g. the main texture and normal maps, pass 'new int[] { Shader.PropertyToID("_BumpMap") }' at this parameter.</param>
 		/// <param name="additionalOutputTextures">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
@@ -442,7 +449,14 @@ namespace Spine.Unity.AttachmentTools {
 		/// <remarks>GetRepackedSkin is an expensive operation, preferably call it at level load time.
 		/// No Spine.Atlas object is created so there is no way to find AtlasRegions except through the Attachments using them.
 		/// Returned <c>Material</c> and <c>Texture</c> behave like <c>new Texture2D()</c>, thus you need to call <c>Destroy()</c>
-		/// to free resources.</remarks>
+		/// to free resources.
+		/// This method caches necessary Texture copies for later re-use, which might steadily increase the texture memory
+		/// footprint when used excessively. Set <paramref name="clearCache"/> to <c>true</c>
+		/// or call <see cref="AtlasUtilities.ClearCache()"/> to clear this texture cache.
+		/// You may want to call <c>Resources.UnloadUnusedAssets()</c> after that.
+		/// </remarks>
+		/// <param name="clearCache">When set to <c>true</c>, <see cref="AtlasUtilities.ClearCache()"/> is called after
+		/// repacking to clear the texture cache. See remarks for additional info.</param>
 		/// <param name="additionalTexturePropertyIDsToCopy">Optional additional textures (such as normal maps) to copy while repacking.
 		/// To copy e.g. the main texture and normal maps, pass 'new int[] { Shader.PropertyToID("_BumpMap") }' at this parameter.</param>
 		/// <param name="additionalOutputTextures">When <c>additionalTexturePropertyIDsToCopy</c> is non-null,
@@ -473,8 +487,7 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>
 		/// Creates and populates a duplicate skin with cloned attachments that are backed by a new packed texture atlas
 		/// comprised of all the regions from the original skin.</summary>
-		/// <remarks>GetRepackedSkin is an expensive operation, preferably call it at level load time.
-		/// No Spine.Atlas object is created so there is no way to find AtlasRegions except through the Attachments using them.</remarks>
+		/// See documentation of <see cref="GetRepackedSkin"/> for details.
 		public static Skin GetRepackedSkin (this Skin o, string newName, Shader shader, out Material outputMaterial, out Texture2D outputTexture,
 			int maxAtlasSize = 1024, int padding = 2, TextureFormat textureFormat = SpineTextureFormat, bool mipmaps = UseMipMaps,
 			Material materialPropertySource = null, bool clearCache = false, bool useOriginalNonrenderables = true,
@@ -525,6 +538,18 @@ namespace Spine.Unity.AttachmentTools {
 		static Dictionary<IntAndAtlasRegionKey, Texture2D> CachedRegionTextures = new Dictionary<IntAndAtlasRegionKey, Texture2D>();
 		static List<Texture2D> CachedRegionTexturesList = new List<Texture2D>();
 
+		/// <summary>
+		/// Frees up textures cached by repacking and remapping operations.
+		///
+		/// Calling <see cref="AttachmentCloneExtensions.GetRemappedClone"/> with parameter <c>premultiplyAlpha=true</c>,
+		/// <see cref="GetRepackedAttachments"/> or <see cref="GetRepackedSkin"/> will cache textures for later re-use,
+		///	which might steadily increase the texture memory footprint when used excessively.
+		///	You can clear this Texture cache by calling <see cref="AtlasUtilities.ClearCache()"/>.
+		/// You may also want to call <c>Resources.UnloadUnusedAssets()</c> after that. Be aware that while this cleanup
+		/// frees up memory, it is also a costly operation and will likely cause a spike in the framerate.
+		/// Thus it is recommended to perform costly repacking and cleanup operations after e.g. a character customization
+		/// screen has been exited, and if required additionally after a certain number of <c>GetRemappedClone()</c> calls.
+		/// </summary>
 		public static void ClearCache () {
 			foreach (var t in CachedRegionTexturesList) {
 				UnityEngine.Object.Destroy(t);

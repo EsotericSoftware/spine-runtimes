@@ -149,8 +149,13 @@ namespace Spine.Unity.Examples {
 			skeletonAnimation.Skeleton.SetSlotsToSetupPose();
 			skeletonAnimation.AnimationState.Apply(skeletonAnimation.Skeleton);
 
-			// You can optionally clear the cache after multiple repack operations.
+			// `GetRepackedSkin()` and each call to `GetRemappedClone()` with parameter `premultiplyAlpha` set to `true`
+			// cache necessarily created Texture copies which can be cleared by calling AtlasUtilities.ClearCache().
+			// You can optionally clear the textures cache after multiple repack operations.
+			// Just be aware that while this cleanup frees up memory, it is also a costly operation
+			// and will likely cause a spike in the framerate.
 			AtlasUtilities.ClearCache();
+			Resources.UnloadUnusedAssets();
 		}
 
 		void UpdateCharacterSkin () {
