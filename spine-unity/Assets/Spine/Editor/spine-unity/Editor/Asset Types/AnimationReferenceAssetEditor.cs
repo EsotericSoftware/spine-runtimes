@@ -33,6 +33,7 @@ using UnityEngine;
 using UnityEditor;
 
 using System.Reflection;
+using System;
 
 namespace Spine.Unity.Editor {
 	using Editor = UnityEditor.Editor;
@@ -58,7 +59,11 @@ namespace Spine.Unity.Editor {
 		SkeletonData lastSkeletonData;
 
 		void OnEnable () { HandleOnEnablePreview(); }
-		void OnDestroy () { HandleOnDestroyPreview(); }
+		void OnDestroy () {
+			HandleOnDestroyPreview();
+			AppDomain.CurrentDomain.DomainUnload -= OnDomainUnload;
+			EditorApplication.update -= preview.HandleEditorUpdate;
+		}
 
 		public override void OnInspectorGUI () {
 			animationNameProperty = animationNameProperty ?? serializedObject.FindProperty("animationName");
@@ -133,6 +138,11 @@ namespace Spine.Unity.Editor {
 		void HandleOnEnablePreview () {
 			if (ThisSkeletonDataAsset != null && ThisSkeletonDataAsset.skeletonJSON == null)
 				return;
+			SpineEditorUtilities.ConfirmInitialization();
+
+			// This handles the case where the managed editor assembly is unloaded before recompilation when code changes.
+			AppDomain.CurrentDomain.DomainUnload -= OnDomainUnload;
+			AppDomain.CurrentDomain.DomainUnload += OnDomainUnload;
 
 			preview.Initialize(this.Repaint, ThisSkeletonDataAsset, LastSkinName);
 			preview.PlayPauseAnimation(ThisAnimationName, true);
@@ -140,6 +150,10 @@ namespace Spine.Unity.Editor {
 			preview.OnSkinChanged += HandleOnSkinChanged;
 			EditorApplication.update -= preview.HandleEditorUpdate;
 			EditorApplication.update += preview.HandleEditorUpdate;
+		}
+
+		private void OnDomainUnload (object sender, EventArgs e) {
+			OnDestroy();
 		}
 
 		private void HandleOnSkinChanged (string skinName) {
