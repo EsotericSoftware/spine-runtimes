@@ -56,7 +56,6 @@ spAttachment* _spMeshAttachment_copy (spAttachment* attachment) {
 	copy->regionV = self->regionV;
 	copy->regionU2 = self->regionU2;
 	copy->regionV2 = self->regionV2;
-	copy->regionRotate = self->regionRotate;
 	copy->regionDegrees = self->regionDegrees;
 	copy->regionOffsetX = self->regionOffsetX;
 	copy->regionOffsetY = self->regionOffsetY;
@@ -95,7 +94,6 @@ spMeshAttachment* spMeshAttachment_newLinkedMesh (spMeshAttachment* self) {
 	copy->regionV = self->regionV;
 	copy->regionU2 = self->regionU2;
 	copy->regionV2 = self->regionV2;
-	copy->regionRotate = self->regionRotate;
 	copy->regionDegrees = self->regionDegrees;
 	copy->regionOffsetX = self->regionOffsetX;
 	copy->regionOffsetY = self->regionOffsetY;

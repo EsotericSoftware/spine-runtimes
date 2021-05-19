@@ -74,8 +74,8 @@ spRegionAttachment* spRegionAttachment_create (const char* name) {
 	return self;
 }
 
-void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate) {
-	if (rotate) {
+void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, float u2, float v2, float degrees) {
+    if (degrees == 90) {
 		self->uvs[URX] = u;
 		self->uvs[URY] = v2;
 		self->uvs[BRX] = u;

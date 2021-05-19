@@ -55,7 +55,7 @@ typedef struct spRegionAttachment {
 } spRegionAttachment;
 
 SP_API spRegionAttachment* spRegionAttachment_create (const char* name);
-SP_API void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, float u2, float v2, int/*bool*/rotate);
+SP_API void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, float u2, float v2, float degrees);
 SP_API void spRegionAttachment_updateOffset (spRegionAttachment* self);
 SP_API void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, spBone* bone, float* vertices, int offset, int stride);
 

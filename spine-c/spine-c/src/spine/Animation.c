@@ -128,6 +128,11 @@ void spTimeline_apply (spTimeline* self, spSkeleton* skeleton, float lastTime, f
 	self->vtable.apply(self, skeleton, lastTime, time, firedEvents, eventsCount, alpha, blend, direction);
 }
 
+void spTimeline_setBezier(spTimeline* self, int bezier, int frame, float value, float time1, float value1, float cx1, float cy1, float cx2, float cy2, float time2, float value2) {
+    if (self->vtable.setBezier)
+        self->vtable.setBezier(self, bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
+}
+
 int spTimeline_getFrameCount (const spTimeline* self) {
     return self->frames->size / self->frameEntries;
 }
@@ -1217,7 +1222,7 @@ spRGBTimeline* spRGBTimeline_create (int framesCount, int bezierCount, int slotI
     return timeline;
 }
 
-void spRGBTimeline_setFrame (spRGBATimeline* self, int frameIndex, float time, float r, float g, float b) {
+void spRGBTimeline_setFrame (spRGBTimeline* self, int frameIndex, float time, float r, float g, float b) {
     float *frames = self->super.super.frames->items;
     frameIndex *= RGB_ENTRIES;
     frames[frameIndex] = time;

@@ -123,6 +123,7 @@ struct spTimeline {
 SP_API void spTimeline_dispose (spTimeline* self);
 SP_API void spTimeline_apply (spTimeline* self, struct spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction);
+SP_API void spTimeline_setBezier(spTimeline* self, int bezier, int frame, float value, float time1, float value1, float cx1, float cy1, float cx2, float cy2, float time2, float value2);
 SP_API int spTimeline_getFrameCount (const spTimeline* self);
 SP_API float spTimeline_getDuration (const spTimeline* self);
 
@@ -281,7 +282,7 @@ typedef struct spRGBTimeline {
 
 SP_API spRGBTimeline* spRGBTimeline_create (int framesCount, int bezierCount, int slotIndex);
 
-SP_API void spRGBTimeline_setFrame (spRGBATimeline* self, int frameIndex, float time, float r, float g, float b);
+SP_API void spRGBTimeline_setFrame (spRGBTimeline* self, int frameIndex, float time, float r, float g, float b);
 
 /**/
 

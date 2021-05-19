@@ -43,7 +43,7 @@ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loa
 		}
 		attachment = spRegionAttachment_create(name);
 		attachment->rendererObject = region;
-		spRegionAttachment_setUVs(attachment, region->u, region->v, region->u2, region->v2, region->rotate);
+		spRegionAttachment_setUVs(attachment, region->u, region->v, region->u2, region->v2, region->degrees);
 		attachment->regionOffsetX = region->offsetX;
 		attachment->regionOffsetY = region->offsetY;
 		attachment->regionWidth = region->width;
@@ -66,7 +66,6 @@ spAttachment* _spAtlasAttachmentLoader_createAttachment (spAttachmentLoader* loa
 		attachment->regionV = region->v;
 		attachment->regionU2 = region->u2;
 		attachment->regionV2 = region->v2;
-		attachment->regionRotate = region->rotate;
 		attachment->regionDegrees = region->degrees;
 		attachment->regionOffsetX = region->offsetX;
 		attachment->regionOffsetY = region->offsetY;
