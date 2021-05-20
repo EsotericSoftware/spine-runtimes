@@ -1158,7 +1158,7 @@ namespace Spine.Unity.Editor {
 			float lineRectWidth = lineRect.width;
 			TrackEntry t = skeletonAnimation.AnimationState.GetCurrent(0);
 
-			if (t != null) {
+			if (t != null && Icons.userEvent != null) { // when changing to play mode, Icons.userEvent  will not be reset
 				int loopCount = (int)(t.TrackTime / t.TrackEnd);
 				float currentTime = t.TrackTime - (t.TrackEnd * loopCount);
 				float normalizedTime = currentTime / t.Animation.Duration;
@@ -1176,14 +1176,15 @@ namespace Spine.Unity.Editor {
 				for (int i = 0; i < currentAnimationEvents.Count; i++) {
 					float eventTime = currentAnimationEventTimes[i];
 					var userEventIcon = Icons.userEvent;
+					float iconX = Mathf.Max(((eventTime / t.Animation.Duration) * lineRectWidth) - (userEventIcon.width / 2), barRect.x);
+					float iconY = barRect.y + userEventIcon.height;
 					var evRect = new Rect(barRect) {
-						x = Mathf.Max(((eventTime / t.Animation.Duration) * lineRectWidth) - (userEventIcon.width / 2), barRect.x),
-						y = barRect.y + userEventIcon.height,
+						x = iconX,
+						y = iconY,
 						width = userEventIcon.width,
 						height = userEventIcon.height
 					};
 					GUI.DrawTexture(evRect, userEventIcon);
-
 					Event ev = Event.current;
 					if (ev.type == EventType.Repaint) {
 						if (evRect.Contains(ev.mousePosition)) {
