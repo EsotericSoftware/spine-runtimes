@@ -68,7 +68,7 @@ typedef enum {
 	SP_MIX_DIRECTION_OUT
 } spMixDirection;
 
-SP_API spAnimation* spAnimation_create (const char* name, spTimelineArray* timelines);
+SP_API spAnimation* spAnimation_create (const char* name, spTimelineArray* timelines, float duration);
 SP_API void spAnimation_dispose (spAnimation* self);
 SP_API int /*bool*/ spAnimation_hasTimeline(spAnimation* self, spPropertyId* ids, int idsCount);
 

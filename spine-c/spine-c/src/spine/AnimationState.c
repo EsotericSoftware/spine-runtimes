@@ -224,7 +224,7 @@ spAnimationState* spAnimationState_create (spAnimationStateData* data) {
 
 	if (!SP_EMPTY_ANIMATION) {
 		SP_EMPTY_ANIMATION = (spAnimation*)1; /* dirty trick so we can recursively call spAnimation_create */
-		SP_EMPTY_ANIMATION = spAnimation_create("<empty>", 0);
+		SP_EMPTY_ANIMATION = spAnimation_create("<empty>", NULL, 0);
 	}
 
 	internal = NEW(_spAnimationState);

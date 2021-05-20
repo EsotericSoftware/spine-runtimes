@@ -35,13 +35,15 @@
 _SP_ARRAY_IMPLEMENT_TYPE(spPropertyIdArray, spPropertyId)
 _SP_ARRAY_IMPLEMENT_TYPE(spTimelineArray, spTimeline*)
 
-spAnimation* spAnimation_create (const char* name, spTimelineArray* timelines) {
+spAnimation* spAnimation_create (const char* name, spTimelineArray* timelines, float duration) {
     int i, n;
 	spAnimation* self = NEW(spAnimation);
 	MALLOC_STR(self->name, name);
+	self->timelines = timelines;
 	for (i = 0, n = timelines->size; i < n; i++) {
 	    spPropertyIdArray_addAllValues(self->timelineIds, timelines->items[i]->propertyIds, 0, timelines->items[i]->propertyIdsCount);
 	}
+	self->duration = duration;
 	return self;
 }
 

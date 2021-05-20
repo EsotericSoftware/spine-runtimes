@@ -304,6 +304,7 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 	int frame, bezier;
 	int drawOrderCount, eventCount;
 	spAnimation* animation;
+	float scale = self->scale;
 
 	int numTimelines = readVarint(input, 1);
 	UNUSED(numTimelines);
@@ -479,7 +480,7 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 
                         switch (readSByte(input)) {
                             case CURVE_STEPPED:
-                                spCurveTimeline_setStepped(frame);
+                                spCurveTimeline_setStepped(SUPER(timeline), frame);
                                 break;
                             case CURVE_BEZIER:
                                 setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, r, nr, 1);
@@ -537,100 +538,132 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 		for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii) {
 			unsigned char timelineType = readByte(input);
 			int frameCount = readVarint(input, 1);
+            int bezierCount = readVarint(input, 1);
+            spTimeline *timeline = NULL;
 			switch (timelineType) {
-			case BONE_ROTATE: {
-				spRotateTimeline *timeline = spRotateTimeline_create(frameCount);
-				timeline->boneIndex = boneIndex;
-				for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-					float time = readFloat(input);
-					float degrees = readFloat(input);
-					spRotateTimeline_setFrame(timeline, frameIndex, time, degrees);
-					if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
-				}
-				spTimelineArray_add(timelines, (spTimeline*)timeline);
-				duration = MAX(duration, timeline->frames[(frameCount - 1) * ROTATE_ENTRIES]);
-				break;
+                case BONE_ROTATE:
+                    timeline = readTimeline(input, SUPER(spRotateTimeline_create(frameCount, bezierCount, boneIndex)), 1);
+                    break;
+                case BONE_TRANSLATE:
+                    timeline = readTimeline2(input, SUPER(spTranslateTimeline_create(frameCount, bezierCount, boneIndex)), scale);
+                    break;
+                case BONE_TRANSLATEX:
+                    timeline = readTimeline(input, SUPER(spTranslateXTimeline_create(frameCount, bezierCount, boneIndex)), scale);
+                    break;
+                case BONE_TRANSLATEY:
+                    timeline = readTimeline(input, SUPER(spTranslateYTimeline_create(frameCount, bezierCount, boneIndex)), scale);
+                    break;
+                case BONE_SCALE:
+                    timeline = readTimeline2(input, SUPER(spScaleTimeline_create(frameCount, bezierCount, boneIndex)), 1);
+                    break;
+                case BONE_SCALEX:
+                    timeline = readTimeline(input, SUPER(spScaleXTimeline_create(frameCount, bezierCount, boneIndex)), 1);
+                    break;
+                case BONE_SCALEY:
+                    timeline = readTimeline(input, SUPER(spScaleYTimeline_create(frameCount, bezierCount, boneIndex)), 1);
+                    break;
+                case BONE_SHEAR:
+                    timeline = readTimeline2(input, SUPER(spShearTimeline_create(frameCount, bezierCount, boneIndex)), 1);
+                    break;
+                case BONE_SHEARX:
+                    timeline = readTimeline(input, SUPER(spShearXTimeline_create(frameCount, bezierCount, boneIndex)), 1);
+                    break;
+                case BONE_SHEARY:
+                    timeline = readTimeline(input, SUPER(spShearYTimeline_create(frameCount, bezierCount, boneIndex)), 1);
+                    break;
+                default: {
+                    for (iii = 0; iii < timelines->size; ++iii)
+                        spTimeline_dispose(timelines->items[iii]);
+                    spTimelineArray_dispose(timelines);
+                    _spSkeletonBinary_setError(self, "Invalid timeline type for a bone: ", skeletonData->bones[boneIndex]->name);
+                    return NULL;
+                }
 			}
-			case BONE_TRANSLATE:
-			case BONE_SCALE:
-			case BONE_SHEAR: {
-				float timelineScale = 1;
-				spTranslateTimeline *timeline = 0;
-				switch (timelineType) {
-					case BONE_SCALE:
-						timeline = spScaleTimeline_create(frameCount);
-						break;
-					case BONE_SHEAR:
-						timeline = spShearTimeline_create(frameCount);
-						break;
-					case BONE_TRANSLATE:
-						timeline = spTranslateTimeline_create(frameCount);
-						timelineScale = self->scale;
-						break;
-					default:
-						break;
-				}
-				timeline->boneIndex = boneIndex;
-				for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-					float time = readFloat(input);
-					float x = readFloat(input) * timelineScale;
-					float y = readFloat(input) * timelineScale;
-					spTranslateTimeline_setFrame(timeline, frameIndex, time, x, y);
-					if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
-				}
-				spTimelineArray_add(timelines, (spTimeline*)timeline);
-				duration = MAX(duration, timeline->frames[(frameCount - 1) * TRANSLATE_ENTRIES]);
-				break;
-			}
-			default: {
-				for (iii = 0; iii < timelines->size; ++iii)
-					spTimeline_dispose(timelines->items[iii]);
-				spTimelineArray_dispose(timelines);
-				_spSkeletonBinary_setError(self, "Invalid timeline type for a bone: ", skeletonData->bones[boneIndex]->name);
-				return 0;
-			}
-			}
+			spTimelineArray_add(timelines, timeline);
 		}
 	}
 
 	/* IK constraint timelines. */
 	for (i = 0, n = readVarint(input, 1); i < n; ++i) {
-		int index = readVarint(input, 1);
-		int frameCount = readVarint(input, 1);
-		spIkConstraintTimeline* timeline = spIkConstraintTimeline_create(frameCount);
-		timeline->ikConstraintIndex = index;
-		for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-			float time = readFloat(input);
-			float mix = readFloat(input);
-			float softness = readFloat(input);
-			signed char bendDirection = readSByte(input);
-			int compress = readBoolean(input);
-			int stretch = readBoolean(input);
-			spIkConstraintTimeline_setFrame(timeline, frameIndex, time, mix, softness, bendDirection, compress, stretch);
-			if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
-		}
-		spTimelineArray_add(timelines, (spTimeline*)timeline);
-		duration = MAX(duration, timeline->frames[(frameCount - 1) * IKCONSTRAINT_ENTRIES]);
+        int index = readVarint(input, 1);
+        int frameCount = readVarint(input, 1);
+        int frameLast = frameCount - 1;
+        int bezierCount = readVarint(input, 1);
+        spIkConstraintTimeline *timeline = spIkConstraintTimeline_create(frameCount, bezierCount, index);
+        float time = readFloat(input);
+        float mix = readFloat(input);
+        float softness = readFloat(input) * scale;
+        for (frame = 0, bezier = 0;; frame++) {
+            float time2, mix2, softness2;
+            int bendDirection = readSByte(input);
+            int compress = readBoolean(input);
+            int stretch = readBoolean(input);
+            spIkConstraintTimeline_setFrame(timeline, frame, time, mix, softness, bendDirection, compress, stretch);
+            if (frame == frameLast) break;
+            time2 = readFloat(input);
+            mix2 = readFloat(input);
+            softness2 = readFloat(input) * scale;
+            switch (readSByte(input)) {
+                case CURVE_STEPPED:
+                    spCurveTimeline_setStepped(SUPER(timeline), frame);
+                    break;
+                case CURVE_BEZIER:
+                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, mix, mix2, 1);
+                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, softness, softness2, scale);
+            }
+            time = time2;
+            mix = mix2;
+            softness = softness2;
+        }
+        spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
 	}
 
 	/* Transform constraint timelines. */
 	for (i = 0, n = readVarint(input, 1); i < n; ++i) {
-		int index = readVarint(input, 1);
-		int frameCount = readVarint(input, 1);
-		spTransformConstraintTimeline* timeline = spTransformConstraintTimeline_create(frameCount);
-		timeline->transformConstraintIndex = index;
-		for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-			float time = readFloat(input);
-			float rotateMix = readFloat(input);
-			float translateMix = readFloat(input);
-			float scaleMix = readFloat(input);
-			float shearMix = readFloat(input);
-			spTransformConstraintTimeline_setFrame(timeline, frameIndex, time, rotateMix, translateMix,
-				scaleMix, shearMix);
-			if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
-		}
-		spTimelineArray_add(timelines, (spTimeline*)timeline);
-		duration = MAX(duration, timeline->frames[(frameCount - 1) * TRANSFORMCONSTRAINT_ENTRIES]);
+        int index = readVarint(input, 1);
+        int frameCount = readVarint(input, 1);
+        int frameLast = frameCount - 1;
+        int bezierCount = readVarint(input, 1);
+        spTransformConstraintTimeline *timeline = spTransformConstraintTimeline_create(frameCount, bezierCount, index);
+        float time = readFloat(input);
+        float mixRotate = readFloat(input);
+        float mixX = readFloat(input);
+        float mixY = readFloat(input);
+        float mixScaleX = readFloat(input);
+        float mixScaleY = readFloat(input);
+        float mixShearY = readFloat(input);
+        for (frame = 0, bezier = 0;; frame++) {
+            float time2, mixRotate2, mixX2, mixY2, mixScaleX2, mixScaleY2, mixShearY2;
+            spTransformConstraintTimeline_setFrame(timeline, frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
+            if (frame == frameLast) break;
+            time2 = readFloat(input);
+            mixRotate2 = readFloat(input);
+            mixX2 = readFloat(input);
+            mixY2 = readFloat(input);
+            mixScaleX2 = readFloat(input);
+            mixScaleY2 = readFloat(input);
+            mixShearY2 = readFloat(input);
+            switch (readSByte(input)) {
+                case CURVE_STEPPED:
+                    spCurveTimeline_setStepped(SUPER(timeline), frame);
+                    break;
+                case CURVE_BEZIER:
+                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, mixX, mixX2, 1);
+                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, mixY, mixY2, 1);
+                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 3, time, time2, mixScaleX, mixScaleX2, 1);
+                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 4, time, time2, mixScaleY, mixScaleY2, 1);
+                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 5, time, time2, mixShearY, mixShearY2, 1);
+            }
+            time = time2;
+            mixRotate = mixRotate2;
+            mixX = mixX2;
+            mixY = mixY2;
+            mixScaleX = mixScaleX2;
+            mixScaleY = mixScaleY2;
+            mixShearY = mixShearY2;
+        }
+        spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
 	}
 
 	/* Path constraint timelines. */
@@ -638,47 +671,58 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 		int index = readVarint(input, 1);
 		spPathConstraintData* data = skeletonData->pathConstraints[index];
 		for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii) {
-			unsigned char timelineType = readByte(input);
-			int frameCount = readVarint(input, 1);
-			switch (timelineType) {
-			case PATH_POSITION:
-			case PATH_SPACING: {
-				spPathConstraintPositionTimeline* timeline = 0;
-				float timelineScale = 1;
-				if (timelineType == PATH_SPACING) {
-					timeline = (spPathConstraintPositionTimeline*)spPathConstraintSpacingTimeline_create(frameCount);
-					if (data->spacingMode == SP_SPACING_MODE_LENGTH || data->spacingMode == SP_SPACING_MODE_FIXED)
-						timelineScale = self->scale;
-				} else {
-					timeline = spPathConstraintPositionTimeline_create(frameCount);
-					if (data->positionMode == SP_POSITION_MODE_FIXED)
-						timelineScale = self->scale;
-				}
-				timeline->pathConstraintIndex = index;
-				for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-					float time = readFloat(input);
-					float value = readFloat(input) * timelineScale;
-					spPathConstraintPositionTimeline_setFrame(timeline, frameIndex, time, value);
-					if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
-				}
-				spTimelineArray_add(timelines, (spTimeline*)timeline);
-				duration = MAX(duration, timeline->frames[(frameCount - 1) * PATHCONSTRAINTPOSITION_ENTRIES]);
-				break;
-			}
-			case PATH_MIX: {
-				spPathConstraintMixTimeline* timeline = spPathConstraintMixTimeline_create(frameCount);
-				timeline->pathConstraintIndex = index;
-				for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-					float time = readFloat(input);
-					float rotateMix = readFloat(input);
-					float translateMix = readFloat(input);
-					spPathConstraintMixTimeline_setFrame(timeline, frameIndex, time, rotateMix, translateMix);
-					if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
-				}
-				spTimelineArray_add(timelines, (spTimeline*)timeline);
-				duration = MAX(duration, timeline->frames[(frameCount - 1) * PATHCONSTRAINTMIX_ENTRIES]);
-			}
-			}
+            int type = readSByte(input);
+            int frameCount = readVarint(input, 1);
+            int bezierCount = readVarint(input, 1);
+            switch (type) {
+                case PATH_POSITION: {
+                    spTimelineArray_add(timelines, readTimeline(input, SUPER(spPathConstraintPositionTimeline_create(frameCount, bezierCount, index)),
+                            data->positionMode == SP_POSITION_MODE_FIXED ? scale : 1));
+                    break;
+                }
+                case PATH_SPACING: {
+                    spTimelineArray_add(timelines, readTimeline(input,
+                                              SUPER(spPathConstraintSpacingTimeline_create(frameCount,
+                                                                                bezierCount,
+                                                                                index)),
+                            data->spacingMode == SP_SPACING_MODE_LENGTH ||
+                            data->spacingMode == SP_SPACING_MODE_FIXED ? scale : 1));
+                    break;
+                }
+                case PATH_MIX: {
+                    float time, mixRotate, mixX, mixY;
+                    int frameLast;
+                    spPathConstraintMixTimeline *timeline = spPathConstraintMixTimeline_create(frameCount, bezierCount, index);
+                    time = readFloat(input);
+                    mixRotate = readFloat(input);
+                    mixX = readFloat(input);
+                    mixY = readFloat(input);
+                    for (frame = 0, bezier = 0, frameLast = spTimeline_getFrameCount(SUPER(SUPER(timeline))) - 1;; frame++) {
+                        float time2, mixRotate2, mixX2, mixY2;
+                        spPathConstraintMixTimeline_setFrame(timeline, frame, time, mixRotate, mixX, mixY);
+                        if (frame == frameLast) break;
+                        time2 = readFloat(input);
+                        mixRotate2 = readFloat(input);
+                        mixX2 = readFloat(input);
+                        mixY2 = readFloat(input);
+                        switch (readSByte(input)) {
+                            case CURVE_STEPPED:
+                                spCurveTimeline_setStepped(SUPER(timeline), frame);
+                                break;
+                            case CURVE_BEZIER:
+                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, mixX, mixX2, 1);
+                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, mixY, mixY2, 1);
+
+                        }
+                        time = time2;
+                        mixRotate = mixRotate2;
+                        mixX = mixX2;
+                        mixY = mixY2;
+                    }
+                    spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
+                }
+            }
 		}
 	}
 
@@ -692,7 +736,8 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 				spDeformTimeline *timeline;
 				int weighted, deformLength;
 				const char* attachmentName = readStringRef(input, skeletonData);
-				int frameCount;
+				int frameCount, frameLast, bezierCount;
+				float time, time2;
 
 				spVertexAttachment* attachment = SUB_CAST(spVertexAttachment,
 					spSkin_getAttachment(skin, slotIndex, attachmentName));
@@ -709,12 +754,12 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 				tempDeform = MALLOC(float, deformLength);
 
 				frameCount = readVarint(input, 1);
-				timeline = spDeformTimeline_create(frameCount, deformLength);
-				timeline->slotIndex = slotIndex;
-				timeline->attachment = SUPER(attachment);
+				frameLast = frameCount - 1;
+				bezierCount = readVarint(input, 1);
+				timeline = spDeformTimeline_create(frameCount, deformLength, bezierCount, slotIndex, attachment);
 
-				for (frameIndex = 0; frameIndex < frameCount; ++frameIndex) {
-					float time = readFloat(input);
+                time = readFloat(input);
+                for (frame = 0, bezier = 0;; ++frame) {
 					float* deform;
 					int end = readVarint(input, 1);
 					if (!end) {
@@ -742,13 +787,21 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 								deform[v] += vertices[v];
 						}
 					}
-					spDeformTimeline_setFrame(timeline, frameIndex, time, deform);
-					if (frameIndex < frameCount - 1) readCurve(input, SUPER(timeline), frameIndex);
+                    spDeformTimeline_setFrame(timeline, frame, time, deform);
+                    if (frame == frameLast) break;
+                    time2 = readFloat(input);
+                    switch(readSByte(input)) {
+                        case CURVE_STEPPED:
+                            spCurveTimeline_setStepped(SUPER(timeline), frame);
+                            break;
+                        case CURVE_BEZIER:
+                            setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, 0, 1, 1);
+                    }
+                    time = time2;
 				}
 				FREE(tempDeform);
 
 				spTimelineArray_add(timelines, (spTimeline*)timeline);
-				duration = MAX(duration, timeline->frames[frameCount - 1]);
 			}
 		}
 	}
@@ -785,7 +838,6 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 			FREE(drawOrder);
 		}
 		spTimelineArray_add(timelines, (spTimeline*)timeline);
-		duration = MAX(duration, timeline->frames[drawOrderCount - 1]);
 	}
 
 	/* Event timeline. */
@@ -809,15 +861,13 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 			spEventTimeline_setFrame(timeline, i, event);
 		}
 		spTimelineArray_add(timelines, (spTimeline*)timeline);
-		duration = MAX(duration, timeline->frames[eventCount - 1]);
 	}
 
-	animation = spAnimation_create(name, 0);
-	FREE(animation->timelines);
-	animation->duration = duration;
-	animation->timelinesCount = timelines->size;
-	animation->timelines = timelines->items;
-	FREE(timelines);
+    duration = 0;
+    for (i = 0, n = timelines->size; i < n; i++) {
+        duration = MAX(duration, spTimeline_getDuration(timelines->items[i]));
+    }
+	animation = spAnimation_create(name, timelines, duration);
 	return animation;
 }
 
