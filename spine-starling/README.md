@@ -28,13 +28,13 @@ The Spine Starling example works on Windows, Linux and Mac OS X. This guide assu
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/).
 2. Install the [ActionScript & MXML extension for Visual Studio Code](https://github.com/BowlerHatLLC/vscode-as3mxml/wiki).
-3. Install [Adobe Flash Player Projector version 32 with debugging support](https://www.adobe.com/support/flashplayer/debug_downloads.html#fp15).
-4. Install the [Adobe AIR SDK 32](http://www.adobe.com/devnet/air/air-sdk-download.html) by simply extracting it to a known location.
+3. Download [Adobe Flash Player 32 projector content debugger](https://www.adobe.com/support/flashplayer/debug_downloads.html#fp15). On Windows, run it once to store its path.
+4. Download [Adobe AIR 32 SDK & Compiler](https://helpx.adobe.com/air/kb/archived-air-sdk-version.html) and extract it to a folder.
 
-To run the Flash example project `spine-starling-example`.
+To run the Flash example project `spine-starling-example`:
 
 1. Open the `spine-starling-example/` folder in Visual Studio Code.
-2. Set the AIR SDK location when prompted.
+2. Set the AIR SDK location when prompted or by pressing `CTRL + SHIFT + P` (`CMD + SHIFT + P` on macOS) and choosing `>ActionScript: Select Workspace SDK`.
 3. Launch the `Launch Spine Starling Example` launch configuration.
 
 Instead of directly adding the sources of from `spine-starling/src` to your project, you can also link the SWC file `spine-starling/lib/spine-starling.swc`. To (re-)compile this file yourself with Visual Studio Code:
