@@ -177,7 +177,6 @@ public class IkConstraint implements Updatable {
 	static public void apply (Bone bone, float targetX, float targetY, boolean compress, boolean stretch, boolean uniform,
 		float alpha) {
 		if (bone == null) throw new IllegalArgumentException("bone cannot be null.");
-		if (!bone.appliedValid) bone.updateAppliedTransform();
 		Bone p = bone.parent;
 		float pa = p.a, pb = p.b, pc = p.c, pd = p.d;
 		float rotationIK = -bone.ashearX - bone.arotation, tx, ty;
@@ -230,8 +229,6 @@ public class IkConstraint implements Updatable {
 		float softness, float alpha) {
 		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
 		if (child == null) throw new IllegalArgumentException("child cannot be null.");
-		if (!parent.appliedValid) parent.updateAppliedTransform();
-		if (!child.appliedValid) child.updateAppliedTransform();
 		float px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, sx = psx, sy = psy, csx = child.ascaleX;
 		int os1, os2, s2;
 		if (psx < 0) {

@@ -118,7 +118,6 @@ public class IKTest extends ApplicationAdapter {
 		boneCoords.set(cameraCoords.x, cameraCoords.y);
 		crosshair.getParent().worldToLocal(boneCoords); // camera space to local bone space
 		crosshair.setPosition(boneCoords.x, boneCoords.y); // override the crosshair position
-		crosshair.setAppliedValid(false);
 
 		// Calculate final world transform with the
 		// crosshair bone set to the mouse cursor

@@ -51,7 +51,6 @@ public class Bone implements Updatable {
 	final Array<Bone> children = new Array();
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
-	boolean appliedValid;
 	float a, b, worldX;
 	float c, d, worldY;
 
@@ -82,9 +81,9 @@ public class Bone implements Updatable {
 		shearY = bone.shearY;
 	}
 
-	/** Same as {@link #updateWorldTransform()}. This method exists for Bone to implement {@link Updatable}. */
+	/** Computes the world transform using the parent bone and this bone's local applied transform. */
 	public void update () {
-		updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
+		updateWorldTransform(ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY);
 	}
 
 	/** Computes the world transform using the parent bone and this bone's local transform.
@@ -94,7 +93,8 @@ public class Bone implements Updatable {
 		updateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 	}
 
-	/** Computes the world transform using the parent bone and the specified local transform. Child bones are not updated.
+	/** Computes the world transform using the parent bone and the specified local transform. The applied transform is set to the
+	 * specified local transform. Child bones are not updated.
 	 * <p>
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
@@ -106,7 +106,6 @@ public class Bone implements Updatable {
 		ascaleY = scaleY;
 		ashearX = shearX;
 		ashearY = shearY;
-		appliedValid = true;
 
 		Bone parent = this.parent;
 		if (parent == null) { // Root bone.
@@ -387,26 +386,15 @@ public class Bone implements Updatable {
 		this.ashearY = ashearY;
 	}
 
-	/** If true, the applied transform matches the world transform. If false, the world transform has been modified since it was
-	 * computed and {@link #updateAppliedTransform()} must be called before accessing the applied transform. */
-	public boolean isAppliedValid () {
-		return appliedValid;
-	}
-
-	public void setAppliedValid (boolean appliedValid) {
-		this.appliedValid = appliedValid;
-	}
-
-	/** Computes the applied transform values from the world transform. This allows the applied transform to be accessed after the
-	 * world transform has been modified (by a constraint, {@link #rotateWorld(float)}, etc).
+	/** Computes the applied transform values from the world transform.
 	 * <p>
-	 * If {@link #updateWorldTransform()} has been called for a bone and {@link #isAppliedValid()} is false, then
-	 * {@link #updateAppliedTransform()} must be called before accessing the applied transform.
+	 * If the world transform is modified (by a constraint, {@link #rotateWorld(float)}, etc) then this method should be called so
+	 * the applied transform matches the world transform. The applied transform may be needed by other code (eg to apply another
+	 * constraints).
 	 * <p>
 	 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The applied transform after
 	 * calling this method is equivalent to the local tranform used to compute the world transform, but may not be identical. */
 	public void updateAppliedTransform () {
-		appliedValid = true;
 		Bone parent = this.parent;
 		if (parent == null) {
 			ax = worldX;
@@ -448,7 +436,7 @@ public class Bone implements Updatable {
 
 	// -- World transform
 
-	/** Part of the world transform matrix for the X axis. If changed, {@link #setAppliedValid(boolean)} should be set to false. */
+	/** Part of the world transform matrix for the X axis. If changed, {@link #updateAppliedTransform()} should be called. */
 	public float getA () {
 		return a;
 	}
@@ -457,7 +445,7 @@ public class Bone implements Updatable {
 		this.a = a;
 	}
 
-	/** Part of the world transform matrix for the Y axis. If changed, {@link #setAppliedValid(boolean)} should be set to false. */
+	/** Part of the world transform matrix for the Y axis. If changed, {@link #updateAppliedTransform()} should be called. */
 	public float getB () {
 		return b;
 	}
@@ -466,7 +454,7 @@ public class Bone implements Updatable {
 		this.b = b;
 	}
 
-	/** Part of the world transform matrix for the X axis. If changed, {@link #setAppliedValid(boolean)} should be set to false. */
+	/** Part of the world transform matrix for the X axis. If changed, {@link #updateAppliedTransform()} should be called. */
 	public float getC () {
 		return c;
 	}
@@ -475,7 +463,7 @@ public class Bone implements Updatable {
 		this.c = c;
 	}
 
-	/** Part of the world transform matrix for the Y axis. If changed, {@link #setAppliedValid(boolean)} should be set to false. */
+	/** Part of the world transform matrix for the Y axis. If changed, {@link #updateAppliedTransform()} should be called. */
 	public float getD () {
 		return d;
 	}
@@ -484,7 +472,7 @@ public class Bone implements Updatable {
 		this.d = d;
 	}
 
-	/** The world X position. If changed, {@link #setAppliedValid(boolean)} should be set to false. */
+	/** The world X position. If changed, {@link #updateAppliedTransform()} should be called. */
 	public float getWorldX () {
 		return worldX;
 	}
@@ -493,7 +481,7 @@ public class Bone implements Updatable {
 		this.worldX = worldX;
 	}
 
-	/** The world Y position. If changed, {@link #setAppliedValid(boolean)} should be set to false. */
+	/** The world Y position. If changed, {@link #updateAppliedTransform()} should be called. */
 	public float getWorldY () {
 		return worldY;
 	}
@@ -569,15 +557,16 @@ public class Bone implements Updatable {
 		return atan2(cos * c + sin * d, cos * a + sin * b) * radDeg;
 	}
 
-	/** Rotates the world transform the specified amount and sets {@link #isAppliedValid()} to false.
-	 * {@link #updateWorldTransform()} will need to be called on any child bones, recursively, and any constraints reapplied. */
+	/** Rotates the world transform the specified amount.
+	 * <p>
+	 * After changes are made to the world transform, {@link #updateAppliedTransform()} should be called and {@link #update()} will
+	 * need to be called on any child bones, recursively. */
 	public void rotateWorld (float degrees) {
 		float cos = cosDeg(degrees), sin = sinDeg(degrees);
 		a = cos * a - sin * c;
 		b = cos * b - sin * d;
 		c = sin * a + cos * c;
 		d = sin * b + cos * d;
-		appliedValid = false;
 	}
 
 	// ---

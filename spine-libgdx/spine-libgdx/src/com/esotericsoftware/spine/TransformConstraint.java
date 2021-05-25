@@ -159,7 +159,7 @@ public class TransformConstraint implements Updatable {
 				bone.d = sin(r) * s;
 			}
 
-			bone.appliedValid = false;
+			bone.updateAppliedTransform();
 		}
 	}
 
@@ -223,7 +223,7 @@ public class TransformConstraint implements Updatable {
 				bone.d = sin(r) * s;
 			}
 
-			bone.appliedValid = false;
+			bone.updateAppliedTransform();
 		}
 	}
 
@@ -232,12 +232,10 @@ public class TransformConstraint implements Updatable {
 			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 
 		Bone target = this.target;
-		if (!target.appliedValid) target.updateAppliedTransform();
 
 		Object[] bones = this.bones.items;
 		for (int i = 0, n = this.bones.size; i < n; i++) {
 			Bone bone = (Bone)bones[i];
-			if (!bone.appliedValid) bone.updateAppliedTransform();
 
 			float rotation = bone.arotation;
 			if (mixRotate != 0) {
@@ -272,12 +270,10 @@ public class TransformConstraint implements Updatable {
 			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 
 		Bone target = this.target;
-		if (!target.appliedValid) target.updateAppliedTransform();
 
 		Object[] bones = this.bones.items;
 		for (int i = 0, n = this.bones.size; i < n; i++) {
 			Bone bone = (Bone)bones[i];
-			if (!bone.appliedValid) bone.updateAppliedTransform();
 
 			float rotation = bone.arotation + (target.arotation + data.offsetRotation) * mixRotate;
 			float x = bone.ax + (target.ax + data.offsetX) * mixX;

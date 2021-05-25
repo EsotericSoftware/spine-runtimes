@@ -342,6 +342,18 @@ public class Skeleton {
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide. */
 	public void updateWorldTransform () {
+		Object[] bones = this.bones.items;
+		for (int i = 0, n = this.bones.size; i < n; i++) {
+			Bone bone = (Bone)bones[i];
+			bone.ax = bone.x;
+			bone.ay = bone.y;
+			bone.arotation = bone.rotation;
+			bone.ascaleX = bone.scaleX;
+			bone.ascaleY = bone.scaleY;
+			bone.ashearX = bone.shearX;
+			bone.ashearY = bone.shearY;
+		}
+
 		Object[] updateCache = this.updateCache.items;
 		for (int i = 0, n = this.updateCache.size; i < n; i++)
 			((Updatable)updateCache[i]).update();
