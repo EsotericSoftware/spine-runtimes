@@ -236,7 +236,9 @@ namespace Spine.Unity.Editor {
 					if (string.IsNullOrEmpty(textureSettingsRef.stringValue)) {
 						var pmaTextureSettingsReferenceGUIDS = AssetDatabase.FindAssets("PMATexturePreset");
 						if (pmaTextureSettingsReferenceGUIDS.Length > 0) {
-							textureSettingsRef.stringValue = AssetDatabase.GUIDToAssetPath(pmaTextureSettingsReferenceGUIDS[0]);
+							var assetPath = AssetDatabase.GUIDToAssetPath(pmaTextureSettingsReferenceGUIDS[0]);
+							if (!string.IsNullOrEmpty(assetPath))
+								textureSettingsRef.stringValue = assetPath;
 						}
 					}
 
