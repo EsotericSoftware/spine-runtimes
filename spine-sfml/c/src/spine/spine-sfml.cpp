@@ -45,7 +45,56 @@ sf::BlendMode additivePma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::One
 sf::BlendMode multiplyPma = sf::BlendMode(sf::BlendMode::DstColor, sf::BlendMode::OneMinusSrcAlpha);
 sf::BlendMode screenPma = sf::BlendMode(sf::BlendMode::One, sf::BlendMode::OneMinusSrcColor);
 
-_SP_ARRAY_IMPLEMENT_TYPE(spColorArray, spColor)
+spColorArray *spColorArray_create(int initialCapacity) {
+    spColorArray *array = ((spColorArray *) _spCalloc(1, sizeof(spColorArray), "_file_name_", 48));
+    array->size = 0;
+    array->capacity = initialCapacity;
+    array->items = ((spColor *) _spCalloc(initialCapacity, sizeof(spColor), "_file_name_", 48));
+    return array;
+}
+void spColorArray_dispose(spColorArray *self) {
+    _spFree((void *) self->items);
+    _spFree((void *) self);
+}
+void spColorArray_clear(spColorArray *self) { self->size = 0; }
+spColorArray *spColorArray_setSize(spColorArray *self, int newSize) {
+    self->size = newSize;
+    if (self->capacity < newSize) {
+        self->capacity = ((8) > ((int) (self->size * 1.75f)) ? (8) : ((int) (self->size * 1.75f)));
+        self->items = ((spColor *) _spRealloc(self->items, sizeof(spColor) * (self->capacity)));
+    }
+    return self;
+}
+void spColorArray_ensureCapacity(spColorArray *self, int newCapacity) {
+    if (self->capacity >= newCapacity)return;
+    self->capacity = newCapacity;
+    self->items = ((spColor *) _spRealloc(self->items, sizeof(spColor) * (self->capacity)));
+}
+void spColorArray_add(spColorArray *self, spColor value) {
+    if (self->size == self->capacity) {
+        self->capacity = ((8) > ((int) (self->size * 1.75f)) ? (8) : ((int) (self->size * 1.75f)));
+        self->items = ((spColor *) _spRealloc(self->items, sizeof(spColor) * (self->capacity)));
+    }
+    self->items[self->size++] = value;
+}
+void spColorArray_addAll(spColorArray *self, spColorArray *other) {
+    int i = 0;
+    for (; i < other->size; i++) { spColorArray_add(self, other->items[i]); }
+}
+void spColorArray_addAllValues(spColorArray *self, spColor *values, int offset, int count) {
+    int i = offset, n = offset + count;
+    for (; i < n; i++) { spColorArray_add(self, values[i]); }
+}
+void spColorArray_removeAt(spColorArray *self, int index) {
+    self->size--;
+    memmove(self->items + index, self->items + index + 1, sizeof(spColor) * (self->size - index));
+}
+
+spColor spColorArray_pop(spColorArray *self) {
+    spColor item = self->items[--self->size];
+    return item;
+}
+spColor spColorArray_peek(spColorArray *self) { return self->items[self->size - 1]; }
 
 void _spAtlasPage_createTexture (spAtlasPage* self, const char* path){
 	Texture* texture = new Texture();

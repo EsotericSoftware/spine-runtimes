@@ -69,6 +69,7 @@ void Json_dispose (Json* json);
 
 /* Get item "string" from object. Case insensitive. */
 Json* Json_getItem (Json* json, const char* string);
+Json *Json_getItemAtIndex(Json *object, int childIndex);
 const char* Json_getString (Json* json, const char* name, const char* defaultValue);
 float Json_getFloat (Json* json, const char* name, float defaultValue);
 int Json_getInt (Json* json, const char* name, int defaultValue);

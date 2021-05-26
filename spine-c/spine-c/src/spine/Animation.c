@@ -39,7 +39,9 @@ spAnimation* spAnimation_create (const char* name, spTimelineArray* timelines, f
     int i, n;
 	spAnimation* self = NEW(spAnimation);
 	MALLOC_STR(self->name, name);
-	self->timelines = timelines;
+	self->timelines = timelines != NULL ? timelines : spTimelineArray_create(1);
+	timelines = self->timelines;
+	self->timelineIds = spPropertyIdArray_create(16);
 	for (i = 0, n = timelines->size; i < n; i++) {
 	    spPropertyIdArray_addAllValues(self->timelineIds, timelines->items[i]->propertyIds, 0, timelines->items[i]->propertyIdsCount);
 	}
@@ -110,6 +112,7 @@ void _spTimeline_init (spTimeline* self,
 ) {
     int i, n;
     self->frames = spFloatArray_create(frameCount * frameEntries);
+    self->frameCount = frameCount;
     self->frameEntries = frameEntries;
 	self->vtable.dispose = dispose;
 	self->vtable.apply = apply;
@@ -136,7 +139,7 @@ void spTimeline_setBezier(spTimeline* self, int bezier, int frame, float value, 
 }
 
 int spTimeline_getFrameCount (const spTimeline* self) {
-    return self->frames->size / self->frameEntries;
+    return self->frameCount / self->frameEntries;
 }
 
 float spTimeline_getDuration (const spTimeline* self) {

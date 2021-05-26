@@ -95,9 +95,15 @@ SP_API spAnimation* spSkeletonData_findAnimation (const spSkeletonData* self, co
 
 SP_API spIkConstraintData* spSkeletonData_findIkConstraint (const spSkeletonData* self, const char* constraintName);
 
+SP_API int spSkeletonData_findIkConstraintIndex (const spSkeletonData* self, const char* constraintName);
+
 SP_API spTransformConstraintData* spSkeletonData_findTransformConstraint (const spSkeletonData* self, const char* constraintName);
 
+SP_API int spSkeletonData_findTransformConstraintIndex (const spSkeletonData* self, const char* constraintName);
+
 SP_API spPathConstraintData* spSkeletonData_findPathConstraint (const spSkeletonData* self, const char* constraintName);
+
+SP_API int spSkeletonData_findPathConstraintIndex (const spSkeletonData* self, const char* constraintName);
 
 #ifdef __cplusplus
 }

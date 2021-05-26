@@ -117,6 +117,7 @@ struct spTimeline {
 	spPropertyId propertyIds[SP_MAX_PROPERTY_IDS];
 	int propertyIdsCount;
 	spFloatArray *frames;
+	int frameCount;
 	int frameEntries;
 };
 

@@ -136,6 +136,13 @@ spIkConstraintData* spSkeletonData_findIkConstraint (const spSkeletonData* self,
 	return 0;
 }
 
+int spSkeletonData_findIkConstraintIndex (const spSkeletonData* self, const char* constraintName) {
+    int i;
+    for (i = 0; i < self->ikConstraintsCount; ++i)
+        if (strcmp(self->ikConstraints[i]->name, constraintName) == 0) return i;
+    return -1;
+}
+
 spTransformConstraintData* spSkeletonData_findTransformConstraint (const spSkeletonData* self, const char* constraintName) {
 	int i;
 	for (i = 0; i < self->transformConstraintsCount; ++i)
@@ -143,9 +150,23 @@ spTransformConstraintData* spSkeletonData_findTransformConstraint (const spSkele
 	return 0;
 }
 
+int spSkeletonData_findTransformConstraintIndex (const spSkeletonData* self, const char* constraintName) {
+    int i;
+    for (i = 0; i < self->transformConstraintsCount; ++i)
+        if (strcmp(self->transformConstraints[i]->name, constraintName) == 0) return i;
+    return -1;
+}
+
 spPathConstraintData* spSkeletonData_findPathConstraint (const spSkeletonData* self, const char* constraintName) {
 	int i;
 	for (i = 0; i < self->pathConstraintsCount; ++i)
 		if (strcmp(self->pathConstraints[i]->name, constraintName) == 0) return self->pathConstraints[i];
 	return 0;
+}
+
+int spSkeletonData_findPathConstraintIndex (const spSkeletonData* self, const char* constraintName) {
+    int i;
+    for (i = 0; i < self->pathConstraintsCount; ++i)
+        if (strcmp(self->pathConstraints[i]->name, constraintName) == 0) return i;
+    return -1;
 }

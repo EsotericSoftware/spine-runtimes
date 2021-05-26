@@ -444,6 +444,15 @@ Json *Json_getItem (Json *object, const char* string) {
 	return c;
 }
 
+Json *Json_getItemAtIndex(Json *object, int childIndex) {
+	Json *current = object->child;
+	while (current != NULL && childIndex > 0) {
+		childIndex--;
+		current = current->next;
+	}
+	return current;
+}
+
 const char* Json_getString (Json* object, const char* name, const char* defaultValue) {
 	object = Json_getItem(object, name);
 	if (object) return object->valueString;

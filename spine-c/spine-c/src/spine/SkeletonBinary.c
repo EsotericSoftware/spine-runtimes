@@ -1139,7 +1139,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonDataFile (spSkeletonBinary* self, c
 spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const unsigned char* binary,
 		const int length) {
 	int i, n, ii, nonessential;
-    char buffer[16];
+    char buffer[32];
     int lowHash, highHash;
 	spSkeletonData* skeletonData;
 	_spSkeletonBinary* internal = SUB_CAST(_spSkeletonBinary, self);
@@ -1155,9 +1155,8 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	skeletonData = spSkeletonData_create();
 	lowHash = readInt(input);
 	highHash = readInt(input);
-	sprintf(buffer, "%x", highHash);
-	sprintf(buffer + 8, "%x", lowHash);
-	buffer[15] = 0;
+	sprintf(buffer, "%x%x", highHash, lowHash);
+	buffer[31] = 0;
 	skeletonData->hash = strdup(buffer);
 
 	skeletonData->version = readString(input);
