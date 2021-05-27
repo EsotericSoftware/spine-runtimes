@@ -390,10 +390,10 @@ public class Bone implements Updatable {
 	 * <p>
 	 * If the world transform is modified (by a constraint, {@link #rotateWorld(float)}, etc) then this method should be called so
 	 * the applied transform matches the world transform. The applied transform may be needed by other code (eg to apply another
-	 * constraints).
+	 * constraint).
 	 * <p>
 	 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The applied transform after
-	 * calling this method is equivalent to the local tranform used to compute the world transform, but may not be identical. */
+	 * calling this method is equivalent to the local transform used to compute the world transform, but may not be identical. */
 	public void updateAppliedTransform () {
 		Bone parent = this.parent;
 		if (parent == null) {
