@@ -919,15 +919,14 @@ namespace Spine.Unity.Editor {
 						skeletonDataAsset.scale = SpineEditorUtilities.Preferences.defaultScale;
 						skeletonDataAsset.blendModeMaterials.applyAdditiveMaterial = !SpineEditorUtilities.Preferences.UsesPMAWorkflow;
 					}
-
 					AssetDatabase.CreateAsset(skeletonDataAsset, filePath);
-					AssetDatabase.SaveAssets();
 				} else {
 					skeletonDataAsset.atlasAssets = atlasAssets;
 					skeletonDataAsset.Clear();
-					var skeletonData = skeletonDataAsset.GetSkeletonData(true);
-					BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonDataAsset, ref skeletonData);
 				}
+				var skeletonData = skeletonDataAsset.GetSkeletonData(true);
+				BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonDataAsset, ref skeletonData);
+				AssetDatabase.SaveAssets();
 
 				return skeletonDataAsset;
 			} else {

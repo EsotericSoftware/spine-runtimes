@@ -80,7 +80,8 @@ namespace Spine.Unity.AttachmentTools {
 		/// <param name="o">The original attachment.</param>
 		/// <param name="sprite">The sprite whose texture to use.</param>
 		/// <param name="sourceMaterial">The source material used to copy the shader and material properties from.</param>
-		/// <param name="premultiplyAlpha">If <c>true</c>, a premultiply alpha clone of the original texture will be created.</param>
+		/// <param name="premultiplyAlpha">If <c>true</c>, a premultiply alpha clone of the original texture will be created.
+		/// See remarks below for additional info.</param>
 		/// <param name="cloneMeshAsLinked">If <c>true</c> MeshAttachments will be cloned as linked meshes and will inherit animation from the original attachment.</param>
 		/// <param name="useOriginalRegionSize">If <c>true</c> the size of the original attachment will be followed, instead of using the Sprite size.</param>
 		/// <param name="pivotShiftsMeshUVCoords">If <c>true</c> and the original Attachment is a MeshAttachment, then
@@ -89,6 +90,10 @@ namespace Spine.Unity.AttachmentTools {
 		///	<param name="useOriginalRegionScale">If <c>true</c> and the original Attachment is a RegionAttachment, then
 		///	the original region's scale value is used instead of the Sprite's pixels per unit property. Since uniform scale is used,
 		///	x scale of the original attachment (width scale) is used, scale in y direction (height scale) is ignored.</param>
+		///	<remarks>When parameter <c>premultiplyAlpha</c> is set to <c>true</c>, a premultiply alpha clone of the
+		///	original texture will be created. Additionally, this PMA Texture clone is cached for later re-use,
+		///	which might steadily increase the Texture memory footprint when used excessively.
+		///	See <see cref="AtlasUtilities.ClearCache()"/> on how to clear these cached textures.</remarks>
 		public static Attachment GetRemappedClone (this Attachment o, Sprite sprite, Material sourceMaterial,
 			bool premultiplyAlpha = true, bool cloneMeshAsLinked = true, bool useOriginalRegionSize = false,
 			bool pivotShiftsMeshUVCoords = true, bool useOriginalRegionScale = false) {

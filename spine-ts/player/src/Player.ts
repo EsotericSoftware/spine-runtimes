@@ -870,7 +870,7 @@ module spine {
 				try {
 					skeletonData = json.readSkeletonData(jsonText);
 				} catch (e) {
-					this.showError("Error: could not load skeleton .json.<br><br>" + escapeHtml(JSON.stringify(e)));
+					this.showError("Error: could not load skeleton .json.<br><br>" + e.toString());
 					return;
 				}
 			} else {
@@ -879,7 +879,7 @@ module spine {
 				try {
 					skeletonData = binary.readSkeletonData(binaryData);
 				} catch (e) {
-					this.showError("Error: could not load skeleton .skel.<br><br>" + escapeHtml(JSON.stringify(e)));
+					this.showError("Error: could not load skeleton .skel.<br><br>" + e.toString());
 					return;
 				}
 			}
