@@ -304,14 +304,17 @@ module spine {
 		private loadingScreen: spine.webgl.LoadingScreen;
 		private assetManager: spine.webgl.AssetManager;
 
-		private loaded: boolean;
-		private skeleton: Skeleton;
-		private animationState: AnimationState;
-		private time = new TimeKeeper();
+		// Whether the skeleton was loaded
+		public loaded: boolean;
+		// The loaded skeleton
+		public skeleton: Skeleton;
+		// The animation state controlling the skeleton
+		public animationState: AnimationState;
+
 		private paused = true;
 		private playTime = 0;
 		private speed = 1;
-
+		private time = new TimeKeeper();
 		private animationViewports: Map<Viewport> = {}
 		private currentViewport: Viewport = null;
 		private previousViewport: Viewport = null;
@@ -1127,7 +1130,7 @@ module spine {
 			this.playButton.classList.add("spine-player-button-icon-play");
 		}
 
-		public setAnimation (animation: string) {
+		public setAnimation (animation: string, loop: boolean = true) {
 			// Determine viewport
 			this.previousViewport = this.currentViewport;
 			let animViewport = this.calculateAnimationViewport(animation);
@@ -1184,7 +1187,7 @@ module spine {
 
 			this.animationState.clearTracks();
 			this.skeleton.setToSetupPose();
-			this.animationState.setAnimation(0, animation, true);
+			this.animationState.setAnimation(0, animation, loop);
 		}
 
 		private percentageToWorldUnit(size: number, percentageOrAbsolute: string | number): number {

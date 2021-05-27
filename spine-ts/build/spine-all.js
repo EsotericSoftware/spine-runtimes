@@ -6,8 +6,6 @@ var __extends = (this && this.__extends) || (function () {
 		return extendStatics(d, b);
 	};
 	return function (d, b) {
-		if (typeof b !== "function" && b !== null)
-			throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
 		d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -11660,10 +11658,10 @@ var spine;
 	var SpinePlayer = (function () {
 		function SpinePlayer(parent, config) {
 			this.config = config;
-			this.time = new spine.TimeKeeper();
 			this.paused = true;
 			this.playTime = 0;
 			this.speed = 1;
+			this.time = new spine.TimeKeeper();
 			this.animationViewports = {};
 			this.currentViewport = null;
 			this.previousViewport = null;
@@ -12371,7 +12369,8 @@ var spine;
 			this.playButton.classList.remove("spine-player-button-icon-pause");
 			this.playButton.classList.add("spine-player-button-icon-play");
 		};
-		SpinePlayer.prototype.setAnimation = function (animation) {
+		SpinePlayer.prototype.setAnimation = function (animation, loop) {
+			if (loop === void 0) { loop = true; }
 			this.previousViewport = this.currentViewport;
 			var animViewport = this.calculateAnimationViewport(animation);
 			var viewport = {
@@ -12424,7 +12423,7 @@ var spine;
 			this.viewportTransitionStart = performance.now();
 			this.animationState.clearTracks();
 			this.skeleton.setToSetupPose();
-			this.animationState.setAnimation(0, animation, true);
+			this.animationState.setAnimation(0, animation, loop);
 		};
 		SpinePlayer.prototype.percentageToWorldUnit = function (size, percentageOrAbsolute) {
 			if (typeof percentageOrAbsolute === "string") {

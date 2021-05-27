@@ -17,6 +17,11 @@ body {
 <body>
 	<div id="container" style="width: 640px; height: 380px;"></div>
 	<div id="container-raptor" style="width: 640px; height: 380px;"></div>
+	<div>
+		<button id="walk">Walk</button>
+		<button id="jump">Jump</button>
+		<button id="roar">Roar</button>
+	</div>
 </body>
 <script>
 	// Creates a new spine player. The debugRender option enables
@@ -30,19 +35,36 @@ body {
 		viewport: {
 			debugRender: true,
 		},
-		showControls: false,
+		showControls: true,
 	});
 
 	// Creates a new spine player with a transparent background,
 	// so content from the website shines through. Hides the controls.
-	new spine.SpinePlayer("container-raptor", {
+	// Instead, the user can control the animation via buttons.
+	var jsControlledPlayer = new spine.SpinePlayer("container-raptor", {
 		jsonUrl: "assets/raptor-pro.json",
 		atlasUrl: "assets/raptor-pma.atlas",
 		animation: "walk",
 		showControls: false,
 		premultipliedAlpha: true,
 		backgroundColor: "#00000000",
-		alpha: true
+		alpha: true,
+		defaultMix: 1,
+		success: (player) => {
+			// Register button click event handlers once the
+			// skeleton has been loaded successfully
+			document.getElementById("walk").addEventListener("click", event => {
+				jsControlledPlayer.setAnimation("walk", false); // set the walk animation to play once
+			});
+
+			document.getElementById("jump").addEventListener("click", event => {
+				jsControlledPlayer.setAnimation("jump", false); // set the jump animation to play once
+			});
+
+			document.getElementById("roar").addEventListener("click", event => {
+				jsControlledPlayer.setAnimation("roar", true); // set the jump animation to loop
+			});
+		}
 	});
 </script>
 </body>

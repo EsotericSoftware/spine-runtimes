@@ -1402,7 +1402,7 @@ declare module spine.webgl {
 		static DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL: boolean;
 		constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap, useMipMaps?: boolean);
 		setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
-		static validateMagFilter(magFilter: TextureFilter): TextureFilter.Nearest | TextureFilter.Linear;
+		static validateMagFilter(magFilter: TextureFilter): TextureFilter.Nearest | TextureFilter.Linear | TextureFilter.Linear;
 		setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
 		update(useMipMaps: boolean): void;
 		restore(): void;
@@ -1947,13 +1947,13 @@ declare module spine {
 		private context;
 		private loadingScreen;
 		private assetManager;
-		private loaded;
-		private skeleton;
-		private animationState;
-		private time;
+		loaded: boolean;
+		skeleton: Skeleton;
+		animationState: AnimationState;
 		private paused;
 		private playTime;
 		private speed;
+		private time;
 		private animationViewports;
 		private currentViewport;
 		private previousViewport;
@@ -1977,7 +1977,7 @@ declare module spine {
 		setupInput(): void;
 		private play;
 		private pause;
-		setAnimation(animation: string): void;
+		setAnimation(animation: string, loop?: boolean): void;
 		private percentageToWorldUnit;
 		private calculateAnimationViewport;
 		stopRendering(): void;
