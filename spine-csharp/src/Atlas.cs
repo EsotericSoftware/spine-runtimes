@@ -68,7 +68,10 @@ namespace Spine {
 			var file = await folder.GetFileAsync(path).AsTask().ConfigureAwait(false);
 			using (var reader = new StreamReader(await file.OpenStreamForReadAsync().ConfigureAwait(false))) {
 				try {
-					Load(reader, Path.GetDirectoryName(path), textureLoader);
+					Atlas atlas = new Atlas(reader, Path.GetDirectoryName(path), textureLoader);
+					this.pages = atlas.pages;
+					this.regions = atlas.regions;
+					this.textureLoader = atlas.textureLoader;
 				} catch (Exception ex) {
 					throw new Exception("Error reading atlas file: " + path, ex);
 				}
@@ -87,7 +90,10 @@ namespace Spine {
 			using (StreamReader reader = new StreamReader(path)) {
 #endif // WINDOWS_PHONE
 				try {
-					Load(reader, Path.GetDirectoryName(path), textureLoader);
+					Atlas atlas = new Atlas(reader, Path.GetDirectoryName(path), textureLoader);
+					this.pages = atlas.pages;
+					this.regions = atlas.regions;
+					this.textureLoader = atlas.textureLoader;
 				} catch (Exception ex) {
 					throw new Exception("Error reading atlas file: " + path, ex);
 				}

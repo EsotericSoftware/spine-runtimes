@@ -95,7 +95,7 @@ namespace Spine {
 			skeletonDebugRenderer.DisableAll();
 			skeletonDebugRenderer.DrawClipping = true;
 
-			// String name = "spineboy-pro";
+			//String name = "spineboy-pro";
 			String name = "raptor-pro";
 			// String name = "tank-pro";
 			//String name = "coin-pro";
@@ -103,7 +103,7 @@ namespace Spine {
 				name = "raptor-pro"; // we only have normalmaps for raptor
 			String atlasName = name.Replace("-pro", "").Replace("-ess", "");
 
-			bool binaryData = false;
+			bool binaryData = name.Contains("spineboy");
 
 			Atlas atlas;
 			if (!useNormalmapShader) {
