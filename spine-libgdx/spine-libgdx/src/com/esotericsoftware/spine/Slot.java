@@ -105,12 +105,17 @@ public class Slot {
 		return attachment;
 	}
 
-	/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears {@link #deform}. */
+	/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears the {@link #deform}.
+	 * The deform is not cleared if the old attachment has the same {@link VertexAttachment#getDeformAttachment()} as the specified
+	 * attachment. */
 	public void setAttachment (@Null Attachment attachment) {
 		if (this.attachment == attachment) return;
+		if (!(attachment instanceof VertexAttachment) || !(this.attachment instanceof VertexAttachment)
+			|| ((VertexAttachment)attachment).getDeformAttachment() != ((VertexAttachment)this.attachment).getDeformAttachment()) {
+			deform.clear();
+		}
 		this.attachment = attachment;
 		attachmentTime = bone.skeleton.time;
-		deform.clear();
 	}
 
 	/** The time that has elapsed since the last time the attachment was set or cleared. Relies on Skeleton
