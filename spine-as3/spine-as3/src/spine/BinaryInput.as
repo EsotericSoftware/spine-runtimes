@@ -30,7 +30,7 @@
 package spine {
 	import flash.utils.ByteArray;
 	
-	class BinaryInput {
+	internal class BinaryInput {
 		private var bytes : ByteArray;	
 		public var strings : Vector.<String> = new Vector.<String>();
 		

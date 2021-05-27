@@ -511,7 +511,7 @@ package spine {
 		}
 
 		public function toString() : String {
-			return _data.name != null ? _data.name : super.toString();
+			return _data.name == null ? "null" : _data.name;
 		}
 
 		public function getBounds(offset : Vector.<Number>, size : Vector.<Number>, temp : Vector.<Number>) : void {

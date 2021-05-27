@@ -166,7 +166,7 @@ package spine {
 
 		// ---
 		public function toString() : String {
-			return name != null ? name : super.toString();
+			return name == null ? "null" : name;
 		}
 	}
 }

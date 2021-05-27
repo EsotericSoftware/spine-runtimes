@@ -126,9 +126,9 @@ package spine {
 				}
 				var b : Number = bone.data.length * sx, dd : Number = Math.sqrt(tx * tx + ty * ty);
 				if ((compress && dd < b) || (stretch && dd > b) && b > 0.0001) {
-					var s : Number = (dd / b - 1) * alpha + 1;
-					sx *= s;
-					if (uniform) sy *= s;
+					var ss : Number = (dd / b - 1) * alpha + 1;
+					sx *= ss;
+					if (uniform) sy *= ss;
 				}
 			}
 			bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY);

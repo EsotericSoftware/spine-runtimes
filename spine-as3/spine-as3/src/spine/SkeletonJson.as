@@ -96,8 +96,6 @@ package spine {
 			if (skeletonMap) {
 				skeletonData.hash = skeletonMap["hash"];
 				skeletonData.version = skeletonMap["spine"];
-				if ("3.8.75" == skeletonData.version)
-					throw new Error("Unsupported skeleton data, please export with a newer version of Spine.");
 				skeletonData.x = skeletonMap["x"] || 0;
 				skeletonData.y = skeletonMap["y"] || 0;
 				skeletonData.width = skeletonMap["width"] || 0;
@@ -126,6 +124,10 @@ package spine {
 				boneData.shearY = Number(boneMap["shearY"] || 0);
 				boneData.transformMode = TransformMode[boneMap["transform"] || "normal"];
 				boneData.skinRequired = boneMap.hasOwnProperty("skin") ? boneMap["skin"] : false;
+
+				color = boneMap["color"];
+				if (color) boneData.color.setFromString(color);
+
 				skeletonData.bones.push(boneData);
 			}
 
@@ -138,14 +140,10 @@ package spine {
 				var slotData : SlotData = new SlotData(skeletonData.slots.length, slotName, boneData);
 
 				var color : String = slotMap["color"];
-				if (color) {
-					slotData.color.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
-				}
+				if (color) slotData.color.setFromString(color);
 
 				var dark : String = slotMap["dark"];
-				if (dark) {
-					slotData.darkColor = new Color(toColor(dark, 0), toColor(dark, 1), toColor(dark, 2), 0);
-				}
+				if (dark) slotData.darkColor = Color.fromString(dark);
 
 				slotData.attachmentName = slotMap["attachment"];
 				slotData.blendMode = BlendMode[slotMap["blend"] || "normal"];
@@ -248,15 +246,16 @@ package spine {
 
 				if (skinMap["bones"]) {
 					for (ii = 0; ii < skinMap["bones"].length; ii++) {
-						var boneData : BoneData = skeletonData.findBone(skinMap["bones"][ii]);
+						boneData = skeletonData.findBone(skinMap["bones"][ii]);
 						if (boneData == null) throw new Error("Skin bone not found: " + skinMap["bones"][ii]);
 						skin.bones.push(boneData);
 					}
 				}
 
+				var constraint : ConstraintData;
 				if (skinMap["ik"]) {
 					for (ii = 0; ii < skinMap["ik"].length; ii++) {
-						var constraint : ConstraintData = skeletonData.findIkConstraint(skinMap["ik"][ii]);
+						constraint = skeletonData.findIkConstraint(skinMap["ik"][ii]);
 						if (constraint == null) throw new Error("Skin IK constraint not found: " + skinMap["ik"][ii]);
 						skin.constraints.push(constraint);
 					}
@@ -264,7 +263,7 @@ package spine {
 
 				if (skinMap["transform"]) {
 					for (ii = 0; ii < skinMap["transform"].length; ii++) {
-						var constraint : ConstraintData = skeletonData.findTransformConstraint(skinMap["transform"][ii]);
+						constraint = skeletonData.findTransformConstraint(skinMap["transform"][ii]);
 						if (constraint == null) throw new Error("Skin transform constraint not found: " + skinMap["transform"][ii]);
 						skin.constraints.push(constraint);
 					}
@@ -272,7 +271,7 @@ package spine {
 
 				if (skinMap["path"]) {
 					for (ii = 0; ii < skinMap["path"].length; ii++) {
-						var constraint : ConstraintData = skeletonData.findPathConstraint(skinMap["path"][ii]);
+						constraint = skeletonData.findPathConstraint(skinMap["path"][ii]);
 						if (constraint == null) throw new Error("Skin path constraint not found: " + skinMap["path"][ii]);
 						skin.constraints.push(constraint);
 					}
@@ -351,10 +350,10 @@ package spine {
 					region.rotation = map["rotation"] || 0;
 					region.width = Number(map["width"] || 0) * scale;
 					region.height = Number(map["height"] || 0) * scale;
+
 					color = map["color"];
-					if (color) {
-						region.color.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
-					}
+					if (color) region.color.setFromString(color);
+
 					region.updateOffset();
 					return region;
 				case AttachmentType.mesh:
@@ -362,10 +361,10 @@ package spine {
 					var mesh : MeshAttachment = attachmentLoader.newMeshAttachment(skin, name, map["path"] || name);
 					if (!mesh) return null;
 					mesh.path = map["path"] || name;
+
 					color = map["color"];
-					if (color) {
-						mesh.color.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
-					}
+					if (color) mesh.color.setFromString(color);
+
 					mesh.width = Number(map["width"] || 0) * scale;
 					mesh.height = Number(map["height"] || 0) * scale;
 					if (map["parent"]) {
@@ -405,10 +404,10 @@ package spine {
 					point.x = map.hasOwnProperty("x") ? Number(map["x"]) * scale : 0;
 					point.y = map.hasOwnProperty("y") ? Number(map["y"]) * scale : 0;
 					point.rotation = map.hasOwnProperty("rotation") ? Number(map["rotation"]) : 0;
+
 					color = map["color"];
-					if (color) {
-						point.color.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
-					}
+					if (color) point.color.setFromString(color);
+
 					return point;
 				case AttachmentType.clipping:
 					var clip : ClippingAttachment = attachmentLoader.newClippingAttachment(skin, name);
@@ -422,10 +421,10 @@ package spine {
 
 					vertexCount = int(map["vertexCount"]);
 					readVertices(map, clip, vertexCount << 1);
+
 					color = map["color"];
-					if (color) {
-						clip.color.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
-					}
+					if (color) clip.color.setFromString(color);
+
 					return clip;
 			}
 
@@ -495,12 +494,8 @@ package spine {
 
 						frameIndex = 0;
 						for each (valueMap in values) {
-							var color : String = valueMap["color"];
-							var r : Number = toColor(color, 0);
-							var g : Number = toColor(color, 1);
-							var b : Number = toColor(color, 2);
-							var a : Number = toColor(color, 3);
-							colorTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), r, g, b, a);
+							var frameColor : Color = Color.fromString(valueMap["color"]);
+							colorTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), frameColor.r, frameColor.g, frameColor.b, frameColor.a);
 							readCurve(valueMap, colorTimeline, frameIndex);
 							frameIndex++;
 						}
@@ -512,12 +507,10 @@ package spine {
 
 						frameIndex = 0;
 						for each (valueMap in values) {
-							color = valueMap["light"];
+							var color : String = valueMap["light"];
 							var darkColor : String = valueMap["dark"];
-							var light : Color = new Color(0, 0, 0, 0);
-							var dark : Color = new Color(0, 0, 0, 0);
-							light.setFrom(toColor(color, 0), toColor(color, 1), toColor(color, 2), toColor(color, 3));
-							dark.setFrom(toColor(darkColor, 0), toColor(darkColor, 1), toColor(darkColor, 2), toColor(darkColor, 3));
+							var light : Color = Color.fromString(color);
+							var dark : Color = Color.fromString(darkColor);
 							twoColorTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), light.r, light.g, light.b, light.a, dark.r, dark.g, dark.b);
 							readCurve(valueMap, twoColorTimeline, frameIndex);
 							frameIndex++;
@@ -795,11 +788,6 @@ package spine {
 				var c4: Number = map["c4"] == null ? 1 : Number(map["c4"]);
 				timeline.setCurve(frameIndex, c1, c2, c3, c4);
 			}
-		}
-
-		static private function toColor(hexString : String, colorIndex : int) : Number {
-			if (hexString.length != 8 && hexString.length != 6) throw new ArgumentError("Color hexidecimal length must be 6 or 8, received: " + hexString);
-			return parseInt(hexString.substring(colorIndex * 2, colorIndex * 2 + 2), 16) / 255;
 		}
 
 		static private function getFloatArray(map : Object, name : String, scale : Number) : Vector.<Number> {

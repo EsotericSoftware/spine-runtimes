@@ -64,6 +64,7 @@ package spine {
 		}
 
 		public function setFromString(hex : String) : Color {
+			if (hex.length != 8 && hex.length != 6) throw new ArgumentError("Hexadecimal color length must be 6 or 8: " + hex);
 			hex = hex.charAt(0) == '#' ? hex.substr(1) : hex;
 			this.r = parseInt(hex.substr(0, 2), 16) / 255.0;
 			this.g = parseInt(hex.substr(2, 2), 16) / 255.0;
@@ -107,6 +108,10 @@ package spine {
 			r = ((value & 0x00ff0000) >>> 16) / 255;
 			g = ((value & 0x0000ff00) >>> 8) / 255;
 			b = ((value & 0x000000ff)) / 255;
+		}
+
+		static public function fromString (hex : String) : Color {
+			return new Color(0, 0, 0, 0).setFromString(hex);
 		}
 	}
 }

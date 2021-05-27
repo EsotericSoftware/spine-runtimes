@@ -182,9 +182,10 @@ package spine.animation {
 				var timelineCount : int = current.animation.timelines.length;
 				var timelines : Vector.<Timeline> = current.animation.timelines;
 				var ii : int = 0;
+				var timeline : Timeline;
 				if ((i == 0 && mix == 1) || blend == MixBlend.add) {
 					for (ii = 0; ii < timelineCount; ii++) {
-						var timeline : Timeline = timelines[ii];
+						timeline = timelines[ii];
 						if (timeline is AttachmentTimeline) {
 							applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, animationTime, blend, true);
 						} else {
@@ -199,7 +200,7 @@ package spine.animation {
 					var timelinesRotation : Vector.<Number> = current.timelinesRotation;
 
 					for (ii = 0; ii < timelineCount; ii++) {
-						var timeline : Timeline = timelines[ii];
+						timeline = timelines[ii];
 						var timelineBlend : MixBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline is RotateTimeline) {
 							applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
@@ -220,8 +221,8 @@ package spine.animation {
 			// the time is before the first key).
 			var setupState : int = unkeyedState + SETUP;
 			var slots : Vector.<Slot> = skeleton.slots;
-			for (var i : int = 0, n : int = skeleton.slots.length; i < n; i++) {
-				var slot : Slot = slots[i];
+			for (var si : int = 0, sn : int = skeleton.slots.length; si < sn; si++) {
+				var slot : Slot = slots[si];
 				if (slot.attachmentState == setupState) {
 					var attachmentName : String = slot.data.attachmentName;
 					slot.attachment = (attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slot.data.index, attachmentName));
