@@ -148,11 +148,6 @@ namespace Spine.Unity {
 						break;
 					case UpdatePhase.World:
 					case UpdatePhase.Complete:
-						// Use Applied transform values (ax, ay, AppliedRotation, ascale) if world values were modified by constraints.
-						if (!bone.appliedValid) {
-							bone.UpdateAppliedTransform();
-						}
-
 						if (position)
 							thisTransform.localPosition = new Vector3(bone.ax * positionScale, bone.ay * positionScale, 0);
 

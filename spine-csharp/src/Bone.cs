@@ -47,7 +47,6 @@ namespace Spine {
 		internal ExposedList<Bone> children = new ExposedList<Bone>();
 		internal float x, y, rotation, scaleX, scaleY, shearX, shearY;
 		internal float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
-		internal bool appliedValid;
 
 		internal float a, b, worldX;
 		internal float c, d, worldY;
@@ -101,13 +100,19 @@ namespace Spine {
 		/// <summary>The applied local shearY.</summary>
 		public float AShearY { get { return ashearY; } set { ashearY = value; } }
 
-		public float A { get { return a; } }
-		public float B { get { return b; } }
-		public float C { get { return c; } }
-		public float D { get { return d; } }
+		/// <summary>Part of the world transform matrix for the X axis. If changed, <see cref="UpdateAppliedTransform()"/> should be called.</summary>
+		public float A { get { return a; } set { a = value; } }
+		/// <summary>Part of the world transform matrix for the Y axis. If changed, <see cref="UpdateAppliedTransform()"/> should be called.</summary>
+		public float B { get { return b; } set { b = value; } }
+		/// <summary>Part of the world transform matrix for the X axis. If changed, <see cref="UpdateAppliedTransform()"/> should be called.</summary>
+		public float C { get { return c; } set { c = value; } }
+		/// <summary>Part of the world transform matrix for the Y axis. If changed, <see cref="UpdateAppliedTransform()"/> should be called.</summary>
+		public float D { get { return d; } set { d = value; } }
 
-		public float WorldX { get { return worldX; } }
-		public float WorldY { get { return worldY; } }
+		/// <summary>The world X position. If changed, <see cref="UpdateAppliedTransform()"/> should be called.</summary>
+		public float WorldX { get { return worldX; } set { worldX = value; } }
+		/// <summary>The world Y position. If changed, <see cref="UpdateAppliedTransform()"/> should be called.</summary>
+		public float WorldY { get { return worldY; } set { worldY = value; } }
 		public float WorldRotationX { get { return MathUtils.Atan2(c, a) * MathUtils.RadDeg; } }
 		public float WorldRotationY { get { return MathUtils.Atan2(d, b) * MathUtils.RadDeg; } }
 
@@ -127,9 +132,9 @@ namespace Spine {
 			SetToSetupPose();
 		}
 
-		/// <summary>Same as <see cref="UpdateWorldTransform"/>. This method exists for Bone to implement <see cref="Spine.IUpdatable"/>.</summary>
+		/// <summary>Computes the world transform using the parent bone and this bone's local applied transform.</summary>
 		public void Update () {
-			UpdateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
+			UpdateWorldTransform(ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY);
 		}
 
 		/// <summary>Computes the world transform using the parent bone and this bone's local transform.</summary>
@@ -137,7 +142,11 @@ namespace Spine {
 			UpdateWorldTransform(x, y, rotation, scaleX, scaleY, shearX, shearY);
 		}
 
-		/// <summary>Computes the world transform using the parent bone and the specified local transform.</summary>
+		/// <summary>Computes the world transform using the parent bone and the specified local transform. The applied transform is set to the
+		/// specified local transform. Child bones are not updated.
+		/// <para>
+		/// See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+		/// Runtimes Guide.</para></summary>
 		public void UpdateWorldTransform (float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
 			ax = x;
 			ay = y;
@@ -146,8 +155,6 @@ namespace Spine {
 			ascaleY = scaleY;
 			ashearX = shearX;
 			ashearY = shearY;
-			appliedValid = true;
-			Skeleton skeleton = this.skeleton;
 
 			Bone parent = this.parent;
 			if (parent == null) { // Root bone.
@@ -258,13 +265,16 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Computes the individual applied transform values from the world transform. This can be useful to perform processing using
-		/// the applied transform after the world transform has been modified directly (eg, by a constraint)..
-		///
-		/// Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation.
-		/// </summary>
+		/// Computes the applied transform values from the world transform.
+		/// <para>
+		/// If the world transform is modified (by a constraint, <see cref="RotateWorld(float)"/>, etc) then this method should be called so
+		/// the applied transform matches the world transform. The applied transform may be needed by other code (eg to apply another
+		/// constraint).
+		/// </para><para>
+		///  Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The applied transform after
+		/// calling this method is equivalent to the local transform used to compute the world transform, but may not be identical.
+		/// </para></summary>
 		internal void UpdateAppliedTransform () {
-			appliedValid = true;
 			Bone parent = this.parent;
 			if (parent == null) {
 				ax = worldX;
@@ -347,9 +357,11 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Rotates the world transform the specified amount and sets isAppliedValid to false.
-		/// </summary>
-		/// <param name="degrees">Degrees.</param>
+		/// Rotates the world transform the specified amount.
+		/// <para>
+		/// After changes are made to the world transform, <see cref="UpdateAppliedTransform()"/> should be called and <see cref="Update()"/> will
+		/// need to be called on any child bones, recursively.
+		/// </para></summary>
 		public void RotateWorld (float degrees) {
 			float a = this.a, b = this.b, c = this.c, d = this.d;
 			float cos = MathUtils.CosDeg(degrees), sin = MathUtils.SinDeg(degrees);
@@ -357,7 +369,6 @@ namespace Spine {
 			this.b = cos * b - sin * d;
 			this.c = sin * a + cos * c;
 			this.d = sin * b + cos * d;
-			appliedValid = false;
 		}
 
 		override public string ToString () {

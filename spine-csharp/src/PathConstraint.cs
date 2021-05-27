@@ -216,7 +216,7 @@ namespace Spine {
 					bone.c = sin * a + cos * c;
 					bone.d = sin * b + cos * d;
 				}
-				bone.appliedValid = false;
+				bone.UpdateAppliedTransform();
 			}
 		}
 

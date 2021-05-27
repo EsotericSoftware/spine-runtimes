@@ -160,7 +160,6 @@ namespace Spine {
 		static public void Apply (Bone bone, float targetX, float targetY, bool compress, bool stretch, bool uniform,
 								float alpha) {
 			if (bone == null) throw new ArgumentNullException("bone", "bone cannot be null.");
-			if (!bone.appliedValid) bone.UpdateAppliedTransform();
 			Bone p = bone.parent;
 
 			float pa = p.a, pb = p.b, pc = p.c, pd = p.d;
@@ -222,8 +221,6 @@ namespace Spine {
 			float softness, float alpha) {
 			if (parent == null) throw new ArgumentNullException("parent", "parent cannot be null.");
 			if (child == null) throw new ArgumentNullException("child", "child cannot be null.");
-			if (!parent.appliedValid) parent.UpdateAppliedTransform();
-			if (!child.appliedValid) child.UpdateAppliedTransform();
 			float px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, sx = psx, sy = psy, csx = child.ascaleX;
 			int os1, os2, s2;
 			if (psx < 0) {

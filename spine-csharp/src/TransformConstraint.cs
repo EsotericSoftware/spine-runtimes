@@ -157,7 +157,7 @@ namespace Spine {
 					bone.d = MathUtils.Sin(r) * s;
 				}
 
-				bone.appliedValid = false;
+				bone.UpdateAppliedTransform();
 			}
 		}
 
@@ -221,7 +221,7 @@ namespace Spine {
 					bone.d = MathUtils.Sin(r) * s;
 				}
 
-				bone.appliedValid = false;
+				bone.UpdateAppliedTransform();
 			}
 		}
 
@@ -230,12 +230,10 @@ namespace Spine {
 			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 
 			Bone target = this.target;
-			if (!target.appliedValid) target.UpdateAppliedTransform();
 
 			var bones = this.bones.Items;
 			for (int i = 0, n = this.bones.Count; i < n; i++) {
 				Bone bone = bones[i];
-				if (!bone.appliedValid) bone.UpdateAppliedTransform();
 
 				float rotation = bone.arotation;
 				if (mixRotate != 0) {
@@ -270,12 +268,10 @@ namespace Spine {
 			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 
 			Bone target = this.target;
-			if (!target.appliedValid) target.UpdateAppliedTransform();
 
 			var bones = this.bones.Items;
 			for (int i = 0, n = this.bones.Count; i < n; i++) {
 				Bone bone = bones[i];
-				if (!bone.appliedValid) bone.UpdateAppliedTransform();
 
 				float rotation = bone.arotation + (target.arotation + data.offsetRotation) * mixRotate;
 				float x = bone.ax + (target.ax + data.offsetX) * mixX;

@@ -316,6 +316,18 @@ namespace Spine {
 		/// Runtimes Guide.</para>
 		/// </summary>
 		public void UpdateWorldTransform () {
+			Object[] bones = this.bones.Items;
+			for (int i = 0, n = this.bones.Count; i < n; i++) {
+				Bone bone = (Bone)bones[i];
+				bone.ax = bone.x;
+				bone.ay = bone.y;
+				bone.arotation = bone.rotation;
+				bone.ascaleX = bone.scaleX;
+				bone.ascaleY = bone.scaleY;
+				bone.ashearX = bone.shearX;
+				bone.ashearY = bone.shearY;
+			}
+
 			var updateCache = this.updateCache.Items;
 			for (int i = 0, n = this.updateCache.Count; i < n; i++)
 				updateCache[i].Update();
