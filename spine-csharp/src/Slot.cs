@@ -135,14 +135,18 @@ namespace Spine {
 			/// <summary>The current attachment for the slot, or null if the slot has no attachment.</summary>
 			get { return attachment; }
 			/// <summary>
-			/// Sets the slot's attachment and, if the attachment changed, resets <see cref="AttachmentTime"/> and clears
-			/// <see cref="Deform">.</summary>
+			/// Sets the slot's attachment and, if the attachment changed, resets <see cref="AttachmentTime"/> and clears the <see cref="Deform"/>.
+			/// The deform is not cleared if the old attachment has the same <see cref="VertexAttachment.DeformAttachment"/> as the specified
+			/// attachment.</summary>
 			/// <param name="value">May be null.</param>
 			set {
 				if (attachment == value) return;
-				attachment = value;
+				if (!(value is VertexAttachment) || !(this.attachment is VertexAttachment)
+					|| ((VertexAttachment)value).DeformAttachment != ((VertexAttachment)this.attachment).DeformAttachment) {
+					deform.Clear();
+				}
+				this.attachment = value;
 				attachmentTime = bone.skeleton.time;
-				deform.Clear(false);
 			}
 		}
 
