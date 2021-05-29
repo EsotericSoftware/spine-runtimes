@@ -1003,8 +1003,8 @@ module spine {
 			timeline.setBezier(bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
 		}
 
-		getValue (map: any, prop: string, defaultValue: any) {
-			return map[prop] !== undefined ? map[prop] : defaultValue;
+		getValue (map: any, property: string, defaultValue: any) {
+			return map[property] !== undefined ? map[property] : defaultValue;
 		}
 
 		static blendModeFromString (str: string) {

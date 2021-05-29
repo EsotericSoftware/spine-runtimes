@@ -69,11 +69,6 @@ package spine {
 			this.attachmentLoader = attachmentLoader;
 		}
 
-		private function getFloatValue(object : Object, key: String, defaultValue : Number) : Number {;
-			var hasKey : Boolean = object.hasOwnProperty(key);
-			return hasKey ? Number(object[key]) : defaultValue;
-		}
-
 		/** @param object A String or ByteArray. */
 		public function readSkeletonData(object : *, name : String = null) : SkeletonData {
 			if (object == null) throw new ArgumentError("object cannot be null.");
@@ -118,12 +113,12 @@ package spine {
 				boneData.x = Number(boneMap["x"] || 0) * scale;
 				boneData.y = Number(boneMap["y"] || 0) * scale;
 				boneData.rotation = (boneMap["rotation"] || 0);
-				boneData.scaleX = boneMap.hasOwnProperty("scaleX") ? boneMap["scaleX"] : 1;
-				boneData.scaleY = boneMap.hasOwnProperty("scaleY") ? boneMap["scaleY"] : 1;
+				boneData.scaleX = getNumber(boneMap, "scaleX", 1);
+				boneData.scaleY = getNumber(boneMap, "scaleY", 1);
 				boneData.shearX = Number(boneMap["shearX"] || 0);
 				boneData.shearY = Number(boneMap["shearY"] || 0);
 				boneData.transformMode = TransformMode[boneMap["transform"] || "normal"];
-				boneData.skinRequired = boneMap.hasOwnProperty("skin") ? boneMap["skin"] : false;
+				boneData.skinRequired = getValue(boneMap, "skin", false);
 
 				color = boneMap["color"];
 				if (color) boneData.color.setFromString(color);
@@ -154,7 +149,7 @@ package spine {
 			for each (var constraintMap : Object in root["ik"]) {
 				var ikConstraintData : IkConstraintData = new IkConstraintData(constraintMap["name"]);
 				ikConstraintData.order = constraintMap["order"] || 0;
-				ikConstraintData.skinRequired = constraintMap.hasOwnProperty("skin") ? constraintMap["skin"] : false;
+				ikConstraintData.skinRequired = getValue(constraintMap, "skin", false);
 
 				for each (boneName in constraintMap["bones"]) {
 					var bone : BoneData = skeletonData.findBone(boneName);
@@ -166,11 +161,11 @@ package spine {
 				if (!ikConstraintData.target) throw new Error("Target bone not found: " + constraintMap["target"]);
 
 				ikConstraintData.bendDirection = (!constraintMap.hasOwnProperty("bendPositive") || constraintMap["bendPositive"]) ? 1 : -1;
-				ikConstraintData.compress = (constraintMap.hasOwnProperty("compress") && constraintMap["compress"]);
-				ikConstraintData.stretch = (constraintMap.hasOwnProperty("stretch") && constraintMap["stretch"]);
-				ikConstraintData.uniform = (constraintMap.hasOwnProperty("uniform") && constraintMap["uniform"]);
-				ikConstraintData.softness = (constraintMap.hasOwnProperty("softness") ? constraintMap["softness"] : 0) * scale;
-				ikConstraintData.mix = constraintMap.hasOwnProperty("mix") ? constraintMap["mix"] : 1;
+				ikConstraintData.compress = getValue(constraintMap, "compress", false);
+				ikConstraintData.stretch = getValue(constraintMap, "stretch", false);
+				ikConstraintData.uniform = getValue(constraintMap, "uniform", false);
+				ikConstraintData.softness = getNumber(constraintMap, "softness", 0) * scale;
+				ikConstraintData.mix = getNumber(constraintMap, "mix", 1);
 
 				skeletonData.ikConstraints.push(ikConstraintData);
 			}
@@ -179,7 +174,7 @@ package spine {
 			for each (constraintMap in root["transform"]) {
 				var transformConstraintData : TransformConstraintData = new TransformConstraintData(constraintMap["name"]);
 				transformConstraintData.order = constraintMap["order"] || 0;
-				transformConstraintData.skinRequired = constraintMap.hasOwnProperty("skin") ? constraintMap["skin"] : false;
+				transformConstraintData.skinRequired = getValue(constraintMap, "skin", false);
 
 				for each (boneName in constraintMap["bones"]) {
 					bone = skeletonData.findBone(boneName);
@@ -190,8 +185,8 @@ package spine {
 				transformConstraintData.target = skeletonData.findBone(constraintMap["target"]);
 				if (!transformConstraintData.target) throw new Error("Target bone not found: " + constraintMap["target"]);
 
-				transformConstraintData.local = constraintMap.hasOwnProperty("local") ? Boolean(constraintMap["local"]) : false;
-				transformConstraintData.relative = constraintMap.hasOwnProperty("relative") ? Boolean(constraintMap["relative"]) : false;
+				transformConstraintData.local = getValue(constraintMap, "local", false);
+				transformConstraintData.relative = getValue(constraintMap, "relative", false);
 
 				transformConstraintData.offsetRotation = Number(constraintMap["rotation"] || 0);
 				transformConstraintData.offsetX = Number(constraintMap["x"] || 0) * scale;
@@ -200,10 +195,10 @@ package spine {
 				transformConstraintData.offsetScaleY = Number(constraintMap["scaleY"] || 0);
 				transformConstraintData.offsetShearY = Number(constraintMap["shearY"] || 0);
 
-				transformConstraintData.rotateMix = constraintMap.hasOwnProperty("rotateMix") ? constraintMap["rotateMix"] : 1;
-				transformConstraintData.translateMix = constraintMap.hasOwnProperty("translateMix") ? constraintMap["translateMix"] : 1;
-				transformConstraintData.scaleMix = constraintMap.hasOwnProperty("scaleMix") ? constraintMap["scaleMix"] : 1;
-				transformConstraintData.shearMix = constraintMap.hasOwnProperty("shearMix") ? constraintMap["shearMix"] : 1;
+				transformConstraintData.rotateMix = getNumber(constraintMap, "rotateMix", 1);
+				transformConstraintData.translateMix = getNumber(constraintMap, "translateMix", 1);
+				transformConstraintData.scaleMix = getNumber(constraintMap, "scaleMix", 1);
+				transformConstraintData.shearMix = getNumber(constraintMap, "shearMix", 1);
 
 				skeletonData.transformConstraints.push(transformConstraintData);
 			}
@@ -212,7 +207,7 @@ package spine {
 			for each (constraintMap in root["path"]) {
 				var pathConstraintData : PathConstraintData = new PathConstraintData(constraintMap["name"]);
 				pathConstraintData.order = constraintMap["order"] || 0;
-				pathConstraintData.skinRequired = constraintMap.hasOwnProperty("skin") ? constraintMap["skin"] : false;
+				pathConstraintData.skinRequired = getValue(constraintMap, "skin", false);
 
 				for each (boneName in constraintMap["bones"]) {
 					bone = skeletonData.findBone(boneName);
@@ -231,8 +226,8 @@ package spine {
 				if (pathConstraintData.positionMode == PositionMode.fixed) pathConstraintData.position *= scale;
 				pathConstraintData.spacing = Number(constraintMap["spacing"] || 0);
 				if (pathConstraintData.spacingMode == SpacingMode.length || pathConstraintData.spacingMode == SpacingMode.fixed) pathConstraintData.spacing *= scale;
-				pathConstraintData.rotateMix = constraintMap.hasOwnProperty("rotateMix") ? constraintMap["rotateMix"] : 1;
-				pathConstraintData.translateMix = constraintMap.hasOwnProperty("translateMix") ? constraintMap["translateMix"] : 1;
+				pathConstraintData.rotateMix = getNumber(constraintMap, "rotateMix", 1);
+				pathConstraintData.translateMix = getNumber(constraintMap, "translateMix", 1);
 
 				skeletonData.pathConstraints.push(pathConstraintData);
 			}
@@ -345,8 +340,8 @@ package spine {
 					region.path = map["path"] || name;
 					region.x = Number(map["x"] || 0) * scale;
 					region.y = Number(map["y"] || 0) * scale;
-					region.scaleX = map.hasOwnProperty("scaleX") ? map["scaleX"] : 1;
-					region.scaleY = map.hasOwnProperty("scaleY") ? map["scaleY"] : 1;
+					region.scaleX = getNumber(map, "scaleX", 1);
+					region.scaleY = getNumber(map, "scaleY", 1);
 					region.rotation = map["rotation"] || 0;
 					region.width = Number(map["width"] || 0) * scale;
 					region.height = Number(map["height"] || 0) * scale;
@@ -368,7 +363,7 @@ package spine {
 					mesh.width = Number(map["width"] || 0) * scale;
 					mesh.height = Number(map["height"] || 0) * scale;
 					if (map["parent"]) {
-						var inheritDeform : Boolean = map.hasOwnProperty("deform") ? Boolean(map["deform"]) : true;
+						var inheritDeform : Boolean = getValue(map, "deform", true);
 						linkedMeshes.push(new LinkedMesh(mesh, map["skin"], slotIndex, map["parent"], inheritDeform));
 						return mesh;
 					}
@@ -388,8 +383,8 @@ package spine {
 				case AttachmentType.path:
 					var path : PathAttachment = attachmentLoader.newPathAttachment(skin, name);
 					if (!path) return null;
-					path.closed = map.hasOwnProperty("closed") ? Boolean(map["closed"]) : false;
-					path.constantSpeed = map.hasOwnProperty("constantSpeed") ? Boolean(map["constantSpeed"]) : true;
+					path.closed = getValue(map, "closed", false);
+					path.constantSpeed = getValue(map, "constantSpeed", true);
 					var vertexCount : int = int(map["vertexCount"]);
 					readVertices(map, path, vertexCount << 1);
 					var lengths : Vector.<Number> = new Vector.<Number>();
@@ -401,9 +396,9 @@ package spine {
 				case AttachmentType.point:
 					var point : PointAttachment = attachmentLoader.newPointAttachment(skin, name);
 					if (!point) return null;
-					point.x = map.hasOwnProperty("x") ? Number(map["x"]) * scale : 0;
-					point.y = map.hasOwnProperty("y") ? Number(map["y"]) * scale : 0;
-					point.rotation = map.hasOwnProperty("rotation") ? Number(map["rotation"]) : 0;
+					point.x = getNumber(map, "x", 0) * scale;
+					point.y = getNumber(map, "y", 0) * scale;
+					point.rotation = getNumber(map, "rotation", 0);
 
 					color = map["color"];
 					if (color) point.color.setFromString(color);
@@ -559,8 +554,8 @@ package spine {
 
 						frameIndex = 0;
 						for each (valueMap in values) {
-							var x : Number = getFloatValue(valueMap, "x", defaultValue) * timelineScale;
-							var y : Number = getFloatValue(valueMap, "y", defaultValue) * timelineScale;
+							var x : Number = getNumber(valueMap, "x", defaultValue) * timelineScale;
+							var y : Number = getNumber(valueMap, "y", defaultValue) * timelineScale;
 							translateTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), x, y);
 							readCurve(valueMap, translateTimeline, frameIndex);
 							frameIndex++;
@@ -580,11 +575,11 @@ package spine {
 				ikTimeline.ikConstraintIndex = skeletonData.ikConstraints.indexOf(ikConstraint);
 				frameIndex = 0;
 				for each (valueMap in values) {
-					var mix : Number = valueMap.hasOwnProperty("mix") ? valueMap["mix"] : 1;
+					var mix : Number = getNumber(valueMap, "mix", 1);
 					var bendDirection : int = (!valueMap.hasOwnProperty("bendPositive") || valueMap["bendPositive"]) ? 1 : -1;
-					var compress : Boolean = (valueMap.hasOwnProperty("compress") && valueMap["compress"]);
-					var stretch : Boolean = (valueMap.hasOwnProperty("stretch") && valueMap["stretch"]);
-					var softness : Number = (valueMap.hasOwnProperty("softness") ? valueMap["softness"] : 0) * scale;
+					var compress : Boolean = getValue(valueMap, "compress", false);
+					var stretch : Boolean = getValue(valueMap, "stretch", false);
+					var softness : Number = getNumber(valueMap, "softness", 0) * scale;
 					ikTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), mix, softness, bendDirection, compress, stretch);
 					readCurve(valueMap, ikTimeline, frameIndex);
 					frameIndex++;
@@ -601,10 +596,10 @@ package spine {
 				transformTimeline.transformConstraintIndex = skeletonData.transformConstraints.indexOf(transformConstraint);
 				frameIndex = 0;
 				for each (valueMap in values) {
-					var rotateMix : Number = valueMap.hasOwnProperty("rotateMix") ? valueMap["rotateMix"] : 1;
-					var translateMix : Number = valueMap.hasOwnProperty("translateMix") ? valueMap["translateMix"] : 1;
-					var scaleMix : Number = valueMap.hasOwnProperty("scaleMix") ? valueMap["scaleMix"] : 1;
-					var shearMix : Number = valueMap.hasOwnProperty("shearMix") ? valueMap["shearMix"] : 1;
+					var rotateMix : Number = getNumber(valueMap, "rotateMix", 1);
+					var translateMix : Number = getNumber(valueMap, "translateMix", 1);
+					var scaleMix : Number = getNumber(valueMap, "scaleMix", 1);
+					var shearMix : Number = getNumber(valueMap, "shearMix", 1);
 					transformTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), rotateMix, translateMix, scaleMix, shearMix);
 					readCurve(valueMap, transformTimeline, frameIndex);
 					frameIndex++;
@@ -649,8 +644,8 @@ package spine {
 						pathMixTimeline.pathConstraintIndex = index;
 						frameIndex = 0;
 						for each (valueMap in values) {
-							rotateMix = valueMap.hasOwnProperty("rotateMix") ? valueMap["rotateMix"] : 1;
-							translateMix = valueMap.hasOwnProperty("translateMix") ? valueMap["translateMix"] : 1;
+							rotateMix = getNumber(valueMap, "rotateMix", 1);
+							translateMix = getNumber(valueMap, "translateMix", 1);
 							pathMixTimeline.setFrame(frameIndex, Number(valueMap["time"] || 0), rotateMix, translateMix);
 							readCurve(valueMap, pathMixTimeline, frameIndex);
 							frameIndex++;
@@ -760,12 +755,12 @@ package spine {
 					var eventData : EventData = skeletonData.findEvent(eventMap["name"]);
 					if (!eventData) throw new Error("Event not found: " + eventMap["name"]);
 					var event : Event = new Event(Number(eventMap["time"] || 0), eventData);
-					event.intValue = eventMap.hasOwnProperty("int") ? eventMap["int"] : eventData.intValue;
-					event.floatValue = eventMap.hasOwnProperty("float") ? eventMap["float"] : eventData.floatValue;
-					event.stringValue = eventMap.hasOwnProperty("string") ? eventMap["string"] : eventData.stringValue;
+					event.intValue = getNumber(eventMap, "int", eventData.intValue);
+					event.floatValue = getNumber(eventMap, "float", eventData.floatValue);
+					event.stringValue = String(getValue(eventMap, "string", eventData.stringValue));
 					if (eventData.audioPath != null) {
-						event.volume = eventMap.hasOwnProperty("volume") ? eventMap["volume"] : 1;
-						event.balance = eventMap.hasOwnProperty("balance") ? eventMap["balance"] : 0;
+						event.volume = getNumber(eventMap, "volume", 1);
+						event.balance = getNumber(eventMap, "balance", 0);
 					}
 					eventTimeline.setFrame(frameIndex++, event);
 				}
@@ -788,6 +783,14 @@ package spine {
 				var c4: Number = map["c4"] == null ? 1 : Number(map["c4"]);
 				timeline.setCurve(frameIndex, c1, c2, c3, c4);
 			}
+		}
+
+		static private function getValue(map : Object, property : String, defaultValue : Object) : Object {
+			return map.hasOwnProperty(property) ? map[property] : defaultValue;
+		}
+
+		static private function getNumber(map : Object, property : String, defaultValue : Number) : Number {
+			return map.hasOwnProperty(property) ? Number(map[property]) : defaultValue;
 		}
 
 		static private function getFloatArray(map : Object, name : String, scale : Number) : Vector.<Number> {
