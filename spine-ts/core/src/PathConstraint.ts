@@ -99,58 +99,58 @@ module spine {
 			let spacing = this.spacing;
 
 			switch (data.spacingMode) {
-				case SpacingMode.Percent:
-					if (scale) {
-						for (let i = 0, n = spacesCount - 1; i < n; i++) {
-							let bone = bones[i];
-							let setupLength = bone.data.length;
-							if (setupLength < PathConstraint.epsilon)
-								lengths[i] = 0;
-							else {
-								let x = setupLength * bone.a, y = setupLength * bone.c;
-								lengths[i] = Math.sqrt(x * x + y * y);
-							}
-						}
-					}
-					Utils.arrayFill(spaces, 1, spacesCount, spacing);
-					break;
-				case SpacingMode.Proportional:
-					let sum = 0;
-					for (let i = 0; i < boneCount;) {
+			case SpacingMode.Percent:
+				if (scale) {
+					for (let i = 0, n = spacesCount - 1; i < n; i++) {
 						let bone = bones[i];
 						let setupLength = bone.data.length;
-						if (setupLength < PathConstraint.epsilon) {
-							if (scale) lengths[i] = 0;
-							spaces[++i] = spacing;
-						} else {
+						if (setupLength < PathConstraint.epsilon)
+							lengths[i] = 0;
+						else {
 							let x = setupLength * bone.a, y = setupLength * bone.c;
-							let length = Math.sqrt(x * x + y * y);
-							if (scale) lengths[i] = length;
-							spaces[++i] = length;
-							sum += length;
+							lengths[i] = Math.sqrt(x * x + y * y);
 						}
 					}
-					if (sum > 0) {
-						sum = spacesCount / sum * spacing;
-						for (let i = 1; i < spacesCount; i++)
-							spaces[i] *= sum;
+				}
+				Utils.arrayFill(spaces, 1, spacesCount, spacing);
+				break;
+			case SpacingMode.Proportional:
+				let sum = 0;
+				for (let i = 0; i < boneCount;) {
+					let bone = bones[i];
+					let setupLength = bone.data.length;
+					if (setupLength < PathConstraint.epsilon) {
+						if (scale) lengths[i] = 0;
+						spaces[++i] = spacing;
+					} else {
+						let x = setupLength * bone.a, y = setupLength * bone.c;
+						let length = Math.sqrt(x * x + y * y);
+						if (scale) lengths[i] = length;
+						spaces[++i] = length;
+						sum += length;
 					}
-					break;
-				default:
-					let lengthSpacing = data.spacingMode == SpacingMode.Length;
-					for (let i = 0, n = spacesCount - 1; i < n;) {
-						let bone = bones[i];
-						let setupLength = bone.data.length;
-						if (setupLength < PathConstraint.epsilon) {
-							if (scale) lengths[i] = 0;
-							spaces[++i] = spacing;
-						} else {
-							let x = setupLength * bone.a, y = setupLength * bone.c;
-							let length = Math.sqrt(x * x + y * y);
-							if (scale) lengths[i] = length;
-							spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
-						}
+				}
+				if (sum > 0) {
+					sum = spacesCount / sum * spacing;
+					for (let i = 1; i < spacesCount; i++)
+						spaces[i] *= sum;
+				}
+				break;
+			default:
+				let lengthSpacing = data.spacingMode == SpacingMode.Length;
+				for (let i = 0, n = spacesCount - 1; i < n;) {
+					let bone = bones[i];
+					let setupLength = bone.data.length;
+					if (setupLength < PathConstraint.epsilon) {
+						if (scale) lengths[i] = 0;
+						spaces[++i] = spacing;
+					} else {
+						let x = setupLength * bone.a, y = setupLength * bone.c;
+						let length = Math.sqrt(x * x + y * y);
+						if (scale) lengths[i] = length;
+						spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
 					}
+				}
 			}
 
 			let positions = this.computeWorldPositions(<PathAttachment>attachment, spacesCount, tangents);

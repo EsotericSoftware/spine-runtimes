@@ -243,7 +243,7 @@ module spine {
 
 					for (let ii = 0; ii < timelineCount; ii++) {
 						let timeline = timelines[ii];
-						let timelineBlend = timelineMode[ii]  == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
+						let timelineBlend = timelineMode[ii] == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline instanceof RotateTimeline) {
 							this.applyRotateTimeline(timeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
 						} else if (timeline instanceof AttachmentTimeline) {
@@ -293,19 +293,16 @@ module spine {
 				if (blend != MixBlend.first) blend = from.mixBlend;
 			}
 
-
 			let attachments = mix < from.attachmentThreshold, drawOrder = mix < from.drawOrderThreshold;
 			let timelineCount = from.animation.timelines.length;
 			let timelines = from.animation.timelines;
 			let alphaHold = from.alpha * to.interruptAlpha, alphaMix = alphaHold * (1 - mix);
 			let animationLast = from.animationLast, animationTime = from.getAnimationTime(), applyTime = animationTime;
 			let events = null;
-			// let events = mix < from.eventThreshold ? this.events : null;
-			if (from.reverse) {
+			if (from.reverse)
 				applyTime = from.animation.duration - applyTime;
-			} else {
-				if  (mix < from.eventThreshold) events = this.events;
-			}
+			else if (mix < from.eventThreshold)
+				events = this.events;
 
 			if (blend == MixBlend.add) {
 				for (let i = 0; i < timelineCount; i++)
@@ -373,7 +370,6 @@ module spine {
 		}
 
 		applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, blend: MixBlend, attachments: boolean) {
-
 			var slot = skeleton.slots[timeline.slotIndex];
 			if (!slot.bone.active) return;
 
@@ -381,9 +377,8 @@ module spine {
 			if (time < frames[0]) { // Time is before first frame.
 				if (blend == MixBlend.setup || blend == MixBlend.first)
 					this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
-			}
-			else
-				this.setAttachment(skeleton, slot, timeline.attachmentNames[Animation.search(frames, time)], attachments);
+			} else
+				this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search(frames, time)], attachments);
 
 			// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
 			if (slot.attachmentState <= this.unkeyedState) slot.attachmentState = this.unkeyedState + AnimationState.SETUP;
@@ -393,7 +388,6 @@ module spine {
 			slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName));
 			if (attachments) slot.attachmentState = this.unkeyedState + AnimationState.CURRENT;
 		}
-
 
 		applyRotateTimeline (timeline: Timeline, skeleton: Skeleton, time: number, alpha: number, blend: MixBlend,
 			timelinesRotation: Array<number>, i: number, firstFrame: boolean) {
@@ -555,7 +549,7 @@ module spine {
 
 		/** Sets an animation by name.
 	 	*
-	 	* {@link #setAnimationWith(}. */
+	 	* See {@link #setAnimationWith()}. */
 		setAnimation (trackIndex: number, animationName: string, loop: boolean) {
 			let animation = this.data.skeletonData.findAnimation(animationName);
 			if (animation == null) throw new Error("Animation not found: " + animationName);
@@ -756,13 +750,12 @@ module spine {
 			let timelinesCount = entry.animation.timelines.length;
 			let timelineMode = Utils.setArraySize(entry.timelineMode, timelinesCount);
 			entry.timelineHoldMix.length = 0;
-			let timelineDipMix = Utils.setArraySize(entry.timelineHoldMix, timelinesCount);
+			let timelineHoldMix = Utils.setArraySize(entry.timelineHoldMix, timelinesCount);
 			let propertyIDs = this.propertyIDs;
 
 			if (to != null && to.holdPrevious) {
-				for (let i = 0; i < timelinesCount; i++) {
+				for (let i = 0; i < timelinesCount; i++)
 					timelineMode[i] = propertyIDs.addAll(timelines[i].getPropertyIds()) ? AnimationState.HOLD_FIRST : AnimationState.HOLD_SUBSEQUENT;
-				}
 				return;
 			}
 
@@ -780,7 +773,7 @@ module spine {
 						if (next.animation.hasTimeline(ids)) continue;
 						if (entry.mixDuration > 0) {
 							timelineMode[i] = AnimationState.HOLD_MIX;
-							timelineDipMix[i] = next;
+							timelineHoldMix[i] = next;
 							continue outer;
 						}
 						break;
@@ -980,8 +973,8 @@ module spine {
 		timelinesRotation = new Array<number>();
 
 		reset () {
-			this.previous = null;
 			this.next = null;
+			this.previous = null;
 			this.mixingFrom = null;
 			this.mixingTo = null;
 			this.animation = null;

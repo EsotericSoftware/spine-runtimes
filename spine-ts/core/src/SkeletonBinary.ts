@@ -509,7 +509,7 @@ module spine {
 		}
 
 		private readAnimation (input: BinaryInput, name: string, skeletonData: SkeletonData): Animation {
-			let numTimelines = input.readInt(true);
+			input.readInt(true); // Number of timelines.
 			let timelines = new Array<Timeline>();
 			let scale = this.scale;
 			let tempColor1 = new Color();
@@ -839,8 +839,7 @@ module spine {
 								data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
 						break;
 					case SkeletonBinary.PATH_MIX:
-						let timeline = new PathConstraintMixTimeline(input.readInt(true), input.readInt(true),
-							index);
+						let timeline = new PathConstraintMixTimeline(input.readInt(true), input.readInt(true), index);
 						let time = input.readFloat(), mixRotate = input.readFloat(), mixX = input.readFloat(), mixY = input.readFloat();
 						for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
 							timeline.setFrame(frame, time, mixRotate, mixX, mixY);
@@ -855,7 +854,6 @@ module spine {
 								SkeletonBinary.setBezier(input, timeline, bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
 								SkeletonBinary.setBezier(input, timeline, bezier++, frame, 1, time, time2, mixX, mixX2, 1);
 								SkeletonBinary.setBezier(input, timeline, bezier++, frame, 2, time, time2, mixY, mixY2, 1);
-
 							}
 							time = time2;
 							mixRotate = mixRotate2;
@@ -979,11 +977,11 @@ module spine {
 
 			let duration = 0;
 			for (let i = 0, n = timelines.length; i < n; i++)
-				duration = Math.max(duration, (timelines[i]).getDuration());
+				duration = Math.max(duration, timelines[i].getDuration());
 			return new Animation(name, timelines, duration);
 		}
 
-		static readTimeline (input: BinaryInput, timeline: CurveTimeline1, scale: number): Timeline {
+		static readTimeline (input: BinaryInput, timeline: CurveTimeline1, scale: number): CurveTimeline1 {
 			let time = input.readFloat(), value = input.readFloat() * scale;
 			for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
 				timeline.setFrame(frame, time, value);
@@ -1002,7 +1000,7 @@ module spine {
 			return timeline;
 		}
 
-		static readTimeline2 (input: BinaryInput, timeline: CurveTimeline2, scale: number): Timeline {
+		static readTimeline2 (input: BinaryInput, timeline: CurveTimeline2, scale: number): CurveTimeline2 {
 			let time = input.readFloat(), value1 = input.readFloat() * scale, value2 = input.readFloat() * scale;
 			for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
 				timeline.setFrame(frame, time, value1, value2);
@@ -1013,8 +1011,8 @@ module spine {
 					timeline.setStepped(frame);
 					break;
 				case SkeletonBinary.CURVE_BEZIER:
-					this.setBezier(input, timeline, bezier++, frame, 0, time, time2, value1, nvalue1, scale);
-					this.setBezier(input, timeline, bezier++, frame, 1, time, time2, value2, nvalue2, scale);
+					SkeletonBinary.setBezier(input, timeline, bezier++, frame, 0, time, time2, value1, nvalue1, scale);
+					SkeletonBinary.setBezier(input, timeline, bezier++, frame, 1, time, time2, value2, nvalue2, scale);
 				}
 				time = time2;
 				value1 = nvalue1;
@@ -1023,7 +1021,8 @@ module spine {
 			return timeline;
 		}
 
-		static setBezier (input: BinaryInput, timeline: CurveTimeline, bezier: number, frame: number, value: number, time1: number, time2: number, value1: number, value2: number, scale: number) {
+		static setBezier (input: BinaryInput, timeline: CurveTimeline, bezier: number, frame: number, value: number,
+			time1: number, time2: number, value1: number, value2: number, scale: number) {
 			timeline.setBezier(bezier, frame, value, time1, value1, input.readFloat(), input.readFloat() * scale, input.readFloat(), input.readFloat() * scale, time2, value2);
 		}
 	}

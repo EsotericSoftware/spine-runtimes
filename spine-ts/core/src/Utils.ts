@@ -61,21 +61,22 @@ module spine {
 		add (value: string): boolean {
 			let contains = this.entries[value];
 			this.entries[value] = true;
-			if (!contains) this.size++;
-			return contains != true;
+			if (!contains) {
+				this.size++;
+				return true;
+			}
+			return false;
 		}
 
 		addAll (values: string[]): boolean {
 			let oldSize = this.size;
-			for (var i = 0, n = values.length; i < n; i++) {
+			for (var i = 0, n = values.length; i < n; i++)
 				this.add(values[i]);
-			}
 			return oldSize != this.size;
 		}
 
 		contains (value: string) {
-			let contains = this.entries[value];
-			return contains == true;
+			return this.entries[value];
 		}
 
 		clear () {
@@ -280,22 +281,22 @@ module spine {
 		}
 
 		static newFloatArray (size: number): ArrayLike<number> {
-			if (Utils.SUPPORTS_TYPED_ARRAYS) {
+			if (Utils.SUPPORTS_TYPED_ARRAYS)
 				return new Float32Array(size)
-			} else {
-				 let array = new Array<number>(size);
-				 for (let i = 0; i < array.length; i++) array[i] = 0;
-				 return array;
+			else {
+				let array = new Array<number>(size);
+				for (let i = 0; i < array.length; i++) array[i] = 0;
+				return array;
 			}
 		}
 
 		static newShortArray (size: number): ArrayLike<number> {
-			if (Utils.SUPPORTS_TYPED_ARRAYS) {
+			if (Utils.SUPPORTS_TYPED_ARRAYS)
 				return new Int16Array(size)
-			} else {
-				 let array = new Array<number>(size);
-				 for (let i = 0; i < array.length; i++) array[i] = 0;
-				 return array;
+			else {
+				let array = new Array<number>(size);
+				for (let i = 0; i < array.length; i++) array[i] = 0;
+				return array;
 			}
 		}
 
@@ -313,9 +314,8 @@ module spine {
 		}
 
 		static contains<T> (array: Array<T>, element: T, identity = true) {
-			for (var i = 0; i < array.length; i++) {
+			for (var i = 0; i < array.length; i++)
 				if (array[i] == element) return true;
-			}
 			return false;
 		}
 	}
@@ -347,9 +347,8 @@ module spine {
 		}
 
 		freeAll (items: ArrayLike<T>) {
-			for (let i = 0; i < items.length; i++) {
+			for (let i = 0; i < items.length; i++)
 				this.free(items[i]);
-			}
 		}
 
 		clear () {
@@ -431,8 +430,7 @@ module spine {
 		}
 
 		addValue (value: number) {
-			if (this.addedValues < this.values.length)
-				this.addedValues++;
+			if (this.addedValues < this.values.length) this.addedValues++;
 			this.values[this.lastValue++] = value;
 			if (this.lastValue > this.values.length - 1) this.lastValue = 0;
 			this.dirty = true;
@@ -442,16 +440,14 @@ module spine {
 			if (this.hasEnoughData()) {
 				if (this.dirty) {
 					let mean = 0;
-					for (let i = 0; i < this.values.length; i++) {
+					for (let i = 0; i < this.values.length; i++)
 						mean += this.values[i];
-					}
 					this.mean = mean / this.values.length;
 					this.dirty = false;
 				}
 				return this.mean;
-			} else {
-				return 0;
 			}
+			return 0;
 		}
 	}
 }

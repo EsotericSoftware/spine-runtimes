@@ -31,7 +31,7 @@ module spine {
 
 	/** Stores the setup pose for a {@link PathConstraint}.
 	 *
-	 * See [Path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide. */
+	 * See [path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide. */
 	export class PathConstraintData extends ConstraintData {
 
 		/** The bones that will be modified by this path constraint. */
@@ -69,21 +69,21 @@ module spine {
 
 	/** Controls how the first bone is positioned along the path.
 	 *
-	 * See [Position mode](http://esotericsoftware.com/spine-path-constraints#Position-mode) in the Spine User Guide. */
+	 * See [position](http://esotericsoftware.com/spine-path-constraints#Position) in the Spine User Guide. */
 	export enum PositionMode {
 		Fixed, Percent
 	}
 
 	/** Controls how bones after the first bone are positioned along the path.
 	 *
-	 * [Spacing mode](http://esotericsoftware.com/spine-path-constraints#Spacing-mode) in the Spine User Guide. */
+	 * See [spacing](http://esotericsoftware.com/spine-path-constraints#Spacing) in the Spine User Guide. */
 	export enum SpacingMode {
 		Length, Fixed, Percent, Proportional
 	}
 
 	/** Controls how bones are rotated, translated, and scaled to match the path.
 	 *
-	 * [Rotate mode](http://esotericsoftware.com/spine-path-constraints#Rotate-mod) in the Spine User Guide. */
+	 * See [rotate mix](http://esotericsoftware.com/spine-path-constraints#Rotate-mix) in the Spine User Guide. */
 	export enum RotateMode {
 		Tangent, Chain, ChainScale
 	}

@@ -77,7 +77,6 @@ module spine {
 					this.applyRelativeLocal();
 				else
 					this.applyAbsoluteLocal();
-
 			} else {
 				if (this.data.relative)
 					this.applyRelativeWorld();
@@ -90,6 +89,7 @@ module spine {
 			let mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
 			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 			let translate = mixX != 0 || mixY != 0;
+
 			let target = this.target;
 			let ta = target.a, tb = target.b, tc = target.c, td = target.d;
 			let degRadReflect = ta * td - tb * tc > 0 ? MathUtils.degRad : -MathUtils.degRad;
@@ -133,7 +133,6 @@ module spine {
 					if (s != 0) s = (s + (Math.sqrt(tb * tb + td * td) - s + this.data.offsetScaleY) * mixScaleY) / s;
 					bone.b *= s;
 					bone.d *= s;
-
 				}
 
 				if (mixShearY > 0) {
@@ -148,7 +147,6 @@ module spine {
 					let s = Math.sqrt(b * b + d * d);
 					bone.b = Math.cos(r) * s;
 					bone.d = Math.sin(r) * s;
-
 				}
 
 				bone.appliedValid = false;
