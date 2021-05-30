@@ -386,7 +386,7 @@ public class AnimationState {
 			if (blend == MixBlend.setup || blend == MixBlend.first)
 				setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
 		} else
-			setAttachment(skeleton, slot, timeline.attachmentNames[Animation.search(frames, time)], attachments);
+			setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search(frames, time)], attachments);
 
 		// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
 		if (slot.attachmentState <= unkeyedState) slot.attachmentState = unkeyedState + SETUP;

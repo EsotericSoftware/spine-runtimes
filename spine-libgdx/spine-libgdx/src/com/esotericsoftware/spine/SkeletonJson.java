@@ -1039,8 +1039,8 @@ public class SkeletonJson extends SkeletonLoader {
 		return bezier;
 	}
 
-	void setBezier (CurveTimeline timeline, int frame, int value, int bezier, float time1, float value1, float cx1, float cy1,
-		float cx2, float cy2, float time2, float value2) {
+	static void setBezier (CurveTimeline timeline, int frame, int value, int bezier, float time1, float value1, float cx1,
+		float cy1, float cx2, float cy2, float time2, float value2) {
 		timeline.setBezier(bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
 	}
 

@@ -131,26 +131,6 @@ public class Animation {
 		return name;
 	}
 
-	/** Linear search using a stride of 1.
-	 * @param time Must be >= the first value in <code>frames</code>.
-	 * @return The index of the first value <= <code>time</code>. */
-	static int search (float[] frames, float time) {
-		int n = frames.length;
-		for (int i = 1; i < n; i++)
-			if (frames[i] > time) return i - 1;
-		return n - 1;
-	}
-
-	/** Linear search using the specified stride.
-	 * @param time Must be >= the first value in <code>frames</code>.
-	 * @return The index of the first value <= <code>time</code>. */
-	static int search (float[] frames, float time, int step) {
-		int n = frames.length;
-		for (int i = step; i < n; i += step)
-			if (frames[i] > time) return i - step;
-		return n - step;
-	}
-
 	/** Controls how timeline values are mixed with setup pose values or current pose values when a timeline is applied with
 	 * <code>alpha</code> < 1.
 	 * <p>
@@ -253,6 +233,26 @@ public class Animation {
 		 *           such as {@link DrawOrderTimeline} or {@link AttachmentTimeline}, and others such as {@link ScaleTimeline}. */
 		abstract public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha,
 			MixBlend blend, MixDirection direction);
+
+		/** Linear search using a stride of 1.
+		 * @param time Must be >= the first value in <code>frames</code>.
+		 * @return The index of the first value <= <code>time</code>. */
+		static int search (float[] frames, float time) {
+			int n = frames.length;
+			for (int i = 1; i < n; i++)
+				if (frames[i] > time) return i - 1;
+			return n - 1;
+		}
+
+		/** Linear search using the specified stride.
+		 * @param time Must be >= the first value in <code>frames</code>.
+		 * @return The index of the first value <= <code>time</code>. */
+		static int search (float[] frames, float time, int step) {
+			int n = frames.length;
+			for (int i = step; i < n; i += step)
+				if (frames[i] > time) return i - step;
+			return n - step;
+		}
 	}
 
 	/** An interface for timelines which change the property of a bone. */
@@ -1122,8 +1122,9 @@ public class Animation {
 			if (!slot.bone.active) return;
 
 			float[] frames = this.frames;
+			Color color = slot.color;
 			if (time < frames[0]) { // Time is before first frame.
-				Color color = slot.color, setup = slot.data.color;
+				Color setup = slot.data.color;
 				switch (blend) {
 				case setup:
 					color.set(setup);
@@ -1163,9 +1164,8 @@ public class Animation {
 				a = getBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
 			}
 
-			Color color = slot.color;
 			if (alpha == 1)
-				slot.color.set(r, g, b, a);
+				color.set(r, g, b, a);
 			else {
 				if (blend == setup) color.set(slot.data.color);
 				color.add((r - color.r) * alpha, (g - color.g) * alpha, (b - color.b) * alpha, (a - color.a) * alpha);
@@ -1211,8 +1211,9 @@ public class Animation {
 			if (!slot.bone.active) return;
 
 			float[] frames = this.frames;
+			Color color = slot.color;
 			if (time < frames[0]) { // Time is before first frame.
-				Color color = slot.color, setup = slot.data.color;
+				Color setup = slot.data.color;
 				switch (blend) {
 				case setup:
 					color.r = setup.r;
@@ -1251,7 +1252,6 @@ public class Animation {
 				b = getBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
 			}
 
-			Color color = slot.color;
 			if (alpha == 1) {
 				color.r = r;
 				color.g = g;
@@ -1290,8 +1290,9 @@ public class Animation {
 			if (!slot.bone.active) return;
 
 			float[] frames = this.frames;
+			Color color = slot.color;
 			if (time < frames[0]) { // Time is before first frame.
-				Color color = slot.color, setup = slot.data.color;
+				Color setup = slot.data.color;
 				switch (blend) {
 				case setup:
 					color.a = setup.a;
@@ -1304,10 +1305,10 @@ public class Animation {
 
 			float a = getCurveValue(time);
 			if (alpha == 1)
-				slot.color.a = a;
+				color.a = a;
 			else {
-				if (blend == setup) slot.color.a = slot.data.color.a;
-				slot.color.a += (a - slot.color.a) * alpha;
+				if (blend == setup) color.a = slot.data.color.a;
+				color.a += (a - color.a) * alpha;
 			}
 		}
 	}
@@ -1359,8 +1360,9 @@ public class Animation {
 			if (!slot.bone.active) return;
 
 			float[] frames = this.frames;
+			Color light = slot.color, dark = slot.darkColor;
 			if (time < frames[0]) { // Time is before first frame.
-				Color light = slot.color, dark = slot.darkColor, setupLight = slot.data.color, setupDark = slot.data.darkColor;
+				Color setupLight = slot.data.color, setupDark = slot.data.darkColor;
 				switch (blend) {
 				case setup:
 					light.set(setupLight);
@@ -1418,9 +1420,8 @@ public class Animation {
 				b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
 			}
 
-			Color light = slot.color, dark = slot.darkColor;
 			if (alpha == 1) {
-				slot.color.set(r, g, b, a);
+				light.set(r, g, b, a);
 				dark.r = r2;
 				dark.g = g2;
 				dark.b = b2;
@@ -1482,8 +1483,9 @@ public class Animation {
 			if (!slot.bone.active) return;
 
 			float[] frames = this.frames;
+			Color light = slot.color, dark = slot.darkColor;
 			if (time < frames[0]) { // Time is before first frame.
-				Color light = slot.color, dark = slot.darkColor, setupLight = slot.data.color, setupDark = slot.data.darkColor;
+				Color setupLight = slot.data.color, setupDark = slot.data.darkColor;
 				switch (blend) {
 				case setup:
 					light.r = setupLight.r;
@@ -1540,7 +1542,6 @@ public class Animation {
 				b2 = getBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
 			}
 
-			Color light = slot.color, dark = slot.darkColor;
 			if (alpha == 1) {
 				light.r = r;
 				light.g = g;
@@ -1579,6 +1580,10 @@ public class Animation {
 			attachmentNames = new String[frameCount];
 		}
 
+		public int getFrameCount () {
+			return frames.length;
+		}
+
 		public int getSlotIndex () {
 			return slotIndex;
 		}
@@ -1607,13 +1612,12 @@ public class Animation {
 				return;
 			}
 
-			float[] frames = this.frames;
-			if (time < frames[0]) { // Time is before first frame.
+			if (time < this.frames[0]) { // Time is before first frame.
 				if (blend == setup || blend == first) setAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
 			}
 
-			setAttachment(skeleton, slot, attachmentNames[search(frames, time)]);
+			setAttachment(skeleton, slot, attachmentNames[search(this.frames, time)]);
 		}
 
 		private void setAttachment (Skeleton skeleton, Slot slot, String attachmentName) {
@@ -1632,6 +1636,10 @@ public class Animation {
 			this.slotIndex = slotIndex;
 			this.attachment = attachment;
 			vertices = new float[frameCount][];
+		}
+
+		public int getFrameCount () {
+			return frames.length;
 		}
 
 		public int getSlotIndex () {
@@ -1905,6 +1913,10 @@ public class Animation {
 			events = new Event[frameCount];
 		}
 
+		public int getFrameCount () {
+			return frames.length;
+		}
+
 		/** The event for each frame. */
 		public Event[] getEvents () {
 			return events;
@@ -1960,6 +1972,10 @@ public class Animation {
 			drawOrders = new int[frameCount][];
 		}
 
+		public int getFrameCount () {
+			return frames.length;
+		}
+
 		/** The draw order for each frame. See {@link #setFrame(int, float, int[])}. */
 		public int[][] getDrawOrders () {
 			return drawOrders;
@@ -1984,7 +2000,6 @@ public class Animation {
 				return;
 			}
 
-			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				if (blend == setup || blend == first) arraycopy(skeleton.slots.items, 0, drawOrder, 0, skeleton.slots.size);
 				return;
@@ -2354,16 +2369,17 @@ public class Animation {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
+				PathConstraintData data = constraint.data;
 				switch (blend) {
 				case setup:
-					constraint.mixRotate = constraint.data.mixRotate;
-					constraint.mixX = constraint.data.mixX;
-					constraint.mixY = constraint.data.mixY;
+					constraint.mixRotate = data.mixRotate;
+					constraint.mixX = data.mixX;
+					constraint.mixY = data.mixY;
 					return;
 				case first:
-					constraint.mixRotate += (constraint.data.mixRotate - constraint.mixRotate) * alpha;
-					constraint.mixX += (constraint.data.mixX - constraint.mixX) * alpha;
-					constraint.mixY += (constraint.data.mixY - constraint.mixY) * alpha;
+					constraint.mixRotate += (data.mixRotate - constraint.mixRotate) * alpha;
+					constraint.mixX += (data.mixX - constraint.mixX) * alpha;
+					constraint.mixY += (data.mixY - constraint.mixY) * alpha;
 				}
 				return;
 			}
