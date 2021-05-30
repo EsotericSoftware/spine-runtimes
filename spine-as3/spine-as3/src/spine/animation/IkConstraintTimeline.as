@@ -33,35 +33,39 @@ package spine.animation {
 	import spine.Skeleton;
 
 	public class IkConstraintTimeline extends CurveTimeline {
-		static public const ENTRIES : int = 6;
-		static internal const PREV_TIME : int = -6, PREV_MIX : int = -5, PREV_SOFTNESS : int = -4, PREV_BEND_DIRECTION : int = -3, PREV_COMPRESS : int = -2, PREV_STRETCH : int = -1;
+		static internal const ENTRIES : int = 6;
 		static internal const MIX : int = 1, SOFTNESS : int = 2, BEND_DIRECTION : int = 3, COMPRESS : int = 4, STRETCH : int = 5;
+
+		/** The index of the IK constraint slot in {@link Skeleton#ikConstraints} that will be changed. */
 		public var ikConstraintIndex : int;
-		public var frames : Vector.<Number>; // time, mix, bendDirection, compress, stretch, ...
 
-		public function IkConstraintTimeline(frameCount : int) {
-			super(frameCount);
-			frames = new Vector.<Number>(frameCount * ENTRIES, true);
+		public function IkConstraintTimeline(frameCount : int, bezierCount : int, ikConstraintIndex : int) {
+			super(frameCount, bezierCount, [
+				Property.ikConstraint + "|" + ikConstraintIndex
+			]);
+			this.ikConstraintIndex = ikConstraintIndex;
 		}
 
-		override public function getPropertyId() : int {
-			return (TimelineType.ikConstraint.ordinal << 24) + ikConstraintIndex;
+		public override function getFrameEntries() : int {
+			return ENTRIES;
 		}
 
-		/** Sets the time, mix and bend direction of the specified keyframe. */
-		public function setFrame(frameIndex : int, time : Number, mix : Number, softness: Number, bendDirection : int, compress: Boolean, stretch: Boolean) : void {
-			frameIndex *= ENTRIES;
-			frames[frameIndex] = time;
-			frames[int(frameIndex + MIX)] = mix;
-			frames[int(frameIndex + SOFTNESS)] = softness;
-			frames[int(frameIndex + BEND_DIRECTION)] = bendDirection;
-			frames[int(frameIndex + COMPRESS)] = compress ? 1 : 0;
-			frames[int(frameIndex + STRETCH)] = stretch ? 1 : 0;
+		/** Sets the time in seconds, mix, softness, bend direction, compress, and stretch for the specified key frame. */
+		public function setFrame (frame : int, time : Number, mix : Number, softness : Number, bendDirection : int, compress: Boolean, stretch : Boolean) : void {
+			frame *= ENTRIES;
+			frames[frame] = time;
+			frames[frame + MIX] = mix;
+			frames[frame + SOFTNESS] = softness;
+			frames[frame + BEND_DIRECTION] = bendDirection;
+			frames[frame + COMPRESS] = compress ? 1 : 0;
+			frames[frame + STRETCH] = stretch ? 1 : 0;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var constraint : IkConstraint = skeleton.ikConstraints[ikConstraintIndex];
 			if (!constraint.active) return;
+
+			var frames : Vector.<Number> = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -81,59 +85,47 @@ package spine.animation {
 				return;
 			}
 
-			if (time >= frames[int(frames.length - ENTRIES)]) { // Time is after last frame.
-				if (blend == MixBlend.setup) {
-					constraint.mix = constraint.data.mix + (frames[frames.length + PREV_MIX] - constraint.data.mix) * alpha;
-					constraint.softness = constraint.data.softness
-						+ (frames[frames.length + PREV_SOFTNESS] - constraint.data.softness) * alpha;
-					if (direction == MixDirection.Out) {
-						constraint.bendDirection = constraint.data.bendDirection;
-						constraint.compress = constraint.data.compress;
-						constraint.stretch = constraint.data.stretch;
-					} else {
-						constraint.bendDirection = int(frames[frames.length + PREV_BEND_DIRECTION]);
-						constraint.compress = int(frames[frames.length + PREV_COMPRESS]) != 0;
-						constraint.stretch = int(frames[frames.length + PREV_STRETCH]) != 0;
-					}
-				} else {
-					constraint.mix += (frames[frames.length + PREV_MIX] - constraint.mix) * alpha;
-					constraint.softness += (frames[frames.length + PREV_SOFTNESS] - constraint.softness) * alpha;
-					if (direction == MixDirection.In) {
-						constraint.bendDirection = int(frames[frames.length + PREV_BEND_DIRECTION]);
-						constraint.compress = int(frames[frames.length + PREV_COMPRESS]) != 0;
-						constraint.stretch = int(frames[frames.length + PREV_STRETCH]) != 0;
-					}
-				}
-				return;
+			var mix : Number = 0, softness : Number = 0;
+			var i : int = search2(frames, time, ENTRIES)
+			var curveType : Number = curves[i / ENTRIES];
+			switch (curveType) {
+			case LINEAR:
+				var before : Number = frames[i];
+				mix = frames[i + MIX];
+				softness = frames[i + SOFTNESS];
+				var t : Number = (time - before) / (frames[i + ENTRIES] - before);
+				mix += (frames[i + ENTRIES + MIX] - mix) * t;
+				softness += (frames[i + ENTRIES + SOFTNESS] - softness) * t;
+				break;
+			case STEPPED:
+				mix = frames[i + MIX];
+				softness = frames[i + SOFTNESS];
+				break;
+			default:
+				mix = getBezierValue(time, i, MIX, curveType - BEZIER);
+				softness = getBezierValue(time, i, SOFTNESS, curveType + BEZIER_SIZE - BEZIER);
 			}
 
-			// Interpolate between the previous frame and the current frame.
-			var frame : int = Animation.binarySearch(frames, time, ENTRIES);
-			var mix : Number = frames[int(frame + PREV_MIX)];
-			var softness : Number = frames[frame + PREV_SOFTNESS];
-			var frameTime : Number = frames[frame];
-			var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
 			if (blend == MixBlend.setup) {
-				constraint.mix = constraint.data.mix + (mix + (frames[frame + MIX] - mix) * percent - constraint.data.mix) * alpha;
-				constraint.softness = constraint.data.softness
-					+ (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.data.softness) * alpha;
-				if (direction == MixDirection.Out) {
+				constraint.mix = constraint.data.mix + (mix - constraint.data.mix) * alpha;
+				constraint.softness = constraint.data.softness + (softness - constraint.data.softness) * alpha;
+
+				if (direction == MixDirection.mixOut) {
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
 				} else {
-					constraint.bendDirection = int(frames[frame + PREV_BEND_DIRECTION]);
-					constraint.compress = int(frames[frame + PREV_COMPRESS]) != 0;
-					constraint.stretch = int(frames[frame + PREV_STRETCH]) != 0;
+					constraint.bendDirection = frames[i + BEND_DIRECTION];
+					constraint.compress = frames[i + COMPRESS] != 0;
+					constraint.stretch = frames[i + STRETCH] != 0;
 				}
 			} else {
-				constraint.mix += (mix + (frames[frame + MIX] - mix) * percent - constraint.mix) * alpha;
-				constraint.softness += (softness + (frames[frame + SOFTNESS] - softness) * percent - constraint.softness) * alpha;
-				if (direction == MixDirection.In) {
-					constraint.bendDirection = int(frames[frame + PREV_BEND_DIRECTION]);
-					constraint.compress = int(frames[frame + PREV_COMPRESS]) != 0;
-					constraint.stretch = int(frames[frame + PREV_STRETCH]) != 0;
+				constraint.mix += (mix - constraint.mix) * alpha;
+				constraint.softness += (softness - constraint.softness) * alpha;
+				if (direction == MixDirection.mixIn) {
+					constraint.bendDirection = frames[i + BEND_DIRECTION];
+					constraint.compress = frames[i + COMPRESS] != 0;
+					constraint.stretch = frames[i + STRETCH] != 0;
 				}
 			}
 		}

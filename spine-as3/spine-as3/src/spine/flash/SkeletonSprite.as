@@ -98,11 +98,11 @@ package spine.flash {
 				var wrapper : Sprite = wrappers[regionAttachment];
 				if (!wrapper) {
 					var region : AtlasRegion = AtlasRegion(regionAttachment.rendererObject);
-					var regionHeight : Number = region.rotate ? region.width : region.height;
+					var regionHeight : Number = region.degrees == 90 ? region.width : region.height;
 					var regionData : BitmapData = region.rendererObject as BitmapData;
 					if (!regionData) {
 						var bitmapData : BitmapData = region.page.rendererObject as BitmapData;
-						var regionWidth : Number = region.rotate ? region.height : region.width;
+						var regionWidth : Number = region.degrees == 90 ? region.height : region.width;
 						regionData = new BitmapData(regionWidth, regionHeight);
 						regionData.copyPixels(bitmapData, new Rectangle(region.x, region.y, regionWidth, regionHeight), new Point());
 						region.rendererObject = regionData;
@@ -122,7 +122,7 @@ package spine.flash {
 					var sin : Number = Math.sin(radians);
 					var shiftX : Number = -regionAttachment.width / 2 * regionAttachment.scaleX;
 					var shiftY : Number = -regionAttachment.height / 2 * regionAttachment.scaleY;
-					if (region.rotate) {
+					if (region.degrees == 90) {
 						bitmap.rotation += 90;
 						shiftX += regionHeight * (regionAttachment.width / region.width);
 					}

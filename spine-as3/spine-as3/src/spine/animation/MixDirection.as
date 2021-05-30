@@ -31,11 +31,11 @@ package spine.animation {
 	public class MixDirection {
 		public var ordinal : int;
 
-		public function MixDirection(order : int) {
-			this.ordinal = order;
+		public function MixDirection(ordinal : int) {
+			this.ordinal = ordinal;
 		}
 
-		public static const In : MixDirection = new MixDirection(0);
-		public static const Out : MixDirection = new MixDirection(1);
+		public static const mixIn : MixDirection = new MixDirection(0);
+		public static const mixOut : MixDirection = new MixDirection(1);
 	}
 }

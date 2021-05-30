@@ -33,8 +33,7 @@ package spine.attachments {
 		internal var _name : String;
 
 		public function Attachment(name : String) {
-			if (name == null)
-				throw new ArgumentError("name cannot be null.");
+			if (name == null) throw new ArgumentError("name cannot be null.");
 			_name = name;
 		}
 

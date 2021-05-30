@@ -103,13 +103,12 @@ package spine {
 			var parent : Bone = _parent;
 			if (!parent) { // Root bone.
 				rotationY = rotation + 90 + shearY;
-				var skeleton : Skeleton = _skeleton;
-				this.a = MathUtils.cosDeg(rotation + shearX) * scaleX * sx;
-				this.b = MathUtils.cosDeg(rotationY) * scaleY * sx;
-				this.c = MathUtils.sinDeg(rotation + shearX) * scaleX * sy;
-				this.d = MathUtils.sinDeg(rotationY) * scaleY * sy;
-				worldX = x * sx + skeleton.x;
-				worldY = y * sy + skeleton.y;
+				a = MathUtils.cosDeg(rotation + shearX) * scaleX * sx;
+				b = MathUtils.cosDeg(rotationY) * scaleY * sx;
+				c = MathUtils.sinDeg(rotation + shearX) * scaleX * sy;
+				d = MathUtils.sinDeg(rotationY) * scaleY * sy;
+				worldX = x * sx + _skeleton.x;
+				worldY = y * sy + _skeleton.y;
 				return;
 			}
 
@@ -117,25 +116,25 @@ package spine {
 			worldX = pa * x + pb * y + parent.worldX;
 			worldY = pc * x + pd * y + parent.worldY;
 
-			switch (this.data.transformMode) {
+			switch (data.transformMode) {
 				case TransformMode.normal: {
 					rotationY = rotation + 90 + shearY;
 					la = MathUtils.cosDeg(rotation + shearX) * scaleX;
 					lb = MathUtils.cosDeg(rotationY) * scaleY;
 					lc = MathUtils.sinDeg(rotation + shearX) * scaleX;
 					ld = MathUtils.sinDeg(rotationY) * scaleY;
-					this.a = pa * la + pb * lc;
-					this.b = pa * lb + pb * ld;
-					this.c = pc * la + pd * lc;
-					this.d = pc * lb + pd * ld;
+					a = pa * la + pb * lc;
+					b = pa * lb + pb * ld;
+					c = pc * la + pd * lc;
+					d = pc * lb + pd * ld;
 					return;
 				}
 				case TransformMode.onlyTranslation: {
 					rotationY = rotation + 90 + shearY;
-					this.a = MathUtils.cosDeg(rotation + shearX) * scaleX;
-					this.b = MathUtils.cosDeg(rotationY) * scaleY;
-					this.c = MathUtils.sinDeg(rotation + shearX) * scaleX;
-					this.d = MathUtils.sinDeg(rotationY) * scaleY;
+					a = MathUtils.cosDeg(rotation + shearX) * scaleX;
+					b = MathUtils.cosDeg(rotationY) * scaleY;
+					c = MathUtils.sinDeg(rotation + shearX) * scaleX;
+					d = MathUtils.sinDeg(rotationY) * scaleY;
 					break;
 				}
 				case TransformMode.noRotationOrReflection: {
@@ -143,8 +142,8 @@ package spine {
 					var prx : Number = 0;
 					if (s > 0.0001) {
 						s = Math.abs(pa * pd - pb * pc) / s;
-						pa /= this.skeleton.scaleX;
-						pc /= this.skeleton.scaleY;
+						pa /= _skeleton.scaleX;
+						pc /= _skeleton.scaleY;
 						pb = pc * s;
 						pd = pa * s;
 						prx = Math.atan2(pc, pa) * MathUtils.radDeg;
@@ -159,10 +158,10 @@ package spine {
 					lb = MathUtils.cosDeg(ry) * scaleY;
 					lc = MathUtils.sinDeg(rx) * scaleX;
 					ld = MathUtils.sinDeg(ry) * scaleY;
-					this.a = pa * la - pb * lc;
-					this.b = pa * lb - pb * ld;
-					this.c = pc * la + pd * lc;
-					this.d = pc * lb + pd * ld;
+					a = pa * la - pb * lc;
+					b = pa * lb - pb * ld;
+					c = pc * la + pd * lc;
+					d = pc * lb + pd * ld;
 					break;
 				}
 				case TransformMode.noScale:
@@ -185,27 +184,27 @@ package spine {
 					lb = MathUtils.cosDeg(90 + shearY) * scaleY;
 					lc = MathUtils.sinDeg(shearX) * scaleX;
 					ld = MathUtils.sinDeg(90 + shearY) * scaleY;
-					this.a = za * la + zb * lc;
-					this.b = za * lb + zb * ld;
-					this.c = zc * la + zd * lc;
-					this.d = zc * lb + zd * ld;
+					a = za * la + zb * lc;
+					b = za * lb + zb * ld;
+					c = zc * la + zd * lc;
+					d = zc * lb + zd * ld;
 					break;
 				}
 			}
-			this.a *= sx;
-			this.b *= sx;
-			this.c *= sy;
-			this.d *= sy;
+			a *= sx;
+			b *= sx;
+			c *= sy;
+			d *= sy;
 		}
 
 		public function setToSetupPose() : void {
-			x = this.data.x;
-			y = this.data.y;
-			rotation = this.data.rotation;
-			scaleX = this.data.scaleX;
-			scaleY = this.data.scaleY;
-			shearX = this.data.shearX;
-			shearY = this.data.shearY;
+			x = data.x;
+			y = data.y;
+			rotation = data.rotation;
+			scaleX = data.scaleX;
+			scaleY = data.scaleY;
+			shearX = data.shearX;
+			shearY = data.shearY;
 		}
 
 		public function get data() : BoneData {
@@ -226,19 +225,19 @@ package spine {
 		}
 
 		public function get worldRotationX() : Number {
-			return Math.atan2(this.c, this.a) * MathUtils.radDeg;
+			return Math.atan2(c, a) * MathUtils.radDeg;
 		}
 
 		public function get worldRotationY() : Number {
-			return Math.atan2(this.d, this.b) * MathUtils.radDeg;
+			return Math.atan2(d, b) * MathUtils.radDeg;
 		}
 
 		public function get worldScaleX() : Number {
-			return Math.sqrt(this.a * this.a + this.c * this.c);
+			return Math.sqrt(a * a + c * c);
 		}
 
 		public function get worldScaleY() : Number {
-			return Math.sqrt(this.b * this.b + this.d * this.d);
+			return Math.sqrt(b * b + d * d);
 		}
 
 		/** Computes the individual applied transform values from the world transform. This can be useful to perform processing using
@@ -287,37 +286,36 @@ package spine {
 		}
 
 		public function worldToLocal(world : Vector.<Number>) : void {
-			var a : Number = this.a, b : Number = this.b, c : Number = this.c, d : Number = this.d;
 			var invDet : Number = 1 / (a * d - b * c);
-			var x : Number = world[0] - this.worldX, y : Number = world[1] - this.worldY;
-			world[0] = (x * d * invDet - y * b * invDet);
-			world[1] = (y * a * invDet - x * c * invDet);
+			var x : Number = world[0] - worldX, y : Number = world[1] - worldY;
+			world[0] = x * d * invDet - y * b * invDet;
+			world[1] = y * a * invDet - x * c * invDet;
 		}
 
 		public function localToWorld(local : Vector.<Number>) : void {
 			var localX : Number = local[0], localY : Number = local[1];
-			local[0] = localX * this.a + localY * this.b + this.worldX;
-			local[1] = localX * this.c + localY * this.d + this.worldY;
+			local[0] = localX * a + localY * b + worldX;
+			local[1] = localX * c + localY * d + worldY;
 		}
 
 		public function worldToLocalRotation(worldRotation : Number) : Number {
-			var sin : Number = MathUtils.sinDeg(worldRotation), cos : Number = MathUtils.cosDeg(worldRotation);			return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * MathUtils.radDeg + rotation - shearX;
+			var sin : Number = MathUtils.sinDeg(worldRotation), cos : Number = MathUtils.cosDeg(worldRotation);
+			return Math.atan2(a * sin - c * cos, d * cos - b * sin) * MathUtils.radDeg + rotation - shearX;
 		}
 
 		public function localToWorldRotation(localRotation : Number) : Number {
 			localRotation -= rotation - shearX;
 			var sin : Number = MathUtils.sinDeg(localRotation), cos : Number = MathUtils.cosDeg(localRotation);
-			return Math.atan2(cos * this.c + sin * this.d, cos * this.a + sin * this.b) * MathUtils.radDeg;
+			return Math.atan2(cos * c + sin * d, cos * a + sin * b) * MathUtils.radDeg;
 		}
 
 		public function rotateWorld(degrees : Number) : void {
-			var a : Number = this.a, b : Number = this.b, c : Number = this.c, d : Number = this.d;
 			var cos : Number = MathUtils.cosDeg(degrees), sin : Number = MathUtils.sinDeg(degrees);
+			var a : Number = this.a, b : Number = this.b, c : Number = this.c, d : Number = this.d;
 			this.a = cos * a - sin * c;
 			this.b = cos * b - sin * d;
 			this.c = sin * a + cos * c;
 			this.d = sin * b + cos * d;
-			this.appliedValid = false;
 		}
 
 		public function toString() : String {

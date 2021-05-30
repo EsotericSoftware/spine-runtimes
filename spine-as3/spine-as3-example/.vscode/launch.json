@@ -4,7 +4,7 @@
         {
             "type": "swf",
             "request": "launch",
-            "name": "Launch Spine AS3 SWF",
+            "name": "Launch spine-as3-example",
             "preLaunchTask": "Compile debug"
         }
     ]

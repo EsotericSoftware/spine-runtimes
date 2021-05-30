@@ -32,32 +32,22 @@ package spine.animation {
 	import spine.Event;
 	import spine.Skeleton;
 
-	public class PathConstraintPositionTimeline extends CurveTimeline {
-		static public const ENTRIES : int = 2;
-		static internal const PREV_TIME : int = -2, PREV_VALUE : int = -1;
-		static internal const VALUE : int = 1;
+	public class PathConstraintPositionTimeline extends CurveTimeline1 {
+		/** The index of the path constraint slot in {@link Skeleton#pathConstraints} that will be changed. */
 		public var pathConstraintIndex : int;
-		public var frames : Vector.<Number>; // time, position, ...
 
-		public function PathConstraintPositionTimeline(frameCount : int) {
-			super(frameCount);
-			frames = new Vector.<Number>(frameCount * ENTRIES, true);
+		public function PathConstraintPositionTimeline (frameCount : int, bezierCount : int, pathConstraintIndex : int) {
+			super(frameCount, bezierCount, [
+				Property.pathConstraintPosition + "|" + pathConstraintIndex
+			]);
+			this.pathConstraintIndex = pathConstraintIndex;
 		}
 
-		override public function getPropertyId() : int {
-			return (TimelineType.pathConstraintPosition.ordinal << 24) + pathConstraintIndex;
-		}
-
-		/** Sets the time and value of the specified keyframe. */
-		public function setFrame(frameIndex : int, time : Number, value : Number) : void {
-			frameIndex *= ENTRIES;
-			frames[frameIndex] = time;
-			frames[frameIndex + VALUE] = value;
-		}
-
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var constraint : PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
 			if (!constraint.active) return;
+
+			var frames : Vector.<Number> = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -69,18 +59,8 @@ package spine.animation {
 				return;
 			}
 
-			var position : Number;
-			if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.
-				position = frames[frames.length + PREV_VALUE];
-			else {
-				// Interpolate between the previous frame and the current frame.
-				var frame : int = Animation.binarySearch(frames, time, ENTRIES);
-				position = frames[frame + PREV_VALUE];
-				var frameTime : Number = frames[frame];
-				var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+			var position : Number = getCurveValue(time);
 
-				position += (frames[frame + VALUE] - position) * percent;
-			}
 			if (blend == MixBlend.setup)
 				constraint.position = constraint.data.position + (position - constraint.data.position) * alpha;
 			else

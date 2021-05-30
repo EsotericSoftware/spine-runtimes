@@ -31,10 +31,44 @@ package spine.animation {
 	import spine.Event;
 	import spine.Skeleton;
 
-	public interface Timeline {
-		/** Sets the value(s) for the specified time. */
-		function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void;
+	public class Timeline {
+		public var propertyIds : Vector.<String>;
+		public var frames : Vector.<Number>;
 
-		function getPropertyId() : int;
+		public function Timeline(frameCount : int, propertyIds : Array) {
+			this.propertyIds = new Vector.<String>(propertyIds.length, true);
+			for (var i : int = 0, n : int = propertyIds.length; i < n; i++)
+				this.propertyIds[i] = propertyIds[i];
+			frames = new Vector.<Number>(frameCount * getFrameEntries(), true);
+		}
+
+		public function getFrameEntries() : int {
+			return 1;
+		}
+
+		public function getFrameCount() : int {
+			return frames.length / getFrameEntries();
+		}
+
+		public function getDuration() : Number {
+			return frames[frames.length - getFrameEntries()];
+		}
+
+		public function apply (skeleton: Skeleton, lastTime: Number, time: Number, events: Vector.<Event>, alpha: Number, blend: MixBlend, direction: MixDirection) : void {
+		}
+
+		static internal function search (frames : Vector.<Number>, time : Number) : int {
+			var n : int = frames.length;
+			for (var i : int = 1; i < n; i++)
+				if (frames[i] > time) return i - 1;
+			return n - 1;
+		}
+
+		static internal function search2 (values : Vector.<Number>, time : Number, step: int) : int {
+			var n : int = values.length;
+			for (var i : int = step; i < n; i += step)
+				if (values[i] > time) return i - step;
+			return n - step;
+		}
 	}
 }

@@ -27,19 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.interpolation {
-	import spine.Interpolation;
-	
-	public class Pow extends Interpolation {
-		protected var power : int;
-		
-		public function Pow(power : int) {
-			this.power = power;
-		}
-		
-		protected override function applyInternal(a : Number) : Number {
-			if (a <= 0.5) return Math.pow(a * 2, power) / 2;
-			return Math.pow((a - 1) * 2, power) / (power % 2 == 0 ? -2 : 2) + 1;
-		}
+package spine.animation {
+	public interface BoneTimeline {
+		function getBoneIndex() : int;
 	}
 }

@@ -4,7 +4,7 @@
         {
             "type": "swf",
             "request": "launch",
-            "name": "Launch Spine Starling Example",
+            "name": "Launch spine-starling-example",
             "preLaunchTask": "Compile debug"
         }
     ]

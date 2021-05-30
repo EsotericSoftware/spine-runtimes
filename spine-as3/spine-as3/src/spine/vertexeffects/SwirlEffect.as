@@ -41,7 +41,7 @@ package spine.vertexeffects {
 		private var _centerX : Number = 0, _centerY : Number = 0;
 		
 		public function SwirlEffect(radius : Number) {
-			this._interpolation = new Pow(2);;
+			this._interpolation = new Pow(2);
 			this._radius = radius;
 		}
 		

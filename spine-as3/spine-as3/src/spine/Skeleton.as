@@ -45,7 +45,6 @@ package spine {
 		public var transformConstraints : Vector.<TransformConstraint>;
 		public var pathConstraints : Vector.<PathConstraint>;
 		private var _updateCache : Vector.<Updatable> = new Vector.<Updatable>();
-		private var _updateCacheReset : Vector.<Bone> = new Vector.<Bone>();
 		private var _skin : Skin;
 		public var color : Color = new Color(1, 1, 1, 1);
 		public var time : Number = 0;
@@ -99,11 +98,10 @@ package spine {
 		public function updateCache() : void {
 			var updateCache : Vector.<Updatable> = this._updateCache;
 			updateCache.length = 0;
-			this._updateCacheReset.length = 0;
 
 			var bones : Vector.<Bone> = this.bones;
-			var i : Number = 0;
-			var n : Number = 0;
+			var i : int = 0;
+			var n : int = 0;
 			var bone : Bone;
 			for (i = 0, n = bones.length; i < n; i++) {
 				bone = bones[i];
@@ -127,12 +125,12 @@ package spine {
 			var ikConstraints : Vector.<IkConstraint> = this.ikConstraints;
 			var transformConstraints : Vector.<TransformConstraint> = this.transformConstraints;
 			var pathConstraints : Vector.<PathConstraint> = this.pathConstraints;
-			var ikCount : Number = ikConstraints.length, transformCount : Number = transformConstraints.length, pathCount : Number = pathConstraints.length;
-			var constraintCount : Number = ikCount + transformCount + pathCount;
+			var ikCount : int = ikConstraints.length, transformCount : int = transformConstraints.length, pathCount : int = pathConstraints.length;
+			var constraintCount : int = ikCount + transformCount + pathCount;
 
 			outer:
 			for (i = 0; i < constraintCount; i++) {
-				var ii : Number = 0;
+				var ii : int = 0;
 				for (ii = 0; ii < ikCount; ii++) {
 					var ikConstraint : IkConstraint = ikConstraints[ii];
 					if (ikConstraint.data.order == i) {
@@ -161,7 +159,7 @@ package spine {
 		}
 
 		private static function contains(list : Vector.<ConstraintData>, element : ConstraintData) : Boolean {
-			for (var i : Number = 0; i < list.length; i++)
+			for (var i : int = 0; i < list.length; i++)
 				if  (list[i] == element) return true;
 			return false;
 		}
@@ -177,9 +175,17 @@ package spine {
 			var parent : Bone = constrained[0];
 			sortBone(parent);
 
-			if (constrained.length > 1) {
+			if (constrained.length == 1) {
+				_updateCache.push(constraint);
+				sortReset(parent.children);
+			} else {
 				var child : Bone = constrained[constrained.length - 1];
-				if (!(_updateCache.indexOf(child) > -1)) _updateCacheReset.push(child);
+				sortBone(child);
+
+				_updateCache.push(constraint);
+
+				sortReset(parent.children);
+				child._sorted = true;
 			}
 
 			_updateCache.push(constraint);
@@ -193,13 +199,12 @@ package spine {
 			if (!constraint.active) return;
 
 			var slot : Slot = constraint.target;
-			var slotIndex : Number = slot.data.index;
+			var slotIndex : int = slot.data.index;
 			var slotBone : Bone = slot.bone;
 			if (skin != null) sortPathConstraintAttachment(skin, slotIndex, slotBone);
 			if (data.defaultSkin != null && data.defaultSkin != skin)
 				sortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
-			var i : Number = 0;
-			var n : Number = 0;
+			var i : int = 0, n : int = 0;
 			for (i = 0, n = data.skins.length; i < n; i++)
 				sortPathConstraintAttachment(data.skins[i], slotIndex, slotBone);
 
@@ -207,7 +212,7 @@ package spine {
 			if (attachment is PathAttachment) sortPathConstraintAttachment2(attachment, slotBone);
 
 			var constrained : Vector.<Bone> = constraint.bones;
-			var boneCount : Number = constrained.length;
+			var boneCount : int = constrained.length;
 			for (i = 0; i < boneCount; i++)
 				sortBone(constrained[i]);
 
@@ -226,13 +231,13 @@ package spine {
 			sortBone(constraint.target);
 
 			var constrained : Vector.<Bone> = constraint.bones;
-			var boneCount : Number = constrained.length;
-			var i : Number = 0;
+			var boneCount : int = constrained.length;
+			var i : int = 0;
 			if (constraint.data.local) {
 				for (i = 0; i < boneCount; i++) {
 					var child : Bone = constrained[i];
 					sortBone(child.parent);
-					if (!(_updateCache.indexOf(child) > -1)) _updateCacheReset.push(child);
+					sortBone(child);
 				}
 			} else {
 				for (i = 0; i < boneCount; i++)
@@ -265,12 +270,11 @@ package spine {
 				sortBone(slotBone);
 			else {
 				var bones : Vector.<Bone> = this.bones;
-				var i : int = 0;
-				while (i < pathBones.length) {
-					var boneCount : int = pathBones[i++];
-					for (var n : int = i + boneCount; i < n; i++) {
-						sortBone(bones[pathBones[i]]);
-					}
+				for (var i : int = 0, n : int = pathBones.length; i < n;) {
+					var nn : int = pathBones[i++];
+					nn += i;
+					while (i < nn)
+						sortBone(bones[pathBones[i++]]);
 				}
 			}
 		}
@@ -294,19 +298,34 @@ package spine {
 
 		/** Updates the world transform for each bone and applies constraints. */
 		public function updateWorldTransform() : void {
-			var updateCacheReset : Vector.<Bone> = this._updateCacheReset;
-			for each (var bone : Bone in updateCacheReset) {
-				bone.ax = bone.x;
-				bone.ay = bone.y;
-				bone.arotation = bone.rotation;
-				bone.ascaleX = bone.scaleX;
-				bone.ascaleY = bone.scaleY;
-				bone.ashearX = bone.shearX;
-				bone.ashearY = bone.shearY;
-				bone.appliedValid = true;
+			var updateCache : Vector.<Updatable> = _updateCache;
+			for (var i : int = 0, n : int = updateCache.length; i < n; i++)
+				updateCache[i].update();
+		}
+
+		public function updateWorldTransformWith (parent : Bone) : void {
+			// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
+			var rootBone : Bone = rootBone;
+			var pa : Number = parent.a, pb : Number = parent.b, pc : Number = parent.c, pd : Number = parent.d;
+			rootBone.worldX = pa * x + pb * y + parent.worldX;
+			rootBone.worldY = pc * x + pd * y + parent.worldY;
+
+			var rotationY : Number = rootBone.rotation + 90 + rootBone.shearY;
+			var la : Number = MathUtils.cosDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
+			var lb : Number = MathUtils.cosDeg(rotationY) * rootBone.scaleY;
+			var lc : Number = MathUtils.sinDeg(rootBone.rotation + rootBone.shearX) * rootBone.scaleX;
+			var ld : Number = MathUtils.sinDeg(rotationY) * rootBone.scaleY;
+			rootBone.a = (pa * la + pb * lc) * scaleX;
+			rootBone.b = (pa * lb + pb * ld) * scaleX;
+			rootBone.c = (pc * la + pd * lc) * scaleY;
+			rootBone.d = (pc * lb + pd * ld) * scaleY;
+
+			// Update everything except root bone.
+			var updateCache : Vector.<Updatable> = _updateCache;
+			for (var i : int = 0, n : int = updateCache.length; i < n; i++) {
+				var updatable : Updatable = updateCache[i];
+				if (updatable != rootBone) updatable.update();
 			}
-			for each (var updatable : Updatable in _updateCache)
-				updatable.update();
 		}
 
 		/** Sets the bones, constraints, and slots to their setup pose values. */
@@ -321,6 +340,7 @@ package spine {
 				bone.setToSetupPose();
 
 			for each (var ikConstraint : IkConstraint in ikConstraints) {
+				var ikData : IkConstraintData = ikConstraint._data;
 				ikConstraint.mix = ikConstraint._data.mix;
 				ikConstraint.softness = ikConstraint._data.softness;
 				ikConstraint.bendDirection = ikConstraint._data.bendDirection;
@@ -329,17 +349,22 @@ package spine {
 			}
 
 			for each (var transformConstraint : TransformConstraint in transformConstraints) {
-				transformConstraint.rotateMix = transformConstraint._data.rotateMix;
-				transformConstraint.translateMix = transformConstraint._data.translateMix;
-				transformConstraint.scaleMix = transformConstraint._data.scaleMix;
-				transformConstraint.shearMix = transformConstraint._data.shearMix;
+				var transformData : TransformConstraintData = transformConstraint._data;
+				transformConstraint.mixRotate = transformData.mixRotate;
+				transformConstraint.mixX = transformData.mixX;
+				transformConstraint.mixY = transformData.mixY;
+				transformConstraint.mixScaleX = transformData.mixScaleX;
+				transformConstraint.mixScaleY = transformData.mixScaleY;
+				transformConstraint.mixShearY = transformData.mixShearY;
 			}
 
 			for each (var pathConstraint : PathConstraint in pathConstraints) {
-				pathConstraint.position = pathConstraint._data.position;
-				pathConstraint.spacing = pathConstraint._data.spacing;
-				pathConstraint.rotateMix = pathConstraint._data.rotateMix;
-				pathConstraint.translateMix = pathConstraint._data.translateMix;
+				var pathData : PathConstraintData = pathConstraint._data;
+				pathConstraint.position = pathData.position;
+				pathConstraint.spacing = pathData.spacing;
+				pathConstraint.mixRotate = pathData.mixRotate;
+				pathConstraint.mixX = pathData.mixX;
+				pathConstraint.mixY = pathData.mixY;
 			}
 		}
 

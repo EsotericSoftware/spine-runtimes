@@ -28,14 +28,14 @@
  *****************************************************************************/
 
 package spine {
-	public dynamic class PathConstraintData extends ConstraintData {			
+	public class PathConstraintData extends ConstraintData {			
 		internal var _bones : Vector.<BoneData> = new Vector.<BoneData>();
 		public var target : SlotData;
 		public var positionMode : PositionMode;
 		public var spacingMode : SpacingMode;
 		public var rotateMode : RotateMode;
 		public var offsetRotation : Number;
-		public var position : Number, spacing : Number, rotateMix : Number, translateMix : Number;
+		public var position : Number, spacing : Number, mixRotate : Number, mixX : Number, mixY : Number;
 
 		public function PathConstraintData(name : String) {
 			super(name, 0, false);

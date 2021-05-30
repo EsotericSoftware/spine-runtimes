@@ -32,20 +32,26 @@ package spine.animation {
 	import spine.Skeleton;
 	import spine.Bone;
 
-	public class ShearTimeline extends TranslateTimeline {
-		public function ShearTimeline(frameCount : int) {
-			super(frameCount);
+	public class ShearTimeline extends CurveTimeline2 implements BoneTimeline {
+		private var boneIndex : int;
+
+		public function ShearTimeline(frameCount : int, bezierCount : int, boneIndex : int) {
+			super(frameCount, bezierCount, [
+				Property.shearX + "|" + boneIndex,
+				Property.shearY + "|" + boneIndex
+			]);
+			this.boneIndex = boneIndex;
 		}
 
-		override public function getPropertyId() : int {
-			return (TimelineType.shear.ordinal << 24) + boneIndex;
+		public function getBoneIndex() : int {
+			return boneIndex;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
-			var frames : Vector.<Number> = this.frames;
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var bone : Bone = skeleton.bones[boneIndex];
 			if (!bone.active) return;
 
+			var frames : Vector.<Number> = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -59,34 +65,40 @@ package spine.animation {
 				return;
 			}
 
-			var x : Number, y : Number;
-			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-				x = frames[frames.length + PREV_X];
-				y = frames[frames.length + PREV_Y];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				var frame : int = Animation.binarySearch(frames, time, ENTRIES);
-				x = frames[frame + PREV_X];
-				y = frames[frame + PREV_Y];
-				var frameTime : Number = frames[frame];
-				var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				x = x + (frames[frame + X] - x) * percent;
-				y = y + (frames[frame + Y] - y) * percent;
+			var x : Number = 0, y : Number = 0;
+			var i : int = search2(frames, time, ENTRIES);
+			var curveType : Number = curves[i / ENTRIES];
+			switch (curveType) {
+			case LINEAR:
+				var before : Number = frames[i];
+				x = frames[i + VALUE1];
+				y = frames[i + VALUE2];
+				var t : Number = (time - before) / (frames[i + ENTRIES] - before);
+				x += (frames[i + ENTRIES + VALUE1] - x) * t;
+				y += (frames[i + ENTRIES + VALUE2] - y) * t;
+				break;
+			case STEPPED:
+				x = frames[i + VALUE1];
+				y = frames[i + VALUE2];
+				break;
+			default:
+				x = getBezierValue(time, i, VALUE1, curveType - BEZIER);
+				y = getBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
 			}
+
 			switch (blend) {
-				case MixBlend.setup:
-					bone.shearX = bone.data.shearX + x * alpha;
-					bone.shearY = bone.data.shearY + y * alpha;
-					break;
-				case MixBlend.first:
-				case MixBlend.replace:
-					bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
-					bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
-					break;
-				case MixBlend.add:
-					bone.shearX += x * alpha;
-					bone.shearY += y * alpha;
+			case MixBlend.setup:
+				bone.shearX = bone.data.shearX + x * alpha;
+				bone.shearY = bone.data.shearY + y * alpha;
+				break;
+			case MixBlend.first:
+			case MixBlend.replace:
+				bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
+				bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
+				break;
+			case MixBlend.add:
+				bone.shearX += x * alpha;
+				bone.shearY += y * alpha;
 			}
 		}
 	}

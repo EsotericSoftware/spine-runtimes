@@ -27,19 +27,59 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.interpolation {
-	import spine.Interpolation;
-	
-	public class Pow extends Interpolation {
-		protected var power : int;
-		
-		public function Pow(power : int) {
-			this.power = power;
+package spine.animation {
+	import spine.Color;
+	import spine.Event;
+	import spine.Skeleton;
+	import spine.Slot;
+
+	public class AlphaTimeline extends CurveTimeline1 implements SlotTimeline {
+		static internal const ENTRIES : Number = 4;
+		static internal const R : Number = 1;
+		static internal const G : Number = 2;
+		static internal const B : Number = 3;
+
+		private var slotIndex : int;
+
+		public function AlphaTimeline (frameCount : Number, bezierCount : Number, slotIndex : Number) {
+			super(frameCount, bezierCount, [
+				Property.alpha + "|" + slotIndex
+			]);
+			this.slotIndex = slotIndex;
 		}
-		
-		protected override function applyInternal(a : Number) : Number {
-			if (a <= 0.5) return Math.pow(a * 2, power) / 2;
-			return Math.pow((a - 1) * 2, power) / (power % 2 == 0 ? -2 : 2) + 1;
+
+		public override function getFrameEntries() : int {
+			return ENTRIES;
+		}
+
+		public function getSlotIndex() : int {
+			return slotIndex;
+		}
+
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
+			var slot : Slot = skeleton.slots[slotIndex];
+			if (!slot.bone.active) return;
+
+			var color : Color = slot.color;
+			if (time < frames[0]) { // Time is before first frame.
+				var setup : Color = slot.data.color;
+				switch (blend) {
+				case MixBlend.setup:
+					color.a = setup.a;
+					return;
+				case MixBlend.first:
+					color.a += (setup.a - color.a) * alpha;
+				}
+				return;
+			}
+
+			var a : Number = getCurveValue(time);
+			if (alpha == 1)
+				color.a = a;
+			else {
+				if (blend == MixBlend.setup) color.a = slot.data.color.a;
+				color.a += (a - color.a) * alpha;
+			}
 		}
 	}
 }

@@ -28,8 +28,8 @@
  *****************************************************************************/
 
 package spine.atlas {
-	import flash.trace.Trace;
 	import flash.utils.ByteArray;
+	import flash.utils.Dictionary;
 
 	public class Atlas {
 		private var pages : Vector.<AtlasPage> = new Vector.<AtlasPage>();
@@ -38,8 +38,7 @@ package spine.atlas {
 
 		/** @param object A String or ByteArray. */
 		public function Atlas(object : *, textureLoader : TextureLoader) {
-			if (!object)
-				return;
+			if (!object) return;
 			if (object is String)
 				load(String(object), textureLoader);
 			else if (object is ByteArray)
@@ -49,107 +48,147 @@ package spine.atlas {
 		}
 
 		protected function load(atlasText : String, textureLoader : TextureLoader) : void {
-			if (textureLoader == null)
-				throw new ArgumentError("textureLoader cannot be null.");
+			if (textureLoader == null) throw new ArgumentError("textureLoader cannot be null.");
 			this.textureLoader = textureLoader;
 
 			var reader : Reader = new Reader(atlasText);
-			var tuple : Array = new Array();
-			tuple.length = 4;
-			var page : AtlasPage = null;
+			var entry : Vector.<String> = new Vector.<String>(5, true);
+			var page : AtlasPage;
+			var region : AtlasRegion;
+
+			var pageFields : Dictionary = new Dictionary();
+			pageFields["size"] = function() : void {
+				page.width = parseInt(entry[1]);
+				page.height = parseInt(entry[2]);
+			};
+			pageFields["format"] = function() : void {
+				page.format = Format[entry[0]];
+			};
+			pageFields["filter"] = function() : void {
+				page.minFilter = TextureFilter[entry[1]];
+				page.magFilter = TextureFilter[entry[2]];
+			};
+			pageFields["repeat"] = function() : void {
+				if (entry[1].indexOf('x') != -1) page.uWrap = TextureWrap.repeat;
+				if (entry[1].indexOf('y') != -1) page.vWrap = TextureWrap.repeat;
+			};
+			pageFields["pma"] = function() : void {
+				page.pma = entry[1] == "true";
+			};
+
+			var regionFields : Dictionary = new Dictionary();
+			regionFields["xy"] = function() : void { // Deprecated, use bounds.
+				region.x = parseInt(entry[1]);
+				region.y = parseInt(entry[2]);
+			};
+			regionFields["size"] = function() : void { // Deprecated, use bounds.
+				region.width = parseInt(entry[1]);
+				region.height = parseInt(entry[2]);
+			};
+			regionFields["bounds"] = function() : void {
+				region.x = parseInt(entry[1]);
+				region.y = parseInt(entry[2]);
+				region.width = parseInt(entry[3]);
+				region.height = parseInt(entry[4]);
+			};
+			regionFields["offset"] = function() : void { // Deprecated, use offsets.
+				region.offsetX = parseInt(entry[1]);
+				region.offsetY = parseInt(entry[2]);
+			};
+			regionFields["orig"] = function() : void { // Deprecated, use offsets.
+				region.originalWidth = parseInt(entry[1]);
+				region.originalHeight = parseInt(entry[2]);
+			};
+			regionFields["offsets"] = function() : void {
+				region.offsetX = parseInt(entry[1]);
+				region.offsetY = parseInt(entry[2]);
+				region.originalWidth = parseInt(entry[3]);
+				region.originalHeight = parseInt(entry[4]);
+			};
+			regionFields["rotate"] = function() : void {
+				var value : String = entry[1];
+				if (value == "true")
+					region.degrees = 90;
+				else if (value != "false")
+					region.degrees = parseInt(value);
+			};
+			regionFields["index"] = function() : void {
+				region.index = parseInt(entry[1]);
+			};
+
+			var line : String = reader.readLine();
+			// Ignore empty lines before first entry.
+			while (line != null && line.length == 0)
+				line = reader.readLine();
+			// Header entries.
 			while (true) {
-				var line : String = reader.readLine();
-				if (line == null)
-					break;
-				line = reader.trim(line);
-				if (line.length == 0)
+				if (line == null || line.length == 0) break;
+				if (reader.readEntry(entry, line) == 0) break; // Silently ignore all header fields.
+				line = reader.readLine();
+			}
+
+			// Page and region entries.
+			var names : Vector.<String>;
+			var values : Vector.<Vector.<Number>>;
+			var field : Function;
+			while (true) {
+				if (line == null) break;
+				if (line.length == 0) {
 					page = null;
-				else if (!page) {
+					line = reader.readLine();
+				} else if (page == null) {
 					page = new AtlasPage();
 					page.name = line;
-
-					if (reader.readTuple(tuple) == 2) { // size is only optional for an atlas packed with an old TexturePacker.
-						page.width = parseInt(tuple[0]);
-						page.height = parseInt(tuple[1]);
-						reader.readTuple(tuple);
+					while (true) {
+						if (reader.readEntry(entry, line = reader.readLine()) == 0) break;
+						field = pageFields[entry[0]];
+						if (field) field();
 					}
-					page.format = Format[tuple[0]];
-
-					reader.readTuple(tuple);
-					page.minFilter = TextureFilter[tuple[0]];
-					page.magFilter = TextureFilter[tuple[1]];
-
-					var direction : String = reader.readValue();
-					page.uWrap = TextureWrap.clampToEdge;
-					page.vWrap = TextureWrap.clampToEdge;
-					if (direction == "x")
-						page.uWrap = TextureWrap.repeat;
-					else if (direction == "y")
-						page.vWrap = TextureWrap.repeat;
-					else if (direction == "xy")
-						page.uWrap = page.vWrap = TextureWrap.repeat;
-
 					textureLoader.loadPage(page, line);
-
-					pages[pages.length] = page;
+					pages.push(page);
 				} else {
-					var region : AtlasRegion = new AtlasRegion();
-					region.name = line;
+					region = new AtlasRegion();
 					region.page = page;
-
-					var rotateValue : String = reader.readValue();
-					if (rotateValue == "true") {
-						region.degrees = 90;
-					} else if (rotateValue == "false") {
-						region.degrees = 0;
-					} else {
-						region.degrees = parseInt(rotateValue);
-					}
-					region.rotate = region.degrees == 90;
-
-					reader.readTuple(tuple);
-					var x : int = parseInt(tuple[0]);
-					var y : int = parseInt(tuple[1]);
-
-					reader.readTuple(tuple);
-					var width : int = parseInt(tuple[0]);
-					var height : int = parseInt(tuple[1]);
-
-					region.u = x / page.width;
-					region.v = y / page.height;
-					if (region.rotate) {
-						region.u2 = (x + height) / page.width;
-						region.v2 = (y + width) / page.height;
-					} else {
-						region.u2 = (x + width) / page.width;
-						region.v2 = (y + height) / page.height;
-					}
-					region.x = x;
-					region.y = y;
-					region.width = Math.abs(width);
-					region.height = Math.abs(height);
-
-					if (reader.readTuple(tuple) == 4) { // split is optional
-						region.splits = new Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
-
-						if (reader.readTuple(tuple) == 4) { // pad is optional, but only present with splits
-							region.pads = new Vector.<int>(parseInt(tuple[0]), parseInt(tuple[1]), parseInt(tuple[2]), parseInt(tuple[3]));
-
-							reader.readTuple(tuple);
+					region.name = line;
+					while (true) {
+						var count : int = reader.readEntry(entry, line = reader.readLine());
+						if (count == 0) break;
+						field = regionFields[entry[0]];
+						if (field)
+							field();
+						else {
+							if (names == null) {
+								names = new Vector.<String>();
+								values = new Vector.<Vector.<Number>>();
+							}
+							names.push(entry[0]);
+							var entryValues : Vector.<Number> = new Vector.<Number>(count, true);
+							for (var i : int = 0; i < count; i++)
+								entryValues[i] = parseInt(entry[i + 1]);
+							values.push(entryValues);
 						}
 					}
-
-					region.originalWidth = parseInt(tuple[0]);
-					region.originalHeight = parseInt(tuple[1]);
-
-					reader.readTuple(tuple);
-					region.offsetX = parseInt(tuple[0]);
-					region.offsetY = parseInt(tuple[1]);
-
-					region.index = parseInt(reader.readValue());
-
+					if (region.originalWidth == 0 && region.originalHeight == 0) {
+						region.originalWidth = region.width;
+						region.originalHeight = region.height;
+					}
+					if (names != null && names.length > 0) {
+						region.names = names;
+						region.values = values;
+						names = null;
+						values = null;
+					}
+					region.u = region.x / page.width;
+					region.v = region.y / page.height;
+					if (region.degrees == 90) {
+						region.u2 = (region.x + region.height) / page.width;
+						region.v2 = (region.y + region.width) / page.height;
+					} else {
+						region.u2 = (region.x + region.width) / page.width;
+						region.v2 = (region.y + region.height) / page.height;
+					}
 					textureLoader.loadRegion(region);
-					regions[regions.length] = region;
+					regions.push(region);
 				}
 			}
 		}
@@ -172,45 +211,39 @@ package spine.atlas {
 }
 
 class Reader {
+	static private const trimRegex : RegExp = /^\s+|\s+$/gs;
+
 	private var lines : Array;
 	private var index : int;
 
-	public function Reader(text : String) {
-		lines = text.split(/\r\n|\r|\n/);
+	function Reader(text : String) {
+		lines = trim(text).split(/[ \t]*(?:\r\n|\r|\n)[ \t]*/);
 	}
 
-	public function trim(value : String) : String {
-		return value.replace(/^\s+|\s+$/gs, "");
+	function trim (value : String) : String {
+		return value.replace(trimRegex, "");
 	}
 
-	public function readLine() : String {
-		if (index >= lines.length)
-			return null;
-		return lines[index++];
+	function readLine() : String {
+		return index >= lines.length ? null : lines[index++];
 	}
 
-	public function readValue() : String {
-		var line : String = readLine();
-		var colon : int = line.indexOf(":");
-		if (colon == -1)
-			throw new Error("Invalid line: " + line);
-		return trim(line.substring(colon + 1));
-	}
+	function readEntry(entry : Vector.<String>, line : String) : int {
+		if (line == null) return 0;
+		if (line.length == 0) return 0;
 
-	/** Returns the number of tuple values read (1, 2 or 4). */
-	public function readTuple(tuple : Array) : int {
-		var line : String = readLine();
-		var colon : int = line.indexOf(":");
-		if (colon == -1)
-			throw new Error("Invalid line: " + line);
-		var i : int = 0, lastMatch : int = colon + 1;
-		for (; i < 3; i++) {
-			var comma : int = line.indexOf(",", lastMatch);
-			if (comma == -1) break;
-			tuple[i] = trim(line.substr(lastMatch, comma - lastMatch));
+		var colon : int = line.indexOf(':');
+		if (colon == -1) return 0;
+		entry[0] = trim(line.substr(0, colon));
+		for (var i : int = 1, lastMatch : int = colon + 1;; i++) {
+			var comma : int = line.indexOf(',', lastMatch);
+			if (comma == -1) {
+				entry[i] = trim(line.substr(lastMatch));
+				return i;
+			}
+			entry[i] = trim(line.substr(lastMatch, comma - lastMatch));
 			lastMatch = comma + 1;
+			if (i == 4) return 4;
 		}
-		tuple[i] = trim(line.substring(lastMatch));
-		return i + 1;
 	}
 }

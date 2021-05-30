@@ -33,7 +33,8 @@ package spine.animation {
 
 	public class TrackEntry implements Poolable {
 		public var animation : Animation;
-		public var next : TrackEntry, mixingFrom : TrackEntry, mixingTo: TrackEntry;
+		public var next : TrackEntry, previous : TrackEntry;
+		public var mixingFrom : TrackEntry, mixingTo: TrackEntry;
 		public var onStart : Listeners = new Listeners();
 		public var onInterrupt : Listeners = new Listeners();
 		public var onEnd : Listeners = new Listeners();
@@ -41,7 +42,7 @@ package spine.animation {
 		public var onComplete : Listeners = new Listeners();
 		public var onEvent : Listeners = new Listeners();
 		public var trackIndex : int;
-		public var loop : Boolean, holdPrevious: Boolean;
+		public var loop : Boolean, reverse : Boolean, holdPrevious: Boolean;
 		public var eventThreshold : Number, attachmentThreshold : Number, drawOrderThreshold : Number;
 		public var animationStart : Number, animationEnd : Number, animationLast : Number, nextAnimationLast : Number;
 		public var delay : Number, trackTime : Number, trackLast : Number, nextTrackLast : Number, trackEnd : Number, timeScale : Number;
@@ -63,8 +64,21 @@ package spine.animation {
 			return Math.min(trackTime + animationStart, animationEnd);
 		}
 
+		/** If this track entry is non-looping, the track time in seconds when {@link #getAnimationEnd()} is reached, or the current
+		 * {@link #getTrackTime()} if it has already been reached. If this track entry is looping, the track time when this
+		 * animation will reach its next {@link #getAnimationEnd()} (the next loop completion). */
+		public function getTrackComplete () : Number {
+			var duration : Number = animationEnd - animationStart;
+			if (duration != 0) {
+				if (loop) return duration * (1 + int(trackTime / duration)); // Completion of next loop.
+				if (trackTime < duration) return duration; // Before duration.
+			}
+			return trackTime; // Next update.
+		}
+
 		public function reset() : void {
 			next = null;
+			previous = null;
 			mixingFrom = null;
 			mixingTo = null;
 			animation = null;

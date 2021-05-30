@@ -34,58 +34,119 @@ package spine.animation {
 	import spine.Skeleton;
 	import spine.Slot;
 
-	public class DeformTimeline extends CurveTimeline {
+	public class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		public var slotIndex : int;
-		public var frames : Vector.<Number>;
-		public var frameVertices : Vector.<Vector.<Number>>;
+
+		/** The attachment that will be deformed. */
 		public var attachment : VertexAttachment;
 
-		public function DeformTimeline(frameCount : int) {
-			super(frameCount);
-			frames = new Vector.<Number>(frameCount, true);
-			frameVertices = new Vector.<Vector.<Number>>(frameCount, true);
+		/** The vertices for each key frame. */
+		public var vertices : Vector.<Vector.<Number>>;
+
+		public function DeformTimeline (frameCount : int, bezierCount : int, slotIndex : int, attachment : VertexAttachment) {
+			super(frameCount, bezierCount, [
+				Property.deform + "|" + slotIndex + "|" + attachment.id
+			]);
+			this.slotIndex = slotIndex;
+			this.attachment = attachment;
+			vertices = new Vector.<Vector.<Number>>(frameCount, true);
 		}
 
-		override public function getPropertyId() : int {
-			return (TimelineType.deform.ordinal << 27) + attachment.id + slotIndex;
+		public override function getFrameCount () : int {
+			return frames.length;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
-		public function setFrame(frameIndex : int, time : Number, vertices : Vector.<Number>) : void {
-			frames[frameIndex] = time;
-			frameVertices[frameIndex] = vertices;
+		public function getSlotIndex() : int {
+			return slotIndex;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
-			var vertexAttachment : VertexAttachment;
-			var setupVertices : Vector.<Number>;
+		/** Sets the time in seconds and the vertices for the specified key frame.
+		 * @param vertices Vertex positions for an unweighted VertexAttachment, or deform offsets if it has weights. */
+		public function setFrame (frame : int, time : Number, vertices : Vector.<Number>) : void {
+			frames[frame] = time;
+			this.vertices[frame] = vertices;
+		}
+
+		/** @param value1 Ignored (0 is used for a deform timeline).
+		 * @param value2 Ignored (1 is used for a deform timeline). */
+		public override function setBezier (bezier : int, frame: int, value : Number, time1 : Number, value1 : Number, cx1 : Number, cy1: Number, cx2 : Number,
+			cy2 : Number, time2 : Number, value2 : Number) : void {
+			var curves : Vector.<Number> = this.curves;
+			var i : int = getFrameCount() + bezier * BEZIER_SIZE;
+			if (value == 0) curves[frame] = BEZIER + i;
+			var tmpx : Number = (time1 - cx1 * 2 + cx2) * 0.03, tmpy : Number = cy2 * 0.03 - cy1 * 0.06;
+			var dddx : Number = ((cx1 - cx2) * 3 - time1 + time2) * 0.006, dddy : Number = (cy1 - cy2 + 0.33333333) * 0.018;
+			var ddx : Number = tmpx * 2 + dddx, ddy : Number = tmpy * 2 + dddy;
+			var dx : Number = (cx1 - time1) * 0.3 + tmpx + dddx * 0.16666667, dy : Number = cy1 * 0.3 + tmpy + dddy * 0.16666667;
+			var x : Number = time1 + dx, y : Number = dy;
+			for (var n : int = i + BEZIER_SIZE; i < n; i += 2) {
+				curves[i] = x;
+				curves[i + 1] = y;
+				dx += ddx;
+				dy += ddy;
+				ddx += dddx;
+				ddy += dddy;
+				x += dx;
+				y += dy;
+			}
+		}
+
+		private function getCurvePercent (time : Number, frame : int) : Number {
+			var curves : Vector.<Number> = this.curves;
+			var i : int = curves[frame];
+			var x : Number;
+			switch (i) {
+			case LINEAR:
+				x = frames[frame];
+				return (time - x) / (frames[frame + getFrameEntries()] - x);
+			case STEPPED:
+				return 0;
+			}
+			i -= BEZIER;
+			if (curves[i] > time) {
+				x = frames[frame];
+				return curves[i + 1] * (time - x) / (curves[i] - x);
+			}
+			var n : int = i + BEZIER_SIZE, y : Number;
+			for (i += 2; i < n; i += 2) {
+				if (curves[i] >= time) {
+					x = curves[i - 2];
+					y = curves[i - 1];
+					return y + (time - x) / (curves[i] - x) * (curves[i + 1] - y);
+				}
+			}
+			x = curves[n - 2];
+			y = curves[n - 1];
+			return y + (1 - y) * (time - x) / (frames[frame + getFrameEntries()] - x);
+		}
+
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var slot : Slot = skeleton.slots[slotIndex];
 			if (!slot.bone.active) return;
 			var slotAttachment : Attachment = slot.attachment;
-			if (!(slotAttachment is VertexAttachment) || !(VertexAttachment(slotAttachment).deformAttachment == attachment)) return;
+			if (!(slotAttachment is VertexAttachment) || VertexAttachment(slotAttachment).deformAttachment != attachment) return;
+			var vertexAttachment : VertexAttachment = VertexAttachment(slotAttachment);
 
-			var deformArray : Vector.<Number> = slot.deform;
-			if (deformArray.length == 0) blend = MixBlend.setup;
+			var deform : Vector.<Number> = slot.deform;
+			if (deform.length == 0) blend = MixBlend.setup;
 
-			var frameVertices : Vector.<Vector.<Number>> = this.frameVertices;
-			var vertexCount : int = frameVertices[0].length;
-			var deform : Vector.<Number>;
+			var vertices : Vector.<Vector.<Number>> = this.vertices;
+			var vertexCount : int = vertices[0].length;
+
+			var i : int, setupVertices : Vector.<Number>;
 
 			var frames : Vector.<Number> = this.frames;
-			var i : int;
 			if (time < frames[0]) {
-				vertexAttachment = VertexAttachment(slotAttachment);
 				switch (blend) {
 				case MixBlend.setup:
-					deformArray.length = 0;
+					deform.length = 0;
 					return;
 				case MixBlend.first:
 					if (alpha == 1) {
-						deformArray.length = 0;
+						deform.length = 0;
 						return;
 					}
-					deformArray.length = vertexCount;
-					deform = deformArray;
+					deform.length = vertexCount;
 					if (vertexAttachment.bones == null) {
 						// Unweighted vertex positions.
 						setupVertices = vertexAttachment.vertices;
@@ -101,82 +162,82 @@ package spine.animation {
 				return;
 			}
 
-			deformArray.length = vertexCount;
-			deform = deformArray;
-			var n : int;
-			var setup : Number, prev : Number;
+			deform.length = vertexCount;
+			var setup : Number;
+
 			if (time >= frames[frames.length - 1]) { // Time is after last frame.
-				var lastVertices : Vector.<Number> = frameVertices[frames.length - 1];
+				var lastVertices : Vector.<Number> = vertices[frames.length - 1];
 				if (alpha == 1) {
 					if (blend == MixBlend.add) {
-						vertexAttachment = VertexAttachment(slotAttachment);
 						if (vertexAttachment.bones == null) {
+							// Unweighted vertex positions, with alpha.
 							setupVertices = vertexAttachment.vertices;
-							for (i = 0; i < vertexCount; i++) {
+							for (i = 0; i < vertexCount; i++)
 								deform[i] += lastVertices[i] - setupVertices[i];
-							}
 						} else {
+							// Weighted deform offsets, with alpha.
 							for (i = 0; i < vertexCount; i++)
 								deform[i] += lastVertices[i];
 						}
 					} else {
-						for (i = 0, n = vertexCount; i < n; i++)
+						for (i = 0; i < vertexCount; i++)
 							deform[i] = lastVertices[i];
 					}
-				} else {
+				} else {
 					switch (blend) {
-						case MixBlend.setup:
-							vertexAttachment = VertexAttachment(slotAttachment);
-							if (vertexAttachment.bones == null) {
-								// Unweighted vertex positions, with alpha.
-								setupVertices = vertexAttachment.vertices;
-								for (i = 0; i < vertexCount; i++) {
-									setup = setupVertices[i];
-									deform[i] = setup + (lastVertices[i] - setup) * alpha;
-								}
-							} else {
-								// Weighted deform offsets, with alpha.
-								for (i = 0; i < vertexCount; i++)
-									deform[i] = lastVertices[i] * alpha;
+					case MixBlend.setup: {
+						if (vertexAttachment.bones == null) {
+							// Unweighted vertex positions, with alpha.
+							setupVertices = vertexAttachment.vertices;
+							for (i = 0; i < vertexCount; i++) {
+								setup = setupVertices[i];
+								deform[i] = setup + (lastVertices[i] - setup) * alpha;
 							}
-							break;
-						case MixBlend.first:
-						case MixBlend.replace:
+						} else {
+							// Weighted deform offsets, with alpha.
 							for (i = 0; i < vertexCount; i++)
-								deform[i] += (lastVertices[i] - deform[i]) * alpha;
-						case MixBlend.add:
-							vertexAttachment = VertexAttachment(slotAttachment);
-							if (vertexAttachment.bones == null) {
-								setupVertices = vertexAttachment.vertices;
-								for (i = 0; i < vertexCount; i++) {
-									deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
-								}
-							} else {
-								for (i = 0; i < vertexCount; i++)
-									deform[i] += lastVertices[i] * alpha;
-							}
+								deform[i] = lastVertices[i] * alpha;
+						}
+						break;
+					}
+					case MixBlend.first:
+					case MixBlend.replace:
+						for (i = 0; i < vertexCount; i++)
+							deform[i] += (lastVertices[i] - deform[i]) * alpha;
+						break;
+					case MixBlend.add:
+						if (vertexAttachment.bones == null) {
+							// Unweighted vertex positions, with alpha.
+							setupVertices = vertexAttachment.vertices;
+							for (i = 0; i < vertexCount; i++)
+								deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+						} else {
+							// Weighted deform offsets, with alpha.
+							for (i = 0; i < vertexCount; i++)
+								deform[i] += lastVertices[i] * alpha;
+						}
 					}
 				}
 				return;
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			var frame : int = Animation.binarySearch1(frames, time);
-			var prevVertices : Vector.<Number> = frameVertices[frame - 1];
-			var nextVertices : Vector.<Number> = frameVertices[frame];
-			var frameTime : Number = frames[frame];
-			var percent : Number = getCurvePercent(frame - 1, 1 - (time - frameTime) / (frames[frame - 1] - frameTime));
+			var frame : int = search(frames, time);
+			var percent : Number = getCurvePercent(time, frame);
+			var prevVertices : Vector.<Number> = vertices[frame], prev : Number;
+			var nextVertices : Vector.<Number> = vertices[frame + 1];
 
 			if (alpha == 1) {
 				if (blend == MixBlend.add) {
-					vertexAttachment = VertexAttachment(slotAttachment);
 					if (vertexAttachment.bones == null) {
+						// Unweighted vertex positions, with alpha.
 						setupVertices = vertexAttachment.vertices;
 						for (i = 0; i < vertexCount; i++) {
 							prev = prevVertices[i];
 							deform[i] += prev + (nextVertices[i] - prev) * percent - setupVertices[i];
 						}
 					} else {
+						// Weighted deform offsets, with alpha.
 						for (i = 0; i < vertexCount; i++) {
 							prev = prevVertices[i];
 							deform[i] += prev + (nextVertices[i] - prev) * percent;
@@ -190,44 +251,46 @@ package spine.animation {
 				}
 			} else {
 				switch (blend) {
-					case MixBlend.setup:
-						vertexAttachment = VertexAttachment(slotAttachment);
-						if (vertexAttachment.bones == null) {
-							// Unweighted vertex positions, with alpha.
-							setupVertices = vertexAttachment.vertices;
-							for (i = 0; i < vertexCount; i++) {
-								prev = prevVertices[i], setup = setupVertices[i];
-								deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
-							}
-						} else {
-							// Weighted deform offsets, with alpha.
-							for (i = 0; i < vertexCount; i++) {
-								prev = prevVertices[i];
-								deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
-							}
-						}
-						break;
-					case MixBlend.first:
-					case MixBlend.replace:
+				case MixBlend.setup: {
+					if (vertexAttachment.bones == null) {
+						// Unweighted vertex positions, with alpha.
+						setupVertices = vertexAttachment.vertices;
 						for (i = 0; i < vertexCount; i++) {
 							prev = prevVertices[i];
-							deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
+							setup = setupVertices[i];
+							deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
 						}
-						break;
-					case MixBlend.add:
-						vertexAttachment = VertexAttachment(slotAttachment);
-						if (vertexAttachment.bones == null) {
-							setupVertices = vertexAttachment.vertices;
-							for (i = 0; i < vertexCount; i++) {
-								prev = prevVertices[i], setup = setupVertices[i];
-								deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
-							}
-						} else {
-							for (i = 0; i < vertexCount; i++) {
-								prev = prevVertices[i];
-								deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
-							}
+					} else {
+						// Weighted deform offsets, with alpha.
+						for (i = 0; i < vertexCount; i++) {
+							prev = prevVertices[i];
+							deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
 						}
+					}
+					break;
+				}
+				case MixBlend.first:
+				case MixBlend.replace:
+					for (i = 0; i < vertexCount; i++) {
+						prev = prevVertices[i];
+						deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
+					}
+					break;
+				case MixBlend.add:
+					if (vertexAttachment.bones == null) {
+						// Unweighted vertex positions, with alpha.
+						setupVertices = vertexAttachment.vertices;
+						for (i = 0; i < vertexCount; i++) {
+							prev = prevVertices[i];
+							deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+						}
+					} else {
+						// Weighted deform offsets, with alpha.
+						for (i = 0; i < vertexCount; i++) {
+							prev = prevVertices[i];
+							deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
+						}
+					}
 				}
 			}
 		}

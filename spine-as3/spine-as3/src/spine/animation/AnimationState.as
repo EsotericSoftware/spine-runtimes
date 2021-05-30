@@ -28,24 +28,20 @@
  *****************************************************************************/
 
 package spine.animation {
-	import spine.Bone;
-	import spine.Event;
-	import spine.MathUtils;
-	import spine.Pool;
-	import spine.Skeleton;
+	import spine.*;
 	import flash.utils.Dictionary;
-	import spine.Slot;
 
 	public class AnimationState {
-		public static var SUBSEQUENT : int = 0;
-		public static var FIRST : int = 1;
-		public static var HOLD_SUBSEQUENT : int = 2;
-		public static var HOLD_FIRST : int = 3;
-		public static var HOLD_MIX : int = 4;
-		public static var SETUP : int = 1;
-		public static var CURRENT : int = 2;
+		static private var SUBSEQUENT : int = 0;
+		static private var FIRST : int = 1;
+		static private var HOLD_SUBSEQUENT : int = 2;
+		static private var HOLD_FIRST : int = 3;
+		static private var HOLD_MIX : int = 4;
+		static private var SETUP : int = 1;
+		static private var CURRENT : int = 2;
 
-		internal static var emptyAnimation : Animation = new Animation("<empty>", new Vector.<Timeline>(), 0);
+		static private var emptyAnimation : Animation = new Animation("<empty>", new Vector.<Timeline>(), 0);
+
 		public var data : AnimationStateData;
 		public var tracks : Vector.<TrackEntry> = new Vector.<TrackEntry>();
 		internal var events : Vector.<Event> = new Vector.<Event>();
@@ -56,7 +52,7 @@ package spine.animation {
 		public var onComplete : Listeners = new Listeners();
 		public var onEvent : Listeners = new Listeners();
 		internal var queue : EventQueue;
-		internal var propertyIDs : Dictionary = new Dictionary();
+		internal var propertyIDs : StringSet = new StringSet();
 		internal var mixingTo : Vector.<TrackEntry> = new Vector.<TrackEntry>();
 		internal var animationsChanged : Boolean;
 		public var timeScale : Number = 1;
@@ -178,7 +174,12 @@ package spine.animation {
 					mix = 0;
 
 				// Apply current entry.
-				var animationLast : Number = current.animationLast, animationTime : Number = current.getAnimationTime();
+				var animationLast : Number = current.animationLast, animationTime : Number = current.getAnimationTime(), applyTime : Number = animationTime;
+				var applyEvents : Vector.<Event> = events;
+				if (current.reverse) {
+					applyTime = current.animation.duration - applyTime;
+					applyEvents = null;
+				}
 				var timelineCount : int = current.animation.timelines.length;
 				var timelines : Vector.<Timeline> = current.animation.timelines;
 				var ii : int = 0;
@@ -186,11 +187,10 @@ package spine.animation {
 				if ((i == 0 && mix == 1) || blend == MixBlend.add) {
 					for (ii = 0; ii < timelineCount; ii++) {
 						timeline = timelines[ii];
-						if (timeline is AttachmentTimeline) {
-							applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, animationTime, blend, true);
-						} else {
-							timeline.apply(skeleton, animationLast, animationTime, events, mix, blend, MixDirection.In);
-						}
+						if (timeline is AttachmentTimeline)
+							applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, applyTime, blend, true);
+						else
+							timeline.apply(skeleton, animationLast, applyTime, applyEvents, mix, blend, MixDirection.mixIn);
 					}
 				} else {
 					var timelineMode : Vector.<int> = current.timelineMode;
@@ -202,12 +202,12 @@ package spine.animation {
 					for (ii = 0; ii < timelineCount; ii++) {
 						timeline = timelines[ii];
 						var timelineBlend : MixBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
-						if (timeline is RotateTimeline) {
-							applyRotateTimeline(timeline, skeleton, animationTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
-						} else if (timeline is AttachmentTimeline) {
-							applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, animationTime, timelineBlend, true);
-						} else
-							timeline.apply(skeleton, animationLast, animationTime, events, mix, timelineBlend, MixDirection.In);
+						if (timeline is RotateTimeline)
+							applyRotateTimeline(timeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
+						else if (timeline is AttachmentTimeline)
+							applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, applyTime, timelineBlend, true);
+						else
+							timeline.apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend, MixDirection.mixIn);
 					}
 				}
 				queueEvents(current, animationTime);
@@ -225,7 +225,7 @@ package spine.animation {
 				var slot : Slot = slots[si];
 				if (slot.attachmentState == setupState) {
 					var attachmentName : String = slot.data.attachmentName;
-					slot.attachment = (attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slot.data.index, attachmentName));
+					slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slot.data.index, attachmentName);
 				}
 			}
 			this.unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
@@ -248,17 +248,21 @@ package spine.animation {
 				if (blend != MixBlend.first) blend = from.mixBlend;
 			}
 
-			var events : Vector.<Event> = mix < from.eventThreshold ? this.events : null;
 			var attachments : Boolean = mix < from.attachmentThreshold, drawOrder : Boolean = mix < from.drawOrderThreshold;
-			var animationLast : Number = from.animationLast, animationTime : Number = from.getAnimationTime();
 			var timelineCount : int = from.animation.timelines.length;
 			var timelines : Vector.<Timeline> = from.animation.timelines;
-			var alphaHold : Number = from.alpha * to.interruptAlpha;
-			var alphaMix : Number = alphaHold * (1 - mix);
+			var alphaHold : Number = from.alpha * to.interruptAlpha, alphaMix : Number = alphaHold * (1 - mix);
+			var animationLast : Number = from.animationLast, animationTime : Number = from.getAnimationTime(), applyTime : Number = animationTime;
+			var events : Vector.<Event> = null;
+			if (from.reverse)
+				applyTime = from.animation.duration - applyTime;
+			else if (mix < from.eventThreshold)
+				events = this.events;
+
 			var i : int = 0;
 			if (blend == MixBlend.add) {
 				for (i = 0; i < timelineCount; i++)
-					timelines[i].apply(skeleton, animationLast, animationTime, events, alphaMix, blend, MixDirection.Out);
+					timelines[i].apply(skeleton, animationLast, applyTime, events, alphaMix, blend, MixDirection.mixOut);
 			} else {
 				var timelineMode : Vector.<int> = from.timelineMode;
 				var timelineHoldMix : Vector.<TrackEntry> = from.timelineHoldMix;
@@ -270,7 +274,7 @@ package spine.animation {
 				from.totalAlpha = 0;
 				for (i = 0; i < timelineCount; i++) {
 					var timeline : Timeline = timelines[i];
-					var direction : MixDirection = MixDirection.Out;
+					var direction : MixDirection = MixDirection.mixOut;
 					var timelineBlend: MixBlend;
 					var alpha : Number = 0;
 					switch (timelineMode[i]) {
@@ -299,12 +303,12 @@ package spine.animation {
 					}
 					from.totalAlpha += alpha;
 					if (timeline is RotateTimeline)
-						applyRotateTimeline(timeline, skeleton, animationTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
+						applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
 					else if (timeline is AttachmentTimeline) {
-						applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, animationTime, timelineBlend, attachments);
+						applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, applyTime, timelineBlend, attachments);
 					} else {
-						if (drawOrder && timeline is DrawOrderTimeline && timelineBlend == MixBlend.setup) direction = MixDirection.In;
-						timeline.apply(skeleton, animationLast, animationTime, events, alpha, timelineBlend, direction);
+						if (drawOrder && timeline is DrawOrderTimeline && timelineBlend == MixBlend.setup) direction = MixDirection.mixIn;
+						timeline.apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction);
 					}
 				}
 			}
@@ -318,22 +322,15 @@ package spine.animation {
 		}
 
 		private function applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: Number, blend: MixBlend, attachments: Boolean) : void {
-			var slot : Slot = skeleton.slots[timeline.slotIndex];
+			var slot : Slot = skeleton.slots[timeline.getSlotIndex()];
 			if (!slot.bone.active) return;
 
 			var frames : Vector.<Number> = timeline.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				if (blend == MixBlend.setup || blend == MixBlend.first)
 					setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
-			}
-			else {
-				var frameIndex : Number;
-				if (time >= frames[frames.length - 1]) // Time is after last frame.
-					frameIndex = frames.length - 1;
-				else
-					frameIndex = Animation.binarySearch1(frames, time) - 1;
-				setAttachment(skeleton, slot, timeline.attachmentNames[frameIndex], attachments);
-			}
+			} else
+				setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search(frames, time)], attachments);
 
 			// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
 			if (slot.attachmentState <= unkeyedState) slot.attachmentState = unkeyedState + SETUP;
@@ -348,14 +345,14 @@ package spine.animation {
 			if (firstFrame) timelinesRotation[i] = 0;
 
 			if (alpha == 1) {
-				timeline.apply(skeleton, 0, time, null, 1, blend, MixDirection.In);
+				timeline.apply(skeleton, 0, time, null, 1, blend, MixDirection.mixIn);
 				return;
 			}
 
 			var rotateTimeline : RotateTimeline = RotateTimeline(timeline);
-			var frames : Vector.<Number> = rotateTimeline.frames;
-			var bone : Bone = skeleton.bones[rotateTimeline.boneIndex];
+			var bone : Bone = skeleton.bones[rotateTimeline.getBoneIndex()];
 			if (!bone.active) return;
+			var frames : Vector.<Number> = rotateTimeline.frames;
 			var r1 : Number, r2 : Number;
 			if (time < frames[0]) {
 				switch (blend) {
@@ -369,20 +366,7 @@ package spine.animation {
 				}
 			} else {
 				r1 = blend == MixBlend.setup ? bone.data.rotation : bone.rotation;
-				if (time >= frames[frames.length - RotateTimeline.ENTRIES]) // Time is after last frame.
-					r2 = bone.data.rotation + frames[frames.length + RotateTimeline.PREV_ROTATION];
-				else {
-					// Interpolate between the previous frame and the current frame.
-					var frame : int = Animation.binarySearch(frames, time, RotateTimeline.ENTRIES);
-					var prevRotation : Number = frames[frame + RotateTimeline.PREV_ROTATION];
-					var frameTime : Number = frames[frame];
-					var percent : Number = rotateTimeline.getCurvePercent((frame >> 1) - 1, 1 - (time - frameTime) / (frames[frame + RotateTimeline.PREV_TIME] - frameTime));
-
-					r2 = frames[frame + RotateTimeline.ROTATION] - prevRotation;
-					r2 -= (16384 - int((16384.499999999996 - r2 / 360))) * 360;
-					r2 = prevRotation + r2 * percent + bone.data.rotation;
-					r2 -= (16384 - int((16384.499999999996 - r2 / 360))) * 360;
-				}
+				r2 = bone.data.rotation + rotateTimeline.getCurveValue(time);
 			}
 
 			// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
@@ -411,8 +395,7 @@ package spine.animation {
 				timelinesRotation[i] = total;
 			}
 			timelinesRotation[i + 1] = diff;
-			r1 += total * alpha;
-			bone.rotation = r1 - (16384 - int((16384.499999999996 - r1 / 360))) * 360;
+			bone.rotation = r1 + total * alpha;
 		}
 
 		private function queueEvents(entry : TrackEntry, animationTime : Number) : void {
@@ -443,7 +426,7 @@ package spine.animation {
 			for (; i < n; i++) {
 				event = events[i];
 				if (event.time < animationStart) continue; // Discard events outside animation start/end.
-				queue.event(entry, events[i]);
+				queue.event(entry, event);
 			}
 		}
 
@@ -481,9 +464,15 @@ package spine.animation {
 			queue.drain();
 		}
 
+		/** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
+		private function clearNext(entry : TrackEntry) : void {
+			disposeNext(entry.next);
+		}
+
 		private function setCurrent(index : int, current : TrackEntry, interrupt : Boolean) : void {
 			var from : TrackEntry = expandToIndex(index);
 			tracks[index] = current;
+			current.previous = null;
 
 			if (from != null) {
 				if (interrupt) queue.interrupt(from);
@@ -551,16 +540,8 @@ package spine.animation {
 				queue.drain();
 			} else {
 				last.next = entry;
-				if (delay <= 0) {
-					var duration : Number = last.animationEnd - last.animationStart;
-					if (duration != 0) {
-						if (last.loop)
-							delay += duration * (1 + (int)(last.trackTime / duration));
-						else
-							delay += Math.max(duration, last.trackTime);
-					} else
-						delay = last.trackTime;
-				}
+				entry.previous = last;
+				if (delay <= 0) delay += last.getTrackComplete() - entry.mixDuration;
 			}
 
 			entry.delay = delay;
@@ -575,10 +556,10 @@ package spine.animation {
 		}
 
 		public function addEmptyAnimation(trackIndex : int, mixDuration : Number, delay : Number) : TrackEntry {
-			if (delay <= 0) delay -= mixDuration;
-			var entry : TrackEntry = addAnimation(trackIndex, emptyAnimation, false, delay);
+			var entry : TrackEntry = addAnimation(trackIndex, emptyAnimation, false, delay <= 0 ? 1 : delay);
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
+			if (delay <= 0 && entry.previous != null) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration;
 			return entry;
 		}
 
@@ -641,7 +622,7 @@ package spine.animation {
 		private function _animationsChanged() : void {
 			animationsChanged = false;
 
-			propertyIDs = new Dictionary();
+			propertyIDs.clear();
 			var i : int = 0;
 			var n: int = 0;
 			var entry : TrackEntry = null;
@@ -658,52 +639,44 @@ package spine.animation {
 		}
 
 		private function computeHold (entry: TrackEntry) : void {
-			var to: TrackEntry = entry.mixingTo;
+			var to : TrackEntry = entry.mixingTo;
 			var timelines : Vector.<Timeline> = entry.animation.timelines;
 			var timelinesCount : int = entry.animation.timelines.length;
 			var timelineMode : Vector.<int> = entry.timelineMode;
 			timelineMode.length = timelinesCount;
+			entry.timelineHoldMix.length = 0;
 			var timelineHoldMix : Vector.<TrackEntry> = entry.timelineHoldMix;
-			timelineHoldMix.length = 0;
-			var propertyIDs: Dictionary = this.propertyIDs;
+			timelineHoldMix.length = timelinesCount;
+			var propertyIDs : StringSet = this.propertyIDs;
 
-			var i : int = 0;
+			var i : int;
+
 			if (to != null && to.holdPrevious) {
-				for (i = 0; i < timelinesCount; i++) {
-					if (!propertyIDs[timelines[i].getPropertyId().toString()]) {
-						timelineMode[i] = HOLD_FIRST;
-					} else {
-						timelineMode[i] = HOLD_SUBSEQUENT;
-					}
-					propertyIDs[timelines[i].getPropertyId().toString()] = true;
-
-				}
+				for (i = 0; i < timelinesCount; i++)
+					timelineMode[i] = propertyIDs.addAll(timelines[i].propertyIds) ? HOLD_FIRST : HOLD_SUBSEQUENT;
 				return;
 			}
 
 			outer:
 			for (i = 0; i < timelinesCount; i++) {
-				var timeline : Timeline = Timeline(timelines[i]);
-				var intId : int = timeline.getPropertyId();
-				var id : String = intId.toString();
-				var contained: Object = propertyIDs[id];
-				propertyIDs[id] = true;
-				if (contained != null) {
-					timelineMode[i] = AnimationState.SUBSEQUENT;
-				} else if (to == null || timeline is AttachmentTimeline || timeline is DrawOrderTimeline
-					|| timeline is EventTimeline || !to.animation.hasTimeline(intId)) {
-					timelineMode[i] = AnimationState.FIRST;
-				} else {
+				var timeline : Timeline = timelines[i];
+				var ids : Vector.<String> = timeline.propertyIds;
+				if (!propertyIDs.addAll(ids))
+					timelineMode[i] = SUBSEQUENT;
+				else if (to == null || timeline is AttachmentTimeline || timeline is DrawOrderTimeline
+					|| timeline is EventTimeline || !to.animation.hasTimeline(ids)) {
+					timelineMode[i] = FIRST;
+				} else {
 					for (var next : TrackEntry = to.mixingTo; next != null; next = next.mixingTo) {
-						if (next.animation.hasTimeline(intId)) continue;
+						if (next.animation.hasTimeline(ids)) continue;
 						if (entry.mixDuration > 0) {
-							timelineMode[i] = AnimationState.HOLD_MIX;
-							timelineHoldMix[i] = entry;
+							timelineMode[i] = HOLD_MIX;
+							timelineHoldMix[i] = next;
 							continue outer;
 						}
 						break;
 					}
-					timelineMode[i] = AnimationState.HOLD_FIRST;
+					timelineMode[i] = HOLD_FIRST;
 				}
 			}
 		}
@@ -725,5 +698,38 @@ package spine.animation {
 		public function clearListenerNotifications() : void {
 			queue.clear();
 		}
+	}
+}
+
+import flash.utils.Dictionary;
+
+class StringSet {
+	private var entries : Dictionary = new Dictionary();
+	private var size : int = 0;
+
+	public function add (value : String): Boolean {
+		var contains : Boolean = entries[value];
+		entries[value] = true;
+		if (!contains) {
+			size++;
+			return true;
+		}
+		return false;
+	}
+
+	public function addAll (values : Vector.<String>) : Boolean {
+		var oldSize : int = size;
+		for (var i : int = 0, n : int = values.length; i < n; i++)
+			add(values[i]);
+		return oldSize != size;
+	}
+
+	public function contains (value : String) : Boolean {
+		return entries[value];
+	}
+
+	public function clear () : void {
+		entries = new Dictionary();
+		size = 0;
 	}
 }

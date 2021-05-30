@@ -32,35 +32,26 @@ package spine.animation {
 	import spine.Event;
 	import spine.Skeleton;
 
-	public class TranslateTimeline extends CurveTimeline {
-		static public const ENTRIES : int = 3;
-		static internal const PREV_TIME : int = -3, PREV_X : int = -2, PREV_Y : int = -1;
-		static internal const X : int = 1, Y : int = 2;
-		public var boneIndex : int;
-		public var frames : Vector.<Number>; // time, value, value, ...
+	public class TranslateTimeline extends CurveTimeline2 implements BoneTimeline {
+		private var boneIndex : int;
 
-		public function TranslateTimeline(frameCount : int) {
-			super(frameCount);
-			frames = new Vector.<Number>(frameCount * ENTRIES, true);
+		public function TranslateTimeline(frameCount : int, bezierCount : int, boneIndex : int) {
+			super(frameCount, bezierCount, [
+				Property.x + "|" + boneIndex,
+				Property.y + "|" + boneIndex
+			]);
+			this.boneIndex = boneIndex;
 		}
 
-		override public function getPropertyId() : int {
-			return (TimelineType.translate.ordinal << 24) + boneIndex;
+		public function getBoneIndex() : int {
+			return boneIndex;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
-		public function setFrame(frameIndex : int, time : Number, x : Number, y : Number) : void {
-			frameIndex *= ENTRIES;
-			frames[frameIndex] = time;
-			frames[int(frameIndex + X)] = x;
-			frames[int(frameIndex + Y)] = y;
-		}
-
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
-			var frames : Vector.<Number> = this.frames;
-
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var bone : Bone = skeleton.bones[boneIndex];
 			if (!bone.active) return;
+
+			var frames : Vector.<Number> = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -74,34 +65,40 @@ package spine.animation {
 				return;
 			}
 
-			var x : Number, y : Number;
-			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-				x = frames[frames.length + PREV_X];
-				y = frames[frames.length + PREV_Y];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				var frame : int = Animation.binarySearch(frames, time, ENTRIES);
-				x = frames[frame + PREV_X];
-				y = frames[frame + PREV_Y];
-				var frameTime : Number = frames[frame];
-				var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				x += (frames[frame + X] - x) * percent;
-				y += (frames[frame + Y] - y) * percent;
+			var x : Number = 0, y : Number = 0;
+			var i : int = search2(frames, time, ENTRIES);
+			var curveType : Number = curves[i / ENTRIES];
+			switch (curveType) {
+			case LINEAR:
+				var before : Number = frames[i];
+				x = frames[i + VALUE1];
+				y = frames[i + VALUE2];
+				var t : Number = (time - before) / (frames[i + ENTRIES] - before);
+				x += (frames[i + ENTRIES + VALUE1] - x) * t;
+				y += (frames[i + ENTRIES + VALUE2] - y) * t;
+				break;
+			case STEPPED:
+				x = frames[i + VALUE1];
+				y = frames[i + VALUE2];
+				break;
+			default:
+				x = getBezierValue(time, i, VALUE1, curveType - BEZIER);
+				y = getBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
 			}
+
 			switch (blend) {
-				case MixBlend.setup:
-					bone.x = bone.data.x + x * alpha;
-					bone.y = bone.data.y + y * alpha;
-					break;
-				case MixBlend.first:
-				case MixBlend.replace:
-					bone.x += (bone.data.x + x - bone.x) * alpha;
-					bone.y += (bone.data.y + y - bone.y) * alpha;
-					break;
-				case MixBlend.add:
-					bone.x += x * alpha;
-					bone.y += y * alpha;
+			case MixBlend.setup:
+				bone.x = bone.data.x + x * alpha;
+				bone.y = bone.data.y + y * alpha;
+				break;
+			case MixBlend.first:
+			case MixBlend.replace:
+				bone.x += (bone.data.x + x - bone.x) * alpha;
+				bone.y += (bone.data.y + y - bone.y) * alpha;
+				break;
+			case MixBlend.add:
+				bone.x += x * alpha;
+				bone.y += y * alpha;
 			}
 		}
 	}

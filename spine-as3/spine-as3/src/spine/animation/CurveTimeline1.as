@@ -27,19 +27,51 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.interpolation {
-	import spine.Interpolation;
-	
-	public class Pow extends Interpolation {
-		protected var power : int;
-		
-		public function Pow(power : int) {
-			this.power = power;
+package spine.animation {
+	/** The base class for a {@link CurveTimeline} that sets one property. */
+	public class CurveTimeline1 extends CurveTimeline {
+		static private const ENTRIES : Number = 2;
+		static private const VALUE : Number = 1;
+
+		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
+		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
+		public function CurveTimeline1 (frameCount : int, bezierCount : int, propertyIds : Array) {
+			super(frameCount, bezierCount, propertyIds);
 		}
-		
-		protected override function applyInternal(a : Number) : Number {
-			if (a <= 0.5) return Math.pow(a * 2, power) / 2;
-			return Math.pow((a - 1) * 2, power) / (power % 2 == 0 ? -2 : 2) + 1;
+
+		public override function getFrameEntries() : int {
+			return ENTRIES;
+		}
+
+		/** Sets the time and values for the specified frame.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+		 * @param time The frame time in seconds. */
+		public function setFrame(frame : int, time : Number, value1 : Number) : void {
+			frame <<= 1;
+			frames[frame] = time;
+			frames[frame + VALUE] = value1;
+		}
+
+		/** Returns the interpolated value for the specified time. */
+		public function getCurveValue(time : Number) : Number {
+			var frames : Vector.<Number> = this.frames;
+			var i : int = frames.length - 2;
+			for (var ii : int = 2; ii <= i; ii += 2) {
+				if (frames[ii] > time) {
+					i = ii - 2;
+					break;
+				}
+			}
+
+			var curveType : Number = curves[i >> 1];
+			switch (curveType) {
+			case LINEAR:
+				var before : Number = frames[i], value : Number = frames[i + VALUE];
+				return value + (time - before) / (frames[i + ENTRIES] - before) * (frames[i + ENTRIES + VALUE] - value);
+			case STEPPED:
+				return frames[i + VALUE];
+			}
+			return getBezierValue(time, i, VALUE, curveType - BEZIER);
 		}
 	}
 }

@@ -93,7 +93,7 @@ package spine.starling {
 
 		public function loadRegion(region : AtlasRegion) : void {
 			var image : Image = new Image(Texture(region.page.rendererObject));
-			if (region.rotate) {
+			if (region.degrees == 90) {
 				image.setTexCoords(0, region.u, region.v2);
 				image.setTexCoords(1, region.u, region.v);
 				image.setTexCoords(2, region.u2, region.v2);

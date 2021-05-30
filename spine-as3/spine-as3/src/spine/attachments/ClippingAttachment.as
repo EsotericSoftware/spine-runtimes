@@ -31,7 +31,7 @@ package spine.attachments {
 	import spine.Color;
 	import spine.SlotData;
 	
-	public class ClippingAttachment extends VertexAttachment {
+	public dynamic class ClippingAttachment extends VertexAttachment {
 		public var endSlot : SlotData;
 		public var color : Color = new Color(0.2275, 0.2275, 0.2275, 1);
 

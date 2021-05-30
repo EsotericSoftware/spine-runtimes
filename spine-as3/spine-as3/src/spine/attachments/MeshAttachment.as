@@ -43,7 +43,6 @@ package spine.attachments {
 		public var regionV : Number;
 		public var regionU2 : Number;
 		public var regionV2 : Number;
-		public var regionRotate : Boolean;
 		public var regionDegrees : int;
 		public var regionOffsetX : Number; // Pixels stripped from the bottom left, unrotated.
 		public var regionOffsetY : Number;
@@ -148,7 +147,6 @@ package spine.attachments {
 			copy.regionV = regionV;
 			copy.regionU2 = regionU2;
 			copy.regionV2 = regionV2;
-			copy.regionRotate = regionRotate;
 			copy.regionDegrees = regionDegrees;
 			copy.regionOffsetX =  regionOffsetX;
 			copy.regionOffsetY = regionOffsetY;
@@ -186,7 +184,6 @@ package spine.attachments {
 			copy.regionV = regionV;
 			copy.regionU2 = regionU2;
 			copy.regionV2 = regionV2;
-			copy.regionRotate = regionRotate;
 			copy.regionDegrees = regionDegrees;
 			copy.regionOffsetX =  regionOffsetX;
 			copy.regionOffsetY = regionOffsetY;

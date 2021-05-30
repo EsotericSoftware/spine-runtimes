@@ -33,16 +33,17 @@ package spine {
 	public class PathConstraint implements Updatable {
 		private static const NONE : int = -1, BEFORE : int = -2, AFTER : int = -3;
 		private static const epsilon : Number = 0.00001;
+
 		internal var _data : PathConstraintData;
 		internal var _bones : Vector.<Bone>;
 		public var target : Slot;
-		public var position : Number, spacing : Number, rotateMix : Number, translateMix : Number;
+		public var position : Number, spacing : Number, mixRotate : Number, mixX : Number, mixY : Number;
 		internal const _spaces : Vector.<Number> = new Vector.<Number>();
 		internal const _positions : Vector.<Number> = new Vector.<Number>();
 		internal const _world : Vector.<Number> = new Vector.<Number>();
 		internal const _curves : Vector.<Number> = new Vector.<Number>();
 		internal const _lengths : Vector.<Number> = new Vector.<Number>();
-		internal const _segments : Vector.<Number> = new Vector.<Number>(10);
+		internal const _segments : Vector.<Number> = new Vector.<Number>(10, true);
 		public var active : Boolean;
 
 		public function PathConstraint(data : PathConstraintData, skeleton : Skeleton) {
@@ -55,8 +56,9 @@ package spine {
 			target = skeleton.findSlot(data.target.name);
 			position = data.position;
 			spacing = data.spacing;
-			rotateMix = data.rotateMix;
-			translateMix = data.translateMix;
+			mixRotate = data.mixRotate;
+			mixX = data.mixX;
+			mixY = data.mixY;
 		}
 		
 		public function isActive() : Boolean {
@@ -71,80 +73,109 @@ package spine {
 			var attachment : PathAttachment = target.attachment as PathAttachment;
 			if (attachment == null) return;
 
-			var rotateMix : Number = this.rotateMix, translateMix : Number = this.translateMix;
-			var translate : Boolean = translateMix > 0, rotate : Boolean = rotateMix > 0;
-			if (!translate && !rotate) return;
+			var mixRotate : Number = this.mixRotate, mixX : Number = this.mixX, mixY : Number = this.mixY;
+			if (mixRotate == 0 && mixX == 0 && mixY == 0) return;
 
 			var data : PathConstraintData = this._data;
-			var percentSpacing : Boolean = data.spacingMode == SpacingMode.percent;			
-			var rotateMode : RotateMode = data.rotateMode;
-			var tangents : Boolean = rotateMode == RotateMode.tangent, scale : Boolean = rotateMode == RotateMode.chainScale;
+			var tangents : Boolean = data.rotateMode == RotateMode.tangent, scale : Boolean = data.rotateMode == RotateMode.chainScale;
+
 			var boneCount : int = this._bones.length, spacesCount : int = tangents ? boneCount : boneCount + 1;
 			var bones : Vector.<Bone> = this._bones;
 			this._spaces.length = spacesCount;
-			var spaces : Vector.<Number> = this._spaces, lengths : Vector.<Number> = null;
+			var spaces : Vector.<Number> = this._spaces, lengths : Vector.<Number> = _lengths;
+			if (scale) lengths.length = boneCount;
 			var spacing : Number = this.spacing;
-			if (scale || !percentSpacing) {
+
+			var i : int, n : int, bone : Bone, setupLength : int, x : Number, y : Number, length : Number;
+
+			switch (data.spacingMode) {
+			case SpacingMode.percent:
 				if (scale) {
-					this._lengths.length = boneCount;
-					lengths = this._lengths;
-				}
-				var lengthSpacing : Boolean = data.spacingMode == SpacingMode.length;
-				for (var i : int = 0, n : int = spacesCount - 1; i < n;) {
-					var bone : Bone = bones[i];
-					var setupLength : Number = bone.data.length;
-					if (setupLength < epsilon) {
-						if (scale) lengths[i] = 0;
-						spaces[++i] = 0;
-					} else if (percentSpacing) {
-						if (scale) {
-							var x_l : Number = setupLength * bone.a;
-							var y_l : Number = setupLength * bone.c;
-							var length_l : Number = Math.sqrt(x_l * x_l + y_l * y_l);
-							lengths[i] = length_l;
+					for (i = 0, n = spacesCount - 1; i < n; i++) {
+						bone = bones[i];
+						setupLength = bone.data.length;
+						if (setupLength < PathConstraint.epsilon)
+							lengths[i] = 0;
+						else {
+							x = setupLength * bone.a;
+							y = setupLength * bone.c;
+							lengths[i] = Math.sqrt(x * x + y * y);
 						}
+					}
+				}
+				for (i = 1; i < spacesCount; i++)
+					spaces[i] = spacing;
+				break;
+			case SpacingMode.proportional:
+				var sum : Number = 0;
+				for (i = 0; i < boneCount;) {
+					bone = bones[i];
+					setupLength = bone.data.length;
+					if (setupLength < PathConstraint.epsilon) {
+						if (scale) lengths[i] = 0;
 						spaces[++i] = spacing;
 					} else {
-						var x : Number = setupLength * bone.a, y : Number = setupLength * bone.c;
-						var length : Number = Math.sqrt(x * x + y * y);
+						x = setupLength * bone.a;
+						y = setupLength * bone.c;
+						length = Math.sqrt(x * x + y * y);
+						if (scale) lengths[i] = length;
+						spaces[++i] = length;
+						sum += length;
+					}
+				}
+				if (sum > 0) {
+					sum = spacesCount / sum * spacing;
+					for (i = 1; i < spacesCount; i++)
+						spaces[i] *= sum;
+				}
+				break;
+			default:
+				var lengthSpacing : Boolean = data.spacingMode == SpacingMode.length;
+				for (i = 0, n = spacesCount - 1; i < n;) {
+					bone = bones[i];
+					setupLength = bone.data.length;
+					if (setupLength < PathConstraint.epsilon) {
+						if (scale) lengths[i] = 0;
+						spaces[++i] = spacing;
+					} else {
+						x = setupLength * bone.a;
+						y = setupLength * bone.c;
+						length = Math.sqrt(x * x + y * y);
 						if (scale) lengths[i] = length;
 						spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
 					}
 				}
-			} else {
-				for (i = 1; i < spacesCount; i++)
-					spaces[i] = spacing;
 			}
 
-			var positions : Vector.<Number> = computeWorldPositions(attachment, spacesCount, tangents, data.positionMode == PositionMode.percent, percentSpacing);
+			var positions : Vector.<Number> = computeWorldPositions(attachment, spacesCount, tangents);
 			var boneX : Number = positions[0], boneY : Number = positions[1], offsetRotation : Number = data.offsetRotation;
 			var tip : Boolean = false;
 			if (offsetRotation == 0)
-				tip = rotateMode == RotateMode.chain;
+				tip = data.rotateMode == RotateMode.chain;
 			else {
 				tip = false;
 				var pa : Bone = target.bone;
 				offsetRotation *= pa.a * pa.d - pa.b * pa.c > 0 ? MathUtils.degRad : -MathUtils.degRad;
 			}
-			var p : Number;
+			var p : int;
 			for (i = 0, p = 3; i < boneCount; i++, p += 3) {
 				bone = bones[i];
-				bone.worldX += (boneX - bone.worldX) * translateMix;
-				bone.worldY += (boneY - bone.worldY) * translateMix;
+				bone.worldX += (boneX - bone.worldX) * mixX;
+				bone.worldY += (boneY - bone.worldY) * mixY;
 				x = positions[p];
 				y = positions[p + 1];
 				var dx : Number = x - boneX, dy : Number = y - boneY;
 				if (scale) {
 					length = lengths[i];
 					if (length != 0) {
-						var s : Number = (Math.sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1;
+						var s : Number = (Math.sqrt(dx * dx + dy * dy) / length - 1) * mixRotate + 1;
 						bone.a *= s;
 						bone.c *= s;
 					}
 				}
 				boneX = x;
 				boneY = y;
-				if (rotate) {
+				if (mixRotate > 0) {
 					var a : Number = bone.a, b : Number = bone.b, c : Number = bone.c, d : Number = bone.d, r : Number, cos : Number, sin : Number;
 					if (tangents)
 						r = positions[p - 1];
@@ -157,8 +188,8 @@ package spine {
 						cos = Math.cos(r);
 						sin = Math.sin(r);
 						length = bone.data.length;
-						boneX += (length * (cos * a - sin * c) - dx) * rotateMix;
-						boneY += (length * (sin * a + cos * c) - dy) * rotateMix;
+						boneX += (length * (cos * a - sin * c) - dx) * mixRotate;
+						boneY += (length * (sin * a + cos * c) - dy) * mixRotate;
 					} else {
 						r += offsetRotation;
 					}
@@ -166,7 +197,7 @@ package spine {
 						r -= (Math.PI * 2);
 					else if (r < -Math.PI) //
 						r += (Math.PI * 2);
-					r *= rotateMix;
+					r *= mixRotate;
 					cos = Math.cos(r);
 					sin = Math.sin(r);
 					bone.a = cos * a - sin * c;
@@ -178,7 +209,7 @@ package spine {
 			}
 		}
 
-		protected function computeWorldPositions(path : PathAttachment, spacesCount : int, tangents : Boolean, percentPosition : Boolean, percentSpacing : Boolean) : Vector.<Number> {
+		protected function computeWorldPositions(path : PathAttachment, spacesCount : int, tangents : Boolean) : Vector.<Number> {
 			var target : Slot = this.target;
 			var position : Number = this.position;
 			var spaces : Vector.<Number> = this._spaces;
@@ -186,21 +217,29 @@ package spine {
 			var out : Vector.<Number> = this._positions, world : Vector.<Number>;
 			var closed : Boolean = path.closed;
 			var verticesLength : int = path.worldVerticesLength, curveCount : int = verticesLength / 6, prevCurve : int = NONE;
+			var multiplier : Number, i : int;
 
 			if (!path.constantSpeed) {
 				var lengths : Vector.<Number> = path.lengths;
 				curveCount -= closed ? 1 : 2;
 				var pathLength : Number = lengths[curveCount];
-				if (percentPosition) position *= pathLength;
-				if (percentSpacing) {
-					for (var i : int = 1; i < spacesCount; i++)
-						spaces[i] *= pathLength;
+				if (data.positionMode == PositionMode.percent) position *= pathLength;
+
+				switch (data.spacingMode) {
+				case SpacingMode.percent:
+					multiplier = pathLength;
+					break;
+				case SpacingMode.proportional:
+					multiplier = pathLength / spacesCount;
+					break;
+				default:
+					multiplier = 1;
 				}
 				this._world.length = 8;
 				world = this._world;
 				var o : int, curve : int;
 				for (i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
-					var space : Number = spaces[i];
+					var space : Number = spaces[i] * multiplier;
 					position += space;
 					var p : Number = position;
 
@@ -304,20 +343,25 @@ package spine {
 				x1 = x2;
 				y1 = y2;
 			}
-			if (percentPosition)
-				position *= pathLength;
-			else
-				position *= pathLength / path.lengths[curveCount - 1];
-			if (percentSpacing) {
-				for (i = 1; i < spacesCount; i++)
-					spaces[i] *= pathLength;
+
+			if (data.positionMode == PositionMode.percent) position *= pathLength;
+
+			switch (data.spacingMode) {
+			case SpacingMode.percent:
+				multiplier = pathLength;
+				break;
+			case SpacingMode.proportional:
+				multiplier = pathLength / spacesCount;
+				break;
+			default:
+				multiplier = 1;
 			}
 
 			var segments : Vector.<Number> = this._segments;
 			var curveLength : Number = 0;
 			var segment : int;
 			for (i = 0, o = 0, curve = 0, segment = 0; i < spacesCount; i++, o += 3) {
-				space = spaces[i];
+				space = spaces[i] * multiplier;
 				position += space;
 				p = position;
 

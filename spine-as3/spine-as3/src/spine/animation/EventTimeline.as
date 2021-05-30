@@ -31,53 +31,53 @@ package spine.animation {
 	import spine.Event;
 	import spine.Skeleton;
 
-	public class EventTimeline implements Timeline {
-		public var frames : Vector.<Number>; // time, ...
+	public class EventTimeline extends Timeline {
 		public var events : Vector.<Event>;
 
 		public function EventTimeline(frameCount : int) {
-			frames = new Vector.<Number>(frameCount, true);
+			super(frameCount, [
+				Property.event
+			]);
 			events = new Vector.<Event>(frameCount, true);
 		}
 
-		public function get frameCount() : int {
+		public override function getFrameCount () : int {
 			return frames.length;
 		}
 
-		public function getPropertyId() : int {
-			return TimelineType.event.ordinal << 24;
+		/** Sets the time in seconds and the event for the specified key frame. */
+		public function setFrame (frame : int, event : Event) : void {
+			frames[frame] = event.time;
+			events[frame] = event;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
-		public function setFrame(frameIndex : int, event : Event) : void {
-			frames[frameIndex] = event.time;
-			events[frameIndex] = event;
-		}
+		/** Fires events for frames > `lastTime` and <= `time`. */
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
+			if (firedEvents == null) return;
 
-		/** Fires events for frames > lastTime and <= time. */
-		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
-			if (!firedEvents) return;
+			var frames : Vector.<Number> = this.frames;
+			var frameCount : int = frames.length;
 
 			if (lastTime > time) { // Fire events after last time for looped animations.
-				apply(skeleton, lastTime, int.MAX_VALUE, firedEvents, alpha, blend, direction);
+				apply(skeleton, lastTime, Number.MAX_VALUE, firedEvents, alpha, blend, direction);
 				lastTime = -1;
-			} else if (lastTime >= frames[int(frameCount - 1)]) // Last time is after last frame.
+			} else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
 				return;
 			if (time < frames[0]) return; // Time is before first frame.
 
-			var frame : int;
+			var i : int = 0;
 			if (lastTime < frames[0])
-				frame = 0;
+				i = 0;
 			else {
-				frame = Animation.binarySearch1(frames, lastTime);
-				var frameTime : Number = frames[frame];
-				while (frame > 0) { // Fire multiple events with the same frame.
-					if (frames[int(frame - 1)] != frameTime) break;
-					frame--;
+				i = search(frames, lastTime) + 1;
+				var frameTime : Number = frames[i];
+				while (i > 0) { // Fire multiple events with the same frame.
+					if (frames[i - 1] != frameTime) break;
+					i--;
 				}
 			}
-			for (; frame < frameCount && time >= frames[frame]; frame++)
-				firedEvents[firedEvents.length] = events[frame];
+			for (; i < frameCount && time >= frames[i]; i++)
+				firedEvents.push(events[i]);
 		}
 	}
 }

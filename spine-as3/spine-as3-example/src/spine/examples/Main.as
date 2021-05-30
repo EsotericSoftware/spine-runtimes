@@ -40,14 +40,15 @@ package spine.examples {
 
 	[SWF(width = "800", height = "600", frameRate = "60", backgroundColor = "#dddddd")]
 	public class Main extends Sprite {
+		[Embed(source = "/spineboy-ess.json", mimeType = "application/octet-stream")]
+		static public const SpineboyJson : Class;
+
 		[Embed(source = "/spineboy.atlas", mimeType = "application/octet-stream")]
 		static public const SpineboyAtlas : Class;
 
 		[Embed(source = "/spineboy.png")]
 		static public const SpineboyAtlasTexture : Class;
 
-		[Embed(source = "/spineboy-ess.json", mimeType = "application/octet-stream")]
-		static public const SpineboyJson : Class;
 		private var skeleton : SkeletonAnimation;
 
 		public function Main() {

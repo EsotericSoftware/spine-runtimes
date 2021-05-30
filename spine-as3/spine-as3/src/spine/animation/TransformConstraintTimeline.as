@@ -34,88 +34,116 @@ package spine.animation {
 	import spine.TransformConstraint;
 
 	public class TransformConstraintTimeline extends CurveTimeline {
-		static public const ENTRIES : int = 5;
-		static internal const PREV_TIME : int = -5, PREV_ROTATE : int = -4, PREV_TRANSLATE : int = -3, PREV_SCALE : int = -2, PREV_SHEAR : int = -1;
-		static internal const ROTATE : int = 1, TRANSLATE : int = 2, SCALE : int = 3, SHEAR : int = 4;
+		static internal const ENTRIES : int = 7;
+		static internal const ROTATE : int = 1, X : int = 2, Y : int = 3, SCALEX : int = 4, SCALEY : int = 5, SHEARY : int = 6;
+
+		/** The index of the transform constraint slot in {@link Skeleton#transformConstraints} that will be changed. */
 		public var transformConstraintIndex : int;
-		public var frames : Vector.<Number>; // time, rotate mix, translate mix, scale mix, shear mix, ...
 
-		public function TransformConstraintTimeline(frameCount : int) {
-			super(frameCount);
-			frames = new Vector.<Number>(frameCount * ENTRIES, true);
+		public function TransformConstraintTimeline(frameCount : int, bezierCount : int, transformConstraintIndex : int) {
+			super(frameCount, bezierCount, [
+				Property.transformConstraint + "|" + transformConstraintIndex
+			]);
+			this.transformConstraintIndex = transformConstraintIndex;
 		}
 
-		override public function getPropertyId() : int {
-			return (TimelineType.transformConstraint.ordinal << 24) + transformConstraintIndex;
+		public override function getFrameEntries() : int {
+			return ENTRIES;
 		}
 
-		/** Sets the time and mixes of the specified keyframe. */
-		public function setFrame(frameIndex : int, time : Number, rotateMix : Number, translateMix : Number, scaleMix : Number, shearMix : Number) : void {
-			frameIndex *= ENTRIES;
-			frames[frameIndex] = time;
-			frames[frameIndex + ROTATE] = rotateMix;
-			frames[frameIndex + TRANSLATE] = translateMix;
-			frames[frameIndex + SCALE] = scaleMix;
-			frames[frameIndex + SHEAR] = shearMix;
+		/** The time in seconds, rotate mix, translate mix, scale mix, and shear mix for the specified key frame. */
+		public function setFrame (frame : int, time : Number, mixRotate: Number, mixX: Number, mixY: Number, mixScaleX: Number, mixScaleY: Number, mixShearY: Number) : void {
+			frame *= ENTRIES;
+			frames[frame] = time;
+			frames[frame + ROTATE] = mixRotate;
+			frames[frame + X] = mixX;
+			frames[frame + Y] = mixY;
+			frames[frame + SCALEX] = mixScaleX;
+			frames[frame + SCALEY] = mixScaleY;
+			frames[frame + SHEARY] = mixShearY;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
-			var frames : Vector.<Number> = this.frames;
-
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var constraint : TransformConstraint = skeleton.transformConstraints[transformConstraintIndex];
 			if (!constraint.active) return;
+
 			var data : TransformConstraintData;
+
+			var frames : Vector.<Number> = this.frames;
 			if (time < frames[0]) {
 				data = constraint.data;
 				switch (blend) {
 				case MixBlend.setup:
-					constraint.rotateMix = data.rotateMix;
-					constraint.translateMix = data.translateMix;
-					constraint.scaleMix = data.scaleMix;
-					constraint.shearMix = data.shearMix;
+					constraint.mixRotate = data.mixRotate;
+					constraint.mixX = data.mixX;
+					constraint.mixY = data.mixY;
+					constraint.mixScaleX = data.mixScaleX;
+					constraint.mixScaleY = data.mixScaleY;
+					constraint.mixShearY = data.mixShearY;
 					return;
 				case MixBlend.first:
-					constraint.rotateMix += (data.rotateMix - constraint.rotateMix) * alpha;
-					constraint.translateMix += (data.translateMix - constraint.translateMix) * alpha;
-					constraint.scaleMix += (data.scaleMix - constraint.scaleMix) * alpha;
-					constraint.shearMix += (data.shearMix - constraint.shearMix) * alpha;
+					constraint.mixRotate += (data.mixRotate - constraint.mixRotate) * alpha;
+					constraint.mixX += (data.mixX - constraint.mixX) * alpha;
+					constraint.mixY += (data.mixY - constraint.mixY) * alpha;
+					constraint.mixScaleX += (data.mixScaleX - constraint.mixScaleX) * alpha;
+					constraint.mixScaleY += (data.mixScaleY - constraint.mixScaleY) * alpha;
+					constraint.mixShearY += (data.mixShearY - constraint.mixShearY) * alpha;
 				}
 				return;
 			}
 
-			var rotate : Number, translate : Number, scale : Number, shear : Number;
-			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-				var i : int = frames.length;
-				rotate = frames[i + PREV_ROTATE];
-				translate = frames[i + PREV_TRANSLATE];
-				scale = frames[i + PREV_SCALE];
-				shear = frames[i + PREV_SHEAR];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				var frame : int = Animation.binarySearch(frames, time, ENTRIES);
-				rotate = frames[frame + PREV_ROTATE];
-				translate = frames[frame + PREV_TRANSLATE];
-				scale = frames[frame + PREV_SCALE];
-				shear = frames[frame + PREV_SHEAR];
-				var frameTime : Number = frames[frame];
-				var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				rotate += (frames[frame + ROTATE] - rotate) * percent;
-				translate += (frames[frame + TRANSLATE] - translate) * percent;
-				scale += (frames[frame + SCALE] - scale) * percent;
-				shear += (frames[frame + SHEAR] - shear) * percent;
+			var rotate : Number, x : Number, y : Number, scaleX : Number, scaleY : Number, shearY : Number;
+			var i : int = search2(frames, time, ENTRIES);
+			var curveType : Number = curves[i / ENTRIES];
+			switch (curveType) {
+			case LINEAR:
+				var before : Number = frames[i];
+				rotate = frames[i + ROTATE];
+				x = frames[i + X];
+				y = frames[i + Y];
+				scaleX = frames[i + SCALEX];
+				scaleY = frames[i + SCALEY];
+				shearY = frames[i + SHEARY];
+				var t : Number = (time - before) / (frames[i + ENTRIES] - before);
+				rotate += (frames[i + ENTRIES + ROTATE] - rotate) * t;
+				x += (frames[i + ENTRIES + X] - x) * t;
+				y += (frames[i + ENTRIES + Y] - y) * t;
+				scaleX += (frames[i + ENTRIES + SCALEX] - scaleX) * t;
+				scaleY += (frames[i + ENTRIES + SCALEY] - scaleY) * t;
+				shearY += (frames[i + ENTRIES + SHEARY] - shearY) * t;
+				break;
+			case STEPPED:
+				rotate = frames[i + ROTATE];
+				x = frames[i + X];
+				y = frames[i + Y];
+				scaleX = frames[i + SCALEX];
+				scaleY = frames[i + SCALEY];
+				shearY = frames[i + SHEARY];
+				break;
+			default:
+				rotate = getBezierValue(time, i, ROTATE, curveType - BEZIER);
+				x = getBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER);
+				y = getBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER);
+				scaleX = getBezierValue(time, i, SCALEX, curveType + BEZIER_SIZE * 3 - BEZIER);
+				scaleY = getBezierValue(time, i, SCALEY, curveType + BEZIER_SIZE * 4 - BEZIER);
+				shearY = getBezierValue(time, i, SHEARY, curveType + BEZIER_SIZE * 5 - BEZIER);
 			}
+
 			if (blend == MixBlend.setup) {
 				data = constraint.data;
-				constraint.rotateMix = data.rotateMix + (rotate - data.rotateMix) * alpha;
-				constraint.translateMix = data.translateMix + (translate - data.translateMix) * alpha;
-				constraint.scaleMix = data.scaleMix + (scale - data.scaleMix) * alpha;
-				constraint.shearMix = data.shearMix + (shear - data.shearMix) * alpha;
+				constraint.mixRotate = data.mixRotate + (rotate - data.mixRotate) * alpha;
+				constraint.mixX = data.mixX + (x - data.mixX) * alpha;
+				constraint.mixY = data.mixY + (y - data.mixY) * alpha;
+				constraint.mixScaleX = data.mixScaleX + (scaleX - data.mixScaleX) * alpha;
+				constraint.mixScaleY = data.mixScaleY + (scaleY - data.mixScaleY) * alpha;
+				constraint.mixShearY = data.mixShearY + (shearY - data.mixShearY) * alpha;
 			} else {
-				constraint.rotateMix += (rotate - constraint.rotateMix) * alpha;
-				constraint.translateMix += (translate - constraint.translateMix) * alpha;
-				constraint.scaleMix += (scale - constraint.scaleMix) * alpha;
-				constraint.shearMix += (shear - constraint.shearMix) * alpha;
+				constraint.mixRotate += (rotate - constraint.mixRotate) * alpha;
+				constraint.mixX += (x - constraint.mixX) * alpha;
+				constraint.mixY += (y - constraint.mixY) * alpha;
+				constraint.mixScaleX += (scaleX - constraint.mixScaleX) * alpha;
+				constraint.mixScaleY += (scaleY - constraint.mixScaleY) * alpha;
+				constraint.mixShearY += (shearY - constraint.mixShearY) * alpha;
 			}
 		}
 	}

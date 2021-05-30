@@ -31,69 +31,91 @@ package spine.animation {
 	import spine.Event;
 	import spine.Skeleton;
 	import spine.PathConstraint;
-
+	import spine.PathConstraintData;
+	
 	public class PathConstraintMixTimeline extends CurveTimeline {
-		static public const ENTRIES : int = 3;
-		static internal const PREV_TIME : int = -3, PREV_ROTATE : int = -2, PREV_TRANSLATE : int = -1;
-		static internal const ROTATE : int = 1, TRANSLATE : int = 2;
+		static internal const ENTRIES : int = 4;
+		static internal const ROTATE : int = 1, X : int = 2, Y : int = 3;
+
+		/** The index of the path constraint slot in {@link Skeleton#getPathConstraints()} that will be changed. */
 		public var pathConstraintIndex : int;
-		public var frames : Vector.<Number>; // time, rotate mix, translate mix, ...
 
-		public function PathConstraintMixTimeline(frameCount : int) {
-			super(frameCount);
-			frames = new Vector.<Number>(frameCount * ENTRIES, true);
+		public function PathConstraintMixTimeline (frameCount : int, bezierCount : int, pathConstraintIndex : int) {
+			super(frameCount, bezierCount, [
+				Property.pathConstraintMix + "|" + pathConstraintIndex
+			]);
+			this.pathConstraintIndex = pathConstraintIndex;
 		}
 
-		override public function getPropertyId() : int {
-			return (TimelineType.pathConstraintMix.ordinal << 24) + pathConstraintIndex;
+		public override function getFrameEntries() : int {
+			return ENTRIES;
 		}
 
-		/** Sets the time and mixes of the specified keyframe. */
-		public function setFrame(frameIndex : int, time : Number, rotateMix : Number, translateMix : Number) : void {
-			frameIndex *= ENTRIES;
-			frames[frameIndex] = time;
-			frames[frameIndex + ROTATE] = rotateMix;
-			frames[frameIndex + TRANSLATE] = translateMix;
+		public function setFrame (frame : int, time : Number, mixRotate : Number, mixX : Number, mixY : Number) : void {
+			frame <<= 2;
+			frames[frame] = time;
+			frames[frame + ROTATE] = mixRotate;
+			frames[frame + X] = mixX;
+			frames[frame + Y] = mixY;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var constraint : PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
 			if (!constraint.active) return;
+
+			var data : PathConstraintData;
+
+			var frames : Vector.<Number> = this.frames;
 			if (time < frames[0]) {
+				data = constraint.data;
 				switch (blend) {
 				case MixBlend.setup:
-					constraint.rotateMix = constraint.data.rotateMix;
-					constraint.translateMix = constraint.data.translateMix;
+					constraint.mixRotate = data.mixRotate;
+					constraint.mixX = data.mixX;
+					constraint.mixY = data.mixY;
 					return;
 				case MixBlend.first:
-					constraint.rotateMix += (constraint.data.rotateMix - constraint.rotateMix) * alpha;
-					constraint.translateMix += (constraint.data.translateMix - constraint.translateMix) * alpha;
+					constraint.mixRotate += (data.mixRotate - constraint.mixRotate) * alpha;
+					constraint.mixX += (data.mixX - constraint.mixX) * alpha;
+					constraint.mixY += (data.mixY - constraint.mixY) * alpha;
 				}
 				return;
 			}
 
-			var rotate : Number, translate : Number;
-			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-				rotate = frames[frames.length + PREV_ROTATE];
-				translate = frames[frames.length + PREV_TRANSLATE];
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				var frame : int = Animation.binarySearch(frames, time, ENTRIES);
-				rotate = frames[frame + PREV_ROTATE];
-				translate = frames[frame + PREV_TRANSLATE];
-				var frameTime : Number = frames[frame];
-				var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				rotate += (frames[frame + ROTATE] - rotate) * percent;
-				translate += (frames[frame + TRANSLATE] - translate) * percent;
+			var rotate : Number, x : Number, y : Number;
+			var i : int = search2(frames, time, ENTRIES);
+			var curveType : Number = curves[i >> 2];
+			switch (curveType) {
+			case LINEAR:
+				var before : Number = frames[i];
+				rotate = frames[i + ROTATE];
+				x = frames[i + X];
+				y = frames[i + Y];
+				var t : Number = (time - before) / (frames[i + ENTRIES] - before);
+				rotate += (frames[i + ENTRIES + ROTATE] - rotate) * t;
+				x += (frames[i + ENTRIES + X] - x) * t;
+				y += (frames[i + ENTRIES + Y] - y) * t;
+				break;
+			case STEPPED:
+				rotate = frames[i + ROTATE];
+				x = frames[i + X];
+				y = frames[i + Y];
+				break;
+			default:
+				rotate = getBezierValue(time, i, ROTATE, curveType - BEZIER);
+				x = getBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER);
+				y = getBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER);
 			}
 
 			if (blend == MixBlend.setup) {
-				constraint.rotateMix = constraint.data.rotateMix + (rotate - constraint.data.rotateMix) * alpha;
-				constraint.translateMix = constraint.data.translateMix + (translate - constraint.data.translateMix) * alpha;
+				data = constraint.data;
+				constraint.mixRotate = data.mixRotate + (rotate - data.mixRotate) * alpha;
+				constraint.mixX = data.mixX + (x - data.mixX) * alpha;
+				constraint.mixY = data.mixY + (y - data.mixY) * alpha;
 			} else {
-				constraint.rotateMix += (rotate - constraint.rotateMix) * alpha;
-				constraint.translateMix += (translate - constraint.translateMix) * alpha;
+				constraint.mixRotate += (rotate - constraint.mixRotate) * alpha;
+				constraint.mixX += (x - constraint.mixX) * alpha;
+				constraint.mixY += (y - constraint.mixY) * alpha;
 			}
 		}
 	}

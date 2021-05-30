@@ -53,7 +53,7 @@ package spine {
 		}
 		
 		public function addSkin (skin: Skin) : void {
-			var i : Number = 0, j : Number = 0;
+			var i : int = 0, j : int = 0;
 			var contained : Boolean = false;
 			
 			for(i = 0; i < skin._bones.length; i++) {
@@ -88,7 +88,7 @@ package spine {
 		}
 		
 		public function copySkin (skin: Skin) : void {
-			var i : Number = 0, j : Number = 0;
+			var i : int = 0, j : int = 0;
 			var contained : Boolean = false;
 			var attachment : SkinEntry;
 			
@@ -136,7 +136,7 @@ package spine {
 			return dictionary ? dictionary[name] : null;
 		}
 		
-		public function removeAttachment (slotIndex : Number, name : String) : void {
+		public function removeAttachment(slotIndex : int, name : String) : void {
 			var dictionary : Dictionary = _attachments[slotIndex];
 			if (dictionary) dictionary[name] = null;
 		}

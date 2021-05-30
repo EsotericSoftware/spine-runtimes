@@ -32,13 +32,13 @@ package spine.attachments {
 	import spine.Skeleton;
 	import spine.Slot;
 
-	public dynamic class VertexAttachment extends Attachment {
+	public class VertexAttachment extends Attachment {
 		private static var nextID : int = 0;
 		
 		public var bones : Vector.<int>;
 		public var vertices : Vector.<Number>;
 		public var worldVerticesLength : int;
-		public var id : int = (nextID++ & 65535) << 11;
+		public var id : int = nextID++;
 		public var deformAttachment : VertexAttachment;
 
 		public function VertexAttachment(name : String) {
@@ -46,11 +46,17 @@ package spine.attachments {
 			deformAttachment = this;
 		}
 
-		/** Transforms local vertices to world coordinates.
-		 * @param start The index of the first local vertex value to transform. Each vertex has 2 values, x and y.
-		 * @param count The number of world vertex values to output. Must be <= {@link #getWorldVerticesLength()} - start.
-		 * @param worldVertices The output world vertices. Must have a length >= offset + count.
-		 * @param offset The worldVertices index to begin writing values. */
+		/** Transforms the attachment's local {@link #vertices} to world coordinates. If the slot's {@link Slot#deform} is
+		 * not empty, it is used to deform the vertices.
+		 *
+		 * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+		 * Runtimes Guide.
+		 * @param start The index of the first {@link #vertices} value to transform. Each vertex has 2 values, x and y.
+		 * @param count The number of world vertex values to output. Must be <= {@link #worldVerticesLength} - `start`.
+		 * @param worldVertices The output world vertices. Must have a length >= `offset` + `count` *
+		 *           `stride` / 2.
+		 * @param offset The `worldVertices` index to begin writing values.
+		 * @param stride The number of `worldVertices` entries between the value pairs written. */
 		public function computeWorldVertices(slot : Slot, start : int, count : int, worldVertices : Vector.<Number>, offset : int, stride : int) : void {
 			count = offset + (count >> 1) * stride;
 			var skeleton : Skeleton = slot.skeleton;

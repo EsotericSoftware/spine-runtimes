@@ -33,20 +33,26 @@ package spine.animation {
 	import spine.Event;
 	import spine.Skeleton;
 
-	public class ScaleTimeline extends TranslateTimeline {
-		public function ScaleTimeline(frameCount : int) {
-			super(frameCount);
+	public class ScaleTimeline extends CurveTimeline2 implements BoneTimeline {
+		private var boneIndex : int;
+
+		public function ScaleTimeline(frameCount : int, bezierCount : int, boneIndex : int) {
+			super(frameCount, bezierCount, [
+				Property.scaleX + "|" + boneIndex,
+				Property.scaleY + "|" + boneIndex
+			]);
+			this.boneIndex = boneIndex;
 		}
 
-		override public function getPropertyId() : int {
-			return (TimelineType.scale.ordinal << 24) + boneIndex;
+		public function getBoneIndex() : int {
+			return boneIndex;
 		}
 
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
-			var frames : Vector.<Number> = this.frames;
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var bone : Bone = skeleton.bones[boneIndex];
 			if (!bone.active) return;
 
+			var frames : Vector.<Number> = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -60,21 +66,29 @@ package spine.animation {
 				return;
 			}
 
-			var x : Number, y : Number;
-			if (time >= frames[frames.length - ENTRIES]) { // Time is after last frame.
-				x = frames[frames.length + PREV_X] * bone.data.scaleX;
-				y = frames[frames.length + PREV_Y] * bone.data.scaleY;
-			} else {
-				// Interpolate between the previous frame and the current frame.
-				var frame : int = Animation.binarySearch(frames, time, ENTRIES);
-				x = frames[frame + PREV_X];
-				y = frames[frame + PREV_Y];
-				var frameTime : Number = frames[frame];
-				var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				x = (x + (frames[frame + X] - x) * percent) * bone.data.scaleX;
-				y = (y + (frames[frame + Y] - y) * percent) * bone.data.scaleY;
+			var x : Number = 0, y : Number = 0;
+			var i : int = search2(frames, time, ENTRIES);
+			var curveType : Number = curves[i / ENTRIES];
+			switch (curveType) {
+			case LINEAR:
+				var before : Number = frames[i];
+				x = frames[i + VALUE1];
+				y = frames[i + VALUE2];
+				var t : Number = (time - before) / (frames[i + ENTRIES] - before);
+				x += (frames[i + ENTRIES + VALUE1] - x) * t;
+				y += (frames[i + ENTRIES + VALUE2] - y) * t;
+				break;
+			case STEPPED:
+				x = frames[i + VALUE1];
+				y = frames[i + VALUE2];
+				break;
+			default:
+				x = getBezierValue(time, i, VALUE1, curveType - BEZIER);
+				y = getBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
 			}
+			x *= bone.data.scaleX;
+			y *= bone.data.scaleY;
+
 			if (alpha == 1) {
 				if (blend == MixBlend.add) {
 					bone.scaleX += x - bone.data.scaleX;
@@ -84,48 +98,48 @@ package spine.animation {
 					bone.scaleY = y;
 				}
 			} else {
-				var bx : Number, by : Number;
-				if (direction == MixDirection.Out) {
+				var bx : Number = 0, by : Number = 0;
+				if (direction == MixDirection.mixOut) {
 					switch (blend) {
-						case MixBlend.setup:
-							bx = bone.data.scaleX;
-							by = bone.data.scaleY;
-							bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
-							bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
-							break;
-						case MixBlend.first:
-						case MixBlend.replace:
-							bx = bone.scaleX;
-							by = bone.scaleY;
-							bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
-							bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
-							break;
-						case MixBlend.add:
-							bx = bone.scaleX;
-							by = bone.scaleY;
-							bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bone.data.scaleX) * alpha;
-							bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - bone.data.scaleY) * alpha;
+					case MixBlend.setup:
+						bx = bone.data.scaleX;
+						by = bone.data.scaleY;
+						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
+						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
+						break;
+					case MixBlend.first:
+					case MixBlend.replace:
+						bx = bone.scaleX;
+						by = bone.scaleY;
+						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
+						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
+						break;
+					case MixBlend.add:
+						bx = bone.scaleX;
+						by = bone.scaleY;
+						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bone.data.scaleX) * alpha;
+						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - bone.data.scaleY) * alpha;
 					}
 				} else {
 					switch (blend) {
-						case MixBlend.setup:
-							bx = Math.abs(bone.data.scaleX) * MathUtils.signum(x);
-							by = Math.abs(bone.data.scaleY) * MathUtils.signum(y);
-							bone.scaleX = bx + (x - bx) * alpha;
-							bone.scaleY = by + (y - by) * alpha;
-							break;
-						case MixBlend.first:
-						case MixBlend.replace:
-							bx = Math.abs(bone.scaleX) * MathUtils.signum(x);
-							by = Math.abs(bone.scaleY) * MathUtils.signum(y);
-							bone.scaleX = bx + (x - bx) * alpha;
-							bone.scaleY = by + (y - by) * alpha;
-							break;
-						case MixBlend.add:
-							bx = MathUtils.signum(x);
-							by = MathUtils.signum(y);
-							bone.scaleX = Math.abs(bone.scaleX) * bx + (x - Math.abs(bone.data.scaleX) * bx) * alpha;
-							bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
+					case MixBlend.setup:
+						bx = Math.abs(bone.data.scaleX) * MathUtils.signum(x);
+						by = Math.abs(bone.data.scaleY) * MathUtils.signum(y);
+						bone.scaleX = bx + (x - bx) * alpha;
+						bone.scaleY = by + (y - by) * alpha;
+						break;
+					case MixBlend.first:
+					case MixBlend.replace:
+						bx = Math.abs(bone.scaleX) * MathUtils.signum(x);
+						by = Math.abs(bone.scaleY) * MathUtils.signum(y);
+						bone.scaleX = bx + (x - bx) * alpha;
+						bone.scaleY = by + (y - by) * alpha;
+						break;
+					case MixBlend.add:
+						bx = MathUtils.signum(x);
+						by = MathUtils.signum(y);
+						bone.scaleX = Math.abs(bone.scaleX) * bx + (x - Math.abs(bone.data.scaleX) * bx) * alpha;
+						bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
 					}
 				}
 			}

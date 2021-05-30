@@ -34,10 +34,11 @@ package spine {
 		public static var GREEN : Color = new Color(0, 1, 0, 1);
 		public static var BLUE : Color = new Color(0, 0, 1, 1);
 		public static var MAGENTA : Color = new Color(1, 0, 1, 1);
-		public var r : Number = 0;
-		public var g : Number = 0;
-		public var b : Number = 0;
-		public var a : Number = 0;
+
+		public var r : Number;
+		public var g : Number;
+		public var b : Number;
+		public var a : Number;
 
 		public function Color(r : Number, g : Number, b : Number, a : Number = 0) {
 			this.r = r;
@@ -46,30 +47,30 @@ package spine {
 			this.a = a;
 		}
 
-		public function setFrom(r : Number, g : Number, b : Number, a : Number) : Color {
-			this.r = r;
-			this.g = g;
-			this.b = b;
-			this.a = a;
-			this.clamp();
-			return this;
-		}
-
 		public function setFromColor(c : Color) : Color {
-			this.r = c.r;
-			this.g = c.g;
-			this.b = c.b;
-			this.a = c.a;
+			r = c.r;
+			g = c.g;
+			b = c.b;
+			a = c.a;
 			return this;
 		}
 
 		public function setFromString(hex : String) : Color {
 			if (hex.length != 8 && hex.length != 6) throw new ArgumentError("Hexadecimal color length must be 6 or 8: " + hex);
 			hex = hex.charAt(0) == '#' ? hex.substr(1) : hex;
-			this.r = parseInt(hex.substr(0, 2), 16) / 255.0;
-			this.g = parseInt(hex.substr(2, 2), 16) / 255.0;
-			this.b = parseInt(hex.substr(4, 2), 16) / 255.0;
-			this.a = (hex.length != 8 ? 255 : parseInt(hex.substr(6, 2), 16)) / 255.0;
+			r = parseInt(hex.substr(0, 2), 16) / 255.0;
+			g = parseInt(hex.substr(2, 2), 16) / 255.0;
+			b = parseInt(hex.substr(4, 2), 16) / 255.0;
+			a = (hex.length != 8 ? 255 : parseInt(hex.substr(6, 2), 16)) / 255.0;
+			return this;
+		}
+
+		public function set(r : Number, g : Number, b : Number, a : Number) : Color {
+			this.r = r;
+			this.g = g;
+			this.b = b;
+			this.a = a;
+			clamp();
 			return this;
 		}
 
@@ -78,22 +79,22 @@ package spine {
 			this.g += g;
 			this.b += b;
 			this.a += a;
-			this.clamp();
+			clamp();
 			return this;
 		}
 
 		public function clamp() : Color {
-			if (this.r < 0) this.r = 0;
-			else if (this.r > 1) this.r = 1;
+			if (r < 0) r = 0;
+			else if (r > 1) r = 1;
 
-			if (this.g < 0) this.g = 0;
-			else if (this.g > 1) this.g = 1;
+			if (g < 0) g = 0;
+			else if (g > 1) g = 1;
 
-			if (this.b < 0) this.b = 0;
-			else if (this.b > 1) this.b = 1;
+			if (b < 0) b = 0;
+			else if (b > 1) b = 1;
 
-			if (this.a < 0) this.a = 0;
-			else if (this.a > 1) this.a = 1;
+			if (a < 0) a = 0;
+			else if (a > 1) a = 1;
 			return this;
 		}
 		

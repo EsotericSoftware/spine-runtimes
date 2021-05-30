@@ -57,6 +57,7 @@ package spine.examples {
 
 		[Embed(source = "/spineboy.png")]
 		static public const SpineboyAtlasTexture : Class;
+
 		private var skeleton : SkeletonAnimation;
 		private var shape: Shape;	
 
@@ -78,7 +79,7 @@ package spine.examples {
 			skeleton.y = 560;
 			skeleton.scale = 0.5;
 
-			skeleton.state.onStart.add(function(entry : TrackEntry) : void {
+/*			skeleton.state.onStart.add(function(entry : TrackEntry) : void {
 				trace(entry.trackIndex + " start: " + entry.animation.name);
 			});
 			skeleton.state.onInterrupt.add(function(entry : TrackEntry) : void {
@@ -95,7 +96,7 @@ package spine.examples {
 			});
 			skeleton.state.onEvent.add(function(entry : TrackEntry, event : Event) : void {
 				trace(entry.trackIndex + " event: " + entry.animation.name + ", " + event.data.name + ": " + event.intValue + ", " + event.floatValue + ", " + event.stringValue + ", " + event.volume + ", " + event.balance);
-			});
+			});*/
 
 			skeleton.skeleton.setToSetupPose();
 			skeleton.state.setAnimationByName(0, "walk", true);
@@ -108,7 +109,7 @@ package spine.examples {
 			
 			shape = new Shape();
 			shape.setVertices(new <Number>[0, 0, 400, 600, 800, 0]);
-			shape.setColor(1, 0, 0, 1);
+			shape.setColor(0, 1, 0, 0.5);
 			addChild(shape);
 			Starling.juggler.add(shape);
 

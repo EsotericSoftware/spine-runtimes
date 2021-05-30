@@ -59,11 +59,8 @@ package spine {
 			return active;
 		}
 
-		public function apply() : void {
-			update();
-		}
-
 		public function update() : void {
+			if (mix == 0) return;
 			switch (bones.length) {
 				case 1:
 					apply1(bones[0], target.worldX, target.worldY, compress, stretch, _data.uniform, mix);
@@ -138,10 +135,6 @@ package spine {
 		 * target is specified in the world coordinate system.
 		 * @param child Any descendant bone of the parent. */
 		static public function apply2(parent : Bone, child : Bone, targetX : Number, targetY : Number, bendDir : int, stretch : Boolean, softness: Number, alpha : Number) : void {
-			if (alpha == 0) {
-				child.updateWorldTransform();
-				return;
-			}
 			if (!parent.appliedValid) parent.updateAppliedTransform();
 			if (!child.appliedValid) child.updateAppliedTransform();
 			var px : Number = parent.ax, py : Number = parent.ay, psx : Number = parent.ascaleX, sx : Number = psx, psy : Number = parent.ascaleY, csx : Number = child.ascaleX;

@@ -27,19 +27,53 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.interpolation {
-	import spine.Interpolation;
-	
-	public class Pow extends Interpolation {
-		protected var power : int;
-		
-		public function Pow(power : int) {
-			this.power = power;
+package spine.animation {
+	import spine.Bone;
+	import spine.Event;
+	import spine.Skeleton;
+
+	public class TranslateYTimeline extends CurveTimeline1 implements BoneTimeline {
+		private var boneIndex : int;
+
+		public function TranslateYTimeline(frameCount : int, bezierCount : int, boneIndex : int) {
+			super(frameCount, bezierCount, [
+				Property.y + "|" + boneIndex
+			]);
+			this.boneIndex = boneIndex;
 		}
-		
-		protected override function applyInternal(a : Number) : Number {
-			if (a <= 0.5) return Math.pow(a * 2, power) / 2;
-			return Math.pow((a - 1) * 2, power) / (power % 2 == 0 ? -2 : 2) + 1;
+
+		public function getBoneIndex() : int {
+			return boneIndex;
+		}
+
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
+			var bone : Bone = skeleton.bones[boneIndex];
+			if (!bone.active) return;
+
+			var frames : Vector.<Number> = this.frames;
+			if (time < frames[0]) {
+				switch (blend) {
+				case MixBlend.setup:
+					bone.y = bone.data.y;
+					return;
+				case MixBlend.first:
+					bone.y += (bone.data.y - bone.y) * alpha;
+				}
+				return;
+			}
+
+			var y : Number = getCurveValue(time);
+			switch (blend) {
+			case MixBlend.setup:
+				bone.y = bone.data.y + y * alpha;
+				break;
+			case MixBlend.first:
+			case MixBlend.replace:
+				bone.y += (bone.data.y + y - bone.y) * alpha;
+				break;
+			case MixBlend.add:
+				bone.y += y * alpha;
+			}
 		}
 	}
 }

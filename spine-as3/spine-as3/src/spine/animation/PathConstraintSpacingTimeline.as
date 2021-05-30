@@ -32,18 +32,22 @@ package spine.animation {
 	import spine.Event;
 	import spine.PathConstraint;
 
-	public class PathConstraintSpacingTimeline extends PathConstraintPositionTimeline {
-		public function PathConstraintSpacingTimeline(frameCount : int) {
-			super(frameCount);
+	public class PathConstraintSpacingTimeline extends CurveTimeline1 {
+		/** The index of the path constraint slot in {@link Skeleton#pathConstraints} that will be changed. */
+		public var pathConstraintIndex : int;
+
+		public function PathConstraintSpacingTimeline (frameCount : int, bezierCount : int, pathConstraintIndex : int) {
+			super(frameCount, bezierCount, [
+				Property.pathConstraintSpacing + "|" + pathConstraintIndex
+			]);
+			this.pathConstraintIndex = pathConstraintIndex;
 		}
 
-		override public function getPropertyId() : int {
-			return (TimelineType.pathConstraintSpacing.ordinal << 24) + pathConstraintIndex;
-		}
-
-		override public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var constraint : PathConstraint = skeleton.pathConstraints[pathConstraintIndex];
 			if (!constraint.active) return;
+
+			var frames : Vector.<Number> = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
 				case MixBlend.setup:
@@ -55,18 +59,7 @@ package spine.animation {
 				return;
 			}
 
-			var spacing : Number;
-			if (time >= frames[frames.length - ENTRIES]) // Time is after last frame.
-				spacing = frames[frames.length + PREV_VALUE];
-			else {
-				// Interpolate between the previous frame and the current frame.
-				var frame : int = Animation.binarySearch(frames, time, ENTRIES);
-				spacing = frames[frame + PREV_VALUE];
-				var frameTime : Number = frames[frame];
-				var percent : Number = getCurvePercent(frame / ENTRIES - 1, 1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
-
-				spacing += (frames[frame + VALUE] - spacing) * percent;
-			}
+			var spacing : Number = getCurveValue(time);
 
 			if (blend == MixBlend.setup)
 				constraint.spacing = constraint.data.spacing + (spacing - constraint.data.spacing) * alpha;

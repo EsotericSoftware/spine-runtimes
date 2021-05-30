@@ -32,57 +32,52 @@ package spine.animation {
 	import spine.Event;
 	import spine.Skeleton;
 
-	public class AttachmentTimeline implements Timeline {
-		public var slotIndex : int;
-		public var frames : Vector.<Number>; // time, ...
+	public class AttachmentTimeline extends Timeline implements SlotTimeline {
+		private var slotIndex : int;
+
+		/** The attachment name for each key frame. May contain null values to clear the attachment. */
 		public var attachmentNames : Vector.<String>;
 
-		public function AttachmentTimeline(frameCount : int) {
-			frames = new Vector.<Number>(frameCount, true);
+		public function AttachmentTimeline (frameCount : int, slotIndex : int) {
+			super(frameCount, [
+				Property.attachment + "|" + slotIndex
+			]);
+			this.slotIndex = slotIndex;
 			attachmentNames = new Vector.<String>(frameCount, true);
 		}
 
-		public function get frameCount() : int {
+		public override function getFrameCount () : int {
 			return frames.length;
 		}
 
-		public function getPropertyId() : int {
-			return (TimelineType.attachment.ordinal << 24) + slotIndex;
+		public function getSlotIndex() : int {
+			return slotIndex;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
-		public function setFrame(frameIndex : int, time : Number, attachmentName : String) : void {
-			frames[frameIndex] = time;
-			attachmentNames[frameIndex] = attachmentName;
+		/** Sets the time in seconds and the attachment name for the specified key frame. */
+		public function setFrame (frame : int, time : Number, attachmentName : String) : void {
+			frames[frame] = time;
+			attachmentNames[frame] = attachmentName;
 		}
 
-		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
-			var attachmentName : String;
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
 			var slot : Slot = skeleton.slots[slotIndex];
 			if (!slot.bone.active) return;
-			if (direction == MixDirection.Out) {
+
+			if (direction == MixDirection.mixOut) {
 				if (blend == MixBlend.setup) setAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
 			}
-			var frames : Vector.<Number> = this.frames;
+
 			if (time < frames[0]) {
-				if (blend == MixBlend.setup || blend == MixBlend.first) {
-					setAttachment(skeleton, slot, slot.data.attachmentName);
-				}
+				if (blend == MixBlend.setup || blend == MixBlend.first) setAttachment(skeleton, slot, slot.data.attachmentName);
 				return;
 			}
 
-			var frameIndex : int;
-			if (time >= frames[frames.length - 1]) // Time is after last frame.
-				frameIndex = frames.length - 1;
-			else
-				frameIndex = Animation.binarySearch(frames, time, 1) - 1;
-
-			attachmentName = attachmentNames[frameIndex];
-			skeleton.slots[slotIndex].attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
+			setAttachment(skeleton, slot, attachmentNames[search(frames, time)]);
 		}
 
-		private function setAttachment(skeleton: Skeleton, slot: Slot, attachmentName: String) : void {
+		private function setAttachment(skeleton : Skeleton, slot : Slot, attachmentName : String) : void {
 			slot.attachment = attachmentName == null ? null : skeleton.getAttachmentForSlotIndex(slotIndex, attachmentName);
 		}
 	}

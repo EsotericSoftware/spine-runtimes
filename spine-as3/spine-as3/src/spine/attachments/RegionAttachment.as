@@ -93,9 +93,9 @@ package spine.attachments {
 			offset[BRY] = Math.sin(radians - brAngle) * brDist + y;
 		}
 
-		public function setUVs(u : Number, v : Number, u2 : Number, v2 : Number, rotate : Boolean) : void {
+		public function setUVs(u : Number, v : Number, u2 : Number, v2 : Number, degrees : int) : void {
 			var uvs : Vector.<Number> = this.uvs;
-			if (rotate) {
+			if (degrees == 90) {
 				uvs[4] = u;
 				uvs[5] = v2;
 				uvs[6] = u;

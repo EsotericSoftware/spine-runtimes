@@ -59,11 +59,11 @@ package spine.examples {
 			attachmentLoader = new AtlasAttachmentLoader(spineAtlas);
 
 			var json : SkeletonJson = new SkeletonJson(attachmentLoader);
-			json.scale = 0.5;
+			json.scale = 0.2;
 			var skeletonData : SkeletonData = json.readSkeletonData(new TankJson());
 
 			skeleton = new SkeletonAnimation(skeletonData);
-			skeleton.x = 400;
+			skeleton.x = 700;
 			skeleton.y = 560;
 			skeleton.state.setAnimationByName(0, "drive", true);
 

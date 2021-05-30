@@ -28,92 +28,104 @@
  *****************************************************************************/
 
 package spine.animation {
-	import spine.MathUtils;
-	import spine.Event;
-	import spine.Skeleton;
+	/** The base class for timelines that interpolate between frame values using stepped, linear, or a Bezier curve. */
+	public class CurveTimeline extends Timeline {
+		static internal const LINEAR : Number = 0;
+		static internal const STEPPED : Number = 1;
+		static internal const BEZIER : Number = 2;
+		static internal const BEZIER_SIZE : int = 18;
 
-	/** Base class for frames that use an interpolation bezier curve. */
-	public class CurveTimeline implements Timeline {
-		static private const LINEAR : Number = 0;
-		static private const STEPPED : Number = 1;
-		static private const BEZIER : Number = 2;
-		static private const BEZIER_SIZE : int = 10 * 2 - 1;
-		private var curves : Vector.<Number>; // type, x, y, ...
+		internal var curves : Vector.<Number>; // type, x, y, ...
 
-		public function CurveTimeline(frameCount : int) {
-			curves = new Vector.<Number>((frameCount - 1) * BEZIER_SIZE, true);
+		public function CurveTimeline(frameCount : int, bezierCount : int, propertyIds : Array) {
+			super(frameCount, propertyIds);
+			curves = new Vector.<Number>(frameCount + bezierCount * BEZIER_SIZE, true);
+			curves[frameCount - 1] = STEPPED;
 		}
 
-		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
+		/** Sets the specified key frame to linear interpolation. */
+		public function setLinear(frame : int) : void {
+			curves[frame] = LINEAR;
 		}
 
-		public function getPropertyId() : int {
-			return 0;
+		/** Sets the specified key frame to stepped interpolation. */
+		public function setStepped(frame : int) : void{
+			curves[frame] = STEPPED;
 		}
 
-		public function get frameCount() : int {
-			return curves.length / BEZIER_SIZE + 1;
-		}
-
-		public function setLinear(frameIndex : int) : void {
-			curves[int(frameIndex * BEZIER_SIZE)] = LINEAR;
-		}
-
-		public function setStepped(frameIndex : int) : void {
-			curves[int(frameIndex * BEZIER_SIZE)] = STEPPED;
-		}
-
-		/** Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.
-		 * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of
-		 * the difference between the keyframe's values. */
-		public function setCurve(frameIndex : int, cx1 : Number, cy1 : Number, cx2 : Number, cy2 : Number) : void {
-			var tmpx : Number = (-cx1 * 2 + cx2) * 0.03, tmpy : Number = (-cy1 * 2 + cy2) * 0.03;
-			var dddfx : Number = ((cx1 - cx2) * 3 + 1) * 0.006, dddfy : Number = ((cy1 - cy2) * 3 + 1) * 0.006;
-			var ddfx : Number = tmpx * 2 + dddfx, ddfy : Number = tmpy * 2 + dddfy;
-			var dfx : Number = cx1 * 0.3 + tmpx + dddfx * 0.16666667, dfy : Number = cy1 * 0.3 + tmpy + dddfy * 0.16666667;
-
-			var i : int = frameIndex * BEZIER_SIZE;
+		/** Shrinks the storage for Bezier curves, for use when <code>bezierCount</code> (specified in the constructor) was larger
+		 * than the actual number of Bezier curves. */
+		public function shrink(bezierCount : int) : void {
+			var size : int = getFrameCount() + bezierCount * BEZIER_SIZE;
 			var curves : Vector.<Number> = this.curves;
-			curves[int(i++)] = BEZIER;
-
-			var x : Number = dfx, y : Number = dfy;
-			for (var n : int = i + BEZIER_SIZE - 1; i < n; i += 2) {
-				curves[i] = x;
-				curves[int(i + 1)] = y;
-				dfx += ddfx;
-				dfy += ddfy;
-				ddfx += dddfx;
-				ddfy += dddfy;
-				x += dfx;
-				y += dfy;
+			if (curves.length > size) {
+				var newCurves : Vector.<Number> = new Vector.<Number>(size, true);
+				for (var i : int = 0; i < size; i++)
+					newCurves[i] = curves[i];
+				curves = newCurves;
 			}
 		}
 
-		public function getCurvePercent(frameIndex : int, percent : Number) : Number {
-			percent = MathUtils.clamp(percent, 0, 1);
+		/** Stores the segments for the specified Bezier curve. For timelines that modify multiple values, there may be more than
+		 * one curve per frame.
+		 * @param bezier The ordinal of this Bezier curve for this timeline, between 0 and <code>bezierCount - 1</code> (specified
+		 *           in the constructor), inclusive.
+		 * @param frame Between 0 and <code>frameCount - 1</code>, inclusive.
+		 * @param value The index of the value for this frame that this curve is used for.
+		 * @param time1 The time for the first key.
+		 * @param value1 The value for the first key.
+		 * @param cx1 The time for the first Bezier handle.
+		 * @param cy1 The value for the first Bezier handle.
+		 * @param cx2 The time of the second Bezier handle.
+		 * @param cy2 The value for the second Bezier handle.
+		 * @param time2 The time for the second key.
+		 * @param value2 The value for the second key. */
+		public function setBezier(bezier : int, frame : int, value : Number, time1 : Number, value1 : Number, cx1 : Number, cy1 : Number, cx2 : Number,
+			cy2 : Number, time2 : Number, value2 : Number) : void {
 			var curves : Vector.<Number> = this.curves;
-			var i : int = frameIndex * BEZIER_SIZE;
-			var type : Number = curves[i];
-			if (type == LINEAR) return percent;
-			if (type == STEPPED) return 0;
-			i++;
-			var x : Number = 0;
-			for (var start : int = i, n : int = i + BEZIER_SIZE - 1; i < n; i += 2) {
-				x = curves[i];
-				if (x >= percent) {
-					var prevX : Number, prevY : Number;
-					if (i == start) {
-						prevX = 0;
-						prevY = 0;
-					} else {
-						prevX = curves[int(i - 2)];
-						prevY = curves[int(i - 1)];
-					}
-					return prevY + (curves[int(i + 1)] - prevY) * (percent - prevX) / (x - prevX);
+			var i : int = getFrameCount() + bezier * BEZIER_SIZE;
+			if (value == 0) curves[frame] = BEZIER + i;
+			var tmpx : Number = (time1 - cx1 * 2 + cx2) * 0.03, tmpy : Number = (value1 - cy1 * 2 + cy2) * 0.03;
+			var dddx : Number = ((cx1 - cx2) * 3 - time1 + time2) * 0.006, dddy : Number = ((cy1 - cy2) * 3 - value1 + value2) * 0.006;
+			var ddx : Number = tmpx * 2 + dddx, ddy : Number = tmpy * 2 + dddy;
+			var dx : Number = (cx1 - time1) * 0.3 + tmpx + dddx * 0.16666667, dy : Number = (cy1 - value1) * 0.3 + tmpy + dddy * 0.16666667;
+			var x : Number = time1 + dx, y : Number = value1 + dy;
+			for (var n : int = i + BEZIER_SIZE; i < n; i += 2) {
+				curves[i] = x;
+				curves[i + 1] = y;
+				dx += ddx;
+				dy += ddy;
+				ddx += dddx;
+				ddy += dddy;
+				x += dx;
+				y += dy;
+			}
+		}
+
+		/** Returns the Bezier interpolated value for the specified time.
+		 * @param frameIndex The index into {@link #getFrames()} for the values of the frame before <code>time</code>.
+		 * @param valueOffset The offset from <code>frameIndex</code> to the value this curve is used for.
+		 * @param i The index of the Bezier segments. See {@link #getCurveType(int)}. */
+		public function getBezierValue(time : Number, frameIndex : int, valueOffset : int, i : int) : Number {
+			var curves : Vector.<Number> = this.curves;
+			var x : Number, y : Number;
+			if (curves[i] > time) {
+				x = frames[frameIndex];
+				y = frames[frameIndex + valueOffset];
+				return y + (time - x) / (curves[i] - x) * (curves[i + 1] - y);
+			}
+			var n : int = i + BEZIER_SIZE;
+			for (i += 2; i < n; i += 2) {
+				if (curves[i] >= time) {
+					x = curves[i - 2];
+					y = curves[i - 1];
+					return y + (time - x) / (curves[i] - x) * (curves[i + 1] - y);
 				}
 			}
-			var y : Number = curves[int(i - 1)];
-			return y + (1 - y) * (percent - x) / (1 - x); // Last point is 1,1.
+			frameIndex += getFrameEntries();
+			x = curves[n - 2];
+			y = curves[n - 1];
+			return y + (time - x) / (frames[frameIndex] - x) * (frames[frameIndex + valueOffset] - y);
 		}
 	}
 }

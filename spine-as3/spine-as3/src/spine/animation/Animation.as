@@ -34,7 +34,7 @@ package spine.animation {
 
 	public class Animation {
 		internal var _name : String;
-		public var _timelines : Vector.<Timeline>;
+		private var _timelines : Vector.<Timeline>;
 		internal var _timelineIds : Dictionary = new Dictionary();
 		public var duration : Number;
 
@@ -43,17 +43,18 @@ package spine.animation {
 			if (timelines == null) throw new ArgumentError("timelines cannot be null.");
 			_name = name;
 			_timelines = timelines;
-			for (var i : Number = 0; i < timelines.length; i++)
-				_timelineIds[timelines[i].getPropertyId()] = true;
+			for (var i : int = 0, n : int = timelines.length; i < n; i++) {
+				var ids : Vector.<String> = timelines[i].propertyIds;
+				for (var ii : int = 0, nn : int = ids.length; ii < nn; ii++)
+					_timelineIds[ids[ii]] = true;
+			}
 			this.duration = duration;
 		}
-		
-		public function hasTimeline(id: Number) : Boolean {
-			return _timelineIds[id] == true;
-		}
 
-		public function get timelines() : Vector.<Timeline> {
-			return _timelines;
+		public function hasTimeline(ids : Vector.<String>) : Boolean {
+			for (var i : int = 0, n : int = ids.length; i < n; i++)
+				if (_timelineIds[ids[i]]) return true;
+			return false;
 		}
 
 		/** Poses the skeleton at the specified time for this animation. */
@@ -77,49 +78,8 @@ package spine.animation {
 			return _name;
 		}
 
-		/** @param target After the first and before the last entry. */
-		static public function binarySearch(values : Vector.<Number>, target : Number, step : int) : int {
-			var low : int = 0;
-			var high : int = values.length / step - 2;
-			if (high == 0)
-				return step;
-			var current : int = high >>> 1;
-			while (true) {
-				if (values[int((current + 1) * step)] <= target)
-					low = current + 1;
-				else
-					high = current;
-				if (low == high)
-					return (low + 1) * step;
-				current = (low + high) >>> 1;
-			}
-			return 0; // Can't happen.
-		}
-
-		/** @param target After the first and before the last entry. */
-		static public function binarySearch1(values : Vector.<Number>, target : Number) : int {
-			var low : int = 0;
-			var high : int = values.length - 2;
-			if (high == 0)
-				return 1;
-			var current : int = high >>> 1;
-			while (true) {
-				if (values[int(current + 1)] <= target)
-					low = current + 1;
-				else
-					high = current;
-				if (low == high)
-					return low + 1;
-				current = (low + high) >>> 1;
-			}
-			return 0; // Can't happen.
-		}
-
-		static public function linearSearch(values : Vector.<Number>, target : Number, step : int) : int {
-			for (var i : int = 0, last : int = values.length - step; i <= last; i += step)
-				if (values[i] > target)
-					return i;
-			return -1;
+		public function get timelines() : Vector.<Timeline> {
+			return _timelines;
 		}
 	}
 }

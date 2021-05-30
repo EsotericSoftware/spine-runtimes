@@ -59,8 +59,7 @@ package spine.starling {
 
 		public function newRegionAttachment(skin : Skin, name : String, path : String) : RegionAttachment {
 			var texture : SubTexture = getTexture(path) as SubTexture;
-			if (texture == null)
-				throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
+			if (texture == null) throw new Error("Region not found in Starling atlas: " + path + " (region attachment: " + name + ")");
 			var attachment : RegionAttachment = new RegionAttachment(name);
 			var rotated : Boolean = texture.rotated;
 			attachment.rendererObject = new Image(Texture.fromTexture(texture)); // Discard frame.
@@ -78,24 +77,23 @@ package spine.starling {
 				tmp = attachment.regionWidth;
 				attachment.regionWidth = attachment.regionHeight;
 				attachment.regionHeight = tmp;
-				attachment["regionU2"] = 0;
-				attachment["regionV2"] = 1;
-				attachment["regionU"] = 1;
-				attachment["regionV"] = 0;
+				attachment.regionU2 = 0;
+				attachment.regionV2 = 1;
+				attachment.regionU = 1;
+				attachment.regionV = 0;
 			} else {
-				attachment["regionU"] = 0;
-				attachment["regionV"] = 0;
-				attachment["regionU2"] = 1;
-				attachment["regionV2"] = 1;
+				attachment.regionU = 0;
+				attachment.regionV = 0;
+				attachment.regionU2 = 1;
+				attachment.regionV2 = 1;
 			}
-			attachment.setUVs(attachment["regionU"], attachment["regionV"], attachment["regionU2"], attachment["regionV2"], rotated);
+			attachment.setUVs(attachment.regionU, attachment.regionV, attachment.regionU2, attachment.regionV2, rotated ? 90 : 0);
 			return attachment;
 		}
 
 		public function newMeshAttachment(skin : Skin, name : String, path : String) : MeshAttachment {
 			var texture : SubTexture = getTexture(path) as SubTexture;
-			if (texture == null)
-				throw new Error("Region not found in Starling atlas: " + path + " (mesh attachment: " + name + ")");
+			if (texture == null) throw new Error("Region not found in Starling atlas: " + path + " (mesh attachment: " + name + ")");
 			var rotated : Boolean = texture.rotated;
 			var attachment : MeshAttachment = new MeshAttachment(name);
 			attachment.regionRotate = rotated;

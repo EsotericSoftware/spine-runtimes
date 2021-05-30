@@ -27,19 +27,31 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.interpolation {
-	import spine.Interpolation;
-	
-	public class Pow extends Interpolation {
-		protected var power : int;
-		
-		public function Pow(power : int) {
-			this.power = power;
-		}
-		
-		protected override function applyInternal(a : Number) : Number {
-			if (a <= 0.5) return Math.pow(a * 2, power) / 2;
-			return Math.pow((a - 1) * 2, power) / (power % 2 == 0 ? -2 : 2) + 1;
-		}
+package spine.animation {
+	public class Property {
+		public static const rotate : int = 0;
+		public static const x : int = 1;
+		public static const y : int = 2;
+		public static const scaleX : int = 3;
+		public static const scaleY : int = 4;
+		public static const shearX : int = 5;
+		public static const shearY : int = 6;
+
+		public static const rgb : int = 7;
+		public static const alpha : int = 8;
+		public static const rgb2 : int = 9;
+
+		public static const attachment : int = 10;
+		public static const deform : int = 11;
+
+		public static const event : int = 12;
+		public static const drawOrder : int = 13;
+
+		public static const ikConstraint : int = 14;
+		public static const transformConstraint : int = 15;
+
+		public static const pathConstraintPosition : int = 16;
+		public static const pathConstraintSpacing : int = 17;
+		public static const pathConstraintMix : int = 18;
 	}
 }

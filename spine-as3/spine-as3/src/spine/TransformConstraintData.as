@@ -31,16 +31,17 @@ package spine {
 	public class TransformConstraintData extends ConstraintData {			
 		internal var _bones : Vector.<BoneData> = new Vector.<BoneData>();
 		public var target : BoneData;
-		public var rotateMix : Number;
-		public var translateMix : Number;
-		public var scaleMix : Number;
-		public var shearMix : Number;
+
+		public var mixRotate : Number;
+		public var mixX : Number, mixY : Number;
+		public var mixScaleX : Number, mixScaleY : Number;
+		public var mixShearY : Number;
+
 		public var offsetRotation : Number;
-		public var offsetX : Number;
-		public var offsetY : Number;
-		public var offsetScaleX : Number;
-		public var offsetScaleY : Number;
+		public var offsetX : Number, offsetY : Number;
+		public var offsetScaleX : Number, offsetScaleY : Number;
 		public var offsetShearY : Number;
+
 		public var relative : Boolean = false;
 		public var local : Boolean = false;
 

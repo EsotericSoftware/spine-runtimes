@@ -37,8 +37,13 @@ package spine {
 		public function BinaryInput(bytes: ByteArray) {
 			this.bytes = bytes;		
 		}
+
 		public function readByte() : int {
-			return bytes.readByte();		
+			return bytes.readByte();
+		}
+
+		public function readUnsignedByte() : int {
+			return bytes.readUnsignedByte();
 		}
 	
 		public function readShort() : int {

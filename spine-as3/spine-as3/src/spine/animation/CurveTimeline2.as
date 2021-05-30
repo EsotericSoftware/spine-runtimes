@@ -27,19 +27,32 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package spine.interpolation {
-	import spine.Interpolation;
-	
-	public class Pow extends Interpolation {
-		protected var power : int;
-		
-		public function Pow(power : int) {
-			this.power = power;
+package spine.animation {
+	/** The base class for a {@link CurveTimeline} which sets two properties. */
+	public class CurveTimeline2 extends CurveTimeline {
+		static internal const ENTRIES : Number = 3;
+		static internal const VALUE1 : Number = 1;
+		static internal const VALUE2 : Number = 2;
+
+		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
+		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
+		public function CurveTimeline2 (frameCount : int, bezierCount : int, propertyIds : Array) {
+			super(frameCount, bezierCount, propertyIds);
 		}
-		
-		protected override function applyInternal(a : Number) : Number {
-			if (a <= 0.5) return Math.pow(a * 2, power) / 2;
-			return Math.pow((a - 1) * 2, power) / (power % 2 == 0 ? -2 : 2) + 1;
+
+		public override function getFrameEntries() : int {
+			return ENTRIES;
+		}
+
+		/** Sets the time and values for the specified frame.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+		 * @param time The frame time in seconds. */
+		public function setFrame(frame : int, time : Number, value1 : Number, value2 : Number) : void {
+			frame *= ENTRIES;
+			var frames : Vector.<Number> = this.frames;
+			frames[frame] = time;
+			frames[frame + VALUE1] = value1;
+			frames[frame + VALUE2] = value2;
 		}
 	}
 }

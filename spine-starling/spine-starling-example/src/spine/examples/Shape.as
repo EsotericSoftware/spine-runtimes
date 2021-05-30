@@ -85,8 +85,7 @@ package spine.examples {
 			mesh.getVertexData().numVertices = idx;
 			
 			var rgb: uint = Color.rgb(r * 255, g * 255, b * 255);
-			var alpha: uint = a * 255;	
-			mesh.getVertexData().colorize("color", 0xffffffff, 0xff);
+			mesh.getVertexData().colorize("color", rgb, a);
 						
 			mesh.setVertexDataChanged();
 			mesh.setIndexDataChanged();

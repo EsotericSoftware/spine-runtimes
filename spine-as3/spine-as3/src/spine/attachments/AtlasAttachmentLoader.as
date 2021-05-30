@@ -49,7 +49,7 @@ package spine.attachments {
 			attachment.rendererObject = region;
 			var scaleX : Number = 1;
 			var scaleY : Number = 1;
-			attachment.setUVs(region.u * scaleX, region.v * scaleY, region.u2 * scaleX, region.v2 * scaleY, region.rotate);
+			attachment.setUVs(region.u * scaleX, region.v * scaleY, region.u2 * scaleX, region.v2 * scaleY, region.degrees);
 			attachment.regionOffsetX = region.offsetX;
 			attachment.regionOffsetY = region.offsetY;
 			attachment.regionWidth = region.width;
@@ -71,7 +71,6 @@ package spine.attachments {
 			attachment.regionV = region.v * scaleY;
 			attachment.regionU2 = region.u2 * scaleX;
 			attachment.regionV2 = region.v2 * scaleY;
-			attachment.regionRotate = region.rotate;
 			attachment.regionDegrees = region.degrees;
 			attachment.regionOffsetX = region.offsetX;
 			attachment.regionOffsetY = region.offsetY;

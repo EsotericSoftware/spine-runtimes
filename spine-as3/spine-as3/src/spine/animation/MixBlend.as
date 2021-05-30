@@ -31,8 +31,8 @@ package spine.animation {
 	public class MixBlend {
 		public var ordinal : int;
 
-		public function MixBlend(order : int) {
-			this.ordinal = order;
+		public function MixBlend(ordinal : int) {
+			this.ordinal = ordinal;
 		}
 
 		public static const setup : MixBlend = new MixBlend(0);

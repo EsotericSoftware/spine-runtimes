@@ -32,12 +32,13 @@ package spine.animation {
 	import spine.Skeleton;
 	import spine.Slot;
 
-	public class DrawOrderTimeline implements Timeline {
-		public var frames : Vector.<Number>; // time, ...
+	public class DrawOrderTimeline extends Timeline {
 		public var drawOrders : Vector.<Vector.<int>>;
 
 		public function DrawOrderTimeline(frameCount : int) {
-			frames = new Vector.<Number>(frameCount, true);
+			super(frameCount, [
+				Property.drawOrder
+			]);
 			drawOrders = new Vector.<Vector.<int>>(frameCount, true);
 		}
 
@@ -45,51 +46,42 @@ package spine.animation {
 			return frames.length;
 		}
 
-		public function getPropertyId() : int {
-			return TimelineType.drawOrder.ordinal << 24;
+		/** Sets the time in seconds and the draw order for the specified key frame.
+		 * @param drawOrder For each slot in {@link Skeleton#slots}, the index of the new draw order. May be null to use setup pose
+		 *           draw order. */
+		public function setFrame(frame : int, time : Number, drawOrder : Vector.<int>) : void {
+			frames[frame] = time;
+			drawOrders[frame] = drawOrder;
 		}
 
-		/** Sets the time and value of the specified keyframe. */
-		public function setFrame(frameIndex : int, time : Number, drawOrder : Vector.<int>) : void {
-			frames[frameIndex] = time;
-			drawOrders[frameIndex] = drawOrder;
-		}
-
-		public function apply(skeleton : Skeleton, lastTime : Number, time : Number, firedEvents : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
-			if (direction == MixDirection.Out) {
+		public override function apply (skeleton : Skeleton, lastTime : Number, time : Number, events : Vector.<Event>, alpha : Number, blend : MixBlend, direction : MixDirection) : void {
+			var drawOrder: Vector.<Slot> = skeleton.drawOrder;
+			var slots : Vector.<Slot> = skeleton.slots;
+			var i : int = 0, n : int = slots.length;
+		
+			if (direction == MixDirection.mixOut) {
 				if (blend == MixBlend.setup) {
-					for (var ii : int = 0, n : int = skeleton.slots.length; ii < n; ii++)
-						skeleton.drawOrder[ii] = skeleton.slots[ii];
+					for (i = 0; i < n; i++)
+						drawOrder[i] = slots[i];
 				}
 				return;
 			}
 
-			var drawOrder : Vector.<Slot> = skeleton.drawOrder;
-			var slots : Vector.<Slot> = skeleton.slots;
-			var slot : Slot;
-			var i : int = 0;
 			if (time < frames[0]) {
 				if (blend == MixBlend.setup || blend == MixBlend.first) {
-					for each (slot in slots)
-						drawOrder[i++] = slot;
+					for (i = 0; i < n; i++)
+						drawOrder[i] = slots[i];
 				}
 				return;
 			}
 
-			var frameIndex : int;
-			if (time >= frames[int(frames.length - 1)]) // Time is after last frame.
-				frameIndex = frames.length - 1;
-			else
-				frameIndex = Animation.binarySearch1(frames, time) - 1;
-
-			var drawOrderToSetupIndex : Vector.<int> = drawOrders[frameIndex];
-			i = 0;
-			if (!drawOrderToSetupIndex) {
-				for each (slot in slots)
-					drawOrder[i++] = slot;
+			var drawOrderToSetupIndex : Vector.<int> = drawOrders[search(frames, time)];
+			if (drawOrderToSetupIndex == null) {
+				for (i = 0; i < n; i++)
+					drawOrder[i] = slots[i];
 			} else {
-				for each (var setupIndex : int in drawOrderToSetupIndex)
-					drawOrder[i++] = slots[setupIndex];
+				for (i = 0; i < n; i++)
+					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
 			}
 		}
 	}
