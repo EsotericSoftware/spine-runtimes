@@ -139,6 +139,8 @@ package spine {
 					bone.b = Math.cos(r) * s;
 					bone.d = Math.sin(r) * s;
 				}
+
+				bone.updateAppliedTransform();
 			}
 		}
 
@@ -205,6 +207,8 @@ package spine {
 					bone.b = Math.cos(r) * s;
 					bone.d = Math.sin(r) * s;
 				}
+
+				bone.updateAppliedTransform();
 			}
 		}
 
@@ -213,12 +217,10 @@ package spine {
 			var mixScaleX : Number = this.mixScaleX, mixScaleY : Number = this.mixScaleY, mixShearY : Number = this.mixShearY;
 
 			var target : Bone = this.target;
-			if (!target.appliedValid) target.updateAppliedTransform();
 
 			var bones : Vector.<Bone> = _bones;
 			for (var i : int = 0, n : int = bones.length; i < n; i++) {
 				var bone : Bone = bones[i];
-				if (!bone.appliedValid) bone.updateAppliedTransform();
 
 				var rotation : Number = bone.arotation;
 				if (mixRotate != 0) {
@@ -253,12 +255,10 @@ package spine {
 			var mixScaleX : Number = this.mixScaleX, mixScaleY : Number = this.mixScaleY, mixShearY : Number = this.mixShearY;
 
 			var target : Bone = this.target;
-			if (!target.appliedValid) target.updateAppliedTransform();
 
 			var bones : Vector.<Bone> = _bones;
 			for (var i : int = 0, n : int = bones.length; i < n; i++) {
 				var bone : Bone = bones[i];
-				if (!bone.appliedValid) bone.updateAppliedTransform();
 
 				var rotation : Number = bone.arotation + (target.arotation + _data.offsetRotation) * mixRotate;
 				var x : Number = bone.ax + (target.ax + _data.offsetX) * mixX;

@@ -29,6 +29,7 @@
 
 package spine {
 	import spine.attachments.Attachment;
+	import spine.attachments.VertexAttachment;
 
 	public class Slot {
 		internal var _data : SlotData;
@@ -67,13 +68,18 @@ package spine {
 			return _attachment;
 		}
 
-		/** Sets the attachment and resets {@link #getAttachmentTime()}.
+		/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears the {@link #deform}.
+		 * The deform is not cleared if the old attachment has the same {@link VertexAttachment#getDeformAttachment()} as the specified
+		 * attachment.
 		 * @param attachment May be null. */
 		public function set attachment(attachment : Attachment) : void {
 			if (_attachment == attachment) return;
+			if (!(attachment is VertexAttachment) || !(this.attachment is VertexAttachment)
+			|| VertexAttachment(attachment).deformAttachment != VertexAttachment(this.attachment).deformAttachment) {
+				deform.length = 0;
+			}
 			_attachment = attachment;
 			_attachmentTime = _bone._skeleton.time;
-			deform.length = 0;
 		}
 
 		public function set attachmentTime(time : Number) : void {

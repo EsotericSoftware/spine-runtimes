@@ -82,9 +82,7 @@ package spine {
 		/** Adjusts the bone rotation so the tip is as close to the target position as possible. The target is specified in the world
 		 * coordinate system. */
 		static public function apply1(bone : Bone, targetX : Number, targetY : Number, compress: Boolean, stretch : Boolean, uniform: Boolean, alpha : Number) : void {
-			if (!bone.appliedValid) bone.updateAppliedTransform();
 			var p : Bone = bone.parent;
-
 			var pa : Number = p.a, pb : Number = p.b, pc : Number = p.c, pd : Number = p.d;
 			var rotationIK : Number = -bone.ashearX - bone.arotation, tx : Number = 0, ty : Number = 0;
 			switch(bone.data.transformMode) {
@@ -135,8 +133,6 @@ package spine {
 		 * target is specified in the world coordinate system.
 		 * @param child Any descendant bone of the parent. */
 		static public function apply2(parent : Bone, child : Bone, targetX : Number, targetY : Number, bendDir : int, stretch : Boolean, softness: Number, alpha : Number) : void {
-			if (!parent.appliedValid) parent.updateAppliedTransform();
-			if (!child.appliedValid) child.updateAppliedTransform();
 			var px : Number = parent.ax, py : Number = parent.ay, psx : Number = parent.ascaleX, sx : Number = psx, psy : Number = parent.ascaleY, csx : Number = child.ascaleX;
 			var os1 : int, os2 : int, s2 : int;
 			if (psx < 0) {

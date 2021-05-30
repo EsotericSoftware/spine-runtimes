@@ -48,7 +48,6 @@ package spine {
 		public var ascaleY : Number;
 		public var ashearX : Number;
 		public var ashearY : Number;
-		public var appliedValid : Boolean;
 		public var a : Number;
 		public var b : Number;
 		public var c : Number;
@@ -73,17 +72,21 @@ package spine {
 			return active;
 		}
 
-		/** Same as updateWorldTransform(). This method exists for Bone to implement Updatable. */
+		/** Computes the world transform using the parent bone and this bone's local applied transform. */
 		public function update() : void {
-			updateWorldTransformWith(x, y, rotation, scaleX, scaleY, shearX, shearY);
+			updateWorldTransformWith(ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY);
 		}
 
-		/** Computes the world SRT using the parent bone and this bone's local SRT. */
+		/** Computes the world transform using the parent bone and this bone's local transform. */
 		public function updateWorldTransform() : void {
 			updateWorldTransformWith(x, y, rotation, scaleX, scaleY, shearX, shearY);
 		}
 
-		/** Computes the world SRT using the parent bone and the specified local SRT. */
+		/** Computes the world transform using the parent bone and the specified local transform. The applied transform is set to the
+		 * specified local transform. Child bones are not updated.
+		 * <p>
+		 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
+		 * Runtimes Guide. */
 		public function updateWorldTransformWith(x : Number, y : Number, rotation : Number, scaleX : Number, scaleY : Number, shearX : Number, shearY : Number) : void {
 			ax = x;
 			ay = y;
@@ -92,7 +95,6 @@ package spine {
 			ascaleY = scaleY;
 			ashearX = shearX;
 			ashearY = shearY;
-			appliedValid = true;
 
 			var rotationY : Number = 0, la : Number = 0, lb : Number = 0, lc : Number = 0, ld : Number = 0;
 			var sin : Number = 0, cos : Number = 0;
@@ -240,12 +242,15 @@ package spine {
 			return Math.sqrt(b * b + d * d);
 		}
 
-		/** Computes the individual applied transform values from the world transform. This can be useful to perform processing using
-		 * the applied transform after the world transform has been modified directly (eg, by a constraint).
+		/** Computes the applied transform values from the world transform.
 		 * <p>
-		 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. */
+		 * If the world transform is modified (by a constraint, {@link #rotateWorld(float)}, etc) then this method should be called so
+		 * the applied transform matches the world transform. The applied transform may be needed by other code (eg to apply another
+		 * constraint).
+		 * <p>
+		 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The applied transform after
+		 * calling this method is equivalent to the local transform used to compute the world transform, but may not be identical. */
 		internal function updateAppliedTransform() : void {
-			appliedValid = true;
 			var parent : Bone = this.parent;
 			if (parent == null) {
 				ax = worldX;
@@ -309,6 +314,10 @@ package spine {
 			return Math.atan2(cos * c + sin * d, cos * a + sin * b) * MathUtils.radDeg;
 		}
 
+		/** Rotates the world transform the specified amount.
+		 * <p>
+		 * After changes are made to the world transform, {@link #updateAppliedTransform()} should be called and {@link #update()} will
+		 * need to be called on any child bones, recursively. */
 		public function rotateWorld(degrees : Number) : void {
 			var cos : Number = MathUtils.cosDeg(degrees), sin : Number = MathUtils.sinDeg(degrees);
 			var a : Number = this.a, b : Number = this.b, c : Number = this.c, d : Number = this.d;

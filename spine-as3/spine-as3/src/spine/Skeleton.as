@@ -298,8 +298,21 @@ package spine {
 
 		/** Updates the world transform for each bone and applies constraints. */
 		public function updateWorldTransform() : void {
+			var bones : Vector.<Bone> = this.bones;
+			var i : int, n : int;
+			for (i = 0, n = bones.length; i < n; i++) {
+				var bone : Bone = bones[i];
+				bone.ax = bone.x;
+				bone.ay = bone.y;
+				bone.arotation = bone.rotation;
+				bone.ascaleX = bone.scaleX;
+				bone.ascaleY = bone.scaleY;
+				bone.ashearX = bone.shearX;
+				bone.ashearY = bone.shearY;
+			}
+
 			var updateCache : Vector.<Updatable> = _updateCache;
-			for (var i : int = 0, n : int = updateCache.length; i < n; i++)
+			for (i = 0, n = updateCache.length; i < n; i++)
 				updateCache[i].update();
 		}
 
