@@ -462,7 +462,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	skeleton->setPosition(320, 320);
 	skeleton->updateWorldTransform();
 
-	drawable.state->setAnimation(0, "animation", true);
+	// drawable.state->setAnimation(0, "animation", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - coin");
 	window.setFramerateLimit(60);
@@ -477,7 +477,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		drawable.update(delta);
+		drawable.update(delta - delta);
 
 		window.clear();
 		window.draw(drawable);
@@ -615,13 +615,13 @@ DebugExtension dbgExtension(SpineExtension::getInstance());
 int main () {
 	SpineExtension::setInstance(&dbgExtension);
 
+    testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
     testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
 	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
-	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);

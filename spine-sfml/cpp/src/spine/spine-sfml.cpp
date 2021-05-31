@@ -77,11 +77,21 @@ SkeletonDrawable::~SkeletonDrawable() {
 	delete skeleton;
 }
 
+void printSkeleton(Skeleton* skeleton) {
+    int i, n;
+    printf("===== Skeleton\n");
+    for (i = 0, n = skeleton->getBones().size(); i < n; i++) {
+        Bone *bone = skeleton->getBones()[i];
+        printf("%s: %f, %f, %f, %f, %f, %f\n", bone->getData().getName().buffer(), bone->getA(), bone->getB(), bone->getC(), bone->getD(), bone->getWorldX(), bone->getWorldY());
+    }
+}
+
 void SkeletonDrawable::update(float deltaTime) {
 	skeleton->update(deltaTime);
 	state->update(deltaTime * timeScale);
 	state->apply(*skeleton);
 	skeleton->updateWorldTransform();
+    printSkeleton(skeleton);
 }
 
 void SkeletonDrawable::draw(RenderTarget &target, RenderStates states) const {

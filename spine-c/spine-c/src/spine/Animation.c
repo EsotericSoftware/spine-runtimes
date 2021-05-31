@@ -112,6 +112,7 @@ void _spTimeline_init (spTimeline* self,
 ) {
     int i, n;
     self->frames = spFloatArray_create(frameCount * frameEntries);
+    self->frames->size = frameCount * frameEntries;
     self->frameCount = frameCount;
     self->frameEntries = frameEntries;
 	self->vtable.dispose = dispose;
@@ -120,6 +121,7 @@ void _spTimeline_init (spTimeline* self,
 
 	for (i = 0, n = propertyIdsCount; i < n; i++)
 	    self->propertyIds[i] = propertyIds[i];
+	self->propertyIdsCount = propertyIdsCount;
 }
 
 void spTimeline_dispose (spTimeline* self) {
@@ -139,7 +141,7 @@ void spTimeline_setBezier(spTimeline* self, int bezier, int frame, float value, 
 }
 
 int spTimeline_getFrameCount (const spTimeline* self) {
-    return self->frameCount / self->frameEntries;
+    return self->frameCount;
 }
 
 float spTimeline_getDuration (const spTimeline* self) {
@@ -166,6 +168,7 @@ void _spCurveTimeline_init (spCurveTimeline* self,
                                                float cx2, float cy2, float time2, float value2)) {
 	_spTimeline_init(SUPER(self), frameCount, frameEntries, propertyIds, propertyIdsCount, dispose, apply, setBezier);
 	self->curves = spFloatArray_create(frameCount + bezierCount * BEZIER_SIZE);
+	self->curves->size = frameCount + bezierCount * BEZIER_SIZE;
 }
 
 void _spCurveTimeline_dispose (spTimeline* self) {

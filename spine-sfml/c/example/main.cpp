@@ -94,12 +94,12 @@ void testcase (void func(spSkeletonData* skeletonData, spAtlas* atlas),
 		const char* jsonName, const char* binaryName, const char* atlasName,
 		float scale) {
 	spAtlas* atlas = spAtlas_createFromFile(atlasName, 0);
-
-	spSkeletonData* skeletonData = readSkeletonJsonData(jsonName, atlas, scale);
+    UNUSED(jsonName);
+	/*spSkeletonData* skeletonData = readSkeletonJsonData(jsonName, atlas, scale);
 	func(skeletonData, atlas);
-	spSkeletonData_dispose(skeletonData);
+	spSkeletonData_dispose(skeletonData);*/
 
-	skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
+	spSkeletonData *skeletonData = readSkeletonBinaryData(binaryName, atlas, scale);
 	func(skeletonData, atlas);
 	spSkeletonData_dispose(skeletonData);
 
@@ -289,8 +289,8 @@ void raptor (spSkeletonData* skeletonData, spAtlas* atlas) {
 	skeleton->y = 590;
 	spSkeleton_updateWorldTransform(skeleton);
 
-	spAnimationState_setAnimationByName(drawable->state, 0, "walk", true);
-	spAnimationState_addAnimationByName(drawable->state, 1, "gun-grab", false, 2);
+    spAnimationState_setAnimationByName(drawable->state, 0, "walk", true);
+    spAnimationState_addAnimationByName(drawable->state, 1, "gun-grab", false, 2);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - raptor");
 	window.setFramerateLimit(60);
@@ -438,7 +438,7 @@ void coin (spSkeletonData* skeletonData, spAtlas* atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		drawable->update(delta);
+		drawable->update(delta - delta);
 
 		window.clear();
 		window.draw(*drawable);
@@ -625,17 +625,17 @@ void testMixAndMatch(spSkeletonData* skeletonData, spAtlas* atlas) {
 }
 
 int main () {
-    testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
-	testcase(testMixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
-	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
-	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 1.0f);
-	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
-	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
-	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
+    //    testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
+    // testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
+    testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
+    testcase(testMixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
+    testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
+    testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 1.0f);
+    testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
 	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
-	// testcase(testSkinsApi, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
+	testcase(testSkinsApi, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	return 0;
 }
