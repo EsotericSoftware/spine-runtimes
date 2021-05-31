@@ -195,15 +195,14 @@ package spine.animation {
 				} else {
 					var timelineMode : Vector.<int> = current.timelineMode;
 
-					var firstFrame : Boolean = current.timelinesRotation.length == 0;
+					var firstFrame : Boolean = current.timelinesRotation.length != timelineCount << 1;
 					if (firstFrame) current.timelinesRotation.length = timelineCount << 1;
-					var timelinesRotation : Vector.<Number> = current.timelinesRotation;
 
 					for (ii = 0; ii < timelineCount; ii++) {
 						timeline = timelines[ii];
 						var timelineBlend : MixBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline is RotateTimeline)
-							applyRotateTimeline(timeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
+							applyRotateTimeline(timeline, skeleton, applyTime, mix, timelineBlend, current.timelinesRotation, ii << 1, firstFrame);
 						else if (timeline is AttachmentTimeline)
 							applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, applyTime, timelineBlend, true);
 						else
@@ -267,7 +266,7 @@ package spine.animation {
 				var timelineMode : Vector.<int> = from.timelineMode;
 				var timelineHoldMix : Vector.<TrackEntry> = from.timelineHoldMix;
 
-				var firstFrame : Boolean = from.timelinesRotation.length == 0;
+				var firstFrame : Boolean = from.timelinesRotation.length != timelineCount << 1;
 				if (firstFrame) from.timelinesRotation.length = timelineCount << 1;
 				var timelinesRotation : Vector.<Number> = from.timelinesRotation;
 

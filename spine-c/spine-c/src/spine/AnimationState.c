@@ -404,7 +404,7 @@ int spAnimationState_apply (spAnimationState* self, spSkeleton* skeleton) {
 		} else {
 			spIntArray* timelineMode = current->timelineMode;
 
-			firstFrame = current->timelinesRotationCount == 0;
+			firstFrame = current->timelinesRotationCount != timelineCount << 1;
 			if (firstFrame) _spAnimationState_resizeTimelinesRotation(current, timelineCount << 1);
 			timelinesRotation = current->timelinesRotation;
 
@@ -498,7 +498,7 @@ float _spAnimationState_applyMixingFrom (spAnimationState* self, spTrackEntry* t
 		timelineMode = from->timelineMode;
 		timelineHoldMix = from->timelineHoldMix;
 
-		firstFrame = from->timelinesRotationCount == 0;
+		firstFrame = from->timelinesRotationCount != timelineCount << 1;
 		if (firstFrame) _spAnimationState_resizeTimelinesRotation(from, timelineCount << 1);
 		timelinesRotation = from->timelinesRotation;
 

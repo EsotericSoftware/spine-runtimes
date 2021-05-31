@@ -447,7 +447,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		} else {
 			Vector<int> &timelineMode = current._timelineMode;
 
-			bool firstFrame = current._timelinesRotation.size() == 0;
+			bool firstFrame = current._timelinesRotation.size() != timelines.size() << 1;
 			if (firstFrame) current._timelinesRotation.setSize(timelines.size() << 1, 0);
 			Vector<float> &timelinesRotation = current._timelinesRotation;
 
@@ -801,7 +801,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 		Vector<int> &timelineMode = from->_timelineMode;
 		Vector<TrackEntry *> &timelineHoldMix = from->_timelineHoldMix;
 
-		bool firstFrame = from->_timelinesRotation.size() == 0;
+		bool firstFrame = from->_timelinesRotation.size() != timelines.size() << 1;
 		if (firstFrame) from->_timelinesRotation.setSize(timelines.size() << 1, 0);
 
 		Vector<float> &timelinesRotation = from->_timelinesRotation;
@@ -815,17 +815,17 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 			switch (timelineMode[i]) {
 				case Subsequent:
 					if (!drawOrder && (timeline->getRTTI().isExactly(DrawOrderTimeline::rtti))) continue;
-                    timelineBlend = blend;
+               timelineBlend = blend;
 					alpha = alphaMix;
 					break;
 				case First:
 					timelineBlend = MixBlend_Setup;
 					alpha = alphaMix;
 					break;
-			    case HoldSubsequent:
-			        timelineBlend = blend;
-			        alpha = alphaHold;
-			        break;
+			   case HoldSubsequent:
+					timelineBlend = blend;
+					alpha = alphaHold;
+					break;
 				case HoldFirst:
 					timelineBlend = MixBlend_Setup;
 					alpha = alphaHold;
@@ -840,11 +840,11 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 			if ((timeline->getRTTI().isExactly(RotateTimeline::rtti))) {
 				applyRotateTimeline((RotateTimeline*)timeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
 			} else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
-                applyAttachmentTimeline(static_cast<AttachmentTimeline*>(timeline), skeleton, applyTime, timelineBlend, attachments);
-            } else {
-			    if (drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) && timelineBlend == MixBlend_Setup)
-			        direction = MixDirection_In;
-			    timeline->apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction);
+				applyAttachmentTimeline(static_cast<AttachmentTimeline*>(timeline), skeleton, applyTime, timelineBlend, attachments);
+			} else {
+				if (drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) && timelineBlend == MixBlend_Setup)
+					direction = MixDirection_In;
+				timeline->apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction);
 			}
 		}
 	}

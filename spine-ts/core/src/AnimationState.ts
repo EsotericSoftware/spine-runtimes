@@ -197,15 +197,14 @@ module spine {
 				} else {
 					let timelineMode = current.timelineMode;
 
-					let firstFrame = current.timelinesRotation.length == 0;
-					if (firstFrame) Utils.setArraySize(current.timelinesRotation, timelineCount << 1, null);
-					let timelinesRotation = current.timelinesRotation;
+					let firstFrame = current.timelinesRotation.length != timelineCount << 1;
+					if (firstFrame) current.timelinesRotation.length = timelineCount << 1;
 
 					for (let ii = 0; ii < timelineCount; ii++) {
 						let timeline = timelines[ii];
 						let timelineBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline instanceof RotateTimeline) {
-							this.applyRotateTimeline(timeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
+							this.applyRotateTimeline(timeline, skeleton, applyTime, mix, timelineBlend, current.timelinesRotation, ii << 1, firstFrame);
 						} else if (timeline instanceof AttachmentTimeline) {
 							this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, true);
 						} else {
@@ -271,9 +270,8 @@ module spine {
 				let timelineMode = from.timelineMode;
 				let timelineHoldMix = from.timelineHoldMix;
 
-				let firstFrame = from.timelinesRotation.length == 0;
-				if (firstFrame) Utils.setArraySize(from.timelinesRotation, timelineCount << 1, null);
-				let timelinesRotation = from.timelinesRotation;
+				let firstFrame = from.timelinesRotation.length != timelineCount << 1;
+				if (firstFrame) from.timelinesRotation.length = timelineCount << 1;
 
 				from.totalAlpha = 0;
 				for (let i = 0; i < timelineCount; i++) {
@@ -308,7 +306,7 @@ module spine {
 					from.totalAlpha += alpha;
 
 					if (timeline instanceof RotateTimeline)
-						this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
+						this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, from.timelinesRotation, i << 1, firstFrame);
 					else if (timeline instanceof AttachmentTimeline)
 						this.applyAttachmentTimeline(timeline, skeleton, applyTime, timelineBlend, attachments);
 					else {
@@ -708,9 +706,10 @@ module spine {
 			let to = entry.mixingTo;
 			let timelines = entry.animation.timelines;
 			let timelinesCount = entry.animation.timelines.length;
-			let timelineMode = Utils.setArraySize(entry.timelineMode, timelinesCount);
-			entry.timelineHoldMix.length = 0;
-			let timelineHoldMix = Utils.setArraySize(entry.timelineHoldMix, timelinesCount);
+			let timelineMode = entry.timelineMode;
+			timelineMode.length = timelinesCount;
+			let timelineHoldMix = entry.timelineHoldMix;
+			timelineHoldMix.length = 0;
 			let propertyIDs = this.propertyIDs;
 
 			if (to != null && to.holdPrevious) {
