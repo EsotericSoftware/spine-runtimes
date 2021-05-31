@@ -79,13 +79,18 @@ module spine {
 			return this.attachment;
 		}
 
-		/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears {@link #deform}.
+		/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears the {@link #deform}.
+		 * The deform is not cleared if the old attachment has the same {@link VertexAttachment#getDeformAttachment()} as the specified
+		 * attachment.
 		 * @param attachment May be null. */
 		setAttachment (attachment: Attachment) {
 			if (this.attachment == attachment) return;
+			if (!(attachment instanceof VertexAttachment) || !(this.attachment instanceof VertexAttachment)
+			|| (<VertexAttachment>attachment).deformAttachment != (<VertexAttachment>this.attachment).deformAttachment) {
+				this.deform.length = 0;
+			}
 			this.attachment = attachment;
 			this.attachmentTime = this.bone.skeleton.time;
-			this.deform.length = 0;
 		}
 
 		setAttachmentTime (time: number) {

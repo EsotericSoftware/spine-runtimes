@@ -89,26 +89,22 @@ module spine {
 		/** The applied local shearY. */
 		ashearY = 0;
 
-		/** If true, the applied transform matches the world transform. If false, the world transform has been modified since it was
-	 	* computed and {@link #updateAppliedTransform()} must be called before accessing the applied transform. */
-		appliedValid = false;
-
-		/** Part of the world transform matrix for the X axis. If changed, {@link #appliedValid} should be set to false. */
+		/** Part of the world transform matrix for the X axis. If changed, {@link #updateAppliedTransform()} should be called. */
 		a = 0;
 
-		/** Part of the world transform matrix for the Y axis. If changed, {@link #appliedValid} should be set to false. */
+		/** Part of the world transform matrix for the Y axis. If changed, {@link #updateAppliedTransform()} should be called. */
 		b = 0;
 
-		/** Part of the world transform matrix for the X axis. If changed, {@link #appliedValid} should be set to false. */
+		/** Part of the world transform matrix for the X axis. If changed, {@link #updateAppliedTransform()} should be called. */
 		c = 0;
 
-		/** Part of the world transform matrix for the Y axis. If changed, {@link #appliedValid} should be set to false. */
+		/** Part of the world transform matrix for the Y axis. If changed, {@link #updateAppliedTransform()} should be called. */
 		d = 0;
 
-		/** The world X position. If changed, {@link #appliedValid} should be set to false. */
+		/** The world X position. If changed, {@link #updateAppliedTransform()} should be called. */
 		worldY = 0;
 
-		/** The world Y position. If changed, {@link #appliedValid} should be set to false. */
+		/** The world Y position. If changed, {@link #updateAppliedTransform()} should be called. */
 		worldX = 0;
 
 		sorted = false;
@@ -130,9 +126,9 @@ module spine {
 			return this.active;
 		}
 
-		/** Same as {@link #updateWorldTransform()}. This method exists for Bone to implement {@link Updatable}. */
+		/** Computes the world transform using the parent bone and this bone's local applied transform. */
 		update () {
-			this.updateWorldTransformWith(this.x, this.y, this.rotation, this.scaleX, this.scaleY, this.shearX, this.shearY);
+			this.updateWorldTransformWith(this.ax, this.ay, this.arotation, this.ascaleX, this.ascaleY, this.ashearX, this.ashearY);
 		}
 
 		/** Computes the world transform using the parent bone and this bone's local transform.
@@ -142,7 +138,8 @@ module spine {
 			this.updateWorldTransformWith(this.x, this.y, this.rotation, this.scaleX, this.scaleY, this.shearX, this.shearY);
 		}
 
-		/** Computes the world transform using the parent bone and the specified local transform. Child bones are not updated.
+		/** Computes the world transform using the parent bone and the specified local transform. The applied transform is set to the
+		 * specified local transform. Child bones are not updated.
 		 *
 		 * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
 		 * Runtimes Guide. */
@@ -154,7 +151,6 @@ module spine {
 			this.ascaleY = scaleY;
 			this.ashearX = shearX;
 			this.ashearY = shearY;
-			this.appliedValid = true;
 
 			let parent = this.parent;
 			if (parent == null) { // Root bone.
@@ -288,16 +284,15 @@ module spine {
 			return Math.sqrt(this.b * this.b + this.d * this.d);
 		}
 
-		/** Computes the applied transform values from the world transform. This allows the applied transform to be accessed after the
-		 * world transform has been modified (by a constraint, {@link #rotateWorld()}, etc).
+		/** Computes the applied transform values from the world transform.
 		 *
-		 * If {@link #updateWorldTransform()} has been called for a bone and {@link #appliedValid} is false, then
-		 * {@link #updateAppliedTransform()} must be called before accessing the applied transform.
+		 * If the world transform is modified (by a constraint, {@link #rotateWorld(float)}, etc) then this method should be called so
+		 * the applied transform matches the world transform. The applied transform may be needed by other code (eg to apply other
+		 * constraints).
 		 *
 		 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The applied transform after
-		 * calling this method is equivalent to the local tranform used to compute the world transform, but may not be identical. */
+		 * calling this method is equivalent to the local transform used to compute the world transform, but may not be identical. */
 		updateAppliedTransform () {
-			this.appliedValid = true;
 			let parent = this.parent;
 			if (parent == null) {
 				this.ax = this.worldX;
@@ -367,8 +362,10 @@ module spine {
 			return Math.atan2(cos * this.c + sin * this.d, cos * this.a + sin * this.b) * MathUtils.radDeg;
 		}
 
-		/** Rotates the world transform the specified amount and sets {@link #appliedValid} to false.
-		 * {@link #updateWorldTransform()} will need to be called on any child bones, recursively, and any constraints reapplied. */
+		/** Rotates the world transform the specified amount.
+		 * <p>
+		 * After changes are made to the world transform, {@link #updateAppliedTransform()} should be called and {@link #update()} will
+		 * need to be called on any child bones, recursively. */
 		rotateWorld (degrees: number) {
 			let a = this.a, b = this.b, c = this.c, d = this.d;
 			let cos = MathUtils.cosDeg(degrees), sin = MathUtils.sinDeg(degrees);
@@ -376,7 +373,6 @@ module spine {
 			this.b = cos * b - sin * d;
 			this.c = sin * a + cos * c;
 			this.d = sin * b + cos * d;
-			this.appliedValid = false;
 		}
 	}
 }

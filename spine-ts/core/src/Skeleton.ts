@@ -321,6 +321,18 @@ module spine {
 		 * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
 		 * Runtimes Guide. */
 		updateWorldTransform () {
+			let bones = this.bones;
+			for (let i = 0, n = bones.length; i < n; i++) {
+				let bone = bones[i];
+				bone.ax = bone.x;
+				bone.ay = bone.y;
+				bone.arotation = bone.rotation;
+				bone.ascaleX = bone.scaleX;
+				bone.ascaleY = bone.scaleY;
+				bone.ashearX = bone.shearX;
+				bone.ashearY = bone.shearY;
+			}
+
 			let updateCache = this._updateCache;
 			for (let i = 0, n = updateCache.length; i < n; i++)
 				updateCache[i].update();

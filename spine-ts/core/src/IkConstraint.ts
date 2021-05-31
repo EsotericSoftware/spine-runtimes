@@ -96,9 +96,7 @@ module spine {
 
 		/** Applies 1 bone IK. The target is specified in the world coordinate system. */
 		apply1 (bone: Bone, targetX: number, targetY: number, compress: boolean, stretch: boolean, uniform: boolean, alpha: number) {
-			if (!bone.appliedValid) bone.updateAppliedTransform();
 			let p = bone.parent;
-
 			let pa = p.a, pb = p.b, pc = p.c, pd = p.d;
 			let rotationIK = -bone.ashearX - bone.arotation, tx = 0, ty = 0;
 
@@ -148,8 +146,6 @@ module spine {
 		/** Applies 2 bone IK. The target is specified in the world coordinate system.
 		 * @param child A direct descendant of the parent bone. */
 		apply2 (parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, softness: number, alpha: number) {
-			if (!parent.appliedValid) parent.updateAppliedTransform();
-			if (!child.appliedValid) child.updateAppliedTransform();
 			let px = parent.ax, py = parent.ay, psx = parent.ascaleX, sx = psx, psy = parent.ascaleY, csx = child.ascaleX;
 			let os1 = 0, os2 = 0, s2 = 0;
 			if (psx < 0) {

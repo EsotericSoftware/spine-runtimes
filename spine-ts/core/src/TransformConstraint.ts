@@ -149,7 +149,7 @@ module spine {
 					bone.d = Math.sin(r) * s;
 				}
 
-				bone.appliedValid = false;
+				bone.updateAppliedTransform();
 			}
 		}
 
@@ -213,7 +213,7 @@ module spine {
 					bone.d = Math.sin(r) * s;
 				}
 
-				bone.appliedValid = false;
+				bone.updateAppliedTransform();
 			}
 		}
 
@@ -222,12 +222,10 @@ module spine {
 			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 
 			let target = this.target;
-			if (!target.appliedValid) target.updateAppliedTransform();
 
 			let bones = this.bones;
 			for (let i = 0, n = bones.length; i < n; i++) {
 				let bone = bones[i];
-				if (!bone.appliedValid) bone.updateAppliedTransform();
 
 				let rotation = bone.arotation;
 				if (mixRotate != 0) {
@@ -262,11 +260,10 @@ module spine {
 			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 
 			let target = this.target;
-			if (!target.appliedValid) target.updateAppliedTransform();
+
 			let bones = this.bones;
 			for (let i = 0, n = bones.length; i < n; i++) {
 				let bone = bones[i];
-				if (!bone.appliedValid) bone.updateAppliedTransform();
 
 				let rotation = bone.arotation + (target.arotation + this.data.offsetRotation) * mixRotate;
 				let x = bone.ax + (target.ax + this.data.offsetX) * mixX;
