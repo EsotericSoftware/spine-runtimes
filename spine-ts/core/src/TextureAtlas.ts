@@ -54,8 +54,8 @@ module spine {
 				// page.format = Format[tuple[0]]; we don't need format in WebGL
 			};
 			pageFields["filter"] = () => {
-				page.minFilter = Texture.filterFromString(entry[1]);
-				page.magFilter = Texture.filterFromString(entry[2]);
+				page.minFilter = Utils.enumValue(TextureFilter, entry[1]);
+				page.magFilter = Utils.enumValue(TextureFilter, entry[2]);
 			};
 			pageFields["repeat"] = () => {
 				if (entry[1].indexOf('x') != -1) page.uWrap = TextureWrap.Repeat;
@@ -153,7 +153,7 @@ module spine {
 						else {
 							if (names == null) {
 								names = [];
-								values = []
+								values = [];
 							}
 							names.push(entry[0]);
 							let entryValues: number[] = [];

@@ -86,7 +86,5 @@ module spine {
 	}
 
 	/** Determines how a bone inherits world transforms from parent bones. */
-	export enum TransformMode {
-		Normal, OnlyTranslation, NoRotationOrReflection, NoScale, NoScaleOrReflection
-	}
+	export enum TransformMode { Normal, OnlyTranslation, NoRotationOrReflection, NoScale, NoScaleOrReflection }
 }

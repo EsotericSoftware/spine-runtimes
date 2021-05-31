@@ -33,6 +33,7 @@ var shapes;
 var lastFrameTime;
 var skeletons = {};
 var activeSkeleton = "spineboy";
+var pow2 = new spine.Pow(2);
 var swirlEffect = new spine.SwirlEffect(0);
 var jitterEffect = new spine.JitterEffect(20, 20);
 var swirlTime = 0;
@@ -83,42 +84,46 @@ function init () {
 	assetManager.loadTextureAtlas("assets/stretchyman-pma.atlas");
 	assetManager.loadBinary("assets/coin-pro.skel");
 	assetManager.loadTextureAtlas("assets/coin-pma.atlas");
+	assetManager.loadBinary("assets/mix-and-match-pro.skel");
+	assetManager.loadText("assets/mix-and-match-pro.json");
+	assetManager.loadTextureAtlas("assets/mix-and-match-pma.atlas");
 	requestAnimationFrame(load);
 }
 
 function load () {
 	// Wait until the AssetManager has loaded all resources, then load the skeletons.
 	if (assetManager.isLoadingComplete()) {
-		skeletons["raptor"] = loadSkeleton("raptor-pro", "walk", true);
-		skeletons["spineboy"] = loadSkeleton("spineboy-pro", "run", true);
-		skeletons["tank"] = loadSkeleton("tank-pro", "drive", true);
-		skeletons["goblins"] = loadSkeleton("goblins-pro", "walk", true, "goblin");
-		skeletons["vine"] = loadSkeleton("vine-pro", "grow", true);
-		skeletons["stretchyman"] = loadSkeleton("stretchyman-pro", "sneak", true);
-		skeletons["coin"] = loadSkeleton("coin-pro", "animation", true);
+		skeletons["coin"] = loadSkeleton("coin-pro.skel", "animation", true);
+		skeletons["goblins"] = loadSkeleton("goblins-pro.skel", "walk", true, "goblin");
+		skeletons["mix-and-match-skel"] = loadSkeleton("mix-and-match-pro.skel", "dance", true, "full-skins/girl-blue-cape");
+		skeletons["mix-and-match-json"] = loadSkeleton("mix-and-match-pro.json", "dance", true, "full-skins/girl-blue-cape");
+		skeletons["raptor"] = loadSkeleton("raptor-pro.skel", "walk", true);
+		skeletons["spineboy"] = loadSkeleton("spineboy-pro.skel", "run", true);
+		skeletons["stretchyman"] = loadSkeleton("stretchyman-pro.skel", "sneak", true);
+		skeletons["tank"] = loadSkeleton("tank-pro.skel", "drive", true);
+		skeletons["vine"] = loadSkeleton("vine-pro.skel", "grow", true);
 		setupUI();
 		lastFrameTime = Date.now() / 1000;
 		requestAnimationFrame(render); // Loading is done, call render every frame.
-	} else {
+	} else
 		requestAnimationFrame(load);
-	}
 }
 
 function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	if (skin === undefined) skin = "default";
 
 	// Load the texture atlas using name.atlas from the AssetManager.
-	var atlas = assetManager.get("assets/" + name.replace("-ess", "").replace("-pro", "") + (premultipliedAlpha ? "-pma": "") + ".atlas");
+	var atlas = assetManager.get("assets/" + name.replace(/(?:-ess|-pro)\.(skel|json)/, "") + (premultipliedAlpha ? "-pma": "") + ".atlas");
 
-	// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
+	// Create an AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
 	var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 
-	// Create a SkeletonBinary instance for parsing the .skel file.
-	var skeletonBinary = new spine.SkeletonBinary(atlasLoader);
+	// Create a skeleton loader instance for parsing the skeleton data file.
+	var skeletonLoader = name.endsWith(".skel") ? new spine.SkeletonBinary(atlasLoader) : new spine.SkeletonJson(atlasLoader);
 
 	// Set the scale to apply during parsing, parse the file, and create a new skeleton.
-	skeletonBinary.scale = 1;
-	var skeletonData = skeletonBinary.readSkeletonData(assetManager.get("assets/" + name + ".skel"));
+	skeletonLoader.scale = 1;
+	var skeletonData = skeletonLoader.readSkeletonData(assetManager.get("assets/" + name));
 	var skeleton = new spine.Skeleton(skeletonData);
 	skeleton.setSkinByName(skin);
 	var bounds = calculateSetupPoseBounds(skeleton);
@@ -126,33 +131,43 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	// Create an AnimationState, and set the initial animation in looping mode.
 	var animationStateData = new spine.AnimationStateData(skeleton.data);
 	var animationState = new spine.AnimationState(animationStateData);
-	if (name == "spineboy") {
-		animationStateData.setMix("walk", "jump", 0.4)
+	if (name == "spineboy-pro.skel") {
+		animationStateData.setMix("walk", "run", 1.5)
+		animationStateData.setMix("run", "jump", 0.2)
 		animationStateData.setMix("jump", "run", 0.4);
-		animationState.setAnimation(0, "walk", true);
-		var jumpEntry = animationState.addAnimation(0, "jump", false, 3);
+		animationState.setEmptyAnimation(0, 0);
+		var entry = animationState.addAnimation(0, "walk", true, 0);
+		entry.mixDuration = 1;
+		animationState.addAnimation(0, "run", true, 1.5);
+		animationState.addAnimation(0, "jump", false, 2);
 		animationState.addAnimation(0, "run", true, 0);
-	} else {
+		animationState.addEmptyAnimation(0, 1, 1);
+		entry = animationState.addAnimation(0, "walk", true, 1.5);
+		entry.mixDuration = 1;
+	} else
 		animationState.setAnimation(0, initialAnimation, true);
+
+	function log (message) {
+		if ($('#debug').is(':checked')) console.log(message);
 	}
 	animationState.addListener({
 		start: function(track) {
-			console.log("Animation on track " + track.trackIndex + " started");
+			log("Animation on track " + track.trackIndex + " started");
 		},
 		interrupt: function(track) {
-			console.log("Animation on track " + track.trackIndex + " interrupted");
+			log("Animation on track " + track.trackIndex + " interrupted");
 		},
 		end: function(track) {
-			console.log("Animation on track " + track.trackIndex + " ended");
+			log("Animation on track " + track.trackIndex + " ended");
 		},
 		disposed: function(track) {
-			console.log("Animation on track " + track.trackIndex + " disposed");
+			log("Animation on track " + track.trackIndex + " disposed");
 		},
 		complete: function(track) {
-			console.log("Animation on track " + track.trackIndex + " completed");
+			log("Animation on track " + track.trackIndex + " completed");
 		},
 		event: function(track, event) {
-			console.log("Event on track " + track.trackIndex + ": " + JSON.stringify(event));
+			log("Event on track " + track.trackIndex + ": " + JSON.stringify(event));
 		}
 	})
 
@@ -273,14 +288,13 @@ function render () {
 		swirlTime += delta;
 		var percent = swirlTime % 2;
 		if (percent > 1) percent = 1 - (percent -1 );
-		swirlEffect.angle = 120 * percent - 60;
+		swirlEffect.angle = pow2.apply(-60, 60, percent);
 		swirlEffect.centerX = bounds.offset.x + bounds.size.x / 2;
 		swirlEffect.centerY = bounds.offset.y + bounds.size.y / 2;
-		swirlEffect.radius = Math.sqrt(bounds.size.x * bounds.size.x + bounds.size.y * bounds.size.y);
+		swirlEffect.radius = Math.sqrt(bounds.size.x * bounds.size.x + bounds.size.y * bounds.size.y) * 0.75;
 		skeletonRenderer.vertexEffect = swirlEffect;
-	} else if (effect == "Jitter") {
+	} else if (effect == "Jitter")
 		skeletonRenderer.vertexEffect = jitterEffect;
-	}
 
 	skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
 	skeletonRenderer.draw(batcher, skeleton);
@@ -317,7 +331,7 @@ function resize () {
 	var centerY = bounds.offset.y + bounds.size.y / 2;
 	var scaleX = bounds.size.x / canvas.width;
 	var scaleY = bounds.size.y / canvas.height;
-	var scale = Math.max(scaleX, scaleY) * 1.2;
+	var scale = Math.max(scaleX, scaleY) * 2;
 	if (scale < 1) scale = 1;
 	var width = canvas.width * scale;
 	var height = canvas.height * scale;

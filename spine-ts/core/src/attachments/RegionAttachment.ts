@@ -33,51 +33,6 @@ module spine {
 	 *
 	 * See [Region attachments](http://esotericsoftware.com/spine-regions) in the Spine User Guide. */
 	export class RegionAttachment extends Attachment {
-		static OX1 = 0;
-		static OY1 = 1;
-		static OX2 = 2;
-		static OY2 = 3;
-		static OX3 = 4;
-		static OY3 = 5;
-		static OX4 = 6;
-		static OY4 = 7;
-
-		static X1 = 0;
-		static Y1 = 1;
-		static C1R = 2;
-		static C1G = 3;
-		static C1B = 4;
-		static C1A = 5;
-		static U1 = 6;
-		static V1 = 7;
-
-		static X2 = 8;
-		static Y2 = 9;
-		static C2R = 10;
-		static C2G = 11;
-		static C2B = 12;
-		static C2A = 13;
-		static U2 = 14;
-		static V2 = 15;
-
-		static X3 = 16;
-		static Y3 = 17;
-		static C3R = 18;
-		static C3G = 19;
-		static C3B = 20;
-		static C3A = 21;
-		static U3 = 22;
-		static V3 = 23;
-
-		static X4 = 24;
-		static Y4 = 25;
-		static C4R = 26;
-		static C4G = 27;
-		static C4B = 28;
-		static C4A = 29;
-		static U4 = 30;
-		static V4 = 31;
-
 		/** The local x translation. */
 		x = 0;
 
@@ -142,14 +97,14 @@ module spine {
 			let localY2Cos = localY2 * cos + this.y;
 			let localY2Sin = localY2 * sin;
 			let offset = this.offset;
-			offset[RegionAttachment.OX1] = localXCos - localYSin;
-			offset[RegionAttachment.OY1] = localYCos + localXSin;
-			offset[RegionAttachment.OX2] = localXCos - localY2Sin;
-			offset[RegionAttachment.OY2] = localY2Cos + localXSin;
-			offset[RegionAttachment.OX3] = localX2Cos - localY2Sin;
-			offset[RegionAttachment.OY3] = localY2Cos + localX2Sin;
-			offset[RegionAttachment.OX4] = localX2Cos - localYSin;
-			offset[RegionAttachment.OY4] = localYCos + localX2Sin;
+			offset[0] = localXCos - localYSin;
+			offset[1] = localYCos + localXSin;
+			offset[2] = localXCos - localY2Sin;
+			offset[3] = localY2Cos + localXSin;
+			offset[4] = localX2Cos - localY2Sin;
+			offset[5] = localY2Cos + localX2Sin;
+			offset[6] = localX2Cos - localYSin;
+			offset[7] = localYCos + localX2Sin;
 		}
 
 		setRegion (region: TextureRegion) : void {
@@ -189,26 +144,26 @@ module spine {
 			let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
 			let offsetX = 0, offsetY = 0;
 
-			offsetX = vertexOffset[RegionAttachment.OX1];
-			offsetY = vertexOffset[RegionAttachment.OY1];
+			offsetX = vertexOffset[0];
+			offsetY = vertexOffset[1];
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // br
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 			offset += stride;
 
-			offsetX = vertexOffset[RegionAttachment.OX2];
-			offsetY = vertexOffset[RegionAttachment.OY2];
+			offsetX = vertexOffset[2];
+			offsetY = vertexOffset[3];
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // bl
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 			offset += stride;
 
-			offsetX = vertexOffset[RegionAttachment.OX3];
-			offsetY = vertexOffset[RegionAttachment.OY3];
+			offsetX = vertexOffset[4];
+			offsetY = vertexOffset[5];
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // ul
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 			offset += stride;
 
-			offsetX = vertexOffset[RegionAttachment.OX4];
-			offsetY = vertexOffset[RegionAttachment.OY4];
+			offsetX = vertexOffset[6];
+			offsetY = vertexOffset[7];
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		}
@@ -230,5 +185,41 @@ module spine {
 			copy.color.setFromColor(this.color);
 			return copy;
 		}
+
+		static X1 = 0;
+		static Y1 = 1;
+		static C1R = 2;
+		static C1G = 3;
+		static C1B = 4;
+		static C1A = 5;
+		static U1 = 6;
+		static V1 = 7;
+
+		static X2 = 8;
+		static Y2 = 9;
+		static C2R = 10;
+		static C2G = 11;
+		static C2B = 12;
+		static C2A = 13;
+		static U2 = 14;
+		static V2 = 15;
+
+		static X3 = 16;
+		static Y3 = 17;
+		static C3R = 18;
+		static C3G = 19;
+		static C3B = 20;
+		static C3A = 21;
+		static U3 = 22;
+		static V3 = 23;
+
+		static X4 = 24;
+		static Y4 = 25;
+		static C4R = 26;
+		static C4G = 27;
+		static C4B = 28;
+		static C4A = 29;
+		static U4 = 30;
+		static V4 = 31;
 	}
 }

@@ -81,10 +81,10 @@ package spine.examples {
 			skeleton.state.apply(skeleton.skeleton);
 			skeleton.skeleton.updateWorldTransform();
 			this.setRequiresRedraw();
-			
+
 			// skeleton.vertexEffect = new JitterEffect(10, 10);
 			swirl = new SwirlEffect(400);
-			swirl.centerY = -200;	
+			swirl.centerY = -200;
 			skeleton.vertexEffect = swirl;
 
 			addChild(skeleton);

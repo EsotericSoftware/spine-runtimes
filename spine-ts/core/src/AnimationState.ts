@@ -34,50 +34,10 @@ module spine {
 	 *
 	 * See [Applying Animations](http://esotericsoftware.com/spine-applying-animations/) in the Spine Runtimes Guide. */
 	export class AnimationState {
-		private static _emptyAnimation: Animation = null;
-
 		private static emptyAnimation(): Animation {
-			if (AnimationState._emptyAnimation == null) AnimationState._emptyAnimation = new Animation("<empty>", [], 0);
-			return AnimationState._emptyAnimation;
+			if (_emptyAnimation == null) _emptyAnimation = new Animation("<empty>", [], 0);
+			return _emptyAnimation;
 		}
-
-		/** 1. A previously applied timeline has set this property.
-		 *
-	 	 * Result: Mix from the current pose to the timeline pose. */
-		static SUBSEQUENT = 0;
-		/** 1. This is the first timeline to set this property.
-		 * 2. The next track entry applied after this one does not have a timeline to set this property.
-		 *
-		 * Result: Mix from the setup pose to the timeline pose. */
-		static FIRST = 1;
-		/** 1) A previously applied timeline has set this property.<br>
-	 	 * 2) The next track entry to be applied does have a timeline to set this property.<br>
-	 	 * 3) The next track entry after that one does not have a timeline to set this property.<br>
-	 	 * Result: Mix from the current pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading
-	 	 * animations that key the same property. A subsequent timeline will set this property using a mix. */
-		static HOLD_SUBSEQUENT = 2;
-		/** 1) This is the first timeline to set this property.<br>
-		 * 2) The next track entry to be applied does have a timeline to set this property.<br>
-		 * 3) The next track entry after that one does not have a timeline to set this property.<br>
-		 * Result: Mix from the setup pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading animations
-		 * that key the same property. A subsequent timeline will set this property using a mix. */
-		static HOLD_FIRST = 3;
-		/** 1. This is the first timeline to set this property.
-		 * 2. The next track entry to be applied does have a timeline to set this property.
-		 * 3. The next track entry after that one does have a timeline to set this property.
-		 * 4. timelineHoldMix stores the first subsequent track entry that does not have a timeline to set this property.
-		 *
-		 * Result: The same as HOLD except the mix percentage from the timelineHoldMix track entry is used. This handles when more than
-		 * 2 track entries in a row have a timeline that sets the same property.
-		 *
-		 * Eg, A -> B -> C -> D where A, B, and C have a timeline setting same property, but D does not. When A is applied, to avoid
-		 * "dipping" A is not mixed out, however D (the first entry that doesn't set the property) mixing in is used to mix out A
-		 * (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
-		 * place. */
-		static HOLD_MIX = 4;
-
-		static SETUP = 1;
-		static CURRENT = 2;
 
 		/** The AnimationStateData to look up mix durations. */
 		data: AnimationStateData;
@@ -243,7 +203,7 @@ module spine {
 
 					for (let ii = 0; ii < timelineCount; ii++) {
 						let timeline = timelines[ii];
-						let timelineBlend = timelineMode[ii] == AnimationState.SUBSEQUENT ? blend : MixBlend.setup;
+						let timelineBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline instanceof RotateTimeline) {
 							this.applyRotateTimeline(timeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
 						} else if (timeline instanceof AttachmentTimeline) {
@@ -264,7 +224,7 @@ module spine {
 			// Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
 			// subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
 			// the time is before the first key).
-			var setupState = this.unkeyedState + AnimationState.SETUP;
+			var setupState = this.unkeyedState + SETUP;
 			var slots = skeleton.slots;
 			for (var i = 0, n = skeleton.slots.length; i < n; i++) {
 				var slot = slots[i];
@@ -322,20 +282,20 @@ module spine {
 					let timelineBlend: MixBlend;
 					let alpha = 0;
 					switch (timelineMode[i]) {
-					case AnimationState.SUBSEQUENT:
+					case SUBSEQUENT:
 						if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
 						timelineBlend = blend;
 						alpha = alphaMix;
 						break;
-					case AnimationState.FIRST:
+					case FIRST:
 						timelineBlend = MixBlend.setup;
 						alpha = alphaMix;
 						break;
-					case AnimationState.HOLD_SUBSEQUENT:
+					case HOLD_SUBSEQUENT:
 						timelineBlend = blend;
 						alpha = alphaHold;
 						break;
-					case AnimationState.HOLD_FIRST:
+					case HOLD_FIRST:
 						timelineBlend = MixBlend.setup;
 						alpha = alphaHold;
 						break;
@@ -381,12 +341,12 @@ module spine {
 				this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search(frames, time)], attachments);
 
 			// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
-			if (slot.attachmentState <= this.unkeyedState) slot.attachmentState = this.unkeyedState + AnimationState.SETUP;
+			if (slot.attachmentState <= this.unkeyedState) slot.attachmentState = this.unkeyedState + SETUP;
 		}
 
 		setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: string, attachments: boolean) {
 			slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName));
-			if (attachments) slot.attachmentState = this.unkeyedState + AnimationState.CURRENT;
+			if (attachments) slot.attachmentState = this.unkeyedState + CURRENT;
 		}
 
 		applyRotateTimeline (timeline: Timeline, skeleton: Skeleton, time: number, alpha: number, blend: MixBlend,
@@ -755,7 +715,7 @@ module spine {
 
 			if (to != null && to.holdPrevious) {
 				for (let i = 0; i < timelinesCount; i++)
-					timelineMode[i] = propertyIDs.addAll(timelines[i].getPropertyIds()) ? AnimationState.HOLD_FIRST : AnimationState.HOLD_SUBSEQUENT;
+					timelineMode[i] = propertyIDs.addAll(timelines[i].getPropertyIds()) ? HOLD_FIRST : HOLD_SUBSEQUENT;
 				return;
 			}
 
@@ -764,21 +724,21 @@ module spine {
 				let timeline = timelines[i];
 				let ids = timeline.getPropertyIds();
 				if (!propertyIDs.addAll(ids))
-					timelineMode[i] = AnimationState.SUBSEQUENT;
+					timelineMode[i] = SUBSEQUENT;
 				else if (to == null || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
 					|| timeline instanceof EventTimeline || !to.animation.hasTimeline(ids)) {
-					timelineMode[i] = AnimationState.FIRST;
+					timelineMode[i] = FIRST;
 				} else {
 					for (let next = to.mixingTo; next != null; next = next.mixingTo) {
 						if (next.animation.hasTimeline(ids)) continue;
 						if (entry.mixDuration > 0) {
-							timelineMode[i] = AnimationState.HOLD_MIX;
+							timelineMode[i] = HOLD_MIX;
 							timelineHoldMix[i] = next;
 							continue outer;
 						}
 						break;
 					}
-					timelineMode[i] = AnimationState.HOLD_FIRST;
+					timelineMode[i] = HOLD_FIRST;
 				}
 			}
 		}
@@ -1176,4 +1136,44 @@ module spine {
 		event (entry: TrackEntry, event: Event) {
 		}
 	}
+
+	/** 1. A previously applied timeline has set this property.
+	 *
+	 * Result: Mix from the current pose to the timeline pose. */
+	const SUBSEQUENT = 0;
+	/** 1. This is the first timeline to set this property.
+	 * 2. The next track entry applied after this one does not have a timeline to set this property.
+	 *
+	 * Result: Mix from the setup pose to the timeline pose. */
+	const FIRST = 1;
+	/** 1) A previously applied timeline has set this property.<br>
+	 * 2) The next track entry to be applied does have a timeline to set this property.<br>
+	 * 3) The next track entry after that one does not have a timeline to set this property.<br>
+	 * Result: Mix from the current pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading
+	 * animations that key the same property. A subsequent timeline will set this property using a mix. */
+	const HOLD_SUBSEQUENT = 2;
+	/** 1) This is the first timeline to set this property.<br>
+	 * 2) The next track entry to be applied does have a timeline to set this property.<br>
+	 * 3) The next track entry after that one does not have a timeline to set this property.<br>
+	 * Result: Mix from the setup pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading animations
+	 * that key the same property. A subsequent timeline will set this property using a mix. */
+	const HOLD_FIRST = 3;
+	/** 1. This is the first timeline to set this property.
+	 * 2. The next track entry to be applied does have a timeline to set this property.
+	 * 3. The next track entry after that one does have a timeline to set this property.
+	 * 4. timelineHoldMix stores the first subsequent track entry that does not have a timeline to set this property.
+	 *
+	 * Result: The same as HOLD except the mix percentage from the timelineHoldMix track entry is used. This handles when more than
+	 * 2 track entries in a row have a timeline that sets the same property.
+	 *
+	 * Eg, A -> B -> C -> D where A, B, and C have a timeline setting same property, but D does not. When A is applied, to avoid
+	 * "dipping" A is not mixed out, however D (the first entry that doesn't set the property) mixing in is used to mix out A
+	 * (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
+	 * place. */
+	const HOLD_MIX = 4;
+
+	const SETUP = 1;
+	const CURRENT = 2;
+
+	let _emptyAnimation: Animation = null;
 }

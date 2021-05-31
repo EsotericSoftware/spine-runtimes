@@ -165,6 +165,10 @@ module spine {
 			color.g = ((value & 0x0000ff00) >>> 8) / 255;
 			color.b = ((value & 0x000000ff)) / 255;
 		}
+
+		static fromString (hex : string) : Color {
+			return new Color().setFromString(hex);
+		}
 	}
 
 	export class MathUtils {
@@ -317,6 +321,10 @@ module spine {
 			for (var i = 0; i < array.length; i++)
 				if (array[i] == element) return true;
 			return false;
+		}
+
+		static enumValue (type: any, name: string) {
+			return type[name[0].toUpperCase() + name.slice(1)];
 		}
 	}
 

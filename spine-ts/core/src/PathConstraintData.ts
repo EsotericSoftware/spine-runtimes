@@ -70,21 +70,15 @@ module spine {
 	/** Controls how the first bone is positioned along the path.
 	 *
 	 * See [position](http://esotericsoftware.com/spine-path-constraints#Position) in the Spine User Guide. */
-	export enum PositionMode {
-		Fixed, Percent
-	}
+	export enum PositionMode { Fixed, Percent }
 
 	/** Controls how bones after the first bone are positioned along the path.
 	 *
 	 * See [spacing](http://esotericsoftware.com/spine-path-constraints#Spacing) in the Spine User Guide. */
-	export enum SpacingMode {
-		Length, Fixed, Percent, Proportional
-	}
+	export enum SpacingMode { Length, Fixed, Percent, Proportional }
 
 	/** Controls how bones are rotated, translated, and scaled to match the path.
 	 *
 	 * See [rotate mix](http://esotericsoftware.com/spine-path-constraints#Rotate-mix) in the Spine User Guide. */
-	export enum RotateMode {
-		Tangent, Chain, ChainScale
-	}
+	export enum RotateMode { Tangent, Chain, ChainScale }
 }

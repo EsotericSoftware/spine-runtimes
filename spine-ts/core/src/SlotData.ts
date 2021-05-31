@@ -31,7 +31,6 @@ module spine {
 
 	/** Stores the setup pose for a {@link Slot}. */
 	export class SlotData {
-
 		/** The index of the slot in {@link Skeleton#getSlots()}. */
 		index: number;
 
@@ -64,4 +63,7 @@ module spine {
 			this.boneData = boneData;
 		}
 	}
+
+	/** Determines how images are blended with existing pixels when drawn. */
+	export enum BlendMode { Normal, Additive, Multiply, Screen }
 }

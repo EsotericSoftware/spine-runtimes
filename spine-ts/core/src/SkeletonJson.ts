@@ -86,7 +86,7 @@ module spine {
 					data.scaleY = getValue(boneMap, "scaleY", 1);
 					data.shearX = getValue(boneMap, "shearX", 0);
 					data.shearY = getValue(boneMap, "shearY", 0);
-					data.transformMode = SkeletonJson.transformModeFromString(getValue(boneMap, "transform", "normal"));
+					data.transformMode = Utils.enumValue(TransformMode, getValue(boneMap, "transform", "Normal"));
 					data.skinRequired = getValue(boneMap, "skin", false);
 
 					let color = getValue(boneMap, "color", null);
@@ -110,13 +110,10 @@ module spine {
 					if (color != null) data.color.setFromString(color);
 
 					let dark: string = getValue(slotMap, "dark", null);
-					if (dark != null) {
-						data.darkColor = new Color(1, 1, 1, 1);
-						data.darkColor.setFromString(dark);
-					}
+					if (dark != null) data.darkColor = Color.fromString(dark);
 
 					data.attachmentName = getValue(slotMap, "attachment", null);
-					data.blendMode = SkeletonJson.blendModeFromString(getValue(slotMap, "blend", "normal"));
+					data.blendMode = Utils.enumValue(BlendMode, getValue(slotMap, "blend", "normal"));
 					skeletonData.slots.push(data);
 				}
 			}
@@ -209,9 +206,9 @@ module spine {
 					data.target = skeletonData.findSlot(targetName);
 					if (data.target == null) throw new Error("Path target slot not found: " + targetName);
 
-					data.positionMode = SkeletonJson.positionModeFromString(getValue(constraintMap, "positionMode", "percent"));
-					data.spacingMode = SkeletonJson.spacingModeFromString(getValue(constraintMap, "spacingMode", "length"));
-					data.rotateMode = SkeletonJson.rotateModeFromString(getValue(constraintMap, "rotateMode", "tangent"));
+					data.positionMode = Utils.enumValue(PositionMode, getValue(constraintMap, "positionMode", "Percent"));
+					data.spacingMode = Utils.enumValue(SpacingMode, getValue(constraintMap, "spacingMode", "Length"));
+					data.rotateMode = Utils.enumValue(RotateMode, getValue(constraintMap, "rotateMode", "Tangent"));
 					data.offsetRotation = getValue(constraintMap, "rotation", 0);
 					data.position = getValue(constraintMap, "position", 0);
 					if (data.positionMode == PositionMode.Fixed) data.position *= scale;
@@ -484,14 +481,14 @@ module spine {
 							let timeline = new RGBATimeline(timelineMap.length, timelineMap.length << 2, slotIndex);
 							let keyMap = timelineMap[0];
 							let time = getValue(keyMap, "time", 0);
-							let color = new Color().setFromString(keyMap.color);
+							let color = Color.fromString(keyMap.color);
 
 							for (let frame = 0, bezier = 0;; frame++) {
 								timeline.setFrame(frame, time, color.r, color.g, color.b, color.a);
 								if (timelineMap.length == frame + 1) break;
 								let nextMap = timelineMap[frame + 1];
 								let time2 = getValue(nextMap, "time", 0);
-								let newColor = new Color().setFromString(nextMap.color);
+								let newColor = Color.fromString(nextMap.color);
 								let curve = keyMap.curve;
 								if (curve) {
 									bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
@@ -510,14 +507,14 @@ module spine {
 							let timeline = new RGBTimeline(timelineMap.length, timelineMap.length * 3, slotIndex);
 							let keyMap = timelineMap[0];
 							let time = getValue(keyMap, "time", 0);
-							let color = new Color().setFromString(keyMap.color);
+							let color = Color.fromString(keyMap.color);
 
 							for (let frame = 0, bezier = 0;; frame++) {
 								timeline.setFrame(frame, time, color.r, color.g, color.b);
 								if (timelineMap.length == frame + 1) break;
 								let nextMap = timelineMap[frame + 1];
 								let time2 = getValue(nextMap, "time", 0);
-								let newColor = new Color().setFromString(nextMap.color);
+								let newColor = Color.fromString(nextMap.color);
 								let curve = keyMap.curve;
 								if (curve) {
 									bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
@@ -532,22 +529,22 @@ module spine {
 							timelines.push(timeline);
 
 						} else if (timelineName == "alpha") {
-							timelines.push(readTimeline(timelineMap, new AlphaTimeline(timelineMap.length, timelineMap.length, slotIndex), 0, 1));
+							timelines.push(readTimeline1(timelineMap, new AlphaTimeline(timelineMap.length, timelineMap.length, slotIndex), 0, 1));
 						} else if (timelineName == "rgba2") {
 							let timeline = new RGBA2Timeline(timelineMap.length, timelineMap.length * 7, slotIndex);
 
 							let keyMap = timelineMap[0];
 							let time = getValue(keyMap, "time", 0);
-							let color = new Color().setFromString(keyMap.light);
-							let color2 = new Color().setFromString(keyMap.dark);
+							let color = Color.fromString(keyMap.light);
+							let color2 = Color.fromString(keyMap.dark);
 
 							for (let frame = 0, bezier = 0;; frame++) {
 								timeline.setFrame(frame, time, color.r, color.g, color.b, color.a, color2.r, color2.g, color2.b);
 								if (timelineMap.length == frame + 1) break;
 								let nextMap = timelineMap[frame + 1];
 								let time2 = getValue(nextMap, "time", 0);
-								let newColor = new Color().setFromString(nextMap.light);
-								let newColor2 = new Color().setFromString(nextMap.dark);
+								let newColor = Color.fromString(nextMap.light);
+								let newColor2 = Color.fromString(nextMap.dark);
 								let curve = keyMap.curve;
 								if (curve) {
 									bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
@@ -571,16 +568,16 @@ module spine {
 
 							let keyMap = timelineMap[0];
 							let time = getValue(keyMap, "time", 0);
-							let color = new Color().setFromString(keyMap.light);
-							let color2 = new Color().setFromString(keyMap.dark);
+							let color = Color.fromString(keyMap.light);
+							let color2 = Color.fromString(keyMap.dark);
 
 							for (let frame = 0, bezier = 0;; frame++) {
 								timeline.setFrame(frame, time, color.r, color.g, color.b, color2.r, color2.g, color2.b);
 								if (timelineMap.length == frame + 1) break;
 								let nextMap = timelineMap[frame + 1];
 								let time2 = getValue(nextMap, "time", 0);
-								let newColor = new Color().setFromString(nextMap.light);
-								let newColor2 = new Color().setFromString(nextMap.dark);
+								let newColor = Color.fromString(nextMap.light);
+								let newColor2 = Color.fromString(nextMap.dark);
 								let curve = keyMap.curve;
 								if (curve) {
 									bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
@@ -615,34 +612,34 @@ module spine {
 						if (timelineMap.length == 0) continue;
 
 						if (timelineName === "rotate") {
-							timelines.push(readTimeline(timelineMap, new RotateTimeline(timelineMap.length, timelineMap.length, boneIndex), 0, 1));
+							timelines.push(readTimeline1(timelineMap, new RotateTimeline(timelineMap.length, timelineMap.length, boneIndex), 0, 1));
 						} else if (timelineName === "translate") {
 							let timeline = new TranslateTimeline(timelineMap.length, timelineMap.length << 1, boneIndex);
 							timelines.push(readTimeline2(timelineMap, timeline, "x", "y", 0, scale));
 						} else if (timelineName === "translatex") {
 							let timeline = new TranslateXTimeline(timelineMap.length, timelineMap.length, boneIndex);
-							timelines.push(readTimeline(timelineMap, timeline, 0, scale));
+							timelines.push(readTimeline1(timelineMap, timeline, 0, scale));
 						} else if (timelineName === "translatey") {
 							let timeline = new TranslateYTimeline(timelineMap.length, timelineMap.length, boneIndex);
-							timelines.push(readTimeline(timelineMap, timeline, 0, scale));
+							timelines.push(readTimeline1(timelineMap, timeline, 0, scale));
 						} else if (timelineName === "scale") {
 							let timeline = new ScaleTimeline(timelineMap.length, timelineMap.length << 1, boneIndex);
 							timelines.push(readTimeline2(timelineMap, timeline, "x", "y", 1, 1));
 						} else if (timelineName === "scalex") {
 							let timeline = new ScaleXTimeline(timelineMap.length, timelineMap.length, boneIndex);
-							timelines.push(readTimeline(timelineMap, timeline, 1, 1));
+							timelines.push(readTimeline1(timelineMap, timeline, 1, 1));
 						} else if (timelineName === "scaley") {
 							let timeline = new ScaleYTimeline(timelineMap.length, timelineMap.length, boneIndex);
-							timelines.push(readTimeline(timelineMap, timeline, 1, 1));
+							timelines.push(readTimeline1(timelineMap, timeline, 1, 1));
 						} else if (timelineName === "shear") {
 							let timeline = new ShearTimeline(timelineMap.length, timelineMap.length << 1, boneIndex);
 							timelines.push(readTimeline2(timelineMap, timeline, "x", "y", 0, 1));
 						} else if (timelineName === "shearx") {
 							let timeline = new ShearXTimeline(timelineMap.length, timelineMap.length, boneIndex);
-							timelines.push(readTimeline(timelineMap, timeline, 0, 1));
+							timelines.push(readTimeline1(timelineMap, timeline, 0, 1));
 						} else if (timelineName === "sheary") {
 							let timeline = new ShearYTimeline(timelineMap.length, timelineMap.length, boneIndex);
-							timelines.push(readTimeline(timelineMap, timeline, 0, 1));
+							timelines.push(readTimeline1(timelineMap, timeline, 0, 1));
 						} else
 							throw new Error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
 					}
@@ -755,10 +752,10 @@ module spine {
 
 						if (timelineName === "position") {
 							let timeline = new PathConstraintPositionTimeline(timelineMap.length, timelineMap.length, index);
-							timelines.push(readTimeline(timelineMap, timeline, 0, data.positionMode == PositionMode.Fixed ? scale : 1));
+							timelines.push(readTimeline1(timelineMap, timeline, 0, data.positionMode == PositionMode.Fixed ? scale : 1));
 						} else if (timelineName === "spacing") {
 							let timeline = new PathConstraintSpacingTimeline(timelineMap.length, timelineMap.length, index);
-							timelines.push(readTimeline(timelineMap, timeline, 0, data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
+							timelines.push(readTimeline1(timelineMap, timeline, 0, data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
 						} else if (timelineName === "mix") {
 							let timeline = new PathConstraintMixTimeline(timelineMap.size, timelineMap.size * 3, index);
 							let time = getValue(keyMap, "time", 0);
@@ -913,115 +910,6 @@ module spine {
 
 			skeletonData.animations.push(new Animation(name, timelines, duration));
 		}
-
-		static private readTimeline (keys: any[], timeline: CurveTimeline1, defaultValue: number, scale: number) {
-			let keyMap = keys[0];
-			let time = getValue(keyMap, "time", 0);
-			let value = getValue(keyMap, "value", defaultValue) * scale;
-			let bezier = 0;
-			for (let frame = 0;; frame++) {
-				timeline.setFrame(frame, time, value);
-				let nextMap = keys[frame + 1];
-				if (!nextMap) break;
-				let time2 = getValue(nextMap, "time", 0);
-				let value2 = getValue(nextMap, "value", defaultValue) * scale;
-				let curve = keyMap.curve;
-				if (curve) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value, value2, scale);
-				time = time2;
-				value = value2;
-				keyMap = nextMap;
-			}
-			return timeline;
-		}
-
-		static private readTimeline2 (keys: any[], timeline: CurveTimeline2, name1: string, name2: string, defaultValue: number, scale: number) {
-			let keyMap = keys[0];
-			let time = getValue(keyMap, "time", 0);
-			let value1 = getValue(keyMap, name1, defaultValue) * scale;
-			let value2 = getValue(keyMap, name2, defaultValue) * scale;
-			let bezier = 0;
-			for (let frame = 0;; frame++) {
-				timeline.setFrame(frame, time, value1, value2);
-				let nextMap = keys[frame + 1];
-				if (!nextMap) break;
-				let time2 = getValue(nextMap, "time", 0);
-				let nvalue1 = getValue(nextMap, name1, defaultValue) * scale;
-				let nvalue2 = getValue(nextMap, name2, defaultValue) * scale;
-				let curve = keyMap.curve;
-				if (curve != null) {
-					bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value1, nvalue1, scale);
-					bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, value2, nvalue2, scale);
-				}
-				time = time2;
-				value1 = nvalue1;
-				value2 = nvalue2;
-				keyMap = nextMap;
-			}
-			timeline.shrink(bezier);
-			return timeline;
-		}
-
-		static private readCurve (curve: any, timeline: CurveTimeline, bezier: number, frame: number, value: number, time1: number, time2: number,
-			value1: number, value2: number, scale: number) {
-			if (curve == "stepped") {
-				if (value != 0) timeline.setStepped(frame);
-			} else {
-				let i = value << 2;
-				let cx1 = curve[i++];
-				let cy1 = curve[i++] * scale;
-				let cx2 = curve[i++];
-				let cy2 = curve[i++] * scale;
-				timeline.setBezier(bezier++, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
-			}
-			return bezier;
-		}
-
-		static private getValue (map: any, property: string, defaultValue: any) {
-			return map[property] !== undefined ? map[property] : defaultValue;
-		}
-
-		static private blendModeFromString (str: string) {
-			str = str.toLowerCase();
-			if (str == "normal") return BlendMode.Normal;
-			if (str == "additive") return BlendMode.Additive;
-			if (str == "multiply") return BlendMode.Multiply;
-			if (str == "screen") return BlendMode.Screen;
-			throw new Error(`Unknown blend mode: ${str}`);
-		}
-
-		static private positionModeFromString (str: string) {
-			str = str.toLowerCase();
-			if (str == "fixed") return PositionMode.Fixed;
-			if (str == "percent") return PositionMode.Percent;
-			throw new Error(`Unknown position mode: ${str}`);
-		}
-
-		static private spacingModeFromString (str: string) {
-			str = str.toLowerCase();
-			if (str == "length") return SpacingMode.Length;
-			if (str == "fixed") return SpacingMode.Fixed;
-			if (str == "percent") return SpacingMode.Percent;
-			if (str == "proportional") return SpacingMode.Proportional;
-			throw new Error(`Unknown spacing mode: ${str}`);
-		}
-
-		static private rotateModeFromString (str: string) {
-			str = str.toLowerCase();
-			if (str == "tangent") return RotateMode.Tangent;
-			if (str == "chain") return RotateMode.Chain;
-			if (str == "chainscale") return RotateMode.ChainScale;
-			throw new Error(`Unknown rotate mode: ${str}`);
-		}
-
-		static private transformModeFromString(str: string) {
-			str = str.toLowerCase();
-			if (str == "normal") return TransformMode.Normal;
-			if (str == "onlytranslation") return TransformMode.OnlyTranslation;
-			if (str == "norotationorreflection") return TransformMode.NoRotationOrReflection;
-			if (str == "noscale") return TransformMode.NoScale;
-			if (str == "noscaleorreflection") return TransformMode.NoScaleOrReflection;
-			throw new Error(`Unknown transform mode: ${str}`);
-		}
 	}
 
 	class LinkedMesh {
@@ -1037,5 +925,71 @@ module spine {
 			this.parent = parent;
 			this.inheritDeform = inheritDeform;
 		}
+	}
+
+	function readTimeline1 (keys: any[], timeline: CurveTimeline1, defaultValue: number, scale: number) {
+		let keyMap = keys[0];
+		let time = getValue(keyMap, "time", 0);
+		let value = getValue(keyMap, "value", defaultValue) * scale;
+		let bezier = 0;
+		for (let frame = 0;; frame++) {
+			timeline.setFrame(frame, time, value);
+			let nextMap = keys[frame + 1];
+			if (!nextMap) break;
+			let time2 = getValue(nextMap, "time", 0);
+			let value2 = getValue(nextMap, "value", defaultValue) * scale;
+			let curve = keyMap.curve;
+			if (curve) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value, value2, scale);
+			time = time2;
+			value = value2;
+			keyMap = nextMap;
+		}
+		return timeline;
+	}
+
+	function readTimeline2 (keys: any[], timeline: CurveTimeline2, name1: string, name2: string, defaultValue: number, scale: number) {
+		let keyMap = keys[0];
+		let time = getValue(keyMap, "time", 0);
+		let value1 = getValue(keyMap, name1, defaultValue) * scale;
+		let value2 = getValue(keyMap, name2, defaultValue) * scale;
+		let bezier = 0;
+		for (let frame = 0;; frame++) {
+			timeline.setFrame(frame, time, value1, value2);
+			let nextMap = keys[frame + 1];
+			if (!nextMap) break;
+			let time2 = getValue(nextMap, "time", 0);
+			let nvalue1 = getValue(nextMap, name1, defaultValue) * scale;
+			let nvalue2 = getValue(nextMap, name2, defaultValue) * scale;
+			let curve = keyMap.curve;
+			if (curve != null) {
+				bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value1, nvalue1, scale);
+				bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, value2, nvalue2, scale);
+			}
+			time = time2;
+			value1 = nvalue1;
+			value2 = nvalue2;
+			keyMap = nextMap;
+		}
+		timeline.shrink(bezier);
+		return timeline;
+	}
+
+	function readCurve (curve: any, timeline: CurveTimeline, bezier: number, frame: number, value: number, time1: number, time2: number,
+		value1: number, value2: number, scale: number) {
+		if (curve == "stepped") {
+			if (value != 0) timeline.setStepped(frame);
+		} else {
+			let i = value << 2;
+			let cx1 = curve[i++];
+			let cy1 = curve[i++] * scale;
+			let cx2 = curve[i++];
+			let cy2 = curve[i++] * scale;
+			timeline.setBezier(bezier++, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
+		}
+		return bezier;
+	}
+
+	function getValue (map: any, property: string, defaultValue: any) {
+		return map[property] !== undefined ? map[property] : defaultValue;
 	}
 }
