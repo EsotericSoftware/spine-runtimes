@@ -103,63 +103,62 @@ namespace Spine {
 			float[] spaces = this.spaces.Resize(spacesCount).Items, lengths = scale ? this.lengths.Resize(boneCount).Items : null;
 			float spacing = this.spacing;
 			switch (data.spacingMode) {
-				case SpacingMode.Percent:
-					if (scale) {
-						for (int i = 0, n = spacesCount - 1; i < n; i++) {
-							Bone bone = bonesItems[i];
-							float setupLength = bone.data.length;
-							if (setupLength < PathConstraint.Epsilon)
-								lengths[i] = 0;
-							else {
-								float x = setupLength * bone.a, y = setupLength * bone.c;
-								lengths[i] = (float)Math.Sqrt(x * x + y * y);
-							}
-						}
-					}
-					ArraysFill(spaces, 1, spacesCount, spacing);
-					break;
-				case SpacingMode.Proportional: {
-					float sum = 0;
-					for (int i = 0; i < boneCount;) {
+			case SpacingMode.Percent:
+				if (scale) {
+					for (int i = 0, n = spacesCount - 1; i < n; i++) {
 						Bone bone = bonesItems[i];
 						float setupLength = bone.data.length;
-						if (setupLength < PathConstraint.Epsilon) {
-							if (scale) lengths[i] = 0;
-							spaces[++i] = spacing;
-						} else {
-							float x = setupLength * bone.a, y = setupLength * bone.c;
-							float length = (float)Math.Sqrt(x * x + y * y);
-							if (scale) lengths[i] = length;
-							spaces[++i] = length;
-							sum += length;
-						}
-					}
-					if (sum > 0) {
-						sum = spacesCount / sum * spacing;
-						for (int i = 1; i < spacesCount; i++)
-							spaces[i] *= sum;
-					}
-					break;
-				}
-				default: {
-					bool lengthSpacing = data.spacingMode == SpacingMode.Length;
-
-					for (int i = 0, n = spacesCount - 1; i < n;) {
-						Bone bone = bonesItems[i];
-						float setupLength = bone.data.length;
-						if (setupLength < PathConstraint.Epsilon) {
-							if (scale) lengths[i] = 0;
-							spaces[++i] = spacing;
-						}
+						if (setupLength < PathConstraint.Epsilon)
+							lengths[i] = 0;
 						else {
 							float x = setupLength * bone.a, y = setupLength * bone.c;
-							float length = (float)Math.Sqrt(x * x + y * y);
-							if (scale) lengths[i] = length;
-							spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+							lengths[i] = (float)Math.Sqrt(x * x + y * y);
 						}
 					}
-					break;
 				}
+				ArraysFill(spaces, 1, spacesCount, spacing);
+				break;
+			case SpacingMode.Proportional: {
+				float sum = 0;
+				for (int i = 0; i < boneCount;) {
+					Bone bone = bonesItems[i];
+					float setupLength = bone.data.length;
+					if (setupLength < PathConstraint.Epsilon) {
+						if (scale) lengths[i] = 0;
+						spaces[++i] = spacing;
+					} else {
+						float x = setupLength * bone.a, y = setupLength * bone.c;
+						float length = (float)Math.Sqrt(x * x + y * y);
+						if (scale) lengths[i] = length;
+						spaces[++i] = length;
+						sum += length;
+					}
+				}
+				if (sum > 0) {
+					sum = spacesCount / sum * spacing;
+					for (int i = 1; i < spacesCount; i++)
+						spaces[i] *= sum;
+				}
+				break;
+			}
+			default: {
+				bool lengthSpacing = data.spacingMode == SpacingMode.Length;
+
+				for (int i = 0, n = spacesCount - 1; i < n;) {
+					Bone bone = bonesItems[i];
+					float setupLength = bone.data.length;
+					if (setupLength < PathConstraint.Epsilon) {
+						if (scale) lengths[i] = 0;
+						spaces[++i] = spacing;
+					} else {
+						float x = setupLength * bone.a, y = setupLength * bone.c;
+						float length = (float)Math.Sqrt(x * x + y * y);
+						if (scale) lengths[i] = length;
+						spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+					}
+				}
+				break;
+			}
 			}
 
 			float[] positions = ComputeWorldPositions(attachment, spacesCount, tangents);
@@ -221,14 +220,13 @@ namespace Spine {
 		}
 
 		float[] ComputeWorldPositions (PathAttachment path, int spacesCount, bool tangents) {
-
 			Slot target = this.target;
 			float position = this.position;
 			float[] spaces = this.spaces.Items, output = this.positions.Resize(spacesCount * 3 + 2).Items, world;
 			bool closed = path.Closed;
 			int verticesLength = path.WorldVerticesLength, curveCount = verticesLength / 6, prevCurve = NONE;
-			float pathLength;
-			float multiplier;
+
+			float pathLength, multiplier;
 			if (!path.ConstantSpeed) {
 				float[] lengths = path.Lengths;
 				curveCount -= closed ? 1 : 2;
@@ -236,17 +234,16 @@ namespace Spine {
 
 				if (data.positionMode == PositionMode.Percent) position *= pathLength;
 
-				//float multiplier;
 				switch (data.spacingMode) {
-					case SpacingMode.Percent:
-						multiplier = pathLength;
-						break;
-					case SpacingMode.Proportional:
-						multiplier = pathLength / spacesCount;
-						break;
-					default:
-						multiplier = 1;
-						break;
+				case SpacingMode.Percent:
+					multiplier = pathLength;
+					break;
+				case SpacingMode.Proportional:
+					multiplier = pathLength / spacesCount;
+					break;
+				default:
+					multiplier = 1;
+					break;
 				}
 
 				world = this.world.Resize(8).Items;
@@ -355,17 +352,16 @@ namespace Spine {
 
 			if (data.positionMode == PositionMode.Percent) position *= pathLength;
 
-			//float multiplier;
 			switch (data.spacingMode) {
-				case SpacingMode.Percent:
-					multiplier = pathLength;
-					break;
-				case SpacingMode.Proportional:
-					multiplier = pathLength / spacesCount;
-					break;
-				default:
-					multiplier = 1;
-					break;
+			case SpacingMode.Percent:
+				multiplier = pathLength;
+				break;
+			case SpacingMode.Proportional:
+				multiplier = pathLength / spacesCount;
+				break;
+			default:
+				multiplier = 1;
+				break;
 			}
 
 			float[] segments = this.segments;

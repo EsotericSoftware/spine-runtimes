@@ -376,162 +376,162 @@ namespace Spine {
 
 			switch ((AttachmentType)input.ReadByte()) {
 			case AttachmentType.Region: {
-					String path = input.ReadStringRef();
-					float rotation = input.ReadFloat();
-					float x = input.ReadFloat();
-					float y = input.ReadFloat();
-					float scaleX = input.ReadFloat();
-					float scaleY = input.ReadFloat();
-					float width = input.ReadFloat();
-					float height = input.ReadFloat();
-					int color = input.ReadInt();
+				String path = input.ReadStringRef();
+				float rotation = input.ReadFloat();
+				float x = input.ReadFloat();
+				float y = input.ReadFloat();
+				float scaleX = input.ReadFloat();
+				float scaleY = input.ReadFloat();
+				float width = input.ReadFloat();
+				float height = input.ReadFloat();
+				int color = input.ReadInt();
 
-					if (path == null) path = name;
-					RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, name, path);
-					if (region == null) return null;
-					region.Path = path;
-					region.x = x * scale;
-					region.y = y * scale;
-					region.scaleX = scaleX;
-					region.scaleY = scaleY;
-					region.rotation = rotation;
-					region.width = width * scale;
-					region.height = height * scale;
-					region.r = ((color & 0xff000000) >> 24) / 255f;
-					region.g = ((color & 0x00ff0000) >> 16) / 255f;
-					region.b = ((color & 0x0000ff00) >> 8) / 255f;
-					region.a = ((color & 0x000000ff)) / 255f;
-					region.UpdateOffset();
-					return region;
-				}
+				if (path == null) path = name;
+				RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, name, path);
+				if (region == null) return null;
+				region.Path = path;
+				region.x = x * scale;
+				region.y = y * scale;
+				region.scaleX = scaleX;
+				region.scaleY = scaleY;
+				region.rotation = rotation;
+				region.width = width * scale;
+				region.height = height * scale;
+				region.r = ((color & 0xff000000) >> 24) / 255f;
+				region.g = ((color & 0x00ff0000) >> 16) / 255f;
+				region.b = ((color & 0x0000ff00) >> 8) / 255f;
+				region.a = ((color & 0x000000ff)) / 255f;
+				region.UpdateOffset();
+				return region;
+			}
 			case AttachmentType.Boundingbox: {
-					int vertexCount = input.ReadInt(true);
-					Vertices vertices = ReadVertices(input, vertexCount);
-					if (nonessential) input.ReadInt(); //int color = nonessential ? input.ReadInt() : 0; // Avoid unused local warning.
+				int vertexCount = input.ReadInt(true);
+				Vertices vertices = ReadVertices(input, vertexCount);
+				if (nonessential) input.ReadInt(); //int color = nonessential ? input.ReadInt() : 0; // Avoid unused local warning.
 
-					BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, name);
-					if (box == null) return null;
-					box.worldVerticesLength = vertexCount << 1;
-					box.vertices = vertices.vertices;
-					box.bones = vertices.bones;
-					// skipped porting: if (nonessential) Color.rgba8888ToColor(box.getColor(), color);
-					return box;
-				}
+				BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, name);
+				if (box == null) return null;
+				box.worldVerticesLength = vertexCount << 1;
+				box.vertices = vertices.vertices;
+				box.bones = vertices.bones;
+				// skipped porting: if (nonessential) Color.rgba8888ToColor(box.getColor(), color);
+				return box;
+			}
 			case AttachmentType.Mesh: {
-					String path = input.ReadStringRef();
-					int color = input.ReadInt();
-					int vertexCount = input.ReadInt(true);
-					float[] uvs = ReadFloatArray(input, vertexCount << 1, 1);
-					int[] triangles = ReadShortArray(input);
-					Vertices vertices = ReadVertices(input, vertexCount);
-					int hullLength = input.ReadInt(true);
-					int[] edges = null;
-					float width = 0, height = 0;
-					if (nonessential) {
-						edges = ReadShortArray(input);
-						width = input.ReadFloat();
-						height = input.ReadFloat();
-					}
-
-					if (path == null) path = name;
-					MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
-					if (mesh == null) return null;
-					mesh.Path = path;
-					mesh.r = ((color & 0xff000000) >> 24) / 255f;
-					mesh.g = ((color & 0x00ff0000) >> 16) / 255f;
-					mesh.b = ((color & 0x0000ff00) >> 8) / 255f;
-					mesh.a = ((color & 0x000000ff)) / 255f;
-					mesh.bones = vertices.bones;
-					mesh.vertices = vertices.vertices;
-					mesh.WorldVerticesLength = vertexCount << 1;
-					mesh.triangles = triangles;
-					mesh.regionUVs = uvs;
-					mesh.UpdateUVs();
-					mesh.HullLength = hullLength << 1;
-					if (nonessential) {
-						mesh.Edges = edges;
-						mesh.Width = width * scale;
-						mesh.Height = height * scale;
-					}
-					return mesh;
+				String path = input.ReadStringRef();
+				int color = input.ReadInt();
+				int vertexCount = input.ReadInt(true);
+				float[] uvs = ReadFloatArray(input, vertexCount << 1, 1);
+				int[] triangles = ReadShortArray(input);
+				Vertices vertices = ReadVertices(input, vertexCount);
+				int hullLength = input.ReadInt(true);
+				int[] edges = null;
+				float width = 0, height = 0;
+				if (nonessential) {
+					edges = ReadShortArray(input);
+					width = input.ReadFloat();
+					height = input.ReadFloat();
 				}
+
+				if (path == null) path = name;
+				MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
+				if (mesh == null) return null;
+				mesh.Path = path;
+				mesh.r = ((color & 0xff000000) >> 24) / 255f;
+				mesh.g = ((color & 0x00ff0000) >> 16) / 255f;
+				mesh.b = ((color & 0x0000ff00) >> 8) / 255f;
+				mesh.a = ((color & 0x000000ff)) / 255f;
+				mesh.bones = vertices.bones;
+				mesh.vertices = vertices.vertices;
+				mesh.WorldVerticesLength = vertexCount << 1;
+				mesh.triangles = triangles;
+				mesh.regionUVs = uvs;
+				mesh.UpdateUVs();
+				mesh.HullLength = hullLength << 1;
+				if (nonessential) {
+					mesh.Edges = edges;
+					mesh.Width = width * scale;
+					mesh.Height = height * scale;
+				}
+				return mesh;
+			}
 			case AttachmentType.Linkedmesh: {
-					String path = input.ReadStringRef();
-					int color = input.ReadInt();
-					String skinName = input.ReadStringRef();
-					String parent = input.ReadStringRef();
-					bool inheritDeform = input.ReadBoolean();
-					float width = 0, height = 0;
-					if (nonessential) {
-						width = input.ReadFloat();
-						height = input.ReadFloat();
-					}
-
-					if (path == null) path = name;
-					MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
-					if (mesh == null) return null;
-					mesh.Path = path;
-					mesh.r = ((color & 0xff000000) >> 24) / 255f;
-					mesh.g = ((color & 0x00ff0000) >> 16) / 255f;
-					mesh.b = ((color & 0x0000ff00) >> 8) / 255f;
-					mesh.a = ((color & 0x000000ff)) / 255f;
-					if (nonessential) {
-						mesh.Width = width * scale;
-						mesh.Height = height * scale;
-					}
-					linkedMeshes.Add(new SkeletonJson.LinkedMesh(mesh, skinName, slotIndex, parent, inheritDeform));
-					return mesh;
+				String path = input.ReadStringRef();
+				int color = input.ReadInt();
+				String skinName = input.ReadStringRef();
+				String parent = input.ReadStringRef();
+				bool inheritDeform = input.ReadBoolean();
+				float width = 0, height = 0;
+				if (nonessential) {
+					width = input.ReadFloat();
+					height = input.ReadFloat();
 				}
+
+				if (path == null) path = name;
+				MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
+				if (mesh == null) return null;
+				mesh.Path = path;
+				mesh.r = ((color & 0xff000000) >> 24) / 255f;
+				mesh.g = ((color & 0x00ff0000) >> 16) / 255f;
+				mesh.b = ((color & 0x0000ff00) >> 8) / 255f;
+				mesh.a = ((color & 0x000000ff)) / 255f;
+				if (nonessential) {
+					mesh.Width = width * scale;
+					mesh.Height = height * scale;
+				}
+				linkedMeshes.Add(new SkeletonJson.LinkedMesh(mesh, skinName, slotIndex, parent, inheritDeform));
+				return mesh;
+			}
 			case AttachmentType.Path: {
-					bool closed = input.ReadBoolean();
-					bool constantSpeed = input.ReadBoolean();
-					int vertexCount = input.ReadInt(true);
-					Vertices vertices = ReadVertices(input, vertexCount);
-					float[] lengths = new float[vertexCount / 3];
-					for (int i = 0, n = lengths.Length; i < n; i++)
-						lengths[i] = input.ReadFloat() * scale;
-					if (nonessential) input.ReadInt(); //int color = nonessential ? input.ReadInt() : 0;
+				bool closed = input.ReadBoolean();
+				bool constantSpeed = input.ReadBoolean();
+				int vertexCount = input.ReadInt(true);
+				Vertices vertices = ReadVertices(input, vertexCount);
+				float[] lengths = new float[vertexCount / 3];
+				for (int i = 0, n = lengths.Length; i < n; i++)
+					lengths[i] = input.ReadFloat() * scale;
+				if (nonessential) input.ReadInt(); //int color = nonessential ? input.ReadInt() : 0;
 
-					PathAttachment path = attachmentLoader.NewPathAttachment(skin, name);
-					if (path == null) return null;
-					path.closed = closed;
-					path.constantSpeed = constantSpeed;
-					path.worldVerticesLength = vertexCount << 1;
-					path.vertices = vertices.vertices;
-					path.bones = vertices.bones;
-					path.lengths = lengths;
-					// skipped porting: if (nonessential) Color.rgba8888ToColor(path.getColor(), color);
-					return path;
-				}
+				PathAttachment path = attachmentLoader.NewPathAttachment(skin, name);
+				if (path == null) return null;
+				path.closed = closed;
+				path.constantSpeed = constantSpeed;
+				path.worldVerticesLength = vertexCount << 1;
+				path.vertices = vertices.vertices;
+				path.bones = vertices.bones;
+				path.lengths = lengths;
+				// skipped porting: if (nonessential) Color.rgba8888ToColor(path.getColor(), color);
+				return path;
+			}
 			case AttachmentType.Point: {
-					float rotation = input.ReadFloat();
-					float x = input.ReadFloat();
-					float y = input.ReadFloat();
-					if (nonessential) input.ReadInt(); //int color = nonessential ? input.ReadInt() : 0;
+				float rotation = input.ReadFloat();
+				float x = input.ReadFloat();
+				float y = input.ReadFloat();
+				if (nonessential) input.ReadInt(); //int color = nonessential ? input.ReadInt() : 0;
 
-					PointAttachment point = attachmentLoader.NewPointAttachment(skin, name);
-					if (point == null) return null;
-					point.x = x * scale;
-					point.y = y * scale;
-					point.rotation = rotation;
-					// skipped porting: if (nonessential) point.color = color;
-					return point;
-				}
+				PointAttachment point = attachmentLoader.NewPointAttachment(skin, name);
+				if (point == null) return null;
+				point.x = x * scale;
+				point.y = y * scale;
+				point.rotation = rotation;
+				// skipped porting: if (nonessential) point.color = color;
+				return point;
+			}
 			case AttachmentType.Clipping: {
-					int endSlotIndex = input.ReadInt(true);
-					int vertexCount = input.ReadInt(true);
-					Vertices vertices = ReadVertices(input, vertexCount);
-					if (nonessential) input.ReadInt();
+				int endSlotIndex = input.ReadInt(true);
+				int vertexCount = input.ReadInt(true);
+				Vertices vertices = ReadVertices(input, vertexCount);
+				if (nonessential) input.ReadInt();
 
-					ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, name);
-					if (clip == null) return null;
-					clip.EndSlot = skeletonData.slots.Items[endSlotIndex];
-					clip.worldVerticesLength = vertexCount << 1;
-					clip.vertices = vertices.vertices;
-					clip.bones = vertices.bones;
-					// skipped porting: if (nonessential) Color.rgba8888ToColor(clip.getColor(), color);
-					return clip;
-				}
+				ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, name);
+				if (clip == null) return null;
+				clip.EndSlot = skeletonData.slots.Items[endSlotIndex];
+				clip.worldVerticesLength = vertexCount << 1;
+				clip.vertices = vertices.vertices;
+				clip.bones = vertices.bones;
+				// skipped porting: if (nonessential) Color.rgba8888ToColor(clip.getColor(), color);
+				return clip;
+			}
 			}
 			return null;
 		}
@@ -865,42 +865,42 @@ namespace Spine {
 				PathConstraintData data = skeletonData.pathConstraints.Items[index];
 				for (int ii = 0, nn = input.ReadInt(true); ii < nn; ii++) {
 					switch (input.ReadByte()) {
-						case PATH_POSITION:
-							timelines
-								.Add(ReadTimeline(input, new PathConstraintPositionTimeline(input.ReadInt(true), input.ReadInt(true), index),
-									data.positionMode == PositionMode.Fixed ? scale : 1));
-							break;
-						case PATH_SPACING:
-							timelines
-								.Add(ReadTimeline(input, new PathConstraintSpacingTimeline(input.ReadInt(true), input.ReadInt(true), index),
-									data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
-							break;
-						case PATH_MIX:
-							PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(input.ReadInt(true), input.ReadInt(true),
-								index);
-							float time = input.ReadFloat(), mixRotate = input.ReadFloat(), mixX = input.ReadFloat(), mixY = input.ReadFloat();
-							for (int frame = 0, bezier = 0, frameLast = timeline.FrameCount - 1; ; frame++) {
-								timeline.SetFrame(frame, time, mixRotate, mixX, mixY);
-								if (frame == frameLast) break;
-								float time2 = input.ReadFloat(), mixRotate2 = input.ReadFloat(), mixX2 = input.ReadFloat(),
-									mixY2 = input.ReadFloat();
-								switch (input.ReadByte()) {
-									case CURVE_STEPPED:
-										timeline.SetStepped(frame);
-										break;
-									case CURVE_BEZIER:
-										SetBezier(input, timeline, bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
-										SetBezier(input, timeline, bezier++, frame, 1, time, time2, mixX, mixX2, 1);
-										SetBezier(input, timeline, bezier++, frame, 2, time, time2, mixY, mixY2, 1);
-										break;
-								}
-								time = time2;
-								mixRotate = mixRotate2;
-								mixX = mixX2;
-								mixY = mixY2;
+					case PATH_POSITION:
+						timelines
+							.Add(ReadTimeline(input, new PathConstraintPositionTimeline(input.ReadInt(true), input.ReadInt(true), index),
+								data.positionMode == PositionMode.Fixed ? scale : 1));
+						break;
+					case PATH_SPACING:
+						timelines
+							.Add(ReadTimeline(input, new PathConstraintSpacingTimeline(input.ReadInt(true), input.ReadInt(true), index),
+								data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
+						break;
+					case PATH_MIX:
+						PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(input.ReadInt(true), input.ReadInt(true),
+							index);
+						float time = input.ReadFloat(), mixRotate = input.ReadFloat(), mixX = input.ReadFloat(), mixY = input.ReadFloat();
+						for (int frame = 0, bezier = 0, frameLast = timeline.FrameCount - 1; ; frame++) {
+							timeline.SetFrame(frame, time, mixRotate, mixX, mixY);
+							if (frame == frameLast) break;
+							float time2 = input.ReadFloat(), mixRotate2 = input.ReadFloat(), mixX2 = input.ReadFloat(),
+								mixY2 = input.ReadFloat();
+							switch (input.ReadByte()) {
+								case CURVE_STEPPED:
+									timeline.SetStepped(frame);
+									break;
+								case CURVE_BEZIER:
+									SetBezier(input, timeline, bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+									SetBezier(input, timeline, bezier++, frame, 1, time, time2, mixX, mixX2, 1);
+									SetBezier(input, timeline, bezier++, frame, 2, time, time2, mixY, mixY2, 1);
+									break;
 							}
-							timelines.Add(timeline);
-							break;
+							time = time2;
+							mixRotate = mixRotate2;
+							mixX = mixX2;
+							mixY = mixY2;
+						}
+						timelines.Add(timeline);
+						break;
 					}
 				}
 			}
@@ -934,8 +934,7 @@ namespace Spine {
 								if (scale == 1) {
 									for (int v = start; v < end; v++)
 										deform[v] = input.ReadFloat();
-								}
-								else {
+								} else {
 									for (int v = start; v < end; v++)
 										deform[v] = input.ReadFloat() * scale;
 								}
@@ -948,12 +947,12 @@ namespace Spine {
 							if (frame == frameLast) break;
 							float time2 = input.ReadFloat();
 							switch (input.ReadByte()) {
-								case CURVE_STEPPED:
-									timeline.SetStepped(frame);
-									break;
-								case CURVE_BEZIER:
-									SetBezier(input, timeline, bezier++, frame, 0, time, time2, 0, 1, 1);
-									break;
+							case CURVE_STEPPED:
+								timeline.SetStepped(frame);
+								break;
+							case CURVE_BEZIER:
+								SetBezier(input, timeline, bezier++, frame, 0, time, time2, 0, 1, 1);
+								break;
 							}
 							time = time2;
 						}

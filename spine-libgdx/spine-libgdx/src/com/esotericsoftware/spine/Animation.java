@@ -1994,22 +1994,23 @@ public class Animation {
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
 			MixDirection direction) {
 
-			Object[] drawOrder = skeleton.drawOrder.items;
 			if (direction == out) {
-				if (blend == setup) arraycopy(skeleton.slots.items, 0, drawOrder, 0, skeleton.slots.size);
+				if (blend == setup) arraycopy(skeleton.slots.items, 0, skeleton.drawOrder.items, 0, skeleton.slots.size);
 				return;
 			}
 
 			if (time < frames[0]) { // Time is before first frame.
-				if (blend == setup || blend == first) arraycopy(skeleton.slots.items, 0, drawOrder, 0, skeleton.slots.size);
+				if (blend == setup || blend == first)
+					arraycopy(skeleton.slots.items, 0, skeleton.drawOrder.items, 0, skeleton.slots.size);
 				return;
 			}
 
 			int[] drawOrderToSetupIndex = drawOrders[search(frames, time)];
 			if (drawOrderToSetupIndex == null)
-				arraycopy(skeleton.slots.items, 0, drawOrder, 0, skeleton.slots.size);
+				arraycopy(skeleton.slots.items, 0, skeleton.drawOrder.items, 0, skeleton.slots.size);
 			else {
 				Object[] slots = skeleton.slots.items;
+				Object[] drawOrder = skeleton.drawOrder.items;
 				for (int i = 0, n = drawOrderToSetupIndex.length; i < n; i++)
 					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
 			}

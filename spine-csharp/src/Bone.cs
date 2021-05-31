@@ -174,77 +174,77 @@ namespace Spine {
 
 			switch (data.transformMode) {
 			case TransformMode.Normal: {
-					float rotationY = rotation + 90 + shearY;
-					float la = MathUtils.CosDeg(rotation + shearX) * scaleX;
-					float lb = MathUtils.CosDeg(rotationY) * scaleY;
-					float lc = MathUtils.SinDeg(rotation + shearX) * scaleX;
-					float ld = MathUtils.SinDeg(rotationY) * scaleY;
-					a = pa * la + pb * lc;
-					b = pa * lb + pb * ld;
-					c = pc * la + pd * lc;
-					d = pc * lb + pd * ld;
-					return;
-				}
+				float rotationY = rotation + 90 + shearY;
+				float la = MathUtils.CosDeg(rotation + shearX) * scaleX;
+				float lb = MathUtils.CosDeg(rotationY) * scaleY;
+				float lc = MathUtils.SinDeg(rotation + shearX) * scaleX;
+				float ld = MathUtils.SinDeg(rotationY) * scaleY;
+				a = pa * la + pb * lc;
+				b = pa * lb + pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
+				return;
+			}
 			case TransformMode.OnlyTranslation: {
-					float rotationY = rotation + 90 + shearY;
-					a = MathUtils.CosDeg(rotation + shearX) * scaleX;
-					b = MathUtils.CosDeg(rotationY) * scaleY;
-					c = MathUtils.SinDeg(rotation + shearX) * scaleX;
-					d = MathUtils.SinDeg(rotationY) * scaleY;
-					break;
-				}
+				float rotationY = rotation + 90 + shearY;
+				a = MathUtils.CosDeg(rotation + shearX) * scaleX;
+				b = MathUtils.CosDeg(rotationY) * scaleY;
+				c = MathUtils.SinDeg(rotation + shearX) * scaleX;
+				d = MathUtils.SinDeg(rotationY) * scaleY;
+				break;
+			}
 			case TransformMode.NoRotationOrReflection: {
-					float s = pa * pa + pc * pc, prx;
-					if (s > 0.0001f) {
-						s = Math.Abs(pa * pd - pb * pc) / s;
-						pa /= skeleton.ScaleX;
-						pc /= skeleton.ScaleY;
-						pb = pc * s;
-						pd = pa * s;
-						prx = MathUtils.Atan2(pc, pa) * MathUtils.RadDeg;
-					} else {
-						pa = 0;
-						pc = 0;
-						prx = 90 - MathUtils.Atan2(pd, pb) * MathUtils.RadDeg;
-					}
-					float rx = rotation + shearX - prx;
-					float ry = rotation + shearY - prx + 90;
-					float la = MathUtils.CosDeg(rx) * scaleX;
-					float lb = MathUtils.CosDeg(ry) * scaleY;
-					float lc = MathUtils.SinDeg(rx) * scaleX;
-					float ld = MathUtils.SinDeg(ry) * scaleY;
-					a = pa * la - pb * lc;
-					b = pa * lb - pb * ld;
-					c = pc * la + pd * lc;
-					d = pc * lb + pd * ld;
-					break;
+				float s = pa * pa + pc * pc, prx;
+				if (s > 0.0001f) {
+					s = Math.Abs(pa * pd - pb * pc) / s;
+					pa /= skeleton.ScaleX;
+					pc /= skeleton.ScaleY;
+					pb = pc * s;
+					pd = pa * s;
+					prx = MathUtils.Atan2(pc, pa) * MathUtils.RadDeg;
+				} else {
+					pa = 0;
+					pc = 0;
+					prx = 90 - MathUtils.Atan2(pd, pb) * MathUtils.RadDeg;
 				}
+				float rx = rotation + shearX - prx;
+				float ry = rotation + shearY - prx + 90;
+				float la = MathUtils.CosDeg(rx) * scaleX;
+				float lb = MathUtils.CosDeg(ry) * scaleY;
+				float lc = MathUtils.SinDeg(rx) * scaleX;
+				float ld = MathUtils.SinDeg(ry) * scaleY;
+				a = pa * la - pb * lc;
+				b = pa * lb - pb * ld;
+				c = pc * la + pd * lc;
+				d = pc * lb + pd * ld;
+				break;
+			}
 			case TransformMode.NoScale:
 			case TransformMode.NoScaleOrReflection: {
-					float cos = MathUtils.CosDeg(rotation), sin = MathUtils.SinDeg(rotation);
-					float za = (pa * cos + pb * sin) / skeleton.ScaleX;
-					float zc = (pc * cos + pd * sin) / skeleton.ScaleY;
-					float s = (float)Math.Sqrt(za * za + zc * zc);
-					if (s > 0.00001f) s = 1 / s;
-					za *= s;
-					zc *= s;
-					s = (float)Math.Sqrt(za * za + zc * zc);
-					if (data.transformMode == TransformMode.NoScale
-						&& (pa * pd - pb * pc < 0) != (skeleton.ScaleX < 0 != skeleton.ScaleY < 0)) s = -s;
+				float cos = MathUtils.CosDeg(rotation), sin = MathUtils.SinDeg(rotation);
+				float za = (pa * cos + pb * sin) / skeleton.ScaleX;
+				float zc = (pc * cos + pd * sin) / skeleton.ScaleY;
+				float s = (float)Math.Sqrt(za * za + zc * zc);
+				if (s > 0.00001f) s = 1 / s;
+				za *= s;
+				zc *= s;
+				s = (float)Math.Sqrt(za * za + zc * zc);
+				if (data.transformMode == TransformMode.NoScale
+					&& (pa * pd - pb * pc < 0) != (skeleton.ScaleX < 0 != skeleton.ScaleY < 0)) s = -s;
 
-					float r = MathUtils.PI / 2 + MathUtils.Atan2(zc, za);
-					float zb = MathUtils.Cos(r) * s;
-					float zd = MathUtils.Sin(r) * s;
-					float la = MathUtils.CosDeg(shearX) * scaleX;
-					float lb = MathUtils.CosDeg(90 + shearY) * scaleY;
-					float lc = MathUtils.SinDeg(shearX) * scaleX;
-					float ld = MathUtils.SinDeg(90 + shearY) * scaleY;
-					a = za * la + zb * lc;
-					b = za * lb + zb * ld;
-					c = zc * la + zd * lc;
-					d = zc * lb + zd * ld;
-					break;
-				}
+				float r = MathUtils.PI / 2 + MathUtils.Atan2(zc, za);
+				float zb = MathUtils.Cos(r) * s;
+				float zd = MathUtils.Sin(r) * s;
+				float la = MathUtils.CosDeg(shearX) * scaleX;
+				float lb = MathUtils.CosDeg(90 + shearY) * scaleY;
+				float lc = MathUtils.SinDeg(shearX) * scaleX;
+				float ld = MathUtils.SinDeg(90 + shearY) * scaleY;
+				a = za * la + zb * lc;
+				b = za * lb + zb * ld;
+				c = zc * la + zd * lc;
+				d = zc * lb + zd * ld;
+				break;
+			}
 			}
 
 			a *= skeleton.ScaleX;

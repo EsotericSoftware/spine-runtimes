@@ -124,15 +124,13 @@ namespace Spine {
 		public ExposedList<ExposedList<float>> Decompose (ExposedList<float> verticesArray, ExposedList<int> triangles) {
 			var vertices = verticesArray.Items;
 			var convexPolygons = this.convexPolygons;
-			for (int i = 0, n = convexPolygons.Count; i < n; i++) {
+			for (int i = 0, n = convexPolygons.Count; i < n; i++)
 				polygonPool.Free(convexPolygons.Items[i]);
-			}
 			convexPolygons.Clear();
 
 			var convexPolygonsIndices = this.convexPolygonsIndices;
-			for (int i = 0, n = convexPolygonsIndices.Count; i < n; i++) {
+			for (int i = 0, n = convexPolygonsIndices.Count; i < n; i++)
 				polygonIndicesPool.Free(convexPolygonsIndices.Items[i]);
-			}
 			convexPolygonsIndices.Clear();
 
 			var polygonIndices = polygonIndicesPool.Obtain();

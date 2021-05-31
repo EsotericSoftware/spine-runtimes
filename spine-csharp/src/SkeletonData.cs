@@ -136,9 +136,9 @@ namespace Spine {
 		/// <returns>-1 if the slot was not found.</returns>
 		public int FindSlotIndex (string slotName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
-			ExposedList<SlotData> slots = this.slots;
-			for (int i = 0, n = slots.Count; i < n; i++)
-				if (slots.Items[i].name == slotName) return i;
+			SlotData[] slots = this.slots.Items;
+			for (int i = 0, n = this.slots.Count; i < n; i++)
+				if (slots[i].name == slotName) return i;
 			return -1;
 		}
 
@@ -217,9 +217,9 @@ namespace Spine {
 		/// <returns>-1 if the path constraint was not found.</returns>
 		public int FindPathConstraintIndex (string pathConstraintName) {
 			if (pathConstraintName == null) throw new ArgumentNullException("pathConstraintName", "pathConstraintName cannot be null.");
-			ExposedList<PathConstraintData> pathConstraints = this.pathConstraints;
-			for (int i = 0, n = pathConstraints.Count; i < n; i++)
-				if (pathConstraints.Items[i].name.Equals(pathConstraintName)) return i;
+			PathConstraintData[] pathConstraints = this.pathConstraints.Items;
+			for (int i = 0, n = this.pathConstraints.Count; i < n; i++)
+				if (pathConstraints[i].name.Equals(pathConstraintName)) return i;
 			return -1;
 		}
 

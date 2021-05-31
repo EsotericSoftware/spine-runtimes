@@ -590,8 +590,7 @@ namespace Spine {
 							}
 							timelines.Add(timeline);
 
-						}
-						else if (timelineName == "rgb") {
+						} else if (timelineName == "rgb") {
 							var timeline = new RGBTimeline(values.Count, values.Count * 3, slotIndex);
 
 							var keyMapEnumerator = values.GetEnumerator();
@@ -772,28 +771,23 @@ namespace Spine {
 						else if (timelineName == "translate") {
 							TranslateTimeline timeline = new TranslateTimeline(values.Count, values.Count << 1, boneIndex);
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, "x", "y", 0, scale));
-						}
-						else if (timelineName == "translatex") {
+						} else if (timelineName == "translatex") {
 							timelines
 								.Add(ReadTimeline(ref keyMapEnumerator, new TranslateXTimeline(values.Count, values.Count, boneIndex), 0, scale));
-						}
-						else if (timelineName == "translatey") {
+						} else if (timelineName == "translatey") {
 							timelines
 								.Add(ReadTimeline(ref keyMapEnumerator, new TranslateYTimeline(values.Count, values.Count, boneIndex), 0, scale));
-						}
-						else if (timelineName == "scale") {
+						} else if (timelineName == "scale") {
 							ScaleTimeline timeline = new ScaleTimeline(values.Count, values.Count << 1, boneIndex);
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, "x", "y", 1, 1));
-						}
-						else if (timelineName == "scalex")
+						} else if (timelineName == "scalex")
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, new ScaleXTimeline(values.Count, values.Count, boneIndex), 1, 1));
 						else if (timelineName == "scaley")
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, new ScaleYTimeline(values.Count, values.Count, boneIndex), 1, 1));
 						else if (timelineName == "shear") {
 							ShearTimeline timeline = new ShearTimeline(values.Count, values.Count << 1, boneIndex);
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, "x", "y", 0, 1));
-						}
-						else if (timelineName == "shearx")
+						} else if (timelineName == "shearx")
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, new ShearXTimeline(values.Count, values.Count, boneIndex), 0, 1));
 						else if (timelineName == "sheary")
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, new ShearYTimeline(values.Count, values.Count, boneIndex), 0, 1));
@@ -906,13 +900,11 @@ namespace Spine {
 						if (timelineName == "position") {
 							CurveTimeline1 timeline = new PathConstraintPositionTimeline(values.Count, values.Count, index);
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, 0, data.positionMode == PositionMode.Fixed ? scale : 1));
-						}
-						else if (timelineName == "spacing") {
+						} else if (timelineName == "spacing") {
 							CurveTimeline1 timeline = new PathConstraintSpacingTimeline(values.Count, values.Count, index);
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, timeline, 0,
 								data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
-						}
-						else if (timelineName == "mix") {
+						} else if (timelineName == "mix") {
 							PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(values.Count, values.Count * 3, index);
 							var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 							float time = GetFloat(keyMap, "time", 0);
@@ -1135,8 +1127,7 @@ namespace Spine {
 
 			if (curve is string) {
 				if (value != 0) timeline.SetStepped(frame);
-			}
-			else {
+			} else {
 				var curveValues = (List<object>)curve;
 				int index = value << 2;
 				float cx1 = (float)curveValues[index];

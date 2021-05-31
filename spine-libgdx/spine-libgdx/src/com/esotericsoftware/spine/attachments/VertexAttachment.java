@@ -66,7 +66,6 @@ abstract public class VertexAttachment extends Attachment {
 	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
 	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride) {
 		count = offset + (count >> 1) * stride;
-		Skeleton skeleton = slot.getSkeleton();
 		FloatArray deformArray = slot.getDeform();
 		float[] vertices = this.vertices;
 		int[] bones = this.bones;
@@ -88,7 +87,7 @@ abstract public class VertexAttachment extends Attachment {
 			v += n + 1;
 			skip += n;
 		}
-		Object[] skeletonBones = skeleton.getBones().items;
+		Object[] skeletonBones = slot.getSkeleton().getBones().items;
 		if (deformArray.size == 0) {
 			for (int w = offset, b = skip * 3; w < count; w += stride) {
 				float wx = 0, wy = 0;

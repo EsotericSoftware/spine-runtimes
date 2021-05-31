@@ -60,17 +60,15 @@ namespace Spine {
 			// once (EnsureCapacity() is only available in newer .Net versions).
 			int idCount = 0;
 			int timelinesCount = timelines.Count;
-			var timelinesItems = timelines.Items;
-			for (int t = 0; t < timelinesCount; ++t) {
+			Timeline[] timelinesItems = timelines.Items;
+			for (int t = 0; t < timelinesCount; ++t)
 				idCount += timelinesItems[t].PropertyIds.Length;
-			}
 			string[] propertyIds = new string[idCount];
 			int currentId = 0;
 			for (int t = 0; t < timelinesCount; ++t) {
 				var ids = timelinesItems[t].PropertyIds;
-				for (int i = 0, idsLength = ids.Length; i < idsLength; ++i) {
+				for (int i = 0, idsLength = ids.Length; i < idsLength; ++i)
 					propertyIds[currentId++] = ids[i];
-				}
 			}
 			this.timelineIds = new HashSet<string>(propertyIds);
 		}
@@ -125,26 +123,6 @@ namespace Spine {
 		override public string ToString () {
 			return name;
 		}
-
-		/// <summary>Search using a stride of 1.</summary>
-		/// <param name="time">Must be >= the first value in <code>frames</code>.</param>
-		/// <returns>The index of the first value <= <code>time</code>.</returns>
-		internal static int Search (float[] frames, float time) {
-			int n = frames.Length;
-			for (int i = 1; i < n; i++)
-				if (frames[i] > time) return i - 1;
-			return n - 1;
-		}
-
-		/// <summary>Search using the specified stride.</summary>
-		/// <param name="time">Must be >= the first value in <code>frames</code>.</param>
-		/// <returns>The index of the first value <= <code>time</code>.</returns>
-		internal static int Search (float[] frames, float time, int step) {
-			int n = frames.Length;
-			for (int i = step; i < n; i += step)
-				if (frames[i] > time) return i - step;
-			return n - step;
-		}
 	}
 
 	/// <summary>
@@ -152,7 +130,6 @@ namespace Spine {
 	/// <code>alpha</code> < 1.</summary>
 	/// <seealso cref="Timeline.Apply(Skeleton, float, float, ExposedList, float, MixBlend, MixDirection)"/>
 	public enum MixBlend {
-
 		/// <summary> Transitions from the setup value to the timeline value (the current value is not used). Before the first frame, the
 		///           setup value is set.</summary>
 		Setup,
@@ -199,7 +176,7 @@ namespace Spine {
 	}
 
 	internal enum Property {
-		Rotate=0, X, Y, ScaleX, ScaleY, ShearX, ShearY, //
+		Rotate = 0, X, Y, ScaleX, ScaleY, ShearX, ShearY, //
 		RGB, Alpha, RGB2, //
 		Attachment, Deform, //
 		Event, DrawOrder, //
@@ -267,6 +244,26 @@ namespace Spine {
 		///                   such as <see cref="DrawOrderTimeline"/> or <see cref="AttachmentTimeline"/>, and other such as <see cref="ScaleTimeline"/>.</param>
 		public abstract void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> events, float alpha,
 			MixBlend blend, MixDirection direction);
+
+		/// <summary>Search using a stride of 1.</summary>
+		/// <param name="time">Must be >= the first value in <code>frames</code>.</param>
+		/// <returns>The index of the first value <= <code>time</code>.</returns>
+		internal static int Search (float[] frames, float time) {
+			int n = frames.Length;
+			for (int i = 1; i < n; i++)
+				if (frames[i] > time) return i - 1;
+			return n - 1;
+		}
+
+		/// <summary>Search using the specified stride.</summary>
+		/// <param name="time">Must be >= the first value in <code>frames</code>.</param>
+		/// <returns>The index of the first value <= <code>time</code>.</returns>
+		internal static int Search (float[] frames, float time, int step) {
+			int n = frames.Length;
+			for (int i = step; i < n; i += step)
+				if (frames[i] > time) return i - step;
+			return n - step;
+		}
 	}
 
 	/// <summary>An interface for timelines which change the property of a bone.</summary>
@@ -498,16 +495,16 @@ namespace Spine {
 
 			float r = GetCurveValue(time);
 			switch (blend) {
-				case MixBlend.Setup:
-					bone.rotation = bone.data.rotation + r * alpha;
-					break;
-				case MixBlend.First:
-				case MixBlend.Replace:
-					r += bone.data.rotation - bone.rotation;
-					goto case MixBlend.Add; // Fall through.
-				case MixBlend.Add:
-					bone.rotation += r * alpha;
-					break;
+			case MixBlend.Setup:
+				bone.rotation = bone.data.rotation + r * alpha;
+				break;
+			case MixBlend.First:
+			case MixBlend.Replace:
+				r += bone.data.rotation - bone.rotation;
+				goto case MixBlend.Add; // Fall through.
+			case MixBlend.Add:
+				bone.rotation += r * alpha;
+				break;
 			}
 		}
 	}
@@ -550,40 +547,40 @@ namespace Spine {
 			}
 
 			float x, y;
-			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
 			switch (curveType) {
-				case LINEAR:
-					float before = frames[i];
-					x = frames[i + VALUE1];
-					y = frames[i + VALUE2];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					x += (frames[i + ENTRIES + VALUE1] - x) * t;
-					y += (frames[i + ENTRIES + VALUE2] - y) * t;
-					break;
-				case STEPPED:
-					x = frames[i + VALUE1];
-					y = frames[i + VALUE2];
-					break;
-				default:
-					x = GetBezierValue(time, i, VALUE1, curveType - BEZIER);
-					y = GetBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
-					break;
+			case LINEAR:
+				float before = frames[i];
+				x = frames[i + VALUE1];
+				y = frames[i + VALUE2];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				x += (frames[i + ENTRIES + VALUE1] - x) * t;
+				y += (frames[i + ENTRIES + VALUE2] - y) * t;
+				break;
+			case STEPPED:
+				x = frames[i + VALUE1];
+				y = frames[i + VALUE2];
+				break;
+			default:
+				x = GetBezierValue(time, i, VALUE1, curveType - BEZIER);
+				y = GetBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
+				break;
 			}
 
 			switch (blend) {
-				case MixBlend.Setup:
-					bone.x = bone.data.x + x * alpha;
-					bone.y = bone.data.y + y * alpha;
-					break;
-				case MixBlend.First:
-				case MixBlend.Replace:
-					bone.x += (bone.data.x + x - bone.x) * alpha;
-					bone.y += (bone.data.y + y - bone.y) * alpha;
-					break;
-				case MixBlend.Add:
-					bone.x += x * alpha;
-					bone.y += y * alpha;
-					break;
+			case MixBlend.Setup:
+				bone.x = bone.data.x + x * alpha;
+				bone.y = bone.data.y + y * alpha;
+				break;
+			case MixBlend.First:
+			case MixBlend.Replace:
+				bone.x += (bone.data.x + x - bone.x) * alpha;
+				bone.y += (bone.data.y + y - bone.y) * alpha;
+				break;
+			case MixBlend.Add:
+				bone.x += x * alpha;
+				bone.y += y * alpha;
+				break;
 			}
 		}
 	}
@@ -611,28 +608,28 @@ namespace Spine {
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
-					case MixBlend.Setup:
-						bone.x = bone.data.x;
-						return;
-					case MixBlend.First:
-						bone.x += (bone.data.x - bone.x) * alpha;
-						break;
+				case MixBlend.Setup:
+					bone.x = bone.data.x;
+					return;
+				case MixBlend.First:
+					bone.x += (bone.data.x - bone.x) * alpha;
+					return;
 				}
 				return;
 			}
 
 			float x = GetCurveValue(time);
 			switch (blend) {
-				case MixBlend.Setup:
-					bone.x = bone.data.x + x * alpha;
-					break;
-				case MixBlend.First:
-				case MixBlend.Replace:
-					bone.x += (bone.data.x + x - bone.x) * alpha;
-					break;
-				case MixBlend.Add:
-					bone.x += x * alpha;
-					break;
+			case MixBlend.Setup:
+				bone.x = bone.data.x + x * alpha;
+				break;
+			case MixBlend.First:
+			case MixBlend.Replace:
+				bone.x += (bone.data.x + x - bone.x) * alpha;
+				break;
+			case MixBlend.Add:
+				bone.x += x * alpha;
+				break;
 			}
 		}
 	}
@@ -665,7 +662,7 @@ namespace Spine {
 					return;
 				case MixBlend.First:
 					bone.y += (bone.data.y - bone.y) * alpha;
-					break;
+					return;
 				}
 				return;
 			}
@@ -724,24 +721,24 @@ namespace Spine {
 			}
 
 			float x, y;
-			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
 			switch (curveType) {
-				case LINEAR:
-					float before = frames[i];
-					x = frames[i + VALUE1];
-					y = frames[i + VALUE2];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					x += (frames[i + ENTRIES + VALUE1] - x) * t;
-					y += (frames[i + ENTRIES + VALUE2] - y) * t;
-					break;
-				case STEPPED:
-					x = frames[i + VALUE1];
-					y = frames[i + VALUE2];
-					break;
-				default:
-					x = GetBezierValue(time, i, VALUE1, curveType - BEZIER);
-					y = GetBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
-					break;
+			case LINEAR:
+				float before = frames[i];
+				x = frames[i + VALUE1];
+				y = frames[i + VALUE2];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				x += (frames[i + ENTRIES + VALUE1] - x) * t;
+				y += (frames[i + ENTRIES + VALUE2] - y) * t;
+				break;
+			case STEPPED:
+				x = frames[i + VALUE1];
+				y = frames[i + VALUE2];
+				break;
+			default:
+				x = GetBezierValue(time, i, VALUE1, curveType - BEZIER);
+				y = GetBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
+				break;
 			}
 			x *= bone.data.scaleX;
 			y *= bone.data.scaleY;
@@ -759,47 +756,47 @@ namespace Spine {
 				float bx, by;
 				if (direction == MixDirection.Out) {
 					switch (blend) {
-						case MixBlend.Setup:
-							bx = bone.data.scaleX;
-							by = bone.data.scaleY;
-							bone.scaleX = bx + (Math.Abs(x) * Math.Sign(bx) - bx) * alpha;
-							bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - by) * alpha;
-							break;
-						case MixBlend.First:
-						case MixBlend.Replace:
-							bx = bone.scaleX;
-							by = bone.scaleY;
-							bone.scaleX = bx + (Math.Abs(x) * Math.Sign(bx) - bx) * alpha;
-							bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - by) * alpha;
-							break;
-						case MixBlend.Add:
-							bx = bone.scaleX;
-							by = bone.scaleY;
-							bone.scaleX = bx + (Math.Abs(x) * Math.Sign(bx) - bone.data.scaleX) * alpha;
-							bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - bone.data.scaleY) * alpha;
-							break;
+					case MixBlend.Setup:
+						bx = bone.data.scaleX;
+						by = bone.data.scaleY;
+						bone.scaleX = bx + (Math.Abs(x) * Math.Sign(bx) - bx) * alpha;
+						bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - by) * alpha;
+						break;
+					case MixBlend.First:
+					case MixBlend.Replace:
+						bx = bone.scaleX;
+						by = bone.scaleY;
+						bone.scaleX = bx + (Math.Abs(x) * Math.Sign(bx) - bx) * alpha;
+						bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - by) * alpha;
+						break;
+					case MixBlend.Add:
+						bx = bone.scaleX;
+						by = bone.scaleY;
+						bone.scaleX = bx + (Math.Abs(x) * Math.Sign(bx) - bone.data.scaleX) * alpha;
+						bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - bone.data.scaleY) * alpha;
+						break;
 					}
 				} else {
 					switch (blend) {
-						case MixBlend.Setup:
-							bx = Math.Abs(bone.data.scaleX) * Math.Sign(x);
-							by = Math.Abs(bone.data.scaleY) * Math.Sign(y);
-							bone.scaleX = bx + (x - bx) * alpha;
-							bone.scaleY = by + (y - by) * alpha;
-							break;
-						case MixBlend.First:
-						case MixBlend.Replace:
-							bx = Math.Abs(bone.scaleX) * Math.Sign(x);
-							by = Math.Abs(bone.scaleY) * Math.Sign(y);
-							bone.scaleX = bx + (x - bx) * alpha;
-							bone.scaleY = by + (y - by) * alpha;
-							break;
-						case MixBlend.Add:
-							bx = Math.Sign(x);
-							by = Math.Sign(y);
-							bone.scaleX = Math.Abs(bone.scaleX) * bx + (x - Math.Abs(bone.data.scaleX) * bx) * alpha;
-							bone.scaleY = Math.Abs(bone.scaleY) * by + (y - Math.Abs(bone.data.scaleY) * by) * alpha;
-							break;
+					case MixBlend.Setup:
+						bx = Math.Abs(bone.data.scaleX) * Math.Sign(x);
+						by = Math.Abs(bone.data.scaleY) * Math.Sign(y);
+						bone.scaleX = bx + (x - bx) * alpha;
+						bone.scaleY = by + (y - by) * alpha;
+						break;
+					case MixBlend.First:
+					case MixBlend.Replace:
+						bx = Math.Abs(bone.scaleX) * Math.Sign(x);
+						by = Math.Abs(bone.scaleY) * Math.Sign(y);
+						bone.scaleX = bx + (x - bx) * alpha;
+						bone.scaleY = by + (y - by) * alpha;
+						break;
+					case MixBlend.Add:
+						bx = Math.Sign(x);
+						by = Math.Sign(y);
+						bone.scaleX = Math.Abs(bone.scaleX) * bx + (x - Math.Abs(bone.data.scaleX) * bx) * alpha;
+						bone.scaleY = Math.Abs(bone.scaleY) * by + (y - Math.Abs(bone.data.scaleY) * by) * alpha;
+						break;
 					}
 				}
 			}
@@ -834,7 +831,7 @@ namespace Spine {
 					return;
 				case MixBlend.First:
 					bone.scaleX += (bone.data.scaleX - bone.scaleX) * alpha;
-					break;
+					return;
 				}
 				return;
 			}
@@ -913,7 +910,7 @@ namespace Spine {
 					return;
 				case MixBlend.First:
 					bone.scaleY += (bone.data.scaleY - bone.scaleY) * alpha;
-					break;
+					return;
 				}
 				return;
 			}
@@ -1002,41 +999,40 @@ namespace Spine {
 			}
 
 			float x, y;
-			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
 			switch (curveType) {
-				case LINEAR:
-					float before = frames[i];
-					x = frames[i + VALUE1];
-					y = frames[i + VALUE2];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					x += (frames[i + ENTRIES + VALUE1] - x) * t;
-					y += (frames[i + ENTRIES + VALUE2] - y) * t;
-					break;
-				case STEPPED:
-					x = frames[i + VALUE1];
-					y = frames[i + VALUE2];
-					break;
-				default:
-					x = GetBezierValue(time, i, VALUE1, curveType - BEZIER);
-					y = GetBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
-					break;
+			case LINEAR:
+				float before = frames[i];
+				x = frames[i + VALUE1];
+				y = frames[i + VALUE2];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				x += (frames[i + ENTRIES + VALUE1] - x) * t;
+				y += (frames[i + ENTRIES + VALUE2] - y) * t;
+				break;
+			case STEPPED:
+				x = frames[i + VALUE1];
+				y = frames[i + VALUE2];
+				break;
+			default:
+				x = GetBezierValue(time, i, VALUE1, curveType - BEZIER);
+				y = GetBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
+				break;
 			}
 
-
 			switch (blend) {
-				case MixBlend.Setup:
-					bone.shearX = bone.data.shearX + x * alpha;
-					bone.shearY = bone.data.shearY + y * alpha;
-					break;
-				case MixBlend.First:
-				case MixBlend.Replace:
-					bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
-					bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
-					break;
-				case MixBlend.Add:
-					bone.shearX += x * alpha;
-					bone.shearY += y * alpha;
-					break;
+			case MixBlend.Setup:
+				bone.shearX = bone.data.shearX + x * alpha;
+				bone.shearY = bone.data.shearY + y * alpha;
+				break;
+			case MixBlend.First:
+			case MixBlend.Replace:
+				bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
+				bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
+				break;
+			case MixBlend.Add:
+				bone.shearX += x * alpha;
+				bone.shearY += y * alpha;
+				break;
 			}
 		}
 	}
@@ -1069,7 +1065,7 @@ namespace Spine {
 					return;
 				case MixBlend.First:
 					bone.shearX += (bone.data.shearX - bone.shearX) * alpha;
-					break;
+					return;
 				}
 				return;
 			}
@@ -1118,7 +1114,7 @@ namespace Spine {
 					return;
 				case MixBlend.First:
 					bone.shearY += (bone.data.shearY - bone.shearY) * alpha;
-					break;
+					return;
 				}
 				return;
 			}
@@ -1201,32 +1197,32 @@ namespace Spine {
 			}
 
 			float r, g, b, a;
-			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
 			switch (curveType) {
-				case LINEAR:
-					float before = frames[i];
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					a = frames[i + A];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					r += (frames[i + ENTRIES + R] - r) * t;
-					g += (frames[i + ENTRIES + G] - g) * t;
-					b += (frames[i + ENTRIES + B] - b) * t;
-					a += (frames[i + ENTRIES + A] - a) * t;
-					break;
-				case STEPPED:
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					a = frames[i + A];
-					break;
-				default:
-					r = GetBezierValue(time, i, R, curveType - BEZIER);
-					g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-					b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-					a = GetBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
-					break;
+			case LINEAR:
+				float before = frames[i];
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				a = frames[i + A];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				r += (frames[i + ENTRIES + R] - r) * t;
+				g += (frames[i + ENTRIES + G] - g) * t;
+				b += (frames[i + ENTRIES + B] - b) * t;
+				a += (frames[i + ENTRIES + A] - a) * t;
+				break;
+			case STEPPED:
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				a = frames[i + A];
+				break;
+			default:
+				r = GetBezierValue(time, i, R, curveType - BEZIER);
+				g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				a = GetBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
+				break;
 			}
 
 			if (alpha == 1) {
@@ -1269,6 +1265,7 @@ namespace Spine {
 				(int)Property.RGB + "|" + slotIndex) {
 			this.slotIndex = slotIndex;
 		}
+
 		public override int FrameEntries {
 			get { return ENTRIES; }
 		}
@@ -1299,44 +1296,44 @@ namespace Spine {
 			if (time < frames[0]) { // Time is before first frame.
 				var setup = slot.data;
 				switch (blend) {
-					case MixBlend.Setup:
-						slot.r = setup.r;
-						slot.g = setup.g;
-						slot.b = setup.b;
-						return;
-					case MixBlend.First:
-						slot.r += (setup.r - slot.r) * alpha;
-						slot.g += (setup.g - slot.g) * alpha;
-						slot.b += (setup.b - slot.b) * alpha;
-						slot.ClampColor();
-						return;
+				case MixBlend.Setup:
+					slot.r = setup.r;
+					slot.g = setup.g;
+					slot.b = setup.b;
+					return;
+				case MixBlend.First:
+					slot.r += (setup.r - slot.r) * alpha;
+					slot.g += (setup.g - slot.g) * alpha;
+					slot.b += (setup.b - slot.b) * alpha;
+					slot.ClampColor();
+					return;
 				}
 				return;
 			}
 
 			float r, g, b;
-			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
+			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
 			switch (curveType) {
-				case LINEAR:
-					float before = frames[i];
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					r += (frames[i + ENTRIES + R] - r) * t;
-					g += (frames[i + ENTRIES + G] - g) * t;
-					b += (frames[i + ENTRIES + B] - b) * t;
-					break;
-				case STEPPED:
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					break;
-				default:
-					r = GetBezierValue(time, i, R, curveType - BEZIER);
-					g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-					b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-					break;
+			case LINEAR:
+				float before = frames[i];
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				r += (frames[i + ENTRIES + R] - r) * t;
+				g += (frames[i + ENTRIES + G] - g) * t;
+				b += (frames[i + ENTRIES + B] - b) * t;
+				break;
+			case STEPPED:
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				break;
+			default:
+				r = GetBezierValue(time, i, R, curveType - BEZIER);
+				g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				break;
 			}
 
 			if (alpha == 1) {
@@ -1344,16 +1341,14 @@ namespace Spine {
 				slot.g = g;
 				slot.b = b;
 				slot.ClampColor();
-			}
-			else {
+			} else {
 				float br, bg, bb;
 				if (blend == MixBlend.Setup) {
 					var setup = slot.data;
 					br = setup.r;
 					bg = setup.g;
 					bb = setup.b;
-				}
-				else {
+				} else {
 					br = slot.r;
 					bg = slot.g;
 					bb = slot.b;
@@ -1390,27 +1385,25 @@ namespace Spine {
 			if (time < frames[0]) { // Time is before first frame.
 				var setup = slot.data;
 				switch (blend) {
-					case MixBlend.Setup:
-						slot.a = setup.a;
-						return;
-					case MixBlend.First:
-						slot.a += (setup.a - slot.a) * alpha;
-						slot.ClampColor();
-						return;
+				case MixBlend.Setup:
+					slot.a = setup.a;
+					return;
+				case MixBlend.First:
+					slot.a += (setup.a - slot.a) * alpha;
+					slot.ClampColor();
+					return;
 				}
 				return;
 			}
 
 			float a = GetCurveValue(time);
-			if (alpha == 1) {
+			if (alpha == 1)
 				slot.a = a;
-				slot.ClampColor();
-			}
 			else {
 				if (blend == MixBlend.Setup) slot.a = slot.data.a;
 				slot.a += (a - slot.a) * alpha;
-				slot.ClampColor();
 			}
+			slot.ClampColor();
 		}
 	}
 
@@ -1469,8 +1462,6 @@ namespace Spine {
 				var slotData = slot.data;
 				switch (blend) {
 				case MixBlend.Setup:
-					//	slot.color.set(slot.data.color);
-					//	slot.darkColor.set(slot.data.darkColor);
 					slot.r = slotData.r;
 					slot.g = slotData.g;
 					slot.b = slotData.b;
@@ -1497,44 +1488,44 @@ namespace Spine {
 			}
 
 			float r, g, b, a, r2, g2, b2;
-			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i >> 3];
+			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i >> 3];
 			switch (curveType) {
-				case LINEAR:
-					float before = frames[i];
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					a = frames[i + A];
-					r2 = frames[i + R2];
-					g2 = frames[i + G2];
-					b2 = frames[i + B2];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					r += (frames[i + ENTRIES + R] - r) * t;
-					g += (frames[i + ENTRIES + G] - g) * t;
-					b += (frames[i + ENTRIES + B] - b) * t;
-					a += (frames[i + ENTRIES + A] - a) * t;
-					r2 += (frames[i + ENTRIES + R2] - r2) * t;
-					g2 += (frames[i + ENTRIES + G2] - g2) * t;
-					b2 += (frames[i + ENTRIES + B2] - b2) * t;
-					break;
-				case STEPPED:
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					a = frames[i + A];
-					r2 = frames[i + R2];
-					g2 = frames[i + G2];
-					b2 = frames[i + B2];
-					break;
-				default:
-					r = GetBezierValue(time, i, R, curveType - BEZIER);
-					g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-					b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-					a = GetBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
-					r2 = GetBezierValue(time, i, R2, curveType + BEZIER_SIZE * 4 - BEZIER);
-					g2 = GetBezierValue(time, i, G2, curveType + BEZIER_SIZE * 5 - BEZIER);
-					b2 = GetBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
-					break;
+			case LINEAR:
+				float before = frames[i];
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				a = frames[i + A];
+				r2 = frames[i + R2];
+				g2 = frames[i + G2];
+				b2 = frames[i + B2];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				r += (frames[i + ENTRIES + R] - r) * t;
+				g += (frames[i + ENTRIES + G] - g) * t;
+				b += (frames[i + ENTRIES + B] - b) * t;
+				a += (frames[i + ENTRIES + A] - a) * t;
+				r2 += (frames[i + ENTRIES + R2] - r2) * t;
+				g2 += (frames[i + ENTRIES + G2] - g2) * t;
+				b2 += (frames[i + ENTRIES + B2] - b2) * t;
+				break;
+			case STEPPED:
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				a = frames[i + A];
+				r2 = frames[i + R2];
+				g2 = frames[i + G2];
+				b2 = frames[i + B2];
+				break;
+			default:
+				r = GetBezierValue(time, i, R, curveType - BEZIER);
+				g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				a = GetBezierValue(time, i, A, curveType + BEZIER_SIZE * 3 - BEZIER);
+				r2 = GetBezierValue(time, i, R2, curveType + BEZIER_SIZE * 4 - BEZIER);
+				g2 = GetBezierValue(time, i, G2, curveType + BEZIER_SIZE * 5 - BEZIER);
+				b2 = GetBezierValue(time, i, B2, curveType + BEZIER_SIZE * 6 - BEZIER);
+				break;
 			}
 
 			if (alpha == 1) {
@@ -1631,67 +1622,67 @@ namespace Spine {
 			if (time < frames[0]) { // Time is before first frame.
 				var slotData = slot.data;
 				switch (blend) {
-					case MixBlend.Setup:
-						//	slot.color.set(slot.data.color);
-						//	slot.darkColor.set(slot.data.darkColor);
-						slot.r = slotData.r;
-						slot.g = slotData.g;
-						slot.b = slotData.b;
-						slot.ClampColor();
-						slot.r2 = slotData.r2;
-						slot.g2 = slotData.g2;
-						slot.b2 = slotData.b2;
-						slot.ClampSecondColor();
-						return;
-					case MixBlend.First:
-						slot.r += (slot.r - slotData.r) * alpha;
-						slot.g += (slot.g - slotData.g) * alpha;
-						slot.b += (slot.b - slotData.b) * alpha;
-						slot.ClampColor();
-						slot.r2 += (slot.r2 - slotData.r2) * alpha;
-						slot.g2 += (slot.g2 - slotData.g2) * alpha;
-						slot.b2 += (slot.b2 - slotData.b2) * alpha;
-						slot.ClampSecondColor();
-						return;
+				case MixBlend.Setup:
+					//	slot.color.set(slot.data.color);
+					//	slot.darkColor.set(slot.data.darkColor);
+					slot.r = slotData.r;
+					slot.g = slotData.g;
+					slot.b = slotData.b;
+					slot.ClampColor();
+					slot.r2 = slotData.r2;
+					slot.g2 = slotData.g2;
+					slot.b2 = slotData.b2;
+					slot.ClampSecondColor();
+					return;
+				case MixBlend.First:
+					slot.r += (slot.r - slotData.r) * alpha;
+					slot.g += (slot.g - slotData.g) * alpha;
+					slot.b += (slot.b - slotData.b) * alpha;
+					slot.ClampColor();
+					slot.r2 += (slot.r2 - slotData.r2) * alpha;
+					slot.g2 += (slot.g2 - slotData.g2) * alpha;
+					slot.b2 += (slot.b2 - slotData.b2) * alpha;
+					slot.ClampSecondColor();
+					return;
 				}
 				return;
 			}
 
 			float r, g, b, r2, g2, b2;
-			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
 			switch (curveType) {
-				case LINEAR:
-					float before = frames[i];
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					r2 = frames[i + R2];
-					g2 = frames[i + G2];
-					b2 = frames[i + B2];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					r += (frames[i + ENTRIES + R] - r) * t;
-					g += (frames[i + ENTRIES + G] - g) * t;
-					b += (frames[i + ENTRIES + B] - b) * t;
-					r2 += (frames[i + ENTRIES + R2] - r2) * t;
-					g2 += (frames[i + ENTRIES + G2] - g2) * t;
-					b2 += (frames[i + ENTRIES + B2] - b2) * t;
-					break;
-				case STEPPED:
-					r = frames[i + R];
-					g = frames[i + G];
-					b = frames[i + B];
-					r2 = frames[i + R2];
-					g2 = frames[i + G2];
-					b2 = frames[i + B2];
-					break;
-				default:
-					r = GetBezierValue(time, i, R, curveType - BEZIER);
-					g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
-					b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
-					r2 = GetBezierValue(time, i, R2, curveType + BEZIER_SIZE * 3 - BEZIER);
-					g2 = GetBezierValue(time, i, G2, curveType + BEZIER_SIZE * 4 - BEZIER);
-					b2 = GetBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
-					break;
+			case LINEAR:
+				float before = frames[i];
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				r2 = frames[i + R2];
+				g2 = frames[i + G2];
+				b2 = frames[i + B2];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				r += (frames[i + ENTRIES + R] - r) * t;
+				g += (frames[i + ENTRIES + G] - g) * t;
+				b += (frames[i + ENTRIES + B] - b) * t;
+				r2 += (frames[i + ENTRIES + R2] - r2) * t;
+				g2 += (frames[i + ENTRIES + G2] - g2) * t;
+				b2 += (frames[i + ENTRIES + B2] - b2) * t;
+				break;
+			case STEPPED:
+				r = frames[i + R];
+				g = frames[i + G];
+				b = frames[i + B];
+				r2 = frames[i + R2];
+				g2 = frames[i + G2];
+				b2 = frames[i + B2];
+				break;
+			default:
+				r = GetBezierValue(time, i, R, curveType - BEZIER);
+				g = GetBezierValue(time, i, G, curveType + BEZIER_SIZE - BEZIER);
+				b = GetBezierValue(time, i, B, curveType + BEZIER_SIZE * 2 - BEZIER);
+				r2 = GetBezierValue(time, i, R2, curveType + BEZIER_SIZE * 3 - BEZIER);
+				g2 = GetBezierValue(time, i, G2, curveType + BEZIER_SIZE * 4 - BEZIER);
+				b2 = GetBezierValue(time, i, B2, curveType + BEZIER_SIZE * 5 - BEZIER);
+				break;
 			}
 
 			if (alpha == 1) {
@@ -1703,8 +1694,7 @@ namespace Spine {
 				slot.g2 = g2;
 				slot.b2 = b2;
 				slot.ClampSecondColor();
-			}
-			else {
+			} else {
 				float br, bg, bb, br2, bg2, bb2;
 				if (blend == MixBlend.Setup) {
 					br = slot.data.r;
@@ -1713,8 +1703,7 @@ namespace Spine {
 					br2 = slot.data.r2;
 					bg2 = slot.data.g2;
 					bb2 = slot.data.b2;
-				}
-				else {
+				} else {
 					br = slot.r;
 					bg = slot.g;
 					bb = slot.b;
@@ -1782,7 +1771,7 @@ namespace Spine {
 				return;
 			}
 
-			SetAttachment(skeleton, slot, attachmentNames[Animation.Search(frames, time)]);
+			SetAttachment(skeleton, slot, attachmentNames[Search(frames, time)]);
 		}
 
 		private void SetAttachment (Skeleton skeleton, Slot slot, string attachmentName) {
@@ -1862,11 +1851,11 @@ namespace Spine {
 			float[] curves = this.curves;
 			int i = (int)curves[frame];
 			switch (i) {
-				case LINEAR:
-					float x = frames[frame];
-					return (time - x) / (frames[frame + FrameEntries] - x);
-				case STEPPED:
-					return 0;
+			case LINEAR:
+				float x = frames[frame];
+				return (time - x) / (frames[frame + FrameEntries] - x);
+			case STEPPED:
+				return 0;
 			}
 			i -= BEZIER;
 			if (curves[i] > time) {
@@ -1888,9 +1877,10 @@ namespace Spine {
 
 		override public void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 									MixDirection direction) {
+
 			Slot slot = skeleton.slots.Items[slotIndex];
 			if (!slot.bone.active) return;
-			VertexAttachment vertexAttachment = slot.attachment as VertexAttachment;
+			var vertexAttachment = slot.attachment as VertexAttachment;
 			if (vertexAttachment == null || vertexAttachment.DeformAttachment != attachment) return;
 
 			var deformArray = slot.Deform;
@@ -1898,11 +1888,11 @@ namespace Spine {
 
 			float[][] vertices = this.vertices;
 			int vertexCount = vertices[0].Length;
-			float[] frames = this.frames;
+
 			float[] deform;
 
+			float[] frames = this.frames;
 			if (time < frames[0]) {  // Time is before first frame.
-
 				switch (blend) {
 				case MixBlend.Setup:
 					deformArray.Clear();
@@ -1913,7 +1903,7 @@ namespace Spine {
 						return;
 					}
 
-					// deformArray.SetSize(vertexCount) // Ensure size and preemptively set count.
+					// Ensure size and preemptively set count.
 					if (deformArray.Capacity < vertexCount) deformArray.Capacity = vertexCount;
 					deformArray.Count = vertexCount;
 					deform = deformArray.Items;
@@ -1930,19 +1920,16 @@ namespace Spine {
 							deform[i] *= alpha;
 					}
 					return;
-				default:
-					return;
 				}
-
+				return;
 			}
 
-			// deformArray.SetSize(vertexCount) // Ensure size and preemptively set count.
+			// Ensure size and preemptively set count.
 			if (deformArray.Capacity < vertexCount) deformArray.Capacity = vertexCount;
 			deformArray.Count = vertexCount;
 			deform = deformArray.Items;
 
 			if (time >= frames[frames.Length - 1]) { // Time is after last frame.
-
 				float[] lastVertices = vertices[frames.Length - 1];
 				if (alpha == 1) {
 					if (blend == MixBlend.Add) {
@@ -1962,45 +1949,45 @@ namespace Spine {
 					}
 				} else {
 					switch (blend) {
-						case MixBlend.Setup: {
-							if (vertexAttachment.bones == null) {
-								// Unweighted vertex positions, with alpha.
-								float[] setupVertices = vertexAttachment.vertices;
-								for (int i = 0; i < vertexCount; i++) {
-									float setup = setupVertices[i];
-									deform[i] = setup + (lastVertices[i] - setup) * alpha;
-								}
-							} else {
-								// Weighted deform offsets, with alpha.
-								for (int i = 0; i < vertexCount; i++)
-									deform[i] = lastVertices[i] * alpha;
+					case MixBlend.Setup: {
+						if (vertexAttachment.bones == null) {
+							// Unweighted vertex positions, with alpha.
+							float[] setupVertices = vertexAttachment.vertices;
+							for (int i = 0; i < vertexCount; i++) {
+								float setup = setupVertices[i];
+								deform[i] = setup + (lastVertices[i] - setup) * alpha;
 							}
-							break;
-						}
-						case MixBlend.First:
-						case MixBlend.Replace:
-							// Vertex positions or deform offsets, with alpha.
+						} else {
+							// Weighted deform offsets, with alpha.
 							for (int i = 0; i < vertexCount; i++)
-								deform[i] += (lastVertices[i] - deform[i]) * alpha;
-							break;
-						case MixBlend.Add:
-							if (vertexAttachment.bones == null) {
-								// Unweighted vertex positions, no alpha.
-								float[] setupVertices = vertexAttachment.vertices;
-								for (int i = 0; i < vertexCount; i++)
-									deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
-							} else {
-								// Weighted deform offsets, alpha.
-								for (int i = 0; i < vertexCount; i++)
-									deform[i] += lastVertices[i] * alpha;
-							}
-							break;
+								deform[i] = lastVertices[i] * alpha;
+						}
+						break;
+					}
+					case MixBlend.First:
+					case MixBlend.Replace:
+						// Vertex positions or deform offsets, with alpha.
+						for (int i = 0; i < vertexCount; i++)
+							deform[i] += (lastVertices[i] - deform[i]) * alpha;
+						break;
+					case MixBlend.Add:
+						if (vertexAttachment.bones == null) {
+							// Unweighted vertex positions, no alpha.
+							float[] setupVertices = vertexAttachment.vertices;
+							for (int i = 0; i < vertexCount; i++)
+								deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+						} else {
+							// Weighted deform offsets, alpha.
+							for (int i = 0; i < vertexCount; i++)
+								deform[i] += lastVertices[i] * alpha;
+						}
+						break;
 					}
 				}
 				return;
 			}
 
-			int frame = Animation.Search(frames, time);
+			int frame = Search(frames, time);
 			float percent = GetCurvePercent(time, frame);
 			float[] prevVertices = vertices[frame];
 			float[] nextVertices = vertices[frame + 1];
@@ -2030,49 +2017,48 @@ namespace Spine {
 				}
 			} else {
 				switch (blend) {
-					case MixBlend.Setup: {
-						if (vertexAttachment.bones == null) {
-							// Unweighted vertex positions, with alpha.
-							float[] setupVertices = vertexAttachment.vertices;
-							for (int i = 0; i < vertexCount; i++) {
-								float prev = prevVertices[i], setup = setupVertices[i];
-								deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
-							}
-						} else {
-							// Weighted deform offsets, with alpha.
-							for (int i = 0; i < vertexCount; i++) {
-								float prev = prevVertices[i];
-								deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
-							}
+				case MixBlend.Setup: {
+					if (vertexAttachment.bones == null) {
+						// Unweighted vertex positions, with alpha.
+						float[] setupVertices = vertexAttachment.vertices;
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = prevVertices[i], setup = setupVertices[i];
+							deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
 						}
-						break;
-					}
-					case MixBlend.First:
-					case MixBlend.Replace: {
-						// Vertex positions or deform offsets, with alpha.
+					} else {
+						// Weighted deform offsets, with alpha.
 						for (int i = 0; i < vertexCount; i++) {
 							float prev = prevVertices[i];
-							deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
+							deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
 						}
-						break;
 					}
-					case MixBlend.Add: {
-						if (vertexAttachment.bones == null) {
-							// Unweighted vertex positions, with alpha.
-							float[] setupVertices = vertexAttachment.vertices;
-							for (int i = 0; i < vertexCount; i++) {
-								float prev = prevVertices[i];
-								deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
-							}
-						} else {
-							// Weighted deform offsets, with alpha.
-							for (int i = 0; i < vertexCount; i++) {
-								float prev = prevVertices[i];
-								deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
-							}
+					break;
+				}
+				case MixBlend.First:
+				case MixBlend.Replace: {
+					// Vertex positions or deform offsets, with alpha.
+					for (int i = 0; i < vertexCount; i++) {
+						float prev = prevVertices[i];
+						deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
+					}
+					break;
+				}
+				case MixBlend.Add:
+					if (vertexAttachment.bones == null) {
+						// Unweighted vertex positions, with alpha.
+						float[] setupVertices = vertexAttachment.vertices;
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = prevVertices[i];
+							deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
 						}
-						break;
+					} else {
+						// Weighted deform offsets, with alpha.
+						for (int i = 0; i < vertexCount; i++) {
+							float prev = prevVertices[i];
+							deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
+						}
 					}
+					break;
 				}
 			}
 		}
@@ -2122,7 +2108,7 @@ namespace Spine {
 			if (lastTime < frames[0])
 				i = 0;
 			else {
-				i = Animation.Search(frames, lastTime) + 1;
+				i = Search(frames, lastTime) + 1;
 				float frameTime = frames[i];
 				while (i > 0) { // Fire multiple events with the same frame.
 					if (frames[i - 1] != frameTime) break;
@@ -2166,23 +2152,23 @@ namespace Spine {
 		public override void Apply (Skeleton skeleton, float lastTime, float time, ExposedList<Event> firedEvents, float alpha, MixBlend blend,
 							MixDirection direction) {
 
-			var drawOrder = skeleton.drawOrder.Items;
 			if (direction == MixDirection.Out) {
-				if (blend == MixBlend.Setup) Array.Copy(skeleton.slots.Items, 0, drawOrder, 0, skeleton.slots.Count);
+				if (blend == MixBlend.Setup) Array.Copy(skeleton.slots.Items, 0, skeleton.drawOrder.Items, 0, skeleton.slots.Count);
 				return;
 			}
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				if (blend == MixBlend.Setup || blend == MixBlend.First) Array.Copy(skeleton.slots.Items, 0, drawOrder, 0, skeleton.slots.Count);
+				if (blend == MixBlend.Setup || blend == MixBlend.First) Array.Copy(skeleton.slots.Items, 0, skeleton.drawOrder.Items, 0, skeleton.slots.Count);
 				return;
 			}
 
-			int[] drawOrderToSetupIndex = drawOrders[Animation.Search(frames, time)];
+			int[] drawOrderToSetupIndex = drawOrders[Search(frames, time)];
 			if (drawOrderToSetupIndex == null)
-				Array.Copy(skeleton.slots.Items, 0, drawOrder, 0, skeleton.slots.Count);
+				Array.Copy(skeleton.slots.Items, 0, skeleton.drawOrder.Items, 0, skeleton.slots.Count);
 			else {
-				var slots = skeleton.slots.Items;
+				Slot[] slots = skeleton.slots.Items;
+				Slot[] drawOrder = skeleton.drawOrder.Items;
 				for (int i = 0, n = drawOrderToSetupIndex.Length; i < n; i++)
 					drawOrder[i] = slots[drawOrderToSetupIndex[i]];
 			}
@@ -2258,24 +2244,24 @@ namespace Spine {
 			}
 
 			float mix, softness;
-			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
 			switch (curveType) {
-				case LINEAR:
-					float before = frames[i];
-					mix = frames[i + MIX];
-					softness = frames[i + SOFTNESS];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					mix += (frames[i + ENTRIES + MIX] - mix) * t;
-					softness += (frames[i + ENTRIES + SOFTNESS] - softness) * t;
-					break;
-				case STEPPED:
-					mix = frames[i + MIX];
-					softness = frames[i + SOFTNESS];
-					break;
-				default:
-					mix = GetBezierValue(time, i, MIX, curveType - BEZIER);
-					softness = GetBezierValue(time, i, SOFTNESS, curveType + BEZIER_SIZE - BEZIER);
-					break;
+			case LINEAR:
+				float before = frames[i];
+				mix = frames[i + MIX];
+				softness = frames[i + SOFTNESS];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				mix += (frames[i + ENTRIES + MIX] - mix) * t;
+				softness += (frames[i + ENTRIES + SOFTNESS] - softness) * t;
+				break;
+			case STEPPED:
+				mix = frames[i + MIX];
+				softness = frames[i + SOFTNESS];
+				break;
+			default:
+				mix = GetBezierValue(time, i, MIX, curveType - BEZIER);
+				softness = GetBezierValue(time, i, SOFTNESS, curveType + BEZIER_SIZE - BEZIER);
+				break;
 			}
 
 			if (blend == MixBlend.Setup) {
@@ -2285,14 +2271,12 @@ namespace Spine {
 					constraint.bendDirection = constraint.data.bendDirection;
 					constraint.compress = constraint.data.compress;
 					constraint.stretch = constraint.data.stretch;
-				}
-				else {
+				} else {
 					constraint.bendDirection = (int)frames[i + BEND_DIRECTION];
 					constraint.compress = frames[i + COMPRESS] != 0;
 					constraint.stretch = frames[i + STRETCH] != 0;
 				}
-			}
-			else {
+			} else {
 				constraint.mix += (mix - constraint.mix) * alpha;
 				constraint.softness += (softness - constraint.softness) * alpha;
 				if (direction == MixDirection.In) {
@@ -2375,40 +2359,40 @@ namespace Spine {
 			}
 
 			float rotate, x, y, scaleX, scaleY, shearY;
-			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
+			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
 			switch (curveType) {
-				case LINEAR:
-					float before = frames[i];
-					rotate = frames[i + ROTATE];
-					x = frames[i + X];
-					y = frames[i + Y];
-					scaleX = frames[i + SCALEX];
-					scaleY = frames[i + SCALEY];
-					shearY = frames[i + SHEARY];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					rotate += (frames[i + ENTRIES + ROTATE] - rotate) * t;
-					x += (frames[i + ENTRIES + X] - x) * t;
-					y += (frames[i + ENTRIES + Y] - y) * t;
-					scaleX += (frames[i + ENTRIES + SCALEX] - scaleX) * t;
-					scaleY += (frames[i + ENTRIES + SCALEY] - scaleY) * t;
-					shearY += (frames[i + ENTRIES + SHEARY] - shearY) * t;
-					break;
-				case STEPPED:
-					rotate = frames[i + ROTATE];
-					x = frames[i + X];
-					y = frames[i + Y];
-					scaleX = frames[i + SCALEX];
-					scaleY = frames[i + SCALEY];
-					shearY = frames[i + SHEARY];
-					break;
-				default:
-					rotate = GetBezierValue(time, i, ROTATE, curveType - BEZIER);
-					x = GetBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER);
-					y = GetBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER);
-					scaleX = GetBezierValue(time, i, SCALEX, curveType + BEZIER_SIZE * 3 - BEZIER);
-					scaleY = GetBezierValue(time, i, SCALEY, curveType + BEZIER_SIZE * 4 - BEZIER);
-					shearY = GetBezierValue(time, i, SHEARY, curveType + BEZIER_SIZE * 5 - BEZIER);
-					break;
+			case LINEAR:
+				float before = frames[i];
+				rotate = frames[i + ROTATE];
+				x = frames[i + X];
+				y = frames[i + Y];
+				scaleX = frames[i + SCALEX];
+				scaleY = frames[i + SCALEY];
+				shearY = frames[i + SHEARY];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				rotate += (frames[i + ENTRIES + ROTATE] - rotate) * t;
+				x += (frames[i + ENTRIES + X] - x) * t;
+				y += (frames[i + ENTRIES + Y] - y) * t;
+				scaleX += (frames[i + ENTRIES + SCALEX] - scaleX) * t;
+				scaleY += (frames[i + ENTRIES + SCALEY] - scaleY) * t;
+				shearY += (frames[i + ENTRIES + SHEARY] - shearY) * t;
+				break;
+			case STEPPED:
+				rotate = frames[i + ROTATE];
+				x = frames[i + X];
+				y = frames[i + Y];
+				scaleX = frames[i + SCALEX];
+				scaleY = frames[i + SCALEY];
+				shearY = frames[i + SHEARY];
+				break;
+			default:
+				rotate = GetBezierValue(time, i, ROTATE, curveType - BEZIER);
+				x = GetBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER);
+				y = GetBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER);
+				scaleX = GetBezierValue(time, i, SCALEX, curveType + BEZIER_SIZE * 3 - BEZIER);
+				scaleY = GetBezierValue(time, i, SCALEY, curveType + BEZIER_SIZE * 4 - BEZIER);
+				shearY = GetBezierValue(time, i, SHEARY, curveType + BEZIER_SIZE * 5 - BEZIER);
+				break;
 			}
 
 			if (blend == MixBlend.Setup) {
@@ -2575,28 +2559,28 @@ namespace Spine {
 			}
 
 			float rotate, x, y;
-			int i = Animation.Search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
+			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i >> 2];
 			switch (curveType) {
-				case LINEAR:
-					float before = frames[i];
-					rotate = frames[i + ROTATE];
-					x = frames[i + X];
-					y = frames[i + Y];
-					float t = (time - before) / (frames[i + ENTRIES] - before);
-					rotate += (frames[i + ENTRIES + ROTATE] - rotate) * t;
-					x += (frames[i + ENTRIES + X] - x) * t;
-					y += (frames[i + ENTRIES + Y] - y) * t;
-					break;
-				case STEPPED:
-					rotate = frames[i + ROTATE];
-					x = frames[i + X];
-					y = frames[i + Y];
-					break;
-				default:
-					rotate = GetBezierValue(time, i, ROTATE, curveType - BEZIER);
-					x = GetBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER);
-					y = GetBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER);
-					break;
+			case LINEAR:
+				float before = frames[i];
+				rotate = frames[i + ROTATE];
+				x = frames[i + X];
+				y = frames[i + Y];
+				float t = (time - before) / (frames[i + ENTRIES] - before);
+				rotate += (frames[i + ENTRIES + ROTATE] - rotate) * t;
+				x += (frames[i + ENTRIES + X] - x) * t;
+				y += (frames[i + ENTRIES + Y] - y) * t;
+				break;
+			case STEPPED:
+				rotate = frames[i + ROTATE];
+				x = frames[i + X];
+				y = frames[i + Y];
+				break;
+			default:
+				rotate = GetBezierValue(time, i, ROTATE, curveType - BEZIER);
+				x = GetBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER);
+				y = GetBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER);
+				break;
 			}
 
 			if (blend == MixBlend.Setup) {

@@ -293,8 +293,7 @@ namespace Spine {
 						sx *= a;
 						if (uniform) sy *= a;
 					}
-				}
-				else
+				} else
 					a2 = (float)Math.Acos(cos) * bendDir;
 				a = l1 + l2 * cos;
 				b = l2 * (float)Math.Sin(a2);

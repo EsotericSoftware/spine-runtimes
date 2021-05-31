@@ -48,6 +48,7 @@ xcshareddata/
 spine-cocos2d-objc/cocos2d/*
 spine-cocos2d-objc/spine-cocos2d-iphone-objc.xcodeproj/project.xcworkspace/xcshareddata/
 
+spine-csharp/.vs/
 spine-csharp/bin
 spine-csharp/obj
 spine-csharp/src/*.meta

@@ -87,7 +87,7 @@ namespace Spine {
 			this.data = data;
 
 			bones = new ExposedList<Bone>(data.bones.Count);
-			var bonesItems = this.bones.Items;
+			Bone[] bonesItems = this.bones.Items;
 			foreach (BoneData boneData in data.bones) {
 				Bone bone;
 				if (boneData.parent == null) {
@@ -131,17 +131,17 @@ namespace Spine {
 			var updateCache = this.updateCache;
 			updateCache.Clear();
 
-			int boneCount = this.bones.Items.Length;
-			var bones = this.bones;
+			int boneCount = this.bones.Count;
+			Bone[] bones = this.bones.Items;
 			for (int i = 0; i < boneCount; i++) {
-				Bone bone = bones.Items[i];
+				Bone bone = bones[i];
 				bone.sorted = bone.data.skinRequired;
 				bone.active = !bone.sorted;
 			}
 			if (skin != null) {
-				Object[] skinBones = skin.bones.Items;
+				BoneData[] skinBones = skin.bones.Items;
 				for (int i = 0, n = skin.bones.Count; i < n; i++) {
-					Bone bone = (Bone)bones.Items[((BoneData)skinBones[i]).index];
+					var bone = bones[skinBones[i].index];
 					do {
 						bone.sorted = false;
 						bone.active = true;
@@ -151,38 +151,37 @@ namespace Spine {
 			}
 
 			int ikCount = this.ikConstraints.Count, transformCount = this.transformConstraints.Count, pathCount = this.pathConstraints.Count;
-			var ikConstraints = this.ikConstraints;
-			var transformConstraints = this.transformConstraints;
-			var pathConstraints = this.pathConstraints;
+			IkConstraint[] ikConstraints = this.ikConstraints.Items;
+			TransformConstraint[] transformConstraints = this.transformConstraints.Items;
+			PathConstraint[] pathConstraints = this.pathConstraints.Items;
 			int constraintCount = ikCount + transformCount + pathCount;
-			//outer:
 			for (int i = 0; i < constraintCount; i++) {
 				for (int ii = 0; ii < ikCount; ii++) {
-					IkConstraint constraint = ikConstraints.Items[ii];
+					IkConstraint constraint = ikConstraints[ii];
 					if (constraint.data.order == i) {
 						SortIkConstraint(constraint);
-						goto continue_outer; //continue outer;
+						goto continue_outer;
 					}
 				}
 				for (int ii = 0; ii < transformCount; ii++) {
-					TransformConstraint constraint = transformConstraints.Items[ii];
+					TransformConstraint constraint = transformConstraints[ii];
 					if (constraint.data.order == i) {
 						SortTransformConstraint(constraint);
-						goto continue_outer; //continue outer;
+						goto continue_outer;
 					}
 				}
 				for (int ii = 0; ii < pathCount; ii++) {
-					PathConstraint constraint = pathConstraints.Items[ii];
+					PathConstraint constraint = pathConstraints[ii];
 					if (constraint.data.order == i) {
 						SortPathConstraint(constraint);
-						goto continue_outer; //continue outer;
+						goto continue_outer;
 					}
 				}
 				continue_outer: {}
 			}
 
 			for (int i = 0; i < boneCount; i++)
-				SortBone(bones.Items[i]);
+				SortBone(bones[i]);
 		}
 
 		private void SortIkConstraint (IkConstraint constraint) {
@@ -200,8 +199,7 @@ namespace Spine {
 			if (constrained.Count == 1) {
 				updateCache.Add(constraint);
 				SortReset(parent.children);
-			}
-			else {
+			} else {
 				Bone child = constrained.Items[constrained.Count - 1];
 				SortBone(child);
 
@@ -269,9 +267,8 @@ namespace Spine {
 		}
 
 		private void SortPathConstraintAttachment (Skin skin, int slotIndex, Bone slotBone) {
-			foreach (var entry in skin.Attachments) {
+			foreach (var entry in skin.Attachments)
 				if (entry.SlotIndex == slotIndex) SortPathConstraintAttachment(entry.Attachment, slotBone);
-			}
 		}
 
 		private void SortPathConstraintAttachment (Attachment attachment, Bone slotBone) {
@@ -299,7 +296,7 @@ namespace Spine {
 		}
 
 		private static void SortReset (ExposedList<Bone> bones) {
-			var bonesItems = bones.Items;
+			Bone[] bonesItems = bones.Items;
 			for (int i = 0, n = bones.Count; i < n; i++) {
 				Bone bone = bonesItems[i];
 				if (!bone.active) continue;
@@ -308,7 +305,6 @@ namespace Spine {
 			}
 		}
 
-
 		/// <summary>
 		/// Updates the world transform for each bone and applies all constraints.
 		/// <para>
@@ -316,9 +312,9 @@ namespace Spine {
 		/// Runtimes Guide.</para>
 		/// </summary>
 		public void UpdateWorldTransform () {
-			Object[] bones = this.bones.Items;
+			Bone[] bones = this.bones.Items;
 			for (int i = 0, n = this.bones.Count; i < n; i++) {
-				Bone bone = (Bone)bones[i];
+				Bone bone = bones[i];
 				bone.ax = bone.x;
 				bone.ay = bone.y;
 				bone.arotation = bone.rotation;
@@ -360,8 +356,7 @@ namespace Spine {
 			var updateCache = this.updateCache.Items;
 			for (int i = 0, n = this.updateCache.Count; i < n; i++) {
 				var updatable = updateCache[i];
-				if (updatable != rootBone)
-					updatable.Update();
+				if (updatable != rootBone) updatable.Update();
 			}
 		}
 
@@ -380,34 +375,35 @@ namespace Spine {
 			var ikConstraints = this.ikConstraints.Items;
 			for (int i = 0, n = this.ikConstraints.Count; i < n; i++) {
 				IkConstraint constraint = ikConstraints[i];
-				constraint.mix = constraint.data.mix;
-				constraint.softness = constraint.data.softness;
-				constraint.bendDirection = constraint.data.bendDirection;
-				constraint.compress = constraint.data.compress;
-				constraint.stretch = constraint.data.stretch;
+				IkConstraintData data = constraint.data;
+				constraint.mix = data.mix;
+				constraint.softness = data.softness;
+				constraint.bendDirection = data.bendDirection;
+				constraint.compress = data.compress;
+				constraint.stretch = data.stretch;
 			}
 
 			var transformConstraints = this.transformConstraints.Items;
 			for (int i = 0, n = this.transformConstraints.Count; i < n; i++) {
 				TransformConstraint constraint = transformConstraints[i];
-				TransformConstraintData constraintData = constraint.data;
-				constraint.mixRotate = constraintData.mixRotate;
-				constraint.mixX = constraintData.mixX;
-				constraint.mixY = constraintData.mixY;
-				constraint.mixScaleX = constraintData.mixScaleX;
-				constraint.mixScaleY = constraintData.mixScaleY;
-				constraint.mixShearY = constraintData.mixShearY;
+				TransformConstraintData data = constraint.data;
+				constraint.mixRotate = data.mixRotate;
+				constraint.mixX = data.mixX;
+				constraint.mixY = data.mixY;
+				constraint.mixScaleX = data.mixScaleX;
+				constraint.mixScaleY = data.mixScaleY;
+				constraint.mixShearY = data.mixShearY;
 			}
 
 			var pathConstraints = this.pathConstraints.Items;
 			for (int i = 0, n = this.pathConstraints.Count; i < n; i++) {
 				PathConstraint constraint = pathConstraints[i];
-				PathConstraintData constraintData = constraint.data;
-				constraint.position = constraintData.position;
-				constraint.spacing = constraintData.spacing;
-				constraint.mixRotate = constraintData.mixRotate;
-				constraint.mixX = constraintData.mixX;
-				constraint.mixY = constraintData.mixY;
+				PathConstraintData data = constraint.data;
+				constraint.position = data.position;
+				constraint.spacing = data.spacing;
+				constraint.mixRotate = data.mixRotate;
+				constraint.mixX = data.mixX;
+				constraint.mixY = data.mixY;
 			}
 		}
 
@@ -491,9 +487,9 @@ namespace Spine {
 				if (skin != null)
 					newSkin.AttachAll(this, skin);
 				else {
-					ExposedList<Slot> slots = this.slots;
-					for (int i = 0, n = slots.Count; i < n; i++) {
-						Slot slot = slots.Items[i];
+					Slot[] slots = this.slots.Items;
+					for (int i = 0, n = this.slots.Count; i < n; i++) {
+						Slot slot = slots[i];
 						string name = slot.data.attachmentName;
 						if (name != null) {
 							Attachment attachment = newSkin.GetAttachment(i, name);
@@ -527,9 +523,9 @@ namespace Spine {
 		/// <param name="attachmentName">May be null to clear the slot's attachment.</param>
 		public void SetAttachment (string slotName, string attachmentName) {
 			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
-			ExposedList<Slot> slots = this.slots;
-			for (int i = 0, n = slots.Count; i < n; i++) {
-				Slot slot = slots.Items[i];
+			Slot[] slots = this.slots.Items;
+			for (int i = 0, n = this.slots.Count; i < n; i++) {
+				Slot slot = slots[i];
 				if (slot.data.name == slotName) {
 					Attachment attachment = null;
 					if (attachmentName != null) {

@@ -78,8 +78,7 @@ namespace Spine {
 		/// <param name="stride">The number of <paramref name="worldVertices"/> entries between the value pairs written.</param>
 		public void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride = 2) {
 			count = offset + (count >> 1) * stride;
-			Skeleton skeleton = slot.bone.skeleton;
-			var deformArray = slot.deform;
+			ExposedList<float> deformArray = slot.deform;
 			float[] vertices = this.vertices;
 			int[] bones = this.bones;
 			if (bones == null) {
@@ -100,7 +99,7 @@ namespace Spine {
 				v += n + 1;
 				skip += n;
 			}
-			var skeletonBones = skeleton.bones.Items;
+			Bone[] skeletonBones = slot.bone.skeleton.bones.Items;
 			if (deformArray.Count == 0) {
 				for (int w = offset, b = skip * 3; w < count; w += stride) {
 					float wx = 0, wy = 0;
@@ -138,15 +137,13 @@ namespace Spine {
 			if (bones != null) {
 				attachment.bones = new int[bones.Length];
 				Array.Copy(bones, 0, attachment.bones, 0, bones.Length);
-			}
-			else
+			} else
 				attachment.bones = null;
 
 			if (vertices != null) {
 				attachment.vertices = new float[vertices.Length];
 				Array.Copy(vertices, 0, attachment.vertices, 0, vertices.Length);
-			}
-			else
+			} else
 				attachment.vertices = null;
 
 			attachment.worldVerticesLength = worldVerticesLength;

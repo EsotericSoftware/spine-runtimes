@@ -64,8 +64,8 @@ namespace Spine {
 		public void Update (Skeleton skeleton, bool updateAabb) {
 			ExposedList<BoundingBoxAttachment> boundingBoxes = BoundingBoxes;
 			ExposedList<Polygon> polygons = Polygons;
-			ExposedList<Slot> slots = skeleton.slots;
-			int slotCount = slots.Count;
+			Slot[] slots = skeleton.slots.Items;
+			int slotCount = skeleton.slots.Count;
 
 			boundingBoxes.Clear();
 			for (int i = 0, n = polygons.Count; i < n; i++)
@@ -73,7 +73,7 @@ namespace Spine {
 			polygons.Clear();
 
 			for (int i = 0; i < slotCount; i++) {
-				Slot slot = slots.Items[i];
+				Slot slot = slots[i];
 				if (!slot.bone.active) continue;
 				BoundingBoxAttachment boundingBox = slot.attachment as BoundingBoxAttachment;
 				if (boundingBox == null) continue;
@@ -106,9 +106,9 @@ namespace Spine {
 
 		private void AabbCompute () {
 			float minX = int.MaxValue, minY = int.MaxValue, maxX = int.MinValue, maxY = int.MinValue;
-			ExposedList<Polygon> polygons = Polygons;
-			for (int i = 0, n = polygons.Count; i < n; i++) {
-				Polygon polygon = polygons.Items[i];
+			Polygon[] polygons = Polygons.Items;
+			for (int i = 0, n = Polygons.Count; i < n; i++) {
+				Polygon polygon = polygons[i];
 				float[] vertices = polygon.Vertices;
 				for (int ii = 0, nn = polygon.Count; ii < nn; ii += 2) {
 					float x = vertices[ii];
@@ -178,18 +178,18 @@ namespace Spine {
 		/// <summary>Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
 		/// efficient to only call this method if <see cref="AabbContainsPoint(float, float)"/> returns true.</summary>
 		public BoundingBoxAttachment ContainsPoint (float x, float y) {
-			ExposedList<Polygon> polygons = Polygons;
-			for (int i = 0, n = polygons.Count; i < n; i++)
-				if (ContainsPoint(polygons.Items[i], x, y)) return BoundingBoxes.Items[i];
+			Polygon[] polygons = Polygons.Items;
+			for (int i = 0, n = Polygons.Count; i < n; i++)
+				if (ContainsPoint(polygons[i], x, y)) return BoundingBoxes.Items[i];
 			return null;
 		}
 
 		/// <summary>Returns the first bounding box attachment that contains the line segment, or null. When doing many checks, it is usually
 		/// more efficient to only call this method if <see cref="aabbIntersectsSegment(float, float, float, float)"/> returns true.</summary>
 		public BoundingBoxAttachment IntersectsSegment (float x1, float y1, float x2, float y2) {
-			ExposedList<Polygon> polygons = Polygons;
-			for (int i = 0, n = polygons.Count; i < n; i++)
-				if (IntersectsSegment(polygons.Items[i], x1, y1, x2, y2)) return BoundingBoxes.Items[i];
+			Polygon[] polygons = Polygons.Items;
+			for (int i = 0, n = Polygons.Count; i < n; i++)
+				if (IntersectsSegment(polygons[i], x1, y1, x2, y2)) return BoundingBoxes.Items[i];
 			return null;
 		}
 

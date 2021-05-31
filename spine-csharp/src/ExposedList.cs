@@ -198,10 +198,11 @@ namespace Spine {
 			if (converter == null)
 				throw new ArgumentNullException("converter");
 			ExposedList<TOutput> u = new ExposedList<TOutput>(Count);
-			for (int i = 0; i < Count; i++)
-				u.Items[i] = converter(Items[i]);
-
 			u.Count = Count;
+			T[] items = Items;
+			TOutput[] uItems = u.Items;
+			for (int i = 0; i < Count; i++)
+				uItems[i] = converter(items[i]);
 			return u;
 		}
 

@@ -132,10 +132,11 @@ namespace Spine {
 
 		/// <summary>Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.</summary>
 		internal void AttachAll (Skeleton skeleton, Skin oldSkin) {
+			Slot[] slots = skeleton.slots.Items;
 			foreach (var item in oldSkin.attachments) {
 				SkinEntry entry = item.Value;
 				int slotIndex = entry.slotIndex;
-				Slot slot = skeleton.slots.Items[slotIndex];
+				Slot slot = slots[slotIndex];
 				if (slot.Attachment == entry.attachment) {
 					Attachment attachment = GetAttachment(slotIndex, entry.name);
 					if (attachment != null) slot.Attachment = attachment;
