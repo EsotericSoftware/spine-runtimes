@@ -42,7 +42,7 @@ namespace Spine.Unity.AnimationTools {
 			if (time < frames[0]) return Vector2.zero;
 
 			float x, y;
-			int i = Animation.Search(frames, time, TranslateTimeline.ENTRIES), curveType = (int)timeline.curves[i / TranslateTimeline.ENTRIES];
+			int i = TranslateTimeline.Search(frames, time, TranslateTimeline.ENTRIES), curveType = (int)timeline.curves[i / TranslateTimeline.ENTRIES];
 			switch (curveType) {
 				case TranslateTimeline.LINEAR:
 					float before = frames[i];
