@@ -503,7 +503,10 @@ namespace Spine.Unity {
 		}
 
 		public void OnBecameVisible () {
+			UpdateMode previousUpdateMode = updateMode;
 			updateMode = UpdateMode.FullUpdate;
+			if (previousUpdateMode != UpdateMode.FullUpdate)
+				LateUpdate(); // OnBecameVisible is called after LateUpdate()
 		}
 
 		public void OnBecameInvisible () {
