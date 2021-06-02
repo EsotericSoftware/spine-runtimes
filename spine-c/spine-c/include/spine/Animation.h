@@ -79,6 +79,34 @@ SP_API void spAnimation_apply (const spAnimation* self, struct spSkeleton* skele
 		spEvent** events, int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction);
 
 /**/
+typedef enum {
+    SP_TIMELINE_ATTACHMENT,
+    SP_TIMELINE_ALPHA,
+    SP_TIMELINE_PATHCONSTRAINTPOSITION,
+    SP_TIMELINE_PATHCONSTRAINTSPACING,
+    SP_TIMELINE_ROTATE,
+    SP_TIMELINE_SCALEX,
+    SP_TIMELINE_SCALEY,
+    SP_TIMELINE_SHEARX,
+    SP_TIMELINE_SHEARY,
+    SP_TIMELINE_TRANSLATEX,
+    SP_TIMELINE_TRANSLATEY,
+    SP_TIMELINE_SCALE,
+    SP_TIMELINE_SHEAR,
+    SP_TIMELINE_TRANSLATE,
+    SP_TIMELINE_DEFORM,
+    SP_TIMELINE_IKCONSTRAINT,
+    SP_TIMELINE_PATHCONSTRAINTMIX,
+    SP_TIMELINE_RGB2,
+    SP_TIMELINE_RGBA2,
+    SP_TIMELINE_RGBA,
+    SP_TIMELINE_RGB,
+    SP_TIMELINE_TRANSFORMCONSTRAINT,
+    SP_TIMELINE_DRAWORDER,
+    SP_TIMELINE_EVENT
+} spTimelineType;
+
+/**/
 
 typedef enum {
     SP_PROPERTY_ROTATE = 1 << 0,
@@ -119,13 +147,13 @@ struct spTimeline {
 	spFloatArray *frames;
 	int frameCount;
 	int frameEntries;
+	spTimelineType type;
 };
 
 SP_API void spTimeline_dispose (spTimeline* self);
 SP_API void spTimeline_apply (spTimeline* self, struct spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction);
 SP_API void spTimeline_setBezier(spTimeline* self, int bezier, int frame, float value, float time1, float value1, float cx1, float cy1, float cx2, float cy2, float time2, float value2);
-SP_API int spTimeline_getFrameCount (const spTimeline* self);
 SP_API float spTimeline_getDuration (const spTimeline* self);
 
 /**/

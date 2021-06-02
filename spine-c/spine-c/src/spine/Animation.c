@@ -104,6 +104,7 @@ void _spTimeline_init (spTimeline* self,
     int frameEntries,
     spPropertyId* propertyIds,
     int propertyIdsCount,
+    spTimelineType type,
     void (*dispose) (spTimeline* self),
     void (*apply) (spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
 		int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction),
@@ -115,13 +116,16 @@ void _spTimeline_init (spTimeline* self,
     self->frames->size = frameCount * frameEntries;
     self->frameCount = frameCount;
     self->frameEntries = frameEntries;
+
+    for (i = 0, n = propertyIdsCount; i < n; i++)
+        self->propertyIds[i] = propertyIds[i];
+    self->propertyIdsCount = propertyIdsCount;
+
+    self->type = type;
+
 	self->vtable.dispose = dispose;
 	self->vtable.apply = apply;
 	self->vtable.setBezier = setBezier;
-
-	for (i = 0, n = propertyIdsCount; i < n; i++)
-	    self->propertyIds[i] = propertyIds[i];
-	self->propertyIdsCount = propertyIdsCount;
 }
 
 void spTimeline_dispose (spTimeline* self) {
@@ -138,10 +142,6 @@ void spTimeline_apply (spTimeline* self, spSkeleton* skeleton, float lastTime, f
 void spTimeline_setBezier(spTimeline* self, int bezier, int frame, float value, float time1, float value1, float cx1, float cy1, float cx2, float cy2, float time2, float value2) {
     if (self->vtable.setBezier)
         self->vtable.setBezier(self, bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
-}
-
-int spTimeline_getFrameCount (const spTimeline* self) {
-    return self->frameCount;
 }
 
 float spTimeline_getDuration (const spTimeline* self) {
@@ -161,12 +161,13 @@ void _spCurveTimeline_init (spCurveTimeline* self,
                             int bezierCount,
                             spPropertyId* propertyIds,
                             int propertyIdsCount,
+                            spTimelineType type,
                             void (*dispose) (spTimeline* self),
                             void (*apply) (spTimeline* self, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
                                            int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction),
                             void (*setBezier) (spTimeline* self, int bezier, int frame, float value, float time1, float value1, float cx1, float cy1,
                                                float cx2, float cy2, float time2, float value2)) {
-	_spTimeline_init(SUPER(self), frameCount, frameEntries, propertyIds, propertyIdsCount, dispose, apply, setBezier);
+	_spTimeline_init(SUPER(self), frameCount, frameEntries, propertyIds, propertyIdsCount, type, dispose, apply, setBezier);
 	self->curves = spFloatArray_create(frameCount + bezierCount * BEZIER_SIZE);
 	self->curves->size = frameCount + bezierCount * BEZIER_SIZE;
 }
@@ -178,7 +179,7 @@ void _spCurveTimeline_dispose (spTimeline* self) {
 void _spCurveTimeline_setBezier (spTimeline* timeline, int bezier, int frame, float value, float time1, float value1, float cx1, float cy1, float cx2, float cy2, float time2, float value2) {
     spCurveTimeline *self = SUB_CAST(spCurveTimeline, timeline);
     float tmpx, tmpy, dddx, dddy,ddx, ddy, dx, dy, x, y;
-    int i = spTimeline_getFrameCount(SUPER(self)) + bezier * BEZIER_SIZE, n;
+    int i = self->super.frameCount + bezier * BEZIER_SIZE, n;
     float* curves = self->curves->items;
     if (value == 0) curves[frame] = CURVE_BEZIER + i;
     tmpx = (time1 - cx1 * 2 + cx2) * 0.03; tmpy = (value1 - cy1 * 2 + cy2) * 0.03;
@@ -321,7 +322,7 @@ spRotateTimeline* spRotateTimeline_create (int frameCount, int bezierCount, int 
     spRotateTimeline* timeline = NEW(spRotateTimeline);
     spPropertyId ids[1];
     ids[0] = ((spPropertyId)SP_PROPERTY_ROTATE << 32) | boneIndex;
-    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spRotateTimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_ROTATE, _spCurveTimeline_dispose, _spRotateTimeline_apply, _spCurveTimeline_setBezier);
     timeline->boneIndex = boneIndex;
     return timeline;
 }
@@ -409,7 +410,7 @@ spTranslateTimeline* spTranslateTimeline_create (int frameCount, int bezierCount
     spPropertyId ids[2];
     ids[0] = ((spPropertyId)SP_PROPERTY_X << 32) | boneIndex;
     ids[1] = ((spPropertyId)SP_PROPERTY_Y << 32) | boneIndex;
-    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE2_ENTRIES, bezierCount, ids, 2, _spCurveTimeline_dispose, _spTranslateTimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE2_ENTRIES, bezierCount, ids, 2, SP_TIMELINE_TRANSLATE, _spCurveTimeline_dispose, _spTranslateTimeline_apply, _spCurveTimeline_setBezier);
     timeline->boneIndex = boneIndex;
     return timeline;
 }
@@ -467,7 +468,7 @@ spTranslateXTimeline* spTranslateXTimeline_create (int frameCount, int bezierCou
     spTranslateXTimeline* timeline = NEW(spTranslateXTimeline);
     spPropertyId ids[1];
     ids[0] = ((spPropertyId)SP_PROPERTY_X << 32) | boneIndex;
-    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spTranslateXTimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_TRANSLATEX, _spCurveTimeline_dispose, _spTranslateXTimeline_apply, _spCurveTimeline_setBezier);
     timeline->boneIndex = boneIndex;
     return timeline;
 }
@@ -525,7 +526,7 @@ spTranslateYTimeline* spTranslateYTimeline_create (int frameCount, int bezierCou
     spTranslateYTimeline* timeline = NEW(spTranslateYTimeline);
     spPropertyId ids[1];
     ids[0] = ((spPropertyId)SP_PROPERTY_Y << 32) | boneIndex;
-    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spTranslateYTimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_TRANSLATEY, _spCurveTimeline_dispose, _spTranslateYTimeline_apply, _spCurveTimeline_setBezier);
     timeline->boneIndex = boneIndex;
     return timeline;
 }
@@ -653,7 +654,7 @@ spScaleTimeline* spScaleTimeline_create (int frameCount, int bezierCount, int bo
     spPropertyId ids[2];
     ids[0] = ((spPropertyId)SP_PROPERTY_SCALEX << 32) | boneIndex;
     ids[1] = ((spPropertyId)SP_PROPERTY_SCALEY << 32) | boneIndex;
-    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE2_ENTRIES, bezierCount, ids, 2, _spCurveTimeline_dispose, _spScaleTimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE2_ENTRIES, bezierCount, ids, 2, SP_TIMELINE_SCALE, _spCurveTimeline_dispose, _spScaleTimeline_apply, _spCurveTimeline_setBezier);
     timeline->boneIndex = boneIndex;
     return timeline;
 }
@@ -739,7 +740,7 @@ spScaleXTimeline* spScaleXTimeline_create (int frameCount, int bezierCount, int 
     spScaleXTimeline* timeline = NEW(spScaleXTimeline);
     spPropertyId ids[1];
     ids[0] = ((spPropertyId)SP_PROPERTY_SCALEX << 32) | boneIndex;
-    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spScaleXTimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_SCALEX, _spCurveTimeline_dispose, _spScaleXTimeline_apply, _spCurveTimeline_setBezier);
     timeline->boneIndex = boneIndex;
     return timeline;
 }
@@ -825,7 +826,7 @@ spScaleYTimeline* spScaleYTimeline_create (int frameCount, int bezierCount, int 
     spScaleYTimeline* timeline = NEW(spScaleYTimeline);
     spPropertyId ids[1];
     ids[0] = ((spPropertyId)SP_PROPERTY_SCALEY << 32) | boneIndex;
-    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spScaleYTimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_SCALEY, _spCurveTimeline_dispose, _spScaleYTimeline_apply, _spCurveTimeline_setBezier);
     timeline->boneIndex = boneIndex;
     return timeline;
 }
@@ -912,7 +913,7 @@ spShearTimeline* spShearTimeline_create (int frameCount, int bezierCount, int bo
     spPropertyId ids[2];
     ids[0] = ((spPropertyId)SP_PROPERTY_SHEARX << 32) | boneIndex;
     ids[1] = ((spPropertyId)SP_PROPERTY_SHEARY << 32) | boneIndex;
-    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE2_ENTRIES, bezierCount, ids, 2, _spCurveTimeline_dispose, _spShearTimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE2_ENTRIES, bezierCount, ids, 2, SP_TIMELINE_SHEAR, _spCurveTimeline_dispose, _spShearTimeline_apply, _spCurveTimeline_setBezier);
     timeline->boneIndex = boneIndex;
     return timeline;
 }
@@ -969,7 +970,7 @@ spShearXTimeline* spShearXTimeline_create (int frameCount, int bezierCount, int 
     spShearXTimeline* timeline = NEW(spShearXTimeline);
     spPropertyId ids[1];
     ids[0] = ((spPropertyId)SP_PROPERTY_SHEARX << 32) | boneIndex;
-    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spShearXTimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_SHEARX, _spCurveTimeline_dispose, _spShearXTimeline_apply, _spCurveTimeline_setBezier);
     timeline->boneIndex = boneIndex;
     return timeline;
 }
@@ -1027,7 +1028,7 @@ spShearYTimeline* spShearYTimeline_create (int frameCount, int bezierCount, int 
     spShearYTimeline* timeline = NEW(spShearYTimeline);
     spPropertyId ids[1];
     ids[0] = ((spPropertyId)SP_PROPERTY_SHEARY << 32) | boneIndex;
-    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spShearYTimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_SHEARY, _spCurveTimeline_dispose, _spShearYTimeline_apply, _spCurveTimeline_setBezier);
     timeline->boneIndex = boneIndex;
     return timeline;
 }
@@ -1123,7 +1124,7 @@ spRGBATimeline* spRGBATimeline_create (int framesCount, int bezierCount, int slo
     spPropertyId ids[2];
     ids[0] = ((spPropertyId)SP_PROPERTY_RGB << 32) | slotIndex;
     ids[1] = ((spPropertyId)SP_PROPERTY_ALPHA << 32) | slotIndex;
-    _spCurveTimeline_init(SUPER(timeline), framesCount, RGBA_ENTRIES, bezierCount, ids, 2, _spCurveTimeline_dispose, _spRGBATimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), framesCount, RGBA_ENTRIES, bezierCount, ids, 2, SP_TIMELINE_RGBA, _spCurveTimeline_dispose, _spRGBATimeline_apply, _spCurveTimeline_setBezier);
     timeline->slotIndex = slotIndex;
     return timeline;
 }
@@ -1225,7 +1226,7 @@ spRGBTimeline* spRGBTimeline_create (int framesCount, int bezierCount, int slotI
     spRGBTimeline* timeline = NEW(spRGBTimeline);
     spPropertyId ids[1];
     ids[0] = ((spPropertyId)SP_PROPERTY_RGB << 32) | slotIndex;
-    _spCurveTimeline_init(SUPER(timeline), framesCount, RGB_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spRGBTimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), framesCount, RGB_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_RGB, _spCurveTimeline_dispose, _spRGBTimeline_apply, _spCurveTimeline_setBezier);
     timeline->slotIndex = slotIndex;
     return timeline;
 }
@@ -1286,7 +1287,7 @@ spAlphaTimeline* spAlphaTimeline_create (int frameCount, int bezierCount, int sl
     spAlphaTimeline* timeline = NEW(spAlphaTimeline);
     spPropertyId ids[1];
     ids[0] = ((spPropertyId)SP_PROPERTY_ALPHA << 32) | slotIndex;
-    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spAlphaTimeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), frameCount, CURVE1_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_ALPHA, _spCurveTimeline_dispose, _spAlphaTimeline_apply, _spCurveTimeline_setBezier);
     timeline->slotIndex = slotIndex;
     return timeline;
 }
@@ -1411,7 +1412,7 @@ spRGBA2Timeline* spRGBA2Timeline_create (int framesCount, int bezierCount, int s
     ids[0] = ((spPropertyId)SP_PROPERTY_RGB << 32) | slotIndex;
     ids[1] = ((spPropertyId)SP_PROPERTY_ALPHA << 32) | slotIndex;
     ids[2] = ((spPropertyId)SP_PROPERTY_RGB2 << 32) | slotIndex;
-    _spCurveTimeline_init(SUPER(timeline), framesCount, RGBA2_ENTRIES, bezierCount, ids, 3, _spCurveTimeline_dispose, _spRGBA2Timeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), framesCount, RGBA2_ENTRIES, bezierCount, ids, 3, SP_TIMELINE_RGBA2, _spCurveTimeline_dispose, _spRGBA2Timeline_apply, _spCurveTimeline_setBezier);
     timeline->slotIndex = slotIndex;
     return timeline;
 }
@@ -1539,7 +1540,7 @@ spRGB2Timeline* spRGB2Timeline_create (int framesCount, int bezierCount, int slo
     spPropertyId ids[2];
     ids[0] = ((spPropertyId)SP_PROPERTY_RGB << 32) | slotIndex;
     ids[1] = ((spPropertyId)SP_PROPERTY_RGB2 << 32) | slotIndex;
-    _spCurveTimeline_init(SUPER(timeline), framesCount, RGB2_ENTRIES, bezierCount, ids, 2, _spCurveTimeline_dispose, _spRGB2Timeline_apply, _spCurveTimeline_setBezier);
+    _spCurveTimeline_init(SUPER(timeline), framesCount, RGB2_ENTRIES, bezierCount, ids, 2, SP_TIMELINE_RGB2, _spCurveTimeline_dispose, _spRGB2Timeline_apply, _spCurveTimeline_setBezier);
     timeline->slotIndex = slotIndex;
     return timeline;
 }
@@ -1610,7 +1611,7 @@ spAttachmentTimeline* spAttachmentTimeline_create (int framesCount, int slotInde
 	spAttachmentTimeline* self = NEW(spAttachmentTimeline);
     spPropertyId ids[1];
     ids[0] = ((spPropertyId)SP_PROPERTY_ATTACHMENT << 32) | slotIndex;
-	_spTimeline_init(SUPER(self), framesCount, 1, ids, 1, _spAttachmentTimeline_dispose, _spAttachmentTimeline_apply, 0);
+	_spTimeline_init(SUPER(self), framesCount, 1, ids, 1, SP_TIMELINE_ATTACHMENT, _spAttachmentTimeline_dispose, _spAttachmentTimeline_apply, 0);
     CONST_CAST(char**, self->attachmentNames) = CALLOC(char*, framesCount);
 	return self;
 }
@@ -1630,7 +1631,7 @@ void spAttachmentTimeline_setFrame (spAttachmentTimeline* self, int frameIndex, 
 void _spDeformTimeline_setBezier(spTimeline *timeline, int bezier, int frame, float value, float time1, float value1, float cx1, float cy1,
           float cx2, float cy2, float time2, float value2) {
     spDeformTimeline *self = SUB_CAST(spDeformTimeline, timeline);
-    int n, i = spTimeline_getFrameCount(SUPER(SUPER(self)))+ bezier * BEZIER_SIZE;
+    int n, i = self->super.super.frameCount + bezier * BEZIER_SIZE;
     float *curves = self->super.curves->items;
     float tmpx = (time1 - cx1 * 2 + cx2) * 0.03, tmpy = cy2 * 0.03 - cy1 * 0.06;
     float dddx = ((cx1 - cx2) * 3 - time1 + time2) * 0.006, dddy = (cy1 - cy2 + 0.33333333) * 0.018;
@@ -1911,7 +1912,7 @@ spDeformTimeline* spDeformTimeline_create (int framesCount, int frameVerticesCou
 	spDeformTimeline* self = NEW(spDeformTimeline);
     spPropertyId ids[1];
     ids[0] = ((spPropertyId) SP_PROPERTY_DEFORM << 32) | ((slotIndex << 16 | attachment->id) & 0xffffffff);
-	_spCurveTimeline_init(SUPER(self), framesCount, 1, bezierCount, ids, 1, _spDeformTimeline_dispose, _spDeformTimeline_apply, _spDeformTimeline_setBezier);
+	_spCurveTimeline_init(SUPER(self), framesCount, 1, bezierCount, ids, 1, SP_TIMELINE_DEFORM, _spDeformTimeline_dispose, _spDeformTimeline_apply, _spDeformTimeline_setBezier);
 	CONST_CAST(float**, self->frameVertices) = CALLOC(float*, framesCount);
 	CONST_CAST(int, self->frameVerticesCount) = frameVerticesCount;
 	return self;
@@ -1983,7 +1984,7 @@ spEventTimeline* spEventTimeline_create (int framesCount) {
 	spEventTimeline* self = NEW(spEventTimeline);
 	spPropertyId ids[1];
 	ids[0] = (spPropertyId)SP_PROPERTY_EVENT << 32;
-	_spTimeline_init(SUPER(self), framesCount, 1, ids, 1, _spEventTimeline_dispose, _spEventTimeline_apply, 0);
+	_spTimeline_init(SUPER(self), framesCount, 1, ids, 1, SP_TIMELINE_EVENT, _spEventTimeline_dispose, _spEventTimeline_apply, 0);
 	CONST_CAST(spEvent**, self->events) = CALLOC(spEvent*, framesCount);
 	return self;
 }
@@ -2043,7 +2044,7 @@ spDrawOrderTimeline* spDrawOrderTimeline_create (int framesCount, int slotsCount
 	spDrawOrderTimeline* self = NEW(spDrawOrderTimeline);
   spPropertyId ids[1];
   ids[0] = (spPropertyId)SP_PROPERTY_DRAWORDER << 32;
-	_spTimeline_init(SUPER(self), framesCount, 1, ids, 1, _spDrawOrderTimeline_dispose, _spDrawOrderTimeline_apply, 0);
+	_spTimeline_init(SUPER(self), framesCount, 1, ids, 1, SP_TIMELINE_DRAWORDER, _spDrawOrderTimeline_dispose, _spDrawOrderTimeline_apply, 0);
 
 	CONST_CAST(int**, self->drawOrders) = CALLOC(int*, framesCount);
 	CONST_CAST(int, self->slotsCount) = slotsCount;
@@ -2158,7 +2159,7 @@ spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount, int bezi
   spIkConstraintTimeline* timeline = NEW(spIkConstraintTimeline);
   spPropertyId ids[1];
   ids[0] = ((spPropertyId)SP_PROPERTY_IKCONSTRAINT << 32) | ikConstraintIndex;
-  _spCurveTimeline_init(SUPER(timeline), framesCount, IKCONSTRAINT_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spIkConstraintTimeline_apply, _spCurveTimeline_setBezier);
+  _spCurveTimeline_init(SUPER(timeline), framesCount, IKCONSTRAINT_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_IKCONSTRAINT, _spCurveTimeline_dispose, _spIkConstraintTimeline_apply, _spCurveTimeline_setBezier);
   timeline->ikConstraintIndex = ikConstraintIndex;
   return timeline;
 }
@@ -2291,7 +2292,7 @@ spTransformConstraintTimeline* spTransformConstraintTimeline_create (int framesC
   spTransformConstraintTimeline* timeline = NEW(spTransformConstraintTimeline);
   spPropertyId ids[1];
   ids[0] = ((spPropertyId)SP_PROPERTY_TRANSFORMCONSTRAINT << 32) | transformConstraintIndex;
-  _spCurveTimeline_init(SUPER(timeline), framesCount, IKCONSTRAINT_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spTransformConstraintTimeline_apply, _spCurveTimeline_setBezier);
+  _spCurveTimeline_init(SUPER(timeline), framesCount, IKCONSTRAINT_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_TRANSFORMCONSTRAINT, _spCurveTimeline_dispose, _spTransformConstraintTimeline_apply, _spCurveTimeline_setBezier);
   timeline->transformConstraintIndex = transformConstraintIndex;
   return timeline;
 }
@@ -2355,7 +2356,7 @@ spPathConstraintPositionTimeline* spPathConstraintPositionTimeline_create (int f
   spPathConstraintPositionTimeline* timeline = NEW(spPathConstraintPositionTimeline);
   spPropertyId ids[1];
   ids[0] = ((spPropertyId)SP_PROPERTY_PATHCONSTRAINT_POSITION << 32) | pathConstraintIndex;
-  _spCurveTimeline_init(SUPER(timeline), framesCount, PATHCONSTRAINTPOSITION_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spPathConstraintPositionTimeline_apply, _spCurveTimeline_setBezier);
+  _spCurveTimeline_init(SUPER(timeline), framesCount, PATHCONSTRAINTPOSITION_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_PATHCONSTRAINTPOSITION, _spCurveTimeline_dispose, _spPathConstraintPositionTimeline_apply, _spCurveTimeline_setBezier);
   timeline->pathConstraintIndex = pathConstraintIndex;
   return timeline;
 }
@@ -2414,7 +2415,7 @@ spPathConstraintSpacingTimeline* spPathConstraintSpacingTimeline_create (int fra
   spPathConstraintSpacingTimeline* timeline = NEW(spPathConstraintSpacingTimeline);
   spPropertyId ids[1];
   ids[0] = ((spPropertyId)SP_PROPERTY_PATHCONSTRAINT_SPACING << 32) | pathConstraintIndex;
-  _spCurveTimeline_init(SUPER(timeline), framesCount, PATHCONSTRAINTSPACING_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spPathConstraintSpacingTimeline_apply, _spCurveTimeline_setBezier);
+  _spCurveTimeline_init(SUPER(timeline), framesCount, PATHCONSTRAINTSPACING_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_PATHCONSTRAINTSPACING, _spCurveTimeline_dispose, _spPathConstraintSpacingTimeline_apply, _spCurveTimeline_setBezier);
   timeline->pathConstraintIndex = pathConstraintIndex;
   return timeline;
 }
@@ -2513,7 +2514,7 @@ spPathConstraintMixTimeline* spPathConstraintMixTimeline_create (int framesCount
   spPathConstraintMixTimeline* timeline = NEW(spPathConstraintMixTimeline);
   spPropertyId ids[1];
   ids[0] = ((spPropertyId)SP_PROPERTY_PATHCONSTRAINT_MIX << 32) | pathConstraintIndex;
-  _spCurveTimeline_init(SUPER(timeline), framesCount, PATHCONSTRAINTMIX_ENTRIES, bezierCount, ids, 1, _spCurveTimeline_dispose, _spPathConstraintMixTimeline_apply, _spCurveTimeline_setBezier);
+  _spCurveTimeline_init(SUPER(timeline), framesCount, PATHCONSTRAINTMIX_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_PATHCONSTRAINTMIX, _spCurveTimeline_dispose, _spPathConstraintMixTimeline_apply, _spCurveTimeline_setBezier);
   timeline->pathConstraintIndex = pathConstraintIndex;
   return timeline;
 }

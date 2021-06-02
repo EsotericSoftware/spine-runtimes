@@ -227,7 +227,7 @@ static spTimeline* readTimeline (_dataInput *input, spCurveTimeline1 *timeline, 
     float time2, value2;
     float time = readFloat(input);
     float value = readFloat(input) * scale;
-    for (frame = 0, bezier = 0, frameLast = spTimeline_getFrameCount(SUPER(timeline)) - 1;; frame++) {
+    for (frame = 0, bezier = 0, frameLast = timeline->super.frameCount - 1;; frame++) {
         spCurveTimeline1_setFrame(timeline, frame, time, value);
         if (frame == frameLast) break;
         time2 = readFloat(input);
@@ -251,7 +251,7 @@ static spTimeline* readTimeline2 (_dataInput *input, spCurveTimeline2 *timeline,
     float time = readFloat(input);
     float value1 = readFloat(input) * scale;
     float value2 = readFloat(input) * scale;
-    for (frame = 0, bezier = 0, frameLast = spTimeline_getFrameCount(SUPER(timeline)) - 1;; frame++) {
+    for (frame = 0, bezier = 0, frameLast = timeline->super.frameCount - 1;; frame++) {
         spCurveTimeline2_setFrame(timeline, frame, time, value1, value2);
         if (frame == frameLast) break;
         time2 = readFloat(input);
@@ -697,7 +697,7 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
                     mixRotate = readFloat(input);
                     mixX = readFloat(input);
                     mixY = readFloat(input);
-                    for (frame = 0, bezier = 0, frameLast = spTimeline_getFrameCount(SUPER(SUPER(timeline))) - 1;; frame++) {
+                    for (frame = 0, bezier = 0, frameLast = timeline->super.super.frameCount - 1;; frame++) {
                         float time2, mixRotate2, mixX2, mixY2;
                         spPathConstraintMixTimeline_setFrame(timeline, frame, time, mixRotate, mixX, mixY);
                         if (frame == frameLast) break;
