@@ -3,6 +3,7 @@
 The spine-love runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [LÖVE](https://love2d.org/). spine-love is based on [spine-lua](../spine-lua).
 
 ## Licensing
+
 You are welcome to evaluate the Spine Runtimes and the examples we provide in this repository free of charge.
 
 You can integrate the Spine Runtimes into your software free of charge, but users of your software must have their own [Spine license](https://esotericsoftware.com/spine-purchase). Please make your users aware of this requirement! This option is often chosen by those making development tools, such as an SDK, game toolkit, or software library.
@@ -15,7 +16,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 spine-love works with data exported from Spine 3.9.x.
 
-spine-love supports all Spine features except for blending modes other than normal.
+spine-love supports all Spine features except for blending modes other than `normal`.
 
 spine-love does not yet support loading the binary format.
 
@@ -32,11 +33,12 @@ Alternatively, the `spine-lua` and `spine-love/spine-love` directories can be co
  * To enable two color tinting, pass `true` to `SkeletonRenderer.new()`.
 
 ## Examples
+
 If you want to run and debug the example project, use IntelliJ IDEA with the EmmyLua plugin.
 
-1. Install IntelliJ IDEA and the EmmyLua plugin.
-2. Install LÖVE.
-3. Copy the contents of `spine-lua` to `spine-love/spine-lua`.
+1. Install [IntelliJ IDEA](https://www.jetbrains.com/idea/) and the [EmmyLua plugin](https://plugins.jetbrains.com/plugin/9768-emmylua).
+2. Install [LÖVE](https://love2d.org/).
+3. Copy the `spine-lua/spine-lua` folder to `spine-love`.
 4. Open the `spine-love` folder in IntelliJ IDEA.
 5. Create a new launch configuration of the type `Lua Application`, with the following settings
     1.  `Program` should point at the `love` or `love.exe` executable, e.g. `/Applications/love.app/Contents/MacOS/love` on macOS.

@@ -23,10 +23,9 @@ spine-corona does not yet support loading the binary format.
 ## Setup
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it as a zip via the download button above.
-1. Copy the contents of `spine-lua` to `spine-corona/spine-lua`.
-1. Run the `main.lua` file using Corona. Tap/click to switch between skeletons
+2. Copy the `spine-lua/spine-lua` folder to `spine-corona`.
+3. Run the `main.lua` file using Corona. Tap/click to switch between skeletons
 
-Alternatively, the `spine-lua` and `spine-corona/spine-corona` directories can be copied into your project. Note that the require statements use `spine-lua.Xxx`, so the spine-lua files must be in a `spine-lua` directory in your project.
+Alternatively, the `spine-lua` and `spine-corona/spine-corona` directories can be copied into your project. Note that the spine-corona `require` statements use `spine-lua.Xxx`, so the spine-lua files must be in a `spine-lua` directory in your project.
 
-When using the `EmmyLua` plugin for IntelliJ IDEA, create a launch configuration pointing at the `Corona Simulator` executable (e.g. ` /Applications/Corona/Corona Simulator.app/Contents/MacOS/Corona Simulator` on macOS), set the working directory to `spine-corona` and set the parameters to `main.lua`.
-
+When using the `EmmyLua` plugin for IntelliJ IDEA, create a launch configuration pointing at the `Corona Simulator` executable (e.g. ` /Applications/Corona/Corona Simulator.app/Contents/MacOS/Corona Simulator` on macOS), set the working directory to `spine-corona`, and set the parameters to `main.lua`.
