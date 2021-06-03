@@ -10,6 +10,7 @@ canvas { position: absolute; width: 100% ;height: 100%; }
 <canvas id="canvas"></canvas>
 <center>
 <div style="color: #fff; position: fixed; top: 0; width: 100%">
+<span>Format:</span><select id="formatList"></select>
 <span>Skeleton:</span><select id="skeletonList"></select>
 <span>Animation:</span><select id="animationList"></select>
 <span>Skin:</span><select id="skinList"></select>
@@ -32,6 +33,7 @@ var shapes;
 
 var lastFrameTime;
 var skeletons = {};
+var format = "JSON";
 var activeSkeleton = "spineboy";
 var pow2 = new spine.Pow(2);
 var swirlEffect = new spine.SwirlEffect(0);
@@ -68,21 +70,28 @@ function init () {
 	debugShader = spine.webgl.Shader.newColored(gl);
 	shapes = new spine.webgl.ShapeRenderer(gl);
 
-	// Tell AssetManager to load the resources for each skeleton, including the exported .skel file, the .atlas file and the .png
+	// Tell AssetManager to load the resources for each skeleton, including the exported data file, the .atlas file and the .png
 	// file for the atlas. We then wait until all resources are loaded in the load() method.
 	assetManager.loadBinary("assets/spineboy-pro.skel");
+	assetManager.loadText("assets/spineboy-pro.json");
 	assetManager.loadTextureAtlas("assets/spineboy-pma.atlas");
 	assetManager.loadBinary("assets/raptor-pro.skel");
+	assetManager.loadText("assets/raptor-pro.json");
 	assetManager.loadTextureAtlas("assets/raptor-pma.atlas");
 	assetManager.loadBinary("assets/tank-pro.skel");
+	assetManager.loadText("assets/tank-pro.json");
 	assetManager.loadTextureAtlas("assets/tank-pma.atlas");
 	assetManager.loadBinary("assets/goblins-pro.skel");
+	assetManager.loadText("assets/goblins-pro.json");
 	assetManager.loadTextureAtlas("assets/goblins-pma.atlas");
 	assetManager.loadBinary("assets/vine-pro.skel");
+	assetManager.loadText("assets/vine-pro.json");
 	assetManager.loadTextureAtlas("assets/vine-pma.atlas");
 	assetManager.loadBinary("assets/stretchyman-pro.skel");
+	assetManager.loadText("assets/stretchyman-pro.json");
 	assetManager.loadTextureAtlas("assets/stretchyman-pma.atlas");
 	assetManager.loadBinary("assets/coin-pro.skel");
+	assetManager.loadText("assets/coin-pro.json");
 	assetManager.loadTextureAtlas("assets/coin-pma.atlas");
 	assetManager.loadBinary("assets/mix-and-match-pro.skel");
 	assetManager.loadText("assets/mix-and-match-pro.json");
@@ -93,15 +102,40 @@ function init () {
 function load () {
 	// Wait until the AssetManager has loaded all resources, then load the skeletons.
 	if (assetManager.isLoadingComplete()) {
-		skeletons["coin"] = loadSkeleton("coin-pro.skel", "animation", true);
-		skeletons["goblins"] = loadSkeleton("goblins-pro.skel", "walk", true, "goblin");
-		skeletons["mix-and-match-skel"] = loadSkeleton("mix-and-match-pro.skel", "dance", true, "full-skins/girl-blue-cape");
-		skeletons["mix-and-match-json"] = loadSkeleton("mix-and-match-pro.json", "dance", true, "full-skins/girl-blue-cape");
-		skeletons["raptor"] = loadSkeleton("raptor-pro.skel", "walk", true);
-		skeletons["spineboy"] = loadSkeleton("spineboy-pro.skel", "run", true);
-		skeletons["stretchyman"] = loadSkeleton("stretchyman-pro.skel", "sneak", true);
-		skeletons["tank"] = loadSkeleton("tank-pro.skel", "drive", true);
-		skeletons["vine"] = loadSkeleton("vine-pro.skel", "grow", true);
+		skeletons = {
+			coin: {
+				Binary: loadSkeleton("coin-pro.skel", "animation", true),
+				JSON: loadSkeleton("coin-pro.json", "animation", true)
+			},
+			goblins: {
+				Binary: loadSkeleton("goblins-pro.skel", "walk", true, "goblin"),
+				JSON: loadSkeleton("goblins-pro.json", "walk", true, "goblin")
+			},
+			"mix-and-match-pro": {
+				Binary: loadSkeleton("mix-and-match-pro.skel", "dance", true, "full-skins/girl-blue-cape"),
+				JSON: loadSkeleton("mix-and-match-pro.json", "dance", true, "full-skins/girl-blue-cape")
+			},
+			raptor: {
+				Binary: loadSkeleton("raptor-pro.skel", "walk", true),
+				JSON: loadSkeleton("raptor-pro.json", "walk", true)
+			},
+			spineboy: {
+				Binary: loadSkeleton("spineboy-pro.skel", "run", true),
+				JSON: loadSkeleton("spineboy-pro.json", "run", true)
+			},
+			stretchyman: {
+				Binary: loadSkeleton("stretchyman-pro.skel", "sneak", true),
+				JSON: loadSkeleton("stretchyman-pro.json", "sneak", true)
+			},
+			tank: {
+				Binary: loadSkeleton("tank-pro.skel", "drive", true),
+				JSON: loadSkeleton("tank-pro.json", "drive", true)
+			},
+			vine: {
+				Binary: loadSkeleton("vine-pro.skel", "grow", true),
+				JSON: loadSkeleton("vine-pro.json", "grow", true)
+			}
+		};
 		setupUI();
 		lastFrameTime = Date.now() / 1000;
 		requestAnimationFrame(render); // Loading is done, call render every frame.
@@ -131,7 +165,7 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	// Create an AnimationState, and set the initial animation in looping mode.
 	var animationStateData = new spine.AnimationStateData(skeleton.data);
 	var animationState = new spine.AnimationState(animationStateData);
-	if (name == "spineboy-pro.skel") {
+	if (name == "spineboy-pro.skel" || name == "spineboy-pro.json") {
 		animationStateData.setMix("walk", "run", 1.5)
 		animationStateData.setMix("run", "jump", 0.2)
 		animationStateData.setMix("jump", "run", 0.4);
@@ -185,6 +219,9 @@ function calculateSetupPoseBounds(skeleton) {
 }
 
 function setupUI () {
+	var formatList = $("#formatList");
+	formatList.append($("<option>Binary</option>"));
+	formatList.append($("<option>JSON</option>"));
 	var skeletonList = $("#skeletonList");
 	for (var skeletonName in skeletons) {
 		var option = $("<option></option>");
@@ -203,8 +240,8 @@ function setupUI () {
 	var setupAnimationUI = function() {
 		var animationList = $("#animationList");
 		animationList.empty();
-		var skeleton = skeletons[activeSkeleton].skeleton;
-		var state = skeletons[activeSkeleton].state;
+		var skeleton = skeletons[activeSkeleton][format].skeleton;
+		var state = skeletons[activeSkeleton][format].state;
 		var activeAnimation = state.tracks[0].animation.name;
 		for (var i = 0; i < skeleton.data.animations.length; i++) {
 			var name = skeleton.data.animations[i].name;
@@ -215,8 +252,8 @@ function setupUI () {
 		}
 
 		animationList.change(function() {
-			var state = skeletons[activeSkeleton].state;
-			var skeleton = skeletons[activeSkeleton].skeleton;
+			var state = skeletons[activeSkeleton][format].state;
+			var skeleton = skeletons[activeSkeleton][format].skeleton;
 			var animationName = $("#animationList option:selected").text();
 			skeleton.setToSetupPose();
 			state.setAnimation(0, animationName, true);
@@ -226,7 +263,7 @@ function setupUI () {
 	var setupSkinUI = function() {
 		var skinList = $("#skinList");
 		skinList.empty();
-		var skeleton = skeletons[activeSkeleton].skeleton;
+		var skeleton = skeletons[activeSkeleton][format].skeleton;
 		var activeSkin = skeleton.skin == null ? "default" : skeleton.skin.name;
 		for (var i = 0; i < skeleton.data.skins.length; i++) {
 			var name = skeleton.data.skins[i].name;
@@ -237,7 +274,7 @@ function setupUI () {
 		}
 
 		skinList.change(function() {
-			var skeleton = skeletons[activeSkeleton].skeleton;
+			var skeleton = skeletons[activeSkeleton][format].skeleton;
 			var skinName = $("#skinList option:selected").text();
 			skeleton.setSkinByName(skinName);
 			skeleton.setSlotsToSetupPose();
@@ -249,6 +286,13 @@ function setupUI () {
 		setupAnimationUI();
 		setupSkinUI();
 	})
+
+	formatList.change(function() {
+		format = $("#formatList option:selected").text();
+		setupAnimationUI();
+		setupSkinUI();
+	})
+
 	setupAnimationUI();
 	setupSkinUI();
 }
@@ -265,10 +309,10 @@ function render () {
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 	// Apply the animation state based on the delta time.
-	var skeleton = skeletons[activeSkeleton].skeleton;
-	var state = skeletons[activeSkeleton].state;
-	var bounds = skeletons[activeSkeleton].bounds;
-	var premultipliedAlpha = skeletons[activeSkeleton].premultipliedAlpha;
+	var skeleton = skeletons[activeSkeleton][format].skeleton;
+	var state = skeletons[activeSkeleton][format].state;
+	var bounds = skeletons[activeSkeleton][format].bounds;
+	var premultipliedAlpha = skeletons[activeSkeleton][format].premultipliedAlpha;
 	state.update(delta);
 	state.apply(skeleton);
 	skeleton.updateWorldTransform();
@@ -326,7 +370,7 @@ function resize () {
 	}
 
 	// Calculations to center the skeleton in the canvas.
-	var bounds = skeletons[activeSkeleton].bounds;
+	var bounds = skeletons[activeSkeleton][format].bounds;
 	var centerX = bounds.offset.x + bounds.size.x / 2;
 	var centerY = bounds.offset.y + bounds.size.y / 2;
 	var scaleX = bounds.size.x / canvas.width;
