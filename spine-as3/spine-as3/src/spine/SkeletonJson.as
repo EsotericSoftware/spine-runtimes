@@ -202,7 +202,7 @@ package spine {
 				if (pathData.spacingMode == SpacingMode.length || pathData.spacingMode == SpacingMode.fixed) pathData.spacing *= scale;
 				pathData.mixRotate = getNumber(constraintMap, "mixRotate", 1);
 				pathData.mixX = getNumber(constraintMap, "mixX", 1);
-				pathData.mixY = getNumber(constraintMap, "mixY", 1);
+				pathData.mixY = getNumber(constraintMap, "mixY", pathData.mixX);
 
 				skeletonData.pathConstraints.push(pathData);
 			}

@@ -216,7 +216,7 @@ module spine {
 					if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed) data.spacing *= scale;
 					data.mixRotate = getValue(constraintMap, "mixRotate", 1);
 					data.mixX = getValue(constraintMap, "mixX", 1);
-					data.mixY = getValue(constraintMap, "mixY", 1);
+					data.mixY = getValue(constraintMap, "mixY", data.mixX);
 
 					skeletonData.pathConstraints.push(data);
 				}
@@ -697,11 +697,11 @@ module spine {
 
 					let time = getValue(keyMap, "time", 0);
 					let mixRotate = getValue(keyMap, "mixRotate", 1);
-					let mixShearY = getValue(keyMap, "mixShearY", 1);
 					let mixX = getValue(keyMap, "mixX", 1);
 					let mixY = getValue(keyMap, "mixY", mixX);
 					let mixScaleX = getValue(keyMap, "mixScaleX", 1);
 					let mixScaleY = getValue(keyMap, "mixScaleY", mixScaleX);
+					let mixShearY = getValue(keyMap, "mixShearY", 1);
 
 					for (let frame = 0, bezier = 0;; frame++) {
 						timeline.setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
@@ -710,11 +710,11 @@ module spine {
 
 						let time2 = getValue(nextMap, "time", 0);
 						let mixRotate2 = getValue(nextMap, "mixRotate", 1);
-						let mixShearY2 = getValue(nextMap, "mixShearY", 1);
 						let mixX2 = getValue(nextMap, "mixX", 1);
 						let mixY2 = getValue(nextMap, "mixY", mixX2);
 						let mixScaleX2 = getValue(nextMap, "mixScaleX", 1);
 						let mixScaleY2 = getValue(nextMap, "mixScaleY", mixScaleX2);
+						let mixShearY2 = getValue(nextMap, "mixShearY", 1);
 						let curve = keyMap.curve;
 						if (curve) {
 							bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);

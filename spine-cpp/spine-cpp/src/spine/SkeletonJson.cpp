@@ -349,12 +349,12 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			data->_offsetScaleY = Json::getFloat(constraintMap, "scaleY", 0);
 			data->_offsetShearY = Json::getFloat(constraintMap, "shearY", 0);
 
-            data->_mixRotate = Json::getFloat(constraintMap, "mixRotate", 1);
-            data->_mixX = Json::getFloat(constraintMap, "mixX", 1);
-            data->_mixY = Json::getFloat(constraintMap, "mixY", data->_mixX);
-            data->_mixScaleX = Json::getFloat(constraintMap, "mixScaleX", 1);
-            data->_mixScaleY = Json::getFloat(constraintMap, "mixScaleY", data->_mixScaleX);
-            data->_mixShearY = Json::getFloat(constraintMap, "mixShearY", 1);
+			data->_mixRotate = Json::getFloat(constraintMap, "mixRotate", 1);
+			data->_mixX = Json::getFloat(constraintMap, "mixX", 1);
+			data->_mixY = Json::getFloat(constraintMap, "mixY", data->_mixX);
+			data->_mixScaleX = Json::getFloat(constraintMap, "mixScaleX", 1);
+			data->_mixScaleY = Json::getFloat(constraintMap, "mixScaleY", data->_mixScaleX);
+			data->_mixShearY = Json::getFloat(constraintMap, "mixShearY", 1);
 
 			skeletonData->_transformConstraints[i] = data;
 		}
@@ -418,7 +418,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			if (data->_spacingMode == SpacingMode_Length || data->_spacingMode == SpacingMode_Fixed) data->_spacing *= _scale;
 			data->_mixRotate = Json::getFloat(constraintMap, "mixRotate", 1);
 			data->_mixX = Json::getFloat(constraintMap, "mixX", 1);
-            data->_mixY = Json::getFloat(constraintMap, "mixY", 1);
+			data->_mixY = Json::getFloat(constraintMap, "mixY", data->_mixX);
 
 			skeletonData->_pathConstraints[i] = data;
 		}

@@ -271,8 +271,7 @@ namespace Spine {
 					if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed) data.spacing *= scale;
 					data.mixRotate = GetFloat(constraintMap, "mixRotate", 1);
 					data.mixX = GetFloat(constraintMap, "mixX", 1);
-					data.mixY = GetFloat(constraintMap, "mixY", 1);
-
+					data.mixY = GetFloat(constraintMap, "mixY", data.mixX);
 
 					skeletonData.pathConstraints.Add(data);
 				}

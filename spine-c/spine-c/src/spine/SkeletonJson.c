@@ -1085,9 +1085,9 @@ spSkeletonData* spSkeletonJson_readSkeletonData (spSkeletonJson* self, const cha
 			if (data->positionMode == SP_POSITION_MODE_FIXED) data->position *= self->scale;
 			data->spacing = Json_getFloat(constraintMap, "spacing", 0);
 			if (data->spacingMode == SP_SPACING_MODE_LENGTH || data->spacingMode == SP_SPACING_MODE_FIXED) data->spacing *= self->scale;
-            data->mixRotate = Json_getFloat(constraintMap, "mixRotate", 1);
-            data->mixX = Json_getFloat(constraintMap, "mixX", 1);
-            data->mixY = Json_getFloat(constraintMap, "mixY", 1);
+			data->mixRotate = Json_getFloat(constraintMap, "mixRotate", 1);
+			data->mixX = Json_getFloat(constraintMap, "mixX", 1);
+			data->mixY = Json_getFloat(constraintMap, "mixY", data->mixX);
 
 			skeletonData->pathConstraints[i] = data;
 		}
