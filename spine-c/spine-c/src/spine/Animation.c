@@ -221,11 +221,11 @@ float _spCurveTimeline_getBezierValue(spCurveTimeline* self, float time, int fra
 }
 
 void spCurveTimeline_setLinear (spCurveTimeline* self, int frameIndex) {
-	self->curves->items[frameIndex * BEZIER_SIZE] = CURVE_LINEAR;
+	self->curves->items[frameIndex] = CURVE_LINEAR;
 }
 
 void spCurveTimeline_setStepped (spCurveTimeline* self, int frameIndex) {
-	self->curves->items[frameIndex * BEZIER_SIZE] = CURVE_STEPPED;
+	self->curves->items[frameIndex] = CURVE_STEPPED;
 }
 
 #define CURVE1_ENTRIES 2
