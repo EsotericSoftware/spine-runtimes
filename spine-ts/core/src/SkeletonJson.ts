@@ -73,10 +73,7 @@ module spine {
 
 					let parent: BoneData = null;
 					let parentName: string = getValue(boneMap, "parent", null);
-					if (parentName) {
-						parent = skeletonData.findBone(parentName);
-						if (!parent) throw new Error("Parent bone not found: " + parentName);
-					}
+					if (parentName) parent = skeletonData.findBone(parentName);
 					let data = new BoneData(skeletonData.bones.length, boneMap.name, parent);
 					data.length = getValue(boneMap, "length", 0) * scale;
 					data.x = getValue(boneMap, "x", 0) * scale;
@@ -100,11 +97,8 @@ module spine {
 			if (root.slots) {
 				for (let i = 0; i < root.slots.length; i++) {
 					let slotMap = root.slots[i];
-					let slotName: string = slotMap.name;
-					let boneName: string = slotMap.bone;
-					let boneData = skeletonData.findBone(boneName);
-					if (!boneData) throw new Error("Slot bone not found: " + boneName);
-					let data = new SlotData(skeletonData.slots.length, slotName, boneData);
+					let boneData = skeletonData.findBone(slotMap.bone);
+					let data = new SlotData(skeletonData.slots.length, slotMap.name, boneData);
 
 					let color: string = getValue(slotMap, "color", null);
 					if (color) data.color.setFromString(color);
@@ -126,16 +120,10 @@ module spine {
 					data.order = getValue(constraintMap, "order", 0);
 					data.skinRequired = getValue(constraintMap, "skin", false);
 
-					for (let ii = 0; ii < constraintMap.bones.length; ii++) {
-						let boneName = constraintMap.bones[ii];
-						let bone = skeletonData.findBone(boneName);
-						if (!bone) throw new Error("IK bone not found: " + boneName);
-						data.bones.push(bone);
-					}
+					for (let ii = 0; ii < constraintMap.bones.length; ii++)
+						data.bones.push(skeletonData.findBone(constraintMap.bones[ii]));
 
-					let targetName: string = constraintMap.target;
-					data.target = skeletonData.findBone(targetName);
-					if (!data.target) throw new Error("IK target bone not found: " + targetName);
+					data.target = skeletonData.findBone(constraintMap.target);
 
 					data.mix = getValue(constraintMap, "mix", 1);
 					data.softness = getValue(constraintMap, "softness", 0) * scale;
@@ -156,16 +144,11 @@ module spine {
 					data.order = getValue(constraintMap, "order", 0);
 					data.skinRequired = getValue(constraintMap, "skin", false);
 
-					for (let ii = 0; ii < constraintMap.bones.length; ii++) {
-						let boneName = constraintMap.bones[ii];
-						let bone = skeletonData.findBone(boneName);
-						if (!bone) throw new Error("Transform constraint bone not found: " + boneName);
-						data.bones.push(bone);
-					}
+					for (let ii = 0; ii < constraintMap.bones.length; ii++)
+						data.bones.push(skeletonData.findBone(constraintMap.bones[ii]));
 
 					let targetName: string = constraintMap.target;
 					data.target = skeletonData.findBone(targetName);
-					if (!data.target) throw new Error("Transform constraint target bone not found: " + targetName);
 
 					data.local = getValue(constraintMap, "local", false);
 					data.relative = getValue(constraintMap, "relative", false);
@@ -195,16 +178,11 @@ module spine {
 					data.order = getValue(constraintMap, "order", 0);
 					data.skinRequired = getValue(constraintMap, "skin", false);
 
-					for (let ii = 0; ii < constraintMap.bones.length; ii++) {
-						let boneName = constraintMap.bones[ii];
-						let bone = skeletonData.findBone(boneName);
-						if (!bone) throw new Error("Transform constraint bone not found: " + boneName);
-						data.bones.push(bone);
-					}
+					for (let ii = 0; ii < constraintMap.bones.length; ii++)
+						data.bones.push(skeletonData.findBone(constraintMap.bones[ii]));
 
 					let targetName: string = constraintMap.target;
 					data.target = skeletonData.findSlot(targetName);
-					if (!data.target) throw new Error("Path target slot not found: " + targetName);
 
 					data.positionMode = Utils.enumValue(PositionMode, getValue(constraintMap, "positionMode", "Percent"));
 					data.spacingMode = Utils.enumValue(SpacingMode, getValue(constraintMap, "spacingMode", "Length"));
@@ -229,40 +207,27 @@ module spine {
 					let skin = new Skin(skinMap.name);
 
 					if (skinMap.bones) {
-						for (let ii = 0; ii < skinMap.bones.length; ii++) {
-							let bone = skeletonData.findBone(skinMap.bones[ii]);
-							if (!bone) throw new Error("Skin bone not found: " + skinMap.bones[i]);
-							skin.bones.push(bone);
-						}
+						for (let ii = 0; ii < skinMap.bones.length; ii++)
+							skin.bones.push(skeletonData.findBone(skinMap.bones[ii]));
 					}
 
 					if (skinMap.ik) {
-						for (let ii = 0; ii < skinMap.ik.length; ii++) {
-							let constraint = skeletonData.findIkConstraint(skinMap.ik[ii]);
-							if (!constraint) throw new Error("Skin IK constraint not found: " + skinMap.ik[i]);
-							skin.constraints.push(constraint);
-						}
+						for (let ii = 0; ii < skinMap.ik.length; ii++)
+							skin.constraints.push(skeletonData.findIkConstraint(skinMap.ik[ii]));
 					}
 
 					if (skinMap.transform) {
-						for (let ii = 0; ii < skinMap.transform.length; ii++) {
-							let constraint = skeletonData.findTransformConstraint(skinMap.transform[ii]);
-							if (!constraint) throw new Error("Skin transform constraint not found: " + skinMap.transform[i]);
-							skin.constraints.push(constraint);
-						}
+						for (let ii = 0; ii < skinMap.transform.length; ii++)
+							skin.constraints.push(skeletonData.findTransformConstraint(skinMap.transform[ii]));
 					}
 
 					if (skinMap.path) {
-						for (let ii = 0; ii < skinMap.path.length; ii++) {
-							let constraint = skeletonData.findPathConstraint(skinMap.path[ii]);
-							if (!constraint) throw new Error("Skin path constraint not found: " + skinMap.path[i]);
-							skin.constraints.push(constraint);
-						}
+						for (let ii = 0; ii < skinMap.path.length; ii++)
+							skin.constraints.push(skeletonData.findPathConstraint(skinMap.path[ii]));
 					}
 
 					for (let slotName in skinMap.attachments) {
 						let slot = skeletonData.findSlot(slotName);
-						if (!slot) throw new Error("Slot not found: " + slotName);
 						let slotMap = skinMap.attachments[slotName];
 						for (let entryName in slotMap) {
 							let attachment = this.readAttachment(slotMap[entryName], skin, slot.index, entryName, skeletonData);
@@ -278,9 +243,7 @@ module spine {
 			for (let i = 0, n = this.linkedMeshes.length; i < n; i++) {
 				let linkedMesh = this.linkedMeshes[i];
 				let skin = !linkedMesh.skin ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
-				if (!skin) throw new Error("Skin not found: " + linkedMesh.skin);
 				let parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-				if (!parent) throw new Error("Parent mesh not found: " + linkedMesh.parent);
 				linkedMesh.mesh.deformAttachment = linkedMesh.inheritDeform ? <VertexAttachment>parent : <VertexAttachment>linkedMesh.mesh;
 				linkedMesh.mesh.setParentMesh(<MeshAttachment> parent);
 				linkedMesh.mesh.updateUVs();
@@ -410,11 +373,7 @@ module spine {
 					if (!clip) return null;
 
 					let end = getValue(map, "end", null);
-					if (end) {
-						let slot = skeletonData.findSlot(end);
-						if (!slot) throw new Error("Clipping end slot not found: " + end);
-						clip.endSlot = slot;
-					}
+					if (end) clip.endSlot = skeletonData.findSlot(end);
 
 					let vertexCount = map.vertexCount;
 					this.readVertices(map, clip, vertexCount << 1);
@@ -465,7 +424,6 @@ module spine {
 				for (let slotName in map.slots) {
 					let slotMap = map.slots[slotName];
 					let slotIndex = skeletonData.findSlotIndex(slotName);
-					if (slotIndex == -1) throw new Error("Slot not found: " + slotName);
 					for (let timelineName in slotMap) {
 						let timelineMap = slotMap[timelineName];
 						if (!timelineMap) continue;
@@ -606,9 +564,7 @@ module spine {
 							}
 
 							timelines.push(timeline);
-
-						} else
-							throw new Error("Invalid timeline type for a slot: " + timelineName + " (" + slotName + ")");
+						}
 					}
 				}
 			}
@@ -618,7 +574,6 @@ module spine {
 				for (let boneName in map.bones) {
 					let boneMap = map.bones[boneName];
 					let boneIndex = skeletonData.findBoneIndex(boneName);
-					if (boneIndex == -1) throw new Error("Bone not found: " + boneName);
 					for (let timelineName in boneMap) {
 						let timelineMap = boneMap[timelineName];
 						if (timelineMap.length == 0) continue;
@@ -652,8 +607,7 @@ module spine {
 						} else if (timelineName === "sheary") {
 							let timeline = new ShearYTimeline(timelineMap.length, timelineMap.length, boneIndex);
 							timelines.push(readTimeline1(timelineMap, timeline, 0, 1));
-						} else
-							throw new Error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
+						}
 					}
 				}
 			}
@@ -813,18 +767,15 @@ module spine {
 				for (let deformName in map.deform) {
 					let deformMap = map.deform[deformName];
 					let skin = skeletonData.findSkin(deformName);
-					if (!skin) throw new Error("Skin not found: " + deformName);
 					for (let slotName in deformMap) {
 						let slotMap = deformMap[slotName];
 						let slotIndex = skeletonData.findSlotIndex(slotName);
-						if (slotIndex == -1) throw new Error("Slot not found: " + slotMap.name);
 						for (let timelineName in slotMap) {
 							let timelineMap = slotMap[timelineName];
 							let keyMap = timelineMap[0];
 							if (!keyMap) continue;
 
 							let attachment = <VertexAttachment>skin.getAttachment(slotIndex, timelineName);
-							if (!attachment) throw new Error("Deform attachment not found: " + timelineMap.name);
 							let weighted = attachment.bones;
 							let vertices = attachment.vertices;
 							let deformLength = weighted ? vertices.length / 3 * 2 : vertices.length;
@@ -884,7 +835,6 @@ module spine {
 						for (let ii = 0; ii < offsets.length; ii++) {
 							let offsetMap = offsets[ii];
 							let slotIndex = skeletonData.findSlotIndex(offsetMap.slot);
-							if (slotIndex == -1) throw new Error("Slot not found: " + offsetMap.slot);
 							// Collect unchanged items.
 							while (originalIndex != slotIndex)
 								unchanged[unchangedIndex++] = originalIndex++;
@@ -910,7 +860,6 @@ module spine {
 				for (let i = 0; i < map.events.length; i++, frame++) {
 					let eventMap = map.events[i];
 					let eventData = skeletonData.findEvent(eventMap.name);
-					if (!eventData) throw new Error("Event not found: " + eventMap.name);
 					let event = new Event(Utils.toSinglePrecision(getValue(eventMap, "time", 0)), eventData);
 					event.intValue = getValue(eventMap, "int", eventData.intValue);
 					event.floatValue = getValue(eventMap, "float", eventData.floatValue);

@@ -204,9 +204,7 @@ module spine {
 			for (let i = 0; i < n; i++) {
 				let linkedMesh = this.linkedMeshes[i];
 				let skin = !linkedMesh.skin ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
-				if (!skin) throw new Error("Skin not found: " + linkedMesh.skin);
 				let parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-				if (!parent) throw new Error("Parent mesh not found: " + linkedMesh.parent);
 				linkedMesh.mesh.deformAttachment = linkedMesh.inheritDeform ? parent as VertexAttachment : linkedMesh.mesh;
 				linkedMesh.mesh.setParentMesh(parent as MeshAttachment);
 				linkedMesh.mesh.updateUVs();
@@ -839,7 +837,6 @@ module spine {
 					for (let iii = 0, nnn = input.readInt(true); iii < nnn; iii++) {
 						let attachmentName = input.readStringRef();
 						let attachment = skin.getAttachment(slotIndex, attachmentName) as VertexAttachment;
-						if (!attachment) throw Error("Vertex attachment not found: " + attachmentName);
 						let weighted = attachment.bones;
 						let vertices = attachment.vertices;
 						let deformLength = weighted ? vertices.length / 3 * 2 : vertices.length;
