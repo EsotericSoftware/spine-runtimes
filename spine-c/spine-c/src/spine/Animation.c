@@ -1419,7 +1419,7 @@ spRGBA2Timeline* spRGBA2Timeline_create (int framesCount, int bezierCount, int s
 
 void spRGBA2Timeline_setFrame (spRGBA2Timeline* self, int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
     float *frames = self->super.super.frames->items;
-    frameIndex *= RGBA_ENTRIES;
+    frameIndex *= RGBA2_ENTRIES;
     frames[frameIndex] = time;
     frames[frameIndex + COLOR_R] = r;
     frames[frameIndex + COLOR_G] = g;
@@ -1482,12 +1482,12 @@ void _spRGB2Timeline_apply (spTimeline* timeline, spSkeleton* skeleton, float la
             g2 = frames[i + COLOR2_G2];
             b2 = frames[i + COLOR2_B2];
             t = (time - before) / (frames[i + RGB2_ENTRIES] - before);
-            r += (frames[i + RGBA2_ENTRIES + COLOR_R] - r) * t;
-            g += (frames[i + RGBA2_ENTRIES + COLOR_G] - g) * t;
-            b += (frames[i + RGBA2_ENTRIES + COLOR_B] - b) * t;
-            r2 += (frames[i + RGBA2_ENTRIES + COLOR2_R2] - r2) * t;
-            g2 += (frames[i + RGBA2_ENTRIES + COLOR2_G2] - g2) * t;
-            b2 += (frames[i + RGBA2_ENTRIES + COLOR2_B2] - b2) * t;
+            r += (frames[i + RGB2_ENTRIES + COLOR_R] - r) * t;
+            g += (frames[i + RGB2_ENTRIES + COLOR_G] - g) * t;
+            b += (frames[i + RGB2_ENTRIES + COLOR_B] - b) * t;
+            r2 += (frames[i + RGB2_ENTRIES + COLOR2_R2] - r2) * t;
+            g2 += (frames[i + RGB2_ENTRIES + COLOR2_G2] - g2) * t;
+            b2 += (frames[i + RGB2_ENTRIES + COLOR2_B2] - b2) * t;
             break;
         }
         case CURVE_STEPPED: {
@@ -1547,7 +1547,7 @@ spRGB2Timeline* spRGB2Timeline_create (int framesCount, int bezierCount, int slo
 
 void spRGB2Timeline_setFrame (spRGB2Timeline* self, int frameIndex, float time, float r, float g, float b, float r2, float g2, float b2) {
     float *frames = self->super.super.frames->items;
-    frameIndex *= RGBA_ENTRIES;
+    frameIndex *= RGB2_ENTRIES;
     frames[frameIndex] = time;
     frames[frameIndex + COLOR_R] = r;
     frames[frameIndex + COLOR_G] = g;
@@ -2292,7 +2292,7 @@ spTransformConstraintTimeline* spTransformConstraintTimeline_create (int framesC
   spTransformConstraintTimeline* timeline = NEW(spTransformConstraintTimeline);
   spPropertyId ids[1];
   ids[0] = ((spPropertyId)SP_PROPERTY_TRANSFORMCONSTRAINT << 32) | transformConstraintIndex;
-  _spCurveTimeline_init(SUPER(timeline), framesCount, IKCONSTRAINT_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_TRANSFORMCONSTRAINT, _spCurveTimeline_dispose, _spTransformConstraintTimeline_apply, _spCurveTimeline_setBezier);
+  _spCurveTimeline_init(SUPER(timeline), framesCount, TRANSFORMCONSTRAINT_ENTRIES, bezierCount, ids, 1, SP_TIMELINE_TRANSFORMCONSTRAINT, _spCurveTimeline_dispose, _spTransformConstraintTimeline_apply, _spCurveTimeline_setBezier);
   timeline->transformConstraintIndex = transformConstraintIndex;
   return timeline;
 }
