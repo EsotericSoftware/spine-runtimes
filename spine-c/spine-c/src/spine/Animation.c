@@ -199,13 +199,13 @@ void _spCurveTimeline_setBezier (spTimeline* timeline, int bezier, int frame, fl
     }
 }
 
-float _spCurveTimeline_getBezierValue(spCurveTimeline* self, float time, int frame, int valueOffset, int i) {
+float _spCurveTimeline_getBezierValue(spCurveTimeline* self, float time, int frameIndex, int valueOffset, int i) {
     float* curves = self->curves->items;
     float* frames = SUPER(self)->frames->items;
     float x, y;
     int n;
     if (curves[i] > time) {
-        x = frames[frame]; y = frames[frame + valueOffset];
+        x = frames[frameIndex]; y = frames[frameIndex + valueOffset];
         return y + (time - x) / (curves[i] - x) * (curves[i + 1] - y);
     }
     n = i + BEZIER_SIZE;
@@ -215,17 +215,17 @@ float _spCurveTimeline_getBezierValue(spCurveTimeline* self, float time, int fra
             return y + (time - x) / (curves[i] - x) * (curves[i + 1] - y);
         }
     }
-    frame += self->super.frameEntries;
+    frameIndex += self->super.frameEntries;
     x = curves[n - 2]; y = curves[n - 1];
-    return y + (time - x) / (frames[frame] - x) * (frames[frame + valueOffset] - y);
+    return y + (time - x) / (frames[frameIndex] - x) * (frames[frameIndex + valueOffset] - y);
 }
 
-void spCurveTimeline_setLinear (spCurveTimeline* self, int frameIndex) {
-	self->curves->items[frameIndex] = CURVE_LINEAR;
+void spCurveTimeline_setLinear (spCurveTimeline* self, int frame) {
+	self->curves->items[frame] = CURVE_LINEAR;
 }
 
-void spCurveTimeline_setStepped (spCurveTimeline* self, int frameIndex) {
-	self->curves->items[frameIndex] = CURVE_STEPPED;
+void spCurveTimeline_setStepped (spCurveTimeline* self, int frame) {
+	self->curves->items[frame] = CURVE_STEPPED;
 }
 
 #define CURVE1_ENTRIES 2
@@ -327,8 +327,8 @@ spRotateTimeline* spRotateTimeline_create (int frameCount, int bezierCount, int 
     return timeline;
 }
 
-void spRotateTimeline_setFrame (spRotateTimeline* self, int frameIndex, float time, float degrees) {
-    spCurveTimeline1_setFrame(SUPER(self), frameIndex, time, degrees);
+void spRotateTimeline_setFrame (spRotateTimeline* self, int frame, float time, float degrees) {
+    spCurveTimeline1_setFrame(SUPER(self), frame, time, degrees);
 }
 
 /**/
@@ -415,8 +415,8 @@ spTranslateTimeline* spTranslateTimeline_create (int frameCount, int bezierCount
     return timeline;
 }
 
-void spTranslateTimeline_setFrame (spTranslateTimeline* self, int frameIndex, float time, float x, float y) {
-	spCurveTimeline2_setFrame(SUPER(self), frameIndex, time, x, y);
+void spTranslateTimeline_setFrame (spTranslateTimeline* self, int frame, float time, float x, float y) {
+	spCurveTimeline2_setFrame(SUPER(self), frame, time, x, y);
 }
 
 /**/
@@ -659,8 +659,8 @@ spScaleTimeline* spScaleTimeline_create (int frameCount, int bezierCount, int bo
     return timeline;
 }
 
-void spScaleTimeline_setFrame (spScaleTimeline* self, int frameIndex, float time, float x, float y) {
-	spCurveTimeline2_setFrame(SUPER(self), frameIndex, time, x, y);
+void spScaleTimeline_setFrame (spScaleTimeline* self, int frame, float time, float x, float y) {
+	spCurveTimeline2_setFrame(SUPER(self), frame, time, x, y);
 }
 
 /**/
@@ -918,8 +918,8 @@ spShearTimeline* spShearTimeline_create (int frameCount, int bezierCount, int bo
     return timeline;
 }
 
-void spShearTimeline_setFrame (spShearTimeline* self, int frameIndex, float time, float x, float y) {
-    spCurveTimeline2_setFrame(SUPER(self), frameIndex, time, x, y);
+void spShearTimeline_setFrame (spShearTimeline* self, int frame, float time, float x, float y) {
+    spCurveTimeline2_setFrame(SUPER(self), frame, time, x, y);
 }
 
 /**/
@@ -1129,14 +1129,14 @@ spRGBATimeline* spRGBATimeline_create (int framesCount, int bezierCount, int slo
     return timeline;
 }
 
-void spRGBATimeline_setFrame (spRGBATimeline* self, int frameIndex, float time, float r, float g, float b, float a) {
+void spRGBATimeline_setFrame (spRGBATimeline* self, int frame, float time, float r, float g, float b, float a) {
 	float *frames = self->super.super.frames->items;
-    frameIndex *= RGBA_ENTRIES;
-	frames[frameIndex] = time;
-    frames[frameIndex + COLOR_R] = r;
-    frames[frameIndex + COLOR_G] = g;
-    frames[frameIndex + COLOR_B] = b;
-    frames[frameIndex + COLOR_A] = a;
+    frame *= RGBA_ENTRIES;
+	frames[frame] = time;
+    frames[frame + COLOR_R] = r;
+    frames[frame + COLOR_G] = g;
+    frames[frame + COLOR_B] = b;
+    frames[frame + COLOR_A] = a;
 }
 
 /**/
@@ -1231,13 +1231,13 @@ spRGBTimeline* spRGBTimeline_create (int framesCount, int bezierCount, int slotI
     return timeline;
 }
 
-void spRGBTimeline_setFrame (spRGBTimeline* self, int frameIndex, float time, float r, float g, float b) {
+void spRGBTimeline_setFrame (spRGBTimeline* self, int frame, float time, float r, float g, float b) {
     float *frames = self->super.super.frames->items;
-    frameIndex *= RGB_ENTRIES;
-    frames[frameIndex] = time;
-    frames[frameIndex + COLOR_R] = r;
-    frames[frameIndex + COLOR_G] = g;
-    frames[frameIndex + COLOR_B] = b;
+    frame *= RGB_ENTRIES;
+    frames[frame] = time;
+    frames[frame + COLOR_R] = r;
+    frames[frame + COLOR_G] = g;
+    frames[frame + COLOR_B] = b;
 }
 
 /**/
@@ -1417,17 +1417,17 @@ spRGBA2Timeline* spRGBA2Timeline_create (int framesCount, int bezierCount, int s
     return timeline;
 }
 
-void spRGBA2Timeline_setFrame (spRGBA2Timeline* self, int frameIndex, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
+void spRGBA2Timeline_setFrame (spRGBA2Timeline* self, int frame, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
     float *frames = self->super.super.frames->items;
-    frameIndex *= RGBA2_ENTRIES;
-    frames[frameIndex] = time;
-    frames[frameIndex + COLOR_R] = r;
-    frames[frameIndex + COLOR_G] = g;
-    frames[frameIndex + COLOR_B] = b;
-    frames[frameIndex + COLOR_A] = a;
-    frames[frameIndex + COLOR_R2] = r2;
-    frames[frameIndex + COLOR_G2] = g2;
-    frames[frameIndex + COLOR_B2] = b2;
+    frame *= RGBA2_ENTRIES;
+    frames[frame] = time;
+    frames[frame + COLOR_R] = r;
+    frames[frame + COLOR_G] = g;
+    frames[frame + COLOR_B] = b;
+    frames[frame + COLOR_A] = a;
+    frames[frame + COLOR_R2] = r2;
+    frames[frame + COLOR_G2] = g2;
+    frames[frame + COLOR_B2] = b2;
 }
 
 /**/
@@ -1545,16 +1545,16 @@ spRGB2Timeline* spRGB2Timeline_create (int framesCount, int bezierCount, int slo
     return timeline;
 }
 
-void spRGB2Timeline_setFrame (spRGB2Timeline* self, int frameIndex, float time, float r, float g, float b, float r2, float g2, float b2) {
+void spRGB2Timeline_setFrame (spRGB2Timeline* self, int frame, float time, float r, float g, float b, float r2, float g2, float b2) {
     float *frames = self->super.super.frames->items;
-    frameIndex *= RGB2_ENTRIES;
-    frames[frameIndex] = time;
-    frames[frameIndex + COLOR_R] = r;
-    frames[frameIndex + COLOR_G] = g;
-    frames[frameIndex + COLOR_B] = b;
-    frames[frameIndex + COLOR2_R2] = r2;
-    frames[frameIndex + COLOR2_G2] = g2;
-    frames[frameIndex + COLOR2_B2] = b2;
+    frame *= RGB2_ENTRIES;
+    frames[frame] = time;
+    frames[frame + COLOR_R] = r;
+    frames[frame + COLOR_G] = g;
+    frames[frame + COLOR_B] = b;
+    frames[frame + COLOR2_R2] = r2;
+    frames[frame + COLOR2_G2] = g2;
+    frames[frame + COLOR2_B2] = b2;
 }
 
 /**/
@@ -1616,14 +1616,14 @@ spAttachmentTimeline* spAttachmentTimeline_create (int framesCount, int slotInde
 	return self;
 }
 
-void spAttachmentTimeline_setFrame (spAttachmentTimeline* self, int frameIndex, float time, const char* attachmentName) {
-	self->super.frames->items[frameIndex] = time;
+void spAttachmentTimeline_setFrame (spAttachmentTimeline* self, int frame, float time, const char* attachmentName) {
+	self->super.frames->items[frame] = time;
 
-	FREE(self->attachmentNames[frameIndex]);
+	FREE(self->attachmentNames[frame]);
 	if (attachmentName)
-		MALLOC_STR(self->attachmentNames[frameIndex], attachmentName);
+		MALLOC_STR(self->attachmentNames[frame], attachmentName);
 	else
-		self->attachmentNames[frameIndex] = 0;
+		self->attachmentNames[frame] = 0;
 }
 
 /**/
@@ -1918,15 +1918,15 @@ spDeformTimeline* spDeformTimeline_create (int framesCount, int frameVerticesCou
 	return self;
 }
 
-void spDeformTimeline_setFrame (spDeformTimeline* self, int frameIndex, float time, float* vertices) {
-	self->super.super.frames->items[frameIndex] = time;
+void spDeformTimeline_setFrame (spDeformTimeline* self, int frame, float time, float* vertices) {
+	self->super.super.frames->items[frame] = time;
 
-	FREE(self->frameVertices[frameIndex]);
+	FREE(self->frameVertices[frame]);
 	if (!vertices)
-		self->frameVertices[frameIndex] = 0;
+		self->frameVertices[frame] = 0;
 	else {
-		self->frameVertices[frameIndex] = MALLOC(float, self->frameVerticesCount);
-		memcpy(CONST_CAST(float*, self->frameVertices[frameIndex]), vertices, self->frameVerticesCount * sizeof(float));
+		self->frameVertices[frame] = MALLOC(float, self->frameVerticesCount);
+		memcpy(CONST_CAST(float*, self->frameVertices[frame]), vertices, self->frameVerticesCount * sizeof(float));
 	}
 }
 
@@ -1989,11 +1989,11 @@ spEventTimeline* spEventTimeline_create (int framesCount) {
 	return self;
 }
 
-void spEventTimeline_setFrame (spEventTimeline* self, int frameIndex, spEvent* event) {
-	self->super.frames->items[frameIndex] = event->time;
+void spEventTimeline_setFrame (spEventTimeline* self, int frame, spEvent* event) {
+	self->super.frames->items[frame] = event->time;
 
-	FREE(self->events[frameIndex]);
-	self->events[frameIndex] = event;
+	FREE(self->events[frame]);
+	self->events[frame] = event;
 }
 
 /**/
@@ -2052,15 +2052,15 @@ spDrawOrderTimeline* spDrawOrderTimeline_create (int framesCount, int slotsCount
 	return self;
 }
 
-void spDrawOrderTimeline_setFrame (spDrawOrderTimeline* self, int frameIndex, float time, const int* drawOrder) {
-  self->super.frames->items[frameIndex] = time;
+void spDrawOrderTimeline_setFrame (spDrawOrderTimeline* self, int frame, float time, const int* drawOrder) {
+  self->super.frames->items[frame] = time;
 
-  FREE(self->drawOrders[frameIndex]);
+  FREE(self->drawOrders[frame]);
   if (!drawOrder)
-    self->drawOrders[frameIndex] = 0;
+    self->drawOrders[frame] = 0;
   else {
-    self->drawOrders[frameIndex] = MALLOC(int, self->slotsCount);
-    memcpy(CONST_CAST(int*, self->drawOrders[frameIndex]), drawOrder, self->slotsCount * sizeof(int));
+    self->drawOrders[frame] = MALLOC(int, self->slotsCount);
+    memcpy(CONST_CAST(int*, self->drawOrders[frame]), drawOrder, self->slotsCount * sizeof(int));
   }
 }
 
@@ -2164,17 +2164,17 @@ spIkConstraintTimeline* spIkConstraintTimeline_create (int framesCount, int bezi
   return timeline;
 }
 
-void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frameIndex, float time, float mix, float softness,
+void spIkConstraintTimeline_setFrame (spIkConstraintTimeline* self, int frame, float time, float mix, float softness,
 	int bendDirection, int /*boolean*/ compress, int /*boolean*/ stretch
 ) {
   float *frames = self->super.super.frames->items;
-	frameIndex *= IKCONSTRAINT_ENTRIES;
-	frames[frameIndex] = time;
-	frames[frameIndex + IKCONSTRAINT_MIX] = mix;
-	frames[frameIndex + IKCONSTRAINT_SOFTNESS] = softness;
-	frames[frameIndex + IKCONSTRAINT_BEND_DIRECTION] = (float)bendDirection;
-	frames[frameIndex + IKCONSTRAINT_COMPRESS] = compress ? 1 : 0;
-	frames[frameIndex + IKCONSTRAINT_STRETCH] = stretch ? 1 : 0;
+	frame *= IKCONSTRAINT_ENTRIES;
+	frames[frame] = time;
+	frames[frame + IKCONSTRAINT_MIX] = mix;
+	frames[frame + IKCONSTRAINT_SOFTNESS] = softness;
+	frames[frame + IKCONSTRAINT_BEND_DIRECTION] = (float)bendDirection;
+	frames[frame + IKCONSTRAINT_COMPRESS] = compress ? 1 : 0;
+	frames[frame + IKCONSTRAINT_STRETCH] = stretch ? 1 : 0;
 }
 
 /**/
@@ -2297,16 +2297,16 @@ spTransformConstraintTimeline* spTransformConstraintTimeline_create (int framesC
   return timeline;
 }
 
-void spTransformConstraintTimeline_setFrame (spTransformConstraintTimeline* self, int frameIndex, float time, float mixRotate, float mixX, float mixY, float mixScaleX, float mixScaleY, float mixShearY) {
+void spTransformConstraintTimeline_setFrame (spTransformConstraintTimeline* self, int frame, float time, float mixRotate, float mixX, float mixY, float mixScaleX, float mixScaleY, float mixShearY) {
   float *frames = self->super.super.frames->items;
-	frameIndex *= TRANSFORMCONSTRAINT_ENTRIES;
-	frames[frameIndex] = time;
-	frames[frameIndex + TRANSFORMCONSTRAINT_ROTATE] = mixRotate;
-	frames[frameIndex + TRANSFORMCONSTRAINT_X] = mixX;
-  frames[frameIndex + TRANSFORMCONSTRAINT_X] = mixY;
-  frames[frameIndex + TRANSFORMCONSTRAINT_SCALEX] = mixScaleX;
-  frames[frameIndex + TRANSFORMCONSTRAINT_SCALEY] = mixScaleY;
-  frames[frameIndex + TRANSFORMCONSTRAINT_SHEARY] = mixShearY;
+	frame *= TRANSFORMCONSTRAINT_ENTRIES;
+	frames[frame] = time;
+	frames[frame + TRANSFORMCONSTRAINT_ROTATE] = mixRotate;
+	frames[frame + TRANSFORMCONSTRAINT_X] = mixX;
+  frames[frame + TRANSFORMCONSTRAINT_X] = mixY;
+  frames[frame + TRANSFORMCONSTRAINT_SCALEX] = mixScaleX;
+  frames[frame + TRANSFORMCONSTRAINT_SCALEY] = mixScaleY;
+  frames[frame + TRANSFORMCONSTRAINT_SHEARY] = mixShearY;
 }
 
 /**/
@@ -2361,11 +2361,11 @@ spPathConstraintPositionTimeline* spPathConstraintPositionTimeline_create (int f
   return timeline;
 }
 
-void spPathConstraintPositionTimeline_setFrame (spPathConstraintPositionTimeline* self, int frameIndex, float time, float value) {
+void spPathConstraintPositionTimeline_setFrame (spPathConstraintPositionTimeline* self, int frame, float time, float value) {
   float *frames = self->super.super.frames->items;
-	frameIndex *= PATHCONSTRAINTPOSITION_ENTRIES;
-	frames[frameIndex] = time;
-	frames[frameIndex + PATHCONSTRAINTPOSITION_VALUE] = value;
+	frame *= PATHCONSTRAINTPOSITION_ENTRIES;
+	frames[frame] = time;
+	frames[frame + PATHCONSTRAINTPOSITION_VALUE] = value;
 }
 
 /**/
@@ -2420,11 +2420,11 @@ spPathConstraintSpacingTimeline* spPathConstraintSpacingTimeline_create (int fra
   return timeline;
 }
 
-void spPathConstraintSpacingTimeline_setFrame (spPathConstraintSpacingTimeline* self, int frameIndex, float time, float value) {
+void spPathConstraintSpacingTimeline_setFrame (spPathConstraintSpacingTimeline* self, int frame, float time, float value) {
   float *frames = self->super.super.frames->items;
-	frameIndex *= PATHCONSTRAINTSPACING_ENTRIES;
-	frames[frameIndex] = time;
-	frames[frameIndex + PATHCONSTRAINTSPACING_VALUE] = value;
+	frame *= PATHCONSTRAINTSPACING_ENTRIES;
+	frames[frame] = time;
+	frames[frame + PATHCONSTRAINTSPACING_VALUE] = value;
 }
 
 /**/
@@ -2519,11 +2519,11 @@ spPathConstraintMixTimeline* spPathConstraintMixTimeline_create (int framesCount
   return timeline;
 }
 
-void spPathConstraintMixTimeline_setFrame (spPathConstraintMixTimeline* self, int frameIndex, float time, float mixRotate, float mixX, float mixY) {
+void spPathConstraintMixTimeline_setFrame (spPathConstraintMixTimeline* self, int frame, float time, float mixRotate, float mixX, float mixY) {
   float *frames = self->super.super.frames->items;
-	frameIndex *= PATHCONSTRAINTMIX_ENTRIES;
-	frames[frameIndex] = time;
-	frames[frameIndex + PATHCONSTRAINTMIX_ROTATE] = mixRotate;
-	frames[frameIndex + PATHCONSTRAINTMIX_X] = mixX;
-  frames[frameIndex + PATHCONSTRAINTMIX_Y] = mixY;
+	frame *= PATHCONSTRAINTMIX_ENTRIES;
+	frames[frame] = time;
+	frames[frame + PATHCONSTRAINTMIX_ROTATE] = mixRotate;
+	frames[frame + PATHCONSTRAINTMIX_X] = mixX;
+  frames[frame + PATHCONSTRAINTMIX_Y] = mixY;
 }

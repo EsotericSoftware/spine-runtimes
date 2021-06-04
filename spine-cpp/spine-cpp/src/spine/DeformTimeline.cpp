@@ -311,10 +311,10 @@ float DeformTimeline::getCurvePercent(float time, int frame) {
     return y + (1 - y) * (time - x) / (_frames[frame + getFrameEntries()] - x);
 }
 
-void DeformTimeline::setFrame(int frameIndex, float time, Vector<float> &vertices) {
-    _frames[frameIndex] = time;
-    _vertices[frameIndex].clear();
-    _vertices[frameIndex].addAll(vertices);
+void DeformTimeline::setFrame(int frame, float time, Vector<float> &vertices) {
+    _frames[frame] = time;
+    _vertices[frame].clear();
+    _vertices[frame].addAll(vertices);
 }
 
 Vector<Vector<float> > &DeformTimeline::getVertices() {

@@ -120,10 +120,10 @@ void PathConstraintMixTimeline::apply(Skeleton &skeleton, float lastTime, float 
     }
 }
 
-void PathConstraintMixTimeline::setFrame(int frameIndex, float time, float mixRotate, float mixX, float mixY) {
-	frameIndex *= ENTRIES;
-	_frames[frameIndex] = time;
-	_frames[frameIndex + ROTATE] = mixRotate;
-	_frames[frameIndex + X] = mixX;
-	_frames[frameIndex + Y] = mixY;
+void PathConstraintMixTimeline::setFrame(int frame, float time, float mixRotate, float mixX, float mixY) {
+	frame *= ENTRIES;
+	_frames[frame] = time;
+	_frames[frame + ROTATE] = mixRotate;
+	_frames[frame + X] = mixX;
+	_frames[frame + Y] = mixY;
 }

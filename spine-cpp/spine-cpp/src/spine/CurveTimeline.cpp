@@ -75,9 +75,9 @@ void CurveTimeline::setBezier (size_t bezier, size_t frame, float value, float t
     }
 }
 
-float CurveTimeline::getBezierValue(float time, size_t frame, size_t valueOffset, size_t i) {
+float CurveTimeline::getBezierValue(float time, size_t frameIndex, size_t valueOffset, size_t i) {
     if (_curves[i] > time) {
-        float x = _frames[frame], y = _frames[frame + valueOffset];
+        float x = _frames[frameIndex], y = _frames[frameIndex + valueOffset];
         return y + (time - x) / (_curves[i] - x) * (_curves[i + 1] - y);
     }
     size_t n = i + BEZIER_SIZE;
@@ -87,9 +87,9 @@ float CurveTimeline::getBezierValue(float time, size_t frame, size_t valueOffset
             return y + (time - x) / (_curves[i] - x) * (_curves[i + 1] - y);
         }
     }
-    frame += getFrameEntries();
+    frameIndex += getFrameEntries();
     float x = _curves[n - 2], y = _curves[n - 1];
-    return y + (time - x) / (_frames[frame] - x) * (_frames[frame + valueOffset] - y);
+    return y + (time - x) / (_frames[frameIndex] - x) * (_frames[frameIndex + valueOffset] - y);
 }
 
 RTTI_IMPL(CurveTimeline1, CurveTimeline)

@@ -144,13 +144,13 @@ void TransformConstraintTimeline::apply(Skeleton &skeleton, float lastTime, floa
     }
 }
 
-void TransformConstraintTimeline::setFrame(size_t frameIndex, float time, float mixRotate, float mixX, float mixY, float mixScaleX, float mixScaleY, float mixShearY) {
-	frameIndex *= ENTRIES;
-	_frames[frameIndex] = time;
-	_frames[frameIndex + ROTATE] = mixRotate;
-	_frames[frameIndex + X] = mixX;
-  _frames[frameIndex + Y] = mixY;
-  _frames[frameIndex + SCALEX] = mixScaleX;
-  _frames[frameIndex + SCALEY] = mixScaleY;
-  _frames[frameIndex + SHEARY] = mixShearY;
+void TransformConstraintTimeline::setFrame(size_t frame, float time, float mixRotate, float mixX, float mixY, float mixScaleX, float mixScaleY, float mixShearY) {
+	frame *= ENTRIES;
+	_frames[frame] = time;
+	_frames[frame + ROTATE] = mixRotate;
+	_frames[frame + X] = mixX;
+  _frames[frame + Y] = mixY;
+  _frames[frame + SCALEX] = mixScaleX;
+  _frames[frame + SCALEY] = mixScaleY;
+  _frames[frame + SHEARY] = mixShearY;
 }
