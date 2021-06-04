@@ -286,12 +286,11 @@ function Animation.RotateTimeline.new (frameCount)
 			elseif blend == MixBlend.first or blend == MixBlend.replace then
 				r = r + bone.data.rotation - bone.rotation
 				r = r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360 -- Wrap within -180 and 180.
-				bone.rotation = bone.rotation + r * alpha;
+				bone.rotation = bone.rotation + r * alpha
 			elseif blend == MixBlend.add then
-				bone.rotation = bone.rotation + r * alpha;
+				bone.rotation = bone.rotation + r * alpha
 			end
-			return;
-		end
+			return		end
 
 		-- Interpolate between the last frame and the current frame.
 		local frame = binarySearch(frames, time, ENTRIES)
@@ -304,7 +303,7 @@ function Animation.RotateTimeline.new (frameCount)
 		if blend == MixBlend.setup then
 			bone.rotation = bone.data.rotation + (r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360) * alpha
 		elseif blend == MixBlend.first or blend == MixBlend.replace then
-			r = r + bone.data.rotation - bone.rotation;
+			r = r + bone.data.rotation - bone.rotation
 			bone.rotation = bone.rotation + (r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360) * alpha
 		elseif blend == MixBlend.add then
 			bone.rotation = bone.rotation + (r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360) * alpha
@@ -360,8 +359,8 @@ function Animation.TranslateTimeline.new (frameCount)
 		local x = 0
 		local y = 0
 		if time >= frames[zlen(frames) - ENTRIES] then -- // Time is after last frame.
-			x = frames[zlen(frames) + PREV_X];
-			y = frames[zlen(frames) + PREV_Y];
+			x = frames[zlen(frames) + PREV_X]
+			y = frames[zlen(frames) + PREV_Y]
 		else
 			-- Interpolate between the previous frame and the current frame.
 			local frame = binarySearch(frames, time, ENTRIES)
@@ -369,7 +368,7 @@ function Animation.TranslateTimeline.new (frameCount)
 			y = frames[frame + PREV_Y]
 			local frameTime = frames[frame]
 			local percent = self:getCurvePercent(math_floor(frame / ENTRIES) - 1,
-				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
 			x = x + (frames[frame + X] - x) * percent
 			y = y + (frames[frame + Y] - y) * percent
@@ -792,7 +791,7 @@ function Animation.AttachmentTimeline.new (frameCount)
 			if blend == MixBlend.setup then
 				self:setAttachment(skeleton, slot, slot.data.attachmentName)
 			end
-			return;
+			return
 		end
 
 		local frames = self.frames
@@ -856,14 +855,14 @@ function Animation.DeformTimeline.new (frameCount)
 		local vertexCount = #(frameVertices[0])
 
 		if time < frames[0] then
-			local vertexAttachment = slotAttachment;
+			local vertexAttachment = slotAttachment
 			if blend == MixBlend.setup then
 				slot.deform = {}
-				return;
+				return
 			elseif blend == MixBlend.first then
 				if (alpha == 1) then
 					slot.deform = {}
-					return;
+					return
 				end
 
 				local deform = utils.setArraySize(deformArray, vertexCount)
@@ -976,7 +975,7 @@ function Animation.DeformTimeline.new (frameCount)
 					end
 				end
 			end
-			return;
+			return
 		end
 
 		-- Interpolate between the previous frame and the current frame.
@@ -1157,7 +1156,7 @@ function Animation.DrawOrderTimeline.new (frameCount)
 					drawOrder[i] = slots[i]
 				end
 			end
-			return;
+			return
 		end
 
 		local frames = self.frames
@@ -1266,7 +1265,7 @@ function Animation.IkConstraintTimeline.new (frameCount)
 					constraint.compress = constraint.data.compress
 					constraint.stretch = constraint.data.stretch
 				else
-					constraint.bendDirection = math_floor(frames[zlen(frames) + PREV_BEND_DIRECTION]);
+					constraint.bendDirection = math_floor(frames[zlen(frames) + PREV_BEND_DIRECTION])
 					if (math_floor(frames[zlen(frames) + PREV_COMPRESS]) == 1) then constraint.compress = true else constraint.compress = false end
 					if (math_floor(frames[zlen(frames) + PREV_STRETCH]) == 1) then constraint.stretch = true else constraint.stretch = false end
 				end
@@ -1389,7 +1388,7 @@ function Animation.TransformConstraintTimeline.new (frameCount)
 			shear = frames[frame + PREV_SHEAR]
 			local frameTime = frames[frame]
 			local percent = self:getCurvePercent(math_floor(frame / ENTRIES) - 1,
-				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime));
+				1 - (time - frameTime) / (frames[frame + PREV_TIME] - frameTime))
 
 			rotate = rotate + (frames[frame + ROTATE] - rotate) * percent
 			translate = translate + (frames[frame + TRANSLATE] - translate) * percent

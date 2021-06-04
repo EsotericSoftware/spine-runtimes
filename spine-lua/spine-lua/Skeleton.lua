@@ -460,7 +460,7 @@ function Skeleton:setSkinByReference(newSkin)
 end
 
 function Skeleton:getAttachment (slotName, attachmentName)
-	return self:getAttachmentByIndex(self.data.slotNameIndices[slotName], attachmentName)
+	return self:getAttachmentByIndex(self.data.nameToSlot[slotName].index, attachmentName)
 end
 
 function Skeleton:getAttachmentByIndex (slotIndex, attachmentName)
@@ -520,7 +520,7 @@ end
 function Skeleton:getBounds(offset, size)
 	if not offset then error("offset cannot be null.", 2) end
 	if not size then error("size cannot be null.", 2) end
-	local drawOrder = self.drawOrder;
+	local drawOrder = self.drawOrder
 	local minX = 99999999
 	local minY = 99999999
 	local maxX = -99999999

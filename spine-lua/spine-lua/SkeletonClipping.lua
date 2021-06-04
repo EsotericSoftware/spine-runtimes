@@ -118,7 +118,7 @@ function SkeletonClipping:clipTriangles(vertices, uvs, triangles, trianglesLengt
 		local u2 = uvs[vertexOffset]
 		local v2 = uvs[vertexOffset + 1]
 
-		vertexOffset = (triangles[i + 2] - 1) * 2 + 1;
+		vertexOffset = (triangles[i + 2] - 1) * 2 + 1
 		local x3 = vertices[vertexOffset]
 		local y3 = vertices[vertexOffset + 1]
 		local u3 = uvs[vertexOffset]
@@ -135,7 +135,7 @@ function SkeletonClipping:clipTriangles(vertices, uvs, triangles, trianglesLengt
 					local d1 = x3 - x2
 					local d2 = x1 - x3
 					local d4 = y3 - y1
-					local d = 1 / (d0 * d2 + d1 * (y1 - y3));
+					local d = 1 / (d0 * d2 + d1 * (y1 - y3))
 
 					local clipOutputCount = clipOutputLength / 2
 					local clipOutputItems = clipOutput
@@ -193,7 +193,7 @@ function SkeletonClipping:clipTriangles(vertices, uvs, triangles, trianglesLengt
 				clippedTrianglesItems[s] = index
 				clippedTrianglesItems[s + 1] = index + 1
 				clippedTrianglesItems[s + 2] = index + 2
-				index = index + 3;
+				index = index + 3
 				break
 			end
 			p = p + 1
@@ -246,7 +246,7 @@ function SkeletonClipping:clip(x1, y1, x2, y2, x3, y3, clippingArea, output)
 			local inputX2 = inputVertices[ii + 2]
 			local inputY2 = inputVertices[ii + 3]
 			local side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0
-			local continue = false;
+			local continue = false
 			if deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0 then
 				if side2 then -- v1 inside, v2 inside
 					table_insert(output, inputX2)

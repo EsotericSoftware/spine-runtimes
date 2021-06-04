@@ -102,12 +102,12 @@ function IkConstraint:apply1 (bone, targetX, targetY, compress, stretch, uniform
 		tx = targetX - bone.worldX
 		ty = targetY - bone.worldY
 	elseif bone.data.transformMode == TransformMode.noRotationOrReflection then
-		local s = math_abs(pa * pd - pb * pc) / (pa * pa + pc * pc);
-		local sa = pa / bone.skeleton.scaleX;
-		local sc = pc / bone.skeleton.scaleY;
-		pb = -sc * s * bone.skeleton.scaleX;
-		pd = sa * s * bone.skeleton.scaleY;
-		rotationIK = rotationIK + math_deg(math_atan2(sc, sa));
+		local s = math_abs(pa * pd - pb * pc) / (pa * pa + pc * pc)
+		local sa = pa / bone.skeleton.scaleX
+		local sc = pc / bone.skeleton.scaleY
+		pb = -sc * s * bone.skeleton.scaleX
+		pd = sa * s * bone.skeleton.scaleY
+		rotationIK = rotationIK + math_deg(math_atan2(sc, sa))
 
 
 		local x = targetX - p.worldX
@@ -255,13 +255,13 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 		b = psy * l2
 		local aa = a * a
 		local bb = b * b
-		local ta = math_atan2(ty, tx);
+		local ta = math_atan2(ty, tx)
 		c = bb * l1 * l1 + aa * dd - aa * bb
 		local c1 = -2 * bb * l1
 		local c2 = bb - aa
 		d = c1 * c1 - 4 * c2 * c
 		if d >= 0 then
-			local q = math_sqrt(d);
+			local q = math_sqrt(d)
 			if (c1 < 0) then q = -q end
 			q = -(c1 + q) / 2
 			local r0 = q / c2
@@ -279,7 +279,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 			local minAngle = math_pi
 			local minX = l1 - a
 			local minDist = minX * minX
-			local minY = 0;
+			local minY = 0
 			local maxAngle = 0
 			local maxX = l1 + a
 			local maxDist = maxX * maxX
@@ -328,7 +328,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 	elseif a2 < -180 then
 		a2 = a2 + 360
 	end
-	child:updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
+	child:updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY)
 end
 
 return IkConstraint

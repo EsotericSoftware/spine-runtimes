@@ -65,6 +65,8 @@ function SkeletonJson.new (attachmentLoader)
 	local readAttachment
 	local readAnimation
 	local readCurve
+	local readTimeline1
+	local readTimeline2
 	local getArray
 
 	local getValue = function (map, name, default)
@@ -83,9 +85,6 @@ function SkeletonJson.new (attachmentLoader)
 		if skeletonMap then
 			skeletonData.hash = skeletonMap["hash"]
 			skeletonData.version = skeletonMap["spine"]
-			if ("3.8.75" == skeletonData.version) then
-				error("Unsupported skeleton data, please export with a newer version of Spine.")
-			end
 			skeletonData.x = skeletonMap["x"]
 			skeletonData.y = skeletonMap["y"]
 			skeletonData.width = skeletonMap["width"]
@@ -105,16 +104,24 @@ function SkeletonJson.new (attachmentLoader)
 				if not parent then error("Parent bone not found: " .. parentName) end
 			end
 			local data = BoneData.new(i, boneName, parent)
-			data.length = getValue(boneMap, "length", 0) * scale;
-			data.x = getValue(boneMap, "x", 0) * scale;
-			data.y = getValue(boneMap, "y", 0) * scale;
-			data.rotation = getValue(boneMap, "rotation", 0);
-			data.scaleX = getValue(boneMap, "scaleX", 1);
-			data.scaleY = getValue(boneMap, "scaleY", 1);
-			data.shearX = getValue(boneMap, "shearX", 0);
-			data.shearY = getValue(boneMap, "shearY", 0);
+			data.length = getValue(boneMap, "length", 0) * scale
+			data.x = getValue(boneMap, "x", 0) * scale
+			data.y = getValue(boneMap, "y", 0) * scale
+			data.rotation = getValue(boneMap, "rotation", 0)
+			data.scaleX = getValue(boneMap, "scaleX", 1)
+			data.scaleY = getValue(boneMap, "scaleY", 1)
+			data.shearX = getValue(boneMap, "shearX", 0)
+			data.shearY = getValue(boneMap, "shearY", 0)
 			data.transformMode = TransformMode[getValue(boneMap, "transform", "normal")]
 			data.skinRequired = getValue(boneMap, "skin", false)
+
+			local color = boneMap["color"]
+			if color then
+				data.color = Color.newWith(tonumber(color:sub(1, 2), 16) / 255,
+					tonumber(color:sub(3, 4), 16) / 255,
+					tonumber(color:sub(5, 6), 16) / 255,
+					tonumber(color:sub(7, 8), 16) / 255)
+			end
 
 			table_insert(skeletonData.bones, data)
 		end
@@ -138,18 +145,17 @@ function SkeletonJson.new (attachmentLoader)
 
 				local dark = slotMap["dark"]
 				if dark then
-					data.darkColor = Color.newWith(1, 1, 1, 1)
-					data.darkColor:set(tonumber(dark:sub(1, 2), 16) / 255,
+					data.darkColor = Color.newWith(
+						tonumber(dark:sub(1, 2), 16) / 255,
 						tonumber(dark:sub(3, 4), 16) / 255,
-						tonumber(dark:sub(5, 6), 16) / 255,
-						0)
+						tonumber(dark:sub(5, 6), 16) / 255, 0)
 				end
 
 				data.attachmentName = getValue(slotMap, "attachment", nil)
 				data.blendMode = BlendMode[getValue(slotMap, "blend", "normal")]
 
 				table_insert(skeletonData.slots, data)
-				skeletonData.slotNameIndices[data.name] = #skeletonData.slots
+				skeletonData.nameToSlot[data.name] = data
 			end
 		end
 
@@ -204,17 +210,19 @@ function SkeletonJson.new (attachmentLoader)
 
 				data.local_ = getValue(constraintMap, "local", false)
 				data.relative = getValue(constraintMap, "relative", false)
-				data.offsetRotation = getValue(constraintMap, "rotation", 0);
-				data.offsetX = getValue(constraintMap, "x", 0) * scale;
-				data.offsetY = getValue(constraintMap, "y", 0) * scale;
-				data.offsetScaleX = getValue(constraintMap, "scaleX", 0);
-				data.offsetScaleY = getValue(constraintMap, "scaleY", 0);
-				data.offsetShearY = getValue(constraintMap, "shearY", 0);
+				data.offsetRotation = getValue(constraintMap, "rotation", 0)
+				data.offsetX = getValue(constraintMap, "x", 0) * scale
+				data.offsetY = getValue(constraintMap, "y", 0) * scale
+				data.offsetScaleX = getValue(constraintMap, "scaleX", 0)
+				data.offsetScaleY = getValue(constraintMap, "scaleY", 0)
+				data.offsetShearY = getValue(constraintMap, "shearY", 0)
 
-				data.rotateMix = getValue(constraintMap, "rotateMix", 1);
-				data.translateMix = getValue(constraintMap, "translateMix", 1);
-				data.scaleMix = getValue(constraintMap, "scaleMix", 1);
-				data.shearMix = getValue(constraintMap, "shearMix", 1);
+				data.mixRotate = getValue(constraintMap, "rotateMix", 1)
+				data.mixX = getValue(constraintMap, "mixX", 1)
+				data.mixY = getValue(constraintMap, "mixY", data.mixX)
+				data.mixScaleX = getValue(constraintMap, "mixScaleX", 1)
+				data.mixScaleY = getValue(constraintMap, "mixScaleY", data.mixScaleX)
+				data.mixShearY = getValue(constraintMap, "mixShearY", 1)
 
 				table_insert(skeletonData.transformConstraints, data)
 			end
@@ -222,8 +230,8 @@ function SkeletonJson.new (attachmentLoader)
 
 		-- Path constraints
 		if root["path"] then
-			for _,constraintMap in ipairs(root.path) do
-				local data = PathConstraintData.new(constraintMap.name);
+			for _,constraintMap in ipairs(root["path"]) do
+				local data = PathConstraintData.new(constraintMap.name)
 				data.order = getValue(constraintMap, "order", 0)
 				data.skinRequired = getValue(constraintMap, "skin", false)
 
@@ -233,20 +241,21 @@ function SkeletonJson.new (attachmentLoader)
 					table_insert(data.bones, bone)
 				end
 
-				local targetName = constraintMap.target;
+				local targetName = constraintMap.target
 				data.target = skeletonData:findSlot(targetName)
 				if data.target == nil then error("Path target slot not found: " .. targetName, 2) end
 
 				data.positionMode = PathConstraintData.PositionMode[getValue(constraintMap, "positionMode", "percent"):lower()]
 				data.spacingMode = PathConstraintData.SpacingMode[getValue(constraintMap, "spacingMode", "length"):lower()]
 				data.rotateMode = PathConstraintData.RotateMode[getValue(constraintMap, "rotateMode", "tangent"):lower()]
-				data.offsetRotation = getValue(constraintMap, "rotation", 0);
-				data.position = getValue(constraintMap, "position", 0);
+				data.offsetRotation = getValue(constraintMap, "rotation", 0)
+				data.position = getValue(constraintMap, "position", 0)
 				if data.positionMode == PathConstraintData.PositionMode.fixed then data.position = data.position * scale end
-				data.spacing = getValue(constraintMap, "spacing", 0);
+				data.spacing = getValue(constraintMap, "spacing", 0)
 				if data.spacingMode == PathConstraintData.SpacingMode.length or data.spacingMode == PathConstraintData.SpacingMode.fixed then data.spacing = data.spacing * scale end
-				data.rotateMix = getValue(constraintMap, "rotateMix", 1);
-				data.translateMix = getValue(constraintMap, "translateMix", 1);
+				data.mixRotate = getValue(constraintMap, "mixRotate", 1)
+				data.mixX = getValue(constraintMap, "mixX", 1)
+				data.mixY = getValue(constraintMap, "mixY", data.mixX)
 
 				table_insert(skeletonData.pathConstraints, data)
 			end
@@ -290,7 +299,7 @@ function SkeletonJson.new (attachmentLoader)
 				end
 				
 				for slotName,slotMap in pairs(skinMap.attachments) do
-					local slotIndex = skeletonData.slotNameIndices[slotName]
+					local slotIndex = skeletonData:findSlot(slotName).index
 					for attachmentName,attachmentMap in pairs(slotMap) do
 						local attachment = readAttachment(attachmentMap, skin, slotIndex, attachmentName, skeletonData)
 						if attachment then
@@ -360,11 +369,11 @@ function SkeletonJson.new (attachmentLoader)
 			region.path = path
 			region.x = getValue(map, "x", 0) * scale
 			region.y = getValue(map, "y", 0) * scale
-			region.scaleX = getValue(map, "scaleX", 1);
-			region.scaleY = getValue(map, "scaleY", 1);
-			region.rotation = getValue(map, "rotation", 0);
-			region.width = map.width * scale;
-			region.height = map.height * scale;
+			region.scaleX = getValue(map, "scaleX", 1)
+			region.scaleY = getValue(map, "scaleY", 1)
+			region.rotation = getValue(map, "rotation", 0)
+			region.width = map.width * scale
+			region.height = map.height * scale
 
 			local color = map["color"]
 			if color then
@@ -453,7 +462,7 @@ function SkeletonJson.new (attachmentLoader)
 					tonumber(color:sub(5, 6), 16) / 255,
 					tonumber(color:sub(7, 8), 16) / 255)
 			end
-			return path;
+			return path
 
 		elseif type == AttachmentType.point then
 			local point = self.attachmentLoader:newPointAttachment(skin, name)
@@ -536,124 +545,239 @@ function SkeletonJson.new (attachmentLoader)
 
 	readAnimation = function (map, name, skeletonData)
 		local timelines = {}
-		local duration = 0
 		local scale = self.scale
 
-		-- Slot timelines
+		-- Slot timelines.
 		local slotsMap = map["slots"]
 		if slotsMap then
-			for slotName,timelineMap in pairs(slotsMap) do
-				local slotIndex = skeletonData.slotNameIndices[slotName]
-
-				for timelineName,values in pairs(timelineMap) do
-					if timelineName == "color" then
-						local timeline = Animation.ColorTimeline.new(#values)
-						timeline.slotIndex = slotIndex
-
-						local frameIndex = 0
-						for _,valueMap in ipairs(values) do
-							local color = valueMap["color"]
-							timeline:setFrame(
-								frameIndex, getValue(valueMap, "time", 0),
-								tonumber(color:sub(1, 2), 16) / 255,
-								tonumber(color:sub(3, 4), 16) / 255,
-								tonumber(color:sub(5, 6), 16) / 255,
-								tonumber(color:sub(7, 8), 16) / 255
-							)
-							readCurve(valueMap, timeline, frameIndex)
-							frameIndex = frameIndex + 1
-						end
-						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.ColorTimeline.ENTRIES])
-					elseif timelineName == "twoColor" then
-						local timeline = Animation.TwoColorTimeline.new(#values)
-						timeline.slotIndex = slotIndex
-
-						local frameIndex = 0
-						for _,valueMap in ipairs(values) do
-							local light = valueMap["light"]
-							local dark = valueMap["dark"]
-							timeline:setFrame(
-								frameIndex, getValue(valueMap, "time", 0),
-								tonumber(light:sub(1, 2), 16) / 255,
-								tonumber(light:sub(3, 4), 16) / 255,
-								tonumber(light:sub(5, 6), 16) / 255,
-								tonumber(light:sub(7, 8), 16) / 255,
-								tonumber(dark:sub(1, 2), 16) / 255,
-								tonumber(dark:sub(3, 4), 16) / 255,
-								tonumber(dark:sub(5, 6), 16) / 255
-							)
-							readCurve(valueMap, timeline, frameIndex)
-							frameIndex = frameIndex + 1
-						end
-						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.TwoColorTimeline.ENTRIES])
+			for slotName,slotMap in pairs(slotsMap) do
+				local slotIndex = skeletonData:findSlot(slotName).index
+				for timelineName,timelineMap in pairs(slotMap) do
+					if not timelineMap then
 					elseif timelineName == "attachment" then
-						local timeline = Animation.AttachmentTimeline.new(#values)
-						timeline.slotIndex = slotIndex
-
-						local frameIndex = 0
-						for _,valueMap in ipairs(values) do
-							local attachmentName = valueMap["name"]
-							timeline:setFrame(frameIndex, getValue(valueMap, "time", 0), attachmentName)
-							frameIndex = frameIndex + 1
+						local timeline = Animation.AttachmentTimeline.new(#timelineMap, slotIndex)
+						for i,keyMap in ipairs(timelineMap) do
+							timeline:setFrame(i + 1, getValue(keyMap, "time", 0), keyMap["name"])
 						end
 						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline.frames[timeline:getFrameCount() - 1])
-
+					elseif timelineName == "rgba" then
+						local timeline = Animation.RGBATimeline.new(#timelineMap, #timelineMap * 4, slotIndex)
+						local keyMap = timelineMap[1]
+						local time = getValue(keyMap, "time", 0)
+						local color = keyMap["color"]
+						local r = tonumber(color:sub(1, 2), 16) / 255
+						local g = tonumber(color:sub(3, 4), 16) / 255
+						local b = tonumber(color:sub(5, 6), 16) / 255
+						local a = tonumber(color:sub(7, 8), 16) / 255
+						local bezier = 0
+						for i,keyMap in ipairs(timelineMap) do
+							local frame = i - 1
+							timeline:setFrame(frame, time, r, g, b, a)
+							local nextMap = timelineMap[i + 1]
+							if not nextMap then
+								timeline:shrink(bezier)
+								break
+							end
+							local time2 = getValue(nextMap, "time", 0)
+							color = nextMap["color"]
+							local nr = tonumber(color:sub(1, 2), 16) / 255
+							local ng = tonumber(color:sub(3, 4), 16) / 255
+							local nb = tonumber(color:sub(5, 6), 16) / 255
+							local na = tonumber(color:sub(7, 8), 16) / 255
+							local curve = keyMap.curve
+							if curve then
+								bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, a, na, 1)
+							end
+							time = time2
+							r = nr
+							g = ng
+							b = nb
+							a = na
+						end
+						table_insert(timelines, timeline)
+					elseif timelineName == "rgb" then
+						local timeline = Animation.RGBTimeline.new(#timelineMap, #timelineMap * 3, slotIndex)
+						local keyMap = timelineMap[1]
+						local time = getValue(keyMap, "time", 0)
+						local color = keyMap["color"]
+						local r = tonumber(color:sub(1, 2), 16) / 255
+						local g = tonumber(color:sub(3, 4), 16) / 255
+						local b = tonumber(color:sub(5, 6), 16) / 255
+						local bezier = 0
+						for i,keyMap in ipairs(timelineMap) do
+							local frame = i - 1
+							timeline:setFrame(frame, time, r, g, b)
+							local nextMap = timelineMap[i + 1]
+							if not nextMap then
+								timeline:shrink(bezier)
+								break
+							end
+							local time2 = getValue(nextMap, "time", 0)
+							color = nextMap["color"]
+							local nr = tonumber(color:sub(1, 2), 16) / 255
+							local ng = tonumber(color:sub(3, 4), 16) / 255
+							local nb = tonumber(color:sub(5, 6), 16) / 255
+							local curve = keyMap.curve
+							if curve then
+								bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb, 1)
+							end
+							time = time2
+							r = nr
+							g = ng
+							b = nb
+						end
+						table_insert(timelines, timeline)
+					elseif timelineName == "alpha" then
+						table_insert(timelines, readTimeline1(timelineMap, Animation.AlphaTimeline.new(#timelineMap, #timelineMap, slotIndex), 0, 1))
+					elseif timelineName == "rgba2" then
+						local timeline = Animation.RGBA2Timeline.new(#timelineMap, #timelineMap * 7, slotIndex)
+						local keyMap = timelineMap[1]
+						local time = getValue(keyMap, "time", 0)
+						local color = keyMap["light"]
+						local r = tonumber(color:sub(1, 2), 16) / 255
+						local g = tonumber(color:sub(3, 4), 16) / 255
+						local b = tonumber(color:sub(5, 6), 16) / 255
+						local a = tonumber(color:sub(7, 8), 16) / 255
+						color = keyMap["dark"]
+						local r2 = tonumber(color:sub(1, 2), 16) / 255
+						local g2 = tonumber(color:sub(3, 4), 16) / 255
+						local b2 = tonumber(color:sub(5, 6), 16) / 255
+						local bezier = 0
+						for i,keyMap in ipairs(timelineMap) do
+							local frame = i - 1
+							timeline:setFrame(frame, time, r, g, b, a, r2, g2, b2)
+							local nextMap = timelineMap[i + 1]
+							if not nextMap then
+								timeline:shrink(bezier)
+								break
+							end
+							local time2 = getValue(nextMap, "time", 0)
+							color = nextMap["light"]
+							local nr = tonumber(color:sub(1, 2), 16) / 255
+							local ng = tonumber(color:sub(3, 4), 16) / 255
+							local nb = tonumber(color:sub(5, 6), 16) / 255
+							local na = tonumber(color:sub(7, 8), 16) / 255
+							color = nextMap["dark"]
+							local nr2 = tonumber(color:sub(1, 2), 16) / 255
+							local ng2 = tonumber(color:sub(3, 4), 16) / 255
+							local nb2 = tonumber(color:sub(5, 6), 16) / 255
+							local curve = keyMap.curve
+							if curve then
+								bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, a, na, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, r2, nr2, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, g2, ng2, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 6, time, time2, b2, nb2, 1)
+							end
+							time = time2
+							r = nr
+							g = ng
+							b = nb
+							a = na
+							r2 = nr2
+							g2 = ng2
+							b2 = nb2
+						end
+						table_insert(timelines, timeline)
+					elseif timelineName == "rgb2" then
+						local timeline = Animation.RGB2Timeline.new(#timelineMap, #timelineMap * 6, slotIndex)
+						local keyMap = timelineMap[1]
+						local time = getValue(keyMap, "time", 0)
+						local color = keyMap["light"]
+						local r = tonumber(color:sub(1, 2), 16) / 255
+						local g = tonumber(color:sub(3, 4), 16) / 255
+						local b = tonumber(color:sub(5, 6), 16) / 255
+						color = keyMap["dark"]
+						local r2 = tonumber(color:sub(1, 2), 16) / 255
+						local g2 = tonumber(color:sub(3, 4), 16) / 255
+						local b2 = tonumber(color:sub(5, 6), 16) / 255
+						local bezier = 0
+						for i,keyMap in ipairs(timelineMap) do
+							local frame = i - 1
+							timeline:setFrame(frame, time, r, g, b, r2, g2, b2)
+							local nextMap = timelineMap[i + 1]
+							if not nextMap then
+								timeline:shrink(bezier)
+								break
+							end
+							local time2 = getValue(nextMap, "time", 0)
+							color = nextMap["light"]
+							local nr = tonumber(color:sub(1, 2), 16) / 255
+							local ng = tonumber(color:sub(3, 4), 16) / 255
+							local nb = tonumber(color:sub(5, 6), 16) / 255
+							color = nextMap["dark"]
+							local nr2 = tonumber(color:sub(1, 2), 16) / 255
+							local ng2 = tonumber(color:sub(3, 4), 16) / 255
+							local nb2 = tonumber(color:sub(5, 6), 16) / 255
+							local curve = keyMap.curve
+							if curve then
+								bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, r, nr, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, g, ng, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, b, nb, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, r2, nr2, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, g2, ng2, 1)
+								bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, b2, nb2, 1)
+							end
+							time = time2
+							r = nr
+							g = ng
+							b = nb
+							r2 = nr2
+							g2 = ng2
+							b2 = nb2
+						end
+						table_insert(timelines, timeline)
 					else
-						error("Invalid frame type for a slot: " .. timelineName .. " (" .. slotName .. ")")
+						error("Invalid timeline type for a slot: " .. timelineName .. " (" .. slotName .. ")")
 					end
 				end
 			end
 		end
 
-		-- Bone timelines
+		-- Bone timelines.
 		local bonesMap = map["bones"]
 		if bonesMap then
-			for boneName,timelineMap in pairs(bonesMap) do
+			for boneName,boneMap in pairs(bonesMap) do
 				local boneIndex = skeletonData:findBoneIndex(boneName)
 				if boneIndex == -1 then error("Bone not found: " .. boneName) end
-
-				for timelineName,values in pairs(timelineMap) do
-					if timelineName == "rotate" then
-						local timeline = Animation.RotateTimeline.new(#values)
-						timeline.boneIndex = boneIndex
-
-						local frameIndex = 0
-						for _,valueMap in ipairs(values) do
-							timeline:setFrame(frameIndex, getValue(valueMap, "time", 0), getValue(valueMap, "angle", 0))
-							readCurve(valueMap, timeline, frameIndex)
-							frameIndex = frameIndex + 1
-						end
-						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.RotateTimeline.ENTRIES])
-
-					elseif timelineName == "translate" or timelineName == "scale" or timelineName == "shear" then
-						local timeline
-						local timelineScale = 1
-						local defaultValue = 0
-						if timelineName == "scale" then
-							timeline = Animation.ScaleTimeline.new(#values)
-							defaultValue = 1
-						elseif timelineName == "shear" then
-							timeline = Animation.ShearTimeline.new(#values)
-						else
-							timeline = Animation.TranslateTimeline.new(#values)
-							timelineScale = self.scale
-						end
-						timeline.boneIndex = boneIndex
-
-						local frameIndex = 0
-						for _,valueMap in ipairs(values) do
-							local x = getValue(valueMap, "x", defaultValue) * timelineScale
-							local y = getValue(valueMap, "y", defaultValue) * timelineScale
-							timeline:setFrame(frameIndex, getValue(valueMap, "time", 0), x, y)
-							readCurve(valueMap, timeline, frameIndex)
-							frameIndex = frameIndex + 1
-						end
-						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.TranslateTimeline.ENTRIES])
+				for timelineName,timelineMap in pairs(boneMap) do
+					if not timelineMap then
+					elseif timelineName == "rotate" then
+						table_insert(timelines, readTimeline1(timelineMap, Animation.RotateTimeline.new(#timelineMap, #timelineMap, boneIndex), 0, 1))
+					elseif timelineName == "translate" then
+						local timeline = Animation.TranslateTimeline.new(#timelineMap, #timelineMap * 2, boneIndex)
+						table_insert(timelines, readTimeline2(timelineMap, timeline, "x", "y", 0, scale))
+					elseif timelineName == "translatex" then
+						local timeline = Animation.TranslateXTimeline.new(#timelineMap, #timelineMap, boneIndex)
+						table_insert(timelines, readTimeline1(timelineMap, timeline, 0, scale))
+					elseif timelineName == "translatey" then
+						local timeline = Animation.TranslateYTimeline.new(#timelineMap, #timelineMap, boneIndex)
+						table_insert(timelines, readTimeline1(timelineMap, timeline, 0, scale))
+					elseif timelineName == "scale" then
+						local timeline = Animation.ScaleTimeline.new(#timelineMap, #timelineMap * 2, boneIndex)
+						table_insert(timelines, readTimeline2(timelineMap, "x", "y", 1, 1))
+					elseif timelineName == "scalex" then
+						local timeline = Animation.ScaleXTimeline.new(#timelineMap, #timelineMap, boneIndex)
+						table_insert(timelines, readTimeline1(timelineMap, timeline, 1, 1))
+					elseif timelineName == "scaley" then
+						local timeline = Animation.ScaleYTimeline.new(#timelineMap, #timelineMap, boneIndex)
+						table_insert(timelines, readTimeline1(timelineMap, timeline, 1, 1))
+					elseif timelineName == "shear" then
+						local timeline = Animation.ShearTimeline.new(#timelineMap, #timelineMap * 2, boneIndex)
+						table_insert(timelines, readTimeline2(timelineMap, "x", "y", 0, 1))
+					elseif timelineName == "shearx" then
+						local timeline = Animation.ShearXTimeline.new(#timelineMap, #timelineMap, boneIndex)
+						table_insert(timelines, readTimeline1(timelineMap, timeline, 0, 1))
+					elseif timelineName == "sheary" then
+						local timeline = Animation.ShearYTimeline.new(#timelineMap, #timelineMap, boneIndex)
+						table_insert(timelines, readTimeline1(timelineMap, timeline, 0, 1))
 					else
 						error("Invalid timeline type for a bone: " .. timelineName .. " (" .. boneName .. ")")
 					end
@@ -664,96 +788,169 @@ function SkeletonJson.new (attachmentLoader)
 		-- IK timelines.
 		local ik = map["ik"]
 		if ik then
-			for ikConstraintName,values in pairs(ik) do
-				local ikConstraint = skeletonData:findIkConstraint(ikConstraintName)
-				local timeline = Animation.IkConstraintTimeline.new(#values)
-				for i,other in pairs(skeletonData.ikConstraints) do
-					if other == ikConstraint then
-						timeline.ikConstraintIndex = i
-						break
+			for constraintName,timelineMap in pairs(ik) do
+				local keyMap = timelineMap[1]
+				if keyMap then
+					local constraintIndex = -1
+					for i,other in pairs(skeletonData.ikConstraints) do
+						if other.name == constraintName then
+							constraintIndex = i
+							break
+						end
+					end
+					local timeline = Animation.IkConstraintTimeline.new(#timelineMap, #timelineMap * 2, constraintIndex)
+					local time = getValue(keyMap, "time", 0)
+					local mix = getValue(keyMap, "mix", 1)
+					local softness = getValue(keyMap, "softness", 0) * scale
+					local bezier = 0
+					for i,keyMap in ipairs(timelineMap) do
+						local frame = i - 1
+						local bendPositive = 1
+						local compress = false
+						local stretch = false
+						if keyMap["bendPositive"] == false then bendPositive = -1 end
+						if keyMap["compress"] ~= nil then compress = keyMap["compress"] end
+						if keyMap["stretch"] ~= nil then stretch = keyMap["stretch"] end
+						timeline:setFrame(frame, time, mix, softness, bendPositive, compress, stretch)
+						local nextMap = timelineMap[i + 1]
+						if not nextMap then
+							timeline:shrink(bezier)
+							break
+						end
+						local time2 = getValue(nextMap, "time", 0)
+						color = nextMap["color"]
+						local mix2 = getValue(nextMap, "mix", 1)
+						local softness2 = getValue(nextMap, "softness", 0) * scale
+						local curve = keyMap.curve
+						if curve then
+							bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mix, mix2, 1)
+							bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, softness, softness2, scale)
+						end
+						time = time2
+						mix = mix2
+						softness = softness2
 					end
 				end
-				local frameIndex = 0
-				for _,valueMap in ipairs(values) do
-					local mix = 1
-					local softness = 0
-					if valueMap["mix"] ~= nil then mix = valueMap["mix"] end
-					if valueMap["softness"] ~= nil then softness = valueMap["softness"] * scale end
-					local bendPositive = 1
-					if valueMap["bendPositive"] == false then bendPositive = -1 end
-					local stretch = false
-					if valueMap["stretch"] ~= nil then stretch = valueMap["stretch"] end
-					local compress = false
-					if valueMap["compress"] ~= nil then compress = valueMap["compress"] end
-					timeline:setFrame(frameIndex, getValue(valueMap, "time", 0), mix, softness, bendPositive, compress, stretch)
-					readCurve(valueMap, timeline, frameIndex)
-					frameIndex = frameIndex + 1
-				end
 				table_insert(timelines, timeline)
-				duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.IkConstraintTimeline.ENTRIES])
 			end
 		end
 
 		-- Transform constraint timelines.
 		local transform = map["transform"]
 		if transform then
-			for constraintName, values in pairs(transform) do
-				local constraint = skeletonData:findTransformConstraint(constraintName)
-				local timeline = Animation.TransformConstraintTimeline.new(#values)
-				for i,other in pairs(skeletonData.transformConstraints) do
-					if other == constraint then
-						timeline.transformConstraintIndex = i
-						break
+			for constraintName, timelineMap in pairs(transform) do
+				local keyMap = timelineMap[1]
+				if keyMap then
+					local constraintIndex = -1
+					for i,other in pairs(skeletonData.transformConstraints) do
+						if other.name == constraintName then
+							constraintIndex = i
+							break
+						end
 					end
+					local timeline = Animation.TransformConstraintTimeline.new(#timelineMap, #timelineMap * 4, constraintIndex)
+					local time = getValue(keyMap, "time", 0)
+					local mixRotate = getValue(keyMap, "mixRotate", 0)
+					local mixX = getValue(keyMap, "mixX", 1)
+					local mixY = getValue(keyMap, "mixY", mixX)
+					local mixScaleX = getValue(keyMap, "mixScaleX", 1)
+					local mixScaleY = getValue(keyMap, "mixScaleY", mixScaleX)
+					local mixShearY = getValue(keyMap, "mixShearY", 1)
+					local bezier = 0
+					for i,keyMap in ipairs(timelineMap) do
+						local frame = i - 1
+						timeline:setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY)
+						local nextMap = timelineMap[frame + 1]
+						if not nextMap then
+							timeline:shrink(bezier)
+							break
+						end
+						local time2 = getValue(nextMap, "time", 0)
+						local mixRotate2 = getValue(nextMap, "mixRotate", 1)
+						local mixX2 = getValue(nextMap, "mixX", 1)
+						local mixY2 = getValue(nextMap, "mixY", mixX2)
+						local mixScaleX2 = getValue(nextMap, "mixScaleX", 1)
+						local mixScaleY2 = getValue(nextMap, "mixScaleY", mixScaleX2)
+						local mixShearY2 = getValue(nextMap, "mixShearY", 1)
+						local curve = keyMap.curve
+						if curve then
+							bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1)
+							bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1)
+							bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1)
+							bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, mixScaleX, mixScaleX2, 1)
+							bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, mixScaleY, mixScaleY2, 1)
+							bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, mixShearY, mixShearY2, 1)
+						end
+						time = time2
+						mixRotate = mixRotate2
+						mixX = mixX2
+						mixY = mixY2
+						mixScaleX = mixScaleX2
+						mixScaleY = mixScaleY2
+						mixScaleX = mixScaleX2
+					end
+					table_insert(timelines, timeline)
 				end
-				local frameIndex = 0
-				for _,valueMap in ipairs(values) do
-					timeline:setFrame(frameIndex, getValue(valueMap, "time", 0), getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1), getValue(valueMap, "scaleMix", 1), getValue(valueMap, "shearMix", 1))
-					readCurve(valueMap, timeline, frameIndex)
-					frameIndex = frameIndex + 1
-				end
-				table_insert(timelines, timeline)
-				duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.TransformConstraintTimeline.ENTRIES])
 			end
 		end
 
 		-- Path constraint timelines.
 		if map.path then
 			for constraintName,constraintMap in pairs(map.path) do
-				local index = skeletonData:findPathConstraintIndex(constraintName)
-				if index == -1 then error("Path constraint not found: " .. constraintName, 2) end
-				local data = skeletonData.pathConstraints[index]
+				local constraint, constraintIndex = -1
+				for i,other in pairs(skeletonData.transformConstraints) do
+					if other.name == constraintName then
+						constraintIndex = i
+						constraint = other
+						break
+					end
+				end
 				for timelineName, timelineMap in pairs(constraintMap) do
-					if timelineName == "position" or timelineName == "spacing" then
-						local timeline = nil
-						local timelineScale = 1
-						if timelineName == "spacing" then
-							timeline = Animation.PathConstraintSpacingTimeline.new(#timelineMap)
-							if data.spacingMode == PathConstraintData.SpacingMode.length or data.spacingMode == PathConstraintData.SpacingMode.fixed then timelineScale = scale end
-						else
-							timeline = Animation.PathConstraintPositionTimeline.new(#timelineMap)
-							if data.positionMode == PathConstraintData.PositionMode.fixed then timelineScale = scale end
+					local keyMap = timelineMap[1]
+					if keyMap then
+						if timelineName == "position" then
+							local timeline = Animation.PathConstraintPositionTimeline.new(#timelineMap, #timelineMap, constraintIndex)
+							local timelineScale = 1
+							if constraint.positionMode == PositionMode.fixed then timelineScale = scale end
+							table_insert(timelines, readTimeline1(timelineMap, timeline, 0, timelineScale))
+						elseif timelineName == "spacing" then
+							local timeline = Animation.PathConstraintSpacingTimeline.new(#timelineMap, #timelineMap, constraintIndex)
+							local timelineScale = 1;
+							if data.spacingMode == SpacingMode.Length or data.spacingMode == SpacingMode.Fixed then timelineScale = scale end
+							table_insert(timelines, readTimeline1(timelineMap, timeline, 0, timelineScale))
+						elseif timelineName == "mix" then
+							local timeline = Animation.PathConstraintMixTimeline.new(#timelineMap, #timelineMap * 3, constraintIndex)
+							local time = getValue(keyMap, "time", 0)
+							local mixRotate = getValue(keyMap, "mixRotate", 1)
+							local mixX = getValue(keyMap, "mixX", 1)
+							local mixY = getValue(keyMap, "mixY", mixX)
+							local bezier = 0
+							for i,keyMap in ipairs(timelineMap) do
+								local frame = i - 1
+								timeline:setFrame(frame, time, mixRotate, mixX, mixY)
+								local nextMap = timelineMap[frame + 1]
+								if not nextMap then
+									timeline:shrink(bezier)
+									break
+								end
+								local time2 = getValue(nextMap, "time", 0)
+								local mixRotate2 = getValue(nextMap, "mixRotate", 1)
+								local mixX2 = getValue(nextMap, "mixX", 1)
+								local mixY2 = getValue(nextMap, "mixY", mixX2)
+								local curve = keyMap.curve
+								if curve then
+									bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1)
+									bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1)
+									bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1)
+								end
+								time = time2
+								mixRotate = mixRotate2
+								mixX = mixX2
+								mixY = mixY2
+								keyMap = nextMap
+							end
+							table_insert(timelines, timeline)
 						end
-						timeline.pathConstraintIndex = index
-						local frameIndex = 0
-						for _,valueMap in ipairs(timelineMap) do
-							timeline:setFrame(frameIndex, getValue(valueMap, "time", 0), getValue(valueMap, timelineName, 0) * timelineScale)
-							readCurve(valueMap, timeline, frameIndex)
-							frameIndex = frameIndex + 1
-						end
-						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.PathConstraintPositionTimeline.ENTRIES])
-					elseif timelineName == "mix" then
-						local timeline = Animation.PathConstraintMixTimeline.new(#timelineMap)
-						timeline.pathConstraintIndex = index
-						local frameIndex = 0
-						for _,valueMap in ipairs(timelineMap) do
-							timeline:setFrame(frameIndex, getValue(valueMap, "time", 0), getValue(valueMap, "rotateMix", 1), getValue(valueMap, "translateMix", 1))
-							readCurve(valueMap, timeline, frameIndex)
-							frameIndex = frameIndex + 1
-						end
-						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline.frames[(timeline:getFrameCount() - 1) * Animation.PathConstraintMixTimeline.ENTRIES])
 					end
 				end
 			end
@@ -765,68 +962,72 @@ function SkeletonJson.new (attachmentLoader)
 				local skin = skeletonData:findSkin(deformName)
 				if not skin then error("Skin not found: " .. deformName, 2) end
 				for slotName,slotMap in pairs(deformMap) do
-					local slotIndex = skeletonData:findSlotIndex(slotName)
+					local slotIndex = skeletonData:findSlot(slotName).index
 					if slotIndex == -1 then error("Slot not found: " .. slotMap.name, 2) end
 					for timelineName,timelineMap in pairs(slotMap) do
-						local attachment = skin:getAttachment(slotIndex, timelineName)
-						if not attachment then error("Deform attachment not found: " .. timelineMap.name, 2) end
-						local weighted = attachment.bones ~= nil
-						local vertices = attachment.vertices;
-						local deformLength = #vertices
-						if weighted then deformLength = math.floor(#vertices / 3) * 2 end
+						local keyMap = timelineMap[1]
+						if keyMap then
+							local attachment = skin:getAttachment(slotIndex, timelineName)
+							if not attachment then error("Deform attachment not found: " .. timelineMap.name, 2) end
+							local weighted = attachment.bones ~= nil
+							local vertices = attachment.vertices
+							local deformLength = #vertices
+							if weighted then deformLength = math.floor(deformLength / 3) * 2 end
 
-						local timeline = Animation.DeformTimeline.new(#timelineMap)
-						timeline.slotIndex = slotIndex
-						timeline.attachment = attachment
-
-						local frameIndex = 0
-						for _,valueMap in ipairs(timelineMap) do
-							local deform = nil
-							local verticesValue = getValue(valueMap, "vertices", nil)
-							if verticesValue == nil then
-								deform = vertices
-								if weighted then deform = utils.newNumberArray(deformLength) end
-							else
-								deform = utils.newNumberArray(deformLength)
-								local start = getValue(valueMap, "offset", 0) + 1
-								utils.arrayCopy(verticesValue, 1, deform, start, #verticesValue)
-								if scale ~= 1 then
-									local i = start
-									local n = i + #verticesValue
-									while i < n do
-										deform[i] = deform[i] * scale
-										i = i + 1
+							local timeline = Animation.DeformTimeline.new(#timelineMap, #timelineMap, slotIndex, attachment)
+							local bezier = 0
+							for i,keyMap in ipairs(timelineMap) do
+								local deform = nil
+								local verticesValue = getValue(keyMap, "vertices", nil)
+								if verticesValue == nil then
+									deform = vertices
+									if weighted then deform = utils.newNumberArray(deformLength) end
+								else
+									deform = utils.newNumberArray(deformLength)
+									local start = getValue(keyMap, "offset", 0) + 1
+									utils.arrayCopy(verticesValue, 1, deform, start, #verticesValue)
+									if scale ~= 1 then
+										local i = start
+										local n = i + #verticesValue
+										while i < n do
+											deform[i] = deform[i] * scale
+											i = i + 1
+										end
+									end
+									if not weighted then
+										local i = 1
+										local n = i + deformLength
+										while i < n do
+											deform[i] = deform[i] + vertices[i]
+											i = i + 1
+										end
 									end
 								end
-								if not weighted then
-									local i = 1
-									local n = i + deformLength
-									while i < n do
-										deform[i] = deform[i] + vertices[i]
-										i = i + 1
-									end
+								local frame = i - 1
+								timeline:setFrame(frame, time, mixRotate, mixX, mixY)
+								local nextMap = timelineMap[frame + 1]
+								if not nextMap then
+									timeline:shrink(bezier)
+									break
 								end
+								local time2 = getValue(nextMap, "time", 0)
+								local curve = keyMap.curve
+								if curve then bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1) end
+								time = time2
 							end
-
-							timeline:setFrame(frameIndex, getValue(valueMap, "time", 0), deform)
-							readCurve(valueMap, timeline, frameIndex)
-							frameIndex = frameIndex + 1
+							table_insert(timelines, timeline)
 						end
-						table_insert(timelines, timeline)
-						duration = math.max(duration, timeline.frames[timeline:getFrameCount() - 1])
 					end
 				end
 			end
 		end
 
-		-- Draworder timeline.
-		local drawOrderValues = map["drawOrder"]
-		if not drawOrderValues then drawOrderValues = map["draworder"] end
-		if drawOrderValues then
-			local timeline = Animation.DrawOrderTimeline.new(#drawOrderValues)
+		-- Draw order timelines.
+		if map["drawOrder"] then
+			local timeline = Animation.DrawOrderTimeline.new(#map["drawOrder"])
 			local slotCount = #skeletonData.slots
-			local frameIndex = 0
-			for _,drawOrderMap in ipairs(drawOrderValues) do
+			local frame = 0
+			for _,drawOrderMap in ipairs(map["drawOrder"]) do
 				local drawOrder = nil
 				local offsets = drawOrderMap["offsets"]
 				if offsets then
@@ -835,7 +1036,7 @@ function SkeletonJson.new (attachmentLoader)
 					local originalIndex = 1
 					local unchangedIndex = 1
 					for _,offsetMap in ipairs(offsets) do
-						local slotIndex = skeletonData:findSlotIndex(offsetMap["slot"])
+						local slotIndex = skeletonData:findSlot(offsetMap["slot"]).index
 						if slotIndex == -1 then error("Slot not found: " .. offsetMap["slot"]) end
 						-- Collect unchanged items.
 						while originalIndex ~= slotIndex do
@@ -861,18 +1062,17 @@ function SkeletonJson.new (attachmentLoader)
 						end
 					end
 				end
-				timeline:setFrame(frameIndex, getValue(drawOrderMap, "time", 0), drawOrder)
-				frameIndex = frameIndex + 1
+				timeline:setFrame(frame, getValue(drawOrderMap, "time", 0), drawOrder)
+				frame = frame + 1
 			end
 			table_insert(timelines, timeline)
-			duration = math.max(duration, timeline.frames[timeline:getFrameCount() - 1])
 		end
 
-		-- Event timeline.
+		-- Event timelines.
 		local events = map["events"]
 		if events then
 			local timeline = Animation.EventTimeline.new(#events)
-			local frameIndex = 0
+			local frame = 0
 			for _,eventMap in ipairs(events) do
 				local eventData = skeletonData:findEvent(eventMap["name"])
 				if not eventData then error("Event not found: " .. eventMap["name"]) end
@@ -896,24 +1096,89 @@ function SkeletonJson.new (attachmentLoader)
 					event.volume = getValue(eventMap, "volume", 1)
 					event.balance = getValue(eventMap, "balance", 0)
 				end
-				timeline:setFrame(frameIndex, event)
-				frameIndex = frameIndex + 1
+				timeline:setFrame(frame, event)
+				frame = frame + 1
 			end
 			table_insert(timelines, timeline)
-			duration = math.max(duration, timeline.frames[timeline:getFrameCount() - 1])
 		end
 
+		local duration = 0
+		for _,timeline in ipairs(timelines) do
+			duration = math.max(duration, timeline:getDuration())
+		end
 		table_insert(skeletonData.animations, Animation.new(name, timelines, duration))
 	end
 
-	readCurve = function (map, timeline, frameIndex)
+	readCurve = function (map, timeline, frame)
 		local curve = map["curve"]
 		if not curve then return end
 		if curve == "stepped" then
-			timeline:setStepped(frameIndex)
+			timeline:setStepped(frame)
 		else
-			timeline:setCurve(frameIndex, getValue(map, "curve", 0), getValue(map, "c2", 0), getValue(map, "c3", 1), getValue(map, "c4", 1))
+			timeline:setCurve(frame, getValue(map, "curve", 0), getValue(map, "c2", 0), getValue(map, "c3", 1), getValue(map, "c4", 1))
 		end
+	end
+
+	readTimeline1 = function (keys, timeline, defaultValue, scale)
+		local keyMap = keys[1]
+		local time = getValue(keyMap, "time", 0)
+		local value = getValue(keyMap, "value", defaultValue) * scale
+		local bezier = 0
+		for i,keyMap in ipairs(keys) do
+			local frame = i - 1
+			timeline:setFrame(frame, time, value)
+			local nextMap = keys[frame + 1]
+			if not nextMap then break end
+			local time2 = getValue(nextMap, "time", 0)
+			local value2 = getValue(nextMap, "value", defaultValue) * scale
+			local curve = keyMap.curve
+			if curve then bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value, value2, scale) end
+			time = time2
+			value = value2
+		end
+		timeline:shrink(bezier)
+		return timeline
+	end
+
+	readTimeline2 = function (keys, timeline, name1, name2, defaultValue, scale)
+		local keyMap = keys[1]
+		local time = getValue(keyMap, "time", 0)
+		local value1 = getValue(keyMap, name1, defaultValue) * scale
+		local value2 = getValue(keyMap, name2, defaultValue) * scale
+		local bezier = 0
+		for i,keyMap in ipairs(keys) do
+			local frame = i - 1
+			timeline:setFrame(frame, time, value1, value2)
+			local nextMap = keys[frame + 1]
+			if not nextMap then break end
+			local time2 = getValue(nextMap, "time", 0)
+			local nvalue1 = getValue(nextMap, name1, defaultValue) * scale
+			local nvalue2 = getValue(nextMap, name2, defaultValue) * scale
+			local curve = keyMap.curve
+			if curve then
+				bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value1, nvalue1, scale)
+				bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, value2, nvalue2, scale)
+			end
+			time = time2
+			value1 = nvalue1
+			value2 = nvalue2
+		end
+		timeline:shrink(bezier)
+		return timeline
+	end
+
+	readCurve = function (curve, timeline, bezier, frame, value, time1, time2, value1, value2, scale)
+		if curve == "stepped" then
+			if value ~= 0 then timeline.setStepped(frame) end
+			return bezier
+		end
+		local i = value * 4
+		local cx1 = curve[i]
+		local cy1 = curve[i + 1] * scale
+		local cx2 = curve[i + 2]
+		local cy2 = curve[i + 3] * scale
+		timeline.setBezier(bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2)
+		return bezier + 1
 	end
 
 	getArray = function (map, name, scale)

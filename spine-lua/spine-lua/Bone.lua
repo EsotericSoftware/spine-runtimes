@@ -40,13 +40,12 @@ local math_pi = math.pi
 local TransformMode = require "spine-lua.TransformMode"
 
 function math.sign(x)
-	if x<0 then
+	if x < 0 then
 		return -1
-	elseif x>0 then
+	elseif x > 0 then
 		return 1
-	else
-		return 0
 	end
+	return 0
 end
 
 local math_sign = math.sign
@@ -96,8 +95,8 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 	self.ashearY = shearY
 	self.appliedValid = true
 
-	local sx = self.skeleton.scaleX;
-	local sy = self.skeleton.scaleY;
+	local sx = self.skeleton.scaleX
+	local sy = self.skeleton.scaleY
 
 	local parent = self.parent
 	if parent == nil then
@@ -132,7 +131,7 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		self.b = pa * lb + pb * ld
 		self.c = pc * la + pd * lc
 		self.d = pc * lb + pd * ld
-		return;
+		return
 	elseif transformMode == TransformMode.onlyTranslation then
 		local rotationY = rotation + 90 + shearY
 		self.a = math_cos(math_rad(rotation + shearX)) * scaleX
@@ -148,11 +147,11 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 			pc = pc / self.skeleton.scaleY
 			pb = pc * s
 			pd = pa * s
-			prx = math_deg(math_atan2(pc, pa));
+			prx = math_deg(math_atan2(pc, pa))
 		else
-			pa = 0;
-			pc = 0;
-			prx = 90 - math_deg(math_atan2(pd, pb));
+			pa = 0
+			pc = 0
+			prx = 90 - math_deg(math_atan2(pd, pb))
 		end
 		local rx = rotation + shearX - prx
 		local ry = rotation + shearY - prx + 90
@@ -181,10 +180,10 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		local r = math_pi / 2 + math_atan2(zc, za)
 		local zb = math_cos(r) * s
 		local zd = math_sin(r) * s
-		local la = math_cos(math_rad(shearX)) * scaleX;
-		local lb = math_cos(math_rad(90 + shearY)) * scaleY;
-		local lc = math_sin(math_rad(shearX)) * scaleX;
-		local ld = math_sin(math_rad(90 + shearY)) * scaleY;
+		local la = math_cos(math_rad(shearX)) * scaleX
+		local lb = math_cos(math_rad(90 + shearY)) * scaleY
+		local lc = math_sin(math_rad(shearX)) * scaleX
+		local ld = math_sin(math_rad(90 + shearY)) * scaleY
 		self.a = za * la + zb * lc
 		self.b = za * lb + zb * ld
 		self.c = zc * la + zd * lc

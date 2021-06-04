@@ -36,8 +36,8 @@ local utils = require "spine-lua.utils"
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local Attachment = require "spine-lua.attachments.Attachment"
 
-local nextID = 0;
-local SHL_11 = 2048;
+local nextID = 0
+local SHL_11 = 2048
 
 local VertexAttachment = {}
 VertexAttachment.__index = VertexAttachment

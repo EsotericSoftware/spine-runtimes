@@ -47,7 +47,8 @@ function BoneData.new (index, name, parent)
 		shearX = 0, shearY = 0,
 		inheritRotation = true,
 		inheritScale = true,
-		skinRequired = false
+		skinRequired = false,
+		color = nil
 	}
 
 	return self

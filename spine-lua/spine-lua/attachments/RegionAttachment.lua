@@ -155,6 +155,7 @@ function RegionAttachment.new (name)
 end
 
 function RegionAttachment:updateOffset ()
+	if not self.region then return end
 	local regionScaleX = self.width / self.region.originalWidth * self.scaleX
 	local regionScaleY = self.height / self.region.originalHeight * self.scaleY
 	local localX = -self.width / 2 * self.scaleX + self.region.offsetX * regionScaleX

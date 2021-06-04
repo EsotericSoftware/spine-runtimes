@@ -84,8 +84,8 @@ function MeshAttachment:updateUVs ()
 			local i = 0
 			local n = #uvs
 			while i < n do
-				uvs[i + 1] = u + regionUVs[i + 2] * width;
-				uvs[i + 2] = v + (1 - regionUVs[i + 1]) * height;
+				uvs[i + 1] = u + regionUVs[i + 2] * width
+				uvs[i + 2] = v + (1 - regionUVs[i + 1]) * height
 				i = i + 2
 			end
 		elseif region.degrees == 180 then
@@ -96,8 +96,8 @@ function MeshAttachment:updateUVs ()
 			local i = 0
 			local n = #uvs
 			while i < n do
-				uvs[i + 1] = u + (1 - regionUVs[i + 1]) * width;
-				uvs[i + 2] = v + (1 - regionUVs[i + 2]) * height;
+				uvs[i + 1] = u + (1 - regionUVs[i + 1]) * width
+				uvs[i + 2] = v + (1 - regionUVs[i + 2]) * height
 				i = i + 2
 			end
 		elseif region.degrees == 270 then
@@ -108,20 +108,20 @@ function MeshAttachment:updateUVs ()
 			local i = 0
 			local n = #uvs
 			while i < n do
-				uvs[i + 1] = u + (1 - regionUVs[i + 2]) * width;
-				uvs[i + 2] = v + regionUVs[i + 1] * height;
+				uvs[i + 1] = u + (1 - regionUVs[i + 2]) * width
+				uvs[i + 2] = v + regionUVs[i + 1] * height
 				i = i + 2
 			end
 		else
-			u = region.u - region.offsetX / textureWidth;
-			v = region.v - (region.originalHeight - region.offsetY - region.height) / textureHeight;
-			width = region.originalWidth / textureWidth;
-			height = region.originalHeight / textureHeight;
+			u = region.u - region.offsetX / textureWidth
+			v = region.v - (region.originalHeight - region.offsetY - region.height) / textureHeight
+			width = region.originalWidth / textureWidth
+			height = region.originalHeight / textureHeight
 			local i = 0
 			local n = #uvs
 			while i < n do
-				uvs[i + 1] = u + regionUVs[i + 1] * width;
-				uvs[i + 2] = v + regionUVs[i + 2] * height;
+				uvs[i + 1] = u + regionUVs[i + 1] * width
+				uvs[i + 2] = v + regionUVs[i + 2] * height
 				i = i + 2
 			end
 		end

@@ -74,7 +74,7 @@ function Triangulator:triangulate (verticesArray)
 	end
 
 	self.triangles = {}
-	local triangles = self.triangles;
+	local triangles = self.triangles
 
 	while vertexCount > 3 do
 		-- Find ear tip.
@@ -122,7 +122,7 @@ function Triangulator:triangulate (verticesArray)
 			if _next == 0 then
 				repeat
 					if not isConcave[i] then
-						break;
+						break
 					end
 					i = i - 1
 				until i == 0
@@ -171,10 +171,10 @@ function Triangulator:decompose(verticesArray, triangles)
 	local vertices = verticesArray
 
 	self.convexPolygons = {}
-	local convexPolygons = self.convexPolygons;
+	local convexPolygons = self.convexPolygons
 
 	self.convexPolygonsIndices = {}
-	local convexPolygonsIndices = self.convexPolygonsIndices;
+	local convexPolygonsIndices = self.convexPolygonsIndices
 
 	local polygonIndices = {}
 	local polygon = {}
@@ -197,12 +197,12 @@ function Triangulator:decompose(verticesArray, triangles)
 		local y3 = vertices[t3 + 1]
 
 		-- If the base of the last triangle is the same as this triangle, check if they form a convex polygon (triangle fan).
-		local merged = false;
+		local merged = false
 		if fanBaseIndex == t1 then
-			local o = #polygon - 4 + 1;
-			local p = polygon;
-			local winding1 = self:winding(p[o], p[o + 1], p[o + 2], p[o + 3], x3, y3);
-			local winding2 = self:winding(x3, y3, p[1], p[2], p[3], p[4]);
+			local o = #polygon - 4 + 1
+			local p = polygon
+			local winding1 = self:winding(p[o], p[o + 1], p[o + 2], p[o + 3], x3, y3)
+			local winding2 = self:winding(x3, y3, p[1], p[2], p[3], p[4])
 			if winding1 == lastWinding and winding2 == lastWinding then
 				table_insert(polygon, x3)
 				table_insert(polygon, y3)
@@ -226,8 +226,8 @@ function Triangulator:decompose(verticesArray, triangles)
 			table_insert(polygon, y3)
 			polygonIndices = {}
 			table_insert(polygonIndices, t1)
-			table_insert(polygonIndices, t2);
-			table_insert(polygonIndices, t3);
+			table_insert(polygonIndices, t2)
+			table_insert(polygonIndices, t3)
 			lastWinding = self:winding(x1, y1, x2, y2, x3, y3)
 			fanBaseIndex = t1
 		end
@@ -266,11 +266,11 @@ function Triangulator:decompose(verticesArray, triangles)
 				if ii ~= i then
 					local otherIndices = convexPolygonsIndices[ii]
 					if (#otherIndices == 3) then
-						local otherFirstIndex = otherIndices[1];
-						local otherSecondIndex = otherIndices[2];
-						local otherLastIndex = otherIndices[3];
+						local otherFirstIndex = otherIndices[1]
+						local otherSecondIndex = otherIndices[2]
+						local otherLastIndex = otherIndices[3]
 
-						local otherPoly = convexPolygons[ii];
+						local otherPoly = convexPolygons[ii]
 						local x3 = otherPoly[#otherPoly - 2 + 1]
 						local y3 = otherPoly[#otherPoly - 1 + 1]
 
@@ -308,14 +308,14 @@ function Triangulator:decompose(verticesArray, triangles)
 		i = i - 1
 	end
 
-	return convexPolygons;
+	return convexPolygons
 end
 
 function Triangulator:isConcave(index, vertexCount, vertices, indices)
-	local previous = indices[(vertexCount + index - 1) % vertexCount] * 2 + 1;
-	local current = indices[index] * 2 + 1;
-	local _next = indices[(index + 1) % vertexCount] * 2 + 1;
-	return not self:positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[_next],vertices[_next + 1]);
+	local previous = indices[(vertexCount + index - 1) % vertexCount] * 2 + 1
+	local current = indices[index] * 2 + 1
+	local _next = indices[(index + 1) % vertexCount] * 2 + 1
+	return not self:positiveArea(vertices[previous], vertices[previous + 1], vertices[current], vertices[current + 1], vertices[_next],vertices[_next + 1])
 end
 
 function Triangulator:positiveArea(p1x, p1y, p2x, p2y, p3x, p3y)
@@ -328,7 +328,7 @@ function Triangulator:winding(p1x, p1y, p2x, p2y, p3x, p3y)
 	if p3x * py - p3y * px + px * p1y - p1x * py >= 0 then
 		return 1
 	else
-		return -1;
+		return -1
 	end
 end
 

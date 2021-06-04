@@ -37,6 +37,7 @@ function SkeletonData.new ()
 		name,
 		bones = {},
 		slots = {},
+		nameToSlot = {},
 		skins = {},
 		defaultSkin = nil,
 		events = {},
@@ -45,8 +46,7 @@ function SkeletonData.new ()
 		transformConstraints = {},
 		pathConstraints = {},
 		x, y, width, height,
-		version, hash, imagesPath,
-		slotNameIndices = {}
+		version, hash, imagesPath
 	}
 	setmetatable(self, SkeletonData)
 
@@ -71,15 +71,7 @@ end
 
 function SkeletonData:findSlot (slotName)
 	if not slotName then error("slotName cannot be nil.", 2) end
-	for i,slot in ipairs(self.slots) do
-		if slot.name == slotName then return slot end
-	end
-	return nil
-end
-
-function SkeletonData:findSlotIndex (slotName)
-	if not slotName then error("slotName cannot be nil.", 2) end
-	return self.slotNameIndices[slotName] or -1
+	return self.nameToSlot[slotName]
 end
 
 function SkeletonData:findSkin (skinName)
@@ -128,14 +120,6 @@ function SkeletonData:findPathConstraint (constraintName)
 		if constraint.name == constraintName then return constraint end
 	end
 	return nil
-end
-
-function SkeletonData:findPathConstraintIndex (constraintName)
-	if not constraintName then error("constraintName cannot be nil.", 2) end
-	for i,constraint in ipairs(self.pathConstraints) do
-		if constraint.name == constraintName then return i end
-	end
-	return -1
 end
 
 return SkeletonData

@@ -159,7 +159,7 @@ function EventQueue:drain ()
 	end
 	self:clear()
 
-	self.drainDisabled = false;
+	self.drainDisabled = false
 end
 
 function EventQueue:clear ()
@@ -326,7 +326,7 @@ function AnimationState:updateMixingFrom (to, delta)
 
 	from.trackTime = from.trackTime + delta * from.timeScale
 	to.mixTime = to.mixTime + delta
-	return false;
+	return false
 end
 
 function AnimationState:apply (skeleton)
@@ -388,7 +388,7 @@ function AnimationState:apply (skeleton)
 					end
 				end
 				self:queueEvents(current, animationTime)
-				self.events = {};
+				self.events = {}
 				current.nextAnimationLast = animationTime
 				current.nextTrackLast = current.trackTime
 			end
@@ -400,7 +400,7 @@ function AnimationState:apply (skeleton)
 	-- subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
 	-- the time is before the first key).
 	local setupState = self.unkeyedState + SETUP
-	local slots = skeleton.slots;
+	local slots = skeleton.slots
 	for _, slot in ipairs(slots) do
 		if slot.attachmentState == setupState then
 			local attachmentName = slot.data.attachmentName
@@ -411,7 +411,7 @@ function AnimationState:apply (skeleton)
 			end
 		end
 	end
-	self.unkeyedState = self.unkeyedState + 2; -- Increasing after each use avoids the need to reset attachmentState for every slot.
+	self.unkeyedState = self.unkeyedState + 2 -- Increasing after each use avoids the need to reset attachmentState for every slot.
 
 
 	queue:drain()
@@ -453,11 +453,11 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 		local firstFrame = #from.timelinesRotation == 0
 		local timelinesRotation = from.timelinesRotation
 
-		from.totalAlpha = 0;
+		from.totalAlpha = 0
 
 		for i,timeline in ipairs(timelines) do
-			local skipSubsequent = false;
-			local direction = MixDirection.out;
+			local skipSubsequent = false
+			local direction = MixDirection.out
 			local timelineBlend = MixBlend.setup
 			local alpha = 0
 			if timelineMode[i] == SUBSEQUENT then
@@ -498,7 +498,7 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 	if (to.mixDuration > 0) then
 		self:queueEvents(from, animationTime)
 	end
-	self.events = {};
+	self.events = {}
 	from.nextAnimationLast = animationTime
 	from.nextTrackLast = from.trackTime
 
@@ -506,20 +506,20 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 end
 
 function AnimationState:applyAttachmentTimeline(timeline, skeleton, time, blend, attachments)
-	local slot = skeleton.slots[timeline.slotIndex];
+	local slot = skeleton.slots[timeline.slotIndex]
 	if slot.bone.active == false then return end
 
 	local frames = timeline.frames
 	if time < frames[0] then -- Time is before first frame.
 		if blend == MixBlend.setup or blend == MixBlend.first then
-			self:setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
+			self:setAttachment(skeleton, slot, slot.data.attachmentName, attachments)
 		end
 	else
 		local frameIndex = 0
 		if (time >= frames[zlen(frames) - 1]) then -- Time is after last frame.
-			frameIndex = zlen(frames) - 1;
+			frameIndex = zlen(frames) - 1
 		else
-			frameIndex = Animation.binarySearch(frames, time, 1) - 1;
+			frameIndex = Animation.binarySearch(frames, time, 1) - 1
 		end
 		self:setAttachment(skeleton, slot, timeline.attachmentNames[frameIndex], attachments)
 	end
@@ -665,7 +665,7 @@ function AnimationState:clearTracks ()
 	local queue = self.queue
 	local tracks = self.tracks
 	local oldDrainDisabled = queue.drainDisabled
-	queue.drainDisabled = true;
+	queue.drainDisabled = true
 	local numTracks = getNumTracks(tracks)
 	local i = 0
 	while i <= numTracks do
@@ -673,7 +673,7 @@ function AnimationState:clearTracks ()
 	end
 	tracks = {}
 	queue.drainDisabled = oldDrainDisabled
-	queue:drain();
+	queue:drain()
 end
 
 function AnimationState:clearTrack (trackIndex)
@@ -686,7 +686,7 @@ function AnimationState:clearTrack (trackIndex)
 
 	self:disposeNext(current)
 
-	local entry = current;
+	local entry = current
 	while (true) do
 		local from = entry.mixingFrom
 		if from == nil then break end
@@ -717,7 +717,7 @@ function AnimationState:setCurrent (index, current, interrupt)
 			current.interruptAlpha = current.interruptAlpha * math_min(1, from.mixTime / from.mixDuration)
 		end
 
-		from.timelinesRotation = {};
+		from.timelinesRotation = {}
 	end
 
 	queue:start(current)
@@ -731,7 +731,7 @@ end
 
 function AnimationState:setAnimation (trackIndex, animation, loop)
 	if not animation then error("animation cannot be null.") end
-	local interrupt = true;
+	local interrupt = true
 	local current = self:expandToIndex(trackIndex)
 	local queue = self.queue
 	local tracks = self.tracks
@@ -743,7 +743,7 @@ function AnimationState:setAnimation (trackIndex, animation, loop)
 			queue:_end(current)
 			self:disposeNext(current)
 			current = current.mixingFrom
-			interrupt = false;
+			interrupt = false
 		else
 			self:disposeNext(current)
 		end

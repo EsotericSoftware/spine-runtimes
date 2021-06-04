@@ -97,7 +97,7 @@ function TransformConstraint:applyAbsoluteWorld ()
 	local tb = target.b
 	local tc = target.c
 	local td = target.d
-	local degRadReflect = 0;
+	local degRadReflect = 0
 	if ta * td - tb * tc > 0 then degRadReflect = utils.degRad else degRadReflect = -utils.degRad end
 	local offsetRotation = self.data.offsetRotation * degRadReflect
 	local offsetShearY = self.data.offsetShearY * degRadReflect
@@ -184,7 +184,7 @@ function TransformConstraint:applyRelativeWorld ()
 	local tb = target.b
 	local tc = target.c
 	local td = target.d
-	local degRadReflect = 0;
+	local degRadReflect = 0
 	if ta * td - tb * tc > 0 then degRadReflect = utils.degRad else degRadReflect = -utils.degRad end
 	local offsetRotation = self.data.offsetRotation * degRadReflect
 	local offsetShearY = self.data.offsetShearY * degRadReflect
@@ -242,7 +242,7 @@ function TransformConstraint:applyRelativeWorld ()
 			end
 			local b = bone.b
 			local d = bone.d
-			r = math_atan2(d, b) + (r - math_pi / 2 + offsetShearY) * shearMix;
+			r = math_atan2(d, b) + (r - math_pi / 2 + offsetShearY) * shearMix
 			local s = math_sqrt(b * b + d * d)
 			bone.b = math_cos(r) * s
 			bone.d = math_sin(r) * s
@@ -297,7 +297,7 @@ function TransformConstraint:applyAbsoluteLocal ()
 			bone.shearY = bone.shearY + r * shearMix
 		end
 
-		bone:updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
+		bone:updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY)
 	end
 end
 
