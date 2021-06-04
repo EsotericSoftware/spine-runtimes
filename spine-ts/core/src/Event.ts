@@ -44,7 +44,7 @@ module spine {
 		balance: number;
 
 		constructor (time: number, data: EventData) {
-			if (data == null) throw new Error("data cannot be null.");
+			if (!data) throw new Error("data cannot be null.");
 			this.time = time;
 			this.data = data;
 		}

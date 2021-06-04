@@ -61,8 +61,8 @@ module spine {
 		active = false;
 
 		constructor (data: IkConstraintData, skeleton: Skeleton) {
-			if (data == null) throw new Error("data cannot be null.");
-			if (skeleton == null) throw new Error("skeleton cannot be null.");
+			if (!data) throw new Error("data cannot be null.");
+			if (!skeleton) throw new Error("skeleton cannot be null.");
 			this.data = data;
 			this.mix = data.mix;
 			this.softness = data.softness;

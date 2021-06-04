@@ -110,7 +110,7 @@ module spine.webgl {
 			element.addEventListener("mousemove", mouseMove, true);
 			element.addEventListener("mouseup", mouseUp, true);
 			element.addEventListener("touchstart", (ev: TouchEvent) => {
-				if (this.currTouch != null) return;
+				if (this.currTouch) return;
 
 				var touches = ev.changedTouches;
 				for (var i = 0; i < touches.length; i++) {
@@ -182,7 +182,7 @@ module spine.webgl {
 				ev.preventDefault();
 			}, false);
 			element.addEventListener("touchmove", (ev: TouchEvent) => {
-				if (this.currTouch == null) return;
+				if (!this.currTouch) return;
 
 				var touches = ev.changedTouches;
 				for (var i = 0; i < touches.length; i++) {

@@ -59,7 +59,7 @@ module spine {
 		 * @param updateAabb If true, the axis aligned bounding box containing all the polygons is computed. If false, the
 		 *           SkeletonBounds AABB methods will always return true. */
 		update (skeleton: Skeleton, updateAabb: boolean) {
-			if (skeleton == null) throw new Error("skeleton cannot be null.");
+			if (!skeleton) throw new Error("skeleton cannot be null.");
 			let boundingBoxes = this.boundingBoxes;
 			let polygons = this.polygons;
 			let polygonPool = this.polygonPool;
@@ -212,7 +212,7 @@ module spine {
 
 		/** Returns the polygon for the specified bounding box, or null. */
 		getPolygon (boundingBox: BoundingBoxAttachment) {
-			if (boundingBox == null) throw new Error("boundingBox cannot be null.");
+			if (!boundingBox) throw new Error("boundingBox cannot be null.");
 			let index = this.boundingBoxes.indexOf(boundingBox);
 			return index == -1 ? null : this.polygons[index];
 		}

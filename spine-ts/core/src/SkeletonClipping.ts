@@ -40,7 +40,7 @@ module spine {
 		private clippingPolygons: Array<Array<number>>;
 
 		clipStart (slot: Slot, clip: ClippingAttachment): number {
-			if (this.clipAttachment != null) return 0;
+			if (this.clipAttachment) return 0;
 			this.clipAttachment = clip;
 
 			let n = clip.worldVerticesLength;
@@ -60,11 +60,11 @@ module spine {
 		}
 
 		clipEndWithSlot (slot: Slot) {
-			if (this.clipAttachment != null && this.clipAttachment.endSlot == slot.data) this.clipEnd();
+			if (this.clipAttachment && this.clipAttachment.endSlot == slot.data) this.clipEnd();
 		}
 
 		clipEnd () {
-			if (this.clipAttachment == null) return;
+			if (!this.clipAttachment) return;
 			this.clipAttachment = null;
 			this.clippingPolygons = null;
 			this.clippedVertices.length = 0;

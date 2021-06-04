@@ -464,8 +464,11 @@ package spine {
 
 						for (frame = 0, bezier = 0;; frame++) {
 							rgbaTimeline.setFrame(frame, time, rgba.r, rgba.g, rgba.b, rgba.a);
-							if (timelineMap.length == frame + 1) break;
 							nextMap = timelineMap[frame + 1];
+							if (!nextMap) {
+								timeline.shrink(bezier);
+								break;
+							}
 							time2 = getNumber(nextMap, "time", 0);
 							var newRgba : Color = Color.fromString(nextMap.color);
 							curve = keyMap.curve;
@@ -479,7 +482,6 @@ package spine {
 							rgba = newRgba;
 							keyMap = nextMap;
 						}
-
 						timelines.push(rgbaTimeline);
 
 					} else if (timelineName == "rgb") {
@@ -490,8 +492,11 @@ package spine {
 
 						for (frame = 0, bezier = 0;; frame++) {
 							rgbTimeline.setFrame(frame, time, rgb.r, rgb.g, rgb.b);
-							if (timelineMap.length == frame + 1) break;
 							nextMap = timelineMap[frame + 1];
+							if (!nextMap) {
+								timeline.shrink(bezier);
+								break;
+							}
 							time2 = getNumber(nextMap, "time", 0);
 							var newRgb : Color = Color.fromString(nextMap.color);
 							curve = keyMap.curve;
@@ -504,7 +509,6 @@ package spine {
 							rgb = newRgb;
 							keyMap = nextMap;
 						}
-
 						timelines.push(rgbTimeline);
 
 					} else if (timelineName == "alpha") {
@@ -519,8 +523,11 @@ package spine {
 
 						for (frame = 0, bezier = 0;; frame++) {
 							rgba2Timeline.setFrame(frame, time, lighta.r, lighta.g, lighta.b, lighta.a, darka.r, darka.g, darka.b);
-							if (timelineMap.length == frame + 1) break;
 							nextMap = timelineMap[frame + 1];
+							if (!nextMap) {
+								timeline.shrink(bezier);
+								break;
+							}
 							time2 = getNumber(nextMap, "time", 0);
 							var newLighta : Color = Color.fromString(nextMap.light);
 							var newDarka : Color = Color.fromString(nextMap.dark);
@@ -539,7 +546,6 @@ package spine {
 							darka = newDarka;
 							keyMap = nextMap;
 						}
-
 						timelines.push(rgba2Timeline);
 
 					} else if (timelineName == "rgb2") {
@@ -552,8 +558,11 @@ package spine {
 
 						for (frame = 0, bezier = 0;; frame++) {
 							rgb2Timeline.setFrame(frame, time, light.r, light.g, light.b, dark.r, dark.g, dark.b);
-							if (timelineMap.length == frame + 1) break;
 							nextMap = timelineMap[frame + 1];
+							if (!nextMap) {
+								timeline.shrink(bezier);
+								break;
+							}
 							time2 = getNumber(nextMap, "time", 0);
 							var newLight : Color = Color.fromString(nextMap.light);
 							var newDark : Color = Color.fromString(nextMap.dark);
@@ -571,7 +580,6 @@ package spine {
 							dark = newDark;
 							keyMap = nextMap;
 						}
-
 						timelines.push(rgb2Timeline);
 
 					} else
@@ -641,7 +649,10 @@ package spine {
 				for (frame = 0, bezier = 0;; frame++) {
 					ikTimeline.setFrame(frame, time, mix, softness, getValue(keyMap, "bendPositive", true) ? 1 : -1, getValue(keyMap, "compress", false), getValue(keyMap, "stretch", false));
 					nextMap = timelineMap[frame + 1];
-					if (!nextMap) break;
+					if (!nextMap) {
+						timeline.shrink(bezier);
+						break;
+					}
 
 					time2 = getNumber(nextMap, "time", 0);
 					var mix2 : Number = getNumber(nextMap, "mix", 1);
@@ -684,7 +695,10 @@ package spine {
 				for (frame = 0, bezier = 0;; frame++) {
 					transformTimeline.setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
 					nextMap = timelineMap[frame + 1];
-					if (!nextMap) break;
+					if (!nextMap) {
+						timeline.shrink(bezier);
+						break;
+					}
 
 					time2 = getNumber(nextMap, "time", 0);
 					mixRotate2 = getNumber(nextMap, "mixRotate", 1);
@@ -743,7 +757,10 @@ package spine {
 						for (frame = 0, bezier = 0;; frame++) {
 							mixTimeline.setFrame(frame, time, mixRotate, mixX, mixY);
 							nextMap = timelineMap[frame + 1];
-							if (!nextMap) break;
+							if (!nextMap) {
+								timeline.shrink(bezier);
+								break;
+							}
 							time2 = getNumber(nextMap, "time", 0);
 							mixRotate2 = getNumber(nextMap, "mixRotate", 1);
 							mixX2 = getNumber(nextMap, "mixX", 1);
@@ -811,7 +828,10 @@ package spine {
 
 							deformTimeline.setFrame(frame, time, deform);
 							nextMap = timelineMap[frame + 1];
-							if (!nextMap) break;
+							if (!nextMap) {
+								timeline.shrink(bezier);
+								break;
+							}
 							time2 = getNumber(nextMap, "time", 0);
 							curve = keyMap.curve;
 							if (curve) bezier = readCurve(curve, deformTimeline, bezier, frame, 0, time, time2, 0, 1, 1);
@@ -824,13 +844,12 @@ package spine {
 			}
 
 			// Draw order timelines.
-			var drawOrdersMap : Array = map["drawOrder"];
-			if (!drawOrdersMap) drawOrdersMap = map["draworder"];
-			if (drawOrdersMap) {
-				var drawOrderTimeline : DrawOrderTimeline = new DrawOrderTimeline(drawOrdersMap.length);
+			var drawOrdersp : Array = map["drawOrder"];
+			if (drawOrders) {
+				var drawOrderTimeline : DrawOrderTimeline = new DrawOrderTimeline(drawOrders.length);
 				var slotCount : int = skeletonData.slots.length;
 				frame = 0;
-				for each (var drawOrderMap : Object in drawOrdersMap) {
+				for each (var drawOrderMap : Object in drawOrders) {
 					var drawOrder : Vector.<int> = null;
 					var offsets : Array = drawOrderMap["offsets"];
 					if (offsets) {
@@ -884,7 +903,6 @@ package spine {
 			var duration : Number = 0;
 			for (i = 0, n = timelines.length; i < n; i++)
 				duration = Math.max(duration, timelines[i].getDuration());
-			if (isNaN(duration)) throw new Error("Animation duration is NaN.");
 
 			skeletonData.animations.push(new Animation(name, timelines, duration));
 		}
@@ -906,6 +924,7 @@ package spine {
 				value = value2;
 				keyMap = nextMap;
 			}
+			timeline.shrink(bezier);
 			return timeline;
 		}
 
@@ -940,15 +959,15 @@ package spine {
 			value1 : Number, value2 : Number, scale : Number) : int {
 			if (curve == "stepped") {
 				if (value != 0) timeline.setStepped(frame);
-			} else {
-				var i : int = value << 2;
-				var cx1 : Number = curve[i++];
-				var cy1 : Number = curve[i++] * scale;
-				var cx2 : Number = curve[i++];
-				var cy2 : Number = curve[i++] * scale;
-				timeline.setBezier(bezier++, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
+				return bezier;
 			}
-			return bezier;
+			var i : int = value << 2;
+			var cx1 : Number = curve[i];
+			var cy1 : Number = curve[i + 1] * scale;
+			var cx2 : Number = curve[i + 2];
+			var cy2 : Number = curve[i + 3] * scale;
+			timeline.setBezier(bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
+			return bezier + 1;
 		}
 
 		static private function getValue(map : Object, property : String, defaultValue : Object) : Object {

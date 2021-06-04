@@ -186,7 +186,7 @@ module spine {
 
 			// Default skin.
 			let defaultSkin = this.readSkin(input, skeletonData, true, nonessential);
-			if (defaultSkin != null) {
+			if (defaultSkin) {
 				skeletonData.defaultSkin = defaultSkin;
 				skeletonData.skins.push(defaultSkin);
 			}
@@ -203,10 +203,10 @@ module spine {
 			n = this.linkedMeshes.length;
 			for (let i = 0; i < n; i++) {
 				let linkedMesh = this.linkedMeshes[i];
-				let skin = linkedMesh.skin == null ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
-				if (skin == null) throw new Error("Skin not found: " + linkedMesh.skin);
+				let skin = !linkedMesh.skin ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
+				if (!skin) throw new Error("Skin not found: " + linkedMesh.skin);
 				let parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-				if (parent == null) throw new Error("Parent mesh not found: " + linkedMesh.parent);
+				if (!parent) throw new Error("Parent mesh not found: " + linkedMesh.parent);
 				linkedMesh.mesh.deformAttachment = linkedMesh.inheritDeform ? parent as VertexAttachment : linkedMesh.mesh;
 				linkedMesh.mesh.setParentMesh(parent as MeshAttachment);
 				linkedMesh.mesh.updateUVs();
@@ -221,7 +221,7 @@ module spine {
 				data.floatValue = input.readFloat();
 				data.stringValue = input.readString();
 				data.audioPath = input.readString();
-				if (data.audioPath != null) {
+				if (data.audioPath) {
 					data.volume = input.readFloat();
 					data.balance = input.readFloat();
 				}
@@ -264,7 +264,7 @@ module spine {
 				for (let ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					let name = input.readStringRef();
 					let attachment = this.readAttachment(input, skeletonData, skin, slotIndex, name, nonessential);
-					if (attachment != null) skin.setAttachment(slotIndex, name, attachment);
+					if (attachment) skin.setAttachment(slotIndex, name, attachment);
 				}
 			}
 			return skin;
@@ -274,7 +274,7 @@ module spine {
 			let scale = this.scale;
 
 			let name = input.readStringRef();
-			if (name == null) name = attachmentName;
+			if (!name) name = attachmentName;
 
 			switch (input.readByte()) {
 			case AttachmentType.Region: {
@@ -288,9 +288,9 @@ module spine {
 				let height = input.readFloat();
 				let color = input.readInt32();
 
-				if (path == null) path = name;
+				if (!path) path = name;
 				let region = this.attachmentLoader.newRegionAttachment(skin, name, path);
-				if (region == null) return null;
+				if (!region) return null;
 				region.path = path;
 				region.x = x * scale;
 				region.y = y * scale;
@@ -309,7 +309,7 @@ module spine {
 				let color = nonessential ? input.readInt32() : 0;
 
 				let box = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
-				if (box == null) return null;
+				if (!box) return null;
 				box.worldVerticesLength = vertexCount << 1;
 				box.vertices = vertices.vertices;
 				box.bones = vertices.bones;
@@ -332,9 +332,9 @@ module spine {
 					height = input.readFloat();
 				}
 
-				if (path == null) path = name;
+				if (!path) path = name;
 				let mesh = this.attachmentLoader.newMeshAttachment(skin, name, path);
-				if (mesh == null) return null;
+				if (!mesh) return null;
 				mesh.path = path;
 				Color.rgba8888ToColor(mesh.color, color);
 				mesh.bones = vertices.bones;
@@ -363,9 +363,9 @@ module spine {
 					height = input.readFloat();
 				}
 
-				if (path == null) path = name;
+				if (!path) path = name;
 				let mesh = this.attachmentLoader.newMeshAttachment(skin, name, path);
-				if (mesh == null) return null;
+				if (!mesh) return null;
 				mesh.path = path;
 				Color.rgba8888ToColor(mesh.color, color);
 				if (nonessential) {
@@ -386,7 +386,7 @@ module spine {
 				let color = nonessential ? input.readInt32() : 0;
 
 				let path = this.attachmentLoader.newPathAttachment(skin, name);
-				if (path == null) return null;
+				if (!path) return null;
 				path.closed = closed;
 				path.constantSpeed = constantSpeed;
 				path.worldVerticesLength = vertexCount << 1;
@@ -403,7 +403,7 @@ module spine {
 				let color = nonessential ? input.readInt32() : 0;
 
 				let point = this.attachmentLoader.newPointAttachment(skin, name);
-				if (point == null) return null;
+				if (!point) return null;
 				point.x = x * scale;
 				point.y = y * scale;
 				point.rotation = rotation;
@@ -417,7 +417,7 @@ module spine {
 				let color = nonessential ? input.readInt32() : 0;
 
 				let clip = this.attachmentLoader.newClippingAttachment(skin, name);
-				if (clip == null) return null;
+				if (!clip) return null;
 				clip.endSlot = skeletonData.slots[endSlotIndex];
 				clip.worldVerticesLength = vertexCount << 1;
 				clip.vertices = vertices.vertices;
@@ -839,8 +839,8 @@ module spine {
 					for (let iii = 0, nnn = input.readInt(true); iii < nnn; iii++) {
 						let attachmentName = input.readStringRef();
 						let attachment = skin.getAttachment(slotIndex, attachmentName) as VertexAttachment;
-						if (attachment == null) throw Error("Vertex attachment not found: " + attachmentName);
-						let weighted = attachment.bones != null;
+						if (!attachment) throw Error("Vertex attachment not found: " + attachmentName);
+						let weighted = attachment.bones;
 						let vertices = attachment.vertices;
 						let deformLength = weighted ? vertices.length / 3 * 2 : vertices.length;
 
@@ -932,7 +932,7 @@ module spine {
 					event.intValue = input.readInt(false);
 					event.floatValue = input.readFloat();
 					event.stringValue = input.readBoolean() ? input.readString() : eventData.stringValue;
-					if (event.data.audioPath != null) {
+					if (event.data.audioPath) {
 						event.volume = input.readFloat();
 						event.balance = input.readFloat();
 					}

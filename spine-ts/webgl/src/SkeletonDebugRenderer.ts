@@ -72,7 +72,7 @@ module spine.webgl {
 				for (let i = 0, n = bones.length; i < n; i++) {
 					let bone = bones[i];
 					if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
-					if (bone.parent == null) continue;
+					if (!bone.parent) continue;
 					let x = skeletonX + bone.data.length * bone.a + bone.worldX;
 					let y = skeletonY + bone.data.length * bone.c + bone.worldY;
 					shapes.rectLine(true, skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, this.boneWidth * this.scale);

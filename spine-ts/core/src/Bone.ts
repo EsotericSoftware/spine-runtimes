@@ -112,8 +112,8 @@ module spine {
 
 		/** @param parent May be null. */
 		constructor (data: BoneData, skeleton: Skeleton, parent: Bone) {
-			if (data == null) throw new Error("data cannot be null.");
-			if (skeleton == null) throw new Error("skeleton cannot be null.");
+			if (!data) throw new Error("data cannot be null.");
+			if (!skeleton) throw new Error("skeleton cannot be null.");
 			this.data = data;
 			this.skeleton = skeleton;
 			this.parent = parent;
@@ -153,7 +153,7 @@ module spine {
 			this.ashearY = shearY;
 
 			let parent = this.parent;
-			if (parent == null) { // Root bone.
+			if (!parent) { // Root bone.
 				let skeleton = this.skeleton;
 				let rotationY = rotation + 90 + shearY;
 				let sx = skeleton.scaleX;
@@ -294,7 +294,7 @@ module spine {
 		 * calling this method is equivalent to the local transform used to compute the world transform, but may not be identical. */
 		updateAppliedTransform () {
 			let parent = this.parent;
-			if (parent == null) {
+			if (!parent) {
 				this.ax = this.worldX;
 				this.ay = this.worldY;
 				this.arotation = Math.atan2(this.c, this.a) * MathUtils.radDeg;

@@ -76,7 +76,7 @@ module spine {
 		 * region. */
 		updateUVs () {
 			let regionUVs = this.regionUVs;
-			if (this.uvs == null || this.uvs.length != regionUVs.length) this.uvs = Utils.newFloatArray(regionUVs.length);
+			if (!this.uvs || this.uvs.length != regionUVs.length) this.uvs = Utils.newFloatArray(regionUVs.length);
 			let uvs = this.uvs;
 			let n = this.uvs.length;
 			let u = this.region.u, v = this.region.v, width = 0, height = 0;
@@ -119,7 +119,7 @@ module spine {
 				v -= (region.originalHeight - region.offsetY - region.height) / textureHeight;
 				width = region.originalWidth / textureWidth;
 				height = region.originalHeight / textureHeight;
-			} else if (this.region == null) {
+			} else if (!this.region) {
 				u = v = 0;
 				width = height = 1;
 			} else {
@@ -143,7 +143,7 @@ module spine {
 		/** @param parentMesh May be null. */
 		setParentMesh (parentMesh: MeshAttachment) {
 			this.parentMesh = parentMesh;
-			if (parentMesh != null) {
+			if (parentMesh) {
 				this.bones = parentMesh.bones;
 				this.vertices = parentMesh.vertices;
 				this.worldVerticesLength = parentMesh.worldVerticesLength;
@@ -155,7 +155,7 @@ module spine {
 		}
 
 		copy (): Attachment {
-			if (this.parentMesh != null) return this.newLinkedMesh();
+			if (this.parentMesh) return this.newLinkedMesh();
 
 			let copy = new MeshAttachment(this.name);
 			copy.region = this.region;
@@ -172,7 +172,7 @@ module spine {
 			copy.hullLength = this.hullLength;
 
 			// Nonessential.
-			if (this.edges != null) {
+			if (this.edges) {
 				copy.edges = new Array<number>(this.edges.length);
 				Utils.arrayCopy(this.edges, 0, copy.edges, 0, this.edges.length);
 			}
@@ -189,7 +189,7 @@ module spine {
 			copy.path = this.path;
 			copy.color.setFromColor(this.color);
 			copy.deformAttachment = this.deformAttachment;
-			copy.setParentMesh(this.parentMesh != null ? this.parentMesh : this);
+			copy.setParentMesh(this.parentMesh ? this.parentMesh : this);
 			copy.updateUVs();
 			return copy;
 		}

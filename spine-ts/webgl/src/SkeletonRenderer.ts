@@ -131,7 +131,7 @@ module spine.webgl {
 					continue;
 				}
 
-				if (texture != null) {
+				if (texture) {
 					let slotColor = slot.color;
 					let finalColor = this.tempColor;
 					finalColor.r = skeletonColor.r * slotColor.r * attachmentColor.r;
@@ -144,7 +144,7 @@ module spine.webgl {
 						finalColor.b *= finalColor.a;
 					}
 					let darkColor = this.tempColor2;
-					if (slot.darkColor == null)
+					if (!slot.darkColor)
 						darkColor.set(0, 0, 0, 1.0);
 					else {
 						if (premultipliedAlpha) {
@@ -167,7 +167,7 @@ module spine.webgl {
 						clipper.clipTriangles(renderable.vertices, renderable.numFloats, triangles, triangles.length, uvs, finalColor, darkColor, twoColorTint);
 						let clippedVertices = new Float32Array(clipper.clippedVertices);
 						let clippedTriangles = clipper.clippedTriangles;
-						if (this.vertexEffect != null) {
+						if (this.vertexEffect) {
 							let vertexEffect = this.vertexEffect;
 							let verts = clippedVertices;
 							if (!twoColorTint) {
@@ -215,7 +215,7 @@ module spine.webgl {
 						batcher.draw(texture, clippedVertices, clippedTriangles);
 					} else {
 						let verts = renderable.vertices;
-						if (this.vertexEffect != null) {
+						if (this.vertexEffect) {
 							let vertexEffect = this.vertexEffect;
 							if (!twoColorTint) {
 								for (let v = 0, u = 0, n = renderable.numFloats; v < n; v += vertexSize, u += 2) {

@@ -83,14 +83,14 @@ module spine {
 		y = 0;
 
 		constructor (data: SkeletonData) {
-			if (data == null) throw new Error("data cannot be null.");
+			if (!data) throw new Error("data cannot be null.");
 			this.data = data;
 
 			this.bones = new Array<Bone>();
 			for (let i = 0; i < data.bones.length; i++) {
 				let boneData = data.bones[i];
 				let bone: Bone;
-				if (boneData.parent == null)
+				if (!boneData.parent)
 					bone = new Bone(boneData, this, null);
 				else {
 					let parent = this.bones[boneData.parent.index];
@@ -145,7 +145,7 @@ module spine {
 				bone.active = !bone.sorted;
 			}
 
-			if (this.skin != null) {
+			if (this.skin) {
 				let skinBones = this.skin.bones;
 				for (let i = 0, n = this.skin.bones.length; i < n; i++) {
 					let bone = this.bones[skinBones[i].index];
@@ -153,7 +153,7 @@ module spine {
 						bone.sorted = false;
 						bone.active = true;
 						bone = bone.parent;
-					} while (bone != null);
+					} while (bone);
 				}
 			}
 
@@ -194,7 +194,7 @@ module spine {
 		}
 
 		sortIkConstraint (constraint: IkConstraint) {
-			constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin != null && Utils.contains(this.skin.constraints, constraint.data, true)));
+			constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)));
 			if (!constraint.active) return;
 
 			let target = constraint.target;
@@ -219,14 +219,14 @@ module spine {
 		}
 
 		sortPathConstraint (constraint: PathConstraint) {
-			constraint.active = constraint.target.bone.isActive() && (!constraint.data.skinRequired || (this.skin != null && Utils.contains(this.skin.constraints, constraint.data, true)));
+			constraint.active = constraint.target.bone.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)));
 			if (!constraint.active) return;
 
 			let slot = constraint.target;
 			let slotIndex = slot.data.index;
 			let slotBone = slot.bone;
-			if (this.skin != null) this.sortPathConstraintAttachment(this.skin, slotIndex, slotBone);
-			if (this.data.defaultSkin != null && this.data.defaultSkin != this.skin)
+			if (this.skin) this.sortPathConstraintAttachment(this.skin, slotIndex, slotBone);
+			if (this.data.defaultSkin && this.data.defaultSkin != this.skin)
 				this.sortPathConstraintAttachment(this.data.defaultSkin, slotIndex, slotBone);
 			for (let i = 0, n = this.data.skins.length; i < n; i++)
 				this.sortPathConstraintAttachment(this.data.skins[i], slotIndex, slotBone);
@@ -248,7 +248,7 @@ module spine {
 		}
 
 		sortTransformConstraint (constraint: TransformConstraint) {
-			constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin != null && Utils.contains(this.skin.constraints, constraint.data, true)));
+			constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)));
 			if (!constraint.active) return;
 
 			this.sortBone(constraint.target);
@@ -286,7 +286,7 @@ module spine {
 		sortPathConstraintAttachmentWith (attachment: Attachment, slotBone: Bone) {
 			if (!(attachment instanceof PathAttachment)) return;
 			let pathBones = (<PathAttachment>attachment).bones;
-			if (pathBones == null)
+			if (!pathBones)
 				this.sortBone(slotBone);
 			else {
 				let bones = this.bones;
@@ -302,7 +302,7 @@ module spine {
 		sortBone (bone: Bone) {
 			if (bone.sorted) return;
 			let parent = bone.parent;
-			if (parent != null) this.sortBone(parent);
+			if (parent) this.sortBone(parent);
 			bone.sorted = true;
 			this._updateCache.push(bone);
 		}
@@ -425,7 +425,7 @@ module spine {
 
 		/** @returns May be null. */
 		findBone (boneName: string) {
-			if (boneName == null) throw new Error("boneName cannot be null.");
+			if (!boneName) throw new Error("boneName cannot be null.");
 			let bones = this.bones;
 			for (let i = 0, n = bones.length; i < n; i++) {
 				let bone = bones[i];
@@ -436,7 +436,7 @@ module spine {
 
 		/** @returns -1 if the bone was not found. */
 		findBoneIndex (boneName: string) {
-			if (boneName == null) throw new Error("boneName cannot be null.");
+			if (!boneName) throw new Error("boneName cannot be null.");
 			let bones = this.bones;
 			for (let i = 0, n = bones.length; i < n; i++)
 				if (bones[i].data.name == boneName) return i;
@@ -447,7 +447,7 @@ module spine {
 		 * repeatedly.
 		 * @returns May be null. */
 		findSlot (slotName: string) {
-			if (slotName == null) throw new Error("slotName cannot be null.");
+			if (!slotName) throw new Error("slotName cannot be null.");
 			let slots = this.slots;
 			for (let i = 0, n = slots.length; i < n; i++) {
 				let slot = slots[i];
@@ -458,7 +458,7 @@ module spine {
 
 		/** @returns -1 if the bone was not found. */
 		findSlotIndex (slotName: string) {
-			if (slotName == null) throw new Error("slotName cannot be null.");
+			if (!slotName) throw new Error("slotName cannot be null.");
 			let slots = this.slots;
 			for (let i = 0, n = slots.length; i < n; i++)
 				if (slots[i].data.name == slotName) return i;
@@ -470,7 +470,7 @@ module spine {
 		 * See {@link #setSkin()}. */
 		setSkinByName (skinName: string) {
 			let skin = this.data.findSkin(skinName);
-			if (skin == null) throw new Error("Skin not found: " + skinName);
+			if (!skin) throw new Error("Skin not found: " + skinName);
 			this.setSkin(skin);
 		}
 
@@ -486,17 +486,17 @@ module spine {
 		 * @param newSkin May be null. */
 		setSkin (newSkin: Skin) {
 			if (newSkin == this.skin) return;
-			if (newSkin != null) {
-				if (this.skin != null)
+			if (newSkin) {
+				if (this.skin)
 					newSkin.attachAll(this, this.skin);
 				else {
 					let slots = this.slots;
 					for (let i = 0, n = slots.length; i < n; i++) {
 						let slot = slots[i];
 						let name = slot.data.attachmentName;
-						if (name != null) {
+						if (name) {
 							let attachment: Attachment = newSkin.getAttachment(i, name);
-							if (attachment != null) slot.setAttachment(attachment);
+							if (attachment) slot.setAttachment(attachment);
 						}
 					}
 				}
@@ -521,12 +521,12 @@ module spine {
 		 * See [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the Spine Runtimes Guide.
 		 * @returns May be null. */
 		getAttachment (slotIndex: number, attachmentName: string): Attachment {
-			if (attachmentName == null) throw new Error("attachmentName cannot be null.");
-			if (this.skin != null) {
+			if (!attachmentName) throw new Error("attachmentName cannot be null.");
+			if (this.skin) {
 				let attachment: Attachment = this.skin.getAttachment(slotIndex, attachmentName);
-				if (attachment != null) return attachment;
+				if (attachment) return attachment;
 			}
-			if (this.data.defaultSkin != null) return this.data.defaultSkin.getAttachment(slotIndex, attachmentName);
+			if (this.data.defaultSkin) return this.data.defaultSkin.getAttachment(slotIndex, attachmentName);
 			return null;
 		}
 
@@ -534,16 +534,15 @@ module spine {
 		 * {@link #getAttachment()}, then setting the slot's {@link Slot#attachment}.
 		 * @param attachmentName May be null to clear the slot's attachment. */
 		setAttachment (slotName: string, attachmentName: string) {
-			if (slotName == null) throw new Error("slotName cannot be null.");
+			if (!slotName) throw new Error("slotName cannot be null.");
 			let slots = this.slots;
 			for (let i = 0, n = slots.length; i < n; i++) {
 				let slot = slots[i];
 				if (slot.data.name == slotName) {
 					let attachment: Attachment = null;
-					if (attachmentName != null) {
+					if (attachmentName) {
 						attachment = this.getAttachment(i, attachmentName);
-						if (attachment == null)
-							throw new Error("Attachment not found: " + attachmentName + ", for slot: " + slotName);
+						if (!attachment) throw new Error("Attachment not found: " + attachmentName + ", for slot: " + slotName);
 					}
 					slot.setAttachment(attachment);
 					return;
@@ -557,7 +556,7 @@ module spine {
 		 * than to call it repeatedly.
 		 * @return May be null. */
 		findIkConstraint (constraintName: string) {
-			if (constraintName == null) throw new Error("constraintName cannot be null.");
+			if (!constraintName) throw new Error("constraintName cannot be null.");
 			let ikConstraints = this.ikConstraints;
 			for (let i = 0, n = ikConstraints.length; i < n; i++) {
 				let ikConstraint = ikConstraints[i];
@@ -570,7 +569,7 @@ module spine {
 		 * this method than to call it repeatedly.
 		 * @return May be null. */
 		findTransformConstraint (constraintName: string) {
-			if (constraintName == null) throw new Error("constraintName cannot be null.");
+			if (!constraintName) throw new Error("constraintName cannot be null.");
 			let transformConstraints = this.transformConstraints;
 			for (let i = 0, n = transformConstraints.length; i < n; i++) {
 				let constraint = transformConstraints[i];
@@ -583,7 +582,7 @@ module spine {
 		 * than to call it repeatedly.
 		 * @return May be null. */
 		findPathConstraint (constraintName: string) {
-			if (constraintName == null) throw new Error("constraintName cannot be null.");
+			if (!constraintName) throw new Error("constraintName cannot be null.");
 			let pathConstraints = this.pathConstraints;
 			for (let i = 0, n = pathConstraints.length; i < n; i++) {
 				let constraint = pathConstraints[i];
@@ -597,8 +596,8 @@ module spine {
 		 * @param size An output value, the width and height of the AABB.
 		 * @param temp Working memory to temporarily store attachments' computed world vertices. */
 		getBounds (offset: Vector2, size: Vector2, temp: Array<number> = new Array<number>(2)) {
-			if (offset == null) throw new Error("offset cannot be null.");
-			if (size == null) throw new Error("size cannot be null.");
+			if (!offset) throw new Error("offset cannot be null.");
+			if (!size) throw new Error("size cannot be null.");
 			let drawOrder = this.drawOrder;
 			let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
@@ -617,7 +616,7 @@ module spine {
 					vertices = Utils.setArraySize(temp, verticesLength, 0);
 					mesh.computeWorldVertices(slot, 0, verticesLength, vertices, 0, 2);
 				}
-				if (vertices != null) {
+				if (vertices) {
 					for (let ii = 0, nn = vertices.length; ii < nn; ii += 2) {
 						let x = vertices[ii], y = vertices[ii + 1];
 						minX = Math.min(minX, x);

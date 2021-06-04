@@ -40,8 +40,8 @@ module spine {
 		duration: number;
 
 		constructor (name: string, timelines: Array<Timeline>, duration: number) {
-			if (name == null) throw new Error("name cannot be null.");
-			if (timelines == null) throw new Error("timelines cannot be null.");
+			if (!name) throw new Error("name cannot be null.");
+			if (!timelines) throw new Error("timelines cannot be null.");
 			this.name = name;
 			this.timelines = timelines;
 			this.timelineIds = new StringSet();
@@ -62,7 +62,7 @@ module spine {
 		 * @param loop If true, the animation repeats after {@link #getDuration()}.
 		 * @param events May be null to ignore fired events. */
 		apply (skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
-			if (skeleton == null) throw new Error("skeleton cannot be null.");
+			if (!skeleton) throw new Error("skeleton cannot be null.");
 
 			if (loop && this.duration != 0) {
 				time %= this.duration;
@@ -1448,7 +1448,7 @@ module spine {
 		}
 
 		setAttachment(skeleton: Skeleton, slot: Slot, attachmentName: string) {
-			slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
+			slot.setAttachment(!attachmentName ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
 		}
 	}
 
@@ -1557,7 +1557,7 @@ module spine {
 						return;
 					}
 					deform.length = vertexCount;
-					if (vertexAttachment.bones == null) {
+					if (!vertexAttachment.bones) {
 						// Unweighted vertex positions.
 						let setupVertices = vertexAttachment.vertices;
 						for (var i = 0; i < vertexCount; i++)
@@ -1578,7 +1578,7 @@ module spine {
 				if (alpha == 1) {
 					if (blend == MixBlend.add) {
 						let vertexAttachment = slotAttachment as VertexAttachment;
-						if (vertexAttachment.bones == null) {
+						if (!vertexAttachment.bones) {
 							// Unweighted vertex positions, with alpha.
 							let setupVertices = vertexAttachment.vertices;
 							for (let i = 0; i < vertexCount; i++)
@@ -1594,7 +1594,7 @@ module spine {
 					switch (blend) {
 					case MixBlend.setup: {
 						let vertexAttachment = slotAttachment as VertexAttachment;
-						if (vertexAttachment.bones == null) {
+						if (!vertexAttachment.bones) {
 							// Unweighted vertex positions, with alpha.
 							let setupVertices = vertexAttachment.vertices;
 							for (let i = 0; i < vertexCount; i++) {
@@ -1615,7 +1615,7 @@ module spine {
 						break;
 					case MixBlend.add:
 						let vertexAttachment = slotAttachment as VertexAttachment;
-						if (vertexAttachment.bones == null) {
+						if (!vertexAttachment.bones) {
 							// Unweighted vertex positions, with alpha.
 							let setupVertices = vertexAttachment.vertices;
 							for (let i = 0; i < vertexCount; i++)
@@ -1639,7 +1639,7 @@ module spine {
 			if (alpha == 1) {
 				if (blend == MixBlend.add) {
 					let vertexAttachment = slotAttachment as VertexAttachment;
-					if (vertexAttachment.bones == null) {
+					if (!vertexAttachment.bones) {
 						// Unweighted vertex positions, with alpha.
 						let setupVertices = vertexAttachment.vertices;
 						for (let i = 0; i < vertexCount; i++) {
@@ -1663,7 +1663,7 @@ module spine {
 				switch (blend) {
 				case MixBlend.setup: {
 					let vertexAttachment = slotAttachment as VertexAttachment;
-					if (vertexAttachment.bones == null) {
+					if (!vertexAttachment.bones) {
 						// Unweighted vertex positions, with alpha.
 						let setupVertices = vertexAttachment.vertices;
 						for (let i = 0; i < vertexCount; i++) {
@@ -1688,7 +1688,7 @@ module spine {
 					break;
 				case MixBlend.add:
 					let vertexAttachment = slotAttachment as VertexAttachment;
-					if (vertexAttachment.bones == null) {
+					if (!vertexAttachment.bones) {
 						// Unweighted vertex positions, with alpha.
 						let setupVertices = vertexAttachment.vertices;
 						for (let i = 0; i < vertexCount; i++) {
@@ -1732,7 +1732,7 @@ module spine {
 
 		/** Fires events for frames > `lastTime` and <= `time`. */
 		apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
-			if (firedEvents == null) return;
+			if (!firedEvents) return;
 
 			let frames = this.frames;
 			let frameCount = this.frames.length;
@@ -1796,7 +1796,7 @@ module spine {
 			}
 
 			let drawOrderToSetupIndex = this.drawOrders[Timeline.search(this.frames, time)];
-			if (drawOrderToSetupIndex == null)
+			if (!drawOrderToSetupIndex)
 				Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
 			else {
 				let drawOrder: Array<Slot> = skeleton.drawOrder;

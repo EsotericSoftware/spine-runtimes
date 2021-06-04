@@ -94,7 +94,6 @@ float CurveTimeline::getBezierValue(float time, size_t frame, size_t valueOffset
 
 RTTI_IMPL(CurveTimeline1, CurveTimeline)
 
-
 CurveTimeline1::CurveTimeline1(size_t frameCount, size_t bezierCount): CurveTimeline(frameCount, CurveTimeline1::ENTRIES, bezierCount) {
 }
 

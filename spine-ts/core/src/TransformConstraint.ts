@@ -50,8 +50,8 @@ module spine {
 		active = false;
 
 		constructor (data: TransformConstraintData, skeleton: Skeleton) {
-			if (data == null) throw new Error("data cannot be null.");
-			if (skeleton == null) throw new Error("skeleton cannot be null.");
+			if (!data) throw new Error("data cannot be null.");
+			if (!skeleton) throw new Error("skeleton cannot be null.");
 			this.data = data;
 			this.mixRotate = data.mixRotate;
 			this.mixX = data.mixX;

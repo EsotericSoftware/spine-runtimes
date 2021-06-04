@@ -812,20 +812,20 @@ public class SkeletonJson extends SkeletonLoader {
 
 		// Path constraint timelines.
 		for (JsonValue constraintMap = map.getChild("path"); constraintMap != null; constraintMap = constraintMap.next) {
-			PathConstraintData data = skeletonData.findPathConstraint(constraintMap.name);
-			if (data == null) throw new SerializationException("Path constraint not found: " + constraintMap.name);
-			int index = skeletonData.pathConstraints.indexOf(data, true);
+			PathConstraintData constraint = skeletonData.findPathConstraint(constraintMap.name);
+			if (constraint == null) throw new SerializationException("Path constraint not found: " + constraintMap.name);
+			int index = skeletonData.pathConstraints.indexOf(constraint, true);
 			for (JsonValue timelineMap = constraintMap.child; timelineMap != null; timelineMap = timelineMap.next) {
 				JsonValue keyMap = timelineMap.child;
 				if (keyMap == null) continue;
 				String timelineName = timelineMap.name;
 				if (timelineName.equals("position")) {
 					CurveTimeline1 timeline = new PathConstraintPositionTimeline(timelineMap.size, timelineMap.size, index);
-					timelines.add(readTimeline(keyMap, timeline, 0, data.positionMode == PositionMode.fixed ? scale : 1));
+					timelines.add(readTimeline(keyMap, timeline, 0, constraint.positionMode == PositionMode.fixed ? scale : 1));
 				} else if (timelineName.equals("spacing")) {
 					CurveTimeline1 timeline = new PathConstraintSpacingTimeline(timelineMap.size, timelineMap.size, index);
 					timelines.add(readTimeline(keyMap, timeline, 0,
-						data.spacingMode == SpacingMode.length || data.spacingMode == SpacingMode.fixed ? scale : 1));
+						constraint.spacingMode == SpacingMode.length || constraint.spacingMode == SpacingMode.fixed ? scale : 1));
 				} else if (timelineName.equals("mix")) {
 					PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(timelineMap.size, timelineMap.size * 3, index);
 					float time = keyMap.getFloat("time", 0);
@@ -915,7 +915,6 @@ public class SkeletonJson extends SkeletonLoader {
 
 		// Draw order timeline.
 		JsonValue drawOrdersMap = map.get("drawOrder");
-		if (drawOrdersMap == null) drawOrdersMap = map.get("draworder");
 		if (drawOrdersMap != null) {
 			DrawOrderTimeline timeline = new DrawOrderTimeline(drawOrdersMap.size);
 			int slotCount = skeletonData.slots.size;
@@ -1027,18 +1026,18 @@ public class SkeletonJson extends SkeletonLoader {
 		float value1, float value2, float scale) {
 		if (curve.isString()) {
 			if (value != 0) timeline.setStepped(frame);
-		} else {
-			curve = curve.get(value << 2);
-			float cx1 = curve.asFloat();
-			curve = curve.next;
-			float cy1 = curve.asFloat() * scale;
-			curve = curve.next;
-			float cx2 = curve.asFloat();
-			curve = curve.next;
-			float cy2 = curve.asFloat() * scale;
-			setBezier(timeline, frame, value, bezier++, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
+			return bezier;
 		}
-		return bezier;
+		curve = curve.get(value << 2);
+		float cx1 = curve.asFloat();
+		curve = curve.next;
+		float cy1 = curve.asFloat() * scale;
+		curve = curve.next;
+		float cx2 = curve.asFloat();
+		curve = curve.next;
+		float cy2 = curve.asFloat() * scale;
+		setBezier(timeline, frame, value, bezier, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
+		return bezier + 1;
 	}
 
 	static void setBezier (CurveTimeline timeline, int frame, int value, int bezier, float time1, float value1, float cx1,

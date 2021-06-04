@@ -559,8 +559,7 @@ namespace Spine {
 							float a = ToColor(color, 3);
 							for (int frame = 0, bezier = 0;; frame++) {
 								timeline.SetFrame(frame, time, r, g, b, a);
-								bool hasNext = keyMapEnumerator.MoveNext();
-								if (!hasNext) {
+								if (!keyMapEnumerator.MoveNext()) {
 									timeline.Shrink(bezier);
 									break;
 								}
@@ -602,8 +601,7 @@ namespace Spine {
 							float b = ToColor(color, 2, 6);
 							for (int frame = 0, bezier = 0; ; frame++) {
 								timeline.SetFrame(frame, time, r, g, b);
-								bool hasNext = keyMapEnumerator.MoveNext();
-								if (!hasNext) {
+								if (!keyMapEnumerator.MoveNext()) {
 									timeline.Shrink(bezier);
 									break;
 								}
@@ -652,8 +650,7 @@ namespace Spine {
 							float b2 = ToColor(color, 2, 6);
 							for (int frame = 0, bezier = 0; ; frame++) {
 								timeline.SetFrame(frame, time, r, g, b, a, r2, g2, b2);
-								bool hasNext = keyMapEnumerator.MoveNext();
-								if (!hasNext) {
+								if (!keyMapEnumerator.MoveNext()) {
 									timeline.Shrink(bezier);
 									break;
 								}
@@ -709,8 +706,7 @@ namespace Spine {
 							float b2 = ToColor(color, 2, 6);
 							for (int frame = 0, bezier = 0; ; frame++) {
 								timeline.SetFrame(frame, time, r, g, b, r2, g2, b2);
-								bool hasNext = keyMapEnumerator.MoveNext();
-								if (!hasNext) {
+								if (!keyMapEnumerator.MoveNext()) {
 									timeline.Shrink(bezier);
 									break;
 								}
@@ -762,8 +758,7 @@ namespace Spine {
 					foreach (KeyValuePair<string, Object> timelineEntry in timelineMap) {
 						var values = (List<Object>)timelineEntry.Value;
 						var keyMapEnumerator = values.GetEnumerator();
-						bool hasNext = keyMapEnumerator.MoveNext();
-						if (!hasNext) continue;
+						if (!keyMapEnumerator.MoveNext()) continue;
 						var timelineName = (string)timelineEntry.Key;
 						if (timelineName == "rotate")
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, new RotateTimeline(values.Count, values.Count, boneIndex), 0, 1));
@@ -801,8 +796,7 @@ namespace Spine {
 				foreach (KeyValuePair<string, Object> timelineMap in (Dictionary<string, Object>)map["ik"]) {
 					var timelineMapValues = (List<Object>)timelineMap.Value;
 					var keyMapEnumerator = timelineMapValues.GetEnumerator();
-					bool hasNext = keyMapEnumerator.MoveNext();
-					if (!hasNext) continue;
+					if (!keyMapEnumerator.MoveNext()) continue;
 					var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 					IkConstraintData constraint = skeletonData.FindIkConstraint(timelineMap.Key);
 					IkConstraintTimeline timeline = new IkConstraintTimeline(timelineMapValues.Count, timelineMapValues.Count << 1,
@@ -812,8 +806,7 @@ namespace Spine {
 					for (int frame = 0, bezier = 0; ; frame++) {
 						timeline.SetFrame(frame, time, mix, softness, GetBoolean(keyMap, "bendPositive", true) ? 1 : -1,
 							GetBoolean(keyMap, "compress", false), GetBoolean(keyMap, "stretch", false));
-						hasNext = keyMapEnumerator.MoveNext();
-						if (!hasNext) {
+						if (!keyMapEnumerator.MoveNext()) {
 							timeline.Shrink(bezier);
 							break;
 						}
@@ -839,8 +832,7 @@ namespace Spine {
 				foreach (KeyValuePair<string, Object> timelineMap in (Dictionary<string, Object>)map["transform"]) {
 					var timelineMapValues = (List<Object>)timelineMap.Value;
 					var keyMapEnumerator = timelineMapValues.GetEnumerator();
-					bool hasNext = keyMapEnumerator.MoveNext();
-					if (!hasNext) continue;
+					if (!keyMapEnumerator.MoveNext()) continue;
 					var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 					TransformConstraintData constraint = skeletonData.FindTransformConstraint(timelineMap.Key);
 					TransformConstraintTimeline timeline = new TransformConstraintTimeline(timelineMapValues.Count, timelineMapValues.Count << 2,
@@ -851,8 +843,7 @@ namespace Spine {
 					float mixScaleX = GetFloat(keyMap, "mixScaleX", 1), mixScaleY = GetFloat(keyMap, "mixScaleY", mixScaleX);
 					for (int frame = 0, bezier = 0; ; frame++) {
 						timeline.SetFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
-						hasNext = keyMapEnumerator.MoveNext();
-						if (!hasNext) {
+						if (!keyMapEnumerator.MoveNext()) {
 							timeline.Shrink(bezier);
 							break;
 						}
@@ -893,8 +884,7 @@ namespace Spine {
 					foreach (KeyValuePair<string, Object> timelineEntry in timelineMap) {
 						var values = (List<Object>)timelineEntry.Value;
 						var keyMapEnumerator = values.GetEnumerator();
-						bool hasNext = keyMapEnumerator.MoveNext();
-						if (!hasNext) continue;
+						if (!keyMapEnumerator.MoveNext()) continue;
 						var timelineName = (string)timelineEntry.Key;
 						if (timelineName == "position") {
 							CurveTimeline1 timeline = new PathConstraintPositionTimeline(values.Count, values.Count, index);
@@ -911,8 +901,7 @@ namespace Spine {
 							float mixX = GetFloat(keyMap, "mixX", 1), mixY = GetFloat(keyMap, "mixY", mixX);
 							for (int frame = 0, bezier = 0; ; frame++) {
 								timeline.SetFrame(frame, time, mixRotate, mixX, mixY);
-								hasNext = keyMapEnumerator.MoveNext();
-								if (!hasNext) {
+								if (!keyMapEnumerator.MoveNext()) {
 									timeline.Shrink(bezier);
 									break;
 								}
@@ -948,8 +937,7 @@ namespace Spine {
 						foreach (KeyValuePair<string, Object> timelineMap in (Dictionary<string, Object>)slotMap.Value) {
 							var timelineMapValues = (List<Object>)timelineMap.Value;
 							var keyMapEnumerator = timelineMapValues.GetEnumerator();
-							bool hasNext = keyMapEnumerator.MoveNext();
-							if (!hasNext) continue;
+							if (!keyMapEnumerator.MoveNext()) continue;
 							var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 							VertexAttachment attachment = (VertexAttachment)skin.GetAttachment(slotIndex, timelineMap.Key);
 							if (attachment == null) throw new Exception("Deform attachment not found: " + timelineMap.Key);
@@ -979,8 +967,7 @@ namespace Spine {
 								}
 
 								timeline.SetFrame(frame, time, deform);
-								hasNext = keyMapEnumerator.MoveNext();
-								if (!hasNext) {
+								if (!keyMapEnumerator.MoveNext()) {
 									timeline.Shrink(bezier);
 									break;
 								}
@@ -1000,8 +987,8 @@ namespace Spine {
 			}
 
 			// Draw order timeline.
-			if (map.ContainsKey("drawOrder") || map.ContainsKey("draworder")) {
-				var values = (List<Object>)map[map.ContainsKey("drawOrder") ? "drawOrder" : "draworder"];
+			if (map.ContainsKey("drawOrder")) {
+				var values = (List<Object>)map["drawOrder"];
 				var timeline = new DrawOrderTimeline(values.Count);
 				int slotCount = skeletonData.slots.Count;
 				int frame = 0;
@@ -1074,9 +1061,7 @@ namespace Spine {
 			int bezier = 0;
 			for (int frame = 0; ; frame++) {
 				timeline.SetFrame(frame, time, value);
-				bool hasNext = keyMapEnumerator.MoveNext();
-				if (!hasNext)
-					break;
+				if (!keyMapEnumerator.MoveNext()) break;
 				var nextMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 				float time2 = GetFloat(nextMap, "time", 0);
 				float value2 = GetFloat(nextMap, "value", defaultValue) * scale;
@@ -1101,9 +1086,7 @@ namespace Spine {
 			int bezier = 0;
 			for (int frame = 0; ; frame++) {
 				timeline.SetFrame(frame, time, value1, value2);
-				bool hasNext = keyMapEnumerator.MoveNext();
-				if (!hasNext)
-					break;
+				if (!keyMapEnumerator.MoveNext()) break;
 				var nextMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 				float time2 = GetFloat(nextMap, "time", 0);
 				float nvalue1 = GetFloat(nextMap, name1, defaultValue) * scale, nvalue2 = GetFloat(nextMap, name2, defaultValue) * scale;
@@ -1126,19 +1109,16 @@ namespace Spine {
 
 			if (curve is string) {
 				if (value != 0) timeline.SetStepped(frame);
-			} else {
-				var curveValues = (List<object>)curve;
-				int index = value << 2;
-				float cx1 = (float)curveValues[index];
-				++index;
-				float cy1 = ((float)curveValues[index]) * scale;
-				++index;
-				float cx2 = (float)curveValues[index];
-				++index;
-				float cy2 = (float)curveValues[index] * scale;
-				SetBezier(timeline, frame, value, bezier++, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
+				return bezier + 1;
 			}
-			return bezier;
+			var curveValues = (List<object>)curve;
+			int i = value << 2;
+			float cx1 = (float)curveValues[i];
+			float cy1 = (float)curveValues[i + 1] * scale;
+			float cx2 = (float)curveValues[i + 2];
+			float cy2 = (float)curveValues[i + 3] * scale;
+			SetBezier(timeline, frame, value, bezier, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
+			return bezier + 1;
 		}
 
 		static void SetBezier (CurveTimeline timeline, int frame, int value, int bezier, float time1, float value1, float cx1, float cy1,

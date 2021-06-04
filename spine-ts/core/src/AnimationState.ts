@@ -35,7 +35,7 @@ module spine {
 	 * See [Applying Animations](http://esotericsoftware.com/spine-applying-animations/) in the Spine Runtimes Guide. */
 	export class AnimationState {
 		private static emptyAnimation(): Animation {
-			if (_emptyAnimation == null) _emptyAnimation = new Animation("<empty>", [], 0);
+			if (!_emptyAnimation) _emptyAnimation = new Animation("<empty>", [], 0);
 			return _emptyAnimation;
 		}
 
@@ -70,7 +70,7 @@ module spine {
 			let tracks = this.tracks;
 			for (let i = 0, n = tracks.length; i < n; i++) {
 				let current = tracks[i];
-				if (current == null) continue;
+				if (!current) continue;
 
 				current.animationLast = current.nextAnimationLast;
 				current.trackLast = current.nextTrackLast;
@@ -85,7 +85,7 @@ module spine {
 				}
 
 				let next = current.next;
-				if (next != null) {
+				if (next) {
 					// When the next entry's delay is passed, change to the next entry, preserving leftover time.
 					let nextTime = current.trackLast - next.delay;
 					if (nextTime >= 0) {
@@ -93,24 +93,24 @@ module spine {
 						next.trackTime += current.timeScale == 0 ? 0 : (nextTime / current.timeScale + delta) * next.timeScale;
 						current.trackTime += currentDelta;
 						this.setCurrent(i, next, true);
-						while (next.mixingFrom != null) {
+						while (next.mixingFrom) {
 							next.mixTime += delta;
 							next = next.mixingFrom;
 						}
 						continue;
 					}
-				} else if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
+				} else if (current.trackLast >= current.trackEnd && !current.mixingFrom) {
 					tracks[i] = null;
 					this.queue.end(current);
 					this.disposeNext(current);
 					continue;
 				}
-				if (current.mixingFrom != null && this.updateMixingFrom(current, delta)) {
+				if (current.mixingFrom && this.updateMixingFrom(current, delta)) {
 					// End mixing from entries once all have completed.
 					let from = current.mixingFrom;
 					current.mixingFrom = null;
-					if (from != null) from.mixingTo = null;
-					while (from != null) {
+					if (from) from.mixingTo = null;
+					while (from) {
 						this.queue.end(from);
 						from = from.mixingFrom;
 					}
@@ -125,7 +125,7 @@ module spine {
 		/** Returns true when all mixing from entries are complete. */
 		updateMixingFrom (to: TrackEntry, delta: number): boolean {
 			let from = to.mixingFrom;
-			if (from == null) return true;
+			if (!from) return true;
 
 			let finished = this.updateMixingFrom(from, delta);
 
@@ -137,7 +137,7 @@ module spine {
 				// Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
 				if (from.totalAlpha == 0 || to.mixDuration == 0) {
 					to.mixingFrom = from.mixingFrom;
-					if (from.mixingFrom != null) from.mixingFrom.mixingTo = to;
+					if (from.mixingFrom) from.mixingFrom.mixingTo = to;
 					to.interruptAlpha = from.interruptAlpha;
 					this.queue.end(from);
 				}
@@ -153,7 +153,7 @@ module spine {
 		 * animation state can be applied to multiple skeletons to pose them identically.
 		 * @returns True if any animations were applied. */
 		apply (skeleton: Skeleton) : boolean {
-			if (skeleton == null) throw new Error("skeleton cannot be null.");
+			if (!skeleton) throw new Error("skeleton cannot be null.");
 			if (this.animationsChanged) this._animationsChanged();
 
 			let events = this.events;
@@ -162,15 +162,15 @@ module spine {
 
 			for (let i = 0, n = tracks.length; i < n; i++) {
 				let current = tracks[i];
-				if (current == null || current.delay > 0) continue;
+				if (!current || current.delay > 0) continue;
 				applied = true;
 				let blend: MixBlend = i == 0 ? MixBlend.first : current.mixBlend;
 
 				// Apply mixing from entries first.
 				let mix = current.alpha;
-				if (current.mixingFrom != null)
+				if (current.mixingFrom)
 					mix *= this.applyMixingFrom(current, skeleton, blend);
-				else if (current.trackTime >= current.trackEnd && current.next == null)
+				else if (current.trackTime >= current.trackEnd && !current.next)
 					mix = 0;
 
 				// Apply current entry.
@@ -229,7 +229,7 @@ module spine {
 				var slot = slots[i];
 				if (slot.attachmentState == setupState) {
 					var attachmentName = slot.data.attachmentName;
-					slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName));
+					slot.setAttachment(!attachmentName ? null : skeleton.getAttachment(slot.data.index, attachmentName));
 				}
 			}
 			this.unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
@@ -240,7 +240,7 @@ module spine {
 
 		applyMixingFrom (to: TrackEntry, skeleton: Skeleton, blend: MixBlend) {
 			let from = to.mixingFrom;
-			if (from.mixingFrom != null) this.applyMixingFrom(from, skeleton, blend);
+			if (from.mixingFrom) this.applyMixingFrom(from, skeleton, blend);
 
 			let mix = 0;
 			if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
@@ -343,7 +343,7 @@ module spine {
 		}
 
 		setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: string, attachments: boolean) {
-			slot.setAttachment(attachmentName == null ? null : skeleton.getAttachment(slot.data.index, attachmentName));
+			slot.setAttachment(!attachmentName ? null : skeleton.getAttachment(slot.data.index, attachmentName));
 			if (attachments) slot.attachmentState = this.unkeyedState + CURRENT;
 		}
 
@@ -458,7 +458,7 @@ module spine {
 		clearTrack (trackIndex: number) {
 			if (trackIndex >= this.tracks.length) return;
 			let current = this.tracks[trackIndex];
-			if (current == null) return;
+			if (!current) return;
 
 			this.queue.end(current);
 
@@ -467,7 +467,7 @@ module spine {
 			let entry = current;
 			while (true) {
 				let from = entry.mixingFrom;
-				if (from == null) break;
+				if (!from) break;
 				this.queue.end(from);
 				entry.mixingFrom = null;
 				entry.mixingTo = null;
@@ -489,14 +489,14 @@ module spine {
 			this.tracks[index] = current;
 			current.previous = null;
 
-			if (from != null) {
+			if (from) {
 				if (interrupt) this.queue.interrupt(from);
 				current.mixingFrom = from;
 				from.mixingTo = current;
 				current.mixTime = 0;
 
 				// Store the interrupted mix percentage.
-				if (from.mixingFrom != null && from.mixDuration > 0)
+				if (from.mixingFrom && from.mixDuration > 0)
 					current.interruptAlpha *= Math.min(1, from.mixTime / from.mixDuration);
 
 				from.timelinesRotation.length = 0; // Reset rotation for mixing out, in case entry was mixed in.
@@ -510,7 +510,7 @@ module spine {
 	 	* See {@link #setAnimationWith()}. */
 		setAnimation (trackIndex: number, animationName: string, loop: boolean) {
 			let animation = this.data.skeletonData.findAnimation(animationName);
-			if (animation == null) throw new Error("Animation not found: " + animationName);
+			if (!animation) throw new Error("Animation not found: " + animationName);
 			return this.setAnimationWith(trackIndex, animation, loop);
 		}
 
@@ -521,10 +521,10 @@ module spine {
 		 * @returns A track entry to allow further customization of animation playback. References to the track entry must not be kept
 		 *         after the {@link AnimationStateListener#dispose()} event occurs. */
 		setAnimationWith (trackIndex: number, animation: Animation, loop: boolean) {
-			if (animation == null) throw new Error("animation cannot be null.");
+			if (!animation) throw new Error("animation cannot be null.");
 			let interrupt = true;
 			let current = this.expandToIndex(trackIndex);
-			if (current != null) {
+			if (current) {
 				if (current.nextTrackLast == -1) {
 					// Don't mix from an entry that was never applied.
 					this.tracks[trackIndex] = current.mixingFrom;
@@ -547,7 +547,7 @@ module spine {
 		 * See {@link #addAnimationWith()}. */
 		addAnimation (trackIndex: number, animationName: string, loop: boolean, delay: number) {
 			let animation = this.data.skeletonData.findAnimation(animationName);
-			if (animation == null) throw new Error("Animation not found: " + animationName);
+			if (!animation) throw new Error("Animation not found: " + animationName);
 			return this.addAnimationWith(trackIndex, animation, loop, delay);
 		}
 
@@ -560,17 +560,17 @@ module spine {
 		 * @returns A track entry to allow further customization of animation playback. References to the track entry must not be kept
 		 *         after the {@link AnimationStateListener#dispose()} event occurs. */
 		addAnimationWith (trackIndex: number, animation: Animation, loop: boolean, delay: number) {
-			if (animation == null) throw new Error("animation cannot be null.");
+			if (!animation) throw new Error("animation cannot be null.");
 
 			let last = this.expandToIndex(trackIndex);
-			if (last != null) {
-				while (last.next != null)
+			if (last) {
+				while (last.next)
 					last = last.next;
 			}
 
 			let entry = this.trackEntry(trackIndex, animation, loop, last);
 
-			if (last == null) {
+			if (!last) {
 				this.setCurrent(trackIndex, entry, true);
 				this.queue.drain();
 			} else {
@@ -619,7 +619,7 @@ module spine {
 			let entry = this.addAnimationWith(trackIndex, AnimationState.emptyAnimation(), false, delay <= 0 ? 1 : delay);
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
-			if (delay <= 0 && entry.previous != null) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration;
+			if (delay <= 0 && entry.previous) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration;
 			return entry;
 		}
 
@@ -630,7 +630,7 @@ module spine {
 			this.queue.drainDisabled = true;
 			for (let i = 0, n = this.tracks.length; i < n; i++) {
 				let current = this.tracks[i];
-				if (current != null) this.setEmptyAnimation(current.trackIndex, mixDuration);
+				if (current) this.setEmptyAnimation(current.trackIndex, mixDuration);
 			}
 			this.queue.drainDisabled = oldDrainDisabled;
 			this.queue.drain();
@@ -670,14 +670,14 @@ module spine {
 			entry.alpha = 1;
 			entry.interruptAlpha = 1;
 			entry.mixTime = 0;
-			entry.mixDuration = last == null ? 0 : this.data.getMix(last.animation, animation);
+			entry.mixDuration = !last ? 0 : this.data.getMix(last.animation, animation);
 			entry.mixBlend = MixBlend.replace;
 			return entry;
 		}
 
 		disposeNext (entry: TrackEntry) {
 			let next = entry.next;
-			while (next != null) {
+			while (next) {
 				this.queue.dispose(next);
 				next = next.next;
 			}
@@ -691,14 +691,14 @@ module spine {
 
 			for (let i = 0, n = this.tracks.length; i < n; i++) {
 				let entry = this.tracks[i];
-				if (entry == null) continue;
-				while (entry.mixingFrom != null)
+				if (!entry) continue;
+				while (entry.mixingFrom)
 					entry = entry.mixingFrom;
 
 				do {
-					if (entry.mixingFrom == null || entry.mixBlend != MixBlend.add) this.computeHold(entry);
+					if (!entry.mixingFrom || entry.mixBlend != MixBlend.add) this.computeHold(entry);
 					entry = entry.mixingTo;
-				} while (entry != null)
+				} while (entry)
 			}
 		}
 
@@ -712,7 +712,7 @@ module spine {
 			timelineHoldMix.length = 0;
 			let propertyIDs = this.propertyIDs;
 
-			if (to != null && to.holdPrevious) {
+			if (to && to.holdPrevious) {
 				for (let i = 0; i < timelinesCount; i++)
 					timelineMode[i] = propertyIDs.addAll(timelines[i].getPropertyIds()) ? HOLD_FIRST : HOLD_SUBSEQUENT;
 				return;
@@ -724,11 +724,11 @@ module spine {
 				let ids = timeline.getPropertyIds();
 				if (!propertyIDs.addAll(ids))
 					timelineMode[i] = SUBSEQUENT;
-				else if (to == null || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
+				else if (!to || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
 					|| timeline instanceof EventTimeline || !to.animation.hasTimeline(ids)) {
 					timelineMode[i] = FIRST;
 				} else {
-					for (let next = to.mixingTo; next != null; next = next.mixingTo) {
+					for (let next = to.mixingTo; next; next = next.mixingTo) {
 						if (next.animation.hasTimeline(ids)) continue;
 						if (entry.mixDuration > 0) {
 							timelineMode[i] = HOLD_MIX;
@@ -750,7 +750,7 @@ module spine {
 
 		/** Adds a listener to receive events for all track entries. */
 		addListener (listener: AnimationStateListener) {
-			if (listener == null) throw new Error("listener cannot be null.");
+			if (!listener) throw new Error("listener cannot be null.");
 			this.listeners.push(listener);
 		}
 
@@ -1042,34 +1042,34 @@ module spine {
 				let entry = objects[i + 1] as TrackEntry;
 				switch (type) {
 				case EventType.start:
-					if (entry.listener != null && entry.listener.start) entry.listener.start(entry);
+					if (entry.listener && entry.listener.start) entry.listener.start(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
 						if (listeners[ii].start) listeners[ii].start(entry);
 					break;
 				case EventType.interrupt:
-					if (entry.listener != null && entry.listener.interrupt) entry.listener.interrupt(entry);
+					if (entry.listener && entry.listener.interrupt) entry.listener.interrupt(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
 						if (listeners[ii].interrupt) listeners[ii].interrupt(entry);
 					break;
 				case EventType.end:
-					if (entry.listener != null && entry.listener.end) entry.listener.end(entry);
+					if (entry.listener && entry.listener.end) entry.listener.end(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
 						if (listeners[ii].end) listeners[ii].end(entry);
 					// Fall through.
 				case EventType.dispose:
-					if (entry.listener != null && entry.listener.dispose) entry.listener.dispose(entry);
+					if (entry.listener && entry.listener.dispose) entry.listener.dispose(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
 						if (listeners[ii].dispose) listeners[ii].dispose(entry);
 					this.animState.trackEntryPool.free(entry);
 					break;
 				case EventType.complete:
-					if (entry.listener != null && entry.listener.complete) entry.listener.complete(entry);
+					if (entry.listener && entry.listener.complete) entry.listener.complete(entry);
 					for (let ii = 0; ii < listeners.length; ii++)
 						if (listeners[ii].complete) listeners[ii].complete(entry);
 					break;
 				case EventType.event:
 					let event = objects[i++ + 2] as Event;
-					if (entry.listener != null && entry.listener.event) entry.listener.event(entry, event);
+					if (entry.listener && entry.listener.event) entry.listener.event(entry, event);
 					for (let ii = 0; ii < listeners.length; ii++)
 						if (listeners[ii].event) listeners[ii].event(entry, event);
 					break;

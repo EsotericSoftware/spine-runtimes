@@ -186,7 +186,7 @@ module spine.webgl {
 
 	export class TexCoordAttribute extends VertexAttribute {
 		constructor (unit: number = 0) {
-			super(Shader.TEXCOORDS + (unit == 0? "": unit), VertexAttributeType.Float, 2);
+			super(Shader.TEXCOORDS + (unit == 0 ? "" : unit), VertexAttributeType.Float, 2);
 		}
 	}
 

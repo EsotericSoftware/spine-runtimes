@@ -37,8 +37,7 @@ module spine {
 		}
 
 		private load (atlasText: string, textureLoader: (path: string) => any) {
-			if (textureLoader == null)
-				throw new Error("textureLoader cannot be null.");
+			if (!textureLoader) throw new Error("textureLoader cannot be null.");
 
 			let reader = new TextureAtlasReader(atlasText);
 			let entry = new Array<string>(4);
@@ -107,11 +106,11 @@ module spine {
 
 			let line = reader.readLine();
 			// Ignore empty lines before first entry.
-			while (line != null && line.trim().length == 0)
+			while (line && line.trim().length == 0)
 				line = reader.readLine();
 			// Header entries.
 			while (true) {
-				if (line == null || line.trim().length == 0) break;
+				if (!line || line.trim().length == 0) break;
 				if (reader.readEntry(entry, line) == 0) break; // Silently ignore all header fields.
 				line = reader.readLine();
 			}
@@ -121,11 +120,11 @@ module spine {
 			let values: number[][] = null;
 			while (true) {
 
-				if (line == null) break;
+				if (!line) break;
 				if (line.trim().length == 0) {
 					page = null;
 					line = reader.readLine();
-				} else if (page == null) {
+				} else if (!page) {
 					page = new TextureAtlasPage();
 					page.name = line.trim();
 					while (true) {
@@ -151,7 +150,7 @@ module spine {
 						if (field)
 							field();
 						else {
-							if (names == null) {
+							if (!names) {
 								names = [];
 								values = [];
 							}
@@ -166,7 +165,7 @@ module spine {
 						region.originalWidth = region.width;
 						region.originalHeight = region.height;
 					}
-					if (names != null && names.length > 0) {
+					if (names && names.length > 0) {
 						region.names = names;
 						region.values = values;
 						names = null;
@@ -218,7 +217,7 @@ module spine {
 		}
 
 		readEntry (entry: string[], line: string): number {
-			if (line == null) return 0;
+			if (!line) return 0;
 			line = line.trim();
 			if (line.length == 0) return 0;
 

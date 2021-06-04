@@ -140,7 +140,7 @@ module spine.canvas {
 					texture = (<TextureAtlasRegion>mesh.region.renderObject).texture.getImage() as HTMLImageElement;
 				} else continue;
 
-				if (texture != null) {
+				if (texture) {
 					let slotBlendMode = slot.data.blendMode;
 					if (slotBlendMode != blendMode) {
 						blendMode = slotBlendMode;

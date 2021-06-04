@@ -55,7 +55,7 @@ module spine {
 
 			// Skeleton
 			let skeletonMap = root.skeleton;
-			if (skeletonMap != null) {
+			if (skeletonMap) {
 				skeletonData.hash = skeletonMap.hash;
 				skeletonData.version = skeletonMap.spine;
 				skeletonData.x = skeletonMap.x;
@@ -73,9 +73,9 @@ module spine {
 
 					let parent: BoneData = null;
 					let parentName: string = getValue(boneMap, "parent", null);
-					if (parentName != null) {
+					if (parentName) {
 						parent = skeletonData.findBone(parentName);
-						if (parent == null) throw new Error("Parent bone not found: " + parentName);
+						if (!parent) throw new Error("Parent bone not found: " + parentName);
 					}
 					let data = new BoneData(skeletonData.bones.length, boneMap.name, parent);
 					data.length = getValue(boneMap, "length", 0) * scale;
@@ -103,14 +103,14 @@ module spine {
 					let slotName: string = slotMap.name;
 					let boneName: string = slotMap.bone;
 					let boneData = skeletonData.findBone(boneName);
-					if (boneData == null) throw new Error("Slot bone not found: " + boneName);
+					if (!boneData) throw new Error("Slot bone not found: " + boneName);
 					let data = new SlotData(skeletonData.slots.length, slotName, boneData);
 
 					let color: string = getValue(slotMap, "color", null);
-					if (color != null) data.color.setFromString(color);
+					if (color) data.color.setFromString(color);
 
 					let dark: string = getValue(slotMap, "dark", null);
-					if (dark != null) data.darkColor = Color.fromString(dark);
+					if (dark) data.darkColor = Color.fromString(dark);
 
 					data.attachmentName = getValue(slotMap, "attachment", null);
 					data.blendMode = Utils.enumValue(BlendMode, getValue(slotMap, "blend", "normal"));
@@ -126,16 +126,16 @@ module spine {
 					data.order = getValue(constraintMap, "order", 0);
 					data.skinRequired = getValue(constraintMap, "skin", false);
 
-					for (let j = 0; j < constraintMap.bones.length; j++) {
-						let boneName = constraintMap.bones[j];
+					for (let ii = 0; ii < constraintMap.bones.length; ii++) {
+						let boneName = constraintMap.bones[ii];
 						let bone = skeletonData.findBone(boneName);
-						if (bone == null) throw new Error("IK bone not found: " + boneName);
+						if (!bone) throw new Error("IK bone not found: " + boneName);
 						data.bones.push(bone);
 					}
 
 					let targetName: string = constraintMap.target;
 					data.target = skeletonData.findBone(targetName);
-					if (data.target == null) throw new Error("IK target bone not found: " + targetName);
+					if (!data.target) throw new Error("IK target bone not found: " + targetName);
 
 					data.mix = getValue(constraintMap, "mix", 1);
 					data.softness = getValue(constraintMap, "softness", 0) * scale;
@@ -156,16 +156,16 @@ module spine {
 					data.order = getValue(constraintMap, "order", 0);
 					data.skinRequired = getValue(constraintMap, "skin", false);
 
-					for (let j = 0; j < constraintMap.bones.length; j++) {
-						let boneName = constraintMap.bones[j];
+					for (let ii = 0; ii < constraintMap.bones.length; ii++) {
+						let boneName = constraintMap.bones[ii];
 						let bone = skeletonData.findBone(boneName);
-						if (bone == null) throw new Error("Transform constraint bone not found: " + boneName);
+						if (!bone) throw new Error("Transform constraint bone not found: " + boneName);
 						data.bones.push(bone);
 					}
 
 					let targetName: string = constraintMap.target;
 					data.target = skeletonData.findBone(targetName);
-					if (data.target == null) throw new Error("Transform constraint target bone not found: " + targetName);
+					if (!data.target) throw new Error("Transform constraint target bone not found: " + targetName);
 
 					data.local = getValue(constraintMap, "local", false);
 					data.relative = getValue(constraintMap, "relative", false);
@@ -195,16 +195,16 @@ module spine {
 					data.order = getValue(constraintMap, "order", 0);
 					data.skinRequired = getValue(constraintMap, "skin", false);
 
-					for (let j = 0; j < constraintMap.bones.length; j++) {
-						let boneName = constraintMap.bones[j];
+					for (let ii = 0; ii < constraintMap.bones.length; ii++) {
+						let boneName = constraintMap.bones[ii];
 						let bone = skeletonData.findBone(boneName);
-						if (bone == null) throw new Error("Transform constraint bone not found: " + boneName);
+						if (!bone) throw new Error("Transform constraint bone not found: " + boneName);
 						data.bones.push(bone);
 					}
 
 					let targetName: string = constraintMap.target;
 					data.target = skeletonData.findSlot(targetName);
-					if (data.target == null) throw new Error("Path target slot not found: " + targetName);
+					if (!data.target) throw new Error("Path target slot not found: " + targetName);
 
 					data.positionMode = Utils.enumValue(PositionMode, getValue(constraintMap, "positionMode", "Percent"));
 					data.spacingMode = Utils.enumValue(SpacingMode, getValue(constraintMap, "spacingMode", "Length"));
@@ -231,7 +231,7 @@ module spine {
 					if (skinMap.bones) {
 						for (let ii = 0; ii < skinMap.bones.length; ii++) {
 							let bone = skeletonData.findBone(skinMap.bones[ii]);
-							if (bone == null) throw new Error("Skin bone not found: " + skinMap.bones[i]);
+							if (!bone) throw new Error("Skin bone not found: " + skinMap.bones[i]);
 							skin.bones.push(bone);
 						}
 					}
@@ -239,7 +239,7 @@ module spine {
 					if (skinMap.ik) {
 						for (let ii = 0; ii < skinMap.ik.length; ii++) {
 							let constraint = skeletonData.findIkConstraint(skinMap.ik[ii]);
-							if (constraint == null) throw new Error("Skin IK constraint not found: " + skinMap.ik[i]);
+							if (!constraint) throw new Error("Skin IK constraint not found: " + skinMap.ik[i]);
 							skin.constraints.push(constraint);
 						}
 					}
@@ -247,7 +247,7 @@ module spine {
 					if (skinMap.transform) {
 						for (let ii = 0; ii < skinMap.transform.length; ii++) {
 							let constraint = skeletonData.findTransformConstraint(skinMap.transform[ii]);
-							if (constraint == null) throw new Error("Skin transform constraint not found: " + skinMap.transform[i]);
+							if (!constraint) throw new Error("Skin transform constraint not found: " + skinMap.transform[i]);
 							skin.constraints.push(constraint);
 						}
 					}
@@ -255,18 +255,18 @@ module spine {
 					if (skinMap.path) {
 						for (let ii = 0; ii < skinMap.path.length; ii++) {
 							let constraint = skeletonData.findPathConstraint(skinMap.path[ii]);
-							if (constraint == null) throw new Error("Skin path constraint not found: " + skinMap.path[i]);
+							if (!constraint) throw new Error("Skin path constraint not found: " + skinMap.path[i]);
 							skin.constraints.push(constraint);
 						}
 					}
 
 					for (let slotName in skinMap.attachments) {
 						let slot = skeletonData.findSlot(slotName);
-						if (slot == null) throw new Error("Slot not found: " + slotName);
+						if (!slot) throw new Error("Slot not found: " + slotName);
 						let slotMap = skinMap.attachments[slotName];
 						for (let entryName in slotMap) {
 							let attachment = this.readAttachment(slotMap[entryName], skin, slot.index, entryName, skeletonData);
-							if (attachment != null) skin.setAttachment(slot.index, entryName, attachment);
+							if (attachment) skin.setAttachment(slot.index, entryName, attachment);
 						}
 					}
 					skeletonData.skins.push(skin);
@@ -277,10 +277,10 @@ module spine {
 			// Linked meshes.
 			for (let i = 0, n = this.linkedMeshes.length; i < n; i++) {
 				let linkedMesh = this.linkedMeshes[i];
-				let skin = linkedMesh.skin == null ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
-				if (skin == null) throw new Error("Skin not found: " + linkedMesh.skin);
+				let skin = !linkedMesh.skin ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
+				if (!skin) throw new Error("Skin not found: " + linkedMesh.skin);
 				let parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-				if (parent == null) throw new Error("Parent mesh not found: " + linkedMesh.parent);
+				if (!parent) throw new Error("Parent mesh not found: " + linkedMesh.parent);
 				linkedMesh.mesh.deformAttachment = linkedMesh.inheritDeform ? <VertexAttachment>parent : <VertexAttachment>linkedMesh.mesh;
 				linkedMesh.mesh.setParentMesh(<MeshAttachment> parent);
 				linkedMesh.mesh.updateUVs();
@@ -296,7 +296,7 @@ module spine {
 					data.floatValue = getValue(eventMap, "float", 0);
 					data.stringValue = getValue(eventMap, "string", "");
 					data.audioPath = getValue(eventMap, "audio", null);
-					if (data.audioPath != null) {
+					if (data.audioPath) {
 						data.volume = getValue(eventMap, "volume", 1);
 						data.balance = getValue(eventMap, "balance", 0);
 					}
@@ -323,7 +323,7 @@ module spine {
 				case "region": {
 					let path = getValue(map, "path", name);
 					let region = this.attachmentLoader.newRegionAttachment(skin, name, path);
-					if (region == null) return null;
+					if (!region) return null;
 					region.path = path;
 					region.x = getValue(map, "x", 0) * scale;
 					region.y = getValue(map, "y", 0) * scale;
@@ -334,34 +334,34 @@ module spine {
 					region.height = map.height * scale;
 
 					let color: string = getValue(map, "color", null);
-					if (color != null) region.color.setFromString(color);
+					if (color) region.color.setFromString(color);
 
 					region.updateOffset();
 					return region;
 				}
 				case "boundingbox": {
 					let box = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
-					if (box == null) return null;
+					if (!box) return null;
 					this.readVertices(map, box, map.vertexCount << 1);
 					let color: string = getValue(map, "color", null);
-					if (color != null) box.color.setFromString(color);
+					if (color) box.color.setFromString(color);
 					return box;
 				}
 				case "mesh":
 				case "linkedmesh": {
 					let path = getValue(map, "path", name);
 					let mesh = this.attachmentLoader.newMeshAttachment(skin, name, path);
-					if (mesh == null) return null;
+					if (!mesh) return null;
 					mesh.path = path;
 
 					let color = getValue(map, "color", null);
-					if (color != null) mesh.color.setFromString(color);
+					if (color) mesh.color.setFromString(color);
 
 					mesh.width = getValue(map, "width", 0) * scale;
 					mesh.height = getValue(map, "height", 0) * scale;
 
 					let parent: string = getValue(map, "parent", null);
-					if (parent != null) {
+					if (parent) {
 						this.linkedMeshes.push(new LinkedMesh(mesh, <string> getValue(map, "skin", null), slotIndex, parent, getValue(map, "deform", true)));
 						return mesh;
 					}
@@ -378,7 +378,7 @@ module spine {
 				}
 				case "path": {
 					let path = this.attachmentLoader.newPathAttachment(skin, name);
-					if (path == null) return null;
+					if (!path) return null;
 					path.closed = getValue(map, "closed", false);
 					path.constantSpeed = getValue(map, "constantSpeed", true);
 
@@ -391,28 +391,28 @@ module spine {
 					path.lengths = lengths;
 
 					let color: string = getValue(map, "color", null);
-					if (color != null) path.color.setFromString(color);
+					if (color) path.color.setFromString(color);
 					return path;
 				}
 				case "point": {
 					let point = this.attachmentLoader.newPointAttachment(skin, name);
-					if (point == null) return null;
+					if (!point) return null;
 					point.x = getValue(map, "x", 0) * scale;
 					point.y = getValue(map, "y", 0) * scale;
 					point.rotation = getValue(map, "rotation", 0);
 
 					let color = getValue(map, "color", null);
-					if (color != null) point.color.setFromString(color);
+					if (color) point.color.setFromString(color);
 					return point;
 				}
 				case "clipping": {
 					let clip = this.attachmentLoader.newClippingAttachment(skin, name);
-					if (clip == null) return null;
+					if (!clip) return null;
 
 					let end = getValue(map, "end", null);
-					if (end != null) {
+					if (end) {
 						let slot = skeletonData.findSlot(end);
-						if (slot == null) throw new Error("Clipping end slot not found: " + end);
+						if (!slot) throw new Error("Clipping end slot not found: " + end);
 						clip.endSlot = slot;
 					}
 
@@ -420,7 +420,7 @@ module spine {
 					this.readVertices(map, clip, vertexCount << 1);
 
 					let color: string = getValue(map, "color", null);
-					if (color != null) clip.color.setFromString(color);
+					if (color) clip.color.setFromString(color);
 					return clip;
 				}
 			}
@@ -485,8 +485,11 @@ module spine {
 
 							for (let frame = 0, bezier = 0;; frame++) {
 								timeline.setFrame(frame, time, color.r, color.g, color.b, color.a);
-								if (timelineMap.length == frame + 1) break;
 								let nextMap = timelineMap[frame + 1];
+								if (!nextMap)  {
+									timeline.shrink(bezier);
+									break;
+								}
 								let time2 = getValue(nextMap, "time", 0);
 								let newColor = Color.fromString(nextMap.color);
 								let curve = keyMap.curve;
@@ -511,8 +514,11 @@ module spine {
 
 							for (let frame = 0, bezier = 0;; frame++) {
 								timeline.setFrame(frame, time, color.r, color.g, color.b);
-								if (timelineMap.length == frame + 1) break;
 								let nextMap = timelineMap[frame + 1];
+								if (!nextMap)  {
+									timeline.shrink(bezier);
+									break;
+								}
 								let time2 = getValue(nextMap, "time", 0);
 								let newColor = Color.fromString(nextMap.color);
 								let curve = keyMap.curve;
@@ -540,8 +546,11 @@ module spine {
 
 							for (let frame = 0, bezier = 0;; frame++) {
 								timeline.setFrame(frame, time, color.r, color.g, color.b, color.a, color2.r, color2.g, color2.b);
-								if (timelineMap.length == frame + 1) break;
 								let nextMap = timelineMap[frame + 1];
+								if (!nextMap)  {
+									timeline.shrink(bezier);
+									break;
+								}
 								let time2 = getValue(nextMap, "time", 0);
 								let newColor = Color.fromString(nextMap.light);
 								let newColor2 = Color.fromString(nextMap.dark);
@@ -573,8 +582,11 @@ module spine {
 
 							for (let frame = 0, bezier = 0;; frame++) {
 								timeline.setFrame(frame, time, color.r, color.g, color.b, color2.r, color2.g, color2.b);
-								if (timelineMap.length == frame + 1) break;
 								let nextMap = timelineMap[frame + 1];
+								if (!nextMap)  {
+									timeline.shrink(bezier);
+									break;
+								}
 								let time2 = getValue(nextMap, "time", 0);
 								let newColor = Color.fromString(nextMap.light);
 								let newColor2 = Color.fromString(nextMap.dark);
@@ -664,7 +676,10 @@ module spine {
 					for (let frame = 0, bezier = 0;; frame++) {
 						timeline.setFrame(frame, time, mix, softness, getValue(keyMap, "bendPositive", true) ? 1 : -1, getValue(keyMap, "compress", false), getValue(keyMap, "stretch", false));
 						let nextMap = constraintMap[frame + 1];
-						if (!nextMap) break;
+						if (!nextMap) {
+							timeline.shrink(bezier);
+							break;
+						}
 
 						let time2 = getValue(nextMap, "time", 0);
 						let mix2 = getValue(nextMap, "mix", 1);
@@ -706,7 +721,10 @@ module spine {
 					for (let frame = 0, bezier = 0;; frame++) {
 						timeline.setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
 						let nextMap = timelineMap[frame + 1];
-						if (!nextMap) break;
+						if (!nextMap) {
+							timeline.shrink(bezier);
+							break;
+						}
 
 						let time2 = getValue(nextMap, "time", 0);
 						let mixRotate2 = getValue(nextMap, "mixRotate", 1);
@@ -742,22 +760,21 @@ module spine {
 			if (map.path) {
 				for (let constraintName in map.path) {
 					let constraintMap = map.path[constraintName];
-					let index = skeletonData.findPathConstraintIndex(constraintName);
-					if (index == -1) throw new Error("Path constraint not found: " + constraintName);
-					let data = skeletonData.pathConstraints[index];
+					let constraint = skeletonData.findPathConstraint(constraintName);
+					let constraintIndex = skeletonData.pathConstraints.indexOf(constraint);
 					for (let timelineName in constraintMap) {
 						let timelineMap = constraintMap[timelineName];
 						let keyMap = timelineMap[0];
 						if (!keyMap) continue;
 
 						if (timelineName === "position") {
-							let timeline = new PathConstraintPositionTimeline(timelineMap.length, timelineMap.length, index);
-							timelines.push(readTimeline1(timelineMap, timeline, 0, data.positionMode == PositionMode.Fixed ? scale : 1));
+							let timeline = new PathConstraintPositionTimeline(timelineMap.length, timelineMap.length, constraintIndex);
+							timelines.push(readTimeline1(timelineMap, timeline, 0, constraint.positionMode == PositionMode.Fixed ? scale : 1));
 						} else if (timelineName === "spacing") {
-							let timeline = new PathConstraintSpacingTimeline(timelineMap.length, timelineMap.length, index);
-							timelines.push(readTimeline1(timelineMap, timeline, 0, data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
+							let timeline = new PathConstraintSpacingTimeline(timelineMap.length, timelineMap.length, constraintIndex);
+							timelines.push(readTimeline1(timelineMap, timeline, 0, constraint.spacingMode == SpacingMode.Length || constraint.spacingMode == SpacingMode.Fixed ? scale : 1));
 						} else if (timelineName === "mix") {
-							let timeline = new PathConstraintMixTimeline(timelineMap.size, timelineMap.size * 3, index);
+							let timeline = new PathConstraintMixTimeline(timelineMap.size, timelineMap.size * 3, constraintIndex);
 							let time = getValue(keyMap, "time", 0);
 							let mixRotate = getValue(keyMap, "mixRotate", 1);
 							let mixX = getValue(keyMap, "mixX", 1);
@@ -765,13 +782,16 @@ module spine {
 							for (let frame = 0, bezier = 0;; frame++) {
 								timeline.setFrame(frame, time, mixRotate, mixX, mixY);
 								let nextMap = timelineMap[frame + 1];
-								if (!nextMap) break;
+								if (!nextMap) {
+									timeline.shrink(bezier);
+									break;
+								}
 								let time2 = getValue(nextMap, "time", 0);
 								let mixRotate2 = getValue(nextMap, "mixRotate", 1);
 								let mixX2 = getValue(nextMap, "mixX", 1);
 								let mixY2 = getValue(nextMap, "mixY", mixX2);
 								let curve = keyMap.curve;
-								if (curve != null) {
+								if (curve) {
 									bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
 									bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1);
 									bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1);
@@ -793,7 +813,7 @@ module spine {
 				for (let deformName in map.deform) {
 					let deformMap = map.deform[deformName];
 					let skin = skeletonData.findSkin(deformName);
-					if (skin == null) throw new Error("Skin not found: " + deformName);
+					if (!skin) throw new Error("Skin not found: " + deformName);
 					for (let slotName in deformMap) {
 						let slotMap = deformMap[slotName];
 						let slotIndex = skeletonData.findSlotIndex(slotName);
@@ -804,8 +824,8 @@ module spine {
 							if (!keyMap) continue;
 
 							let attachment = <VertexAttachment>skin.getAttachment(slotIndex, timelineName);
-							if (attachment == null) throw new Error("Deform attachment not found: " + timelineMap.name);
-							let weighted = attachment.bones != null;
+							if (!attachment) throw new Error("Deform attachment not found: " + timelineMap.name);
+							let weighted = attachment.bones;
 							let vertices = attachment.vertices;
 							let deformLength = weighted ? vertices.length / 3 * 2 : vertices.length;
 
@@ -814,7 +834,7 @@ module spine {
 							for (let frame = 0, bezier = 0;; frame++) {
 								let deform: ArrayLike<number>;
 								let verticesValue: Array<Number> = getValue(keyMap, "vertices", null);
-								if (verticesValue == null)
+								if (!verticesValue)
 									deform = weighted ? Utils.newFloatArray(deformLength) : vertices;
 								else {
 									deform = Utils.newFloatArray(deformLength);
@@ -832,7 +852,10 @@ module spine {
 
 								timeline.setFrame(frame, time, deform);
 								let nextMap = timelineMap[frame + 1];
-								if (!nextMap) break;
+								if (!nextMap) {
+									timeline.shrink(bezier);
+									break;
+								}
 								let time2 = getValue(nextMap, "time", 0);
 								let curve = keyMap.curve;
 								if (curve) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
@@ -846,22 +869,20 @@ module spine {
 			}
 
 			// Draw order timelines.
-			let drawOrderNode = map.drawOrder;
-			if (drawOrderNode == null) drawOrderNode = map.draworder;
-			if (drawOrderNode != null) {
-				let timeline = new DrawOrderTimeline(drawOrderNode.length);
+			if (map.drawOrder) {
+				let timeline = new DrawOrderTimeline(map.drawOrder.length);
 				let slotCount = skeletonData.slots.length;
 				let frame = 0;
-				for (let j = 0; j < drawOrderNode.length; j++, frame++) {
-					let drawOrderMap = drawOrderNode[j];
+				for (let i = 0; i < map.drawOrder.length; i++, frame++) {
+					let drawOrderMap = map.drawOrder[i];
 					let drawOrder: Array<number> = null;
 					let offsets = getValue(drawOrderMap, "offsets", null);
-					if (offsets != null) {
+					if (offsets) {
 						drawOrder = Utils.newArray<number>(slotCount, -1);
 						let unchanged = Utils.newArray<number>(slotCount - offsets.length, 0);
 						let originalIndex = 0, unchangedIndex = 0;
-						for (let i = 0; i < offsets.length; i++) {
-							let offsetMap = offsets[i];
+						for (let ii = 0; ii < offsets.length; ii++) {
+							let offsetMap = offsets[ii];
 							let slotIndex = skeletonData.findSlotIndex(offsetMap.slot);
 							if (slotIndex == -1) throw new Error("Slot not found: " + offsetMap.slot);
 							// Collect unchanged items.
@@ -874,8 +895,8 @@ module spine {
 						while (originalIndex < slotCount)
 							unchanged[unchangedIndex++] = originalIndex++;
 						// Fill in unchanged items.
-						for (let i = slotCount - 1; i >= 0; i--)
-							if (drawOrder[i] == -1) drawOrder[i] = unchanged[--unchangedIndex];
+						for (let ii = slotCount - 1; ii >= 0; ii--)
+							if (drawOrder[ii] == -1) drawOrder[ii] = unchanged[--unchangedIndex];
 					}
 					timeline.setFrame(frame, getValue(drawOrderMap, "time", 0), drawOrder);
 				}
@@ -889,12 +910,12 @@ module spine {
 				for (let i = 0; i < map.events.length; i++, frame++) {
 					let eventMap = map.events[i];
 					let eventData = skeletonData.findEvent(eventMap.name);
-					if (eventData == null) throw new Error("Event not found: " + eventMap.name);
+					if (!eventData) throw new Error("Event not found: " + eventMap.name);
 					let event = new Event(Utils.toSinglePrecision(getValue(eventMap, "time", 0)), eventData);
 					event.intValue = getValue(eventMap, "int", eventData.intValue);
 					event.floatValue = getValue(eventMap, "float", eventData.floatValue);
 					event.stringValue = getValue(eventMap, "string", eventData.stringValue);
-					if (event.data.audioPath != null) {
+					if (event.data.audioPath) {
 						event.volume = getValue(eventMap, "volume", 1);
 						event.balance = getValue(eventMap, "balance", 0);
 					}
@@ -906,8 +927,6 @@ module spine {
 			let duration = 0;
 			for (let i = 0, n = timelines.length; i < n; i++)
 				duration = Math.max(duration, timelines[i].getDuration());
-			if (isNaN(duration)) throw new Error("Animation duration is NaN.");
-
 			skeletonData.animations.push(new Animation(name, timelines, duration));
 		}
 	}
@@ -944,6 +963,7 @@ module spine {
 			value = value2;
 			keyMap = nextMap;
 		}
+		timeline.shrink(bezier);
 		return timeline;
 	}
 
@@ -961,7 +981,7 @@ module spine {
 			let nvalue1 = getValue(nextMap, name1, defaultValue) * scale;
 			let nvalue2 = getValue(nextMap, name2, defaultValue) * scale;
 			let curve = keyMap.curve;
-			if (curve != null) {
+			if (curve) {
 				bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value1, nvalue1, scale);
 				bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, value2, nvalue2, scale);
 			}
@@ -978,15 +998,15 @@ module spine {
 		value1: number, value2: number, scale: number) {
 		if (curve == "stepped") {
 			if (value != 0) timeline.setStepped(frame);
-		} else {
-			let i = value << 2;
-			let cx1 = curve[i++];
-			let cy1 = curve[i++] * scale;
-			let cx2 = curve[i++];
-			let cy2 = curve[i++] * scale;
-			timeline.setBezier(bezier++, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
+			return bezier;
 		}
-		return bezier;
+		let i = value << 2;
+		let cx1 = curve[i];
+		let cy1 = curve[i + 1] * scale;
+		let cx2 = curve[i + 2];
+		let cy2 = curve[i + 3] * scale;
+		timeline.setBezier(bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
+		return bezier + 1;
 	}
 
 	function getValue (map: any, property: string, defaultValue: any) {

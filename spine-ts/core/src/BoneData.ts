@@ -78,7 +78,7 @@ module spine {
 
 		constructor (index: number, name: string, parent: BoneData) {
 			if (index < 0) throw new Error("index must be >= 0.");
-			if (name == null) throw new Error("name cannot be null.");
+			if (!name) throw new Error("name cannot be null.");
 			this.index = index;
 			this.name = name;
 			this.parent = parent;

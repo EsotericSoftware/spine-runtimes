@@ -65,8 +65,8 @@ module spine {
 		active = false;
 
 		constructor (data: PathConstraintData, skeleton: Skeleton) {
-			if (data == null) throw new Error("data cannot be null.");
-			if (skeleton == null) throw new Error("skeleton cannot be null.");
+			if (!data) throw new Error("data cannot be null.");
+			if (!skeleton) throw new Error("skeleton cannot be null.");
 			this.data = data;
 			this.bones = new Array<Bone>();
 			for (let i = 0, n = data.bones.length; i < n; i++)

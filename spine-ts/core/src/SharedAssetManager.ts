@@ -58,11 +58,11 @@ module spine {
 
 		private queueAsset(clientId: string, textureLoader: (image: HTMLImageElement | ImageBitmap) => any, path: string): boolean {
 			let clientAssets = this.clientAssets[clientId];
-			if (clientAssets === null || clientAssets === undefined) {
+			if (!clientAssets) {
 				clientAssets = new Assets(clientId);
 				this.clientAssets[clientId] = clientAssets;
 			}
-			if (textureLoader !== null) clientAssets.textureLoader = textureLoader;
+			if (textureLoader) clientAssets.textureLoader = textureLoader;
 			clientAssets.toLoad.push(path);
 
 			// check if already queued, in which case we can skip actual
@@ -150,7 +150,7 @@ module spine {
 		get (clientId: string, path: string) {
 			path = this.pathPrefix + path;
 			let clientAssets = this.clientAssets[clientId];
-			if (clientAssets === null || clientAssets === undefined) return true;
+			if (!clientAssets) return true;
 			return clientAssets.assets[path];
 		}
 
@@ -161,12 +161,11 @@ module spine {
 			for (let i = 0; i < clientAssets.toLoad.length; i++) {
 				let path = clientAssets.toLoad[i];
 				let asset = clientAssets.assets[path];
-				if (asset === null || asset === undefined) {
+				if (!asset) {
 					let rawAsset = this.rawAssets[path];
-					if (rawAsset === null || rawAsset === undefined) continue;
+					if (!rawAsset) continue;
 
-					if (isWebWorker)
-					{
+					if (isWebWorker) {
 						if (rawAsset instanceof ImageBitmap) {
 							clientAssets.assets[path] = clientAssets.textureLoader(<ImageBitmap>rawAsset);
 						} else {
@@ -185,10 +184,9 @@ module spine {
 
 		isLoadingComplete (clientId: string): boolean {
 			let clientAssets = this.clientAssets[clientId];
-			if (clientAssets === null || clientAssets === undefined) return true;
+			if (!clientAssets) return true;
 			this.updateClientAssets(clientAssets);
 			return clientAssets.toLoad.length == clientAssets.loaded();
-
 		}
 
 		/*remove (clientId: string, path: string) {

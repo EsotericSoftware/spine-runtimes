@@ -40,7 +40,7 @@ module spine {
 		defaultMix = 0;
 
 		constructor (skeletonData: SkeletonData) {
-			if (skeletonData == null) throw new Error("skeletonData cannot be null.");
+			if (!skeletonData) throw new Error("skeletonData cannot be null.");
 			this.skeletonData = skeletonData;
 		}
 
@@ -49,9 +49,9 @@ module spine {
 		 * See {@link #setMixWith()}. */
 		setMix (fromName: string, toName: string, duration: number) {
 			let from = this.skeletonData.findAnimation(fromName);
-			if (from == null) throw new Error("Animation not found: " + fromName);
+			if (!from) throw new Error("Animation not found: " + fromName);
 			let to = this.skeletonData.findAnimation(toName);
-			if (to == null) throw new Error("Animation not found: " + toName);
+			if (!to) throw new Error("Animation not found: " + toName);
 			this.setMixWith(from, to, duration);
 		}
 
@@ -59,8 +59,8 @@ module spine {
 		 *
 		 * See {@link TrackEntry#mixDuration}. */
 		setMixWith (from: Animation, to: Animation, duration: number) {
-			if (from == null) throw new Error("from cannot be null.");
-			if (to == null) throw new Error("to cannot be null.");
+			if (!from) throw new Error("from cannot be null.");
+			if (!to) throw new Error("to cannot be null.");
 			let key = from.name + "." + to.name;
 			this.animationToMixTime[key] = duration;
 		}

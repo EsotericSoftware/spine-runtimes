@@ -60,12 +60,12 @@ module spine {
 		deform = new Array<number>();
 
 		constructor (data: SlotData, bone: Bone) {
-			if (data == null) throw new Error("data cannot be null.");
-			if (bone == null) throw new Error("bone cannot be null.");
+			if (!data) throw new Error("data cannot be null.");
+			if (!bone) throw new Error("bone cannot be null.");
 			this.data = data;
 			this.bone = bone;
 			this.color = new Color();
-			this.darkColor = data.darkColor == null ? null : new Color();
+			this.darkColor = !data.darkColor ? null : new Color();
 			this.setToSetupPose();
 		}
 
@@ -106,8 +106,8 @@ module spine {
 		/** Sets this slot to the setup pose. */
 		setToSetupPose () {
 			this.color.setFromColor(this.data.color);
-			if (this.darkColor != null) this.darkColor.setFromColor(this.data.darkColor);
-			if (this.data.attachmentName == null)
+			if (this.darkColor) this.darkColor.setFromColor(this.data.darkColor);
+			if (!this.data.attachmentName)
 				this.attachment = null;
 			else {
 				this.attachment = null;

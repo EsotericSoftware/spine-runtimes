@@ -33,7 +33,7 @@ module spine {
 		name: string;
 
 		constructor (name: string) {
-			if (name == null) throw new Error("name cannot be null.");
+			if (!name) throw new Error("name cannot be null.");
 			this.name = name;
 		}
 
@@ -86,7 +86,7 @@ module spine {
 			let deformArray = slot.deform;
 			let vertices = this.vertices;
 			let bones = this.bones;
-			if (bones == null) {
+			if (!bones) {
 				if (deformArray.length > 0) vertices = deformArray;
 				let bone = slot.bone;
 				let x = bone.worldX;
@@ -140,13 +140,13 @@ module spine {
 
 		/** Does not copy id (generated) or name (set on construction). **/
 		copyTo (attachment: VertexAttachment) {
-			if (this.bones != null) {
+			if (this.bones) {
 				attachment.bones = new Array<number>(this.bones.length);
 				Utils.arrayCopy(this.bones, 0, attachment.bones, 0, this.bones.length);
 			} else
 				attachment.bones = null;
 
-			if (this.vertices != null) {
+			if (this.vertices) {
 				attachment.vertices = Utils.newFloatArray(this.vertices.length);
 				Utils.arrayCopy(this.vertices, 0, attachment.vertices, 0, this.vertices.length);
 			} else

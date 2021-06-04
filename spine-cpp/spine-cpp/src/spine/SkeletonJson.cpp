@@ -80,28 +80,28 @@
 using namespace spine;
 
 static float toColor(const char *value, size_t index) {
-    char digits[3];
-    char *error;
-    int color;
+	char digits[3];
+	char *error;
+	int color;
 
-    if (index >= strlen(value) / 2) return -1;
+	if (index >= strlen(value) / 2) return -1;
 
-    value += index * 2;
+	value += index * 2;
 
-    digits[0] = *value;
-    digits[1] = *(value + 1);
-    digits[2] = '\0';
-    color = (int) strtoul(digits, &error, 16);
-    if (*error != 0) return -1;
+	digits[0] = *value;
+	digits[1] = *(value + 1);
+	digits[2] = '\0';
+	color = (int) strtoul(digits, &error, 16);
+	if (*error != 0) return -1;
 
-    return color / (float) 255;
+	return color / (float) 255;
 }
 
 static void toColor(Color &color, const char *value, bool hasAlpha) {
-    color.r = toColor(value, 0);
-    color.g = toColor(value, 1);
-    color.b = toColor(value, 2);
-    if (hasAlpha) color.a = toColor(value, 3);
+	color.r = toColor(value, 0);
+	color.g = toColor(value, 1);
+	color.b = toColor(value, 2);
+	if (hasAlpha) color.a = toColor(value, 3);
 }
 
 SkeletonJson::SkeletonJson(Atlas *atlas) : _attachmentLoader(new(__FILE__, __LINE__) AtlasAttachmentLoader(atlas)),
@@ -750,69 +750,71 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 
 void SkeletonJson::setBezier (CurveTimeline *timeline, int frame, int value, int bezier, float time1, float value1, float cx1, float cy1,
 float cx2, float cy2, float time2, float value2) {
-    timeline->setBezier(bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
+	timeline->setBezier(bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
 }
 
 int SkeletonJson::readCurve (Json *curve, CurveTimeline *timeline, int bezier, int frame, int value, float time1, float time2,
-               float value1, float value2, float scale) {
-    if (curve->_type == Json::JSON_STRING && strcmp(curve->_valueString, "stepped") == 0) {
-        timeline->setStepped(frame);
-    } else {
-        curve = Json::getItem(curve, value << 2);
-        float cx1 = curve->_valueFloat;
-        curve = curve->_next;
-        float cy1 = curve->_valueFloat * scale;
-        curve = curve->_next;
-        float cx2 = curve->_valueFloat;
-        curve = curve->_next;
-        float cy2 = curve->_valueFloat * scale;
-        setBezier(timeline, frame, value, bezier++, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
-    }
-    return bezier;
+			   float value1, float value2, float scale) {
+	if (curve->_type == Json::JSON_STRING && strcmp(curve->_valueString, "stepped") == 0) {
+		timeline->setStepped(frame);
+		return bezier;
+	}
+	curve = Json::getItem(curve, value << 2);
+	float cx1 = curve->_valueFloat;
+	curve = curve->_next;
+	float cy1 = curve->_valueFloat * scale;
+	curve = curve->_next;
+	float cx2 = curve->_valueFloat;
+	curve = curve->_next;
+	float cy2 = curve->_valueFloat * scale;
+	setBezier(timeline, frame, value, bezier, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
+	return bezier + 1;
 }
 
 Timeline *SkeletonJson::readTimeline (Json *keyMap, CurveTimeline1 *timeline, float defaultValue, float scale) {
-    float time = Json::getFloat(keyMap, "time", 0);
-    float value = Json::getFloat(keyMap, "value", defaultValue) * scale;
-    int bezier = 0;
-    for (int frame = 0;; frame++) {
-        timeline->setFrame(frame, time, value);
-        Json* nextMap = keyMap->_next;
-        if (nextMap == NULL) break;
-        float time2 = Json::getFloat(nextMap, "time", 0);
-        float value2 = Json::getFloat(nextMap, "value", defaultValue) * scale;
-        Json* curve = Json::getItem(keyMap, "curve");
-        if (curve != NULL) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value, value2, scale);
-        time = time2;
-        value = value2;
-        keyMap = nextMap;
-    }
-    return timeline;
+	float time = Json::getFloat(keyMap, "time", 0);
+	float value = Json::getFloat(keyMap, "value", defaultValue) * scale;
+	int bezier = 0;
+	for (int frame = 0;; frame++) {
+		timeline->setFrame(frame, time, value);
+		Json* nextMap = keyMap->_next;
+		if (!nextMap) break;
+		float time2 = Json::getFloat(nextMap, "time", 0);
+		float value2 = Json::getFloat(nextMap, "value", defaultValue) * scale;
+		Json* curve = Json::getItem(keyMap, "curve");
+		if (curve != NULL) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value, value2, scale);
+		time = time2;
+		value = value2;
+		keyMap = nextMap;
+	}
+	// timeline.shrink(); // BOZO
+	return timeline;
 }
 
 Timeline *SkeletonJson::readTimeline (Json *keyMap, CurveTimeline2 *timeline, const char *name1, const char *name2, float defaultValue, float scale) {
-    float time = Json::getFloat(keyMap, "time", 0);
-    float value1 = Json::getFloat(keyMap, name1, defaultValue) * scale;
-    float value2 = Json::getFloat(keyMap, name2, defaultValue) * scale;
-    int bezier = 0;
-    for (int frame = 0;; frame++) {
-        timeline->setFrame(frame, time, value1, value2);
-        Json *nextMap = keyMap->_next;
-        if (nextMap == NULL) break;
-        float time2 = Json::getFloat(nextMap, "time", 0);
-        float nvalue1 = Json::getFloat(nextMap, name1, defaultValue) * scale;
-        float nvalue2 = Json::getFloat(nextMap, name2, defaultValue) * scale;
-        Json *curve = Json::getItem(keyMap, "curve");
-        if (curve != NULL) {
-            bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value1, nvalue1, scale);
-            bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, value2, nvalue2, scale);
-        }
-        time = time2;
-        value1 = nvalue1;
-        value2 = nvalue2;
-        keyMap = nextMap;
-    }
-    return timeline;
+	float time = Json::getFloat(keyMap, "time", 0);
+	float value1 = Json::getFloat(keyMap, name1, defaultValue) * scale;
+	float value2 = Json::getFloat(keyMap, name2, defaultValue) * scale;
+	int bezier = 0;
+	for (int frame = 0;; frame++) {
+		timeline->setFrame(frame, time, value1, value2);
+		Json *nextMap = keyMap->_next;
+		if (!nextMap) break;
+		float time2 = Json::getFloat(nextMap, "time", 0);
+		float nvalue1 = Json::getFloat(nextMap, name1, defaultValue) * scale;
+		float nvalue2 = Json::getFloat(nextMap, name2, defaultValue) * scale;
+		Json *curve = Json::getItem(keyMap, "curve");
+		if (curve != NULL) {
+			bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value1, nvalue1, scale);
+			bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, value2, nvalue2, scale);
+		}
+		time = time2;
+		value1 = nvalue1;
+		value2 = nvalue2;
+		keyMap = nextMap;
+	}
+	// timeline.shrink(); // BOZO
+	return timeline;
 }
 
 Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
@@ -827,7 +829,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 	Json *events = Json::getItem(root, "events");
 	Json *boneMap, *slotMap, *constraintMap, *keyMap, *nextMap, *curve;
 	int frame, bezier;
-    Color color, color2, newColor, newColor2;
+	Color color, color2, newColor, newColor2;
 
 	/** Slot timelines. */
 	for (slotMap = slots ? slots->_child : 0; slotMap; slotMap = slotMap->_next) {
@@ -840,7 +842,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 
 		for (Json *timelineMap = slotMap->_child; timelineMap; timelineMap = timelineMap->_next) {
 			if (strcmp(timelineMap->_name, "attachment") == 0) {
-			    int frameCount = timelineMap->_size;
+				int frameCount = timelineMap->_size;
 				AttachmentTimeline *timeline = new(__FILE__, __LINE__) AttachmentTimeline(frameCount, slotIndex);
 				for (keyMap = timelineMap->_child, frame = 0; keyMap; keyMap = keyMap->_next, ++frame) {
 					timeline->setFrame(frame, Json::getFloat(keyMap, "time", 0), Json::getItem(keyMap, "name")->_valueString);
@@ -848,121 +850,133 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 				timelines.add(timeline);
 
 			} else if (strcmp(timelineMap->_name, "rgba") == 0) {
-                int frameCount = timelineMap->_size;
-                int bezierCount = frameCount << 2;
+				int frameCount = timelineMap->_size;
+				int bezierCount = frameCount << 2;
 				RGBATimeline *timeline = new(__FILE__, __LINE__) RGBATimeline(frameCount, bezierCount, slotIndex);
-                keyMap = timelineMap->_child;
-                float time = Json::getFloat(keyMap, "time", 0);
-                toColor(color, Json::getString(keyMap, "color", 0), true);
+				keyMap = timelineMap->_child;
+				float time = Json::getFloat(keyMap, "time", 0);
+				toColor(color, Json::getString(keyMap, "color", 0), true);
 
 				for (frame = 0, bezier = 0;;++frame) {
 					timeline->setFrame(frame, time, color.r, color.g, color.b, color.a);
 					nextMap = keyMap->_next;
-					if (!nextMap) break;
+					if (!nextMap) {
+						// timeline.shrink(); // BOZO
+						break;
+					}
 					float time2 = Json::getFloat(nextMap, "time", 0);
-                    toColor(newColor, Json::getString(nextMap, "color", 0), true);
-                    curve = Json::getItem(keyMap, "curve");
-                    if (curve) {
-                        bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, color.g, newColor.g, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, color.b, newColor.b, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, color.a, newColor.a, 1);
-                    }
-                    time = time2;
-                    color = newColor;
-                    keyMap = nextMap;
+					toColor(newColor, Json::getString(nextMap, "color", 0), true);
+					curve = Json::getItem(keyMap, "curve");
+					if (curve) {
+						bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, color.g, newColor.g, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, color.b, newColor.b, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, color.a, newColor.a, 1);
+					}
+					time = time2;
+					color = newColor;
+					keyMap = nextMap;
 				}
 				timelines.add(timeline);
 			} else if (strcmp(timelineMap->_name, "rgb") == 0) {
-                int frameCount = timelineMap->_size;
-                int bezierCount = frameCount * 3;
-                RGBTimeline *timeline = new(__FILE__, __LINE__) RGBTimeline(frameCount, bezierCount, slotIndex);
-                keyMap = timelineMap->_child;
-                float time = Json::getFloat(keyMap, "time", 0);
-                toColor(color, Json::getString(keyMap, "color", 0), false);
+				int frameCount = timelineMap->_size;
+				int bezierCount = frameCount * 3;
+				RGBTimeline *timeline = new(__FILE__, __LINE__) RGBTimeline(frameCount, bezierCount, slotIndex);
+				keyMap = timelineMap->_child;
+				float time = Json::getFloat(keyMap, "time", 0);
+				toColor(color, Json::getString(keyMap, "color", 0), false);
 
-                for (frame = 0, bezier = 0;;++frame) {
-                    timeline->setFrame(frame, time, color.r, color.g, color.b);
-                    nextMap = keyMap->_next;
-                    if (!nextMap) break;
-                    float time2 = Json::getFloat(nextMap, "time", 0);
-                    toColor(newColor, Json::getString(nextMap, "color", 0), false);
-                    curve = Json::getItem(keyMap, "curve");
-                    if (curve) {
-                        bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, color.g, newColor.g, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, color.b, newColor.b, 1);
-                    }
-                    time = time2;
-                    color = newColor;
-                    keyMap = nextMap;
-                }
-                timelines.add(timeline);
-            } else if (strcmp(timelineMap->_name, "alpha") == 0) {
-                timelines.add(readTimeline(timelineMap->_child, new (__FILE__, __LINE__) AlphaTimeline(timelineMap->_size, timelineMap->_size, slotIndex), 0, 1));
-            } else if (strcmp(timelineMap->_name, "rgba2") == 0) {
-                int frameCount = timelineMap->_size;
-                int bezierCount = frameCount * 7;
-                RGBA2Timeline *timeline = new(__FILE__, __LINE__) RGBA2Timeline(frameCount, bezierCount, slotIndex);
-                keyMap = timelineMap->_child;
-                float time = Json::getFloat(keyMap, "time", 0);
-                toColor(color, Json::getString(keyMap, "light", 0), true);
-                toColor(color2, Json::getString(keyMap, "dark", 0), false);
+				for (frame = 0, bezier = 0;;++frame) {
+					timeline->setFrame(frame, time, color.r, color.g, color.b);
+					nextMap = keyMap->_next;
+					if (!nextMap) {
+						// timeline.shrink(); // BOZO
+						break;
+					}
+					float time2 = Json::getFloat(nextMap, "time", 0);
+					toColor(newColor, Json::getString(nextMap, "color", 0), false);
+					curve = Json::getItem(keyMap, "curve");
+					if (curve) {
+						bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, color.g, newColor.g, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, color.b, newColor.b, 1);
+					}
+					time = time2;
+					color = newColor;
+					keyMap = nextMap;
+				}
+				timelines.add(timeline);
+			} else if (strcmp(timelineMap->_name, "alpha") == 0) {
+				timelines.add(readTimeline(timelineMap->_child, new (__FILE__, __LINE__) AlphaTimeline(timelineMap->_size, timelineMap->_size, slotIndex), 0, 1));
+			} else if (strcmp(timelineMap->_name, "rgba2") == 0) {
+				int frameCount = timelineMap->_size;
+				int bezierCount = frameCount * 7;
+				RGBA2Timeline *timeline = new(__FILE__, __LINE__) RGBA2Timeline(frameCount, bezierCount, slotIndex);
+				keyMap = timelineMap->_child;
+				float time = Json::getFloat(keyMap, "time", 0);
+				toColor(color, Json::getString(keyMap, "light", 0), true);
+				toColor(color2, Json::getString(keyMap, "dark", 0), false);
 
-                for (frame = 0, bezier = 0;;++frame) {
-                    timeline->setFrame(frame, time, color.r, color.g, color.b, color.a, color2.g, color2.g, color2.b);
-                    nextMap = keyMap->_next;
-                    if (!nextMap) break;
-                    float time2 = Json::getFloat(nextMap, "time", 0);
-                    toColor(newColor, Json::getString(nextMap, "light", 0), true);
-                    toColor(newColor2, Json::getString(nextMap, "dark", 0), false);
-                    curve = Json::getItem(keyMap, "curve");
-                    if (curve) {
-                        bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, color.g, newColor.g, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, color.b, newColor.b, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, color.a, newColor.a, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, color2.r, newColor2.r, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, color2.g, newColor2.g, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 6, time, time2, color2.b, newColor2.b, 1);
-                    }
-                    time = time2;
-                    color = newColor;
-                    color2 = newColor2;
-                    keyMap = nextMap;
-                }
-                timelines.add(timeline);
-            } else if (strcmp(timelineMap->_name, "rgb2") == 0) {
-                int frameCount = timelineMap->_size;
-                int bezierCount = frameCount * 7;
-                RGBA2Timeline *timeline = new(__FILE__, __LINE__) RGBA2Timeline(frameCount, bezierCount, slotIndex);
-                keyMap = timelineMap->_child;
-                float time = Json::getFloat(keyMap, "time", 0);
-                toColor(color, Json::getString(keyMap, "light", 0), false);
-                toColor(color2, Json::getString(keyMap, "dark", 0), false);
+				for (frame = 0, bezier = 0;;++frame) {
+					timeline->setFrame(frame, time, color.r, color.g, color.b, color.a, color2.g, color2.g, color2.b);
+					nextMap = keyMap->_next;
+					if (!nextMap) {
+						// timeline.shrink(); // BOZO
+						break;
+					}
+					float time2 = Json::getFloat(nextMap, "time", 0);
+					toColor(newColor, Json::getString(nextMap, "light", 0), true);
+					toColor(newColor2, Json::getString(nextMap, "dark", 0), false);
+					curve = Json::getItem(keyMap, "curve");
+					if (curve) {
+						bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, color.g, newColor.g, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, color.b, newColor.b, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, color.a, newColor.a, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, color2.r, newColor2.r, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, color2.g, newColor2.g, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 6, time, time2, color2.b, newColor2.b, 1);
+					}
+					time = time2;
+					color = newColor;
+					color2 = newColor2;
+					keyMap = nextMap;
+				}
+				timelines.add(timeline);
+			} else if (strcmp(timelineMap->_name, "rgb2") == 0) {
+				int frameCount = timelineMap->_size;
+				int bezierCount = frameCount * 7;
+				RGBA2Timeline *timeline = new(__FILE__, __LINE__) RGBA2Timeline(frameCount, bezierCount, slotIndex);
+				keyMap = timelineMap->_child;
+				float time = Json::getFloat(keyMap, "time", 0);
+				toColor(color, Json::getString(keyMap, "light", 0), false);
+				toColor(color2, Json::getString(keyMap, "dark", 0), false);
 
-                for (frame = 0, bezier = 0;;++frame) {
-                    timeline->setFrame(frame, time, color.r, color.g, color.b, color.a, color2.r, color2.g, color2.b);
-                    nextMap = keyMap->_next;
-                    if (!nextMap) break;
-                    float time2 = Json::getFloat(nextMap, "time", 0);
-                    toColor(newColor, Json::getString(nextMap, "light", 0), false);
-                    toColor(newColor2, Json::getString(nextMap, "dark", 0), false);
-                    curve = Json::getItem(keyMap, "curve");
-                    if (curve) {
-                        bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, color.g, newColor.g, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, color.b, newColor.b, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, color2.r, newColor2.r, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, color2.g, newColor2.g, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, color2.b, newColor2.b, 1);
-                    }
-                    time = time2;
-                    color = newColor;
-                    color2 = newColor2;
-                    keyMap = nextMap;
-                }
-                timelines.add(timeline);
+				for (frame = 0, bezier = 0;;++frame) {
+					timeline->setFrame(frame, time, color.r, color.g, color.b, color.a, color2.r, color2.g, color2.b);
+					nextMap = keyMap->_next;
+					if (!nextMap) {
+						// timeline.shrink(); // BOZO
+						break;
+					}
+					float time2 = Json::getFloat(nextMap, "time", 0);
+					toColor(newColor, Json::getString(nextMap, "light", 0), false);
+					toColor(newColor2, Json::getString(nextMap, "dark", 0), false);
+					curve = Json::getItem(keyMap, "curve");
+					if (curve) {
+						bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, color.r, newColor.r, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, color.g, newColor.g, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, color.b, newColor.b, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, color2.r, newColor2.r, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, color2.g, newColor2.g, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, color2.b, newColor2.b, 1);
+					}
+					time = time2;
+					color = newColor;
+					color2 = newColor2;
+					keyMap = nextMap;
+				}
+				timelines.add(timeline);
 			} else {
 				ContainerUtil::cleanUpVectorOfPointers(timelines);
 				setError(NULL, "Invalid timeline type for a slot: ", timelineMap->_name);
@@ -983,185 +997,192 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 		}
 
 		for (timelineMap = boneMap->_child; timelineMap; timelineMap = timelineMap->_next) {
-		    if (timelineMap->_size == 0) continue;
+			if (timelineMap->_size == 0) continue;
 
-            if (strcmp(timelineMap->_name, "rotate") == 0) {
-                timelines.add(readTimeline(timelineMap->_child, new RotateTimeline(timelineMap->_size, timelineMap->_size, boneIndex), 0, 1));
-            } else if (strcmp(timelineMap->_name, "translate") == 0) {
-                TranslateTimeline *timeline = new TranslateTimeline(timelineMap->_size, timelineMap->_size << 1, boneIndex);
-                timelines.add(readTimeline(timelineMap->_child, timeline, "x", "y", 0, _scale));
-            } else if (strcmp(timelineMap->_name, "translatex") == 0) {
-                TranslateXTimeline *timeline = new TranslateXTimeline(timelineMap->_size, timelineMap->_size, boneIndex);
-                timelines.add(readTimeline(timelineMap->_child, timeline, 0, _scale));
-            } else if (strcmp(timelineMap->_name, "translatey") == 0) {
-                TranslateYTimeline *timeline = new TranslateYTimeline(timelineMap->_size, timelineMap->_size, boneIndex);
-                timelines.add(readTimeline(timelineMap->_child, timeline, 0, _scale));
-            } else if (strcmp(timelineMap->_name, "scale") == 0) {
-                ScaleTimeline *timeline = new (__FILE__, __LINE__) ScaleTimeline(timelineMap->_size, timelineMap->_size << 1, boneIndex);
-                timelines.add(readTimeline(timelineMap->_child, timeline, "x", "y", 1, 1));
-            } else if (strcmp(timelineMap->_name, "scalex") == 0) {
-                ScaleXTimeline *timeline = new (__FILE__, __LINE__) ScaleXTimeline(timelineMap->_size, timelineMap->_size, boneIndex);
-                timelines.add(readTimeline(timelineMap->_child, timeline, 1, 1));
-            } else if (strcmp(timelineMap->_name, "scaley") == 0) {
-                ScaleYTimeline *timeline = new (__FILE__, __LINE__) ScaleYTimeline(timelineMap->_size, timelineMap->_size, boneIndex);
-                timelines.add(readTimeline(timelineMap->_child, timeline, 1, 1));
-            } else if (strcmp(timelineMap->_name, "shear") == 0) {
-                ShearTimeline *timeline = new (__FILE__, __LINE__) ShearTimeline(timelineMap->_size, timelineMap->_size << 1, boneIndex);
-                timelines.add(readTimeline(timelineMap->_child, timeline, "x", "y", 0, 1));
-            } else if (strcmp(timelineMap->_name, "shearx") == 0) {
-                ShearXTimeline *timeline = new (__FILE__, __LINE__) ShearXTimeline(timelineMap->_size, timelineMap->_size, boneIndex);
-                timelines.add(readTimeline(timelineMap->_child, timeline, 0, 1));
-            } else if (strcmp(timelineMap->_name, "sheary") == 0) {
-                ShearYTimeline *timeline = new (__FILE__, __LINE__) ShearYTimeline(timelineMap->_size, timelineMap->_size, boneIndex);
-                timelines.add(readTimeline(timelineMap->_child, timeline, 0, 1));
-            } else {
-                ContainerUtil::cleanUpVectorOfPointers(timelines);
-                setError(NULL, "Invalid timeline type for a bone: ", timelineMap->_name);
-                return NULL;
-            }
+			if (strcmp(timelineMap->_name, "rotate") == 0) {
+				timelines.add(readTimeline(timelineMap->_child, new RotateTimeline(timelineMap->_size, timelineMap->_size, boneIndex), 0, 1));
+			} else if (strcmp(timelineMap->_name, "translate") == 0) {
+				TranslateTimeline *timeline = new TranslateTimeline(timelineMap->_size, timelineMap->_size << 1, boneIndex);
+				timelines.add(readTimeline(timelineMap->_child, timeline, "x", "y", 0, _scale));
+			} else if (strcmp(timelineMap->_name, "translatex") == 0) {
+				TranslateXTimeline *timeline = new TranslateXTimeline(timelineMap->_size, timelineMap->_size, boneIndex);
+				timelines.add(readTimeline(timelineMap->_child, timeline, 0, _scale));
+			} else if (strcmp(timelineMap->_name, "translatey") == 0) {
+				TranslateYTimeline *timeline = new TranslateYTimeline(timelineMap->_size, timelineMap->_size, boneIndex);
+				timelines.add(readTimeline(timelineMap->_child, timeline, 0, _scale));
+			} else if (strcmp(timelineMap->_name, "scale") == 0) {
+				ScaleTimeline *timeline = new (__FILE__, __LINE__) ScaleTimeline(timelineMap->_size, timelineMap->_size << 1, boneIndex);
+				timelines.add(readTimeline(timelineMap->_child, timeline, "x", "y", 1, 1));
+			} else if (strcmp(timelineMap->_name, "scalex") == 0) {
+				ScaleXTimeline *timeline = new (__FILE__, __LINE__) ScaleXTimeline(timelineMap->_size, timelineMap->_size, boneIndex);
+				timelines.add(readTimeline(timelineMap->_child, timeline, 1, 1));
+			} else if (strcmp(timelineMap->_name, "scaley") == 0) {
+				ScaleYTimeline *timeline = new (__FILE__, __LINE__) ScaleYTimeline(timelineMap->_size, timelineMap->_size, boneIndex);
+				timelines.add(readTimeline(timelineMap->_child, timeline, 1, 1));
+			} else if (strcmp(timelineMap->_name, "shear") == 0) {
+				ShearTimeline *timeline = new (__FILE__, __LINE__) ShearTimeline(timelineMap->_size, timelineMap->_size << 1, boneIndex);
+				timelines.add(readTimeline(timelineMap->_child, timeline, "x", "y", 0, 1));
+			} else if (strcmp(timelineMap->_name, "shearx") == 0) {
+				ShearXTimeline *timeline = new (__FILE__, __LINE__) ShearXTimeline(timelineMap->_size, timelineMap->_size, boneIndex);
+				timelines.add(readTimeline(timelineMap->_child, timeline, 0, 1));
+			} else if (strcmp(timelineMap->_name, "sheary") == 0) {
+				ShearYTimeline *timeline = new (__FILE__, __LINE__) ShearYTimeline(timelineMap->_size, timelineMap->_size, boneIndex);
+				timelines.add(readTimeline(timelineMap->_child, timeline, 0, 1));
+			} else {
+				ContainerUtil::cleanUpVectorOfPointers(timelines);
+				setError(NULL, "Invalid timeline type for a bone: ", timelineMap->_name);
+				return NULL;
+			}
 		}
 	}
 
 	/** IK constraint timelines. */
 	for (constraintMap = ik ? ik->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
-	    keyMap = constraintMap->_child;
-        if (keyMap == NULL) continue;
+		keyMap = constraintMap->_child;
+		if (keyMap == NULL) continue;
 
 		IkConstraintData *constraint = skeletonData->findIkConstraint(constraintMap->_name);
 		int constraintIndex = skeletonData->_ikConstraints.indexOf(constraint);
 		IkConstraintTimeline *timeline = new(__FILE__, __LINE__) IkConstraintTimeline(constraintMap->_size, constraintMap->_size << 1, constraintIndex);
 
-        float time = Json::getFloat(keyMap, "time", 0);
-        float mix = Json::getFloat(keyMap, "mix", 1);
-        float softness = Json::getFloat(keyMap, "softness", 0) * _scale;
+		float time = Json::getFloat(keyMap, "time", 0);
+		float mix = Json::getFloat(keyMap, "mix", 1);
+		float softness = Json::getFloat(keyMap, "softness", 0) * _scale;
 
-        for (frame = 0, bezier = 0;; frame++) {
-            int bendDirection = Json::getBoolean(keyMap, "bendPositive", true) ? 1 : -1;
-            timeline->setFrame(frame, time, mix, softness, bendDirection, Json::getBoolean(keyMap, "compress", false), Json::getBoolean(keyMap, "stretch", false));
-            nextMap = keyMap->_next;
-            if (!nextMap) break;
+		for (frame = 0, bezier = 0;; frame++) {
+			int bendDirection = Json::getBoolean(keyMap, "bendPositive", true) ? 1 : -1;
+			timeline->setFrame(frame, time, mix, softness, bendDirection, Json::getBoolean(keyMap, "compress", false), Json::getBoolean(keyMap, "stretch", false));
+			nextMap = keyMap->_next;
+			if (!nextMap) {
+				// timeline.shrink(); // BOZO
+				break;
+			}
 
-            float time2 = Json::getFloat(nextMap, "time", 0);
-            float mix2 = Json::getFloat(nextMap, "mix", 1);
-            float softness2 = Json::getFloat(nextMap, "softness", 0) * _scale;
-            curve = Json::getItem(keyMap, "curve");
-            if (curve) {
-                bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mix, mix2, 1);
-                bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, softness, softness2, _scale);
-            }
+			float time2 = Json::getFloat(nextMap, "time", 0);
+			float mix2 = Json::getFloat(nextMap, "mix", 1);
+			float softness2 = Json::getFloat(nextMap, "softness", 0) * _scale;
+			curve = Json::getItem(keyMap, "curve");
+			if (curve) {
+				bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mix, mix2, 1);
+				bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, softness, softness2, _scale);
+			}
 
-            time = time2;
-            mix = mix2;
-            softness = softness2;
-            keyMap = nextMap;
-        }
+			time = time2;
+			mix = mix2;
+			softness = softness2;
+			keyMap = nextMap;
+		}
 
 		timelines.add(timeline);
 	}
 
 	/** Transform constraint timelines. */
 	for (constraintMap = transform ? transform->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
-        keyMap = constraintMap->_child;
-        if (keyMap == NULL) continue;
+		keyMap = constraintMap->_child;
+		if (keyMap == NULL) continue;
 
-        TransformConstraintData *constraint = skeletonData->findTransformConstraint(constraintMap->_name);
-        int constraintIndex = skeletonData->_transformConstraints.indexOf(constraint);
-        TransformConstraintTimeline *timeline = new(__FILE__, __LINE__) TransformConstraintTimeline(constraintMap->_size, constraintMap->_size << 2, constraintIndex);
+		TransformConstraintData *constraint = skeletonData->findTransformConstraint(constraintMap->_name);
+		int constraintIndex = skeletonData->_transformConstraints.indexOf(constraint);
+		TransformConstraintTimeline *timeline = new(__FILE__, __LINE__) TransformConstraintTimeline(constraintMap->_size, constraintMap->_size << 2, constraintIndex);
 
-        float time = Json::getFloat(keyMap, "time", 0);
-        float mixRotate = Json::getFloat(keyMap, "mixRotate", 1);
-        float mixShearY = Json::getFloat(keyMap, "mixShearY", 1);
-        float mixX = Json::getFloat(keyMap, "mixX", 1);
-        float mixY = Json::getFloat(keyMap, "mixY", mixX);
-        float mixScaleX = Json::getFloat(keyMap, "mixScaleX", 1);
-        float mixScaleY = Json::getFloat(keyMap, "mixScaleY", mixScaleX);
+		float time = Json::getFloat(keyMap, "time", 0);
+		float mixRotate = Json::getFloat(keyMap, "mixRotate", 1);
+		float mixShearY = Json::getFloat(keyMap, "mixShearY", 1);
+		float mixX = Json::getFloat(keyMap, "mixX", 1);
+		float mixY = Json::getFloat(keyMap, "mixY", mixX);
+		float mixScaleX = Json::getFloat(keyMap, "mixScaleX", 1);
+		float mixScaleY = Json::getFloat(keyMap, "mixScaleY", mixScaleX);
 
-        for (frame = 0, bezier = 0;; frame++) {
-            timeline->setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
-            nextMap = keyMap->_next;
-            if (!nextMap) break;
+		for (frame = 0, bezier = 0;; frame++) {
+			timeline->setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
+			nextMap = keyMap->_next;
+			if (!nextMap) {
+				// timeline.shrink(); // BOZO
+				break;
+			}
 
-            float time2 = Json::getFloat(nextMap, "time", 0);
-            float mixRotate2 = Json::getFloat(nextMap, "mixRotate", 1);
-            float mixShearY2 = Json::getFloat(nextMap, "mixShearY", 1);
-            float mixX2 = Json::getFloat(nextMap, "mixX", 1);
-            float mixY2 = Json::getFloat(nextMap, "mixY", mixX2);
-            float mixScaleX2 = Json::getFloat(nextMap, "mixScaleX", 1);
-            float mixScaleY2 = Json::getFloat(nextMap, "mixScaleY", mixScaleX2);
-            curve = Json::getItem(keyMap, "curve");
-            if (curve) {
-                bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
-                bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1);
-                bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1);
-                bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, mixScaleX, mixScaleX2, 1);
-                bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, mixScaleY, mixScaleY2, 1);
-                bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, mixShearY, mixShearY2, 1);
-            }
+			float time2 = Json::getFloat(nextMap, "time", 0);
+			float mixRotate2 = Json::getFloat(nextMap, "mixRotate", 1);
+			float mixShearY2 = Json::getFloat(nextMap, "mixShearY", 1);
+			float mixX2 = Json::getFloat(nextMap, "mixX", 1);
+			float mixY2 = Json::getFloat(nextMap, "mixY", mixX2);
+			float mixScaleX2 = Json::getFloat(nextMap, "mixScaleX", 1);
+			float mixScaleY2 = Json::getFloat(nextMap, "mixScaleY", mixScaleX2);
+			curve = Json::getItem(keyMap, "curve");
+			if (curve) {
+				bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+				bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1);
+				bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1);
+				bezier = readCurve(curve, timeline, bezier, frame, 3, time, time2, mixScaleX, mixScaleX2, 1);
+				bezier = readCurve(curve, timeline, bezier, frame, 4, time, time2, mixScaleY, mixScaleY2, 1);
+				bezier = readCurve(curve, timeline, bezier, frame, 5, time, time2, mixShearY, mixShearY2, 1);
+			}
 
-            time = time2;
-            mixRotate = mixRotate2;
-            mixX = mixX2;
-            mixY = mixY2;
-            mixScaleX = mixScaleX2;
-            mixScaleY = mixScaleY2;
-            mixScaleX = mixScaleX2;
-            keyMap = nextMap;
-        }
+			time = time2;
+			mixRotate = mixRotate2;
+			mixX = mixX2;
+			mixY = mixY2;
+			mixScaleX = mixScaleX2;
+			mixScaleY = mixScaleY2;
+			mixScaleX = mixScaleX2;
+			keyMap = nextMap;
+		}
 
-        timelines.add(timeline);
+		timelines.add(timeline);
 	}
 
 	/** Path constraint timelines. */
 	for (constraintMap = paths ? paths->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
-        PathConstraintData *data = skeletonData->findPathConstraint(constraintMap->_name);
-        if (!data) {
-            ContainerUtil::cleanUpVectorOfPointers(timelines);
-            setError(NULL, "Path constraint not found: ", constraintMap->_name);
-            return NULL;
-        }
-        int index = skeletonData->_pathConstraints.indexOf(data);
-        for (Json *timelineMap = constraintMap->_child; timelineMap; timelineMap = timelineMap->_next) {
-            keyMap = timelineMap->_child;
-            if (keyMap == NULL) continue;
-            const char *timelineName = timelineMap->_name;
-            if (strcmp(timelineName, "position") == 0 ) {
-                PathConstraintPositionTimeline *timeline = new (__FILE__, __LINE__) PathConstraintPositionTimeline(timelineMap->_size, timelineMap->_size, index);
-                timelines.add(readTimeline(keyMap, timeline, 0, data->_positionMode == PositionMode_Fixed ? _scale : 1));
-            } else if (strcmp(timelineName, "spacing") == 0) {
-                CurveTimeline1 *timeline = new PathConstraintSpacingTimeline(timelineMap->_size, timelineMap->_size, index);
-                timelines.add(readTimeline(keyMap, timeline, 0,
-                                           data->_spacingMode == SpacingMode_Length || data->_spacingMode == SpacingMode_Fixed ? _scale : 1));
-            } else if (strcmp(timelineName, "mix") == 0) {
-                PathConstraintMixTimeline *timeline = new PathConstraintMixTimeline(timelineMap->_size, timelineMap->_size * 3, index);
-                float time = Json::getFloat(keyMap, "time", 0);
-                float mixRotate = Json::getFloat(keyMap, "mixRotate", 1);
-                float mixX = Json::getFloat(keyMap, "mixX", 1);
-                float mixY = Json::getFloat(keyMap, "mixY", mixX);
-                for (frame = 0, bezier = 0;; frame++) {
-                    timeline->setFrame(frame, time, mixRotate, mixX, mixY);
-                    nextMap = keyMap->_next;
-                    if (nextMap == NULL) {
-                        break;
-                    }
-                    float time2 = Json::getFloat(nextMap, "time", 0);
-                    float mixRotate2 = Json::getFloat(nextMap, "mixRotate", 1);
-                    float mixX2 = Json::getFloat(nextMap, "mixX", 1);
-                    float mixY2 = Json::getFloat(nextMap, "mixY", mixX2);
-                    curve = Json::getItem(keyMap, "curve");
-                    if (curve != NULL) {
-                        bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1);
-                        bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1);
-                    }
-                    time = time2;
-                    mixRotate = mixRotate2;
-                    mixX = mixX2;
-                    mixY = mixY2;
-                    keyMap = nextMap;
-                }
-                timelines.add(timeline);
-            }
-        }
+		PathConstraintData *data = skeletonData->findPathConstraint(constraintMap->_name);
+		if (!data) {
+			ContainerUtil::cleanUpVectorOfPointers(timelines);
+			setError(NULL, "Path constraint not found: ", constraintMap->_name);
+			return NULL;
+		}
+		int index = skeletonData->_pathConstraints.indexOf(data);
+		for (Json *timelineMap = constraintMap->_child; timelineMap; timelineMap = timelineMap->_next) {
+			keyMap = timelineMap->_child;
+			if (keyMap == NULL) continue;
+			const char *timelineName = timelineMap->_name;
+			if (strcmp(timelineName, "position") == 0 ) {
+				PathConstraintPositionTimeline *timeline = new (__FILE__, __LINE__) PathConstraintPositionTimeline(timelineMap->_size, timelineMap->_size, index);
+				timelines.add(readTimeline(keyMap, timeline, 0, data->_positionMode == PositionMode_Fixed ? _scale : 1));
+			} else if (strcmp(timelineName, "spacing") == 0) {
+				CurveTimeline1 *timeline = new PathConstraintSpacingTimeline(timelineMap->_size, timelineMap->_size, index);
+				timelines.add(readTimeline(keyMap, timeline, 0,
+										   data->_spacingMode == SpacingMode_Length || data->_spacingMode == SpacingMode_Fixed ? _scale : 1));
+			} else if (strcmp(timelineName, "mix") == 0) {
+				PathConstraintMixTimeline *timeline = new PathConstraintMixTimeline(timelineMap->_size, timelineMap->_size * 3, index);
+				float time = Json::getFloat(keyMap, "time", 0);
+				float mixRotate = Json::getFloat(keyMap, "mixRotate", 1);
+				float mixX = Json::getFloat(keyMap, "mixX", 1);
+				float mixY = Json::getFloat(keyMap, "mixY", mixX);
+				for (frame = 0, bezier = 0;; frame++) {
+					timeline->setFrame(frame, time, mixRotate, mixX, mixY);
+					nextMap = keyMap->_next;
+					if (!nextMap) {
+						// timeline.shrink(); // BOZO
+						break;
+					}
+					float time2 = Json::getFloat(nextMap, "time", 0);
+					float mixRotate2 = Json::getFloat(nextMap, "mixRotate", 1);
+					float mixX2 = Json::getFloat(nextMap, "mixX", 1);
+					float mixY2 = Json::getFloat(nextMap, "mixY", mixX2);
+					curve = Json::getItem(keyMap, "curve");
+					if (curve != NULL) {
+						bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 1, time, time2, mixX, mixX2, 1);
+						bezier = readCurve(curve, timeline, bezier, frame, 2, time, time2, mixY, mixY2, 1);
+					}
+					time = time2;
+					mixRotate = mixRotate2;
+					mixX = mixX2;
+					mixY = mixY2;
+					keyMap = nextMap;
+				}
+				timelines.add(timeline);
+			}
+		}
 	}
 
 	/** Deform timelines. */
@@ -1171,8 +1192,8 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 			int slotIndex = skeletonData->findSlotIndex(slotMap->_name);
 			Json *timelineMap;
 			for (timelineMap = slotMap->_child; timelineMap; timelineMap = timelineMap->_next) {
-			    keyMap = timelineMap->_child;
-			    if (keyMap == NULL) continue;
+				keyMap = timelineMap->_child;
+				if (keyMap == NULL) continue;
 
 				Attachment *baseAttachment = skin->getAttachment(slotIndex, timelineMap->_name);
 				if (!baseAttachment) {
@@ -1187,7 +1208,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 				int deformLength = weighted ? verts.size() / 3 * 2 : verts.size();
 
 				DeformTimeline *timeline = new(__FILE__, __LINE__) DeformTimeline(timelineMap->_size, timelineMap->_size, slotIndex, attachment);
-                float time = Json::getFloat(keyMap, "time", 0);
+				float time = Json::getFloat(keyMap, "time", 0);
 				for (frame = 0, bezier = 0;; frame++) {
 					Json *vertices = Json::getItem(keyMap, "vertices");
 					Vector<float> deformed;
@@ -1217,16 +1238,19 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 							}
 						}
 					}
-                    timeline->setFrame(frame, time, deformed);
-                    nextMap = keyMap->_next;
-                    if (!nextMap) break;
-                    float time2 = Json::getFloat(nextMap, "time", 0);
-                    curve = Json::getItem(keyMap, "curve");
-                    if (curve) {
-                        bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
-                    }
-                    time = time2;
-                    keyMap = nextMap;
+					timeline->setFrame(frame, time, deformed);
+					nextMap = keyMap->_next;
+					if (!nextMap) {
+						// timeline.shrink(); // BOZO
+						break;
+					}
+					float time2 = Json::getFloat(nextMap, "time", 0);
+					curve = Json::getItem(keyMap, "curve");
+					if (curve) {
+						bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
+					}
+					time = time2;
+					keyMap = nextMap;
 				}
 				timelines.add(timeline);
 			}
@@ -1307,7 +1331,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 
 	float duration = 0;
 	for (size_t i = 0; i < timelines.size(); i++)
-	    duration = MathUtil::max(duration, timelines[i]->getDuration());
+		duration = MathUtil::max(duration, timelines[i]->getDuration());
 	return new(__FILE__, __LINE__) Animation(String(root->_name), timelines, duration);
 }
 

@@ -41,7 +41,7 @@ module spine {
 
 		newRegionAttachment (skin: Skin, name: string, path: string): RegionAttachment {
 			let region = this.atlas.findRegion(path);
-			if (region == null) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
+			if (!region) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
 			region.renderObject = region;
 			let attachment = new RegionAttachment(name);
 			attachment.setRegion(region);
@@ -50,7 +50,7 @@ module spine {
 
 		newMeshAttachment (skin: Skin, name: string, path: string) : MeshAttachment {
 			let region = this.atlas.findRegion(path);
-			if (region == null) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
+			if (!region) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
 			region.renderObject = region;
 			let attachment = new MeshAttachment(name);
 			attachment.region = region;

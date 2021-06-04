@@ -46,13 +46,13 @@ module spine {
 		constraints = new Array<ConstraintData>();
 
 		constructor (name: string) {
-			if (name == null) throw new Error("name cannot be null.");
+			if (!name) throw new Error("name cannot be null.");
 			this.name = name;
 		}
 
 		/** Adds an attachment to the skin for the specified slot index and name. */
 		setAttachment (slotIndex: number, name: string, attachment: Attachment) {
-			if (attachment == null) throw new Error("attachment cannot be null.");
+			if (!attachment) throw new Error("attachment cannot be null.");
 			let attachments = this.attachments;
 			if (slotIndex >= attachments.length) attachments.length = slotIndex + 1;
 			if (!attachments[slotIndex]) attachments[slotIndex] = { };
@@ -64,8 +64,8 @@ module spine {
 			for(let i = 0; i < skin.bones.length; i++) {
 				let bone = skin.bones[i];
 				let contained = false;
-				for (let j = 0; j < this.bones.length; j++) {
-					if (this.bones[j] == bone) {
+				for (let ii = 0; ii < this.bones.length; ii++) {
+					if (this.bones[ii] == bone) {
 						contained = true;
 						break;
 					}
@@ -76,8 +76,8 @@ module spine {
 			for(let i = 0; i < skin.constraints.length; i++) {
 				let constraint = skin.constraints[i];
 				let contained = false;
-				for (let j = 0; j < this.constraints.length; j++) {
-					if (this.constraints[j] == constraint) {
+				for (let ii = 0; ii < this.constraints.length; ii++) {
+					if (this.constraints[ii] == constraint) {
 						contained = true;
 						break;
 					}
@@ -98,8 +98,8 @@ module spine {
 			for(let i = 0; i < skin.bones.length; i++) {
 				let bone = skin.bones[i];
 				let contained = false;
-				for (let j = 0; j < this.bones.length; j++) {
-					if (this.bones[j] == bone) {
+				for (let ii = 0; ii < this.bones.length; ii++) {
+					if (this.bones[ii] == bone) {
 						contained = true;
 						break;
 					}
@@ -110,8 +110,8 @@ module spine {
 			for(let i = 0; i < skin.constraints.length; i++) {
 				let constraint = skin.constraints[i];
 				let contained = false;
-				for (let j = 0; j < this.constraints.length; j++) {
-					if (this.constraints[j] == constraint) {
+				for (let ii = 0; ii < this.constraints.length; ii++) {
+					if (this.constraints[ii] == constraint) {
 						contained = true;
 						break;
 					}
@@ -122,7 +122,7 @@ module spine {
 			let attachments = skin.getAttachments();
 			for (let i = 0; i < attachments.length; i++) {
 				var attachment = attachments[i];
-				if (attachment.attachment == null) continue;
+				if (!attachment.attachment) continue;
 				if (attachment.attachment instanceof MeshAttachment) {
 					attachment.attachment = attachment.attachment.newLinkedMesh();
 					this.setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
@@ -190,7 +190,7 @@ module spine {
 						let skinAttachment:Attachment = dictionary[key];
 						if (slotAttachment == skinAttachment) {
 							let attachment = this.getAttachment(slotIndex, key);
-							if (attachment != null) slot.setAttachment(attachment);
+							if (attachment) slot.setAttachment(attachment);
 							break;
 						}
 					}

@@ -138,7 +138,7 @@ module spine.webgl {
 				quad[i++] = 0;
 				quad[i++] = 0;
 				quad[i++] = 0;
-				quad[i++] = 0;
+				quad[i] = 0;
 			}
 			this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
 		}
@@ -202,7 +202,7 @@ module spine.webgl {
 				quad[i++] = 0;
 				quad[i++] = 0;
 				quad[i++] = 0;
-				quad[i++] = 0;
+				quad[i] = 0;
 			}
 			this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
 		}
@@ -333,7 +333,7 @@ module spine.webgl {
 				quad[i++] = 0;
 				quad[i++] = 0;
 				quad[i++] = 0;
-				quad[i++] = 0;
+				quad[i] = 0;
 			}
 			this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
 		}
@@ -397,7 +397,7 @@ module spine.webgl {
 				quad[i++] = 0;
 				quad[i++] = 0;
 				quad[i++] = 0;
-				quad[i++] = 0;
+				quad[i] = 0;
 			}
 			this.batcher.draw(<GLTexture>region.texture, quad, this.QUAD_TRIANGLES);
 		}
@@ -488,9 +488,8 @@ module spine.webgl {
 				this.shapesShader.setUniform4x4f(Shader.MVP_MATRIX, this.camera.projectionView.values);
 				this.shapes.begin(this.shapesShader);
 				this.activeRenderer = this.shapes;
-			} else {
+			} else
 				this.activeRenderer = this.skeletonDebugRenderer;
-			}
 		}
 
 		dispose () {

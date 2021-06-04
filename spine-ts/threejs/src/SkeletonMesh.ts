@@ -191,7 +191,7 @@ module spine.threejs {
 					continue;
 				} else continue;
 
-				if (texture != null) {
+				if (texture) {
 					let skeleton = slot.bone.skeleton;
 					let skeletonColor = skeleton.color;
 					let slotColor = slot.color;
@@ -211,7 +211,7 @@ module spine.threejs {
 						clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, null, false);
 						let clippedVertices = clipper.clippedVertices;
 						let clippedTriangles = clipper.clippedTriangles;
-						if (this.vertexEffect != null) {
+						if (this.vertexEffect) {
 							let vertexEffect = this.vertexEffect;
 							let verts = clippedVertices;
 							for (let v = 0, n = clippedVertices.length; v < n; v += vertexSize) {
@@ -238,7 +238,7 @@ module spine.threejs {
 						finalIndicesLength = clippedTriangles.length;
 					} else {
 						let verts = vertices;
-						if (this.vertexEffect != null) {
+						if (this.vertexEffect) {
 							let vertexEffect = this.vertexEffect;
 							for (let v = 0, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
 								tempPos.x = verts[v];
@@ -291,9 +291,7 @@ module spine.threejs {
 					//}
 
 					let batchMaterial = <SkeletonMeshMaterial>batch.material;
-					if (batchMaterial.uniforms.map.value == null) {
-						batchMaterial.uniforms.map.value = texture.texture;
-					}
+					if (!batchMaterial.uniforms.map.value) batchMaterial.uniforms.map.value = texture.texture;
 					if (batchMaterial.uniforms.map.value != texture.texture) {
 						batch.end();
 						batch = this.nextBatch();

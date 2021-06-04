@@ -735,7 +735,7 @@ module spine {
 			this.loadingScreen.draw(this.assetManager.isLoadingComplete());
 
 			// Have we finished loading the asset? Then set things up
-			if (this.assetManager.isLoadingComplete() && this.skeleton == null) this.loadSkeleton();
+			if (this.assetManager.isLoadingComplete() && !this.skeleton) this.loadSkeleton();
 
 			// Resize the canvas
 			this.sceneRenderer.resize(webgl.ResizeMode.Expand);
@@ -1025,7 +1025,7 @@ module spine {
 					}
 				},
 				dragged: (x, y) => {
-					if (target != null) {
+					if (target) {
 						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
 						if (target.parent !== null) {
 							target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
