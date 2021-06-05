@@ -59,7 +59,7 @@ function SkeletonBounds:update (skeleton, updateAabb)
 	local slots = skeleton.slots
 
 	for _,slot in ipairs(skeleton.slots) do
-		if (slot.bone.active) then
+		if slot.bone.active then
 			local attachment = slot.attachment
 			if attachment and attachment.type == AttachmentType.boundingbox then
 				local boundingBox = attachment
@@ -110,7 +110,7 @@ end
 function SkeletonBounds:aabbIntersectsSegment (x1, y1, x2, y2)
 	local minX, minY, maxX, maxY = self.minX, self.minY, self.maxX, self.maxY
 	if (x1 <= minX and x2 <= minX) or (y1 <= minY and y2 <= minY) or (x1 >= maxX and x2 >= maxX) or (y1 >= maxY and y2 >= maxY) then
-			return false
+		return false
 	end
 	local m = (y2 - y1) / (x2 - x1)
 	local y = m * (minX - x1) + y1

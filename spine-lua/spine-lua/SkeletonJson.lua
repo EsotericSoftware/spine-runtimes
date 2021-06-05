@@ -48,6 +48,9 @@ local TransformMode = require "spine-lua.TransformMode"
 local utils = require "spine-lua.utils"
 local Color = require "spine-lua.Color"
 
+local math_max = math.max
+local math_floor = math.floor
+
 local SkeletonJson = {}
 function SkeletonJson.new (attachmentLoader)
 	if not attachmentLoader then attachmentLoader = AttachmentLoader.new() end
@@ -200,13 +203,13 @@ function SkeletonJson.new (attachmentLoader)
 
 				for _,boneName in ipairs(constraintMap.bones) do
 					local bone = skeletonData:findBone(boneName)
-					if not bone then error("Transform constraint bone not found: " .. boneName, 2) end
+					if not bone then error("Transform constraint bone not found: " .. boneName) end
 					table_insert(data.bones, bone)
 				end
 
 				local targetName = constraintMap.target
 				data.target = skeletonData:findBone(targetName)
-				if not data.target then error("Transform constraint target bone not found: " .. (targetName or "none"), 2) end
+				if not data.target then error("Transform constraint target bone not found: " .. (targetName or "none")) end
 
 				data.local_ = getValue(constraintMap, "local", false)
 				data.relative = getValue(constraintMap, "relative", false)
@@ -237,13 +240,13 @@ function SkeletonJson.new (attachmentLoader)
 
 				for _,boneName in ipairs(constraintMap.bones) do
 					local bone = skeletonData:findBone(boneName)
-					if not bone then error("Path constraint bone not found: " .. boneName, 2) end
+					if not bone then error("Path constraint bone not found: " .. boneName) end
 					table_insert(data.bones, bone)
 				end
 
 				local targetName = constraintMap.target
 				data.target = skeletonData:findSlot(targetName)
-				if data.target == nil then error("Path target slot not found: " .. targetName, 2) end
+				if data.target == nil then error("Path target slot not found: " .. targetName) end
 
 				data.positionMode = PathConstraintData.PositionMode[getValue(constraintMap, "positionMode", "percent"):lower()]
 				data.spacingMode = PathConstraintData.SpacingMode[getValue(constraintMap, "spacingMode", "length"):lower()]
@@ -269,7 +272,7 @@ function SkeletonJson.new (attachmentLoader)
 				if skinMap["bones"] then
 					for _, entry in ipairs(skinMap["bones"]) do
 						local bone = skeletonData:findBone(entry)
-						if bone == nil then error("Skin bone not found:  " .. entry, 2) end
+						if bone == nil then error("Skin bone not found:  " .. entry) end
 						table_insert(skin.bones, bone)
 					end
 				end
@@ -277,7 +280,7 @@ function SkeletonJson.new (attachmentLoader)
 				if skinMap["ik"] then
 					for _, entry in ipairs(skinMap["ik"]) do
 						local constraint = skeletonData:findIkConstraint(entry)
-						if constraint == nil then error("Skin IK constraint not found:  " .. entry, 2) end
+						if constraint == nil then error("Skin IK constraint not found:  " .. entry) end
 						table_insert(skin.constraints, constraint)
 					end
 				end
@@ -285,7 +288,7 @@ function SkeletonJson.new (attachmentLoader)
 				if skinMap["transform"] then
 					for _, entry in ipairs(skinMap["transform"]) do
 						local constraint = skeletonData:findTransformConstraint(entry)
-						if constraint == nil then error("Skin transform constraint not found:  " .. entry, 2) end
+						if constraint == nil then error("Skin transform constraint not found:  " .. entry) end
 						table_insert(skin.constraints, constraint)
 					end
 				end
@@ -293,7 +296,7 @@ function SkeletonJson.new (attachmentLoader)
 				if skinMap["path"] then
 					for _, entry in ipairs(skinMap["path"]) do
 						local constraint = skeletonData:findPathConstraint(entry)
-						if constraint == nil then error("Skin path constraint not found:  " .. entry, 2) end
+						if constraint == nil then error("Skin path constraint not found:  " .. entry) end
 						table_insert(skin.constraints, constraint)
 					end
 				end
@@ -915,7 +918,7 @@ function SkeletonJson.new (attachmentLoader)
 							table_insert(timelines, readTimeline1(timelineMap, timeline, 0, timelineScale))
 						elseif timelineName == "spacing" then
 							local timeline = Animation.PathConstraintSpacingTimeline.new(#timelineMap, #timelineMap, constraintIndex)
-							local timelineScale = 1;
+							local timelineScale = 1
 							if data.spacingMode == SpacingMode.Length or data.spacingMode == SpacingMode.Fixed then timelineScale = scale end
 							table_insert(timelines, readTimeline1(timelineMap, timeline, 0, timelineScale))
 						elseif timelineName == "mix" then
@@ -960,19 +963,19 @@ function SkeletonJson.new (attachmentLoader)
 		if map.deform then
 			for deformName, deformMap in pairs(map.deform) do
 				local skin = skeletonData:findSkin(deformName)
-				if not skin then error("Skin not found: " .. deformName, 2) end
+				if not skin then error("Skin not found: " .. deformName) end
 				for slotName,slotMap in pairs(deformMap) do
 					local slotIndex = skeletonData:findSlot(slotName).index
-					if slotIndex == -1 then error("Slot not found: " .. slotMap.name, 2) end
+					if slotIndex == -1 then error("Slot not found: " .. slotMap.name) end
 					for timelineName,timelineMap in pairs(slotMap) do
 						local keyMap = timelineMap[1]
 						if keyMap then
 							local attachment = skin:getAttachment(slotIndex, timelineName)
-							if not attachment then error("Deform attachment not found: " .. timelineMap.name, 2) end
+							if not attachment then error("Deform attachment not found: " .. timelineMap.name) end
 							local weighted = attachment.bones ~= nil
 							local vertices = attachment.vertices
 							local deformLength = #vertices
-							if weighted then deformLength = math.floor(deformLength / 3) * 2 end
+							if weighted then deformLength = math_floor(deformLength / 3) * 2 end
 
 							local timeline = Animation.DeformTimeline.new(#timelineMap, #timelineMap, slotIndex, attachment)
 							local bezier = 0
@@ -1104,7 +1107,7 @@ function SkeletonJson.new (attachmentLoader)
 
 		local duration = 0
 		for _,timeline in ipairs(timelines) do
-			duration = math.max(duration, timeline:getDuration())
+			duration = math_max(duration, timeline:getDuration())
 		end
 		table_insert(skeletonData.animations, Animation.new(name, timelines, duration))
 	end

@@ -51,7 +51,7 @@ end
 
 function AtlasAttachmentLoader:newRegionAttachment (skin, name, path)
 	local region = self.atlas:findRegion(path)
-	if not region then error("Region not found in atlas: " .. path .. " (region attachment: " .. name .. ")") end
+	if not region then error("Region not found in atlas: " .. path .. " (region attachment: " .. name .. ")", 2) end
 	region.renderObject = region
 	local attachment = RegionAttachment.new(name)
 	attachment:setRegion(region)
@@ -61,7 +61,7 @@ end
 
 function AtlasAttachmentLoader:newMeshAttachment (skin, name, path)
 	local region = self.atlas:findRegion(path)
-	if not region then error("Region not found in atlas: " .. path .. " (mesh attachment: " .. name .. ")") end
+	if not region then error("Region not found in atlas: " .. path .. " (mesh attachment: " .. name .. ")", 2) end
 	region.renderObject = region
 	local attachment = MeshAttachment.new(name)
 	attachment.region = region

@@ -128,9 +128,9 @@ function SkeletonClipping:clipTriangles(vertices, uvs, triangles, trianglesLengt
 		while p <= polygonsCount do
 			local s = #clippedVertices + 1
 			local clipOutput = {}
-			if (self:clip(x1, y1, x2, y2, x3, y3, polygons[p], clipOutput)) then
+			if self:clip(x1, y1, x2, y2, x3, y3, polygons[p], clipOutput) then
 				local clipOutputLength = #clipOutput
-				if (clipOutputLength > 0) then
+				if clipOutputLength > 0 then
 					local d0 = y2 - y3
 					local d1 = x3 - x2
 					local d2 = x1 - x3
@@ -295,7 +295,7 @@ function SkeletonClipping:clip(x1, y1, x2, y2, x3, y3, clippingArea, output)
 		table_insert(output, output[1])
 		table_insert(output, output[2])
 
-		if (i == clippingVerticesLast) then break end
+		if i == clippingVerticesLast then break end
 		local temp = output
 		output = input
 		for i, _ in ipairs(output) do
@@ -340,7 +340,7 @@ function SkeletonClipping:makeClockwise(polygon)
 		area = area + p1x * p2y - p2x * p1y
 		i = i + 2
 	end
-	if (area < 0) then return end
+	if area < 0 then return end
 
 	i = 1
 	local lastX = verticesLength - 2 + 1

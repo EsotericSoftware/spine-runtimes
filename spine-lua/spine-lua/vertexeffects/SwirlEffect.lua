@@ -69,7 +69,7 @@ function SwirlEffect:transform (vertex)
 	local x = vertex.x - self.worldX
 	local y = vertex.y - self.worldY
 	local dist = math_sqrt(x * x + y * y)
-	if (dist < self.radius) then
+	if dist < self.radius then
 		local theta = interpolation.apply(self.interpolation, 0, self.angleRad, (self.radius - dist) / self.radius)
 		local cos = math_cos(theta)
 		local sin = math_sin(theta)

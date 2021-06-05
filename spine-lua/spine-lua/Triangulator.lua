@@ -111,7 +111,7 @@ function Triangulator:triangulate (verticesArray)
 					end
 					ii = (ii + 1) % vertexCount
 				end
-				if (not goToHead) then
+				if not goToHead then
 					breakLoop = true
 					break
 				end
@@ -244,7 +244,7 @@ function Triangulator:decompose(verticesArray, triangles)
 	n = #convexPolygons
 	while i <= n do
 		polygonIndices = convexPolygonsIndices[i]
-		if (#polygonIndices > 0) then
+		if #polygonIndices > 0 then
 			local firstIndex = polygonIndices[1]
 			local lastIndex = polygonIndices[#polygonIndices]
 
@@ -265,7 +265,7 @@ function Triangulator:decompose(verticesArray, triangles)
 			while ii <= n do
 				if ii ~= i then
 					local otherIndices = convexPolygonsIndices[ii]
-					if (#otherIndices == 3) then
+					if #otherIndices == 3 then
 						local otherFirstIndex = otherIndices[1]
 						local otherSecondIndex = otherIndices[2]
 						local otherLastIndex = otherIndices[3]

@@ -187,7 +187,7 @@ function Skin:attachAll(skeleton, oldSkin)
 		local slotAttachment = slot.attachment
 		if slotAttachment then
 			local dictionary = oldSkin.attachments[i]
-			if (dictionary) then
+			if dictionary then
 				for key, value in pairs(dictionary) do
 					local skinAttachment = value
 					if slotAttachment == skinAttachment then

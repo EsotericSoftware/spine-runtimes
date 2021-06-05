@@ -125,9 +125,9 @@ function IkConstraint:apply1 (bone, targetX, targetY, compress, stretch, uniform
 	rotationIK = rotationIK + math_deg(math_atan2(ty, tx))
 	if bone.ascaleX < 0 then rotationIK = rotationIK + 180 end
 	if rotationIK > 180 then
-	rotationIK = rotationIK - 360
-	elseif (rotationIK < -180) then
-	rotationIK = rotationIK + 360
+		rotationIK = rotationIK - 360
+	elseif rotationIK < -180 then
+		rotationIK = rotationIK + 360
 	end
 	local sx = bone.ascaleX
 	local sy = bone.ascaleY
@@ -262,7 +262,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 		d = c1 * c1 - 4 * c2 * c
 		if d >= 0 then
 			local q = math_sqrt(d)
-			if (c1 < 0) then q = -q end
+			if c1 < 0 then q = -q end
 			q = -(c1 + q) / 2
 			local r0 = q / c2
 			local r1 = c / q
@@ -285,7 +285,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 			local maxDist = maxX * maxX
 			local maxY = 0
 			c = -a * l1 / (aa - bb)
-			if (c >= -1 and c <= 1) then
+			if c >= -1 and c <= 1 then
 				c = math_acos(c)
 				x = a * math_cos(c) + l1
 				y = b * math_sin(c)

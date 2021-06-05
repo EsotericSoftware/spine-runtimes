@@ -438,7 +438,7 @@ function Skeleton:setSkin (skinName)
 end
 
 function Skeleton:setSkinByReference(newSkin)
-	if (self.skin == newSkin) then return end
+	if self.skin == newSkin then return end
 	if newSkin then
 		if self.skin then
 			newSkin:attachAll(self, self.skin)

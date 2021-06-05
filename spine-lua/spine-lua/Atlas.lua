@@ -43,13 +43,13 @@ function Atlas.parse(atlasPath, atlasBase)
 	end
 
 	if not atlasPath then
-		error("Error: " .. atlasPath .. ".atlas" .. " doesn't exist!")
+		error("Error: " .. atlasPath .. ".atlas" .. " doesn't exist!", 2)
 		return nil
 	end
 
 	local atlasLines = spine.utils.readFile( atlasPath, atlasBase )
 	if not atlasLines then
-		error("Error: " .. atlasPath .. ".atlas" .. " unable to read!")
+		error("Error: " .. atlasPath .. ".atlas" .. " unable to read!", 2)
 		return nil
 	end
 

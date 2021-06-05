@@ -313,9 +313,9 @@ function AnimationState:updateMixingFrom (to, delta)
 	from.trackLast = from.nextTrackLast
 
 	-- Require mixTime > 0 to ensure the mixing from entry was applied at least once.
-	if (to.mixTime > 0 and to.mixTime >= to.mixDuration) then
+	if to.mixTime > 0 and to.mixTime >= to.mixDuration then
 		-- Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
-		if (from.totalAlpha == 0 or to.mixDuration == 0) then
+		if from.totalAlpha == 0 or to.mixDuration == 0 then
 			to.mixingFrom = from.mixingFrom
 			if from.mixingFrom then from.mixingFrom.mixingTo = to end
 			to.interruptAlpha = from.interruptAlpha
@@ -365,7 +365,7 @@ function AnimationState:apply (skeleton)
 						if timeline.type == Animation.TimelineType.attachment then
 							self:applyAttachmentTimeline(timeline, skeleton, animationTime, blend, true)
 						else
-							timeline:apply(skeleton, animationLast, animationTime, self.events, mix, blend, MixDirection._in)
+							timeline:apply(skeleton, animationLast, animationTime, self.events, mix, blend, MixDirection.mixIn)
 						end
 					end
 				else
@@ -383,7 +383,7 @@ function AnimationState:apply (skeleton)
 						elseif timeline.type == Animation.TimelineType.attachment then
 							self:applyAttachmentTimeline(timeline, skeleton, animationTime, timelineBlend, true)
 						else
-							timeline:apply(skeleton, animationLast, animationTime, self.events, mix, timelineBlend, MixDirection._in)
+							timeline:apply(skeleton, animationLast, animationTime, self.events, mix, timelineBlend, MixDirection.mixIn)
 						end
 					end
 				end
@@ -444,7 +444,7 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 
 	if blend == MixBlend.add then
 		for i,timeline in ipairs(timelines) do
-			timeline:apply(skeleton, animationLast, animationTime, events, alphaMix, blend, MixDirection.out)
+			timeline:apply(skeleton, animationLast, animationTime, events, alphaMix, blend, MixDirection.mixOut)
 		end
 	else
 		local timelineMode = from.timelineMode
@@ -457,7 +457,7 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 
 		for i,timeline in ipairs(timelines) do
 			local skipSubsequent = false
-			local direction = MixDirection.out
+			local direction = MixDirection.mixOut
 			local timelineBlend = MixBlend.setup
 			local alpha = 0
 			if timelineMode[i] == SUBSEQUENT then
@@ -486,8 +486,8 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 				elseif timeline.type == Animation.TimelineType.attachment then
 					self:applyAttachmentTimeline(timeline, skeleton, animationTime, timelineBlend, attachments)
 				else
-					if (drawOrder and timeline.type == Animation.TimelineType.drawOrder and timelineBlend == MixBlend.setup) then
-						direction = MixDirection._in
+					if drawOrder and timeline.type == Animation.TimelineType.drawOrder and timelineBlend == MixBlend.setup then
+						direction = MixDirection.mixIn
 					end
 					timeline:apply(skeleton, animationLast, animationTime, self.events, alpha, timelineBlend, direction)
 				end
@@ -495,7 +495,7 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 		end
 	end
 
-	if (to.mixDuration > 0) then
+	if to.mixDuration > 0 then
 		self:queueEvents(from, animationTime)
 	end
 	self.events = {}
@@ -516,7 +516,7 @@ function AnimationState:applyAttachmentTimeline(timeline, skeleton, time, blend,
 		end
 	else
 		local frameIndex = 0
-		if (time >= frames[zlen(frames) - 1]) then -- Time is after last frame.
+		if time >= frames[zlen(frames) - 1] then -- Time is after last frame.
 			frameIndex = zlen(frames) - 1
 		else
 			frameIndex = Animation.binarySearch(frames, time, 1) - 1
@@ -529,7 +529,7 @@ function AnimationState:applyAttachmentTimeline(timeline, skeleton, time, blend,
 end
 
 function AnimationState:setAttachment(skeleton, slot, attachmentName, attachments)
-	if (attachmentName == nil) then
+	if attachmentName == nil then
 		slot.attachment = nil
 	else
 		slot.attachment = skeleton:getAttachmentByIndex(slot.data.index, attachmentName)
@@ -544,7 +544,7 @@ function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, bl
 	end
 
 	if alpha == 1 then
-		timeline:apply(skeleton, 0, time, nil, 1, blend, MixDirection._in)
+		timeline:apply(skeleton, 0, time, nil, 1, blend, MixDirection.mixIn)
 		return
 	end
 
@@ -730,7 +730,7 @@ function AnimationState:setAnimationByName (trackIndex, animationName, loop)
 end
 
 function AnimationState:setAnimation (trackIndex, animation, loop)
-	if not animation then error("animation cannot be null.") end
+	if not animation then error("animation cannot be null.", 2) end
 	local interrupt = true
 	local current = self:expandToIndex(trackIndex)
 	local queue = self.queue
@@ -756,12 +756,12 @@ end
 
 function AnimationState:addAnimationByName (trackIndex, animationName, loop, delay)
 	local animation = self.data.skeletonData:findAnimation(animationName)
-	if not animation then error("Animation not found: " + animationName) end
+	if not animation then error("Animation not found: " + animationName, 2) end
 	return self:addAnimation(trackIndex, animation, loop, delay)
 end
 
 function AnimationState:addAnimation (trackIndex, animation, loop, delay)
-	if not animation then error("animation cannot be null.") end
+	if not animation then error("animation cannot be null.", 2) end
 
 	local last = self:expandToIndex(trackIndex)
 	if last then
@@ -911,7 +911,7 @@ function AnimationState:_animationsChanged ()
 				end
 
 				repeat
-					if (entry.mixingTo == nil or entry.mixBlend ~= MixBlend.add) then
+					if entry.mixingTo == nil or entry.mixBlend ~= MixBlend.add then
 						self:computeHold(entry)
 					end
 					entry = entry.mixingTo
@@ -930,7 +930,7 @@ function AnimationState:computeHold(entry)
 	local timelineHoldMix = entry.timelineHoldMix
 	local propertyIDs = self.propertyIDs
 
-	if (to and to.holdPrevious) then
+	if to and to.holdPrevious then
 		local i = 1
 		while i <= timelinesCount do
 			local id = "" .. timelines[i]:getPropertyId()

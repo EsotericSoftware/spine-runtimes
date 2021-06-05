@@ -36,7 +36,7 @@ function interpolation.apply (func, start, _end, a)
 end
 
 function interpolation.pow2(a)
-	if (a <= 0.5) then return math_pow(a * 2, 2) / 2 end
+	if a <= 0.5 then return math_pow(a * 2, 2) / 2 end
 	return math_pow((a - 1) * 2, 2) / -2 + 1
 end
 

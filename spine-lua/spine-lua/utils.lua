@@ -169,17 +169,17 @@ end
 function utils.randomTriangularWith(min, max, mode)
 	local u = math.random()
 	local d = max - min
-	if (u <= (mode - min) / d) then return min + math_sqrt(u * d * (mode - min)) end
+	if u <= (mode - min) / d then return min + math_sqrt(u * d * (mode - min)) end
 	return max - math_sqrt((1 - u) * d * (max - mode))
 end
 
 function utils.testBit(value, bit)
-	if (value == nil) then return 0 end
+	if value == nil then return 0 end
 	return value % (2 * bit) >= bit
 end
 
 function utils.setBit(value, bit)
-	if (value == nil) then return 0 end
+	if value == nil then return 0 end
 	if value % (2 * bit) >= bit then
 		return value
 	end
@@ -187,7 +187,7 @@ function utils.setBit(value, bit)
 end
 
 function utils.clearBit(value, bit)
-	if (value == nil) then return 0 end
+	if value == nil then return 0 end
 	if value % (2 * bit) >= bit then
 		return value - bit
 	end
