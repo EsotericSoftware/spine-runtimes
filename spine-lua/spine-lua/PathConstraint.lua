@@ -36,7 +36,7 @@ local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local PathConstraintData = require "spine-lua.PathConstraintData"
 local utils = require "spine-lua.utils"
 local math_pi = math.pi
-local math_pi2 = math.pi * 2
+local math_pi2 = math_pi * 2
 local math_atan2 = math.atan2
 local math_sqrt = math.sqrt
 local math_acos = math.acos
@@ -51,10 +51,10 @@ local math_max = math.max
 local PathConstraint = {}
 PathConstraint.__index = PathConstraint
 
-PathConstraint.NONE = -1
-PathConstraint.BEFORE = -2
-PathConstraint.AFTER = -3
-PathConstraint.epsilon = 0.00001
+local NONE = -1
+local BEFORE = -2
+local AFTER = -3
+local epsilon = 0.00001
 
 function PathConstraint.new (data, skeleton)
 	if not data then error("data cannot be nil", 2) end
@@ -66,8 +66,9 @@ function PathConstraint.new (data, skeleton)
 		target = skeleton:findSlot(data.target.name),
 		position = data.position,
 		spacing = data.spacing,
-		rotateMix = data.rotateMix,
-		translateMix = data.translateMix,
+		mixRotate = data.mixRotate,
+		mixX = data.mixX,
+		mixY = data.mixY,
 		spaces = {},
 		positions = {},
 		world = {},
@@ -85,81 +86,113 @@ function PathConstraint.new (data, skeleton)
 	return self
 end
 
-function PathConstraint:apply ()
-	self:update()
-end
-
 function PathConstraint:update ()
 	local attachment = self.target.attachment
-	if not attachment or not (attachment.type == AttachmentType.path) then return end
+	if not attachment or attachment.type ~= AttachmentType.path then return end
 
-	local rotateMix = self.rotateMix
-	local translateMix = self.translateMix
-	local translate = translateMix > 0
-	local rotate = rotateMix > 0
-	if not translate and not rotate then return end
-
+	local mixRotate = self.mixRotate
+	local mixX = self.mixX
+	local mixY = self.mixY
+	if mixRotate == 0 and mixX == 0 and mixY == 0 then return end
+	
 	local data = self.data
-	local percentSpacing = data.spacingMode == PathConstraintData.SpacingMode.percent
-	local rotateMode = data.rotateMode
 	local tangents = rotateMode == PathConstraintData.RotateMode.tangent
 	local scale = rotateMode == PathConstraintData.RotateMode.chainscale
+
 	local bones = self.bones
 	local boneCount = #bones
-	local spacesCount = boneCount + 1
-	if tangents then spacesCount = boneCount end
+	local spacesCount = boneCount
+	if tangents then spacesCount = spacesCount + 1 end
 	local spaces = utils.setArraySize(self.spaces, spacesCount)
 	local lengths = nil
+	if scale then lengths = Utils.setArraySize(this.lengths, boneCount) end
 	local spacing = self.spacing
-	if scale or not percentSpacing then
-		if scale then lengths = utils.setArraySize(self.lengths, boneCount) end
-		local lengthSpacing = data.spacingMode == PathConstraintData.SpacingMode.length
-		local i = 0
-		local n = spacesCount - 1
-		while i < n do
-			local bone = bones[i + 1]
-			local setupLength = bone.data.length
-			if setupLength < PathConstraint.epsilon then
-				if scale then lengths[i + 1] = 0 end
-				i = i + 1
-				spaces[i + 1] = 0
-			elseif percentSpacing then
-				if scale then
+
+	if data.spacingMode == PathConstraintData.SpacingMode.percent then
+		if scale then
+			local i = 0
+			local n = spacesCount - 1
+			while i < n do
+				local bone = bones[i]
+				local setupLength = bone.data.length
+				if setupLength < epsilon then
+					lengths[i] = 0
+				else
 					local x = setupLength * bone.a
 					local y = setupLength * bone.c
-					local length = math_sqrt(x * x + y * y)
-					lengths[i + 1] = length
+					lengths[i] = math_sqrt(x * x + y * y)
 				end
 				i = i + 1
-				spaces[i + 1] = spacing
+			end
+		end
+		local i = 1
+		while i < spacesCount do
+			spaces[i] = spacing
+			i = i + 1
+		end
+	elseif data.spacingMode == PathConstraintData.SpacingMode.proportional then
+		local sum = 0
+		local i = 0
+		while i < boneCount do
+			local bone = bones[i]
+			local setupLength = bone.data.length
+			if setupLength < epsilon then
+				if scale then lengths[i] = 0 end
+				i = i + 1
+				spaces[i] = spacing
 			else
-	 			local x = setupLength * bone.a
+				local x = setupLength * bone.a
 				local y = setupLength * bone.c
 				local length = math_sqrt(x * x + y * y)
-				if scale then lengths[i + 1] = length end
+				if scale then lengths[i] = length end
 				i = i + 1
-				if lengthSpacing then
-					spaces[i + 1] = (setupLength + spacing) * length / setupLength
-				else
-					spaces[i + 1] = spacing * length / setupLength
-				end
+				spaces[i] = length
+				sum = sum + length
+			end
+		end
+		if sum > 0 then
+			sum = spacesCount / sum * spacing
+			local i = 1
+			while i < spacesCount do
+				spaces[i] = spaces[i] * sum
+				i = i + 1
 			end
 		end
 	else
+		local lengthSpacing = data.spacingMode == PathConstraintData.SpacingMode.length
 		local i = 1
-		while i < spacesCount do
-			spaces[i + 1] = spacing
-			i = i + 1
+		local n = spacesCount - 1
+		while i < n do
+			local bone = bones[i]
+			local setupLength = bone.data.length
+			if setupLength < epsilon then
+				if scale then lengths[i] = 0 end
+				i = i + 1
+				spaces[i] = spacing
+			else
+				local x = setupLength * bone.a
+				local y = setupLength * bone.c
+				local length = math_sqrt(x * x + y * y)
+				if scale then lengths[i] = length end
+				i = i + 1
+				local s
+				if lengthSpacing then
+					s = setupLength + spacing
+				else
+					s = spacing
+				end
+				spaces[i] = s * length / setupLength
+			end
 		end
 	end
 
-	local positions = self:computeWorldPositions(attachment, spacesCount, tangents, data.positionMode == PathConstraintData.PositionMode.percent, percentSpacing)
+	local positions = self:computeWorldPositions(attachment, spacesCount, tangents)
 	local boneX = positions[1]
 	local boneY = positions[2]
 	local offsetRotation = data.offsetRotation
 	local tip = false
 	if offsetRotation == 0 then
-			tip = rotateMode == PathConstraintData.RotateMode.chain
+		tip = data.rotateMode == PathConstraintData.RotateMode.chain
 	else
 		tip = false
 		local p = self.target.bone
@@ -174,8 +207,8 @@ function PathConstraint:update ()
 	local p = 3
 	while i < boneCount do
 		local bone = bones[i + 1]
-		bone.worldX = bone.worldX + (boneX - bone.worldX) * translateMix
-		bone.worldY = bone.worldY + (boneY - bone.worldY) * translateMix
+		bone.worldX = bone.worldX + (boneX - bone.worldX) * mixX
+		bone.worldY = bone.worldY + (boneY - bone.worldY) * mixY
 		local x = positions[p + 1]
 		local y = positions[p + 2]
 		local dx = x - boneX
@@ -183,14 +216,14 @@ function PathConstraint:update ()
 		if scale then
 			local length = lengths[i + 1]
 			if length ~= 0 then
-				local s = (math_sqrt(dx * dx + dy * dy) / length - 1) * rotateMix + 1
+				local s = (math_sqrt(dx * dx + dy * dy) / length - 1) * mixRotate + 1
 				bone.a = bone.a * s
 				bone.c = bone.c * s
 			end
 		end
 		boneX = x
 		boneY = y
-		if rotate then
+		if mixRotate then
 			local a = bone.a
 			local b = bone.b
 			local c = bone.c
@@ -210,8 +243,8 @@ function PathConstraint:update ()
 				cos = math_cos(r)
 				sin = math_sin(r)
 				local length = bone.data.length
-				boneX = boneX + (length * (cos * a - sin * c) - dx) * rotateMix
-				boneY = boneY + (length * (sin * a + cos * c) - dy) * rotateMix
+				boneX = boneX + (length * (cos * a - sin * c) - dx) * mixRotate
+				boneY = boneY + (length * (sin * a + cos * c) - dy) * mixRotate
 			else
 				r = r + offsetRotation
 			end
@@ -220,21 +253,21 @@ function PathConstraint:update ()
 			elseif r < -math_pi then
 				r = r + math_pi2
 			end
-			r = r * rotateMix
+			r = r * mixRotate
 			cos = math_cos(r)
-			sin = math.sin(r)
+			sin = math_sin(r)
 			bone.a = cos * a - sin * c
 			bone.b = cos * b - sin * d
 			bone.c = sin * a + cos * c
 			bone.d = sin * b + cos * d
 		end
-		bone.appliedValid = false
+		bone:updateAppliedTransform()
 		i = i + 1
 		p = p + 3
 	end
 end
 
-function PathConstraint:computeWorldPositions (path, spacesCount, tangents, percentPosition, percentSpacing)
+function PathConstraint:computeWorldPositions (path, spacesCount, tangents)
 	local target = self.target
 	local position = self.position
 	local spaces = self.spaces
@@ -250,20 +283,20 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 		local lengths = path.lengths
 		if closed then curveCount = curveCount - 1 else curveCount = curveCount - 2 end
 		local pathLength = lengths[curveCount + 1]
-		if percentPosition then position = position * pathLength end
-		if percentSpacing then
-			i = 1
-			while i < spacesCount do
-				spaces[i + 1] = spaces[i + 1] * pathLength
-				i = i + 1
-			end
+		if self.data.positionMode == PathConstraintData.PositionMode.percent then position = position * pathLength end
+
+		local multiplier = 1
+		if self.data.spacingMode == PathConstraintData.SpacingMode.percent then
+			multiplier = pathLength
+		elseif self.data.spacingMode == PathConstraintData.SpacingMode.proportional then
+			multiplier = pathLength / spacesCount
 		end
 		world = utils.setArraySize(self.world, 8)
 		i = 0
 		local o = 0
 		local curve = 0
 		while i < spacesCount do
-			local space = spaces[i + 1]
+			local space = spaces[i + 1] * multiplier
 			position = position + space
 			local p = position
 
@@ -389,17 +422,14 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 		i = i + 1
 		w = w + 6
 	end
-	if percentPosition then
-		position = position * pathLength
-	else
-		position = position * pathLength / path.lengths[curveCount]
-	end
-	if percentSpacing then
-		i = 1
-		while i < spacesCount do
-			spaces[i + 1] = spaces[i + 1] * pathLength
-			i = i + 1
-		end
+
+	if self.data.positionMode == PathConstraintData.PositionMode.percent then position = position * pathLength end
+
+	local multiplier = 1
+	if self.data.spacingMode == PathConstraintData.SpacingMode.percent then
+		multiplier = pathLength
+	elseif self.data.spacingMode == PathConstraintData.SpacingMode.proportional then
+		multiplier = pathLength / spacesCount
 	end
 
 	local segments = self.segments
@@ -409,7 +439,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents, perc
 	local curve = 0
 	local segment = 0
 	while i < spacesCount do
-		local space = spaces[i + 1]
+		local space = spaces[i + 1] * multiplier
 		position = position + space
 		local p = position
 

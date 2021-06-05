@@ -76,6 +76,7 @@ function IkConstraint:apply ()
 end
 
 function IkConstraint:update ()
+	if self.mix == 0 then return end
 	local target = self.target
 	local bones = self.bones
 	local boneCount = #bones
@@ -87,9 +88,7 @@ function IkConstraint:update ()
 end
 
 function IkConstraint:apply1 (bone, targetX, targetY, compress, stretch, uniform, alpha)
-	if not bone.appliedValid then bone:updateAppliedTransform() end
 	local p = bone.parent
-
 	local pa = p.a
 	local pb = p.b
 	local pc = p.c
@@ -148,12 +147,6 @@ function IkConstraint:apply1 (bone, targetX, targetY, compress, stretch, uniform
 	end
 
 function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch, softness, alpha)
-	if alpha == 0 then
-		child:updateWorldTransform()
-		return
-	end
-	if not parent.appliedValid then parent:updateAppliedTransform() end
-	if not child.appliedValid then child:updateAppliedTransform() end
 	local px = parent.ax
 	local py = parent.ay
 	local psx = parent.ascaleX

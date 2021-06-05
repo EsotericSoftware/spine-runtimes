@@ -59,7 +59,6 @@ function Skeleton.new (data)
 		transformConstraints = {},
 		pathConstraints = {},
 		_updateCache = {},
-		updateCacheReset = {},
 		skin = nil,
 		color = Color.newWith(1, 1, 1, 1),
 		time = 0,
@@ -110,7 +109,6 @@ end
 function Skeleton:updateCache ()
 	local updateCache = {}
 	self._updateCache = updateCache
-	self.updateCacheReset = {}
 
 	local bones = self.bones
 	for _, bone in ipairs(bones) do
@@ -122,11 +120,11 @@ function Skeleton:updateCache ()
 		local skinBones = self.skin.bones
 		for i, boneData in ipairs(skinBones) do
 			local bone = bones[boneData.index]
-			while bone do
+			repeat
 				bone.sorted = false
 				bone.active = true
 				bone = bone.parent
-			end
+			until not bone
 		end
 	end
 
@@ -196,22 +194,18 @@ function Skeleton:sortIkConstraint (constraint)
 	local parent = constrained[1]
 	self:sortBone(parent)
 
-	if #constrained > 1 then
+	if #constrained == 1 then
+		table_insert(self._updateCache, constraint)
+		self:sortReset(parent.children)
+	else
 		local child = constrained[#constrained]
-		local contains = false
-		for _, updatable in ipairs(self._updateCache) do
-			if updatable == child then
-				contains = true
-				break
-			end
-		end
-		if not contains then table_insert(self.updateCacheReset, child) end
+		self:sortBone(child)
+
+		table_insert(self._updateCache, constraint)
+
+		self:sortReset(parent.children)
+		child.sorted = true
 	end
-
-	table_insert(self._updateCache, constraint)
-
-	self:sortReset(parent.children)
-	constrained[#constrained].sorted = true
 end
 
 function Skeleton:sortPathConstraint(constraint)
@@ -266,7 +260,7 @@ function Skeleton:sortTransformConstraint(constraint)
 					break
 				end
 			end
-			if not contains then table_insert(self.updateCacheReset, child) end
+			self:sortBone(child)
 		end
 	else
 		for _,bone in ipairs(constrained) do
@@ -279,7 +273,6 @@ function Skeleton:sortTransformConstraint(constraint)
 	for _,bone in ipairs(constrained) do
 		self:sortReset(bone.children)
 	end
-
 	for _,bone in ipairs(constrained) do
 		bone.sorted = true
 	end
@@ -333,8 +326,7 @@ end
 
 -- Updates the world transform for each bone and applies IK constraints.
 function Skeleton:updateWorldTransform ()
-	local updateCacheReset = self.updateCacheReset
-	for _,bone in ipairs(updateCacheReset) do
+	for _,bone in ipairs(self.bones) do
 		bone.ax = bone.x
 		bone.ay = bone.y
 		bone.arotation = bone.rotation
@@ -342,11 +334,9 @@ function Skeleton:updateWorldTransform ()
 		bone.ascaleY = bone.scaleY
 		bone.ashearX = bone.shearX
 		bone.ashearY = bone.shearY
-		bone.appliedValid = true
 	end
 
-	local updateCache = self._updateCache
-	for _, updatable in ipairs(updateCache) do
+	for _, updatable in ipairs(self._updateCache) do
 		updatable:update()
 	end
 end
@@ -372,10 +362,12 @@ function Skeleton:setBonesToSetupPose ()
 	local transformConstraints = self.transformConstraints
 	for _, constraint in ipairs(transformConstraints) do
 		local data = constraint.data
-		constraint.rotateMix = data.rotateMix
-		constraint.translateMix = data.translateMix
-		constraint.scaleMix = data.scaleMix
-		constraint.shearMix = data.shearMix
+		constraint.mixRotate = data.mixRotate
+		constraint.mixX = data.mixX
+		constraint.mixY = data.mixY
+		constraint.mixScaleX = data.mixScaleX
+		constraint.mixScaleY = data.mixScaleY
+		constraint.mixShearY = data.mixShearY
 	end
 
 	local pathConstraints = self.pathConstraints
@@ -383,8 +375,9 @@ function Skeleton:setBonesToSetupPose ()
 		local data = constraint.data
 		constraint.position = data.position
 		constraint.spacing = data.spacing
-		constraint.rotateMix = data.rotateMix
-		constraint.translateMix = data.translateMix
+		constraint.mixRotate = data.mixRotate
+		constraint.mixX = data.mixX
+		constraint.mixY = data.mixY
 	end
 end
 

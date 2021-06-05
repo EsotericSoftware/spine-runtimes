@@ -37,7 +37,7 @@ function TransformConstraintData.new (name)
 		skinRequired = false,
 		bones = {},
 		target = nil,
-		rotateMix = 0, translateMix = 0, scaleMix = 0, shearMix = 0,
+		mixRotate = 0, mixX = 0, mixY = 0, mixScaleX = 0, mixScaleY = 0, mixShearY = 0,
 		offsetRotation = 0, offsetX = 0, offsetY = 0, offsetScaleX = 0, offsetScaleY = 0, offsetShearY = 0,
 		relative = false,
 		local_ = false

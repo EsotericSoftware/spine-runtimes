@@ -60,9 +60,16 @@ end
 
 function Slot:setAttachment (attachment)
 	if self.attachment == attachment then return end
+	if not attachment
+		or not attachment.isVertexAttachment
+		or not self.attachment
+		or not self.attachment.isVertexAttachment
+		or attachment.deformAttachment ~= self.attachment.deformAttachment
+	then
+		self.deform = {}
+	end
 	self.attachment = attachment
 	self.attachmentTime = self.bone.skeleton.time
-	self.deform = {}
 end
 
 function Slot:setAttachmentTime (time)

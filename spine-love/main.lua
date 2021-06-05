@@ -113,8 +113,8 @@ end
 function love.load(arg)
 	if arg[#arg] == "-debug" then require("mobdebug").start() end
 	skeletonRenderer = spine.SkeletonRenderer.new(true)
-  table.insert(skeletons, loadSkeleton("mix-and-match-pro", "mix-and-match", "dance", nil, 0.5, 400, 500))
 	table.insert(skeletons, loadSkeleton("spineboy-pro", "spineboy", "walk", nil, 0.5, 400, 500))
+	table.insert(skeletons, loadSkeleton("mix-and-match-pro", "mix-and-match", "dance", nil, 0.5, 400, 500))
 	table.insert(skeletons, loadSkeleton("stretchyman-pro", "stretchyman", "sneak", nil, 0.5, 200, 500))
 	table.insert(skeletons, loadSkeleton("coin-pro", "coin", "animation", nil, 0.5, 400, 300))
 	table.insert(skeletons, loadSkeleton("raptor-pro", "raptor", "walk", nil, 0.3, 400, 500))

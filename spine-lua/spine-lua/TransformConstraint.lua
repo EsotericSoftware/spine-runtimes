@@ -53,7 +53,7 @@ function TransformConstraint.new (data, skeleton)
 		data = data,
 		bones = {},
 		target = nil,
-		rotateMix = data.rotateMix, translateMix = data.translateMix, scaleMix = data.scaleMix, shearMix = data.shearMix,
+		mixRotate = data.mixRotate, mixX = data.mixX, mixY = data.mixY, mixScaleX = data.mixScaleX, mixScaleY = data.mixScaleY, mixShearY = data.mixShearY,
 		temp = { 0, 0 },
 		active = false
 	}
@@ -67,11 +67,9 @@ function TransformConstraint.new (data, skeleton)
 	return self
 end
 
-function TransformConstraint:apply ()
-	self:update()
-end
-
 function TransformConstraint:update ()
+	if self.mixRotate == 0 and self.mixX == 0 and self.mixY == 0 and self.mixScaleX == 0 and self.mixScaleX == 0 and self.mixShearY == 0 then return end
+
 	if self.data.local_ then
 		if self.data.relative then
 			self:applyRelativeLocal()
@@ -88,10 +86,14 @@ function TransformConstraint:update ()
 end
 
 function TransformConstraint:applyAbsoluteWorld ()
-	local rotateMix = self.rotateMix
-	local translateMix = self.translateMix
-	local scaleMix = self.scaleMix
-	local shearMix = self.shearMix
+	local mixRotate = self.mixRotate
+	local mixX = self.mixX
+	local mixY = self.mixY
+	local mixScaleX = self.mixScaleX
+	local mixScaleY = self.mixScaleY
+	local mixShearY = self.mixShearY
+	local translate = mixX ~= 0 or mixY ~= 0
+
 	local target = self.target
 	local ta = target.a
 	local tb = target.b
@@ -101,10 +103,10 @@ function TransformConstraint:applyAbsoluteWorld ()
 	if ta * td - tb * tc > 0 then degRadReflect = utils.degRad else degRadReflect = -utils.degRad end
 	local offsetRotation = self.data.offsetRotation * degRadReflect
 	local offsetShearY = self.data.offsetShearY * degRadReflect
+
 	local bones = self.bones
 	for _, bone in ipairs(bones) do
-		local modified = false
-		if rotateMix ~= 0 then
+		if mixRotate ~= 0 then
 			local a = bone.a
 			local b = bone.b
 			local c = bone.c
@@ -115,45 +117,38 @@ function TransformConstraint:applyAbsoluteWorld ()
 			elseif r < -math_pi then
 				r = r + math_pi2
 			end
-			r = r * rotateMix
+			r = r * mixRotate
 			local cos = math_cos(r)
 			local sin = math_sin(r)
 			bone.a = cos * a - sin * c
 			bone.b = cos * b - sin * d
 			bone.c = sin * a + cos * c
 			bone.d = sin * b + cos * d
-			modified = true
 		end
 
-		if translateMix ~= 0 then
+		if translate then
 			local temp = self.temp
 			temp[1] = self.data.offsetX
 			temp[2] = self.data.offsetY
 			target:localToWorld(temp)
-			bone.worldX = bone.worldX + (temp[1] - bone.worldX) * translateMix
-			bone.worldY = bone.worldY + (temp[2] - bone.worldY) * translateMix
-			modified = true
+			bone.worldX = bone.worldX + (temp[1] - bone.worldX) * mixX
+			bone.worldY = bone.worldY + (temp[2] - bone.worldY) * mixY
 		end
 
-		if scaleMix > 0 then
+		if mixScaleX ~= 0 then
 			local s = math_sqrt(bone.a * bone.a + bone.c * bone.c)
-			local ts = math_sqrt(ta * ta + tc * tc)
-			if s > 0.00001 then
-				s = (s + (ts - s + self.data.offsetScaleX) * scaleMix) / s
-			end
+			if s ~= 0 then s = (s + (math_sqrt(ta * ta + tc * tc) - s + self.data.offsetScaleX) * mixScaleX) / s end
 			bone.a = bone.a * s
 			bone.c = bone.c * s
-			s = math_sqrt(bone.b * bone.b + bone.d * bone.d)
-			ts = math_sqrt(tb * tb + td * td)
-			if s > 0.00001 then
-				s = (s + (ts - s + self.data.offsetScaleY) * scaleMix) / s
-			end
+		end
+		if mixScaleY ~= 0 then
+			local s = math_sqrt(bone.b * bone.b + bone.d * bone.d)
+			if s ~= 0 then s = (s + (math_sqrt(tb * tb + td * td) - s + self.data.offsetScaleY) * mixScaleY) / s end
 			bone.b = bone.b * s
 			bone.d = bone.d * s
-			modified = true
 		end
 
-		if shearMix > 0 then
+		if mixShearY > 0 then
 			local b = bone.b
 			local d = bone.d
 			local by = math_atan2(d, b)
@@ -163,22 +158,25 @@ function TransformConstraint:applyAbsoluteWorld ()
 			elseif r < -math_pi then
 				r = r + math_pi2
 			end
-			r = by + (r + offsetShearY) * shearMix
+			r = by + (r + offsetShearY) * mixShearY
 			local s = math_sqrt(b * b + d * d)
 			bone.b = math_cos(r) * s
 			bone.d = math_sin(r) * s
-			modified = true
 		end
 
-		if modified then bone.appliedValid = false end
+		bone:updateAppliedTransform()
 	end
 end
 
 function TransformConstraint:applyRelativeWorld ()
-	local rotateMix = self.rotateMix
-	local translateMix = self.translateMix
-	local scaleMix = self.scaleMix
-	local shearMix = self.shearMix
+	local mixRotate = self.mixRotate
+	local mixX = self.mixX
+	local mixY = self.mixY
+	local mixScaleX = self.mixScaleX
+	local mixScaleY = self.mixScaleY
+	local mixShearY = self.mixShearY
+	local translate = mixX ~= 0 or mixY ~= 0
+
 	local target = self.target
 	local ta = target.a
 	local tb = target.b
@@ -188,11 +186,12 @@ function TransformConstraint:applyRelativeWorld ()
 	if ta * td - tb * tc > 0 then degRadReflect = utils.degRad else degRadReflect = -utils.degRad end
 	local offsetRotation = self.data.offsetRotation * degRadReflect
 	local offsetShearY = self.data.offsetShearY * degRadReflect
+
 	local bones = self.bones
 	for _, bone in ipairs(bones) do
 		local modified = false
 
-		if rotateMix ~= 0 then
+		if mixRotate ~= 0 then
 			local a = bone.a
 			local b = bone.b
 			local c = bone.c
@@ -203,37 +202,36 @@ function TransformConstraint:applyRelativeWorld ()
 			elseif r < -math_pi then
 				r = r + math_pi2
 			end
-			r = r * rotateMix
+			r = r * mixRotate
 			local cos = math_cos(r)
 			local sin = math_sin(r)
 			bone.a = cos * a - sin * c
 			bone.b = cos * b - sin * d
 			bone.c = sin * a + cos * c
 			bone.d = sin * b + cos * d
-			modified = true
 		end
 
-		if translateMix ~= 0 then
+		if translate then
 			local temp = self.temp
 			temp[1] = self.data.offsetX
 			temp[2] = self.data.offsetY
 			target:localToWorld(temp)
-			bone.worldX = bone.worldX + temp[1] * translateMix
-			bone.worldY = bone.worldY + temp[2] * translateMix
-			modified = true
+			bone.worldX = bone.worldX + temp[1] * mixX
+			bone.worldY = bone.worldY + temp[2] * mixY
 		end
 
-		if scaleMix > 0 then
-			local s = (math_sqrt(ta * ta + tc * tc) - 1 + self.data.offsetScaleX) * scaleMix + 1
+		if mixScaleX ~= 0 then
+			local s = (math_sqrt(ta * ta + tc * tc) - 1 + self.data.offsetScaleX) * mixScaleX + 1
 			bone.a = bone.a * s
 			bone.c = bone.c * s
-			s = (math_sqrt(tb * tb + td * td) - 1 + self.data.offsetScaleY) * scaleMix + 1
+		end
+		if mixScaleY ~= 0 then
+			local s = (math_sqrt(tb * tb + td * td) - 1 + self.data.offsetScaleY) * mixScaleY + 1
 			bone.b = bone.b * s
 			bone.d = bone.d * s
-			modified = true
 		end
 
-		if shearMix > 0 then
+		if mixShearY > 0 then
 			local r = math_atan2(td, tb) - math_atan2(tc, ta)
 			if r > math_pi then
 				r = r - math_pi2
@@ -242,59 +240,54 @@ function TransformConstraint:applyRelativeWorld ()
 			end
 			local b = bone.b
 			local d = bone.d
-			r = math_atan2(d, b) + (r - math_pi / 2 + offsetShearY) * shearMix
+			r = math_atan2(d, b) + (r - math_pi / 2 + offsetShearY) * mixShearY
 			local s = math_sqrt(b * b + d * d)
 			bone.b = math_cos(r) * s
 			bone.d = math_sin(r) * s
-			modified = true
 		end
 
-		if modified then bone.appliedValid = false end
+		bone:updateAppliedTransform()
 	end
 end
 
 function TransformConstraint:applyAbsoluteLocal ()
-	local rotateMix = self.rotateMix
-	local translateMix = self.translateMix
-	local scaleMix = self.scaleMix
-	local shearMix = self.shearMix
+	local mixRotate = self.mixRotate
+	local mixX = self.mixX
+	local mixY = self.mixY
+	local mixScaleX = self.mixScaleX
+	local mixScaleY = self.mixScaleY
+	local mixShearY = self.mixShearY
+
 	local target = self.target
 	if not target.appliedValid then target:updatedAppliedTransform() end
 	local bones = self.bones
 	for _, bone in ipairs(bones) do
-		local modified = false
-		if not bone.appliedValid then bone:updateAppliedTransform() end
-
 		local rotation = bone.arotation
-		if rotateMix ~= 0 then
+		if mixRotate ~= 0 then
 			local r = target.arotation - rotation + self.data.offsetRotation
 			r = r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360
-			rotation = rotation + r * rotateMix
+			rotation = rotation + r * mixRotate
 		end
 
 		local x = bone.ax
 		local y = bone.ay
-		if translateMix ~= 0 then
-			x = x + (target.ax - x + self.data.offsetX) * translateMix
-			y = x + (target.ay - y + self.data.offsetY) * translateMix
-		end
+		x = x + (target.ax - x + self.data.offsetX) * mixX
+		y = x + (target.ay - y + self.data.offsetY) * mixX
 
 		local scaleX = bone.ascaleX
 		local scaleY = bone.ascaleY
-		if scaleMix ~= 0 then
-			if scaleX > 0.00001 then
-				scaleX = (scaleX + (target.ascaleX - scaleX + self.data.offsetScaleX) * scaleMix) / scaleX
-			end
-			if scaleY > 0.00001 then
-				scaleY = (scaleY + (target.ascaleY - scaleY + self.data.offsetScaleY) * scaleMix) / scaleY
-			end
+		if mixScaleX ~= 0 and scaleX ~= 0 then
+			scaleX = (scaleX + (target.ascaleX - scaleX + self.data.offsetScaleX) * mixScaleX) / scaleX
+		end
+		if mixScaleY ~= 0 and scaleY ~= 0 then
+			scaleY = (scaleY + (target.ascaleY - scaleY + self.data.offsetScaleY) * mixScaleY) / scaleY
 		end
 
 		local shearY = bone.ashearY
-		if shearMix ~= 0 then
+		if mixShearY ~= 0 then
 			local r = target.ashearY - shearY + self.data.offsetShearY
 			r = r - (16384 - math_floor(16384.499999999996 - r / 360)) * 360
-			bone.shearY = bone.shearY + r * shearMix
+			bone.shearY = bone.shearY + r * mixShearY
 		end
 
 		bone:updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY)
@@ -302,40 +295,23 @@ function TransformConstraint:applyAbsoluteLocal ()
 end
 
 function TransformConstraint:applyRelativeLocal ()
-	local rotateMix = self.rotateMix
-	local translateMix = self.translateMix
-	local scaleMix = self.scaleMix
-	local shearMix = self.shearMix
+	local mixRotate = self.mixRotate
+	local mixX = self.mixX
+	local mixY = self.mixY
+	local mixScaleX = self.mixScaleX
+	local mixScaleY = self.mixScaleY
+	local mixShearY = self.mixShearY
+
 	local target = self.target
-	if not target.appliedValid then target:updateAppliedTransform() end
+
 	local bones = self.bones
 	for _, bone in ipairs(bones) do
-		if not bone.appliedValid then bone:updateAppliedTransform() end
-
-		local rotation = bone.arotation
-		if rotateMix ~= 0 then rotation = rotation + (target.arotation + self.data.offsetRotation) * rotateMix end
-
-		local x = bone.ax
-		local y = bone.ay
-		if translateMix ~= 0 then
-			x = x + (target.ax + self.data.offsetX) * translateMix
-			y = y + (target.ay + self.data.offsetY) * translateMix
-		end
-
-		local scaleX = bone.ascaleX
-		local scaleY = bone.ascaleY
-		if scaleMix ~= 0 then
-			if scaleX > 0.00001 then
-				scaleX = scaleX * (((target.ascaleX - 1 + self.data.offsetScaleX) * scaleMix) + 1)
-			end
-			if scaleY > 0.00001 then
-				scaleY = scaleY * (((target.ascaleY - 1 + self.data.offsetScaleY) * scaleMix) + 1)
-			end
-		end
-
-		local shearY = bone.ashearY
-		if shearMix ~= 0 then shearY = shearY + (target.ashearY + self.data.offsetShearY) * shearMix end
-
+		local rotation = bone.arotation + (target.arotation + this.data.offsetRotation) * mixRotate
+		local x = bone.ax + (target.ax + this.data.offsetX) * mixX
+		local y = bone.ay + (target.ay + this.data.offsetY) * mixY
+		local scaleX = (bone.ascaleX * ((target.ascaleX - 1 + this.data.offsetScaleX) * mixScaleX) + 1)
+		local scaleY = (bone.ascaleY * ((target.ascaleY - 1 + this.data.offsetScaleY) * mixScaleY) + 1)
+		local shearY = bone.ashearY + (target.ashearY + this.data.offsetShearY) * mixShearY
 		bone:updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY)
 	end
 end

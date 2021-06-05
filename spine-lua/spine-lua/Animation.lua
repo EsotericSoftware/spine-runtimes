@@ -37,7 +37,7 @@ local utils = require "spine-lua.utils"
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 
 local setmetatable = setmetatable
-local math_floor = math_floor
+local math_floor = math.floor
 local math_abs = math.abs
 local math_signum = utils.signum
 
@@ -64,14 +64,14 @@ function Animation.new (name, timelines, duration)
 		self.timelineIds = {}
 		for i,timeline in ipairs(self.timelines) do
 			for _,id in ipairs(timeline.propertyIds) do
-				timelineIds[id] = true
+				self.timelineIds[id] = true
 			end
 		end
 	end
 
 	function self:hasTimeline (ids)
 		for _,id in ipairs(ids) do
-			if timelineIds[id] then return true end
+			if self.timelineIds[id] then return true end
 		end
 		return false
 	end
@@ -134,11 +134,28 @@ Animation.Property = {
 }
 local Property = Animation.Property
 
+Animation.TimelineType = {
+	rotate = 0,
+	translate = 1, translateX = 2, translateY = 3,
+	scale = 4, scaleX = 5, scaleY = 6,
+	shear = 7, shearX = 8, shearY = 9,
+	rgba = 10, rgb = 11, alpha = 12, rgba2 = 13, rgb2 = 14,
+	attachment = 15,
+	deform = 16,
+	event = 17,
+	drawOrder = 18,
+	ikConstraint = 19,
+	transformConstraint = 20,
+	pathConstraintPosition = 21, pathConstraintSpacing = 22, pathConstraintMix = 23
+}
+local TimelineType = Animation.TimelineType
+
 Animation.Timeline = {}
-function Animation.Timeline.new (frameCount, propertyIds)
+function Animation.Timeline.new (timelineType, frameEntries, frameCount, propertyIds)
 	local self = {
+		timelineType = timelineType,
 		propertyIds = propertyIds,
-		frames = utils.newNumberArrayZero((frameCount - 1) * self:getFrameEntries())
+		frames = utils.newNumberArrayZero((frameCount - 1) * frameEntries)
 	}
 
 	function self:getFrameEntries ()
@@ -158,7 +175,8 @@ end
 
 local function search1 (frames, time)
 	local n = zlen(frames)
-	while i <= n do
+	local i = 1
+	while i < n do
 		if frames[i] > time then return i - 1 end
 		i = i + 1
 	end
@@ -169,7 +187,7 @@ Animation.Timeline.search1 = search1
 local function search (frames, time, step)
 	local n = zlen(frames)
 	local i = step
-	while i <= n do
+	while i < n do
 		if frames[i] > time then return i - step end
 		i = i + step
 	end
@@ -182,14 +200,15 @@ local BEZIER = 2
 local BEZIER_SIZE = 18
 
 Animation.CurveTimeline = {}
-function Animation.CurveTimeline.new (frameCount, bezierCount, propertyIds)
+function Animation.CurveTimeline.new (timelineType, frameEntries, frameCount, bezierCount, propertyIds)
 	local LINEAR = 0
 	local STEPPED = 1
 	local BEZIER = 2
 	local BEZIER_SIZE = 10 * 2 - 1
 
-	local self = Animation.Timeline.new(frameCount, propertyIds)
+	local self = Animation.Timeline.new(timelineType, frameEntries, frameCount, propertyIds)
 	self.curves = utils.newNumberArrayZero(frameCount + bezierCount * BEZIER_SIZE)
+	self.curves[frameCount - 1] = STEPPED
 
 	function self:getFrameCount ()
 		return math_floor(zlen(self.curves) / BEZIER_SIZE) + 1
@@ -261,11 +280,11 @@ function Animation.CurveTimeline.new (frameCount, bezierCount, propertyIds)
 end
 
 Animation.CurveTimeline1 = {}
-function Animation.CurveTimeline1.new (frameCount, bezierCount, propertyId)
+function Animation.CurveTimeline1.new (timelineType, frameCount, bezierCount, propertyId)
 	local ENTRIES = 2
 	local VALUE = 1
 
-	local self = Animation.CurveTimeline.new(frameCount, bezierCount, { propertyId })
+	local self = Animation.CurveTimeline.new(timelineType, ENTRIES, frameCount, bezierCount, { propertyId })
 
 	function self:getFrameEntries ()
 		return ENTRIES
@@ -303,12 +322,12 @@ function Animation.CurveTimeline1.new (frameCount, bezierCount, propertyId)
 end
 
 Animation.CurveTimeline2 = {}
-function Animation.CurveTimeline2.new (frameCount, bezierCount, propertyId1, propertyId2)
+function Animation.CurveTimeline2.new (timelineType, frameCount, bezierCount, propertyId1, propertyId2)
 	local ENTRIES = 3
 	local VALUE1 = 1
 	local VALUE2 = 2
 
-	local self = Animation.CurveTimeline.new(frameCount, bezierCount, { propertyId1, propertyId2 })
+	local self = Animation.CurveTimeline.new(timelineType, ENTRIES, frameCount, bezierCount, { propertyId1, propertyId2 })
 
 	function self:getFrameEntries ()
 		return ENTRIES
@@ -326,7 +345,7 @@ end
 
 Animation.RotateTimeline = {}
 function Animation.RotateTimeline.new (frameCount, bezierCount, boneIndex)
-	local self = Animation.CurveTimeline1.new(frameCount, bezierCount, Property.rotate.."|"..boneIndex)
+	local self = Animation.CurveTimeline1.new(TimelineType.rotate, frameCount, bezierCount, Property.rotate.."|"..boneIndex)
 	self.boneIndex = boneIndex
 
 	function self:apply (skeleton, lastTime, time, events, alpha, blend, direction)
@@ -358,7 +377,11 @@ end
 
 Animation.TranslateTimeline = {}
 function Animation.TranslateTimeline.new (frameCount, bezierCount, boneIndex)
-	local self = Animation.CurveTimeline2.new(frameCount, bezierCount,
+	local ENTRIES = 3
+	local VALUE1 = 1
+	local VALUE2 = 2
+
+	local self = Animation.CurveTimeline2.new(TimelineType.translate, frameCount, bezierCount,
 		Property.x.."|"..boneIndex,
 		Property.y.."|"..boneIndex
 	)
@@ -382,7 +405,7 @@ function Animation.TranslateTimeline.new (frameCount, bezierCount, boneIndex)
 
 		local x = 0
 		local y = 0
-		local frame = search2(frames, time, ENTRIES)
+		local i = search(frames, time, ENTRIES)
 		local curveType = self.curves[math_floor(i / ENTRIES)]
 		if curveType == LINEAR then
 			local before = frames[i]
@@ -416,7 +439,7 @@ end
 
 Animation.TranslateXTimeline = {}
 function Animation.TranslateXTimeline.new (frameCount, bezierCount, boneIndex)
-	local self = Animation.CurveTimeline1.new(frameCount, bezierCount, Property.x.."|"..boneIndex)
+	local self = Animation.CurveTimeline1.new(TimelineType.translateX, frameCount, bezierCount, Property.x.."|"..boneIndex)
 	self.boneIndex = boneIndex
 
 	function self:apply (skeleton, lastTime, time, events, alpha, blend, direction)
@@ -448,7 +471,7 @@ end
 
 Animation.TranslateYTimeline = {}
 function Animation.TranslateYTimeline.new (frameCount, bezierCount, boneIndex)
-	local self = Animation.CurveTimeline1.new(frameCount, bezierCount, Property.x.."|"..boneIndex)
+	local self = Animation.CurveTimeline1.new(TimelineType.translateY, frameCount, bezierCount, Property.x.."|"..boneIndex)
 	self.boneIndex = boneIndex
 
 	function self:apply (skeleton, lastTime, time, events, alpha, blend, direction)
@@ -480,7 +503,11 @@ end
 
 Animation.ScaleTimeline = {}
 function Animation.ScaleTimeline.new (frameCount, bezierCount, boneIndex)
-	local self = Animation.CurveTimeline2.new(frameCount, bezierCount,
+	local ENTRIES = 3
+	local VALUE1 = 1
+	local VALUE2 = 2
+
+	local self = Animation.CurveTimeline2.new(TimelineType.scale, frameCount, bezierCount,
 		Property.scaleX.."|"..boneIndex,
 		Property.scaleY.."|"..boneIndex
 	)
@@ -504,7 +531,7 @@ function Animation.ScaleTimeline.new (frameCount, bezierCount, boneIndex)
 
 		local x = 0
 		local y = 0
-		local i = search2(frames, time, ENTRIES)
+		local i = search(frames, time, ENTRIES)
 		local curveType = self.curves[math_floor(i / ENTRIES)]
 		if curveType == LINEAR then
 			local before = frames[i]
@@ -577,7 +604,7 @@ end
 
 Animation.ScaleXTimeline = {}
 function Animation.ScaleXTimeline.new (frameCount, bezierCount, boneIndex)
-	local self = Animation.CurveTimeline1.new(frameCount, bezierCount, Property.scaleX.."|"..boneIndex)
+	local self = Animation.CurveTimeline1.new(TimelineType.scaleX, frameCount, bezierCount, Property.scaleX.."|"..boneIndex)
 	self.boneIndex = boneIndex
 
 	function self:apply (skeleton, lastTime, time, events, alpha, blend, direction)
@@ -634,7 +661,7 @@ end
 
 Animation.ScaleYTimeline = {}
 function Animation.ScaleYTimeline.new (frameCount, bezierCount, boneIndex)
-	local self = Animation.CurveTimeline1.new(frameCount, bezierCount, Property.scaleY.."|"..boneIndex)
+	local self = Animation.CurveTimeline1.new(TimelineType.scaleY, frameCount, bezierCount, Property.scaleY.."|"..boneIndex)
 	self.boneIndex = boneIndex
 
 	function self:apply (skeleton, lastTime, time, events, alpha, blend, direction)
@@ -690,8 +717,12 @@ function Animation.ScaleYTimeline.new (frameCount, bezierCount, boneIndex)
 end
 
 Animation.ShearTimeline = {}
-function Animation.ShearTimeline.new (frameCount)
-	local self = Animation.CurveTimeline2.new(frameCount, bezierCount,
+function Animation.ShearTimeline.new (frameCount, bezierCount, boneIndex)
+	local ENTRIES = 3
+	local VALUE1 = 1
+	local VALUE2 = 2
+
+	local self = Animation.CurveTimeline2.new(TimelineType.shear, frameCount, bezierCount,
 		Property.shearX.."|"..boneIndex,
 		Property.shearY.."|"..boneIndex
 	)
@@ -715,7 +746,7 @@ function Animation.ShearTimeline.new (frameCount)
 
 		local x = 0
 		local y = 0
-		local i = search2(frames, time, ENTRIES)
+		local i = search(frames, time, ENTRIES)
 		local curveType = self.curves[math_floor(i / ENTRIES)]
 		if curveType == LINEAR then
 			local before = frames[i]
@@ -748,8 +779,8 @@ function Animation.ShearTimeline.new (frameCount)
 end
 
 Animation.ShearXTimeline = {}
-function Animation.ShearXTimeline.new (frameCount)
-	local self = Animation.CurveTimeline1.new(frameCount, bezierCount, Property.shearX.."|"..boneIndex)
+function Animation.ShearXTimeline.new (frameCount, bezierCount, boneIndex)
+	local self = Animation.CurveTimeline1.new(TimelineType.shearX, frameCount, bezierCount, Property.shearX.."|"..boneIndex)
 	self.boneIndex = boneIndex
 
 	function self:apply (skeleton, lastTime, time, events, alpha, blend, direction)
@@ -780,8 +811,8 @@ function Animation.ShearXTimeline.new (frameCount)
 end
 
 Animation.ShearYTimeline = {}
-function Animation.ShearYTimeline.new (frameCount)
-	local self = Animation.CurveTimeline1.new(frameCount, bezierCount, Property.shearY.."|"..boneIndex)
+function Animation.ShearYTimeline.new (frameCount, bezierCount, boneIndex)
+	local self = Animation.CurveTimeline1.new(TimelineType.shearY, frameCount, bezierCount, Property.shearY.."|"..boneIndex)
 	self.boneIndex = boneIndex
 
 	function self:apply (skeleton, lastTime, time, events, alpha, blend, direction)
@@ -819,7 +850,7 @@ function Animation.RGBATimeline.new (frameCount, bezierCount, slotIndex)
 	local B = 3
 	local A = 4
 
-	local self = Animation.CurveTimeline.new(frameCount, bezierCount, {
+	local self = Animation.CurveTimeline.new(TimelineType.rgba, ENTRIES, frameCount, bezierCount, {
 		Property.rgb.."|"..slotIndex,
 		Property.alpha.."|"..slotIndex
 	})
@@ -856,7 +887,7 @@ function Animation.RGBATimeline.new (frameCount, bezierCount, slotIndex)
 		end
 
 		local r, g, b, a
-		local i = search2(frames, time, ENTRIES)
+		local i = search(frames, time, ENTRIES)
 		local curveType = self.curves[i / ENTRIES]
 		if curveType == LINEAR then
 			local before = frames[i]
@@ -899,7 +930,7 @@ function Animation.RGBTimeline.new (frameCount, bezierCount, slotIndex)
 	local G = 2
 	local B = 3
 
-	local self = Animation.CurveTimeline.new(frameCount, bezierCount, { Property.rgb.."|"..slotIndex })
+	local self = Animation.CurveTimeline.new(TimelineType.rgb, ENTRIES, frameCount, bezierCount, { Property.rgb.."|"..slotIndex })
 	self.slotIndex = slotIndex
 	
 	function self:getFrameEntries ()
@@ -935,7 +966,7 @@ function Animation.RGBTimeline.new (frameCount, bezierCount, slotIndex)
 		end
 
 		local r, g, b
-		local i = search2(frames, time, ENTRIES)
+		local i = search(frames, time, ENTRIES)
 		local curveType = self.curves[i / ENTRIES]
 		if curveType == LINEAR then
 			local before = frames[i]
@@ -978,7 +1009,7 @@ end
 
 Animation.AlphaTimeline = {}
 function Animation.AlphaTimeline.new (frameCount, bezierCount, slotIndex)
-	local self = Animation.CurveTimeline1.new(frameCount, bezierCount, Property.alpha.."|"..slotIndex)
+	local self = Animation.CurveTimeline1.new(TimelineType.alpha, frameCount, bezierCount, Property.alpha.."|"..slotIndex)
 	self.slotIndex = slotIndex
 
 	function self:apply (skeleton, lastTime, time, events, alpha, blend, direction)
@@ -1020,7 +1051,7 @@ function Animation.RGBA2Timeline.new (frameCount, bezierCount, slotIndex)
 	local G2 = 6
 	local B2 = 7
 
-	local self = Animation.CurveTimeline.new(frameCount, bezierCount, {
+	local self = Animation.CurveTimeline.new(TimelineType.rgba2, ENTRIES, frameCount, bezierCount, {
 		Property.rgb.."|"..slotIndex,
 		Property.alpha.."|"..slotIndex,
 		Property.rgb2.."|"..slotIndex
@@ -1069,7 +1100,7 @@ function Animation.RGBA2Timeline.new (frameCount, bezierCount, slotIndex)
 		end
 
 		local r, g, b, a, r2, g2, b2
-		local i = search2(frames, time, ENTRIES)
+		local i = search(frames, time, ENTRIES)
 		local curveType = self.curves[math_floor(i / ENTRIES)]
 		if curveType == LINEAR then
 			local before = frames[i]
@@ -1139,7 +1170,7 @@ function Animation.RGB2Timeline.new (frameCount, bezierCount, slotIndex)
 	local G2 = 5
 	local B2 = 6
 
-	local self = Animation.CurveTimeline.new(frameCount, bezierCount, {
+	local self = Animation.CurveTimeline.new(TimelineType.rgb2, ENTRIES, frameCount, bezierCount, {
 		Property.rgb.."|"..slotIndex,
 		Property.rgb2.."|"..slotIndex
 	})
@@ -1189,7 +1220,7 @@ function Animation.RGB2Timeline.new (frameCount, bezierCount, slotIndex)
 		end
 
 		local r, g, b, r2, g2, b2
-		local i = search2(frames, time, ENTRIES)
+		local i = search(frames, time, ENTRIES)
 		local curveType = self.curves[math_floor(i / ENTRIES)]
 		if curveType == LINEAR then
 			local before = frames[i]
@@ -1254,7 +1285,7 @@ end
 
 Animation.AttachmentTimeline = {}
 function Animation.AttachmentTimeline.new (frameCount, bezierCount, slotIndex)
-	local self = Animation.Timeline.new(frameCount, { Property.attachment + "|" + slotIndex })
+	local self = Animation.Timeline.new(TimelineType.attachment, 1, frameCount, { Property.attachment.."|"..slotIndex })
 	self.slotIndex = slotIndex
 	self.attachmentNames = {}
 
@@ -1311,7 +1342,7 @@ end
 
 Animation.DeformTimeline = {}
 function Animation.DeformTimeline.new (frameCount, bezierCount, slotIndex, attachment)
-	local self = Animation.CurveTimeline.new(frameCount, bezierCount, { Property.deform + "|" + slotIndex + "|" + attachment.id })
+	local self = Animation.CurveTimeline.new(TimelineType.deform, 1, frameCount, bezierCount, { Property.deform.."|"..slotIndex.."|"..attachment.id })
 	self.slotIndex = slotIndex
 	self.attachment = attachment
 	self.vertices = {}
@@ -1353,7 +1384,7 @@ function Animation.DeformTimeline.new (frameCount, bezierCount, slotIndex, attac
 		end
 	end
 
-	function getCurvePercent (time, frame)
+	function self:getCurvePercent (time, frame)
 		local curves = self.curves
 		local i = curves[frame]
 		if i == LINEAR then
@@ -1387,7 +1418,7 @@ function Animation.DeformTimeline.new (frameCount, bezierCount, slotIndex, attac
 		if not slot.bone.active then return end
 
 		local vertexAttachment = slot.attachment
-		if not vertexAttachment or not vertexAttachment.vertexAttachment or vertexAttachment.deformAttachment ~= self.attachment then return end
+		if not vertexAttachment or not vertexAttachment.isVertexAttachment or vertexAttachment.deformAttachment ~= self.attachment then return end
 
 		local frames = self.frames
 		local deform = slot.deform
@@ -1604,7 +1635,7 @@ end
 Animation.EventTimeline = {}
 local eventPropertyIds = { Property.event }
 function Animation.EventTimeline.new (frameCount)
-	local self = Animation.Timeline.new(frameCount, eventPropertyIds)
+	local self = Animation.Timeline.new(TimelineType.event, 1, frameCount, eventPropertyIds)
 	self.events = {}
 
 	function self:getFrameCount ()
@@ -1635,7 +1666,7 @@ function Animation.EventTimeline.new (frameCount)
 		if lastTime < frames[0] then
 			i = 0
 		else
-			i = binarySearch1(frames, lastTime)
+			i = search1(frames, lastTime) + 1
 			local i = frames[i]
 			while i > 0 do -- Fire multiple events with the same frame.
 				if frames[i - 1] ~= i then break end
@@ -1654,7 +1685,7 @@ end
 Animation.DrawOrderTimeline = {}
 local drawOrderPropertyIds = { Property.drawOrder }
 function Animation.DrawOrderTimeline.new (frameCount)
-	local self = Animation.Timeline.new(frameCount, drawOrderPropertyIds)
+	local self = Animation.Timeline.new(TimelineType.drawOrder, 1, frameCount, drawOrderPropertyIds)
 	self.drawOrders = {}
 
 	function self:getFrameCount ()
@@ -1667,6 +1698,9 @@ function Animation.DrawOrderTimeline.new (frameCount)
 	end
 
 	function self:apply (skeleton, lastTime, time, events, alpha, blend, direction)
+		local drawOrder = skeleton.drawOrder
+		local slots = skeleton.slots
+
 		if direction == MixDirection.mixOut then
 			if blend == MixBlend.setup then
 				for i,slot in ipairs(slots) do
@@ -1691,8 +1725,6 @@ function Animation.DrawOrderTimeline.new (frameCount)
 				drawOrder[i] = slots[i]
 			end
 		else
-			local drawOrder = skeleton.drawOrder
-			local slots = skeleton.slots
 			for i,setupIndex in ipairs(drawOrderToSetupIndex) do
 				drawOrder[i] = skeleton.slots[setupIndex]
 			end
@@ -1711,7 +1743,7 @@ function Animation.IkConstraintTimeline.new (frameCount, bezierCount, ikConstrai
 	local COMPRESS = 4
 	local STRETCH = 5
 
-	local self = Animation.CurveTimeline.new(frameCount, bezierCount, { Property.ikConstraint + "|" + ikConstraintIndex })
+	local self = Animation.CurveTimeline.new(TimelineType.ikConstraint, ENTRIES, frameCount, bezierCount, { Property.ikConstraint.."|"..ikConstraintIndex })
 	self.ikConstraintIndex = ikConstraintIndex
 
 	function self:getFrameEntries ()
@@ -1804,7 +1836,7 @@ function Animation.IkConstraintTimeline.new (frameCount, bezierCount, ikConstrai
 end
 
 Animation.TransformConstraintTimeline = {}
-function Animation.TransformConstraintTimeline.new (frameCount, transformConstraintIndex)
+function Animation.TransformConstraintTimeline.new (frameCount, bezierCount, transformConstraintIndex)
 	local ENTRIES = 7
 	local ROTATE = 1
 	local X = 2
@@ -1813,7 +1845,7 @@ function Animation.TransformConstraintTimeline.new (frameCount, transformConstra
 	local SCALEY = 5
 	local SHEARY = 6
 
-	local self = Animation.CurveTimeline.new(frameCount, bezierCount, { Property.transformConstraint + "|" + transformConstraintIndex })
+	local self = Animation.CurveTimeline.new(TimelineType.transformConstraint, ENTRIES, frameCount, bezierCount, { Property.transformConstraint.."|"..transformConstraintIndex })
 	self.transformConstraintIndex = transformConstraintIndex
 
 	function self:getFrameEntries ()
@@ -1918,7 +1950,7 @@ end
 
 Animation.PathConstraintPositionTimeline = {}
 function Animation.PathConstraintPositionTimeline.new (frameCount, bezierCount, pathConstraintIndex)
-	local self = Animation.CurveTimeline1.new(frameCount, bezierCount, Property.pathConstraintPosition.."|"..pathConstraintIndex)
+	local self = Animation.CurveTimeline1.new(TimelineType.pathConstraintPosition, frameCount, bezierCount, Property.pathConstraintPosition.."|"..pathConstraintIndex)
 	self.pathConstraintIndex = pathConstraintIndex
 
 	function self:apply (skeleton, lastTime, time, events, alpha, blend, direction)
@@ -1948,7 +1980,7 @@ end
 
 Animation.PathConstraintSpacingTimeline = {}
 function Animation.PathConstraintSpacingTimeline.new (frameCount, bezierCount, pathConstraintIndex)
-	local self = Animation.CurveTimeline1.new(frameCount, bezierCount, Property.pathConstraintSpacing.."|"..pathConstraintIndex)
+	local self = Animation.CurveTimeline1.new(TimelineType.pathConstraintSpacing, frameCount, bezierCount, Property.pathConstraintSpacing.."|"..pathConstraintIndex)
 	self.pathConstraintIndex = pathConstraintIndex
 
 	function self:apply (skeleton, lastTime, time, events, alpha, blend, direction)
@@ -1983,7 +2015,7 @@ function Animation.PathConstraintMixTimeline.new (frameCount, bezierCount, pathC
 	local X = 2
 	local Y = 3
 
-	local self = Animation.CurveTimeline.new(frameCount, bezierCount, Property.pathConstraintMix.."|"..pathConstraintIndex)
+	local self = Animation.CurveTimeline.new(TimelineType.pathConstraintMix, ENTRIES, frameCount, bezierCount, Property.pathConstraintMix.."|"..pathConstraintIndex)
 	self.pathConstraintIndex = pathConstraintIndex
 
 	function self:getFrameEntries ()
@@ -2006,13 +2038,13 @@ function Animation.PathConstraintMixTimeline.new (frameCount, bezierCount, pathC
 		local frames = self.frames
 		if time < frames[0] then
 			if blend == MixBlend.setup then
-				constraint.mixRotate = constraint.data.mixRotate;
-				constraint.mixX = constraint.data.mixX;
-				constraint.mixY = constraint.data.mixY;
+				constraint.mixRotate = constraint.data.mixRotate
+				constraint.mixX = constraint.data.mixX
+				constraint.mixY = constraint.data.mixY
 			elseif blend == MixBlend.first then
-				constraint.mixRotate = constraint.mixRotate + (constraint.data.mixRotate - constraint.mixRotate) * alpha;
-				constraint.mixX = constraint.mixX + (constraint.data.mixX - constraint.mixX) * alpha;
-				constraint.mixY = constraint.mixY + (constraint.data.mixY - constraint.mixY) * alpha;
+				constraint.mixRotate = constraint.mixRotate + (constraint.data.mixRotate - constraint.mixRotate) * alpha
+				constraint.mixX = constraint.mixX + (constraint.data.mixX - constraint.mixX) * alpha
+				constraint.mixY = constraint.mixY + (constraint.data.mixY - constraint.mixY) * alpha
 			end
 			return
 		end
@@ -2020,36 +2052,36 @@ function Animation.PathConstraintMixTimeline.new (frameCount, bezierCount, pathC
 		local rotate
 		local x
 		local y
-		local i = search(frames, time, ENTRIES);
-		local curveType = self.curves[math_floor(i / 4)];
+		local i = search(frames, time, ENTRIES)
+		local curveType = self.curves[math_floor(i / 4)]
 		if curveType == LINEAR then
-			local before = frames[i];
-			rotate = frames[i + ROTATE];
-			x = frames[i + X];
-			y = frames[i + Y];
-			local t = (time - before) / (frames[i + ENTRIES] - before);
-			rotate = rotate + (frames[i + ENTRIES + ROTATE] - rotate) * t;
-			x = x + (frames[i + ENTRIES + X] - x) * t;
-			y = y + (frames[i + ENTRIES + Y] - y) * t;
+			local before = frames[i]
+			rotate = frames[i + ROTATE]
+			x = frames[i + X]
+			y = frames[i + Y]
+			local t = (time - before) / (frames[i + ENTRIES] - before)
+			rotate = rotate + (frames[i + ENTRIES + ROTATE] - rotate) * t
+			x = x + (frames[i + ENTRIES + X] - x) * t
+			y = y + (frames[i + ENTRIES + Y] - y) * t
 		elseif curveType == STEPPED then
-			rotate = frames[i + ROTATE];
-			x = frames[i + X];
-			y = frames[i + Y];
+			rotate = frames[i + ROTATE]
+			x = frames[i + X]
+			y = frames[i + Y]
 		else
-			rotate = this.getBezierValue(time, i, ROTATE, curveType - BEZIER);
-			x = this.getBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER);
-			y = this.getBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER);
+			rotate = this.getBezierValue(time, i, ROTATE, curveType - BEZIER)
+			x = this.getBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER)
+			y = this.getBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER)
 		end
 
 		if blend == MixBlend.setup then
-			local data = constraint.data;
-			constraint.mixRotate = data.mixRotate + (rotate - data.mixRotate) * alpha;
-			constraint.mixX = data.mixX + (x - data.mixX) * alpha;
-			constraint.mixY = data.mixY + (y - data.mixY) * alpha;
+			local data = constraint.data
+			constraint.mixRotate = data.mixRotate + (rotate - data.mixRotate) * alpha
+			constraint.mixX = data.mixX + (x - data.mixX) * alpha
+			constraint.mixY = data.mixY + (y - data.mixY) * alpha
 		else
-			constraint.mixRotate = constraint.mixRotate + (rotate - constraint.mixRotate) * alpha;
-			constraint.mixX = constraint.mixX + (x - constraint.mixX) * alpha;
-			constraint.mixY = constraint.mixY + (y - constraint.mixY) * alpha;
+			constraint.mixRotate = constraint.mixRotate + (rotate - constraint.mixRotate) * alpha
+			constraint.mixX = constraint.mixX + (x - constraint.mixX) * alpha
+			constraint.mixY = constraint.mixY + (y - constraint.mixY) * alpha
 		end
 	end
 

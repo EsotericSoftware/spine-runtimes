@@ -43,8 +43,9 @@ function PathConstraintData.new (name)
 		offsetRotation = 0,
 		position = 0,
 		spacing = 0,
-		rotateMix = 0,
-		translateMix = 0
+		mixRotate = 0,
+		mixX = 0,
+		mixY = 0
 	}
 
 	return self
@@ -58,7 +59,8 @@ PathConstraintData.PositionMode = {
 PathConstraintData.SpacingMode = {
 	length = 0,
 	fixed = 1,
-	percent = 2
+	percent = 2,
+	proportional = 3
 }
 
 PathConstraintData.RotateMode = {

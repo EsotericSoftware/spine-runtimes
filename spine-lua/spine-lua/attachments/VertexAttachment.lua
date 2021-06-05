@@ -37,7 +37,6 @@ local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local Attachment = require "spine-lua.attachments.Attachment"
 
 local nextID = 0
-local SHL_11 = 2048
 
 local VertexAttachment = {}
 VertexAttachment.__index = VertexAttachment
@@ -45,16 +44,16 @@ setmetatable(VertexAttachment, { __index = Attachment })
 
 function VertexAttachment.new (name, attachmentType)
 	local self = Attachment.new(name, attachmentType)
-	self.vertexAttachment = true
+
+	self.id = nextID
+	nextID = nextID + 1
+
+	self.isVertexAttachment = true
 	self.bones = nil
 	self.vertices = nil
 	self.worldVerticesLength = 0
-	while nextID > 65535 do
-		nextID = nextID - 65535
-	end
-	self.id = nextID * SHL_11
 	self.deformAttachment = self
-	nextID = nextID + 1
+
 	setmetatable(self, VertexAttachment)
 	return self
 end

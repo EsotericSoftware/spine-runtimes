@@ -27,6 +27,8 @@
 -- THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -------------------------------------------------------------------------------
 
+local TransformMode = require "spine-lua.TransformMode"
+
 local setmetatable = setmetatable
 local math_rad = math.rad
 local math_deg = math.deg
@@ -36,19 +38,6 @@ local math_atan2 = math.atan2
 local math_sqrt = math.sqrt
 local math_abs = math.abs
 local math_pi = math.pi
-
-local TransformMode = require "spine-lua.TransformMode"
-
-function math.sign(x)
-	if x < 0 then
-		return -1
-	elseif x > 0 then
-		return 1
-	end
-	return 0
-end
-
-local math_sign = math.sign
 
 local Bone = {}
 Bone.__index = Bone
@@ -64,7 +53,6 @@ function Bone.new (data, skeleton, parent)
 		children = { },
 		x = 0, y = 0, rotation = 0, scaleX = 1, scaleY = 1, shearX = 0, shearY = 0,
 		ax = 0, ay = 0, arotation = 0, ascaleX = 0, ascaleY = 0, ashearX = 0, ashearY = 0,
-		appliedValid = false,
 
 		a = 0, b = 0, worldX = 0, -- a b x
 		c = 0, d = 0, worldY = 0, -- c d y
@@ -78,7 +66,7 @@ function Bone.new (data, skeleton, parent)
 end
 
 function Bone:update ()
-	self:updateWorldTransformWith(self.x, self.y, self.rotation, self.scaleX, self.scaleY, self.shearX, self.shearY)
+	self:updateWorldTransformWith(self.ax, self.ay, self.arotation, self.ascaleX, self.ascaleY, self.ashearX, self.ashearY)
 end
 
 function Bone:updateWorldTransform ()
@@ -93,13 +81,12 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 	self.ascaleY = scaleY
 	self.ashearX = shearX
 	self.ashearY = shearY
-	self.appliedValid = true
 
 	local sx = self.skeleton.scaleX
 	local sy = self.skeleton.scaleY
 
 	local parent = self.parent
-	if parent == nil then
+	if not parent then
 		local rotationY = rotation + 90 + shearY
 		local rotationRad = math_rad(rotation + shearX)
 		local rotationYRad = math_rad(rotationY)
@@ -225,7 +212,7 @@ end
 
 function Bone:updateAppliedTransform ()
 	local parent = self.parent
-	if parent == nil then
+	if not parent then
 		self.ax = self.worldX
 		self.ay = self.worldY
 		self.arotation = math_deg(math_atan2(self.c, self.a))
@@ -268,15 +255,11 @@ function Bone:updateAppliedTransform ()
 end
 
 function Bone:worldToLocal (world)
-	local a = self.a
-	local b = self.b
-	local c = self.c
-	local d = self.d
-	local invDet = 1 / (a * d - b * c)
+	local invDet = 1 / (self.a * self.d - self.b * self.c)
 	local x = world[1] - self.worldX
 	local y = world[2] - self.worldY
-	world[1] = (x * d * invDet - y * b * invDet)
-	world[2] = (y * a * invDet - x * c * invDet)
+	world[1] = x * self.d * invDet - y * self.b * invDet
+	world[2] = y * self.a * invDet - x * self.c * invDet
 	return world
 end
 
@@ -313,7 +296,6 @@ function Bone:rotateWorld (degrees)
 	self.b = cos * b - sin * d
 	self.c = sin * a + cos * c
 	self.d = sin * b + cos * d
-	self.appliedValid = false
 end
 
 return Bone

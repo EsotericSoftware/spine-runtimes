@@ -7,7 +7,7 @@
 -- Integration of the Spine Runtimes into software or otherwise creating
 -- derivative works of the Spine Runtimes is permitted under the terms and
 -- conditions of Section 2 of the Spine Editor License Agreement:
--- http://esotericsoftware.com/spine-editor-license
+-- http:--esotericsoftware.com/spine-editor-license
 --
 -- Otherwise, it is permitted to integrate the Spine Runtimes into software
 -- or otherwise create derivative works of the Spine Runtimes (collectively,
@@ -28,6 +28,7 @@
 -------------------------------------------------------------------------------
 
 local setmetatable = setmetatable
+local tonumber = tonumber
 local table_insert = table.insert
 local math_abs = math.abs
 
@@ -47,7 +48,8 @@ function TextureAtlasPage.new ()
 		vWrap = nil,
 		texture = nil,
 		width = 0,
-		height = 0
+		height = 0,
+		pma = false
 	}
 	setmetatable(self, TextureAtlasPage)
 	return self
@@ -73,168 +75,178 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 	if not atlasContent then error("atlasContent cannot be nil.", 2) end
 	if not imageLoader then error("imageLoader cannot be nil.", 2) end
 
-	function lineIterator(s)
-		if s:sub(-1)~="\n" then s=s.."\n" end
-		return s:gmatch("(.-)\n")
+	local readLine = atlasContent:gmatch("[ \t]*(.-)[ \t]*\r?\n")
+
+	local trim = function (value)
+		return value:match("^%s*(.-)%s*$")
 	end
 
-	local lines = {}
-	local index = 0
-	local numLines = 0
-	for line in lineIterator(atlasContent) do
-		lines[numLines] = line
-		numLines = numLines + 1
-	end
+	local entry = {}
+	local readEntry = function (entry, line)
+		if not line then return 0 end
+		if line:len() == 0 then return 0 end
 
-	local readLine = function ()
-		if index >= numLines then return nil end
-		local line = lines[index]
-		index = index + 1
-		return line
-	end
-
-	local readValue = function ()
-		local line = readLine()
-		local idx = line:find(":")
-		if not idx then error("Invalid line: " .. line, 2) end
-		return line:sub(idx + 1):match'^%s*(.*%S)' or ''
-	end
-
-	local readTuple = function ()
-		local line = readLine()
-		local idx = line:find(":")
-		if not idx then
-			error("Invalid line: " .. line, 2)
-		end
+		local colon = line:find(":")
+		if not colon then return 0 end
+		entry[0] = trim(line:sub(1, colon))
+		local lastMatch = colon + 1
 		local i = 1
-		local lastMatch = idx + 1
-		local tuple = {}
-		while i <= 3 do
+		while true do
 			local comma = line:find(",", lastMatch)
-			if not comma then break end
-			tuple[i] = line:sub(lastMatch, comma - 1):match'^%s*(.*%S)' or ''
+			if not comma then
+				entry[i] = trim(line:sub(lastMatch))
+				return i
+			end
+			entry[i] = trim(line:sub(lastMatch, comma - lastMatch))
 			lastMatch = comma + 1
+			if i == 4 then return 4 end
 			i = i + 1
 		end
-		tuple[i] = line:sub(lastMatch):match'^%s*(.*%S)' or ''
-		return tuple
 	end
 
-	local parseInt = function (str)
-		return tonumber(str)
+	local page
+	local region
+
+	local pageFields = {}
+	pageFields["size"] = function ()
+		page.width = tonumber(entry[1])
+		page.height = tonumber(entry[2])
+	end
+	pageFields["format"] = function ()
+		-- page.format = Format[tuple[0]] we don't need format in Lua
+	end
+	pageFields["filter"] = function ()
+		page.minFilter = TextureFilter[entry[1]]
+		page.magFilter = TextureFilter[entry[2]]
+	end
+	pageFields["repeat"] = function ()
+		if entry[1]:find("x") then page.uWrap = TextureWrap.Repeat end
+		if entry[1]:find("y") then page.vWrap = TextureWrap.Repeat end
+	end
+	pageFields["pma"] = function ()
+		page.pma = entry[1] == "true"
 	end
 
-	local filterFromString = function (str)
-		str = str:lower()
-		if str == "nearest" then return TextureFilter.Nearest
-		elseif str == "linear" then return TextureFilter.Linear
-		elseif str == "mipmap" then return TextureFilter.MipMap
-		elseif str == "mipmapnearestnearest" then return TextureFilter.MipMapNearestNearest
-		elseif str == "mipmaplinearnearest" then return TextureFilter.MipMapLinearNearest
-		elseif str == "mipmapnearestlinear" then return TextureFilter.MipMapNearestLinear
-		elseif str == "mipmaplinearlinear" then return TextureFilter.MipMapLinearLinear
-		else error("Unknown texture wrap: " .. str, 2)
+	local regionFields = {}
+	regionFields["xy"] = function () -- Deprecated, use bounds.
+		region.x = tonumber(entry[1])
+		region.y = tonumber(entry[2])
+	end
+	regionFields["size"] = function () -- Deprecated, use bounds.
+		region.width = tonumber(entry[1])
+		region.height = tonumber(entry[2])
+	end
+	regionFields["bounds"] = function ()
+		region.x = tonumber(entry[1])
+		region.y = tonumber(entry[2])
+		region.width = tonumber(entry[3])
+		region.height = tonumber(entry[4])
+	end
+	regionFields["offset"] = function () -- Deprecated, use offsets.
+		region.offsetX = tonumber(entry[1])
+		region.offsetY = tonumber(entry[2])
+	end
+	regionFields["orig"] = function () -- Deprecated, use offsets.
+		region.originalWidth = tonumber(entry[1])
+		region.originalHeight = tonumber(entry[2])
+	end
+	regionFields["offsets"] = function ()
+		region.offsetX = tonumber(entry[1])
+		region.offsetY = tonumber(entry[2])
+		region.originalWidth = tonumber(entry[3])
+		region.originalHeight = tonumber(entry[4])
+	end
+	regionFields["rotate"] = function ()
+		local value = entry[1]
+		if value == "true" then
+			region.degrees = 90
+		elseif value ~= "false" then
+			region.degrees = tonumber(value)
 		end
 	end
+	regionFields["index"] = function ()
+		region.index = tonumber(entry[1])
+	end
 
-	local page = nil
+	local line = readLine()
+	-- Ignore empty lines before first entry.
+	while line and line:len() == 0 do
+		line = readLine()
+	end
+	-- Header entries.
 	while true do
-		local line = readLine()
+		if not line or line:len() == 0 then break end
+		if readEntry(entry, line) == 0 then break end -- Silently ignore all header fields.
+		line = readLine()
+	end
+
+	-- Page and region entries.
+	local names
+	local values
+	while true do
 		if not line then break end
-		line = line:match'^%s*(.*%S)' or ''
 		if line:len() == 0 then
 			page = nil
+			line = readLine()
 		elseif not page then
 			page = TextureAtlasPage.new()
-			page.name = line
-
-			local tuple = readTuple()
-			if #tuple == 2 then
-				page.width = parseInt(tuple[1])
-				page.height = parseInt(tuple[2])
-				tuple = readTuple()
-			else
-				-- We only support atlases that have the page width/height
-				-- encoded in them. That way we don't rely on any special
-				-- wrapper objects for images to get the page size from
-				error("Atlas must specify page width/height. Please export to the latest atlas format", 2)
+			page.name = trim(line)
+			while true do
+				line = readLine()
+				if readEntry(entry, line) == 0 then break end
+				local field = pageFields[entry[0]]
+				if field then field() end
 			end
-
-			tuple = readTuple()
-			page.minFilter = filterFromString(tuple[1])
-			page.magFilter = filterFromString(tuple[2])
-
-			local direction = readValue()
-			page.uWrap = TextureWrap.ClampToEdge
-			page.vWrap = TextureWrap.ClampToEdge
-			if direction == "x" then
-				page.uWrap = TextureWrap.Repeat
-			elseif direction == "y" then
-				page.vWrap = TextureWrap.Repeat
-			elseif direction == "xy" then
-				page.uWrap = TextureWrap.Repeat
-				page.vWrap = TextureWrap.Repeat
-			end
-
-			page.texture = imageLoader(line)
-			-- FIXME page.texture:setFilters(page.minFilter, page.magFilter)
-			-- FIXME page.texture:setWraps(page.uWrap, page.vWrap)
+			page.texture = imageLoader(page.name)
+			-- FIXME - Apply the filter and wrap settings to the texture.
+			-- page.texture:setFilters(page.minFilter, page.magFilter)
+			-- page.texture:setWraps(page.uWrap, page.vWrap)
 			table_insert(self.pages, page)
 		else
-			local region = TextureAtlasRegion.new()
-			region.name = line
+			region = TextureAtlasRegion.new()
 			region.page = page
-
-			local rotateValue = readValue()
-			if rotateValue == "true" then
-				region.degrees = 90
-			elseif rotateValue == "false" then
-				region.degrees = 0
-			else
-				region.degrees = tonumber(rotateValue)
-			end
-			if region.degrees == 90 then region.rotate = true end
-
-			local tuple = readTuple()
-			local x = parseInt(tuple[1])
-			local y = parseInt(tuple[2])
-
-			tuple = readTuple()
-			local width = parseInt(tuple[1])
-			local height = parseInt(tuple[2])
-
-			region.u = x / page.width
-			region.v = y / page.height
-			if region.rotate then
-				region.u2 = (x + height) / page.width
-				region.v2 = (y + width) / page.height
-			else
-				region.u2 = (x + width) / page.width
-				region.v2 = (y + height) / page.height
-			end
-
-			region.x = x
-			region.y = y
-			region.width = math_abs(width)
-			region.height = math_abs(height)
-
-			-- Read and skip optional splits
-			tuple = readTuple()
-			if #tuple == 4 then
-				tuple = readTuple()
-				if #tuple == 4 then
-					readTuple()
+			region.name = line
+			while true do
+				line = readLine()
+				local count = readEntry(entry, line)
+				if count == 0 then break end
+				local field = regionFields[entry[0]]
+				if field then
+					field()
+				else
+					if not names then
+						names = {}
+						values = {}
+					end
+					table_insert(names, entry[0])
+					local entryValues = {}
+					local i = 0
+					while i < count do
+						table_insert(entryValues, tonumber(entry[i + 1]))
+						 i = i + 1
+					end
+					table_insert(values, entryValues)
 				end
 			end
-
-			region.originalWidth = parseInt(tuple[1])
-			region.originalHeight = parseInt(tuple[2])
-
-			tuple = readTuple()
-			region.offsetX = parseInt(tuple[1])
-			region.offsetY = parseInt(tuple[2])
-
-			region.index = parseInt(readValue())
+			if region.originalWidth == 0 and region.originalHeight == 0 then
+				region.originalWidth = region.width
+				region.originalHeight = region.height
+			end
+			if names and #names > 0 then
+				region.names = names
+				region.values = values
+				names = nil
+				values = nil
+			end
+			region.u = region.x / page.width
+			region.v = region.y / page.height
+			if region.degrees == 90 then
+				region.u2 = (region.x + region.height) / page.width
+				region.v2 = (region.y + region.width) / page.height
+			else
+				region.u2 = (region.x + region.width) / page.width
+				region.v2 = (region.y + region.height) / page.height
+			end
 			region.texture = page.texture
 			table_insert(self.regions, region)
 		end

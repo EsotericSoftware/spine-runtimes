@@ -558,9 +558,9 @@ function SkeletonJson.new (attachmentLoader)
 				for timelineName,timelineMap in pairs(slotMap) do
 					if not timelineMap then
 					elseif timelineName == "attachment" then
-						local timeline = Animation.AttachmentTimeline.new(#timelineMap, slotIndex)
+						local timeline = Animation.AttachmentTimeline.new(#timelineMap, #timelineMap, slotIndex)
 						for i,keyMap in ipairs(timelineMap) do
-							timeline:setFrame(i + 1, getValue(keyMap, "time", 0), keyMap["name"])
+							timeline:setFrame(i - 1, getValue(keyMap, "time", 0), keyMap["name"])
 						end
 						table_insert(timelines, timeline)
 					elseif timelineName == "rgba" then
@@ -765,7 +765,7 @@ function SkeletonJson.new (attachmentLoader)
 						table_insert(timelines, readTimeline1(timelineMap, timeline, 0, scale))
 					elseif timelineName == "scale" then
 						local timeline = Animation.ScaleTimeline.new(#timelineMap, #timelineMap * 2, boneIndex)
-						table_insert(timelines, readTimeline2(timelineMap, "x", "y", 1, 1))
+						table_insert(timelines, readTimeline2(timelineMap, timeline, "x", "y", 1, 1))
 					elseif timelineName == "scalex" then
 						local timeline = Animation.ScaleXTimeline.new(#timelineMap, #timelineMap, boneIndex)
 						table_insert(timelines, readTimeline1(timelineMap, timeline, 1, 1))
@@ -774,7 +774,7 @@ function SkeletonJson.new (attachmentLoader)
 						table_insert(timelines, readTimeline1(timelineMap, timeline, 1, 1))
 					elseif timelineName == "shear" then
 						local timeline = Animation.ShearTimeline.new(#timelineMap, #timelineMap * 2, boneIndex)
-						table_insert(timelines, readTimeline2(timelineMap, "x", "y", 0, 1))
+						table_insert(timelines, readTimeline2(timelineMap, timeline, "x", "y", 0, 1))
 					elseif timelineName == "shearx" then
 						local timeline = Animation.ShearXTimeline.new(#timelineMap, #timelineMap, boneIndex)
 						table_insert(timelines, readTimeline1(timelineMap, timeline, 0, 1))
@@ -901,7 +901,7 @@ function SkeletonJson.new (attachmentLoader)
 		if map.path then
 			for constraintName,constraintMap in pairs(map.path) do
 				local constraint, constraintIndex = -1
-				for i,other in pairs(skeletonData.transformConstraints) do
+				for i,other in pairs(skeletonData.pathConstraints) do
 					if other.name == constraintName then
 						constraintIndex = i
 						constraint = other
@@ -914,12 +914,12 @@ function SkeletonJson.new (attachmentLoader)
 						if timelineName == "position" then
 							local timeline = Animation.PathConstraintPositionTimeline.new(#timelineMap, #timelineMap, constraintIndex)
 							local timelineScale = 1
-							if constraint.positionMode == PositionMode.fixed then timelineScale = scale end
+							if constraint.positionMode == PathConstraintData.PositionMode.fixed then timelineScale = scale end
 							table_insert(timelines, readTimeline1(timelineMap, timeline, 0, timelineScale))
 						elseif timelineName == "spacing" then
 							local timeline = Animation.PathConstraintSpacingTimeline.new(#timelineMap, #timelineMap, constraintIndex)
 							local timelineScale = 1
-							if data.spacingMode == SpacingMode.Length or data.spacingMode == SpacingMode.Fixed then timelineScale = scale end
+							if data.spacingMode == PathConstraintData.SpacingMode.Length or data.spacingMode == PathConstraintData.SpacingMode.Fixed then timelineScale = scale end
 							table_insert(timelines, readTimeline1(timelineMap, timeline, 0, timelineScale))
 						elseif timelineName == "mix" then
 							local timeline = Animation.PathConstraintMixTimeline.new(#timelineMap, #timelineMap * 3, constraintIndex)
@@ -978,6 +978,7 @@ function SkeletonJson.new (attachmentLoader)
 							if weighted then deformLength = math_floor(deformLength / 3) * 2 end
 
 							local timeline = Animation.DeformTimeline.new(#timelineMap, #timelineMap, slotIndex, attachment)
+							local time = getValue(keyMap, "time", 0)
 							local bezier = 0
 							for i,keyMap in ipairs(timelineMap) do
 								local deform = nil
@@ -1007,7 +1008,7 @@ function SkeletonJson.new (attachmentLoader)
 									end
 								end
 								local frame = i - 1
-								timeline:setFrame(frame, time, mixRotate, mixX, mixY)
+								timeline:setFrame(frame, time, deform)
 								local nextMap = timelineMap[frame + 1]
 								if not nextMap then
 									timeline:shrink(bezier)
@@ -1172,15 +1173,15 @@ function SkeletonJson.new (attachmentLoader)
 
 	readCurve = function (curve, timeline, bezier, frame, value, time1, time2, value1, value2, scale)
 		if curve == "stepped" then
-			if value ~= 0 then timeline.setStepped(frame) end
+			if value ~= 0 then timeline:setStepped(frame) end
 			return bezier
 		end
-		local i = value * 4
+		local i = value * 4 + 1
 		local cx1 = curve[i]
 		local cy1 = curve[i + 1] * scale
 		local cx2 = curve[i + 2]
 		local cy2 = curve[i + 3] * scale
-		timeline.setBezier(bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2)
+		timeline:setBezier(bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2)
 		return bezier + 1
 	end
 
