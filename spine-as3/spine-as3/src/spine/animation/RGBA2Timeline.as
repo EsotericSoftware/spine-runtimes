@@ -101,7 +101,7 @@ package spine.animation {
 			}
 
 			var r : Number = 0, g : Number = 0, b : Number = 0, a : Number = 0, r2 : Number = 0, g2 : Number = 0, b2 : Number = 0;
-			var i : int = search2(frames, time, ENTRIES);
+			var i : int = search(frames, time, ENTRIES);
 			var curveType : Number = curves[i >> 3];
 			switch (curveType) {
 			case LINEAR:

@@ -93,7 +93,7 @@ package spine.animation {
 			}
 
 			var rotate : Number, x : Number, y : Number, scaleX : Number, scaleY : Number, shearY : Number;
-			var i : int = search2(frames, time, ENTRIES);
+			var i : int = search(frames, time, ENTRIES);
 			var curveType : Number = curves[i / ENTRIES];
 			switch (curveType) {
 			case LINEAR:

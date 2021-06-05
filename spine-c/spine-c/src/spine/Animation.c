@@ -60,9 +60,9 @@ void spAnimation_dispose (spAnimation* self) {
 }
 
 int /*bool*/ spAnimation_hasTimeline(spAnimation* self, spPropertyId* ids, int idsCount) {
-    int i, n, ii, nn;
+    int i, n, ii;
     for (i = 0, n = self->timelineIds->size; i < n; i++) {
-        for (ii = 0, nn = idsCount; ii < nn; ii++) {
+        for (ii = 0; ii < idsCount; ii++) {
             if (self->timelineIds->items[i] == ids[ii]) return 1;
         }
     }
@@ -111,13 +111,13 @@ void _spTimeline_init (spTimeline* self,
     void (*setBezier) (spTimeline* self, int bezier, int frame, float value, float time1, float value1, float cx1, float cy1,
                        float cx2, float cy2, float time2, float value2)
 ) {
-    int i, n;
+    int i;
     self->frames = spFloatArray_create(frameCount * frameEntries);
     self->frames->size = frameCount * frameEntries;
     self->frameCount = frameCount;
     self->frameEntries = frameEntries;
 
-    for (i = 0, n = propertyIdsCount; i < n; i++)
+    for (i = 0; i < propertyIdsCount; i++)
         self->propertyIds[i] = propertyIds[i];
     self->propertyIdsCount = propertyIdsCount;
 
@@ -1434,7 +1434,6 @@ void spRGBA2Timeline_setFrame (spRGBA2Timeline* self, int frame, float time, flo
 
 static const int RGB2_ENTRIES = 7, COLOR2_R2 = 5, COLOR2_G2 = 6, COLOR2_B2 = 7;
 
-
 void _spRGB2Timeline_apply (spTimeline* timeline, spSkeleton* skeleton, float lastTime, float time, spEvent** firedEvents,
                              int* eventsCount, float alpha, spMixBlend blend, spMixDirection direction
 ) {
@@ -1521,6 +1520,7 @@ void _spRGB2Timeline_apply (spTimeline* timeline, spSkeleton* skeleton, float la
     } else {
         if (blend == SP_MIX_BLEND_SETUP) {
             spColor_setFromColor3(light, &slot->data->color);
+
             spColor_setFromColor3(dark, slot->data->darkColor);
         }
         spColor_addFloats3(light, (r - light->r) * alpha, (g - light->g) * alpha, (b - light->b) * alpha);
@@ -1929,7 +1929,6 @@ void spDeformTimeline_setFrame (spDeformTimeline* self, int frame, float time, f
 		memcpy(CONST_CAST(float*, self->frameVertices[frame]), vertices, self->frameVerticesCount * sizeof(float));
 	}
 }
-
 
 /**/
 

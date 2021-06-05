@@ -75,10 +75,10 @@ package spine.animation {
 			var frames : Vector.<Number> = this.frames;
 			var color : Color = slot.color;
 			if (time < frames[0]) {
-				var  setup : Color = slot.data.color;
+				var setup : Color = slot.data.color;
 				switch (blend) {
 				case MixBlend.setup:
-					color.setFromColor(slot.data.color);
+					color.setFromColor(setup);
 					return;
 				case MixBlend.first:
 					color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
@@ -88,7 +88,7 @@ package spine.animation {
 			}
 
 			var r : Number = 0, g : Number = 0, b : Number = 0, a : Number = 0;
-			var i : int = search2(frames, time, ENTRIES);
+			var i : int = search(frames, time, ENTRIES);
 			var curveType : Number = curves[i / ENTRIES];
 			switch (curveType) {
 			case LINEAR:

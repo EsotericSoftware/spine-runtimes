@@ -57,17 +57,17 @@ package spine.animation {
 		public function apply (skeleton: Skeleton, lastTime: Number, time: Number, events: Vector.<Event>, alpha: Number, blend: MixBlend, direction: MixDirection) : void {
 		}
 
-		static internal function search (frames : Vector.<Number>, time : Number) : int {
+		static internal function search1 (frames : Vector.<Number>, time : Number) : int {
 			var n : int = frames.length;
 			for (var i : int = 1; i < n; i++)
 				if (frames[i] > time) return i - 1;
 			return n - 1;
 		}
 
-		static internal function search2 (values : Vector.<Number>, time : Number, step: int) : int {
-			var n : int = values.length;
+		static internal function search (frames : Vector.<Number>, time : Number, step: int) : int {
+			var n : int = frames.length;
 			for (var i : int = step; i < n; i += step)
-				if (values[i] > time) return i - step;
+				if (frames[i] > time) return i - step;
 			return n - step;
 		}
 	}

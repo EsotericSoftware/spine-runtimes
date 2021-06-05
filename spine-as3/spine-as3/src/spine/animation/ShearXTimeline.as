@@ -36,9 +36,7 @@ package spine.animation {
 		private var boneIndex : int;
 
 		public function ShearXTimeline(frameCount : int, bezierCount : int, boneIndex : int) {
-			super(frameCount, bezierCount, [
-				Property.shearX + "|" + boneIndex
-			]);
+			super(frameCount, bezierCount, Property.shearX + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 

@@ -42,9 +42,7 @@ package spine.animation {
 		private var slotIndex : int;
 
 		public function AlphaTimeline (frameCount : Number, bezierCount : Number, slotIndex : Number) {
-			super(frameCount, bezierCount, [
-				Property.alpha + "|" + slotIndex
-			]);
+			super(frameCount, bezierCount, Property.alpha + "|" + slotIndex);
 			this.slotIndex = slotIndex;
 		}
 

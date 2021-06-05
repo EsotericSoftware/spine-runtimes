@@ -41,16 +41,20 @@ module spine {
 
 		constructor (name: string, timelines: Array<Timeline>, duration: number) {
 			if (!name) throw new Error("name cannot be null.");
-			if (!timelines) throw new Error("timelines cannot be null.");
 			this.name = name;
+			this.setTimelines(timelines);
+			this.duration = duration;
+		}
+
+		setTimelines(timelines: Array<Timeline>) {
+			if (!timelines) throw new Error("timelines cannot be null.");
 			this.timelines = timelines;
 			this.timelineIds = new StringSet();
 			for (var i = 0; i < timelines.length; i++)
 				this.timelineIds.addAll(timelines[i].getPropertyIds());
-			this.duration = duration;
 		}
 
-		hasTimeline(ids: string[]) {
+		hasTimeline(ids: string[]) : boolean {
 			for (let i = 0; i < ids.length; i++)
 				if (this.timelineIds.contains(ids[i])) return true;
 			return false;
@@ -166,17 +170,17 @@ module spine {
 
 		abstract apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection): void;
 
-		static search (frames: ArrayLike<number>, time: number) {
+		static search1 (frames: ArrayLike<number>, time: number) {
 			let n = frames.length;
 			for (let i = 1; i < n; i++)
 				if (frames[i] > time) return i - 1;
 			return n - 1;
 		}
 
-		static search2 (values: ArrayLike<number>, time: number, step: number) {
-			let n = values.length;
+		static search (frames: ArrayLike<number>, time: number, step: number) {
+			let n = frames.length;
 			for (let i = step; i < n; i += step)
-				if (values[i] > time) return i - step;
+				if (frames[i] > time) return i - step;
 			return n - step;
 		}
 	}
@@ -282,8 +286,8 @@ module spine {
 	}
 
 	export abstract class CurveTimeline1 extends CurveTimeline {
-		constructor(frameCount: number, bezierCount: number, propertyIds: string[]) {
-			super(frameCount, bezierCount, propertyIds);
+		constructor(frameCount: number, bezierCount: number, propertyId: string) {
+			super(frameCount, bezierCount, [ propertyId ]);
 		}
 
 		getFrameEntries () {
@@ -326,8 +330,8 @@ module spine {
 	export abstract class CurveTimeline2 extends CurveTimeline {
 		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
 		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
-		constructor (frameCount: number, bezierCount: number, propertyIds: string[]) {
-			super(frameCount, bezierCount, propertyIds);
+		constructor (frameCount: number, bezierCount: number, propertyId1: string, propertyId2: string) {
+			super(frameCount, bezierCount, [ propertyId1, propertyId2 ]);
 		}
 
 		getFrameEntries () {
@@ -350,9 +354,7 @@ module spine {
 		boneIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
-			super(frameCount, bezierCount, [
-				Property.rotate + "|" + boneIndex
-			]);
+			super(frameCount, bezierCount, Property.rotate + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 
@@ -391,10 +393,10 @@ module spine {
 		boneIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
-			super(frameCount, bezierCount, [
+			super(frameCount, bezierCount,
 				Property.x + "|" + boneIndex,
 				Property.y + "|" + boneIndex,
-			]);
+			);
 			this.boneIndex = boneIndex;
 		}
 
@@ -417,7 +419,7 @@ module spine {
 			}
 
 			let x = 0, y = 0;
-			let i = Timeline.search2(frames, time, 3/*ENTRIES*/);
+			let i = Timeline.search(frames, time, 3/*ENTRIES*/);
 			let curveType = this.curves[i / 3/*ENTRIES*/];
 			switch (curveType) {
 			case 0/*LINEAR*/:
@@ -459,9 +461,7 @@ module spine {
 		boneIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
-			super(frameCount, bezierCount, [
-				Property.x + "|" + boneIndex
-			]);
+			super(frameCount, bezierCount, Property.x + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 
@@ -501,9 +501,7 @@ module spine {
 		boneIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
-			super(frameCount, bezierCount, [
-				Property.y + "|" + boneIndex
-			]);
+			super(frameCount, bezierCount, Property.y + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 
@@ -543,10 +541,10 @@ module spine {
 		boneIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
-			super(frameCount, bezierCount, [
+			super(frameCount, bezierCount,
 				Property.scaleX + "|" + boneIndex,
 				Property.scaleY + "|" + boneIndex
-			]);
+			);
 			this.boneIndex = boneIndex;
 		}
 
@@ -569,7 +567,7 @@ module spine {
 			}
 
 			let x = 0, y = 0;
-			let i = Timeline.search2(frames, time, 3/*ENTRIES*/);
+			let i = Timeline.search(frames, time, 3/*ENTRIES*/);
 			let curveType = this.curves[i / 3/*ENTRIES*/];
 			switch (curveType) {
 			case 0/*LINEAR*/:
@@ -653,9 +651,7 @@ module spine {
 		boneIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
-			super(frameCount, bezierCount, [
-				Property.scaleX + "|" + boneIndex
-			]);
+			super(frameCount, bezierCount, Property.scaleX + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 
@@ -724,9 +720,7 @@ module spine {
 		boneIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
-			super(frameCount, bezierCount, [
-				Property.scaleY + "|" + boneIndex
-			]);
+			super(frameCount, bezierCount, Property.scaleY + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 
@@ -795,10 +789,10 @@ module spine {
 		boneIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
-			super(frameCount, bezierCount, [
+			super(frameCount, bezierCount,
 				Property.shearX + "|" + boneIndex,
 				Property.shearY + "|" + boneIndex
-			]);
+			);
 			this.boneIndex = boneIndex;
 		}
 
@@ -821,7 +815,7 @@ module spine {
 			}
 
 			let x = 0, y = 0;
-			let i = Timeline.search2(frames, time, 3/*ENTRIES*/);
+			let i = Timeline.search(frames, time, 3/*ENTRIES*/);
 			let curveType = this.curves[i / 3/*ENTRIES*/];
 			switch (curveType) {
 			case 0/*LINEAR*/:
@@ -863,9 +857,7 @@ module spine {
 		boneIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
-			super(frameCount, bezierCount, [
-				Property.shearX + "|" + boneIndex
-			]);
+			super(frameCount, bezierCount, Property.shearX + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 
@@ -905,9 +897,7 @@ module spine {
 		boneIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, boneIndex: number) {
-			super(frameCount, bezierCount, [
-				Property.shearY + "|" + boneIndex
-			]);
+			super(frameCount, bezierCount, Property.shearY + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 
@@ -978,7 +968,7 @@ module spine {
 				let setup = slot.data.color;
 				switch (blend) {
 				case MixBlend.setup:
-					color.setFromColor(slot.data.color);
+					color.setFromColor(setup);
 					return;
 				case MixBlend.first:
 					color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
@@ -988,7 +978,7 @@ module spine {
 			}
 
 			let r = 0, g = 0, b = 0, a = 0;
-			let i = Timeline.search2(frames, time, 5/*ENTRIES*/);
+			let i = Timeline.search(frames, time, 5/*ENTRIES*/);
 			let curveType = this.curves[i / 5/*ENTRIES*/];
 			switch (curveType) {
 			case 0/*LINEAR*/:
@@ -1071,7 +1061,7 @@ module spine {
 			}
 
 			let r = 0, g = 0, b = 0;
-			let i = Timeline.search2(frames, time, 4/*ENTRIES*/);
+			let i = Timeline.search(frames, time, 4/*ENTRIES*/);
 			let curveType = this.curves[i >> 2];
 			switch (curveType) {
 			case 0/*LINEAR*/:
@@ -1117,9 +1107,7 @@ module spine {
 		slotIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, slotIndex: number) {
-			super(frameCount, bezierCount, [
-				Property.alpha + "|" + slotIndex
-			]);
+			super(frameCount, bezierCount, Property.alpha + "|" + slotIndex);
 			this.slotIndex = slotIndex;
 		}
 
@@ -1206,7 +1194,7 @@ module spine {
 			}
 
 			let r = 0, g = 0, b = 0, a = 0, r2 = 0, g2 = 0, b2 = 0;
-			let i = Timeline.search2(frames, time, 8/*ENTRIES*/);
+			let i = Timeline.search(frames, time, 8/*ENTRIES*/);
 			let curveType = this.curves[i >> 3];
 			switch (curveType) {
 			case 0/*LINEAR*/:
@@ -1254,7 +1242,10 @@ module spine {
 			} else {
 				if (blend == MixBlend.setup) {
 					light.setFromColor(slot.data.color);
-					dark.setFromColor(slot.data.darkColor);
+					let setupDark = slot.data.darkColor;
+					dark.r = setupDark.r;
+					dark.g = setupDark.g;
+					dark.b = setupDark.b;
 				}
 				light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
 				dark.r += (r2 - dark.r) * alpha;
@@ -1321,7 +1312,7 @@ module spine {
 			}
 
 			let r = 0, g = 0, b = 0, a = 0, r2 = 0, g2 = 0, b2 = 0;
-			let i = Timeline.search2(frames, time, 7/*ENTRIES*/);
+			let i = Timeline.search(frames, time, 7/*ENTRIES*/);
 			let curveType = this.curves[i / 7/*ENTRIES*/];
 			switch (curveType) {
 			case 0/*LINEAR*/:
@@ -1423,7 +1414,7 @@ module spine {
 				return;
 			}
 
-			this.setAttachment(skeleton, slot, this.attachmentNames[Timeline.search(this.frames, time)]);
+			this.setAttachment(skeleton, slot, this.attachmentNames[Timeline.search1(this.frames, time)]);
 		}
 
 		setAttachment(skeleton: Skeleton, slot: Slot, attachmentName: string) {
@@ -1610,7 +1601,7 @@ module spine {
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			let frame = Timeline.search(frames, time);
+			let frame = Timeline.search1(frames, time);
 			let percent = this.getCurvePercent(time, frame);
 			let prevVertices = vertices[frame];
 			let nextVertices = vertices[frame + 1];
@@ -1727,7 +1718,7 @@ module spine {
 			if (lastTime < frames[0])
 				i = 0;
 			else {
-				i = Timeline.search(frames, lastTime) + 1;
+				i = Timeline.search1(frames, lastTime) + 1;
 				let frameTime = frames[i];
 				while (i > 0) { // Fire multiple events with the same frame.
 					if (frames[i - 1] != frameTime) break;
@@ -1774,7 +1765,7 @@ module spine {
 				return;
 			}
 
-			let drawOrderToSetupIndex = this.drawOrders[Timeline.search(this.frames, time)];
+			let drawOrderToSetupIndex = this.drawOrders[Timeline.search1(this.frames, time)];
 			if (!drawOrderToSetupIndex)
 				Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
 			else {
@@ -1839,7 +1830,7 @@ module spine {
 			}
 
 			let mix = 0, softness = 0;
-			let i = Timeline.search2(frames, time, 6/*ENTRIES*/)
+			let i = Timeline.search(frames, time, 6/*ENTRIES*/)
 			let curveType = this.curves[i / 6/*ENTRIES*/];
 			switch (curveType) {
 			case 0/*LINEAR*/:
@@ -1943,7 +1934,7 @@ module spine {
 			}
 
 			let rotate, x, y, scaleX, scaleY, shearY;
-			let i = Timeline.search2(frames, time, 7/*ENTRIES*/);
+			let i = Timeline.search(frames, time, 7/*ENTRIES*/);
 			let curveType = this.curves[i / 7/*ENTRIES*/];
 			switch (curveType) {
 			case 0/*LINEAR*/:
@@ -2004,9 +1995,7 @@ module spine {
 		pathConstraintIndex: number;
 
 		constructor (frameCount: number, bezierCount: number, pathConstraintIndex: number) {
-			super(frameCount, bezierCount, [
-				Property.pathConstraintPosition + "|" + pathConstraintIndex
-			]);
+			super(frameCount, bezierCount, Property.pathConstraintPosition + "|" + pathConstraintIndex);
 			this.pathConstraintIndex = pathConstraintIndex;
 		}
 
@@ -2041,9 +2030,7 @@ module spine {
 		pathConstraintIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, pathConstraintIndex: number) {
-			super(frameCount, bezierCount, [
-				Property.pathConstraintSpacing + "|" + pathConstraintIndex
-			]);
+			super(frameCount, bezierCount, Property.pathConstraintSpacing + "|" + pathConstraintIndex);
 			this.pathConstraintIndex = pathConstraintIndex;
 		}
 
@@ -2119,7 +2106,7 @@ module spine {
 			}
 
 			let rotate, x, y;
-			let i = Timeline.search2(frames, time, 4/*ENTRIES*/);
+			let i = Timeline.search(frames, time, 4/*ENTRIES*/);
 			let curveType = this.curves[i >> 2];
 			switch (curveType) {
 			case 0/*LINEAR*/:

@@ -37,9 +37,7 @@ package spine.animation {
 		private var boneIndex : int;
 
 		public function ScaleXTimeline(frameCount : int, bezierCount : int, boneIndex : int) {
-			super(frameCount, bezierCount, [
-				Property.scaleX + "|" + boneIndex
-			]);
+			super(frameCount, bezierCount, Property.scaleX + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 

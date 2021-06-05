@@ -222,7 +222,7 @@ package spine.animation {
 			}
 
 			// Interpolate between the previous frame and the current frame.
-			var frame : int = search(frames, time);
+			var frame : int = search1(frames, time);
 			var percent : Number = getCurvePercent(time, frame);
 			var prevVertices : Vector.<Number> = vertices[frame], prev : Number;
 			var nextVertices : Vector.<Number> = vertices[frame + 1];

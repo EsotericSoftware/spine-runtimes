@@ -336,7 +336,7 @@ module spine {
 				if (blend == MixBlend.setup || blend == MixBlend.first)
 					this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
 			} else
-				this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search(frames, time)], attachments);
+				this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search1(frames, time)], attachments);
 
 			// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
 			if (slot.attachmentState <= this.unkeyedState) slot.attachmentState = this.unkeyedState + SETUP;

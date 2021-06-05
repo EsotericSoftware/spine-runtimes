@@ -36,10 +36,10 @@ package spine.animation {
 		private var boneIndex : int;
 
 		public function ShearTimeline(frameCount : int, bezierCount : int, boneIndex : int) {
-			super(frameCount, bezierCount, [
+			super(frameCount, bezierCount,
 				Property.shearX + "|" + boneIndex,
 				Property.shearY + "|" + boneIndex
-			]);
+			);
 			this.boneIndex = boneIndex;
 		}
 
@@ -66,7 +66,7 @@ package spine.animation {
 			}
 
 			var x : Number = 0, y : Number = 0;
-			var i : int = search2(frames, time, ENTRIES);
+			var i : int = search(frames, time, ENTRIES);
 			var curveType : Number = curves[i / ENTRIES];
 			switch (curveType) {
 			case LINEAR:

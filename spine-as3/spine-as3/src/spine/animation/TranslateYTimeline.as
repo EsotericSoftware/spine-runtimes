@@ -36,9 +36,7 @@ package spine.animation {
 		private var boneIndex : int;
 
 		public function TranslateYTimeline(frameCount : int, bezierCount : int, boneIndex : int) {
-			super(frameCount, bezierCount, [
-				Property.y + "|" + boneIndex
-			]);
+			super(frameCount, bezierCount, Property.y + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 

@@ -74,7 +74,7 @@ package spine.animation {
 				return;
 			}
 
-			setAttachment(skeleton, slot, attachmentNames[search(frames, time)]);
+			setAttachment(skeleton, slot, attachmentNames[search1(frames, time)]);
 		}
 
 		private function setAttachment(skeleton : Skeleton, slot : Slot, attachmentName : String) : void {

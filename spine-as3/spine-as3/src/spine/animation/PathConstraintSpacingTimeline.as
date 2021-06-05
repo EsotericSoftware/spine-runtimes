@@ -37,9 +37,7 @@ package spine.animation {
 		public var pathConstraintIndex : int;
 
 		public function PathConstraintSpacingTimeline (frameCount : int, bezierCount : int, pathConstraintIndex : int) {
-			super(frameCount, bezierCount, [
-				Property.pathConstraintSpacing + "|" + pathConstraintIndex
-			]);
+			super(frameCount, bezierCount, Property.pathConstraintSpacing + "|" + pathConstraintIndex);
 			this.pathConstraintIndex = pathConstraintIndex;
 		}
 

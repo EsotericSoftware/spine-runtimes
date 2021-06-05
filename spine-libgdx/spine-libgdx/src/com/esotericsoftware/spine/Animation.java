@@ -376,9 +376,9 @@ public class Animation {
 		static final int VALUE = 1;
 
 		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
-		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
-		public CurveTimeline1 (int frameCount, int bezierCount, String... propertyIds) {
-			super(frameCount, bezierCount, propertyIds);
+		 * @param propertyId Unique identifier for the property the timeline modifies. */
+		public CurveTimeline1 (int frameCount, int bezierCount, String propertyId) {
+			super(frameCount, bezierCount, propertyId);
 		}
 
 		public int getFrameEntries () {
@@ -423,9 +423,10 @@ public class Animation {
 		static final int VALUE1 = 1, VALUE2 = 2;
 
 		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
-		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
-		public CurveTimeline2 (int frameCount, int bezierCount, String... propertyIds) {
-			super(frameCount, bezierCount, propertyIds);
+		 * @param propertyId1 Unique identifier for the first property the timeline modifies.
+		 * @param propertyId2 Unique identifier for the second property the timeline modifies. */
+		public CurveTimeline2 (int frameCount, int bezierCount, String propertyId1, String propertyId2) {
+			super(frameCount, bezierCount, propertyId1, propertyId2);
 		}
 
 		public int getFrameEntries () {
@@ -1428,7 +1429,10 @@ public class Animation {
 			} else {
 				if (blend == setup) {
 					light.set(slot.data.color);
-					dark.set(slot.data.darkColor);
+					Color setupDark = slot.data.darkColor;
+					dark.r = setupDark.r;
+					dark.g = setupDark.g;
+					dark.b = setupDark.b;
 				}
 				light.add((r - light.r) * alpha, (g - light.g) * alpha, (b - light.b) * alpha, (a - light.a) * alpha);
 				dark.r += (r2 - dark.r) * alpha;

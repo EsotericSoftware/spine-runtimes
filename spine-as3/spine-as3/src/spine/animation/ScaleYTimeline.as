@@ -37,9 +37,7 @@ package spine.animation {
 		private var boneIndex : int;
 
 		public function ScaleYTimeline(frameCount : int, bezierCount : int, boneIndex : int) {
-			super(frameCount, bezierCount, [
-				Property.scaleY + "|" + boneIndex
-			]);
+			super(frameCount, bezierCount, Property.scaleY + "|" + boneIndex);
 			this.boneIndex = boneIndex;
 		}
 

@@ -75,7 +75,7 @@ package spine.animation {
 				return;
 			}
 
-			var drawOrderToSetupIndex : Vector.<int> = drawOrders[search(frames, time)];
+			var drawOrderToSetupIndex : Vector.<int> = drawOrders[search1(frames, time)];
 			if (drawOrderToSetupIndex == null) {
 				for (i = 0; i < n; i++)
 					drawOrder[i] = slots[i];

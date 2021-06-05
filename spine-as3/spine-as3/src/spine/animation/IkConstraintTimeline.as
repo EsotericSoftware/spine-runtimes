@@ -86,7 +86,7 @@ package spine.animation {
 			}
 
 			var mix : Number = 0, softness : Number = 0;
-			var i : int = search2(frames, time, ENTRIES)
+			var i : int = search(frames, time, ENTRIES)
 			var curveType : Number = curves[i / ENTRIES];
 			switch (curveType) {
 			case LINEAR:

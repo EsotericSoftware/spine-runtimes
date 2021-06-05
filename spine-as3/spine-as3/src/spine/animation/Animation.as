@@ -40,15 +40,19 @@ package spine.animation {
 
 		public function Animation(name : String, timelines : Vector.<Timeline>, duration : Number) {
 			if (name == null) throw new ArgumentError("name cannot be null.");
-			if (timelines == null) throw new ArgumentError("timelines cannot be null.");
 			_name = name;
+			setTimelines(timelines);
+			this.duration = duration;
+		}
+
+		public function setTimelines(timelines : Vector.<Timeline>) : void {
+			if (timelines == null) throw new ArgumentError("timelines cannot be null.");
 			_timelines = timelines;
 			for (var i : int = 0, n : int = timelines.length; i < n; i++) {
 				var ids : Vector.<String> = timelines[i].propertyIds;
 				for (var ii : int = 0, nn : int = ids.length; ii < nn; ii++)
 					_timelineIds[ids[ii]] = true;
 			}
-			this.duration = duration;
 		}
 
 		public function hasTimeline(ids : Vector.<String>) : Boolean {

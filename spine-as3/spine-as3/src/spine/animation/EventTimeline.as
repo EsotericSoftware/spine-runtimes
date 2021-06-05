@@ -69,7 +69,7 @@ package spine.animation {
 			if (lastTime < frames[0])
 				i = 0;
 			else {
-				i = search(frames, lastTime) + 1;
+				i = search1(frames, lastTime) + 1;
 				var frameTime : Number = frames[i];
 				while (i > 0) { // Fire multiple events with the same frame.
 					if (frames[i - 1] != frameTime) break;

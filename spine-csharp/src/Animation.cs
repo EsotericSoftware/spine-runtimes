@@ -395,8 +395,8 @@ namespace Spine {
 
 		/// <param name="bezierCount">The maximum number of Bezier curves. See <see cref="Shrink(int)"/>.</param>
 		/// <param name="propertyIds">Unique identifiers for the properties the timeline modifies.</param>
-		public CurveTimeline1 (int frameCount, int bezierCount, params string[] propertyIds)
-			: base(frameCount, bezierCount, propertyIds) {
+		public CurveTimeline1 (int frameCount, int bezierCount, string propertyId)
+			: base(frameCount, bezierCount, propertyId) {
 		}
 
 		public override int FrameEntries {
@@ -442,8 +442,8 @@ namespace Spine {
 
 		/// <param name="bezierCount">The maximum number of Bezier curves. See <see cref="Shrink(int)"/>.</param>
 		/// <param name="propertyIds">Unique identifiers for the properties the timeline modifies.</param>
-		public CurveTimeline2 (int frameCount, int bezierCount, params string[] propertyIds)
-			:base (frameCount, bezierCount, propertyIds) {
+		public CurveTimeline2 (int frameCount, int bezierCount, string propertyId1, string propertyId2)
+			:base (frameCount, bezierCount, propertyId1, propertyId2) {
 		}
 
 		public override int FrameEntries {
@@ -1230,7 +1230,6 @@ namespace Spine {
 				slot.g = g;
 				slot.b = b;
 				slot.a = a;
-				slot.ClampColor();
 			} else {
 				float br, bg, bb, ba;
 				if (blend == MixBlend.Setup) {
@@ -1244,12 +1243,12 @@ namespace Spine {
 					bb = slot.b;
 					ba = slot.a;
 				}
-				slot.r = br + ((r - br) * alpha);
-				slot.g = bg + ((g - bg) * alpha);
-				slot.b = bb + ((b - bb) * alpha);
-				slot.a = ba + ((a - ba) * alpha);
-				slot.ClampColor();
+				slot.r = br + (r - br) * alpha;
+				slot.g = bg + (g - bg) * alpha;
+				slot.b = bb + (b - bb) * alpha;
+				slot.a = ba + (a - ba) * alpha;
 			}
+			slot.ClampColor();
 		}
 	}
 
@@ -1340,7 +1339,6 @@ namespace Spine {
 				slot.r = r;
 				slot.g = g;
 				slot.b = b;
-				slot.ClampColor();
 			} else {
 				float br, bg, bb;
 				if (blend == MixBlend.Setup) {
@@ -1353,11 +1351,11 @@ namespace Spine {
 					bg = slot.g;
 					bb = slot.b;
 				}
-				slot.r = br + ((r - br) * alpha);
-				slot.g = bg + ((g - bg) * alpha);
-				slot.b = bb + ((b - bb) * alpha);
-				slot.ClampColor();
+				slot.r = br + (r - br) * alpha;
+				slot.g = bg + (g - bg) * alpha;
+				slot.b = bb + (b - bb) * alpha;
 			}
+			slot.ClampColor();
 		}
 	}
 
@@ -1459,28 +1457,28 @@ namespace Spine {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				var slotData = slot.data;
+				SlotData setup = slot.data;
 				switch (blend) {
 				case MixBlend.Setup:
-					slot.r = slotData.r;
-					slot.g = slotData.g;
-					slot.b = slotData.b;
-					slot.a = slotData.a;
+					slot.r = setup.r;
+					slot.g = setup.g;
+					slot.b = setup.b;
+					slot.a = setup.a;
 					slot.ClampColor();
-					slot.r2 = slotData.r2;
-					slot.g2 = slotData.g2;
-					slot.b2 = slotData.b2;
+					slot.r2 = setup.r2;
+					slot.g2 = setup.g2;
+					slot.b2 = setup.b2;
 					slot.ClampSecondColor();
 					return;
 				case MixBlend.First:
-					slot.r += (slot.r - slotData.r) * alpha;
-					slot.g += (slot.g - slotData.g) * alpha;
-					slot.b += (slot.b - slotData.b) * alpha;
-					slot.a += (slot.a - slotData.a) * alpha;
+					slot.r += (slot.r - setup.r) * alpha;
+					slot.g += (slot.g - setup.g) * alpha;
+					slot.b += (slot.b - setup.b) * alpha;
+					slot.a += (slot.a - setup.a) * alpha;
 					slot.ClampColor();
-					slot.r2 += (slot.r2 - slotData.r2) * alpha;
-					slot.g2 += (slot.g2 - slotData.g2) * alpha;
-					slot.b2 += (slot.b2 - slotData.b2) * alpha;
+					slot.r2 += (slot.r2 - setup.r2) * alpha;
+					slot.g2 += (slot.g2 - setup.g2) * alpha;
+					slot.b2 += (slot.b2 - setup.b2) * alpha;
 					slot.ClampSecondColor();
 					return;
 				}
@@ -1533,11 +1531,9 @@ namespace Spine {
 				slot.g = g;
 				slot.b = b;
 				slot.a = a;
-				slot.ClampColor();
 				slot.r2 = r2;
 				slot.g2 = g2;
 				slot.b2 = b2;
-				slot.ClampSecondColor();
 			} else {
 				float br, bg, bb, ba, br2, bg2, bb2;
 				if (blend == MixBlend.Setup) {
@@ -1557,16 +1553,16 @@ namespace Spine {
 					bg2 = slot.g2;
 					bb2 = slot.b2;
 				}
-				slot.r = br + ((r - br) * alpha);
-				slot.g = bg + ((g - bg) * alpha);
-				slot.b = bb + ((b - bb) * alpha);
-				slot.a = ba + ((a - ba) * alpha);
-				slot.ClampColor();
-				slot.r2 = br2 + ((r2 - br2) * alpha);
-				slot.g2 = bg2 + ((g2 - bg2) * alpha);
-				slot.b2 = bb2 + ((b2 - bb2) * alpha);
-				slot.ClampSecondColor();
+				slot.r = br + (r - br) * alpha;
+				slot.g = bg + (g - bg) * alpha;
+				slot.b = bb + (b - bb) * alpha;
+				slot.a = ba + (a - ba) * alpha;
+				slot.r2 = br2 + (r2 - br2) * alpha;
+				slot.g2 = bg2 + (g2 - bg2) * alpha;
+				slot.b2 = bb2 + (b2 - bb2) * alpha;
 			}
+			slot.ClampColor();
+			slot.ClampSecondColor();
 		}
 	}
 
@@ -1620,28 +1616,26 @@ namespace Spine {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				var slotData = slot.data;
+				SlotData setup = slot.data;
 				switch (blend) {
 				case MixBlend.Setup:
-					//	slot.color.set(slot.data.color);
-					//	slot.darkColor.set(slot.data.darkColor);
-					slot.r = slotData.r;
-					slot.g = slotData.g;
-					slot.b = slotData.b;
+					slot.r = setup.r;
+					slot.g = setup.g;
+					slot.b = setup.b;
 					slot.ClampColor();
-					slot.r2 = slotData.r2;
-					slot.g2 = slotData.g2;
-					slot.b2 = slotData.b2;
+					slot.r2 = setup.r2;
+					slot.g2 = setup.g2;
+					slot.b2 = setup.b2;
 					slot.ClampSecondColor();
 					return;
 				case MixBlend.First:
-					slot.r += (slot.r - slotData.r) * alpha;
-					slot.g += (slot.g - slotData.g) * alpha;
-					slot.b += (slot.b - slotData.b) * alpha;
+					slot.r += (slot.r - setup.r) * alpha;
+					slot.g += (slot.g - setup.g) * alpha;
+					slot.b += (slot.b - setup.b) * alpha;
 					slot.ClampColor();
-					slot.r2 += (slot.r2 - slotData.r2) * alpha;
-					slot.g2 += (slot.g2 - slotData.g2) * alpha;
-					slot.b2 += (slot.b2 - slotData.b2) * alpha;
+					slot.r2 += (slot.r2 - setup.r2) * alpha;
+					slot.g2 += (slot.g2 - setup.g2) * alpha;
+					slot.b2 += (slot.b2 - setup.b2) * alpha;
 					slot.ClampSecondColor();
 					return;
 				}
@@ -1689,20 +1683,19 @@ namespace Spine {
 				slot.r = r;
 				slot.g = g;
 				slot.b = b;
-				slot.ClampColor();
 				slot.r2 = r2;
 				slot.g2 = g2;
 				slot.b2 = b2;
-				slot.ClampSecondColor();
 			} else {
 				float br, bg, bb, br2, bg2, bb2;
 				if (blend == MixBlend.Setup) {
-					br = slot.data.r;
-					bg = slot.data.g;
-					bb = slot.data.b;
-					br2 = slot.data.r2;
-					bg2 = slot.data.g2;
-					bb2 = slot.data.b2;
+					SlotData setup = slot.data;
+					br = setup.r;
+					bg = setup.g;
+					bb = setup.b;
+					br2 = setup.r2;
+					bg2 = setup.g2;
+					bb2 = setup.b2;
 				} else {
 					br = slot.r;
 					bg = slot.g;
@@ -1711,15 +1704,15 @@ namespace Spine {
 					bg2 = slot.g2;
 					bb2 = slot.b2;
 				}
-				slot.r = br + ((r - br) * alpha);
-				slot.g = bg + ((g - bg) * alpha);
-				slot.b = bb + ((b - bb) * alpha);
-				slot.ClampColor();
-				slot.r2 = br2 + ((r2 - br2) * alpha);
-				slot.g2 = bg2 + ((g2 - bg2) * alpha);
-				slot.b2 = bb2 + ((b2 - bb2) * alpha);
-				slot.ClampSecondColor();
+				slot.r = br + (r - br) * alpha;
+				slot.g = bg + (g - bg) * alpha;
+				slot.b = bb + (b - bb) * alpha;
+				slot.r2 = br2 + (r2 - br2) * alpha;
+				slot.g2 = bg2 + (g2 - bg2) * alpha;
+				slot.b2 = bb2 + (b2 - bb2) * alpha;
 			}
+			slot.ClampColor();
+			slot.ClampSecondColor();
 		}
 	}
 
