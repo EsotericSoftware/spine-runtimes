@@ -88,7 +88,7 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 
 		local colon = line:find(":")
 		if not colon then return 0 end
-		entry[0] = trim(line:sub(1, colon))
+		entry[0] = trim(line:sub(1, colon - 1))
 		local lastMatch = colon + 1
 		local i = 1
 		while true do
@@ -97,7 +97,7 @@ function TextureAtlas:parse (atlasContent, imageLoader)
 				entry[i] = trim(line:sub(lastMatch))
 				return i
 			end
-			entry[i] = trim(line:sub(lastMatch, comma - lastMatch))
+			entry[i] = trim(line:sub(lastMatch, comma - 1))
 			lastMatch = comma + 1
 			if i == 4 then return 4 end
 			i = i + 1

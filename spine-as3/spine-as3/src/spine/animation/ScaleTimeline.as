@@ -66,7 +66,7 @@ package spine.animation {
 				return;
 			}
 
-			var x : Number = 0, y : Number = 0;
+			var x : Number, y : Number;
 			var i : int = search(frames, time, ENTRIES);
 			var curveType : Number = curves[i / ENTRIES];
 			switch (curveType) {

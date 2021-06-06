@@ -566,7 +566,7 @@ module spine {
 				return;
 			}
 
-			let x = 0, y = 0;
+			let x, y;
 			let i = Timeline.search(frames, time, 3/*ENTRIES*/);
 			let curveType = this.curves[i / 3/*ENTRIES*/];
 			switch (curveType) {

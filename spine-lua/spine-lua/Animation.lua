@@ -262,6 +262,7 @@ function Animation.CurveTimeline.new (timelineType, frameEntries, frameCount, be
 			return y + (time - x) / (curves[i] - x) * (curves[i + 1] - y)
 		end
 		local n = i + BEZIER_SIZE
+		i = i + 2
 		while i < n do
 			if curves[i] >= time then
 				local x = curves[i - 2]
@@ -365,9 +366,10 @@ function Animation.RotateTimeline.new (frameCount, bezierCount, boneIndex)
 		local r = self:getCurveValue(time)
 		if blend == MixBlend.setup then
 			bone.rotation = bone.data.rotation + r * alpha
-		elseif blend == MixBlend.first or blend == MixBlend.replace then
-			r = r + bone.data.rotation - bone.rotation
-		elseif blend == MixBlend.add then
+		else
+			if blend == MixBlend.first or blend == MixBlend.replace then
+				r = r + bone.data.rotation - bone.rotation
+			end
 			bone.rotation = bone.rotation + r * alpha
 		end
 	end
@@ -529,8 +531,8 @@ function Animation.ScaleTimeline.new (frameCount, bezierCount, boneIndex)
 			return
 		end
 
-		local x = 0
-		local y = 0
+		local x
+		local y
 		local i = search(frames, time, ENTRIES)
 		local curveType = self.curves[math_floor(i / ENTRIES)]
 		if curveType == LINEAR then

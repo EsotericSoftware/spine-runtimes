@@ -61,20 +61,16 @@ function SkeletonJson.new (attachmentLoader)
 		linkedMeshes = {}
 	}
 
-	function self:readSkeletonDataFile (fileName, base)
-		return self:readSkeletonData(utils.readFile(fileName, base))
-	end
-
 	local readAttachment
 	local readAnimation
 	local readCurve
 	local readTimeline1
 	local readTimeline2
 	local getArray
+	local getValue
 
-	local getValue = function (map, name, default)
-		local value = map[name]
-		if value == nil then return default else return value end
+	function self:readSkeletonDataFile (fileName, base)
+		return self:readSkeletonData(utils.readFile(fileName, base))
 	end
 
 	function self:readSkeletonData (jsonText)
@@ -981,6 +977,7 @@ function SkeletonJson.new (attachmentLoader)
 							local time = getValue(keyMap, "time", 0)
 							local bezier = 0
 							for i,keyMap in ipairs(timelineMap) do
+								local frame = i - 1
 								local deform = nil
 								local verticesValue = getValue(keyMap, "vertices", nil)
 								if verticesValue == nil then
@@ -1007,7 +1004,6 @@ function SkeletonJson.new (attachmentLoader)
 										end
 									end
 								end
-								local frame = i - 1
 								timeline:setFrame(frame, time, deform)
 								local nextMap = timelineMap[frame + 1]
 								if not nextMap then
@@ -1198,6 +1194,11 @@ function SkeletonJson.new (attachmentLoader)
 			end
 		end
 		return values
+	end
+
+	getValue = function (map, name, default)
+		local value = map[name]
+		if value == nil then return default else return value end
 	end
 
 	return self
