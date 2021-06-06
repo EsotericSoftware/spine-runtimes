@@ -67,7 +67,7 @@ package spine.animation {
 		/** If this track entry is non-looping, the track time in seconds when {@link #getAnimationEnd()} is reached, or the current
 		 * {@link #getTrackTime()} if it has already been reached. If this track entry is looping, the track time when this
 		 * animation will reach its next {@link #getAnimationEnd()} (the next loop completion). */
-		public function getTrackComplete () : Number {
+		public function getTrackComplete() : Number {
 			var duration : Number = animationEnd - animationStart;
 			if (duration != 0) {
 				if (loop) return duration * (1 + int(trackTime / duration)); // Completion of next loop.

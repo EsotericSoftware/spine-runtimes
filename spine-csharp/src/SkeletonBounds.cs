@@ -125,7 +125,6 @@ namespace Spine {
 			this.maxY = maxY;
 		}
 
-
 		/// <summary>Returns true if the axis aligned bounding box contains the point.</summary>
 		public bool AabbContainsPoint (float x, float y) {
 			return x >= minX && x <= maxX && y >= minY && y <= maxY;

@@ -381,12 +381,11 @@ public class AnimationState {
 		Slot slot = skeleton.slots.get(timeline.slotIndex);
 		if (!slot.bone.active) return;
 
-		float[] frames = timeline.frames;
-		if (time < frames[0]) { // Time is before first frame.
+		if (time < timeline.frames[0]) { // Time is before first frame.
 			if (blend == MixBlend.setup || blend == MixBlend.first)
 				setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
 		} else
-			setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search(frames, time)], attachments);
+			setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search(timeline.frames, time)], attachments);
 
 		// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
 		if (slot.attachmentState <= unkeyedState) slot.attachmentState = unkeyedState + SETUP;
@@ -675,7 +674,7 @@ public class AnimationState {
 		TrackEntry entry = addAnimation(trackIndex, emptyAnimation, false, delay <= 0 ? 1 : delay);
 		entry.mixDuration = mixDuration;
 		entry.trackEnd = mixDuration;
-		if (delay <= 0 && entry.previous != null) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration;
+		if (delay <= 0 && entry.previous != null) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration + delay;
 		return entry;
 	}
 

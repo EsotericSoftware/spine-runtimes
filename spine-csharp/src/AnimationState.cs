@@ -366,7 +366,6 @@ namespace Spine {
 				if (mix < from.eventThreshold) events = this.events;
 			}
 
-
 			if (blend == MixBlend.Add) {
 				for (int i = 0; i < timelineCount; i++)
 					timelines[i].Apply(skeleton, animationLast, applyTime, events, alphaMix, blend, MixDirection.Out);
@@ -661,7 +660,6 @@ namespace Spine {
 			queue.Start(current); // triggers AnimationsChanged
 		}
 
-
 		/// <summary>Sets an animation by name. <seealso cref="SetAnimation(int, Animation, bool)" /></summary>
 		public TrackEntry SetAnimation (int trackIndex, string animationName, bool loop) {
 			Animation animation = data.skeletonData.FindAnimation(animationName);
@@ -780,7 +778,7 @@ namespace Spine {
 			TrackEntry entry = AddAnimation(trackIndex, AnimationState.EmptyAnimation, false, delay <= 0 ? 1 : delay);
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
-			if (delay <= 0 && entry.previous != null) entry.delay = entry.previous.TrackComplete - entry.mixDuration;
+			if (delay <= 0 && entry.previous != null) entry.delay = entry.previous.TrackComplete - entry.mixDuration + delay;
 			return entry;
 		}
 
@@ -859,15 +857,12 @@ namespace Spine {
 				if (entry == null) continue;
 				while (entry.mixingFrom != null) // Move to last entry, then iterate in reverse.
 					entry = entry.mixingFrom;
-
 				do {
 					if (entry.mixingTo == null || entry.mixBlend != MixBlend.Add) ComputeHold(entry);
 					entry = entry.mixingTo;
 				} while (entry != null);
 			}
 		}
-
-
 
 		private void ComputeHold (TrackEntry entry) {
 			TrackEntry to = entry.mixingTo;

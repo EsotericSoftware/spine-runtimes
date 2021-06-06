@@ -325,7 +325,6 @@ namespace Spine {
 			return skeletonData;
 		}
 
-
 		/// <returns>May be null.</returns>
 		private Skin ReadSkin (SkeletonInput input, SkeletonData skeletonData, bool defaultSkin, bool nonessential) {
 

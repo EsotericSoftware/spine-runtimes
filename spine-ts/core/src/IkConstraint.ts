@@ -123,7 +123,8 @@ module spine {
 			if (bone.ascaleX < 0) rotationIK += 180;
 			if (rotationIK > 180)
 				rotationIK -= 360;
-			else if (rotationIK < -180) rotationIK += 360;
+			else if (rotationIK < -180)
+				rotationIK += 360;
 			let sx = bone.ascaleX, sy = bone.ascaleY;
 			if (compress || stretch) {
 				switch (bone.data.transformMode) {
@@ -272,13 +273,15 @@ module spine {
 			a1 = (a1 - os) * MathUtils.radDeg + os1 - rotation;
 			if (a1 > 180)
 				a1 -= 360;
-			else if (a1 < -180) a1 += 360;
+			else if (a1 < -180) //
+				a1 += 360;
 			parent.updateWorldTransformWith(px, py, rotation + a1 * alpha, sx, parent.ascaleY, 0, 0);
 			rotation = child.arotation;
 			a2 = ((a2 + os) * MathUtils.radDeg - child.ashearX) * s2 + os2 - rotation;
 			if (a2 > 180)
 				a2 -= 360;
-			else if (a2 < -180) a2 += 360;
+			else if (a2 < -180) //
+				a2 += 360;
 			child.updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
 		}
 	}

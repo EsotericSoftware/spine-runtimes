@@ -180,8 +180,8 @@ module spine {
 					applyTime = current.animation.duration - applyTime;
 					applyEvents = null;
 				}
-				let timelineCount = current.animation.timelines.length;
 				let timelines = current.animation.timelines;
+				let timelineCount = timelines.length;
 				if ((i == 0 && mix == 1) || blend == MixBlend.add) {
 					for (let ii = 0; ii < timelineCount; ii++) {
 						// Fixes issue #302 on IOS9 where mix, blend sometimes became undefined and caused assets
@@ -253,8 +253,8 @@ module spine {
 			}
 
 			let attachments = mix < from.attachmentThreshold, drawOrder = mix < from.drawOrderThreshold;
-			let timelineCount = from.animation.timelines.length;
 			let timelines = from.animation.timelines;
+			let timelineCount = timelines.length;
 			let alphaHold = from.alpha * to.interruptAlpha, alphaMix = alphaHold * (1 - mix);
 			let animationLast = from.animationLast, animationTime = from.getAnimationTime(), applyTime = animationTime;
 			let events = null;
@@ -331,12 +331,11 @@ module spine {
 			var slot = skeleton.slots[timeline.slotIndex];
 			if (!slot.bone.active) return;
 
-			var frames = timeline.frames;
-			if (time < frames[0]) { // Time is before first frame.
+			if (time < timeline.frames[0]) { // Time is before first frame.
 				if (blend == MixBlend.setup || blend == MixBlend.first)
 					this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
 			} else
-				this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search1(frames, time)], attachments);
+				this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search1(timeline.frames, time)], attachments);
 
 			// If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
 			if (slot.attachmentState <= this.unkeyedState) slot.attachmentState = this.unkeyedState + SETUP;
@@ -347,7 +346,7 @@ module spine {
 			if (attachments) slot.attachmentState = this.unkeyedState + CURRENT;
 		}
 
-		applyRotateTimeline (timeline: Timeline, skeleton: Skeleton, time: number, alpha: number, blend: MixBlend,
+		applyRotateTimeline (timeline: RotateTimeline, skeleton: Skeleton, time: number, alpha: number, blend: MixBlend,
 			timelinesRotation: Array<number>, i: number, firstFrame: boolean) {
 
 			if (firstFrame) timelinesRotation[i] = 0;
@@ -357,10 +356,9 @@ module spine {
 				return;
 			}
 
-			let rotateTimeline = timeline as RotateTimeline;
-			let bone = skeleton.bones[rotateTimeline.boneIndex];
+			let bone = skeleton.bones[timeline.boneIndex];
 			if (!bone.active) return;
-			let frames = rotateTimeline.frames;
+			let frames = timeline.frames;
 			let r1 = 0, r2 = 0;
 			if (time < frames[0]) {
 				switch (blend) {
@@ -374,7 +372,7 @@ module spine {
 				}
 			} else {
 				r1 = blend == MixBlend.setup ? bone.data.rotation : bone.rotation;
-				r2 = bone.data.rotation + rotateTimeline.getCurveValue(time);
+				r2 = bone.data.rotation + timeline.getCurveValue(time);
 			}
 
 			// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
@@ -619,7 +617,7 @@ module spine {
 			let entry = this.addAnimationWith(trackIndex, AnimationState.emptyAnimation(), false, delay <= 0 ? 1 : delay);
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
-			if (delay <= 0 && entry.previous) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration;
+			if (delay <= 0 && entry.previous) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration + delay;
 			return entry;
 		}
 
@@ -688,17 +686,16 @@ module spine {
 			this.animationsChanged = false;
 
 			this.propertyIDs.clear();
-
-			for (let i = 0, n = this.tracks.length; i < n; i++) {
-				let entry = this.tracks[i];
+			let tracks = this.tracks;
+			for (let i = 0, n = tracks.length; i < n; i++) {
+				let entry = tracks[i];
 				if (!entry) continue;
 				while (entry.mixingFrom)
 					entry = entry.mixingFrom;
-
 				do {
-					if (!entry.mixingFrom || entry.mixBlend != MixBlend.add) this.computeHold(entry);
+					if (!entry.mixingTo || entry.mixBlend != MixBlend.add) this.computeHold(entry);
 					entry = entry.mixingTo;
-				} while (entry)
+				} while (entry);
 			}
 		}
 

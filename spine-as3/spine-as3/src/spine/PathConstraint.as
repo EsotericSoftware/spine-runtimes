@@ -79,8 +79,8 @@ package spine {
 			var data : PathConstraintData = this._data;
 			var tangents : Boolean = data.rotateMode == RotateMode.tangent, scale : Boolean = data.rotateMode == RotateMode.chainScale;
 
-			var boneCount : int = this._bones.length, spacesCount : int = tangents ? boneCount : boneCount + 1;
 			var bones : Vector.<Bone> = this._bones;
+			var boneCount : int = bones.length, spacesCount : int = tangents ? boneCount : boneCount + 1;
 			this._spaces.length = spacesCount;
 			var spaces : Vector.<Number> = this._spaces, lengths : Vector.<Number> = _lengths;
 			if (scale) lengths.length = boneCount;

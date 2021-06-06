@@ -93,8 +93,8 @@ module spine {
 			let data = this.data;
 			let tangents = data.rotateMode == RotateMode.Tangent, scale = data.rotateMode == RotateMode.ChainScale;
 
-			let boneCount = this.bones.length, spacesCount = tangents ? boneCount : boneCount + 1;
 			let bones = this.bones;
+			let boneCount = bones.length, spacesCount = tangents ? boneCount : boneCount + 1;
 			let spaces = Utils.setArraySize(this.spaces, spacesCount), lengths: Array<number> = scale ? this.lengths = Utils.setArraySize(this.lengths, boneCount) : null;
 			let spacing = this.spacing;
 
@@ -342,7 +342,7 @@ module spine {
 
 			if (this.data.positionMode == PositionMode.Percent) position *= pathLength;
 
-			let multiplier = 0;
+			let multiplier;
 			switch (this.data.spacingMode) {
 			case SpacingMode.Percent:
 				multiplier = pathLength;

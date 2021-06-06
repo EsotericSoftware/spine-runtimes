@@ -323,7 +323,6 @@ namespace Spine {
 			}
 		}
 
-
 		/// <summary>
 		/// Stores the segments for the specified Bezier curve. For timelines that modify multiple values, there may be more than
 		/// one curve per frame.</summary>

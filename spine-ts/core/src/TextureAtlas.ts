@@ -255,7 +255,6 @@ module spine {
 		x: number;
 		y: number;
 		index: number;
-		rotate: boolean;
 		degrees: number;
 		texture: Texture;
 		names: string[];

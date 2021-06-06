@@ -219,8 +219,6 @@ namespace Spine {
 			Array.Copy(Items, index, array, arrayIndex, count);
 		}
 
-
-
 		public bool Exists (Predicate<T> match) {
 			CheckMatch(match);
 			return GetIndex(0, Count, match) != -1;

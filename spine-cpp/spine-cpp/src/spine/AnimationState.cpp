@@ -596,8 +596,8 @@ TrackEntry *AnimationState::addEmptyAnimation(size_t trackIndex, float mixDurati
 	TrackEntry *entry = addAnimation(trackIndex, AnimationState::getEmptyAnimation(), false, delay <= 0 ? 1 : delay);
 	entry->_mixDuration = mixDuration;
 	entry->_trackEnd = mixDuration;
-    if (delay <= 0 && entry->_previous != NULL) entry->_delay = entry->_previous->getTrackComplete() - entry->_mixDuration;
-    return entry;
+	if (delay <= 0 && entry->_previous != NULL) entry->_delay = entry->_previous->getTrackComplete() - entry->_mixDuration + delay;
+	return entry;
 }
 
 void AnimationState::setEmptyAnimations(float mixDuration) {
@@ -699,7 +699,7 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 		}
 	} else {
 		r1 = blend == MixBlend_Setup ? bone->_data._rotation : bone->_rotation;
-        r2 = bone->_data._rotation + rotateTimeline->getCurveValue(time);
+		r2 = bone->_data._rotation + rotateTimeline->getCurveValue(time);
 	}
 
 	// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
@@ -732,7 +732,7 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 		timelinesRotation[i] = total;
 	}
 	timelinesRotation[i + 1] = diff;
-    bone->_rotation = r1 + total * alpha;
+	bone->_rotation = r1 + total * alpha;
 }
 
 bool AnimationState::updateMixingFrom(TrackEntry *to, float delta) {

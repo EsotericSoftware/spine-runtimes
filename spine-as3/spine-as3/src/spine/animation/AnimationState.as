@@ -180,8 +180,8 @@ package spine.animation {
 					applyTime = current.animation.duration - applyTime;
 					applyEvents = null;
 				}
-				var timelineCount : int = current.animation.timelines.length;
 				var timelines : Vector.<Timeline> = current.animation.timelines;
+				var timelineCount : int = timelines.length;
 				var ii : int = 0;
 				var timeline : Timeline;
 				if ((i == 0 && mix == 1) || blend == MixBlend.add) {
@@ -202,7 +202,7 @@ package spine.animation {
 						timeline = timelines[ii];
 						var timelineBlend : MixBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
 						if (timeline is RotateTimeline)
-							applyRotateTimeline(timeline, skeleton, applyTime, mix, timelineBlend, current.timelinesRotation, ii << 1, firstFrame);
+							applyRotateTimeline(RotateTimeline(timeline), skeleton, applyTime, mix, timelineBlend, current.timelinesRotation, ii << 1, firstFrame);
 						else if (timeline is AttachmentTimeline)
 							applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, applyTime, timelineBlend, true);
 						else
@@ -248,8 +248,8 @@ package spine.animation {
 			}
 
 			var attachments : Boolean = mix < from.attachmentThreshold, drawOrder : Boolean = mix < from.drawOrderThreshold;
-			var timelineCount : int = from.animation.timelines.length;
 			var timelines : Vector.<Timeline> = from.animation.timelines;
+			var timelineCount : int = timelines.length;
 			var alphaHold : Number = from.alpha * to.interruptAlpha, alphaMix : Number = alphaHold * (1 - mix);
 			var animationLast : Number = from.animationLast, animationTime : Number = from.getAnimationTime(), applyTime : Number = animationTime;
 			var events : Vector.<Event> = null;
@@ -340,7 +340,7 @@ package spine.animation {
 			if (attachments) slot.attachmentState = unkeyedState + CURRENT;
 		}
 
-		private function applyRotateTimeline(timeline : Timeline, skeleton : Skeleton, time : Number, alpha : Number, blend : MixBlend, timelinesRotation : Vector.<Number>, i : int, firstFrame : Boolean) : void {
+		private function applyRotateTimeline(timeline : RotateTimeline, skeleton : Skeleton, time : Number, alpha : Number, blend : MixBlend, timelinesRotation : Vector.<Number>, i : int, firstFrame : Boolean) : void {
 			if (firstFrame) timelinesRotation[i] = 0;
 
 			if (alpha == 1) {
@@ -348,10 +348,9 @@ package spine.animation {
 				return;
 			}
 
-			var rotateTimeline : RotateTimeline = RotateTimeline(timeline);
-			var bone : Bone = skeleton.bones[rotateTimeline.getBoneIndex()];
+			var bone : Bone = skeleton.bones[timeline.getBoneIndex()];
 			if (!bone.active) return;
-			var frames : Vector.<Number> = rotateTimeline.frames;
+			var frames : Vector.<Number> = timeline.frames;
 			var r1 : Number, r2 : Number;
 			if (time < frames[0]) {
 				switch (blend) {
@@ -365,7 +364,7 @@ package spine.animation {
 				}
 			} else {
 				r1 = blend == MixBlend.setup ? bone.data.rotation : bone.rotation;
-				r2 = bone.data.rotation + rotateTimeline.getCurveValue(time);
+				r2 = bone.data.rotation + timeline.getCurveValue(time);
 			}
 
 			// Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
@@ -558,7 +557,7 @@ package spine.animation {
 			var entry : TrackEntry = addAnimation(trackIndex, emptyAnimation, false, delay <= 0 ? 1 : delay);
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
-			if (delay <= 0 && entry.previous != null) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration;
+			if (delay <= 0 && entry.previous != null) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration + delay;
 			return entry;
 		}
 
@@ -622,18 +621,16 @@ package spine.animation {
 			animationsChanged = false;
 
 			propertyIDs.clear();
-			var i : int = 0;
-			var n: int = 0;
-			var entry : TrackEntry = null;
-			for (i = 0, n = tracks.length; i < n; i++) {
-				entry = tracks[i];
-				if (entry == null) continue;
-				while (entry.mixingFrom != null)
+			var tracks = this.tracks;
+			for (var i : int = 0, n : int = tracks.length; i < n; i++) {
+				var entry : TrackEntry = tracks[i];
+				if (!entry) continue;
+				while (entry.mixingFrom)
 					entry = entry.mixingFrom;
 				do {
-					if (entry.mixingTo == null || entry.mixBlend != MixBlend.add) computeHold(entry);
+					if (!entry.mixingTo || entry.mixBlend != MixBlend.add) computeHold(entry);
 					entry = entry.mixingTo;
-				} while (entry != null);
+				} while (entry);
 			}
 		}
 
