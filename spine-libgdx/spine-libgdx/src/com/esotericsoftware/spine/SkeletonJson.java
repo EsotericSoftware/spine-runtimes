@@ -980,11 +980,13 @@ public class SkeletonJson extends SkeletonLoader {
 
 	private Timeline readTimeline (JsonValue keyMap, CurveTimeline1 timeline, float defaultValue, float scale) {
 		float time = keyMap.getFloat("time", 0), value = keyMap.getFloat("value", defaultValue) * scale;
-		int bezier = 0;
-		for (int frame = 0;; frame++) {
+		for (int frame = 0, bezier = 0;; frame++) {
 			timeline.setFrame(frame, time, value);
 			JsonValue nextMap = keyMap.next;
-			if (nextMap == null) break;
+			if (nextMap == null) {
+				timeline.shrink(bezier);
+				return timeline;
+			}
 			float time2 = nextMap.getFloat("time", 0);
 			float value2 = nextMap.getFloat("value", defaultValue) * scale;
 			JsonValue curve = keyMap.get("curve");
@@ -993,19 +995,19 @@ public class SkeletonJson extends SkeletonLoader {
 			value = value2;
 			keyMap = nextMap;
 		}
-		timeline.shrink(bezier);
-		return timeline;
 	}
 
 	private Timeline readTimeline (JsonValue keyMap, CurveTimeline2 timeline, String name1, String name2, float defaultValue,
 		float scale) {
 		float time = keyMap.getFloat("time", 0);
 		float value1 = keyMap.getFloat(name1, defaultValue) * scale, value2 = keyMap.getFloat(name2, defaultValue) * scale;
-		int bezier = 0;
-		for (int frame = 0;; frame++) {
+		for (int frame = 0, bezier = 0;; frame++) {
 			timeline.setFrame(frame, time, value1, value2);
 			JsonValue nextMap = keyMap.next;
-			if (nextMap == null) break;
+			if (nextMap == null) {
+				timeline.shrink(bezier);
+				return timeline;
+			}
 			float time2 = nextMap.getFloat("time", 0);
 			float nvalue1 = nextMap.getFloat(name1, defaultValue) * scale, nvalue2 = nextMap.getFloat(name2, defaultValue) * scale;
 			JsonValue curve = keyMap.get("curve");
@@ -1018,8 +1020,6 @@ public class SkeletonJson extends SkeletonLoader {
 			value2 = nvalue2;
 			keyMap = nextMap;
 		}
-		timeline.shrink(bezier);
-		return timeline;
 	}
 
 	int readCurve (JsonValue curve, CurveTimeline timeline, int bezier, int frame, int value, float time1, float time2,

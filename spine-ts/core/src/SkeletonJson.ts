@@ -903,17 +903,17 @@ module spine {
 		for (let frame = 0;; frame++) {
 			timeline.setFrame(frame, time, value);
 			let nextMap = keys[frame + 1];
-			if (!nextMap) break;
+			if (!nextMap) {
+				timeline.shrink(bezier);
+				return timeline;
+			}
 			let time2 = getValue(nextMap, "time", 0);
 			let value2 = getValue(nextMap, "value", defaultValue) * scale;
-			let curve = keyMap.curve;
-			if (curve) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value, value2, scale);
+			if (keyMap.curve) bezier = readCurve(keyMap.curve, timeline, bezier, frame, 0, time, time2, value, value2, scale);
 			time = time2;
 			value = value2;
 			keyMap = nextMap;
 		}
-		timeline.shrink(bezier);
-		return timeline;
 	}
 
 	function readTimeline2 (keys: any[], timeline: CurveTimeline2, name1: string, name2: string, defaultValue: number, scale: number) {
@@ -925,7 +925,10 @@ module spine {
 		for (let frame = 0;; frame++) {
 			timeline.setFrame(frame, time, value1, value2);
 			let nextMap = keys[frame + 1];
-			if (!nextMap) break;
+			if (!nextMap) {
+				timeline.shrink(bezier);
+				return timeline;
+			}
 			let time2 = getValue(nextMap, "time", 0);
 			let nvalue1 = getValue(nextMap, name1, defaultValue) * scale;
 			let nvalue2 = getValue(nextMap, name2, defaultValue) * scale;
@@ -939,8 +942,6 @@ module spine {
 			value2 = nvalue2;
 			keyMap = nextMap;
 		}
-		timeline.shrink(bezier);
-		return timeline;
 	}
 
 	function readCurve (curve: any, timeline: CurveTimeline, bezier: number, frame: number, value: number, time1: number, time2: number,

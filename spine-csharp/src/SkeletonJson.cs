@@ -1058,10 +1058,12 @@ namespace Spine {
 			var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 			float time = GetFloat(keyMap, "time", 0);
 			float value = GetFloat(keyMap, "value", defaultValue) * scale;
-			int bezier = 0;
-			for (int frame = 0; ; frame++) {
+			for (int frame = 0, bezier = 0; ; frame++) {
 				timeline.SetFrame(frame, time, value);
-				if (!keyMapEnumerator.MoveNext()) break;
+				if (!keyMapEnumerator.MoveNext()) {
+					timeline.Shrink(bezier);
+					return timeline;
+				}
 				var nextMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 				float time2 = GetFloat(nextMap, "time", 0);
 				float value2 = GetFloat(nextMap, "value", defaultValue) * scale;
@@ -1073,8 +1075,6 @@ namespace Spine {
 				value = value2;
 				keyMap = nextMap;
 			}
-			timeline.Shrink(bezier);
-			return timeline;
 		}
 
 		static Timeline ReadTimeline (ref List<object>.Enumerator keyMapEnumerator, CurveTimeline2 timeline, String name1, String name2, float defaultValue,
@@ -1083,10 +1083,12 @@ namespace Spine {
 			var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 			float time = GetFloat(keyMap, "time", 0);
 			float value1 = GetFloat(keyMap, name1, defaultValue) * scale, value2 = GetFloat(keyMap, name2, defaultValue) * scale;
-			int bezier = 0;
-			for (int frame = 0; ; frame++) {
+			for (int frame = 0, bezier = 0; ; frame++) {
 				timeline.SetFrame(frame, time, value1, value2);
-				if (!keyMapEnumerator.MoveNext()) break;
+				if (!keyMapEnumerator.MoveNext()) {
+					timeline.Shrink(bezier);
+					return timeline;
+				}
 				var nextMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
 				float time2 = GetFloat(nextMap, "time", 0);
 				float nvalue1 = GetFloat(nextMap, name1, defaultValue) * scale, nvalue2 = GetFloat(nextMap, name2, defaultValue) * scale;
@@ -1100,8 +1102,6 @@ namespace Spine {
 				value2 = nvalue2;
 				keyMap = nextMap;
 			}
-			timeline.Shrink(bezier);
-			return timeline;
 		}
 
 		static int ReadCurve (object curve, CurveTimeline timeline, int bezier, int frame, int value, float time1, float time2,
@@ -1148,26 +1148,22 @@ namespace Spine {
 		}
 
 		static float GetFloat(Dictionary<string, Object> map, string name, float defaultValue) {
-			if (!map.ContainsKey(name))
-				return defaultValue;
+			if (!map.ContainsKey(name)) return defaultValue;
 			return (float)map[name];
 		}
 
 		static int GetInt(Dictionary<string, Object> map, string name, int defaultValue) {
-			if (!map.ContainsKey(name))
-				return defaultValue;
+			if (!map.ContainsKey(name)) return defaultValue;
 			return (int)(float)map[name];
 		}
 
 		static bool GetBoolean(Dictionary<string, Object> map, string name, bool defaultValue) {
-			if (!map.ContainsKey(name))
-				return defaultValue;
+			if (!map.ContainsKey(name)) return defaultValue;
 			return (bool)map[name];
 		}
 
 		static string GetString(Dictionary<string, Object> map, string name, string defaultValue) {
-			if (!map.ContainsKey(name))
-				return defaultValue;
+			if (!map.ContainsKey(name)) return defaultValue;
 			return (string)map[name];
 		}
 

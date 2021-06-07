@@ -911,21 +911,20 @@ package spine {
 			var keyMap : Object = keys[0];
 			var time : Number = getNumber(keyMap, "time", 0);
 			var value : Number = getNumber(keyMap, "value", defaultValue) * scale;
-			var bezier : int = 0;
-			for (var frame : int = 0;; frame++) {
+			for (var frame : int = 0, bezier : int = 0;; frame++) {
 				timeline.setFrame(frame, time, value);
 				var nextMap : Object = keys[frame + 1];
-				if (!nextMap) break;
+				if (!nextMap) {
+					timeline.shrink(bezier);
+					return timeline;
+				}
 				var time2 : Number = getNumber(nextMap, "time", 0);
 				var value2 : Number = getNumber(nextMap, "value", defaultValue) * scale;
-				var curve : Object = keyMap.curve;
-				if (curve) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value, value2, scale);
+				if (keyMap.curve) bezier = readCurve(keyMap.curve, timeline, bezier, frame, 0, time, time2, value, value2, scale);
 				time = time2;
 				value = value2;
 				keyMap = nextMap;
 			}
-			timeline.shrink(bezier);
-			return timeline;
 		}
 
 		static private function readTimeline2(keys : Array, timeline : CurveTimeline2, name1 : String, name2 : String, defaultValue : Number, scale : Number) : CurveTimeline2 {
@@ -933,11 +932,13 @@ package spine {
 			var time : Number = getNumber(keyMap, "time", 0);
 			var value1 : Number = getNumber(keyMap, name1, defaultValue) * scale;
 			var value2 : Number = getNumber(keyMap, name2, defaultValue) * scale;
-			var bezier : int = 0;
-			for (var frame : int = 0;; frame++) {
+			for (var frame : int = 0, bezier : int = 0;; frame++) {
 				timeline.setFrame(frame, time, value1, value2);
 				var nextMap : Object = keys[frame + 1];
-				if (!nextMap) break;
+				if (!nextMap) {
+					timeline.shrink(bezier);
+					return timeline;
+				}
 				var time2 : Number = getNumber(nextMap, "time", 0);
 				var nvalue1 : Number = getNumber(nextMap, name1, defaultValue) * scale;
 				var nvalue2 : Number = getNumber(nextMap, name2, defaultValue) * scale;
@@ -951,8 +952,6 @@ package spine {
 				value2 = nvalue2;
 				keyMap = nextMap;
 			}
-			timeline.shrink(bezier);
-			return timeline;
 		}
 
 		static private function readCurve(curve : Object, timeline : CurveTimeline, bezier : int, frame : int, value : Number, time1 : Number, time2 : Number,
