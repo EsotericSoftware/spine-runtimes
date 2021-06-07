@@ -112,7 +112,7 @@ void _spTransformConstraint_applyAbsoluteWorld(spTransformConstraint *self) {
 			CONST_CAST(float, bone->b) = COS(r) * s;
 			CONST_CAST(float, bone->d) = SIN(r) * s;
 		}
-		CONST_CAST(int, bone->appliedValid) = 0;
+		spBone_updateAppliedTransform(bone);
 	}
 }
 
@@ -172,7 +172,7 @@ void _spTransformConstraint_applyRelativeWorld(spTransformConstraint *self) {
 			CONST_CAST(float, bone->d) = SIN(r) * s;
 		}
 
-		CONST_CAST(int, bone->appliedValid) = 0;
+		spBone_updateAppliedTransform(bone);
 	}
 }
 
@@ -183,10 +183,8 @@ void _spTransformConstraint_applyAbsoluteLocal(spTransformConstraint *self) {
 	int i;
 	float rotation, r, x, y, scaleX, scaleY, shearY;
 
-	if (!target->appliedValid) spBone_updateAppliedTransform(target);
 	for (i = 0; i < self->bonesCount; ++i) {
 		spBone *bone = self->bones[i];
-		if (!bone->appliedValid) spBone_updateAppliedTransform(bone);
 
 		rotation = bone->arotation;
 		if (mixRotate != 0) {
@@ -223,11 +221,8 @@ void _spTransformConstraint_applyRelativeLocal(spTransformConstraint *self) {
 	int i;
 	float rotation, x, y, scaleX, scaleY, shearY;
 
-	if (!target->appliedValid) spBone_updateAppliedTransform(target);
-
 	for (i = 0; i < self->bonesCount; ++i) {
 		spBone *bone = self->bones[i];
-		if (!bone->appliedValid) spBone_updateAppliedTransform(bone);
 
 		rotation = bone->arotation + (target->arotation + self->data->offsetRotation) * mixRotate;
 		x = bone->ax + (target->ax + self->data->offsetX) * mixX;

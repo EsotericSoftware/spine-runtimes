@@ -225,7 +225,6 @@ void ikDemo (spSkeletonData* skeletonData, spAtlas* atlas) {
         spBone_worldToLocal(crosshair->parent, mouseCoords.x, mouseCoords.y, &boneCoordsX, &boneCoordsY);
         crosshair->x = boneCoordsX;
         crosshair->y = boneCoordsY;
-        crosshair->appliedValid = false;
 
         // Calculate final world transform with the
         // crosshair bone set to the mouse cursor

@@ -48,7 +48,6 @@ struct spBone {
 	spBone **const children;
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
-	int /*bool*/ appliedValid;
 
 	float const a, b, worldX;
 	float const c, d, worldY;
@@ -67,6 +66,8 @@ SP_API spBone *spBone_create(spBoneData *data, struct spSkeleton *skeleton, spBo
 SP_API void spBone_dispose(spBone *self);
 
 SP_API void spBone_setToSetupPose(spBone *self);
+
+SP_API void spBone_update(spBone *self);
 
 SP_API void spBone_updateWorldTransform(spBone *self);
 

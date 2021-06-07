@@ -57,6 +57,10 @@ void spBone_dispose(spBone *self) {
 	FREE(self);
 }
 
+void spBone_update(spBone *self) {
+	spBone_updateWorldTransformWith(self, self->ax, self->ay, self->arotation, self->ascaleX, self->ascaleY, self->ashearX, self->ashearY);
+}
+
 void spBone_updateWorldTransform(spBone *self) {
 	spBone_updateWorldTransformWith(self, self->x, self->y, self->rotation, self->scaleX, self->scaleY, self->shearX,
 									self->shearY);
@@ -77,7 +81,6 @@ void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotat
 	self->ascaleY = scaleY;
 	self->ashearX = shearX;
 	self->ashearY = shearY;
-	self->appliedValid = 1;
 
 	if (!parent) { /* Root bone. */
 		float rotationY = rotation + 90 + shearY;
@@ -214,7 +217,6 @@ float spBone_getWorldScaleY(spBone *self) {
  * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. */
 void spBone_updateAppliedTransform(spBone *self) {
 	spBone *parent = self->parent;
-	self->appliedValid = 1;
 	if (!parent) {
 		self->ax = self->worldX;
 		self->ay = self->worldY;
@@ -289,5 +291,4 @@ void spBone_rotateWorld(spBone *self, float degrees) {
 	CONST_CAST(float, self->b) = cosine * b - sine * d;
 	CONST_CAST(float, self->c) = sine * a + cosine * c;
 	CONST_CAST(float, self->d) = sine * b + cosine * d;
-	CONST_CAST(int, self->appliedValid) = 0;
 }

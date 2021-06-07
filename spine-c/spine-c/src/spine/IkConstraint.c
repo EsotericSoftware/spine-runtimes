@@ -78,7 +78,6 @@ spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boolean*
 	float pa = p->a, pb = p->b, pc = p->c, pd = p->d;
 	float rotationIK = -bone->ashearX - bone->arotation;
 	float tx = 0, ty = 0, sx = 0, sy = 0, s = 0, sa = 0, sc = 0;
-	if (!bone->appliedValid) spBone_updateAppliedTransform(bone);
 
 	switch (bone->data->transformMode) {
 		case SP_TRANSFORMMODE_ONLYTRANSLATION:
@@ -139,8 +138,6 @@ spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float target
 	float id, x, y;
 	float aa, bb, ll, ta, c0, c1, c2;
 
-	if (!parent->appliedValid) spBone_updateAppliedTransform(parent);
-	if (!child->appliedValid) spBone_updateAppliedTransform(child);
 	px = parent->ax;
 	py = parent->ay;
 	psx = parent->ascaleX;

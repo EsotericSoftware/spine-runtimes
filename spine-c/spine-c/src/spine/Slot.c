@@ -51,11 +51,31 @@ void spSlot_dispose(spSlot *self) {
 	FREE(self);
 }
 
+static int isVertexAttachment(spAttachment *attachment) {
+	if (attachment == NULL) return 0;
+	switch (attachment->type) {
+		case SP_ATTACHMENT_BOUNDING_BOX:
+		case SP_ATTACHMENT_CLIPPING:
+		case SP_ATTACHMENT_MESH:
+		case SP_ATTACHMENT_PATH:
+			return -1;
+		default:
+			return 0;
+	}
+}
+
 void spSlot_setAttachment(spSlot *self, spAttachment *attachment) {
 	if (attachment == self->attachment) return;
+
+	if (!isVertexAttachment(attachment) ||
+		!isVertexAttachment(self->attachment)
+		|| (SUB_CAST(spVertexAttachment, attachment)->deformAttachment !=
+			SUB_CAST(spVertexAttachment, self->attachment)->deformAttachment)) {
+		self->deformCount = 0;
+	}
+
 	CONST_CAST(spAttachment*, self->attachment) = attachment;
 	SUB_CAST(_spSlot, self)->attachmentTime = self->bone->skeleton->time;
-	self->deformCount = 0;
 }
 
 void spSlot_setAttachmentTime(spSlot *self, float time) {

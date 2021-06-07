@@ -221,7 +221,7 @@ void spPathConstraint_update(spPathConstraint *self) {
 			CONST_CAST(float, bone->c) = sine * a + cosine * c;
 			CONST_CAST(float, bone->d) = sine * b + cosine * d;
 		}
-		CONST_CAST(int, bone->appliedValid) = -1;
+		spBone_updateAppliedTransform(bone);
 	}
 }
 

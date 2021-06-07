@@ -398,13 +398,25 @@ void spSkeleton_updateCache(spSkeleton *self) {
 }
 
 void spSkeleton_updateWorldTransform(const spSkeleton *self) {
-	int i;
+	int i, n;
 	_spSkeleton *internal = SUB_CAST(_spSkeleton, self);
+
+	for (i = 0, n = self->bonesCount; i < n; i++) {
+		spBone *bone = self->bones[i];
+		bone->ax = bone->x;
+		bone->ay = bone->y;
+		bone->arotation = bone->rotation;
+		bone->ascaleX = bone->scaleX;
+		bone->ascaleY = bone->scaleY;
+		bone->ashearX = bone->shearX;
+		bone->ashearY = bone->shearY;
+	}
+	
 	for (i = 0; i < internal->updateCacheCount; ++i) {
 		_spUpdate *update = internal->updateCache + i;
 		switch (update->type) {
 			case SP_UPDATE_BONE:
-				spBone_updateWorldTransform((spBone *) update->object);
+				spBone_update((spBone *) update->object);
 				break;
 			case SP_UPDATE_IK_CONSTRAINT:
 				spIkConstraint_update((spIkConstraint *) update->object);
