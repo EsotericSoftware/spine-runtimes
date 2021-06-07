@@ -119,8 +119,7 @@ module spine {
 			let names: string[] = null;
 			let values: number[][] = null;
 			while (true) {
-
-				if (!line) break;
+				if (line === null) break;
 				if (line.trim().length == 0) {
 					page = null;
 					line = reader.readLine();
