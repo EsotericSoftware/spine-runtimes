@@ -213,7 +213,7 @@ void TransformConstraint::applyAbsoluteWorld() {
 			bone._d = MathUtil::sin(r) * s;
 		}
 
-		bone._appliedValid = false;
+		bone.updateAppliedTransform();
 	}
 }
 
@@ -276,20 +276,17 @@ void TransformConstraint::applyRelativeWorld() {
 			bone._d = MathUtil::sin(r) * s;
 		}
 
-		bone._appliedValid = false;
+		bone.updateAppliedTransform();
 	}
 }
 
 void TransformConstraint::applyAbsoluteLocal() {
 	float mixRotate = _mixRotate, mixX = _mixX, mixY = _mixY, mixScaleX = _mixScaleX, mixScaleY = _mixScaleY, mixShearY = _mixShearY;
 	Bone &target = *_target;
-	if (!target._appliedValid) target.updateAppliedTransform();
 
 	for (size_t i = 0; i < _bones.size(); ++i) {
 		Bone *item = _bones[i];
 		Bone &bone = *item;
-
-		if (!bone._appliedValid) bone.updateAppliedTransform();
 
 		float rotation = bone._arotation;
 		if (mixRotate != 0) {
@@ -322,13 +319,10 @@ void TransformConstraint::applyAbsoluteLocal() {
 void TransformConstraint::applyRelativeLocal() {
 	float mixRotate = _mixRotate, mixX = _mixX, mixY = _mixY, mixScaleX = _mixScaleX, mixScaleY = _mixScaleY, mixShearY = _mixShearY;
 	Bone &target = *_target;
-	if (!target._appliedValid) target.updateAppliedTransform();
 
 	for (size_t i = 0; i < _bones.size(); ++i) {
 		Bone *item = _bones[i];
 		Bone &bone = *item;
-
-		if (!bone._appliedValid) bone.updateAppliedTransform();
 
 		float rotation = bone._arotation + (target._arotation + _data._offsetRotation) * mixRotate;
 		float x = bone._ax + (target._ax + _data._offsetX) * mixX;

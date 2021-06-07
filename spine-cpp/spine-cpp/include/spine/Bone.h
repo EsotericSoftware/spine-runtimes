@@ -243,10 +243,6 @@ namespace spine {
 		/// Returns the magnitide (always positive) of the world scale Y.
 		float getWorldScaleY();
 
-		bool isAppliedValid();
-
-		void setAppliedValid(bool valid);
-
 		bool isActive();
 
 		void setActive(bool inValue);
@@ -260,7 +256,6 @@ namespace spine {
 		Vector<Bone *> _children;
 		float _x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY;
 		float _ax, _ay, _arotation, _ascaleX, _ascaleY, _ashearX, _ashearY;
-		bool _appliedValid;
 		float _a, _b, _worldX;
 		float _c, _d, _worldY;
 		bool _sorted;

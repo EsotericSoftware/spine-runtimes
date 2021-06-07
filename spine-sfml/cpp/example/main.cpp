@@ -223,7 +223,6 @@ void ikDemo (SkeletonData* skeletonData, Atlas* atlas) {
         crosshair->getParent()->worldToLocal(mouseCoords.x, mouseCoords.y, boneCoordsX, boneCoordsY);
         crosshair->setX(boneCoordsX);
         crosshair->setY(boneCoordsY);
-        crosshair->setAppliedValid(false);
 
         // Calculate final world transform with the
         // crosshair bone set to the mouse cursor
@@ -251,8 +250,6 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 
 	drawable.state->setAnimation(0, "walk", true);
 
-    drawable.update(0.3f);
-
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - goblins");
 	window.setFramerateLimit(60);
 	sf::Event event;
@@ -261,10 +258,10 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
 
-		// float delta = deltaClock.getElapsedTime().asSeconds();
+		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		drawable.update(0);
+		drawable.update(delta);
 
 		window.clear();
 		window.draw(drawable);

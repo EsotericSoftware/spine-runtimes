@@ -212,6 +212,17 @@ void Skeleton::printUpdateCache() {
 }
 
 void Skeleton::updateWorldTransform() {
+	for (size_t i = 0, n = _bones.size(); i < n; i++) {
+		Bone *bone = _bones[i];
+		bone->_ax = bone->_x;
+		bone->_ay = bone->_y;
+		bone->_arotation = bone->_rotation;
+		bone->_ascaleX = bone->_scaleX;
+		bone->_ascaleY = bone->_scaleY;
+		bone->_ashearX = bone->_shearX;
+		bone->_ashearY = bone->_shearY;
+	}
+
 	for (size_t i = 0, n = _updateCache.size(); i < n; ++i) {
 		_updateCache[i]->update();
 	}

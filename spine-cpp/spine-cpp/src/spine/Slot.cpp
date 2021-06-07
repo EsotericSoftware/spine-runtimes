@@ -37,6 +37,7 @@
 #include <spine/Bone.h>
 #include <spine/Skeleton.h>
 #include <spine/Attachment.h>
+#include <spine/VertexAttachment.h>
 
 using namespace spine;
 
@@ -99,9 +100,17 @@ void Slot::setAttachment(Attachment *inValue) {
 		return;
 	}
 
+	if (inValue && _attachment) {
+		if (!(inValue->getRTTI().instanceOf(VertexAttachment::rtti)) ||
+			!(_attachment->getRTTI().instanceOf(VertexAttachment::rtti))
+			|| (static_cast<VertexAttachment *>(inValue)->getDeformAttachment() !=
+				(static_cast<VertexAttachment *>(_attachment)->getDeformAttachment()))) {
+			_deform.clear();
+		}
+	}
+
 	_attachment = inValue;
 	_attachmentTime = _skeleton.getTime();
-	_deform.clear();
 }
 
 int Slot::getAttachmentState() {

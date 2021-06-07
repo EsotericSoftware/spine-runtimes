@@ -220,7 +220,7 @@ void PathConstraint::update() {
 			bone._d = sin * b + cos * d;
 		}
 
-		bone._appliedValid = false;
+		bone.updateAppliedTransform();
 	}
 }
 

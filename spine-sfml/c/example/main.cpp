@@ -252,7 +252,6 @@ void goblins (spSkeletonData* skeletonData, spAtlas* atlas) {
 	spSkeleton_updateWorldTransform(skeleton);
 
 	spAnimationState_setAnimationByName(drawable->state, 0, "walk", true);
-    drawable->update(0.3f);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - goblins");
 	window.setFramerateLimit(60);
@@ -262,10 +261,10 @@ void goblins (spSkeletonData* skeletonData, spAtlas* atlas) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
 
-		// float delta = deltaClock.getElapsedTime().asSeconds();
+		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		drawable->update(0);
+		drawable->update(delta);
 
 		window.clear();
 		window.draw(*drawable);

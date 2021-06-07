@@ -49,7 +49,6 @@ IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress, boo
 	float pa = p->_a, pb = p->_b, pc = p->_c, pd = p->_d;
 	float rotationIK = -bone._ashearX - bone._arotation;
 	float tx = 0, ty = 0;
-	if (!bone._appliedValid) bone.updateAppliedTransform();
 
 	switch (bone._data.getTransformMode()) {
 		case TransformMode_OnlyTranslation:
@@ -105,8 +104,6 @@ IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int
 	Bone *pp = parent.getParent();
 	float tx, ty, dx, dy, dd, l1, l2, a1, a2, r, td, sd, p;
 	float id, x, y;
-	if (!parent._appliedValid) parent.updateAppliedTransform();
-	if (!child._appliedValid) child.updateAppliedTransform();
 	px = parent._ax;
 	py = parent._ay;
 	psx = parent._ascaleX;

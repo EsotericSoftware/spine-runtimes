@@ -68,7 +68,6 @@ Bone::Bone(BoneData &data, Skeleton &skeleton, Bone *parent) : Updatable(),
 															   _ascaleY(0),
 															   _ashearX(0),
 															   _ashearY(0),
-															   _appliedValid(false),
 															   _a(1),
 															   _b(0),
 															   _worldX(0),
@@ -81,7 +80,7 @@ Bone::Bone(BoneData &data, Skeleton &skeleton, Bone *parent) : Updatable(),
 }
 
 void Bone::update() {
-	updateWorldTransform(_x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY);
+	updateWorldTransform(_ax, _ay, _arotation, _ascaleX, _ascaleY, _ashearX, _ashearY);
 }
 
 void Bone::updateWorldTransform() {
@@ -101,7 +100,6 @@ Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, float
 	_ascaleY = scaleY;
 	_ashearX = shearX;
 	_ashearY = shearY;
-	_appliedValid = true;
 
 	if (!parent) { /* Root bone. */
 		float rotationY = rotation + 90 + shearY;
@@ -267,8 +265,6 @@ void Bone::rotateWorld(float degrees) {
 	_b = cos * b - sin * d;
 	_c = sin * a + cos * c;
 	_d = sin * b + cos * d;
-
-	_appliedValid = false;
 }
 
 float Bone::getWorldToLocalRotationX() {
@@ -495,17 +491,8 @@ float Bone::getWorldScaleY() {
 	return MathUtil::sqrt(_b * _b + _d * _d);
 }
 
-bool Bone::isAppliedValid() {
-	return _appliedValid;
-}
-
-void Bone::setAppliedValid(bool valid) {
-	_appliedValid = valid;
-}
-
 void Bone::updateAppliedTransform() {
 	Bone *parent = _parent;
-	_appliedValid = 1;
 	if (!parent) {
 		_ax = _worldX;
 		_ay = _worldY;
