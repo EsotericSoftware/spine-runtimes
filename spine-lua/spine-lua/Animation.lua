@@ -155,7 +155,7 @@ function Animation.Timeline.new (timelineType, frameEntries, frameCount, propert
 	local self = {
 		timelineType = timelineType,
 		propertyIds = propertyIds,
-		frames = utils.newNumberArrayZero((frameCount - 1) * frameEntries)
+		frames = utils.newNumberArrayZero(frameCount * frameEntries)
 	}
 
 	function self:getFrameEntries ()
@@ -201,18 +201,9 @@ local BEZIER_SIZE = 18
 
 Animation.CurveTimeline = {}
 function Animation.CurveTimeline.new (timelineType, frameEntries, frameCount, bezierCount, propertyIds)
-	local LINEAR = 0
-	local STEPPED = 1
-	local BEZIER = 2
-	local BEZIER_SIZE = 10 * 2 - 1
-
 	local self = Animation.Timeline.new(timelineType, frameEntries, frameCount, propertyIds)
 	self.curves = utils.newNumberArrayZero(frameCount + bezierCount * BEZIER_SIZE)
 	self.curves[frameCount - 1] = STEPPED
-
-	function self:getFrameCount ()
-		return math_floor(zlen(self.curves) / BEZIER_SIZE) + 1
-	end
 
 	function self:setStepped (frame)
 		self.curves[frame] = STEPPED
@@ -1459,8 +1450,8 @@ function Animation.DeformTimeline.new (frameCount, bezierCount, slotIndex, attac
 		end
 
 		utils.setArraySize(deform, vertexCount)
-		if time >= frames[zlen(frames) - 1] then -- Time is after last frame.
-			local lastVertices = vertices[zlen(frames) - 1]
+		if time >= frames[#frames] then -- Time is after last frame.
+			local lastVertices = vertices[#frames]
 			if alpha == 1 then
 				if blend == MixBlend.add then
 					if vertexAttachment.bones == nil then

@@ -551,7 +551,7 @@ end
 function AnimationState:applyRotateTimeline (timeline, skeleton, time, alpha, blend, timelinesRotation, i, firstFrame)
 	if firstFrame then
 		timelinesRotation[i] = 0
-		timelinesRotation[i+1] = 0
+		timelinesRotation[i + 1] = 0
 	end
 
 	if alpha == 1 then
@@ -722,9 +722,9 @@ function AnimationState:setCurrent (index, current, interrupt)
 end
 
 function AnimationState:setAnimationByName (trackIndex, animationName, loop)
-		local animation = self.data.skeletonData:findAnimation(animationName)
-		if not animation then error("Animation not found: " .. animationName, 2) end
-		return self:setAnimation(trackIndex, animation, loop)
+	local animation = self.data.skeletonData:findAnimation(animationName)
+	if not animation then error("Animation not found: " .. animationName, 2) end
+	return self:setAnimation(trackIndex, animation, loop)
 end
 
 function AnimationState:setAnimation (trackIndex, animation, loop)

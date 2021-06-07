@@ -859,7 +859,7 @@ function SkeletonJson.new (attachmentLoader)
 					for i,keyMap in ipairs(timelineMap) do
 						local frame = i - 1
 						timeline:setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY)
-						local nextMap = timelineMap[frame + 1]
+						local nextMap = timelineMap[i + 1]
 						if not nextMap then
 							timeline:shrink(bezier)
 							break
@@ -927,7 +927,7 @@ function SkeletonJson.new (attachmentLoader)
 							for i,keyMap in ipairs(timelineMap) do
 								local frame = i - 1
 								timeline:setFrame(frame, time, mixRotate, mixX, mixY)
-								local nextMap = timelineMap[frame + 1]
+								local nextMap = timelineMap[i + 1]
 								if not nextMap then
 									timeline:shrink(bezier)
 									break
@@ -981,8 +981,11 @@ function SkeletonJson.new (attachmentLoader)
 								local deform = nil
 								local verticesValue = getValue(keyMap, "vertices", nil)
 								if verticesValue == nil then
-									deform = vertices
-									if weighted then deform = utils.newNumberArray(deformLength) end
+									if weighted then
+										deform = utils.newNumberArray(deformLength)
+									else
+										deform = vertices
+									end
 								else
 									deform = utils.newNumberArray(deformLength)
 									local start = getValue(keyMap, "offset", 0) + 1
@@ -1005,7 +1008,7 @@ function SkeletonJson.new (attachmentLoader)
 									end
 								end
 								timeline:setFrame(frame, time, deform)
-								local nextMap = timelineMap[frame + 1]
+								local nextMap = timelineMap[i + 1]
 								if not nextMap then
 									timeline:shrink(bezier)
 									break
@@ -1109,16 +1112,6 @@ function SkeletonJson.new (attachmentLoader)
 		table_insert(skeletonData.animations, Animation.new(name, timelines, duration))
 	end
 
-	readCurve = function (map, timeline, frame)
-		local curve = map["curve"]
-		if not curve then return end
-		if curve == "stepped" then
-			timeline:setStepped(frame)
-		else
-			timeline:setCurve(frame, getValue(map, "curve", 0), getValue(map, "c2", 0), getValue(map, "c3", 1), getValue(map, "c4", 1))
-		end
-	end
-
 	readTimeline1 = function (keys, timeline, defaultValue, scale)
 		local keyMap = keys[1]
 		local time = getValue(keyMap, "time", 0)
@@ -1127,17 +1120,17 @@ function SkeletonJson.new (attachmentLoader)
 		for i,keyMap in ipairs(keys) do
 			local frame = i - 1
 			timeline:setFrame(frame, time, value)
-			local nextMap = keys[frame + 1]
-			if not nextMap then break end
+			local nextMap = keys[i + 1]
+			if not nextMap then
+				timeline:shrink(bezier)
+				return timeline
+			end
 			local time2 = getValue(nextMap, "time", 0)
 			local value2 = getValue(nextMap, "value", defaultValue) * scale
-			local curve = keyMap.curve
-			if curve then bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, value, value2, scale) end
+			if keyMap.curve then bezier = readCurve(keyMap.curve, timeline, bezier, frame, 0, time, time2, value, value2, scale) end
 			time = time2
 			value = value2
 		end
-		timeline:shrink(bezier)
-		return timeline
 	end
 
 	readTimeline2 = function (keys, timeline, name1, name2, defaultValue, scale)
@@ -1149,8 +1142,11 @@ function SkeletonJson.new (attachmentLoader)
 		for i,keyMap in ipairs(keys) do
 			local frame = i - 1
 			timeline:setFrame(frame, time, value1, value2)
-			local nextMap = keys[frame + 1]
-			if not nextMap then break end
+			local nextMap = keys[i + 1]
+			if not nextMap then
+				timeline:shrink(bezier)
+				return timeline
+			end
 			local time2 = getValue(nextMap, "time", 0)
 			local nvalue1 = getValue(nextMap, name1, defaultValue) * scale
 			local nvalue2 = getValue(nextMap, name2, defaultValue) * scale
@@ -1163,8 +1159,6 @@ function SkeletonJson.new (attachmentLoader)
 			value1 = nvalue1
 			value2 = nvalue2
 		end
-		timeline:shrink(bezier)
-		return timeline
 	end
 
 	readCurve = function (curve, timeline, bezier, frame, value, time1, time2, value1, value2, scale)
