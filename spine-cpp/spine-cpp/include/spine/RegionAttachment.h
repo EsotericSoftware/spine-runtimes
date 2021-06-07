@@ -44,13 +44,15 @@ namespace spine {
 	/// Attachment that displays a texture region.
 	class SP_API RegionAttachment : public Attachment, public HasRendererObject {
 		friend class SkeletonBinary;
+
 		friend class SkeletonJson;
+
 		friend class AtlasAttachmentLoader;
 
-		RTTI_DECL
+	RTTI_DECL
 
 	public:
-		explicit RegionAttachment(const String& name);
+		explicit RegionAttachment(const String &name);
 
 		void updateOffset();
 
@@ -61,51 +63,73 @@ namespace spine {
 		/// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + 8.
 		/// @param offset The worldVertices index to begin writing values.
 		/// @param stride The number of worldVertices entries between the value pairs written.
-		void computeWorldVertices(Bone& bone, float *worldVertices, size_t offset, size_t stride = 2);
-		void computeWorldVertices(Bone& bone, Vector<float>& worldVertices, size_t offset, size_t stride = 2);
+		void computeWorldVertices(Bone &bone, float *worldVertices, size_t offset, size_t stride = 2);
+
+		void computeWorldVertices(Bone &bone, Vector<float> &worldVertices, size_t offset, size_t stride = 2);
 
 		float getX();
+
 		void setX(float inValue);
+
 		float getY();
+
 		void setY(float inValue);
+
 		float getRotation();
+
 		void setRotation(float inValue);
+
 		float getScaleX();
+
 		void setScaleX(float inValue);
+
 		float getScaleY();
+
 		void setScaleY(float inValue);
+
 		float getWidth();
+
 		void setWidth(float inValue);
+
 		float getHeight();
+
 		void setHeight(float inValue);
 
-		Color& getColor();
+		Color &getColor();
 
-		const String& getPath();
-		void setPath(const String& inValue);
+		const String &getPath();
+
+		void setPath(const String &inValue);
 
 		float getRegionOffsetX();
+
 		void setRegionOffsetX(float inValue);
 
 		float getRegionOffsetY();
+
 		void setRegionOffsetY(float inValue);
 
 		float getRegionWidth();
+
 		void setRegionWidth(float inValue);
 
 		float getRegionHeight();
+
 		void setRegionHeight(float inValue);
 
 		float getRegionOriginalWidth();
+
 		void setRegionOriginalWidth(float inValue);
 
 		float getRegionOriginalHeight();
+
 		void setRegionOriginalHeight(float inValue);
 
-		Vector<float>& getOffset();
-		Vector<float>& getUVs();
+		Vector<float> &getOffset();
 
-		virtual Attachment* copy();
+		Vector<float> &getUVs();
+
+		virtual Attachment *copy();
 
 	private:
 		static const int BLX;

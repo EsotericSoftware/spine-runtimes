@@ -46,8 +46,8 @@ using namespace spine;
 RTTI_IMPL(DrawOrderTimeline, Timeline)
 
 DrawOrderTimeline::DrawOrderTimeline(size_t frameCount) : Timeline(frameCount, 1) {
-    PropertyId ids[] = {((PropertyId) Property_DrawOrder << 32)};
-    setPropertyIds(ids, 1);
+	PropertyId ids[] = {((PropertyId) Property_DrawOrder << 32)};
+	setPropertyIds(ids, 1);
 
 	_drawOrders.ensureCapacity(frameCount);
 	for (size_t i = 0; i < frameCount; ++i) {
@@ -57,7 +57,7 @@ DrawOrderTimeline::DrawOrderTimeline(size_t frameCount) : Timeline(frameCount, 1
 }
 
 void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-	MixBlend blend, MixDirection direction
+							  MixBlend blend, MixDirection direction
 ) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
@@ -66,12 +66,12 @@ void DrawOrderTimeline::apply(Skeleton &skeleton, float lastTime, float time, Ve
 	Vector<Slot *> &drawOrder = skeleton._drawOrder;
 	Vector<Slot *> &slots = skeleton._slots;
 	if (direction == MixDirection_Out) {
-	    if (blend == MixBlend_Setup) {
-            drawOrder.clear();
-            drawOrder.ensureCapacity(slots.size());
-            for (size_t i = 0, n = slots.size(); i < n; ++i)
-                drawOrder.add(slots[i]);
-        }
+		if (blend == MixBlend_Setup) {
+			drawOrder.clear();
+			drawOrder.ensureCapacity(slots.size());
+			for (size_t i = 0, n = slots.size(); i < n; ++i)
+				drawOrder.add(slots[i]);
+		}
 		return;
 	}
 

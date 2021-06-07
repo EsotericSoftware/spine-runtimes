@@ -35,15 +35,15 @@
 #include <spine/Array.h>
 
 typedef struct {
-	const unsigned char* cursor;
-	const unsigned char* end;
+	const unsigned char *cursor;
+	const unsigned char *end;
 } _dataInput;
 
 typedef struct {
-	const char* parent;
-	const char* skin;
+	const char *parent;
+	const char *skin;
 	int slotIndex;
-	spMeshAttachment* mesh;
+	spMeshAttachment *mesh;
 	int inheritDeform;
 } _spLinkedMesh;
 
@@ -53,54 +53,54 @@ typedef struct {
 
 	int linkedMeshCount;
 	int linkedMeshCapacity;
-	_spLinkedMesh* linkedMeshes;
+	_spLinkedMesh *linkedMeshes;
 } _spSkeletonBinary;
 
-spSkeletonBinary* spSkeletonBinary_createWithLoader (spAttachmentLoader* attachmentLoader) {
-	spSkeletonBinary* self = SUPER(NEW(_spSkeletonBinary));
+spSkeletonBinary *spSkeletonBinary_createWithLoader(spAttachmentLoader *attachmentLoader) {
+	spSkeletonBinary *self = SUPER(NEW(_spSkeletonBinary));
 	self->scale = 1;
 	self->attachmentLoader = attachmentLoader;
 	return self;
 }
 
-spSkeletonBinary* spSkeletonBinary_create (spAtlas* atlas) {
-	spAtlasAttachmentLoader* attachmentLoader = spAtlasAttachmentLoader_create(atlas);
-	spSkeletonBinary* self = spSkeletonBinary_createWithLoader(SUPER(attachmentLoader));
+spSkeletonBinary *spSkeletonBinary_create(spAtlas *atlas) {
+	spAtlasAttachmentLoader *attachmentLoader = spAtlasAttachmentLoader_create(atlas);
+	spSkeletonBinary *self = spSkeletonBinary_createWithLoader(SUPER(attachmentLoader));
 	SUB_CAST(_spSkeletonBinary, self)->ownsLoader = 1;
 	return self;
 }
 
-void spSkeletonBinary_dispose (spSkeletonBinary* self) {
-	_spSkeletonBinary* internal = SUB_CAST(_spSkeletonBinary, self);
+void spSkeletonBinary_dispose(spSkeletonBinary *self) {
+	_spSkeletonBinary *internal = SUB_CAST(_spSkeletonBinary, self);
 	if (internal->ownsLoader) spAttachmentLoader_dispose(self->attachmentLoader);
 	FREE(internal->linkedMeshes);
 	FREE(self->error);
 	FREE(self);
 }
 
-void _spSkeletonBinary_setError (spSkeletonBinary* self, const char* value1, const char* value2) {
+void _spSkeletonBinary_setError(spSkeletonBinary *self, const char *value1, const char *value2) {
 	char message[256];
 	int length;
 	FREE(self->error);
 	strcpy(message, value1);
-	length = (int)strlen(value1);
+	length = (int) strlen(value1);
 	if (value2) strncat(message + length, value2, 255 - length);
 	MALLOC_STR(self->error, message);
 }
 
-static unsigned char readByte (_dataInput* input) {
+static unsigned char readByte(_dataInput *input) {
 	return *input->cursor++;
 }
 
-static signed char readSByte (_dataInput* input) {
-	return (signed char)readByte(input);
+static signed char readSByte(_dataInput *input) {
+	return (signed char) readByte(input);
 }
 
-static int readBoolean (_dataInput* input) {
+static int readBoolean(_dataInput *input) {
 	return readByte(input) != 0;
 }
 
-static int readInt (_dataInput* input) {
+static int readInt(_dataInput *input) {
 	int result = readByte(input);
 	result <<= 8;
 	result |= readByte(input);
@@ -111,7 +111,7 @@ static int readInt (_dataInput* input) {
 	return result;
 }
 
-static int readVarint (_dataInput* input, int/*bool*/optimizePositive) {
+static int readVarint(_dataInput *input, int/*bool*/optimizePositive) {
 	unsigned char b = readByte(input);
 	int value = b & 0x7F;
 	if (b & 0x80) {
@@ -127,11 +127,11 @@ static int readVarint (_dataInput* input, int/*bool*/optimizePositive) {
 			}
 		}
 	}
-	if (!optimizePositive) value = (((unsigned int)value >> 1) ^ -(value & 1));
+	if (!optimizePositive) value = (((unsigned int) value >> 1) ^ -(value & 1));
 	return value;
 }
 
-float readFloat (_dataInput* input) {
+float readFloat(_dataInput *input) {
 	union {
 		int intValue;
 		float floatValue;
@@ -140,7 +140,7 @@ float readFloat (_dataInput* input) {
 	return intToFloat.floatValue;
 }
 
-char* readString (_dataInput* input) {
+char *readString(_dataInput *input) {
 	int length = readVarint(input, 1);
 	char *string;
 	if (length == 0) {
@@ -153,12 +153,12 @@ char* readString (_dataInput* input) {
 	return string;
 }
 
-static char* readStringRef(_dataInput* input, spSkeletonData* skeletonData) {
+static char *readStringRef(_dataInput *input, spSkeletonData *skeletonData) {
 	int index = readVarint(input, 1);
 	return index == 0 ? 0 : skeletonData->strings[index - 1];
 }
 
-static void readColor (_dataInput* input, float *r, float *g, float *b, float *a) {
+static void readColor(_dataInput *input, float *r, float *g, float *b, float *a) {
 	*r = readByte(input) / 255.0f;
 	*g = readByte(input) / 255.0f;
 	*b = readByte(input) / 255.0f;
@@ -213,72 +213,74 @@ static void readColor (_dataInput* input, float *r, float *g, float *b, float *a
 #define PATH_ROTATE_CHAIN 1
 #define PATH_ROTATE_CHAIN_SCALE 2
 
-static void setBezier(_dataInput* input, spTimeline* timeline, int bezier, int frame, int value, float time1, float time2,
-float value1, float value2, float scale) {
-    float cx1 = readFloat(input);
-    float cy1 = readFloat(input);
-    float cx2 = readFloat(input);
-    float cy2 = readFloat(input);
-    spTimeline_setBezier(timeline, bezier, frame, value, time1, value1, cx1, cy1 * scale, cx2, cy2 * scale, time2, value2);
+static void
+setBezier(_dataInput *input, spTimeline *timeline, int bezier, int frame, int value, float time1, float time2,
+		  float value1, float value2, float scale) {
+	float cx1 = readFloat(input);
+	float cy1 = readFloat(input);
+	float cx2 = readFloat(input);
+	float cy2 = readFloat(input);
+	spTimeline_setBezier(timeline, bezier, frame, value, time1, value1, cx1, cy1 * scale, cx2, cy2 * scale, time2,
+						 value2);
 }
 
-static spTimeline* readTimeline (_dataInput *input, spCurveTimeline1 *timeline, float scale) {
-    int frame, bezier, frameLast;
-    float time2, value2;
-    float time = readFloat(input);
-    float value = readFloat(input) * scale;
-    for (frame = 0, bezier = 0, frameLast = timeline->super.frameCount - 1;; frame++) {
-        spCurveTimeline1_setFrame(timeline, frame, time, value);
-        if (frame == frameLast) break;
-        time2 = readFloat(input);
-        value2 = readFloat(input) * scale;
-        switch (readSByte(input)) {
-            case CURVE_STEPPED:
-                spCurveTimeline_setStepped(timeline, frame);
-                break;
-            case CURVE_BEZIER:
-                setBezier(input, SUPER(timeline), bezier++, frame, 0, time, time2, value, value2, 1);
-        }
-        time = time2;
-        value = value2;
-    }
-    return SUPER(timeline);
+static spTimeline *readTimeline(_dataInput *input, spCurveTimeline1 *timeline, float scale) {
+	int frame, bezier, frameLast;
+	float time2, value2;
+	float time = readFloat(input);
+	float value = readFloat(input) * scale;
+	for (frame = 0, bezier = 0, frameLast = timeline->super.frameCount - 1;; frame++) {
+		spCurveTimeline1_setFrame(timeline, frame, time, value);
+		if (frame == frameLast) break;
+		time2 = readFloat(input);
+		value2 = readFloat(input) * scale;
+		switch (readSByte(input)) {
+			case CURVE_STEPPED:
+				spCurveTimeline_setStepped(timeline, frame);
+				break;
+			case CURVE_BEZIER:
+				setBezier(input, SUPER(timeline), bezier++, frame, 0, time, time2, value, value2, 1);
+		}
+		time = time2;
+		value = value2;
+	}
+	return SUPER(timeline);
 }
 
-static spTimeline* readTimeline2 (_dataInput *input, spCurveTimeline2 *timeline, float scale) {
-    int frame, bezier, frameLast;
-    float time2, nvalue1, nvalue2;
-    float time = readFloat(input);
-    float value1 = readFloat(input) * scale;
-    float value2 = readFloat(input) * scale;
-    for (frame = 0, bezier = 0, frameLast = timeline->super.frameCount - 1;; frame++) {
-        spCurveTimeline2_setFrame(timeline, frame, time, value1, value2);
-        if (frame == frameLast) break;
-        time2 = readFloat(input);
-        nvalue1 = readFloat(input) * scale;
-        nvalue2 = readFloat(input) * scale;
-        switch (readSByte(input)) {
-            case CURVE_STEPPED:
-                spCurveTimeline_setStepped(timeline, frame);
-                break;
-            case CURVE_BEZIER:
-                setBezier(input, SUPER(timeline), bezier++, frame, 0, time, time2, value1, nvalue1, scale);
-                setBezier(input, SUPER(timeline), bezier++, frame, 1, time, time2, value2, nvalue2, scale);
-        }
-        time = time2;
-        value1 = nvalue1;
-        value2 = nvalue2;
-    }
-    return SUPER(timeline);
+static spTimeline *readTimeline2(_dataInput *input, spCurveTimeline2 *timeline, float scale) {
+	int frame, bezier, frameLast;
+	float time2, nvalue1, nvalue2;
+	float time = readFloat(input);
+	float value1 = readFloat(input) * scale;
+	float value2 = readFloat(input) * scale;
+	for (frame = 0, bezier = 0, frameLast = timeline->super.frameCount - 1;; frame++) {
+		spCurveTimeline2_setFrame(timeline, frame, time, value1, value2);
+		if (frame == frameLast) break;
+		time2 = readFloat(input);
+		nvalue1 = readFloat(input) * scale;
+		nvalue2 = readFloat(input) * scale;
+		switch (readSByte(input)) {
+			case CURVE_STEPPED:
+				spCurveTimeline_setStepped(timeline, frame);
+				break;
+			case CURVE_BEZIER:
+				setBezier(input, SUPER(timeline), bezier++, frame, 0, time, time2, value1, nvalue1, scale);
+				setBezier(input, SUPER(timeline), bezier++, frame, 1, time, time2, value2, nvalue2, scale);
+		}
+		time = time2;
+		value1 = nvalue1;
+		value2 = nvalue2;
+	}
+	return SUPER(timeline);
 }
 
-static void _spSkeletonBinary_addLinkedMesh (spSkeletonBinary* self, spMeshAttachment* mesh,
-		const char* skin, int slotIndex, const char* parent, int inheritDeform) {
-	_spLinkedMesh* linkedMesh;
-	_spSkeletonBinary* internal = SUB_CAST(_spSkeletonBinary, self);
+static void _spSkeletonBinary_addLinkedMesh(spSkeletonBinary *self, spMeshAttachment *mesh,
+											const char *skin, int slotIndex, const char *parent, int inheritDeform) {
+	_spLinkedMesh *linkedMesh;
+	_spSkeletonBinary *internal = SUB_CAST(_spSkeletonBinary, self);
 
 	if (internal->linkedMeshCount == internal->linkedMeshCapacity) {
-		_spLinkedMesh* linkedMeshes;
+		_spLinkedMesh *linkedMeshes;
 		internal->linkedMeshCapacity *= 2;
 		if (internal->linkedMeshCapacity < 8) internal->linkedMeshCapacity = 8;
 		/* TODO Why not realloc? */
@@ -296,14 +298,14 @@ static void _spSkeletonBinary_addLinkedMesh (spSkeletonBinary* self, spMeshAttac
 	linkedMesh->inheritDeform = inheritDeform;
 }
 
-static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, const char* name,
-		_dataInput* input, spSkeletonData *skeletonData) {
-	spTimelineArray* timelines = spTimelineArray_create(18);
+static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, const char *name,
+													_dataInput *input, spSkeletonData *skeletonData) {
+	spTimelineArray *timelines = spTimelineArray_create(18);
 	float duration = 0;
 	int i, n, ii, nn, iii, nnn;
 	int frame, bezier;
 	int drawOrderCount, eventCount;
-	spAnimation* animation;
+	spAnimation *animation;
 	float scale = self->scale;
 
 	int numTimelines = readVarint(input, 1);
@@ -317,217 +319,217 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 			int frameCount = readVarint(input, 1);
 			int frameLast = frameCount - 1;
 			switch (timelineType) {
-                case SLOT_ATTACHMENT: {
-                    spAttachmentTimeline *timeline = spAttachmentTimeline_create(frameCount, slotIndex);
-                    for (frame = 0; frame < frameCount; ++frame) {
-                        float time = readFloat(input);
-                        const char *attachmentName = readStringRef(input, skeletonData);
-                        spAttachmentTimeline_setFrame(timeline, frame, time, attachmentName);
-                    }
-                    spTimelineArray_add(timelines, SUPER(timeline));
-                    break;
-                }
-                case SLOT_RGBA: {
-                    int bezierCount = readVarint(input, 1);
-                    spRGBATimeline *timeline = spRGBATimeline_create(frameCount, bezierCount, slotIndex);
+				case SLOT_ATTACHMENT: {
+					spAttachmentTimeline *timeline = spAttachmentTimeline_create(frameCount, slotIndex);
+					for (frame = 0; frame < frameCount; ++frame) {
+						float time = readFloat(input);
+						const char *attachmentName = readStringRef(input, skeletonData);
+						spAttachmentTimeline_setFrame(timeline, frame, time, attachmentName);
+					}
+					spTimelineArray_add(timelines, SUPER(timeline));
+					break;
+				}
+				case SLOT_RGBA: {
+					int bezierCount = readVarint(input, 1);
+					spRGBATimeline *timeline = spRGBATimeline_create(frameCount, bezierCount, slotIndex);
 
-                    float time = readFloat(input);
-                    float r = readByte(input) / 255.0;
-                    float g = readByte(input) / 255.0;
-                    float b = readByte(input) / 255.0;
-                    float a = readByte(input) / 255.0;
+					float time = readFloat(input);
+					float r = readByte(input) / 255.0;
+					float g = readByte(input) / 255.0;
+					float b = readByte(input) / 255.0;
+					float a = readByte(input) / 255.0;
 
-                    for (frame = 0, bezier = 0;; frame++) {
-                        float time2, r2, g2, b2, a2;
-                        spRGBATimeline_setFrame(timeline, frame, time, r, g, b, a);
-                        if (frame == frameLast) break;
+					for (frame = 0, bezier = 0;; frame++) {
+						float time2, r2, g2, b2, a2;
+						spRGBATimeline_setFrame(timeline, frame, time, r, g, b, a);
+						if (frame == frameLast) break;
 
-                        time2 = readFloat(input);
-                        r2 = readByte(input) / 255.0;
-                        g2 = readByte(input) / 255.0;
-                        b2 = readByte(input) / 255.0;
-                        a2 = readByte(input) / 255.0;
+						time2 = readFloat(input);
+						r2 = readByte(input) / 255.0;
+						g2 = readByte(input) / 255.0;
+						b2 = readByte(input) / 255.0;
+						a2 = readByte(input) / 255.0;
 
-                        switch (readSByte(input)) {
-                            case CURVE_STEPPED:
-                                spCurveTimeline_setStepped(SUPER(timeline), frame);
-                                break;
-                            case CURVE_BEZIER:
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, r, r2, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, g, g2, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, b, b2, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 3, time, time2, a, a2, 1);
-                        }
-                        time = time2;
-                        r = r2;
-                        g = g2;
-                        b = b2;
-                        a = a2;
-                    }
-                    spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
-                    break;
-                }
-                case SLOT_RGB: {
-                    int bezierCount = readVarint(input, 1);
-                    spRGBTimeline *timeline = spRGBTimeline_create(frameCount, bezierCount, slotIndex);
+						switch (readSByte(input)) {
+							case CURVE_STEPPED:
+								spCurveTimeline_setStepped(SUPER(timeline), frame);
+								break;
+							case CURVE_BEZIER:
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, r, r2, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, g, g2, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, b, b2, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 3, time, time2, a, a2, 1);
+						}
+						time = time2;
+						r = r2;
+						g = g2;
+						b = b2;
+						a = a2;
+					}
+					spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
+					break;
+				}
+				case SLOT_RGB: {
+					int bezierCount = readVarint(input, 1);
+					spRGBTimeline *timeline = spRGBTimeline_create(frameCount, bezierCount, slotIndex);
 
-                    float time = readFloat(input);
-                    float r = readByte(input) / 255.0;
-                    float g = readByte(input) / 255.0;
-                    float b = readByte(input) / 255.0;
+					float time = readFloat(input);
+					float r = readByte(input) / 255.0;
+					float g = readByte(input) / 255.0;
+					float b = readByte(input) / 255.0;
 
-                    for (frame = 0, bezier = 0;; frame++) {
-                        float time2, r2, g2, b2;
-                        spRGBTimeline_setFrame(timeline, frame, time, r, g, b);
-                        if (frame == frameLast) break;
+					for (frame = 0, bezier = 0;; frame++) {
+						float time2, r2, g2, b2;
+						spRGBTimeline_setFrame(timeline, frame, time, r, g, b);
+						if (frame == frameLast) break;
 
-                        time2 = readFloat(input);
-                        r2 = readByte(input) / 255.0;
-                        g2 = readByte(input) / 255.0;
-                        b2 = readByte(input) / 255.0;
+						time2 = readFloat(input);
+						r2 = readByte(input) / 255.0;
+						g2 = readByte(input) / 255.0;
+						b2 = readByte(input) / 255.0;
 
-                        switch (readSByte(input)) {
-                            case CURVE_STEPPED:
-                                spCurveTimeline_setStepped(SUPER(timeline), frame);
-                                break;
-                            case CURVE_BEZIER:
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, r, r2, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, g, g2, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, b, b2, 1);
-                        }
-                        time = time2;
-                        r = r2;
-                        g = g2;
-                        b = b2;
-                    }
-                    spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
-                    break;
-                }
-                case SLOT_RGBA2: {
-                    int bezierCount = readVarint(input, 1);
-                    spRGBA2Timeline *timeline = spRGBA2Timeline_create(frameCount, bezierCount, slotIndex);
+						switch (readSByte(input)) {
+							case CURVE_STEPPED:
+								spCurveTimeline_setStepped(SUPER(timeline), frame);
+								break;
+							case CURVE_BEZIER:
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, r, r2, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, g, g2, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, b, b2, 1);
+						}
+						time = time2;
+						r = r2;
+						g = g2;
+						b = b2;
+					}
+					spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
+					break;
+				}
+				case SLOT_RGBA2: {
+					int bezierCount = readVarint(input, 1);
+					spRGBA2Timeline *timeline = spRGBA2Timeline_create(frameCount, bezierCount, slotIndex);
 
-                    float time = readFloat(input);
-                    float r = readByte(input) / 255.0;
-                    float g = readByte(input) / 255.0;
-                    float b = readByte(input) / 255.0;
-                    float a = readByte(input) / 255.0;
-                    float r2 = readByte(input) / 255.0;
-                    float g2 = readByte(input) / 255.0;
-                    float b2 = readByte(input) / 255.0;
+					float time = readFloat(input);
+					float r = readByte(input) / 255.0;
+					float g = readByte(input) / 255.0;
+					float b = readByte(input) / 255.0;
+					float a = readByte(input) / 255.0;
+					float r2 = readByte(input) / 255.0;
+					float g2 = readByte(input) / 255.0;
+					float b2 = readByte(input) / 255.0;
 
-                    for (frame = 0, bezier = 0;; frame++) {
-                        float time2, nr, ng, nb, na, nr2, ng2, nb2;
-                        spRGBA2Timeline_setFrame(timeline, frame, time, r, g, b, a, r2, g2, b2);
-                        if (frame == frameLast) break;
-                        time2 = readFloat(input);
-                        nr = readByte(input) / 255.0;
-                        ng = readByte(input) / 255.0;
-                        nb = readByte(input) / 255.0;
-                        na = readByte(input) / 255.0;
-                        nr2 = readByte(input) / 255.0;
-                        ng2 = readByte(input) / 255.0;
-                        nb2 = readByte(input) / 255.0;
+					for (frame = 0, bezier = 0;; frame++) {
+						float time2, nr, ng, nb, na, nr2, ng2, nb2;
+						spRGBA2Timeline_setFrame(timeline, frame, time, r, g, b, a, r2, g2, b2);
+						if (frame == frameLast) break;
+						time2 = readFloat(input);
+						nr = readByte(input) / 255.0;
+						ng = readByte(input) / 255.0;
+						nb = readByte(input) / 255.0;
+						na = readByte(input) / 255.0;
+						nr2 = readByte(input) / 255.0;
+						ng2 = readByte(input) / 255.0;
+						nb2 = readByte(input) / 255.0;
 
-                        switch (readSByte(input)) {
-                            case CURVE_STEPPED:
-                                spCurveTimeline_setStepped(SUPER(timeline), frame);
-                                break;
-                            case CURVE_BEZIER:
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, r, nr, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, g, ng, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, b, nb, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 3, time, time2, a, na, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 4, time, time2, r2, nr2, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 5, time, time2, g2, ng2, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 6, time, time2, b2, nb2, 1);
-                        }
-                        time = time2;
-                        r = nr;
-                        g = ng;
-                        b = nb;
-                        a = na;
-                        r2 = nr2;
-                        g2 = ng2;
-                        b2 = nb2;
-                    }
-                    spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
-                    break;
-                }
-                case SLOT_RGB2: {
-                    int bezierCount = readVarint(input, 1);
-                    spRGB2Timeline *timeline = spRGB2Timeline_create(frameCount, bezierCount, slotIndex);
+						switch (readSByte(input)) {
+							case CURVE_STEPPED:
+								spCurveTimeline_setStepped(SUPER(timeline), frame);
+								break;
+							case CURVE_BEZIER:
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, r, nr, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, g, ng, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, b, nb, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 3, time, time2, a, na, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 4, time, time2, r2, nr2, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 5, time, time2, g2, ng2, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 6, time, time2, b2, nb2, 1);
+						}
+						time = time2;
+						r = nr;
+						g = ng;
+						b = nb;
+						a = na;
+						r2 = nr2;
+						g2 = ng2;
+						b2 = nb2;
+					}
+					spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
+					break;
+				}
+				case SLOT_RGB2: {
+					int bezierCount = readVarint(input, 1);
+					spRGB2Timeline *timeline = spRGB2Timeline_create(frameCount, bezierCount, slotIndex);
 
-                    float time = readFloat(input);
-                    float r = readByte(input) / 255.0;
-                    float g = readByte(input) / 255.0;
-                    float b = readByte(input) / 255.0;
-                    float r2 = readByte(input) / 255.0;
-                    float g2 = readByte(input) / 255.0;
-                    float b2 = readByte(input) / 255.0;
+					float time = readFloat(input);
+					float r = readByte(input) / 255.0;
+					float g = readByte(input) / 255.0;
+					float b = readByte(input) / 255.0;
+					float r2 = readByte(input) / 255.0;
+					float g2 = readByte(input) / 255.0;
+					float b2 = readByte(input) / 255.0;
 
-                    for (frame = 0, bezier = 0;; frame++) {
-                        float time2, nr, ng, nb, nr2, ng2, nb2;
-                        spRGB2Timeline_setFrame(timeline, frame, time, r, g, b, r2, g2, b2);
-                        if (frame == frameLast) break;
-                        time2 = readFloat(input);
-                        nr = readByte(input) / 255.0;
-                        ng = readByte(input) / 255.0;
-                        nb = readByte(input) / 255.0;
-                        nr2 = readByte(input) / 255.0;
-                        ng2 = readByte(input) / 255.0;
-                        nb2 = readByte(input) / 255.0;
+					for (frame = 0, bezier = 0;; frame++) {
+						float time2, nr, ng, nb, nr2, ng2, nb2;
+						spRGB2Timeline_setFrame(timeline, frame, time, r, g, b, r2, g2, b2);
+						if (frame == frameLast) break;
+						time2 = readFloat(input);
+						nr = readByte(input) / 255.0;
+						ng = readByte(input) / 255.0;
+						nb = readByte(input) / 255.0;
+						nr2 = readByte(input) / 255.0;
+						ng2 = readByte(input) / 255.0;
+						nb2 = readByte(input) / 255.0;
 
-                        switch (readSByte(input)) {
-                            case CURVE_STEPPED:
-                                spCurveTimeline_setStepped(SUPER(timeline), frame);
-                                break;
-                            case CURVE_BEZIER:
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, r, nr, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, g, ng, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, b, nb, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 3, time, time2, r2, nr2, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 4, time, time2, g2, ng2, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 5, time, time2, b2, nb2, 1);
-                        }
-                        time = time2;
-                        r = nr;
-                        g = ng;
-                        b = nb;
-                        r2 = nr2;
-                        g2 = ng2;
-                        b2 = nb2;
-                    }
-                    spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
-                    break;
-                }
-                case SLOT_ALPHA: {
-                    int bezierCount = readVarint(input, 1);
-                    spAlphaTimeline *timeline = spAlphaTimeline_create(frameCount, bezierCount, slotIndex);
-                    float time = readFloat(input);
-                    float a = readByte(input) / 255.0;
-                    for (frame = 0, bezier = 0;; frame++) {
-                        float time2, a2;
-                        spAlphaTimeline_setFrame(timeline, frame, time, a);
-                        if (frame == frameLast) break;
-                        time2 = readFloat(input);
-                        a2 = readByte(input) / 255;
-                        switch (readSByte(input)) {
-                            case CURVE_STEPPED:
-                                spCurveTimeline_setStepped(SUPER(timeline), frame);
-                                break;
-                            case CURVE_BEZIER:
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, a, a2, 1);
-                        }
-                        time = time2;
-                        a = a2;
-                    }
-                    spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
-                    break;
-                }
-                default: {
-                    return NULL;
-                }
+						switch (readSByte(input)) {
+							case CURVE_STEPPED:
+								spCurveTimeline_setStepped(SUPER(timeline), frame);
+								break;
+							case CURVE_BEZIER:
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, r, nr, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, g, ng, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, b, nb, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 3, time, time2, r2, nr2, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 4, time, time2, g2, ng2, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 5, time, time2, b2, nb2, 1);
+						}
+						time = time2;
+						r = nr;
+						g = ng;
+						b = nb;
+						r2 = nr2;
+						g2 = ng2;
+						b2 = nb2;
+					}
+					spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
+					break;
+				}
+				case SLOT_ALPHA: {
+					int bezierCount = readVarint(input, 1);
+					spAlphaTimeline *timeline = spAlphaTimeline_create(frameCount, bezierCount, slotIndex);
+					float time = readFloat(input);
+					float a = readByte(input) / 255.0;
+					for (frame = 0, bezier = 0;; frame++) {
+						float time2, a2;
+						spAlphaTimeline_setFrame(timeline, frame, time, a);
+						if (frame == frameLast) break;
+						time2 = readFloat(input);
+						a2 = readByte(input) / 255;
+						switch (readSByte(input)) {
+							case CURVE_STEPPED:
+								spCurveTimeline_setStepped(SUPER(timeline), frame);
+								break;
+							case CURVE_BEZIER:
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, a, a2, 1);
+						}
+						time = time2;
+						a = a2;
+					}
+					spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
+					break;
+				}
+				default: {
+					return NULL;
+				}
 			}
 		}
 	}
@@ -538,46 +540,60 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 		for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii) {
 			unsigned char timelineType = readByte(input);
 			int frameCount = readVarint(input, 1);
-            int bezierCount = readVarint(input, 1);
-            spTimeline *timeline = NULL;
+			int bezierCount = readVarint(input, 1);
+			spTimeline *timeline = NULL;
 			switch (timelineType) {
-                case BONE_ROTATE:
-                    timeline = readTimeline(input, SUPER(spRotateTimeline_create(frameCount, bezierCount, boneIndex)), 1);
-                    break;
-                case BONE_TRANSLATE:
-                    timeline = readTimeline2(input, SUPER(spTranslateTimeline_create(frameCount, bezierCount, boneIndex)), scale);
-                    break;
-                case BONE_TRANSLATEX:
-                    timeline = readTimeline(input, SUPER(spTranslateXTimeline_create(frameCount, bezierCount, boneIndex)), scale);
-                    break;
-                case BONE_TRANSLATEY:
-                    timeline = readTimeline(input, SUPER(spTranslateYTimeline_create(frameCount, bezierCount, boneIndex)), scale);
-                    break;
-                case BONE_SCALE:
-                    timeline = readTimeline2(input, SUPER(spScaleTimeline_create(frameCount, bezierCount, boneIndex)), 1);
-                    break;
-                case BONE_SCALEX:
-                    timeline = readTimeline(input, SUPER(spScaleXTimeline_create(frameCount, bezierCount, boneIndex)), 1);
-                    break;
-                case BONE_SCALEY:
-                    timeline = readTimeline(input, SUPER(spScaleYTimeline_create(frameCount, bezierCount, boneIndex)), 1);
-                    break;
-                case BONE_SHEAR:
-                    timeline = readTimeline2(input, SUPER(spShearTimeline_create(frameCount, bezierCount, boneIndex)), 1);
-                    break;
-                case BONE_SHEARX:
-                    timeline = readTimeline(input, SUPER(spShearXTimeline_create(frameCount, bezierCount, boneIndex)), 1);
-                    break;
-                case BONE_SHEARY:
-                    timeline = readTimeline(input, SUPER(spShearYTimeline_create(frameCount, bezierCount, boneIndex)), 1);
-                    break;
-                default: {
-                    for (iii = 0; iii < timelines->size; ++iii)
-                        spTimeline_dispose(timelines->items[iii]);
-                    spTimelineArray_dispose(timelines);
-                    _spSkeletonBinary_setError(self, "Invalid timeline type for a bone: ", skeletonData->bones[boneIndex]->name);
-                    return NULL;
-                }
+				case BONE_ROTATE:
+					timeline = readTimeline(input, SUPER(spRotateTimeline_create(frameCount, bezierCount, boneIndex)),
+											1);
+					break;
+				case BONE_TRANSLATE:
+					timeline = readTimeline2(input,
+											 SUPER(spTranslateTimeline_create(frameCount, bezierCount, boneIndex)),
+											 scale);
+					break;
+				case BONE_TRANSLATEX:
+					timeline = readTimeline(input,
+											SUPER(spTranslateXTimeline_create(frameCount, bezierCount, boneIndex)),
+											scale);
+					break;
+				case BONE_TRANSLATEY:
+					timeline = readTimeline(input,
+											SUPER(spTranslateYTimeline_create(frameCount, bezierCount, boneIndex)),
+											scale);
+					break;
+				case BONE_SCALE:
+					timeline = readTimeline2(input, SUPER(spScaleTimeline_create(frameCount, bezierCount, boneIndex)),
+											 1);
+					break;
+				case BONE_SCALEX:
+					timeline = readTimeline(input, SUPER(spScaleXTimeline_create(frameCount, bezierCount, boneIndex)),
+											1);
+					break;
+				case BONE_SCALEY:
+					timeline = readTimeline(input, SUPER(spScaleYTimeline_create(frameCount, bezierCount, boneIndex)),
+											1);
+					break;
+				case BONE_SHEAR:
+					timeline = readTimeline2(input, SUPER(spShearTimeline_create(frameCount, bezierCount, boneIndex)),
+											 1);
+					break;
+				case BONE_SHEARX:
+					timeline = readTimeline(input, SUPER(spShearXTimeline_create(frameCount, bezierCount, boneIndex)),
+											1);
+					break;
+				case BONE_SHEARY:
+					timeline = readTimeline(input, SUPER(spShearYTimeline_create(frameCount, bezierCount, boneIndex)),
+											1);
+					break;
+				default: {
+					for (iii = 0; iii < timelines->size; ++iii)
+						spTimeline_dispose(timelines->items[iii]);
+					spTimelineArray_dispose(timelines);
+					_spSkeletonBinary_setError(self, "Invalid timeline type for a bone: ",
+											   skeletonData->bones[boneIndex]->name);
+					return NULL;
+				}
 			}
 			spTimelineArray_add(timelines, timeline);
 		}
@@ -585,162 +601,171 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 
 	/* IK constraint timelines. */
 	for (i = 0, n = readVarint(input, 1); i < n; ++i) {
-        int index = readVarint(input, 1);
-        int frameCount = readVarint(input, 1);
-        int frameLast = frameCount - 1;
-        int bezierCount = readVarint(input, 1);
-        spIkConstraintTimeline *timeline = spIkConstraintTimeline_create(frameCount, bezierCount, index);
-        float time = readFloat(input);
-        float mix = readFloat(input);
-        float softness = readFloat(input) * scale;
-        for (frame = 0, bezier = 0;; frame++) {
-            float time2, mix2, softness2;
-            int bendDirection = readSByte(input);
-            int compress = readBoolean(input);
-            int stretch = readBoolean(input);
-            spIkConstraintTimeline_setFrame(timeline, frame, time, mix, softness, bendDirection, compress, stretch);
-            if (frame == frameLast) break;
-            time2 = readFloat(input);
-            mix2 = readFloat(input);
-            softness2 = readFloat(input) * scale;
-            switch (readSByte(input)) {
-                case CURVE_STEPPED:
-                    spCurveTimeline_setStepped(SUPER(timeline), frame);
-                    break;
-                case CURVE_BEZIER:
-                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, mix, mix2, 1);
-                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, softness, softness2, scale);
-            }
-            time = time2;
-            mix = mix2;
-            softness = softness2;
-        }
-        spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
+		int index = readVarint(input, 1);
+		int frameCount = readVarint(input, 1);
+		int frameLast = frameCount - 1;
+		int bezierCount = readVarint(input, 1);
+		spIkConstraintTimeline *timeline = spIkConstraintTimeline_create(frameCount, bezierCount, index);
+		float time = readFloat(input);
+		float mix = readFloat(input);
+		float softness = readFloat(input) * scale;
+		for (frame = 0, bezier = 0;; frame++) {
+			float time2, mix2, softness2;
+			int bendDirection = readSByte(input);
+			int compress = readBoolean(input);
+			int stretch = readBoolean(input);
+			spIkConstraintTimeline_setFrame(timeline, frame, time, mix, softness, bendDirection, compress, stretch);
+			if (frame == frameLast) break;
+			time2 = readFloat(input);
+			mix2 = readFloat(input);
+			softness2 = readFloat(input) * scale;
+			switch (readSByte(input)) {
+				case CURVE_STEPPED:
+					spCurveTimeline_setStepped(SUPER(timeline), frame);
+					break;
+				case CURVE_BEZIER:
+					setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, mix, mix2, 1);
+					setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, softness, softness2,
+							  scale);
+			}
+			time = time2;
+			mix = mix2;
+			softness = softness2;
+		}
+		spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
 	}
 
 	/* Transform constraint timelines. */
 	for (i = 0, n = readVarint(input, 1); i < n; ++i) {
-        int index = readVarint(input, 1);
-        int frameCount = readVarint(input, 1);
-        int frameLast = frameCount - 1;
-        int bezierCount = readVarint(input, 1);
-        spTransformConstraintTimeline *timeline = spTransformConstraintTimeline_create(frameCount, bezierCount, index);
-        float time = readFloat(input);
-        float mixRotate = readFloat(input);
-        float mixX = readFloat(input);
-        float mixY = readFloat(input);
-        float mixScaleX = readFloat(input);
-        float mixScaleY = readFloat(input);
-        float mixShearY = readFloat(input);
-        for (frame = 0, bezier = 0;; frame++) {
-            float time2, mixRotate2, mixX2, mixY2, mixScaleX2, mixScaleY2, mixShearY2;
-            spTransformConstraintTimeline_setFrame(timeline, frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
-            if (frame == frameLast) break;
-            time2 = readFloat(input);
-            mixRotate2 = readFloat(input);
-            mixX2 = readFloat(input);
-            mixY2 = readFloat(input);
-            mixScaleX2 = readFloat(input);
-            mixScaleY2 = readFloat(input);
-            mixShearY2 = readFloat(input);
-            switch (readSByte(input)) {
-                case CURVE_STEPPED:
-                    spCurveTimeline_setStepped(SUPER(timeline), frame);
-                    break;
-                case CURVE_BEZIER:
-                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
-                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, mixX, mixX2, 1);
-                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, mixY, mixY2, 1);
-                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 3, time, time2, mixScaleX, mixScaleX2, 1);
-                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 4, time, time2, mixScaleY, mixScaleY2, 1);
-                    setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 5, time, time2, mixShearY, mixShearY2, 1);
-            }
-            time = time2;
-            mixRotate = mixRotate2;
-            mixX = mixX2;
-            mixY = mixY2;
-            mixScaleX = mixScaleX2;
-            mixScaleY = mixScaleY2;
-            mixShearY = mixShearY2;
-        }
-        spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
+		int index = readVarint(input, 1);
+		int frameCount = readVarint(input, 1);
+		int frameLast = frameCount - 1;
+		int bezierCount = readVarint(input, 1);
+		spTransformConstraintTimeline *timeline = spTransformConstraintTimeline_create(frameCount, bezierCount, index);
+		float time = readFloat(input);
+		float mixRotate = readFloat(input);
+		float mixX = readFloat(input);
+		float mixY = readFloat(input);
+		float mixScaleX = readFloat(input);
+		float mixScaleY = readFloat(input);
+		float mixShearY = readFloat(input);
+		for (frame = 0, bezier = 0;; frame++) {
+			float time2, mixRotate2, mixX2, mixY2, mixScaleX2, mixScaleY2, mixShearY2;
+			spTransformConstraintTimeline_setFrame(timeline, frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY,
+												   mixShearY);
+			if (frame == frameLast) break;
+			time2 = readFloat(input);
+			mixRotate2 = readFloat(input);
+			mixX2 = readFloat(input);
+			mixY2 = readFloat(input);
+			mixScaleX2 = readFloat(input);
+			mixScaleY2 = readFloat(input);
+			mixShearY2 = readFloat(input);
+			switch (readSByte(input)) {
+				case CURVE_STEPPED:
+					spCurveTimeline_setStepped(SUPER(timeline), frame);
+					break;
+				case CURVE_BEZIER:
+					setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+					setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, mixX, mixX2, 1);
+					setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, mixY, mixY2, 1);
+					setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 3, time, time2, mixScaleX, mixScaleX2, 1);
+					setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 4, time, time2, mixScaleY, mixScaleY2, 1);
+					setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 5, time, time2, mixShearY, mixShearY2, 1);
+			}
+			time = time2;
+			mixRotate = mixRotate2;
+			mixX = mixX2;
+			mixY = mixY2;
+			mixScaleX = mixScaleX2;
+			mixScaleY = mixScaleY2;
+			mixShearY = mixShearY2;
+		}
+		spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
 	}
 
 	/* Path constraint timelines. */
 	for (i = 0, n = readVarint(input, 1); i < n; ++i) {
 		int index = readVarint(input, 1);
-		spPathConstraintData* data = skeletonData->pathConstraints[index];
+		spPathConstraintData *data = skeletonData->pathConstraints[index];
 		for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii) {
-            int type = readSByte(input);
-            int frameCount = readVarint(input, 1);
-            int bezierCount = readVarint(input, 1);
-            switch (type) {
-                case PATH_POSITION: {
-                    spTimelineArray_add(timelines, readTimeline(input, SUPER(spPathConstraintPositionTimeline_create(frameCount, bezierCount, index)),
-                            data->positionMode == SP_POSITION_MODE_FIXED ? scale : 1));
-                    break;
-                }
-                case PATH_SPACING: {
-                    spTimelineArray_add(timelines, readTimeline(input,
-                                              SUPER(spPathConstraintSpacingTimeline_create(frameCount,
-                                                                                bezierCount,
-                                                                                index)),
-                            data->spacingMode == SP_SPACING_MODE_LENGTH ||
-                            data->spacingMode == SP_SPACING_MODE_FIXED ? scale : 1));
-                    break;
-                }
-                case PATH_MIX: {
-                    float time, mixRotate, mixX, mixY;
-                    int frameLast;
-                    spPathConstraintMixTimeline *timeline = spPathConstraintMixTimeline_create(frameCount, bezierCount, index);
-                    time = readFloat(input);
-                    mixRotate = readFloat(input);
-                    mixX = readFloat(input);
-                    mixY = readFloat(input);
-                    for (frame = 0, bezier = 0, frameLast = timeline->super.super.frameCount - 1;; frame++) {
-                        float time2, mixRotate2, mixX2, mixY2;
-                        spPathConstraintMixTimeline_setFrame(timeline, frame, time, mixRotate, mixX, mixY);
-                        if (frame == frameLast) break;
-                        time2 = readFloat(input);
-                        mixRotate2 = readFloat(input);
-                        mixX2 = readFloat(input);
-                        mixY2 = readFloat(input);
-                        switch (readSByte(input)) {
-                            case CURVE_STEPPED:
-                                spCurveTimeline_setStepped(SUPER(timeline), frame);
-                                break;
-                            case CURVE_BEZIER:
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, mixX, mixX2, 1);
-                                setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, mixY, mixY2, 1);
+			int type = readSByte(input);
+			int frameCount = readVarint(input, 1);
+			int bezierCount = readVarint(input, 1);
+			switch (type) {
+				case PATH_POSITION: {
+					spTimelineArray_add(timelines, readTimeline(input, SUPER(spPathConstraintPositionTimeline_create(
+							frameCount, bezierCount, index)),
+																data->positionMode == SP_POSITION_MODE_FIXED ? scale
+																											 : 1));
+					break;
+				}
+				case PATH_SPACING: {
+					spTimelineArray_add(timelines, readTimeline(input,
+																SUPER(spPathConstraintSpacingTimeline_create(frameCount,
+																											 bezierCount,
+																											 index)),
+																data->spacingMode == SP_SPACING_MODE_LENGTH ||
+																data->spacingMode == SP_SPACING_MODE_FIXED ? scale
+																										   : 1));
+					break;
+				}
+				case PATH_MIX: {
+					float time, mixRotate, mixX, mixY;
+					int frameLast;
+					spPathConstraintMixTimeline *timeline = spPathConstraintMixTimeline_create(frameCount, bezierCount,
+																							   index);
+					time = readFloat(input);
+					mixRotate = readFloat(input);
+					mixX = readFloat(input);
+					mixY = readFloat(input);
+					for (frame = 0, bezier = 0, frameLast = timeline->super.super.frameCount - 1;; frame++) {
+						float time2, mixRotate2, mixX2, mixY2;
+						spPathConstraintMixTimeline_setFrame(timeline, frame, time, mixRotate, mixX, mixY);
+						if (frame == frameLast) break;
+						time2 = readFloat(input);
+						mixRotate2 = readFloat(input);
+						mixX2 = readFloat(input);
+						mixY2 = readFloat(input);
+						switch (readSByte(input)) {
+							case CURVE_STEPPED:
+								spCurveTimeline_setStepped(SUPER(timeline), frame);
+								break;
+							case CURVE_BEZIER:
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, mixRotate,
+										  mixRotate2, 1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 1, time, time2, mixX, mixX2,
+										  1);
+								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, mixY, mixY2,
+										  1);
 
-                        }
-                        time = time2;
-                        mixRotate = mixRotate2;
-                        mixX = mixX2;
-                        mixY = mixY2;
-                    }
-                    spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
-                }
-            }
+						}
+						time = time2;
+						mixRotate = mixRotate2;
+						mixX = mixX2;
+						mixY = mixY2;
+					}
+					spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
+				}
+			}
 		}
 	}
 
 	/* Deform timelines. */
 	for (i = 0, n = readVarint(input, 1); i < n; ++i) {
-		spSkin* skin = skeletonData->skins[readVarint(input, 1)];
+		spSkin *skin = skeletonData->skins[readVarint(input, 1)];
 		for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii) {
 			int slotIndex = readVarint(input, 1);
 			for (iii = 0, nnn = readVarint(input, 1); iii < nnn; ++iii) {
-				float* tempDeform;
+				float *tempDeform;
 				spDeformTimeline *timeline;
 				int weighted, deformLength;
-				const char* attachmentName = readStringRef(input, skeletonData);
+				const char *attachmentName = readStringRef(input, skeletonData);
 				int frameCount, frameLast, bezierCount;
 				float time, time2;
 
-				spVertexAttachment* attachment = SUB_CAST(spVertexAttachment,
-					spSkin_getAttachment(skin, slotIndex, attachmentName));
+				spVertexAttachment *attachment = SUB_CAST(spVertexAttachment,
+														  spSkin_getAttachment(skin, slotIndex, attachmentName));
 				if (!attachment) {
 					for (i = 0; i < timelines->size; ++i)
 						spTimeline_dispose(timelines->items[i]);
@@ -758,9 +783,9 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 				bezierCount = readVarint(input, 1);
 				timeline = spDeformTimeline_create(frameCount, deformLength, bezierCount, slotIndex, attachment);
 
-                time = readFloat(input);
-                for (frame = 0, bezier = 0;; ++frame) {
-					float* deform;
+				time = readFloat(input);
+				for (frame = 0, bezier = 0;; ++frame) {
+					float *deform;
 					int end = readVarint(input, 1);
 					if (!end) {
 						if (weighted) {
@@ -782,26 +807,26 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 						}
 						memset(deform + v, 0, sizeof(float) * (deformLength - v));
 						if (!weighted) {
-							float* vertices = attachment->vertices;
+							float *vertices = attachment->vertices;
 							for (v = 0; v < deformLength; ++v)
 								deform[v] += vertices[v];
 						}
 					}
-                    spDeformTimeline_setFrame(timeline, frame, time, deform);
-                    if (frame == frameLast) break;
-                    time2 = readFloat(input);
-                    switch(readSByte(input)) {
-                        case CURVE_STEPPED:
-                            spCurveTimeline_setStepped(SUPER(timeline), frame);
-                            break;
-                        case CURVE_BEZIER:
-                            setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, 0, 1, 1);
-                    }
-                    time = time2;
+					spDeformTimeline_setFrame(timeline, frame, time, deform);
+					if (frame == frameLast) break;
+					time2 = readFloat(input);
+					switch (readSByte(input)) {
+						case CURVE_STEPPED:
+							spCurveTimeline_setStepped(SUPER(timeline), frame);
+							break;
+						case CURVE_BEZIER:
+							setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, 0, 1, 1);
+					}
+					time = time2;
 				}
 				FREE(tempDeform);
 
-				spTimelineArray_add(timelines, (spTimeline*)timeline);
+				spTimelineArray_add(timelines, (spTimeline *) timeline);
 			}
 		}
 	}
@@ -809,12 +834,12 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 	/* Draw order timeline. */
 	drawOrderCount = readVarint(input, 1);
 	if (drawOrderCount) {
-		spDrawOrderTimeline* timeline = spDrawOrderTimeline_create(drawOrderCount, skeletonData->slotsCount);
+		spDrawOrderTimeline *timeline = spDrawOrderTimeline_create(drawOrderCount, skeletonData->slotsCount);
 		for (i = 0; i < drawOrderCount; ++i) {
 			float time = readFloat(input);
 			int offsetCount = readVarint(input, 1);
-			int* drawOrder = MALLOC(int, skeletonData->slotsCount);
-			int* unchanged = MALLOC(int, skeletonData->slotsCount - offsetCount);
+			int *drawOrder = MALLOC(int, skeletonData->slotsCount);
+			int *unchanged = MALLOC(int, skeletonData->slotsCount - offsetCount);
 			int originalIndex = 0, unchangedIndex = 0;
 			memset(drawOrder, -1, sizeof(int) * skeletonData->slotsCount);
 			for (ii = 0; ii < offsetCount; ++ii) {
@@ -837,17 +862,17 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 			spDrawOrderTimeline_setFrame(timeline, i, time, drawOrder);
 			FREE(drawOrder);
 		}
-		spTimelineArray_add(timelines, (spTimeline*)timeline);
+		spTimelineArray_add(timelines, (spTimeline *) timeline);
 	}
 
 	/* Event timeline. */
 	eventCount = readVarint(input, 1);
 	if (eventCount) {
-		spEventTimeline* timeline = spEventTimeline_create(eventCount);
+		spEventTimeline *timeline = spEventTimeline_create(eventCount);
 		for (i = 0; i < eventCount; ++i) {
 			float time = readFloat(input);
-			spEventData* eventData = skeletonData->events[readVarint(input, 1)];
-			spEvent* event = spEvent_create(time, eventData);
+			spEventData *eventData = skeletonData->events[readVarint(input, 1)];
+			spEvent *event = spEvent_create(time, eventData);
 			event->intValue = readVarint(input, 0);
 			event->floatValue = readFloat(input);
 			if (readBoolean(input))
@@ -860,19 +885,19 @@ static spAnimation* _spSkeletonBinary_readAnimation (spSkeletonBinary* self, con
 			}
 			spEventTimeline_setFrame(timeline, i, event);
 		}
-		spTimelineArray_add(timelines, (spTimeline*)timeline);
+		spTimelineArray_add(timelines, (spTimeline *) timeline);
 	}
 
-    duration = 0;
-    for (i = 0, n = timelines->size; i < n; i++) {
-        duration = MAX(duration, spTimeline_getDuration(timelines->items[i]));
-    }
+	duration = 0;
+	for (i = 0, n = timelines->size; i < n; i++) {
+		duration = MAX(duration, spTimeline_getDuration(timelines->items[i]));
+	}
 	animation = spAnimation_create(name, timelines, duration);
 	return animation;
 }
 
-static float* _readFloatArray(_dataInput *input, int n, float scale) {
-	float* array = MALLOC(float, n);
+static float *_readFloatArray(_dataInput *input, int n, float scale) {
+	float *array = MALLOC(float, n);
 	int i;
 	if (scale == 1)
 		for (i = 0; i < n; ++i)
@@ -883,9 +908,9 @@ static float* _readFloatArray(_dataInput *input, int n, float scale) {
 	return array;
 }
 
-static short* _readShortArray(_dataInput *input, int *length) {
+static short *_readShortArray(_dataInput *input, int *length) {
 	int n = readVarint(input, 1);
-	short* array = MALLOC(short, n);
+	short *array = MALLOC(short, n);
 	int i;
 	*length = n;
 	for (i = 0; i < n; ++i) {
@@ -895,12 +920,12 @@ static short* _readShortArray(_dataInput *input, int *length) {
 	return array;
 }
 
-static void _readVertices(spSkeletonBinary* self, _dataInput* input, spVertexAttachment* attachment,
-		int vertexCount) {
+static void _readVertices(spSkeletonBinary *self, _dataInput *input, spVertexAttachment *attachment,
+						  int vertexCount) {
 	int i, ii;
 	int verticesLength = vertexCount << 1;
-	spFloatArray* weights = spFloatArray_create(8);
-	spIntArray* bones = spIntArray_create(8);
+	spFloatArray *weights = spFloatArray_create(8);
+	spIntArray *bones = spIntArray_create(8);
 
 	attachment->worldVerticesLength = verticesLength;
 
@@ -937,157 +962,158 @@ static void _readVertices(spSkeletonBinary* self, _dataInput* input, spVertexAtt
 	FREE(bones);
 }
 
-spAttachment* spSkeletonBinary_readAttachment(spSkeletonBinary* self, _dataInput* input,
-		spSkin* skin, int slotIndex, const char* attachmentName, spSkeletonData* skeletonData, int/*bool*/ nonessential) {
+spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput *input,
+											  spSkin *skin, int slotIndex, const char *attachmentName,
+											  spSkeletonData *skeletonData, int/*bool*/ nonessential) {
 	int i;
 	spAttachmentType type;
-	const char* name = readStringRef(input, skeletonData);
+	const char *name = readStringRef(input, skeletonData);
 	if (!name) name = attachmentName;
 
-	type = (spAttachmentType)readByte(input);
+	type = (spAttachmentType) readByte(input);
 
 	switch (type) {
-	case SP_ATTACHMENT_REGION: {
-		const char* path = readStringRef(input, skeletonData);
-		spAttachment* attachment;
-		spRegionAttachment* region;
-		if (!path) MALLOC_STR(path, name);
-		else {
-			const char* tmp = 0;
-			MALLOC_STR(tmp, path);
-			path = tmp;
+		case SP_ATTACHMENT_REGION: {
+			const char *path = readStringRef(input, skeletonData);
+			spAttachment *attachment;
+			spRegionAttachment *region;
+			if (!path) MALLOC_STR(path, name);
+			else {
+				const char *tmp = 0;
+				MALLOC_STR(tmp, path);
+				path = tmp;
+			}
+			attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
+			region = SUB_CAST(spRegionAttachment, attachment);
+			region->path = path;
+			region->rotation = readFloat(input);
+			region->x = readFloat(input) * self->scale;
+			region->y = readFloat(input) * self->scale;
+			region->scaleX = readFloat(input);
+			region->scaleY = readFloat(input);
+			region->width = readFloat(input) * self->scale;
+			region->height = readFloat(input) * self->scale;
+			readColor(input, &region->color.r, &region->color.g, &region->color.b, &region->color.a);
+			spRegionAttachment_updateOffset(region);
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			return attachment;
 		}
-		attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
-		region = SUB_CAST(spRegionAttachment, attachment);
-		region->path = path;
-		region->rotation = readFloat(input);
-		region->x = readFloat(input) * self->scale;
-		region->y = readFloat(input) * self->scale;
-		region->scaleX = readFloat(input);
-		region->scaleY = readFloat(input);
-		region->width = readFloat(input) * self->scale;
-		region->height = readFloat(input) * self->scale;
-		readColor(input, &region->color.r, &region->color.g, &region->color.b, &region->color.a);
-		spRegionAttachment_updateOffset(region);
-		spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-		return attachment;
-	}
-	case SP_ATTACHMENT_BOUNDING_BOX: {
-		int vertexCount = readVarint(input, 1);
-		spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
-		_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
-		if (nonessential) readInt(input); /* Skip color. */
-		spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-		return attachment;
-	}
-	case SP_ATTACHMENT_MESH: {
-		int vertexCount;
-		spAttachment* attachment;
-		spMeshAttachment* mesh;
-		const char* path = readStringRef(input, skeletonData);
-		if (!path) MALLOC_STR(path, name);
-		else {
-			const char* tmp = 0;
-			MALLOC_STR(tmp, path);
-			path = tmp;
+		case SP_ATTACHMENT_BOUNDING_BOX: {
+			int vertexCount = readVarint(input, 1);
+			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+			_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
+			if (nonessential) readInt(input); /* Skip color. */
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			return attachment;
 		}
-		attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
-		mesh = SUB_CAST(spMeshAttachment, attachment);
-		mesh->path = path;
-		readColor(input, &mesh->color.r, &mesh->color.g, &mesh->color.b, &mesh->color.a);
-		vertexCount = readVarint(input, 1);
-		mesh->regionUVs = _readFloatArray(input, vertexCount << 1, 1);
-		mesh->triangles = (unsigned short*)_readShortArray(input, &mesh->trianglesCount);
-		_readVertices(self, input, SUPER(mesh), vertexCount);
-		spMeshAttachment_updateUVs(mesh);
-		mesh->hullLength = readVarint(input, 1) << 1;
-		if (nonessential) {
-			mesh->edges = (int*)_readShortArray(input, &mesh->edgesCount);
-			mesh->width = readFloat(input) * self->scale;
-			mesh->height = readFloat(input) * self->scale;
-		} else {
-			mesh->edges = 0;
-			mesh->width = 0;
-			mesh->height = 0;
+		case SP_ATTACHMENT_MESH: {
+			int vertexCount;
+			spAttachment *attachment;
+			spMeshAttachment *mesh;
+			const char *path = readStringRef(input, skeletonData);
+			if (!path) MALLOC_STR(path, name);
+			else {
+				const char *tmp = 0;
+				MALLOC_STR(tmp, path);
+				path = tmp;
+			}
+			attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
+			mesh = SUB_CAST(spMeshAttachment, attachment);
+			mesh->path = path;
+			readColor(input, &mesh->color.r, &mesh->color.g, &mesh->color.b, &mesh->color.a);
+			vertexCount = readVarint(input, 1);
+			mesh->regionUVs = _readFloatArray(input, vertexCount << 1, 1);
+			mesh->triangles = (unsigned short *) _readShortArray(input, &mesh->trianglesCount);
+			_readVertices(self, input, SUPER(mesh), vertexCount);
+			spMeshAttachment_updateUVs(mesh);
+			mesh->hullLength = readVarint(input, 1) << 1;
+			if (nonessential) {
+				mesh->edges = (int *) _readShortArray(input, &mesh->edgesCount);
+				mesh->width = readFloat(input) * self->scale;
+				mesh->height = readFloat(input) * self->scale;
+			} else {
+				mesh->edges = 0;
+				mesh->width = 0;
+				mesh->height = 0;
+			}
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			return attachment;
 		}
-		spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-		return attachment;
-	}
-	case SP_ATTACHMENT_LINKED_MESH: {
-		const char* skinName;
-		const char* parent;
-		spAttachment* attachment;
-		spMeshAttachment* mesh;
-		int inheritDeform;
-		const char* path = readStringRef(input, skeletonData);
-		if (!path) MALLOC_STR(path, name);
-		else {
-			const char* tmp = 0;
-			MALLOC_STR(tmp, path);
-			path = tmp;
+		case SP_ATTACHMENT_LINKED_MESH: {
+			const char *skinName;
+			const char *parent;
+			spAttachment *attachment;
+			spMeshAttachment *mesh;
+			int inheritDeform;
+			const char *path = readStringRef(input, skeletonData);
+			if (!path) MALLOC_STR(path, name);
+			else {
+				const char *tmp = 0;
+				MALLOC_STR(tmp, path);
+				path = tmp;
+			}
+			attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
+			mesh = SUB_CAST(spMeshAttachment, attachment);
+			mesh->path = path;
+			readColor(input, &mesh->color.r, &mesh->color.g, &mesh->color.b, &mesh->color.a);
+			skinName = readStringRef(input, skeletonData);
+			parent = readStringRef(input, skeletonData);
+			inheritDeform = readBoolean(input);
+			if (nonessential) {
+				mesh->width = readFloat(input) * self->scale;
+				mesh->height = readFloat(input) * self->scale;
+			}
+			_spSkeletonBinary_addLinkedMesh(self, mesh, skinName, slotIndex, parent, inheritDeform);
+			return attachment;
 		}
-		attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, path);
-		mesh = SUB_CAST(spMeshAttachment, attachment);
-		mesh->path = path;
-		readColor(input, &mesh->color.r, &mesh->color.g, &mesh->color.b, &mesh->color.a);
-		skinName = readStringRef(input, skeletonData);
-		parent = readStringRef(input, skeletonData);
-		inheritDeform = readBoolean(input);
-		if (nonessential) {
-			mesh->width = readFloat(input) * self->scale;
-			mesh->height = readFloat(input) * self->scale;
+		case SP_ATTACHMENT_PATH: {
+			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+			spPathAttachment *path = SUB_CAST(spPathAttachment, attachment);
+			int vertexCount = 0;
+			path->closed = readBoolean(input);
+			path->constantSpeed = readBoolean(input);
+			vertexCount = readVarint(input, 1);
+			_readVertices(self, input, SUPER(path), vertexCount);
+			path->lengthsLength = vertexCount / 3;
+			path->lengths = MALLOC(float, path->lengthsLength);
+			for (i = 0; i < path->lengthsLength; ++i) {
+				path->lengths[i] = readFloat(input) * self->scale;
+			}
+			if (nonessential) readInt(input); /* Skip color. */
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			return attachment;
 		}
-		_spSkeletonBinary_addLinkedMesh(self, mesh, skinName, slotIndex, parent, inheritDeform);
-		return attachment;
-	}
-	case SP_ATTACHMENT_PATH: {
-		spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
-		spPathAttachment* path = SUB_CAST(spPathAttachment, attachment);
-		int vertexCount = 0;
-		path->closed = readBoolean(input);
-		path->constantSpeed = readBoolean(input);
-		vertexCount = readVarint(input, 1);
-		_readVertices(self, input, SUPER(path), vertexCount);
-		path->lengthsLength = vertexCount / 3;
-		path->lengths = MALLOC(float, path->lengthsLength);
-		for (i = 0; i < path->lengthsLength; ++i) {
-			path->lengths[i] = readFloat(input) * self->scale;
-		}
-		if (nonessential) readInt(input); /* Skip color. */
-		spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-		return attachment;
-	}
-	case SP_ATTACHMENT_POINT: {
-		spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
-		spPointAttachment* point = SUB_CAST(spPointAttachment, attachment);
-		point->rotation = readFloat(input);
-		point->x = readFloat(input) * self->scale;
-		point->y = readFloat(input) * self->scale;
+		case SP_ATTACHMENT_POINT: {
+			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+			spPointAttachment *point = SUB_CAST(spPointAttachment, attachment);
+			point->rotation = readFloat(input);
+			point->x = readFloat(input) * self->scale;
+			point->y = readFloat(input) * self->scale;
 
-		if (nonessential) {
-			readColor(input, &point->color.r, &point->color.g, &point->color.b, &point->color.a);
+			if (nonessential) {
+				readColor(input, &point->color.r, &point->color.g, &point->color.b, &point->color.a);
+			}
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			return attachment;
 		}
-		spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-		return attachment;
-	}
-	case SP_ATTACHMENT_CLIPPING: {
-		int endSlotIndex = readVarint(input, 1);
-		int vertexCount = readVarint(input, 1);
-		spAttachment* attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
-		spClippingAttachment* clip = SUB_CAST(spClippingAttachment, attachment);
-		_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
-		if (nonessential) readInt(input); /* Skip color. */
-		clip->endSlot = skeletonData->slots[endSlotIndex];
-		spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
-		return attachment;
-	}
+		case SP_ATTACHMENT_CLIPPING: {
+			int endSlotIndex = readVarint(input, 1);
+			int vertexCount = readVarint(input, 1);
+			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+			spClippingAttachment *clip = SUB_CAST(spClippingAttachment, attachment);
+			_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
+			if (nonessential) readInt(input); /* Skip color. */
+			clip->endSlot = skeletonData->slots[endSlotIndex];
+			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
+			return attachment;
+		}
 	}
 
 	return 0;
 }
 
-spSkin* spSkeletonBinary_readSkin(spSkeletonBinary* self, _dataInput* input, int/*bool*/ defaultSkin,
-		spSkeletonData* skeletonData, int/*bool*/ nonessential) {
+spSkin *spSkeletonBinary_readSkin(spSkeletonBinary *self, _dataInput *input, int/*bool*/ defaultSkin,
+								  spSkeletonData *skeletonData, int/*bool*/ nonessential) {
 	spSkin *skin;
 	int i, n, ii, nn, slotCount;
 
@@ -1104,7 +1130,8 @@ spSkin* spSkeletonBinary_readSkin(spSkeletonBinary* self, _dataInput* input, int
 			spIkConstraintDataArray_add(skin->ikConstraints, skeletonData->ikConstraints[readVarint(input, 1)]);
 
 		for (i = 0, n = readVarint(input, 1); i < n; i++)
-			spTransformConstraintDataArray_add(skin->transformConstraints, skeletonData->transformConstraints[readVarint(input, 1)]);
+			spTransformConstraintDataArray_add(skin->transformConstraints,
+											   skeletonData->transformConstraints[readVarint(input, 1)]);
 
 		for (i = 0, n = readVarint(input, 1); i < n; i++)
 			spPathConstraintDataArray_add(skin->pathConstraints, skeletonData->pathConstraints[readVarint(input, 1)]);
@@ -1115,36 +1142,37 @@ spSkin* spSkeletonBinary_readSkin(spSkeletonBinary* self, _dataInput* input, int
 	for (i = 0; i < slotCount; ++i) {
 		int slotIndex = readVarint(input, 1);
 		for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii) {
-			const char* name = readStringRef(input, skeletonData);
-			spAttachment* attachment = spSkeletonBinary_readAttachment(self, input, skin, slotIndex, name, skeletonData, nonessential);
+			const char *name = readStringRef(input, skeletonData);
+			spAttachment *attachment = spSkeletonBinary_readAttachment(self, input, skin, slotIndex, name, skeletonData,
+																	   nonessential);
 			if (attachment) spSkin_setAttachment(skin, slotIndex, name, attachment);
 		}
 	}
 	return skin;
 }
 
-spSkeletonData* spSkeletonBinary_readSkeletonDataFile (spSkeletonBinary* self, const char* path) {
+spSkeletonData *spSkeletonBinary_readSkeletonDataFile(spSkeletonBinary *self, const char *path) {
 	int length;
-	spSkeletonData* skeletonData;
-	const char* binary = _spUtil_readFile(path, &length);
+	spSkeletonData *skeletonData;
+	const char *binary = _spUtil_readFile(path, &length);
 	if (length == 0 || !binary) {
 		_spSkeletonBinary_setError(self, "Unable to read skeleton file: ", path);
 		return 0;
 	}
-	skeletonData = spSkeletonBinary_readSkeletonData(self, (unsigned char*)binary, length);
+	skeletonData = spSkeletonBinary_readSkeletonData(self, (unsigned char *) binary, length);
 	FREE(binary);
 	return skeletonData;
 }
 
-spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const unsigned char* binary,
-		const int length) {
+spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const unsigned char *binary,
+												  const int length) {
 	int i, n, ii, nonessential;
-    char buffer[32];
-    int lowHash, highHash;
-	spSkeletonData* skeletonData;
-	_spSkeletonBinary* internal = SUB_CAST(_spSkeletonBinary, self);
+	char buffer[32];
+	int lowHash, highHash;
+	spSkeletonData *skeletonData;
+	_spSkeletonBinary *internal = SUB_CAST(_spSkeletonBinary, self);
 
-	_dataInput* input = NEW(_dataInput);
+	_dataInput *input = NEW(_dataInput);
 	input->cursor = binary;
 	input->end = binary + length;
 
@@ -1189,10 +1217,10 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	skeletonData->bonesCount = readVarint(input, 1);
 	skeletonData->bones = MALLOC(spBoneData*, skeletonData->bonesCount);
 	for (i = 0; i < skeletonData->bonesCount; ++i) {
-		spBoneData* data;
+		spBoneData *data;
 		int mode;
-		const char* name = readString(input);
-		spBoneData* parent = i == 0 ? 0 : skeletonData->bones[readVarint(input, 1)];
+		const char *name = readString(input);
+		spBoneData *parent = i == 0 ? 0 : skeletonData->bones[readVarint(input, 1)];
 		/* TODO Avoid copying of name */
 		data = spBoneData_create(i, name, parent);
 		FREE(name);
@@ -1206,11 +1234,21 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		data->length = readFloat(input) * self->scale;
 		mode = readVarint(input, 1);
 		switch (mode) {
-		case 0: data->transformMode = SP_TRANSFORMMODE_NORMAL; break;
-		case 1: data->transformMode = SP_TRANSFORMMODE_ONLYTRANSLATION; break;
-		case 2: data->transformMode = SP_TRANSFORMMODE_NOROTATIONORREFLECTION; break;
-		case 3: data->transformMode = SP_TRANSFORMMODE_NOSCALE; break;
-		case 4: data->transformMode = SP_TRANSFORMMODE_NOSCALEORREFLECTION; break;
+			case 0:
+				data->transformMode = SP_TRANSFORMMODE_NORMAL;
+				break;
+			case 1:
+				data->transformMode = SP_TRANSFORMMODE_ONLYTRANSLATION;
+				break;
+			case 2:
+				data->transformMode = SP_TRANSFORMMODE_NOROTATIONORREFLECTION;
+				break;
+			case 3:
+				data->transformMode = SP_TRANSFORMMODE_NOSCALE;
+				break;
+			case 4:
+				data->transformMode = SP_TRANSFORMMODE_NOSCALEORREFLECTION;
+				break;
 		}
 		data->skinRequired = readBoolean(input);
 		if (nonessential) readInt(input); /* Skip bone color. */
@@ -1222,11 +1260,11 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	skeletonData->slots = MALLOC(spSlotData*, skeletonData->slotsCount);
 	for (i = 0; i < skeletonData->slotsCount; ++i) {
 		int r, g, b, a;
-		const char* attachmentName;
-		const char* slotName = readString(input);
-		spBoneData* boneData = skeletonData->bones[readVarint(input, 1)];
+		const char *attachmentName;
+		const char *slotName = readString(input);
+		spBoneData *boneData = skeletonData->bones[readVarint(input, 1)];
 		/* TODO Avoid copying of slotName */
-		spSlotData* slotData = spSlotData_create(i, slotName, boneData);
+		spSlotData *slotData = spSlotData_create(i, slotName, boneData);
 		FREE(slotName);
 		readColor(input, &slotData->color.r, &slotData->color.g, &slotData->color.b, &slotData->color.a);
 		a = readByte(input);
@@ -1240,7 +1278,7 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		attachmentName = readStringRef(input, skeletonData);
 		if (attachmentName) MALLOC_STR(slotData->attachmentName, attachmentName);
 		else slotData->attachmentName = 0;
-		slotData->blendMode = (spBlendMode)readVarint(input, 1);
+		slotData->blendMode = (spBlendMode) readVarint(input, 1);
 		skeletonData->slots[i] = slotData;
 	}
 
@@ -1248,9 +1286,9 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	skeletonData->ikConstraintsCount = readVarint(input, 1);
 	skeletonData->ikConstraints = MALLOC(spIkConstraintData*, skeletonData->ikConstraintsCount);
 	for (i = 0; i < skeletonData->ikConstraintsCount; ++i) {
-		const char* name = readString(input);
+		const char *name = readString(input);
 		/* TODO Avoid copying of name */
-		spIkConstraintData* data = spIkConstraintData_create(name);
+		spIkConstraintData *data = spIkConstraintData_create(name);
 		data->order = readVarint(input, 1);
 		data->skinRequired = readBoolean(input);
 		FREE(name);
@@ -1273,9 +1311,9 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	skeletonData->transformConstraints = MALLOC(
 			spTransformConstraintData*, skeletonData->transformConstraintsCount);
 	for (i = 0; i < skeletonData->transformConstraintsCount; ++i) {
-		const char* name = readString(input);
+		const char *name = readString(input);
 		/* TODO Avoid copying of name */
-		spTransformConstraintData* data = spTransformConstraintData_create(name);
+		spTransformConstraintData *data = spTransformConstraintData_create(name);
 		data->order = readVarint(input, 1);
 		data->skinRequired = readBoolean(input);
 		FREE(name);
@@ -1292,12 +1330,12 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		data->offsetScaleX = readFloat(input);
 		data->offsetScaleY = readFloat(input);
 		data->offsetShearY = readFloat(input);
-        data->mixRotate = readFloat(input);
-        data->mixX = readFloat(input);
-        data->mixY = readFloat(input);
-        data->mixScaleX = readFloat(input);
-        data->mixScaleY = readFloat(input);
-        data->mixShearY = readFloat(input);
+		data->mixRotate = readFloat(input);
+		data->mixX = readFloat(input);
+		data->mixY = readFloat(input);
+		data->mixScaleX = readFloat(input);
+		data->mixScaleY = readFloat(input);
+		data->mixShearY = readFloat(input);
 		skeletonData->transformConstraints[i] = data;
 	}
 
@@ -1305,9 +1343,9 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	skeletonData->pathConstraintsCount = readVarint(input, 1);
 	skeletonData->pathConstraints = MALLOC(spPathConstraintData*, skeletonData->pathConstraintsCount);
 	for (i = 0; i < skeletonData->pathConstraintsCount; ++i) {
-		const char* name = readString(input);
+		const char *name = readString(input);
 		/* TODO Avoid copying of name */
-		spPathConstraintData* data = spPathConstraintData_create(name);
+		spPathConstraintData *data = spPathConstraintData_create(name);
 		data->order = readVarint(input, 1);
 		data->skinRequired = readBoolean(input);
 		FREE(name);
@@ -1316,17 +1354,18 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 		for (ii = 0; ii < data->bonesCount; ++ii)
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->slots[readVarint(input, 1)];
-		data->positionMode = (spPositionMode)readVarint(input, 1);
-		data->spacingMode = (spSpacingMode)readVarint(input, 1);
-		data->rotateMode = (spRotateMode)readVarint(input, 1);
+		data->positionMode = (spPositionMode) readVarint(input, 1);
+		data->spacingMode = (spSpacingMode) readVarint(input, 1);
+		data->rotateMode = (spRotateMode) readVarint(input, 1);
 		data->offsetRotation = readFloat(input);
 		data->position = readFloat(input);
 		if (data->positionMode == SP_POSITION_MODE_FIXED) data->position *= self->scale;
 		data->spacing = readFloat(input);
-		if (data->spacingMode == SP_SPACING_MODE_LENGTH || data->spacingMode == SP_SPACING_MODE_FIXED) data->spacing *= self->scale;
-        data->mixRotate = readFloat(input);
-        data->mixX = readFloat(input);
-        data->mixY = readFloat(input);
+		if (data->spacingMode == SP_SPACING_MODE_LENGTH || data->spacingMode == SP_SPACING_MODE_FIXED)
+			data->spacing *= self->scale;
+		data->mixRotate = readFloat(input);
+		data->mixX = readFloat(input);
+		data->mixY = readFloat(input);
 		skeletonData->pathConstraints[i] = data;
 	}
 
@@ -1349,9 +1388,10 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 
 	/* Linked meshes. */
 	for (i = 0; i < internal->linkedMeshCount; ++i) {
-		_spLinkedMesh* linkedMesh = internal->linkedMeshes + i;
-		spSkin* skin = !linkedMesh->skin ? skeletonData->defaultSkin : spSkeletonData_findSkin(skeletonData, linkedMesh->skin);
-		spAttachment* parent;
+		_spLinkedMesh *linkedMesh = internal->linkedMeshes + i;
+		spSkin *skin = !linkedMesh->skin ? skeletonData->defaultSkin : spSkeletonData_findSkin(skeletonData,
+																							   linkedMesh->skin);
+		spAttachment *parent;
 		if (!skin) {
 			FREE(input);
 			spSkeletonData_dispose(skeletonData);
@@ -1365,7 +1405,9 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 			_spSkeletonBinary_setError(self, "Parent mesh not found: ", linkedMesh->parent);
 			return 0;
 		}
-		linkedMesh->mesh->super.deformAttachment = linkedMesh->inheritDeform ? SUB_CAST(spVertexAttachment, parent) : SUB_CAST(spVertexAttachment, linkedMesh->mesh);
+		linkedMesh->mesh->super.deformAttachment = linkedMesh->inheritDeform ? SUB_CAST(spVertexAttachment, parent)
+																			 : SUB_CAST(spVertexAttachment,
+																						linkedMesh->mesh);
 		spMeshAttachment_setParentMesh(linkedMesh->mesh, SUB_CAST(spMeshAttachment, parent));
 		spMeshAttachment_updateUVs(linkedMesh->mesh);
 		spAttachmentLoader_configureAttachment(self->attachmentLoader, SUPER(SUPER(linkedMesh->mesh)));
@@ -1375,8 +1417,8 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	skeletonData->eventsCount = readVarint(input, 1);
 	skeletonData->events = MALLOC(spEventData*, skeletonData->eventsCount);
 	for (i = 0; i < skeletonData->eventsCount; ++i) {
-		const char* name = readStringRef(input, skeletonData);
-		spEventData* eventData = spEventData_create(name);
+		const char *name = readStringRef(input, skeletonData);
+		spEventData *eventData = spEventData_create(name);
 		eventData->intValue = readVarint(input, 0);
 		eventData->floatValue = readFloat(input);
 		eventData->stringValue = readString(input);
@@ -1392,8 +1434,8 @@ spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const
 	skeletonData->animationsCount = readVarint(input, 1);
 	skeletonData->animations = MALLOC(spAnimation*, skeletonData->animationsCount);
 	for (i = 0; i < skeletonData->animationsCount; ++i) {
-		const char* name = readString(input);
-		spAnimation* animation = _spSkeletonBinary_readAnimation(self, name, input, skeletonData);
+		const char *name = readString(input);
+		spAnimation *animation = _spSkeletonBinary_readAnimation(self, name, input, skeletonData);
 		FREE(name);
 		if (!animation) {
 			FREE(input);

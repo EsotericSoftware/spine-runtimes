@@ -1,6 +1,6 @@
 #include <spine/extension.h>
 #include "MemoryTestFixture.h"
-#include "SpineEventMonitor.h" 
+#include "SpineEventMonitor.h"
 
 #include "spine/spine.h"
 
@@ -11,47 +11,42 @@
 
 #define MAX_RUN_TIME 6000 // equal to about 100 seconds of execution
 
-MemoryTestFixture::~MemoryTestFixture()
-{
+MemoryTestFixture::~MemoryTestFixture() {
 	finalize();
 }
 
-void MemoryTestFixture::initialize()
-{
+void MemoryTestFixture::initialize() {
 	// on a Per- Fixture Basis, before Test execution
 }
 
-void MemoryTestFixture::finalize()
-{
+void MemoryTestFixture::finalize() {
 	// on a Per- Fixture Basis, after all tests pass/fail
 }
 
-void MemoryTestFixture::setUp()
-{
+void MemoryTestFixture::setUp() {
 	// Setup on Per-Test Basis
 }
 
-void MemoryTestFixture::tearDown()
-{
+void MemoryTestFixture::tearDown() {
 	// Tear Down on Per-Test Basis
 }
 
 
 //////////////////////////////////////////////////////////////////////////
 // Helper methods
-static spSkeletonData* readSkeletonJsonData(const char* filename, spAtlas* atlas) {
-	spSkeletonJson* json = spSkeletonJson_create(atlas);
+static spSkeletonData *readSkeletonJsonData(const char *filename, spAtlas *atlas) {
+	spSkeletonJson *json = spSkeletonJson_create(atlas);
 	ASSERT(json != 0);
 
-	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, filename);
+	spSkeletonData *skeletonData = spSkeletonJson_readSkeletonDataFile(json, filename);
 	ASSERT(skeletonData != 0);
 
 	spSkeletonJson_dispose(json);
 	return skeletonData;
 }
 
-static void LoadSpineboyExample(spAtlas* &atlas, spSkeletonData* &skeletonData, spAnimationStateData* &stateData, spSkeleton* &skeleton, spAnimationState* &state)
-{
+static void LoadSpineboyExample(spAtlas *&atlas, spSkeletonData *&skeletonData, spAnimationStateData *&stateData,
+								spSkeleton *&skeleton, spAnimationState *&state) {
 	///////////////////////////////////////////////////////////////////////////
 	// Global Animation Information
 	atlas = spAtlas_createFromFile(SPINEBOY_ATLAS, 0);
@@ -65,7 +60,7 @@ static void LoadSpineboyExample(spAtlas* &atlas, spSkeletonData* &skeletonData, 
 	stateData->defaultMix = 0.4f; // force mixing
 
 	///////////////////////////////////////////////////////////////////////////
-	// Animation Instance 
+	// Animation Instance
 	skeleton = spSkeleton_create(skeletonData);
 	ASSERT(skeleton != 0);
 
@@ -73,8 +68,9 @@ static void LoadSpineboyExample(spAtlas* &atlas, spSkeletonData* &skeletonData, 
 	ASSERT(state != 0);
 }
 
-static void DisposeAll(spSkeleton* skeleton, spAnimationState* state, spAnimationStateData* stateData, spSkeletonData* skeletonData, spAtlas* atlas)
-{
+static void
+DisposeAll(spSkeleton *skeleton, spAnimationState *state, spAnimationStateData *stateData, spSkeletonData *skeletonData,
+		   spAtlas *atlas) {
 	///////////////////////////////////////////////////////////////////////////
 	// Dispose Instance
 	spSkeleton_dispose(skeleton);
@@ -91,13 +87,12 @@ static void DisposeAll(spSkeleton* skeleton, spAnimationState* state, spAnimatio
 //////////////////////////////////////////////////////////////////////////
 // Reproduce Memory leak as described in Issue #776
 // https://github.com/EsotericSoftware/spine-runtimes/issues/776
-void MemoryTestFixture::reproduceIssue_776()
-{
-	spAtlas* atlas = 0;
-	spSkeletonData* skeletonData = 0;
-	spAnimationStateData* stateData = 0;
-	spSkeleton* skeleton = 0;
-	spAnimationState* state = 0;
+void MemoryTestFixture::reproduceIssue_776() {
+	spAtlas *atlas = 0;
+	spSkeletonData *skeletonData = 0;
+	spAnimationStateData *stateData = 0;
+	spSkeleton *skeleton = 0;
+	spAnimationState *state = 0;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Initialize Animations
@@ -111,14 +106,14 @@ void MemoryTestFixture::reproduceIssue_776()
 
 	// Interrupt the animation on this specific sequence of spEventType(s)
 	eventMonitor
-		.AddInterruptEvent(SP_ANIMATION_INTERRUPT, "jump")
-		.AddInterruptEvent(SP_ANIMATION_START);
+			.AddInterruptEvent(SP_ANIMATION_INTERRUPT, "jump")
+			.AddInterruptEvent(SP_ANIMATION_START);
 
 	spAnimationState_setAnimationByName(state, 0, "walk", true);
 	spAnimationState_addAnimationByName(state, 0, "jump", false, 0.0f);
-	spAnimationState_addAnimationByName(state, 0, "run",  true,  0.0f);
+	spAnimationState_addAnimationByName(state, 0, "run", true, 0.0f);
 	spAnimationState_addAnimationByName(state, 0, "jump", false, 3.0f);
-	spAnimationState_addAnimationByName(state, 0, "walk", true,  0.0f);
+	spAnimationState_addAnimationByName(state, 0, "walk", true, 0.0f);
 	spAnimationState_addAnimationByName(state, 0, "idle", false, 1.0f);
 
 	for (int i = 0; i < MAX_RUN_TIME && eventMonitor.isAnimationPlaying(); ++i) {
@@ -133,13 +128,12 @@ void MemoryTestFixture::reproduceIssue_776()
 	DisposeAll(skeleton, state, stateData, skeletonData, atlas);
 }
 
-void MemoryTestFixture::reproduceIssue_777()
-{
-	spAtlas* atlas = 0;
-	spSkeletonData* skeletonData = 0;
-	spAnimationStateData* stateData = 0;
-	spSkeleton* skeleton = 0;
-	spAnimationState* state = 0;
+void MemoryTestFixture::reproduceIssue_777() {
+	spAtlas *atlas = 0;
+	spSkeletonData *skeletonData = 0;
+	spAnimationStateData *stateData = 0;
+	spSkeleton *skeleton = 0;
+	spAnimationState *state = 0;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Initialize Animations
@@ -180,23 +174,21 @@ void MemoryTestFixture::reproduceIssue_777()
 	DisposeAll(skeleton, state, stateData, skeletonData, atlas);
 }
 
-spSkeleton* skeleton = 0;
-static void  spineAnimStateHandler(spAnimationState* state, int type, spTrackEntry* entry, spEvent* event)
-{
-	if (type == SP_ANIMATION_COMPLETE)
-	{
+spSkeleton *skeleton = 0;
+
+static void spineAnimStateHandler(spAnimationState *state, int type, spTrackEntry *entry, spEvent *event) {
+	if (type == SP_ANIMATION_COMPLETE) {
 		spAnimationState_setAnimationByName(state, 0, "walk", false);
 		spAnimationState_update(state, 0);
 		spAnimationState_apply(state, skeleton);
 	}
 }
 
-void MemoryTestFixture::reproduceIssue_Loop()
-{
-	spAtlas* atlas = 0;
-	spSkeletonData* skeletonData = 0;
-	spAnimationStateData* stateData = 0;
-	spAnimationState* state = 0;
+void MemoryTestFixture::reproduceIssue_Loop() {
+	spAtlas *atlas = 0;
+	spSkeletonData *skeletonData = 0;
+	spAnimationStateData *stateData = 0;
+	spAnimationState *state = 0;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Initialize Animations
@@ -205,7 +197,7 @@ void MemoryTestFixture::reproduceIssue_Loop()
 	///////////////////////////////////////////////////////////////////////////
 
 	if (state)
-		state->listener = (spAnimationStateListener)&spineAnimStateHandler;
+		state->listener = (spAnimationStateListener) &spineAnimStateHandler;
 
 	spAnimationState_setAnimationByName(state, 0, "walk", false);
 
@@ -221,8 +213,8 @@ void MemoryTestFixture::reproduceIssue_Loop()
 }
 
 void MemoryTestFixture::triangulator() {
-	spTriangulator* triangulator = spTriangulator_create();
-	spFloatArray* polygon = spFloatArray_create(16);
+	spTriangulator *triangulator = spTriangulator_create();
+	spFloatArray *polygon = spFloatArray_create(16);
 	spFloatArray_add(polygon, 0);
 	spFloatArray_add(polygon, 0);
 	spFloatArray_add(polygon, 100);
@@ -232,7 +224,7 @@ void MemoryTestFixture::triangulator() {
 	spFloatArray_add(polygon, 0);
 	spFloatArray_add(polygon, 100);
 
-	spShortArray* triangles = spTriangulator_triangulate(triangulator, polygon);
+	spShortArray *triangles = spTriangulator_triangulate(triangulator, polygon);
 	ASSERT(triangles->size == 6);
 	ASSERT(triangles->items[0] == 3);
 	ASSERT(triangles->items[1] == 0);
@@ -241,7 +233,7 @@ void MemoryTestFixture::triangulator() {
 	ASSERT(triangles->items[4] == 1);
 	ASSERT(triangles->items[5] == 2);
 
-	spArrayFloatArray* polys = spTriangulator_decompose(triangulator, polygon, triangles);
+	spArrayFloatArray *polys = spTriangulator_decompose(triangulator, polygon, triangles);
 	ASSERT(polys->size == 1);
 	ASSERT(polys->items[0]->size == 8);
 	ASSERT(polys->items[0]->items[0] == 0);
@@ -258,19 +250,19 @@ void MemoryTestFixture::triangulator() {
 }
 
 void MemoryTestFixture::skeletonClipper() {
-	spSkeletonClipping* clipping = spSkeletonClipping_create();
+	spSkeletonClipping *clipping = spSkeletonClipping_create();
 
-	spBoneData* boneData = spBoneData_create(0, "bone", 0);
-	spBone* bone = spBone_create(boneData, 0, 0);
+	spBoneData *boneData = spBoneData_create(0, "bone", 0);
+	spBone *bone = spBone_create(boneData, 0, 0);
 	CONST_CAST(float, bone->a) = 1;
 	CONST_CAST(float, bone->b) = 0;
 	CONST_CAST(float, bone->c) = 0;
 	CONST_CAST(float, bone->d) = 1;
 	CONST_CAST(float, bone->worldX) = 0;
 	CONST_CAST(float, bone->worldY) = 0;
-	spSlotData* slotData = spSlotData_create(0, "slot", 0);
-	spSlot* slot = spSlot_create(slotData, bone);
-	spClippingAttachment* clip = spClippingAttachment_create("clipping");
+	spSlotData *slotData = spSlotData_create(0, "slot", 0);
+	spSlot *slot = spSlot_create(slotData, bone);
+	spClippingAttachment *clip = spClippingAttachment_create("clipping");
 	clip->endSlot = slotData;
 	clip->super.worldVerticesLength = 4 * 2;
 	clip->super.verticesCount = 4;
@@ -286,40 +278,42 @@ void MemoryTestFixture::skeletonClipper() {
 
 	spSkeletonClipping_clipStart(clipping, slot, clip);
 
-	spFloatArray* vertices = spFloatArray_create(16);
+	spFloatArray *vertices = spFloatArray_create(16);
 	spFloatArray_add(vertices, 0);
 	spFloatArray_add(vertices, 0);
 	spFloatArray_add(vertices, 100);
 	spFloatArray_add(vertices, 0);
 	spFloatArray_add(vertices, 50);
 	spFloatArray_add(vertices, 150);
-	spFloatArray* uvs = spFloatArray_create(16);
+	spFloatArray *uvs = spFloatArray_create(16);
 	spFloatArray_add(uvs, 0);
 	spFloatArray_add(uvs, 0);
 	spFloatArray_add(uvs, 1);
 	spFloatArray_add(uvs, 0);
 	spFloatArray_add(uvs, 0.5f);
 	spFloatArray_add(uvs, 1);
-	spUnsignedShortArray* indices = spUnsignedShortArray_create(16);
+	spUnsignedShortArray *indices = spUnsignedShortArray_create(16);
 	spUnsignedShortArray_add(indices, 0);
 	spUnsignedShortArray_add(indices, 1);
 	spUnsignedShortArray_add(indices, 2);
 
-	spSkeletonClipping_clipTriangles(clipping, vertices->items, vertices->size, indices->items, indices->size, uvs->items, 2);
+	spSkeletonClipping_clipTriangles(clipping, vertices->items, vertices->size, indices->items, indices->size,
+									 uvs->items, 2);
 
-	float expectedVertices[8] = { 83.333328f, 50.000000f, 76.666664f, 70.000000f, 23.333334f, 70.000000f, 16.666672f, 50.000000f };
+	float expectedVertices[8] = {83.333328f, 50.000000f, 76.666664f, 70.000000f, 23.333334f, 70.000000f, 16.666672f,
+								 50.000000f};
 	ASSERT(clipping->clippedVertices->size == 8);
 	for (int i = 0; i < clipping->clippedVertices->size; i++) {
 		ASSERT(ABS(clipping->clippedVertices->items[i] - expectedVertices[i]) < 0.001);
 	}
 
-	float expectedUVs[8] = { 0.833333f, 0.333333f, 0.766667f, 0.466667f, 0.233333f, 0.466667f, 0.166667f, 0.333333f };
+	float expectedUVs[8] = {0.833333f, 0.333333f, 0.766667f, 0.466667f, 0.233333f, 0.466667f, 0.166667f, 0.333333f};
 	ASSERT(clipping->clippedUVs->size == 8);
 	for (int i = 0; i < clipping->clippedUVs->size; i++) {
 		ASSERT(ABS(clipping->clippedUVs->items[i] - expectedUVs[i]) < 0.001);
 	}
 
-	short expectedIndices[6] = { 0, 1, 2, 0, 2, 3 };
+	short expectedIndices[6] = {0, 1, 2, 0, 2, 3};
 	ASSERT(clipping->clippedTriangles->size == 6);
 	for (int i = 0; i < clipping->clippedTriangles->size; i++) {
 		ASSERT(clipping->clippedTriangles->items[i] == expectedIndices[i]);

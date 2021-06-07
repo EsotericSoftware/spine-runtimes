@@ -44,16 +44,20 @@ struct spAtlasAttachmentLoader;
 
 typedef struct spSkeletonBinary {
 	float scale;
-	spAttachmentLoader* attachmentLoader;
-	const char* const error;
+	spAttachmentLoader *attachmentLoader;
+	const char *const error;
 } spSkeletonBinary;
 
-SP_API spSkeletonBinary* spSkeletonBinary_createWithLoader (spAttachmentLoader* attachmentLoader);
-SP_API spSkeletonBinary* spSkeletonBinary_create (spAtlas* atlas);
-SP_API void spSkeletonBinary_dispose (spSkeletonBinary* self);
+SP_API spSkeletonBinary *spSkeletonBinary_createWithLoader(spAttachmentLoader *attachmentLoader);
 
-SP_API spSkeletonData* spSkeletonBinary_readSkeletonData (spSkeletonBinary* self, const unsigned char* binary, const int length);
-SP_API spSkeletonData* spSkeletonBinary_readSkeletonDataFile (spSkeletonBinary* self, const char* path);
+SP_API spSkeletonBinary *spSkeletonBinary_create(spAtlas *atlas);
+
+SP_API void spSkeletonBinary_dispose(spSkeletonBinary *self);
+
+SP_API spSkeletonData *
+spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const unsigned char *binary, const int length);
+
+SP_API spSkeletonData *spSkeletonBinary_readSkeletonDataFile(spSkeletonBinary *self, const char *path);
 
 #ifdef __cplusplus
 }

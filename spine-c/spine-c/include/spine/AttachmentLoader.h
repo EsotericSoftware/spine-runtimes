@@ -39,22 +39,23 @@ extern "C" {
 #endif
 
 typedef struct spAttachmentLoader {
-	const char* error1;
-	const char* error2;
+	const char *error1;
+	const char *error2;
 
-	const void* const vtable;
+	const void *const vtable;
 } spAttachmentLoader;
 
-SP_API void spAttachmentLoader_dispose (spAttachmentLoader* self);
+SP_API void spAttachmentLoader_dispose(spAttachmentLoader *self);
 
 /* Called to create each attachment. Returns 0 to not load an attachment. If 0 is returned and _spAttachmentLoader_setError was
  * called, an error occurred. */
-SP_API spAttachment* spAttachmentLoader_createAttachment (spAttachmentLoader* self, spSkin* skin, spAttachmentType type, const char* name,
-		const char* path);
+SP_API spAttachment *
+spAttachmentLoader_createAttachment(spAttachmentLoader *self, spSkin *skin, spAttachmentType type, const char *name,
+									const char *path);
 /* Called after the attachment has been fully configured. */
-SP_API void spAttachmentLoader_configureAttachment (spAttachmentLoader* self, spAttachment* attachment);
+SP_API void spAttachmentLoader_configureAttachment(spAttachmentLoader *self, spAttachment *attachment);
 /* Called just before the attachment is disposed. This can release allocations made in spAttachmentLoader_configureAttachment. */
-SP_API void spAttachmentLoader_disposeAttachment (spAttachmentLoader* self, spAttachment* attachment);
+SP_API void spAttachmentLoader_disposeAttachment(spAttachmentLoader *self, spAttachment *attachment);
 
 #ifdef __cplusplus
 }

@@ -23,31 +23,33 @@
 
 namespace JetBrains {
 
-	class SourceLine
-	{
+	class SourceLine {
 	public:
-		SourceLine():lineNumber(-1){}
-		SourceLine(const std::string& theFile, int theLineNum):fileName(theFile),lineNumber(theLineNum){}
-		~SourceLine(){}
+		SourceLine() : lineNumber(-1) {}
+
+		SourceLine(const std::string &theFile, int theLineNum) : fileName(theFile), lineNumber(theLineNum) {}
+
+		~SourceLine() {}
 
 		std::string fileName;
 		int lineNumber;
-		bool isValid() const {return (!fileName.empty() && lineNumber > -1);}
+
+		bool isValid() const { return (!fileName.empty() && lineNumber > -1); }
 	};
 
-	class TestFailure
-	{
+	class TestFailure {
 	public:
 		std::string details;
 		SourceLine sourceLine;
 		std::string testName;
 		std::string description;
 	public:
-		TestFailure(){}
-		~TestFailure(){}
+		TestFailure() {}
 
-		TestFailure(const std::string& theTestName, const std::string& theDetails, SourceLine theSourcelLine, const std::string& theDescription)
-		{
+		~TestFailure() {}
+
+		TestFailure(const std::string &theTestName, const std::string &theDetails, SourceLine theSourcelLine,
+					const std::string &theDescription) {
 			testName = theTestName;
 			details = theDetails;
 			sourceLine = theSourcelLine;
@@ -55,21 +57,26 @@ namespace JetBrains {
 		}
 	};
 
-	class TeamcityProgressListener 
-	{
+	class TeamcityProgressListener {
 	public:
 		TeamcityMessages messages;
 	public:
-		TeamcityProgressListener(const std::string& _flowid);
-		TeamcityProgressListener();
-		~TeamcityProgressListener(){}
+		TeamcityProgressListener(const std::string &_flowid);
 
-		void startTest(const std::string& test);
+		TeamcityProgressListener();
+
+		~TeamcityProgressListener() {}
+
+		void startTest(const std::string &test);
+
 		void addFailure(const TestFailure &failure);
-		void endTest(const std::string& test);
-		void startSuite(const std::string& test);
-		void endSuite(const std::string& test);
-    
+
+		void endTest(const std::string &test);
+
+		void startSuite(const std::string &test);
+
+		void endSuite(const std::string &test);
+
 	private:
 		std::string flowid;
 
@@ -77,7 +84,7 @@ namespace JetBrains {
 		TeamcityProgressListener(const TeamcityProgressListener &copy);
 
 		// Prevents the use of the copy operator.
-		void operator =(const TeamcityProgressListener &copy);
+		void operator=(const TeamcityProgressListener &copy);
 	};
 
 }

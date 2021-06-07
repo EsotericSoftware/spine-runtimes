@@ -34,16 +34,16 @@ typedef enum {
 	BLX = 0, BLY, ULX, ULY, URX, URY, BRX, BRY
 } spVertexIndex;
 
-void _spRegionAttachment_dispose (spAttachment* attachment) {
-	spRegionAttachment* self = SUB_CAST(spRegionAttachment, attachment);
+void _spRegionAttachment_dispose(spAttachment *attachment) {
+	spRegionAttachment *self = SUB_CAST(spRegionAttachment, attachment);
 	_spAttachment_deinit(attachment);
 	FREE(self->path);
 	FREE(self);
 }
 
-spAttachment* _spRegionAttachment_copy (spAttachment* attachment) {
-	spRegionAttachment* self = SUB_CAST(spRegionAttachment, attachment);
-	spRegionAttachment* copy = spRegionAttachment_create(attachment->name);
+spAttachment *_spRegionAttachment_copy(spAttachment *attachment) {
+	spRegionAttachment *self = SUB_CAST(spRegionAttachment, attachment);
+	spRegionAttachment *copy = spRegionAttachment_create(attachment->name);
 	copy->regionWidth = self->regionWidth;
 	copy->regionHeight = self->regionHeight;
 	copy->regionOffsetX = self->regionOffsetX;
@@ -65,8 +65,8 @@ spAttachment* _spRegionAttachment_copy (spAttachment* attachment) {
 	return SUPER(copy);
 }
 
-spRegionAttachment* spRegionAttachment_create (const char* name) {
-	spRegionAttachment* self = NEW(spRegionAttachment);
+spRegionAttachment *spRegionAttachment_create(const char *name) {
+	spRegionAttachment *self = NEW(spRegionAttachment);
 	self->scaleX = 1;
 	self->scaleY = 1;
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
@@ -74,8 +74,8 @@ spRegionAttachment* spRegionAttachment_create (const char* name) {
 	return self;
 }
 
-void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, float u2, float v2, float degrees) {
-    if (degrees == 90) {
+void spRegionAttachment_setUVs(spRegionAttachment *self, float u, float v, float u2, float v2, float degrees) {
+	if (degrees == 90) {
 		self->uvs[URX] = u;
 		self->uvs[URY] = v2;
 		self->uvs[BRX] = u;
@@ -96,7 +96,7 @@ void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, floa
 	}
 }
 
-void spRegionAttachment_updateOffset (spRegionAttachment* self) {
+void spRegionAttachment_updateOffset(spRegionAttachment *self) {
 	float regionScaleX = self->width / self->regionOriginalWidth * self->scaleX;
 	float regionScaleY = self->height / self->regionOriginalHeight * self->scaleY;
 	float localX = -self->width / 2 * self->scaleX + self->regionOffsetX * regionScaleX;
@@ -123,8 +123,9 @@ void spRegionAttachment_updateOffset (spRegionAttachment* self) {
 	self->offset[BRY] = localYCos + localX2Sin;
 }
 
-void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, spBone* bone, float* vertices, int offset, int stride) {
-	const float* offsets = self->offset;
+void spRegionAttachment_computeWorldVertices(spRegionAttachment *self, spBone *bone, float *vertices, int offset,
+											 int stride) {
+	const float *offsets = self->offset;
 	float x = bone->worldX, y = bone->worldY;
 	float offsetX, offsetY;
 

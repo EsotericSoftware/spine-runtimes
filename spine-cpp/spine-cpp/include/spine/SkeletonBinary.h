@@ -38,110 +38,123 @@
 
 namespace spine {
 	class SkeletonData;
+
 	class Atlas;
+
 	class AttachmentLoader;
+
 	class LinkedMesh;
+
 	class Skin;
+
 	class Attachment;
+
 	class VertexAttachment;
+
 	class Animation;
+
 	class Timeline;
+
 	class CurveTimeline;
-    class CurveTimeline1;
-    class CurveTimeline2;
+
+	class CurveTimeline1;
+
+	class CurveTimeline2;
 
 	class SP_API SkeletonBinary : public SpineObject {
 	public:
-        static const int BONE_ROTATE = 0;
-        static const int BONE_TRANSLATE = 1;
-        static const int BONE_TRANSLATEX = 2;
-        static const int BONE_TRANSLATEY = 3;
-        static const int BONE_SCALE = 4;
-        static const int BONE_SCALEX = 5;
-        static const int BONE_SCALEY = 6;
-        static const int BONE_SHEAR = 7;
-        static const int BONE_SHEARX = 8;
-        static const int BONE_SHEARY = 9;
+		static const int BONE_ROTATE = 0;
+		static const int BONE_TRANSLATE = 1;
+		static const int BONE_TRANSLATEX = 2;
+		static const int BONE_TRANSLATEY = 3;
+		static const int BONE_SCALE = 4;
+		static const int BONE_SCALEX = 5;
+		static const int BONE_SCALEY = 6;
+		static const int BONE_SHEAR = 7;
+		static const int BONE_SHEARX = 8;
+		static const int BONE_SHEARY = 9;
 
-        static const int SLOT_ATTACHMENT = 0;
-        static const int SLOT_RGBA = 1;
-        static const int SLOT_RGB = 2;
-        static const int SLOT_RGBA2 = 3;
-        static const int SLOT_RGB2 = 4;
-        static const int SLOT_ALPHA = 5;
+		static const int SLOT_ATTACHMENT = 0;
+		static const int SLOT_RGBA = 1;
+		static const int SLOT_RGB = 2;
+		static const int SLOT_RGBA2 = 3;
+		static const int SLOT_RGB2 = 4;
+		static const int SLOT_ALPHA = 5;
 
-        static const int PATH_POSITION = 0;
-        static const int PATH_SPACING = 1;
-        static const int PATH_MIX = 2;
+		static const int PATH_POSITION = 0;
+		static const int PATH_SPACING = 1;
+		static const int PATH_MIX = 2;
 
-        static const int CURVE_LINEAR = 0;
-        static const int CURVE_STEPPED = 1;
-        static const int CURVE_BEZIER = 2;
+		static const int CURVE_LINEAR = 0;
+		static const int CURVE_STEPPED = 1;
+		static const int CURVE_BEZIER = 2;
 
-		explicit SkeletonBinary(Atlas* atlasArray);
+		explicit SkeletonBinary(Atlas *atlasArray);
 
-		explicit SkeletonBinary(AttachmentLoader* attachmentLoader, bool ownsLoader = false);
+		explicit SkeletonBinary(AttachmentLoader *attachmentLoader, bool ownsLoader = false);
 
 		~SkeletonBinary();
 
-		SkeletonData* readSkeletonData(const unsigned char* binary, int length);
+		SkeletonData *readSkeletonData(const unsigned char *binary, int length);
 
-		SkeletonData* readSkeletonDataFile(const String& path);
+		SkeletonData *readSkeletonDataFile(const String &path);
 
 		void setScale(float scale) { _scale = scale; }
 
-		String& getError() { return _error; }
+		String &getError() { return _error; }
 
 	private:
 		struct DataInput : public SpineObject {
-			const unsigned char* cursor;
-			const unsigned char* end;
+			const unsigned char *cursor;
+			const unsigned char *end;
 		};
 
-		AttachmentLoader* _attachmentLoader;
-		Vector<LinkedMesh*> _linkedMeshes;
+		AttachmentLoader *_attachmentLoader;
+		Vector<LinkedMesh *> _linkedMeshes;
 		String _error;
 		float _scale;
 		const bool _ownsLoader;
 
-		void setError(const char* value1, const char* value2);
+		void setError(const char *value1, const char *value2);
 
-		char* readString(DataInput* input);
+		char *readString(DataInput *input);
 
-		char* readStringRef(DataInput* input, SkeletonData* skeletonData);
+		char *readStringRef(DataInput *input, SkeletonData *skeletonData);
 
-		float readFloat(DataInput* input);
+		float readFloat(DataInput *input);
 
-		unsigned char readByte(DataInput* input);
+		unsigned char readByte(DataInput *input);
 
-		signed char readSByte(DataInput* input);
+		signed char readSByte(DataInput *input);
 
-		bool readBoolean(DataInput* input);
+		bool readBoolean(DataInput *input);
 
-		int readInt(DataInput* input);
+		int readInt(DataInput *input);
 
-		void readColor(DataInput* input, Color& color);
+		void readColor(DataInput *input, Color &color);
 
-		int readVarint(DataInput* input, bool optimizePositive);
+		int readVarint(DataInput *input, bool optimizePositive);
 
-		Skin* readSkin(DataInput* input, bool defaultSkin, SkeletonData* skeletonData, bool nonessential);
+		Skin *readSkin(DataInput *input, bool defaultSkin, SkeletonData *skeletonData, bool nonessential);
 
-		Attachment* readAttachment(DataInput* input, Skin* skin, int slotIndex, const String& attachmentName, SkeletonData* skeletonData, bool nonessential);
+		Attachment *readAttachment(DataInput *input, Skin *skin, int slotIndex, const String &attachmentName,
+								   SkeletonData *skeletonData, bool nonessential);
 
-		void readVertices(DataInput* input, VertexAttachment* attachment, int vertexCount);
+		void readVertices(DataInput *input, VertexAttachment *attachment, int vertexCount);
 
-		void readFloatArray(DataInput *input, int n, float scale, Vector<float>& array);
+		void readFloatArray(DataInput *input, int n, float scale, Vector<float> &array);
 
-		void readShortArray(DataInput *input, Vector<unsigned short>& array);
+		void readShortArray(DataInput *input, Vector<unsigned short> &array);
 
-		Animation* readAnimation(const String& name, DataInput* input, SkeletonData *skeletonData);
+		Animation *readAnimation(const String &name, DataInput *input, SkeletonData *skeletonData);
 
-		void setBezier(DataInput* input, CurveTimeline* timeline, int bezier, int frame, int value, float time1, float time2,
-                       float value1, float value2, float scale);
+		void
+		setBezier(DataInput *input, CurveTimeline *timeline, int bezier, int frame, int value, float time1, float time2,
+				  float value1, float value2, float scale);
 
-		Timeline *readTimeline (DataInput *input, CurveTimeline1 *timeline, float scale);
+		Timeline *readTimeline(DataInput *input, CurveTimeline1 *timeline, float scale);
 
-        Timeline *readTimeline2 (DataInput *input, CurveTimeline2 *timeline, float scale);
+		Timeline *readTimeline2(DataInput *input, CurveTimeline2 *timeline, float scale);
 	};
 }
 

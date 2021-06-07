@@ -41,12 +41,12 @@ extern "C" {
 struct spSkeleton;
 
 typedef struct spIkConstraint {
-	spIkConstraintData* const data;
+	spIkConstraintData *const data;
 
 	int bonesCount;
-	spBone** bones;
+	spBone **bones;
 
-	spBone* target;
+	spBone *target;
 	int bendDirection;
 	int /*boolean*/ compress;
 	int /*boolean*/ stretch;
@@ -56,13 +56,18 @@ typedef struct spIkConstraint {
 	int /*boolean*/ active;
 } spIkConstraint;
 
-SP_API spIkConstraint* spIkConstraint_create (spIkConstraintData* data, const struct spSkeleton* skeleton);
-SP_API void spIkConstraint_dispose (spIkConstraint* self);
+SP_API spIkConstraint *spIkConstraint_create(spIkConstraintData *data, const struct spSkeleton *skeleton);
 
-SP_API void spIkConstraint_update (spIkConstraint* self);
+SP_API void spIkConstraint_dispose(spIkConstraint *self);
 
-SP_API void spIkConstraint_apply1 (spBone* bone, float targetX, float targetY, int /*boolean*/ compress, int /*boolean*/ stretch, int /*boolean*/ uniform, float alpha);
-SP_API void spIkConstraint_apply2 (spBone* parent, spBone* child, float targetX, float targetY, int bendDirection, int /*boolean*/ stretch, float softness, float alpha);
+SP_API void spIkConstraint_update(spIkConstraint *self);
+
+SP_API void
+spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boolean*/ compress, int /*boolean*/ stretch,
+					  int /*boolean*/ uniform, float alpha);
+
+SP_API void spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float targetY, int bendDirection,
+								  int /*boolean*/ stretch, float softness, float alpha);
 
 #ifdef __cplusplus
 }

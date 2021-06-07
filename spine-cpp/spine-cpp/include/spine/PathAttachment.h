@@ -35,21 +35,27 @@
 namespace spine {
 	class SP_API PathAttachment : public VertexAttachment {
 		friend class SkeletonBinary;
+
 		friend class SkeletonJson;
 
-		RTTI_DECL
+	RTTI_DECL
 
 	public:
-		explicit PathAttachment(const String& name);
+		explicit PathAttachment(const String &name);
 
 		/// The length in the setup pose from the start of the path to the end of each curve.
-		Vector<float>& getLengths();
+		Vector<float> &getLengths();
+
 		bool isClosed();
+
 		void setClosed(bool inValue);
+
 		bool isConstantSpeed();
+
 		void setConstantSpeed(bool inValue);
 
-		virtual Attachment* copy();
+		virtual Attachment *copy();
+
 	private:
 		Vector<float> _lengths;
 		bool _closed;

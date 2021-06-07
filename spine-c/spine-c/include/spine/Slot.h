@@ -40,28 +40,30 @@ extern "C" {
 #endif
 
 typedef struct spSlot {
-	spSlotData* const data;
-	spBone* const bone;
+	spSlotData *const data;
+	spBone *const bone;
 	spColor color;
-	spColor* darkColor;
-	spAttachment* attachment;
+	spColor *darkColor;
+	spAttachment *attachment;
 	int attachmentState;
 
 	int deformCapacity;
 	int deformCount;
-	float* deform;
+	float *deform;
 } spSlot;
 
-SP_API spSlot* spSlot_create (spSlotData* data, spBone* bone);
-SP_API void spSlot_dispose (spSlot* self);
+SP_API spSlot *spSlot_create(spSlotData *data, spBone *bone);
+
+SP_API void spSlot_dispose(spSlot *self);
 
 /* @param attachment May be 0 to clear the attachment for the slot. */
-SP_API void spSlot_setAttachment (spSlot* self, spAttachment* attachment);
+SP_API void spSlot_setAttachment(spSlot *self, spAttachment *attachment);
 
-SP_API void spSlot_setAttachmentTime (spSlot* self, float time);
-SP_API float spSlot_getAttachmentTime (const spSlot* self);
+SP_API void spSlot_setAttachmentTime(spSlot *self, float time);
 
-SP_API void spSlot_setToSetupPose (spSlot* self);
+SP_API float spSlot_getAttachmentTime(const spSlot *self);
+
+SP_API void spSlot_setToSetupPose(spSlot *self);
 
 #ifdef __cplusplus
 }

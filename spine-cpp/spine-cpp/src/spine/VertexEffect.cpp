@@ -37,7 +37,7 @@
 
 using namespace spine;
 
-JitterVertexEffect::JitterVertexEffect(float jitterX, float jitterY): _jitterX(jitterX), _jitterY(jitterY) {
+JitterVertexEffect::JitterVertexEffect(float jitterX, float jitterY) : _jitterX(jitterX), _jitterY(jitterY) {
 }
 
 void JitterVertexEffect::begin(Skeleton &skeleton) {
@@ -74,14 +74,14 @@ float JitterVertexEffect::getJitterY() {
 	return _jitterY;
 }
 
-SwirlVertexEffect::SwirlVertexEffect(float radius, Interpolation &interpolation):
-	_centerX(0),
-	_centerY(0),
-	_radius(radius),
-	_angle(0),
-	_worldX(0),
-	_worldY(0),
-	_interpolation(interpolation) {
+SwirlVertexEffect::SwirlVertexEffect(float radius, Interpolation &interpolation) :
+		_centerX(0),
+		_centerY(0),
+		_radius(radius),
+		_angle(0),
+		_worldX(0),
+		_worldY(0),
+		_interpolation(interpolation) {
 }
 
 void SwirlVertexEffect::begin(Skeleton &skeleton) {
@@ -97,7 +97,7 @@ void SwirlVertexEffect::transform(float &positionX, float &positionY, float &u, 
 
 	float x = positionX - _worldX;
 	float y = positionY - _worldY;
-	float dist = (float)MathUtil::sqrt(x * x + y * y);
+	float dist = (float) MathUtil::sqrt(x * x + y * y);
 	if (dist < _radius) {
 		float theta = _interpolation.interpolate(0, _angle, (_radius - dist) / _radius);
 		float cos = MathUtil::cos(theta), sin = MathUtil::sin(theta);

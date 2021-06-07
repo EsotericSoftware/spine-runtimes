@@ -46,9 +46,11 @@ typedef struct spPointAttachment {
 	spColor color;
 } spPointAttachment;
 
-SP_API spPointAttachment* spPointAttachment_create (const char* name);
-SP_API void spPointAttachment_computeWorldPosition (spPointAttachment* self, spBone* bone, float* x, float* y);
-SP_API float spPointAttachment_computeWorldRotation (spPointAttachment* self, spBone* bone);
+SP_API spPointAttachment *spPointAttachment_create(const char *name);
+
+SP_API void spPointAttachment_computeWorldPosition(spPointAttachment *self, spBone *bone, float *x, float *y);
+
+SP_API float spPointAttachment_computeWorldRotation(spPointAttachment *self, spBone *bone);
 
 #ifdef __cplusplus
 }

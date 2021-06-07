@@ -37,34 +37,35 @@
 
 namespace spine {
 	class Atlas;
+
 	class AtlasRegion;
 
 	/// An AttachmentLoader that configures attachments using texture regions from an Atlas.
 	/// See http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data about Loading Skeleton Data in the Spine Runtimes Guide.
 	class SP_API AtlasAttachmentLoader : public AttachmentLoader {
 	public:
-		RTTI_DECL
+	RTTI_DECL
 
-		explicit AtlasAttachmentLoader(Atlas* atlas);
+		explicit AtlasAttachmentLoader(Atlas *atlas);
 
-		virtual RegionAttachment* newRegionAttachment(Skin& skin, const String& name, const String& path);
+		virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path);
 
-		virtual MeshAttachment* newMeshAttachment(Skin& skin, const String& name, const String& path);
+		virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path);
 
-		virtual BoundingBoxAttachment* newBoundingBoxAttachment(Skin& skin, const String& name);
+		virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &skin, const String &name);
 
-		virtual PathAttachment* newPathAttachment(Skin& skin, const String& name);
+		virtual PathAttachment *newPathAttachment(Skin &skin, const String &name);
 
-		virtual PointAttachment* newPointAttachment(Skin& skin, const String& name);
+		virtual PointAttachment *newPointAttachment(Skin &skin, const String &name);
 
-		virtual ClippingAttachment* newClippingAttachment(Skin& skin, const String& name);
+		virtual ClippingAttachment *newClippingAttachment(Skin &skin, const String &name);
 
-		virtual void configureAttachment(Attachment* attachment);
+		virtual void configureAttachment(Attachment *attachment);
 
-		AtlasRegion* findRegion(const String& name);
+		AtlasRegion *findRegion(const String &name);
 
 	private:
-		Atlas* _atlas;
+		Atlas *_atlas;
 	};
 }
 

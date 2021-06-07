@@ -31,8 +31,8 @@
 #include <spine/extension.h>
 #include <stdio.h>
 
-void _spMeshAttachment_dispose (spAttachment* attachment) {
-	spMeshAttachment* self = SUB_CAST(spMeshAttachment, attachment);
+void _spMeshAttachment_dispose(spAttachment *attachment) {
+	spMeshAttachment *self = SUB_CAST(spMeshAttachment, attachment);
 	FREE(self->path);
 	FREE(self->uvs);
 	if (!self->parentMesh) {
@@ -45,9 +45,9 @@ void _spMeshAttachment_dispose (spAttachment* attachment) {
 	FREE(self);
 }
 
-spAttachment* _spMeshAttachment_copy (spAttachment* attachment) {
-	spMeshAttachment* copy;
-	spMeshAttachment* self = SUB_CAST(spMeshAttachment, attachment);
+spAttachment *_spMeshAttachment_copy(spAttachment *attachment) {
+	spMeshAttachment *copy;
+	spMeshAttachment *self = SUB_CAST(spMeshAttachment, attachment);
 	if (self->parentMesh)
 		return SUPER(SUPER(spMeshAttachment_newLinkedMesh(self)));
 	copy = spMeshAttachment_create(attachment->name);
@@ -86,8 +86,8 @@ spAttachment* _spMeshAttachment_copy (spAttachment* attachment) {
 	return SUPER(SUPER(copy));
 }
 
-spMeshAttachment* spMeshAttachment_newLinkedMesh (spMeshAttachment* self) {
-	spMeshAttachment* copy = spMeshAttachment_create(self->super.super.name);
+spMeshAttachment *spMeshAttachment_newLinkedMesh(spMeshAttachment *self) {
+	spMeshAttachment *copy = spMeshAttachment_create(self->super.super.name);
 
 	copy->rendererObject = self->rendererObject;
 	copy->regionU = self->regionU;
@@ -109,80 +109,81 @@ spMeshAttachment* spMeshAttachment_newLinkedMesh (spMeshAttachment* self) {
 	return copy;
 }
 
-spMeshAttachment* spMeshAttachment_create (const char* name) {
-	spMeshAttachment* self = NEW(spMeshAttachment);
+spMeshAttachment *spMeshAttachment_create(const char *name) {
+	spMeshAttachment *self = NEW(spMeshAttachment);
 	_spVertexAttachment_init(SUPER(self));
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
 	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_MESH, _spMeshAttachment_dispose, _spMeshAttachment_copy);
 	return self;
 }
 
-void spMeshAttachment_updateUVs (spMeshAttachment* self) {
+void spMeshAttachment_updateUVs(spMeshAttachment *self) {
 	int i, n;
-	float* uvs;
+	float *uvs;
 	float u, v, width, height;
 	int verticesLength = SUPER(self)->worldVerticesLength;
 	FREE(self->uvs);
 	uvs = self->uvs = MALLOC(float, verticesLength);
 	n = verticesLength;
-	u = self->regionU; v = self->regionV;
+	u = self->regionU;
+	v = self->regionV;
 
 	switch (self->regionDegrees) {
-	case 90: {
-		float textureWidth = self->regionHeight / (self->regionU2 - self->regionU);
-		float textureHeight = self->regionWidth / (self->regionV2 - self->regionV);
-		u -= (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureWidth;
-		v -= (self->regionOriginalWidth - self->regionOffsetX - self->regionWidth) / textureHeight;
-		width = self->regionOriginalHeight / textureWidth;
-		height = self->regionOriginalWidth / textureHeight;
-		for (i = 0; i < n; i += 2) {
-			uvs[i] = u + self->regionUVs[i + 1] * width;
-			uvs[i + 1] = v + (1 - self->regionUVs[i]) * height;
+		case 90: {
+			float textureWidth = self->regionHeight / (self->regionU2 - self->regionU);
+			float textureHeight = self->regionWidth / (self->regionV2 - self->regionV);
+			u -= (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureWidth;
+			v -= (self->regionOriginalWidth - self->regionOffsetX - self->regionWidth) / textureHeight;
+			width = self->regionOriginalHeight / textureWidth;
+			height = self->regionOriginalWidth / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				uvs[i] = u + self->regionUVs[i + 1] * width;
+				uvs[i + 1] = v + (1 - self->regionUVs[i]) * height;
+			}
+			return;
 		}
-		return;
-	}
-	case 180: {
-		float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
-		float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
-		u -= (self->regionOriginalWidth - self->regionOffsetX - self->regionWidth) / textureWidth;
-		v -= self->regionOffsetY / textureHeight;
-		width = self->regionOriginalWidth / textureWidth;
-		height = self->regionOriginalHeight / textureHeight;
-		for (i = 0; i < n; i += 2) {
-			uvs[i] = u + (1 - self->regionUVs[i]) * width;
-			uvs[i + 1] = v + (1 - self->regionUVs[i + 1]) * height;
+		case 180: {
+			float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
+			float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
+			u -= (self->regionOriginalWidth - self->regionOffsetX - self->regionWidth) / textureWidth;
+			v -= self->regionOffsetY / textureHeight;
+			width = self->regionOriginalWidth / textureWidth;
+			height = self->regionOriginalHeight / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				uvs[i] = u + (1 - self->regionUVs[i]) * width;
+				uvs[i + 1] = v + (1 - self->regionUVs[i + 1]) * height;
+			}
+			return;
 		}
-		return;
-	}
-	case 270: {
-		float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
-		float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
-		u -= self->regionOffsetY / textureWidth;
-		v -= self->regionOffsetX / textureHeight;
-		width = self->regionOriginalHeight / textureWidth;
-		height = self->regionOriginalWidth / textureHeight;
-		for (i = 0; i < n; i += 2) {
-			uvs[i] = u + (1 - self->regionUVs[i + 1]) * width;
-			uvs[i + 1] = v + self->regionUVs[i] * height;
+		case 270: {
+			float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
+			float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
+			u -= self->regionOffsetY / textureWidth;
+			v -= self->regionOffsetX / textureHeight;
+			width = self->regionOriginalHeight / textureWidth;
+			height = self->regionOriginalWidth / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				uvs[i] = u + (1 - self->regionUVs[i + 1]) * width;
+				uvs[i + 1] = v + self->regionUVs[i] * height;
+			}
+			return;
 		}
-		return;
-	}
-	default: {
-		float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
-		float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
-		u -= self->regionOffsetX / textureWidth;
-		v -= (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureHeight;
-		width = self->regionOriginalWidth / textureWidth;
-		height = self->regionOriginalHeight / textureHeight;
-		for (i = 0; i < n; i += 2) {
-			uvs[i] = u + self->regionUVs[i] * width;
-			uvs[i + 1] = v + self->regionUVs[i + 1] * height;
+		default: {
+			float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
+			float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
+			u -= self->regionOffsetX / textureWidth;
+			v -= (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureHeight;
+			width = self->regionOriginalWidth / textureWidth;
+			height = self->regionOriginalHeight / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				uvs[i] = u + self->regionUVs[i] * width;
+				uvs[i + 1] = v + self->regionUVs[i + 1] * height;
+			}
 		}
-	}
 	}
 }
 
-void spMeshAttachment_setParentMesh (spMeshAttachment* self, spMeshAttachment* parentMesh) {
+void spMeshAttachment_setParentMesh(spMeshAttachment *self, spMeshAttachment *parentMesh) {
 	CONST_CAST(spMeshAttachment*, self->parentMesh) = parentMesh;
 	if (parentMesh) {
 		self->super.bones = parentMesh->super.bones;

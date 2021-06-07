@@ -32,38 +32,41 @@
 #include <stdio.h>
 
 _SP_ARRAY_IMPLEMENT_TYPE(spBoneDataArray, spBoneData*)
+
 _SP_ARRAY_IMPLEMENT_TYPE(spIkConstraintDataArray, spIkConstraintData*)
+
 _SP_ARRAY_IMPLEMENT_TYPE(spTransformConstraintDataArray, spTransformConstraintData*)
+
 _SP_ARRAY_IMPLEMENT_TYPE(spPathConstraintDataArray, spPathConstraintData*)
 
-_Entry* _Entry_create (int slotIndex, const char* name, spAttachment* attachment) {
-	_Entry* self = NEW(_Entry);
+_Entry *_Entry_create(int slotIndex, const char *name, spAttachment *attachment) {
+	_Entry *self = NEW(_Entry);
 	self->slotIndex = slotIndex;
 	MALLOC_STR(self->name, name);
 	self->attachment = attachment;
 	return self;
 }
 
-void _Entry_dispose (_Entry* self) {
+void _Entry_dispose(_Entry *self) {
 	spAttachment_dispose(self->attachment);
 	FREE(self->name);
 	FREE(self);
 }
 
-static _SkinHashTableEntry* _SkinHashTableEntry_create (_Entry* entry) {
-	_SkinHashTableEntry* self = NEW(_SkinHashTableEntry);
+static _SkinHashTableEntry *_SkinHashTableEntry_create(_Entry *entry) {
+	_SkinHashTableEntry *self = NEW(_SkinHashTableEntry);
 	self->entry = entry;
 	return self;
 }
 
-static void _SkinHashTableEntry_dispose (_SkinHashTableEntry* self) {
+static void _SkinHashTableEntry_dispose(_SkinHashTableEntry *self) {
 	FREE(self);
 }
 
 /**/
 
-spSkin* spSkin_create (const char* name) {
-	spSkin* self = SUPER(NEW(_spSkin));
+spSkin *spSkin_create(const char *name) {
+	spSkin *self = SUPER(NEW(_spSkin));
 	MALLOC_STR(self->name, name);
 	self->bones = spBoneDataArray_create(4);
 	self->ikConstraints = spIkConstraintDataArray_create(4);
@@ -72,24 +75,24 @@ spSkin* spSkin_create (const char* name) {
 	return self;
 }
 
-void spSkin_dispose (spSkin* self) {
-	_Entry* entry = SUB_CAST(_spSkin, self)->entries;
+void spSkin_dispose(spSkin *self) {
+	_Entry *entry = SUB_CAST(_spSkin, self)->entries;
 
 	while (entry) {
-		_Entry* nextEntry = entry->next;
+		_Entry *nextEntry = entry->next;
 		_Entry_dispose(entry);
 		entry = nextEntry;
 	}
 
 	{
-		_SkinHashTableEntry** currentHashtableEntry = SUB_CAST(_spSkin, self)->entriesHashTable;
+		_SkinHashTableEntry **currentHashtableEntry = SUB_CAST(_spSkin, self)->entriesHashTable;
 		int i;
 
 		for (i = 0; i < SKIN_ENTRIES_HASH_TABLE_SIZE; ++i, ++currentHashtableEntry) {
-			_SkinHashTableEntry* hashtableEntry = *currentHashtableEntry;
+			_SkinHashTableEntry *hashtableEntry = *currentHashtableEntry;
 
 			while (hashtableEntry) {
-				_SkinHashTableEntry* nextEntry = hashtableEntry->next;
+				_SkinHashTableEntry *nextEntry = hashtableEntry->next;
 				_SkinHashTableEntry_dispose(hashtableEntry);
 				hashtableEntry = nextEntry;
 			}
@@ -104,9 +107,10 @@ void spSkin_dispose (spSkin* self) {
 	FREE(self);
 }
 
-void spSkin_setAttachment (spSkin* self, int slotIndex, const char* name, spAttachment* attachment) {
-	_SkinHashTableEntry* existingEntry = 0;
-	_SkinHashTableEntry* hashEntry = SUB_CAST(_spSkin, self)->entriesHashTable[(unsigned int)slotIndex % SKIN_ENTRIES_HASH_TABLE_SIZE];
+void spSkin_setAttachment(spSkin *self, int slotIndex, const char *name, spAttachment *attachment) {
+	_SkinHashTableEntry *existingEntry = 0;
+	_SkinHashTableEntry *hashEntry = SUB_CAST(_spSkin, self)->entriesHashTable[(unsigned int) slotIndex %
+																			   SKIN_ENTRIES_HASH_TABLE_SIZE];
 	while (hashEntry) {
 		if (hashEntry->entry->slotIndex == slotIndex && strcmp(hashEntry->entry->name, name) == 0) {
 			existingEntry = hashEntry;
@@ -121,31 +125,33 @@ void spSkin_setAttachment (spSkin* self, int slotIndex, const char* name, spAtta
 		if (hashEntry->entry->attachment) spAttachment_dispose(hashEntry->entry->attachment);
 		hashEntry->entry->attachment = attachment;
 	} else {
-		_Entry* newEntry = _Entry_create(slotIndex, name, attachment);
+		_Entry *newEntry = _Entry_create(slotIndex, name, attachment);
 		newEntry->next = SUB_CAST(_spSkin, self)->entries;
 		SUB_CAST(_spSkin, self)->entries = newEntry;
 		{
-			unsigned int hashTableIndex = (unsigned int)slotIndex % SKIN_ENTRIES_HASH_TABLE_SIZE;
-			_SkinHashTableEntry** hashTable = SUB_CAST(_spSkin, self)->entriesHashTable;
+			unsigned int hashTableIndex = (unsigned int) slotIndex % SKIN_ENTRIES_HASH_TABLE_SIZE;
+			_SkinHashTableEntry **hashTable = SUB_CAST(_spSkin, self)->entriesHashTable;
 
-			_SkinHashTableEntry* newHashEntry = _SkinHashTableEntry_create(newEntry);
+			_SkinHashTableEntry *newHashEntry = _SkinHashTableEntry_create(newEntry);
 			newHashEntry->next = hashTable[hashTableIndex];
 			SUB_CAST(_spSkin, self)->entriesHashTable[hashTableIndex] = newHashEntry;
 		}
 	}
 }
 
-spAttachment* spSkin_getAttachment (const spSkin* self, int slotIndex, const char* name) {
-	const _SkinHashTableEntry* hashEntry = SUB_CAST(_spSkin, self)->entriesHashTable[(unsigned int)slotIndex % SKIN_ENTRIES_HASH_TABLE_SIZE];
+spAttachment *spSkin_getAttachment(const spSkin *self, int slotIndex, const char *name) {
+	const _SkinHashTableEntry *hashEntry = SUB_CAST(_spSkin, self)->entriesHashTable[(unsigned int) slotIndex %
+																					 SKIN_ENTRIES_HASH_TABLE_SIZE];
 	while (hashEntry) {
-		if (hashEntry->entry->slotIndex == slotIndex && strcmp(hashEntry->entry->name, name) == 0) return hashEntry->entry->attachment;
+		if (hashEntry->entry->slotIndex == slotIndex && strcmp(hashEntry->entry->name, name) == 0)
+			return hashEntry->entry->attachment;
 		hashEntry = hashEntry->next;
 	}
 	return 0;
 }
 
-const char* spSkin_getAttachmentName (const spSkin* self, int slotIndex, int attachmentIndex) {
-	const _Entry* entry = SUB_CAST(_spSkin, self)->entries;
+const char *spSkin_getAttachmentName(const spSkin *self, int slotIndex, int attachmentIndex) {
+	const _Entry *entry = SUB_CAST(_spSkin, self)->entries;
 	int i = 0;
 	while (entry) {
 		if (entry->slotIndex == slotIndex) {
@@ -157,7 +163,7 @@ const char* spSkin_getAttachmentName (const spSkin* self, int slotIndex, int att
 	return 0;
 }
 
-void spSkin_attachAll (const spSkin* self, spSkeleton* skeleton, const spSkin* oldSkin) {
+void spSkin_attachAll(const spSkin *self, spSkeleton *skeleton, const spSkin *oldSkin) {
 	const _Entry *entry = SUB_CAST(_spSkin, oldSkin)->entries;
 	while (entry) {
 		spSlot *slot = skeleton->slots[entry->slotIndex];
@@ -169,9 +175,9 @@ void spSkin_attachAll (const spSkin* self, spSkeleton* skeleton, const spSkin* o
 	}
 }
 
-void spSkin_addSkin(spSkin* self, const spSkin* other) {
+void spSkin_addSkin(spSkin *self, const spSkin *other) {
 	int i = 0;
-	spSkinEntry* entry;
+	spSkinEntry *entry;
 
 	for (i = 0; i < other->bones->size; i++) {
 		if (!spBoneDataArray_contains(self->bones, other->bones->items[i]))
@@ -200,9 +206,9 @@ void spSkin_addSkin(spSkin* self, const spSkin* other) {
 	}
 }
 
-void spSkin_copySkin(spSkin* self, const spSkin* other) {
+void spSkin_copySkin(spSkin *self, const spSkin *other) {
 	int i = 0;
-	spSkinEntry* entry;
+	spSkinEntry *entry;
 
 	for (i = 0; i < other->bones->size; i++) {
 		if (!spBoneDataArray_contains(self->bones, other->bones->items[i]))
@@ -227,25 +233,26 @@ void spSkin_copySkin(spSkin* self, const spSkin* other) {
 	entry = spSkin_getAttachments(other);
 	while (entry) {
 		if (entry->attachment->type == SP_ATTACHMENT_MESH) {
-			spMeshAttachment* attachment = spMeshAttachment_newLinkedMesh(SUB_CAST(spMeshAttachment, entry->attachment));
+			spMeshAttachment *attachment = spMeshAttachment_newLinkedMesh(
+					SUB_CAST(spMeshAttachment, entry->attachment));
 			spSkin_setAttachment(self, entry->slotIndex, entry->name, SUPER(SUPER(attachment)));
 		} else {
-			spAttachment* attachment = entry->attachment ? spAttachment_copy(entry->attachment) : 0;
+			spAttachment *attachment = entry->attachment ? spAttachment_copy(entry->attachment) : 0;
 			spSkin_setAttachment(self, entry->slotIndex, entry->name, attachment);
 		}
 		entry = entry->next;
 	}
 }
 
-spSkinEntry* spSkin_getAttachments(const spSkin* self) {
+spSkinEntry *spSkin_getAttachments(const spSkin *self) {
 	return SUB_CAST(_spSkin, self)->entries;
 }
 
-void spSkin_clear(spSkin* self) {
-	_Entry* entry = SUB_CAST(_spSkin, self)->entries;
+void spSkin_clear(spSkin *self) {
+	_Entry *entry = SUB_CAST(_spSkin, self)->entries;
 
 	while (entry) {
-		_Entry* nextEntry = entry->next;
+		_Entry *nextEntry = entry->next;
 		_Entry_dispose(entry);
 		entry = nextEntry;
 	}
@@ -253,14 +260,14 @@ void spSkin_clear(spSkin* self) {
 	SUB_CAST(_spSkin, self)->entries = 0;
 
 	{
-		_SkinHashTableEntry** currentHashtableEntry = SUB_CAST(_spSkin, self)->entriesHashTable;
+		_SkinHashTableEntry **currentHashtableEntry = SUB_CAST(_spSkin, self)->entriesHashTable;
 		int i;
 
 		for (i = 0; i < SKIN_ENTRIES_HASH_TABLE_SIZE; ++i, ++currentHashtableEntry) {
-			_SkinHashTableEntry* hashtableEntry = *currentHashtableEntry;
+			_SkinHashTableEntry *hashtableEntry = *currentHashtableEntry;
 
 			while (hashtableEntry) {
-				_SkinHashTableEntry* nextEntry = hashtableEntry->next;
+				_SkinHashTableEntry *nextEntry = hashtableEntry->next;
 				_SkinHashTableEntry_dispose(hashtableEntry);
 				hashtableEntry = nextEntry;
 			}

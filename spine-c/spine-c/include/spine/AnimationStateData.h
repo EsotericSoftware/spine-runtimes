@@ -39,18 +39,21 @@ extern "C" {
 #endif
 
 typedef struct spAnimationStateData {
-	spSkeletonData* const skeletonData;
+	spSkeletonData *const skeletonData;
 	float defaultMix;
-	const void* const entries;
+	const void *const entries;
 } spAnimationStateData;
 
-SP_API spAnimationStateData* spAnimationStateData_create (spSkeletonData* skeletonData);
-SP_API void spAnimationStateData_dispose (spAnimationStateData* self);
+SP_API spAnimationStateData *spAnimationStateData_create(spSkeletonData *skeletonData);
 
-SP_API void spAnimationStateData_setMixByName (spAnimationStateData* self, const char* fromName, const char* toName, float duration);
-SP_API void spAnimationStateData_setMix (spAnimationStateData* self, spAnimation* from, spAnimation* to, float duration);
+SP_API void spAnimationStateData_dispose(spAnimationStateData *self);
+
+SP_API void
+spAnimationStateData_setMixByName(spAnimationStateData *self, const char *fromName, const char *toName, float duration);
+
+SP_API void spAnimationStateData_setMix(spAnimationStateData *self, spAnimation *from, spAnimation *to, float duration);
 /* Returns 0 if there is no mixing between the animations. */
-SP_API float spAnimationStateData_getMix (spAnimationStateData* self, spAnimation* from, spAnimation* to);
+SP_API float spAnimationStateData_getMix(spAnimationStateData *self, spAnimation *from, spAnimation *to);
 
 #ifdef __cplusplus
 }

@@ -31,19 +31,19 @@
 #include <limits.h>
 #include <spine/extension.h>
 
-spPolygon* spPolygon_create (int capacity) {
-	spPolygon* self = NEW(spPolygon);
+spPolygon *spPolygon_create(int capacity) {
+	spPolygon *self = NEW(spPolygon);
 	self->capacity = capacity;
 	CONST_CAST(float*, self->vertices) = MALLOC(float, capacity);
 	return self;
 }
 
-void spPolygon_dispose (spPolygon* self) {
+void spPolygon_dispose(spPolygon *self) {
 	FREE(self->vertices);
 	FREE(self);
 }
 
-int/*bool*/spPolygon_containsPoint (spPolygon* self, float x, float y) {
+int/*bool*/spPolygon_containsPoint(spPolygon *self, float x, float y) {
 	int prevIndex = self->count - 2;
 	int inside = 0;
 	int i;
@@ -52,14 +52,15 @@ int/*bool*/spPolygon_containsPoint (spPolygon* self, float x, float y) {
 		float prevY = self->vertices[prevIndex + 1];
 		if ((vertexY < y && prevY >= y) || (prevY < y && vertexY >= y)) {
 			float vertexX = self->vertices[i];
-			if (vertexX + (y - vertexY) / (prevY - vertexY) * (self->vertices[prevIndex] - vertexX) < x) inside = !inside;
+			if (vertexX + (y - vertexY) / (prevY - vertexY) * (self->vertices[prevIndex] - vertexX) < x)
+				inside = !inside;
 		}
 		prevIndex = i;
 	}
 	return inside;
 }
 
-int/*bool*/spPolygon_intersectsSegment (spPolygon* self, float x1, float y1, float x2, float y2) {
+int/*bool*/spPolygon_intersectsSegment(spPolygon *self, float x1, float y1, float x2, float y2) {
 	float width12 = x1 - x2, height12 = y1 - y2;
 	float det1 = x1 * y2 - y1 * x2;
 	float x3 = self->vertices[self->count - 2], y3 = self->vertices[self->count - 1];
@@ -72,7 +73,8 @@ int/*bool*/spPolygon_intersectsSegment (spPolygon* self, float x1, float y1, flo
 		float x = (det1 * width34 - width12 * det2) / det3;
 		if (((x >= x3 && x <= x4) || (x >= x4 && x <= x3)) && ((x >= x1 && x <= x2) || (x >= x2 && x <= x1))) {
 			float y = (det1 * height34 - height12 * det2) / det3;
-			if (((y >= y3 && y <= y4) || (y >= y4 && y <= y3)) && ((y >= y1 && y <= y2) || (y >= y2 && y <= y1))) return 1;
+			if (((y >= y3 && y <= y4) || (y >= y4 && y <= y3)) && ((y >= y1 && y <= y2) || (y >= y2 && y <= y1)))
+				return 1;
 		}
 		x3 = x4;
 		y3 = y4;
@@ -87,11 +89,11 @@ typedef struct {
 	int capacity;
 } _spSkeletonBounds;
 
-spSkeletonBounds* spSkeletonBounds_create () {
+spSkeletonBounds *spSkeletonBounds_create() {
 	return SUPER(NEW(_spSkeletonBounds));
 }
 
-void spSkeletonBounds_dispose (spSkeletonBounds* self) {
+void spSkeletonBounds_dispose(spSkeletonBounds *self) {
 	int i;
 	for (i = 0; i < SUB_CAST(_spSkeletonBounds, self)->capacity; ++i)
 		if (self->polygons[i]) spPolygon_dispose(self->polygons[i]);
@@ -100,40 +102,40 @@ void spSkeletonBounds_dispose (spSkeletonBounds* self) {
 	FREE(self);
 }
 
-void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/*bool*/updateAabb) {
+void spSkeletonBounds_update(spSkeletonBounds *self, spSkeleton *skeleton, int/*bool*/updateAabb) {
 	int i;
 
-	_spSkeletonBounds* internal = SUB_CAST(_spSkeletonBounds, self);
+	_spSkeletonBounds *internal = SUB_CAST(_spSkeletonBounds, self);
 	if (internal->capacity < skeleton->slotsCount) {
-		spPolygon** newPolygons;
+		spPolygon **newPolygons;
 
 		FREE(self->boundingBoxes);
 		self->boundingBoxes = MALLOC(spBoundingBoxAttachment*, skeleton->slotsCount);
 
 		newPolygons = CALLOC(spPolygon*, skeleton->slotsCount);
-		memcpy(newPolygons, self->polygons, sizeof(spPolygon*) * internal->capacity);
+		memcpy(newPolygons, self->polygons, sizeof(spPolygon *) * internal->capacity);
 		FREE(self->polygons);
 		self->polygons = newPolygons;
 
 		internal->capacity = skeleton->slotsCount;
 	}
 
-	self->minX = (float)INT_MAX;
-	self->minY = (float)INT_MAX;
-	self->maxX = (float)INT_MIN;
-	self->maxY = (float)INT_MIN;
+	self->minX = (float) INT_MAX;
+	self->minY = (float) INT_MAX;
+	self->maxX = (float) INT_MIN;
+	self->maxY = (float) INT_MIN;
 
 	self->count = 0;
 	for (i = 0; i < skeleton->slotsCount; ++i) {
-		spPolygon* polygon;
-		spBoundingBoxAttachment* boundingBox;
-		spAttachment* attachment;
+		spPolygon *polygon;
+		spBoundingBoxAttachment *boundingBox;
+		spAttachment *attachment;
 
-		spSlot* slot = skeleton->slots[i];
+		spSlot *slot = skeleton->slots[i];
 		if (!slot->bone->active) continue;
 		attachment = slot->attachment;
 		if (!attachment || attachment->type != SP_ATTACHMENT_BOUNDING_BOX) continue;
-		boundingBox = (spBoundingBoxAttachment*)attachment;
+		boundingBox = (spBoundingBoxAttachment *) attachment;
 		self->boundingBoxes[self->count] = boundingBox;
 
 		polygon = self->polygons[self->count];
@@ -160,17 +162,18 @@ void spSkeletonBounds_update (spSkeletonBounds* self, spSkeleton* skeleton, int/
 	}
 }
 
-int/*bool*/spSkeletonBounds_aabbContainsPoint (spSkeletonBounds* self, float x, float y) {
+int/*bool*/spSkeletonBounds_aabbContainsPoint(spSkeletonBounds *self, float x, float y) {
 	return x >= self->minX && x <= self->maxX && y >= self->minY && y <= self->maxY;
 }
 
-int/*bool*/spSkeletonBounds_aabbIntersectsSegment (spSkeletonBounds* self, float x1, float y1, float x2, float y2) {
+int/*bool*/spSkeletonBounds_aabbIntersectsSegment(spSkeletonBounds *self, float x1, float y1, float x2, float y2) {
 	float m, x, y;
 	if ((x1 <= self->minX && x2 <= self->minX)
 		|| (y1 <= self->minY && y2 <= self->minY)
 		|| (x1 >= self->maxX && x2 >= self->maxX)
 		|| (y1 >= self->maxY && y2 >= self->maxY)
-	) return 0;
+			)
+		return 0;
 	m = (y2 - y1) / (x2 - x1);
 	y = m * (self->minX - x1) + y1;
 	if (y > self->minY && y < self->maxY) return 1;
@@ -183,25 +186,27 @@ int/*bool*/spSkeletonBounds_aabbIntersectsSegment (spSkeletonBounds* self, float
 	return 0;
 }
 
-int/*bool*/spSkeletonBounds_aabbIntersectsSkeleton (spSkeletonBounds* self, spSkeletonBounds* bounds) {
-	return self->minX < bounds->maxX && self->maxX > bounds->minX && self->minY < bounds->maxY && self->maxY > bounds->minY;
+int/*bool*/spSkeletonBounds_aabbIntersectsSkeleton(spSkeletonBounds *self, spSkeletonBounds *bounds) {
+	return self->minX < bounds->maxX && self->maxX > bounds->minX && self->minY < bounds->maxY &&
+		   self->maxY > bounds->minY;
 }
 
-spBoundingBoxAttachment* spSkeletonBounds_containsPoint (spSkeletonBounds* self, float x, float y) {
+spBoundingBoxAttachment *spSkeletonBounds_containsPoint(spSkeletonBounds *self, float x, float y) {
 	int i;
 	for (i = 0; i < self->count; ++i)
 		if (spPolygon_containsPoint(self->polygons[i], x, y)) return self->boundingBoxes[i];
 	return 0;
 }
 
-spBoundingBoxAttachment* spSkeletonBounds_intersectsSegment (spSkeletonBounds* self, float x1, float y1, float x2, float y2) {
+spBoundingBoxAttachment *
+spSkeletonBounds_intersectsSegment(spSkeletonBounds *self, float x1, float y1, float x2, float y2) {
 	int i;
 	for (i = 0; i < self->count; ++i)
 		if (spPolygon_intersectsSegment(self->polygons[i], x1, y1, x2, y2)) return self->boundingBoxes[i];
 	return 0;
 }
 
-spPolygon* spSkeletonBounds_getPolygon (spSkeletonBounds* self, spBoundingBoxAttachment* boundingBox) {
+spPolygon *spSkeletonBounds_getPolygon(spSkeletonBounds *self, spBoundingBoxAttachment *boundingBox) {
 	int i;
 	for (i = 0; i < self->count; ++i)
 		if (self->boundingBoxes[i] == boundingBox) return self->polygons[i];

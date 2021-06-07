@@ -32,12 +32,13 @@
 #include <spine/Slot.h>
 
 typedef struct _spAttachmentVtable {
-	void (*dispose) (spAttachment* self);
-	spAttachment* (*copy) (spAttachment* self);
+	void (*dispose)(spAttachment *self);
+
+	spAttachment *(*copy)(spAttachment *self);
 } _spAttachmentVtable;
 
-void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType type, /**/
-		void (*dispose) (spAttachment* self), spAttachment* (*copy) (spAttachment* self)) {
+void _spAttachment_init(spAttachment *self, const char *name, spAttachmentType type, /**/
+						void (*dispose)(spAttachment *self), spAttachment *(*copy)(spAttachment *self)) {
 
 	CONST_CAST(_spAttachmentVtable*, self->vtable) = NEW(_spAttachmentVtable);
 	VTABLE(spAttachment, self)->dispose = dispose;
@@ -47,18 +48,18 @@ void _spAttachment_init (spAttachment* self, const char* name, spAttachmentType 
 	CONST_CAST(spAttachmentType, self->type) = type;
 }
 
-void _spAttachment_deinit (spAttachment* self) {
+void _spAttachment_deinit(spAttachment *self) {
 	if (self->attachmentLoader) spAttachmentLoader_disposeAttachment(self->attachmentLoader, self);
 	FREE(self->vtable);
 	FREE(self->name);
 }
 
-spAttachment* spAttachment_copy (spAttachment* self) {
-	return VTABLE(spAttachment, self) ->copy(self);
+spAttachment *spAttachment_copy(spAttachment *self) {
+	return VTABLE(spAttachment, self)->copy(self);
 }
 
-void spAttachment_dispose (spAttachment* self) {
+void spAttachment_dispose(spAttachment *self) {
 	self->refCount--;
 	if (self->refCount <= 0)
-		VTABLE(spAttachment, self) ->dispose(self);
+		VTABLE(spAttachment, self)->dispose(self);
 }

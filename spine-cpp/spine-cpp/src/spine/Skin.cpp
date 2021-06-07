@@ -47,7 +47,7 @@ using namespace spine;
 Skin::AttachmentMap::AttachmentMap() {
 }
 
-static void disposeAttachment(Attachment* attachment) {
+static void disposeAttachment(Attachment *attachment) {
 	if (!attachment) return;
 	attachment->dereference();
 	if (attachment->getRefCount() == 0) delete attachment;
@@ -113,7 +113,7 @@ Attachment *Skin::getAttachment(size_t slotIndex, const String &name) {
 	return _attachments.get(slotIndex, name);
 }
 
-void Skin::removeAttachment(size_t slotIndex, const String& name) {
+void Skin::removeAttachment(size_t slotIndex, const String &name) {
 	_attachments.remove(slotIndex, name);
 }
 
@@ -158,7 +158,7 @@ void Skin::attachAll(Skeleton &skeleton, Skin &oldSkin) {
 	}
 }
 
-void Skin::addSkin(Skin* other) {
+void Skin::addSkin(Skin *other) {
 	for (size_t i = 0; i < other->getBones().size(); i++)
 		if (!_bones.contains(other->getBones()[i])) _bones.add(other->getBones()[i]);
 
@@ -166,13 +166,13 @@ void Skin::addSkin(Skin* other) {
 		if (!_constraints.contains(other->getConstraints()[i])) _constraints.add(other->getConstraints()[i]);
 
 	AttachmentMap::Entries entries = other->getAttachments();
-	while(entries.hasNext()) {
-		AttachmentMap::Entry& entry = entries.next();
+	while (entries.hasNext()) {
+		AttachmentMap::Entry &entry = entries.next();
 		setAttachment(entry._slotIndex, entry._name, entry._attachment);
 	}
 }
 
-void Skin::copySkin(Skin* other) {
+void Skin::copySkin(Skin *other) {
 	for (size_t i = 0; i < other->getBones().size(); i++)
 		if (!_bones.contains(other->getBones()[i])) _bones.add(other->getBones()[i]);
 
@@ -180,19 +180,20 @@ void Skin::copySkin(Skin* other) {
 		if (!_constraints.contains(other->getConstraints()[i])) _constraints.add(other->getConstraints()[i]);
 
 	AttachmentMap::Entries entries = other->getAttachments();
-	while(entries.hasNext()) {
-		AttachmentMap::Entry& entry = entries.next();
+	while (entries.hasNext()) {
+		AttachmentMap::Entry &entry = entries.next();
 		if (entry._attachment->getRTTI().isExactly(MeshAttachment::rtti))
-			setAttachment(entry._slotIndex, entry._name, static_cast<MeshAttachment*>(entry._attachment)->newLinkedMesh());
+			setAttachment(entry._slotIndex, entry._name,
+						  static_cast<MeshAttachment *>(entry._attachment)->newLinkedMesh());
 		else
 			setAttachment(entry._slotIndex, entry._name, entry._attachment->copy());
 	}
 }
 
-Vector<ConstraintData*>& Skin::getConstraints() {
+Vector<ConstraintData *> &Skin::getConstraints() {
 	return _constraints;
 }
 
-Vector<BoneData*>& Skin::getBones() {
+Vector<BoneData *> &Skin::getBones() {
 	return _bones;
 }

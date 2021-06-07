@@ -52,16 +52,15 @@ const int PathConstraint::BEFORE = -2;
 const int PathConstraint::AFTER = -3;
 
 PathConstraint::PathConstraint(PathConstraintData &data, Skeleton &skeleton) : Updatable(),
-	_data(data),
-	_target(skeleton.findSlot(
-	data.getTarget()->getName())),
-	_position(data.getPosition()),
-	_spacing(data.getSpacing()),
-	_mixRotate(data.getMixRotate()),
-	_mixX(data.getMixX()),
-    _mixY(data.getMixY()),
-	_active(false)
-{
+																			   _data(data),
+																			   _target(skeleton.findSlot(
+																					   data.getTarget()->getName())),
+																			   _position(data.getPosition()),
+																			   _spacing(data.getSpacing()),
+																			   _mixRotate(data.getMixRotate()),
+																			   _mixX(data.getMixX()),
+																			   _mixY(data.getMixY()),
+																			   _active(false) {
 	_bones.ensureCapacity(_data.getBones().size());
 	for (size_t i = 0; i < _data.getBones().size(); i++) {
 		BoneData *boneData = _data.getBones()[i];
@@ -86,74 +85,74 @@ void PathConstraint::update() {
 	size_t boneCount = _bones.size();
 	size_t spacesCount = tangents ? boneCount : boneCount + 1;
 	_spaces.setSize(spacesCount, 0);
-    if (scale) _lengths.setSize(boneCount, 0);
+	if (scale) _lengths.setSize(boneCount, 0);
 	float spacing = _spacing;
 
-	switch(data._spacingMode) {
-	    case SpacingMode_Percent: {
-            if (scale) {
-                for (size_t i = 0, n = spacesCount - 1; i < n; i++) {
-                    Bone *boneP = _bones[i];
-                    Bone &bone = *boneP;
-                    float setupLength = bone._data.getLength();
-                    if (setupLength < PathConstraint::EPSILON) {
-                        _lengths[i] = 0;
-                    } else {
-                        float x = setupLength * bone._a, y = setupLength * bone._c;
-                        _lengths[i] = MathUtil::sqrt(x * x + y * y);
-                    }
-                }
-            }
-            for (size_t i = 1; i < spacesCount; ++i) {
-                _spaces[i] = spacing;
-            }
-            break;
-        }
-	    case SpacingMode_Proportional: {
-            float sum = 0;
-            for (size_t i = 0; i < boneCount;) {
-                Bone *boneP = _bones[i];
-                Bone &bone = *boneP;
-                float setupLength = bone._data.getLength();
-                if (setupLength < PathConstraint::EPSILON) {
-                    if (scale) _lengths[i] = 0;
-                    _spaces[++i] = spacing;
-                } else {
-                    float x = setupLength * bone._a, y = setupLength * bone._c;
-                    float length = MathUtil::sqrt(x * x + y * y);
-                    if (scale) _lengths[i] = length;
-                    _spaces[++i] = length;
-                    sum += length;
-                }
-            }
-            if (sum > 0) {
-                sum = spacesCount / sum * spacing;
-                for (size_t i = 1; i < spacesCount; i++) {
-                    _spaces[i] *= sum;
-                }
-            }
-            break;
-        }
-	    default: {
-            bool lengthSpacing = data._spacingMode == SpacingMode_Length;
-            for (size_t i = 0, n = spacesCount - 1; i < n;) {
-                Bone *boneP = _bones[i];
-                Bone &bone = *boneP;
-                float setupLength = bone._data.getLength();
-                if (setupLength < PathConstraint::EPSILON) {
-                    if (scale) _lengths[i] = 0;
-                    _spaces[++i] = spacing;
-                } else {
-                    float x = setupLength * bone._a, y = setupLength * bone._c;
-                    float length = MathUtil::sqrt(x * x + y * y);
-                    if (scale) _lengths[i] = length;
-                    _spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
-                }
-            }
-        }
+	switch (data._spacingMode) {
+		case SpacingMode_Percent: {
+			if (scale) {
+				for (size_t i = 0, n = spacesCount - 1; i < n; i++) {
+					Bone *boneP = _bones[i];
+					Bone &bone = *boneP;
+					float setupLength = bone._data.getLength();
+					if (setupLength < PathConstraint::EPSILON) {
+						_lengths[i] = 0;
+					} else {
+						float x = setupLength * bone._a, y = setupLength * bone._c;
+						_lengths[i] = MathUtil::sqrt(x * x + y * y);
+					}
+				}
+			}
+			for (size_t i = 1; i < spacesCount; ++i) {
+				_spaces[i] = spacing;
+			}
+			break;
+		}
+		case SpacingMode_Proportional: {
+			float sum = 0;
+			for (size_t i = 0; i < boneCount;) {
+				Bone *boneP = _bones[i];
+				Bone &bone = *boneP;
+				float setupLength = bone._data.getLength();
+				if (setupLength < PathConstraint::EPSILON) {
+					if (scale) _lengths[i] = 0;
+					_spaces[++i] = spacing;
+				} else {
+					float x = setupLength * bone._a, y = setupLength * bone._c;
+					float length = MathUtil::sqrt(x * x + y * y);
+					if (scale) _lengths[i] = length;
+					_spaces[++i] = length;
+					sum += length;
+				}
+			}
+			if (sum > 0) {
+				sum = spacesCount / sum * spacing;
+				for (size_t i = 1; i < spacesCount; i++) {
+					_spaces[i] *= sum;
+				}
+			}
+			break;
+		}
+		default: {
+			bool lengthSpacing = data._spacingMode == SpacingMode_Length;
+			for (size_t i = 0, n = spacesCount - 1; i < n;) {
+				Bone *boneP = _bones[i];
+				Bone &bone = *boneP;
+				float setupLength = bone._data.getLength();
+				if (setupLength < PathConstraint::EPSILON) {
+					if (scale) _lengths[i] = 0;
+					_spaces[++i] = spacing;
+				} else {
+					float x = setupLength * bone._a, y = setupLength * bone._c;
+					float length = MathUtil::sqrt(x * x + y * y);
+					if (scale) _lengths[i] = length;
+					_spaces[++i] = (lengthSpacing ? setupLength + spacing : spacing) * length / setupLength;
+				}
+			}
+		}
 	}
 
-	Vector<float>& positions = computeWorldPositions(*attachment, spacesCount, tangents);
+	Vector<float> &positions = computeWorldPositions(*attachment, spacesCount, tangents);
 	float boneX = positions[0];
 	float boneY = positions[1];
 	float offsetRotation = data.getOffsetRotation();
@@ -262,11 +261,11 @@ void PathConstraint::setMixX(float inValue) {
 }
 
 float PathConstraint::getMixY() {
-    return _mixY;
+	return _mixY;
 }
 
 void PathConstraint::setMixY(float inValue) {
-    _mixY = inValue;
+	_mixY = inValue;
 }
 
 Vector<Bone *> &PathConstraint::getBones() {
@@ -285,7 +284,7 @@ PathConstraintData &PathConstraint::getData() {
 	return _data;
 }
 
-Vector<float>&
+Vector<float> &
 PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, bool tangents) {
 	Slot &target = *_target;
 	float position = _position;
@@ -302,19 +301,19 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 		Vector<float> &lengths = path.getLengths();
 		curveCount -= closed ? 1 : 2;
 		pathLength = lengths[curveCount];
-        if (_data._positionMode == PositionMode_Percent) position *= pathLength;
+		if (_data._positionMode == PositionMode_Percent) position *= pathLength;
 
-        float multiplier = 0;
-        switch (_data._spacingMode) {
-            case SpacingMode_Percent:
-                multiplier = pathLength;
-                break;
-            case SpacingMode_Proportional:
-                multiplier = pathLength / spacesCount;
-                break;
-            default:
-                multiplier = 1;
-        }
+		float multiplier = 0;
+		switch (_data._spacingMode) {
+			case SpacingMode_Percent:
+				multiplier = pathLength;
+				break;
+			case SpacingMode_Proportional:
+				multiplier = pathLength / spacesCount;
+				break;
+			default:
+				multiplier = 1;
+		}
 
 		world.setSize(8, 0);
 		for (int i = 0, o = 0, curve = 0; i < spacesCount; i++, o += 3) {
@@ -370,7 +369,7 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 			}
 
 			addCurvePosition(p, world[0], world[1], world[2], world[3], world[4], world[5], world[6], world[7],
-				out, o, tangents || (i > 0 && space < EPSILON));
+							 out, o, tangents || (i > 0 && space < EPSILON));
 		}
 		return out;
 	}
@@ -427,19 +426,19 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 		y1 = y2;
 	}
 
-    if (_data._positionMode == PositionMode_Percent) position *= pathLength;
+	if (_data._positionMode == PositionMode_Percent) position *= pathLength;
 
-    float multiplier = 0;
-    switch (_data._spacingMode) {
-        case SpacingMode_Percent:
-            multiplier = pathLength;
-            break;
-        case SpacingMode_Proportional:
-            multiplier = pathLength / spacesCount;
-            break;
-        default:
-            multiplier = 1;
-    }
+	float multiplier = 0;
+	switch (_data._spacingMode) {
+		case SpacingMode_Percent:
+			multiplier = pathLength;
+			break;
+		case SpacingMode_Proportional:
+			multiplier = pathLength / spacesCount;
+			break;
+		default:
+			multiplier = 1;
+	}
 
 	float curveLength = 0;
 	for (int i = 0, o = 0, curve = 0, segment = 0; i < spacesCount; i++, o += 3) {
@@ -527,7 +526,7 @@ PathConstraint::computeWorldPositions(PathAttachment &path, int spacesCount, boo
 			break;
 		}
 		addCurvePosition(p * 0.1f, x1, y1, cx1, cy1, cx2, cy2, x2, y2, out, o,
-			tangents || (i > 0 && space < EPSILON));
+						 tangents || (i > 0 && space < EPSILON));
 	}
 
 	return out;
@@ -556,7 +555,7 @@ void PathConstraint::addAfterPosition(float p, Vector<float> &temp, int i, Vecto
 }
 
 void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2,
-	float y2, Vector<float> &output, int o, bool tangents
+									  float y2, Vector<float> &output, int o, bool tangents
 ) {
 	if (p < EPSILON || MathUtil::isNan(p)) {
 		output[o] = x1;
@@ -574,7 +573,8 @@ void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, fl
 		if (p < 0.001)
 			output[o + 2] = MathUtil::atan2(cy1 - y1, cx1 - x1);
 		else
-			output[o + 2] = MathUtil::atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt), x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
+			output[o + 2] = MathUtil::atan2(y - (y1 * uu + cy1 * ut * 2 + cy2 * tt),
+											x - (x1 * uu + cx1 * ut * 2 + cx2 * tt));
 	}
 }
 

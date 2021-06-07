@@ -38,6 +38,7 @@
 #include <assert.h>
 
 using namespace spine;
+
 TransformConstraintData::TransformConstraintData(const String &name) :
 		ConstraintData(name),
 		_target(NULL),
@@ -45,8 +46,8 @@ TransformConstraintData::TransformConstraintData(const String &name) :
 		_mixX(0),
 		_mixY(0),
 		_mixScaleX(0),
-        _mixScaleY(0),
-        _mixShearY(0),
+		_mixScaleY(0),
+		_mixShearY(0),
 		_offsetRotation(0),
 		_offsetX(0),
 		_offsetY(0),
@@ -70,23 +71,23 @@ float TransformConstraintData::getMixRotate() {
 }
 
 float TransformConstraintData::getMixX() {
-    return _mixX;
+	return _mixX;
 }
 
 float TransformConstraintData::getMixY() {
-    return _mixY;
+	return _mixY;
 }
 
 float TransformConstraintData::getMixScaleX() {
-    return _mixScaleX;
+	return _mixScaleX;
 }
 
 float TransformConstraintData::getMixScaleY() {
-    return _mixScaleY;
+	return _mixScaleY;
 }
 
 float TransformConstraintData::getMixShearY() {
-    return _mixShearY;
+	return _mixShearY;
 }
 
 float TransformConstraintData::getOffsetRotation() {

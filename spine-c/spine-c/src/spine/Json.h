@@ -45,37 +45,41 @@ extern "C" {
 
 /* The Json structure: */
 typedef struct Json {
-	struct Json* next;
+	struct Json *next;
 #if SPINE_JSON_HAVE_PREV
 	struct Json* prev; /* next/prev allow you to walk array/object chains. Alternatively, use getSize/getItem */
 #endif
-	struct Json* child; /* An array or object item will have a child pointer pointing to a chain of the items in the array/object. */
+	struct Json *child; /* An array or object item will have a child pointer pointing to a chain of the items in the array/object. */
 
 	int type; /* The type of the item, as above. */
 	int size; /* The number of children. */
 
-	const char* valueString; /* The item's string, if type==Json_String */
+	const char *valueString; /* The item's string, if type==Json_String */
 	int valueInt; /* The item's number, if type==Json_Number */
 	float valueFloat; /* The item's number, if type==Json_Number */
 
-	const char* name; /* The item's name string, if this item is the child of, or is in the list of subitems of an object. */
+	const char *name; /* The item's name string, if this item is the child of, or is in the list of subitems of an object. */
 } Json;
 
 /* Supply a block of JSON, and this returns a Json object you can interrogate. Call Json_dispose when finished. */
-Json* Json_create (const char* value);
+Json *Json_create(const char *value);
 
 /* Delete a Json entity and all subentities. */
-void Json_dispose (Json* json);
+void Json_dispose(Json *json);
 
 /* Get item "string" from object. Case insensitive. */
-Json* Json_getItem (Json* json, const char* string);
+Json *Json_getItem(Json *json, const char *string);
+
 Json *Json_getItemAtIndex(Json *object, int childIndex);
-const char* Json_getString (Json* json, const char* name, const char* defaultValue);
-float Json_getFloat (Json* json, const char* name, float defaultValue);
-int Json_getInt (Json* json, const char* name, int defaultValue);
+
+const char *Json_getString(Json *json, const char *name, const char *defaultValue);
+
+float Json_getFloat(Json *json, const char *name, float defaultValue);
+
+int Json_getInt(Json *json, const char *name, int defaultValue);
 
 /* For analysing failed parses. This returns a pointer to the parse error. You'll probably need to look a few chars back to make sense of it. Defined when Json_create() returns 0. 0 when Json_create() succeeds. */
-const char* Json_getError (void);
+const char *Json_getError(void);
 
 #ifdef __cplusplus
 }

@@ -51,12 +51,12 @@ typedef enum {
 } spRotateMode;
 
 typedef struct spPathConstraintData {
-	const char* const name;
+	const char *const name;
 	int order;
 	int/*bool*/ skinRequired;
 	int bonesCount;
-	spBoneData** const bones;
-	spSlotData* target;
+	spBoneData **const bones;
+	spSlotData *target;
 	spPositionMode positionMode;
 	spSpacingMode spacingMode;
 	spRotateMode rotateMode;
@@ -65,8 +65,9 @@ typedef struct spPathConstraintData {
 	float mixRotate, mixX, mixY;
 } spPathConstraintData;
 
-SP_API spPathConstraintData* spPathConstraintData_create (const char* name);
-SP_API void spPathConstraintData_dispose (spPathConstraintData* self);
+SP_API spPathConstraintData *spPathConstraintData_create(const char *name);
+
+SP_API void spPathConstraintData_dispose(spPathConstraintData *self);
 
 #ifdef __cplusplus
 }

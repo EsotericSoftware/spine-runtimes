@@ -30,8 +30,8 @@
 #include <spine/PathAttachment.h>
 #include <spine/extension.h>
 
-void _spPathAttachment_dispose (spAttachment* attachment) {
-	spPathAttachment* self = SUB_CAST(spPathAttachment, attachment);
+void _spPathAttachment_dispose(spAttachment *attachment) {
+	spPathAttachment *self = SUB_CAST(spPathAttachment, attachment);
 
 	_spVertexAttachment_deinit(SUPER(self));
 
@@ -39,9 +39,9 @@ void _spPathAttachment_dispose (spAttachment* attachment) {
 	FREE(self);
 }
 
-spAttachment* _spPathAttachment_copy (spAttachment* attachment) {
-	spPathAttachment* copy = spPathAttachment_create(attachment->name);
-	spPathAttachment* self = SUB_CAST(spPathAttachment, attachment);
+spAttachment *_spPathAttachment_copy(spAttachment *attachment) {
+	spPathAttachment *copy = spPathAttachment_create(attachment->name);
+	spPathAttachment *self = SUB_CAST(spPathAttachment, attachment);
 	spVertexAttachment_copyTo(SUPER(self), SUPER(copy));
 	copy->lengthsLength = self->lengthsLength;
 	copy->lengths = MALLOC(float, self->lengthsLength);
@@ -51,8 +51,8 @@ spAttachment* _spPathAttachment_copy (spAttachment* attachment) {
 	return SUPER(SUPER(copy));
 }
 
-spPathAttachment* spPathAttachment_create (const char* name) {
-	spPathAttachment* self = NEW(spPathAttachment);
+spPathAttachment *spPathAttachment_create(const char *name) {
+	spPathAttachment *self = NEW(spPathAttachment);
 	_spVertexAttachment_init(SUPER(self));
 	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_PATH, _spPathAttachment_dispose, _spPathAttachment_copy);
 	return self;

@@ -62,7 +62,7 @@ Vector<int> &Triangulator::triangulate(Vector<float> &vertices) {
 
 	Vector<int> &triangles = _triangles;
 	triangles.clear();
-	triangles.ensureCapacity(MathUtil::max((int)0, (int)vertexCount - 2) << 2);
+	triangles.ensureCapacity(MathUtil::max((int) 0, (int) vertexCount - 2) << 2);
 
 	while (vertexCount > 3) {
 		// Find ear tip.
@@ -255,7 +255,7 @@ Vector<Vector<float> *> &Triangulator::decompose(Vector<float> &vertices, Vector
 	}
 
 	// Remove empty polygons that resulted from the merge step above.
-	for (int i = (int)convexPolygons.size() - 1; i >= 0; --i) {
+	for (int i = (int) convexPolygons.size() - 1; i >= 0; --i) {
 		polygon = convexPolygons[i];
 		if (polygon->size() == 0) {
 			convexPolygons.removeAt(i);
@@ -275,8 +275,8 @@ bool Triangulator::isConcave(int index, int vertexCount, Vector<float> &vertices
 	int next = indices[(index + 1) % vertexCount] << 1;
 
 	return !positiveArea(vertices[previous], vertices[previous + 1],
-		vertices[current], vertices[current + 1],
-		vertices[next], vertices[next + 1]);
+						 vertices[current], vertices[current + 1],
+						 vertices[next], vertices[next + 1]);
 }
 
 bool Triangulator::positiveArea(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {

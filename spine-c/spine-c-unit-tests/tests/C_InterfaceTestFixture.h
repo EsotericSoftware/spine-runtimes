@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 //////////////////////////////////////////////////////////////////////
 //	filename: 	C_InterfaceTestFixture.h
 //	
@@ -9,11 +9,9 @@
 #include "TestOptions.h"
 #include "MiniCppUnit.hxx"
 
-class C_InterfaceTestFixture : public TestFixture<C_InterfaceTestFixture>
-{
+class C_InterfaceTestFixture : public TestFixture<C_InterfaceTestFixture> {
 public:
-	TEST_FIXTURE(C_InterfaceTestFixture)
-	{
+	TEST_FIXTURE(C_InterfaceTestFixture) {
 		// enable/disable individual tests here
 		TEST_CASE(spineboyTestCase);
 		TEST_CASE(raptorTestCase);
@@ -22,12 +20,17 @@ public:
 
 public:
 	virtual void setUp();
+
 	virtual void tearDown();
 
-	void	spineboyTestCase();
-	void	raptorTestCase();
-	void	goblinsTestCase();
+	void spineboyTestCase();
+
+	void raptorTestCase();
+
+	void goblinsTestCase();
 };
+
 #if defined(gForceAllTests) || defined(gCInterfaceTestFixture)
+
 REGISTER_FIXTURE(C_InterfaceTestFixture);
 #endif

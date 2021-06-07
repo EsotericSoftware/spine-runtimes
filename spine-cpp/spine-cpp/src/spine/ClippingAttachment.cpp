@@ -50,8 +50,8 @@ void ClippingAttachment::setEndSlot(SlotData *inValue) {
 	_endSlot = inValue;
 }
 
-Attachment* ClippingAttachment::copy() {
-	ClippingAttachment* copy = new (__FILE__, __LINE__) ClippingAttachment(getName());
+Attachment *ClippingAttachment::copy() {
+	ClippingAttachment *copy = new(__FILE__, __LINE__) ClippingAttachment(getName());
 	copyTo(copy);
 	copy->_endSlot = _endSlot;
 	return copy;

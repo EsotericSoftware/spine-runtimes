@@ -41,18 +41,20 @@ extern "C" {
 struct spSkeleton;
 
 typedef struct spTransformConstraint {
-	spTransformConstraintData* const data;
+	spTransformConstraintData *const data;
 	int bonesCount;
-	spBone** const bones;
-	spBone* target;
+	spBone **const bones;
+	spBone *target;
 	float mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY;
 	int /*boolean*/ active;
 } spTransformConstraint;
 
-SP_API spTransformConstraint* spTransformConstraint_create (spTransformConstraintData* data, const struct spSkeleton* skeleton);
-SP_API void spTransformConstraint_dispose (spTransformConstraint* self);
+SP_API spTransformConstraint *
+spTransformConstraint_create(spTransformConstraintData *data, const struct spSkeleton *skeleton);
 
-SP_API void spTransformConstraint_update (spTransformConstraint* self);
+SP_API void spTransformConstraint_dispose(spTransformConstraint *self);
+
+SP_API void spTransformConstraint_update(spTransformConstraint *self);
 
 #ifdef __cplusplus
 }

@@ -37,17 +37,18 @@ extern "C" {
 #endif
 
 typedef struct spEventData {
-	const char* const name;
+	const char *const name;
 	int intValue;
 	float floatValue;
-	const char* stringValue;
-	const char* audioPath;
+	const char *stringValue;
+	const char *audioPath;
 	float volume;
 	float balance;
 } spEventData;
 
-SP_API spEventData* spEventData_create (const char* name);
-SP_API void spEventData_dispose (spEventData* self);
+SP_API spEventData *spEventData_create(const char *name);
+
+SP_API void spEventData_dispose(spEventData *self);
 
 #ifdef __cplusplus
 }

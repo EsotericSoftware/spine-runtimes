@@ -35,71 +35,86 @@
 
 namespace spine {
 
-class Skeleton;
-class Color;
+	class Skeleton;
 
-class SP_API VertexEffect: public SpineObject {
-public:
-	virtual void begin(Skeleton& skeleton) = 0;
-	virtual void transform(float& x, float& y, float &u, float &v, Color &light, Color &dark) = 0;
-	virtual void end() = 0;
-};
+	class Color;
 
-class SP_API JitterVertexEffect: public VertexEffect {
-public:
-	JitterVertexEffect(float jitterX, float jitterY);
+	class SP_API VertexEffect : public SpineObject {
+	public:
+		virtual void begin(Skeleton &skeleton) = 0;
 
-	void begin(Skeleton& skeleton);
-	void transform(float& x, float& y, float &u, float &v, Color &light, Color &dark);
-	void end();
+		virtual void transform(float &x, float &y, float &u, float &v, Color &light, Color &dark) = 0;
 
-	void setJitterX(float jitterX);
-	float getJitterX();
+		virtual void end() = 0;
+	};
 
-	void setJitterY(float jitterY);
-	float getJitterY();
+	class SP_API JitterVertexEffect : public VertexEffect {
+	public:
+		JitterVertexEffect(float jitterX, float jitterY);
 
-protected:
-	float _jitterX;
-	float _jitterY;
-};
+		void begin(Skeleton &skeleton);
 
-class SP_API SwirlVertexEffect: public VertexEffect {
-public:
-	SwirlVertexEffect(float radius, Interpolation &interpolation);
+		void transform(float &x, float &y, float &u, float &v, Color &light, Color &dark);
 
-	void begin(Skeleton& skeleton);
-	void transform(float& x, float& y, float &u, float &v, Color &light, Color &dark);
-	void end();
+		void end();
 
-	void setCenterX(float centerX);
-	float getCenterX();
+		void setJitterX(float jitterX);
 
-	void setCenterY(float centerY);
-	float getCenterY();
+		float getJitterX();
 
-	void setRadius(float radius);
-	float getRadius();
+		void setJitterY(float jitterY);
 
-	void setAngle(float angle);
-	float getAngle();
+		float getJitterY();
 
-	void setWorldX(float worldX);
-	float getWorldX();
+	protected:
+		float _jitterX;
+		float _jitterY;
+	};
 
-	void setWorldY(float worldY);
-	float getWorldY();
+	class SP_API SwirlVertexEffect : public VertexEffect {
+	public:
+		SwirlVertexEffect(float radius, Interpolation &interpolation);
 
-protected:
-	float _centerX;
-	float _centerY;
-	float _radius;
-	float _angle;
-	float _worldX;
-	float _worldY;
+		void begin(Skeleton &skeleton);
 
-	Interpolation& _interpolation;
-};
+		void transform(float &x, float &y, float &u, float &v, Color &light, Color &dark);
+
+		void end();
+
+		void setCenterX(float centerX);
+
+		float getCenterX();
+
+		void setCenterY(float centerY);
+
+		float getCenterY();
+
+		void setRadius(float radius);
+
+		float getRadius();
+
+		void setAngle(float angle);
+
+		float getAngle();
+
+		void setWorldX(float worldX);
+
+		float getWorldX();
+
+		void setWorldY(float worldY);
+
+		float getWorldY();
+
+	protected:
+		float _centerX;
+		float _centerY;
+		float _radius;
+		float _angle;
+		float _worldX;
+		float _worldY;
+
+		Interpolation &_interpolation;
+	};
 }
 
 #endif /* Spine_VertexEffect_h */

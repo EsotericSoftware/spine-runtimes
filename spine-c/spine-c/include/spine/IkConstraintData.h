@@ -38,13 +38,13 @@ extern "C" {
 #endif
 
 typedef struct spIkConstraintData {
-	const char* const name;
+	const char *const name;
 	int order;
 	int /*boolean*/ skinRequired;
 	int bonesCount;
-	spBoneData** bones;
+	spBoneData **bones;
 
-	spBoneData* target;
+	spBoneData *target;
 	int bendDirection;
 	int /*boolean*/ compress;
 	int /*boolean*/ stretch;
@@ -53,8 +53,9 @@ typedef struct spIkConstraintData {
 	float softness;
 } spIkConstraintData;
 
-SP_API spIkConstraintData* spIkConstraintData_create (const char* name);
-SP_API void spIkConstraintData_dispose (spIkConstraintData* self);
+SP_API spIkConstraintData *spIkConstraintData_create(const char *name);
+
+SP_API void spIkConstraintData_dispose(spIkConstraintData *self);
 
 #ifdef __cplusplus
 }

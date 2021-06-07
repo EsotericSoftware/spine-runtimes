@@ -30,15 +30,15 @@
 #include <spine/PointAttachment.h>
 #include <spine/extension.h>
 
-void _spPointAttachment_dispose (spAttachment* attachment) {
-	spPointAttachment* self = SUB_CAST(spPointAttachment, attachment);
+void _spPointAttachment_dispose(spAttachment *attachment) {
+	spPointAttachment *self = SUB_CAST(spPointAttachment, attachment);
 	_spAttachment_deinit(attachment);
 	FREE(self);
 }
 
-spAttachment* _spPointAttachment_copy (spAttachment* attachment) {
-	spPointAttachment* self = SUB_CAST(spPointAttachment, attachment);
-	spPointAttachment* copy = spPointAttachment_create(attachment->name);
+spAttachment *_spPointAttachment_copy(spAttachment *attachment) {
+	spPointAttachment *self = SUB_CAST(spPointAttachment, attachment);
+	spPointAttachment *copy = spPointAttachment_create(attachment->name);
 	copy->x = self->x;
 	copy->y = self->y;
 	copy->rotation = self->rotation;
@@ -46,18 +46,18 @@ spAttachment* _spPointAttachment_copy (spAttachment* attachment) {
 	return SUPER(copy);
 }
 
-spPointAttachment* spPointAttachment_create (const char* name) {
-	spPointAttachment* self = NEW(spPointAttachment);
+spPointAttachment *spPointAttachment_create(const char *name) {
+	spPointAttachment *self = NEW(spPointAttachment);
 	_spAttachment_init(SUPER(self), name, SP_ATTACHMENT_POINT, _spPointAttachment_dispose, _spPointAttachment_copy);
 	return self;
 }
 
-void spPointAttachment_computeWorldPosition (spPointAttachment* self, spBone* bone, float* x, float* y) {
+void spPointAttachment_computeWorldPosition(spPointAttachment *self, spBone *bone, float *x, float *y) {
 	*x = self->x * bone->a + self->y * bone->b + bone->worldX;
 	*y = self->x * bone->c + self->y * bone->d + bone->worldY;
 }
 
-float spPointAttachment_computeWorldRotation (spPointAttachment* self, spBone* bone) {
+float spPointAttachment_computeWorldRotation(spPointAttachment *self, spBone *bone) {
 	float cosine, sine, x, y;
 	cosine = COS_DEG(self->rotation);
 	sine = SIN_DEG(self->rotation);

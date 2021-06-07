@@ -91,9 +91,9 @@
 
 #if _MSC_VER < 1300
 /** necesary for Visual 6 which don't define std::min */
-namespace std
-{
-	template<typename T> T min(const T& a, const T& b) { return a < b ? a: b; }
+namespace std {
+	template<typename T>
+	T min(const T &a, const T &b) { return a < b ? a : b; }
 }
 #endif
 
@@ -109,38 +109,45 @@ extern JetBrains::TeamcityProgressListener gTeamCityListener;
  * methods but it is probably asking for a refactoring in order to limit
  * access only to TestFixtures
  */
-class TestsListener
-{
+class TestsListener {
 public:
 	/** accessor to the global (static) singleton instance */
-	static TestsListener& theInstance();
-	std::stringstream& errorsLog();
+	static TestsListener &theInstance();
+
+	std::stringstream &errorsLog();
+
 	std::string logString();
-	void currentTestName( std::string& name);
+
+	void currentTestName(std::string &name);
+
 	static void testHasRun();
+
 	static void testHasPassed();
-	static void testHasFailed(const char* reason, const char* file, int line);
+
+	static void testHasFailed(const char *reason, const char *file, int line);
+
 	static void testHasThrown();
+
 	/** the human readable summary of run tests*/
 	std::string summary();
+
 	/** returns wheather all run tests have passed */
 	static bool allTestsPassed();
-	
+
 private:
-	static const char* errmsgTag_nameOfTest() { return "Test failed: "; }
-	
+	static const char *errmsgTag_nameOfTest() { return "Test failed: "; }
+
 	/** constructor private: force the singleton to be wellbehaved ! */
 	TestsListener();
-	
-	std::string* _currentTestName;
+
+	std::string *_currentTestName;
 	std::stringstream _log;
 	unsigned _executed;
 	unsigned _failed;
 	unsigned _exceptions;
 };
 
-class TestFailedException
-{
+class TestFailedException {
 };
 
 /**
@@ -149,12 +156,13 @@ class TestFailedException
  *
  * It does the 'Component' role in the 'Composite' patten
  **/
-class Test
-{
+class Test {
 public:
-	virtual ~Test(){}
+	virtual ~Test() {}
+
 	/** run the test: exercice the code and check results*/
 	virtual void runTest() = 0;
+
 	/** the test human-readable name */
 	virtual std::string name() const = 0;
 };
@@ -164,13 +172,16 @@ public:
  * This class is just a placeholder for all assert functions --as static methods.
  * It is meant for being used just by the assert macros
  */
-class Assert
-{
-	static const char * errmsgTag_testFailedIn() { return "Test failed in "; }
-	static const char * errmsgTag_inLine() { return ", line: "; };
-	static const char * errmsgTag_failedExpression() { return "Failed expression: "; } 
-	static const char * errmsgTag_expected() { return "Expected: "; } 
-	static const char * errmsgTag_butWas() { return "But was: "; } 
+class Assert {
+	static const char *errmsgTag_testFailedIn() { return "Test failed in "; }
+
+	static const char *errmsgTag_inLine() { return ", line: "; };
+
+	static const char *errmsgTag_failedExpression() { return "Failed expression: "; }
+
+	static const char *errmsgTag_expected() { return "Expected: "; }
+
+	static const char *errmsgTag_butWas() { return "But was: "; }
 
 public:
 #ifdef _MSC_VER
@@ -181,25 +192,31 @@ public:
 	static const char * bold() { return ""; }
 	static const char * yellow() { return ""; }
 #else
-	static const char * blue() { return "\033[36;1m"; }
-	static const char * green() { return "\033[32;1m"; }
-	static const char * red() { return "\033[31;1m"; }
-	static const char * normal() { return "\033[0m"; }
-	static const char * bold() { return "\033[" "1m"; }
-	static const char * yellow() { return "\033[93;1m"; }
+
+	static const char *blue() { return "\033[36;1m"; }
+
+	static const char *green() { return "\033[32;1m"; }
+
+	static const char *red() { return "\033[31;1m"; }
+
+	static const char *normal() { return "\033[0m"; }
+
+	static const char *bold() { return "\033[" "1m"; }
+
+	static const char *yellow() { return "\033[93;1m"; }
+
 #endif
+
 	template<typename AType>
-	static void assertEquals( const AType& expected, const AType& result,
-		const char* file="", int linia=0 )
-	{
-		if(expected != result)
-		{
+	static void assertEquals(const AType &expected, const AType &result,
+							 const char *file = "", int linia = 0) {
+		if (expected != result) {
 			std::stringstream anError;
 
 			anError
-				<< file << ", linia: " << linia << "\n"
-				<< errmsgTag_expected() << " " << expected << " "
-				<< errmsgTag_butWas() << " " << result << "\n";
+					<< file << ", linia: " << linia << "\n"
+					<< errmsgTag_expected() << " " << expected << " "
+					<< errmsgTag_butWas() << " " << result << "\n";
 
 			// TestsListener::theInstance().errorsLog() << anError;
 
@@ -207,41 +224,41 @@ public:
 		}
 	}
 
-	static void assertTrue(char* strExpression, bool expression,
-			const char* file="", int linia=0);
+	static void assertTrue(char *strExpression, bool expression,
+						   const char *file = "", int linia = 0);
 
-	static void assertTrueMissatge(char* strExpression, bool expression, 
-			const char* missatge, const char* file="", int linia=0);
+	static void assertTrueMissatge(char *strExpression, bool expression,
+								   const char *missatge, const char *file = "", int linia = 0);
 
-	static void assertEquals( const char * expected, const char * result,
-		const char* file="", int linia=0 );
-	
-	static void assertEquals( const bool& expected, const bool& result,
-		const char* file="", int linia=0 );
-	
-	static void assertEquals( const double& expected, const double& result,
-		const char* file="", int linia=0 );
+	static void assertEquals(const char *expected, const char *result,
+							 const char *file = "", int linia = 0);
 
-	static void assertEquals( const float& expected, const float& result,
-		const char* file="", int linia=0 );
-	
-	static void assertEquals( const long double& expected, const long double& result,
-		const char* file="", int linia=0 );
-	
-	static void assertEqualsEpsilon( const double& expected, const double& result, const double& epsilon,
-		const char* file="", int linia=0 );
+	static void assertEquals(const bool &expected, const bool &result,
+							 const char *file = "", int linia = 0);
 
-	static int notEqualIndex( const std::string & one, const std::string & other );
+	static void assertEquals(const double &expected, const double &result,
+							 const char *file = "", int linia = 0);
+
+	static void assertEquals(const float &expected, const float &result,
+							 const char *file = "", int linia = 0);
+
+	static void assertEquals(const long double &expected, const long double &result,
+							 const char *file = "", int linia = 0);
+
+	static void assertEqualsEpsilon(const double &expected, const double &result, const double &epsilon,
+									const char *file = "", int linia = 0);
+
+	static int notEqualIndex(const std::string &one, const std::string &other);
 
 	/**
 	 * we overload the assert with string doing colored diffs
 	 *
-	 * MS Visual6 doesn't allow string by reference :-( 
+	 * MS Visual6 doesn't allow string by reference :-(
 	 */
-	static void assertEquals( const std::string expected, const std::string result,
-		const char* file="", int linia=0 );
-	
-	static void fail(const char* motiu, const char* file="", int linia=0);
+	static void assertEquals(const std::string expected, const std::string result,
+							 const char *file = "", int linia = 0);
+
+	static void fail(const char *motiu, const char *file = "", int linia = 0);
 
 
 };
@@ -261,12 +278,12 @@ public:
  * instantiate TestCase objects templatized with this same parameter: it needs the 
  * concrete class type for calling its non-static methods.
  */
-template <typename ConcreteTestFixture>
-class TestFixture : public Test
-{
+template<typename ConcreteTestFixture>
+class TestFixture : public Test {
 protected:
 
 	typedef ConcreteTestFixture ConcreteFixture;
+
 	typedef void(ConcreteTestFixture::*TestCaseMethod)();
 
 	/**
@@ -274,116 +291,106 @@ protected:
 	 *
 	 * Makes the 'Leave' role in the 'Composite' GoF pattern because can't be
 	 * be a composition of other tests.
-	 * 
-	 * It's also a case of 'Command' pattern because it encapsules in an object 
+	 *
+	 * It's also a case of 'Command' pattern because it encapsules in an object
 	 * certain functionality whose execution depends on some deferred entity.
 	 */
-	class TestCase : public Test
-	{
+	class TestCase : public Test {
 	public:
-		TestCase(ConcreteFixture* parent, TestCaseMethod method, const std::string & name) : 
-		  _parent(parent),
-		  _testCaseMethod(method),
-		  _name(name)
-		{
+		TestCase(ConcreteFixture *parent, TestCaseMethod method, const std::string &name) :
+				_parent(parent),
+				_testCaseMethod(method),
+				_name(name) {
 		}
+
 		/** calls TestFixture method.  setUp and tearDown methods are called by
 		 * its parent TestFixture (in its runTest method).
 		 * it is robust to unexpected exceptions (throw) */
-		void runTest()
-		{
+		void runTest() {
 			TestsListener::theInstance().testHasRun();
 			TestsListener::theInstance().currentTestName(_name);
-			try
-			{
+			try {
 				(_parent->*_testCaseMethod)();
 				TestsListener::theInstance().testHasPassed();
 			}
-			catch( std::exception& error )
-			{
+			catch (std::exception &error) {
 				TestsListener::theInstance().testHasThrown();
-				TestsListener::theInstance().errorsLog() 
-					<< "std::exception catched by MiniCppUnit: \n"
-					<< "what() : " 
-					<< Assert::yellow() << error.what() 
-					<< Assert::normal() << "\n";
+				TestsListener::theInstance().errorsLog()
+						<< "std::exception catched by MiniCppUnit: \n"
+						<< "what() : "
+						<< Assert::yellow() << error.what()
+						<< Assert::normal() << "\n";
 			}
-			catch ( TestFailedException& ) //just for skiping current test case
+			catch (TestFailedException &) //just for skiping current test case
 			{
 				// the assert() calls testHasFailed()
 			}
-			catch(...)
-			{
+			catch (...) {
 				TestsListener::theInstance().testHasThrown();
-				TestsListener::theInstance().errorsLog() 
-					<< "non standard exception catched by MiniCppUnit.\n";
+				TestsListener::theInstance().errorsLog()
+						<< "non standard exception catched by MiniCppUnit.\n";
 			}
 		}
 
 		/** the TestFixture method hame */
-		std::string name() const
-		{
+		std::string name() const {
 			return _name;
 		}
 
 	private:
-		ConcreteFixture* _parent;
+		ConcreteFixture *_parent;
 		TestCaseMethod _testCaseMethod;
 		std::string _name;
 	};
-    //------------- end of class TestCase ----------------------------
+	//------------- end of class TestCase ----------------------------
 
 private:
-	
-	typedef std::list<Test*> TestCases;
+
+	typedef std::list<Test *> TestCases;
 	TestCases _testCases;
 	std::string _name;
 
-	void testsList() const
-	{
+	void testsList() const {
 		std::cout << "\n+ " << name() << "\n";
-		for( TestCases::const_iterator it=_testCases.begin(); 
-			it!=_testCases.end(); it++ )
-			std::cout << "  - "<< (*it)->name() << "\n";
+		for (TestCases::const_iterator it = _testCases.begin();
+			 it != _testCases.end(); it++)
+			std::cout << "  - " << (*it)->name() << "\n";
 	}
-	
+
 
 public:
 	virtual void setUp() {}
+
 	virtual void tearDown() {}
 
-	std::string name() const 
-	{
+	std::string name() const {
 		return _name;
 	};
 
-	TestFixture(const std::string& name="A text fixture") : _name(name)
-	{
+	TestFixture(const std::string &name = "A text fixture") : _name(name) {
 	}
 
-	void afegeixCasDeTest(ConcreteFixture* parent, TestCaseMethod method, const char* name)
-	{
-		TestCase* casDeTest = new TestCase(parent, method, _name + "::" + name);
-		_testCases.push_back( casDeTest );
+	void afegeixCasDeTest(ConcreteFixture *parent, TestCaseMethod method, const char *name) {
+		TestCase *casDeTest = new TestCase(parent, method, _name + "::" + name);
+		_testCases.push_back(casDeTest);
 	}
+
 	/** calls each test after setUp and tearDown TestFixture methods */
-	void runTest()
-	{
+	void runTest() {
 		testsList();
 		TestCases::iterator it;
-		for( it=_testCases.begin(); it!=_testCases.end(); it++)
-		{
+		for (it = _testCases.begin(); it != _testCases.end(); it++) {
 			setUp();
 			(*it)->runTest();
 			tearDown();
 		}
 	}
-	/** TestCase that wrapps TestFixture methods are dynamically created and owned by 
+
+	/** TestCase that wrapps TestFixture methods are dynamically created and owned by
 	 * the TestFixture. So here we clean it up*/
-	virtual ~TestFixture()
-	{	
+	virtual ~TestFixture() {
 		TestCases::iterator it;
-		for( it =_testCases.begin(); it!=_testCases.end(); it++)
+		for (it = _testCases.begin(); it != _testCases.end(); it++)
 			delete (*it);
 	}
 };
@@ -392,61 +399,59 @@ public:
 /**
  * This class is aimed to hold a creator method for each concrete TestFixture
  */
-class TestFixtureFactory
-{
+class TestFixtureFactory {
 private:
-	/** Well behaved singleton: 
+	/** Well behaved singleton:
 	 *  Don't allow instantiation apart from theInstance(), so private ctr.*/
-	TestFixtureFactory()
-	{
+	TestFixtureFactory() {
 	}
-	typedef Test* (*FixtureCreator)();
+
+	typedef Test *(*FixtureCreator)();
+
 	std::list<FixtureCreator> _creators;
 public:
 	/** Accessor to the (static) singleton instance */
-	static TestFixtureFactory& theInstance()
-	{
+	static TestFixtureFactory &theInstance() {
 		static TestFixtureFactory theFactory;
 		return theFactory;
 	}
-	bool runTests()
-	{
+
+	bool runTests() {
 		std::list<FixtureCreator>::iterator it;
-		for(it=_creators.begin(); it!=_creators.end(); it++)
-		{	
+		for (it = _creators.begin(); it != _creators.end(); it++) {
 			FixtureCreator creator = *it;
-			Test* test = creator();
+			Test *test = creator();
 			test->runTest();
 			delete test;
 		}
-		std::string errors =  TestsListener::theInstance().logString();
-		if (errors!="") std::cout << "\n\nError Details:\n" << errors;
+		std::string errors = TestsListener::theInstance().logString();
+		if (errors != "") std::cout << "\n\nError Details:\n" << errors;
 		std::cout << TestsListener::theInstance().summary();
 
-		return TestsListener::theInstance().allTestsPassed();	
+		return TestsListener::theInstance().allTestsPassed();
 	}
-	void addFixtureCreator(FixtureCreator creator)
-	{
-		_creators.push_back( creator );
+
+	void addFixtureCreator(FixtureCreator creator) {
+		_creators.push_back(creator);
 	}
-	
+
 };
 
 /** 
  * Macro a usar despr�s de cada classe de test
  */
-#define REGISTER_FIXTURE( ConcreteTestFixture ) \
+#define REGISTER_FIXTURE(ConcreteTestFixture) \
 \
 Test* Creador##ConcreteTestFixture() { return new ConcreteTestFixture; } \
 \
 class Registrador##ConcreteTestFixture \
 { \
 public: \
-	Registrador##ConcreteTestFixture() \
-	{ \
-		TestFixtureFactory::theInstance().addFixtureCreator( \
-				Creador##ConcreteTestFixture); \
-	} \
+    Registrador##ConcreteTestFixture() \
+    { \
+        TestFixtureFactory::theInstance().addFixtureCreator( \
+                Creador##ConcreteTestFixture); \
+    } \
 }; \
 static Registrador##ConcreteTestFixture estatic##ConcreteTestFixture;
 
@@ -455,20 +460,20 @@ static Registrador##ConcreteTestFixture estatic##ConcreteTestFixture;
  * Assert macros to use in test methods. An assert is a test condition
  * we want to check.
  */
-#define ASSERT_EQUALS( expected, result) \
-	Assert::assertEquals( expected, result, __FILE__, __LINE__ );
+#define ASSERT_EQUALS(expected, result) \
+    Assert::assertEquals( expected, result, __FILE__, __LINE__ );
 
-#define ASSERT_EQUALS_EPSILON( expected, result, epsilon) \
-	Assert::assertEqualsEpsilon( expected, result, epsilon, __FILE__, __LINE__ );
+#define ASSERT_EQUALS_EPSILON(expected, result, epsilon) \
+    Assert::assertEqualsEpsilon( expected, result, epsilon, __FILE__, __LINE__ );
 
-#define ASSERT( exp ) \
-	Assert::assertTrue(#exp, exp, __FILE__, __LINE__);
+#define ASSERT(exp) \
+    Assert::assertTrue(#exp, exp, __FILE__, __LINE__);
 
-#define ASSERT_MESSAGE( exp, message ) \
-	Assert::assertTrueMissatge(#exp, exp, message, __FILE__, __LINE__);
+#define ASSERT_MESSAGE(exp, message) \
+    Assert::assertTrueMissatge(#exp, exp, message, __FILE__, __LINE__);
 
-#define FAIL( why ) \
-	Assert::fail(#why, __FILE__, __LINE__);
+#define FAIL(why) \
+    Assert::fail(#why, __FILE__, __LINE__);
 
 /**
  * Macros that allows to write the  constructor of the concrete TestFixture.
@@ -491,14 +496,11 @@ static Registrador##ConcreteTestFixture estatic##ConcreteTestFixture;
  * @endcode
  */
 
-#define TEST_FIXTURE( ConcreteFixture ) \
-	ConcreteFixture() : TestFixture<ConcreteFixture>( #ConcreteFixture )
+#define TEST_FIXTURE(ConcreteFixture) \
+    ConcreteFixture() : TestFixture<ConcreteFixture>( #ConcreteFixture )
 
-#define TEST_CASE( methodName ) \
-	afegeixCasDeTest( this, &ConcreteFixture::methodName, #methodName );
-
-
+#define TEST_CASE(methodName) \
+    afegeixCasDeTest( this, &ConcreteFixture::methodName, #methodName );
 
 
-			     
 #endif  // MiniCppUnit_hxx

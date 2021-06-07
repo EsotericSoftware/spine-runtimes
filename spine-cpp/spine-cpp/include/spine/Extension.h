@@ -37,89 +37,89 @@
 #define SP_UNUSED(x) (void)(x)
 
 namespace spine {
-class String;
+	class String;
 
-class SP_API SpineExtension {
-public:
-	template<typename T>
-	static T *alloc(size_t num, const char *file, int line) {
-		return (T *) getInstance()->_alloc(sizeof(T) * num, file, line);
-	}
+	class SP_API SpineExtension {
+	public:
+		template<typename T>
+		static T *alloc(size_t num, const char *file, int line) {
+			return (T *) getInstance()->_alloc(sizeof(T) * num, file, line);
+		}
 
-	template<typename T>
-	static T *calloc(size_t num, const char *file, int line) {
-		return (T *) getInstance()->_calloc(sizeof(T) * num, file, line);
-	}
+		template<typename T>
+		static T *calloc(size_t num, const char *file, int line) {
+			return (T *) getInstance()->_calloc(sizeof(T) * num, file, line);
+		}
 
-	template<typename T>
-	static T *realloc(T *ptr, size_t num, const char *file, int line) {
-		return (T *) getInstance()->_realloc(ptr, sizeof(T) * num, file, line);
-	}
+		template<typename T>
+		static T *realloc(T *ptr, size_t num, const char *file, int line) {
+			return (T *) getInstance()->_realloc(ptr, sizeof(T) * num, file, line);
+		}
 
-	template<typename T>
-	static void free(T *ptr, const char *file, int line) {
-		getInstance()->_free((void *) ptr, file, line);
-	}
+		template<typename T>
+		static void free(T *ptr, const char *file, int line) {
+			getInstance()->_free((void *) ptr, file, line);
+		}
 
-	template<typename T>
-	static void beforeFree(T *ptr) {
-		getInstance()->_beforeFree((void *) ptr);
-	}
-	
-	static char *readFile(const String &path, int *length) {
-		return getInstance()->_readFile(path, length);
-	}
+		template<typename T>
+		static void beforeFree(T *ptr) {
+			getInstance()->_beforeFree((void *) ptr);
+		}
 
-	static void setInstance(SpineExtension *inSpineExtension);
+		static char *readFile(const String &path, int *length) {
+			return getInstance()->_readFile(path, length);
+		}
 
-	static SpineExtension *getInstance();
+		static void setInstance(SpineExtension *inSpineExtension);
 
-	virtual ~SpineExtension();
+		static SpineExtension *getInstance();
 
-	/// Implement this function to use your own memory allocator
-	virtual void *_alloc(size_t size, const char *file, int line) = 0;
+		virtual ~SpineExtension();
 
-	virtual void *_calloc(size_t size, const char *file, int line) = 0;
+		/// Implement this function to use your own memory allocator
+		virtual void *_alloc(size_t size, const char *file, int line) = 0;
 
-	virtual void *_realloc(void *ptr, size_t size, const char *file, int line) = 0;
+		virtual void *_calloc(size_t size, const char *file, int line) = 0;
 
-	/// If you provide a spineAllocFunc, you should also provide a spineFreeFunc
-	virtual void _free(void *mem, const char *file, int line) = 0;
+		virtual void *_realloc(void *ptr, size_t size, const char *file, int line) = 0;
 
-	virtual char *_readFile(const String &path, int *length) = 0;
+		/// If you provide a spineAllocFunc, you should also provide a spineFreeFunc
+		virtual void _free(void *mem, const char *file, int line) = 0;
 
-	virtual void _beforeFree(void *ptr) { SP_UNUSED(ptr); }
+		virtual char *_readFile(const String &path, int *length) = 0;
 
-protected:
-	SpineExtension();
+		virtual void _beforeFree(void *ptr) { SP_UNUSED(ptr); }
 
-private:
-	static SpineExtension *_instance;
-};
+	protected:
+		SpineExtension();
 
-class SP_API DefaultSpineExtension : public SpineExtension {
-public:
-	DefaultSpineExtension();
+	private:
+		static SpineExtension *_instance;
+	};
 
-	virtual ~DefaultSpineExtension();
+	class SP_API DefaultSpineExtension : public SpineExtension {
+	public:
+		DefaultSpineExtension();
 
-protected:
-	virtual void *_alloc(size_t size, const char *file, int line);
+		virtual ~DefaultSpineExtension();
 
-	virtual void *_calloc(size_t size, const char *file, int line);
+	protected:
+		virtual void *_alloc(size_t size, const char *file, int line);
 
-	virtual void *_realloc(void *ptr, size_t size, const char *file, int line);
+		virtual void *_calloc(size_t size, const char *file, int line);
 
-	virtual void _free(void *mem, const char *file, int line);
+		virtual void *_realloc(void *ptr, size_t size, const char *file, int line);
 
-	virtual char *_readFile(const String &path, int *length);
-};
+		virtual void _free(void *mem, const char *file, int line);
+
+		virtual char *_readFile(const String &path, int *length);
+	};
 
 // This function is to be implemented by engine specific runtimes to provide
 // the default extension for that engine. It is called the first time
 // SpineExtension::getInstance() is called, when no instance has been set
 // yet.
-extern SpineExtension *getDefaultExtension();
+	extern SpineExtension *getDefaultExtension();
 }
 
 #endif /* Spine_Extension_h */

@@ -33,11 +33,11 @@
 #include <spine/Vector.h>
 
 namespace spine {
-class SP_API Vertices : public SpineObject {
-public:
-	Vector<size_t> _bones;
-	Vector<float> _vertices;
-};
+	class SP_API Vertices : public SpineObject {
+	public:
+		Vector <size_t> _bones;
+		Vector<float> _vertices;
+	};
 }
 
 #endif /* Spine_Vertices_h */

@@ -47,17 +47,20 @@ extern "C" {
 struct spSkeleton;
 
 _SP_ARRAY_DECLARE_TYPE(spBoneDataArray, spBoneData*)
+
 _SP_ARRAY_DECLARE_TYPE(spIkConstraintDataArray, spIkConstraintData*)
+
 _SP_ARRAY_DECLARE_TYPE(spTransformConstraintDataArray, spTransformConstraintData*)
+
 _SP_ARRAY_DECLARE_TYPE(spPathConstraintDataArray, spPathConstraintData*)
 
 typedef struct spSkin {
-	const char* const name;
+	const char *const name;
 
-	spBoneDataArray* bones;
-	spIkConstraintDataArray* ikConstraints;
-	spTransformConstraintDataArray* transformConstraints;
-	spPathConstraintDataArray* pathConstraints;
+	spBoneDataArray *bones;
+	spIkConstraintDataArray *ikConstraints;
+	spTransformConstraintDataArray *transformConstraints;
+	spPathConstraintDataArray *pathConstraints;
 } spSkin;
 
 /* Private structs, needed by Skeleton */
@@ -65,48 +68,49 @@ typedef struct _Entry _Entry;
 typedef struct _Entry spSkinEntry;
 struct _Entry {
 	int slotIndex;
-	const char* name;
-	spAttachment* attachment;
-	_Entry* next;
+	const char *name;
+	spAttachment *attachment;
+	_Entry *next;
 };
 
 typedef struct _SkinHashTableEntry _SkinHashTableEntry;
 struct _SkinHashTableEntry {
-	_Entry* entry;
-	_SkinHashTableEntry* next;
+	_Entry *entry;
+	_SkinHashTableEntry *next;
 };
 
 typedef struct {
 	spSkin super;
-	_Entry* entries; /* entries list stored for getting attachment name by attachment index */
-	_SkinHashTableEntry* entriesHashTable[SKIN_ENTRIES_HASH_TABLE_SIZE]; /* hashtable for fast attachment lookup */
+	_Entry *entries; /* entries list stored for getting attachment name by attachment index */
+	_SkinHashTableEntry *entriesHashTable[SKIN_ENTRIES_HASH_TABLE_SIZE]; /* hashtable for fast attachment lookup */
 } _spSkin;
 
-SP_API spSkin* spSkin_create (const char* name);
-SP_API void spSkin_dispose (spSkin* self);
+SP_API spSkin *spSkin_create(const char *name);
+
+SP_API void spSkin_dispose(spSkin *self);
 
 /* The Skin owns the attachment. */
-SP_API void spSkin_setAttachment (spSkin* self, int slotIndex, const char* name, spAttachment* attachment);
+SP_API void spSkin_setAttachment(spSkin *self, int slotIndex, const char *name, spAttachment *attachment);
 /* Returns 0 if the attachment was not found. */
-SP_API spAttachment* spSkin_getAttachment (const spSkin* self, int slotIndex, const char* name);
+SP_API spAttachment *spSkin_getAttachment(const spSkin *self, int slotIndex, const char *name);
 
 /* Returns 0 if the slot or attachment was not found. */
-SP_API const char* spSkin_getAttachmentName (const spSkin* self, int slotIndex, int attachmentIndex);
+SP_API const char *spSkin_getAttachmentName(const spSkin *self, int slotIndex, int attachmentIndex);
 
 /** Attach each attachment in this skin if the corresponding attachment in oldSkin is currently attached. */
-SP_API void spSkin_attachAll (const spSkin* self, struct spSkeleton* skeleton, const spSkin* oldspSkin);
+SP_API void spSkin_attachAll(const spSkin *self, struct spSkeleton *skeleton, const spSkin *oldspSkin);
 
 /** Adds all attachments, bones, and constraints from the specified skin to this skin. */
-SP_API void spSkin_addSkin(spSkin* self, const spSkin* other);
+SP_API void spSkin_addSkin(spSkin *self, const spSkin *other);
 
 /** Adds all attachments, bones, and constraints from the specified skin to this skin. Attachments are deep copied. */
-SP_API void spSkin_copySkin(spSkin* self, const spSkin* other);
+SP_API void spSkin_copySkin(spSkin *self, const spSkin *other);
 
 /** Returns all attachments in this skin. */
-SP_API spSkinEntry* spSkin_getAttachments(const spSkin* self);
+SP_API spSkinEntry *spSkin_getAttachments(const spSkin *self);
 
 /** Clears all attachments, bones, and constraints. */
-SP_API void spSkin_clear(spSkin* self);
+SP_API void spSkin_clear(spSkin *self);
 
 #ifdef __cplusplus
 }

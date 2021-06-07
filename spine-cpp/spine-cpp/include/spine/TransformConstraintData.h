@@ -40,38 +40,54 @@ namespace spine {
 
 	class SP_API TransformConstraintData : public ConstraintData {
 		friend class SkeletonBinary;
+
 		friend class SkeletonJson;
 
 		friend class TransformConstraint;
+
 		friend class Skeleton;
+
 		friend class TransformConstraintTimeline;
 
 	public:
-		explicit TransformConstraintData(const String& name);
+		explicit TransformConstraintData(const String &name);
 
-		Vector<BoneData*>& getBones();
-		BoneData* getTarget();
-        float getMixRotate();
-        float getMixX();
-        float getMixY();
-        float getMixScaleX();
-        float getMixScaleY();
-        float getMixShearY();
+		Vector<BoneData *> &getBones();
+
+		BoneData *getTarget();
+
+		float getMixRotate();
+
+		float getMixX();
+
+		float getMixY();
+
+		float getMixScaleX();
+
+		float getMixScaleY();
+
+		float getMixShearY();
 
 		float getOffsetRotation();
+
 		float getOffsetX();
+
 		float getOffsetY();
+
 		float getOffsetScaleX();
+
 		float getOffsetScaleY();
+
 		float getOffsetShearY();
 
 		bool isRelative();
+
 		bool isLocal();
 
 	private:
-		Vector<BoneData*> _bones;
-		BoneData* _target;
-        float _mixRotate, _mixX, _mixY, _mixScaleX, _mixScaleY, _mixShearY;
+		Vector<BoneData *> _bones;
+		BoneData *_target;
+		float _mixRotate, _mixX, _mixY, _mixScaleX, _mixScaleY, _mixShearY;
 		float _offsetRotation, _offsetX, _offsetY, _offsetScaleX, _offsetScaleY, _offsetShearY;
 		bool _relative, _local;
 	};

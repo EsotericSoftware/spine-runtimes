@@ -23,36 +23,45 @@
 
 namespace JetBrains {
 
-std::string getFlowIdFromEnvironment();
-bool underTeamcity();
+	std::string getFlowIdFromEnvironment();
 
-class TeamcityMessages {
-    std::ostream *m_out;
-    
-protected:
-    std::string escape(std::string s);
+	bool underTeamcity();
 
-    void openMsg(const std::string &name);
-    void writeProperty(std::string name, std::string value);
-    void closeMsg();
+	class TeamcityMessages {
+		std::ostream *m_out;
 
-public:
-    TeamcityMessages();
-    
-    void setOutput(std::ostream &);
-    
-    void suiteStarted(std::string name, std::string flowid = "");
-    void suiteFinished(std::string name, std::string flowid = "");
-    
-    void testStarted(std::string name, std::string flowid = "");
-    void testFailed(std::string name, std::string message, std::string details, std::string flowid = "");
-    void testIgnored(std::string name, std::string message, std::string flowid = "");
-    void testFinished(std::string name, int durationMs = -1, std::string flowid = "");    
+	protected:
+		std::string escape(std::string s);
 
-	void messageError(const std::string& text);
-	void messageWarning(const std::string& text);
-	void messageNormal(const std::string& text);
-};
+		void openMsg(const std::string &name);
+
+		void writeProperty(std::string name, std::string value);
+
+		void closeMsg();
+
+	public:
+		TeamcityMessages();
+
+		void setOutput(std::ostream &);
+
+		void suiteStarted(std::string name, std::string flowid = "");
+
+		void suiteFinished(std::string name, std::string flowid = "");
+
+		void testStarted(std::string name, std::string flowid = "");
+
+		void testFailed(std::string name, std::string message, std::string details, std::string flowid = "");
+
+		void testIgnored(std::string name, std::string message, std::string flowid = "");
+
+		void testFinished(std::string name, int durationMs = -1, std::string flowid = "");
+
+		void messageError(const std::string &text);
+
+		void messageWarning(const std::string &text);
+
+		void messageNormal(const std::string &text);
+	};
 
 }
 

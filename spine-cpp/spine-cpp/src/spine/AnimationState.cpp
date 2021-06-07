@@ -57,21 +57,22 @@ void dummyOnAnimationEventFunc(AnimationState *state, spine::EventType type, Tra
 	SP_UNUSED(event);
 }
 
-TrackEntry::TrackEntry() : _animation(NULL), _previous(NULL), _next(NULL), _mixingFrom(NULL), _mixingTo(0), _trackIndex(0), _loop(false), _holdPrevious(false), _reverse(false),
-	_eventThreshold(0), _attachmentThreshold(0), _drawOrderThreshold(0), _animationStart(0),
-	_animationEnd(0), _animationLast(0), _nextAnimationLast(0), _delay(0), _trackTime(0),
-	_trackLast(0), _nextTrackLast(0), _trackEnd(0), _timeScale(1.0f), _alpha(0), _mixTime(0),
-	_mixDuration(0), _interruptAlpha(0), _totalAlpha(0), _mixBlend(MixBlend_Replace),
-	_listener(dummyOnAnimationEventFunc), _listenerObject(NULL) {
+TrackEntry::TrackEntry() : _animation(NULL), _previous(NULL), _next(NULL), _mixingFrom(NULL), _mixingTo(0),
+						   _trackIndex(0), _loop(false), _holdPrevious(false), _reverse(false),
+						   _eventThreshold(0), _attachmentThreshold(0), _drawOrderThreshold(0), _animationStart(0),
+						   _animationEnd(0), _animationLast(0), _nextAnimationLast(0), _delay(0), _trackTime(0),
+						   _trackLast(0), _nextTrackLast(0), _trackEnd(0), _timeScale(1.0f), _alpha(0), _mixTime(0),
+						   _mixDuration(0), _interruptAlpha(0), _totalAlpha(0), _mixBlend(MixBlend_Replace),
+						   _listener(dummyOnAnimationEventFunc), _listenerObject(NULL) {
 }
 
-TrackEntry::~TrackEntry() { }
+TrackEntry::~TrackEntry() {}
 
 int TrackEntry::getTrackIndex() { return _trackIndex; }
 
 Animation *TrackEntry::getAnimation() { return _animation; }
 
-TrackEntry* TrackEntry::getPrevious() { return _previous; }
+TrackEntry *TrackEntry::getPrevious() { return _previous; }
 
 bool TrackEntry::getLoop() { return _loop; }
 
@@ -173,7 +174,7 @@ void TrackEntry::setListener(AnimationStateListener inValue) {
 	_listenerObject = NULL;
 }
 
-void TrackEntry::setListener(AnimationStateListenerObject* inValue) {
+void TrackEntry::setListener(AnimationStateListenerObject *inValue) {
 	_listener = dummyOnAnimationEventFunc;
 	_listenerObject = inValue;
 }
@@ -196,12 +197,12 @@ void TrackEntry::reset() {
 }
 
 float TrackEntry::getTrackComplete() {
-    float duration = _animationEnd - _animationStart;
-    if (duration != 0) {
-        if (_loop) return duration * (1 + (int)(_trackTime / duration)); // Completion of next loop.
-        if (_trackTime < duration) return duration; // Before duration.
-    }
-    return _trackTime; // Next update.
+	float duration = _animationEnd - _animationStart;
+	if (duration != 0) {
+		if (_loop) return duration * (1 + (int) (_trackTime / duration)); // Completion of next loop.
+		if (_trackTime < duration) return duration; // Before duration.
+	}
+	return _trackTime; // Next update.
 }
 
 EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry *trackEntry, Event *event) :
@@ -219,8 +220,8 @@ EventQueueEntry EventQueue::newEventQueueEntry(EventType eventType, TrackEntry *
 }
 
 EventQueue::EventQueue(AnimationState &state, Pool<TrackEntry> &trackEntryPool) : _state(state),
-	_trackEntryPool(trackEntryPool),
-	_drainDisabled(false) {
+																				  _trackEntryPool(trackEntryPool),
+																				  _drainDisabled(false) {
 }
 
 EventQueue::~EventQueue() {
@@ -268,35 +269,36 @@ void EventQueue::drain() {
 		TrackEntry *trackEntry = queueEntry->_entry;
 
 		switch (queueEntry->_type) {
-		case EventType_Start:
-		case EventType_Interrupt:
-		case EventType_Complete:
-			if (!trackEntry->_listenerObject) trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
-			else trackEntry->_listenerObject->callback(&state, queueEntry->_type, trackEntry, NULL);
-			if(!state._listenerObject) state._listener(&state, queueEntry->_type, trackEntry, NULL);
-			else state._listenerObject->callback(&state, queueEntry->_type, trackEntry, NULL);
-			break;
-		case EventType_End:
-			if (!trackEntry->_listenerObject) trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
-			else trackEntry->_listenerObject->callback(&state, queueEntry->_type, trackEntry, NULL);
-			if (!state._listenerObject) state._listener(&state, queueEntry->_type, trackEntry, NULL);
-			else state._listenerObject->callback(&state, queueEntry->_type, trackEntry, NULL);
-			/* Fall through. */
-		case EventType_Dispose:
-			if (!trackEntry->_listenerObject) trackEntry->_listener(&state, EventType_Dispose, trackEntry, NULL);
-			else trackEntry->_listenerObject->callback(&state, EventType_Dispose, trackEntry, NULL);
-			if (!state._listenerObject) state._listener(&state, EventType_Dispose, trackEntry, NULL);
-			else state._listenerObject->callback(&state, EventType_Dispose, trackEntry, NULL);
+			case EventType_Start:
+			case EventType_Interrupt:
+			case EventType_Complete:
+				if (!trackEntry->_listenerObject) trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
+				else trackEntry->_listenerObject->callback(&state, queueEntry->_type, trackEntry, NULL);
+				if (!state._listenerObject) state._listener(&state, queueEntry->_type, trackEntry, NULL);
+				else state._listenerObject->callback(&state, queueEntry->_type, trackEntry, NULL);
+				break;
+			case EventType_End:
+				if (!trackEntry->_listenerObject) trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
+				else trackEntry->_listenerObject->callback(&state, queueEntry->_type, trackEntry, NULL);
+				if (!state._listenerObject) state._listener(&state, queueEntry->_type, trackEntry, NULL);
+				else state._listenerObject->callback(&state, queueEntry->_type, trackEntry, NULL);
+				/* Fall through. */
+			case EventType_Dispose:
+				if (!trackEntry->_listenerObject) trackEntry->_listener(&state, EventType_Dispose, trackEntry, NULL);
+				else trackEntry->_listenerObject->callback(&state, EventType_Dispose, trackEntry, NULL);
+				if (!state._listenerObject) state._listener(&state, EventType_Dispose, trackEntry, NULL);
+				else state._listenerObject->callback(&state, EventType_Dispose, trackEntry, NULL);
 
-			trackEntry->reset();
-			_trackEntryPool.free(trackEntry);
-			break;
-		case EventType_Event:
-			if (!trackEntry->_listenerObject) trackEntry->_listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
-			else trackEntry->_listenerObject->callback(&state, queueEntry->_type, trackEntry, queueEntry->_event);
-			if (!state._listenerObject) state._listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
-			else state._listenerObject->callback(&state, queueEntry->_type, trackEntry, queueEntry->_event);
-			break;
+				trackEntry->reset();
+				_trackEntryPool.free(trackEntry);
+				break;
+			case EventType_Event:
+				if (!trackEntry->_listenerObject)
+					trackEntry->_listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
+				else trackEntry->_listenerObject->callback(&state, queueEntry->_type, trackEntry, queueEntry->_event);
+				if (!state._listenerObject) state._listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
+				else state._listenerObject->callback(&state, queueEntry->_type, trackEntry, queueEntry->_event);
+				break;
 		}
 	}
 	_eventQueueEntries.clear();
@@ -316,17 +318,17 @@ AnimationState::AnimationState(AnimationStateData *data) :
 
 AnimationState::~AnimationState() {
 	for (size_t i = 0; i < _tracks.size(); i++) {
-		TrackEntry* entry = _tracks[i];
+		TrackEntry *entry = _tracks[i];
 		if (entry) {
-			TrackEntry* from = entry->_mixingFrom;
+			TrackEntry *from = entry->_mixingFrom;
 			while (from) {
-				TrackEntry* curr = from;
+				TrackEntry *curr = from;
 				from = curr->_mixingFrom;
 				delete curr;
 			}
-			TrackEntry* next = entry->_next;
+			TrackEntry *next = entry->_next;
 			while (next) {
-				TrackEntry* curr = next;
+				TrackEntry *curr = next;
 				next = curr->_next;
 				delete curr;
 			}
@@ -366,7 +368,8 @@ void AnimationState::update(float delta) {
 			float nextTime = current._trackLast - next->_delay;
 			if (nextTime >= 0) {
 				next->_delay = 0;
-				next->_trackTime += current._timeScale == 0 ? 0 : (nextTime / current._timeScale + delta) * next->_timeScale;
+				next->_trackTime +=
+						current._timeScale == 0 ? 0 : (nextTime / current._timeScale + delta) * next->_timeScale;
 				current._trackTime += currentDelta;
 				setCurrent(i, next, true);
 				while (next->_mixingFrom != NULL) {
@@ -431,19 +434,20 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		float applyTime = animationTime;
 		Vector<Event *> *applyEvents = &_events;
 		if (current._reverse) {
-		    applyTime = current._animation->getDuration() - applyTime;
-		    applyEvents = NULL;
+			applyTime = current._animation->getDuration() - applyTime;
+			applyEvents = NULL;
 		}
 		size_t timelineCount = current._animation->_timelines.size();
 		Vector<Timeline *> &timelines = current._animation->_timelines;
 		if ((i == 0 && mix == 1) || blend == MixBlend_Add) {
 			for (size_t ii = 0; ii < timelineCount; ++ii) {
-                Timeline *timeline = timelines[ii];
-                if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
-                    applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, blend, true);
-                else
-                    timeline->apply(skeleton, animationLast, applyTime, applyEvents, mix, blend, MixDirection_In);
-            }
+				Timeline *timeline = timelines[ii];
+				if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
+					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, blend,
+											true);
+				else
+					timeline->apply(skeleton, animationLast, applyTime, applyEvents, mix, blend, MixDirection_In);
+			}
 		} else {
 			Vector<int> &timelineMode = current._timelineMode;
 
@@ -458,11 +462,14 @@ bool AnimationState::apply(Skeleton &skeleton) {
 				MixBlend timelineBlend = timelineMode[ii] == Subsequent ? blend : MixBlend_Setup;
 
 				if (timeline->getRTTI().isExactly(RotateTimeline::rtti))
-					applyRotateTimeline(static_cast<RotateTimeline *>(timeline), skeleton, applyTime, mix, timelineBlend, timelinesRotation, ii << 1, firstFrame);
+					applyRotateTimeline(static_cast<RotateTimeline *>(timeline), skeleton, applyTime, mix,
+										timelineBlend, timelinesRotation, ii << 1, firstFrame);
 				else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
-                    applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, timelineBlend, true);
+					applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime,
+											timelineBlend, true);
 				else
-					timeline->apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend, MixDirection_In);
+					timeline->apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend,
+									MixDirection_In);
 			}
 		}
 
@@ -472,16 +479,17 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		current._nextTrackLast = current._trackTime;
 	}
 
-    int setupState = _unkeyedState + Setup;
-    Vector<Slot*>& slots = skeleton.getSlots();
-    for (int i = 0, n = slots.size(); i < n; i++) {
-        Slot* slot = slots[i];
-        if (slot->getAttachmentState() == setupState) {
-            const String& attachmentName = slot->getData().getAttachmentName();
-            slot->setAttachment(attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot->getData().getIndex(), attachmentName));
-        }
-    }
-    _unkeyedState += 2;
+	int setupState = _unkeyedState + Setup;
+	Vector<Slot *> &slots = skeleton.getSlots();
+	for (int i = 0, n = slots.size(); i < n; i++) {
+		Slot *slot = slots[i];
+		if (slot->getAttachmentState() == setupState) {
+			const String &attachmentName = slot->getData().getAttachmentName();
+			slot->setAttachment(attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot->getData().getIndex(),
+																						 attachmentName));
+		}
+	}
+	_unkeyedState += 2;
 
 	_queue->drain();
 	return applied;
@@ -596,7 +604,8 @@ TrackEntry *AnimationState::addEmptyAnimation(size_t trackIndex, float mixDurati
 	TrackEntry *entry = addAnimation(trackIndex, AnimationState::getEmptyAnimation(), false, delay <= 0 ? 1 : delay);
 	entry->_mixDuration = mixDuration;
 	entry->_trackEnd = mixDuration;
-	if (delay <= 0 && entry->_previous != NULL) entry->_delay = entry->_previous->getTrackComplete() - entry->_mixDuration + delay;
+	if (delay <= 0 && entry->_previous != NULL)
+		entry->_delay = entry->_previous->getTrackComplete() - entry->_mixDuration + delay;
 	return entry;
 }
 
@@ -638,7 +647,7 @@ void AnimationState::setListener(AnimationStateListener inValue) {
 	_listenerObject = NULL;
 }
 
-void AnimationState::setListener(AnimationStateListenerObject* inValue) {
+void AnimationState::setListener(AnimationStateListenerObject *inValue) {
 	_listener = dummyOnAnimationEventFunc;
 	_listenerObject = inValue;
 }
@@ -646,6 +655,7 @@ void AnimationState::setListener(AnimationStateListenerObject* inValue) {
 void AnimationState::disableQueue() {
 	_queue->_drainDisabled = true;
 }
+
 void AnimationState::enableQueue() {
 	_queue->_drainDisabled = false;
 }
@@ -656,25 +666,27 @@ Animation *AnimationState::getEmptyAnimation() {
 	return &ret;
 }
 
-void AnimationState::applyAttachmentTimeline(AttachmentTimeline* attachmentTimeline, Skeleton& skeleton, float time, MixBlend blend, bool attachments) {
-    Slot* slot = skeleton.getSlots()[attachmentTimeline->getSlotIndex()];
-    if (!slot->getBone().isActive()) return;
+void AnimationState::applyAttachmentTimeline(AttachmentTimeline *attachmentTimeline, Skeleton &skeleton, float time,
+											 MixBlend blend, bool attachments) {
+	Slot *slot = skeleton.getSlots()[attachmentTimeline->getSlotIndex()];
+	if (!slot->getBone().isActive()) return;
 
-    Vector<float>& frames = attachmentTimeline->getFrames();
-    if (time < frames[0]) {
-        if (blend == MixBlend_Setup || blend == MixBlend_First)
-            setAttachment(skeleton, *slot, slot->getData().getAttachmentName(), attachments);
-    } else {
-        setAttachment(skeleton, *slot, attachmentTimeline->getAttachmentNames()[Animation::search(frames, time)], attachments);
-    }
+	Vector<float> &frames = attachmentTimeline->getFrames();
+	if (time < frames[0]) {
+		if (blend == MixBlend_Setup || blend == MixBlend_First)
+			setAttachment(skeleton, *slot, slot->getData().getAttachmentName(), attachments);
+	} else {
+		setAttachment(skeleton, *slot, attachmentTimeline->getAttachmentNames()[Animation::search(frames, time)],
+					  attachments);
+	}
 
-    /* If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.*/
-    if (slot->getAttachmentState() <= _unkeyedState) slot->setAttachmentState(_unkeyedState + Setup);
+	/* If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.*/
+	if (slot->getAttachmentState() <= _unkeyedState) slot->setAttachmentState(_unkeyedState + Setup);
 }
 
 
 void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleton &skeleton, float time, float alpha,
-	MixBlend blend, Vector<float> &timelinesRotation, size_t i, bool firstFrame
+										 MixBlend blend, Vector<float> &timelinesRotation, size_t i, bool firstFrame
 ) {
 	if (firstFrame) timelinesRotation[i] = 0;
 
@@ -685,17 +697,17 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 
 	Bone *bone = skeleton._bones[rotateTimeline->_boneIndex];
 	if (!bone->isActive()) return;
-	Vector<float>& frames = rotateTimeline->_frames;
+	Vector<float> &frames = rotateTimeline->_frames;
 	float r1, r2;
 	if (time < frames[0]) {
 		switch (blend) {
-		case MixBlend_Setup:
-			bone->_rotation = bone->_data._rotation;
-		default:
-			return;
-		case MixBlend_First:
-			r1 = bone->_rotation;
-			r2 = bone->_data._rotation;
+			case MixBlend_Setup:
+				bone->_rotation = bone->_data._rotation;
+			default:
+				return;
+			case MixBlend_First:
+				r1 = bone->_rotation;
+				r2 = bone->_data._rotation;
 		}
 	} else {
 		r1 = blend == MixBlend_Setup ? bone->_data._rotation : bone->_rotation;
@@ -785,14 +797,14 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 	Vector<Timeline *> &timelines = from->_animation->_timelines;
 	size_t timelineCount = timelines.size();
 	float alphaHold = from->_alpha * to->_interruptAlpha, alphaMix = alphaHold * (1 - mix);
-    float animationLast = from->_animationLast, animationTime = from->getAnimationTime();
-    float applyTime = animationTime;
-    Vector<Event *> *events = NULL;
-    if (from->_reverse) {
-        applyTime = from->_animation->_duration - applyTime;
-    } else {
-        if (mix < from->_eventThreshold) events = &_events;
-    }
+	float animationLast = from->_animationLast, animationTime = from->getAnimationTime();
+	float applyTime = animationTime;
+	Vector<Event *> *events = NULL;
+	if (from->_reverse) {
+		applyTime = from->_animation->_duration - applyTime;
+	} else {
+		if (mix < from->_eventThreshold) events = &_events;
+	}
 
 	if (blend == MixBlend_Add) {
 		for (size_t i = 0; i < timelineCount; i++)
@@ -815,14 +827,14 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 			switch (timelineMode[i]) {
 				case Subsequent:
 					if (!drawOrder && (timeline->getRTTI().isExactly(DrawOrderTimeline::rtti))) continue;
-               timelineBlend = blend;
+					timelineBlend = blend;
 					alpha = alphaMix;
 					break;
 				case First:
 					timelineBlend = MixBlend_Setup;
 					alpha = alphaMix;
 					break;
-			   case HoldSubsequent:
+				case HoldSubsequent:
 					timelineBlend = blend;
 					alpha = alphaHold;
 					break;
@@ -838,11 +850,14 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 			}
 			from->_totalAlpha += alpha;
 			if ((timeline->getRTTI().isExactly(RotateTimeline::rtti))) {
-				applyRotateTimeline((RotateTimeline*)timeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
+				applyRotateTimeline((RotateTimeline *) timeline, skeleton, applyTime, alpha, timelineBlend,
+									timelinesRotation, i << 1, firstFrame);
 			} else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
-				applyAttachmentTimeline(static_cast<AttachmentTimeline*>(timeline), skeleton, applyTime, timelineBlend, attachments);
+				applyAttachmentTimeline(static_cast<AttachmentTimeline *>(timeline), skeleton, applyTime, timelineBlend,
+										attachments);
 			} else {
-				if (drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) && timelineBlend == MixBlend_Setup)
+				if (drawOrder && timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) &&
+					timelineBlend == MixBlend_Setup)
 					direction = MixDirection_In;
 				timeline->apply(skeleton, animationLast, applyTime, events, alpha, timelineBlend, direction);
 			}
@@ -860,9 +875,10 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 	return mix;
 }
 
-void AnimationState::setAttachment(Skeleton& skeleton, Slot& slot, const String& attachmentName, bool attachments) {
-    slot.setAttachment(attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot.getData().getIndex(), attachmentName));
-    if (attachments) slot.setAttachmentState(_unkeyedState + Current);
+void AnimationState::setAttachment(Skeleton &skeleton, Slot &slot, const String &attachmentName, bool attachments) {
+	slot.setAttachment(
+			attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot.getData().getIndex(), attachmentName));
+	if (attachments) slot.setAttachmentState(_unkeyedState + Current);
 }
 
 void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
@@ -896,7 +912,7 @@ void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
 }
 
 void AnimationState::clearNext(TrackEntry *entry) {
-    disposeNext(entry->_next);
+	disposeNext(entry->_next);
 }
 
 void AnimationState::setCurrent(size_t index, TrackEntry *current, bool interrupt) {
@@ -991,7 +1007,7 @@ void AnimationState::animationsChanged() {
 }
 
 void AnimationState::computeHold(TrackEntry *entry) {
-	TrackEntry* to = entry->_mixingTo;
+	TrackEntry *to = entry->_mixingTo;
 	Vector<Timeline *> &timelines = entry->_animation->_timelines;
 	size_t timelinesCount = timelines.size();
 	Vector<int> &timelineMode = entry->_timelineMode;
@@ -1001,7 +1017,7 @@ void AnimationState::computeHold(TrackEntry *entry) {
 
 	if (to != NULL && to->_holdPrevious) {
 		for (size_t i = 0; i < timelinesCount; i++) {
-            timelineMode[i] = _propertyIDs.addAll(timelines[i]->getPropertyIds(), true) ? HoldFirst : HoldSubsequent;
+			timelineMode[i] = _propertyIDs.addAll(timelines[i]->getPropertyIds(), true) ? HoldFirst : HoldSubsequent;
 		}
 		return;
 	}
@@ -1016,8 +1032,8 @@ void AnimationState::computeHold(TrackEntry *entry) {
 			timelineMode[i] = Subsequent;
 		} else {
 			if (to == NULL || timeline->getRTTI().isExactly(AttachmentTimeline::rtti) ||
-					timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) ||
-					timeline->getRTTI().isExactly(EventTimeline::rtti) || !to->_animation->hasTimeline(ids)) {
+				timeline->getRTTI().isExactly(DrawOrderTimeline::rtti) ||
+				timeline->getRTTI().isExactly(EventTimeline::rtti) || !to->_animation->hasTimeline(ids)) {
 				timelineMode[i] = First;
 			} else {
 				for (TrackEntry *next = to->_mixingTo; next != NULL; next = next->_mixingTo) {

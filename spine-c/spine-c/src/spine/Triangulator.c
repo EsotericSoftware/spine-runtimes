@@ -31,8 +31,8 @@
 #include <spine/extension.h>
 #include <stdio.h>
 
-spTriangulator* spTriangulator_create() {
-	spTriangulator* triangulator = CALLOC(spTriangulator, 1);
+spTriangulator *spTriangulator_create() {
+	spTriangulator *triangulator = CALLOC(spTriangulator, 1);
 
 	triangulator->convexPolygons = spArrayFloatArray_create(16);
 	triangulator->convexPolygonsIndices = spArrayShortArray_create(16);
@@ -45,7 +45,7 @@ spTriangulator* spTriangulator_create() {
 	return triangulator;
 }
 
-void spTriangulator_dispose(spTriangulator* self) {
+void spTriangulator_dispose(spTriangulator *self) {
 	int i;
 
 	for (i = 0; i < self->convexPolygons->size; i++) {
@@ -75,32 +75,32 @@ void spTriangulator_dispose(spTriangulator* self) {
 	FREE(self);
 }
 
-static spFloatArray* _obtainPolygon(spTriangulator* self) {
+static spFloatArray *_obtainPolygon(spTriangulator *self) {
 	if (self->polygonPool->size == 0) return spFloatArray_create(16);
 	else return spArrayFloatArray_pop(self->polygonPool);
 }
 
-static void _freePolygon(spTriangulator* self, spFloatArray* polygon) {
+static void _freePolygon(spTriangulator *self, spFloatArray *polygon) {
 	spArrayFloatArray_add(self->polygonPool, polygon);
 }
 
-static void _freeAllPolygons(spTriangulator* self, spArrayFloatArray* polygons) {
+static void _freeAllPolygons(spTriangulator *self, spArrayFloatArray *polygons) {
 	int i;
 	for (i = 0; i < polygons->size; i++) {
 		_freePolygon(self, polygons->items[i]);
 	}
 }
 
-static spShortArray* _obtainPolygonIndices(spTriangulator* self) {
+static spShortArray *_obtainPolygonIndices(spTriangulator *self) {
 	if (self->polygonIndicesPool->size == 0) return spShortArray_create(16);
 	else return spArrayShortArray_pop(self->polygonIndicesPool);
 }
 
-static void _freePolygonIndices(spTriangulator* self, spShortArray* indices) {
+static void _freePolygonIndices(spTriangulator *self, spShortArray *indices) {
 	spArrayShortArray_add(self->polygonIndicesPool, indices);
 }
 
-static void _freeAllPolygonIndices(spTriangulator* self, spArrayShortArray* polygonIndices) {
+static void _freeAllPolygonIndices(spTriangulator *self, spArrayShortArray *polygonIndices) {
 	int i;
 	for (i = 0; i < polygonIndices->size; i++) {
 		_freePolygonIndices(self, polygonIndices->items[i]);
@@ -111,35 +111,35 @@ static int _positiveArea(float p1x, float p1y, float p2x, float p2y, float p3x, 
 	return p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y) >= 0;
 }
 
-static int _isConcave(int index, int vertexCount, float* vertices, short* indices) {
+static int _isConcave(int index, int vertexCount, float *vertices, short *indices) {
 	int previous = indices[(vertexCount + index - 1) % vertexCount] << 1;
 	int current = indices[index] << 1;
 	int next = indices[(index + 1) % vertexCount] << 1;
 	return !_positiveArea(vertices[previous], vertices[previous + 1],
-		vertices[current], vertices[current + 1],
-		vertices[next], vertices[next + 1]);
+						  vertices[current], vertices[current + 1],
+						  vertices[next], vertices[next + 1]);
 }
 
-static int _winding (float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
+static int _winding(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y) {
 	float px = p2x - p1x, py = p2y - p1y;
 	return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
 }
 
-spShortArray* spTriangulator_triangulate(spTriangulator* self, spFloatArray* verticesArray) {
-	float* vertices = verticesArray->items;
+spShortArray *spTriangulator_triangulate(spTriangulator *self, spFloatArray *verticesArray) {
+	float *vertices = verticesArray->items;
 	int vertexCount = verticesArray->size >> 1;
 	int i, n, ii;
 
-	spShortArray* indicesArray = self->indicesArray;
-	short* indices;
-	spIntArray* isConcaveArray;
-	int* isConcave;
-	spShortArray* triangles;
+	spShortArray *indicesArray = self->indicesArray;
+	short *indices;
+	spIntArray *isConcaveArray;
+	int *isConcave;
+	spShortArray *triangles;
 
 	spShortArray_clear(indicesArray);
 	indices = spShortArray_setSize(indicesArray, vertexCount)->items;
 	for (i = 0; i < vertexCount; i++)
-		indices[i] = (short)i;
+		indices[i] = (short) i;
 
 	isConcaveArray = self->isConcaveArray;
 	isConcave = spIntArray_setSize(isConcaveArray, vertexCount)->items;
@@ -165,7 +165,8 @@ spShortArray* spTriangulator_triangulate(spTriangulator* self, spFloatArray* ver
 					float vx, vy;
 					if (!isConcave[ii]) continue;
 					v = indices[ii] << 1;
-					vx = vertices[v]; vy = vertices[v + 1];
+					vx = vertices[v];
+					vy = vertices[v + 1];
 					if (_positiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
 						if (_positiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
 							if (_positiveArea(p2x, p2y, p3x, p3y, vx, vy)) goto break_outer;
@@ -211,16 +212,17 @@ spShortArray* spTriangulator_triangulate(spTriangulator* self, spFloatArray* ver
 	return triangles;
 }
 
-spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloatArray* verticesArray, spShortArray* triangles) {
-	float* vertices = verticesArray->items;
+spArrayFloatArray *
+spTriangulator_decompose(spTriangulator *self, spFloatArray *verticesArray, spShortArray *triangles) {
+	float *vertices = verticesArray->items;
 
-	spArrayFloatArray* convexPolygons = self->convexPolygons;
-	spArrayShortArray* convexPolygonsIndices;
-	spShortArray* polygonIndices;
-	spFloatArray* polygon;
+	spArrayFloatArray *convexPolygons = self->convexPolygons;
+	spArrayShortArray *convexPolygonsIndices;
+	spShortArray *polygonIndices;
+	spFloatArray *polygon;
 
 	int fanBaseIndex, lastWinding;
-	short* trianglesItems;
+	short *trianglesItems;
 	int i, n;
 
 	_freeAllPolygons(self, convexPolygons);
@@ -236,7 +238,8 @@ spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloatArray* 
 	polygon = _obtainPolygon(self);
 	spFloatArray_clear(polygon);
 
-	fanBaseIndex = -1; lastWinding = 0;
+	fanBaseIndex = -1;
+	lastWinding = 0;
 	trianglesItems = triangles->items;
 	for (i = 0, n = triangles->size; i < n; i += 3) {
 		int t1 = trianglesItems[i] << 1, t2 = trianglesItems[i + 1] << 1, t3 = trianglesItems[i + 2] << 1;
@@ -247,7 +250,7 @@ spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloatArray* 
 		int merged = 0;
 		if (fanBaseIndex == t1) {
 			int o = polygon->size - 4;
-			float* p = polygon->items;
+			float *p = polygon->items;
 			int winding1 = _winding(p[o], p[o + 1], p[o + 2], p[o + 3], x3, y3);
 			int winding2 = _winding(x3, y3, p[0], p[1], p[2], p[3]);
 			if (winding1 == lastWinding && winding2 == lastWinding) {
@@ -292,7 +295,7 @@ spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloatArray* 
 	for (i = 0, n = convexPolygons->size; i < n; i++) {
 		int firstIndex, lastIndex;
 		int o;
-		float* p;
+		float *p;
 		float prevPrevX, prevPrevY, prevX, prevY, firstX, firstY, secondX, secondY;
 		int winding;
 		int ii;
@@ -305,16 +308,20 @@ spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloatArray* 
 		polygon = convexPolygons->items[i];
 		o = polygon->size - 4;
 		p = polygon->items;
-		prevPrevX = p[o]; prevPrevY = p[o + 1];
-		prevX = p[o + 2]; prevY = p[o + 3];
-		firstX = p[0]; firstY = p[1];
-		secondX = p[2]; secondY = p[3];
+		prevPrevX = p[o];
+		prevPrevY = p[o + 1];
+		prevX = p[o + 2];
+		prevY = p[o + 3];
+		firstX = p[0];
+		firstY = p[1];
+		secondX = p[2];
+		secondY = p[3];
 		winding = _winding(prevPrevX, prevPrevY, prevX, prevY, firstX, firstY);
 
 		for (ii = 0; ii < n; ii++) {
-			spShortArray* otherIndices;
+			spShortArray *otherIndices;
 			int otherFirstIndex, otherSecondIndex, otherLastIndex;
-			spFloatArray* otherPoly;
+			spFloatArray *otherPoly;
 			float x3, y3;
 			int winding1, winding2;
 
@@ -326,7 +333,8 @@ spArrayFloatArray* spTriangulator_decompose(spTriangulator* self, spFloatArray* 
 			otherLastIndex = otherIndices->items[2];
 
 			otherPoly = convexPolygons->items[ii];
-			x3 = otherPoly->items[otherPoly->size - 2]; y3 = otherPoly->items[otherPoly->size - 1];
+			x3 = otherPoly->items[otherPoly->size - 2];
+			y3 = otherPoly->items[otherPoly->size - 1];
 
 			if (otherFirstIndex != firstIndex || otherSecondIndex != lastIndex) continue;
 			winding1 = _winding(prevPrevX, prevPrevY, prevX, prevY, x3, y3);

@@ -23,60 +23,54 @@ using namespace std;
 
 namespace JetBrains {
 
-TeamcityProgressListener::TeamcityProgressListener()
-{
-    flowid = getFlowIdFromEnvironment();
-}
+	TeamcityProgressListener::TeamcityProgressListener() {
+		flowid = getFlowIdFromEnvironment();
+	}
 
-TeamcityProgressListener::TeamcityProgressListener(const std::string& _flowid)
-{
-    flowid = _flowid;
-}
+	TeamcityProgressListener::TeamcityProgressListener(const std::string &_flowid) {
+		flowid = _flowid;
+	}
 
-void TeamcityProgressListener::startTest(const std::string& test) {
-    messages.testStarted(test, flowid);
-}
+	void TeamcityProgressListener::startTest(const std::string &test) {
+		messages.testStarted(test, flowid);
+	}
 
-static string sourceLine2string(const SourceLine &sline) {
-    stringstream ss;
-        
-    ss << sline.fileName << ":" << sline.lineNumber;
-    
-    return ss.str();
-}
+	static string sourceLine2string(const SourceLine &sline) {
+		stringstream ss;
 
-void TeamcityProgressListener::addFailure(const TestFailure &failure) 
-{
-  
-    string details = failure.details;
-    
-    if (failure.sourceLine.isValid()) {
-        details.append(" at ");
-        details.append(sourceLine2string(failure.sourceLine));
-        details.append("\n");
-    }
-    
-    messages.testFailed(
-        failure.testName,
-        failure.description,
-        details,
-        flowid
-    );
-}
+		ss << sline.fileName << ":" << sline.lineNumber;
 
-void TeamcityProgressListener::endTest(const std::string& test) 
-{
-    messages.testFinished(test, -1, flowid);
-}
+		return ss.str();
+	}
 
-void TeamcityProgressListener::startSuite(const std::string& test) 
-{
-    messages.suiteStarted(test, flowid);
-}
+	void TeamcityProgressListener::addFailure(const TestFailure &failure) {
 
-void TeamcityProgressListener::endSuite(const std::string& test) 
-{
-    messages.suiteFinished(test, flowid);
-}
+		string details = failure.details;
+
+		if (failure.sourceLine.isValid()) {
+			details.append(" at ");
+			details.append(sourceLine2string(failure.sourceLine));
+			details.append("\n");
+		}
+
+		messages.testFailed(
+				failure.testName,
+				failure.description,
+				details,
+				flowid
+		);
+	}
+
+	void TeamcityProgressListener::endTest(const std::string &test) {
+		messages.testFinished(test, -1, flowid);
+	}
+
+	void TeamcityProgressListener::startSuite(const std::string &test) {
+		messages.suiteStarted(test, flowid);
+	}
+
+	void TeamcityProgressListener::endSuite(const std::string &test) {
+		messages.suiteFinished(test, flowid);
+	}
 
 }

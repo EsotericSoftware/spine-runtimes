@@ -151,21 +151,11 @@ SkeletonDrawable::~SkeletonDrawable () {
 	spColorArray_dispose(tempColors);
 }
 
-void printSkeleton(spSkeleton* skeleton) {
-    int i, n;
-    printf("===== Skeleton\n");
-    for (i = 0, n = skeleton->bonesCount; i < n; i++) {
-        spBone *bone = skeleton->bones[i];
-        printf("%s: %f, %f, %f, %f, %f, %f\n", bone->data->name, bone->a, bone->b, bone->c, bone->d, bone->worldX, bone->worldY);
-    }
-}
-
 void SkeletonDrawable::update (float deltaTime) {
 	spSkeleton_update(skeleton, deltaTime);
 	spAnimationState_update(state, deltaTime * timeScale);
 	spAnimationState_apply(state, skeleton);
 	spSkeleton_updateWorldTransform(skeleton);
-	printSkeleton(skeleton);
 }
 
 void SkeletonDrawable::draw (RenderTarget& target, RenderStates states) const {

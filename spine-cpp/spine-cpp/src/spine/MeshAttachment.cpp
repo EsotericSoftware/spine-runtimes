@@ -39,24 +39,23 @@ using namespace spine;
 RTTI_IMPL(MeshAttachment, VertexAttachment)
 
 MeshAttachment::MeshAttachment(const String &name) : VertexAttachment(name), HasRendererObject(),
-	_regionOffsetX(0),
-	_regionOffsetY(0),
-	_regionWidth(0),
-	_regionHeight(0),
-	_regionOriginalWidth(0),
-	_regionOriginalHeight(0),
-	_parentMesh(NULL),
-	_path(),
-	_regionU(0),
-	_regionV(0),
-	_regionU2(0),
-	_regionV2(0),
-	_width(0),
-	_height(0),
-	_color(1, 1, 1, 1),
-	_hullLength(0),
-	_regionDegrees(0)
-{}
+													 _regionOffsetX(0),
+													 _regionOffsetY(0),
+													 _regionWidth(0),
+													 _regionHeight(0),
+													 _regionOriginalWidth(0),
+													 _regionOriginalHeight(0),
+													 _parentMesh(NULL),
+													 _path(),
+													 _regionU(0),
+													 _regionV(0),
+													 _regionU2(0),
+													 _regionV2(0),
+													 _width(0),
+													 _height(0),
+													 _color(1, 1, 1, 1),
+													 _hullLength(0),
+													 _regionDegrees(0) {}
 
 MeshAttachment::~MeshAttachment() {}
 
@@ -70,57 +69,57 @@ void MeshAttachment::updateUVs() {
 	float width = 0, height = 0;
 
 	switch (_regionDegrees) {
-	case 90: {
-		float textureWidth = _regionHeight / (_regionU2 - _regionU);
-		float textureHeight = _regionWidth / (_regionV2 - _regionV);
-		u -= (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureWidth;
-		v -= (_regionOriginalWidth - _regionOffsetX - _regionWidth) / textureHeight;
-		width = _regionOriginalHeight / textureWidth;
-		height = _regionOriginalWidth / textureHeight;
-		for (i = 0; i < n; i += 2) {
-			_uvs[i] = u + _regionUVs[i + 1] * width;
-			_uvs[i + 1] = v + (1 - _regionUVs[i]) * height;
+		case 90: {
+			float textureWidth = _regionHeight / (_regionU2 - _regionU);
+			float textureHeight = _regionWidth / (_regionV2 - _regionV);
+			u -= (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureWidth;
+			v -= (_regionOriginalWidth - _regionOffsetX - _regionWidth) / textureHeight;
+			width = _regionOriginalHeight / textureWidth;
+			height = _regionOriginalWidth / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				_uvs[i] = u + _regionUVs[i + 1] * width;
+				_uvs[i + 1] = v + (1 - _regionUVs[i]) * height;
+			}
+			return;
 		}
-		return;
-	}
-	case 180: {
-		float textureWidth = _regionWidth / (_regionU2 - _regionU);
-		float textureHeight = _regionHeight / (_regionV2 - _regionV);
-		u -= (_regionOriginalWidth - _regionOffsetX - _regionWidth) / textureWidth;
-		v -= _regionOffsetY / textureHeight;
-		width = _regionOriginalWidth / textureWidth;
-		height = _regionOriginalHeight / textureHeight;
-		for (i = 0; i < n; i += 2) {
-			_uvs[i] = u + (1 - _regionUVs[i]) * width;
-			_uvs[i + 1] = v + (1 - _regionUVs[i + 1]) * height;
+		case 180: {
+			float textureWidth = _regionWidth / (_regionU2 - _regionU);
+			float textureHeight = _regionHeight / (_regionV2 - _regionV);
+			u -= (_regionOriginalWidth - _regionOffsetX - _regionWidth) / textureWidth;
+			v -= _regionOffsetY / textureHeight;
+			width = _regionOriginalWidth / textureWidth;
+			height = _regionOriginalHeight / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				_uvs[i] = u + (1 - _regionUVs[i]) * width;
+				_uvs[i + 1] = v + (1 - _regionUVs[i + 1]) * height;
+			}
+			return;
 		}
-		return;
-	}
-	case 270: {
-		float textureHeight = _regionHeight / (_regionV2 - _regionV);
-		float textureWidth = _regionWidth / (_regionU2 - _regionU);
-		u -= _regionOffsetY / textureWidth;
-		v -= _regionOffsetX / textureHeight;
-		width = _regionOriginalHeight / textureWidth;
-		height = _regionOriginalWidth / textureHeight;
-		for (i = 0; i < n; i += 2) {
-			_uvs[i] = u + (1 - _regionUVs[i + 1]) * width;
-			_uvs[i + 1] = v + _regionUVs[i] * height;
+		case 270: {
+			float textureHeight = _regionHeight / (_regionV2 - _regionV);
+			float textureWidth = _regionWidth / (_regionU2 - _regionU);
+			u -= _regionOffsetY / textureWidth;
+			v -= _regionOffsetX / textureHeight;
+			width = _regionOriginalHeight / textureWidth;
+			height = _regionOriginalWidth / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				_uvs[i] = u + (1 - _regionUVs[i + 1]) * width;
+				_uvs[i + 1] = v + _regionUVs[i] * height;
+			}
+			return;
 		}
-		return;
-	}
-	default: {
-		float textureWidth = _regionWidth / (_regionU2 - _regionU);
-		float textureHeight = _regionHeight / (_regionV2 - _regionV);
-		u -= _regionOffsetX / textureWidth;
-		v -= (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureHeight;
-		width = _regionOriginalWidth / textureWidth;
-		height = _regionOriginalHeight / textureHeight;
-		for (i = 0; i < n; i += 2) {
-			_uvs[i] = u + _regionUVs[i] * width;
-			_uvs[i + 1] = v + _regionUVs[i + 1] * height;
+		default: {
+			float textureWidth = _regionWidth / (_regionU2 - _regionU);
+			float textureHeight = _regionHeight / (_regionV2 - _regionV);
+			u -= _regionOffsetX / textureWidth;
+			v -= (_regionOriginalHeight - _regionOffsetY - _regionHeight) / textureHeight;
+			width = _regionOriginalWidth / textureWidth;
+			height = _regionOriginalHeight / textureHeight;
+			for (i = 0; i < n; i += 2) {
+				_uvs[i] = u + _regionUVs[i] * width;
+				_uvs[i + 1] = v + _regionUVs[i + 1] * height;
+			}
 		}
-	}
 	}
 }
 
@@ -283,10 +282,10 @@ spine::Color &MeshAttachment::getColor() {
 	return _color;
 }
 
-Attachment* MeshAttachment::copy() {
+Attachment *MeshAttachment::copy() {
 	if (_parentMesh) return newLinkedMesh();
 
-	MeshAttachment* copy = new (__FILE__, __LINE__) MeshAttachment(getName());
+	MeshAttachment *copy = new(__FILE__, __LINE__) MeshAttachment(getName());
 	copy->setRendererObject(getRendererObject());
 	copy->_regionU = _regionU;
 	copy->_regionV = _regionV;
@@ -315,8 +314,8 @@ Attachment* MeshAttachment::copy() {
 	return copy;
 }
 
-MeshAttachment* MeshAttachment::newLinkedMesh() {
-	MeshAttachment* copy = new (__FILE__, __LINE__) MeshAttachment(getName());
+MeshAttachment *MeshAttachment::newLinkedMesh() {
+	MeshAttachment *copy = new(__FILE__, __LINE__) MeshAttachment(getName());
 	copy->setRendererObject(getRendererObject());
 	copy->_regionU = _regionU;
 	copy->_regionV = _regionV;

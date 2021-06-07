@@ -41,11 +41,11 @@ extern "C" {
 
 typedef struct spRegionAttachment {
 	spAttachment super;
-	const char* path;
+	const char *path;
 	float x, y, scaleX, scaleY, rotation, width, height;
 	spColor color;
 
-	void* rendererObject;
+	void *rendererObject;
 	int regionOffsetX, regionOffsetY; /* Pixels stripped from the bottom left, unrotated. */
 	int regionWidth, regionHeight; /* Unrotated, stripped pixel size. */
 	int regionOriginalWidth, regionOriginalHeight; /* Unrotated, unstripped pixel size. */
@@ -54,10 +54,14 @@ typedef struct spRegionAttachment {
 	float uvs[8];
 } spRegionAttachment;
 
-SP_API spRegionAttachment* spRegionAttachment_create (const char* name);
-SP_API void spRegionAttachment_setUVs (spRegionAttachment* self, float u, float v, float u2, float v2, float degrees);
-SP_API void spRegionAttachment_updateOffset (spRegionAttachment* self);
-SP_API void spRegionAttachment_computeWorldVertices (spRegionAttachment* self, spBone* bone, float* vertices, int offset, int stride);
+SP_API spRegionAttachment *spRegionAttachment_create(const char *name);
+
+SP_API void spRegionAttachment_setUVs(spRegionAttachment *self, float u, float v, float u2, float v2, float degrees);
+
+SP_API void spRegionAttachment_updateOffset(spRegionAttachment *self);
+
+SP_API void spRegionAttachment_computeWorldVertices(spRegionAttachment *self, spBone *bone, float *vertices, int offset,
+													int stride);
 
 #ifdef __cplusplus
 }

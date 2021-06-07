@@ -36,7 +36,9 @@
 
 namespace spine {
 	class Skeleton;
+
 	class BoundingBoxAttachment;
+
 	class Polygon;
 
 	/// Collects each BoundingBoxAttachment that is visible and computes the world vertices for its polygon.
@@ -44,6 +46,7 @@ namespace spine {
 	class SP_API SkeletonBounds : public SpineObject {
 	public:
 		SkeletonBounds();
+
 		~SkeletonBounds();
 
 		/// Clears any previous polygons, finds all visible bounding box attachments,
@@ -53,7 +56,7 @@ namespace spine {
 		/// If true, the axis aligned bounding box containing all the polygons is computed.
 		/// If false, the SkeletonBounds AABB methods will always return true.
 		///
-		void update(Skeleton& skeleton, bool updateAabb);
+		void update(Skeleton &skeleton, bool updateAabb);
 
 		/// Returns true if the axis aligned bounding box contains the point.
 		bool aabbcontainsPoint(float x, float y);
@@ -65,28 +68,29 @@ namespace spine {
 		bool aabbIntersectsSkeleton(SkeletonBounds bounds);
 
 		/// Returns true if the polygon contains the point.
-		bool containsPoint(Polygon* polygon, float x, float y);
+		bool containsPoint(Polygon *polygon, float x, float y);
 
 		/// Returns the first bounding box attachment that contains the point, or NULL. When doing many checks, it is usually more
 		/// efficient to only call this method if {@link #aabbcontainsPoint(float, float)} returns true.
-		BoundingBoxAttachment* containsPoint(float x, float y);
+		BoundingBoxAttachment *containsPoint(float x, float y);
 
 		/// Returns the first bounding box attachment that contains the line segment, or NULL. When doing many checks, it is usually
 		/// more efficient to only call this method if {@link #aabbintersectsSegment(float, float, float, float)} returns true.
-		BoundingBoxAttachment* intersectsSegment(float x1, float y1, float x2, float y2);
+		BoundingBoxAttachment *intersectsSegment(float x1, float y1, float x2, float y2);
 
 		/// Returns true if the polygon contains the line segment.
-		bool intersectsSegment(Polygon* polygon, float x1, float y1, float x2, float y2);
+		bool intersectsSegment(Polygon *polygon, float x1, float y1, float x2, float y2);
 
-		Polygon* getPolygon(BoundingBoxAttachment* attachment);
+		Polygon *getPolygon(BoundingBoxAttachment *attachment);
 
 		float getWidth();
+
 		float getHeight();
 
 	private:
-		Pool<Polygon> _polygonPool;
-		Vector<BoundingBoxAttachment*> _boundingBoxes;
-		Vector<Polygon*> _polygons;
+		Pool <Polygon> _polygonPool;
+		Vector<BoundingBoxAttachment *> _boundingBoxes;
+		Vector<Polygon *> _polygons;
 		float _minX, _minY, _maxX, _maxY;
 
 		void aabbCompute();

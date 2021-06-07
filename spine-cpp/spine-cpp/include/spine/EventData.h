@@ -35,52 +35,52 @@
 
 namespace spine {
 /// Stores the setup pose values for an Event.
-class SP_API EventData : public SpineObject {
-	friend class SkeletonBinary;
+	class SP_API EventData : public SpineObject {
+		friend class SkeletonBinary;
 
-	friend class SkeletonJson;
+		friend class SkeletonJson;
 
-	friend class Event;
+		friend class Event;
 
-public:
-	explicit EventData(const String &name);
+	public:
+		explicit EventData(const String &name);
 
-	/// The name of the event, which is unique within the skeleton.
-	const String &getName() const;
+		/// The name of the event, which is unique within the skeleton.
+		const String &getName() const;
 
-	int getIntValue() const;
+		int getIntValue() const;
 
-	void setIntValue(int inValue);
+		void setIntValue(int inValue);
 
-	float getFloatValue()  const;
+		float getFloatValue() const;
 
-	void setFloatValue(float inValue);
+		void setFloatValue(float inValue);
 
-	const String &getStringValue()  const;
+		const String &getStringValue() const;
 
-	void setStringValue(const String &inValue);
+		void setStringValue(const String &inValue);
 
-	const String &getAudioPath()  const;
+		const String &getAudioPath() const;
 
-	void setAudioPath(const String &inValue);
+		void setAudioPath(const String &inValue);
 
-	float getVolume() const;
+		float getVolume() const;
 
-	void setVolume(float inValue);
+		void setVolume(float inValue);
 
-	float getBalance() const;
+		float getBalance() const;
 
-	void setBalance(float inValue);
+		void setBalance(float inValue);
 
-private:
-	const String _name;
-	int _intValue;
-	float _floatValue;
-	String _stringValue;
-	String _audioPath;
-	float _volume;
-	float _balance;
-};
+	private:
+		const String _name;
+		int _intValue;
+		float _floatValue;
+		String _stringValue;
+		String _audioPath;
+		float _volume;
+		float _balance;
+	};
 }
 
 #endif /* Spine_EventData_h */

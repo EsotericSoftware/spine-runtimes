@@ -50,8 +50,8 @@ using namespace spine;
 RTTI_IMPL(EventTimeline, Timeline)
 
 EventTimeline::EventTimeline(size_t frameCount) : Timeline(frameCount, 1) {
-    PropertyId ids[] = {((PropertyId) Property_Event << 32)};
-    setPropertyIds(ids, 1);
+	PropertyId ids[] = {((PropertyId) Property_Event << 32)};
+	setPropertyIds(ids, 1);
 	_events.setSize(frameCount, NULL);
 }
 
@@ -60,7 +60,7 @@ EventTimeline::~EventTimeline() {
 }
 
 void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-	MixBlend blend, MixDirection direction
+						  MixBlend blend, MixDirection direction
 ) {
 	if (pEvents == NULL) return;
 
@@ -81,9 +81,9 @@ void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 
 	int i;
 	if (lastTime < _frames[0]) {
-        i = 0;
+		i = 0;
 	} else {
-        i = Animation::search(_frames, lastTime) + 1;
+		i = Animation::search(_frames, lastTime) + 1;
 		float frameTime = _frames[i];
 		while (i > 0) {
 			// Fire multiple events with the same i.
@@ -92,7 +92,7 @@ void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 		}
 	}
 
-	for (; (size_t)i < frameCount && time >= _frames[i]; i++)
+	for (; (size_t) i < frameCount && time >= _frames[i]; i++)
 		events.add(_events[i]);
 }
 

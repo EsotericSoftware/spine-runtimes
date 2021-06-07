@@ -30,8 +30,8 @@
 #include <spine/SkeletonClipping.h>
 #include <spine/extension.h>
 
-spSkeletonClipping* spSkeletonClipping_create() {
-	spSkeletonClipping* clipping = CALLOC(spSkeletonClipping, 1);
+spSkeletonClipping *spSkeletonClipping_create() {
+	spSkeletonClipping *clipping = CALLOC(spSkeletonClipping, 1);
 
 	clipping->triangulator = spTriangulator_create();
 	clipping->clippingPolygon = spFloatArray_create(128);
@@ -44,7 +44,7 @@ spSkeletonClipping* spSkeletonClipping_create() {
 	return clipping;
 }
 
-void spSkeletonClipping_dispose(spSkeletonClipping* self) {
+void spSkeletonClipping_dispose(spSkeletonClipping *self) {
 	spTriangulator_dispose(self->triangulator);
 	spFloatArray_dispose(self->clippingPolygon);
 	spFloatArray_dispose(self->clipOutput);
@@ -55,12 +55,13 @@ void spSkeletonClipping_dispose(spSkeletonClipping* self) {
 	FREE(self);
 }
 
-static void _makeClockwise (spFloatArray* polygon) {
+static void _makeClockwise(spFloatArray *polygon) {
 	int i, n, lastX;
-	float* vertices = polygon->items;
+	float *vertices = polygon->items;
 	int verticeslength = polygon->size;
 
-	float area = vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1], p1x, p1y, p2x, p2y;
+	float area =
+			vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1], p1x, p1y, p2x, p2y;
 	for (i = 0, n = verticeslength - 3; i < n; i += 2) {
 		p1x = vertices[i];
 		p1y = vertices[i + 1];
@@ -80,9 +81,9 @@ static void _makeClockwise (spFloatArray* polygon) {
 	}
 }
 
-int spSkeletonClipping_clipStart(spSkeletonClipping* self, spSlot* slot, spClippingAttachment* clip) {
+int spSkeletonClipping_clipStart(spSkeletonClipping *self, spSlot *slot, spClippingAttachment *clip) {
 	int i, n;
-	float* vertices;
+	float *vertices;
 	if (self->clipAttachment) return 0;
 	self->clipAttachment = clip;
 
@@ -90,9 +91,11 @@ int spSkeletonClipping_clipStart(spSkeletonClipping* self, spSlot* slot, spClipp
 	vertices = spFloatArray_setSize(self->clippingPolygon, n)->items;
 	spVertexAttachment_computeWorldVertices(SUPER(clip), slot, 0, n, vertices, 0, 2);
 	_makeClockwise(self->clippingPolygon);
-	self->clippingPolygons = spTriangulator_decompose(self->triangulator, self->clippingPolygon, spTriangulator_triangulate(self->triangulator, self->clippingPolygon));
+	self->clippingPolygons = spTriangulator_decompose(self->triangulator, self->clippingPolygon,
+													  spTriangulator_triangulate(self->triangulator,
+																				 self->clippingPolygon));
 	for (i = 0, n = self->clippingPolygons->size; i < n; i++) {
-		spFloatArray* polygon = self->clippingPolygons->items[i];
+		spFloatArray *polygon = self->clippingPolygons->items[i];
 		_makeClockwise(polygon);
 		spFloatArray_add(polygon, polygon->items[0]);
 		spFloatArray_add(polygon, polygon->items[1]);
@@ -100,11 +103,11 @@ int spSkeletonClipping_clipStart(spSkeletonClipping* self, spSlot* slot, spClipp
 	return self->clippingPolygons->size;
 }
 
-void spSkeletonClipping_clipEnd(spSkeletonClipping* self, spSlot* slot) {
+void spSkeletonClipping_clipEnd(spSkeletonClipping *self, spSlot *slot) {
 	if (self->clipAttachment != 0 && self->clipAttachment->endSlot == slot->data) spSkeletonClipping_clipEnd2(self);
 }
 
-void spSkeletonClipping_clipEnd2(spSkeletonClipping* self) {
+void spSkeletonClipping_clipEnd2(spSkeletonClipping *self) {
 	if (!self->clipAttachment) return;
 	self->clipAttachment = 0;
 	self->clippingPolygons = 0;
@@ -114,18 +117,20 @@ void spSkeletonClipping_clipEnd2(spSkeletonClipping* self) {
 	spFloatArray_clear(self->clippingPolygon);
 }
 
-int /*boolean*/ spSkeletonClipping_isClipping(spSkeletonClipping* self) {
+int /*boolean*/ spSkeletonClipping_isClipping(spSkeletonClipping *self) {
 	return self->clipAttachment != 0;
 }
 
-int /*boolean*/ _clip(spSkeletonClipping* self, float x1, float y1, float x2, float y2, float x3, float y3, spFloatArray* clippingArea, spFloatArray* output) {
+int /*boolean*/
+_clip(spSkeletonClipping *self, float x1, float y1, float x2, float y2, float x3, float y3, spFloatArray *clippingArea,
+	  spFloatArray *output) {
 	int i;
-	spFloatArray* originalOutput = output;
+	spFloatArray *originalOutput = output;
 	int clipped = 0;
-	float* clippingVertices;
+	float *clippingVertices;
 	int clippingVerticesLast;
 
-	spFloatArray* input = 0;
+	spFloatArray *input = 0;
 	if (clippingArea->size % 4 >= 2) {
 		input = output;
 		output = self->scratch;
@@ -147,12 +152,12 @@ int /*boolean*/ _clip(spSkeletonClipping* self, float x1, float y1, float x2, fl
 	clippingVerticesLast = clippingArea->size - 4;
 	for (i = 0;; i += 2) {
 		int ii;
-		spFloatArray* temp;
+		spFloatArray *temp;
 		float edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
 		float edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
 		float deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;
 
-		float* inputVertices = input->items;
+		float *inputVertices = input->items;
 		int inputVerticesLength = input->size - 2, outputStart = output->size;
 		for (ii = 0; ii < inputVerticesLength; ii += 2) {
 			float inputX = inputVertices[ii], inputY = inputVertices[ii + 1];
@@ -217,13 +222,14 @@ int /*boolean*/ _clip(spSkeletonClipping* self, float x1, float y1, float x2, fl
 	return clipped;
 }
 
-void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices, int verticesLength, unsigned short* triangles, int trianglesLength, float* uvs, int stride) {
+void spSkeletonClipping_clipTriangles(spSkeletonClipping *self, float *vertices, int verticesLength,
+									  unsigned short *triangles, int trianglesLength, float *uvs, int stride) {
 	int i;
-	spFloatArray* clipOutput = self->clipOutput;
-	spFloatArray* clippedVertices = self->clippedVertices;
-	spFloatArray* clippedUVs = self->clippedUVs;
-	spUnsignedShortArray* clippedTriangles = self->clippedTriangles;
-	spFloatArray** polygons = self->clippingPolygons->items;
+	spFloatArray *clipOutput = self->clipOutput;
+	spFloatArray *clippedVertices = self->clippedVertices;
+	spFloatArray *clippedUVs = self->clippedUVs;
+	spUnsignedShortArray *clippedTriangles = self->clippedTriangles;
+	spFloatArray **polygons = self->clippingPolygons->items;
 	int polygonsCount = self->clippingPolygons->size;
 
 	short index = 0;
@@ -240,27 +246,34 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 		float u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
 
 		vertexOffset = triangles[i + 1] * stride;
-		x2 = vertices[vertexOffset]; y2 = vertices[vertexOffset + 1];
-		u2 = uvs[vertexOffset]; v2 = uvs[vertexOffset + 1];
+		x2 = vertices[vertexOffset];
+		y2 = vertices[vertexOffset + 1];
+		u2 = uvs[vertexOffset];
+		v2 = uvs[vertexOffset + 1];
 
 		vertexOffset = triangles[i + 2] * stride;
-		x3 = vertices[vertexOffset]; y3 = vertices[vertexOffset + 1];
-		u3 = uvs[vertexOffset]; v3 = uvs[vertexOffset + 1];
+		x3 = vertices[vertexOffset];
+		y3 = vertices[vertexOffset + 1];
+		u3 = uvs[vertexOffset];
+		v3 = uvs[vertexOffset + 1];
 
 		for (p = 0; p < polygonsCount; p++) {
 			int s = clippedVertices->size;
 			if (_clip(self, x1, y1, x2, y2, x3, y3, polygons[p], clipOutput)) {
 				int ii;
 				float d0, d1, d2, d4, d;
-				unsigned short* clippedTrianglesItems;
+				unsigned short *clippedTrianglesItems;
 				int clipOutputCount;
-				float* clipOutputItems;
-				float* clippedVerticesItems;
-				float* clippedUVsItems;
+				float *clipOutputItems;
+				float *clippedVerticesItems;
+				float *clippedUVsItems;
 
 				int clipOutputLength = clipOutput->size;
 				if (clipOutputLength == 0) continue;
-				d0 = y2 - y3; d1 = x3 - x2; d2 = x1 - x3; d4 = y3 - y1;
+				d0 = y2 - y3;
+				d1 = x3 - x2;
+				d2 = x1 - x3;
+				d4 = y3 - y1;
 				d = 1 / (d0 * d2 + d1 * (y1 - y3));
 
 				clipOutputCount = clipOutputLength >> 1;
@@ -272,7 +285,8 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 					float x = clipOutputItems[ii], y = clipOutputItems[ii + 1];
 					clippedVerticesItems[s] = x;
 					clippedVerticesItems[s + 1] = y;
-					c0 = x - x3; c1 = y - y3;
+					c0 = x - x3;
+					c1 = y - y3;
 					a = (d0 * c0 + d1 * c1) * d;
 					b = (d4 * c0 + d2 * c1) * d;
 					c = 1 - a - b;
@@ -282,20 +296,21 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 				}
 
 				s = clippedTriangles->size;
-				clippedTrianglesItems = spUnsignedShortArray_setSize(clippedTriangles, s + 3 * (clipOutputCount - 2))->items;
+				clippedTrianglesItems = spUnsignedShortArray_setSize(clippedTriangles,
+																	 s + 3 * (clipOutputCount - 2))->items;
 				clipOutputCount--;
 				for (ii = 1; ii < clipOutputCount; ii++) {
 					clippedTrianglesItems[s] = index;
-					clippedTrianglesItems[s + 1] = (unsigned short)(index + ii);
-					clippedTrianglesItems[s + 2] = (unsigned short)(index + ii + 1);
+					clippedTrianglesItems[s + 1] = (unsigned short) (index + ii);
+					clippedTrianglesItems[s + 2] = (unsigned short) (index + ii + 1);
 					s += 3;
 				}
 				index += clipOutputCount + 1;
 
 			} else {
-				unsigned short* clippedTrianglesItems;
-				float* clippedVerticesItems = spFloatArray_setSize(clippedVertices, s + (3 << 1))->items;
-				float* clippedUVsItems = spFloatArray_setSize(clippedUVs, s + (3 << 1))->items;
+				unsigned short *clippedTrianglesItems;
+				float *clippedVerticesItems = spFloatArray_setSize(clippedVertices, s + (3 << 1))->items;
+				float *clippedUVsItems = spFloatArray_setSize(clippedUVs, s + (3 << 1))->items;
 				clippedVerticesItems[s] = x1;
 				clippedVerticesItems[s + 1] = y1;
 				clippedVerticesItems[s + 2] = x2;
@@ -313,8 +328,8 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping* self, float* vertices,
 				s = clippedTriangles->size;
 				clippedTrianglesItems = spUnsignedShortArray_setSize(clippedTriangles, s + 3)->items;
 				clippedTrianglesItems[s] = index;
-				clippedTrianglesItems[s + 1] = (unsigned short)(index + 1);
-				clippedTrianglesItems[s + 2] = (unsigned short)(index + 2);
+				clippedTrianglesItems[s + 1] = (unsigned short) (index + 1);
+				clippedTrianglesItems[s + 2] = (unsigned short) (index + 2);
 				index += 3;
 				i += 3;
 				goto continue_outer;

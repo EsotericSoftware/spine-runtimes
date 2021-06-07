@@ -41,22 +41,28 @@ extern "C" {
 #endif
 
 typedef enum {
-	SP_ANIMATION_START, SP_ANIMATION_INTERRUPT, SP_ANIMATION_END, SP_ANIMATION_COMPLETE, SP_ANIMATION_DISPOSE, SP_ANIMATION_EVENT
+	SP_ANIMATION_START,
+	SP_ANIMATION_INTERRUPT,
+	SP_ANIMATION_END,
+	SP_ANIMATION_COMPLETE,
+	SP_ANIMATION_DISPOSE,
+	SP_ANIMATION_EVENT
 } spEventType;
 
 typedef struct spAnimationState spAnimationState;
 typedef struct spTrackEntry spTrackEntry;
 
-typedef void (*spAnimationStateListener) (spAnimationState* state, spEventType type, spTrackEntry* entry, spEvent* event);
+typedef void (*spAnimationStateListener)(spAnimationState *state, spEventType type, spTrackEntry *entry,
+										 spEvent *event);
 
 _SP_ARRAY_DECLARE_TYPE(spTrackEntryArray, spTrackEntry*)
 
 struct spTrackEntry {
-	spAnimation* animation;
-	spTrackEntry* previous;
-	spTrackEntry* next;
-	spTrackEntry* mixingFrom;
-	spTrackEntry* mixingTo;
+	spAnimation *animation;
+	spTrackEntry *previous;
+	spTrackEntry *next;
+	spTrackEntry *mixingFrom;
+	spTrackEntry *mixingTo;
 	spAnimationStateListener listener;
 	int trackIndex;
 	int /*boolean*/ loop;
@@ -67,65 +73,78 @@ struct spTrackEntry {
 	float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
 	float alpha, mixTime, mixDuration, interruptAlpha, totalAlpha;
 	spMixBlend mixBlend;
-	spIntArray* timelineMode;
-	spTrackEntryArray* timelineHoldMix;
-	float* timelinesRotation;
+	spIntArray *timelineMode;
+	spTrackEntryArray *timelineHoldMix;
+	float *timelinesRotation;
 	int timelinesRotationCount;
-	void* rendererObject;
-	void* userData;
+	void *rendererObject;
+	void *userData;
 };
 
 struct spAnimationState {
-	spAnimationStateData* const data;
+	spAnimationStateData *const data;
 
 	int tracksCount;
-	spTrackEntry** tracks;
+	spTrackEntry **tracks;
 
 	spAnimationStateListener listener;
 
 	float timeScale;
 
-	void* rendererObject;
-	void* userData;
+	void *rendererObject;
+	void *userData;
 
-    int unkeyedState;
+	int unkeyedState;
 };
 
 /* @param data May be 0 for no mixing. */
-SP_API spAnimationState* spAnimationState_create (spAnimationStateData* data);
-SP_API void spAnimationState_dispose (spAnimationState* self);
+SP_API spAnimationState *spAnimationState_create(spAnimationStateData *data);
 
-SP_API void spAnimationState_update (spAnimationState* self, float delta);
-SP_API int /**bool**/ spAnimationState_apply (spAnimationState* self, struct spSkeleton* skeleton);
+SP_API void spAnimationState_dispose(spAnimationState *self);
 
-SP_API void spAnimationState_clearTracks (spAnimationState* self);
-SP_API void spAnimationState_clearTrack (spAnimationState* self, int trackIndex);
+SP_API void spAnimationState_update(spAnimationState *self, float delta);
+
+SP_API int /**bool**/ spAnimationState_apply(spAnimationState *self, struct spSkeleton *skeleton);
+
+SP_API void spAnimationState_clearTracks(spAnimationState *self);
+
+SP_API void spAnimationState_clearTrack(spAnimationState *self, int trackIndex);
 
 /** Set the current animation. Any queued animations are cleared. */
-SP_API spTrackEntry* spAnimationState_setAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
-		int/*bool*/loop);
-SP_API spTrackEntry* spAnimationState_setAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop);
+SP_API spTrackEntry *
+spAnimationState_setAnimationByName(spAnimationState *self, int trackIndex, const char *animationName,
+									int/*bool*/loop);
+
+SP_API spTrackEntry *
+spAnimationState_setAnimation(spAnimationState *self, int trackIndex, spAnimation *animation, int/*bool*/loop);
 
 /** Adds an animation to be played delay seconds after the current or last queued animation, taking into account any mix
  * duration. */
-SP_API spTrackEntry* spAnimationState_addAnimationByName (spAnimationState* self, int trackIndex, const char* animationName,
-		int/*bool*/loop, float delay);
-SP_API spTrackEntry* spAnimationState_addAnimation (spAnimationState* self, int trackIndex, spAnimation* animation, int/*bool*/loop,
-		float delay);
-SP_API spTrackEntry* spAnimationState_setEmptyAnimation(spAnimationState* self, int trackIndex, float mixDuration);
-SP_API spTrackEntry* spAnimationState_addEmptyAnimation(spAnimationState* self, int trackIndex, float mixDuration, float delay);
-SP_API void spAnimationState_setEmptyAnimations(spAnimationState* self, float mixDuration);
+SP_API spTrackEntry *
+spAnimationState_addAnimationByName(spAnimationState *self, int trackIndex, const char *animationName,
+									int/*bool*/loop, float delay);
 
-SP_API spTrackEntry* spAnimationState_getCurrent (spAnimationState* self, int trackIndex);
+SP_API spTrackEntry *
+spAnimationState_addAnimation(spAnimationState *self, int trackIndex, spAnimation *animation, int/*bool*/loop,
+							  float delay);
 
-SP_API void spAnimationState_clearListenerNotifications(spAnimationState* self);
+SP_API spTrackEntry *spAnimationState_setEmptyAnimation(spAnimationState *self, int trackIndex, float mixDuration);
 
-SP_API float spTrackEntry_getAnimationTime (spTrackEntry* entry);
+SP_API spTrackEntry *
+spAnimationState_addEmptyAnimation(spAnimationState *self, int trackIndex, float mixDuration, float delay);
 
-SP_API float spTrackEntry_getTrackComplete(spTrackEntry* entry);
+SP_API void spAnimationState_setEmptyAnimations(spAnimationState *self, float mixDuration);
+
+SP_API spTrackEntry *spAnimationState_getCurrent(spAnimationState *self, int trackIndex);
+
+SP_API void spAnimationState_clearListenerNotifications(spAnimationState *self);
+
+SP_API float spTrackEntry_getAnimationTime(spTrackEntry *entry);
+
+SP_API float spTrackEntry_getTrackComplete(spTrackEntry *entry);
 
 /** Use this to dispose static memory before your app exits to appease your memory leak detector*/
-SP_API void spAnimationState_disposeStatics ();
+SP_API void spAnimationState_disposeStatics();
 
 #ifdef __cplusplus
 }

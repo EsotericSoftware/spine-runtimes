@@ -35,13 +35,13 @@
 
 using namespace spine;
 
-ConstraintData::ConstraintData(const String& name): _name(name), _order(0), _skinRequired(false) {
+ConstraintData::ConstraintData(const String &name) : _name(name), _order(0), _skinRequired(false) {
 }
 
 ConstraintData::~ConstraintData() {
 }
 
-const String& ConstraintData::getName() {
+const String &ConstraintData::getName() {
 	return _name;
 }
 

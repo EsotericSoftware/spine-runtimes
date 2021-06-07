@@ -35,63 +35,75 @@
 namespace spine {
 	class SP_API ShearTimeline : public CurveTimeline2 {
 		friend class SkeletonBinary;
+
 		friend class SkeletonJson;
 
-		RTTI_DECL
+	RTTI_DECL
 
 	public:
 		explicit ShearTimeline(size_t frameCount, size_t bezierCount, int boneIndex);
 
 		virtual ~ShearTimeline();
 
-		virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
+		virtual void
+		apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixBlend blend,
+			  MixDirection direction);
 
-        int getBoneIndex() { return _boneIndex; }
+		int getBoneIndex() { return _boneIndex; }
 
-        void setBoneIndex(int inValue) { _boneIndex = inValue; }
-    private:
-        int _boneIndex;
+		void setBoneIndex(int inValue) { _boneIndex = inValue; }
+
+	private:
+		int _boneIndex;
 	};
 
-    class SP_API ShearXTimeline : public CurveTimeline1 {
-        friend class SkeletonBinary;
-        friend class SkeletonJson;
+	class SP_API ShearXTimeline : public CurveTimeline1 {
+		friend class SkeletonBinary;
 
-    RTTI_DECL
+		friend class SkeletonJson;
 
-    public:
-        explicit ShearXTimeline(size_t frameCount, size_t bezierCount, int boneIndex);
+	RTTI_DECL
 
-        virtual ~ShearXTimeline();
+	public:
+		explicit ShearXTimeline(size_t frameCount, size_t bezierCount, int boneIndex);
 
-        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
+		virtual ~ShearXTimeline();
 
-        int getBoneIndex() { return _boneIndex; }
+		virtual void
+		apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixBlend blend,
+			  MixDirection direction);
 
-        void setBoneIndex(int inValue) { _boneIndex = inValue; }
-    private:
-        int _boneIndex;
-    };
+		int getBoneIndex() { return _boneIndex; }
 
-    class SP_API ShearYTimeline : public CurveTimeline1 {
-        friend class SkeletonBinary;
-        friend class SkeletonJson;
+		void setBoneIndex(int inValue) { _boneIndex = inValue; }
 
-    RTTI_DECL
+	private:
+		int _boneIndex;
+	};
 
-    public:
-        explicit ShearYTimeline(size_t frameCount, size_t bezierCount, int boneIndex);
+	class SP_API ShearYTimeline : public CurveTimeline1 {
+		friend class SkeletonBinary;
 
-        virtual ~ShearYTimeline();
+		friend class SkeletonJson;
 
-        virtual void apply(Skeleton& skeleton, float lastTime, float time, Vector<Event*>* pEvents, float alpha, MixBlend blend, MixDirection direction);
+	RTTI_DECL
 
-        int getBoneIndex() { return _boneIndex; }
+	public:
+		explicit ShearYTimeline(size_t frameCount, size_t bezierCount, int boneIndex);
 
-        void setBoneIndex(int inValue) { _boneIndex = inValue; }
-    private:
-        int _boneIndex;
-    };
+		virtual ~ShearYTimeline();
+
+		virtual void
+		apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha, MixBlend blend,
+			  MixDirection direction);
+
+		int getBoneIndex() { return _boneIndex; }
+
+		void setBoneIndex(int inValue) { _boneIndex = inValue; }
+
+	private:
+		int _boneIndex;
+	};
 }
 
 #endif /* Spine_ShearTimeline_h */

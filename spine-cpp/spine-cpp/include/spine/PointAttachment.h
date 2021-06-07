@@ -43,27 +43,31 @@ namespace spine {
 	///
 	class SP_API PointAttachment : public Attachment {
 		friend class SkeletonBinary;
+
 		friend class SkeletonJson;
 
-		RTTI_DECL
+	RTTI_DECL
 
 	public:
-		explicit PointAttachment(const String& name);
+		explicit PointAttachment(const String &name);
 
-		void computeWorldPosition(Bone& bone, float& ox, float& oy);
+		void computeWorldPosition(Bone &bone, float &ox, float &oy);
 
-		float computeWorldRotation(Bone& bone);
+		float computeWorldRotation(Bone &bone);
 
 		float getX();
+
 		void setX(float inValue);
 
 		float getY();
+
 		void setY(float inValue);
 
 		float getRotation();
+
 		void setRotation(float inValue);
 
-		virtual Attachment* copy();
+		virtual Attachment *copy();
 
 	private:
 		float _x, _y, _rotation;

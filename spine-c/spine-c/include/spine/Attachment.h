@@ -49,16 +49,16 @@ typedef enum {
 } spAttachmentType;
 
 typedef struct spAttachment {
-	const char* const name;
+	const char *const name;
 	const spAttachmentType type;
-	const void* const vtable;
+	const void *const vtable;
 	int refCount;
-	struct spAttachmentLoader* attachmentLoader;
+	struct spAttachmentLoader *attachmentLoader;
 } spAttachment;
 
-void spAttachment_dispose (spAttachment* self);
+void spAttachment_dispose(spAttachment *self);
 
-spAttachment* spAttachment_copy (spAttachment* self);
+spAttachment *spAttachment_copy(spAttachment *self);
 
 #ifdef __cplusplus
 }

@@ -42,11 +42,12 @@ extern "C" {
 
 typedef struct spClippingAttachment {
 	spVertexAttachment super;
-	spSlotData* endSlot;
+	spSlotData *endSlot;
 } spClippingAttachment;
 
-SP_API void _spClippingAttachment_dispose(spAttachment* self);
-SP_API spClippingAttachment* spClippingAttachment_create (const char* name);
+SP_API void _spClippingAttachment_dispose(spAttachment *self);
+
+SP_API spClippingAttachment *spClippingAttachment_create(const char *name);
 
 #ifdef __cplusplus
 }

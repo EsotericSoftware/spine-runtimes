@@ -51,33 +51,32 @@ bool Bone::isYDown() {
 }
 
 Bone::Bone(BoneData &data, Skeleton &skeleton, Bone *parent) : Updatable(),
-	_data(data),
-	_skeleton(skeleton),
-	_parent(parent),
-	_x(0),
-	_y(0),
-	_rotation(0),
-	_scaleX(0),
-	_scaleY(0),
-	_shearX(0),
-	_shearY(0),
-	_ax(0),
-	_ay(0),
-	_arotation(0),
-	_ascaleX(0),
-	_ascaleY(0),
-	_ashearX(0),
-	_ashearY(0),
-	_appliedValid(false),
-	_a(1),
-	_b(0),
-	_worldX(0),
-	_c(0),
-	_d(1),
-	_worldY(0),
-	_sorted(false),
-	_active(false)
-{
+															   _data(data),
+															   _skeleton(skeleton),
+															   _parent(parent),
+															   _x(0),
+															   _y(0),
+															   _rotation(0),
+															   _scaleX(0),
+															   _scaleY(0),
+															   _shearX(0),
+															   _shearY(0),
+															   _ax(0),
+															   _ay(0),
+															   _arotation(0),
+															   _ascaleX(0),
+															   _ascaleY(0),
+															   _ashearX(0),
+															   _ashearY(0),
+															   _appliedValid(false),
+															   _a(1),
+															   _b(0),
+															   _worldX(0),
+															   _c(0),
+															   _d(1),
+															   _worldY(0),
+															   _sorted(false),
+															   _active(false) {
 	setToSetupPose();
 }
 
@@ -89,7 +88,8 @@ void Bone::updateWorldTransform() {
 	updateWorldTransform(_x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY);
 }
 
-void Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
+void
+Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
 	float cosine, sine;
 	float pa, pb, pc, pd;
 	Bone *parent = _parent;
@@ -125,82 +125,82 @@ void Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, 
 	_worldY = pc * x + pd * y + parent->_worldY;
 
 	switch (_data.getTransformMode()) {
-	case TransformMode_Normal: {
-		float rotationY = rotation + 90 + shearY;
-		float la = MathUtil::cosDeg(rotation + shearX) * scaleX;
-		float lb = MathUtil::cosDeg(rotationY) * scaleY;
-		float lc = MathUtil::sinDeg(rotation + shearX) * scaleX;
-		float ld = MathUtil::sinDeg(rotationY) * scaleY;
-		_a = pa * la + pb * lc;
-		_b = pa * lb + pb * ld;
-		_c = pc * la + pd * lc;
-		_d = pc * lb + pd * ld;
-		return;
-	}
-	case TransformMode_OnlyTranslation: {
-		float rotationY = rotation + 90 + shearY;
-		_a = MathUtil::cosDeg(rotation + shearX) * scaleX;
-		_b = MathUtil::cosDeg(rotationY) * scaleY;
-		_c = MathUtil::sinDeg(rotation + shearX) * scaleX;
-		_d = MathUtil::sinDeg(rotationY) * scaleY;
-		break;
-	}
-	case TransformMode_NoRotationOrReflection: {
-		float s = pa * pa + pc * pc;
-		float prx, rx, ry, la, lb, lc, ld;
-		if (s > 0.0001f) {
-			s = MathUtil::abs(pa * pd - pb * pc) / s;
-            pa /= _skeleton.getScaleX();
-            pc /= _skeleton.getScaleY();
-			pb = pc * s;
-			pd = pa * s;
-			prx = MathUtil::atan2(pc, pa) * MathUtil::Rad_Deg;
-		} else {
-			pa = 0;
-			pc = 0;
-			prx = 90 - MathUtil::atan2(pd, pb) * MathUtil::Rad_Deg;
+		case TransformMode_Normal: {
+			float rotationY = rotation + 90 + shearY;
+			float la = MathUtil::cosDeg(rotation + shearX) * scaleX;
+			float lb = MathUtil::cosDeg(rotationY) * scaleY;
+			float lc = MathUtil::sinDeg(rotation + shearX) * scaleX;
+			float ld = MathUtil::sinDeg(rotationY) * scaleY;
+			_a = pa * la + pb * lc;
+			_b = pa * lb + pb * ld;
+			_c = pc * la + pd * lc;
+			_d = pc * lb + pd * ld;
+			return;
 		}
-		rx = rotation + shearX - prx;
-		ry = rotation + shearY - prx + 90;
-		la = MathUtil::cosDeg(rx) * scaleX;
-		lb = MathUtil::cosDeg(ry) * scaleY;
-		lc = MathUtil::sinDeg(rx) * scaleX;
-		ld = MathUtil::sinDeg(ry) * scaleY;
-		_a = pa * la - pb * lc;
-		_b = pa * lb - pb * ld;
-		_c = pc * la + pd * lc;
-		_d = pc * lb + pd * ld;
-		break;
-	}
-	case TransformMode_NoScale:
-	case TransformMode_NoScaleOrReflection: {
-		float za, zc, s;
-		float r, zb, zd, la, lb, lc, ld;
-		cosine = MathUtil::cosDeg(rotation);
-		sine = MathUtil::sinDeg(rotation);
-		za = (pa * cosine + pb * sine) / _skeleton.getScaleX();
-		zc = (pc * cosine + pd * sine) / _skeleton.getScaleY();
-		s = MathUtil::sqrt(za * za + zc * zc);
-		if (s > 0.00001f) s = 1 / s;
-		za *= s;
-		zc *= s;
-		s = MathUtil::sqrt(za * za + zc * zc);
-		if (_data.getTransformMode() == TransformMode_NoScale
-			&& (pa * pd - pb * pc < 0) != (_skeleton.getScaleX() < 0 != _skeleton.getScaleY() < 0))
-			s = -s;
-		r = MathUtil::Pi / 2 + MathUtil::atan2(zc, za);
-		zb = MathUtil::cos(r) * s;
-		zd = MathUtil::sin(r) * s;
-		la = MathUtil::cosDeg(shearX) * scaleX;
-		lb = MathUtil::cosDeg(90 + shearY) * scaleY;
-		lc = MathUtil::sinDeg(shearX) * scaleX;
-		ld = MathUtil::sinDeg(90 + shearY) * scaleY;
-		_a = za * la + zb * lc;
-		_b = za * lb + zb * ld;
-		_c = zc * la + zd * lc;
-		_d = zc * lb + zd * ld;
-		break;
-	}
+		case TransformMode_OnlyTranslation: {
+			float rotationY = rotation + 90 + shearY;
+			_a = MathUtil::cosDeg(rotation + shearX) * scaleX;
+			_b = MathUtil::cosDeg(rotationY) * scaleY;
+			_c = MathUtil::sinDeg(rotation + shearX) * scaleX;
+			_d = MathUtil::sinDeg(rotationY) * scaleY;
+			break;
+		}
+		case TransformMode_NoRotationOrReflection: {
+			float s = pa * pa + pc * pc;
+			float prx, rx, ry, la, lb, lc, ld;
+			if (s > 0.0001f) {
+				s = MathUtil::abs(pa * pd - pb * pc) / s;
+				pa /= _skeleton.getScaleX();
+				pc /= _skeleton.getScaleY();
+				pb = pc * s;
+				pd = pa * s;
+				prx = MathUtil::atan2(pc, pa) * MathUtil::Rad_Deg;
+			} else {
+				pa = 0;
+				pc = 0;
+				prx = 90 - MathUtil::atan2(pd, pb) * MathUtil::Rad_Deg;
+			}
+			rx = rotation + shearX - prx;
+			ry = rotation + shearY - prx + 90;
+			la = MathUtil::cosDeg(rx) * scaleX;
+			lb = MathUtil::cosDeg(ry) * scaleY;
+			lc = MathUtil::sinDeg(rx) * scaleX;
+			ld = MathUtil::sinDeg(ry) * scaleY;
+			_a = pa * la - pb * lc;
+			_b = pa * lb - pb * ld;
+			_c = pc * la + pd * lc;
+			_d = pc * lb + pd * ld;
+			break;
+		}
+		case TransformMode_NoScale:
+		case TransformMode_NoScaleOrReflection: {
+			float za, zc, s;
+			float r, zb, zd, la, lb, lc, ld;
+			cosine = MathUtil::cosDeg(rotation);
+			sine = MathUtil::sinDeg(rotation);
+			za = (pa * cosine + pb * sine) / _skeleton.getScaleX();
+			zc = (pc * cosine + pd * sine) / _skeleton.getScaleY();
+			s = MathUtil::sqrt(za * za + zc * zc);
+			if (s > 0.00001f) s = 1 / s;
+			za *= s;
+			zc *= s;
+			s = MathUtil::sqrt(za * za + zc * zc);
+			if (_data.getTransformMode() == TransformMode_NoScale
+				&& (pa * pd - pb * pc < 0) != (_skeleton.getScaleX() < 0 != _skeleton.getScaleY() < 0))
+				s = -s;
+			r = MathUtil::Pi / 2 + MathUtil::atan2(zc, za);
+			zb = MathUtil::cos(r) * s;
+			zd = MathUtil::sin(r) * s;
+			la = MathUtil::cosDeg(shearX) * scaleX;
+			lb = MathUtil::cosDeg(90 + shearY) * scaleY;
+			lc = MathUtil::sinDeg(shearX) * scaleX;
+			ld = MathUtil::sinDeg(90 + shearY) * scaleY;
+			_a = za * la + zb * lc;
+			_b = za * lb + zb * ld;
+			_c = zc * la + zd * lc;
+			_d = zc * lb + zd * ld;
+			break;
+		}
 	}
 	_a *= _skeleton.getScaleX();
 	_b *= _skeleton.getScaleX();
@@ -242,7 +242,8 @@ float Bone::worldToLocalRotation(float worldRotation) {
 	float sin = MathUtil::sinDeg(worldRotation);
 	float cos = MathUtil::cosDeg(worldRotation);
 
-	return MathUtil::atan2(_a * sin - _c * cos, _d * cos - _b * sin) * MathUtil::Rad_Deg + this->_rotation - this->_shearX;
+	return MathUtil::atan2(_a * sin - _c * cos, _d * cos - _b * sin) * MathUtil::Rad_Deg + this->_rotation -
+		   this->_shearX;
 }
 
 float Bone::localToWorldRotation(float localRotation) {
@@ -497,6 +498,7 @@ float Bone::getWorldScaleY() {
 bool Bone::isAppliedValid() {
 	return _appliedValid;
 }
+
 void Bone::setAppliedValid(bool valid) {
 	_appliedValid = valid;
 }

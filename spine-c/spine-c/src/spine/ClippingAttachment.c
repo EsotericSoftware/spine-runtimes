@@ -30,26 +30,27 @@
 #include <spine/ClippingAttachment.h>
 #include <spine/extension.h>
 
-void _spClippingAttachment_dispose (spAttachment* attachment) {
-	spClippingAttachment* self = SUB_CAST(spClippingAttachment, attachment);
+void _spClippingAttachment_dispose(spAttachment *attachment) {
+	spClippingAttachment *self = SUB_CAST(spClippingAttachment, attachment);
 
 	_spVertexAttachment_deinit(SUPER(self));
 
 	FREE(self);
 }
 
-spAttachment* _spClippingAttachment_copy (spAttachment* attachment) {
-	spClippingAttachment* copy = spClippingAttachment_create(attachment->name);
-	spClippingAttachment* self = SUB_CAST(spClippingAttachment, attachment);
+spAttachment *_spClippingAttachment_copy(spAttachment *attachment) {
+	spClippingAttachment *copy = spClippingAttachment_create(attachment->name);
+	spClippingAttachment *self = SUB_CAST(spClippingAttachment, attachment);
 	spVertexAttachment_copyTo(SUPER(self), SUPER(copy));
 	copy->endSlot = self->endSlot;
 	return SUPER(SUPER(copy));
 }
 
-spClippingAttachment* spClippingAttachment_create (const char* name) {
-	spClippingAttachment* self = NEW(spClippingAttachment);
+spClippingAttachment *spClippingAttachment_create(const char *name) {
+	spClippingAttachment *self = NEW(spClippingAttachment);
 	_spVertexAttachment_init(SUPER(self));
-	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_CLIPPING, _spClippingAttachment_dispose, _spClippingAttachment_copy);
+	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_CLIPPING, _spClippingAttachment_dispose,
+					   _spClippingAttachment_copy);
 	self->endSlot = 0;
 	return self;
 }

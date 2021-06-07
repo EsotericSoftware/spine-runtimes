@@ -43,7 +43,7 @@ struct spVertexEffect;
 typedef void (*spVertexEffectBegin)(struct spVertexEffect *self, spSkeleton *skeleton);
 
 typedef void (*spVertexEffectTransform)(struct spVertexEffect *self, float *x, float *y, float *u, float *v,
-	spColor *light, spColor *dark);
+										spColor *light, spColor *dark);
 
 typedef void (*spVertexEffectEnd)(struct spVertexEffect *self);
 

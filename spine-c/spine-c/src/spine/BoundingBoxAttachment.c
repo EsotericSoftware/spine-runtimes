@@ -30,24 +30,25 @@
 #include <spine/BoundingBoxAttachment.h>
 #include <spine/extension.h>
 
-void _spBoundingBoxAttachment_dispose (spAttachment* attachment) {
-	spBoundingBoxAttachment* self = SUB_CAST(spBoundingBoxAttachment, attachment);
+void _spBoundingBoxAttachment_dispose(spAttachment *attachment) {
+	spBoundingBoxAttachment *self = SUB_CAST(spBoundingBoxAttachment, attachment);
 
 	_spVertexAttachment_deinit(SUPER(self));
 
 	FREE(self);
 }
 
-spAttachment* _spBoundingBoxAttachment_copy (spAttachment* attachment) {
-	spBoundingBoxAttachment* copy = spBoundingBoxAttachment_create(attachment->name);
-	spBoundingBoxAttachment* self = SUB_CAST(spBoundingBoxAttachment, attachment);
+spAttachment *_spBoundingBoxAttachment_copy(spAttachment *attachment) {
+	spBoundingBoxAttachment *copy = spBoundingBoxAttachment_create(attachment->name);
+	spBoundingBoxAttachment *self = SUB_CAST(spBoundingBoxAttachment, attachment);
 	spVertexAttachment_copyTo(SUPER(self), SUPER(copy));
 	return SUPER(SUPER(copy));
 }
 
-spBoundingBoxAttachment* spBoundingBoxAttachment_create (const char* name) {
-	spBoundingBoxAttachment* self = NEW(spBoundingBoxAttachment);
+spBoundingBoxAttachment *spBoundingBoxAttachment_create(const char *name) {
+	spBoundingBoxAttachment *self = NEW(spBoundingBoxAttachment);
 	_spVertexAttachment_init(SUPER(self));
-	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_BOUNDING_BOX, _spBoundingBoxAttachment_dispose, _spBoundingBoxAttachment_copy);
+	_spAttachment_init(SUPER(SUPER(self)), name, SP_ATTACHMENT_BOUNDING_BOX, _spBoundingBoxAttachment_dispose,
+					   _spBoundingBoxAttachment_copy);
 	return self;
 }

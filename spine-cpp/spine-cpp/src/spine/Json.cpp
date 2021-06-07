@@ -66,12 +66,12 @@ Json *Json::getItem(Json *object, const char *string) {
 }
 
 Json *Json::getItem(Json *object, int childIndex) {
-    Json *current = object->_child;
-    while (current != NULL && childIndex > 0) {
-        childIndex--;
-        current = current->_next;
-    }
-    return current;
+	Json *current = object->_child;
+	while (current != NULL && childIndex > 0) {
+		childIndex--;
+		current = current->_next;
+	}
+	return current;
 }
 
 const char *Json::getString(Json *object, const char *name, const char *defaultValue) {
@@ -131,23 +131,23 @@ Json::Json(const char *value) :
 }
 
 Json::~Json() {
-    spine::Json* curr = NULL;
-    spine::Json* next = _child;
-    do {
-        curr = next;
-        if (curr) {
-            next = curr->_next;
-        }
-        delete curr;
-    } while(next);
+	spine::Json *curr = NULL;
+	spine::Json *next = _child;
+	do {
+		curr = next;
+		if (curr) {
+			next = curr->_next;
+		}
+		delete curr;
+	} while (next);
 
-    if (_valueString) {
-        SpineExtension::free(_valueString, __FILE__, __LINE__);
-    }
+	if (_valueString) {
+		SpineExtension::free(_valueString, __FILE__, __LINE__);
+	}
 
-    if (_name) {
-        SpineExtension::free(_name, __FILE__, __LINE__);
-    }
+	if (_name) {
+		SpineExtension::free(_name, __FILE__, __LINE__);
+	}
 }
 
 const char *Json::skip(const char *inValue) {
@@ -174,49 +174,49 @@ const char *Json::parseValue(Json *item, const char *value) {
 #endif
 
 	switch (*value) {
-	case 'n': {
-		if (!strncmp(value + 1, "ull", 3)) {
-			item->_type = JSON_NULL;
-			return value + 4;
+		case 'n': {
+			if (!strncmp(value + 1, "ull", 3)) {
+				item->_type = JSON_NULL;
+				return value + 4;
+			}
+			break;
 		}
-		break;
-	}
-	case 'f': {
-		if (!strncmp(value + 1, "alse", 4)) {
-			item->_type = JSON_FALSE;
-			/* calloc prevents us needing item->_type = JSON_FALSE or valueInt = 0 here */
-			return value + 5;
+		case 'f': {
+			if (!strncmp(value + 1, "alse", 4)) {
+				item->_type = JSON_FALSE;
+				/* calloc prevents us needing item->_type = JSON_FALSE or valueInt = 0 here */
+				return value + 5;
+			}
+			break;
 		}
-		break;
-	}
-	case 't': {
-		if (!strncmp(value + 1, "rue", 3)) {
-			item->_type = JSON_TRUE;
-			item->_valueInt = 1;
-			return value + 4;
+		case 't': {
+			if (!strncmp(value + 1, "rue", 3)) {
+				item->_type = JSON_TRUE;
+				item->_valueInt = 1;
+				return value + 4;
+			}
+			break;
 		}
-		break;
-	}
-	case '\"':
-		return parseString(item, value);
-	case '[':
-		return parseArray(item, value);
-	case '{':
-		return parseObject(item, value);
-	case '-': /* fallthrough */
-	case '0': /* fallthrough */
-	case '1': /* fallthrough */
-	case '2': /* fallthrough */
-	case '3': /* fallthrough */
-	case '4': /* fallthrough */
-	case '5': /* fallthrough */
-	case '6': /* fallthrough */
-	case '7': /* fallthrough */
-	case '8': /* fallthrough */
-	case '9':
-		return parseNumber(item, value);
-	default:
-		break;
+		case '\"':
+			return parseString(item, value);
+		case '[':
+			return parseArray(item, value);
+		case '{':
+			return parseObject(item, value);
+		case '-': /* fallthrough */
+		case '0': /* fallthrough */
+		case '1': /* fallthrough */
+		case '2': /* fallthrough */
+		case '3': /* fallthrough */
+		case '4': /* fallthrough */
+		case '5': /* fallthrough */
+		case '6': /* fallthrough */
+		case '7': /* fallthrough */
+		case '8': /* fallthrough */
+		case '9':
+			return parseNumber(item, value);
+		default:
+			break;
 	}
 
 	_error = value;
@@ -402,8 +402,8 @@ const char *Json::parseNumber(Json *item, const char *num) {
 
 	if (ptr != num) {
 		/* Parse success, number found. */
-		item->_valueFloat = (float)result;
-		item->_valueInt = (int)result;
+		item->_valueFloat = (float) result;
+		item->_valueInt = (int) result;
 		item->_type = JSON_NUMBER;
 		return ptr;
 	} else {

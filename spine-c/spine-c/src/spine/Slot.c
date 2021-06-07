@@ -35,8 +35,8 @@ typedef struct {
 	float attachmentTime;
 } _spSlot;
 
-spSlot* spSlot_create (spSlotData* data, spBone* bone) {
-	spSlot* self = SUPER(NEW(_spSlot));
+spSlot *spSlot_create(spSlotData *data, spBone *bone) {
+	spSlot *self = SUPER(NEW(_spSlot));
 	CONST_CAST(spSlotData*, self->data) = data;
 	CONST_CAST(spBone*, self->bone) = bone;
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
@@ -45,36 +45,36 @@ spSlot* spSlot_create (spSlotData* data, spBone* bone) {
 	return self;
 }
 
-void spSlot_dispose (spSlot* self) {
+void spSlot_dispose(spSlot *self) {
 	FREE(self->deform);
 	FREE(self->darkColor);
 	FREE(self);
 }
 
-void spSlot_setAttachment (spSlot* self, spAttachment* attachment) {
+void spSlot_setAttachment(spSlot *self, spAttachment *attachment) {
 	if (attachment == self->attachment) return;
 	CONST_CAST(spAttachment*, self->attachment) = attachment;
 	SUB_CAST(_spSlot, self)->attachmentTime = self->bone->skeleton->time;
 	self->deformCount = 0;
 }
 
-void spSlot_setAttachmentTime (spSlot* self, float time) {
+void spSlot_setAttachmentTime(spSlot *self, float time) {
 	SUB_CAST(_spSlot, self)->attachmentTime = self->bone->skeleton->time - time;
 }
 
-float spSlot_getAttachmentTime (const spSlot* self) {
-	return self->bone->skeleton->time - SUB_CAST(_spSlot, self) ->attachmentTime;
+float spSlot_getAttachmentTime(const spSlot *self) {
+	return self->bone->skeleton->time - SUB_CAST(_spSlot, self)->attachmentTime;
 }
 
-void spSlot_setToSetupPose (spSlot* self) {
+void spSlot_setToSetupPose(spSlot *self) {
 	spColor_setFromColor(&self->color, &self->data->color);
 	if (self->darkColor) spColor_setFromColor(self->darkColor, self->data->darkColor);
 
 	if (!self->data->attachmentName)
 		spSlot_setAttachment(self, 0);
 	else {
-		spAttachment* attachment = spSkeleton_getAttachmentForSlotIndex(
-			self->bone->skeleton, self->data->index, self->data->attachmentName);
+		spAttachment *attachment = spSkeleton_getAttachmentForSlotIndex(
+				self->bone->skeleton, self->data->index, self->data->attachmentName);
 		CONST_CAST(spAttachment*, self->attachment) = 0;
 		spSlot_setAttachment(self, attachment);
 	}

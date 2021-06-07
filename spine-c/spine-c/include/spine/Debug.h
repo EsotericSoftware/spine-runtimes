@@ -36,15 +36,22 @@
 extern "C" {
 #endif
 
-void spDebug_printSkeletonData(spSkeletonData* skeletonData);
-void spDebug_printAnimation(spAnimation* animation);
-void spDebug_printTimeline(spTimeline* timeline);
-void spDebug_printBoneDatas(spBoneData** boneDatas, int numBoneDatas);
-void spDebug_printBoneData(spBoneData* boneData);
+void spDebug_printSkeletonData(spSkeletonData *skeletonData);
 
-void spDebug_printSkeleton(spSkeleton* skeleton);
-void spDebug_printBones(spBone** bones, int numBones);
-void spDebug_printBone(spBone* bone);
+void spDebug_printAnimation(spAnimation *animation);
+
+void spDebug_printTimeline(spTimeline *timeline);
+
+void spDebug_printBoneDatas(spBoneData **boneDatas, int numBoneDatas);
+
+void spDebug_printBoneData(spBoneData *boneData);
+
+void spDebug_printSkeleton(spSkeleton *skeleton);
+
+void spDebug_printBones(spBone **bones, int numBones);
+
+void spDebug_printBone(spBone *bone);
+
 void spDebug_printFloats(float *values, int numFloats);
 
 #ifdef __cplusplus

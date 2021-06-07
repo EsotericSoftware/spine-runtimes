@@ -44,7 +44,7 @@ typedef struct spBoundingBoxAttachment {
 	spVertexAttachment super;
 } spBoundingBoxAttachment;
 
-SP_API spBoundingBoxAttachment* spBoundingBoxAttachment_create (const char* name);
+SP_API spBoundingBoxAttachment *spBoundingBoxAttachment_create(const char *name);
 
 #ifdef __cplusplus
 }

@@ -44,37 +44,40 @@ typedef struct spMeshAttachment spMeshAttachment;
 struct spMeshAttachment {
 	spVertexAttachment super;
 
-	void* rendererObject;
+	void *rendererObject;
 	int regionOffsetX, regionOffsetY; /* Pixels stripped from the bottom left, unrotated. */
 	int regionWidth, regionHeight; /* Unrotated, stripped pixel size. */
 	int regionOriginalWidth, regionOriginalHeight; /* Unrotated, unstripped pixel size. */
 	float regionU, regionV, regionU2, regionV2;
 	int regionDegrees;
 
-	const char* path;
+	const char *path;
 
-	float* regionUVs;
-	float* uvs;
+	float *regionUVs;
+	float *uvs;
 
 	int trianglesCount;
-	unsigned short* triangles;
+	unsigned short *triangles;
 
 	spColor color;
 
 	int hullLength;
 
-	spMeshAttachment* const parentMesh;
+	spMeshAttachment *const parentMesh;
 
 	/* Nonessential. */
 	int edgesCount;
-	int* edges;
+	int *edges;
 	float width, height;
 };
 
-SP_API spMeshAttachment* spMeshAttachment_create (const char* name);
-SP_API void spMeshAttachment_updateUVs (spMeshAttachment* self);
-SP_API void spMeshAttachment_setParentMesh (spMeshAttachment* self, spMeshAttachment* parentMesh);
-SP_API spMeshAttachment* spMeshAttachment_newLinkedMesh (spMeshAttachment* self);
+SP_API spMeshAttachment *spMeshAttachment_create(const char *name);
+
+SP_API void spMeshAttachment_updateUVs(spMeshAttachment *self);
+
+SP_API void spMeshAttachment_setParentMesh(spMeshAttachment *self, spMeshAttachment *parentMesh);
+
+SP_API spMeshAttachment *spMeshAttachment_newLinkedMesh(spMeshAttachment *self);
 
 #ifdef __cplusplus
 }

@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <string>
 
@@ -10,10 +10,12 @@ enum ErrorLevel {
 	DEBUGLVL
 };
 
-extern void KOutputDebug(ErrorLevel lvl, const char* fmt ...);
+extern void KOutputDebug(ErrorLevel lvl, const char *fmt ...);
 
-extern std::string GetFileName(const std::string& thePath, bool noExtension);
-extern std::string GetFileDir(const std::string& thePath, bool withSlash);
-extern std::string GetFileExt(const std::string& thePath);
+extern std::string GetFileName(const std::string &thePath, bool noExtension);
 
-extern int CompareNoCase(const std::string& str1, const std::string& str2);
+extern std::string GetFileDir(const std::string &thePath, bool withSlash);
+
+extern std::string GetFileExt(const std::string &thePath);
+
+extern int CompareNoCase(const std::string &str1, const std::string &str2);

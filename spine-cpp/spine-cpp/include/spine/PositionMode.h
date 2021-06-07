@@ -31,10 +31,10 @@
 #define Spine_PositionMode_h
 
 namespace spine {
-enum PositionMode {
-	PositionMode_Fixed = 0,
-	PositionMode_Percent
-};
+	enum PositionMode {
+		PositionMode_Fixed = 0,
+		PositionMode_Percent
+	};
 }
 
 #endif /* Spine_PositionMode_h */

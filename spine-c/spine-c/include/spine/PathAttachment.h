@@ -43,11 +43,11 @@ extern "C" {
 typedef struct spPathAttachment {
 	spVertexAttachment super;
 	int lengthsLength;
-	float* lengths;
+	float *lengths;
 	int/*bool*/ closed, constantSpeed;
 } spPathAttachment;
 
-SP_API spPathAttachment* spPathAttachment_create (const char* name);
+SP_API spPathAttachment *spPathAttachment_create(const char *name);
 
 #ifdef __cplusplus
 }

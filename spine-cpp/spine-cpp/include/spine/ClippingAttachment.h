@@ -37,22 +37,24 @@ namespace spine {
 
 	class SP_API ClippingAttachment : public VertexAttachment {
 		friend class SkeletonBinary;
+
 		friend class SkeletonJson;
 
 		friend class SkeletonClipping;
 
-		RTTI_DECL
+	RTTI_DECL
 
 	public:
-		explicit ClippingAttachment(const String& name);
+		explicit ClippingAttachment(const String &name);
 
-		SlotData* getEndSlot();
-		void setEndSlot(SlotData* inValue);
+		SlotData *getEndSlot();
 
-		virtual Attachment* copy();
+		void setEndSlot(SlotData *inValue);
+
+		virtual Attachment *copy();
 
 	private:
-		SlotData* _endSlot;
+		SlotData *_endSlot;
 	};
 }
 

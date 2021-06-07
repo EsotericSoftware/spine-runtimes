@@ -81,8 +81,8 @@ void PointAttachment::setRotation(float inValue) {
 	_rotation = inValue;
 }
 
-Attachment* PointAttachment::copy() {
-	PointAttachment* copy = new(__FILE__, __LINE__) PointAttachment(getName());
+Attachment *PointAttachment::copy() {
+	PointAttachment *copy = new(__FILE__, __LINE__) PointAttachment(getName());
 	copy->_x = _x;
 	copy->_y = _y;
 	copy->_rotation = _rotation;

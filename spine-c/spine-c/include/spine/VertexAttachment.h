@@ -43,21 +43,22 @@ struct spVertexAttachment {
 	spAttachment super;
 
 	int bonesCount;
-	int* bones;
+	int *bones;
 
 	int verticesCount;
-	float* vertices;
+	float *vertices;
 
 	int worldVerticesLength;
 
-	spVertexAttachment* deformAttachment;
+	spVertexAttachment *deformAttachment;
 
 	int id;
 };
 
-SP_API void spVertexAttachment_computeWorldVertices (spVertexAttachment* self, spSlot* slot, int start, int count, float* worldVertices, int offset, int stride);
+SP_API void spVertexAttachment_computeWorldVertices(spVertexAttachment *self, spSlot *slot, int start, int count,
+													float *worldVertices, int offset, int stride);
 
-void spVertexAttachment_copyTo(spVertexAttachment* self, spVertexAttachment* other);
+void spVertexAttachment_copyTo(spVertexAttachment *self, spVertexAttachment *other);
 
 #ifdef __cplusplus
 }

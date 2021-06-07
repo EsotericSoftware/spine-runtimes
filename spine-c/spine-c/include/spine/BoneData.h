@@ -47,16 +47,17 @@ typedef enum {
 typedef struct spBoneData spBoneData;
 struct spBoneData {
 	const int index;
-	const char* const name;
-	spBoneData* const parent;
+	const char *const name;
+	spBoneData *const parent;
 	float length;
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	spTransformMode transformMode;
 	int/*bool*/ skinRequired;
 };
 
-SP_API spBoneData* spBoneData_create (int index, const char* name, spBoneData* parent);
-SP_API void spBoneData_dispose (spBoneData* self);
+SP_API spBoneData *spBoneData_create(int index, const char *name, spBoneData *parent);
+
+SP_API void spBoneData_dispose(spBoneData *self);
 
 #ifdef __cplusplus
 }

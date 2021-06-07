@@ -44,19 +44,20 @@ typedef enum {
 
 typedef struct spSlotData {
 	const int index;
-	const char* const name;
-	const spBoneData* const boneData;
-	const char* attachmentName;
+	const char *const name;
+	const spBoneData *const boneData;
+	const char *attachmentName;
 	spColor color;
-	spColor* darkColor;
+	spColor *darkColor;
 	spBlendMode blendMode;
 } spSlotData;
 
-SP_API spSlotData* spSlotData_create (const int index, const char* name, spBoneData* boneData);
-SP_API void spSlotData_dispose (spSlotData* self);
+SP_API spSlotData *spSlotData_create(const int index, const char *name, spBoneData *boneData);
+
+SP_API void spSlotData_dispose(spSlotData *self);
 
 /* @param attachmentName May be 0 for no setup pose attachment. */
-SP_API void spSlotData_setAttachmentName (spSlotData* self, const char* attachmentName);
+SP_API void spSlotData_setAttachmentName(spSlotData *self, const char *attachmentName);
 
 #ifdef __cplusplus
 }

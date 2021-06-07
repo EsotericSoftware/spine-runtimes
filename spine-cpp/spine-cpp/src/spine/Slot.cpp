@@ -55,7 +55,7 @@ Slot::Slot(SlotData &data, Bone &bone) :
 
 void Slot::setToSetupPose() {
 	_color.set(_data.getColor());
-	if  (_hasDarkColor) _darkColor.set(_data.getDarkColor());
+	if (_hasDarkColor) _darkColor.set(_data.getDarkColor());
 
 	const String &attachmentName = _data.getAttachmentName();
 	if (attachmentName.length() > 0) {
@@ -105,11 +105,11 @@ void Slot::setAttachment(Attachment *inValue) {
 }
 
 int Slot::getAttachmentState() {
-    return _attachmentState;
+	return _attachmentState;
 }
 
 void Slot::setAttachmentState(int state) {
-    _attachmentState = state;
+	_attachmentState = state;
 }
 
 float Slot::getAttachmentTime() {

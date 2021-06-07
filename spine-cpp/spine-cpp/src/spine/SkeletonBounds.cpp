@@ -47,9 +47,9 @@ SkeletonBounds::SkeletonBounds() : _minX(0), _minY(0), _maxX(0), _maxY(0) {
 }
 
 SkeletonBounds::~SkeletonBounds() {
-    for (size_t i = 0, n = _polygons.size(); i < n; i++)
-        _polygonPool.free(_polygons[i]);
-    _polygons.clear();
+	for (size_t i = 0, n = _polygons.size(); i < n; i++)
+		_polygonPool.free(_polygons[i]);
+	_polygons.clear();
 }
 
 void SkeletonBounds::update(Skeleton &skeleton, bool updateAabb) {

@@ -42,7 +42,8 @@ using namespace spine;
 
 RTTI_IMPL(VertexAttachment, Attachment)
 
-VertexAttachment::VertexAttachment(const String &name) : Attachment(name), _worldVerticesLength(0), _deformAttachment(this), _id(getNextID()) {
+VertexAttachment::VertexAttachment(const String &name) : Attachment(name), _worldVerticesLength(0),
+														 _deformAttachment(this), _id(getNextID()) {
 }
 
 VertexAttachment::~VertexAttachment() {
@@ -56,11 +57,13 @@ void VertexAttachment::computeWorldVertices(Slot &slot, float *worldVertices) {
 	computeWorldVertices(slot, 0, _worldVerticesLength, worldVertices, 0);
 }
 
-void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t count, Vector<float> &worldVertices, size_t offset, size_t stride) {
+void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t count, Vector<float> &worldVertices,
+											size_t offset, size_t stride) {
 	computeWorldVertices(slot, start, count, worldVertices.buffer(), offset, stride);
 }
 
-void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t count, float *worldVertices, size_t offset, size_t stride) {
+void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t count, float *worldVertices, size_t offset,
+											size_t stride) {
 	count = offset + (count >> 1) * stride;
 	Skeleton &skeleton = slot._bone._skeleton;
 	Vector<float> *deformArray = &slot.getDeform();
@@ -147,11 +150,11 @@ void VertexAttachment::setWorldVerticesLength(size_t inValue) {
 	_worldVerticesLength = inValue;
 }
 
-VertexAttachment* VertexAttachment::getDeformAttachment() {
+VertexAttachment *VertexAttachment::getDeformAttachment() {
 	return _deformAttachment;
 }
 
-void VertexAttachment::setDeformAttachment(VertexAttachment* attachment) {
+void VertexAttachment::setDeformAttachment(VertexAttachment *attachment) {
 	_deformAttachment = attachment;
 }
 
@@ -160,7 +163,7 @@ int VertexAttachment::getNextID() {
 	return nextID++;
 }
 
-void VertexAttachment::copyTo(VertexAttachment* other) {
+void VertexAttachment::copyTo(VertexAttachment *other) {
 	other->_bones.clearAndAddAll(this->_bones);
 	other->_vertices.clearAndAddAll(this->_vertices);
 	other->_worldVerticesLength = this->_worldVerticesLength;

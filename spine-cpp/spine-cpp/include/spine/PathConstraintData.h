@@ -40,56 +40,72 @@
 
 namespace spine {
 	class BoneData;
+
 	class SlotData;
 
 	class SP_API PathConstraintData : public ConstraintData {
 		friend class SkeletonBinary;
+
 		friend class SkeletonJson;
 
 		friend class PathConstraint;
+
 		friend class Skeleton;
+
 		friend class PathConstraintMixTimeline;
+
 		friend class PathConstraintPositionTimeline;
+
 		friend class PathConstraintSpacingTimeline;
 
 	public:
-		explicit PathConstraintData(const String& name);
+		explicit PathConstraintData(const String &name);
 
-		Vector<BoneData*>& getBones();
+		Vector<BoneData *> &getBones();
 
-		SlotData* getTarget();
-		void setTarget(SlotData* inValue);
+		SlotData *getTarget();
+
+		void setTarget(SlotData *inValue);
 
 		PositionMode getPositionMode();
+
 		void setPositionMode(PositionMode inValue);
 
 		SpacingMode getSpacingMode();
+
 		void setSpacingMode(SpacingMode inValue);
 
 		RotateMode getRotateMode();
+
 		void setRotateMode(RotateMode inValue);
 
 		float getOffsetRotation();
+
 		void setOffsetRotation(float inValue);
 
 		float getPosition();
+
 		void setPosition(float inValue);
 
 		float getSpacing();
+
 		void setSpacing(float inValue);
 
 		float getMixRotate();
+
 		void setMixRotate(float inValue);
 
-        float getMixX();
-        void setMixX(float inValue);
+		float getMixX();
 
-        float getMixY();
-        void setMixY(float inValue);
+		void setMixX(float inValue);
+
+		float getMixY();
+
+		void setMixY(float inValue);
 
 	private:
-		Vector<BoneData*> _bones;
-		SlotData* _target;
+		Vector<BoneData *> _bones;
+		SlotData *_target;
 		PositionMode _positionMode;
 		SpacingMode _spacingMode;
 		RotateMode _rotateMode;

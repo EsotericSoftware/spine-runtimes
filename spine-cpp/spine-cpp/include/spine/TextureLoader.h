@@ -42,9 +42,9 @@ namespace spine {
 
 		virtual ~TextureLoader();
 
-		virtual void load(AtlasPage& page, const String& path) = 0;
+		virtual void load(AtlasPage &page, const String &path) = 0;
 
-		virtual void unload(void* texture) = 0;
+		virtual void unload(void *texture) = 0;
 	};
 }
 

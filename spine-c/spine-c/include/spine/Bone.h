@@ -41,11 +41,11 @@ struct spSkeleton;
 
 typedef struct spBone spBone;
 struct spBone {
-	spBoneData* const data;
-	struct spSkeleton* const skeleton;
-	spBone* const parent;
+	spBoneData *const data;
+	struct spSkeleton *const skeleton;
+	spBone *const parent;
 	int childrenCount;
-	spBone** const children;
+	spBone **const children;
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	float ax, ay, arotation, ascaleX, ascaleY, ashearX, ashearY;
 	int /*bool*/ appliedValid;
@@ -57,30 +57,41 @@ struct spBone {
 	int/*bool*/ active;
 };
 
-SP_API void spBone_setYDown (int/*bool*/yDown);
-SP_API int/*bool*/spBone_isYDown ();
+SP_API void spBone_setYDown(int/*bool*/yDown);
+
+SP_API int/*bool*/spBone_isYDown();
 
 /* @param parent May be 0. */
-SP_API spBone* spBone_create (spBoneData* data, struct spSkeleton* skeleton, spBone* parent);
-SP_API void spBone_dispose (spBone* self);
+SP_API spBone *spBone_create(spBoneData *data, struct spSkeleton *skeleton, spBone *parent);
 
-SP_API void spBone_setToSetupPose (spBone* self);
+SP_API void spBone_dispose(spBone *self);
 
-SP_API void spBone_updateWorldTransform (spBone* self);
-SP_API void spBone_updateWorldTransformWith (spBone* self, float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY);
+SP_API void spBone_setToSetupPose(spBone *self);
 
-SP_API float spBone_getWorldRotationX (spBone* self);
-SP_API float spBone_getWorldRotationY (spBone* self);
-SP_API float spBone_getWorldScaleX (spBone* self);
-SP_API float spBone_getWorldScaleY (spBone* self);
+SP_API void spBone_updateWorldTransform(spBone *self);
 
-SP_API void spBone_updateAppliedTransform (spBone* self);
+SP_API void spBone_updateWorldTransformWith(spBone *self, float x, float y, float rotation, float scaleX, float scaleY,
+											float shearX, float shearY);
 
-SP_API void spBone_worldToLocal (spBone* self, float worldX, float worldY, float* localX, float* localY);
-SP_API void spBone_localToWorld (spBone* self, float localX, float localY, float* worldX, float* worldY);
-SP_API float spBone_worldToLocalRotation (spBone* self, float worldRotation);
-SP_API float spBone_localToWorldRotation (spBone* self, float localRotation);
-SP_API void spBone_rotateWorld (spBone* self, float degrees);
+SP_API float spBone_getWorldRotationX(spBone *self);
+
+SP_API float spBone_getWorldRotationY(spBone *self);
+
+SP_API float spBone_getWorldScaleX(spBone *self);
+
+SP_API float spBone_getWorldScaleY(spBone *self);
+
+SP_API void spBone_updateAppliedTransform(spBone *self);
+
+SP_API void spBone_worldToLocal(spBone *self, float worldX, float worldY, float *localX, float *localY);
+
+SP_API void spBone_localToWorld(spBone *self, float localX, float localY, float *worldX, float *worldY);
+
+SP_API float spBone_worldToLocalRotation(spBone *self, float worldRotation);
+
+SP_API float spBone_localToWorldRotation(spBone *self, float localRotation);
+
+SP_API void spBone_rotateWorld(spBone *self, float degrees);
 
 #ifdef __cplusplus
 }

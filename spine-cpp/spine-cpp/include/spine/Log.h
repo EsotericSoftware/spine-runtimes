@@ -27,52 +27,31 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
+#ifndef SPINE_DEBUG_LOG_H
+#define SPINE_DEBUG_LOG_H
 
-#include <spine/Timeline.h>
-
-#include <spine/Skeleton.h>
-#include <spine/Event.h>
+#include <spine/spine.h>
 
 namespace spine {
-	RTTI_IMPL_NOPARENT(Timeline)
+	SP_API void spDebug_printSkeletonData(SkeletonData *skeletonData);
 
-	Timeline::Timeline(size_t frameCount, size_t frameEntries)
-			: _propertyIds(), _frames(), _frameEntries(frameEntries) {
-		_frames.setSize(frameCount * frameEntries, 0);
-	}
+	SP_API void spDebug_printAnimation(Animation *animation);
 
-	Timeline::~Timeline() {
-	}
+	SP_API void spDebug_printTimeline(Timeline *timeline);
 
-	Vector<PropertyId> &Timeline::getPropertyIds() {
-		return _propertyIds;
-	}
+	SP_API void spDebug_printBoneDatas(Vector<BoneData *> &boneDatas);
 
-	void Timeline::setPropertyIds(PropertyId propertyIds[], size_t propertyIdsCount) {
-		_propertyIds.clear();
-		_propertyIds.ensureCapacity(propertyIdsCount);
-		for (size_t i = 0; i < propertyIdsCount; i++) {
-			_propertyIds.add(propertyIds[i]);
-		}
-	}
+	SP_API void spDebug_printBoneData(BoneData *boneData);
 
-	size_t Timeline::getFrameCount() {
-		return _frames.size() / _frameEntries;
-	}
+	SP_API void spDebug_printSkeleton(Skeleton *skeleton);
 
-	Vector<float> &Timeline::getFrames() {
-		return _frames;
-	}
+	SP_API void spDebug_printBones(Vector<Bone *> &bones);
 
-	size_t Timeline::getFrameEntries() {
-		return _frameEntries;
-	}
+	SP_API void spDebug_printBone(Bone *bone);
 
-	float Timeline::getDuration() {
-		return _frames[_frames.size() - getFrameEntries()];
-	}
+	SP_API void spDebug_printFloats(float *values, int numFloats);
 
+	SP_API void spDebug_printFloats(Vector<float> &values);
 }
+
+#endif

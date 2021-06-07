@@ -136,15 +136,15 @@ void Skeleton::updateCache() {
 	_updateCache.clear();
 
 	for (size_t i = 0, n = _bones.size(); i < n; ++i) {
-		Bone* bone = _bones[i];
+		Bone *bone = _bones[i];
 		bone->_sorted = bone->_data.isSkinRequired();
 		bone->_active = !bone->_sorted;
 	}
 
 	if (_skin) {
-		Vector<BoneData*>& skinBones = _skin->getBones();
+		Vector<BoneData *> &skinBones = _skin->getBones();
 		for (size_t i = 0, n = skinBones.size(); i < n; i++) {
-			Bone* bone = _bones[skinBones[i]->getIndex()];
+			Bone *bone = _bones[skinBones[i]->getIndex()];
 			do {
 				bone->_sorted = false;
 				bone->_active = true;
@@ -217,29 +217,29 @@ void Skeleton::updateWorldTransform() {
 	}
 }
 
-void Skeleton::updateWorldTransform(Bone* parent) {
-    // Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
-    Bone& rootBone = *getRootBone();
-    float pa = parent->_a, pb = parent->_b, pc = parent->_c, pd = parent->_d;
-    rootBone._worldX = pa * _x + pb * _y + parent->_worldX;
-    rootBone._worldY = pc * _x + pd * _y + parent->_worldY;
+void Skeleton::updateWorldTransform(Bone *parent) {
+	// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
+	Bone &rootBone = *getRootBone();
+	float pa = parent->_a, pb = parent->_b, pc = parent->_c, pd = parent->_d;
+	rootBone._worldX = pa * _x + pb * _y + parent->_worldX;
+	rootBone._worldY = pc * _x + pd * _y + parent->_worldY;
 
-    float rotationY = rootBone._rotation + 90 + rootBone._shearY;
-    float la = MathUtil::cosDeg(rootBone._rotation + rootBone._shearX) * rootBone._scaleX;
-    float lb = MathUtil::cosDeg(rotationY) * rootBone._scaleY;
-    float lc = MathUtil::sinDeg(rootBone._rotation + rootBone._shearX) * rootBone._scaleX;
-    float ld = MathUtil::sinDeg(rotationY) * rootBone._scaleY;
-    rootBone._a = (pa * la + pb * lc) * _scaleX;
-    rootBone._b = (pa * lb + pb * ld) * _scaleX;
-    rootBone._c = (pc * la + pd * lc) * _scaleY;
-    rootBone._d = (pc * lb + pd * ld) * _scaleY;
+	float rotationY = rootBone._rotation + 90 + rootBone._shearY;
+	float la = MathUtil::cosDeg(rootBone._rotation + rootBone._shearX) * rootBone._scaleX;
+	float lb = MathUtil::cosDeg(rotationY) * rootBone._scaleY;
+	float lc = MathUtil::sinDeg(rootBone._rotation + rootBone._shearX) * rootBone._scaleX;
+	float ld = MathUtil::sinDeg(rotationY) * rootBone._scaleY;
+	rootBone._a = (pa * la + pb * lc) * _scaleX;
+	rootBone._b = (pa * lb + pb * ld) * _scaleX;
+	rootBone._c = (pc * la + pd * lc) * _scaleY;
+	rootBone._d = (pc * lb + pd * ld) * _scaleY;
 
-    // Update everything except root bone.
-    Bone *rb = getRootBone();
-    for (size_t i = 0, n = _updateCache.size(); i < n; i++) {
-        Updatable *updatable = _updateCache[i];
-        if (updatable != rb) updatable->update();
-    }
+	// Update everything except root bone.
+	Bone *rb = getRootBone();
+	for (size_t i = 0, n = _updateCache.size(); i < n; i++) {
+		Updatable *updatable = _updateCache[i];
+		if (updatable != rb) updatable->update();
+	}
 }
 
 void Skeleton::setToSetupPose() {
@@ -273,7 +273,7 @@ void Skeleton::setBonesToSetupPose() {
 		constraint._mixY = constraintData._mixY;
 		constraint._mixScaleX = constraintData._mixScaleX;
 		constraint._mixScaleY = constraintData._mixScaleY;
-        constraint._mixShearY = constraintData._mixShearY;
+		constraint._mixShearY = constraintData._mixShearY;
 	}
 
 	for (size_t i = 0, n = _pathConstraints.size(); i < n; ++i) {
@@ -284,8 +284,8 @@ void Skeleton::setBonesToSetupPose() {
 		constraint._position = constraintData._position;
 		constraint._spacing = constraintData._spacing;
 		constraint._mixRotate = constraintData._mixRotate;
-        constraint._mixX = constraintData._mixX;
-        constraint._mixY = constraintData._mixY;
+		constraint._mixX = constraintData._mixX;
+		constraint._mixY = constraintData._mixY;
 	}
 }
 
@@ -567,7 +567,8 @@ void Skeleton::setScaleY(float inValue) {
 }
 
 void Skeleton::sortIkConstraint(IkConstraint *constraint) {
-	constraint->_active = constraint->_target->_active && (!constraint->_data.isSkinRequired() || (_skin && _skin->_constraints.contains(&constraint->_data)));
+	constraint->_active = constraint->_target->_active && (!constraint->_data.isSkinRequired() ||
+														   (_skin && _skin->_constraints.contains(&constraint->_data)));
 	if (!constraint->_active) return;
 
 	Bone *target = constraint->getTarget();
@@ -578,21 +579,23 @@ void Skeleton::sortIkConstraint(IkConstraint *constraint) {
 	sortBone(parent);
 
 	if (constrained.size() == 1) {
-	    _updateCache.add(constraint);
-	    sortReset(parent->_children);
+		_updateCache.add(constraint);
+		sortReset(parent->_children);
 	} else {
-        Bone* child = constrained[constrained.size() - 1];
-        sortBone(child);
+		Bone *child = constrained[constrained.size() - 1];
+		sortBone(child);
 
-        _updateCache.add(constraint);
+		_updateCache.add(constraint);
 
-        sortReset(parent->_children);
-        child->_sorted = true;
+		sortReset(parent->_children);
+		child->_sorted = true;
 	}
 }
 
 void Skeleton::sortPathConstraint(PathConstraint *constraint) {
-	constraint->_active = constraint->_target->_bone._active && (!constraint->_data.isSkinRequired() || (_skin && _skin->_constraints.contains(&constraint->_data)));
+	constraint->_active = constraint->_target->_bone._active && (!constraint->_data.isSkinRequired() || (_skin &&
+																										 _skin->_constraints.contains(
+																												 &constraint->_data)));
 	if (!constraint->_active) return;
 
 	Slot *slot = constraint->getTarget();
@@ -623,7 +626,8 @@ void Skeleton::sortPathConstraint(PathConstraint *constraint) {
 }
 
 void Skeleton::sortTransformConstraint(TransformConstraint *constraint) {
-	constraint->_active = constraint->_target->_active && (!constraint->_data.isSkinRequired() || (_skin && _skin->_constraints.contains(&constraint->_data)));
+	constraint->_active = constraint->_target->_active && (!constraint->_data.isSkinRequired() ||
+														   (_skin && _skin->_constraints.contains(&constraint->_data)));
 	if (!constraint->_active) return;
 
 	sortBone(constraint->getTarget());

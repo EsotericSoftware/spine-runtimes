@@ -36,21 +36,28 @@
 
 namespace spine {
 	class PathConstraintData;
+
 	class Skeleton;
+
 	class PathAttachment;
+
 	class Bone;
+
 	class Slot;
 
 	class SP_API PathConstraint : public Updatable {
 		friend class Skeleton;
+
 		friend class PathConstraintMixTimeline;
+
 		friend class PathConstraintPositionTimeline;
+
 		friend class PathConstraintSpacingTimeline;
 
-		RTTI_DECL
+	RTTI_DECL
 
 	public:
-		PathConstraint(PathConstraintData& data, Skeleton& skeleton);
+		PathConstraint(PathConstraintData &data, Skeleton &skeleton);
 
 		/// Applies the constraint to the constrained bones.
 		void apply();
@@ -60,26 +67,32 @@ namespace spine {
 		virtual int getOrder();
 
 		float getPosition();
+
 		void setPosition(float inValue);
 
 		float getSpacing();
+
 		void setSpacing(float inValue);
 
 		float getMixRotate();
+
 		void setMixRotate(float inValue);
 
-        float getMixX();
-        void setMixX(float inValue);
+		float getMixX();
 
-        float getMixY();
-        void setMixY(float inValue);
+		void setMixX(float inValue);
 
-		Vector<Bone*>& getBones();
+		float getMixY();
 
-		Slot* getTarget();
-		void setTarget(Slot* inValue);
+		void setMixY(float inValue);
 
-		PathConstraintData& getData();
+		Vector<Bone *> &getBones();
+
+		Slot *getTarget();
+
+		void setTarget(Slot *inValue);
+
+		PathConstraintData &getData();
 
 		bool isActive();
 
@@ -91,9 +104,9 @@ namespace spine {
 		static const int BEFORE;
 		static const int AFTER;
 
-		PathConstraintData& _data;
-		Vector<Bone*> _bones;
-		Slot* _target;
+		PathConstraintData &_data;
+		Vector<Bone *> _bones;
+		Slot *_target;
 		float _position, _spacing;
 		float _mixRotate, _mixX, _mixY;
 
@@ -106,13 +119,15 @@ namespace spine {
 
 		bool _active;
 
-		Vector<float>& computeWorldPositions(PathAttachment& path, int spacesCount, bool tangents);
+		Vector<float> &computeWorldPositions(PathAttachment &path, int spacesCount, bool tangents);
 
-		static void addBeforePosition(float p, Vector<float>& temp, int i, Vector<float>& output, int o);
+		static void addBeforePosition(float p, Vector<float> &temp, int i, Vector<float> &output, int o);
 
-		static void addAfterPosition(float p, Vector<float>& temp, int i, Vector<float>& output, int o);
+		static void addAfterPosition(float p, Vector<float> &temp, int i, Vector<float> &output, int o);
 
-		static void addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2, Vector<float>& output, int o, bool tangents);
+		static void
+		addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2,
+						 Vector<float> &output, int o, bool tangents);
 	};
 }
 

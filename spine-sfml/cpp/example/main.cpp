@@ -30,6 +30,7 @@
 #include <iostream>
 #include <spine/spine-sfml.h>
 #include <spine/Debug.h>
+#include <spine/Log.h>
 #include <SFML/Graphics.hpp>
 
 using namespace std;
@@ -94,11 +95,12 @@ shared_ptr<SkeletonData> readSkeletonBinaryData (const char* filename, Atlas* at
 void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
 			   const char* jsonName, const char* binaryName, const char* atlasName,
 			   float scale) {
+    SP_UNUSED(jsonName);
 	SFMLTextureLoader textureLoader;
 	auto atlas = make_unique_test<Atlas>(atlasName, &textureLoader);
 
 	auto skeletonData = readSkeletonJsonData(jsonName, atlas.get(), scale);
-	func(skeletonData.get(), atlas.get());
+	func(skeletonData.get(), atlas.get());//
 
 	skeletonData = readSkeletonBinaryData(binaryName, atlas.get(), scale);
 	func(skeletonData.get(), atlas.get());
@@ -242,19 +244,14 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable.setUsePremultipliedAlpha(true);
 
 	Skeleton* skeleton = drawable.skeleton;
-
-	Skin* skin = skeleton->getData()->findSkin("goblingirl");
-	Skin copy("test");
-
-	copy.copySkin(skin);
-
-	skeleton->setSkin(&copy);
+	skeleton->setSkin("goblingirl");
 	skeleton->setSlotsToSetupPose();
-
 	skeleton->setPosition(320, 590);
 	skeleton->updateWorldTransform();
 
 	drawable.state->setAnimation(0, "walk", true);
+
+    drawable.update(0.3f);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - goblins");
 	window.setFramerateLimit(60);
@@ -264,10 +261,10 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 		while (window.pollEvent(event))
 			if (event.type == sf::Event::Closed) window.close();
 
-		float delta = deltaClock.getElapsedTime().asSeconds();
+		// float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		drawable.update(delta);
+		drawable.update(0);
 
 		window.clear();
 		window.draw(drawable);
@@ -462,7 +459,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	skeleton->setPosition(320, 320);
 	skeleton->updateWorldTransform();
 
-	// drawable.state->setAnimation(0, "animation", true);
+	drawable.state->setAnimation(0, "animation", true);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - coin");
 	window.setFramerateLimit(60);
@@ -477,7 +474,7 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
-		drawable.update(delta - delta);
+		drawable.update(delta);
 
 		window.clear();
 		window.draw(drawable);
@@ -497,11 +494,12 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 	skeleton->updateWorldTransform();
 
 	drawable.state->setAnimation(0, "idle", true);
+    drawable.state->setAnimation(1, "blink", true);
 
-	TrackEntry* left = drawable.state->setAnimation(1, "left", true);
-	TrackEntry* right = drawable.state->setAnimation(2, "right", true);
-	TrackEntry* up = drawable.state->setAnimation(3, "up", true);
-	TrackEntry* down = drawable.state->setAnimation(4, "down", true);
+	TrackEntry* left = drawable.state->setAnimation(2, "left", true);
+	TrackEntry* right = drawable.state->setAnimation(3, "right", true);
+	TrackEntry* up = drawable.state->setAnimation(4, "up", true);
+	TrackEntry* down = drawable.state->setAnimation(5, "down", true);
 
 	left->setAlpha(0);
 	left->setMixBlend(MixBlend_Add);
@@ -615,16 +613,16 @@ DebugExtension dbgExtension(SpineExtension::getInstance());
 int main () {
 	SpineExtension::setInstance(&dbgExtension);
 
-    testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
     testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
-	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
+    testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
-	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
+    testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
+    testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
 
 	dbgExtension.reportLeaks();

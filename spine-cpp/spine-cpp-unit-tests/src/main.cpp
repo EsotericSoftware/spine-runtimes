@@ -94,7 +94,7 @@ void testLoading() {
 }
 
 namespace spine {
-	SpineExtension* getDefaultExtension() {
+	SpineExtension *getDefaultExtension() {
 		return new DefaultSpineExtension();
 	}
 }

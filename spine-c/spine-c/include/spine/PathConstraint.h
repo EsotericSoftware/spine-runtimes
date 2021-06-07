@@ -43,27 +43,27 @@ extern "C" {
 struct spSkeleton;
 
 typedef struct spPathConstraint {
-	spPathConstraintData* const data;
+	spPathConstraintData *const data;
 	int bonesCount;
-	spBone** const bones;
-	spSlot* target;
+	spBone **const bones;
+	spSlot *target;
 	float position, spacing;
 	float mixRotate, mixX, mixY;
 
 	int spacesCount;
-	float* spaces;
+	float *spaces;
 
 	int positionsCount;
-	float* positions;
+	float *positions;
 
 	int worldCount;
-	float* world;
+	float *world;
 
 	int curvesCount;
-	float* curves;
+	float *curves;
 
 	int lengthsCount;
-	float* lengths;
+	float *lengths;
 
 	float segments[10];
 
@@ -72,11 +72,14 @@ typedef struct spPathConstraint {
 
 #define SP_PATHCONSTRAINT_
 
-SP_API spPathConstraint* spPathConstraint_create (spPathConstraintData* data, const struct spSkeleton* skeleton);
-SP_API void spPathConstraint_dispose (spPathConstraint* self);
+SP_API spPathConstraint *spPathConstraint_create(spPathConstraintData *data, const struct spSkeleton *skeleton);
 
-SP_API void spPathConstraint_update (spPathConstraint* self);
-SP_API float* spPathConstraint_computeWorldPositions(spPathConstraint* self, spPathAttachment* path, int spacesCount, int/*bool*/ tangents);
+SP_API void spPathConstraint_dispose(spPathConstraint *self);
+
+SP_API void spPathConstraint_update(spPathConstraint *self);
+
+SP_API float *spPathConstraint_computeWorldPositions(spPathConstraint *self, spPathAttachment *path, int spacesCount,
+													 int/*bool*/ tangents);
 
 #ifdef __cplusplus
 }
