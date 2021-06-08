@@ -306,12 +306,12 @@ function TransformConstraint:applyRelativeLocal ()
 
 	local bones = self.bones
 	for _, bone in ipairs(bones) do
-		local rotation = bone.arotation + (target.arotation + this.data.offsetRotation) * mixRotate
-		local x = bone.ax + (target.ax + this.data.offsetX) * mixX
-		local y = bone.ay + (target.ay + this.data.offsetY) * mixY
-		local scaleX = (bone.ascaleX * ((target.ascaleX - 1 + this.data.offsetScaleX) * mixScaleX) + 1)
-		local scaleY = (bone.ascaleY * ((target.ascaleY - 1 + this.data.offsetScaleY) * mixScaleY) + 1)
-		local shearY = bone.ashearY + (target.ashearY + this.data.offsetShearY) * mixShearY
+		local rotation = bone.arotation + (target.arotation + self.data.offsetRotation) * mixRotate
+		local x = bone.ax + (target.ax + self.data.offsetX) * mixX
+		local y = bone.ay + (target.ay + self.data.offsetY) * mixY
+		local scaleX = (bone.ascaleX * ((target.ascaleX - 1 + self.data.offsetScaleX) * mixScaleX) + 1)
+		local scaleY = (bone.ascaleY * ((target.ascaleY - 1 + self.data.offsetScaleY) * mixScaleY) + 1)
+		local shearY = bone.ashearY + (target.ashearY + self.data.offsetShearY) * mixShearY
 		bone:updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY)
 	end
 end

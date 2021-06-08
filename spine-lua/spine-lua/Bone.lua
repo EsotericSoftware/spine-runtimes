@@ -37,7 +37,7 @@ local math_cos = math.cos
 local math_atan2 = math.atan2
 local math_sqrt = math.sqrt
 local math_abs = math.abs
-local math_pi = math.pi
+local math_pi_half = math.pi / 2
 
 local Bone = {}
 Bone.__index = Bone
@@ -119,7 +119,9 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		self.c = pc * la + pd * lc
 		self.d = pc * lb + pd * ld
 		return
-	elseif transformMode == TransformMode.onlyTranslation then
+	end
+
+	if transformMode == TransformMode.onlyTranslation then
 		local rotationY = rotation + 90 + shearY
 		self.a = math_cos(math_rad(rotation + shearX)) * scaleX
 		self.b = math_cos(math_rad(rotationY)) * scaleY
@@ -127,7 +129,7 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		self.d = math_sin(math_rad(rotationY)) * scaleY
 	elseif transformMode == TransformMode.noRotationOrReflection then
 		local s = pa * pa + pc * pc
-		local prx = 0
+		local prx
 		if s > 0.0001 then
 			s = math_abs(pa * pd - pb * pc) / s
 			pa = pa / self.skeleton.scaleX
@@ -150,7 +152,6 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		self.b = pa * lb - pb * ld
 		self.c = pc * la + pd * lc
 		self.d = pc * lb + pd * ld
-
 	elseif transformMode == TransformMode.noScale or transformMode == TransformMode.noScaleOrReflection then
 		local cos = math_cos(math_rad(rotation))
 		local sin = math_sin(math_rad(rotation))
@@ -161,10 +162,10 @@ function Bone:updateWorldTransformWith (x, y, rotation, scaleX, scaleY, shearX, 
 		za = za * s
 		zc = zc * s
 		s = math_sqrt(za * za + zc * zc)
-		if transformMode == TransformMode.noScale and pa * pd - pb * pc < 0 ~= (sx < 0) ~= (sy < 0) then
+		if transformMode == TransformMode.noScale and (pa * pd - pb * pc < 0) ~= ((sx < 0) ~= (sy < 0)) then
 			s = -s
 		end
-		local r = math_pi / 2 + math_atan2(zc, za)
+		local r = math_pi_half + math_atan2(zc, za)
 		local zb = math_cos(r) * s
 		local zd = math_sin(r) * s
 		local la = math_cos(math_rad(shearX)) * scaleX
@@ -215,11 +216,15 @@ function Bone:updateAppliedTransform ()
 	if not parent then
 		self.ax = self.worldX
 		self.ay = self.worldY
-		self.arotation = math_deg(math_atan2(self.c, self.a))
-		self.ascaleX = math_sqrt(self.a * self.a + self.c * self.c)
-		self.ascaleY = math_sqrt(self.b * self.b + self.d * self.d)
+		local a = self.a
+		local b = self.b
+		local c = self.c
+		local d = self.d
+		self.arotation = math_deg(math_atan2(c, a))
+		self.ascaleX = math_sqrt(a * a + c * c)
+		self.ascaleY = math_sqrt(b * b + d * d)
 		self.ashearX = 0
-		self.ashearY = math_deg(math_atan2(self.a * self.b + self.c * self.d, self.a * self.d - self.b * self.c))
+		self.ashearY = math_deg(math_atan2(a * b + c * d, a * d - b * c))
 		return
 	end
 	local pa = parent.a

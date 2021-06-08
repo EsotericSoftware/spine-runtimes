@@ -65,25 +65,25 @@ function loadSkeleton (jsonFile, atlasFile, animation, skin, scale, x, y)
 		skeleton.vertexEffect = swirl
 		-- skeleton.vertexEffect = spine.JitterEffect.new(10, 10)
 	end
-  
-  if jsonFile == "mix-and-match-pro" then
-    -- Create a new skin, by mixing and matching other skins
-    -- that fit together. Items making up the girl are individual
-    -- skins. Using the skin API, a new skin is created which is
-    -- a combination of all these individual item skins.
-    local skin = spine.Skin.new("mix-and-match")
-    skin:addSkin(skeletonData:findSkin("skin-base"))
-    skin:addSkin(skeletonData:findSkin("nose/short"))
-    skin:addSkin(skeletonData:findSkin("eyelids/girly"))
-    skin:addSkin(skeletonData:findSkin("eyes/violet"))
-    skin:addSkin(skeletonData:findSkin("hair/brown"))
-    skin:addSkin(skeletonData:findSkin("clothes/hoodie-orange"))
-    skin:addSkin(skeletonData:findSkin("legs/pants-jeans"))
-    skin:addSkin(skeletonData:findSkin("accessories/bag"))
-    skin:addSkin(skeletonData:findSkin("accessories/hat-red-yellow"))
-    skeleton:setSkinByReference(skin)
-  end
 	
+	if jsonFile == "mix-and-match-pro" then
+		-- Create a new skin, by mixing and matching other skins
+		-- that fit together. Items making up the girl are individual
+		-- skins. Using the skin API, a new skin is created which is
+		-- a combination of all these individual item skins.
+		local skin = spine.Skin.new("mix-and-match")
+		skin:addSkin(skeletonData:findSkin("skin-base"))
+		skin:addSkin(skeletonData:findSkin("nose/short"))
+		skin:addSkin(skeletonData:findSkin("eyelids/girly"))
+		skin:addSkin(skeletonData:findSkin("eyes/violet"))
+		skin:addSkin(skeletonData:findSkin("hair/brown"))
+		skin:addSkin(skeletonData:findSkin("clothes/hoodie-orange"))
+		skin:addSkin(skeletonData:findSkin("legs/pants-jeans"))
+		skin:addSkin(skeletonData:findSkin("accessories/bag"))
+		skin:addSkin(skeletonData:findSkin("accessories/hat-red-yellow"))
+		skeleton:setSkinByReference(skin)
+	end
+
 	-- set some event callbacks
 	state.onStart = function (entry)
 		print(entry.trackIndex.." start: "..entry.animation.name)
@@ -103,21 +103,18 @@ function loadSkeleton (jsonFile, atlasFile, animation, skin, scale, x, y)
 	state.onEvent = function (entry, event)
 		print(entry.trackIndex.." event: "..entry.animation.name..", "..event.data.name..", "..event.intValue..", "..event.floatValue..", '"..(event.stringValue or "").."'" .. ", " .. event.volume .. ", " .. event.balance)
 	end
-	
-	state:update(0.5)
-	state:apply(skeleton)
-	
+
 	return { state = state, skeleton = skeleton }
 end
 
 function love.load(arg)
 	if arg[#arg] == "-debug" then require("mobdebug").start() end
 	skeletonRenderer = spine.SkeletonRenderer.new(true)
-	table.insert(skeletons, loadSkeleton("goblins-pro", "goblins", "walk", "goblin", 1, 400, 500))
-	table.insert(skeletons, loadSkeleton("mix-and-match-pro", "mix-and-match", "dance", nil, 0.5, 400, 500))
-	table.insert(skeletons, loadSkeleton("spineboy-pro", "spineboy", "walk", nil, 0.5, 400, 500))
 	table.insert(skeletons, loadSkeleton("stretchyman-pro", "stretchyman", "sneak", nil, 0.5, 200, 500))
+	table.insert(skeletons, loadSkeleton("spineboy-pro", "spineboy", "walk", nil, 0.5, 400, 500))
+	table.insert(skeletons, loadSkeleton("mix-and-match-pro", "mix-and-match", "dance", nil, 0.5, 400, 500))
 	table.insert(skeletons, loadSkeleton("coin-pro", "coin", "animation", nil, 0.5, 400, 300))
+	table.insert(skeletons, loadSkeleton("goblins-pro", "goblins", "walk", "goblin", 1, 400, 500))
 	table.insert(skeletons, loadSkeleton("raptor-pro", "raptor", "walk", nil, 0.3, 400, 500))
 	table.insert(skeletons, loadSkeleton("tank-pro", "tank", "drive", nil, 0.2, 600, 500))
 	table.insert(skeletons, loadSkeleton("vine-pro", "vine", "grow", nil, 0.3, 400, 500))

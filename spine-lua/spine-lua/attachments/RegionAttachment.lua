@@ -35,7 +35,7 @@ local math_cos = math.cos
 local AttachmentType = require "spine-lua.attachments.AttachmentType"
 local Attachment = require "spine-lua.attachments.Attachment"
 local Color = require "spine-lua.Color"
-local Utils = require "spine-lua.utils"
+local utils = require "spine-lua.utils"
 
 local OX1 = 1
 local OY1 = 2
@@ -146,8 +146,8 @@ function RegionAttachment.new (name)
 	self.path = nil
 	self.rendererObject = nil
 	self.region = nil
-	self.offset = Utils.newNumberArray(8)
-	self.uvs = Utils.newNumberArray(8)
+	self.offset = utils.newNumberArray(8)
+	self.uvs = utils.newNumberArray(8)
 	self.tempColor = Color.newWith(1, 1, 1, 1)
 	setmetatable(self, RegionAttachment)
 
@@ -186,7 +186,7 @@ end
 
 function RegionAttachment:setRegion (region)
 	local uvs = self.uvs
-	if region.rotate then
+	if region.degrees == 90 then
 		uvs[5] = region.u
 		uvs[6] = region.v2
 		uvs[7] = region.u
@@ -256,8 +256,8 @@ function RegionAttachment:copy ()
 	copy.path = self.path
 	copy.rendererObject = self.rendererObject
 	copy.region = self.region
-	copy.offset = Utils.copy(self.offset)
-	copy.uvs = Utils.copy(self.uvs)
+	copy.offset = utils.copy(self.offset)
+	copy.uvs = utils.copy(self.uvs)
 	copy.tempColor:setFrom(self.tempColor)
 	return copy
 end

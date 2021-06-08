@@ -399,6 +399,7 @@ public class Bone implements Updatable {
 		if (parent == null) {
 			ax = worldX;
 			ay = worldY;
+			float a = this.a, b = this.b, c = this.c, d = this.d;
 			arotation = atan2(c, a) * radDeg;
 			ascaleX = (float)Math.sqrt(a * a + c * c);
 			ascaleY = (float)Math.sqrt(b * b + d * d);

@@ -96,7 +96,7 @@ function SkeletonJson.new (attachmentLoader)
 		for i,boneMap in ipairs(root["bones"]) do
 			local boneName = boneMap["name"]
 
-			local parent = nil
+			local parent
 			local parentName = boneMap["parent"]
 			if parentName then
 				parent = skeletonData:findBone(parentName)
@@ -216,7 +216,7 @@ function SkeletonJson.new (attachmentLoader)
 				data.offsetScaleY = getValue(constraintMap, "scaleY", 0)
 				data.offsetShearY = getValue(constraintMap, "shearY", 0)
 
-				data.mixRotate = getValue(constraintMap, "rotateMix", 1)
+				data.mixRotate = getValue(constraintMap, "mixRotate", 1)
 				data.mixX = getValue(constraintMap, "mixX", 1)
 				data.mixY = getValue(constraintMap, "mixY", data.mixX)
 				data.mixScaleX = getValue(constraintMap, "mixScaleX", 1)
@@ -790,7 +790,7 @@ function SkeletonJson.new (attachmentLoader)
 			for constraintName,timelineMap in pairs(ik) do
 				local keyMap = timelineMap[1]
 				if keyMap then
-					local constraintIndex = -1
+					local constraintIndex
 					for i,other in pairs(skeletonData.ikConstraints) do
 						if other.name == constraintName then
 							constraintIndex = i
@@ -829,8 +829,8 @@ function SkeletonJson.new (attachmentLoader)
 						mix = mix2
 						softness = softness2
 					end
+					table_insert(timelines, timeline)
 				end
-				table_insert(timelines, timeline)
 			end
 		end
 
@@ -840,7 +840,7 @@ function SkeletonJson.new (attachmentLoader)
 			for constraintName, timelineMap in pairs(transform) do
 				local keyMap = timelineMap[1]
 				if keyMap then
-					local constraintIndex = -1
+					local constraintIndex
 					for i,other in pairs(skeletonData.transformConstraints) do
 						if other.name == constraintName then
 							constraintIndex = i
@@ -896,7 +896,7 @@ function SkeletonJson.new (attachmentLoader)
 		-- Path constraint timelines.
 		if map.path then
 			for constraintName,constraintMap in pairs(map.path) do
-				local constraint, constraintIndex = -1
+				local constraint, constraintIndex
 				for i,other in pairs(skeletonData.pathConstraints) do
 					if other.name == constraintName then
 						constraintIndex = i
@@ -978,7 +978,7 @@ function SkeletonJson.new (attachmentLoader)
 							local bezier = 0
 							for i,keyMap in ipairs(timelineMap) do
 								local frame = i - 1
-								local deform = nil
+								local deform
 								local verticesValue = getValue(keyMap, "vertices", nil)
 								if verticesValue == nil then
 									if weighted then
@@ -1031,7 +1031,7 @@ function SkeletonJson.new (attachmentLoader)
 			local slotCount = #skeletonData.slots
 			local frame = 0
 			for _,drawOrderMap in ipairs(map["drawOrder"]) do
-				local drawOrder = nil
+				local drawOrder
 				local offsets = drawOrderMap["offsets"]
 				if offsets then
 					drawOrder = {}

@@ -1301,7 +1301,6 @@ function Animation.AttachmentTimeline.new (frameCount, bezierCount, slotIndex)
 	end
 
 	local function setAttachment (skeleton, slot, attachmentName)
-		local attachmentName = self.attachmentNames[frameIndex]
 		if not attachmentName then
 			slot:setAttachment(nil)
 		else
@@ -1543,7 +1542,7 @@ function Animation.DeformTimeline.new (frameCount, bezierCount, slotIndex, attac
 		local percent = self:getCurvePercent(time, frame)
 		local prevVertices = vertices[frame]
 		local nextVertices = vertices[frame + 1]
-
+		
 		if alpha == 1 then
 			if blend == MixBlend.add then
 				if vertexAttachment.bones == nil then
@@ -1764,7 +1763,6 @@ function Animation.IkConstraintTimeline.new (frameCount, bezierCount, ikConstrai
 	function self:apply (skeleton, lastTime, time, events, alpha, blend, direction)
 		local constraint = skeleton.ikConstraints[self.ikConstraintIndex]
 		if not constraint.active then return end
-		
 		local frames = self.frames
 		if time < frames[0] then
 			if blend == MixBlend.setup then
@@ -1786,7 +1784,7 @@ function Animation.IkConstraintTimeline.new (frameCount, bezierCount, ikConstrai
 		local mix = 0
 		local softness = 0
 		local i = search(frames, time, ENTRIES)
-		local curveType = this.curves[i / ENTRIES]
+		local curveType = self.curves[i / ENTRIES]
 		if curveType == LINEAR then
 			local before = frames[i]
 			mix = frames[i + MIX]
@@ -1888,7 +1886,7 @@ function Animation.TransformConstraintTimeline.new (frameCount, bezierCount, tra
 		local scaleY
 		local shearY
 		local i = search(frames, time, ENTRIES)
-		local curveType = this.curves[i / ENTRIES]
+		local curveType = self.curves[i / ENTRIES]
 		if curveType == LINEAR then
 			local before = frames[i]
 			rotate = frames[i + ROTATE]
@@ -2061,9 +2059,9 @@ function Animation.PathConstraintMixTimeline.new (frameCount, bezierCount, pathC
 			x = frames[i + X]
 			y = frames[i + Y]
 		else
-			rotate = this.getBezierValue(time, i, ROTATE, curveType - BEZIER)
-			x = this.getBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER)
-			y = this.getBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER)
+			rotate = self:getBezierValue(time, i, ROTATE, curveType - BEZIER)
+			x = self:getBezierValue(time, i, X, curveType + BEZIER_SIZE - BEZIER)
+			y = self:getBezierValue(time, i, Y, curveType + BEZIER_SIZE * 2 - BEZIER)
 		end
 
 		if blend == MixBlend.setup then

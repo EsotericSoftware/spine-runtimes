@@ -101,11 +101,15 @@ function PathConstraint:update ()
 
 	local bones = self.bones
 	local boneCount = #bones
-	local spacesCount = boneCount
-	if tangents then spacesCount = spacesCount + 1 end
+	local spacesCount
+	if tangents then
+		spacesCount = boneCount
+	else
+		spacesCount = boneCount + 1
+	end
 	local spaces = utils.setArraySize(self.spaces, spacesCount)
-	local lengths = nil
-	if scale then lengths = Utils.setArraySize(this.lengths, boneCount) end
+	local lengths
+	if scale then lengths = utils.setArraySize(self.lengths, boneCount) end
 	local spacing = self.spacing
 
 	if data.spacingMode == PathConstraintData.SpacingMode.percent then
@@ -113,20 +117,20 @@ function PathConstraint:update ()
 			local i = 0
 			local n = spacesCount - 1
 			while i < n do
-				local bone = bones[i]
+				local bone = bones[i + 1]
 				local setupLength = bone.data.length
 				if setupLength < epsilon then
-					lengths[i] = 0
+					lengths[i + 1] = 0
 				else
 					local x = setupLength * bone.a
 					local y = setupLength * bone.c
-					lengths[i] = math_sqrt(x * x + y * y)
+					lengths[i + 1] = math_sqrt(x * x + y * y)
 				end
 				i = i + 1
 			end
 		end
-		local i = 1
-		while i < spacesCount do
+		local i = 2
+		while i <= spacesCount do
 			spaces[i] = spacing
 			i = i + 1
 		end
@@ -134,46 +138,46 @@ function PathConstraint:update ()
 		local sum = 0
 		local i = 0
 		while i < boneCount do
-			local bone = bones[i]
+			local bone = bones[i + 1]
 			local setupLength = bone.data.length
 			if setupLength < epsilon then
-				if scale then lengths[i] = 0 end
+				if scale then lengths[i + 1] = 0 end
 				i = i + 1
-				spaces[i] = spacing
+				spaces[i + 1] = spacing
 			else
 				local x = setupLength * bone.a
 				local y = setupLength * bone.c
 				local length = math_sqrt(x * x + y * y)
-				if scale then lengths[i] = length end
+				if scale then lengths[i + 1] = length end
 				i = i + 1
-				spaces[i] = length
+				spaces[i + 1] = length
 				sum = sum + length
 			end
 		end
 		if sum > 0 then
 			sum = spacesCount / sum * spacing
-			local i = 1
-			while i < spacesCount do
+			local i = 2
+			while i <= spacesCount do
 				spaces[i] = spaces[i] * sum
 				i = i + 1
 			end
 		end
 	else
 		local lengthSpacing = data.spacingMode == PathConstraintData.SpacingMode.length
-		local i = 1
+		local i = 0
 		local n = spacesCount - 1
 		while i < n do
-			local bone = bones[i]
+			local bone = bones[i + 1]
 			local setupLength = bone.data.length
 			if setupLength < epsilon then
-				if scale then lengths[i] = 0 end
+				if scale then lengths[i + 1] = 0 end
 				i = i + 1
-				spaces[i] = spacing
+				spaces[i + 1] = spacing
 			else
 				local x = setupLength * bone.a
 				local y = setupLength * bone.c
 				local length = math_sqrt(x * x + y * y)
-				if scale then lengths[i] = length end
+				if scale then lengths[i + 1] = length end
 				i = i + 1
 				local s
 				if lengthSpacing then
@@ -181,7 +185,7 @@ function PathConstraint:update ()
 				else
 					s = spacing
 				end
-				spaces[i] = s * length / setupLength
+				spaces[i + 1] = s * length / setupLength
 			end
 		end
 	end
@@ -190,7 +194,7 @@ function PathConstraint:update ()
 	local boneX = positions[1]
 	local boneY = positions[2]
 	local offsetRotation = data.offsetRotation
-	local tip = false
+	local tip
 	if offsetRotation == 0 then
 		tip = data.rotateMode == PathConstraintData.RotateMode.chain
 	else
@@ -272,7 +276,7 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents)
 	local position = self.position
 	local spaces = self.spaces
 	local out = utils.setArraySize(self.positions, spacesCount * 3 + 2)
-	local world = nil
+	local world
 	local closed = path.closed
 	local verticesLength = path.worldVerticesLength
 	local curveCount = verticesLength / 6
@@ -292,7 +296,6 @@ function PathConstraint:computeWorldPositions (path, spacesCount, tangents)
 			multiplier = pathLength / spacesCount
 		end
 		world = utils.setArraySize(self.world, 8)
-		i = 0
 		local o = 0
 		local curve = 0
 		while i < spacesCount do
