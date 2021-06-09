@@ -66,7 +66,7 @@ package spine {
 					apply1(bones[0], target.worldX, target.worldY, compress, stretch, _data.uniform, mix);
 					break;
 				case 2:
-					apply2(bones[0], bones[1], target.worldX, target.worldY, bendDirection, stretch, softness, mix);
+					apply2(bones[0], bones[1], target.worldX, target.worldY, bendDirection, stretch, _data.uniform, softness, mix);
 					break;
 			}
 		}
@@ -132,8 +132,8 @@ package spine {
 		/** Adjusts the parent and child bone rotations so the tip of the child is as close to the target position as possible. The
 		 * target is specified in the world coordinate system.
 		 * @param child Any descendant bone of the parent. */
-		static public function apply2(parent : Bone, child : Bone, targetX : Number, targetY : Number, bendDir : int, stretch : Boolean, softness: Number, alpha : Number) : void {
-			var px : Number = parent.ax, py : Number = parent.ay, psx : Number = parent.ascaleX, sx : Number = psx, psy : Number = parent.ascaleY, csx : Number = child.ascaleX;
+		static public function apply2(parent : Bone, child : Bone, targetX : Number, targetY : Number, bendDir : int, stretch : Boolean, uniform : Boolean, softness: Number, alpha : Number) : void {
+			var px : Number = parent.ax, py : Number = parent.ay, psx : Number = parent.ascaleX, psy : Number = parent.ascaleY, sx : Number = psx, sy : Number = psy, csx : Number = child.ascaleX;
 			var os1 : int, os2 : int, s2 : int;
 			if (psx < 0) {
 				psx = -psx;
@@ -154,7 +154,7 @@ package spine {
 				os2 = 0;
 			var cx : Number = child.ax, cy : Number, cwx : Number, cwy : Number, a : Number = parent.a, b : Number = parent.b, c : Number = parent.c, d : Number = parent.d;
 			var u : Boolean = Math.abs(psx - psy) <= 0.0001;
-			if (!u) {
+			if (!u || stretch) {
 				cy = 0;
 				cwx = a * cx + parent.worldX;
 				cwy = c * cx + parent.worldY;
@@ -181,7 +181,7 @@ package spine {
 			var tx : Number = (x * d - y * b) * id - px, ty : Number = (y * a - x * c) * id - py;
 			var dd : Number = tx * tx + ty * ty;
 			if (softness != 0) {
-				softness *= psx * (csx + 1) / 2;
+				softness *= psx * (csx + 1) * 0.5;
 				var td : Number = Math.sqrt(dd), sd : Number = td - l1 - l2 * psx + softness;
 				if (sd > 0) {
 					var p : Number = Math.min(1, sd / (softness * 2)) - 1;
@@ -195,13 +195,19 @@ package spine {
 			if (u) {
 				l2 *= psx;
 				var cos : Number = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-				if (cos < -1)
+				if (cos < -1) {
 					cos = -1;
-				else if (cos > 1) {
+					a2 = Math.PI * bendDir;
+				} else if (cos > 1) {
 					cos = 1;
-					if (stretch) sx *= (Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
-				}
-				a2 = Math.acos(cos) * bendDir;
+					a2 = 0;
+					if (stretch) {
+						a = (Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+						sx *= a;
+						if (uniform) sy *= a;
+					}
+				} else
+					a2 = Math.acos(cos) * bendDir;
 				a = l1 + l2 * cos;
 				b = l2 * Math.sin(a2);
 				a1 = Math.atan2(ty * a - tx * b, tx * a + ty * b);
@@ -215,7 +221,7 @@ package spine {
 				if (d >= 0) {
 					var q : Number = Math.sqrt(d);
 					if (c1 < 0) q = -q;
-					q = -(c1 + q) / 2;
+					q = -(c1 + q) * 0.5;
 					var r0 : Number = q / c2, r1 : Number = c / q;
 					var r : Number = Math.abs(r0) < Math.abs(r1) ? r0 : r1;
 					if (r * r <= dd) {
@@ -246,7 +252,7 @@ package spine {
 						maxY = y;
 					}
 				}
-				if (dd <= (minDist + maxDist) / 2) {
+				if (dd <= (minDist + maxDist) * 0.5) {
 					a1 = ta - Math.atan2(minY * bendDir, minX);
 					a2 = minAngle * bendDir;
 				} else {
@@ -260,7 +266,7 @@ package spine {
 			if (a1 > 180)
 				a1 -= 360;
 			else if (a1 < -180) a1 += 360;
-			parent.updateWorldTransformWith(px, py, rotation + a1 * alpha, sx, parent.ascaleY, 0, 0);
+			parent.updateWorldTransformWith(px, py, rotation + a1 * alpha, sx, sy, 0, 0);
 			rotation = child.arotation;
 			a2 = ((a2 + os) * MathUtils.radDeg - child.ashearX) * s2 + os2 - rotation;
 			if (a2 > 180)

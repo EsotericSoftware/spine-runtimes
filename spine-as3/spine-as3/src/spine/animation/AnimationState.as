@@ -302,7 +302,7 @@ package spine.animation {
 					}
 					from.totalAlpha += alpha;
 					if (timeline is RotateTimeline)
-						applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
+						applyRotateTimeline(RotateTimeline(timeline), skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1, firstFrame);
 					else if (timeline is AttachmentTimeline) {
 						applyAttachmentTimeline(AttachmentTimeline(timeline), skeleton, applyTime, timelineBlend, attachments);
 					} else {

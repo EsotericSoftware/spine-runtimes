@@ -35,7 +35,7 @@ package spine.animation {
 
 		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
 		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
-		public function CurveTimeline1 (frameCount : int, bezierCount : int, propertyId : string) {
+		public function CurveTimeline1 (frameCount : int, bezierCount : int, propertyId : String) {
 			super(frameCount, bezierCount, [ propertyId ]);
 		}
 

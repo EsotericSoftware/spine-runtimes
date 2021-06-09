@@ -466,7 +466,7 @@ package spine {
 							rgbaTimeline.setFrame(frame, time, rgba.r, rgba.g, rgba.b, rgba.a);
 							nextMap = timelineMap[frame + 1];
 							if (!nextMap) {
-								timeline.shrink(bezier);
+								rgbaTimeline.shrink(bezier);
 								break;
 							}
 							time2 = getNumber(nextMap, "time", 0);
@@ -494,7 +494,7 @@ package spine {
 							rgbTimeline.setFrame(frame, time, rgb.r, rgb.g, rgb.b);
 							nextMap = timelineMap[frame + 1];
 							if (!nextMap) {
-								timeline.shrink(bezier);
+								rgbTimeline.shrink(bezier);
 								break;
 							}
 							time2 = getNumber(nextMap, "time", 0);
@@ -525,7 +525,7 @@ package spine {
 							rgba2Timeline.setFrame(frame, time, lighta.r, lighta.g, lighta.b, lighta.a, darka.r, darka.g, darka.b);
 							nextMap = timelineMap[frame + 1];
 							if (!nextMap) {
-								timeline.shrink(bezier);
+								rgba2Timeline.shrink(bezier);
 								break;
 							}
 							time2 = getNumber(nextMap, "time", 0);
@@ -560,7 +560,7 @@ package spine {
 							rgb2Timeline.setFrame(frame, time, light.r, light.g, light.b, dark.r, dark.g, dark.b);
 							nextMap = timelineMap[frame + 1];
 							if (!nextMap) {
-								timeline.shrink(bezier);
+								rgb2Timeline.shrink(bezier);
 								break;
 							}
 							time2 = getNumber(nextMap, "time", 0);
@@ -650,7 +650,7 @@ package spine {
 					ikTimeline.setFrame(frame, time, mix, softness, getValue(keyMap, "bendPositive", true) ? 1 : -1, getValue(keyMap, "compress", false), getValue(keyMap, "stretch", false));
 					nextMap = timelineMap[frame + 1];
 					if (!nextMap) {
-						timeline.shrink(bezier);
+						ikTimeline.shrink(bezier);
 						break;
 					}
 
@@ -696,7 +696,7 @@ package spine {
 					transformTimeline.setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
 					nextMap = timelineMap[frame + 1];
 					if (!nextMap) {
-						timeline.shrink(bezier);
+						transformTimeline.shrink(bezier);
 						break;
 					}
 
@@ -758,7 +758,7 @@ package spine {
 							mixTimeline.setFrame(frame, time, mixRotate, mixX, mixY);
 							nextMap = timelineMap[frame + 1];
 							if (!nextMap) {
-								timeline.shrink(bezier);
+								mixTimeline.shrink(bezier);
 								break;
 							}
 							time2 = getNumber(nextMap, "time", 0);
@@ -829,7 +829,7 @@ package spine {
 							deformTimeline.setFrame(frame, time, deform);
 							nextMap = timelineMap[frame + 1];
 							if (!nextMap) {
-								timeline.shrink(bezier);
+								deformTimeline.shrink(bezier);
 								break;
 							}
 							time2 = getNumber(nextMap, "time", 0);
@@ -844,7 +844,7 @@ package spine {
 			}
 
 			// Draw order timelines.
-			var drawOrdersp : Array = map["drawOrder"];
+			var drawOrders : Array = map["drawOrder"];
 			if (drawOrders) {
 				var drawOrderTimeline : DrawOrderTimeline = new DrawOrderTimeline(drawOrders.length);
 				var slotCount : int = skeletonData.slots.length;
