@@ -501,7 +501,7 @@ declare module spine {
 		isActive(): boolean;
 		update(): void;
 		apply1(bone: Bone, targetX: number, targetY: number, compress: boolean, stretch: boolean, uniform: boolean, alpha: number): void;
-		apply2(parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, softness: number, alpha: number): void;
+		apply2(parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, uniform: boolean, softness: number, alpha: number): void;
 	}
 }
 declare module spine {
@@ -1327,7 +1327,7 @@ declare module spine.webgl {
 		static DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL: boolean;
 		constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap, useMipMaps?: boolean);
 		setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
-		static validateMagFilter(magFilter: TextureFilter): TextureFilter.Nearest | TextureFilter.Linear;
+		static validateMagFilter(magFilter: TextureFilter): TextureFilter.Nearest | TextureFilter.Linear | TextureFilter.Linear;
 		setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
 		update(useMipMaps: boolean): void;
 		restore(): void;

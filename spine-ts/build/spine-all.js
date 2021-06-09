@@ -6,8 +6,6 @@ var __extends = (this && this.__extends) || (function () {
 		return extendStatics(d, b);
 	};
 	return function (d, b) {
-		if (typeof b !== "function" && b !== null)
-			throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
 		d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -3397,7 +3395,7 @@ var spine;
 					this.apply1(bones[0], target.worldX, target.worldY, this.compress, this.stretch, this.data.uniform, this.mix);
 					break;
 				case 2:
-					this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.stretch, this.softness, this.mix);
+					this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.stretch, this.data.uniform, this.softness, this.mix);
 					break;
 			}
 		};
@@ -3448,8 +3446,8 @@ var spine;
 			}
 			bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY);
 		};
-		IkConstraint.prototype.apply2 = function (parent, child, targetX, targetY, bendDir, stretch, softness, alpha) {
-			var px = parent.ax, py = parent.ay, psx = parent.ascaleX, sx = psx, psy = parent.ascaleY, csx = child.ascaleX;
+		IkConstraint.prototype.apply2 = function (parent, child, targetX, targetY, bendDir, stretch, uniform, softness, alpha) {
+			var px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, sx = psx, sy = psy, csx = child.ascaleX;
 			var os1 = 0, os2 = 0, s2 = 0;
 			if (psx < 0) {
 				psx = -psx;
@@ -3472,7 +3470,7 @@ var spine;
 				os2 = 0;
 			var cx = child.ax, cy = 0, cwx = 0, cwy = 0, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
 			var u = Math.abs(psx - psy) <= 0.0001;
-			if (!u) {
+			if (!u || stretch) {
 				cy = 0;
 				cwx = a * cx + parent.worldX;
 				cwy = c * cx + parent.worldY;
@@ -3500,7 +3498,7 @@ var spine;
 			var tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
 			var dd = tx * tx + ty * ty;
 			if (softness != 0) {
-				softness *= psx * (csx + 1) / 2;
+				softness *= psx * (csx + 1) * 0.5;
 				var td = Math.sqrt(dd), sd = td - l1 - l2 * psx + softness;
 				if (sd > 0) {
 					var p = Math.min(1, sd / (softness * 2)) - 1;
@@ -3513,14 +3511,22 @@ var spine;
 			outer: if (u) {
 				l2 *= psx;
 				var cos = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-				if (cos < -1)
+				if (cos < -1) {
 					cos = -1;
+					a2 = Math.PI * bendDir;
+				}
 				else if (cos > 1) {
 					cos = 1;
-					if (stretch)
-						sx *= (Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+					a2 = 0;
+					if (stretch) {
+						a = (Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+						sx *= a;
+						if (uniform)
+							sy *= a;
+					}
 				}
-				a2 = Math.acos(cos) * bendDir;
+				else
+					a2 = Math.acos(cos) * bendDir;
 				a = l1 + l2 * cos;
 				b = l2 * Math.sin(a2);
 				a1 = Math.atan2(ty * a - tx * b, tx * a + ty * b);
@@ -3536,7 +3542,7 @@ var spine;
 					var q = Math.sqrt(d);
 					if (c1 < 0)
 						q = -q;
-					q = -(c1 + q) / 2;
+					q = -(c1 + q) * 0.5;
 					var r0 = q / c2, r1 = c / q;
 					var r = Math.abs(r0) < Math.abs(r1) ? r0 : r1;
 					if (r * r <= dd) {
@@ -3567,7 +3573,7 @@ var spine;
 						maxY = y;
 					}
 				}
-				if (dd <= (minDist + maxDist) / 2) {
+				if (dd <= (minDist + maxDist) * 0.5) {
 					a1 = ta - Math.atan2(minY * bendDir, minX);
 					a2 = minAngle * bendDir;
 				}
@@ -3583,7 +3589,7 @@ var spine;
 				a1 -= 360;
 			else if (a1 < -180)
 				a1 += 360;
-			parent.updateWorldTransformWith(px, py, rotation + a1 * alpha, sx, parent.ascaleY, 0, 0);
+			parent.updateWorldTransformWith(px, py, rotation + a1 * alpha, sx, sy, 0, 0);
 			rotation = child.arotation;
 			a2 = ((a2 + os) * spine.MathUtils.radDeg - child.ashearX) * s2 + os2 - rotation;
 			if (a2 > 180)

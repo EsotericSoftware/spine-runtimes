@@ -89,7 +89,7 @@ module spine {
 				this.apply1(bones[0], target.worldX, target.worldY, this.compress, this.stretch, this.data.uniform, this.mix);
 				break;
 			case 2:
-				this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.stretch, this.softness, this.mix);
+				this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.stretch, this.data.uniform, this.softness, this.mix);
 				break;
 			}
 		}
@@ -146,8 +146,8 @@ module spine {
 
 		/** Applies 2 bone IK. The target is specified in the world coordinate system.
 		 * @param child A direct descendant of the parent bone. */
-		apply2 (parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, softness: number, alpha: number) {
-			let px = parent.ax, py = parent.ay, psx = parent.ascaleX, sx = psx, psy = parent.ascaleY, csx = child.ascaleX;
+		apply2 (parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, uniform: boolean, softness: number, alpha: number) {
+			let px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, sx = psx, sy = psy, csx = child.ascaleX;
 			let os1 = 0, os2 = 0, s2 = 0;
 			if (psx < 0) {
 				psx = -psx;
@@ -168,7 +168,7 @@ module spine {
 				os2 = 0;
 			let cx = child.ax, cy = 0, cwx = 0, cwy = 0, a = parent.a, b = parent.b, c = parent.c, d = parent.d;
 			let u = Math.abs(psx - psy) <= 0.0001;
-			if (!u) {
+			if (!u || stretch) {
 				cy = 0;
 				cwx = a * cx + parent.worldX;
 				cwy = c * cx + parent.worldY;
@@ -195,7 +195,7 @@ module spine {
 			let tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
 			let dd = tx * tx + ty * ty;
 			if (softness != 0) {
-				softness *= psx * (csx + 1) / 2;
+				softness *= psx * (csx + 1) * 0.5;
 				let td = Math.sqrt(dd), sd = td - l1 - l2 * psx + softness;
 				if (sd > 0) {
 					let p = Math.min(1, sd / (softness * 2)) - 1;
@@ -209,13 +209,19 @@ module spine {
 			if (u) {
 				l2 *= psx;
 				let cos = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-				if (cos < -1)
+				if (cos < -1) {
 					cos = -1;
-				else if (cos > 1) {
+					a2 = Math.PI * bendDir;
+				} else if (cos > 1) {
 					cos = 1;
-					if (stretch) sx *= (Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
-				}
-				a2 = Math.acos(cos) * bendDir;
+					a2 = 0;
+					if (stretch) {
+						a = (Math.sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+						sx *= a;
+						if (uniform) sy *= a;
+					}
+				} else
+					a2 = Math.acos(cos) * bendDir;
 				a = l1 + l2 * cos;
 				b = l2 * Math.sin(a2);
 				a1 = Math.atan2(ty * a - tx * b, tx * a + ty * b);
@@ -229,7 +235,7 @@ module spine {
 				if (d >= 0) {
 					let q = Math.sqrt(d);
 					if (c1 < 0) q = -q;
-					q = -(c1 + q) / 2;
+					q = -(c1 + q) * 0.5;
 					let r0 = q / c2, r1 = c / q;
 					let r = Math.abs(r0) < Math.abs(r1) ? r0 : r1;
 					if (r * r <= dd) {
@@ -260,7 +266,7 @@ module spine {
 						maxY = y;
 					}
 				}
-				if (dd <= (minDist + maxDist) / 2) {
+				if (dd <= (minDist + maxDist) * 0.5) {
 					a1 = ta - Math.atan2(minY * bendDir, minX);
 					a2 = minAngle * bendDir;
 				} else {
@@ -275,7 +281,7 @@ module spine {
 				a1 -= 360;
 			else if (a1 < -180) //
 				a1 += 360;
-			parent.updateWorldTransformWith(px, py, rotation + a1 * alpha, sx, parent.ascaleY, 0, 0);
+			parent.updateWorldTransformWith(px, py, rotation + a1 * alpha, sx, sy, 0, 0);
 			rotation = child.arotation;
 			a2 = ((a2 + os) * MathUtils.radDeg - child.ashearX) * s2 + os2 - rotation;
 			if (a2 > 180)
