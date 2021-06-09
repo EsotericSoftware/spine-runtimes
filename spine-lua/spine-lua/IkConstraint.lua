@@ -83,7 +83,7 @@ function IkConstraint:update ()
 	if boneCount == 1 then
 		self:apply1(bones[1], target.worldX, target.worldY, self.compress, self.stretch, self.data.uniform, self.mix)
 	elseif boneCount == 2 then
-		self:apply2(bones[1], bones[2], target.worldX, target.worldY, self.bendDirection, self.stretch, self.softness, self.mix)
+		self:apply2(bones[1], bones[2], target.worldX, target.worldY, self.bendDirection, self.stretch, self.data.uniform, self.softness, self.mix)
 	end
 end
 
@@ -146,12 +146,13 @@ function IkConstraint:apply1 (bone, targetX, targetY, compress, stretch, uniform
 	bone:updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY)
 	end
 
-function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch, softness, alpha)
+function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch, uniform, softness, alpha)
 	local px = parent.ax
 	local py = parent.ay
 	local psx = parent.ascaleX
-	local sx = psx
 	local psy = parent.ascaleY
+	local sx = psx
+	local sy = psy
 	local csx = child.ascaleX
 	local os1 = 0
 	local os2 = 0
@@ -183,7 +184,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 	local c = parent.c
 	local d = parent.d
 	local u = math_abs(psx - psy) <= 0.0001
-	if not u then
+	if not u or stretch then
 		cy = 0
 		cwx = a * cx + parent.worldX
 		cwy = c * cx + parent.worldY
@@ -217,7 +218,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 	local ty = (y * a - x * c) * id - py
 	local dd = tx * tx + ty * ty
 	if softness ~= 0 then
-		softness = softness * (psx * (csx + 1) / 2)
+		softness = softness * (psx * (csx + 1) * 0.5)
 		local td = math_sqrt(dd)
 		local sd = td - l1 - l2 * psx + softness
 		if sd > 0 then
@@ -234,11 +235,18 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 		local cos = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2)
 		if cos < -1 then
 			cos = -1
+			a2 = math_pi * bendDir
 		elseif cos > 1 then
 			cos = 1
-			if stretch then sx = sx * ((math_sqrt(dd) / (l1 + l2) - 1) * alpha + 1) end
+			a2 = 0
+			if stretch then
+				a = ((math_sqrt(dd) / (l1 + l2) - 1) * alpha + 1)
+				sx = sx * a
+				if uniform then sy = sy * a end
+			end
+		else
+			a2 = math_acos(cos) * bendDir
 		end
-		a2 = math_acos(cos) * bendDir
 		a = l1 + l2 * cos
 		b = l2 * math_sin(a2)
 		a1 = math_atan2(ty * a - tx * b, tx * a + ty * b)
@@ -256,7 +264,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 		if d >= 0 then
 			local q = math_sqrt(d)
 			if c1 < 0 then q = -q end
-			q = -(c1 + q) / 2
+			q = -(c1 + q) * 0.5
 			local r0 = q / c2
 			local r1 = c / q
 			local r = r1
@@ -296,7 +304,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 					maxY = y
 				end
 			end
-			if dd <= (minDist + maxDist) / 2 then
+			if dd <= (minDist + maxDist) * 0.5 then
 				a1 = ta - math_atan2(minY * bendDir, minX)
 				a2 = minAngle * bendDir
 			else
@@ -313,7 +321,7 @@ function IkConstraint:apply2 (parent, child, targetX, targetY, bendDir, stretch,
 	elseif a1 < -180 then
 		a1 = a1 + 360
 	end
-	parent:updateWorldTransformWith(px, py, rotation + a1 * alpha, sx, parent.ascaleY, 0, 0)
+	parent:updateWorldTransformWith(px, py, rotation + a1 * alpha, sx, sy, 0, 0)
 	rotation = child.rotation
 	a2 = (math_deg(a2 + os) - child.ashearX) * s2 + os2 - rotation
 	if a2 > 180 then
