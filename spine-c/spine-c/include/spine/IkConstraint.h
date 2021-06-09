@@ -67,7 +67,7 @@ spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boolean*
 					  int /*boolean*/ uniform, float alpha);
 
 SP_API void spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float targetY, int bendDirection,
-								  int /*boolean*/ stretch, float softness, float alpha);
+								  int /*boolean*/ stretch, int /*boolean*/ uniform, float softness, float alpha);
 
 #ifdef __cplusplus
 }

@@ -66,7 +66,7 @@ void spIkConstraint_update(spIkConstraint *self) {
 			break;
 		case 2:
 			spIkConstraint_apply2(self->bones[0], self->bones[1], self->target->worldX, self->target->worldY,
-								  self->bendDirection, self->stretch, self->softness, self->mix);
+								  self->bendDirection, self->stretch, self->data->uniform, self->softness, self->mix);
 			break;
 	}
 }
@@ -128,9 +128,9 @@ spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boolean*
 
 void
 spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float targetY, int bendDir, int /*boolean*/ stretch,
-					  float softness, float alpha) {
+					  int /*boolean*/ uniform, float softness, float alpha) {
 	float a, b, c, d;
-	float px, py, psx, sx, psy;
+	float px, py, psx, psy, sx, sy;
 	float cx, cy, csx, cwx, cwy;
 	int o1, o2, s2, u;
 	spBone *pp = parent->parent;
@@ -141,8 +141,9 @@ spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float target
 	px = parent->ax;
 	py = parent->ay;
 	psx = parent->ascaleX;
-	sx = psx;
 	psy = parent->ascaleY;
+	sx = psx;
+	sy = psy;
 	csx = child->ascaleX;
 	if (psx < 0) {
 		psx = -psx;
@@ -164,7 +165,7 @@ spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float target
 	r = psx - psy;
 	cx = child->ax;
 	u = (r < 0 ? -r : r) <= 0.0001f;
-	if (!u) {
+	if (!u || stretch) {
 		cy = 0;
 		cwx = parent->a * cx + parent->worldX;
 		cwy = parent->c * cx + parent->worldY;
@@ -196,7 +197,7 @@ spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float target
 	ty = (y * a - x * c) * id - py;
 	dd = tx * tx + ty * ty;
 	if (softness != 0) {
-		softness *= psx * (csx + 1) / 2;
+		softness *= psx * (csx + 1) * 0.5f;
 		td = SQRT(dd);
 		sd = td - l1 - l2 * psx + softness;
 		if (sd > 0) {
@@ -211,12 +212,19 @@ spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float target
 		float cosine;
 		l2 *= psx;
 		cosine = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-		if (cosine < -1) cosine = -1;
-		else if (cosine > 1) {
+		if (cosine < -1) {
+			cosine = -1;
+			a2 = PI * bendDir;
+		} else if (cosine > 1) {
 			cosine = 1;
-			if (stretch) sx *= (SQRT(dd) / (l1 + l2) - 1) * alpha + 1;
-		}
-		a2 = ACOS(cosine) * bendDir;
+			a2 = 0;
+			if (stretch) {
+				a = (SQRT(dd) / (l1 + l2) - 1) * alpha + 1;
+				sx *= a;
+				if (uniform) sy *= a;
+			}
+		} else
+			a2 = ACOS(cosine) * bendDir;
 		a = l1 + l2 * cosine;
 		b = l2 * SIN(a2);
 		a1 = ATAN2(ty * a - tx * b, tx * a + ty * b);
@@ -229,7 +237,7 @@ spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float target
 		if (d >= 0) {
 			float q = SQRT(d), r0, r1;
 			if (c1 < 0) q = -q;
-			q = -(c1 + q) / 2;
+			q = -(c1 + q) * 0.5f;
 			r0 = q / c2;
 			r1 = c0 / q;
 			r = ABS(r0) < ABS(r1) ? r0 : r1;
@@ -262,7 +270,7 @@ spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float target
 					maxY = y;
 				}
 			}
-			if (dd <= (minDist + maxDist) / 2) {
+			if (dd <= (minDist + maxDist) * 0.5f) {
 				a1 = ta - ATAN2(minY * bendDir, minX);
 				a2 = minAngle * bendDir;
 			} else {
@@ -274,14 +282,16 @@ spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float target
 	break_outer:
 	{
 		float os = ATAN2(cy, cx) * s2;
-		a1 = (a1 - os) * RAD_DEG + o1 - parent->arotation;
+		float rotation = parent->arotation;
+		a1 = (a1 - os) * RAD_DEG + o1 -rotation;
 		if (a1 > 180) a1 -= 360;
 		else if (a1 < -180) a1 += 360;
-		spBone_updateWorldTransformWith(parent, px, py, parent->arotation + a1 * alpha, sx, parent->ascaleY, 0, 0);
-		a2 = ((a2 + os) * RAD_DEG - child->ashearX) * s2 + o2 - child->arotation;
+		spBone_updateWorldTransformWith(parent, px, py, rotation + a1 * alpha, sx, sy, 0, 0);
+		rotation = child->arotation;
+		a2 = ((a2 + os) * RAD_DEG - child->ashearX) * s2 + o2 - rotation;
 		if (a2 > 180) a2 -= 360;
 		else if (a2 < -180) a2 += 360;
-		spBone_updateWorldTransformWith(child, cx, cy, child->arotation + a2 * alpha, child->ascaleX, child->ascaleY,
+		spBone_updateWorldTransformWith(child, cx, cy, rotation + a2 * alpha, child->ascaleX, child->ascaleY,
 										child->ashearX, child->ashearY);
 	}
 }

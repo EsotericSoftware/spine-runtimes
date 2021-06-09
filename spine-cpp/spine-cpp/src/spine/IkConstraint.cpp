@@ -95,10 +95,10 @@ IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress, boo
 }
 
 void
-IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, float softness,
+IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, bool uniform, float softness,
 					float alpha) {
 	float a, b, c, d;
-	float px, py, psx, sx, psy;
+	float px, py, psx, psy, sx, sy;
 	float cx, cy, csx, cwx, cwy;
 	int o1, o2, s2, u;
 	Bone *pp = parent.getParent();
@@ -107,8 +107,9 @@ IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int
 	px = parent._ax;
 	py = parent._ay;
 	psx = parent._ascaleX;
-	sx = psx;
 	psy = parent._ascaleY;
+	sx = psx;
+	sy = psy;
 	csx = child._ascaleX;
 	if (psx < 0) {
 		psx = -psx;
@@ -130,7 +131,7 @@ IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int
 	r = psx - psy;
 	cx = child._ax;
 	u = (r < 0 ? -r : r) <= 0.0001f;
-	if (!u) {
+	if (!u || stretch) {
 		cy = 0;
 		cwx = parent._a * cx + parent._worldX;
 		cwy = parent._c * cx + parent._worldY;
@@ -160,7 +161,7 @@ IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int
 	tx = (x * d - y * b) * id - px, ty = (y * a - x * c) * id - py;
 	dd = tx * tx + ty * ty;
 	if (softness != 0) {
-		softness *= psx * (csx + 1) / 2;
+		softness *= psx * (csx + 1) * 0.5f;
 		td = MathUtil::sqrt(dd), sd = td - l1 - l2 * psx + softness;
 		if (sd > 0) {
 			p = MathUtil::min(1.0f, sd / (softness * 2)) - 1;
@@ -174,12 +175,19 @@ IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int
 		float cosine;
 		l2 *= psx;
 		cosine = (dd - l1 * l1 - l2 * l2) / (2 * l1 * l2);
-		if (cosine < -1) cosine = -1;
-		else if (cosine > 1) {
+		if (cosine < -1) {
+			cosine = -1;
+			a2 = MathUtil::Pi * bendDir;
+		} else if (cosine > 1) {
 			cosine = 1;
-			if (stretch) sx *= (MathUtil::sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
-		}
-		a2 = MathUtil::acos(cosine) * bendDir;
+			a2 = 0;
+			if (stretch) {
+				a = (MathUtil::sqrt(dd) / (l1 + l2) - 1) * alpha + 1;
+				sx *= a;
+				if (uniform) sy *= a;
+			}
+		} else
+			a2 = MathUtil::acos(cosine) * bendDir;
 		a = l1 + l2 * cosine;
 		b = l2 * MathUtil::sin(a2);
 		a1 = MathUtil::atan2(ty * a - tx * b, tx * a + ty * b);
@@ -191,7 +199,7 @@ IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int
 		if (d >= 0) {
 			float q = MathUtil::sqrt(d), r0, r1;
 			if (c1 < 0) q = -q;
-			q = -(c1 + q) / 2;
+			q = -(c1 + q) * 0.5f;
 			r0 = q / c2;
 			r1 = c0 / q;
 			r = MathUtil::abs(r0) < MathUtil::abs(r1) ? r0 : r1;
@@ -224,7 +232,7 @@ IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int
 					maxY = y;
 				}
 			}
-			if (dd <= (minDist + maxDist) / 2) {
+			if (dd <= (minDist + maxDist) * 0.5f) {
 				a1 = ta - MathUtil::atan2(minY * bendDir, minX);
 				a2 = minAngle * bendDir;
 			} else {
@@ -239,7 +247,7 @@ IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int
 		a1 = (a1 - os) * MathUtil::Rad_Deg + o1 - parent._arotation;
 		if (a1 > 180) a1 -= 360;
 		else if (a1 < -180) a1 += 360;
-		parent.updateWorldTransform(px, py, parent._arotation + a1 * alpha, sx, parent._ascaleY, 0, 0);
+		parent.updateWorldTransform(px, py, parent._arotation + a1 * alpha, sx, sy, 0, 0);
 		a2 = ((a2 + os) * MathUtil::Rad_Deg - child._ashearX) * s2 + o2 - child._arotation;
 		if (a2 > 180) a2 -= 360;
 		else if (a2 < -180) a2 += 360;
@@ -276,7 +284,7 @@ void IkConstraint::update() {
 		case 2: {
 			Bone *bone0 = _bones[0];
 			Bone *bone1 = _bones[1];
-			apply(*bone0, *bone1, _target->getWorldX(), _target->getWorldY(), _bendDirection, _stretch, _softness,
+			apply(*bone0, *bone1, _target->getWorldX(), _target->getWorldY(), _bendDirection, _stretch, _data._uniform, _softness,
 				  _mix);
 		}
 			break;
