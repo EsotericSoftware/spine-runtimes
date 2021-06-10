@@ -51,7 +51,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<gdx.version>1.9.10</gdx.version>
+		<gdx.version>1.10.0</gdx.version>
 	</properties>
 
 	<build>
