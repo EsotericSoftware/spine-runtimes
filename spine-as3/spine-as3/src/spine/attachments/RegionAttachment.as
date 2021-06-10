@@ -30,6 +30,7 @@
 package spine.attachments {
 	import spine.Color;
 	import spine.Bone;
+	import flash.trace.Trace;
 
 	public dynamic class RegionAttachment extends Attachment {
 		public const BLX : int = 0;
@@ -72,25 +73,26 @@ package spine.attachments {
 			var localY : Number = -height * 0.5 * scaleY + regionOffsetY * regionScaleY;
 			var localX2 : Number = localX + regionWidth * regionScaleX;
 			var localY2 : Number = localY + regionHeight * regionScaleY;
-					
+
 			var radians : Number = rotation * Math.PI / 180;
-			var ulDist : Number = Math.sqrt(localX * localX + localY * localY);
-			var ulAngle : Number = Math.atan2(localY, localX);
-			var urDist : Number = Math.sqrt(localX2 * localX2 + localY * localY);
-			var urAngle : Number = Math.atan2(localY, localX2);
-			var blDist : Number = Math.sqrt(localX * localX + localY2 * localY2);
-			var blAngle : Number = Math.atan2(localY2, localX);
-			var brDist : Number = Math.sqrt(localX2 * localX2 + localY2 * localY2);
-			var brAngle : Number = Math.atan2(localY2, localX2);
-					
-			offset[BLX] = Math.cos(radians - blAngle) * blDist + x;
-			offset[BLY] = Math.sin(radians - blAngle) * blDist + y;
-			offset[ULX] = Math.cos(radians - ulAngle) * ulDist + x;
-			offset[ULY] = Math.sin(radians - ulAngle) * ulDist + y;
-			offset[URX] = Math.cos(radians - urAngle) * urDist + x;
-			offset[URY] = Math.sin(radians - urAngle) * urDist + y;
-			offset[BRX] = Math.cos(radians - brAngle) * brDist + x;
-			offset[BRY] = Math.sin(radians - brAngle) * brDist + y;
+			var cos:Number = Math.cos(radians);
+			var sin:Number = Math.sin(radians);
+			var localXCos:Number = localX * cos + x;
+			var localXSin:Number = localX * sin;
+			var localYCos:Number = localY * cos + y;
+			var localYSin:Number = localY * sin;
+			var localX2Cos:Number = localX2 * cos + x;
+			var localX2Sin:Number = localX2 * sin;
+			var localY2Cos:Number = localY2 * cos + y;
+			var localY2Sin:Number = localY2 * sin;
+			offset[BLX] = localXCos - localYSin;
+			offset[BLY] = localYCos + localXSin;
+			offset[ULX] = localXCos - localY2Sin;
+			offset[ULY] = localY2Cos + localXSin;
+			offset[URX] = localX2Cos - localY2Sin;
+			offset[URY] = localY2Cos + localX2Sin;
+			offset[BRX] = localX2Cos - localYSin;
+			offset[BRY] = localYCos + localX2Sin;
 		}
 
 		public function setUVs(u : Number, v : Number, u2 : Number, v2 : Number, rotate : Boolean) : void {
@@ -127,33 +129,33 @@ package spine.attachments {
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // br
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 			offset += stride;
-		
+
 			offsetX = vertexOffset[BLX];
 			offsetY = vertexOffset[BLY];
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // bl
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 			offset += stride;
-		
+
 			offsetX = vertexOffset[ULX];
 			offsetY = vertexOffset[ULY];
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // ul
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 			offset += stride;
-		
+
 			offsetX = vertexOffset[URX];
 			offsetY = vertexOffset[URY];
 			worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
 			worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 		}
-		
+
 		override public function copy (): Attachment {
-			var copy : RegionAttachment = new RegionAttachment(name);	
+			var copy : RegionAttachment = new RegionAttachment(name);
 			copy.regionWidth = regionWidth;
 			copy.regionHeight = regionHeight;
 			copy.regionOffsetX = regionOffsetX;
 			copy.regionOffsetY = regionOffsetY;
 			copy.regionOriginalWidth = regionOriginalWidth;
-			copy.regionOriginalHeight = regionOriginalHeight;			
+			copy.regionOriginalHeight = regionOriginalHeight;
 			copy.rendererObject = rendererObject;
 			copy.path = path;
 			copy.x = x;
@@ -164,7 +166,7 @@ package spine.attachments {
 			copy.width = width;
 			copy.height = height;
 			copy.uvs = uvs.concat();
-			copy.offset = offset.concat();			
+			copy.offset = offset.concat();
 			copy.color.setFromColor(color);
 			return copy;
 		}
