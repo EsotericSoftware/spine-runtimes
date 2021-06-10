@@ -29,7 +29,7 @@
 
 require("mobdebug").start()
 
-local spine = require "spine-corona.spine"
+local spine = require "spine-solar2d.spine"
 
 local skeletons = {}
 local activeSkeleton = 1

@@ -124,6 +124,8 @@
 ### Love2D
 
 ### Corona
+* **Breaking changes**
+* spine-corona has been renamed to spine-solar2d. Change your `require "spine-corona.spine"` statements to `require "spine-solar2d.spine"`
 
 ## Typescript/Javascript
 * **Breaking changes**

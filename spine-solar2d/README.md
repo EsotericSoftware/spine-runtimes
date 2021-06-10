@@ -1,6 +1,6 @@
-# spine-corona
+# spine-solar2d
 
-The spine-corona runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Corona](http://coronalabs.com/products/corona-sdk/). spine-corona is based on [spine-lua](../spine-lua).
+The spine-solar2d runtime provides functionality to load, manipulate and render [Spine](http://esotericsoftware.com) skeletal animation data using [Solar2D](https://solar2d.com/) (previously Corona). spine-solar2d is based on [spine-lua](../spine-lua).
 
 ## Licensing
 
@@ -14,18 +14,18 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-corona works with data exported from Spine 3.9.xx.
+spine-solar2d works with data exported from Spine 3.9.xx.
 
-spine-corona supports all Spine features.
+spine-solar2d supports all Spine features.
 
-spine-corona does not yet support loading the binary format.
+spine-solar2d does not yet support loading the binary format.
 
 ## Setup
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it as a zip via the download button above.
-2. Copy the `spine-lua/spine-lua` folder to `spine-corona`.
-3. Run the `main.lua` file using Corona. Tap/click to switch between skeletons
+2. Copy the `spine-lua/spine-lua` folder to `spine-solar2d`.
+3. Run the `main.lua` file using Solar2D. Tap/click to switch between skeletons
 
-Alternatively, the `spine-lua` and `spine-corona/spine-corona` directories can be copied into your project. Note that the spine-corona `require` statements use `spine-lua.Xxx`, so the spine-lua files must be in a `spine-lua` directory in your project.
+Alternatively, the `spine-lua` and `spine-solar2d/spine-solar2d` directories can be copied into your project. Note that the spine-solar2d `require` statements use `spine-lua.Xxx`, so the spine-lua files must be in a `spine-lua` directory in your project.
 
-When using the `EmmyLua` plugin for IntelliJ IDEA, create a launch configuration pointing at the `Corona Simulator` executable (e.g. ` /Applications/Corona/Corona Simulator.app/Contents/MacOS/Corona Simulator` on macOS), set the working directory to `spine-corona`, and set the parameters to `main.lua`.
+When using the `EmmyLua` plugin for IntelliJ IDEA, create a launch configuration pointing at the `Corona Simulator` executable (e.g. ` /Applications/Corona/Corona Simulator.app/Contents/MacOS/Corona Simulator` on macOS), set the working directory to `spine-solar2d`, and set the parameters to `main.lua`.
