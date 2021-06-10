@@ -10763,7 +10763,7 @@ var spine;
 			function ManagedWebGLRenderingContext(canvasOrContext, contextConfig) {
 				if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
 				this.restorables = new Array();
-				if (canvasOrContext instanceof HTMLCanvasElement || canvasOrContext instanceof EventTarget) {
+				if (!((canvasOrContext instanceof WebGLRenderingContext) || (canvasOrContext instanceof WebGL2RenderingContext))) {
 					this.setupCanvas(canvasOrContext, contextConfig);
 				}
 				else {
