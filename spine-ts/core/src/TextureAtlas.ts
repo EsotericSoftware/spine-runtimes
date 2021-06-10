@@ -253,6 +253,10 @@ module spine {
 		name: string;
 		x: number;
 		y: number;
+		offsetX: number;
+		offsetY: number;
+		originalWidth: number;
+		originalHeight: number;
 		index: number;
 		degrees: number;
 		texture: Texture;

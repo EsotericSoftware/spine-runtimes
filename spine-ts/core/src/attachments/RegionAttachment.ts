@@ -68,7 +68,6 @@ module spine {
 		 * See {@link #updateOffset()}. */
 		offset = Utils.newFloatArray(8);
 
-
 		uvs = Utils.newFloatArray(8);
 
 		tempColor = new Color(1, 1, 1, 1);
@@ -79,6 +78,7 @@ module spine {
 
 		/** Calculates the {@link #offset} using the region settings. Must be called after changing region settings. */
 		updateOffset () : void {
+			let region = this.region;
 			let regionScaleX = this.width / this.region.originalWidth * this.scaleX;
 			let regionScaleY = this.height / this.region.originalHeight * this.scaleY;
 			let localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
@@ -88,13 +88,14 @@ module spine {
 			let radians = this.rotation * Math.PI / 180;
 			let cos = Math.cos(radians);
 			let sin = Math.sin(radians);
-			let localXCos = localX * cos + this.x;
+			let x = this.x, y = this.y;
+			let localXCos = localX * cos + x;
 			let localXSin = localX * sin;
-			let localYCos = localY * cos + this.y;
+			let localYCos = localY * cos + y;
 			let localYSin = localY * sin;
-			let localX2Cos = localX2 * cos + this.x;
+			let localX2Cos = localX2 * cos + x;
 			let localX2Sin = localX2 * sin;
-			let localY2Cos = localY2 * cos + this.y;
+			let localY2Cos = localY2 * cos + y;
 			let localY2Sin = localY2 * sin;
 			let offset = this.offset;
 			offset[0] = localXCos - localYSin;
