@@ -33,9 +33,9 @@ package spine {
 	internal class BinaryInput {
 		private var bytes : ByteArray;	
 		public var strings : Vector.<String> = new Vector.<String>();
-		
+
 		public function BinaryInput(bytes: ByteArray) {
-			this.bytes = bytes;		
+			this.bytes = bytes;
 		}
 
 		public function readByte() : int {
@@ -45,15 +45,15 @@ package spine {
 		public function readUnsignedByte() : int {
 			return bytes.readUnsignedByte();
 		}
-	
+
 		public function readShort() : int {
 			return bytes.readShort();
 		}
-	
+
 		public function readInt32(): int {
 			 return bytes.readInt();
 		}
-	
+
 		public function readInt(optimizePositive: Boolean) : int {
 			var b : int = readByte();
 			var result : int = b & 0x7F;
@@ -75,12 +75,12 @@ package spine {
 			}
 			return optimizePositive ? result : ((result >>> 1) ^ -(result & 1));
 		}
-	
+
 		public function readStringRef (): String {
 			var index : int = readInt(true);
 			return index == 0 ? null : strings[index - 1];
 		}
-	
+
 		public function readString () : String {
 			var byteCount : int = readInt(true);
 			switch (byteCount) {
@@ -90,7 +90,7 @@ package spine {
 				return "";
 			}
 			byteCount--;
-			var chars : String = "";		
+			var chars : String = "";
 			for (var i : int = 0; i < byteCount;) {
 				var b : int = readByte();
 				switch (b >> 4) {
@@ -110,11 +110,11 @@ package spine {
 			}
 			return chars;
 		}
-	
+
 		public function readFloat (): Number {
-			return bytes.readFloat();		
+			return bytes.readFloat();
 		}
-	
+
 		public function readBoolean (): Boolean {
 			return this.readByte() != 0;
 		}
