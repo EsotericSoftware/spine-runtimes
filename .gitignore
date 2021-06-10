@@ -108,8 +108,7 @@ spine-tk2d/*.sln
 spine-tk2d/Assets/TK2DROOT*
 spine-tk2d/Assets/-tk2d*
 
-spine-corona/spine-lua/
-!spine-corona/spine-lua/Place spine-lua here.txt
+spine-solar2d/spine-lua/
 
 spine-love/spine-lua/
 spine-love/love/

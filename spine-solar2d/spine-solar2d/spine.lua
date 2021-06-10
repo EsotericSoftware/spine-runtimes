@@ -133,7 +133,7 @@ function spine.Skeleton:updateWorldTransform()
 	if (self.vertexEffect) then self.vertexEffect:beginEffect(self) end
 
 	-- Remove old drawing group, we will start anew
-	if self.drawingGroup then self.drawingGroup:removeSelf() end
+	if self.drawingGroup and self.drawingGroup.removeSelf then self.drawingGroup:removeSelf() end
 	local drawingGroup = display.newGroup()
 	self.drawingGroup = drawingGroup
 	self.group:insert(drawingGroup)
