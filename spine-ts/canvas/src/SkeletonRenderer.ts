@@ -50,46 +50,38 @@ module spine.canvas {
 
 		private drawImages (skeleton: Skeleton) {
 			let ctx = this.ctx;
+			let color = this.tempColor;
+			let skeletonColor = skeleton.color;
 			let drawOrder = skeleton.drawOrder;
 
 			if (this.debugRendering) ctx.strokeStyle = "green";
 
-			ctx.save();
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
-				if (!slot.bone.active) continue;
+				let bone = slot.bone;
+				if (!bone.active) continue;
+
 				let attachment = slot.getAttachment();
-				let regionAttachment: RegionAttachment = null;
-				let region: TextureAtlasRegion = null;
-				let image: HTMLImageElement = null;
+				if (!(attachment instanceof RegionAttachment)) continue;
+				let region: TextureAtlasRegion = <TextureAtlasRegion>attachment.region;
+				let image: HTMLImageElement = (<CanvasTexture>region.texture).getImage() as HTMLImageElement;
 
-				if (attachment instanceof RegionAttachment) {
-					regionAttachment = <RegionAttachment>attachment;
-					region = <TextureAtlasRegion>regionAttachment.region;
-					image = (<CanvasTexture>region.texture).getImage() as HTMLImageElement;
-				} else continue;
-
-				let skeleton = slot.bone.skeleton;
-				let skeletonColor = skeleton.color;
 				let slotColor = slot.color;
-				let regionColor = regionAttachment.color;
-				let alpha = skeletonColor.a * slotColor.a * regionColor.a;
-				let color = this.tempColor;
+				let regionColor = attachment.color;
 				color.set(skeletonColor.r * slotColor.r * regionColor.r,
 					skeletonColor.g * slotColor.g * regionColor.g,
 					skeletonColor.b * slotColor.b * regionColor.b,
-					alpha);
+					skeletonColor.a * slotColor.a * regionColor.a);
 
-				let att = <RegionAttachment>attachment;
-				let bone = slot.bone;
-				let w = region.width;
-				let h = region.height;
 				ctx.save();
 				ctx.transform(bone.a, bone.c, bone.b, bone.d, bone.worldX, bone.worldY);
 				ctx.translate(attachment.offset[0], attachment.offset[1]);
 				ctx.rotate(attachment.rotation * Math.PI / 180);
-				let atlasScale = att.width / w;
+
+				let atlasScale = attachment.width / region.originalWidth;
 				ctx.scale(atlasScale * attachment.scaleX, atlasScale * attachment.scaleY);
+
+				let w = region.width, h = region.height;
 				ctx.translate(w / 2, h / 2);
 				if (attachment.region.degrees == 90) {
 					let t = w;
@@ -99,6 +91,7 @@ module spine.canvas {
 				}
 				ctx.scale(1, -1);
 				ctx.translate(-w / 2, -h / 2);
+
 				if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
 					ctx.globalAlpha = color.a;
 					// experimental tinting via compositing, doesn't work
@@ -110,54 +103,47 @@ module spine.canvas {
 				if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
 				ctx.restore();
 			}
-
-			ctx.restore();
 		}
 
 		private drawTriangles (skeleton: Skeleton) {
-			let blendMode: BlendMode = null;
+			let ctx = this.ctx;
+			let color = this.tempColor;
+			let skeletonColor = skeleton.color;
+			let drawOrder = skeleton.drawOrder;
 
+			let blendMode: BlendMode = null;
 			let vertices: ArrayLike<number> = this.vertices;
 			let triangles: Array<number> = null;
-			let drawOrder = skeleton.drawOrder;
 
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let slot = drawOrder[i];
 				let attachment = slot.getAttachment();
-				let texture: HTMLImageElement = null;
-				let region: TextureAtlasRegion = null;
+
+				let texture: HTMLImageElement;
+				let region: TextureAtlasRegion;
 				if (attachment instanceof RegionAttachment) {
 					let regionAttachment = <RegionAttachment>attachment;
 					vertices = this.computeRegionVertices(slot, regionAttachment, false);
 					triangles = SkeletonRenderer.QUAD_TRIANGLES;
 					region = <TextureAtlasRegion>regionAttachment.region;
 					texture = (<CanvasTexture>region.texture).getImage() as HTMLImageElement;
-
 				} else if (attachment instanceof MeshAttachment) {
 					let mesh = <MeshAttachment>attachment;
 					vertices = this.computeMeshVertices(slot, mesh, false);
 					triangles = mesh.triangles;
 					texture = (<TextureAtlasRegion>mesh.region.renderObject).texture.getImage() as HTMLImageElement;
-				} else continue;
+				} else
+					continue;
 
 				if (texture) {
-					let slotBlendMode = slot.data.blendMode;
-					if (slotBlendMode != blendMode) {
-						blendMode = slotBlendMode;
-					}
+					if (slot.data.blendMode != blendMode) blendMode = slot.data.blendMode;
 
-					let skeleton = slot.bone.skeleton;
-					let skeletonColor = skeleton.color;
 					let slotColor = slot.color;
 					let attachmentColor = attachment.color;
-					let alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
-					let color = this.tempColor;
 					color.set(skeletonColor.r * slotColor.r * attachmentColor.r,
-					skeletonColor.g * slotColor.g * attachmentColor.g,
-					skeletonColor.b * slotColor.b * attachmentColor.b,
-					alpha);
-
-					let ctx = this.ctx;
+						skeletonColor.g * slotColor.g * attachmentColor.g,
+						skeletonColor.b * slotColor.b * attachmentColor.b,
+						skeletonColor.a * slotColor.a * attachmentColor.a);
 
 					if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
 						ctx.globalAlpha = color.a;
@@ -167,8 +153,8 @@ module spine.canvas {
 						// ctx.fillRect(0, 0, w, h);
 					}
 
-					for (var j = 0; j < triangles.length; j+=3) {
-						let t1 = triangles[j] * 8, t2 = triangles[j+1] * 8, t3 = triangles[j+2] * 8;
+					for (var j = 0; j < triangles.length; j += 3) {
+						let t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
 
 						let x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
 						let x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
@@ -222,17 +208,17 @@ module spine.canvas {
 			u2 -= u0;
 			v2 -= v0;
 
-			var det = 1 / (u1*v2 - u2*v1),
+			var det = 1 / (u1 * v2 - u2 * v1),
 
 			// linear transformation
-			a = (v2*x1 - v1*x2) * det,
-			b = (v2*y1 - v1*y2) * det,
-			c = (u1*x2 - u2*x1) * det,
-			d = (u1*y2 - u2*y1) * det,
+			a = (v2 * x1 - v1 * x2) * det,
+			b = (v2 * y1 - v1 * y2) * det,
+			c = (u1 * x2 - u2 * x1) * det,
+			d = (u1 * y2 - u2 * y1) * det,
 
 			// translation
-			e = x0 - a*u0 - c*v0,
-			f = y0 - b*u0 - d*v0;
+			e = x0 - a * u0 - c * v0,
+			f = y0 - b * u0 - d * v0;
 
 			ctx.save();
 			ctx.transform(a, b, c, d, e, f);
@@ -242,8 +228,7 @@ module spine.canvas {
 		}
 
 		private computeRegionVertices(slot: Slot, region: RegionAttachment, pma: boolean) {
-			let skeleton = slot.bone.skeleton;
-			let skeletonColor = skeleton.color;
+			let skeletonColor = slot.bone.skeleton.color;
 			let slotColor = slot.color;
 			let regionColor = region.color;
 			let alpha = skeletonColor.a * slotColor.a * regionColor.a;
@@ -291,8 +276,7 @@ module spine.canvas {
 		}
 
 		private computeMeshVertices(slot: Slot, mesh: MeshAttachment, pma: boolean) {
-			let skeleton = slot.bone.skeleton;
-			let skeletonColor = skeleton.color;
+			let skeletonColor = slot.bone.skeleton.color;
 			let slotColor = slot.color;
 			let regionColor = mesh.color;
 			let alpha = skeletonColor.a * slotColor.a * regionColor.a;
@@ -303,15 +287,13 @@ module spine.canvas {
 				skeletonColor.b * slotColor.b * regionColor.b * multiplier,
 				alpha);
 
-			let numVertices = mesh.worldVerticesLength / 2;
-			if (this.vertices.length < mesh.worldVerticesLength) {
-				this.vertices = Utils.newFloatArray(mesh.worldVerticesLength);
-			}
+			let vertexCount = mesh.worldVerticesLength / 2;
 			let vertices = this.vertices;
+			if (vertices.length < mesh.worldVerticesLength) this.vertices = vertices = Utils.newFloatArray(mesh.worldVerticesLength);
 			mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
 
 			let uvs = mesh.uvs;
-			for (let i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
+			for (let i = 0, u = 0, v = 2; i < vertexCount; i++) {
 				vertices[v++] = color.r;
 				vertices[v++] = color.g;
 				vertices[v++] = color.b;

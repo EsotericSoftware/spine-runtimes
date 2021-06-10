@@ -68,7 +68,6 @@ module spine {
 		 * See {@link #updateOffset()}. */
 		offset = Utils.newFloatArray(8);
 
-
 		uvs = Utils.newFloatArray(8);
 
 		tempColor = new Color(1, 1, 1, 1);
@@ -79,22 +78,28 @@ module spine {
 
 		/** Calculates the {@link #offset} using the region settings. Must be called after changing region settings. */
 		updateOffset () : void {
-			let regionScaleX = this.width / this.region.originalWidth * this.scaleX;
-			let regionScaleY = this.height / this.region.originalHeight * this.scaleY;
-			let localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
-			let localY = -this.height / 2 * this.scaleY + this.region.offsetY * regionScaleY;
-			let localX2 = localX + this.region.width * regionScaleX;
-			let localY2 = localY + this.region.height * regionScaleY;
+			let region = this.region;
+			let width = this.width, height = this.height;
+			let scaleX = this.scaleX, scaleY = this.scaleY;
+			let localX2 = width * 0.5;
+			let localY2 = height * 0.5;
+			let localX = (-localX2 + region.offsetX / region.originalWidth * width) * scaleX;
+			let localY = (-localY2 + region.offsetY / region.originalHeight * height) * scaleY;
+			localX2 -= (region.originalWidth - region.offsetX - region.width) / region.originalWidth * width;
+			localY2 -= (region.originalHeight - region.offsetY - region.height) / region.originalHeight * height;
+			localX2 *= scaleX;
+			localY2 *= scaleY;
 			let radians = this.rotation * Math.PI / 180;
 			let cos = Math.cos(radians);
 			let sin = Math.sin(radians);
-			let localXCos = localX * cos + this.x;
+			let x = this.x, y = this.y;
+			let localXCos = localX * cos + x;
 			let localXSin = localX * sin;
-			let localYCos = localY * cos + this.y;
+			let localYCos = localY * cos + y;
 			let localYSin = localY * sin;
-			let localX2Cos = localX2 * cos + this.x;
+			let localX2Cos = localX2 * cos + x;
 			let localX2Sin = localX2 * sin;
-			let localY2Cos = localY2 * cos + this.y;
+			let localY2Cos = localY2 * cos + y;
 			let localY2Sin = localY2 * sin;
 			let offset = this.offset;
 			offset[0] = localXCos - localYSin;
