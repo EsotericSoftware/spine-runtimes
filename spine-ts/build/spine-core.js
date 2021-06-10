@@ -6,6 +6,8 @@ var __extends = (this && this.__extends) || (function () {
 		return extendStatics(d, b);
 	};
 	return function (d, b) {
+		if (typeof b !== "function" && b !== null)
+			throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
 		d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -8957,6 +8959,7 @@ var spine;
 			return _this;
 		}
 		RegionAttachment.prototype.updateOffset = function () {
+			var region = this.region;
 			var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
 			var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
 			var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
@@ -8966,13 +8969,14 @@ var spine;
 			var radians = this.rotation * Math.PI / 180;
 			var cos = Math.cos(radians);
 			var sin = Math.sin(radians);
-			var localXCos = localX * cos + this.x;
+			var x = this.x, y = this.y;
+			var localXCos = localX * cos + x;
 			var localXSin = localX * sin;
-			var localYCos = localY * cos + this.y;
+			var localYCos = localY * cos + y;
 			var localYSin = localY * sin;
-			var localX2Cos = localX2 * cos + this.x;
+			var localX2Cos = localX2 * cos + x;
 			var localX2Sin = localX2 * sin;
-			var localY2Cos = localY2 * cos + this.y;
+			var localY2Cos = localY2 * cos + y;
 			var localY2Sin = localY2 * sin;
 			var offset = this.offset;
 			offset[0] = localXCos - localYSin;

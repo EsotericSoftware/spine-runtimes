@@ -6,6 +6,8 @@ var __extends = (this && this.__extends) || (function () {
 		return extendStatics(d, b);
 	};
 	return function (d, b) {
+		if (typeof b !== "function" && b !== null)
+			throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
 		d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -8957,6 +8959,7 @@ var spine;
 			return _this;
 		}
 		RegionAttachment.prototype.updateOffset = function () {
+			var region = this.region;
 			var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
 			var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
 			var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
@@ -8966,13 +8969,14 @@ var spine;
 			var radians = this.rotation * Math.PI / 180;
 			var cos = Math.cos(radians);
 			var sin = Math.sin(radians);
-			var localXCos = localX * cos + this.x;
+			var x = this.x, y = this.y;
+			var localXCos = localX * cos + x;
 			var localXSin = localX * sin;
-			var localYCos = localY * cos + this.y;
+			var localYCos = localY * cos + y;
 			var localYSin = localY * sin;
-			var localX2Cos = localX2 * cos + this.x;
+			var localX2Cos = localX2 * cos + x;
 			var localX2Sin = localX2 * sin;
-			var localY2Cos = localY2 * cos + this.y;
+			var localY2Cos = localY2 * cos + y;
 			var localY2Sin = localY2 * sin;
 			var offset = this.offset;
 			offset[0] = localXCos - localYSin;
@@ -9195,42 +9199,31 @@ var spine;
 			};
 			SkeletonRenderer.prototype.drawImages = function (skeleton) {
 				var ctx = this.ctx;
+				var color = this.tempColor;
+				var skeletonColor = skeleton.color;
 				var drawOrder = skeleton.drawOrder;
 				if (this.debugRendering)
 					ctx.strokeStyle = "green";
-				ctx.save();
 				for (var i = 0, n = drawOrder.length; i < n; i++) {
 					var slot = drawOrder[i];
-					if (!slot.bone.active)
+					var bone = slot.bone;
+					if (!bone.active)
 						continue;
 					var attachment = slot.getAttachment();
-					var regionAttachment = null;
-					var region = null;
-					var image = null;
-					if (attachment instanceof spine.RegionAttachment) {
-						regionAttachment = attachment;
-						region = regionAttachment.region;
-						image = region.texture.getImage();
-					}
-					else
+					if (!(attachment instanceof spine.RegionAttachment))
 						continue;
-					var skeleton_1 = slot.bone.skeleton;
-					var skeletonColor = skeleton_1.color;
+					var region = attachment.region;
+					var image = region.texture.getImage();
 					var slotColor = slot.color;
-					var regionColor = regionAttachment.color;
-					var alpha = skeletonColor.a * slotColor.a * regionColor.a;
-					var color = this.tempColor;
-					color.set(skeletonColor.r * slotColor.r * regionColor.r, skeletonColor.g * slotColor.g * regionColor.g, skeletonColor.b * slotColor.b * regionColor.b, alpha);
-					var att = attachment;
-					var bone = slot.bone;
-					var w = region.width;
-					var h = region.height;
+					var regionColor = attachment.color;
+					color.set(skeletonColor.r * slotColor.r * regionColor.r, skeletonColor.g * slotColor.g * regionColor.g, skeletonColor.b * slotColor.b * regionColor.b, skeletonColor.a * slotColor.a * regionColor.a);
 					ctx.save();
 					ctx.transform(bone.a, bone.c, bone.b, bone.d, bone.worldX, bone.worldY);
 					ctx.translate(attachment.offset[0], attachment.offset[1]);
 					ctx.rotate(attachment.rotation * Math.PI / 180);
-					var atlasScale = att.width / w;
+					var atlasScale = attachment.width / region.originalWidth;
 					ctx.scale(atlasScale * attachment.scaleX, atlasScale * attachment.scaleY);
+					var w = region.width, h = region.height;
 					ctx.translate(w / 2, h / 2);
 					if (attachment.region.degrees == 90) {
 						var t = w;
@@ -9248,18 +9241,20 @@ var spine;
 						ctx.strokeRect(0, 0, w, h);
 					ctx.restore();
 				}
-				ctx.restore();
 			};
 			SkeletonRenderer.prototype.drawTriangles = function (skeleton) {
+				var ctx = this.ctx;
+				var color = this.tempColor;
+				var skeletonColor = skeleton.color;
+				var drawOrder = skeleton.drawOrder;
 				var blendMode = null;
 				var vertices = this.vertices;
 				var triangles = null;
-				var drawOrder = skeleton.drawOrder;
 				for (var i = 0, n = drawOrder.length; i < n; i++) {
 					var slot = drawOrder[i];
 					var attachment = slot.getAttachment();
-					var texture = null;
-					var region = null;
+					var texture = void 0;
+					var region = void 0;
 					if (attachment instanceof spine.RegionAttachment) {
 						var regionAttachment = attachment;
 						vertices = this.computeRegionVertices(slot, regionAttachment, false);
@@ -9276,18 +9271,11 @@ var spine;
 					else
 						continue;
 					if (texture) {
-						var slotBlendMode = slot.data.blendMode;
-						if (slotBlendMode != blendMode) {
-							blendMode = slotBlendMode;
-						}
-						var skeleton_2 = slot.bone.skeleton;
-						var skeletonColor = skeleton_2.color;
+						if (slot.data.blendMode != blendMode)
+							blendMode = slot.data.blendMode;
 						var slotColor = slot.color;
 						var attachmentColor = attachment.color;
-						var alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
-						var color = this.tempColor;
-						color.set(skeletonColor.r * slotColor.r * attachmentColor.r, skeletonColor.g * slotColor.g * attachmentColor.g, skeletonColor.b * slotColor.b * attachmentColor.b, alpha);
-						var ctx = this.ctx;
+						color.set(skeletonColor.r * slotColor.r * attachmentColor.r, skeletonColor.g * slotColor.g * attachmentColor.g, skeletonColor.b * slotColor.b * attachmentColor.b, skeletonColor.a * slotColor.a * attachmentColor.a);
 						if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
 							ctx.globalAlpha = color.a;
 						}
@@ -9340,8 +9328,7 @@ var spine;
 				ctx.restore();
 			};
 			SkeletonRenderer.prototype.computeRegionVertices = function (slot, region, pma) {
-				var skeleton = slot.bone.skeleton;
-				var skeletonColor = skeleton.color;
+				var skeletonColor = slot.bone.skeleton.color;
 				var slotColor = slot.color;
 				var regionColor = region.color;
 				var alpha = skeletonColor.a * slotColor.a * regionColor.a;
@@ -9378,22 +9365,20 @@ var spine;
 				return vertices;
 			};
 			SkeletonRenderer.prototype.computeMeshVertices = function (slot, mesh, pma) {
-				var skeleton = slot.bone.skeleton;
-				var skeletonColor = skeleton.color;
+				var skeletonColor = slot.bone.skeleton.color;
 				var slotColor = slot.color;
 				var regionColor = mesh.color;
 				var alpha = skeletonColor.a * slotColor.a * regionColor.a;
 				var multiplier = pma ? alpha : 1;
 				var color = this.tempColor;
 				color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier, skeletonColor.g * slotColor.g * regionColor.g * multiplier, skeletonColor.b * slotColor.b * regionColor.b * multiplier, alpha);
-				var numVertices = mesh.worldVerticesLength / 2;
-				if (this.vertices.length < mesh.worldVerticesLength) {
-					this.vertices = spine.Utils.newFloatArray(mesh.worldVerticesLength);
-				}
+				var vertexCount = mesh.worldVerticesLength / 2;
 				var vertices = this.vertices;
+				if (vertices.length < mesh.worldVerticesLength)
+					this.vertices = vertices = spine.Utils.newFloatArray(mesh.worldVerticesLength);
 				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
 				var uvs = mesh.uvs;
-				for (var i = 0, n = numVertices, u = 0, v = 2; i < n; i++) {
+				for (var i = 0, u = 0, v = 2; i < vertexCount; i++) {
 					vertices[v++] = color.r;
 					vertices[v++] = color.g;
 					vertices[v++] = color.b;

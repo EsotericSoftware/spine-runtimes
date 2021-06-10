@@ -6,6 +6,8 @@ var __extends = (this && this.__extends) || (function () {
 		return extendStatics(d, b);
 	};
 	return function (d, b) {
+		if (typeof b !== "function" && b !== null)
+			throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
 		extendStatics(d, b);
 		function __() { this.constructor = d; }
 		d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -8957,6 +8959,7 @@ var spine;
 			return _this;
 		}
 		RegionAttachment.prototype.updateOffset = function () {
+			var region = this.region;
 			var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
 			var regionScaleY = this.height / this.region.originalHeight * this.scaleY;
 			var localX = -this.width / 2 * this.scaleX + this.region.offsetX * regionScaleX;
@@ -8966,13 +8969,14 @@ var spine;
 			var radians = this.rotation * Math.PI / 180;
 			var cos = Math.cos(radians);
 			var sin = Math.sin(radians);
-			var localXCos = localX * cos + this.x;
+			var x = this.x, y = this.y;
+			var localXCos = localX * cos + x;
 			var localXSin = localX * sin;
-			var localYCos = localY * cos + this.y;
+			var localYCos = localY * cos + y;
 			var localYSin = localY * sin;
-			var localX2Cos = localX2 * cos + this.x;
+			var localX2Cos = localX2 * cos + x;
 			var localX2Sin = localX2 * sin;
-			var localY2Cos = localY2 * cos + this.y;
+			var localY2Cos = localY2 * cos + y;
 			var localY2Sin = localY2 * sin;
 			var offset = this.offset;
 			offset[0] = localXCos - localYSin;
@@ -11702,7 +11706,7 @@ var spine;
 			function ManagedWebGLRenderingContext(canvasOrContext, contextConfig) {
 				if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
 				this.restorables = new Array();
-				if (canvasOrContext instanceof HTMLCanvasElement || canvasOrContext instanceof EventTarget) {
+				if (!((canvasOrContext instanceof WebGLRenderingContext) || (canvasOrContext instanceof WebGL2RenderingContext))) {
 					this.setupCanvas(canvasOrContext, contextConfig);
 				}
 				else {
@@ -11908,10 +11912,10 @@ var spine;
 	var SpinePlayer = (function () {
 		function SpinePlayer(parent, config) {
 			this.config = config;
-			this.time = new spine.TimeKeeper();
 			this.paused = true;
 			this.playTime = 0;
 			this.speed = 1;
+			this.time = new spine.TimeKeeper();
 			this.animationViewports = {};
 			this.currentViewport = null;
 			this.previousViewport = null;
@@ -12619,7 +12623,8 @@ var spine;
 			this.playButton.classList.remove("spine-player-button-icon-pause");
 			this.playButton.classList.add("spine-player-button-icon-play");
 		};
-		SpinePlayer.prototype.setAnimation = function (animation) {
+		SpinePlayer.prototype.setAnimation = function (animation, loop) {
+			if (loop === void 0) { loop = true; }
 			this.previousViewport = this.currentViewport;
 			var animViewport = this.calculateAnimationViewport(animation);
 			var viewport = {
@@ -12672,7 +12677,7 @@ var spine;
 			this.viewportTransitionStart = performance.now();
 			this.animationState.clearTracks();
 			this.skeleton.setToSetupPose();
-			this.animationState.setAnimation(0, animation, true);
+			this.animationState.setAnimation(0, animation, loop);
 		};
 		SpinePlayer.prototype.percentageToWorldUnit = function (size, percentageOrAbsolute) {
 			if (typeof percentageOrAbsolute === "string") {
