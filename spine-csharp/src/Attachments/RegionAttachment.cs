@@ -76,29 +76,19 @@ namespace Spine {
 		}
 
 		public void UpdateOffset () {
-			float width = this.width;
-			float height = this.height;
+			float width = this.width, height = this.height;
+			float scaleX = this.scaleX, scaleY = this.scaleY;
 			float localX2 = width * 0.5f;
 			float localY2 = height * 0.5f;
-			float localX = -localX2;
-			float localY = -localY2;
-			if (regionOriginalWidth != 0) { // if (region != null)
-				localX += regionOffsetX / regionOriginalWidth * width;
-				localY += regionOffsetY / regionOriginalHeight * height;
-				localX2 -= (regionOriginalWidth - regionOffsetX - regionWidth) / regionOriginalWidth * width;
-				localY2 -= (regionOriginalHeight - regionOffsetY - regionHeight) / regionOriginalHeight * height;
-			}
-			float scaleX = this.scaleX;
-			float scaleY = this.scaleY;
-			localX *= scaleX;
-			localY *= scaleY;
+			float localX = (-localX2 + regionOffsetX / regionOriginalWidth * width) * scaleX;
+			float localY = (-localY2 + regionOffsetY / regionOriginalHeight * height) * scaleY;
+			localX2 -= (regionOriginalWidth - regionOffsetX - regionWidth) / regionOriginalWidth * width;
+			localY2 -= (regionOriginalHeight - regionOffsetY - regionHeight) / regionOriginalHeight * height;
 			localX2 *= scaleX;
 			localY2 *= scaleY;
-			float rotation = this.rotation;
-			float cos = MathUtils.CosDeg(rotation);
-			float sin = MathUtils.SinDeg(rotation);
-			float x = this.x;
-			float y = this.y;
+			float cos = MathUtils.CosDeg(this.rotation);
+			float sin = MathUtils.SinDeg(this.rotation);
+			float x = this.x, y = this.y;
 			float localXCos = localX * cos + x;
 			float localXSin = localX * sin;
 			float localYCos = localY * cos + y;
