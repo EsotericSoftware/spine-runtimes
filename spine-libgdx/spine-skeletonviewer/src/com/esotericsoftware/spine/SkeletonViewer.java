@@ -73,7 +73,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 	SkeletonRendererDebug debugRenderer;
 	SkeletonViewerUI ui;
 
-	SkeletonViewAtlas atlas;
+	SkeletonViewerAtlas atlas;
 	SkeletonData skeletonData;
 	Skeleton skeleton;
 	AnimationState state;
@@ -123,7 +123,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		reloadTimer = 0;
 
 		try {
-			atlas = new SkeletonViewAtlas(this, skeletonFile);
+			atlas = new SkeletonViewerAtlas(this, skeletonFile);
 
 			// Load skeleton data.
 			String extension = skeletonFile.extension();

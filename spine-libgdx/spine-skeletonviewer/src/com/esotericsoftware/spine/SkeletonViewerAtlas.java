@@ -14,12 +14,12 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.TextureAtlasData.Page;
 import com.badlogic.gdx.utils.Null;
 
-class SkeletonViewAtlas extends TextureAtlas {
+class SkeletonViewerAtlas extends TextureAtlas {
 	private final SkeletonViewer viewer;
 	private @Null FileHandle atlasFile;
 	private final AtlasRegion fake;
 
-	public SkeletonViewAtlas (final SkeletonViewer viewer, @Null FileHandle skeletonFile) {
+	public SkeletonViewerAtlas (final SkeletonViewer viewer, @Null FileHandle skeletonFile) {
 		this.viewer = viewer;
 
 		atlasFile = findAtlasFile(skeletonFile);
@@ -64,6 +64,7 @@ class SkeletonViewAtlas extends TextureAtlas {
 			for (String endSuffix : endSuffixes) {
 				for (String dataSuffix : dataSuffixes) {
 					String suffix = startSuffix + dataSuffix + endSuffix;
+					System.out.println(suffix);
 					if (baseName.endsWith(suffix)) {
 						FileHandle file = findAtlasFile(skeletonFile, baseName.substring(0, baseName.length() - suffix.length()));
 						if (file != null) return file;
@@ -79,6 +80,9 @@ class SkeletonViewAtlas extends TextureAtlas {
 			for (String endSuffix : endSuffixes) {
 				for (String suffix : atlasSuffixes) {
 					FileHandle file = skeletonFile.sibling(baseName + startSuffix + suffix + endSuffix);
+					System.out.println(baseName + startSuffix + suffix + endSuffix);
+					if (file.exists()) 
+						System.out.println();
 					if (file.exists()) return file;
 				}
 			}
