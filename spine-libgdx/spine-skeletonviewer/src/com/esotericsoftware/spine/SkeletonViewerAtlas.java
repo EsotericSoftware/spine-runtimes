@@ -64,7 +64,6 @@ class SkeletonViewerAtlas extends TextureAtlas {
 			for (String endSuffix : endSuffixes) {
 				for (String dataSuffix : dataSuffixes) {
 					String suffix = startSuffix + dataSuffix + endSuffix;
-					System.out.println(suffix);
 					if (baseName.endsWith(suffix)) {
 						FileHandle file = findAtlasFile(skeletonFile, baseName.substring(0, baseName.length() - suffix.length()));
 						if (file != null) return file;
@@ -80,9 +79,6 @@ class SkeletonViewerAtlas extends TextureAtlas {
 			for (String endSuffix : endSuffixes) {
 				for (String suffix : atlasSuffixes) {
 					FileHandle file = skeletonFile.sibling(baseName + startSuffix + suffix + endSuffix);
-					System.out.println(baseName + startSuffix + suffix + endSuffix);
-					if (file.exists()) 
-						System.out.println();
 					if (file.exists()) return file;
 				}
 			}
