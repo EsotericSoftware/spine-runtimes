@@ -227,6 +227,8 @@ function spine.Skeleton:updateWorldTransform()
 				end
 				if not isClippingAttachment then self.clipper:clipEnd(slot) end
 			end
+		else
+			self.clipper:clipEnd(slot)
 		end
 	end
 

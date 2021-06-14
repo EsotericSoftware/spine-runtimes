@@ -352,6 +352,9 @@ function SkeletonRenderer:draw (skeleton)
 			elseif attachment.type == spine.AttachmentType.clipping then
 				self.clipper:clipStart(slot, attachment)
 				break -- continues for loop
+			else
+				self.clipper:clipEnd(slot)
+				break -- continues for loop
 			end
 
 			if texture then
