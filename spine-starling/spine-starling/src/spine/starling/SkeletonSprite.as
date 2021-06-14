@@ -98,7 +98,10 @@ package spine.starling {
 			for (var i : int = 0, n : int = drawOrder.length; i < n; ++i) {
 				var worldVertices : Vector.<Number> = _tempVertices;
 				var slot : Slot = drawOrder[i];
-				if (!slot.bone.active) continue;
+				if (!slot.bone.active) {
+					clipper.clipEndWithSlot(slot);
+					continue;
+				}
 
 				if (slot.attachment is RegionAttachment) {
 					var region : RegionAttachment = slot.attachment as RegionAttachment;
@@ -156,6 +159,7 @@ package spine.starling {
 					clipper.clipStart(slot, clip);
 					continue;
 				} else {
+					clipper.clipEndWithSlot(slot);
 					continue;
 				}
 

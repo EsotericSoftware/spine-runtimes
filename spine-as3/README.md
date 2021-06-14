@@ -16,7 +16,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 spine-as3 works with data exported from Spine 3.9.xx.
 
-spine-as3 supports all Spine features, including meshes. If using the `spine.flash` classes for rendering, meshes and two color tinting are not supported.
+spine-as3 supports all Spine features, including meshes. If using the `spine.flash` classes for rendering, meshes, clipping, and two color tinting are not supported.
 
 ## Usage
 1. Create a new Flex or Adobe AIR project in your preferred IDE.
