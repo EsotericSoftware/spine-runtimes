@@ -9365,8 +9365,10 @@ var spine;
 				for (var i = 0, n = drawOrder.length; i < n; i++) {
 					var vertexSize = clipper.isClipping() ? 2 : SkeletonMesh.VERTEX_SIZE;
 					var slot = drawOrder[i];
-					if (!slot.bone.active)
+					if (!slot.bone.active) {
+						clipper.clipEndWithSlot(slot);
 						continue;
+					}
 					var attachment = slot.getAttachment();
 					var attachmentColor = null;
 					var texture = null;
@@ -9399,8 +9401,10 @@ var spine;
 						clipper.clipStart(slot, clip);
 						continue;
 					}
-					else
+					else {
+						clipper.clipEndWithSlot(slot);
 						continue;
+					}
 					if (texture) {
 						var skeleton = slot.bone.skeleton;
 						var skeletonColor = skeleton.color;
@@ -9479,8 +9483,10 @@ var spine;
 							finalIndices = triangles;
 							finalIndicesLength = triangles.length;
 						}
-						if (finalVerticesLength == 0 || finalIndicesLength == 0)
+						if (finalVerticesLength == 0 || finalIndicesLength == 0) {
+							clipper.clipEndWithSlot(slot);
 							continue;
+						}
 						if (!batch.canBatch(finalVerticesLength, finalIndicesLength)) {
 							batch.end();
 							batch = this.nextBatch();

@@ -159,7 +159,10 @@ module spine.threejs {
 			for (let i = 0, n = drawOrder.length; i < n; i++) {
 				let vertexSize = clipper.isClipping() ? 2 : SkeletonMesh.VERTEX_SIZE;
 				let slot = drawOrder[i];
-				if (!slot.bone.active) continue;
+				if (!slot.bone.active) {
+					clipper.clipEndWithSlot(slot);
+					continue;
+				}
 				let attachment = slot.getAttachment();
 				let attachmentColor: Color = null;
 				let texture: ThreeJsTexture = null;
@@ -189,7 +192,10 @@ module spine.threejs {
 					let clip = <ClippingAttachment>(attachment);
 					clipper.clipStart(slot, clip);
 					continue;
-				} else continue;
+				} else {
+					clipper.clipEndWithSlot(slot);
+					continue;
+				}
 
 				if (texture) {
 					let skeleton = slot.bone.skeleton;
@@ -273,8 +279,10 @@ module spine.threejs {
 						finalIndicesLength = triangles.length;
 					}
 
-					if (finalVerticesLength == 0 || finalIndicesLength == 0)
+					if (finalVerticesLength == 0 || finalIndicesLength == 0) {
+						clipper.clipEndWithSlot(slot);
 						continue;
+					}
 
 					// Start new batch if this one can't hold vertices/indices
 					if (!batch.canBatch(finalVerticesLength, finalIndicesLength)) {
