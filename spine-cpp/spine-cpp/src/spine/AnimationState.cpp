@@ -265,23 +265,23 @@ void EventQueue::drain() {
 
 	// Don't cache _eventQueueEntries.size() so callbacks can queue their own events (eg, call setAnimation in AnimationState_Complete).
 	for (size_t i = 0; i < _eventQueueEntries.size(); ++i) {
-		EventQueueEntry *queueEntry = &_eventQueueEntries[i];
-		TrackEntry *trackEntry = queueEntry->_entry;
+		EventQueueEntry queueEntry = _eventQueueEntries[i];
+		TrackEntry *trackEntry = queueEntry._entry;
 
-		switch (queueEntry->_type) {
+		switch (queueEntry._type) {
 			case EventType_Start:
 			case EventType_Interrupt:
 			case EventType_Complete:
-				if (!trackEntry->_listenerObject) trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
-				else trackEntry->_listenerObject->callback(&state, queueEntry->_type, trackEntry, NULL);
-				if (!state._listenerObject) state._listener(&state, queueEntry->_type, trackEntry, NULL);
-				else state._listenerObject->callback(&state, queueEntry->_type, trackEntry, NULL);
+				if (!trackEntry->_listenerObject) trackEntry->_listener(&state, queueEntry._type, trackEntry, NULL);
+				else trackEntry->_listenerObject->callback(&state, queueEntry._type, trackEntry, NULL);
+				if (!state._listenerObject) state._listener(&state, queueEntry._type, trackEntry, NULL);
+				else state._listenerObject->callback(&state, queueEntry._type, trackEntry, NULL);
 				break;
 			case EventType_End:
-				if (!trackEntry->_listenerObject) trackEntry->_listener(&state, queueEntry->_type, trackEntry, NULL);
-				else trackEntry->_listenerObject->callback(&state, queueEntry->_type, trackEntry, NULL);
-				if (!state._listenerObject) state._listener(&state, queueEntry->_type, trackEntry, NULL);
-				else state._listenerObject->callback(&state, queueEntry->_type, trackEntry, NULL);
+				if (!trackEntry->_listenerObject) trackEntry->_listener(&state, queueEntry._type, trackEntry, NULL);
+				else trackEntry->_listenerObject->callback(&state, queueEntry._type, trackEntry, NULL);
+				if (!state._listenerObject) state._listener(&state, queueEntry._type, trackEntry, NULL);
+				else state._listenerObject->callback(&state, queueEntry._type, trackEntry, NULL);
 				/* Fall through. */
 			case EventType_Dispose:
 				if (!trackEntry->_listenerObject) trackEntry->_listener(&state, EventType_Dispose, trackEntry, NULL);
@@ -294,10 +294,10 @@ void EventQueue::drain() {
 				break;
 			case EventType_Event:
 				if (!trackEntry->_listenerObject)
-					trackEntry->_listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
-				else trackEntry->_listenerObject->callback(&state, queueEntry->_type, trackEntry, queueEntry->_event);
-				if (!state._listenerObject) state._listener(&state, queueEntry->_type, trackEntry, queueEntry->_event);
-				else state._listenerObject->callback(&state, queueEntry->_type, trackEntry, queueEntry->_event);
+					trackEntry->_listener(&state, queueEntry._type, trackEntry, queueEntry._event);
+				else trackEntry->_listenerObject->callback(&state, queueEntry._type, trackEntry, queueEntry._event);
+				if (!state._listenerObject) state._listener(&state, queueEntry._type, trackEntry, queueEntry._event);
+				else state._listenerObject->callback(&state, queueEntry._type, trackEntry, queueEntry._event);
 				break;
 		}
 	}
