@@ -43,6 +43,7 @@ extern "C" {
 typedef struct spClippingAttachment {
 	spVertexAttachment super;
 	spSlotData *endSlot;
+	spColor color;
 } spClippingAttachment;
 
 SP_API void _spClippingAttachment_dispose(spAttachment *self);

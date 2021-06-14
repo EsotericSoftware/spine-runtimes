@@ -31,6 +31,7 @@
 #define Spine_ClippingAttachment_h
 
 #include <spine/VertexAttachment.h>
+#include <spine/Color.h>
 
 namespace spine {
 	class SlotData;
@@ -51,10 +52,13 @@ namespace spine {
 
 		void setEndSlot(SlotData *inValue);
 
+		Color &getColor();
+
 		virtual Attachment *copy();
 
 	private:
 		SlotData *_endSlot;
+		Color _color;
 	};
 }
 

@@ -902,16 +902,15 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 	if (skeleton) {
 		MALLOC_STR(skeletonData->hash, Json_getString(skeleton, "hash", 0));
 		MALLOC_STR(skeletonData->version, Json_getString(skeleton, "spine", 0));
-		if (strcmp(skeletonData->version, "3.8.75") == 0) {
-			spSkeletonData_dispose(skeletonData);
-			_spSkeletonJson_setError(self, root,
-									 "Unsupported skeleton data, please export with a newer version of Spine.", "");
-			return 0;
-		}
 		skeletonData->x = Json_getFloat(skeleton, "x", 0);
 		skeletonData->y = Json_getFloat(skeleton, "y", 0);
 		skeletonData->width = Json_getFloat(skeleton, "width", 0);
 		skeletonData->height = Json_getFloat(skeleton, "height", 0);
+		skeletonData->fps = Json_getFloat(skeleton, "fps", 30);
+		skeletonData->imagesPath = Json_getString(skeleton, "images", 0);
+		if (skeletonData->imagesPath) skeletonData->imagesPath = strdup(skeletonData->imagesPath);
+		skeletonData->audioPath = Json_getString(skeleton, "audio", 0);
+		if (skeletonData->audioPath) skeletonData->audioPath = strdup(skeletonData->audioPath);
 	}
 
 	/* Bones. */
@@ -920,6 +919,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 	for (boneMap = bones->child, i = 0; boneMap; boneMap = boneMap->next, ++i) {
 		spBoneData *data;
 		const char *transformMode;
+		const char *color;
 
 		spBoneData *parent = 0;
 		const char *parentName = Json_getString(boneMap, "parent", 0);
@@ -951,6 +951,9 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 		else if (strcmp(transformMode, "noScaleOrReflection") == 0)
 			data->transformMode = SP_TRANSFORMMODE_NOSCALEORREFLECTION;
 		data->skinRequired = Json_getInt(boneMap, "skin", 0) ? 1 : 0;
+
+		color = Json_getString(boneMap, "color", 0);
+		if (color) toColor2(&data->color, color, -1);
 
 		skeletonData->bones[i] = data;
 		skeletonData->bonesCount++;
@@ -1370,6 +1373,14 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 							int vertexCount = Json_getInt(attachmentMap, "vertexCount", 0) << 1;
 							_readVertices(self, attachmentMap, SUPER(box), vertexCount);
 							box->super.verticesCount = vertexCount;
+							color = Json_getString(attachmentMap, "color", 0);
+							if (color) {
+								spColor_setFromFloats(&box->color,
+													  toColor(color, 0),
+													  toColor(color, 1),
+													  toColor(color, 2),
+													  toColor(color, 3));
+							}
 							spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 							break;
 						}
@@ -1387,6 +1398,14 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 							curves = Json_getItem(attachmentMap, "lengths");
 							for (curves = curves->child, ii = 0; curves; curves = curves->next, ++ii)
 								pathAttachment->lengths[ii] = curves->valueFloat * self->scale;
+							color = Json_getString(attachmentMap, "color", 0);
+							if (color) {
+								spColor_setFromFloats(&pathAttachment->color,
+													  toColor(color, 0),
+													  toColor(color, 1),
+													  toColor(color, 2),
+													  toColor(color, 3));
+							}
 							break;
 						}
 						case SP_ATTACHMENT_POINT: {
@@ -1415,6 +1434,14 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 							}
 							vertexCount = Json_getInt(attachmentMap, "vertexCount", 0) << 1;
 							_readVertices(self, attachmentMap, SUPER(clip), vertexCount);
+							color = Json_getString(attachmentMap, "color", 0);
+							if (color) {
+								spColor_setFromFloats(&clip->color,
+													  toColor(color, 0),
+													  toColor(color, 1),
+													  toColor(color, 2),
+													  toColor(color, 3));
+							}
 							spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 							break;
 						}

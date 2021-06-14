@@ -48,6 +48,9 @@ typedef struct spSkeletonData {
 	const char *version;
 	const char *hash;
 	float x, y, width, height;
+	float fps;
+	const char *imagesPath;
+	const char *audioPath;
 
 	int stringsCount;
 	char **strings;

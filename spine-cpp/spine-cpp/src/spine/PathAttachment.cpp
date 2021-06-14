@@ -37,7 +37,7 @@ using namespace spine;
 
 RTTI_IMPL(PathAttachment, VertexAttachment)
 
-PathAttachment::PathAttachment(const String &name) : VertexAttachment(name), _closed(false), _constantSpeed(false) {
+PathAttachment::PathAttachment(const String &name) : VertexAttachment(name), _closed(false), _constantSpeed(false), _color() {
 }
 
 Vector<float> &PathAttachment::getLengths() {
@@ -58,6 +58,10 @@ bool PathAttachment::isConstantSpeed() {
 
 void PathAttachment::setConstantSpeed(bool inValue) {
 	_constantSpeed = inValue;
+}
+
+Color &PathAttachment::getColor() {
+	return _color;
 }
 
 Attachment *PathAttachment::copy() {

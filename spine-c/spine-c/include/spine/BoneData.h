@@ -31,6 +31,7 @@
 #define SPINE_BONEDATA_H_
 
 #include <spine/dll.h>
+#include <spine/Color.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,6 +54,7 @@ struct spBoneData {
 	float x, y, rotation, scaleX, scaleY, shearX, shearY;
 	spTransformMode transformMode;
 	int/*bool*/ skinRequired;
+	spColor color;
 };
 
 SP_API spBoneData *spBoneData_create(int index, const char *name, spBoneData *parent);

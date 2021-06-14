@@ -127,7 +127,6 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	nonessential = readBoolean(input);
 
 	if (nonessential) {
-		/* Skip images path, audio path & fps */
 		skeletonData->_fps = readFloat(input);
 		skeletonData->_imagesPath.own(readString(input));
 		skeletonData->_audioPath.own(readString(input));
@@ -154,7 +153,9 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		data->_length = readFloat(input) * _scale;
 		data->_transformMode = static_cast<TransformMode>(readVarint(input, true));
 		data->_skinRequired = readBoolean(input);
-		if (nonessential) readInt(input); /* Skip bone color. */
+		if (nonessential) {
+			readColor(input, data->getColor());
+		}
 		skeletonData->_bones[i] = data;
 	}
 
@@ -315,7 +316,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 		eventData->_intValue = readVarint(input, false);
 		eventData->_floatValue = readFloat(input);
 		eventData->_stringValue.own(readString(input));
-		eventData->_audioPath.own(readString(input)); // skip audio path
+		eventData->_audioPath.own(readString(input));
 		if (!eventData->_audioPath.isEmpty()) {
 			eventData->_volume = readFloat(input);
 			eventData->_balance = readFloat(input);
@@ -515,8 +516,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			}
 			readVertices(input, static_cast<VertexAttachment *>(box), vertexCount);
 			if (nonessential) {
-				/* Skip color. */
-				readInt(input);
+				readColor(input, box->getColor());
 			}
 			_attachmentLoader->configureAttachment(box);
 			return box;
@@ -591,8 +591,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 				path->_lengths[i] = readFloat(input) * _scale;
 			}
 			if (nonessential) {
-				/* Skip color. */
-				readInt(input);
+				readColor(input, path->getColor());
 			}
 			_attachmentLoader->configureAttachment(path);
 			return path;
@@ -608,8 +607,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			point->_y = readFloat(input) * _scale;
 
 			if (nonessential) {
-				/* Skip color. */
-				readInt(input);
+				readColor(input, point->getColor());
 			}
 			_attachmentLoader->configureAttachment(point);
 			return point;
@@ -625,8 +623,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			readVertices(input, static_cast<VertexAttachment *>(clip), vertexCount);
 			clip->_endSlot = skeletonData->_slots[endSlotIndex];
 			if (nonessential) {
-				/* Skip color. */
-				readInt(input);
+				readColor(input, clip->getColor());
 			}
 			_attachmentLoader->configureAttachment(clip);
 			return clip;

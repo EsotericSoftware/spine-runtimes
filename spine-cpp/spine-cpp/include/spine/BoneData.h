@@ -33,6 +33,7 @@
 #include <spine/TransformMode.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
+#include <spine/Color.h>
 
 namespace spine {
 	class SP_API BoneData : public SpineObject {
@@ -122,6 +123,8 @@ namespace spine {
 
 		void setSkinRequired(bool inValue);
 
+		Color &getColor();
+
 	private:
 		const int _index;
 		const String _name;
@@ -130,6 +133,7 @@ namespace spine {
 		float _x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY;
 		TransformMode _transformMode;
 		bool _skinRequired;
+		Color _color;
 	};
 }
 

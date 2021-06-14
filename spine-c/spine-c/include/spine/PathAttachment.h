@@ -45,6 +45,7 @@ typedef struct spPathAttachment {
 	int lengthsLength;
 	float *lengths;
 	int/*bool*/ closed, constantSpeed;
+	spColor color;
 } spPathAttachment;
 
 SP_API spPathAttachment *spPathAttachment_create(const char *name);

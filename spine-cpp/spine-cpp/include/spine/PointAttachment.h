@@ -31,6 +31,7 @@
 #define Spine_PointAttachment_h
 
 #include <spine/Attachment.h>
+#include <spine/Color.h>
 
 namespace spine {
 	class Bone;
@@ -67,10 +68,13 @@ namespace spine {
 
 		void setRotation(float inValue);
 
+		Color &getColor();
+
 		virtual Attachment *copy();
 
 	private:
 		float _x, _y, _rotation;
+		Color _color;
 	};
 }
 

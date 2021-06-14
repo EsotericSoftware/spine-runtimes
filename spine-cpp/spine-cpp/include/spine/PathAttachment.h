@@ -31,6 +31,7 @@
 #define Spine_PathAttachment_h
 
 #include <spine/VertexAttachment.h>
+#include <spine/Color.h>
 
 namespace spine {
 	class SP_API PathAttachment : public VertexAttachment {
@@ -54,12 +55,15 @@ namespace spine {
 
 		void setConstantSpeed(bool inValue);
 
+		Color &getColor();
+
 		virtual Attachment *copy();
 
 	private:
 		Vector<float> _lengths;
 		bool _closed;
 		bool _constantSpeed;
+		Color _color;
 	};
 }
 

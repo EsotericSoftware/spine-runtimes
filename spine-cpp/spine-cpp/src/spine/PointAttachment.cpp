@@ -41,7 +41,7 @@ using namespace spine;
 
 RTTI_IMPL(PointAttachment, Attachment)
 
-PointAttachment::PointAttachment(const String &name) : Attachment(name), _x(0), _y(0), _rotation(0) {
+PointAttachment::PointAttachment(const String &name) : Attachment(name), _x(0), _y(0), _rotation(0), _color()  {
 }
 
 void PointAttachment::computeWorldPosition(Bone &bone, float &ox, float &oy) {
@@ -79,6 +79,10 @@ float PointAttachment::getRotation() {
 
 void PointAttachment::setRotation(float inValue) {
 	_rotation = inValue;
+}
+
+Color &PointAttachment::getColor() {
+	return _color;
 }
 
 Attachment *PointAttachment::copy() {

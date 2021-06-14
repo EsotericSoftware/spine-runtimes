@@ -205,6 +205,9 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			data->_transformMode = TransformMode_NoScaleOrReflection;
 		data->_skinRequired = Json::getBoolean(boneMap, "skin", false);
 
+		const char* color = Json::getString(boneMap, "color", NULL);
+		if (color) toColor(data->getColor(), color, true);
+
 		skeletonData->_bones[i] = data;
 		bonesCount++;
 	}
@@ -548,12 +551,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							region->_height = Json::getFloat(attachmentMap, "height", 32) * _scale;
 
 							color = Json::getString(attachmentMap, "color", 0);
-							if (color) {
-								region->getColor().r = toColor(color, 0);
-								region->getColor().g = toColor(color, 1);
-								region->getColor().b = toColor(color, 2);
-								region->getColor().a = toColor(color, 3);
-							}
+							if (color) toColor(region->getColor(), color, true);
 
 							region->updateOffset();
 							_attachmentLoader->configureAttachment(region);
@@ -573,12 +571,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							mesh->_path = attachmentPath;
 
 							color = Json::getString(attachmentMap, "color", 0);
-							if (color) {
-								mesh->getColor().r = toColor(color, 0);
-								mesh->getColor().g = toColor(color, 1);
-								mesh->getColor().b = toColor(color, 2);
-								mesh->getColor().a = toColor(color, 3);
-							}
+							if (color) toColor(mesh->getColor(), color, true);
 
 							mesh->_width = Json::getFloat(attachmentMap, "width", 32) * _scale;
 							mesh->_height = Json::getFloat(attachmentMap, "height", 32) * _scale;
@@ -633,6 +626,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 
 							int vertexCount = Json::getInt(attachmentMap, "vertexCount", 0) << 1;
 							readVertices(attachmentMap, box, vertexCount);
+							color = Json::getString(attachmentMap, "color", NULL);
+							if (color) toColor(box->getColor(), color, true);
 							_attachmentLoader->configureAttachment(attachment);
 							break;
 						}
@@ -654,6 +649,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							curves = Json::getItem(attachmentMap, "lengths");
 							for (curves = curves->_child, ii = 0; curves; curves = curves->_next, ++ii)
 								pathAttatchment->_lengths[ii] = curves->_valueFloat * _scale;
+							color = Json::getString(attachmentMap, "color", NULL);
+							if (color) toColor(pathAttatchment->getColor(), color, true);
 							_attachmentLoader->configureAttachment(attachment);
 							break;
 						}
@@ -665,6 +662,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							point->_x = Json::getFloat(attachmentMap, "x", 0) * _scale;
 							point->_y = Json::getFloat(attachmentMap, "y", 0) * _scale;
 							point->_rotation = Json::getFloat(attachmentMap, "rotation", 0);
+							color = Json::getString(attachmentMap, "color", NULL);
+							if (color) toColor(point->getColor(), color, true);
 							_attachmentLoader->configureAttachment(attachment);
 							break;
 						}
@@ -678,6 +677,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							if (end) clip->_endSlot = skeletonData->findSlot(end);
 							vertexCount = Json::getInt(attachmentMap, "vertexCount", 0) << 1;
 							readVertices(attachmentMap, clip, vertexCount);
+							color = Json::getString(attachmentMap, "color", NULL);
+							if (color) toColor(clip->getColor(), color, true);
 							_attachmentLoader->configureAttachment(attachment);
 							break;
 						}

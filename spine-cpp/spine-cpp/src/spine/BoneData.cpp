@@ -50,7 +50,8 @@ BoneData::BoneData(int index, const String &name, BoneData *parent) :
 		_shearX(0),
 		_shearY(0),
 		_transformMode(TransformMode_Normal),
-		_skinRequired(false) {
+		_skinRequired(false),
+		_color() {
 	assert(index >= 0);
 	assert(_name.length() > 0);
 }
@@ -145,4 +146,8 @@ bool BoneData::isSkinRequired() {
 
 void BoneData::setSkinRequired(bool inValue) {
 	_skinRequired = inValue;
+}
+
+Color &BoneData::getColor() {
+	return _color;
 }

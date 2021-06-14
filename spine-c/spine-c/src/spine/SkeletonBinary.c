@@ -1002,7 +1002,10 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			int vertexCount = readVarint(input, 1);
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
 			_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
-			if (nonessential) readInt(input); /* Skip color. */
+			if (nonessential) {
+				spBoundingBoxAttachment *bbox = SUB_CAST(spBoundingBoxAttachment, attachment);
+				readColor(input, &bbox->color.r, &bbox->color.g, &bbox->color.b, &bbox->color.a);
+			}
 			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 			return attachment;
 		}
@@ -1079,7 +1082,9 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			for (i = 0; i < path->lengthsLength; ++i) {
 				path->lengths[i] = readFloat(input) * self->scale;
 			}
-			if (nonessential) readInt(input); /* Skip color. */
+			if (nonessential) {
+				readColor(input, &path->color.r, &path->color.g, &path->color.b, &path->color.a);
+			}
 			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 			return attachment;
 		}
@@ -1102,7 +1107,9 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
 			spClippingAttachment *clip = SUB_CAST(spClippingAttachment, attachment);
 			_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
-			if (nonessential) readInt(input); /* Skip color. */
+			if (nonessential) {
+				readColor(input, &clip->color.r, &clip->color.g, &clip->color.b, &clip->color.a);
+			}
 			clip->endSlot = skeletonData->slots[endSlotIndex];
 			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 			return attachment;
@@ -1201,10 +1208,17 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	nonessential = readBoolean(input);
 
 	if (nonessential) {
-		/* Skip images path & fps */
-		readFloat(input);
-		FREE(readString(input));
-		FREE(readString(input));
+		skeletonData->fps = readFloat(input);
+		skeletonData->imagesPath = readString(input);
+		if (!strlen(skeletonData->imagesPath)) {
+			FREE(skeletonData->imagesPath);
+			skeletonData->imagesPath = 0;
+		}
+		skeletonData->audioPath = readString(input);
+		if (!strlen(skeletonData->audioPath)) {
+			FREE(skeletonData->audioPath);
+			skeletonData->audioPath = 0;
+		}
 	}
 
 	skeletonData->stringsCount = n = readVarint(input, 1);
@@ -1251,7 +1265,9 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 				break;
 		}
 		data->skinRequired = readBoolean(input);
-		if (nonessential) readInt(input); /* Skip bone color. */
+		if (nonessential) {
+			readColor(input, &data->color.r, &data->color.g, &data->color.b, &data->color.a);
+		}
 		skeletonData->bones[i] = data;
 	}
 
