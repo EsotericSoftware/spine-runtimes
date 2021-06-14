@@ -13,7 +13,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-ue4 works with data exported from Spine 3.9.xx.
+spine-ue4 works with data exported from Spine 4.0.xx.
 
 spine-ue4 supports all Spine features.
 

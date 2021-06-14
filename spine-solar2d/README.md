@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-solar2d works with data exported from Spine 3.9.xx.
+spine-solar2d works with data exported from Spine 4.0.xx.
 
 spine-solar2d supports all Spine features.
 
