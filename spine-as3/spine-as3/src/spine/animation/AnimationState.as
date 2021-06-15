@@ -605,6 +605,7 @@ package spine.animation {
 			entry.interruptAlpha = 1;
 			entry.mixTime = 0;
 			entry.mixDuration = last == null ? 0 : data.getMix(last.animation, animation);
+			entry.mixBlend = MixBlend.replace;
 			return entry;
 		}
 

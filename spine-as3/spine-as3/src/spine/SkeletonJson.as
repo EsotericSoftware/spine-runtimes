@@ -957,7 +957,7 @@ package spine {
 		static private function readCurve(curve : Object, timeline : CurveTimeline, bezier : int, frame : int, value : Number, time1 : Number, time2 : Number,
 			value1 : Number, value2 : Number, scale : Number) : int {
 			if (curve == "stepped") {
-				if (value != 0) timeline.setStepped(frame);
+				timeline.setStepped(frame);
 				return bezier;
 			}
 			var i : int = value << 2;
