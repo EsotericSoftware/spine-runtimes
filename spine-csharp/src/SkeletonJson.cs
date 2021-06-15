@@ -1107,8 +1107,9 @@ namespace Spine {
 		static int ReadCurve (object curve, CurveTimeline timeline, int bezier, int frame, int value, float time1, float time2,
 			float value1, float value2, float scale) {
 
-			if (curve is string) {
-				if (value != 0) timeline.SetStepped(frame);
+			string curveString = curve as string;
+			if (curveString != null) {
+				if (curveString == "stepped") timeline.SetStepped(frame);
 				return bezier + 1;
 			}
 			var curveValues = (List<object>)curve;

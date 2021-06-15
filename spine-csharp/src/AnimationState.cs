@@ -832,6 +832,7 @@ namespace Spine {
 			entry.interruptAlpha = 1;
 			entry.mixTime = 0;
 			entry.mixDuration = last == null ? 0 : data.GetMix(last.animation, animation);
+			entry.mixBlend = MixBlend.Replace;
 			return entry;
 		}
 
