@@ -1163,7 +1163,7 @@ function SkeletonJson.new (attachmentLoader)
 
 	readCurve = function (curve, timeline, bezier, frame, value, time1, time2, value1, value2, scale)
 		if curve == "stepped" then
-			if value ~= 0 then timeline:setStepped(frame) end
+			timeline:setStepped(frame)
 			return bezier
 		end
 		local i = value * 4 + 1
