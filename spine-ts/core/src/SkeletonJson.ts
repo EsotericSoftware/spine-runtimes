@@ -947,7 +947,7 @@ module spine {
 	function readCurve (curve: any, timeline: CurveTimeline, bezier: number, frame: number, value: number, time1: number, time2: number,
 		value1: number, value2: number, scale: number) {
 		if (curve == "stepped") {
-			if (value != 0) timeline.setStepped(frame);
+			timeline.setStepped(frame);
 			return bezier;
 		}
 		let i = value << 2;

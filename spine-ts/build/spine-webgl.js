@@ -7200,8 +7200,7 @@ var spine;
 	}
 	function readCurve(curve, timeline, bezier, frame, value, time1, time2, value1, value2, scale) {
 		if (curve == "stepped") {
-			if (value != 0)
-				timeline.setStepped(frame);
+			timeline.setStepped(frame);
 			return bezier;
 		}
 		var i = value << 2;
