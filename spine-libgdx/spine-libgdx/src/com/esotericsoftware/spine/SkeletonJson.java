@@ -1025,7 +1025,7 @@ public class SkeletonJson extends SkeletonLoader {
 	int readCurve (JsonValue curve, CurveTimeline timeline, int bezier, int frame, int value, float time1, float time2,
 		float value1, float value2, float scale) {
 		if (curve.isString()) {
-			if (value != 0) timeline.setStepped(frame);
+			if (curve.asString().equals("stepped")) timeline.setStepped(frame);
 			return bezier;
 		}
 		curve = curve.get(value << 2);
