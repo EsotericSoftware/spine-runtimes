@@ -974,6 +974,7 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 	entry._interruptAlpha = 1;
 	entry._mixTime = 0;
 	entry._mixDuration = (last == NULL) ? 0 : _data->getMix(last->_animation, animation);
+	entry._mixBlend = MixBlend_Replace;
 
 	return entryP;
 }
