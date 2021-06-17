@@ -864,8 +864,11 @@ module spine {
 
 			let atlas = this.assetManager.get(this.config.atlasUrl);
 			let skeletonData: SkeletonData;
-			if (this.config.jsonUrl) {
-				let jsonText = this.assetManager.get(this.config.jsonUrl);
+			let jsonUrl = this.config.jsonUrl;
+			if (jsonUrl) {
+				let jsonText = this.assetManager.get(jsonUrl);
+				let hash = jsonUrl.indexOf("#");
+				if (hash != -1) jsonText = JSON.parse(jsonText)[jsonUrl.substr(hash + 1)];
 				let json = new SkeletonJson(new AtlasAttachmentLoader(atlas));
 				try {
 					skeletonData = json.readSkeletonData(jsonText);
