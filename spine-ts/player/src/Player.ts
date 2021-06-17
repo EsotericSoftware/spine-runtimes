@@ -858,7 +858,7 @@ module spine {
 			if (this.loaded) return;
 
 			if (this.assetManager.hasErrors()) {
-				this.showError("Error: assets could not be loaded.<br><br>" + escapeHtml(JSON.stringify(this.assetManager.getErrors())));
+				this.showError("Error: Assets could not be loaded.<br><br>" + escapeHtml(JSON.stringify(this.assetManager.getErrors())));
 				return;
 			}
 
@@ -873,7 +873,7 @@ module spine {
 				try {
 					skeletonData = json.readSkeletonData(jsonText);
 				} catch (e) {
-					this.showError("Error: could not load skeleton .json.<br><br>" + e.toString());
+					this.showError("Error: Could not load skeleton JSON.<br><br>" + e.toString());
 					return;
 				}
 			} else {
@@ -882,7 +882,7 @@ module spine {
 				try {
 					skeletonData = binary.readSkeletonData(binaryData);
 				} catch (e) {
-					this.showError("Error: could not load skeleton .skel.<br><br>" + e.toString());
+					this.showError("Error: Could not load skeleton binary.<br><br>" + e.toString());
 					return;
 				}
 			}
