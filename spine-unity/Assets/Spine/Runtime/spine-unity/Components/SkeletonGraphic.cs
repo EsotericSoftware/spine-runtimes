@@ -72,7 +72,7 @@ namespace Spine.Unity {
 		public bool unscaledTime;
 		public bool allowMultipleCanvasRenderers = false;
 		public List<CanvasRenderer> canvasRenderers = new List<CanvasRenderer>();
-		protected List<RawImage> rawImages = new List<RawImage>();
+		protected List<SkeletonSubmeshGraphic> submeshGraphics = new List<SkeletonSubmeshGraphic>();
 		protected int usedRenderersCount = 0;
 
 		// Submesh Separation
@@ -203,7 +203,7 @@ namespace Spine.Unity {
 
 			base.Awake ();
 			updateMode = updateWhenInvisible;
-			SyncRawImagesWithCanvasRenderers();
+			SyncSubmeshGraphicsWithCanvasRenderers();
 			if (!this.IsValid) {
 #if UNITY_EDITOR
 				// workaround for special import case of open scene where OnValidate and Awake are
@@ -262,16 +262,21 @@ namespace Spine.Unity {
 			ApplyAnimation();
 		}
 
-		protected void SyncRawImagesWithCanvasRenderers () {
-			rawImages.Clear();
+		protected void SyncSubmeshGraphicsWithCanvasRenderers () {
+			submeshGraphics.Clear();
+
+#if UNITY_EDITOR
+			if (!Application.isPlaying)
+				DestroyOldRawImages();
+#endif
 			foreach (var canvasRenderer in canvasRenderers) {
-				var rawImage = canvasRenderer.GetComponent<RawImage>();
-				if (rawImage == null) {
-					rawImage = canvasRenderer.gameObject.AddComponent<RawImage>();
-					rawImage.maskable = this.maskable;
-					rawImage.raycastTarget = false;
+				var submeshGraphic = canvasRenderer.GetComponent<SkeletonSubmeshGraphic>();
+				if (submeshGraphic == null) {
+					submeshGraphic = canvasRenderer.gameObject.AddComponent<SkeletonSubmeshGraphic>();
+					submeshGraphic.maskable = this.maskable;
+					submeshGraphic.raycastTarget = false;
 				}
-				rawImages.Add(rawImage);
+				submeshGraphics.Add(submeshGraphic);
 			}
 		}
 
@@ -481,7 +486,7 @@ namespace Spine.Unity {
 				}
 			}
 			canvasRenderers = newList;
-			SyncRawImagesWithCanvasRenderers();
+			SyncSubmeshGraphicsWithCanvasRenderers();
 		}
 
 		public void Initialize (bool overwrite) {
@@ -660,7 +665,6 @@ namespace Spine.Unity {
 				var canvasRenderer = canvasRenderers[i];
 				if (i >= usedRenderersCount) {
 					canvasRenderer.gameObject.SetActive(true);
-					rawImages[i].Rebuild(CanvasUpdate.PreRender);
 				}
 				canvasRenderer.SetMesh(targetMesh);
 				canvasRenderer.materialCount = 1;
@@ -704,10 +708,10 @@ namespace Spine.Unity {
 				go.transform.localPosition = Vector3.zero;
 				var canvasRenderer = go.AddComponent<CanvasRenderer>();
 				canvasRenderers.Add(canvasRenderer);
-				var rawImage = go.AddComponent<RawImage>();
-				rawImage.maskable = this.maskable;
-				rawImage.raycastTarget = false;
-				rawImages.Add(rawImage);
+				var submeshGraphic = go.AddComponent<SkeletonSubmeshGraphic>();
+				submeshGraphic.maskable = this.maskable;
+				submeshGraphic.raycastTarget = false;
+				submeshGraphics.Add(submeshGraphic);
 			}
 		}
 
@@ -731,7 +735,16 @@ namespace Spine.Unity {
 				}
 			}
 		}
-	#endif
+
+		private void DestroyOldRawImages () {
+			foreach (var canvasRenderer in canvasRenderers) {
+				var oldRawImage = canvasRenderer.GetComponent<RawImage>();
+				if (oldRawImage != null) {
+					DestroyImmediate(oldRawImage);
+				}
+			}
+		}
+#endif
 
 		protected void EnsureMeshesCount (int targetCount) {
 			int oldCount = meshes.Count;
