@@ -438,8 +438,13 @@ module spine {
 					this.assetManager.setRawDataURI(path, data);
 				}
 			}
-			if (config.jsonUrl) this.assetManager.loadText(config.jsonUrl);
-			else this.assetManager.loadBinary(config.skelUrl);
+			let jsonUrl = config.jsonUrl;
+			if (jsonUrl) {
+				let hash = jsonUrl.indexOf("#");
+				if (hash != -1) jsonUrl = jsonUrl.substr(0, hash);
+				this.assetManager.loadText(jsonUrl);
+			} else
+				this.assetManager.loadBinary(config.skelUrl);
 			this.assetManager.loadTextureAtlas(config.atlasUrl);
 			if (config.backgroundImage && config.backgroundImage.url)
 				this.assetManager.loadTexture(config.backgroundImage.url);
@@ -866,9 +871,14 @@ module spine {
 			let skeletonData: SkeletonData;
 			let jsonUrl = this.config.jsonUrl;
 			if (jsonUrl) {
-				let jsonText = this.assetManager.get(jsonUrl);
 				let hash = jsonUrl.indexOf("#");
-				if (hash != -1) jsonText = JSON.parse(jsonText)[jsonUrl.substr(hash + 1)];
+				let field = null;
+				if (hash != -1) {
+					field = jsonUrl.substr(hash + 1);
+					jsonUrl = jsonUrl.substr(0, hash);
+				}
+				let jsonText = this.assetManager.get(jsonUrl);
+				if (field) jsonText = JSON.parse(jsonText)[field];
 				let json = new SkeletonJson(new AtlasAttachmentLoader(atlas));
 				try {
 					skeletonData = json.readSkeletonData(jsonText);
