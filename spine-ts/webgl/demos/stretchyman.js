@@ -21,8 +21,6 @@ var stretchymanDemo = function(canvas, bgColor) {
 	var kneePos = new spine.Vector2();
 	var playButton, timeLine, spacing, isPlaying = true, playTime = 0;
 
-	var DEMO_NAME = "StretchymanDemo";
-
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
@@ -30,22 +28,17 @@ var stretchymanDemo = function(canvas, bgColor) {
 		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = spineDemos.assetManager;
-		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
-		input = new spine.webgl.Input(canvas);
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas2.png");
-		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
-		assetManager.loadJson(DEMO_NAME, "demos.json");
+		assetManager = new spine.webgl.AssetManager(gl, "assets/", spineDemos.downloader);
+		assetManager.loadTextureAtlas("atlas2.atlas");
+		assetManager.loadJson("demos.json");
 		timeKeeper = new spine.TimeKeeper();
+		input = new spine.webgl.Input(canvas);
 	}
 
 	function loadingComplete () {
-		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
-			return assetManager.get(DEMO_NAME, path);
-		});
-		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("atlas2.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").stretchyman);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").stretchyman);
 		skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setToSetupPose();
 		skeleton.updateWorldTransform();
@@ -181,8 +174,8 @@ var stretchymanDemo = function(canvas, bgColor) {
 		gl.lineWidth(1);
 	}
 
+	init();
+	stretchymanDemo.assetManager = assetManager;
 	stretchymanDemo.loadingComplete = loadingComplete;
 	stretchymanDemo.render = render;
-	stretchymanDemo.DEMO_NAME = DEMO_NAME;
-	init();
 };

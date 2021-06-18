@@ -15,8 +15,6 @@ var transformsDemo = function(canvas, bgColor) {
 	var lastRotation = 0;
 	var mix, lastOffset = 0, lastMix = 0.5;
 
-	var DEMO_NAME = "TransformsDemo";
-
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
@@ -24,22 +22,17 @@ var transformsDemo = function(canvas, bgColor) {
 		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = spineDemos.assetManager;
-		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas2.png");
-		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
-		assetManager.loadJson(DEMO_NAME, "demos.json");
+		assetManager = new spine.webgl.AssetManager(gl, "assets/", spineDemos.downloader);
+		assetManager.loadTextureAtlas("atlas2.atlas");
+		assetManager.loadJson("demos.json");
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();
 	}
 
 	function loadingComplete () {
-		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
-			return assetManager.get(DEMO_NAME, path);
-		});
-		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("atlas2.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").transforms);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").transforms);
 		skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setToSetupPose();
 		skeleton.updateWorldTransform();
@@ -80,7 +73,9 @@ var transformsDemo = function(canvas, bgColor) {
 			var val = percent;
 			var delta = val - lastMix;
 			lastMix = val;
-			skeleton.findTransformConstraint("wheel1").translateMix += delta;
+			var constraint = skeleton.findTransformConstraint("wheel1");
+			constraint.mixX += delta;
+			constraint.mixY += delta;
 			$("#transforms-translationmix-label").text(Math.round(val * 100) + "%");
 		};
 		$("#transforms-translationmix-label").text("50%");
@@ -170,8 +165,8 @@ var transformsDemo = function(canvas, bgColor) {
 		renderer.end();
 	}
 
+	init();
+	transformsDemo.assetManager = assetManager;
 	transformsDemo.loadingComplete = loadingComplete;
 	transformsDemo.render = render;
-	transformsDemo.DEMO_NAME = DEMO_NAME;
-	init();
 };

@@ -3,30 +3,29 @@ var spineDemos = {
 	HOVER_COLOR_OUTER: new spine.Color(1, 1, 1, 1),
 	NON_HOVER_COLOR_INNER: new spine.Color(0.478, 0, 0, 0.5),
 	NON_HOVER_COLOR_OUTER: new spine.Color(1, 0, 0, 0.8),
-	assetManager: new spine.SharedAssetManager("assets/"),
 	demos: [],
 	loopRunning: false,
-	canvases: []
+	canvases: [],
+	downloader: new spine.Downloader()
 };
 
 window.onerror = function (msg, url, lineNo, columnNo, error) {
-    var string = msg.toLowerCase();
-    var substring = "script error";
-    if (string.indexOf(substring) > -1){
-        alert('Script Error: See Browser Console for Detail');
-    } else {
-        var message = [
-            'Message: ' + msg,
-            'URL: ' + url,
-            'Line: ' + lineNo,
-            'Column: ' + columnNo,
-            'Error object: ' + JSON.stringify(error)
-        ].join(' - ');
+	var string = msg.toLowerCase();
+	var substring = "script error";
+	if (string.indexOf(substring) > -1)
+		alert('Script Error: See Browser Console for Detail');
+	else {
+		var message = [
+			'Message: ' + msg,
+			'URL: ' + url,
+			'Line: ' + lineNo,
+			'Column: ' + columnNo,
+			'Error object: ' + JSON.stringify(error)
+		].join(' - ');
 
-        alert(message);
-    }
-
-    return false;
+		alert(message);
+	}
+	return false;
 };
 
 (function () {
@@ -37,8 +36,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 		requestAnimationFrame(loop);
 		var demos = spineDemos.demos;
 		for (var i = 0; i < demos.length; i++) {
-			var demo = demos[i];			
-
+			var demo = demos[i];
 			checkElementVisible(demo);
 			renderDemo(demo);
 		}
@@ -46,7 +44,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 
 	function renderDemo(demo) {
 		var canvas = demo.canvas;
-		if (!spineDemos.assetManager.isLoadingComplete(demo.DEMO_NAME)) {
+		if (!demo.assetManager.isLoadingComplete()) {
 			if (demo.visible) {
 				if (canvas.parentElement != demo.placeholder) {
 					$(canvas).detach();

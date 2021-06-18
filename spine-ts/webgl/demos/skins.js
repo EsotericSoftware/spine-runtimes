@@ -5,8 +5,6 @@ var skinsDemo = function(canvas, bgColor) {
 	var playButton, timeLine, isPlaying = true, playTime = 0;
 	var randomizeSkins, lastSkinChange = Date.now() / 1000, clickAnim = 0;
 
-	var DEMO_NAME = "SkinsDemo";
-
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
@@ -14,23 +12,17 @@ var skinsDemo = function(canvas, bgColor) {
 		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = spineDemos.assetManager;
-		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "heroes.png");
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "heroes2.png");
-		assetManager.loadText(DEMO_NAME, "heroes.atlas");
-		assetManager.loadJson(DEMO_NAME, "demos.json");
+		assetManager = new spine.webgl.AssetManager(gl, "assets/", spineDemos.downloader);
+		assetManager.loadTextureAtlas("heroes.atlas");
+		assetManager.loadJson("demos.json");
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();
 	}
 
 	function loadingComplete () {
-		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "heroes.atlas"), function(path) {
-			return assetManager.get(DEMO_NAME, path);
-		});
-		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("heroes.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").heroes);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").heroes);
 		skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setSkinByName("Assassin");
 		var stateData = new spine.AnimationStateData(skeleton.data);
@@ -199,7 +191,7 @@ var skinsDemo = function(canvas, bgColor) {
 
 		renderer.begin();
 		renderer.drawSkeleton(skeleton, true);
-		var texture = assetManager.get(DEMO_NAME, "heroes.png");
+		var texture = assetManager.get("heroes.png");
 		var width = bounds.x * 1.25;
 		var scale = width / texture.getImage().width;
 		var height = scale * texture.getImage().height;
@@ -207,8 +199,8 @@ var skinsDemo = function(canvas, bgColor) {
 		renderer.end();
 	}
 
+	init();
+	skinsDemo.assetManager = assetManager;
 	skinsDemo.loadingComplete = loadingComplete;
 	skinsDemo.render = render;
-	skinsDemo.DEMO_NAME = DEMO_NAME;
-	init();
 };

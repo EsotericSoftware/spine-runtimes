@@ -13,8 +13,6 @@ var hoverboardDemo = function(canvas, bgColor) {
 	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.webgl.Vector3();
 	var isPlaying = true;
 
-	var DEMO_NAME = "HoverboardDemo";
-
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
@@ -22,23 +20,17 @@ var hoverboardDemo = function(canvas, bgColor) {
 		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = spineDemos.assetManager;
-		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas12.png");
-		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
-		assetManager.loadJson(DEMO_NAME, "demos.json");
+		assetManager = new spine.webgl.AssetManager(gl, "assets/", spineDemos.downloader);
+		assetManager.loadTextureAtlas("atlas1.atlas");
+		assetManager.loadJson("demos.json");
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();
 	}
 
 	function loadingComplete () {
-		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
-			return assetManager.get(DEMO_NAME, path);
-		});
-		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("atlas1.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json")["spineboy"]);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").spineboy);
 		skeleton = new spine.Skeleton(skeletonData);
 		state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 		state.setAnimation(0, "hoverboard", true);
@@ -174,8 +166,8 @@ var hoverboardDemo = function(canvas, bgColor) {
 		gl.lineWidth(1);
 	}
 
+	init();
+	hoverboardDemo.assetManager = assetManager;
 	hoverboardDemo.loadingComplete = loadingComplete;
 	hoverboardDemo.render = render;
-	hoverboardDemo.DEMO_NAME = DEMO_NAME;
-	init();
 };

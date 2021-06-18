@@ -5,7 +5,6 @@ $(function () {
 	}
 
 	spineDemos.init();
-	spineDemos.assetManager = new spine.SharedAssetManager("assets/");
 
 	var demos = [
 		spritesheetsDemo,

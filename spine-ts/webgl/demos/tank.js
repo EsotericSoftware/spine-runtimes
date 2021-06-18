@@ -4,8 +4,6 @@ var tankDemo = function(canvas, bgColor) {
 	var timeKeeper;
 	var playButton, timeLine, isPlaying = true, playTime = 0;
 
-	var DEMO_NAME = "TankDemo";
-
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
@@ -13,21 +11,16 @@ var tankDemo = function(canvas, bgColor) {
 		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = spineDemos.assetManager;
-		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas2.png");
-		assetManager.loadText(DEMO_NAME, "atlas2.atlas");
-		assetManager.loadJson(DEMO_NAME, "demos.json");
+		assetManager = new spine.webgl.AssetManager(gl, "assets/", spineDemos.downloader);
+		assetManager.loadTextureAtlas("atlas2.atlas");
+		assetManager.loadJson("demos.json");
 		timeKeeper = new spine.TimeKeeper();
 	}
 
 	function loadingComplete () {
-		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas2.atlas"), function(path) {
-			return assetManager.get(DEMO_NAME, path);
-		});
-		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("atlas2.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").tank);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").tank);
 		skeleton = new spine.Skeleton(skeletonData);
 		state = new spine.AnimationState(new spine.AnimationStateData(skeleton.data));
 		state.setAnimation(0, "drive", true);
@@ -114,8 +107,8 @@ var tankDemo = function(canvas, bgColor) {
 		renderer.end();
 	}
 
+	init();
+	tankDemo.assetManager = assetManager;
 	tankDemo.loadingComplete = loadingComplete;
 	tankDemo.render = render;
-	tankDemo.DEMO_NAME = DEMO_NAME;
-	init();
 };

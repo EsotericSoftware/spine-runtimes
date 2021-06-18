@@ -8,8 +8,6 @@ var imageChangesDemo = function(canvas, bgColor) {
 	var activeSkeleton = "Alien";
 	var playButton, timeLine, isPlaying = true;
 
-	var DEMO_NAME = "ImageChangesDemo";
-
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
@@ -17,12 +15,9 @@ var imageChangesDemo = function(canvas, bgColor) {
 		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = spineDemos.assetManager;
-		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas12.png");
-		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
-		assetManager.loadJson(DEMO_NAME, "demos.json");
+		assetManager = new spine.webgl.AssetManager(gl, "assets/", spineDemos.downloader);
+		assetManager.loadTextureAtlas("atlas1.atlas");
+		assetManager.loadJson("demos.json");
 		timeKeeper = new spine.TimeKeeper();
 	}
 
@@ -74,12 +69,9 @@ var imageChangesDemo = function(canvas, bgColor) {
 	}
 
 	function loadSkeleton(name, animation, sequenceSlots) {
-		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
-			return assetManager.get(DEMO_NAME, path);
-		});
-		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("atlas1.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json")[name]);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json")[name]);
 		var skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setSkinByName("default");
 
@@ -102,7 +94,6 @@ var imageChangesDemo = function(canvas, bgColor) {
 		}
 
 		return {
-			atlas: atlas,
 			skeleton: skeleton,
 			state: state,
 			playTime: 0,
@@ -191,8 +182,8 @@ var imageChangesDemo = function(canvas, bgColor) {
 		renderer.end();
 	}
 
+	init();
+	imageChangesDemo.assetManager = assetManager;
 	imageChangesDemo.loadingComplete = loadingComplete;
 	imageChangesDemo.render = render;
-	imageChangesDemo.DEMO_NAME = DEMO_NAME;
-	init();
 };

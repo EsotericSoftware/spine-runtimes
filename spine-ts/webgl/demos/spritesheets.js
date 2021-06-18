@@ -11,8 +11,6 @@ var spritesheetsDemo = function(canvas, bgColor) {
 	var timeKeeper, loadingScreen, input;
 	var playTime = 0, framePlaytime = 0, clickAnim = 0;
 
-	var DEMO_NAME = "SpritesheetsDemo";
-
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
@@ -20,23 +18,17 @@ var spritesheetsDemo = function(canvas, bgColor) {
 		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = spineDemos.assetManager;
-		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas12.png");
-		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
-		assetManager.loadJson(DEMO_NAME, "demos.json");
+		assetManager = new spine.webgl.AssetManager(gl, "assets/", spineDemos.downloader);
+		assetManager.loadTextureAtlas("atlas1.atlas");
+		assetManager.loadJson("demos.json");
 		timeKeeper = new spine.TimeKeeper();
 		input = new spine.webgl.Input(canvas);
 	}
 
 	function loadingComplete () {
-		skeletonAtlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
-			return assetManager.get(DEMO_NAME, path);
-		});
-		var atlasLoader = new spine.AtlasAttachmentLoader(skeletonAtlas);
+		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("atlas1.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json").raptor);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").raptor);
 		skeleton = new spine.Skeleton(skeletonData);
 		var stateData = new spine.AnimationStateData(skeleton.data);
 		stateData.defaultMix = 0.5;
@@ -144,8 +136,8 @@ var spritesheetsDemo = function(canvas, bgColor) {
 		renderer.end();
 	}
 
+	init();
+	spritesheetsDemo.assetManager = assetManager;
 	spritesheetsDemo.loadingComplete = loadingComplete;
 	spritesheetsDemo.render = render;
-	spritesheetsDemo.DEMO_NAME = DEMO_NAME;
-	init();
 };

@@ -6,8 +6,6 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 	var timeSlider, timeSliderLabel;
 	var timeKeeper;
 
-	var DEMO_NAME = "TransitionsDemo";
-
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
@@ -19,13 +17,9 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = spineDemos.assetManager;
-		var textureLoader = function(img) { return new spine.webgl.GLTexture(gl, img); };
-
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas1.png");
-		assetManager.loadTexture(DEMO_NAME, textureLoader, "atlas12.png");
-		assetManager.loadText(DEMO_NAME, "atlas1.atlas");
-		assetManager.loadJson(DEMO_NAME, "demos.json");
+		assetManager = new spine.webgl.AssetManager(gl, "assets/", spineDemos.downloader);
+		assetManager.loadTextureAtlas("atlas1.atlas");
+		assetManager.loadJson("demos.json");
 
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();
@@ -85,12 +79,9 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 	}
 
 	function loadSkeleton(name) {
-		var atlas = new spine.TextureAtlas(assetManager.get(DEMO_NAME, "atlas1.atlas"), function(path) {
-			return assetManager.get(DEMO_NAME, path);
-		});
-		var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("atlas1.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(DEMO_NAME, "demos.json")[name]);
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json")[name]);
 		var skeleton = new spine.Skeleton(skeletonData);
 		skeleton.setSkinByName("default");
 		return skeleton;
@@ -134,8 +125,8 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 		renderer.end();
 	}
 
+	init();
+	transitionsDemo.assetManager = assetManager;
 	transitionsDemo.loadingComplete = loadingComplete;
 	transitionsDemo.render = render;
-	transitionsDemo.DEMO_NAME = DEMO_NAME;
-	init();
 };
