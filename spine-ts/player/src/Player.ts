@@ -40,13 +40,16 @@ module spine {
 	}
 
 	export interface SpinePlayerConfig {
-		/* the URL of the skeleton .json file */
+		/* The URL of the skeleton JSON file (.json). */
 		jsonUrl: string
 
-		/* the URL of the skeleton .skel file */
+		/* Optional: the name of a field in the JSON that holds the skeleton data. */
+		jsonField: string
+
+		/* The URL of the skeleton binary file (.skel). */
 		skelUrl: string
 
-		/* the URL of the skeleton .atlas file. Atlas page images are automatically resolved. */
+		/* The URL of the skeleton atlas file (.atlas). Atlas page images are automatically resolved. */
 		atlasUrl: string
 
 		/* Raw data URIs, mapping from a path to base 64 encoded raw data. When the player
@@ -132,6 +135,9 @@ module spine {
 
 		/* Optional: callback when the widget could not be loaded. */
 		error: (widget: SpinePlayer, msg: string) => void
+
+		/* Optional: the specified downloader is used for the player's asset manager, allowing multiple players to share assets. */
+		downloader: spine.Downloader
 	}
 
 	class Popup {
@@ -304,6 +310,7 @@ module spine {
 		private loadingScreen: spine.webgl.LoadingScreen;
 		private assetManager: spine.webgl.AssetManager;
 
+		public error: boolean;
 		// Whether the skeleton was loaded
 		public loaded: boolean;
 		// The loaded skeleton
@@ -326,8 +333,7 @@ module spine {
 		private stopRequestAnimationFrame = false;
 
 		constructor(parent: HTMLElement | string, private config: SpinePlayerConfig) {
-			if (typeof parent === "string") this.parent = document.getElementById(parent);
-			else this.parent = parent;
+			this.parent = typeof parent === "string" ? document.getElementById(parent) : parent;
 			this.parent.appendChild(this.render());
 		}
 
@@ -361,7 +367,7 @@ module spine {
 			if (typeof config.debug.meshes === "undefined") config.debug.meshes = false;
 
 			if (config.animations && config.animation) {
-				if (config.animations.indexOf(config.animation) < 0) throw new Error("Default animation '" + config.animation + "' is not contained in the list of selectable animations " + escapeHtml(JSON.stringify(this.config.animations)) + ".");
+				if (config.animations.indexOf(config.animation) < 0) throw new Error("Default animation '" + config.animation + "' is not contained in the list of selectable animations: " + escapeHtml(JSON.stringify(this.config.animations)));
 			}
 
 			if (config.skins && config.skin) {
@@ -370,19 +376,20 @@ module spine {
 
 			if (!config.controlBones) config.controlBones = [];
 
-			if (typeof config.showControls === "undefined")
-				config.showControls = true;
+			if (typeof config.showControls === "undefined") config.showControls = true;
 
-			if (typeof config.defaultMix === "undefined")
-				config.defaultMix = 0.25;
+			if (typeof config.defaultMix === "undefined") config.defaultMix = 0.25;
 
 			return config;
 		}
 
 		showError(error: string) {
+			if (this.error) return;
+			this.error = true;
+			console.log(error);
 			let errorDom = findWithClass(this.dom, "spine-player-error")[0];
 			errorDom.classList.remove("spine-player-hidden");
-			errorDom.innerHTML = `<p style="text-align: center; align-self: center;">${error}</p>`;
+			errorDom.innerHTML = '<p style="text-align: center; align-self: center;">' + error.replace("\n", "<br><br>") + '</p>';
 			this.config.error(this, error);
 		}
 
@@ -414,7 +421,7 @@ module spine {
 				this.config = this.validateConfig(config);
 			} catch (e) {
 				this.showError(e);
-				return dom
+				return dom;
 			}
 
 			try {
@@ -426,12 +433,12 @@ module spine {
 				this.sceneRenderer = new spine.webgl.SceneRenderer(this.canvas, this.context, true);
 				this.loadingScreen = new spine.webgl.LoadingScreen(this.sceneRenderer);
 			} catch (e) {
-				this.showError("Sorry, your browser does not support WebGL.<br><br>Please use the latest version of Firefox, Chrome, Edge, or Safari.");
+				this.showError("Sorry, your browser does not support WebGL.\nPlease use the latest version of Firefox, Chrome, Edge, or Safari.");
 				return dom;
 			}
 
 			// Load the assets
-			this.assetManager = new spine.webgl.AssetManager(this.context);
+			this.assetManager = new spine.webgl.AssetManager(this.context, "", config.downloader);
 			if (config.rawDataURIs) {
 				for (let path in config.rawDataURIs) {
 					let data = config.rawDataURIs[path];
@@ -439,11 +446,9 @@ module spine {
 				}
 			}
 			let jsonUrl = config.jsonUrl;
-			if (jsonUrl) {
-				let hash = jsonUrl.indexOf("#");
-				if (hash != -1) jsonUrl = jsonUrl.substr(0, hash);
-				this.assetManager.loadText(jsonUrl);
-			} else
+			if (jsonUrl)
+				this.assetManager.loadJson(jsonUrl);
+			else
 				this.assetManager.loadBinary(config.skelUrl);
 			this.assetManager.loadTextureAtlas(config.atlasUrl);
 			if (config.backgroundImage && config.backgroundImage.url)
@@ -597,9 +602,7 @@ module spine {
 			let rows = findWithClass(popup.dom, "spine-player-list")[0];
 			this.skeleton.data.animations.forEach((animation) => {
 				// skip animations not whitelisted if a whitelist is given
-				if (this.config.animations && this.config.animations.indexOf(animation.name) < 0) {
-					return;
-				}
+				if (this.config.animations && this.config.animations.indexOf(animation.name) < 0) return;
 
 				let row = createElement(/*html*/`
 					<li class="spine-player-list-item selectable">
@@ -727,125 +730,129 @@ module spine {
 		}
 
 		drawFrame (requestNextFrame = true) {
-			if (requestNextFrame && !this.stopRequestAnimationFrame) requestAnimationFrame(() => this.drawFrame());
-			let ctx = this.context;
-			let gl = ctx.gl;
+			try {
+				if (requestNextFrame && !this.stopRequestAnimationFrame && !this.error) requestAnimationFrame(() => this.drawFrame());
+				let ctx = this.context;
+				let gl = ctx.gl;
 
-			// Clear the viewport
-			var doc = document as any;
-			var isFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
-			let bg = new Color().setFromString(isFullscreen ? this.config.fullScreenBackgroundColor : this.config.backgroundColor);
-			gl.clearColor(bg.r, bg.g, bg.b, bg.a);
-			gl.clear(gl.COLOR_BUFFER_BIT);
+				// Clear the viewport
+				var doc = document as any;
+				var isFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+				let bg = new Color().setFromString(isFullscreen ? this.config.fullScreenBackgroundColor : this.config.backgroundColor);
+				gl.clearColor(bg.r, bg.g, bg.b, bg.a);
+				gl.clear(gl.COLOR_BUFFER_BIT);
 
-			// Display loading screen
-			this.loadingScreen.backgroundColor.setFromColor(bg);
-			this.loadingScreen.draw(this.assetManager.isLoadingComplete());
+				// Display loading screen
+				this.loadingScreen.backgroundColor.setFromColor(bg);
+				this.loadingScreen.draw(this.assetManager.isLoadingComplete());
 
-			// Have we finished loading the asset? Then set things up
-			if (this.assetManager.isLoadingComplete() && !this.skeleton) this.loadSkeleton();
+				// Have we finished loading the asset? Then set things up
+				if (this.assetManager.isLoadingComplete() && !this.skeleton) this.loadSkeleton();
 
-			// Resize the canvas
-			this.sceneRenderer.resize(webgl.ResizeMode.Expand);
+				// Resize the canvas
+				this.sceneRenderer.resize(webgl.ResizeMode.Expand);
 
-			// Update and draw the skeleton
-			if (this.loaded) {
-				// Update animation and skeleton based on user selections
-				if (!this.paused && this.config.animation) {
-					this.time.update();
-					let delta = this.time.delta * this.speed;
+				// Update and draw the skeleton
+				if (this.loaded) {
+					// Update animation and skeleton based on user selections
+					if (!this.paused && this.config.animation) {
+						this.time.update();
+						let delta = this.time.delta * this.speed;
 
-					let animationDuration = this.animationState.getCurrent(0).animation.duration;
-					this.playTime += delta;
-					while (this.playTime >= animationDuration && animationDuration != 0) {
-						this.playTime -= animationDuration;
-					}
-					this.playTime = Math.max(0, Math.min(this.playTime, animationDuration));
-					this.timelineSlider.setValue(this.playTime / animationDuration);
+						let animationDuration = this.animationState.getCurrent(0).animation.duration;
+						this.playTime += delta;
+						while (this.playTime >= animationDuration && animationDuration != 0) {
+							this.playTime -= animationDuration;
+						}
+						this.playTime = Math.max(0, Math.min(this.playTime, animationDuration));
+						this.timelineSlider.setValue(this.playTime / animationDuration);
 
-					this.animationState.update(delta);
-					this.animationState.apply(this.skeleton);
-				}
-
-				this.skeleton.updateWorldTransform();
-
-				let viewport = {
-					x: this.currentViewport.x - (this.currentViewport.padLeft as number),
-					y: this.currentViewport.y - (this.currentViewport.padBottom as number),
-					width: this.currentViewport.width + (this.currentViewport.padLeft as number) + (this.currentViewport.padRight as number),
-					height: this.currentViewport.height + (this.currentViewport.padBottom as number) + (this.currentViewport.padTop as number)
-				}
-
-				let transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / this.config.viewport.transitionTime;
-				if (this.previousViewport && transitionAlpha < 1) {
-					let oldViewport = {
-						x: this.previousViewport.x - (this.previousViewport.padLeft as number),
-						y: this.previousViewport.y - (this.previousViewport.padBottom as number),
-						width: this.previousViewport.width + (this.previousViewport.padLeft as number) + (this.previousViewport.padRight as number),
-						height: this.previousViewport.height + (this.previousViewport.padBottom as number) + (this.previousViewport.padTop as number)
+						this.animationState.update(delta);
+						this.animationState.apply(this.skeleton);
 					}
 
-					viewport = {
-						x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
-						y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
-						width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
-						height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
+					this.skeleton.updateWorldTransform();
+
+					let viewport = {
+						x: this.currentViewport.x - (this.currentViewport.padLeft as number),
+						y: this.currentViewport.y - (this.currentViewport.padBottom as number),
+						width: this.currentViewport.width + (this.currentViewport.padLeft as number) + (this.currentViewport.padRight as number),
+						height: this.currentViewport.height + (this.currentViewport.padBottom as number) + (this.currentViewport.padTop as number)
 					}
-				}
 
-				let viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
+					let transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / this.config.viewport.transitionTime;
+					if (this.previousViewport && transitionAlpha < 1) {
+						let oldViewport = {
+							x: this.previousViewport.x - (this.previousViewport.padLeft as number),
+							y: this.previousViewport.y - (this.previousViewport.padBottom as number),
+							width: this.previousViewport.width + (this.previousViewport.padLeft as number) + (this.previousViewport.padRight as number),
+							height: this.previousViewport.height + (this.previousViewport.padBottom as number) + (this.previousViewport.padTop as number)
+						}
 
-				this.sceneRenderer.camera.zoom = viewport.width / viewportSize.x;
-				this.sceneRenderer.camera.position.x = viewport.x + viewport.width / 2;
-				this.sceneRenderer.camera.position.y = viewport.y + viewport.height / 2;
-
-				this.sceneRenderer.begin();
-
-				// Draw background image if given
-				if (this.config.backgroundImage && this.config.backgroundImage.url) {
-					let bgImage = this.assetManager.get(this.config.backgroundImage.url);
-					if (!(this.config.backgroundImage.hasOwnProperty("x") && this.config.backgroundImage.hasOwnProperty("y") && this.config.backgroundImage.hasOwnProperty("width") && this.config.backgroundImage.hasOwnProperty("height"))) {
-						this.sceneRenderer.drawTexture(bgImage, viewport.x, viewport.y, viewport.width, viewport.height);
-					} else {
-						this.sceneRenderer.drawTexture(bgImage, this.config.backgroundImage.x, this.config.backgroundImage.y, this.config.backgroundImage.width, this.config.backgroundImage.height);
+						viewport = {
+							x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
+							y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
+							width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
+							height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
+						}
 					}
+
+					let viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
+
+					this.sceneRenderer.camera.zoom = viewport.width / viewportSize.x;
+					this.sceneRenderer.camera.position.x = viewport.x + viewport.width / 2;
+					this.sceneRenderer.camera.position.y = viewport.y + viewport.height / 2;
+
+					this.sceneRenderer.begin();
+
+					// Draw background image if given
+					if (this.config.backgroundImage && this.config.backgroundImage.url) {
+						let bgImage = this.assetManager.get(this.config.backgroundImage.url);
+						if (!(this.config.backgroundImage.hasOwnProperty("x") && this.config.backgroundImage.hasOwnProperty("y") && this.config.backgroundImage.hasOwnProperty("width") && this.config.backgroundImage.hasOwnProperty("height"))) {
+							this.sceneRenderer.drawTexture(bgImage, viewport.x, viewport.y, viewport.width, viewport.height);
+						} else {
+							this.sceneRenderer.drawTexture(bgImage, this.config.backgroundImage.x, this.config.backgroundImage.y, this.config.backgroundImage.width, this.config.backgroundImage.height);
+						}
+					}
+
+					// Draw skeleton and debug output
+					this.sceneRenderer.drawSkeleton(this.skeleton, this.config.premultipliedAlpha);
+					this.sceneRenderer.skeletonDebugRenderer.drawBones = this.config.debug.bones;
+					this.sceneRenderer.skeletonDebugRenderer.drawBoundingBoxes = this.config.debug.bounds;
+					this.sceneRenderer.skeletonDebugRenderer.drawClipping = this.config.debug.clipping;
+					this.sceneRenderer.skeletonDebugRenderer.drawMeshHull = this.config.debug.hulls;
+					this.sceneRenderer.skeletonDebugRenderer.drawPaths = this.config.debug.paths;
+					this.sceneRenderer.skeletonDebugRenderer.drawRegionAttachments = this.config.debug.regions;
+					this.sceneRenderer.skeletonDebugRenderer.drawMeshTriangles = this.config.debug.meshes;
+					this.sceneRenderer.drawSkeletonDebug(this.skeleton, this.config.premultipliedAlpha);
+
+					// Render the selected bones
+					let controlBones = this.config.controlBones;
+					let selectedBones = this.selectedBones;
+					let skeleton = this.skeleton;
+					gl.lineWidth(2);
+					for (var i = 0; i < controlBones.length; i++) {
+						var bone = skeleton.findBone(controlBones[i]);
+						if (!bone) continue;
+						var colorInner = selectedBones[i] !== null ? SpinePlayer.HOVER_COLOR_INNER : SpinePlayer.NON_HOVER_COLOR_INNER;
+						var colorOuter = selectedBones[i] !== null ? SpinePlayer.HOVER_COLOR_OUTER : SpinePlayer.NON_HOVER_COLOR_OUTER;
+						this.sceneRenderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);
+						this.sceneRenderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
+					}
+					gl.lineWidth(1);
+
+					// Render the viewport bounds
+					if (this.config.viewport.debugRender) {
+						this.sceneRenderer.rect(false, this.currentViewport.x, this.currentViewport.y, this.currentViewport.width, this.currentViewport.height, Color.GREEN);
+						this.sceneRenderer.rect(false, viewport.x, viewport.y, viewport.width, viewport.height, Color.RED);
+					}
+
+					this.sceneRenderer.end();
+
+					this.sceneRenderer.camera.zoom = 0;
 				}
-
-				// Draw skeleton and debug output
-				this.sceneRenderer.drawSkeleton(this.skeleton, this.config.premultipliedAlpha);
-				this.sceneRenderer.skeletonDebugRenderer.drawBones = this.config.debug.bones;
-				this.sceneRenderer.skeletonDebugRenderer.drawBoundingBoxes = this.config.debug.bounds;
-				this.sceneRenderer.skeletonDebugRenderer.drawClipping = this.config.debug.clipping;
-				this.sceneRenderer.skeletonDebugRenderer.drawMeshHull = this.config.debug.hulls;
-				this.sceneRenderer.skeletonDebugRenderer.drawPaths = this.config.debug.paths;
-				this.sceneRenderer.skeletonDebugRenderer.drawRegionAttachments = this.config.debug.regions;
-				this.sceneRenderer.skeletonDebugRenderer.drawMeshTriangles = this.config.debug.meshes;
-				this.sceneRenderer.drawSkeletonDebug(this.skeleton, this.config.premultipliedAlpha);
-
-				// Render the selected bones
-				let controlBones = this.config.controlBones;
-				let selectedBones = this.selectedBones;
-				let skeleton = this.skeleton;
-				gl.lineWidth(2);
-				for (var i = 0; i < controlBones.length; i++) {
-					var bone = skeleton.findBone(controlBones[i]);
-					if (!bone) continue;
-					var colorInner = selectedBones[i] !== null ? SpinePlayer.HOVER_COLOR_INNER : SpinePlayer.NON_HOVER_COLOR_INNER;
-					var colorOuter = selectedBones[i] !== null ? SpinePlayer.HOVER_COLOR_OUTER : SpinePlayer.NON_HOVER_COLOR_OUTER;
-					this.sceneRenderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);
-					this.sceneRenderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
-				}
-				gl.lineWidth(1);
-
-				// Render the viewport bounds
-				if (this.config.viewport.debugRender) {
-					this.sceneRenderer.rect(false, this.currentViewport.x, this.currentViewport.y, this.currentViewport.width, this.currentViewport.height, Color.GREEN);
-					this.sceneRenderer.rect(false, viewport.x, viewport.y, viewport.width, viewport.height, Color.RED);
-				}
-
-				this.sceneRenderer.end();
-
-				this.sceneRenderer.camera.zoom = 0;
+			} catch (e) {
+				this.showError(`Error: Unable to render skeleton.\n${e.message}`);
 			}
 		}
 
@@ -861,9 +868,10 @@ module spine {
 
 		loadSkeleton () {
 			if (this.loaded) return;
+			if (this.error) return;
 
 			if (this.assetManager.hasErrors()) {
-				this.showError("Error: Assets could not be loaded.<br><br>" + escapeHtml(JSON.stringify(this.assetManager.getErrors())));
+				this.showError("Error: Assets could not be loaded.\n" + escapeHtml(JSON.stringify(this.assetManager.getErrors())));
 				return;
 			}
 
@@ -871,19 +879,17 @@ module spine {
 			let skeletonData: SkeletonData;
 			let jsonUrl = this.config.jsonUrl;
 			if (jsonUrl) {
-				let hash = jsonUrl.indexOf("#");
-				let field = null;
-				if (hash != -1) {
-					field = jsonUrl.substr(hash + 1);
-					jsonUrl = jsonUrl.substr(0, hash);
-				}
-				let jsonText = this.assetManager.get(jsonUrl);
-				if (field) jsonText = JSON.parse(jsonText)[field];
-				let json = new SkeletonJson(new AtlasAttachmentLoader(atlas));
 				try {
-					skeletonData = json.readSkeletonData(jsonText);
+					let jsonData = this.assetManager.get(jsonUrl);
+					if (!jsonData) throw new Error("Empty JSON data.");
+					if (this.config.jsonField) {
+						jsonData = jsonData[this.config.jsonField];
+						if (!jsonData) throw new Error("JSON field not found: " + this.config.jsonField);
+					}
+					let json = new SkeletonJson(new AtlasAttachmentLoader(atlas));
+					skeletonData = json.readSkeletonData(jsonData);
 				} catch (e) {
-					this.showError("Error: Could not load skeleton JSON.<br><br>" + e.toString());
+					this.showError(`Error: Could not load skeleton JSON.\n${e.message}`);
 					return;
 				}
 			} else {
@@ -892,7 +898,7 @@ module spine {
 				try {
 					skeletonData = binary.readSkeletonData(binaryData);
 				} catch (e) {
-					this.showError("Error: Could not load skeleton binary.<br><br>" + e.toString());
+					this.showError(`Error: Could not load skeleton binary.\n${e.message}`);
 					return;
 				}
 			}
@@ -905,22 +911,21 @@ module spine {
 			if (this.config.controlBones) {
 				this.config.controlBones.forEach(bone => {
 					if (!skeletonData.findBone(bone)) {
-						this.showError(`Error: control bone '${bone}' does not exist in skeleton.`);
+						this.showError(`Error: Control bone does not exist in skeleton: ${bone}`);
+						return;
 					}
 				})
 			}
 
 			// Setup skin
 			if (!this.config.skin) {
-				if (skeletonData.skins.length > 0) {
-					this.config.skin = skeletonData.skins[0].name;
-				}
+				if (skeletonData.skins.length > 0) this.config.skin = skeletonData.skins[0].name;
 			}
 
 			if (this.config.skins && this.config.skin.length > 0) {
 				this.config.skins.forEach(skin => {
 					if (!this.skeleton.data.findSkin(skin)) {
-						this.showError(`Error: skin '${skin}' in selectable skin list does not exist in skeleton.`);
+						this.showError(`Error: Skin in config list does not exist in skeleton: ${skin}`);
 						return;
 					}
 				});
@@ -928,16 +933,14 @@ module spine {
 
 			if (this.config.skin) {
 				if (!this.skeleton.data.findSkin(this.config.skin)) {
-					this.showError(`Error: skin '${this.config.skin}' does not exist in skeleton.`);
+					this.showError(`Error: Skin does not exist in skeleton: ${this.config.skin}`);
 					return;
 				}
 				this.skeleton.setSkinByName(this.config.skin);
 				this.skeleton.setSlotsToSetupPose();
 			}
 
-			// Setup empty viewport if none is given and check
-			// if all animations for which viewports where given
-			// exist.
+			// Setup empty viewport if none is given and check if all animations for which viewports where given exist.
 			if (!this.config.viewport) {
 				(this.config.viewport as any) = {
 					animations: {},
@@ -952,7 +955,7 @@ module spine {
 			} else {
 				Object.getOwnPropertyNames(this.config.viewport.animations).forEach((animation: string) => {
 					if (!skeletonData.findAnimation(animation)) {
-						this.showError(`Error: animation '${animation}' for which a viewport was specified does not exist in skeleton.`);
+						this.showError(`Error: Animation for which a viewport was specified does not exist in skeleton: ${animation}`);
 						return;
 					}
 				});
@@ -962,7 +965,7 @@ module spine {
 			if (this.config.animations && this.config.animations.length > 0) {
 				this.config.animations.forEach(animation => {
 					if (!this.skeleton.data.findAnimation(animation)) {
-						this.showError(`Error: animation '${animation}' in selectable animation list does not exist in skeleton.`);
+						this.showError(`Error: Animation in config list does not exist in skeleton: ${animation}`);
 						return;
 					}
 				});
@@ -980,7 +983,7 @@ module spine {
 
 			if(this.config.animation) {
 				if (!skeletonData.findAnimation(this.config.animation)) {
-					this.showError(`Error: animation '${this.config.animation}' does not exist in skeleton.`);
+					this.showError(`Error: Animation does not exist in skeleton: ${this.config.animation}`);
 					return;
 				}
 				this.play()
@@ -1127,11 +1130,8 @@ module spine {
 			this.playButton.classList.remove("spine-player-button-icon-play");
 			this.playButton.classList.add("spine-player-button-icon-pause");
 
-			if (this.config.animation) {
-				if (!this.animationState.getCurrent(0)) {
-					this.setAnimation(this.config.animation);
-				}
-			}
+			if (this.config.animation && !this.animationState.getCurrent(0))
+				this.setAnimation(this.config.animation);
 		}
 
 		private pause () {
@@ -1237,9 +1237,8 @@ module spine {
 					maxX = Math.max(offset.x + size.x, maxX);
 					minY = Math.min(offset.y, minY);
 					maxY = Math.max(offset.y + size.y, maxY);
-				} else {
-					console.log("Bounds of animation " + animationName + " are NaN");
-				}
+				} else
+					console.log("Animation bounds are NaN: " + animationName);
 			}
 
 			offset.x = minX;

@@ -31,117 +31,91 @@ module spine {
 	export class AssetManager implements Disposable {
 		private pathPrefix: string;
 		private textureLoader: (image: HTMLImageElement) => any;
+		private downloader: Downloader;
 		private assets: Map<any> = {};
 		private errors: Map<string> = {};
 		private toLoad = 0;
 		private loaded = 0;
-		private rawDataUris: Map<string> = {};
 
-		constructor (textureLoader: (image: HTMLImageElement) => any, pathPrefix: string = "") {
+		constructor (textureLoader: (image: HTMLImageElement) => any, pathPrefix: string = "", downloader: Downloader = null) {
 			this.textureLoader = textureLoader;
 			this.pathPrefix = pathPrefix;
+			this.downloader = downloader || new Downloader();
 		}
 
-		private downloadText (url: string, success: (data: string) => void, error: (status: number, responseText: string) => void) {
-			let request = new XMLHttpRequest();
-			request.overrideMimeType("text/html");
-			if (this.rawDataUris[url]) url = this.rawDataUris[url];
-			request.open("GET", url, true);
-			request.onload = () => {
-				if (request.status == 200) {
-					success(request.responseText);
-				} else {
-					error(request.status, request.responseText);
-				}
-			}
-			request.onerror = () => {
-				error(request.status, request.responseText);
-			}
-			request.send();
+		private start (path: string): string {
+			this.toLoad++;
+			return this.pathPrefix + path;
 		}
 
-		private downloadBinary (url: string, success: (data: Uint8Array) => void, error: (status: number, responseText: string) => void) {
-			let request = new XMLHttpRequest();
-			if (this.rawDataUris[url]) url = this.rawDataUris[url];
-			request.open("GET", url, true);
-			request.responseType = "arraybuffer";
-			request.onload = () => {
-				if (request.status == 200) {
-					success(new Uint8Array(request.response as ArrayBuffer));
-				} else {
-					error(request.status, request.responseText);
-				}
-			}
-			request.onerror = () => {
-				error(request.status, request.responseText);
-			}
-			request.send();
+		private success (path: string, callback: (path: string, data: any) => void, asset: any) {
+			this.toLoad--;
+			this.loaded++;
+			this.assets[path] = asset;
+			if (callback) callback(path, asset);
+		}
+
+		private error (path: string, callback: (path: string, error: string) => void, message: string) {
+			this.toLoad--;
+			this.loaded++;
+			this.errors[path] = message;
+			if (callback) callback(path, message);
 		}
 
 		setRawDataURI(path: string, data: string) {
-			this.rawDataUris[this.pathPrefix + path] = data;
+			this.downloader.rawDataUris[this.pathPrefix + path] = data;
 		}
 
 		loadBinary(path: string,
 			success: (path: string, binary: Uint8Array) => void = null,
 			error: (path: string, error: string) => void = null) {
-			path = this.pathPrefix + path;
-			this.toLoad++;
+			path = this.start(path);
 
-			this.downloadBinary(path, (data: Uint8Array): void => {
-				this.assets[path] = data;
-				if (success) success(path, data);
-				this.toLoad--;
-				this.loaded++;
-			}, (state: number, responseText: string): void => {
-				this.errors[path] = `Couldn't load binary ${path}: status ${status}, ${responseText}`;
-				if (error) error(path, `Couldn't load binary ${path}: status ${status}, ${responseText}`);
-				this.toLoad--;
-				this.loaded++;
+			this.downloader.downloadBinary(path, (data: Uint8Array): void => {
+				this.success(path, success, data);
+			}, (status: number, responseText: string): void => {
+				this.error(path, error, `Couldn't load binary ${path}: status ${status}, ${responseText}`);
 			});
 		}
 
 		loadText(path: string,
 			success: (path: string, text: string) => void = null,
 			error: (path: string, error: string) => void = null) {
-			path = this.pathPrefix + path;
-			this.toLoad++;
+			path = this.start(path);
 
-			this.downloadText(path, (data: string): void => {
-				this.assets[path] = data;
-				if (success) success(path, data);
-				this.toLoad--;
-				this.loaded++;
-			}, (state: number, responseText: string): void => {
-				this.errors[path] = `Couldn't load text ${path}: status ${status}, ${responseText}`;
-				if (error) error(path, `Couldn't load text ${path}: status ${status}, ${responseText}`);
-				this.toLoad--;
-				this.loaded++;
+			this.downloader.downloadText(path, (data: string): void => {
+				this.success(path, success, data);
+			}, (status: number, responseText: string): void => {
+				this.error(path, error, `Couldn't load text ${path}: status ${status}, ${responseText}`);
+			});
+		}
+
+		loadJson(path: string,
+			success: (path: string, object: object) => void = null,
+			error: (path: string, error: string) => void = null) {
+			path = this.start(path);
+
+			this.downloader.downloadJson(path, (data: object): void => {
+				this.success(path, success, data);
+			}, (status: number, responseText: string): void => {
+				this.error(path, error, `Couldn't load JSON ${path}: status ${status}, ${responseText}`);
 			});
 		}
 
 		loadTexture (path: string,
 			success: (path: string, image: HTMLImageElement) => void = null,
 			error: (path: string, error: string) => void = null) {
-			path = this.pathPrefix + path;
-			let storagePath = path;
-			this.toLoad++;
+			path = this.start(path);
+
 			let img = new Image();
 			img.crossOrigin = "anonymous";
 			img.onload = (ev) => {
-				let texture = this.textureLoader(img);
-				this.assets[storagePath] = texture;
-				this.toLoad--;
-				this.loaded++;
-				if (success) success(path, img);
+				this.success(path, success, this.textureLoader(img));
 			}
 			img.onerror = (ev) => {
-				this.errors[path] = `Couldn't load image ${path}`;
-				this.toLoad--;
-				this.loaded++;
-				if (error) error(path, `Couldn't load image ${path}`);
+				this.error(path, error, `Couldn't load image ${path}`);
 			}
-			if (this.rawDataUris[path]) path = this.rawDataUris[path];
+			if (this.downloader.rawDataUris[path]) path = this.downloader.rawDataUris[path];
 			img.src = path;
 		}
 
@@ -149,11 +123,10 @@ module spine {
 			success: (path: string, atlas: TextureAtlas) => void = null,
 			error: (path: string, error: string) => void = null
 		) {
+			path = this.start(path);
 			let parent = path.lastIndexOf("/") >= 0 ? path.substring(0, path.lastIndexOf("/")) : "";
-			path = this.pathPrefix + path;
-			this.toLoad++;
 
-			this.downloadText(path, (atlasData: string): void => {
+			this.downloader.downloadText(path, (atlasData: string): void => {
 				let pagesLoaded: any = { count: 0 };
 				let atlasPages = new Array<string>();
 				try {
@@ -165,11 +138,7 @@ module spine {
 						return new FakeTexture(image);
 					});
 				} catch (e) {
-					let ex = e as Error;
-					this.errors[path] = `Couldn't load texture atlas ${path}: ${ex.message}`;
-					if (error) error(path, `Couldn't load texture atlas ${path}: ${ex.message}`);
-					this.toLoad--;
-					this.loaded++;
+					this.error(path, error, `Couldn't load texture atlas ${path}: ${e.message}`);
 					return;
 				}
 
@@ -181,57 +150,37 @@ module spine {
 						if (pagesLoaded.count == atlasPages.length) {
 							if (!pageLoadError) {
 								try {
-									let atlas = new TextureAtlas(atlasData, (path: string) => {
+									this.success(path, success, new TextureAtlas(atlasData, (path: string) => {
 										return this.get(parent == "" ? path : parent + "/" + path);
-									});
-									this.assets[path] = atlas;
-									if (success) success(path, atlas);
-									this.toLoad--;
-									this.loaded++;
+									}));
 								} catch (e) {
-									let ex = e as Error;
-									this.errors[path] = `Couldn't load texture atlas ${path}: ${ex.message}`;
-									if (error) error(path, `Couldn't load texture atlas ${path}: ${ex.message}`);
-									this.toLoad--;
-									this.loaded++;
+									this.error(path, error, `Couldn't load texture atlas ${path}: ${e.message}`);
 								}
-							} else {
-								this.errors[path] = `Couldn't load texture atlas page ${imagePath}} of atlas ${path}`;
-								if (error) error(path, `Couldn't load texture atlas page ${imagePath} of atlas ${path}`);
-								this.toLoad--;
-								this.loaded++;
-							}
+							} else
+								this.error(path, error, `Couldn't load texture atlas page ${imagePath}} of atlas ${path}`);
 						}
 					}, (imagePath: string, errorMessage: string) => {
 						pageLoadError = true;
 						pagesLoaded.count++;
 
-						if (pagesLoaded.count == atlasPages.length) {
-							this.errors[path] = `Couldn't load texture atlas page ${imagePath}} of atlas ${path}`;
-							if (error) error(path, `Couldn't load texture atlas page ${imagePath} of atlas ${path}`);
-							this.toLoad--;
-							this.loaded++;
-						}
+						if (pagesLoaded.count == atlasPages.length)
+							this.error(path, error, `Couldn't load texture atlas page ${imagePath}} of atlas ${path}`);
 					});
 				}
-			}, (state: number, responseText: string): void => {
-				this.errors[path] = `Couldn't load texture atlas ${path}: status ${status}, ${responseText}`;
-				if (error) error(path, `Couldn't load texture atlas ${path}: status ${status}, ${responseText}`);
-				this.toLoad--;
-				this.loaded++;
+			}, (status: number, responseText: string): void => {
+				this.error(path, error, `Couldn't load texture atlas ${path}: status ${status}, ${responseText}`);
 			});
 		}
 
 		get (path: string) {
-			path = this.pathPrefix + path;
-			return this.assets[path];
+			return this.assets[this.pathPrefix + path];
 		}
 
 		remove (path: string) {
 			path = this.pathPrefix + path;
 			let asset = this.assets[path];
 			if ((<any>asset).dispose) (<any>asset).dispose();
-			this.assets[path] = null;
+			delete this.assets[path];
 		}
 
 		removeAll () {
@@ -264,6 +213,68 @@ module spine {
 
 		getErrors() {
 			return this.errors;
+		}
+	}
+
+	export class Downloader {
+		private callbacks: Map<Array<Function>> = {};
+		rawDataUris: Map<string> = {};
+
+		downloadText (url: string, success: (data: string) => void, error: (status: number, responseText: string) => void) {
+			if (this.rawDataUris[url]) url = this.rawDataUris[url];
+			if (this.start(url, success, error)) return;
+			let request = new XMLHttpRequest();
+			request.overrideMimeType("text/html");
+			request.open("GET", url, true);
+			let done = () => {
+				this.finish(url, request.status, request.responseText);
+			};
+			request.onload = done;
+			request.onerror = done;
+			request.send();
+		}
+
+		downloadJson (url: string, success: (data: object) => void, error: (status: number, responseText: string) => void) {
+			this.downloadText(url, (data: string): void => {
+				success(JSON.parse(data));
+			}, error);
+		}
+
+		downloadBinary (url: string, success: (data: Uint8Array) => void, error: (status: number, responseText: string) => void) {
+			if (this.rawDataUris[url]) url = this.rawDataUris[url];
+			if (this.start(url, success, error)) return;
+			let request = new XMLHttpRequest();
+			request.open("GET", url, true);
+			request.responseType = "arraybuffer";
+			let onerror = () => {
+				this.finish(url, request.status, request.responseText);
+			};
+			request.onload = () => {
+				if (request.status == 200)
+					this.finish(url, 200, new Uint8Array(request.response as ArrayBuffer));
+				else
+					onerror();
+			};
+			request.onerror = onerror;
+			request.send();
+		}
+
+		private start (url: string, success: any, error: any) {
+			let callbacks = this.callbacks[url];
+			try {
+				if (callbacks) return true;
+				this.callbacks[url] = callbacks = [];
+			} finally {
+				callbacks.push(success, error);
+			}
+		}
+
+		private finish (url: string, status: number, data: any) {
+			let callbacks = this.callbacks[url];
+			delete this.callbacks[url];
+			let args = status == 200 ? [data] : [status, data];
+			for (let i = args.length - 1, n = callbacks.length; i < n; i += 2)
+				callbacks[i].apply(null, args);
 		}
 	}
 }
