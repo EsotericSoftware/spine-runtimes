@@ -30,14 +30,14 @@
 module spine {
 	export class AssetManager implements Disposable {
 		private pathPrefix: string;
-		private textureLoader: (image: HTMLImageElement) => any;
+		private textureLoader: (image: HTMLImageElement | ImageBitmap) => any;
 		private downloader: Downloader;
 		private assets: Map<any> = {};
 		private errors: Map<string> = {};
 		private toLoad = 0;
 		private loaded = 0;
 
-		constructor (textureLoader: (image: HTMLImageElement) => any, pathPrefix: string = "", downloader: Downloader = null) {
+		constructor (textureLoader: (image: HTMLImageElement | ImageBitmap) => any, pathPrefix: string = "", downloader: Downloader = null) {
 			this.textureLoader = textureLoader;
 			this.pathPrefix = pathPrefix;
 			this.downloader = downloader || new Downloader();
@@ -48,14 +48,14 @@ module spine {
 			return this.pathPrefix + path;
 		}
 
-		private success (path: string, callback: (path: string, data: any) => void, asset: any) {
+		private success (callback: (path: string, data: any) => void, path: string, asset: any) {
 			this.toLoad--;
 			this.loaded++;
 			this.assets[path] = asset;
 			if (callback) callback(path, asset);
 		}
 
-		private error (path: string, callback: (path: string, error: string) => void, message: string) {
+		private error (callback: (path: string, message: string) => void, path: string, message: string) {
 			this.toLoad--;
 			this.loaded++;
 			this.errors[path] = message;
@@ -68,66 +68,80 @@ module spine {
 
 		loadBinary(path: string,
 			success: (path: string, binary: Uint8Array) => void = null,
-			error: (path: string, error: string) => void = null) {
+			error: (path: string, message: string) => void = null) {
 			path = this.start(path);
 
 			this.downloader.downloadBinary(path, (data: Uint8Array): void => {
-				this.success(path, success, data);
+				this.success(success, path, data);
 			}, (status: number, responseText: string): void => {
-				this.error(path, error, `Couldn't load binary ${path}: status ${status}, ${responseText}`);
+				this.error(error, path, `Couldn't load binary ${path}: status ${status}, ${responseText}`);
 			});
 		}
 
 		loadText(path: string,
 			success: (path: string, text: string) => void = null,
-			error: (path: string, error: string) => void = null) {
+			error: (path: string, message: string) => void = null) {
 			path = this.start(path);
 
 			this.downloader.downloadText(path, (data: string): void => {
-				this.success(path, success, data);
+				this.success(success, path, data);
 			}, (status: number, responseText: string): void => {
-				this.error(path, error, `Couldn't load text ${path}: status ${status}, ${responseText}`);
+				this.error(error, path, `Couldn't load text ${path}: status ${status}, ${responseText}`);
 			});
 		}
 
 		loadJson(path: string,
 			success: (path: string, object: object) => void = null,
-			error: (path: string, error: string) => void = null) {
+			error: (path: string, message: string) => void = null) {
 			path = this.start(path);
 
 			this.downloader.downloadJson(path, (data: object): void => {
-				this.success(path, success, data);
+				this.success(success, path, data);
 			}, (status: number, responseText: string): void => {
-				this.error(path, error, `Couldn't load JSON ${path}: status ${status}, ${responseText}`);
+				this.error(error, path, `Couldn't load JSON ${path}: status ${status}, ${responseText}`);
 			});
 		}
 
 		loadTexture (path: string,
-			success: (path: string, image: HTMLImageElement) => void = null,
-			error: (path: string, error: string) => void = null) {
+			success: (path: string, image: HTMLImageElement | ImageBitmap) => void = null,
+			error: (path: string, message: string) => void = null) {
 			path = this.start(path);
 
-			let img = new Image();
-			img.crossOrigin = "anonymous";
-			img.onload = (ev) => {
-				this.success(path, success, this.textureLoader(img));
+			let isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
+			let isWebWorker = !isBrowser && typeof importScripts !== 'undefined';
+			if (isWebWorker) {
+				fetch(path, {mode: <RequestMode>"cors"}).then( (response) => {
+					if (response.ok) return response.blob();
+					this.error(error, path, `Couldn't load image: ${path}`);
+					return null;
+				}).then( (blob) => {
+					return blob ? createImageBitmap(blob, { premultiplyAlpha: "none", colorSpaceConversion: "none" }) : null;
+				}).then( (bitmap) => {
+					if (bitmap) this.success(success, path, this.textureLoader(bitmap));
+				});
+			} else {
+				let image = new Image();
+				image.crossOrigin = "anonymous";
+				image.onload = () => {
+					this.success(success, path, this.textureLoader(image));
+				};
+				image.onerror = () => {
+					this.error(error, path, `Couldn't load image: ${path}`);
+				};
+				if (this.downloader.rawDataUris[path]) path = this.downloader.rawDataUris[path];
+				image.src = path;
 			}
-			img.onerror = (ev) => {
-				this.error(path, error, `Couldn't load image ${path}`);
-			}
-			if (this.downloader.rawDataUris[path]) path = this.downloader.rawDataUris[path];
-			img.src = path;
 		}
 
 		loadTextureAtlas (path: string,
 			success: (path: string, atlas: TextureAtlas) => void = null,
-			error: (path: string, error: string) => void = null
+			error: (path: string, message: string) => void = null
 		) {
-			path = this.start(path);
 			let parent = path.lastIndexOf("/") >= 0 ? path.substring(0, path.lastIndexOf("/")) : "";
+			path = this.start(path);
 
 			this.downloader.downloadText(path, (atlasData: string): void => {
-				let pagesLoaded: any = { count: 0 };
+				let pagesLoaded = 0;
 				let atlasPages = new Array<string>();
 				try {
 					let atlas = new TextureAtlas(atlasData, (path: string) => {
@@ -137,38 +151,34 @@ module spine {
 						image.height = 16;
 						return new FakeTexture(image);
 					});
+					for (let atlasPage of atlasPages) {
+						let pageLoadError = false;
+						this.loadTexture(atlasPage, (imagePath: string, image: HTMLImageElement | ImageBitmap) => {
+							pagesLoaded++;
+							if (pagesLoaded == atlasPages.length) {
+								if (!pageLoadError) {
+									try {
+										this.success(success, path, new TextureAtlas(atlasData, (path: string) => {
+											return this.get(parent == "" ? path : parent + "/" + path);
+										}));
+									} catch (e) {
+										this.error(error, path, `Couldn't load texture atlas ${path}: ${e.message}`);
+									}
+								} else
+									this.error(error, path, `Couldn't load texture atlas ${path} page: ${imagePath}`);
+							}
+						}, (imagePath: string, errorMessage: string) => {
+							pageLoadError = true;
+							pagesLoaded++;
+							if (pagesLoaded == atlasPages.length)
+								this.error(error, path, `Couldn't load texture atlas ${path} page: ${imagePath}`);
+						});
+					}
 				} catch (e) {
-					this.error(path, error, `Couldn't load texture atlas ${path}: ${e.message}`);
-					return;
-				}
-
-				for (let atlasPage of atlasPages) {
-					let pageLoadError = false;
-					this.loadTexture(atlasPage, (imagePath: string, image: HTMLImageElement) => {
-						pagesLoaded.count++;
-
-						if (pagesLoaded.count == atlasPages.length) {
-							if (!pageLoadError) {
-								try {
-									this.success(path, success, new TextureAtlas(atlasData, (path: string) => {
-										return this.get(parent == "" ? path : parent + "/" + path);
-									}));
-								} catch (e) {
-									this.error(path, error, `Couldn't load texture atlas ${path}: ${e.message}`);
-								}
-							} else
-								this.error(path, error, `Couldn't load texture atlas page ${imagePath}} of atlas ${path}`);
-						}
-					}, (imagePath: string, errorMessage: string) => {
-						pageLoadError = true;
-						pagesLoaded.count++;
-
-						if (pagesLoaded.count == atlasPages.length)
-							this.error(path, error, `Couldn't load texture atlas page ${imagePath}} of atlas ${path}`);
-					});
+					this.error(error, path, `Couldn't load texture atlas ${path}: ${e.message}`);
 				}
 			}, (status: number, responseText: string): void => {
-				this.error(path, error, `Couldn't load texture atlas ${path}: status ${status}, ${responseText}`);
+				this.error(error, path, `Couldn't load texture atlas ${path}: status ${status}, ${responseText}`);
 			});
 		}
 
