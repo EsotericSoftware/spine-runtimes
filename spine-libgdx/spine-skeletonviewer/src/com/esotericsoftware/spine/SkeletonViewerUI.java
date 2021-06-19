@@ -483,7 +483,7 @@ class SkeletonViewerUI {
 					if (name == null)
 						viewer.state.setEmptyAnimation(trackButtons.getCheckedIndex(), mixSlider.getValue());
 					else
-						viewer.setAnimation();
+						viewer.setAnimation(false);
 				}
 			}
 		});
@@ -491,7 +491,7 @@ class SkeletonViewerUI {
 
 		ChangeListener setAnimation = new ChangeListener() {
 			public void changed (ChangeEvent event, Actor actor) {
-				viewer.setAnimation();
+				viewer.setAnimation(false);
 			}
 		};
 		loopCheckbox.addListener(setAnimation);

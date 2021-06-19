@@ -108,6 +108,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 
 		ui.loadPrefs();
 		ui.prefsLoaded = true;
+		setAnimation(true);
 
 		if (false) {
 			ui.animationList.clearListeners();
@@ -182,16 +183,16 @@ public class SkeletonViewer extends ApplicationAdapter {
 		// Configure skeleton from UI.
 
 		if (ui.skinList.getSelected() != null) skeleton.setSkin(ui.skinList.getSelected());
-		setAnimation();
+		setAnimation(true);
 		return true;
 	}
 
-	void setAnimation () {
+	void setAnimation (boolean first) {
+		if (!ui.prefsLoaded) return;
 		if (ui.animationList.getSelected() == null) return;
 		int track = ui.trackButtons.getCheckedIndex();
-		TrackEntry current = state.getCurrent(track);
 		TrackEntry entry;
-		if (current == null) {
+		if (!first && state.getCurrent(track) == null) {
 			state.setEmptyAnimation(track, 0);
 			entry = state.addAnimation(track, ui.animationList.getSelected(), ui.loopCheckbox.isChecked(), 0);
 			entry.setMixDuration(ui.mixSlider.getValue());
