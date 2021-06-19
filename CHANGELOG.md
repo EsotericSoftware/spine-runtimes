@@ -35,6 +35,7 @@
 * Materials on `SkeletonRendererComponent` are now blueprint read and writeable. This allows setting dynamic material instances at runtime.
 * Added `InitialSkin` property to `USpineWidget`. This allows previewing different skins in the UMG Designer. Initial skins can still be overridden via blueprint events such as `On Initialized`.
 * **Breaking changes**: `SpineWidget` no longer has the `Scale` property. Instead the size x/y properties can be used.
+* Added `SetSlotColor` on `USpineSkeletonComponent` to easily set the color of a slot via blueprints.
 
 ## C# ##
 * **Breaking changes**

@@ -110,6 +110,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	bool HasSlot(const FString SlotName);
 
+	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
+	void SetSlotColor(const FString SlotName, const FColor color);
+
 	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
 	void GetAnimations(TArray<FString> &Animations);
 

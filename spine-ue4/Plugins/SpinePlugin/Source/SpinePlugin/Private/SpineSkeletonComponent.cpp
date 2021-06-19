@@ -105,8 +105,7 @@ FTransform USpineSkeletonComponent::GetBoneWorldTransform (const FString& BoneNa
 	CheckState();
 	if (skeleton) {
 		Bone* bone = skeleton->findBone(TCHAR_TO_UTF8(*BoneName));		
-		if (!bone) return FTransform();
-		if (!bone->isAppliedValid()) this->InternalTick(0, false);		
+		if (!bone) return FTransform();		
 
 		// Need to fetch the renderer component to get world transform of actor plus
 		// offset by renderer component and its parent component(s). If no renderer
@@ -139,7 +138,6 @@ void USpineSkeletonComponent::SetBoneWorldPosition (const FString& BoneName, con
 	if (skeleton) {
 		Bone* bone = skeleton->findBone(TCHAR_TO_UTF8(*BoneName));
 		if (!bone) return;
-		if (!bone->isAppliedValid()) this->InternalTick(0, false);
 
 		// Need to fetch the renderer component to get world transform of actor plus
 		// offset by renderer component and its parent component(s). If no renderer
@@ -241,6 +239,16 @@ bool USpineSkeletonComponent::HasSlot (const FString SlotName) {
 		return skeleton->getData()->findSlot(TCHAR_TO_UTF8(*SlotName)) != nullptr;
 	}
 	return false;
+}
+
+void USpineSkeletonComponent::SetSlotColor(const FString SlotName, const FColor color) {
+	CheckState();
+	if (skeleton) {		
+		Slot *slot = skeleton->findSlot(TCHAR_TO_UTF8(*SlotName));
+		if (slot) {
+			slot->getColor().set(color.R, color.B, color.G, color.A);
+		}
+	}
 }
 
 void USpineSkeletonComponent::GetAnimations(TArray<FString> &Animations) {
