@@ -327,8 +327,11 @@ void USpineSkeletonDataAsset::SetMixes(AnimationStateData* animationStateData) {
 	animationStateData->setDefaultMix(DefaultMix);
 }
 
-AnimationStateData* USpineSkeletonDataAsset::GetAnimationStateData(Atlas* atlas) {
-	return atlasToNativeData.Contains(atlas) ? atlasToNativeData[atlas].animationStateData : nullptr;
+AnimationStateData* USpineSkeletonDataAsset::GetAnimationStateData(Atlas* atlas) {	
+	if (!atlasToNativeData.Contains(atlas)) return nullptr;
+	AnimationStateData *data = atlasToNativeData[atlas].animationStateData;
+	SetMixes(data);
+	return data;
 }
 
 void USpineSkeletonDataAsset::SetMix(const FString& from, const FString& to, float mix) {
