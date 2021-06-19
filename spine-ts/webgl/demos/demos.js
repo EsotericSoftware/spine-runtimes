@@ -1,7 +1,7 @@
 
 $(function () {
-	window.onerror = function(message, url, lineNo) {
-		alert("Error: " + message + "\n" + "URL:" + url + "\nLine: " + lineNo);
+	window.onerror = function (message, url, lineNo) {
+		alert("Error: " + message + "\n" + "URL: " + url + "\nLine: " + lineNo);
 	}
 
 	spineDemos.init();
@@ -13,12 +13,12 @@ $(function () {
 		meshesDemo,
 		skinsDemo,
 		hoverboardDemo,
+		additiveBlendingDemo,
 		vineDemo,
-		clippingDemo,
 		stretchymanDemo,
+		clippingDemo,
 		tankDemo,
-		transformsDemo,
-		additiveBlendingDemo
+		transformsDemo
 	];
 
 	var placeholders = document.getElementsByClassName("aspect");

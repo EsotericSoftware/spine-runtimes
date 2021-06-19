@@ -12,7 +12,7 @@ var skinsDemo = function(canvas, bgColor) {
 		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, "assets/", spineDemos.downloader);
+		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("heroes.atlas");
 		assetManager.loadJson("demos.json");
 		input = new spine.webgl.Input(canvas);

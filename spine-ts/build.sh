@@ -17,8 +17,6 @@ tsc -p tsconfig.threejs.json
 tsc -p tsconfig.player.json
 ls build/*.js build/*.ts | awk '{print "unexpand -t 4 ", $0, " > /tmp/e; mv /tmp/e ", $0}' | sh
 
-
-
 if ! [ -z "$TS_UPDATE_URL" ] && ! [ -z "$BRANCH" ];
 then
 	echo "Deploying spine-ts $BRANCH artifacts"

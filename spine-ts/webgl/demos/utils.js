@@ -6,7 +6,8 @@ var spineDemos = {
 	demos: [],
 	loopRunning: false,
 	canvases: [],
-	downloader: new spine.Downloader()
+	downloader: new spine.Downloader(),
+	path: "assets/"
 };
 
 window.onerror = function (msg, url, lineNo, columnNo, error) {

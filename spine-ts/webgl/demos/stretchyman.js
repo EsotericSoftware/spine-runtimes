@@ -28,7 +28,7 @@ var stretchymanDemo = function(canvas, bgColor) {
 		gl = canvas.ctx.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, "assets/", spineDemos.downloader);
+		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas2.atlas");
 		assetManager.loadJson("demos.json");
 		timeKeeper = new spine.TimeKeeper();
