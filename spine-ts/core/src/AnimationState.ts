@@ -506,7 +506,7 @@ module spine {
 		/** Sets an animation by name.
 	 	*
 	 	* See {@link #setAnimationWith()}. */
-		setAnimation (trackIndex: number, animationName: string, loop: boolean) {
+		setAnimation (trackIndex: number, animationName: string, loop: boolean = false) {
 			let animation = this.data.skeletonData.findAnimation(animationName);
 			if (!animation) throw new Error("Animation not found: " + animationName);
 			return this.setAnimationWith(trackIndex, animation, loop);
@@ -518,7 +518,7 @@ module spine {
 		 *           duration. In either case {@link TrackEntry#trackEnd} determines when the track is cleared.
 		 * @returns A track entry to allow further customization of animation playback. References to the track entry must not be kept
 		 *         after the {@link AnimationStateListener#dispose()} event occurs. */
-		setAnimationWith (trackIndex: number, animation: Animation, loop: boolean) {
+		setAnimationWith (trackIndex: number, animation: Animation, loop: boolean = false) {
 			if (!animation) throw new Error("animation cannot be null.");
 			let interrupt = true;
 			let current = this.expandToIndex(trackIndex);
@@ -543,7 +543,7 @@ module spine {
 		/** Queues an animation by name.
 		 *
 		 * See {@link #addAnimationWith()}. */
-		addAnimation (trackIndex: number, animationName: string, loop: boolean, delay: number) {
+		addAnimation (trackIndex: number, animationName: string, loop: boolean = false, delay: number = 0) {
 			let animation = this.data.skeletonData.findAnimation(animationName);
 			if (!animation) throw new Error("Animation not found: " + animationName);
 			return this.addAnimationWith(trackIndex, animation, loop, delay);
@@ -557,7 +557,7 @@ module spine {
 		 *           previous entry is looping, its next loop completion is used instead of its duration.
 		 * @returns A track entry to allow further customization of animation playback. References to the track entry must not be kept
 		 *         after the {@link AnimationStateListener#dispose()} event occurs. */
-		addAnimationWith (trackIndex: number, animation: Animation, loop: boolean, delay: number) {
+		addAnimationWith (trackIndex: number, animation: Animation, loop: boolean = false, delay: number = 0) {
 			if (!animation) throw new Error("animation cannot be null.");
 
 			let last = this.expandToIndex(trackIndex);
@@ -595,7 +595,7 @@ module spine {
 		 * {@link TrackEntry#setMixDuration()}. Mixing from an empty animation causes the new animation to be applied more and
 		 * more over the mix duration. Properties keyed in the new animation transition from the value from lower tracks or from the
 		 * setup pose value if no lower tracks key the property to the value keyed in the new animation. */
-		setEmptyAnimation (trackIndex: number, mixDuration: number) {
+		setEmptyAnimation (trackIndex: number, mixDuration: number = 0) {
 			let entry = this.setAnimationWith(trackIndex, AnimationState.emptyAnimation(), false);
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
@@ -613,7 +613,7 @@ module spine {
 		 *           loop completion is used instead of its duration.
 		 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 		 *         after the {@link AnimationStateListener#dispose()} event occurs. */
-		addEmptyAnimation (trackIndex: number, mixDuration: number, delay: number) {
+		addEmptyAnimation (trackIndex: number, mixDuration: number = 0, delay: number = 0) {
 			let entry = this.addAnimationWith(trackIndex, AnimationState.emptyAnimation(), false, delay <= 0 ? 1 : delay);
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
@@ -623,7 +623,7 @@ module spine {
 
 		/** Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix
 	 	* duration. */
-		setEmptyAnimations (mixDuration: number) {
+		setEmptyAnimations (mixDuration: number = 0) {
 			let oldDrainDisabled = this.queue.drainDisabled;
 			this.queue.drainDisabled = true;
 			for (let i = 0, n = this.tracks.length; i < n; i++) {

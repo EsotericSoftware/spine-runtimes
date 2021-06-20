@@ -124,7 +124,7 @@ module spine {
 			this.r = parseInt(hex.substr(0, 2), 16) / 255;
 			this.g = parseInt(hex.substr(2, 2), 16) / 255;
 			this.b = parseInt(hex.substr(4, 2), 16) / 255;
-			this.a = (hex.length != 8 ? 1 : parseInt(hex.substr(6, 2), 16) / 255);
+			this.a = hex.length != 8 ? 1 : parseInt(hex.substr(6, 2), 16) / 255;
 			return this;
 		}
 
