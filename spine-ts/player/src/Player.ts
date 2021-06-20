@@ -140,6 +140,12 @@ module spine {
 		/* Optional: Callback when the skeleton could not be loaded or rendered. Default: none */
 		error: (player: SpinePlayer, msg: string) => void
 
+		/* Optional: Callback just after the skeleton is posed each frame. Default: none */
+		update: (player: SpinePlayer) => void
+
+		/* Optional: Callback just after the skeleton is drawn each frame. Default: none */
+		draw: (player: SpinePlayer) => void
+
 		/* Optional: The downloader used by the player's asset manager. Passing the same downloader to multiple players using the
 		   same assets ensures the assets are only downloaded once. Default: new instance */
 		downloader: spine.Downloader
@@ -733,6 +739,7 @@ module spine {
 						this.animationState.update(delta);
 						this.animationState.apply(skeleton);
 						skeleton.updateWorldTransform();
+						if (config.update) config.update(this);
 					}
 
 					// Determine the viewport.
@@ -795,6 +802,7 @@ module spine {
 					) {
 						renderer.drawSkeletonDebug(skeleton, config.premultipliedAlpha);
 					}
+					if (config.draw) config.draw(this);
 
 					// Draw the control bones.
 					let controlBones = config.controlBones;
