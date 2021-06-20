@@ -31,7 +31,9 @@ module spine.webgl {
 	let spinnerImage: HTMLImageElement;
 	let logoImage: HTMLImageElement;
 	let loaded = 0;
+
 	const FADE_IN = 1, FADE_OUT = 1;
+	const logoWidth = 165, logoHeight = 108, spinnerSize = 163;
 
 	export class LoadingScreen {
 		private renderer: SceneRenderer;
@@ -77,13 +79,8 @@ module spine.webgl {
 			let canvas = renderer.canvas;
 			let gl = renderer.context.gl;
 
-			renderer.resize(ResizeMode.Stretch);
-
-			renderer.camera.zoom = 1;
+			renderer.resize(ResizeMode.Expand);
 			renderer.camera.position.set(canvas.width / 2, canvas.height / 2, 0);
-			renderer.camera.viewportWidth = canvas.width;
-			renderer.camera.viewportHeight = canvas.height;
-
 			renderer.batcher.setBlendMode(gl.ONE, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 			if (complete) {
@@ -94,6 +91,7 @@ module spine.webgl {
 				a = 1 - (a - 1) * (a - 1);
 				tempColor.a *= a;
 				if (tempColor.a > 0) {
+					renderer.camera.zoom = 1;
 					renderer.begin();
 					renderer.quad(true, 0, 0, canvas.width, 0, canvas.width, canvas.height, 0, canvas.height,
 						tempColor, tempColor, tempColor, tempColor);
@@ -114,12 +112,10 @@ module spine.webgl {
 				this.logo = new GLTexture(renderer.context, logoImage);
 				this.spinner = new GLTexture(renderer.context, spinnerImage);
 			}
-			let logoWidth = logoImage.width, logoHeight = logoImage.height;
-			let spinnerWidth = spinnerImage.width, spinnerHeight = spinnerImage.height;
-
+			renderer.camera.zoom = Math.max(1, spinnerSize / canvas.height);
 			renderer.begin();
 			renderer.drawTexture(this.logo, (canvas.width - logoWidth) / 2, (canvas.height - logoHeight) / 2, logoWidth, logoHeight, tempColor);
-			renderer.drawTextureRotated(this.spinner, (canvas.width - spinnerWidth) / 2, (canvas.height - spinnerHeight) / 2, spinnerWidth, spinnerHeight, spinnerWidth / 2, spinnerHeight / 2, this.angle, tempColor);
+			renderer.drawTextureRotated(this.spinner, (canvas.width - spinnerSize) / 2, (canvas.height - spinnerSize) / 2, spinnerSize, spinnerSize, spinnerSize / 2, spinnerSize / 2, this.angle, tempColor);
 			renderer.end();
 		}
 	}

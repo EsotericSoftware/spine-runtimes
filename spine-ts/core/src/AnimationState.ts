@@ -34,7 +34,7 @@ module spine {
 	 *
 	 * See [Applying Animations](http://esotericsoftware.com/spine-applying-animations/) in the Spine Runtimes Guide. */
 	export class AnimationState {
-		private static emptyAnimation(): Animation {
+		private static emptyAnimation (): Animation {
 			if (!_emptyAnimation) _emptyAnimation = new Animation("<empty>", [], 0);
 			return _emptyAnimation;
 		}

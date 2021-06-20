@@ -464,8 +464,7 @@ module spine.webgl {
 				let targetRatio = targetHeight / targetWidth;
 				let sourceRatio = sourceHeight / sourceWidth;
 				let scale = targetRatio < sourceRatio ? targetWidth / sourceWidth : targetHeight / sourceHeight;
-				this.camera.viewportWidth = sourceWidth * scale;
-				this.camera.viewportHeight = sourceHeight * scale;
+				this.camera.setViewport(sourceWidth * scale, sourceHeight * scale);
 			}
 			this.camera.update();
 		}

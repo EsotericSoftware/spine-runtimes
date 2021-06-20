@@ -98,7 +98,7 @@ module spine.webgl {
 			this.mesh.setIndicesLength(this.indicesLength);
 		}
 
-		private flush () {
+		flush () {
 			if (this.verticesLength == 0) return;
 
 			this.lastTexture.bind();

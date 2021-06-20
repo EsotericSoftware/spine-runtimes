@@ -42,8 +42,6 @@ module spine.webgl {
 		projection = new Matrix4();
 		view = new Matrix4();
 
-		private tmp = new Vector3();
-
 		constructor (viewportWidth: number, viewportHeight: number) {
 			this.viewportWidth = viewportWidth;
 			this.viewportHeight = viewportHeight;
@@ -57,8 +55,8 @@ module spine.webgl {
 			let inverseProjectionView = this.inverseProjectionView;
 			let zoom = this.zoom, viewportWidth = this.viewportWidth, viewportHeight = this.viewportHeight;
 			projection.ortho(zoom * (-viewportWidth / 2), zoom * (viewportWidth / 2),
-							 zoom * (-viewportHeight / 2), zoom * (viewportHeight / 2),
-							 this.near, this.far);
+				zoom * (-viewportHeight / 2), zoom * (viewportHeight / 2),
+				this.near, this.far);
 			view.lookAt(this.position, this.direction, this.up);
 			projectionView.set(projection.values);
 			projectionView.multiply(view);
@@ -67,13 +65,19 @@ module spine.webgl {
 
 		screenToWorld (screenCoords: Vector3, screenWidth: number, screenHeight: number) {
 			let x = screenCoords.x, y = screenHeight - screenCoords.y - 1;
-			let tmp = this.tmp;
-			tmp.x = (2 * x) / screenWidth - 1;
-			tmp.y = (2 * y) / screenHeight - 1;
-			tmp.z = (2 * screenCoords.z) - 1;
-			tmp.project(this.inverseProjectionView);
-			screenCoords.set(tmp.x, tmp.y, tmp.z);
+			screenCoords.x = (2 * x) / screenWidth - 1;
+			screenCoords.y = (2 * y) / screenHeight - 1;
+			screenCoords.z = (2 * screenCoords.z) - 1;
+			screenCoords.project(this.inverseProjectionView);
 			return screenCoords;
+		}
+
+		worldToScreen (worldCoords: Vector3, screenWidth: number, screenHeight: number) {
+			worldCoords.project(this.projectionView);
+			worldCoords.x = screenWidth * (worldCoords.x + 1) / 2;
+			worldCoords.y = screenHeight * (worldCoords.y + 1) / 2;
+			worldCoords.z = (worldCoords.z + 1) / 2;
+			return worldCoords;
 		}
 
 		setViewport(viewportWidth: number, viewportHeight: number) {
