@@ -37,7 +37,8 @@ module spine.webgl {
 		private lastTexture: GLTexture = null;
 		private verticesLength = 0;
 		private indicesLength = 0;
-		private srcBlend: number;
+		private srcColorBlend: number;
+		private srcAlphaBlend: number;
 		private dstBlend: number;
 
 		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true, maxVertices: number = 10920) {
@@ -47,29 +48,32 @@ module spine.webgl {
 					[new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute(), new Color2Attribute()] :
 					[new Position2Attribute(), new ColorAttribute(), new TexCoordAttribute()];
 			this.mesh = new Mesh(context, attributes, maxVertices, maxVertices * 3);
-			this.srcBlend = this.context.gl.SRC_ALPHA;
-			this.dstBlend = this.context.gl.ONE_MINUS_SRC_ALPHA;
+			let gl = this.context.gl;
+			this.srcColorBlend = gl.SRC_ALPHA;
+			this.srcAlphaBlend = gl.ONE;
+			this.dstBlend = gl.ONE_MINUS_SRC_ALPHA;
 		}
 
 		begin (shader: Shader) {
-			let gl = this.context.gl;
 			if (this.isDrawing) throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
 			this.drawCalls = 0;
 			this.shader = shader;
 			this.lastTexture = null;
 			this.isDrawing = true;
 
+			let gl = this.context.gl;
 			gl.enable(gl.BLEND);
-			gl.blendFunc(this.srcBlend, this.dstBlend);
+			gl.blendFuncSeparate(this.srcColorBlend, this.dstBlend, this.srcAlphaBlend, this.dstBlend);
 		}
 
-		setBlendMode (srcBlend: number, dstBlend: number) {
-			let gl = this.context.gl;
-			this.srcBlend = srcBlend;
+		setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstBlend: number) {
+			this.srcColorBlend = srcColorBlend;
+			this.srcAlphaBlend = srcAlphaBlend;
 			this.dstBlend = dstBlend;
 			if (this.isDrawing) {
 				this.flush();
-				gl.blendFunc(this.srcBlend, this.dstBlend);
+				let gl = this.context.gl;
+				gl.blendFuncSeparate(srcColorBlend, dstBlend, srcAlphaBlend, dstBlend);
 			}
 		}
 
@@ -95,11 +99,10 @@ module spine.webgl {
 		}
 
 		private flush () {
-			let gl = this.context.gl;
 			if (this.verticesLength == 0) return;
 
 			this.lastTexture.bind();
-			this.mesh.draw(this.shader, gl.TRIANGLES);
+			this.mesh.draw(this.shader, this.context.gl.TRIANGLES);
 
 			this.verticesLength = 0;
 			this.indicesLength = 0;
@@ -109,17 +112,19 @@ module spine.webgl {
 		}
 
 		end () {
-			let gl = this.context.gl;
 			if (!this.isDrawing) throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
 			if (this.verticesLength > 0 || this.indicesLength > 0) this.flush();
 			this.shader = null;
 			this.lastTexture = null;
 			this.isDrawing = false;
 
+			let gl = this.context.gl;
 			gl.disable(gl.BLEND);
 		}
 
-		getDrawCalls () { return this.drawCalls; }
+		getDrawCalls () {
+			return this.drawCalls;
+		}
 
 		dispose () {
 			this.mesh.dispose();

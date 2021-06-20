@@ -34,9 +34,9 @@ module spine.webgl {
 		private restorables = new Array<Restorable>();
 
 		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget | WebGL2RenderingContext, contextConfig: any = { alpha: "true" }) {
-			if (!((canvasOrContext instanceof WebGLRenderingContext) || (canvasOrContext instanceof WebGL2RenderingContext))) {
+			if (!((canvasOrContext instanceof WebGLRenderingContext) || (canvasOrContext instanceof WebGL2RenderingContext)))
 				this.setupCanvas(canvasOrContext, contextConfig);
-			} else {
+			else {
 				this.gl = canvasOrContext;
 				this.canvas = this.gl.canvas;
 			}
@@ -47,15 +47,12 @@ module spine.webgl {
 			this.canvas = canvas;
 			canvas.addEventListener("webglcontextlost", (e: any) => {
 				let event = <WebGLContextEvent>e;
-				if (e) {
-					e.preventDefault();
-				}
+				if (e) e.preventDefault();
 			});
 
 			canvas.addEventListener("webglcontextrestored", (e: any) => {
-				for (let i = 0, n = this.restorables.length; i < n; i++) {
+				for (let i = 0, n = this.restorables.length; i < n; i++)
 					this.restorables[i].restore();
-				}
 			});
 		}
 
@@ -69,34 +66,41 @@ module spine.webgl {
 		}
 	}
 
-	export class WebGLBlendModeConverter {
-		static ZERO = 0;
-		static ONE = 1;
-		static SRC_COLOR = 0x0300;
-		static ONE_MINUS_SRC_COLOR = 0x0301;
-		static SRC_ALPHA = 0x0302;
-		static ONE_MINUS_SRC_ALPHA = 0x0303;
-		static DST_ALPHA = 0x0304;
-		static ONE_MINUS_DST_ALPHA = 0x0305;
-		static DST_COLOR = 0x0306
+	const ONE = 1;
+	const ONE_MINUS_SRC_COLOR = 0x0301;
+	const SRC_ALPHA = 0x0302;
+	const ONE_MINUS_SRC_ALPHA = 0x0303;
+	const ONE_MINUS_DST_ALPHA = 0x0305;
+	const DST_COLOR = 0x0306;
 
+	export class WebGLBlendModeConverter {
 		static getDestGLBlendMode (blendMode: BlendMode) {
-			switch(blendMode) {
-				case BlendMode.Normal: return WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA;
-				case BlendMode.Additive: return WebGLBlendModeConverter.ONE;
-				case BlendMode.Multiply: return WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA;
-				case BlendMode.Screen: return WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA;
-				default: throw new Error("Unknown blend mode: " + blendMode);
+			switch (blendMode) {
+			case BlendMode.Normal: return ONE_MINUS_SRC_ALPHA;
+			case BlendMode.Additive: return ONE;
+			case BlendMode.Multiply: return ONE_MINUS_SRC_ALPHA;
+			case BlendMode.Screen: return ONE_MINUS_SRC_ALPHA;
+			default: throw new Error("Unknown blend mode: " + blendMode);
 			}
 		}
 
-		static getSourceGLBlendMode (blendMode: BlendMode, premultipliedAlpha: boolean = false) {
-			switch(blendMode) {
-				case BlendMode.Normal: return premultipliedAlpha? WebGLBlendModeConverter.ONE : WebGLBlendModeConverter.SRC_ALPHA;
-				case BlendMode.Additive: return premultipliedAlpha? WebGLBlendModeConverter.ONE : WebGLBlendModeConverter.SRC_ALPHA;
-				case BlendMode.Multiply: return WebGLBlendModeConverter.DST_COLOR;
-				case BlendMode.Screen: return WebGLBlendModeConverter.ONE;
-				default: throw new Error("Unknown blend mode: " + blendMode);
+		static getSourceColorGLBlendMode (blendMode: BlendMode, premultipliedAlpha: boolean = false) {
+			switch (blendMode) {
+			case BlendMode.Normal: return premultipliedAlpha ? ONE : SRC_ALPHA;
+			case BlendMode.Additive: return premultipliedAlpha ? ONE : SRC_ALPHA;
+			case BlendMode.Multiply: return DST_COLOR;
+			case BlendMode.Screen: return ONE;
+			default: throw new Error("Unknown blend mode: " + blendMode);
+			}
+		}
+
+		static getSourceAlphaGLBlendMode (blendMode: BlendMode) {
+			switch (blendMode) {
+			case BlendMode.Normal: return ONE;
+			case BlendMode.Additive: return ONE;
+			case BlendMode.Multiply: return ONE_MINUS_SRC_ALPHA;
+			case BlendMode.Screen: return ONE_MINUS_SRC_COLOR;
+			default: throw new Error("Unknown blend mode: " + blendMode);
 			}
 		}
 	}

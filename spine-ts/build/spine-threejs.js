@@ -2918,6 +2918,7 @@ var spine;
             if (asset.dispose)
                 asset.dispose();
             delete this.assets[path];
+            return asset;
         };
         AssetManager.prototype.removeAll = function () {
             for (var key in this.assets) {
@@ -8101,8 +8102,7 @@ var spine;
             this.g = g;
             this.b = b;
             this.a = a;
-            this.clamp();
-            return this;
+            return this.clamp();
         };
         Color.prototype.setFromColor = function (c) {
             this.r = c.r;
@@ -8113,10 +8113,10 @@ var spine;
         };
         Color.prototype.setFromString = function (hex) {
             hex = hex.charAt(0) == '#' ? hex.substr(1) : hex;
-            this.r = parseInt(hex.substr(0, 2), 16) / 255.0;
-            this.g = parseInt(hex.substr(2, 2), 16) / 255.0;
-            this.b = parseInt(hex.substr(4, 2), 16) / 255.0;
-            this.a = (hex.length != 8 ? 255 : parseInt(hex.substr(6, 2), 16)) / 255.0;
+            this.r = parseInt(hex.substr(0, 2), 16) / 255;
+            this.g = parseInt(hex.substr(2, 2), 16) / 255;
+            this.b = parseInt(hex.substr(4, 2), 16) / 255;
+            this.a = (hex.length != 8 ? 1 : parseInt(hex.substr(6, 2), 16) / 255);
             return this;
         };
         Color.prototype.add = function (r, g, b, a) {
@@ -8124,8 +8124,7 @@ var spine;
             this.g += g;
             this.b += b;
             this.a += a;
-            this.clamp();
-            return this;
+            return this.clamp();
         };
         Color.prototype.clamp = function () {
             if (this.r < 0)

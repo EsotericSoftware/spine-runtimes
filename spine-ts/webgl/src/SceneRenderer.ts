@@ -28,6 +28,15 @@
  *****************************************************************************/
 
 module spine.webgl {
+	const quad = [
+		0, 0, 1, 1, 1, 1, 0, 0,
+		0, 0, 1, 1, 1, 1, 0, 0,
+		0, 0, 1, 1, 1, 1, 0, 0,
+		0, 0, 1, 1, 1, 1, 0, 0,
+	];
+	const QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
+	const WHITE = new Color(1, 1, 1, 1);
+
 	export class SceneRenderer implements Disposable {
 		context: ManagedWebGLRenderingContext;
 		canvas: HTMLCanvasElement;
@@ -37,17 +46,9 @@ module spine.webgl {
 		private batcherShader: Shader;
 		private shapes: ShapeRenderer;
 		private shapesShader: Shader;
-		private activeRenderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer = null;
+		private activeRenderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer;
 		skeletonRenderer: SkeletonRenderer;
 		skeletonDebugRenderer: SkeletonDebugRenderer;
-		private QUAD = [
-			0, 0, 1, 1, 1, 1, 0, 0,
-			0, 0, 1, 1, 1, 1, 0, 0,
-			0, 0, 1, 1, 1, 1, 0, 0,
-			0, 0, 1, 1, 1, 1, 0, 0,
-		];
-		private QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
-		private WHITE = new Color(1, 1, 1, 1);
 
 		constructor (canvas: HTMLCanvasElement, context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true) {
 			this.canvas = canvas;
@@ -73,7 +74,7 @@ module spine.webgl {
 			this.skeletonRenderer.draw(this.batcher, skeleton, slotRangeStart, slotRangeEnd);
 		}
 
-		drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha = false, ignoredBones: Array<string> = null) {
+		drawSkeletonDebug (skeleton: Skeleton, premultipliedAlpha = false, ignoredBones: Array<string> = null) {
 			this.enableRenderer(this.shapes);
 			this.skeletonDebugRenderer.premultipliedAlpha = premultipliedAlpha;
 			this.skeletonDebugRenderer.draw(this.shapes, skeleton, ignoredBones);
@@ -81,8 +82,7 @@ module spine.webgl {
 
 		drawTexture (texture: GLTexture, x: number, y: number, width: number, height: number, color: Color = null) {
 			this.enableRenderer(this.batcher);
-			if (color === null) color = this.WHITE;
-			let quad = this.QUAD;
+			if (color === null) color = WHITE;
 			var i = 0;
 			quad[i++] = x;
 			quad[i++] = y;
@@ -140,13 +140,12 @@ module spine.webgl {
 				quad[i++] = 0;
 				quad[i] = 0;
 			}
-			this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
+			this.batcher.draw(texture, quad, QUAD_TRIANGLES);
 		}
 
 		drawTextureUV (texture: GLTexture, x: number, y: number, width: number, height: number, u: number, v: number, u2: number, v2: number, color: Color = null) {
 			this.enableRenderer(this.batcher);
-			if (color === null) color = this.WHITE;
-			let quad = this.QUAD;
+			if (color === null) color = WHITE;
 			var i = 0;
 			quad[i++] = x;
 			quad[i++] = y;
@@ -204,13 +203,12 @@ module spine.webgl {
 				quad[i++] = 0;
 				quad[i] = 0;
 			}
-			this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
+			this.batcher.draw(texture, quad, QUAD_TRIANGLES);
 		}
 
-		drawTextureRotated (texture: GLTexture, x: number, y: number, width: number, height: number, pivotX: number, pivotY: number, angle: number, color: Color = null, premultipliedAlpha: boolean = false) {
+		drawTextureRotated (texture: GLTexture, x: number, y: number, width: number, height: number, pivotX: number, pivotY: number, angle: number, color: Color = null) {
 			this.enableRenderer(this.batcher);
-			if (color === null) color = this.WHITE;
-			let quad = this.QUAD;
+			if (color === null) color = WHITE;
 
 			// bottom left and top right corner points relative to origin
 			let worldOriginX = x + pivotX;
@@ -335,13 +333,12 @@ module spine.webgl {
 				quad[i++] = 0;
 				quad[i] = 0;
 			}
-			this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
+			this.batcher.draw(texture, quad, QUAD_TRIANGLES);
 		}
 
-		drawRegion (region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color: Color = null, premultipliedAlpha: boolean = false) {
+		drawRegion (region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color: Color = null) {
 			this.enableRenderer(this.batcher);
-			if (color === null) color = this.WHITE;
-			let quad = this.QUAD;
+			if (color === null) color = WHITE;
 			var i = 0;
 			quad[i++] = x;
 			quad[i++] = y;
@@ -399,7 +396,7 @@ module spine.webgl {
 				quad[i++] = 0;
 				quad[i] = 0;
 			}
-			this.batcher.draw(<GLTexture>region.texture, quad, this.QUAD_TRIANGLES);
+			this.batcher.draw(<GLTexture>region.texture, quad, QUAD_TRIANGLES);
 		}
 
 		line (x: number, y: number, x2: number, y2: number, color: Color = null, color2: Color = null) {
@@ -458,11 +455,10 @@ module spine.webgl {
 			}
 			this.context.gl.viewport(0, 0, canvas.width, canvas.height);
 
-			if (resizeMode === ResizeMode.Stretch) {
-				// nothing to do, we simply apply the viewport size of the camera
-			} else if (resizeMode === ResizeMode.Expand) {
+			// Nothing to do for stretch, we simply apply the viewport size of the camera.
+			if (resizeMode === ResizeMode.Expand)
 				this.camera.setViewport(w, h);
-			} else if (resizeMode === ResizeMode.Fit) {
+			else if (resizeMode === ResizeMode.Fit) {
 				let sourceWidth = canvas.width, sourceHeight = canvas.height;
 				let targetWidth = this.camera.viewportWidth, targetHeight = this.camera.viewportHeight;
 				let targetRatio = targetHeight / targetWidth;

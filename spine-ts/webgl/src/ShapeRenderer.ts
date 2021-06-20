@@ -37,15 +37,18 @@ module spine.webgl {
 		private shader: Shader;
 		private vertexIndex = 0;
 		private tmp = new Vector2();
-		private srcBlend: number;
+		private srcColorBlend: number;
+		private srcAlphaBlend: number;
 		private dstBlend: number;
 
 		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
 			this.mesh = new Mesh(context, [new Position2Attribute(), new ColorAttribute()], maxVertices, 0);
-			this.srcBlend = this.context.gl.SRC_ALPHA;
-			this.dstBlend = this.context.gl.ONE_MINUS_SRC_ALPHA;
+			let gl = this.context.gl;
+			this.srcColorBlend = gl.SRC_ALPHA;
+			this.srcAlphaBlend = gl.ONE;
+			this.dstBlend = gl.ONE_MINUS_SRC_ALPHA;
 		}
 
 		begin (shader: Shader) {
@@ -56,16 +59,17 @@ module spine.webgl {
 
 			let gl = this.context.gl;
 			gl.enable(gl.BLEND);
-			gl.blendFunc(this.srcBlend, this.dstBlend);
+			gl.blendFuncSeparate(this.srcColorBlend, this.dstBlend, this.srcAlphaBlend, this.dstBlend);
 		}
 
-		setBlendMode (srcBlend: number, dstBlend: number) {
-			let gl = this.context.gl;
-			this.srcBlend = srcBlend;
+		setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstBlend: number) {
+			this.srcColorBlend = srcColorBlend;
+			this.srcAlphaBlend = srcAlphaBlend;
 			this.dstBlend = dstBlend;
 			if (this.isDrawing) {
 				this.flush();
-				gl.blendFunc(this.srcBlend, this.dstBlend);
+				let gl = this.context.gl;
+				gl.blendFuncSeparate(srcColorBlend, dstBlend, srcAlphaBlend, dstBlend);
 			}
 		}
 
@@ -309,7 +313,8 @@ module spine.webgl {
 		end () {
 			if (!this.isDrawing) throw new Error("ShapeRenderer.begin() has not been called");
 			this.flush();
-			this.context.gl.disable(this.context.gl.BLEND);
+			let gl = this.context.gl;
+			gl.disable(gl.BLEND);
 			this.isDrawing = false;
 		}
 

@@ -362,7 +362,7 @@ declare module spine {
         loadTexture(path: string, success?: (path: string, image: HTMLImageElement | ImageBitmap) => void, error?: (path: string, message: string) => void): void;
         loadTextureAtlas(path: string, success?: (path: string, atlas: TextureAtlas) => void, error?: (path: string, message: string) => void): void;
         get(path: string): any;
-        remove(path: string): void;
+        remove(path: string): any;
         removeAll(): void;
         isLoadingComplete(): boolean;
         getToLoad(): number;
@@ -1360,21 +1360,15 @@ declare module spine.webgl {
 }
 declare module spine.webgl {
     class LoadingScreen {
-        static FADE_SECONDS: number;
-        private static loaded;
-        private static spinnerImg;
-        private static logoImg;
         private renderer;
         private logo;
         private spinner;
         private angle;
         private fadeOut;
+        private fadeIn;
         private timeKeeper;
         backgroundColor: Color;
         private tempColor;
-        private firstDraw;
-        private static SPINNER_DATA;
-        private static SPINE_LOGO_DATA;
         constructor(renderer: SceneRenderer);
         draw(complete?: boolean): void;
     }
@@ -1489,11 +1483,12 @@ declare module spine.webgl {
         private lastTexture;
         private verticesLength;
         private indicesLength;
-        private srcBlend;
+        private srcColorBlend;
+        private srcAlphaBlend;
         private dstBlend;
         constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint?: boolean, maxVertices?: number);
         begin(shader: Shader): void;
-        setBlendMode(srcBlend: number, dstBlend: number): void;
+        setBlendMode(srcColorBlend: number, srcAlphaBlend: number, dstBlend: number): void;
         draw(texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>): void;
         private flush;
         end(): void;
@@ -1514,17 +1509,14 @@ declare module spine.webgl {
         private activeRenderer;
         skeletonRenderer: SkeletonRenderer;
         skeletonDebugRenderer: SkeletonDebugRenderer;
-        private QUAD;
-        private QUAD_TRIANGLES;
-        private WHITE;
         constructor(canvas: HTMLCanvasElement, context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint?: boolean);
         begin(): void;
         drawSkeleton(skeleton: Skeleton, premultipliedAlpha?: boolean, slotRangeStart?: number, slotRangeEnd?: number): void;
         drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha?: boolean, ignoredBones?: Array<string>): void;
         drawTexture(texture: GLTexture, x: number, y: number, width: number, height: number, color?: Color): void;
         drawTextureUV(texture: GLTexture, x: number, y: number, width: number, height: number, u: number, v: number, u2: number, v2: number, color?: Color): void;
-        drawTextureRotated(texture: GLTexture, x: number, y: number, width: number, height: number, pivotX: number, pivotY: number, angle: number, color?: Color, premultipliedAlpha?: boolean): void;
-        drawRegion(region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color?: Color, premultipliedAlpha?: boolean): void;
+        drawTextureRotated(texture: GLTexture, x: number, y: number, width: number, height: number, pivotX: number, pivotY: number, angle: number, color?: Color): void;
+        drawRegion(region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color?: Color): void;
         line(x: number, y: number, x2: number, y2: number, color?: Color, color2?: Color): void;
         triangle(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color?: Color, color2?: Color, color3?: Color): void;
         quad(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, color?: Color, color2?: Color, color3?: Color, color4?: Color): void;
@@ -1601,11 +1593,12 @@ declare module spine.webgl {
         private shader;
         private vertexIndex;
         private tmp;
-        private srcBlend;
+        private srcColorBlend;
+        private srcAlphaBlend;
         private dstBlend;
         constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, maxVertices?: number);
         begin(shader: Shader): void;
-        setBlendMode(srcBlend: number, dstBlend: number): void;
+        setBlendMode(srcColorBlend: number, srcAlphaBlend: number, dstBlend: number): void;
         setColor(color: Color): void;
         setColorWith(r: number, g: number, b: number, a: number): void;
         point(x: number, y: number, color?: Color): void;
@@ -1712,17 +1705,9 @@ declare module spine.webgl {
         removeRestorable(restorable: Restorable): void;
     }
     class WebGLBlendModeConverter {
-        static ZERO: number;
-        static ONE: number;
-        static SRC_COLOR: number;
-        static ONE_MINUS_SRC_COLOR: number;
-        static SRC_ALPHA: number;
-        static ONE_MINUS_SRC_ALPHA: number;
-        static DST_ALPHA: number;
-        static ONE_MINUS_DST_ALPHA: number;
-        static DST_COLOR: number;
-        static getDestGLBlendMode(blendMode: BlendMode): number;
-        static getSourceGLBlendMode(blendMode: BlendMode, premultipliedAlpha?: boolean): number;
+        static getDestGLBlendMode(blendMode: BlendMode): 1 | 771;
+        static getSourceColorGLBlendMode(blendMode: BlendMode, premultipliedAlpha?: boolean): 1 | 770 | 774;
+        static getSourceAlphaGLBlendMode(blendMode: BlendMode): 1 | 771 | 769;
     }
 }
 declare module spine.threejs {
@@ -1791,16 +1776,6 @@ declare module spine.threejs {
     }
 }
 declare module spine {
-    interface Viewport {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-        padLeft: string | number;
-        padRight: string | number;
-        padTop: string | number;
-        padBottom: string | number;
-    }
     interface SpinePlayerConfig {
         jsonUrl: string;
         jsonField: string;
@@ -1814,6 +1789,7 @@ declare module spine {
         skins: string[];
         premultipliedAlpha: boolean;
         showControls: boolean;
+        showLoading: boolean;
         debug: {
             bones: boolean;
             regions: boolean;
@@ -1839,6 +1815,7 @@ declare module spine {
         };
         alpha: boolean;
         backgroundColor: string;
+        fullScreenBackgroundColor: string;
         backgroundImage: {
             url: string;
             x: number;
@@ -1846,58 +1823,63 @@ declare module spine {
             width: number;
             height: number;
         };
-        fullScreenBackgroundColor: string;
         controlBones: string[];
         success: (widget: SpinePlayer) => void;
         error: (widget: SpinePlayer, msg: string) => void;
         downloader: spine.Downloader;
     }
+    interface Viewport {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        padLeft: string | number;
+        padRight: string | number;
+        padTop: string | number;
+        padBottom: string | number;
+    }
     class SpinePlayer {
         private config;
-        static HOVER_COLOR_INNER: Color;
-        static HOVER_COLOR_OUTER: Color;
-        static NON_HOVER_COLOR_INNER: Color;
-        static NON_HOVER_COLOR_OUTER: Color;
-        private sceneRenderer;
+        private parent;
         private dom;
-        private playerControls;
         private canvas;
+        private context;
+        private sceneRenderer;
+        private loadingScreen;
+        private assetManager;
+        private bg;
+        private bgFullscreen;
+        private playerControls;
         private timelineSlider;
         private playButton;
         private skinButton;
         private animationButton;
-        private context;
-        private loadingScreen;
-        private assetManager;
+        private selectedBones;
+        private cancelId;
+        private lastPopup;
         error: boolean;
-        loaded: boolean;
         skeleton: Skeleton;
         animationState: AnimationState;
         private paused;
         private playTime;
         private speed;
         private time;
-        private animationViewports;
+        private stopRequestAnimationFrame;
         private currentViewport;
         private previousViewport;
         private viewportTransitionStart;
-        private selectedBones;
-        private parent;
-        private stopRequestAnimationFrame;
         constructor(parent: HTMLElement | string, config: SpinePlayerConfig);
-        validateConfig(config: SpinePlayerConfig): SpinePlayerConfig;
-        showError(error: string): void;
-        render(): HTMLElement;
-        private lastPopup;
-        showSpeedDialog(speedButton: HTMLElement): void;
-        showAnimationsDialog(animationsButton: HTMLElement): void;
-        showSkinsDialog(skinButton: HTMLElement): void;
-        showSettingsDialog(settingsButton: HTMLElement): void;
-        drawFrame(requestNextFrame?: boolean): void;
-        scale(sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number): Vector2;
-        loadSkeleton(): void;
-        private cancelId;
-        setupInput(): void;
+        private validateConfig;
+        private showError;
+        private render;
+        private showSpeedDialog;
+        private showAnimationsDialog;
+        private showSkinsDialog;
+        private showSettingsDialog;
+        private drawFrame;
+        private scale;
+        private loadSkeleton;
+        private setupInput;
         private play;
         private pause;
         setAnimation(animation: string, loop?: boolean): void;

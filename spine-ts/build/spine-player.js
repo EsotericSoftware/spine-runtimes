@@ -2918,6 +2918,7 @@ var spine;
             if (asset.dispose)
                 asset.dispose();
             delete this.assets[path];
+            return asset;
         };
         AssetManager.prototype.removeAll = function () {
             for (var key in this.assets) {
@@ -8101,8 +8102,7 @@ var spine;
             this.g = g;
             this.b = b;
             this.a = a;
-            this.clamp();
-            return this;
+            return this.clamp();
         };
         Color.prototype.setFromColor = function (c) {
             this.r = c.r;
@@ -8113,10 +8113,10 @@ var spine;
         };
         Color.prototype.setFromString = function (hex) {
             hex = hex.charAt(0) == '#' ? hex.substr(1) : hex;
-            this.r = parseInt(hex.substr(0, 2), 16) / 255.0;
-            this.g = parseInt(hex.substr(2, 2), 16) / 255.0;
-            this.b = parseInt(hex.substr(4, 2), 16) / 255.0;
-            this.a = (hex.length != 8 ? 255 : parseInt(hex.substr(6, 2), 16)) / 255.0;
+            this.r = parseInt(hex.substr(0, 2), 16) / 255;
+            this.g = parseInt(hex.substr(2, 2), 16) / 255;
+            this.b = parseInt(hex.substr(4, 2), 16) / 255;
+            this.a = (hex.length != 8 ? 1 : parseInt(hex.substr(6, 2), 16) / 255);
             return this;
         };
         Color.prototype.add = function (r, g, b, a) {
@@ -8124,8 +8124,7 @@ var spine;
             this.g += g;
             this.b += b;
             this.a += a;
-            this.clamp();
-            return this;
+            return this.clamp();
         };
         Color.prototype.clamp = function () {
             if (this.r < 0)
@@ -9106,9 +9105,8 @@ var spine;
             };
             GLTexture.prototype.update = function (useMipMaps) {
                 var gl = this.context.gl;
-                if (!this.texture) {
+                if (!this.texture)
                     this.texture = this.context.gl.createTexture();
-                }
                 this.bind();
                 if (GLTexture.DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL)
                     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
@@ -9344,98 +9342,94 @@ var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
+        var spinnerImage;
+        var logoImage;
+        var loaded = 0;
+        var FADE_IN = 1, FADE_OUT = 1;
         var LoadingScreen = (function () {
             function LoadingScreen(renderer) {
                 this.logo = null;
                 this.spinner = null;
                 this.angle = 0;
                 this.fadeOut = 0;
+                this.fadeIn = 0;
                 this.timeKeeper = new spine.TimeKeeper();
                 this.backgroundColor = new spine.Color(0.135, 0.135, 0.135, 1);
                 this.tempColor = new spine.Color();
-                this.firstDraw = 0;
                 this.renderer = renderer;
                 this.timeKeeper.maxDelta = 9;
-                if (LoadingScreen.logoImg === null) {
+                if (!logoImage) {
                     var isSafari = navigator.userAgent.indexOf("Safari") > -1;
-                    LoadingScreen.logoImg = new Image();
-                    LoadingScreen.logoImg.src = LoadingScreen.SPINE_LOGO_DATA;
+                    var onload_1 = function () { return loaded++; };
+                    logoImage = new Image();
+                    logoImage.src = SPINE_LOGO_DATA;
                     if (!isSafari)
-                        LoadingScreen.logoImg.crossOrigin = "anonymous";
-                    LoadingScreen.logoImg.onload = function (ev) {
-                        LoadingScreen.loaded++;
-                    };
-                    LoadingScreen.spinnerImg = new Image();
-                    LoadingScreen.spinnerImg.src = LoadingScreen.SPINNER_DATA;
+                        logoImage.crossOrigin = "anonymous";
+                    logoImage.onload = onload_1;
+                    spinnerImage = new Image();
+                    spinnerImage.src = SPINNER_DATA;
                     if (!isSafari)
-                        LoadingScreen.spinnerImg.crossOrigin = "anonymous";
-                    LoadingScreen.spinnerImg.onload = function (ev) {
-                        LoadingScreen.loaded++;
-                    };
+                        spinnerImage.crossOrigin = "anonymous";
+                    spinnerImage.onload = onload_1;
                 }
             }
             LoadingScreen.prototype.draw = function (complete) {
                 if (complete === void 0) { complete = false; }
-                if (complete && this.fadeOut > LoadingScreen.FADE_SECONDS)
+                if (loaded < 2 || (complete && this.fadeOut > FADE_OUT))
                     return;
                 this.timeKeeper.update();
-                var a = Math.abs(Math.sin(this.timeKeeper.totalTime + 0.75));
-                this.angle -= this.timeKeeper.delta / 1.4 * 360 * (1 + 1.5 * Math.pow(a, 5));
+                var a = Math.abs(Math.sin(this.timeKeeper.totalTime + 0.25));
+                this.angle -= this.timeKeeper.delta * 200 * (1 + 1.5 * Math.pow(a, 5));
+                var tempColor = this.tempColor;
                 var renderer = this.renderer;
                 var canvas = renderer.canvas;
                 var gl = renderer.context.gl;
                 renderer.resize(webgl.ResizeMode.Stretch);
-                var oldX = renderer.camera.position.x, oldY = renderer.camera.position.y;
+                renderer.camera.zoom = 1;
                 renderer.camera.position.set(canvas.width / 2, canvas.height / 2, 0);
                 renderer.camera.viewportWidth = canvas.width;
                 renderer.camera.viewportHeight = canvas.height;
-                if (!complete) {
-                    gl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
-                    gl.clear(gl.COLOR_BUFFER_BIT);
-                    this.tempColor.a = 1;
+                renderer.batcher.setBlendMode(gl.ONE, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+                if (complete) {
+                    this.fadeOut += this.timeKeeper.delta * (this.timeKeeper.totalTime < 1 ? 2 : 1);
+                    if (this.fadeOut > FADE_OUT)
+                        return;
+                    tempColor.setFromColor(this.backgroundColor);
+                    a = 1 - this.fadeOut / FADE_OUT;
+                    a = 1 - (a - 1) * (a - 1);
+                    tempColor.a *= a;
+                    if (tempColor.a > 0) {
+                        renderer.begin();
+                        renderer.quad(true, 0, 0, canvas.width, 0, canvas.width, canvas.height, 0, canvas.height, tempColor, tempColor, tempColor, tempColor);
+                        renderer.end();
+                    }
                 }
                 else {
-                    this.fadeOut += this.timeKeeper.delta * (this.timeKeeper.totalTime < 1 ? 2 : 1);
-                    if (this.fadeOut > LoadingScreen.FADE_SECONDS) {
-                        renderer.camera.position.set(oldX, oldY, 0);
-                        return;
+                    this.fadeIn += this.timeKeeper.delta;
+                    if (this.backgroundColor.a > 0) {
+                        gl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
+                        gl.clear(gl.COLOR_BUFFER_BIT);
                     }
-                    a = 1 - this.fadeOut / LoadingScreen.FADE_SECONDS;
-                    this.tempColor.setFromColor(this.backgroundColor);
-                    this.tempColor.a = 1 - (a - 1) * (a - 1);
-                    renderer.begin();
-                    renderer.quad(true, 0, 0, canvas.width, 0, canvas.width, canvas.height, 0, canvas.height, this.tempColor, this.tempColor, this.tempColor, this.tempColor);
-                    renderer.end();
+                    a = 1;
                 }
-                this.tempColor.set(1, 1, 1, this.tempColor.a);
-                if (LoadingScreen.loaded != 2)
-                    return;
-                if (this.logo === null) {
-                    this.logo = new webgl.GLTexture(renderer.context, LoadingScreen.logoImg);
-                    this.spinner = new webgl.GLTexture(renderer.context, LoadingScreen.spinnerImg);
+                a *= Math.min(this.fadeIn / FADE_IN, 1);
+                tempColor.set(a, a, a, a);
+                if (!this.logo) {
+                    this.logo = new webgl.GLTexture(renderer.context, logoImage);
+                    this.spinner = new webgl.GLTexture(renderer.context, spinnerImage);
                 }
-                this.logo.update(false);
-                this.spinner.update(false);
-                var logoWidth = this.logo.getImage().width;
-                var logoHeight = this.logo.getImage().height;
-                var spinnerWidth = this.spinner.getImage().width;
-                var spinnerHeight = this.spinner.getImage().height;
-                renderer.batcher.setBlendMode(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                var logoWidth = logoImage.width, logoHeight = logoImage.height;
+                var spinnerWidth = spinnerImage.width, spinnerHeight = spinnerImage.height;
                 renderer.begin();
-                renderer.drawTexture(this.logo, (canvas.width - logoWidth) / 2, (canvas.height - logoHeight) / 2, logoWidth, logoHeight, this.tempColor);
-                renderer.drawTextureRotated(this.spinner, (canvas.width - spinnerWidth) / 2, (canvas.height - spinnerHeight) / 2, spinnerWidth, spinnerHeight, spinnerWidth / 2, spinnerHeight / 2, this.angle, this.tempColor);
+                renderer.drawTexture(this.logo, (canvas.width - logoWidth) / 2, (canvas.height - logoHeight) / 2, logoWidth, logoHeight, tempColor);
+                renderer.drawTextureRotated(this.spinner, (canvas.width - spinnerWidth) / 2, (canvas.height - spinnerHeight) / 2, spinnerWidth, spinnerHeight, spinnerWidth / 2, spinnerHeight / 2, this.angle, tempColor);
                 renderer.end();
-                renderer.camera.position.set(oldX, oldY, 0);
             };
-            LoadingScreen.FADE_SECONDS = 1;
-            LoadingScreen.loaded = 0;
-            LoadingScreen.spinnerImg = null;
-            LoadingScreen.logoImg = null;
-            LoadingScreen.SPINNER_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKMAAACjCAYAAADmbK6AAAAACXBIWXMAAAsTAAALEwEAmpwYAAALB2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczpwaG90b3Nob3A9Imh0dHA6Ly9ucy5hZG9iZS5jb20vcGhvdG9zaG9wLzEuMC8iIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIiB4bWxuczpleGlmPSJodHRwOi8vbnMuYWRvYmUuY29tL2V4aWYvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxNS41IChXaW5kb3dzKSIgeG1wOkNyZWF0ZURhdGU9IjIwMTYtMDktMDhUMTQ6MjU6MTIrMDI6MDAiIHhtcDpNZXRhZGF0YURhdGU9IjIwMTgtMTEtMTVUMTY6NDA6NTkrMDE6MDAiIHhtcDpNb2RpZnlEYXRlPSIyMDE4LTExLTE1VDE2OjQwOjU5KzAxOjAwIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpmZDhlNTljMC02NGJjLTIxNGQtODAyZi1jZDlhODJjM2ZjMGMiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDpmYmNmZWJlYS03MjY2LWE0NGQtOTI4NS0wOTJmNGNhYzk4ZWEiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDowODMzNWIyYy04NzYyLWQzNGMtOTBhOS02ODJjYjJmYTQ2M2UiIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiIHRpZmY6T3JpZW50YXRpb249IjEiIHRpZmY6WFJlc29sdXRpb249IjcyMDAwMC8xMDAwMCIgdGlmZjpZUmVzb2x1dGlvbj0iNzIwMDAwLzEwMDAwIiB0aWZmOlJlc29sdXRpb25Vbml0PSIyIiBleGlmOkNvbG9yU3BhY2U9IjY1NTM1IiBleGlmOlBpeGVsWERpbWVuc2lvbj0iMjk3IiBleGlmOlBpeGVsWURpbWVuc2lvbj0iMjQyIj4gPHhtcE1NOkhpc3Rvcnk+IDxyZGY6U2VxPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY3JlYXRlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDowODMzNWIyYy04NzYyLWQzNGMtOTBhOS02ODJjYjJmYTQ2M2UiIHN0RXZ0OndoZW49IjIwMTYtMDktMDhUMTQ6MjU6MTIrMDI6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE1LjUgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpiNThlMTlkNi0xYTRjLTQyNDEtODU0ZC01MDVlZjYxMjRhODQiIHN0RXZ0OndoZW49IjIwMTgtMTEtMTVUMTY6NDA6MjMrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjQ3YzYzYzIwLWJkYjgtYzM0YS1hYzMyLWQ5MDdjOWEyOTA0MCIgc3RFdnQ6d2hlbj0iMjAxOC0xMS0xNVQxNjo0MDo1OSswMTowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY29udmVydGVkIiBzdEV2dDpwYXJhbWV0ZXJzPSJmcm9tIGFwcGxpY2F0aW9uL3ZuZC5hZG9iZS5waG90b3Nob3AgdG8gaW1hZ2UvcG5nIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJkZXJpdmVkIiBzdEV2dDpwYXJhbWV0ZXJzPSJjb252ZXJ0ZWQgZnJvbSBhcHBsaWNhdGlvbi92bmQuYWRvYmUucGhvdG9zaG9wIHRvIGltYWdlL3BuZyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6ZmQ4ZTU5YzAtNjRiYy0yMTRkLTgwMmYtY2Q5YTgyYzNmYzBjIiBzdEV2dDp3aGVuPSIyMDE4LTExLTE1VDE2OjQwOjU5KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0N2M2M2MyMC1iZGI4LWMzNGEtYWMzMi1kOTA3YzlhMjkwNDAiIHN0UmVmOmRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDo2OWRmZjljYy01YzFiLWE5NDctOTc3OS03ODgxZjM0ODk3MDMiIHN0UmVmOm9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDowODMzNWIyYy04NzYyLWQzNGMtOTBhOS02ODJjYjJmYTQ2M2UiLz4gPHBob3Rvc2hvcDpEb2N1bWVudEFu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";
-            LoadingScreen.SPINE_LOGO_DATA = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKUAAABsCAYAAAALzHKmAAAACXBIWXMAAAsTAAALEwEAmpwYAAALB2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDIgNzkuMTYwOTI0LCAyMDE3LzA3LzEzLTAxOjA2OjM5ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczpwaG90b3Nob3A9Imh0dHA6Ly9ucy5hZG9iZS5jb20vcGhvdG9zaG9wLzEuMC8iIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIiB4bWxuczpleGlmPSJodHRwOi8vbnMuYWRvYmUuY29tL2V4aWYvMS4wLyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ0MgMjAxNS41IChXaW5kb3dzKSIgeG1wOkNyZWF0ZURhdGU9IjIwMTYtMDktMDhUMTQ6MjU6MTIrMDI6MDAiIHhtcDpNZXRhZGF0YURhdGU9IjIwMTgtMTEtMTVUMTY6NDA6NTkrMDE6MDAiIHhtcDpNb2RpZnlEYXRlPSIyMDE4LTExLTE1VDE2OjQwOjU5KzAxOjAwIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDowMTdhZGQ3Ni04OTZlLThlNGUtYmM5MS00ZjEyNjI1YjA3MjgiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDplMTViNGE2ZS1hMDg3LWEzNDktODdhOS1mNDYzYjE2MzQ0Y2MiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDowODMzNWIyYy04NzYyLWQzNGMtOTBhOS02ODJjYjJmYTQ2M2UiIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiIHRpZmY6T3JpZW50YXRpb249IjEiIHRpZmY6WFJlc29sdXRpb249IjcyMDAwMC8xMDAwMCIgdGlmZjpZUmVzb2x1dGlvbj0iNzIwMDAwLzEwMDAwIiB0aWZmOlJlc29sdXRpb25Vbml0PSIyIiBleGlmOkNvbG9yU3BhY2U9IjY1NTM1IiBleGlmOlBpeGVsWERpbWVuc2lvbj0iMjk3IiBleGlmOlBpeGVsWURpbWVuc2lvbj0iMjQyIj4gPHhtcE1NOkhpc3Rvcnk+IDxyZGY6U2VxPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY3JlYXRlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDowODMzNWIyYy04NzYyLWQzNGMtOTBhOS02ODJjYjJmYTQ2M2UiIHN0RXZ0OndoZW49IjIwMTYtMDktMDhUMTQ6MjU6MTIrMDI6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAyMDE1LjUgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpiNThlMTlkNi0xYTRjLTQyNDEtODU0ZC01MDVlZjYxMjRhODQiIHN0RXZ0OndoZW49IjIwMTgtMTEtMTVUMTY6NDA6MjMrMDE6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiIHN0RXZ0OmNoYW5nZWQ9Ii8iLz4gPHJkZjpsaSBzdEV2dDphY3Rpb249InNhdmVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjJlNjJiMWM2LWIxYzQtNDk0MC04MDMxLWU4ZDkyNTBmODJjNSIgc3RFdnQ6d2hlbj0iMjAxOC0xMS0xNVQxNjo0MDo1OSswMTowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIENDIChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0iY29udmVydGVkIiBzdEV2dDpwYXJhbWV0ZXJzPSJmcm9tIGFwcGxpY2F0aW9uL3ZuZC5hZG9iZS5waG90b3Nob3AgdG8gaW1hZ2UvcG5nIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJkZXJpdmVkIiBzdEV2dDpwYXJhbWV0ZXJzPSJjb252ZXJ0ZWQgZnJvbSBhcHBsaWNhdGlvbi92bmQuYWRvYmUucGhvdG9zaG9wIHRvIGltYWdlL3BuZyIvPiA8cmRmOmxpIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MDE3YWRkNzYtODk2ZS04ZTRlLWJjOTEtNGYxMjYyNWIwNzI4IiBzdEV2dDp3aGVuPSIyMDE4LTExLTE1VDE2OjQwOjU5KzAxOjAwIiBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIiBzdEV2dDpjaGFuZ2VkPSIvIi8+IDwvcmRmOlNlcT4gPC94bXBNTTpIaXN0b3J5PiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoyZTYyYjFjNi1iMWM0LTQ5NDAtODAzMS1lOGQ5MjUwZjgyYzUiIHN0UmVmOmRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDo2OWRmZjljYy01YzFiLWE5NDctOTc3OS03ODgxZjM0ODk3MDMiIHN0UmVmOm9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDowODMzNWIyYy04NzYyLWQzNGMtOTBhOS02ODJjYjJmYTQ2M2UiLz4gPHBob3Rvc2hvcDpEb2N1bWVudEFu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";
             return LoadingScreen;
         }());
         webgl.LoadingScreen = LoadingScreen;
+        var SPINNER_DATA = "data:image/png;base64,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";
+        var SPINE_LOGO_DATA = "data:image/png;base64,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";
     })(webgl = spine.webgl || (spine.webgl = {}));
 })(spine || (spine = {}));
 var spine;
@@ -9947,27 +9941,30 @@ var spine;
                     [new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute(), new webgl.Color2Attribute()] :
                     [new webgl.Position2Attribute(), new webgl.ColorAttribute(), new webgl.TexCoordAttribute()];
                 this.mesh = new webgl.Mesh(context, attributes, maxVertices, maxVertices * 3);
-                this.srcBlend = this.context.gl.SRC_ALPHA;
-                this.dstBlend = this.context.gl.ONE_MINUS_SRC_ALPHA;
+                var gl = this.context.gl;
+                this.srcColorBlend = gl.SRC_ALPHA;
+                this.srcAlphaBlend = gl.ONE;
+                this.dstBlend = gl.ONE_MINUS_SRC_ALPHA;
             }
             PolygonBatcher.prototype.begin = function (shader) {
-                var gl = this.context.gl;
                 if (this.isDrawing)
                     throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
                 this.drawCalls = 0;
                 this.shader = shader;
                 this.lastTexture = null;
                 this.isDrawing = true;
-                gl.enable(gl.BLEND);
-                gl.blendFunc(this.srcBlend, this.dstBlend);
-            };
-            PolygonBatcher.prototype.setBlendMode = function (srcBlend, dstBlend) {
                 var gl = this.context.gl;
-                this.srcBlend = srcBlend;
+                gl.enable(gl.BLEND);
+                gl.blendFuncSeparate(this.srcColorBlend, this.dstBlend, this.srcAlphaBlend, this.dstBlend);
+            };
+            PolygonBatcher.prototype.setBlendMode = function (srcColorBlend, srcAlphaBlend, dstBlend) {
+                this.srcColorBlend = srcColorBlend;
+                this.srcAlphaBlend = srcAlphaBlend;
                 this.dstBlend = dstBlend;
                 if (this.isDrawing) {
                     this.flush();
-                    gl.blendFunc(this.srcBlend, this.dstBlend);
+                    var gl = this.context.gl;
+                    gl.blendFuncSeparate(srcColorBlend, dstBlend, srcAlphaBlend, dstBlend);
                 }
             };
             PolygonBatcher.prototype.draw = function (texture, vertices, indices) {
@@ -9990,11 +9987,10 @@ var spine;
                 this.mesh.setIndicesLength(this.indicesLength);
             };
             PolygonBatcher.prototype.flush = function () {
-                var gl = this.context.gl;
                 if (this.verticesLength == 0)
                     return;
                 this.lastTexture.bind();
-                this.mesh.draw(this.shader, gl.TRIANGLES);
+                this.mesh.draw(this.shader, this.context.gl.TRIANGLES);
                 this.verticesLength = 0;
                 this.indicesLength = 0;
                 this.mesh.setVerticesLength(0);
@@ -10002,7 +9998,6 @@ var spine;
                 this.drawCalls++;
             };
             PolygonBatcher.prototype.end = function () {
-                var gl = this.context.gl;
                 if (!this.isDrawing)
                     throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
                 if (this.verticesLength > 0 || this.indicesLength > 0)
@@ -10010,9 +10005,12 @@ var spine;
                 this.shader = null;
                 this.lastTexture = null;
                 this.isDrawing = false;
+                var gl = this.context.gl;
                 gl.disable(gl.BLEND);
             };
-            PolygonBatcher.prototype.getDrawCalls = function () { return this.drawCalls; };
+            PolygonBatcher.prototype.getDrawCalls = function () {
+                return this.drawCalls;
+            };
             PolygonBatcher.prototype.dispose = function () {
                 this.mesh.dispose();
             };
@@ -10025,19 +10023,18 @@ var spine;
 (function (spine) {
     var webgl;
     (function (webgl) {
+        var quad = [
+            0, 0, 1, 1, 1, 1, 0, 0,
+            0, 0, 1, 1, 1, 1, 0, 0,
+            0, 0, 1, 1, 1, 1, 0, 0,
+            0, 0, 1, 1, 1, 1, 0, 0,
+        ];
+        var QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
+        var WHITE = new spine.Color(1, 1, 1, 1);
         var SceneRenderer = (function () {
             function SceneRenderer(canvas, context, twoColorTint) {
                 if (twoColorTint === void 0) { twoColorTint = true; }
                 this.twoColorTint = false;
-                this.activeRenderer = null;
-                this.QUAD = [
-                    0, 0, 1, 1, 1, 1, 0, 0,
-                    0, 0, 1, 1, 1, 1, 0, 0,
-                    0, 0, 1, 1, 1, 1, 0, 0,
-                    0, 0, 1, 1, 1, 1, 0, 0,
-                ];
-                this.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
-                this.WHITE = new spine.Color(1, 1, 1, 1);
                 this.canvas = canvas;
                 this.context = context instanceof webgl.ManagedWebGLRenderingContext ? context : new webgl.ManagedWebGLRenderingContext(context);
                 this.twoColorTint = twoColorTint;
@@ -10072,8 +10069,7 @@ var spine;
                 if (color === void 0) { color = null; }
                 this.enableRenderer(this.batcher);
                 if (color === null)
-                    color = this.WHITE;
-                var quad = this.QUAD;
+                    color = WHITE;
                 var i = 0;
                 quad[i++] = x;
                 quad[i++] = y;
@@ -10131,14 +10127,13 @@ var spine;
                     quad[i++] = 0;
                     quad[i] = 0;
                 }
-                this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
+                this.batcher.draw(texture, quad, QUAD_TRIANGLES);
             };
             SceneRenderer.prototype.drawTextureUV = function (texture, x, y, width, height, u, v, u2, v2, color) {
                 if (color === void 0) { color = null; }
                 this.enableRenderer(this.batcher);
                 if (color === null)
-                    color = this.WHITE;
-                var quad = this.QUAD;
+                    color = WHITE;
                 var i = 0;
                 quad[i++] = x;
                 quad[i++] = y;
@@ -10196,15 +10191,13 @@ var spine;
                     quad[i++] = 0;
                     quad[i] = 0;
                 }
-                this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
+                this.batcher.draw(texture, quad, QUAD_TRIANGLES);
             };
-            SceneRenderer.prototype.drawTextureRotated = function (texture, x, y, width, height, pivotX, pivotY, angle, color, premultipliedAlpha) {
+            SceneRenderer.prototype.drawTextureRotated = function (texture, x, y, width, height, pivotX, pivotY, angle, color) {
                 if (color === void 0) { color = null; }
-                if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
                 this.enableRenderer(this.batcher);
                 if (color === null)
-                    color = this.WHITE;
-                var quad = this.QUAD;
+                    color = WHITE;
                 var worldOriginX = x + pivotX;
                 var worldOriginY = y + pivotY;
                 var fx = -pivotX;
@@ -10314,15 +10307,13 @@ var spine;
                     quad[i++] = 0;
                     quad[i] = 0;
                 }
-                this.batcher.draw(texture, quad, this.QUAD_TRIANGLES);
+                this.batcher.draw(texture, quad, QUAD_TRIANGLES);
             };
-            SceneRenderer.prototype.drawRegion = function (region, x, y, width, height, color, premultipliedAlpha) {
+            SceneRenderer.prototype.drawRegion = function (region, x, y, width, height, color) {
                 if (color === void 0) { color = null; }
-                if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
                 this.enableRenderer(this.batcher);
                 if (color === null)
-                    color = this.WHITE;
-                var quad = this.QUAD;
+                    color = WHITE;
                 var i = 0;
                 quad[i++] = x;
                 quad[i++] = y;
@@ -10380,7 +10371,7 @@ var spine;
                     quad[i++] = 0;
                     quad[i] = 0;
                 }
-                this.batcher.draw(region.texture, quad, this.QUAD_TRIANGLES);
+                this.batcher.draw(region.texture, quad, QUAD_TRIANGLES);
             };
             SceneRenderer.prototype.line = function (x, y, x2, y2, color, color2) {
                 if (color === void 0) { color = null; }
@@ -10445,11 +10436,8 @@ var spine;
                     canvas.height = h;
                 }
                 this.context.gl.viewport(0, 0, canvas.width, canvas.height);
-                if (resizeMode === ResizeMode.Stretch) {
-                }
-                else if (resizeMode === ResizeMode.Expand) {
+                if (resizeMode === ResizeMode.Expand)
                     this.camera.setViewport(w, h);
-                }
                 else if (resizeMode === ResizeMode.Fit) {
                     var sourceWidth = canvas.width, sourceHeight = canvas.height;
                     var targetWidth = this.camera.viewportWidth, targetHeight = this.camera.viewportHeight;
@@ -10674,8 +10662,10 @@ var spine;
                     throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
                 this.context = context instanceof webgl.ManagedWebGLRenderingContext ? context : new webgl.ManagedWebGLRenderingContext(context);
                 this.mesh = new webgl.Mesh(context, [new webgl.Position2Attribute(), new webgl.ColorAttribute()], maxVertices, 0);
-                this.srcBlend = this.context.gl.SRC_ALPHA;
-                this.dstBlend = this.context.gl.ONE_MINUS_SRC_ALPHA;
+                var gl = this.context.gl;
+                this.srcColorBlend = gl.SRC_ALPHA;
+                this.srcAlphaBlend = gl.ONE;
+                this.dstBlend = gl.ONE_MINUS_SRC_ALPHA;
             }
             ShapeRenderer.prototype.begin = function (shader) {
                 if (this.isDrawing)
@@ -10685,15 +10675,16 @@ var spine;
                 this.isDrawing = true;
                 var gl = this.context.gl;
                 gl.enable(gl.BLEND);
-                gl.blendFunc(this.srcBlend, this.dstBlend);
+                gl.blendFuncSeparate(this.srcColorBlend, this.dstBlend, this.srcAlphaBlend, this.dstBlend);
             };
-            ShapeRenderer.prototype.setBlendMode = function (srcBlend, dstBlend) {
-                var gl = this.context.gl;
-                this.srcBlend = srcBlend;
+            ShapeRenderer.prototype.setBlendMode = function (srcColorBlend, srcAlphaBlend, dstBlend) {
+                this.srcColorBlend = srcColorBlend;
+                this.srcAlphaBlend = srcAlphaBlend;
                 this.dstBlend = dstBlend;
                 if (this.isDrawing) {
                     this.flush();
-                    gl.blendFunc(this.srcBlend, this.dstBlend);
+                    var gl = this.context.gl;
+                    gl.blendFuncSeparate(srcColorBlend, dstBlend, srcAlphaBlend, dstBlend);
                 }
             };
             ShapeRenderer.prototype.setColor = function (color) {
@@ -10944,7 +10935,8 @@ var spine;
                 if (!this.isDrawing)
                     throw new Error("ShapeRenderer.begin() has not been called");
                 this.flush();
-                this.context.gl.disable(this.context.gl.BLEND);
+                var gl = this.context.gl;
+                gl.disable(gl.BLEND);
                 this.isDrawing = false;
             };
             ShapeRenderer.prototype.flush = function () {
@@ -11017,7 +11009,7 @@ var spine;
                 var skeletonY = skeleton.y;
                 var gl = this.context.gl;
                 var srcFunc = this.premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
-                shapes.setBlendMode(srcFunc, gl.ONE_MINUS_SRC_ALPHA);
+                shapes.setBlendMode(srcFunc, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
                 var bones = skeleton.bones;
                 if (this.drawBones) {
                     shapes.setColor(this.boneLineColor);
@@ -11316,7 +11308,7 @@ var spine;
                         var slotBlendMode = slot.data.blendMode;
                         if (slotBlendMode != blendMode) {
                             blendMode = slotBlendMode;
-                            batcher.setBlendMode(webgl.WebGLBlendModeConverter.getSourceGLBlendMode(blendMode, premultipliedAlpha), webgl.WebGLBlendModeConverter.getDestGLBlendMode(blendMode));
+                            batcher.setBlendMode(webgl.WebGLBlendModeConverter.getSourceColorGLBlendMode(blendMode, premultipliedAlpha), webgl.WebGLBlendModeConverter.getSourceAlphaGLBlendMode(blendMode), webgl.WebGLBlendModeConverter.getDestGLBlendMode(blendMode));
                         }
                         if (clipper.isClipping()) {
                             clipper.clipTriangles(renderable.vertices, renderable.numFloats, triangles, triangles.length, uvs, finalColor, darkColor, twoColorTint);
@@ -11550,9 +11542,8 @@ var spine;
             function ManagedWebGLRenderingContext(canvasOrContext, contextConfig) {
                 if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
                 this.restorables = new Array();
-                if (!((canvasOrContext instanceof WebGLRenderingContext) || (canvasOrContext instanceof WebGL2RenderingContext))) {
+                if (!((canvasOrContext instanceof WebGLRenderingContext) || (canvasOrContext instanceof WebGL2RenderingContext)))
                     this.setupCanvas(canvasOrContext, contextConfig);
-                }
                 else {
                     this.gl = canvasOrContext;
                     this.canvas = this.gl.canvas;
@@ -11564,14 +11555,12 @@ var spine;
                 this.canvas = canvas;
                 canvas.addEventListener("webglcontextlost", function (e) {
                     var event = e;
-                    if (e) {
+                    if (e)
                         e.preventDefault();
-                    }
                 });
                 canvas.addEventListener("webglcontextrestored", function (e) {
-                    for (var i = 0, n = _this.restorables.length; i < n; i++) {
+                    for (var i = 0, n = _this.restorables.length; i < n; i++)
                         _this.restorables[i].restore();
-                    }
                 });
             };
             ManagedWebGLRenderingContext.prototype.addRestorable = function (restorable) {
@@ -11585,37 +11574,43 @@ var spine;
             return ManagedWebGLRenderingContext;
         }());
         webgl.ManagedWebGLRenderingContext = ManagedWebGLRenderingContext;
+        var ONE = 1;
+        var ONE_MINUS_SRC_COLOR = 0x0301;
+        var SRC_ALPHA = 0x0302;
+        var ONE_MINUS_SRC_ALPHA = 0x0303;
+        var ONE_MINUS_DST_ALPHA = 0x0305;
+        var DST_COLOR = 0x0306;
         var WebGLBlendModeConverter = (function () {
             function WebGLBlendModeConverter() {
             }
             WebGLBlendModeConverter.getDestGLBlendMode = function (blendMode) {
                 switch (blendMode) {
-                    case spine.BlendMode.Normal: return WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA;
-                    case spine.BlendMode.Additive: return WebGLBlendModeConverter.ONE;
-                    case spine.BlendMode.Multiply: return WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA;
-                    case spine.BlendMode.Screen: return WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA;
+                    case spine.BlendMode.Normal: return ONE_MINUS_SRC_ALPHA;
+                    case spine.BlendMode.Additive: return ONE;
+                    case spine.BlendMode.Multiply: return ONE_MINUS_SRC_ALPHA;
+                    case spine.BlendMode.Screen: return ONE_MINUS_SRC_ALPHA;
                     default: throw new Error("Unknown blend mode: " + blendMode);
                 }
             };
-            WebGLBlendModeConverter.getSourceGLBlendMode = function (blendMode, premultipliedAlpha) {
+            WebGLBlendModeConverter.getSourceColorGLBlendMode = function (blendMode, premultipliedAlpha) {
                 if (premultipliedAlpha === void 0) { premultipliedAlpha = false; }
                 switch (blendMode) {
-                    case spine.BlendMode.Normal: return premultipliedAlpha ? WebGLBlendModeConverter.ONE : WebGLBlendModeConverter.SRC_ALPHA;
-                    case spine.BlendMode.Additive: return premultipliedAlpha ? WebGLBlendModeConverter.ONE : WebGLBlendModeConverter.SRC_ALPHA;
-                    case spine.BlendMode.Multiply: return WebGLBlendModeConverter.DST_COLOR;
-                    case spine.BlendMode.Screen: return WebGLBlendModeConverter.ONE;
+                    case spine.BlendMode.Normal: return premultipliedAlpha ? ONE : SRC_ALPHA;
+                    case spine.BlendMode.Additive: return premultipliedAlpha ? ONE : SRC_ALPHA;
+                    case spine.BlendMode.Multiply: return DST_COLOR;
+                    case spine.BlendMode.Screen: return ONE;
                     default: throw new Error("Unknown blend mode: " + blendMode);
                 }
             };
-            WebGLBlendModeConverter.ZERO = 0;
-            WebGLBlendModeConverter.ONE = 1;
-            WebGLBlendModeConverter.SRC_COLOR = 0x0300;
-            WebGLBlendModeConverter.ONE_MINUS_SRC_COLOR = 0x0301;
-            WebGLBlendModeConverter.SRC_ALPHA = 0x0302;
-            WebGLBlendModeConverter.ONE_MINUS_SRC_ALPHA = 0x0303;
-            WebGLBlendModeConverter.DST_ALPHA = 0x0304;
-            WebGLBlendModeConverter.ONE_MINUS_DST_ALPHA = 0x0305;
-            WebGLBlendModeConverter.DST_COLOR = 0x0306;
+            WebGLBlendModeConverter.getSourceAlphaGLBlendMode = function (blendMode) {
+                switch (blendMode) {
+                    case spine.BlendMode.Normal: return ONE;
+                    case spine.BlendMode.Additive: return ONE;
+                    case spine.BlendMode.Multiply: return ONE_MINUS_SRC_ALPHA;
+                    case spine.BlendMode.Screen: return ONE_MINUS_SRC_COLOR;
+                    default: throw new Error("Unknown blend mode: " + blendMode);
+                }
+            };
             return WebGLBlendModeConverter;
         }());
         webgl.WebGLBlendModeConverter = WebGLBlendModeConverter;
@@ -11623,10 +11618,755 @@ var spine;
 })(spine || (spine = {}));
 var spine;
 (function (spine) {
+    var SpinePlayer = (function () {
+        function SpinePlayer(parent, config) {
+            this.config = config;
+            this.bg = new spine.Color();
+            this.bgFullscreen = new spine.Color();
+            this.cancelId = 0;
+            this.paused = true;
+            this.playTime = 0;
+            this.speed = 1;
+            this.time = new spine.TimeKeeper();
+            this.stopRequestAnimationFrame = false;
+            this.viewportTransitionStart = 0;
+            this.parent = typeof parent === "string" ? document.getElementById(parent) : parent;
+            this.parent.appendChild(this.render());
+        }
+        SpinePlayer.prototype.validateConfig = function (config) {
+            if (!config)
+                throw new Error("Please pass a configuration to new.spine.SpinePlayer().");
+            if (!config.jsonUrl && !config.skelUrl)
+                throw new Error("Please specify the URL of the skeleton JSON or .skel file.");
+            if (!config.atlasUrl)
+                throw new Error("Please specify the URL of the atlas file.");
+            if (!config.backgroundColor)
+                config.backgroundColor = "#000000";
+            if (!config.fullScreenBackgroundColor)
+                config.fullScreenBackgroundColor = config.backgroundColor;
+            if (config.backgroundImage && !config.backgroundImage.url)
+                config.backgroundImage = null;
+            if (typeof config.premultipliedAlpha === "undefined")
+                config.premultipliedAlpha = true;
+            if (!config.success)
+                config.success = function (widget) { };
+            if (!config.error)
+                config.error = function (widget, msg) { };
+            if (!config.debug)
+                config.debug = {};
+            if (config.animations && config.animation && config.animations.indexOf(config.animation) < 0)
+                throw new Error("Animation '" + config.animation + "' is not in the config animation list: " + toString(this.config.animations));
+            if (config.skins && config.skin && config.skins.indexOf(config.skin) < 0)
+                throw new Error("Default skin '" + config.skin + "' is not in the config skins list: " + toString(this.config.skins));
+            if (!config.viewport)
+                config.viewport = {};
+            if (!config.viewport.animations)
+                config.viewport.animations = {};
+            if (typeof config.viewport.debugRender === "undefined")
+                config.viewport.debugRender = false;
+            if (typeof config.viewport.transitionTime === "undefined")
+                config.viewport.transitionTime = 0.2;
+            if (!config.controlBones)
+                config.controlBones = [];
+            if (typeof config.showControls === "undefined")
+                config.showControls = true;
+            if (typeof config.showLoading === "undefined")
+                config.showLoading = true;
+            if (typeof config.defaultMix === "undefined")
+                config.defaultMix = 0.25;
+        };
+        SpinePlayer.prototype.showError = function (message, error) {
+            if (error === void 0) { error = null; }
+            if (this.error) {
+                if (error)
+                    throw error;
+            }
+            else {
+                this.error = true;
+                this.dom.appendChild(createElement("<div class=\"spine-player-error\"><p style=\"text-align: center; align-self: center;\">"
+                    + message.replace("\n", "<br><br>") + "</p></div>"));
+                this.config.error(this, message);
+                throw (error ? error : new Error(message));
+            }
+        };
+        SpinePlayer.prototype.render = function () {
+            var _this = this;
+            var config = this.config;
+            try {
+                this.validateConfig(config);
+            }
+            catch (e) {
+                this.showError(e.message, e);
+            }
+            this.bg.setFromString(config.backgroundColor);
+            this.bgFullscreen.setFromString(config.fullScreenBackgroundColor);
+            var controls = !config.showControls ? null : "\n<div class=\"spine-player-controls spine-player-popup-parent spine-player-controls-hidden\">\n<div class=\"spine-player-timeline\"></div>\n<div class=\"spine-player-buttons\">\n<button class=\"spine-player-button spine-player-button-icon-pause\"></button>\n<div class=\"spine-player-button-spacer\"></div>\n<button class=\"spine-player-button spine-player-button-icon-speed\"></button>\n<button class=\"spine-player-button spine-player-button-icon-animations\"></button>\n<button class=\"spine-player-button spine-player-button-icon-skins\"></button>\n<button class=\"spine-player-button spine-player-button-icon-settings\"></button>\n<button class=\"spine-player-button spine-player-button-icon-fullscreen\"></button>\n<img class=\"spine-player-button-icon-spine-logo\" src=\"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20104%2031.16%22%3E%3Cpath%20d%3D%22M104%2012.68a1.31%201.31%200%200%201-.37%201%201.28%201.28%200%200%201-.85.31H91.57a10.51%2010.51%200%200%200%20.29%202.55%204.92%204.92%200%200%200%201%202%204.27%204.27%200%200%200%201.64%201.26%206.89%206.89%200%200%200%202.6.44%2010.66%2010.66%200%200%200%202.17-.2%2012.81%2012.81%200%200%200%201.64-.44q.69-.25%201.14-.44a1.87%201.87%200%200%201%20.68-.2.44.44%200%200%201%20.27.04.43.43%200%200%201%20.16.2%201.38%201.38%200%200%201%20.09.37%204.89%204.89%200%200%201%200%20.58%204.14%204.14%200%200%201%200%20.43v.32a.83.83%200%200%201-.09.26%201.1%201.1%200%200%201-.17.22%202.77%202.77%200%200%201-.61.34%208.94%208.94%200%200%201-1.32.46%2018.54%2018.54%200%200%201-1.88.41%2013.78%2013.78%200%200%201-2.28.18%2010.55%2010.55%200%200%201-3.68-.59%206.82%206.82%200%200%201-2.66-1.74%207.44%207.44%200%200%201-1.63-2.89%2013.48%2013.48%200%200%201-.55-4%2012.76%2012.76%200%200%201%20.57-3.94%208.35%208.35%200%200%201%201.64-3%207.15%207.15%200%200%201%202.58-1.87%208.47%208.47%200%200%201%203.39-.65%208.19%208.19%200%200%201%203.41.64%206.46%206.46%200%200%201%202.32%201.73%207%207%200%200%201%201.3%202.54%2011.17%2011.17%200%200%201%20.43%203.13zm-3.14-.93a5.69%205.69%200%200%200-1.09-3.86%204.17%204.17%200%200%200-3.42-1.4%204.52%204.52%200%200%200-2%20.44%204.41%204.41%200%200%200-1.47%201.15A5.29%205.29%200%200%200%2092%209.75a7%207%200%200%200-.36%202zM80.68%2021.94a.42.42%200%200%201-.08.26.59.59%200%200%201-.25.18%201.74%201.74%200%200%201-.47.11%206.31%206.31%200%200%201-.76%200%206.5%206.5%200%200%201-.78%200%201.74%201.74%200%200%201-.47-.11.59.59%200%200%201-.25-.18.42.42%200%200%201-.08-.26V12a9.8%209.8%200%200%200-.23-2.35%204.86%204.86%200%200%200-.66-1.53%202.88%202.88%200%200%200-1.13-1%203.57%203.57%200%200%200-1.6-.34%204%204%200%200%200-2.35.83A12.71%2012.71%200%200%200%2069.11%2010v11.9a.42.42%200%200%201-.08.26.59.59%200%200%201-.25.18%201.74%201.74%200%200%201-.47.11%206.51%206.51%200%200%201-.78%200%206.31%206.31%200%200%201-.76%200%201.88%201.88%200%200%201-.48-.11.52.52%200%200%201-.25-.18.46.46%200%200%201-.07-.26v-17a.53.53%200%200%201%20.03-.21.5.5%200%200%201%20.23-.19%201.28%201.28%200%200%201%20.44-.11%208.53%208.53%200%200%201%201.39%200%201.12%201.12%200%200%201%20.43.11.6.6%200%200%201%20.22.19.47.47%200%200%201%20.07.26V7.2a10.46%2010.46%200%200%201%202.87-2.36%206.17%206.17%200%200%201%202.88-.75%206.41%206.41%200%200%201%202.87.58%205.16%205.16%200%200%201%201.88%201.54%206.15%206.15%200%200%201%201%202.26%2013.46%2013.46%200%200%201%20.31%203.11z%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M43.35%202.86c.09%202.6%201.89%204%205.48%204.61%203%20.48%205.79.24%206.69-2.37%201.75-5.09-2.4-3.82-6-4.39s-6.31-2.03-6.17%202.15zm1.08%2010.69c.33%201.94%202.14%203.06%204.91%203s4.84-1.16%205.13-3.25c.53-3.88-2.53-2.38-5.3-2.3s-5.4-1.26-4.74%202.55zM48%2022.44c.55%201.45%202.06%202.06%204.1%201.63s3.45-1.11%203.33-2.76c-.21-3.06-2.22-2.1-4.26-1.66S47%2019.6%2048%2022.44zm1.78%206.78c.16%201.22%201.22%202%202.88%201.93s2.92-.67%203.13-2c.4-2.43-1.46-1.53-3.12-1.51s-3.17-.82-2.89%201.58z%22%20fill%3D%22%23ff4000%22%2F%3E%3Cpath%20d%3D%22M35.28%2013.16a15.33%2015.33%200%200%201-.48%204%208.75%208.75%200%200%201-1.42%203%206.35%206.35%200%200%201-2.32%201.91%207.14%207.14%200%200%201-3.16.67%206.1%206.1%200%200%201-1.4-.15%205.34%205.34%200%200%201-1.26-.47%207.29%207.29%200%200%201-1.24-.81q-.61-.49-1.29-1.15v8.51a.47.47%200%200%201-.08.26.56.56%200%200%201-.25.19%201.74%201.74%200%200%201-.47.11%206.47%206.47%200%200%201-.78%200%206.26%206.26%200%200%201-.76%200%201.89%201.89%200%200%201-.48-.11.49.49%200%200%201-.25-.19.51.51%200%200%201-.07-.26V4.91a.57.57%200%200%201%20.06-.27.46.46%200%200%201%20.23-.18%201.47%201.47%200%200%201%20.44-.1%207.41%207.41%200%200%201%201.3%200%201.45%201.45%200%200%201%20.43.1.52.52%200%200%201%20.24.18.51.51%200%200%201%20.07.27V7.2a18.06%2018.06%200%200%201%201.49-1.38%209%209%200%200%201%201.45-1%206.82%206.82%200%200%201%201.49-.59%207.09%207.09%200%200%201%204.78.52%206%206%200%200%201%202.13%202%208.79%208.79%200%200%201%201.2%202.9%2015.72%2015.72%200%200%201%20.4%203.51zm-3.28.36a15.64%2015.64%200%200%200-.2-2.53%207.32%207.32%200%200%200-.69-2.17%204.06%204.06%200%200%200-1.3-1.51%203.49%203.49%200%200%200-2-.57%204.1%204.1%200%200%200-1.2.18%204.92%204.92%200%200%200-1.2.57%208.54%208.54%200%200%200-1.28%201A15.77%2015.77%200%200%200%2022.76%2010v6.77a13.53%2013.53%200%200%200%202.46%202.4%204.12%204.12%200%200%200%202.44.83%203.56%203.56%200%200%200%202-.57A4.28%204.28%200%200%200%2031%2018a7.58%207.58%200%200%200%20.77-2.12%2011.43%2011.43%200%200%200%20.23-2.36zM12%2017.3a5.39%205.39%200%200%201-.48%202.33%204.73%204.73%200%200%201-1.37%201.72%206.19%206.19%200%200%201-2.12%201.06%209.62%209.62%200%200%201-2.71.36%2010.38%2010.38%200%200%201-3.21-.5A7.63%207.63%200%200%201%201%2021.82a3.25%203.25%200%200%201-.66-.43%201.09%201.09%200%200%201-.3-.53%203.59%203.59%200%200%201-.04-.93%204.06%204.06%200%200%201%200-.61%202%202%200%200%201%20.09-.4.42.42%200%200%201%20.16-.22.43.43%200%200%201%20.24-.07%201.35%201.35%200%200%201%20.61.26q.41.26%201%20.56a9.22%209.22%200%200%200%201.41.55%206.25%206.25%200%200%200%201.87.26%205.62%205.62%200%200%200%201.44-.17%203.48%203.48%200%200%200%201.12-.5%202.23%202.23%200%200%200%20.73-.84%202.68%202.68%200%200%200%20.26-1.21%202%202%200%200%200-.37-1.21%203.55%203.55%200%200%200-1-.87%208.09%208.09%200%200%200-1.36-.66l-1.56-.61a16%2016%200%200%201-1.57-.73%206%206%200%200%201-1.37-1%204.52%204.52%200%200%201-1-1.4%204.69%204.69%200%200%201-.37-2%204.88%204.88%200%200%201%20.39-1.87%204.46%204.46%200%200%201%201.16-1.61%205.83%205.83%200%200%201%201.94-1.11A8.06%208.06%200%200%201%206.53%204a8.28%208.28%200%200%201%201.36.11%209.36%209.36%200%200%201%201.23.28%205.92%205.92%200%200%201%20.94.37%204.09%204.09%200%200%201%20.59.35%201%201%200%200%201%20.26.26.83.83%200%200%201%20.09.26%201.32%201.32%200%200%200%20.06.35%203.87%203.87%200%200%201%200%20.51%204.76%204.76%200%200%201%200%20.56%201.39%201.39%200%200%201-.09.39.5.5%200%200%201-.16.22.35.35%200%200%201-.21.07%201%201%200%200%201-.49-.21%207%207%200%200%200-.83-.44%209.26%209.26%200%200%200-1.2-.44%205.49%205.49%200%200%200-1.58-.16%204.93%204.93%200%200%200-1.4.18%202.69%202.69%200%200%200-1%20.51%202.16%202.16%200%200%200-.59.83%202.43%202.43%200%200%200-.2%201%202%202%200%200%200%20.38%201.24%203.6%203.6%200%200%200%201%20.88%208.25%208.25%200%200%200%201.38.68l1.58.62q.8.32%201.59.72a6%206%200%200%201%201.39%201%204.37%204.37%200%200%201%201%201.36%204.46%204.46%200%200%201%20.37%201.8z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E\">\n</div></div>";
+            var dom = this.dom = createElement("<div class=\"spine-player\"><canvas class=\"spine-player-canvas\"></canvas>" + controls + "</div>");
+            try {
+                this.canvas = findWithClass(dom, "spine-player-canvas");
+                this.context = new spine.webgl.ManagedWebGLRenderingContext(this.canvas, { alpha: config.alpha });
+                this.sceneRenderer = new spine.webgl.SceneRenderer(this.canvas, this.context, true);
+                if (config.showLoading)
+                    this.loadingScreen = new spine.webgl.LoadingScreen(this.sceneRenderer);
+            }
+            catch (e) {
+                this.showError("Sorry, your browser does not support WebGL.\nPlease use the latest version of Firefox, Chrome, Edge, or Safari.", e);
+            }
+            this.assetManager = new spine.webgl.AssetManager(this.context, "", config.downloader);
+            if (config.rawDataURIs) {
+                for (var path in config.rawDataURIs)
+                    this.assetManager.setRawDataURI(path, config.rawDataURIs[path]);
+            }
+            if (config.jsonUrl)
+                this.assetManager.loadJson(config.jsonUrl);
+            else
+                this.assetManager.loadBinary(config.skelUrl);
+            this.assetManager.loadTextureAtlas(config.atlasUrl);
+            if (config.backgroundImage)
+                this.assetManager.loadTexture(config.backgroundImage.url);
+            requestAnimationFrame(function () { return _this.drawFrame(); });
+            if (config.showControls) {
+                this.playerControls = dom.children[1];
+                var controls_1 = this.playerControls.children;
+                var timeline = controls_1[0];
+                var buttons = controls_1[1].children;
+                this.playButton = buttons[0];
+                var speedButton_1 = buttons[2];
+                this.animationButton = buttons[3];
+                this.skinButton = buttons[4];
+                var settingsButton_1 = buttons[5];
+                var fullscreenButton = buttons[6];
+                var logoButton = buttons[7];
+                this.timelineSlider = new Slider();
+                timeline.appendChild(this.timelineSlider.render());
+                this.playButton.onclick = function () { return (_this.paused ? _this.play() : _this.pause()); };
+                speedButton_1.onclick = function () { return _this.showSpeedDialog(speedButton_1); };
+                this.animationButton.onclick = function () { return _this.showAnimationsDialog(_this.animationButton); };
+                this.skinButton.onclick = function () { return _this.showSkinsDialog(_this.skinButton); };
+                settingsButton_1.onclick = function () { return _this.showSettingsDialog(settingsButton_1); };
+                var oldWidth_1 = this.canvas.clientWidth, oldHeight_1 = this.canvas.clientHeight;
+                var oldStyleWidth_1 = this.canvas.style.width, oldStyleHeight_1 = this.canvas.style.height;
+                var isFullscreen_1 = false;
+                fullscreenButton.onclick = function () {
+                    var fullscreenChanged = function () {
+                        isFullscreen_1 = !isFullscreen_1;
+                        if (!isFullscreen_1) {
+                            _this.canvas.style.width = oldWidth_1 + "px";
+                            _this.canvas.style.height = oldHeight_1 + "px";
+                            _this.drawFrame(false);
+                            requestAnimationFrame(function () {
+                                _this.canvas.style.width = oldStyleWidth_1;
+                                _this.canvas.style.height = oldStyleHeight_1;
+                            });
+                        }
+                    };
+                    var player = dom;
+                    player.onfullscreenchange = fullscreenChanged;
+                    player.onwebkitfullscreenchange = fullscreenChanged;
+                    var doc = document;
+                    if (doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
+                        if (doc.exitFullscreen)
+                            doc.exitFullscreen();
+                        else if (doc.mozCancelFullScreen)
+                            doc.mozCancelFullScreen();
+                        else if (doc.webkitExitFullscreen)
+                            doc.webkitExitFullscreen();
+                        else if (doc.msExitFullscreen)
+                            doc.msExitFullscreen();
+                    }
+                    else {
+                        oldWidth_1 = _this.canvas.clientWidth;
+                        oldHeight_1 = _this.canvas.clientHeight;
+                        oldStyleWidth_1 = _this.canvas.style.width;
+                        oldStyleHeight_1 = _this.canvas.style.height;
+                        if (player.requestFullscreen)
+                            player.requestFullscreen();
+                        else if (player.webkitRequestFullScreen)
+                            player.webkitRequestFullScreen();
+                        else if (player.mozRequestFullScreen)
+                            player.mozRequestFullScreen();
+                        else if (player.msRequestFullscreen)
+                            player.msRequestFullscreen();
+                    }
+                };
+                logoButton.onclick = function () { return window.open("http://esotericsoftware.com"); };
+            }
+            window.onresize = function () { return _this.drawFrame(false); };
+            return dom;
+        };
+        SpinePlayer.prototype.showSpeedDialog = function (speedButton) {
+            var _this = this;
+            if (this.lastPopup) {
+                this.lastPopup.dom.remove();
+                if (findWithClass(this.lastPopup.dom, "spine-player-popup-title").textContent == "Speed") {
+                    this.lastPopup = null;
+                    speedButton.classList.remove("spine-player-button-icon-speed-selected");
+                    return;
+                }
+            }
+            var popup = new Popup(this.dom, this.playerControls, "\n<div class=\"spine-player-popup-title\">Speed</div>\n<hr>\n<div class=\"spine-player-row\" style=\"user-select: none; align-items: center; padding: 8px;\">\n<div class=\"spine-player-column\">\n\t<div class=\"spine-player-speed-slider\" style=\"margin-bottom: 4px;\"></div>\n\t<div class=\"spine-player-row\" style=\"justify-content: space-between;\"><div>0.1x</div><div>1x</div><div>2x</div></div>\n</div>\n</div>");
+            var slider = new Slider(2, 0.1, true);
+            findWithClass(popup.dom, "spine-player-speed-slider").appendChild(slider.render());
+            slider.setValue(this.speed / 2);
+            slider.change = function (percentage) { return _this.speed = percentage * 2; };
+            speedButton.classList.add("spine-player-button-icon-speed-selected");
+            popup.show(function () {
+                speedButton.classList.remove("spine-player-button-icon-speed-selected");
+                popup.dom.remove();
+                _this.lastPopup = null;
+            });
+            this.lastPopup = popup;
+        };
+        SpinePlayer.prototype.showAnimationsDialog = function (animationsButton) {
+            var _this = this;
+            if (this.lastPopup) {
+                this.lastPopup.dom.remove();
+                if (findWithClass(this.lastPopup.dom, "spine-player-popup-title").textContent == "Animations") {
+                    this.lastPopup = null;
+                    animationsButton.classList.remove("spine-player-button-icon-animations-selected");
+                    return;
+                }
+            }
+            if (!this.skeleton || !this.skeleton.data.animations.length)
+                return;
+            var popup = new Popup(this.dom, this.playerControls, "<div class=\"spine-player-popup-title\">Animations</div><hr><ul class=\"spine-player-list\"></ul>");
+            var rows = findWithClass(popup.dom, "spine-player-list");
+            this.skeleton.data.animations.forEach(function (animation) {
+                if (_this.config.animations && _this.config.animations.indexOf(animation.name) < 0)
+                    return;
+                var row = createElement("<li class=\"spine-player-list-item selectable\"><div class=\"selectable-circle\"></div><div class=\"selectable-text\"></div></li>");
+                if (animation.name == _this.config.animation)
+                    row.classList.add("selected");
+                findWithClass(row, "selectable-text").innerText = animation.name;
+                rows.appendChild(row);
+                row.onclick = function () {
+                    removeClass(rows.children, "selected");
+                    row.classList.add("selected");
+                    _this.config.animation = animation.name;
+                    _this.playTime = 0;
+                    _this.setAnimation(animation.name);
+                };
+            });
+            animationsButton.classList.add("spine-player-button-icon-animations-selected");
+            popup.show(function () {
+                animationsButton.classList.remove("spine-player-button-icon-animations-selected");
+                popup.dom.remove();
+                _this.lastPopup = null;
+            });
+            this.lastPopup = popup;
+        };
+        SpinePlayer.prototype.showSkinsDialog = function (skinButton) {
+            var _this = this;
+            if (this.lastPopup) {
+                this.lastPopup.dom.remove();
+                if (findWithClass(this.lastPopup.dom, "spine-player-popup-title").textContent == "Skins") {
+                    this.lastPopup = null;
+                    skinButton.classList.remove("spine-player-button-icon-skins-selected");
+                    return;
+                }
+            }
+            if (!this.skeleton || !this.skeleton.data.animations.length)
+                return;
+            var popup = new Popup(this.dom, this.playerControls, "<div class=\"spine-player-popup-title\">Skins</div><hr><ul class=\"spine-player-list\"></ul>");
+            var rows = findWithClass(popup.dom, "spine-player-list");
+            this.skeleton.data.skins.forEach(function (skin) {
+                if (_this.config.skins && _this.config.skins.indexOf(skin.name) < 0)
+                    return;
+                var row = createElement("<li class=\"spine-player-list-item selectable\"><div class=\"selectable-circle\"></div><div class=\"selectable-text\"></div></li>");
+                if (skin.name == _this.config.skin)
+                    row.classList.add("selected");
+                findWithClass(row, "selectable-text").innerText = skin.name;
+                rows.appendChild(row);
+                row.onclick = function () {
+                    removeClass(rows.children, "selected");
+                    row.classList.add("selected");
+                    _this.config.skin = skin.name;
+                    _this.skeleton.setSkinByName(_this.config.skin);
+                    _this.skeleton.setSlotsToSetupPose();
+                };
+            });
+            skinButton.classList.add("spine-player-button-icon-skins-selected");
+            popup.show(function () {
+                skinButton.classList.remove("spine-player-button-icon-skins-selected");
+                popup.dom.remove();
+                _this.lastPopup = null;
+            });
+            this.lastPopup = popup;
+        };
+        SpinePlayer.prototype.showSettingsDialog = function (settingsButton) {
+            var _this = this;
+            if (this.lastPopup) {
+                this.lastPopup.dom.remove();
+                if (findWithClass(this.lastPopup.dom, "spine-player-popup-title").textContent == "Debug") {
+                    this.lastPopup = null;
+                    settingsButton.classList.remove("spine-player-button-icon-settings-selected");
+                    return;
+                }
+            }
+            if (!this.skeleton || !this.skeleton.data.animations.length)
+                return;
+            var popup = new Popup(this.dom, this.playerControls, "<div class=\"spine-player-popup-title\">Debug</div><hr><ul class=\"spine-player-list\"></li>");
+            var rows = findWithClass(popup.dom, "spine-player-list");
+            var makeItem = function (label, name) {
+                var row = createElement("<li class=\"spine-player-list-item\"></li>");
+                var s = new Switch(label);
+                row.appendChild(s.render());
+                var debug = _this.config.debug;
+                s.setEnabled(debug[name]);
+                s.change = function (value) { return debug[name] = value; };
+                rows.appendChild(row);
+            };
+            makeItem("Bones", "bones");
+            makeItem("Regions", "regions");
+            makeItem("Meshes", "meshes");
+            makeItem("Bounds", "bounds");
+            makeItem("Paths", "paths");
+            makeItem("Clipping", "clipping");
+            makeItem("Points", "points");
+            makeItem("Hulls", "hulls");
+            settingsButton.classList.add("spine-player-button-icon-settings-selected");
+            popup.show(function () {
+                settingsButton.classList.remove("spine-player-button-icon-settings-selected");
+                popup.dom.remove();
+                _this.lastPopup = null;
+            });
+            this.lastPopup = popup;
+        };
+        SpinePlayer.prototype.drawFrame = function (requestNextFrame) {
+            var _this = this;
+            if (requestNextFrame === void 0) { requestNextFrame = true; }
+            try {
+                if (requestNextFrame && !this.stopRequestAnimationFrame && !this.error)
+                    requestAnimationFrame(function () { return _this.drawFrame(); });
+                var doc = document;
+                var isFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+                var bg = isFullscreen ? this.bgFullscreen : this.bg;
+                if (!this.skeleton && this.assetManager.isLoadingComplete())
+                    this.loadSkeleton();
+                var skeleton = this.skeleton;
+                var config = this.config;
+                if (skeleton) {
+                    var renderer = this.sceneRenderer;
+                    renderer.resize(spine.webgl.ResizeMode.Expand);
+                    if (!this.paused && config.animation) {
+                        this.time.update();
+                        var delta = this.time.delta * this.speed;
+                        var animationDuration = this.animationState.getCurrent(0).animation.duration;
+                        this.playTime += delta;
+                        while (this.playTime >= animationDuration && animationDuration != 0)
+                            this.playTime -= animationDuration;
+                        this.playTime = Math.max(0, Math.min(this.playTime, animationDuration));
+                        if (config.showControls)
+                            this.timelineSlider.setValue(this.playTime / animationDuration);
+                        this.animationState.update(delta);
+                        this.animationState.apply(skeleton);
+                    }
+                    skeleton.updateWorldTransform();
+                    var viewport = {
+                        x: this.currentViewport.x - this.currentViewport.padLeft,
+                        y: this.currentViewport.y - this.currentViewport.padBottom,
+                        width: this.currentViewport.width + this.currentViewport.padLeft + this.currentViewport.padRight,
+                        height: this.currentViewport.height + this.currentViewport.padBottom + this.currentViewport.padTop
+                    };
+                    var transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / config.viewport.transitionTime;
+                    if (this.previousViewport && transitionAlpha < 1) {
+                        var oldViewport = {
+                            x: this.previousViewport.x - this.previousViewport.padLeft,
+                            y: this.previousViewport.y - this.previousViewport.padBottom,
+                            width: this.previousViewport.width + this.previousViewport.padLeft + this.previousViewport.padRight,
+                            height: this.previousViewport.height + this.previousViewport.padBottom + this.previousViewport.padTop
+                        };
+                        viewport = {
+                            x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
+                            y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
+                            width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
+                            height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
+                        };
+                    }
+                    var viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
+                    var gl = this.context.gl;
+                    gl.clearColor(bg.r, bg.g, bg.b, bg.a);
+                    gl.clear(gl.COLOR_BUFFER_BIT);
+                    renderer.camera.zoom = viewport.width / viewportSize.x;
+                    renderer.camera.position.x = viewport.x + viewport.width / 2;
+                    renderer.camera.position.y = viewport.y + viewport.height / 2;
+                    renderer.begin();
+                    if (config.backgroundImage) {
+                        var bgImage = this.assetManager.get(config.backgroundImage.url);
+                        if (config.backgroundImage.hasOwnProperty("x") && config.backgroundImage.hasOwnProperty("y") && config.backgroundImage.width && config.backgroundImage.height)
+                            renderer.drawTexture(bgImage, config.backgroundImage.x, config.backgroundImage.y, config.backgroundImage.width, config.backgroundImage.height);
+                        else
+                            renderer.drawTexture(bgImage, viewport.x, viewport.y, viewport.width, viewport.height);
+                    }
+                    renderer.drawSkeleton(skeleton, config.premultipliedAlpha);
+                    if ((renderer.skeletonDebugRenderer.drawBones = config.debug.bones)
+                        || (renderer.skeletonDebugRenderer.drawBoundingBoxes = config.debug.bounds)
+                        || (renderer.skeletonDebugRenderer.drawClipping = config.debug.clipping)
+                        || (renderer.skeletonDebugRenderer.drawMeshHull = config.debug.hulls)
+                        || (renderer.skeletonDebugRenderer.drawPaths = config.debug.paths)
+                        || (renderer.skeletonDebugRenderer.drawRegionAttachments = config.debug.regions)
+                        || (renderer.skeletonDebugRenderer.drawMeshTriangles = config.debug.meshes)) {
+                        renderer.drawSkeletonDebug(skeleton, config.premultipliedAlpha);
+                    }
+                    var controlBones = config.controlBones;
+                    if (controlBones.length) {
+                        var selectedBones = this.selectedBones;
+                        gl.lineWidth(2);
+                        for (var i = 0; i < controlBones.length; i++) {
+                            var bone = skeleton.findBone(controlBones[i]);
+                            if (!bone)
+                                continue;
+                            var colorInner = selectedBones[i] ? BONE_INNER_OVER : BONE_INNER;
+                            var colorOuter = selectedBones[i] ? BONE_OUTER_OVER : BONE_OUTER;
+                            renderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);
+                            renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
+                        }
+                        gl.lineWidth(1);
+                    }
+                    if (config.viewport.debugRender) {
+                        renderer.rect(false, this.currentViewport.x, this.currentViewport.y, this.currentViewport.width, this.currentViewport.height, spine.Color.GREEN);
+                        renderer.rect(false, viewport.x, viewport.y, viewport.width, viewport.height, spine.Color.RED);
+                    }
+                    renderer.end();
+                }
+                if (config.showLoading) {
+                    this.loadingScreen.backgroundColor.setFromColor(bg);
+                    this.loadingScreen.draw(this.assetManager.isLoadingComplete());
+                }
+            }
+            catch (e) {
+                this.showError("Error: Unable to render skeleton.\n" + e.message, e);
+            }
+        };
+        SpinePlayer.prototype.scale = function (sourceWidth, sourceHeight, targetWidth, targetHeight) {
+            var targetRatio = targetHeight / targetWidth;
+            var sourceRatio = sourceHeight / sourceWidth;
+            var scale = targetRatio > sourceRatio ? targetWidth / sourceWidth : targetHeight / sourceHeight;
+            var temp = new spine.Vector2();
+            temp.x = sourceWidth * scale;
+            temp.y = sourceHeight * scale;
+            return temp;
+        };
+        SpinePlayer.prototype.loadSkeleton = function () {
+            var _this = this;
+            if (this.error)
+                return;
+            if (this.assetManager.hasErrors())
+                this.showError("Error: Assets could not be loaded.\n" + toString(this.assetManager.getErrors()));
+            var config = this.config;
+            var atlas = this.assetManager.get(config.atlasUrl);
+            var skeletonData;
+            if (config.jsonUrl) {
+                try {
+                    var jsonData = this.assetManager.remove(config.jsonUrl);
+                    if (!jsonData)
+                        throw new Error("Empty JSON data.");
+                    if (config.jsonField) {
+                        jsonData = jsonData[config.jsonField];
+                        if (!jsonData)
+                            throw new Error("JSON field not found: " + config.jsonField);
+                    }
+                    var json = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
+                    skeletonData = json.readSkeletonData(jsonData);
+                }
+                catch (e) {
+                    this.showError("Error: Could not load skeleton JSON.\n" + e.message, e);
+                }
+            }
+            else {
+                var binaryData = this.assetManager.remove(config.skelUrl);
+                var binary = new spine.SkeletonBinary(new spine.AtlasAttachmentLoader(atlas));
+                try {
+                    skeletonData = binary.readSkeletonData(binaryData);
+                }
+                catch (e) {
+                    this.showError("Error: Could not load skeleton binary.\n" + e.message, e);
+                }
+            }
+            this.skeleton = new spine.Skeleton(skeletonData);
+            var stateData = new spine.AnimationStateData(skeletonData);
+            stateData.defaultMix = config.defaultMix;
+            this.animationState = new spine.AnimationState(stateData);
+            config.controlBones.forEach(function (bone) {
+                if (!skeletonData.findBone(bone))
+                    _this.showError("Error: Control bone does not exist in skeleton: " + bone);
+            });
+            if (!config.skin && skeletonData.skins.length)
+                config.skin = skeletonData.skins[0].name;
+            if (config.skins && config.skin.length) {
+                config.skins.forEach(function (skin) {
+                    if (!_this.skeleton.data.findSkin(skin))
+                        _this.showError("Error: Skin in config list does not exist in skeleton: " + skin);
+                });
+            }
+            if (config.skin) {
+                if (!this.skeleton.data.findSkin(config.skin))
+                    this.showError("Error: Skin does not exist in skeleton: " + config.skin);
+                this.skeleton.setSkinByName(config.skin);
+                this.skeleton.setSlotsToSetupPose();
+            }
+            Object.getOwnPropertyNames(config.viewport.animations).forEach(function (animation) {
+                if (!skeletonData.findAnimation(animation))
+                    _this.showError("Error: Animation for which a viewport was specified does not exist in skeleton: " + animation);
+            });
+            if (config.animations && config.animations.length) {
+                config.animations.forEach(function (animation) {
+                    if (!_this.skeleton.data.findAnimation(animation))
+                        _this.showError("Error: Animation in config list does not exist in skeleton: " + animation);
+                });
+                if (!config.animation)
+                    config.animation = config.animations[0];
+            }
+            if (!config.animation && skeletonData.animations.length)
+                config.animation = skeletonData.animations[0].name;
+            if (config.animation) {
+                if (!skeletonData.findAnimation(config.animation))
+                    this.showError("Error: Animation does not exist in skeleton: " + config.animation);
+                this.play();
+                if (config.showControls) {
+                    this.timelineSlider.change = function (percentage) {
+                        _this.pause();
+                        var animationDuration = _this.animationState.getCurrent(0).animation.duration;
+                        var time = animationDuration * percentage;
+                        _this.animationState.update(time - _this.playTime);
+                        _this.animationState.apply(_this.skeleton);
+                        _this.skeleton.updateWorldTransform();
+                        _this.playTime = time;
+                    };
+                }
+            }
+            this.setupInput();
+            if (config.showControls) {
+                if (skeletonData.skins.length == 1 || (config.skins && config.skins.length == 1))
+                    this.skinButton.classList.add("spine-player-hidden");
+                if (skeletonData.animations.length == 1 || (config.animations && config.animations.length == 1))
+                    this.animationButton.classList.add("spine-player-hidden");
+            }
+            config.success(this);
+        };
+        SpinePlayer.prototype.setupInput = function () {
+            var _this = this;
+            var controlBones = this.config.controlBones;
+            if (!controlBones.length && !this.config.showControls)
+                return;
+            var selectedBones = this.selectedBones = new Array(controlBones.length);
+            var canvas = this.canvas;
+            var input = new spine.webgl.Input(canvas);
+            var target = null;
+            var coords = new spine.webgl.Vector3();
+            var temp3 = new spine.webgl.Vector3();
+            var temp2 = new spine.Vector2();
+            var skeleton = this.skeleton;
+            var renderer = this.sceneRenderer;
+            input.addListener({
+                down: function (x, y) {
+                    for (var i = 0; i < controlBones.length; i++) {
+                        var bone = skeleton.findBone(controlBones[i]);
+                        if (!bone)
+                            continue;
+                        renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+                        if (temp3.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30)
+                            target = bone;
+                    }
+                },
+                up: function (x, y) {
+                    if (target)
+                        target = null;
+                    else if (_this.config.showControls) {
+                        if (_this.paused)
+                            _this.play();
+                        else
+                            _this.pause();
+                    }
+                },
+                dragged: function (x, y) {
+                    if (target) {
+                        renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+                        if (target.parent) {
+                            target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
+                            target.x = temp2.x;
+                            target.y = temp2.y;
+                        }
+                        else {
+                            target.x = coords.x - skeleton.x;
+                            target.y = coords.y - skeleton.y;
+                        }
+                    }
+                },
+                moved: function (x, y) {
+                    for (var i = 0; i < controlBones.length; i++) {
+                        var bone = skeleton.findBone(controlBones[i]);
+                        if (!bone)
+                            continue;
+                        renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+                        if (temp3.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30)
+                            selectedBones[i] = bone;
+                        else
+                            selectedBones[i] = null;
+                    }
+                }
+            });
+            if (!this.config.showControls)
+                return;
+            document.addEventListener("mousemove", function (ev) {
+                if (ev instanceof MouseEvent)
+                    handleHover(ev.clientX, ev.clientY);
+            });
+            document.addEventListener("touchmove", function (ev) {
+                if (ev instanceof TouchEvent) {
+                    var touches = ev.changedTouches;
+                    if (touches.length) {
+                        var touch = touches[0];
+                        handleHover(touch.clientX, touch.clientY);
+                    }
+                }
+            });
+            var mouseOverControls = true, mouseOverCanvas = false;
+            var handleHover = function (mouseX, mouseY) {
+                var popup = findWithClass(_this.dom, "spine-player-popup");
+                mouseOverControls = overlap(mouseX, mouseY, _this.playerControls.getBoundingClientRect());
+                mouseOverCanvas = overlap(mouseX, mouseY, canvas.getBoundingClientRect());
+                clearTimeout(_this.cancelId);
+                var hide = !popup && !mouseOverControls && !mouseOverCanvas && !_this.paused;
+                if (hide)
+                    _this.playerControls.classList.add("spine-player-controls-hidden");
+                else
+                    _this.playerControls.classList.remove("spine-player-controls-hidden");
+                if (!mouseOverControls && !popup && !_this.paused) {
+                    _this.cancelId = setTimeout(function () {
+                        if (!_this.paused)
+                            _this.playerControls.classList.add("spine-player-controls-hidden");
+                    }, 1000);
+                }
+            };
+            var overlap = function (mouseX, mouseY, rect) {
+                var x = mouseX - rect.left, y = mouseY - rect.top;
+                return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
+            };
+        };
+        SpinePlayer.prototype.play = function () {
+            var _this = this;
+            this.paused = false;
+            if (this.config.showControls) {
+                this.cancelId = setTimeout(function () {
+                    if (!_this.paused)
+                        _this.playerControls.classList.add("spine-player-controls-hidden");
+                }, 1000);
+                this.playButton.classList.remove("spine-player-button-icon-play");
+                this.playButton.classList.add("spine-player-button-icon-pause");
+            }
+            if (this.config.animation && !this.animationState.getCurrent(0))
+                this.setAnimation(this.config.animation);
+        };
+        SpinePlayer.prototype.pause = function () {
+            this.paused = true;
+            if (this.config.showControls) {
+                this.playerControls.classList.remove("spine-player-controls-hidden");
+                clearTimeout(this.cancelId);
+                this.playButton.classList.remove("spine-player-button-icon-pause");
+                this.playButton.classList.add("spine-player-button-icon-play");
+            }
+        };
+        SpinePlayer.prototype.setAnimation = function (animation, loop) {
+            if (loop === void 0) { loop = true; }
+            this.previousViewport = this.currentViewport;
+            var animViewport = this.calculateAnimationViewport(animation);
+            var viewport = {
+                x: animViewport.x,
+                y: animViewport.y,
+                width: animViewport.width,
+                height: animViewport.height,
+                padLeft: "10%",
+                padRight: "10%",
+                padTop: "10%",
+                padBottom: "10%"
+            };
+            var globalViewport = this.config.viewport;
+            if (typeof globalViewport.x !== "undefined" && typeof globalViewport.y !== "undefined" && globalViewport.width && globalViewport.height) {
+                viewport.x = globalViewport.x;
+                viewport.y = globalViewport.y;
+                viewport.width = globalViewport.width;
+                viewport.height = globalViewport.height;
+            }
+            if (typeof globalViewport.padLeft !== "undefined")
+                viewport.padLeft = globalViewport.padLeft;
+            if (typeof globalViewport.padRight !== "undefined")
+                viewport.padRight = globalViewport.padRight;
+            if (typeof globalViewport.padTop !== "undefined")
+                viewport.padTop = globalViewport.padTop;
+            if (typeof globalViewport.padBottom !== "undefined")
+                viewport.padBottom = globalViewport.padBottom;
+            var userAnimViewport = this.config.viewport.animations[animation];
+            if (userAnimViewport) {
+                if (typeof userAnimViewport.x !== "undefined" && typeof userAnimViewport.y !== "undefined" && userAnimViewport.width && userAnimViewport.height) {
+                    viewport.x = userAnimViewport.x;
+                    viewport.y = userAnimViewport.y;
+                    viewport.width = userAnimViewport.width;
+                    viewport.height = userAnimViewport.height;
+                }
+                if (typeof userAnimViewport.padLeft !== "undefined")
+                    viewport.padLeft = userAnimViewport.padLeft;
+                if (typeof userAnimViewport.padRight !== "undefined")
+                    viewport.padRight = userAnimViewport.padRight;
+                if (typeof userAnimViewport.padTop !== "undefined")
+                    viewport.padTop = userAnimViewport.padTop;
+                if (typeof userAnimViewport.padBottom !== "undefined")
+                    viewport.padBottom = userAnimViewport.padBottom;
+            }
+            viewport.padLeft = this.percentageToWorldUnit(viewport.width, viewport.padLeft);
+            viewport.padRight = this.percentageToWorldUnit(viewport.width, viewport.padRight);
+            viewport.padBottom = this.percentageToWorldUnit(viewport.height, viewport.padBottom);
+            viewport.padTop = this.percentageToWorldUnit(viewport.height, viewport.padTop);
+            this.currentViewport = viewport;
+            this.viewportTransitionStart = performance.now();
+            this.animationState.clearTracks();
+            this.skeleton.setToSetupPose();
+            this.animationState.setAnimation(0, animation, loop);
+        };
+        SpinePlayer.prototype.percentageToWorldUnit = function (size, percentageOrAbsolute) {
+            if (typeof percentageOrAbsolute === "string")
+                return size * parseFloat(percentageOrAbsolute.substr(0, percentageOrAbsolute.length - 1)) / 100;
+            return percentageOrAbsolute;
+        };
+        SpinePlayer.prototype.calculateAnimationViewport = function (animationName) {
+            var animation = this.skeleton.data.findAnimation(animationName);
+            this.animationState.clearTracks();
+            this.skeleton.setToSetupPose();
+            this.animationState.setAnimationWith(0, animation, true);
+            var steps = 100, stepTime = animation.duration ? animation.duration / steps : 0;
+            var minX = 100000000, maxX = -100000000, minY = 100000000, maxY = -100000000;
+            var offset = new spine.Vector2(), size = new spine.Vector2();
+            for (var i = 0; i < steps; i++) {
+                this.animationState.update(stepTime);
+                this.animationState.apply(this.skeleton);
+                this.skeleton.updateWorldTransform();
+                this.skeleton.getBounds(offset, size);
+                if (!isNaN(offset.x) && !isNaN(offset.y) && !isNaN(size.x) && !isNaN(size.y)) {
+                    minX = Math.min(offset.x, minX);
+                    maxX = Math.max(offset.x + size.x, maxX);
+                    minY = Math.min(offset.y, minY);
+                    maxY = Math.max(offset.y + size.y, maxY);
+                }
+                else
+                    this.showError("Animation bounds are invalid: " + animationName);
+            }
+            return {
+                x: minX,
+                y: minY,
+                width: maxX - minX,
+                height: maxY - minY
+            };
+        };
+        SpinePlayer.prototype.stopRendering = function () {
+            this.stopRequestAnimationFrame = true;
+        };
+        return SpinePlayer;
+    }());
+    spine.SpinePlayer = SpinePlayer;
     var Popup = (function () {
         function Popup(player, parent, htmlContent) {
             this.player = player;
-            this.dom = createElement("\n\t\t\t\t<div class=\"spine-player-popup spine-player-hidden\">\n\t\t\t\t</div>\n\t\t\t");
+            this.dom = createElement("<div class=\"spine-player-popup spine-player-hidden\"></div>");
             this.dom.innerHTML = htmlContent;
             parent.appendChild(this.dom);
         }
@@ -11649,7 +12389,7 @@ var spine;
                     justClicked = false;
                     return;
                 }
-                if (!isContained(_this.dom, event.target)) {
+                if (!_this.dom.contains(event.target)) {
                     _this.dom.remove();
                     window.removeEventListener("click", windowClickListener);
                     dismissedListener();
@@ -11667,7 +12407,7 @@ var spine;
         }
         Switch.prototype.render = function () {
             var _this = this;
-            this["switch"] = createElement("\n\t\t\t\t<div class=\"spine-player-switch\">\n\t\t\t\t\t<span class=\"spine-player-switch-text\">" + this.text + "</span>\n\t\t\t\t\t<div class=\"spine-player-switch-knob-area\">\n\t\t\t\t\t\t<div class=\"spine-player-switch-knob\"></div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
+            this["switch"] = createElement("\n<div class=\"spine-player-switch\">\n\t<span class=\"spine-player-switch-text\">" + this.text + "</span>\n\t<div class=\"spine-player-switch-knob-area\">\n\t\t<div class=\"spine-player-switch-knob\"></div>\n\t</div>\n</div>");
             this["switch"].addEventListener("click", function () {
                 _this.setEnabled(!_this.enabled);
                 if (_this.change)
@@ -11698,8 +12438,8 @@ var spine;
         }
         Slider.prototype.render = function () {
             var _this = this;
-            this.slider = createElement("\n\t\t\t\t<div class=\"spine-player-slider " + (this.big ? "big" : "") + "\">\n\t\t\t\t\t<div class=\"spine-player-slider-value\"></div>\n\t\t\t\t\t<!--<div class=\"spine-player-slider-knob\"></div>-->\n\t\t\t\t</div>\n\t\t\t");
-            this.value = findWithClass(this.slider, "spine-player-slider-value")[0];
+            this.slider = createElement("\n<div class=\"spine-player-slider " + (this.big ? "big" : "") + "\">\n\t<div class=\"spine-player-slider-value\"></div>\n\t<!--<div class=\"spine-player-slider-knob\"></div>-->\n</div>");
+            this.value = findWithClass(this.slider, "spine-player-slider-value");
             this.setValue(0);
             var input = new spine.webgl.Input(this.slider);
             var dragging = false;
@@ -11710,26 +12450,20 @@ var spine;
                 },
                 up: function (x, y) {
                     dragging = false;
-                    var percentage = x / _this.slider.clientWidth;
-                    percentage = percentage = Math.max(0, Math.min(percentage, 1));
-                    _this.setValue(x / _this.slider.clientWidth);
+                    var percentage = _this.setValue(x / _this.slider.clientWidth);
                     if (_this.change)
                         _this.change(percentage);
                     _this.value.classList.remove("hovering");
                 },
                 moved: function (x, y) {
                     if (dragging) {
-                        var percentage = x / _this.slider.clientWidth;
-                        percentage = Math.max(0, Math.min(percentage, 1));
-                        percentage = _this.setValue(x / _this.slider.clientWidth);
+                        var percentage = _this.setValue(x / _this.slider.clientWidth);
                         if (_this.change)
                             _this.change(percentage);
                     }
                 },
                 dragged: function (x, y) {
-                    var percentage = x / _this.slider.clientWidth;
-                    percentage = Math.max(0, Math.min(percentage, 1));
-                    percentage = _this.setValue(x / _this.slider.clientWidth);
+                    var percentage = _this.setValue(x / _this.slider.clientWidth);
                     if (_this.change)
                         _this.change(percentage);
                 }
@@ -11738,14 +12472,13 @@ var spine;
         };
         Slider.prototype.setValue = function (percentage) {
             percentage = Math.max(0, Math.min(1, percentage));
-            if (this.snaps > 0) {
-                var modulo = percentage % (1 / this.snaps);
-                if (modulo < (1 / this.snaps) * this.snapPercentage) {
+            if (this.snaps) {
+                var snap = 1 / this.snaps;
+                var modulo = percentage % snap;
+                if (modulo < snap * this.snapPercentage)
                     percentage = percentage - modulo;
-                }
-                else if (modulo > (1 / this.snaps) - (1 / this.snaps) * this.snapPercentage) {
-                    percentage = percentage - modulo + (1 / this.snaps);
-                }
+                else if (modulo > snap - snap * this.snapPercentage)
+                    percentage = percentage - modulo + snap;
                 percentage = Math.max(0, Math.min(1, percentage));
             }
             this.value.style.width = "" + (percentage * 100) + "%";
@@ -11753,906 +12486,30 @@ var spine;
         };
         return Slider;
     }());
-    var SpinePlayer = (function () {
-        function SpinePlayer(parent, config) {
-            this.config = config;
-            this.paused = true;
-            this.playTime = 0;
-            this.speed = 1;
-            this.time = new spine.TimeKeeper();
-            this.animationViewports = {};
-            this.currentViewport = null;
-            this.previousViewport = null;
-            this.viewportTransitionStart = 0;
-            this.stopRequestAnimationFrame = false;
-            this.cancelId = 0;
-            this.parent = typeof parent === "string" ? document.getElementById(parent) : parent;
-            this.parent.appendChild(this.render());
-        }
-        SpinePlayer.prototype.validateConfig = function (config) {
-            if (!config)
-                throw new Error("Please pass a configuration to new.spine.SpinePlayer().");
-            if (!config.jsonUrl && !config.skelUrl)
-                throw new Error("Please specify the URL of the skeleton JSON or .skel file.");
-            if (!config.atlasUrl)
-                throw new Error("Please specify the URL of the atlas file.");
-            if (!config.alpha)
-                config.alpha = false;
-            if (!config.backgroundColor)
-                config.backgroundColor = "#000000";
-            if (!config.fullScreenBackgroundColor)
-                config.fullScreenBackgroundColor = config.backgroundColor;
-            if (typeof config.premultipliedAlpha === "undefined")
-                config.premultipliedAlpha = true;
-            if (!config.success)
-                config.success = function (widget) { };
-            if (!config.error)
-                config.error = function (widget, msg) { };
-            if (!config.debug)
-                config.debug = {
-                    bones: false,
-                    regions: false,
-                    meshes: false,
-                    bounds: false,
-                    clipping: false,
-                    paths: false,
-                    points: false,
-                    hulls: false
-                };
-            if (typeof config.debug.bones === "undefined")
-                config.debug.bones = false;
-            if (typeof config.debug.bounds === "undefined")
-                config.debug.bounds = false;
-            if (typeof config.debug.clipping === "undefined")
-                config.debug.clipping = false;
-            if (typeof config.debug.hulls === "undefined")
-                config.debug.hulls = false;
-            if (typeof config.debug.paths === "undefined")
-                config.debug.paths = false;
-            if (typeof config.debug.points === "undefined")
-                config.debug.points = false;
-            if (typeof config.debug.regions === "undefined")
-                config.debug.regions = false;
-            if (typeof config.debug.meshes === "undefined")
-                config.debug.meshes = false;
-            if (config.animations && config.animation) {
-                if (config.animations.indexOf(config.animation) < 0)
-                    throw new Error("Default animation '" + config.animation + "' is not contained in the list of selectable animations: " + escapeHtml(JSON.stringify(this.config.animations)));
-            }
-            if (config.skins && config.skin) {
-                if (config.skins.indexOf(config.skin) < 0)
-                    throw new Error("Default skin '" + config.skin + "' is not contained in the list of selectable skins " + escapeHtml(JSON.stringify(this.config.skins)) + ".");
-            }
-            if (!config.controlBones)
-                config.controlBones = [];
-            if (typeof config.showControls === "undefined")
-                config.showControls = true;
-            if (typeof config.defaultMix === "undefined")
-                config.defaultMix = 0.25;
-            return config;
-        };
-        SpinePlayer.prototype.showError = function (error) {
-            if (this.error)
-                return;
-            this.error = true;
-            console.log(error);
-            var errorDom = findWithClass(this.dom, "spine-player-error")[0];
-            errorDom.classList.remove("spine-player-hidden");
-            errorDom.innerHTML = '<p style="text-align: center; align-self: center;">' + error.replace("\n", "<br><br>") + '</p>';
-            this.config.error(this, error);
-        };
-        SpinePlayer.prototype.render = function () {
-            var _this = this;
-            var config = this.config;
-            var dom = this.dom = createElement("\n\t\t\t\t<div class=\"spine-player\">\n\t\t\t\t\t<canvas class=\"spine-player-canvas\"></canvas>\n\t\t\t\t\t<div class=\"spine-player-error spine-player-hidden\"></div>\n\t\t\t\t\t<div class=\"spine-player-controls spine-player-popup-parent spine-player-controls-hidden\">\n\t\t\t\t\t\t<div class=\"spine-player-timeline\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"spine-player-buttons\">\n\t\t\t\t\t\t\t<button id=\"spine-player-button-play-pause\" class=\"spine-player-button spine-player-button-icon-pause\"></button>\n\t\t\t\t\t\t\t<div class=\"spine-player-button-spacer\"></div>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-speed\" class=\"spine-player-button spine-player-button-icon-speed\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-animation\" class=\"spine-player-button spine-player-button-icon-animations\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-skin\" class=\"spine-player-button spine-player-button-icon-skins\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-settings\" class=\"spine-player-button spine-player-button-icon-settings\"></button>\n\t\t\t\t\t\t\t<button id=\"spine-player-button-fullscreen\" class=\"spine-player-button spine-player-button-icon-fullscreen\"></button>\n\t\t\t\t\t\t\t<img id=\"spine-player-button-logo\" class=\"spine-player-button-icon-spine-logo\" src=\"data:image/svg+xml,%3Csvg%20id%3D%22Spine_Logo%22%20data-name%3D%22Spine%20Logo%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20104%2031.16%22%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill%3A%23fff%3B%7D.cls-2%7Bfill%3A%23ff4000%3B%7D%3C%2Fstyle%3E%3C%2Fdefs%3E%3Ctitle%3Espine-logo-white%3C%2Ftitle%3E%3Cpath%20id%3D%22e%22%20class%3D%22cls-1%22%20d%3D%22M104%2C12.68a1.31%2C1.31%2C0%2C0%2C1-.37%2C1%2C1.28%2C1.28%2C0%2C0%2C1-.85.31H91.57a10.51%2C10.51%2C0%2C0%2C0%2C.29%2C2.55%2C4.92%2C4.92%2C0%2C0%2C0%2C1%2C2A4.27%2C4.27%2C0%2C0%2C0%2C94.5%2C19.8a6.89%2C6.89%2C0%2C0%2C0%2C2.6.44%2C10.66%2C10.66%2C0%2C0%2C0%2C2.17-.2%2C12.81%2C12.81%2C0%2C0%2C0%2C1.64-.44q.69-.25%2C1.14-.44a1.87%2C1.87%2C0%2C0%2C1%2C.68-.2A.44.44%2C0%2C0%2C1%2C103%2C19a.43.43%2C0%2C0%2C1%2C.16.2%2C1.38%2C1.38%2C0%2C0%2C1%2C.09.37%2C4.89%2C4.89%2C0%2C0%2C1%2C0%2C.58%2C4.14%2C4.14%2C0%2C0%2C1%2C0%2C.43v.32a.83.83%2C0%2C0%2C1-.09.26%2C1.1%2C1.1%2C0%2C0%2C1-.17.22%2C2.77%2C2.77%2C0%2C0%2C1-.61.34%2C8.94%2C8.94%2C0%2C0%2C1-1.32.46%2C18.54%2C18.54%2C0%2C0%2C1-1.88.41%2C13.78%2C13.78%2C0%2C0%2C1-2.28.18%2C10.55%2C10.55%2C0%2C0%2C1-3.68-.59%2C6.82%2C6.82%2C0%2C0%2C1-2.66-1.74%2C7.44%2C7.44%2C0%2C0%2C1-1.63-2.89%2C13.48%2C13.48%2C0%2C0%2C1-.55-4%2C12.76%2C12.76%2C0%2C0%2C1%2C.57-3.94%2C8.35%2C8.35%2C0%2C0%2C1%2C1.64-3%2C7.15%2C7.15%2C0%2C0%2C1%2C2.58-1.87%2C8.47%2C8.47%2C0%2C0%2C1%2C3.39-.65%2C8.19%2C8.19%2C0%2C0%2C1%2C3.41.64%2C6.46%2C6.46%2C0%2C0%2C1%2C2.32%2C1.73A7%2C7%2C0%2C0%2C1%2C103.59%2C9a11.17%2C11.17%2C0%2C0%2C1%2C.43%2C3.13Zm-3.14-.93a5.69%2C5.69%2C0%2C0%2C0-1.09-3.86%2C4.17%2C4.17%2C0%2C0%2C0-3.42-1.4%2C4.52%2C4.52%2C0%2C0%2C0-2%2C.44%2C4.41%2C4.41%2C0%2C0%2C0-1.47%2C1.15A5.29%2C5.29%2C0%2C0%2C0%2C92%2C9.75a7%2C7%2C0%2C0%2C0-.36%2C2Z%22%2F%3E%3Cpath%20id%3D%22n%22%20class%3D%22cls-1%22%20d%3D%22M80.68%2C21.94a.42.42%2C0%2C0%2C1-.08.26.59.59%2C0%2C0%2C1-.25.18%2C1.74%2C1.74%2C0%2C0%2C1-.47.11%2C6.31%2C6.31%2C0%2C0%2C1-.76%2C0%2C6.5%2C6.5%2C0%2C0%2C1-.78%2C0%2C1.74%2C1.74%2C0%2C0%2C1-.47-.11.59.59%2C0%2C0%2C1-.25-.18.42.42%2C0%2C0%2C1-.08-.26V12a9.8%2C9.8%2C0%2C0%2C0-.23-2.35%2C4.86%2C4.86%2C0%2C0%2C0-.66-1.53%2C2.88%2C2.88%2C0%2C0%2C0-1.13-1%2C3.57%2C3.57%2C0%2C0%2C0-1.6-.34%2C4%2C4%2C0%2C0%2C0-2.35.83A12.71%2C12.71%2C0%2C0%2C0%2C69.11%2C10v11.9a.42.42%2C0%2C0%2C1-.08.26.59.59%2C0%2C0%2C1-.25.18%2C1.74%2C1.74%2C0%2C0%2C1-.47.11%2C6.51%2C6.51%2C0%2C0%2C1-.78%2C0%2C6.31%2C6.31%2C0%2C0%2C1-.76%2C0%2C1.88%2C1.88%2C0%2C0%2C1-.48-.11.52.52%2C0%2C0%2C1-.25-.18.46.46%2C0%2C0%2C1-.07-.26v-17A.53.53%2C0%2C0%2C1%2C66%2C4.69a.5.5%2C0%2C0%2C1%2C.23-.19%2C1.28%2C1.28%2C0%2C0%2C1%2C.44-.11%2C8.53%2C8.53%2C0%2C0%2C1%2C1.39%2C0%2C1.12%2C1.12%2C0%2C0%2C1%2C.43.11.6.6%2C0%2C0%2C1%2C.22.19.47.47%2C0%2C0%2C1%2C.07.26V7.2a10.46%2C10.46%2C0%2C0%2C1%2C2.87-2.36%2C6.17%2C6.17%2C0%2C0%2C1%2C2.88-.75%2C6.41%2C6.41%2C0%2C0%2C1%2C2.87.58%2C5.16%2C5.16%2C0%2C0%2C1%2C1.88%2C1.54%2C6.15%2C6.15%2C0%2C0%2C1%2C1%2C2.26%2C13.46%2C13.46%2C0%2C0%2C1%2C.31%2C3.11Z%22%2F%3E%3Cg%20id%3D%22i%22%3E%3Cpath%20class%3D%22cls-2%22%20d%3D%22M43.35%2C2.86c.09%2C2.6%2C1.89%2C4%2C5.48%2C4.61%2C3%2C.48%2C5.79.24%2C6.69-2.37%2C1.75-5.09-2.4-3.82-6-4.39S43.21-1.32%2C43.35%2C2.86Z%22%2F%3E%3Cpath%20class%3D%22cls-2%22%20d%3D%22M44.43%2C13.55c.33%2C1.94%2C2.14%2C3.06%2C4.91%2C3s4.84-1.16%2C5.13-3.25c.53-3.88-2.53-2.38-5.3-2.3S43.77%2C9.74%2C44.43%2C13.55Z%22%2F%3E%3Cpath%20class%3D%22cls-2%22%20d%3D%22M48%2C22.44c.55%2C1.45%2C2.06%2C2.06%2C4.1%2C1.63s3.45-1.11%2C3.33-2.76c-.21-3.06-2.22-2.1-4.26-1.66S47%2C19.6%2C48%2C22.44Z%22%2F%3E%3Cpath%20class%3D%22cls-2%22%20d%3D%22M49.78%2C29.22c.16%2C1.22%2C1.22%2C2%2C2.88%2C1.93s2.92-.67%2C3.13-2c.4-2.43-1.46-1.53-3.12-1.51S49.5%2C26.82%2C49.78%2C29.22Z%22%2F%3E%3C%2Fg%3E%3Cpath%20id%3D%22p%22%20class%3D%22cls-1%22%20d%3D%22M35.28%2C13.16a15.33%2C15.33%2C0%2C0%2C1-.48%2C4%2C8.75%2C8.75%2C0%2C0%2C1-1.42%2C3%2C6.35%2C6.35%2C0%2C0%2C1-2.32%2C1.91%2C7.14%2C7.14%2C0%2C0%2C1-3.16.67%2C6.1%2C6.1%2C0%2C0%2C1-1.4-.15%2C5.34%2C5.34%2C0%2C0%2C1-1.26-.47A7.29%2C7.29%2C0%2C0%2C1%2C24%2C21.31q-.61-.49-1.29-1.15v8.51a.47.47%2C0%2C0%2C1-.08.26.56.56%2C0%2C0%2C1-.25.19%2C1.74%2C1.74%2C0%2C0%2C1-.47.11%2C6.47%2C6.47%2C0%2C0%2C1-.78%2C0%2C6.26%2C6.26%2C0%2C0%2C1-.76%2C0%2C1.89%2C1.89%2C0%2C0%2C1-.48-.11.49.49%2C0%2C0%2C1-.25-.19.51.51%2C0%2C0%2C1-.07-.26V4.91a.57.57%2C0%2C0%2C1%2C.06-.27.46.46%2C0%2C0%2C1%2C.23-.18%2C1.47%2C1.47%2C0%2C0%2C1%2C.44-.1%2C7.41%2C7.41%2C0%2C0%2C1%2C1.3%2C0%2C1.45%2C1.45%2C0%2C0%2C1%2C.43.1.52.52%2C0%2C0%2C1%2C.24.18.51.51%2C0%2C0%2C1%2C.07.27V7.2a18.06%2C18.06%2C0%2C0%2C1%2C1.49-1.38%2C9%2C9%2C0%2C0%2C1%2C1.45-1%2C6.82%2C6.82%2C0%2C0%2C1%2C1.49-.59%2C7.09%2C7.09%2C0%2C0%2C1%2C4.78.52%2C6%2C6%2C0%2C0%2C1%2C2.13%2C2%2C8.79%2C8.79%2C0%2C0%2C1%2C1.2%2C2.9A15.72%2C15.72%2C0%2C0%2C1%2C35.28%2C13.16ZM32%2C13.52a15.64%2C15.64%2C0%2C0%2C0-.2-2.53%2C7.32%2C7.32%2C0%2C0%2C0-.69-2.17%2C4.06%2C4.06%2C0%2C0%2C0-1.3-1.51%2C3.49%2C3.49%2C0%2C0%2C0-2-.57%2C4.1%2C4.1%2C0%2C0%2C0-1.2.18%2C4.92%2C4.92%2C0%2C0%2C0-1.2.57%2C8.54%2C8.54%2C0%2C0%2C0-1.28%2C1A15.77%2C15.77%2C0%2C0%2C0%2C22.76%2C10v6.77a13.53%2C13.53%2C0%2C0%2C0%2C2.46%2C2.4%2C4.12%2C4.12%2C0%2C0%2C0%2C2.44.83%2C3.56%2C3.56%2C0%2C0%2C0%2C2-.57A4.28%2C4.28%2C0%2C0%2C0%2C31%2C18a7.58%2C7.58%2C0%2C0%2C0%2C.77-2.12A11.43%2C11.43%2C0%2C0%2C0%2C32%2C13.52Z%22%2F%3E%3Cpath%20id%3D%22s%22%20class%3D%22cls-1%22%20d%3D%22M12%2C17.3a5.39%2C5.39%2C0%2C0%2C1-.48%2C2.33%2C4.73%2C4.73%2C0%2C0%2C1-1.37%2C1.72%2C6.19%2C6.19%2C0%2C0%2C1-2.12%2C1.06%2C9.62%2C9.62%2C0%2C0%2C1-2.71.36%2C10.38%2C10.38%2C0%2C0%2C1-3.21-.5%2C7.63%2C7.63%2C0%2C0%2C1-1.11-.45%2C3.25%2C3.25%2C0%2C0%2C1-.66-.43%2C1.09%2C1.09%2C0%2C0%2C1-.3-.53A3.59%2C3.59%2C0%2C0%2C1%2C0%2C19.93a4.06%2C4.06%2C0%2C0%2C1%2C0-.61%2C2%2C2%2C0%2C0%2C1%2C.09-.4.42.42%2C0%2C0%2C1%2C.16-.22.43.43%2C0%2C0%2C1%2C.24-.07%2C1.35%2C1.35%2C0%2C0%2C1%2C.61.26q.41.26%2C1%2C.56A9.22%2C9.22%2C0%2C0%2C0%2C3.51%2C20a6.25%2C6.25%2C0%2C0%2C0%2C1.87.26%2C5.62%2C5.62%2C0%2C0%2C0%2C1.44-.17%2C3.48%2C3.48%2C0%2C0%2C0%2C1.12-.5%2C2.23%2C2.23%2C0%2C0%2C0%2C.73-.84%2C2.68%2C2.68%2C0%2C0%2C0%2C.26-1.21%2C2%2C2%2C0%2C0%2C0-.37-1.21%2C3.55%2C3.55%2C0%2C0%2C0-1-.87A8.09%2C8.09%2C0%2C0%2C0%2C6.2%2C14.8l-1.56-.61a16%2C16%2C0%2C0%2C1-1.57-.73%2C6%2C6%2C0%2C0%2C1-1.37-1%2C4.52%2C4.52%2C0%2C0%2C1-1-1.4%2C4.69%2C4.69%2C0%2C0%2C1-.37-2A4.88%2C4.88%2C0%2C0%2C1%2C.72%2C7.19%2C4.46%2C4.46%2C0%2C0%2C1%2C1.88%2C5.58%2C5.83%2C5.83%2C0%2C0%2C1%2C3.82%2C4.47%2C8.06%2C8.06%2C0%2C0%2C1%2C6.53%2C4a8.28%2C8.28%2C0%2C0%2C1%2C1.36.11%2C9.36%2C9.36%2C0%2C0%2C1%2C1.23.28%2C5.92%2C5.92%2C0%2C0%2C1%2C.94.37%2C4.09%2C4.09%2C0%2C0%2C1%2C.59.35%2C1%2C1%2C0%2C0%2C1%2C.26.26.83.83%2C0%2C0%2C1%2C.09.26%2C1.32%2C1.32%2C0%2C0%2C0%2C.06.35%2C3.87%2C3.87%2C0%2C0%2C1%2C0%2C.51%2C4.76%2C4.76%2C0%2C0%2C1%2C0%2C.56%2C1.39%2C1.39%2C0%2C0%2C1-.09.39.5.5%2C0%2C0%2C1-.16.22.35.35%2C0%2C0%2C1-.21.07%2C1%2C1%2C0%2C0%2C1-.49-.21%2C7%2C7%2C0%2C0%2C0-.83-.44%2C9.26%2C9.26%2C0%2C0%2C0-1.2-.44A5.49%2C5.49%2C0%2C0%2C0%2C6.5%2C6.48a4.93%2C4.93%2C0%2C0%2C0-1.4.18%2C2.69%2C2.69%2C0%2C0%2C0-1%2C.51A2.16%2C2.16%2C0%2C0%2C0%2C3.51%2C8a2.43%2C2.43%2C0%2C0%2C0-.2%2C1%2C2%2C2%2C0%2C0%2C0%2C.38%2C1.24%2C3.6%2C3.6%2C0%2C0%2C0%2C1%2C.88%2C8.25%2C8.25%2C0%2C0%2C0%2C1.38.68l1.58.62q.8.32%2C1.59.72a6%2C6%2C0%2C0%2C1%2C1.39%2C1%2C4.37%2C4.37%2C0%2C0%2C1%2C1%2C1.36A4.46%2C4.46%2C0%2C0%2C1%2C12%2C17.3Z%22%2F%3E%3C%2Fsvg%3E\"/>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
-            try {
-                this.config = this.validateConfig(config);
-            }
-            catch (e) {
-                this.showError(e);
-                return dom;
-            }
-            try {
-                this.canvas = findWithClass(dom, "spine-player-canvas")[0];
-                var webglConfig = { alpha: config.alpha };
-                this.context = new spine.webgl.ManagedWebGLRenderingContext(this.canvas, webglConfig);
-                this.sceneRenderer = new spine.webgl.SceneRenderer(this.canvas, this.context, true);
-                this.loadingScreen = new spine.webgl.LoadingScreen(this.sceneRenderer);
-            }
-            catch (e) {
-                this.showError("Sorry, your browser does not support WebGL.\nPlease use the latest version of Firefox, Chrome, Edge, or Safari.");
-                return dom;
-            }
-            this.assetManager = new spine.webgl.AssetManager(this.context, "", config.downloader);
-            if (config.rawDataURIs) {
-                for (var path in config.rawDataURIs) {
-                    var data = config.rawDataURIs[path];
-                    this.assetManager.setRawDataURI(path, data);
-                }
-            }
-            var jsonUrl = config.jsonUrl;
-            if (jsonUrl)
-                this.assetManager.loadJson(jsonUrl);
-            else
-                this.assetManager.loadBinary(config.skelUrl);
-            this.assetManager.loadTextureAtlas(config.atlasUrl);
-            if (config.backgroundImage && config.backgroundImage.url)
-                this.assetManager.loadTexture(config.backgroundImage.url);
-            requestAnimationFrame(function () { return _this.drawFrame(); });
-            this.playerControls = findWithClass(dom, "spine-player-controls")[0];
-            var timeline = findWithClass(dom, "spine-player-timeline")[0];
-            this.timelineSlider = new Slider();
-            timeline.appendChild(this.timelineSlider.render());
-            this.playButton = findWithId(dom, "spine-player-button-play-pause")[0];
-            var speedButton = findWithId(dom, "spine-player-button-speed")[0];
-            this.animationButton = findWithId(dom, "spine-player-button-animation")[0];
-            this.skinButton = findWithId(dom, "spine-player-button-skin")[0];
-            var settingsButton = findWithId(dom, "spine-player-button-settings")[0];
-            var fullscreenButton = findWithId(dom, "spine-player-button-fullscreen")[0];
-            var logoButton = findWithId(dom, "spine-player-button-logo")[0];
-            this.playButton.onclick = function () {
-                if (_this.paused)
-                    _this.play();
-                else
-                    _this.pause();
-            };
-            speedButton.onclick = function () {
-                _this.showSpeedDialog(speedButton);
-            };
-            this.animationButton.onclick = function () {
-                _this.showAnimationsDialog(_this.animationButton);
-            };
-            this.skinButton.onclick = function () {
-                _this.showSkinsDialog(_this.skinButton);
-            };
-            settingsButton.onclick = function () {
-                _this.showSettingsDialog(settingsButton);
-            };
-            var oldWidth = this.canvas.clientWidth;
-            var oldHeight = this.canvas.clientHeight;
-            var oldStyleWidth = this.canvas.style.width;
-            var oldStyleHeight = this.canvas.style.height;
-            var isFullscreen = false;
-            fullscreenButton.onclick = function () {
-                var fullscreenChanged = function () {
-                    isFullscreen = !isFullscreen;
-                    if (!isFullscreen) {
-                        _this.canvas.style.width = "" + oldWidth + "px";
-                        _this.canvas.style.height = "" + oldHeight + "px";
-                        _this.drawFrame(false);
-                        requestAnimationFrame(function () {
-                            _this.canvas.style.width = oldStyleWidth;
-                            _this.canvas.style.height = oldStyleHeight;
-                        });
-                    }
-                };
-                var doc = document;
-                dom.onfullscreenchange = fullscreenChanged;
-                dom.onwebkitfullscreenchange = fullscreenChanged;
-                if (doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement) {
-                    if (doc.exitFullscreen)
-                        doc.exitFullscreen();
-                    else if (doc.mozCancelFullScreen)
-                        doc.mozCancelFullScreen();
-                    else if (doc.webkitExitFullscreen)
-                        doc.webkitExitFullscreen();
-                    else if (doc.msExitFullscreen)
-                        doc.msExitFullscreen();
-                }
-                else {
-                    oldWidth = _this.canvas.clientWidth;
-                    oldHeight = _this.canvas.clientHeight;
-                    oldStyleWidth = _this.canvas.style.width;
-                    oldStyleHeight = _this.canvas.style.height;
-                    var player = dom;
-                    if (player.requestFullscreen)
-                        player.requestFullscreen();
-                    else if (player.webkitRequestFullScreen)
-                        player.webkitRequestFullScreen();
-                    else if (player.mozRequestFullScreen)
-                        player.mozRequestFullScreen();
-                    else if (player.msRequestFullscreen)
-                        player.msRequestFullscreen();
-                }
-            };
-            logoButton.onclick = function () {
-                window.open("http://esotericsoftware.com");
-            };
-            window.onresize = function () {
-                _this.drawFrame(false);
-            };
-            return dom;
-        };
-        SpinePlayer.prototype.showSpeedDialog = function (speedButton) {
-            var _this = this;
-            if (this.lastPopup)
-                this.lastPopup.dom.remove();
-            if (this.lastPopup && findWithClass(this.lastPopup.dom, "spine-player-popup-title")[0].textContent == "Speed") {
-                this.lastPopup = null;
-                speedButton.classList.remove("spine-player-button-icon-speed-selected");
-                return;
-            }
-            var popup = new Popup(this.dom, this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Speed</div>\n\t\t\t\t<hr>\n\t\t\t\t<div class=\"spine-player-row\" style=\"user-select: none; align-items: center; padding: 8px;\">\n\t\t\t\t\t<div class=\"spine-player-column\">\n\t\t\t\t\t\t<div class=\"spine-player-speed-slider\" style=\"margin-bottom: 4px;\"></div>\n\t\t\t\t\t\t<div class=\"spine-player-row\" style=\"justify-content: space-between;\">\n\t\t\t\t\t\t\t<div>0.1x</div>\n\t\t\t\t\t\t\t<div>1x</div>\n\t\t\t\t\t\t\t<div>2x</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t");
-            var sliderParent = findWithClass(popup.dom, "spine-player-speed-slider")[0];
-            var slider = new Slider(2, 0.1, true);
-            sliderParent.appendChild(slider.render());
-            slider.setValue(this.speed / 2);
-            slider.change = function (percentage) {
-                _this.speed = percentage * 2;
-            };
-            speedButton.classList.add("spine-player-button-icon-speed-selected");
-            popup.show(function () {
-                speedButton.classList.remove("spine-player-button-icon-speed-selected");
-                popup.dom.remove();
-                _this.lastPopup = null;
-            });
-            this.lastPopup = popup;
-        };
-        SpinePlayer.prototype.showAnimationsDialog = function (animationsButton) {
-            var _this = this;
-            if (this.lastPopup)
-                this.lastPopup.dom.remove();
-            if (this.lastPopup && findWithClass(this.lastPopup.dom, "spine-player-popup-title")[0].textContent == "Animations") {
-                this.lastPopup = null;
-                animationsButton.classList.remove("spine-player-button-icon-animations-selected");
-                return;
-            }
-            if (!this.skeleton || this.skeleton.data.animations.length == 0)
-                return;
-            var popup = new Popup(this.dom, this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Animations</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\"></ul>\n\t\t\t");
-            var rows = findWithClass(popup.dom, "spine-player-list")[0];
-            this.skeleton.data.animations.forEach(function (animation) {
-                if (_this.config.animations && _this.config.animations.indexOf(animation.name) < 0)
-                    return;
-                var row = createElement("\n\t\t\t\t\t<li class=\"spine-player-list-item selectable\">\n\t\t\t\t\t\t<div class=\"selectable-circle\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"selectable-text\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</li>\n\t\t\t\t");
-                if (animation.name == _this.config.animation)
-                    row.classList.add("selected");
-                findWithClass(row, "selectable-text")[0].innerText = animation.name;
-                rows.appendChild(row);
-                row.onclick = function () {
-                    removeClass(rows.children, "selected");
-                    row.classList.add("selected");
-                    _this.config.animation = animation.name;
-                    _this.playTime = 0;
-                    _this.setAnimation(animation.name);
-                };
-            });
-            animationsButton.classList.add("spine-player-button-icon-animations-selected");
-            popup.show(function () {
-                animationsButton.classList.remove("spine-player-button-icon-animations-selected");
-                popup.dom.remove();
-                _this.lastPopup = null;
-            });
-            this.lastPopup = popup;
-        };
-        SpinePlayer.prototype.showSkinsDialog = function (skinButton) {
-            var _this = this;
-            if (this.lastPopup)
-                this.lastPopup.dom.remove();
-            if (this.lastPopup && findWithClass(this.lastPopup.dom, "spine-player-popup-title")[0].textContent == "Skins") {
-                this.lastPopup = null;
-                skinButton.classList.remove("spine-player-button-icon-skins-selected");
-                return;
-            }
-            if (!this.skeleton || this.skeleton.data.animations.length == 0)
-                return;
-            var popup = new Popup(this.dom, this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Skins</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\"></ul>\n\t\t\t");
-            var rows = findWithClass(popup.dom, "spine-player-list")[0];
-            this.skeleton.data.skins.forEach(function (skin) {
-                if (_this.config.skins && _this.config.skins.indexOf(skin.name) < 0) {
-                    return;
-                }
-                var row = createElement("\n\t\t\t\t\t<li class=\"spine-player-list-item selectable\">\n\t\t\t\t\t\t<div class=\"selectable-circle\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"selectable-text\">\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</li>\n\t\t\t\t");
-                if (skin.name == _this.config.skin)
-                    row.classList.add("selected");
-                findWithClass(row, "selectable-text")[0].innerText = skin.name;
-                rows.appendChild(row);
-                row.onclick = function () {
-                    removeClass(rows.children, "selected");
-                    row.classList.add("selected");
-                    _this.config.skin = skin.name;
-                    _this.skeleton.setSkinByName(_this.config.skin);
-                    _this.skeleton.setSlotsToSetupPose();
-                };
-            });
-            skinButton.classList.add("spine-player-button-icon-skins-selected");
-            popup.show(function () {
-                skinButton.classList.remove("spine-player-button-icon-skins-selected");
-                popup.dom.remove();
-                _this.lastPopup = null;
-            });
-            this.lastPopup = popup;
-        };
-        SpinePlayer.prototype.showSettingsDialog = function (settingsButton) {
-            var _this = this;
-            if (this.lastPopup)
-                this.lastPopup.dom.remove();
-            if (this.lastPopup && findWithClass(this.lastPopup.dom, "spine-player-popup-title")[0].textContent == "Debug") {
-                this.lastPopup = null;
-                settingsButton.classList.remove("spine-player-button-icon-settings-selected");
-                return;
-            }
-            if (!this.skeleton || this.skeleton.data.animations.length == 0)
-                return;
-            var popup = new Popup(this.dom, this.playerControls, "\n\t\t\t\t<div class=\"spine-player-popup-title\">Debug</div>\n\t\t\t\t<hr>\n\t\t\t\t<ul class=\"spine-player-list\">\n\t\t\t\t</li>\n\t\t\t");
-            var rows = findWithClass(popup.dom, "spine-player-list")[0];
-            var makeItem = function (label, name) {
-                var row = createElement("<li class=\"spine-player-list-item\"></li>");
-                var s = new Switch(label);
-                row.appendChild(s.render());
-                s.setEnabled(_this.config.debug[name]);
-                s.change = function (value) {
-                    _this.config.debug[name] = value;
-                };
-                rows.appendChild(row);
-            };
-            makeItem("Bones", "bones");
-            makeItem("Regions", "regions");
-            makeItem("Meshes", "meshes");
-            makeItem("Bounds", "bounds");
-            makeItem("Paths", "paths");
-            makeItem("Clipping", "clipping");
-            makeItem("Points", "points");
-            makeItem("Hulls", "hulls");
-            settingsButton.classList.add("spine-player-button-icon-settings-selected");
-            popup.show(function () {
-                settingsButton.classList.remove("spine-player-button-icon-settings-selected");
-                popup.dom.remove();
-                _this.lastPopup = null;
-            });
-            this.lastPopup = popup;
-        };
-        SpinePlayer.prototype.drawFrame = function (requestNextFrame) {
-            var _this = this;
-            if (requestNextFrame === void 0) { requestNextFrame = true; }
-            try {
-                if (requestNextFrame && !this.stopRequestAnimationFrame && !this.error)
-                    requestAnimationFrame(function () { return _this.drawFrame(); });
-                var ctx = this.context;
-                var gl = ctx.gl;
-                var doc = document;
-                var isFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
-                var bg = new spine.Color().setFromString(isFullscreen ? this.config.fullScreenBackgroundColor : this.config.backgroundColor);
-                gl.clearColor(bg.r, bg.g, bg.b, bg.a);
-                gl.clear(gl.COLOR_BUFFER_BIT);
-                this.loadingScreen.backgroundColor.setFromColor(bg);
-                this.loadingScreen.draw(this.assetManager.isLoadingComplete());
-                if (this.assetManager.isLoadingComplete() && !this.skeleton)
-                    this.loadSkeleton();
-                this.sceneRenderer.resize(spine.webgl.ResizeMode.Expand);
-                if (this.loaded) {
-                    if (!this.paused && this.config.animation) {
-                        this.time.update();
-                        var delta = this.time.delta * this.speed;
-                        var animationDuration = this.animationState.getCurrent(0).animation.duration;
-                        this.playTime += delta;
-                        while (this.playTime >= animationDuration && animationDuration != 0) {
-                            this.playTime -= animationDuration;
-                        }
-                        this.playTime = Math.max(0, Math.min(this.playTime, animationDuration));
-                        this.timelineSlider.setValue(this.playTime / animationDuration);
-                        this.animationState.update(delta);
-                        this.animationState.apply(this.skeleton);
-                    }
-                    this.skeleton.updateWorldTransform();
-                    var viewport = {
-                        x: this.currentViewport.x - this.currentViewport.padLeft,
-                        y: this.currentViewport.y - this.currentViewport.padBottom,
-                        width: this.currentViewport.width + this.currentViewport.padLeft + this.currentViewport.padRight,
-                        height: this.currentViewport.height + this.currentViewport.padBottom + this.currentViewport.padTop
-                    };
-                    var transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / this.config.viewport.transitionTime;
-                    if (this.previousViewport && transitionAlpha < 1) {
-                        var oldViewport = {
-                            x: this.previousViewport.x - this.previousViewport.padLeft,
-                            y: this.previousViewport.y - this.previousViewport.padBottom,
-                            width: this.previousViewport.width + this.previousViewport.padLeft + this.previousViewport.padRight,
-                            height: this.previousViewport.height + this.previousViewport.padBottom + this.previousViewport.padTop
-                        };
-                        viewport = {
-                            x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
-                            y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
-                            width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
-                            height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
-                        };
-                    }
-                    var viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
-                    this.sceneRenderer.camera.zoom = viewport.width / viewportSize.x;
-                    this.sceneRenderer.camera.position.x = viewport.x + viewport.width / 2;
-                    this.sceneRenderer.camera.position.y = viewport.y + viewport.height / 2;
-                    this.sceneRenderer.begin();
-                    if (this.config.backgroundImage && this.config.backgroundImage.url) {
-                        var bgImage = this.assetManager.get(this.config.backgroundImage.url);
-                        if (!(this.config.backgroundImage.hasOwnProperty("x") && this.config.backgroundImage.hasOwnProperty("y") && this.config.backgroundImage.hasOwnProperty("width") && this.config.backgroundImage.hasOwnProperty("height"))) {
-                            this.sceneRenderer.drawTexture(bgImage, viewport.x, viewport.y, viewport.width, viewport.height);
-                        }
-                        else {
-                            this.sceneRenderer.drawTexture(bgImage, this.config.backgroundImage.x, this.config.backgroundImage.y, this.config.backgroundImage.width, this.config.backgroundImage.height);
-                        }
-                    }
-                    this.sceneRenderer.drawSkeleton(this.skeleton, this.config.premultipliedAlpha);
-                    this.sceneRenderer.skeletonDebugRenderer.drawBones = this.config.debug.bones;
-                    this.sceneRenderer.skeletonDebugRenderer.drawBoundingBoxes = this.config.debug.bounds;
-                    this.sceneRenderer.skeletonDebugRenderer.drawClipping = this.config.debug.clipping;
-                    this.sceneRenderer.skeletonDebugRenderer.drawMeshHull = this.config.debug.hulls;
-                    this.sceneRenderer.skeletonDebugRenderer.drawPaths = this.config.debug.paths;
-                    this.sceneRenderer.skeletonDebugRenderer.drawRegionAttachments = this.config.debug.regions;
-                    this.sceneRenderer.skeletonDebugRenderer.drawMeshTriangles = this.config.debug.meshes;
-                    this.sceneRenderer.drawSkeletonDebug(this.skeleton, this.config.premultipliedAlpha);
-                    var controlBones = this.config.controlBones;
-                    var selectedBones = this.selectedBones;
-                    var skeleton = this.skeleton;
-                    gl.lineWidth(2);
-                    for (var i = 0; i < controlBones.length; i++) {
-                        var bone = skeleton.findBone(controlBones[i]);
-                        if (!bone)
-                            continue;
-                        var colorInner = selectedBones[i] !== null ? SpinePlayer.HOVER_COLOR_INNER : SpinePlayer.NON_HOVER_COLOR_INNER;
-                        var colorOuter = selectedBones[i] !== null ? SpinePlayer.HOVER_COLOR_OUTER : SpinePlayer.NON_HOVER_COLOR_OUTER;
-                        this.sceneRenderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);
-                        this.sceneRenderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
-                    }
-                    gl.lineWidth(1);
-                    if (this.config.viewport.debugRender) {
-                        this.sceneRenderer.rect(false, this.currentViewport.x, this.currentViewport.y, this.currentViewport.width, this.currentViewport.height, spine.Color.GREEN);
-                        this.sceneRenderer.rect(false, viewport.x, viewport.y, viewport.width, viewport.height, spine.Color.RED);
-                    }
-                    this.sceneRenderer.end();
-                    this.sceneRenderer.camera.zoom = 0;
-                }
-            }
-            catch (e) {
-                this.showError("Error: Unable to render skeleton.\n" + e.message);
-            }
-        };
-        SpinePlayer.prototype.scale = function (sourceWidth, sourceHeight, targetWidth, targetHeight) {
-            var targetRatio = targetHeight / targetWidth;
-            var sourceRatio = sourceHeight / sourceWidth;
-            var scale = targetRatio > sourceRatio ? targetWidth / sourceWidth : targetHeight / sourceHeight;
-            var temp = new spine.Vector2();
-            temp.x = sourceWidth * scale;
-            temp.y = sourceHeight * scale;
-            return temp;
-        };
-        SpinePlayer.prototype.loadSkeleton = function () {
-            var _this = this;
-            if (this.loaded)
-                return;
-            if (this.error)
-                return;
-            if (this.assetManager.hasErrors()) {
-                this.showError("Error: Assets could not be loaded.\n" + escapeHtml(JSON.stringify(this.assetManager.getErrors())));
-                return;
-            }
-            var atlas = this.assetManager.get(this.config.atlasUrl);
-            var skeletonData;
-            var jsonUrl = this.config.jsonUrl;
-            if (jsonUrl) {
-                try {
-                    var jsonData = this.assetManager.get(jsonUrl);
-                    if (!jsonData)
-                        throw new Error("Empty JSON data.");
-                    if (this.config.jsonField) {
-                        jsonData = jsonData[this.config.jsonField];
-                        if (!jsonData)
-                            throw new Error("JSON field not found: " + this.config.jsonField);
-                    }
-                    var json = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
-                    skeletonData = json.readSkeletonData(jsonData);
-                }
-                catch (e) {
-                    this.showError("Error: Could not load skeleton JSON.\n" + e.message);
-                    return;
-                }
-            }
-            else {
-                var binaryData = this.assetManager.get(this.config.skelUrl);
-                var binary = new spine.SkeletonBinary(new spine.AtlasAttachmentLoader(atlas));
-                try {
-                    skeletonData = binary.readSkeletonData(binaryData);
-                }
-                catch (e) {
-                    this.showError("Error: Could not load skeleton binary.\n" + e.message);
-                    return;
-                }
-            }
-            this.skeleton = new spine.Skeleton(skeletonData);
-            var stateData = new spine.AnimationStateData(skeletonData);
-            stateData.defaultMix = this.config.defaultMix;
-            this.animationState = new spine.AnimationState(stateData);
-            if (this.config.controlBones) {
-                this.config.controlBones.forEach(function (bone) {
-                    if (!skeletonData.findBone(bone)) {
-                        _this.showError("Error: Control bone does not exist in skeleton: " + bone);
-                        return;
-                    }
-                });
-            }
-            if (!this.config.skin) {
-                if (skeletonData.skins.length > 0)
-                    this.config.skin = skeletonData.skins[0].name;
-            }
-            if (this.config.skins && this.config.skin.length > 0) {
-                this.config.skins.forEach(function (skin) {
-                    if (!_this.skeleton.data.findSkin(skin)) {
-                        _this.showError("Error: Skin in config list does not exist in skeleton: " + skin);
-                        return;
-                    }
-                });
-            }
-            if (this.config.skin) {
-                if (!this.skeleton.data.findSkin(this.config.skin)) {
-                    this.showError("Error: Skin does not exist in skeleton: " + this.config.skin);
-                    return;
-                }
-                this.skeleton.setSkinByName(this.config.skin);
-                this.skeleton.setSlotsToSetupPose();
-            }
-            if (!this.config.viewport) {
-                this.config.viewport = {
-                    animations: {},
-                    debugRender: false,
-                    transitionTime: 0.2
-                };
-            }
-            if (typeof this.config.viewport.debugRender === "undefined")
-                this.config.viewport.debugRender = false;
-            if (typeof this.config.viewport.transitionTime === "undefined")
-                this.config.viewport.transitionTime = 0.2;
-            if (!this.config.viewport.animations) {
-                this.config.viewport.animations = {};
-            }
-            else {
-                Object.getOwnPropertyNames(this.config.viewport.animations).forEach(function (animation) {
-                    if (!skeletonData.findAnimation(animation)) {
-                        _this.showError("Error: Animation for which a viewport was specified does not exist in skeleton: " + animation);
-                        return;
-                    }
-                });
-            }
-            if (this.config.animations && this.config.animations.length > 0) {
-                this.config.animations.forEach(function (animation) {
-                    if (!_this.skeleton.data.findAnimation(animation)) {
-                        _this.showError("Error: Animation in config list does not exist in skeleton: " + animation);
-                        return;
-                    }
-                });
-                if (!this.config.animation) {
-                    this.config.animation = this.config.animations[0];
-                }
-            }
-            if (!this.config.animation) {
-                if (skeletonData.animations.length > 0) {
-                    this.config.animation = skeletonData.animations[0].name;
-                }
-            }
-            if (this.config.animation) {
-                if (!skeletonData.findAnimation(this.config.animation)) {
-                    this.showError("Error: Animation does not exist in skeleton: " + this.config.animation);
-                    return;
-                }
-                this.play();
-                this.timelineSlider.change = function (percentage) {
-                    _this.pause();
-                    var animationDuration = _this.animationState.getCurrent(0).animation.duration;
-                    var time = animationDuration * percentage;
-                    _this.animationState.update(time - _this.playTime);
-                    _this.animationState.apply(_this.skeleton);
-                    _this.skeleton.updateWorldTransform();
-                    _this.playTime = time;
-                };
-            }
-            this.setupInput();
-            if (skeletonData.skins.length == 1 || (this.config.skins && this.config.skins.length == 1))
-                this.skinButton.classList.add("spine-player-hidden");
-            if (skeletonData.animations.length == 1 || (this.config.animations && this.config.animations.length == 1))
-                this.animationButton.classList.add("spine-player-hidden");
-            this.config.success(this);
-            this.loaded = true;
-        };
-        SpinePlayer.prototype.setupInput = function () {
-            var _this = this;
-            var controlBones = this.config.controlBones;
-            var selectedBones = this.selectedBones = new Array(this.config.controlBones.length);
-            var canvas = this.canvas;
-            var input = new spine.webgl.Input(canvas);
-            var target = null;
-            var coords = new spine.webgl.Vector3();
-            var temp = new spine.webgl.Vector3();
-            var temp2 = new spine.Vector2();
-            var skeleton = this.skeleton;
-            var renderer = this.sceneRenderer;
-            input.addListener({
-                down: function (x, y) {
-                    for (var i = 0; i < controlBones.length; i++) {
-                        var bone = skeleton.findBone(controlBones[i]);
-                        if (!bone)
-                            continue;
-                        renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-                        if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
-                            target = bone;
-                        }
-                    }
-                },
-                up: function (x, y) {
-                    if (target) {
-                        target = null;
-                    }
-                    else {
-                        if (!_this.config.showControls)
-                            return;
-                        if (_this.paused)
-                            _this.play();
-                        else
-                            _this.pause();
-                    }
-                },
-                dragged: function (x, y) {
-                    if (target) {
-                        renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-                        if (target.parent !== null) {
-                            target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
-                            target.x = temp2.x;
-                            target.y = temp2.y;
-                        }
-                        else {
-                            target.x = coords.x - skeleton.x;
-                            target.y = coords.y - skeleton.y;
-                        }
-                    }
-                },
-                moved: function (x, y) {
-                    for (var i = 0; i < controlBones.length; i++) {
-                        var bone = skeleton.findBone(controlBones[i]);
-                        if (!bone)
-                            continue;
-                        renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-                        if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
-                            selectedBones[i] = bone;
-                        }
-                        else {
-                            selectedBones[i] = null;
-                        }
-                    }
-                }
-            });
-            var mouseOverControls = true;
-            var mouseOverCanvas = false;
-            document.addEventListener("mousemove", function (ev) {
-                if (ev instanceof MouseEvent) {
-                    handleHover(ev.clientX, ev.clientY);
-                }
-            });
-            document.addEventListener("touchmove", function (ev) {
-                if (ev instanceof TouchEvent) {
-                    var touches = ev.changedTouches;
-                    if (touches.length > 0) {
-                        var touch = touches[0];
-                        handleHover(touch.clientX, touch.clientY);
-                    }
-                }
-            });
-            var handleHover = function (mouseX, mouseY) {
-                if (!_this.config.showControls)
-                    return;
-                var popup = findWithClass(_this.dom, "spine-player-popup");
-                mouseOverControls = overlap(mouseX, mouseY, _this.playerControls.getBoundingClientRect());
-                mouseOverCanvas = overlap(mouseX, mouseY, _this.canvas.getBoundingClientRect());
-                clearTimeout(_this.cancelId);
-                var hide = popup.length == 0 && !mouseOverControls && !mouseOverCanvas && !_this.paused;
-                if (hide) {
-                    _this.playerControls.classList.add("spine-player-controls-hidden");
-                }
-                else {
-                    _this.playerControls.classList.remove("spine-player-controls-hidden");
-                }
-                if (!mouseOverControls && popup.length == 0 && !_this.paused) {
-                    var remove = function () {
-                        if (!_this.paused)
-                            _this.playerControls.classList.add("spine-player-controls-hidden");
-                    };
-                    _this.cancelId = setTimeout(remove, 1000);
-                }
-            };
-            var overlap = function (mouseX, mouseY, rect) {
-                var x = mouseX - rect.left;
-                var y = mouseY - rect.top;
-                return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
-            };
-        };
-        SpinePlayer.prototype.play = function () {
-            var _this = this;
-            this.paused = false;
-            var remove = function () {
-                if (!_this.paused)
-                    _this.playerControls.classList.add("spine-player-controls-hidden");
-            };
-            this.cancelId = setTimeout(remove, 1000);
-            this.playButton.classList.remove("spine-player-button-icon-play");
-            this.playButton.classList.add("spine-player-button-icon-pause");
-            if (this.config.animation && !this.animationState.getCurrent(0))
-                this.setAnimation(this.config.animation);
-        };
-        SpinePlayer.prototype.pause = function () {
-            this.paused = true;
-            this.playerControls.classList.remove("spine-player-controls-hidden");
-            clearTimeout(this.cancelId);
-            this.playButton.classList.remove("spine-player-button-icon-pause");
-            this.playButton.classList.add("spine-player-button-icon-play");
-        };
-        SpinePlayer.prototype.setAnimation = function (animation, loop) {
-            if (loop === void 0) { loop = true; }
-            this.previousViewport = this.currentViewport;
-            var animViewport = this.calculateAnimationViewport(animation);
-            var viewport = {
-                x: animViewport.x,
-                y: animViewport.y,
-                width: animViewport.width,
-                height: animViewport.height,
-                padLeft: "10%",
-                padRight: "10%",
-                padTop: "10%",
-                padBottom: "10%"
-            };
-            var globalViewport = this.config.viewport;
-            if (typeof globalViewport.x !== "undefined" && typeof globalViewport.y !== "undefined" && typeof globalViewport.width !== "undefined" && typeof globalViewport.height !== "undefined") {
-                viewport.x = globalViewport.x;
-                viewport.y = globalViewport.y;
-                viewport.width = globalViewport.width;
-                viewport.height = globalViewport.height;
-            }
-            if (typeof globalViewport.padLeft !== "undefined")
-                viewport.padLeft = globalViewport.padLeft;
-            if (typeof globalViewport.padRight !== "undefined")
-                viewport.padRight = globalViewport.padRight;
-            if (typeof globalViewport.padTop !== "undefined")
-                viewport.padTop = globalViewport.padTop;
-            if (typeof globalViewport.padBottom !== "undefined")
-                viewport.padBottom = globalViewport.padBottom;
-            var userAnimViewport = this.config.viewport.animations[animation];
-            if (userAnimViewport) {
-                if (typeof userAnimViewport.x !== "undefined" && typeof userAnimViewport.y !== "undefined" && typeof userAnimViewport.width !== "undefined" && typeof userAnimViewport.height !== "undefined") {
-                    viewport.x = userAnimViewport.x;
-                    viewport.y = userAnimViewport.y;
-                    viewport.width = userAnimViewport.width;
-                    viewport.height = userAnimViewport.height;
-                }
-                if (typeof userAnimViewport.padLeft !== "undefined")
-                    viewport.padLeft = userAnimViewport.padLeft;
-                if (typeof userAnimViewport.padRight !== "undefined")
-                    viewport.padRight = userAnimViewport.padRight;
-                if (typeof userAnimViewport.padTop !== "undefined")
-                    viewport.padTop = userAnimViewport.padTop;
-                if (typeof userAnimViewport.padBottom !== "undefined")
-                    viewport.padBottom = userAnimViewport.padBottom;
-            }
-            viewport.padLeft = this.percentageToWorldUnit(viewport.width, viewport.padLeft);
-            viewport.padRight = this.percentageToWorldUnit(viewport.width, viewport.padRight);
-            viewport.padBottom = this.percentageToWorldUnit(viewport.height, viewport.padBottom);
-            viewport.padTop = this.percentageToWorldUnit(viewport.height, viewport.padTop);
-            this.currentViewport = viewport;
-            this.viewportTransitionStart = performance.now();
-            this.animationState.clearTracks();
-            this.skeleton.setToSetupPose();
-            this.animationState.setAnimation(0, animation, loop);
-        };
-        SpinePlayer.prototype.percentageToWorldUnit = function (size, percentageOrAbsolute) {
-            if (typeof percentageOrAbsolute === "string") {
-                return size * parseFloat(percentageOrAbsolute.substr(0, percentageOrAbsolute.length - 1)) / 100;
-            }
-            else {
-                return percentageOrAbsolute;
-            }
-        };
-        SpinePlayer.prototype.calculateAnimationViewport = function (animationName) {
-            var animation = this.skeleton.data.findAnimation(animationName);
-            this.animationState.clearTracks();
-            this.skeleton.setToSetupPose();
-            this.animationState.setAnimationWith(0, animation, true);
-            var steps = 100;
-            var stepTime = animation.duration > 0 ? animation.duration / steps : 0;
-            var minX = 100000000;
-            var maxX = -100000000;
-            var minY = 100000000;
-            var maxY = -100000000;
-            var offset = new spine.Vector2();
-            var size = new spine.Vector2();
-            for (var i = 0; i < steps; i++) {
-                this.animationState.update(stepTime);
-                this.animationState.apply(this.skeleton);
-                this.skeleton.updateWorldTransform();
-                this.skeleton.getBounds(offset, size);
-                if (!isNaN(offset.x) && !isNaN(offset.y) && !isNaN(size.x) && !isNaN(size.y)) {
-                    minX = Math.min(offset.x, minX);
-                    maxX = Math.max(offset.x + size.x, maxX);
-                    minY = Math.min(offset.y, minY);
-                    maxY = Math.max(offset.y + size.y, maxY);
-                }
-                else
-                    console.log("Animation bounds are NaN: " + animationName);
-            }
-            offset.x = minX;
-            offset.y = minY;
-            size.x = maxX - minX;
-            size.y = maxY - minY;
-            return {
-                x: offset.x,
-                y: offset.y,
-                width: size.x,
-                height: size.y
-            };
-        };
-        SpinePlayer.prototype.stopRendering = function () {
-            this.stopRequestAnimationFrame = true;
-        };
-        SpinePlayer.HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.25);
-        SpinePlayer.HOVER_COLOR_OUTER = new spine.Color(1, 1, 1, 1);
-        SpinePlayer.NON_HOVER_COLOR_INNER = new spine.Color(0.478, 0, 0, 0.5);
-        SpinePlayer.NON_HOVER_COLOR_OUTER = new spine.Color(1, 0, 0, 0.8);
-        return SpinePlayer;
-    }());
-    spine.SpinePlayer = SpinePlayer;
-    function isContained(dom, needle) {
-        if (dom === needle)
-            return true;
-        var findRecursive = function (dom, needle) {
-            for (var i = 0; i < dom.children.length; i++) {
-                var child = dom.children[i];
-                if (child === needle)
-                    return true;
-                if (findRecursive(child, needle))
-                    return true;
-            }
-            return false;
-        };
-        return findRecursive(dom, needle);
-    }
-    function findWithId(dom, id) {
-        var found = new Array();
-        var findRecursive = function (dom, id, found) {
-            for (var i = 0; i < dom.children.length; i++) {
-                var child = dom.children[i];
-                if (child.id === id)
-                    found.push(child);
-                findRecursive(child, id, found);
-            }
-        };
-        findRecursive(dom, id, found);
-        return found;
-    }
-    function findWithClass(dom, className) {
-        var found = new Array();
-        var findRecursive = function (dom, className, found) {
-            for (var i = 0; i < dom.children.length; i++) {
-                var child = dom.children[i];
-                if (child.classList.contains(className))
-                    found.push(child);
-                findRecursive(child, className, found);
-            }
-        };
-        findRecursive(dom, className, found);
-        return found;
+    function findWithClass(element, className) {
+        return element.getElementsByClassName(className)[0];
     }
     function createElement(html) {
-        var dom = document.createElement("div");
-        dom.innerHTML = html;
-        return dom.children[0];
+        var div = document.createElement("div");
+        div.innerHTML = html;
+        return div.children[0];
     }
     function removeClass(elements, clazz) {
-        for (var i = 0; i < elements.length; i++) {
+        for (var i = 0; i < elements.length; i++)
             elements[i].classList.remove(clazz);
-        }
     }
-    function escapeHtml(str) {
-        if (!str)
-            return "";
-        return str
+    function toString(object) {
+        return JSON.stringify(object)
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&#34;")
             .replace(/'/g, "&#39;");
     }
+    var BONE_INNER_OVER = new spine.Color(0.478, 0, 0, 0.25);
+    var BONE_OUTER_OVER = new spine.Color(1, 1, 1, 1);
+    var BONE_INNER = new spine.Color(0.478, 0, 0, 0.5);
+    var BONE_OUTER = new spine.Color(1, 0, 0, 0.8);
 })(spine || (spine = {}));
 var spine;
 (function (spine) {

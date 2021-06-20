@@ -160,7 +160,10 @@ module spine.webgl {
 					let slotBlendMode = slot.data.blendMode;
 					if (slotBlendMode != blendMode) {
 						blendMode = slotBlendMode;
-						batcher.setBlendMode(WebGLBlendModeConverter.getSourceGLBlendMode(blendMode, premultipliedAlpha), WebGLBlendModeConverter.getDestGLBlendMode(blendMode));
+						batcher.setBlendMode(
+							WebGLBlendModeConverter.getSourceColorGLBlendMode(blendMode, premultipliedAlpha),
+							WebGLBlendModeConverter.getSourceAlphaGLBlendMode(blendMode),
+							WebGLBlendModeConverter.getDestGLBlendMode(blendMode));
 					}
 
 					if (clipper.isClipping()) {

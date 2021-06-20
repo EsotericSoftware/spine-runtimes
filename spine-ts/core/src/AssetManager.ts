@@ -191,6 +191,7 @@ module spine {
 			let asset = this.assets[path];
 			if ((<any>asset).dispose) (<any>asset).dispose();
 			delete this.assets[path];
+			return asset;
 		}
 
 		removeAll () {

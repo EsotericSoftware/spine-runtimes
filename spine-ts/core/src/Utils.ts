@@ -108,8 +108,7 @@ module spine {
 			this.g = g;
 			this.b = b;
 			this.a = a;
-			this.clamp();
-			return this;
+			return this.clamp();
 		}
 
 		setFromColor (c: Color) {
@@ -122,10 +121,10 @@ module spine {
 
 		setFromString (hex: string) {
 			hex = hex.charAt(0) == '#' ? hex.substr(1) : hex;
-			this.r = parseInt(hex.substr(0, 2), 16) / 255.0;
-			this.g = parseInt(hex.substr(2, 2), 16) / 255.0;
-			this.b = parseInt(hex.substr(4, 2), 16) / 255.0;
-			this.a = (hex.length != 8 ? 255 : parseInt(hex.substr(6, 2), 16)) / 255.0;
+			this.r = parseInt(hex.substr(0, 2), 16) / 255;
+			this.g = parseInt(hex.substr(2, 2), 16) / 255;
+			this.b = parseInt(hex.substr(4, 2), 16) / 255;
+			this.a = (hex.length != 8 ? 1 : parseInt(hex.substr(6, 2), 16) / 255);
 			return this;
 		}
 
@@ -134,8 +133,7 @@ module spine {
 			this.g += g;
 			this.b += b;
 			this.a += a;
-			this.clamp();
-			return this;
+			return this.clamp();
 		}
 
 		clamp () {

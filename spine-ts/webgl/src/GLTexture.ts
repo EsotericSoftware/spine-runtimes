@@ -52,7 +52,7 @@ module spine.webgl {
 		}
 
 		static validateMagFilter (magFilter: TextureFilter) {
-			switch(magFilter) {
+			switch (magFilter) {
 				case TextureFilter.MipMap:
 				case TextureFilter.MipMapLinearLinear:
 				case TextureFilter.MipMapLinearNearest:
@@ -73,9 +73,7 @@ module spine.webgl {
 
 		update (useMipMaps: boolean) {
 			let gl = this.context.gl;
-			if (!this.texture) {
-				this.texture = this.context.gl.createTexture();
-			}
+			if (!this.texture) this.texture = this.context.gl.createTexture();
 			this.bind();
 			if (GLTexture.DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL) gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this._image);

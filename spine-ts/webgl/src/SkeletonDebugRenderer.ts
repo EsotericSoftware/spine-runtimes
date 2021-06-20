@@ -64,7 +64,7 @@ module spine.webgl {
 			let skeletonY = skeleton.y;
 			let gl = this.context.gl;
 			let srcFunc = this.premultipliedAlpha ? gl.ONE : gl.SRC_ALPHA;
-			shapes.setBlendMode(srcFunc, gl.ONE_MINUS_SRC_ALPHA);
+			shapes.setBlendMode(srcFunc, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
 			let bones = skeleton.bones;
 			if (this.drawBones) {

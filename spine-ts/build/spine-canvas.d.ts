@@ -362,7 +362,7 @@ declare module spine {
         loadTexture(path: string, success?: (path: string, image: HTMLImageElement | ImageBitmap) => void, error?: (path: string, message: string) => void): void;
         loadTextureAtlas(path: string, success?: (path: string, atlas: TextureAtlas) => void, error?: (path: string, message: string) => void): void;
         get(path: string): any;
-        remove(path: string): void;
+        remove(path: string): any;
         removeAll(): void;
         isLoadingComplete(): boolean;
         getToLoad(): number;
