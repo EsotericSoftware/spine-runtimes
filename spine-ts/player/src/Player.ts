@@ -28,17 +28,6 @@
  *****************************************************************************/
 
 module spine {
-	export interface Viewport {
-		x: number,
-		y: number,
-		width: number,
-		height: number,
-		padLeft: string | number
-		padRight: string | number
-		padTop: string | number
-		padBottom: string | number
-	}
-
 	export interface SpinePlayerConfig {
 		/* The URL of the skeleton JSON file (.json). */
 		jsonUrl: string
@@ -140,155 +129,15 @@ module spine {
 		downloader: spine.Downloader
 	}
 
-	class Popup {
-		public dom: HTMLElement;
-
-		constructor(private player: HTMLElement, parent: HTMLElement, htmlContent: string) {
-			this.dom = createElement(/*html*/`
-				<div class="spine-player-popup spine-player-hidden">
-				</div>
-			`);
-			this.dom.innerHTML = htmlContent;
-			parent.appendChild(this.dom);
-		}
-
-		show (dismissedListener: () => void) {
-			this.dom.classList.remove("spine-player-hidden");
-
-			// Make sure the popup isn't bigger than the player.
-			var dismissed = false;
-			let resize = () => {
-				if (!dismissed) requestAnimationFrame(resize);
-				let bottomOffset = Math.abs(this.dom.getBoundingClientRect().bottom - this.player.getBoundingClientRect().bottom);
-				let rightOffset = Math.abs(this.dom.getBoundingClientRect().right - this.player.getBoundingClientRect().right);
-				let maxHeight = this.player.clientHeight - bottomOffset - rightOffset;
-				this.dom.style.maxHeight = maxHeight + "px";
-			}
-			requestAnimationFrame(resize);
-
-			// Dismiss when clicking somewhere else outside
-			// the popup
-			var justClicked = true;
-			let windowClickListener = (event: any) => {
-				if (justClicked) {
-					justClicked = false;
-					return;
-				}
-				if (!isContained(this.dom, event.target)) {
-					this.dom.remove();
-					window.removeEventListener("click", windowClickListener);
-					dismissedListener();
-					dismissed = true;
-				}
-			}
-			window.addEventListener("click", windowClickListener);
-		}
-	}
-
-	class Switch {
-		private switch: HTMLElement;
-		private enabled = false;
-		public change: (value: boolean) => void;
-
-		constructor(private text: string) {}
-
-		render(): HTMLElement {
-			this.switch = createElement(/*html*/`
-				<div class="spine-player-switch">
-					<span class="spine-player-switch-text">${this.text}</span>
-					<div class="spine-player-switch-knob-area">
-						<div class="spine-player-switch-knob"></div>
-					</div>
-				</div>
-			`);
-			this.switch.addEventListener("click", () => {
-				this.setEnabled(!this.enabled);
-				if (this.change) this.change(this.enabled);
-			})
-			return this.switch;
-		}
-
-		setEnabled(enabled: boolean) {
-			if (enabled) this.switch.classList.add("active");
-			else this.switch.classList.remove("active");
-			this.enabled = enabled;
-		}
-
-		isEnabled(): boolean {
-			return this.enabled;
-		}
-	}
-
-	class Slider {
-		private slider: HTMLElement;
-		private value: HTMLElement;
-		private knob: HTMLElement;
-		public change: (percentage: number) => void;
-
-		constructor(public snaps = 0, public snapPercentage = 0.1, public big = false) { }
-
-		render(): HTMLElement {
-			this.slider = createElement(/*html*/`
-				<div class="spine-player-slider ${this.big ? "big": ""}">
-					<div class="spine-player-slider-value"></div>
-					<!--<div class="spine-player-slider-knob"></div>-->
-				</div>
-			`);
-			this.value = findWithClass(this.slider, "spine-player-slider-value")[0];
-			// this.knob = findWithClass(this.slider, "spine-player-slider-knob")[0];
-			this.setValue(0);
-
-			let input = new spine.webgl.Input(this.slider);
-			var dragging = false;
-			input.addListener({
-				down: (x, y) => {
-					dragging = true;
-					this.value.classList.add("hovering");
-				},
-				up: (x, y) => {
-					dragging = false;
-					let percentage = x / this.slider.clientWidth;
-					percentage = percentage = Math.max(0, Math.min(percentage, 1));
-					this.setValue(x / this.slider.clientWidth);
-					if (this.change) this.change(percentage);
-					this.value.classList.remove("hovering");
-				},
-				moved: (x, y) => {
-					if (dragging) {
-						let percentage = x / this.slider.clientWidth;
-						percentage = Math.max(0, Math.min(percentage, 1));
-						percentage = this.setValue(x / this.slider.clientWidth);
-						if (this.change) this.change(percentage);
-					}
-				},
-				dragged: (x, y) => {
-					let percentage = x / this.slider.clientWidth;
-					percentage = Math.max(0, Math.min(percentage, 1));
-					percentage = this.setValue(x / this.slider.clientWidth);
-					if (this.change) this.change(percentage);
-				}
-			});
-
-
-			return this.slider;
-		}
-
-		setValue(percentage: number): number {
-			percentage = Math.max(0, Math.min(1, percentage));
-			if (this.snaps > 0) {
-				let modulo = percentage % (1 / this.snaps);
-				// floor
-				if (modulo < (1 / this.snaps) * this.snapPercentage) {
-					percentage = percentage - modulo;
-				} else if (modulo > (1 / this.snaps) - (1 / this.snaps) * this.snapPercentage) {
-					percentage = percentage - modulo + (1 / this.snaps);
-				}
-				percentage = Math.max(0, Math.min(1, percentage));
-			}
-			this.value.style.width = "" + (percentage * 100) + "%";
-			// this.knob.style.left = "" + (-8 + percentage * this.slider.clientWidth) + "px";
-			return percentage;
-		}
+	export interface Viewport {
+		x: number,
+		y: number,
+		width: number,
+		height: number,
+		padLeft: string | number
+		padRight: string | number
+		padTop: string | number
+		padBottom: string | number
 	}
 
 	export class SpinePlayer {
@@ -1256,6 +1105,157 @@ module spine {
 
 		public stopRendering() {
 			this.stopRequestAnimationFrame = true;
+		}
+	}
+
+	class Popup {
+		public dom: HTMLElement;
+
+		constructor(private player: HTMLElement, parent: HTMLElement, htmlContent: string) {
+			this.dom = createElement(/*html*/`
+				<div class="spine-player-popup spine-player-hidden">
+				</div>
+			`);
+			this.dom.innerHTML = htmlContent;
+			parent.appendChild(this.dom);
+		}
+
+		show (dismissedListener: () => void) {
+			this.dom.classList.remove("spine-player-hidden");
+
+			// Make sure the popup isn't bigger than the player.
+			var dismissed = false;
+			let resize = () => {
+				if (!dismissed) requestAnimationFrame(resize);
+				let bottomOffset = Math.abs(this.dom.getBoundingClientRect().bottom - this.player.getBoundingClientRect().bottom);
+				let rightOffset = Math.abs(this.dom.getBoundingClientRect().right - this.player.getBoundingClientRect().right);
+				let maxHeight = this.player.clientHeight - bottomOffset - rightOffset;
+				this.dom.style.maxHeight = maxHeight + "px";
+			}
+			requestAnimationFrame(resize);
+
+			// Dismiss when clicking somewhere else outside
+			// the popup
+			var justClicked = true;
+			let windowClickListener = (event: any) => {
+				if (justClicked) {
+					justClicked = false;
+					return;
+				}
+				if (!isContained(this.dom, event.target)) {
+					this.dom.remove();
+					window.removeEventListener("click", windowClickListener);
+					dismissedListener();
+					dismissed = true;
+				}
+			}
+			window.addEventListener("click", windowClickListener);
+		}
+	}
+
+	class Switch {
+		private switch: HTMLElement;
+		private enabled = false;
+		public change: (value: boolean) => void;
+
+		constructor(private text: string) {}
+
+		render(): HTMLElement {
+			this.switch = createElement(/*html*/`
+				<div class="spine-player-switch">
+					<span class="spine-player-switch-text">${this.text}</span>
+					<div class="spine-player-switch-knob-area">
+						<div class="spine-player-switch-knob"></div>
+					</div>
+				</div>
+			`);
+			this.switch.addEventListener("click", () => {
+				this.setEnabled(!this.enabled);
+				if (this.change) this.change(this.enabled);
+			})
+			return this.switch;
+		}
+
+		setEnabled(enabled: boolean) {
+			if (enabled) this.switch.classList.add("active");
+			else this.switch.classList.remove("active");
+			this.enabled = enabled;
+		}
+
+		isEnabled(): boolean {
+			return this.enabled;
+		}
+	}
+
+	class Slider {
+		private slider: HTMLElement;
+		private value: HTMLElement;
+		private knob: HTMLElement;
+		public change: (percentage: number) => void;
+
+		constructor(public snaps = 0, public snapPercentage = 0.1, public big = false) { }
+
+		render(): HTMLElement {
+			this.slider = createElement(/*html*/`
+				<div class="spine-player-slider ${this.big ? "big": ""}">
+					<div class="spine-player-slider-value"></div>
+					<!--<div class="spine-player-slider-knob"></div>-->
+				</div>
+			`);
+			this.value = findWithClass(this.slider, "spine-player-slider-value")[0];
+			// this.knob = findWithClass(this.slider, "spine-player-slider-knob")[0];
+			this.setValue(0);
+
+			let input = new spine.webgl.Input(this.slider);
+			var dragging = false;
+			input.addListener({
+				down: (x, y) => {
+					dragging = true;
+					this.value.classList.add("hovering");
+				},
+				up: (x, y) => {
+					dragging = false;
+					let percentage = x / this.slider.clientWidth;
+					percentage = percentage = Math.max(0, Math.min(percentage, 1));
+					this.setValue(x / this.slider.clientWidth);
+					if (this.change) this.change(percentage);
+					this.value.classList.remove("hovering");
+				},
+				moved: (x, y) => {
+					if (dragging) {
+						let percentage = x / this.slider.clientWidth;
+						percentage = Math.max(0, Math.min(percentage, 1));
+						percentage = this.setValue(x / this.slider.clientWidth);
+						if (this.change) this.change(percentage);
+					}
+				},
+				dragged: (x, y) => {
+					let percentage = x / this.slider.clientWidth;
+					percentage = Math.max(0, Math.min(percentage, 1));
+					percentage = this.setValue(x / this.slider.clientWidth);
+					if (this.change) this.change(percentage);
+				}
+			});
+
+
+			return this.slider;
+		}
+
+		setValue(percentage: number): number {
+			percentage = Math.max(0, Math.min(1, percentage));
+			if (this.snaps > 0) {
+				let modulo = percentage % (1 / this.snaps);
+				// floor
+				if (modulo < (1 / this.snaps) * this.snapPercentage) {
+					percentage = percentage - modulo;
+				} else if (modulo > (1 / this.snaps) - (1 / this.snaps) * this.snapPercentage) {
+					percentage = percentage - modulo + (1 / this.snaps);
+				}
+				percentage = Math.max(0, Math.min(1, percentage));
+			}
+			this.value.style.width = "" + (percentage * 100) + "%";
+			// this.knob.style.left = "" + (-8 + percentage * this.slider.clientWidth) + "px";
+			return percentage;
 		}
 	}
 
