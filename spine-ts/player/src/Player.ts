@@ -162,14 +162,14 @@ module spine {
 
 	export class SpinePlayer {
 		private parent: HTMLElement;
-		private dom: HTMLElement;
-		private canvas: HTMLCanvasElement;
+		public dom: HTMLElement;
+		public canvas: HTMLCanvasElement;
 		private context: spine.webgl.ManagedWebGLRenderingContext;
 		private sceneRenderer: spine.webgl.SceneRenderer;
 		private loadingScreen: spine.webgl.LoadingScreen;
-		private assetManager: spine.webgl.AssetManager;
-		private bg = new Color();
-		private bgFullscreen = new Color();
+		public assetManager: spine.webgl.AssetManager;
+		public bg = new Color();
+		public bgFullscreen = new Color();
 
 		private playerControls: HTMLElement;
 		private timelineSlider: Slider;
