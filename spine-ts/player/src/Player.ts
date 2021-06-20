@@ -454,7 +454,8 @@ module spine {
 
 			if (config.success) config.success(this);
 
-			if (!this.animationState.getCurrent(0)) {
+			let entry = this.animationState.getCurrent(0);
+			if (!entry) {
 				if (this.config.animation)
 					this.setAnimation(this.config.animation);
 				else {
@@ -462,7 +463,8 @@ module spine {
 					entry.trackEnd = 100000000;
 					this.setViewport(entry.animation);
 				}
-			}
+			} else if (!this.currentViewport)
+				this.setViewport(entry.animation);
 		}
 
 		private setupInput () {
@@ -728,20 +730,22 @@ module spine {
 						height: this.currentViewport.height + (this.currentViewport.padBottom as number) + (this.currentViewport.padTop as number)
 					};
 
-					let transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / config.viewport.transitionTime;
-					if (this.previousViewport && transitionAlpha < 1) {
-						let oldViewport = {
-							x: this.previousViewport.x - (this.previousViewport.padLeft as number),
-							y: this.previousViewport.y - (this.previousViewport.padBottom as number),
-							width: this.previousViewport.width + (this.previousViewport.padLeft as number) + (this.previousViewport.padRight as number),
-							height: this.previousViewport.height + (this.previousViewport.padBottom as number) + (this.previousViewport.padTop as number)
-						};
-						viewport = {
-							x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
-							y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
-							width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
-							height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
-						};
+					if (this.previousViewport) {
+						let transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / config.viewport.transitionTime;
+						if (transitionAlpha < 1) {
+							let oldViewport = {
+								x: this.previousViewport.x - (this.previousViewport.padLeft as number),
+								y: this.previousViewport.y - (this.previousViewport.padBottom as number),
+								width: this.previousViewport.width + (this.previousViewport.padLeft as number) + (this.previousViewport.padRight as number),
+								height: this.previousViewport.height + (this.previousViewport.padBottom as number) + (this.previousViewport.padTop as number)
+							};
+							viewport = {
+								x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
+								y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
+								width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
+								height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
+							};
+						}
 					}
 
 					let viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
