@@ -210,10 +210,6 @@ module spine {
 			this.bgFullscreen.setFromString(config.fullScreenBackgroundColor);
 
 			this.parent.appendChild(this.create());
-			if (!config.alpha) { // Prevents a flash before the first frame is drawn.
-				let hex = config.backgroundColor;
-				this.parent.style.backgroundColor = (hex.charAt(0) == '#' ? hex : "#" + hex).substr(0, 7);
-			}
 
 			// Register a global resize handler to redraw, avoiding flicker.
 			window.addEventListener("resize", () => this.drawFrame(false));
@@ -263,6 +259,11 @@ module spine {
 
 			let dom = this.dom = createElement(
 				/*html*/`<div class="spine-player" style="position:relative;height:100%"><canvas class="spine-player-canvas" style="display:block;width:100%;height:100%"></canvas>${controls}</div>`);
+
+			if (!config.alpha) { // Prevents a flash before the first frame is drawn.
+				let hex = config.backgroundColor;
+				this.dom.style.backgroundColor = (hex.charAt(0) == '#' ? hex : "#" + hex).substr(0, 7);
+			}
 
 			try {
 				// Setup the OpenGL context.
