@@ -12561,15 +12561,18 @@ var spine;
 			this.play();
 			if (config.success)
 				config.success(this);
-			if (!this.animationState.getCurrent(0)) {
+			var entry = this.animationState.getCurrent(0);
+			if (!entry) {
 				if (this.config.animation)
 					this.setAnimation(this.config.animation);
 				else {
-					var entry = this.animationState.setEmptyAnimation(0);
+					entry = this.animationState.setEmptyAnimation(0);
 					entry.trackEnd = 100000000;
 					this.setViewport(entry.animation);
 				}
 			}
+			else if (!this.currentViewport)
+				this.setViewport(entry.animation);
 		};
 		SpinePlayer.prototype.setupInput = function () {
 			var _this = this;
@@ -12816,20 +12819,22 @@ var spine;
 						width: this.currentViewport.width + this.currentViewport.padLeft + this.currentViewport.padRight,
 						height: this.currentViewport.height + this.currentViewport.padBottom + this.currentViewport.padTop
 					};
-					var transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / config.viewport.transitionTime;
-					if (this.previousViewport && transitionAlpha < 1) {
-						var oldViewport = {
-							x: this.previousViewport.x - this.previousViewport.padLeft,
-							y: this.previousViewport.y - this.previousViewport.padBottom,
-							width: this.previousViewport.width + this.previousViewport.padLeft + this.previousViewport.padRight,
-							height: this.previousViewport.height + this.previousViewport.padBottom + this.previousViewport.padTop
-						};
-						viewport = {
-							x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
-							y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
-							width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
-							height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
-						};
+					if (this.previousViewport) {
+						var transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / config.viewport.transitionTime;
+						if (transitionAlpha < 1) {
+							var oldViewport = {
+								x: this.previousViewport.x - this.previousViewport.padLeft,
+								y: this.previousViewport.y - this.previousViewport.padBottom,
+								width: this.previousViewport.width + this.previousViewport.padLeft + this.previousViewport.padRight,
+								height: this.previousViewport.height + this.previousViewport.padBottom + this.previousViewport.padTop
+							};
+							viewport = {
+								x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
+								y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
+								width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
+								height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
+							};
+						}
 					}
 					var viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
 					var gl = this.context.gl;

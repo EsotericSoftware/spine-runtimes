@@ -459,7 +459,7 @@ module spine {
 				if (this.config.animation)
 					this.setAnimation(this.config.animation);
 				else {
-					var entry = this.animationState.setEmptyAnimation(0);
+					entry = this.animationState.setEmptyAnimation(0);
 					entry.trackEnd = 100000000;
 					this.setViewport(entry.animation);
 				}
