@@ -209,7 +209,6 @@ module spine {
 			this.bg.setFromString(config.backgroundColor);
 			this.bgFullscreen.setFromString(config.fullScreenBackgroundColor);
 
-			this.parent.style.position = "relative";
 			this.parent.appendChild(this.create());
 			if (!config.alpha) { // Prevents a flash before the first frame is drawn.
 				let hex = config.backgroundColor;
@@ -233,9 +232,9 @@ module spine {
 			if (config.premultipliedAlpha === undefined) config.premultipliedAlpha = true;
 			if (!config.debug) config.debug = {} as any;
 			if (config.animations && config.animation && config.animations.indexOf(config.animation) < 0)
-				throw new Error("Animation '" + config.animation + "' is not in the config animation list: " + toString(this.config.animations));
+				throw new Error("Animation '" + config.animation + "' is not in the config animation list: " + toString(config.animations));
 			if (config.skins && config.skin && config.skins.indexOf(config.skin) < 0)
-				throw new Error("Default skin '" + config.skin + "' is not in the config skins list: " + toString(this.config.skins));
+				throw new Error("Default skin '" + config.skin + "' is not in the config skins list: " + toString(config.skins));
 			if (!config.viewport) config.viewport = {} as any;
 			if (!config.viewport.animations) config.viewport.animations = {};
 			if (config.viewport.debugRender === undefined) config.viewport.debugRender = false;
@@ -263,7 +262,7 @@ module spine {
 </div></div>` : "";
 
 			let dom = this.dom = createElement(
-				/*html*/`<div class="spine-player"><canvas class="spine-player-canvas" style="display:block;height:100%;width:100%"></canvas>${controls}</div>`);
+				/*html*/`<div class="spine-player" style="position:relative;height:100%"><canvas class="spine-player-canvas" style="display:block;width:100%;height:100%"></canvas>${controls}</div>`);
 
 			try {
 				// Setup the OpenGL context.
@@ -450,26 +449,29 @@ module spine {
 				if (skeletonData.animations.length == 1 || (config.animations && config.animations.length == 1)) this.animationButton.classList.add("spine-player-hidden");
 			}
 
-			this.play();
-
 			if (config.success) config.success(this);
 
 			let entry = this.animationState.getCurrent(0);
 			if (!entry) {
-				if (this.config.animation)
-					this.setAnimation(this.config.animation);
-				else {
+				if (config.animation) {
+					entry = this.setAnimation(config.animation);
+					this.play();
+				} else {
 					entry = this.animationState.setEmptyAnimation(0);
 					entry.trackEnd = 100000000;
 					this.setViewport(entry.animation);
+					this.pause();
 				}
-			} else if (!this.currentViewport)
+			} else if (!this.currentViewport) {
 				this.setViewport(entry.animation);
+				this.play();
+			}
 		}
 
 		private setupInput () {
-			let controlBones = this.config.controlBones;
-			if (!controlBones.length && !this.config.showControls) return;
+			let config = this.config;
+			let controlBones = config.controlBones;
+			if (!controlBones.length && !config.showControls) return;
 			let selectedBones = this.selectedBones = new Array<Bone>(controlBones.length);
 			let canvas = this.canvas;
 			let input = new spine.webgl.Input(canvas);
@@ -506,7 +508,7 @@ module spine {
 				up: (x, y) => {
 					if (target)
 						target = null;
-					else if (this.config.showControls)
+					else if (config.showControls)
 						(this.paused ? this.play() : this.pause());
 				},
 				dragged: (x, y) => {
@@ -527,7 +529,7 @@ module spine {
 				moved: (x, y) => closest(x, y)
 			});
 
-			if (!this.config.showControls) return;
+			if (!config.showControls) return;
 
 			// For manual hover to work, we need to disable hidding controls if the mouse/touch entered the clickable area of a child of the controls.
 			// For this we need to register a mouse handler on the document and see if we are within the canvas area.
@@ -570,12 +572,22 @@ module spine {
 
 		play () {
 			this.paused = false;
-			if (this.config.showControls) {
+			let config = this.config;
+			if (config.showControls) {
 				this.cancelId = setTimeout(() => {
 					if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
 				}, 1000);
 				this.playButton.classList.remove("spine-player-button-icon-play");
 				this.playButton.classList.add("spine-player-button-icon-pause");
+
+				// If no config animation, set one when first clicked.
+				if (!config.animation) {
+					if (config.animations && config.animations.length)
+						config.animation = config.animations[0];
+					else if (this.skeleton.data.animations.length)
+						config.animation = this.skeleton.data.animations[0].name;
+					if (config.animation) this.setAnimation(config.animation);
+				}
 			}
 		}
 
@@ -844,10 +856,10 @@ module spine {
 			let popup = new Popup(this.dom, this.playerControls, /*html*/`
 <div class="spine-player-popup-title">Speed</div>
 <hr>
-<div class="spine-player-row" style="user-select: none; align-items: center; padding: 8px;">
+<div class="spine-player-row" style="align-items:center;padding:8px">
 <div class="spine-player-column">
-	<div class="spine-player-speed-slider" style="margin-bottom: 4px;"></div>
-	<div class="spine-player-row" style="justify-content: space-between;"><div>0.1x</div><div>1x</div><div>2x</div></div>
+	<div class="spine-player-speed-slider" style="margin-bottom:4px"></div>
+	<div class="spine-player-row" style="justify-content:space-between"><div>0.1x</div><div>1x</div><div>2x</div></div>
 </div>
 </div>`);
 			let slider = new Slider(2, 0.1, true);
@@ -994,7 +1006,7 @@ module spine {
 			} else {
 				this.error = true;
 				this.dom.appendChild(createElement(
-					/*html*/`<div class="spine-player-error" style="background:#000; color:#fff; position:absolute; top:0; width:100%; height:100%; display:flex; justify-content:center; align-items:center; overflow:auto; z-index:999">`
+					/*html*/`<div class="spine-player-error" style="background:#000;color:#fff;position:absolute;top:0;width:100%;height:100%;display:flex;justify-content:center;align-items:center;overflow:auto;z-index:999">`
 					+ message.replace("\n", "<br><br>") + `</div>`));
 				if (this.config.error) this.config.error(this, message);
 				throw (error ? error : new Error(message));

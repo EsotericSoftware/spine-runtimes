@@ -33,15 +33,15 @@ module spine {
 	export class SpinePlayerEditor {
 		private static DEFAULT_CODE =
 		`
-<script src="https://esotericsoftware.com/files/spine-player/3.7/spine-player.js"></script>
-<link rel="stylesheet" href="https://esotericsoftware.com/files/spine-player/3.7/spine-player.css">
+<script src="https://esotericsoftware.com/files/spine-player/4.0/spine-player.js"></script>
+<link rel="stylesheet" href="https://esotericsoftware.com/files/spine-player/4.0/spine-player.css">
 
 <div id="player-container" style="width: 100%; height: 100vh;"></div>
 
 <script>
 new spine.SpinePlayer("player-container", {
-	jsonUrl: "https://esotericsoftware.com/files/examples/spineboy/export/spineboy-pro.json",
-	atlasUrl: "https://esotericsoftware.com/files/examples/spineboy/export/spineboy-pma.atlas"
+	jsonUrl: "https://esotericsoftware.com/files/examples/4.0/spineboy/export/spineboy-pro.json",
+	atlasUrl: "https://esotericsoftware.com/files/examples/4.0/spineboy/export/spineboy-pma.atlas"
 });
 </script>
 		`.trim();
@@ -50,9 +50,7 @@ new spine.SpinePlayer("player-container", {
 `<html>
 <head>
 <style>
-body {
-	margin: 0px;
-}
+body { margin: 0px; }
 </style>
 </head>
 <body>`.trim()
@@ -60,7 +58,7 @@ body {
 		private code: any;
 		private player: HTMLIFrameElement;
 
-		constructor(parent: HTMLElement) {
+		constructor (parent: HTMLElement) {
 			this.render(parent);
 		}
 
