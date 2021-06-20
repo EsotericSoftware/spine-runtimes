@@ -102,7 +102,7 @@ module spine {
 				} else if (current.trackLast >= current.trackEnd && !current.mixingFrom) {
 					tracks[i] = null;
 					this.queue.end(current);
-					this.disposeNext(current);
+					this.clearNext(current);
 					continue;
 				}
 				if (current.mixingFrom && this.updateMixingFrom(current, delta)) {
@@ -460,7 +460,7 @@ module spine {
 
 			this.queue.end(current);
 
-			this.disposeNext(current);
+			this.clearNext(current);
 
 			let entry = current;
 			while (true) {
@@ -475,11 +475,6 @@ module spine {
 			this.tracks[current.trackIndex] = null;
 
 			this.queue.drain();
-		}
-
-		/** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
-		clearNext(entry: TrackEntry) {
-			this.disposeNext(entry.next);
 		}
 
 		setCurrent (index: number, current: TrackEntry, interrupt: boolean) {
@@ -528,11 +523,11 @@ module spine {
 					this.tracks[trackIndex] = current.mixingFrom;
 					this.queue.interrupt(current);
 					this.queue.end(current);
-					this.disposeNext(current);
+					this.clearNext(current);
 					current = current.mixingFrom;
 					interrupt = false;
 				} else
-					this.disposeNext(current);
+					this.clearNext(current);
 			}
 			let entry = this.trackEntry(trackIndex, animation, loop, current);
 			this.setCurrent(trackIndex, entry, interrupt);
@@ -673,7 +668,8 @@ module spine {
 			return entry;
 		}
 
-		disposeNext (entry: TrackEntry) {
+		/** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
+		clearNext (entry: TrackEntry) {
 			let next = entry.next;
 			while (next) {
 				this.queue.dispose(next);

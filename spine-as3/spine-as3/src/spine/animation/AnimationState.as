@@ -106,7 +106,7 @@ package spine.animation {
 					if (current.trackLast >= current.trackEnd && current.mixingFrom == null) {
 						tracks[i] = null;
 						queue.end(current);
-						disposeNext(current);
+						clearNext(current);
 						continue;
 					}
 				}
@@ -445,7 +445,7 @@ package spine.animation {
 
 			queue.end(current);
 
-			disposeNext(current);
+			clearNext(current);
 
 			var entry : TrackEntry = current;
 			while (true) {
@@ -460,11 +460,6 @@ package spine.animation {
 			tracks[current.trackIndex] = null;
 
 			queue.drain();
-		}
-
-		/** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
-		private function clearNext(entry : TrackEntry) : void {
-			disposeNext(entry.next);
 		}
 
 		private function setCurrent(index : int, current : TrackEntry, interrupt : Boolean) : void {
@@ -504,11 +499,11 @@ package spine.animation {
 					tracks[trackIndex] = current.mixingFrom;
 					queue.interrupt(current);
 					queue.end(current);
-					disposeNext(current);
+					clearNext(current);
 					current = current.mixingFrom;
 					interrupt = false;
 				} else
-					disposeNext(current);
+					clearNext(current);
 			}
 			var entry : TrackEntry = trackEntry(trackIndex, animation, loop, current);
 			setCurrent(trackIndex, entry, interrupt);
@@ -609,7 +604,8 @@ package spine.animation {
 			return entry;
 		}
 
-		private function disposeNext(entry : TrackEntry) : void {
+		/** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
+		public function clearNext(entry : TrackEntry) : void {
 			var next : TrackEntry = entry.next;
 			while (next != null) {
 				queue.dispose(next);

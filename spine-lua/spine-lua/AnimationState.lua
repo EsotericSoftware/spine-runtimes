@@ -284,7 +284,7 @@ function AnimationState:update (delta)
 					if current.trackLast >= current.trackEnd and current.mixingFrom == nil then
 						tracks[i] = nil
 						queue:_end(current)
-						self:disposeNext(current)
+						self:clearNext(current)
 						skip = true
 					end
 				end
@@ -679,7 +679,7 @@ function AnimationState:clearTrack (trackIndex)
 
 	queue:_end(current)
 
-	self:disposeNext(current)
+	self:clearNext(current)
 
 	local entry = current
 	while (true) do
@@ -694,10 +694,6 @@ function AnimationState:clearTrack (trackIndex)
 	tracks[current.trackIndex] = nil
 
 	queue:drain()
-end
-
-function AnimationState:clearNext (entry)
-	self:disposeNext(entry.next)
 end
 
 function AnimationState:setCurrent (index, current, interrupt)
@@ -739,11 +735,11 @@ function AnimationState:setAnimation (trackIndex, animation, loop)
 			tracks[trackIndex] = current.mixingFrom
 			queue:interrupt(current)
 			queue:_end(current)
-			self:disposeNext(current)
+			self:clearNext(current)
 			current = current.mixingFrom
 			interrupt = false
 		else
-			self:disposeNext(current)
+			self:clearNext(current)
 		end
 	end
 	local entry = self:trackEntry(trackIndex, animation, loop, current)
@@ -860,7 +856,7 @@ function AnimationState:trackEntry (trackIndex, animation, loop, last)
 	return entry
 end
 
-function AnimationState:disposeNext (entry)
+function AnimationState:clearNext (entry)
 	local _next = entry.next
 	local queue = self.queue
 	while _next do

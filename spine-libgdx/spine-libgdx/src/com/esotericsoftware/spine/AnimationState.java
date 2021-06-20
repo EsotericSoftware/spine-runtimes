@@ -150,7 +150,7 @@ public class AnimationState {
 				// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
 				tracks[i] = null;
 				queue.end(current);
-				disposeNext(current);
+				clearNext(current);
 				continue;
 			}
 			if (current.mixingFrom != null && updateMixingFrom(current, delta)) {
@@ -514,7 +514,7 @@ public class AnimationState {
 
 		queue.end(current);
 
-		disposeNext(current);
+		clearNext(current);
 
 		TrackEntry entry = current;
 		while (true) {
@@ -529,11 +529,6 @@ public class AnimationState {
 		tracks.set(current.trackIndex, null);
 
 		queue.drain();
-	}
-
-	/** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
-	public void clearNext (TrackEntry entry) {
-		disposeNext(entry.next);
 	}
 
 	private void setCurrent (int index, TrackEntry current, boolean interrupt) {
@@ -583,11 +578,11 @@ public class AnimationState {
 				tracks.set(trackIndex, current.mixingFrom);
 				queue.interrupt(current);
 				queue.end(current);
-				disposeNext(current);
+				clearNext(current);
 				current = current.mixingFrom;
 				interrupt = false; // mixingFrom is current again, but don't interrupt it twice.
 			} else
-				disposeNext(current);
+				clearNext(current);
 		}
 		TrackEntry entry = trackEntry(trackIndex, animation, loop, current);
 		setCurrent(trackIndex, entry, interrupt);
@@ -730,7 +725,8 @@ public class AnimationState {
 		return entry;
 	}
 
-	private void disposeNext (TrackEntry entry) {
+	/** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
+	public void clearNext (TrackEntry entry) {
 		TrackEntry next = entry.next;
 		while (next != null) {
 			queue.dispose(next);

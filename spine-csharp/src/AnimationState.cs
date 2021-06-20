@@ -170,7 +170,7 @@ namespace Spine {
 					// Clear the track when there is no next entry, the track end time is reached, and there is no mixingFrom.
 					tracksItems[i] = null;
 					queue.End(current);
-					DisposeNext(current);
+					ClearNext(current);
 					continue;
 				}
 				if (current.mixingFrom != null && UpdateMixingFrom(current, delta)) {
@@ -615,7 +615,7 @@ namespace Spine {
 
 			queue.End(current);
 
-			DisposeNext(current);
+			ClearNext(current);
 
 			TrackEntry entry = current;
 			while (true) {
@@ -630,12 +630,6 @@ namespace Spine {
 			tracks.Items[current.trackIndex] = null;
 
 			queue.Drain();
-		}
-
-		/// <summary>
-		/// Removes the <see cref="TrackEntry.Next">next entry</see> and all entries after it for the specified entry.</summary>
-		public void ClearNext (TrackEntry entry) {
-			DisposeNext(entry.next);
 		}
 
 		/// <summary>Sets the active TrackEntry for a given track number.</summary>
@@ -683,11 +677,11 @@ namespace Spine {
 					tracks.Items[trackIndex] = current.mixingFrom;
 					queue.Interrupt(current);
 					queue.End(current);
-					DisposeNext(current);
+					ClearNext(current);
 					current = current.mixingFrom;
 					interrupt = false; // mixingFrom is current again, but don't interrupt it twice.
 				} else
-					DisposeNext(current);
+					ClearNext(current);
 			}
 			TrackEntry entry = NewTrackEntry(trackIndex, animation, loop, current);
 			SetCurrent(trackIndex, entry, interrupt);
@@ -836,8 +830,8 @@ namespace Spine {
 			return entry;
 		}
 
-		/// <summary>Dispose all track entries queued after the given TrackEntry.</summary>
-		private void DisposeNext (TrackEntry entry) {
+		/// <summary>Removes the <see cref="TrackEntry.Next">next entry</see> and all entries after it for the specified entry.</summary>
+		public void ClearNext (TrackEntry entry) {
 			TrackEntry next = entry.next;
 			while (next != null) {
 				queue.Dispose(next);
