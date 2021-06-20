@@ -233,7 +233,7 @@ module spine {
 			this.bg.setFromString(config.backgroundColor);
 			this.bgFullscreen.setFromString(config.fullScreenBackgroundColor);
 
-			let controls = !config.showControls ? null : /*html*/`
+			let controls = !config.showControls ? "" : /*html*/`
 <div class="spine-player-controls spine-player-popup-parent spine-player-controls-hidden">
 <div class="spine-player-timeline"></div>
 <div class="spine-player-buttons">
