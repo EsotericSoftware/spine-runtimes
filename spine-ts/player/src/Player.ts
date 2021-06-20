@@ -140,6 +140,9 @@ module spine {
 		/* Optional: Callback when the skeleton could not be loaded or rendered. Default: none */
 		error: (player: SpinePlayer, msg: string) => void
 
+		/* Optional: Callback at the start of each frame, before the skeleton is posed or drawn. Default: none */
+		frame: (player: SpinePlayer) => void
+
 		/* Optional: Callback just after the skeleton is posed each frame. Default: none */
 		update: (player: SpinePlayer) => void
 
@@ -718,6 +721,8 @@ module spine {
 					// Resize the canvas.
 					let renderer = this.sceneRenderer;
 					renderer.resize(webgl.ResizeMode.Expand);
+
+					if (config.frame) config.frame(this);
 
 					// Update animation time and pose the skeleton.
 					if (!this.paused) {
