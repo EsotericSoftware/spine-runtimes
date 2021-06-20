@@ -8,14 +8,14 @@ var spritesheetsDemo = function(canvas, bgColor) {
 	var skeletonAtlas;
 	var viewportWidth, viewportHeight;
 	var frames = [], currFrame = 0, frameTime = 0, frameScale = 0, FPS = 30;
-	var timeKeeper, loadingScreen, input;
+	var timeKeeper, input;
 	var playTime = 0, framePlaytime = 0, clickAnim = 0;
 
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.ctx.gl;
+		gl = canvas.context.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);

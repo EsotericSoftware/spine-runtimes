@@ -1,7 +1,7 @@
 var skinsDemo = function(canvas, bgColor) {
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, offset, bounds;
-	var timeKeeper, loadingScreen;
+	var timeKeeper;
 	var playButton, timeLine, isPlaying = true, playTime = 0;
 	var randomizeSkins, lastSkinChange = Date.now() / 1000, clickAnim = 0;
 
@@ -9,7 +9,7 @@ var skinsDemo = function(canvas, bgColor) {
 
 	function init () {
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.ctx.gl;
+		gl = canvas.context.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);

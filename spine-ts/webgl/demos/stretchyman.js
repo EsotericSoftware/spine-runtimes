@@ -6,7 +6,7 @@ var stretchymanDemo = function(canvas, bgColor) {
 
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, bounds, state;
-	var timeKeeper, loadingScreen;
+	var timeKeeper;
 	var target = null;
 	var hoverTargets = [];
 	var controlBones = [
@@ -25,7 +25,7 @@ var stretchymanDemo = function(canvas, bgColor) {
 
 	function init () {
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.ctx.gl;
+		gl = canvas.context.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);

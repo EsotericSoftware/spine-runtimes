@@ -44,30 +44,22 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 	}
 
 	function renderDemo(demo) {
-		var canvas = demo.canvas;
-		if (!demo.assetManager.isLoadingComplete()) {
-			if (demo.visible) {
-				if (canvas.parentElement != demo.placeholder) {
-					$(canvas).detach();
-					demo.placeholder.appendChild(canvas);
-				}
-				demo.loadingScreen.draw();
+		if (demo.visible) {
+			var canvas = demo.canvas;
+			if (canvas.parentElement != demo.placeholder) {
+				$(canvas).detach();
+				demo.placeholder.appendChild(canvas);
 			}
-		} else {
-			if (!demo.loaded) {
-				demo.loadingComplete();
-				demo.loaded = true;
-			}
-
-			if (demo.visible) {
-				if (canvas.parentElement != demo.placeholder) {
-					$(canvas).detach();
-					demo.placeholder.appendChild(canvas);
+			let complete = demo.assetManager.isLoadingComplete();
+			if (complete) {
+				if (!demo.loaded) {
+					demo.loaded = true;
+					demo.loadingComplete();
 				}
-				if (spineDemos.log) console.log("Rendering " + canvas.id);
+				if (spineDemos.log) console.log("Rendering: " + canvas.id);
 				demo.render();
-				demo.loadingScreen.draw(true);
 			}
+			demo.loadingScreen.draw(complete);
 		}
 	}
 
@@ -85,7 +77,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 		for (var i = 0; i < numCanvases; i++) {
 			var canvas = document.createElement("canvas");
 			canvas.width = 1; canvas.height = 1;
-			canvas.ctx = new spine.webgl.ManagedWebGLRenderingContext(canvas, { alpha: false });
+			canvas.context = new spine.webgl.ManagedWebGLRenderingContext(canvas, { alpha: false });
 			canvas.id = "canvas-" + i;		
 			spineDemos.canvases.push(canvas);
 		}
@@ -107,7 +99,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 		demo.placeholder = placeholder;
 		demo.canvas = canvas;
 		demo.visible = false;
-		var renderer = new spine.webgl.SceneRenderer(canvas, canvas.ctx.gl);
+		var renderer = new spine.webgl.SceneRenderer(canvas, canvas.context.gl);
 		demo.loadingScreen = new spine.webgl.LoadingScreen(renderer);
 		$(window).on('DOMContentLoaded load resize scroll', function() {
 			checkElementVisible(demo);

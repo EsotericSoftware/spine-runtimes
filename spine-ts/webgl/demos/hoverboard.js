@@ -6,7 +6,7 @@ var hoverboardDemo = function(canvas, bgColor) {
 
 	var gl, renderer, input, assetManager;
 	var skeleton, state, bounds;
-	var timeKeeper, loadingScreen;
+	var timeKeeper;
 	var target = null;
 	var hoverTargets = [];
 	var controlBones = ["hoverboard controller", "hip controller", "board target", "crosshair"];
@@ -17,7 +17,7 @@ var hoverboardDemo = function(canvas, bgColor) {
 
 	function init () {
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.ctx.gl;
+		gl = canvas.context.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);

@@ -14,7 +14,7 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 		timeSliderLabel = $("#transitions-timeslider-label")[0];
 
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.ctx.gl;
+		gl = canvas.context.gl;
 
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);

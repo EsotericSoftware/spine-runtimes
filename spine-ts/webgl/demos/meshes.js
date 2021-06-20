@@ -1,7 +1,7 @@
 var meshesDemo = function(canvas, bgColor) {
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, bounds;
-	var timeKeeper, loadingScreen;
+	var timeKeeper;
 	var skeletons = {};
 	var activeSkeleton = "Orange Girl";
 	var playButton, timeline, isPlaying = true;
@@ -10,7 +10,7 @@ var meshesDemo = function(canvas, bgColor) {
 
 	function init () {
 		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
-		gl = canvas.ctx.gl;
+		gl = canvas.context.gl;
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
