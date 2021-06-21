@@ -1,46 +1,77 @@
 # 4.0
 
 ## AS3
-* **Breaking changes**
+**NOTE: Spine 4.0 will be the last release supporting spine-as3. Starting from Spine 4.1, spine-as3 will no longer be supported or maintained.**
 * Switched projects from FDT to Visual Studio Code. See updated `README.md` files for instructions.
-
-* **Additions**
+* Expose non-essential colors on bones, bounding box, clipping, and path attachments.
+* Timeline API has been extended to support component-wise timelines exported by Spine 4.0.
+* Added `AnimationState.clearNext()` which removes the given `TrackEntry` and all entries after it.
+* Added support for texture atlas key value pairs, see `AtlasRegion.names` and `AtlasRegion.values`.
+* Added support for reverse animation playback via `TrackEntry.reverse`.
+* Added proportional spacing mode support for path constraints.
+* Added support for uniform scaling for two bone IK.
+* Fixed applying a constraint reverting changes from other constraints.
 
 ### Starling
+**NOTE: Spine 4.0 will be the last release supporting spine-starling. Starting from Spine 4.1, spine-starling will no longer be supported or maintained.**
 * Switched projects from FDT to Visual Studio Code. See updated `README.md` files for instructions.
 
 ## C
-* **Breaking changes**
-* **Additions**
+* **Breaking change:** Removed `SPINE_SHORT_NAMES` define and C++ constructors.
+* Timeline API has been extended to support component-wise timelines exported by Spine 4.0.
+* Added `spAnimationState_clearNext()` which removes the given `spTrackEntry` and all entries after it.
+* Added support for texture atlas key value pairs, see `spAtlasRegion.keyValues`.
+* Added support for reverse animation playback via `spTrackEntry.reverse`.
+* Added proportional spacing mode support for path constraints.
+* Added support for uniform scaling for two bone IK.
+* Fixed applying a constraint reverting changes from other constraints.
 
 ### Cocos2d-Objc
+**NOTE: Spine 4.0 will be the last release supporting spine-cocos2d-objc. Starting from Spine 4.1, spine-cocos2d-objc will no longer be supported or maintained.**
 
 ### SFML
+* Added `ikDemo()` in `main.cpp`. to illustrate how to drive a bone and IK chain through mouse movement.
 
 ## C++
-* **Breaking Changes**
-
-* **Additions**
 * Removed dependency on STL throughout the code base, cutting down on the LOC that need parsing by 66%.
 * Exposed `x` and `y` on `SkeletonData` through getters and setters.
+* Expose non-essential colors on bones, bounding box, clipping, and path attachments.
+* Timeline API has been extended to support component-wise timelines exported by Spine 4.0.
+* Added `AnimationState.clearNext()` which removes the given `TrackEntry` and all entries after it.
+* Added support for texture atlas key value pairs, see `AtlasRegion.names` and `AtlasRegion.values`.
+* Added support for reverse animation playback via `TrackEntry.reverse`.
+* Added proportional spacing mode support for path constraints.
+* Added support for uniform scaling for two bone IK.
+* Fixed applying a constraint reverting changes from other constraints.
 
 ### Cocos2d-x
 * Added `IKExample` scene to illustrate how to drive a bone and IK chain through mouse movement.
 * Added `SkeletonAnimation::setPreUpdateWorldTransformsListener()` and `SkeletonAnimation::setPostUpdateWorldTransformsListener()`. This allows users to modify bone transforms and other skeleton properties before and after the world transforms of all bones are calculated. See the `IKExample` for a usage example.
 
 ### SFML
+* Added `ikDemo()` in `main.cpp`. to illustrate how to drive a bone and IK chain through mouse movement.
 
 ### UE4
 * `SpineWidget` now supports the full widget transform, including rendering scale/shear.
 * Materials on `SkeletonRendererComponent` are now blueprint read and writeable. This allows setting dynamic material instances at runtime.
 * Added `InitialSkin` property to `USpineWidget`. This allows previewing different skins in the UMG Designer. Initial skins can still be overridden via blueprint events such as `On Initialized`.
-* **Breaking changes**: `SpineWidget` no longer has the `Scale` property. Instead the size x/y properties can be used.
+* **Breaking change:** `SpineWidget` no longer has the `Scale` property. Instead the size x/y properties can be used.
 * Added `SetSlotColor` on `USpineSkeletonComponent` to easily set the color of a slot via blueprints.
+* Changed mixes set on an `SkeletonDataAsset` will now be applied to instances of `USpineSkeletonComponent`.
+* Generated normals are now correctly flipped for back faces.
+* Modifying parent materials updates material instances accordingly.
+* Only `.json` files that are actually encoding Spine skeletons will be loaded. Other `.json` files will be left to other importers.
+* Updated example project to UE 4.25.
+
 
 ## C# ##
-* **Breaking changes**
-
-* **Additions**
+* Timeline API has been extended to support component-wise timelines exported by Spine 4.0.
+* Added `AnimationState.clearNext()` which removes the given `TrackEntry` and all entries after it.
+* Added support for texture atlas key value pairs, see `AtlasRegion.names` and `AtlasRegion.values`.
+* Added support for reverse animation playback via `TrackEntry.Reverse`.
+* Added proportional spacing mode support for path constraints.
+* Added support for uniform scaling for two bone IK.
+* Fixed applying a constraint reverting changes from other constraints.
 
 ### Unity
 
@@ -110,41 +141,71 @@
 
 ### XNA/MonoGame
 * Added normalmap support via `SpineEffectNormalmap` and support for loading multiple texture layers following a suffix-pattern. Please see the example code on how to use them.
+* Added `Z` property to `SkeletonRenderer` to provide a constant Z offset that's added to all vertices.
+* Added `ZSpacing` property to `SkeletonRenderer` to allow specifying the distance on the z-axis between attachments.
+* SkeletonDebugRenderer bone color attributes are now public and modifiable by user.
+
 
 ## Java
-* **Breaking changes**
-
-* **Additions**
+* Timeline API has been extended to support component-wise timelines exported by Spine 4.0.
+* Added `AnimationState.clearNext()` which removes the given `TrackEntry` and all entries after it.
+* Added support for texture atlas key value pairs, see `Region.names` and `Region.values`.
+* Added support for reverse animation playback via `TrackEntry.getReverse()` and `TrackEntry.setReverse()`.
+* Added proportional spacing mode support for path constraints.
+* Added support for uniform scaling for two bone IK.
+* Fixed applying a constraint reverting changes from other constraints.
 
 ### libGDX
+* Exposed colors in `SkeletonRendererDebug`.
+* Updated to libGDX 1.10.0.
 
 ## Lua
-* **Breaking changes**
-
-* **Additions**
+* Expose non-essential colors on bones, bounding box, clipping, and path attachments.
+* Timeline API has been extended to support component-wise timelines exported by Spine 4.0.
+* Added `AnimationState.clearNext()` which removes the given `TrackEntry` and all entries after it.
+* Added support for texture atlas key value pairs, see `AtlasRegion.names` and `AtlasRegion.values`.
+* Added support for reverse animation playback via `TrackEntry.reverse`.
+* Added proportional spacing mode support for path constraints.
+* Added support for uniform scaling for two bone IK.
+* Fixed applying a constraint reverting changes from other constraints.
 
 ### Love2D
 
 ### Corona
-* **Breaking changes**
-* spine-corona has been renamed to spine-solar2d. Change your `require "spine-corona.spine"` statements to `require "spine-solar2d.spine"`
+* **Breaking change:** spine-corona has been renamed to spine-solar2d. Change your `require "spine-corona.spine"` statements to `require "spine-solar2d.spine"`
 
 ## Typescript/Javascript
-* **Breaking changes**
 * Updated runtime to be compatible with TypeScript 3.6.3.
 * Added `AssetManager#setRawDataURI(path, data)`. Allows to set raw data URIs for a specific path, which in turn enables embedding assets into JavaScript/HTML.
-
-* **Additions**
+* Expose non-essential colors on bones, bounding box, clipping, and path attachments.
+* Timeline API has been extended to support component-wise timelines exported by Spine 4.0.
+* Added `AnimationState.clearNext()` which removes the given `TrackEntry` and all entries after it.
+* Added support for texture atlas key value pairs, see `AtlasRegion.names` and `AtlasRegion.values`.
+* Added support for reverse animation playback via `TrackEntry.reverse`.
+* Added proportional spacing mode support for path constraints.
+* Added support for uniform scaling for two bone IK.
+* Fixed applying a constraint reverting changes from other constraints.
+* `AssetManager` constructor now takes an option `Downloader` instance. Used to download assets only once and share them between `AssetManager` instances.
+* Added web worker support to `AssetManager`.
+* Added various default parameters to `AnimationState` methods for ease of use.
+* 
 
 ### WebGL backend
+* **Breaking change:** removed `SharedAssetManager`. Use `AssetManager` with a shared `Downloader` instance instead.
 
 ### Canvas backend
+* Renderer now accounts for whitespace stripping.
 
 ### Three.js backend
 * `SkeletonMesh` now takes an optional `SkeletonMeshMaterialParametersCustomizer` function that allows you to modify the `ShaderMaterialParameters` before the material is finalized. Use it to modify things like THREEJS' `Material.depthTest` etc. See #1590.
 
 ### Player
-* Added `SpinePlayerConfig#rawDataURIs`. Allows to embed data URIs for skeletons, atlases and atlas page images directly in the HTML/JS without needing to load it from a separate file. See the example for a demonstration.
+* Added `SpinePlayerConfig.rawDataURIs`. Allows to embed data URIs for skeletons, atlases and atlas page images directly in the HTML/JS without needing to load it from a separate file. See the example for a demonstration.
+* Added `SpinePlayerConfig.frame`. If set, the callback is called each frame, before the skeleton is posed or drawn.
+* Added `SpinePlayerConfig.update`. If set, the callback is called each frame, just after the skeleton is posed.
+* Added `SpinePlayerConfig.draw`. If set, the callback is called each frame, just after the skeleton is drawn.
+* Added `SpinePlayerConfig.downloader`. The `spine.Downloader` instance can be shared between players so assets are only downloaded once.
+* If `SpinePlayerConfig.jsonURL` ends with an anchor, the anchor text is used to find the skeleton in the specified JSON file.
 
 # 3.8
 
