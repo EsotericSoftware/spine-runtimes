@@ -33,5 +33,5 @@ if((${SPINE_COCOS2D_X}) OR (${CMAKE_CURRENT_BINARY_DIR} MATCHES "spine-cocos2dx"
 	add_subdirectory(spine-cocos2dx)
 endif()
 
-add_subdirectory(spine-c/spine-c-unit-tests)
+# add_subdirectory(spine-c/spine-c-unit-tests)
 add_subdirectory(spine-cpp/spine-cpp-unit-tests)

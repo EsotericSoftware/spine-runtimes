@@ -383,7 +383,7 @@ void AnimationState::update(float delta) {
 			_tracks[i] = NULL;
 
 			_queue->end(currentP);
-			disposeNext(currentP);
+			clearNext(currentP);
 			continue;
 		}
 
@@ -513,7 +513,7 @@ void AnimationState::clearTrack(size_t trackIndex) {
 
 	_queue->end(current);
 
-	disposeNext(current);
+    clearNext(current);
 
 	TrackEntry *entry = current;
 	while (true) {
@@ -548,11 +548,11 @@ TrackEntry *AnimationState::setAnimation(size_t trackIndex, Animation *animation
 			_tracks[trackIndex] = current->_mixingFrom;
 			_queue->interrupt(current);
 			_queue->end(current);
-			disposeNext(current);
+            clearNext(current);
 			current = current->_mixingFrom;
 			interrupt = false;
 		} else {
-			disposeNext(current);
+            clearNext(current);
 		}
 	}
 
@@ -911,10 +911,6 @@ void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
 	}
 }
 
-void AnimationState::clearNext(TrackEntry *entry) {
-	disposeNext(entry->_next);
-}
-
 void AnimationState::setCurrent(size_t index, TrackEntry *current, bool interrupt) {
 	TrackEntry *from = expandToIndex(index);
 	_tracks[index] = current;
@@ -979,7 +975,7 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 	return entryP;
 }
 
-void AnimationState::disposeNext(TrackEntry *entry) {
+void AnimationState::clearNext(TrackEntry *entry) {
 	TrackEntry *next = entry->_next;
 	while (next != NULL) {
 		_queue->dispose(next);

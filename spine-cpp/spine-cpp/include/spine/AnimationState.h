@@ -480,9 +480,6 @@ namespace spine {
 		/// @param last May be NULL.
 		TrackEntry *newTrackEntry(size_t trackIndex, Animation *animation, bool loop, TrackEntry *last);
 
-		/// Dispose all track entries queued after the given TrackEntry.
-		void disposeNext(TrackEntry *entry);
-
 		void animationsChanged();
 
 		void computeHold(TrackEntry *entry);

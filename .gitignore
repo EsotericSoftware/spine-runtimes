@@ -143,3 +143,4 @@ spine-ue4/SpineUE4.VC.VC.opendb
 .gradle/
 *.iml
 */out/
+cmake-build-debug-visual-studio

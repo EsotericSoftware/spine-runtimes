@@ -79,12 +79,6 @@ void spKeyValueArray_addAllValues(spKeyValueArray *self, spKeyValue *values, int
 	for (; i < n; i++) { spKeyValueArray_add(self, values[i]); }
 }
 
-void spKeyValueArray_removeAt(spKeyValueArray *self, int index) {
-	self->size--;
-	__builtin___memmove_chk(self->items + index, self->items + index + 1, sizeof(spKeyValue) * (self->size - index),
-							__builtin_object_size(self->items + index, 0));
-}
-
 int spKeyValueArray_contains(spKeyValueArray *self, spKeyValue value) {
 	spKeyValue *items = self->items;
 	int i, n;

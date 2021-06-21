@@ -78,8 +78,6 @@ spTrackEntry *
 _spAnimationState_trackEntry(spAnimationState *self, int trackIndex, spAnimation *animation, int /*boolean*/ loop,
 							 spTrackEntry *last);
 
-void _spAnimationState_disposeNext(spAnimationState *self, spTrackEntry *entry);
-
 void _spAnimationState_animationsChanged(spAnimationState *self);
 
 float *_spAnimationState_resizeTimelinesRotation(spTrackEntry *entry, int newSize);
@@ -321,7 +319,7 @@ void spAnimationState_update(spAnimationState *self, float delta) {
 			if (current->trackLast >= current->trackEnd && current->mixingFrom == 0) {
 				self->tracks[i] = 0;
 				_spEventQueue_end(internal->queue, current);
-				_spAnimationState_disposeNext(self, current);
+				spAnimationState_clearNext(self, current);
 				continue;
 			}
 		}
@@ -742,10 +740,6 @@ void _spAnimationState_queueEvents(spAnimationState *self, spTrackEntry *entry, 
 	}
 }
 
-void spAnimationState_clearNext(spTrackEntry *entry) {
-	_spAnimationState_disposeTrackEntry(entry);
-}
-
 void spAnimationState_clearTracks(spAnimationState *self) {
 	_spAnimationState *internal = SUB_CAST(_spAnimationState, self);
 	int i, n, oldDrainDisabled;
@@ -770,7 +764,7 @@ void spAnimationState_clearTrack(spAnimationState *self, int trackIndex) {
 
 	_spEventQueue_end(internal->queue, current);
 
-	_spAnimationState_disposeNext(self, current);
+    spAnimationState_clearNext(self, current);
 
 	entry = current;
 	while (1) {
@@ -827,11 +821,11 @@ spAnimationState_setAnimation(spAnimationState *self, int trackIndex, spAnimatio
 			self->tracks[trackIndex] = current->mixingFrom;
 			_spEventQueue_interrupt(internal->queue, current);
 			_spEventQueue_end(internal->queue, current);
-			_spAnimationState_disposeNext(self, current);
+            spAnimationState_clearNext(self, current);
 			current = current->mixingFrom;
 			interrupt = 0;
 		} else
-			_spAnimationState_disposeNext(self, current);
+            spAnimationState_clearNext(self, current);
 	}
 	entry = _spAnimationState_trackEntry(self, trackIndex, animation, loop, current);
 	_spAnimationState_setCurrent(self, trackIndex, entry, interrupt);
@@ -957,7 +951,7 @@ _spAnimationState_trackEntry(spAnimationState *self, int trackIndex, spAnimation
 	return entry;
 }
 
-void _spAnimationState_disposeNext(spAnimationState *self, spTrackEntry *entry) {
+void spAnimationState_clearNext(spAnimationState *self, spTrackEntry *entry) {
 	_spAnimationState *internal = SUB_CAST(_spAnimationState, self);
 	spTrackEntry *next = entry->next;
 	while (next) {
