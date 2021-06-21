@@ -76,11 +76,26 @@
 ### Unity
 
 * **Breaking changes**
-  * Removed all `Spine.Unity.AttachmentTools.SkinUtilities` Skin extension methods. These have become obsoleted and error-prone since the introduction of the new Skin API in 3.8. To fix any compile errors, replace any usage of `Skin` extension methods with their counterparts, e.g. replace occurrances of `skin.AddAttachments()` with `skin.AddSkin()`.
+  * Removed all `Spine.Unity.AttachmentTools.SkinUtilities` Skin extension methods. These have become obsoleted and error-prone since the introduction of the new Skin API in 3.8. To fix any compile errors, replace any usage of `Skin` extension methods with their counterparts, e.g. replace occurrances of `skin.AddAttachments()` with `skin.AddSkin()`. Please see the example scene `Mix and Match Skins` on how to use the new Skin API to combine skins, or the updated old example scenes `Mix and Match` and `Mix and Match Equip` on how you can update an existing project using the old workflow. If you are using `skeletonAnimation.Skeleton.UnshareSkin()` in your code, you can replace it with `Skin customSkin = new Skin("custom skin"); customSkin.AddSkin(skeletonAnimation.Skeleton.Skin);`.
   * Removed redundant `Spine.Unity.AttachmentTools.AttachmentCloneExtensions` extension methods `Attachment.GetCopy()` and `Attachment.GetLinkedMesh()`. To fix any compile errors, replace any occurrances with `Attachment.Copy()` and `Attachment.NewLinkedMesh()`.
   * Removed rarely used `Spine.Unity.AttachmentTools.AttachmentRegionExtensions` extension methods `Attachment.GetRegion()`. Use `Attachment.RendererObject as AtlasRegion` instead.
-  * Removed redundant `Spine.SkeletonExtensions` extension methods `Skeleton.Set*ToSetupPose()`. Also removed less commonly used extension methods `TrackEntry.AllowImmediateQueue()` and `Attachment.IsRenderable()`.
-  * `Skin.Attachments` now replaces `Skin.GetAttachments()`, returning an `ICollection<SkinEntry>`. This makes access more consistent and intuitive. To fix any compile errors, replace any occurrances of `skin.GetAttachments()` by `skin.Attachments`.
+  * Removed redundant `Spine.SkeletonExtensions` extension methods:  
+    Replace:
+    * `Skeleton.SetPropertyToSetupPose()`
+    * `Skeleton.SetDrawOrderToSetupPose()`
+    * `Skeleton.SetSlotAttachmentsToSetupPose()`
+    * `Skeleton.SetSlotAttachmentToSetupPose()`
+
+    with `Skeleton.SetSlotsToSetupPose()`.  
+    Replace:
+     * `Slot.SetColorToSetupPose()`
+     * `Slot.SetAttachmentToSetupPose()`
+
+    with `Slot.SetToSetupPose()`.
+
+    Also removed less commonly used extension methods:
+    `TrackEntry.AllowImmediateQueue()`, `Animation.SetKeyedItemsToSetupPose()` and `Attachment.IsRenderable()`.
+  * `Skin.GetAttachments()` has been replaced by `Skin.Attachments`, returning an `ICollection<SkinEntry>`. This makes access more consistent and intuitive. To fix any compile errors, replace any occurrances of `Skin.GetAttachments()` by `Skin.Attachments`.
   * Reverted changes: `BoneFollower` property `followLocalScale` has intermediately been renamed to `followScale` but was renamed back to `followLocalScale`. Serialized values (scenes and prefabs) will automatically be upgraded, only code accessing `followScale` needs to be adapted.
   * Corrected blending behaviour of all `Sprite` shaders in `Premultiply Alpha` blend mode (including URP and LWRP packages). Previously vertex color alpha was premultiplied again, even though `Premultiply Alpha` blend mode assumes PMA texture and PMA vertex color input. Slot-alpha blending will thus be correctly lighter after upgrading to 4.0. If you have compensated this problem by disabling `Advanced - PMA Vertex Colors` you can now re-enable this parameter, also allowing for rendering Additive slots in a single pass.
   * Corrected all `Outline` shaders outline thickness when `Advanced - Sample 8 Neighbourhood` is disabled (thus using `4 Neighbourhood`). Previously weighting was incorrectly thick (4x as thick) compared to 8 neighbourhood, now it is more consistent. This might require adjustment of all your outline materials where `Sample 8 Neighbourhood` is disabled to restore the previous outline thickness, by adjusting the `Outline Threshold` parameter through adding a `/4` to make the threshold 4 times smaller.
