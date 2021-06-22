@@ -182,6 +182,11 @@ module spine {
 			return null;
 		}
 
+		setTextures (assetManager: AssetManager, pathPrefix: string = "") {
+			for (let page of this.pages)
+				page.setTexture(assetManager.get(pathPrefix + page.name));
+		}
+
 		dispose () {
 			for (let i = 0; i < this.pages.length; i++) {
 				this.pages[i].texture.dispose();

@@ -848,6 +848,7 @@ declare module spine {
 		regions: TextureAtlasRegion[];
 		constructor(atlasText: string);
 		findRegion(name: string): TextureAtlasRegion;
+		setTextures(assetManager: AssetManager, pathPrefix?: string): void;
 		dispose(): void;
 	}
 	class TextureAtlasPage {

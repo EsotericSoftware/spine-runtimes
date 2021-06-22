@@ -137,7 +137,8 @@ module spine {
 			success: (path: string, atlas: TextureAtlas) => void = null,
 			error: (path: string, message: string) => void = null
 		) {
-			let parent = path.lastIndexOf("/") >= 0 ? path.substring(0, path.lastIndexOf("/")) : "";
+			let index = path.lastIndexOf("/");
+			let parent = index >= 0 ? path.substring(0, index + 1) : "";
 			path = this.start(path);
 
 			this.downloader.downloadText(path, (atlasText: string): void => {
@@ -145,7 +146,7 @@ module spine {
 					let atlas = new TextureAtlas(atlasText);
 					let toLoad = atlas.pages.length, abort = false;
 					for (let page of atlas.pages) {
-						this.loadTexture(parent == "" ? page.name : parent + "/" + page.name,
+						this.loadTexture(parent + page.name,
 							(imagePath: string, texture: Texture) => {
 								if (!abort) {
 									page.setTexture(texture);

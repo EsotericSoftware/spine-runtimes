@@ -2866,14 +2866,15 @@ var spine;
 			var _this = this;
 			if (success === void 0) { success = null; }
 			if (error === void 0) { error = null; }
-			var parent = path.lastIndexOf("/") >= 0 ? path.substring(0, path.lastIndexOf("/")) : "";
+			var index = path.lastIndexOf("/");
+			var parent = index >= 0 ? path.substring(0, index + 1) : "";
 			path = this.start(path);
 			this.downloader.downloadText(path, function (atlasText) {
 				try {
 					var atlas_1 = new spine.TextureAtlas(atlasText);
 					var toLoad_1 = atlas_1.pages.length, abort_1 = false;
 					var _loop_1 = function (page) {
-						_this.loadTexture(parent == "" ? page.name : parent + "/" + page.name, function (imagePath, texture) {
+						_this.loadTexture(parent + page.name, function (imagePath, texture) {
 							if (!abort_1) {
 								page.setTexture(texture);
 								if (--toLoad_1 == 0)
@@ -7501,6 +7502,13 @@ var spine;
 				}
 			}
 			return null;
+		};
+		TextureAtlas.prototype.setTextures = function (assetManager, pathPrefix) {
+			if (pathPrefix === void 0) { pathPrefix = ""; }
+			for (var _i = 0, _a = this.pages; _i < _a.length; _i++) {
+				var page = _a[_i];
+				page.setTexture(assetManager.get(pathPrefix + page.name));
+			}
 		};
 		TextureAtlas.prototype.dispose = function () {
 			for (var i = 0; i < this.pages.length; i++) {

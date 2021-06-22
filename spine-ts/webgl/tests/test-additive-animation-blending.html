@@ -45,9 +45,8 @@
 
 		function load () {
 			if (assetManager.isLoadingComplete()) {
-				var atlas = new spine.TextureAtlas(assetManager.get("owl-pma.atlas"), function(path) {
-					return assetManager.get(path);
-				});
+				var atlas = new spine.TextureAtlas(assetManager.get("owl-pma.atlas"));
+				atlas.setTextures(assetManager);
 				var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 				var skeletonJson = new spine.SkeletonJson(atlasLoader);
 				skeletonJson.scale = 0.5;
@@ -57,17 +56,18 @@
 				animationStateData.defaultMix = 0.3;
 				animationState = new spine.AnimationState(animationStateData);
 
-				animationState.setAnimation(0, "blink", true);
-				upEntry = animationState.setAnimation(1, "up", true);
+				animationState.setAnimation(0, "idle", true);
+				animationState.setAnimation(1, "blink", true);
+				upEntry = animationState.setAnimation(2, "up", true);
 				upEntry.alpha = 0;
 				upEntry.mixBlend = spine.MixBlend.add;
-				downEntry = animationState.setAnimation(2, "down", true);
+				downEntry = animationState.setAnimation(3, "down", true);
 				downEntry.alpha = 0;
 				downEntry.mixBlend = spine.MixBlend.add;
-				leftEntry = animationState.setAnimation(3, "left", true);
+				leftEntry = animationState.setAnimation(4, "left", true);
 				leftEntry.alpha = 0;
 				leftEntry.mixBlend = spine.MixBlend.add;
-				rightEntry = animationState.setAnimation(4, "right", true);
+				rightEntry = animationState.setAnimation(5, "right", true);
 				rightEntry.alpha = 0;
 				rightEntry.mixBlend = spine.MixBlend.add;
 
@@ -80,6 +80,7 @@
 		function render () {
 			time.update();
 			animationState.update(time.delta);
+			skeleton.setToSetupPose(); // Or key all bones used in the additive animations in a lower track, like idle.
 			animationState.apply(skeleton);
 			skeleton.y = -canvas.height / 2 / 2;
 			skeleton.updateWorldTransform();
