@@ -1258,6 +1258,7 @@ declare module spine {
 declare module spine.webgl {
 	class AssetManager extends spine.AssetManager {
 		constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, pathPrefix?: string, downloader?: Downloader);
+		protected createTexture(context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap): Texture;
 	}
 }
 declare module spine.webgl {
@@ -1283,7 +1284,7 @@ declare module spine.webgl {
 }
 declare module spine.webgl {
 	class GLTexture extends Texture implements Disposable, Restorable {
-		private context;
+		context: ManagedWebGLRenderingContext;
 		private texture;
 		private boundUnit;
 		private useMipMaps;
@@ -1726,6 +1727,7 @@ declare module spine {
 			width: number;
 			height: number;
 		};
+		mipmaps: true;
 		controlBones: string[];
 		success: (player: SpinePlayer) => void;
 		error: (player: SpinePlayer, msg: string) => void;

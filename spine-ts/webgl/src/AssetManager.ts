@@ -30,9 +30,11 @@
 module spine.webgl {
 	export class AssetManager extends spine.AssetManager {
 		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, pathPrefix: string = "", downloader: Downloader = null) {
-			super((image: HTMLImageElement | ImageBitmap) => {
-				return new spine.webgl.GLTexture(context, image);
-			}, pathPrefix, downloader);
+			super((image: HTMLImageElement | ImageBitmap) => this.createTexture(context, image), pathPrefix, downloader);
+		}
+
+		protected createTexture (context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap): Texture {
+			return new spine.webgl.GLTexture(context, image);
 		}
 	}
 }

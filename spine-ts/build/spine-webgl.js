@@ -8991,10 +8991,12 @@ var spine;
 			function AssetManager(context, pathPrefix, downloader) {
 				if (pathPrefix === void 0) { pathPrefix = ""; }
 				if (downloader === void 0) { downloader = null; }
-				return _super.call(this, function (image) {
-					return new spine.webgl.GLTexture(context, image);
-				}, pathPrefix, downloader) || this;
+				var _this = _super.call(this, function (image) { return _this.createTexture(context, image); }, pathPrefix, downloader) || this;
+				return _this;
 			}
+			AssetManager.prototype.createTexture = function (context, image) {
+				return new spine.webgl.GLTexture(context, image);
+			};
 			return AssetManager;
 		}(spine.AssetManager));
 		webgl.AssetManager = AssetManager;

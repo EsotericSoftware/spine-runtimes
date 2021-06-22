@@ -9241,10 +9241,12 @@ var spine;
 			function AssetManager(context, pathPrefix, downloader) {
 				if (pathPrefix === void 0) { pathPrefix = ""; }
 				if (downloader === void 0) { downloader = null; }
-				return _super.call(this, function (image) {
-					return new spine.webgl.GLTexture(context, image);
-				}, pathPrefix, downloader) || this;
+				var _this = _super.call(this, function (image) { return _this.createTexture(context, image); }, pathPrefix, downloader) || this;
+				return _this;
 			}
+			AssetManager.prototype.createTexture = function (context, image) {
+				return new spine.webgl.GLTexture(context, image);
+			};
 			return AssetManager;
 		}(spine.AssetManager));
 		webgl.AssetManager = AssetManager;
@@ -12373,7 +12375,51 @@ var spine;
 			catch (e) {
 				this.showError("Sorry, your browser does not support WebGL.\nPlease use the latest version of Firefox, Chrome, Edge, or Safari.", e);
 			}
-			this.assetManager = new spine.webgl.AssetManager(this.context, "", config.downloader);
+			this.assetManager = new (function (_super) {
+				__extends(class_1, _super);
+				function class_1() {
+					return _super !== null && _super.apply(this, arguments) || this;
+				}
+				class_1.prototype.createTexture = function (context, image) {
+					return new (function (_super) {
+						__extends(class_2, _super);
+						function class_2() {
+							return _super !== null && _super.apply(this, arguments) || this;
+						}
+						class_2.prototype.setFilters = function (minFilter, magFilter) {
+							if (config.mipmaps) {
+								minFilter = spine.TextureFilter.MipMapLinearLinear;
+								magFilter = spine.TextureFilter.Linear;
+							}
+							var mipmaps = false;
+							switch (minFilter) {
+								case spine.TextureFilter.MipMap:
+								case spine.TextureFilter.MipMapLinearLinear:
+								case spine.TextureFilter.MipMapLinearNearest:
+								case spine.TextureFilter.MipMapNearestLinear:
+								case spine.TextureFilter.MipMapNearestNearest:
+									if (config.mipmaps) {
+										var gl = this.context.gl;
+										var ext = gl.getExtension("EXT_texture_filter_anisotropic");
+										if (ext) {
+											gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, 8);
+											mipmaps = true;
+										}
+										else
+											minFilter = spine.TextureFilter.Linear;
+									}
+									else
+										mipmaps = true;
+							}
+							_super.prototype.setFilters.call(this, minFilter, magFilter);
+							if (mipmaps)
+								this.update(true);
+						};
+						return class_2;
+					}(spine.webgl.GLTexture))(context, image);
+				};
+				return class_1;
+			}(spine.webgl.AssetManager))(this.context, "", config.downloader);
 			if (config.rawDataURIs) {
 				for (var path in config.rawDataURIs)
 					this.assetManager.setRawDataURI(path, config.rawDataURIs[path]);

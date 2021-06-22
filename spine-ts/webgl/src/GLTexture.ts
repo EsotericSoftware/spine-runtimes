@@ -29,7 +29,7 @@
 
 module spine.webgl {
 	export class GLTexture extends Texture implements Disposable, Restorable {
-		private context: ManagedWebGLRenderingContext;
+		context: ManagedWebGLRenderingContext;
 		private texture: WebGLTexture = null;
 		private boundUnit = 0;
 		private useMipMaps = false;

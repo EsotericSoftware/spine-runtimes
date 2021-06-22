@@ -130,6 +130,10 @@ module spine {
 			height: number
 		}
 
+		/* Optional: Whether mipmapping and anisotropic filtering are used for highest quality scaling when available, otherwise the
+		   filter settings from the texture atlas are used. Default: true */
+		mipmaps: true
+
 		/* Optional: List of bone names that the user can drag to position. Default: none */
 		controlBones: string[]
 
@@ -287,7 +291,38 @@ module spine {
 			}
 
 			// Load the assets.
-			this.assetManager = new spine.webgl.AssetManager(this.context, "", config.downloader);
+			this.assetManager = new class extends spine.webgl.AssetManager {
+				protected createTexture (context: spine.webgl.ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap): Texture {
+					return new class extends spine.webgl.GLTexture {
+						setFilters (minFilter: TextureFilter, magFilter: TextureFilter) {
+							if (config.mipmaps) {
+								minFilter = TextureFilter.MipMapLinearLinear;
+								magFilter = TextureFilter.Linear;
+							}
+							var mipmaps = false;
+							switch (minFilter) {
+							case TextureFilter.MipMap:
+							case TextureFilter.MipMapLinearLinear:
+							case TextureFilter.MipMapLinearNearest:
+							case TextureFilter.MipMapNearestLinear:
+							case TextureFilter.MipMapNearestNearest:
+								if (config.mipmaps) {
+									let gl = this.context.gl;
+									let ext = gl.getExtension("EXT_texture_filter_anisotropic");
+									if (ext) {
+										gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, 8);
+										mipmaps = true;
+									} else
+										minFilter = TextureFilter.Linear; // Don't use mipmaps without anisotropic.
+								} else
+									mipmaps = true;
+							}
+							super.setFilters(minFilter, magFilter);
+							if (mipmaps) this.update(true);
+						}
+					}(context, image);
+				}
+			}(this.context, "", config.downloader);
 			if (config.rawDataURIs) {
 				for (let path in config.rawDataURIs)
 					this.assetManager.setRawDataURI(path, config.rawDataURIs[path]);
