@@ -447,8 +447,10 @@ module spine.webgl {
 
 		resize (resizeMode: ResizeMode) {
 			let canvas = this.canvas;
-			var w = canvas.clientWidth;
-			var h = canvas.clientHeight;
+			var dpr = window.devicePixelRatio || 1;
+			var w = Math.round(canvas.clientWidth * dpr);
+			var h = Math.round(canvas.clientHeight * dpr);
+ 
 			if (canvas.width != w || canvas.height != h) {
 				canvas.width = w;
 				canvas.height = h;
