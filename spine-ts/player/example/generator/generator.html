@@ -74,7 +74,7 @@ body {
 		var editor = document.getElementById("editor")
 
 		function showError(errorMessage) {
-			alert(errorMessage);
+			alert("Error: " + errorMessage);
 		}
 
 		window.addEventListener("load", function(event) {
@@ -87,8 +87,8 @@ body {
 					console.log(`${data.version} ${data.majorVersion} ${data.minorVersion} ${data.patchVersion}`);
 
 					spine = null;
-					var cssUrl = `https://esotericsoftware.com/files/spine-player/${data.majorVersion}.${data.minorVersion}/spine-player.css`;
-					var playerUrl = `https://esotericsoftware.com/files/spine-player/${data.majorVersion}.${data.minorVersion}/spine-player.js`;
+					var cssUrl = `https://esotericsoftware.com/files/spine-player/${data.majorVersion}.${data.minorVersion}/spine-player.min.css`;
+					var playerUrl = `https://esotericsoftware.com/files/spine-player/${data.majorVersion}.${data.minorVersion}/spine-player.min.js`;
 
 					Loader.loadStyle(cssUrl, function () {
 						Loader.loadJavaScript(playerUrl, function () {
