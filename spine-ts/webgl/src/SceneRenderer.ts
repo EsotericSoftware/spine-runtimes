@@ -396,7 +396,7 @@ module spine.webgl {
 				quad[i++] = 0;
 				quad[i] = 0;
 			}
-			this.batcher.draw(<GLTexture>region.texture, quad, QUAD_TRIANGLES);
+			this.batcher.draw(<GLTexture>region.page.texture, quad, QUAD_TRIANGLES);
 		}
 
 		line (x: number, y: number, x2: number, y2: number, color: Color = null, color2: Color = null) {

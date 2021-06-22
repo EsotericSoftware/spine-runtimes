@@ -175,7 +175,7 @@ module spine.threejs {
 					region.computeWorldVertices(slot.bone, vertices, 0, vertexSize);
 					triangles = SkeletonMesh.QUAD_TRIANGLES;
 					uvs = region.uvs;
-					texture = <ThreeJsTexture>(<TextureAtlasRegion>region.region.renderObject).texture;
+					texture = <ThreeJsTexture>(<TextureAtlasRegion>region.region.renderObject).page.texture;
 				} else if (attachment instanceof MeshAttachment) {
 					let mesh = <MeshAttachment>attachment;
 					attachmentColor = mesh.color;
@@ -187,7 +187,7 @@ module spine.threejs {
 					mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, vertexSize);
 					triangles = mesh.triangles;
 					uvs = mesh.uvs;
-					texture = <ThreeJsTexture>(<TextureAtlasRegion>mesh.region.renderObject).texture;
+					texture = <ThreeJsTexture>(<TextureAtlasRegion>mesh.region.renderObject).page.texture;
 				} else if (attachment instanceof ClippingAttachment) {
 					let clip = <ClippingAttachment>(attachment);
 					clipper.clipStart(slot, clip);

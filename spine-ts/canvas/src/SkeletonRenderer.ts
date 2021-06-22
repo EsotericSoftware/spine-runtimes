@@ -64,7 +64,7 @@ module spine.canvas {
 				let attachment = slot.getAttachment();
 				if (!(attachment instanceof RegionAttachment)) continue;
 				let region: TextureAtlasRegion = <TextureAtlasRegion>attachment.region;
-				let image: HTMLImageElement = (<CanvasTexture>region.texture).getImage() as HTMLImageElement;
+				let image: HTMLImageElement = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
 
 				let slotColor = slot.color;
 				let regionColor = attachment.color;
@@ -126,12 +126,12 @@ module spine.canvas {
 					vertices = this.computeRegionVertices(slot, regionAttachment, false);
 					triangles = SkeletonRenderer.QUAD_TRIANGLES;
 					region = <TextureAtlasRegion>regionAttachment.region;
-					texture = (<CanvasTexture>region.texture).getImage() as HTMLImageElement;
+					texture = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
 				} else if (attachment instanceof MeshAttachment) {
 					let mesh = <MeshAttachment>attachment;
 					vertices = this.computeMeshVertices(slot, mesh, false);
 					triangles = mesh.triangles;
-					texture = (<TextureAtlasRegion>mesh.region.renderObject).texture.getImage() as HTMLImageElement;
+					texture = (<TextureAtlasRegion>mesh.region.renderObject).page.texture.getImage() as HTMLImageElement;
 				} else
 					continue;
 

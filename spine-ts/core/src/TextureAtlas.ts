@@ -32,13 +32,7 @@ module spine {
 		pages = new Array<TextureAtlasPage>();
 		regions = new Array<TextureAtlasRegion>();
 
-		constructor (atlasText: string, textureLoader: (path: string) => any) {
-			this.load(atlasText, textureLoader);
-		}
-
-		private load (atlasText: string, textureLoader: (path: string) => any) {
-			if (!textureLoader) throw new Error("textureLoader cannot be null.");
-
+		constructor (atlasText: string) {
 			let reader = new TextureAtlasReader(atlasText);
 			let entry = new Array<string>(4);
 			let page: TextureAtlasPage = null;
@@ -131,11 +125,6 @@ module spine {
 						let field: Function = pageFields[entry[0]];
 						if (field) field();
 					}
-					page.texture = textureLoader(page.name);
-					page.texture.setFilters(page.minFilter, page.magFilter);
-					page.texture.setWraps(page.uWrap, page.vWrap);
-					// page.width = page.texture.getImage().width;
-					// page.height = page.texture.getImage().height;
 					this.pages.push(page);
 				} else {
 					region = new TextureAtlasRegion();
@@ -179,7 +168,6 @@ module spine {
 						region.u2 = (region.x + region.width) / page.width;
 						region.v2 = (region.y + region.height) / page.height;
 					}
-					region.texture = page.texture;
 					this.regions.push(region);
 				}
 			}
@@ -246,6 +234,12 @@ module spine {
 		width: number;
 		height: number;
 		pma: boolean;
+
+		setTexture (texture: Texture) {
+			this.texture = texture;
+			texture.setFilters(this.minFilter, this.magFilter);
+			texture.setWraps(this.uWrap, this.vWrap);
+		}
 	}
 
 	export class TextureAtlasRegion extends TextureRegion {
@@ -259,7 +253,6 @@ module spine {
 		originalHeight: number;
 		index: number;
 		degrees: number;
-		texture: Texture;
 		names: string[];
 		values: number[][];
 	}

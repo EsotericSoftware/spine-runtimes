@@ -107,7 +107,7 @@ module spine.webgl {
 					region.computeWorldVertices(slot.bone, renderable.vertices, 0, clippedVertexSize);
 					triangles = SkeletonRenderer.QUAD_TRIANGLES;
 					uvs = region.uvs;
-					texture = <GLTexture>(<TextureAtlasRegion>region.region.renderObject).texture;
+					texture = <GLTexture>(<TextureAtlasRegion>region.region.renderObject).page.texture;
 					attachmentColor = region.color;
 				} else if (attachment instanceof MeshAttachment) {
 					let mesh = <MeshAttachment>attachment;
@@ -119,7 +119,7 @@ module spine.webgl {
 					}
 					mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, renderable.vertices, 0, clippedVertexSize);
 					triangles = mesh.triangles;
-					texture = <GLTexture>(<TextureAtlasRegion>mesh.region.renderObject).texture;
+					texture = <GLTexture>(<TextureAtlasRegion>mesh.region.renderObject).page.texture;
 					uvs = mesh.uvs;
 					attachmentColor = mesh.color;
 				} else if (attachment instanceof ClippingAttachment) {

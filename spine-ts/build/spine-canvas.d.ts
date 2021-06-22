@@ -232,7 +232,6 @@ declare module spine {
 		queueEvents(entry: TrackEntry, animationTime: number): void;
 		clearTracks(): void;
 		clearTrack(trackIndex: number): void;
-		clearNext(entry: TrackEntry): void;
 		setCurrent(index: number, current: TrackEntry, interrupt: boolean): void;
 		setAnimation(trackIndex: number, animationName: string, loop?: boolean): TrackEntry;
 		setAnimationWith(trackIndex: number, animation: Animation, loop?: boolean): TrackEntry;
@@ -243,7 +242,7 @@ declare module spine {
 		setEmptyAnimations(mixDuration?: number): void;
 		expandToIndex(index: number): TrackEntry;
 		trackEntry(trackIndex: number, animation: Animation, loop: boolean, last: TrackEntry): TrackEntry;
-		disposeNext(entry: TrackEntry): void;
+		clearNext(entry: TrackEntry): void;
 		_animationsChanged(): void;
 		computeHold(entry: TrackEntry): void;
 		getCurrent(trackIndex: number): TrackEntry;
@@ -351,7 +350,7 @@ declare module spine {
 		private errors;
 		private toLoad;
 		private loaded;
-		constructor(textureLoader: (image: HTMLImageElement | ImageBitmap) => any, pathPrefix?: string, downloader?: Downloader);
+		constructor(textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture, pathPrefix?: string, downloader?: Downloader);
 		private start;
 		private success;
 		private error;
@@ -359,7 +358,7 @@ declare module spine {
 		loadBinary(path: string, success?: (path: string, binary: Uint8Array) => void, error?: (path: string, message: string) => void): void;
 		loadText(path: string, success?: (path: string, text: string) => void, error?: (path: string, message: string) => void): void;
 		loadJson(path: string, success?: (path: string, object: object) => void, error?: (path: string, message: string) => void): void;
-		loadTexture(path: string, success?: (path: string, image: HTMLImageElement | ImageBitmap) => void, error?: (path: string, message: string) => void): void;
+		loadTexture(path: string, success?: (path: string, texture: Texture) => void, error?: (path: string, message: string) => void): void;
 		loadTextureAtlas(path: string, success?: (path: string, atlas: TextureAtlas) => void, error?: (path: string, message: string) => void): void;
 		get(path: string): any;
 		remove(path: string): any;
@@ -847,8 +846,7 @@ declare module spine {
 	class TextureAtlas implements Disposable {
 		pages: TextureAtlasPage[];
 		regions: TextureAtlasRegion[];
-		constructor(atlasText: string, textureLoader: (path: string) => any);
-		private load;
+		constructor(atlasText: string);
 		findRegion(name: string): TextureAtlasRegion;
 		dispose(): void;
 	}
@@ -862,6 +860,7 @@ declare module spine {
 		width: number;
 		height: number;
 		pma: boolean;
+		setTexture(texture: Texture): void;
 	}
 	class TextureAtlasRegion extends TextureRegion {
 		page: TextureAtlasPage;
@@ -874,7 +873,6 @@ declare module spine {
 		originalHeight: number;
 		index: number;
 		degrees: number;
-		texture: Texture;
 		names: string[];
 		values: number[][];
 	}

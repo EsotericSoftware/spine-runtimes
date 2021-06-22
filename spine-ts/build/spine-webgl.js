@@ -1981,7 +1981,7 @@ var spine;
 				else if (current.trackLast >= current.trackEnd && !current.mixingFrom) {
 					tracks[i] = null;
 					this.queue.end(current);
-					this.disposeNext(current);
+					this.clearNext(current);
 					continue;
 				}
 				if (current.mixingFrom && this.updateMixingFrom(current, delta)) {
@@ -2300,7 +2300,7 @@ var spine;
 			if (!current)
 				return;
 			this.queue.end(current);
-			this.disposeNext(current);
+			this.clearNext(current);
 			var entry = current;
 			while (true) {
 				var from = entry.mixingFrom;
@@ -2313,9 +2313,6 @@ var spine;
 			}
 			this.tracks[current.trackIndex] = null;
 			this.queue.drain();
-		};
-		AnimationState.prototype.clearNext = function (entry) {
-			this.disposeNext(entry.next);
 		};
 		AnimationState.prototype.setCurrent = function (index, current, interrupt) {
 			var from = this.expandToIndex(index);
@@ -2351,12 +2348,12 @@ var spine;
 					this.tracks[trackIndex] = current.mixingFrom;
 					this.queue.interrupt(current);
 					this.queue.end(current);
-					this.disposeNext(current);
+					this.clearNext(current);
 					current = current.mixingFrom;
 					interrupt = false;
 				}
 				else
-					this.disposeNext(current);
+					this.clearNext(current);
 			}
 			var entry = this.trackEntry(trackIndex, animation, loop, current);
 			this.setCurrent(trackIndex, entry, interrupt);
@@ -2457,7 +2454,7 @@ var spine;
 			entry.mixBlend = spine.MixBlend.replace;
 			return entry;
 		};
-		AnimationState.prototype.disposeNext = function (entry) {
+		AnimationState.prototype.clearNext = function (entry) {
 			var next = entry.next;
 			while (next) {
 				this.queue.dispose(next);
@@ -2871,49 +2868,31 @@ var spine;
 			if (error === void 0) { error = null; }
 			var parent = path.lastIndexOf("/") >= 0 ? path.substring(0, path.lastIndexOf("/")) : "";
 			path = this.start(path);
-			this.downloader.downloadText(path, function (atlasData) {
-				var pagesLoaded = 0;
-				var atlasPages = new Array();
+			this.downloader.downloadText(path, function (atlasText) {
 				try {
-					var atlas = new spine.TextureAtlas(atlasData, function (path) {
-						atlasPages.push(parent == "" ? path : parent + "/" + path);
-						var image = document.createElement("img");
-						image.width = 16;
-						image.height = 16;
-						return new spine.FakeTexture(image);
-					});
-					var _loop_1 = function (atlasPage) {
-						var pageLoadError = false;
-						_this.loadTexture(atlasPage, function (imagePath, image) {
-							pagesLoaded++;
-							if (pagesLoaded == atlasPages.length) {
-								if (!pageLoadError) {
-									try {
-										_this.success(success, path, new spine.TextureAtlas(atlasData, function (path) {
-											return _this.get(parent == "" ? path : parent + "/" + path);
-										}));
-									}
-									catch (e) {
-										_this.error(error, path, "Couldn't load texture atlas " + path + ": " + e.message);
-									}
-								}
-								else
-									_this.error(error, path, "Couldn't load texture atlas " + path + " page: " + imagePath);
+					var atlas_1 = new spine.TextureAtlas(atlasText);
+					var toLoad_1 = atlas_1.pages.length, abort_1 = false;
+					var _loop_1 = function (page) {
+						_this.loadTexture(parent == "" ? page.name : parent + "/" + page.name, function (imagePath, texture) {
+							if (!abort_1) {
+								page.setTexture(texture);
+								if (--toLoad_1 == 0)
+									_this.success(success, path, atlas_1);
 							}
-						}, function (imagePath, errorMessage) {
-							pageLoadError = true;
-							pagesLoaded++;
-							if (pagesLoaded == atlasPages.length)
-								_this.error(error, path, "Couldn't load texture atlas " + path + " page: " + imagePath);
+						}, function (imagePath, message) {
+							if (!abort_1) {
+								abort_1 = true;
+								_this.error(error, path, "Couldn't load texture atlas " + path + " page " + imagePath + ": " + message);
+							}
 						});
 					};
-					for (var _i = 0, atlasPages_1 = atlasPages; _i < atlasPages_1.length; _i++) {
-						var atlasPage = atlasPages_1[_i];
-						_loop_1(atlasPage);
+					for (var _i = 0, _a = atlas_1.pages; _i < _a.length; _i++) {
+						var page = _a[_i];
+						_loop_1(page);
 					}
 				}
 				catch (e) {
-					_this.error(error, path, "Couldn't load texture atlas " + path + ": " + e.message);
+					_this.error(error, path, "Couldn't parse texture atlas " + path + ": " + e.message);
 				}
 			}, function (status, responseText) {
 				_this.error(error, path, "Couldn't load texture atlas " + path + ": status " + status + ", " + responseText);
@@ -7371,14 +7350,9 @@ var spine;
 var spine;
 (function (spine) {
 	var TextureAtlas = (function () {
-		function TextureAtlas(atlasText, textureLoader) {
+		function TextureAtlas(atlasText) {
 			this.pages = new Array();
 			this.regions = new Array();
-			this.load(atlasText, textureLoader);
-		}
-		TextureAtlas.prototype.load = function (atlasText, textureLoader) {
-			if (!textureLoader)
-				throw new Error("textureLoader cannot be null.");
 			var reader = new TextureAtlasReader(atlasText);
 			var entry = new Array(4);
 			var page = null;
@@ -7471,9 +7445,6 @@ var spine;
 						if (field)
 							field();
 					}
-					page.texture = textureLoader(page.name);
-					page.texture.setFilters(page.minFilter, page.magFilter);
-					page.texture.setWraps(page.uWrap, page.vWrap);
 					this.pages.push(page);
 				}
 				else {
@@ -7519,11 +7490,10 @@ var spine;
 						region.u2 = (region.x + region.width) / page.width;
 						region.v2 = (region.y + region.height) / page.height;
 					}
-					region.texture = page.texture;
 					this.regions.push(region);
 				}
 			}
-		};
+		}
 		TextureAtlas.prototype.findRegion = function (name) {
 			for (var i = 0; i < this.regions.length; i++) {
 				if (this.regions[i].name == name) {
@@ -7581,6 +7551,11 @@ var spine;
 			this.uWrap = spine.TextureWrap.ClampToEdge;
 			this.vWrap = spine.TextureWrap.ClampToEdge;
 		}
+		TextureAtlasPage.prototype.setTexture = function (texture) {
+			this.texture = texture;
+			texture.setFilters(this.minFilter, this.magFilter);
+			texture.setWraps(this.uWrap, this.vWrap);
+		};
 		return TextureAtlasPage;
 	}());
 	spine.TextureAtlasPage = TextureAtlasPage;
@@ -8630,8 +8605,8 @@ var spine;
 			var n = this.uvs.length;
 			var u = this.region.u, v = this.region.v, width = 0, height = 0;
 			if (this.region instanceof spine.TextureAtlasRegion) {
-				var region = this.region;
-				var textureWidth = region.texture.getImage().width, textureHeight = region.texture.getImage().height;
+				var region = this.region, image = region.page.texture.getImage();
+				var textureWidth = image.width, textureHeight = image.height;
 				switch (region.degrees) {
 					case 90:
 						u -= (region.originalHeight - region.offsetY - region.height) / textureWidth;
@@ -10383,7 +10358,7 @@ var spine;
 					quad[i++] = 0;
 					quad[i] = 0;
 				}
-				this.batcher.draw(region.texture, quad, QUAD_TRIANGLES);
+				this.batcher.draw(region.page.texture, quad, QUAD_TRIANGLES);
 			};
 			SceneRenderer.prototype.line = function (x, y, x2, y2, color, color2) {
 				if (color === void 0) { color = null; }
@@ -11264,7 +11239,7 @@ var spine;
 						region.computeWorldVertices(slot.bone, renderable.vertices, 0, clippedVertexSize);
 						triangles = SkeletonRenderer.QUAD_TRIANGLES;
 						uvs = region.uvs;
-						texture = region.region.renderObject.texture;
+						texture = region.region.renderObject.page.texture;
 						attachmentColor = region.color;
 					}
 					else if (attachment instanceof spine.MeshAttachment) {
@@ -11277,7 +11252,7 @@ var spine;
 						}
 						mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, renderable.vertices, 0, clippedVertexSize);
 						triangles = mesh.triangles;
-						texture = mesh.region.renderObject.texture;
+						texture = mesh.region.renderObject.page.texture;
 						uvs = mesh.uvs;
 						attachmentColor = mesh.color;
 					}

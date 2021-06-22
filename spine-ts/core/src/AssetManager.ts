@@ -30,14 +30,14 @@
 module spine {
 	export class AssetManager implements Disposable {
 		private pathPrefix: string;
-		private textureLoader: (image: HTMLImageElement | ImageBitmap) => any;
+		private textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture;
 		private downloader: Downloader;
 		private assets: Map<any> = {};
 		private errors: Map<string> = {};
 		private toLoad = 0;
 		private loaded = 0;
 
-		constructor (textureLoader: (image: HTMLImageElement | ImageBitmap) => any, pathPrefix: string = "", downloader: Downloader = null) {
+		constructor (textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture, pathPrefix: string = "", downloader: Downloader = null) {
 			this.textureLoader = textureLoader;
 			this.pathPrefix = pathPrefix;
 			this.downloader = downloader || new Downloader();
@@ -103,7 +103,7 @@ module spine {
 		}
 
 		loadTexture (path: string,
-			success: (path: string, image: HTMLImageElement | ImageBitmap) => void = null,
+			success: (path: string, texture: Texture) => void = null,
 			error: (path: string, message: string) => void = null) {
 			path = this.start(path);
 
@@ -140,42 +140,28 @@ module spine {
 			let parent = path.lastIndexOf("/") >= 0 ? path.substring(0, path.lastIndexOf("/")) : "";
 			path = this.start(path);
 
-			this.downloader.downloadText(path, (atlasData: string): void => {
-				let pagesLoaded = 0;
-				let atlasPages = new Array<string>();
+			this.downloader.downloadText(path, (atlasText: string): void => {
 				try {
-					let atlas = new TextureAtlas(atlasData, (path: string) => {
-						atlasPages.push(parent == "" ? path : parent + "/" + path);
-						let image = document.createElement("img") as HTMLImageElement;
-						image.width = 16;
-						image.height = 16;
-						return new FakeTexture(image);
-					});
-					for (let atlasPage of atlasPages) {
-						let pageLoadError = false;
-						this.loadTexture(atlasPage, (imagePath: string, image: HTMLImageElement | ImageBitmap) => {
-							pagesLoaded++;
-							if (pagesLoaded == atlasPages.length) {
-								if (!pageLoadError) {
-									try {
-										this.success(success, path, new TextureAtlas(atlasData, (path: string) => {
-											return this.get(parent == "" ? path : parent + "/" + path);
-										}));
-									} catch (e) {
-										this.error(error, path, `Couldn't load texture atlas ${path}: ${e.message}`);
-									}
-								} else
-									this.error(error, path, `Couldn't load texture atlas ${path} page: ${imagePath}`);
+					let atlas = new TextureAtlas(atlasText);
+					let toLoad = atlas.pages.length, abort = false;
+					for (let page of atlas.pages) {
+						this.loadTexture(parent == "" ? page.name : parent + "/" + page.name,
+							(imagePath: string, texture: Texture) => {
+								if (!abort) {
+									page.setTexture(texture);
+									if (--toLoad == 0) this.success(success, path, atlas);
+								}
+							},
+							(imagePath: string, message: string) => {
+								if (!abort) {
+									abort = true;
+									this.error(error, path, `Couldn't load texture atlas ${path} page ${imagePath}: ${message}`);
+								}
 							}
-						}, (imagePath: string, errorMessage: string) => {
-							pageLoadError = true;
-							pagesLoaded++;
-							if (pagesLoaded == atlasPages.length)
-								this.error(error, path, `Couldn't load texture atlas ${path} page: ${imagePath}`);
-						});
+						);
 					}
 				} catch (e) {
-					this.error(error, path, `Couldn't load texture atlas ${path}: ${e.message}`);
+					this.error(error, path, `Couldn't parse texture atlas ${path}: ${e.message}`);
 				}
 			}, (status: number, responseText: string): void => {
 				this.error(error, path, `Couldn't load texture atlas ${path}: status ${status}, ${responseText}`);
