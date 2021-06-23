@@ -202,7 +202,8 @@ namespace Spine.Unity {
 		protected override void Awake () {
 
 			base.Awake ();
-			updateMode = updateWhenInvisible;
+			this.onCullStateChanged.AddListener(OnCullStateChanged);
+
 			SyncSubmeshGraphicsWithCanvasRenderers();
 			if (!this.IsValid) {
 #if UNITY_EDITOR
@@ -316,6 +317,13 @@ namespace Spine.Unity {
 			if (updateMode != UpdateMode.FullUpdate) return;
 
 			UpdateMesh();
+		}
+
+		protected void OnCullStateChanged (bool culled) {
+			if (culled)
+				OnBecameInvisible();
+			else
+				OnBecameVisible();
 		}
 
 		public void OnBecameVisible () {
