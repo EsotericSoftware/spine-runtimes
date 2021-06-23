@@ -1730,9 +1730,10 @@ declare module spine {
         controlBones: string[];
         success: (player: SpinePlayer) => void;
         error: (player: SpinePlayer, msg: string) => void;
-        frame: (player: SpinePlayer) => void;
-        update: (player: SpinePlayer) => void;
-        draw: (player: SpinePlayer) => void;
+        frame: (player: SpinePlayer, delta: number) => void;
+        update: (player: SpinePlayer, delta: number) => void;
+        draw: (player: SpinePlayer, delta: number) => void;
+        loading: (player: SpinePlayer, delta: number) => void;
         downloader: spine.Downloader;
     }
     interface Viewport {
@@ -1747,12 +1748,12 @@ declare module spine {
     }
     class SpinePlayer {
         private config;
-        private parent;
+        parent: HTMLElement;
         dom: HTMLElement;
         canvas: HTMLCanvasElement;
-        private context;
-        private sceneRenderer;
-        private loadingScreen;
+        context: spine.webgl.ManagedWebGLRenderingContext;
+        sceneRenderer: spine.webgl.SceneRenderer;
+        loadingScreen: spine.webgl.LoadingScreen;
         assetManager: spine.webgl.AssetManager;
         bg: Color;
         bgFullscreen: Color;
@@ -1768,10 +1769,11 @@ declare module spine {
         error: boolean;
         skeleton: Skeleton;
         animationState: AnimationState;
-        private paused;
+        paused: boolean;
         speed: number;
-        private time;
+        time: TimeKeeper;
         private stopRequestAnimationFrame;
+        private viewport;
         private currentViewport;
         private previousViewport;
         private viewportTransitionStart;
@@ -1788,7 +1790,6 @@ declare module spine {
         private percentageToWorldUnit;
         private calculateAnimationViewport;
         private drawFrame;
-        private scale;
         stopRendering(): void;
         private showSpeedDialog;
         private showAnimationsDialog;

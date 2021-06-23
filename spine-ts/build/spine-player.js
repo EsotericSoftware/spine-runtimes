@@ -11626,6 +11626,7 @@ var spine;
             this.speed = 1;
             this.time = new spine.TimeKeeper();
             this.stopRequestAnimationFrame = false;
+            this.viewport = {};
             this.viewportTransitionStart = 0;
             this.parent = typeof parent === "string" ? document.getElementById(parent) : parent;
             var controls = config.showControls ? "\n<div class=\"spine-player-controls spine-player-popup-parent spine-player-controls-hidden\">\n<div class=\"spine-player-timeline\"></div>\n<div class=\"spine-player-buttons\">\n<button class=\"spine-player-button spine-player-button-icon-pause\"></button>\n<div class=\"spine-player-button-spacer\"></div>\n<button class=\"spine-player-button spine-player-button-icon-speed\"></button>\n<button class=\"spine-player-button spine-player-button-icon-animations\"></button>\n<button class=\"spine-player-button spine-player-button-icon-skins\"></button>\n<button class=\"spine-player-button spine-player-button-icon-settings\"></button>\n<button class=\"spine-player-button spine-player-button-icon-fullscreen\"></button>\n<img class=\"spine-player-button-icon-spine-logo\" src=\"data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20104%2031.16%22%3E%3Cpath%20d%3D%22M104%2012.68a1.31%201.31%200%200%201-.37%201%201.28%201.28%200%200%201-.85.31H91.57a10.51%2010.51%200%200%200%20.29%202.55%204.92%204.92%200%200%200%201%202%204.27%204.27%200%200%200%201.64%201.26%206.89%206.89%200%200%200%202.6.44%2010.66%2010.66%200%200%200%202.17-.2%2012.81%2012.81%200%200%200%201.64-.44q.69-.25%201.14-.44a1.87%201.87%200%200%201%20.68-.2.44.44%200%200%201%20.27.04.43.43%200%200%201%20.16.2%201.38%201.38%200%200%201%20.09.37%204.89%204.89%200%200%201%200%20.58%204.14%204.14%200%200%201%200%20.43v.32a.83.83%200%200%201-.09.26%201.1%201.1%200%200%201-.17.22%202.77%202.77%200%200%201-.61.34%208.94%208.94%200%200%201-1.32.46%2018.54%2018.54%200%200%201-1.88.41%2013.78%2013.78%200%200%201-2.28.18%2010.55%2010.55%200%200%201-3.68-.59%206.82%206.82%200%200%201-2.66-1.74%207.44%207.44%200%200%201-1.63-2.89%2013.48%2013.48%200%200%201-.55-4%2012.76%2012.76%200%200%201%20.57-3.94%208.35%208.35%200%200%201%201.64-3%207.15%207.15%200%200%201%202.58-1.87%208.47%208.47%200%200%201%203.39-.65%208.19%208.19%200%200%201%203.41.64%206.46%206.46%200%200%201%202.32%201.73%207%207%200%200%201%201.3%202.54%2011.17%2011.17%200%200%201%20.43%203.13zm-3.14-.93a5.69%205.69%200%200%200-1.09-3.86%204.17%204.17%200%200%200-3.42-1.4%204.52%204.52%200%200%200-2%20.44%204.41%204.41%200%200%200-1.47%201.15A5.29%205.29%200%200%200%2092%209.75a7%207%200%200%200-.36%202zM80.68%2021.94a.42.42%200%200%201-.08.26.59.59%200%200%201-.25.18%201.74%201.74%200%200%201-.47.11%206.31%206.31%200%200%201-.76%200%206.5%206.5%200%200%201-.78%200%201.74%201.74%200%200%201-.47-.11.59.59%200%200%201-.25-.18.42.42%200%200%201-.08-.26V12a9.8%209.8%200%200%200-.23-2.35%204.86%204.86%200%200%200-.66-1.53%202.88%202.88%200%200%200-1.13-1%203.57%203.57%200%200%200-1.6-.34%204%204%200%200%200-2.35.83A12.71%2012.71%200%200%200%2069.11%2010v11.9a.42.42%200%200%201-.08.26.59.59%200%200%201-.25.18%201.74%201.74%200%200%201-.47.11%206.51%206.51%200%200%201-.78%200%206.31%206.31%200%200%201-.76%200%201.88%201.88%200%200%201-.48-.11.52.52%200%200%201-.25-.18.46.46%200%200%201-.07-.26v-17a.53.53%200%200%201%20.03-.21.5.5%200%200%201%20.23-.19%201.28%201.28%200%200%201%20.44-.11%208.53%208.53%200%200%201%201.39%200%201.12%201.12%200%200%201%20.43.11.6.6%200%200%201%20.22.19.47.47%200%200%201%20.07.26V7.2a10.46%2010.46%200%200%201%202.87-2.36%206.17%206.17%200%200%201%202.88-.75%206.41%206.41%200%200%201%202.87.58%205.16%205.16%200%200%201%201.88%201.54%206.15%206.15%200%200%201%201%202.26%2013.46%2013.46%200%200%201%20.31%203.11z%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M43.35%202.86c.09%202.6%201.89%204%205.48%204.61%203%20.48%205.79.24%206.69-2.37%201.75-5.09-2.4-3.82-6-4.39s-6.31-2.03-6.17%202.15zm1.08%2010.69c.33%201.94%202.14%203.06%204.91%203s4.84-1.16%205.13-3.25c.53-3.88-2.53-2.38-5.3-2.3s-5.4-1.26-4.74%202.55zM48%2022.44c.55%201.45%202.06%202.06%204.1%201.63s3.45-1.11%203.33-2.76c-.21-3.06-2.22-2.1-4.26-1.66S47%2019.6%2048%2022.44zm1.78%206.78c.16%201.22%201.22%202%202.88%201.93s2.92-.67%203.13-2c.4-2.43-1.46-1.53-3.12-1.51s-3.17-.82-2.89%201.58z%22%20fill%3D%22%23ff4000%22%2F%3E%3Cpath%20d%3D%22M35.28%2013.16a15.33%2015.33%200%200%201-.48%204%208.75%208.75%200%200%201-1.42%203%206.35%206.35%200%200%201-2.32%201.91%207.14%207.14%200%200%201-3.16.67%206.1%206.1%200%200%201-1.4-.15%205.34%205.34%200%200%201-1.26-.47%207.29%207.29%200%200%201-1.24-.81q-.61-.49-1.29-1.15v8.51a.47.47%200%200%201-.08.26.56.56%200%200%201-.25.19%201.74%201.74%200%200%201-.47.11%206.47%206.47%200%200%201-.78%200%206.26%206.26%200%200%201-.76%200%201.89%201.89%200%200%201-.48-.11.49.49%200%200%201-.25-.19.51.51%200%200%201-.07-.26V4.91a.57.57%200%200%201%20.06-.27.46.46%200%200%201%20.23-.18%201.47%201.47%200%200%201%20.44-.1%207.41%207.41%200%200%201%201.3%200%201.45%201.45%200%200%201%20.43.1.52.52%200%200%201%20.24.18.51.51%200%200%201%20.07.27V7.2a18.06%2018.06%200%200%201%201.49-1.38%209%209%200%200%201%201.45-1%206.82%206.82%200%200%201%201.49-.59%207.09%207.09%200%200%201%204.78.52%206%206%200%200%201%202.13%202%208.79%208.79%200%200%201%201.2%202.9%2015.72%2015.72%200%200%201%20.4%203.51zm-3.28.36a15.64%2015.64%200%200%200-.2-2.53%207.32%207.32%200%200%200-.69-2.17%204.06%204.06%200%200%200-1.3-1.51%203.49%203.49%200%200%200-2-.57%204.1%204.1%200%200%200-1.2.18%204.92%204.92%200%200%200-1.2.57%208.54%208.54%200%200%200-1.28%201A15.77%2015.77%200%200%200%2022.76%2010v6.77a13.53%2013.53%200%200%200%202.46%202.4%204.12%204.12%200%200%200%202.44.83%203.56%203.56%200%200%200%202-.57A4.28%204.28%200%200%200%2031%2018a7.58%207.58%200%200%200%20.77-2.12%2011.43%2011.43%200%200%200%20.23-2.36zM12%2017.3a5.39%205.39%200%200%201-.48%202.33%204.73%204.73%200%200%201-1.37%201.72%206.19%206.19%200%200%201-2.12%201.06%209.62%209.62%200%200%201-2.71.36%2010.38%2010.38%200%200%201-3.21-.5A7.63%207.63%200%200%201%201%2021.82a3.25%203.25%200%200%201-.66-.43%201.09%201.09%200%200%201-.3-.53%203.59%203.59%200%200%201-.04-.93%204.06%204.06%200%200%201%200-.61%202%202%200%200%201%20.09-.4.42.42%200%200%201%20.16-.22.43.43%200%200%201%20.24-.07%201.35%201.35%200%200%201%20.61.26q.41.26%201%20.56a9.22%209.22%200%200%200%201.41.55%206.25%206.25%200%200%200%201.87.26%205.62%205.62%200%200%200%201.44-.17%203.48%203.48%200%200%200%201.12-.5%202.23%202.23%200%200%200%20.73-.84%202.68%202.68%200%200%200%20.26-1.21%202%202%200%200%200-.37-1.21%203.55%203.55%200%200%200-1-.87%208.09%208.09%200%200%200-1.36-.66l-1.56-.61a16%2016%200%200%201-1.57-.73%206%206%200%200%201-1.37-1%204.52%204.52%200%200%201-1-1.4%204.69%204.69%200%200%201-.37-2%204.88%204.88%200%200%201%20.39-1.87%204.46%204.46%200%200%201%201.16-1.61%205.83%205.83%200%200%201%201.94-1.11A8.06%208.06%200%200%201%206.53%204a8.28%208.28%200%200%201%201.36.11%209.36%209.36%200%200%201%201.23.28%205.92%205.92%200%200%201%20.94.37%204.09%204.09%200%200%201%20.59.35%201%201%200%200%201%20.26.26.83.83%200%200%201%20.09.26%201.32%201.32%200%200%200%20.06.35%203.87%203.87%200%200%201%200%20.51%204.76%204.76%200%200%201%200%20.56%201.39%201.39%200%200%201-.09.39.5.5%200%200%201-.16.22.35.35%200%200%201-.21.07%201%201%200%200%201-.49-.21%207%207%200%200%200-.83-.44%209.26%209.26%200%200%200-1.2-.44%205.49%205.49%200%200%200-1.58-.16%204.93%204.93%200%200%200-1.4.18%202.69%202.69%200%200%200-1%20.51%202.16%202.16%200%200%200-.59.83%202.43%202.43%200%200%200-.2%201%202%202%200%200%200%20.38%201.24%203.6%203.6%200%200%200%201%20.88%208.25%208.25%200%200%200%201.38.68l1.58.62q.8.32%201.59.72a6%206%200%200%201%201.39%201%204.37%204.37%200%200%201%201%201.36%204.46%204.46%200%200%201%20.37%201.8z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E\">\n</div></div>" : "";
@@ -11655,9 +11656,9 @@ var spine;
                 config.fullScreenBackgroundColor = config.backgroundColor;
             if (config.backgroundImage && !config.backgroundImage.url)
                 config.backgroundImage = null;
-            if (config.premultipliedAlpha === undefined)
+            if (config.premultipliedAlpha === void 0)
                 config.premultipliedAlpha = true;
-            if (config.mipmaps === undefined)
+            if (config.mipmaps === void 0)
                 config.mipmaps = true;
             if (!config.debug)
                 config.debug = {};
@@ -11669,17 +11670,17 @@ var spine;
                 config.viewport = {};
             if (!config.viewport.animations)
                 config.viewport.animations = {};
-            if (config.viewport.debugRender === undefined)
+            if (config.viewport.debugRender === void 0)
                 config.viewport.debugRender = false;
-            if (config.viewport.transitionTime === undefined)
+            if (config.viewport.transitionTime === void 0)
                 config.viewport.transitionTime = 0.25;
             if (!config.controlBones)
                 config.controlBones = [];
-            if (config.showControls === undefined)
+            if (config.showControls === void 0)
                 config.showControls = true;
-            if (config.showLoading === undefined)
+            if (config.showLoading === void 0)
                 config.showLoading = true;
-            if (config.defaultMix === undefined)
+            if (config.defaultMix === void 0)
                 config.defaultMix = 0.25;
         };
         SpinePlayer.prototype.initialize = function () {
@@ -11914,8 +11915,8 @@ var spine;
                 return;
             var selectedBones = this.selectedBones = new Array(controlBones.length);
             var canvas = this.canvas;
-            var input = new spine.webgl.Input(canvas);
             var target = null;
+            var offset = new spine.Vector2();
             var coords = new spine.webgl.Vector3();
             var mouse = new spine.webgl.Vector3();
             var position = new spine.Vector2();
@@ -11923,6 +11924,7 @@ var spine;
             var renderer = this.sceneRenderer;
             var closest = function (x, y) {
                 mouse.set(x, canvas.clientHeight - y, 0);
+                offset.x = offset.y = 0;
                 var bestDistance = 24, index = 0;
                 var best;
                 for (var i = 0; i < controlBones.length; i++) {
@@ -11933,15 +11935,19 @@ var spine;
                         bestDistance = distance;
                         best = bone;
                         index = i;
+                        offset.x = coords.x - mouse.x;
+                        offset.y = coords.y - mouse.y;
                     }
                 }
                 if (best)
                     selectedBones[index] = best;
                 return best;
             };
-            input.addListener({
-                down: function (x, y) { return target = closest(x, y); },
-                up: function (x, y) {
+            new spine.webgl.Input(canvas).addListener({
+                down: function (x, y) {
+                    target = closest(x, y);
+                },
+                up: function () {
                     if (target)
                         target = null;
                     else if (config.showControls)
@@ -11949,8 +11955,8 @@ var spine;
                 },
                 dragged: function (x, y) {
                     if (target) {
-                        x = spine.MathUtils.clamp(x, 0, canvas.clientWidth);
-                        y = spine.MathUtils.clamp(y, 0, canvas.clientHeight);
+                        x = spine.MathUtils.clamp(x + offset.x, 0, canvas.clientWidth);
+                        y = spine.MathUtils.clamp(y - offset.y, 0, canvas.clientHeight);
                         renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.clientWidth, canvas.clientHeight);
                         if (target.parent) {
                             target.parent.worldToLocal(position.set(coords.x - skeleton.x, coords.y - skeleton.y));
@@ -11965,43 +11971,43 @@ var spine;
                 },
                 moved: function (x, y) { return closest(x, y); }
             });
-            if (!config.showControls)
-                return;
-            document.addEventListener("mousemove", function (ev) {
-                if (ev instanceof MouseEvent)
-                    handleHover(ev.clientX, ev.clientY);
-            });
-            document.addEventListener("touchmove", function (ev) {
-                if (ev instanceof TouchEvent) {
-                    var touches = ev.changedTouches;
-                    if (touches.length) {
-                        var touch = touches[0];
-                        handleHover(touch.clientX, touch.clientY);
+            if (config.showControls) {
+                document.addEventListener("mousemove", function (ev) {
+                    if (ev instanceof MouseEvent)
+                        handleHover_1(ev.clientX, ev.clientY);
+                });
+                document.addEventListener("touchmove", function (ev) {
+                    if (ev instanceof TouchEvent) {
+                        var touches = ev.changedTouches;
+                        if (touches.length) {
+                            var touch = touches[0];
+                            handleHover_1(touch.clientX, touch.clientY);
+                        }
                     }
-                }
-            });
-            var mouseOverControls = true, mouseOverCanvas = false;
-            var handleHover = function (mouseX, mouseY) {
-                var popup = findWithClass(_this.dom, "spine-player-popup");
-                mouseOverControls = overlap(mouseX, mouseY, _this.playerControls.getBoundingClientRect());
-                mouseOverCanvas = overlap(mouseX, mouseY, canvas.getBoundingClientRect());
-                clearTimeout(_this.cancelId);
-                var hide = !popup && !mouseOverControls && !mouseOverCanvas && !_this.paused;
-                if (hide)
-                    _this.playerControls.classList.add("spine-player-controls-hidden");
-                else
-                    _this.playerControls.classList.remove("spine-player-controls-hidden");
-                if (!mouseOverControls && !popup && !_this.paused) {
-                    _this.cancelId = setTimeout(function () {
-                        if (!_this.paused)
-                            _this.playerControls.classList.add("spine-player-controls-hidden");
-                    }, 1000);
-                }
-            };
-            var overlap = function (mouseX, mouseY, rect) {
-                var x = mouseX - rect.left, y = mouseY - rect.top;
-                return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
-            };
+                });
+                var overlap_1 = function (mouseX, mouseY, rect) {
+                    var x = mouseX - rect.left, y = mouseY - rect.top;
+                    return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
+                };
+                var mouseOverControls_1 = true, mouseOverCanvas_1 = false;
+                var handleHover_1 = function (mouseX, mouseY) {
+                    var popup = findWithClass(_this.dom, "spine-player-popup");
+                    mouseOverControls_1 = overlap_1(mouseX, mouseY, _this.playerControls.getBoundingClientRect());
+                    mouseOverCanvas_1 = overlap_1(mouseX, mouseY, canvas.getBoundingClientRect());
+                    clearTimeout(_this.cancelId);
+                    var hide = !popup && !mouseOverControls_1 && !mouseOverCanvas_1 && !_this.paused;
+                    if (hide)
+                        _this.playerControls.classList.add("spine-player-controls-hidden");
+                    else
+                        _this.playerControls.classList.remove("spine-player-controls-hidden");
+                    if (!mouseOverControls_1 && !popup && !_this.paused) {
+                        _this.cancelId = setTimeout(function () {
+                            if (!_this.paused)
+                                _this.playerControls.classList.add("spine-player-controls-hidden");
+                        }, 1000);
+                    }
+                };
+            }
         };
         SpinePlayer.prototype.play = function () {
             var _this = this;
@@ -12049,13 +12055,13 @@ var spine;
                 animation = this.skeleton.data.findAnimation(animation);
             this.previousViewport = this.currentViewport;
             var globalViewport = this.config.viewport;
-            var viewport = {
-                padLeft: globalViewport.padLeft !== undefined ? globalViewport.padLeft : "10%",
-                padRight: globalViewport.padRight !== undefined ? globalViewport.padRight : "10%",
-                padTop: globalViewport.padTop !== undefined ? globalViewport.padTop : "10%",
-                padBottom: globalViewport.padBottom !== undefined ? globalViewport.padBottom : "10%"
+            var viewport = this.currentViewport = {
+                padLeft: globalViewport.padLeft !== void 0 ? globalViewport.padLeft : "10%",
+                padRight: globalViewport.padRight !== void 0 ? globalViewport.padRight : "10%",
+                padTop: globalViewport.padTop !== void 0 ? globalViewport.padTop : "10%",
+                padBottom: globalViewport.padBottom !== void 0 ? globalViewport.padBottom : "10%"
             };
-            if (globalViewport.x !== undefined && globalViewport.y !== undefined && globalViewport.width && globalViewport.height) {
+            if (globalViewport.x !== void 0 && globalViewport.y !== void 0 && globalViewport.width && globalViewport.height) {
                 viewport.x = globalViewport.x;
                 viewport.y = globalViewport.y;
                 viewport.width = globalViewport.width;
@@ -12065,26 +12071,25 @@ var spine;
                 this.calculateAnimationViewport(animation, viewport);
             var userAnimViewport = this.config.viewport.animations[animation.name];
             if (userAnimViewport) {
-                if (userAnimViewport.x !== undefined && userAnimViewport.y !== undefined && userAnimViewport.width && userAnimViewport.height) {
+                if (userAnimViewport.x !== void 0 && userAnimViewport.y !== void 0 && userAnimViewport.width && userAnimViewport.height) {
                     viewport.x = userAnimViewport.x;
                     viewport.y = userAnimViewport.y;
                     viewport.width = userAnimViewport.width;
                     viewport.height = userAnimViewport.height;
                 }
-                if (userAnimViewport.padLeft !== undefined)
+                if (userAnimViewport.padLeft !== void 0)
                     viewport.padLeft = userAnimViewport.padLeft;
-                if (userAnimViewport.padRight !== undefined)
+                if (userAnimViewport.padRight !== void 0)
                     viewport.padRight = userAnimViewport.padRight;
-                if (userAnimViewport.padTop !== undefined)
+                if (userAnimViewport.padTop !== void 0)
                     viewport.padTop = userAnimViewport.padTop;
-                if (userAnimViewport.padBottom !== undefined)
+                if (userAnimViewport.padBottom !== void 0)
                     viewport.padBottom = userAnimViewport.padBottom;
             }
             viewport.padLeft = this.percentageToWorldUnit(viewport.width, viewport.padLeft);
             viewport.padRight = this.percentageToWorldUnit(viewport.width, viewport.padRight);
             viewport.padBottom = this.percentageToWorldUnit(viewport.height, viewport.padBottom);
             viewport.padTop = this.percentageToWorldUnit(viewport.height, viewport.padTop);
-            this.currentViewport = viewport;
             this.viewportTransitionStart = performance.now();
             return animation;
         };
@@ -12127,20 +12132,25 @@ var spine;
                 var doc = document;
                 var isFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
                 var bg = isFullscreen ? this.bgFullscreen : this.bg;
-                if (!this.skeleton && this.assetManager.isLoadingComplete())
+                this.time.update();
+                var delta = this.time.delta;
+                var loading = this.assetManager.isLoadingComplete();
+                if (!this.skeleton && loading)
                     this.loadSkeleton();
                 var skeleton = this.skeleton;
                 var config = this.config;
                 if (skeleton) {
                     var renderer = this.sceneRenderer;
                     renderer.resize(spine.webgl.ResizeMode.Expand);
+                    var playDelta = this.paused ? 0 : delta * this.speed;
                     if (config.frame)
-                        config.frame(this);
+                        config.frame(this, playDelta);
                     if (!this.paused) {
-                        this.time.update();
-                        var delta = this.time.delta * this.speed;
+                        this.animationState.update(playDelta);
+                        this.animationState.apply(skeleton);
+                        skeleton.updateWorldTransform();
                         if (config.showControls) {
-                            this.playTime += delta;
+                            this.playTime += playDelta;
                             var entry = this.animationState.getCurrent(0);
                             if (entry) {
                                 var duration = entry.animation.duration;
@@ -12150,18 +12160,12 @@ var spine;
                                 this.timelineSlider.setValue(this.playTime / duration);
                             }
                         }
-                        this.animationState.update(delta);
-                        this.animationState.apply(skeleton);
-                        skeleton.updateWorldTransform();
-                        if (config.update)
-                            config.update(this);
                     }
-                    var viewport = {
-                        x: this.currentViewport.x - this.currentViewport.padLeft,
-                        y: this.currentViewport.y - this.currentViewport.padBottom,
-                        width: this.currentViewport.width + this.currentViewport.padLeft + this.currentViewport.padRight,
-                        height: this.currentViewport.height + this.currentViewport.padBottom + this.currentViewport.padTop
-                    };
+                    var viewport = this.viewport;
+                    viewport.x = this.currentViewport.x - this.currentViewport.padLeft,
+                        viewport.y = this.currentViewport.y - this.currentViewport.padBottom,
+                        viewport.width = this.currentViewport.width + this.currentViewport.padLeft + this.currentViewport.padRight,
+                        viewport.height = this.currentViewport.height + this.currentViewport.padBottom + this.currentViewport.padTop;
                     if (this.previousViewport) {
                         var transitionAlpha = (performance.now() - this.viewportTransitionStart) / 1000 / config.viewport.transitionTime;
                         if (transitionAlpha < 1) {
@@ -12169,28 +12173,29 @@ var spine;
                             var y = this.previousViewport.y - this.previousViewport.padBottom;
                             var width = this.previousViewport.width + this.previousViewport.padLeft + this.previousViewport.padRight;
                             var height = this.previousViewport.height + this.previousViewport.padBottom + this.previousViewport.padTop;
-                            viewport = {
-                                x: x + (viewport.x - x) * transitionAlpha,
-                                y: y + (viewport.y - y) * transitionAlpha,
-                                width: width + (viewport.width - width) * transitionAlpha,
-                                height: height + (viewport.height - height) * transitionAlpha
-                            };
+                            viewport.x = x + (viewport.x - x) * transitionAlpha;
+                            viewport.y = y + (viewport.y - y) * transitionAlpha;
+                            viewport.width = width + (viewport.width - width) * transitionAlpha;
+                            viewport.height = height + (viewport.height - height) * transitionAlpha;
                         }
                     }
-                    var viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
+                    renderer.camera.zoom = this.canvas.height / this.canvas.width > viewport.height / viewport.width
+                        ? viewport.width / this.canvas.width : viewport.height / this.canvas.height;
+                    renderer.camera.position.x = viewport.x + viewport.width / 2;
+                    renderer.camera.position.y = viewport.y + viewport.height / 2;
                     var gl = this.context.gl;
                     gl.clearColor(bg.r, bg.g, bg.b, bg.a);
                     gl.clear(gl.COLOR_BUFFER_BIT);
-                    renderer.camera.zoom = viewport.width / viewportSize.x;
-                    renderer.camera.position.x = viewport.x + viewport.width / 2;
-                    renderer.camera.position.y = viewport.y + viewport.height / 2;
+                    if (config.update)
+                        config.update(this, playDelta);
                     renderer.begin();
-                    if (config.backgroundImage) {
-                        var bgImage = this.assetManager.get(config.backgroundImage.url);
-                        if (config.backgroundImage.hasOwnProperty("x") && config.backgroundImage.hasOwnProperty("y") && config.backgroundImage.width && config.backgroundImage.height)
-                            renderer.drawTexture(bgImage, config.backgroundImage.x, config.backgroundImage.y, config.backgroundImage.width, config.backgroundImage.height);
+                    var bgImage = config.backgroundImage;
+                    if (bgImage) {
+                        var texture = this.assetManager.get(bgImage.url);
+                        if (bgImage.x !== void 0 && bgImage.y !== void 0 && bgImage.width && bgImage.height)
+                            renderer.drawTexture(texture, bgImage.x, bgImage.y, bgImage.width, bgImage.height);
                         else
-                            renderer.drawTexture(bgImage, viewport.x, viewport.y, viewport.width, viewport.height);
+                            renderer.drawTexture(texture, viewport.x, viewport.y, viewport.width, viewport.height);
                     }
                     renderer.drawSkeleton(skeleton, config.premultipliedAlpha);
                     if ((renderer.skeletonDebugRenderer.drawBones = config.debug.bones)
@@ -12202,8 +12207,6 @@ var spine;
                         || (renderer.skeletonDebugRenderer.drawMeshTriangles = config.debug.meshes)) {
                         renderer.drawSkeletonDebug(skeleton, config.premultipliedAlpha);
                     }
-                    if (config.draw)
-                        config.draw(this);
                     var controlBones = config.controlBones;
                     if (controlBones.length) {
                         var selectedBones = this.selectedBones;
@@ -12224,24 +12227,19 @@ var spine;
                         renderer.rect(false, viewport.x, viewport.y, viewport.width, viewport.height, spine.Color.RED);
                     }
                     renderer.end();
+                    if (config.draw)
+                        config.draw(this, playDelta);
                 }
                 if (config.showLoading) {
                     this.loadingScreen.backgroundColor.setFromColor(bg);
-                    this.loadingScreen.draw(this.assetManager.isLoadingComplete());
+                    this.loadingScreen.draw(loading);
                 }
+                if (loading && config.loading)
+                    config.loading(this, delta);
             }
             catch (e) {
                 this.showError("Error: Unable to render skeleton.\n" + e.message, e);
             }
-        };
-        SpinePlayer.prototype.scale = function (sourceWidth, sourceHeight, targetWidth, targetHeight) {
-            var targetRatio = targetHeight / targetWidth;
-            var sourceRatio = sourceHeight / sourceWidth;
-            var scale = targetRatio > sourceRatio ? targetWidth / sourceWidth : targetHeight / sourceHeight;
-            var temp = new spine.Vector2();
-            temp.x = sourceWidth * scale;
-            temp.y = sourceHeight * scale;
-            return temp;
         };
         SpinePlayer.prototype.stopRendering = function () {
             this.stopRequestAnimationFrame = true;
@@ -12481,31 +12479,25 @@ var spine;
             this.slider = createElement("\n<div class=\"spine-player-slider " + (this.big ? "big" : "") + "\">\n\t<div class=\"spine-player-slider-value\"></div>\n\t<!--<div class=\"spine-player-slider-knob\"></div>-->\n</div>");
             this.value = findWithClass(this.slider, "spine-player-slider-value");
             this.setValue(0);
-            var input = new spine.webgl.Input(this.slider);
             var dragging = false;
-            input.addListener({
+            new spine.webgl.Input(this.slider).addListener({
                 down: function (x, y) {
                     dragging = true;
                     _this.value.classList.add("hovering");
                 },
                 up: function (x, y) {
                     dragging = false;
-                    var percentage = _this.setValue(x / _this.slider.clientWidth);
                     if (_this.change)
-                        _this.change(percentage);
+                        _this.change(_this.setValue(x / _this.slider.clientWidth));
                     _this.value.classList.remove("hovering");
                 },
                 moved: function (x, y) {
-                    if (dragging) {
-                        var percentage = _this.setValue(x / _this.slider.clientWidth);
-                        if (_this.change)
-                            _this.change(percentage);
-                    }
+                    if (dragging && _this.change)
+                        _this.change(_this.setValue(x / _this.slider.clientWidth));
                 },
                 dragged: function (x, y) {
-                    var percentage = _this.setValue(x / _this.slider.clientWidth);
                     if (_this.change)
-                        _this.change(percentage);
+                        _this.change(_this.setValue(x / _this.slider.clientWidth));
                 }
             });
             return this.slider;

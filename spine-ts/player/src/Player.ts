@@ -145,13 +145,16 @@ module spine {
 		error: (player: SpinePlayer, msg: string) => void
 
 		/* Optional: Callback at the start of each frame, before the skeleton is posed or drawn. Default: none */
-		frame: (player: SpinePlayer) => void
+		frame: (player: SpinePlayer, delta: number) => void
 
-		/* Optional: Callback just after the skeleton is posed each frame. Default: none */
-		update: (player: SpinePlayer) => void
+		/* Optional: Callback after the skeleton is posed each frame, before it is drawn. Default: none */
+		update: (player: SpinePlayer, delta: number) => void
 
-		/* Optional: Callback just after the skeleton is drawn each frame. Default: none */
-		draw: (player: SpinePlayer) => void
+		/* Optional: Callback after the skeleton is drawn each frame. Default: none */
+		draw: (player: SpinePlayer, delta: number) => void
+
+		/* Optional: Callback each frame before the skeleton is loaded. Default: none */
+		loading: (player: SpinePlayer, delta: number) => void
 
 		/* Optional: The downloader used by the player's asset manager. Passing the same downloader to multiple players using the
 		   same assets ensures the assets are only downloaded once. Default: new instance */
@@ -174,12 +177,12 @@ module spine {
 	}
 
 	export class SpinePlayer {
-		private parent: HTMLElement;
+		public parent: HTMLElement;
 		public dom: HTMLElement;
 		public canvas: HTMLCanvasElement;
-		private context: spine.webgl.ManagedWebGLRenderingContext;
-		private sceneRenderer: spine.webgl.SceneRenderer;
-		private loadingScreen: spine.webgl.LoadingScreen;
+		public context: spine.webgl.ManagedWebGLRenderingContext;
+		public sceneRenderer: spine.webgl.SceneRenderer;
+		public loadingScreen: spine.webgl.LoadingScreen;
 		public assetManager: spine.webgl.AssetManager;
 		public bg = new Color();
 		public bgFullscreen = new Color();
@@ -202,11 +205,12 @@ module spine {
 		/* The animation state controlling the skeleton. Null until loading is complete (access after config.success). */
 		public animationState: AnimationState;
 
-		private paused = true;
+		public paused = true;
 		public speed = 1;
-		private time = new TimeKeeper();
+		public time = new TimeKeeper();
 		private stopRequestAnimationFrame = false;
 
+		private viewport: Viewport = {} as Viewport;
 		private currentViewport: Viewport;
 		private previousViewport: Viewport;
 		private viewportTransitionStart = 0;
@@ -254,8 +258,8 @@ module spine {
 			if (!config.backgroundColor) config.backgroundColor = config.alpha ? "00000000" : "000000";
 			if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
 			if (config.backgroundImage && !config.backgroundImage.url) config.backgroundImage = null;
-			if (config.premultipliedAlpha === undefined) config.premultipliedAlpha = true;
-			if (config.mipmaps === undefined) config.mipmaps = true;
+			if (config.premultipliedAlpha === void 0) config.premultipliedAlpha = true;
+			if (config.mipmaps === void 0) config.mipmaps = true;
 			if (!config.debug) config.debug = {} as any;
 			if (config.animations && config.animation && config.animations.indexOf(config.animation) < 0)
 				throw new Error("Animation '" + config.animation + "' is not in the config animation list: " + toString(config.animations));
@@ -263,12 +267,12 @@ module spine {
 				throw new Error("Default skin '" + config.skin + "' is not in the config skins list: " + toString(config.skins));
 			if (!config.viewport) config.viewport = {} as any;
 			if (!config.viewport.animations) config.viewport.animations = {};
-			if (config.viewport.debugRender === undefined) config.viewport.debugRender = false;
-			if (config.viewport.transitionTime === undefined) config.viewport.transitionTime = 0.25;
+			if (config.viewport.debugRender === void 0) config.viewport.debugRender = false;
+			if (config.viewport.transitionTime === void 0) config.viewport.transitionTime = 0.25;
 			if (!config.controlBones) config.controlBones = [];
-			if (config.showControls === undefined) config.showControls = true;
-			if (config.showLoading === undefined) config.showLoading = true;
-			if (config.defaultMix === undefined) config.defaultMix = 0.25;
+			if (config.showControls === void 0) config.showControls = true;
+			if (config.showLoading === void 0) config.showLoading = true;
+			if (config.defaultMix === void 0) config.defaultMix = 0.25;
 		}
 
 		private initialize (): HTMLElement {
@@ -509,8 +513,8 @@ module spine {
 			if (!controlBones.length && !config.showControls) return;
 			let selectedBones = this.selectedBones = new Array<Bone>(controlBones.length);
 			let canvas = this.canvas;
-			let input = new spine.webgl.Input(canvas);
 			let target:Bone = null;
+			let offset = new spine.Vector2();
 			let coords = new spine.webgl.Vector3();
 			let mouse = new spine.webgl.Vector3();
 			let position = new spine.Vector2();
@@ -519,6 +523,7 @@ module spine {
 
 			let closest = function (x: number, y: number): Bone {
  				mouse.set(x, canvas.clientHeight - y, 0)
+				offset.x = offset.y = 0;
 				let bestDistance = 24, index = 0;
 				let best:Bone;
 				for (let i = 0; i < controlBones.length; i++) {
@@ -531,15 +536,19 @@ module spine {
 						bestDistance = distance;
 						best = bone;
 						index = i;
+						offset.x = coords.x - mouse.x;
+						offset.y = coords.y - mouse.y;
 					}
 				}
 				if (best) selectedBones[index] = best;
 				return best;
 			};
 
-			input.addListener({
-				down: (x, y) => target = closest(x, y),
-				up: (x, y) => {
+			new spine.webgl.Input(canvas).addListener({
+				down: (x, y) => {
+					target = closest(x, y);
+				},
+				up: () => {
 					if (target)
 						target = null;
 					else if (config.showControls)
@@ -547,8 +556,8 @@ module spine {
 				},
 				dragged: (x, y) => {
 					if (target) {
-						x = MathUtils.clamp(x, 0, canvas.clientWidth)
-						y = MathUtils.clamp(y, 0, canvas.clientHeight);
+						x = MathUtils.clamp(x + offset.x, 0, canvas.clientWidth)
+						y = MathUtils.clamp(y - offset.y, 0, canvas.clientHeight);
 						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.clientWidth, canvas.clientHeight);
 						if (target.parent) {
 							target.parent.worldToLocal(position.set(coords.x - skeleton.x, coords.y - skeleton.y));
@@ -563,44 +572,44 @@ module spine {
 				moved: (x, y) => closest(x, y)
 			});
 
-			if (!config.showControls) return;
+			if (config.showControls) {
+				// For manual hover to work, we need to disable hidding controls if the mouse/touch entered the clickable area of a child of the controls.
+				// For this we need to register a mouse handler on the document and see if we are within the canvas area.
+				document.addEventListener("mousemove", (ev: UIEvent) => {
+					if (ev instanceof MouseEvent) handleHover(ev.clientX, ev.clientY);
+				});
+				document.addEventListener("touchmove", (ev: UIEvent) => {
+					if (ev instanceof TouchEvent) {
+						let touches = ev.changedTouches;
+						if (touches.length) {
+							let touch = touches[0];
+							handleHover(touch.clientX, touch.clientY);
+						}
+					}
+				});
 
-			// For manual hover to work, we need to disable hidding controls if the mouse/touch entered the clickable area of a child of the controls.
-			// For this we need to register a mouse handler on the document and see if we are within the canvas area.
-			document.addEventListener("mousemove", (ev: UIEvent) => {
-				if (ev instanceof MouseEvent) handleHover(ev.clientX, ev.clientY);
-			});
-			document.addEventListener("touchmove", (ev: UIEvent) => {
-				if (ev instanceof TouchEvent) {
-					let touches = ev.changedTouches;
-					if (touches.length) {
-						let touch = touches[0];
-						handleHover(touch.clientX, touch.clientY);
+				let overlap = (mouseX: number, mouseY: number, rect: DOMRect | ClientRect): boolean => {
+					let x = mouseX - rect.left, y = mouseY - rect.top;
+					return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
+				}
+
+				let mouseOverControls = true, mouseOverCanvas = false;
+				let handleHover = (mouseX: number, mouseY: number) => {
+					let popup = findWithClass(this.dom, "spine-player-popup");
+					mouseOverControls = overlap(mouseX, mouseY, this.playerControls.getBoundingClientRect());
+					mouseOverCanvas = overlap(mouseX, mouseY, canvas.getBoundingClientRect());
+					clearTimeout(this.cancelId);
+					let hide = !popup && !mouseOverControls && !mouseOverCanvas && !this.paused;
+					if (hide)
+						this.playerControls.classList.add("spine-player-controls-hidden");
+					else
+						this.playerControls.classList.remove("spine-player-controls-hidden");
+					if (!mouseOverControls && !popup && !this.paused) {
+						this.cancelId = setTimeout(() => {
+							if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
+						}, 1000);
 					}
 				}
-			});
-
-			let mouseOverControls = true, mouseOverCanvas = false;
-			let handleHover = (mouseX: number, mouseY: number) => {
-				let popup = findWithClass(this.dom, "spine-player-popup");
-				mouseOverControls = overlap(mouseX, mouseY, this.playerControls.getBoundingClientRect());
-				mouseOverCanvas = overlap(mouseX, mouseY, canvas.getBoundingClientRect());
-				clearTimeout(this.cancelId);
-				let hide = !popup && !mouseOverControls && !mouseOverCanvas && !this.paused;
-				if (hide)
-					this.playerControls.classList.add("spine-player-controls-hidden");
-				else
-					this.playerControls.classList.remove("spine-player-controls-hidden");
-				if (!mouseOverControls && !popup && !this.paused) {
-					this.cancelId = setTimeout(() => {
-						if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
-					}, 1000);
-				}
-			}
-
-			let overlap = (mouseX: number, mouseY: number, rect: DOMRect | ClientRect): boolean => {
-				let x = mouseX - rect.left, y = mouseY - rect.top;
-				return x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
 			}
 		}
 
@@ -655,13 +664,13 @@ module spine {
 
 			// Determine the base viewport.
 			let globalViewport = this.config.viewport;
-			let viewport = {
-				padLeft: globalViewport.padLeft !== undefined ? globalViewport.padLeft : "10%",
-				padRight: globalViewport.padRight !== undefined ? globalViewport.padRight : "10%",
-				padTop: globalViewport.padTop !== undefined ? globalViewport.padTop : "10%",
-				padBottom: globalViewport.padBottom !== undefined ? globalViewport.padBottom : "10%"
+			let viewport = this.currentViewport = {
+				padLeft: globalViewport.padLeft !== void 0 ? globalViewport.padLeft : "10%",
+				padRight: globalViewport.padRight !== void 0 ? globalViewport.padRight : "10%",
+				padTop: globalViewport.padTop !== void 0 ? globalViewport.padTop : "10%",
+				padBottom: globalViewport.padBottom !== void 0 ? globalViewport.padBottom : "10%"
 			} as Viewport;
-			if (globalViewport.x !== undefined && globalViewport.y !== undefined && globalViewport.width && globalViewport.height) {
+			if (globalViewport.x !== void 0 && globalViewport.y !== void 0 && globalViewport.width && globalViewport.height) {
 				viewport.x = globalViewport.x;
 				viewport.y = globalViewport.y;
 				viewport.width = globalViewport.width;
@@ -672,16 +681,16 @@ module spine {
 			// Override with the animation specific viewport for the final result.
 			let userAnimViewport = this.config.viewport.animations[animation.name];
 			if (userAnimViewport) {
-				if (userAnimViewport.x !== undefined && userAnimViewport.y !== undefined && userAnimViewport.width && userAnimViewport.height) {
+				if (userAnimViewport.x !== void 0 && userAnimViewport.y !== void 0 && userAnimViewport.width && userAnimViewport.height) {
 					viewport.x = userAnimViewport.x;
 					viewport.y = userAnimViewport.y;
 					viewport.width = userAnimViewport.width;
 					viewport.height = userAnimViewport.height;
 				}
-				if (userAnimViewport.padLeft !== undefined) viewport.padLeft = userAnimViewport.padLeft;
-				if (userAnimViewport.padRight !== undefined) viewport.padRight = userAnimViewport.padRight;
-				if (userAnimViewport.padTop !== undefined) viewport.padTop = userAnimViewport.padTop;
-				if (userAnimViewport.padBottom !== undefined) viewport.padBottom = userAnimViewport.padBottom;
+				if (userAnimViewport.padLeft !== void 0) viewport.padLeft = userAnimViewport.padLeft;
+				if (userAnimViewport.padRight !== void 0) viewport.padRight = userAnimViewport.padRight;
+				if (userAnimViewport.padTop !== void 0) viewport.padTop = userAnimViewport.padTop;
+				if (userAnimViewport.padBottom !== void 0) viewport.padBottom = userAnimViewport.padBottom;
 			}
 
 			// Translate percentage padding to world units.
@@ -690,7 +699,6 @@ module spine {
 			viewport.padBottom = this.percentageToWorldUnit(viewport.height, viewport.padBottom);
 			viewport.padTop = this.percentageToWorldUnit(viewport.height, viewport.padTop);
 
-			this.currentViewport = viewport;
 			this.viewportTransitionStart = performance.now();
 			return animation;
 		}
@@ -737,8 +745,12 @@ module spine {
 				let isFullscreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
 				let bg = isFullscreen ? this.bgFullscreen : this.bg;
 
+				this.time.update();
+				let delta = this.time.delta;
+
 				// Load the skeleton if the assets are ready.
-				if (!this.skeleton && this.assetManager.isLoadingComplete()) this.loadSkeleton();
+				var loading = this.assetManager.isLoadingComplete();
+				if (!this.skeleton && loading) this.loadSkeleton();
 				let skeleton = this.skeleton;
 				let config = this.config;
 				if (skeleton) {
@@ -746,15 +758,17 @@ module spine {
 					let renderer = this.sceneRenderer;
 					renderer.resize(webgl.ResizeMode.Expand);
 
-					if (config.frame) config.frame(this);
+					let playDelta = this.paused ? 0 : delta * this.speed;
+					if (config.frame) config.frame(this, playDelta);
 
 					// Update animation time and pose the skeleton.
 					if (!this.paused) {
-						this.time.update();
-						let delta = this.time.delta * this.speed;
+						this.animationState.update(playDelta);
+						this.animationState.apply(skeleton);
+						skeleton.updateWorldTransform();
 
 						if (config.showControls) {
-							this.playTime += delta;
+							this.playTime += playDelta;
 							let entry = this.animationState.getCurrent(0);
 							if (entry) {
 								let duration = entry.animation.duration;
@@ -764,20 +778,14 @@ module spine {
 								this.timelineSlider.setValue(this.playTime / duration);
 							}
 						}
-
-						this.animationState.update(delta);
-						this.animationState.apply(skeleton);
-						skeleton.updateWorldTransform();
-						if (config.update) config.update(this);
 					}
 
 					// Determine the viewport.
-					let viewport = {
-						x: this.currentViewport.x - (this.currentViewport.padLeft as number),
-						y: this.currentViewport.y - (this.currentViewport.padBottom as number),
-						width: this.currentViewport.width + (this.currentViewport.padLeft as number) + (this.currentViewport.padRight as number),
-						height: this.currentViewport.height + (this.currentViewport.padBottom as number) + (this.currentViewport.padTop as number)
-					};
+					var viewport = this.viewport;
+					viewport.x = this.currentViewport.x - (this.currentViewport.padLeft as number),
+					viewport.y = this.currentViewport.y - (this.currentViewport.padBottom as number),
+					viewport.width = this.currentViewport.width + (this.currentViewport.padLeft as number) + (this.currentViewport.padRight as number),
+					viewport.height = this.currentViewport.height + (this.currentViewport.padBottom as number) + (this.currentViewport.padTop as number)
 
 					if (this.previousViewport) {
 						let transitionAlpha = (performance.now() - this.viewportTransitionStart) / 1000 / config.viewport.transitionTime;
@@ -786,35 +794,35 @@ module spine {
 							let y = this.previousViewport.y - (this.previousViewport.padBottom as number);
 							let width = this.previousViewport.width + (this.previousViewport.padLeft as number) + (this.previousViewport.padRight as number);
 							let height = this.previousViewport.height + (this.previousViewport.padBottom as number) + (this.previousViewport.padTop as number);
-							viewport = {
-								x: x + (viewport.x - x) * transitionAlpha,
-								y: y + (viewport.y - y) * transitionAlpha,
-								width: width + (viewport.width - width) * transitionAlpha,
-								height: height + (viewport.height - height) * transitionAlpha
-							};
+							viewport.x = x + (viewport.x - x) * transitionAlpha;
+							viewport.y = y + (viewport.y - y) * transitionAlpha;
+							viewport.width = width + (viewport.width - width) * transitionAlpha;
+							viewport.height = height + (viewport.height - height) * transitionAlpha;
 						}
 					}
 
-					let viewportSize = this.scale(viewport.width, viewport.height, this.canvas.width, this.canvas.height);
+					renderer.camera.zoom = this.canvas.height / this.canvas.width > viewport.height / viewport.width
+						? viewport.width / this.canvas.width : viewport.height / this.canvas.height;
+					renderer.camera.position.x = viewport.x + viewport.width / 2;
+					renderer.camera.position.y = viewport.y + viewport.height / 2;
 
 					// Clear the screen.
 					let gl = this.context.gl;
 					gl.clearColor(bg.r, bg.g, bg.b, bg.a);
 					gl.clear(gl.COLOR_BUFFER_BIT);
 
-					renderer.camera.zoom = viewport.width / viewportSize.x;
-					renderer.camera.position.x = viewport.x + viewport.width / 2;
-					renderer.camera.position.y = viewport.y + viewport.height / 2;
+					if (config.update) config.update(this, playDelta);
 
 					renderer.begin();
 
 					// Draw the background image.
-					if (config.backgroundImage) {
-						let bgImage = this.assetManager.get(config.backgroundImage.url);
-						if (config.backgroundImage.hasOwnProperty("x") && config.backgroundImage.hasOwnProperty("y") && config.backgroundImage.width && config.backgroundImage.height)
-							renderer.drawTexture(bgImage, config.backgroundImage.x, config.backgroundImage.y, config.backgroundImage.width, config.backgroundImage.height);
+					let bgImage = config.backgroundImage;
+					if (bgImage) {
+						let texture = this.assetManager.get(bgImage.url);
+						if (bgImage.x !== void 0 && bgImage.y !== void 0 && bgImage.width && bgImage.height)
+							renderer.drawTexture(texture, bgImage.x, bgImage.y, bgImage.width, bgImage.height);
 						else
-							renderer.drawTexture(bgImage, viewport.x, viewport.y, viewport.width, viewport.height);
+							renderer.drawTexture(texture, viewport.x, viewport.y, viewport.width, viewport.height);
 					}
 
 					// Draw the skeleton and debug output.
@@ -829,7 +837,6 @@ module spine {
 					) {
 						renderer.drawSkeletonDebug(skeleton, config.premultipliedAlpha);
 					}
-					if (config.draw) config.draw(this);
 
 					// Draw the control bones.
 					let controlBones = config.controlBones;
@@ -854,26 +861,19 @@ module spine {
 					}
 
 					renderer.end();
+
+					if (config.draw) config.draw(this, playDelta);
 				}
 
 				// Draw the loading screen.
 				if (config.showLoading) {
 					this.loadingScreen.backgroundColor.setFromColor(bg);
-					this.loadingScreen.draw(this.assetManager.isLoadingComplete());
+					this.loadingScreen.draw(loading);
 				}
+				if (loading && config.loading) config.loading(this, delta);
 			} catch (e) {
 				this.showError(`Error: Unable to render skeleton.\n${e.message}`, e);
 			}
-		}
-
-		private scale (sourceWidth: number, sourceHeight: number, targetWidth: number, targetHeight: number): Vector2 {
-			let targetRatio = targetHeight / targetWidth;
-			let sourceRatio = sourceHeight / sourceWidth;
-			let scale = targetRatio > sourceRatio ? targetWidth / sourceWidth : targetHeight / sourceHeight;
-			let temp = new spine.Vector2();
-			temp.x = sourceWidth * scale;
-			temp.y = sourceHeight * scale;
-			return temp;
 		}
 
 		stopRendering () {
@@ -1142,28 +1142,22 @@ module spine {
 			// this.knob = findWithClass(this.slider, "spine-player-slider-knob");
 			this.setValue(0);
 
-			let input = new spine.webgl.Input(this.slider);
 			let dragging = false;
-			input.addListener({
+			new spine.webgl.Input(this.slider).addListener({
 				down: (x, y) => {
 					dragging = true;
 					this.value.classList.add("hovering");
 				},
 				up: (x, y) => {
 					dragging = false;
-					let percentage = this.setValue(x / this.slider.clientWidth);
-					if (this.change) this.change(percentage);
+					if (this.change) this.change(this.setValue(x / this.slider.clientWidth));
 					this.value.classList.remove("hovering");
 				},
 				moved: (x, y) => {
-					if (dragging) {
-						let percentage = this.setValue(x / this.slider.clientWidth);
-						if (this.change) this.change(percentage);
-					}
+					if (dragging && this.change) this.change(this.setValue(x / this.slider.clientWidth));
 				},
 				dragged: (x, y) => {
-					let percentage = this.setValue(x / this.slider.clientWidth);
-					if (this.change) this.change(percentage);
+					if (this.change) this.change(this.setValue(x / this.slider.clientWidth));
 				}
 			});
 
