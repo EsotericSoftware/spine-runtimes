@@ -2881,10 +2881,9 @@ var spine;
 									_this.success(success, path, atlas_1);
 							}
 						}, function (imagePath, message) {
-							if (!abort_1) {
-								abort_1 = true;
+							if (!abort_1)
 								_this.error(error, path, "Couldn't load texture atlas " + path + " page " + imagePath + ": " + message);
-							}
+							abort_1 = true;
 						});
 					};
 					for (var _i = 0, _a = atlas_1.pages; _i < _a.length; _i++) {
@@ -9024,7 +9023,6 @@ var spine;
 				geo.setAttribute("uv", new THREE.InterleavedBufferAttribute(vertexBuffer, 2, 7, false));
 				geo.setIndex(new THREE.BufferAttribute(indices, 1));
 				geo.getIndex().usage = WebGLRenderingContext.DYNAMIC_DRAW;
-				;
 				geo.drawRange.start = 0;
 				geo.drawRange.count = 0;
 				_this.geometry = geo;

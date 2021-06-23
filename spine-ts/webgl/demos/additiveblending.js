@@ -26,9 +26,7 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 	};
 
 	function init () {
-		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.context.gl;
-
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas2.atlas");
@@ -96,7 +94,7 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 			var input = new spine.webgl.Input(canvas);
 			input.addListener({
 				down: function(x, y) {
-					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.clientWidth, canvas.clientHeight);
 					if (temp.set(handle.x, handle.y, 0).distance(coords) < canvas.width * HANDLE_SIZE) {
 						dragging = true;
 					}
@@ -106,7 +104,7 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 				},
 				dragged: function(x, y) {
 					if (dragging && x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
-						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.clientWidth, canvas.clientHeight);
 						handle.x = coords.x;
 						handle.y = coords.y;
 						calculateBlend(x, y, false);

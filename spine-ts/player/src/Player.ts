@@ -393,7 +393,7 @@ module spine {
 			let atlas = this.assetManager.get(config.atlasUrl);
 			let gl = this.context.gl, anisotropic = gl.getExtension("EXT_texture_filter_anisotropic");
 			for (let page of atlas.pages) {
-				var minFilter = page.minFilter;
+				let minFilter = page.minFilter;
 				if (config.mipmaps) {
 					if (anisotropic) {
 						gl.texParameterf(gl.TEXTURE_2D, anisotropic.TEXTURE_MAX_ANISOTROPY_EXT, 8);
@@ -509,26 +509,25 @@ module spine {
 			let input = new spine.webgl.Input(canvas);
 			let target:Bone = null;
 			let coords = new spine.webgl.Vector3();
-			let temp3 = new spine.webgl.Vector3();
-			let temp2 = new spine.Vector2();
+			let mouse = new spine.webgl.Vector3();
+			let position = new spine.Vector2();
 			let skeleton = this.skeleton;
 			let renderer = this.sceneRenderer;
 
 			let closest = function (x: number, y: number): Bone {
-				y = canvas.height - y;
+ 				mouse.set(x, canvas.clientHeight - y, 0)
 				let bestDistance = 24, index = 0;
 				let best:Bone;
 				for (let i = 0; i < controlBones.length; i++) {
 					selectedBones[i] = null;
 					let bone = skeleton.findBone(controlBones[i]);
-					if (bone) {
-						renderer.camera.worldToScreen(coords.set(bone.worldX, bone.worldY, 0), canvas.width, canvas.height);
-						let distance = temp3.set(x, y, 0).distance(coords);
-						if (distance < bestDistance) {
-							bestDistance = distance;
-							best = bone;
-							index = i;
-						}
+					let distance = renderer.camera.worldToScreen(
+						coords.set(bone.worldX, bone.worldY, 0),
+						canvas.clientWidth, canvas.clientHeight).distance(mouse);
+					if (distance < bestDistance) {
+						bestDistance = distance;
+						best = bone;
+						index = i;
 					}
 				}
 				if (best) selectedBones[index] = best;
@@ -545,13 +544,13 @@ module spine {
 				},
 				dragged: (x, y) => {
 					if (target) {
-						x = MathUtils.clamp(x, 0, canvas.width)
-						y = MathUtils.clamp(y, 0, canvas.height);
-						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+						x = MathUtils.clamp(x, 0, canvas.clientWidth)
+						y = MathUtils.clamp(y, 0, canvas.clientHeight);
+						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.clientWidth, canvas.clientHeight);
 						if (target.parent) {
-							target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
-							target.x = temp2.x;
-							target.y = temp2.y;
+							target.parent.worldToLocal(position.set(coords.x - skeleton.x, coords.y - skeleton.y));
+							target.x = position.x;
+							target.y = position.y;
 						} else {
 							target.x = coords.x - skeleton.x;
 							target.y = coords.y - skeleton.y;
@@ -753,7 +752,7 @@ module spine {
 
 						if (config.showControls) {
 							this.playTime += delta;
-							var entry = this.animationState.getCurrent(0);
+							let entry = this.animationState.getCurrent(0);
 							if (entry) {
 								let duration = entry.animation.duration;
 								while (this.playTime >= duration && duration != 0)
@@ -778,19 +777,17 @@ module spine {
 					};
 
 					if (this.previousViewport) {
-						let transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / config.viewport.transitionTime;
+						let transitionAlpha = (performance.now() - this.viewportTransitionStart) / 1000 / config.viewport.transitionTime;
 						if (transitionAlpha < 1) {
-							let oldViewport = {
-								x: this.previousViewport.x - (this.previousViewport.padLeft as number),
-								y: this.previousViewport.y - (this.previousViewport.padBottom as number),
-								width: this.previousViewport.width + (this.previousViewport.padLeft as number) + (this.previousViewport.padRight as number),
-								height: this.previousViewport.height + (this.previousViewport.padBottom as number) + (this.previousViewport.padTop as number)
-							};
+							let x = this.previousViewport.x - (this.previousViewport.padLeft as number);
+							let y = this.previousViewport.y - (this.previousViewport.padBottom as number);
+							let width = this.previousViewport.width + (this.previousViewport.padLeft as number) + (this.previousViewport.padRight as number);
+							let height = this.previousViewport.height + (this.previousViewport.padBottom as number) + (this.previousViewport.padTop as number);
 							viewport = {
-								x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
-								y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
-								width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
-								height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
+								x: x + (viewport.x - x) * transitionAlpha,
+								y: y + (viewport.y - y) * transitionAlpha,
+								width: width + (viewport.width - width) * transitionAlpha,
+								height: height + (viewport.height - height) * transitionAlpha
 							};
 						}
 					}
@@ -844,11 +841,11 @@ module spine {
 							renderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);
 							renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
 						}
-						gl.lineWidth(1);
 					}
 
 					// Draw the viewport bounds.
 					if (config.viewport.debugRender) {
+						gl.lineWidth(1);
 						renderer.rect(false, this.currentViewport.x, this.currentViewport.y, this.currentViewport.width, this.currentViewport.height, Color.GREEN);
 						renderer.rect(false, viewport.x, viewport.y, viewport.width, viewport.height, Color.RED);
 					}

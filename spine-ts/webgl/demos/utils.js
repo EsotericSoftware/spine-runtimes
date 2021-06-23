@@ -109,6 +109,45 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 		spineDemos.demos.push(demo);
 	}
 
+	var coords = new spine.webgl.Vector3();
+	var mouse = new spine.webgl.Vector3();
+	spineDemos.closest = function (canvas, renderer, skeleton, controlBones, hoverTargets, x, y) {
+		mouse.set(x, canvas.clientHeight - y, 0)
+		var bestDistance = 24, index = 0;
+		var best;
+		for (var i = 0; i < controlBones.length; i++) {
+			hoverTargets[i] = null;
+			let bone = skeleton.findBone(controlBones[i]);
+			let distance = renderer.camera.worldToScreen(
+				coords.set(bone.worldX, bone.worldY, 0),
+				canvas.clientWidth, canvas.clientHeight).distance(mouse);
+			if (distance < bestDistance) {
+				bestDistance = distance;
+				best = bone;
+				index = i;
+			}
+		}
+		if (best) hoverTargets[index] = best;
+		return best;
+	};
+
+	var position = new spine.webgl.Vector3();
+	spineDemos.dragged = function (canvas, renderer, target, x, y) {
+		if (target) {
+			x = spine.MathUtils.clamp(x, 0, canvas.clientWidth)
+			y = spine.MathUtils.clamp(y, 0, canvas.clientHeight);
+			renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.clientWidth, canvas.clientHeight);
+			if (target.parent !== null) {
+				target.parent.worldToLocal(position.set(coords.x, coords.y));
+				target.x = position.x;
+				target.y = position.y;
+			} else {
+				target.x = coords.x;
+				target.y = coords.y;
+			}
+		}
+	};
+
 	loadSliders = function () {
 		$(window).resize(function() {
 			$(".slider").each(function () {

@@ -2881,10 +2881,9 @@ var spine;
 									_this.success(success, path, atlas_1);
 							}
 						}, function (imagePath, message) {
-							if (!abort_1) {
-								abort_1 = true;
+							if (!abort_1)
 								_this.error(error, path, "Couldn't load texture atlas " + path + " page " + imagePath + ": " + message);
-							}
+							abort_1 = true;
 						});
 					};
 					for (var _i = 0, _a = atlas_1.pages; _i < _a.length; _i++) {

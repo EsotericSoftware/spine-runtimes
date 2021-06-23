@@ -16,9 +16,7 @@ var vineDemo = function(canvas, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.context.gl;
-
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		input = new spine.webgl.Input(canvas);
 		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
@@ -89,40 +87,16 @@ var vineDemo = function(canvas, bgColor) {
 	function setupInput() {
 		input.addListener({
 			down: function(x, y) {
-				for (var i = 0; i < controlBones.length; i++) {
-					var bone = skeleton.findBone(controlBones[i]);
-					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
-						target = bone;
-					}
-				}
+				target = spineDemos.closest(canvas, renderer, skeleton, controlBones, hoverTargets, x, y);
 			},
 			up: function(x, y) {
 				target = null;
 			},
 			dragged: function(x, y) {
-				if (target != null && x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
-					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-					if (target.parent !== null) {
-						target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
-						target.x = temp2.x;
-						target.y = temp2.y;
-					} else {
-						target.x = coords.x - skeleton.x;
-						target.y = coords.y - skeleton.y;
-					}
-				}
+				spineDemos.dragged(canvas, renderer, target, x, y);
 			},
 			moved: function (x, y) {
-				for (var i = 0; i < controlBones.length; i++) {
-					var bone = skeleton.findBone(controlBones[i]);
-					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
-						hoverTargets[i] = bone;
-					} else {
-						hoverTargets[i] = null;
-					}
-				}
+				spineDemos.closest(canvas, renderer, skeleton, controlBones, hoverTargets, x, y);
 			}
 		});
 	}

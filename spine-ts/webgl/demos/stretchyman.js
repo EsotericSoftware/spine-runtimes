@@ -24,9 +24,7 @@ var stretchymanDemo = function(canvas, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.context.gl;
-
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas2.atlas");
@@ -72,43 +70,21 @@ var stretchymanDemo = function(canvas, bgColor) {
 	function setupInput (){
 		input.addListener({
 			down: function(x, y) {
-				for (var i = 0; i < controlBones.length; i++) {
-					var bone = skeleton.findBone(controlBones[i]);
-					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
-						target = bone;
-					}
-				}
+				target = spineDemos.closest(canvas, renderer, skeleton, controlBones, hoverTargets, x, y);
 			},
 			up: function(x, y) {
 				target = null;
 			},
 			dragged: function(x, y) {
-				if (target != null && x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
-					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-					if (target.parent !== null)
-						target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
-					else
-						temp2.set(coords.x - skeleton.x, coords.y - skeleton.y);
-					target.x = temp2.x;
-					target.y = temp2.y;
-					if (target.data.name === "head controller") {
-						var hipControl = skeleton.findBone("hip controller");
-						target.x = spine.MathUtils.clamp(target.x, -65, 65);
-						target.y = Math.max(260, target.y);
-					}
+				spineDemos.dragged(canvas, renderer, target, x, y);
+				if (target && target.data.name === "head controller") {
+					var hipControl = skeleton.findBone("hip controller");
+					target.x = spine.MathUtils.clamp(target.x, -65, 65);
+					target.y = Math.max(260, target.y);
 				}
 			},
 			moved: function (x, y) {
-				for (var i = 0; i < controlBones.length; i++) {
-					var bone = skeleton.findBone(controlBones[i]);
-					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
-						hoverTargets[i] = bone;
-					} else {
-						hoverTargets[i] = null;
-					}
-				}
+				spineDemos.closest(canvas, renderer, skeleton, controlBones, hoverTargets, x, y);
 			}
 		});
 	}

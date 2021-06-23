@@ -9,20 +9,17 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		timeSlider = $("#transitions-timeslider").data("slider");
-		timeSlider.set(0.5);
-		timeSliderLabel = $("#transitions-timeslider-label")[0];
-
-		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.context.gl;
-
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas1.atlas");
 		assetManager.loadJson("demos.json");
-
 		input = new spine.webgl.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();
+
+		timeSlider = $("#transitions-timeslider").data("slider");
+		timeSlider.set(0.5);
+		timeSliderLabel = $("#transitions-timeslider-label")[0];
 	}
 
 	function loadingComplete () {

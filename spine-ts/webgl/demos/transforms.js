@@ -18,9 +18,7 @@ var transformsDemo = function(canvas, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.context.gl;
-
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas2.atlas");
@@ -83,7 +81,7 @@ var transformsDemo = function(canvas, bgColor) {
 
 	function setupInput() {
 		var getRotation = function(x, y) {
-			renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+			renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.clientWidth, canvas.clientHeight);
 			var wheel1 = skeleton.findBone("wheel1overlay");
 			var v = coords.sub(new spine.webgl.Vector3(wheel1.worldX, wheel1.worldY, 0)).normalize();
 			var angle = Math.acos(v.x) * spine.MathUtils.radiansToDegrees;
@@ -92,48 +90,23 @@ var transformsDemo = function(canvas, bgColor) {
 		}
 		input.addListener({
 			down: function(x, y) {
-				renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-				for (var i = 0; i < controlBones.length; i++) {
-					var bone = skeleton.findBone(controlBones[i]);
-					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
-						target = bone;
-						if (target === rotateHandle) lastRotation = getRotation(x, y);
-					}
-				}
+				target = spineDemos.closest(canvas, renderer, skeleton, controlBones, hoverTargets, x, y);
+				if (target === rotateHandle) lastRotation = getRotation(x, y);
 			},
 			up: function(x, y) {
 				target = null;
 			},
 			dragged: function(x, y) {
-				if (target != null && x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
-					if (target === rotateHandle) {
-						var rotation = getRotation(x, y);
-						var delta = rotation - lastRotation;
-						skeleton.findBone("wheel1").rotation += delta;
-						lastRotation = rotation;
-					} else {
-						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-						if (target.parent !== null) {
-							target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
-							target.x = temp2.x;
-							target.y = temp2.y;
-						} else {
-							target.x = coords.x - skeleton.x;
-							target.y = coords.y - skeleton.y;
-						}
-					}
-				}
-			 },
+				if (target === rotateHandle) {
+					var rotation = getRotation(x, y);
+					var delta = rotation - lastRotation;
+					skeleton.findBone("wheel1").rotation += delta;
+					lastRotation = rotation;
+				} else
+					spineDemos.dragged(canvas, renderer, target, x, y);
+			},
 			moved: function (x, y) {
-				renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
-				for (var i = 0; i < controlBones.length; i++) {
-					var bone = skeleton.findBone(controlBones[i]);
-					if (temp.set(skeleton.x + bone.worldX, skeleton.y + bone.worldY, 0).distance(coords) < 30) {
-						hoverTargets[i] = bone;
-					} else {
-						hoverTargets[i] = null;
-					}
-				}
+				spineDemos.closest(canvas, renderer, skeleton, controlBones, hoverTargets, x, y);
 			}
 		})
 	}

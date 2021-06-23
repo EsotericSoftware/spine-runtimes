@@ -2881,10 +2881,9 @@ var spine;
 									_this.success(success, path, atlas_1);
 							}
 						}, function (imagePath, message) {
-							if (!abort_1) {
-								abort_1 = true;
+							if (!abort_1)
 								_this.error(error, path, "Couldn't load texture atlas " + path + " page " + imagePath + ": " + message);
-							}
+							abort_1 = true;
 						});
 					};
 					for (var _i = 0, _a = atlas_1.pages; _i < _a.length; _i++) {
@@ -8991,12 +8990,10 @@ var spine;
 			function AssetManager(context, pathPrefix, downloader) {
 				if (pathPrefix === void 0) { pathPrefix = ""; }
 				if (downloader === void 0) { downloader = null; }
-				var _this = _super.call(this, function (image) { return _this.createTexture(context, image); }, pathPrefix, downloader) || this;
-				return _this;
+				return _super.call(this, function (image) {
+					return new spine.webgl.GLTexture(context, image);
+				}, pathPrefix, downloader) || this;
 			}
-			AssetManager.prototype.createTexture = function (context, image) {
-				return new spine.webgl.GLTexture(context, image);
-			};
 			return AssetManager;
 		}(spine.AssetManager));
 		webgl.AssetManager = AssetManager;

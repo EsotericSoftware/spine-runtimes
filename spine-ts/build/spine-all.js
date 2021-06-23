@@ -2881,10 +2881,9 @@ var spine;
 									_this.success(success, path, atlas_1);
 							}
 						}, function (imagePath, message) {
-							if (!abort_1) {
-								abort_1 = true;
+							if (!abort_1)
 								_this.error(error, path, "Couldn't load texture atlas " + path + " page " + imagePath + ": " + message);
-							}
+							abort_1 = true;
 						});
 					};
 					for (var _i = 0, _a = atlas_1.pages; _i < _a.length; _i++) {
@@ -9241,12 +9240,10 @@ var spine;
 			function AssetManager(context, pathPrefix, downloader) {
 				if (pathPrefix === void 0) { pathPrefix = ""; }
 				if (downloader === void 0) { downloader = null; }
-				var _this = _super.call(this, function (image) { return _this.createTexture(context, image); }, pathPrefix, downloader) || this;
-				return _this;
+				return _super.call(this, function (image) {
+					return new spine.webgl.GLTexture(context, image);
+				}, pathPrefix, downloader) || this;
 			}
-			AssetManager.prototype.createTexture = function (context, image) {
-				return new spine.webgl.GLTexture(context, image);
-			};
 			return AssetManager;
 		}(spine.AssetManager));
 		webgl.AssetManager = AssetManager;
@@ -11905,7 +11902,6 @@ var spine;
 				geo.setAttribute("uv", new THREE.InterleavedBufferAttribute(vertexBuffer, 2, 7, false));
 				geo.setIndex(new THREE.BufferAttribute(indices, 1));
 				geo.getIndex().usage = WebGLRenderingContext.DYNAMIC_DRAW;
-				;
 				geo.drawRange.start = 0;
 				geo.drawRange.count = 0;
 				_this.geometry = geo;
@@ -12333,6 +12329,8 @@ var spine;
 				config.backgroundImage = null;
 			if (config.premultipliedAlpha === undefined)
 				config.premultipliedAlpha = true;
+			if (config.mipmaps === undefined)
+				config.mipmaps = true;
 			if (!config.debug)
 				config.debug = {};
 			if (config.animations && config.animation && config.animations.indexOf(config.animation) < 0)
@@ -12375,51 +12373,7 @@ var spine;
 			catch (e) {
 				this.showError("Sorry, your browser does not support WebGL.\nPlease use the latest version of Firefox, Chrome, Edge, or Safari.", e);
 			}
-			this.assetManager = new (function (_super) {
-				__extends(class_1, _super);
-				function class_1() {
-					return _super !== null && _super.apply(this, arguments) || this;
-				}
-				class_1.prototype.createTexture = function (context, image) {
-					return new (function (_super) {
-						__extends(class_2, _super);
-						function class_2() {
-							return _super !== null && _super.apply(this, arguments) || this;
-						}
-						class_2.prototype.setFilters = function (minFilter, magFilter) {
-							if (config.mipmaps) {
-								minFilter = spine.TextureFilter.MipMapLinearLinear;
-								magFilter = spine.TextureFilter.Linear;
-							}
-							var mipmaps = false;
-							switch (minFilter) {
-								case spine.TextureFilter.MipMap:
-								case spine.TextureFilter.MipMapLinearLinear:
-								case spine.TextureFilter.MipMapLinearNearest:
-								case spine.TextureFilter.MipMapNearestLinear:
-								case spine.TextureFilter.MipMapNearestNearest:
-									if (config.mipmaps) {
-										var gl = this.context.gl;
-										var ext = gl.getExtension("EXT_texture_filter_anisotropic");
-										if (ext) {
-											gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, 8);
-											mipmaps = true;
-										}
-										else
-											minFilter = spine.TextureFilter.Linear;
-									}
-									else
-										mipmaps = true;
-							}
-							_super.prototype.setFilters.call(this, minFilter, magFilter);
-							if (mipmaps)
-								this.update(true);
-						};
-						return class_2;
-					}(spine.webgl.GLTexture))(context, image);
-				};
-				return class_1;
-			}(spine.webgl.AssetManager))(this.context, "", config.downloader);
+			this.assetManager = new spine.webgl.AssetManager(this.context, "", config.downloader);
 			if (config.rawDataURIs) {
 				for (var path in config.rawDataURIs)
 					this.assetManager.setRawDataURI(path, config.rawDataURIs[path]);
@@ -12516,6 +12470,22 @@ var spine;
 				this.showError("Error: Assets could not be loaded.\n" + toString(this.assetManager.getErrors()));
 			var config = this.config;
 			var atlas = this.assetManager.get(config.atlasUrl);
+			var gl = this.context.gl, anisotropic = gl.getExtension("EXT_texture_filter_anisotropic");
+			for (var _i = 0, _a = atlas.pages; _i < _a.length; _i++) {
+				var page = _a[_i];
+				var minFilter = page.minFilter;
+				if (config.mipmaps) {
+					if (anisotropic) {
+						gl.texParameterf(gl.TEXTURE_2D, anisotropic.TEXTURE_MAX_ANISOTROPY_EXT, 8);
+						minFilter = spine.TextureFilter.MipMapLinearLinear;
+					}
+					else
+						minFilter = spine.TextureFilter.Linear;
+					page.texture.setFilters(minFilter, spine.TextureFilter.Nearest);
+				}
+				if (minFilter != spine.TextureFilter.Nearest && minFilter != spine.TextureFilter.Linear)
+					page.texture.update(true);
+			}
 			var skeletonData;
 			if (config.jsonUrl) {
 				try {
@@ -12618,25 +12588,22 @@ var spine;
 			var input = new spine.webgl.Input(canvas);
 			var target = null;
 			var coords = new spine.webgl.Vector3();
-			var temp3 = new spine.webgl.Vector3();
-			var temp2 = new spine.Vector2();
+			var mouse = new spine.webgl.Vector3();
+			var position = new spine.Vector2();
 			var skeleton = this.skeleton;
 			var renderer = this.sceneRenderer;
 			var closest = function (x, y) {
-				y = canvas.height - y;
+				mouse.set(x, canvas.clientHeight - y, 0);
 				var bestDistance = 24, index = 0;
 				var best;
 				for (var i = 0; i < controlBones.length; i++) {
 					selectedBones[i] = null;
 					var bone = skeleton.findBone(controlBones[i]);
-					if (bone) {
-						renderer.camera.worldToScreen(coords.set(bone.worldX, bone.worldY, 0), canvas.width, canvas.height);
-						var distance = temp3.set(x, y, 0).distance(coords);
-						if (distance < bestDistance) {
-							bestDistance = distance;
-							best = bone;
-							index = i;
-						}
+					var distance = renderer.camera.worldToScreen(coords.set(bone.worldX, bone.worldY, 0), canvas.clientWidth, canvas.clientHeight).distance(mouse);
+					if (distance < bestDistance) {
+						bestDistance = distance;
+						best = bone;
+						index = i;
 					}
 				}
 				if (best)
@@ -12653,13 +12620,13 @@ var spine;
 				},
 				dragged: function (x, y) {
 					if (target) {
-						x = spine.MathUtils.clamp(x, 0, canvas.width);
-						y = spine.MathUtils.clamp(y, 0, canvas.height);
-						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.width, canvas.height);
+						x = spine.MathUtils.clamp(x, 0, canvas.clientWidth);
+						y = spine.MathUtils.clamp(y, 0, canvas.clientHeight);
+						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.clientWidth, canvas.clientHeight);
 						if (target.parent) {
-							target.parent.worldToLocal(temp2.set(coords.x - skeleton.x, coords.y - skeleton.y));
-							target.x = temp2.x;
-							target.y = temp2.y;
+							target.parent.worldToLocal(position.set(coords.x - skeleton.x, coords.y - skeleton.y));
+							target.x = position.x;
+							target.y = position.y;
 						}
 						else {
 							target.x = coords.x - skeleton.x;
@@ -12867,19 +12834,17 @@ var spine;
 						height: this.currentViewport.height + this.currentViewport.padBottom + this.currentViewport.padTop
 					};
 					if (this.previousViewport) {
-						var transitionAlpha = ((performance.now() - this.viewportTransitionStart) / 1000) / config.viewport.transitionTime;
+						var transitionAlpha = (performance.now() - this.viewportTransitionStart) / 1000 / config.viewport.transitionTime;
 						if (transitionAlpha < 1) {
-							var oldViewport = {
-								x: this.previousViewport.x - this.previousViewport.padLeft,
-								y: this.previousViewport.y - this.previousViewport.padBottom,
-								width: this.previousViewport.width + this.previousViewport.padLeft + this.previousViewport.padRight,
-								height: this.previousViewport.height + this.previousViewport.padBottom + this.previousViewport.padTop
-							};
+							var x = this.previousViewport.x - this.previousViewport.padLeft;
+							var y = this.previousViewport.y - this.previousViewport.padBottom;
+							var width = this.previousViewport.width + this.previousViewport.padLeft + this.previousViewport.padRight;
+							var height = this.previousViewport.height + this.previousViewport.padBottom + this.previousViewport.padTop;
 							viewport = {
-								x: oldViewport.x + (viewport.x - oldViewport.x) * transitionAlpha,
-								y: oldViewport.y + (viewport.y - oldViewport.y) * transitionAlpha,
-								width: oldViewport.width + (viewport.width - oldViewport.width) * transitionAlpha,
-								height: oldViewport.height + (viewport.height - oldViewport.height) * transitionAlpha
+								x: x + (viewport.x - x) * transitionAlpha,
+								y: y + (viewport.y - y) * transitionAlpha,
+								width: width + (viewport.width - width) * transitionAlpha,
+								height: height + (viewport.height - height) * transitionAlpha
 							};
 						}
 					}
@@ -12923,9 +12888,9 @@ var spine;
 							renderer.circle(true, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorInner);
 							renderer.circle(false, skeleton.x + bone.worldX, skeleton.y + bone.worldY, 20, colorOuter);
 						}
-						gl.lineWidth(1);
 					}
 					if (config.viewport.debugRender) {
+						gl.lineWidth(1);
 						renderer.rect(false, this.currentViewport.x, this.currentViewport.y, this.currentViewport.width, this.currentViewport.height, spine.Color.GREEN);
 						renderer.rect(false, viewport.x, viewport.y, viewport.width, viewport.height, spine.Color.RED);
 					}

@@ -9,7 +9,6 @@ var meshesDemo = function(canvas, bgColor) {
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
 	function init () {
-		canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
 		gl = canvas.context.gl;
 		renderer = new spine.webgl.SceneRenderer(canvas, gl);
 		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
