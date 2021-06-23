@@ -9151,10 +9151,10 @@ var spine;
 				this.lastY = 0;
 				this.buttonDown = false;
 				this.currTouch = null;
+				this.listeners = new Array();
 				this.touchesPool = new spine.Pool(function () {
 					return new spine.webgl.Touch(0, 0, 0);
 				});
-				this.listeners = new Array();
 				this.element = element;
 				this.setupCallbacks(element);
 			}
@@ -9166,10 +9166,9 @@ var spine;
 						var x = ev.clientX - rect.left;
 						var y = ev.clientY - rect.top;
 						var listeners = _this.listeners;
-						for (var i = 0; i < listeners.length; i++) {
+						for (var i = 0; i < listeners.length; i++)
 							if (listeners[i].down)
 								listeners[i].down(x, y);
-						}
 						_this.lastX = x;
 						_this.lastY = y;
 						_this.buttonDown = true;
@@ -9203,10 +9202,9 @@ var spine;
 						var x = ev.clientX - rect.left;
 						var y = ev.clientY - rect.top;
 						var listeners = _this.listeners;
-						for (var i = 0; i < listeners.length; i++) {
+						for (var i = 0; i < listeners.length; i++)
 							if (listeners[i].up)
 								listeners[i].up(x, y);
-						}
 						_this.lastX = x;
 						_this.lastY = y;
 						_this.buttonDown = false;
@@ -9218,94 +9216,98 @@ var spine;
 				element.addEventListener("mousemove", mouseMove, true);
 				element.addEventListener("mouseup", mouseUp, true);
 				element.addEventListener("touchstart", function (ev) {
-					if (_this.currTouch)
-						return;
-					var touches = ev.changedTouches;
-					for (var i = 0; i < touches.length; i++) {
-						var touch = touches[i];
-						var rect = element.getBoundingClientRect();
-						var x = touch.clientX - rect.left;
-						var y = touch.clientY - rect.top;
-						_this.currTouch = _this.touchesPool.obtain();
-						_this.currTouch.identifier = touch.identifier;
-						_this.currTouch.x = x;
-						_this.currTouch.y = y;
-						break;
+					if (!_this.currTouch) {
+						var touches = ev.changedTouches;
+						for (var i = 0; i < touches.length; i++) {
+							var touch = touches[i];
+							var rect = element.getBoundingClientRect();
+							var x = touch.clientX - rect.left;
+							var y = touch.clientY - rect.top;
+							_this.currTouch = _this.touchesPool.obtain();
+							_this.currTouch.identifier = touch.identifier;
+							_this.currTouch.x = x;
+							_this.currTouch.y = y;
+							break;
+						}
+						var listeners = _this.listeners;
+						for (var i_17 = 0; i_17 < listeners.length; i_17++) {
+							if (listeners[i_17].down)
+								listeners[i_17].down(_this.currTouch.x, _this.currTouch.y);
+						}
+						_this.lastX = _this.currTouch.x;
+						_this.lastY = _this.currTouch.y;
+						_this.buttonDown = true;
 					}
-					var listeners = _this.listeners;
-					for (var i_17 = 0; i_17 < listeners.length; i_17++) {
-						if (listeners[i_17].down)
-							listeners[i_17].down(_this.currTouch.x, _this.currTouch.y);
-					}
-					_this.lastX = _this.currTouch.x;
-					_this.lastY = _this.currTouch.y;
-					_this.buttonDown = true;
 					ev.preventDefault();
 				}, false);
 				element.addEventListener("touchend", function (ev) {
-					var touches = ev.changedTouches;
-					for (var i = 0; i < touches.length; i++) {
-						var touch = touches[i];
-						if (_this.currTouch.identifier === touch.identifier) {
-							var rect = element.getBoundingClientRect();
-							var x = _this.currTouch.x = touch.clientX - rect.left;
-							var y = _this.currTouch.y = touch.clientY - rect.top;
-							_this.touchesPool.free(_this.currTouch);
-							var listeners = _this.listeners;
-							for (var i_18 = 0; i_18 < listeners.length; i_18++) {
-								if (listeners[i_18].up)
-									listeners[i_18].up(x, y);
+					if (_this.currTouch) {
+						var touches = ev.changedTouches;
+						for (var i = 0; i < touches.length; i++) {
+							var touch = touches[i];
+							if (_this.currTouch.identifier === touch.identifier) {
+								var rect = element.getBoundingClientRect();
+								var x = _this.currTouch.x = touch.clientX - rect.left;
+								var y = _this.currTouch.y = touch.clientY - rect.top;
+								_this.touchesPool.free(_this.currTouch);
+								var listeners = _this.listeners;
+								for (var i_18 = 0; i_18 < listeners.length; i_18++) {
+									if (listeners[i_18].up)
+										listeners[i_18].up(x, y);
+								}
+								_this.lastX = x;
+								_this.lastY = y;
+								_this.buttonDown = false;
+								_this.currTouch = null;
+								break;
 							}
-							_this.lastX = x;
-							_this.lastY = y;
-							_this.buttonDown = false;
-							_this.currTouch = null;
-							break;
 						}
 					}
 					ev.preventDefault();
 				}, false);
 				element.addEventListener("touchcancel", function (ev) {
-					var touches = ev.changedTouches;
-					for (var i = 0; i < touches.length; i++) {
-						var touch = touches[i];
-						if (_this.currTouch.identifier === touch.identifier) {
-							var rect = element.getBoundingClientRect();
-							var x = _this.currTouch.x = touch.clientX - rect.left;
-							var y = _this.currTouch.y = touch.clientY - rect.top;
-							_this.touchesPool.free(_this.currTouch);
-							var listeners = _this.listeners;
-							for (var i_19 = 0; i_19 < listeners.length; i_19++) {
-								if (listeners[i_19].up)
-									listeners[i_19].up(x, y);
+					if (_this.currTouch) {
+						var touches = ev.changedTouches;
+						for (var i = 0; i < touches.length; i++) {
+							var touch = touches[i];
+							if (_this.currTouch.identifier === touch.identifier) {
+								var rect = element.getBoundingClientRect();
+								var x = _this.currTouch.x = touch.clientX - rect.left;
+								var y = _this.currTouch.y = touch.clientY - rect.top;
+								_this.touchesPool.free(_this.currTouch);
+								var listeners = _this.listeners;
+								for (var i_19 = 0; i_19 < listeners.length; i_19++) {
+									if (listeners[i_19].up)
+										listeners[i_19].up(x, y);
+								}
+								_this.lastX = x;
+								_this.lastY = y;
+								_this.buttonDown = false;
+								_this.currTouch = null;
+								break;
 							}
-							_this.lastX = x;
-							_this.lastY = y;
-							_this.buttonDown = false;
-							_this.currTouch = null;
-							break;
 						}
 					}
 					ev.preventDefault();
 				}, false);
 				element.addEventListener("touchmove", function (ev) {
-					if (!_this.currTouch)
-						return;
-					var touches = ev.changedTouches;
-					for (var i = 0; i < touches.length; i++) {
-						var touch = touches[i];
-						if (_this.currTouch.identifier === touch.identifier) {
-							var rect = element.getBoundingClientRect();
-							var x = touch.clientX - rect.left;
-							var y = touch.clientY - rect.top;
-							var listeners = _this.listeners;
-							for (var i_20 = 0; i_20 < listeners.length; i_20++) {
-								if (listeners[i_20].dragged)
-									listeners[i_20].dragged(x, y);
+					if (_this.currTouch) {
+						var touches = ev.changedTouches;
+						for (var i = 0; i < touches.length; i++) {
+							var touch = touches[i];
+							if (_this.currTouch.identifier === touch.identifier) {
+								var rect = element.getBoundingClientRect();
+								var x = touch.clientX - rect.left;
+								var y = touch.clientY - rect.top;
+								var listeners = _this.listeners;
+								for (var i_20 = 0; i_20 < listeners.length; i_20++) {
+									if (listeners[i_20].dragged)
+										listeners[i_20].dragged(x, y);
+								}
+								_this.lastX = _this.currTouch.x = x;
+								_this.lastY = _this.currTouch.y = y;
+								break;
 							}
-							_this.lastX = _this.currTouch.x = x;
-							_this.lastY = _this.currTouch.y = y;
-							break;
 						}
 					}
 					ev.preventDefault();

@@ -1337,8 +1337,8 @@ declare module spine.webgl {
 		lastY: number;
 		buttonDown: boolean;
 		currTouch: Touch;
-		touchesPool: Pool<Touch>;
 		private listeners;
+		touchesPool: Pool<Touch>;
 		constructor(element: HTMLElement);
 		private setupCallbacks;
 		addListener(listener: InputListener): void;
