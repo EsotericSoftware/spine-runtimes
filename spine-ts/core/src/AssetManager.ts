@@ -154,10 +154,8 @@ module spine {
 								}
 							},
 							(imagePath: string, message: string) => {
-								if (!abort) {
-									abort = true;
-									this.error(error, path, `Couldn't load texture atlas ${path} page ${imagePath}: ${message}`);
-								}
+								if (!abort) this.error(error, path, `Couldn't load texture atlas ${path} page ${imagePath}: ${message}`);
+								abort = true;
 							}
 						);
 					}

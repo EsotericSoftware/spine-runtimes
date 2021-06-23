@@ -239,6 +239,7 @@ module spine {
 			if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
 			if (config.backgroundImage && !config.backgroundImage.url) config.backgroundImage = null;
 			if (config.premultipliedAlpha === undefined) config.premultipliedAlpha = true;
+			if (config.mipmaps === undefined) config.mipmaps = true;
 			if (!config.debug) config.debug = {} as any;
 			if (config.animations && config.animation && config.animations.indexOf(config.animation) < 0)
 				throw new Error("Animation '" + config.animation + "' is not in the config animation list: " + toString(config.animations));
@@ -291,38 +292,7 @@ module spine {
 			}
 
 			// Load the assets.
-			this.assetManager = new class extends spine.webgl.AssetManager {
-				protected createTexture (context: spine.webgl.ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap): Texture {
-					return new class extends spine.webgl.GLTexture {
-						setFilters (minFilter: TextureFilter, magFilter: TextureFilter) {
-							if (config.mipmaps) {
-								minFilter = TextureFilter.MipMapLinearLinear;
-								magFilter = TextureFilter.Linear;
-							}
-							var mipmaps = false;
-							switch (minFilter) {
-							case TextureFilter.MipMap:
-							case TextureFilter.MipMapLinearLinear:
-							case TextureFilter.MipMapLinearNearest:
-							case TextureFilter.MipMapNearestLinear:
-							case TextureFilter.MipMapNearestNearest:
-								if (config.mipmaps) {
-									let gl = this.context.gl;
-									let ext = gl.getExtension("EXT_texture_filter_anisotropic");
-									if (ext) {
-										gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, 8);
-										mipmaps = true;
-									} else
-										minFilter = TextureFilter.Linear; // Don't use mipmaps without anisotropic.
-								} else
-									mipmaps = true;
-							}
-							super.setFilters(minFilter, magFilter);
-							if (mipmaps) this.update(true);
-						}
-					}(context, image);
-				}
-			}(this.context, "", config.downloader);
+			this.assetManager = new spine.webgl.AssetManager(this.context, "", config.downloader);
 			if (config.rawDataURIs) {
 				for (let path in config.rawDataURIs)
 					this.assetManager.setRawDataURI(path, config.rawDataURIs[path]);
@@ -418,7 +388,24 @@ module spine {
 				this.showError("Error: Assets could not be loaded.\n" + toString(this.assetManager.getErrors()));
 
 			let config = this.config;
+
+			// Configure filtering.
 			let atlas = this.assetManager.get(config.atlasUrl);
+			let gl = this.context.gl, anisotropic = gl.getExtension("EXT_texture_filter_anisotropic");
+			for (let page of atlas.pages) {
+				var minFilter = page.minFilter;
+				if (config.mipmaps) {
+					if (anisotropic) {
+						gl.texParameterf(gl.TEXTURE_2D, anisotropic.TEXTURE_MAX_ANISOTROPY_EXT, 8);
+						minFilter = TextureFilter.MipMapLinearLinear;
+					} else
+						minFilter = TextureFilter.Linear; // Don't use mipmaps without anisotropic.
+					page.texture.setFilters(minFilter, TextureFilter.Nearest);
+				}
+				if (minFilter != TextureFilter.Nearest && minFilter != TextureFilter.Linear) page.texture.update(true);
+			}
+
+			// Load skeleton data.
 			let skeletonData: SkeletonData;
 			if (config.jsonUrl) {
 				try {
@@ -447,7 +434,7 @@ module spine {
 			stateData.defaultMix = config.defaultMix;
 			this.animationState = new AnimationState(stateData);
 
-			// Check if all controllable bones are in the skeleton
+			// Check if all control bones are in the skeleton
 			config.controlBones.forEach(bone => {
 				if (!skeletonData.findBone(bone)) this.showError(`Error: Control bone does not exist in skeleton: ${bone}`);
 			})
