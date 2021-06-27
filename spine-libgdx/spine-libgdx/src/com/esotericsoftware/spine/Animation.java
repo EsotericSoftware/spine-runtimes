@@ -46,13 +46,14 @@ import com.esotericsoftware.spine.attachments.VertexAttachment;
 public class Animation {
 	final String name;
 	Array<Timeline> timelines;
-	final ObjectSet<String> timelineIds = new ObjectSet();
+	final ObjectSet<String> timelineIds;
 	float duration;
 
 	public Animation (String name, Array<Timeline> timelines, float duration) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
 		this.duration = duration;
+		timelineIds = new ObjectSet(timelines.size);
 		setTimelines(timelines);
 	}
 
@@ -65,9 +66,10 @@ public class Animation {
 		if (timelines == null) throw new IllegalArgumentException("timelines cannot be null.");
 		this.timelines = timelines;
 
-		timelineIds.clear();
+		int n = timelines.size;
+		timelineIds.clear(n);
 		Object[] items = timelines.items;
-		for (int i = 0, n = timelines.size; i < n; i++)
+		for (int i = 0; i < n; i++)
 			timelineIds.addAll(((Timeline)items[i]).getPropertyIds());
 	}
 
