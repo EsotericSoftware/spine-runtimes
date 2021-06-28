@@ -58,7 +58,7 @@ function init () {
 	batcher = new spine.webgl.PolygonBatcher(gl);
 	mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
 	skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
-	assetManager = new spine.webgl.AssetManager(gl);
+	assetManager = new spine.webgl.AssetManager(gl, "assets/");
 
 	// Create a debug renderer and the ShapeRenderer it needs to render lines.
 	debugRenderer = new spine.webgl.SkeletonDebugRenderer(gl);
@@ -72,30 +72,30 @@ function init () {
 
 	// Tell AssetManager to load the resources for each skeleton, including the exported data file, the .atlas file and the .png
 	// file for the atlas. We then wait until all resources are loaded in the load() method.
-	assetManager.loadBinary("assets/spineboy-pro.skel");
-	assetManager.loadText("assets/spineboy-pro.json");
-	assetManager.loadTextureAtlas("assets/spineboy-pma.atlas");
-	assetManager.loadBinary("assets/raptor-pro.skel");
-	assetManager.loadText("assets/raptor-pro.json");
-	assetManager.loadTextureAtlas("assets/raptor-pma.atlas");
-	assetManager.loadBinary("assets/tank-pro.skel");
-	assetManager.loadText("assets/tank-pro.json");
-	assetManager.loadTextureAtlas("assets/tank-pma.atlas");
-	assetManager.loadBinary("assets/goblins-pro.skel");
-	assetManager.loadText("assets/goblins-pro.json");
-	assetManager.loadTextureAtlas("assets/goblins-pma.atlas");
-	assetManager.loadBinary("assets/vine-pro.skel");
-	assetManager.loadText("assets/vine-pro.json");
-	assetManager.loadTextureAtlas("assets/vine-pma.atlas");
-	assetManager.loadBinary("assets/stretchyman-pro.skel");
-	assetManager.loadText("assets/stretchyman-pro.json");
-	assetManager.loadTextureAtlas("assets/stretchyman-pma.atlas");
-	assetManager.loadBinary("assets/coin-pro.skel");
-	assetManager.loadText("assets/coin-pro.json");
-	assetManager.loadTextureAtlas("assets/coin-pma.atlas");
-	assetManager.loadBinary("assets/mix-and-match-pro.skel");
-	assetManager.loadText("assets/mix-and-match-pro.json");
-	assetManager.loadTextureAtlas("assets/mix-and-match-pma.atlas");
+	assetManager.loadBinary("spineboy-pro.skel");
+	assetManager.loadText("spineboy-pro.json");
+	assetManager.loadTextureAtlas("spineboy-pma.atlas");
+	assetManager.loadBinary("raptor-pro.skel");
+	assetManager.loadText("raptor-pro.json");
+	assetManager.loadTextureAtlas("raptor-pma.atlas");
+	assetManager.loadBinary("tank-pro.skel");
+	assetManager.loadText("tank-pro.json");
+	assetManager.loadTextureAtlas("tank-pma.atlas");
+	assetManager.loadBinary("goblins-pro.skel");
+	assetManager.loadText("goblins-pro.json");
+	assetManager.loadTextureAtlas("goblins-pma.atlas");
+	assetManager.loadBinary("vine-pro.skel");
+	assetManager.loadText("vine-pro.json");
+	assetManager.loadTextureAtlas("vine-pma.atlas");
+	assetManager.loadBinary("stretchyman-pro.skel");
+	assetManager.loadText("stretchyman-pro.json");
+	assetManager.loadTextureAtlas("stretchyman-pma.atlas");
+	assetManager.loadBinary("coin-pro.skel");
+	assetManager.loadText("coin-pro.json");
+	assetManager.loadTextureAtlas("coin-pma.atlas");
+	assetManager.loadBinary("mix-and-match-pro.skel");
+	assetManager.loadText("mix-and-match-pro.json");
+	assetManager.loadTextureAtlas("mix-and-match-pma.atlas");
 	requestAnimationFrame(load);
 }
 
@@ -147,7 +147,7 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 	if (skin === undefined) skin = "default";
 
 	// Load the texture atlas using name.atlas from the AssetManager.
-	var atlas = assetManager.get("assets/" + name.replace(/(?:-ess|-pro)\.(skel|json)/, "") + (premultipliedAlpha ? "-pma": "") + ".atlas");
+	var atlas = assetManager.require(name.replace(/(?:-ess|-pro)\.(skel|json)/, "") + (premultipliedAlpha ? "-pma": "") + ".atlas");
 
 	// Create an AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
 	var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
@@ -157,7 +157,7 @@ function loadSkeleton (name, initialAnimation, premultipliedAlpha, skin) {
 
 	// Set the scale to apply during parsing, parse the file, and create a new skeleton.
 	skeletonLoader.scale = 1;
-	var skeletonData = skeletonLoader.readSkeletonData(assetManager.get("assets/" + name));
+	var skeletonData = skeletonLoader.readSkeletonData(assetManager.require(name));
 	var skeleton = new spine.Skeleton(skeletonData);
 	skeleton.setSkinByName(skin);
 	var bounds = calculateSetupPoseBounds(skeleton);

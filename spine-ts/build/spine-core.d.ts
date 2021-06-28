@@ -361,6 +361,7 @@ declare module spine {
 		loadTexture(path: string, success?: (path: string, texture: Texture) => void, error?: (path: string, message: string) => void): void;
 		loadTextureAtlas(path: string, success?: (path: string, atlas: TextureAtlas) => void, error?: (path: string, message: string) => void): void;
 		get(path: string): any;
+		require(path: string): any;
 		remove(path: string): any;
 		removeAll(): void;
 		isLoadingComplete(): boolean;

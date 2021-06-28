@@ -397,7 +397,7 @@ module spine {
 			let config = this.config;
 
 			// Configure filtering.
-			let atlas = this.assetManager.get(config.atlasUrl);
+			let atlas = this.assetManager.require(config.atlasUrl);
 			let gl = this.context.gl, anisotropic = gl.getExtension("EXT_texture_filter_anisotropic");
 			for (let page of atlas.pages) {
 				let minFilter = page.minFilter;
@@ -818,7 +818,7 @@ module spine {
 					// Draw the background image.
 					let bgImage = config.backgroundImage;
 					if (bgImage) {
-						let texture = this.assetManager.get(bgImage.url);
+						let texture = this.assetManager.require(bgImage.url);
 						if (bgImage.x !== void 0 && bgImage.y !== void 0 && bgImage.width && bgImage.height)
 							renderer.drawTexture(texture, bgImage.x, bgImage.y, bgImage.width, bgImage.height);
 						else

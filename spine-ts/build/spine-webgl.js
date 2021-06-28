@@ -2882,7 +2882,7 @@ var spine;
 							}
 						}, function (imagePath, message) {
 							if (!abort_1)
-								_this.error(error, path, "Couldn't load texture atlas " + path + " page " + imagePath + ": " + message);
+								_this.error(error, path, "Couldn't load texture atlas " + path + " page image: " + imagePath);
 							abort_1 = true;
 						});
 					};
@@ -2900,6 +2900,14 @@ var spine;
 		};
 		AssetManager.prototype.get = function (path) {
 			return this.assets[this.pathPrefix + path];
+		};
+		AssetManager.prototype.require = function (path) {
+			path = this.pathPrefix + path;
+			var asset = this.assets[path];
+			if (asset)
+				return asset;
+			var error = this.errors[path];
+			throw Error("Asset not found: " + path + (error ? "\n" + error : ""));
 		};
 		AssetManager.prototype.remove = function (path) {
 			path = this.pathPrefix + path;

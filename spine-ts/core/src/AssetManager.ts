@@ -154,7 +154,7 @@ module spine {
 								}
 							},
 							(imagePath: string, message: string) => {
-								if (!abort) this.error(error, path, `Couldn't load texture atlas ${path} page ${imagePath}: ${message}`);
+								if (!abort) this.error(error, path, `Couldn't load texture atlas ${path} page image: ${imagePath}`);
 								abort = true;
 							}
 						);
@@ -169,6 +169,14 @@ module spine {
 
 		get (path: string) {
 			return this.assets[this.pathPrefix + path];
+		}
+
+		require (path: string) {
+			path = this.pathPrefix + path;
+			let asset = this.assets[path];
+			if (asset) return asset;
+			let error = this.errors[path];
+			throw Error("Asset not found: " + path + (error ? "\n" + error  : ""));
 		}
 
 		remove (path: string) {

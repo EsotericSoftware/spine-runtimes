@@ -54,7 +54,7 @@ function load (name, scale) {
 
 		// Load the texture atlas using name.atlas and name.png from the AssetManager.
 		// The function passed to TextureAtlas is used to resolve relative paths.
-		atlas = assetManager.get(atlasFile);
+		atlas = assetManager.require(atlasFile);
 
 		// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
 		atlasLoader = new spine.AtlasAttachmentLoader(atlas);
@@ -64,7 +64,7 @@ function load (name, scale) {
 
 		// Set the scale to apply during parsing, parse the file, and create a new skeleton.
 		skeletonJson.scale = 0.4;
-		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile));
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.require(skeletonFile));
 
 		// Create a SkeletonMesh from the data and attach it to the scene
 		skeletonMesh = new spine.threejs.SkeletonMesh(skeletonData, function(parameters) {

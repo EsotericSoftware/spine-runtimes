@@ -60,7 +60,7 @@ function load () {
 
 function loadSpineboy (initialAnimation, premultipliedAlpha) {
 	// Load the texture atlas from the AssetManager.
-	var atlas = assetManager.get("assets/spineboy-pma.atlas");
+	var atlas = assetManager.require("assets/spineboy-pma.atlas");
 
 	// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
 	var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
@@ -70,7 +70,7 @@ function loadSpineboy (initialAnimation, premultipliedAlpha) {
 
 	// Set the scale to apply during parsing, parse the file, and create a new skeleton.
 	skeletonBinary.scale = 1;
-	var skeletonData = skeletonBinary.readSkeletonData(assetManager.get("assets/spineboy-pro.skel"));
+	var skeletonData = skeletonBinary.readSkeletonData(assetManager.require("assets/spineboy-pro.skel"));
 	var skeleton = new spine.Skeleton(skeletonData);
 	var bounds = calculateSetupPoseBounds(skeleton);
 
