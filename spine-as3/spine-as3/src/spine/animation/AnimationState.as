@@ -618,7 +618,6 @@ package spine.animation {
 			animationsChanged = false;
 
 			propertyIDs.clear();
-			var tracks = this.tracks;
 			for (var i : int = 0, n : int = tracks.length; i < n; i++) {
 				var entry : TrackEntry = tracks[i];
 				if (!entry) continue;

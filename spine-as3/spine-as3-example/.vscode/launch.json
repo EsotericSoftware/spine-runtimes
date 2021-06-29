@@ -1,11 +1,11 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "swf",
-            "request": "launch",
-            "name": "Launch spine-as3-example",
-            "preLaunchTask": "Compile debug"
-        }
-    ]
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "swf",
+			"request": "launch",
+			"name": "Launch spine-as3-example",
+			"preLaunchTask": "Compile debug"
+		}
+	]
 }
