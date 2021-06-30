@@ -126,11 +126,12 @@ void spPathConstraint_update(spPathConstraint *self) {
 					}
 				}
 			}
-			for (i = 1, n = spacesCount; i < n; i++) spaces[i] = spacing;
+			for (i = 1, n = spacesCount; i < n; i++)
+				spaces[i] = spacing;
 			break;
 		case SP_SPACING_MODE_PROPORTIONAL:
 			sum = 0;
-			for (i = 0; i < boneCount;) {
+			for (i = 0, n = spacesCount - 1; i < n;) {
 				spBone *bone = bones[i];
 				setupLength = bone->data->length;
 				if (setupLength < EPSILON) {

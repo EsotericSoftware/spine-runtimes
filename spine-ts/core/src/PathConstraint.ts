@@ -116,7 +116,7 @@ module spine {
 				break;
 			case SpacingMode.Proportional:
 				let sum = 0;
-				for (let i = 0; i < boneCount;) {
+				for (let i = 0, n = spacesCount - 1; i < n;) {
 					let bone = bones[i];
 					let setupLength = bone.data.length;
 					if (setupLength < PathConstraint.epsilon) {

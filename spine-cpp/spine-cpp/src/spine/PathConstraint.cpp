@@ -110,7 +110,7 @@ void PathConstraint::update() {
 		}
 		case SpacingMode_Proportional: {
 			float sum = 0;
-			for (size_t i = 0; i < boneCount;) {
+			for (size_t i = 0, n = spacesCount - 1; i < n;) {
 				Bone *boneP = _bones[i];
 				Bone &bone = *boneP;
 				float setupLength = bone._data.getLength();

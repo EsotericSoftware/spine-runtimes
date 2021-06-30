@@ -120,7 +120,7 @@ namespace Spine {
 				break;
 			case SpacingMode.Proportional: {
 				float sum = 0;
-				for (int i = 0; i < boneCount;) {
+				for (int i = 0, n = spacesCount - 1; i < n;) {
 					Bone bone = bonesItems[i];
 					float setupLength = bone.data.length;
 					if (setupLength < PathConstraint.Epsilon) {
@@ -143,7 +143,6 @@ namespace Spine {
 			}
 			default: {
 				bool lengthSpacing = data.spacingMode == SpacingMode.Length;
-
 				for (int i = 0, n = spacesCount - 1; i < n;) {
 					Bone bone = bonesItems[i];
 					float setupLength = bone.data.length;
