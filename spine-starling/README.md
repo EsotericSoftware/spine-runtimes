@@ -19,9 +19,9 @@ spine-starling works with data exported from Spine 4.0.xx.
 spine-starling supports all Spine features.
 
 # Usage
-1. Create a new Starling 2.0 project as per the [documentation].
+1. Create a new Starling 2.6 project as per the [documentation](https://gamua.com/starling/first-steps/).
 2. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it as a zip via the download button above.
-3. Copy the sources in `spine-as3/spine-as3/src/` and `spine-starling/spine-starling/src/` into your project's source directory
+3. Copy the sources in `spine-as3/spine-as3/src/` and `spine-starling/spine-starling/src/` into your project's source directory.
 
 ## Example
 The Spine Starling example works on Windows, Linux and Mac OS X. This guide assumes you are using [Visual Studio Code](https://code.visualstudio.com/) together with the [ActionScript & MXML extension for Visual Studio Code](https://github.com/BowlerHatLLC/vscode-as3mxml/wiki) as your development environment.
@@ -29,7 +29,7 @@ The Spine Starling example works on Windows, Linux and Mac OS X. This guide assu
 1. Install [Visual Studio Code](https://code.visualstudio.com/).
 2. Install the [ActionScript & MXML extension for Visual Studio Code](https://github.com/BowlerHatLLC/vscode-as3mxml/wiki).
 3. Download [Adobe Flash Player 32 projector content debugger](https://www.adobe.com/support/flashplayer/debug_downloads.html#fp15). On Windows, run it once to store its path.
-4. Download [Adobe AIR 32 SDK & Compiler](https://helpx.adobe.com/air/kb/archived-air-sdk-version.html) and extract it to a folder.
+4. Download [Adobe AIR 33 SDK & Compiler](https://airsdk.harman.com/download) and extract it to a folder.
 
 To run the Flash example project `spine-starling-example`:
 
