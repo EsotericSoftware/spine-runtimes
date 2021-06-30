@@ -1,0 +1,12 @@
+buildscript { repositories { mavenCentral() }}
+
+plugins {
+  id "com.diffplug.spotless" version "5.14.0"
+}
+
+spotless {
+    java {
+        target 'spine-libgdx/**/*.java'
+        eclipse().configFile('formatters/eclipse-formatter.xml')
+    }
+}

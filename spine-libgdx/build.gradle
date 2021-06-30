@@ -1,11 +1,11 @@
 apply plugin: "java"
-apply plugin: "maven"
+apply plugin: "maven-publish"
 
 group = "com.github.EsotericSoftware"
-version = "4.0-beta"
+version = "4.0"
 
 ext {
-    libgdxVersion = "1.9.14"
+    libgdxVersion = "1.10.0"
 }
 
 sourceSets.main.java.srcDirs = ["spine-libgdx/src"]
@@ -16,17 +16,16 @@ repositories {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
-    compile "com.badlogicgames.gdx:gdx:$libgdxVersion"
+    implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
 
-    testCompile "com.badlogicgames.gdx:gdx:$libgdxVersion"
-    testCompile "com.badlogicgames.gdx:gdx-backend-lwjgl:$libgdxVersion"
-    testCompile "com.badlogicgames.gdx:gdx-platform:$libgdxVersion:natives-desktop"
-    testCompile "com.badlogicgames.gdx:gdx-box2d:$libgdxVersion"
-    testCompile "com.badlogicgames.gdx:gdx-box2d-platform:$libgdxVersion:natives-desktop"
+    testImplementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
+    testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$libgdxVersion"
+    testImplementation "com.badlogicgames.gdx:gdx-platform:$libgdxVersion:natives-desktop"
+    testImplementation "com.badlogicgames.gdx:gdx-box2d:$libgdxVersion"
+    testImplementation "com.badlogicgames.gdx:gdx-box2d-platform:$libgdxVersion:natives-desktop"
 
 }
 
