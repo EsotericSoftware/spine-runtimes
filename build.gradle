@@ -5,6 +5,8 @@ plugins {
 }
 
 spotless {
+    lineEndings 'UNIX'
+
     java {
         target 'spine-libgdx/**/*.java'
         eclipse().configFile('formatters/eclipse-formatter.xml')
