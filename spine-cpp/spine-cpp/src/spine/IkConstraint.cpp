@@ -94,7 +94,8 @@ void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress
 							  bone._ashearY);
 }
 
-void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, bool uniform, float softness,
+void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, bool uniform,
+						 float softness,
 						 float alpha) {
 	float a, b, c, d;
 	float px, py, psx, psy, sx, sy;
@@ -283,7 +284,8 @@ void IkConstraint::update() {
 		case 2: {
 			Bone *bone0 = _bones[0];
 			Bone *bone1 = _bones[1];
-			apply(*bone0, *bone1, _target->getWorldX(), _target->getWorldY(), _bendDirection, _stretch, _data._uniform, _softness,
+			apply(*bone0, *bone1, _target->getWorldX(), _target->getWorldY(), _bendDirection, _stretch, _data._uniform,
+				  _softness,
 				  _mix);
 		} break;
 	}

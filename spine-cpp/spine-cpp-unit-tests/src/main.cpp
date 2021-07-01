@@ -2,7 +2,9 @@
 #include <spine/spine.h>
 #include <stdio.h>
 
+#ifdef MSVC
 #pragma warning(disable : 4710)
+#endif
 
 using namespace spine;
 
@@ -56,7 +58,9 @@ void dispose(Atlas *atlas, SkeletonData *skeletonData, AnimationStateData *state
 struct TestData {
 	TestData(const String &jsonSkeleton, const String &binarySkeleton, const String &atlas) : _jsonSkeleton(
 																									  jsonSkeleton),
-																							  _binarySkeleton(binarySkeleton), _atlas(atlas) {}
+																							  _binarySkeleton(
+																									  binarySkeleton),
+																							  _atlas(atlas) {}
 
 	String _jsonSkeleton;
 	String _binarySkeleton;
@@ -101,6 +105,8 @@ namespace spine {
 }// namespace spine
 
 int main(int argc, char **argv) {
+	SP_UNUSED(argc);
+	SP_UNUSED(argv);
 	DebugExtension debug(SpineExtension::getInstance());
 	SpineExtension::setInstance(&debug);
 

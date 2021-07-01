@@ -88,11 +88,11 @@ namespace spine {
 				}
 
 			protected:
-				Entries(Vector <Vector<Entry> > &buckets) : _buckets(buckets), _slotIndex(0), _bucketIndex(0) {
+				Entries(Vector <Vector<Entry>> &buckets) : _buckets(buckets), _slotIndex(0), _bucketIndex(0) {
 				}
 
 			private:
-				Vector <Vector<Entry > > &_buckets;
+				Vector <Vector<Entry>> &_buckets;
 				size_t _slotIndex;
 				size_t _bucketIndex;
 			};
@@ -112,7 +112,7 @@ namespace spine {
 
 			int findInBucket(Vector <Entry> &, const String &attachmentName);
 
-			Vector <Vector<Entry> > _buckets;
+			Vector <Vector<Entry>> _buckets;
 		};
 
 		explicit Skin(const String &name);

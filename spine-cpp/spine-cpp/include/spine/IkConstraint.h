@@ -58,7 +58,8 @@ namespace spine {
 		/// possible. The target is specified in the world coordinate system.
 		/// @param child A direct descendant of the parent bone.
 		static void
-		apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, bool uniform, float softness,
+		apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, bool uniform,
+			  float softness,
 			  float alpha);
 
 		IkConstraint(IkConstraintData &data, Skeleton &skeleton);

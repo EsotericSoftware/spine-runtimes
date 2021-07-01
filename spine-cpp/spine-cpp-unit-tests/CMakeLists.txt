@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 2.8.9)
 project(spine_cpp_unit_test)
 
 set(CMAKE_INSTALL_PREFIX "./")

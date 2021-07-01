@@ -101,7 +101,9 @@ void Slot::setAttachment(Attachment *inValue) {
 
 	if (inValue && _attachment) {
 		if (!(inValue->getRTTI().instanceOf(VertexAttachment::rtti)) ||
-			!(_attachment->getRTTI().instanceOf(VertexAttachment::rtti)) || (static_cast<VertexAttachment *>(inValue)->getDeformAttachment() != (static_cast<VertexAttachment *>(_attachment)->getDeformAttachment()))) {
+			!(_attachment->getRTTI().instanceOf(VertexAttachment::rtti)) ||
+			(static_cast<VertexAttachment *>(inValue)->getDeformAttachment() !=
+			 (static_cast<VertexAttachment *>(_attachment)->getDeformAttachment()))) {
 			_deform.clear();
 		}
 	}

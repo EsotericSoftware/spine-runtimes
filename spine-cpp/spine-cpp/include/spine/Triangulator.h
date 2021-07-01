@@ -56,8 +56,8 @@ namespace spine {
 		Vector<bool> _isConcaveArray;
 		Vector<int> _triangles;
 
-		Pool <Vector<float> > _polygonPool;
-		Pool <Vector<int> > _polygonIndicesPool;
+		Pool <Vector<float>> _polygonPool;
+		Pool <Vector<int>> _polygonIndicesPool;
 
 		static bool isConcave(int index, int vertexCount, Vector<float> &vertices, Vector<int> &indices);
 

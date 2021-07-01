@@ -51,10 +51,10 @@ namespace spine {
 		/// @param drawOrder May be NULL to use bind pose draw order
 		void setFrame(size_t frame, float time, Vector<int> &drawOrder);
 
-		Vector <Vector<int> > &getDrawOrders();
+		Vector <Vector<int>> &getDrawOrders();
 
 	private:
-		Vector <Vector<int> > _drawOrders;
+		Vector <Vector<int>> _drawOrders;
 	};
 }
 

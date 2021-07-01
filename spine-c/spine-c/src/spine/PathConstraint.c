@@ -130,7 +130,7 @@ void spPathConstraint_update(spPathConstraint *self) {
 			break;
 		case SP_SPACING_MODE_PROPORTIONAL:
 			sum = 0;
-			for (i = 0; i < boneCount;) {
+			for (i = 0, n = spacesCount - 1; i < n;) {
 				spBone *bone = bones[i];
 				setupLength = bone->data->length;
 				if (setupLength < EPSILON) {

@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 2.8.9)
 #
 # First download and extract SFML 2.4.1 for the respective OS we are on
 #

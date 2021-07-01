@@ -15,6 +15,7 @@
 ### Starling
 **NOTE: Spine 4.0 will be the last release supporting spine-starling. Starting from Spine 4.1, spine-starling will no longer be supported or maintained.**
 * Switched projects from FDT to Visual Studio Code. See updated `README.md` files for instructions.
+* Updated to Starling 2.6 and Air SDK 33.
 
 ## C
 * **Breaking change:** Removed `SPINE_SHORT_NAMES` define and C++ constructors.
@@ -43,6 +44,7 @@
 * Added proportional spacing mode support for path constraints.
 * Added support for uniform scaling for two bone IK.
 * Fixed applying a constraint reverting changes from other constraints.
+* spine-cpp now requires C++11.
 
 ### Cocos2d-x
 * Added `IKExample` scene to illustrate how to drive a bone and IK chain through mouse movement.
