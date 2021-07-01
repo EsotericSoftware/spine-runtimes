@@ -33,15 +33,15 @@
 
 #include <spine/DeformTimeline.h>
 
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
 
 #include <spine/VertexAttachment.h>
 
 #include <spine/Animation.h>
+#include <spine/Bone.h>
 #include <spine/Property.h>
 #include <spine/Slot.h>
-#include <spine/Bone.h>
 #include <spine/SlotData.h>
 
 using namespace spine;
@@ -49,7 +49,7 @@ using namespace spine;
 RTTI_IMPL(DeformTimeline, CurveTimeline)
 
 DeformTimeline::DeformTimeline(size_t frameCount, size_t bezierCount, int slotIndex, VertexAttachment *attachment)
-		: CurveTimeline(frameCount, 1, bezierCount), _slotIndex(slotIndex), _attachment(attachment) {
+	: CurveTimeline(frameCount, 1, bezierCount), _slotIndex(slotIndex), _attachment(attachment) {
 	PropertyId ids[] = {((PropertyId) Property_Deform << 32) | ((slotIndex << 16 | attachment->_id) & 0xffffffff)};
 	setPropertyIds(ids, 1);
 
@@ -61,8 +61,7 @@ DeformTimeline::DeformTimeline(size_t frameCount, size_t bezierCount, int slotIn
 }
 
 void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						   MixBlend blend, MixDirection direction
-) {
+						   MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -86,7 +85,7 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 		blend = MixBlend_Setup;
 	}
 
-	Vector<Vector<float> > &vertices = _vertices;
+	Vector<Vector<float>> &vertices = _vertices;
 	size_t vertexCount = vertices[0].size();
 
 	Vector<float> &frames = _frames;
@@ -123,7 +122,7 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	deformArray.setSize(vertexCount, 0);
 	Vector<float> &deform = deformArray;
 
-	if (time >= frames[frames.size() - 1]) { // Time is after last frame.
+	if (time >= frames[frames.size() - 1]) {// Time is after last frame.
 		Vector<float> &lastVertices = vertices[frames.size() - 1];
 		if (alpha == 1) {
 			if (blend == MixBlend_Add) {
@@ -261,9 +260,8 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	}
 }
 
-void
-DeformTimeline::setBezier(size_t bezier, size_t frame, float value, float time1, float value1, float cx1, float cy1,
-						  float cx2, float cy2, float time2, float value2) {
+void DeformTimeline::setBezier(size_t bezier, size_t frame, float value, float time1, float value1, float cx1, float cy1,
+							   float cx2, float cy2, float time2, float value2) {
 	SP_UNUSED(value1);
 	SP_UNUSED(value2);
 	size_t i = getFrameCount() + bezier * DeformTimeline::BEZIER_SIZE;
@@ -320,7 +318,7 @@ void DeformTimeline::setFrame(int frame, float time, Vector<float> &vertices) {
 	_vertices[frame].addAll(vertices);
 }
 
-Vector<Vector<float> > &DeformTimeline::getVertices() {
+Vector<Vector<float>> &DeformTimeline::getVertices() {
 	return _vertices;
 }
 

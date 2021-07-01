@@ -33,8 +33,8 @@
 
 #include <spine/SkeletonClipping.h>
 
-#include <spine/Slot.h>
 #include <spine/ClippingAttachment.h>
+#include <spine/Slot.h>
 
 using namespace spine;
 
@@ -92,8 +92,7 @@ void SkeletonClipping::clipTriangles(Vector<float> &vertices, Vector<unsigned sh
 }
 
 void SkeletonClipping::clipTriangles(float *vertices, unsigned short *triangles,
-									 size_t trianglesLength, float *uvs, size_t stride
-) {
+									 size_t trianglesLength, float *uvs, size_t stride) {
 	Vector<float> &clipOutput = _clipOutput;
 	Vector<float> &clippedVertices = _clippedVertices;
 	Vector<unsigned short> &clippedTriangles = _clippedTriangles;
@@ -106,7 +105,7 @@ void SkeletonClipping::clipTriangles(float *vertices, unsigned short *triangles,
 	clippedTriangles.clear();
 
 	size_t i = 0;
-	continue_outer:
+continue_outer:
 	for (; i < trianglesLength; i += 3) {
 		int vertexOffset = triangles[i] * stride;
 		float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
@@ -201,8 +200,7 @@ Vector<float> &SkeletonClipping::getClippedUVs() {
 }
 
 bool SkeletonClipping::clip(float x1, float y1, float x2, float y2, float x3, float y3, Vector<float> *clippingArea,
-							Vector<float> *output
-) {
+							Vector<float> *output) {
 	Vector<float> *originalOutput = output;
 	bool clipped = false;
 

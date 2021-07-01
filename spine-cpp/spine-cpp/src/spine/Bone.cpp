@@ -87,8 +87,7 @@ void Bone::updateWorldTransform() {
 	updateWorldTransform(_x, _y, _rotation, _scaleX, _scaleY, _shearX, _shearY);
 }
 
-void
-Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
+void Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, float scaleY, float shearX, float shearY) {
 	float cosine, sine;
 	float pa, pb, pc, pd;
 	Bone *parent = _parent;
@@ -183,8 +182,7 @@ Bone::updateWorldTransform(float x, float y, float rotation, float scaleX, float
 			za *= s;
 			zc *= s;
 			s = MathUtil::sqrt(za * za + zc * zc);
-			if (_data.getTransformMode() == TransformMode_NoScale
-				&& (pa * pd - pb * pc < 0) != (_skeleton.getScaleX() < 0 != _skeleton.getScaleY() < 0))
+			if (_data.getTransformMode() == TransformMode_NoScale && (pa * pd - pb * pc < 0) != (_skeleton.getScaleX() < 0 != _skeleton.getScaleY() < 0))
 				s = -s;
 			r = MathUtil::Pi / 2 + MathUtil::atan2(zc, za);
 			zb = MathUtil::cos(r) * s;

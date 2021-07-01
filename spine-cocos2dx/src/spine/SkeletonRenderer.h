@@ -38,21 +38,21 @@ namespace spine {
 	class AttachmentVertices;
 
 	/* Draws a skeleton. */
-	class SkeletonRenderer: public cocos2d::Node, public cocos2d::BlendProtocol {
+	class SkeletonRenderer : public cocos2d::Node, public cocos2d::BlendProtocol {
 	public:
 		CREATE_FUNC(SkeletonRenderer);
-		static SkeletonRenderer* createWithSkeleton(Skeleton* skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false);
-		static SkeletonRenderer* createWithData (SkeletonData* skeletonData, bool ownsSkeletonData = false);
-		static SkeletonRenderer* createWithFile (const std::string& skeletonDataFile, Atlas* atlas, float scale = 1);
-		static SkeletonRenderer* createWithFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
+		static SkeletonRenderer *createWithSkeleton(Skeleton *skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false);
+		static SkeletonRenderer *createWithData(SkeletonData *skeletonData, bool ownsSkeletonData = false);
+		static SkeletonRenderer *createWithFile(const std::string &skeletonDataFile, Atlas *atlas, float scale = 1);
+		static SkeletonRenderer *createWithFile(const std::string &skeletonDataFile, const std::string &atlasFile, float scale = 1);
 
-		void update (float deltaTime) override;
-		void draw (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags) override;
-		cocos2d::Rect getBoundingBox () const override;
-		void onEnter () override;
-		void onExit () override;
+		void update(float deltaTime) override;
+		void draw(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, uint32_t transformFlags) override;
+		cocos2d::Rect getBoundingBox() const override;
+		void onEnter() override;
+		void onExit() override;
 
-		Skeleton* getSkeleton() const;
+		Skeleton *getSkeleton() const;
 
 		void setTimeScale(float scale);
 		float getTimeScale() const;
@@ -71,31 +71,31 @@ namespace spine {
 		bool getDebugBoundingRectEnabled() const;
 
 		// --- Convenience methods for common Skeleton_* functions.
-		void updateWorldTransform ();
+		void updateWorldTransform();
 
-		void setToSetupPose ();
-		void setBonesToSetupPose ();
-		void setSlotsToSetupPose ();
+		void setToSetupPose();
+		void setBonesToSetupPose();
+		void setSlotsToSetupPose();
 
 		/* Returns 0 if the bone was not found. */
-		Bone* findBone (const std::string& boneName) const;
+		Bone *findBone(const std::string &boneName) const;
 		/* Returns 0 if the slot was not found. */
-		Slot* findSlot (const std::string& slotName) const;
+		Slot *findSlot(const std::string &slotName) const;
 
 		/* Sets the skin used to look up attachments not found in the SkeletonData defaultSkin. Attachments from the new skin are
 		 * attached if the corresponding attachment from the old skin was attached.
 		 * @param skin May be empty string ("") for no skin.*/
-		void setSkin (const std::string& skinName);
+		void setSkin(const std::string &skinName);
 		/** @param skin May be 0 for no skin.*/
-		void setSkin (const char* skinName);
+		void setSkin(const char *skinName);
 
 		/* Returns 0 if the slot or attachment was not found. */
-		Attachment* getAttachment (const std::string& slotName, const std::string& attachmentName) const;
+		Attachment *getAttachment(const std::string &slotName, const std::string &attachmentName) const;
 		/* Returns false if the slot or attachment was not found.
 		 * @param attachmentName May be empty string ("") for no attachment. */
-		bool setAttachment (const std::string& slotName, const std::string& attachmentName);
+		bool setAttachment(const std::string &slotName, const std::string &attachmentName);
 		/* @param attachmentName May be 0 for no attachment. */
-		bool setAttachment (const std::string& slotName, const char* attachmentName);
+		bool setAttachment(const std::string &slotName, const char *attachmentName);
 
 		/* Enables/disables two color tinting for this instance. May break batching */
 		void setTwoColorTint(bool enabled);
@@ -103,56 +103,55 @@ namespace spine {
 		bool isTwoColorTint();
 
 		/* Sets the vertex effect to be used, set to 0 to disable vertex effects */
-		void setVertexEffect(VertexEffect* effect);
+		void setVertexEffect(VertexEffect *effect);
 
 		/* Sets the range of slots that should be rendered. Use -1, -1 to clear the range */
 		void setSlotsRange(int startSlotIndex, int endSlotIndex);
 
 		// --- BlendProtocol
-		void setBlendFunc (const cocos2d::BlendFunc& blendFunc)override;
-		const cocos2d::BlendFunc& getBlendFunc () const override;
-		void setOpacityModifyRGB (bool value) override;
-		bool isOpacityModifyRGB () const override;
+		void setBlendFunc(const cocos2d::BlendFunc &blendFunc) override;
+		const cocos2d::BlendFunc &getBlendFunc() const override;
+		void setOpacityModifyRGB(bool value) override;
+		bool isOpacityModifyRGB() const override;
 
-	CC_CONSTRUCTOR_ACCESS:
-		SkeletonRenderer ();
-		SkeletonRenderer(Skeleton* skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false, bool ownsAtlas = false);
-		SkeletonRenderer (SkeletonData* skeletonData, bool ownsSkeletonData = false);
-		SkeletonRenderer (const std::string& skeletonDataFile, Atlas* atlas, float scale = 1);
-		SkeletonRenderer (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
+		CC_CONSTRUCTOR_ACCESS : SkeletonRenderer();
+		SkeletonRenderer(Skeleton *skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false, bool ownsAtlas = false);
+		SkeletonRenderer(SkeletonData *skeletonData, bool ownsSkeletonData = false);
+		SkeletonRenderer(const std::string &skeletonDataFile, Atlas *atlas, float scale = 1);
+		SkeletonRenderer(const std::string &skeletonDataFile, const std::string &atlasFile, float scale = 1);
 
-		virtual ~SkeletonRenderer ();
+		virtual ~SkeletonRenderer();
 
-		void initWithSkeleton(Skeleton* skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false, bool ownsAtlas = false);
-		void initWithData (SkeletonData* skeletonData, bool ownsSkeletonData = false);
-		void initWithJsonFile (const std::string& skeletonDataFile, Atlas* atlas, float scale = 1);
-		void initWithJsonFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
-		void initWithBinaryFile (const std::string& skeletonDataFile, Atlas* atlas, float scale = 1);
-		void initWithBinaryFile (const std::string& skeletonDataFile, const std::string& atlasFile, float scale = 1);
+		void initWithSkeleton(Skeleton *skeleton, bool ownsSkeleton = false, bool ownsSkeletonData = false, bool ownsAtlas = false);
+		void initWithData(SkeletonData *skeletonData, bool ownsSkeletonData = false);
+		void initWithJsonFile(const std::string &skeletonDataFile, Atlas *atlas, float scale = 1);
+		void initWithJsonFile(const std::string &skeletonDataFile, const std::string &atlasFile, float scale = 1);
+		void initWithBinaryFile(const std::string &skeletonDataFile, Atlas *atlas, float scale = 1);
+		void initWithBinaryFile(const std::string &skeletonDataFile, const std::string &atlasFile, float scale = 1);
 
-		virtual void initialize ();
+		virtual void initialize();
 
 	protected:
-		void setSkeletonData (SkeletonData* skeletonData, bool ownsSkeletonData);
+		void setSkeletonData(SkeletonData *skeletonData, bool ownsSkeletonData);
 		void setupGLProgramState(bool twoColorTintEnabled);
-		virtual void drawDebug (cocos2d::Renderer* renderer, const cocos2d::Mat4& transform, uint32_t transformFlags);
+		virtual void drawDebug(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, uint32_t transformFlags);
 
 		bool _ownsSkeletonData;
 		bool _ownsSkeleton;
 		bool _ownsAtlas = false;
-		Atlas* _atlas;
-		AttachmentLoader* _attachmentLoader;
+		Atlas *_atlas;
+		AttachmentLoader *_attachmentLoader;
 		cocos2d::CustomCommand _debugCommand;
 		cocos2d::BlendFunc _blendFunc;
 		bool _premultipliedAlpha;
-		Skeleton* _skeleton;
+		Skeleton *_skeleton;
 		float _timeScale;
 		bool _debugSlots;
 		bool _debugBones;
 		bool _debugMeshes;
 		bool _debugBoundingRect;
-		SkeletonClipping* _clipper;
-		VertexEffect* _effect;
+		SkeletonClipping *_clipper;
+		VertexEffect *_effect;
 		cocos2d::Rect _boundingRect;
 
 		int _startSlotIndex;
@@ -160,6 +159,6 @@ namespace spine {
 		bool _twoColorTint;
 	};
 
-}
+}// namespace spine
 
 #endif /* SPINE_SKELETONRENDERER_H_ */

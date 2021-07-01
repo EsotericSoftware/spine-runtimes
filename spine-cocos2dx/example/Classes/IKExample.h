@@ -35,17 +35,17 @@
 
 class IKExample : public cocos2d::LayerColor {
 public:
-    static cocos2d::Scene* scene ();
+	static cocos2d::Scene *scene();
 
-    CREATE_FUNC (IKExample);
+	CREATE_FUNC(IKExample);
 
-    virtual bool init ();
+	virtual bool init();
 
-    virtual void update (float deltaTime);
+	virtual void update(float deltaTime);
 
 private:
-    spine::SkeletonAnimation* skeletonNode;
+	spine::SkeletonAnimation *skeletonNode;
 	cocos2d::Vec2 position;
 };
 
-#endif // _IKEXAMPLE_H_
+#endif// _IKEXAMPLE_H_

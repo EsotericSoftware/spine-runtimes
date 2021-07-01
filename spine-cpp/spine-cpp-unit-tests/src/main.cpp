@@ -1,47 +1,47 @@
-#include <stdio.h>
-#include <spine/spine.h>
 #include <spine/Debug.h>
+#include <spine/spine.h>
+#include <stdio.h>
 
-#pragma warning ( disable : 4710 )
+#pragma warning(disable : 4710)
 
 using namespace spine;
 
 void loadBinary(const String &binaryFile, const String &atlasFile, Atlas *&atlas, SkeletonData *&skeletonData,
 				AnimationStateData *&stateData, Skeleton *&skeleton, AnimationState *&state) {
-	atlas = new(__FILE__, __LINE__) Atlas(atlasFile, NULL);
+	atlas = new (__FILE__, __LINE__) Atlas(atlasFile, NULL);
 	assert(atlas != NULL);
 
 	SkeletonBinary binary(atlas);
 	skeletonData = binary.readSkeletonDataFile(binaryFile);
 	assert(skeletonData);
 
-	skeleton = new(__FILE__, __LINE__) Skeleton(skeletonData);
+	skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
 	assert(skeleton != NULL);
 
-	stateData = new(__FILE__, __LINE__) AnimationStateData(skeletonData);
+	stateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
 	assert(stateData != NULL);
 	stateData->setDefaultMix(0.4f);
 
-	state = new(__FILE__, __LINE__) AnimationState(stateData);
+	state = new (__FILE__, __LINE__) AnimationState(stateData);
 }
 
 void loadJson(const String &jsonFile, const String &atlasFile, Atlas *&atlas, SkeletonData *&skeletonData,
 			  AnimationStateData *&stateData, Skeleton *&skeleton, AnimationState *&state) {
-	atlas = new(__FILE__, __LINE__) Atlas(atlasFile, NULL);
+	atlas = new (__FILE__, __LINE__) Atlas(atlasFile, NULL);
 	assert(atlas != NULL);
 
 	SkeletonJson json(atlas);
 	skeletonData = json.readSkeletonDataFile(jsonFile);
 	assert(skeletonData);
 
-	skeleton = new(__FILE__, __LINE__) Skeleton(skeletonData);
+	skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
 	assert(skeleton != NULL);
 
-	stateData = new(__FILE__, __LINE__) AnimationStateData(skeletonData);
+	stateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
 	assert(stateData != NULL);
 	stateData->setDefaultMix(0.4f);
 
-	state = new(__FILE__, __LINE__) AnimationState(stateData);
+	state = new (__FILE__, __LINE__) AnimationState(stateData);
 }
 
 void dispose(Atlas *atlas, SkeletonData *skeletonData, AnimationStateData *stateData, Skeleton *skeleton,
@@ -55,7 +55,8 @@ void dispose(Atlas *atlas, SkeletonData *skeletonData, AnimationStateData *state
 
 struct TestData {
 	TestData(const String &jsonSkeleton, const String &binarySkeleton, const String &atlas) : _jsonSkeleton(
-			jsonSkeleton), _binarySkeleton(binarySkeleton), _atlas(atlas) {}
+																									  jsonSkeleton),
+																							  _binarySkeleton(binarySkeleton), _atlas(atlas) {}
 
 	String _jsonSkeleton;
 	String _binarySkeleton;
@@ -65,7 +66,7 @@ struct TestData {
 void testLoading() {
 	Vector<TestData> testData;
 	testData.add(TestData("testdata/coin/coin-pro.json", "testdata/coin/coin-pro.skel", "testdata/coin/coin.atlas"));
-/*testData.add(TestData("testdata/goblins/goblins-pro.json", "testdata/goblins/goblins-pro.skel",
+	/*testData.add(TestData("testdata/goblins/goblins-pro.json", "testdata/goblins/goblins-pro.skel",
 						  "testdata/goblins/goblins.atlas"));
 	testData.add(TestData("testdata/raptor/raptor-pro.json", "testdata/raptor/raptor-pro.skel",
 						  "testdata/raptor/raptor.atlas"));
@@ -97,7 +98,7 @@ namespace spine {
 	SpineExtension *getDefaultExtension() {
 		return new DefaultSpineExtension();
 	}
-}
+}// namespace spine
 
 int main(int argc, char **argv) {
 	DebugExtension debug(SpineExtension::getInstance());

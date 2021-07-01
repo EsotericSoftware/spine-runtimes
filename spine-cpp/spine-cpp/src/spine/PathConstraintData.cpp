@@ -40,18 +40,17 @@
 
 using namespace spine;
 
-PathConstraintData::PathConstraintData(const String &name) :
-		ConstraintData(name),
-		_target(NULL),
-		_positionMode(PositionMode_Fixed),
-		_spacingMode(SpacingMode_Length),
-		_rotateMode(RotateMode_Tangent),
-		_offsetRotation(0),
-		_position(0),
-		_spacing(0),
-		_mixRotate(0),
-		_mixX(0),
-		_mixY(0) {
+PathConstraintData::PathConstraintData(const String &name) : ConstraintData(name),
+															 _target(NULL),
+															 _positionMode(PositionMode_Fixed),
+															 _spacingMode(SpacingMode_Length),
+															 _rotateMode(RotateMode_Tangent),
+															 _offsetRotation(0),
+															 _position(0),
+															 _spacing(0),
+															 _mixRotate(0),
+															 _mixX(0),
+															 _mixY(0) {
 }
 
 Vector<BoneData *> &PathConstraintData::getBones() {

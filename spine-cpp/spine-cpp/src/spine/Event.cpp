@@ -35,14 +35,13 @@
 
 #include <spine/EventData.h>
 
-spine::Event::Event(float time, const spine::EventData &data) :
-		_data(data),
-		_time(time),
-		_intValue(0),
-		_floatValue(0),
-		_stringValue(),
-		_volume(1),
-		_balance(0) {
+spine::Event::Event(float time, const spine::EventData &data) : _data(data),
+																_time(time),
+																_intValue(0),
+																_floatValue(0),
+																_stringValue(),
+																_volume(1),
+																_balance(0) {
 }
 
 const spine::EventData &spine::Event::getData() {

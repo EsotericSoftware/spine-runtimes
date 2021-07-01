@@ -31,7 +31,14 @@
 #include <spine/extension.h>
 
 typedef enum {
-	BLX = 0, BLY, ULX, ULY, URX, URY, BRX, BRY
+	BLX = 0,
+	BLY,
+	ULX,
+	ULY,
+	URX,
+	URY,
+	BRX,
+	BRY
 } spVertexIndex;
 
 void _spRegionAttachment_dispose(spAttachment *attachment) {

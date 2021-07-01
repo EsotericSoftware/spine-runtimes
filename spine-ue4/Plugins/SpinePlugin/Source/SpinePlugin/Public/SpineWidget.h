@@ -32,16 +32,16 @@
 #include "Runtime/UMG/Public/UMG.h"
 #include "Runtime/UMG/Public/UMGStyle.h"
 #include "SpineSkeletonDataAsset.h"
-#include "spine/spine.h"
 #include "SpineWidget.generated.h"
+#include "spine/spine.h"
 
 class SSpineWidget;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineWidgetBeforeUpdateWorldTransformDelegate, USpineWidget*, skeleton);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineWidgetAfterUpdateWorldTransformDelegate, USpineWidget*, skeleton);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineWidgetBeforeUpdateWorldTransformDelegate, USpineWidget *, skeleton);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineWidgetAfterUpdateWorldTransformDelegate, USpineWidget *, skeleton);
 
 UCLASS(ClassGroup = (Spine), meta = (BlueprintSpawnableComponent))
-class SPINEPLUGIN_API USpineWidget: public UWidget {
+class SPINEPLUGIN_API USpineWidget : public UWidget {
 	GENERATED_UCLASS_BODY()
 
 public:
@@ -55,22 +55,22 @@ public:
 	FString InitialSkin;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
-	USpineAtlasAsset* Atlas;
+	USpineAtlasAsset *Atlas;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
-	USpineSkeletonDataAsset* SkeletonData;
+	USpineSkeletonDataAsset *SkeletonData;
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
-	UMaterialInterface* NormalBlendMaterial;
+	UMaterialInterface *NormalBlendMaterial;
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
-	UMaterialInterface* AdditiveBlendMaterial;
+	UMaterialInterface *AdditiveBlendMaterial;
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
-	UMaterialInterface* MultiplyBlendMaterial;
+	UMaterialInterface *MultiplyBlendMaterial;
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadOnly)
-	UMaterialInterface* ScreenBlendMaterial;
+	UMaterialInterface *ScreenBlendMaterial;
 
 	UPROPERTY(Category = Spine, EditAnywhere, BlueprintReadWrite)
 	FName TextureParameterName;
@@ -152,7 +152,7 @@ public:
 
 	/* Manages if this skeleton should update automatically or is paused. */
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
-		void SetAutoPlay(bool bInAutoPlays);
+	void SetAutoPlay(bool bInAutoPlays);
 
 	/* Directly set the time of the current animation, will clamp to animation range. */
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
@@ -166,19 +166,19 @@ public:
 	float GetTimeScale();
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
-	UTrackEntry* SetAnimation(int trackIndex, FString animationName, bool loop);
+	UTrackEntry *SetAnimation(int trackIndex, FString animationName, bool loop);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
-	UTrackEntry* AddAnimation(int trackIndex, FString animationName, bool loop, float delay);
+	UTrackEntry *AddAnimation(int trackIndex, FString animationName, bool loop, float delay);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
-	UTrackEntry* SetEmptyAnimation(int trackIndex, float mixDuration);
+	UTrackEntry *SetEmptyAnimation(int trackIndex, float mixDuration);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
-	UTrackEntry* AddEmptyAnimation(int trackIndex, float mixDuration, float delay);
+	UTrackEntry *AddEmptyAnimation(int trackIndex, float mixDuration, float delay);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
-	UTrackEntry* GetCurrent(int trackIndex);
+	UTrackEntry *GetCurrent(int trackIndex);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Animation")
 	void ClearTracks();
@@ -211,7 +211,8 @@ public:
 
 	// used in C event callback. Needs to be public as we can't call
 	// protected methods from plain old C function.
-	void GCTrackEntry(UTrackEntry* entry) { trackEntries.Remove(entry); }
+	void GCTrackEntry(UTrackEntry *entry) { trackEntries.Remove(entry); }
+
 protected:
 	friend class SSpineWidget;
 
@@ -221,29 +222,29 @@ protected:
 
 	TSharedPtr<SSpineWidget> slateWidget;
 
-	spine::Skeleton* skeleton;
-	spine::AnimationState* state;
-	USpineAtlasAsset* lastAtlas = nullptr;
-	spine::Atlas* lastSpineAtlas = nullptr;
-	USpineSkeletonDataAsset* lastData = nullptr;
-	spine::Skin* customSkin = nullptr;
+	spine::Skeleton *skeleton;
+	spine::AnimationState *state;
+	USpineAtlasAsset *lastAtlas = nullptr;
+	spine::Atlas *lastSpineAtlas = nullptr;
+	USpineSkeletonDataAsset *lastData = nullptr;
+	spine::Skin *customSkin = nullptr;
 
 	// Need to hold on to the dynamic instances, or the GC will kill us while updating them
 	UPROPERTY()
-	TArray<UMaterialInstanceDynamic*> atlasNormalBlendMaterials;
-	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToNormalBlendMaterial;
+	TArray<UMaterialInstanceDynamic *> atlasNormalBlendMaterials;
+	TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> pageToNormalBlendMaterial;
 
 	UPROPERTY()
-	TArray<UMaterialInstanceDynamic*> atlasAdditiveBlendMaterials;
-	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToAdditiveBlendMaterial;
+	TArray<UMaterialInstanceDynamic *> atlasAdditiveBlendMaterials;
+	TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> pageToAdditiveBlendMaterial;
 
 	UPROPERTY()
-	TArray<UMaterialInstanceDynamic*> atlasMultiplyBlendMaterials;
-	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToMultiplyBlendMaterial;
+	TArray<UMaterialInstanceDynamic *> atlasMultiplyBlendMaterials;
+	TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> pageToMultiplyBlendMaterial;
 
 	UPROPERTY()
-	TArray<UMaterialInstanceDynamic*> atlasScreenBlendMaterials;
-	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*> pageToScreenBlendMaterial;
+	TArray<UMaterialInstanceDynamic *> atlasScreenBlendMaterials;
+	TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> pageToScreenBlendMaterial;
 
 	spine::Vector<float> worldVertices;
 	spine::SkeletonClipping clipper;
@@ -251,7 +252,7 @@ protected:
 	// keep track of track entries so they won't get GCed while
 	// in transit within a blueprint
 	UPROPERTY()
-	TSet<UTrackEntry*> trackEntries;
+	TSet<UTrackEntry *> trackEntries;
 
 private:
 	/* If the animation should update automatically. */

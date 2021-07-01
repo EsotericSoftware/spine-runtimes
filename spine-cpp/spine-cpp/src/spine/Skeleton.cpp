@@ -33,23 +33,23 @@
 
 #include <spine/Skeleton.h>
 
-#include <spine/SkeletonData.h>
+#include <spine/Attachment.h>
 #include <spine/Bone.h>
-#include <spine/Slot.h>
 #include <spine/IkConstraint.h>
 #include <spine/PathConstraint.h>
-#include <spine/TransformConstraint.h>
+#include <spine/SkeletonData.h>
 #include <spine/Skin.h>
-#include <spine/Attachment.h>
+#include <spine/Slot.h>
+#include <spine/TransformConstraint.h>
 
 #include <spine/BoneData.h>
-#include <spine/SlotData.h>
 #include <spine/IkConstraintData.h>
-#include <spine/TransformConstraintData.h>
-#include <spine/PathConstraintData.h>
-#include <spine/RegionAttachment.h>
 #include <spine/MeshAttachment.h>
 #include <spine/PathAttachment.h>
+#include <spine/PathConstraintData.h>
+#include <spine/RegionAttachment.h>
+#include <spine/SlotData.h>
+#include <spine/TransformConstraintData.h>
 
 #include <spine/ContainerUtil.h>
 
@@ -57,25 +57,24 @@
 
 using namespace spine;
 
-Skeleton::Skeleton(SkeletonData *skeletonData) :
-		_data(skeletonData),
-		_skin(NULL),
-		_color(1, 1, 1, 1),
-		_time(0),
-		_scaleX(1),
-		_scaleY(1),
-		_x(0),
-		_y(0) {
+Skeleton::Skeleton(SkeletonData *skeletonData) : _data(skeletonData),
+												 _skin(NULL),
+												 _color(1, 1, 1, 1),
+												 _time(0),
+												 _scaleX(1),
+												 _scaleY(1),
+												 _x(0),
+												 _y(0) {
 	_bones.ensureCapacity(_data->getBones().size());
 	for (size_t i = 0; i < _data->getBones().size(); ++i) {
 		BoneData *data = _data->getBones()[i];
 
 		Bone *bone;
 		if (data->getParent() == NULL) {
-			bone = new(__FILE__, __LINE__) Bone(*data, *this, NULL);
+			bone = new (__FILE__, __LINE__) Bone(*data, *this, NULL);
 		} else {
 			Bone *parent = _bones[data->getParent()->getIndex()];
-			bone = new(__FILE__, __LINE__) Bone(*data, *this, parent);
+			bone = new (__FILE__, __LINE__) Bone(*data, *this, parent);
 			parent->getChildren().add(bone);
 		}
 
@@ -88,7 +87,7 @@ Skeleton::Skeleton(SkeletonData *skeletonData) :
 		SlotData *data = _data->getSlots()[i];
 
 		Bone *bone = _bones[data->getBoneData().getIndex()];
-		Slot *slot = new(__FILE__, __LINE__) Slot(*data, *bone);
+		Slot *slot = new (__FILE__, __LINE__) Slot(*data, *bone);
 
 		_slots.add(slot);
 		_drawOrder.add(slot);
@@ -98,7 +97,7 @@ Skeleton::Skeleton(SkeletonData *skeletonData) :
 	for (size_t i = 0; i < _data->getIkConstraints().size(); ++i) {
 		IkConstraintData *data = _data->getIkConstraints()[i];
 
-		IkConstraint *constraint = new(__FILE__, __LINE__) IkConstraint(*data, *this);
+		IkConstraint *constraint = new (__FILE__, __LINE__) IkConstraint(*data, *this);
 
 		_ikConstraints.add(constraint);
 	}
@@ -107,7 +106,7 @@ Skeleton::Skeleton(SkeletonData *skeletonData) :
 	for (size_t i = 0; i < _data->getTransformConstraints().size(); ++i) {
 		TransformConstraintData *data = _data->getTransformConstraints()[i];
 
-		TransformConstraint *constraint = new(__FILE__, __LINE__) TransformConstraint(*data, *this);
+		TransformConstraint *constraint = new (__FILE__, __LINE__) TransformConstraint(*data, *this);
 
 		_transformConstraints.add(constraint);
 	}
@@ -116,7 +115,7 @@ Skeleton::Skeleton(SkeletonData *skeletonData) :
 	for (size_t i = 0; i < _data->getPathConstraints().size(); ++i) {
 		PathConstraintData *data = _data->getPathConstraints()[i];
 
-		PathConstraint *constraint = new(__FILE__, __LINE__) PathConstraint(*data, *this);
+		PathConstraint *constraint = new (__FILE__, __LINE__) PathConstraint(*data, *this);
 
 		_pathConstraints.add(constraint);
 	}
@@ -160,7 +159,7 @@ void Skeleton::updateCache() {
 	size_t constraintCount = ikCount + transformCount + pathCount;
 
 	size_t i = 0;
-	continue_outer:
+continue_outer:
 	for (; i < constraintCount; ++i) {
 		for (size_t ii = 0; ii < ikCount; ++ii) {
 			IkConstraint *constraint = _ikConstraints[ii];

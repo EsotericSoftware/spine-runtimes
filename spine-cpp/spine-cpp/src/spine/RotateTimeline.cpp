@@ -33,12 +33,12 @@
 
 #include <spine/RotateTimeline.h>
 
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
 
+#include <spine/Animation.h>
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
-#include <spine/Animation.h>
 #include <spine/Property.h>
 
 using namespace spine;
@@ -53,8 +53,7 @@ RotateTimeline::RotateTimeline(size_t frameCount, size_t bezierCount, int boneIn
 }
 
 void RotateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						   MixBlend blend, MixDirection direction
-) {
+						   MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);

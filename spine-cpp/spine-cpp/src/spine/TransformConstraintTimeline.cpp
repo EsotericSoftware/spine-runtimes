@@ -33,8 +33,8 @@
 
 #include <spine/TransformConstraintTimeline.h>
 
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
 
 #include <spine/Animation.h>
 #include <spine/Property.h>

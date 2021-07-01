@@ -30,39 +30,39 @@
 #pragma once
 
 #include "Engine.h"
-#include "spine/spine.h"
 #include "SpineSkeletonDataAsset.generated.h"
+#include "spine/spine.h"
 
 USTRUCT(BlueprintType, Category = "Spine")
 struct SPINEPLUGIN_API FSpineAnimationStateMixData {
 	GENERATED_BODY();
 
-public:	
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString From;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString To;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Mix = 0;
 };
 
-UCLASS(BlueprintType, ClassGroup=(Spine))
-class SPINEPLUGIN_API USpineSkeletonDataAsset: public UObject {
+UCLASS(BlueprintType, ClassGroup = (Spine))
+class SPINEPLUGIN_API USpineSkeletonDataAsset : public UObject {
 	GENERATED_BODY()
-	
-public:
-	spine::SkeletonData* GetSkeletonData(spine::Atlas* Atlas);
 
-	spine::AnimationStateData* GetAnimationStateData(spine::Atlas* atlas);
-	void SetMix(const FString& from, const FString& to, float mix);
-	float GetMix(const FString& from, const FString& to);
-	
-	FName GetSkeletonDataFileName () const;
-	void SetRawData (TArray<uint8> &Data);
-	
-	virtual void BeginDestroy () override;
+public:
+	spine::SkeletonData *GetSkeletonData(spine::Atlas *Atlas);
+
+	spine::AnimationStateData *GetAnimationStateData(spine::Atlas *atlas);
+	void SetMix(const FString &from, const FString &to, float mix);
+	float GetMix(const FString &from, const FString &to);
+
+	FName GetSkeletonDataFileName() const;
+	void SetRawData(TArray<uint8> &Data);
+
+	virtual void BeginDestroy() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DefaultMix = 0;
@@ -84,37 +84,37 @@ public:
 
 	UPROPERTY(Transient, VisibleAnywhere)
 	TArray<FString> Events;
-	
+
 protected:
 	UPROPERTY()
-	TArray<uint8> rawData;		
-	
+	TArray<uint8> rawData;
+
 	UPROPERTY()
 	FName skeletonDataFileName;
 
 	// These are created at runtime
 	struct NativeSkeletonData {
-		spine::SkeletonData* skeletonData;
-		spine::AnimationStateData* animationStateData;
+		spine::SkeletonData *skeletonData;
+		spine::AnimationStateData *animationStateData;
 	};
 
-	TMap<spine::Atlas*, NativeSkeletonData> atlasToNativeData;
+	TMap<spine::Atlas *, NativeSkeletonData> atlasToNativeData;
 
 	void ClearNativeData();
 
-	void SetMixes(spine::AnimationStateData* animationStateData);
-	
+	void SetMixes(spine::AnimationStateData *animationStateData);
+
 #if WITH_EDITORONLY_DATA
 public:
-	void SetSkeletonDataFileName (const FName &skeletonDataFileName);	 
-	
+	void SetSkeletonDataFileName(const FName &skeletonDataFileName);
+
 protected:
-	UPROPERTY(VisibleAnywhere, Instanced, Category=ImportSettings)
-	class UAssetImportData* importData;
-	
-	virtual void PostInitProperties ( ) override;
-	virtual void GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const override;
-	virtual void Serialize (FArchive& Ar) override;
+	UPROPERTY(VisibleAnywhere, Instanced, Category = ImportSettings)
+	class UAssetImportData *importData;
+
+	virtual void PostInitProperties() override;
+	virtual void GetAssetRegistryTags(TArray<FAssetRegistryTag> &OutTags) const override;
+	virtual void Serialize(FArchive &Ar) override;
 #endif
 
 	void LoadInfo();

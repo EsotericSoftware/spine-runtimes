@@ -27,12 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#include "Runtime/Core/Public/Misc/MessageDialog.h"
 #include "SpinePluginPrivatePCH.h"
 #include "spine/spine.h"
+#include <stdlib.h>
 #include <string.h>
 #include <string>
-#include <stdlib.h>
-#include "Runtime/Core/Public/Misc/MessageDialog.h"
 
 #define LOCTEXT_NAMESPACE "Spine"
 
@@ -41,12 +41,13 @@ using namespace spine;
 #define SPINE_MAJOR_VERSION 4
 #define SPINE_MINOR_VERSION 0
 
-FName USpineSkeletonDataAsset::GetSkeletonDataFileName () const {
+FName USpineSkeletonDataAsset::GetSkeletonDataFileName() const {
 #if WITH_EDITORONLY_DATA
 	TArray<FString> files;
 	if (importData) importData->ExtractFilenames(files);
 	if (files.Num() > 0) return FName(*files[0]);
-	else return skeletonDataFileName;
+	else
+		return skeletonDataFileName;
 #else
 	return skeletonDataFileName;
 #endif
@@ -54,27 +55,27 @@ FName USpineSkeletonDataAsset::GetSkeletonDataFileName () const {
 
 #if WITH_EDITORONLY_DATA
 
-void USpineSkeletonDataAsset::SetSkeletonDataFileName (const FName &SkeletonDataFileName) {
+void USpineSkeletonDataAsset::SetSkeletonDataFileName(const FName &SkeletonDataFileName) {
 	importData->UpdateFilenameOnly(SkeletonDataFileName.ToString());
 	TArray<FString> files;
 	importData->ExtractFilenames(files);
 	if (files.Num() > 0) this->skeletonDataFileName = FName(*files[0]);
 }
 
-void USpineSkeletonDataAsset::PostInitProperties () {
+void USpineSkeletonDataAsset::PostInitProperties() {
 	if (!HasAnyFlags(RF_ClassDefaultObject)) importData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
 	Super::PostInitProperties();
 }
 
-void USpineSkeletonDataAsset::GetAssetRegistryTags (TArray<FAssetRegistryTag>& OutTags) const {
+void USpineSkeletonDataAsset::GetAssetRegistryTags(TArray<FAssetRegistryTag> &OutTags) const {
 	if (importData) {
-		OutTags.Add(FAssetRegistryTag(SourceFileTagName(), importData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden) );
+		OutTags.Add(FAssetRegistryTag(SourceFileTagName(), importData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
 	}
-	
+
 	Super::GetAssetRegistryTags(OutTags);
 }
 
-void USpineSkeletonDataAsset::Serialize (FArchive& Ar) {
+void USpineSkeletonDataAsset::Serialize(FArchive &Ar) {
 	Super::Serialize(Ar);
 	if (Ar.IsLoading() && Ar.UE4Ver() < VER_UE4_ASSET_IMPORT_DATA_AS_JSON && !importData)
 		importData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
@@ -91,7 +92,7 @@ void USpineSkeletonDataAsset::ClearNativeData() {
 	atlasToNativeData.Empty();
 }
 
-void USpineSkeletonDataAsset::BeginDestroy () {
+void USpineSkeletonDataAsset::BeginDestroy() {
 	ClearNativeData();
 
 	Super::BeginDestroy();
@@ -99,33 +100,31 @@ void USpineSkeletonDataAsset::BeginDestroy () {
 
 class SP_API NullAttachmentLoader : public AttachmentLoader {
 public:
-
-	virtual RegionAttachment* newRegionAttachment(Skin& skin, const String& name, const String& path) {
-		return new(__FILE__, __LINE__) RegionAttachment(name);
+	virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path) {
+		return new (__FILE__, __LINE__) RegionAttachment(name);
 	}
 
-	virtual MeshAttachment* newMeshAttachment(Skin& skin, const String& name, const String& path) {
-		return new(__FILE__, __LINE__) MeshAttachment(name);
+	virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path) {
+		return new (__FILE__, __LINE__) MeshAttachment(name);
 	}
 
-	virtual BoundingBoxAttachment* newBoundingBoxAttachment(Skin& skin, const String& name) {
-		return new(__FILE__, __LINE__) BoundingBoxAttachment(name);
+	virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &skin, const String &name) {
+		return new (__FILE__, __LINE__) BoundingBoxAttachment(name);
 	}
 
-	virtual PathAttachment* newPathAttachment(Skin& skin, const String& name) {
-		return new(__FILE__, __LINE__) PathAttachment(name);
+	virtual PathAttachment *newPathAttachment(Skin &skin, const String &name) {
+		return new (__FILE__, __LINE__) PathAttachment(name);
 	}
 
-	virtual PointAttachment* newPointAttachment(Skin& skin, const String& name) {
-		return new(__FILE__, __LINE__) PointAttachment(name);
+	virtual PointAttachment *newPointAttachment(Skin &skin, const String &name) {
+		return new (__FILE__, __LINE__) PointAttachment(name);
 	}
 
-	virtual ClippingAttachment* newClippingAttachment(Skin& skin, const String& name) {
-		return new(__FILE__, __LINE__) ClippingAttachment(name);
+	virtual ClippingAttachment *newClippingAttachment(Skin &skin, const String &name) {
+		return new (__FILE__, __LINE__) ClippingAttachment(name);
 	}
 
-	virtual void configureAttachment(Attachment* attachment) {
-
+	virtual void configureAttachment(Attachment *attachment) {
 	}
 };
 
@@ -138,7 +137,7 @@ void USpineSkeletonDataAsset::SetRawData(TArray<uint8> &Data) {
 	LoadInfo();
 }
 
-static bool checkVersion(const char* version) {
+static bool checkVersion(const char *version) {
 	String tokens[3];
 	int currToken = 0;
 
@@ -162,19 +161,19 @@ static bool checkVersion(const char* version) {
 	return versionNumber[0] >= SPINE_MAJOR_VERSION && versionNumber[1] >= SPINE_MINOR_VERSION;
 }
 
-static bool checkJson(const char* jsonData) {
+static bool checkJson(const char *jsonData) {
 	Json json(jsonData);
-	Json* skeleton = Json::getItem(&json, "skeleton");
+	Json *skeleton = Json::getItem(&json, "skeleton");
 	if (!skeleton) return false;
-	const char* version = Json::getString(skeleton, "spine", 0);
+	const char *version = Json::getString(skeleton, "spine", 0);
 	if (!version) return false;
 
 	return checkVersion(version);
 }
 
 struct BinaryInput {
-	const unsigned char* cursor;
-	const unsigned char* end;
+	const unsigned char *cursor;
+	const unsigned char *end;
 };
 
 static unsigned char readByte(BinaryInput *input) {
@@ -199,7 +198,7 @@ static int readVarint(BinaryInput *input, bool optimizePositive) {
 	}
 
 	if (!optimizePositive) {
-		value = (((unsigned int)value >> 1) ^ -(value & 1));
+		value = (((unsigned int) value >> 1) ^ -(value & 1));
 	}
 
 	return value;
@@ -218,12 +217,12 @@ static char *readString(BinaryInput *input) {
 	return string;
 }
 
-static bool checkBinary(const char* binaryData, int length) {
+static bool checkBinary(const char *binaryData, int length) {
 	BinaryInput input;
-	input.cursor = (const unsigned char*)binaryData;
-	input.end = (const unsigned char*)binaryData + length;
+	input.cursor = (const unsigned char *) binaryData;
+	input.end = (const unsigned char *) binaryData + length;
 	SpineExtension::free(readString(&input), __FILE__, __LINE__);
-	char* version = readString(&input);
+	char *version = readString(&input);
 	bool result = checkVersion(version);
 	SpineExtension::free(version, __FILE__, __LINE__);
 	return result;
@@ -234,19 +233,18 @@ void USpineSkeletonDataAsset::LoadInfo() {
 	int dataLen = rawData.Num();
 	if (dataLen == 0) return;
 	NullAttachmentLoader loader;
-	SkeletonData* skeletonData = nullptr;
+	SkeletonData *skeletonData = nullptr;
 	if (skeletonDataFileName.GetPlainNameString().Contains(TEXT(".json"))) {
-		SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(&loader);
-		if(checkJson((const char*)rawData.GetData())) skeletonData = json->readSkeletonData((const char*)rawData.GetData());
+		SkeletonJson *json = new (__FILE__, __LINE__) SkeletonJson(&loader);
+		if (checkJson((const char *) rawData.GetData())) skeletonData = json->readSkeletonData((const char *) rawData.GetData());
 		if (!skeletonData) {
 			FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure the version of your exported data matches your runtime version.\n\n") + skeletonDataFileName.GetPlainNameString() + FString("\n\n") + UTF8_TO_TCHAR(json->getError().buffer())));
 			UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(json->getError().buffer()));
 		}
 		delete json;
-	}
-	else {
-		SkeletonBinary* binary = new (__FILE__, __LINE__) SkeletonBinary(&loader);
-		if (checkBinary((const char*)rawData.GetData(), (int)rawData.Num())) skeletonData = binary->readSkeletonData((const unsigned char*)rawData.GetData(), (int)rawData.Num());
+	} else {
+		SkeletonBinary *binary = new (__FILE__, __LINE__) SkeletonBinary(&loader);
+		if (checkBinary((const char *) rawData.GetData(), (int) rawData.Num())) skeletonData = binary->readSkeletonData((const unsigned char *) rawData.GetData(), (int) rawData.Num());
 		if (!skeletonData) {
 			FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure the version of your exported data matches your runtime version.\n\n") + skeletonDataFileName.GetPlainNameString() + FString("\n\n") + UTF8_TO_TCHAR(binary->getError().buffer())));
 			UE_LOG(SpineLog, Error, TEXT("Couldn't load skeleton data and atlas: %s"), UTF8_TO_TCHAR(binary->getError().buffer()));
@@ -274,19 +272,19 @@ void USpineSkeletonDataAsset::LoadInfo() {
 #endif
 }
 
-SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas) {
-	SkeletonData* skeletonData = nullptr;
-	AnimationStateData* animationStateData = nullptr;
+SkeletonData *USpineSkeletonDataAsset::GetSkeletonData(Atlas *Atlas) {
+	SkeletonData *skeletonData = nullptr;
+	AnimationStateData *animationStateData = nullptr;
 	if (atlasToNativeData.Contains(Atlas)) {
 		skeletonData = atlasToNativeData[Atlas].skeletonData;
 		animationStateData = atlasToNativeData[Atlas].animationStateData;
 	}
 
-	if (!skeletonData) {		
+	if (!skeletonData) {
 		int dataLen = rawData.Num();
 		if (skeletonDataFileName.GetPlainNameString().Contains(TEXT(".json"))) {
-			SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(Atlas);
-			if (checkJson((const char*)rawData.GetData())) skeletonData = json->readSkeletonData((const char*)rawData.GetData());
+			SkeletonJson *json = new (__FILE__, __LINE__) SkeletonJson(Atlas);
+			if (checkJson((const char *) rawData.GetData())) skeletonData = json->readSkeletonData((const char *) rawData.GetData());
 			if (!skeletonData) {
 #if WITH_EDITORONLY_DATA
 				FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure the version of your exported data matches your runtime version.\n\n") + skeletonDataFileName.GetPlainNameString() + FString("\n\n") + UTF8_TO_TCHAR(json->getError().buffer())));
@@ -295,8 +293,8 @@ SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas) {
 			}
 			delete json;
 		} else {
-			SkeletonBinary* binary = new (__FILE__, __LINE__) SkeletonBinary(Atlas);
-			if (checkBinary((const char*)rawData.GetData(), (int)rawData.Num())) skeletonData = binary->readSkeletonData((const unsigned char*)rawData.GetData(), (int)rawData.Num());
+			SkeletonBinary *binary = new (__FILE__, __LINE__) SkeletonBinary(Atlas);
+			if (checkBinary((const char *) rawData.GetData(), (int) rawData.Num())) skeletonData = binary->readSkeletonData((const unsigned char *) rawData.GetData(), (int) rawData.Num());
 			if (!skeletonData) {
 #if WITH_EDITORONLY_DATA
 				FMessageDialog::Debugf(FText::FromString(FString("Couldn't load skeleton data and/or atlas. Please ensure the version of your exported data matches your runtime version.\n\n") + skeletonDataFileName.GetPlainNameString() + FString("\n\n") + UTF8_TO_TCHAR(binary->getError().buffer())));
@@ -309,44 +307,44 @@ SkeletonData* USpineSkeletonDataAsset::GetSkeletonData (Atlas* Atlas) {
 		if (skeletonData) {
 			animationStateData = new (__FILE__, __LINE__) AnimationStateData(skeletonData);
 			SetMixes(animationStateData);
-			atlasToNativeData.Add(Atlas, { skeletonData, animationStateData });
+			atlasToNativeData.Add(Atlas, {skeletonData, animationStateData});
 		}
 	}
 
 	return skeletonData;
 }
 
-void USpineSkeletonDataAsset::SetMixes(AnimationStateData* animationStateData) {
-	for (auto& data : MixData) {
+void USpineSkeletonDataAsset::SetMixes(AnimationStateData *animationStateData) {
+	for (auto &data : MixData) {
 		if (!data.From.IsEmpty() && !data.To.IsEmpty()) {
-			const char* fromChar = TCHAR_TO_UTF8(*data.From);
-			const char* toChar = TCHAR_TO_UTF8(*data.To);
+			const char *fromChar = TCHAR_TO_UTF8(*data.From);
+			const char *toChar = TCHAR_TO_UTF8(*data.To);
 			animationStateData->setMix(fromChar, toChar, data.Mix);
 		}
 	}
 	animationStateData->setDefaultMix(DefaultMix);
 }
 
-AnimationStateData* USpineSkeletonDataAsset::GetAnimationStateData(Atlas* atlas) {	
+AnimationStateData *USpineSkeletonDataAsset::GetAnimationStateData(Atlas *atlas) {
 	if (!atlasToNativeData.Contains(atlas)) return nullptr;
 	AnimationStateData *data = atlasToNativeData[atlas].animationStateData;
 	SetMixes(data);
 	return data;
 }
 
-void USpineSkeletonDataAsset::SetMix(const FString& from, const FString& to, float mix) {
+void USpineSkeletonDataAsset::SetMix(const FString &from, const FString &to, float mix) {
 	FSpineAnimationStateMixData data;
 	data.From = from;
 	data.To = to;
-	data.Mix = mix;	
+	data.Mix = mix;
 	this->MixData.Add(data);
 	for (auto &pair : atlasToNativeData) {
 		SetMixes(pair.Value.animationStateData);
 	}
 }
 
-float USpineSkeletonDataAsset::GetMix(const FString& from, const FString& to) {
-	for (auto& data : MixData) {
+float USpineSkeletonDataAsset::GetMix(const FString &from, const FString &to) {
+	for (auto &data : MixData) {
 		if (data.From.Equals(from) && data.To.Equals(to)) return data.Mix;
 	}
 	return 0;

@@ -35,17 +35,17 @@
 
 class RaptorExample : public cocos2d::LayerColor {
 public:
-	static cocos2d::Scene* scene ();
+	static cocos2d::Scene *scene();
 
 	CREATE_FUNC(RaptorExample);
 
-	virtual bool init ();
-	
+	virtual bool init();
+
 	virtual void update(float fDelta);
 
 private:
-	spine::SkeletonAnimation* skeletonNode;
+	spine::SkeletonAnimation *skeletonNode;
 	float swirlTime;
 };
 
-#endif // _RAPTOREXAMPLE_H_
+#endif// _RAPTOREXAMPLE_H_

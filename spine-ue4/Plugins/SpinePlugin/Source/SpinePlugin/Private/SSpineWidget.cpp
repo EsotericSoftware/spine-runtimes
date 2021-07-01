@@ -29,19 +29,19 @@
 
 #include "SpinePluginPrivatePCH.h"
 
-#include "SSpineWidget.h"
 #include "Framework/Application/SlateApplication.h"
-#include "Materials/MaterialInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialInterface.h"
 #include "Modules/ModuleManager.h"
-#include "Runtime/SlateRHIRenderer/Public/Interfaces/ISlateRHIRendererModule.h"
 #include "Rendering/DrawElements.h"
+#include "Runtime/SlateRHIRenderer/Public/Interfaces/ISlateRHIRendererModule.h"
+#include "SSpineWidget.h"
+#include "Slate/SMeshWidget.h"
 #include "Slate/SlateVectorArtData.h"
 #include "Slate/SlateVectorArtInstanceData.h"
-#include "Slate/SMeshWidget.h"
 #include "SlateMaterialBrush.h"
-#include <spine/spine.h>
 #include "SpineWidget.h"
+#include <spine/spine.h>
 
 using namespace spine;
 
@@ -54,10 +54,10 @@ struct SpineSlateMaterialBrush : public FSlateBrush {
 	}
 };
 
-void SSpineWidget::Construct(const FArguments& args) {
+void SSpineWidget::Construct(const FArguments &args) {
 }
 
-void SSpineWidget::SetData(USpineWidget* Widget) {
+void SSpineWidget::SetData(USpineWidget *Widget) {
 	this->widget = Widget;
 	if (widget && widget->skeleton && widget->Atlas) {
 		Skeleton *skeleton = widget->skeleton;
@@ -68,7 +68,7 @@ void SSpineWidget::SetData(USpineWidget* Widget) {
 	}
 }
 
-static void setVertex(FSlateVertex* vertex, float x, float y, float u, float v, const FColor& color, const FVector2D& offset) {
+static void setVertex(FSlateVertex *vertex, float x, float y, float u, float v, const FColor &color, const FVector2D &offset) {
 	vertex->Position.X = offset.X + x;
 	vertex->Position.Y = offset.Y + y;
 	vertex->TexCoords[0] = u;
@@ -82,11 +82,11 @@ static void setVertex(FSlateVertex* vertex, float x, float y, float u, float v, 
 	vertex->PixelSize[1] = 1;
 }
 
-int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyClippingRect, FSlateWindowElementList& OutDrawElements,
-	int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const {
+int32 SSpineWidget::OnPaint(const FPaintArgs &Args, const FGeometry &AllottedGeometry, const FSlateRect &MyClippingRect, FSlateWindowElementList &OutDrawElements,
+							int32 LayerId, const FWidgetStyle &InWidgetStyle, bool bParentEnabled) const {
 
-	SSpineWidget* self = (SSpineWidget*)this;
-	UMaterialInstanceDynamic* MatNow = nullptr;
+	SSpineWidget *self = (SSpineWidget *) this;
+	UMaterialInstanceDynamic *MatNow = nullptr;
 
 	if (widget && widget->skeleton && widget->Atlas) {
 		widget->skeleton->getColor().set(widget->Color.R, widget->Color.G, widget->Color.B, widget->Color.A);
@@ -102,9 +102,9 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 			widget->pageToScreenBlendMaterial.Empty();
 
 			for (int i = 0; i < widget->Atlas->atlasPages.Num(); i++) {
-				AtlasPage* currPage = widget->Atlas->GetAtlas()->getPages()[i];
+				AtlasPage *currPage = widget->Atlas->GetAtlas()->getPages()[i];
 
-				UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(widget->NormalBlendMaterial, widget);
+				UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(widget->NormalBlendMaterial, widget);
 				material->SetTextureParameterValue(widget->TextureParameterName, widget->Atlas->atlasPages[i]);
 				widget->atlasNormalBlendMaterials.Add(material);
 				widget->pageToNormalBlendMaterial.Add(currPage, material);
@@ -131,14 +131,14 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 			widget->pageToScreenBlendMaterial.Empty();
 
 			for (int i = 0; i < widget->Atlas->atlasPages.Num(); i++) {
-				AtlasPage* currPage = widget->Atlas->GetAtlas()->getPages()[i];
+				AtlasPage *currPage = widget->Atlas->GetAtlas()->getPages()[i];
 
-				UTexture2D* texture = widget->Atlas->atlasPages[i];
-				UTexture* oldTexture = nullptr;
+				UTexture2D *texture = widget->Atlas->atlasPages[i];
+				UTexture *oldTexture = nullptr;
 
-				UMaterialInstanceDynamic* current = widget->atlasNormalBlendMaterials[i];
+				UMaterialInstanceDynamic *current = widget->atlasNormalBlendMaterials[i];
 				if (!current || !current->GetTextureParameterValue(widget->TextureParameterName, oldTexture) || oldTexture != texture) {
-					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(widget->NormalBlendMaterial, widget);
+					UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(widget->NormalBlendMaterial, widget);
 					material->SetTextureParameterValue(widget->TextureParameterName, texture);
 					widget->atlasNormalBlendMaterials[i] = material;
 				}
@@ -146,7 +146,7 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 
 				current = widget->atlasAdditiveBlendMaterials[i];
 				if (!current || !current->GetTextureParameterValue(widget->TextureParameterName, oldTexture) || oldTexture != texture) {
-					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(widget->AdditiveBlendMaterial, widget);
+					UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(widget->AdditiveBlendMaterial, widget);
 					material->SetTextureParameterValue(widget->TextureParameterName, texture);
 					widget->atlasAdditiveBlendMaterials[i] = material;
 				}
@@ -154,7 +154,7 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 
 				current = widget->atlasMultiplyBlendMaterials[i];
 				if (!current || !current->GetTextureParameterValue(widget->TextureParameterName, oldTexture) || oldTexture != texture) {
-					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(widget->MultiplyBlendMaterial, widget);
+					UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(widget->MultiplyBlendMaterial, widget);
 					material->SetTextureParameterValue(widget->TextureParameterName, texture);
 					widget->atlasMultiplyBlendMaterials[i] = material;
 				}
@@ -162,7 +162,7 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 
 				current = widget->atlasScreenBlendMaterials[i];
 				if (!current || !current->GetTextureParameterValue(widget->TextureParameterName, oldTexture) || oldTexture != texture) {
-					UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(widget->ScreenBlendMaterial, widget);
+					UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(widget->ScreenBlendMaterial, widget);
 					material->SetTextureParameterValue(widget->TextureParameterName, texture);
 					widget->atlasScreenBlendMaterials[i] = material;
 				}
@@ -176,9 +176,9 @@ int32 SSpineWidget::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeo
 	return LayerId;
 }
 
-void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements, const FGeometry& AllottedGeometry, int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector>& Colors2, UMaterialInstanceDynamic* Material) {
+void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList &OutDrawElements, const FGeometry &AllottedGeometry, int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector> &Colors2, UMaterialInstanceDynamic *Material) {
 	if (Vertices.Num() == 0) return;
-	SSpineWidget* self = (SSpineWidget*)this;
+	SSpineWidget *self = (SSpineWidget *) this;
 
 	const FVector2D widgetSize = AllottedGeometry.GetLocalSize();
 	const FVector2D sizeScale = widgetSize / FVector2D(boundsSize.X, boundsSize.Y);
@@ -189,18 +189,18 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements
 	}
 
 	self->renderData.IndexData.SetNumUninitialized(Indices.Num());
-	SlateIndex* indexData = (SlateIndex*)renderData.IndexData.GetData();
+	SlateIndex *indexData = (SlateIndex *) renderData.IndexData.GetData();
 	for (int i = 0; i < Indices.Num(); i++) {
-		indexData[i] = (SlateIndex)Indices[i];
+		indexData[i] = (SlateIndex) Indices[i];
 	}
-	
+
 	self->renderData.VertexData.SetNumUninitialized(Vertices.Num());
-	FSlateVertex* vertexData = (FSlateVertex*)renderData.VertexData.GetData();
+	FSlateVertex *vertexData = (FSlateVertex *) renderData.VertexData.GetData();
 	FVector2D offset = AllottedGeometry.AbsolutePosition;
 	FColor white = FColor(0xffffffff);
-	const FSlateRenderTransform& Transform = AllottedGeometry.GetAccumulatedRenderTransform();
+	const FSlateRenderTransform &Transform = AllottedGeometry.GetAccumulatedRenderTransform();
 
-	for (size_t i = 0; i < (size_t)Vertices.Num(); i++) {
+	for (size_t i = 0; i < (size_t) Vertices.Num(); i++) {
 		setVertex(&vertexData[i], 0, 0, Uvs[i].X, Uvs[i].Y, Colors[i], Transform.TransformPoint(FVector2D(Vertices[i])));
 	}
 
@@ -222,7 +222,7 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList& OutDrawElements
 	Idx++;
 }
 
-void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawElements, const FGeometry& AllottedGeometry, Skeleton* Skeleton) {
+void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList &OutDrawElements, const FGeometry &AllottedGeometry, Skeleton *Skeleton) {
 	TArray<FVector> vertices;
 	TArray<int32> indices;
 	TArray<FVector2D> uvs;
@@ -231,31 +231,31 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 
 	int idx = 0;
 	int meshSection = 0;
-	UMaterialInstanceDynamic* lastMaterial = nullptr;
+	UMaterialInstanceDynamic *lastMaterial = nullptr;
 
 	SkeletonClipping &clipper = widget->clipper;
 	Vector<float> &worldVertices = widget->worldVertices;
 
 	float depthOffset = 0;
-	unsigned short quadIndices[] = { 0, 1, 2, 0, 2, 3 };
+	unsigned short quadIndices[] = {0, 1, 2, 0, 2, 3};
 
-	for (int i = 0; i < (int)Skeleton->getSlots().size(); ++i) {
+	for (int i = 0; i < (int) Skeleton->getSlots().size(); ++i) {
 		Vector<float> *attachmentVertices = &worldVertices;
-		unsigned short* attachmentIndices = nullptr;
+		unsigned short *attachmentIndices = nullptr;
 		int numVertices;
 		int numIndices;
-		AtlasRegion* attachmentAtlasRegion = nullptr;
+		AtlasRegion *attachmentAtlasRegion = nullptr;
 		Color attachmentColor;
 		attachmentColor.set(1, 1, 1, 1);
-		float* attachmentUvs = nullptr;
+		float *attachmentUvs = nullptr;
 
-		Slot* slot = Skeleton->getDrawOrder()[i];
+		Slot *slot = Skeleton->getDrawOrder()[i];
 		if (!slot->getBone().isActive()) {
 			clipper.clipEnd(*slot);
 			continue;
 		}
 
-		Attachment* attachment = slot->getAttachment();
+		Attachment *attachment = slot->getAttachment();
 		if (!attachment) {
 			clipper.clipEnd(*slot);
 			continue;
@@ -266,27 +266,25 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 		}
 
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
-			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
+			RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
 			attachmentColor.set(regionAttachment->getColor());
-			attachmentAtlasRegion = (AtlasRegion*)regionAttachment->getRendererObject();
+			attachmentAtlasRegion = (AtlasRegion *) regionAttachment->getRendererObject();
 			regionAttachment->computeWorldVertices(slot->getBone(), *attachmentVertices, 0, 2);
 			attachmentIndices = quadIndices;
 			attachmentUvs = regionAttachment->getUVs().buffer();
 			numVertices = 4;
 			numIndices = 6;
-		}
-		else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
-			MeshAttachment* mesh = (MeshAttachment*)attachment;
+		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
+			MeshAttachment *mesh = (MeshAttachment *) attachment;
 			attachmentColor.set(mesh->getColor());
-			attachmentAtlasRegion = (AtlasRegion*)mesh->getRendererObject();
+			attachmentAtlasRegion = (AtlasRegion *) mesh->getRendererObject();
 			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), *attachmentVertices, 0, 2);
 			attachmentIndices = mesh->getTriangles().buffer();
 			attachmentUvs = mesh->getUVs().buffer();
 			numVertices = mesh->getWorldVerticesLength() >> 1;
 			numIndices = mesh->getTriangles().size();
-		}
-		else /* clipping */ {
-			ClippingAttachment* clip = (ClippingAttachment*)attachment;
+		} else /* clipping */ {
+			ClippingAttachment *clip = (ClippingAttachment *) attachment;
 			clipper.clipStart(*slot, clip);
 			continue;
 		}
@@ -294,42 +292,42 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 		// if the user switches the atlas data while not having switched
 		// to the correct skeleton data yet, we won't find any regions.
 		// ignore regions for which we can't find a material
-		UMaterialInstanceDynamic* material = nullptr;
+		UMaterialInstanceDynamic *material = nullptr;
 		switch (slot->getData().getBlendMode()) {
-		case BlendMode_Normal:
-			if (!widget->pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-				clipper.clipEnd(*slot);
-				continue;
-			}
-			material = widget->pageToNormalBlendMaterial[attachmentAtlasRegion->page];
-			break;
-		case BlendMode_Additive:
-			if (!widget->pageToAdditiveBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-				clipper.clipEnd(*slot);
-				continue;
-			}
-			material = widget->pageToAdditiveBlendMaterial[attachmentAtlasRegion->page];
-			break;
-		case BlendMode_Multiply:
-			if (!widget->pageToMultiplyBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-				clipper.clipEnd(*slot);
-				continue;
-			}
-			material = widget->pageToMultiplyBlendMaterial[attachmentAtlasRegion->page];
-			break;
-		case BlendMode_Screen:
-			if (!widget->pageToScreenBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-				clipper.clipEnd(*slot);
-				continue;
-			}
-			material = widget->pageToScreenBlendMaterial[attachmentAtlasRegion->page];
-			break;
-		default:
-			if (!widget->pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-				clipper.clipEnd(*slot);
-				continue;
-			}
-			material = widget->pageToNormalBlendMaterial[attachmentAtlasRegion->page];
+			case BlendMode_Normal:
+				if (!widget->pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+					clipper.clipEnd(*slot);
+					continue;
+				}
+				material = widget->pageToNormalBlendMaterial[attachmentAtlasRegion->page];
+				break;
+			case BlendMode_Additive:
+				if (!widget->pageToAdditiveBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+					clipper.clipEnd(*slot);
+					continue;
+				}
+				material = widget->pageToAdditiveBlendMaterial[attachmentAtlasRegion->page];
+				break;
+			case BlendMode_Multiply:
+				if (!widget->pageToMultiplyBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+					clipper.clipEnd(*slot);
+					continue;
+				}
+				material = widget->pageToMultiplyBlendMaterial[attachmentAtlasRegion->page];
+				break;
+			case BlendMode_Screen:
+				if (!widget->pageToScreenBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+					clipper.clipEnd(*slot);
+					continue;
+				}
+				material = widget->pageToScreenBlendMaterial[attachmentAtlasRegion->page];
+				break;
+			default:
+				if (!widget->pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+					clipper.clipEnd(*slot);
+					continue;
+				}
+				material = widget->pageToNormalBlendMaterial[attachmentAtlasRegion->page];
 		}
 
 		if (clipper.isClipping()) {
@@ -360,7 +358,7 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList& OutDrawEle
 		float dg = slot->hasDarkColor() ? slot->getDarkColor().g : 0.0f;
 		float db = slot->hasDarkColor() ? slot->getDarkColor().b : 0.0f;
 
-		float* verticesPtr = attachmentVertices->buffer();
+		float *verticesPtr = attachmentVertices->buffer();
 		for (int j = 0; j < numVertices << 1; j += 2) {
 			colors.Add(FColor(r, g, b, a));
 			darkColors.Add(FVector(dr, dg, db));

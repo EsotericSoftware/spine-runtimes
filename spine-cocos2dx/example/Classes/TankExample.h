@@ -35,14 +35,14 @@
 
 class TankExample : public cocos2d::LayerColor {
 public:
-	static cocos2d::Scene* scene ();
+	static cocos2d::Scene *scene();
 
 	CREATE_FUNC(TankExample);
 
-	virtual bool init ();
+	virtual bool init();
 
 private:
-	spine::SkeletonAnimation* skeletonNode;
+	spine::SkeletonAnimation *skeletonNode;
 };
 
-#endif // _TANKEXAMPLE_H_
+#endif// _TANKEXAMPLE_H_

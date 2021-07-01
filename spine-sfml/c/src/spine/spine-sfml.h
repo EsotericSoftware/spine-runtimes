@@ -30,43 +30,44 @@
 #ifndef SPINE_SFML_H_
 #define SPINE_SFML_H_
 
-#include <spine/spine.h>
-#include <spine/extension.h>
+#include <SFML/Graphics/RenderStates.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/RenderStates.hpp>
+#include <spine/extension.h>
+#include <spine/spine.h>
 
 _SP_ARRAY_DECLARE_TYPE(spColorArray, spColor)
 
 namespace spine {
 
-class SkeletonDrawable: public sf::Drawable {
-public:
-	spSkeleton* skeleton;
-	spAnimationState* state;
-	float timeScale;
-	sf::VertexArray* vertexArray;
-	spVertexEffect* vertexEffect;
+	class SkeletonDrawable : public sf::Drawable {
+	public:
+		spSkeleton *skeleton;
+		spAnimationState *state;
+		float timeScale;
+		sf::VertexArray *vertexArray;
+		spVertexEffect *vertexEffect;
 
-	SkeletonDrawable (spSkeletonData* skeleton, spAnimationStateData* stateData = 0);
-	~SkeletonDrawable ();
+		SkeletonDrawable(spSkeletonData *skeleton, spAnimationStateData *stateData = 0);
+		~SkeletonDrawable();
 
-	void update (float deltaTime);
+		void update(float deltaTime);
 
-	virtual void draw (sf::RenderTarget& target, sf::RenderStates states) const;
+		virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
-	void setUsePremultipliedAlpha(bool usePMA) { usePremultipliedAlpha = usePMA; };
-	bool getUsePremultipliedAlpha() { return usePremultipliedAlpha; };
-private:
-	bool ownsAnimationStateData;
-	float* worldVertices;
-	spFloatArray* tempUvs;
-	spColorArray* tempColors;
-	spSkeletonClipping* clipper;
-	bool usePremultipliedAlpha;
-};
+		void setUsePremultipliedAlpha(bool usePMA) { usePremultipliedAlpha = usePMA; };
+		bool getUsePremultipliedAlpha() { return usePremultipliedAlpha; };
+
+	private:
+		bool ownsAnimationStateData;
+		float *worldVertices;
+		spFloatArray *tempUvs;
+		spColorArray *tempColors;
+		spSkeletonClipping *clipper;
+		bool usePremultipliedAlpha;
+	};
 
 } /* namespace spine */
 #endif /* SPINE_SFML_H_ */

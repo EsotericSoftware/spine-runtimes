@@ -30,58 +30,58 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
+#include "SpineSkeletonComponent.generated.h"
 #include "SpineSkeletonDataAsset.h"
 #include "spine/spine.h"
-#include "SpineSkeletonComponent.generated.h"
 
 class USpineSkeletonComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineBeforeUpdateWorldTransformDelegate, USpineSkeletonComponent*, skeleton);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineAfterUpdateWorldTransformDelegate, USpineSkeletonComponent*, skeleton);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineBeforeUpdateWorldTransformDelegate, USpineSkeletonComponent *, skeleton);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineAfterUpdateWorldTransformDelegate, USpineSkeletonComponent *, skeleton);
 
 class USpineAtlasAsset;
-UCLASS(ClassGroup=(Spine), meta=(BlueprintSpawnableComponent))
-class SPINEPLUGIN_API USpineSkeletonComponent: public UActorComponent {
+UCLASS(ClassGroup = (Spine), meta = (BlueprintSpawnableComponent))
+class SPINEPLUGIN_API USpineSkeletonComponent : public UActorComponent {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
-	USpineAtlasAsset* Atlas;
-	
+	USpineAtlasAsset *Atlas;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Spine)
-	USpineSkeletonDataAsset* SkeletonData;
-	
-	spine::Skeleton* GetSkeleton () { return skeleton; };
+	USpineSkeletonDataAsset *SkeletonData;
+
+	spine::Skeleton *GetSkeleton() { return skeleton; };
 
 	UFUNCTION(BlueprintPure, Category = "Components|Spine|Skeleton")
 	void GetSkins(TArray<FString> &Skins);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	bool SetSkins(UPARAM(ref) TArray<FString>& SkinNames);
-	
+	bool SetSkins(UPARAM(ref) TArray<FString> &SkinNames);
+
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	bool SetSkin (const FString SkinName);
+	bool SetSkin(const FString SkinName);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	bool HasSkin(const FString SkinName);
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	bool SetAttachment (const FString slotName, const FString attachmentName);
-	
+	bool SetAttachment(const FString slotName, const FString attachmentName);
+
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	FTransform GetBoneWorldTransform (const FString& BoneName);
-	
+	FTransform GetBoneWorldTransform(const FString &BoneName);
+
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	void SetBoneWorldPosition (const FString& BoneName, const FVector& position);
+	void SetBoneWorldPosition(const FString &BoneName, const FVector &position);
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	void UpdateWorldTransform();
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	void SetToSetupPose ();
-	
+	void SetToSetupPose();
+
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
-	void SetBonesToSetupPose ();
+	void SetBonesToSetupPose();
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	void SetSlotsToSetupPose();
@@ -121,29 +121,29 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Spine|Skeleton")
 	float GetAnimationDuration(FString AnimationName);
-	
+
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Skeleton")
 	FSpineBeforeUpdateWorldTransformDelegate BeforeUpdateWorldTransform;
-	
+
 	UPROPERTY(BlueprintAssignable, Category = "Components|Spine|Skeleton")
 	FSpineAfterUpdateWorldTransformDelegate AfterUpdateWorldTransform;
-		
-	USpineSkeletonComponent ();
-	
-	virtual void BeginPlay () override;
-		
-	virtual void TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;	
 
-	virtual void FinishDestroy () override;
-	
+	USpineSkeletonComponent();
+
+	virtual void BeginPlay() override;
+
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
+
+	virtual void FinishDestroy() override;
+
 protected:
-	virtual void CheckState ();
+	virtual void CheckState();
 	virtual void InternalTick(float DeltaTime, bool CallDelegates = true, bool Preview = false);
-	virtual void DisposeState ();
+	virtual void DisposeState();
 
-	spine::Skeleton* skeleton;
-	USpineAtlasAsset* lastAtlas = nullptr;
-	spine::Atlas* lastSpineAtlas = nullptr;
-	USpineSkeletonDataAsset* lastData = nullptr;
-	spine::Skin* customSkin = nullptr;
+	spine::Skeleton *skeleton;
+	USpineAtlasAsset *lastAtlas = nullptr;
+	spine::Atlas *lastSpineAtlas = nullptr;
+	USpineSkeletonDataAsset *lastData = nullptr;
+	spine::Skin *customSkin = nullptr;
 };

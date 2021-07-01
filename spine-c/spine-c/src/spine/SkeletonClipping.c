@@ -61,7 +61,8 @@ static void _makeClockwise(spFloatArray *polygon) {
 	int verticeslength = polygon->size;
 
 	float area =
-			vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1], p1x, p1y, p2x, p2y;
+				  vertices[verticeslength - 2] * vertices[1] - vertices[0] * vertices[verticeslength - 1],
+		  p1x, p1y, p2x, p2y;
 	for (i = 0, n = verticeslength - 3; i < n; i += 2) {
 		p1x = vertices[i];
 		p1y = vertices[i + 1];
@@ -237,7 +238,7 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping *self, float *vertices,
 	spFloatArray_clear(clippedUVs);
 	spUnsignedShortArray_clear(clippedTriangles);
 	i = 0;
-	continue_outer:
+continue_outer:
 	for (; i < trianglesLength; i += 3) {
 		int p;
 		int vertexOffset = triangles[i] * stride;
@@ -297,7 +298,8 @@ void spSkeletonClipping_clipTriangles(spSkeletonClipping *self, float *vertices,
 
 				s = clippedTriangles->size;
 				clippedTrianglesItems = spUnsignedShortArray_setSize(clippedTriangles,
-																	 s + 3 * (clipOutputCount - 2))->items;
+																	 s + 3 * (clipOutputCount - 2))
+												->items;
 				clipOutputCount--;
 				for (ii = 1; ii < clipOutputCount; ii++) {
 					clippedTrianglesItems[s] = index;

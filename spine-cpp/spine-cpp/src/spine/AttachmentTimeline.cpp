@@ -33,8 +33,8 @@
 
 #include <spine/AttachmentTimeline.h>
 
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
 
 #include <spine/Animation.h>
 #include <spine/Bone.h>
@@ -60,13 +60,11 @@ AttachmentTimeline::AttachmentTimeline(size_t frameCount, int slotIndex) : Timel
 AttachmentTimeline::~AttachmentTimeline() {}
 
 void AttachmentTimeline::setAttachment(Skeleton &skeleton, Slot &slot, String *attachmentName) {
-	slot.setAttachment(attachmentName == NULL || attachmentName->isEmpty() ? NULL : skeleton.getAttachment(_slotIndex,
-																										   *attachmentName));
+	slot.setAttachment(attachmentName == NULL || attachmentName->isEmpty() ? NULL : skeleton.getAttachment(_slotIndex, *attachmentName));
 }
 
 void AttachmentTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-							   MixBlend blend, MixDirection direction
-) {
+							   MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(alpha);

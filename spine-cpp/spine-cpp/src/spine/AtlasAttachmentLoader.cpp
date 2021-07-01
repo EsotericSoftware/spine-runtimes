@@ -32,13 +32,13 @@
 #endif
 
 #include <spine/AtlasAttachmentLoader.h>
-#include <spine/Skin.h>
-#include <spine/RegionAttachment.h>
-#include <spine/MeshAttachment.h>
 #include <spine/BoundingBoxAttachment.h>
+#include <spine/ClippingAttachment.h>
+#include <spine/MeshAttachment.h>
 #include <spine/PathAttachment.h>
 #include <spine/PointAttachment.h>
-#include <spine/ClippingAttachment.h>
+#include <spine/RegionAttachment.h>
+#include <spine/Skin.h>
 
 #include <spine/Atlas.h>
 
@@ -56,7 +56,7 @@ namespace spine {
 
 		AtlasRegion &region = *regionP;
 
-		RegionAttachment *attachmentP = new(__FILE__, __LINE__) RegionAttachment(name);
+		RegionAttachment *attachmentP = new (__FILE__, __LINE__) RegionAttachment(name);
 
 		RegionAttachment &attachment = *attachmentP;
 		attachment.setRendererObject(regionP);
@@ -78,7 +78,7 @@ namespace spine {
 
 		AtlasRegion &region = *regionP;
 
-		MeshAttachment *attachmentP = new(__FILE__, __LINE__) MeshAttachment(name);
+		MeshAttachment *attachmentP = new (__FILE__, __LINE__) MeshAttachment(name);
 
 		MeshAttachment &attachment = *attachmentP;
 		attachment.setRendererObject(regionP);
@@ -99,22 +99,22 @@ namespace spine {
 
 	BoundingBoxAttachment *AtlasAttachmentLoader::newBoundingBoxAttachment(Skin &skin, const String &name) {
 		SP_UNUSED(skin);
-		return new(__FILE__, __LINE__) BoundingBoxAttachment(name);
+		return new (__FILE__, __LINE__) BoundingBoxAttachment(name);
 	}
 
 	PathAttachment *AtlasAttachmentLoader::newPathAttachment(Skin &skin, const String &name) {
 		SP_UNUSED(skin);
-		return new(__FILE__, __LINE__) PathAttachment(name);
+		return new (__FILE__, __LINE__) PathAttachment(name);
 	}
 
 	PointAttachment *AtlasAttachmentLoader::newPointAttachment(Skin &skin, const String &name) {
 		SP_UNUSED(skin);
-		return new(__FILE__, __LINE__) PointAttachment(name);
+		return new (__FILE__, __LINE__) PointAttachment(name);
 	}
 
 	ClippingAttachment *AtlasAttachmentLoader::newClippingAttachment(Skin &skin, const String &name) {
 		SP_UNUSED(skin);
-		return new(__FILE__, __LINE__) ClippingAttachment(name);
+		return new (__FILE__, __LINE__) ClippingAttachment(name);
 	}
 
 	void AtlasAttachmentLoader::configureAttachment(Attachment *attachment) {
@@ -125,4 +125,4 @@ namespace spine {
 		return _atlas->findRegion(name);
 	}
 
-}
+}// namespace spine

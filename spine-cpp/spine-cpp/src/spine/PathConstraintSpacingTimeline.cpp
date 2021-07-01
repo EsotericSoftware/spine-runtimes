@@ -33,15 +33,15 @@
 
 #include <spine/PathConstraintSpacingTimeline.h>
 
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
 
 #include <spine/Animation.h>
+#include <spine/PathConstraint.h>
+#include <spine/PathConstraintData.h>
 #include <spine/Property.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
-#include <spine/PathConstraint.h>
-#include <spine/PathConstraintData.h>
 
 using namespace spine;
 
@@ -57,8 +57,7 @@ PathConstraintSpacingTimeline::PathConstraintSpacingTimeline(size_t frameCount, 
 }
 
 void PathConstraintSpacingTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents,
-										  float alpha, MixBlend blend, MixDirection direction
-) {
+										  float alpha, MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);

@@ -31,18 +31,18 @@
 #include "SpinePluginPrivatePCH.h"
 #endif
 
-#include <spine/AnimationState.h>
 #include <spine/Animation.h>
-#include <spine/Event.h>
+#include <spine/AnimationState.h>
 #include <spine/AnimationStateData.h>
-#include <spine/Skeleton.h>
-#include <spine/RotateTimeline.h>
-#include <spine/SkeletonData.h>
+#include <spine/AttachmentTimeline.h>
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
-#include <spine/AttachmentTimeline.h>
 #include <spine/DrawOrderTimeline.h>
+#include <spine/Event.h>
 #include <spine/EventTimeline.h>
+#include <spine/RotateTimeline.h>
+#include <spine/Skeleton.h>
+#include <spine/SkeletonData.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
 
@@ -199,20 +199,19 @@ void TrackEntry::reset() {
 float TrackEntry::getTrackComplete() {
 	float duration = _animationEnd - _animationStart;
 	if (duration != 0) {
-		if (_loop) return duration * (1 + (int) (_trackTime / duration)); // Completion of next loop.
-		if (_trackTime < duration) return duration; // Before duration.
+		if (_loop) return duration * (1 + (int) (_trackTime / duration));// Completion of next loop.
+		if (_trackTime < duration) return duration;                      // Before duration.
 	}
-	return _trackTime; // Next update.
+	return _trackTime;// Next update.
 }
 
-EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry *trackEntry, Event *event) :
-		_type(eventType),
-		_entry(trackEntry),
-		_event(event) {
+EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry *trackEntry, Event *event) : _type(eventType),
+																							  _entry(trackEntry),
+																							  _event(event) {
 }
 
 EventQueue *EventQueue::newEventQueue(AnimationState &state, Pool<TrackEntry> &trackEntryPool) {
-	return new(__FILE__, __LINE__) EventQueue(state, trackEntryPool);
+	return new (__FILE__, __LINE__) EventQueue(state, trackEntryPool);
 }
 
 EventQueueEntry EventQueue::newEventQueueEntry(EventType eventType, TrackEntry *entry, Event *event) {
@@ -273,21 +272,27 @@ void EventQueue::drain() {
 			case EventType_Interrupt:
 			case EventType_Complete:
 				if (!trackEntry->_listenerObject) trackEntry->_listener(&state, queueEntry._type, trackEntry, NULL);
-				else trackEntry->_listenerObject->callback(&state, queueEntry._type, trackEntry, NULL);
+				else
+					trackEntry->_listenerObject->callback(&state, queueEntry._type, trackEntry, NULL);
 				if (!state._listenerObject) state._listener(&state, queueEntry._type, trackEntry, NULL);
-				else state._listenerObject->callback(&state, queueEntry._type, trackEntry, NULL);
+				else
+					state._listenerObject->callback(&state, queueEntry._type, trackEntry, NULL);
 				break;
 			case EventType_End:
 				if (!trackEntry->_listenerObject) trackEntry->_listener(&state, queueEntry._type, trackEntry, NULL);
-				else trackEntry->_listenerObject->callback(&state, queueEntry._type, trackEntry, NULL);
+				else
+					trackEntry->_listenerObject->callback(&state, queueEntry._type, trackEntry, NULL);
 				if (!state._listenerObject) state._listener(&state, queueEntry._type, trackEntry, NULL);
-				else state._listenerObject->callback(&state, queueEntry._type, trackEntry, NULL);
+				else
+					state._listenerObject->callback(&state, queueEntry._type, trackEntry, NULL);
 				/* Fall through. */
 			case EventType_Dispose:
 				if (!trackEntry->_listenerObject) trackEntry->_listener(&state, EventType_Dispose, trackEntry, NULL);
-				else trackEntry->_listenerObject->callback(&state, EventType_Dispose, trackEntry, NULL);
+				else
+					trackEntry->_listenerObject->callback(&state, EventType_Dispose, trackEntry, NULL);
 				if (!state._listenerObject) state._listener(&state, EventType_Dispose, trackEntry, NULL);
-				else state._listenerObject->callback(&state, EventType_Dispose, trackEntry, NULL);
+				else
+					state._listenerObject->callback(&state, EventType_Dispose, trackEntry, NULL);
 
 				trackEntry->reset();
 				_trackEntryPool.free(trackEntry);
@@ -295,9 +300,11 @@ void EventQueue::drain() {
 			case EventType_Event:
 				if (!trackEntry->_listenerObject)
 					trackEntry->_listener(&state, queueEntry._type, trackEntry, queueEntry._event);
-				else trackEntry->_listenerObject->callback(&state, queueEntry._type, trackEntry, queueEntry._event);
+				else
+					trackEntry->_listenerObject->callback(&state, queueEntry._type, trackEntry, queueEntry._event);
 				if (!state._listenerObject) state._listener(&state, queueEntry._type, trackEntry, queueEntry._event);
-				else state._listenerObject->callback(&state, queueEntry._type, trackEntry, queueEntry._event);
+				else
+					state._listenerObject->callback(&state, queueEntry._type, trackEntry, queueEntry._event);
 				break;
 		}
 	}
@@ -306,14 +313,13 @@ void EventQueue::drain() {
 	_drainDisabled = false;
 }
 
-AnimationState::AnimationState(AnimationStateData *data) :
-		_data(data),
-		_queue(EventQueue::newEventQueue(*this, _trackEntryPool)),
-		_animationsChanged(false),
-		_listener(dummyOnAnimationEventFunc),
-		_listenerObject(NULL),
-		_unkeyedState(0),
-		_timeScale(1) {
+AnimationState::AnimationState(AnimationStateData *data) : _data(data),
+														   _queue(EventQueue::newEventQueue(*this, _trackEntryPool)),
+														   _animationsChanged(false),
+														   _listener(dummyOnAnimationEventFunc),
+														   _listenerObject(NULL),
+														   _unkeyedState(0),
+														   _timeScale(1) {
 }
 
 AnimationState::~AnimationState() {
@@ -426,7 +432,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		if (current._mixingFrom != NULL) {
 			mix *= applyMixingFrom(currentP, skeleton, blend);
 		} else if (current._trackTime >= current._trackEnd && current._next == NULL) {
-			mix = 0; // Set to setup pose the last time the entry will be applied.
+			mix = 0;// Set to setup pose the last time the entry will be applied.
 		}
 
 		// apply current entry.
@@ -485,8 +491,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		Slot *slot = slots[i];
 		if (slot->getAttachmentState() == setupState) {
 			const String &attachmentName = slot->getData().getAttachmentName();
-			slot->setAttachment(attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot->getData().getIndex(),
-																						 attachmentName));
+			slot->setAttachment(attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot->getData().getIndex(), attachmentName));
 		}
 	}
 	_unkeyedState += 2;
@@ -513,7 +518,7 @@ void AnimationState::clearTrack(size_t trackIndex) {
 
 	_queue->end(current);
 
-    clearNext(current);
+	clearNext(current);
 
 	TrackEntry *entry = current;
 	while (true) {
@@ -548,11 +553,11 @@ TrackEntry *AnimationState::setAnimation(size_t trackIndex, Animation *animation
 			_tracks[trackIndex] = current->_mixingFrom;
 			_queue->interrupt(current);
 			_queue->end(current);
-            clearNext(current);
+			clearNext(current);
 			current = current->_mixingFrom;
 			interrupt = false;
 		} else {
-            clearNext(current);
+			clearNext(current);
 		}
 	}
 
@@ -686,8 +691,7 @@ void AnimationState::applyAttachmentTimeline(AttachmentTimeline *attachmentTimel
 
 
 void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleton &skeleton, float time, float alpha,
-										 MixBlend blend, Vector<float> &timelinesRotation, size_t i, bool firstFrame
-) {
+										 MixBlend blend, Vector<float> &timelinesRotation, size_t i, bool firstFrame) {
 	if (firstFrame) timelinesRotation[i] = 0;
 
 	if (alpha == 1) {
@@ -725,8 +729,8 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 			lastTotal = 0;
 			lastDiff = diff;
 		} else {
-			lastTotal = timelinesRotation[i]; // Angle and direction of mix, including loops.
-			lastDiff = timelinesRotation[i + 1]; // Difference between bones.
+			lastTotal = timelinesRotation[i];   // Angle and direction of mix, including loops.
+			lastDiff = timelinesRotation[i + 1];// Difference between bones.
 		}
 
 		bool current = diff > 0, dir = lastTotal >= 0;
@@ -737,7 +741,7 @@ void AnimationState::applyRotateTimeline(RotateTimeline *rotateTimeline, Skeleto
 			dir = current;
 		}
 
-		total = diff + lastTotal - MathUtil::fmod(lastTotal, 360); // Store loops as part of lastTotal.
+		total = diff + lastTotal - MathUtil::fmod(lastTotal, 360);// Store loops as part of lastTotal.
 		if (dir != current) {
 			total += 360 * MathUtil::sign(lastTotal);
 		}
@@ -891,7 +895,7 @@ void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
 	for (; i < n; ++i) {
 		Event *e = _events[i];
 		if (e->_time < trackLastWrapped) break;
-		if (e->_time > animationEnd) continue; // Discard events outside animation start/end.
+		if (e->_time > animationEnd) continue;// Discard events outside animation start/end.
 		_queue->event(entry, e);
 	}
 
@@ -906,7 +910,7 @@ void AnimationState::queueEvents(TrackEntry *entry, float animationTime) {
 	// Queue events after complete.
 	for (; i < n; ++i) {
 		Event *e = _events[i];
-		if (e->_time < animationStart) continue; // Discard events outside animation start/end.
+		if (e->_time < animationStart) continue;// Discard events outside animation start/end.
 		_queue->event(entry, e);
 	}
 }
@@ -928,10 +932,10 @@ void AnimationState::setCurrent(size_t index, TrackEntry *current, bool interrup
 			current->_interruptAlpha *= MathUtil::min(1.0f, from->_mixTime / from->_mixDuration);
 		}
 
-		from->_timelinesRotation.clear(); // Reset rotation for mixing out, in case entry was mixed in.
+		from->_timelinesRotation.clear();// Reset rotation for mixing out, in case entry was mixed in.
 	}
 
-	_queue->start(current); // triggers animationsChanged
+	_queue->start(current);// triggers animationsChanged
 }
 
 TrackEntry *AnimationState::expandToIndex(size_t index) {
@@ -942,7 +946,7 @@ TrackEntry *AnimationState::expandToIndex(size_t index) {
 }
 
 TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animation, bool loop, TrackEntry *last) {
-	TrackEntry *entryP = _trackEntryPool.obtain(); // Pooling
+	TrackEntry *entryP = _trackEntryPool.obtain();// Pooling
 	TrackEntry &entry = *entryP;
 
 	entry._trackIndex = trackIndex;
@@ -962,8 +966,8 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 	entry._delay = 0;
 	entry._trackTime = 0;
 	entry._trackLast = -1;
-	entry._nextTrackLast = -1; // nextTrackLast == -1 signifies a TrackEntry that wasn't applied yet.
-	entry._trackEnd = FLT_MAX; // loop ? float.MaxValue : animation.Duration;
+	entry._nextTrackLast = -1;// nextTrackLast == -1 signifies a TrackEntry that wasn't applied yet.
+	entry._trackEnd = FLT_MAX;// loop ? float.MaxValue : animation.Duration;
 	entry._timeScale = 1;
 
 	entry._alpha = 1;
@@ -1021,7 +1025,7 @@ void AnimationState::computeHold(TrackEntry *entry) {
 
 	// outer:
 	size_t i = 0;
-	continue_outer:
+continue_outer:
 	for (; i < timelinesCount; ++i) {
 		Timeline *timeline = timelines[i];
 		Vector<PropertyId> &ids = timeline->getPropertyIds();
@@ -1039,7 +1043,7 @@ void AnimationState::computeHold(TrackEntry *entry) {
 						timelineMode[i] = HoldMix;
 						timelineHoldMix[i] = next;
 						i++;
-						goto continue_outer; // continue outer;
+						goto continue_outer;// continue outer;
 					}
 					break;
 				}

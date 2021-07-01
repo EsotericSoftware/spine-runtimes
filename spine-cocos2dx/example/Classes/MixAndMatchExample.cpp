@@ -33,7 +33,7 @@
 USING_NS_CC;
 using namespace spine;
 
-Scene* MixAndMatchExample::scene () {
+Scene *MixAndMatchExample::scene() {
 	Scene *scene = Scene::create();
 	scene->addChild(MixAndMatchExample::create());
 	return scene;
@@ -43,17 +43,17 @@ MixAndMatchExample::~MixAndMatchExample() {
 	delete skin;
 }
 
-bool MixAndMatchExample::init () {
+bool MixAndMatchExample::init() {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
 	skeletonNode = SkeletonAnimation::createWithBinaryFile("mix-and-match-pro.skel", "mix-and-match.atlas", 0.5);
 	skeletonNode->setAnimation(0, "dance", true);
-	
+
 	// Create a new skin, by mixing and matching other skins
 	// that fit together. Items making up the girl are individual
 	// skins. Using the skin API, a new skin is created which is
 	// a combination of all these individual item skins.
-	SkeletonData* skeletonData = skeletonNode->getSkeleton()->getData();
+	SkeletonData *skeletonData = skeletonNode->getSkeleton()->getData();
 	skin = new (__FILE__, __LINE__) Skin("mix-and-match");
 	skin->addSkin(skeletonData->findSkin("skin-base"));
 	skin->addSkin(skeletonData->findSkin("nose/short"));
@@ -71,8 +71,8 @@ bool MixAndMatchExample::init () {
 
 	scheduleUpdate();
 
-	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
+	EventListenerTouchOneByOne *listener = EventListenerTouchOneByOne::create();
+	listener->onTouchBegan = [this](Touch *touch, cocos2d::Event *event) -> bool {
 		if (!skeletonNode->getDebugBonesEnabled())
 			skeletonNode->setDebugBonesEnabled(true);
 		else if (skeletonNode->getTimeScale() == 1)

@@ -61,7 +61,8 @@ void _spDebug_printCurveTimeline(CurveTimeline *timeline) {
 void spine::spDebug_printTimeline(Timeline *timeline) {
 	if (timeline->getRTTI().instanceOf(CurveTimeline::rtti))
 		_spDebug_printCurveTimeline(static_cast<CurveTimeline *>(timeline));
-	else _spDebug_printTimelineBase(timeline);
+	else
+		_spDebug_printTimelineBase(timeline);
 }
 
 void spine::spDebug_printAnimation(Animation *animation) {

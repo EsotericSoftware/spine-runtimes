@@ -34,13 +34,13 @@
 
 class USpineSkeletonComponent;
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SPINEPLUGIN_API USpineBoneDriverComponent : public USceneComponent {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AActor* Target = 0;
+	AActor *Target = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString BoneName;
@@ -57,16 +57,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool UseScale = true;
-	
+
 	USpineBoneDriverComponent();
-	
+
 	virtual void BeginPlay() override;
-	
-	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
+
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 protected:
 	UFUNCTION()
-	void BeforeUpdateWorldTransform(USpineSkeletonComponent* skeleton);
+	void BeforeUpdateWorldTransform(USpineSkeletonComponent *skeleton);
 
-	USpineSkeletonComponent* lastBoundComponent = nullptr;
+	USpineSkeletonComponent *lastBoundComponent = nullptr;
 };

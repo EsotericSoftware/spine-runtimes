@@ -38,10 +38,9 @@
 using namespace spine;
 
 LinkedMesh::LinkedMesh(MeshAttachment *mesh, const String &skin, size_t slotIndex, const String &parent,
-					   bool inheritDeform) :
-		_mesh(mesh),
-		_skin(skin),
-		_slotIndex(slotIndex),
-		_parent(parent),
-		_inheritDeform(inheritDeform) {
+					   bool inheritDeform) : _mesh(mesh),
+											 _skin(skin),
+											 _slotIndex(slotIndex),
+											 _parent(parent),
+											 _inheritDeform(inheritDeform) {
 }

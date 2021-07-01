@@ -37,15 +37,14 @@
 
 using namespace spine;
 
-IkConstraintData::IkConstraintData(const String &name) :
-		ConstraintData(name),
-		_target(NULL),
-		_bendDirection(1),
-		_compress(false),
-		_stretch(false),
-		_uniform(false),
-		_mix(1),
-		_softness(0) {
+IkConstraintData::IkConstraintData(const String &name) : ConstraintData(name),
+														 _target(NULL),
+														 _bendDirection(1),
+														 _compress(false),
+														 _stretch(false),
+														 _uniform(false),
+														 _mix(1),
+														 _softness(0) {
 }
 
 Vector<BoneData *> &IkConstraintData::getBones() {

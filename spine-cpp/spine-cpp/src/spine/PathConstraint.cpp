@@ -33,14 +33,14 @@
 
 #include <spine/PathConstraint.h>
 
+#include <spine/Bone.h>
+#include <spine/PathAttachment.h>
 #include <spine/PathConstraintData.h>
 #include <spine/Skeleton.h>
-#include <spine/PathAttachment.h>
-#include <spine/Bone.h>
 #include <spine/Slot.h>
 
-#include <spine/SlotData.h>
 #include <spine/BoneData.h>
+#include <spine/SlotData.h>
 
 using namespace spine;
 
@@ -555,8 +555,7 @@ void PathConstraint::addAfterPosition(float p, Vector<float> &temp, int i, Vecto
 }
 
 void PathConstraint::addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2,
-									  float y2, Vector<float> &output, int o, bool tangents
-) {
+									  float y2, Vector<float> &output, int o, bool tangents) {
 	if (p < EPSILON || MathUtil::isNan(p)) {
 		output[o] = x1;
 		output[o + 1] = y1;

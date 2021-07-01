@@ -31,8 +31,8 @@
 #include "SpinePluginPrivatePCH.h"
 #endif
 
-#include <spine/MeshAttachment.h>
 #include <spine/HasRendererObject.h>
+#include <spine/MeshAttachment.h>
 
 using namespace spine;
 
@@ -285,7 +285,7 @@ spine::Color &MeshAttachment::getColor() {
 Attachment *MeshAttachment::copy() {
 	if (_parentMesh) return newLinkedMesh();
 
-	MeshAttachment *copy = new(__FILE__, __LINE__) MeshAttachment(getName());
+	MeshAttachment *copy = new (__FILE__, __LINE__) MeshAttachment(getName());
 	copy->setRendererObject(getRendererObject());
 	copy->_regionU = _regionU;
 	copy->_regionV = _regionV;
@@ -315,7 +315,7 @@ Attachment *MeshAttachment::copy() {
 }
 
 MeshAttachment *MeshAttachment::newLinkedMesh() {
-	MeshAttachment *copy = new(__FILE__, __LINE__) MeshAttachment(getName());
+	MeshAttachment *copy = new (__FILE__, __LINE__) MeshAttachment(getName());
 	copy->setRendererObject(getRendererObject());
 	copy->_regionU = _regionU;
 	copy->_regionV = _regionV;

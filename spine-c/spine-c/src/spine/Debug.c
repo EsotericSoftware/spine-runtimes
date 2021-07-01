@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Debug.h>
 #include <spine/Animation.h>
+#include <spine/Debug.h>
 
 #include <stdio.h>
 
@@ -56,8 +56,7 @@ static const char *_spTimelineTypeNames[] = {
 		"Rgb",
 		"TransformConstraint",
 		"DrawOrder",
-		"Event"
-};
+		"Event"};
 
 void spDebug_printSkeletonData(spSkeletonData *skeletonData) {
 	int i, n;

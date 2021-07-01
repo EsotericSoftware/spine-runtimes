@@ -33,13 +33,13 @@
 USING_NS_CC;
 using namespace spine;
 
-Scene* SkeletonRendererSeparatorExample::scene () {
+Scene *SkeletonRendererSeparatorExample::scene() {
 	Scene *scene = Scene::create();
 	scene->addChild(SkeletonRendererSeparatorExample::create());
 	return scene;
 }
 
-bool SkeletonRendererSeparatorExample::init () {
+bool SkeletonRendererSeparatorExample::init() {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
 	// Spineboy's back, which will manage the animation and GPU resources
@@ -73,8 +73,8 @@ bool SkeletonRendererSeparatorExample::init () {
 
 	scheduleUpdate();
 
-	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
+	EventListenerTouchOneByOne *listener = EventListenerTouchOneByOne::create();
+	listener->onTouchBegan = [this](Touch *touch, cocos2d::Event *event) -> bool {
 		if (!backNode->getDebugBonesEnabled())
 			backNode->setDebugBonesEnabled(true);
 		else if (backNode->getTimeScale() == 1)
@@ -88,7 +88,7 @@ bool SkeletonRendererSeparatorExample::init () {
 	return true;
 }
 
-void SkeletonRendererSeparatorExample::update (float deltaTime) {
+void SkeletonRendererSeparatorExample::update(float deltaTime) {
 	// Test releasing memory.
 	// Director::getInstance()->replaceScene(SpineboyExample::scene());
 }

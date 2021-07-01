@@ -91,14 +91,18 @@ void spColor_addFloats3(spColor *self, float r, float g, float b) {
 
 void spColor_clamp(spColor *self) {
 	if (self->r < 0) self->r = 0;
-	else if (self->r > 1) self->r = 1;
+	else if (self->r > 1)
+		self->r = 1;
 
 	if (self->g < 0) self->g = 0;
-	else if (self->g > 1) self->g = 1;
+	else if (self->g > 1)
+		self->g = 1;
 
 	if (self->b < 0) self->b = 0;
-	else if (self->b > 1) self->b = 1;
+	else if (self->b > 1)
+		self->b = 1;
 
 	if (self->a < 0) self->a = 0;
-	else if (self->a > 1) self->a = 1;
+	else if (self->a > 1)
+		self->a = 1;
 }

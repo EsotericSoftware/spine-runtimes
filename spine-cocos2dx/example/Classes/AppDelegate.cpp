@@ -29,13 +29,13 @@
 
 #include "AppDelegate.h"
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "IKExample.h"
-#include <spine/spine-cocos2dx.h>
-#include <spine/Debug.h>
 #include "AppMacros.h"
+#include "IKExample.h"
+#include <spine/Debug.h>
+#include <spine/spine-cocos2dx.h>
 
 USING_NS_CC;
 using namespace std;
@@ -44,21 +44,21 @@ using namespace spine;
 
 DebugExtension debugExtension(SpineExtension::getInstance());
 
-AppDelegate::AppDelegate () {
+AppDelegate::AppDelegate() {
 }
 
-AppDelegate::~AppDelegate () {
+AppDelegate::~AppDelegate() {
 	SkeletonBatch::destroyInstance();
 	SkeletonTwoColorBatch::destroyInstance();
 	debugExtension.reportLeaks();
 }
 
-bool AppDelegate::applicationDidFinishLaunching () {
+bool AppDelegate::applicationDidFinishLaunching() {
 	// initialize director
 	auto director = Director::getInstance();
 	auto glview = director->getOpenGLView();
 	if (!glview) {
-		GLContextAttrs attrs = { 8, 8, 8, 8, 0, 0 };
+		GLContextAttrs attrs = {8, 8, 8, 8, 0, 0};
 		GLView::setGLContextAttrs(attrs);
 		glview = GLViewImpl::create("Spine Example");
 		director->setOpenGLView(glview);
@@ -73,7 +73,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 #endif
 
 	cocos2d::Size frameSize = glview->getFrameSize();
-	
+
 	vector<string> searchPath;
 
 	// In this demo, we select resource according to the frame's height.
@@ -83,22 +83,22 @@ bool AppDelegate::applicationDidFinishLaunching () {
 	if (frameSize.height > mediumResource.size.height) {
 		// if the frame's height is larger than the height of medium resource size, select large resource.
 		searchPath.push_back(largeResource.directory);
-		director->setContentScaleFactor(MIN(largeResource.size.height/designResolutionSize.height, largeResource.size.width/designResolutionSize.width));
+		director->setContentScaleFactor(MIN(largeResource.size.height / designResolutionSize.height, largeResource.size.width / designResolutionSize.width));
 	} else if (frameSize.height > smallResource.size.height) {
 		// if the frame's height is larger than the height of small resource size, select medium resource.
 		searchPath.push_back(mediumResource.directory);
-		director->setContentScaleFactor(MIN(mediumResource.size.height/designResolutionSize.height, mediumResource.size.width/designResolutionSize.width));
+		director->setContentScaleFactor(MIN(mediumResource.size.height / designResolutionSize.height, mediumResource.size.width / designResolutionSize.width));
 	} else {
 		// if the frame's height is smaller than the height of medium resource size, select small resource.
 		searchPath.push_back(smallResource.directory);
-		director->setContentScaleFactor(MIN(smallResource.size.height/designResolutionSize.height, smallResource.size.width/designResolutionSize.width));
+		director->setContentScaleFactor(MIN(smallResource.size.height / designResolutionSize.height, smallResource.size.width / designResolutionSize.width));
 	}
-	
+
 	searchPath.push_back("common");
-	 
+
 	// set search path
 	FileUtils::getInstance()->setSearchPaths(searchPath);
-	
+
 	// turn on display FPS
 	director->setDisplayStats(true);
 
@@ -107,7 +107,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 
 	// Set the Debug wrapper extension so we know about memory leaks.
 	SpineExtension::setInstance(&debugExtension);
-	
+
 	// create a scene. it's an autorelease object
 	//auto scene = RaptorExample::scene();
 	auto scene = IKExample::scene();
@@ -119,7 +119,7 @@ bool AppDelegate::applicationDidFinishLaunching () {
 }
 
 // This function will be called when the app is inactive. When comes a phone call,it's be invoked too
-void AppDelegate::applicationDidEnterBackground () {
+void AppDelegate::applicationDidEnterBackground() {
 	Director::getInstance()->stopAnimation();
 
 	// if you use SimpleAudioEngine, it must be paused
@@ -127,7 +127,7 @@ void AppDelegate::applicationDidEnterBackground () {
 }
 
 // this function will be called when the app is active again
-void AppDelegate::applicationWillEnterForeground () {
+void AppDelegate::applicationWillEnterForeground() {
 	Director::getInstance()->startAnimation();
 
 	// if you use SimpleAudioEngine, it must resume here

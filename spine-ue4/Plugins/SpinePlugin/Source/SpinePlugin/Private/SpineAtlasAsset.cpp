@@ -29,9 +29,9 @@
 
 #include "SpinePluginPrivatePCH.h"
 #include "spine/spine.h"
+#include <stdlib.h>
 #include <string.h>
 #include <string>
-#include <stdlib.h>
 
 #define LOCTEXT_NAMESPACE "Spine"
 
@@ -39,27 +39,27 @@ using namespace spine;
 
 #if WITH_EDITORONLY_DATA
 
-void USpineAtlasAsset::SetAtlasFileName (const FName &AtlasFileName) {
+void USpineAtlasAsset::SetAtlasFileName(const FName &AtlasFileName) {
 	importData->UpdateFilenameOnly(AtlasFileName.ToString());
 	TArray<FString> files;
 	importData->ExtractFilenames(files);
 	if (files.Num() > 0) atlasFileName = FName(*files[0]);
 }
 
-void USpineAtlasAsset::PostInitProperties () {
+void USpineAtlasAsset::PostInitProperties() {
 	if (!HasAnyFlags(RF_ClassDefaultObject)) importData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
 	Super::PostInitProperties();
 }
 
-void USpineAtlasAsset::GetAssetRegistryTags (TArray<FAssetRegistryTag>& OutTags) const {
+void USpineAtlasAsset::GetAssetRegistryTags(TArray<FAssetRegistryTag> &OutTags) const {
 	if (importData) {
-		OutTags.Add(FAssetRegistryTag(SourceFileTagName(), importData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden) );
+		OutTags.Add(FAssetRegistryTag(SourceFileTagName(), importData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
 	}
-	
+
 	Super::GetAssetRegistryTags(OutTags);
 }
 
-void USpineAtlasAsset::Serialize (FArchive& Ar) {
+void USpineAtlasAsset::Serialize(FArchive &Ar) {
 	Super::Serialize(Ar);
 	if (Ar.IsLoading() && Ar.UE4Ver() < VER_UE4_ASSET_IMPORT_DATA_AS_JSON && !importData)
 		importData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
@@ -72,7 +72,8 @@ FName USpineAtlasAsset::GetAtlasFileName() const {
 	TArray<FString> files;
 	if (importData) importData->ExtractFilenames(files);
 	if (files.Num() > 0) return FName(*files[0]);
-	else return atlasFileName;
+	else
+		return atlasFileName;
 #else
 	return atlasFileName;
 #endif
@@ -86,7 +87,7 @@ void USpineAtlasAsset::SetRawData(const FString &RawData) {
 	}
 }
 
-void USpineAtlasAsset::BeginDestroy () {
+void USpineAtlasAsset::BeginDestroy() {
 	if (atlas) {
 		delete atlas;
 		atlas = nullptr;
@@ -94,7 +95,7 @@ void USpineAtlasAsset::BeginDestroy () {
 	Super::BeginDestroy();
 }
 
-Atlas* USpineAtlasAsset::GetAtlas () {
+Atlas *USpineAtlasAsset::GetAtlas() {
 	if (!atlas) {
 		if (atlas) {
 			delete atlas;
@@ -103,10 +104,10 @@ Atlas* USpineAtlasAsset::GetAtlas () {
 		std::string t = TCHAR_TO_UTF8(*rawData);
 
 		atlas = new (__FILE__, __LINE__) Atlas(t.c_str(), strlen(t.c_str()), "", nullptr);
-		Vector<AtlasPage*> &pages = atlas->getPages();
+		Vector<AtlasPage *> &pages = atlas->getPages();
 		for (size_t i = 0, n = pages.size(), j = 0; i < n; i++) {
-			AtlasPage* page = pages[i];
-			if (atlasPages.Num() > 0 && atlasPages.Num() > (int32)i)
+			AtlasPage *page = pages[i];
+			if (atlasPages.Num() > 0 && atlasPages.Num() > (int32) i)
 				page->setRendererObject(atlasPages[j++]);
 		}
 	}

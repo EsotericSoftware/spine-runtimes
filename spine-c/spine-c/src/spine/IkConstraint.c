@@ -27,16 +27,16 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#include <float.h>
 #include <spine/IkConstraint.h>
 #include <spine/Skeleton.h>
 #include <spine/extension.h>
-#include <float.h>
 
 spIkConstraint *spIkConstraint_create(spIkConstraintData *data, const spSkeleton *skeleton) {
 	int i;
 
 	spIkConstraint *self = NEW(spIkConstraint);
-	CONST_CAST(spIkConstraintData*, self->data) = data;
+	CONST_CAST(spIkConstraintData *, self->data) = data;
 	self->bendDirection = data->bendDirection;
 	self->compress = data->compress;
 	self->stretch = data->stretch;
@@ -44,7 +44,7 @@ spIkConstraint *spIkConstraint_create(spIkConstraintData *data, const spSkeleton
 	self->softness = data->softness;
 
 	self->bonesCount = self->data->bonesCount;
-	self->bones = MALLOC(spBone*, self->bonesCount);
+	self->bones = MALLOC(spBone *, self->bonesCount);
 	for (i = 0; i < self->bonesCount; ++i)
 		self->bones[i] = spSkeleton_findBone(skeleton, self->data->bones[i]->name);
 	self->target = spSkeleton_findBone(skeleton, self->data->target->name);
@@ -71,9 +71,8 @@ void spIkConstraint_update(spIkConstraint *self) {
 	}
 }
 
-void
-spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boolean*/ compress, int /*boolean*/ stretch,
-					  int /*boolean*/ uniform, float alpha) {
+void spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boolean*/ compress, int /*boolean*/ stretch,
+						   int /*boolean*/ uniform, float alpha) {
 	spBone *p = bone->parent;
 	float pa = p->a, pb = p->b, pc = p->c, pd = p->d;
 	float rotationIK = -bone->ashearX - bone->arotation;
@@ -103,7 +102,8 @@ spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boolean*
 
 	if (bone->ascaleX < 0) rotationIK += 180;
 	if (rotationIK > 180) rotationIK -= 360;
-	else if (rotationIK < -180) rotationIK += 360;
+	else if (rotationIK < -180)
+		rotationIK += 360;
 	sx = bone->ascaleX;
 	sy = bone->ascaleY;
 	if (compress || stretch) {
@@ -126,9 +126,8 @@ spIkConstraint_apply1(spBone *bone, float targetX, float targetY, int /*boolean*
 									sy, bone->ashearX, bone->ashearY);
 }
 
-void
-spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float targetY, int bendDir, int /*boolean*/ stretch,
-					  int /*boolean*/ uniform, float softness, float alpha) {
+void spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float targetY, int bendDir, int /*boolean*/ stretch,
+						   int /*boolean*/ uniform, float softness, float alpha) {
 	float a, b, c, d;
 	float px, py, psx, psy, sx, sy;
 	float cx, cy, csx, cwx, cwy;
@@ -279,19 +278,20 @@ spIkConstraint_apply2(spBone *parent, spBone *child, float targetX, float target
 			}
 		}
 	}
-	break_outer:
-	{
-		float os = ATAN2(cy, cx) * s2;
-		float rotation = parent->arotation;
-		a1 = (a1 - os) * RAD_DEG + o1 -rotation;
-		if (a1 > 180) a1 -= 360;
-		else if (a1 < -180) a1 += 360;
-		spBone_updateWorldTransformWith(parent, px, py, rotation + a1 * alpha, sx, sy, 0, 0);
-		rotation = child->arotation;
-		a2 = ((a2 + os) * RAD_DEG - child->ashearX) * s2 + o2 - rotation;
-		if (a2 > 180) a2 -= 360;
-		else if (a2 < -180) a2 += 360;
-		spBone_updateWorldTransformWith(child, cx, cy, rotation + a2 * alpha, child->ascaleX, child->ascaleY,
-										child->ashearX, child->ashearY);
-	}
+break_outer : {
+	float os = ATAN2(cy, cx) * s2;
+	float rotation = parent->arotation;
+	a1 = (a1 - os) * RAD_DEG + o1 - rotation;
+	if (a1 > 180) a1 -= 360;
+	else if (a1 < -180)
+		a1 += 360;
+	spBone_updateWorldTransformWith(parent, px, py, rotation + a1 * alpha, sx, sy, 0, 0);
+	rotation = child->arotation;
+	a2 = ((a2 + os) * RAD_DEG - child->ashearX) * s2 + o2 - rotation;
+	if (a2 > 180) a2 -= 360;
+	else if (a2 < -180)
+		a2 += 360;
+	spBone_updateWorldTransformWith(child, cx, cy, rotation + a2 * alpha, child->ascaleX, child->ascaleY,
+									child->ashearX, child->ashearY);
+}
 }

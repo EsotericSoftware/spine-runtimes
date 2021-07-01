@@ -33,13 +33,13 @@
 
 #include <spine/ShearTimeline.h>
 
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
 
-#include <spine/Slot.h>
-#include <spine/SlotData.h>
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
+#include <spine/Slot.h>
+#include <spine/SlotData.h>
 
 using namespace spine;
 
@@ -57,8 +57,7 @@ ShearTimeline::~ShearTimeline() {
 }
 
 void ShearTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						  MixBlend blend, MixDirection direction
-) {
+						  MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -135,8 +134,7 @@ ShearXTimeline::~ShearXTimeline() {
 }
 
 void ShearXTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						   MixBlend blend, MixDirection direction
-) {
+						   MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -184,8 +182,7 @@ ShearYTimeline::~ShearYTimeline() {
 }
 
 void ShearYTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						   MixBlend blend, MixDirection direction
-) {
+						   MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);

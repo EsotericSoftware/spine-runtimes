@@ -35,11 +35,11 @@ THE SOFTWARE.
 #endif
 
 #include "Json.h"
-#include <stdio.h>
 #include <ctype.h>
+#include <spine/extension.h>
+#include <stdio.h>
 #include <stdlib.h> /* strtod (C89), strtof (C99) */
 #include <string.h> /* strcasecmp (4.4BSD - compatibility), _stricmp (_WIN32) */
-#include <spine/extension.h>
 
 #ifndef SPINE_JSON_DEBUG
 /* Define this to do extra NULL and expected-character checking */
@@ -221,7 +221,8 @@ static const char *parse_string(Json *item, const char *str) {
 						len = 1;
 					else if (uc < 0x800)
 						len = 2;
-					else if (uc < 0x10000) len = 3;
+					else if (uc < 0x10000)
+						len = 3;
 					ptr2 += len;
 
 					switch (len) {
@@ -292,7 +293,7 @@ Json *Json_create(const char *value) {
 static const char *parse_value(Json *item, const char *value) {
 	/* Referenced by Json_create(), parse_array(), and parse_object(). */
 	/* Always called with the result of skip(). */
-#if SPINE_JSON_DEBUG /* Checked at entry to graph, Json_create, and after every parse_ call. */
+#if SPINE_JSON_DEBUG      /* Checked at entry to graph, Json_create, and after every parse_ call. */
 	if (!value) return 0; /* Fail on null. */
 #endif
 
@@ -362,7 +363,7 @@ static const char *parse_array(Json *item, const char *value) {
 	if (*value == ']') return value + 1; /* empty array. */
 
 	item->child = child = Json_new();
-	if (!item->child) return 0; /* memory fail */
+	if (!item->child) return 0;                    /* memory fail */
 	value = skip(parse_value(child, skip(value))); /* skip any spacing, get the value. */
 	if (!value) return 0;
 	item->size = 1;
@@ -409,7 +410,7 @@ static const char *parse_object(Json *item, const char *value) {
 	if (*value != ':') {
 		ep = value;
 		return 0;
-	} /* fail! */
+	}                                                  /* fail! */
 	value = skip(parse_value(child, skip(value + 1))); /* skip any spacing, get the value. */
 	if (!value) return 0;
 	item->size = 1;
@@ -429,7 +430,7 @@ static const char *parse_object(Json *item, const char *value) {
 		if (*value != ':') {
 			ep = value;
 			return 0;
-		} /* fail! */
+		}                                                  /* fail! */
 		value = skip(parse_value(child, skip(value + 1))); /* skip any spacing, get the value. */
 		if (!value) return 0;
 		item->size++;

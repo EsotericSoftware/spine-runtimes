@@ -52,13 +52,13 @@
  [Note] Normally, developer just need to define one design resolution(e.g. 960x640) with one or more resources.
  */
 
-#define DESIGN_RESOLUTION_480X320    0
-#define DESIGN_RESOLUTION_960x640    1
-#define DESIGN_RESOLUTION_1024X768   2
-#define DESIGN_RESOLUTION_2048X1536  3
+#define DESIGN_RESOLUTION_480X320 0
+#define DESIGN_RESOLUTION_960x640 1
+#define DESIGN_RESOLUTION_1024X768 2
+#define DESIGN_RESOLUTION_2048X1536 3
 
 /* If you want to switch design resolution, change next line */
-#define TARGET_DESIGN_RESOLUTION_SIZE  DESIGN_RESOLUTION_960x640
+#define TARGET_DESIGN_RESOLUTION_SIZE DESIGN_RESOLUTION_960x640
 
 typedef struct tagResource {
 	cocos2d::Size size;

@@ -27,23 +27,23 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/spine-cocos2dx.h>
-#include <spine/Extension.h>
 #include <spine/AttachmentVertices.h>
+#include <spine/Extension.h>
+#include <spine/spine-cocos2dx.h>
 
 USING_NS_CC;
 using namespace spine;
 
-static void deleteAttachmentVertices (void* vertices) {
+static void deleteAttachmentVertices(void *vertices) {
 	delete (AttachmentVertices *) vertices;
 }
 
 static unsigned short quadTriangles[6] = {0, 1, 2, 2, 3, 0};
 
-static void setAttachmentVertices(RegionAttachment* attachment) {
-	AtlasRegion* region = (AtlasRegion*)attachment->getRendererObject();
-	AttachmentVertices* attachmentVertices = new AttachmentVertices((Texture2D*)region->page->getRendererObject(), 4, quadTriangles, 6);
-	V3F_C4B_T2F* vertices = attachmentVertices->_triangles->verts;
+static void setAttachmentVertices(RegionAttachment *attachment) {
+	AtlasRegion *region = (AtlasRegion *) attachment->getRendererObject();
+	AttachmentVertices *attachmentVertices = new AttachmentVertices((Texture2D *) region->page->getRendererObject(), 4, quadTriangles, 6);
+	V3F_C4B_T2F *vertices = attachmentVertices->_triangles->verts;
 	for (int i = 0, ii = 0; i < 4; ++i, ii += 2) {
 		vertices[i].texCoords.u = attachment->getUVs()[ii];
 		vertices[i].texCoords.v = attachment->getUVs()[ii + 1];
@@ -51,11 +51,11 @@ static void setAttachmentVertices(RegionAttachment* attachment) {
 	attachment->setRendererObject(attachmentVertices, deleteAttachmentVertices);
 }
 
-static void setAttachmentVertices(MeshAttachment* attachment) {
-	AtlasRegion* region = (AtlasRegion*)attachment->getRendererObject();
-	AttachmentVertices* attachmentVertices = new AttachmentVertices((Texture2D*)region->page->getRendererObject(),
+static void setAttachmentVertices(MeshAttachment *attachment) {
+	AtlasRegion *region = (AtlasRegion *) attachment->getRendererObject();
+	AttachmentVertices *attachmentVertices = new AttachmentVertices((Texture2D *) region->page->getRendererObject(),
 																	attachment->getWorldVerticesLength() >> 1, attachment->getTriangles().buffer(), attachment->getTriangles().size());
-	V3F_C4B_T2F* vertices = attachmentVertices->_triangles->verts;
+	V3F_C4B_T2F *vertices = attachmentVertices->_triangles->verts;
 	for (int i = 0, ii = 0, nn = attachment->getWorldVerticesLength(); ii < nn; ++i, ii += 2) {
 		vertices[i].texCoords.u = attachment->getUVs()[ii];
 		vertices[i].texCoords.v = attachment->getUVs()[ii + 1];
@@ -63,82 +63,82 @@ static void setAttachmentVertices(MeshAttachment* attachment) {
 	attachment->setRendererObject(attachmentVertices, deleteAttachmentVertices);
 }
 
-Cocos2dAtlasAttachmentLoader::Cocos2dAtlasAttachmentLoader(Atlas* atlas): AtlasAttachmentLoader(atlas) {
+Cocos2dAtlasAttachmentLoader::Cocos2dAtlasAttachmentLoader(Atlas *atlas) : AtlasAttachmentLoader(atlas) {
 }
 
-Cocos2dAtlasAttachmentLoader::~Cocos2dAtlasAttachmentLoader() { }
+Cocos2dAtlasAttachmentLoader::~Cocos2dAtlasAttachmentLoader() {}
 
-void Cocos2dAtlasAttachmentLoader::configureAttachment(Attachment* attachment) {
+void Cocos2dAtlasAttachmentLoader::configureAttachment(Attachment *attachment) {
 	if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
-		setAttachmentVertices((RegionAttachment*)attachment);
+		setAttachmentVertices((RegionAttachment *) attachment);
 	} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
-		setAttachmentVertices((MeshAttachment*)attachment);
+		setAttachmentVertices((MeshAttachment *) attachment);
 	}
 }
 
 #if COCOS2D_VERSION >= 0x0040000
 
-backend::SamplerAddressMode wrap (TextureWrap wrap) {
-	return wrap ==  TextureWrap_ClampToEdge ? backend::SamplerAddressMode::CLAMP_TO_EDGE : backend::SamplerAddressMode::REPEAT;
+backend::SamplerAddressMode wrap(TextureWrap wrap) {
+	return wrap == TextureWrap_ClampToEdge ? backend::SamplerAddressMode::CLAMP_TO_EDGE : backend::SamplerAddressMode::REPEAT;
 }
 
-backend::SamplerFilter filter (TextureFilter filter) {
+backend::SamplerFilter filter(TextureFilter filter) {
 	switch (filter) {
-	case TextureFilter_Unknown:
-		break;
-	case TextureFilter_Nearest:
-		return backend::SamplerFilter::NEAREST;
-	case TextureFilter_Linear:
-		return backend::SamplerFilter::LINEAR;
-	case TextureFilter_MipMap:
-		return backend::SamplerFilter::LINEAR;
-	case TextureFilter_MipMapNearestNearest:
-		return backend::SamplerFilter::NEAREST;
-	case TextureFilter_MipMapLinearNearest:
-        return backend::SamplerFilter::NEAREST;
-	case TextureFilter_MipMapNearestLinear:
-        return backend::SamplerFilter::LINEAR;
-	case TextureFilter_MipMapLinearLinear:
-        return backend::SamplerFilter::LINEAR;
+		case TextureFilter_Unknown:
+			break;
+		case TextureFilter_Nearest:
+			return backend::SamplerFilter::NEAREST;
+		case TextureFilter_Linear:
+			return backend::SamplerFilter::LINEAR;
+		case TextureFilter_MipMap:
+			return backend::SamplerFilter::LINEAR;
+		case TextureFilter_MipMapNearestNearest:
+			return backend::SamplerFilter::NEAREST;
+		case TextureFilter_MipMapLinearNearest:
+			return backend::SamplerFilter::NEAREST;
+		case TextureFilter_MipMapNearestLinear:
+			return backend::SamplerFilter::LINEAR;
+		case TextureFilter_MipMapLinearLinear:
+			return backend::SamplerFilter::LINEAR;
 	}
 	return backend::SamplerFilter::LINEAR;
 }
 
 #else
 
-GLuint wrap (TextureWrap wrap) {
-	return wrap ==  TextureWrap_ClampToEdge ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+GLuint wrap(TextureWrap wrap) {
+	return wrap == TextureWrap_ClampToEdge ? GL_CLAMP_TO_EDGE : GL_REPEAT;
 }
 
-GLuint filter (TextureFilter filter) {
+GLuint filter(TextureFilter filter) {
 	switch (filter) {
-	case TextureFilter_Unknown:
-		break;
-	case TextureFilter_Nearest:
-		return GL_NEAREST;
-	case TextureFilter_Linear:
-		return GL_LINEAR;
-	case TextureFilter_MipMap:
-		return GL_LINEAR_MIPMAP_LINEAR;
-	case TextureFilter_MipMapNearestNearest:
-		return GL_NEAREST_MIPMAP_NEAREST;
-	case TextureFilter_MipMapLinearNearest:
-		return GL_LINEAR_MIPMAP_NEAREST;
-	case TextureFilter_MipMapNearestLinear:
-		return GL_NEAREST_MIPMAP_LINEAR;
-	case TextureFilter_MipMapLinearLinear:
-		return GL_LINEAR_MIPMAP_LINEAR;
+		case TextureFilter_Unknown:
+			break;
+		case TextureFilter_Nearest:
+			return GL_NEAREST;
+		case TextureFilter_Linear:
+			return GL_LINEAR;
+		case TextureFilter_MipMap:
+			return GL_LINEAR_MIPMAP_LINEAR;
+		case TextureFilter_MipMapNearestNearest:
+			return GL_NEAREST_MIPMAP_NEAREST;
+		case TextureFilter_MipMapLinearNearest:
+			return GL_LINEAR_MIPMAP_NEAREST;
+		case TextureFilter_MipMapNearestLinear:
+			return GL_NEAREST_MIPMAP_LINEAR;
+		case TextureFilter_MipMapLinearLinear:
+			return GL_LINEAR_MIPMAP_LINEAR;
 	}
 	return GL_LINEAR;
 }
 
 #endif
 
-Cocos2dTextureLoader::Cocos2dTextureLoader() : TextureLoader() { }
-Cocos2dTextureLoader::~Cocos2dTextureLoader() { }
+Cocos2dTextureLoader::Cocos2dTextureLoader() : TextureLoader() {}
+Cocos2dTextureLoader::~Cocos2dTextureLoader() {}
 
-void Cocos2dTextureLoader::load(AtlasPage& page, const spine::String& path) {
-	Texture2D* texture = Director::getInstance()->getTextureCache()->addImage(path.buffer());
+void Cocos2dTextureLoader::load(AtlasPage &page, const spine::String &path) {
+	Texture2D *texture = Director::getInstance()->getTextureCache()->addImage(path.buffer());
 	CCASSERT(texture != nullptr, "Invalid image");
 	if (texture) {
 		texture->retain();
@@ -155,35 +155,35 @@ void Cocos2dTextureLoader::load(AtlasPage& page, const spine::String& path) {
 	}
 }
 
-void Cocos2dTextureLoader::unload(void* texture) {
+void Cocos2dTextureLoader::unload(void *texture) {
 	if (texture) {
-		((Texture2D*)texture)->release();
+		((Texture2D *) texture)->release();
 	}
 }
 
 
-Cocos2dExtension::Cocos2dExtension() : DefaultSpineExtension() { }
+Cocos2dExtension::Cocos2dExtension() : DefaultSpineExtension() {}
 
-Cocos2dExtension::~Cocos2dExtension() { }
+Cocos2dExtension::~Cocos2dExtension() {}
 
 char *Cocos2dExtension::_readFile(const spine::String &path, int *length) {
-    Data data = FileUtils::getInstance()->getDataFromFile(path.buffer());
+	Data data = FileUtils::getInstance()->getDataFromFile(path.buffer());
 	if (data.isNull()) return nullptr;
 
-	// avoid buffer overflow (int is shorter than ssize_t in certain platforms)
+		// avoid buffer overflow (int is shorter than ssize_t in certain platforms)
 #if COCOS2D_VERSION >= 0x00031200
 	ssize_t tmpLen;
-	char *ret = (char*)data.takeBuffer(&tmpLen);
+	char *ret = (char *) data.takeBuffer(&tmpLen);
 	*length = static_cast<int>(tmpLen);
 	return ret;
 #else
 	*length = static_cast<int>(data.getSize());
-    auto bytes = SpineExtension::alloc<char>(*length, __FILE__, __LINE__);
+	auto bytes = SpineExtension::alloc<char>(*length, __FILE__, __LINE__);
 	memcpy(bytes, data.getBytes(), *length);
 	return bytes;
 #endif
 }
 
-SpineExtension *spine::getDefaultExtension () {
+SpineExtension *spine::getDefaultExtension() {
 	return new Cocos2dExtension();
 }

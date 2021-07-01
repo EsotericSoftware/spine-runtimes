@@ -27,49 +27,49 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <iostream>
-#include <spine/spine-sfml.h>
-#include <spine/Debug.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <iostream>
+#include <spine/Debug.h>
+#include <spine/spine-sfml.h>
 
 using namespace std;
 using namespace spine;
 #include <stdio.h>
 #include <stdlib.h>
 
-void callback (spAnimationState* state, spEventType type, spTrackEntry* entry, spEvent* event) {
+void callback(spAnimationState *state, spEventType type, spTrackEntry *entry, spEvent *event) {
 	UNUSED(state);
-	const char* animationName = (entry && entry->animation) ? entry->animation->name : 0;
+	const char *animationName = (entry && entry->animation) ? entry->animation->name : 0;
 
 	switch (type) {
-	case SP_ANIMATION_START:
-		printf("%d start: %s\n", entry->trackIndex, animationName);
-		break;
-	case SP_ANIMATION_INTERRUPT:
-		printf("%d interrupt: %s\n", entry->trackIndex, animationName);
-		break;
-	case SP_ANIMATION_END:
-		printf("%d end: %s\n", entry->trackIndex, animationName);
-		break;
-	case SP_ANIMATION_COMPLETE:
-		printf("%d complete: %s\n", entry->trackIndex, animationName);
-		break;
-	case SP_ANIMATION_DISPOSE:
-		printf("%d dispose: %s\n", entry->trackIndex, animationName);
-		break;
-	case SP_ANIMATION_EVENT:
-		printf("%d event: %s, %s: %d, %f, %s %f %f\n", entry->trackIndex, animationName, event->data->name, event->intValue, event->floatValue,
-				event->stringValue, event->volume, event->balance);
-		break;
+		case SP_ANIMATION_START:
+			printf("%d start: %s\n", entry->trackIndex, animationName);
+			break;
+		case SP_ANIMATION_INTERRUPT:
+			printf("%d interrupt: %s\n", entry->trackIndex, animationName);
+			break;
+		case SP_ANIMATION_END:
+			printf("%d end: %s\n", entry->trackIndex, animationName);
+			break;
+		case SP_ANIMATION_COMPLETE:
+			printf("%d complete: %s\n", entry->trackIndex, animationName);
+			break;
+		case SP_ANIMATION_DISPOSE:
+			printf("%d dispose: %s\n", entry->trackIndex, animationName);
+			break;
+		case SP_ANIMATION_EVENT:
+			printf("%d event: %s, %s: %d, %f, %s %f %f\n", entry->trackIndex, animationName, event->data->name, event->intValue, event->floatValue,
+				   event->stringValue, event->volume, event->balance);
+			break;
 	}
 	fflush(stdout);
 }
 
-spSkeletonData* readSkeletonJsonData (const char* filename, spAtlas* atlas, float scale) {
-	spSkeletonJson* json = spSkeletonJson_create(atlas);
+spSkeletonData *readSkeletonJsonData(const char *filename, spAtlas *atlas, float scale) {
+	spSkeletonJson *json = spSkeletonJson_create(atlas);
 	json->scale = scale;
-	spSkeletonData* skeletonData = spSkeletonJson_readSkeletonDataFile(json, filename);
+	spSkeletonData *skeletonData = spSkeletonJson_readSkeletonDataFile(json, filename);
 	if (!skeletonData) {
 		printf("%s\n", json->error);
 		exit(0);
@@ -78,8 +78,8 @@ spSkeletonData* readSkeletonJsonData (const char* filename, spAtlas* atlas, floa
 	return skeletonData;
 }
 
-spSkeletonData* readSkeletonBinaryData (const char* filename, spAtlas* atlas, float scale) {
-	spSkeletonBinary* binary = spSkeletonBinary_create(atlas);
+spSkeletonData *readSkeletonBinaryData(const char *filename, spAtlas *atlas, float scale) {
+	spSkeletonBinary *binary = spSkeletonBinary_create(atlas);
 	binary->scale = scale;
 	spSkeletonData *skeletonData = spSkeletonBinary_readSkeletonDataFile(binary, filename);
 	if (!skeletonData) {
@@ -90,12 +90,12 @@ spSkeletonData* readSkeletonBinaryData (const char* filename, spAtlas* atlas, fl
 	return skeletonData;
 }
 
-void testcase (void func(spSkeletonData* skeletonData, spAtlas* atlas),
-		const char* jsonName, const char* binaryName, const char* atlasName,
-		float scale) {
-	spAtlas* atlas = spAtlas_createFromFile(atlasName, 0);
+void testcase(void func(spSkeletonData *skeletonData, spAtlas *atlas),
+			  const char *jsonName, const char *binaryName, const char *atlasName,
+			  float scale) {
+	spAtlas *atlas = spAtlas_createFromFile(atlasName, 0);
 
-	spSkeletonData* skeletonData = readSkeletonJsonData(jsonName, atlas, scale);
+	spSkeletonData *skeletonData = readSkeletonJsonData(jsonName, atlas, scale);
 	func(skeletonData, atlas);
 	spSkeletonData_dispose(skeletonData);
 
@@ -106,27 +106,27 @@ void testcase (void func(spSkeletonData* skeletonData, spAtlas* atlas),
 	spAtlas_dispose(atlas);
 }
 
-void spineboy (spSkeletonData* skeletonData, spAtlas* atlas) {
+void spineboy(spSkeletonData *skeletonData, spAtlas *atlas) {
 	UNUSED(atlas);
-	spSkeletonBounds* bounds = spSkeletonBounds_create();
+	spSkeletonBounds *bounds = spSkeletonBounds_create();
 
 	// Configure mixing.
-	spAnimationStateData* stateData = spAnimationStateData_create(skeletonData);
+	spAnimationStateData *stateData = spAnimationStateData_create(skeletonData);
 	spAnimationStateData_setMixByName(stateData, "walk", "jump", 0.2f);
 	spAnimationStateData_setMixByName(stateData, "jump", "run", 0.2f);
 
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData, stateData);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData, stateData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
 
-	spSkeleton* skeleton = drawable->skeleton;
+	spSkeleton *skeleton = drawable->skeleton;
 	spSkeleton_setToSetupPose(skeleton);
 
 	skeleton->x = 320;
 	skeleton->y = 590;
 	spSkeleton_updateWorldTransform(skeleton);
 
-	spSlot* headSlot = spSkeleton_findSlot(skeleton, "head");
+	spSlot *headSlot = spSkeleton_findSlot(skeleton, "head");
 
 	drawable->state->listener = callback;
 	spAnimationState_addAnimationByName(drawable->state, 0, "walk", true, 0);
@@ -146,7 +146,7 @@ void spineboy (spSkeletonData* skeletonData, spAtlas* atlas) {
 
 		spSkeletonBounds_update(bounds, skeleton, true);
 		sf::Vector2i position = sf::Mouse::getPosition(window);
-		if (spSkeletonBounds_containsPoint(bounds, (float)position.x, (float)position.y)) {
+		if (spSkeletonBounds_containsPoint(bounds, (float) position.x, (float) position.y)) {
 			headSlot->color.g = 0;
 			headSlot->color.b = 0;
 		} else {
@@ -164,86 +164,86 @@ void spineboy (spSkeletonData* skeletonData, spAtlas* atlas) {
 	spSkeletonBounds_dispose(bounds);
 }
 
-void ikDemo (spSkeletonData* skeletonData, spAtlas* atlas) {
-    UNUSED(atlas);
-
-    // Create the SkeletonDrawable and position it
-    spAnimationStateData* stateData = spAnimationStateData_create(skeletonData);
-    SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData, stateData);
-    drawable->timeScale = 1;
-    drawable->setUsePremultipliedAlpha(true);
-
-    spSkeleton* skeleton = drawable->skeleton;
-    skeleton->x = 320;
-    skeleton->y = 590;
-
-    // Queue the "walk" animation on the first track.
-    spAnimationState_setAnimationByName(drawable->state, 0, "walk", true);
-
-    // Queue the "aim" animation on a higher track.
-    // It consists of a single frame that positions
-    // the back arm and gun such that they point at
-    // the "crosshair" bone. By setting this
-    // animation on a higher track, it overrides
-    // any changes to the back arm and gun made
-    // by the walk animation, allowing us to
-    // mix the two. The mouse position following
-    // is performed in the render() method below.
-    spAnimationState_setAnimationByName(drawable->state, 1, "aim", true);
-
-    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - IK Demo");
-    window.setFramerateLimit(60);
-    sf::Event event;
-    sf::Clock deltaClock;
-    while (window.isOpen()) {
-        while (window.pollEvent(event))
-            if (event.type == sf::Event::Closed) window.close();
-
-        float delta = deltaClock.getElapsedTime().asSeconds();
-        deltaClock.restart();
-
-        // Update and apply the animations to the skeleton,
-        // then calculate the world transforms of every bone.
-        // This is needed so we can call Bone#worldToLocal()
-        // later.
-        drawable->update(delta);
-
-        // Position the "crosshair" bone at the mouse
-        // location. We do this before calling
-        // skeleton.updateWorldTransform() below, so
-        // our change is incorporated before the IK
-        // constraint is applied.
-        //
-        // When setting the crosshair bone position
-        // to the mouse position, we need to translate
-        // from "mouse space" to "local bone space". Note that the local
-        // bone space is calculated using the bone's parent
-        // worldToLocal() function!
-        sf::Vector2i mouseCoords = sf::Mouse::getPosition(window);
-        float boneCoordsX = 0, boneCoordsY = 0;
-        spBone* crosshair = spSkeleton_findBone(drawable->skeleton, "crosshair"); // Should be cached.
-        spBone_worldToLocal(crosshair->parent, mouseCoords.x, mouseCoords.y, &boneCoordsX, &boneCoordsY);
-        crosshair->x = boneCoordsX;
-        crosshair->y = boneCoordsY;
-
-        // Calculate final world transform with the
-        // crosshair bone set to the mouse cursor
-        // position.
-        spSkeleton_updateWorldTransform(drawable->skeleton);
-
-        window.clear();
-        window.draw(*drawable);
-        window.display();
-    }
-}
-
-void goblins (spSkeletonData* skeletonData, spAtlas* atlas) {
+void ikDemo(spSkeletonData *skeletonData, spAtlas *atlas) {
 	UNUSED(atlas);
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+
+	// Create the SkeletonDrawable and position it
+	spAnimationStateData *stateData = spAnimationStateData_create(skeletonData);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData, stateData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
 
-	spSkeleton* skeleton = drawable->skeleton;
+	spSkeleton *skeleton = drawable->skeleton;
+	skeleton->x = 320;
+	skeleton->y = 590;
+
+	// Queue the "walk" animation on the first track.
+	spAnimationState_setAnimationByName(drawable->state, 0, "walk", true);
+
+	// Queue the "aim" animation on a higher track.
+	// It consists of a single frame that positions
+	// the back arm and gun such that they point at
+	// the "crosshair" bone. By setting this
+	// animation on a higher track, it overrides
+	// any changes to the back arm and gun made
+	// by the walk animation, allowing us to
+	// mix the two. The mouse position following
+	// is performed in the render() method below.
+	spAnimationState_setAnimationByName(drawable->state, 1, "aim", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - IK Demo");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		// Update and apply the animations to the skeleton,
+		// then calculate the world transforms of every bone.
+		// This is needed so we can call Bone#worldToLocal()
+		// later.
+		drawable->update(delta);
+
+		// Position the "crosshair" bone at the mouse
+		// location. We do this before calling
+		// skeleton.updateWorldTransform() below, so
+		// our change is incorporated before the IK
+		// constraint is applied.
+		//
+		// When setting the crosshair bone position
+		// to the mouse position, we need to translate
+		// from "mouse space" to "local bone space". Note that the local
+		// bone space is calculated using the bone's parent
+		// worldToLocal() function!
+		sf::Vector2i mouseCoords = sf::Mouse::getPosition(window);
+		float boneCoordsX = 0, boneCoordsY = 0;
+		spBone *crosshair = spSkeleton_findBone(drawable->skeleton, "crosshair");// Should be cached.
+		spBone_worldToLocal(crosshair->parent, mouseCoords.x, mouseCoords.y, &boneCoordsX, &boneCoordsY);
+		crosshair->x = boneCoordsX;
+		crosshair->y = boneCoordsY;
+
+		// Calculate final world transform with the
+		// crosshair bone set to the mouse cursor
+		// position.
+		spSkeleton_updateWorldTransform(drawable->skeleton);
+
+		window.clear();
+		window.draw(*drawable);
+		window.display();
+	}
+}
+
+void goblins(spSkeletonData *skeletonData, spAtlas *atlas) {
+	UNUSED(atlas);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
+	drawable->timeScale = 1;
+	drawable->setUsePremultipliedAlpha(true);
+
+	spSkeleton *skeleton = drawable->skeleton;
 	spSkeleton_setSkinByName(skeleton, "goblingirl");
 	spSkeleton_setSlotsToSetupPose(skeleton);
 	skeleton->x = 320;
@@ -271,23 +271,23 @@ void goblins (spSkeletonData* skeletonData, spAtlas* atlas) {
 	}
 }
 
-void raptor (spSkeletonData* skeletonData, spAtlas* atlas) {
+void raptor(spSkeletonData *skeletonData, spAtlas *atlas) {
 	UNUSED(atlas);
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
 
-	spSwirlVertexEffect* effect = spSwirlVertexEffect_create(400);
+	spSwirlVertexEffect *effect = spSwirlVertexEffect_create(400);
 	effect->centerY = -200;
 	drawable->vertexEffect = &effect->super;
 
-	spSkeleton* skeleton = drawable->skeleton;
+	spSkeleton *skeleton = drawable->skeleton;
 	skeleton->x = 320;
 	skeleton->y = 590;
 	spSkeleton_updateWorldTransform(skeleton);
 
-    spAnimationState_setAnimationByName(drawable->state, 0, "walk", true);
-    spAnimationState_addAnimationByName(drawable->state, 1, "gun-grab", false, 2);
+	spAnimationState_setAnimationByName(drawable->state, 0, "walk", true);
+	spAnimationState_addAnimationByName(drawable->state, 1, "gun-grab", false, 2);
 
 	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - raptor");
 	window.setFramerateLimit(60);
@@ -302,7 +302,7 @@ void raptor (spSkeletonData* skeletonData, spAtlas* atlas) {
 		deltaClock.restart();
 
 		swirlTime += delta;
-		float percent = (float)fmod(swirlTime, 2);
+		float percent = (float) fmod(swirlTime, 2);
 		if (percent > 1) percent = 1 - (percent - 1);
 		effect->angle = _spMath_interpolate(_spMath_pow2_apply, -60, 60, percent);
 
@@ -315,13 +315,13 @@ void raptor (spSkeletonData* skeletonData, spAtlas* atlas) {
 	spSwirlVertexEffect_dispose(effect);
 }
 
-void tank (spSkeletonData* skeletonData, spAtlas* atlas) {
+void tank(spSkeletonData *skeletonData, spAtlas *atlas) {
 	UNUSED(atlas);
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
 
-	spSkeleton* skeleton = drawable->skeleton;
+	spSkeleton *skeleton = drawable->skeleton;
 	skeleton->x = 500;
 	skeleton->y = 590;
 	spSkeleton_updateWorldTransform(skeleton);
@@ -346,13 +346,13 @@ void tank (spSkeletonData* skeletonData, spAtlas* atlas) {
 	}
 }
 
-void vine (spSkeletonData* skeletonData, spAtlas* atlas) {
+void vine(spSkeletonData *skeletonData, spAtlas *atlas) {
 	UNUSED(atlas);
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
 
-	spSkeleton* skeleton = drawable->skeleton;
+	spSkeleton *skeleton = drawable->skeleton;
 	skeleton->x = 320;
 	skeleton->y = 590;
 	spSkeleton_updateWorldTransform(skeleton);
@@ -378,13 +378,13 @@ void vine (spSkeletonData* skeletonData, spAtlas* atlas) {
 	}
 }
 
-void stretchyman (spSkeletonData* skeletonData, spAtlas* atlas) {
+void stretchyman(spSkeletonData *skeletonData, spAtlas *atlas) {
 	UNUSED(atlas);
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
 
-	spSkeleton* skeleton = drawable->skeleton;
+	spSkeleton *skeleton = drawable->skeleton;
 	skeleton->x = 100;
 	skeleton->y = 590;
 	spSkeleton_updateWorldTransform(skeleton);
@@ -410,15 +410,15 @@ void stretchyman (spSkeletonData* skeletonData, spAtlas* atlas) {
 	}
 }
 
-void coin (spSkeletonData* skeletonData, spAtlas* atlas) {
+void coin(spSkeletonData *skeletonData, spAtlas *atlas) {
 	UNUSED(atlas);
 
 
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
 
-	spSkeleton* skeleton = drawable->skeleton;
+	spSkeleton *skeleton = drawable->skeleton;
 	skeleton->x = 320;
 	skeleton->y = 320;
 	spSkeleton_updateWorldTransform(skeleton);
@@ -444,23 +444,23 @@ void coin (spSkeletonData* skeletonData, spAtlas* atlas) {
 	}
 }
 
-void owl (spSkeletonData* skeletonData, spAtlas* atlas) {
+void owl(spSkeletonData *skeletonData, spAtlas *atlas) {
 	UNUSED(atlas);
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
 
-	spSkeleton* skeleton = drawable->skeleton;
+	spSkeleton *skeleton = drawable->skeleton;
 	skeleton->x = 320;
 	skeleton->y = 400;
 	spSkeleton_updateWorldTransform(skeleton);
 
 	spAnimationState_setAnimationByName(drawable->state, 0, "idle", true);
 	spAnimationState_setAnimationByName(drawable->state, 1, "blink", true);
-	spTrackEntry* left = spAnimationState_setAnimationByName(drawable->state, 2, "left", true);
-	spTrackEntry* right = spAnimationState_setAnimationByName(drawable->state, 3, "right", true);
-	spTrackEntry* up = spAnimationState_setAnimationByName(drawable->state, 4, "up", true);
-	spTrackEntry* down = spAnimationState_setAnimationByName(drawable->state, 5, "down", true);
+	spTrackEntry *left = spAnimationState_setAnimationByName(drawable->state, 2, "left", true);
+	spTrackEntry *right = spAnimationState_setAnimationByName(drawable->state, 3, "right", true);
+	spTrackEntry *up = spAnimationState_setAnimationByName(drawable->state, 4, "up", true);
+	spTrackEntry *down = spAnimationState_setAnimationByName(drawable->state, 5, "down", true);
 
 	left->alpha = 0;
 	left->mixBlend = SP_MIX_BLEND_ADD;
@@ -503,11 +503,11 @@ void owl (spSkeletonData* skeletonData, spAtlas* atlas) {
 /**
  * Used for debugging purposes during runtime development
  */
-void test (spSkeletonData* skeletonData, spAtlas* atlas) {
+void test(spSkeletonData *skeletonData, spAtlas *atlas) {
 	UNUSED(atlas);
-	spSkeleton* skeleton = spSkeleton_create(skeletonData);
-	spAnimationStateData* animData = spAnimationStateData_create(skeletonData);
-	spAnimationState* animState = spAnimationState_create(animData);
+	spSkeleton *skeleton = spSkeleton_create(skeletonData);
+	spAnimationStateData *animData = spAnimationStateData_create(skeletonData);
+	spAnimationState *animState = spAnimationState_create(animData);
 	spAnimationState_setAnimationByName(animState, 0, "drive", true);
 
 
@@ -518,7 +518,7 @@ void test (spSkeletonData* skeletonData, spAtlas* atlas) {
 		spAnimationState_apply(animState, skeleton);
 		spSkeleton_updateWorldTransform(skeleton);
 		for (int ii = 0; ii < skeleton->bonesCount; ii++) {
-			spBone* bone = skeleton->bones[ii];
+			spBone *bone = skeleton->bones[ii];
 			printf("%s %f %f %f %f %f %f\n", bone->data->name, bone->a, bone->b, bone->c, bone->d, bone->worldX, bone->worldY);
 		}
 		printf("========================================\n");
@@ -528,15 +528,15 @@ void test (spSkeletonData* skeletonData, spAtlas* atlas) {
 	spSkeleton_dispose(skeleton);
 }
 
-void testSkinsApi(spSkeletonData* skeletonData, spAtlas* atlas) {
+void testSkinsApi(spSkeletonData *skeletonData, spAtlas *atlas) {
 	UNUSED(atlas);
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
 
-	spSkeleton* skeleton = drawable->skeleton;
+	spSkeleton *skeleton = drawable->skeleton;
 
-	spSkin* skin = spSkin_create("test-skin");
+	spSkin *skin = spSkin_create("test-skin");
 	spSkin_copySkin(skin, spSkeletonData_findSkin(skeletonData, "goblingirl"));
 	// spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "goblingirl"));
 	spSkeleton_setSkin(skeleton, skin);
@@ -570,19 +570,19 @@ void testSkinsApi(spSkeletonData* skeletonData, spAtlas* atlas) {
 	spSkin_dispose(skin);
 }
 
-void testMixAndMatch(spSkeletonData* skeletonData, spAtlas* atlas) {
+void testMixAndMatch(spSkeletonData *skeletonData, spAtlas *atlas) {
 	UNUSED(atlas);
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
 
-	spSkeleton* skeleton = drawable->skeleton;
+	spSkeleton *skeleton = drawable->skeleton;
 
 	// Create a new skin, by mixing and matching other skins
 	// that fit together. Items making up the girl are individual
 	// skins. Using the skin API, a new skin is created which is
 	// a combination of all these individual item skins.
-	spSkin* skin = spSkin_create("mix-and-match");
+	spSkin *skin = spSkin_create("mix-and-match");
 	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "skin-base"));
 	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "nose/short"));
 	spSkin_addSkin(skin, spSkeletonData_findSkin(skeletonData, "eyelids/girly"));
@@ -623,17 +623,17 @@ void testMixAndMatch(spSkeletonData* skeletonData, spAtlas* atlas) {
 	spSkin_dispose(skin);
 }
 
-int main () {
-    testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
-    testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
-    testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
-    testcase(testMixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
-    testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 1.0f);
-    testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
+int main() {
+	testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
+	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
+	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
+	testcase(testMixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
+	testcase(test, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 1.0f);
+	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
-    testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
+	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
 	testcase(testSkinsApi, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	return 0;

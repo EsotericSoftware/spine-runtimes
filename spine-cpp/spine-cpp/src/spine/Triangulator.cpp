@@ -83,14 +83,14 @@ Vector<int> &Triangulator::triangulate(Vector<float> &vertices) {
 					if (positiveArea(p3x, p3y, p1x, p1y, vx, vy)) {
 						if (positiveArea(p1x, p1y, p2x, p2y, vx, vy)) {
 							if (positiveArea(p2x, p2y, p3x, p3y, vx, vy)) {
-								goto break_outer; // break outer;
+								goto break_outer;// break outer;
 							}
 						}
 					}
 				}
 				break;
 			}
-			break_outer:
+		break_outer:
 
 			if (next == 0) {
 				do {

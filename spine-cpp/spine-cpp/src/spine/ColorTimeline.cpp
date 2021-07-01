@@ -33,8 +33,8 @@
 
 #include <spine/ColorTimeline.h>
 
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
 
 #include <spine/Animation.h>
 #include <spine/Bone.h>
@@ -59,8 +59,7 @@ RGBATimeline::~RGBATimeline() {
 }
 
 void RGBATimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						 MixBlend blend, MixDirection direction
-) {
+						 MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -149,8 +148,7 @@ RGBTimeline::~RGBTimeline() {
 }
 
 void RGBTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						MixBlend blend, MixDirection direction
-) {
+						MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -233,8 +231,7 @@ AlphaTimeline::~AlphaTimeline() {
 }
 
 void AlphaTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						  MixBlend blend, MixDirection direction
-) {
+						  MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -242,7 +239,7 @@ void AlphaTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 	Slot *slot = skeleton._slots[_slotIndex];
 	if (!slot->_bone._active) return;
 
-	if (time < _frames[0]) { // Time is before first frame.
+	if (time < _frames[0]) {// Time is before first frame.
 		Color &color = slot->_color, &setup = slot->_data._color;
 		switch (blend) {
 			case MixBlend_Setup:
@@ -281,8 +278,7 @@ RGBA2Timeline::~RGBA2Timeline() {
 }
 
 void RGBA2Timeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						  MixBlend blend, MixDirection direction
-) {
+						  MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -375,8 +371,7 @@ void RGBA2Timeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 	}
 }
 
-void
-RGBA2Timeline::setFrame(int frame, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
+void RGBA2Timeline::setFrame(int frame, float time, float r, float g, float b, float a, float r2, float g2, float b2) {
 	frame *= ENTRIES;
 	_frames[frame] = time;
 	_frames[frame + R] = r;
@@ -403,8 +398,7 @@ RGB2Timeline::~RGB2Timeline() {
 }
 
 void RGB2Timeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						 MixBlend blend, MixDirection direction
-) {
+						 MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -491,8 +485,7 @@ void RGB2Timeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<
 	}
 }
 
-void
-RGB2Timeline::setFrame(int frame, float time, float r, float g, float b, float r2, float g2, float b2) {
+void RGB2Timeline::setFrame(int frame, float time, float r, float g, float b, float r2, float g2, float b2) {
 	frame *= ENTRIES;
 	_frames[frame] = time;
 	_frames[frame + R] = r;

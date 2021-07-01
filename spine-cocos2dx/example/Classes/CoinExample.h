@@ -35,14 +35,14 @@
 
 class CoinExample : public cocos2d::LayerColor {
 public:
-	static cocos2d::Scene* scene ();
+	static cocos2d::Scene *scene();
 
 	CREATE_FUNC(CoinExample);
 
-	virtual bool init ();
+	virtual bool init();
 
 private:
-	spine::SkeletonAnimation* skeletonNode;
+	spine::SkeletonAnimation *skeletonNode;
 };
 
-#endif // _COINXAMPLE_H_
+#endif// _COINXAMPLE_H_

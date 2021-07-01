@@ -27,19 +27,19 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef  _APPDELEGATE_H_
-#define  _APPDELEGATE_H_
+#ifndef _APPDELEGATE_H_
+#define _APPDELEGATE_H_
 
 #include "cocos2d.h"
 
-class AppDelegate: private cocos2d::Application {
+class AppDelegate : private cocos2d::Application {
 public:
-	AppDelegate ();
-	virtual ~AppDelegate ();
+	AppDelegate();
+	virtual ~AppDelegate();
 
-	virtual bool applicationDidFinishLaunching ();
-	virtual void applicationDidEnterBackground ();
-	virtual void applicationWillEnterForeground ();    
+	virtual bool applicationDidFinishLaunching();
+	virtual void applicationDidEnterBackground();
+	virtual void applicationWillEnterForeground();
 };
 
-#endif // _APPDELEGATE_H_
+#endif// _APPDELEGATE_H_

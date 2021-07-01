@@ -32,8 +32,8 @@
 #endif
 
 #include <spine/Atlas.h>
-#include <spine/TextureLoader.h>
 #include <spine/ContainerUtil.h>
+#include <spine/TextureLoader.h>
 
 #include <ctype.h>
 
@@ -65,8 +65,8 @@ Atlas::Atlas(const String &path, TextureLoader *textureLoader, bool createTextur
 }
 
 Atlas::Atlas(const char *data, int length, const char *dir, TextureLoader *textureLoader, bool createTexture)
-		: _textureLoader(
-		textureLoader) {
+	: _textureLoader(
+			  textureLoader) {
 	load(data, length, dir, createTexture);
 }
 
@@ -258,7 +258,7 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 			memcpy(path, dir, dirLength);
 			if (needsSlash) path[dirLength] = '/';
 			strcpy(path + dirLength + needsSlash, name);
-			page = new(__FILE__, __LINE__) AtlasPage(String(name, true));
+			page = new (__FILE__, __LINE__) AtlasPage(String(name, true));
 
 			while (true) {
 				line = reader.readLine();
@@ -289,7 +289,7 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 			}
 			_pages.add(page);
 		} else {
-			AtlasRegion *region = new(__FILE__, __LINE__) AtlasRegion();
+			AtlasRegion *region = new (__FILE__, __LINE__) AtlasRegion();
 			region->page = page;
 			region->name = String(line->copy(), true);
 			while (true) {
@@ -351,4 +351,3 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 		}
 	}
 }
-

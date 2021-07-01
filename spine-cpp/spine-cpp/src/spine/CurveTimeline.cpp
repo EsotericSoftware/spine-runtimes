@@ -128,7 +128,7 @@ float CurveTimeline1::getCurveValue(float time) {
 		case CurveTimeline::LINEAR: {
 			float before = _frames[i], value = _frames[i + CurveTimeline1::VALUE];
 			return value + (time - before) / (_frames[i + CurveTimeline1::ENTRIES] - before) *
-						   (_frames[i + CurveTimeline1::ENTRIES + CurveTimeline1::VALUE] - value);
+								   (_frames[i + CurveTimeline1::ENTRIES + CurveTimeline1::VALUE] - value);
 		}
 		case CurveTimeline::STEPPED:
 			return _frames[i + CurveTimeline1::VALUE];

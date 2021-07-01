@@ -33,13 +33,13 @@
 
 #include <spine/TranslateTimeline.h>
 
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
 
-#include <spine/Slot.h>
-#include <spine/SlotData.h>
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
+#include <spine/Slot.h>
+#include <spine/SlotData.h>
 
 using namespace spine;
 
@@ -57,8 +57,7 @@ TranslateTimeline::~TranslateTimeline() {
 }
 
 void TranslateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-							  MixBlend blend, MixDirection direction
-) {
+							  MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -125,7 +124,8 @@ void TranslateTimeline::apply(Skeleton &skeleton, float lastTime, float time, Ve
 RTTI_IMPL(TranslateXTimeline, CurveTimeline1)
 
 TranslateXTimeline::TranslateXTimeline(size_t frameCount, size_t bezierCount, int boneIndex) : CurveTimeline1(
-		frameCount, bezierCount), _boneIndex(boneIndex) {
+																									   frameCount, bezierCount),
+																							   _boneIndex(boneIndex) {
 	PropertyId ids[] = {((PropertyId) Property_X << 32) | boneIndex};
 	setPropertyIds(ids, 1);
 }
@@ -134,8 +134,7 @@ TranslateXTimeline::~TranslateXTimeline() {
 }
 
 void TranslateXTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-							   MixBlend blend, MixDirection direction
-) {
+							   MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);
@@ -173,7 +172,8 @@ void TranslateXTimeline::apply(Skeleton &skeleton, float lastTime, float time, V
 RTTI_IMPL(TranslateYTimeline, CurveTimeline1)
 
 TranslateYTimeline::TranslateYTimeline(size_t frameCount, size_t bezierCount, int boneIndex) : CurveTimeline1(
-		frameCount, bezierCount), _boneIndex(boneIndex) {
+																									   frameCount, bezierCount),
+																							   _boneIndex(boneIndex) {
 	PropertyId ids[] = {((PropertyId) Property_Y << 32) | boneIndex};
 	setPropertyIds(ids, 1);
 }
@@ -182,8 +182,7 @@ TranslateYTimeline::~TranslateYTimeline() {
 }
 
 void TranslateYTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-							   MixBlend blend, MixDirection direction
-) {
+							   MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 	SP_UNUSED(direction);

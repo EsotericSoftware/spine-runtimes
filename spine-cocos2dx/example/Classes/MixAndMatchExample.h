@@ -35,17 +35,17 @@
 
 class MixAndMatchExample : public cocos2d::LayerColor {
 public:
-	static cocos2d::Scene* scene ();
+	static cocos2d::Scene *scene();
 
 	CREATE_FUNC(MixAndMatchExample);
 
-	virtual bool init ();
-	
+	virtual bool init();
+
 	virtual ~MixAndMatchExample();
 
 private:
-	spine::SkeletonAnimation* skeletonNode;
-	spine::Skin* skin;
+	spine::SkeletonAnimation *skeletonNode;
+	spine::Skin *skin;
 };
 
-#endif // _MIXANDMATCHXAMPLE_H_
+#endif// _MIXANDMATCHXAMPLE_H_

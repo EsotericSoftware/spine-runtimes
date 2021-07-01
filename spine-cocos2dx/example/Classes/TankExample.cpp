@@ -33,13 +33,13 @@
 USING_NS_CC;
 using namespace spine;
 
-Scene* TankExample::scene () {
+Scene *TankExample::scene() {
 	Scene *scene = Scene::create();
 	scene->addChild(TankExample::create());
 	return scene;
 }
 
-bool TankExample::init () {
+bool TankExample::init() {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
 	skeletonNode = SkeletonAnimation::createWithBinaryFile("tank-pro.skel", "tank.atlas", 0.5f);
@@ -50,8 +50,8 @@ bool TankExample::init () {
 
 	scheduleUpdate();
 
-	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
+	EventListenerTouchOneByOne *listener = EventListenerTouchOneByOne::create();
+	listener->onTouchBegan = [this](Touch *touch, cocos2d::Event *event) -> bool {
 		if (!skeletonNode->getDebugBonesEnabled())
 			skeletonNode->setDebugBonesEnabled(true);
 		else if (skeletonNode->getTimeScale() == 1)

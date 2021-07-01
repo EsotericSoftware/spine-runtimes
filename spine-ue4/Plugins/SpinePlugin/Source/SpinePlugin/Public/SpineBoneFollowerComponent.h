@@ -33,14 +33,14 @@
 #include "SpineBoneFollowerComponent.generated.h"
 
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SPINEPLUGIN_API USpineBoneFollowerComponent : public USceneComponent {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AActor* Target = 0;
-	
+	AActor *Target = 0;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString BoneName;
 
@@ -56,10 +56,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool UseScale = true;
-	
-	USpineBoneFollowerComponent ();
-	
-	virtual void BeginPlay () override;
-		
-	virtual void TickComponent (float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	USpineBoneFollowerComponent();
+
+	virtual void BeginPlay() override;
+
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 };

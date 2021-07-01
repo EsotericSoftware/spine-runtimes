@@ -39,7 +39,7 @@ using namespace spine;
 
 RTTI_IMPL(ClippingAttachment, VertexAttachment)
 
-ClippingAttachment::ClippingAttachment(const String &name) : VertexAttachment(name), _endSlot(NULL), _color()  {
+ClippingAttachment::ClippingAttachment(const String &name) : VertexAttachment(name), _endSlot(NULL), _color() {
 }
 
 SlotData *ClippingAttachment::getEndSlot() {
@@ -55,7 +55,7 @@ Color &ClippingAttachment::getColor() {
 }
 
 Attachment *ClippingAttachment::copy() {
-	ClippingAttachment *copy = new(__FILE__, __LINE__) ClippingAttachment(getName());
+	ClippingAttachment *copy = new (__FILE__, __LINE__) ClippingAttachment(getName());
 	copyTo(copy);
 	copy->_endSlot = _endSlot;
 	return copy;

@@ -37,21 +37,20 @@
 
 using namespace spine;
 
-BoneData::BoneData(int index, const String &name, BoneData *parent) :
-		_index(index),
-		_name(name),
-		_parent(parent),
-		_length(0),
-		_x(0),
-		_y(0),
-		_rotation(0),
-		_scaleX(1),
-		_scaleY(1),
-		_shearX(0),
-		_shearY(0),
-		_transformMode(TransformMode_Normal),
-		_skinRequired(false),
-		_color() {
+BoneData::BoneData(int index, const String &name, BoneData *parent) : _index(index),
+																	  _name(name),
+																	  _parent(parent),
+																	  _length(0),
+																	  _x(0),
+																	  _y(0),
+																	  _rotation(0),
+																	  _scaleX(1),
+																	  _scaleY(1),
+																	  _shearX(0),
+																	  _shearY(0),
+																	  _transformMode(TransformMode_Normal),
+																	  _skinRequired(false),
+																	  _color() {
 	assert(index >= 0);
 	assert(_name.length() > 0);
 }

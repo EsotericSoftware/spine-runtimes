@@ -30,8 +30,8 @@
 #ifndef SPINE_COCOS2DX_H_
 #define SPINE_COCOS2DX_H_
 
-#include <spine/spine.h>
 #include "cocos2d.h"
+#include <spine/spine.h>
 
 #include <spine/SkeletonRenderer.h>
 
@@ -46,33 +46,33 @@
 #include <spine/SkeletonAnimation.h>
 
 namespace spine {
-	class Cocos2dAtlasAttachmentLoader: public AtlasAttachmentLoader {
+	class Cocos2dAtlasAttachmentLoader : public AtlasAttachmentLoader {
 	public:
-		Cocos2dAtlasAttachmentLoader(Atlas* atlas);
+		Cocos2dAtlasAttachmentLoader(Atlas *atlas);
 		virtual ~Cocos2dAtlasAttachmentLoader();
-		virtual void configureAttachment(Attachment* attachment);
+		virtual void configureAttachment(Attachment *attachment);
 	};
 
-	class Cocos2dTextureLoader: public TextureLoader {
+	class Cocos2dTextureLoader : public TextureLoader {
 	public:
 		Cocos2dTextureLoader();
-		
-		virtual ~Cocos2dTextureLoader();
-		
-		virtual void load(AtlasPage& page, const String& path);
 
-		virtual void unload(void* texture);
+		virtual ~Cocos2dTextureLoader();
+
+		virtual void load(AtlasPage &page, const String &path);
+
+		virtual void unload(void *texture);
 	};
 
-	class Cocos2dExtension: public DefaultSpineExtension {
+	class Cocos2dExtension : public DefaultSpineExtension {
 	public:
 		Cocos2dExtension();
-		
+
 		virtual ~Cocos2dExtension();
-		
+
 	protected:
 		virtual char *_readFile(const String &path, int *length);
 	};
-}
+}// namespace spine
 
 #endif /* SPINE_COCOS2DX_H_ */

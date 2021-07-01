@@ -31,13 +31,13 @@
 #include <spine/extension.h>
 #include <stdio.h>
 
-_SP_ARRAY_IMPLEMENT_TYPE(spBoneDataArray, spBoneData*)
+_SP_ARRAY_IMPLEMENT_TYPE(spBoneDataArray, spBoneData *)
 
-_SP_ARRAY_IMPLEMENT_TYPE(spIkConstraintDataArray, spIkConstraintData*)
+_SP_ARRAY_IMPLEMENT_TYPE(spIkConstraintDataArray, spIkConstraintData *)
 
-_SP_ARRAY_IMPLEMENT_TYPE(spTransformConstraintDataArray, spTransformConstraintData*)
+_SP_ARRAY_IMPLEMENT_TYPE(spTransformConstraintDataArray, spTransformConstraintData *)
 
-_SP_ARRAY_IMPLEMENT_TYPE(spPathConstraintDataArray, spPathConstraintData*)
+_SP_ARRAY_IMPLEMENT_TYPE(spPathConstraintDataArray, spPathConstraintData *)
 
 _Entry *_Entry_create(int slotIndex, const char *name, spAttachment *attachment) {
 	_Entry *self = NEW(_Entry);
@@ -109,8 +109,7 @@ void spSkin_dispose(spSkin *self) {
 
 void spSkin_setAttachment(spSkin *self, int slotIndex, const char *name, spAttachment *attachment) {
 	_SkinHashTableEntry *existingEntry = 0;
-	_SkinHashTableEntry *hashEntry = SUB_CAST(_spSkin, self)->entriesHashTable[(unsigned int) slotIndex %
-																			   SKIN_ENTRIES_HASH_TABLE_SIZE];
+	_SkinHashTableEntry *hashEntry = SUB_CAST(_spSkin, self)->entriesHashTable[(unsigned int) slotIndex % SKIN_ENTRIES_HASH_TABLE_SIZE];
 	while (hashEntry) {
 		if (hashEntry->entry->slotIndex == slotIndex && strcmp(hashEntry->entry->name, name) == 0) {
 			existingEntry = hashEntry;
@@ -140,8 +139,7 @@ void spSkin_setAttachment(spSkin *self, int slotIndex, const char *name, spAttac
 }
 
 spAttachment *spSkin_getAttachment(const spSkin *self, int slotIndex, const char *name) {
-	const _SkinHashTableEntry *hashEntry = SUB_CAST(_spSkin, self)->entriesHashTable[(unsigned int) slotIndex %
-																					 SKIN_ENTRIES_HASH_TABLE_SIZE];
+	const _SkinHashTableEntry *hashEntry = SUB_CAST(_spSkin, self)->entriesHashTable[(unsigned int) slotIndex % SKIN_ENTRIES_HASH_TABLE_SIZE];
 	while (hashEntry) {
 		if (hashEntry->entry->slotIndex == slotIndex && strcmp(hashEntry->entry->name, name) == 0)
 			return hashEntry->entry->attachment;

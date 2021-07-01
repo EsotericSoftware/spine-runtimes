@@ -31,15 +31,15 @@
 #include "spine/spine.h"
 
 
-class FSpineEditorPlugin: public ISpineEditorPlugin {
+class FSpineEditorPlugin : public ISpineEditorPlugin {
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 };
 
 IMPLEMENT_MODULE(FSpineEditorPlugin, SpineEditorPlugin)
 
-void FSpineEditorPlugin::StartupModule () {
+void FSpineEditorPlugin::StartupModule() {
 }
 
-void FSpineEditorPlugin::ShutdownModule () {
+void FSpineEditorPlugin::ShutdownModule() {
 }

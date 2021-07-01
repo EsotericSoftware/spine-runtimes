@@ -27,12 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpinePlugin.h"
-#include "SpineSkeletonDataAsset.h"
 #include "SpineAtlasAsset.h"
-#include "SpineSkeletonComponent.h"
-#include "SpineSkeletonAnimationComponent.h"
-#include "SpineSkeletonRendererComponent.h"
-#include "SpineBoneFollowerComponent.h"
 #include "SpineBoneDriverComponent.h"
+#include "SpineBoneFollowerComponent.h"
+#include "SpinePlugin.h"
+#include "SpineSkeletonAnimationComponent.h"
+#include "SpineSkeletonComponent.h"
+#include "SpineSkeletonDataAsset.h"
+#include "SpineSkeletonRendererComponent.h"
 #include "SpineWidget.h"

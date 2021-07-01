@@ -33,13 +33,13 @@
 
 #include <spine/ScaleTimeline.h>
 
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
 
-#include <spine/Slot.h>
-#include <spine/SlotData.h>
 #include <spine/Bone.h>
 #include <spine/BoneData.h>
+#include <spine/Slot.h>
+#include <spine/SlotData.h>
 
 using namespace spine;
 
@@ -56,8 +56,7 @@ ScaleTimeline::ScaleTimeline(size_t frameCount, size_t bezierCount, int boneInde
 ScaleTimeline::~ScaleTimeline() {}
 
 void ScaleTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						  MixBlend blend, MixDirection direction
-) {
+						  MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 
@@ -176,8 +175,7 @@ ScaleXTimeline::ScaleXTimeline(size_t frameCount, size_t bezierCount, int boneIn
 ScaleXTimeline::~ScaleXTimeline() {}
 
 void ScaleXTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						   MixBlend blend, MixDirection direction
-) {
+						   MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 
@@ -253,8 +251,7 @@ ScaleYTimeline::ScaleYTimeline(size_t frameCount, size_t bezierCount, int boneIn
 ScaleYTimeline::~ScaleYTimeline() {}
 
 void ScaleYTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						   MixBlend blend, MixDirection direction
-) {
+						   MixBlend blend, MixDirection direction) {
 	SP_UNUSED(lastTime);
 	SP_UNUSED(pEvents);
 

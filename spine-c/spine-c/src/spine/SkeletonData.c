@@ -28,8 +28,8 @@
  *****************************************************************************/
 
 #include <spine/SkeletonData.h>
-#include <string.h>
 #include <spine/extension.h>
+#include <string.h>
 
 spSkeletonData *spSkeletonData_create() {
 	return NEW(spSkeletonData);

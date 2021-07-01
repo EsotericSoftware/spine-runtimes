@@ -39,4 +39,4 @@ namespace spine {
 
 	TextureLoader::~TextureLoader() {
 	}
-}
+}// namespace spine

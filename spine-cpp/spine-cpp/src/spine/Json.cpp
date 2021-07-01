@@ -38,8 +38,8 @@ THE SOFTWARE.
 #define _BSD_SOURCE
 #endif
 
-#include <spine/Json.h>
 #include <spine/Extension.h>
+#include <spine/Json.h>
 #include <spine/SpineString.h>
 
 #include <assert.h>
@@ -111,18 +111,17 @@ const char *Json::getError() {
 	return _error;
 }
 
-Json::Json(const char *value) :
-		_next(NULL),
+Json::Json(const char *value) : _next(NULL),
 #if SPINE_JSON_HAVE_PREV
-		_prev(NULL),
+								_prev(NULL),
 #endif
-		_child(NULL),
-		_type(0),
-		_size(0),
-		_valueString(NULL),
-		_valueInt(0),
-		_valueFloat(0),
-		_name(NULL) {
+								_child(NULL),
+								_type(0),
+								_size(0),
+								_valueString(NULL),
+								_valueInt(0),
+								_valueFloat(0),
+								_name(NULL) {
 	if (value) {
 		value = parseValue(this, skip(value));
 
@@ -429,7 +428,7 @@ const char *Json::parseArray(Json *item, const char *value) {
 		return value + 1; /* empty array. */
 	}
 
-	item->_child = child = new(__FILE__, __LINE__) Json(NULL);
+	item->_child = child = new (__FILE__, __LINE__) Json(NULL);
 	if (!item->_child) {
 		return NULL; /* memory fail */
 	}
@@ -443,7 +442,7 @@ const char *Json::parseArray(Json *item, const char *value) {
 	item->_size = 1;
 
 	while (*value == ',') {
-		Json *new_item = new(__FILE__, __LINE__) Json(NULL);
+		Json *new_item = new (__FILE__, __LINE__) Json(NULL);
 		if (!new_item) {
 			return NULL; /* memory fail */
 		}
@@ -485,7 +484,7 @@ const char *Json::parseObject(Json *item, const char *value) {
 		return value + 1; /* empty array. */
 	}
 
-	item->_child = child = new(__FILE__, __LINE__) Json(NULL);
+	item->_child = child = new (__FILE__, __LINE__) Json(NULL);
 	if (!item->_child) {
 		return NULL;
 	}
@@ -508,7 +507,7 @@ const char *Json::parseObject(Json *item, const char *value) {
 	item->_size = 1;
 
 	while (*value == ',') {
-		Json *new_item = new(__FILE__, __LINE__) Json(NULL);
+		Json *new_item = new (__FILE__, __LINE__) Json(NULL);
 		if (!new_item) {
 			return NULL; /* memory fail */
 		}

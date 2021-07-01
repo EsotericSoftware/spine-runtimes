@@ -39,23 +39,22 @@
 
 using namespace spine;
 
-TransformConstraintData::TransformConstraintData(const String &name) :
-		ConstraintData(name),
-		_target(NULL),
-		_mixRotate(0),
-		_mixX(0),
-		_mixY(0),
-		_mixScaleX(0),
-		_mixScaleY(0),
-		_mixShearY(0),
-		_offsetRotation(0),
-		_offsetX(0),
-		_offsetY(0),
-		_offsetScaleX(0),
-		_offsetScaleY(0),
-		_offsetShearY(0),
-		_relative(false),
-		_local(false) {
+TransformConstraintData::TransformConstraintData(const String &name) : ConstraintData(name),
+																	   _target(NULL),
+																	   _mixRotate(0),
+																	   _mixX(0),
+																	   _mixY(0),
+																	   _mixScaleX(0),
+																	   _mixScaleY(0),
+																	   _mixShearY(0),
+																	   _offsetRotation(0),
+																	   _offsetX(0),
+																	   _offsetY(0),
+																	   _offsetScaleX(0),
+																	   _offsetScaleY(0),
+																	   _offsetShearY(0),
+																	   _relative(false),
+																	   _local(false) {
 }
 
 Vector<BoneData *> &TransformConstraintData::getBones() {

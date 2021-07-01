@@ -33,30 +33,29 @@
 
 #include <spine/SkeletonData.h>
 
-#include <spine/BoneData.h>
-#include <spine/SlotData.h>
-#include <spine/Skin.h>
-#include <spine/EventData.h>
 #include <spine/Animation.h>
+#include <spine/BoneData.h>
+#include <spine/EventData.h>
 #include <spine/IkConstraintData.h>
-#include <spine/TransformConstraintData.h>
 #include <spine/PathConstraintData.h>
+#include <spine/Skin.h>
+#include <spine/SlotData.h>
+#include <spine/TransformConstraintData.h>
 
 #include <spine/ContainerUtil.h>
 
 using namespace spine;
 
-SkeletonData::SkeletonData() :
-		_name(),
-		_defaultSkin(NULL),
-		_x(0),
-		_y(0),
-		_width(0),
-		_height(0),
-		_version(),
-		_hash(),
-		_fps(0),
-		_imagesPath() {
+SkeletonData::SkeletonData() : _name(),
+							   _defaultSkin(NULL),
+							   _x(0),
+							   _y(0),
+							   _width(0),
+							   _height(0),
+							   _version(),
+							   _hash(),
+							   _fps(0),
+							   _imagesPath() {
 }
 
 SkeletonData::~SkeletonData() {

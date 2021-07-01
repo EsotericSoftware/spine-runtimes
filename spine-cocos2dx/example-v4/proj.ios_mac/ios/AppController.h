@@ -29,10 +29,8 @@
 @class RootViewController;
 
 @interface AppController : NSObject <UIApplicationDelegate> {
-
 }
 
-@property(nonatomic, readonly) RootViewController* viewController;
+@property(nonatomic, readonly) RootViewController *viewController;
 
 @end
-

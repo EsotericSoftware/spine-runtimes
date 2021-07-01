@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#include "SpineAtlasImportFactory.h"
 #include "SpineEditorPlugin.h"
 #include "SpinePlugin.h"
-#include "SpineAtlasImportFactory.h"
 #include "SpineSkeletonImportFactory.h"

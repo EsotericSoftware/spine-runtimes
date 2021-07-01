@@ -11,4 +11,13 @@ spotless {
         target 'spine-libgdx/**/*.java'
         eclipse().configFile('formatters/eclipse-formatter.xml')
     }
+
+    cpp {
+        target 'spine-c/**/*.c', 'spine-c/**/.h',
+               'spine-cpp/**/*.cpp', 'spine-cpp/**/.h',
+               'spine-cocos2dx/**/*.cpp', 'spine-cocos2dx/**/*.h',
+               'spine-sfml/**/*.c', 'spine-sfml/**/*.cpp', 'spine-sfml/**/*.h',
+               'spine-ue4/**/*.cpp', 'spine-ue4/**/*.h'
+        clangFormat('12.0.0').style('file')
+    }
 }

@@ -30,53 +30,54 @@
 #ifndef SPINE_SFML_H_
 #define SPINE_SFML_H_
 
-#include <spine/spine.h>
+#include <SFML/Graphics/RenderStates.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/RenderStates.hpp>
+#include <spine/spine.h>
 
 
 namespace spine {
 
-class SkeletonDrawable : public sf::Drawable {
-public:
-	Skeleton *skeleton;
-	AnimationState *state;
-	float timeScale;
-	sf::VertexArray *vertexArray;
-	VertexEffect* vertexEffect;
+	class SkeletonDrawable : public sf::Drawable {
+	public:
+		Skeleton *skeleton;
+		AnimationState *state;
+		float timeScale;
+		sf::VertexArray *vertexArray;
+		VertexEffect *vertexEffect;
 
-	SkeletonDrawable(SkeletonData *skeleton, AnimationStateData *stateData = 0);
+		SkeletonDrawable(SkeletonData *skeleton, AnimationStateData *stateData = 0);
 
-	~SkeletonDrawable();
+		~SkeletonDrawable();
 
-	void update(float deltaTime);
+		void update(float deltaTime);
 
-	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
+		virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 
-	void setUsePremultipliedAlpha(bool usePMA) { usePremultipliedAlpha = usePMA; };
+		void setUsePremultipliedAlpha(bool usePMA) { usePremultipliedAlpha = usePMA; };
 
-	bool getUsePremultipliedAlpha() { return usePremultipliedAlpha; };
-private:
-	mutable bool ownsAnimationStateData;
-	mutable Vector<float> worldVertices;
-	mutable Vector<float> tempUvs;
-	mutable Vector<Color> tempColors;
-	mutable Vector<unsigned short> quadIndices;
-	mutable SkeletonClipping clipper;
-	mutable bool usePremultipliedAlpha;
-};
+		bool getUsePremultipliedAlpha() { return usePremultipliedAlpha; };
 
-class SFMLTextureLoader : public TextureLoader {
-public:
-	virtual void load(AtlasPage &page, const String &path);
+	private:
+		mutable bool ownsAnimationStateData;
+		mutable Vector<float> worldVertices;
+		mutable Vector<float> tempUvs;
+		mutable Vector<Color> tempColors;
+		mutable Vector<unsigned short> quadIndices;
+		mutable SkeletonClipping clipper;
+		mutable bool usePremultipliedAlpha;
+	};
 
-	virtual void unload(void *texture);
+	class SFMLTextureLoader : public TextureLoader {
+	public:
+		virtual void load(AtlasPage &page, const String &path);
 
-	String toString() const;
-};
+		virtual void unload(void *texture);
+
+		String toString() const;
+	};
 
 } /* namespace spine */
 #endif /* SPINE_SFML_H_ */

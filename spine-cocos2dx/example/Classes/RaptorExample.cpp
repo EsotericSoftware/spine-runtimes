@@ -38,35 +38,35 @@ PowInterpolation pow2(2);
 PowOutInterpolation powOut2(2);
 SwirlVertexEffect effect(400, powOut2);
 
-Scene* RaptorExample::scene () {
+Scene *RaptorExample::scene() {
 	Scene *scene = Scene::create();
 	scene->addChild(RaptorExample::create());
 	return scene;
 }
 
-bool RaptorExample::init () {
+bool RaptorExample::init() {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
 	skeletonNode = SkeletonAnimation::createWithJsonFile("raptor-pro.json", "raptor.atlas", 0.5f);
 	skeletonNode->setAnimation(0, "walk", true);
 	skeletonNode->addAnimation(1, "gun-grab", false, 2);
 	skeletonNode->setTwoColorTint(true);
-	
+
 	effect.setCenterY(200);
 	swirlTime = 0;
-	
+
 	skeletonNode->setVertexEffect(&effect);
 
 	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 20));
 	addChild(skeletonNode);
 
 	scheduleUpdate();
-	
-	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
+
+	EventListenerTouchOneByOne *listener = EventListenerTouchOneByOne::create();
+	listener->onTouchBegan = [this](Touch *touch, cocos2d::Event *event) -> bool {
 		if (!skeletonNode->getDebugBonesEnabled()) {
 			skeletonNode->setDebugBonesEnabled(true);
-			skeletonNode->setDebugMeshesEnabled(true);			
+			skeletonNode->setDebugMeshesEnabled(true);
 		} else if (skeletonNode->getTimeScale() == 1)
 			skeletonNode->setTimeScale(0.3f);
 		else

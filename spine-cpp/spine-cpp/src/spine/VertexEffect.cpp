@@ -31,9 +31,9 @@
 #include "SpinePluginPrivatePCH.h"
 #endif
 
-#include <spine/VertexEffect.h>
 #include <spine/MathUtil.h>
 #include <spine/Skeleton.h>
+#include <spine/VertexEffect.h>
 
 using namespace spine;
 
@@ -74,14 +74,13 @@ float JitterVertexEffect::getJitterY() {
 	return _jitterY;
 }
 
-SwirlVertexEffect::SwirlVertexEffect(float radius, Interpolation &interpolation) :
-		_centerX(0),
-		_centerY(0),
-		_radius(radius),
-		_angle(0),
-		_worldX(0),
-		_worldY(0),
-		_interpolation(interpolation) {
+SwirlVertexEffect::SwirlVertexEffect(float radius, Interpolation &interpolation) : _centerX(0),
+																				   _centerY(0),
+																				   _radius(radius),
+																				   _angle(0),
+																				   _worldX(0),
+																				   _worldY(0),
+																				   _interpolation(interpolation) {
 }
 
 void SwirlVertexEffect::begin(Skeleton &skeleton) {
@@ -107,7 +106,6 @@ void SwirlVertexEffect::transform(float &positionX, float &positionY, float &u, 
 }
 
 void SwirlVertexEffect::end() {
-
 }
 
 void SwirlVertexEffect::setCenterX(float centerX) {

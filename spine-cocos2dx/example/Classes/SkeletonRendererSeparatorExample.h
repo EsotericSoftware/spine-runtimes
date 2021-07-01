@@ -35,19 +35,18 @@
 
 class SkeletonRendererSeparatorExample : public cocos2d::LayerColor {
 public:
-	static cocos2d::Scene* scene ();
+	static cocos2d::Scene *scene();
 
-	CREATE_FUNC (SkeletonRendererSeparatorExample);
+	CREATE_FUNC(SkeletonRendererSeparatorExample);
 
-	virtual bool init ();
+	virtual bool init();
 
-	virtual void update (float deltaTime);
+	virtual void update(float deltaTime);
 
 private:
-	spine::SkeletonAnimation* backNode;
-	spine::SkeletonRenderer* frontNode;
-	cocos2d::DrawNode* betweenNode;
-	
+	spine::SkeletonAnimation *backNode;
+	spine::SkeletonRenderer *frontNode;
+	cocos2d::DrawNode *betweenNode;
 };
 
-#endif // _SKELETONRENDERERSEPARATOREXAMPLE_H_
+#endif// _SKELETONRENDERERSEPARATOREXAMPLE_H_

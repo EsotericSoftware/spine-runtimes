@@ -33,22 +33,22 @@
 
 #include <spine/IkConstraintTimeline.h>
 
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
 
 #include <spine/Animation.h>
+#include <spine/IkConstraint.h>
+#include <spine/IkConstraintData.h>
 #include <spine/Property.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
-#include <spine/IkConstraint.h>
-#include <spine/IkConstraintData.h>
 
 using namespace spine;
 
 RTTI_IMPL(IkConstraintTimeline, CurveTimeline)
 
 IkConstraintTimeline::IkConstraintTimeline(size_t frameCount, size_t bezierCount, int ikConstraintIndex)
-		: CurveTimeline(frameCount, IkConstraintTimeline::ENTRIES, bezierCount), _ikConstraintIndex(ikConstraintIndex) {
+	: CurveTimeline(frameCount, IkConstraintTimeline::ENTRIES, bezierCount), _ikConstraintIndex(ikConstraintIndex) {
 	PropertyId ids[] = {((PropertyId) Property_IkConstraint << 32) | ikConstraintIndex};
 	setPropertyIds(ids, 1);
 }
@@ -105,7 +105,7 @@ void IkConstraintTimeline::apply(Skeleton &skeleton, float lastTime, float time,
 			mix = getBezierValue(time, i, IkConstraintTimeline::MIX, curveType - IkConstraintTimeline::BEZIER);
 			softness = getBezierValue(time, i, IkConstraintTimeline::SOFTNESS,
 									  curveType + IkConstraintTimeline::BEZIER_SIZE -
-									  IkConstraintTimeline::BEZIER);
+											  IkConstraintTimeline::BEZIER);
 		}
 	}
 

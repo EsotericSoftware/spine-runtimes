@@ -32,9 +32,9 @@
 #endif
 
 #include <spine/Animation.h>
-#include <spine/Timeline.h>
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
+#include <spine/Timeline.h>
 
 #include <spine/ContainerUtil.h>
 
@@ -42,11 +42,10 @@
 
 using namespace spine;
 
-Animation::Animation(const String &name, Vector<Timeline *> &timelines, float duration) :
-		_timelines(timelines),
-		_timelineIds(),
-		_duration(duration),
-		_name(name) {
+Animation::Animation(const String &name, Vector<Timeline *> &timelines, float duration) : _timelines(timelines),
+																						  _timelineIds(),
+																						  _duration(duration),
+																						  _name(name) {
 	assert(_name.length() > 0);
 	for (size_t i = 0; i < timelines.size(); i++) {
 		Vector<PropertyId> propertyIds = timelines[i]->getPropertyIds();
@@ -67,8 +66,7 @@ Animation::~Animation() {
 }
 
 void Animation::apply(Skeleton &skeleton, float lastTime, float time, bool loop, Vector<Event *> *pEvents, float alpha,
-					  MixBlend blend, MixDirection direction
-) {
+					  MixBlend blend, MixDirection direction) {
 	if (loop && _duration != 0) {
 		time = MathUtil::fmod(time, _duration);
 		if (lastTime > 0) {

@@ -35,14 +35,13 @@
 
 #include <assert.h>
 
-spine::EventData::EventData(const spine::String &name) :
-		_name(name),
-		_intValue(0),
-		_floatValue(0),
-		_stringValue(),
-		_audioPath(),
-		_volume(1),
-		_balance(0) {
+spine::EventData::EventData(const spine::String &name) : _name(name),
+														 _intValue(0),
+														 _floatValue(0),
+														 _stringValue(),
+														 _audioPath(),
+														 _volume(1),
+														 _balance(0) {
 	assert(_name.length() > 0);
 }
 

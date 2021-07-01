@@ -27,14 +27,14 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/TransformConstraint.h>
 #include <spine/Skeleton.h>
+#include <spine/TransformConstraint.h>
 #include <spine/extension.h>
 
 spTransformConstraint *spTransformConstraint_create(spTransformConstraintData *data, const spSkeleton *skeleton) {
 	int i;
 	spTransformConstraint *self = NEW(spTransformConstraint);
-	CONST_CAST(spTransformConstraintData*, self->data) = data;
+	CONST_CAST(spTransformConstraintData *, self->data) = data;
 	self->mixRotate = data->mixRotate;
 	self->mixX = data->mixX;
 	self->mixY = data->mixY;
@@ -42,7 +42,7 @@ spTransformConstraint *spTransformConstraint_create(spTransformConstraintData *d
 	self->mixScaleY = data->mixScaleY;
 	self->mixShearY = data->mixShearY;
 	self->bonesCount = data->bonesCount;
-	CONST_CAST(spBone**, self->bones) = MALLOC(spBone*, self->bonesCount);
+	CONST_CAST(spBone **, self->bones) = MALLOC(spBone *, self->bonesCount);
 	for (i = 0; i < self->bonesCount; ++i)
 		self->bones[i] = spSkeleton_findBone(skeleton, self->data->bones[i]->name);
 	self->target = spSkeleton_findBone(skeleton, self->data->target->name);
@@ -56,13 +56,13 @@ void spTransformConstraint_dispose(spTransformConstraint *self) {
 
 void _spTransformConstraint_applyAbsoluteWorld(spTransformConstraint *self) {
 	float mixRotate = self->mixRotate, mixX = self->mixX, mixY = self->mixY, mixScaleX = self->mixScaleX,
-			mixScaleY = self->mixScaleY, mixShearY = self->mixShearY;
+		  mixScaleY = self->mixScaleY, mixShearY = self->mixShearY;
 	int /*bool*/ translate = mixX != 0 || mixY != 0;
 	spBone *target = self->target;
 	float ta = target->a, tb = target->b, tc = target->c, td = target->d;
 	float degRadReflect = ta * td - tb * tc > 0 ? DEG_RAD : -DEG_RAD;
 	float offsetRotation = self->data->offsetRotation * degRadReflect, offsetShearY =
-			self->data->offsetShearY * degRadReflect;
+																			   self->data->offsetShearY * degRadReflect;
 	int i;
 	float a, b, c, d, r, cosine, sine, x, y, s, by;
 	for (i = 0; i < self->bonesCount; ++i) {
@@ -72,7 +72,8 @@ void _spTransformConstraint_applyAbsoluteWorld(spTransformConstraint *self) {
 			a = bone->a, b = bone->b, c = bone->c, d = bone->d;
 			r = ATAN2(tc, ta) - ATAN2(c, a) + offsetRotation;
 			if (r > PI) r -= PI2;
-			else if (r < -PI) r += PI2;
+			else if (r < -PI)
+				r += PI2;
 			r *= mixRotate;
 			cosine = COS(r);
 			sine = SIN(r);
@@ -107,7 +108,8 @@ void _spTransformConstraint_applyAbsoluteWorld(spTransformConstraint *self) {
 			r = ATAN2(td, tb) - ATAN2(tc, ta) - (by - ATAN2(bone->c, bone->a));
 			s = SQRT(b * b + d * d);
 			if (r > PI) r -= PI2;
-			else if (r < -PI) r += PI2;
+			else if (r < -PI)
+				r += PI2;
 			r = by + (r + offsetShearY) * mixShearY;
 			CONST_CAST(float, bone->b) = COS(r) * s;
 			CONST_CAST(float, bone->d) = SIN(r) * s;
@@ -118,13 +120,13 @@ void _spTransformConstraint_applyAbsoluteWorld(spTransformConstraint *self) {
 
 void _spTransformConstraint_applyRelativeWorld(spTransformConstraint *self) {
 	float mixRotate = self->mixRotate, mixX = self->mixX, mixY = self->mixY, mixScaleX = self->mixScaleX,
-			mixScaleY = self->mixScaleY, mixShearY = self->mixShearY;
+		  mixScaleY = self->mixScaleY, mixShearY = self->mixShearY;
 	int /*bool*/ translate = mixX != 0 || mixY != 0;
 	spBone *target = self->target;
 	float ta = target->a, tb = target->b, tc = target->c, td = target->d;
 	float degRadReflect = ta * td - tb * tc > 0 ? DEG_RAD : -DEG_RAD;
 	float offsetRotation = self->data->offsetRotation * degRadReflect, offsetShearY =
-			self->data->offsetShearY * degRadReflect;
+																			   self->data->offsetShearY * degRadReflect;
 	int i;
 	float a, b, c, d, r, cosine, sine, x, y, s;
 	for (i = 0; i < self->bonesCount; ++i) {
@@ -134,7 +136,8 @@ void _spTransformConstraint_applyRelativeWorld(spTransformConstraint *self) {
 			a = bone->a, b = bone->b, c = bone->c, d = bone->d;
 			r = ATAN2(tc, ta) + offsetRotation;
 			if (r > PI) r -= PI2;
-			else if (r < -PI) r += PI2;
+			else if (r < -PI)
+				r += PI2;
 			r *= mixRotate;
 			cosine = COS(r);
 			sine = SIN(r);
@@ -164,7 +167,8 @@ void _spTransformConstraint_applyRelativeWorld(spTransformConstraint *self) {
 		if (mixShearY > 0) {
 			r = ATAN2(td, tb) - ATAN2(tc, ta);
 			if (r > PI) r -= PI2;
-			else if (r < -PI) r += PI2;
+			else if (r < -PI)
+				r += PI2;
 			b = bone->b, d = bone->d;
 			r = ATAN2(d, b) + (r - PI / 2 + offsetShearY) * mixShearY;
 			s = SQRT(b * b + d * d);
@@ -178,7 +182,7 @@ void _spTransformConstraint_applyRelativeWorld(spTransformConstraint *self) {
 
 void _spTransformConstraint_applyAbsoluteLocal(spTransformConstraint *self) {
 	float mixRotate = self->mixRotate, mixX = self->mixX, mixY = self->mixY, mixScaleX = self->mixScaleX,
-			mixScaleY = self->mixScaleY, mixShearY = self->mixShearY;
+		  mixScaleY = self->mixScaleY, mixShearY = self->mixShearY;
 	spBone *target = self->target;
 	int i;
 	float rotation, r, x, y, scaleX, scaleY, shearY;
@@ -216,7 +220,7 @@ void _spTransformConstraint_applyAbsoluteLocal(spTransformConstraint *self) {
 
 void _spTransformConstraint_applyRelativeLocal(spTransformConstraint *self) {
 	float mixRotate = self->mixRotate, mixX = self->mixX, mixY = self->mixY, mixScaleX = self->mixScaleX,
-			mixScaleY = self->mixScaleY, mixShearY = self->mixShearY;
+		  mixScaleY = self->mixScaleY, mixShearY = self->mixShearY;
 	spBone *target = self->target;
 	int i;
 	float rotation, x, y, scaleX, scaleY, shearY;

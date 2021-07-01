@@ -37,24 +37,24 @@ using namespace spine;
 // of a bone based on the touch position, which in
 // turn will make an IK chain follow that bone
 // smoothly.
-Scene* IKExample::scene () {
-    Scene *scene = Scene::create();
-    scene->addChild(IKExample::create());
-    return scene;
+Scene *IKExample::scene() {
+	Scene *scene = Scene::create();
+	scene->addChild(IKExample::create());
+	return scene;
 }
 
-bool IKExample::init () {
-    if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
-	
+bool IKExample::init() {
+	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
+
 	// Load the Spineboy skeleton and create a SkeletonAnimation node from it
 	// centered on the screen.
-    skeletonNode = SkeletonAnimation::createWithJsonFile("spineboy-pro.json", "spineboy.atlas", 0.6f);
-    skeletonNode->setPosition(Vec2(_contentSize.width / 2, 20));
-    addChild(skeletonNode);
-    
+	skeletonNode = SkeletonAnimation::createWithJsonFile("spineboy-pro.json", "spineboy.atlas", 0.6f);
+	skeletonNode->setPosition(Vec2(_contentSize.width / 2, 20));
+	addChild(skeletonNode);
+
 	// Queue the "walk" animation on the first track.
 	skeletonNode->setAnimation(0, "walk", true);
-	
+
 	// Queue the "aim" animation on a higher track.
 	// It consists of a single frame that positions
 	// the back arm and gun such that they point at
@@ -69,15 +69,15 @@ bool IKExample::init () {
 	// Next we setup a listener that receives and stores
 	// the current mouse location. The location is converted
 	// to the skeleton's coordinate system.
-	EventListenerMouse* mouseListener = EventListenerMouse::create();
-	mouseListener->onMouseMove = [this] (cocos2d::Event* event) -> void {
+	EventListenerMouse *mouseListener = EventListenerMouse::create();
+	mouseListener->onMouseMove = [this](cocos2d::Event *event) -> void {
 		// convert the mosue location to the skeleton's coordinate space
 		// and store it.
-		EventMouse* mouseEvent = dynamic_cast<EventMouse*>(event);
+		EventMouse *mouseEvent = dynamic_cast<EventMouse *>(event);
 		position = skeletonNode->convertToNodeSpace(mouseEvent->getLocationInView());
 	};
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(mouseListener, this);
-	
+
 	// Position the "crosshair" bone at the mouse
 	// location.
 	//
@@ -91,30 +91,29 @@ bool IKExample::init () {
 	// converted mouse location, we call updateWorldTransforms()
 	// again so the change of the IK target position is
 	// applied to the rest of the skeleton.
-	skeletonNode->setPostUpdateWorldTransformsListener([this] (SkeletonAnimation* node) -> void {
-		Bone* crosshair = node->findBone("crosshair"); // The bone should be cached
+	skeletonNode->setPostUpdateWorldTransformsListener([this](SkeletonAnimation *node) -> void {
+		Bone *crosshair = node->findBone("crosshair");// The bone should be cached
 		float localX = 0, localY = 0;
 		crosshair->getParent()->worldToLocal(position.x, position.y, localX, localY);
 		crosshair->setX(localX);
 		crosshair->setY(localY);
 		crosshair->setAppliedValid(false);
-		
+
 		node->getSkeleton()->updateWorldTransform();
 	});
-	
-	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
-        Director::getInstance()->replaceScene(SpineboyExample::scene());
-        return true;
-    };
-	
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
-	
-    scheduleUpdate();
 
-    return true;
+	EventListenerTouchOneByOne *listener = EventListenerTouchOneByOne::create();
+	listener->onTouchBegan = [this](Touch *touch, cocos2d::Event *event) -> bool {
+		Director::getInstance()->replaceScene(SpineboyExample::scene());
+		return true;
+	};
+
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+
+	scheduleUpdate();
+
+	return true;
 }
 
-void IKExample::update (float deltaTime) {
-    
+void IKExample::update(float deltaTime) {
 }

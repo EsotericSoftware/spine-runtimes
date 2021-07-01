@@ -33,14 +33,14 @@
 
 #include <spine/Timeline.h>
 
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
 
 namespace spine {
 	RTTI_IMPL_NOPARENT(Timeline)
 
 	Timeline::Timeline(size_t frameCount, size_t frameEntries)
-			: _propertyIds(), _frames(), _frameEntries(frameEntries) {
+		: _propertyIds(), _frames(), _frameEntries(frameEntries) {
 		_frames.setSize(frameCount * frameEntries, 0);
 	}
 
@@ -75,4 +75,4 @@ namespace spine {
 		return _frames[_frames.size() - getFrameEntries()];
 	}
 
-}
+}// namespace spine

@@ -33,15 +33,15 @@
 
 #include <spine/EventTimeline.h>
 
-#include <spine/Skeleton.h>
 #include <spine/Event.h>
+#include <spine/Skeleton.h>
 
 #include <spine/Animation.h>
+#include <spine/ContainerUtil.h>
+#include <spine/EventData.h>
 #include <spine/Property.h>
 #include <spine/Slot.h>
 #include <spine/SlotData.h>
-#include <spine/EventData.h>
-#include <spine/ContainerUtil.h>
 
 #include <float.h>
 
@@ -60,8 +60,7 @@ EventTimeline::~EventTimeline() {
 }
 
 void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector<Event *> *pEvents, float alpha,
-						  MixBlend blend, MixDirection direction
-) {
+						  MixBlend blend, MixDirection direction) {
 	if (pEvents == NULL) return;
 
 	Vector<Event *> &events = *pEvents;
@@ -77,7 +76,7 @@ void EventTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 		return;
 	}
 
-	if (time < _frames[0]) return; // Time is before first i.
+	if (time < _frames[0]) return;// Time is before first i.
 
 	int i;
 	if (lastTime < _frames[0]) {

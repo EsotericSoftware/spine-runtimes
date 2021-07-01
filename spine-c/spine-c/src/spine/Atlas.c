@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Atlas.h>
 #include <ctype.h>
+#include <spine/Atlas.h>
 #include <spine/extension.h>
 
 spKeyValueArray *spKeyValueArray_create(int initialCapacity) {
@@ -56,7 +56,7 @@ spKeyValueArray *spKeyValueArray_setSize(spKeyValueArray *self, int newSize) {
 }
 
 void spKeyValueArray_ensureCapacity(spKeyValueArray *self, int newCapacity) {
-	if (self->capacity >= newCapacity)return;
+	if (self->capacity >= newCapacity) return;
 	self->capacity = newCapacity;
 	self->items = ((spKeyValue *) _spRealloc(self->items, sizeof(spKeyValue) * (self->capacity)));
 }
@@ -82,7 +82,9 @@ void spKeyValueArray_addAllValues(spKeyValueArray *self, spKeyValue *values, int
 int spKeyValueArray_contains(spKeyValueArray *self, spKeyValue value) {
 	spKeyValue *items = self->items;
 	int i, n;
-	for (i = 0, n = self->size; i < n; i++) { if (!strcmp(items[i].name, value.name))return -1; }
+	for (i = 0, n = self->size; i < n; i++) {
+		if (!strcmp(items[i].name, value.name)) return -1;
+	}
 	return 0;
 }
 
@@ -95,7 +97,7 @@ spKeyValue spKeyValueArray_peek(spKeyValueArray *self) { return self->items[self
 
 spAtlasPage *spAtlasPage_create(spAtlas *atlas, const char *name) {
 	spAtlasPage *self = NEW(spAtlasPage);
-	CONST_CAST(spAtlas*, self->atlas) = atlas;
+	CONST_CAST(spAtlas *, self->atlas) = atlas;
 	MALLOC_STR(self->name, name);
 	return self;
 }

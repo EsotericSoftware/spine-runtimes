@@ -37,13 +37,13 @@ using namespace spine;
 
 Cocos2dTextureLoader textureLoader;
 
-Scene* BatchingExample::scene () {
+Scene *BatchingExample::scene() {
 	Scene *scene = Scene::create();
 	scene->addChild(BatchingExample::create());
 	return scene;
 }
 
-bool BatchingExample::init () {
+bool BatchingExample::init() {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
 	// Load the texture atlas. Note that the texture loader has to live
@@ -56,8 +56,8 @@ bool BatchingExample::init () {
 	_attachmentLoader = new (__FILE__, __LINE__) Cocos2dAtlasAttachmentLoader(_atlas);
 
 	// Load the skeleton data.
-	SkeletonJson* json = new (__FILE__, __LINE__) SkeletonJson(_attachmentLoader);
-	json->setScale(0.6f); // Resizes skeleton data to 60% of the size it was in Spine.
+	SkeletonJson *json = new (__FILE__, __LINE__) SkeletonJson(_attachmentLoader);
+	json->setScale(0.6f);// Resizes skeleton data to 60% of the size it was in Spine.
 	_skeletonData = json->readSkeletonDataFile("spineboy-pro.json");
 	CCASSERT(_skeletonData, json->getError().isEmpty() ? json->getError().buffer() : "Error reading skeleton data file.");
 	delete json;
@@ -71,7 +71,7 @@ bool BatchingExample::init () {
 	int yMin = 0, yMax = _contentSize.height * 0.7f;
 	for (int i = 0; i < NUM_SKELETONS; i++) {
 		// Each skeleton node shares the same atlas, skeleton data, and mix times.
-		SkeletonAnimation* skeletonNode = SkeletonAnimation::createWithData(_skeletonData, false);
+		SkeletonAnimation *skeletonNode = SkeletonAnimation::createWithData(_skeletonData, false);
 		skeletonNode->setAnimationStateData(_stateData);
 
 		skeletonNode->setAnimation(0, "walk", true);
@@ -81,21 +81,20 @@ bool BatchingExample::init () {
 		// alternative setting two color tint for groups of 10 skeletons
 		// should end up with #skeletons / 10 batches
 		// if (j++ < 10)
-//			skeletonNode->setTwoColorTint(true);
-//		if (j == 20) j = 0;
+		//			skeletonNode->setTwoColorTint(true);
+		//		if (j == 20) j = 0;
 		// skeletonNode->setTwoColorTint(true);
 
 		skeletonNode->setPosition(Vec2(
-			RandomHelper::random_int(xMin, xMax),
-			RandomHelper::random_int(yMin, yMax)
-		));
+				RandomHelper::random_int(xMin, xMax),
+				RandomHelper::random_int(yMin, yMax)));
 		addChild(skeletonNode);
 	}
 
 	scheduleUpdate();
 
-	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
+	EventListenerTouchOneByOne *listener = EventListenerTouchOneByOne::create();
+	listener->onTouchBegan = [this](Touch *touch, cocos2d::Event *event) -> bool {
 		Director::getInstance()->replaceScene(IKExample::scene());
 		return true;
 	};
@@ -104,7 +103,7 @@ bool BatchingExample::init () {
 	return true;
 }
 
-BatchingExample::~BatchingExample () {
+BatchingExample::~BatchingExample() {
 	// SkeletonAnimation instances are cocos2d-x nodes and are disposed of automatically as normal, but the data created
 	// manually to be shared across multiple SkeletonAnimations needs to be disposed of manually.
 

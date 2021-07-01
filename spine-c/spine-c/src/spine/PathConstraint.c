@@ -39,9 +39,9 @@
 spPathConstraint *spPathConstraint_create(spPathConstraintData *data, const spSkeleton *skeleton) {
 	int i;
 	spPathConstraint *self = NEW(spPathConstraint);
-	CONST_CAST(spPathConstraintData*, self->data) = data;
+	CONST_CAST(spPathConstraintData *, self->data) = data;
 	self->bonesCount = data->bonesCount;
-	CONST_CAST(spBone**, self->bones) = MALLOC(spBone*, self->bonesCount);
+	CONST_CAST(spBone **, self->bones) = MALLOC(spBone *, self->bonesCount);
 	for (i = 0; i < self->bonesCount; ++i)
 		self->bones[i] = spSkeleton_findBone(skeleton, self->data->bones[i]->name);
 	self->target = spSkeleton_findSlot(skeleton, self->data->target->name);
@@ -79,7 +79,7 @@ void spPathConstraint_update(spPathConstraint *self) {
 	float *spaces, *lengths, *positions;
 	float spacing;
 	float boneX, boneY, offsetRotation;
-	int/*bool*/tip;
+	int /*bool*/ tip;
 	float mixRotate = self->mixRotate, mixX = self->mixX, mixY = self->mixY;
 	int lengthSpacing;
 	spPathAttachment *attachment = (spPathAttachment *) self->target->attachment;
@@ -241,7 +241,7 @@ static void _addAfterPosition(float p, float *temp, int i, float *out, int o) {
 
 static void
 _addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2,
-				  float *out, int o, int/*bool*/tangents) {
+				  float *out, int o, int /*bool*/ tangents) {
 	float tt, ttt, u, uu, uuu;
 	float ut, ut3, uut3, utt3;
 	float x, y;
@@ -265,8 +265,8 @@ _addCurvePosition(float p, float x1, float y1, float cx1, float cy1, float cx2, 
 }
 
 float *spPathConstraint_computeWorldPositions(spPathConstraint *self, spPathAttachment *path, int spacesCount,
-											  int/*bool*/ tangents) {
-	int i, o, w, curve, segment, /*bool*/closed, verticesLength, curveCount, prevCurve;
+											  int /*bool*/ tangents) {
+	int i, o, w, curve, segment, /*bool*/ closed, verticesLength, curveCount, prevCurve;
 	float *out, *curves, *segments;
 	float tmpx, tmpy, dddfx, dddfy, ddfx, ddfy, dfx, dfy, pathLength, curveLength, p;
 	float x1, y1, cx1, cy1, cx2, cy2, x2, y2, multiplier;

@@ -28,8 +28,7 @@
 
 
 @interface RootViewController : UIViewController {
-
 }
-- (BOOL) prefersStatusBarHidden;
+- (BOOL)prefersStatusBarHidden;
 
 @end

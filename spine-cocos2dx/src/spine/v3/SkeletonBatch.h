@@ -40,28 +40,28 @@ namespace spine {
 
 	class SkeletonBatch {
 	public:
-		static SkeletonBatch* getInstance ();
+		static SkeletonBatch *getInstance();
 
-		static void destroyInstance ();
+		static void destroyInstance();
 
-		void update (float delta);
+		void update(float delta);
 
-		cocos2d::V3F_C4B_T2F* allocateVertices(uint32_t numVertices);
+		cocos2d::V3F_C4B_T2F *allocateVertices(uint32_t numVertices);
 		void deallocateVertices(uint32_t numVertices);
-		unsigned short* allocateIndices(uint32_t numIndices);
+		unsigned short *allocateIndices(uint32_t numIndices);
 		void deallocateIndices(uint32_t numVertices);
-		cocos2d::TrianglesCommand* addCommand(cocos2d::Renderer* renderer, float globalOrder, cocos2d::Texture2D* texture, cocos2d::GLProgramState* glProgramState, cocos2d::BlendFunc blendType, const cocos2d::TrianglesCommand::Triangles& triangles, const cocos2d::Mat4& mv, uint32_t flags);
+		cocos2d::TrianglesCommand *addCommand(cocos2d::Renderer *renderer, float globalOrder, cocos2d::Texture2D *texture, cocos2d::GLProgramState *glProgramState, cocos2d::BlendFunc blendType, const cocos2d::TrianglesCommand::Triangles &triangles, const cocos2d::Mat4 &mv, uint32_t flags);
 
 	protected:
-		SkeletonBatch ();
-		virtual ~SkeletonBatch ();
+		SkeletonBatch();
+		virtual ~SkeletonBatch();
 
-		void reset ();
+		void reset();
 
-		cocos2d::TrianglesCommand* nextFreeCommand ();
+		cocos2d::TrianglesCommand *nextFreeCommand();
 
 		// pool of commands
-		std::vector<cocos2d::TrianglesCommand*> _commandsPool;
+		std::vector<cocos2d::TrianglesCommand *> _commandsPool;
 		uint32_t _nextFreeCommand;
 
 		// pool of vertices
@@ -72,8 +72,8 @@ namespace spine {
 		Vector<unsigned short> _indices;
 	};
 
-}
+}// namespace spine
 
 #endif
 
-#endif // SPINE_SKELETONBATCH_H_
+#endif// SPINE_SKELETONBATCH_H_

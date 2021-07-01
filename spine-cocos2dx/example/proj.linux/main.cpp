@@ -1,15 +1,14 @@
 #include "../Classes/AppDelegate.h"
 
-#include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
+#include <stdlib.h>
 #include <string>
+#include <unistd.h>
 
 USING_NS_CC;
 
-int main(int argc, char **argv)
-{
-    // create the application instance
-    AppDelegate app;
-    return Application::getInstance()->run();
+int main(int argc, char **argv) {
+	// create the application instance
+	AppDelegate app;
+	return Application::getInstance()->run();
 }

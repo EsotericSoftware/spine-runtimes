@@ -33,55 +33,56 @@
 
 #include <spine/SkeletonBinary.h>
 
-#include <spine/SkeletonData.h>
+#include <spine/Animation.h>
 #include <spine/Atlas.h>
 #include <spine/AtlasAttachmentLoader.h>
-#include <spine/LinkedMesh.h>
-#include <spine/Skin.h>
 #include <spine/Attachment.h>
-#include <spine/VertexAttachment.h>
-#include <spine/Animation.h>
 #include <spine/CurveTimeline.h>
+#include <spine/LinkedMesh.h>
+#include <spine/SkeletonData.h>
+#include <spine/Skin.h>
+#include <spine/VertexAttachment.h>
 
-#include <spine/ContainerUtil.h>
-#include <spine/BoneData.h>
-#include <spine/SlotData.h>
-#include <spine/IkConstraintData.h>
-#include <spine/TransformConstraintData.h>
-#include <spine/PathConstraintData.h>
-#include <spine/AttachmentType.h>
-#include <spine/RegionAttachment.h>
-#include <spine/BoundingBoxAttachment.h>
-#include <spine/MeshAttachment.h>
-#include <spine/PathAttachment.h>
-#include <spine/PointAttachment.h>
-#include <spine/ClippingAttachment.h>
-#include <spine/EventData.h>
 #include <spine/AttachmentTimeline.h>
+#include <spine/AttachmentType.h>
+#include <spine/BoneData.h>
+#include <spine/BoundingBoxAttachment.h>
+#include <spine/ClippingAttachment.h>
 #include <spine/ColorTimeline.h>
-#include <spine/RotateTimeline.h>
-#include <spine/TranslateTimeline.h>
-#include <spine/ScaleTimeline.h>
-#include <spine/ShearTimeline.h>
-#include <spine/IkConstraintTimeline.h>
-#include <spine/TransformConstraintTimeline.h>
-#include <spine/PathConstraintPositionTimeline.h>
-#include <spine/PathConstraintSpacingTimeline.h>
-#include <spine/PathConstraintMixTimeline.h>
+#include <spine/ContainerUtil.h>
 #include <spine/DeformTimeline.h>
 #include <spine/DrawOrderTimeline.h>
-#include <spine/EventTimeline.h>
 #include <spine/Event.h>
+#include <spine/EventData.h>
+#include <spine/EventTimeline.h>
+#include <spine/IkConstraintData.h>
+#include <spine/IkConstraintTimeline.h>
+#include <spine/MeshAttachment.h>
+#include <spine/PathAttachment.h>
+#include <spine/PathConstraintData.h>
+#include <spine/PathConstraintMixTimeline.h>
+#include <spine/PathConstraintPositionTimeline.h>
+#include <spine/PathConstraintSpacingTimeline.h>
+#include <spine/PointAttachment.h>
+#include <spine/RegionAttachment.h>
+#include <spine/RotateTimeline.h>
+#include <spine/ScaleTimeline.h>
+#include <spine/ShearTimeline.h>
+#include <spine/SlotData.h>
+#include <spine/TransformConstraintData.h>
+#include <spine/TransformConstraintTimeline.h>
+#include <spine/TranslateTimeline.h>
 
 using namespace spine;
 
 SkeletonBinary::SkeletonBinary(Atlas *atlasArray) : _attachmentLoader(
-		new(__FILE__, __LINE__) AtlasAttachmentLoader(atlasArray)), _error(), _scale(1), _ownsLoader(true) {
-
+															new (__FILE__, __LINE__) AtlasAttachmentLoader(atlasArray)),
+													_error(), _scale(1), _ownsLoader(true) {
 }
 
 SkeletonBinary::SkeletonBinary(AttachmentLoader *attachmentLoader, bool ownsLoader) : _attachmentLoader(
-		attachmentLoader), _error(),
+																							  attachmentLoader),
+																					  _error(),
 																					  _scale(1),
 																					  _ownsLoader(ownsLoader) {
 	assert(_attachmentLoader != NULL);
@@ -98,13 +99,13 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	bool nonessential;
 	SkeletonData *skeletonData;
 
-	DataInput *input = new(__FILE__, __LINE__) DataInput();
+	DataInput *input = new (__FILE__, __LINE__) DataInput();
 	input->cursor = binary;
 	input->end = binary + length;
 
 	_linkedMeshes.clear();
 
-	skeletonData = new(__FILE__, __LINE__) SkeletonData();
+	skeletonData = new (__FILE__, __LINE__) SkeletonData();
 
 	char buffer[16] = {0};
 	int lowHash = readInt(input);
@@ -142,7 +143,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	for (int i = 0; i < numBones; ++i) {
 		const char *name = readString(input);
 		BoneData *parent = i == 0 ? 0 : skeletonData->_bones[readVarint(input, true)];
-		BoneData *data = new(__FILE__, __LINE__) BoneData(i, String(name, true), parent);
+		BoneData *data = new (__FILE__, __LINE__) BoneData(i, String(name, true), parent);
 		data->_rotation = readFloat(input);
 		data->_x = readFloat(input) * _scale;
 		data->_y = readFloat(input) * _scale;
@@ -165,7 +166,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	for (int i = 0; i < slotsCount; ++i) {
 		const char *slotName = readString(input);
 		BoneData *boneData = skeletonData->_bones[readVarint(input, true)];
-		SlotData *slotData = new(__FILE__, __LINE__) SlotData(i, String(slotName, true), *boneData);
+		SlotData *slotData = new (__FILE__, __LINE__) SlotData(i, String(slotName, true), *boneData);
 
 		readColor(input, slotData->getColor());
 		unsigned char r = readByte(input);
@@ -186,7 +187,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	skeletonData->_ikConstraints.setSize(ikConstraintsCount, 0);
 	for (int i = 0; i < ikConstraintsCount; ++i) {
 		const char *name = readString(input);
-		IkConstraintData *data = new(__FILE__, __LINE__) IkConstraintData(String(name, true));
+		IkConstraintData *data = new (__FILE__, __LINE__) IkConstraintData(String(name, true));
 		data->setOrder(readVarint(input, true));
 		data->setSkinRequired(readBoolean(input));
 		int bonesCount = readVarint(input, true);
@@ -208,7 +209,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	skeletonData->_transformConstraints.setSize(transformConstraintsCount, 0);
 	for (int i = 0; i < transformConstraintsCount; ++i) {
 		const char *name = readString(input);
-		TransformConstraintData *data = new(__FILE__, __LINE__) TransformConstraintData(String(name, true));
+		TransformConstraintData *data = new (__FILE__, __LINE__) TransformConstraintData(String(name, true));
 		data->setOrder(readVarint(input, true));
 		data->setSkinRequired(readBoolean(input));
 		int bonesCount = readVarint(input, true);
@@ -238,7 +239,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	skeletonData->_pathConstraints.setSize(pathConstraintsCount, 0);
 	for (int i = 0; i < pathConstraintsCount; ++i) {
 		const char *name = readString(input);
-		PathConstraintData *data = new(__FILE__, __LINE__) PathConstraintData(String(name, true));
+		PathConstraintData *data = new (__FILE__, __LINE__) PathConstraintData(String(name, true));
 		data->setOrder(readVarint(input, true));
 		data->setSkinRequired(readBoolean(input));
 		int bonesCount = readVarint(input, true);
@@ -283,8 +284,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	/* Linked meshes. */
 	for (int i = 0, n = _linkedMeshes.size(); i < n; ++i) {
 		LinkedMesh *linkedMesh = _linkedMeshes[i];
-		Skin *skin = linkedMesh->_skin.length() == 0 ? skeletonData->getDefaultSkin() : skeletonData->findSkin(
-				linkedMesh->_skin);
+		Skin *skin = linkedMesh->_skin.length() == 0 ? skeletonData->getDefaultSkin() : skeletonData->findSkin(linkedMesh->_skin);
 		if (skin == NULL) {
 			delete input;
 			delete skeletonData;
@@ -312,7 +312,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	skeletonData->_events.setSize(eventsCount, 0);
 	for (int i = 0; i < eventsCount; ++i) {
 		const char *name = readStringRef(input, skeletonData);
-		EventData *eventData = new(__FILE__, __LINE__) EventData(String(name));
+		EventData *eventData = new (__FILE__, __LINE__) EventData(String(name));
 		eventData->_intValue = readVarint(input, false);
 		eventData->_floatValue = readFloat(input);
 		eventData->_stringValue.own(readString(input));
@@ -445,9 +445,9 @@ Skin *SkeletonBinary::readSkin(DataInput *input, bool defaultSkin, SkeletonData 
 	if (defaultSkin) {
 		slotCount = readVarint(input, true);
 		if (slotCount == 0) return NULL;
-		skin = new(__FILE__, __LINE__) Skin("default");
+		skin = new (__FILE__, __LINE__) Skin("default");
 	} else {
-		skin = new(__FILE__, __LINE__) Skin(readStringRef(input, skeletonData));
+		skin = new (__FILE__, __LINE__) Skin(readStringRef(input, skeletonData));
 		for (int i = 0, n = readVarint(input, true); i < n; i++)
 			skin->getBones().add(skeletonData->_bones[readVarint(input, true)]);
 
@@ -479,8 +479,7 @@ Skin *SkeletonBinary::readSkin(DataInput *input, bool defaultSkin, SkeletonData 
 }
 
 Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slotIndex, const String &attachmentName,
-										   SkeletonData *skeletonData, bool nonessential
-) {
+										   SkeletonData *skeletonData, bool nonessential) {
 	String name(readStringRef(input, skeletonData));
 	if (name.isEmpty()) name = attachmentName;
 
@@ -570,8 +569,8 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 				mesh->_height = readFloat(input) * _scale;
 			}
 
-			LinkedMesh *linkedMesh = new(__FILE__, __LINE__) LinkedMesh(mesh, String(skinName), slotIndex,
-																		String(parent), inheritDeform);
+			LinkedMesh *linkedMesh = new (__FILE__, __LINE__) LinkedMesh(mesh, String(skinName), slotIndex,
+																		 String(parent), inheritDeform);
 			_linkedMeshes.add(linkedMesh);
 			return mesh;
 		}
@@ -755,7 +754,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 			int frameLast = frameCount - 1;
 			switch (timelineType) {
 				case SLOT_ATTACHMENT: {
-					AttachmentTimeline *timeline = new(__FILE__, __LINE__) AttachmentTimeline(frameCount, slotIndex);
+					AttachmentTimeline *timeline = new (__FILE__, __LINE__) AttachmentTimeline(frameCount, slotIndex);
 					for (int frame = 0; frame < frameCount; ++frame) {
 						float time = readFloat(input);
 						String attachmentName(readStringRef(input, skeletonData));
@@ -766,7 +765,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 				}
 				case SLOT_RGBA: {
 					int bezierCount = readVarint(input, true);
-					RGBATimeline *timeline = new(__FILE__, __LINE__) RGBATimeline(frameCount, bezierCount, slotIndex);
+					RGBATimeline *timeline = new (__FILE__, __LINE__) RGBATimeline(frameCount, bezierCount, slotIndex);
 
 					float time = readFloat(input);
 					float r = readByte(input) / 255.0;
@@ -805,7 +804,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 				}
 				case SLOT_RGB: {
 					int bezierCount = readVarint(input, true);
-					RGBTimeline *timeline = new(__FILE__, __LINE__) RGBTimeline(frameCount, bezierCount, slotIndex);
+					RGBTimeline *timeline = new (__FILE__, __LINE__) RGBTimeline(frameCount, bezierCount, slotIndex);
 
 					float time = readFloat(input);
 					float r = readByte(input) / 255.0;
@@ -840,7 +839,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 				}
 				case SLOT_RGBA2: {
 					int bezierCount = readVarint(input, true);
-					RGBA2Timeline *timeline = new(__FILE__, __LINE__) RGBA2Timeline(frameCount, bezierCount, slotIndex);
+					RGBA2Timeline *timeline = new (__FILE__, __LINE__) RGBA2Timeline(frameCount, bezierCount, slotIndex);
 
 					float time = readFloat(input);
 					float r = readByte(input) / 255.0;
@@ -890,7 +889,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 				}
 				case SLOT_RGB2: {
 					int bezierCount = readVarint(input, true);
-					RGB2Timeline *timeline = new(__FILE__, __LINE__) RGB2Timeline(frameCount, bezierCount, slotIndex);
+					RGB2Timeline *timeline = new (__FILE__, __LINE__) RGB2Timeline(frameCount, bezierCount, slotIndex);
 
 					float time = readFloat(input);
 					float r = readByte(input) / 255.0;
@@ -936,7 +935,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 				}
 				case SLOT_ALPHA: {
 					int bezierCount = readVarint(input, true);
-					AlphaTimeline *timeline = new(__FILE__, __LINE__) AlphaTimeline(frameCount, bezierCount, slotIndex);
+					AlphaTimeline *timeline = new (__FILE__, __LINE__) AlphaTimeline(frameCount, bezierCount, slotIndex);
 					float time = readFloat(input);
 					float a = readByte(input) / 255.0;
 					for (int frame = 0, bezier = 0;; frame++) {
@@ -977,49 +976,46 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 			switch (timelineType) {
 				case BONE_ROTATE:
 					timeline = readTimeline(input,
-											new(__FILE__, __LINE__) RotateTimeline(frameCount, bezierCount, boneIndex),
+											new (__FILE__, __LINE__) RotateTimeline(frameCount, bezierCount, boneIndex),
 											1);
 					break;
 				case BONE_TRANSLATE:
-					timeline = readTimeline2(input, new(__FILE__, __LINE__) TranslateTimeline(frameCount, bezierCount,
-																							  boneIndex), scale);
+					timeline = readTimeline2(input, new (__FILE__, __LINE__) TranslateTimeline(frameCount, bezierCount, boneIndex), scale);
 					break;
 				case BONE_TRANSLATEX:
-					timeline = readTimeline(input, new(__FILE__, __LINE__) TranslateXTimeline(frameCount, bezierCount,
-																							  boneIndex), scale);
+					timeline = readTimeline(input, new (__FILE__, __LINE__) TranslateXTimeline(frameCount, bezierCount, boneIndex), scale);
 					break;
 				case BONE_TRANSLATEY:
-					timeline = readTimeline(input, new(__FILE__, __LINE__) TranslateYTimeline(frameCount, bezierCount,
-																							  boneIndex), scale);
+					timeline = readTimeline(input, new (__FILE__, __LINE__) TranslateYTimeline(frameCount, bezierCount, boneIndex), scale);
 					break;
 				case BONE_SCALE:
 					timeline = readTimeline2(input,
-											 new(__FILE__, __LINE__) ScaleTimeline(frameCount, bezierCount, boneIndex),
+											 new (__FILE__, __LINE__) ScaleTimeline(frameCount, bezierCount, boneIndex),
 											 1);
 					break;
 				case BONE_SCALEX:
 					timeline = readTimeline(input,
-											new(__FILE__, __LINE__) ScaleXTimeline(frameCount, bezierCount, boneIndex),
+											new (__FILE__, __LINE__) ScaleXTimeline(frameCount, bezierCount, boneIndex),
 											1);
 					break;
 				case BONE_SCALEY:
 					timeline = readTimeline(input,
-											new(__FILE__, __LINE__) ScaleYTimeline(frameCount, bezierCount, boneIndex),
+											new (__FILE__, __LINE__) ScaleYTimeline(frameCount, bezierCount, boneIndex),
 											1);
 					break;
 				case BONE_SHEAR:
 					timeline = readTimeline2(input,
-											 new(__FILE__, __LINE__) ShearTimeline(frameCount, bezierCount, boneIndex),
+											 new (__FILE__, __LINE__) ShearTimeline(frameCount, bezierCount, boneIndex),
 											 1);
 					break;
 				case BONE_SHEARX:
 					timeline = readTimeline(input,
-											new(__FILE__, __LINE__) ShearXTimeline(frameCount, bezierCount, boneIndex),
+											new (__FILE__, __LINE__) ShearXTimeline(frameCount, bezierCount, boneIndex),
 											1);
 					break;
 				case BONE_SHEARY:
 					timeline = readTimeline(input,
-											new(__FILE__, __LINE__) ShearYTimeline(frameCount, bezierCount, boneIndex),
+											new (__FILE__, __LINE__) ShearYTimeline(frameCount, bezierCount, boneIndex),
 											1);
 					break;
 				default: {
@@ -1038,7 +1034,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 		int frameCount = readVarint(input, true);
 		int frameLast = frameCount - 1;
 		int bezierCount = readVarint(input, true);
-		IkConstraintTimeline *timeline = new(__FILE__, __LINE__) IkConstraintTimeline(frameCount, bezierCount, index);
+		IkConstraintTimeline *timeline = new (__FILE__, __LINE__) IkConstraintTimeline(frameCount, bezierCount, index);
 		float time = readFloat(input);
 		float mix = readFloat(input);
 		float softness = readFloat(input) * scale;
@@ -1135,7 +1131,9 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 																				bezierCount,
 																				index),
 											  data->_spacingMode == SpacingMode_Length ||
-											  data->_spacingMode == SpacingMode_Fixed ? scale : 1));
+															  data->_spacingMode == SpacingMode_Fixed
+													  ? scale
+													  : 1));
 					break;
 				}
 				case PATH_MIX:
@@ -1159,7 +1157,6 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 								setBezier(input, timeline, bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
 								setBezier(input, timeline, bezier++, frame, 1, time, time2, mixX, mixX2, 1);
 								setBezier(input, timeline, bezier++, frame, 2, time, time2, mixY, mixY2, 1);
-
 						}
 						time = time2;
 						mixRotate = mixRotate2;
@@ -1195,8 +1192,8 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 				int frameCount = readVarint(input, true);
 				int frameLast = frameCount - 1;
 				int bezierCount = readVarint(input, true);
-				DeformTimeline *timeline = new(__FILE__, __LINE__) DeformTimeline(frameCount, bezierCount, slotIndex,
-																				  attachment);
+				DeformTimeline *timeline = new (__FILE__, __LINE__) DeformTimeline(frameCount, bezierCount, slotIndex,
+																				   attachment);
 
 				float time = readFloat(input);
 				for (int frame = 0, bezier = 0;; ++frame) {
@@ -1249,7 +1246,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 	// Draw order timeline.
 	size_t drawOrderCount = (size_t) readVarint(input, true);
 	if (drawOrderCount > 0) {
-		DrawOrderTimeline *timeline = new(__FILE__, __LINE__) DrawOrderTimeline(drawOrderCount);
+		DrawOrderTimeline *timeline = new (__FILE__, __LINE__) DrawOrderTimeline(drawOrderCount);
 
 		size_t slotCount = skeletonData->_slots.size();
 		for (size_t i = 0; i < drawOrderCount; ++i) {
@@ -1290,12 +1287,12 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 	// Event timeline.
 	int eventCount = readVarint(input, true);
 	if (eventCount > 0) {
-		EventTimeline *timeline = new(__FILE__, __LINE__) EventTimeline(eventCount);
+		EventTimeline *timeline = new (__FILE__, __LINE__) EventTimeline(eventCount);
 
 		for (int i = 0; i < eventCount; ++i) {
 			float time = readFloat(input);
 			EventData *eventData = skeletonData->_events[readVarint(input, true)];
-			Event *event = new(__FILE__, __LINE__) Event(time, *eventData);
+			Event *event = new (__FILE__, __LINE__) Event(time, *eventData);
 
 			event->_intValue = readVarint(input, false);
 			event->_floatValue = readFloat(input);
@@ -1317,5 +1314,5 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 	for (int i = 0, n = timelines.size(); i < n; i++) {
 		duration = MathUtil::max(duration, (timelines[i])->getDuration());
 	}
-	return new(__FILE__, __LINE__) Animation(String(name), timelines, duration);
+	return new (__FILE__, __LINE__) Animation(String(name), timelines, duration);
 }

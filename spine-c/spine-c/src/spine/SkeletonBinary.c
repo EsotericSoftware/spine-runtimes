@@ -27,12 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/SkeletonBinary.h>
-#include <stdio.h>
-#include <spine/extension.h>
-#include <spine/AtlasAttachmentLoader.h>
 #include <spine/Animation.h>
 #include <spine/Array.h>
+#include <spine/AtlasAttachmentLoader.h>
+#include <spine/SkeletonBinary.h>
+#include <spine/extension.h>
+#include <stdio.h>
 
 typedef struct {
 	const unsigned char *cursor;
@@ -111,7 +111,7 @@ static int readInt(_dataInput *input) {
 	return result;
 }
 
-static int readVarint(_dataInput *input, int/*bool*/optimizePositive) {
+static int readVarint(_dataInput *input, int /*bool*/ optimizePositive) {
 	unsigned char b = readByte(input);
 	int value = b & 0x7F;
 	if (b & 0x80) {
@@ -694,8 +694,7 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 			int bezierCount = readVarint(input, 1);
 			switch (type) {
 				case PATH_POSITION: {
-					spTimelineArray_add(timelines, readTimeline(input, SUPER(spPathConstraintPositionTimeline_create(
-							frameCount, bezierCount, index)),
+					spTimelineArray_add(timelines, readTimeline(input, SUPER(spPathConstraintPositionTimeline_create(frameCount, bezierCount, index)),
 																data->positionMode == SP_POSITION_MODE_FIXED ? scale
 																											 : 1));
 					break;
@@ -706,8 +705,9 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 																											 bezierCount,
 																											 index)),
 																data->spacingMode == SP_SPACING_MODE_LENGTH ||
-																data->spacingMode == SP_SPACING_MODE_FIXED ? scale
-																										   : 1));
+																				data->spacingMode == SP_SPACING_MODE_FIXED
+																		? scale
+																		: 1));
 					break;
 				}
 				case PATH_MIX: {
@@ -738,7 +738,6 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 										  1);
 								setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 2, time, time2, mixY, mixY2,
 										  1);
-
 						}
 						time = time2;
 						mixRotate = mixRotate2;
@@ -964,7 +963,7 @@ static void _readVertices(spSkeletonBinary *self, _dataInput *input, spVertexAtt
 
 spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput *input,
 											  spSkin *skin, int slotIndex, const char *attachmentName,
-											  spSkeletonData *skeletonData, int/*bool*/ nonessential) {
+											  spSkeletonData *skeletonData, int /*bool*/ nonessential) {
 	int i;
 	spAttachmentType type;
 	const char *name = readStringRef(input, skeletonData);
@@ -1119,8 +1118,8 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 	return 0;
 }
 
-spSkin *spSkeletonBinary_readSkin(spSkeletonBinary *self, _dataInput *input, int/*bool*/ defaultSkin,
-								  spSkeletonData *skeletonData, int/*bool*/ nonessential) {
+spSkin *spSkeletonBinary_readSkin(spSkeletonBinary *self, _dataInput *input, int /*bool*/ defaultSkin,
+								  spSkeletonData *skeletonData, int /*bool*/ nonessential) {
 	spSkin *skin;
 	int i, n, ii, nn, slotCount;
 
@@ -1184,7 +1183,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	input->end = binary + length;
 
 	FREE(self->error);
-	CONST_CAST(char*, self->error) = 0;
+	CONST_CAST(char *, self->error) = 0;
 	internal->linkedMeshCount = 0;
 
 	skeletonData = spSkeletonData_create();
@@ -1222,14 +1221,14 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	}
 
 	skeletonData->stringsCount = n = readVarint(input, 1);
-	skeletonData->strings = MALLOC(char*, skeletonData->stringsCount);
+	skeletonData->strings = MALLOC(char *, skeletonData->stringsCount);
 	for (i = 0; i < n; i++) {
 		skeletonData->strings[i] = readString(input);
 	}
 
 	/* Bones. */
 	skeletonData->bonesCount = readVarint(input, 1);
-	skeletonData->bones = MALLOC(spBoneData*, skeletonData->bonesCount);
+	skeletonData->bones = MALLOC(spBoneData *, skeletonData->bonesCount);
 	for (i = 0; i < skeletonData->bonesCount; ++i) {
 		spBoneData *data;
 		int mode;
@@ -1273,7 +1272,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 
 	/* Slots. */
 	skeletonData->slotsCount = readVarint(input, 1);
-	skeletonData->slots = MALLOC(spSlotData*, skeletonData->slotsCount);
+	skeletonData->slots = MALLOC(spSlotData *, skeletonData->slotsCount);
 	for (i = 0; i < skeletonData->slotsCount; ++i) {
 		int r, g, b, a;
 		const char *attachmentName;
@@ -1293,14 +1292,15 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		}
 		attachmentName = readStringRef(input, skeletonData);
 		if (attachmentName) MALLOC_STR(slotData->attachmentName, attachmentName);
-		else slotData->attachmentName = 0;
+		else
+			slotData->attachmentName = 0;
 		slotData->blendMode = (spBlendMode) readVarint(input, 1);
 		skeletonData->slots[i] = slotData;
 	}
 
 	/* IK constraints. */
 	skeletonData->ikConstraintsCount = readVarint(input, 1);
-	skeletonData->ikConstraints = MALLOC(spIkConstraintData*, skeletonData->ikConstraintsCount);
+	skeletonData->ikConstraints = MALLOC(spIkConstraintData *, skeletonData->ikConstraintsCount);
 	for (i = 0; i < skeletonData->ikConstraintsCount; ++i) {
 		const char *name = readString(input);
 		/* TODO Avoid copying of name */
@@ -1309,7 +1309,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		data->skinRequired = readBoolean(input);
 		FREE(name);
 		data->bonesCount = readVarint(input, 1);
-		data->bones = MALLOC(spBoneData*, data->bonesCount);
+		data->bones = MALLOC(spBoneData *, data->bonesCount);
 		for (ii = 0; ii < data->bonesCount; ++ii)
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->bones[readVarint(input, 1)];
@@ -1325,7 +1325,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	/* Transform constraints. */
 	skeletonData->transformConstraintsCount = readVarint(input, 1);
 	skeletonData->transformConstraints = MALLOC(
-			spTransformConstraintData*, skeletonData->transformConstraintsCount);
+			spTransformConstraintData *, skeletonData->transformConstraintsCount);
 	for (i = 0; i < skeletonData->transformConstraintsCount; ++i) {
 		const char *name = readString(input);
 		/* TODO Avoid copying of name */
@@ -1334,7 +1334,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		data->skinRequired = readBoolean(input);
 		FREE(name);
 		data->bonesCount = readVarint(input, 1);
-		CONST_CAST(spBoneData**, data->bones) = MALLOC(spBoneData*, data->bonesCount);
+		CONST_CAST(spBoneData **, data->bones) = MALLOC(spBoneData *, data->bonesCount);
 		for (ii = 0; ii < data->bonesCount; ++ii)
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->bones[readVarint(input, 1)];
@@ -1357,7 +1357,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 
 	/* Path constraints */
 	skeletonData->pathConstraintsCount = readVarint(input, 1);
-	skeletonData->pathConstraints = MALLOC(spPathConstraintData*, skeletonData->pathConstraintsCount);
+	skeletonData->pathConstraints = MALLOC(spPathConstraintData *, skeletonData->pathConstraintsCount);
 	for (i = 0; i < skeletonData->pathConstraintsCount; ++i) {
 		const char *name = readString(input);
 		/* TODO Avoid copying of name */
@@ -1366,7 +1366,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		data->skinRequired = readBoolean(input);
 		FREE(name);
 		data->bonesCount = readVarint(input, 1);
-		CONST_CAST(spBoneData**, data->bones) = MALLOC(spBoneData*, data->bonesCount);
+		CONST_CAST(spBoneData **, data->bones) = MALLOC(spBoneData *, data->bonesCount);
 		for (ii = 0; ii < data->bonesCount; ++ii)
 			data->bones[ii] = skeletonData->bones[readVarint(input, 1)];
 		data->target = skeletonData->slots[readVarint(input, 1)];
@@ -1392,7 +1392,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	if (skeletonData->defaultSkin)
 		++skeletonData->skinsCount;
 
-	skeletonData->skins = MALLOC(spSkin*, skeletonData->skinsCount);
+	skeletonData->skins = MALLOC(spSkin *, skeletonData->skinsCount);
 
 	if (skeletonData->defaultSkin)
 		skeletonData->skins[0] = skeletonData->defaultSkin;
@@ -1405,8 +1405,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	/* Linked meshes. */
 	for (i = 0; i < internal->linkedMeshCount; ++i) {
 		_spLinkedMesh *linkedMesh = internal->linkedMeshes + i;
-		spSkin *skin = !linkedMesh->skin ? skeletonData->defaultSkin : spSkeletonData_findSkin(skeletonData,
-																							   linkedMesh->skin);
+		spSkin *skin = !linkedMesh->skin ? skeletonData->defaultSkin : spSkeletonData_findSkin(skeletonData, linkedMesh->skin);
 		spAttachment *parent;
 		if (!skin) {
 			FREE(input);
@@ -1431,7 +1430,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 
 	/* Events. */
 	skeletonData->eventsCount = readVarint(input, 1);
-	skeletonData->events = MALLOC(spEventData*, skeletonData->eventsCount);
+	skeletonData->events = MALLOC(spEventData *, skeletonData->eventsCount);
 	for (i = 0; i < skeletonData->eventsCount; ++i) {
 		const char *name = readStringRef(input, skeletonData);
 		spEventData *eventData = spEventData_create(name);
@@ -1448,7 +1447,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 
 	/* Animations. */
 	skeletonData->animationsCount = readVarint(input, 1);
-	skeletonData->animations = MALLOC(spAnimation*, skeletonData->animationsCount);
+	skeletonData->animations = MALLOC(spAnimation *, skeletonData->animationsCount);
 	for (i = 0; i < skeletonData->animationsCount; ++i) {
 		const char *name = readString(input);
 		spAnimation *animation = _spSkeletonBinary_readAnimation(self, name, input, skeletonData);

@@ -28,8 +28,8 @@
  *****************************************************************************/
 
 #include <spine/AttachmentLoader.h>
-#include <stdio.h>
 #include <spine/extension.h>
+#include <stdio.h>
 
 typedef struct _spAttachmentLoaderVtable {
 	spAttachment *(*createAttachment)(spAttachmentLoader *self, spSkin *skin, spAttachmentType type, const char *name,
@@ -48,9 +48,8 @@ void _spAttachmentLoader_init(spAttachmentLoader *self,
 																spAttachmentType type, const char *name,
 																const char *path),
 							  void (*configureAttachment)(spAttachmentLoader *self, spAttachment *),
-							  void (*disposeAttachment)(spAttachmentLoader *self, spAttachment *)
-) {
-	CONST_CAST(_spAttachmentLoaderVtable*, self->vtable) = NEW(_spAttachmentLoaderVtable);
+							  void (*disposeAttachment)(spAttachmentLoader *self, spAttachment *)) {
+	CONST_CAST(_spAttachmentLoaderVtable *, self->vtable) = NEW(_spAttachmentLoaderVtable);
 	VTABLE(spAttachmentLoader, self)->dispose = dispose;
 	VTABLE(spAttachmentLoader, self)->createAttachment = createAttachment;
 	VTABLE(spAttachmentLoader, self)->configureAttachment = configureAttachment;

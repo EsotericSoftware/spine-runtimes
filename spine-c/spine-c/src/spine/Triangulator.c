@@ -77,7 +77,8 @@ void spTriangulator_dispose(spTriangulator *self) {
 
 static spFloatArray *_obtainPolygon(spTriangulator *self) {
 	if (self->polygonPool->size == 0) return spFloatArray_create(16);
-	else return spArrayFloatArray_pop(self->polygonPool);
+	else
+		return spArrayFloatArray_pop(self->polygonPool);
 }
 
 static void _freePolygon(spTriangulator *self, spFloatArray *polygon) {
@@ -93,7 +94,8 @@ static void _freeAllPolygons(spTriangulator *self, spArrayFloatArray *polygons) 
 
 static spShortArray *_obtainPolygonIndices(spTriangulator *self) {
 	if (self->polygonIndicesPool->size == 0) return spShortArray_create(16);
-	else return spArrayShortArray_pop(self->polygonIndicesPool);
+	else
+		return spArrayShortArray_pop(self->polygonIndicesPool);
 }
 
 static void _freePolygonIndices(spTriangulator *self, spShortArray *indices) {
@@ -175,7 +177,7 @@ spShortArray *spTriangulator_triangulate(spTriangulator *self, spFloatArray *ver
 				}
 				break;
 			}
-			break_outer:
+		break_outer:
 
 			if (next == 0) {
 				do {

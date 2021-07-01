@@ -27,24 +27,24 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#include <SFML/Graphics.hpp>
 #include <iostream>
-#include <spine/spine-sfml.h>
 #include <spine/Debug.h>
 #include <spine/Log.h>
-#include <SFML/Graphics.hpp>
+#include <spine/spine-sfml.h>
 
 using namespace std;
 using namespace spine;
 #include <memory>
 
 template<typename T, typename... Args>
-unique_ptr<T> make_unique_test(Args&&... args) {
+unique_ptr<T> make_unique_test(Args &&...args) {
 	return unique_ptr<T>(new T(forward<Args>(args)...));
 }
 
-void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* event) {
+void callback(AnimationState *state, EventType type, TrackEntry *entry, Event *event) {
 	SP_UNUSED(state);
-	const String& animationName = (entry && entry->getAnimation()) ? entry->getAnimation()->getName() : String("");
+	const String &animationName = (entry && entry->getAnimation()) ? entry->getAnimation()->getName() : String("");
 
 	switch (type) {
 		case EventType_Start:
@@ -70,7 +70,7 @@ void callback (AnimationState* state, EventType type, TrackEntry* entry, Event* 
 	fflush(stdout);
 }
 
-shared_ptr<SkeletonData> readSkeletonJsonData (const String& filename, Atlas* atlas, float scale) {
+shared_ptr<SkeletonData> readSkeletonJsonData(const String &filename, Atlas *atlas, float scale) {
 	SkeletonJson json(atlas);
 	json.setScale(scale);
 	auto skeletonData = json.readSkeletonDataFile(filename);
@@ -81,7 +81,7 @@ shared_ptr<SkeletonData> readSkeletonJsonData (const String& filename, Atlas* at
 	return shared_ptr<SkeletonData>(skeletonData);
 }
 
-shared_ptr<SkeletonData> readSkeletonBinaryData (const char* filename, Atlas* atlas, float scale) {
+shared_ptr<SkeletonData> readSkeletonBinaryData(const char *filename, Atlas *atlas, float scale) {
 	SkeletonBinary binary(atlas);
 	binary.setScale(scale);
 	auto skeletonData = binary.readSkeletonDataFile(filename);
@@ -92,10 +92,10 @@ shared_ptr<SkeletonData> readSkeletonBinaryData (const char* filename, Atlas* at
 	return shared_ptr<SkeletonData>(skeletonData);
 }
 
-void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
-			   const char* jsonName, const char* binaryName, const char* atlasName,
-			   float scale) {
-    SP_UNUSED(jsonName);
+void testcase(void func(SkeletonData *skeletonData, Atlas *atlas),
+			  const char *jsonName, const char *binaryName, const char *atlasName,
+			  float scale) {
+	SP_UNUSED(jsonName);
 	SFMLTextureLoader textureLoader;
 	auto atlas = make_unique_test<Atlas>(atlasName, &textureLoader);
 
@@ -106,7 +106,7 @@ void testcase (void func(SkeletonData* skeletonData, Atlas* atlas),
 	func(skeletonData.get(), atlas.get());
 }
 
-void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
+void spineboy(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
 	SkeletonBounds bounds;
@@ -120,13 +120,13 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
 
-	Skeleton* skeleton = drawable.skeleton;
+	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setToSetupPose();
 
 	skeleton->setPosition(320, 590);
 	skeleton->updateWorldTransform();
 
-	Slot* headSlot = skeleton->findSlot("head");
+	Slot *headSlot = skeleton->findSlot("head");
 
 	drawable.state->setListener(callback);
 	drawable.state->addAnimation(0, "walk", true, 0);
@@ -146,7 +146,7 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 
 		bounds.update(*skeleton, true);
 		sf::Vector2i position = sf::Mouse::getPosition(window);
-		if (bounds.containsPoint((float)position.x, (float)position.y)) {
+		if (bounds.containsPoint((float) position.x, (float) position.y)) {
 			headSlot->getColor().g = 0;
 			headSlot->getColor().b = 0;
 		} else {
@@ -162,87 +162,87 @@ void spineboy (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
-void ikDemo (SkeletonData* skeletonData, Atlas* atlas) {
-    SP_UNUSED(atlas);
+void ikDemo(SkeletonData *skeletonData, Atlas *atlas) {
+	SP_UNUSED(atlas);
 
-    SkeletonBounds bounds;
+	SkeletonBounds bounds;
 
-    // Create the SkeletonDrawable and position it
-    AnimationStateData stateData(skeletonData);
-    SkeletonDrawable drawable(skeletonData, &stateData);
-    drawable.timeScale = 1;
-    drawable.setUsePremultipliedAlpha(true);
-    drawable.skeleton->setPosition(320, 590);
+	// Create the SkeletonDrawable and position it
+	AnimationStateData stateData(skeletonData);
+	SkeletonDrawable drawable(skeletonData, &stateData);
+	drawable.timeScale = 1;
+	drawable.setUsePremultipliedAlpha(true);
+	drawable.skeleton->setPosition(320, 590);
 
-    // Queue the "walk" animation on the first track.
-    drawable.state->setAnimation(0, "walk", true);
+	// Queue the "walk" animation on the first track.
+	drawable.state->setAnimation(0, "walk", true);
 
-    // Queue the "aim" animation on a higher track.
-    // It consists of a single frame that positions
-    // the back arm and gun such that they point at
-    // the "crosshair" bone. By setting this
-    // animation on a higher track, it overrides
-    // any changes to the back arm and gun made
-    // by the walk animation, allowing us to
-    // mix the two. The mouse position following
-    // is performed in the render() method below.
-    drawable.state->setAnimation(1, "aim", true);
+	// Queue the "aim" animation on a higher track.
+	// It consists of a single frame that positions
+	// the back arm and gun such that they point at
+	// the "crosshair" bone. By setting this
+	// animation on a higher track, it overrides
+	// any changes to the back arm and gun made
+	// by the walk animation, allowing us to
+	// mix the two. The mouse position following
+	// is performed in the render() method below.
+	drawable.state->setAnimation(1, "aim", true);
 
-    sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - IK Demo");
-    window.setFramerateLimit(60);
-    sf::Event event;
-    sf::Clock deltaClock;
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - IK Demo");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
 
-    while (window.isOpen()) {
-        while (window.pollEvent(event))
-            if (event.type == sf::Event::Closed) window.close();
+	while (window.isOpen()) {
+		while (window.pollEvent(event))
+			if (event.type == sf::Event::Closed) window.close();
 
-        float delta = deltaClock.getElapsedTime().asSeconds();
-        deltaClock.restart();
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
 
-        // Update and apply the animations to the skeleton,
-        // then calculate the world transforms of every bone.
-        // This is needed so we can call Bone#worldToLocal()
-        // later.
-        drawable.update(delta);
+		// Update and apply the animations to the skeleton,
+		// then calculate the world transforms of every bone.
+		// This is needed so we can call Bone#worldToLocal()
+		// later.
+		drawable.update(delta);
 
-        // Position the "crosshair" bone at the mouse
-        // location. We do this before calling
-        // skeleton.updateWorldTransform() below, so
-        // our change is incorporated before the IK
-        // constraint is applied.
-        //
-        // When setting the crosshair bone position
-        // to the mouse position, we need to translate
-        // from "mouse space" to "local bone space". Note that the local
-        // bone space is calculated using the bone's parent
-        // worldToLocal() function!
-        sf::Vector2i mouseCoords = sf::Mouse::getPosition(window);
-        float boneCoordsX = 0, boneCoordsY = 0;
-        Bone* crosshair = drawable.skeleton->findBone("crosshair"); // Should be cached.
-        crosshair->getParent()->worldToLocal(mouseCoords.x, mouseCoords.y, boneCoordsX, boneCoordsY);
-        crosshair->setX(boneCoordsX);
-        crosshair->setY(boneCoordsY);
+		// Position the "crosshair" bone at the mouse
+		// location. We do this before calling
+		// skeleton.updateWorldTransform() below, so
+		// our change is incorporated before the IK
+		// constraint is applied.
+		//
+		// When setting the crosshair bone position
+		// to the mouse position, we need to translate
+		// from "mouse space" to "local bone space". Note that the local
+		// bone space is calculated using the bone's parent
+		// worldToLocal() function!
+		sf::Vector2i mouseCoords = sf::Mouse::getPosition(window);
+		float boneCoordsX = 0, boneCoordsY = 0;
+		Bone *crosshair = drawable.skeleton->findBone("crosshair");// Should be cached.
+		crosshair->getParent()->worldToLocal(mouseCoords.x, mouseCoords.y, boneCoordsX, boneCoordsY);
+		crosshair->setX(boneCoordsX);
+		crosshair->setY(boneCoordsY);
 
-        // Calculate final world transform with the
-        // crosshair bone set to the mouse cursor
-        // position.
-        drawable.skeleton->updateWorldTransform();
+		// Calculate final world transform with the
+		// crosshair bone set to the mouse cursor
+		// position.
+		drawable.skeleton->updateWorldTransform();
 
-        window.clear();
-        window.draw(drawable);
-        window.display();
-    }
+		window.clear();
+		window.draw(drawable);
+		window.display();
+	}
 }
 
-void goblins (SkeletonData* skeletonData, Atlas* atlas) {
+void goblins(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
 
-	Skeleton* skeleton = drawable.skeleton;
+	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setSkin("goblingirl");
 	skeleton->setSlotsToSetupPose();
 	skeleton->setPosition(320, 590);
@@ -269,7 +269,7 @@ void goblins (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
-void raptor (SkeletonData* skeletonData, Atlas* atlas) {
+void raptor(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
 	SkeletonDrawable drawable(skeletonData);
@@ -282,7 +282,7 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 	effect.setCenterY(-200);
 	drawable.vertexEffect = &effect;
 
-	Skeleton* skeleton = drawable.skeleton;
+	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(320, 590);
 	skeleton->updateWorldTransform();
 
@@ -314,14 +314,14 @@ void raptor (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
-void tank (SkeletonData* skeletonData, Atlas* atlas) {
+void tank(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
 
-	Skeleton* skeleton = drawable.skeleton;
+	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(500, 590);
 	skeleton->updateWorldTransform();
 
@@ -345,14 +345,14 @@ void tank (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
-void vine (SkeletonData* skeletonData, Atlas* atlas) {
+void vine(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
 
-	Skeleton* skeleton = drawable.skeleton;
+	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(320, 590);
 	skeleton->updateWorldTransform();
 
@@ -377,14 +377,14 @@ void vine (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
-void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
+void stretchyman(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
 
-	Skeleton* skeleton = drawable.skeleton;
+	Skeleton *skeleton = drawable.skeleton;
 
 	skeleton->setPosition(100, 590);
 	skeleton->updateWorldTransform();
@@ -410,14 +410,14 @@ void stretchyman (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
-void stretchymanStrechyIk (SkeletonData* skeletonData, Atlas* atlas) {
+void stretchymanStrechyIk(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
-	SkeletonDrawable* drawable = new SkeletonDrawable(skeletonData);
+	SkeletonDrawable *drawable = new SkeletonDrawable(skeletonData);
 	drawable->timeScale = 1;
 	drawable->setUsePremultipliedAlpha(true);
 
-	Skeleton* skeleton = drawable->skeleton;
+	Skeleton *skeleton = drawable->skeleton;
 
 	skeleton->setPosition(100, 590);
 	skeleton->updateWorldTransform();
@@ -445,14 +445,14 @@ void stretchymanStrechyIk (SkeletonData* skeletonData, Atlas* atlas) {
 	delete drawable;
 }
 
-void coin (SkeletonData* skeletonData, Atlas* atlas) {
+void coin(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
 
-	Skeleton* skeleton = drawable.skeleton;
+	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(320, 320);
 	skeleton->updateWorldTransform();
 
@@ -479,24 +479,24 @@ void coin (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
-void owl (SkeletonData* skeletonData, Atlas* atlas) {
+void owl(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
 
-	Skeleton* skeleton = drawable.skeleton;
+	Skeleton *skeleton = drawable.skeleton;
 	skeleton->setPosition(320, 400);
 	skeleton->updateWorldTransform();
 
 	drawable.state->setAnimation(0, "idle", true);
-    drawable.state->setAnimation(1, "blink", true);
+	drawable.state->setAnimation(1, "blink", true);
 
-	TrackEntry* left = drawable.state->setAnimation(2, "left", true);
-	TrackEntry* right = drawable.state->setAnimation(3, "right", true);
-	TrackEntry* up = drawable.state->setAnimation(4, "up", true);
-	TrackEntry* down = drawable.state->setAnimation(5, "down", true);
+	TrackEntry *left = drawable.state->setAnimation(2, "left", true);
+	TrackEntry *right = drawable.state->setAnimation(3, "right", true);
+	TrackEntry *up = drawable.state->setAnimation(4, "up", true);
+	TrackEntry *down = drawable.state->setAnimation(5, "down", true);
 
 	left->setAlpha(0);
 	left->setMixBlend(MixBlend_Add);
@@ -538,14 +538,14 @@ void owl (SkeletonData* skeletonData, Atlas* atlas) {
 	}
 }
 
-void mixAndMatch (SkeletonData* skeletonData, Atlas* atlas) {
+void mixAndMatch(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
 	SkeletonDrawable drawable(skeletonData);
 	drawable.timeScale = 1;
 	drawable.setUsePremultipliedAlpha(true);
 
-	Skeleton* skeleton = drawable.skeleton;
+	Skeleton *skeleton = drawable.skeleton;
 
 	Skin skin("mix-and-match");
 	skin.addSkin(skeletonData->findSkin("skin-base"));
@@ -588,7 +588,7 @@ void mixAndMatch (SkeletonData* skeletonData, Atlas* atlas) {
 /**
  * Used for debugging purposes during runtime development
  */
-void test (SkeletonData* skeletonData, Atlas* atlas) {
+void test(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
 	Skeleton skeleton(skeletonData);
@@ -607,19 +607,19 @@ void test (SkeletonData* skeletonData, Atlas* atlas) {
 
 DebugExtension dbgExtension(SpineExtension::getInstance());
 
-int main () {
+int main() {
 	SpineExtension::setInstance(&dbgExtension);
 
-    testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
+	testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
-    testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
+	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
-    testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
+	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
-    testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
+	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);
 	testcase(stretchyman, "data/stretchyman-pro.json", "data/stretchyman-pro.skel", "data/stretchyman-pma.atlas", 0.6f);
 
 	dbgExtension.reportLeaks();

@@ -38,6 +38,6 @@ _SP_ARRAY_IMPLEMENT_TYPE(spShortArray, short)
 
 _SP_ARRAY_IMPLEMENT_TYPE(spUnsignedShortArray, unsigned short)
 
-_SP_ARRAY_IMPLEMENT_TYPE(spArrayFloatArray, spFloatArray*)
+_SP_ARRAY_IMPLEMENT_TYPE(spArrayFloatArray, spFloatArray *)
 
-_SP_ARRAY_IMPLEMENT_TYPE(spArrayShortArray, spShortArray*)
+_SP_ARRAY_IMPLEMENT_TYPE(spArrayShortArray, spShortArray *)

@@ -33,43 +33,43 @@
 USING_NS_CC;
 using namespace spine;
 
-Scene* SpineboyExample::scene () {
+Scene *SpineboyExample::scene() {
 	Scene *scene = Scene::create();
 	scene->addChild(SpineboyExample::create());
 	return scene;
 }
 
-bool SpineboyExample::init () {
+bool SpineboyExample::init() {
 	if (!LayerColor::initWithColor(Color4B(128, 128, 128, 255))) return false;
 
 	skeletonNode = SkeletonAnimation::createWithJsonFile("spineboy-pro.json", "spineboy.atlas", 0.6f);
 
-    skeletonNode->setStartListener( [] (TrackEntry* entry) {
+	skeletonNode->setStartListener([](TrackEntry *entry) {
 		log("%d start: %s", entry->getTrackIndex(), entry->getAnimation()->getName().buffer());
 	});
-    skeletonNode->setInterruptListener( [] (TrackEntry* entry) {
-        log("%d interrupt", entry->getTrackIndex());
-    });
-	skeletonNode->setEndListener( [] (TrackEntry* entry) {
+	skeletonNode->setInterruptListener([](TrackEntry *entry) {
+		log("%d interrupt", entry->getTrackIndex());
+	});
+	skeletonNode->setEndListener([](TrackEntry *entry) {
 		log("%d end", entry->getTrackIndex());
 	});
-	skeletonNode->setCompleteListener( [] (TrackEntry* entry) {
+	skeletonNode->setCompleteListener([](TrackEntry *entry) {
 		log("%d complete", entry->getTrackIndex());
 	});
-    skeletonNode->setDisposeListener( [] (TrackEntry* entry) {
-        log("%d dispose", entry->getTrackIndex());
-    });
-	skeletonNode->setEventListener( [] (TrackEntry* entry, spine::Event* event) {
+	skeletonNode->setDisposeListener([](TrackEntry *entry) {
+		log("%d dispose", entry->getTrackIndex());
+	});
+	skeletonNode->setEventListener([](TrackEntry *entry, spine::Event *event) {
 		log("%d event: %s, %d, %f, %s", entry->getTrackIndex(), event->getData().getName().buffer(), event->getIntValue(), event->getFloatValue(), event->getStringValue().buffer());
 	});
 
 	skeletonNode->setMix("walk", "jump", 0.4);
 	skeletonNode->setMix("jump", "run", 0.4);
 	skeletonNode->setAnimation(0, "walk", true);
-	TrackEntry* jumpEntry = skeletonNode->addAnimation(0, "jump", false, 1);
+	TrackEntry *jumpEntry = skeletonNode->addAnimation(0, "jump", false, 1);
 	skeletonNode->addAnimation(0, "run", true);
 
-	skeletonNode->setTrackStartListener(jumpEntry, [] (TrackEntry* entry) {
+	skeletonNode->setTrackStartListener(jumpEntry, [](TrackEntry *entry) {
 		log("jumped!");
 	});
 
@@ -81,8 +81,8 @@ bool SpineboyExample::init () {
 
 	scheduleUpdate();
 
-	EventListenerTouchOneByOne* listener = EventListenerTouchOneByOne::create();
-	listener->onTouchBegan = [this] (Touch* touch, cocos2d::Event* event) -> bool {
+	EventListenerTouchOneByOne *listener = EventListenerTouchOneByOne::create();
+	listener->onTouchBegan = [this](Touch *touch, cocos2d::Event *event) -> bool {
 		if (!skeletonNode->getDebugBonesEnabled())
 			skeletonNode->setDebugBonesEnabled(true);
 		else if (skeletonNode->getTimeScale() == 1)
@@ -96,7 +96,7 @@ bool SpineboyExample::init () {
 	return true;
 }
 
-void SpineboyExample::update (float deltaTime) {
+void SpineboyExample::update(float deltaTime) {
 	// Test releasing memory.
 	// Director::getInstance()->replaceScene(SpineboyExample::scene());
 }

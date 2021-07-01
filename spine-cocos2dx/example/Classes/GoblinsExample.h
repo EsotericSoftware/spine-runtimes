@@ -35,14 +35,14 @@
 
 class GoblinsExample : public cocos2d::LayerColor {
 public:
-	static cocos2d::Scene* scene ();
+	static cocos2d::Scene *scene();
 
 	CREATE_FUNC(GoblinsExample);
 
-	virtual bool init ();
+	virtual bool init();
 
 private:
-	spine::SkeletonAnimation* skeletonNode;
+	spine::SkeletonAnimation *skeletonNode;
 };
 
-#endif // _GOBLINSEXAMPLE_H_
+#endif// _GOBLINSEXAMPLE_H_

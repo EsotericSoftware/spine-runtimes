@@ -33,9 +33,9 @@
 
 #include <spine/IkConstraint.h>
 
+#include <spine/Bone.h>
 #include <spine/IkConstraintData.h>
 #include <spine/Skeleton.h>
-#include <spine/Bone.h>
 
 #include <spine/BoneData.h>
 
@@ -43,8 +43,7 @@ using namespace spine;
 
 RTTI_IMPL(IkConstraint, Updatable)
 
-void
-IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress, bool stretch, bool uniform, float alpha) {
+void IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress, bool stretch, bool uniform, float alpha) {
 	Bone *p = bone.getParent();
 	float pa = p->_a, pb = p->_b, pc = p->_c, pd = p->_d;
 	float rotationIK = -bone._ashearX - bone._arotation;
@@ -72,7 +71,8 @@ IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress, boo
 	rotationIK += MathUtil::atan2(ty, tx) * MathUtil::Rad_Deg;
 	if (bone._ascaleX < 0) rotationIK += 180;
 	if (rotationIK > 180) rotationIK -= 360;
-	else if (rotationIK < -180) rotationIK += 360;
+	else if (rotationIK < -180)
+		rotationIK += 360;
 	float sx = bone._ascaleX;
 	float sy = bone._ascaleY;
 	if (compress || stretch) {
@@ -94,9 +94,8 @@ IkConstraint::apply(Bone &bone, float targetX, float targetY, bool compress, boo
 							  bone._ashearY);
 }
 
-void
-IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, bool uniform, float softness,
-					float alpha) {
+void IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int bendDir, bool stretch, bool uniform, float softness,
+						 float alpha) {
 	float a, b, c, d;
 	float px, py, psx, psy, sx, sy;
 	float cx, cy, csx, cwx, cwy;
@@ -241,19 +240,20 @@ IkConstraint::apply(Bone &parent, Bone &child, float targetX, float targetY, int
 			}
 		}
 	}
-	break_outer:
-	{
-		float os = MathUtil::atan2(cy, cx) * s2;
-		a1 = (a1 - os) * MathUtil::Rad_Deg + o1 - parent._arotation;
-		if (a1 > 180) a1 -= 360;
-		else if (a1 < -180) a1 += 360;
-		parent.updateWorldTransform(px, py, parent._arotation + a1 * alpha, sx, sy, 0, 0);
-		a2 = ((a2 + os) * MathUtil::Rad_Deg - child._ashearX) * s2 + o2 - child._arotation;
-		if (a2 > 180) a2 -= 360;
-		else if (a2 < -180) a2 += 360;
-		child.updateWorldTransform(cx, cy, child._arotation + a2 * alpha, child._ascaleX, child._ascaleY,
-								   child._ashearX, child._ashearY);
-	}
+break_outer : {
+	float os = MathUtil::atan2(cy, cx) * s2;
+	a1 = (a1 - os) * MathUtil::Rad_Deg + o1 - parent._arotation;
+	if (a1 > 180) a1 -= 360;
+	else if (a1 < -180)
+		a1 += 360;
+	parent.updateWorldTransform(px, py, parent._arotation + a1 * alpha, sx, sy, 0, 0);
+	a2 = ((a2 + os) * MathUtil::Rad_Deg - child._ashearX) * s2 + o2 - child._arotation;
+	if (a2 > 180) a2 -= 360;
+	else if (a2 < -180)
+		a2 += 360;
+	child.updateWorldTransform(cx, cy, child._arotation + a2 * alpha, child._ascaleX, child._ascaleY,
+							   child._ashearX, child._ashearY);
+}
 }
 
 IkConstraint::IkConstraint(IkConstraintData &data, Skeleton &skeleton) : Updatable(),
@@ -279,15 +279,13 @@ void IkConstraint::update() {
 		case 1: {
 			Bone *bone0 = _bones[0];
 			apply(*bone0, _target->getWorldX(), _target->getWorldY(), _compress, _stretch, _data._uniform, _mix);
-		}
-			break;
+		} break;
 		case 2: {
 			Bone *bone0 = _bones[0];
 			Bone *bone1 = _bones[1];
 			apply(*bone0, *bone1, _target->getWorldX(), _target->getWorldY(), _bendDirection, _stretch, _data._uniform, _softness,
 				  _mix);
-		}
-			break;
+		} break;
 	}
 }
 

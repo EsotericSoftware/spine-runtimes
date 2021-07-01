@@ -37,8 +37,8 @@ typedef struct {
 
 spSlot *spSlot_create(spSlotData *data, spBone *bone) {
 	spSlot *self = SUPER(NEW(_spSlot));
-	CONST_CAST(spSlotData*, self->data) = data;
-	CONST_CAST(spBone*, self->bone) = bone;
+	CONST_CAST(spSlotData *, self->data) = data;
+	CONST_CAST(spBone *, self->bone) = bone;
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
 	self->darkColor = data->darkColor == 0 ? 0 : spColor_create();
 	spSlot_setToSetupPose(self);
@@ -68,13 +68,11 @@ void spSlot_setAttachment(spSlot *self, spAttachment *attachment) {
 	if (attachment == self->attachment) return;
 
 	if (!isVertexAttachment(attachment) ||
-		!isVertexAttachment(self->attachment)
-		|| (SUB_CAST(spVertexAttachment, attachment)->deformAttachment !=
-			SUB_CAST(spVertexAttachment, self->attachment)->deformAttachment)) {
+		!isVertexAttachment(self->attachment) || (SUB_CAST(spVertexAttachment, attachment)->deformAttachment != SUB_CAST(spVertexAttachment, self->attachment)->deformAttachment)) {
 		self->deformCount = 0;
 	}
 
-	CONST_CAST(spAttachment*, self->attachment) = attachment;
+	CONST_CAST(spAttachment *, self->attachment) = attachment;
 	SUB_CAST(_spSlot, self)->attachmentTime = self->bone->skeleton->time;
 }
 
@@ -95,7 +93,7 @@ void spSlot_setToSetupPose(spSlot *self) {
 	else {
 		spAttachment *attachment = spSkeleton_getAttachmentForSlotIndex(
 				self->bone->skeleton, self->data->index, self->data->attachmentName);
-		CONST_CAST(spAttachment*, self->attachment) = 0;
+		CONST_CAST(spAttachment *, self->attachment) = 0;
 		spSlot_setAttachment(self, attachment);
 	}
 }

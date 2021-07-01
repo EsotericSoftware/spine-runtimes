@@ -9,11 +9,6 @@
  * 
  */
 UCLASS()
-class SPINEUE4_API ASpineUE4GameMode : public AGameMode
-{
+class SPINEUE4_API ASpineUE4GameMode : public AGameMode {
 	GENERATED_BODY()
-	
-	
-	
-	
 };

@@ -28,12 +28,15 @@
  *****************************************************************************/
 
 #include <spine/Skeleton.h>
+#include <spine/extension.h>
 #include <stdlib.h>
 #include <string.h>
-#include <spine/extension.h>
 
 typedef enum {
-	SP_UPDATE_BONE, SP_UPDATE_IK_CONSTRAINT, SP_UPDATE_PATH_CONSTRAINT, SP_UPDATE_TRANSFORM_CONSTRAINT
+	SP_UPDATE_BONE,
+	SP_UPDATE_IK_CONSTRAINT,
+	SP_UPDATE_PATH_CONSTRAINT,
+	SP_UPDATE_TRANSFORM_CONSTRAINT
 } _spUpdateType;
 
 typedef struct {
@@ -55,10 +58,10 @@ spSkeleton *spSkeleton_create(spSkeletonData *data) {
 
 	_spSkeleton *internal = NEW(_spSkeleton);
 	spSkeleton *self = SUPER(internal);
-	CONST_CAST(spSkeletonData*, self->data) = data;
+	CONST_CAST(spSkeletonData *, self->data) = data;
 
 	self->bonesCount = self->data->bonesCount;
-	self->bones = MALLOC(spBone*, self->bonesCount);
+	self->bones = MALLOC(spBone *, self->bonesCount);
 	childrenCounts = CALLOC(int, self->bonesCount);
 
 	for (i = 0; i < self->bonesCount; ++i) {
@@ -76,7 +79,7 @@ spSkeleton *spSkeleton_create(spSkeletonData *data) {
 	for (i = 0; i < self->bonesCount; ++i) {
 		spBoneData *boneData = self->data->bones[i];
 		spBone *bone = self->bones[i];
-		CONST_CAST(spBone**, bone->children) = MALLOC(spBone*, childrenCounts[boneData->index]);
+		CONST_CAST(spBone **, bone->children) = MALLOC(spBone *, childrenCounts[boneData->index]);
 	}
 	for (i = 0; i < self->bonesCount; ++i) {
 		spBone *bone = self->bones[i];
@@ -84,31 +87,31 @@ spSkeleton *spSkeleton_create(spSkeletonData *data) {
 		if (parent)
 			parent->children[parent->childrenCount++] = bone;
 	}
-	CONST_CAST(spBone*, self->root) = (self->bonesCount > 0 ? self->bones[0] : NULL);
+	CONST_CAST(spBone *, self->root) = (self->bonesCount > 0 ? self->bones[0] : NULL);
 
 	self->slotsCount = data->slotsCount;
-	self->slots = MALLOC(spSlot*, self->slotsCount);
+	self->slots = MALLOC(spSlot *, self->slotsCount);
 	for (i = 0; i < self->slotsCount; ++i) {
 		spSlotData *slotData = data->slots[i];
 		spBone *bone = self->bones[slotData->boneData->index];
 		self->slots[i] = spSlot_create(slotData, bone);
 	}
 
-	self->drawOrder = MALLOC(spSlot*, self->slotsCount);
+	self->drawOrder = MALLOC(spSlot *, self->slotsCount);
 	memcpy(self->drawOrder, self->slots, sizeof(spSlot *) * self->slotsCount);
 
 	self->ikConstraintsCount = data->ikConstraintsCount;
-	self->ikConstraints = MALLOC(spIkConstraint*, self->ikConstraintsCount);
+	self->ikConstraints = MALLOC(spIkConstraint *, self->ikConstraintsCount);
 	for (i = 0; i < self->data->ikConstraintsCount; ++i)
 		self->ikConstraints[i] = spIkConstraint_create(self->data->ikConstraints[i], self);
 
 	self->transformConstraintsCount = data->transformConstraintsCount;
-	self->transformConstraints = MALLOC(spTransformConstraint*, self->transformConstraintsCount);
+	self->transformConstraints = MALLOC(spTransformConstraint *, self->transformConstraintsCount);
 	for (i = 0; i < self->data->transformConstraintsCount; ++i)
 		self->transformConstraints[i] = spTransformConstraint_create(self->data->transformConstraints[i], self);
 
 	self->pathConstraintsCount = data->pathConstraintsCount;
-	self->pathConstraints = MALLOC(spPathConstraint*, self->pathConstraintsCount);
+	self->pathConstraints = MALLOC(spPathConstraint *, self->pathConstraintsCount);
 	for (i = 0; i < self->data->pathConstraintsCount; i++)
 		self->pathConstraints[i] = spPathConstraint_create(self->data->pathConstraints[i], self);
 
@@ -363,7 +366,7 @@ void spSkeleton_updateCache(spSkeleton *self) {
 	constraintCount = ikCount + transformCount + pathCount;
 
 	i = 0;
-	continue_outer:
+continue_outer:
 	for (; i < constraintCount; i++) {
 		for (ii = 0; ii < ikCount; ii++) {
 			spIkConstraint *ikConstraint = ikConstraints[ii];
@@ -411,7 +414,7 @@ void spSkeleton_updateWorldTransform(const spSkeleton *self) {
 		bone->ashearX = bone->shearX;
 		bone->ashearY = bone->shearY;
 	}
-	
+
 	for (i = 0; i < internal->updateCacheCount; ++i) {
 		_spUpdate *update = internal->updateCache + i;
 		switch (update->type) {
@@ -432,7 +435,7 @@ void spSkeleton_updateWorldTransform(const spSkeleton *self) {
 }
 
 void spSkeleton_updateWorldTransformWith(const spSkeleton *self, const spBone *parent) {
-/* Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection. */
+	/* Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection. */
 	int i;
 	float rotationY, la, lb, lc, ld;
 	_spUpdate *updateCache;
@@ -578,7 +581,7 @@ void spSkeleton_setSkin(spSkeleton *self, spSkin *newSkin) {
 			}
 		}
 	}
-	CONST_CAST(spSkin*, self->skin) = newSkin;
+	CONST_CAST(spSkin *, self->skin) = newSkin;
 	spSkeleton_updateCache(self);
 }
 

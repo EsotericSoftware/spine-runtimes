@@ -37,15 +37,14 @@
 
 using namespace spine;
 
-SlotData::SlotData(int index, const String &name, BoneData &boneData) :
-		_index(index),
-		_name(name),
-		_boneData(boneData),
-		_color(1, 1, 1, 1),
-		_darkColor(0, 0, 0, 0),
-		_hasDarkColor(false),
-		_attachmentName(),
-		_blendMode(BlendMode_Normal) {
+SlotData::SlotData(int index, const String &name, BoneData &boneData) : _index(index),
+																		_name(name),
+																		_boneData(boneData),
+																		_color(1, 1, 1, 1),
+																		_darkColor(0, 0, 0, 0),
+																		_hasDarkColor(false),
+																		_attachmentName(),
+																		_blendMode(BlendMode_Normal) {
 	assert(_index >= 0);
 	assert(_name.length() > 0);
 }

@@ -136,25 +136,25 @@ void RegionAttachment::computeWorldVertices(Bone &bone, float *worldVertices, si
 
 	offsetX = _vertexOffset[BRX];
 	offsetY = _vertexOffset[BRY];
-	worldVertices[offset] = offsetX * a + offsetY * b + x; // br
+	worldVertices[offset] = offsetX * a + offsetY * b + x;// br
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 	offset += stride;
 
 	offsetX = _vertexOffset[BLX];
 	offsetY = _vertexOffset[BLY];
-	worldVertices[offset] = offsetX * a + offsetY * b + x; // bl
+	worldVertices[offset] = offsetX * a + offsetY * b + x;// bl
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 	offset += stride;
 
 	offsetX = _vertexOffset[ULX];
 	offsetY = _vertexOffset[ULY];
-	worldVertices[offset] = offsetX * a + offsetY * b + x; // ul
+	worldVertices[offset] = offsetX * a + offsetY * b + x;// ul
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 	offset += stride;
 
 	offsetX = _vertexOffset[URX];
 	offsetY = _vertexOffset[URY];
-	worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
+	worldVertices[offset] = offsetX * a + offsetY * b + x;// ur
 	worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 }
 
@@ -283,7 +283,7 @@ spine::Color &RegionAttachment::getColor() {
 }
 
 Attachment *RegionAttachment::copy() {
-	RegionAttachment *copy = new(__FILE__, __LINE__) RegionAttachment(getName());
+	RegionAttachment *copy = new (__FILE__, __LINE__) RegionAttachment(getName());
 	copy->_regionWidth = _regionWidth;
 	copy->_regionHeight = _regionHeight;
 	copy->_regionOffsetX = _regionOffsetX;
