@@ -144,3 +144,6 @@ spine-ue4/SpineUE4.VC.VC.opendb
 *.iml
 */out/
 cmake-build-debug-visual-studio
+spine-cocos2dx/build-v4/
+spine-cocos2dx/example-v4/cocos2d
+spine-cocos2dx/example-v4/cocos2dx.zip

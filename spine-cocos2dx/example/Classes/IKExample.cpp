@@ -97,7 +97,6 @@ bool IKExample::init() {
 		crosshair->getParent()->worldToLocal(position.x, position.y, localX, localY);
 		crosshair->setX(localX);
 		crosshair->setY(localY);
-		crosshair->setAppliedValid(false);
 
 		node->getSkeleton()->updateWorldTransform();
 	});

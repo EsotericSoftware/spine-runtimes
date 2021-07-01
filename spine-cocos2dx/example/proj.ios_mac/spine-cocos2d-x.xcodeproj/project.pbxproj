@@ -79,7 +79,6 @@
 		763104E220BC1B5E00927A1E /* Updatable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A520BC1B5600927A1E /* Updatable.cpp */; };
 		763104E320BC1B5E00927A1E /* RegionAttachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A620BC1B5700927A1E /* RegionAttachment.cpp */; };
 		763104E420BC1B5E00927A1E /* ClippingAttachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A720BC1B5700927A1E /* ClippingAttachment.cpp */; };
-		763104E520BC1B5E00927A1E /* TwoColorTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A820BC1B5700927A1E /* TwoColorTimeline.cpp */; };
 		763104E620BC1B5E00927A1E /* TransformConstraintData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A920BC1B5700927A1E /* TransformConstraintData.cpp */; };
 		763104E720BC1B5E00927A1E /* PathAttachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104AA20BC1B5700927A1E /* PathAttachment.cpp */; };
 		763104E820BC1B5E00927A1E /* BoundingBoxAttachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104AB20BC1B5700927A1E /* BoundingBoxAttachment.cpp */; };
@@ -162,7 +161,6 @@
 		763105D420BC1B9700927A1E /* TransformConstraintTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7631049C20BC1B5600927A1E /* TransformConstraintTimeline.cpp */; };
 		763105D520BC1B9700927A1E /* TranslateTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104C220BC1B5E00927A1E /* TranslateTimeline.cpp */; };
 		763105D620BC1B9700927A1E /* Triangulator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A020BC1B5600927A1E /* Triangulator.cpp */; };
-		763105D720BC1B9700927A1E /* TwoColorTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A820BC1B5700927A1E /* TwoColorTimeline.cpp */; };
 		763105D820BC1B9700927A1E /* Updatable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104A520BC1B5600927A1E /* Updatable.cpp */; };
 		763105D920BC1B9700927A1E /* VertexAttachment.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7631049220BC1B5500927A1E /* VertexAttachment.cpp */; };
 		763105DA20BC1B9700927A1E /* VertexEffect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 763104AE20BC1B5800927A1E /* VertexEffect.cpp */; };
@@ -340,7 +338,6 @@
 		763104A520BC1B5600927A1E /* Updatable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Updatable.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/Updatable.cpp"; sourceTree = "<group>"; };
 		763104A620BC1B5700927A1E /* RegionAttachment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = RegionAttachment.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/RegionAttachment.cpp"; sourceTree = "<group>"; };
 		763104A720BC1B5700927A1E /* ClippingAttachment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ClippingAttachment.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/ClippingAttachment.cpp"; sourceTree = "<group>"; };
-		763104A820BC1B5700927A1E /* TwoColorTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TwoColorTimeline.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/TwoColorTimeline.cpp"; sourceTree = "<group>"; };
 		763104A920BC1B5700927A1E /* TransformConstraintData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransformConstraintData.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/TransformConstraintData.cpp"; sourceTree = "<group>"; };
 		763104AA20BC1B5700927A1E /* PathAttachment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PathAttachment.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/PathAttachment.cpp"; sourceTree = "<group>"; };
 		763104AB20BC1B5700927A1E /* BoundingBoxAttachment.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = BoundingBoxAttachment.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/BoundingBoxAttachment.cpp"; sourceTree = "<group>"; };
@@ -684,7 +681,6 @@
 				7631049C20BC1B5600927A1E /* TransformConstraintTimeline.cpp */,
 				763104C220BC1B5E00927A1E /* TranslateTimeline.cpp */,
 				763104A020BC1B5600927A1E /* Triangulator.cpp */,
-				763104A820BC1B5700927A1E /* TwoColorTimeline.cpp */,
 				763104A520BC1B5600927A1E /* Updatable.cpp */,
 				7631049220BC1B5500927A1E /* VertexAttachment.cpp */,
 				763104AE20BC1B5800927A1E /* VertexEffect.cpp */,
@@ -911,7 +907,6 @@
 				763104C720BC1B5E00927A1E /* DrawOrderTimeline.cpp in Sources */,
 				767D80E322B29F22000BD703 /* MixAndMatchExample.cpp in Sources */,
 				763104F520BC1B5E00927A1E /* MeshAttachment.cpp in Sources */,
-				763104E520BC1B5E00927A1E /* TwoColorTimeline.cpp in Sources */,
 				763104D420BC1B5E00927A1E /* IkConstraint.cpp in Sources */,
 				763104E920BC1B5E00927A1E /* Skin.cpp in Sources */,
 				763104C820BC1B5E00927A1E /* PathConstraintMixTimeline.cpp in Sources */,
@@ -1022,7 +1017,6 @@
 				763105D420BC1B9700927A1E /* TransformConstraintTimeline.cpp in Sources */,
 				763105D520BC1B9700927A1E /* TranslateTimeline.cpp in Sources */,
 				763105D620BC1B9700927A1E /* Triangulator.cpp in Sources */,
-				763105D720BC1B9700927A1E /* TwoColorTimeline.cpp in Sources */,
 				763105D820BC1B9700927A1E /* Updatable.cpp in Sources */,
 				763105D920BC1B9700927A1E /* VertexAttachment.cpp in Sources */,
 				763105DA20BC1B9700927A1E /* VertexEffect.cpp in Sources */,
