@@ -196,7 +196,7 @@ module spine {
 		private playTime = 0;
 		private selectedBones: Bone[];
 		private cancelId = 0;
-		private lastPopup: Popup;
+		popup: Popup;
 
 		/* True if the player is unable to load or render the skeleton. */
 		public error: boolean;
@@ -749,7 +749,7 @@ module spine {
 				let delta = this.time.delta;
 
 				// Load the skeleton if the assets are ready.
-				var loading = this.assetManager.isLoadingComplete();
+				let loading = this.assetManager.isLoadingComplete();
 				if (!this.skeleton && loading) this.loadSkeleton();
 				let skeleton = this.skeleton;
 				let config = this.config;
@@ -781,7 +781,7 @@ module spine {
 					}
 
 					// Determine the viewport.
-					var viewport = this.viewport;
+					let viewport = this.viewport;
 					viewport.x = this.currentViewport.x - (this.currentViewport.padLeft as number),
 					viewport.y = this.currentViewport.y - (this.currentViewport.padBottom as number),
 					viewport.width = this.currentViewport.width + (this.currentViewport.padLeft as number) + (this.currentViewport.padRight as number),
@@ -880,16 +880,15 @@ module spine {
 			this.stopRequestAnimationFrame = true;
 		}
 
+		private hidePopup (id: string): boolean {
+			return this.popup && this.popup.hide(id);
+		}
+
 		private showSpeedDialog (speedButton: HTMLElement) {
-			if (this.lastPopup) {
-				this.lastPopup.dom.remove();
-				if (findWithClass(this.lastPopup.dom, "spine-player-popup-title").textContent == "Speed") {
-					this.lastPopup = null;
-					speedButton.classList.remove("spine-player-button-icon-speed-selected")
-					return;
-				}
-			}
-			let popup = new Popup(this.dom, this.playerControls, /*html*/`
+			let id = "speed";
+			if (this.hidePopup(id)) return;
+
+			let popup = new Popup(id, speedButton, this, this.playerControls, /*html*/`
 <div class="spine-player-popup-title">Speed</div>
 <hr>
 <div class="spine-player-row" style="align-items:center;padding:8px">
@@ -902,27 +901,15 @@ module spine {
 			findWithClass(popup.dom, "spine-player-speed-slider").appendChild(slider.create());
 			slider.setValue(this.speed / 2);
 			slider.change = (percentage) => this.speed = percentage * 2;
-			speedButton.classList.add("spine-player-button-icon-speed-selected")
-			popup.show(() => {
-				speedButton.classList.remove("spine-player-button-icon-speed-selected")
-				popup.dom.remove();
-				this.lastPopup = null;
-			});
-			this.lastPopup = popup;
+			popup.show();
 		}
 
 		private showAnimationsDialog (animationsButton: HTMLElement) {
-			if (this.lastPopup) {
-				this.lastPopup.dom.remove();
-				if (findWithClass(this.lastPopup.dom, "spine-player-popup-title").textContent == "Animations") {
-					this.lastPopup = null;
-					animationsButton.classList.remove("spine-player-button-icon-animations-selected")
-					return;
-				}
-			}
+			let id = "animations";
+			if (this.hidePopup(id)) return;
 			if (!this.skeleton || !this.skeleton.data.animations.length) return;
 
-			let popup = new Popup(this.dom, this.playerControls,
+			let popup = new Popup(id, animationsButton, this, this.playerControls,
 				/*html*/`<div class="spine-player-popup-title">Animations</div><hr><ul class="spine-player-list"></ul>`);
 
 			let rows = findWithClass(popup.dom, "spine-player-list");
@@ -944,27 +931,15 @@ module spine {
 					this.play();
 				}
 			});
-			animationsButton.classList.add("spine-player-button-icon-animations-selected")
-			popup.show(() => {
-				animationsButton.classList.remove("spine-player-button-icon-animations-selected")
-				popup.dom.remove();
-				this.lastPopup = null;
-			});
-			this.lastPopup = popup;
+			popup.show();
 		}
 
 		private showSkinsDialog (skinButton: HTMLElement) {
-			if (this.lastPopup) {
-				this.lastPopup.dom.remove();
-				if (findWithClass(this.lastPopup.dom, "spine-player-popup-title").textContent == "Skins") {
-					this.lastPopup = null;
-					skinButton.classList.remove("spine-player-button-icon-skins-selected")
-					return;
-				}
-			}
+			let id = "skins";
+			if (this.hidePopup(id)) return;
 			if (!this.skeleton || !this.skeleton.data.animations.length) return;
 
-			let popup = new Popup(this.dom, this.playerControls,
+			let popup = new Popup(id, skinButton, this, this.playerControls,
 				/*html*/`<div class="spine-player-popup-title">Skins</div><hr><ul class="spine-player-list"></ul>`);
 
 			let rows = findWithClass(popup.dom, "spine-player-list");
@@ -984,28 +959,15 @@ module spine {
 					this.skeleton.setSlotsToSetupPose();
 				}
 			});
-
-			skinButton.classList.add("spine-player-button-icon-skins-selected")
-			popup.show(() => {
-				skinButton.classList.remove("spine-player-button-icon-skins-selected")
-				popup.dom.remove();
-				this.lastPopup = null;
-			});
-			this.lastPopup = popup;
+			popup.show();
 		}
 
 		private showSettingsDialog (settingsButton: HTMLElement) {
-			if (this.lastPopup) {
-				this.lastPopup.dom.remove();
-				if (findWithClass(this.lastPopup.dom, "spine-player-popup-title").textContent == "Debug") {
-					this.lastPopup = null;
-					settingsButton.classList.remove("spine-player-button-icon-settings-selected")
-					return;
-				}
-			}
+			let id = "settings";
+			if (this.hidePopup(id)) return;
 			if (!this.skeleton || !this.skeleton.data.animations.length) return;
 
-			let popup = new Popup(this.dom, this.playerControls, /*html*/`<div class="spine-player-popup-title">Debug</div><hr><ul class="spine-player-list"></li>`);
+			let popup = new Popup(id, settingsButton, this, this.playerControls, /*html*/`<div class="spine-player-popup-title">Debug</div><hr><ul class="spine-player-list"></li>`);
 
 			let rows = findWithClass(popup.dom, "spine-player-list");
 			let makeItem = (label: string, name: string) => {
@@ -1017,7 +979,6 @@ module spine {
 				s.change = (value) => debug[name] = value;
 				rows.appendChild(row);
 			};
-
 			makeItem("Bones", "bones");
 			makeItem("Regions", "regions");
 			makeItem("Meshes", "meshes");
@@ -1026,14 +987,7 @@ module spine {
 			makeItem("Clipping", "clipping");
 			makeItem("Points", "points");
 			makeItem("Hulls", "hulls");
-
-			settingsButton.classList.add("spine-player-button-icon-settings-selected")
-			popup.show(() => {
-				settingsButton.classList.remove("spine-player-button-icon-settings-selected")
-				popup.dom.remove();
-				this.lastPopup = null;
-			});
-			this.lastPopup = popup;
+			popup.show();
 		}
 
 		private showError (message: string, error: Error = null) {
@@ -1052,41 +1006,55 @@ module spine {
 
 	class Popup {
 		public dom: HTMLElement;
+		private className: string;
 
-		constructor (private player: HTMLElement, parent: HTMLElement, htmlContent: string) {
+		constructor (private id: string, private button: HTMLElement, private player: SpinePlayer, parent: HTMLElement, htmlContent: string) {
 			this.dom = createElement(/*html*/`<div class="spine-player-popup spine-player-hidden"></div>`);
 			this.dom.innerHTML = htmlContent;
 			parent.appendChild(this.dom);
+			this.className = "spine-player-button-icon-" + id + "-selected";
 		}
 
-		show (dismissedListener: () => void) {
+		hide (id: string): boolean {
+			this.dom.remove();
+			this.button.classList.remove(this.className);
+			if (this.id == id) {
+				this.player.popup = null;
+				return true;
+			}
+		}
+
+		show () {
+			this.player.popup = this;
+			this.button.classList.add(this.className);
 			this.dom.classList.remove("spine-player-hidden");
 
 			// Make sure the popup isn't bigger than the player.
 			let dismissed = false;
 			let resize = () => {
 				if (!dismissed) requestAnimationFrame(resize);
-				let bottomOffset = Math.abs(this.dom.getBoundingClientRect().bottom - this.player.getBoundingClientRect().bottom);
-				let rightOffset = Math.abs(this.dom.getBoundingClientRect().right - this.player.getBoundingClientRect().right);
-				let maxHeight = this.player.clientHeight - bottomOffset - rightOffset;
-				this.dom.style.maxHeight = maxHeight + "px";
+				let playerDom = this.player.dom;
+				let bottomOffset = Math.abs(playerDom.getBoundingClientRect().bottom - playerDom.getBoundingClientRect().bottom);
+				let rightOffset = Math.abs(playerDom.getBoundingClientRect().right - playerDom.getBoundingClientRect().right);
+				this.dom.style.maxHeight = (playerDom.clientHeight - bottomOffset - rightOffset) + "px";
 			}
 			requestAnimationFrame(resize);
 
 			// Dismiss when clicking somewhere outside the popup.
 			let justClicked = true;
 			let windowClickListener = (event: any) => {
-				if (justClicked) {
+				if (justClicked || this.player.popup != this) {
 					justClicked = false;
 					return;
 				}
 				if (!this.dom.contains(event.target)) {
 					this.dom.remove();
 					window.removeEventListener("click", windowClickListener);
-					dismissedListener();
+					this.button.classList.remove(this.className);
+					this.player.popup = null;
 					dismissed = true;
 				}
-			}
+			};
 			window.addEventListener("click", windowClickListener);
 		}
 	}
