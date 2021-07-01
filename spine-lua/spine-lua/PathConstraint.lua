@@ -137,7 +137,8 @@ function PathConstraint:update ()
 	elseif data.spacingMode == PathConstraintData.SpacingMode.proportional then
 		local sum = 0
 		local i = 0
-		while i < boneCount do
+		local n = spacesCount - 1
+		while i < n do
 			local bone = bones[i + 1]
 			local setupLength = bone.data.length
 			if setupLength < epsilon then

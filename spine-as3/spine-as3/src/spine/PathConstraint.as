@@ -108,7 +108,7 @@ package spine {
 				break;
 			case SpacingMode.proportional:
 				var sum : Number = 0;
-				for (i = 0; i < boneCount;) {
+				for (i = 0, n = spacesCount - 1; i < n;) {
 					bone = bones[i];
 					setupLength = bone.data.length;
 					if (setupLength < PathConstraint.epsilon) {

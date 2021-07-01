@@ -124,7 +124,7 @@ public class PathConstraint implements Updatable {
 			break;
 		case proportional:
 			float sum = 0;
-			for (int i = 0; i < boneCount;) {
+			for (int i = 0, n = spacesCount - 1; i < n;) {
 				Bone bone = (Bone)bones[i];
 				float setupLength = bone.data.length;
 				if (setupLength < epsilon) {
