@@ -29,10 +29,12 @@
 
 #pragma once
 
+// clang-format off
 #include "Components/ActorComponent.h"
 #include "SpineSkeletonComponent.h"
 #include "spine/spine.h"
 #include "SpineSkeletonAnimationComponent.generated.h"
+// clang-format on
 
 USTRUCT(BlueprintType, Category = "Spine")
 struct SPINEPLUGIN_API FSpineEvent {

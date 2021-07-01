@@ -29,10 +29,12 @@
 
 #pragma once
 
+// clang-format off
 #include "Components/ActorComponent.h"
 #include "SpineSkeletonDataAsset.h"
 #include "spine/spine.h"
 #include "SpineSkeletonComponent.generated.h"
+// clang-format on
 
 class USpineSkeletonComponent;
 

@@ -4,8 +4,8 @@
 
 #include "Components/SceneComponent.h"
 #include "CoreMinimal.h"
-#include "SpineSkeletonRendererComponent.h"
 #include "MySceneComponent.generated.h"
+#include "SpineSkeletonRendererComponent.h"
 
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))

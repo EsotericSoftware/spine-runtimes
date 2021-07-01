@@ -29,9 +29,11 @@
 
 #pragma once
 
+// clang-format off
 #include "SpineAtlasAsset.h"
 #include "UnrealEd.h"
 #include "SpineAtlasImportFactory.generated.h"
+// clang-format on
 
 UCLASS()
 class USpineAtlasAssetFactory : public UFactory, public FReimportHandler {

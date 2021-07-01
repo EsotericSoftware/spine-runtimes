@@ -29,9 +29,11 @@
 
 #pragma once
 
+// clang-format off
 #include "Engine.h"
 #include "spine/spine.h"
 #include "SpineSkeletonDataAsset.generated.h"
+// clang-format on
 
 USTRUCT(BlueprintType, Category = "Spine")
 struct SPINEPLUGIN_API FSpineAnimationStateMixData {

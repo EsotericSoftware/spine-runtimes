@@ -29,11 +29,13 @@
 
 #pragma once
 
+// clang-format off
 #include "Runtime/UMG/Public/UMG.h"
 #include "Runtime/UMG/Public/UMGStyle.h"
 #include "SpineSkeletonDataAsset.h"
 #include "spine/spine.h"
 #include "SpineWidget.generated.h"
+// clang-format on
 
 class SSpineWidget;
 

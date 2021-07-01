@@ -29,9 +29,11 @@
 
 #pragma once
 
+// clang-format off
 #include "Engine.h"
 #include "spine/spine.h"
 #include "SpineAtlasAsset.generated.h"
+// clang-format on
 
 UCLASS(BlueprintType, ClassGroup = (Spine))
 class SPINEPLUGIN_API USpineAtlasAsset : public UObject {
