@@ -30,8 +30,8 @@
 #pragma once
 
 #include "Engine.h"
-#include "SpineSkeletonDataAsset.generated.h"
 #include "spine/spine.h"
+#include "SpineSkeletonDataAsset.generated.h"
 
 USTRUCT(BlueprintType, Category = "Spine")
 struct SPINEPLUGIN_API FSpineAnimationStateMixData {

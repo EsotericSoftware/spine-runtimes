@@ -30,8 +30,8 @@
 #pragma once
 
 #include "SpineAtlasAsset.h"
-#include "SpineAtlasImportFactory.generated.h"
 #include "UnrealEd.h"
+#include "SpineAtlasImportFactory.generated.h"
 
 UCLASS()
 class USpineAtlasAssetFactory : public UFactory, public FReimportHandler {

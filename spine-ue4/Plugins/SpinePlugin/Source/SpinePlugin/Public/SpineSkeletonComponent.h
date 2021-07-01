@@ -30,9 +30,9 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
-#include "SpineSkeletonComponent.generated.h"
 #include "SpineSkeletonDataAsset.h"
 #include "spine/spine.h"
+#include "SpineSkeletonComponent.generated.h"
 
 class USpineSkeletonComponent;
 

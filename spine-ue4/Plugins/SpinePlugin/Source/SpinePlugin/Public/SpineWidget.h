@@ -32,8 +32,8 @@
 #include "Runtime/UMG/Public/UMG.h"
 #include "Runtime/UMG/Public/UMGStyle.h"
 #include "SpineSkeletonDataAsset.h"
-#include "SpineWidget.generated.h"
 #include "spine/spine.h"
+#include "SpineWidget.generated.h"
 
 class SSpineWidget;
 

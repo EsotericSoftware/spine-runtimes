@@ -30,9 +30,9 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
-#include "SpineSkeletonAnimationComponent.generated.h"
 #include "SpineSkeletonComponent.h"
 #include "spine/spine.h"
+#include "SpineSkeletonAnimationComponent.generated.h"
 
 USTRUCT(BlueprintType, Category = "Spine")
 struct SPINEPLUGIN_API FSpineEvent {

@@ -30,8 +30,8 @@
 #pragma once
 
 #include "Engine.h"
-#include "SpineAtlasAsset.generated.h"
 #include "spine/spine.h"
+#include "SpineAtlasAsset.generated.h"
 
 UCLASS(BlueprintType, ClassGroup = (Spine))
 class SPINEPLUGIN_API USpineAtlasAsset : public UObject {
