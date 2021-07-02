@@ -128,6 +128,18 @@ namespace Spine.Unity.Editor {
 					if (sg.isActiveAndEnabled && sg.skeletonDataAsset == skeletonDataAsset) sg.Initialize(true);
 				}
 			}
+
+			public static void ReloadAnimationReferenceAssets (SkeletonDataAsset skeletonDataAsset) {
+				string[] guids = UnityEditor.AssetDatabase.FindAssets("t:AnimationReferenceAsset");
+				foreach (string guid in guids) {
+					string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+					if (!string.IsNullOrEmpty(path)) {
+						var referenceAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<AnimationReferenceAsset>(path);
+						if (referenceAsset.SkeletonDataAsset == skeletonDataAsset)
+							referenceAsset.Initialize();
+					}
+				}
+			}
 		}
 	}
 }
