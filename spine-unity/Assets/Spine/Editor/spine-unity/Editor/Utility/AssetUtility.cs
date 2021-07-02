@@ -472,6 +472,7 @@ namespace Spine.Unity.Editor {
 							EditorPrefs.SetString(guid + "_hash", currentHash);
 					}
 					SpineEditorUtilities.DataReloadHandler.ReloadSceneSkeletonComponents(skeletonDataAsset);
+					SpineEditorUtilities.DataReloadHandler.ReloadAnimationReferenceAssets(skeletonDataAsset);
 				}
 			}
 		}
