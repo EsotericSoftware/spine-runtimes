@@ -356,7 +356,12 @@ namespace Spine.Unity {
 			for (int i = 0; i < separatorSlotNames.Length; i++)
 				separatorSlots.Add(skeleton.FindSlot(separatorSlotNames[i]));
 
-			LateUpdate(); // Generate mesh for the first frame it exists.
+			// Generate mesh once, required to update mesh bounds for visibility
+			UpdateMode updateModeSaved = updateMode;
+			updateMode = UpdateMode.FullUpdate;
+			skeleton.UpdateWorldTransform();
+			LateUpdate();
+			updateMode = updateModeSaved;
 
 			if (OnRebuild != null)
 				OnRebuild(this);
