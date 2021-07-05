@@ -32,7 +32,7 @@ Alternatively, the contents of the `spine-libgdx/src` directory can be copied in
 * spine-libgdx depends on the gdx-box2d extension project solely for the `Box2DExample` test.
 
 ## Maven & Gradle
-The spine-libgdx runtime is released to Maven Central through SonaType. We also deploy snapshot builds on every commit to the master repository. You can find the Jenkins build [here](http://libgdx.badlogicgames.com:8080/job/spine-libgdx/).
+The spine-libgdx runtime is released to Maven Central through SonaType. We also deploy snapshot builds on every commit to the repository via [GitHub Actions](https://github.com/EsotericSoftware/spine-runtimes/actions).
 
 ### Versions
 
@@ -40,14 +40,14 @@ You can find the latest version for release builds [here](http://search.maven.or
 
 You can find the latest SNAPSHOT version in the project's [pom.xml](spine-libgdx/pom.xml#L13).
 
-If you want to use a different branch, e.g. `3.6-beta`, build the artifact locally:
+If you want to use a different branch, e.g. `4.1-beta`, build the artifact locally:
 
 ```
 cd spine-libgdx/spine-libgdx
 mvn install
 ```
 
-The version number is composed of the editor number at the time of release of the Maven artifact plus a patch number at the end. E.g. `3.5.51.3` means editor version `3.5.51`, and patch version `3` for the runtime. The editor version is updated everytime a new editor release is performed, the patch version is updated everytime a new fix or enhancement is released in the runtime.
+The version number is composed of the editor number at the time of release of the Maven artifact plus a patch number at the end. E.g. `4.0.02.1` means editor version `4.0.02`, and patch version `1` for the runtime. The editor version is updated everytime a new editor release is performed, the patch version is updated everytime a new fix or enhancement is released in the runtime.
 
 
 ### Maven
@@ -57,7 +57,7 @@ To add the spine-libgdx runtime to your Maven project, add this dependency:
 <depenency>
 	<groupId>com.esotericsoftware.spine</groupId>
 	<artifactId>spine-libgdx</artifactId>
-	<version>3.5.51.1</version>
+	<version>4.0.02.1</version>
 </depenency>
 ```
 
@@ -83,7 +83,7 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
 
-        compile "com.esotericsoftware.spine:spine-libgdx:3.5.51.1"
+        compile "com.esotericsoftware.spine:spine-libgdx:4.0.02.1"
     }
 }
 ```
