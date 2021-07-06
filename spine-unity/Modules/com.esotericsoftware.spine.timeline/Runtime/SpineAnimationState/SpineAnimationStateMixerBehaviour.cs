@@ -40,12 +40,49 @@ namespace Spine.Unity.Playables {
 		float[] lastInputWeights;
 		public int trackIndex;
 
+		IAnimationStateComponent animationStateComponent;
+		bool isPaused = false;
+		TrackEntry pausedTrackEntry;
+		float previousTimeScale = 1;
+
+		public override void OnBehaviourPause (Playable playable, FrameData info) {
+			if (!isPaused)
+				HandlePause(playable);
+			isPaused = true;
+		}
+
+		public override void OnBehaviourPlay (Playable playable, FrameData info) {
+			if (isPaused)
+				HandleResume(playable);
+			isPaused = false;
+		}
+
+		protected void HandlePause (Playable playable) {
+			if (animationStateComponent == null) return;
+
+			TrackEntry current = animationStateComponent.AnimationState.GetCurrent(trackIndex);
+			if (current != null) {
+				previousTimeScale = current.TimeScale;
+				current.TimeScale = 0;
+				pausedTrackEntry = current;
+			}
+		}
+
+		protected void HandleResume (Playable playable) {
+			if (animationStateComponent == null) return;
+
+			TrackEntry current = animationStateComponent.AnimationState.GetCurrent(trackIndex);
+			if (current != null && current == pausedTrackEntry) {
+				current.TimeScale = previousTimeScale;
+			}
+		}
+
 		// NOTE: This function is called at runtime and edit time. Keep that in mind when setting the values of properties.
 		public override void ProcessFrame (Playable playable, FrameData info, object playerData) {
 
 			var skeletonAnimation = playerData as SkeletonAnimation;
 			var skeletonGraphic = playerData as SkeletonGraphic;
-			var animationStateComponent = playerData as IAnimationStateComponent;
+			animationStateComponent = playerData as IAnimationStateComponent;
 			var skeletonComponent = playerData as ISkeletonComponent;
 			if (animationStateComponent == null || skeletonComponent == null) return;
 
