@@ -52,7 +52,12 @@ namespace Spine.Unity {
 		/// <summary>
 		/// This is the Spine.AnimationState object of this SkeletonAnimation. You can control animations through it.
 		/// Note that this object, like .skeleton, is not guaranteed to exist in Awake. Do all accesses and caching to it in Start</summary>
-		public Spine.AnimationState AnimationState { get { return this.state; } }
+		public Spine.AnimationState AnimationState {
+			get {
+				Initialize(false);
+				return this.state;
+			}
+		}
 		private bool wasUpdatedAfterInit = true;
 		#endregion
 
@@ -105,6 +110,7 @@ namespace Spine.Unity {
 				}
 			}
 			set {
+				Initialize(false);
 				if (_animationName == value) {
 					TrackEntry entry = state.GetCurrent(0);
 					if (entry != null && entry.loop == loop)
