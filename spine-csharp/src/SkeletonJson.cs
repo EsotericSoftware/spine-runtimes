@@ -1110,7 +1110,7 @@ namespace Spine {
 			string curveString = curve as string;
 			if (curveString != null) {
 				if (curveString == "stepped") timeline.SetStepped(frame);
-				return bezier + 1;
+				return bezier;
 			}
 			var curveValues = (List<object>)curve;
 			int i = value << 2;
