@@ -1,6 +1,6 @@
 # spine-cpp
 
-The spine-cpp runtime provides basic functionality to load and manipulate [spine](http://esotericsoftware.com) skeletal animation data using C++. It does not perform rendering but can be extended to enable spine animations for other projects that utilize C++. Note, this library uses C++03 for maximum portability and therefore does not take advantage of any C++11 or newer features such as std::unique_ptr.
+The spine-cpp runtime provides basic functionality to load and manipulate [spine](http://esotericsoftware.com) skeletal animation data using C++. It does not perform rendering but can be extended to enable spine animations for other projects that utilize C++.
 
 ## Licensing
 
