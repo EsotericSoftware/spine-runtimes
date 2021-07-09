@@ -566,7 +566,8 @@ namespace Spine.Unity {
 
 				float tintBlackAlpha = 1.0f;
 				if (pmaVertexColors) {
-					color.a = (byte)(skeletonA * slot.a * c.a * 255);
+					float colorA = skeletonA * slot.a * c.a;
+					color.a = (byte)(colorA * 255);
 					color.r = (byte)(skeletonR * slot.r * c.r * color.a);
 					color.g = (byte)(skeletonG * slot.g * c.g * color.a);
 					color.b = (byte)(skeletonB * slot.b * c.b * color.a);
@@ -575,6 +576,9 @@ namespace Spine.Unity {
 							tintBlackAlpha = 0;
 						else
 							color.a = 0;
+					}
+					else if (canvasGroupTintBlack) { // other blend modes
+						tintBlackAlpha = colorA;
 					}
 				} else {
 					color.a = (byte)(skeletonA * slot.a * c.a * 255);
