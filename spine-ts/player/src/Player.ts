@@ -396,12 +396,13 @@ module spine {
 
 			let config = this.config;
 
-			// Configure filtering.
+			// Configure filtering, so not force mipmaps on Safari, they require POW2 textures
 			let atlas = this.assetManager.require(config.atlasUrl);
 			let gl = this.context.gl, anisotropic = gl.getExtension("EXT_texture_filter_anisotropic");
+			let isSafari = navigator.vendor.match(/apple/i) && !navigator.userAgent.match(/crios/i) && !navigator.userAgent.match(/fxios/i);
 			for (let page of atlas.pages) {
 				let minFilter = page.minFilter;
-				if (config.mipmaps) {
+				if (!isSafari && config.mipmaps) {
 					if (anisotropic) {
 						gl.texParameterf(gl.TEXTURE_2D, anisotropic.TEXTURE_MAX_ANISOTROPY_EXT, 8);
 						minFilter = TextureFilter.MipMapLinearLinear;
