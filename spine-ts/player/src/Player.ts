@@ -396,13 +396,17 @@ module spine {
 
 			let config = this.config;
 
-			// Configure filtering, so not force mipmaps on Safari, they require POW2 textures
-			let atlas = this.assetManager.require(config.atlasUrl);
+			// Configure filtering, don't use mipmaps in WebGL1 if the atlas page is non-POT
+			let atlas = this.assetManager.require(config.atlasUrl) as TextureAtlas;
 			let gl = this.context.gl, anisotropic = gl.getExtension("EXT_texture_filter_anisotropic");
-			let isSafari = navigator.vendor.match(/apple/i) && !navigator.userAgent.match(/crios/i) && !navigator.userAgent.match(/fxios/i);
+			let isWebGL1 = gl.getParameter(gl.VERSION).indexOf("WebGL 1.0") != -1;
 			for (let page of atlas.pages) {
 				let minFilter = page.minFilter;
-				if (!isSafari && config.mipmaps) {
+				var useMipMaps: boolean = config.mipmaps;
+				var isPOT = MathUtils.isPowerOfTwo(page.width) && MathUtils.isPowerOfTwo(page.height);
+				if (isWebGL1 && !isPOT) useMipMaps = false;
+
+				if (useMipMaps) {
 					if (anisotropic) {
 						gl.texParameterf(gl.TEXTURE_2D, anisotropic.TEXTURE_MAX_ANISOTROPY_EXT, 8);
 						minFilter = TextureFilter.MipMapLinearLinear;
@@ -410,7 +414,7 @@ module spine {
 						minFilter = TextureFilter.Linear; // Don't use mipmaps without anisotropic.
 					page.texture.setFilters(minFilter, TextureFilter.Nearest);
 				}
-				if (minFilter != TextureFilter.Nearest && minFilter != TextureFilter.Linear) page.texture.update(true);
+				if (minFilter != TextureFilter.Nearest && minFilter != TextureFilter.Linear) (page.texture as spine.webgl.GLTexture).update(true);
 			}
 
 			// Load skeleton data.

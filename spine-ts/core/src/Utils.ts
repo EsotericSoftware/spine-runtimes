@@ -214,6 +214,10 @@ module spine {
 			if (u <= (mode - min) / d) return min + Math.sqrt(u * d * (mode - min));
 			return max - Math.sqrt((1 - u) * d * (max - mode));
 		}
+
+		static isPowerOfTwo(value: number) {
+			return value && (value & (value - 1)) === 0;
+		}
 	}
 
 	export abstract class Interpolation {
