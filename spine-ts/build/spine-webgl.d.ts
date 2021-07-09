@@ -1668,7 +1668,7 @@ declare module spine.webgl {
 		canvas: HTMLCanvasElement | OffscreenCanvas;
 		gl: WebGLRenderingContext;
 		private restorables;
-		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget | WebGL2RenderingContext, contextConfig?: any);
+		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget, contextConfig?: any);
 		private setupCanvas;
 		addRestorable(restorable: Restorable): void;
 		removeRestorable(restorable: Restorable): void;

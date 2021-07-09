@@ -3702,7 +3702,7 @@ var spine;
 					break;
 				case spine.SpacingMode.Proportional:
 					var sum = 0;
-					for (var i = 0; i < boneCount;) {
+					for (var i = 0, n = spacesCount - 1; i < n;) {
 						var bone = bones[i];
 						var setupLength = bone.data.length;
 						if (setupLength < PathConstraint.epsilon) {
@@ -11796,7 +11796,7 @@ var spine;
 			function ManagedWebGLRenderingContext(canvasOrContext, contextConfig) {
 				if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
 				this.restorables = new Array();
-				if (!((canvasOrContext instanceof WebGLRenderingContext) || (canvasOrContext instanceof WebGL2RenderingContext)))
+				if (!((canvasOrContext instanceof WebGLRenderingContext) || (typeof WebGL2RenderingContext !== 'undefined' && canvasOrContext instanceof WebGL2RenderingContext)))
 					this.setupCanvas(canvasOrContext, contextConfig);
 				else {
 					this.gl = canvasOrContext;
@@ -12928,42 +12928,29 @@ var spine;
 		SpinePlayer.prototype.stopRendering = function () {
 			this.stopRequestAnimationFrame = true;
 		};
+		SpinePlayer.prototype.hidePopup = function (id) {
+			return this.popup && this.popup.hide(id);
+		};
 		SpinePlayer.prototype.showSpeedDialog = function (speedButton) {
 			var _this = this;
-			if (this.lastPopup) {
-				this.lastPopup.dom.remove();
-				if (findWithClass(this.lastPopup.dom, "spine-player-popup-title").textContent == "Speed") {
-					this.lastPopup = null;
-					speedButton.classList.remove("spine-player-button-icon-speed-selected");
-					return;
-				}
-			}
-			var popup = new Popup(this.dom, this.playerControls, "\n<div class=\"spine-player-popup-title\">Speed</div>\n<hr>\n<div class=\"spine-player-row\" style=\"align-items:center;padding:8px\">\n<div class=\"spine-player-column\">\n\t<div class=\"spine-player-speed-slider\" style=\"margin-bottom:4px\"></div>\n\t<div class=\"spine-player-row\" style=\"justify-content:space-between\"><div>0.1x</div><div>1x</div><div>2x</div></div>\n</div>\n</div>");
+			var id = "speed";
+			if (this.hidePopup(id))
+				return;
+			var popup = new Popup(id, speedButton, this, this.playerControls, "\n<div class=\"spine-player-popup-title\">Speed</div>\n<hr>\n<div class=\"spine-player-row\" style=\"align-items:center;padding:8px\">\n<div class=\"spine-player-column\">\n\t<div class=\"spine-player-speed-slider\" style=\"margin-bottom:4px\"></div>\n\t<div class=\"spine-player-row\" style=\"justify-content:space-between\"><div>0.1x</div><div>1x</div><div>2x</div></div>\n</div>\n</div>");
 			var slider = new Slider(2, 0.1, true);
 			findWithClass(popup.dom, "spine-player-speed-slider").appendChild(slider.create());
 			slider.setValue(this.speed / 2);
 			slider.change = function (percentage) { return _this.speed = percentage * 2; };
-			speedButton.classList.add("spine-player-button-icon-speed-selected");
-			popup.show(function () {
-				speedButton.classList.remove("spine-player-button-icon-speed-selected");
-				popup.dom.remove();
-				_this.lastPopup = null;
-			});
-			this.lastPopup = popup;
+			popup.show();
 		};
 		SpinePlayer.prototype.showAnimationsDialog = function (animationsButton) {
 			var _this = this;
-			if (this.lastPopup) {
-				this.lastPopup.dom.remove();
-				if (findWithClass(this.lastPopup.dom, "spine-player-popup-title").textContent == "Animations") {
-					this.lastPopup = null;
-					animationsButton.classList.remove("spine-player-button-icon-animations-selected");
-					return;
-				}
-			}
+			var id = "animations";
+			if (this.hidePopup(id))
+				return;
 			if (!this.skeleton || !this.skeleton.data.animations.length)
 				return;
-			var popup = new Popup(this.dom, this.playerControls, "<div class=\"spine-player-popup-title\">Animations</div><hr><ul class=\"spine-player-list\"></ul>");
+			var popup = new Popup(id, animationsButton, this, this.playerControls, "<div class=\"spine-player-popup-title\">Animations</div><hr><ul class=\"spine-player-list\"></ul>");
 			var rows = findWithClass(popup.dom, "spine-player-list");
 			this.skeleton.data.animations.forEach(function (animation) {
 				if (_this.config.animations && _this.config.animations.indexOf(animation.name) < 0)
@@ -12982,27 +12969,16 @@ var spine;
 					_this.play();
 				};
 			});
-			animationsButton.classList.add("spine-player-button-icon-animations-selected");
-			popup.show(function () {
-				animationsButton.classList.remove("spine-player-button-icon-animations-selected");
-				popup.dom.remove();
-				_this.lastPopup = null;
-			});
-			this.lastPopup = popup;
+			popup.show();
 		};
 		SpinePlayer.prototype.showSkinsDialog = function (skinButton) {
 			var _this = this;
-			if (this.lastPopup) {
-				this.lastPopup.dom.remove();
-				if (findWithClass(this.lastPopup.dom, "spine-player-popup-title").textContent == "Skins") {
-					this.lastPopup = null;
-					skinButton.classList.remove("spine-player-button-icon-skins-selected");
-					return;
-				}
-			}
+			var id = "skins";
+			if (this.hidePopup(id))
+				return;
 			if (!this.skeleton || !this.skeleton.data.animations.length)
 				return;
-			var popup = new Popup(this.dom, this.playerControls, "<div class=\"spine-player-popup-title\">Skins</div><hr><ul class=\"spine-player-list\"></ul>");
+			var popup = new Popup(id, skinButton, this, this.playerControls, "<div class=\"spine-player-popup-title\">Skins</div><hr><ul class=\"spine-player-list\"></ul>");
 			var rows = findWithClass(popup.dom, "spine-player-list");
 			this.skeleton.data.skins.forEach(function (skin) {
 				if (_this.config.skins && _this.config.skins.indexOf(skin.name) < 0)
@@ -13020,27 +12996,16 @@ var spine;
 					_this.skeleton.setSlotsToSetupPose();
 				};
 			});
-			skinButton.classList.add("spine-player-button-icon-skins-selected");
-			popup.show(function () {
-				skinButton.classList.remove("spine-player-button-icon-skins-selected");
-				popup.dom.remove();
-				_this.lastPopup = null;
-			});
-			this.lastPopup = popup;
+			popup.show();
 		};
 		SpinePlayer.prototype.showSettingsDialog = function (settingsButton) {
 			var _this = this;
-			if (this.lastPopup) {
-				this.lastPopup.dom.remove();
-				if (findWithClass(this.lastPopup.dom, "spine-player-popup-title").textContent == "Debug") {
-					this.lastPopup = null;
-					settingsButton.classList.remove("spine-player-button-icon-settings-selected");
-					return;
-				}
-			}
+			var id = "settings";
+			if (this.hidePopup(id))
+				return;
 			if (!this.skeleton || !this.skeleton.data.animations.length)
 				return;
-			var popup = new Popup(this.dom, this.playerControls, "<div class=\"spine-player-popup-title\">Debug</div><hr><ul class=\"spine-player-list\"></li>");
+			var popup = new Popup(id, settingsButton, this, this.playerControls, "<div class=\"spine-player-popup-title\">Debug</div><hr><ul class=\"spine-player-list\"></li>");
 			var rows = findWithClass(popup.dom, "spine-player-list");
 			var makeItem = function (label, name) {
 				var row = createElement("<li class=\"spine-player-list-item\"></li>");
@@ -13059,13 +13024,7 @@ var spine;
 			makeItem("Clipping", "clipping");
 			makeItem("Points", "points");
 			makeItem("Hulls", "hulls");
-			settingsButton.classList.add("spine-player-button-icon-settings-selected");
-			popup.show(function () {
-				settingsButton.classList.remove("spine-player-button-icon-settings-selected");
-				popup.dom.remove();
-				_this.lastPopup = null;
-			});
-			this.lastPopup = popup;
+			popup.show();
 		};
 		SpinePlayer.prototype.showError = function (message, error) {
 			if (error === void 0) { error = null; }
@@ -13086,35 +13045,49 @@ var spine;
 	}());
 	spine.SpinePlayer = SpinePlayer;
 	var Popup = (function () {
-		function Popup(player, parent, htmlContent) {
+		function Popup(id, button, player, parent, htmlContent) {
+			this.id = id;
+			this.button = button;
 			this.player = player;
 			this.dom = createElement("<div class=\"spine-player-popup spine-player-hidden\"></div>");
 			this.dom.innerHTML = htmlContent;
 			parent.appendChild(this.dom);
+			this.className = "spine-player-button-icon-" + id + "-selected";
 		}
-		Popup.prototype.show = function (dismissedListener) {
+		Popup.prototype.hide = function (id) {
+			this.dom.remove();
+			this.button.classList.remove(this.className);
+			if (this.id == id) {
+				this.player.popup = null;
+				return true;
+			}
+		};
+		Popup.prototype.show = function () {
 			var _this = this;
+			this.player.popup = this;
+			this.button.classList.add(this.className);
 			this.dom.classList.remove("spine-player-hidden");
 			var dismissed = false;
 			var resize = function () {
 				if (!dismissed)
 					requestAnimationFrame(resize);
-				var bottomOffset = Math.abs(_this.dom.getBoundingClientRect().bottom - _this.player.getBoundingClientRect().bottom);
-				var rightOffset = Math.abs(_this.dom.getBoundingClientRect().right - _this.player.getBoundingClientRect().right);
-				var maxHeight = _this.player.clientHeight - bottomOffset - rightOffset;
-				_this.dom.style.maxHeight = maxHeight + "px";
+				var playerDom = _this.player.dom;
+				var bottomOffset = Math.abs(playerDom.getBoundingClientRect().bottom - playerDom.getBoundingClientRect().bottom);
+				var rightOffset = Math.abs(playerDom.getBoundingClientRect().right - playerDom.getBoundingClientRect().right);
+				_this.dom.style.maxHeight = (playerDom.clientHeight - bottomOffset - rightOffset) + "px";
 			};
 			requestAnimationFrame(resize);
 			var justClicked = true;
 			var windowClickListener = function (event) {
-				if (justClicked) {
+				if (justClicked || _this.player.popup != _this) {
 					justClicked = false;
 					return;
 				}
 				if (!_this.dom.contains(event.target)) {
 					_this.dom.remove();
 					window.removeEventListener("click", windowClickListener);
-					dismissedListener();
+					_this.button.classList.remove(_this.className);
+					_this.player.popup = null;
 					dismissed = true;
 				}
 			};

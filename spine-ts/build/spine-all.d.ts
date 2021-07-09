@@ -1699,7 +1699,7 @@ declare module spine.webgl {
 		canvas: HTMLCanvasElement | OffscreenCanvas;
 		gl: WebGLRenderingContext;
 		private restorables;
-		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget | WebGL2RenderingContext, contextConfig?: any);
+		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget, contextConfig?: any);
 		private setupCanvas;
 		addRestorable(restorable: Restorable): void;
 		removeRestorable(restorable: Restorable): void;
@@ -1776,7 +1776,7 @@ declare module spine.threejs {
 	}
 }
 declare module spine {
-	interface SpinePlayerConfig {
+	export interface SpinePlayerConfig {
 		jsonUrl: string;
 		jsonField: string;
 		binaryUrl: string;
@@ -1833,7 +1833,7 @@ declare module spine {
 		loading: (player: SpinePlayer, delta: number) => void;
 		downloader: spine.Downloader;
 	}
-	interface Viewport {
+	export interface Viewport {
 		x: number;
 		y: number;
 		width: number;
@@ -1843,7 +1843,7 @@ declare module spine {
 		padTop: string | number;
 		padBottom: string | number;
 	}
-	class SpinePlayer {
+	export class SpinePlayer {
 		private config;
 		parent: HTMLElement;
 		dom: HTMLElement;
@@ -1862,7 +1862,7 @@ declare module spine {
 		private playTime;
 		private selectedBones;
 		private cancelId;
-		private lastPopup;
+		popup: Popup;
 		error: boolean;
 		skeleton: Skeleton;
 		animationState: AnimationState;
@@ -1888,12 +1888,24 @@ declare module spine {
 		private calculateAnimationViewport;
 		private drawFrame;
 		stopRendering(): void;
+		private hidePopup;
 		private showSpeedDialog;
 		private showAnimationsDialog;
 		private showSkinsDialog;
 		private showSettingsDialog;
 		private showError;
 	}
+	class Popup {
+		private id;
+		private button;
+		private player;
+		dom: HTMLElement;
+		private className;
+		constructor(id: string, button: HTMLElement, player: SpinePlayer, parent: HTMLElement, htmlContent: string);
+		hide(id: string): boolean;
+		show(): void;
+	}
+	export {};
 }
 declare function CodeMirror(el: Element, config: any): void;
 declare module spine {

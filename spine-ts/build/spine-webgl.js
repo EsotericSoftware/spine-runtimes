@@ -3702,7 +3702,7 @@ var spine;
 					break;
 				case spine.SpacingMode.Proportional:
 					var sum = 0;
-					for (var i = 0; i < boneCount;) {
+					for (var i = 0, n = spacesCount - 1; i < n;) {
 						var bone = bones[i];
 						var setupLength = bone.data.length;
 						if (setupLength < PathConstraint.epsilon) {
@@ -11546,7 +11546,7 @@ var spine;
 			function ManagedWebGLRenderingContext(canvasOrContext, contextConfig) {
 				if (contextConfig === void 0) { contextConfig = { alpha: "true" }; }
 				this.restorables = new Array();
-				if (!((canvasOrContext instanceof WebGLRenderingContext) || (canvasOrContext instanceof WebGL2RenderingContext)))
+				if (!((canvasOrContext instanceof WebGLRenderingContext) || (typeof WebGL2RenderingContext !== 'undefined' && canvasOrContext instanceof WebGL2RenderingContext)))
 					this.setupCanvas(canvasOrContext, contextConfig);
 				else {
 					this.gl = canvasOrContext;

@@ -3702,7 +3702,7 @@ var spine;
 					break;
 				case spine.SpacingMode.Proportional:
 					var sum = 0;
-					for (var i = 0; i < boneCount;) {
+					for (var i = 0, n = spacesCount - 1; i < n;) {
 						var bone = bones[i];
 						var setupLength = bone.data.length;
 						if (setupLength < PathConstraint.epsilon) {

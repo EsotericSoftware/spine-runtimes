@@ -33,8 +33,8 @@ module spine.webgl {
 		public gl: WebGLRenderingContext;
 		private restorables = new Array<Restorable>();
 
-		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget | WebGL2RenderingContext, contextConfig: any = { alpha: "true" }) {
-			if (!((canvasOrContext instanceof WebGLRenderingContext) || (canvasOrContext instanceof WebGL2RenderingContext)))
+		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget, contextConfig: any = { alpha: "true" }) {
+			if (!((canvasOrContext instanceof WebGLRenderingContext) || (typeof WebGL2RenderingContext !== 'undefined' && canvasOrContext instanceof WebGL2RenderingContext)))
 				this.setupCanvas(canvasOrContext, contextConfig);
 			else {
 				this.gl = canvasOrContext;
