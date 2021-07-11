@@ -1252,7 +1252,7 @@ namespace Spine {
 	}
 
 	class EventQueue {
-		private readonly ExposedList<EventQueueEntry> eventQueueEntries = new ExposedList<EventQueueEntry>();
+		private readonly List<EventQueueEntry> eventQueueEntries = new List<EventQueueEntry>();
 		internal bool drainDisabled;
 
 		private readonly AnimationState state;
@@ -1296,12 +1296,12 @@ namespace Spine {
 			if (drainDisabled) return;
 			drainDisabled = true;
 
-			EventQueueEntry[] entries = eventQueueEntries.Items;
+			List<EventQueueEntry> eventQueueEntries = this.eventQueueEntries;
 			AnimationState state = this.state;
 
 			// Don't cache eventQueueEntries.Count so callbacks can queue their own events (eg, call SetAnimation in AnimationState_Complete).
 			for (int i = 0; i < eventQueueEntries.Count; i++) {
-				EventQueueEntry queueEntry = entries[i];
+				EventQueueEntry queueEntry = eventQueueEntries[i];
 				TrackEntry trackEntry = queueEntry.entry;
 
 				switch (queueEntry.type) {
