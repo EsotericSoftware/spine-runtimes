@@ -671,10 +671,9 @@ namespace Spine.Unity {
 
 				var submeshMaterial = submeshInstructionItem.material;
 				var canvasRenderer = canvasRenderers[i];
-				if (i >= usedRenderersCount) {
+				if (i >= usedRenderersCount)
 					canvasRenderer.gameObject.SetActive(true);
-					rawImages[i].Rebuild(CanvasUpdate.PreRender);
-				}
+
 				canvasRenderer.SetMesh(targetMesh);
 				canvasRenderer.materialCount = 1;
 
