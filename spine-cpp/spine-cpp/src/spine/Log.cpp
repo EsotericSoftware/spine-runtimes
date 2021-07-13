@@ -44,8 +44,8 @@ void spine::spDebug_printSkeletonData(SkeletonData *skeletonData) {
 
 void _spDebug_printTimelineBase(Timeline *timeline) {
 	printf("   Timeline %s:\n", timeline->getRTTI().getClassName());
-	printf("      frame count: %lu\n", timeline->getFrameCount());
-	printf("      frame entries: %lu\n", timeline->getFrameEntries());
+	printf("      frame count: %zu\n", timeline->getFrameCount());
+	printf("      frame entries: %zu\n", timeline->getFrameEntries());
 	printf("      frames: ");
 	spDebug_printFloats(timeline->getFrames());
 	printf("\n");
@@ -67,7 +67,7 @@ void spine::spDebug_printTimeline(Timeline *timeline) {
 
 void spine::spDebug_printAnimation(Animation *animation) {
 	int i, n;
-	printf("Animation %s: %lu timelines\n", animation->getName().buffer(), animation->getTimelines().size());
+	printf("Animation %s: %zu timelines\n", animation->getName().buffer(), animation->getTimelines().size());
 
 	for (i = 0, n = animation->getTimelines().size(); i < n; i++) {
 		Timeline *timeline = animation->getTimelines()[i];
@@ -115,7 +115,7 @@ void spine::spDebug_printFloats(float *values, int numFloats) {
 
 void spine::spDebug_printFloats(Vector<float> &values) {
 	int i, n;
-	printf("(%lu) [", values.size());
+	printf("(%zu) [", values.size());
 	for (i = 0, n = values.size(); i < n; i++) {
 		printf("%f, ", values[i]);
 	}
