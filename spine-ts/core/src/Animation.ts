@@ -1088,7 +1088,7 @@ module spine {
 				color.r = r;
 				color.g = g;
 				color.b = b;
-			} else {
+			} else {
 				if (blend == MixBlend.setup) {
 					let setup = slot.data.color;
 					color.r = setup.r;
@@ -1560,7 +1560,7 @@ module spine {
 						}
 					} else
 						Utils.arrayCopy(lastVertices, 0, deform, 0, vertexCount);
-				} else {
+				} else {
 					switch (blend) {
 					case MixBlend.setup: {
 						let vertexAttachment = slotAttachment as VertexAttachment;

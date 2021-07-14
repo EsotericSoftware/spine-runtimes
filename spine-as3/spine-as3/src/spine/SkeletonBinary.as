@@ -933,7 +933,7 @@ package spine {
 									deform.length = deformLength;
 								} else
 									deform = vertices;
-							} else {
+							} else {
 								var v : int, vn: int;
 								deform = new Vector.<Number>();
 								deform.length = deformLength;

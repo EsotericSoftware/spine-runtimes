@@ -1103,7 +1103,7 @@ module spine {
 		private knob: HTMLElement;
 		public change: (percentage: number) => void;
 
-		constructor (public snaps = 0, public snapPercentage = 0.1, public big = false) { }
+		constructor (public snaps = 0, public snapPercentage = 0.1, public big = false) { }
 
 		create (): HTMLElement {
 			this.slider = createElement(/*html*/`
