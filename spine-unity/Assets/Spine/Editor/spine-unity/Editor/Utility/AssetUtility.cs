@@ -47,6 +47,10 @@
 #define EXPOSES_SPRITE_ATLAS_UTILITIES
 #endif
 
+#if !UNITY_2019_4_OR_NEWER
+#define PROBLEMATIC_PACKAGE_ASSET_MODIFICATION
+#endif
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -313,8 +317,10 @@ namespace Spine.Unity.Editor {
 			// Import atlases first.
 			var newAtlases = new List<AtlasAssetBase>();
 			foreach (string ap in atlasPaths) {
+			#if PROBLEMATIC_PACKAGE_ASSET_MODIFICATION
 				if (ap.StartsWith("Packages"))
 					continue;
+			#endif
 				TextAsset atlasText = AssetDatabase.LoadAssetAtPath<TextAsset>(ap);
 				AtlasAssetBase atlas = IngestSpineAtlas(atlasText, texturesWithoutMetaFile);
 				newAtlases.Add(atlas);
@@ -327,8 +333,10 @@ namespace Spine.Unity.Editor {
 				string skeletonPath = skeletonPathEntry.path;
 				var compatibilityProblems = skeletonPathEntry.compatibilityProblems;
 				string otherProblemDescription = skeletonPathEntry.otherProblemDescription;
+			#if PROBLEMATIC_PACKAGE_ASSET_MODIFICATION
 				if (skeletonPath.StartsWith("Packages"))
 					continue;
+			#endif
 				if (!reimport && CheckForValidSkeletonData(skeletonPath)) {
 					ReloadSkeletonData(skeletonPath, compatibilityProblems);
 					continue;
@@ -617,7 +625,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public static bool SpriteAtlasSettingsNeedAdjustment (UnityEngine.U2D.SpriteAtlas spriteAtlas) {
-		#if EXPOSES_SPRITE_ATLAS_UTILITIES
+#if EXPOSES_SPRITE_ATLAS_UTILITIES
 			UnityEditor.U2D.SpriteAtlasPackingSettings packingSettings = UnityEditor.U2D.SpriteAtlasExtensions.GetPackingSettings(spriteAtlas);
 			UnityEditor.U2D.SpriteAtlasTextureSettings textureSettings = UnityEditor.U2D.SpriteAtlasExtensions.GetTextureSettings(spriteAtlas);
 
@@ -628,13 +636,13 @@ namespace Spine.Unity.Editor {
 				textureSettings.generateMipMaps == false;
 			// note: platformSettings.textureCompression is always providing "Compressed", so we have to skip it.
 			return !areSettingsAsDesired;
-		#else
+#else
 			return false;
-		#endif
+#endif
 		}
 
 		public static bool AdjustSpriteAtlasSettings (UnityEngine.U2D.SpriteAtlas spriteAtlas) {
-		#if EXPOSES_SPRITE_ATLAS_UTILITIES
+#if EXPOSES_SPRITE_ATLAS_UTILITIES
 			UnityEditor.U2D.SpriteAtlasPackingSettings packingSettings = UnityEditor.U2D.SpriteAtlasExtensions.GetPackingSettings(spriteAtlas);
 			UnityEditor.U2D.SpriteAtlasTextureSettings textureSettings = UnityEditor.U2D.SpriteAtlasExtensions.GetTextureSettings(spriteAtlas);
 
@@ -654,9 +662,9 @@ namespace Spine.Unity.Editor {
 			string atlasPath = AssetDatabase.GetAssetPath(spriteAtlas);
 			Debug.Log(string.Format("Adjusted unsuitable SpriteAtlas settings '{0}'", atlasPath), spriteAtlas);
 			return false;
-		#else
+#else
 			return true;
-		#endif
+#endif
 		}
 
 		public static bool GeneratePngFromSpriteAtlas (UnityEngine.U2D.SpriteAtlas spriteAtlas, out string texturePath) {
