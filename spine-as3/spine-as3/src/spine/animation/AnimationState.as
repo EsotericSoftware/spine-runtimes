@@ -658,7 +658,7 @@ package spine.animation {
 				else if (to == null || timeline is AttachmentTimeline || timeline is DrawOrderTimeline
 					|| timeline is EventTimeline || !to.animation.hasTimeline(ids)) {
 					timelineMode[i] = FIRST;
-				} else {
+				} else {
 					for (var next : TrackEntry = to.mixingTo; next != null; next = next.mixingTo) {
 						if (next.animation.hasTimeline(ids)) continue;
 						if (entry.mixDuration > 0) {

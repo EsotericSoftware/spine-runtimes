@@ -115,7 +115,7 @@ package spine.animation {
 				color.r = r;
 				color.g = g;
 				color.b = b;
-			} else {
+			} else {
 				if (blend == MixBlend.setup) {
 					setup = slot.data.color;
 					color.r = setup.r;

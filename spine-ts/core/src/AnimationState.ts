@@ -720,7 +720,7 @@ module spine {
 				else if (!to || timeline instanceof AttachmentTimeline || timeline instanceof DrawOrderTimeline
 					|| timeline instanceof EventTimeline || !to.animation.hasTimeline(ids)) {
 					timelineMode[i] = FIRST;
-				} else {
+				} else {
 					for (let next = to.mixingTo; next; next = next.mixingTo) {
 						if (next.animation.hasTimeline(ids)) continue;
 						if (entry.mixDuration > 0) {

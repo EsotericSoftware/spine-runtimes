@@ -183,7 +183,7 @@ package spine.animation {
 						for (i = 0; i < vertexCount; i++)
 							deform[i] = lastVertices[i];
 					}
-				} else {
+				} else {
 					switch (blend) {
 					case MixBlend.setup: {
 						if (vertexAttachment.bones == null) {

@@ -946,7 +946,7 @@ module spine {
 	}
 
 	class BinaryInput {
-		constructor(data: Uint8Array, public strings = new Array<string>(), private index: number = 0, private buffer = new DataView(data.buffer)) { 
+		constructor(data: Uint8Array, public strings = new Array<string>(), private index: number = 0, private buffer = new DataView(data.buffer)) {
 		}
 
 		readByte(): number {

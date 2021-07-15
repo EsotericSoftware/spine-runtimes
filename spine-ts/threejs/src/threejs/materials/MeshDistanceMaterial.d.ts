@@ -3,8 +3,8 @@ import { Vector3 } from './../math/Vector3';
 import { Texture } from './../textures/Texture';
 
 export interface MeshDistanceMaterialParameters extends MaterialParameters {
-	alphaMap?: Texture | null;
-	displacementMap?: Texture | null;
+	alphaMap?: Texture | null;
+	displacementMap?: Texture | null;
 	displacementScale?: number;
 	displacementBias?: number;
 	farDistance?: number;
@@ -16,7 +16,7 @@ export class MeshDistanceMaterial extends Material {
 
 	constructor( parameters?: MeshDistanceMaterialParameters );
 
-	alphaMap: Texture | null;
+	alphaMap: Texture | null;
 	displacementMap: Texture | null;
 	displacementScale: number;
 	displacementBias: number;

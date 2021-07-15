@@ -610,7 +610,7 @@ module spine {
 					verticesLength = 8;
 					vertices = Utils.setArraySize(temp, verticesLength, 0);
 					(<RegionAttachment>attachment).computeWorldVertices(slot.bone, vertices, 0, 2);
-				} else if (attachment instanceof MeshAttachment) {
+				} else if (attachment instanceof MeshAttachment) {
 					let mesh = (<MeshAttachment>attachment);
 					verticesLength = mesh.worldVerticesLength;
 					vertices = Utils.setArraySize(temp, verticesLength, 0);
