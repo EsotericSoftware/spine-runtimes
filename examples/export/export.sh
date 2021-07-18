@@ -149,6 +149,7 @@ if [ -d "$UNITY_BASE_DIR" ]; then
 	echo "Exporting Unity assets..."
 	"$SPINE_EXE" \
 	-u $version \
+	--clean-examples \
 	-i $UNITY_BASE_DIR/eyes/eyes.spine -o $UNITY_BASE_DIR/eyes/export -e json.json \
 	-i $UNITY_BASE_DIR/eyes/eyes.spine -o $UNITY_BASE_DIR/eyes/export -e binary.json \
 	-i $UNITY_BASE_DIR/eyes/images -o $UNITY_BASE_DIR/eyes/export -n eyes -p atlas-1.0.json \
