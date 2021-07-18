@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "xw6BotWLkgU",
-	"spine": "4.0.58-beta",
+	"hash": "IQgkYFQG8ng",
+	"spine": "4.0.07",
 	"x": -188.63,
 	"y": -7.94,
 	"width": 418.45,
@@ -358,9 +358,7 @@
 		"rotation": -180,
 		"mixRotate": 0,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -371,9 +369,7 @@
 		"rotation": 84.3,
 		"mixRotate": 0,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -385,9 +381,7 @@
 		"y": 56.4,
 		"mixRotate": 0,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -399,9 +393,7 @@
 		"shearY": -36,
 		"mixRotate": 0,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -413,9 +405,7 @@
 		"y": 20.7,
 		"mixRotate": 0,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -427,9 +417,7 @@
 		"y": 21.3,
 		"mixRotate": 0,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -440,9 +428,7 @@
 		"y": -1.66,
 		"mixRotate": 0,
 		"mixX": -1,
-		"mixY": -1,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -452,9 +438,7 @@
 		"target": "hoverboard-controller",
 		"mixRotate": 0,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	}
 ],
@@ -1034,7 +1018,11 @@
 						"value": 47.95,
 						"curve": [ 2.3, 47.95, 2.617, 18.72 ]
 					},
-					{ "time": 2.6667, "value": 18.51, "curve": "stepped" },
+					{
+						"time": 2.6667,
+						"value": 18.51,
+						"curve": [ 3.172, 16.58, 4.06, 16.79 ]
+					},
 					{
 						"time": 4.5333,
 						"value": 18.51,
@@ -1900,7 +1888,11 @@
 						"value": 1.29,
 						"curve": [ 1.509, 3.3, 1.763, 2.75 ]
 					},
-					{ "time": 1.8667, "value": 2.78, "curve": "stepped" },
+					{
+						"time": 1.8667,
+						"value": 2.78,
+						"curve": [ 1.974, 2.81, 2.108, 2.81 ]
+					},
 					{
 						"time": 2.2,
 						"value": 2.78,
@@ -2005,7 +1997,11 @@
 						"value": 15.21,
 						"curve": [ 1.142, 15.21, 1.183, 10.73 ]
 					},
-					{ "time": 1.2667, "value": 10.61, "curve": "stepped" },
+					{
+						"time": 1.2667,
+						"value": 10.61,
+						"curve": [ 1.45, 10.34, 1.817, 10.61 ]
+					},
 					{
 						"time": 2,
 						"value": 10.61,

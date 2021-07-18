@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "3P3VgYJ8Bxk",
-	"spine": "4.0.58-beta",
+	"spine": "4.0.07",
 	"x": -5852.65,
 	"y": -348.5,
 	"width": 7202.61,
@@ -889,9 +889,7 @@
 		"target": "wheel-big1",
 		"rotation": 65.6,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -901,9 +899,7 @@
 		"target": "wheel-mid1",
 		"rotation": 93,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -913,9 +909,7 @@
 		"target": "wheel-mid1",
 		"rotation": -89,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -925,9 +919,7 @@
 		"target": "wheel-mid1",
 		"rotation": -152.6,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -937,9 +929,7 @@
 		"target": "wheel-small1",
 		"rotation": 87,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -949,9 +939,7 @@
 		"target": "wheel-small1",
 		"rotation": 54.9,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	}
 ],
