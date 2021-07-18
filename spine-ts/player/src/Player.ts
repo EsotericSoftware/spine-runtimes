@@ -218,6 +218,7 @@ module spine {
 		constructor (parent: HTMLElement | string, private config: SpinePlayerConfig) {
 			this.parent = typeof parent === "string" ? document.getElementById(parent) : parent;
 
+			if (config.showControls === void 0) config.showControls = true;
 			let controls = config.showControls ? /*html*/`
 <div class="spine-player-controls spine-player-popup-parent spine-player-controls-hidden">
 <div class="spine-player-timeline"></div>
@@ -270,7 +271,6 @@ module spine {
 			if (config.viewport.debugRender === void 0) config.viewport.debugRender = false;
 			if (config.viewport.transitionTime === void 0) config.viewport.transitionTime = 0.25;
 			if (!config.controlBones) config.controlBones = [];
-			if (config.showControls === void 0) config.showControls = true;
 			if (config.showLoading === void 0) config.showLoading = true;
 			if (config.defaultMix === void 0) config.defaultMix = 0.25;
 		}
