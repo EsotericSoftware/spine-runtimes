@@ -2,6 +2,7 @@ windmill-pma.png
 	size: 1024, 512
 	filter: Linear, Linear
 	pma: true
+	scale: 0.5
 bush1
 	bounds: 398, 8, 56, 38
 bush2

@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "EedJfu7UJ/I",
-	"spine": "4.0.58-beta",
+	"spine": "4.0.07",
 	"x": -240.58,
 	"y": -3.38,
 	"width": 410.36,
@@ -840,9 +840,7 @@
 		"target": "eye-back-pupil",
 		"mixRotate": 0,
 		"mixX": 0.4,
-		"mixY": 0.4,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -852,9 +850,7 @@
 		"target": "eye-front-pupil",
 		"mixRotate": 0,
 		"mixX": 0.4,
-		"mixY": 0.4,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -864,9 +860,7 @@
 		"target": "head-control",
 		"mixRotate": 0,
 		"mixX": 0.2,
-		"mixY": 0.2,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -879,9 +873,7 @@
 		"y": 46.72,
 		"mixRotate": 0,
 		"mixX": 0.05,
-		"mixY": 0.05,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -894,9 +886,7 @@
 		"y": 27.17,
 		"mixRotate": 0,
 		"mixX": 0.15,
-		"mixY": 0.15,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -911,9 +901,7 @@
 		"shearY": -36,
 		"mixRotate": 0,
 		"mixX": 0.6,
-		"mixY": 0.6,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -924,9 +912,7 @@
 		"x": -88.92,
 		"mixRotate": 0,
 		"mixX": -1,
-		"mixY": -1,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -938,7 +924,6 @@
 		"x": 132.85,
 		"y": 58.02,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -950,7 +935,6 @@
 		"x": 17.25,
 		"y": 41.79,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -962,7 +946,6 @@
 		"x": 147.87,
 		"y": -60.85,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -974,7 +957,6 @@
 		"x": 23.51,
 		"y": -48.52,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -986,7 +968,6 @@
 		"x": 130.03,
 		"y": -50.13,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -998,7 +979,6 @@
 		"x": 129.36,
 		"y": 40.42,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -1011,9 +991,7 @@
 		"y": -46.12,
 		"mixRotate": 0.18,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -1026,9 +1004,7 @@
 		"y": 29.54,
 		"mixRotate": 0.186,
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -1042,9 +1018,7 @@
 		"y": -0.72,
 		"shearY": -36,
 		"mixX": 0.7,
-		"mixY": 0.7,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	},
 	{
@@ -1058,9 +1032,7 @@
 		"y": 2.23,
 		"shearY": -36,
 		"mixX": 0.7,
-		"mixY": 0.7,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	}
 ],
