@@ -217,6 +217,7 @@ module spine {
 
 		constructor (parent: HTMLElement | string, private config: SpinePlayerConfig) {
 			this.parent = typeof parent === "string" ? document.getElementById(parent) : parent;
+			if (!this.parent) throw new Error("SpinePlayer parent not found: " + parent);
 
 			if (config.showControls === void 0) config.showControls = true;
 			let controls = config.showControls ? /*html*/`
