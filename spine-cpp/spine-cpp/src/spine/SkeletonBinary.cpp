@@ -707,7 +707,7 @@ Timeline *SkeletonBinary::readTimeline(DataInput *input, CurveTimeline1 *timelin
 				timeline->setStepped(frame);
 				break;
 			case CURVE_BEZIER:
-				setBezier(input, timeline, bezier++, frame, 0, time, time2, value, value2, 1);
+				setBezier(input, timeline, bezier++, frame, 0, time, time2, value, value2, scale);
 		}
 		time = time2;
 		value = value2;

@@ -1031,7 +1031,7 @@ namespace Spine {
 					timeline.SetStepped(frame);
 					break;
 				case CURVE_BEZIER:
-					SetBezier (input, timeline, bezier++, frame, 0, time, time2, value, value2, 1);
+					SetBezier (input, timeline, bezier++, frame, 0, time, time2, value, value2, scale);
 						break;
 				}
 				time = time2;

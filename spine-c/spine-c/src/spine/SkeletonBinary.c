@@ -239,7 +239,7 @@ static spTimeline *readTimeline(_dataInput *input, spCurveTimeline1 *timeline, f
 				spCurveTimeline_setStepped(timeline, frame);
 				break;
 			case CURVE_BEZIER:
-				setBezier(input, SUPER(timeline), bezier++, frame, 0, time, time2, value, value2, 1);
+				setBezier(input, SUPER(timeline), bezier++, frame, 0, time, time2, value, value2, scale);
 		}
 		time = time2;
 		value = value2;
