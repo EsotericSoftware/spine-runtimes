@@ -71,6 +71,11 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		singleFieldRect.y += lineHeightWithSpacing;
 		EditorGUI.PropertyField(singleFieldRect, loopProp);
 
+		singleFieldRect.y += lineHeightWithSpacing;
+		EditorGUI.PropertyField(singleFieldRect, dontPauseWithDirectorProp,
+			new GUIContent("Don't Pause with Director",
+				"If set to true, the animation will continue playing when the Director is paused."));
+
 		singleFieldRect.y += lineHeightWithSpacing * 0.5f;
 
 		singleFieldRect.y += lineHeightWithSpacing;
@@ -91,9 +96,6 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 
 		singleFieldRect.y += lineHeightWithSpacing;
 		EditorGUI.PropertyField(singleFieldRect, holdPreviousProp);
-
-		singleFieldRect.y += lineHeightWithSpacing;
-		EditorGUI.PropertyField(singleFieldRect, dontPauseWithDirectorProp);
 
 		singleFieldRect.y += lineHeightWithSpacing;
 		EditorGUI.PropertyField(singleFieldRect, eventProp);
