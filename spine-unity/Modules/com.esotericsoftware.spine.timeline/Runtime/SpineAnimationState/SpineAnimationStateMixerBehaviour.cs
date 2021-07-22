@@ -41,14 +41,17 @@ namespace Spine.Unity.Playables {
 		public int trackIndex;
 
 		IAnimationStateComponent animationStateComponent;
+		bool dontPauseWithDirector = true;
 		bool isPaused = false;
 		TrackEntry pausedTrackEntry;
 		float previousTimeScale = 1;
 
 		public override void OnBehaviourPause (Playable playable, FrameData info) {
-			if (!isPaused)
-				HandlePause(playable);
-			isPaused = true;
+			if (!dontPauseWithDirector) {
+				if (!isPaused)
+					HandlePause(playable);
+				isPaused = true;
+			}
 		}
 
 		public override void OnBehaviourPlay (Playable playable, FrameData info) {
@@ -118,6 +121,8 @@ namespace Spine.Unity.Playables {
 				if (trackStarted) {
 					ScriptPlayable<SpineAnimationStateBehaviour> inputPlayable = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(i);
 					SpineAnimationStateBehaviour clipData = inputPlayable.GetBehaviour();
+
+					dontPauseWithDirector = clipData.dontPauseWithDirector;
 
 					if (clipData.animationReference == null) {
 						float mixDuration = clipData.customDuration ? clipData.mixDuration : state.Data.DefaultMix;
