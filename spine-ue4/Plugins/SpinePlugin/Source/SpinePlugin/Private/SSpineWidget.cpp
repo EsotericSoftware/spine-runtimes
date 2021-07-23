@@ -196,7 +196,7 @@ void SSpineWidget::Flush(int32 LayerId, FSlateWindowElementList &OutDrawElements
 
 	self->renderData.VertexData.SetNumUninitialized(Vertices.Num());
 	FSlateVertex *vertexData = (FSlateVertex *) renderData.VertexData.GetData();
-	FVector2D offset = AllottedGeometry.AbsolutePosition;
+	FVector2D offset = AllottedGeometry.GetAbsolutePositionAtCoordinates(FVector2D(0.0f, 0.0f));
 	FColor white = FColor(0xffffffff);
 	const FSlateRenderTransform &Transform = AllottedGeometry.GetAccumulatedRenderTransform();
 
