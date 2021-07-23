@@ -220,7 +220,7 @@ static SimpleString *ai_readLine(AtlasInput *self) {
 	self->line.end = self->index;
 	if (self->index != self->end) self->index++;
 	self->line = *ss_trim(&self->line);
-	self->line.length = self->end - self->start;
+	self->line.length = self->line.end - self->line.start;
 	return &self->line;
 }
 
