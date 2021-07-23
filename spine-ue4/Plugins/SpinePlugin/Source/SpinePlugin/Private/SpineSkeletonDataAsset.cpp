@@ -221,7 +221,8 @@ static bool checkBinary(const char *binaryData, int length) {
 	BinaryInput input;
 	input.cursor = (const unsigned char *) binaryData;
 	input.end = (const unsigned char *) binaryData + length;
-	SpineExtension::free(readString(&input), __FILE__, __LINE__);
+	// Skip hash
+	input.cursor += 8;
 	char *version = readString(&input);
 	bool result = checkVersion(version);
 	SpineExtension::free(version, __FILE__, __LINE__);
