@@ -1,6 +1,6 @@
 // This is a premultiply-alpha adaptation of the built-in Unity shader "UI/Default" in Unity 5.6.2 to allow Unity UI stencil masking.
 
-Shader "Spine/SkeletonGraphic"
+Shader "Spine/SkeletonGraphic Multiply"
 {
 	Properties
 	{
@@ -54,9 +54,10 @@ Shader "Spine/SkeletonGraphic"
 		ZWrite Off
 		ZTest [unity_GUIZTestMode]
 		Fog { Mode Off }
-		Blend One OneMinusSrcAlpha
+		Blend DstColor OneMinusSrcAlpha
 		ColorMask [_ColorMask]
 
+		//UsePass "Spine/SkeletonGraphic/NORMAL"
 		Pass
 		{
 			Name "Normal"

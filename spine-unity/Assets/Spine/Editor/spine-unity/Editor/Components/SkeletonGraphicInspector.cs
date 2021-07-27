@@ -49,6 +49,7 @@ namespace Spine.Unity.Editor {
 		static GUIStyle ReloadButtonStyle { get { return EditorStyles.miniButton; } }
 
 		SerializedProperty material, color;
+		SerializedProperty additiveMaterial, multiplyMaterial, screenMaterial;
 		SerializedProperty skeletonDataAsset, initialSkinName;
 		SerializedProperty startingAnimation, startingLoop, timeScale, freeze, updateWhenInvisible, unscaledTime, tintBlack;
 		SerializedProperty initialFlipX, initialFlipY;
@@ -98,6 +99,10 @@ namespace Spine.Unity.Editor {
 			raycastTarget = so.FindProperty("m_RaycastTarget");
 
 			// SkeletonRenderer
+			additiveMaterial = so.FindProperty("additiveMaterial");
+			multiplyMaterial = so.FindProperty("multiplyMaterial");
+			screenMaterial = so.FindProperty("screenMaterial");
+
 			skeletonDataAsset = so.FindProperty("skeletonDataAsset");
 			initialSkinName = so.FindProperty("initialSkinName");
 
@@ -201,6 +206,35 @@ namespace Spine.Unity.Editor {
 						}
 						EditorGUILayout.EndHorizontal();
 
+						var blendModeMaterials = thisSkeletonGraphic.skeletonDataAsset.blendModeMaterials;
+						if (allowMultipleCanvasRenderers.boolValue == true && blendModeMaterials.RequiresBlendModeMaterials) {
+							using (new SpineInspectorUtility.IndentScope()) {
+								EditorGUILayout.BeginHorizontal();
+								EditorGUILayout.LabelField("Blend Mode Materials", EditorStyles.boldLabel);
+
+								if (GUILayout.Button(new GUIContent("Assign Default", "Assign default Blend Mode Materials."),
+									EditorStyles.miniButton, GUILayout.Width(100f))) {
+									AssignDefaultBlendModeMaterials();
+								}
+								EditorGUILayout.EndHorizontal();
+
+								bool usesAdditiveMaterial = blendModeMaterials.applyAdditiveMaterial;
+								bool pmaVertexColors = thisSkeletonGraphic.MeshGenerator.settings.pmaVertexColors;
+								if (pmaVertexColors)
+									using (new EditorGUI.DisabledGroupScope(true)) {
+										EditorGUILayout.LabelField("Additive Material - Unused with PMA Vertex Colors", EditorStyles.label);
+									}
+								else if (usesAdditiveMaterial)
+									EditorGUILayout.PropertyField(additiveMaterial, SpineInspectorUtility.TempContent("Additive Material", null, "SkeletonGraphic Material for 'Additive' blend mode slots. Unused when 'PMA Vertex Colors' is enabled."));
+								else
+									using (new EditorGUI.DisabledGroupScope(true)) {
+										EditorGUILayout.LabelField("No Additive Mat - 'Apply Additive Material' disabled at SkeletonDataAsset", EditorStyles.label);
+									}
+								EditorGUILayout.PropertyField(multiplyMaterial, SpineInspectorUtility.TempContent("Multiply Material", null, "SkeletonGraphic Material for 'Multiply' blend mode slots."));
+								EditorGUILayout.PropertyField(screenMaterial, SpineInspectorUtility.TempContent("Screen Material", null, "SkeletonGraphic Material for 'Screen' blend mode slots."));
+							}
+						}
+
 						EditorGUILayout.PropertyField(updateWhenInvisible);
 
 						// warning box
@@ -297,6 +331,15 @@ namespace Spine.Unity.Editor {
 					return true;
 			}
 			return false;
+		}
+
+		protected void AssignDefaultBlendModeMaterials () {
+			foreach (var target in targets) {
+				var skeletonGraphic = (SkeletonGraphic)target;
+				skeletonGraphic.additiveMaterial = DefaultSkeletonGraphicAdditiveMaterial;
+				skeletonGraphic.multiplyMaterial = DefaultSkeletonGraphicMultiplyMaterial;
+				skeletonGraphic.screenMaterial = DefaultSkeletonGraphicScreenMaterial;
+			}
 		}
 
 		public static void SetSeparatorSlotNames (SkeletonRenderer skeletonRenderer, string[] newSlotNames) {
@@ -419,20 +462,37 @@ namespace Spine.Unity.Editor {
 			var go = EditorInstantiation.NewGameObject(gameObjectName, true, typeof(RectTransform), typeof(CanvasRenderer), typeof(SkeletonGraphic));
 			var graphic = go.GetComponent<SkeletonGraphic>();
 			graphic.material = SkeletonGraphicInspector.DefaultSkeletonGraphicMaterial;
+			graphic.additiveMaterial = SkeletonGraphicInspector.DefaultSkeletonGraphicAdditiveMaterial;
+			graphic.multiplyMaterial = SkeletonGraphicInspector.DefaultSkeletonGraphicMultiplyMaterial;
+			graphic.screenMaterial = SkeletonGraphicInspector.DefaultSkeletonGraphicScreenMaterial;
 			return go;
 		}
 
 		public static Material DefaultSkeletonGraphicMaterial {
-			get {
-				var guids = AssetDatabase.FindAssets("SkeletonGraphicDefault t:material");
-				if (guids.Length <= 0) return null;
+			get { return FirstMaterialWithName("SkeletonGraphicDefault"); }
+		}
 
-				var firstAssetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
-				if (string.IsNullOrEmpty(firstAssetPath)) return null;
+		public static Material DefaultSkeletonGraphicAdditiveMaterial {
+			get { return FirstMaterialWithName("SkeletonGraphicAdditive"); }
+		}
 
-				var firstMaterial = AssetDatabase.LoadAssetAtPath<Material>(firstAssetPath);
-				return firstMaterial;
-			}
+		public static Material DefaultSkeletonGraphicMultiplyMaterial {
+			get { return FirstMaterialWithName("SkeletonGraphicMultiply"); }
+		}
+
+		public static Material DefaultSkeletonGraphicScreenMaterial {
+			get { return FirstMaterialWithName("SkeletonGraphicScreen"); }
+		}
+
+		protected static Material FirstMaterialWithName (string name) {
+			var guids = AssetDatabase.FindAssets(name + " t:material");
+			if (guids.Length <= 0) return null;
+
+			var firstAssetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
+			if (string.IsNullOrEmpty(firstAssetPath)) return null;
+
+			var firstMaterial = AssetDatabase.LoadAssetAtPath<Material>(firstAssetPath);
+			return firstMaterial;
 		}
 
 		#endregion

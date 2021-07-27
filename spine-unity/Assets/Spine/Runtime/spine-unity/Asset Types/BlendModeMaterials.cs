@@ -52,6 +52,16 @@ namespace Spine.Unity {
 
 		public bool RequiresBlendModeMaterials { get { return requiresBlendModeMaterials; } set { requiresBlendModeMaterials = value; } }
 
+		public BlendMode BlendModeForMaterial(Material material) {
+			foreach (var pair in multiplyMaterials)
+				if (pair.material == material) return BlendMode.Multiply;
+			foreach (var pair in additiveMaterials)
+				if (pair.material == material) return BlendMode.Additive;
+			foreach (var pair in screenMaterials)
+				if (pair.material == material) return BlendMode.Screen;
+			return BlendMode.Normal;
+		}
+
 	#if UNITY_EDITOR
 		public void TransferSettingsFrom (BlendModeMaterialsAsset modifierAsset) {
 			applyAdditiveMaterial = modifierAsset.applyAdditiveMaterial;

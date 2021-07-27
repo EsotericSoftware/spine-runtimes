@@ -31,6 +31,7 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -49,6 +50,10 @@ namespace Spine.Unity {
 		#region Inspector
 		public SkeletonDataAsset skeletonDataAsset;
 		public SkeletonDataAsset SkeletonDataAsset { get { return skeletonDataAsset; } }
+
+		public Material additiveMaterial;
+		public Material multiplyMaterial;
+		public Material screenMaterial;
 
 		[SpineSkin(dataField:"skeletonDataAsset", defaultAsEmptyString:true)]
 		public string initialSkinName;
@@ -661,6 +666,10 @@ namespace Spine.Unity {
 				}
 			}
 
+			BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
+			bool hasBlendModeMaterials = blendModeMaterials.RequiresBlendModeMaterials;
+			bool mainCullTransparentMesh = this.canvasRenderer.cullTransparentMesh;
+			bool pmaVertexColors = meshGenerator.settings.pmaVertexColors;
 			int targetSiblingIndex = 0;
 			for (int i = 0; i < submeshCount; i++) {
 				var submeshInstructionItem = currentInstructions.submeshInstructions.Items[i];
@@ -692,9 +701,32 @@ namespace Spine.Unity {
 					parent = separatorParts[++separatorSlotGroupIndex];
 				}
 
-				if (useOriginalTextureAndMaterial)
-					canvasRenderer.SetMaterial(this.materialForRendering, submeshMaterial.mainTexture);
-				else {
+				if (useOriginalTextureAndMaterial) {
+					Texture usedTexture = submeshMaterial.mainTexture;
+					if (!hasBlendModeMaterials)
+						canvasRenderer.SetMaterial(this.materialForRendering, usedTexture);
+					else {
+						bool allowCullTransparentMesh = true;
+						BlendMode blendMode = blendModeMaterials.BlendModeForMaterial(submeshMaterial);
+						Material usedMaterial = this.materialForRendering;
+						if (blendMode == BlendMode.Normal) {
+							if (submeshInstructionItem.hasPMAAdditiveSlot)
+								allowCullTransparentMesh = false;
+						} else if (blendMode == BlendMode.Additive) {
+							if (pmaVertexColors)
+								allowCullTransparentMesh = false;
+							else if (additiveMaterial)
+								usedMaterial = additiveMaterial;
+						} else if (blendMode == BlendMode.Multiply && multiplyMaterial)
+							usedMaterial = multiplyMaterial;
+						else if (blendMode == BlendMode.Screen && screenMaterial)
+							usedMaterial = screenMaterial;
+
+						canvasRenderer.SetMaterial(usedMaterial, usedTexture);
+						canvasRenderer.cullTransparentMesh = allowCullTransparentMesh ?
+							mainCullTransparentMesh : false;
+					}
+				} else {
 					var originalTexture = submeshMaterial.mainTexture;
 					Material usedMaterial;
 					Texture usedTexture;

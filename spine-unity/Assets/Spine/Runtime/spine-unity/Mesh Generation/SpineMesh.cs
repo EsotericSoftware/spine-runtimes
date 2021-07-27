@@ -67,6 +67,7 @@ namespace Spine.Unity {
 		public int rawFirstVertexIndex;
 		public bool hasClipping;
 		#endif
+		public bool hasPMAAdditiveSlot;
 
 		/// <summary>The number of slots in this SubmeshInstruction's range. Not necessarily the number of attachments.</summary>
 		public int SlotCount { get { return endSlot - startSlot; } }

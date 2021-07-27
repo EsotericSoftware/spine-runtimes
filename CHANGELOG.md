@@ -151,6 +151,7 @@
   * Added an example component `RootMotionDeltaCompensation` located in `Spine Examples/Scripts/Sample Components` which can be used for applying simple delta compensation. You can enable and disable the component to toggle delta compensation of the currently playing animation on and off.
   * `SkeletonRagdoll` and `SkeletonRagdoll2D` now support bone scale at any bone in the skeleton hierarchy. This includes negative scale and root bone scale.
   * `Attachment.GetRemappedClone(Sprite)` method now provides an additional optional parameter `useOriginalRegionScale`. When set to `true`, the replaced attachment's scale is used instead of the Sprite's `Pixel per Unity` setting, allowing for more consistent scaling. *Note:* When remapping Sprites, be sure to set the Sprite's `Mesh Type` to `Full Rect` and not `Tight`, otherwise the scale will be wrong.
+  * `SkeletonGraphic` now **supports all Slot blend modes** when `Advanced - Multiple Canvas Renderers` is enabled in the Inspector. The `SkeletonGraphic` Inspector now provides a `Blend Mode Materials` section where you can assign `SkeletonGraphic` materials for each blend mode, or use the new default materials. New `SkeletonGraphic` shaders and materials have been added for each blend mode. The `BlendModes.unity` example scene has been extended to demonstrate this new feature. For detailed information see the [`SkeletonGraphic documentation page`](http://esotericsoftware.com/spine-unity#Parameters).
 
 * **Changes of default values**
 
