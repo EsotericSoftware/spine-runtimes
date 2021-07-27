@@ -31,6 +31,10 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
+#if UNITY_2018_2_OR_NEWER
+#define HAS_CULL_TRANSPARENT_MESH
+#endif
+
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -668,7 +672,9 @@ namespace Spine.Unity {
 
 			BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
 			bool hasBlendModeMaterials = blendModeMaterials.RequiresBlendModeMaterials;
+		#if HAS_CULL_TRANSPARENT_MESH
 			bool mainCullTransparentMesh = this.canvasRenderer.cullTransparentMesh;
+		#endif
 			bool pmaVertexColors = meshGenerator.settings.pmaVertexColors;
 			int targetSiblingIndex = 0;
 			for (int i = 0; i < submeshCount; i++) {
@@ -723,8 +729,10 @@ namespace Spine.Unity {
 							usedMaterial = screenMaterial;
 
 						canvasRenderer.SetMaterial(usedMaterial, usedTexture);
+					#if HAS_CULL_TRANSPARENT_MESH
 						canvasRenderer.cullTransparentMesh = allowCullTransparentMesh ?
 							mainCullTransparentMesh : false;
+					#endif
 					}
 				} else {
 					var originalTexture = submeshMaterial.mainTexture;
