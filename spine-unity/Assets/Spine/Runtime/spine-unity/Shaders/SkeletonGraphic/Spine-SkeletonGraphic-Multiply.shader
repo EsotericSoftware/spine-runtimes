@@ -57,7 +57,6 @@ Shader "Spine/SkeletonGraphic Multiply"
 		Blend DstColor OneMinusSrcAlpha
 		ColorMask [_ColorMask]
 
-		//UsePass "Spine/SkeletonGraphic/NORMAL"
 		Pass
 		{
 			Name "Normal"

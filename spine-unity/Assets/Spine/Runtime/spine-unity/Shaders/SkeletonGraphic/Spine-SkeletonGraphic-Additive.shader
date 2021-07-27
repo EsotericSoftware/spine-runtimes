@@ -57,7 +57,6 @@ Shader "Spine/SkeletonGraphic Additive"
 		Blend One One
 		ColorMask [_ColorMask]
 
-		//UsePass "Spine/SkeletonGraphic/NORMAL"
 		Pass
 		{
 			Name "Normal"

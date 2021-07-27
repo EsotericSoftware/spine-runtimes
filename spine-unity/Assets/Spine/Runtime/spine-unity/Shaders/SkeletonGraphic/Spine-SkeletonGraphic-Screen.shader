@@ -57,7 +57,6 @@ Shader "Spine/SkeletonGraphic Screen"
 		Blend One OneMinusSrcColor
 		ColorMask [_ColorMask]
 
-		//UsePass "Spine/SkeletonGraphic/NORMAL"
 		Pass
 		{
 			Name "Normal"
