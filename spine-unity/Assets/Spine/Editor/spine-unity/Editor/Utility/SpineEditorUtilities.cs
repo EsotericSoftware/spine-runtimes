@@ -95,6 +95,22 @@ namespace Spine.Unity.Editor {
 			texturesWithoutMetaFile.Clear();
 		}
 
+		// Post process prefabs to set setupPose as a mesh
+		void OnPostprocessPrefab(GameObject g)
+		{
+			var skeletonRenderers = g.GetComponentsInChildren<SkeletonRenderer>(true);
+
+			// generate new meshes
+			foreach (var r in skeletonRenderers) {
+				var meshFilter = r.GetComponent<MeshFilter>();
+				r.Initialize(true, true);
+				r.LateUpdateMesh();
+				var mesh = meshFilter.sharedMesh;
+				mesh.name = "Skeleton Mesh for Prefab " + r.gameObject.name;
+				context.AddObjectToAsset(mesh.name, mesh);
+			}
+		}
+
 #region Initialization
 		static SpineEditorUtilities () {
 			EditorApplication.delayCall += Initialize; // delayed so that AssetDatabase is ready.

@@ -391,6 +391,10 @@ namespace Spine.Unity {
 
 			if (updateMode != UpdateMode.FullUpdate) return;
 
+			LateUpdateMesh();
+		}
+
+		public virtual void LateUpdateMesh() {
 			#if SPINE_OPTIONAL_RENDEROVERRIDE
 			bool doMeshOverride = generateMeshOverride != null;
 			if ((!meshRenderer.enabled)	&& !doMeshOverride) return;
