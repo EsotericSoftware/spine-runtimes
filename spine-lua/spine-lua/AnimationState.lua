@@ -789,14 +789,12 @@ function AnimationState:setEmptyAnimation (trackIndex, mixDuration)
 end
 
 function AnimationState:addEmptyAnimation (trackIndex, mixDuration, delay)
-	local addDelay = 1
-	if delay > 0 then addDelay = delay end
-	local entry = self:addAnimation(trackIndex, EMPTY_ANIMATION, false, addDelay)
+	local entry = self:addAnimation(trackIndex, EMPTY_ANIMATION, false, delay)
+	if delay <= 0 then
+		entry.delay = entry.delay + entry.mixDuration - mixDuration
+	end
 	entry.mixDuration = mixDuration
 	entry.trackEnd = mixDuration
-	if delay <= 0 and entry.previous then
-		entry.delay = entry.previous:getTrackComplete() - entry.mixDuration + delay
-	end
 	return entry
 end
 

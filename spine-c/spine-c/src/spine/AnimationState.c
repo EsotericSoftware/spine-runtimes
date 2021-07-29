@@ -868,12 +868,10 @@ spTrackEntry *spAnimationState_setEmptyAnimation(spAnimationState *self, int tra
 
 spTrackEntry *
 spAnimationState_addEmptyAnimation(spAnimationState *self, int trackIndex, float mixDuration, float delay) {
-	spTrackEntry *entry;
-	entry = spAnimationState_addAnimation(self, trackIndex, SP_EMPTY_ANIMATION, 0, delay <= 0 ? 1 : delay);
+	spTrackEntry *entry = spAnimationState_addAnimation(self, trackIndex, SP_EMPTY_ANIMATION, 0, delay);
+	if (delay <= 0) entry->delay += entry->mixDuration - mixDuration;
 	entry->mixDuration = mixDuration;
 	entry->trackEnd = mixDuration;
-	if (delay <= 0 && entry->previous != NULL)
-		entry->delay = spTrackEntry_getTrackComplete(entry->previous) - entry->mixDuration + delay;
 	return entry;
 }
 

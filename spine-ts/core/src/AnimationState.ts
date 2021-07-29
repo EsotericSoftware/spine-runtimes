@@ -609,10 +609,10 @@ module spine {
 		 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 		 *         after the {@link AnimationStateListener#dispose()} event occurs. */
 		addEmptyAnimation (trackIndex: number, mixDuration: number = 0, delay: number = 0) {
-			let entry = this.addAnimationWith(trackIndex, AnimationState.emptyAnimation(), false, delay <= 0 ? 1 : delay);
+			let entry = this.addAnimationWith(trackIndex, AnimationState.emptyAnimation(), false, delay);
+			if (delay <= 0) entry.delay += entry.mixDuration - mixDuration;
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
-			if (delay <= 0 && entry.previous) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration + delay;
 			return entry;
 		}
 

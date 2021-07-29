@@ -666,10 +666,10 @@ public class AnimationState {
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs. */
 	public TrackEntry addEmptyAnimation (int trackIndex, float mixDuration, float delay) {
-		TrackEntry entry = addAnimation(trackIndex, emptyAnimation, false, delay <= 0 ? 1 : delay);
+		TrackEntry entry = addAnimation(trackIndex, emptyAnimation, false, delay);
+		if (delay <= 0) entry.delay += entry.mixDuration - mixDuration;
 		entry.mixDuration = mixDuration;
 		entry.trackEnd = mixDuration;
-		if (delay <= 0 && entry.previous != null) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration + delay;
 		return entry;
 	}
 

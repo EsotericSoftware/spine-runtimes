@@ -549,10 +549,10 @@ package spine.animation {
 		}
 
 		public function addEmptyAnimation(trackIndex : int, mixDuration : Number, delay : Number) : TrackEntry {
-			var entry : TrackEntry = addAnimation(trackIndex, emptyAnimation, false, delay <= 0 ? 1 : delay);
+			var entry : TrackEntry = addAnimation(trackIndex, emptyAnimation, false, delay);
+			if (delay <= 0) entry.delay += entry.mixDuration - mixDuration;
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
-			if (delay <= 0 && entry.previous != null) entry.delay = entry.previous.getTrackComplete() - entry.mixDuration + delay;
 			return entry;
 		}
 

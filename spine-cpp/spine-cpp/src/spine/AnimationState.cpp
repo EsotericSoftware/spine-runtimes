@@ -606,11 +606,10 @@ TrackEntry *AnimationState::setEmptyAnimation(size_t trackIndex, float mixDurati
 }
 
 TrackEntry *AnimationState::addEmptyAnimation(size_t trackIndex, float mixDuration, float delay) {
-	TrackEntry *entry = addAnimation(trackIndex, AnimationState::getEmptyAnimation(), false, delay <= 0 ? 1 : delay);
+	TrackEntry *entry = addAnimation(trackIndex, AnimationState::getEmptyAnimation(), false, delay);
+	if (delay <= 0) entry->_delay += entry->_mixDuration - mixDuration;
 	entry->_mixDuration = mixDuration;
 	entry->_trackEnd = mixDuration;
-	if (delay <= 0 && entry->_previous != NULL)
-		entry->_delay = entry->_previous->getTrackComplete() - entry->_mixDuration + delay;
 	return entry;
 }
 

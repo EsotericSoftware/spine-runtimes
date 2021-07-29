@@ -769,10 +769,10 @@ namespace Spine {
 		/// after the <see cref="AnimationState.Dispose"/> event occurs.
 		/// </returns>
 		public TrackEntry AddEmptyAnimation (int trackIndex, float mixDuration, float delay) {
-			TrackEntry entry = AddAnimation(trackIndex, AnimationState.EmptyAnimation, false, delay <= 0 ? 1 : delay);
+			TrackEntry entry = AddAnimation(trackIndex, AnimationState.EmptyAnimation, false, delay);
+			if (delay <= 0) entry.delay += entry.mixDuration - mixDuration;
 			entry.mixDuration = mixDuration;
 			entry.trackEnd = mixDuration;
-			if (delay <= 0 && entry.previous != null) entry.delay = entry.previous.TrackComplete - entry.mixDuration + delay;
 			return entry;
 		}
 
