@@ -51,6 +51,7 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		SerializedProperty mixDurationProp = property.FindPropertyRelative("mixDuration");
 		SerializedProperty holdPreviousProp = property.FindPropertyRelative("holdPrevious");
 		SerializedProperty dontPauseWithDirectorProp = property.FindPropertyRelative("dontPauseWithDirector");
+		SerializedProperty dontPauseOnStopProp = property.FindPropertyRelative("dontPauseOnStop");
 		SerializedProperty eventProp = property.FindPropertyRelative("eventThreshold");
 		SerializedProperty attachmentProp = property.FindPropertyRelative("attachmentThreshold");
 		SerializedProperty drawOrderProp = property.FindPropertyRelative("drawOrderThreshold");
@@ -75,6 +76,14 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		EditorGUI.PropertyField(singleFieldRect, dontPauseWithDirectorProp,
 			new GUIContent("Don't Pause with Director",
 				"If set to true, the animation will continue playing when the Director is paused."));
+
+		singleFieldRect.y += lineHeightWithSpacing;
+
+		using (new EditorGUI.DisabledGroupScope(dontPauseWithDirectorProp.boolValue == true)) {
+			EditorGUI.PropertyField(singleFieldRect, dontPauseOnStopProp,
+			new GUIContent("Don't Pause on Stop",
+				"If 'Don't Pause with Director' is true but this parameter is false, the animation will continue playing when the Graph is stopped, e.g. when reaching the track end."));
+		}
 
 		singleFieldRect.y += lineHeightWithSpacing * 0.5f;
 

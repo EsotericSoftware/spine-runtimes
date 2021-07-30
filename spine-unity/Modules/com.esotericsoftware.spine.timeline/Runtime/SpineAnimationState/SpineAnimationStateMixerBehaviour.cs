@@ -41,17 +41,23 @@ namespace Spine.Unity.Playables {
 		public int trackIndex;
 
 		IAnimationStateComponent animationStateComponent;
-		bool dontPauseWithDirector = true;
+		bool pauseWithDirector = true;
+		bool pauseWithDirectorButNotOnStop = false;
 		bool isPaused = false;
 		TrackEntry pausedTrackEntry;
 		float previousTimeScale = 1;
 
 		public override void OnBehaviourPause (Playable playable, FrameData info) {
-			if (!dontPauseWithDirector) {
+			if (pauseWithDirector) {
 				if (!isPaused)
 					HandlePause(playable);
 				isPaused = true;
 			}
+		}
+
+		public override void OnGraphStop (Playable playable) {
+			if (isPaused && pauseWithDirectorButNotOnStop)
+				HandleResume(playable); // this stop event occurs after pause, so resume again
 		}
 
 		public override void OnBehaviourPlay (Playable playable, FrameData info) {
@@ -122,7 +128,8 @@ namespace Spine.Unity.Playables {
 					ScriptPlayable<SpineAnimationStateBehaviour> inputPlayable = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(i);
 					SpineAnimationStateBehaviour clipData = inputPlayable.GetBehaviour();
 
-					dontPauseWithDirector = clipData.dontPauseWithDirector;
+					pauseWithDirector = !clipData.dontPauseWithDirector;
+					pauseWithDirectorButNotOnStop = pauseWithDirector && clipData.dontPauseOnStop;
 
 					if (clipData.animationReference == null) {
 						float mixDuration = clipData.customDuration ? clipData.mixDuration : state.Data.DefaultMix;
