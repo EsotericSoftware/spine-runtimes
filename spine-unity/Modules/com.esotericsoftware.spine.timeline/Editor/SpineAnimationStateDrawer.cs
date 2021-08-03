@@ -38,7 +38,7 @@ using Spine.Unity.Editor;
 public class SpineAnimationStateDrawer : PropertyDrawer {
 
 	public override float GetPropertyHeight (SerializedProperty property, GUIContent label) {
-		const int fieldCount = 11;
+		const int fieldCount = 15;
 		return fieldCount * EditorGUIUtility.singleLineHeight;
 	}
 
