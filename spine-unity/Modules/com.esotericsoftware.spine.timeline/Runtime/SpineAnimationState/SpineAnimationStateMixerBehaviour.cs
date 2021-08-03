@@ -38,14 +38,18 @@ namespace Spine.Unity.Playables {
 	public class SpineAnimationStateMixerBehaviour : PlayableBehaviour {
 
 		float[] lastInputWeights;
+		bool lastAnyTrackPlaying = false;
 		public int trackIndex;
 
 		IAnimationStateComponent animationStateComponent;
 		bool pauseWithDirector = true;
-		bool pauseWithDirectorButNotOnStop = false;
+		bool endAtClipEnd = true;
+		float endMixOutDuration = 0.1f;
 		bool isPaused = false;
 		TrackEntry pausedTrackEntry;
 		float previousTimeScale = 1;
+
+		TrackEntry timelineStartedTrackEntry;
 
 		public override void OnBehaviourPause (Playable playable, FrameData info) {
 			if (pauseWithDirector) {
@@ -56,8 +60,10 @@ namespace Spine.Unity.Playables {
 		}
 
 		public override void OnGraphStop (Playable playable) {
-			if (isPaused && pauseWithDirectorButNotOnStop)
-				HandleResume(playable); // this stop event occurs after pause, so resume again
+			if (endAtClipEnd)
+				HandleClipEnd();
+			else if (isPaused) // stop event occurred after pause, so resume again
+				HandleResume(playable);
 		}
 
 		public override void OnBehaviourPlay (Playable playable, FrameData info) {
@@ -70,7 +76,7 @@ namespace Spine.Unity.Playables {
 			if (animationStateComponent == null) return;
 
 			TrackEntry current = animationStateComponent.AnimationState.GetCurrent(trackIndex);
-			if (current != null) {
+			if (current != null && current == timelineStartedTrackEntry) {
 				previousTimeScale = current.TimeScale;
 				current.TimeScale = 0;
 				pausedTrackEntry = current;
@@ -86,9 +92,22 @@ namespace Spine.Unity.Playables {
 			}
 		}
 
+		protected void HandleClipEnd () {
+			var state = animationStateComponent.AnimationState;
+			if (endAtClipEnd &&
+				timelineStartedTrackEntry != null &&
+				timelineStartedTrackEntry == state.GetCurrent(trackIndex)) {
+
+				if (endMixOutDuration >= 0)
+					state.SetEmptyAnimation(trackIndex, endMixOutDuration);
+				else // pause if endMixOutDuration < 0
+					timelineStartedTrackEntry.TimeScale = 0;
+				timelineStartedTrackEntry = null;
+			}
+		}
+
 		// NOTE: This function is called at runtime and edit time. Keep that in mind when setting the values of properties.
 		public override void ProcessFrame (Playable playable, FrameData info, object playerData) {
-
 			var skeletonAnimation = playerData as SkeletonAnimation;
 			var skeletonGraphic = playerData as SkeletonGraphic;
 			animationStateComponent = playerData as IAnimationStateComponent;
@@ -116,12 +135,15 @@ namespace Spine.Unity.Playables {
 					this.lastInputWeights[i] = default(float);
 			}
 			var lastInputWeights = this.lastInputWeights;
+			bool anyTrackPlaying = false;
 
 			// Check all clips. If a clip that was weight 0 turned into weight 1, call SetAnimation.
 			for (int i = 0; i < inputCount; i++) {
 				float lastInputWeight = lastInputWeights[i];
 				float inputWeight = playable.GetInputWeight(i);
 				bool trackStarted = lastInputWeight == 0 && inputWeight > 0;
+				if (inputWeight > 0)
+					anyTrackPlaying = true;
 				lastInputWeights[i] = inputWeight;
 
 				if (trackStarted) {
@@ -129,7 +151,8 @@ namespace Spine.Unity.Playables {
 					SpineAnimationStateBehaviour clipData = inputPlayable.GetBehaviour();
 
 					pauseWithDirector = !clipData.dontPauseWithDirector;
-					pauseWithDirectorButNotOnStop = pauseWithDirector && clipData.dontPauseOnStop;
+					endAtClipEnd = !clipData.dontEndWithClip;
+					endMixOutDuration = clipData.endMixOutDuration;
 
 					if (clipData.animationReference == null) {
 						float mixDuration = clipData.customDuration ? clipData.mixDuration : state.Data.DefaultMix;
@@ -147,6 +170,8 @@ namespace Spine.Unity.Playables {
 
 							if (clipData.customDuration)
 								trackEntry.MixDuration = clipData.mixDuration;
+
+							timelineStartedTrackEntry = trackEntry;
 						}
 						//else Debug.LogWarningFormat("Animation named '{0}' not found", clipData.animationName);
 					}
@@ -162,6 +187,9 @@ namespace Spine.Unity.Playables {
 					}
 				}
 			}
+			if (lastAnyTrackPlaying && !anyTrackPlaying)
+				HandleClipEnd();
+			this.lastAnyTrackPlaying = anyTrackPlaying;
 		}
 
 		#if SPINE_EDITMODEPOSE

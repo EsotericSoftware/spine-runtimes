@@ -51,7 +51,8 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		SerializedProperty mixDurationProp = property.FindPropertyRelative("mixDuration");
 		SerializedProperty holdPreviousProp = property.FindPropertyRelative("holdPrevious");
 		SerializedProperty dontPauseWithDirectorProp = property.FindPropertyRelative("dontPauseWithDirector");
-		SerializedProperty dontPauseOnStopProp = property.FindPropertyRelative("dontPauseOnStop");
+		SerializedProperty dontEndWithClip = property.FindPropertyRelative("dontEndWithClip");
+		SerializedProperty endMixOutDuration = property.FindPropertyRelative("endMixOutDuration");
 		SerializedProperty eventProp = property.FindPropertyRelative("eventThreshold");
 		SerializedProperty attachmentProp = property.FindPropertyRelative("attachmentThreshold");
 		SerializedProperty drawOrderProp = property.FindPropertyRelative("drawOrderThreshold");
@@ -78,11 +79,19 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 				"If set to true, the animation will continue playing when the Director is paused."));
 
 		singleFieldRect.y += lineHeightWithSpacing;
+		EditorGUI.PropertyField(singleFieldRect, dontEndWithClip,
+		new GUIContent("Don't End with Clip",
+			"Normally when empty space follows the clip on the timeline, the empty animation is set on the track. " +
+			"Set this parameter to true to continue playing the clip's animation instead."));
 
-		using (new EditorGUI.DisabledGroupScope(dontPauseWithDirectorProp.boolValue == true)) {
-			EditorGUI.PropertyField(singleFieldRect, dontPauseOnStopProp,
-			new GUIContent("Don't Pause on Stop",
-				"If 'Don't Pause with Director' is true but this parameter is false, the animation will continue playing when the Graph is stopped, e.g. when reaching the track end."));
+		singleFieldRect.y += lineHeightWithSpacing;
+
+		using (new EditorGUI.DisabledGroupScope(dontEndWithClip.boolValue == true)) {
+			EditorGUI.PropertyField(singleFieldRect, endMixOutDuration,
+		new GUIContent("Clip End Mix Out Duration",
+			"When 'Don't End with Clip' is false, and the clip is followed by blank space or stopped, " +
+			"the empty animation is set with this MixDuration. When set to a negative value, " +
+			"the clip is paused instead."));
 		}
 
 		singleFieldRect.y += lineHeightWithSpacing * 0.5f;
