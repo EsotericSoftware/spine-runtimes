@@ -41,6 +41,10 @@
 #define BUILT_IN_SPRITE_MASK_COMPONENT
 #endif
 
+#if UNITY_2020_2_OR_NEWER
+#define HAS_ON_POSTPROCESS_PREFAB
+#endif
+
 using UnityEditor;
 using System.Collections.Generic;
 using UnityEngine;
@@ -60,7 +64,8 @@ namespace Spine.Unity.Editor {
 
 		protected SerializedProperty skeletonDataAsset, initialSkinName;
 		protected SerializedProperty initialFlipX, initialFlipY;
-		protected SerializedProperty updateWhenInvisible, singleSubmesh, separatorSlotNames, clearStateOnDisable, immutableTriangles, fixDrawOrder;
+		protected SerializedProperty updateWhenInvisible, singleSubmesh, separatorSlotNames, clearStateOnDisable,
+			immutableTriangles, fixDrawOrder, fixPrefabOverrideViaMeshFilter;
 		protected SerializedProperty normals, tangents, zSpacing, pmaVertexColors, tintBlack; // MeshGenerator settings
 		protected SerializedProperty maskInteraction;
 		protected SerializedProperty maskMaterialsNone, maskMaterialsInside, maskMaterialsOutside;
@@ -75,7 +80,8 @@ namespace Spine.Unity.Editor {
 		protected bool deleteOutsideMaskMaterialsQueued = false;
 
 		protected GUIContent SkeletonDataAssetLabel, SkeletonUtilityButtonContent;
-		protected GUIContent PMAVertexColorsLabel, ClearStateOnDisableLabel, ZSpacingLabel, ImmubleTrianglesLabel, TintBlackLabel, UpdateWhenInvisibleLabel, SingleSubmeshLabel, FixDrawOrderLabel;
+		protected GUIContent PMAVertexColorsLabel, ClearStateOnDisableLabel, ZSpacingLabel, ImmubleTrianglesLabel,
+			TintBlackLabel, UpdateWhenInvisibleLabel, SingleSubmeshLabel, FixDrawOrderLabel, FixPrefabOverrideViaMeshFilterLabel;
 		protected GUIContent NormalsLabel, TangentsLabel, MaskInteractionLabel;
 		protected GUIContent MaskMaterialsHeadingLabel, MaskMaterialsNoneLabel, MaskMaterialsInsideLabel, MaskMaterialsOutsideLabel;
 		protected GUIContent SetMaterialButtonLabel, ClearMaterialButtonLabel, DeleteMaterialButtonLabel;
@@ -123,6 +129,7 @@ namespace Spine.Unity.Editor {
 			SingleSubmeshLabel = new GUIContent("Use Single Submesh", "Simplifies submesh generation by assuming you are only using one Material and need only one submesh. This is will disable multiple materials, render separation, and custom slot materials.");
 			UpdateWhenInvisibleLabel = new GUIContent("Update When Invisible", "Update mode used when the MeshRenderer becomes invisible. Update mode is automatically reset to UpdateMode.FullUpdate when the mesh becomes visible again.");
 			FixDrawOrderLabel = new GUIContent("Fix Draw Order", "Applies only when 3+ submeshes are used (2+ materials with alternating order, e.g. \"A B A\"). If true, GPU instancing will be disabled at all materials and MaterialPropertyBlocks are assigned at each material to prevent aggressive batching of submeshes by e.g. the LWRP renderer, leading to incorrect draw order (e.g. \"A1 B A2\" changed to \"A1A2 B\"). You can disable this parameter when everything is drawn correctly to save the additional performance cost. Note: the GPU instancing setting will remain disabled at affected material assets after exiting play mode, you have to enable it manually if you accidentally enabled this parameter.");
+			FixPrefabOverrideViaMeshFilterLabel = new GUIContent("Fix Prefab Overr. MeshFilter", "Fixes the prefab always being marked as changed (sets the MeshFilter's hide flags to DontSaveInEditor), but at the cost of references to the MeshFilter by other components being lost.");
 			MaskInteractionLabel = new GUIContent("Mask Interaction", "SkeletonRenderer's interaction with a Sprite Mask.");
 			MaskMaterialsHeadingLabel = new GUIContent("Mask Interaction Materials", "Materials used for different interaction with sprite masks.");
 			MaskMaterialsNoneLabel = new GUIContent("Normal Materials", "Normal materials used when Mask Interaction is set to None.");
@@ -146,6 +153,7 @@ namespace Spine.Unity.Editor {
 			updateWhenInvisible = so.FindProperty("updateWhenInvisible");
 			singleSubmesh = so.FindProperty("singleSubmesh");
 			fixDrawOrder = so.FindProperty("fixDrawOrder");
+			fixPrefabOverrideViaMeshFilter = so.FindProperty("fixPrefabOverrideViaMeshFilter");
 			maskInteraction = so.FindProperty("maskInteraction");
 			maskMaterialsNone = so.FindProperty("maskMaterials.materialsMaskDisabled");
 			maskMaterialsInside = so.FindProperty("maskMaterials.materialsInsideMask");
@@ -340,6 +348,11 @@ namespace Spine.Unity.Editor {
 							if (immutableTriangles != null) EditorGUILayout.PropertyField(immutableTriangles, ImmubleTrianglesLabel);
 							EditorGUILayout.PropertyField(clearStateOnDisable, ClearStateOnDisableLabel);
 							EditorGUILayout.Space();
+
+						#if HAS_ON_POSTPROCESS_PREFAB
+							if (fixPrefabOverrideViaMeshFilter != null) EditorGUILayout.PropertyField(fixPrefabOverrideViaMeshFilter, FixPrefabOverrideViaMeshFilterLabel);
+							EditorGUILayout.Space();
+						#endif
 						}
 
 						SeparatorsField(separatorSlotNames);

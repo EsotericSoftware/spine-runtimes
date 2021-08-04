@@ -56,7 +56,7 @@ namespace Spine.Unity {
 	#else
 	[ExecuteInEditMode]
 	#endif
-	[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer)), DisallowMultipleComponent]
+	[RequireComponent(typeof(MeshRenderer)), DisallowMultipleComponent]
 	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonRenderer-Component")]
 	public class SkeletonRenderer : MonoBehaviour, ISkeletonComponent, IHasSkeletonDataAsset {
 		public SkeletonDataAsset skeletonDataAsset;
@@ -73,6 +73,21 @@ namespace Spine.Unity {
 			set { editorSkipSkinSync = value; }
 		}
 		protected bool editorSkipSkinSync = false;
+		/// <summary>Sets the MeshFilter's hide flags to DontSaveInEditor which fixes the prefab
+		/// always being marked as changed, but at the cost of references to the MeshFilter by other
+		/// components being lost.</summary>
+		public bool fixPrefabOverrideViaMeshFilter = false;
+		public void EditorUpdateMeshFilterHideFlags () {
+			if (!meshFilter) {
+				meshFilter = GetComponent<MeshFilter>();
+				if (meshFilter == null)
+					meshFilter = gameObject.AddComponent<MeshFilter>();
+			}
+			if (fixPrefabOverrideViaMeshFilter)
+				meshFilter.hideFlags = HideFlags.DontSaveInEditor;
+			else
+				meshFilter.hideFlags = HideFlags.None;
+		}
 		#endif
 		/// <summary>Flip X and Y to use when the Skeleton is initialized.</summary>
 		public bool initialFlipX, initialFlipY;
@@ -341,6 +356,9 @@ namespace Spine.Unity {
 			valid = true;
 
 			meshFilter = GetComponent<MeshFilter>();
+			if (meshFilter == null)
+				meshFilter = gameObject.AddComponent<MeshFilter>();
+
 			meshRenderer = GetComponent<MeshRenderer>();
 			rendererBuffers.Initialize();
 
@@ -380,18 +398,23 @@ namespace Spine.Unity {
 		public virtual void LateUpdate () {
 			if (!valid) return;
 
-			#if UNITY_EDITOR && NEW_PREFAB_SYSTEM
+		#if UNITY_EDITOR && NEW_PREFAB_SYSTEM
 			// Don't store mesh or material at the prefab, otherwise it will permanently reload
 			var prefabType = UnityEditor.PrefabUtility.GetPrefabAssetType(this);
 			if (UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this) &&
 				(prefabType == UnityEditor.PrefabAssetType.Regular || prefabType == UnityEditor.PrefabAssetType.Variant)) {
 				return;
 			}
-			#endif
+			EditorUpdateMeshFilterHideFlags();
+		#endif
 
 			if (updateMode != UpdateMode.FullUpdate) return;
 
-			#if SPINE_OPTIONAL_RENDEROVERRIDE
+			LateUpdateMesh();
+		}
+
+		public virtual void LateUpdateMesh () {
+#if SPINE_OPTIONAL_RENDEROVERRIDE
 			bool doMeshOverride = generateMeshOverride != null;
 			if ((!meshRenderer.enabled)	&& !doMeshOverride) return;
 			#else
@@ -488,7 +511,8 @@ namespace Spine.Unity {
 			meshGenerator.FillLateVertexData(currentMesh);
 
 			// STEP 4. The UnityEngine.Mesh is ready. Set it as the MeshFilter's mesh. Store the instructions used for that mesh. ===========
-			meshFilter.sharedMesh = currentMesh;
+			if (meshFilter)
+				meshFilter.sharedMesh = currentMesh;
 			currentSmartMesh.instructionUsed.Set(currentInstructions);
 
 			#if BUILT_IN_SPRITE_MASK_COMPONENT

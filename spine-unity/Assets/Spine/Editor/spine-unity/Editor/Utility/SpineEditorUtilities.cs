@@ -50,6 +50,10 @@
 #define BUILT_IN_SPRITE_MASK_COMPONENT
 #endif
 
+#if UNITY_2020_2_OR_NEWER
+#define HAS_ON_POSTPROCESS_PREFAB
+#endif
+
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -95,7 +99,27 @@ namespace Spine.Unity.Editor {
 			texturesWithoutMetaFile.Clear();
 		}
 
-#region Initialization
+#if HAS_ON_POSTPROCESS_PREFAB
+		// Post process prefabs for setting the MeshFilter to not cause constant Prefab override changes.
+		void OnPostprocessPrefab (GameObject g) {
+			var skeletonRenderers = g.GetComponentsInChildren<SkeletonRenderer>(true);
+			foreach (SkeletonRenderer renderer in skeletonRenderers) {
+				var meshFilter = renderer.GetComponent<MeshFilter>();
+				if (meshFilter == null)
+					meshFilter = renderer.gameObject.AddComponent<MeshFilter>();
+
+				renderer.EditorUpdateMeshFilterHideFlags();
+				renderer.Initialize(true, true);
+				renderer.LateUpdateMesh();
+				var mesh = meshFilter.sharedMesh;
+				string meshName = string.Format("Skeleton Prefab Mesh \"{0}\"", renderer.name);
+				mesh.name = meshName;
+				context.AddObjectToAsset(meshName, mesh);
+			}
+		}
+#endif
+
+		#region Initialization
 		static SpineEditorUtilities () {
 			EditorApplication.delayCall += Initialize; // delayed so that AssetDatabase is ready.
 		}
