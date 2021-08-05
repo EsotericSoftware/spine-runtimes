@@ -47,7 +47,7 @@ cd spine-libgdx/spine-libgdx
 mvn install
 ```
 
-The version number is composed of the editor number at the time of release of the Maven artifact plus a patch number at the end. E.g. `4.0.02.1` means editor version `4.0.02`, and patch version `1` for the runtime. The editor version is updated everytime a new editor release is performed, the patch version is updated everytime a new fix or enhancement is released in the runtime.
+The version number is composed of the editor number at the time of release of the Maven artifact plus a patch number at the end. E.g. `4.0.18.1` means editor version `4.0.18`, and patch version `1` for the runtime. The editor version is updated everytime a new editor release is performed, the patch version is updated everytime a new fix or enhancement is released in the runtime.
 
 
 ### Maven
@@ -57,7 +57,7 @@ To add the spine-libgdx runtime to your Maven project, add this dependency:
 <depenency>
 	<groupId>com.esotericsoftware.spine</groupId>
 	<artifactId>spine-libgdx</artifactId>
-	<version>4.0.02.1</version>
+	<version>4.0.18.1</version>
 </depenency>
 ```
 
@@ -83,7 +83,7 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
 
-        compile "com.esotericsoftware.spine:spine-libgdx:4.0.02.1"
+        compile "com.esotericsoftware.spine:spine-libgdx:4.0.18.1"
     }
 }
 ```
