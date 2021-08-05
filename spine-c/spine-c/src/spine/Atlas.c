@@ -139,7 +139,10 @@ typedef struct SimpleString {
 static SimpleString *ss_trim(SimpleString *self) {
 	while (isspace((unsigned char) *self->start) && self->start < self->end)
 		self->start++;
-	if (self->start == self->end) return self;
+	if (self->start == self->end) {
+		self->length = self->end - self->start;
+		return self;
+	}
 	self->end--;
 	while (((unsigned char) *self->end == '\r') && self->end >= self->start)
 		self->end--;

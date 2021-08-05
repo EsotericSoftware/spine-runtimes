@@ -111,7 +111,10 @@ struct SimpleString {
 	SimpleString trim() {
 		while (isspace((unsigned char) *start) && start < end)
 			start++;
-		if (start == end) return *this;
+		if (start == end) {
+			length = end - start;
+			return *this;
+		}
 		end--;
 		while (((unsigned char) *end == '\r') && end >= start)
 			end--;
