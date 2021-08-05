@@ -456,8 +456,7 @@ int spAnimationState_apply(spAnimationState *self, spSkeleton *skeleton) {
 		slot = slots[i];
 		if (slot->attachmentState == setupState) {
 			attachmentName = slot->data->attachmentName;
-			slot->attachment =
-					attachmentName == NULL ? NULL : spSkeleton_getAttachmentForSlotIndex(skeleton, slot->data->index, attachmentName);
+			spSlot_setAttachment(slot, attachmentName == NULL ? NULL : spSkeleton_getAttachmentForSlotIndex(skeleton, slot->data->index, attachmentName));
 		}
 	}
 	self->unkeyedState += 2;
@@ -588,7 +587,7 @@ float _spAnimationState_applyMixingFrom(spAnimationState *self, spTrackEntry *to
 static void
 _spAnimationState_setAttachment(spAnimationState *self, spSkeleton *skeleton, spSlot *slot, const char *attachmentName,
 								int /*bool*/ attachments) {
-	slot->attachment = attachmentName == NULL ? NULL : spSkeleton_getAttachmentForSlotIndex(skeleton, slot->data->index, attachmentName);
+	spSlot_setAttachment(slot, attachmentName == NULL ? NULL : spSkeleton_getAttachmentForSlotIndex(skeleton, slot->data->index, attachmentName));
 	if (attachments) slot->attachmentState = self->unkeyedState + CURRENT;
 }
 

@@ -85,7 +85,7 @@ void spAnimation_apply(const spAnimation *self, spSkeleton *skeleton, float last
 						 direction);
 }
 
-static search(spFloatArray
+static int search(spFloatArray
 					  *values,
 			  float time) {
 	int i, n;
@@ -98,7 +98,7 @@ static search(spFloatArray
 	return values->size - 1;
 }
 
-static search2(spFloatArray
+static int search2(spFloatArray
 					   *values,
 			   float time,
 			   int step) {
@@ -1628,8 +1628,7 @@ void spRGB2Timeline_setFrame(spRGB2Timeline *self, int frame, float time, float 
 
 static void
 _spSetAttachment(spAttachmentTimeline *timeline, spSkeleton *skeleton, spSlot *slot, const char *attachmentName) {
-	slot->attachment =
-			attachmentName == NULL ? NULL : spSkeleton_getAttachmentForSlotIndex(skeleton, timeline->slotIndex, attachmentName);
+	spSlot_setAttachment(slot, attachmentName == NULL ? NULL : spSkeleton_getAttachmentForSlotIndex(skeleton, timeline->slotIndex, attachmentName));
 }
 
 void _spAttachmentTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float lastTime, float time,
