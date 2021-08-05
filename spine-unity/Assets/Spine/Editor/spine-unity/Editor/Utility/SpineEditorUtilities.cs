@@ -114,6 +114,7 @@ namespace Spine.Unity.Editor {
 				var mesh = meshFilter.sharedMesh;
 				string meshName = string.Format("Skeleton Prefab Mesh \"{0}\"", renderer.name);
 				mesh.name = meshName;
+				mesh.hideFlags = HideFlags.DontSaveInEditor; // removed flag DontSaveInBuild, prevents a build error when the prefab is referenced
 				context.AddObjectToAsset(meshName, mesh);
 			}
 		}
