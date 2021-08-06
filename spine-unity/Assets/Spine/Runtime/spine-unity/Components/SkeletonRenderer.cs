@@ -73,17 +73,32 @@ namespace Spine.Unity {
 			set { editorSkipSkinSync = value; }
 		}
 		protected bool editorSkipSkinSync = false;
+
 		/// <summary>Sets the MeshFilter's hide flags to DontSaveInEditor which fixes the prefab
 		/// always being marked as changed, but at the cost of references to the MeshFilter by other
 		/// components being lost.</summary>
-		public bool fixPrefabOverrideViaMeshFilter = false;
+		public enum PrefabOverrideViaMeshFilter
+		{
+			UseGlobal,
+			Enable,
+			Disable,
+		}
+		public PrefabOverrideViaMeshFilter fixPrefabOverrideViaMeshFilter = PrefabOverrideViaMeshFilter.UseGlobal;
+		public static bool fixPrefabOverrideViaMeshFilterGlobal = false;
 		public void EditorUpdateMeshFilterHideFlags () {
 			if (!meshFilter) {
 				meshFilter = GetComponent<MeshFilter>();
 				if (meshFilter == null)
 					meshFilter = gameObject.AddComponent<MeshFilter>();
 			}
-			if (fixPrefabOverrideViaMeshFilter)
+			bool dontSaveInEditor = false;
+			if (fixPrefabOverrideViaMeshFilter == PrefabOverrideViaMeshFilter.UseGlobal &&
+					fixPrefabOverrideViaMeshFilterGlobal == true) {
+				dontSaveInEditor = true;
+			} else if (fixPrefabOverrideViaMeshFilter == PrefabOverrideViaMeshFilter.Enable) {
+				dontSaveInEditor = true;
+			}
+			if (dontSaveInEditor)
 				meshFilter.hideFlags = HideFlags.DontSaveInEditor;
 			else
 				meshFilter.hideFlags = HideFlags.None;
