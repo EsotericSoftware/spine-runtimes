@@ -122,8 +122,11 @@ namespace Spine.Unity.Editor {
 				renderer.Initialize(true, true);
 				renderer.LateUpdateMesh();
 				var mesh = meshFilter.sharedMesh;
+				if (mesh == null) continue;
+				
 				string meshName = string.Format("Skeleton Prefab Mesh \"{0}\"", renderer.name);
 				mesh.name = meshName;
+				mesh.hideFlags = HideFlags.None;
 				if (context != null)
 					context.AddObjectToAsset(meshFilter.sharedMesh.name, meshFilter.sharedMesh);
 			}
