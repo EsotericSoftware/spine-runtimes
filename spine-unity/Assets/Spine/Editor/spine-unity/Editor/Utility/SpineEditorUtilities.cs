@@ -102,8 +102,18 @@ namespace Spine.Unity.Editor {
 #if HAS_ON_POSTPROCESS_PREFAB
 		// Post process prefabs for setting the MeshFilter to not cause constant Prefab override changes.
 		void OnPostprocessPrefab (GameObject g) {
+			if (SpineBuildProcessor.isBuilding)
+				return;
+
+			SetupSpinePrefabMesh(g, context);
+		}
+
+		public static bool SetupSpinePrefabMesh(GameObject g, UnityEditor.AssetImporters.AssetImportContext context)
+		{
+			bool wasModified = false;
 			var skeletonRenderers = g.GetComponentsInChildren<SkeletonRenderer>(true);
 			foreach (SkeletonRenderer renderer in skeletonRenderers) {
+				wasModified = true;
 				var meshFilter = renderer.GetComponent<MeshFilter>();
 				if (meshFilter == null)
 					meshFilter = renderer.gameObject.AddComponent<MeshFilter>();
@@ -114,9 +124,27 @@ namespace Spine.Unity.Editor {
 				var mesh = meshFilter.sharedMesh;
 				string meshName = string.Format("Skeleton Prefab Mesh \"{0}\"", renderer.name);
 				mesh.name = meshName;
-				mesh.hideFlags = HideFlags.DontSaveInEditor; // removed flag DontSaveInBuild, prevents a build error when the prefab is referenced
-				context.AddObjectToAsset(meshName, mesh);
+				if (context != null)
+					context.AddObjectToAsset(meshFilter.sharedMesh.name, meshFilter.sharedMesh);
 			}
+			return wasModified;
+		}
+
+		public static bool CleanupSpinePrefabMesh(GameObject g)
+		{
+			bool wasModified = false;
+			var skeletonRenderers = g.GetComponentsInChildren<SkeletonRenderer>(true);
+			foreach (SkeletonRenderer renderer in skeletonRenderers) {
+				var meshFilter = renderer.GetComponent<MeshFilter>();
+				if (meshFilter != null) {
+					if (meshFilter.sharedMesh) {
+						wasModified = true;
+						meshFilter.sharedMesh = null;
+						meshFilter.hideFlags = HideFlags.None;
+					}
+				}
+			}
+			return wasModified;
 		}
 #endif
 
