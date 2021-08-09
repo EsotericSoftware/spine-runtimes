@@ -416,11 +416,11 @@ namespace Spine.Unity {
 		public virtual void LateUpdateMesh () {
 #if SPINE_OPTIONAL_RENDEROVERRIDE
 			bool doMeshOverride = generateMeshOverride != null;
-			if ((!meshRenderer.enabled)	&& !doMeshOverride) return;
-			#else
+			if ((!meshRenderer || !meshRenderer.enabled) && !doMeshOverride) return;
+#else
 			const bool doMeshOverride = false;
 			if (!meshRenderer.enabled) return;
-			#endif
+#endif
 			var currentInstructions = this.currentInstructions;
 			var workingSubmeshInstructions = currentInstructions.submeshInstructions;
 			var currentSmartMesh = rendererBuffers.GetNextMesh(); // Double-buffer for performance.
