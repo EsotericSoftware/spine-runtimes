@@ -83,10 +83,25 @@ namespace Spine.Unity {
 				if (meshFilter == null)
 					meshFilter = gameObject.AddComponent<MeshFilter>();
 			}
-			if (fixPrefabOverrideViaMeshFilter)
+			if (fixPrefabOverrideViaMeshFilter) {
+			#if NEW_PREFAB_SYSTEM
+				if (UnityEditor.PrefabUtility.IsPartOfAnyPrefab(meshFilter)) {
+					var instanceRoot = UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(meshFilter);
+					var objectOverrides = UnityEditor.PrefabUtility.GetObjectOverrides(instanceRoot);
+
+					foreach (UnityEditor.SceneManagement.ObjectOverride objectOverride in objectOverrides) {
+						if (objectOverride.instanceObject == meshFilter) {
+							objectOverride.Revert(UnityEditor.InteractionMode.AutomatedAction);
+							break;
+						}
+					}
+				}
+			#endif
 				meshFilter.hideFlags = HideFlags.DontSaveInEditor;
-			else
+			}
+			else {
 				meshFilter.hideFlags = HideFlags.None;
+			}
 		}
 		#endif
 		/// <summary>Flip X and Y to use when the Skeleton is initialized.</summary>
@@ -303,6 +318,11 @@ namespace Spine.Unity {
 			Initialize(false);
 		}
 	#endif
+
+		void OnEnable() {
+			if (!Application.isPlaying)
+				LateUpdate();
+		}
 
 		void OnDisable () {
 			if (clearStateOnDisable && valid)
