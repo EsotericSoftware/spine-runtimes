@@ -87,12 +87,13 @@ namespace Spine.Unity {
 			#if NEW_PREFAB_SYSTEM
 				if (UnityEditor.PrefabUtility.IsPartOfAnyPrefab(meshFilter)) {
 					var instanceRoot = UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(meshFilter);
-					var objectOverrides = UnityEditor.PrefabUtility.GetObjectOverrides(instanceRoot);
-
-					foreach (UnityEditor.SceneManagement.ObjectOverride objectOverride in objectOverrides) {
-						if (objectOverride.instanceObject == meshFilter) {
-							objectOverride.Revert(UnityEditor.InteractionMode.AutomatedAction);
-							break;
+					if (instanceRoot != null) {
+						var objectOverrides = UnityEditor.PrefabUtility.GetObjectOverrides(instanceRoot);
+						foreach (UnityEditor.SceneManagement.ObjectOverride objectOverride in objectOverrides) {
+							if (objectOverride.instanceObject == meshFilter) {
+								objectOverride.Revert(UnityEditor.InteractionMode.AutomatedAction);
+								break;
+							}
 						}
 					}
 				}
