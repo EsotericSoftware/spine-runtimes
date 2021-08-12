@@ -320,10 +320,12 @@ namespace Spine.Unity {
 		}
 	#endif
 
+	#if UNITY_EDITOR
 		void OnEnable() {
 			if (!Application.isPlaying)
 				LateUpdate();
 		}
+	#endif
 
 		void OnDisable () {
 			if (clearStateOnDisable && valid)
