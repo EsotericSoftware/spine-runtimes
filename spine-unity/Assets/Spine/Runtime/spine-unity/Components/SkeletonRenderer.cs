@@ -91,7 +91,7 @@ namespace Spine.Unity {
 						var objectOverrides = UnityEditor.PrefabUtility.GetObjectOverrides(instanceRoot);
 						foreach (UnityEditor.SceneManagement.ObjectOverride objectOverride in objectOverrides) {
 							if (objectOverride.instanceObject == meshFilter) {
-								objectOverride.Revert(UnityEditor.InteractionMode.AutomatedAction);
+								objectOverride.Revert();
 								break;
 							}
 						}
