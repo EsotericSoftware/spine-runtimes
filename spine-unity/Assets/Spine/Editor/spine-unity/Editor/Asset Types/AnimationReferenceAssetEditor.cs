@@ -97,9 +97,6 @@ namespace Spine.Unity.Editor {
 					preview.PlayPauseAnimation(animationNameProperty.stringValue, true);
 			}
 
-			lastSkeletonDataAsset = ThisSkeletonDataAsset;
-			lastSkeletonData = ThisSkeletonDataAsset.GetSkeletonData(true);
-
 			//EditorGUILayout.HelpBox(AnimationReferenceAssetEditor.InspectorHelpText, MessageType.Info, true);
 			EditorGUILayout.Space();
 			EditorGUI.BeginChangeCheck();
@@ -128,6 +125,9 @@ namespace Spine.Unity.Editor {
 					}
 				}
 			}
+
+			lastSkeletonDataAsset = ThisSkeletonDataAsset;
+			lastSkeletonData = ThisSkeletonDataAsset.GetSkeletonData(true);
 		}
 
 		#region Preview Handlers
