@@ -15,8 +15,20 @@ MonoBehaviour:
   - {fileID: 11400000, guid: db7ac54cc9ef711408d53c53b765b9a3, type: 2}
   scale: 0.01
   skeletonJSON: {fileID: 4900000, guid: 1a6f51aad0fef5a40aeedfeec5c0b8b2, type: 3}
-  skeletonDataModifiers:
-  - {fileID: 11400000, guid: 22c0225612a65ee4fb15bad49f644762, type: 2}
+  isUpgradingBlendModeMaterials: 0
+  blendModeMaterials:
+    requiresBlendModeMaterials: 1
+    applyAdditiveMaterial: 1
+    additiveMaterials:
+    - pageName: whirlyblendmodes.png
+      material: {fileID: 2100000, guid: 867b647cef55dcb43928a83908d96007, type: 2}
+    multiplyMaterials:
+    - pageName: whirlyblendmodes.png
+      material: {fileID: 2100000, guid: aa8b3fb015cd7eb438453da5e475ad54, type: 2}
+    screenMaterials:
+    - pageName: whirlyblendmodes.png
+      material: {fileID: 2100000, guid: 1489a5bef834c9743bab2d5bd43168f1, type: 2}
+  skeletonDataModifiers: []
   fromAnimation: []
   toAnimation: []
   duration: []
