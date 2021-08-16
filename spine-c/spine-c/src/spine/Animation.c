@@ -86,8 +86,8 @@ void spAnimation_apply(const spAnimation *self, spSkeleton *skeleton, float last
 }
 
 static int search(spFloatArray
-					  *values,
-			  float time) {
+						  *values,
+				  float time) {
 	int i, n;
 	float *items = values->items;
 	for (
@@ -99,9 +99,9 @@ static int search(spFloatArray
 }
 
 static int search2(spFloatArray
-					   *values,
-			   float time,
-			   int step) {
+						   *values,
+				   float time,
+				   int step) {
 	int i, n;
 	float *items = values->items;
 	for (
