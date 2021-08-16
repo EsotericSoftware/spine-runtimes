@@ -8,21 +8,33 @@ setup() {
 	cp $dir/.clang-format $dir/..
 	cp $dir/build.gradle $dir/..
 	cp $dir/settings.gradle $dir/..	
+	cp $dir/.editorconfig $dir/../spine-csharp
+	cp $dir/.editorconfig $dir/../spine-xna
+	cp $dir/.editorconfig $dir/../spine-monogame
+	cp $dir/.editorconfig $dir/../spine-unity
 }
 
 cleanup() {
 	rm $dir/../.clang-format
 	rm $dir/../build.gradle
 	rm $dir/../settings.gradle
+	rm $dir/../spine-csharp/.editorconfig	
+	rm $dir/../spine-xna/.editorconfig
+	rm $dir/../spine-monogame/.editorconfig
+	rm $dir/../spine-unity/.editorconfig
 }
 
-# copy Gradle and clang-format config to root
+# copy Gradle, dotnet-format, and clang-format config to root
 setup
 
-# Execute spotless
+# Execute spotless and dotnet-format
 pushd $dir/..
 ./formatters/gradlew spotlessApply
+dotnet-format spine-csharp/spine-csharp.sln
+dotnet-format -f spine-xna
+dotnet-format -f spine-monogame
+dotnet-format -f spine-unity
 popd
 
-# Delete Gradle and clang-format config files in root
+# Delete Gradle, dotnet-format, and clang-format config files in root
 cleanup

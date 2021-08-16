@@ -5,5 +5,6 @@ You will need the following in your `PATH`:
 
 - JDK 10+
 - clang-format 12 (i.e. `brew install clang-format`)
+- dotnet format (i.e. `dotnet tool install -g dotnet-format`, comes with dotnet 6 out of the box)
 
 To run the formatter, invoke the `format.sh` script. This will shuffle around the Gradle config files, invoke spotless, then undo the config file shuffling. Invoking `./gradlew spotlessApply` from the `formatters/` directory will not work.
