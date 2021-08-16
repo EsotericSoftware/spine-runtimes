@@ -62,11 +62,11 @@ module spine {
 			if (callback) callback(path, message);
 		}
 
-		setRawDataURI(path: string, data: string) {
+		setRawDataURI (path: string, data: string) {
 			this.downloader.rawDataUris[this.pathPrefix + path] = data;
 		}
 
-		loadBinary(path: string,
+		loadBinary (path: string,
 			success: (path: string, binary: Uint8Array) => void = null,
 			error: (path: string, message: string) => void = null) {
 			path = this.start(path);
@@ -78,7 +78,7 @@ module spine {
 			});
 		}
 
-		loadText(path: string,
+		loadText (path: string,
 			success: (path: string, text: string) => void = null,
 			error: (path: string, message: string) => void = null) {
 			path = this.start(path);
@@ -90,7 +90,7 @@ module spine {
 			});
 		}
 
-		loadJson(path: string,
+		loadJson (path: string,
 			success: (path: string, object: object) => void = null,
 			error: (path: string, message: string) => void = null) {
 			path = this.start(path);
@@ -110,13 +110,13 @@ module spine {
 			let isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
 			let isWebWorker = !isBrowser && typeof importScripts !== 'undefined';
 			if (isWebWorker) {
-				fetch(path, {mode: <RequestMode>"cors"}).then( (response) => {
+				fetch(path, { mode: <RequestMode>"cors" }).then((response) => {
 					if (response.ok) return response.blob();
 					this.error(error, path, `Couldn't load image: ${path}`);
 					return null;
-				}).then( (blob) => {
+				}).then((blob) => {
 					return blob ? createImageBitmap(blob, { premultiplyAlpha: "none", colorSpaceConversion: "none" }) : null;
-				}).then( (bitmap) => {
+				}).then((bitmap) => {
 					if (bitmap) this.success(success, path, this.textureLoader(bitmap));
 				});
 			} else {
@@ -176,7 +176,7 @@ module spine {
 			let asset = this.assets[path];
 			if (asset) return asset;
 			let error = this.errors[path];
-			throw Error("Asset not found: " + path + (error ? "\n" + error  : ""));
+			throw Error("Asset not found: " + path + (error ? "\n" + error : ""));
 		}
 
 		remove (path: string) {
@@ -211,11 +211,11 @@ module spine {
 			this.removeAll();
 		}
 
-		hasErrors() {
+		hasErrors () {
 			return Object.keys(this.errors).length > 0;
 		}
 
-		getErrors() {
+		getErrors () {
 			return this.errors;
 		}
 	}

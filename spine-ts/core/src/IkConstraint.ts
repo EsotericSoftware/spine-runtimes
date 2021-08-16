@@ -85,12 +85,12 @@ module spine {
 			let target = this.target;
 			let bones = this.bones;
 			switch (bones.length) {
-			case 1:
-				this.apply1(bones[0], target.worldX, target.worldY, this.compress, this.stretch, this.data.uniform, this.mix);
-				break;
-			case 2:
-				this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.stretch, this.data.uniform, this.softness, this.mix);
-				break;
+				case 1:
+					this.apply1(bones[0], target.worldX, target.worldY, this.compress, this.stretch, this.data.uniform, this.mix);
+					break;
+				case 2:
+					this.apply2(bones[0], bones[1], target.worldX, target.worldY, this.bendDirection, this.stretch, this.data.uniform, this.softness, this.mix);
+					break;
 			}
 		}
 
@@ -100,7 +100,7 @@ module spine {
 			let pa = p.a, pb = p.b, pc = p.c, pd = p.d;
 			let rotationIK = -bone.ashearX - bone.arotation, tx = 0, ty = 0;
 
-			switch(bone.data.transformMode) {
+			switch (bone.data.transformMode) {
 				case TransformMode.OnlyTranslation:
 					tx = targetX - bone.worldX;
 					ty = targetY - bone.worldY;
@@ -112,7 +112,7 @@ module spine {
 					pb = -sc * s * bone.skeleton.scaleX;
 					pd = sa * s * bone.skeleton.scaleY;
 					rotationIK += Math.atan2(sc, sa) * MathUtils.radDeg;
-					// Fall through
+				// Fall through
 				default:
 					let x = targetX - p.worldX, y = targetY - p.worldY;
 					let d = pa * pd - pb * pc;

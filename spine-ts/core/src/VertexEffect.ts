@@ -29,8 +29,8 @@
 
 module spine {
 	export interface VertexEffect {
-		begin(skeleton: Skeleton): void;
-		transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void;
-		end(): void;
+		begin (skeleton: Skeleton): void;
+		transform (position: Vector2, uv: Vector2, light: Color, dark: Color): void;
+		end (): void;
 	}
 }

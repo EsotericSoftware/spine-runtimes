@@ -46,7 +46,7 @@ module spine {
 			this.duration = duration;
 		}
 
-		setTimelines(timelines: Array<Timeline>) {
+		setTimelines (timelines: Array<Timeline>) {
 			if (!timelines) throw new Error("timelines cannot be null.");
 			this.timelines = timelines;
 			this.timelineIds = new StringSet();
@@ -54,7 +54,7 @@ module spine {
 				this.timelineIds.addAll(timelines[i].getPropertyIds());
 		}
 
-		hasTimeline(ids: string[]) : boolean {
+		hasTimeline (ids: string[]): boolean {
 			for (let i = 0; i < ids.length; i++)
 				if (this.timelineIds.contains(ids[i])) return true;
 			return false;
@@ -147,7 +147,7 @@ module spine {
 		propertyIds: string[];
 		frames: ArrayLike<number>;
 
-		constructor(frameCount: number, propertyIds: string[]) {
+		constructor (frameCount: number, propertyIds: string[]) {
 			this.propertyIds = propertyIds;
 			this.frames = Utils.newFloatArray(frameCount * this.getFrameEntries());
 		}
@@ -286,8 +286,8 @@ module spine {
 	}
 
 	export abstract class CurveTimeline1 extends CurveTimeline {
-		constructor(frameCount: number, bezierCount: number, propertyId: string) {
-			super(frameCount, bezierCount, [ propertyId ]);
+		constructor (frameCount: number, bezierCount: number, propertyId: string) {
+			super(frameCount, bezierCount, [propertyId]);
 		}
 
 		getFrameEntries () {
@@ -316,11 +316,11 @@ module spine {
 
 			let curveType = this.curves[i >> 1];
 			switch (curveType) {
-			case 0/*LINEAR*/:
-				let before = frames[i], value = frames[i + 1/*VALUE*/];
-				return value + (time - before) / (frames[i + 2/*ENTRIES*/] - before) * (frames[i + 2/*ENTRIES*/ + 1/*VALUE*/] - value);
-			case 1/*STEPPED*/:
-				return frames[i + 1/*VALUE*/];
+				case 0/*LINEAR*/:
+					let before = frames[i], value = frames[i + 1/*VALUE*/];
+					return value + (time - before) / (frames[i + 2/*ENTRIES*/] - before) * (frames[i + 2/*ENTRIES*/ + 1/*VALUE*/] - value);
+				case 1/*STEPPED*/:
+					return frames[i + 1/*VALUE*/];
 			}
 			return this.getBezierValue(time, i, 1/*VALUE*/, curveType - 2/*BEZIER*/);
 		}
@@ -331,7 +331,7 @@ module spine {
 		/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
 		 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
 		constructor (frameCount: number, bezierCount: number, propertyId1: string, propertyId2: string) {
-			super(frameCount, bezierCount, [ propertyId1, propertyId2 ]);
+			super(frameCount, bezierCount, [propertyId1, propertyId2]);
 		}
 
 		getFrameEntries () {
@@ -365,25 +365,25 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					bone.rotation = bone.data.rotation;
-					return;
-				case MixBlend.first:
-					bone.rotation += (bone.data.rotation - bone.rotation) * alpha;
+					case MixBlend.setup:
+						bone.rotation = bone.data.rotation;
+						return;
+					case MixBlend.first:
+						bone.rotation += (bone.data.rotation - bone.rotation) * alpha;
 				}
 				return;
 			}
 
 			let r = this.getCurveValue(time);
 			switch (blend) {
-			case MixBlend.setup:
-				bone.rotation = bone.data.rotation + r * alpha;
-				break;
-			case MixBlend.first:
-			case MixBlend.replace:
-				r += bone.data.rotation - bone.rotation;
-			case MixBlend.add:
-				bone.rotation += r * alpha;
+				case MixBlend.setup:
+					bone.rotation = bone.data.rotation + r * alpha;
+					break;
+				case MixBlend.first:
+				case MixBlend.replace:
+					r += bone.data.rotation - bone.rotation;
+				case MixBlend.add:
+					bone.rotation += r * alpha;
 			}
 		}
 	}
@@ -407,13 +407,13 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					bone.x = bone.data.x;
-					bone.y = bone.data.y;
-					return;
-				case MixBlend.first:
-					bone.x += (bone.data.x - bone.x) * alpha;
-					bone.y += (bone.data.y - bone.y) * alpha;
+					case MixBlend.setup:
+						bone.x = bone.data.x;
+						bone.y = bone.data.y;
+						return;
+					case MixBlend.first:
+						bone.x += (bone.data.x - bone.x) * alpha;
+						bone.y += (bone.data.y - bone.y) * alpha;
 				}
 				return;
 			}
@@ -422,36 +422,36 @@ module spine {
 			let i = Timeline.search(frames, time, 3/*ENTRIES*/);
 			let curveType = this.curves[i / 3/*ENTRIES*/];
 			switch (curveType) {
-			case 0/*LINEAR*/:
-				let before = frames[i];
-				x = frames[i + 1/*VALUE1*/];
-				y = frames[i + 2/*VALUE2*/];
-				let t = (time - before) / (frames[i + 3/*ENTRIES*/] - before);
-				x += (frames[i + 3/*ENTRIES*/ + 1/*VALUE1*/] - x) * t;
-				y += (frames[i + 3/*ENTRIES*/ + 2/*VALUE2*/] - y) * t;
-				break;
-			case 1/*STEPPED*/:
-				x = frames[i + 1/*VALUE1*/];
-				y = frames[i + 2/*VALUE2*/];
-				break;
-			default:
-				x = this.getBezierValue(time, i, 1/*VALUE1*/, curveType - 2/*BEZIER*/);
-				y = this.getBezierValue(time, i, 2/*VALUE2*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+				case 0/*LINEAR*/:
+					let before = frames[i];
+					x = frames[i + 1/*VALUE1*/];
+					y = frames[i + 2/*VALUE2*/];
+					let t = (time - before) / (frames[i + 3/*ENTRIES*/] - before);
+					x += (frames[i + 3/*ENTRIES*/ + 1/*VALUE1*/] - x) * t;
+					y += (frames[i + 3/*ENTRIES*/ + 2/*VALUE2*/] - y) * t;
+					break;
+				case 1/*STEPPED*/:
+					x = frames[i + 1/*VALUE1*/];
+					y = frames[i + 2/*VALUE2*/];
+					break;
+				default:
+					x = this.getBezierValue(time, i, 1/*VALUE1*/, curveType - 2/*BEZIER*/);
+					y = this.getBezierValue(time, i, 2/*VALUE2*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
 			}
 
 			switch (blend) {
-			case MixBlend.setup:
-				bone.x = bone.data.x + x * alpha;
-				bone.y = bone.data.y + y * alpha;
-				break;
-			case MixBlend.first:
-			case MixBlend.replace:
-				bone.x += (bone.data.x + x - bone.x) * alpha;
-				bone.y += (bone.data.y + y - bone.y) * alpha;
-				break;
-			case MixBlend.add:
-				bone.x += x * alpha;
-				bone.y += y * alpha;
+				case MixBlend.setup:
+					bone.x = bone.data.x + x * alpha;
+					bone.y = bone.data.y + y * alpha;
+					break;
+				case MixBlend.first:
+				case MixBlend.replace:
+					bone.x += (bone.data.x + x - bone.x) * alpha;
+					bone.y += (bone.data.y + y - bone.y) * alpha;
+					break;
+				case MixBlend.add:
+					bone.x += x * alpha;
+					bone.y += y * alpha;
 			}
 		}
 	}
@@ -472,26 +472,26 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					bone.x = bone.data.x;
-					return;
-				case MixBlend.first:
-					bone.x += (bone.data.x - bone.x) * alpha;
+					case MixBlend.setup:
+						bone.x = bone.data.x;
+						return;
+					case MixBlend.first:
+						bone.x += (bone.data.x - bone.x) * alpha;
 				}
 				return;
 			}
 
 			let x = this.getCurveValue(time);
 			switch (blend) {
-			case MixBlend.setup:
-				bone.x = bone.data.x + x * alpha;
-				break;
-			case MixBlend.first:
-			case MixBlend.replace:
-				bone.x += (bone.data.x + x - bone.x) * alpha;
-				break;
-			case MixBlend.add:
-				bone.x += x * alpha;
+				case MixBlend.setup:
+					bone.x = bone.data.x + x * alpha;
+					break;
+				case MixBlend.first:
+				case MixBlend.replace:
+					bone.x += (bone.data.x + x - bone.x) * alpha;
+					break;
+				case MixBlend.add:
+					bone.x += x * alpha;
 			}
 		}
 	}
@@ -512,26 +512,26 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					bone.y = bone.data.y;
-					return;
-				case MixBlend.first:
-					bone.y += (bone.data.y - bone.y) * alpha;
+					case MixBlend.setup:
+						bone.y = bone.data.y;
+						return;
+					case MixBlend.first:
+						bone.y += (bone.data.y - bone.y) * alpha;
 				}
 				return;
 			}
 
 			let y = this.getCurveValue(time);
 			switch (blend) {
-			case MixBlend.setup:
-				bone.y = bone.data.y + y * alpha;
-				break;
-			case MixBlend.first:
-			case MixBlend.replace:
-				bone.y += (bone.data.y + y - bone.y) * alpha;
-				break;
-			case MixBlend.add:
-				bone.y += y * alpha;
+				case MixBlend.setup:
+					bone.y = bone.data.y + y * alpha;
+					break;
+				case MixBlend.first:
+				case MixBlend.replace:
+					bone.y += (bone.data.y + y - bone.y) * alpha;
+					break;
+				case MixBlend.add:
+					bone.y += y * alpha;
 			}
 		}
 	}
@@ -555,13 +555,13 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					bone.scaleX = bone.data.scaleX;
-					bone.scaleY = bone.data.scaleY;
-					return;
-				case MixBlend.first:
-					bone.scaleX += (bone.data.scaleX - bone.scaleX) * alpha;
-					bone.scaleY += (bone.data.scaleY - bone.scaleY) * alpha;
+					case MixBlend.setup:
+						bone.scaleX = bone.data.scaleX;
+						bone.scaleY = bone.data.scaleY;
+						return;
+					case MixBlend.first:
+						bone.scaleX += (bone.data.scaleX - bone.scaleX) * alpha;
+						bone.scaleY += (bone.data.scaleY - bone.scaleY) * alpha;
 				}
 				return;
 			}
@@ -570,21 +570,21 @@ module spine {
 			let i = Timeline.search(frames, time, 3/*ENTRIES*/);
 			let curveType = this.curves[i / 3/*ENTRIES*/];
 			switch (curveType) {
-			case 0/*LINEAR*/:
-				let before = frames[i];
-				x = frames[i + 1/*VALUE1*/];
-				y = frames[i + 2/*VALUE2*/];
-				let t = (time - before) / (frames[i + 3/*ENTRIES*/] - before);
-				x += (frames[i + 3/*ENTRIES*/ + 1/*VALUE1*/] - x) * t;
-				y += (frames[i + 3/*ENTRIES*/ + 2/*VALUE2*/] - y) * t;
-				break;
-			case 1/*STEPPED*/:
-				x = frames[i + 1/*VALUE1*/];
-				y = frames[i + 2/*VALUE2*/];
-				break;
-			default:
-				x = this.getBezierValue(time, i, 1/*VALUE1*/, curveType - 2/*BEZIER*/);
-				y = this.getBezierValue(time, i, 2/*VALUE2*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+				case 0/*LINEAR*/:
+					let before = frames[i];
+					x = frames[i + 1/*VALUE1*/];
+					y = frames[i + 2/*VALUE2*/];
+					let t = (time - before) / (frames[i + 3/*ENTRIES*/] - before);
+					x += (frames[i + 3/*ENTRIES*/ + 1/*VALUE1*/] - x) * t;
+					y += (frames[i + 3/*ENTRIES*/ + 2/*VALUE2*/] - y) * t;
+					break;
+				case 1/*STEPPED*/:
+					x = frames[i + 1/*VALUE1*/];
+					y = frames[i + 2/*VALUE2*/];
+					break;
+				default:
+					x = this.getBezierValue(time, i, 1/*VALUE1*/, curveType - 2/*BEZIER*/);
+					y = this.getBezierValue(time, i, 2/*VALUE2*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
 			}
 			x *= bone.data.scaleX;
 			y *= bone.data.scaleY;
@@ -601,45 +601,45 @@ module spine {
 				let bx = 0, by = 0;
 				if (direction == MixDirection.mixOut) {
 					switch (blend) {
-					case MixBlend.setup:
-						bx = bone.data.scaleX;
-						by = bone.data.scaleY;
-						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
-						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
-						break;
-					case MixBlend.first:
-					case MixBlend.replace:
-						bx = bone.scaleX;
-						by = bone.scaleY;
-						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
-						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
-						break;
-					case MixBlend.add:
-						bx = bone.scaleX;
-						by = bone.scaleY;
-						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bone.data.scaleX) * alpha;
-						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - bone.data.scaleY) * alpha;
+						case MixBlend.setup:
+							bx = bone.data.scaleX;
+							by = bone.data.scaleY;
+							bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
+							bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
+							break;
+						case MixBlend.first:
+						case MixBlend.replace:
+							bx = bone.scaleX;
+							by = bone.scaleY;
+							bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
+							bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
+							break;
+						case MixBlend.add:
+							bx = bone.scaleX;
+							by = bone.scaleY;
+							bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bone.data.scaleX) * alpha;
+							bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - bone.data.scaleY) * alpha;
 					}
 				} else {
 					switch (blend) {
-					case MixBlend.setup:
-						bx = Math.abs(bone.data.scaleX) * MathUtils.signum(x);
-						by = Math.abs(bone.data.scaleY) * MathUtils.signum(y);
-						bone.scaleX = bx + (x - bx) * alpha;
-						bone.scaleY = by + (y - by) * alpha;
-						break;
-					case MixBlend.first:
-					case MixBlend.replace:
-						bx = Math.abs(bone.scaleX) * MathUtils.signum(x);
-						by = Math.abs(bone.scaleY) * MathUtils.signum(y);
-						bone.scaleX = bx + (x - bx) * alpha;
-						bone.scaleY = by + (y - by) * alpha;
-						break;
-					case MixBlend.add:
-						bx = MathUtils.signum(x);
-						by = MathUtils.signum(y);
-						bone.scaleX = Math.abs(bone.scaleX) * bx + (x - Math.abs(bone.data.scaleX) * bx) * alpha;
-						bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
+						case MixBlend.setup:
+							bx = Math.abs(bone.data.scaleX) * MathUtils.signum(x);
+							by = Math.abs(bone.data.scaleY) * MathUtils.signum(y);
+							bone.scaleX = bx + (x - bx) * alpha;
+							bone.scaleY = by + (y - by) * alpha;
+							break;
+						case MixBlend.first:
+						case MixBlend.replace:
+							bx = Math.abs(bone.scaleX) * MathUtils.signum(x);
+							by = Math.abs(bone.scaleY) * MathUtils.signum(y);
+							bone.scaleX = bx + (x - bx) * alpha;
+							bone.scaleY = by + (y - by) * alpha;
+							break;
+						case MixBlend.add:
+							bx = MathUtils.signum(x);
+							by = MathUtils.signum(y);
+							bone.scaleX = Math.abs(bone.scaleX) * bx + (x - Math.abs(bone.data.scaleX) * bx) * alpha;
+							bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
 					}
 				}
 			}
@@ -662,11 +662,11 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					bone.scaleX = bone.data.scaleX;
-					return;
-				case MixBlend.first:
-					bone.scaleX += (bone.data.scaleX - bone.scaleX) * alpha;
+					case MixBlend.setup:
+						bone.scaleX = bone.data.scaleX;
+						return;
+					case MixBlend.first:
+						bone.scaleX += (bone.data.scaleX - bone.scaleX) * alpha;
 				}
 				return;
 			}
@@ -682,33 +682,33 @@ module spine {
 				let bx = 0;
 				if (direction == MixDirection.mixOut) {
 					switch (blend) {
-					case MixBlend.setup:
-						bx = bone.data.scaleX;
-						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
-						break;
-					case MixBlend.first:
-					case MixBlend.replace:
-						bx = bone.scaleX;
-						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
-						break;
-					case MixBlend.add:
-						bx = bone.scaleX;
-						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bone.data.scaleX) * alpha;
+						case MixBlend.setup:
+							bx = bone.data.scaleX;
+							bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
+							break;
+						case MixBlend.first:
+						case MixBlend.replace:
+							bx = bone.scaleX;
+							bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
+							break;
+						case MixBlend.add:
+							bx = bone.scaleX;
+							bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bone.data.scaleX) * alpha;
 					}
 				} else {
 					switch (blend) {
-					case MixBlend.setup:
-						bx = Math.abs(bone.data.scaleX) * MathUtils.signum(x);
-						bone.scaleX = bx + (x - bx) * alpha;
-						break;
-					case MixBlend.first:
-					case MixBlend.replace:
-						bx = Math.abs(bone.scaleX) * MathUtils.signum(x);
-						bone.scaleX = bx + (x - bx) * alpha;
-						break;
-					case MixBlend.add:
-						bx = MathUtils.signum(x);
-						bone.scaleX = Math.abs(bone.scaleX) * bx + (x - Math.abs(bone.data.scaleX) * bx) * alpha;
+						case MixBlend.setup:
+							bx = Math.abs(bone.data.scaleX) * MathUtils.signum(x);
+							bone.scaleX = bx + (x - bx) * alpha;
+							break;
+						case MixBlend.first:
+						case MixBlend.replace:
+							bx = Math.abs(bone.scaleX) * MathUtils.signum(x);
+							bone.scaleX = bx + (x - bx) * alpha;
+							break;
+						case MixBlend.add:
+							bx = MathUtils.signum(x);
+							bone.scaleX = Math.abs(bone.scaleX) * bx + (x - Math.abs(bone.data.scaleX) * bx) * alpha;
 					}
 				}
 			}
@@ -731,11 +731,11 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					bone.scaleY = bone.data.scaleY;
-					return;
-				case MixBlend.first:
-					bone.scaleY += (bone.data.scaleY - bone.scaleY) * alpha;
+					case MixBlend.setup:
+						bone.scaleY = bone.data.scaleY;
+						return;
+					case MixBlend.first:
+						bone.scaleY += (bone.data.scaleY - bone.scaleY) * alpha;
 				}
 				return;
 			}
@@ -751,33 +751,33 @@ module spine {
 				let by = 0;
 				if (direction == MixDirection.mixOut) {
 					switch (blend) {
-					case MixBlend.setup:
-						by = bone.data.scaleY;
-						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
-						break;
-					case MixBlend.first:
-					case MixBlend.replace:
-						by = bone.scaleY;
-						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
-						break;
-					case MixBlend.add:
-						by = bone.scaleY;
-						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - bone.data.scaleY) * alpha;
+						case MixBlend.setup:
+							by = bone.data.scaleY;
+							bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
+							break;
+						case MixBlend.first:
+						case MixBlend.replace:
+							by = bone.scaleY;
+							bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
+							break;
+						case MixBlend.add:
+							by = bone.scaleY;
+							bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - bone.data.scaleY) * alpha;
 					}
 				} else {
 					switch (blend) {
-					case MixBlend.setup:
-						by = Math.abs(bone.data.scaleY) * MathUtils.signum(y);
-						bone.scaleY = by + (y - by) * alpha;
-						break;
-					case MixBlend.first:
-					case MixBlend.replace:
-						by = Math.abs(bone.scaleY) * MathUtils.signum(y);
-						bone.scaleY = by + (y - by) * alpha;
-						break;
-					case MixBlend.add:
-						by = MathUtils.signum(y);
-						bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
+						case MixBlend.setup:
+							by = Math.abs(bone.data.scaleY) * MathUtils.signum(y);
+							bone.scaleY = by + (y - by) * alpha;
+							break;
+						case MixBlend.first:
+						case MixBlend.replace:
+							by = Math.abs(bone.scaleY) * MathUtils.signum(y);
+							bone.scaleY = by + (y - by) * alpha;
+							break;
+						case MixBlend.add:
+							by = MathUtils.signum(y);
+							bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
 					}
 				}
 			}
@@ -803,13 +803,13 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					bone.shearX = bone.data.shearX;
-					bone.shearY = bone.data.shearY;
-					return;
-				case MixBlend.first:
-					bone.shearX += (bone.data.shearX - bone.shearX) * alpha;
-					bone.shearY += (bone.data.shearY - bone.shearY) * alpha;
+					case MixBlend.setup:
+						bone.shearX = bone.data.shearX;
+						bone.shearY = bone.data.shearY;
+						return;
+					case MixBlend.first:
+						bone.shearX += (bone.data.shearX - bone.shearX) * alpha;
+						bone.shearY += (bone.data.shearY - bone.shearY) * alpha;
 				}
 				return;
 			}
@@ -818,36 +818,36 @@ module spine {
 			let i = Timeline.search(frames, time, 3/*ENTRIES*/);
 			let curveType = this.curves[i / 3/*ENTRIES*/];
 			switch (curveType) {
-			case 0/*LINEAR*/:
-				let before = frames[i];
-				x = frames[i + 1/*VALUE1*/];
-				y = frames[i + 2/*VALUE2*/];
-				let t = (time - before) / (frames[i + 3/*ENTRIES*/] - before);
-				x += (frames[i + 3/*ENTRIES*/ + 1/*VALUE1*/] - x) * t;
-				y += (frames[i + 3/*ENTRIES*/ + 2/*VALUE2*/] - y) * t;
-				break;
-			case 1/*STEPPED*/:
-				x = frames[i + 1/*VALUE1*/];
-				y = frames[i + 2/*VALUE2*/];
-				break;
-			default:
-				x = this.getBezierValue(time, i, 1/*VALUE1*/, curveType - 2/*BEZIER*/);
-				y = this.getBezierValue(time, i, 2/*VALUE2*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+				case 0/*LINEAR*/:
+					let before = frames[i];
+					x = frames[i + 1/*VALUE1*/];
+					y = frames[i + 2/*VALUE2*/];
+					let t = (time - before) / (frames[i + 3/*ENTRIES*/] - before);
+					x += (frames[i + 3/*ENTRIES*/ + 1/*VALUE1*/] - x) * t;
+					y += (frames[i + 3/*ENTRIES*/ + 2/*VALUE2*/] - y) * t;
+					break;
+				case 1/*STEPPED*/:
+					x = frames[i + 1/*VALUE1*/];
+					y = frames[i + 2/*VALUE2*/];
+					break;
+				default:
+					x = this.getBezierValue(time, i, 1/*VALUE1*/, curveType - 2/*BEZIER*/);
+					y = this.getBezierValue(time, i, 2/*VALUE2*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
 			}
 
 			switch (blend) {
-			case MixBlend.setup:
-				bone.shearX = bone.data.shearX + x * alpha;
-				bone.shearY = bone.data.shearY + y * alpha;
-				break;
-			case MixBlend.first:
-			case MixBlend.replace:
-				bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
-				bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
-				break;
-			case MixBlend.add:
-				bone.shearX += x * alpha;
-				bone.shearY += y * alpha;
+				case MixBlend.setup:
+					bone.shearX = bone.data.shearX + x * alpha;
+					bone.shearY = bone.data.shearY + y * alpha;
+					break;
+				case MixBlend.first:
+				case MixBlend.replace:
+					bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
+					bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
+					break;
+				case MixBlend.add:
+					bone.shearX += x * alpha;
+					bone.shearY += y * alpha;
 			}
 		}
 	}
@@ -868,26 +868,26 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					bone.shearX = bone.data.shearX;
-					return;
-				case MixBlend.first:
-					bone.shearX += (bone.data.shearX - bone.shearX) * alpha;
+					case MixBlend.setup:
+						bone.shearX = bone.data.shearX;
+						return;
+					case MixBlend.first:
+						bone.shearX += (bone.data.shearX - bone.shearX) * alpha;
 				}
 				return;
 			}
 
 			let x = this.getCurveValue(time);
 			switch (blend) {
-			case MixBlend.setup:
-				bone.shearX = bone.data.shearX + x * alpha;
-				break;
-			case MixBlend.first:
-			case MixBlend.replace:
-				bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
-				break;
-			case MixBlend.add:
-				bone.shearX += x * alpha;
+				case MixBlend.setup:
+					bone.shearX = bone.data.shearX + x * alpha;
+					break;
+				case MixBlend.first:
+				case MixBlend.replace:
+					bone.shearX += (bone.data.shearX + x - bone.shearX) * alpha;
+					break;
+				case MixBlend.add:
+					bone.shearX += x * alpha;
 			}
 		}
 	}
@@ -908,26 +908,26 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					bone.shearY = bone.data.shearY;
-					return;
-				case MixBlend.first:
-					bone.shearY += (bone.data.shearY - bone.shearY) * alpha;
+					case MixBlend.setup:
+						bone.shearY = bone.data.shearY;
+						return;
+					case MixBlend.first:
+						bone.shearY += (bone.data.shearY - bone.shearY) * alpha;
 				}
 				return;
 			}
 
 			let y = this.getCurveValue(time);
 			switch (blend) {
-			case MixBlend.setup:
-				bone.shearY = bone.data.shearY + y * alpha;
-				break;
-			case MixBlend.first:
-			case MixBlend.replace:
-				bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
-				break;
-			case MixBlend.add:
-				bone.shearY += y * alpha;
+				case MixBlend.setup:
+					bone.shearY = bone.data.shearY + y * alpha;
+					break;
+				case MixBlend.first:
+				case MixBlend.replace:
+					bone.shearY += (bone.data.shearY + y - bone.shearY) * alpha;
+					break;
+				case MixBlend.add:
+					bone.shearY += y * alpha;
 			}
 		}
 	}
@@ -967,12 +967,12 @@ module spine {
 			if (time < frames[0]) {
 				let setup = slot.data.color;
 				switch (blend) {
-				case MixBlend.setup:
-					color.setFromColor(setup);
-					return;
-				case MixBlend.first:
-					color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
-						(setup.a - color.a) * alpha);
+					case MixBlend.setup:
+						color.setFromColor(setup);
+						return;
+					case MixBlend.first:
+						color.add((setup.r - color.r) * alpha, (setup.g - color.g) * alpha, (setup.b - color.b) * alpha,
+							(setup.a - color.a) * alpha);
 				}
 				return;
 			}
@@ -981,29 +981,29 @@ module spine {
 			let i = Timeline.search(frames, time, 5/*ENTRIES*/);
 			let curveType = this.curves[i / 5/*ENTRIES*/];
 			switch (curveType) {
-			case 0/*LINEAR*/:
-				let before = frames[i];
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				a = frames[i + 4/*A*/];
-				let t = (time - before) / (frames[i + 5/*ENTRIES*/] - before);
-				r += (frames[i + 5/*ENTRIES*/ + 1/*R*/] - r) * t;
-				g += (frames[i + 5/*ENTRIES*/ + 2/*G*/] - g) * t;
-				b += (frames[i + 5/*ENTRIES*/ + 3/*B*/] - b) * t;
-				a += (frames[i + 5/*ENTRIES*/ + 4/*A*/] - a) * t;
-				break;
-			case 1/*STEPPED*/:
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				a = frames[i + 4/*A*/];
-				break;
-			default:
-				r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
-				g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
-				b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
-				a = this.getBezierValue(time, i, 4/*A*/, curveType + 18/*BEZIER_SIZE*/ * 3 - 2/*BEZIER*/);
+				case 0/*LINEAR*/:
+					let before = frames[i];
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					a = frames[i + 4/*A*/];
+					let t = (time - before) / (frames[i + 5/*ENTRIES*/] - before);
+					r += (frames[i + 5/*ENTRIES*/ + 1/*R*/] - r) * t;
+					g += (frames[i + 5/*ENTRIES*/ + 2/*G*/] - g) * t;
+					b += (frames[i + 5/*ENTRIES*/ + 3/*B*/] - b) * t;
+					a += (frames[i + 5/*ENTRIES*/ + 4/*A*/] - a) * t;
+					break;
+				case 1/*STEPPED*/:
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					a = frames[i + 4/*A*/];
+					break;
+				default:
+					r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
+					g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+					b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
+					a = this.getBezierValue(time, i, 4/*A*/, curveType + 18/*BEZIER_SIZE*/ * 3 - 2/*BEZIER*/);
 			}
 			if (alpha == 1)
 				color.set(r, g, b, a);
@@ -1047,15 +1047,15 @@ module spine {
 			if (time < frames[0]) {
 				let setup = slot.data.color;
 				switch (blend) {
-				case MixBlend.setup:
-					color.r = setup.r;
-					color.g = setup.g;
-					color.b = setup.b;
-					return;
-				case MixBlend.first:
-					color.r += (setup.r - color.r) * alpha;
-					color.g += (setup.g - color.g) * alpha;
-					color.b += (setup.b - color.b) * alpha;
+					case MixBlend.setup:
+						color.r = setup.r;
+						color.g = setup.g;
+						color.b = setup.b;
+						return;
+					case MixBlend.first:
+						color.r += (setup.r - color.r) * alpha;
+						color.g += (setup.g - color.g) * alpha;
+						color.b += (setup.b - color.b) * alpha;
 				}
 				return;
 			}
@@ -1064,25 +1064,25 @@ module spine {
 			let i = Timeline.search(frames, time, 4/*ENTRIES*/);
 			let curveType = this.curves[i >> 2];
 			switch (curveType) {
-			case 0/*LINEAR*/:
-				let before = frames[i];
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				let t = (time - before) / (frames[i + 4/*ENTRIES*/] - before);
-				r += (frames[i + 4/*ENTRIES*/ + 1/*R*/] - r) * t;
-				g += (frames[i + 4/*ENTRIES*/ + 2/*G*/] - g) * t;
-				b += (frames[i + 4/*ENTRIES*/ + 3/*B*/] - b) * t;
-				break;
-			case 1/*STEPPED*/:
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				break;
-			default:
-				r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
-				g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
-				b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
+				case 0/*LINEAR*/:
+					let before = frames[i];
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					let t = (time - before) / (frames[i + 4/*ENTRIES*/] - before);
+					r += (frames[i + 4/*ENTRIES*/ + 1/*R*/] - r) * t;
+					g += (frames[i + 4/*ENTRIES*/ + 2/*G*/] - g) * t;
+					b += (frames[i + 4/*ENTRIES*/ + 3/*B*/] - b) * t;
+					break;
+				case 1/*STEPPED*/:
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					break;
+				default:
+					r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
+					g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+					b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
 			}
 			if (alpha == 1) {
 				color.r = r;
@@ -1119,11 +1119,11 @@ module spine {
 			if (time < this.frames[0]) { // Time is before first frame.
 				let setup = slot.data.color;
 				switch (blend) {
-				case MixBlend.setup:
-					color.a = setup.a;
-					return;
-				case MixBlend.first:
-					color.a += (setup.a - color.a) * alpha;
+					case MixBlend.setup:
+						color.a = setup.a;
+						return;
+					case MixBlend.first:
+						color.a += (setup.a - color.a) * alpha;
 				}
 				return;
 			}
@@ -1139,7 +1139,7 @@ module spine {
 	}
 
 	/** Changes a slot's {@link Slot#color} and {@link Slot#darkColor} for two color tinting. */
-	export class RGBA2Timeline extends CurveTimeline implements SlotTimeline{
+	export class RGBA2Timeline extends CurveTimeline implements SlotTimeline {
 		slotIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, slotIndex: number) {
@@ -1177,18 +1177,18 @@ module spine {
 			if (time < frames[0]) {
 				let setupLight = slot.data.color, setupDark = slot.data.darkColor;
 				switch (blend) {
-				case MixBlend.setup:
-					light.setFromColor(setupLight);
-					dark.r = setupDark.r;
-					dark.g = setupDark.g;
-					dark.b = setupDark.b;
-					return;
-				case MixBlend.first:
-					light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
-						(setupLight.a - light.a) * alpha);
-					dark.r += (setupDark.r - dark.r) * alpha;
-					dark.g += (setupDark.g - dark.g) * alpha;
-					dark.b += (setupDark.b - dark.b) * alpha;
+					case MixBlend.setup:
+						light.setFromColor(setupLight);
+						dark.r = setupDark.r;
+						dark.g = setupDark.g;
+						dark.b = setupDark.b;
+						return;
+					case MixBlend.first:
+						light.add((setupLight.r - light.r) * alpha, (setupLight.g - light.g) * alpha, (setupLight.b - light.b) * alpha,
+							(setupLight.a - light.a) * alpha);
+						dark.r += (setupDark.r - dark.r) * alpha;
+						dark.g += (setupDark.g - dark.g) * alpha;
+						dark.b += (setupDark.b - dark.b) * alpha;
 				}
 				return;
 			}
@@ -1197,41 +1197,41 @@ module spine {
 			let i = Timeline.search(frames, time, 8/*ENTRIES*/);
 			let curveType = this.curves[i >> 3];
 			switch (curveType) {
-			case 0/*LINEAR*/:
-				let before = frames[i];
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				a = frames[i + 4/*A*/];
-				r2 = frames[i + 5/*R2*/];
-				g2 = frames[i + 6/*G2*/];
-				b2 = frames[i + 7/*B2*/];
-				let t = (time - before) / (frames[i + 8/*ENTRIES*/] - before);
-				r += (frames[i + 8/*ENTRIES*/ + 1/*R*/] - r) * t;
-				g += (frames[i + 8/*ENTRIES*/ + 2/*G*/] - g) * t;
-				b += (frames[i + 8/*ENTRIES*/ + 3/*B*/] - b) * t;
-				a += (frames[i + 8/*ENTRIES*/ + 4/*A*/] - a) * t;
-				r2 += (frames[i + 8/*ENTRIES*/ + 5/*R2*/] - r2) * t;
-				g2 += (frames[i + 8/*ENTRIES*/ + 6/*G2*/] - g2) * t;
-				b2 += (frames[i + 8/*ENTRIES*/ + 7/*B2*/] - b2) * t;
-				break;
-			case 1/*STEPPED*/:
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				a = frames[i + 4/*A*/];
-				r2 = frames[i + 5/*R2*/];
-				g2 = frames[i + 6/*G2*/];
-				b2 = frames[i + 7/*B2*/];
-				break;
-			default:
-				r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
-				g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
-				b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
-				a = this.getBezierValue(time, i, 4/*A*/, curveType + 18/*BEZIER_SIZE*/ * 3 - 2/*BEZIER*/);
-				r2 = this.getBezierValue(time, i, 5/*R2*/, curveType + 18/*BEZIER_SIZE*/ * 4 - 2/*BEZIER*/);
-				g2 = this.getBezierValue(time, i, 6/*G2*/, curveType + 18/*BEZIER_SIZE*/ * 5 - 2/*BEZIER*/);
-				b2 = this.getBezierValue(time, i, 7/*B2*/, curveType + 18/*BEZIER_SIZE*/ * 6 - 2/*BEZIER*/);
+				case 0/*LINEAR*/:
+					let before = frames[i];
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					a = frames[i + 4/*A*/];
+					r2 = frames[i + 5/*R2*/];
+					g2 = frames[i + 6/*G2*/];
+					b2 = frames[i + 7/*B2*/];
+					let t = (time - before) / (frames[i + 8/*ENTRIES*/] - before);
+					r += (frames[i + 8/*ENTRIES*/ + 1/*R*/] - r) * t;
+					g += (frames[i + 8/*ENTRIES*/ + 2/*G*/] - g) * t;
+					b += (frames[i + 8/*ENTRIES*/ + 3/*B*/] - b) * t;
+					a += (frames[i + 8/*ENTRIES*/ + 4/*A*/] - a) * t;
+					r2 += (frames[i + 8/*ENTRIES*/ + 5/*R2*/] - r2) * t;
+					g2 += (frames[i + 8/*ENTRIES*/ + 6/*G2*/] - g2) * t;
+					b2 += (frames[i + 8/*ENTRIES*/ + 7/*B2*/] - b2) * t;
+					break;
+				case 1/*STEPPED*/:
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					a = frames[i + 4/*A*/];
+					r2 = frames[i + 5/*R2*/];
+					g2 = frames[i + 6/*G2*/];
+					b2 = frames[i + 7/*B2*/];
+					break;
+				default:
+					r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
+					g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+					b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
+					a = this.getBezierValue(time, i, 4/*A*/, curveType + 18/*BEZIER_SIZE*/ * 3 - 2/*BEZIER*/);
+					r2 = this.getBezierValue(time, i, 5/*R2*/, curveType + 18/*BEZIER_SIZE*/ * 4 - 2/*BEZIER*/);
+					g2 = this.getBezierValue(time, i, 6/*G2*/, curveType + 18/*BEZIER_SIZE*/ * 5 - 2/*BEZIER*/);
+					b2 = this.getBezierValue(time, i, 7/*B2*/, curveType + 18/*BEZIER_SIZE*/ * 6 - 2/*BEZIER*/);
 			}
 
 			if (alpha == 1) {
@@ -1256,7 +1256,7 @@ module spine {
 	}
 
 	/** Changes a slot's {@link Slot#color} and {@link Slot#darkColor} for two color tinting. */
-	export class RGB2Timeline extends CurveTimeline implements SlotTimeline{
+	export class RGB2Timeline extends CurveTimeline implements SlotTimeline {
 		slotIndex = 0;
 
 		constructor (frameCount: number, bezierCount: number, slotIndex: number) {
@@ -1292,21 +1292,21 @@ module spine {
 			if (time < frames[0]) {
 				let setupLight = slot.data.color, setupDark = slot.data.darkColor;
 				switch (blend) {
-				case MixBlend.setup:
-					light.r = setupLight.r;
-					light.g = setupLight.g;
-					light.b = setupLight.b;
-					dark.r = setupDark.r;
-					dark.g = setupDark.g;
-					dark.b = setupDark.b;
-					return;
-				case MixBlend.first:
-					light.r += (setupLight.r - light.r) * alpha;
-					light.g += (setupLight.g - light.g) * alpha;
-					light.b += (setupLight.b - light.b) * alpha;
-					dark.r += (setupDark.r - dark.r) * alpha;
-					dark.g += (setupDark.g - dark.g) * alpha;
-					dark.b += (setupDark.b - dark.b) * alpha;
+					case MixBlend.setup:
+						light.r = setupLight.r;
+						light.g = setupLight.g;
+						light.b = setupLight.b;
+						dark.r = setupDark.r;
+						dark.g = setupDark.g;
+						dark.b = setupDark.b;
+						return;
+					case MixBlend.first:
+						light.r += (setupLight.r - light.r) * alpha;
+						light.g += (setupLight.g - light.g) * alpha;
+						light.b += (setupLight.b - light.b) * alpha;
+						dark.r += (setupDark.r - dark.r) * alpha;
+						dark.g += (setupDark.g - dark.g) * alpha;
+						dark.b += (setupDark.b - dark.b) * alpha;
 				}
 				return;
 			}
@@ -1315,37 +1315,37 @@ module spine {
 			let i = Timeline.search(frames, time, 7/*ENTRIES*/);
 			let curveType = this.curves[i / 7/*ENTRIES*/];
 			switch (curveType) {
-			case 0/*LINEAR*/:
-				let before = frames[i];
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				r2 = frames[i + 4/*R2*/];
-				g2 = frames[i + 5/*G2*/];
-				b2 = frames[i + 6/*B2*/];
-				let t = (time - before) / (frames[i + 7/*ENTRIES*/] - before);
-				r += (frames[i + 7/*ENTRIES*/ + 1/*R*/] - r) * t;
-				g += (frames[i + 7/*ENTRIES*/ + 2/*G*/] - g) * t;
-				b += (frames[i + 7/*ENTRIES*/ + 3/*B*/] - b) * t;
-				r2 += (frames[i + 7/*ENTRIES*/ + 4/*R2*/] - r2) * t;
-				g2 += (frames[i + 7/*ENTRIES*/ + 5/*G2*/] - g2) * t;
-				b2 += (frames[i + 7/*ENTRIES*/ + 6/*B2*/] - b2) * t;
-				break;
-			case 1/*STEPPED*/:
-				r = frames[i + 1/*R*/];
-				g = frames[i + 2/*G*/];
-				b = frames[i + 3/*B*/];
-				r2 = frames[i + 4/*R2*/];
-				g2 = frames[i + 5/*G2*/];
-				b2 = frames[i + 6/*B2*/];
-				break;
-			default:
-				r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
-				g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
-				b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
-				r2 = this.getBezierValue(time, i, 4/*R2*/, curveType + 18/*BEZIER_SIZE*/ * 3 - 2/*BEZIER*/);
-				g2 = this.getBezierValue(time, i, 5/*G2*/, curveType + 18/*BEZIER_SIZE*/ * 4 - 2/*BEZIER*/);
-				b2 = this.getBezierValue(time, i, 6/*B2*/, curveType + 18/*BEZIER_SIZE*/ * 5 - 2/*BEZIER*/);
+				case 0/*LINEAR*/:
+					let before = frames[i];
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					r2 = frames[i + 4/*R2*/];
+					g2 = frames[i + 5/*G2*/];
+					b2 = frames[i + 6/*B2*/];
+					let t = (time - before) / (frames[i + 7/*ENTRIES*/] - before);
+					r += (frames[i + 7/*ENTRIES*/ + 1/*R*/] - r) * t;
+					g += (frames[i + 7/*ENTRIES*/ + 2/*G*/] - g) * t;
+					b += (frames[i + 7/*ENTRIES*/ + 3/*B*/] - b) * t;
+					r2 += (frames[i + 7/*ENTRIES*/ + 4/*R2*/] - r2) * t;
+					g2 += (frames[i + 7/*ENTRIES*/ + 5/*G2*/] - g2) * t;
+					b2 += (frames[i + 7/*ENTRIES*/ + 6/*B2*/] - b2) * t;
+					break;
+				case 1/*STEPPED*/:
+					r = frames[i + 1/*R*/];
+					g = frames[i + 2/*G*/];
+					b = frames[i + 3/*B*/];
+					r2 = frames[i + 4/*R2*/];
+					g2 = frames[i + 5/*G2*/];
+					b2 = frames[i + 6/*B2*/];
+					break;
+				default:
+					r = this.getBezierValue(time, i, 1/*R*/, curveType - 2/*BEZIER*/);
+					g = this.getBezierValue(time, i, 2/*G*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+					b = this.getBezierValue(time, i, 3/*B*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
+					r2 = this.getBezierValue(time, i, 4/*R2*/, curveType + 18/*BEZIER_SIZE*/ * 3 - 2/*BEZIER*/);
+					g2 = this.getBezierValue(time, i, 5/*G2*/, curveType + 18/*BEZIER_SIZE*/ * 4 - 2/*BEZIER*/);
+					b2 = this.getBezierValue(time, i, 6/*B2*/, curveType + 18/*BEZIER_SIZE*/ * 5 - 2/*BEZIER*/);
 			}
 
 			if (alpha == 1) {
@@ -1417,7 +1417,7 @@ module spine {
 			this.setAttachment(skeleton, slot, this.attachmentNames[Timeline.search1(this.frames, time)]);
 		}
 
-		setAttachment(skeleton: Skeleton, slot: Slot, attachmentName: string) {
+		setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: string) {
 			slot.setAttachment(!attachmentName ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
 		}
 	}
@@ -1480,11 +1480,11 @@ module spine {
 			let curves = this.curves;
 			let i = curves[frame];
 			switch (i) {
-			case 0/*LINEAR*/:
-				let x = this.frames[frame];
-				return (time - x) / (this.frames[frame + this.getFrameEntries()] - x);
-			case 1/*STEPPED*/:
-				return 0;
+				case 0/*LINEAR*/:
+					let x = this.frames[frame];
+					return (time - x) / (this.frames[frame + this.getFrameEntries()] - x);
+				case 1/*STEPPED*/:
+					return 0;
 			}
 			i -= 2/*BEZIER*/;
 			if (curves[i] > time) {
@@ -1518,26 +1518,26 @@ module spine {
 			if (time < frames[0]) {
 				let vertexAttachment = <VertexAttachment>slotAttachment;
 				switch (blend) {
-				case MixBlend.setup:
-					deform.length = 0;
-					return;
-				case MixBlend.first:
-					if (alpha == 1) {
+					case MixBlend.setup:
 						deform.length = 0;
 						return;
-					}
-					deform.length = vertexCount;
-					if (!vertexAttachment.bones) {
-						// Unweighted vertex positions.
-						let setupVertices = vertexAttachment.vertices;
-						for (var i = 0; i < vertexCount; i++)
-							deform[i] += (setupVertices[i] - deform[i]) * alpha;
-					} else {
-						// Weighted deform offsets.
-						alpha = 1 - alpha;
-						for (var i = 0; i < vertexCount; i++)
-							deform[i] *= alpha;
-					}
+					case MixBlend.first:
+						if (alpha == 1) {
+							deform.length = 0;
+							return;
+						}
+						deform.length = vertexCount;
+						if (!vertexAttachment.bones) {
+							// Unweighted vertex positions.
+							let setupVertices = vertexAttachment.vertices;
+							for (var i = 0; i < vertexCount; i++)
+								deform[i] += (setupVertices[i] - deform[i]) * alpha;
+						} else {
+							// Weighted deform offsets.
+							alpha = 1 - alpha;
+							for (var i = 0; i < vertexCount; i++)
+								deform[i] *= alpha;
+						}
 				}
 				return;
 			}
@@ -1562,39 +1562,39 @@ module spine {
 						Utils.arrayCopy(lastVertices, 0, deform, 0, vertexCount);
 				} else {
 					switch (blend) {
-					case MixBlend.setup: {
-						let vertexAttachment = slotAttachment as VertexAttachment;
-						if (!vertexAttachment.bones) {
-							// Unweighted vertex positions, with alpha.
-							let setupVertices = vertexAttachment.vertices;
-							for (let i = 0; i < vertexCount; i++) {
-								let setup = setupVertices[i];
-								deform[i] = setup + (lastVertices[i] - setup) * alpha;
+						case MixBlend.setup: {
+							let vertexAttachment = slotAttachment as VertexAttachment;
+							if (!vertexAttachment.bones) {
+								// Unweighted vertex positions, with alpha.
+								let setupVertices = vertexAttachment.vertices;
+								for (let i = 0; i < vertexCount; i++) {
+									let setup = setupVertices[i];
+									deform[i] = setup + (lastVertices[i] - setup) * alpha;
+								}
+							} else {
+								// Weighted deform offsets, with alpha.
+								for (let i = 0; i < vertexCount; i++)
+									deform[i] = lastVertices[i] * alpha;
 							}
-						} else {
-							// Weighted deform offsets, with alpha.
-							for (let i = 0; i < vertexCount; i++)
-								deform[i] = lastVertices[i] * alpha;
+							break;
 						}
-						break;
-					}
-					case MixBlend.first:
-					case MixBlend.replace:
-						for (let i = 0; i < vertexCount; i++)
-							deform[i] += (lastVertices[i] - deform[i]) * alpha;
-						break;
-					case MixBlend.add:
-						let vertexAttachment = slotAttachment as VertexAttachment;
-						if (!vertexAttachment.bones) {
-							// Unweighted vertex positions, with alpha.
-							let setupVertices = vertexAttachment.vertices;
+						case MixBlend.first:
+						case MixBlend.replace:
 							for (let i = 0; i < vertexCount; i++)
-								deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
-						} else {
-							// Weighted deform offsets, with alpha.
-							for (let i = 0; i < vertexCount; i++)
-								deform[i] += lastVertices[i] * alpha;
-						}
+								deform[i] += (lastVertices[i] - deform[i]) * alpha;
+							break;
+						case MixBlend.add:
+							let vertexAttachment = slotAttachment as VertexAttachment;
+							if (!vertexAttachment.bones) {
+								// Unweighted vertex positions, with alpha.
+								let setupVertices = vertexAttachment.vertices;
+								for (let i = 0; i < vertexCount; i++)
+									deform[i] += (lastVertices[i] - setupVertices[i]) * alpha;
+							} else {
+								// Weighted deform offsets, with alpha.
+								for (let i = 0; i < vertexCount; i++)
+									deform[i] += lastVertices[i] * alpha;
+							}
 					}
 				}
 				return;
@@ -1631,47 +1631,47 @@ module spine {
 				}
 			} else {
 				switch (blend) {
-				case MixBlend.setup: {
-					let vertexAttachment = slotAttachment as VertexAttachment;
-					if (!vertexAttachment.bones) {
-						// Unweighted vertex positions, with alpha.
-						let setupVertices = vertexAttachment.vertices;
-						for (let i = 0; i < vertexCount; i++) {
-							let prev = prevVertices[i], setup = setupVertices[i];
-							deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+					case MixBlend.setup: {
+						let vertexAttachment = slotAttachment as VertexAttachment;
+						if (!vertexAttachment.bones) {
+							// Unweighted vertex positions, with alpha.
+							let setupVertices = vertexAttachment.vertices;
+							for (let i = 0; i < vertexCount; i++) {
+								let prev = prevVertices[i], setup = setupVertices[i];
+								deform[i] = setup + (prev + (nextVertices[i] - prev) * percent - setup) * alpha;
+							}
+						} else {
+							// Weighted deform offsets, with alpha.
+							for (let i = 0; i < vertexCount; i++) {
+								let prev = prevVertices[i];
+								deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+							}
 						}
-					} else {
-						// Weighted deform offsets, with alpha.
+						break;
+					}
+					case MixBlend.first:
+					case MixBlend.replace:
 						for (let i = 0; i < vertexCount; i++) {
 							let prev = prevVertices[i];
-							deform[i] = (prev + (nextVertices[i] - prev) * percent) * alpha;
+							deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
 						}
-					}
-					break;
-				}
-				case MixBlend.first:
-				case MixBlend.replace:
-					for (let i = 0; i < vertexCount; i++) {
-						let prev = prevVertices[i];
-						deform[i] += (prev + (nextVertices[i] - prev) * percent - deform[i]) * alpha;
-					}
-					break;
-				case MixBlend.add:
-					let vertexAttachment = slotAttachment as VertexAttachment;
-					if (!vertexAttachment.bones) {
-						// Unweighted vertex positions, with alpha.
-						let setupVertices = vertexAttachment.vertices;
-						for (let i = 0; i < vertexCount; i++) {
-							let prev = prevVertices[i];
-							deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+						break;
+					case MixBlend.add:
+						let vertexAttachment = slotAttachment as VertexAttachment;
+						if (!vertexAttachment.bones) {
+							// Unweighted vertex positions, with alpha.
+							let setupVertices = vertexAttachment.vertices;
+							for (let i = 0; i < vertexCount; i++) {
+								let prev = prevVertices[i];
+								deform[i] += (prev + (nextVertices[i] - prev) * percent - setupVertices[i]) * alpha;
+							}
+						} else {
+							// Weighted deform offsets, with alpha.
+							for (let i = 0; i < vertexCount; i++) {
+								let prev = prevVertices[i];
+								deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
+							}
 						}
-					} else {
-						// Weighted deform offsets, with alpha.
-						for (let i = 0; i < vertexCount; i++) {
-							let prev = prevVertices[i];
-							deform[i] += (prev + (nextVertices[i] - prev) * percent) * alpha;
-						}
-					}
 				}
 			}
 		}
@@ -1679,7 +1679,7 @@ module spine {
 
 	/** Fires an {@link Event} when specific animation times are reached. */
 	export class EventTimeline extends Timeline {
-		static propertyIds = [ "" + Property.event ];
+		static propertyIds = ["" + Property.event];
 
 		/** The event for each key frame. */
 		events: Array<Event>;
@@ -1732,7 +1732,7 @@ module spine {
 
 	/** Changes a skeleton's {@link Skeleton#drawOrder}. */
 	export class DrawOrderTimeline extends Timeline {
-		static propertyIds = [ "" + Property.drawOrder ];
+		static propertyIds = ["" + Property.drawOrder];
 
 		/** The draw order for each key frame. See {@link #setFrame(int, float, int[])}. */
 		drawOrders: Array<Array<number>>;
@@ -1812,19 +1812,19 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					constraint.mix = constraint.data.mix;
-					constraint.softness = constraint.data.softness;
-					constraint.bendDirection = constraint.data.bendDirection;
-					constraint.compress = constraint.data.compress;
-					constraint.stretch = constraint.data.stretch;
-					return;
-				case MixBlend.first:
-					constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
-					constraint.softness += (constraint.data.softness - constraint.softness) * alpha;
-					constraint.bendDirection = constraint.data.bendDirection;
-					constraint.compress = constraint.data.compress;
-					constraint.stretch = constraint.data.stretch;
+					case MixBlend.setup:
+						constraint.mix = constraint.data.mix;
+						constraint.softness = constraint.data.softness;
+						constraint.bendDirection = constraint.data.bendDirection;
+						constraint.compress = constraint.data.compress;
+						constraint.stretch = constraint.data.stretch;
+						return;
+					case MixBlend.first:
+						constraint.mix += (constraint.data.mix - constraint.mix) * alpha;
+						constraint.softness += (constraint.data.softness - constraint.softness) * alpha;
+						constraint.bendDirection = constraint.data.bendDirection;
+						constraint.compress = constraint.data.compress;
+						constraint.stretch = constraint.data.stretch;
 				}
 				return;
 			}
@@ -1833,21 +1833,21 @@ module spine {
 			let i = Timeline.search(frames, time, 6/*ENTRIES*/)
 			let curveType = this.curves[i / 6/*ENTRIES*/];
 			switch (curveType) {
-			case 0/*LINEAR*/:
-				let before = frames[i];
-				mix = frames[i + 1/*MIX*/];
-				softness = frames[i + 2/*SOFTNESS*/];
-				let t = (time - before) / (frames[i + 6/*ENTRIES*/] - before);
-				mix += (frames[i + 6/*ENTRIES*/ + 1/*MIX*/] - mix) * t;
-				softness += (frames[i + 6/*ENTRIES*/ + 2/*SOFTNESS*/] - softness) * t;
-				break;
-			case 1/*STEPPED*/:
-				mix = frames[i + 1/*MIX*/];
-				softness = frames[i + 2/*SOFTNESS*/];
-				break;
-			default:
-				mix = this.getBezierValue(time, i, 1/*MIX*/, curveType - 2/*BEZIER*/);
-				softness = this.getBezierValue(time, i, 2/*SOFTNESS*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+				case 0/*LINEAR*/:
+					let before = frames[i];
+					mix = frames[i + 1/*MIX*/];
+					softness = frames[i + 2/*SOFTNESS*/];
+					let t = (time - before) / (frames[i + 6/*ENTRIES*/] - before);
+					mix += (frames[i + 6/*ENTRIES*/ + 1/*MIX*/] - mix) * t;
+					softness += (frames[i + 6/*ENTRIES*/ + 2/*SOFTNESS*/] - softness) * t;
+					break;
+				case 1/*STEPPED*/:
+					mix = frames[i + 1/*MIX*/];
+					softness = frames[i + 2/*SOFTNESS*/];
+					break;
+				default:
+					mix = this.getBezierValue(time, i, 1/*MIX*/, curveType - 2/*BEZIER*/);
+					softness = this.getBezierValue(time, i, 2/*SOFTNESS*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
 			}
 
 			if (blend == MixBlend.setup) {
@@ -1914,21 +1914,21 @@ module spine {
 			if (time < frames[0]) {
 				let data = constraint.data;
 				switch (blend) {
-				case MixBlend.setup:
-					constraint.mixRotate = data.mixRotate;
-					constraint.mixX = data.mixX;
-					constraint.mixY = data.mixY;
-					constraint.mixScaleX = data.mixScaleX;
-					constraint.mixScaleY = data.mixScaleY;
-					constraint.mixShearY = data.mixShearY;
-					return;
-				case MixBlend.first:
-					constraint.mixRotate += (data.mixRotate - constraint.mixRotate) * alpha;
-					constraint.mixX += (data.mixX - constraint.mixX) * alpha;
-					constraint.mixY += (data.mixY - constraint.mixY) * alpha;
-					constraint.mixScaleX += (data.mixScaleX - constraint.mixScaleX) * alpha;
-					constraint.mixScaleY += (data.mixScaleY - constraint.mixScaleY) * alpha;
-					constraint.mixShearY += (data.mixShearY - constraint.mixShearY) * alpha;
+					case MixBlend.setup:
+						constraint.mixRotate = data.mixRotate;
+						constraint.mixX = data.mixX;
+						constraint.mixY = data.mixY;
+						constraint.mixScaleX = data.mixScaleX;
+						constraint.mixScaleY = data.mixScaleY;
+						constraint.mixShearY = data.mixShearY;
+						return;
+					case MixBlend.first:
+						constraint.mixRotate += (data.mixRotate - constraint.mixRotate) * alpha;
+						constraint.mixX += (data.mixX - constraint.mixX) * alpha;
+						constraint.mixY += (data.mixY - constraint.mixY) * alpha;
+						constraint.mixScaleX += (data.mixScaleX - constraint.mixScaleX) * alpha;
+						constraint.mixScaleY += (data.mixScaleY - constraint.mixScaleY) * alpha;
+						constraint.mixShearY += (data.mixShearY - constraint.mixShearY) * alpha;
 				}
 				return;
 			}
@@ -1937,37 +1937,37 @@ module spine {
 			let i = Timeline.search(frames, time, 7/*ENTRIES*/);
 			let curveType = this.curves[i / 7/*ENTRIES*/];
 			switch (curveType) {
-			case 0/*LINEAR*/:
-				let before = frames[i];
-				rotate = frames[i + 1/*ROTATE*/];
-				x = frames[i + 2/*X*/];
-				y = frames[i + 3/*Y*/];
-				scaleX = frames[i + 4/*SCALEX*/];
-				scaleY = frames[i + 5/*SCALEY*/];
-				shearY = frames[i + 6/*SHEARY*/];
-				let t = (time - before) / (frames[i + 7/*ENTRIES*/] - before);
-				rotate += (frames[i + 7/*ENTRIES*/ + 1/*ROTATE*/] - rotate) * t;
-				x += (frames[i + 7/*ENTRIES*/ + 2/*X*/] - x) * t;
-				y += (frames[i + 7/*ENTRIES*/ + 3/*Y*/] - y) * t;
-				scaleX += (frames[i + 7/*ENTRIES*/ + 4/*SCALEX*/] - scaleX) * t;
-				scaleY += (frames[i + 7/*ENTRIES*/ + 5/*SCALEY*/] - scaleY) * t;
-				shearY += (frames[i + 7/*ENTRIES*/ + 6/*SHEARY*/] - shearY) * t;
-				break;
-			case 1/*STEPPED*/:
-				rotate = frames[i + 1/*ROTATE*/];
-				x = frames[i + 2/*X*/];
-				y = frames[i + 3/*Y*/];
-				scaleX = frames[i + 4/*SCALEX*/];
-				scaleY = frames[i + 5/*SCALEY*/];
-				shearY = frames[i + 6/*SHEARY*/];
-				break;
-			default:
-				rotate = this.getBezierValue(time, i, 1/*ROTATE*/, curveType - 2/*BEZIER*/);
-				x = this.getBezierValue(time, i, 2/*X*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
-				y = this.getBezierValue(time, i, 3/*Y*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
-				scaleX = this.getBezierValue(time, i, 4/*SCALEX*/, curveType + 18/*BEZIER_SIZE*/ * 3 - 2/*BEZIER*/);
-				scaleY = this.getBezierValue(time, i, 5/*SCALEY*/, curveType + 18/*BEZIER_SIZE*/ * 4 - 2/*BEZIER*/);
-				shearY = this.getBezierValue(time, i, 6/*SHEARY*/, curveType + 18/*BEZIER_SIZE*/ * 5 - 2/*BEZIER*/);
+				case 0/*LINEAR*/:
+					let before = frames[i];
+					rotate = frames[i + 1/*ROTATE*/];
+					x = frames[i + 2/*X*/];
+					y = frames[i + 3/*Y*/];
+					scaleX = frames[i + 4/*SCALEX*/];
+					scaleY = frames[i + 5/*SCALEY*/];
+					shearY = frames[i + 6/*SHEARY*/];
+					let t = (time - before) / (frames[i + 7/*ENTRIES*/] - before);
+					rotate += (frames[i + 7/*ENTRIES*/ + 1/*ROTATE*/] - rotate) * t;
+					x += (frames[i + 7/*ENTRIES*/ + 2/*X*/] - x) * t;
+					y += (frames[i + 7/*ENTRIES*/ + 3/*Y*/] - y) * t;
+					scaleX += (frames[i + 7/*ENTRIES*/ + 4/*SCALEX*/] - scaleX) * t;
+					scaleY += (frames[i + 7/*ENTRIES*/ + 5/*SCALEY*/] - scaleY) * t;
+					shearY += (frames[i + 7/*ENTRIES*/ + 6/*SHEARY*/] - shearY) * t;
+					break;
+				case 1/*STEPPED*/:
+					rotate = frames[i + 1/*ROTATE*/];
+					x = frames[i + 2/*X*/];
+					y = frames[i + 3/*Y*/];
+					scaleX = frames[i + 4/*SCALEX*/];
+					scaleY = frames[i + 5/*SCALEY*/];
+					shearY = frames[i + 6/*SHEARY*/];
+					break;
+				default:
+					rotate = this.getBezierValue(time, i, 1/*ROTATE*/, curveType - 2/*BEZIER*/);
+					x = this.getBezierValue(time, i, 2/*X*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+					y = this.getBezierValue(time, i, 3/*Y*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
+					scaleX = this.getBezierValue(time, i, 4/*SCALEX*/, curveType + 18/*BEZIER_SIZE*/ * 3 - 2/*BEZIER*/);
+					scaleY = this.getBezierValue(time, i, 5/*SCALEY*/, curveType + 18/*BEZIER_SIZE*/ * 4 - 2/*BEZIER*/);
+					shearY = this.getBezierValue(time, i, 6/*SHEARY*/, curveType + 18/*BEZIER_SIZE*/ * 5 - 2/*BEZIER*/);
 			}
 
 			if (blend == MixBlend.setup) {
@@ -2006,11 +2006,11 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					constraint.position = constraint.data.position;
-					return;
-				case MixBlend.first:
-					constraint.position += (constraint.data.position - constraint.position) * alpha;
+					case MixBlend.setup:
+						constraint.position = constraint.data.position;
+						return;
+					case MixBlend.first:
+						constraint.position += (constraint.data.position - constraint.position) * alpha;
 				}
 				return;
 			}
@@ -2041,11 +2041,11 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					constraint.spacing = constraint.data.spacing;
-					return;
-				case MixBlend.first:
-					constraint.spacing += (constraint.data.spacing - constraint.spacing) * alpha;
+					case MixBlend.setup:
+						constraint.spacing = constraint.data.spacing;
+						return;
+					case MixBlend.first:
+						constraint.spacing += (constraint.data.spacing - constraint.spacing) * alpha;
 				}
 				return;
 			}
@@ -2092,15 +2092,15 @@ module spine {
 			let frames = this.frames;
 			if (time < frames[0]) {
 				switch (blend) {
-				case MixBlend.setup:
-					constraint.mixRotate = constraint.data.mixRotate;
-					constraint.mixX = constraint.data.mixX;
-					constraint.mixY = constraint.data.mixY;
-					return;
-				case MixBlend.first:
-					constraint.mixRotate += (constraint.data.mixRotate - constraint.mixRotate) * alpha;
-					constraint.mixX += (constraint.data.mixX - constraint.mixX) * alpha;
-					constraint.mixY += (constraint.data.mixY - constraint.mixY) * alpha;
+					case MixBlend.setup:
+						constraint.mixRotate = constraint.data.mixRotate;
+						constraint.mixX = constraint.data.mixX;
+						constraint.mixY = constraint.data.mixY;
+						return;
+					case MixBlend.first:
+						constraint.mixRotate += (constraint.data.mixRotate - constraint.mixRotate) * alpha;
+						constraint.mixX += (constraint.data.mixX - constraint.mixX) * alpha;
+						constraint.mixY += (constraint.data.mixY - constraint.mixY) * alpha;
 				}
 				return;
 			}
@@ -2109,25 +2109,25 @@ module spine {
 			let i = Timeline.search(frames, time, 4/*ENTRIES*/);
 			let curveType = this.curves[i >> 2];
 			switch (curveType) {
-			case 0/*LINEAR*/:
-				let before = frames[i];
-				rotate = frames[i + 1/*ROTATE*/];
-				x = frames[i + 2/*X*/];
-				y = frames[i + 3/*Y*/];
-				let t = (time - before) / (frames[i + 4/*ENTRIES*/] - before);
-				rotate += (frames[i + 4/*ENTRIES*/ + 1/*ROTATE*/] - rotate) * t;
-				x += (frames[i + 4/*ENTRIES*/ + 2/*X*/] - x) * t;
-				y += (frames[i + 4/*ENTRIES*/ + 3/*Y*/] - y) * t;
-				break;
-			case 1/*STEPPED*/:
-				rotate = frames[i + 1/*ROTATE*/];
-				x = frames[i + 2/*X*/];
-				y = frames[i + 3/*Y*/];
-				break;
-			default:
-				rotate = this.getBezierValue(time, i, 1/*ROTATE*/, curveType - 2/*BEZIER*/);
-				x = this.getBezierValue(time, i, 2/*X*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
-				y = this.getBezierValue(time, i, 3/*Y*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
+				case 0/*LINEAR*/:
+					let before = frames[i];
+					rotate = frames[i + 1/*ROTATE*/];
+					x = frames[i + 2/*X*/];
+					y = frames[i + 3/*Y*/];
+					let t = (time - before) / (frames[i + 4/*ENTRIES*/] - before);
+					rotate += (frames[i + 4/*ENTRIES*/ + 1/*ROTATE*/] - rotate) * t;
+					x += (frames[i + 4/*ENTRIES*/ + 2/*X*/] - x) * t;
+					y += (frames[i + 4/*ENTRIES*/ + 3/*Y*/] - y) * t;
+					break;
+				case 1/*STEPPED*/:
+					rotate = frames[i + 1/*ROTATE*/];
+					x = frames[i + 2/*X*/];
+					y = frames[i + 3/*Y*/];
+					break;
+				default:
+					rotate = this.getBezierValue(time, i, 1/*ROTATE*/, curveType - 2/*BEZIER*/);
+					x = this.getBezierValue(time, i, 2/*X*/, curveType + 18/*BEZIER_SIZE*/ - 2/*BEZIER*/);
+					y = this.getBezierValue(time, i, 3/*Y*/, curveType + 18/*BEZIER_SIZE*/ * 2 - 2/*BEZIER*/);
 			}
 
 			if (blend == MixBlend.setup) {

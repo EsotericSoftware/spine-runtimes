@@ -34,7 +34,7 @@ module spine {
 		/** The SkeletonData to look up animations when they are specified by name. */
 		skeletonData: SkeletonData;
 
-		animationToMixTime: Map<number> = { };
+		animationToMixTime: Map<number> = {};
 
 		/** The mix duration to use when no mix duration has been defined between two animations. */
 		defaultMix = 0;

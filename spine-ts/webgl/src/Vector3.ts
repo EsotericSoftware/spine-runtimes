@@ -39,7 +39,7 @@ module spine.webgl {
 			this.z = z;
 		}
 
-		setFrom(v: Vector3): Vector3 {
+		setFrom (v: Vector3): Vector3 {
 			this.x = v.x;
 			this.y = v.y;
 			this.z = v.z;

@@ -45,7 +45,7 @@ module spine.webgl {
 			this.setupCallbacks(element);
 		}
 
-		private setupCallbacks(element: HTMLElement) {
+		private setupCallbacks (element: HTMLElement) {
 			let mouseDown = (ev: UIEvent) => {
 				if (ev instanceof MouseEvent) {
 					let rect = element.getBoundingClientRect();
@@ -207,11 +207,11 @@ module spine.webgl {
 			}, false);
 		}
 
-		addListener(listener: InputListener) {
+		addListener (listener: InputListener) {
 			this.listeners.push(listener);
 		}
 
-		removeListener(listener: InputListener) {
+		removeListener (listener: InputListener) {
 			let idx = this.listeners.indexOf(listener);
 			if (idx > -1) {
 				this.listeners.splice(idx, 1);
@@ -220,14 +220,14 @@ module spine.webgl {
 	}
 
 	export class Touch {
-		constructor(public identifier: number, public x: number, public y: number) {
+		constructor (public identifier: number, public x: number, public y: number) {
 		}
 	}
 
 	export interface InputListener {
-		down(x: number, y: number): void;
-		up(x: number, y: number): void;
-		moved(x: number, y: number): void;
-		dragged(x: number, y: number): void;
+		down (x: number, y: number): void;
+		up (x: number, y: number): void;
+		moved (x: number, y: number): void;
+		dragged (x: number, y: number): void;
 	}
 }

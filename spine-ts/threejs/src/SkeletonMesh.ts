@@ -97,7 +97,7 @@ module spine.threejs {
 			this.state = new AnimationState(animData);
 		}
 
-		update(deltaTime: number) {
+		update (deltaTime: number) {
 			let state = this.state;
 			let skeleton = this.skeleton;
 
@@ -133,7 +133,7 @@ module spine.threejs {
 			return batch;
 		}
 
-		private updateGeometry() {
+		private updateGeometry () {
 			this.clearBatches();
 
 			let tempPos = this.tempPos;
@@ -204,9 +204,9 @@ module spine.threejs {
 					let alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
 					let color = this.tempColor;
 					color.set(skeletonColor.r * slotColor.r * attachmentColor.r,
-							skeletonColor.g * slotColor.g * attachmentColor.g,
-							skeletonColor.b * slotColor.b * attachmentColor.b,
-							alpha);
+						skeletonColor.g * slotColor.g * attachmentColor.g,
+						skeletonColor.b * slotColor.b * attachmentColor.b,
+						alpha);
 
 					let finalVertices: ArrayLike<number>;
 					let finalVerticesLength: number;

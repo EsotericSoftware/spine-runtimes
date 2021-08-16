@@ -268,161 +268,161 @@ module spine {
 			return skin;
 		}
 
-		private readAttachment(input: BinaryInput, skeletonData: SkeletonData, skin: Skin, slotIndex: number, attachmentName: string, nonessential: boolean): Attachment {
+		private readAttachment (input: BinaryInput, skeletonData: SkeletonData, skin: Skin, slotIndex: number, attachmentName: string, nonessential: boolean): Attachment {
 			let scale = this.scale;
 
 			let name = input.readStringRef();
 			if (!name) name = attachmentName;
 
 			switch (input.readByte()) {
-			case AttachmentType.Region: {
-				let path = input.readStringRef();
-				let rotation = input.readFloat();
-				let x = input.readFloat();
-				let y = input.readFloat();
-				let scaleX = input.readFloat();
-				let scaleY = input.readFloat();
-				let width = input.readFloat();
-				let height = input.readFloat();
-				let color = input.readInt32();
+				case AttachmentType.Region: {
+					let path = input.readStringRef();
+					let rotation = input.readFloat();
+					let x = input.readFloat();
+					let y = input.readFloat();
+					let scaleX = input.readFloat();
+					let scaleY = input.readFloat();
+					let width = input.readFloat();
+					let height = input.readFloat();
+					let color = input.readInt32();
 
-				if (!path) path = name;
-				let region = this.attachmentLoader.newRegionAttachment(skin, name, path);
-				if (!region) return null;
-				region.path = path;
-				region.x = x * scale;
-				region.y = y * scale;
-				region.scaleX = scaleX;
-				region.scaleY = scaleY;
-				region.rotation = rotation;
-				region.width = width * scale;
-				region.height = height * scale;
-				Color.rgba8888ToColor(region.color, color);
-				region.updateOffset();
-				return region;
-			}
-			case AttachmentType.BoundingBox: {
-				let vertexCount = input.readInt(true);
-				let vertices = this.readVertices(input, vertexCount);
-				let color = nonessential ? input.readInt32() : 0;
-
-				let box = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
-				if (!box) return null;
-				box.worldVerticesLength = vertexCount << 1;
-				box.vertices = vertices.vertices;
-				box.bones = vertices.bones;
-				if (nonessential) Color.rgba8888ToColor(box.color, color);
-				return box;
-			}
-			case AttachmentType.Mesh: {
-				let path = input.readStringRef();
-				let color = input.readInt32();
-				let vertexCount = input.readInt(true);
-				let uvs = this.readFloatArray(input, vertexCount << 1, 1);
-				let triangles = this.readShortArray(input);
-				let vertices = this.readVertices(input, vertexCount);
-				let hullLength = input.readInt(true);
-				let edges = null;
-				let width = 0, height = 0;
-				if (nonessential) {
-					edges = this.readShortArray(input);
-					width = input.readFloat();
-					height = input.readFloat();
+					if (!path) path = name;
+					let region = this.attachmentLoader.newRegionAttachment(skin, name, path);
+					if (!region) return null;
+					region.path = path;
+					region.x = x * scale;
+					region.y = y * scale;
+					region.scaleX = scaleX;
+					region.scaleY = scaleY;
+					region.rotation = rotation;
+					region.width = width * scale;
+					region.height = height * scale;
+					Color.rgba8888ToColor(region.color, color);
+					region.updateOffset();
+					return region;
 				}
+				case AttachmentType.BoundingBox: {
+					let vertexCount = input.readInt(true);
+					let vertices = this.readVertices(input, vertexCount);
+					let color = nonessential ? input.readInt32() : 0;
 
-				if (!path) path = name;
-				let mesh = this.attachmentLoader.newMeshAttachment(skin, name, path);
-				if (!mesh) return null;
-				mesh.path = path;
-				Color.rgba8888ToColor(mesh.color, color);
-				mesh.bones = vertices.bones;
-				mesh.vertices = vertices.vertices;
-				mesh.worldVerticesLength = vertexCount << 1;
-				mesh.triangles = triangles;
-				mesh.regionUVs = uvs;
-				mesh.updateUVs();
-				mesh.hullLength = hullLength << 1;
-				if (nonessential) {
-					mesh.edges = edges;
-					mesh.width = width * scale;
-					mesh.height = height * scale;
+					let box = this.attachmentLoader.newBoundingBoxAttachment(skin, name);
+					if (!box) return null;
+					box.worldVerticesLength = vertexCount << 1;
+					box.vertices = vertices.vertices;
+					box.bones = vertices.bones;
+					if (nonessential) Color.rgba8888ToColor(box.color, color);
+					return box;
 				}
-				return mesh;
-			}
-			case AttachmentType.LinkedMesh: {
-				let path = input.readStringRef();
-				let color = input.readInt32();
-				let skinName = input.readStringRef();
-				let parent = input.readStringRef();
-				let inheritDeform = input.readBoolean();
-				let width = 0, height = 0;
-				if (nonessential) {
-					width = input.readFloat();
-					height = input.readFloat();
+				case AttachmentType.Mesh: {
+					let path = input.readStringRef();
+					let color = input.readInt32();
+					let vertexCount = input.readInt(true);
+					let uvs = this.readFloatArray(input, vertexCount << 1, 1);
+					let triangles = this.readShortArray(input);
+					let vertices = this.readVertices(input, vertexCount);
+					let hullLength = input.readInt(true);
+					let edges = null;
+					let width = 0, height = 0;
+					if (nonessential) {
+						edges = this.readShortArray(input);
+						width = input.readFloat();
+						height = input.readFloat();
+					}
+
+					if (!path) path = name;
+					let mesh = this.attachmentLoader.newMeshAttachment(skin, name, path);
+					if (!mesh) return null;
+					mesh.path = path;
+					Color.rgba8888ToColor(mesh.color, color);
+					mesh.bones = vertices.bones;
+					mesh.vertices = vertices.vertices;
+					mesh.worldVerticesLength = vertexCount << 1;
+					mesh.triangles = triangles;
+					mesh.regionUVs = uvs;
+					mesh.updateUVs();
+					mesh.hullLength = hullLength << 1;
+					if (nonessential) {
+						mesh.edges = edges;
+						mesh.width = width * scale;
+						mesh.height = height * scale;
+					}
+					return mesh;
 				}
+				case AttachmentType.LinkedMesh: {
+					let path = input.readStringRef();
+					let color = input.readInt32();
+					let skinName = input.readStringRef();
+					let parent = input.readStringRef();
+					let inheritDeform = input.readBoolean();
+					let width = 0, height = 0;
+					if (nonessential) {
+						width = input.readFloat();
+						height = input.readFloat();
+					}
 
-				if (!path) path = name;
-				let mesh = this.attachmentLoader.newMeshAttachment(skin, name, path);
-				if (!mesh) return null;
-				mesh.path = path;
-				Color.rgba8888ToColor(mesh.color, color);
-				if (nonessential) {
-					mesh.width = width * scale;
-					mesh.height = height * scale;
+					if (!path) path = name;
+					let mesh = this.attachmentLoader.newMeshAttachment(skin, name, path);
+					if (!mesh) return null;
+					mesh.path = path;
+					Color.rgba8888ToColor(mesh.color, color);
+					if (nonessential) {
+						mesh.width = width * scale;
+						mesh.height = height * scale;
+					}
+					this.linkedMeshes.push(new LinkedMesh(mesh, skinName, slotIndex, parent, inheritDeform));
+					return mesh;
 				}
-				this.linkedMeshes.push(new LinkedMesh(mesh, skinName, slotIndex, parent, inheritDeform));
-				return mesh;
-			}
-			case AttachmentType.Path: {
-				let closed = input.readBoolean();
-				let constantSpeed = input.readBoolean();
-				let vertexCount = input.readInt(true);
-				let vertices = this.readVertices(input, vertexCount);
-				let lengths = Utils.newArray(vertexCount / 3, 0);
-				for (let i = 0, n = lengths.length; i < n; i++)
-					lengths[i] = input.readFloat() * scale;
-				let color = nonessential ? input.readInt32() : 0;
+				case AttachmentType.Path: {
+					let closed = input.readBoolean();
+					let constantSpeed = input.readBoolean();
+					let vertexCount = input.readInt(true);
+					let vertices = this.readVertices(input, vertexCount);
+					let lengths = Utils.newArray(vertexCount / 3, 0);
+					for (let i = 0, n = lengths.length; i < n; i++)
+						lengths[i] = input.readFloat() * scale;
+					let color = nonessential ? input.readInt32() : 0;
 
-				let path = this.attachmentLoader.newPathAttachment(skin, name);
-				if (!path) return null;
-				path.closed = closed;
-				path.constantSpeed = constantSpeed;
-				path.worldVerticesLength = vertexCount << 1;
-				path.vertices = vertices.vertices;
-				path.bones = vertices.bones;
-				path.lengths = lengths;
-				if (nonessential) Color.rgba8888ToColor(path.color, color);
-				return path;
-			}
-			case AttachmentType.Point: {
-				let rotation = input.readFloat();
-				let x = input.readFloat();
-				let y = input.readFloat();
-				let color = nonessential ? input.readInt32() : 0;
+					let path = this.attachmentLoader.newPathAttachment(skin, name);
+					if (!path) return null;
+					path.closed = closed;
+					path.constantSpeed = constantSpeed;
+					path.worldVerticesLength = vertexCount << 1;
+					path.vertices = vertices.vertices;
+					path.bones = vertices.bones;
+					path.lengths = lengths;
+					if (nonessential) Color.rgba8888ToColor(path.color, color);
+					return path;
+				}
+				case AttachmentType.Point: {
+					let rotation = input.readFloat();
+					let x = input.readFloat();
+					let y = input.readFloat();
+					let color = nonessential ? input.readInt32() : 0;
 
-				let point = this.attachmentLoader.newPointAttachment(skin, name);
-				if (!point) return null;
-				point.x = x * scale;
-				point.y = y * scale;
-				point.rotation = rotation;
-				if (nonessential) Color.rgba8888ToColor(point.color, color);
-				return point;
-			}
-			case AttachmentType.Clipping: {
-				let endSlotIndex = input.readInt(true);
-				let vertexCount = input.readInt(true);
-				let vertices = this.readVertices(input, vertexCount);
-				let color = nonessential ? input.readInt32() : 0;
+					let point = this.attachmentLoader.newPointAttachment(skin, name);
+					if (!point) return null;
+					point.x = x * scale;
+					point.y = y * scale;
+					point.rotation = rotation;
+					if (nonessential) Color.rgba8888ToColor(point.color, color);
+					return point;
+				}
+				case AttachmentType.Clipping: {
+					let endSlotIndex = input.readInt(true);
+					let vertexCount = input.readInt(true);
+					let vertices = this.readVertices(input, vertexCount);
+					let color = nonessential ? input.readInt32() : 0;
 
-				let clip = this.attachmentLoader.newClippingAttachment(skin, name);
-				if (!clip) return null;
-				clip.endSlot = skeletonData.slots[endSlotIndex];
-				clip.worldVerticesLength = vertexCount << 1;
-				clip.vertices = vertices.vertices;
-				clip.bones = vertices.bones;
-				if (nonessential) Color.rgba8888ToColor(clip.color, color);
-				return clip;
-			}
+					let clip = this.attachmentLoader.newClippingAttachment(skin, name);
+					if (!clip) return null;
+					clip.endSlot = skeletonData.slots[endSlotIndex];
+					clip.worldVerticesLength = vertexCount << 1;
+					clip.vertices = vertices.vertices;
+					clip.bones = vertices.bones;
+					if (nonessential) Color.rgba8888ToColor(clip.color, color);
+					return clip;
+				}
 			}
 			return null;
 		}
@@ -504,7 +504,7 @@ module spine {
 							let b = input.readUnsignedByte() / 255.0;
 							let a = input.readUnsignedByte() / 255.0;
 
-							for (let frame = 0, bezier = 0;; frame++) {
+							for (let frame = 0, bezier = 0; ; frame++) {
 								timeline.setFrame(frame, time, r, g, b, a);
 								if (frame == frameLast) break;
 
@@ -542,7 +542,7 @@ module spine {
 							let g = input.readUnsignedByte() / 255.0;
 							let b = input.readUnsignedByte() / 255.0;
 
-							for (let frame = 0, bezier = 0;; frame++) {
+							for (let frame = 0, bezier = 0; ; frame++) {
 								timeline.setFrame(frame, time, r, g, b);
 								if (frame == frameLast) break;
 
@@ -581,7 +581,7 @@ module spine {
 							let g2 = input.readUnsignedByte() / 255.0;
 							let b2 = input.readUnsignedByte() / 255.0;
 
-							for (let frame = 0, bezier = 0;; frame++) {
+							for (let frame = 0, bezier = 0; ; frame++) {
 								timeline.setFrame(frame, time, r, g, b, a, r2, g2, b2);
 								if (frame == frameLast) break;
 								let time2 = input.readFloat();
@@ -630,7 +630,7 @@ module spine {
 							let g2 = input.readUnsignedByte() / 255.0;
 							let b2 = input.readUnsignedByte() / 255.0;
 
-							for (let frame = 0, bezier = 0;; frame++) {
+							for (let frame = 0, bezier = 0; ; frame++) {
 								timeline.setFrame(frame, time, r, g, b, r2, g2, b2);
 								if (frame == frameLast) break;
 								let time2 = input.readFloat();
@@ -667,17 +667,17 @@ module spine {
 						case SLOT_ALPHA: {
 							let timeline = new AlphaTimeline(frameCount, input.readInt(true), slotIndex);
 							let time = input.readFloat(), a = input.readUnsignedByte() / 255;
-							for (let frame = 0, bezier = 0;; frame++) {
+							for (let frame = 0, bezier = 0; ; frame++) {
 								timeline.setFrame(frame, time, a);
 								if (frame == frameLast) break;
 								let time2 = input.readFloat();
 								let a2 = input.readUnsignedByte() / 255;
 								switch (input.readByte()) {
-								case CURVE_STEPPED:
-									timeline.setStepped(frame);
-									break;
-								case CURVE_BEZIER:
-									setBezier(input, timeline, bezier++, frame, 0, time, time2, a, a2, 1);
+									case CURVE_STEPPED:
+										timeline.setStepped(frame);
+										break;
+									case CURVE_BEZIER:
+										setBezier(input, timeline, bezier++, frame, 0, time, time2, a, a2, 1);
 								}
 								time = time2;
 								a = a2;
@@ -695,35 +695,35 @@ module spine {
 				for (let ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					let type = input.readByte(), frameCount = input.readInt(true), bezierCount = input.readInt(true);
 					switch (type) {
-					case BONE_ROTATE:
-						timelines.push(readTimeline1(input, new RotateTimeline(frameCount, bezierCount, boneIndex), 1));
-						break;
-					case BONE_TRANSLATE:
-						timelines.push(readTimeline2(input, new TranslateTimeline(frameCount, bezierCount, boneIndex), scale));
-						break;
-					case BONE_TRANSLATEX:
-						timelines.push(readTimeline1(input, new TranslateXTimeline(frameCount, bezierCount, boneIndex), scale));
-						break;
-					case BONE_TRANSLATEY:
-						timelines.push(readTimeline1(input, new TranslateYTimeline(frameCount, bezierCount, boneIndex), scale));
-						break;
-					case BONE_SCALE:
-						timelines.push(readTimeline2(input, new ScaleTimeline(frameCount, bezierCount, boneIndex), 1));
-						break;
-					case BONE_SCALEX:
-						timelines.push(readTimeline1(input, new ScaleXTimeline(frameCount, bezierCount, boneIndex), 1));
-						break;
-					case BONE_SCALEY:
-						timelines.push(readTimeline1(input, new ScaleYTimeline(frameCount, bezierCount, boneIndex), 1));
-						break;
-					case BONE_SHEAR:
-						timelines.push(readTimeline2(input, new ShearTimeline(frameCount, bezierCount, boneIndex), 1));
-						break;
-					case BONE_SHEARX:
-						timelines.push(readTimeline1(input, new ShearXTimeline(frameCount, bezierCount, boneIndex), 1));
-						break;
-					case BONE_SHEARY:
-						timelines.push(readTimeline1(input, new ShearYTimeline(frameCount, bezierCount, boneIndex), 1));
+						case BONE_ROTATE:
+							timelines.push(readTimeline1(input, new RotateTimeline(frameCount, bezierCount, boneIndex), 1));
+							break;
+						case BONE_TRANSLATE:
+							timelines.push(readTimeline2(input, new TranslateTimeline(frameCount, bezierCount, boneIndex), scale));
+							break;
+						case BONE_TRANSLATEX:
+							timelines.push(readTimeline1(input, new TranslateXTimeline(frameCount, bezierCount, boneIndex), scale));
+							break;
+						case BONE_TRANSLATEY:
+							timelines.push(readTimeline1(input, new TranslateYTimeline(frameCount, bezierCount, boneIndex), scale));
+							break;
+						case BONE_SCALE:
+							timelines.push(readTimeline2(input, new ScaleTimeline(frameCount, bezierCount, boneIndex), 1));
+							break;
+						case BONE_SCALEX:
+							timelines.push(readTimeline1(input, new ScaleXTimeline(frameCount, bezierCount, boneIndex), 1));
+							break;
+						case BONE_SCALEY:
+							timelines.push(readTimeline1(input, new ScaleYTimeline(frameCount, bezierCount, boneIndex), 1));
+							break;
+						case BONE_SHEAR:
+							timelines.push(readTimeline2(input, new ShearTimeline(frameCount, bezierCount, boneIndex), 1));
+							break;
+						case BONE_SHEARX:
+							timelines.push(readTimeline1(input, new ShearXTimeline(frameCount, bezierCount, boneIndex), 1));
+							break;
+						case BONE_SHEARY:
+							timelines.push(readTimeline1(input, new ShearYTimeline(frameCount, bezierCount, boneIndex), 1));
 					}
 				}
 			}
@@ -733,17 +733,17 @@ module spine {
 				let index = input.readInt(true), frameCount = input.readInt(true), frameLast = frameCount - 1;
 				let timeline = new IkConstraintTimeline(frameCount, input.readInt(true), index);
 				let time = input.readFloat(), mix = input.readFloat(), softness = input.readFloat() * scale;
-				for (let frame = 0, bezier = 0;; frame++) {
+				for (let frame = 0, bezier = 0; ; frame++) {
 					timeline.setFrame(frame, time, mix, softness, input.readByte(), input.readBoolean(), input.readBoolean());
 					if (frame == frameLast) break;
 					let time2 = input.readFloat(), mix2 = input.readFloat(), softness2 = input.readFloat() * scale;
 					switch (input.readByte()) {
-					case CURVE_STEPPED:
-						timeline.setStepped(frame);
-						break;
-					case CURVE_BEZIER:
-						setBezier(input, timeline, bezier++, frame, 0, time, time2, mix, mix2, 1);
-						setBezier(input, timeline, bezier++, frame, 1, time, time2, softness, softness2, scale);
+						case CURVE_STEPPED:
+							timeline.setStepped(frame);
+							break;
+						case CURVE_BEZIER:
+							setBezier(input, timeline, bezier++, frame, 0, time, time2, mix, mix2, 1);
+							setBezier(input, timeline, bezier++, frame, 1, time, time2, softness, softness2, scale);
 					}
 					time = time2;
 					mix = mix2;
@@ -758,22 +758,22 @@ module spine {
 				let timeline = new TransformConstraintTimeline(frameCount, input.readInt(true), index);
 				let time = input.readFloat(), mixRotate = input.readFloat(), mixX = input.readFloat(), mixY = input.readFloat(),
 					mixScaleX = input.readFloat(), mixScaleY = input.readFloat(), mixShearY = input.readFloat();
-				for (let frame = 0, bezier = 0;; frame++) {
+				for (let frame = 0, bezier = 0; ; frame++) {
 					timeline.setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
 					if (frame == frameLast) break;
 					let time2 = input.readFloat(), mixRotate2 = input.readFloat(), mixX2 = input.readFloat(), mixY2 = input.readFloat(),
 						mixScaleX2 = input.readFloat(), mixScaleY2 = input.readFloat(), mixShearY2 = input.readFloat();
 					switch (input.readByte()) {
-					case CURVE_STEPPED:
-						timeline.setStepped(frame);
-						break;
-					case CURVE_BEZIER:
-						setBezier(input, timeline, bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
-						setBezier(input, timeline, bezier++, frame, 1, time, time2, mixX, mixX2, 1);
-						setBezier(input, timeline, bezier++, frame, 2, time, time2, mixY, mixY2, 1);
-						setBezier(input, timeline, bezier++, frame, 3, time, time2, mixScaleX, mixScaleX2, 1);
-						setBezier(input, timeline, bezier++, frame, 4, time, time2, mixScaleY, mixScaleY2, 1);
-						setBezier(input, timeline, bezier++, frame, 5, time, time2, mixShearY, mixShearY2, 1);
+						case CURVE_STEPPED:
+							timeline.setStepped(frame);
+							break;
+						case CURVE_BEZIER:
+							setBezier(input, timeline, bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+							setBezier(input, timeline, bezier++, frame, 1, time, time2, mixX, mixX2, 1);
+							setBezier(input, timeline, bezier++, frame, 2, time, time2, mixY, mixY2, 1);
+							setBezier(input, timeline, bezier++, frame, 3, time, time2, mixScaleX, mixScaleX2, 1);
+							setBezier(input, timeline, bezier++, frame, 4, time, time2, mixScaleY, mixScaleY2, 1);
+							setBezier(input, timeline, bezier++, frame, 5, time, time2, mixShearY, mixShearY2, 1);
 					}
 					time = time2;
 					mixRotate = mixRotate2;
@@ -792,39 +792,39 @@ module spine {
 				let data = skeletonData.pathConstraints[index];
 				for (let ii = 0, nn = input.readInt(true); ii < nn; ii++) {
 					switch (input.readByte()) {
-					case PATH_POSITION:
-						timelines
-							.push(readTimeline1(input, new PathConstraintPositionTimeline(input.readInt(true), input.readInt(true), index),
-								data.positionMode == PositionMode.Fixed ? scale : 1));
-						break;
-					case PATH_SPACING:
-						timelines
-							.push(readTimeline1(input, new PathConstraintSpacingTimeline(input.readInt(true), input.readInt(true), index),
-								data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
-						break;
-					case PATH_MIX:
-						let timeline = new PathConstraintMixTimeline(input.readInt(true), input.readInt(true), index);
-						let time = input.readFloat(), mixRotate = input.readFloat(), mixX = input.readFloat(), mixY = input.readFloat();
-						for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
-							timeline.setFrame(frame, time, mixRotate, mixX, mixY);
-							if (frame == frameLast) break;
-							let time2 = input.readFloat(), mixRotate2 = input.readFloat(), mixX2 = input.readFloat(),
-								mixY2 = input.readFloat();
-							switch (input.readByte()) {
-							case CURVE_STEPPED:
-								timeline.setStepped(frame);
-								break;
-							case CURVE_BEZIER:
-								setBezier(input, timeline, bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
-								setBezier(input, timeline, bezier++, frame, 1, time, time2, mixX, mixX2, 1);
-								setBezier(input, timeline, bezier++, frame, 2, time, time2, mixY, mixY2, 1);
+						case PATH_POSITION:
+							timelines
+								.push(readTimeline1(input, new PathConstraintPositionTimeline(input.readInt(true), input.readInt(true), index),
+									data.positionMode == PositionMode.Fixed ? scale : 1));
+							break;
+						case PATH_SPACING:
+							timelines
+								.push(readTimeline1(input, new PathConstraintSpacingTimeline(input.readInt(true), input.readInt(true), index),
+									data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed ? scale : 1));
+							break;
+						case PATH_MIX:
+							let timeline = new PathConstraintMixTimeline(input.readInt(true), input.readInt(true), index);
+							let time = input.readFloat(), mixRotate = input.readFloat(), mixX = input.readFloat(), mixY = input.readFloat();
+							for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1; ; frame++) {
+								timeline.setFrame(frame, time, mixRotate, mixX, mixY);
+								if (frame == frameLast) break;
+								let time2 = input.readFloat(), mixRotate2 = input.readFloat(), mixX2 = input.readFloat(),
+									mixY2 = input.readFloat();
+								switch (input.readByte()) {
+									case CURVE_STEPPED:
+										timeline.setStepped(frame);
+										break;
+									case CURVE_BEZIER:
+										setBezier(input, timeline, bezier++, frame, 0, time, time2, mixRotate, mixRotate2, 1);
+										setBezier(input, timeline, bezier++, frame, 1, time, time2, mixX, mixX2, 1);
+										setBezier(input, timeline, bezier++, frame, 2, time, time2, mixY, mixY2, 1);
+								}
+								time = time2;
+								mixRotate = mixRotate2;
+								mixX = mixX2;
+								mixY = mixY2;
 							}
-							time = time2;
-							mixRotate = mixRotate2;
-							mixX = mixX2;
-							mixY = mixY2;
-						}
-						timelines.push(timeline);
+							timelines.push(timeline);
 					}
 				}
 			}
@@ -847,7 +847,7 @@ module spine {
 						let timeline = new DeformTimeline(frameCount, bezierCount, slotIndex, attachment);
 
 						let time = input.readFloat();
-						for (let frame = 0, bezier = 0;; frame++) {
+						for (let frame = 0, bezier = 0; ; frame++) {
 							let deform;
 							let end = input.readInt(true);
 							if (end == 0)
@@ -872,7 +872,7 @@ module spine {
 							timeline.setFrame(frame, time, deform);
 							if (frame == frameLast) break;
 							let time2 = input.readFloat();
-							switch(input.readByte()) {
+							switch (input.readByte()) {
 								case CURVE_STEPPED:
 									timeline.setStepped(frame);
 									break;
@@ -946,30 +946,30 @@ module spine {
 	}
 
 	class BinaryInput {
-		constructor(data: Uint8Array, public strings = new Array<string>(), private index: number = 0, private buffer = new DataView(data.buffer)) {
+		constructor (data: Uint8Array, public strings = new Array<string>(), private index: number = 0, private buffer = new DataView(data.buffer)) {
 		}
 
-		readByte(): number {
+		readByte (): number {
 			return this.buffer.getInt8(this.index++);
 		}
 
-		readUnsignedByte(): number {
+		readUnsignedByte (): number {
 			return this.buffer.getUint8(this.index++);
 		}
 
-		readShort(): number {
+		readShort (): number {
 			let value = this.buffer.getInt16(this.index);
 			this.index += 2;
 			return value;
 		}
 
-		readInt32(): number {
-			 let value = this.buffer.getInt32(this.index)
-			 this.index += 4;
-			 return value;
+		readInt32 (): number {
+			let value = this.buffer.getInt32(this.index)
+			this.index += 4;
+			return value;
 		}
 
-		readInt(optimizePositive: boolean) {
+		readInt (optimizePositive: boolean) {
 			let b = this.readByte();
 			let result = b & 0x7F;
 			if ((b & 0x80) != 0) {
@@ -999,10 +999,10 @@ module spine {
 		readString (): string {
 			let byteCount = this.readInt(true);
 			switch (byteCount) {
-			case 0:
-				return null;
-			case 1:
-				return "";
+				case 0:
+					return null;
+				case 1:
+					return "";
 			}
 			byteCount--;
 			let chars = "";
@@ -1010,18 +1010,18 @@ module spine {
 			for (let i = 0; i < byteCount;) {
 				let b = this.readByte();
 				switch (b >> 4) {
-				case 12:
-				case 13:
-					chars += String.fromCharCode(((b & 0x1F) << 6 | this.readByte() & 0x3F));
-					i += 2;
-					break;
-				case 14:
-					chars += String.fromCharCode(((b & 0x0F) << 12 | (this.readByte() & 0x3F) << 6 | this.readByte() & 0x3F));
-					i += 3;
-					break;
-				default:
-					chars += String.fromCharCode(b);
-					i++;
+					case 12:
+					case 13:
+						chars += String.fromCharCode(((b & 0x1F) << 6 | this.readByte() & 0x3F));
+						i += 2;
+						break;
+					case 14:
+						chars += String.fromCharCode(((b & 0x0F) << 12 | (this.readByte() & 0x3F) << 6 | this.readByte() & 0x3F));
+						i += 3;
+						break;
+					default:
+						chars += String.fromCharCode(b);
+						i++;
 				}
 			}
 			return chars;
@@ -1054,23 +1054,23 @@ module spine {
 	}
 
 	class Vertices {
-		constructor(public bones: Array<number> = null, public vertices: Array<number> | Float32Array = null) { }
+		constructor (public bones: Array<number> = null, public vertices: Array<number> | Float32Array = null) { }
 	}
 
 	enum AttachmentType { Region, BoundingBox, Mesh, LinkedMesh, Path, Point, Clipping }
 
 	function readTimeline1 (input: BinaryInput, timeline: CurveTimeline1, scale: number): CurveTimeline1 {
 		let time = input.readFloat(), value = input.readFloat() * scale;
-		for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
+		for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1; ; frame++) {
 			timeline.setFrame(frame, time, value);
 			if (frame == frameLast) break;
 			let time2 = input.readFloat(), value2 = input.readFloat() * scale;
 			switch (input.readByte()) {
-			case CURVE_STEPPED:
-				timeline.setStepped(frame);
-				break;
-			case CURVE_BEZIER:
-				setBezier(input, timeline, bezier++, frame, 0, time, time2, value, value2, scale);
+				case CURVE_STEPPED:
+					timeline.setStepped(frame);
+					break;
+				case CURVE_BEZIER:
+					setBezier(input, timeline, bezier++, frame, 0, time, time2, value, value2, scale);
 			}
 			time = time2;
 			value = value2;
@@ -1080,17 +1080,17 @@ module spine {
 
 	function readTimeline2 (input: BinaryInput, timeline: CurveTimeline2, scale: number): CurveTimeline2 {
 		let time = input.readFloat(), value1 = input.readFloat() * scale, value2 = input.readFloat() * scale;
-		for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1;; frame++) {
+		for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1; ; frame++) {
 			timeline.setFrame(frame, time, value1, value2);
 			if (frame == frameLast) break;
 			let time2 = input.readFloat(), nvalue1 = input.readFloat() * scale, nvalue2 = input.readFloat() * scale;
 			switch (input.readByte()) {
-			case CURVE_STEPPED:
-				timeline.setStepped(frame);
-				break;
-			case CURVE_BEZIER:
-				setBezier(input, timeline, bezier++, frame, 0, time, time2, value1, nvalue1, scale);
-				setBezier(input, timeline, bezier++, frame, 1, time, time2, value2, nvalue2, scale);
+				case CURVE_STEPPED:
+					timeline.setStepped(frame);
+					break;
+				case CURVE_BEZIER:
+					setBezier(input, timeline, bezier++, frame, 0, time, time2, value1, nvalue1, scale);
+					setBezier(input, timeline, bezier++, frame, 1, time, time2, value2, nvalue2, scale);
 			}
 			time = time2;
 			value1 = nvalue1;
@@ -1104,29 +1104,29 @@ module spine {
 		timeline.setBezier(bezier, frame, value, time1, value1, input.readFloat(), input.readFloat() * scale, input.readFloat(), input.readFloat() * scale, time2, value2);
 	}
 
-	const  BONE_ROTATE = 0;
-	const  BONE_TRANSLATE = 1;
-	const  BONE_TRANSLATEX = 2;
-	const  BONE_TRANSLATEY = 3;
-	const  BONE_SCALE = 4;
-	const  BONE_SCALEX = 5;
-	const  BONE_SCALEY = 6;
-	const  BONE_SHEAR = 7;
-	const  BONE_SHEARX = 8;
-	const  BONE_SHEARY = 9;
+	const BONE_ROTATE = 0;
+	const BONE_TRANSLATE = 1;
+	const BONE_TRANSLATEX = 2;
+	const BONE_TRANSLATEY = 3;
+	const BONE_SCALE = 4;
+	const BONE_SCALEX = 5;
+	const BONE_SCALEY = 6;
+	const BONE_SHEAR = 7;
+	const BONE_SHEARX = 8;
+	const BONE_SHEARY = 9;
 
-	const  SLOT_ATTACHMENT = 0;
-	const  SLOT_RGBA = 1;
-	const  SLOT_RGB = 2;
-	const  SLOT_RGBA2 = 3;
-	const  SLOT_RGB2 = 4;
-	const  SLOT_ALPHA = 5;
+	const SLOT_ATTACHMENT = 0;
+	const SLOT_RGBA = 1;
+	const SLOT_RGB = 2;
+	const SLOT_RGBA2 = 3;
+	const SLOT_RGB2 = 4;
+	const SLOT_ALPHA = 5;
 
-	const  PATH_POSITION = 0;
-	const  PATH_SPACING = 1;
-	const  PATH_MIX = 2;
+	const PATH_POSITION = 0;
+	const PATH_SPACING = 1;
+	const PATH_MIX = 2;
 
-	const  CURVE_LINEAR = 0;
-	const  CURVE_STEPPED = 1;
-	const  CURVE_BEZIER = 2;
+	const CURVE_LINEAR = 0;
+	const CURVE_STEPPED = 1;
+	const CURVE_BEZIER = 2;
 }

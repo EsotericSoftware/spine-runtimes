@@ -120,7 +120,7 @@ module spine {
 			return triangles;
 		}
 
-		decompose (verticesArray: Array<number>, triangles: Array<number>) : Array<Array<number>> {
+		decompose (verticesArray: Array<number>, triangles: Array<number>): Array<Array<number>> {
 			let vertices = verticesArray;
 			let convexPolygons = this.convexPolygons;
 			this.polygonPool.freeAll(convexPolygons);

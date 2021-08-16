@@ -71,8 +71,8 @@ module spine {
 	}
 
 	export class FakeTexture extends Texture {
-		setFilters(minFilter: TextureFilter, magFilter: TextureFilter) { }
-		setWraps(uWrap: TextureWrap, vWrap: TextureWrap) { }
-		dispose() { }
+		setFilters (minFilter: TextureFilter, magFilter: TextureFilter) { }
+		setWraps (uWrap: TextureWrap, vWrap: TextureWrap) { }
+		dispose () { }
 	}
 }

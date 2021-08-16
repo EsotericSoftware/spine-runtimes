@@ -51,7 +51,7 @@ module spine {
 		readSkeletonData (json: string | any): SkeletonData {
 			let scale = this.scale;
 			let skeletonData = new SkeletonData();
-			let root = typeof(json) === "string" ? JSON.parse(json) : json;
+			let root = typeof (json) === "string" ? JSON.parse(json) : json;
 
 			// Skeleton
 			let skeletonMap = root.skeleton;
@@ -245,7 +245,7 @@ module spine {
 				let skin = !linkedMesh.skin ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
 				let parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 				linkedMesh.mesh.deformAttachment = linkedMesh.inheritDeform ? <VertexAttachment>parent : <VertexAttachment>linkedMesh.mesh;
-				linkedMesh.mesh.setParentMesh(<MeshAttachment> parent);
+				linkedMesh.mesh.setParentMesh(<MeshAttachment>parent);
 				linkedMesh.mesh.updateUVs();
 			}
 			this.linkedMeshes.length = 0;
@@ -325,7 +325,7 @@ module spine {
 
 					let parent: string = getValue(map, "parent", null);
 					if (parent) {
-						this.linkedMeshes.push(new LinkedMesh(mesh, <string> getValue(map, "skin", null), slotIndex, parent, getValue(map, "deform", true)));
+						this.linkedMeshes.push(new LinkedMesh(mesh, <string>getValue(map, "skin", null), slotIndex, parent, getValue(map, "deform", true)));
 						return mesh;
 					}
 
@@ -441,10 +441,10 @@ module spine {
 							let time = getValue(keyMap, "time", 0);
 							let color = Color.fromString(keyMap.color);
 
-							for (let frame = 0, bezier = 0;; frame++) {
+							for (let frame = 0, bezier = 0; ; frame++) {
 								timeline.setFrame(frame, time, color.r, color.g, color.b, color.a);
 								let nextMap = timelineMap[frame + 1];
-								if (!nextMap)  {
+								if (!nextMap) {
 									timeline.shrink(bezier);
 									break;
 								}
@@ -470,10 +470,10 @@ module spine {
 							let time = getValue(keyMap, "time", 0);
 							let color = Color.fromString(keyMap.color);
 
-							for (let frame = 0, bezier = 0;; frame++) {
+							for (let frame = 0, bezier = 0; ; frame++) {
 								timeline.setFrame(frame, time, color.r, color.g, color.b);
 								let nextMap = timelineMap[frame + 1];
-								if (!nextMap)  {
+								if (!nextMap) {
 									timeline.shrink(bezier);
 									break;
 								}
@@ -502,10 +502,10 @@ module spine {
 							let color = Color.fromString(keyMap.light);
 							let color2 = Color.fromString(keyMap.dark);
 
-							for (let frame = 0, bezier = 0;; frame++) {
+							for (let frame = 0, bezier = 0; ; frame++) {
 								timeline.setFrame(frame, time, color.r, color.g, color.b, color.a, color2.r, color2.g, color2.b);
 								let nextMap = timelineMap[frame + 1];
-								if (!nextMap)  {
+								if (!nextMap) {
 									timeline.shrink(bezier);
 									break;
 								}
@@ -538,10 +538,10 @@ module spine {
 							let color = Color.fromString(keyMap.light);
 							let color2 = Color.fromString(keyMap.dark);
 
-							for (let frame = 0, bezier = 0;; frame++) {
+							for (let frame = 0, bezier = 0; ; frame++) {
 								timeline.setFrame(frame, time, color.r, color.g, color.b, color2.r, color2.g, color2.b);
 								let nextMap = timelineMap[frame + 1];
-								if (!nextMap)  {
+								if (!nextMap) {
 									timeline.shrink(bezier);
 									break;
 								}
@@ -627,7 +627,7 @@ module spine {
 					let mix = getValue(keyMap, "mix", 1);
 					let softness = getValue(keyMap, "softness", 0) * scale;
 
-					for (let frame = 0, bezier = 0;; frame++) {
+					for (let frame = 0, bezier = 0; ; frame++) {
 						timeline.setFrame(frame, time, mix, softness, getValue(keyMap, "bendPositive", true) ? 1 : -1, getValue(keyMap, "compress", false), getValue(keyMap, "stretch", false));
 						let nextMap = constraintMap[frame + 1];
 						if (!nextMap) {
@@ -672,7 +672,7 @@ module spine {
 					let mixScaleY = getValue(keyMap, "mixScaleY", mixScaleX);
 					let mixShearY = getValue(keyMap, "mixShearY", 1);
 
-					for (let frame = 0, bezier = 0;; frame++) {
+					for (let frame = 0, bezier = 0; ; frame++) {
 						timeline.setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
 						let nextMap = timelineMap[frame + 1];
 						if (!nextMap) {
@@ -733,7 +733,7 @@ module spine {
 							let mixRotate = getValue(keyMap, "mixRotate", 1);
 							let mixX = getValue(keyMap, "mixX", 1);
 							let mixY = getValue(keyMap, "mixY", mixX);
-							for (let frame = 0, bezier = 0;; frame++) {
+							for (let frame = 0, bezier = 0; ; frame++) {
 								timeline.setFrame(frame, time, mixRotate, mixX, mixY);
 								let nextMap = timelineMap[frame + 1];
 								if (!nextMap) {
@@ -782,7 +782,7 @@ module spine {
 
 							let timeline = new DeformTimeline(timelineMap.length, timelineMap.length, slotIndex, attachment);
 							let time = getValue(keyMap, "time", 0);
-							for (let frame = 0, bezier = 0;; frame++) {
+							for (let frame = 0, bezier = 0; ; frame++) {
 								let deform: ArrayLike<number>;
 								let verticesValue: Array<Number> = getValue(keyMap, "vertices", null);
 								if (!verticesValue)
@@ -900,7 +900,7 @@ module spine {
 		let time = getValue(keyMap, "time", 0);
 		let value = getValue(keyMap, "value", defaultValue) * scale;
 		let bezier = 0;
-		for (let frame = 0;; frame++) {
+		for (let frame = 0; ; frame++) {
 			timeline.setFrame(frame, time, value);
 			let nextMap = keys[frame + 1];
 			if (!nextMap) {
@@ -922,7 +922,7 @@ module spine {
 		let value1 = getValue(keyMap, name1, defaultValue) * scale;
 		let value2 = getValue(keyMap, name2, defaultValue) * scale;
 		let bezier = 0;
-		for (let frame = 0;; frame++) {
+		for (let frame = 0; ; frame++) {
 			timeline.setFrame(frame, time, value1, value2);
 			let nextMap = keys[frame + 1];
 			if (!nextMap) {

@@ -37,15 +37,15 @@ module spine {
 			this.jitterY = jitterY;
 		}
 
-		begin(skeleton: Skeleton): void {
+		begin (skeleton: Skeleton): void {
 		}
 
-		transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void {
+		transform (position: Vector2, uv: Vector2, light: Color, dark: Color): void {
 			position.x += MathUtils.randomTriangular(-this.jitterX, this.jitterY);
 			position.y += MathUtils.randomTriangular(-this.jitterX, this.jitterY);
 		}
 
-		end(): void {
+		end (): void {
 		}
 	}
 }

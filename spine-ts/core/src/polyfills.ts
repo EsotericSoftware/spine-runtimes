@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 interface Math {
-	fround(n: number): number;
+	fround (n: number): number;
 }
 
 (() => {

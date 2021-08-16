@@ -151,7 +151,7 @@ module spine {
 			return this;
 		}
 
-		static rgba8888ToColor(color: Color, value: number) {
+		static rgba8888ToColor (color: Color, value: number) {
 			color.r = ((value & 0xff000000) >>> 24) / 255;
 			color.g = ((value & 0x00ff0000) >>> 16) / 255;
 			color.b = ((value & 0x0000ff00) >>> 8) / 255;
@@ -164,7 +164,7 @@ module spine {
 			color.b = ((value & 0x000000ff)) / 255;
 		}
 
-		static fromString (hex : string) : Color {
+		static fromString (hex: string): Color {
 			return new Color().setFromString(hex);
 		}
 	}
@@ -200,7 +200,7 @@ module spine {
 		}
 
 		static cbrt (x: number) {
-			let y = Math.pow(Math.abs(x), 1/3);
+			let y = Math.pow(Math.abs(x), 1 / 3);
 			return x < 0 ? -y : y;
 		}
 
@@ -215,14 +215,14 @@ module spine {
 			return max - Math.sqrt((1 - u) * d * (max - mode));
 		}
 
-		static isPowerOfTwo(value: number) {
+		static isPowerOfTwo (value: number) {
 			return value && (value & (value - 1)) === 0;
 		}
 	}
 
 	export abstract class Interpolation {
 		protected abstract applyInternal (a: number): number;
-		apply(start: number, end: number, a: number): number {
+		apply (start: number, end: number, a: number): number {
 			return start + (end - start) * this.applyInternal(a);
 		}
 	}
@@ -246,13 +246,13 @@ module spine {
 			super(power);
 		}
 
-		applyInternal (a: number) : number {
+		applyInternal (a: number): number {
 			return Math.pow(a - 1, this.power) * (this.power % 2 == 0 ? -1 : 1) + 1;
 		}
 	}
 
 	export class Utils {
-		static SUPPORTS_TYPED_ARRAYS = typeof(Float32Array) !== "undefined";
+		static SUPPORTS_TYPED_ARRAYS = typeof (Float32Array) !== "undefined";
 
 		static arrayCopy<T> (source: ArrayLike<T>, sourceStart: number, dest: ArrayLike<T>, destStart: number, numElements: number) {
 			for (let i = sourceStart, j = destStart; i < sourceStart + numElements; i++, j++) {
@@ -330,7 +330,7 @@ module spine {
 	}
 
 	export class DebugUtils {
-		static logBones(skeleton: Skeleton) {
+		static logBones (skeleton: Skeleton) {
 			for (let i = 0; i < skeleton.bones.length; i++) {
 				let bone = skeleton.bones[i];
 				console.log(bone.data.name + ", " + bone.a + ", " + bone.b + ", " + bone.c + ", " + bone.d + ", " + bone.worldX + ", " + bone.worldY);

@@ -172,79 +172,79 @@ module spine {
 			this.worldY = pc * x + pd * y + parent.worldY;
 
 			switch (this.data.transformMode) {
-			case TransformMode.Normal: {
-				let rotationY = rotation + 90 + shearY;
-				let la = MathUtils.cosDeg(rotation + shearX) * scaleX;
-				let lb = MathUtils.cosDeg(rotationY) * scaleY;
-				let lc = MathUtils.sinDeg(rotation + shearX) * scaleX;
-				let ld = MathUtils.sinDeg(rotationY) * scaleY;
-				this.a = pa * la + pb * lc;
-				this.b = pa * lb + pb * ld;
-				this.c = pc * la + pd * lc;
-				this.d = pc * lb + pd * ld;
-				return;
-			}
-			case TransformMode.OnlyTranslation: {
-				let rotationY = rotation + 90 + shearY;
-				this.a = MathUtils.cosDeg(rotation + shearX) * scaleX;
-				this.b = MathUtils.cosDeg(rotationY) * scaleY;
-				this.c = MathUtils.sinDeg(rotation + shearX) * scaleX;
-				this.d = MathUtils.sinDeg(rotationY) * scaleY;
-				break;
-			}
-			case TransformMode.NoRotationOrReflection: {
-				let s = pa * pa + pc * pc;
-				let prx = 0;
-				if (s > 0.0001) {
-					s = Math.abs(pa * pd - pb * pc) / s;
-					pa /= this.skeleton.scaleX;
-					pc /= this.skeleton.scaleY;
-					pb = pc * s;
-					pd = pa * s;
-					prx = Math.atan2(pc, pa) * MathUtils.radDeg;
-				} else {
-					pa = 0;
-					pc = 0;
-					prx = 90 - Math.atan2(pd, pb) * MathUtils.radDeg;
+				case TransformMode.Normal: {
+					let rotationY = rotation + 90 + shearY;
+					let la = MathUtils.cosDeg(rotation + shearX) * scaleX;
+					let lb = MathUtils.cosDeg(rotationY) * scaleY;
+					let lc = MathUtils.sinDeg(rotation + shearX) * scaleX;
+					let ld = MathUtils.sinDeg(rotationY) * scaleY;
+					this.a = pa * la + pb * lc;
+					this.b = pa * lb + pb * ld;
+					this.c = pc * la + pd * lc;
+					this.d = pc * lb + pd * ld;
+					return;
 				}
-				let rx = rotation + shearX - prx;
-				let ry = rotation + shearY - prx + 90;
-				let la = MathUtils.cosDeg(rx) * scaleX;
-				let lb = MathUtils.cosDeg(ry) * scaleY;
-				let lc = MathUtils.sinDeg(rx) * scaleX;
-				let ld = MathUtils.sinDeg(ry) * scaleY;
-				this.a = pa * la - pb * lc;
-				this.b = pa * lb - pb * ld;
-				this.c = pc * la + pd * lc;
-				this.d = pc * lb + pd * ld;
-				break;
-			}
-			case TransformMode.NoScale:
-			case TransformMode.NoScaleOrReflection: {
-				let cos = MathUtils.cosDeg(rotation);
-				let sin = MathUtils.sinDeg(rotation);
-				let za = (pa * cos + pb * sin) / this.skeleton.scaleX;
-				let zc = (pc * cos + pd * sin) / this.skeleton.scaleY;
-				let s = Math.sqrt(za * za + zc * zc);
-				if (s > 0.00001) s = 1 / s;
-				za *= s;
-				zc *= s;
-				s = Math.sqrt(za * za + zc * zc);
-				if (this.data.transformMode == TransformMode.NoScale
-					&& (pa * pd - pb * pc < 0) != (this.skeleton.scaleX < 0 != this.skeleton.scaleY < 0)) s = -s;
-				let r = Math.PI / 2 + Math.atan2(zc, za);
-				let zb = Math.cos(r) * s;
-				let zd = Math.sin(r) * s;
-				let la = MathUtils.cosDeg(shearX) * scaleX;
-				let lb = MathUtils.cosDeg(90 + shearY) * scaleY;
-				let lc = MathUtils.sinDeg(shearX) * scaleX;
-				let ld = MathUtils.sinDeg(90 + shearY) * scaleY;
-				this.a = za * la + zb * lc;
-				this.b = za * lb + zb * ld;
-				this.c = zc * la + zd * lc;
-				this.d = zc * lb + zd * ld;
-				break;
-			}
+				case TransformMode.OnlyTranslation: {
+					let rotationY = rotation + 90 + shearY;
+					this.a = MathUtils.cosDeg(rotation + shearX) * scaleX;
+					this.b = MathUtils.cosDeg(rotationY) * scaleY;
+					this.c = MathUtils.sinDeg(rotation + shearX) * scaleX;
+					this.d = MathUtils.sinDeg(rotationY) * scaleY;
+					break;
+				}
+				case TransformMode.NoRotationOrReflection: {
+					let s = pa * pa + pc * pc;
+					let prx = 0;
+					if (s > 0.0001) {
+						s = Math.abs(pa * pd - pb * pc) / s;
+						pa /= this.skeleton.scaleX;
+						pc /= this.skeleton.scaleY;
+						pb = pc * s;
+						pd = pa * s;
+						prx = Math.atan2(pc, pa) * MathUtils.radDeg;
+					} else {
+						pa = 0;
+						pc = 0;
+						prx = 90 - Math.atan2(pd, pb) * MathUtils.radDeg;
+					}
+					let rx = rotation + shearX - prx;
+					let ry = rotation + shearY - prx + 90;
+					let la = MathUtils.cosDeg(rx) * scaleX;
+					let lb = MathUtils.cosDeg(ry) * scaleY;
+					let lc = MathUtils.sinDeg(rx) * scaleX;
+					let ld = MathUtils.sinDeg(ry) * scaleY;
+					this.a = pa * la - pb * lc;
+					this.b = pa * lb - pb * ld;
+					this.c = pc * la + pd * lc;
+					this.d = pc * lb + pd * ld;
+					break;
+				}
+				case TransformMode.NoScale:
+				case TransformMode.NoScaleOrReflection: {
+					let cos = MathUtils.cosDeg(rotation);
+					let sin = MathUtils.sinDeg(rotation);
+					let za = (pa * cos + pb * sin) / this.skeleton.scaleX;
+					let zc = (pc * cos + pd * sin) / this.skeleton.scaleY;
+					let s = Math.sqrt(za * za + zc * zc);
+					if (s > 0.00001) s = 1 / s;
+					za *= s;
+					zc *= s;
+					s = Math.sqrt(za * za + zc * zc);
+					if (this.data.transformMode == TransformMode.NoScale
+						&& (pa * pd - pb * pc < 0) != (this.skeleton.scaleX < 0 != this.skeleton.scaleY < 0)) s = -s;
+					let r = Math.PI / 2 + Math.atan2(zc, za);
+					let zb = Math.cos(r) * s;
+					let zd = Math.sin(r) * s;
+					let la = MathUtils.cosDeg(shearX) * scaleX;
+					let lb = MathUtils.cosDeg(90 + shearY) * scaleY;
+					let lc = MathUtils.sinDeg(shearX) * scaleX;
+					let ld = MathUtils.sinDeg(90 + shearY) * scaleY;
+					this.a = za * la + zb * lc;
+					this.b = za * lb + zb * ld;
+					this.c = zc * la + zd * lc;
+					this.d = zc * lb + zd * ld;
+					break;
+				}
 			}
 			this.a *= this.skeleton.scaleX;
 			this.b *= this.skeleton.scaleX;

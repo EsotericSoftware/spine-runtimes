@@ -38,7 +38,7 @@ module spine.webgl {
 
 		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap, useMipMaps: boolean = false) {
 			super(image);
-			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
+			this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 			this.useMipMaps = useMipMaps;
 			this.restore();
 			this.context.addRestorable(this);

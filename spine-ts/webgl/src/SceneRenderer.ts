@@ -52,7 +52,7 @@ module spine.webgl {
 
 		constructor (canvas: HTMLCanvasElement, context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true) {
 			this.canvas = canvas;
-			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
+			this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 			this.twoColorTint = twoColorTint;
 			this.camera = new OrthoCamera(canvas.width, canvas.height);
 			this.batcherShader = twoColorTint ? Shader.newTwoColoredTextured(this.context) : Shader.newColoredTextured(this.context);
@@ -450,7 +450,7 @@ module spine.webgl {
 			var dpr = window.devicePixelRatio || 1;
 			var w = Math.round(canvas.clientWidth * dpr);
 			var h = Math.round(canvas.clientHeight * dpr);
- 
+
 			if (canvas.width != w || canvas.height != h) {
 				canvas.width = w;
 				canvas.height = h;
@@ -471,7 +471,7 @@ module spine.webgl {
 			this.camera.update();
 		}
 
-		private enableRenderer(renderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer) {
+		private enableRenderer (renderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer) {
 			if (this.activeRenderer === renderer) return;
 			this.end();
 			if (renderer instanceof PolygonBatcher) {

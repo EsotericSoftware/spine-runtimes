@@ -519,7 +519,7 @@ module spine {
 			if (!controlBones.length && !config.showControls) return;
 			let selectedBones = this.selectedBones = new Array<Bone>(controlBones.length);
 			let canvas = this.canvas;
-			let target:Bone = null;
+			let target: Bone = null;
 			let offset = new spine.Vector2();
 			let coords = new spine.webgl.Vector3();
 			let mouse = new spine.webgl.Vector3();
@@ -528,10 +528,10 @@ module spine {
 			let renderer = this.sceneRenderer;
 
 			let closest = function (x: number, y: number): Bone {
- 				mouse.set(x, canvas.clientHeight - y, 0)
+				mouse.set(x, canvas.clientHeight - y, 0)
 				offset.x = offset.y = 0;
 				let bestDistance = 24, index = 0;
-				let best:Bone;
+				let best: Bone;
 				for (let i = 0; i < controlBones.length; i++) {
 					selectedBones[i] = null;
 					let bone = skeleton.findBone(controlBones[i]);
@@ -789,9 +789,9 @@ module spine {
 					// Determine the viewport.
 					let viewport = this.viewport;
 					viewport.x = this.currentViewport.x - (this.currentViewport.padLeft as number),
-					viewport.y = this.currentViewport.y - (this.currentViewport.padBottom as number),
-					viewport.width = this.currentViewport.width + (this.currentViewport.padLeft as number) + (this.currentViewport.padRight as number),
-					viewport.height = this.currentViewport.height + (this.currentViewport.padBottom as number) + (this.currentViewport.padTop as number)
+						viewport.y = this.currentViewport.y - (this.currentViewport.padBottom as number),
+						viewport.width = this.currentViewport.width + (this.currentViewport.padLeft as number) + (this.currentViewport.padRight as number),
+						viewport.height = this.currentViewport.height + (this.currentViewport.padBottom as number) + (this.currentViewport.padTop as number)
 
 					if (this.previousViewport) {
 						let transitionAlpha = (performance.now() - this.viewportTransitionStart) / 1000 / config.viewport.transitionTime;
@@ -1070,7 +1070,7 @@ module spine {
 		private enabled = false;
 		public change: (value: boolean) => void;
 
-		constructor (private text: string) {}
+		constructor (private text: string) { }
 
 		create (): HTMLElement {
 			this.switch = createElement(/*html*/`
@@ -1108,7 +1108,7 @@ module spine {
 
 		create (): HTMLElement {
 			this.slider = createElement(/*html*/`
-<div class="spine-player-slider ${this.big ? "big": ""}">
+<div class="spine-player-slider ${this.big ? "big" : ""}">
 	<div class="spine-player-slider-value"></div>
 	<!--<div class="spine-player-slider-knob"></div>-->
 </div>`);

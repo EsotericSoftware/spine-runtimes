@@ -152,7 +152,7 @@ module spine {
 		/** Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
 		 * animation state can be applied to multiple skeletons to pose them identically.
 		 * @returns True if any animations were applied. */
-		apply (skeleton: Skeleton) : boolean {
+		apply (skeleton: Skeleton): boolean {
 			if (!skeleton) throw new Error("skeleton cannot be null.");
 			if (this.animationsChanged) this._animationsChanged();
 
@@ -280,28 +280,28 @@ module spine {
 					let timelineBlend: MixBlend;
 					let alpha = 0;
 					switch (timelineMode[i]) {
-					case SUBSEQUENT:
-						if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
-						timelineBlend = blend;
-						alpha = alphaMix;
-						break;
-					case FIRST:
-						timelineBlend = MixBlend.setup;
-						alpha = alphaMix;
-						break;
-					case HOLD_SUBSEQUENT:
-						timelineBlend = blend;
-						alpha = alphaHold;
-						break;
-					case HOLD_FIRST:
-						timelineBlend = MixBlend.setup;
-						alpha = alphaHold;
-						break;
-					default:
-						timelineBlend = MixBlend.setup;
-						let holdMix = timelineHoldMix[i];
-						alpha = alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
-						break;
+						case SUBSEQUENT:
+							if (!drawOrder && timeline instanceof DrawOrderTimeline) continue;
+							timelineBlend = blend;
+							alpha = alphaMix;
+							break;
+						case FIRST:
+							timelineBlend = MixBlend.setup;
+							alpha = alphaMix;
+							break;
+						case HOLD_SUBSEQUENT:
+							timelineBlend = blend;
+							alpha = alphaHold;
+							break;
+						case HOLD_FIRST:
+							timelineBlend = MixBlend.setup;
+							alpha = alphaHold;
+							break;
+						default:
+							timelineBlend = MixBlend.setup;
+							let holdMix = timelineHoldMix[i];
+							alpha = alphaHold * Math.max(0, 1 - holdMix.mixTime / holdMix.mixDuration);
+							break;
 					}
 					from.totalAlpha += alpha;
 
@@ -948,7 +948,7 @@ module spine {
 			return Math.min(this.trackTime + this.animationStart, this.animationEnd);
 		}
 
-		setAnimationLast(animationLast: number) {
+		setAnimationLast (animationLast: number) {
 			this.animationLast = animationLast;
 			this.nextAnimationLast = animationLast;
 		}
@@ -971,7 +971,7 @@ module spine {
 			this.timelinesRotation.length = 0;
 		}
 
-		getTrackComplete() {
+		getTrackComplete () {
 			let duration = this.animationEnd - this.animationStart;
 			if (duration != 0) {
 				if (this.loop) return duration * (1 + ((this.trackTime / duration) | 0)); // Completion of next loop.
@@ -986,7 +986,7 @@ module spine {
 		drainDisabled = false;
 		animState: AnimationState;
 
-		constructor(animState: AnimationState) {
+		constructor (animState: AnimationState) {
 			this.animState = animState;
 		}
 
@@ -1034,38 +1034,38 @@ module spine {
 				let type = objects[i] as EventType;
 				let entry = objects[i + 1] as TrackEntry;
 				switch (type) {
-				case EventType.start:
-					if (entry.listener && entry.listener.start) entry.listener.start(entry);
-					for (let ii = 0; ii < listeners.length; ii++)
-						if (listeners[ii].start) listeners[ii].start(entry);
-					break;
-				case EventType.interrupt:
-					if (entry.listener && entry.listener.interrupt) entry.listener.interrupt(entry);
-					for (let ii = 0; ii < listeners.length; ii++)
-						if (listeners[ii].interrupt) listeners[ii].interrupt(entry);
-					break;
-				case EventType.end:
-					if (entry.listener && entry.listener.end) entry.listener.end(entry);
-					for (let ii = 0; ii < listeners.length; ii++)
-						if (listeners[ii].end) listeners[ii].end(entry);
+					case EventType.start:
+						if (entry.listener && entry.listener.start) entry.listener.start(entry);
+						for (let ii = 0; ii < listeners.length; ii++)
+							if (listeners[ii].start) listeners[ii].start(entry);
+						break;
+					case EventType.interrupt:
+						if (entry.listener && entry.listener.interrupt) entry.listener.interrupt(entry);
+						for (let ii = 0; ii < listeners.length; ii++)
+							if (listeners[ii].interrupt) listeners[ii].interrupt(entry);
+						break;
+					case EventType.end:
+						if (entry.listener && entry.listener.end) entry.listener.end(entry);
+						for (let ii = 0; ii < listeners.length; ii++)
+							if (listeners[ii].end) listeners[ii].end(entry);
 					// Fall through.
-				case EventType.dispose:
-					if (entry.listener && entry.listener.dispose) entry.listener.dispose(entry);
-					for (let ii = 0; ii < listeners.length; ii++)
-						if (listeners[ii].dispose) listeners[ii].dispose(entry);
-					this.animState.trackEntryPool.free(entry);
-					break;
-				case EventType.complete:
-					if (entry.listener && entry.listener.complete) entry.listener.complete(entry);
-					for (let ii = 0; ii < listeners.length; ii++)
-						if (listeners[ii].complete) listeners[ii].complete(entry);
-					break;
-				case EventType.event:
-					let event = objects[i++ + 2] as Event;
-					if (entry.listener && entry.listener.event) entry.listener.event(entry, event);
-					for (let ii = 0; ii < listeners.length; ii++)
-						if (listeners[ii].event) listeners[ii].event(entry, event);
-					break;
+					case EventType.dispose:
+						if (entry.listener && entry.listener.dispose) entry.listener.dispose(entry);
+						for (let ii = 0; ii < listeners.length; ii++)
+							if (listeners[ii].dispose) listeners[ii].dispose(entry);
+						this.animState.trackEntryPool.free(entry);
+						break;
+					case EventType.complete:
+						if (entry.listener && entry.listener.complete) entry.listener.complete(entry);
+						for (let ii = 0; ii < listeners.length; ii++)
+							if (listeners[ii].complete) listeners[ii].complete(entry);
+						break;
+					case EventType.event:
+						let event = objects[i++ + 2] as Event;
+						if (entry.listener && entry.listener.event) entry.listener.event(entry, event);
+						for (let ii = 0; ii < listeners.length; ii++)
+							if (listeners[ii].event) listeners[ii].event(entry, event);
+						break;
 				}
 			}
 			this.clear();

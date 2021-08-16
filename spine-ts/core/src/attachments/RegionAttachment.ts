@@ -72,12 +72,12 @@ module spine {
 
 		tempColor = new Color(1, 1, 1, 1);
 
-		constructor (name:string) {
+		constructor (name: string) {
 			super(name);
 		}
 
 		/** Calculates the {@link #offset} using the region settings. Must be called after changing region settings. */
-		updateOffset () : void {
+		updateOffset (): void {
 			let region = this.region;
 			let regionScaleX = this.width / this.region.originalWidth * this.scaleX;
 			let regionScaleY = this.height / this.region.originalHeight * this.scaleY;
@@ -108,7 +108,7 @@ module spine {
 			offset[7] = localYCos + localX2Sin;
 		}
 
-		setRegion (region: TextureRegion) : void {
+		setRegion (region: TextureRegion): void {
 			this.region = region;
 			let uvs = this.uvs;
 			if (region.degrees == 90) {

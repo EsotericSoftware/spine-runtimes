@@ -27,12 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-declare function CodeMirror(el: Element, config: any): void;
+declare function CodeMirror (el: Element, config: any): void;
 
 module spine {
 	export class SpinePlayerEditor {
 		private static DEFAULT_CODE =
-		`
+			`
 <script src="https://esotericsoftware.com/files/spine-player/4.0/spine-player.js"></script>
 <link rel="stylesheet" href="https://esotericsoftware.com/files/spine-player/4.0/spine-player.css">
 
@@ -47,7 +47,7 @@ new spine.SpinePlayer("player-container", {
 		`.trim();
 
 		private prefix: string =
-`<html>
+			`<html>
 <head>
 <style>
 body { margin: 0px; }
@@ -91,21 +91,21 @@ body { margin: 0px; }
 			})
 		}
 
-		setPreAndPostfix(prefix: string, postfix: string) {
+		setPreAndPostfix (prefix: string, postfix: string) {
 			this.prefix = prefix;
 			this.postfix = postfix;
 			this.startPlayer()
 		}
 
-		setCode(code: string) {
+		setCode (code: string) {
 			this.code.setValue(code);
 			this.startPlayer();
 		}
 
 		private timerId = 0;
-		startPlayer() {
+		startPlayer () {
 			clearTimeout(this.timerId);
-			this.timerId = setTimeout( () => {
+			this.timerId = setTimeout(() => {
 				let code = this.code.getDoc().getValue();
 				code = this.prefix + code + this.postfix;
 				code = window.btoa(code);

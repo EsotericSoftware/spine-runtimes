@@ -87,7 +87,7 @@ module spine {
 
 		applyAbsoluteWorld () {
 			let mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
-			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
+				mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 			let translate = mixX != 0 || mixY != 0;
 
 			let target = this.target;
@@ -155,7 +155,7 @@ module spine {
 
 		applyRelativeWorld () {
 			let mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
-			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
+				mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 			let translate = mixX != 0 || mixY != 0;
 
 			let target = this.target;
@@ -219,7 +219,7 @@ module spine {
 
 		applyAbsoluteLocal () {
 			let mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
-			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
+				mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 
 			let target = this.target;
 
@@ -257,7 +257,7 @@ module spine {
 
 		applyRelativeLocal () {
 			let mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
-			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
+				mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 
 			let target = this.target;
 

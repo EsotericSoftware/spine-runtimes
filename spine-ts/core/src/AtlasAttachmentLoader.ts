@@ -48,7 +48,7 @@ module spine {
 			return attachment;
 		}
 
-		newMeshAttachment (skin: Skin, name: string, path: string) : MeshAttachment {
+		newMeshAttachment (skin: Skin, name: string, path: string): MeshAttachment {
 			let region = this.atlas.findRegion(path);
 			if (!region) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
 			region.renderObject = region;
@@ -57,7 +57,7 @@ module spine {
 			return attachment;
 		}
 
-		newBoundingBoxAttachment (skin: Skin, name: string) : BoundingBoxAttachment {
+		newBoundingBoxAttachment (skin: Skin, name: string): BoundingBoxAttachment {
 			return new BoundingBoxAttachment(name);
 		}
 
@@ -65,11 +65,11 @@ module spine {
 			return new PathAttachment(name);
 		}
 
-		newPointAttachment(skin: Skin, name: string): PointAttachment {
+		newPointAttachment (skin: Skin, name: string): PointAttachment {
 			return new PointAttachment(name);
 		}
 
-		newClippingAttachment(skin: Skin, name: string): ClippingAttachment {
+		newClippingAttachment (skin: Skin, name: string): ClippingAttachment {
 			return new ClippingAttachment(name);
 		}
 	}

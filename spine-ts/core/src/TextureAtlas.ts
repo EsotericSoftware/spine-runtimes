@@ -216,7 +216,7 @@ module spine {
 			let colon = line.indexOf(':');
 			if (colon == -1) return 0;
 			entry[0] = line.substr(0, colon).trim();
-			for (let i = 1, lastMatch = colon + 1;; i++) {
+			for (let i = 1, lastMatch = colon + 1; ; i++) {
 				let comma = line.indexOf(',', lastMatch);
 				if (comma == -1) {
 					entry[i] = line.substr(lastMatch).trim();

@@ -30,11 +30,11 @@
 module spine.webgl {
 	export class Mesh implements Disposable, Restorable {
 		private context: ManagedWebGLRenderingContext;
-		private vertices:Float32Array;
+		private vertices: Float32Array;
 		private verticesBuffer: WebGLBuffer;
 		private verticesLength = 0;
 		private dirtyVertices = false;
-		private indices:Uint16Array;
+		private indices: Uint16Array;
 		private indicesBuffer: WebGLBuffer;
 		private indicesLength = 0;
 		private dirtyIndices = false;
@@ -68,7 +68,7 @@ module spine.webgl {
 		}
 
 		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, private attributes: VertexAttribute[], maxVertices: number, maxIndices: number) {
-			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
+			this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 			this.elementsPerVertex = 0;
 			for (let i = 0; i < attributes.length; i++) {
 				this.elementsPerVertex += attributes[i].numElements;
@@ -93,7 +93,7 @@ module spine.webgl {
 		}
 
 		draw (shader: Shader, primitiveType: number) {
-			this.drawWithOffset(shader, primitiveType, 0, this.indicesLength > 0? this.indicesLength: this.verticesLength / this.elementsPerVertex);
+			this.drawWithOffset(shader, primitiveType, 0, this.indicesLength > 0 ? this.indicesLength : this.verticesLength / this.elementsPerVertex);
 		}
 
 		drawWithOffset (shader: Shader, primitiveType: number, offset: number, count: number) {

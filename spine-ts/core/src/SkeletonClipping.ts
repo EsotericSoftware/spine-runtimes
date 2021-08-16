@@ -250,7 +250,7 @@ module spine {
 
 			let clippingVertices = clippingArea;
 			let clippingVerticesLast = clippingArea.length - 4;
-			for (let i = 0;; i += 2) {
+			for (let i = 0; ; i += 2) {
 				let edgeX = clippingVertices[i], edgeY = clippingVertices[i + 1];
 				let edgeX2 = clippingVertices[i + 2], edgeY2 = clippingVertices[i + 3];
 				let deltaX = edgeX - edgeX2, deltaY = edgeY - edgeY2;

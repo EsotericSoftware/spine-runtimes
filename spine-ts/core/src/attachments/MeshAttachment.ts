@@ -83,37 +83,37 @@ module spine {
 			if (this.region instanceof TextureAtlasRegion) {
 				let region = this.region, image = region.page.texture.getImage();
 				let textureWidth = image.width, textureHeight = image.height;
-				switch(region.degrees) {
-				case 90:
-					u -= (region.originalHeight - region.offsetY - region.height) / textureWidth;
-					v -= (region.originalWidth - region.offsetX - region.width) / textureHeight;
-					width = region.originalHeight / textureWidth;
-					height = region.originalWidth / textureHeight;
-					for (let i = 0; i < n; i += 2) {
-						uvs[i] = u + regionUVs[i + 1] * width;
-						uvs[i + 1] = v + (1 - regionUVs[i]) * height;
-					}
-					return;
-				case 180:
-					u -= (region.originalWidth - region.offsetX - region.width) / textureWidth;
-					v -= region.offsetY / textureHeight;
-					width = region.originalWidth / textureWidth;
-					height = region.originalHeight / textureHeight;
-					for (let i = 0; i < n; i += 2) {
-						uvs[i] = u + (1 - regionUVs[i]) * width;
-						uvs[i + 1] = v + (1 - regionUVs[i + 1]) * height;
-					}
-					return;
-				case 270:
-					u -= region.offsetY / textureWidth;
-					v -= region.offsetX / textureHeight;
-					width = region.originalHeight / textureWidth;
-					height = region.originalWidth / textureHeight;
-					for (let i = 0; i < n; i += 2) {
-						uvs[i] = u + (1 - regionUVs[i + 1]) * width;
-						uvs[i + 1] = v + regionUVs[i] * height;
-					}
-					return;
+				switch (region.degrees) {
+					case 90:
+						u -= (region.originalHeight - region.offsetY - region.height) / textureWidth;
+						v -= (region.originalWidth - region.offsetX - region.width) / textureHeight;
+						width = region.originalHeight / textureWidth;
+						height = region.originalWidth / textureHeight;
+						for (let i = 0; i < n; i += 2) {
+							uvs[i] = u + regionUVs[i + 1] * width;
+							uvs[i + 1] = v + (1 - regionUVs[i]) * height;
+						}
+						return;
+					case 180:
+						u -= (region.originalWidth - region.offsetX - region.width) / textureWidth;
+						v -= region.offsetY / textureHeight;
+						width = region.originalWidth / textureWidth;
+						height = region.originalHeight / textureHeight;
+						for (let i = 0; i < n; i += 2) {
+							uvs[i] = u + (1 - regionUVs[i]) * width;
+							uvs[i + 1] = v + (1 - regionUVs[i + 1]) * height;
+						}
+						return;
+					case 270:
+						u -= region.offsetY / textureWidth;
+						v -= region.offsetX / textureHeight;
+						width = region.originalHeight / textureWidth;
+						height = region.originalWidth / textureHeight;
+						for (let i = 0; i < n; i += 2) {
+							uvs[i] = u + (1 - regionUVs[i + 1]) * width;
+							uvs[i + 1] = v + regionUVs[i] * height;
+						}
+						return;
 				}
 				u -= region.offsetX / textureWidth;
 				v -= (region.originalHeight - region.offsetY - region.height) / textureHeight;

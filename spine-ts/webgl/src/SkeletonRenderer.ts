@@ -29,7 +29,7 @@
 
 module spine.webgl {
 	class Renderable {
-		constructor(public vertices: ArrayLike<number>, public numVertices: number, public numFloats: number) {}
+		constructor (public vertices: ArrayLike<number>, public numVertices: number, public numFloats: number) { }
 	};
 
 	export class SkeletonRenderer {
@@ -39,7 +39,7 @@ module spine.webgl {
 		vertexEffect: VertexEffect = null;
 		private tempColor = new Color();
 		private tempColor2 = new Color();
-		private vertices:ArrayLike<number>;
+		private vertices: ArrayLike<number>;
 		private vertexSize = 2 + 2 + 4;
 		private twoColorTint = false;
 		private renderable: Renderable = new Renderable(null, 0, 0);

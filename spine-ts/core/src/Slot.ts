@@ -86,7 +86,7 @@ module spine {
 		setAttachment (attachment: Attachment) {
 			if (this.attachment == attachment) return;
 			if (!(attachment instanceof VertexAttachment) || !(this.attachment instanceof VertexAttachment)
-			|| (<VertexAttachment>attachment).deformAttachment != (<VertexAttachment>this.attachment).deformAttachment) {
+				|| (<VertexAttachment>attachment).deformAttachment != (<VertexAttachment>this.attachment).deformAttachment) {
 				this.deform.length = 0;
 			}
 			this.attachment = attachment;

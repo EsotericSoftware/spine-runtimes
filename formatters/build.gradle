@@ -28,4 +28,9 @@ spotless {
                'spine-ue4/**/*.h'
         clangFormat('12.0.1').style('file')
     }
+
+    typescript {
+        target 'spine-ts/**/*.ts'
+        tsfmt('7.2.2').tsfmtFile('formatters/tsfmt.json')
+    }
 }

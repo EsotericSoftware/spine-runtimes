@@ -55,7 +55,7 @@ module spine.webgl {
 		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, private vertexShader: string, private fragmentShader: string) {
 			this.vsSource = vertexShader;
 			this.fsSource = fragmentShader;
-			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
+			this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 			this.context.addRestorable(this);
 			this.compile();
 		}

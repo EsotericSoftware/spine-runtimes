@@ -33,7 +33,7 @@ module spine.webgl {
 		public gl: WebGLRenderingContext;
 		private restorables = new Array<Restorable>();
 
-		constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget, contextConfig: any = { alpha: "true" }) {
+		constructor (canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget, contextConfig: any = { alpha: "true" }) {
 			if (!((canvasOrContext instanceof WebGLRenderingContext) || (typeof WebGL2RenderingContext !== 'undefined' && canvasOrContext instanceof WebGL2RenderingContext)))
 				this.setupCanvas(canvasOrContext, contextConfig);
 			else {
@@ -42,8 +42,8 @@ module spine.webgl {
 			}
 		}
 
-		private setupCanvas(canvas: any, contextConfig: any) {
-			this.gl = <WebGLRenderingContext> (canvas.getContext("webgl2", contextConfig) || canvas.getContext("webgl", contextConfig));
+		private setupCanvas (canvas: any, contextConfig: any) {
+			this.gl = <WebGLRenderingContext>(canvas.getContext("webgl2", contextConfig) || canvas.getContext("webgl", contextConfig));
 			this.canvas = canvas;
 			canvas.addEventListener("webglcontextlost", (e: any) => {
 				let event = <WebGLContextEvent>e;
@@ -56,11 +56,11 @@ module spine.webgl {
 			});
 		}
 
-		addRestorable(restorable: Restorable) {
+		addRestorable (restorable: Restorable) {
 			this.restorables.push(restorable);
 		}
 
-		removeRestorable(restorable: Restorable) {
+		removeRestorable (restorable: Restorable) {
 			let index = this.restorables.indexOf(restorable);
 			if (index > -1) this.restorables.splice(index, 1);
 		}
@@ -76,31 +76,31 @@ module spine.webgl {
 	export class WebGLBlendModeConverter {
 		static getDestGLBlendMode (blendMode: BlendMode) {
 			switch (blendMode) {
-			case BlendMode.Normal: return ONE_MINUS_SRC_ALPHA;
-			case BlendMode.Additive: return ONE;
-			case BlendMode.Multiply: return ONE_MINUS_SRC_ALPHA;
-			case BlendMode.Screen: return ONE_MINUS_SRC_ALPHA;
-			default: throw new Error("Unknown blend mode: " + blendMode);
+				case BlendMode.Normal: return ONE_MINUS_SRC_ALPHA;
+				case BlendMode.Additive: return ONE;
+				case BlendMode.Multiply: return ONE_MINUS_SRC_ALPHA;
+				case BlendMode.Screen: return ONE_MINUS_SRC_ALPHA;
+				default: throw new Error("Unknown blend mode: " + blendMode);
 			}
 		}
 
 		static getSourceColorGLBlendMode (blendMode: BlendMode, premultipliedAlpha: boolean = false) {
 			switch (blendMode) {
-			case BlendMode.Normal: return premultipliedAlpha ? ONE : SRC_ALPHA;
-			case BlendMode.Additive: return premultipliedAlpha ? ONE : SRC_ALPHA;
-			case BlendMode.Multiply: return DST_COLOR;
-			case BlendMode.Screen: return ONE;
-			default: throw new Error("Unknown blend mode: " + blendMode);
+				case BlendMode.Normal: return premultipliedAlpha ? ONE : SRC_ALPHA;
+				case BlendMode.Additive: return premultipliedAlpha ? ONE : SRC_ALPHA;
+				case BlendMode.Multiply: return DST_COLOR;
+				case BlendMode.Screen: return ONE;
+				default: throw new Error("Unknown blend mode: " + blendMode);
 			}
 		}
 
 		static getSourceAlphaGLBlendMode (blendMode: BlendMode) {
 			switch (blendMode) {
-			case BlendMode.Normal: return ONE;
-			case BlendMode.Additive: return ONE;
-			case BlendMode.Multiply: return ONE_MINUS_SRC_ALPHA;
-			case BlendMode.Screen: return ONE_MINUS_SRC_COLOR;
-			default: throw new Error("Unknown blend mode: " + blendMode);
+				case BlendMode.Normal: return ONE;
+				case BlendMode.Additive: return ONE;
+				case BlendMode.Multiply: return ONE_MINUS_SRC_ALPHA;
+				case BlendMode.Screen: return ONE_MINUS_SRC_COLOR;
+				default: throw new Error("Unknown blend mode: " + blendMode);
 			}
 		}
 	}

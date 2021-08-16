@@ -43,7 +43,7 @@ module spine.webgl {
 
 		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, maxVertices: number = 10920) {
 			if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
-			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
+			this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 			this.mesh = new Mesh(context, [new Position2Attribute(), new ColorAttribute()], maxVertices, 0);
 			let gl = this.context.gl;
 			this.srcColorBlend = gl.SRC_ALPHA;
@@ -193,7 +193,7 @@ module spine.webgl {
 
 			for (let i = offset, n = offset + count - 2; i < n; i += 2) {
 				let x1 = polygonVertices[i];
-				let y1 = polygonVertices[i+1];
+				let y1 = polygonVertices[i + 1];
 
 				let x2 = 0;
 				let y2 = 0;
@@ -325,7 +325,7 @@ module spine.webgl {
 			this.vertexIndex = 0;
 		}
 
-		private check(shapeType: ShapeType, numVertices: number) {
+		private check (shapeType: ShapeType, numVertices: number) {
 			if (!this.isDrawing) throw new Error("ShapeRenderer.begin() has not been called");
 			if (this.shapeType == shapeType) {
 				if (this.mesh.maxVertices() - this.mesh.numVertices() < numVertices) this.flush();

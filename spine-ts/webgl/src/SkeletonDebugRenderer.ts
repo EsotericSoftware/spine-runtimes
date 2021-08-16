@@ -56,7 +56,7 @@ module spine.webgl {
 		private static GREEN = new Color(0, 1, 0, 1);
 
 		constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext) {
-			this.context = context instanceof ManagedWebGLRenderingContext? context : new ManagedWebGLRenderingContext(context);
+			this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 		}
 
 		draw (shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones: Array<string> = null) {
@@ -208,7 +208,7 @@ module spine.webgl {
 					let nn = clip.worldVerticesLength;
 					let world = this.temp = Utils.setArraySize(this.temp, nn, 0);
 					clip.computeWorldVertices(slot, 0, nn, world, 0, 2);
-					for (let i = 0, n = world.length; i < n; i+=2) {
+					for (let i = 0, n = world.length; i < n; i += 2) {
 						let x = world[i];
 						let y = world[i + 1];
 						let x2 = world[(i + 2) % world.length];

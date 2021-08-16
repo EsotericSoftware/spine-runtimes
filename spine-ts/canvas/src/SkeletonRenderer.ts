@@ -180,9 +180,9 @@ module spine.canvas {
 
 		// Adapted from http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 		// Apache 2 licensed
-		private drawTriangle(img: HTMLImageElement, x0: number, y0: number, u0: number, v0: number,
-						x1: number, y1: number, u1: number, v1: number,
-						x2: number, y2: number, u2: number, v2: number) {
+		private drawTriangle (img: HTMLImageElement, x0: number, y0: number, u0: number, v0: number,
+			x1: number, y1: number, u1: number, v1: number,
+			x2: number, y2: number, u2: number, v2: number) {
 			let ctx = this.ctx;
 
 			u0 *= img.width;
@@ -210,15 +210,15 @@ module spine.canvas {
 
 			var det = 1 / (u1 * v2 - u2 * v1),
 
-			// linear transformation
-			a = (v2 * x1 - v1 * x2) * det,
-			b = (v2 * y1 - v1 * y2) * det,
-			c = (u1 * x2 - u2 * x1) * det,
-			d = (u1 * y2 - u2 * y1) * det,
+				// linear transformation
+				a = (v2 * x1 - v1 * x2) * det,
+				b = (v2 * y1 - v1 * y2) * det,
+				c = (u1 * x2 - u2 * x1) * det,
+				d = (u1 * y2 - u2 * y1) * det,
 
-			// translation
-			e = x0 - a * u0 - c * v0,
-			f = y0 - b * u0 - d * v0;
+				// translation
+				e = x0 - a * u0 - c * v0,
+				f = y0 - b * u0 - d * v0;
 
 			ctx.save();
 			ctx.transform(a, b, c, d, e, f);
@@ -227,7 +227,7 @@ module spine.canvas {
 			ctx.restore();
 		}
 
-		private computeRegionVertices(slot: Slot, region: RegionAttachment, pma: boolean) {
+		private computeRegionVertices (slot: Slot, region: RegionAttachment, pma: boolean) {
 			let skeletonColor = slot.bone.skeleton.color;
 			let slotColor = slot.color;
 			let regionColor = region.color;
@@ -275,7 +275,7 @@ module spine.canvas {
 			return vertices;
 		}
 
-		private computeMeshVertices(slot: Slot, mesh: MeshAttachment, pma: boolean) {
+		private computeMeshVertices (slot: Slot, mesh: MeshAttachment, pma: boolean) {
 			let skeletonColor = slot.bone.skeleton.color;
 			let slotColor = slot.color;
 			let regionColor = mesh.color;

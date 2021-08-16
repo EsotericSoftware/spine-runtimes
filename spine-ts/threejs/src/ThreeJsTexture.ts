@@ -52,7 +52,7 @@ module spine.threejs {
 			this.texture.dispose();
 		}
 
-		static toThreeJsTextureFilter(filter: TextureFilter) {
+		static toThreeJsTextureFilter (filter: TextureFilter) {
 			if (filter === TextureFilter.Linear) return THREE.LinearFilter;
 			else if (filter === TextureFilter.MipMap) return THREE.LinearMipMapLinearFilter; // also includes TextureFilter.MipMapLinearLinear
 			else if (filter === TextureFilter.MipMapLinearNearest) return THREE.LinearMipMapNearestFilter;
@@ -62,7 +62,7 @@ module spine.threejs {
 			else throw new Error("Unknown texture filter: " + filter);
 		}
 
-		static toThreeJsTextureWrap(wrap: TextureWrap) {
+		static toThreeJsTextureWrap (wrap: TextureWrap) {
 			if (wrap === TextureWrap.ClampToEdge) return THREE.ClampToEdgeWrapping;
 			else if (wrap === TextureWrap.MirroredRepeat) return THREE.MirroredRepeatWrapping;
 			else if (wrap === TextureWrap.Repeat) return THREE.RepeatWrapping;

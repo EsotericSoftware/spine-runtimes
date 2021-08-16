@@ -331,7 +331,7 @@ module spine.webgl {
 			return this;
 		}
 
-		static initTemps() {
+		static initTemps () {
 			if (Matrix4.xAxis === null) Matrix4.xAxis = new Vector3();
 			if (Matrix4.yAxis === null) Matrix4.yAxis = new Vector3();
 			if (Matrix4.zAxis === null) Matrix4.zAxis = new Vector3();

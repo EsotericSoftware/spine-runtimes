@@ -80,7 +80,7 @@ module spine.webgl {
 			return worldCoords;
 		}
 
-		setViewport(viewportWidth: number, viewportHeight: number) {
+		setViewport (viewportWidth: number, viewportHeight: number) {
 			this.viewportWidth = viewportWidth;
 			this.viewportHeight = viewportHeight;
 		}

@@ -41,12 +41,12 @@ module spine {
 			this.radius = radius;
 		}
 
-		begin(skeleton: Skeleton): void {
+		begin (skeleton: Skeleton): void {
 			this.worldX = skeleton.x + this.centerX;
 			this.worldY = skeleton.y + this.centerY;
 		}
 
-		transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void {
+		transform (position: Vector2, uv: Vector2, light: Color, dark: Color): void {
 			let radAngle = this.angle * MathUtils.degreesToRadians;
 			let x = position.x - this.worldX;
 			let y = position.y - this.worldY;
@@ -60,7 +60,7 @@ module spine {
 			}
 		}
 
-		end(): void {
+		end (): void {
 		}
 	}
 }

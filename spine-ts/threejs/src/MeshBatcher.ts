@@ -80,7 +80,7 @@ module spine.threejs {
 			this.indicesLength = 0;
 		}
 
-		canBatch(verticesLength: number, indicesLength: number) {
+		canBatch (verticesLength: number, indicesLength: number) {
 			if (this.indicesLength + indicesLength >= this.indices.byteLength / 2) return false;
 			if (this.verticesLength + verticesLength >= this.vertices.byteLength / 2) return false;
 			return true;
@@ -91,7 +91,7 @@ module spine.threejs {
 			let vertexBuffer = this.vertices;
 			let i = this.verticesLength;
 			let j = 0;
-			for (;j < verticesLength;) {
+			for (; j < verticesLength;) {
 				vertexBuffer[i++] = vertices[j++];
 				vertexBuffer[i++] = vertices[j++];
 				vertexBuffer[i++] = z;
