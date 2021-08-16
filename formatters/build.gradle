@@ -31,6 +31,7 @@ spotless {
 
     typescript {
         target 'spine-ts/**/*.ts'
+        targetExclude 'spine-ts/**/*.d.ts'
         tsfmt('7.2.2').tsfmtFile('formatters/tsfmt.json')
     }
 }
