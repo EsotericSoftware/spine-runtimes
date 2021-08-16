@@ -55,6 +55,7 @@ namespace Spine.Unity {
 
 		[Header("Optional")]
 		public Rigidbody2D rigidBody2D;
+		public bool applyRigidbody2DGravity = false;
 		public Rigidbody rigidBody;
 
 		public bool UsesRigidbody {
@@ -93,7 +94,18 @@ namespace Spine.Unity {
 				return; // Root motion is only applied when component is enabled.
 
 			if (rigidBody2D != null) {
-				rigidBody2D.MovePosition(new Vector2(transform.position.x, transform.position.y)
+
+				Vector2 gravityAndVelocityMovement = Vector2.zero;
+				if (applyRigidbody2DGravity) {
+					float deltaTime = Time.fixedDeltaTime;
+					float deltaTimeSquared = (deltaTime * deltaTime);
+
+					rigidBody2D.velocity += rigidBody2D.gravityScale * Physics2D.gravity * deltaTime;
+					gravityAndVelocityMovement = 0.5f * rigidBody2D.gravityScale * Physics2D.gravity * deltaTimeSquared +
+						rigidBody2D.velocity * deltaTime;
+				}
+
+				rigidBody2D.MovePosition(gravityAndVelocityMovement + new Vector2(transform.position.x, transform.position.y)
 					+ rigidbodyDisplacement);
 			}
 			if (rigidBody != null) {
@@ -143,8 +155,7 @@ namespace Spine.Unity {
 			if (index >= 0) {
 				this.rootMotionBoneIndex = index;
 				this.rootMotionBone = skeleton.bones.Items[index];
-			}
-			else {
+			} else {
 				Debug.Log("Bone named \"" + name + "\" could not be found.");
 				this.rootMotionBoneIndex = 0;
 				this.rootMotionBone = skeleton.RootBone;
@@ -250,8 +261,7 @@ namespace Spine.Unity {
 				// to prevent stutter which would otherwise occur if we don't move every Update.
 				tempSkeletonDisplacement += skeletonDelta;
 				SetEffectiveBoneOffsetsTo(tempSkeletonDisplacement, parentBoneScale);
-			}
-			else {
+			} else {
 				transform.position += transform.TransformVector(skeletonDelta);
 				ClearEffectiveBoneOffsets(parentBoneScale);
 			}
@@ -305,8 +315,7 @@ namespace Spine.Unity {
 				if (topLevelBone == rootMotionBone) {
 					if (transformPositionX) topLevelBone.x = displacementSkeletonSpace.x / skeleton.ScaleX;
 					if (transformPositionY) topLevelBone.y = displacementSkeletonSpace.y / skeleton.ScaleY;
-				}
-				else {
+				} else {
 					float offsetX = (initialOffset.x - rootMotionBone.x) * parentBoneScale.x;
 					float offsetY = (initialOffset.y - rootMotionBone.y) * parentBoneScale.y;
 					if (transformPositionX) topLevelBone.x = (displacementSkeletonSpace.x / skeleton.ScaleX) + offsetX;

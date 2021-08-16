@@ -42,6 +42,7 @@ namespace Spine.Unity.Editor {
 		protected SerializedProperty rootMotionTranslateXPerY;
 		protected SerializedProperty rootMotionTranslateYPerX;
 		protected SerializedProperty rigidBody2D;
+		protected SerializedProperty applyRigidbody2DGravity;
 		protected SerializedProperty rigidBody;
 
 		protected GUIContent rootMotionBoneNameLabel;
@@ -52,6 +53,7 @@ namespace Spine.Unity.Editor {
 		protected GUIContent rootMotionTranslateXPerYLabel;
 		protected GUIContent rootMotionTranslateYPerXLabel;
 		protected GUIContent rigidBody2DLabel;
+		protected GUIContent applyRigidbody2DGravityLabel;
 		protected GUIContent rigidBodyLabel;
 
 		protected virtual void OnEnable () {
@@ -64,6 +66,7 @@ namespace Spine.Unity.Editor {
 			rootMotionTranslateXPerY = serializedObject.FindProperty("rootMotionTranslateXPerY");
 			rootMotionTranslateYPerX = serializedObject.FindProperty("rootMotionTranslateYPerX");
 			rigidBody2D = serializedObject.FindProperty("rigidBody2D");
+			applyRigidbody2DGravity = serializedObject.FindProperty("applyRigidbody2DGravity");
 			rigidBody = serializedObject.FindProperty("rigidBody");
 
 			rootMotionBoneNameLabel = new UnityEngine.GUIContent("Root Motion Bone", "The bone to take the motion from.");
@@ -79,6 +82,8 @@ namespace Spine.Unity.Editor {
 				"\n\n" +
 				"Note that animation and physics updates are not always in sync." +
 				"Some jitter may result at certain framerates.");
+			applyRigidbody2DGravityLabel = new UnityEngine.GUIContent("Apply Gravity",
+				"Apply Rigidbody2D Gravity");
 			rigidBodyLabel = new UnityEngine.GUIContent("Rigidbody",
 				"Optional Rigidbody: Assign a Rigidbody here if you want " +
 				" to apply the root motion to the rigidbody instead of the Transform." +
@@ -107,6 +112,12 @@ namespace Spine.Unity.Editor {
 
 		protected virtual void OptionalPropertyFields () {
 			EditorGUILayout.PropertyField(rigidBody2D, rigidBody2DLabel);
+
+			if (rigidBody2D.objectReferenceValue != null || rigidBody2D.hasMultipleDifferentValues) {
+				using (new SpineInspectorUtility.IndentScope())
+					EditorGUILayout.PropertyField(applyRigidbody2DGravity, applyRigidbody2DGravityLabel);
+			}
+
 			EditorGUILayout.PropertyField(rigidBody, rigidBodyLabel);
 		}
 	}
