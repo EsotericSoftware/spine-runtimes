@@ -44,12 +44,12 @@ namespace Spine.Unity.Examples {
 		[Header("Visor")]
 		public Sprite visorSprite;
 		[SpineSlot] public string visorSlot;
-		[SpineAttachment(slotField:"visorSlot", skinField:"baseSkinName")] public string visorKey = "goggles";
+		[SpineAttachment(slotField: "visorSlot", skinField: "baseSkinName")] public string visorKey = "goggles";
 
 		[Header("Gun")]
 		public Sprite gunSprite;
 		[SpineSlot] public string gunSlot;
-		[SpineAttachment(slotField:"gunSlot", skinField:"baseSkinName")] public string gunKey = "gun";
+		[SpineAttachment(slotField: "gunSlot", skinField: "baseSkinName")] public string gunKey = "gun";
 
 		[Header("Runtime Repack Required!!")]
 		public bool repack = true;
@@ -82,6 +82,7 @@ namespace Spine.Unity.Examples {
 			// STEP 0: PREPARE SKINS
 			// Let's prepare a new skin to be our custom skin with equips/customizations. We get a clone so our original skins are unaffected.
 			customSkin = customSkin ?? new Skin("custom skin"); // This requires that all customizations are done with skin placeholders defined in Spine.
+
 			// Next let's get the skin that contains our source attachments. These are the attachments that
 			var baseSkin = skeleton.Data.FindSkin(baseSkinName);
 
@@ -94,9 +95,10 @@ namespace Spine.Unity.Examples {
 			// Let's do this for the visor.
 			int visorSlotIndex = skeleton.FindSlotIndex(visorSlot); // You can access GetAttachment and SetAttachment via string, but caching the slotIndex is faster.
 			Attachment baseAttachment = baseSkin.GetAttachment(visorSlotIndex, visorKey); // STEP 1.1
-			Attachment newAttachment = baseAttachment.GetRemappedClone(visorSprite, sourceMaterial); // STEP 1.2 - 1.3
+
 			// Note: Each call to `GetRemappedClone()` with parameter `premultiplyAlpha` set to `true` creates
 			// a cached Texture copy which can be cleared by calling AtlasUtilities.ClearCache() as done below.
+			Attachment newAttachment = baseAttachment.GetRemappedClone(visorSprite, sourceMaterial); // STEP 1.2 - 1.3
 			customSkin.SetAttachment(visorSlotIndex, visorKey, newAttachment); // STEP 1.4
 
 			// And now for the gun.
@@ -116,7 +118,7 @@ namespace Spine.Unity.Examples {
 			// 				Repacking requires that you set all source textures/sprites/atlases to be Read/Write enabled in the inspector.
 			// 				Combine all the attachment sources into one skin. Usually this means the default skin and the custom skin.
 			// 				call Skin.GetRepackedSkin to get a cloned skin with cloned attachments that all use one texture.
-			if (repack)	{
+			if (repack) {
 				var repackedSkin = new Skin("repacked skin");
 				repackedSkin.AddSkin(skeleton.Data.DefaultSkin);
 				repackedSkin.AddSkin(customSkin);
