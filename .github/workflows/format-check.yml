@@ -53,7 +53,7 @@ jobs:
         export CLANGFORMAT=`pwd`/clang/bin/clang-format
         export PATH="$PATH:/root/.dotnet/tools"      
         ./formatters/format.sh
-        git config --global core.autocrlf false          
+        git config --global core.autocrlf input
         git diff > format-diff.txt
 
     - name: Archive formatting result
