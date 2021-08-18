@@ -13,22 +13,6 @@ jobs:
         sudo apt update
         sudo apt install -y --force-yes curl xz-utils libicu-dev git        
 
-    - name: Cache Clang
-      id: cache-clang
-      uses: actions/cache@v2
-      with:
-        path: clang
-        key: ${{ runner.os }}-clang
-
-    - name: Install Clang
-      if: steps.cache-clang.outputs.cache-hit != 'true'
-      run: |
-        curl -L https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/clang+llvm-12.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz --output clang.tar.xz
-        tar -xf clang.tar.xz
-        mv clang+llvm-12.0.1-x86_64-linux-gnu-ubuntu- clang
-        sudo rm /usr/bin/clang-format
-        sudo ln -s /clang/bin/clang-format /usr/bin/clang-format
-
     - name: Install dotnet
       uses: actions/setup-dotnet@v1
       with:
