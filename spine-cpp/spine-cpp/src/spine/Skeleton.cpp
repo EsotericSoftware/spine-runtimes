@@ -57,7 +57,7 @@
 
 using namespace spine;
 
-Skeleton::Skeleton(SkeletonData *skeletonData) : _data(skeletonData),
+Skeleton::Skeleton (SkeletonData *skeletonData) : _data(skeletonData),
 												 _skin(NULL),
 												 _color(1, 1, 1, 1),
 												 _time(0),
