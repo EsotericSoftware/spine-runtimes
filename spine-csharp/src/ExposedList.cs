@@ -1,4 +1,4 @@
-﻿//
+//
 // System.Collections.Generic.List
 //
 // Authors:
