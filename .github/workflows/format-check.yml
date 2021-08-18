@@ -53,10 +53,9 @@ jobs:
         export CLANGFORMAT=`pwd`/clang/bin/clang-format
         export PATH="$PATH:/root/.dotnet/tools"      
         ./formatters/format.sh
-        find . -type f -name '*.cs' -exec perl -pi -e 's/\r\n/\n/g' '{}' +        
-        git diff > format-diff.txt
-
-    - run: spine-csharp/src/Atlas.cs        
+        find . -type f -name '*.cs' -exec perl -pi -e 's/\r\n/\n/g' '{}' +
+        git diff
+        git diff > format-diff.txt          
 
     - name: Archive formatting result
       uses: actions/upload-artifact@v2
