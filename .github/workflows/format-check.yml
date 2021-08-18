@@ -11,9 +11,7 @@ jobs:
     - name: Install OS dependencies (needed for act on ubuntu-latest)      
       run: |
         sudo apt update
-        sudo apt install -y --force-yes curl xz-utils libicu-dev git  
-        git config --global core.autocrlf input
-        git config --global core.eol 
+        sudo apt install -y --force-yes curl xz-utils libicu-dev git dos2unix
 
     - uses: actions/checkout@v1      
 
