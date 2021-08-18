@@ -53,6 +53,13 @@ jobs:
         export CLANGFORMAT=`pwd`/clang/bin/clang-format
         export PATH="$PATH:/root/.dotnet/tools"      
         ./formatters/format.sh
+        git diff > format-diff.txt
+        
+    - name: Archive formatting result
+      uses: actions/upload-artifact@v2
+      with:
+        name: format-diff
+        path: format-diff.txt
 
     - name: Fail on format changes
       run: |
