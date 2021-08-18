@@ -26,7 +26,7 @@ spotless {
                'spine-sfml/**/*.h',
                'spine-ue4/**/*.cpp',
                'spine-ue4/**/*.h'
-        clangFormat('{versionFound}').style('file')
+        clangFormat('11.0.0-2~ubuntu20.04.1').style('file')
     }
 
     typescript {
