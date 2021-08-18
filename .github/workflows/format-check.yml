@@ -50,7 +50,7 @@ jobs:
                 
     - name: Format   
       run: | 
-        export PATH=$PATH:`pwd`/clang/bin/
+        export PATH=`pwd`/clang/bin/:$PATH
         export PATH="$PATH:/root/.dotnet/tools"      
         ./formatters/format.sh
 
