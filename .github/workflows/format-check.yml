@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:      
 
+    - run: git config --global core.autocrlf input
+
     - uses: actions/checkout@v1  
 
     - name: Install OS dependencies (needed for act on ubuntu-latest)      
@@ -52,8 +54,7 @@ jobs:
       run: | 
         export CLANGFORMAT=`pwd`/clang/bin/clang-format
         export PATH="$PATH:/root/.dotnet/tools"      
-        ./formatters/format.sh
-        git config --global core.autocrlf input
+        ./formatters/format.sh        
         git diff > format-diff.txt
 
     - name: Archive formatting result
