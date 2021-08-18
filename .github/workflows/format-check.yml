@@ -55,7 +55,7 @@ jobs:
         export CLANGFORMAT=`pwd`/clang/bin/clang-format
         export PATH="$PATH:/root/.dotnet/tools"      
         ./formatters/format.sh
-        find . -type f -name '*.php' -exec dos2unix '{}' +        
+        find . -type f -name '*.cs' -exec dos2unix '{}' +        
         git diff > format-diff.txt
 
     - run: spine-csharp/src/Atlas.cs        
