@@ -93,9 +93,6 @@ namespace Spine {
 			var oldItems = Items;
 			if (newSize > itemsLength) {
 				Array.Resize(ref Items, newSize);
-//				var newItems = new T[newSize];
-//				Array.Copy(oldItems, newItems, Count);
-//				Items = newItems;
 			} else if (newSize < itemsLength) {
 				// Allow nulling of T reference type to allow GC.
 				for (int i = newSize; i < itemsLength; i++)
