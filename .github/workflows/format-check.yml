@@ -10,8 +10,8 @@ jobs:
 
     - name: Install OS dependencies (needed for act on ubuntu-latest)      
       run: |
-        apt update
-        apt install -y --force-yes curl xz-utils libicu-dev git        
+        sudo apt update
+        sudo apt install -y --force-yes curl xz-utils libicu-dev git        
 
     - name: Cache Clang
       id: cache-clang
