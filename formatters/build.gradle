@@ -26,7 +26,7 @@ spotless {
                'spine-sfml/**/*.h',
                'spine-ue4/**/*.cpp',
                'spine-ue4/**/*.h'
-        clangFormat().pathToExe("$System.env.CLANGFORMAT").style('file')
+        clangFormat("12.0.1").pathToExe("$System.env.CLANGFORMAT").style('file')
     }
 
     typescript {
