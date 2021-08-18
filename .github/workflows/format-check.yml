@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:      
 
+    - uses: actions/checkout@v1  
+
     - name: Install OS dependencies (needed for act on ubuntu-latest)      
       run: |
         sudo apt update
@@ -32,9 +34,7 @@ jobs:
       with:
           dotnet-version: "6.0.x"      
           include-prerelease: true   
-    - run: dotnet tool install -g dotnet-format     
-
-    - uses: actions/checkout@v1  
+    - run: dotnet tool install -g dotnet-format    
           
     - name: Install Node and dependenceis    
       uses: actions/setup-node@v1       
