@@ -62,7 +62,7 @@ public class Skeleton {
 	float scaleX = 1, scaleY = 1;
 	float x, y;
 
-	public Skeleton(SkeletonData data) {
+	public Skeleton (SkeletonData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		this.data = data;
 

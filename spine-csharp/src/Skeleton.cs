@@ -31,7 +31,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Spine {
-	public class Skeleton{
+	public class Skeleton {
 		internal SkeletonData data;
 		internal ExposedList<Bone> bones;
 		internal ExposedList<Slot> slots;

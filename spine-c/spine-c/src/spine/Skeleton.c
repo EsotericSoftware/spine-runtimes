@@ -52,7 +52,7 @@ typedef struct {
 	_spUpdate *updateCache;
 } _spSkeleton;
 
-spSkeleton *spSkeleton_create (spSkeletonData *data) {
+spSkeleton *spSkeleton_create(spSkeletonData *data) {
 	int i;
 	int *childrenCounts;
 
