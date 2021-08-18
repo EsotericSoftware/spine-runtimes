@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:      
 
-    - run: git config --global core.autocrlf input
+    - run: git config --global core.autocrlf false
 
     - uses: actions/checkout@v1  
 
