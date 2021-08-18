@@ -56,5 +56,5 @@ jobs:
 
     - name: Fail on format changes
       run: |
-        git status --porcelain
-        if [[ `git status --porcelain` ]]; then echo "detected format changes!" & exit 1; fi
+        git ls-files -m
+        if [[ `git ls-files -m` ]]; then echo "Detected formatting errors!" & exit 1; fi
