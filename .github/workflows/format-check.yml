@@ -11,7 +11,7 @@ jobs:
     - name: Install OS dependencies (needed for act on ubuntu-latest)      
       run: |
         sudo apt update
-        sudo apt install -y --force-yes curl xz-utils libicu-dev git dos2unix       
+        sudo apt install -y --force-yes curl xz-utils libicu-dev git  
         git config --global core.autocrlf input
         git config --global core.eol 
 
@@ -55,7 +55,7 @@ jobs:
         export CLANGFORMAT=`pwd`/clang/bin/clang-format
         export PATH="$PATH:/root/.dotnet/tools"      
         ./formatters/format.sh
-        find . -type f -name '*.cs' -exec dos2unix '{}' +        
+        find . -type f -name '*.cs' -exec perl -pi -e 's/\r\n/\n/g' '{}' +        
         git diff > format-diff.txt
 
     - run: spine-csharp/src/Atlas.cs        
