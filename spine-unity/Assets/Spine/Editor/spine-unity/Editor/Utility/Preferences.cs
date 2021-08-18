@@ -43,19 +43,19 @@
 #define NEW_PREFERENCES_SETTINGS_PROVIDER
 #endif
 
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Linq;
 using System.Reflection;
-using System.Globalization;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	public partial class SpineEditorUtilities {
 
-	#if NEW_PREFERENCES_SETTINGS_PROVIDER
+#if NEW_PREFERENCES_SETTINGS_PROVIDER
 		static class SpineSettingsProviderRegistration
 		{
 			[SettingsProvider]
@@ -79,27 +79,27 @@ namespace Spine.Unity.Editor {
 				return provider;
 			}
 		}
-	#else
+#else
 		// Preferences entry point
 		[PreferenceItem("Spine")]
 		static void PreferencesGUI () {
 			Preferences.HandlePreferencesGUI();
 		}
-	#endif
+#endif
 
-	#if NEW_PREFERENCES_SETTINGS_PROVIDER
+#if NEW_PREFERENCES_SETTINGS_PROVIDER
 		public static SpinePreferences Preferences {
 			get {
 				return SpinePreferences.GetOrCreateSettings();
 			}
 		}
-	#endif
+#endif
 
-	#if NEW_PREFERENCES_SETTINGS_PROVIDER
+#if NEW_PREFERENCES_SETTINGS_PROVIDER
 		public static class OldPreferences {
-	#else
+#else
 		public static class Preferences {
-	#endif
+#endif
 			const string DEFAULT_SCALE_KEY = "SPINE_DEFAULT_SCALE";
 			public static float defaultScale = SpinePreferences.DEFAULT_DEFAULT_SCALE;
 
@@ -423,12 +423,12 @@ namespace Spine.Unity.Editor {
 			property.stringValue = material ? AssetDatabase.GetAssetPath(material) : "";
 		}
 
-	#if NEW_PREFERENCES_SETTINGS_PROVIDER
+#if NEW_PREFERENCES_SETTINGS_PROVIDER
 		public static void PresetAssetPropertyField (SerializedProperty property, GUIContent label) {
 			var texturePreset = (EditorGUILayout.ObjectField(label, AssetDatabase.LoadAssetAtPath<UnityEditor.Presets.Preset>(property.stringValue), typeof(UnityEditor.Presets.Preset), false) as UnityEditor.Presets.Preset);
 			bool isTexturePreset = texturePreset != null && texturePreset.GetTargetTypeName() == "TextureImporter";
 			property.stringValue = isTexturePreset ? AssetDatabase.GetAssetPath(texturePreset) : "";
 		}
-	#endif
+#endif
 	}
 }

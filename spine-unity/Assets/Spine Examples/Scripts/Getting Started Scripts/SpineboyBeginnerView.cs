@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using System.Collections;
 using Spine.Unity;
+using System.Collections;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 	public class SpineboyBeginnerView : MonoBehaviour {
@@ -70,7 +70,7 @@ namespace Spine.Unity.Examples {
 			if (skeletonAnimation == null) return;
 			if (model == null) return;
 
-			if ((skeletonAnimation.skeleton.ScaleX < 0) != model.facingLeft) {	// Detect changes in model.facingLeft
+			if ((skeletonAnimation.skeleton.ScaleX < 0) != model.facingLeft) {  // Detect changes in model.facingLeft
 				Turn(model.facingLeft);
 			}
 

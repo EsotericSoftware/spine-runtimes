@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using Spine.Unity;
+﻿using Spine.Unity;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 
@@ -38,7 +38,7 @@ namespace Spine.Unity.Examples {
 				rootMotion.rootMotionTranslateYPerX = 0;
 		}
 
-		void AdjustDelta() {
+		void AdjustDelta () {
 			Vector3 toTarget = targetPosition.position - this.transform.position;
 			rootMotion.AdjustRootMotionToDistance(toTarget, trackIndex, adjustX, adjustY,
 				minScaleX, maxScaleX, minScaleY, maxScaleY,

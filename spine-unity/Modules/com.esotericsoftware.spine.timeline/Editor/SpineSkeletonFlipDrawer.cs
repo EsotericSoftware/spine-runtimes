@@ -32,8 +32,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 
 [CustomPropertyDrawer(typeof(SpineSkeletonFlipBehaviour))]
-public class SpineSkeletonFlipDrawer : PropertyDrawer
-{
+public class SpineSkeletonFlipDrawer : PropertyDrawer {
 	public override float GetPropertyHeight (SerializedProperty property, GUIContent label) {
 		int fieldCount = 2;
 		return fieldCount * EditorGUIUtility.singleLineHeight;

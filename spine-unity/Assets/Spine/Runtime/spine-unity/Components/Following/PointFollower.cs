@@ -35,11 +35,11 @@ using UnityEngine;
 
 namespace Spine.Unity {
 
-	#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 	[ExecuteAlways]
-	#else
+#else
 	[ExecuteInEditMode]
-	#endif
+#endif
 	[AddComponentMenu("Spine/Point Follower")]
 	[HelpURL("http://esotericsoftware.com/spine-unity#PointFollower")]
 	public class PointFollower : MonoBehaviour, IHasSkeletonRenderer, IHasSkeletonComponent {
@@ -48,10 +48,10 @@ namespace Spine.Unity {
 		public SkeletonRenderer SkeletonRenderer { get { return this.skeletonRenderer; } }
 		public ISkeletonComponent SkeletonComponent { get { return skeletonRenderer as ISkeletonComponent; } }
 
-		[SpineSlot(dataField:"skeletonRenderer", includeNone: true)]
+		[SpineSlot(dataField: "skeletonRenderer", includeNone: true)]
 		public string slotName;
 
-		[SpineAttachment(slotField:"slotName", dataField: "skeletonRenderer", fallbackToTextField:true, includeNone: true)]
+		[SpineAttachment(slotField: "slotName", dataField: "skeletonRenderer", fallbackToTextField: true, includeNone: true)]
 		public string pointAttachmentName;
 
 		public bool followRotation = true;
@@ -72,9 +72,9 @@ namespace Spine.Unity {
 
 			UpdateReferences();
 
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (Application.isEditor) LateUpdate();
-			#endif
+#endif
 		}
 
 		private void HandleRebuildRenderer (SkeletonRenderer skeletonRenderer) {
@@ -107,9 +107,9 @@ namespace Spine.Unity {
 		}
 
 		public void LateUpdate () {
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (!Application.isPlaying) skeletonTransformIsParent = Transform.ReferenceEquals(skeletonTransform, transform.parent);
-			#endif
+#endif
 
 			if (point == null) {
 				if (string.IsNullOrEmpty(pointAttachmentName)) return;

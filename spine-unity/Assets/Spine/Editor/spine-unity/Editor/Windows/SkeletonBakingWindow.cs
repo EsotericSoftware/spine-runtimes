@@ -29,8 +29,8 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 
@@ -51,7 +51,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		public SkeletonDataAsset skeletonDataAsset;
-		[SpineSkin(dataField:"skeletonDataAsset")]
+		[SpineSkin(dataField: "skeletonDataAsset")]
 		public string skinToBake = "default";
 
 		// Settings

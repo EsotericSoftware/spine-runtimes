@@ -27,13 +27,13 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using Spine.Unity.Examples;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using Spine.Unity.Examples;
 
 namespace Spine.Unity.Editor {
 

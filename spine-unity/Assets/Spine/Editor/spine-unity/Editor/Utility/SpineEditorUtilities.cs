@@ -54,14 +54,14 @@
 #define HAS_ON_POSTPROCESS_PREFAB
 #endif
 
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Linq;
 using System.Reflection;
-using System.Globalization;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	using EventType = UnityEngine.EventType;
@@ -77,11 +77,11 @@ namespace Spine.Unity.Editor {
 
 		// Auto-import entry point for textures
 		void OnPreprocessTexture () {
-		#if UNITY_2018_1_OR_NEWER
+#if UNITY_2018_1_OR_NEWER
 			bool customTextureSettingsExist = !assetImporter.importSettingsMissing;
-		#else
+#else
 			bool customTextureSettingsExist = System.IO.File.Exists(assetImporter.assetPath + ".meta");
-		#endif
+#endif
 			if (!customTextureSettingsExist) {
 				texturesWithoutMetaFile.Add(assetImporter.assetPath);
 			}
@@ -159,11 +159,11 @@ namespace Spine.Unity.Editor {
 		static void Initialize () {
 			// Note: Preferences need to be loaded when changing play mode
 			// to initialize handle scale correctly.
-			#if !NEW_PREFERENCES_SETTINGS_PROVIDER
+#if !NEW_PREFERENCES_SETTINGS_PROVIDER
 			Preferences.Load();
-			#else
+#else
 			SpinePreferences.Load();
-			#endif
+#endif
 
 			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
@@ -175,46 +175,45 @@ namespace Spine.Unity.Editor {
 			if (assets.Length > 0) {
 				assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
 				editorGUIPath = Path.GetDirectoryName(assetPath).Replace('\\', '/');
-			}
-			else {
+			} else {
 				editorGUIPath = editorPath.Replace("/Utility", "/GUI");
 			}
 			Icons.Initialize();
 
 			// Drag and Drop
-		#if UNITY_2019_1_OR_NEWER
+#if UNITY_2019_1_OR_NEWER
 			SceneView.duringSceneGui -= DragAndDropInstantiation.SceneViewDragAndDrop;
 			SceneView.duringSceneGui += DragAndDropInstantiation.SceneViewDragAndDrop;
-		#else
+#else
 			SceneView.onSceneGUIDelegate -= DragAndDropInstantiation.SceneViewDragAndDrop;
 			SceneView.onSceneGUIDelegate += DragAndDropInstantiation.SceneViewDragAndDrop;
-		#endif
+#endif
 
 			EditorApplication.hierarchyWindowItemOnGUI -= HierarchyHandler.HandleDragAndDrop;
 			EditorApplication.hierarchyWindowItemOnGUI += HierarchyHandler.HandleDragAndDrop;
 
 			// Hierarchy Icons
-			#if NEWPLAYMODECALLBACKS
+#if NEWPLAYMODECALLBACKS
 			EditorApplication.playModeStateChanged -= HierarchyHandler.IconsOnPlaymodeStateChanged;
 			EditorApplication.playModeStateChanged += HierarchyHandler.IconsOnPlaymodeStateChanged;
 			HierarchyHandler.IconsOnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-			#else
+#else
 			EditorApplication.playmodeStateChanged -= HierarchyHandler.IconsOnPlaymodeStateChanged;
 			EditorApplication.playmodeStateChanged += HierarchyHandler.IconsOnPlaymodeStateChanged;
 			HierarchyHandler.IconsOnPlaymodeStateChanged();
-			#endif
+#endif
 
 			// Data Refresh Edit Mode.
 			// This prevents deserialized SkeletonData from persisting from play mode to edit mode.
-			#if NEWPLAYMODECALLBACKS
+#if NEWPLAYMODECALLBACKS
 			EditorApplication.playModeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
 			EditorApplication.playModeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
 			DataReloadHandler.OnPlaymodeStateChanged(PlayModeStateChange.EnteredEditMode);
-			#else
+#else
 			EditorApplication.playmodeStateChanged -= DataReloadHandler.OnPlaymodeStateChanged;
 			EditorApplication.playmodeStateChanged += DataReloadHandler.OnPlaymodeStateChanged;
 			DataReloadHandler.OnPlaymodeStateChanged();
-			#endif
+#endif
 
 			if (SpineEditorUtilities.Preferences.textureImporterWarning) {
 				IssueWarningsForUnrecommendedTextureSettings();
@@ -228,7 +227,7 @@ namespace Spine.Unity.Editor {
 				Initialize();
 		}
 
-		public static void IssueWarningsForUnrecommendedTextureSettings() {
+		public static void IssueWarningsForUnrecommendedTextureSettings () {
 
 			string[] atlasDescriptionGUIDs = AssetDatabase.FindAssets("t:textasset .atlas"); // Note: finds ".atlas.txt" but also ".atlas 1.txt" files.
 			for (int i = 0; i < atlasDescriptionGUIDs.Length; ++i) {
@@ -288,9 +287,9 @@ namespace Spine.Unity.Editor {
 				stateComponent.AnimationState.AssignEventSubscribersFrom(oldAnimationState);
 			}
 
-		#if BUILT_IN_SPRITE_MASK_COMPONENT
+#if BUILT_IN_SPRITE_MASK_COMPONENT
 			SpineMaskUtilities.EditorAssignSpriteMaskMaterials(component);
-		#endif
+#endif
 			component.LateUpdate();
 		}
 
@@ -305,8 +304,7 @@ namespace Spine.Unity.Editor {
 			return asset != null && asset.GetSkeletonData(quiet: true) != null;
 		}
 
-		public static bool IssueWarningsForUnrecommendedTextureSettings(string texturePath)
-		{
+		public static bool IssueWarningsForUnrecommendedTextureSettings (string texturePath) {
 			TextureImporter texImporter = (TextureImporter)TextureImporter.GetAtPath(texturePath);
 			if (texImporter == null) {
 				return false;
@@ -321,7 +319,7 @@ namespace Spine.Unity.Editor {
 
 			string errorMessage = null;
 			if (MaterialChecks.IsTextureSetupProblematic(material, PlayerSettings.colorSpace,
-				texImporter. sRGBTexture, texImporter. mipmapEnabled, texImporter. alphaIsTransparency,
+				texImporter.sRGBTexture, texImporter.mipmapEnabled, texImporter.alphaIsTransparency,
 				texturePath, materialPath, ref errorMessage)) {
 				Debug.LogWarning(errorMessage, material);
 			}
@@ -492,10 +490,8 @@ namespace Spine.Unity.Editor {
 		}
 	}
 
-	public class TextureModificationWarningProcessor : UnityEditor.AssetModificationProcessor
-	{
-		static string[] OnWillSaveAssets(string[] paths)
-		{
+	public class TextureModificationWarningProcessor : UnityEditor.AssetModificationProcessor {
+		static string[] OnWillSaveAssets (string[] paths) {
 			if (SpineEditorUtilities.Preferences.textureImporterWarning) {
 				foreach (string path in paths) {
 					if ((path != null) &&

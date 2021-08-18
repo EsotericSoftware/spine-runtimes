@@ -33,9 +33,9 @@
 #define HINGE_JOINT_NEW_BEHAVIOUR
 #endif
 
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 	[RequireComponent(typeof(SkeletonRenderer))]
@@ -174,7 +174,7 @@ namespace Spine.Unity.Examples {
 
 					joint.GetComponent<Rigidbody2D>().mass = joint.connectedBody.mass * massFalloffFactor;
 
-				#if HINGE_JOINT_NEW_BEHAVIOUR
+#if HINGE_JOINT_NEW_BEHAVIOUR
 					float referenceAngle = (rbParent.transform.eulerAngles.z - t.eulerAngles.z + 360f) % 360f;
 					float minAngle = referenceAngle - rotationLimit;
 					float maxAngle = referenceAngle + rotationLimit;
@@ -182,10 +182,10 @@ namespace Spine.Unity.Examples {
 						minAngle -= 360f;
 						maxAngle -= 360f;
 					}
-				#else
-					float minAngle = - rotationLimit;
+#else
+					float minAngle = -rotationLimit;
 					float maxAngle = rotationLimit;
-				#endif
+#endif
 					joint.limits = new JointAngleLimits2D {
 						min = minAngle,
 						max = maxAngle
@@ -457,7 +457,7 @@ namespace Spine.Unity.Examples {
 			return new Vector3(flipX ? -1f : 1f, flipY ? -1f : 1f, 1f);
 		}
 
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		void OnDrawGizmosSelected () {
 			if (isActive) {
 				Gizmos.DrawWireSphere(transform.position, thickness * 1.2f);
@@ -466,7 +466,7 @@ namespace Spine.Unity.Examples {
 				Gizmos.DrawWireSphere(newTransformPos, thickness * 1.2f);
 			}
 		}
-		#endif
+#endif
 	}
 
 }

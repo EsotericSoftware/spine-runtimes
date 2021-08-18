@@ -31,8 +31,8 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	using Icons = SpineEditorUtilities.Icons;
@@ -71,8 +71,7 @@ namespace Spine.Unity.Editor {
 							return false;
 					}
 					return true;
-				}
-				else {
+				} else {
 					var component = (SkeletonGraphic)target;
 					return component.IsValid;
 				}
@@ -136,8 +135,7 @@ namespace Spine.Unity.Editor {
 					foreach (var c in targets) {
 						SpineEditorUtilities.ReloadSkeletonDataAssetAndComponent(c as SkeletonGraphic);
 					}
-				}
-				else {
+				} else {
 					foreach (var c in targets) {
 						var component = c as SkeletonGraphic;
 						if (!component.IsValid) {
@@ -243,8 +241,7 @@ namespace Spine.Unity.Editor {
 								meshGeneratorSettings.isExpanded = true;
 								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("'Multiple Canvas Renderers' must be enabled\nwhen 'Enable Separation' is enabled.", Icons.warning), GUILayout.Height(42), GUILayout.Width(340));
 							}
-						}
-						else if (meshRendersIncorrectlyWithSingleRenderer) {
+						} else if (meshRendersIncorrectlyWithSingleRenderer) {
 							using (new SpineInspectorUtility.BoxScope()) {
 								meshGeneratorSettings.isExpanded = true;
 								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("This mesh uses multiple atlas pages. You\n" +
@@ -298,12 +295,12 @@ namespace Spine.Unity.Editor {
 			if (TargetIsValid && !isInspectingPrefab) {
 				EditorGUILayout.Space();
 				if (SpineInspectorUtility.CenteredButton(new GUIContent("Add Skeleton Utility", Icons.skeletonUtility), 21, true, 200f))
-				foreach (var t in targets) {
-					var component = t as Component;
-					if (component.GetComponent<SkeletonUtility>() == null) {
-						component.gameObject.AddComponent<SkeletonUtility>();
+					foreach (var t in targets) {
+						var component = t as Component;
+						if (component.GetComponent<SkeletonUtility>() == null) {
+							component.gameObject.AddComponent<SkeletonUtility>();
+						}
 					}
-				}
 			}
 
 			wasChanged |= EditorGUI.EndChangeCheck();
@@ -384,12 +381,11 @@ namespace Spine.Unity.Editor {
 						separatorSlotNames.arraySize++;
 					}
 					GUILayout.EndHorizontal();
-				}
-				else
+				} else
 					EditorGUILayout.PropertyField(separatorSlotNames, new GUIContent(separatorSlotNames.displayName + string.Format("{0} [{1}]", terminalSlotWarning, separatorSlotNames.arraySize), SeparatorsDescription), true);
 
 				EditorGUILayout.PropertyField(enableSeparatorSlots, SpineInspectorUtility.TempContent("Enable Separation", tooltip: "Whether to enable separation at the above separator slots."));
-				EditorGUILayout.PropertyField(updateSeparatorPartLocation, SpineInspectorUtility.TempContent("Update Part Location", tooltip:"Update separator part GameObject location to match the position of the SkeletonGraphic. This can be helpful when re-parenting parts to a different GameObject."));
+				EditorGUILayout.PropertyField(updateSeparatorPartLocation, SpineInspectorUtility.TempContent("Update Part Location", tooltip: "Update separator part GameObject location to match the position of the SkeletonGraphic. This can be helpful when re-parenting parts to a different GameObject."));
 			}
 		}
 

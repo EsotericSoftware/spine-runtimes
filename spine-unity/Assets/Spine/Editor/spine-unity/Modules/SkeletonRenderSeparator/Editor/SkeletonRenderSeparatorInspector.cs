@@ -31,13 +31,11 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
-using UnityEngine;
-using UnityEditor;
-
-using System.Collections.Generic;
-
 using Spine.Unity;
 using Spine.Unity.Editor;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 
@@ -66,9 +64,9 @@ namespace Spine.Unity.Examples {
 
 			var partsRenderers = component.partsRenderers;
 			partsRenderers_ = serializedObject.FindProperty("partsRenderers");
-			partsRenderers_.isExpanded = partsRenderersExpanded ||	// last state
-				partsRenderers.Contains(null) ||	// null items found
-				partsRenderers.Count < 1 ||			// no parts renderers
+			partsRenderers_.isExpanded = partsRenderersExpanded ||  // last state
+				partsRenderers.Contains(null) ||    // null items found
+				partsRenderers.Count < 1 ||         // no parts renderers
 				(skeletonRenderer_.objectReferenceValue != null && SkeletonRendererSeparatorCount + 1 > partsRenderers.Count); // not enough parts renderers
 		}
 
@@ -87,14 +85,14 @@ namespace Spine.Unity.Examples {
 			// Triggers regeneration and assignment of the mesh filter's mesh.
 
 			bool isMeshFilterAlwaysNull = false;
-			#if UNITY_EDITOR && NEW_PREFAB_SYSTEM
+#if UNITY_EDITOR && NEW_PREFAB_SYSTEM
 			// Don't store mesh or material at the prefab, otherwise it will permanently reload
 			var prefabType = UnityEditor.PrefabUtility.GetPrefabAssetType(component);
 			if (UnityEditor.PrefabUtility.IsPartOfPrefabAsset(component) &&
 				(prefabType == UnityEditor.PrefabAssetType.Regular || prefabType == UnityEditor.PrefabAssetType.Variant)) {
 				isMeshFilterAlwaysNull = true;
 			}
-			#endif
+#endif
 
 			if (!isMeshFilterAlwaysNull && component.GetComponent<MeshFilter>() && component.GetComponent<MeshFilter>().sharedMesh == null) {
 				component.OnDisable();
@@ -171,7 +169,7 @@ namespace Spine.Unity.Examples {
 
 				totalParts = separatorCount + 1;
 				var counterStyle = skeletonRendererExpanded ? EditorStyles.label : EditorStyles.miniLabel;
-				EditorGUILayout.LabelField(string.Format("{0}: separates into {1}.", SpineInspectorUtility.Pluralize(separatorCount, "separator", "separators"), SpineInspectorUtility.Pluralize(totalParts, "part", "parts") ), counterStyle);
+				EditorGUILayout.LabelField(string.Format("{0}: separates into {1}.", SpineInspectorUtility.Pluralize(separatorCount, "separator", "separators"), SpineInspectorUtility.Pluralize(totalParts, "part", "parts")), counterStyle);
 			}
 
 			// Parts renderers
@@ -301,7 +299,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		#region SkeletonRenderer Context Menu Item
-		[MenuItem ("CONTEXT/SkeletonRenderer/Add Skeleton Render Separator")]
+		[MenuItem("CONTEXT/SkeletonRenderer/Add Skeleton Render Separator")]
 		static void AddRenderSeparatorComponent (MenuCommand cmd) {
 			var skeletonRenderer = cmd.context as SkeletonRenderer;
 			var newComponent = skeletonRenderer.gameObject.AddComponent<SkeletonRenderSeparator>();
@@ -310,7 +308,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		// Validate
-		[MenuItem ("CONTEXT/SkeletonRenderer/Add Skeleton Render Separator", true)]
+		[MenuItem("CONTEXT/SkeletonRenderer/Add Skeleton Render Separator", true)]
 		static bool ValidateAddRenderSeparatorComponent (MenuCommand cmd) {
 			var skeletonRenderer = cmd.context as SkeletonRenderer;
 			var separator = skeletonRenderer.GetComponent<SkeletonRenderSeparator>();

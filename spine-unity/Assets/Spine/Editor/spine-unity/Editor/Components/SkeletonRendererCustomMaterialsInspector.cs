@@ -31,13 +31,13 @@
 
 // Contributed by: Lost Polygon
 
+using Spine.Unity.Examples;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using Spine.Unity.Examples;
 
 namespace Spine.Unity.Editor {
 
@@ -137,9 +137,9 @@ namespace Spine.Unity.Editor {
 
 			if (SpineInspectorUtility.LargeCenteredButton(SpineInspectorUtility.TempContent("Clear and Reapply Changes", tooltip: "Removes all non-serialized overrides in the SkeletonRenderer and reapplies the overrides on this component."))) {
 				if (skeletonRenderer != null) {
-					#if SPINE_OPTIONAL_MATERIALOVERRIDE
+#if SPINE_OPTIONAL_MATERIALOVERRIDE
 					skeletonRenderer.CustomMaterialOverride.Clear();
-					#endif
+#endif
 					skeletonRenderer.CustomSlotMaterials.Clear();
 					RemoveCustomMaterials();
 					SetCustomMaterials();

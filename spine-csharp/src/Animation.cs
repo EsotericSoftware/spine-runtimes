@@ -442,7 +442,7 @@ namespace Spine {
 		/// <param name="bezierCount">The maximum number of Bezier curves. See <see cref="Shrink(int)"/>.</param>
 		/// <param name="propertyIds">Unique identifiers for the properties the timeline modifies.</param>
 		public CurveTimeline2 (int frameCount, int bezierCount, string propertyId1, string propertyId2)
-			:base (frameCount, bezierCount, propertyId1, propertyId2) {
+			: base(frameCount, bezierCount, propertyId1, propertyId2) {
 		}
 
 		public override int FrameEntries {
@@ -515,7 +515,7 @@ namespace Spine {
 		public TranslateTimeline (int frameCount, int bezierCount, int boneIndex)
 			: base(frameCount, bezierCount, //
 				(int)Property.X + "|" + boneIndex, //
-				(int) Property.Y + "|" + boneIndex) {
+				(int)Property.Y + "|" + boneIndex) {
 			this.boneIndex = boneIndex;
 		}
 
@@ -2077,7 +2077,7 @@ namespace Spine {
 		/// <param name="frame">Between 0 and <code>frameCount</code>, inclusive.</param>
 		public void SetFrame (int frame, Event e) {
 			frames[frame] = e.time;
-			events [frame] = e;
+			events[frame] = e;
 		}
 
 		/// <summary>Fires events for frames &gt; <code>lastTime</code> and &lt;= <code>time</code>.</summary>
@@ -2411,7 +2411,7 @@ namespace Spine {
 		readonly int pathConstraintIndex;
 
 		public PathConstraintPositionTimeline (int frameCount, int bezierCount, int pathConstraintIndex)
-			:base(frameCount, bezierCount, (int)Property.PathConstraintPosition + "|" + pathConstraintIndex) {
+			: base(frameCount, bezierCount, (int)Property.PathConstraintPosition + "|" + pathConstraintIndex) {
 			this.pathConstraintIndex = pathConstraintIndex;
 		}
 

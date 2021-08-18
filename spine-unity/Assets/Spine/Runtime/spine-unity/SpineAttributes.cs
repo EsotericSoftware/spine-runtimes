@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
 using System;
 using System.Collections;
+using UnityEngine;
 
 namespace Spine.Unity {
 
@@ -267,14 +267,13 @@ namespace Spine.Unity {
 			public string name;
 
 			public Hierarchy (string fullPath) {
-				string[] chunks = fullPath.Split(new char[]{'/'}, System.StringSplitOptions.RemoveEmptyEntries);
+				string[] chunks = fullPath.Split(new char[] { '/' }, System.StringSplitOptions.RemoveEmptyEntries);
 				if (chunks.Length == 0) {
 					skin = "";
 					slot = "";
 					name = "";
 					return;
-				}
-				else if (chunks.Length < 2) {
+				} else if (chunks.Length < 2) {
 					throw new System.Exception("Cannot generate Attachment Hierarchy from string! Not enough components! [" + fullPath + "]");
 				}
 				skin = chunks[0];

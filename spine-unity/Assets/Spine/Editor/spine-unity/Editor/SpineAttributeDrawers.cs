@@ -29,13 +29,13 @@
 
 // Contributed by: Mitch Thompson
 
-using UnityEngine;
-using UnityEditor;
+using Spine;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using Spine;
 using System.Linq;
+using System.Reflection;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	public struct SpineDrawerValuePair {
@@ -48,7 +48,7 @@ namespace Spine.Unity.Editor {
 		}
 	}
 
-	public abstract class SpineTreeItemDrawerBase<T> : PropertyDrawer where T:SpineAttributeBase {
+	public abstract class SpineTreeItemDrawerBase<T> : PropertyDrawer where T : SpineAttributeBase {
 		protected SkeletonDataAsset skeletonDataAsset;
 		internal const string NoneStringConstant = "<None>";
 
@@ -172,7 +172,7 @@ namespace Spine.Unity.Editor {
 	[CustomPropertyDrawer(typeof(SpineSlot))]
 	public class SpineSlotDrawer : SpineTreeItemDrawerBase<SpineSlot> {
 
-		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.slot; } }
+		protected override Texture2D Icon { get { return SpineEditorUtilities.Icons.slot; } }
 
 		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineSlot targetAttribute, SkeletonData data) {
 			if (TargetAttribute.includeNone)
@@ -219,7 +219,7 @@ namespace Spine.Unity.Editor {
 	public class SpineSkinDrawer : SpineTreeItemDrawerBase<SpineSkin> {
 		const string DefaultSkinName = "default";
 
-		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.skin; } }
+		protected override Texture2D Icon { get { return SpineEditorUtilities.Icons.skin; } }
 
 		internal override string NoneString { get { return TargetAttribute.defaultAsEmptyString ? DefaultSkinName : NoneStringConstant; } }
 
@@ -267,7 +267,7 @@ namespace Spine.Unity.Editor {
 	[CustomPropertyDrawer(typeof(SpineAnimation))]
 	public class SpineAnimationDrawer : SpineTreeItemDrawerBase<SpineAnimation> {
 
-		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.animation; } }
+		protected override Texture2D Icon { get { return SpineEditorUtilities.Icons.animation; } }
 
 		public static void GetAnimationMenuItems (SkeletonData data, List<string> outputNames, List<GUIContent> outputMenuItems, bool includeNone = true) {
 			if (data == null) return;
@@ -309,7 +309,7 @@ namespace Spine.Unity.Editor {
 	[CustomPropertyDrawer(typeof(SpineEvent))]
 	public class SpineEventNameDrawer : SpineTreeItemDrawerBase<SpineEvent> {
 
-		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.userEvent; } }
+		protected override Texture2D Icon { get { return SpineEditorUtilities.Icons.userEvent; } }
 
 		public static void GetEventMenuItems (SkeletonData data, List<string> eventNames, List<GUIContent> menuItems, bool includeNone = true) {
 			if (data == null) return;
@@ -354,7 +354,7 @@ namespace Spine.Unity.Editor {
 	[CustomPropertyDrawer(typeof(SpineIkConstraint))]
 	public class SpineIkConstraintDrawer : SpineTreeItemDrawerBase<SpineIkConstraint> {
 
-		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.constraintIK; } }
+		protected override Texture2D Icon { get { return SpineEditorUtilities.Icons.constraintIK; } }
 
 		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineIkConstraint targetAttribute, SkeletonData data) {
 			var constraints = skeletonDataAsset.GetSkeletonData(false).IkConstraints;
@@ -374,7 +374,7 @@ namespace Spine.Unity.Editor {
 	[CustomPropertyDrawer(typeof(SpineTransformConstraint))]
 	public class SpineTransformConstraintDrawer : SpineTreeItemDrawerBase<SpineTransformConstraint> {
 
-		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.constraintTransform; } }
+		protected override Texture2D Icon { get { return SpineEditorUtilities.Icons.constraintTransform; } }
 
 		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineTransformConstraint targetAttribute, SkeletonData data) {
 			var constraints = skeletonDataAsset.GetSkeletonData(false).TransformConstraints;
@@ -393,7 +393,7 @@ namespace Spine.Unity.Editor {
 	[CustomPropertyDrawer(typeof(SpinePathConstraint))]
 	public class SpinePathConstraintDrawer : SpineTreeItemDrawerBase<SpinePathConstraint> {
 
-		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.constraintPath; } }
+		protected override Texture2D Icon { get { return SpineEditorUtilities.Icons.constraintPath; } }
 
 		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpinePathConstraint targetAttribute, SkeletonData data) {
 			var constraints = skeletonDataAsset.GetSkeletonData(false).PathConstraints;
@@ -412,7 +412,7 @@ namespace Spine.Unity.Editor {
 	[CustomPropertyDrawer(typeof(SpineAttachment))]
 	public class SpineAttachmentDrawer : SpineTreeItemDrawerBase<SpineAttachment> {
 
-		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.genericAttachment; } }
+		protected override Texture2D Icon { get { return SpineEditorUtilities.Icons.genericAttachment; } }
 
 		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineAttachment targetAttribute, SkeletonData data) {
 			ISkeletonComponent skeletonComponent = GetTargetSkeletonComponent(property);
@@ -514,7 +514,7 @@ namespace Spine.Unity.Editor {
 	[CustomPropertyDrawer(typeof(SpineBone))]
 	public class SpineBoneDrawer : SpineTreeItemDrawerBase<SpineBone> {
 
-		protected override Texture2D Icon {	get { return SpineEditorUtilities.Icons.bone; } }
+		protected override Texture2D Icon { get { return SpineEditorUtilities.Icons.bone; } }
 
 		protected override void PopulateMenu (GenericMenu menu, SerializedProperty property, SpineBone targetAttribute, SkeletonData data) {
 			menu.AddDisabledItem(new GUIContent(skeletonDataAsset.name));

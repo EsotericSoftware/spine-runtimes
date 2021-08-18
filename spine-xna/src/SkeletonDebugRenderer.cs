@@ -57,7 +57,7 @@ namespace Spine {
 		public bool DrawClipping { get; set; }
 		public bool DrawClippingDecomposed { get; set; }
 		public bool DrawSkeletonXY { get; set; }
-		public void DisableAll() {
+		public void DisableAll () {
 			DrawBones = false;
 			DrawRegionAttachments = false;
 			DrawBoundingBoxes = false;
@@ -68,7 +68,7 @@ namespace Spine {
 			DrawSkeletonXY = false;
 		}
 
-		public void EnableAll() {
+		public void EnableAll () {
 			DrawBones = true;
 			DrawRegionAttachments = true;
 			DrawBoundingBoxes = true;
@@ -88,11 +88,11 @@ namespace Spine {
 			EnableAll();
 		}
 
-		public void Begin() {
+		public void Begin () {
 			renderer.Begin();
 		}
 
-		public void Draw(Skeleton skeleton) {
+		public void Draw (Skeleton skeleton) {
 			var skeletonX = skeleton.X;
 			var skeletonY = skeleton.Y;
 
@@ -116,7 +116,7 @@ namespace Spine {
 					var slot = slots.Items[i];
 					var attachment = slot.Attachment;
 					if (attachment is RegionAttachment) {
-						var regionAttachment = (RegionAttachment) attachment;
+						var regionAttachment = (RegionAttachment)attachment;
 						var vertices = this.vertices;
 						regionAttachment.ComputeWorldVertices(slot.Bone, vertices, 0, 2);
 						renderer.Line(vertices[0], vertices[1], vertices[2], vertices[3]);
@@ -221,7 +221,7 @@ namespace Spine {
 			}
 		}
 
-		public void End() {
+		public void End () {
 			renderer.End();
 		}
 	}

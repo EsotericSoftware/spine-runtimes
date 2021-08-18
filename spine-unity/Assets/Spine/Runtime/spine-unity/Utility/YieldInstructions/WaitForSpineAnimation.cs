@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using System.Collections;
 using System;
+using System.Collections;
+using UnityEngine;
 
 namespace Spine.Unity {
 	/// <summary>
@@ -43,8 +43,7 @@ namespace Spine.Unity {
 	public class WaitForSpineAnimation : IEnumerator {
 
 		[Flags]
-		public enum AnimationEventTypes
-		{
+		public enum AnimationEventTypes {
 			Start = 1,
 			Interrupt = 2,
 			End = 4,
@@ -71,7 +70,7 @@ namespace Spine.Unity {
 		#region IEnumerator
 		bool IEnumerator.MoveNext () {
 			if (m_WasFired) {
-				((IEnumerator)this).Reset();	// auto-reset for YieldInstruction reuse
+				((IEnumerator)this).Reset();    // auto-reset for YieldInstruction reuse
 				return false;
 			}
 
@@ -86,8 +85,7 @@ namespace Spine.Unity {
 				// Break immediately if trackEntry is null.
 				Debug.LogWarning("TrackEntry was null. Coroutine will continue immediately.");
 				m_WasFired = true;
-			}
-			else {
+			} else {
 				if ((eventsToWaitFor & AnimationEventTypes.Start) != 0)
 					trackEntry.Start += HandleComplete;
 				if ((eventsToWaitFor & AnimationEventTypes.Interrupt) != 0)

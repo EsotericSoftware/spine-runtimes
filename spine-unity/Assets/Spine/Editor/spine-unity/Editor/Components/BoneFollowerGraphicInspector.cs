@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using UnityEditor;
 using Spine.Unity;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 
@@ -45,7 +45,7 @@ namespace Spine.Unity.Editor {
 		bool needsReset;
 
 		#region Context Menu Item
-		[MenuItem ("CONTEXT/SkeletonGraphic/Add BoneFollower GameObject")]
+		[MenuItem("CONTEXT/SkeletonGraphic/Add BoneFollower GameObject")]
 		static void AddBoneFollowerGameObject (MenuCommand cmd) {
 			var skeletonGraphic = cmd.context as SkeletonGraphic;
 			var go = EditorInstantiation.NewGameObject("BoneFollower", true, typeof(RectTransform));
@@ -63,7 +63,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		// Validate
-		[MenuItem ("CONTEXT/SkeletonGraphic/Add BoneFollower GameObject", true)]
+		[MenuItem("CONTEXT/SkeletonGraphic/Add BoneFollower GameObject", true)]
 		static bool ValidateAddBoneFollowerGameObject (MenuCommand cmd) {
 			var skeletonGraphic = cmd.context as SkeletonGraphic;
 			return skeletonGraphic.IsValid;

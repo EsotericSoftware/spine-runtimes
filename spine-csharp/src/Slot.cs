@@ -62,7 +62,7 @@ namespace Spine {
 		}
 
 		/// <summary>Copy constructor.</summary>
-		public Slot(Slot slot, Bone bone) {
+		public Slot (Slot slot, Bone bone) {
 			if (slot == null) throw new ArgumentNullException("slot", "slot cannot be null.");
 			if (bone == null) throw new ArgumentNullException("bone", "bone cannot be null.");
 			data = slot.data;
@@ -106,7 +106,7 @@ namespace Spine {
 		/// color tinting.</summary>
 		public float A { get { return a; } set { a = value; } }
 
-		public void ClampColor() {
+		public void ClampColor () {
 			r = MathUtils.Clamp(r, 0, 1);
 			g = MathUtils.Clamp(g, 0, 1);
 			b = MathUtils.Clamp(b, 0, 1);

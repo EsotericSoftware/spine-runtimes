@@ -31,11 +31,11 @@
 #define EXPOSES_SPRITE_ATLAS_UTILITIES
 #endif
 
+using Spine;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using Spine;
 using UnityEngine.U2D;
 
 #if UNITY_EDITOR
@@ -65,12 +65,12 @@ namespace Spine.Unity {
 		public override int MaterialCount { get { return materials == null ? 0 : materials.Length; } }
 		public override Material PrimaryMaterial { get { return materials[0]; } }
 
-	#if UNITY_EDITOR
+#if UNITY_EDITOR
 		static MethodInfo GetPackedSpritesMethod, GetPreviewTexturesMethod;
-		#if !EXPOSES_SPRITE_ATLAS_UTILITIES
+#if !EXPOSES_SPRITE_ATLAS_UTILITIES
 		static MethodInfo PackAtlasesMethod;
-		#endif
-	#endif
+#endif
+#endif
 
 		#region Runtime Instantiation
 		/// <summary>
@@ -180,17 +180,17 @@ namespace Spine.Unity {
 				return new Atlas(pages, regions);
 
 			Texture2D texture = null;
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (!Application.isPlaying)
 				texture = AccessPackedTextureEditor(spriteAtlas);
 			else
-			#endif
-				texture = AccessPackedTexture(sprites);
+#endif
+			texture = AccessPackedTexture(sprites);
 
 			Material material = materials[0];
-		#if !UNITY_EDITOR
+#if !UNITY_EDITOR
 			material.mainTexture = texture;
-		#endif
+#endif
 
 			Spine.AtlasPage page = new AtlasPage();
 			page.name = spriteAtlas.name;
@@ -208,7 +208,7 @@ namespace Spine.Unity {
 			sprites = AccessPackedSprites(spriteAtlas);
 
 			int i = 0;
-			for ( ; i < sprites.Length; ++i) {
+			for (; i < sprites.Length; ++i) {
 				var sprite = sprites[i];
 				AtlasRegion region = new AtlasRegion();
 				region.name = sprite.name.Replace("(Clone)", "");
@@ -335,9 +335,9 @@ namespace Spine.Unity {
 		}
 
 		public static Texture2D AccessPackedTextureEditor (SpriteAtlas spriteAtlas) {
-		#if EXPOSES_SPRITE_ATLAS_UTILITIES
+#if EXPOSES_SPRITE_ATLAS_UTILITIES
 			UnityEditor.U2D.SpriteAtlasUtility.PackAtlases(new SpriteAtlas[] { spriteAtlas }, EditorUserBuildSettings.activeBuildTarget);
-		#else
+#else
 			/*if (PackAtlasesMethod == null) {
 				System.Type T = Type.GetType("UnityEditor.U2D.SpriteAtlasUtility,UnityEditor");
 				PackAtlasesMethod = T.GetMethod("PackAtlases", BindingFlags.NonPublic | BindingFlags.Static);
@@ -345,7 +345,7 @@ namespace Spine.Unity {
 			if (PackAtlasesMethod != null) {
 				PackAtlasesMethod.Invoke(null, new object[] { new SpriteAtlas[] { spriteAtlas }, EditorUserBuildSettings.activeBuildTarget });
 			}*/
-		#endif
+#endif
 			if (GetPreviewTexturesMethod == null) {
 				System.Type T = Type.GetType("UnityEditor.U2D.SpriteAtlasExtensions,UnityEditor");
 				GetPreviewTexturesMethod = T.GetMethod("GetPreviewTextures", BindingFlags.NonPublic | BindingFlags.Static);

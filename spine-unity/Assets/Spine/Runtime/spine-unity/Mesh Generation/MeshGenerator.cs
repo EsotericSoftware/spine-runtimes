@@ -35,9 +35,9 @@
 #define SPINE_TRIANGLECHECK // Avoid calling SetTriangles at the cost of checking for mesh differences (vertex counts, memberwise attachment list compare) every frame.
 //#define SPINE_DEBUG
 
-using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity {
 	public delegate void MeshGeneratorDelegate (MeshGeneratorBuffers buffers);
@@ -156,25 +156,25 @@ namespace Spine.Unity {
 			instructionOutput.Clear(); // submeshInstructions.Clear(); attachments.Clear();
 			var workingSubmeshInstructions = instructionOutput.submeshInstructions;
 
-			#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 			instructionOutput.attachments.Resize(drawOrderCount);
 			var workingAttachmentsItems = instructionOutput.attachments.Items;
 			int totalRawVertexCount = 0;
-			#endif
+#endif
 
 			var current = new SubmeshInstruction {
 				skeleton = skeleton,
 				preActiveClippingSlotSource = -1,
 				startSlot = 0,
-				#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 				rawFirstVertexIndex = 0,
-				#endif
+#endif
 				material = material,
 				forceSeparate = false,
 				endSlot = drawOrderCount
 			};
 
-			#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 			object rendererObject = null;
 			bool skeletonHasClipping = false;
 			var drawOrderItems = drawOrder.Items;
@@ -214,32 +214,31 @@ namespace Spine.Unity {
 				totalRawVertexCount += attachmentVertexCount;
 			}
 
-		#if !SPINE_TK2D
+#if !SPINE_TK2D
 			if (material == null && rendererObject != null)
 				current.material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
-		#else
+#else
 			if (material == null && rendererObject != null)
 				current.material = (rendererObject is Material) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
-		#endif
+#endif
 
 			instructionOutput.hasActiveClipping = skeletonHasClipping;
 			instructionOutput.rawVertexCount = totalRawVertexCount;
-			#endif
+#endif
 
 			if (totalRawVertexCount > 0) {
 				workingSubmeshInstructions.Resize(1);
 				workingSubmeshInstructions.Items[0] = current;
-			}
-			else {
+			} else {
 				workingSubmeshInstructions.Resize(0);
 			}
 		}
 
 		public static bool RequiresMultipleSubmeshesByDrawOrder (Skeleton skeleton) {
 
-		#if SPINE_TK2D
+#if SPINE_TK2D
 			return false;
-		#endif
+#endif
 			ExposedList<Slot> drawOrder = skeleton.drawOrder;
 			int drawOrderCount = drawOrder.Count;
 			var drawOrderItems = drawOrder.Items;
@@ -274,21 +273,21 @@ namespace Spine.Unity {
 			// Clear last state of attachments and submeshes
 			instructionOutput.Clear(); // submeshInstructions.Clear(); attachments.Clear();
 			var workingSubmeshInstructions = instructionOutput.submeshInstructions;
-			#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 			instructionOutput.attachments.Resize(drawOrderCount);
 			var workingAttachmentsItems = instructionOutput.attachments.Items;
 			int totalRawVertexCount = 0;
 			bool skeletonHasClipping = false;
-			#endif
+#endif
 
 			var current = new SubmeshInstruction {
 				skeleton = skeleton,
 				preActiveClippingSlotSource = -1
 			};
 
-			#if !SPINE_TK2D
+#if !SPINE_TK2D
 			bool isCustomSlotMaterialsPopulated = customSlotMaterials != null && customSlotMaterials.Count > 0;
-			#endif
+#endif
 
 			int separatorCount = separatorSlots == null ? 0 : separatorSlots.Count;
 			bool hasSeparators = separatorCount > 0;
@@ -303,10 +302,10 @@ namespace Spine.Unity {
 				if (!slot.bone.active) continue;
 				if (slot.data.blendMode == BlendMode.Additive) current.hasPMAAdditiveSlot = true;
 				Attachment attachment = slot.attachment;
-				#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 				workingAttachmentsItems[i] = attachment;
 				int attachmentVertexCount = 0, attachmentTriangleCount = 0;
-				#endif
+#endif
 
 				object rendererObject = null; // An AtlasRegion in plain Spine-Unity. Spine-TK2D hooks into TK2D's system. eventual source of Material object.
 				bool noRender = false; // Using this allows empty slots as separators, and keeps separated parts more stable despite slots being reordered
@@ -314,20 +313,20 @@ namespace Spine.Unity {
 				var regionAttachment = attachment as RegionAttachment;
 				if (regionAttachment != null) {
 					rendererObject = regionAttachment.RendererObject;
-					#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 					attachmentVertexCount = 4;
 					attachmentTriangleCount = 6;
-					#endif
+#endif
 				} else {
 					var meshAttachment = attachment as MeshAttachment;
 					if (meshAttachment != null) {
 						rendererObject = meshAttachment.RendererObject;
-						#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 						attachmentVertexCount = meshAttachment.worldVerticesLength >> 1;
 						attachmentTriangleCount = meshAttachment.triangles.Length;
-						#endif
+#endif
 					} else {
-						#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 						var clippingAttachment = attachment as ClippingAttachment;
 						if (clippingAttachment != null) {
 							clippingEndSlot = clippingAttachment.endSlot;
@@ -335,7 +334,7 @@ namespace Spine.Unity {
 							current.hasClipping = true;
 							skeletonHasClipping = true;
 						}
-						#endif
+#endif
 						noRender = true;
 					}
 				}
@@ -366,15 +365,15 @@ namespace Spine.Unity {
 
 						current.startSlot = i;
 						lastPreActiveClipping = clippingAttachmentSource;
-						#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 						current.rawTriangleCount = 0;
 						current.rawVertexCount = 0;
 						current.rawFirstVertexIndex = totalRawVertexCount;
 						current.hasClipping = clippingAttachmentSource >= 0;
-						#endif
+#endif
 					}
 				} else {
-					#if !SPINE_TK2D
+#if !SPINE_TK2D
 					Material material;
 					if (isCustomSlotMaterialsPopulated) {
 						if (!customSlotMaterials.TryGetValue(slot, out material))
@@ -382,9 +381,9 @@ namespace Spine.Unity {
 					} else {
 						material = (Material)((AtlasRegion)rendererObject).page.rendererObject;
 					}
-					#else
+#else
 					Material material = (rendererObject is Material) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
-					#endif
+#endif
 
 					if (current.forceSeparate || (current.rawVertexCount > 0 && !System.Object.ReferenceEquals(current.material, material))) { // Material changed. Add the previous submesh.
 						{ // Add
@@ -397,22 +396,22 @@ namespace Spine.Unity {
 						}
 						current.startSlot = i;
 						lastPreActiveClipping = clippingAttachmentSource;
-						#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 						current.rawTriangleCount = 0;
 						current.rawVertexCount = 0;
 						current.rawFirstVertexIndex = totalRawVertexCount;
 						current.hasClipping = clippingAttachmentSource >= 0;
-						#endif
+#endif
 					}
 
 					// Update state for the next Attachment.
 					current.material = material;
-					#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 					current.rawTriangleCount += attachmentTriangleCount;
 					current.rawVertexCount += attachmentVertexCount;
 					current.rawFirstVertexIndex = totalRawVertexCount;
 					totalRawVertexCount += attachmentVertexCount;
-					#endif
+#endif
 				}
 
 				if (clippingEndSlot != null && slot.data == clippingEndSlot && i != clippingAttachmentSource) {
@@ -433,10 +432,10 @@ namespace Spine.Unity {
 				}
 			}
 
-			#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 			instructionOutput.hasActiveClipping = skeletonHasClipping;
 			instructionOutput.rawVertexCount = totalRawVertexCount;
-			#endif
+#endif
 			instructionOutput.immutableTriangles = immutableTriangles;
 		}
 
@@ -497,11 +496,11 @@ namespace Spine.Unity {
 			float zSpacing = settings.zSpacing;
 			bool pmaVertexColors = settings.pmaVertexColors;
 			bool tintBlack = settings.tintBlack;
-			#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 			bool useClipping = settings.useClipping && instruction.hasClipping;
-			#else
+#else
 			bool useClipping = settings.useClipping;
-			#endif
+#endif
 			bool canvasGroupTintBlack = settings.tintBlack && settings.canvasGroupTintBlack;
 
 			if (useClipping) {
@@ -578,8 +577,7 @@ namespace Spine.Unity {
 							tintBlackAlpha = 0;
 						else
 							color.a = 0;
-					}
-					else if (canvasGroupTintBlack) { // other blend modes
+					} else if (canvasGroupTintBlack) { // other blend modes
 						tintBlackAlpha = colorA;
 					}
 				} else {
@@ -831,7 +829,7 @@ namespace Spine.Unity {
 						vbi[vertexIndex].x = x1; vbi[vertexIndex].y = y1; vbi[vertexIndex].z = z;
 						vbi[vertexIndex + 1].x = x4; vbi[vertexIndex + 1].y = y4; vbi[vertexIndex + 1].z = z;
 						vbi[vertexIndex + 2].x = x2; vbi[vertexIndex + 2].y = y2; vbi[vertexIndex + 2].z = z;
-						vbi[vertexIndex + 3].x = x3; vbi[vertexIndex + 3].y = y3;	vbi[vertexIndex + 3].z = z;
+						vbi[vertexIndex + 3].x = x3; vbi[vertexIndex + 3].y = y3; vbi[vertexIndex + 3].z = z;
 
 						if (settings.pmaVertexColors) {
 							color.a = (byte)(a * slot.a * regionAttachment.a * 255);
@@ -1255,7 +1253,7 @@ namespace Spine.Unity {
 				// t.Normalize() (aggressively inlined). Even better if offloaded to GPU via vertex shader.
 				float magnitude = Mathf.Sqrt(t.x * t.x + t.y * t.y);
 				if (magnitude > 1E-05) {
-					float reciprocalMagnitude = 1f/magnitude;
+					float reciprocalMagnitude = 1f / magnitude;
 					t.x *= reciprocalMagnitude;
 					t.y *= reciprocalMagnitude;
 				}

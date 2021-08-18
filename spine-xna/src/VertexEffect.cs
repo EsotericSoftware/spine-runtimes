@@ -34,27 +34,27 @@ using System.Text;
 
 namespace Spine {
 	public interface IVertexEffect {
-		void Begin(Skeleton skeleton);
-		void Transform(ref VertexPositionColorTextureColor vertex);
-		void End();
+		void Begin (Skeleton skeleton);
+		void Transform (ref VertexPositionColorTextureColor vertex);
+		void End ();
 	}
 
 	public class JitterEffect : IVertexEffect {
 		public float JitterX { get; set; }
 		public float JitterY { get; set; }
 
-		public JitterEffect(float jitterX, float jitterY) {
+		public JitterEffect (float jitterX, float jitterY) {
 			JitterX = jitterX;
 			JitterY = jitterY;
 		}
 
-		public void Begin(Skeleton skeleton) {
+		public void Begin (Skeleton skeleton) {
 		}
 
-		public void End() {
+		public void End () {
 		}
 
-		public void Transform(ref VertexPositionColorTextureColor vertex) {
+		public void Transform (ref VertexPositionColorTextureColor vertex) {
 			vertex.Position.X += MathUtils.RandomTriangle(-JitterX, JitterY);
 			vertex.Position.Y += MathUtils.RandomTriangle(-JitterX, JitterY);
 		}
@@ -69,20 +69,20 @@ namespace Spine {
 		public float CenterY { get; set; }
 		public IInterpolation Interpolation { get; set; }
 
-		public SwirlEffect(float radius) {
+		public SwirlEffect (float radius) {
 			Radius = radius;
 			Interpolation = IInterpolation.Pow2;
 		}
 
-		public void Begin(Skeleton skeleton) {
+		public void Begin (Skeleton skeleton) {
 			worldX = skeleton.X + CenterX;
 			worldY = skeleton.Y + CenterY;
 		}
 
-		public void End() {
+		public void End () {
 		}
 
-		public void Transform(ref VertexPositionColorTextureColor vertex) {
+		public void Transform (ref VertexPositionColorTextureColor vertex) {
 			float x = vertex.Position.X - worldX;
 			float y = vertex.Position.Y - worldY;
 			float dist = (float)Math.Sqrt(x * x + y * y);

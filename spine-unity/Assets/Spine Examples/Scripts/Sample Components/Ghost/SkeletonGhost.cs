@@ -29,8 +29,8 @@
 
 // Contributed by: Mitch Thompson
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 
@@ -44,7 +44,7 @@ namespace Spine.Unity.Examples {
 		public bool ghostingEnabled = true;
 		[Tooltip("The time between invididual ghost pieces being spawned.")]
 		[UnityEngine.Serialization.FormerlySerializedAs("spawnRate")]
-		public float spawnInterval = 1f/30f;
+		public float spawnInterval = 1f / 30f;
 		[Tooltip("Maximum number of ghosts that can exist at a time. If the fade speed is not fast enough, the oldest ghost will immediately disappear to enforce the maximum number.")]
 		public int maximumGhosts = 10;
 		public float fadeSpeed = 10;

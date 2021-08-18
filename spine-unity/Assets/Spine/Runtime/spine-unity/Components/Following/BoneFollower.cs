@@ -37,11 +37,11 @@ using UnityEngine;
 namespace Spine.Unity {
 
 	/// <summary>Sets a GameObject's transform to match a bone on a Spine skeleton.</summary>
-	#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 	[ExecuteAlways]
-	#else
+#else
 	[ExecuteInEditMode]
-	#endif
+#endif
 	[AddComponentMenu("Spine/BoneFollower")]
 	[HelpURL("http://esotericsoftware.com/spine-unity#BoneFollower")]
 	public class BoneFollower : MonoBehaviour {
@@ -124,10 +124,10 @@ namespace Spine.Unity {
 			if (!string.IsNullOrEmpty(boneName))
 				bone = skeletonRenderer.skeleton.FindBone(boneName);
 
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (Application.isEditor)
 				LateUpdate();
-			#endif
+#endif
 		}
 
 		void OnDestroy () {
@@ -141,10 +141,10 @@ namespace Spine.Unity {
 				return;
 			}
 
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (!Application.isPlaying)
 				skeletonTransformIsParent = Transform.ReferenceEquals(skeletonTransform, transform.parent);
-			#endif
+#endif
 
 			if (bone == null) {
 				if (string.IsNullOrEmpty(boneName)) return;
@@ -190,8 +190,7 @@ namespace Spine.Unity {
 					if (followSkeletonFlip || maintainedAxisOrientation == AxisOrientation.XAxis) {
 						if ((skeletonLossyScale.x * parentLossyScale.x < 0))
 							boneWorldRotation += 180f;
-					}
-					else {
+					} else {
 						if ((skeletonLossyScale.y * parentLossyScale.y < 0))
 							boneWorldRotation += 180f;
 					}

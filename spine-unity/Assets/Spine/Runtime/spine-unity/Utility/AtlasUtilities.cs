@@ -32,9 +32,9 @@
 #endif
 
 
-using UnityEngine;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 
 namespace Spine.Unity.AttachmentTools {
@@ -47,13 +47,13 @@ namespace Spine.Unity.AttachmentTools {
 
 		const int NonrenderingRegion = -1;
 
-	#if CONFIGURABLE_ENTER_PLAY_MODE
+#if CONFIGURABLE_ENTER_PLAY_MODE
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
 		static void Init () {
 			// handle disabled domain reload
 			AtlasUtilities.ClearCache();
 		}
-	#endif
+#endif
 
 		public static AtlasRegion ToAtlasRegion (this Texture2D t, Material materialPropertySource, float scale = DefaultScale) {
 			return t.ToAtlasRegion(materialPropertySource.shader, scale, materialPropertySource);
@@ -113,7 +113,7 @@ namespace Spine.Unity.AttachmentTools {
 				material.CopyPropertiesFromMaterial(materialPropertySource);
 				material.shaderKeywords = materialPropertySource.shaderKeywords;
 			}
-			var newTexture = t.GetClone(textureFormat, mipmaps, applyPMA : true);
+			var newTexture = t.GetClone(textureFormat, mipmaps, applyPMA: true);
 
 			newTexture.name = t.name + "-pma-";
 			material.name = t.name + shader.name;
@@ -174,7 +174,7 @@ namespace Spine.Unity.AttachmentTools {
 				material.shaderKeywords = materialPropertySource.shaderKeywords;
 			}
 
-			var tex = s.ToTexture(textureFormat, mipmaps, applyPMA : true);
+			var tex = s.ToTexture(textureFormat, mipmaps, applyPMA: true);
 			tex.name = s.name + "-pma-";
 			material.name = tex.name + shader.name;
 
@@ -358,8 +358,7 @@ namespace Spine.Unity.AttachmentTools {
 					int existingIndex;
 					if (existingRegions.TryGetValue(region, out existingIndex)) {
 						regionIndices.Add(existingIndex);
-					}
-					else {
+					} else {
 						originalRegions.Add(region);
 						for (int i = 0; i < numTextureParamsToRepack; ++i) {
 							Texture2D regionTexture = (i == 0 ?
@@ -376,8 +375,7 @@ namespace Spine.Unity.AttachmentTools {
 					}
 
 					outputAttachments[attachmentIndex] = newAttachment;
-				}
-				else {
+				} else {
 					outputAttachments[attachmentIndex] = useOriginalNonrenderables ? originalAttachment : originalAttachment.Copy();
 					regionIndices.Add(NonrenderingRegion); // Output attachments pairs with regionIndices list 1:1. Pad with a sentinel if the attachment doesn't have a region.
 				}
@@ -412,8 +410,7 @@ namespace Spine.Unity.AttachmentTools {
 					rects = rectsForTexParam;
 					newMaterial.mainTexture = newTexture;
 					outputTexture = newTexture;
-				}
-				else {
+				} else {
 					newMaterial.SetTexture(additionalTexturePropertyIDsToCopy[i - 1], newTexture);
 					additionalOutputTextures[i - 1] = newTexture;
 				}
@@ -526,7 +523,7 @@ namespace Spine.Unity.AttachmentTools {
 			int i;
 			AtlasRegion region;
 
-			public IntAndAtlasRegionKey(int i, AtlasRegion region) {
+			public IntAndAtlasRegionKey (int i, AtlasRegion region) {
 				this.i = i;
 				this.region = region;
 			}
@@ -592,20 +589,19 @@ namespace Spine.Unity.AttachmentTools {
 			Rect r;
 			if (!s.packed || s.packingMode == SpritePackingMode.Rectangle) {
 				r = s.textureRect;
-			}
-			else {
+			} else {
 				r = new Rect();
 				r.xMin = Math.Min(s.uv[0].x, s.uv[1].x) * spriteTexture.width;
 				r.xMax = Math.Max(s.uv[0].x, s.uv[1].x) * spriteTexture.width;
 				r.yMin = Math.Min(s.uv[0].y, s.uv[2].y) * spriteTexture.height;
 				r.yMax = Math.Max(s.uv[0].y, s.uv[2].y) * spriteTexture.height;
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 				if (s.uv.Length > 4) {
 					Debug.LogError("When using a tightly packed SpriteAtlas with Spine, you may only access Sprites that are packed as 'FullRect' from it! " +
 						"You can either disable 'Tight Packing' at the whole SpriteAtlas, or change the single Sprite's TextureImporter Setting 'MeshType' to 'Full Rect'." +
 						"Sprite Asset: " + s.name, s);
 				}
-			#endif
+#endif
 			}
 			var newTexture = new Texture2D((int)r.width, (int)r.height, textureFormat, mipmaps, linear);
 			newTexture.CopyTextureAttributesFrom(spriteTexture);
@@ -635,7 +631,7 @@ namespace Spine.Unity.AttachmentTools {
 				destination.SetPixels(pixelBuffer);
 				destination.Apply();
 			} else {
-			 	Graphics.CopyTexture(source, 0, 0, (int)sourceRect.x, (int)sourceRect.y, (int)sourceRect.width, (int)sourceRect.height, destination, 0, 0, 0, 0);
+				Graphics.CopyTexture(source, 0, 0, (int)sourceRect.x, (int)sourceRect.y, (int)sourceRect.width, (int)sourceRect.height, destination, 0, 0, 0, 0);
 			}
 		}
 
@@ -783,12 +779,12 @@ namespace Spine.Unity.AttachmentTools {
 			return material.GetTexture(texturePropertyId) as Texture2D;
 		}
 
-		static void CopyTextureAttributesFrom(this Texture2D destination, Texture2D source) {
+		static void CopyTextureAttributesFrom (this Texture2D destination, Texture2D source) {
 			destination.filterMode = source.filterMode;
 			destination.anisoLevel = source.anisoLevel;
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 			destination.alphaIsTransparency = source.alphaIsTransparency;
-		#endif
+#endif
 			destination.wrapModeU = source.wrapModeU;
 			destination.wrapModeV = source.wrapModeV;
 			destination.wrapModeW = source.wrapModeW;

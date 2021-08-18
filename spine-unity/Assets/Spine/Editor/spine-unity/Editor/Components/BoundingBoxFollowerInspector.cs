@@ -31,9 +31,9 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
@@ -66,11 +66,11 @@ namespace Spine.Unity.Editor {
 
 		public override void OnInspectorGUI () {
 
-			#if !NEW_PREFAB_SYSTEM
+#if !NEW_PREFAB_SYSTEM
 			bool isInspectingPrefab = (PrefabUtility.GetPrefabType(target) == PrefabType.Prefab);
-			#else
+#else
 			bool isInspectingPrefab = false;
-			#endif
+#endif
 
 			// Note: when calling InitializeEditor() in OnEnable, it throws exception
 			// "SerializedObjectNotCreatableException: Object at index 0 is null".
@@ -109,10 +109,10 @@ namespace Spine.Unity.Editor {
 			if (EditorGUI.EndChangeCheck()) {
 				serializedObject.ApplyModifiedProperties();
 				InitializeEditor();
-				#if !NEW_PREFAB_SYSTEM
+#if !NEW_PREFAB_SYSTEM
 				if (!isInspectingPrefab)
 					rebuildRequired = true;
-				#endif
+#endif
 			}
 
 			using (new SpineInspectorUtility.LabelWidthScope(150f)) {

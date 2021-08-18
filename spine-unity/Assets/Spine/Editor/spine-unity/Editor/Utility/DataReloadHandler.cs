@@ -35,14 +35,14 @@
 #define NEWPLAYMODECALLBACKS
 #endif
 
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Linq;
 using System.Reflection;
-using System.Globalization;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 
@@ -51,11 +51,11 @@ namespace Spine.Unity.Editor {
 
 			internal static Dictionary<int, string> savedSkeletonDataAssetAtSKeletonGraphicID = new Dictionary<int, string>();
 
-		#if NEWPLAYMODECALLBACKS
+#if NEWPLAYMODECALLBACKS
 			internal static void OnPlaymodeStateChanged (PlayModeStateChange stateChange) {
-		#else
+#else
 			internal static void OnPlaymodeStateChanged () {
-		#endif
+#endif
 				ReloadAllActiveSkeletonsEditMode();
 			}
 

@@ -27,9 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System;
-using System.IO;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
@@ -37,6 +34,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Spine;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Spine {
 	public class Example : Microsoft.Xna.Framework.Game {
@@ -76,8 +76,7 @@ namespace Spine {
 			if (!useNormalmapShader) {
 				// Two color tint effect. Note that you can also use the default BasicEffect instead.
 				spineEffect = Content.Load<Effect>("spine-xna-example-content\\SpineEffect");
-			}
-			else {
+			} else {
 				spineEffect = Content.Load<Effect>("spine-xna-example-content\\SpineEffectNormalmap");
 				spineEffect.Parameters["Light0_Direction"].SetValue(new Vector3(-0.5265408f, 0.5735765f, -0.6275069f));
 				spineEffect.Parameters["Light0_Diffuse"].SetValue(new Vector3(1, 0.9607844f, 0.8078432f));
@@ -108,8 +107,7 @@ namespace Spine {
 			Atlas atlas;
 			if (!useNormalmapShader) {
 				atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice));
-			}
-			else {
+			} else {
 				atlas = new Atlas(assetsFolder + atlasName + ".atlas", new XnaTextureLoader(GraphicsDevice,
 								loadMultipleTextureLayers: true, textureSuffixes: new string[] { "", "_normals" }));
 			}
@@ -124,8 +122,7 @@ namespace Spine {
 				SkeletonBinary binary = new SkeletonBinary(atlas);
 				binary.Scale = scale;
 				skeletonData = binary.ReadSkeletonData(assetsFolder + name + ".skel");
-			}
-			else {
+			} else {
 				SkeletonJson json = new SkeletonJson(atlas);
 				json.Scale = scale;
 				skeletonData = json.ReadSkeletonData(assetsFolder + name + ".json");
@@ -153,19 +150,15 @@ namespace Spine {
 				TrackEntry entry = state.AddAnimation(0, "jump", false, 0);
 				entry.End += End; // Event handling for queued animations.
 				state.AddAnimation(0, "run", true, 0);
-			}
-			else if (name == "raptor-pro") {
+			} else if (name == "raptor-pro") {
 				state.SetAnimation(0, "walk", true);
 				state.AddAnimation(1, "gun-grab", false, 2);
-			}
-			else if (name == "coin-pro") {
+			} else if (name == "coin-pro") {
 				state.SetAnimation(0, "animation", true);
-			}
-			else if (name == "tank-pro") {
+			} else if (name == "tank-pro") {
 				skeleton.X += 300;
 				state.SetAnimation(0, "drive", true);
-			}
-			else {
+			} else {
 				state.SetAnimation(0, "walk", true);
 			}
 
@@ -184,7 +177,7 @@ namespace Spine {
 			// TODO: Add your update logic here
 #if (!WINDOWS_STOREAPP || WINDOWS_PHONE81) && !IOS
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
-					this.Exit();
+				this.Exit();
 #endif
 			base.Update(gameTime);
 		}

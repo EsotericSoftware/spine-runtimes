@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEditor;
 using Spine.Unity.Playables;
+using UnityEditor;
 using UnityEngine.Timeline;
 
 namespace Spine.Unity.Editor {

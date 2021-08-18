@@ -31,16 +31,16 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity {
 
-	#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 	[ExecuteAlways]
-	#else
+#else
 	[ExecuteInEditMode]
-	#endif
+#endif
 	[RequireComponent(typeof(ISkeletonAnimation))]
 	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonUtility")]
 	public sealed class SkeletonUtility : MonoBehaviour {
@@ -74,7 +74,7 @@ namespace Spine.Unity {
 #if UNITY_EDITOR
 			if (!Application.isPlaying)
 				UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Spawn BoundingBox");
-# endif
+#endif
 			var got = go.transform;
 			got.parent = parent;
 			got.localPosition = Vector3.zero;
@@ -152,8 +152,7 @@ namespace Spine.Unity {
 					boneRoot.eulerAngles = new Vector3(skeleton.ScaleY > 0 ? 0 : 180,
 																	skeleton.ScaleX > 0 ? 0 : 180,
 																	0);
-				}
-				else {
+				} else {
 					boneRoot.localScale = new Vector3(skeleton.ScaleX, skeleton.ScaleY, 1f);
 				}
 			}
@@ -231,8 +230,7 @@ namespace Spine.Unity {
 			if (skeletonRenderer != null) {
 				skeletonRenderer.OnRebuild -= HandleRendererReset;
 				skeletonRenderer.OnRebuild += HandleRendererReset;
-			}
-			else if (skeletonGraphic != null) {
+			} else if (skeletonGraphic != null) {
 				skeletonGraphic.OnRebuild -= HandleRendererReset;
 				skeletonGraphic.OnRebuild += HandleRendererReset;
 				canvas = skeletonGraphic.canvas;
@@ -433,10 +431,10 @@ namespace Spine.Unity {
 
 		public GameObject SpawnBone (Bone bone, Transform parent, SkeletonUtilityBone.Mode mode, bool pos, bool rot, bool sca) {
 			GameObject go = new GameObject(bone.Data.Name);
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (!Application.isPlaying)
 				UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Spawn Bone");
-		#endif
+#endif
 			if (skeletonGraphic != null)
 				go.AddComponent<RectTransform>();
 

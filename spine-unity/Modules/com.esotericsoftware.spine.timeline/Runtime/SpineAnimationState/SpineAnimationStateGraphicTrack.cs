@@ -38,7 +38,7 @@ namespace Spine.Unity.Playables {
 	public class SpineAnimationStateGraphicTrack : TrackAsset {
 		public int trackIndex = 0;
 
-		public override Playable CreateTrackMixer(PlayableGraph graph, GameObject go, int inputCount) {
+		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
 			var scriptPlayable = ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create(graph, inputCount);
 			var mixerBehaviour = scriptPlayable.GetBehaviour();
 			mixerBehaviour.trackIndex = this.trackIndex;

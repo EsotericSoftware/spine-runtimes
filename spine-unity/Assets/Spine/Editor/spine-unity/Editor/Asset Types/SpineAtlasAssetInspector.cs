@@ -30,12 +30,12 @@
 //#define BAKE_ALL_BUTTON
 //#define REGION_BAKING_MESH
 
+using Spine;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using Spine;
 
 namespace Spine.Unity.Editor {
 	using Event = UnityEngine.Event;
@@ -72,12 +72,12 @@ namespace Spine.Unity.Editor {
 			materials = serializedObject.FindProperty("materials");
 			materials.isExpanded = true;
 			atlasAsset = (SpineAtlasAsset)target;
-			#if REGION_BAKING_MESH
+#if REGION_BAKING_MESH
 			UpdateBakedList();
-			#endif
+#endif
 		}
 
-		#if REGION_BAKING_MESH
+#if REGION_BAKING_MESH
 		private List<bool> baked;
 		private List<GameObject> bakedObjects;
 
@@ -99,7 +99,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 		}
-		#endif
+#endif
 
 		override public void OnInspectorGUI () {
 			if (serializedObject.isEditingMultipleObjects) {
@@ -155,7 +155,7 @@ namespace Spine.Unity.Editor {
 
 			EditorGUILayout.Space();
 
-			#if REGION_BAKING_MESH
+#if REGION_BAKING_MESH
 			if (atlasFile.objectReferenceValue != null) {
 				Atlas atlas = asset.GetAtlas();
 				FieldInfo field = typeof(Atlas).GetField("regions", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.NonPublic);
@@ -219,7 +219,7 @@ namespace Spine.Unity.Editor {
 				}
 				EditorGUI.indentLevel--;
 
-				#if BAKE_ALL_BUTTON
+#if BAKE_ALL_BUTTON
 				// Check state
 				bool allBaked = true;
 				bool allUnbaked = true;
@@ -258,10 +258,10 @@ namespace Spine.Unity.Editor {
 					}
 
 				}
-				#endif
+#endif
 
 			}
-			#else
+#else
 			if (atlasFile.objectReferenceValue != null) {
 
 
@@ -306,7 +306,7 @@ namespace Spine.Unity.Editor {
 				}
 				EditorGUI.indentLevel = baseIndent;
 			}
-			#endif
+#endif
 
 			if (serializedObject.ApplyModifiedProperties() || SpineInspectorUtility.UndoRedoPerformed(Event.current))
 				atlasAsset.Clear();
@@ -320,7 +320,7 @@ namespace Spine.Unity.Editor {
 			var sprites = new List<SpriteMetaData>(spriteSheet);
 
 			var regions = SpineAtlasAssetInspector.GetRegions(atlas);
-			char[] FilenameDelimiter = {'.'};
+			char[] FilenameDelimiter = { '.' };
 			int updatedCount = 0;
 			int addedCount = 0;
 
@@ -329,13 +329,13 @@ namespace Spine.Unity.Editor {
 				string textureName = texture.name;
 				bool pageMatch = string.Equals(pageName, textureName, StringComparison.Ordinal);
 
-//				if (pageMatch) {
-//					int pw = r.page.width;
-//					int ph = r.page.height;
-//					bool mismatchSize = pw != texture.width || pw > t.maxTextureSize || ph != texture.height || ph > t.maxTextureSize;
-//					if (mismatchSize)
-//						Debug.LogWarningFormat("Size mismatch found.\nExpected atlas size is {0}x{1}. Texture Import Max Size of texture '{2}'({4}x{5}) is currently set to {3}.", pw, ph, texture.name, t.maxTextureSize, texture.width, texture.height);
-//				}
+				//				if (pageMatch) {
+				//					int pw = r.page.width;
+				//					int ph = r.page.height;
+				//					bool mismatchSize = pw != texture.width || pw > t.maxTextureSize || ph != texture.height || ph > t.maxTextureSize;
+				//					if (mismatchSize)
+				//						Debug.LogWarningFormat("Size mismatch found.\nExpected atlas size is {0}x{1}. Texture Import Max Size of texture '{2}'({4}x{5}) is currently set to {3}.", pw, ph, texture.name, t.maxTextureSize, texture.width, texture.height);
+				//				}
 
 				int spriteIndex = pageMatch ? sprites.FindIndex(
 					(s) => string.Equals(s.name, r.name, StringComparison.Ordinal)

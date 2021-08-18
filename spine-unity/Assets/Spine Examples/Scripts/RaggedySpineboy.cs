@@ -27,16 +27,16 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using System.Collections;
 using Spine.Unity;
+using System.Collections;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 	public class RaggedySpineboy : MonoBehaviour {
 
 		public LayerMask groundMask;
 		public float restoreDuration = 0.5f;
-		public Vector2 launchVelocity = new Vector2(50,100);
+		public Vector2 launchVelocity = new Vector2(50, 100);
 
 		Spine.Unity.Examples.SkeletonRagdoll2D ragdoll;
 		Collider2D naturalCollider;

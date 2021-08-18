@@ -41,12 +41,12 @@ namespace Spine.Unity {
 		#region Inspector
 		public AtlasAssetBase[] atlasAssets = new AtlasAssetBase[0];
 
-		#if SPINE_TK2D
+#if SPINE_TK2D
 		public tk2dSpriteCollectionData spriteCollection;
 		public float scale = 1f;
-		#else
+#else
 		public float scale = 0.01f;
-		#endif
+#endif
 		public TextAsset skeletonJSON;
 
 		public bool isUpgradingBlendModeMaterials = false;
@@ -77,7 +77,7 @@ namespace Spine.Unity {
 		/// <summary>
 		/// Creates a runtime SkeletonDataAsset.</summary>
 		public static SkeletonDataAsset CreateRuntimeInstance (TextAsset skeletonDataFile, AtlasAssetBase atlasAsset, bool initialize, float scale = 0.01f) {
-			return CreateRuntimeInstance(skeletonDataFile, new [] {atlasAsset}, initialize, scale);
+			return CreateRuntimeInstance(skeletonDataFile, new[] { atlasAsset }, initialize, scale);
 		}
 
 		/// <summary>
@@ -145,10 +145,10 @@ namespace Spine.Unity {
 			float skeletonDataScale;
 			Atlas[] atlasArray = this.GetAtlasArray();
 
-			#if !SPINE_TK2D
+#if !SPINE_TK2D
 			attachmentLoader = (atlasArray.Length == 0) ? (AttachmentLoader)new RegionlessAttachmentLoader() : (AttachmentLoader)new AtlasAttachmentLoader(atlasArray);
 			skeletonDataScale = scale;
-			#else
+#else
 			if (spriteCollection != null) {
 				attachmentLoader = new Spine.Unity.TK2D.SpriteCollectionAttachmentLoader(spriteCollection);
 				skeletonDataScale = (1.0f / (spriteCollection.invOrthoSize * spriteCollection.halfTargetHeight) * scale);
@@ -161,7 +161,7 @@ namespace Spine.Unity {
 				attachmentLoader = new AtlasAttachmentLoader(atlasArray);
 				skeletonDataScale = scale;
 			}
-			#endif
+#endif
 
 			bool hasBinaryExtension = skeletonJSON.name.ToLower().Contains(".skel");
 			SkeletonData loadedSkeletonData = null;
@@ -176,7 +176,7 @@ namespace Spine.Unity {
 					Debug.LogError("Error reading skeleton JSON file for SkeletonData asset: " + name + "\n" + ex.Message + "\n" + ex.StackTrace, skeletonJSON);
 			}
 
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (loadedSkeletonData == null && !quiet && skeletonJSON != null) {
 				string problemDescription = null;
 				bool isSpineSkeletonData;
@@ -192,7 +192,7 @@ namespace Spine.Unity {
 					return null;
 				}
 			}
-			#endif
+#endif
 			if (loadedSkeletonData == null)
 				return null;
 

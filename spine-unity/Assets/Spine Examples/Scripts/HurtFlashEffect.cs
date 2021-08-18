@@ -37,8 +37,8 @@ public class HurtFlashEffect : MonoBehaviour {
 
 	public int flashCount = DefaultFlashCount;
 	public Color flashColor = Color.white;
-	[Range(1f/120f, 1f/15f)]
-	public float interval = 1f/60f;
+	[Range(1f / 120f, 1f / 15f)]
+	public float interval = 1f / 60f;
 	public string fillPhaseProperty = "_FillPhase";
 	public string fillColorProperty = "_FillColor";
 

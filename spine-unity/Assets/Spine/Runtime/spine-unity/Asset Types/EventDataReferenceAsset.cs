@@ -42,10 +42,10 @@ namespace Spine.Unity {
 		EventData eventData;
 		public EventData EventData {
 			get {
-				#if AUTOINIT_SPINEREFERENCE
+#if AUTOINIT_SPINEREFERENCE
 				if (eventData == null)
 					Initialize();
-				#endif
+#endif
 				return eventData;
 			}
 		}

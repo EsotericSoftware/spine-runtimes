@@ -36,9 +36,9 @@
 #endif
 
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
 using UnityEditor.AnimatedValues;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	using Editor = UnityEditor.Editor;
@@ -81,7 +81,7 @@ namespace Spine.Unity.Editor {
 		SerializedProperty bpo;
 		Bone bone;
 
-		[SpineBone(dataField:"skeletonRenderer")]
+		[SpineBone(dataField: "skeletonRenderer")]
 		public string boneName;
 
 		readonly Dictionary<Slot, List<Skin.SkinEntry>> attachmentTable = new Dictionary<Slot, List<Skin.SkinEntry>>();
@@ -105,13 +105,13 @@ namespace Spine.Unity.Editor {
 		}
 
 		void OnSelectionChange () {
-		#if UNITY_2019_1_OR_NEWER
+#if UNITY_2019_1_OR_NEWER
 			SceneView.duringSceneGui -= this.OnSceneGUI;
 			SceneView.duringSceneGui += this.OnSceneGUI;
-		#else
+#else
 			SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
 			SceneView.onSceneGUIDelegate += this.OnSceneGUI;
-		#endif
+#endif
 
 			bool noSkeletonRenderer = false;
 
@@ -152,11 +152,11 @@ namespace Spine.Unity.Editor {
 			isPrefab = false;
 			boneName = string.Empty;
 			bone = null;
-		#if UNITY_2019_1_OR_NEWER
+#if UNITY_2019_1_OR_NEWER
 			SceneView.duringSceneGui -= this.OnSceneGUI;
-		#else
+#else
 			SceneView.onSceneGUIDelegate -= this.OnSceneGUI;
-		#endif
+#endif
 		}
 
 		void OnDestroy () {
@@ -484,7 +484,7 @@ namespace Spine.Unity.Editor {
 
 							if (Application.isPlaying) {
 								foreach (var slot in skeleton.DrawOrder) {
-									if (skeletonRenderer.separatorSlots.Contains(slot))	EditorGUILayout.LabelField(SeparatorString);
+									if (skeletonRenderer.separatorSlots.Contains(slot)) EditorGUILayout.LabelField(SeparatorString);
 
 									using (new EditorGUI.DisabledScope(!slot.Bone.Active)) {
 										EditorGUILayout.LabelField(SpineInspectorUtility.TempContent(slot.Data.Name, Icons.slot), GUILayout.ExpandWidth(false));
@@ -557,13 +557,13 @@ namespace Spine.Unity.Editor {
 
 		static float ViewRound (float x) {
 			const float Factor = 100f;
-			const float Divisor = 1f/Factor;
+			const float Divisor = 1f / Factor;
 			return Mathf.Round(x * Factor) * Divisor;
 		}
 
 		static Vector2 RoundVector2 (float x, float y) {
 			const float Factor = 100f;
-			const float Divisor = 1f/Factor;
+			const float Divisor = 1f / Factor;
 			return new Vector2(Mathf.Round(x * Factor) * Divisor, Mathf.Round(y * Factor) * Divisor);
 		}
 

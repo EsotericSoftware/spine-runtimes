@@ -37,11 +37,11 @@ using UnityEngine;
 namespace Spine.Unity {
 	using AxisOrientation = BoneFollower.AxisOrientation;
 
-	#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 	[ExecuteAlways]
-	#else
+#else
 	[ExecuteInEditMode]
-	#endif
+#endif
 	[RequireComponent(typeof(RectTransform)), DisallowMultipleComponent]
 	[AddComponentMenu("Spine/UI/BoneFollowerGraphic")]
 	[HelpURL("http://esotericsoftware.com/spine-unity#BoneFollowerGraphic")]
@@ -103,18 +103,18 @@ namespace Spine.Unity {
 			if (!valid) return;
 
 			skeletonTransform = skeletonGraphic.transform;
-//			skeletonGraphic.OnRebuild -= HandleRebuildRenderer;
-//			skeletonGraphic.OnRebuild += HandleRebuildRenderer;
+			//			skeletonGraphic.OnRebuild -= HandleRebuildRenderer;
+			//			skeletonGraphic.OnRebuild += HandleRebuildRenderer;
 			skeletonTransformIsParent = Transform.ReferenceEquals(skeletonTransform, transform.parent);
 
 			if (!string.IsNullOrEmpty(boneName))
 				bone = skeletonGraphic.Skeleton.FindBone(boneName);
 
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (Application.isEditor) {
 				LateUpdate();
 			}
-			#endif
+#endif
 		}
 
 		public void LateUpdate () {
@@ -123,10 +123,10 @@ namespace Spine.Unity {
 				return;
 			}
 
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (!Application.isPlaying)
 				skeletonTransformIsParent = Transform.ReferenceEquals(skeletonTransform, transform.parent);
-			#endif
+#endif
 
 			if (bone == null) {
 				if (string.IsNullOrEmpty(boneName)) return;
@@ -169,8 +169,7 @@ namespace Spine.Unity {
 					if (followSkeletonFlip || maintainedAxisOrientation == AxisOrientation.XAxis) {
 						if ((skeletonLossyScale.x * parentLossyScale.x < 0))
 							boneWorldRotation += 180f;
-					}
-					else {
+					} else {
 						if ((skeletonLossyScale.y * parentLossyScale.y < 0))
 							boneWorldRotation += 180f;
 					}

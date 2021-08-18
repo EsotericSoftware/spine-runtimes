@@ -27,11 +27,11 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using Spine;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using Spine;
 
 namespace Spine.Unity {
 	/// <summary>Loads and stores a Spine atlas and list of materials.</summary>
@@ -214,8 +214,8 @@ namespace Spine.Unity {
 	}
 
 	public class NoOpTextureLoader : TextureLoader {
-		public void Load (AtlasPage page, string path) {}
-		public void Unload (object texture) {}
+		public void Load (AtlasPage page, string path) { }
+		public void Unload (object texture) { }
 	}
 
 	public class MaterialsTextureLoader : TextureLoader {

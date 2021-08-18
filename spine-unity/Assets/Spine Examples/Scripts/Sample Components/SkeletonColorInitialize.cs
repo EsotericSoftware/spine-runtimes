@@ -27,10 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System.Collections.Generic;
-using UnityEngine;
 using Spine;
 using Spine.Unity;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity.Prototyping {
 	/// <summary>
@@ -46,7 +46,7 @@ namespace Spine.Unity.Prototyping {
 			public Color color = Color.white;
 		}
 
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		void OnValidate () {
 			var skeletonComponent = GetComponent<ISkeletonComponent>();
 			if (skeletonComponent != null) {
@@ -58,7 +58,7 @@ namespace Spine.Unity.Prototyping {
 			}
 			ApplySettings();
 		}
-		#endif
+#endif
 
 		void Start () {
 			ApplySettings();

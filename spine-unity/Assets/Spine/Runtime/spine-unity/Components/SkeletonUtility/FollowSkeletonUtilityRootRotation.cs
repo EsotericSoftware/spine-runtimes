@@ -40,7 +40,7 @@ namespace Spine.Unity {
 	/// do not attempt to use this component for other purposes.
 	/// </summary>
 	public class FollowSkeletonUtilityRootRotation : MonoBehaviour {
-	
+
 		const float FLIP_ANGLE_THRESHOLD = 100.0f;
 
 		public Transform reference;

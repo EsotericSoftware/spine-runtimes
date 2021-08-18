@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using UnityEditor;
 using Spine.Unity.Editor;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 	[CustomEditor(typeof(SkeletonPartsRenderer))]

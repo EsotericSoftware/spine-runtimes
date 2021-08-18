@@ -27,10 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using System;
 #if UNITY_EDITOR
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -40,13 +40,13 @@ namespace Spine.Unity {
 
 	public static class SkeletonDataCompatibility {
 
-	#if UNITY_EDITOR
+#if UNITY_EDITOR
 		static readonly int[][] compatibleBinaryVersions = { new[] { 4, 0, 0 } };
 		static readonly int[][] compatibleJsonVersions = { new[] { 4, 0, 0 } };
 
 		static bool wasVersionDialogShown = false;
 		static readonly Regex jsonVersionRegex = new Regex(@"""spine""\s*:\s*""([^""]+)""", RegexOptions.CultureInvariant);
-	#endif
+#endif
 
 		public enum SourceType {
 			Json,
@@ -81,7 +81,7 @@ namespace Spine.Unity {
 			}
 		}
 
-	#if UNITY_EDITOR
+#if UNITY_EDITOR
 		public static VersionInfo GetVersionInfo (TextAsset asset, out bool isSpineSkeletonData, ref string problemDescription) {
 			isSpineSkeletonData = false;
 			if (asset == null)
@@ -210,6 +210,6 @@ namespace Spine.Unity {
 			Debug.LogError(string.Format("Error importing skeleton '{0}': {1}",
 				spineJson.name, descriptionString), spineJson);
 		}
-	#endif // UNITY_EDITOR
+#endif // UNITY_EDITOR
 	}
 }

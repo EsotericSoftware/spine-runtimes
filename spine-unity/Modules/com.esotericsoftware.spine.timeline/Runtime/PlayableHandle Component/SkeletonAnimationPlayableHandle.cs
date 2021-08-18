@@ -27,14 +27,14 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 //using UnityEngine.Playables;
 
 using Spine;
 using Spine.Unity;
 using Spine.Unity.Playables;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity.Playables {
 
@@ -43,7 +43,7 @@ namespace Spine.Unity.Playables {
 		#region Inspector
 		public SkeletonAnimation skeletonAnimation;
 
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		void Reset () {
 			InitializeReference();
 		}
@@ -51,11 +51,11 @@ namespace Spine.Unity.Playables {
 		void OnValidate () {
 			InitializeReference();
 		}
-		#endif
+#endif
 
 		#endregion
 
-		public override Skeleton Skeleton {	get { return skeletonAnimation.Skeleton; } }
+		public override Skeleton Skeleton { get { return skeletonAnimation.Skeleton; } }
 		public override SkeletonData SkeletonData { get { return skeletonAnimation.Skeleton.Data; } }
 
 		void Awake () {

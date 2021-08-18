@@ -35,7 +35,7 @@ namespace Spine {
 
 		public SlotData EndSlot { get { return endSlot; } set { endSlot = value; } }
 
-		public ClippingAttachment(string name) : base(name) {
+		public ClippingAttachment (string name) : base(name) {
 		}
 
 		public override Attachment Copy () {

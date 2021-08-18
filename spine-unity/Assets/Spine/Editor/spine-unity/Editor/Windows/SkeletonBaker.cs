@@ -33,15 +33,15 @@
 
 #define SPINE_SKELETONMECANIM
 
-using UnityEngine;
-using UnityEditor;
-using UnityEditorInternal;
+using Spine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.IO;
-using Spine;
+using UnityEditor;
+using UnityEditorInternal;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 
@@ -72,7 +72,7 @@ namespace Spine.Unity.Editor {
 	public static class SkeletonBaker {
 
 		#region SkeletonMecanim's Mecanim Clips
-		#if SPINE_SKELETONMECANIM
+#if SPINE_SKELETONMECANIM
 		public static void UpdateMecanimClips (SkeletonDataAsset skeletonDataAsset) {
 			if (skeletonDataAsset.controller == null)
 				return;
@@ -170,7 +170,7 @@ namespace Spine.Unity.Editor {
 		static bool HasFlag (this UnityEngine.Object o, HideFlags flagToCheck) {
 			return (o.hideFlags & flagToCheck) == flagToCheck;
 		}
-		#endif
+#endif
 		#endregion
 
 		#region Prefab and AnimationClip Baking
@@ -279,13 +279,13 @@ namespace Spine.Unity.Editor {
 				Object prefab = AssetDatabase.LoadAssetAtPath(prefabPath, typeof(GameObject));
 
 				if (prefab == null) {
-					#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 					GameObject emptyGameObject = new GameObject();
 					prefab = PrefabUtility.SaveAsPrefabAssetAndConnect(emptyGameObject, prefabPath, InteractionMode.AutomatedAction);
 					GameObject.DestroyImmediate(emptyGameObject);
-					#else
+#else
 					prefab = PrefabUtility.CreateEmptyPrefab(prefabPath);
-					#endif
+#endif
 					newPrefab = true;
 				}
 
@@ -432,22 +432,22 @@ namespace Spine.Unity.Editor {
 				}
 
 				if (newPrefab) {
-					#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 					PrefabUtility.SaveAsPrefabAssetAndConnect(prefabRoot, prefabPath, InteractionMode.AutomatedAction);
-					#else
+#else
 					PrefabUtility.ReplacePrefab(prefabRoot, prefab, ReplacePrefabOptions.ConnectToPrefab);
-					#endif
+#endif
 				} else {
 
 					foreach (string str in unusedMeshNames) {
 						Mesh.DestroyImmediate(meshTable[str], true);
 					}
 
-					#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 					PrefabUtility.SaveAsPrefabAssetAndConnect(prefabRoot, prefabPath, InteractionMode.AutomatedAction);
-					#else
+#else
 					PrefabUtility.ReplacePrefab(prefabRoot, prefab, ReplacePrefabOptions.ReplaceNameBased);
-					#endif
+#endif
 				}
 
 
@@ -532,7 +532,7 @@ namespace Spine.Unity.Editor {
 			mesh.vertices = verts;
 			mesh.uv = uvs;
 			mesh.triangles = triangles;
-			mesh.colors = new [] { color, color, color, color };
+			mesh.colors = new[] { color, color, color, color };
 			mesh.RecalculateBounds();
 			mesh.RecalculateNormals();
 			mesh.name = name;
@@ -740,9 +740,9 @@ namespace Spine.Unity.Editor {
 
 			return arr;
 		}
-#endregion
+		#endregion
 
-#region Animation Baking
+		#region Animation Baking
 		static AnimationClip ExtractAnimation (string name, SkeletonData skeletonData, Dictionary<int, List<string>> slotLookup, bool bakeIK, SendMessageOptions eventOptions, AnimationClip clip = null) {
 			var animation = skeletonData.FindAnimation(name);
 
@@ -1416,10 +1416,10 @@ namespace Spine.Unity.Editor {
 
 			return angle;
 		}
-#endregion
-#endregion
+		#endregion
+		#endregion
 
-#region Region Baking
+		#region Region Baking
 		public static GameObject BakeRegion (SpineAtlasAsset atlasAsset, AtlasRegion region, bool autoSave = true) {
 			atlasAsset.GetAtlas(); // Initializes atlasAsset.
 
@@ -1438,11 +1438,11 @@ namespace Spine.Unity.Editor {
 
 			if (prefab == null) {
 				root = EditorInstantiation.NewGameObject("temp", true, typeof(MeshFilter), typeof(MeshRenderer));
-				#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 				prefab = PrefabUtility.SaveAsPrefabAsset(root, bakedPrefabPath);
-				#else
+#else
 				prefab = PrefabUtility.CreatePrefab(bakedPrefabPath, root);
-				#endif
+#endif
 
 				isNewPrefab = true;
 				Object.DestroyImmediate(root);
@@ -1469,7 +1469,7 @@ namespace Spine.Unity.Editor {
 
 			return prefab;
 		}
-#endregion
+		#endregion
 
 		static string GetPath (BoneData b) {
 			return GetPathRecurse(b).Substring(1);

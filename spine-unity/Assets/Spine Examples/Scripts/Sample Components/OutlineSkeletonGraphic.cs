@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
 using Spine.Unity;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 
@@ -38,7 +38,7 @@ namespace Spine.Unity.Examples {
 		public Material materialWithoutOutline;
 		public Material materialWithOutline;
 
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		void Reset () {
 			skeletonGraphic = GetComponent<SkeletonGraphic>();
 
@@ -51,7 +51,7 @@ namespace Spine.Unity.Examples {
 				}
 			}
 		}
-		#endif
+#endif
 
 		void OnEnable () {
 			if (skeletonGraphic == null)
@@ -62,7 +62,7 @@ namespace Spine.Unity.Examples {
 			skeletonGraphic.material = materialWithOutline;
 		}
 
-		public void  DisableOutlineRendering () {
+		public void DisableOutlineRendering () {
 			skeletonGraphic.material = materialWithoutOutline;
 		}
 	}

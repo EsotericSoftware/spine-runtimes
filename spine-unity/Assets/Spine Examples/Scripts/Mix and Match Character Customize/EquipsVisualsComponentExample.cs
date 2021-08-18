@@ -27,11 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using Spine.Unity.AttachmentTools;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-using Spine.Unity.AttachmentTools;
 
 namespace Spine.Unity.Examples {
 	public class EquipsVisualsComponentExample : MonoBehaviour {
@@ -79,7 +78,7 @@ namespace Spine.Unity.Examples {
 			if (runtimeAtlas)
 				Destroy(runtimeAtlas);
 			var repackedSkin = collectedSkin.GetRepackedSkin("Repacked skin", skeletonAnimation.SkeletonDataAsset.atlasAssets[0].PrimaryMaterial,
-				out runtimeMaterial, out runtimeAtlas, maxAtlasSize : 1024, clearCache: false);
+				out runtimeMaterial, out runtimeAtlas, maxAtlasSize: 1024, clearCache: false);
 			collectedSkin.Clear();
 
 			// You can optionally clear the textures cache after each ore multiple repack operations are done.

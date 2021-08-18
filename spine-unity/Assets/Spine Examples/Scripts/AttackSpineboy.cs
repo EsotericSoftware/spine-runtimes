@@ -56,7 +56,7 @@ namespace Spine.Unity.Examples {
 				if (currentHealth > 0) {
 					spineboy.AnimationState.SetAnimation(0, hit, false);
 					spineboy.AnimationState.AddAnimation(0, idle, true, 0);
-					gauge.fillPercent = (float)currentHealth/(float)maxHealth;
+					gauge.fillPercent = (float)currentHealth / (float)maxHealth;
 					onAttack.Invoke();
 				} else {
 					if (currentHealth >= 0) {

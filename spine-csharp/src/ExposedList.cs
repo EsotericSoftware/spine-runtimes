@@ -298,7 +298,7 @@ namespace Spine {
 
 		private int GetLastIndex (int startIndex, int count, Predicate<T> match) {
 			// unlike FindLastIndex, takes regular params for search range
-			for (int i = startIndex + count; i != startIndex; )
+			for (int i = startIndex + count; i != startIndex;)
 				if (match(Items[--i]))
 					return i;
 			return -1;

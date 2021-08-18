@@ -272,7 +272,7 @@ namespace Spine {
 					}
 
 					// Determine curve containing position.
-					for (;; curve++) {
+					for (; ; curve++) {
 						float length = lengths[curve];
 						if (p > length) continue;
 						if (curve == 0)
@@ -383,7 +383,7 @@ namespace Spine {
 				}
 
 				// Determine curve containing position.
-				for (;; curve++) {
+				for (; ; curve++) {
 					float length = curves[curve];
 					if (p > length) continue;
 					if (curve == 0)
@@ -438,7 +438,7 @@ namespace Spine {
 
 				// Weight by segment length.
 				p *= curveLength;
-				for (;; segment++) {
+				for (; ; segment++) {
 					float length = segments[segment];
 					if (p > length) continue;
 					if (segment == 0)

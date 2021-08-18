@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using System.Collections;
 using Spine.Unity;
+using System.Collections;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 	public class Raptor : MonoBehaviour {

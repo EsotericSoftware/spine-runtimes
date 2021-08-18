@@ -29,9 +29,9 @@
 
 // Contributed by: Mitch Thompson
 
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 	[RequireComponent(typeof(SkeletonRenderer))]
@@ -437,7 +437,7 @@ namespace Spine.Unity.Examples {
 			return colliders;
 		}
 
-		public class LayerFieldAttribute : PropertyAttribute {}
+		public class LayerFieldAttribute : PropertyAttribute { }
 	}
 
 }

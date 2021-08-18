@@ -27,10 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System;
-using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.IO;
 
 namespace Spine {
 	public class XnaTextureLoader : TextureLoader {
@@ -65,8 +65,7 @@ namespace Spine {
 
 			if (textureLayerSuffixes == null) {
 				page.rendererObject = texture;
-			}
-			else {
+			} else {
 				Texture2D[] textureLayersArray = new Texture2D[textureLayerSuffixes.Length];
 				textureLayersArray[0] = texture;
 				for (int layer = 1; layer < textureLayersArray.Length; ++layer) {

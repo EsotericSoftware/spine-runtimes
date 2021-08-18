@@ -32,16 +32,16 @@
 #endif
 #define SPINE_OPTIONAL_RENDEROVERRIDE
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity {
 
-	#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 	[ExecuteAlways]
-	#else
+#else
 	[ExecuteInEditMode]
-	#endif
+#endif
 	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonRenderSeparator")]
 	public class SkeletonRenderSeparator : MonoBehaviour {
 		public const int DefaultSortingOrderIncrement = 5;
@@ -52,10 +52,10 @@ namespace Spine.Unity {
 		public SkeletonRenderer SkeletonRenderer {
 			get { return skeletonRenderer; }
 			set {
-				#if SPINE_OPTIONAL_RENDEROVERRIDE
+#if SPINE_OPTIONAL_RENDEROVERRIDE
 				if (skeletonRenderer != null)
 					skeletonRenderer.GenerateMeshOverride -= HandleRender;
-				#endif
+#endif
 
 				skeletonRenderer = value;
 				if (value == null)
@@ -69,12 +69,12 @@ namespace Spine.Unity {
 		public bool copyMeshRendererFlags = true;
 		public List<Spine.Unity.SkeletonPartsRenderer> partsRenderers = new List<SkeletonPartsRenderer>();
 
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		void Reset () {
 			if (skeletonRenderer == null)
 				skeletonRenderer = GetComponent<SkeletonRenderer>();
 		}
-		#endif
+#endif
 		#endregion
 
 		#region Callback Delegates
@@ -119,14 +119,14 @@ namespace Spine.Unity {
 
 			srs.OnEnable();
 
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			// Make sure editor updates properly in edit mode.
 			if (!Application.isPlaying) {
 				skeletonRenderer.enabled = false;
 				skeletonRenderer.enabled = true;
 				skeletonRenderer.LateUpdate();
 			}
-			#endif
+#endif
 
 			return srs;
 		}
@@ -161,10 +161,10 @@ namespace Spine.Unity {
 			if (copiedBlock == null) copiedBlock = new MaterialPropertyBlock();
 			mainMeshRenderer = skeletonRenderer.GetComponent<MeshRenderer>();
 
-			#if SPINE_OPTIONAL_RENDEROVERRIDE
+#if SPINE_OPTIONAL_RENDEROVERRIDE
 			skeletonRenderer.GenerateMeshOverride -= HandleRender;
 			skeletonRenderer.GenerateMeshOverride += HandleRender;
-			#endif
+#endif
 
 			if (copyMeshRendererFlags) {
 				var lightProbeUsage = mainMeshRenderer.lightProbeUsage;
@@ -191,9 +191,9 @@ namespace Spine.Unity {
 
 		public void OnDisable () {
 			if (skeletonRenderer == null) return;
-			#if SPINE_OPTIONAL_RENDEROVERRIDE
+#if SPINE_OPTIONAL_RENDEROVERRIDE
 			skeletonRenderer.GenerateMeshOverride -= HandleRender;
-			#endif
+#endif
 
 			skeletonRenderer.LateUpdate();
 

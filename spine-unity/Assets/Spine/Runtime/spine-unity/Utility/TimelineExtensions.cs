@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity.AnimationTools {
 	public static class TimelineExtensions {
@@ -44,29 +44,28 @@ namespace Spine.Unity.AnimationTools {
 			float x, y;
 			int i = TranslateTimeline.Search(frames, time, TranslateTimeline.ENTRIES), curveType = (int)timeline.curves[i / TranslateTimeline.ENTRIES];
 			switch (curveType) {
-				case TranslateTimeline.LINEAR:
-					float before = frames[i];
-					x = frames[i + TranslateTimeline.VALUE1];
-					y = frames[i + TranslateTimeline.VALUE2];
-					float t = (time - before) / (frames[i + TranslateTimeline.ENTRIES] - before);
-					x += (frames[i + TranslateTimeline.ENTRIES + TranslateTimeline.VALUE1] - x) * t;
-					y += (frames[i + TranslateTimeline.ENTRIES + TranslateTimeline.VALUE2] - y) * t;
-					break;
-				case TranslateTimeline.STEPPED:
-					x = frames[i + TranslateTimeline.VALUE1];
-					y = frames[i + TranslateTimeline.VALUE2];
-					break;
-				default:
-					x = timeline.GetBezierValue(time, i, TranslateTimeline.VALUE1, curveType - TranslateTimeline.BEZIER);
-					y = timeline.GetBezierValue(time, i, TranslateTimeline.VALUE2, curveType + TranslateTimeline.BEZIER_SIZE - TranslateTimeline.BEZIER);
-					break;
+			case TranslateTimeline.LINEAR:
+				float before = frames[i];
+				x = frames[i + TranslateTimeline.VALUE1];
+				y = frames[i + TranslateTimeline.VALUE2];
+				float t = (time - before) / (frames[i + TranslateTimeline.ENTRIES] - before);
+				x += (frames[i + TranslateTimeline.ENTRIES + TranslateTimeline.VALUE1] - x) * t;
+				y += (frames[i + TranslateTimeline.ENTRIES + TranslateTimeline.VALUE2] - y) * t;
+				break;
+			case TranslateTimeline.STEPPED:
+				x = frames[i + TranslateTimeline.VALUE1];
+				y = frames[i + TranslateTimeline.VALUE2];
+				break;
+			default:
+				x = timeline.GetBezierValue(time, i, TranslateTimeline.VALUE1, curveType - TranslateTimeline.BEZIER);
+				y = timeline.GetBezierValue(time, i, TranslateTimeline.VALUE2, curveType + TranslateTimeline.BEZIER_SIZE - TranslateTimeline.BEZIER);
+				break;
 			}
 
 			Vector2 xy = new Vector2(x, y);
 			if (skeletonData == null) {
 				return xy;
-			}
-			else {
+			} else {
 				var boneData = skeletonData.bones.Items[timeline.BoneIndex];
 				return xy + new Vector2(boneData.x, boneData.y);
 			}

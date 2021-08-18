@@ -47,7 +47,7 @@ namespace Spine {
 		BasicEffect effect;
 		public BasicEffect Effect { get { return effect; } set { effect = value; } }
 
-		public ShapeRenderer(GraphicsDevice device) {
+		public ShapeRenderer (GraphicsDevice device) {
 			this.device = device;
 			this.effect = new BasicEffect(device);
 			effect.World = Matrix.Identity;
@@ -56,27 +56,27 @@ namespace Spine {
 			effect.VertexColorEnabled = true;
 		}
 
-		public void SetColor(Color color) {
+		public void SetColor (Color color) {
 			this.color = color;
 		}
 
-		public void Begin() {
+		public void Begin () {
 			device.RasterizerState = new RasterizerState();
 			device.BlendState = BlendState.AlphaBlend;
 		}
 
-		public void Line(float x1, float y1, float x2, float y2) {
+		public void Line (float x1, float y1, float x2, float y2) {
 			vertices.Add(new VertexPositionColor(new Vector3(x1, y1, 0), color));
 			vertices.Add(new VertexPositionColor(new Vector3(x2, y2, 0), color));
 		}
 
 		/** Calls {@link #circle(float, float, float, int)} by estimating the number of segments needed for a smooth circle. */
-		public void Circle(float x, float y, float radius) {
+		public void Circle (float x, float y, float radius) {
 			Circle(x, y, radius, Math.Max(1, (int)(6 * (float)Math.Pow(radius, 1.0f / 3.0f))));
 		}
 
 		/** Draws a circle using {@link ShapeType#Line} or {@link ShapeType#Filled}. */
-		public void Circle(float x, float y, float radius, int segments) {
+		public void Circle (float x, float y, float radius, int segments) {
 			if (segments <= 0) throw new ArgumentException("segments must be > 0.");
 			float angle = 2 * MathUtils.PI / segments;
 			float cos = MathUtils.Cos(angle);
@@ -99,7 +99,7 @@ namespace Spine {
 			vertices.Add(new VertexPositionColor(new Vector3(x + cx, y + cy, 0), color));
 		}
 
-		public void Triangle(float x1, float y1, float x2, float y2, float x3, float y3) {
+		public void Triangle (float x1, float y1, float x2, float y2, float x3, float y3) {
 			vertices.Add(new VertexPositionColor(new Vector3(x1, y1, 0), color));
 			vertices.Add(new VertexPositionColor(new Vector3(x2, y2, 0), color));
 
@@ -110,13 +110,13 @@ namespace Spine {
 			vertices.Add(new VertexPositionColor(new Vector3(x1, y1, 0), color));
 		}
 
-		public void X(float x, float y, float len) {
+		public void X (float x, float y, float len) {
 			Line(x + len, y + len, x - len, y - len);
 			Line(x - len, y + len, x + len, y - len);
 		}
 
-		public void Polygon(float[] polygonVertices, int offset, int count) {
-			if (count< 3) throw new ArgumentException("Polygon must contain at least 3 vertices");
+		public void Polygon (float[] polygonVertices, int offset, int count) {
+			if (count < 3) throw new ArgumentException("Polygon must contain at least 3 vertices");
 
 			offset <<= 1;
 
@@ -143,14 +143,14 @@ namespace Spine {
 			}
 		}
 
-		public void Rect(float x, float y, float width, float height) {
+		public void Rect (float x, float y, float width, float height) {
 			Line(x, y, x + width, y);
 			Line(x + width, y, x + width, y + height);
 			Line(x + width, y + height, x, y + height);
 			Line(x, y + height, x, y);
 		}
 
-		public void End() {
+		public void End () {
 			if (vertices.Count == 0) return;
 			var verticesArray = vertices.ToArray();
 

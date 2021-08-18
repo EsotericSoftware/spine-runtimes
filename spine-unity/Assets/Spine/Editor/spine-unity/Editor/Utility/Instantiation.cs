@@ -31,14 +31,14 @@
 
 #define SPINE_SKELETONMECANIM
 
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Linq;
 using System.Reflection;
-using System.Globalization;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	using EventType = UnityEngine.EventType;
@@ -155,8 +155,7 @@ namespace Spine.Unity.Editor {
 				if (isUI) {
 					if (usedParent != null && usedParent.GetComponent<RectTransform>() != null) {
 						((SkeletonGraphic)newSkeletonComponent).MatchRectTransformWithBounds();
-					}
-					else
+					} else
 						Debug.Log("Created a UI Skeleton GameObject not under a RectTransform. It may not be visible until you parent it to a canvas.");
 				}
 

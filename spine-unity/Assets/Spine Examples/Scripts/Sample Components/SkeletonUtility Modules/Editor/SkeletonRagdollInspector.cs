@@ -29,8 +29,8 @@
 
 // Contributed by: Mitch Thompson
 
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 

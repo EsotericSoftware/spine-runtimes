@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using Spine.Unity.AttachmentTools;
 using System.Collections.Generic;
 using UnityEngine;
-using Spine.Unity.AttachmentTools;
 
 namespace Spine.Unity.Examples {
 
@@ -77,7 +77,7 @@ namespace Spine.Unity.Examples {
 			UpdateCombinedSkin();
 		}
 
-		public void NextHairSkin() {
+		public void NextHairSkin () {
 			activeHairIndex = (activeHairIndex + 1) % hairSkins.Length;
 			UpdateCharacterSkin();
 			UpdateCombinedSkin();
@@ -113,22 +113,22 @@ namespace Spine.Unity.Examples {
 			UpdateCombinedSkin();
 		}
 
-		public void Equip(string itemSkin, ItemType itemType) {
+		public void Equip (string itemSkin, ItemType itemType) {
 			switch (itemType) {
-				case ItemType.Cloth:
-					clothesSkin = itemSkin;
-					break;
-				case ItemType.Pants:
-					pantsSkin = itemSkin;
-					break;
-				case ItemType.Bag:
-					bagSkin = itemSkin;
-					break;
-				case ItemType.Hat:
-					hatSkin = itemSkin;
-					break;
-				default:
-					break;
+			case ItemType.Cloth:
+				clothesSkin = itemSkin;
+				break;
+			case ItemType.Pants:
+				pantsSkin = itemSkin;
+				break;
+			case ItemType.Bag:
+				bagSkin = itemSkin;
+				break;
+			case ItemType.Hat:
+				hatSkin = itemSkin;
+				break;
+			default:
+				break;
 			}
 			UpdateCombinedSkin();
 		}

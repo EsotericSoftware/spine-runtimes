@@ -31,8 +31,8 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 
@@ -42,8 +42,7 @@ namespace Spine.Unity.Examples {
 	[ExecuteInEditMode]
 #endif
 	[RequireComponent(typeof(MeshRenderer)), RequireComponent(typeof(MeshFilter))]
-	public class RenderExistingMesh : MonoBehaviour
-	{
+	public class RenderExistingMesh : MonoBehaviour {
 		public MeshRenderer referenceRenderer;
 
 		bool updateViaSkeletonCallback = false;
@@ -101,21 +100,21 @@ namespace Spine.Unity.Examples {
 			InitializeDict();
 		}
 
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		private void Update () {
 			if (!Application.isPlaying) {
 				InitializeDict();
 			}
 		}
-		#endif
+#endif
 
 		void LateUpdate () {
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (!Application.isPlaying) {
 				UpdateMaterials();
 				return;
 			}
-			#endif
+#endif
 
 			if (updateViaSkeletonCallback)
 				return;

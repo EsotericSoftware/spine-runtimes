@@ -38,7 +38,7 @@ namespace Spine.Unity {
 	/// </summary>
 	[RequireComponent(typeof(Rigidbody))]
 	public class FollowLocationRigidbody : MonoBehaviour {
-	
+
 		public Transform reference;
 		Rigidbody ownRigidbody;
 

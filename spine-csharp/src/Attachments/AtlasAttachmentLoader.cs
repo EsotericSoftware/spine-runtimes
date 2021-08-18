@@ -89,7 +89,7 @@ namespace Spine {
 			return new PointAttachment(name);
 		}
 
-		public ClippingAttachment NewClippingAttachment(Skin skin, string name) {
+		public ClippingAttachment NewClippingAttachment (Skin skin, string name) {
 			return new ClippingAttachment(name);
 		}
 

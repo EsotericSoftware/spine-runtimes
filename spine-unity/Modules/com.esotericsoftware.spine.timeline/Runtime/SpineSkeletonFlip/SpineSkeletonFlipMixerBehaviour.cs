@@ -31,12 +31,11 @@
 #define PLAYABLE_DIRECTOR_HAS_STOPPED_EVENT
 #endif
 
+using Spine.Unity;
 using System;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
-
-using Spine.Unity;
 
 namespace Spine.Unity.Playables {
 	public class SpineSkeletonFlipMixerBehaviour : PlayableBehaviour {

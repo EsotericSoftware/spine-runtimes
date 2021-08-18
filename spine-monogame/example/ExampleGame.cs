@@ -27,10 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace Spine {
 
@@ -40,19 +40,19 @@ namespace Spine {
 		private MouseState lastMouseState;
 		protected Boolean mouseClicked = false;
 
-		public Screen(Example game) {
+		public Screen (Example game) {
 			this.game = game;
 			skeletonRenderer = new SkeletonRenderer(game.GraphicsDevice);
 			skeletonRenderer.PremultipliedAlpha = false;
 		}
 
-		public void UpdateInput() {
+		public void UpdateInput () {
 			MouseState state = Mouse.GetState();
 			mouseClicked = lastMouseState.LeftButton == ButtonState.Pressed && state.LeftButton == ButtonState.Released;
 			lastMouseState = state;
 		}
 
-		public abstract void Render(float deltaTime);
+		public abstract void Render (float deltaTime);
 	}
 
 	/// <summary>
@@ -63,7 +63,7 @@ namespace Spine {
 		Skeleton skeleton;
 		AnimationState state;
 
-		public RaptorScreen(Example game) : base (game) {
+		public RaptorScreen (Example game) : base(game) {
 			// Load the texture atlas
 			atlas = new Atlas("data/raptor.atlas", new XnaTextureLoader(game.GraphicsDevice));
 
@@ -85,7 +85,7 @@ namespace Spine {
 			state.SetAnimation(0, "walk", true);
 		}
 
-		public override void Render(float deltaTime) {
+		public override void Render (float deltaTime) {
 			// Update the animation state and apply the animations
 			// to the skeleton
 			state.Update(deltaTime);
@@ -116,7 +116,7 @@ namespace Spine {
 		Skeleton skeleton;
 		AnimationState state;
 
-		public TankScreen(Example game) : base(game) {
+		public TankScreen (Example game) : base(game) {
 			// Instantiate and configure the two color tinting effect and
 			// assign it to the skeleton renderer
 			var twoColorTintEffect = game.Content.Load<Effect>("Content\\SpineEffect");
@@ -140,7 +140,7 @@ namespace Spine {
 			state.SetAnimation(0, "shoot", true);
 		}
 
-		public override void Render(float deltaTime) {
+		public override void Render (float deltaTime) {
 			state.Update(deltaTime);
 			state.Apply(skeleton);
 
@@ -169,7 +169,7 @@ namespace Spine {
 		Skeleton skeleton;
 		AnimationState state;
 
-		public SpineboyScreen(Example game) : base(game) {
+		public SpineboyScreen (Example game) : base(game) {
 			atlas = new Atlas("data/spineboy.atlas", new XnaTextureLoader(game.GraphicsDevice));
 
 			SkeletonBinary binary = new SkeletonBinary(atlas);
@@ -197,7 +197,7 @@ namespace Spine {
 			state.AddAnimation(0, "run", true, 0);
 		}
 
-		public override void Render(float deltaTime) {
+		public override void Render (float deltaTime) {
 			state.Update(deltaTime);
 			state.Apply(skeleton);
 			skeleton.UpdateWorldTransform();
@@ -223,7 +223,7 @@ namespace Spine {
 		Skeleton skeleton;
 		AnimationState state;
 
-		public MixAndMatchScreen(Example game) : base(game) {
+		public MixAndMatchScreen (Example game) : base(game) {
 			atlas = new Atlas("data/mix-and-match.atlas", new XnaTextureLoader(game.GraphicsDevice));
 
 			SkeletonJson json = new SkeletonJson(atlas);
@@ -256,7 +256,7 @@ namespace Spine {
 			skeleton.SetSkin(mixAndMatchSkin);
 		}
 
-		public override void Render(float deltaTime) {
+		public override void Render (float deltaTime) {
 			state.Update(deltaTime);
 			state.Apply(skeleton);
 			skeleton.UpdateWorldTransform();
@@ -276,7 +276,7 @@ namespace Spine {
 		GraphicsDeviceManager graphics;
 		public Screen currentScreen;
 
-		public Example() {
+		public Example () {
 			IsMouseVisible = true;
 
 			graphics = new GraphicsDeviceManager(this);
@@ -285,15 +285,15 @@ namespace Spine {
 			graphics.PreferredBackBufferHeight = 600;
 		}
 
-		protected override void LoadContent() {
+		protected override void LoadContent () {
 			currentScreen = new MixAndMatchScreen(this);
 		}
 
-		protected override void Update(GameTime gameTime) {
+		protected override void Update (GameTime gameTime) {
 			currentScreen.UpdateInput();
 		}
 
-		protected override void Draw(GameTime gameTime) {
+		protected override void Draw (GameTime gameTime) {
 			currentScreen.Render((float)(gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0));
 		}
 	}

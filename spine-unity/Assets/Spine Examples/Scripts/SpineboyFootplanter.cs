@@ -27,18 +27,17 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using Spine;
+using Spine.Unity;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-using Spine;
-using Spine.Unity;
 
 namespace Spine.Unity.Examples {
 	public class SpineboyFootplanter : MonoBehaviour {
 
 		public float timeScale = 0.5f;
-		[SpineBone]	public string nearBoneName, farBoneName;
+		[SpineBone] public string nearBoneName, farBoneName;
 
 		[Header("Settings")]
 		public Vector2 footSize;
@@ -147,7 +146,7 @@ namespace Spine.Unity.Examples {
 
 			// Default starting positions.
 			nearFoot.worldPos = tpos;
-			nearFoot.worldPos .x -= comfyDistance;
+			nearFoot.worldPos.x -= comfyDistance;
 			nearFoot.worldPosPrev = nearFoot.worldPosNext = nearFoot.worldPos;
 
 			farFoot.worldPos = tpos;

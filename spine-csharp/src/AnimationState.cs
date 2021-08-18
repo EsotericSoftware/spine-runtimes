@@ -73,7 +73,7 @@ namespace Spine {
 		/// out position.
 		internal const int HoldMix = 4;
 
-		internal const int Setup = 1,  Current = 2;
+		internal const int Setup = 1, Current = 2;
 
 		protected AnimationStateData data;
 		private readonly ExposedList<TrackEntry> tracks = new ExposedList<TrackEntry>();
@@ -510,15 +510,15 @@ namespace Spine {
 			float r1, r2;
 			if (time < frames[0]) { // Time is before first frame.
 				switch (blend) {
-					case MixBlend.Setup:
-						bone.rotation = bone.data.rotation;
-						goto default; // Fall through.
-					default:
-						return;
-					case MixBlend.First:
-						r1 = bone.rotation;
-						r2 = bone.data.rotation;
-						break;
+				case MixBlend.Setup:
+					bone.rotation = bone.data.rotation;
+					goto default; // Fall through.
+				default:
+					return;
+				case MixBlend.First:
+					r1 = bone.rotation;
+					r2 = bone.data.rotation;
+					break;
 				}
 			} else {
 				r1 = blend == MixBlend.Setup ? bone.data.rotation : bone.rotation;
@@ -590,7 +590,7 @@ namespace Spine {
 		/// <para>
 		/// It may be desired to use <see cref="AnimationState.SetEmptyAnimations(float)"/> to mix the skeletons back to the setup pose,
 		/// rather than leaving them in their current pose.</para>
-		 /// </summary>
+		/// </summary>
 		public void ClearTracks () {
 			bool oldDrainDisabled = queue.drainDisabled;
 			queue.drainDisabled = true;
@@ -896,7 +896,7 @@ namespace Spine {
 					}
 					timelineMode[i] = AnimationState.HoldFirst;
 				}
-				continue_outer: {}
+				continue_outer: { }
 			}
 		}
 

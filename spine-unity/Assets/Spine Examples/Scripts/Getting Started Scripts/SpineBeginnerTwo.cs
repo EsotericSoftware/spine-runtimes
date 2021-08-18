@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using System.Collections;
 using Spine.Unity;
+using System.Collections;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 	public class SpineBeginnerTwo : MonoBehaviour {
@@ -92,7 +92,7 @@ namespace Spine.Unity.Examples {
 				spineAnimationState.AddAnimation(0, idleAnimationName, true, 0);
 				yield return new WaitForSeconds(1f);
 
-				skeleton.ScaleX = -1;		// skeleton allows you to flip the skeleton.
+				skeleton.ScaleX = -1;       // skeleton allows you to flip the skeleton.
 				spineAnimationState.SetAnimation(0, idleTurnAnimationName, false);
 				spineAnimationState.AddAnimation(0, idleAnimationName, true, 0);
 				yield return new WaitForSeconds(0.5f);

@@ -43,7 +43,7 @@ namespace Spine {
 		internal ExposedList<IkConstraintData> ikConstraints = new ExposedList<IkConstraintData>();
 		internal ExposedList<TransformConstraintData> transformConstraints = new ExposedList<TransformConstraintData>();
 		internal ExposedList<PathConstraintData> pathConstraints = new ExposedList<PathConstraintData>();
-		internal float x , y, width, height;
+		internal float x, y, width, height;
 		internal string version, hash;
 
 		// Nonessential.

@@ -118,10 +118,10 @@ namespace Spine.Unity.Playables {
 			var state = animationStateComponent.AnimationState;
 
 			if (!Application.isPlaying) {
-				#if SPINE_EDITMODEPOSE
+#if SPINE_EDITMODEPOSE
 				PreviewEditModePose(playable, skeletonComponent, animationStateComponent,
 					skeletonAnimation, skeletonGraphic);
-				#endif
+#endif
 				return;
 			}
 
@@ -180,8 +180,7 @@ namespace Spine.Unity.Playables {
 					if (skeletonAnimation) {
 						skeletonAnimation.Update(0);
 						skeletonAnimation.LateUpdate();
-					}
-					else if (skeletonGraphic) {
+					} else if (skeletonGraphic) {
 						skeletonGraphic.Update(0);
 						skeletonGraphic.LateUpdate();
 					}
@@ -192,7 +191,7 @@ namespace Spine.Unity.Playables {
 			this.lastAnyTrackPlaying = anyTrackPlaying;
 		}
 
-		#if SPINE_EDITMODEPOSE
+#if SPINE_EDITMODEPOSE
 
 		AnimationState dummyAnimationState;
 
@@ -290,7 +289,7 @@ namespace Spine.Unity.Playables {
 			// Do nothing outside of the first clip and the last clip.
 
 		}
-		#endif
+#endif
 
 	}
 

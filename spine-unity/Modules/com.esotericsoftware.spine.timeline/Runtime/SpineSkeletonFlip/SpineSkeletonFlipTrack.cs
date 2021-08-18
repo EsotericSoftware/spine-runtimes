@@ -27,12 +27,11 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using Spine.Unity;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
-using System.Collections.Generic;
-
-using Spine.Unity;
 
 namespace Spine.Unity.Playables {
 

@@ -38,7 +38,7 @@ namespace Spine.Unity.Examples {
 		[Range(0, 100)]
 		public int count = 20;
 
-		[SpineAnimation(dataField:"skeletonDataAsset")]
+		[SpineAnimation(dataField: "skeletonDataAsset")]
 		public string startingAnimation;
 
 		IEnumerator Start () {
@@ -51,7 +51,7 @@ namespace Spine.Unity.Examples {
 				var sa = SkeletonAnimation.NewSkeletonAnimationGameObject(skeletonDataAsset); // Spawn a new SkeletonAnimation GameObject.
 				DoExtraStuff(sa, spineAnimation); // optional stuff for fun.
 				sa.gameObject.name = i.ToString();
-				yield return new WaitForSeconds(1f/8f);
+				yield return new WaitForSeconds(1f / 8f);
 			}
 
 		}

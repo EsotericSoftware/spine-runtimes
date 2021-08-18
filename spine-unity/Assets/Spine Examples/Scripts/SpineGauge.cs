@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
 using Spine.Unity;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 	[ExecuteInEditMode]
@@ -36,7 +36,7 @@ namespace Spine.Unity.Examples {
 	public class SpineGauge : MonoBehaviour {
 
 		#region Inspector
-		[Range(0,1)]
+		[Range(0, 1)]
 		public float fillPercent = 0;
 		public AnimationReferenceAsset fillAnimation;
 		#endregion

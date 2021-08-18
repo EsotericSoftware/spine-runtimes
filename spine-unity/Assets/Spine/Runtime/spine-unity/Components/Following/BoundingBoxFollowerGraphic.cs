@@ -31,16 +31,16 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity {
 
-	#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 	[ExecuteAlways]
-	#else
+#else
 	[ExecuteInEditMode]
-	#endif
+#endif
 	[HelpURL("http://esotericsoftware.com/spine-unity#BoundingBoxFollowerGraphic")]
 	public class BoundingBoxFollowerGraphic : MonoBehaviour {
 		internal static bool DebugMessages = true;
@@ -99,11 +99,11 @@ namespace Spine.Unity {
 			// Don't reinitialize if the setup did not change.
 			if (!overwrite
 				&&
-				colliderTable.Count > 0 && slot != null			// Slot is set and colliders already populated.
+				colliderTable.Count > 0 && slot != null         // Slot is set and colliders already populated.
 				&&
-				skeletonGraphic.Skeleton == slot.Skeleton		// Skeleton object did not change.
+				skeletonGraphic.Skeleton == slot.Skeleton       // Skeleton object did not change.
 				&&
-				slotName == slot.data.name						// Slot object did not change.
+				slotName == slot.data.name                      // Slot object did not change.
 			)
 				return;
 
@@ -211,7 +211,7 @@ namespace Spine.Unity {
 						DestroyImmediate(collider);
 					else
 #endif
-						Destroy(collider);
+					Destroy(collider);
 				}
 			}
 		}

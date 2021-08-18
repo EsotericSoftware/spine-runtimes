@@ -38,7 +38,7 @@ namespace Spine.Unity {
 	/// </summary>
 	[RequireComponent(typeof(Rigidbody2D))]
 	public class FollowLocationRigidbody2D : MonoBehaviour {
-	
+
 		public Transform reference;
 		public bool followFlippedX;
 		Rigidbody2D ownRigidbody;
@@ -50,8 +50,7 @@ namespace Spine.Unity {
 		void FixedUpdate () {
 			if (followFlippedX) {
 				ownRigidbody.rotation = ((-reference.rotation.eulerAngles.z + 270f) % 360f) - 90f;
-			}
-			else
+			} else
 				ownRigidbody.rotation = reference.rotation.eulerAngles.z;
 			ownRigidbody.position = reference.position;
 		}

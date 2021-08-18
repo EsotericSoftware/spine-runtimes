@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
 using Spine;
 using Spine.Unity;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 	public class Goblins : MonoBehaviour {

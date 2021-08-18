@@ -27,10 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using UnityEditor;
 using Spine.Unity;
-
+using UnityEditor;
+using UnityEngine;
 using SpineInspectorUtility = Spine.Unity.Editor.SpineInspectorUtility;
 
 public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
@@ -528,17 +527,15 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 					eBlendMode blendMode = GetMaterialBlendMode(material);
 
 					switch (blendMode) {
-					case eBlendMode.Opaque:
-						{
-							SetRenderType(material, "Opaque", useCustomRenderType);
-						}
-						break;
-					default:
-						{
-							bool zWrite = HasZWriteEnabled(material);
-							SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderType);
-						}
-						break;
+					case eBlendMode.Opaque: {
+						SetRenderType(material, "Opaque", useCustomRenderType);
+					}
+					break;
+					default: {
+						bool zWrite = HasZWriteEnabled(material);
+						SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderType);
+					}
+					break;
 					}
 				}
 			}
@@ -942,14 +939,13 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 			case eNormalsMode.FixedNormalsModelSpace:
 				renderType = "SpriteModelSpaceFixedNormal";
 				break;
-			case eNormalsMode.MeshNormals:
-				{
-					//If sprite doesn't write to depth assign custom render type so we can write its depth with soft edges
-					if (!zWrite) {
-						renderType = "Sprite";
-					}
+			case eNormalsMode.MeshNormals: {
+				//If sprite doesn't write to depth assign custom render type so we can write its depth with soft edges
+				if (!zWrite) {
+					renderType = "Sprite";
 				}
-				break;
+			}
+			break;
 			}
 		}
 
@@ -1014,8 +1010,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		foreach (Material material in editor.targets) {
 			if (material.shader.name == shaderType) {
 				isAnyTargetTypeShader = true;
-			}
-			else if (isAnyTargetTypeShader) {
+			} else if (isAnyTargetTypeShader) {
 				mixedValue = true;
 			}
 		}
@@ -1040,21 +1035,16 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		if (material.shader.name == kShaderPixelLit ||
 			material.shader.name == kShaderPixelLitOutline) {
 			return eLightMode.PixelLit;
-		}
-		else if (material.shader.name == kShaderUnlit ||
-				material.shader.name == kShaderUnlitOutline) {
+		} else if (material.shader.name == kShaderUnlit ||
+				  material.shader.name == kShaderUnlitOutline) {
 			return eLightMode.Unlit;
-		}
-		else if (material.shader.name == kShaderLitLW) {
+		} else if (material.shader.name == kShaderLitLW) {
 			return eLightMode.LitLightweight;
-		}
-		else if (material.shader.name == kShaderLitURP) {
+		} else if (material.shader.name == kShaderLitURP) {
 			return eLightMode.LitUniversal;
-		}
-		else if (material.shader.name == kShaderLitURP2D) {
+		} else if (material.shader.name == kShaderLitURP2D) {
 			return eLightMode.LitUniversal2D;
-		}
-		else { // if (material.shader.name == kShaderVertexLit || kShaderVertexLitOutline)
+		} else { // if (material.shader.name == kShaderVertexLit || kShaderVertexLitOutline)
 			return eLightMode.VertexLit;
 		}
 	}
@@ -1091,59 +1081,53 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 		bool useCustomRenderQueue = material.GetFloat("_CustomRenderQueue") > 0.0f;
 
 		switch (blendMode) {
-		case eBlendMode.Opaque:
-			{
-				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
-				SetRenderType(material, "Opaque", useCustomRenderQueue);
-				renderQueue = kSolidQueue;
-			}
-			break;
-		case eBlendMode.Additive:
-			{
-				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
-				bool zWrite = HasZWriteEnabled(material);
-				SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
-				renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
-			}
-			break;
-		case eBlendMode.SoftAdditive:
-			{
-				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcColor);
-				bool zWrite = HasZWriteEnabled(material);
-				SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
-				renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
-			}
-			break;
-		case eBlendMode.Multiply:
-			{
-				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
-				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.SrcColor);
-				bool zWrite = HasZWriteEnabled(material);
-				SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
-				renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
-			}
-			break;
-		case eBlendMode.Multiplyx2:
-			{
-				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.DstColor);
-				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.SrcColor);
-				bool zWrite = HasZWriteEnabled(material);
-				SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
-				renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
-			}
-			break;
-		default:
-			{
-				material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
-				material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-				bool zWrite = HasZWriteEnabled(material);
-				SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
-				renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
-			}
-			break;
+		case eBlendMode.Opaque: {
+			material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+			material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+			SetRenderType(material, "Opaque", useCustomRenderQueue);
+			renderQueue = kSolidQueue;
+		}
+		break;
+		case eBlendMode.Additive: {
+			material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+			material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
+			bool zWrite = HasZWriteEnabled(material);
+			SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
+			renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
+		}
+		break;
+		case eBlendMode.SoftAdditive: {
+			material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+			material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcColor);
+			bool zWrite = HasZWriteEnabled(material);
+			SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
+			renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
+		}
+		break;
+		case eBlendMode.Multiply: {
+			material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+			material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.SrcColor);
+			bool zWrite = HasZWriteEnabled(material);
+			SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
+			renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
+		}
+		break;
+		case eBlendMode.Multiplyx2: {
+			material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.DstColor);
+			material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.SrcColor);
+			bool zWrite = HasZWriteEnabled(material);
+			SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
+			renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
+		}
+		break;
+		default: {
+			material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+			material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+			bool zWrite = HasZWriteEnabled(material);
+			SetRenderType(material, zWrite ? "TransparentCutout" : "Transparent", useCustomRenderQueue);
+			renderQueue = zWrite ? kAlphaTestQueue : kTransparentQueue;
+		}
+		break;
 		}
 
 		material.renderQueue = renderQueue + material.GetInt("_RenderQueue");
@@ -1209,8 +1193,7 @@ public class SpineSpriteShaderGUI : SpineShaderWithOutlineGUI {
 	static bool HasZWriteEnabled (Material material) {
 		if (material.HasProperty("_ZWrite")) {
 			return material.GetFloat("_ZWrite") > 0.0f;
-		}
-		else return true; // Pixel Lit shader always has _ZWrite enabled.
+		} else return true; // Pixel Lit shader always has _ZWrite enabled.
 	}
 	#endregion
 }

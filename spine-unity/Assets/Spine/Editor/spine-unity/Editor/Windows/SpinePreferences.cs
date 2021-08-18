@@ -35,26 +35,26 @@
 #define NEW_PREFERENCES_SETTINGS_PROVIDER
 #endif
 
-using UnityEngine;
-using UnityEditor;
 using System.Threading;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 
 	public class SpinePreferences : ScriptableObject {
 
-		#if NEW_PREFERENCES_SETTINGS_PROVIDER
+#if NEW_PREFERENCES_SETTINGS_PROVIDER
 		static int wasPreferencesDirCreated = 0;
 		static int wasPreferencesAssetCreated = 0;
-		#endif
+#endif
 
 		public const string SPINE_SETTINGS_ASSET_PATH = "Assets/Editor/SpineSettings.asset";
 
-		#if SPINE_TK2D
+#if SPINE_TK2D
 		internal const float DEFAULT_DEFAULT_SCALE = 1f;
-		#else
+#else
 		internal const float DEFAULT_DEFAULT_SCALE = 0.01f;
-		#endif
+#endif
 		public float defaultScale = DEFAULT_DEFAULT_SCALE;
 
 		internal const float DEFAULT_DEFAULT_MIX = 0.2f;
@@ -83,7 +83,7 @@ namespace Spine.Unity.Editor {
 				return IsPMAWorkflow(textureSettingsReference);
 			}
 		}
-		public static bool IsPMAWorkflow(string textureSettingsReference) {
+		public static bool IsPMAWorkflow (string textureSettingsReference) {
 			if (textureSettingsReference == null)
 				return true;
 			string settingsReference = textureSettingsReference.ToLower();
@@ -280,11 +280,11 @@ namespace Spine.Unity.Editor {
 					}
 				}
 
-				#if SPINE_TK2D_DEFINE
+#if SPINE_TK2D_DEFINE
 				bool isTK2DDefineSet = true;
-				#else
+#else
 				bool isTK2DDefineSet = false;
-				#endif
+#endif
 				bool isTK2DAllowed = SpineEditorUtilities.SpineTK2DEditorUtility.IsTK2DAllowed;
 				if (SpineEditorUtilities.SpineTK2DEditorUtility.IsTK2DInstalled() || isTK2DDefineSet) {
 					GUILayout.Space(20);
@@ -296,12 +296,12 @@ namespace Spine.Unity.Editor {
 						if (GUILayout.Button("Disable", GUILayout.Width(64)))
 							SpineEditorUtilities.SpineTK2DEditorUtility.DisableTK2D();
 					}
-					#if !SPINE_TK2D_DEFINE
+#if !SPINE_TK2D_DEFINE
 					if (!isTK2DAllowed) {
 						EditorGUILayout.LabelField("To allow TK2D support, please modify line 67 in", EditorStyles.boldLabel);
 						EditorGUILayout.LabelField("Spine/Editor/spine-unity/Editor/Util./BuildSettings.cs", EditorStyles.boldLabel);
 					}
-					#endif
+#endif
 				}
 
 				GUILayout.Space(20);

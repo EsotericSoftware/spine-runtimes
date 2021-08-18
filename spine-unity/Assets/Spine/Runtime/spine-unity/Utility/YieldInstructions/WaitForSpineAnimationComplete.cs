@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using System.Collections;
 using Spine;
+using System.Collections;
+using UnityEngine;
 
 namespace Spine.Unity {
 	/// <summary>
@@ -44,8 +44,7 @@ namespace Spine.Unity {
 
 		public WaitForSpineAnimationComplete (Spine.TrackEntry trackEntry, bool includeEndEvent = false) :
 			base(trackEntry,
-				includeEndEvent ? (AnimationEventTypes.Complete | AnimationEventTypes.End) : AnimationEventTypes.Complete)
-		{
+				includeEndEvent ? (AnimationEventTypes.Complete | AnimationEventTypes.End) : AnimationEventTypes.Complete) {
 		}
 
 		#region Reuse

@@ -39,7 +39,7 @@ namespace Spine.Unity.Examples {
 		[SpineSlot]
 		public string eyeSlotName, mouthSlotName;
 
-		[SpineAttachment(slotField:"eyeSlotName")]
+		[SpineAttachment(slotField: "eyeSlotName")]
 		public string shockEyeName, normalEyeName;
 
 		[SpineAttachment(slotField: "mouthSlotName")]

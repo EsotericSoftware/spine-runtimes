@@ -29,9 +29,9 @@
 
 // Original Contribution by: Mitch Thompson
 
-using UnityEngine;
-using System.Collections.Generic;
 using Spine.Unity.AttachmentTools;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity.Examples {
 	public class SpriteAttacher : MonoBehaviour {
@@ -45,7 +45,7 @@ namespace Spine.Unity.Examples {
 		[SpineSlot] public string slot;
 		#endregion
 
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		void OnValidate () {
 			var skeletonComponent = GetComponent<ISkeletonComponent>();
 			var skeletonRenderer = skeletonComponent as SkeletonRenderer;
@@ -70,7 +70,7 @@ namespace Spine.Unity.Examples {
 				}
 			}
 		}
-		#endif
+#endif
 
 		RegionAttachment attachment;
 		Slot spineSlot;

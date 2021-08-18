@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
 using Spine.Unity;
+using UnityEngine;
 
 public class SkeletonGraphicPlayAnimationAtEvent : MonoBehaviour {
 

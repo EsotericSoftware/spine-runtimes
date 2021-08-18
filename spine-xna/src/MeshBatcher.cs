@@ -27,10 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 
 namespace Spine {
 	public struct VertexPositionColorTextureColor : IVertexType {

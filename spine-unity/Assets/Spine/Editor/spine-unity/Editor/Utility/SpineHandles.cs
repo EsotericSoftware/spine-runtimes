@@ -31,23 +31,23 @@
 
 #define SPINE_SKELETONMECANIM
 
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Linq;
 using System.Reflection;
-using System.Globalization;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	using EventType = UnityEngine.EventType;
 
 	public static class SpineHandles {
 		public static Color BoneColor { get { return new Color(0.8f, 0.8f, 0.8f, 0.4f); } }
-		public static Color PathColor { get { return new Color(254/255f, 127/255f, 0); } }
-		public static Color TransformContraintColor { get { return new Color(170/255f, 226/255f, 35/255f); } }
-		public static Color IkColor { get { return new Color(228/255f,90/255f,43/255f); } }
+		public static Color PathColor { get { return new Color(254 / 255f, 127 / 255f, 0); } }
+		public static Color TransformContraintColor { get { return new Color(170 / 255f, 226 / 255f, 35 / 255f); } }
+		public static Color IkColor { get { return new Color(228 / 255f, 90 / 255f, 43 / 255f); } }
 		public static Color PointColor { get { return new Color(1f, 1f, 0f, 1f); } }
 
 		static Vector3[] _boneMeshVerts = {
@@ -63,7 +63,7 @@ namespace Spine.Unity.Editor {
 					_boneMesh = new Mesh {
 						vertices = _boneMeshVerts,
 						uv = new Vector2[4],
-						triangles = new [] { 0, 1, 2, 2, 3, 0 }
+						triangles = new[] { 0, 1, 2, 2, 3, 0 }
 					};
 					_boneMesh.RecalculateBounds();
 					_boneMesh.RecalculateNormals();
@@ -77,13 +77,13 @@ namespace Spine.Unity.Editor {
 			get {
 				if (_arrowheadMesh == null) {
 					_arrowheadMesh = new Mesh {
-						vertices = new [] {
+						vertices = new[] {
 							new Vector3(0, 0),
 							new Vector3(-0.1f, 0.05f),
 							new Vector3(-0.1f, -0.05f)
 						},
 						uv = new Vector2[3],
-						triangles = new [] { 0, 1, 2 }
+						triangles = new[] { 0, 1, 2 }
 					};
 					_arrowheadMesh.RecalculateBounds();
 					_arrowheadMesh.RecalculateNormals();
@@ -269,10 +269,10 @@ namespace Spine.Unity.Editor {
 			int n = worldVerticesLength - step;
 			Vector3 p0, p1, p2, p3;
 			for (int i = 2; i < n; i += step) {
-				p0 = m.MultiplyPoint(new Vector3(pv[i], pv[i+1]));
-				p1 = m.MultiplyPoint(new Vector3(pv[i+2], pv[i+3]));
-				p2 = m.MultiplyPoint(new Vector3(pv[i+4], pv[i+5]));
-				p3 = m.MultiplyPoint(new Vector3(pv[i+6], pv[i+7]));
+				p0 = m.MultiplyPoint(new Vector3(pv[i], pv[i + 1]));
+				p1 = m.MultiplyPoint(new Vector3(pv[i + 2], pv[i + 3]));
+				p2 = m.MultiplyPoint(new Vector3(pv[i + 4], pv[i + 5]));
+				p3 = m.MultiplyPoint(new Vector3(pv[i + 6], pv[i + 7]));
 				DrawCubicBezier(p0, p1, p2, p3);
 			}
 
@@ -290,7 +290,7 @@ namespace Spine.Unity.Editor {
 			SpineHandles.DrawDot(firstPoint, endCapSize);
 
 			//if (!p.Closed) SpineHandles.DrawDot(m.MultiplyPoint(new Vector3(pv[n - 4], pv[n - 3])), endCapSize);
-			if (includeName) Handles.Label(firstPoint + new Vector3(0,0.1f), p.Name, PathNameStyle);
+			if (includeName) Handles.Label(firstPoint + new Vector3(0, 0.1f), p.Name, PathNameStyle);
 
 			Handles.color = ocolor;
 		}
@@ -385,30 +385,30 @@ namespace Spine.Unity.Editor {
 					pos = bones.Items[0].GetWorldPosition(transform, skeletonRenderScale);
 					switch (bones.Count) {
 					case 1: {
-							Handles.color = handleColor;
-							Handles.DrawLine(targetPos, pos);
-							SpineHandles.DrawBoneCircle(targetPos, handleColor, normal);
-							var m = bones.Items[0].GetMatrix4x4();
-							m.m03 = targetBone.WorldX * skeletonRenderScale;
-							m.m13 = targetBone.WorldY * skeletonRenderScale;
-							SpineHandles.DrawArrowhead(transform.localToWorldMatrix * m);
-							break;
-						}
+						Handles.color = handleColor;
+						Handles.DrawLine(targetPos, pos);
+						SpineHandles.DrawBoneCircle(targetPos, handleColor, normal);
+						var m = bones.Items[0].GetMatrix4x4();
+						m.m03 = targetBone.WorldX * skeletonRenderScale;
+						m.m13 = targetBone.WorldY * skeletonRenderScale;
+						SpineHandles.DrawArrowhead(transform.localToWorldMatrix * m);
+						break;
+					}
 					case 2: {
-							Bone childBone = bones.Items[1];
-							Vector3 child = childBone.GetWorldPosition(transform, skeletonRenderScale);
-							Handles.color = handleColor;
-							Handles.DrawLine(child, pos);
-							Handles.DrawLine(targetPos, child);
-							SpineHandles.DrawBoneCircle(pos, handleColor, normal, 0.5f);
-							SpineHandles.DrawBoneCircle(child, handleColor, normal, 0.5f);
-							SpineHandles.DrawBoneCircle(targetPos, handleColor, normal);
-							var m = childBone.GetMatrix4x4();
-							m.m03 = targetBone.WorldX * skeletonRenderScale;
-							m.m13 = targetBone.WorldY * skeletonRenderScale;
-							SpineHandles.DrawArrowhead(transform.localToWorldMatrix * m);
-							break;
-						}
+						Bone childBone = bones.Items[1];
+						Vector3 child = childBone.GetWorldPosition(transform, skeletonRenderScale);
+						Handles.color = handleColor;
+						Handles.DrawLine(child, pos);
+						Handles.DrawLine(targetPos, child);
+						SpineHandles.DrawBoneCircle(pos, handleColor, normal, 0.5f);
+						SpineHandles.DrawBoneCircle(child, handleColor, normal, 0.5f);
+						SpineHandles.DrawBoneCircle(targetPos, handleColor, normal);
+						var m = childBone.GetMatrix4x4();
+						m.m03 = targetBone.WorldX * skeletonRenderScale;
+						m.m13 = targetBone.WorldY * skeletonRenderScale;
+						SpineHandles.DrawArrowhead(transform.localToWorldMatrix * m);
+						break;
+					}
 					}
 				}
 				//Handles.Label(targetPos, ikc.Data.Name, SpineHandles.BoneNameStyle);

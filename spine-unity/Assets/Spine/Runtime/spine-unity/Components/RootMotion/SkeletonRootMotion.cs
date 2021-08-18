@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using System.Collections.Generic;
 using Spine.Unity.AnimationTools;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity {
 
@@ -79,7 +79,7 @@ namespace Spine.Unity {
 
 		protected override float AdditionalScale {
 			get {
-				return canvas ? canvas.referencePixelsPerUnit: 1.0f;
+				return canvas ? canvas.referencePixelsPerUnit : 1.0f;
 			}
 		}
 
@@ -134,19 +134,16 @@ namespace Spine.Unity {
 			if (next != null) {
 				if (next.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
 					mix = 1;
-				}
-				else {
+				} else {
 					mix = next.mixTime / next.mixDuration;
 					if (mix > 1) mix = 1;
 				}
 				float mixAndAlpha = track.alpha * next.interruptAlpha * (1 - mix);
 				currentDelta *= mixAndAlpha;
-			}
-			else {
+			} else {
 				if (track.mixDuration == 0) {
 					mix = 1;
-				}
-				else {
+				} else {
 					mix = track.alpha * (track.mixTime / track.mixDuration);
 					if (mix > 1) mix = 1;
 				}

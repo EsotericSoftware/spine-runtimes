@@ -35,11 +35,11 @@ using UnityEngine;
 
 namespace Spine.Unity {
 
-	#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 	[ExecuteAlways]
-	#else
+#else
 	[ExecuteInEditMode]
-	#endif
+#endif
 	[AddComponentMenu("Spine/SkeletonAnimation")]
 	[HelpURL("http://esotericsoftware.com/spine-unity#SkeletonAnimation-Component")]
 	public class SkeletonAnimation : SkeletonRenderer, ISkeletonAnimation, IAnimationStateComponent {
@@ -177,21 +177,21 @@ namespace Spine.Unity {
 				var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(_animationName);
 				if (animationObject != null) {
 					state.SetAnimation(0, animationObject, loop);
-					#if UNITY_EDITOR
+#if UNITY_EDITOR
 					if (!Application.isPlaying)
 						Update(0f);
-					#endif
+#endif
 				}
 			}
 		}
 
 		void Update () {
-			#if UNITY_EDITOR
+#if UNITY_EDITOR
 			if (!Application.isPlaying) {
 				Update(0f);
 				return;
 			}
-			#endif
+#endif
 
 			Update(Time.deltaTime);
 		}

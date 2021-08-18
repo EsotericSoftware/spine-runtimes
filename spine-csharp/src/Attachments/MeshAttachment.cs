@@ -129,7 +129,7 @@ namespace Spine {
 				width = RegionOriginalHeight / textureWidth;
 				height = RegionOriginalWidth / textureHeight;
 
-				for (int i = 0, n = uvs.Length; i<n; i += 2) {
+				for (int i = 0, n = uvs.Length; i < n; i += 2) {
 					uvs[i] = u + (1 - regionUVs[i + 1]) * width;
 					uvs[i + 1] = v + regionUVs[i] * height;
 				}

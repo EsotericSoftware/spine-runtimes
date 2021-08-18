@@ -27,9 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using Spine.Unity;
 using UnityEngine;
 using UnityEngine.Events;
-using Spine.Unity;
 
 namespace Spine.Unity.Examples {
 
@@ -188,29 +188,29 @@ namespace Spine.Unity.Examples {
 			// When the state changes, notify the animation handle of the new state.
 			string stateName = null;
 			switch (currentState) {
-				case CharacterState.Idle:
-					stateName = "idle";
-					break;
-				case CharacterState.Walk:
-					stateName = "walk";
-					break;
-				case CharacterState.Run:
-					stateName = "run";
-					break;
-				case CharacterState.Crouch:
-					stateName = "crouch";
-					break;
-				case CharacterState.Rise:
-					stateName = "rise";
-					break;
-				case CharacterState.Fall:
-					stateName = "fall";
-					break;
-				case CharacterState.Attack:
-					stateName = "attack";
-					break;
-				default:
-					break;
+			case CharacterState.Idle:
+				stateName = "idle";
+				break;
+			case CharacterState.Walk:
+				stateName = "walk";
+				break;
+			case CharacterState.Run:
+				stateName = "run";
+				break;
+			case CharacterState.Crouch:
+				stateName = "crouch";
+				break;
+			case CharacterState.Rise:
+				stateName = "rise";
+				break;
+			case CharacterState.Fall:
+				stateName = "fall";
+				break;
+			case CharacterState.Attack:
+				stateName = "attack";
+				break;
+			default:
+				break;
 			}
 
 			animationHandle.PlayAnimationForState(stateName, 0);

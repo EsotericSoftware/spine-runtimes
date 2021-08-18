@@ -216,11 +216,11 @@ namespace Spine.Unity {
 			if (rendererObject == null)
 				return null;
 
-			#if SPINE_TK2D
+#if SPINE_TK2D
 			return (rendererObject.GetType() == typeof(Material)) ? (Material)rendererObject : (Material)((AtlasRegion)rendererObject).page.rendererObject;
-			#else
+#else
 			return (Material)((AtlasRegion)rendererObject).page.rendererObject;
-			#endif
+#endif
 		}
 
 		/// <summary>Fills a Vector2 buffer with local vertices.</summary>
@@ -237,7 +237,7 @@ namespace Spine.Unity {
 				var localVerts = va.vertices;
 				for (int i = 0; i < bufferTargetSize; i++) {
 					int j = i * 2;
-					buffer[i] = new Vector2(localVerts[j], localVerts[j+1]);
+					buffer[i] = new Vector2(localVerts[j], localVerts[j + 1]);
 				}
 			} else {
 				var floats = new float[floatsCount];
@@ -249,7 +249,7 @@ namespace Spine.Unity {
 
 				for (int i = 0; i < bufferTargetSize; i++) {
 					int j = i * 2;
-					float x = floats[j] - bwx, y = floats[j+1] - bwy;
+					float x = floats[j] - bwx, y = floats[j + 1] - bwy;
 					buffer[i] = new Vector2(x * ia + y * ib, x * ic + y * id);
 				}
 			}
@@ -327,78 +327,78 @@ namespace Spine {
 			result.y = pc * boneData.x + pd * boneData.y + parentMatrix.y;
 
 			switch (boneData.transformMode) {
-				case TransformMode.Normal: {
-					float rotationY = boneData.rotation + 90 + boneData.shearY;
-					float la = MathUtils.CosDeg(boneData.rotation + boneData.shearX) * boneData.scaleX;
-					float lb = MathUtils.CosDeg(rotationY) * boneData.scaleY;
-					float lc = MathUtils.SinDeg(boneData.rotation + boneData.shearX) * boneData.scaleX;
-					float ld = MathUtils.SinDeg(rotationY) * boneData.scaleY;
-					result.a = pa * la + pb * lc;
-					result.b = pa * lb + pb * ld;
-					result.c = pc * la + pd * lc;
-					result.d = pc * lb + pd * ld;
-					break;
+			case TransformMode.Normal: {
+				float rotationY = boneData.rotation + 90 + boneData.shearY;
+				float la = MathUtils.CosDeg(boneData.rotation + boneData.shearX) * boneData.scaleX;
+				float lb = MathUtils.CosDeg(rotationY) * boneData.scaleY;
+				float lc = MathUtils.SinDeg(boneData.rotation + boneData.shearX) * boneData.scaleX;
+				float ld = MathUtils.SinDeg(rotationY) * boneData.scaleY;
+				result.a = pa * la + pb * lc;
+				result.b = pa * lb + pb * ld;
+				result.c = pc * la + pd * lc;
+				result.d = pc * lb + pd * ld;
+				break;
+			}
+			case TransformMode.OnlyTranslation: {
+				float rotationY = boneData.rotation + 90 + boneData.shearY;
+				result.a = MathUtils.CosDeg(boneData.rotation + boneData.shearX) * boneData.scaleX;
+				result.b = MathUtils.CosDeg(rotationY) * boneData.scaleY;
+				result.c = MathUtils.SinDeg(boneData.rotation + boneData.shearX) * boneData.scaleX;
+				result.d = MathUtils.SinDeg(rotationY) * boneData.scaleY;
+				break;
+			}
+			case TransformMode.NoRotationOrReflection: {
+				float s = pa * pa + pc * pc, prx;
+				if (s > 0.0001f) {
+					s = Math.Abs(pa * pd - pb * pc) / s;
+					pb = pc * s;
+					pd = pa * s;
+					prx = MathUtils.Atan2(pc, pa) * MathUtils.RadDeg;
+				} else {
+					pa = 0;
+					pc = 0;
+					prx = 90 - MathUtils.Atan2(pd, pb) * MathUtils.RadDeg;
 				}
-				case TransformMode.OnlyTranslation: {
-					float rotationY = boneData.rotation + 90 + boneData.shearY;
-					result.a = MathUtils.CosDeg(boneData.rotation + boneData.shearX) * boneData.scaleX;
-					result.b = MathUtils.CosDeg(rotationY) * boneData.scaleY;
-					result.c = MathUtils.SinDeg(boneData.rotation + boneData.shearX) * boneData.scaleX;
-					result.d = MathUtils.SinDeg(rotationY) * boneData.scaleY;
-					break;
+				float rx = boneData.rotation + boneData.shearX - prx;
+				float ry = boneData.rotation + boneData.shearY - prx + 90;
+				float la = MathUtils.CosDeg(rx) * boneData.scaleX;
+				float lb = MathUtils.CosDeg(ry) * boneData.scaleY;
+				float lc = MathUtils.SinDeg(rx) * boneData.scaleX;
+				float ld = MathUtils.SinDeg(ry) * boneData.scaleY;
+				result.a = pa * la - pb * lc;
+				result.b = pa * lb - pb * ld;
+				result.c = pc * la + pd * lc;
+				result.d = pc * lb + pd * ld;
+				break;
+			}
+			case TransformMode.NoScale:
+			case TransformMode.NoScaleOrReflection: {
+				float cos = MathUtils.CosDeg(boneData.rotation), sin = MathUtils.SinDeg(boneData.rotation);
+				float za = pa * cos + pb * sin;
+				float zc = pc * cos + pd * sin;
+				float s = (float)Math.Sqrt(za * za + zc * zc);
+				if (s > 0.00001f)
+					s = 1 / s;
+				za *= s;
+				zc *= s;
+				s = (float)Math.Sqrt(za * za + zc * zc);
+				float r = MathUtils.PI / 2 + MathUtils.Atan2(zc, za);
+				float zb = MathUtils.Cos(r) * s;
+				float zd = MathUtils.Sin(r) * s;
+				float la = MathUtils.CosDeg(boneData.shearX) * boneData.scaleX;
+				float lb = MathUtils.CosDeg(90 + boneData.shearY) * boneData.scaleY;
+				float lc = MathUtils.SinDeg(boneData.shearX) * boneData.scaleX;
+				float ld = MathUtils.SinDeg(90 + boneData.shearY) * boneData.scaleY;
+				if (boneData.transformMode != TransformMode.NoScaleOrReflection ? pa * pd - pb * pc < 0 : false) {
+					zb = -zb;
+					zd = -zd;
 				}
-				case TransformMode.NoRotationOrReflection: {
-					float s = pa * pa + pc * pc, prx;
-					if (s > 0.0001f) {
-						s = Math.Abs(pa * pd - pb * pc) / s;
-						pb = pc * s;
-						pd = pa * s;
-						prx = MathUtils.Atan2(pc, pa) * MathUtils.RadDeg;
-					} else {
-						pa = 0;
-						pc = 0;
-						prx = 90 - MathUtils.Atan2(pd, pb) * MathUtils.RadDeg;
-					}
-					float rx = boneData.rotation + boneData.shearX - prx;
-					float ry = boneData.rotation + boneData.shearY - prx + 90;
-					float la = MathUtils.CosDeg(rx) * boneData.scaleX;
-					float lb = MathUtils.CosDeg(ry) * boneData.scaleY;
-					float lc = MathUtils.SinDeg(rx) * boneData.scaleX;
-					float ld = MathUtils.SinDeg(ry) * boneData.scaleY;
-					result.a = pa * la - pb * lc;
-					result.b = pa * lb - pb * ld;
-					result.c = pc * la + pd * lc;
-					result.d = pc * lb + pd * ld;
-					break;
-				}
-				case TransformMode.NoScale:
-				case TransformMode.NoScaleOrReflection: {
-					float cos = MathUtils.CosDeg(boneData.rotation), sin = MathUtils.SinDeg(boneData.rotation);
-					float za = pa * cos + pb * sin;
-					float zc = pc * cos + pd * sin;
-					float s = (float)Math.Sqrt(za * za + zc * zc);
-					if (s > 0.00001f)
-						s = 1 / s;
-					za *= s;
-					zc *= s;
-					s = (float)Math.Sqrt(za * za + zc * zc);
-					float r = MathUtils.PI / 2 + MathUtils.Atan2(zc, za);
-					float zb = MathUtils.Cos(r) * s;
-					float zd = MathUtils.Sin(r) * s;
-					float la = MathUtils.CosDeg(boneData.shearX) * boneData.scaleX;
-					float lb = MathUtils.CosDeg(90 + boneData.shearY) * boneData.scaleY;
-					float lc = MathUtils.SinDeg(boneData.shearX) * boneData.scaleX;
-					float ld = MathUtils.SinDeg(90 + boneData.shearY) * boneData.scaleY;
-					if (boneData.transformMode != TransformMode.NoScaleOrReflection ? pa * pd - pb * pc < 0 : false) {
-						zb = -zb;
-						zd = -zd;
-					}
-					result.a = za * la + zb * lc;
-					result.b = za * lb + zb * ld;
-					result.c = zc * la + zd * lc;
-					result.d = zc * lb + zd * ld;
-					break;
-				}
+				result.a = za * la + zb * lc;
+				result.b = za * lb + zb * ld;
+				result.c = zc * la + zd * lc;
+				result.d = zc * lb + zd * ld;
+				break;
+			}
 			}
 
 			return result;

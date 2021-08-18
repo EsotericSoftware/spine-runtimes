@@ -31,9 +31,9 @@
 #define SPINE_TRIANGLECHECK // Avoid calling SetTriangles at the cost of checking for mesh differences (vertex counts, memberwise attachment list compare) every frame.
 //#define SPINE_DEBUG
 
-using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity {
 	/// <summary>A double-buffered Mesh, and a shared material array, bundled for use by Spine components that need to push a Mesh and materials to a Unity MeshRenderer and MeshFilter.</summary>
@@ -119,14 +119,14 @@ namespace Spine.Unity {
 
 			public void Dispose () {
 				if (mesh != null) {
-					#if UNITY_EDITOR
+#if UNITY_EDITOR
 					if (Application.isEditor && !Application.isPlaying)
 						UnityEngine.Object.DestroyImmediate(mesh);
 					else
 						UnityEngine.Object.Destroy(mesh);
-					#else
+#else
 					UnityEngine.Object.Destroy(mesh);
-					#endif
+#endif
 				}
 				mesh = null;
 			}

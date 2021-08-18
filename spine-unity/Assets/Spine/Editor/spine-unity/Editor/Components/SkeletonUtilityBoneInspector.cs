@@ -33,10 +33,10 @@
 #define HINGE_JOINT_NEW_BEHAVIOUR
 #endif
 
-using UnityEngine;
-using UnityEditor;
-using System.Collections.Generic;
 using Spine;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	using Icons = SpineEditorUtilities.Icons;
@@ -91,7 +91,7 @@ namespace Spine.Unity.Editor {
 			if (skeleton.Skin == null)
 				skin = skeleton.Data.DefaultSkin;
 
-			for(int i = 0; i < slotCount; i++){
+			for (int i = 0; i < slotCount; i++) {
 				Slot slot = skeletonUtility.Skeleton.Slots.Items[i];
 				if (slot.Bone == utilityBone.bone) {
 					var slotAttachments = new List<Skin.SkinEntry>();
@@ -198,7 +198,7 @@ namespace Spine.Unity.Editor {
 			using (new EditorGUI.DisabledGroupScope(multiObject || boundingBoxTable.Count == 0)) {
 				EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("Bounding Boxes", Icons.boundingBox), EditorStyles.boldLabel);
 
-				foreach (var entry in boundingBoxTable){
+				foreach (var entry in boundingBoxTable) {
 					Slot slot = entry.Key;
 					var boundingBoxes = entry.Value;
 
@@ -367,7 +367,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		void ApplyJoint2DAngleLimits (HingeJoint2D joint, float rotationLimit, Transform parentBone, Transform bone) {
-		#if HINGE_JOINT_NEW_BEHAVIOUR
+#if HINGE_JOINT_NEW_BEHAVIOUR
 			float referenceAngle = (parentBone.eulerAngles.z - bone.eulerAngles.z + 360f) % 360f;
 			float minAngle = referenceAngle - rotationLimit;
 			float maxAngle = referenceAngle + rotationLimit;
@@ -380,7 +380,7 @@ namespace Spine.Unity.Editor {
 				maxAngle += 360f;
 			}
 #else
-			float minAngle = - rotationLimit;
+			float minAngle = -rotationLimit;
 			float maxAngle = rotationLimit;
 #endif
 			joint.limits = new JointAngleLimits2D {
@@ -432,7 +432,7 @@ namespace Spine.Unity.Editor {
 			mirroredChain.SetActive(false);
 		}
 
-		void FlipBone2DHorizontal(Transform bone, Transform mirrorPosition) {
+		void FlipBone2DHorizontal (Transform bone, Transform mirrorPosition) {
 			Vector3 position = bone.position;
 			position.x = 2 * mirrorPosition.position.x - position.x; // = mirrorPosition + (mirrorPosition - bone.position)
 			bone.position = position;
@@ -520,14 +520,13 @@ namespace Spine.Unity.Editor {
 			utilBone.gameObject.AddComponent<Rigidbody>();
 		}
 
-		static void AttachRigidbodyAndCollider2D(SkeletonUtilityBone utilBone, bool enableCollider = false) {
+		static void AttachRigidbodyAndCollider2D (SkeletonUtilityBone utilBone, bool enableCollider = false) {
 			if (utilBone.GetComponent<Collider2D>() == null) {
 				if (utilBone.bone.Data.Length == 0) {
 					var sphere = utilBone.gameObject.AddComponent<CircleCollider2D>();
 					sphere.radius = 0.1f;
 					sphere.enabled = enableCollider;
-				}
-				else {
+				} else {
 					float length = utilBone.bone.Data.Length;
 					var box = utilBone.gameObject.AddComponent<BoxCollider2D>();
 					box.size = new Vector3(length, length / 3f, 0.2f);

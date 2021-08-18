@@ -27,10 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	public static class SpineInspectorUtility {
@@ -108,11 +108,11 @@ namespace Spine.Unity.Editor {
 			return current.type == EventType.ValidateCommand && current.commandName == "UndoRedoPerformed";
 		}
 
-		public static Texture2D UnityIcon<T>() {
+		public static Texture2D UnityIcon<T> () {
 			return EditorGUIUtility.ObjectContent(null, typeof(T)).image as Texture2D;
 		}
 
-		public static Texture2D UnityIcon(System.Type type) {
+		public static Texture2D UnityIcon (System.Type type) {
 			return EditorGUIUtility.ObjectContent(null, type).image as Texture2D;
 		}
 
@@ -325,7 +325,7 @@ namespace Spine.Unity.Editor {
 		static MethodInfo SortingLayerFieldMethod {
 			get {
 				if (m_SortingLayerFieldMethod == null)
-					m_SortingLayerFieldMethod = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new [] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
+					m_SortingLayerFieldMethod = typeof(EditorGUILayout).GetMethod("SortingLayerField", BindingFlags.Static | BindingFlags.NonPublic, null, new[] { typeof(GUIContent), typeof(SerializedProperty), typeof(GUIStyle) }, null);
 
 				return m_SortingLayerFieldMethod;
 			}
@@ -336,8 +336,8 @@ namespace Spine.Unity.Editor {
 			public SerializedProperty sortingLayerID;
 			public SerializedProperty sortingOrder;
 
-			public SerializedSortingProperties (Renderer r) : this(new SerializedObject(r)) {}
-			public SerializedSortingProperties (Object[] renderers) : this(new SerializedObject(renderers)) {}
+			public SerializedSortingProperties (Renderer r) : this(new SerializedObject(r)) { }
+			public SerializedSortingProperties (Object[] renderers) : this(new SerializedObject(renderers)) { }
 
 			public SerializedSortingProperties (SerializedObject rendererSerializedObject) {
 				renderer = rendererSerializedObject;
@@ -362,7 +362,7 @@ namespace Spine.Unity.Editor {
 				EditorGUI.BeginChangeCheck();
 
 			if (SpineInspectorUtility.SortingLayerFieldMethod != null && prop.sortingLayerID != null)
-				SpineInspectorUtility.SortingLayerFieldMethod.Invoke(null, new object[] { SortingLayerLabel, prop.sortingLayerID, EditorStyles.popup } );
+				SpineInspectorUtility.SortingLayerFieldMethod.Invoke(null, new object[] { SortingLayerLabel, prop.sortingLayerID, EditorStyles.popup });
 			else
 				EditorGUILayout.PropertyField(prop.sortingLayerID);
 

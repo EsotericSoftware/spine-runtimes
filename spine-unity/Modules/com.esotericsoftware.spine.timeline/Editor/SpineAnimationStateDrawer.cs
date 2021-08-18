@@ -27,12 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEditor;
-using UnityEngine;
 using Spine;
 using Spine.Unity;
-using Spine.Unity.Playables;
 using Spine.Unity.Editor;
+using Spine.Unity.Playables;
+using UnityEditor;
+using UnityEngine;
 
 [CustomPropertyDrawer(typeof(SpineAnimationStateBehaviour))]
 public class SpineAnimationStateDrawer : PropertyDrawer {

@@ -31,9 +31,9 @@
 #define SPINE_TRIANGLECHECK // Avoid calling SetTriangles at the cost of checking for mesh differences (vertex counts, memberwise attachment list compare) every frame.
 //#define SPINE_DEBUG
 
-using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Spine.Unity {
 	/// <summary>Instructions used by a SkeletonRenderer to render a mesh.</summary>
@@ -41,18 +41,18 @@ namespace Spine.Unity {
 		public readonly ExposedList<SubmeshInstruction> submeshInstructions = new ExposedList<SubmeshInstruction>();
 
 		public bool immutableTriangles;
-		#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 		public bool hasActiveClipping;
 		public int rawVertexCount = -1;
 		public readonly ExposedList<Attachment> attachments = new ExposedList<Attachment>();
-		#endif
+#endif
 
 		public void Clear () {
-			#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 			this.attachments.Clear(false);
 			rawVertexCount = -1;
 			hasActiveClipping = false;
-			#endif
+#endif
 			this.submeshInstructions.Clear(false);
 		}
 
@@ -61,9 +61,9 @@ namespace Spine.Unity {
 		}
 
 		public void SetWithSubset (ExposedList<SubmeshInstruction> instructions, int startSubmesh, int endSubmesh) {
-			#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 			int runningVertexCount = 0;
-			#endif
+#endif
 
 			var submeshes = this.submeshInstructions;
 			submeshes.Clear(false);
@@ -74,13 +74,13 @@ namespace Spine.Unity {
 			for (int i = 0; i < submeshCount; i++) {
 				var instruction = instructionsItems[startSubmesh + i];
 				submeshesItems[i] = instruction;
-				#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 				this.hasActiveClipping |= instruction.hasClipping;
 				submeshesItems[i].rawFirstVertexIndex = runningVertexCount; // Ensure current instructions have correct cached values.
 				runningVertexCount += instruction.rawVertexCount; // vertexCount will also be used for the rest of this method.
-				#endif
+#endif
 			}
-			#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 			this.rawVertexCount = runningVertexCount;
 
 			// assumption: instructions are contiguous. start and end are valid within instructions.
@@ -99,20 +99,20 @@ namespace Spine.Unity {
 				attachmentsItems[i] = slot.attachment;
 			}
 
-			#endif
+#endif
 		}
 
 		public void Set (SkeletonRendererInstruction other) {
 			this.immutableTriangles = other.immutableTriangles;
 
-			#if SPINE_TRIANGLECHECK
+#if SPINE_TRIANGLECHECK
 			this.hasActiveClipping = other.hasActiveClipping;
 			this.rawVertexCount = other.rawVertexCount;
 			this.attachments.Clear(false);
 			this.attachments.EnsureCapacity(other.attachments.Capacity);
 			this.attachments.Count = other.attachments.Count;
 			other.attachments.CopyTo(this.attachments.Items);
-			#endif
+#endif
 
 			this.submeshInstructions.Clear(false);
 			this.submeshInstructions.EnsureCapacity(other.submeshInstructions.Capacity);
@@ -121,11 +121,11 @@ namespace Spine.Unity {
 		}
 
 		public static bool GeometryNotEqual (SkeletonRendererInstruction a, SkeletonRendererInstruction b) {
-			#if SPINE_TRIANGLECHECK
-			#if UNITY_EDITOR
+#if SPINE_TRIANGLECHECK
+#if UNITY_EDITOR
 			if (!Application.isPlaying)
 			return true;
-			#endif
+#endif
 
 			if (a.hasActiveClipping || b.hasActiveClipping) return true; // Triangles are unpredictable when clipping is active.
 
@@ -166,13 +166,13 @@ namespace Spine.Unity {
 			}
 
 			return false;
-			#else
+#else
 			// In normal immutable triangle use, immutableTriangles will be initially false, forcing the smartmesh to update the first time but never again after that, unless there was an immutableTriangles flag mismatch..
 			if (a.immutableTriangles || b.immutableTriangles)
 				return (a.immutableTriangles != b.immutableTriangles);
 
 			return true;
-			#endif
+#endif
 		}
 	}
 }

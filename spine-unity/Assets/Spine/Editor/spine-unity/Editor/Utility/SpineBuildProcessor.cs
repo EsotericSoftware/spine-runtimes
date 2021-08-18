@@ -36,25 +36,23 @@
 #define HAS_ON_POSTPROCESS_PREFAB
 #endif
 
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEditor.Build;
+using UnityEngine;
 #if HAS_BUILD_PROCESS_WITH_REPORT
 using UnityEditor.Build.Reporting;
 #endif
 
 namespace Spine.Unity.Editor {
-	public class SpineBuildProcessor
-	{
+	public class SpineBuildProcessor {
 		internal static bool isBuilding = false;
 
 #if HAS_ON_POSTPROCESS_PREFAB
 		static List<string> prefabsToRestore = new List<string>();
 #endif
 
-		internal static void PreprocessBuild()
-		{
+		internal static void PreprocessBuild () {
 			isBuilding = true;
 #if HAS_ON_POSTPROCESS_PREFAB
 			var assets = AssetDatabase.FindAssets("t:Prefab");
@@ -69,8 +67,7 @@ namespace Spine.Unity.Editor {
 #endif
 		}
 
-		internal static void PostprocessBuild()
-		{
+		internal static void PostprocessBuild () {
 			isBuilding = false;
 #if HAS_ON_POSTPROCESS_PREFAB
 			foreach (string assetPath in prefabsToRestore) {
@@ -98,8 +95,7 @@ namespace Spine.Unity.Editor {
 			SpineBuildProcessor.PreprocessBuild();
 		}
 #else
-		void IPreprocessBuild.OnPreprocessBuild(BuildTarget target, string path)
-		{
+		void IPreprocessBuild.OnPreprocessBuild (BuildTarget target, string path) {
 			SpineBuildProcessor.PreprocessBuild();
 		}
 #endif
@@ -123,8 +119,7 @@ namespace Spine.Unity.Editor {
 			SpineBuildProcessor.PostprocessBuild();
 		}
 #else
-		void IPostprocessBuild.OnPostprocessBuild(BuildTarget target, string path)
-		{
+		void IPostprocessBuild.OnPostprocessBuild (BuildTarget target, string path) {
 			SpineBuildProcessor.PostprocessBuild();
 		}
 #endif

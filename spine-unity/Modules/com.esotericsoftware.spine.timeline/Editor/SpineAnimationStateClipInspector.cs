@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using UnityEditor;
 using Spine.Unity.Playables;
+using UnityEditor;
 using UnityEngine.Timeline;
 
 namespace Spine.Unity.Editor {
@@ -70,7 +70,7 @@ namespace Spine.Unity.Editor {
 			serializedObject.ApplyModifiedProperties();
 		}
 
-		protected void AdjustMixDuration(SpineAnimationStateClip targetClip, ClipInfo timelineClipInfo) {
+		protected void AdjustMixDuration (SpineAnimationStateClip targetClip, ClipInfo timelineClipInfo) {
 
 			if (timelineClipInfo == null)
 				return;
@@ -89,15 +89,14 @@ namespace Spine.Unity.Editor {
 				}
 				targetClip.template.mixDuration = blendInDur;
 				EditorUtility.SetDirty(targetClip);
-			}
-			else if (wasBlendingBefore) {
+			} else if (wasBlendingBefore) {
 				targetClip.template.mixDuration = timelineClipInfo.unblendedMixDuration;
 				EditorUtility.SetDirty(targetClip);
 			}
 			timelineClipInfo.previousBlendInDuration = blendInDur;
 		}
 
-		protected TimelineClip FindTimelineClip(SpineAnimationStateClip targetClip) {
+		protected TimelineClip FindTimelineClip (SpineAnimationStateClip targetClip) {
 			string[] guids = AssetDatabase.FindAssets("t:TimelineAsset");
 			foreach (string guid in guids) {
 				TimelineAsset timeline = (TimelineAsset)AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guid), typeof(TimelineAsset));

@@ -44,10 +44,10 @@ namespace Spine.Unity {
 
 		public Animation Animation {
 			get {
-				#if AUTOINIT_SPINEREFERENCE
+#if AUTOINIT_SPINEREFERENCE
 				if (animation == null)
 					Initialize();
-				#endif
+#endif
 
 				return animation;
 			}

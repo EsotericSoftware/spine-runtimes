@@ -60,7 +60,7 @@ namespace Spine.Unity.Prototyping {
 			var state = animationStateComponent.AnimationState;
 			foreach (var ep in events) {
 				var eventData = skeletonData.FindEvent(ep.spineEvent);
-				ep.eventDelegate = ep.eventDelegate ?? delegate(TrackEntry trackEntry, Event e) { if (e.Data == eventData) ep.unityHandler.Invoke(); };
+				ep.eventDelegate = ep.eventDelegate ?? delegate (TrackEntry trackEntry, Event e) { if (e.Data == eventData) ep.unityHandler.Invoke(); };
 				state.Event += ep.eventDelegate;
 			}
 		}

@@ -27,13 +27,13 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using Spine;
+using Spine.Unity;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
-using Spine;
-using Spine.Unity;
-using System.Collections.Generic;
 
 namespace Spine.Unity.Playables {
 
@@ -48,9 +48,9 @@ namespace Spine.Unity.Playables {
 		public bool customDuration = false;
 		public bool useBlendDuration = true;
 		[SerializeField]
-		#pragma warning disable 414
+#pragma warning disable 414
 		private bool isInitialized = false; // required to read preferences values from editor side.
-		#pragma warning restore 414
+#pragma warning restore 414
 		public float mixDuration = 0.1f;
 		public bool holdPrevious = false;
 		public bool dontPauseWithDirector = false;

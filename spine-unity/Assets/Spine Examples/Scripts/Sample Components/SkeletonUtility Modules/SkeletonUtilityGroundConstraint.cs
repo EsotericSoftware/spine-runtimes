@@ -35,11 +35,11 @@ using UnityEngine;
 
 namespace Spine.Unity.Examples {
 
-	#if NEW_PREFAB_SYSTEM
+#if NEW_PREFAB_SYSTEM
 	[ExecuteAlways]
-	#else
+#else
 	[ExecuteInEditMode]
-	#endif
+#endif
 	[RequireComponent(typeof(SkeletonUtilityBone))]
 	public class SkeletonUtilityGroundConstraint : SkeletonUtilityConstraint {
 

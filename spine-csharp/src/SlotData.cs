@@ -62,7 +62,7 @@ namespace Spine {
 		public BlendMode BlendMode { get { return blendMode; } set { blendMode = value; } }
 
 		public SlotData (int index, String name, BoneData boneData) {
-			if (index < 0) throw new ArgumentException ("index must be >= 0.", "index");
+			if (index < 0) throw new ArgumentException("index must be >= 0.", "index");
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null.");
 			if (boneData == null) throw new ArgumentNullException("boneData", "boneData cannot be null.");
 			this.index = index;

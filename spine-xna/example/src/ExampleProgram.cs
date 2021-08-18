@@ -10,7 +10,7 @@ namespace Spine {
             }
         }
     }
-#elif WINDOWS_STOREAPP 
+#elif WINDOWS_STOREAPP
     public static class Program
     {
         /// <summary>

@@ -34,7 +34,7 @@ namespace Spine.Unity.Examples {
 
 		public SkeletonAnimation skeletonAnimation;
 
-		[SpineBone(dataField:"skeletonAnimation")]
+		[SpineBone(dataField: "skeletonAnimation")]
 		public string boneName;
 		public Camera cam;
 

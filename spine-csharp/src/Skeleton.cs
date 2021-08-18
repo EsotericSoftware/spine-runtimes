@@ -117,7 +117,7 @@ namespace Spine {
 			foreach (TransformConstraintData transformConstraintData in data.transformConstraints)
 				transformConstraints.Add(new TransformConstraint(transformConstraintData, this));
 
-			pathConstraints = new ExposedList<PathConstraint> (data.pathConstraints.Count);
+			pathConstraints = new ExposedList<PathConstraint>(data.pathConstraints.Count);
 			foreach (PathConstraintData pathConstraintData in data.pathConstraints)
 				pathConstraints.Add(new PathConstraint(pathConstraintData, this));
 
@@ -177,7 +177,7 @@ namespace Spine {
 						goto continue_outer;
 					}
 				}
-				continue_outer: {}
+				continue_outer: { }
 			}
 
 			for (int i = 0; i < boneCount; i++)
@@ -332,7 +332,7 @@ namespace Spine {
 		/// <summary>
 		/// Temporarily sets the root bone as a child of the specified bone, then updates the world transform for each bone and applies
 		/// all constraints.
-	 	/// </summary>
+		/// </summary>
 		public void UpdateWorldTransform (Bone parent) {
 			if (parent == null) throw new ArgumentNullException("parent", "parent cannot be null.");
 
@@ -472,7 +472,7 @@ namespace Spine {
 		/// <para>Sets the skin used to look up attachments before looking in the <see cref="SkeletonData.DefaultSkin"/>. If the
 		/// skin is changed, <see cref="UpdateCache()"/> is called.
 		/// </para>
-	 	/// <para>Attachments from the new skin are attached if the corresponding attachment from the old skin was attached.
+		/// <para>Attachments from the new skin are attached if the corresponding attachment from the old skin was attached.
 		/// If there was no old skin, each slot's setup mode attachment is attached from the new skin.
 		/// </para>
 		/// <para>After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling

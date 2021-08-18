@@ -32,8 +32,8 @@
 #endif
 
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 
 #if WINDOWS_STOREAPP
 using System.Threading.Tasks;
@@ -77,17 +77,17 @@ namespace Spine {
 		}
 #else
 		public override SkeletonData ReadSkeletonData (string path) {
-		#if WINDOWS_PHONE
+#if WINDOWS_PHONE
 			using (var reader = new StreamReader(Microsoft.Xna.Framework.TitleContainer.OpenStream(path))) {
-		#else
+#else
 			using (var reader = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))) {
-		#endif
+#endif
 				SkeletonData skeletonData = ReadSkeletonData(reader);
 				skeletonData.name = Path.GetFileNameWithoutExtension(path);
 				return skeletonData;
 			}
 		}
-		#endif
+#endif
 
 		public SkeletonData ReadSkeletonData (TextReader reader) {
 			if (reader == null) throw new ArgumentNullException("reader", "reader cannot be null.");
@@ -178,7 +178,7 @@ namespace Spine {
 				foreach (Dictionary<string, Object> constraintMap in (List<Object>)root["ik"]) {
 					IkConstraintData data = new IkConstraintData((string)constraintMap["name"]);
 					data.order = GetInt(constraintMap, "order", 0);
-					data.skinRequired = GetBoolean(constraintMap,"skin", false);
+					data.skinRequired = GetBoolean(constraintMap, "skin", false);
 
 					if (constraintMap.ContainsKey("bones")) {
 						foreach (string boneName in (List<Object>)constraintMap["bones"]) {
@@ -207,7 +207,7 @@ namespace Spine {
 				foreach (Dictionary<string, Object> constraintMap in (List<Object>)root["transform"]) {
 					TransformConstraintData data = new TransformConstraintData((string)constraintMap["name"]);
 					data.order = GetInt(constraintMap, "order", 0);
-					data.skinRequired = GetBoolean(constraintMap,"skin", false);
+					data.skinRequired = GetBoolean(constraintMap, "skin", false);
 
 					if (constraintMap.ContainsKey("bones")) {
 						foreach (string boneName in (List<Object>)constraintMap["bones"]) {
@@ -243,11 +243,11 @@ namespace Spine {
 			}
 
 			// Path constraints.
-			if(root.ContainsKey("path")) {
+			if (root.ContainsKey("path")) {
 				foreach (Dictionary<string, Object> constraintMap in (List<Object>)root["path"]) {
 					PathConstraintData data = new PathConstraintData((string)constraintMap["name"]);
 					data.order = GetInt(constraintMap, "order", 0);
-					data.skinRequired = GetBoolean(constraintMap,"skin", false);
+					data.skinRequired = GetBoolean(constraintMap, "skin", false);
 
 					if (constraintMap.ContainsKey("bones")) {
 						foreach (string boneName in (List<Object>)constraintMap["bones"]) {
@@ -418,78 +418,78 @@ namespace Spine {
 				return box;
 			case AttachmentType.Mesh:
 			case AttachmentType.Linkedmesh: {
-					MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
-					if (mesh == null) return null;
-					mesh.Path = path;
+				MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
+				if (mesh == null) return null;
+				mesh.Path = path;
 
-					if (map.ContainsKey("color")) {
-						var color = (string)map["color"];
-						mesh.r = ToColor(color, 0);
-						mesh.g = ToColor(color, 1);
-						mesh.b = ToColor(color, 2);
-						mesh.a = ToColor(color, 3);
-					}
+				if (map.ContainsKey("color")) {
+					var color = (string)map["color"];
+					mesh.r = ToColor(color, 0);
+					mesh.g = ToColor(color, 1);
+					mesh.b = ToColor(color, 2);
+					mesh.a = ToColor(color, 3);
+				}
 
-					mesh.Width = GetFloat(map, "width", 0) * scale;
-					mesh.Height = GetFloat(map, "height", 0) * scale;
+				mesh.Width = GetFloat(map, "width", 0) * scale;
+				mesh.Height = GetFloat(map, "height", 0) * scale;
 
-					string parent = GetString(map, "parent", null);
-					if (parent != null) {
-						linkedMeshes.Add(new LinkedMesh(mesh, GetString(map, "skin", null), slotIndex, parent, GetBoolean(map, "deform", true)));
-						return mesh;
-					}
-
-					float[] uvs = GetFloatArray(map, "uvs", 1);
-					ReadVertices(map, mesh, uvs.Length);
-					mesh.triangles = GetIntArray(map, "triangles");
-					mesh.regionUVs = uvs;
-					mesh.UpdateUVs();
-
-					if (map.ContainsKey("hull")) mesh.HullLength = GetInt(map, "hull", 0) << 1;
-					if (map.ContainsKey("edges")) mesh.Edges = GetIntArray(map, "edges");
+				string parent = GetString(map, "parent", null);
+				if (parent != null) {
+					linkedMeshes.Add(new LinkedMesh(mesh, GetString(map, "skin", null), slotIndex, parent, GetBoolean(map, "deform", true)));
 					return mesh;
 				}
+
+				float[] uvs = GetFloatArray(map, "uvs", 1);
+				ReadVertices(map, mesh, uvs.Length);
+				mesh.triangles = GetIntArray(map, "triangles");
+				mesh.regionUVs = uvs;
+				mesh.UpdateUVs();
+
+				if (map.ContainsKey("hull")) mesh.HullLength = GetInt(map, "hull", 0) << 1;
+				if (map.ContainsKey("edges")) mesh.Edges = GetIntArray(map, "edges");
+				return mesh;
+			}
 			case AttachmentType.Path: {
-					PathAttachment pathAttachment = attachmentLoader.NewPathAttachment(skin, name);
-					if (pathAttachment == null) return null;
-					pathAttachment.closed = GetBoolean(map, "closed", false);
-					pathAttachment.constantSpeed = GetBoolean(map, "constantSpeed", true);
+				PathAttachment pathAttachment = attachmentLoader.NewPathAttachment(skin, name);
+				if (pathAttachment == null) return null;
+				pathAttachment.closed = GetBoolean(map, "closed", false);
+				pathAttachment.constantSpeed = GetBoolean(map, "constantSpeed", true);
 
-					int vertexCount = GetInt(map, "vertexCount", 0);
-					ReadVertices(map, pathAttachment, vertexCount << 1);
+				int vertexCount = GetInt(map, "vertexCount", 0);
+				ReadVertices(map, pathAttachment, vertexCount << 1);
 
-					// potential BOZO see Java impl
-					pathAttachment.lengths = GetFloatArray(map, "lengths", scale);
-					return pathAttachment;
-				}
+				// potential BOZO see Java impl
+				pathAttachment.lengths = GetFloatArray(map, "lengths", scale);
+				return pathAttachment;
+			}
 			case AttachmentType.Point: {
-					PointAttachment point = attachmentLoader.NewPointAttachment(skin, name);
-					if (point == null) return null;
-					point.x = GetFloat(map, "x", 0) * scale;
-					point.y = GetFloat(map, "y", 0) * scale;
-					point.rotation = GetFloat(map, "rotation", 0);
+				PointAttachment point = attachmentLoader.NewPointAttachment(skin, name);
+				if (point == null) return null;
+				point.x = GetFloat(map, "x", 0) * scale;
+				point.y = GetFloat(map, "y", 0) * scale;
+				point.rotation = GetFloat(map, "rotation", 0);
 
-					//string color = GetString(map, "color", null);
-					//if (color != null) point.color = color;
-					return point;
-				}
+				//string color = GetString(map, "color", null);
+				//if (color != null) point.color = color;
+				return point;
+			}
 			case AttachmentType.Clipping: {
-					ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, name);
-					if (clip == null) return null;
+				ClippingAttachment clip = attachmentLoader.NewClippingAttachment(skin, name);
+				if (clip == null) return null;
 
-					string end = GetString(map, "end", null);
-					if (end != null) {
-						SlotData slot = skeletonData.FindSlot(end);
-						if (slot == null) throw new Exception("Clipping end slot not found: " + end);
-						clip.EndSlot = slot;
-					}
-
-					ReadVertices(map, clip, GetInt(map, "vertexCount", 0) << 1);
-
-					//string color = GetString(map, "color", null);
-					// if (color != null) clip.color = color;
-					return clip;
+				string end = GetString(map, "end", null);
+				if (end != null) {
+					SlotData slot = skeletonData.FindSlot(end);
+					if (slot == null) throw new Exception("Clipping end slot not found: " + end);
+					clip.EndSlot = slot;
 				}
+
+				ReadVertices(map, clip, GetInt(map, "vertexCount", 0) << 1);
+
+				//string color = GetString(map, "color", null);
+				// if (color != null) clip.color = color;
+				return clip;
+			}
 			}
 			return null;
 		}
@@ -557,7 +557,7 @@ namespace Spine {
 							float g = ToColor(color, 1);
 							float b = ToColor(color, 2);
 							float a = ToColor(color, 3);
-							for (int frame = 0, bezier = 0;; frame++) {
+							for (int frame = 0, bezier = 0; ; frame++) {
 								timeline.SetFrame(frame, time, r, g, b, a);
 								if (!keyMapEnumerator.MoveNext()) {
 									timeline.Shrink(bezier);
@@ -632,7 +632,7 @@ namespace Spine {
 							keyMapEnumerator.MoveNext();
 							timelines.Add(ReadTimeline(ref keyMapEnumerator, new AlphaTimeline(values.Count, values.Count, slotIndex), 0, 1));
 
-						}  else if (timelineName == "rgba2") {
+						} else if (timelineName == "rgba2") {
 							var timeline = new RGBA2Timeline(values.Count, values.Count * 7, slotIndex);
 
 							var keyMapEnumerator = values.GetEnumerator();
@@ -1127,7 +1127,7 @@ namespace Spine {
 			timeline.SetBezier(bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2);
 		}
 
-		static float[] GetFloatArray(Dictionary<string, Object> map, string name, float scale) {
+		static float[] GetFloatArray (Dictionary<string, Object> map, string name, float scale) {
 			var list = (List<Object>)map[name];
 			var values = new float[list.Count];
 			if (scale == 1) {
@@ -1140,7 +1140,7 @@ namespace Spine {
 			return values;
 		}
 
-		static int[] GetIntArray(Dictionary<string, Object> map, string name) {
+		static int[] GetIntArray (Dictionary<string, Object> map, string name) {
 			var list = (List<Object>)map[name];
 			var values = new int[list.Count];
 			for (int i = 0, n = list.Count; i < n; i++)
@@ -1148,27 +1148,27 @@ namespace Spine {
 			return values;
 		}
 
-		static float GetFloat(Dictionary<string, Object> map, string name, float defaultValue) {
+		static float GetFloat (Dictionary<string, Object> map, string name, float defaultValue) {
 			if (!map.ContainsKey(name)) return defaultValue;
 			return (float)map[name];
 		}
 
-		static int GetInt(Dictionary<string, Object> map, string name, int defaultValue) {
+		static int GetInt (Dictionary<string, Object> map, string name, int defaultValue) {
 			if (!map.ContainsKey(name)) return defaultValue;
 			return (int)(float)map[name];
 		}
 
-		static bool GetBoolean(Dictionary<string, Object> map, string name, bool defaultValue) {
+		static bool GetBoolean (Dictionary<string, Object> map, string name, bool defaultValue) {
 			if (!map.ContainsKey(name)) return defaultValue;
 			return (bool)map[name];
 		}
 
-		static string GetString(Dictionary<string, Object> map, string name, string defaultValue) {
+		static string GetString (Dictionary<string, Object> map, string name, string defaultValue) {
 			if (!map.ContainsKey(name)) return defaultValue;
 			return (string)map[name];
 		}
 
-		static float ToColor(string hexString, int colorIndex, int expectedLength = 8) {
+		static float ToColor (string hexString, int colorIndex, int expectedLength = 8) {
 			if (hexString.Length != expectedLength)
 				throw new ArgumentException("Color hexidecimal length must be " + expectedLength + ", recieved: " + hexString, "hexString");
 			return Convert.ToInt32(hexString.Substring(colorIndex * 2, 2), 16) / (float)255;

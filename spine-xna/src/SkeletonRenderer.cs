@@ -27,10 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 
 namespace Spine {
 	/// <summary>Draws region and mesh attachments.</summary>
@@ -99,7 +99,7 @@ namespace Spine {
 			batcher.AfterLastDrawPass();
 		}
 
-		public void Draw(Skeleton skeleton) {
+		public void Draw (Skeleton skeleton) {
 			var drawOrder = skeleton.DrawOrder;
 			var drawOrderItems = skeleton.DrawOrder.Items;
 			float skeletonR = skeleton.R, skeletonG = skeleton.G, skeletonB = skeleton.B, skeletonA = skeleton.A;
@@ -130,8 +130,7 @@ namespace Spine {
 					indicesCount = 6;
 					indices = quadTriangles;
 					uvs = regionAttachment.UVs;
-				}
-				else if (attachment is MeshAttachment) {
+				} else if (attachment is MeshAttachment) {
 					MeshAttachment mesh = (MeshAttachment)attachment;
 					attachmentColorR = mesh.R; attachmentColorG = mesh.G; attachmentColorB = mesh.B; attachmentColorA = mesh.A;
 					AtlasRegion region = (AtlasRegion)mesh.RendererObject;
@@ -143,13 +142,11 @@ namespace Spine {
 					indicesCount = mesh.Triangles.Length;
 					indices = mesh.Triangles;
 					uvs = mesh.UVs;
-				}
-				else if (attachment is ClippingAttachment) {
+				} else if (attachment is ClippingAttachment) {
 					ClippingAttachment clip = (ClippingAttachment)attachment;
 					clipper.ClipStart(slot, clip);
 					continue;
-				}
-				else {
+				} else {
 					continue;
 				}
 
@@ -167,8 +164,7 @@ namespace Spine {
 							skeletonR * slot.R * attachmentColorR * a,
 							skeletonG * slot.G * attachmentColorG * a,
 							skeletonB * slot.B * attachmentColorB * a, a);
-				}
-				else {
+				} else {
 					color = new Color(
 							skeletonR * slot.R * attachmentColorR,
 							skeletonG * slot.G * attachmentColorG,
@@ -201,9 +197,9 @@ namespace Spine {
 				// submit to batch
 				MeshItem item = batcher.NextItem(verticesCount, indicesCount);
 				if (textureObject is Texture2D)
-					item.texture = (Texture2D) textureObject;
+					item.texture = (Texture2D)textureObject;
 				else {
-					item.textureLayers = (Texture2D[]) textureObject;
+					item.textureLayers = (Texture2D[])textureObject;
 					item.texture = item.textureLayers[0];
 				}
 				for (int ii = 0, nn = indicesCount; ii < nn; ii++) {

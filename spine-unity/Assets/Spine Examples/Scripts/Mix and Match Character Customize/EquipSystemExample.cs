@@ -27,11 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using Spine.Unity.AttachmentTools;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-using Spine.Unity.AttachmentTools;
 
 namespace Spine.Unity.Examples {
 	public class EquipSystemExample : MonoBehaviour, IHasSkeletonDataAsset {
@@ -54,7 +53,7 @@ namespace Spine.Unity.Examples {
 			public string slot;
 			[SpineSkin]
 			public string templateSkin;
-			[SpineAttachment(skinField:"templateSkin")]
+			[SpineAttachment(skinField: "templateSkin")]
 			public string templateAttachment;
 		}
 

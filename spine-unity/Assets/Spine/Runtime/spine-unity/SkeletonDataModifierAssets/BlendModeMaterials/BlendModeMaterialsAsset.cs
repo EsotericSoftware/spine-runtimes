@@ -27,13 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using Spine;
+using Spine.Unity;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-using Spine;
-using Spine.Unity;
 
 namespace Spine.Unity {
 	[CreateAssetMenu(menuName = "Spine/SkeletonData Modifiers/Blend Mode Materials", order = 200)]
@@ -65,15 +64,15 @@ namespace Spine.Unity {
 
 					Material templateMaterial = null;
 					switch (slot.blendMode) {
-						case BlendMode.Multiply:
-							templateMaterial = multiplyTemplate;
-							break;
-						case BlendMode.Screen:
-							templateMaterial = screenTemplate;
-							break;
-						case BlendMode.Additive:
-							templateMaterial = additiveTemplate;
-							break;
+					case BlendMode.Multiply:
+						templateMaterial = multiplyTemplate;
+						break;
+					case BlendMode.Screen:
+						templateMaterial = screenTemplate;
+						break;
+					case BlendMode.Additive:
+						templateMaterial = additiveTemplate;
+						break;
 					}
 					if (templateMaterial == null) continue;
 

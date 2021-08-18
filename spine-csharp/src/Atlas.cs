@@ -261,7 +261,7 @@ namespace Spine {
 			int colon = line.IndexOf(':');
 			if (colon == -1) return 0;
 			entry[0] = line.Substring(0, colon).Trim();
-			for (int i = 1, lastMatch = colon + 1;; i++) {
+			for (int i = 1, lastMatch = colon + 1; ; i++) {
 				int comma = line.IndexOf(',', lastMatch);
 				if (comma == -1) {
 					entry[i] = line.Substring(lastMatch).Trim();

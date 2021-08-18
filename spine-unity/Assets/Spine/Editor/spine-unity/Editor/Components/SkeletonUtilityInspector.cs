@@ -31,12 +31,12 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
-using UnityEngine;
+using Spine;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.AnimatedValues;
-using System.Collections.Generic;
-using Spine;
-using System.Reflection;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	using Icons = SpineEditorUtilities.Icons;
@@ -51,7 +51,7 @@ namespace Spine.Unity.Editor {
 
 #if !NEW_PREFAB_SYSTEM
 		bool isPrefab;
-		#endif
+#endif
 
 		readonly GUIContent SpawnHierarchyButtonLabel = new GUIContent("Spawn Hierarchy", Icons.skeleton);
 
@@ -65,8 +65,7 @@ namespace Spine.Unity.Editor {
 				if (skeletonRenderer != null) {
 					skeletonRenderer.Initialize(false);
 					skeletonRenderer.LateUpdate();
-				}
-				else if (skeletonGraphic != null) {
+				} else if (skeletonGraphic != null) {
 					skeletonGraphic.Initialize(false);
 					skeletonGraphic.LateUpdate();
 				}
@@ -76,19 +75,19 @@ namespace Spine.Unity.Editor {
 			if ((skeletonRenderer != null && !skeletonRenderer.valid) ||
 				(skeletonGraphic != null && !skeletonGraphic.IsValid)) return;
 
-			#if !NEW_PREFAB_SYSTEM
+#if !NEW_PREFAB_SYSTEM
 			isPrefab |= PrefabUtility.GetPrefabType(this.target) == PrefabType.Prefab;
-			#endif
+#endif
 		}
 
 		public override void OnInspectorGUI () {
 
-			#if !NEW_PREFAB_SYSTEM
+#if !NEW_PREFAB_SYSTEM
 			if (isPrefab) {
 				GUILayout.Label(new GUIContent("Cannot edit Prefabs", Icons.warning));
 				return;
 			}
-			#endif
+#endif
 
 			serializedObject.Update();
 

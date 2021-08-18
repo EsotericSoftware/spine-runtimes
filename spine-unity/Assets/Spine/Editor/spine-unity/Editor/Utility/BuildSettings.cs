@@ -43,14 +43,14 @@
 #define NEWHIERARCHYWINDOWCALLBACKS
 #endif
 
-using UnityEngine;
-using UnityEditor;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Linq;
 using System.Reflection;
-using System.Globalization;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
 
 namespace Spine.Unity.Editor {
 	public partial class SpineEditorUtilities {
@@ -82,8 +82,7 @@ namespace Spine.Unity.Editor {
 		}
 	}
 
-	public static class SpineBuildEnvUtility
-	{
+	public static class SpineBuildEnvUtility {
 		static bool IsInvalidGroup (BuildTargetGroup group) {
 			int gi = (int)group;
 			return
@@ -115,8 +114,7 @@ namespace Spine.Unity.Editor {
 
 			if (wasDefineAdded) {
 				Debug.LogWarning("Setting Scripting Define Symbol " + define);
-			}
-			else {
+			} else {
 				Debug.LogWarning("Already Set Scripting Define Symbol " + define);
 			}
 			return wasDefineAdded;
@@ -143,8 +141,7 @@ namespace Spine.Unity.Editor {
 
 			if (wasDefineRemoved) {
 				Debug.LogWarning("Removing Scripting Define Symbol " + define);
-			}
-			else {
+			} else {
 				Debug.LogWarning("Already Removed Scripting Define Symbol " + define);
 			}
 			return wasDefineRemoved;
