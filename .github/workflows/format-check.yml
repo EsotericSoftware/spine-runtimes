@@ -54,7 +54,8 @@ jobs:
       run: | 
         export CLANGFORMAT=`pwd`/clang/bin/clang-format
         export PATH="$PATH:/root/.dotnet/tools"      
-        ./formatters/format.sh        
+        ./formatters/format.sh   
+        git diff     
         git diff > format-diff.txt
 
     - name: Archive formatting result
