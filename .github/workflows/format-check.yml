@@ -26,8 +26,8 @@ jobs:
         curl -L https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/clang+llvm-12.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz --output clang.tar.xz
         tar -xf clang.tar.xz
         mv clang+llvm-12.0.1-x86_64-linux-gnu-ubuntu- clang
-        rm /usr/bin/clang-format
-        ln -s /clang/bin/clang-format /usr/bin/clang-format
+        sudo rm /usr/bin/clang-format
+        sudo ln -s /clang/bin/clang-format /usr/bin/clang-format
 
     - name: Install dotnet
       uses: actions/setup-dotnet@v1
