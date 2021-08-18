@@ -8,14 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:      
 
-    - run: git config --global core.autocrlf false
-
-    - uses: actions/checkout@v1  
-
     - name: Install OS dependencies (needed for act on ubuntu-latest)      
       run: |
         sudo apt update
-        sudo apt install -y --force-yes curl xz-utils libicu-dev git        
+        sudo apt install -y --force-yes curl xz-utils libicu-dev git dos2unix       
+        git config --global core.autocrlf input
+        git config --global core.eol 
+
+    - uses: actions/checkout@v1      
 
     - name: Cache Clang
       id: cache-clang
@@ -54,9 +54,11 @@ jobs:
       run: | 
         export CLANGFORMAT=`pwd`/clang/bin/clang-format
         export PATH="$PATH:/root/.dotnet/tools"      
-        ./formatters/format.sh   
-        git diff     
+        ./formatters/format.sh
+        find . -type f -name '*.php' -exec dos2unix '{}' +        
         git diff > format-diff.txt
+
+    - run: spine-csharp/src/Atlas.cs        
 
     - name: Archive formatting result
       uses: actions/upload-artifact@v2
