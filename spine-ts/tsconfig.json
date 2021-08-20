@@ -3,19 +3,12 @@
 		"module": "none",
 		"noImplicitAny": true,
 		"removeComments": true,
-		"preserveConstEnums": true,
-		"outFile": "build/spine-all.js",
+		"preserveConstEnums": true,		
 		"sourceMap": true,
-		"declaration": true
-	},
-	"include": [
-		"core/src/**/*",
-		"canvas/src/**/*",
-		"webgl/src/**/*",
-		"threejs/src/**/*",
-		"player/src/**/*"
-	],
-	"exclude": [
-		"build"
-	]
+		"declaration": true,
+		"declarationMap": true,
+		"composite": true,
+		"esModuleInterop": true,
+		"target": "ES2015"
+	},	
 }

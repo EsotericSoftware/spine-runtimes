@@ -18,6 +18,7 @@ build/
 cmake-build-debug/
 .vscode/settings.json
 spine-runtimes.code-workspace
+node_modules
 
 spine-as3/spine-as3/.settings/com.powerflasher.fdt.core.metaDataTags.prefs
 
