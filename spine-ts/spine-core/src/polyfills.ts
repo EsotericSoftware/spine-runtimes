@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-interface Math {
-	fround(n: number): number;
-}
-
 (() => {
 	if (!Math.fround) {
 		Math.fround = (function (array) {
@@ -40,3 +36,5 @@ interface Math {
 		})(new Float32Array(1));
 	}
 })();
+
+export { }

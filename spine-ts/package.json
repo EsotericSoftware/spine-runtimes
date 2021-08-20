@@ -24,14 +24,10 @@
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "private": true,
   "workspaces": [
-    "spine-core/*",
-    "spine-canvas/*",
-    "spine-player/*",
-    "spine-threejs/*",
-    "spine-webgl/*"
-  ],
-  "devDependencies": {
-    "npx": "^10.2.2",
-    "typescript": "^4.3.5"
-  }
+    "spine-core",
+    "spine-canvas",
+    "spine-player",
+    "spine-threejs",
+    "spine-webgl"
+  ]
 }

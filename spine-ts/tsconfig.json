@@ -3,12 +3,13 @@
 		"module": "none",
 		"noImplicitAny": true,
 		"removeComments": true,
-		"preserveConstEnums": true,		
+		"preserveConstEnums": true,
 		"sourceMap": true,
 		"declaration": true,
 		"declarationMap": true,
 		"composite": true,
 		"esModuleInterop": true,
+		"isolatedModules": true,
 		"target": "ES2015"
-	},	
+	},
 }
