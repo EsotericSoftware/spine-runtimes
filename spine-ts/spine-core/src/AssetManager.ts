@@ -111,7 +111,7 @@ export class AssetManager implements Disposable {
 		path = this.start(path);
 
 		let isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
-		let isWebWorker = !isBrowser && typeof importScripts !== 'undefined';
+		let isWebWorker = !isBrowser; // && typeof importScripts !== 'undefined';
 		if (isWebWorker) {
 			fetch(path, { mode: <RequestMode>"cors" }).then((response) => {
 				if (response.ok) return response.blob();

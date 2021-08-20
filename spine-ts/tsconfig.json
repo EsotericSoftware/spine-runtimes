@@ -1,6 +1,5 @@
 {
 	"compilerOptions": {
-		"module": "none",
 		"noImplicitAny": true,
 		"removeComments": true,
 		"preserveConstEnums": true,
@@ -10,6 +9,5 @@
 		"composite": true,
 		"esModuleInterop": true,
 		"isolatedModules": true,
-		"target": "ES2015"
 	},
 }
