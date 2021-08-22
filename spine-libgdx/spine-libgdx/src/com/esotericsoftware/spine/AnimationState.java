@@ -1329,28 +1329,37 @@ public class AnimationState {
 	 * See TrackEntry {@link TrackEntry#setListener(AnimationStateListener)} and AnimationState
 	 * {@link AnimationState#addListener(AnimationStateListener)}. */
 	static public interface AnimationStateListener {
-		/** Invoked when this entry has been set as the current entry. */
+		/** Invoked when this entry has been set as the current entry. {@link #end(TrackEntry)} will occur when this entry will no
+		 * longer be applied. */
 		public void start (TrackEntry entry);
 
 		/** Invoked when another entry has replaced this entry as the current entry. This entry may continue being applied for
 		 * mixing. */
 		public void interrupt (TrackEntry entry);
 
-		/** Invoked when this entry is no longer the current entry and will never be applied again. */
+		/** Invoked when this entry will never be applied again. This only occurs if this entry has previously been set as the
+		 * current entry ({@link #start(TrackEntry)} was invoked). */
 		public void end (TrackEntry entry);
 
 		/** Invoked when this entry will be disposed. This may occur without the entry ever being set as the current entry.
+		 * <p>
 		 * References to the entry should not be kept after <code>dispose</code> is called, as it may be destroyed or reused. */
 		public void dispose (TrackEntry entry);
 
-		/** Invoked every time this entry's animation completes a loop. Because this event is trigged in
-		 * {@link AnimationState#apply(Skeleton)}, any animations set in response to the event won't be applied until the next time
-		 * the AnimationState is applied. */
+		/** Invoked every time this entry's animation completes a loop. This may occur during mixing (after
+		 * {@link #interrupt(TrackEntry)}).
+		 * <p>
+		 * If this entry's {@link TrackEntry#getMixingTo()} is not null, this entry is mixing out (it is not the current entry).
+		 * <p>
+		 * Because this event is triggered at the end of {@link AnimationState#apply(Skeleton)}, any animations set in response to
+		 * the event won't be applied until the next time the AnimationState is applied. */
 		public void complete (TrackEntry entry);
 
-		/** Invoked when this entry's animation triggers an event. Because this event is trigged in
-		 * {@link AnimationState#apply(Skeleton)}, any animations set in response to the event won't be applied until the next time
-		 * the AnimationState is applied. */
+		/** Invoked when this entry's animation triggers an event. This may occur during mixing (after
+		 * {@link #interrupt(TrackEntry)}), see {@link TrackEntry#eventThreshold}.
+		 * <p>
+		 * Because this event is triggered at the end of {@link AnimationState#apply(Skeleton)}, any animations set in response to
+		 * the event won't be applied until the next time the AnimationState is applied. */
 		public void event (TrackEntry entry, Event event);
 	}
 
