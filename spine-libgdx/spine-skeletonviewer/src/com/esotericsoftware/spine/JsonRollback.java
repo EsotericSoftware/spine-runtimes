@@ -197,7 +197,7 @@ public class JsonRollback {
 				}
 				if (name.equals("rgba"))
 					map.parent.name = "color";
-				else if (name.equals("rgba")) //
+				else if (name.equals("rgba2")) //
 					map.parent.name = "twoColor";
 			}
 		}
