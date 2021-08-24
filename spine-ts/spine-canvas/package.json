@@ -1,10 +1,9 @@
 {
-  "name": "spine-ts",
+  "name": "@esotericsoftware/spine-canvas",
   "version": "4.0.1",
   "description": "The official Spine Runtimes for the web.",
-  "scripts": {
-    "build": "npx tsc -b --clean; tsc -b; npx rollup -c rollup.config.js --sourcemap;"
-  },
+  "main": "dist/index.js",
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/esotericsoftware/spine-runtimes.git"
@@ -24,14 +23,6 @@
     "url": "https://github.com/esotericsoftware/spine-runtimes/issues"
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
-  "private": true,
-  "workspaces": [
-    "spine-core",
-    "spine-canvas",
-    "spine-player",
-    "spine-threejs",
-    "spine-webgl"
-  ],
   "devDependencies": {
     "npx": "^10.2.2",
     "rollup": "^2.56.2",

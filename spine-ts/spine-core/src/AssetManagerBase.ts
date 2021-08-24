@@ -31,7 +31,7 @@ import { Texture } from "./Texture";
 import { TextureAtlas } from "./TextureAtlas";
 import { Disposable, StringMap } from "./Utils";
 
-export class AssetManager implements Disposable {
+export class AssetManagerBase implements Disposable {
 	private pathPrefix: string;
 	private textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture;
 	private downloader: Downloader;

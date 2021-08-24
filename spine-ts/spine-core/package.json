@@ -2,10 +2,8 @@
   "name": "@esotericsoftware/spine-core",
   "version": "4.0.1",
   "description": "The official Spine Runtimes for the web.",
-  "main": "build/index.js",
-  "scripts": {
-    "build": "npx tsc -p ./tsconfig.json; npx rollup -c rollup.config.js --sourcemap;"
-  },
+  "main": "dist/index.js",
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/esotericsoftware/spine-runtimes.git"
@@ -24,11 +22,5 @@
   "bugs": {
     "url": "https://github.com/esotericsoftware/spine-runtimes/issues"
   },
-  "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
-  "devDependencies": {
-    "npx": "^10.2.2",
-    "rollup": "^2.56.2",
-    "rollup-plugin-dts": "^3.0.2",
-    "typescript": "^4.3.5"
-  }
+  "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme"
 }

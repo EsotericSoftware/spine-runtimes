@@ -27,12 +27,11 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-/// <reference path="../../core/src/AssetManager.ts"/>
+import { Downloader, AssetManagerBase } from "../../spine-core/dist/index";
+import { CanvasTexture } from "./CanvasTexture";
 
-module spine.canvas {
-	export class AssetManager extends spine.AssetManager {
-		constructor (pathPrefix: string = "", downloader: Downloader = null) {
-			super((image: HTMLImageElement) => { return new spine.canvas.CanvasTexture(image); }, pathPrefix, downloader);
-		}
+export class AssetManager extends AssetManagerBase {
+	constructor(pathPrefix: string = "", downloader: Downloader = null) {
+		super((image: HTMLImageElement) => { return new CanvasTexture(image); }, pathPrefix, downloader);
 	}
 }

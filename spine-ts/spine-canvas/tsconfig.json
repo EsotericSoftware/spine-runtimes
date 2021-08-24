@@ -3,6 +3,7 @@
 	"compilerOptions": {
 		"rootDir": "./src",
 		"outDir": "./dist",
+		"moduleResolution": "node",
 	},
 	"include": [
 		"**/*.ts"
@@ -10,5 +11,9 @@
 	"exclude": [
 		"dist/**/*.d.ts"
 	],
-	"references": []
+	"references": [
+		{
+			"path": "../spine-core"
+		}
+	]
 }

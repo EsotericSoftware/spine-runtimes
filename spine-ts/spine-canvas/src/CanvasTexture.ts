@@ -27,16 +27,14 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-/// <reference path="../../core/src/Texture.ts"/>
+import { Texture, TextureFilter, TextureWrap } from "../../spine-core/dist/index";
 
-module spine.canvas {
-	export class CanvasTexture extends Texture {
-		constructor (image: HTMLImageElement) {
-			super(image);
-		}
-
-		setFilters (minFilter: TextureFilter, magFilter: TextureFilter) { }
-		setWraps (uWrap: TextureWrap, vWrap: TextureWrap) { }
-		dispose () { }
+export class CanvasTexture extends Texture {
+	constructor(image: HTMLImageElement) {
+		super(image);
 	}
+
+	setFilters(minFilter: TextureFilter, magFilter: TextureFilter) { }
+	setWraps(uWrap: TextureWrap, vWrap: TextureWrap) { }
+	dispose() { }
 }

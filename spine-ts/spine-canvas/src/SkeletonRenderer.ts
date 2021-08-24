@@ -27,283 +27,284 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-module spine.canvas {
-	export class SkeletonRenderer {
-		static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
-		static VERTEX_SIZE = 2 + 2 + 4;
+import { Utils, Color, Skeleton, RegionAttachment, TextureAtlasRegion, BlendMode, MeshAttachment, Slot } from "../../spine-core/dist/index";
+import { CanvasTexture } from "./CanvasTexture";
 
-		private ctx: CanvasRenderingContext2D;
+export class SkeletonRenderer {
+	static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
+	static VERTEX_SIZE = 2 + 2 + 4;
 
-		public triangleRendering = false;
-		public debugRendering = false;
-		private vertices = Utils.newFloatArray(8 * 1024);
-		private tempColor = new Color();
+	private ctx: CanvasRenderingContext2D;
 
-		constructor(context: CanvasRenderingContext2D) {
-			this.ctx = context;
+	public triangleRendering = false;
+	public debugRendering = false;
+	private vertices = Utils.newFloatArray(8 * 1024);
+	private tempColor = new Color();
+
+	constructor(context: CanvasRenderingContext2D) {
+		this.ctx = context;
+	}
+
+	draw(skeleton: Skeleton) {
+		if (this.triangleRendering) this.drawTriangles(skeleton);
+		else this.drawImages(skeleton);
+	}
+
+	private drawImages(skeleton: Skeleton) {
+		let ctx = this.ctx;
+		let color = this.tempColor;
+		let skeletonColor = skeleton.color;
+		let drawOrder = skeleton.drawOrder;
+
+		if (this.debugRendering) ctx.strokeStyle = "green";
+
+		for (let i = 0, n = drawOrder.length; i < n; i++) {
+			let slot = drawOrder[i];
+			let bone = slot.bone;
+			if (!bone.active) continue;
+
+			let attachment = slot.getAttachment();
+			if (!(attachment instanceof RegionAttachment)) continue;
+			let region: TextureAtlasRegion = <TextureAtlasRegion>attachment.region;
+			let image: HTMLImageElement = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
+
+			let slotColor = slot.color;
+			let regionColor = attachment.color;
+			color.set(skeletonColor.r * slotColor.r * regionColor.r,
+				skeletonColor.g * slotColor.g * regionColor.g,
+				skeletonColor.b * slotColor.b * regionColor.b,
+				skeletonColor.a * slotColor.a * regionColor.a);
+
+			ctx.save();
+			ctx.transform(bone.a, bone.c, bone.b, bone.d, bone.worldX, bone.worldY);
+			ctx.translate(attachment.offset[0], attachment.offset[1]);
+			ctx.rotate(attachment.rotation * Math.PI / 180);
+
+			let atlasScale = attachment.width / region.originalWidth;
+			ctx.scale(atlasScale * attachment.scaleX, atlasScale * attachment.scaleY);
+
+			let w = region.width, h = region.height;
+			ctx.translate(w / 2, h / 2);
+			if (attachment.region.degrees == 90) {
+				let t = w;
+				w = h;
+				h = t;
+				ctx.rotate(-Math.PI / 2);
+			}
+			ctx.scale(1, -1);
+			ctx.translate(-w / 2, -h / 2);
+
+			if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
+				ctx.globalAlpha = color.a;
+				// experimental tinting via compositing, doesn't work
+				// ctx.globalCompositeOperation = "source-atop";
+				// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0)  + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
+				// ctx.fillRect(0, 0, w, h);
+			}
+			ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
+			if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
+			ctx.restore();
 		}
+	}
 
-		draw(skeleton: Skeleton) {
-			if (this.triangleRendering) this.drawTriangles(skeleton);
-			else this.drawImages(skeleton);
-		}
+	private drawTriangles(skeleton: Skeleton) {
+		let ctx = this.ctx;
+		let color = this.tempColor;
+		let skeletonColor = skeleton.color;
+		let drawOrder = skeleton.drawOrder;
 
-		private drawImages(skeleton: Skeleton) {
-			let ctx = this.ctx;
-			let color = this.tempColor;
-			let skeletonColor = skeleton.color;
-			let drawOrder = skeleton.drawOrder;
+		let blendMode: BlendMode = null;
+		let vertices: ArrayLike<number> = this.vertices;
+		let triangles: Array<number> = null;
 
-			if (this.debugRendering) ctx.strokeStyle = "green";
+		for (let i = 0, n = drawOrder.length; i < n; i++) {
+			let slot = drawOrder[i];
+			let attachment = slot.getAttachment();
 
-			for (let i = 0, n = drawOrder.length; i < n; i++) {
-				let slot = drawOrder[i];
-				let bone = slot.bone;
-				if (!bone.active) continue;
+			let texture: HTMLImageElement;
+			let region: TextureAtlasRegion;
+			if (attachment instanceof RegionAttachment) {
+				let regionAttachment = <RegionAttachment>attachment;
+				vertices = this.computeRegionVertices(slot, regionAttachment, false);
+				triangles = SkeletonRenderer.QUAD_TRIANGLES;
+				region = <TextureAtlasRegion>regionAttachment.region;
+				texture = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
+			} else if (attachment instanceof MeshAttachment) {
+				let mesh = <MeshAttachment>attachment;
+				vertices = this.computeMeshVertices(slot, mesh, false);
+				triangles = mesh.triangles;
+				texture = (<TextureAtlasRegion>mesh.region.renderObject).page.texture.getImage() as HTMLImageElement;
+			} else
+				continue;
 
-				let attachment = slot.getAttachment();
-				if (!(attachment instanceof RegionAttachment)) continue;
-				let region: TextureAtlasRegion = <TextureAtlasRegion>attachment.region;
-				let image: HTMLImageElement = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
+			if (texture) {
+				if (slot.data.blendMode != blendMode) blendMode = slot.data.blendMode;
 
 				let slotColor = slot.color;
-				let regionColor = attachment.color;
-				color.set(skeletonColor.r * slotColor.r * regionColor.r,
-					skeletonColor.g * slotColor.g * regionColor.g,
-					skeletonColor.b * slotColor.b * regionColor.b,
-					skeletonColor.a * slotColor.a * regionColor.a);
-
-				ctx.save();
-				ctx.transform(bone.a, bone.c, bone.b, bone.d, bone.worldX, bone.worldY);
-				ctx.translate(attachment.offset[0], attachment.offset[1]);
-				ctx.rotate(attachment.rotation * Math.PI / 180);
-
-				let atlasScale = attachment.width / region.originalWidth;
-				ctx.scale(atlasScale * attachment.scaleX, atlasScale * attachment.scaleY);
-
-				let w = region.width, h = region.height;
-				ctx.translate(w / 2, h / 2);
-				if (attachment.region.degrees == 90) {
-					let t = w;
-					w = h;
-					h = t;
-					ctx.rotate(-Math.PI / 2);
-				}
-				ctx.scale(1, -1);
-				ctx.translate(-w / 2, -h / 2);
+				let attachmentColor = attachment.color;
+				color.set(skeletonColor.r * slotColor.r * attachmentColor.r,
+					skeletonColor.g * slotColor.g * attachmentColor.g,
+					skeletonColor.b * slotColor.b * attachmentColor.b,
+					skeletonColor.a * slotColor.a * attachmentColor.a);
 
 				if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
 					ctx.globalAlpha = color.a;
 					// experimental tinting via compositing, doesn't work
 					// ctx.globalCompositeOperation = "source-atop";
-					// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0)  + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
+					// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0) + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
 					// ctx.fillRect(0, 0, w, h);
 				}
-				ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
-				if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
-				ctx.restore();
-			}
-		}
 
-		private drawTriangles(skeleton: Skeleton) {
-			let ctx = this.ctx;
-			let color = this.tempColor;
-			let skeletonColor = skeleton.color;
-			let drawOrder = skeleton.drawOrder;
+				for (var j = 0; j < triangles.length; j += 3) {
+					let t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
 
-			let blendMode: BlendMode = null;
-			let vertices: ArrayLike<number> = this.vertices;
-			let triangles: Array<number> = null;
+					let x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
+					let x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
+					let x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
 
-			for (let i = 0, n = drawOrder.length; i < n; i++) {
-				let slot = drawOrder[i];
-				let attachment = slot.getAttachment();
+					this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
 
-				let texture: HTMLImageElement;
-				let region: TextureAtlasRegion;
-				if (attachment instanceof RegionAttachment) {
-					let regionAttachment = <RegionAttachment>attachment;
-					vertices = this.computeRegionVertices(slot, regionAttachment, false);
-					triangles = SkeletonRenderer.QUAD_TRIANGLES;
-					region = <TextureAtlasRegion>regionAttachment.region;
-					texture = (<CanvasTexture>region.page.texture).getImage() as HTMLImageElement;
-				} else if (attachment instanceof MeshAttachment) {
-					let mesh = <MeshAttachment>attachment;
-					vertices = this.computeMeshVertices(slot, mesh, false);
-					triangles = mesh.triangles;
-					texture = (<TextureAtlasRegion>mesh.region.renderObject).page.texture.getImage() as HTMLImageElement;
-				} else
-					continue;
-
-				if (texture) {
-					if (slot.data.blendMode != blendMode) blendMode = slot.data.blendMode;
-
-					let slotColor = slot.color;
-					let attachmentColor = attachment.color;
-					color.set(skeletonColor.r * slotColor.r * attachmentColor.r,
-						skeletonColor.g * slotColor.g * attachmentColor.g,
-						skeletonColor.b * slotColor.b * attachmentColor.b,
-						skeletonColor.a * slotColor.a * attachmentColor.a);
-
-					if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
-						ctx.globalAlpha = color.a;
-						// experimental tinting via compositing, doesn't work
-						// ctx.globalCompositeOperation = "source-atop";
-						// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0) + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
-						// ctx.fillRect(0, 0, w, h);
-					}
-
-					for (var j = 0; j < triangles.length; j += 3) {
-						let t1 = triangles[j] * 8, t2 = triangles[j + 1] * 8, t3 = triangles[j + 2] * 8;
-
-						let x0 = vertices[t1], y0 = vertices[t1 + 1], u0 = vertices[t1 + 6], v0 = vertices[t1 + 7];
-						let x1 = vertices[t2], y1 = vertices[t2 + 1], u1 = vertices[t2 + 6], v1 = vertices[t2 + 7];
-						let x2 = vertices[t3], y2 = vertices[t3 + 1], u2 = vertices[t3 + 6], v2 = vertices[t3 + 7];
-
-						this.drawTriangle(texture, x0, y0, u0, v0, x1, y1, u1, v1, x2, y2, u2, v2);
-
-						if (this.debugRendering) {
-							ctx.strokeStyle = "green";
-							ctx.beginPath();
-							ctx.moveTo(x0, y0);
-							ctx.lineTo(x1, y1);
-							ctx.lineTo(x2, y2);
-							ctx.lineTo(x0, y0);
-							ctx.stroke();
-						}
+					if (this.debugRendering) {
+						ctx.strokeStyle = "green";
+						ctx.beginPath();
+						ctx.moveTo(x0, y0);
+						ctx.lineTo(x1, y1);
+						ctx.lineTo(x2, y2);
+						ctx.lineTo(x0, y0);
+						ctx.stroke();
 					}
 				}
 			}
-
-			this.ctx.globalAlpha = 1;
 		}
 
-		// Adapted from http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
-		// Apache 2 licensed
-		private drawTriangle(img: HTMLImageElement, x0: number, y0: number, u0: number, v0: number,
-			x1: number, y1: number, u1: number, v1: number,
-			x2: number, y2: number, u2: number, v2: number) {
-			let ctx = this.ctx;
+		this.ctx.globalAlpha = 1;
+	}
 
-			u0 *= img.width;
-			v0 *= img.height;
-			u1 *= img.width;
-			v1 *= img.height;
-			u2 *= img.width;
-			v2 *= img.height;
+	// Adapted from http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
+	// Apache 2 licensed
+	private drawTriangle(img: HTMLImageElement, x0: number, y0: number, u0: number, v0: number,
+		x1: number, y1: number, u1: number, v1: number,
+		x2: number, y2: number, u2: number, v2: number) {
+		let ctx = this.ctx;
 
-			ctx.beginPath();
-			ctx.moveTo(x0, y0);
-			ctx.lineTo(x1, y1);
-			ctx.lineTo(x2, y2);
-			ctx.closePath();
+		u0 *= img.width;
+		v0 *= img.height;
+		u1 *= img.width;
+		v1 *= img.height;
+		u2 *= img.width;
+		v2 *= img.height;
 
-			x1 -= x0;
-			y1 -= y0;
-			x2 -= x0;
-			y2 -= y0;
+		ctx.beginPath();
+		ctx.moveTo(x0, y0);
+		ctx.lineTo(x1, y1);
+		ctx.lineTo(x2, y2);
+		ctx.closePath();
 
-			u1 -= u0;
-			v1 -= v0;
-			u2 -= u0;
-			v2 -= v0;
+		x1 -= x0;
+		y1 -= y0;
+		x2 -= x0;
+		y2 -= y0;
 
-			var det = 1 / (u1 * v2 - u2 * v1),
+		u1 -= u0;
+		v1 -= v0;
+		u2 -= u0;
+		v2 -= v0;
 
-				// linear transformation
-				a = (v2 * x1 - v1 * x2) * det,
-				b = (v2 * y1 - v1 * y2) * det,
-				c = (u1 * x2 - u2 * x1) * det,
-				d = (u1 * y2 - u2 * y1) * det,
+		var det = 1 / (u1 * v2 - u2 * v1),
 
-				// translation
-				e = x0 - a * u0 - c * v0,
-				f = y0 - b * u0 - d * v0;
+			// linear transformation
+			a = (v2 * x1 - v1 * x2) * det,
+			b = (v2 * y1 - v1 * y2) * det,
+			c = (u1 * x2 - u2 * x1) * det,
+			d = (u1 * y2 - u2 * y1) * det,
 
-			ctx.save();
-			ctx.transform(a, b, c, d, e, f);
-			ctx.clip();
-			ctx.drawImage(img, 0, 0);
-			ctx.restore();
+			// translation
+			e = x0 - a * u0 - c * v0,
+			f = y0 - b * u0 - d * v0;
+
+		ctx.save();
+		ctx.transform(a, b, c, d, e, f);
+		ctx.clip();
+		ctx.drawImage(img, 0, 0);
+		ctx.restore();
+	}
+
+	private computeRegionVertices(slot: Slot, region: RegionAttachment, pma: boolean) {
+		let skeletonColor = slot.bone.skeleton.color;
+		let slotColor = slot.color;
+		let regionColor = region.color;
+		let alpha = skeletonColor.a * slotColor.a * regionColor.a;
+		let multiplier = pma ? alpha : 1;
+		let color = this.tempColor;
+		color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
+			skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+			skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+			alpha);
+
+		region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+
+		let vertices = this.vertices;
+		let uvs = region.uvs;
+
+		vertices[RegionAttachment.C1R] = color.r;
+		vertices[RegionAttachment.C1G] = color.g;
+		vertices[RegionAttachment.C1B] = color.b;
+		vertices[RegionAttachment.C1A] = color.a;
+		vertices[RegionAttachment.U1] = uvs[0];
+		vertices[RegionAttachment.V1] = uvs[1];
+
+		vertices[RegionAttachment.C2R] = color.r;
+		vertices[RegionAttachment.C2G] = color.g;
+		vertices[RegionAttachment.C2B] = color.b;
+		vertices[RegionAttachment.C2A] = color.a;
+		vertices[RegionAttachment.U2] = uvs[2];
+		vertices[RegionAttachment.V2] = uvs[3];
+
+		vertices[RegionAttachment.C3R] = color.r;
+		vertices[RegionAttachment.C3G] = color.g;
+		vertices[RegionAttachment.C3B] = color.b;
+		vertices[RegionAttachment.C3A] = color.a;
+		vertices[RegionAttachment.U3] = uvs[4];
+		vertices[RegionAttachment.V3] = uvs[5];
+
+		vertices[RegionAttachment.C4R] = color.r;
+		vertices[RegionAttachment.C4G] = color.g;
+		vertices[RegionAttachment.C4B] = color.b;
+		vertices[RegionAttachment.C4A] = color.a;
+		vertices[RegionAttachment.U4] = uvs[6];
+		vertices[RegionAttachment.V4] = uvs[7];
+
+		return vertices;
+	}
+
+	private computeMeshVertices(slot: Slot, mesh: MeshAttachment, pma: boolean) {
+		let skeletonColor = slot.bone.skeleton.color;
+		let slotColor = slot.color;
+		let regionColor = mesh.color;
+		let alpha = skeletonColor.a * slotColor.a * regionColor.a;
+		let multiplier = pma ? alpha : 1;
+		let color = this.tempColor;
+		color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
+			skeletonColor.g * slotColor.g * regionColor.g * multiplier,
+			skeletonColor.b * slotColor.b * regionColor.b * multiplier,
+			alpha);
+
+		let vertexCount = mesh.worldVerticesLength / 2;
+		let vertices = this.vertices;
+		if (vertices.length < mesh.worldVerticesLength) this.vertices = vertices = Utils.newFloatArray(mesh.worldVerticesLength);
+		mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+
+		let uvs = mesh.uvs;
+		for (let i = 0, u = 0, v = 2; i < vertexCount; i++) {
+			vertices[v++] = color.r;
+			vertices[v++] = color.g;
+			vertices[v++] = color.b;
+			vertices[v++] = color.a;
+			vertices[v++] = uvs[u++];
+			vertices[v++] = uvs[u++];
+			v += 2;
 		}
 
-		private computeRegionVertices(slot: Slot, region: RegionAttachment, pma: boolean) {
-			let skeletonColor = slot.bone.skeleton.color;
-			let slotColor = slot.color;
-			let regionColor = region.color;
-			let alpha = skeletonColor.a * slotColor.a * regionColor.a;
-			let multiplier = pma ? alpha : 1;
-			let color = this.tempColor;
-			color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
-				skeletonColor.g * slotColor.g * regionColor.g * multiplier,
-				skeletonColor.b * slotColor.b * regionColor.b * multiplier,
-				alpha);
-
-			region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
-
-			let vertices = this.vertices;
-			let uvs = region.uvs;
-
-			vertices[RegionAttachment.C1R] = color.r;
-			vertices[RegionAttachment.C1G] = color.g;
-			vertices[RegionAttachment.C1B] = color.b;
-			vertices[RegionAttachment.C1A] = color.a;
-			vertices[RegionAttachment.U1] = uvs[0];
-			vertices[RegionAttachment.V1] = uvs[1];
-
-			vertices[RegionAttachment.C2R] = color.r;
-			vertices[RegionAttachment.C2G] = color.g;
-			vertices[RegionAttachment.C2B] = color.b;
-			vertices[RegionAttachment.C2A] = color.a;
-			vertices[RegionAttachment.U2] = uvs[2];
-			vertices[RegionAttachment.V2] = uvs[3];
-
-			vertices[RegionAttachment.C3R] = color.r;
-			vertices[RegionAttachment.C3G] = color.g;
-			vertices[RegionAttachment.C3B] = color.b;
-			vertices[RegionAttachment.C3A] = color.a;
-			vertices[RegionAttachment.U3] = uvs[4];
-			vertices[RegionAttachment.V3] = uvs[5];
-
-			vertices[RegionAttachment.C4R] = color.r;
-			vertices[RegionAttachment.C4G] = color.g;
-			vertices[RegionAttachment.C4B] = color.b;
-			vertices[RegionAttachment.C4A] = color.a;
-			vertices[RegionAttachment.U4] = uvs[6];
-			vertices[RegionAttachment.V4] = uvs[7];
-
-			return vertices;
-		}
-
-		private computeMeshVertices(slot: Slot, mesh: MeshAttachment, pma: boolean) {
-			let skeletonColor = slot.bone.skeleton.color;
-			let slotColor = slot.color;
-			let regionColor = mesh.color;
-			let alpha = skeletonColor.a * slotColor.a * regionColor.a;
-			let multiplier = pma ? alpha : 1;
-			let color = this.tempColor;
-			color.set(skeletonColor.r * slotColor.r * regionColor.r * multiplier,
-				skeletonColor.g * slotColor.g * regionColor.g * multiplier,
-				skeletonColor.b * slotColor.b * regionColor.b * multiplier,
-				alpha);
-
-			let vertexCount = mesh.worldVerticesLength / 2;
-			let vertices = this.vertices;
-			if (vertices.length < mesh.worldVerticesLength) this.vertices = vertices = Utils.newFloatArray(mesh.worldVerticesLength);
-			mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, SkeletonRenderer.VERTEX_SIZE);
-
-			let uvs = mesh.uvs;
-			for (let i = 0, u = 0, v = 2; i < vertexCount; i++) {
-				vertices[v++] = color.r;
-				vertices[v++] = color.g;
-				vertices[v++] = color.b;
-				vertices[v++] = color.a;
-				vertices[v++] = uvs[u++];
-				vertices[v++] = uvs[u++];
-				v += 2;
-			}
-
-			return vertices;
-		}
+		return vertices;
 	}
 }

@@ -4,6 +4,34 @@
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.spine = {}));
 }(this, (function (exports) { 'use strict';
 
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
     var __extends$d = (this && this.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
@@ -19,7 +47,7 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var IntSet = (function () {
+    var IntSet = /** @class */ (function () {
         function IntSet() {
             this.array = new Array();
         }
@@ -39,7 +67,7 @@
         };
         return IntSet;
     }());
-    var StringSet = (function () {
+    var StringSet = /** @class */ (function () {
         function StringSet() {
             this.entries = {};
             this.size = 0;
@@ -68,7 +96,7 @@
         };
         return StringSet;
     }());
-    var Color = (function () {
+    var Color = /** @class */ (function () {
         function Color(r, g, b, a) {
             if (r === void 0) { r = 0; }
             if (g === void 0) { g = 0; }
@@ -148,7 +176,7 @@
         Color.MAGENTA = new Color(1, 0, 1, 1);
         return Color;
     }());
-    var MathUtils = (function () {
+    var MathUtils = /** @class */ (function () {
         function MathUtils() {
         }
         MathUtils.clamp = function (value, min, max) {
@@ -195,7 +223,7 @@
         MathUtils.degRad = MathUtils.degreesToRadians;
         return MathUtils;
     }());
-    var Interpolation = (function () {
+    var Interpolation = /** @class */ (function () {
         function Interpolation() {
         }
         Interpolation.prototype.apply = function (start, end, a) {
@@ -203,7 +231,7 @@
         };
         return Interpolation;
     }());
-    var Pow = (function (_super) {
+    var Pow = /** @class */ (function (_super) {
         __extends$d(Pow, _super);
         function Pow(power) {
             var _this = _super.call(this) || this;
@@ -218,7 +246,7 @@
         };
         return Pow;
     }(Interpolation));
-    var PowOut = (function (_super) {
+    var PowOut = /** @class */ (function (_super) {
         __extends$d(PowOut, _super);
         function PowOut(power) {
             return _super.call(this, power) || this;
@@ -228,7 +256,7 @@
         };
         return PowOut;
     }(Pow));
-    var Utils = (function () {
+    var Utils = /** @class */ (function () {
         function Utils() {
         }
         Utils.arrayCopy = function (source, sourceStart, dest, destStart, numElements) {
@@ -290,6 +318,7 @@
         Utils.toSinglePrecision = function (value) {
             return Utils.SUPPORTS_TYPED_ARRAYS ? Math.fround(value) : value;
         };
+        // This function is used to fix WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
         Utils.webkit602BugfixHelper = function (alpha, blend) {
         };
         Utils.contains = function (array, element, identity) {
@@ -304,7 +333,7 @@
         Utils.SUPPORTS_TYPED_ARRAYS = typeof (Float32Array) !== "undefined";
         return Utils;
     }());
-    var DebugUtils = (function () {
+    var DebugUtils = /** @class */ (function () {
         function DebugUtils() {
         }
         DebugUtils.logBones = function (skeleton) {
@@ -315,7 +344,7 @@
         };
         return DebugUtils;
     }());
-    var Pool = (function () {
+    var Pool = /** @class */ (function () {
         function Pool(instantiator) {
             this.items = new Array();
             this.instantiator = instantiator;
@@ -337,7 +366,7 @@
         };
         return Pool;
     }());
-    var Vector2 = (function () {
+    var Vector2 = /** @class */ (function () {
         function Vector2(x, y) {
             if (x === void 0) { x = 0; }
             if (y === void 0) { y = 0; }
@@ -364,7 +393,7 @@
         };
         return Vector2;
     }());
-    var TimeKeeper = (function () {
+    var TimeKeeper = /** @class */ (function () {
         function TimeKeeper() {
             this.maxDelta = 0.064;
             this.framesPerSecond = 0;
@@ -391,7 +420,7 @@
         };
         return TimeKeeper;
     }());
-    var WindowedMean = (function () {
+    var WindowedMean = /** @class */ (function () {
         function WindowedMean(windowSize) {
             if (windowSize === void 0) { windowSize = 32; }
             this.addedValues = 0;
@@ -427,6 +456,34 @@
         return WindowedMean;
     }());
 
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
     var __extends$c = (this && this.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
@@ -442,7 +499,8 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var Attachment = (function () {
+    /** The base class for all attachments. */
+    var Attachment = /** @class */ (function () {
         function Attachment(name) {
             if (!name)
                 throw new Error("name cannot be null.");
@@ -450,15 +508,32 @@
         }
         return Attachment;
     }());
-    var VertexAttachment = (function (_super) {
+    /** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
+     * {@link Slot#deform}. */
+    var VertexAttachment = /** @class */ (function (_super) {
         __extends$c(VertexAttachment, _super);
         function VertexAttachment(name) {
             var _this = _super.call(this, name) || this;
+            /** The unique ID for this attachment. */
             _this.id = VertexAttachment.nextID++;
+            /** The maximum number of world vertex values that can be output by
+             * {@link #computeWorldVertices()} using the `count` parameter. */
             _this.worldVerticesLength = 0;
+            /** Deform keys for the deform attachment are also applied to this attachment. May be null if no deform keys should be applied. */
             _this.deformAttachment = _this;
             return _this;
         }
+        /** Transforms the attachment's local {@link #vertices} to world coordinates. If the slot's {@link Slot#deform} is
+         * not empty, it is used to deform the vertices.
+         *
+         * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+         * Runtimes Guide.
+         * @param start The index of the first {@link #vertices} value to transform. Each vertex has 2 values, x and y.
+         * @param count The number of world vertex values to output. Must be <= {@link #worldVerticesLength} - `start`.
+         * @param worldVertices The output world vertices. Must have a length >= `offset` + `count` *
+         *           `stride` / 2.
+         * @param offset The `worldVertices` index to begin writing values.
+         * @param stride The number of `worldVertices` entries between the value pairs written. */
         VertexAttachment.prototype.computeWorldVertices = function (slot, start, count, worldVertices, offset, stride) {
             count = offset + (count >> 1) * stride;
             var skeleton = slot.bone.skeleton;
@@ -518,6 +593,7 @@
                 }
             }
         };
+        /** Does not copy id (generated) or name (set on construction). **/
         VertexAttachment.prototype.copyTo = function (attachment) {
             if (this.bones) {
                 attachment.bones = new Array(this.bones.length);
@@ -538,6 +614,34 @@
         return VertexAttachment;
     }(Attachment));
 
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
     var __extends$b = (this && this.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
@@ -553,7 +657,8 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var Animation = (function () {
+    /** A simple container for a list of timelines and a name. */
+    var Animation = /** @class */ (function () {
         function Animation(name, timelines, duration) {
             if (!name)
                 throw new Error("name cannot be null.");
@@ -575,6 +680,11 @@
                     return true;
             return false;
         };
+        /** Applies all the animation's timelines to the specified skeleton.
+         *
+         * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection)}.
+         * @param loop If true, the animation repeats after {@link #getDuration()}.
+         * @param events May be null to ignore fired events. */
         Animation.prototype.apply = function (skeleton, lastTime, time, loop, events, alpha, blend, direction) {
             if (!skeleton)
                 throw new Error("skeleton cannot be null.");
@@ -589,13 +699,38 @@
         };
         return Animation;
     }());
+    /** Controls how a timeline value is mixed with the setup pose value or current pose value when a timeline's `alpha`
+     * < 1.
+     *
+     * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection)}. */
     exports.MixBlend = void 0;
     (function (MixBlend) {
+        /** Transitions from the setup value to the timeline value (the current value is not used). Before the first key, the setup
+         * value is set. */
         MixBlend[MixBlend["setup"] = 0] = "setup";
+        /** Transitions from the current value to the timeline value. Before the first key, transitions from the current value to
+         * the setup value. Timelines which perform instant transitions, such as {@link DrawOrderTimeline} or
+         * {@link AttachmentTimeline}, use the setup value before the first key.
+         *
+         * `first` is intended for the first animations applied, not for animations layered on top of those. */
         MixBlend[MixBlend["first"] = 1] = "first";
+        /** Transitions from the current value to the timeline value. No change is made before the first key (the current value is
+         * kept until the first key).
+         *
+         * `replace` is intended for animations layered on top of others, not for the first animations applied. */
         MixBlend[MixBlend["replace"] = 2] = "replace";
+        /** Transitions from the current value to the current value plus the timeline value. No change is made before the first key
+         * (the current value is kept until the first key).
+         *
+         * `add` is intended for animations layered on top of others, not for the first animations applied. Properties
+         * keyed by additive animations must be set manually or by another animation before applying the additive animations, else
+         * the property values will increase continually. */
         MixBlend[MixBlend["add"] = 3] = "add";
     })(exports.MixBlend || (exports.MixBlend = {}));
+    /** Indicates whether a timeline's `alpha` is mixing out over time toward 0 (the setup or current pose value) or
+     * mixing in toward 1 (the timeline's value).
+     *
+     * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection)}. */
     exports.MixDirection = void 0;
     (function (MixDirection) {
         MixDirection[MixDirection["mixIn"] = 0] = "mixIn";
@@ -622,7 +757,8 @@
         pathConstraintSpacing: 17,
         pathConstraintMix: 18
     };
-    var Timeline = (function () {
+    /** The interface for all timelines. */
+    var Timeline = /** @class */ (function () {
         function Timeline(frameCount, propertyIds) {
             this.propertyIds = propertyIds;
             this.frames = Utils.newFloatArray(frameCount * this.getFrameEntries());
@@ -655,39 +791,58 @@
         };
         return Timeline;
     }());
-    var CurveTimeline = (function (_super) {
+    /** The base class for timelines that use interpolation between key frame values. */
+    var CurveTimeline = /** @class */ (function (_super) {
         __extends$b(CurveTimeline, _super);
         function CurveTimeline(frameCount, bezierCount, propertyIds) {
             var _this = _super.call(this, frameCount, propertyIds) || this;
-            _this.curves = Utils.newFloatArray(frameCount + bezierCount * 18);
-            _this.curves[frameCount - 1] = 1;
+            _this.curves = Utils.newFloatArray(frameCount + bezierCount * 18 /*BEZIER_SIZE*/);
+            _this.curves[frameCount - 1] = 1 /*STEPPED*/;
             return _this;
         }
+        /** Sets the specified key frame to linear interpolation. */
         CurveTimeline.prototype.setLinear = function (frame) {
-            this.curves[frame] = 0;
+            this.curves[frame] = 0 /*LINEAR*/;
         };
+        /** Sets the specified key frame to stepped interpolation. */
         CurveTimeline.prototype.setStepped = function (frame) {
-            this.curves[frame] = 1;
+            this.curves[frame] = 1 /*STEPPED*/;
         };
+        /** Shrinks the storage for Bezier curves, for use when <code>bezierCount</code> (specified in the constructor) was larger
+         * than the actual number of Bezier curves. */
         CurveTimeline.prototype.shrink = function (bezierCount) {
-            var size = this.getFrameCount() + bezierCount * 18;
+            var size = this.getFrameCount() + bezierCount * 18 /*BEZIER_SIZE*/;
             if (this.curves.length > size) {
                 var newCurves = Utils.newFloatArray(size);
                 Utils.arrayCopy(this.curves, 0, newCurves, 0, size);
                 this.curves = newCurves;
             }
         };
+        /** Stores the segments for the specified Bezier curve. For timelines that modify multiple values, there may be more than
+         * one curve per frame.
+         * @param bezier The ordinal of this Bezier curve for this timeline, between 0 and <code>bezierCount - 1</code> (specified
+         *           in the constructor), inclusive.
+         * @param frame Between 0 and <code>frameCount - 1</code>, inclusive.
+         * @param value The index of the value for this frame that this curve is used for.
+         * @param time1 The time for the first key.
+         * @param value1 The value for the first key.
+         * @param cx1 The time for the first Bezier handle.
+         * @param cy1 The value for the first Bezier handle.
+         * @param cx2 The time of the second Bezier handle.
+         * @param cy2 The value for the second Bezier handle.
+         * @param time2 The time for the second key.
+         * @param value2 The value for the second key. */
         CurveTimeline.prototype.setBezier = function (bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2) {
             var curves = this.curves;
-            var i = this.getFrameCount() + bezier * 18;
+            var i = this.getFrameCount() + bezier * 18 /*BEZIER_SIZE*/;
             if (value == 0)
-                curves[frame] = 2 + i;
+                curves[frame] = 2 /*BEZIER*/ + i;
             var tmpx = (time1 - cx1 * 2 + cx2) * 0.03, tmpy = (value1 - cy1 * 2 + cy2) * 0.03;
             var dddx = ((cx1 - cx2) * 3 - time1 + time2) * 0.006, dddy = ((cy1 - cy2) * 3 - value1 + value2) * 0.006;
             var ddx = tmpx * 2 + dddx, ddy = tmpy * 2 + dddy;
             var dx = (cx1 - time1) * 0.3 + tmpx + dddx * 0.16666667, dy = (cy1 - value1) * 0.3 + tmpy + dddy * 0.16666667;
             var x = time1 + dx, y = value1 + dy;
-            for (var n = i + 18; i < n; i += 2) {
+            for (var n = i + 18 /*BEZIER_SIZE*/; i < n; i += 2) {
                 curves[i] = x;
                 curves[i + 1] = y;
                 dx += ddx;
@@ -698,13 +853,17 @@
                 y += dy;
             }
         };
+        /** Returns the Bezier interpolated value for the specified time.
+         * @param frameIndex The index into {@link #getFrames()} for the values of the frame before <code>time</code>.
+         * @param valueOffset The offset from <code>frameIndex</code> to the value this curve is used for.
+         * @param i The index of the Bezier segments. See {@link #getCurveType(int)}. */
         CurveTimeline.prototype.getBezierValue = function (time, frameIndex, valueOffset, i) {
             var curves = this.curves;
             if (curves[i] > time) {
                 var x_1 = this.frames[frameIndex], y_1 = this.frames[frameIndex + valueOffset];
                 return y_1 + (time - x_1) / (curves[i] - x_1) * (curves[i + 1] - y_1);
             }
-            var n = i + 18;
+            var n = i + 18 /*BEZIER_SIZE*/;
             for (i += 2; i < n; i += 2) {
                 if (curves[i] >= time) {
                     var x_2 = curves[i - 2], y_2 = curves[i - 1];
@@ -717,19 +876,23 @@
         };
         return CurveTimeline;
     }(Timeline));
-    var CurveTimeline1 = (function (_super) {
+    var CurveTimeline1 = /** @class */ (function (_super) {
         __extends$b(CurveTimeline1, _super);
         function CurveTimeline1(frameCount, bezierCount, propertyId) {
             return _super.call(this, frameCount, bezierCount, [propertyId]) || this;
         }
         CurveTimeline1.prototype.getFrameEntries = function () {
-            return 2;
+            return 2 /*ENTRIES*/;
         };
+        /** Sets the time and value for the specified frame.
+         * @param frame Between 0 and <code>frameCount</code>, inclusive.
+         * @param time The frame time in seconds. */
         CurveTimeline1.prototype.setFrame = function (frame, time, value) {
             frame <<= 1;
             this.frames[frame] = time;
-            this.frames[frame + 1] = value;
+            this.frames[frame + 1 /*VALUE*/] = value;
         };
+        /** Returns the interpolated value for the specified time. */
         CurveTimeline1.prototype.getCurveValue = function (time) {
             var frames = this.frames;
             var i = frames.length - 2;
@@ -741,33 +904,40 @@
             }
             var curveType = this.curves[i >> 1];
             switch (curveType) {
-                case 0:
-                    var before = frames[i], value = frames[i + 1];
-                    return value + (time - before) / (frames[i + 2] - before) * (frames[i + 2 + 1] - value);
-                case 1:
-                    return frames[i + 1];
+                case 0 /*LINEAR*/:
+                    var before = frames[i], value = frames[i + 1 /*VALUE*/];
+                    return value + (time - before) / (frames[i + 2 /*ENTRIES*/] - before) * (frames[i + 2 /*ENTRIES*/ + 1 /*VALUE*/] - value);
+                case 1 /*STEPPED*/:
+                    return frames[i + 1 /*VALUE*/];
             }
-            return this.getBezierValue(time, i, 1, curveType - 2);
+            return this.getBezierValue(time, i, 1 /*VALUE*/, curveType - 2 /*BEZIER*/);
         };
         return CurveTimeline1;
     }(CurveTimeline));
-    var CurveTimeline2 = (function (_super) {
+    /** The base class for a {@link CurveTimeline} which sets two properties. */
+    var CurveTimeline2 = /** @class */ (function (_super) {
         __extends$b(CurveTimeline2, _super);
+        /** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
+         * @param propertyIds Unique identifiers for the properties the timeline modifies. */
         function CurveTimeline2(frameCount, bezierCount, propertyId1, propertyId2) {
             return _super.call(this, frameCount, bezierCount, [propertyId1, propertyId2]) || this;
         }
         CurveTimeline2.prototype.getFrameEntries = function () {
-            return 3;
+            return 3 /*ENTRIES*/;
         };
+        /** Sets the time and values for the specified frame.
+         * @param frame Between 0 and <code>frameCount</code>, inclusive.
+         * @param time The frame time in seconds. */
         CurveTimeline2.prototype.setFrame = function (frame, time, value1, value2) {
-            frame *= 3;
+            frame *= 3 /*ENTRIES*/;
             this.frames[frame] = time;
-            this.frames[frame + 1] = value1;
-            this.frames[frame + 2] = value2;
+            this.frames[frame + 1 /*VALUE1*/] = value1;
+            this.frames[frame + 2 /*VALUE2*/] = value2;
         };
         return CurveTimeline2;
     }(CurveTimeline));
-    var RotateTimeline = (function (_super) {
+    /** Changes a bone's local {@link Bone#rotation}. */
+    var RotateTimeline = /** @class */ (function (_super) {
         __extends$b(RotateTimeline, _super);
         function RotateTimeline(frameCount, bezierCount, boneIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.rotate + "|" + boneIndex) || this;
@@ -804,7 +974,8 @@
         };
         return RotateTimeline;
     }(CurveTimeline1));
-    var TranslateTimeline = (function (_super) {
+    /** Changes a bone's local {@link Bone#x} and {@link Bone#y}. */
+    var TranslateTimeline = /** @class */ (function (_super) {
         __extends$b(TranslateTimeline, _super);
         function TranslateTimeline(frameCount, bezierCount, boneIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.x + "|" + boneIndex, Property.y + "|" + boneIndex) || this;
@@ -830,24 +1001,24 @@
                 return;
             }
             var x = 0, y = 0;
-            var i = Timeline.search(frames, time, 3);
-            var curveType = this.curves[i / 3];
+            var i = Timeline.search(frames, time, 3 /*ENTRIES*/);
+            var curveType = this.curves[i / 3 /*ENTRIES*/];
             switch (curveType) {
-                case 0:
+                case 0 /*LINEAR*/:
                     var before = frames[i];
-                    x = frames[i + 1];
-                    y = frames[i + 2];
-                    var t = (time - before) / (frames[i + 3] - before);
-                    x += (frames[i + 3 + 1] - x) * t;
-                    y += (frames[i + 3 + 2] - y) * t;
+                    x = frames[i + 1 /*VALUE1*/];
+                    y = frames[i + 2 /*VALUE2*/];
+                    var t = (time - before) / (frames[i + 3 /*ENTRIES*/] - before);
+                    x += (frames[i + 3 /*ENTRIES*/ + 1 /*VALUE1*/] - x) * t;
+                    y += (frames[i + 3 /*ENTRIES*/ + 2 /*VALUE2*/] - y) * t;
                     break;
-                case 1:
-                    x = frames[i + 1];
-                    y = frames[i + 2];
+                case 1 /*STEPPED*/:
+                    x = frames[i + 1 /*VALUE1*/];
+                    y = frames[i + 2 /*VALUE2*/];
                     break;
                 default:
-                    x = this.getBezierValue(time, i, 1, curveType - 2);
-                    y = this.getBezierValue(time, i, 2, curveType + 18 - 2);
+                    x = this.getBezierValue(time, i, 1 /*VALUE1*/, curveType - 2 /*BEZIER*/);
+                    y = this.getBezierValue(time, i, 2 /*VALUE2*/, curveType + 18 /*BEZIER_SIZE*/ - 2 /*BEZIER*/);
             }
             switch (blend) {
                 case exports.MixBlend.setup:
@@ -866,7 +1037,8 @@
         };
         return TranslateTimeline;
     }(CurveTimeline2));
-    var TranslateXTimeline = (function (_super) {
+    /** Changes a bone's local {@link Bone#x}. */
+    var TranslateXTimeline = /** @class */ (function (_super) {
         __extends$b(TranslateXTimeline, _super);
         function TranslateXTimeline(frameCount, bezierCount, boneIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.x + "|" + boneIndex) || this;
@@ -904,7 +1076,8 @@
         };
         return TranslateXTimeline;
     }(CurveTimeline1));
-    var TranslateYTimeline = (function (_super) {
+    /** Changes a bone's local {@link Bone#x}. */
+    var TranslateYTimeline = /** @class */ (function (_super) {
         __extends$b(TranslateYTimeline, _super);
         function TranslateYTimeline(frameCount, bezierCount, boneIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.y + "|" + boneIndex) || this;
@@ -942,7 +1115,8 @@
         };
         return TranslateYTimeline;
     }(CurveTimeline1));
-    var ScaleTimeline = (function (_super) {
+    /** Changes a bone's local {@link Bone#scaleX)} and {@link Bone#scaleY}. */
+    var ScaleTimeline = /** @class */ (function (_super) {
         __extends$b(ScaleTimeline, _super);
         function ScaleTimeline(frameCount, bezierCount, boneIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.scaleX + "|" + boneIndex, Property.scaleY + "|" + boneIndex) || this;
@@ -968,24 +1142,24 @@
                 return;
             }
             var x, y;
-            var i = Timeline.search(frames, time, 3);
-            var curveType = this.curves[i / 3];
+            var i = Timeline.search(frames, time, 3 /*ENTRIES*/);
+            var curveType = this.curves[i / 3 /*ENTRIES*/];
             switch (curveType) {
-                case 0:
+                case 0 /*LINEAR*/:
                     var before = frames[i];
-                    x = frames[i + 1];
-                    y = frames[i + 2];
-                    var t = (time - before) / (frames[i + 3] - before);
-                    x += (frames[i + 3 + 1] - x) * t;
-                    y += (frames[i + 3 + 2] - y) * t;
+                    x = frames[i + 1 /*VALUE1*/];
+                    y = frames[i + 2 /*VALUE2*/];
+                    var t = (time - before) / (frames[i + 3 /*ENTRIES*/] - before);
+                    x += (frames[i + 3 /*ENTRIES*/ + 1 /*VALUE1*/] - x) * t;
+                    y += (frames[i + 3 /*ENTRIES*/ + 2 /*VALUE2*/] - y) * t;
                     break;
-                case 1:
-                    x = frames[i + 1];
-                    y = frames[i + 2];
+                case 1 /*STEPPED*/:
+                    x = frames[i + 1 /*VALUE1*/];
+                    y = frames[i + 2 /*VALUE2*/];
                     break;
                 default:
-                    x = this.getBezierValue(time, i, 1, curveType - 2);
-                    y = this.getBezierValue(time, i, 2, curveType + 18 - 2);
+                    x = this.getBezierValue(time, i, 1 /*VALUE1*/, curveType - 2 /*BEZIER*/);
+                    y = this.getBezierValue(time, i, 2 /*VALUE2*/, curveType + 18 /*BEZIER_SIZE*/ - 2 /*BEZIER*/);
             }
             x *= bone.data.scaleX;
             y *= bone.data.scaleY;
@@ -1049,7 +1223,8 @@
         };
         return ScaleTimeline;
     }(CurveTimeline2));
-    var ScaleXTimeline = (function (_super) {
+    /** Changes a bone's local {@link Bone#scaleX)} and {@link Bone#scaleY}. */
+    var ScaleXTimeline = /** @class */ (function (_super) {
         __extends$b(ScaleXTimeline, _super);
         function ScaleXTimeline(frameCount, bezierCount, boneIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.scaleX + "|" + boneIndex) || this;
@@ -1080,6 +1255,7 @@
                     bone.scaleX = x;
             }
             else {
+                // Mixing out uses sign of setup or current pose, else use sign of key.
                 var bx = 0;
                 if (direction == exports.MixDirection.mixOut) {
                     switch (blend) {
@@ -1117,7 +1293,8 @@
         };
         return ScaleXTimeline;
     }(CurveTimeline1));
-    var ScaleYTimeline = (function (_super) {
+    /** Changes a bone's local {@link Bone#scaleX)} and {@link Bone#scaleY}. */
+    var ScaleYTimeline = /** @class */ (function (_super) {
         __extends$b(ScaleYTimeline, _super);
         function ScaleYTimeline(frameCount, bezierCount, boneIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.scaleY + "|" + boneIndex) || this;
@@ -1148,6 +1325,7 @@
                     bone.scaleY = y;
             }
             else {
+                // Mixing out uses sign of setup or current pose, else use sign of key.
                 var by = 0;
                 if (direction == exports.MixDirection.mixOut) {
                     switch (blend) {
@@ -1185,7 +1363,8 @@
         };
         return ScaleYTimeline;
     }(CurveTimeline1));
-    var ShearTimeline = (function (_super) {
+    /** Changes a bone's local {@link Bone#shearX} and {@link Bone#shearY}. */
+    var ShearTimeline = /** @class */ (function (_super) {
         __extends$b(ShearTimeline, _super);
         function ShearTimeline(frameCount, bezierCount, boneIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.shearX + "|" + boneIndex, Property.shearY + "|" + boneIndex) || this;
@@ -1211,24 +1390,24 @@
                 return;
             }
             var x = 0, y = 0;
-            var i = Timeline.search(frames, time, 3);
-            var curveType = this.curves[i / 3];
+            var i = Timeline.search(frames, time, 3 /*ENTRIES*/);
+            var curveType = this.curves[i / 3 /*ENTRIES*/];
             switch (curveType) {
-                case 0:
+                case 0 /*LINEAR*/:
                     var before = frames[i];
-                    x = frames[i + 1];
-                    y = frames[i + 2];
-                    var t = (time - before) / (frames[i + 3] - before);
-                    x += (frames[i + 3 + 1] - x) * t;
-                    y += (frames[i + 3 + 2] - y) * t;
+                    x = frames[i + 1 /*VALUE1*/];
+                    y = frames[i + 2 /*VALUE2*/];
+                    var t = (time - before) / (frames[i + 3 /*ENTRIES*/] - before);
+                    x += (frames[i + 3 /*ENTRIES*/ + 1 /*VALUE1*/] - x) * t;
+                    y += (frames[i + 3 /*ENTRIES*/ + 2 /*VALUE2*/] - y) * t;
                     break;
-                case 1:
-                    x = frames[i + 1];
-                    y = frames[i + 2];
+                case 1 /*STEPPED*/:
+                    x = frames[i + 1 /*VALUE1*/];
+                    y = frames[i + 2 /*VALUE2*/];
                     break;
                 default:
-                    x = this.getBezierValue(time, i, 1, curveType - 2);
-                    y = this.getBezierValue(time, i, 2, curveType + 18 - 2);
+                    x = this.getBezierValue(time, i, 1 /*VALUE1*/, curveType - 2 /*BEZIER*/);
+                    y = this.getBezierValue(time, i, 2 /*VALUE2*/, curveType + 18 /*BEZIER_SIZE*/ - 2 /*BEZIER*/);
             }
             switch (blend) {
                 case exports.MixBlend.setup:
@@ -1247,7 +1426,8 @@
         };
         return ShearTimeline;
     }(CurveTimeline2));
-    var ShearXTimeline = (function (_super) {
+    /** Changes a bone's local {@link Bone#shearX} and {@link Bone#shearY}. */
+    var ShearXTimeline = /** @class */ (function (_super) {
         __extends$b(ShearXTimeline, _super);
         function ShearXTimeline(frameCount, bezierCount, boneIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.shearX + "|" + boneIndex) || this;
@@ -1285,7 +1465,8 @@
         };
         return ShearXTimeline;
     }(CurveTimeline1));
-    var ShearYTimeline = (function (_super) {
+    /** Changes a bone's local {@link Bone#shearX} and {@link Bone#shearY}. */
+    var ShearYTimeline = /** @class */ (function (_super) {
         __extends$b(ShearYTimeline, _super);
         function ShearYTimeline(frameCount, bezierCount, boneIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.shearY + "|" + boneIndex) || this;
@@ -1323,7 +1504,8 @@
         };
         return ShearYTimeline;
     }(CurveTimeline1));
-    var RGBATimeline = (function (_super) {
+    /** Changes a slot's {@link Slot#color}. */
+    var RGBATimeline = /** @class */ (function (_super) {
         __extends$b(RGBATimeline, _super);
         function RGBATimeline(frameCount, bezierCount, slotIndex) {
             var _this = _super.call(this, frameCount, bezierCount, [
@@ -1335,15 +1517,16 @@
             return _this;
         }
         RGBATimeline.prototype.getFrameEntries = function () {
-            return 5;
+            return 5 /*ENTRIES*/;
         };
+        /** Sets the time in seconds, red, green, blue, and alpha for the specified key frame. */
         RGBATimeline.prototype.setFrame = function (frame, time, r, g, b, a) {
-            frame *= 5;
+            frame *= 5 /*ENTRIES*/;
             this.frames[frame] = time;
-            this.frames[frame + 1] = r;
-            this.frames[frame + 2] = g;
-            this.frames[frame + 3] = b;
-            this.frames[frame + 4] = a;
+            this.frames[frame + 1 /*R*/] = r;
+            this.frames[frame + 2 /*G*/] = g;
+            this.frames[frame + 3 /*B*/] = b;
+            this.frames[frame + 4 /*A*/] = a;
         };
         RGBATimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha, blend, direction) {
             var slot = skeleton.slots[this.slotIndex];
@@ -1363,32 +1546,32 @@
                 return;
             }
             var r = 0, g = 0, b = 0, a = 0;
-            var i = Timeline.search(frames, time, 5);
-            var curveType = this.curves[i / 5];
+            var i = Timeline.search(frames, time, 5 /*ENTRIES*/);
+            var curveType = this.curves[i / 5 /*ENTRIES*/];
             switch (curveType) {
-                case 0:
+                case 0 /*LINEAR*/:
                     var before = frames[i];
-                    r = frames[i + 1];
-                    g = frames[i + 2];
-                    b = frames[i + 3];
-                    a = frames[i + 4];
-                    var t = (time - before) / (frames[i + 5] - before);
-                    r += (frames[i + 5 + 1] - r) * t;
-                    g += (frames[i + 5 + 2] - g) * t;
-                    b += (frames[i + 5 + 3] - b) * t;
-                    a += (frames[i + 5 + 4] - a) * t;
+                    r = frames[i + 1 /*R*/];
+                    g = frames[i + 2 /*G*/];
+                    b = frames[i + 3 /*B*/];
+                    a = frames[i + 4 /*A*/];
+                    var t = (time - before) / (frames[i + 5 /*ENTRIES*/] - before);
+                    r += (frames[i + 5 /*ENTRIES*/ + 1 /*R*/] - r) * t;
+                    g += (frames[i + 5 /*ENTRIES*/ + 2 /*G*/] - g) * t;
+                    b += (frames[i + 5 /*ENTRIES*/ + 3 /*B*/] - b) * t;
+                    a += (frames[i + 5 /*ENTRIES*/ + 4 /*A*/] - a) * t;
                     break;
-                case 1:
-                    r = frames[i + 1];
-                    g = frames[i + 2];
-                    b = frames[i + 3];
-                    a = frames[i + 4];
+                case 1 /*STEPPED*/:
+                    r = frames[i + 1 /*R*/];
+                    g = frames[i + 2 /*G*/];
+                    b = frames[i + 3 /*B*/];
+                    a = frames[i + 4 /*A*/];
                     break;
                 default:
-                    r = this.getBezierValue(time, i, 1, curveType - 2);
-                    g = this.getBezierValue(time, i, 2, curveType + 18 - 2);
-                    b = this.getBezierValue(time, i, 3, curveType + 18 * 2 - 2);
-                    a = this.getBezierValue(time, i, 4, curveType + 18 * 3 - 2);
+                    r = this.getBezierValue(time, i, 1 /*R*/, curveType - 2 /*BEZIER*/);
+                    g = this.getBezierValue(time, i, 2 /*G*/, curveType + 18 /*BEZIER_SIZE*/ - 2 /*BEZIER*/);
+                    b = this.getBezierValue(time, i, 3 /*B*/, curveType + 18 /*BEZIER_SIZE*/ * 2 - 2 /*BEZIER*/);
+                    a = this.getBezierValue(time, i, 4 /*A*/, curveType + 18 /*BEZIER_SIZE*/ * 3 - 2 /*BEZIER*/);
             }
             if (alpha == 1)
                 color.set(r, g, b, a);
@@ -1400,7 +1583,8 @@
         };
         return RGBATimeline;
     }(CurveTimeline));
-    var RGBTimeline = (function (_super) {
+    /** Changes a slot's {@link Slot#color}. */
+    var RGBTimeline = /** @class */ (function (_super) {
         __extends$b(RGBTimeline, _super);
         function RGBTimeline(frameCount, bezierCount, slotIndex) {
             var _this = _super.call(this, frameCount, bezierCount, [
@@ -1411,14 +1595,15 @@
             return _this;
         }
         RGBTimeline.prototype.getFrameEntries = function () {
-            return 4;
+            return 4 /*ENTRIES*/;
         };
+        /** Sets the time in seconds, red, green, blue, and alpha for the specified key frame. */
         RGBTimeline.prototype.setFrame = function (frame, time, r, g, b) {
             frame <<= 2;
             this.frames[frame] = time;
-            this.frames[frame + 1] = r;
-            this.frames[frame + 2] = g;
-            this.frames[frame + 3] = b;
+            this.frames[frame + 1 /*R*/] = r;
+            this.frames[frame + 2 /*G*/] = g;
+            this.frames[frame + 3 /*B*/] = b;
         };
         RGBTimeline.prototype.apply = function (skeleton, lastTime, time, events, alpha, blend, direction) {
             var slot = skeleton.slots[this.slotIndex];
@@ -1442,28 +1627,28 @@
                 return;
             }
             var r = 0, g = 0, b = 0;
-            var i = Timeline.search(frames, time, 4);
+            var i = Timeline.search(frames, time, 4 /*ENTRIES*/);
             var curveType = this.curves[i >> 2];
             switch (curveType) {
-                case 0:
+                case 0 /*LINEAR*/:
                     var before = frames[i];
-                    r = frames[i + 1];
-                    g = frames[i + 2];
-                    b = frames[i + 3];
-                    var t = (time - before) / (frames[i + 4] - before);
-                    r += (frames[i + 4 + 1] - r) * t;
-                    g += (frames[i + 4 + 2] - g) * t;
-                    b += (frames[i + 4 + 3] - b) * t;
+                    r = frames[i + 1 /*R*/];
+                    g = frames[i + 2 /*G*/];
+                    b = frames[i + 3 /*B*/];
+                    var t = (time - before) / (frames[i + 4 /*ENTRIES*/] - before);
+                    r += (frames[i + 4 /*ENTRIES*/ + 1 /*R*/] - r) * t;
+                    g += (frames[i + 4 /*ENTRIES*/ + 2 /*G*/] - g) * t;
+                    b += (frames[i + 4 /*ENTRIES*/ + 3 /*B*/] - b) * t;
                     break;
-                case 1:
-                    r = frames[i + 1];
-                    g = frames[i + 2];
-                    b = frames[i + 3];
+                case 1 /*STEPPED*/:
+                    r = frames[i + 1 /*R*/];
+                    g = frames[i + 2 /*G*/];
+                    b = frames[i + 3 /*B*/];
                     break;
                 default:
-                    r = this.getBezierValue(time, i, 1, curveType - 2);
-                    g = this.getBezierValue(time, i, 2, curveType + 18 - 2);
-                    b = this.getBezierValue(time, i, 3, curveType + 18 * 2 - 2);
+                    r = this.getBezierValue(time, i, 1 /*R*/, curveType - 2 /*BEZIER*/);
+                    g = this.getBezierValue(time, i, 2 /*G*/, curveType + 18 /*BEZIER_SIZE*/ - 2 /*BEZIER*/);
+                    b = this.getBezierValue(time, i, 3 /*B*/, curveType + 18 /*BEZIER_SIZE*/ * 2 - 2 /*BEZIER*/);
             }
             if (alpha == 1) {
                 color.r = r;
@@ -1484,7 +1669,8 @@
         };
         return RGBTimeline;
     }(CurveTimeline));
-    var AlphaTimeline = (function (_super) {
+    /** Changes a bone's local {@link Bone#shearX} and {@link Bone#shearY}. */
+    var AlphaTimeline = /** @class */ (function (_super) {
         __extends$b(AlphaTimeline, _super);
         function AlphaTimeline(frameCount, bezierCount, slotIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.alpha + "|" + slotIndex) || this;
@@ -1497,7 +1683,7 @@
             if (!slot.bone.active)
                 return;
             var color = slot.color;
-            if (time < this.frames[0]) {
+            if (time < this.frames[0]) { // Time is before first frame.
                 var setup = slot.data.color;
                 switch (blend) {
                     case exports.MixBlend.setup:
@@ -1519,7 +1705,8 @@
         };
         return AlphaTimeline;
     }(CurveTimeline1));
-    var RGBA2Timeline = (function (_super) {
+    /** Changes a slot's {@link Slot#color} and {@link Slot#darkColor} for two color tinting. */
+    var RGBA2Timeline = /** @class */ (function (_super) {
         __extends$b(RGBA2Timeline, _super);
         function RGBA2Timeline(frameCount, bezierCount, slotIndex) {
             var _this = _super.call(this, frameCount, bezierCount, [
@@ -1532,18 +1719,19 @@
             return _this;
         }
         RGBA2Timeline.prototype.getFrameEntries = function () {
-            return 8;
+            return 8 /*ENTRIES*/;
         };
+        /** Sets the time in seconds, light, and dark colors for the specified key frame. */
         RGBA2Timeline.prototype.setFrame = function (frame, time, r, g, b, a, r2, g2, b2) {
             frame <<= 3;
             this.frames[frame] = time;
-            this.frames[frame + 1] = r;
-            this.frames[frame + 2] = g;
-            this.frames[frame + 3] = b;
-            this.frames[frame + 4] = a;
-            this.frames[frame + 5] = r2;
-            this.frames[frame + 6] = g2;
-            this.frames[frame + 7] = b2;
+            this.frames[frame + 1 /*R*/] = r;
+            this.frames[frame + 2 /*G*/] = g;
+            this.frames[frame + 3 /*B*/] = b;
+            this.frames[frame + 4 /*A*/] = a;
+            this.frames[frame + 5 /*R2*/] = r2;
+            this.frames[frame + 6 /*G2*/] = g2;
+            this.frames[frame + 7 /*B2*/] = b2;
         };
         RGBA2Timeline.prototype.apply = function (skeleton, lastTime, time, events, alpha, blend, direction) {
             var slot = skeleton.slots[this.slotIndex];
@@ -1569,44 +1757,44 @@
                 return;
             }
             var r = 0, g = 0, b = 0, a = 0, r2 = 0, g2 = 0, b2 = 0;
-            var i = Timeline.search(frames, time, 8);
+            var i = Timeline.search(frames, time, 8 /*ENTRIES*/);
             var curveType = this.curves[i >> 3];
             switch (curveType) {
-                case 0:
+                case 0 /*LINEAR*/:
                     var before = frames[i];
-                    r = frames[i + 1];
-                    g = frames[i + 2];
-                    b = frames[i + 3];
-                    a = frames[i + 4];
-                    r2 = frames[i + 5];
-                    g2 = frames[i + 6];
-                    b2 = frames[i + 7];
-                    var t = (time - before) / (frames[i + 8] - before);
-                    r += (frames[i + 8 + 1] - r) * t;
-                    g += (frames[i + 8 + 2] - g) * t;
-                    b += (frames[i + 8 + 3] - b) * t;
-                    a += (frames[i + 8 + 4] - a) * t;
-                    r2 += (frames[i + 8 + 5] - r2) * t;
-                    g2 += (frames[i + 8 + 6] - g2) * t;
-                    b2 += (frames[i + 8 + 7] - b2) * t;
+                    r = frames[i + 1 /*R*/];
+                    g = frames[i + 2 /*G*/];
+                    b = frames[i + 3 /*B*/];
+                    a = frames[i + 4 /*A*/];
+                    r2 = frames[i + 5 /*R2*/];
+                    g2 = frames[i + 6 /*G2*/];
+                    b2 = frames[i + 7 /*B2*/];
+                    var t = (time - before) / (frames[i + 8 /*ENTRIES*/] - before);
+                    r += (frames[i + 8 /*ENTRIES*/ + 1 /*R*/] - r) * t;
+                    g += (frames[i + 8 /*ENTRIES*/ + 2 /*G*/] - g) * t;
+                    b += (frames[i + 8 /*ENTRIES*/ + 3 /*B*/] - b) * t;
+                    a += (frames[i + 8 /*ENTRIES*/ + 4 /*A*/] - a) * t;
+                    r2 += (frames[i + 8 /*ENTRIES*/ + 5 /*R2*/] - r2) * t;
+                    g2 += (frames[i + 8 /*ENTRIES*/ + 6 /*G2*/] - g2) * t;
+                    b2 += (frames[i + 8 /*ENTRIES*/ + 7 /*B2*/] - b2) * t;
                     break;
-                case 1:
-                    r = frames[i + 1];
-                    g = frames[i + 2];
-                    b = frames[i + 3];
-                    a = frames[i + 4];
-                    r2 = frames[i + 5];
-                    g2 = frames[i + 6];
-                    b2 = frames[i + 7];
+                case 1 /*STEPPED*/:
+                    r = frames[i + 1 /*R*/];
+                    g = frames[i + 2 /*G*/];
+                    b = frames[i + 3 /*B*/];
+                    a = frames[i + 4 /*A*/];
+                    r2 = frames[i + 5 /*R2*/];
+                    g2 = frames[i + 6 /*G2*/];
+                    b2 = frames[i + 7 /*B2*/];
                     break;
                 default:
-                    r = this.getBezierValue(time, i, 1, curveType - 2);
-                    g = this.getBezierValue(time, i, 2, curveType + 18 - 2);
-                    b = this.getBezierValue(time, i, 3, curveType + 18 * 2 - 2);
-                    a = this.getBezierValue(time, i, 4, curveType + 18 * 3 - 2);
-                    r2 = this.getBezierValue(time, i, 5, curveType + 18 * 4 - 2);
-                    g2 = this.getBezierValue(time, i, 6, curveType + 18 * 5 - 2);
-                    b2 = this.getBezierValue(time, i, 7, curveType + 18 * 6 - 2);
+                    r = this.getBezierValue(time, i, 1 /*R*/, curveType - 2 /*BEZIER*/);
+                    g = this.getBezierValue(time, i, 2 /*G*/, curveType + 18 /*BEZIER_SIZE*/ - 2 /*BEZIER*/);
+                    b = this.getBezierValue(time, i, 3 /*B*/, curveType + 18 /*BEZIER_SIZE*/ * 2 - 2 /*BEZIER*/);
+                    a = this.getBezierValue(time, i, 4 /*A*/, curveType + 18 /*BEZIER_SIZE*/ * 3 - 2 /*BEZIER*/);
+                    r2 = this.getBezierValue(time, i, 5 /*R2*/, curveType + 18 /*BEZIER_SIZE*/ * 4 - 2 /*BEZIER*/);
+                    g2 = this.getBezierValue(time, i, 6 /*G2*/, curveType + 18 /*BEZIER_SIZE*/ * 5 - 2 /*BEZIER*/);
+                    b2 = this.getBezierValue(time, i, 7 /*B2*/, curveType + 18 /*BEZIER_SIZE*/ * 6 - 2 /*BEZIER*/);
             }
             if (alpha == 1) {
                 light.set(r, g, b, a);
@@ -1630,7 +1818,8 @@
         };
         return RGBA2Timeline;
     }(CurveTimeline));
-    var RGB2Timeline = (function (_super) {
+    /** Changes a slot's {@link Slot#color} and {@link Slot#darkColor} for two color tinting. */
+    var RGB2Timeline = /** @class */ (function (_super) {
         __extends$b(RGB2Timeline, _super);
         function RGB2Timeline(frameCount, bezierCount, slotIndex) {
             var _this = _super.call(this, frameCount, bezierCount, [
@@ -1642,17 +1831,18 @@
             return _this;
         }
         RGB2Timeline.prototype.getFrameEntries = function () {
-            return 7;
+            return 7 /*ENTRIES*/;
         };
+        /** Sets the time in seconds, light, and dark colors for the specified key frame. */
         RGB2Timeline.prototype.setFrame = function (frame, time, r, g, b, r2, g2, b2) {
-            frame *= 7;
+            frame *= 7 /*ENTRIES*/;
             this.frames[frame] = time;
-            this.frames[frame + 1] = r;
-            this.frames[frame + 2] = g;
-            this.frames[frame + 3] = b;
-            this.frames[frame + 4] = r2;
-            this.frames[frame + 5] = g2;
-            this.frames[frame + 6] = b2;
+            this.frames[frame + 1 /*R*/] = r;
+            this.frames[frame + 2 /*G*/] = g;
+            this.frames[frame + 3 /*B*/] = b;
+            this.frames[frame + 4 /*R2*/] = r2;
+            this.frames[frame + 5 /*G2*/] = g2;
+            this.frames[frame + 6 /*B2*/] = b2;
         };
         RGB2Timeline.prototype.apply = function (skeleton, lastTime, time, events, alpha, blend, direction) {
             var slot = skeleton.slots[this.slotIndex];
@@ -1682,40 +1872,40 @@
                 return;
             }
             var r = 0, g = 0, b = 0, r2 = 0, g2 = 0, b2 = 0;
-            var i = Timeline.search(frames, time, 7);
-            var curveType = this.curves[i / 7];
+            var i = Timeline.search(frames, time, 7 /*ENTRIES*/);
+            var curveType = this.curves[i / 7 /*ENTRIES*/];
             switch (curveType) {
-                case 0:
+                case 0 /*LINEAR*/:
                     var before = frames[i];
-                    r = frames[i + 1];
-                    g = frames[i + 2];
-                    b = frames[i + 3];
-                    r2 = frames[i + 4];
-                    g2 = frames[i + 5];
-                    b2 = frames[i + 6];
-                    var t = (time - before) / (frames[i + 7] - before);
-                    r += (frames[i + 7 + 1] - r) * t;
-                    g += (frames[i + 7 + 2] - g) * t;
-                    b += (frames[i + 7 + 3] - b) * t;
-                    r2 += (frames[i + 7 + 4] - r2) * t;
-                    g2 += (frames[i + 7 + 5] - g2) * t;
-                    b2 += (frames[i + 7 + 6] - b2) * t;
+                    r = frames[i + 1 /*R*/];
+                    g = frames[i + 2 /*G*/];
+                    b = frames[i + 3 /*B*/];
+                    r2 = frames[i + 4 /*R2*/];
+                    g2 = frames[i + 5 /*G2*/];
+                    b2 = frames[i + 6 /*B2*/];
+                    var t = (time - before) / (frames[i + 7 /*ENTRIES*/] - before);
+                    r += (frames[i + 7 /*ENTRIES*/ + 1 /*R*/] - r) * t;
+                    g += (frames[i + 7 /*ENTRIES*/ + 2 /*G*/] - g) * t;
+                    b += (frames[i + 7 /*ENTRIES*/ + 3 /*B*/] - b) * t;
+                    r2 += (frames[i + 7 /*ENTRIES*/ + 4 /*R2*/] - r2) * t;
+                    g2 += (frames[i + 7 /*ENTRIES*/ + 5 /*G2*/] - g2) * t;
+                    b2 += (frames[i + 7 /*ENTRIES*/ + 6 /*B2*/] - b2) * t;
                     break;
-                case 1:
-                    r = frames[i + 1];
-                    g = frames[i + 2];
-                    b = frames[i + 3];
-                    r2 = frames[i + 4];
-                    g2 = frames[i + 5];
-                    b2 = frames[i + 6];
+                case 1 /*STEPPED*/:
+                    r = frames[i + 1 /*R*/];
+                    g = frames[i + 2 /*G*/];
+                    b = frames[i + 3 /*B*/];
+                    r2 = frames[i + 4 /*R2*/];
+                    g2 = frames[i + 5 /*G2*/];
+                    b2 = frames[i + 6 /*B2*/];
                     break;
                 default:
-                    r = this.getBezierValue(time, i, 1, curveType - 2);
-                    g = this.getBezierValue(time, i, 2, curveType + 18 - 2);
-                    b = this.getBezierValue(time, i, 3, curveType + 18 * 2 - 2);
-                    r2 = this.getBezierValue(time, i, 4, curveType + 18 * 3 - 2);
-                    g2 = this.getBezierValue(time, i, 5, curveType + 18 * 4 - 2);
-                    b2 = this.getBezierValue(time, i, 6, curveType + 18 * 5 - 2);
+                    r = this.getBezierValue(time, i, 1 /*R*/, curveType - 2 /*BEZIER*/);
+                    g = this.getBezierValue(time, i, 2 /*G*/, curveType + 18 /*BEZIER_SIZE*/ - 2 /*BEZIER*/);
+                    b = this.getBezierValue(time, i, 3 /*B*/, curveType + 18 /*BEZIER_SIZE*/ * 2 - 2 /*BEZIER*/);
+                    r2 = this.getBezierValue(time, i, 4 /*R2*/, curveType + 18 /*BEZIER_SIZE*/ * 3 - 2 /*BEZIER*/);
+                    g2 = this.getBezierValue(time, i, 5 /*G2*/, curveType + 18 /*BEZIER_SIZE*/ * 4 - 2 /*BEZIER*/);
+                    b2 = this.getBezierValue(time, i, 6 /*B2*/, curveType + 18 /*BEZIER_SIZE*/ * 5 - 2 /*BEZIER*/);
             }
             if (alpha == 1) {
                 light.r = r;
@@ -1745,7 +1935,8 @@
         };
         return RGB2Timeline;
     }(CurveTimeline));
-    var AttachmentTimeline = (function (_super) {
+    /** Changes a slot's {@link Slot#attachment}. */
+    var AttachmentTimeline = /** @class */ (function (_super) {
         __extends$b(AttachmentTimeline, _super);
         function AttachmentTimeline(frameCount, slotIndex) {
             var _this = _super.call(this, frameCount, [
@@ -1759,6 +1950,7 @@
         AttachmentTimeline.prototype.getFrameCount = function () {
             return this.frames.length;
         };
+        /** Sets the time in seconds and the attachment name for the specified key frame. */
         AttachmentTimeline.prototype.setFrame = function (frame, time, attachmentName) {
             this.frames[frame] = time;
             this.attachmentNames[frame] = attachmentName;
@@ -1784,7 +1976,8 @@
         };
         return AttachmentTimeline;
     }(Timeline));
-    var DeformTimeline = (function (_super) {
+    /** Changes a slot's {@link Slot#deform} to deform a {@link VertexAttachment}. */
+    var DeformTimeline = /** @class */ (function (_super) {
         __extends$b(DeformTimeline, _super);
         function DeformTimeline(frameCount, bezierCount, slotIndex, attachment) {
             var _this = _super.call(this, frameCount, bezierCount, [
@@ -1799,21 +1992,25 @@
         DeformTimeline.prototype.getFrameCount = function () {
             return this.frames.length;
         };
+        /** Sets the time in seconds and the vertices for the specified key frame.
+         * @param vertices Vertex positions for an unweighted VertexAttachment, or deform offsets if it has weights. */
         DeformTimeline.prototype.setFrame = function (frame, time, vertices) {
             this.frames[frame] = time;
             this.vertices[frame] = vertices;
         };
+        /** @param value1 Ignored (0 is used for a deform timeline).
+         * @param value2 Ignored (1 is used for a deform timeline). */
         DeformTimeline.prototype.setBezier = function (bezier, frame, value, time1, value1, cx1, cy1, cx2, cy2, time2, value2) {
             var curves = this.curves;
-            var i = this.getFrameCount() + bezier * 18;
+            var i = this.getFrameCount() + bezier * 18 /*BEZIER_SIZE*/;
             if (value == 0)
-                curves[frame] = 2 + i;
+                curves[frame] = 2 /*BEZIER*/ + i;
             var tmpx = (time1 - cx1 * 2 + cx2) * 0.03, tmpy = cy2 * 0.03 - cy1 * 0.06;
             var dddx = ((cx1 - cx2) * 3 - time1 + time2) * 0.006, dddy = (cy1 - cy2 + 0.33333333) * 0.018;
             var ddx = tmpx * 2 + dddx, ddy = tmpy * 2 + dddy;
             var dx = (cx1 - time1) * 0.3 + tmpx + dddx * 0.16666667, dy = cy1 * 0.3 + tmpy + dddy * 0.16666667;
             var x = time1 + dx, y = dy;
-            for (var n = i + 18; i < n; i += 2) {
+            for (var n = i + 18 /*BEZIER_SIZE*/; i < n; i += 2) {
                 curves[i] = x;
                 curves[i + 1] = y;
                 dx += ddx;
@@ -1828,18 +2025,18 @@
             var curves = this.curves;
             var i = curves[frame];
             switch (i) {
-                case 0:
+                case 0 /*LINEAR*/:
                     var x_3 = this.frames[frame];
                     return (time - x_3) / (this.frames[frame + this.getFrameEntries()] - x_3);
-                case 1:
+                case 1 /*STEPPED*/:
                     return 0;
             }
-            i -= 2;
+            i -= 2 /*BEZIER*/;
             if (curves[i] > time) {
                 var x_4 = this.frames[frame];
                 return curves[i + 1] * (time - x_4) / (curves[i] - x_4);
             }
-            var n = i + 18;
+            var n = i + 18 /*BEZIER_SIZE*/;
             for (i += 2; i < n; i += 2) {
                 if (curves[i] >= time) {
                     var x_5 = curves[i - 2], y_3 = curves[i - 1];
@@ -1875,11 +2072,13 @@
                         }
                         deform.length = vertexCount;
                         if (!vertexAttachment.bones) {
+                            // Unweighted vertex positions.
                             var setupVertices = vertexAttachment.vertices;
                             for (var i = 0; i < vertexCount; i++)
                                 deform[i] += (setupVertices[i] - deform[i]) * alpha;
                         }
                         else {
+                            // Weighted deform offsets.
                             alpha = 1 - alpha;
                             for (var i = 0; i < vertexCount; i++)
                                 deform[i] *= alpha;
@@ -1888,17 +2087,19 @@
                 return;
             }
             deform.length = vertexCount;
-            if (time >= frames[frames.length - 1]) {
+            if (time >= frames[frames.length - 1]) { // Time is after last frame.
                 var lastVertices = vertices[frames.length - 1];
                 if (alpha == 1) {
                     if (blend == exports.MixBlend.add) {
                         var vertexAttachment = slotAttachment;
                         if (!vertexAttachment.bones) {
+                            // Unweighted vertex positions, with alpha.
                             var setupVertices = vertexAttachment.vertices;
                             for (var i_1 = 0; i_1 < vertexCount; i_1++)
                                 deform[i_1] += lastVertices[i_1] - setupVertices[i_1];
                         }
                         else {
+                            // Weighted deform offsets, with alpha.
                             for (var i_2 = 0; i_2 < vertexCount; i_2++)
                                 deform[i_2] += lastVertices[i_2];
                         }
@@ -1911,6 +2112,7 @@
                         case exports.MixBlend.setup: {
                             var vertexAttachment_1 = slotAttachment;
                             if (!vertexAttachment_1.bones) {
+                                // Unweighted vertex positions, with alpha.
                                 var setupVertices = vertexAttachment_1.vertices;
                                 for (var i_3 = 0; i_3 < vertexCount; i_3++) {
                                     var setup = setupVertices[i_3];
@@ -1918,6 +2120,7 @@
                                 }
                             }
                             else {
+                                // Weighted deform offsets, with alpha.
                                 for (var i_4 = 0; i_4 < vertexCount; i_4++)
                                     deform[i_4] = lastVertices[i_4] * alpha;
                             }
@@ -1931,11 +2134,13 @@
                         case exports.MixBlend.add:
                             var vertexAttachment = slotAttachment;
                             if (!vertexAttachment.bones) {
+                                // Unweighted vertex positions, with alpha.
                                 var setupVertices = vertexAttachment.vertices;
                                 for (var i_6 = 0; i_6 < vertexCount; i_6++)
                                     deform[i_6] += (lastVertices[i_6] - setupVertices[i_6]) * alpha;
                             }
                             else {
+                                // Weighted deform offsets, with alpha.
                                 for (var i_7 = 0; i_7 < vertexCount; i_7++)
                                     deform[i_7] += lastVertices[i_7] * alpha;
                             }
@@ -1943,6 +2148,7 @@
                 }
                 return;
             }
+            // Interpolate between the previous frame and the current frame.
             var frame = Timeline.search1(frames, time);
             var percent = this.getCurvePercent(time, frame);
             var prevVertices = vertices[frame];
@@ -1951,6 +2157,7 @@
                 if (blend == exports.MixBlend.add) {
                     var vertexAttachment = slotAttachment;
                     if (!vertexAttachment.bones) {
+                        // Unweighted vertex positions, with alpha.
                         var setupVertices = vertexAttachment.vertices;
                         for (var i_8 = 0; i_8 < vertexCount; i_8++) {
                             var prev = prevVertices[i_8];
@@ -1958,6 +2165,7 @@
                         }
                     }
                     else {
+                        // Weighted deform offsets, with alpha.
                         for (var i_9 = 0; i_9 < vertexCount; i_9++) {
                             var prev = prevVertices[i_9];
                             deform[i_9] += prev + (nextVertices[i_9] - prev) * percent;
@@ -1976,6 +2184,7 @@
                     case exports.MixBlend.setup: {
                         var vertexAttachment_2 = slotAttachment;
                         if (!vertexAttachment_2.bones) {
+                            // Unweighted vertex positions, with alpha.
                             var setupVertices = vertexAttachment_2.vertices;
                             for (var i_11 = 0; i_11 < vertexCount; i_11++) {
                                 var prev = prevVertices[i_11], setup = setupVertices[i_11];
@@ -1983,6 +2192,7 @@
                             }
                         }
                         else {
+                            // Weighted deform offsets, with alpha.
                             for (var i_12 = 0; i_12 < vertexCount; i_12++) {
                                 var prev = prevVertices[i_12];
                                 deform[i_12] = (prev + (nextVertices[i_12] - prev) * percent) * alpha;
@@ -2000,6 +2210,7 @@
                     case exports.MixBlend.add:
                         var vertexAttachment = slotAttachment;
                         if (!vertexAttachment.bones) {
+                            // Unweighted vertex positions, with alpha.
                             var setupVertices = vertexAttachment.vertices;
                             for (var i_14 = 0; i_14 < vertexCount; i_14++) {
                                 var prev = prevVertices[i_14];
@@ -2007,6 +2218,7 @@
                             }
                         }
                         else {
+                            // Weighted deform offsets, with alpha.
                             for (var i_15 = 0; i_15 < vertexCount; i_15++) {
                                 var prev = prevVertices[i_15];
                                 deform[i_15] += (prev + (nextVertices[i_15] - prev) * percent) * alpha;
@@ -2017,7 +2229,8 @@
         };
         return DeformTimeline;
     }(CurveTimeline));
-    var EventTimeline = (function (_super) {
+    /** Fires an {@link Event} when specific animation times are reached. */
+    var EventTimeline = /** @class */ (function (_super) {
         __extends$b(EventTimeline, _super);
         function EventTimeline(frameCount) {
             var _this = _super.call(this, frameCount, EventTimeline.propertyIds) || this;
@@ -2027,30 +2240,32 @@
         EventTimeline.prototype.getFrameCount = function () {
             return this.frames.length;
         };
+        /** Sets the time in seconds and the event for the specified key frame. */
         EventTimeline.prototype.setFrame = function (frame, event) {
             this.frames[frame] = event.time;
             this.events[frame] = event;
         };
+        /** Fires events for frames > `lastTime` and <= `time`. */
         EventTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, blend, direction) {
             if (!firedEvents)
                 return;
             var frames = this.frames;
             var frameCount = this.frames.length;
-            if (lastTime > time) {
+            if (lastTime > time) { // Fire events after last time for looped animations.
                 this.apply(skeleton, lastTime, Number.MAX_VALUE, firedEvents, alpha, blend, direction);
                 lastTime = -1;
             }
-            else if (lastTime >= frames[frameCount - 1])
+            else if (lastTime >= frames[frameCount - 1]) // Last time is after last frame.
                 return;
             if (time < frames[0])
-                return;
+                return; // Time is before first frame.
             var i = 0;
             if (lastTime < frames[0])
                 i = 0;
             else {
                 i = Timeline.search1(frames, lastTime) + 1;
                 var frameTime = frames[i];
-                while (i > 0) {
+                while (i > 0) { // Fire multiple events with the same frame.
                     if (frames[i - 1] != frameTime)
                         break;
                     i--;
@@ -2062,7 +2277,8 @@
         EventTimeline.propertyIds = ["" + Property.event];
         return EventTimeline;
     }(Timeline));
-    var DrawOrderTimeline = (function (_super) {
+    /** Changes a skeleton's {@link Skeleton#drawOrder}. */
+    var DrawOrderTimeline = /** @class */ (function (_super) {
         __extends$b(DrawOrderTimeline, _super);
         function DrawOrderTimeline(frameCount) {
             var _this = _super.call(this, frameCount, DrawOrderTimeline.propertyIds) || this;
@@ -2072,6 +2288,9 @@
         DrawOrderTimeline.prototype.getFrameCount = function () {
             return this.frames.length;
         };
+        /** Sets the time in seconds and the draw order for the specified key frame.
+         * @param drawOrder For each slot in {@link Skeleton#slots}, the index of the new draw order. May be null to use setup pose
+         *           draw order. */
         DrawOrderTimeline.prototype.setFrame = function (frame, time, drawOrder) {
             this.frames[frame] = time;
             this.drawOrders[frame] = drawOrder;
@@ -2100,7 +2319,9 @@
         DrawOrderTimeline.propertyIds = ["" + Property.drawOrder];
         return DrawOrderTimeline;
     }(Timeline));
-    var IkConstraintTimeline = (function (_super) {
+    /** Changes an IK constraint's {@link IkConstraint#mix}, {@link IkConstraint#softness},
+     * {@link IkConstraint#bendDirection}, {@link IkConstraint#stretch}, and {@link IkConstraint#compress}. */
+    var IkConstraintTimeline = /** @class */ (function (_super) {
         __extends$b(IkConstraintTimeline, _super);
         function IkConstraintTimeline(frameCount, bezierCount, ikConstraintIndex) {
             var _this = _super.call(this, frameCount, bezierCount, [
@@ -2110,16 +2331,17 @@
             return _this;
         }
         IkConstraintTimeline.prototype.getFrameEntries = function () {
-            return 6;
+            return 6 /*ENTRIES*/;
         };
+        /** Sets the time in seconds, mix, softness, bend direction, compress, and stretch for the specified key frame. */
         IkConstraintTimeline.prototype.setFrame = function (frame, time, mix, softness, bendDirection, compress, stretch) {
-            frame *= 6;
+            frame *= 6 /*ENTRIES*/;
             this.frames[frame] = time;
-            this.frames[frame + 1] = mix;
-            this.frames[frame + 2] = softness;
-            this.frames[frame + 3] = bendDirection;
-            this.frames[frame + 4] = compress ? 1 : 0;
-            this.frames[frame + 5] = stretch ? 1 : 0;
+            this.frames[frame + 1 /*MIX*/] = mix;
+            this.frames[frame + 2 /*SOFTNESS*/] = softness;
+            this.frames[frame + 3 /*BEND_DIRECTION*/] = bendDirection;
+            this.frames[frame + 4 /*COMPRESS*/] = compress ? 1 : 0;
+            this.frames[frame + 5 /*STRETCH*/] = stretch ? 1 : 0;
         };
         IkConstraintTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, blend, direction) {
             var constraint = skeleton.ikConstraints[this.ikConstraintIndex];
@@ -2145,24 +2367,24 @@
                 return;
             }
             var mix = 0, softness = 0;
-            var i = Timeline.search(frames, time, 6);
-            var curveType = this.curves[i / 6];
+            var i = Timeline.search(frames, time, 6 /*ENTRIES*/);
+            var curveType = this.curves[i / 6 /*ENTRIES*/];
             switch (curveType) {
-                case 0:
+                case 0 /*LINEAR*/:
                     var before = frames[i];
-                    mix = frames[i + 1];
-                    softness = frames[i + 2];
-                    var t = (time - before) / (frames[i + 6] - before);
-                    mix += (frames[i + 6 + 1] - mix) * t;
-                    softness += (frames[i + 6 + 2] - softness) * t;
+                    mix = frames[i + 1 /*MIX*/];
+                    softness = frames[i + 2 /*SOFTNESS*/];
+                    var t = (time - before) / (frames[i + 6 /*ENTRIES*/] - before);
+                    mix += (frames[i + 6 /*ENTRIES*/ + 1 /*MIX*/] - mix) * t;
+                    softness += (frames[i + 6 /*ENTRIES*/ + 2 /*SOFTNESS*/] - softness) * t;
                     break;
-                case 1:
-                    mix = frames[i + 1];
-                    softness = frames[i + 2];
+                case 1 /*STEPPED*/:
+                    mix = frames[i + 1 /*MIX*/];
+                    softness = frames[i + 2 /*SOFTNESS*/];
                     break;
                 default:
-                    mix = this.getBezierValue(time, i, 1, curveType - 2);
-                    softness = this.getBezierValue(time, i, 2, curveType + 18 - 2);
+                    mix = this.getBezierValue(time, i, 1 /*MIX*/, curveType - 2 /*BEZIER*/);
+                    softness = this.getBezierValue(time, i, 2 /*SOFTNESS*/, curveType + 18 /*BEZIER_SIZE*/ - 2 /*BEZIER*/);
             }
             if (blend == exports.MixBlend.setup) {
                 constraint.mix = constraint.data.mix + (mix - constraint.data.mix) * alpha;
@@ -2173,24 +2395,26 @@
                     constraint.stretch = constraint.data.stretch;
                 }
                 else {
-                    constraint.bendDirection = frames[i + 3];
-                    constraint.compress = frames[i + 4] != 0;
-                    constraint.stretch = frames[i + 5] != 0;
+                    constraint.bendDirection = frames[i + 3 /*BEND_DIRECTION*/];
+                    constraint.compress = frames[i + 4 /*COMPRESS*/] != 0;
+                    constraint.stretch = frames[i + 5 /*STRETCH*/] != 0;
                 }
             }
             else {
                 constraint.mix += (mix - constraint.mix) * alpha;
                 constraint.softness += (softness - constraint.softness) * alpha;
                 if (direction == exports.MixDirection.mixIn) {
-                    constraint.bendDirection = frames[i + 3];
-                    constraint.compress = frames[i + 4] != 0;
-                    constraint.stretch = frames[i + 5] != 0;
+                    constraint.bendDirection = frames[i + 3 /*BEND_DIRECTION*/];
+                    constraint.compress = frames[i + 4 /*COMPRESS*/] != 0;
+                    constraint.stretch = frames[i + 5 /*STRETCH*/] != 0;
                 }
             }
         };
         return IkConstraintTimeline;
     }(CurveTimeline));
-    var TransformConstraintTimeline = (function (_super) {
+    /** Changes a transform constraint's {@link TransformConstraint#rotateMix}, {@link TransformConstraint#translateMix},
+     * {@link TransformConstraint#scaleMix}, and {@link TransformConstraint#shearMix}. */
+    var TransformConstraintTimeline = /** @class */ (function (_super) {
         __extends$b(TransformConstraintTimeline, _super);
         function TransformConstraintTimeline(frameCount, bezierCount, transformConstraintIndex) {
             var _this = _super.call(this, frameCount, bezierCount, [
@@ -2200,18 +2424,19 @@
             return _this;
         }
         TransformConstraintTimeline.prototype.getFrameEntries = function () {
-            return 7;
+            return 7 /*ENTRIES*/;
         };
+        /** The time in seconds, rotate mix, translate mix, scale mix, and shear mix for the specified key frame. */
         TransformConstraintTimeline.prototype.setFrame = function (frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY) {
             var frames = this.frames;
-            frame *= 7;
+            frame *= 7 /*ENTRIES*/;
             frames[frame] = time;
-            frames[frame + 1] = mixRotate;
-            frames[frame + 2] = mixX;
-            frames[frame + 3] = mixY;
-            frames[frame + 4] = mixScaleX;
-            frames[frame + 5] = mixScaleY;
-            frames[frame + 6] = mixShearY;
+            frames[frame + 1 /*ROTATE*/] = mixRotate;
+            frames[frame + 2 /*X*/] = mixX;
+            frames[frame + 3 /*Y*/] = mixY;
+            frames[frame + 4 /*SCALEX*/] = mixScaleX;
+            frames[frame + 5 /*SCALEY*/] = mixScaleY;
+            frames[frame + 6 /*SHEARY*/] = mixShearY;
         };
         TransformConstraintTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, blend, direction) {
             var constraint = skeleton.transformConstraints[this.transformConstraintIndex];
@@ -2240,40 +2465,40 @@
                 return;
             }
             var rotate, x, y, scaleX, scaleY, shearY;
-            var i = Timeline.search(frames, time, 7);
-            var curveType = this.curves[i / 7];
+            var i = Timeline.search(frames, time, 7 /*ENTRIES*/);
+            var curveType = this.curves[i / 7 /*ENTRIES*/];
             switch (curveType) {
-                case 0:
+                case 0 /*LINEAR*/:
                     var before = frames[i];
-                    rotate = frames[i + 1];
-                    x = frames[i + 2];
-                    y = frames[i + 3];
-                    scaleX = frames[i + 4];
-                    scaleY = frames[i + 5];
-                    shearY = frames[i + 6];
-                    var t = (time - before) / (frames[i + 7] - before);
-                    rotate += (frames[i + 7 + 1] - rotate) * t;
-                    x += (frames[i + 7 + 2] - x) * t;
-                    y += (frames[i + 7 + 3] - y) * t;
-                    scaleX += (frames[i + 7 + 4] - scaleX) * t;
-                    scaleY += (frames[i + 7 + 5] - scaleY) * t;
-                    shearY += (frames[i + 7 + 6] - shearY) * t;
+                    rotate = frames[i + 1 /*ROTATE*/];
+                    x = frames[i + 2 /*X*/];
+                    y = frames[i + 3 /*Y*/];
+                    scaleX = frames[i + 4 /*SCALEX*/];
+                    scaleY = frames[i + 5 /*SCALEY*/];
+                    shearY = frames[i + 6 /*SHEARY*/];
+                    var t = (time - before) / (frames[i + 7 /*ENTRIES*/] - before);
+                    rotate += (frames[i + 7 /*ENTRIES*/ + 1 /*ROTATE*/] - rotate) * t;
+                    x += (frames[i + 7 /*ENTRIES*/ + 2 /*X*/] - x) * t;
+                    y += (frames[i + 7 /*ENTRIES*/ + 3 /*Y*/] - y) * t;
+                    scaleX += (frames[i + 7 /*ENTRIES*/ + 4 /*SCALEX*/] - scaleX) * t;
+                    scaleY += (frames[i + 7 /*ENTRIES*/ + 5 /*SCALEY*/] - scaleY) * t;
+                    shearY += (frames[i + 7 /*ENTRIES*/ + 6 /*SHEARY*/] - shearY) * t;
                     break;
-                case 1:
-                    rotate = frames[i + 1];
-                    x = frames[i + 2];
-                    y = frames[i + 3];
-                    scaleX = frames[i + 4];
-                    scaleY = frames[i + 5];
-                    shearY = frames[i + 6];
+                case 1 /*STEPPED*/:
+                    rotate = frames[i + 1 /*ROTATE*/];
+                    x = frames[i + 2 /*X*/];
+                    y = frames[i + 3 /*Y*/];
+                    scaleX = frames[i + 4 /*SCALEX*/];
+                    scaleY = frames[i + 5 /*SCALEY*/];
+                    shearY = frames[i + 6 /*SHEARY*/];
                     break;
                 default:
-                    rotate = this.getBezierValue(time, i, 1, curveType - 2);
-                    x = this.getBezierValue(time, i, 2, curveType + 18 - 2);
-                    y = this.getBezierValue(time, i, 3, curveType + 18 * 2 - 2);
-                    scaleX = this.getBezierValue(time, i, 4, curveType + 18 * 3 - 2);
-                    scaleY = this.getBezierValue(time, i, 5, curveType + 18 * 4 - 2);
-                    shearY = this.getBezierValue(time, i, 6, curveType + 18 * 5 - 2);
+                    rotate = this.getBezierValue(time, i, 1 /*ROTATE*/, curveType - 2 /*BEZIER*/);
+                    x = this.getBezierValue(time, i, 2 /*X*/, curveType + 18 /*BEZIER_SIZE*/ - 2 /*BEZIER*/);
+                    y = this.getBezierValue(time, i, 3 /*Y*/, curveType + 18 /*BEZIER_SIZE*/ * 2 - 2 /*BEZIER*/);
+                    scaleX = this.getBezierValue(time, i, 4 /*SCALEX*/, curveType + 18 /*BEZIER_SIZE*/ * 3 - 2 /*BEZIER*/);
+                    scaleY = this.getBezierValue(time, i, 5 /*SCALEY*/, curveType + 18 /*BEZIER_SIZE*/ * 4 - 2 /*BEZIER*/);
+                    shearY = this.getBezierValue(time, i, 6 /*SHEARY*/, curveType + 18 /*BEZIER_SIZE*/ * 5 - 2 /*BEZIER*/);
             }
             if (blend == exports.MixBlend.setup) {
                 var data = constraint.data;
@@ -2295,7 +2520,8 @@
         };
         return TransformConstraintTimeline;
     }(CurveTimeline));
-    var PathConstraintPositionTimeline = (function (_super) {
+    /** Changes a path constraint's {@link PathConstraint#position}. */
+    var PathConstraintPositionTimeline = /** @class */ (function (_super) {
         __extends$b(PathConstraintPositionTimeline, _super);
         function PathConstraintPositionTimeline(frameCount, bezierCount, pathConstraintIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.pathConstraintPosition + "|" + pathConstraintIndex) || this;
@@ -2325,10 +2551,12 @@
         };
         return PathConstraintPositionTimeline;
     }(CurveTimeline1));
-    var PathConstraintSpacingTimeline = (function (_super) {
+    /** Changes a path constraint's {@link PathConstraint#spacing}. */
+    var PathConstraintSpacingTimeline = /** @class */ (function (_super) {
         __extends$b(PathConstraintSpacingTimeline, _super);
         function PathConstraintSpacingTimeline(frameCount, bezierCount, pathConstraintIndex) {
             var _this = _super.call(this, frameCount, bezierCount, Property.pathConstraintSpacing + "|" + pathConstraintIndex) || this;
+            /** The index of the path constraint slot in {@link Skeleton#getPathConstraints()} that will be changed. */
             _this.pathConstraintIndex = 0;
             _this.pathConstraintIndex = pathConstraintIndex;
             return _this;
@@ -2356,26 +2584,29 @@
         };
         return PathConstraintSpacingTimeline;
     }(CurveTimeline1));
-    var PathConstraintMixTimeline = (function (_super) {
+    /** Changes a transform constraint's {@link PathConstraint#getMixRotate()}, {@link PathConstraint#getMixX()}, and
+     * {@link PathConstraint#getMixY()}. */
+    var PathConstraintMixTimeline = /** @class */ (function (_super) {
         __extends$b(PathConstraintMixTimeline, _super);
         function PathConstraintMixTimeline(frameCount, bezierCount, pathConstraintIndex) {
             var _this = _super.call(this, frameCount, bezierCount, [
                 Property.pathConstraintMix + "|" + pathConstraintIndex
             ]) || this;
+            /** The index of the path constraint slot in {@link Skeleton#getPathConstraints()} that will be changed. */
             _this.pathConstraintIndex = 0;
             _this.pathConstraintIndex = pathConstraintIndex;
             return _this;
         }
         PathConstraintMixTimeline.prototype.getFrameEntries = function () {
-            return 4;
+            return 4 /*ENTRIES*/;
         };
         PathConstraintMixTimeline.prototype.setFrame = function (frame, time, mixRotate, mixX, mixY) {
             var frames = this.frames;
             frame <<= 2;
             frames[frame] = time;
-            frames[frame + 1] = mixRotate;
-            frames[frame + 2] = mixX;
-            frames[frame + 3] = mixY;
+            frames[frame + 1 /*ROTATE*/] = mixRotate;
+            frames[frame + 2 /*X*/] = mixX;
+            frames[frame + 3 /*Y*/] = mixY;
         };
         PathConstraintMixTimeline.prototype.apply = function (skeleton, lastTime, time, firedEvents, alpha, blend, direction) {
             var constraint = skeleton.pathConstraints[this.pathConstraintIndex];
@@ -2397,28 +2628,28 @@
                 return;
             }
             var rotate, x, y;
-            var i = Timeline.search(frames, time, 4);
+            var i = Timeline.search(frames, time, 4 /*ENTRIES*/);
             var curveType = this.curves[i >> 2];
             switch (curveType) {
-                case 0:
+                case 0 /*LINEAR*/:
                     var before = frames[i];
-                    rotate = frames[i + 1];
-                    x = frames[i + 2];
-                    y = frames[i + 3];
-                    var t = (time - before) / (frames[i + 4] - before);
-                    rotate += (frames[i + 4 + 1] - rotate) * t;
-                    x += (frames[i + 4 + 2] - x) * t;
-                    y += (frames[i + 4 + 3] - y) * t;
+                    rotate = frames[i + 1 /*ROTATE*/];
+                    x = frames[i + 2 /*X*/];
+                    y = frames[i + 3 /*Y*/];
+                    var t = (time - before) / (frames[i + 4 /*ENTRIES*/] - before);
+                    rotate += (frames[i + 4 /*ENTRIES*/ + 1 /*ROTATE*/] - rotate) * t;
+                    x += (frames[i + 4 /*ENTRIES*/ + 2 /*X*/] - x) * t;
+                    y += (frames[i + 4 /*ENTRIES*/ + 3 /*Y*/] - y) * t;
                     break;
-                case 1:
-                    rotate = frames[i + 1];
-                    x = frames[i + 2];
-                    y = frames[i + 3];
+                case 1 /*STEPPED*/:
+                    rotate = frames[i + 1 /*ROTATE*/];
+                    x = frames[i + 2 /*X*/];
+                    y = frames[i + 3 /*Y*/];
                     break;
                 default:
-                    rotate = this.getBezierValue(time, i, 1, curveType - 2);
-                    x = this.getBezierValue(time, i, 2, curveType + 18 - 2);
-                    y = this.getBezierValue(time, i, 3, curveType + 18 * 2 - 2);
+                    rotate = this.getBezierValue(time, i, 1 /*ROTATE*/, curveType - 2 /*BEZIER*/);
+                    x = this.getBezierValue(time, i, 2 /*X*/, curveType + 18 /*BEZIER_SIZE*/ - 2 /*BEZIER*/);
+                    y = this.getBezierValue(time, i, 3 /*Y*/, curveType + 18 /*BEZIER_SIZE*/ * 2 - 2 /*BEZIER*/);
             }
             if (blend == exports.MixBlend.setup) {
                 var data = constraint.data;
@@ -2435,9 +2666,46 @@
         return PathConstraintMixTimeline;
     }(CurveTimeline));
 
-    var AnimationState = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Applies animations over time, queues animations for later playback, mixes (crossfading) between animations, and applies
+     * multiple animations on top of each other (layering).
+     *
+     * See [Applying Animations](http://esotericsoftware.com/spine-applying-animations/) in the Spine Runtimes Guide. */
+    var AnimationState = /** @class */ (function () {
         function AnimationState(data) {
+            /** The list of tracks that currently have animations, which may contain null entries. */
             this.tracks = new Array();
+            /** Multiplier for the delta time when the animation state is updated, causing time for all animations and mixes to play slower
+             * or faster. Defaults to 1.
+             *
+             * See TrackEntry {@link TrackEntry#timeScale} for affecting a single animation. */
             this.timeScale = 1;
             this.unkeyedState = 0;
             this.events = new Array();
@@ -2453,6 +2721,7 @@
                 _emptyAnimation = new Animation("<empty>", [], 0);
             return _emptyAnimation;
         };
+        /** Increments each track entry {@link TrackEntry#trackTime()}, setting queued animations as current if needed. */
         AnimationState.prototype.update = function (delta) {
             delta *= this.timeScale;
             var tracks = this.tracks;
@@ -2472,6 +2741,7 @@
                 }
                 var next = current.next;
                 if (next) {
+                    // When the next entry's delay is passed, change to the next entry, preserving leftover time.
                     var nextTime = current.trackLast - next.delay;
                     if (nextTime >= 0) {
                         next.delay = 0;
@@ -2492,6 +2762,7 @@
                     continue;
                 }
                 if (current.mixingFrom && this.updateMixingFrom(current, delta)) {
+                    // End mixing from entries once all have completed.
                     var from = current.mixingFrom;
                     current.mixingFrom = null;
                     if (from)
@@ -2505,6 +2776,7 @@
             }
             this.queue.drain();
         };
+        /** Returns true when all mixing from entries are complete. */
         AnimationState.prototype.updateMixingFrom = function (to, delta) {
             var from = to.mixingFrom;
             if (!from)
@@ -2512,7 +2784,9 @@
             var finished = this.updateMixingFrom(from, delta);
             from.animationLast = from.nextAnimationLast;
             from.trackLast = from.nextTrackLast;
+            // Require mixTime > 0 to ensure the mixing from entry was applied at least once.
             if (to.mixTime > 0 && to.mixTime >= to.mixDuration) {
+                // Require totalAlpha == 0 to ensure mixing is complete, unless mixDuration == 0 (the transition is a single frame).
                 if (from.totalAlpha == 0 || to.mixDuration == 0) {
                     to.mixingFrom = from.mixingFrom;
                     if (from.mixingFrom)
@@ -2526,6 +2800,9 @@
             to.mixTime += delta;
             return false;
         };
+        /** Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
+         * animation state can be applied to multiple skeletons to pose them identically.
+         * @returns True if any animations were applied. */
         AnimationState.prototype.apply = function (skeleton) {
             if (!skeleton)
                 throw new Error("skeleton cannot be null.");
@@ -2540,11 +2817,13 @@
                     continue;
                 applied = true;
                 var blend = i_1 == 0 ? exports.MixBlend.first : current.mixBlend;
+                // Apply mixing from entries first.
                 var mix = current.alpha;
                 if (current.mixingFrom)
                     mix *= this.applyMixingFrom(current, skeleton, blend);
                 else if (current.trackTime >= current.trackEnd && !current.next)
                     mix = 0;
+                // Apply current entry.
                 var animationLast = current.animationLast, animationTime = current.getAnimationTime(), applyTime = animationTime;
                 var applyEvents = events;
                 if (current.reverse) {
@@ -2555,6 +2834,9 @@
                 var timelineCount = timelines.length;
                 if ((i_1 == 0 && mix == 1) || blend == exports.MixBlend.add) {
                     for (var ii = 0; ii < timelineCount; ii++) {
+                        // Fixes issue #302 on IOS9 where mix, blend sometimes became undefined and caused assets
+                        // to sometimes stop rendering when using color correction, as their RGBA values become NaN.
+                        // (https://github.com/pixijs/pixi-spine/issues/302)
                         Utils.webkit602BugfixHelper(mix, blend);
                         var timeline = timelines[ii];
                         if (timeline instanceof AttachmentTimeline)
@@ -2578,6 +2860,7 @@
                             this.applyAttachmentTimeline(timeline_1, skeleton, applyTime, blend, true);
                         }
                         else {
+                            // This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
                             Utils.webkit602BugfixHelper(mix, blend);
                             timeline_1.apply(skeleton, animationLast, applyTime, applyEvents, mix, timelineBlend, exports.MixDirection.mixIn);
                         }
@@ -2588,6 +2871,9 @@
                 current.nextAnimationLast = animationTime;
                 current.nextTrackLast = current.trackTime;
             }
+            // Set slots attachments to the setup pose, if needed. This occurs if an animation that is mixing out sets attachments so
+            // subsequent timelines see any deform, but the subsequent timelines don't set an attachment (eg they are also mixing out or
+            // the time is before the first key).
             var setupState = this.unkeyedState + SETUP;
             var slots = skeleton.slots;
             for (var i = 0, n = skeleton.slots.length; i < n; i++) {
@@ -2597,7 +2883,7 @@
                     slot.setAttachment(!attachmentName ? null : skeleton.getAttachment(slot.data.index, attachmentName));
                 }
             }
-            this.unkeyedState += 2;
+            this.unkeyedState += 2; // Increasing after each use avoids the need to reset attachmentState for every slot.
             this.queue.drain();
             return applied;
         };
@@ -2606,7 +2892,7 @@
             if (from.mixingFrom)
                 this.applyMixingFrom(from, skeleton, blend);
             var mix = 0;
-            if (to.mixDuration == 0) {
+            if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
                 mix = 1;
                 if (blend == exports.MixBlend.first)
                     blend = exports.MixBlend.setup;
@@ -2675,6 +2961,7 @@
                     else if (timeline instanceof AttachmentTimeline)
                         this.applyAttachmentTimeline(timeline, skeleton, applyTime, timelineBlend, attachments);
                     else {
+                        // This fixes the WebKit 602 specific issue described at http://esotericsoftware.com/forum/iOS-10-disappearing-graphics-10109
                         Utils.webkit602BugfixHelper(alpha, blend);
                         if (drawOrder && timeline instanceof DrawOrderTimeline && timelineBlend == exports.MixBlend.setup)
                             direction = exports.MixDirection.mixIn;
@@ -2693,12 +2980,13 @@
             var slot = skeleton.slots[timeline.slotIndex];
             if (!slot.bone.active)
                 return;
-            if (time < timeline.frames[0]) {
+            if (time < timeline.frames[0]) { // Time is before first frame.
                 if (blend == exports.MixBlend.setup || blend == exports.MixBlend.first)
                     this.setAttachment(skeleton, slot, slot.data.attachmentName, attachments);
             }
             else
                 this.setAttachment(skeleton, slot, timeline.attachmentNames[Timeline.search1(timeline.frames, time)], attachments);
+            // If an attachment wasn't set (ie before the first frame or attachments is false), set the setup attachment later.
             if (slot.attachmentState <= this.unkeyedState)
                 slot.attachmentState = this.unkeyedState + SETUP;
         };
@@ -2734,6 +3022,7 @@
                 r1 = blend == exports.MixBlend.setup ? bone.data.rotation : bone.rotation;
                 r2 = bone.data.rotation + timeline.getCurveValue(time);
             }
+            // Mix between rotations using the direction of the shortest route on the first frame while detecting crosses.
             var total = 0, diff = r2 - r1;
             diff -= (16384 - ((16384.499999999996 - diff / 360) | 0)) * 360;
             if (diff == 0) {
@@ -2746,16 +3035,18 @@
                     lastDiff = diff;
                 }
                 else {
-                    lastTotal = timelinesRotation[i];
-                    lastDiff = timelinesRotation[i + 1];
+                    lastTotal = timelinesRotation[i]; // Angle and direction of mix, including loops.
+                    lastDiff = timelinesRotation[i + 1]; // Difference between bones.
                 }
                 var current = diff > 0, dir = lastTotal >= 0;
+                // Detect cross at 0 (not 180).
                 if (MathUtils.signum(lastDiff) != MathUtils.signum(diff) && Math.abs(lastDiff) <= 90) {
+                    // A cross after a 360 rotation is a loop.
                     if (Math.abs(lastTotal) > 180)
                         lastTotal += 360 * MathUtils.signum(lastTotal);
                     dir = current;
                 }
-                total = diff + lastTotal - lastTotal % 360;
+                total = diff + lastTotal - lastTotal % 360; // Store loops as part of lastTotal.
                 if (dir != current)
                     total += 360 * MathUtils.signum(lastTotal);
                 timelinesRotation[i] = total;
@@ -2767,6 +3058,7 @@
             var animationStart = entry.animationStart, animationEnd = entry.animationEnd;
             var duration = animationEnd - animationStart;
             var trackLastWrapped = entry.trackLast % duration;
+            // Queue events before complete.
             var events = this.events;
             var i = 0, n = events.length;
             for (; i < n; i++) {
@@ -2774,9 +3066,10 @@
                 if (event_1.time < trackLastWrapped)
                     break;
                 if (event_1.time > animationEnd)
-                    continue;
+                    continue; // Discard events outside animation start/end.
                 this.queue.event(entry, event_1);
             }
+            // Queue complete if completed a loop iteration or the animation.
             var complete = false;
             if (entry.loop)
                 complete = duration == 0 || trackLastWrapped > entry.trackTime % duration;
@@ -2784,13 +3077,18 @@
                 complete = animationTime >= animationEnd && entry.animationLast < animationEnd;
             if (complete)
                 this.queue.complete(entry);
+            // Queue events after complete.
             for (; i < n; i++) {
                 var event_2 = events[i];
                 if (event_2.time < animationStart)
-                    continue;
+                    continue; // Discard events outside animation start/end.
                 this.queue.event(entry, event_2);
             }
         };
+        /** Removes all animations from all tracks, leaving skeletons in their current pose.
+         *
+         * It may be desired to use {@link AnimationState#setEmptyAnimation()} to mix the skeletons back to the setup pose,
+         * rather than leaving them in their current pose. */
         AnimationState.prototype.clearTracks = function () {
             var oldDrainDisabled = this.queue.drainDisabled;
             this.queue.drainDisabled = true;
@@ -2800,6 +3098,10 @@
             this.queue.drainDisabled = oldDrainDisabled;
             this.queue.drain();
         };
+        /** Removes all animations from the track, leaving skeletons in their current pose.
+         *
+         * It may be desired to use {@link AnimationState#setEmptyAnimation()} to mix the skeletons back to the setup pose,
+         * rather than leaving them in their current pose. */
         AnimationState.prototype.clearTrack = function (trackIndex) {
             if (trackIndex >= this.tracks.length)
                 return;
@@ -2831,12 +3133,16 @@
                 current.mixingFrom = from;
                 from.mixingTo = current;
                 current.mixTime = 0;
+                // Store the interrupted mix percentage.
                 if (from.mixingFrom && from.mixDuration > 0)
                     current.interruptAlpha *= Math.min(1, from.mixTime / from.mixDuration);
-                from.timelinesRotation.length = 0;
+                from.timelinesRotation.length = 0; // Reset rotation for mixing out, in case entry was mixed in.
             }
             this.queue.start(current);
         };
+        /** Sets an animation by name.
+          *
+          * See {@link #setAnimationWith()}. */
         AnimationState.prototype.setAnimation = function (trackIndex, animationName, loop) {
             if (loop === void 0) { loop = false; }
             var animation = this.data.skeletonData.findAnimation(animationName);
@@ -2844,6 +3150,12 @@
                 throw new Error("Animation not found: " + animationName);
             return this.setAnimationWith(trackIndex, animation, loop);
         };
+        /** Sets the current animation for a track, discarding any queued animations. If the formerly current track entry was never
+         * applied to a skeleton, it is replaced (not mixed from).
+         * @param loop If true, the animation will repeat. If false it will not, instead its last frame is applied if played beyond its
+         *           duration. In either case {@link TrackEntry#trackEnd} determines when the track is cleared.
+         * @returns A track entry to allow further customization of animation playback. References to the track entry must not be kept
+         *         after the {@link AnimationStateListener#dispose()} event occurs. */
         AnimationState.prototype.setAnimationWith = function (trackIndex, animation, loop) {
             if (loop === void 0) { loop = false; }
             if (!animation)
@@ -2852,6 +3164,7 @@
             var current = this.expandToIndex(trackIndex);
             if (current) {
                 if (current.nextTrackLast == -1) {
+                    // Don't mix from an entry that was never applied.
                     this.tracks[trackIndex] = current.mixingFrom;
                     this.queue.interrupt(current);
                     this.queue.end(current);
@@ -2867,6 +3180,9 @@
             this.queue.drain();
             return entry;
         };
+        /** Queues an animation by name.
+         *
+         * See {@link #addAnimationWith()}. */
         AnimationState.prototype.addAnimation = function (trackIndex, animationName, loop, delay) {
             if (loop === void 0) { loop = false; }
             if (delay === void 0) { delay = 0; }
@@ -2875,6 +3191,14 @@
                 throw new Error("Animation not found: " + animationName);
             return this.addAnimationWith(trackIndex, animation, loop, delay);
         };
+        /** Adds an animation to be played after the current or last queued animation for a track. If the track is empty, it is
+         * equivalent to calling {@link #setAnimationWith()}.
+         * @param delay If > 0, sets {@link TrackEntry#delay}. If <= 0, the delay set is the duration of the previous track entry
+         *           minus any mix duration (from the {@link AnimationStateData}) plus the specified `delay` (ie the mix
+         *           ends at (`delay` = 0) or before (`delay` < 0) the previous track entry duration). If the
+         *           previous entry is looping, its next loop completion is used instead of its duration.
+         * @returns A track entry to allow further customization of animation playback. References to the track entry must not be kept
+         *         after the {@link AnimationStateListener#dispose()} event occurs. */
         AnimationState.prototype.addAnimationWith = function (trackIndex, animation, loop, delay) {
             if (loop === void 0) { loop = false; }
             if (delay === void 0) { delay = 0; }
@@ -2899,6 +3223,20 @@
             entry.delay = delay;
             return entry;
         };
+        /** Sets an empty animation for a track, discarding any queued animations, and sets the track entry's
+         * {@link TrackEntry#mixduration}. An empty animation has no timelines and serves as a placeholder for mixing in or out.
+         *
+         * Mixing out is done by setting an empty animation with a mix duration using either {@link #setEmptyAnimation()},
+         * {@link #setEmptyAnimations()}, or {@link #addEmptyAnimation()}. Mixing to an empty animation causes
+         * the previous animation to be applied less and less over the mix duration. Properties keyed in the previous animation
+         * transition to the value from lower tracks or to the setup pose value if no lower tracks key the property. A mix duration of
+         * 0 still mixes out over one frame.
+         *
+         * Mixing in is done by first setting an empty animation, then adding an animation using
+         * {@link #addAnimation()} and on the returned track entry, set the
+         * {@link TrackEntry#setMixDuration()}. Mixing from an empty animation causes the new animation to be applied more and
+         * more over the mix duration. Properties keyed in the new animation transition from the value from lower tracks or from the
+         * setup pose value if no lower tracks key the property to the value keyed in the new animation. */
         AnimationState.prototype.setEmptyAnimation = function (trackIndex, mixDuration) {
             if (mixDuration === void 0) { mixDuration = 0; }
             var entry = this.setAnimationWith(trackIndex, AnimationState.emptyAnimation(), false);
@@ -2906,6 +3244,17 @@
             entry.trackEnd = mixDuration;
             return entry;
         };
+        /** Adds an empty animation to be played after the current or last queued animation for a track, and sets the track entry's
+         * {@link TrackEntry#mixDuration}. If the track is empty, it is equivalent to calling
+         * {@link #setEmptyAnimation()}.
+         *
+         * See {@link #setEmptyAnimation()}.
+         * @param delay If > 0, sets {@link TrackEntry#delay}. If <= 0, the delay set is the duration of the previous track entry
+         *           minus any mix duration plus the specified `delay` (ie the mix ends at (`delay` = 0) or
+         *           before (`delay` < 0) the previous track entry duration). If the previous entry is looping, its next
+         *           loop completion is used instead of its duration.
+         * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
+         *         after the {@link AnimationStateListener#dispose()} event occurs. */
         AnimationState.prototype.addEmptyAnimation = function (trackIndex, mixDuration, delay) {
             if (mixDuration === void 0) { mixDuration = 0; }
             if (delay === void 0) { delay = 0; }
@@ -2916,6 +3265,8 @@
             entry.trackEnd = mixDuration;
             return entry;
         };
+        /** Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix
+          * duration. */
         AnimationState.prototype.setEmptyAnimations = function (mixDuration) {
             if (mixDuration === void 0) { mixDuration = 0; }
             var oldDrainDisabled = this.queue.drainDisabled;
@@ -2935,6 +3286,7 @@
             this.tracks.length = index + 1;
             return null;
         };
+        /** @param last May be null. */
         AnimationState.prototype.trackEntry = function (trackIndex, animation, loop, last) {
             var entry = this.trackEntryPool.obtain();
             entry.trackIndex = trackIndex;
@@ -2961,6 +3313,7 @@
             entry.mixBlend = exports.MixBlend.replace;
             return entry;
         };
+        /** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
         AnimationState.prototype.clearNext = function (entry) {
             var next = entry.next;
             while (next) {
@@ -3024,31 +3377,47 @@
                 }
             }
         };
+        /** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
         AnimationState.prototype.getCurrent = function (trackIndex) {
             if (trackIndex >= this.tracks.length)
                 return null;
             return this.tracks[trackIndex];
         };
+        /** Adds a listener to receive events for all track entries. */
         AnimationState.prototype.addListener = function (listener) {
             if (!listener)
                 throw new Error("listener cannot be null.");
             this.listeners.push(listener);
         };
+        /** Removes the listener added with {@link #addListener()}. */
         AnimationState.prototype.removeListener = function (listener) {
             var index = this.listeners.indexOf(listener);
             if (index >= 0)
                 this.listeners.splice(index, 1);
         };
+        /** Removes all listeners added with {@link #addListener()}. */
         AnimationState.prototype.clearListeners = function () {
             this.listeners.length = 0;
         };
+        /** Discards all listener notifications that have not yet been delivered. This can be useful to call from an
+         * {@link AnimationStateListener} when it is known that further notifications that may have been already queued for delivery
+         * are not wanted because new animations are being set. */
         AnimationState.prototype.clearListenerNotifications = function () {
             this.queue.clear();
         };
         return AnimationState;
     }());
-    var TrackEntry = (function () {
+    /** Stores settings and other state for the playback of an animation on an {@link AnimationState} track.
+     *
+     * References to a track entry must not be kept after the {@link AnimationStateListener#dispose()} event occurs. */
+    var TrackEntry = /** @class */ (function () {
         function TrackEntry() {
+            /** Controls how properties keyed in the animation are mixed with lower tracks. Defaults to {@link MixBlend#replace}, which
+             * replaces the values from the lower tracks with the animation values. {@link MixBlend#add} adds the animation values to
+             * the values from the lower tracks.
+             *
+             * The `mixBlend` can be set for a new track entry only before {@link AnimationState#apply()} is first
+             * called. */
             this.mixBlend = exports.MixBlend.replace;
             this.timelineMode = new Array();
             this.timelineHoldMix = new Array();
@@ -3065,6 +3434,9 @@
             this.timelineHoldMix.length = 0;
             this.timelinesRotation.length = 0;
         };
+        /** Uses {@link #trackTime} to compute the `animationTime`, which is between {@link #animationStart}
+         * and {@link #animationEnd}. When the `trackTime` is 0, the `animationTime` is equal to the
+         * `animationStart` time. */
         TrackEntry.prototype.getAnimationTime = function () {
             if (this.loop) {
                 var duration = this.animationEnd - this.animationStart;
@@ -3078,9 +3450,19 @@
             this.animationLast = animationLast;
             this.nextAnimationLast = animationLast;
         };
+        /** Returns true if at least one loop has been completed.
+         *
+         * See {@link AnimationStateListener#complete()}. */
         TrackEntry.prototype.isComplete = function () {
             return this.trackTime >= this.animationEnd - this.animationStart;
         };
+        /** Resets the rotation directions for mixing this entry's rotate timelines. This can be useful to avoid bones rotating the
+         * long way around when using {@link #alpha} and starting animations on other tracks.
+         *
+         * Mixing with {@link MixBlend#replace} involves finding a rotation between two others, which has two possible solutions:
+         * the short way or the long way around. The two rotations likely change over time, so which direction is the short or long
+         * way also changes. If the short way was always chosen, bones would flip to the other side when that direction became the
+         * long way. TrackEntry chooses the short way the first time it is applied and remembers that direction. */
         TrackEntry.prototype.resetRotationDirections = function () {
             this.timelinesRotation.length = 0;
         };
@@ -3088,15 +3470,15 @@
             var duration = this.animationEnd - this.animationStart;
             if (duration != 0) {
                 if (this.loop)
-                    return duration * (1 + ((this.trackTime / duration) | 0));
+                    return duration * (1 + ((this.trackTime / duration) | 0)); // Completion of next loop.
                 if (this.trackTime < duration)
-                    return duration;
+                    return duration; // Before duration.
             }
-            return this.trackTime;
+            return this.trackTime; // Next update.
         };
         return TrackEntry;
     }());
-    var EventQueue = (function () {
+    var EventQueue = /** @class */ (function () {
         function EventQueue(animState) {
             this.objects = [];
             this.drainDisabled = false;
@@ -3159,6 +3541,7 @@
                         for (var ii = 0; ii < listeners.length; ii++)
                             if (listeners[ii].end)
                                 listeners[ii].end(entry);
+                    // Fall through.
                     case exports.EventType.dispose:
                         if (entry.listener && entry.listener.dispose)
                             entry.listener.dispose(entry);
@@ -3201,7 +3584,7 @@
         EventType[EventType["complete"] = 4] = "complete";
         EventType[EventType["event"] = 5] = "event";
     })(exports.EventType || (exports.EventType = {}));
-    var AnimationStateAdapter = (function () {
+    var AnimationStateAdapter = /** @class */ (function () {
         function AnimationStateAdapter() {
         }
         AnimationStateAdapter.prototype.start = function (entry) {
@@ -3218,23 +3601,85 @@
         };
         return AnimationStateAdapter;
     }());
+    /** 1. A previously applied timeline has set this property.
+     *
+     * Result: Mix from the current pose to the timeline pose. */
     var SUBSEQUENT = 0;
+    /** 1. This is the first timeline to set this property.
+     * 2. The next track entry applied after this one does not have a timeline to set this property.
+     *
+     * Result: Mix from the setup pose to the timeline pose. */
     var FIRST = 1;
+    /** 1) A previously applied timeline has set this property.<br>
+     * 2) The next track entry to be applied does have a timeline to set this property.<br>
+     * 3) The next track entry after that one does not have a timeline to set this property.<br>
+     * Result: Mix from the current pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading
+     * animations that key the same property. A subsequent timeline will set this property using a mix. */
     var HOLD_SUBSEQUENT = 2;
+    /** 1) This is the first timeline to set this property.<br>
+     * 2) The next track entry to be applied does have a timeline to set this property.<br>
+     * 3) The next track entry after that one does not have a timeline to set this property.<br>
+     * Result: Mix from the setup pose to the timeline pose, but do not mix out. This avoids "dipping" when crossfading animations
+     * that key the same property. A subsequent timeline will set this property using a mix. */
     var HOLD_FIRST = 3;
+    /** 1. This is the first timeline to set this property.
+     * 2. The next track entry to be applied does have a timeline to set this property.
+     * 3. The next track entry after that one does have a timeline to set this property.
+     * 4. timelineHoldMix stores the first subsequent track entry that does not have a timeline to set this property.
+     *
+     * Result: The same as HOLD except the mix percentage from the timelineHoldMix track entry is used. This handles when more than
+     * 2 track entries in a row have a timeline that sets the same property.
+     *
+     * Eg, A -> B -> C -> D where A, B, and C have a timeline setting same property, but D does not. When A is applied, to avoid
+     * "dipping" A is not mixed out, however D (the first entry that doesn't set the property) mixing in is used to mix out A
+     * (which affects B and C). Without using D to mix out, A would be applied fully until mixing completes, then snap into
+     * place. */
     var HOLD_MIX = 4;
     var SETUP = 1;
     var CURRENT = 2;
     var _emptyAnimation = null;
 
-    var AnimationStateData = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores mix (crossfade) durations to be applied when {@link AnimationState} animations are changed. */
+    var AnimationStateData = /** @class */ (function () {
         function AnimationStateData(skeletonData) {
             this.animationToMixTime = {};
+            /** The mix duration to use when no mix duration has been defined between two animations. */
             this.defaultMix = 0;
             if (!skeletonData)
                 throw new Error("skeletonData cannot be null.");
             this.skeletonData = skeletonData;
         }
+        /** Sets a mix duration by animation name.
+         *
+         * See {@link #setMixWith()}. */
         AnimationStateData.prototype.setMix = function (fromName, toName, duration) {
             var from = this.skeletonData.findAnimation(fromName);
             if (!from)
@@ -3244,6 +3689,9 @@
                 throw new Error("Animation not found: " + toName);
             this.setMixWith(from, to, duration);
         };
+        /** Sets the mix duration when changing from the specified animation to the other.
+         *
+         * See {@link TrackEntry#mixDuration}. */
         AnimationStateData.prototype.setMixWith = function (from, to, duration) {
             if (!from)
                 throw new Error("from cannot be null.");
@@ -3252,6 +3700,8 @@
             var key = from.name + "." + to.name;
             this.animationToMixTime[key] = duration;
         };
+        /** Returns the mix duration to use when changing from the specified animation to the other, or the {@link #defaultMix} if
+          * no mix duration has been set. */
         AnimationStateData.prototype.getMix = function (from, to) {
             var key = from.name + "." + to.name;
             var value = this.animationToMixTime[key];
@@ -3260,6 +3710,34 @@
         return AnimationStateData;
     }());
 
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
     var __extends$a = (this && this.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
@@ -3275,7 +3753,135 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var Texture = (function () {
+    /** An attachment with vertices that make up a polygon. Can be used for hit detection, creating physics bodies, spawning particle
+     * effects, and more.
+     *
+     * See {@link SkeletonBounds} and [Bounding Boxes](http://esotericsoftware.com/spine-bounding-boxes) in the Spine User
+     * Guide. */
+    var BoundingBoxAttachment = /** @class */ (function (_super) {
+        __extends$a(BoundingBoxAttachment, _super);
+        function BoundingBoxAttachment(name) {
+            var _this = _super.call(this, name) || this;
+            _this.color = new Color(1, 1, 1, 1);
+            return _this;
+        }
+        BoundingBoxAttachment.prototype.copy = function () {
+            var copy = new BoundingBoxAttachment(this.name);
+            this.copyTo(copy);
+            copy.color.setFromColor(this.color);
+            return copy;
+        };
+        return BoundingBoxAttachment;
+    }(VertexAttachment));
+
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    var __extends$9 = (this && this.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+    /** An attachment with vertices that make up a polygon used for clipping the rendering of other attachments. */
+    var ClippingAttachment = /** @class */ (function (_super) {
+        __extends$9(ClippingAttachment, _super);
+        function ClippingAttachment(name) {
+            var _this = _super.call(this, name) || this;
+            // Nonessential.
+            /** The color of the clipping polygon as it was in Spine. Available only when nonessential data was exported. Clipping polygons
+             * are not usually rendered at runtime. */
+            _this.color = new Color(0.2275, 0.2275, 0.8078, 1); // ce3a3aff
+            return _this;
+        }
+        ClippingAttachment.prototype.copy = function () {
+            var copy = new ClippingAttachment(this.name);
+            this.copyTo(copy);
+            copy.endSlot = this.endSlot;
+            copy.color.setFromColor(this.color);
+            return copy;
+        };
+        return ClippingAttachment;
+    }(VertexAttachment));
+
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    var __extends$8 = (this && this.__extends) || (function () {
+        var extendStatics = function (d, b) {
+            extendStatics = Object.setPrototypeOf ||
+                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+                function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+            return extendStatics(d, b);
+        };
+        return function (d, b) {
+            if (typeof b !== "function" && b !== null)
+                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+    var Texture = /** @class */ (function () {
         function Texture(image) {
             this._image = image;
         }
@@ -3292,15 +3898,15 @@
         TextureFilter[TextureFilter["MipMapNearestNearest"] = 9984] = "MipMapNearestNearest";
         TextureFilter[TextureFilter["MipMapLinearNearest"] = 9985] = "MipMapLinearNearest";
         TextureFilter[TextureFilter["MipMapNearestLinear"] = 9986] = "MipMapNearestLinear";
-        TextureFilter[TextureFilter["MipMapLinearLinear"] = 9987] = "MipMapLinearLinear";
+        TextureFilter[TextureFilter["MipMapLinearLinear"] = 9987] = "MipMapLinearLinear"; // WebGLRenderingContext.LINEAR_MIPMAP_LINEAR
     })(exports.TextureFilter || (exports.TextureFilter = {}));
     exports.TextureWrap = void 0;
     (function (TextureWrap) {
         TextureWrap[TextureWrap["MirroredRepeat"] = 33648] = "MirroredRepeat";
         TextureWrap[TextureWrap["ClampToEdge"] = 33071] = "ClampToEdge";
-        TextureWrap[TextureWrap["Repeat"] = 10497] = "Repeat";
+        TextureWrap[TextureWrap["Repeat"] = 10497] = "Repeat"; // WebGLRenderingContext.REPEAT
     })(exports.TextureWrap || (exports.TextureWrap = {}));
-    var TextureRegion = (function () {
+    var TextureRegion = /** @class */ (function () {
         function TextureRegion() {
             this.u = 0;
             this.v = 0;
@@ -3316,8 +3922,8 @@
         }
         return TextureRegion;
     }());
-    var FakeTexture = (function (_super) {
-        __extends$a(FakeTexture, _super);
+    var FakeTexture = /** @class */ (function (_super) {
+        __extends$8(FakeTexture, _super);
         function FakeTexture() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
@@ -3327,7 +3933,35 @@
         return FakeTexture;
     }(Texture));
 
-    var __extends$9 = (this && this.__extends) || (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    var __extends$7 = (this && this.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
                 ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -3342,7 +3976,7 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var TextureAtlas = (function () {
+    var TextureAtlas = /** @class */ (function () {
         function TextureAtlas(atlasText) {
             this.pages = new Array();
             this.regions = new Array();
@@ -3356,6 +3990,7 @@
                 page.height = parseInt(entry[2]);
             };
             pageFields["format"] = function () {
+                // page.format = Format[tuple[0]]; we don't need format in WebGL
             };
             pageFields["filter"] = function () {
                 page.minFilter = Utils.enumValue(exports.TextureFilter, entry[1]);
@@ -3410,15 +4045,18 @@
                 region.index = parseInt(entry[1]);
             };
             var line = reader.readLine();
+            // Ignore empty lines before first entry.
             while (line && line.trim().length == 0)
                 line = reader.readLine();
+            // Header entries.
             while (true) {
                 if (!line || line.trim().length == 0)
                     break;
                 if (reader.readEntry(entry, line) == 0)
-                    break;
+                    break; // Silently ignore all header fields.
                 line = reader.readLine();
             }
+            // Page and region entries.
             var names = null;
             var values = null;
             while (true) {
@@ -3509,7 +4147,7 @@
         };
         return TextureAtlas;
     }());
-    var TextureAtlasReader = (function () {
+    var TextureAtlasReader = /** @class */ (function () {
         function TextureAtlasReader(text) {
             this.index = 0;
             this.lines = text.split(/\r\n|\r|\n/);
@@ -3543,7 +4181,7 @@
         };
         return TextureAtlasReader;
     }());
-    var TextureAtlasPage = (function () {
+    var TextureAtlasPage = /** @class */ (function () {
         function TextureAtlasPage() {
             this.minFilter = exports.TextureFilter.Nearest;
             this.magFilter = exports.TextureFilter.Nearest;
@@ -3557,328 +4195,42 @@
         };
         return TextureAtlasPage;
     }());
-    var TextureAtlasRegion = (function (_super) {
-        __extends$9(TextureAtlasRegion, _super);
+    var TextureAtlasRegion = /** @class */ (function (_super) {
+        __extends$7(TextureAtlasRegion, _super);
         function TextureAtlasRegion() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         return TextureAtlasRegion;
     }(TextureRegion));
 
-    var AssetManager = (function () {
-        function AssetManager(textureLoader, pathPrefix, downloader) {
-            if (pathPrefix === void 0) { pathPrefix = ""; }
-            if (downloader === void 0) { downloader = null; }
-            this.assets = {};
-            this.errors = {};
-            this.toLoad = 0;
-            this.loaded = 0;
-            this.textureLoader = textureLoader;
-            this.pathPrefix = pathPrefix;
-            this.downloader = downloader || new Downloader();
-        }
-        AssetManager.prototype.start = function (path) {
-            this.toLoad++;
-            return this.pathPrefix + path;
-        };
-        AssetManager.prototype.success = function (callback, path, asset) {
-            this.toLoad--;
-            this.loaded++;
-            this.assets[path] = asset;
-            if (callback)
-                callback(path, asset);
-        };
-        AssetManager.prototype.error = function (callback, path, message) {
-            this.toLoad--;
-            this.loaded++;
-            this.errors[path] = message;
-            if (callback)
-                callback(path, message);
-        };
-        AssetManager.prototype.setRawDataURI = function (path, data) {
-            this.downloader.rawDataUris[this.pathPrefix + path] = data;
-        };
-        AssetManager.prototype.loadBinary = function (path, success, error) {
-            var _this = this;
-            if (success === void 0) { success = null; }
-            if (error === void 0) { error = null; }
-            path = this.start(path);
-            this.downloader.downloadBinary(path, function (data) {
-                _this.success(success, path, data);
-            }, function (status, responseText) {
-                _this.error(error, path, "Couldn't load binary " + path + ": status " + status + ", " + responseText);
-            });
-        };
-        AssetManager.prototype.loadText = function (path, success, error) {
-            var _this = this;
-            if (success === void 0) { success = null; }
-            if (error === void 0) { error = null; }
-            path = this.start(path);
-            this.downloader.downloadText(path, function (data) {
-                _this.success(success, path, data);
-            }, function (status, responseText) {
-                _this.error(error, path, "Couldn't load text " + path + ": status " + status + ", " + responseText);
-            });
-        };
-        AssetManager.prototype.loadJson = function (path, success, error) {
-            var _this = this;
-            if (success === void 0) { success = null; }
-            if (error === void 0) { error = null; }
-            path = this.start(path);
-            this.downloader.downloadJson(path, function (data) {
-                _this.success(success, path, data);
-            }, function (status, responseText) {
-                _this.error(error, path, "Couldn't load JSON " + path + ": status " + status + ", " + responseText);
-            });
-        };
-        AssetManager.prototype.loadTexture = function (path, success, error) {
-            var _this = this;
-            if (success === void 0) { success = null; }
-            if (error === void 0) { error = null; }
-            path = this.start(path);
-            var isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
-            var isWebWorker = !isBrowser;
-            if (isWebWorker) {
-                fetch(path, { mode: "cors" }).then(function (response) {
-                    if (response.ok)
-                        return response.blob();
-                    _this.error(error, path, "Couldn't load image: " + path);
-                    return null;
-                }).then(function (blob) {
-                    return blob ? createImageBitmap(blob, { premultiplyAlpha: "none", colorSpaceConversion: "none" }) : null;
-                }).then(function (bitmap) {
-                    if (bitmap)
-                        _this.success(success, path, _this.textureLoader(bitmap));
-                });
-            }
-            else {
-                var image_1 = new Image();
-                image_1.crossOrigin = "anonymous";
-                image_1.onload = function () {
-                    _this.success(success, path, _this.textureLoader(image_1));
-                };
-                image_1.onerror = function () {
-                    _this.error(error, path, "Couldn't load image: " + path);
-                };
-                if (this.downloader.rawDataUris[path])
-                    path = this.downloader.rawDataUris[path];
-                image_1.src = path;
-            }
-        };
-        AssetManager.prototype.loadTextureAtlas = function (path, success, error) {
-            var _this = this;
-            if (success === void 0) { success = null; }
-            if (error === void 0) { error = null; }
-            var index = path.lastIndexOf("/");
-            var parent = index >= 0 ? path.substring(0, index + 1) : "";
-            path = this.start(path);
-            this.downloader.downloadText(path, function (atlasText) {
-                try {
-                    var atlas_1 = new TextureAtlas(atlasText);
-                    var toLoad_1 = atlas_1.pages.length, abort_1 = false;
-                    var _loop_1 = function (page) {
-                        _this.loadTexture(parent + page.name, function (imagePath, texture) {
-                            if (!abort_1) {
-                                page.setTexture(texture);
-                                if (--toLoad_1 == 0)
-                                    _this.success(success, path, atlas_1);
-                            }
-                        }, function (imagePath, message) {
-                            if (!abort_1)
-                                _this.error(error, path, "Couldn't load texture atlas " + path + " page image: " + imagePath);
-                            abort_1 = true;
-                        });
-                    };
-                    for (var _i = 0, _a = atlas_1.pages; _i < _a.length; _i++) {
-                        var page = _a[_i];
-                        _loop_1(page);
-                    }
-                }
-                catch (e) {
-                    _this.error(error, path, "Couldn't parse texture atlas " + path + ": " + e.message);
-                }
-            }, function (status, responseText) {
-                _this.error(error, path, "Couldn't load texture atlas " + path + ": status " + status + ", " + responseText);
-            });
-        };
-        AssetManager.prototype.get = function (path) {
-            return this.assets[this.pathPrefix + path];
-        };
-        AssetManager.prototype.require = function (path) {
-            path = this.pathPrefix + path;
-            var asset = this.assets[path];
-            if (asset)
-                return asset;
-            var error = this.errors[path];
-            throw Error("Asset not found: " + path + (error ? "\n" + error : ""));
-        };
-        AssetManager.prototype.remove = function (path) {
-            path = this.pathPrefix + path;
-            var asset = this.assets[path];
-            if (asset.dispose)
-                asset.dispose();
-            delete this.assets[path];
-            return asset;
-        };
-        AssetManager.prototype.removeAll = function () {
-            for (var key in this.assets) {
-                var asset = this.assets[key];
-                if (asset.dispose)
-                    asset.dispose();
-            }
-            this.assets = {};
-        };
-        AssetManager.prototype.isLoadingComplete = function () {
-            return this.toLoad == 0;
-        };
-        AssetManager.prototype.getToLoad = function () {
-            return this.toLoad;
-        };
-        AssetManager.prototype.getLoaded = function () {
-            return this.loaded;
-        };
-        AssetManager.prototype.dispose = function () {
-            this.removeAll();
-        };
-        AssetManager.prototype.hasErrors = function () {
-            return Object.keys(this.errors).length > 0;
-        };
-        AssetManager.prototype.getErrors = function () {
-            return this.errors;
-        };
-        return AssetManager;
-    }());
-    var Downloader = (function () {
-        function Downloader() {
-            this.callbacks = {};
-            this.rawDataUris = {};
-        }
-        Downloader.prototype.downloadText = function (url, success, error) {
-            var _this = this;
-            if (this.rawDataUris[url])
-                url = this.rawDataUris[url];
-            if (this.start(url, success, error))
-                return;
-            var request = new XMLHttpRequest();
-            request.overrideMimeType("text/html");
-            request.open("GET", url, true);
-            var done = function () {
-                _this.finish(url, request.status, request.responseText);
-            };
-            request.onload = done;
-            request.onerror = done;
-            request.send();
-        };
-        Downloader.prototype.downloadJson = function (url, success, error) {
-            this.downloadText(url, function (data) {
-                success(JSON.parse(data));
-            }, error);
-        };
-        Downloader.prototype.downloadBinary = function (url, success, error) {
-            var _this = this;
-            if (this.rawDataUris[url])
-                url = this.rawDataUris[url];
-            if (this.start(url, success, error))
-                return;
-            var request = new XMLHttpRequest();
-            request.open("GET", url, true);
-            request.responseType = "arraybuffer";
-            var onerror = function () {
-                _this.finish(url, request.status, request.responseText);
-            };
-            request.onload = function () {
-                if (request.status == 200)
-                    _this.finish(url, 200, new Uint8Array(request.response));
-                else
-                    onerror();
-            };
-            request.onerror = onerror;
-            request.send();
-        };
-        Downloader.prototype.start = function (url, success, error) {
-            var callbacks = this.callbacks[url];
-            try {
-                if (callbacks)
-                    return true;
-                this.callbacks[url] = callbacks = [];
-            }
-            finally {
-                callbacks.push(success, error);
-            }
-        };
-        Downloader.prototype.finish = function (url, status, data) {
-            var callbacks = this.callbacks[url];
-            delete this.callbacks[url];
-            var args = status == 200 ? [data] : [status, data];
-            for (var i = args.length - 1, n = callbacks.length; i < n; i += 2)
-                callbacks[i].apply(null, args);
-        };
-        return Downloader;
-    }());
-
-    var __extends$8 = (this && this.__extends) || (function () {
-        var extendStatics = function (d, b) {
-            extendStatics = Object.setPrototypeOf ||
-                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-                function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-            return extendStatics(d, b);
-        };
-        return function (d, b) {
-            if (typeof b !== "function" && b !== null)
-                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-            extendStatics(d, b);
-            function __() { this.constructor = d; }
-            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-    })();
-    var BoundingBoxAttachment = (function (_super) {
-        __extends$8(BoundingBoxAttachment, _super);
-        function BoundingBoxAttachment(name) {
-            var _this = _super.call(this, name) || this;
-            _this.color = new Color(1, 1, 1, 1);
-            return _this;
-        }
-        BoundingBoxAttachment.prototype.copy = function () {
-            var copy = new BoundingBoxAttachment(this.name);
-            this.copyTo(copy);
-            copy.color.setFromColor(this.color);
-            return copy;
-        };
-        return BoundingBoxAttachment;
-    }(VertexAttachment));
-
-    var __extends$7 = (this && this.__extends) || (function () {
-        var extendStatics = function (d, b) {
-            extendStatics = Object.setPrototypeOf ||
-                ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-                function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-            return extendStatics(d, b);
-        };
-        return function (d, b) {
-            if (typeof b !== "function" && b !== null)
-                throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-            extendStatics(d, b);
-            function __() { this.constructor = d; }
-            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-    })();
-    var ClippingAttachment = (function (_super) {
-        __extends$7(ClippingAttachment, _super);
-        function ClippingAttachment(name) {
-            var _this = _super.call(this, name) || this;
-            _this.color = new Color(0.2275, 0.2275, 0.8078, 1);
-            return _this;
-        }
-        ClippingAttachment.prototype.copy = function () {
-            var copy = new ClippingAttachment(this.name);
-            this.copyTo(copy);
-            copy.endSlot = this.endSlot;
-            copy.color.setFromColor(this.color);
-            return copy;
-        };
-        return ClippingAttachment;
-    }(VertexAttachment));
-
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
     var __extends$6 = (this && this.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
@@ -3894,14 +4246,21 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var MeshAttachment = (function (_super) {
+    /** An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
+     * supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
+     *
+     * See [Mesh attachments](http://esotericsoftware.com/spine-meshes) in the Spine User Guide. */
+    var MeshAttachment = /** @class */ (function (_super) {
         __extends$6(MeshAttachment, _super);
         function MeshAttachment(name) {
             var _this = _super.call(this, name) || this;
+            /** The color to tint the mesh. */
             _this.color = new Color(1, 1, 1, 1);
             _this.tempColor = new Color(0, 0, 0, 0);
             return _this;
         }
+        /** Calculates {@link #uvs} using {@link #regionUVs} and the {@link #region}. Must be called after changing the region UVs or
+         * region. */
         MeshAttachment.prototype.updateUVs = function () {
             var regionUVs = this.regionUVs;
             if (!this.uvs || this.uvs.length != regionUVs.length)
@@ -3962,9 +4321,13 @@
                 uvs[i + 1] = v + regionUVs[i + 1] * height;
             }
         };
+        /** The parent mesh if this is a linked mesh, else null. A linked mesh shares the {@link #bones}, {@link #vertices},
+         * {@link #regionUVs}, {@link #triangles}, {@link #hullLength}, {@link #edges}, {@link #width}, and {@link #height} with the
+         * parent mesh, but may have a different {@link #name} or {@link #path} (and therefore a different texture). */
         MeshAttachment.prototype.getParentMesh = function () {
             return this.parentMesh;
         };
+        /** @param parentMesh May be null. */
         MeshAttachment.prototype.setParentMesh = function (parentMesh) {
             this.parentMesh = parentMesh;
             if (parentMesh) {
@@ -3992,6 +4355,7 @@
             copy.triangles = new Array(this.triangles.length);
             Utils.arrayCopy(this.triangles, 0, copy.triangles, 0, this.triangles.length);
             copy.hullLength = this.hullLength;
+            // Nonessential.
             if (this.edges) {
                 copy.edges = new Array(this.edges.length);
                 Utils.arrayCopy(this.edges, 0, copy.edges, 0, this.edges.length);
@@ -4000,6 +4364,7 @@
             copy.height = this.height;
             return copy;
         };
+        /** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. **/
         MeshAttachment.prototype.newLinkedMesh = function () {
             var copy = new MeshAttachment(this.name);
             copy.region = this.region;
@@ -4013,6 +4378,34 @@
         return MeshAttachment;
     }(VertexAttachment));
 
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
     var __extends$5 = (this && this.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
@@ -4028,12 +4421,20 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var PathAttachment = (function (_super) {
+    /** An attachment whose vertices make up a composite Bezier curve.
+     *
+     * See {@link PathConstraint} and [Paths](http://esotericsoftware.com/spine-paths) in the Spine User Guide. */
+    var PathAttachment = /** @class */ (function (_super) {
         __extends$5(PathAttachment, _super);
         function PathAttachment(name) {
             var _this = _super.call(this, name) || this;
+            /** If true, the start and end knots are connected. */
             _this.closed = false;
+            /** If true, additional calculations are performed to make calculating positions along the path more accurate. If false, fewer
+             * calculations are performed but calculating positions along the path is less accurate. */
             _this.constantSpeed = false;
+            /** The color of the path as it was in Spine. Available only when nonessential data was exported. Paths are not usually
+             * rendered at runtime. */
             _this.color = new Color(1, 1, 1, 1);
             return _this;
         }
@@ -4050,6 +4451,34 @@
         return PathAttachment;
     }(VertexAttachment));
 
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
     var __extends$4 = (this && this.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
@@ -4065,10 +4494,17 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var PointAttachment = (function (_super) {
+    /** An attachment which is a single point and a rotation. This can be used to spawn projectiles, particles, etc. A bone can be
+     * used in similar ways, but a PointAttachment is slightly less expensive to compute and can be hidden, shown, and placed in a
+     * skin.
+     *
+     * See [Point Attachments](http://esotericsoftware.com/spine-point-attachments) in the Spine User Guide. */
+    var PointAttachment = /** @class */ (function (_super) {
         __extends$4(PointAttachment, _super);
         function PointAttachment(name) {
             var _this = _super.call(this, name) || this;
+            /** The color of the point attachment as it was in Spine. Available only when nonessential data was exported. Point attachments
+             * are not usually rendered at runtime. */
             _this.color = new Color(0.38, 0.94, 0, 1);
             return _this;
         }
@@ -4094,6 +4530,34 @@
         return PointAttachment;
     }(VertexAttachment));
 
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
     var __extends$3 = (this && this.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
@@ -4109,23 +4573,38 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var RegionAttachment = (function (_super) {
+    /** An attachment that displays a textured quadrilateral.
+     *
+     * See [Region attachments](http://esotericsoftware.com/spine-regions) in the Spine User Guide. */
+    var RegionAttachment = /** @class */ (function (_super) {
         __extends$3(RegionAttachment, _super);
         function RegionAttachment(name) {
             var _this = _super.call(this, name) || this;
+            /** The local x translation. */
             _this.x = 0;
+            /** The local y translation. */
             _this.y = 0;
+            /** The local scaleX. */
             _this.scaleX = 1;
+            /** The local scaleY. */
             _this.scaleY = 1;
+            /** The local rotation. */
             _this.rotation = 0;
+            /** The width of the region attachment in Spine. */
             _this.width = 0;
+            /** The height of the region attachment in Spine. */
             _this.height = 0;
+            /** The color to tint the region attachment. */
             _this.color = new Color(1, 1, 1, 1);
+            /** For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.
+             *
+             * See {@link #updateOffset()}. */
             _this.offset = Utils.newFloatArray(8);
             _this.uvs = Utils.newFloatArray(8);
             _this.tempColor = new Color(1, 1, 1, 1);
             return _this;
         }
+        /** Calculates the {@link #offset} using the region settings. Must be called after changing region settings. */
         RegionAttachment.prototype.updateOffset = function () {
             this.region;
             var regionScaleX = this.width / this.region.originalWidth * this.scaleX;
@@ -4180,6 +4659,13 @@
                 uvs[7] = region.v2;
             }
         };
+        /** Transforms the attachment's four vertices to world coordinates.
+         *
+         * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+         * Runtimes Guide.
+         * @param worldVertices The output world vertices. Must have a length >= `offset` + 8.
+         * @param offset The `worldVertices` index to begin writing values.
+         * @param stride The number of `worldVertices` entries between the value pairs written. */
         RegionAttachment.prototype.computeWorldVertices = function (bone, worldVertices, offset, stride) {
             var vertexOffset = this.offset;
             var x = bone.worldX, y = bone.worldY;
@@ -4187,22 +4673,22 @@
             var offsetX = 0, offsetY = 0;
             offsetX = vertexOffset[0];
             offsetY = vertexOffset[1];
-            worldVertices[offset] = offsetX * a + offsetY * b + x;
+            worldVertices[offset] = offsetX * a + offsetY * b + x; // br
             worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
             offset += stride;
             offsetX = vertexOffset[2];
             offsetY = vertexOffset[3];
-            worldVertices[offset] = offsetX * a + offsetY * b + x;
+            worldVertices[offset] = offsetX * a + offsetY * b + x; // bl
             worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
             offset += stride;
             offsetX = vertexOffset[4];
             offsetY = vertexOffset[5];
-            worldVertices[offset] = offsetX * a + offsetY * b + x;
+            worldVertices[offset] = offsetX * a + offsetY * b + x; // ul
             worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
             offset += stride;
             offsetX = vertexOffset[6];
             offsetY = vertexOffset[7];
-            worldVertices[offset] = offsetX * a + offsetY * b + x;
+            worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
             worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
         };
         RegionAttachment.prototype.copy = function () {
@@ -4257,7 +4743,39 @@
         return RegionAttachment;
     }(Attachment));
 
-    var AtlasAttachmentLoader = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** An {@link AttachmentLoader} that configures attachments using texture regions from an {@link TextureAtlas}.
+     *
+     * See [Loading skeleton data](http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data) in the
+     * Spine Runtimes Guide. */
+    var AtlasAttachmentLoader = /** @class */ (function () {
         function AtlasAttachmentLoader(atlas) {
             this.atlas = atlas;
         }
@@ -4294,17 +4812,59 @@
         return AtlasAttachmentLoader;
     }());
 
-    var BoneData = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores the setup pose for a {@link Bone}. */
+    var BoneData = /** @class */ (function () {
         function BoneData(index, name, parent) {
+            /** The local x translation. */
             this.x = 0;
+            /** The local y translation. */
             this.y = 0;
+            /** The local rotation. */
             this.rotation = 0;
+            /** The local scaleX. */
             this.scaleX = 1;
+            /** The local scaleY. */
             this.scaleY = 1;
+            /** The local shearX. */
             this.shearX = 0;
+            /** The local shearX. */
             this.shearY = 0;
+            /** The transform mode for how parent world transforms affect this bone. */
             this.transformMode = exports.TransformMode.Normal;
+            /** When true, {@link Skeleton#updateWorldTransform()} only updates this bone if the {@link Skeleton#skin} contains this
+              * bone.
+              * @see Skin#bones */
             this.skinRequired = false;
+            /** The color of the bone as it was in Spine. Available only when nonessential data was exported. Bones are not usually
+             * rendered at runtime. */
             this.color = new Color();
             if (index < 0)
                 throw new Error("index must be >= 0.");
@@ -4316,6 +4876,7 @@
         }
         return BoneData;
     }());
+    /** Determines how a bone inherits world transforms from parent bones. */
     exports.TransformMode = void 0;
     (function (TransformMode) {
         TransformMode[TransformMode["Normal"] = 0] = "Normal";
@@ -4325,28 +4886,83 @@
         TransformMode[TransformMode["NoScaleOrReflection"] = 4] = "NoScaleOrReflection";
     })(exports.TransformMode || (exports.TransformMode = {}));
 
-    var Bone = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores a bone's current pose.
+     *
+     * A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a
+     * local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a
+     * constraint or application code modifies the world transform after it was computed from the local transform. */
+    var Bone = /** @class */ (function () {
+        /** @param parent May be null. */
         function Bone(data, skeleton, parent) {
+            /** The immediate children of this bone. */
             this.children = new Array();
+            /** The local x translation. */
             this.x = 0;
+            /** The local y translation. */
             this.y = 0;
+            /** The local rotation in degrees, counter clockwise. */
             this.rotation = 0;
+            /** The local scaleX. */
             this.scaleX = 0;
+            /** The local scaleY. */
             this.scaleY = 0;
+            /** The local shearX. */
             this.shearX = 0;
+            /** The local shearY. */
             this.shearY = 0;
+            /** The applied local x translation. */
             this.ax = 0;
+            /** The applied local y translation. */
             this.ay = 0;
+            /** The applied local rotation in degrees, counter clockwise. */
             this.arotation = 0;
+            /** The applied local scaleX. */
             this.ascaleX = 0;
+            /** The applied local scaleY. */
             this.ascaleY = 0;
+            /** The applied local shearX. */
             this.ashearX = 0;
+            /** The applied local shearY. */
             this.ashearY = 0;
+            /** Part of the world transform matrix for the X axis. If changed, {@link #updateAppliedTransform()} should be called. */
             this.a = 0;
+            /** Part of the world transform matrix for the Y axis. If changed, {@link #updateAppliedTransform()} should be called. */
             this.b = 0;
+            /** Part of the world transform matrix for the X axis. If changed, {@link #updateAppliedTransform()} should be called. */
             this.c = 0;
+            /** Part of the world transform matrix for the Y axis. If changed, {@link #updateAppliedTransform()} should be called. */
             this.d = 0;
+            /** The world X position. If changed, {@link #updateAppliedTransform()} should be called. */
             this.worldY = 0;
+            /** The world Y position. If changed, {@link #updateAppliedTransform()} should be called. */
             this.worldX = 0;
             this.sorted = false;
             this.active = false;
@@ -4359,15 +4975,26 @@
             this.parent = parent;
             this.setToSetupPose();
         }
+        /** Returns false when the bone has not been computed because {@link BoneData#skinRequired} is true and the
+          * {@link Skeleton#skin active skin} does not {@link Skin#bones contain} this bone. */
         Bone.prototype.isActive = function () {
             return this.active;
         };
+        /** Computes the world transform using the parent bone and this bone's local applied transform. */
         Bone.prototype.update = function () {
             this.updateWorldTransformWith(this.ax, this.ay, this.arotation, this.ascaleX, this.ascaleY, this.ashearX, this.ashearY);
         };
+        /** Computes the world transform using the parent bone and this bone's local transform.
+         *
+         * See {@link #updateWorldTransformWith()}. */
         Bone.prototype.updateWorldTransform = function () {
             this.updateWorldTransformWith(this.x, this.y, this.rotation, this.scaleX, this.scaleY, this.shearX, this.shearY);
         };
+        /** Computes the world transform using the parent bone and the specified local transform. The applied transform is set to the
+         * specified local transform. Child bones are not updated.
+         *
+         * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+         * Runtimes Guide. */
         Bone.prototype.updateWorldTransformWith = function (x, y, rotation, scaleX, scaleY, shearX, shearY) {
             this.ax = x;
             this.ay = y;
@@ -4377,7 +5004,7 @@
             this.ashearX = shearX;
             this.ashearY = shearY;
             var parent = this.parent;
-            if (!parent) {
+            if (!parent) { // Root bone.
                 var skeleton = this.skeleton;
                 var rotationY = rotation + 90 + shearY;
                 var sx = skeleton.scaleX;
@@ -4476,6 +5103,7 @@
             this.c *= this.skeleton.scaleY;
             this.d *= this.skeleton.scaleY;
         };
+        /** Sets this bone's local transform to the setup pose. */
         Bone.prototype.setToSetupPose = function () {
             var data = this.data;
             this.x = data.x;
@@ -4486,18 +5114,30 @@
             this.shearX = data.shearX;
             this.shearY = data.shearY;
         };
+        /** The world rotation for the X axis, calculated using {@link #a} and {@link #c}. */
         Bone.prototype.getWorldRotationX = function () {
             return Math.atan2(this.c, this.a) * MathUtils.radDeg;
         };
+        /** The world rotation for the Y axis, calculated using {@link #b} and {@link #d}. */
         Bone.prototype.getWorldRotationY = function () {
             return Math.atan2(this.d, this.b) * MathUtils.radDeg;
         };
+        /** The magnitude (always positive) of the world scale X, calculated using {@link #a} and {@link #c}. */
         Bone.prototype.getWorldScaleX = function () {
             return Math.sqrt(this.a * this.a + this.c * this.c);
         };
+        /** The magnitude (always positive) of the world scale Y, calculated using {@link #b} and {@link #d}. */
         Bone.prototype.getWorldScaleY = function () {
             return Math.sqrt(this.b * this.b + this.d * this.d);
         };
+        /** Computes the applied transform values from the world transform.
+         *
+         * If the world transform is modified (by a constraint, {@link #rotateWorld(float)}, etc) then this method should be called so
+         * the applied transform matches the world transform. The applied transform may be needed by other code (eg to apply other
+         * constraints).
+         *
+         * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The applied transform after
+         * calling this method is equivalent to the local transform used to compute the world transform, but may not be identical. */
         Bone.prototype.updateAppliedTransform = function () {
             var parent = this.parent;
             if (!parent) {
@@ -4538,6 +5178,7 @@
                 this.arotation = 90 - Math.atan2(rd, rb) * MathUtils.radDeg;
             }
         };
+        /** Transforms a point from world coordinates to the bone's local coordinates. */
         Bone.prototype.worldToLocal = function (world) {
             var invDet = 1 / (this.a * this.d - this.b * this.c);
             var x = world.x - this.worldX, y = world.y - this.worldY;
@@ -4545,21 +5186,28 @@
             world.y = y * this.a * invDet - x * this.c * invDet;
             return world;
         };
+        /** Transforms a point from the bone's local coordinates to world coordinates. */
         Bone.prototype.localToWorld = function (local) {
             var x = local.x, y = local.y;
             local.x = x * this.a + y * this.b + this.worldX;
             local.y = x * this.c + y * this.d + this.worldY;
             return local;
         };
+        /** Transforms a world rotation to a local rotation. */
         Bone.prototype.worldToLocalRotation = function (worldRotation) {
             var sin = MathUtils.sinDeg(worldRotation), cos = MathUtils.cosDeg(worldRotation);
             return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * MathUtils.radDeg + this.rotation - this.shearX;
         };
+        /** Transforms a local rotation to a world rotation. */
         Bone.prototype.localToWorldRotation = function (localRotation) {
             localRotation -= this.rotation - this.shearX;
             var sin = MathUtils.sinDeg(localRotation), cos = MathUtils.cosDeg(localRotation);
             return Math.atan2(cos * this.c + sin * this.d, cos * this.a + sin * this.b) * MathUtils.radDeg;
         };
+        /** Rotates the world transform the specified amount.
+         * <p>
+         * After changes are made to the world transform, {@link #updateAppliedTransform()} should be called and {@link #update()} will
+         * need to be called on any child bones, recursively. */
         Bone.prototype.rotateWorld = function (degrees) {
             var a = this.a, b = this.b, c = this.c, d = this.d;
             var cos = MathUtils.cosDeg(degrees), sin = MathUtils.sinDeg(degrees);
@@ -4571,7 +5219,36 @@
         return Bone;
     }());
 
-    var ConstraintData = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** The base class for all constraint datas. */
+    var ConstraintData = /** @class */ (function () {
         function ConstraintData(name, order, skinRequired) {
             this.name = name;
             this.order = order;
@@ -4580,7 +5257,319 @@
         return ConstraintData;
     }());
 
-    var Event = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    var AssetManagerBase = /** @class */ (function () {
+        function AssetManagerBase(textureLoader, pathPrefix, downloader) {
+            if (pathPrefix === void 0) { pathPrefix = ""; }
+            if (downloader === void 0) { downloader = null; }
+            this.assets = {};
+            this.errors = {};
+            this.toLoad = 0;
+            this.loaded = 0;
+            this.textureLoader = textureLoader;
+            this.pathPrefix = pathPrefix;
+            this.downloader = downloader || new Downloader();
+        }
+        AssetManagerBase.prototype.start = function (path) {
+            this.toLoad++;
+            return this.pathPrefix + path;
+        };
+        AssetManagerBase.prototype.success = function (callback, path, asset) {
+            this.toLoad--;
+            this.loaded++;
+            this.assets[path] = asset;
+            if (callback)
+                callback(path, asset);
+        };
+        AssetManagerBase.prototype.error = function (callback, path, message) {
+            this.toLoad--;
+            this.loaded++;
+            this.errors[path] = message;
+            if (callback)
+                callback(path, message);
+        };
+        AssetManagerBase.prototype.setRawDataURI = function (path, data) {
+            this.downloader.rawDataUris[this.pathPrefix + path] = data;
+        };
+        AssetManagerBase.prototype.loadBinary = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            path = this.start(path);
+            this.downloader.downloadBinary(path, function (data) {
+                _this.success(success, path, data);
+            }, function (status, responseText) {
+                _this.error(error, path, "Couldn't load binary " + path + ": status " + status + ", " + responseText);
+            });
+        };
+        AssetManagerBase.prototype.loadText = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            path = this.start(path);
+            this.downloader.downloadText(path, function (data) {
+                _this.success(success, path, data);
+            }, function (status, responseText) {
+                _this.error(error, path, "Couldn't load text " + path + ": status " + status + ", " + responseText);
+            });
+        };
+        AssetManagerBase.prototype.loadJson = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            path = this.start(path);
+            this.downloader.downloadJson(path, function (data) {
+                _this.success(success, path, data);
+            }, function (status, responseText) {
+                _this.error(error, path, "Couldn't load JSON " + path + ": status " + status + ", " + responseText);
+            });
+        };
+        AssetManagerBase.prototype.loadTexture = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            path = this.start(path);
+            var isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
+            var isWebWorker = !isBrowser; // && typeof importScripts !== 'undefined';
+            if (isWebWorker) {
+                fetch(path, { mode: "cors" }).then(function (response) {
+                    if (response.ok)
+                        return response.blob();
+                    _this.error(error, path, "Couldn't load image: " + path);
+                    return null;
+                }).then(function (blob) {
+                    return blob ? createImageBitmap(blob, { premultiplyAlpha: "none", colorSpaceConversion: "none" }) : null;
+                }).then(function (bitmap) {
+                    if (bitmap)
+                        _this.success(success, path, _this.textureLoader(bitmap));
+                });
+            }
+            else {
+                var image_1 = new Image();
+                image_1.crossOrigin = "anonymous";
+                image_1.onload = function () {
+                    _this.success(success, path, _this.textureLoader(image_1));
+                };
+                image_1.onerror = function () {
+                    _this.error(error, path, "Couldn't load image: " + path);
+                };
+                if (this.downloader.rawDataUris[path])
+                    path = this.downloader.rawDataUris[path];
+                image_1.src = path;
+            }
+        };
+        AssetManagerBase.prototype.loadTextureAtlas = function (path, success, error) {
+            var _this = this;
+            if (success === void 0) { success = null; }
+            if (error === void 0) { error = null; }
+            var index = path.lastIndexOf("/");
+            var parent = index >= 0 ? path.substring(0, index + 1) : "";
+            path = this.start(path);
+            this.downloader.downloadText(path, function (atlasText) {
+                try {
+                    var atlas_1 = new TextureAtlas(atlasText);
+                    var toLoad_1 = atlas_1.pages.length, abort_1 = false;
+                    var _loop_1 = function (page) {
+                        _this.loadTexture(parent + page.name, function (imagePath, texture) {
+                            if (!abort_1) {
+                                page.setTexture(texture);
+                                if (--toLoad_1 == 0)
+                                    _this.success(success, path, atlas_1);
+                            }
+                        }, function (imagePath, message) {
+                            if (!abort_1)
+                                _this.error(error, path, "Couldn't load texture atlas " + path + " page image: " + imagePath);
+                            abort_1 = true;
+                        });
+                    };
+                    for (var _i = 0, _a = atlas_1.pages; _i < _a.length; _i++) {
+                        var page = _a[_i];
+                        _loop_1(page);
+                    }
+                }
+                catch (e) {
+                    _this.error(error, path, "Couldn't parse texture atlas " + path + ": " + e.message);
+                }
+            }, function (status, responseText) {
+                _this.error(error, path, "Couldn't load texture atlas " + path + ": status " + status + ", " + responseText);
+            });
+        };
+        AssetManagerBase.prototype.get = function (path) {
+            return this.assets[this.pathPrefix + path];
+        };
+        AssetManagerBase.prototype.require = function (path) {
+            path = this.pathPrefix + path;
+            var asset = this.assets[path];
+            if (asset)
+                return asset;
+            var error = this.errors[path];
+            throw Error("Asset not found: " + path + (error ? "\n" + error : ""));
+        };
+        AssetManagerBase.prototype.remove = function (path) {
+            path = this.pathPrefix + path;
+            var asset = this.assets[path];
+            if (asset.dispose)
+                asset.dispose();
+            delete this.assets[path];
+            return asset;
+        };
+        AssetManagerBase.prototype.removeAll = function () {
+            for (var key in this.assets) {
+                var asset = this.assets[key];
+                if (asset.dispose)
+                    asset.dispose();
+            }
+            this.assets = {};
+        };
+        AssetManagerBase.prototype.isLoadingComplete = function () {
+            return this.toLoad == 0;
+        };
+        AssetManagerBase.prototype.getToLoad = function () {
+            return this.toLoad;
+        };
+        AssetManagerBase.prototype.getLoaded = function () {
+            return this.loaded;
+        };
+        AssetManagerBase.prototype.dispose = function () {
+            this.removeAll();
+        };
+        AssetManagerBase.prototype.hasErrors = function () {
+            return Object.keys(this.errors).length > 0;
+        };
+        AssetManagerBase.prototype.getErrors = function () {
+            return this.errors;
+        };
+        return AssetManagerBase;
+    }());
+    var Downloader = /** @class */ (function () {
+        function Downloader() {
+            this.callbacks = {};
+            this.rawDataUris = {};
+        }
+        Downloader.prototype.downloadText = function (url, success, error) {
+            var _this = this;
+            if (this.rawDataUris[url])
+                url = this.rawDataUris[url];
+            if (this.start(url, success, error))
+                return;
+            var request = new XMLHttpRequest();
+            request.overrideMimeType("text/html");
+            request.open("GET", url, true);
+            var done = function () {
+                _this.finish(url, request.status, request.responseText);
+            };
+            request.onload = done;
+            request.onerror = done;
+            request.send();
+        };
+        Downloader.prototype.downloadJson = function (url, success, error) {
+            this.downloadText(url, function (data) {
+                success(JSON.parse(data));
+            }, error);
+        };
+        Downloader.prototype.downloadBinary = function (url, success, error) {
+            var _this = this;
+            if (this.rawDataUris[url])
+                url = this.rawDataUris[url];
+            if (this.start(url, success, error))
+                return;
+            var request = new XMLHttpRequest();
+            request.open("GET", url, true);
+            request.responseType = "arraybuffer";
+            var onerror = function () {
+                _this.finish(url, request.status, request.responseText);
+            };
+            request.onload = function () {
+                if (request.status == 200)
+                    _this.finish(url, 200, new Uint8Array(request.response));
+                else
+                    onerror();
+            };
+            request.onerror = onerror;
+            request.send();
+        };
+        Downloader.prototype.start = function (url, success, error) {
+            var callbacks = this.callbacks[url];
+            try {
+                if (callbacks)
+                    return true;
+                this.callbacks[url] = callbacks = [];
+            }
+            finally {
+                callbacks.push(success, error);
+            }
+        };
+        Downloader.prototype.finish = function (url, status, data) {
+            var callbacks = this.callbacks[url];
+            delete this.callbacks[url];
+            var args = status == 200 ? [data] : [status, data];
+            for (var i = args.length - 1, n = callbacks.length; i < n; i += 2)
+                callbacks[i].apply(null, args);
+        };
+        return Downloader;
+    }());
+
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores the current pose values for an {@link Event}.
+     *
+     * See Timeline {@link Timeline#apply()},
+     * AnimationStateListener {@link AnimationStateListener#event()}, and
+     * [Events](http://esotericsoftware.com/spine-events) in the Spine User Guide. */
+    var Event = /** @class */ (function () {
         function Event(time, data) {
             if (!data)
                 throw new Error("data cannot be null.");
@@ -4590,19 +5579,88 @@
         return Event;
     }());
 
-    var EventData = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores the setup pose values for an {@link Event}.
+     *
+     * See [Events](http://esotericsoftware.com/spine-events) in the Spine User Guide. */
+    var EventData = /** @class */ (function () {
         function EventData(name) {
             this.name = name;
         }
         return EventData;
     }());
 
-    var IkConstraint = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of
+     * the last bone is as close to the target bone as possible.
+     *
+     * See [IK constraints](http://esotericsoftware.com/spine-ik-constraints) in the Spine User Guide. */
+    var IkConstraint = /** @class */ (function () {
         function IkConstraint(data, skeleton) {
+            /** Controls the bend direction of the IK bones, either 1 or -1. */
             this.bendDirection = 0;
+            /** When true and only a single bone is being constrained, if the target is too close, the bone is scaled to reach it. */
             this.compress = false;
+            /** When true, if the target is out of range, the parent bone is scaled to reach it. If more than one bone is being constrained
+             * and the parent bone has local nonuniform scale, stretch is not applied. */
             this.stretch = false;
+            /** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
             this.mix = 1;
+            /** For two bone IK, the distance from the maximum reach of the bones that rotation will slow. */
             this.softness = 0;
             this.active = false;
             if (!data)
@@ -4637,6 +5695,7 @@
                     break;
             }
         };
+        /** Applies 1 bone IK. The target is specified in the world coordinate system. */
         IkConstraint.prototype.apply1 = function (bone, targetX, targetY, compress, stretch, uniform, alpha) {
             var p = bone.parent;
             var pa = p.a, pb = p.b, pc = p.c, pd = p.d;
@@ -4653,6 +5712,7 @@
                     pb = -sc * s * bone.skeleton.scaleX;
                     pd = sa * s * bone.skeleton.scaleY;
                     rotationIK += Math.atan2(sc, sa) * MathUtils.radDeg;
+                // Fall through
                 default:
                     var x = targetX - p.worldX, y = targetY - p.worldY;
                     var d = pa * pd - pb * pc;
@@ -4684,6 +5744,8 @@
             }
             bone.updateWorldTransformWith(bone.ax, bone.ay, bone.arotation + rotationIK * alpha, sx, sy, bone.ashearX, bone.ashearY);
         };
+        /** Applies 2 bone IK. The target is specified in the world coordinate system.
+         * @param child A direct descendant of the parent bone. */
         IkConstraint.prototype.apply2 = function (parent, child, targetX, targetY, bendDir, stretch, uniform, softness, alpha) {
             var px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, sx = psx, sy = psy, csx = child.ascaleX;
             var os1 = 0, os2 = 0, s2 = 0;
@@ -4825,20 +5887,48 @@
             a1 = (a1 - os) * MathUtils.radDeg + os1 - rotation;
             if (a1 > 180)
                 a1 -= 360;
-            else if (a1 < -180)
+            else if (a1 < -180) //
                 a1 += 360;
             parent.updateWorldTransformWith(px, py, rotation + a1 * alpha, sx, sy, 0, 0);
             rotation = child.arotation;
             a2 = ((a2 + os) * MathUtils.radDeg - child.ashearX) * s2 + os2 - rotation;
             if (a2 > 180)
                 a2 -= 360;
-            else if (a2 < -180)
+            else if (a2 < -180) //
                 a2 += 360;
             child.updateWorldTransformWith(cx, cy, rotation + a2 * alpha, child.ascaleX, child.ascaleY, child.ashearX, child.ashearY);
         };
         return IkConstraint;
     }());
 
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
     var __extends$2 = (this && this.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
@@ -4854,22 +5944,62 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var IkConstraintData = (function (_super) {
+    /** Stores the setup pose for an {@link IkConstraint}.
+     * <p>
+     * See [IK constraints](http://esotericsoftware.com/spine-ik-constraints) in the Spine User Guide. */
+    var IkConstraintData = /** @class */ (function (_super) {
         __extends$2(IkConstraintData, _super);
         function IkConstraintData(name) {
             var _this = _super.call(this, name, 0, false) || this;
+            /** The bones that are constrained by this IK constraint. */
             _this.bones = new Array();
+            /** Controls the bend direction of the IK bones, either 1 or -1. */
             _this.bendDirection = 1;
+            /** When true and only a single bone is being constrained, if the target is too close, the bone is scaled to reach it. */
             _this.compress = false;
+            /** When true, if the target is out of range, the parent bone is scaled to reach it. If more than one bone is being constrained
+             * and the parent bone has local nonuniform scale, stretch is not applied. */
             _this.stretch = false;
+            /** When true, only a single bone is being constrained, and {@link #getCompress()} or {@link #getStretch()} is used, the bone
+             * is scaled on both the X and Y axes. */
             _this.uniform = false;
+            /** A percentage (0-1) that controls the mix between the constrained and unconstrained rotations. */
             _this.mix = 1;
+            /** For two bone IK, the distance from the maximum reach of the bones that rotation will slow. */
             _this.softness = 0;
             return _this;
         }
         return IkConstraintData;
     }(ConstraintData));
 
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
     var __extends$1 = (this && this.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
@@ -4885,10 +6015,14 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var PathConstraintData = (function (_super) {
+    /** Stores the setup pose for a {@link PathConstraint}.
+     *
+     * See [path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide. */
+    var PathConstraintData = /** @class */ (function (_super) {
         __extends$1(PathConstraintData, _super);
         function PathConstraintData(name) {
             var _this = _super.call(this, name, 0, false) || this;
+            /** The bones that will be modified by this path constraint. */
             _this.bones = new Array();
             _this.mixRotate = 0;
             _this.mixX = 0;
@@ -4897,11 +6031,17 @@
         }
         return PathConstraintData;
     }(ConstraintData));
+    /** Controls how the first bone is positioned along the path.
+     *
+     * See [position](http://esotericsoftware.com/spine-path-constraints#Position) in the Spine User Guide. */
     exports.PositionMode = void 0;
     (function (PositionMode) {
         PositionMode[PositionMode["Fixed"] = 0] = "Fixed";
         PositionMode[PositionMode["Percent"] = 1] = "Percent";
     })(exports.PositionMode || (exports.PositionMode = {}));
+    /** Controls how bones after the first bone are positioned along the path.
+     *
+     * See [spacing](http://esotericsoftware.com/spine-path-constraints#Spacing) in the Spine User Guide. */
     exports.SpacingMode = void 0;
     (function (SpacingMode) {
         SpacingMode[SpacingMode["Length"] = 0] = "Length";
@@ -4909,6 +6049,9 @@
         SpacingMode[SpacingMode["Percent"] = 2] = "Percent";
         SpacingMode[SpacingMode["Proportional"] = 3] = "Proportional";
     })(exports.SpacingMode || (exports.SpacingMode = {}));
+    /** Controls how bones are rotated, translated, and scaled to match the path.
+     *
+     * See [rotate mix](http://esotericsoftware.com/spine-path-constraints#Rotate-mix) in the Spine User Guide. */
     exports.RotateMode = void 0;
     (function (RotateMode) {
         RotateMode[RotateMode["Tangent"] = 0] = "Tangent";
@@ -4916,9 +6059,43 @@
         RotateMode[RotateMode["ChainScale"] = 2] = "ChainScale";
     })(exports.RotateMode || (exports.RotateMode = {}));
 
-    var PathConstraint = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores the current pose for a path constraint. A path constraint adjusts the rotation, translation, and scale of the
+     * constrained bones so they follow a {@link PathAttachment}.
+     *
+     * See [Path constraints](http://esotericsoftware.com/spine-path-constraints) in the Spine User Guide. */
+    var PathConstraint = /** @class */ (function () {
         function PathConstraint(data, skeleton) {
+            /** The position along the path. */
             this.position = 0;
+            /** The spacing between bones. */
             this.spacing = 0;
             this.mixRotate = 0;
             this.mixX = 0;
@@ -5067,7 +6244,7 @@
                     }
                     if (r > MathUtils.PI)
                         r -= MathUtils.PI2;
-                    else if (r < -MathUtils.PI)
+                    else if (r < -MathUtils.PI) //
                         r += MathUtils.PI2;
                     r *= mixRotate;
                     cos = Math.cos(r);
@@ -5130,6 +6307,7 @@
                         this.addAfterPosition(p - pathLength_1, world, 0, out, o);
                         continue;
                     }
+                    // Determine curve containing position.
                     for (;; curve++) {
                         var length_5 = lengths[curve];
                         if (p > length_5)
@@ -5155,6 +6333,7 @@
                 }
                 return out;
             }
+            // World vertices.
             if (closed) {
                 verticesLength += 2;
                 world = Utils.setArraySize(this.world, verticesLength);
@@ -5169,6 +6348,7 @@
                 world = Utils.setArraySize(this.world, verticesLength);
                 path.computeWorldVertices(target, 2, verticesLength, world, 0, 2);
             }
+            // Curve lengths.
             var curves = Utils.setArraySize(this.curves, curveCount);
             var pathLength = 0;
             var x1 = world[0], y1 = world[1], cx1 = 0, cy1 = 0, cx2 = 0, cy2 = 0, x2 = 0, y2 = 0;
@@ -5237,6 +6417,7 @@
                     this.addAfterPosition(p - pathLength, world, verticesLength - 4, out, o);
                     continue;
                 }
+                // Determine curve containing position.
                 for (;; curve++) {
                     var length_6 = curves[curve];
                     if (p > length_6)
@@ -5249,6 +6430,7 @@
                     }
                     break;
                 }
+                // Curve segment lengths.
                 if (curve != prevCurve) {
                     prevCurve = curve;
                     var ii = curve * 6;
@@ -5288,6 +6470,7 @@
                     segments[9] = curveLength;
                     segment = 0;
                 }
+                // Weight by segment length.
                 p *= curveLength;
                 for (;; segment++) {
                     var length_7 = segments[segment];
@@ -5343,8 +6526,43 @@
         return PathConstraint;
     }());
 
-    var Slot = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores a slot's current pose. Slots organize attachments for {@link Skeleton#drawOrder} purposes and provide a place to store
+     * state for an attachment. State cannot be stored in an attachment itself because attachments are stateless and may be shared
+     * across multiple skeletons. */
+    var Slot = /** @class */ (function () {
         function Slot(data, bone) {
+            /** Values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
+             * weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
+             *
+             * See {@link VertexAttachment#computeWorldVertices()} and {@link DeformTimeline}. */
             this.deform = new Array();
             if (!data)
                 throw new Error("data cannot be null.");
@@ -5356,12 +6574,18 @@
             this.darkColor = !data.darkColor ? null : new Color();
             this.setToSetupPose();
         }
+        /** The skeleton this slot belongs to. */
         Slot.prototype.getSkeleton = function () {
             return this.bone.skeleton;
         };
+        /** The current attachment for the slot, or null if the slot has no attachment. */
         Slot.prototype.getAttachment = function () {
             return this.attachment;
         };
+        /** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears the {@link #deform}.
+         * The deform is not cleared if the old attachment has the same {@link VertexAttachment#getDeformAttachment()} as the specified
+         * attachment.
+         * @param attachment May be null. */
         Slot.prototype.setAttachment = function (attachment) {
             if (this.attachment == attachment)
                 return;
@@ -5375,9 +6599,12 @@
         Slot.prototype.setAttachmentTime = function (time) {
             this.attachmentTime = this.bone.skeleton.time - time;
         };
+        /** The time that has elapsed since the last time the attachment was set or cleared. Relies on Skeleton
+         * {@link Skeleton#time}. */
         Slot.prototype.getAttachmentTime = function () {
             return this.bone.skeleton.time - this.attachmentTime;
         };
+        /** Sets this slot to the setup pose. */
         Slot.prototype.setToSetupPose = function () {
             this.color.setFromColor(this.data.color);
             if (this.darkColor)
@@ -5392,7 +6619,39 @@
         return Slot;
     }());
 
-    var TransformConstraint = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores the current pose for a transform constraint. A transform constraint adjusts the world transform of the constrained
+     * bones to match that of the target bone.
+     *
+     * See [Transform constraints](http://esotericsoftware.com/spine-transform-constraints) in the Spine User Guide. */
+    var TransformConstraint = /** @class */ (function () {
         function TransformConstraint(data, skeleton) {
             this.mixRotate = 0;
             this.mixX = 0;
@@ -5453,7 +6712,7 @@
                     var r = Math.atan2(tc, ta) - Math.atan2(c, a) + offsetRotation;
                     if (r > MathUtils.PI)
                         r -= MathUtils.PI2;
-                    else if (r < -MathUtils.PI)
+                    else if (r < -MathUtils.PI) //
                         r += MathUtils.PI2;
                     r *= mixRotate;
                     var cos = Math.cos(r), sin = Math.sin(r);
@@ -5488,7 +6747,7 @@
                     var r = Math.atan2(td, tb) - Math.atan2(tc, ta) - (by - Math.atan2(bone.c, bone.a));
                     if (r > MathUtils.PI)
                         r -= MathUtils.PI2;
-                    else if (r < -MathUtils.PI)
+                    else if (r < -MathUtils.PI) //
                         r += MathUtils.PI2;
                     r = by + (r + offsetShearY) * mixShearY;
                     var s = Math.sqrt(b * b + d * d);
@@ -5513,7 +6772,7 @@
                     var r = Math.atan2(tc, ta) + offsetRotation;
                     if (r > MathUtils.PI)
                         r -= MathUtils.PI2;
-                    else if (r < -MathUtils.PI)
+                    else if (r < -MathUtils.PI) //
                         r += MathUtils.PI2;
                     r *= mixRotate;
                     var cos = Math.cos(r), sin = Math.sin(r);
@@ -5542,7 +6801,7 @@
                     var r = Math.atan2(td, tb) - Math.atan2(tc, ta);
                     if (r > MathUtils.PI)
                         r -= MathUtils.PI2;
-                    else if (r < -MathUtils.PI)
+                    else if (r < -MathUtils.PI) //
                         r += MathUtils.PI2;
                     var b = bone.b, d = bone.d;
                     r = Math.atan2(d, b) + (r - MathUtils.PI / 2 + offsetShearY) * mixShearY;
@@ -5600,13 +6859,54 @@
         return TransformConstraint;
     }());
 
-    var Skeleton = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores the current pose for a skeleton.
+     *
+     * See [Instance objects](http://esotericsoftware.com/spine-runtime-architecture#Instance-objects) in the Spine Runtimes Guide. */
+    var Skeleton = /** @class */ (function () {
         function Skeleton(data) {
+            /** The list of bones and constraints, sorted in the order they should be updated, as computed by {@link #updateCache()}. */
             this._updateCache = new Array();
+            /** Returns the skeleton's time. This can be used for tracking, such as with Slot {@link Slot#attachmentTime}.
+             * <p>
+             * See {@link #update()}. */
             this.time = 0;
+            /** Scales the entire skeleton on the X axis. This affects all bones, even if the bone's transform mode disallows scale
+              * inheritance. */
             this.scaleX = 1;
+            /** Scales the entire skeleton on the Y axis. This affects all bones, even if the bone's transform mode disallows scale
+              * inheritance. */
             this.scaleY = 1;
+            /** Sets the skeleton X position, which is added to the root bone worldX position. */
             this.x = 0;
+            /** Sets the skeleton Y position, which is added to the root bone worldY position. */
             this.y = 0;
             if (!data)
                 throw new Error("data cannot be null.");
@@ -5651,6 +6951,8 @@
             this.color = new Color(1, 1, 1, 1);
             this.updateCache();
         }
+        /** Caches information about bones and constraints. Must be called if the {@link #getSkin()} is modified or if bones,
+         * constraints, or weighted path attachments are added or removed. */
         Skeleton.prototype.updateCache = function () {
             var updateCache = this._updateCache;
             updateCache.length = 0;
@@ -5671,6 +6973,7 @@
                     } while (bone);
                 }
             }
+            // IK first, lowest hierarchy depth first.
             var ikConstraints = this.ikConstraints;
             var transformConstraints = this.transformConstraints;
             var pathConstraints = this.pathConstraints;
@@ -5817,6 +7120,10 @@
                 bone.sorted = false;
             }
         };
+        /** Updates the world transform for each bone and applies all constraints.
+         *
+         * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+         * Runtimes Guide. */
         Skeleton.prototype.updateWorldTransform = function () {
             var bones = this.bones;
             for (var i = 0, n = bones.length; i < n; i++) {
@@ -5834,6 +7141,7 @@
                 updateCache[i].update();
         };
         Skeleton.prototype.updateWorldTransformWith = function (parent) {
+            // Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
             var rootBone = this.getRootBone();
             var pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
             rootBone.worldX = pa * this.x + pb * this.y + parent.worldX;
@@ -5847,6 +7155,7 @@
             rootBone.b = (pa * lb + pb * ld) * this.scaleX;
             rootBone.c = (pc * la + pd * lc) * this.scaleY;
             rootBone.d = (pc * lb + pd * ld) * this.scaleY;
+            // Update everything except root bone.
             var updateCache = this._updateCache;
             for (var i = 0, n = updateCache.length; i < n; i++) {
                 var updatable = updateCache[i];
@@ -5854,10 +7163,12 @@
                     updatable.update();
             }
         };
+        /** Sets the bones, constraints, and slots to their setup pose values. */
         Skeleton.prototype.setToSetupPose = function () {
             this.setBonesToSetupPose();
             this.setSlotsToSetupPose();
         };
+        /** Sets the bones and constraints to their setup pose values. */
         Skeleton.prototype.setBonesToSetupPose = function () {
             var bones = this.bones;
             for (var i = 0, n = bones.length; i < n; i++)
@@ -5893,17 +7204,20 @@
                 constraint.mixY = data.mixY;
             }
         };
+        /** Sets the slots and draw order to their setup pose values. */
         Skeleton.prototype.setSlotsToSetupPose = function () {
             var slots = this.slots;
             Utils.arrayCopy(slots, 0, this.drawOrder, 0, slots.length);
             for (var i = 0, n = slots.length; i < n; i++)
                 slots[i].setToSetupPose();
         };
+        /** @returns May return null. */
         Skeleton.prototype.getRootBone = function () {
             if (this.bones.length == 0)
                 return null;
             return this.bones[0];
         };
+        /** @returns May be null. */
         Skeleton.prototype.findBone = function (boneName) {
             if (!boneName)
                 throw new Error("boneName cannot be null.");
@@ -5915,6 +7229,7 @@
             }
             return null;
         };
+        /** @returns -1 if the bone was not found. */
         Skeleton.prototype.findBoneIndex = function (boneName) {
             if (!boneName)
                 throw new Error("boneName cannot be null.");
@@ -5924,6 +7239,9 @@
                     return i;
             return -1;
         };
+        /** Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
+         * repeatedly.
+         * @returns May be null. */
         Skeleton.prototype.findSlot = function (slotName) {
             if (!slotName)
                 throw new Error("slotName cannot be null.");
@@ -5935,6 +7253,7 @@
             }
             return null;
         };
+        /** @returns -1 if the bone was not found. */
         Skeleton.prototype.findSlotIndex = function (slotName) {
             if (!slotName)
                 throw new Error("slotName cannot be null.");
@@ -5944,12 +7263,25 @@
                     return i;
             return -1;
         };
+        /** Sets a skin by name.
+         *
+         * See {@link #setSkin()}. */
         Skeleton.prototype.setSkinByName = function (skinName) {
             var skin = this.data.findSkin(skinName);
             if (!skin)
                 throw new Error("Skin not found: " + skinName);
             this.setSkin(skin);
         };
+        /** Sets the skin used to look up attachments before looking in the {@link SkeletonData#defaultSkin default skin}. If the
+         * skin is changed, {@link #updateCache()} is called.
+         *
+         * Attachments from the new skin are attached if the corresponding attachment from the old skin was attached. If there was no
+         * old skin, each slot's setup mode attachment is attached from the new skin.
+         *
+         * After changing the skin, the visible attachments can be reset to those attached in the setup pose by calling
+         * {@link #setSlotsToSetupPose()}. Also, often {@link AnimationState#apply()} is called before the next time the
+         * skeleton is rendered to allow any attachment keys in the current animation(s) to hide or show attachments from the new skin.
+         * @param newSkin May be null. */
         Skeleton.prototype.setSkin = function (newSkin) {
             if (newSkin == this.skin)
                 return;
@@ -5972,9 +7304,19 @@
             this.skin = newSkin;
             this.updateCache();
         };
+        /** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot name and attachment
+         * name.
+         *
+         * See {@link #getAttachment()}.
+         * @returns May be null. */
         Skeleton.prototype.getAttachmentByName = function (slotName, attachmentName) {
             return this.getAttachment(this.data.findSlotIndex(slotName), attachmentName);
         };
+        /** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot index and
+         * attachment name. First the skin is checked and if the attachment was not found, the default skin is checked.
+         *
+         * See [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the Spine Runtimes Guide.
+         * @returns May be null. */
         Skeleton.prototype.getAttachment = function (slotIndex, attachmentName) {
             if (!attachmentName)
                 throw new Error("attachmentName cannot be null.");
@@ -5987,6 +7329,9 @@
                 return this.data.defaultSkin.getAttachment(slotIndex, attachmentName);
             return null;
         };
+        /** A convenience method to set an attachment by finding the slot with {@link #findSlot()}, finding the attachment with
+         * {@link #getAttachment()}, then setting the slot's {@link Slot#attachment}.
+         * @param attachmentName May be null to clear the slot's attachment. */
         Skeleton.prototype.setAttachment = function (slotName, attachmentName) {
             if (!slotName)
                 throw new Error("slotName cannot be null.");
@@ -6006,6 +7351,9 @@
             }
             throw new Error("Slot not found: " + slotName);
         };
+        /** Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
+         * than to call it repeatedly.
+         * @return May be null. */
         Skeleton.prototype.findIkConstraint = function (constraintName) {
             if (!constraintName)
                 throw new Error("constraintName cannot be null.");
@@ -6017,6 +7365,9 @@
             }
             return null;
         };
+        /** Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
+         * this method than to call it repeatedly.
+         * @return May be null. */
         Skeleton.prototype.findTransformConstraint = function (constraintName) {
             if (!constraintName)
                 throw new Error("constraintName cannot be null.");
@@ -6028,6 +7379,9 @@
             }
             return null;
         };
+        /** Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
+         * than to call it repeatedly.
+         * @return May be null. */
         Skeleton.prototype.findPathConstraint = function (constraintName) {
             if (!constraintName)
                 throw new Error("constraintName cannot be null.");
@@ -6039,6 +7393,10 @@
             }
             return null;
         };
+        /** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
+         * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
+         * @param size An output value, the width and height of the AABB.
+         * @param temp Working memory to temporarily store attachments' computed world vertices. */
         Skeleton.prototype.getBounds = function (offset, size, temp) {
             if (temp === void 0) { temp = new Array(2); }
             if (!offset)
@@ -6078,24 +7436,69 @@
             offset.set(minX, minY);
             size.set(maxX - minX, maxY - minY);
         };
+        /** Increments the skeleton's {@link #time}. */
         Skeleton.prototype.update = function (delta) {
             this.time += delta;
         };
         return Skeleton;
     }());
 
-    var SkeletonData = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores the setup pose and all of the stateless data for a skeleton.
+     *
+     * See [Data objects](http://esotericsoftware.com/spine-runtime-architecture#Data-objects) in the Spine Runtimes
+     * Guide. */
+    var SkeletonData = /** @class */ (function () {
         function SkeletonData() {
-            this.bones = new Array();
-            this.slots = new Array();
+            /** The skeleton's bones, sorted parent first. The root bone is always the first bone. */
+            this.bones = new Array(); // Ordered parents first.
+            /** The skeleton's slots. */
+            this.slots = new Array(); // Setup pose draw order.
             this.skins = new Array();
+            /** The skeleton's events. */
             this.events = new Array();
+            /** The skeleton's animations. */
             this.animations = new Array();
+            /** The skeleton's IK constraints. */
             this.ikConstraints = new Array();
+            /** The skeleton's transform constraints. */
             this.transformConstraints = new Array();
+            /** The skeleton's path constraints. */
             this.pathConstraints = new Array();
+            // Nonessential
+            /** The dopesheet FPS in Spine. Available only when nonessential data was exported. */
             this.fps = 0;
         }
+        /** Finds a bone by comparing each bone's name. It is more efficient to cache the results of this method than to call it
+         * multiple times.
+         * @returns May be null. */
         SkeletonData.prototype.findBone = function (boneName) {
             if (!boneName)
                 throw new Error("boneName cannot be null.");
@@ -6116,6 +7519,9 @@
                     return i;
             return -1;
         };
+        /** Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
+         * multiple times.
+         * @returns May be null. */
         SkeletonData.prototype.findSlot = function (slotName) {
             if (!slotName)
                 throw new Error("slotName cannot be null.");
@@ -6136,6 +7542,9 @@
                     return i;
             return -1;
         };
+        /** Finds a skin by comparing each skin's name. It is more efficient to cache the results of this method than to call it
+         * multiple times.
+         * @returns May be null. */
         SkeletonData.prototype.findSkin = function (skinName) {
             if (!skinName)
                 throw new Error("skinName cannot be null.");
@@ -6147,6 +7556,9 @@
             }
             return null;
         };
+        /** Finds an event by comparing each events's name. It is more efficient to cache the results of this method than to call it
+         * multiple times.
+         * @returns May be null. */
         SkeletonData.prototype.findEvent = function (eventDataName) {
             if (!eventDataName)
                 throw new Error("eventDataName cannot be null.");
@@ -6158,6 +7570,9 @@
             }
             return null;
         };
+        /** Finds an animation by comparing each animation's name. It is more efficient to cache the results of this method than to
+         * call it multiple times.
+         * @returns May be null. */
         SkeletonData.prototype.findAnimation = function (animationName) {
             if (!animationName)
                 throw new Error("animationName cannot be null.");
@@ -6169,6 +7584,9 @@
             }
             return null;
         };
+        /** Finds an IK constraint by comparing each IK constraint's name. It is more efficient to cache the results of this method
+         * than to call it multiple times.
+         * @return May be null. */
         SkeletonData.prototype.findIkConstraint = function (constraintName) {
             if (!constraintName)
                 throw new Error("constraintName cannot be null.");
@@ -6180,6 +7598,9 @@
             }
             return null;
         };
+        /** Finds a transform constraint by comparing each transform constraint's name. It is more efficient to cache the results of
+         * this method than to call it multiple times.
+         * @return May be null. */
         SkeletonData.prototype.findTransformConstraint = function (constraintName) {
             if (!constraintName)
                 throw new Error("constraintName cannot be null.");
@@ -6191,6 +7612,9 @@
             }
             return null;
         };
+        /** Finds a path constraint by comparing each path constraint's name. It is more efficient to cache the results of this method
+         * than to call it multiple times.
+         * @return May be null. */
         SkeletonData.prototype.findPathConstraint = function (constraintName) {
             if (!constraintName)
                 throw new Error("constraintName cannot be null.");
@@ -6205,7 +7629,36 @@
         return SkeletonData;
     }());
 
-    var SkinEntry = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores an entry in the skin consisting of the slot index, name, and attachment **/
+    var SkinEntry = /** @class */ (function () {
         function SkinEntry(slotIndex, name, attachment) {
             this.slotIndex = slotIndex;
             this.name = name;
@@ -6213,7 +7666,11 @@
         }
         return SkinEntry;
     }());
-    var Skin = (function () {
+    /** Stores attachments by slot index and attachment name.
+     *
+     * See SkeletonData {@link SkeletonData#defaultSkin}, Skeleton {@link Skeleton#skin}, and
+     * [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the Spine Runtimes Guide. */
+    var Skin = /** @class */ (function () {
         function Skin(name) {
             this.attachments = new Array();
             this.bones = Array();
@@ -6222,6 +7679,7 @@
                 throw new Error("name cannot be null.");
             this.name = name;
         }
+        /** Adds an attachment to the skin for the specified slot index and name. */
         Skin.prototype.setAttachment = function (slotIndex, name, attachment) {
             if (!attachment)
                 throw new Error("attachment cannot be null.");
@@ -6232,6 +7690,7 @@
                 attachments[slotIndex] = {};
             attachments[slotIndex][name] = attachment;
         };
+        /** Adds all attachments, bones, and constraints from the specified skin to this skin. */
         Skin.prototype.addSkin = function (skin) {
             for (var i = 0; i < skin.bones.length; i++) {
                 var bone = skin.bones[i];
@@ -6263,6 +7722,8 @@
                 this.setAttachment(attachment.slotIndex, attachment.name, attachment.attachment);
             }
         };
+        /** Adds all bones and constraints and copies of all attachments from the specified skin to this skin. Mesh attachments are not
+         * copied, instead a new linked mesh is created. The attachment copies can be modified without affecting the originals. */
         Skin.prototype.copySkin = function (skin) {
             for (var i = 0; i < skin.bones.length; i++) {
                 var bone = skin.bones[i];
@@ -6303,15 +7764,18 @@
                 }
             }
         };
+        /** Returns the attachment for the specified slot index and name, or null. */
         Skin.prototype.getAttachment = function (slotIndex, name) {
             var dictionary = this.attachments[slotIndex];
             return dictionary ? dictionary[name] : null;
         };
+        /** Removes the attachment in the skin for the specified slot index and name, if any. */
         Skin.prototype.removeAttachment = function (slotIndex, name) {
             var dictionary = this.attachments[slotIndex];
             if (dictionary)
                 dictionary[name] = null;
         };
+        /** Returns all attachments in this skin. */
         Skin.prototype.getAttachments = function () {
             var entries = new Array();
             for (var i = 0; i < this.attachments.length; i++) {
@@ -6326,6 +7790,7 @@
             }
             return entries;
         };
+        /** Returns all attachments in this skin for the specified slot index. */
         Skin.prototype.getAttachmentsForSlot = function (slotIndex, attachments) {
             var slotAttachments = this.attachments[slotIndex];
             if (slotAttachments) {
@@ -6336,11 +7801,13 @@
                 }
             }
         };
+        /** Clears all attachments, bones, and constraints. */
         Skin.prototype.clear = function () {
             this.attachments.length = 0;
             this.bones.length = 0;
             this.constraints.length = 0;
         };
+        /** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
         Skin.prototype.attachAll = function (skeleton, oldSkin) {
             var slotIndex = 0;
             for (var i = 0; i < skeleton.slots.length; i++) {
@@ -6364,8 +7831,39 @@
         return Skin;
     }());
 
-    var SlotData = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Stores the setup pose for a {@link Slot}. */
+    var SlotData = /** @class */ (function () {
         function SlotData(index, name, boneData) {
+            /** The color used to tint the slot's attachment. If {@link #getDarkColor()} is set, this is used as the light color for two
+             * color tinting. */
             this.color = new Color(1, 1, 1, 1);
             if (index < 0)
                 throw new Error("index must be >= 0.");
@@ -6379,6 +7877,7 @@
         }
         return SlotData;
     }());
+    /** Determines how images are blended with existing pixels when drawn. */
     exports.BlendMode = void 0;
     (function (BlendMode) {
         BlendMode[BlendMode["Normal"] = 0] = "Normal";
@@ -6387,6 +7886,34 @@
         BlendMode[BlendMode["Screen"] = 3] = "Screen";
     })(exports.BlendMode || (exports.BlendMode = {}));
 
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
     var __extends = (this && this.__extends) || (function () {
         var extendStatics = function (d, b) {
             extendStatics = Object.setPrototypeOf ||
@@ -6402,10 +7929,14 @@
             d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
     })();
-    var TransformConstraintData = (function (_super) {
+    /** Stores the setup pose for a {@link TransformConstraint}.
+     *
+     * See [Transform constraints](http://esotericsoftware.com/spine-transform-constraints) in the Spine User Guide. */
+    var TransformConstraintData = /** @class */ (function (_super) {
         __extends(TransformConstraintData, _super);
         function TransformConstraintData(name) {
             var _this = _super.call(this, name, 0, false) || this;
+            /** The bones that will be modified by this transform constraint. */
             _this.bones = new Array();
             _this.mixRotate = 0;
             _this.mixX = 0;
@@ -6413,11 +7944,17 @@
             _this.mixScaleX = 0;
             _this.mixScaleY = 0;
             _this.mixShearY = 0;
+            /** An offset added to the constrained bone rotation. */
             _this.offsetRotation = 0;
+            /** An offset added to the constrained bone X translation. */
             _this.offsetX = 0;
+            /** An offset added to the constrained bone Y translation. */
             _this.offsetY = 0;
+            /** An offset added to the constrained bone scaleX. */
             _this.offsetScaleX = 0;
+            /** An offset added to the constrained bone scaleY. */
             _this.offsetScaleY = 0;
+            /** An offset added to the constrained bone shearY. */
             _this.offsetShearY = 0;
             _this.relative = false;
             _this.local = false;
@@ -6426,8 +7963,45 @@
         return TransformConstraintData;
     }(ConstraintData));
 
-    var SkeletonBinary = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Loads skeleton data in the Spine binary format.
+     *
+     * See [Spine binary format](http://esotericsoftware.com/spine-binary-format) and
+     * [JSON and binary data](http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data) in the Spine
+     * Runtimes Guide. */
+    var SkeletonBinary = /** @class */ (function () {
         function SkeletonBinary(attachmentLoader) {
+            /** Scales bone positions, image sizes, and translations as they are loaded. This allows different size images to be used at
+             * runtime than were used in Spine.
+             *
+             * See [Scaling](http://esotericsoftware.com/spine-loading-skeleton-data#Scaling) in the Spine Runtimes Guide. */
             this.scale = 1;
             this.linkedMeshes = new Array();
             this.attachmentLoader = attachmentLoader;
@@ -6435,7 +8009,7 @@
         SkeletonBinary.prototype.readSkeletonData = function (binary) {
             var scale = this.scale;
             var skeletonData = new SkeletonData();
-            skeletonData.name = "";
+            skeletonData.name = ""; // BOZO
             var input = new BinaryInput(binary);
             var lowHash = input.readInt32();
             var highHash = input.readInt32();
@@ -6452,9 +8026,11 @@
                 skeletonData.audioPath = input.readString();
             }
             var n = 0;
+            // Strings.
             n = input.readInt(true);
             for (var i = 0; i < n; i++)
                 input.strings.push(input.readString());
+            // Bones.
             n = input.readInt(true);
             for (var i = 0; i < n; i++) {
                 var name_1 = input.readString();
@@ -6474,6 +8050,7 @@
                     Color.rgba8888ToColor(data.color, input.readInt32());
                 skeletonData.bones.push(data);
             }
+            // Slots.
             n = input.readInt(true);
             for (var i = 0; i < n; i++) {
                 var slotName = input.readString();
@@ -6487,6 +8064,7 @@
                 data.blendMode = input.readInt(true);
                 skeletonData.slots.push(data);
             }
+            // IK constraints.
             n = input.readInt(true);
             for (var i = 0, nn = void 0; i < n; i++) {
                 var data = new IkConstraintData(input.readString());
@@ -6504,6 +8082,7 @@
                 data.uniform = input.readBoolean();
                 skeletonData.ikConstraints.push(data);
             }
+            // Transform constraints.
             n = input.readInt(true);
             for (var i = 0, nn = void 0; i < n; i++) {
                 var data = new TransformConstraintData(input.readString());
@@ -6529,6 +8108,7 @@
                 data.mixShearY = input.readFloat();
                 skeletonData.transformConstraints.push(data);
             }
+            // Path constraints.
             n = input.readInt(true);
             for (var i = 0, nn = void 0; i < n; i++) {
                 var data = new PathConstraintData(input.readString());
@@ -6553,17 +8133,20 @@
                 data.mixY = input.readFloat();
                 skeletonData.pathConstraints.push(data);
             }
+            // Default skin.
             var defaultSkin = this.readSkin(input, skeletonData, true, nonessential);
             if (defaultSkin) {
                 skeletonData.defaultSkin = defaultSkin;
                 skeletonData.skins.push(defaultSkin);
             }
+            // Skins.
             {
                 var i = skeletonData.skins.length;
                 Utils.setArraySize(skeletonData.skins, n = i + input.readInt(true));
                 for (; i < n; i++)
                     skeletonData.skins[i] = this.readSkin(input, skeletonData, false, nonessential);
             }
+            // Linked meshes.
             n = this.linkedMeshes.length;
             for (var i = 0; i < n; i++) {
                 var linkedMesh = this.linkedMeshes[i];
@@ -6574,6 +8157,7 @@
                 linkedMesh.mesh.updateUVs();
             }
             this.linkedMeshes.length = 0;
+            // Events.
             n = input.readInt(true);
             for (var i = 0; i < n; i++) {
                 var data = new EventData(input.readStringRef());
@@ -6587,6 +8171,7 @@
                 }
                 skeletonData.events.push(data);
             }
+            // Animations.
             n = input.readInt(true);
             for (var i = 0; i < n; i++)
                 skeletonData.animations.push(this.readAnimation(input, input.readString(), skeletonData));
@@ -6833,11 +8418,12 @@
             return array;
         };
         SkeletonBinary.prototype.readAnimation = function (input, name, skeletonData) {
-            input.readInt(true);
+            input.readInt(true); // Number of timelines.
             var timelines = new Array();
             var scale = this.scale;
             new Color();
             new Color();
+            // Slot timelines.
             for (var i = 0, n = input.readInt(true); i < n; i++) {
                 var slotIndex = input.readInt(true);
                 for (var ii = 0, nn = input.readInt(true); ii < nn; ii++) {
@@ -7037,6 +8623,7 @@
                     }
                 }
             }
+            // Bone timelines.
             for (var i = 0, n = input.readInt(true); i < n; i++) {
                 var boneIndex = input.readInt(true);
                 for (var ii = 0, nn = input.readInt(true); ii < nn; ii++) {
@@ -7074,6 +8661,7 @@
                     }
                 }
             }
+            // IK constraint timelines.
             for (var i = 0, n = input.readInt(true); i < n; i++) {
                 var index = input.readInt(true), frameCount = input.readInt(true), frameLast = frameCount - 1;
                 var timeline = new IkConstraintTimeline(frameCount, input.readInt(true), index);
@@ -7097,6 +8685,7 @@
                 }
                 timelines.push(timeline);
             }
+            // Transform constraint timelines.
             for (var i = 0, n = input.readInt(true); i < n; i++) {
                 var index = input.readInt(true), frameCount = input.readInt(true), frameLast = frameCount - 1;
                 var timeline = new TransformConstraintTimeline(frameCount, input.readInt(true), index);
@@ -7128,6 +8717,7 @@
                 }
                 timelines.push(timeline);
             }
+            // Path constraint timelines.
             for (var i = 0, n = input.readInt(true); i < n; i++) {
                 var index = input.readInt(true);
                 var data = skeletonData.pathConstraints[index];
@@ -7167,6 +8757,7 @@
                     }
                 }
             }
+            // Deform timelines.
             for (var i = 0, n = input.readInt(true); i < n; i++) {
                 var skin = skeletonData.skins[input.readInt(true)];
                 for (var ii = 0, nn = input.readInt(true); ii < nn; ii++) {
@@ -7221,6 +8812,7 @@
                     }
                 }
             }
+            // Draw order timeline.
             var drawOrderCount = input.readInt(true);
             if (drawOrderCount > 0) {
                 var timeline = new DrawOrderTimeline(drawOrderCount);
@@ -7235,12 +8827,16 @@
                     var originalIndex = 0, unchangedIndex = 0;
                     for (var ii = 0; ii < offsetCount; ii++) {
                         var slotIndex = input.readInt(true);
+                        // Collect unchanged items.
                         while (originalIndex != slotIndex)
                             unchanged[unchangedIndex++] = originalIndex++;
+                        // Set changed items.
                         drawOrder[originalIndex + input.readInt(true)] = originalIndex++;
                     }
+                    // Collect remaining unchanged items.
                     while (originalIndex < slotCount)
                         unchanged[unchangedIndex++] = originalIndex++;
+                    // Fill in unchanged items.
                     for (var ii = slotCount - 1; ii >= 0; ii--)
                         if (drawOrder[ii] == -1)
                             drawOrder[ii] = unchanged[--unchangedIndex];
@@ -7248,6 +8844,7 @@
                 }
                 timelines.push(timeline);
             }
+            // Event timeline.
             var eventCount = input.readInt(true);
             if (eventCount > 0) {
                 var timeline = new EventTimeline(eventCount);
@@ -7273,7 +8870,7 @@
         };
         return SkeletonBinary;
     }());
-    var BinaryInput = (function () {
+    var BinaryInput = /** @class */ (function () {
         function BinaryInput(data, strings, index, buffer) {
             if (strings === void 0) { strings = new Array(); }
             if (index === void 0) { index = 0; }
@@ -7362,7 +8959,7 @@
         };
         return BinaryInput;
     }());
-    var LinkedMesh$1 = (function () {
+    var LinkedMesh$1 = /** @class */ (function () {
         function LinkedMesh(mesh, skin, slotIndex, parent, inheritDeform) {
             this.mesh = mesh;
             this.skin = skin;
@@ -7372,7 +8969,7 @@
         }
         return LinkedMesh;
     }());
-    var Vertices = (function () {
+    var Vertices = /** @class */ (function () {
         function Vertices(bones, vertices) {
             if (bones === void 0) { bones = null; }
             if (vertices === void 0) { vertices = null; }
@@ -7456,18 +9053,58 @@
     var CURVE_STEPPED = 1;
     var CURVE_BEZIER = 2;
 
-    var SkeletonBounds = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Collects each visible {@link BoundingBoxAttachment} and computes the world vertices for its polygon. The polygon vertices are
+     * provided along with convenience methods for doing hit detection. */
+    var SkeletonBounds = /** @class */ (function () {
         function SkeletonBounds() {
+            /** The left edge of the axis aligned bounding box. */
             this.minX = 0;
+            /** The bottom edge of the axis aligned bounding box. */
             this.minY = 0;
+            /** The right edge of the axis aligned bounding box. */
             this.maxX = 0;
+            /** The top edge of the axis aligned bounding box. */
             this.maxY = 0;
+            /** The visible bounding boxes. */
             this.boundingBoxes = new Array();
+            /** The world vertices for the bounding box polygons. */
             this.polygons = new Array();
             this.polygonPool = new Pool(function () {
                 return Utils.newFloatArray(16);
             });
         }
+        /** Clears any previous polygons, finds all visible bounding box attachments, and computes the world vertices for each bounding
+         * box's polygon.
+         * @param updateAabb If true, the axis aligned bounding box containing all the polygons is computed. If false, the
+         *           SkeletonBounds AABB methods will always return true. */
         SkeletonBounds.prototype.update = function (skeleton, updateAabb) {
             if (!skeleton)
                 throw new Error("skeleton cannot be null.");
@@ -7525,9 +9162,11 @@
             this.maxX = maxX;
             this.maxY = maxY;
         };
+        /** Returns true if the axis aligned bounding box contains the point. */
         SkeletonBounds.prototype.aabbContainsPoint = function (x, y) {
             return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY;
         };
+        /** Returns true if the axis aligned bounding box intersects the line segment. */
         SkeletonBounds.prototype.aabbIntersectsSegment = function (x1, y1, x2, y2) {
             var minX = this.minX;
             var minY = this.minY;
@@ -7550,9 +9189,12 @@
                 return true;
             return false;
         };
+        /** Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds. */
         SkeletonBounds.prototype.aabbIntersectsSkeleton = function (bounds) {
             return this.minX < bounds.maxX && this.maxX > bounds.minX && this.minY < bounds.maxY && this.maxY > bounds.minY;
         };
+        /** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
+         * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
         SkeletonBounds.prototype.containsPoint = function (x, y) {
             var polygons = this.polygons;
             for (var i = 0, n = polygons.length; i < n; i++)
@@ -7560,6 +9202,7 @@
                     return this.boundingBoxes[i];
             return null;
         };
+        /** Returns true if the polygon contains the point. */
         SkeletonBounds.prototype.containsPointPolygon = function (polygon, x, y) {
             var vertices = polygon;
             var nn = polygon.length;
@@ -7577,6 +9220,9 @@
             }
             return inside;
         };
+        /** Returns the first bounding box attachment that contains any part of the line segment, or null. When doing many checks, it
+         * is usually more efficient to only call this method if {@link #aabbIntersectsSegment()} returns
+         * true. */
         SkeletonBounds.prototype.intersectsSegment = function (x1, y1, x2, y2) {
             var polygons = this.polygons;
             for (var i = 0, n = polygons.length; i < n; i++)
@@ -7584,6 +9230,7 @@
                     return this.boundingBoxes[i];
             return null;
         };
+        /** Returns true if the polygon contains any part of the line segment. */
         SkeletonBounds.prototype.intersectsSegmentPolygon = function (polygon, x1, y1, x2, y2) {
             var vertices = polygon;
             var nn = polygon.length;
@@ -7606,22 +9253,53 @@
             }
             return false;
         };
+        /** Returns the polygon for the specified bounding box, or null. */
         SkeletonBounds.prototype.getPolygon = function (boundingBox) {
             if (!boundingBox)
                 throw new Error("boundingBox cannot be null.");
             var index = this.boundingBoxes.indexOf(boundingBox);
             return index == -1 ? null : this.polygons[index];
         };
+        /** The width of the axis aligned bounding box. */
         SkeletonBounds.prototype.getWidth = function () {
             return this.maxX - this.minX;
         };
+        /** The height of the axis aligned bounding box. */
         SkeletonBounds.prototype.getHeight = function () {
             return this.maxY - this.minY;
         };
         return SkeletonBounds;
     }());
 
-    var Triangulator = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    var Triangulator = /** @class */ (function () {
         function Triangulator() {
             this.convexPolygons = new Array();
             this.convexPolygonsIndices = new Array();
@@ -7649,6 +9327,7 @@
             var triangles = this.triangles;
             triangles.length = 0;
             while (vertexCount > 3) {
+                // Find ear tip.
                 var previous = vertexCount - 1, i = 0, next = 1;
                 while (true) {
                     outer: if (!isConcave[i]) {
@@ -7682,6 +9361,7 @@
                     i = next;
                     next = (next + 1) % vertexCount;
                 }
+                // Cut ear tip.
                 triangles.push(indices[(vertexCount + i - 1) % vertexCount]);
                 triangles.push(indices[i]);
                 triangles.push(indices[(i + 1) % vertexCount]);
@@ -7712,12 +9392,14 @@
             polygonIndices.length = 0;
             var polygon = this.polygonPool.obtain();
             polygon.length = 0;
+            // Merge subsequent triangles if they form a triangle fan.
             var fanBaseIndex = -1, lastWinding = 0;
             for (var i = 0, n = triangles.length; i < n; i += 3) {
                 var t1 = triangles[i] << 1, t2 = triangles[i + 1] << 1, t3 = triangles[i + 2] << 1;
                 var x1 = vertices[t1], y1 = vertices[t1 + 1];
                 var x2 = vertices[t2], y2 = vertices[t2 + 1];
                 var x3 = vertices[t3], y3 = vertices[t3 + 1];
+                // If the base of the last triangle is the same as this triangle, check if they form a convex polygon (triangle fan).
                 var merged = false;
                 if (fanBaseIndex == t1) {
                     var o = polygon.length - 4;
@@ -7730,6 +9412,7 @@
                         merged = true;
                     }
                 }
+                // Otherwise make this triangle the new base.
                 if (!merged) {
                     if (polygon.length > 0) {
                         convexPolygons.push(polygon);
@@ -7760,6 +9443,7 @@
                 convexPolygons.push(polygon);
                 convexPolygonsIndices.push(polygonIndices);
             }
+            // Go through the list of polygons and try to merge the remaining triangles with the found triangle fans.
             for (var i = 0, n = convexPolygons.length; i < n; i++) {
                 polygonIndices = convexPolygonsIndices[i];
                 if (polygonIndices.length == 0)
@@ -7802,6 +9486,7 @@
                     }
                 }
             }
+            // Remove empty polygons that resulted from the merge step above.
             for (var i = convexPolygons.length - 1; i >= 0; i--) {
                 polygon = convexPolygons[i];
                 if (polygon.length == 0) {
@@ -7830,7 +9515,35 @@
         return Triangulator;
     }());
 
-    var SkeletonClipping = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    var SkeletonClipping = /** @class */ (function () {
         function SkeletonClipping() {
             this.triangulator = new Triangulator();
             this.clippingPolygon = new Array();
@@ -8007,9 +9720,12 @@
                 }
             }
         };
+        /** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
+         * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */
         SkeletonClipping.prototype.clip = function (x1, y1, x2, y2, x3, y3, clippingArea, output) {
             var originalOutput = output;
             var clipped = false;
+            // Avoid copy at the end.
             var input = null;
             if (clippingArea.length % 4 >= 2) {
                 input = output;
@@ -8040,11 +9756,12 @@
                     var inputX2 = inputVertices[ii + 2], inputY2 = inputVertices[ii + 3];
                     var side2 = deltaX * (inputY2 - edgeY2) - deltaY * (inputX2 - edgeX2) > 0;
                     if (deltaX * (inputY - edgeY2) - deltaY * (inputX - edgeX2) > 0) {
-                        if (side2) {
+                        if (side2) { // v1 inside, v2 inside
                             output.push(inputX2);
                             output.push(inputY2);
                             continue;
                         }
+                        // v1 inside, v2 outside
                         var c0 = inputY2 - inputY, c2 = inputX2 - inputX;
                         var s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
                         if (Math.abs(s) > 0.000001) {
@@ -8057,7 +9774,7 @@
                             output.push(edgeY);
                         }
                     }
-                    else if (side2) {
+                    else if (side2) { // v1 outside, v2 inside
                         var c0 = inputY2 - inputY, c2 = inputX2 - inputX;
                         var s = c0 * (edgeX2 - edgeX) - c2 * (edgeY2 - edgeY);
                         if (Math.abs(s) > 0.000001) {
@@ -8074,7 +9791,7 @@
                     }
                     clipped = true;
                 }
-                if (outputStart == output.length) {
+                if (outputStart == output.length) { // All edges outside.
                     originalOutput.length = 0;
                     return true;
                 }
@@ -8121,8 +9838,45 @@
         return SkeletonClipping;
     }());
 
-    var SkeletonJson = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    /** Loads skeleton data in the Spine JSON format.
+     *
+     * See [Spine JSON format](http://esotericsoftware.com/spine-json-format) and
+     * [JSON and binary data](http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data) in the Spine
+     * Runtimes Guide. */
+    var SkeletonJson = /** @class */ (function () {
         function SkeletonJson(attachmentLoader) {
+            /** Scales bone positions, image sizes, and translations as they are loaded. This allows different size images to be used at
+             * runtime than were used in Spine.
+             *
+             * See [Scaling](http://esotericsoftware.com/spine-loading-skeleton-data#Scaling) in the Spine Runtimes Guide. */
             this.scale = 1;
             this.linkedMeshes = new Array();
             this.attachmentLoader = attachmentLoader;
@@ -8131,6 +9885,7 @@
             var scale = this.scale;
             var skeletonData = new SkeletonData();
             var root = typeof (json) === "string" ? JSON.parse(json) : json;
+            // Skeleton
             var skeletonMap = root.skeleton;
             if (skeletonMap) {
                 skeletonData.hash = skeletonMap.hash;
@@ -8142,6 +9897,7 @@
                 skeletonData.fps = skeletonMap.fps;
                 skeletonData.imagesPath = skeletonMap.images;
             }
+            // Bones
             if (root.bones) {
                 for (var i = 0; i < root.bones.length; i++) {
                     var boneMap = root.bones[i];
@@ -8166,6 +9922,7 @@
                     skeletonData.bones.push(data);
                 }
             }
+            // Slots.
             if (root.slots) {
                 for (var i = 0; i < root.slots.length; i++) {
                     var slotMap = root.slots[i];
@@ -8182,6 +9939,7 @@
                     skeletonData.slots.push(data);
                 }
             }
+            // IK constraints
             if (root.ik) {
                 for (var i = 0; i < root.ik.length; i++) {
                     var constraintMap = root.ik[i];
@@ -8200,6 +9958,7 @@
                     skeletonData.ikConstraints.push(data);
                 }
             }
+            // Transform constraints.
             if (root.transform) {
                 for (var i = 0; i < root.transform.length; i++) {
                     var constraintMap = root.transform[i];
@@ -8227,6 +9986,7 @@
                     skeletonData.transformConstraints.push(data);
                 }
             }
+            // Path constraints.
             if (root.path) {
                 for (var i = 0; i < root.path.length; i++) {
                     var constraintMap = root.path[i];
@@ -8253,6 +10013,7 @@
                     skeletonData.pathConstraints.push(data);
                 }
             }
+            // Skins.
             if (root.skins) {
                 for (var i = 0; i < root.skins.length; i++) {
                     var skinMap = root.skins[i];
@@ -8287,6 +10048,7 @@
                         skeletonData.defaultSkin = skin;
                 }
             }
+            // Linked meshes.
             for (var i = 0, n = this.linkedMeshes.length; i < n; i++) {
                 var linkedMesh = this.linkedMeshes[i];
                 var skin = !linkedMesh.skin ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
@@ -8296,6 +10058,7 @@
                 linkedMesh.mesh.updateUVs();
             }
             this.linkedMeshes.length = 0;
+            // Events.
             if (root.events) {
                 for (var eventName in root.events) {
                     var eventMap = root.events[eventName];
@@ -8311,6 +10074,7 @@
                     skeletonData.events.push(data);
                 }
             }
+            // Animations.
             if (root.animations) {
                 for (var animationName in root.animations) {
                     var animationMap = root.animations[animationName];
@@ -8455,6 +10219,7 @@
         SkeletonJson.prototype.readAnimation = function (map, name, skeletonData) {
             var scale = this.scale;
             var timelines = new Array();
+            // Slot timelines.
             if (map.slots) {
                 for (var slotName in map.slots) {
                     var slotMap = map.slots[slotName];
@@ -8595,6 +10360,7 @@
                     }
                 }
             }
+            // Bone timelines.
             if (map.bones) {
                 for (var boneName in map.bones) {
                     var boneMap = map.bones[boneName];
@@ -8645,6 +10411,7 @@
                     }
                 }
             }
+            // IK constraint timelines.
             if (map.ik) {
                 for (var constraintName in map.ik) {
                     var constraintMap = map.ik[constraintName];
@@ -8680,6 +10447,7 @@
                     timelines.push(timeline);
                 }
             }
+            // Transform constraint timelines.
             if (map.transform) {
                 for (var constraintName in map.transform) {
                     var timelineMap = map.transform[constraintName];
@@ -8731,6 +10499,7 @@
                     timelines.push(timeline);
                 }
             }
+            // Path constraint timelines.
             if (map.path) {
                 for (var constraintName in map.path) {
                     var constraintMap = map.path[constraintName];
@@ -8783,6 +10552,7 @@
                     }
                 }
             }
+            // Deform timelines.
             if (map.deform) {
                 for (var deformName in map.deform) {
                     var deformMap = map.deform[deformName];
@@ -8837,6 +10607,7 @@
                     }
                 }
             }
+            // Draw order timelines.
             if (map.drawOrder) {
                 var timeline = new DrawOrderTimeline(map.drawOrder.length);
                 var slotCount = skeletonData.slots.length;
@@ -8852,12 +10623,16 @@
                         for (var ii = 0; ii < offsets.length; ii++) {
                             var offsetMap = offsets[ii];
                             var slotIndex = skeletonData.findSlotIndex(offsetMap.slot);
+                            // Collect unchanged items.
                             while (originalIndex != slotIndex)
                                 unchanged[unchangedIndex++] = originalIndex++;
+                            // Set changed items.
                             drawOrder[originalIndex + offsetMap.offset] = originalIndex++;
                         }
+                        // Collect remaining unchanged items.
                         while (originalIndex < slotCount)
                             unchanged[unchangedIndex++] = originalIndex++;
+                        // Fill in unchanged items.
                         for (var ii = slotCount - 1; ii >= 0; ii--)
                             if (drawOrder[ii] == -1)
                                 drawOrder[ii] = unchanged[--unchangedIndex];
@@ -8866,6 +10641,7 @@
                 }
                 timelines.push(timeline);
             }
+            // Event timelines.
             if (map.events) {
                 var timeline = new EventTimeline(map.events.length);
                 var frame = 0;
@@ -8891,7 +10667,7 @@
         };
         return SkeletonJson;
     }());
-    var LinkedMesh = (function () {
+    var LinkedMesh = /** @class */ (function () {
         function LinkedMesh(mesh, skin, slotIndex, parent, inheritDeform) {
             this.mesh = mesh;
             this.skin = skin;
@@ -8966,6 +10742,34 @@
         return map[property] !== undefined ? map[property] : defaultValue;
     }
 
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
     (function () {
         if (typeof Math.fround === "undefined") {
             Math.fround = (function (array) {
@@ -8976,7 +10780,35 @@
         }
     })();
 
-    var JitterEffect = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    var JitterEffect = /** @class */ (function () {
         function JitterEffect(jitterX, jitterY) {
             this.jitterX = 0;
             this.jitterY = 0;
@@ -8994,7 +10826,35 @@
         return JitterEffect;
     }());
 
-    var SwirlEffect = (function () {
+    /******************************************************************************
+     * Spine Runtimes License Agreement
+     * Last updated January 1, 2020. Replaces all prior versions.
+     *
+     * Copyright (c) 2013-2020, Esoteric Software LLC
+     *
+     * Integration of the Spine Runtimes into software or otherwise creating
+     * derivative works of the Spine Runtimes is permitted under the terms and
+     * conditions of Section 2 of the Spine Editor License Agreement:
+     * http://esotericsoftware.com/spine-editor-license
+     *
+     * Otherwise, it is permitted to integrate the Spine Runtimes into software
+     * or otherwise create derivative works of the Spine Runtimes (collectively,
+     * "Products"), provided that each user of the Products must obtain their own
+     * Spine Editor license and redistribution of the Products in any form must
+     * include this license and copyright notice.
+     *
+     * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+     * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+     * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+     * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+     * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+     * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+     * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+     * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+     *****************************************************************************/
+    var SwirlEffect = /** @class */ (function () {
         function SwirlEffect(radius) {
             this.centerX = 0;
             this.centerY = 0;
@@ -9027,14 +10887,12 @@
         return SwirlEffect;
     }());
 
-    console.log("Spine 4.0.1");
-
     exports.AlphaTimeline = AlphaTimeline;
     exports.Animation = Animation;
     exports.AnimationState = AnimationState;
     exports.AnimationStateAdapter = AnimationStateAdapter;
     exports.AnimationStateData = AnimationStateData;
-    exports.AssetManager = AssetManager;
+    exports.AssetManagerBase = AssetManagerBase;
     exports.AtlasAttachmentLoader = AtlasAttachmentLoader;
     exports.Attachment = Attachment;
     exports.AttachmentTimeline = AttachmentTimeline;

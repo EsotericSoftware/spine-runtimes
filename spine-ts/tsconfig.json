@@ -1,13 +1,14 @@
 {
-	"compilerOptions": {
-		"noImplicitAny": true,
-		"removeComments": true,
-		"preserveConstEnums": true,
-		"sourceMap": true,
-		"declaration": true,
-		"declarationMap": true,
-		"composite": true,
-		"esModuleInterop": true,
-		"isolatedModules": true,
-	},
+	"files": [],
+	"references": [
+		{
+			"path": "./spine-core"
+		},
+		{
+			"path": "./spine-canvas"
+		}
+	],
+	"paths": {
+		"@esotericsoftware/spine-core": "./spine-core/src/index.ts"
+	}
 }

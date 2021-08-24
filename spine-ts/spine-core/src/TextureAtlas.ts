@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { AssetManager } from "./AssetManager";
+import { AssetManagerBase } from "./AssetManagerBase";
 import { TextureFilter, TextureWrap, Texture, TextureRegion } from "./Texture";
 import { Disposable, Utils, StringMap } from "./Utils";
 
@@ -185,7 +185,7 @@ export class TextureAtlas implements Disposable {
 		return null;
 	}
 
-	setTextures(assetManager: AssetManager, pathPrefix: string = "") {
+	setTextures(assetManager: AssetManagerBase, pathPrefix: string = "") {
 		for (let page of this.pages)
 			page.setTexture(assetManager.get(pathPrefix + page.name));
 	}

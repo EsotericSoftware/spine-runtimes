@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"module": "es2015",
+		"noImplicitAny": true,
+		"preserveConstEnums": true,
+		"sourceMap": true,
+		"esModuleInterop": true,
+		"isolatedModules": true,
+		"lib": [
+			"DOM",
+			"ES2015"
+		],
+		"declaration": true,
+		"declarationMap": true,
+		"composite": true,
+	},
+	"exclude": [
+		"node_modules"
+	]
+}
