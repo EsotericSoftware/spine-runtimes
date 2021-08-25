@@ -6,6 +6,12 @@
 		},
 		{
 			"path": "./spine-canvas"
+		},
+		{
+			"path": "./spine-webgl"
+		},
+		{
+			"path": "./spine-player"
 		}
 	]
 }

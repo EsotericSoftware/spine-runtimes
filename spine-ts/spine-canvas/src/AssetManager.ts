@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { AssetManagerBase, Downloader } from "spine-core";
+import { AssetManagerBase, Downloader } from "@esotericsoftware/spine-core"
 import { CanvasTexture } from "./CanvasTexture";
 
 export class AssetManager extends AssetManagerBase {

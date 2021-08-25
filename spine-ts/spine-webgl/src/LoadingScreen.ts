@@ -27,6 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+import { Color, TimeKeeper } from "@esotericsoftware/spine-core";
 import { GLTexture } from "./GLTexture";
 import { ResizeMode, SceneRenderer } from "./SceneRenderer";
 
@@ -44,9 +45,9 @@ export class LoadingScreen {
 	private angle = 0;
 	private fadeOut = 0;
 	private fadeIn = 0;
-	private timeKeeper = new spine.TimeKeeper();
-	backgroundColor = new spine.Color(0.135, 0.135, 0.135, 1);
-	private tempColor = new spine.Color();
+	private timeKeeper = new TimeKeeper();
+	backgroundColor = new Color(0.135, 0.135, 0.135, 1);
+	private tempColor = new Color();
 
 	constructor(renderer: SceneRenderer) {
 		this.renderer = renderer;

@@ -27,14 +27,15 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { AssetManagerBase, Downloader } from "spine-core";
+import { AssetManagerBase, Downloader } from "@esotericsoftware/spine-core"
 import { ManagedWebGLRenderingContext } from "./WebGL";
+import { GLTexture } from "./GLTexture";
 
 
 export class AssetManager extends AssetManagerBase {
 	constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, pathPrefix: string = "", downloader: Downloader = null) {
 		super((image: HTMLImageElement | ImageBitmap) => {
-			return new spine.webgl.GLTexture(context, image);
+			return new GLTexture(context, image);
 		}, pathPrefix, downloader);
 	}
 }

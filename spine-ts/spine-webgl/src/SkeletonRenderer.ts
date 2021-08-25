@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { NumberArrayLike, VertexEffect, Color, SkeletonClipping, Vector2, Utils, Skeleton, BlendMode, RegionAttachment, TextureAtlasRegion, MeshAttachment, ClippingAttachment } from "spine-core";
+import { NumberArrayLike, VertexEffect, Color, SkeletonClipping, Vector2, Utils, Skeleton, BlendMode, RegionAttachment, TextureAtlasRegion, MeshAttachment, ClippingAttachment } from "@esotericsoftware/spine-core";
 import { GLTexture } from "./GLTexture";
 import { PolygonBatcher } from "./PolygonBatcher";
 import { ManagedWebGLRenderingContext, WebGLBlendModeConverter } from "./WebGL";
@@ -120,7 +120,7 @@ export class SkeletonRenderer {
 				renderable.numVertices = (mesh.worldVerticesLength >> 1);
 				renderable.numFloats = renderable.numVertices * clippedVertexSize;
 				if (renderable.numFloats > renderable.vertices.length) {
-					renderable.vertices = this.vertices = spine.Utils.newFloatArray(renderable.numFloats);
+					renderable.vertices = this.vertices = Utils.newFloatArray(renderable.numFloats);
 				}
 				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, renderable.vertices, 0, clippedVertexSize);
 				triangles = mesh.triangles;

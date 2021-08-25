@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Texture, Disposable, Restorable, TextureFilter, TextureWrap } from "spine-core";
+import { Texture, Disposable, Restorable, TextureFilter, TextureWrap } from "@esotericsoftware/spine-core";
 import { ManagedWebGLRenderingContext } from "./WebGL";
 
 export class GLTexture extends Texture implements Disposable, Restorable {

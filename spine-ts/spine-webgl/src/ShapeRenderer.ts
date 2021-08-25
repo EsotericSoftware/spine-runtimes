@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Disposable, Color, Vector2, MathUtils } from "spine-core";
+import { Disposable, Color, Vector2, MathUtils } from "@esotericsoftware/spine-core";
 import { Mesh, Position2Attribute, ColorAttribute } from "./Mesh";
 import { Shader } from "./Shader";
 import { ManagedWebGLRenderingContext } from "./WebGL";

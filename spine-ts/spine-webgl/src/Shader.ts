@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Disposable, Restorable } from "spine-core";
+import { Disposable, Restorable } from "@esotericsoftware/spine-core";
 import { ManagedWebGLRenderingContext } from "./WebGL";
 
 export class Shader implements Disposable, Restorable {

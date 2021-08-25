@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Utils, Color, Skeleton, RegionAttachment, TextureAtlasRegion, BlendMode, MeshAttachment, Slot } from "spine-core";
+import { Utils, Color, Skeleton, RegionAttachment, TextureAtlasRegion, BlendMode, MeshAttachment, Slot } from "@esotericsoftware/spine-core";
 import { CanvasTexture } from "./CanvasTexture";
 
 export class SkeletonRenderer {

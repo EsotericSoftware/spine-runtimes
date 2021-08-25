@@ -2,7 +2,7 @@ export * from "./AssetManager";
 export * from "./CanvasTexture";
 export * from "./SkeletonRenderer";
 
-export * from "spine-core";
+export * from "@esotericsoftware/spine-core"
 
 // Before modularization, we would expose spine-core on the global
 // `spine` object, and spine-canvas on the global `spine.canvas` object.
@@ -23,9 +23,5 @@ export * from "spine-core";
 //
 // This will break if esbuild renames the variable `src_exports` pointing to
 // the exports object.
-declare global {
-	var spine: any;
-}
-
 let exports = eval("src_exports");
-exports.canvas = exports;
+if (exports) exports.canvas = exports;

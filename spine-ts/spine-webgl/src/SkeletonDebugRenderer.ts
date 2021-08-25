@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Disposable, Color, SkeletonBounds, Utils, Skeleton, RegionAttachment, MeshAttachment, PathAttachment, ClippingAttachment } from "spine-core";
+import { Disposable, Color, SkeletonBounds, Utils, Skeleton, RegionAttachment, MeshAttachment, PathAttachment, ClippingAttachment } from "@esotericsoftware/spine-core";
 import { ShapeRenderer } from "./ShapeRenderer";
 import { ManagedWebGLRenderingContext } from "./WebGL";
 

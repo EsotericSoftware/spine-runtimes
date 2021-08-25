@@ -27,12 +27,11 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-declare function CodeMirror (el: Element, config: any): void;
+declare function CodeMirror(el: Element, config: any): void;
 
-module spine {
-	export class SpinePlayerEditor {
-		private static DEFAULT_CODE =
-			`
+export class SpinePlayerEditor {
+	private static DEFAULT_CODE =
+		`
 <script src="https://esotericsoftware.com/files/spine-player/4.0/spine-player.js"></script>
 <link rel="stylesheet" href="https://esotericsoftware.com/files/spine-player/4.0/spine-player.css">
 
@@ -46,72 +45,71 @@ new spine.SpinePlayer("player-container", {
 </script>
 		`.trim();
 
-		private prefix: string =
-			`<html>
+	private prefix: string =
+		`<html>
 <head>
 <style>
 body { margin: 0px; }
 </style>
 </head>
 <body>`.trim()
-		private postfix: string = `</body>`;
-		private code: any;
-		private player: HTMLIFrameElement;
+	private postfix: string = `</body>`;
+	private code: any;
+	private player: HTMLIFrameElement;
 
-		constructor (parent: HTMLElement) {
-			this.render(parent);
-		}
+	constructor(parent: HTMLElement) {
+		this.render(parent);
+	}
 
-		private render (parent: HTMLElement) {
-			let dom = /*html*/`
+	private render(parent: HTMLElement) {
+		let dom = /*html*/`
 				<div class="spine-player-editor-container">
 					<div class="spine-player-editor-code"></div>
 					<iframe class="spine-player-editor-player"></iframe>
 				</div>
 			`;
-			parent.innerHTML = dom;
-			let codeElement = parent.getElementsByClassName("spine-player-editor-code")[0];
-			this.player = parent.getElementsByClassName("spine-player-editor-player")[0] as HTMLIFrameElement;
+		parent.innerHTML = dom;
+		let codeElement = parent.getElementsByClassName("spine-player-editor-code")[0];
+		this.player = parent.getElementsByClassName("spine-player-editor-player")[0] as HTMLIFrameElement;
 
-			requestAnimationFrame(() => {
-				this.code = CodeMirror(codeElement, {
-					lineNumbers: true,
-					tabSize: 3,
-					indentUnit: 3,
-					indentWithTabs: true,
-					scrollBarStyle: "native",
-					mode: "htmlmixed",
-					theme: "monokai"
-				});
-				this.code.on("change", () => {
-					this.startPlayer();
-				});
+		requestAnimationFrame(() => {
+			this.code = CodeMirror(codeElement, {
+				lineNumbers: true,
+				tabSize: 3,
+				indentUnit: 3,
+				indentWithTabs: true,
+				scrollBarStyle: "native",
+				mode: "htmlmixed",
+				theme: "monokai"
+			});
+			this.code.on("change", () => {
+				this.startPlayer();
+			});
 
-				this.setCode(SpinePlayerEditor.DEFAULT_CODE);
-			})
-		}
+			this.setCode(SpinePlayerEditor.DEFAULT_CODE);
+		})
+	}
 
-		setPreAndPostfix (prefix: string, postfix: string) {
-			this.prefix = prefix;
-			this.postfix = postfix;
-			this.startPlayer()
-		}
+	setPreAndPostfix(prefix: string, postfix: string) {
+		this.prefix = prefix;
+		this.postfix = postfix;
+		this.startPlayer()
+	}
 
-		setCode (code: string) {
-			this.code.setValue(code);
-			this.startPlayer();
-		}
+	setCode(code: string) {
+		this.code.setValue(code);
+		this.startPlayer();
+	}
 
-		private timerId = 0;
-		startPlayer () {
-			clearTimeout(this.timerId);
-			this.timerId = setTimeout(() => {
-				let code = this.code.getDoc().getValue();
-				code = this.prefix + code + this.postfix;
-				code = window.btoa(code);
-				this.player.src = "";
-				this.player.src = "data:text/html;base64," + code;
-			}, 500);
-		}
+	private timerId = 0;
+	startPlayer() {
+		clearTimeout(this.timerId);
+		this.timerId = setTimeout(() => {
+			let code = this.code.getDoc().getValue();
+			code = this.prefix + code + this.postfix;
+			code = window.btoa(code);
+			this.player.src = "";
+			this.player.src = "data:text/html;base64," + code;
+		}, 500);
 	}
 }

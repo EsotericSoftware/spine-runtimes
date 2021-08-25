@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Restorable, BlendMode } from "spine-core";
+import { Restorable, BlendMode } from "@esotericsoftware/spine-core";
 
 export class ManagedWebGLRenderingContext {
 	public canvas: HTMLCanvasElement | OffscreenCanvas;

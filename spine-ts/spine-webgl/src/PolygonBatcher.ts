@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Disposable } from "spine-core";
+import { Disposable } from "@esotericsoftware/spine-core";
 import { GLTexture } from "./GLTexture";
 import { Mesh, Position2Attribute, ColorAttribute, TexCoordAttribute, Color2Attribute } from "./Mesh";
 import { Shader } from "./Shader";

@@ -10,7 +10,6 @@
 			"ES2015"
 		],
 		"declaration": true,
-		"declarationMap": true,
 		"composite": true,
 		"moduleResolution": "node",
 	}

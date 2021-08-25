@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Pool } from "spine-core";
+import { Pool } from "@esotericsoftware/spine-core";
 
 export class Input {
 	element: HTMLElement;
@@ -38,7 +38,7 @@ export class Input {
 	private listeners = new Array<InputListener>();
 
 	touchesPool = new Pool<Touch>(() => {
-		return new spine.webgl.Touch(0, 0, 0);
+		return new Touch(0, 0, 0);
 	});
 
 	constructor(element: HTMLElement) {

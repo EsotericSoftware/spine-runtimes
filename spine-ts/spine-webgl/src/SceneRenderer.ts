@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Color, Disposable, Skeleton, MathUtils, TextureAtlasRegion } from "spine-core";
+import { Color, Disposable, Skeleton, MathUtils, TextureAtlasRegion } from "@esotericsoftware/spine-core";
 import { OrthoCamera } from "./Camera";
 import { GLTexture } from "./GLTexture";
 import { PolygonBatcher } from "./PolygonBatcher";
