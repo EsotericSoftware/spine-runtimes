@@ -27,95 +27,95 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-module spine.webgl {
-	export class Vector3 {
-		x = 0;
-		y = 0;
-		z = 0;
+import { Matrix4, M00, M01, M02, M03, M10, M11, M12, M13, M20, M21, M22, M23, M30, M31, M32, M33 } from "./Matrix4";
 
-		constructor (x: number = 0, y: number = 0, z: number = 0) {
-			this.x = x;
-			this.y = y;
-			this.z = z;
-		}
+export class Vector3 {
+	x = 0;
+	y = 0;
+	z = 0;
 
-		setFrom (v: Vector3): Vector3 {
-			this.x = v.x;
-			this.y = v.y;
-			this.z = v.z;
-			return this;
-		}
+	constructor(x: number = 0, y: number = 0, z: number = 0) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
 
-		set (x: number, y: number, z: number): Vector3 {
-			this.x = x;
-			this.y = y;
-			this.z = z;
-			return this;
-		}
+	setFrom(v: Vector3): Vector3 {
+		this.x = v.x;
+		this.y = v.y;
+		this.z = v.z;
+		return this;
+	}
 
-		add (v: Vector3): Vector3 {
-			this.x += v.x;
-			this.y += v.y;
-			this.z += v.z;
-			return this;
-		}
+	set(x: number, y: number, z: number): Vector3 {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		return this;
+	}
 
-		sub (v: Vector3): Vector3 {
-			this.x -= v.x;
-			this.y -= v.y;
-			this.z -= v.z;
-			return this;
-		}
+	add(v: Vector3): Vector3 {
+		this.x += v.x;
+		this.y += v.y;
+		this.z += v.z;
+		return this;
+	}
 
-		scale (s: number): Vector3 {
-			this.x *= s;
-			this.y *= s;
-			this.z *= s;
-			return this;
-		}
+	sub(v: Vector3): Vector3 {
+		this.x -= v.x;
+		this.y -= v.y;
+		this.z -= v.z;
+		return this;
+	}
 
-		normalize (): Vector3 {
-			let len = this.length();
-			if (len == 0) return this;
-			len = 1 / len;
-			this.x *= len;
-			this.y *= len;
-			this.z *= len;
-			return this;
-		}
+	scale(s: number): Vector3 {
+		this.x *= s;
+		this.y *= s;
+		this.z *= s;
+		return this;
+	}
 
-		cross (v: Vector3): Vector3 {
-			return this.set(this.y * v.z - this.z * v.y, this.z * v.x - this.x * v.z, this.x * v.y - this.y * v.x)
-		}
+	normalize(): Vector3 {
+		let len = this.length();
+		if (len == 0) return this;
+		len = 1 / len;
+		this.x *= len;
+		this.y *= len;
+		this.z *= len;
+		return this;
+	}
 
-		multiply (matrix: Matrix4): Vector3 {
-			let l_mat = matrix.values;
-			return this.set(this.x * l_mat[M00] + this.y * l_mat[M01] + this.z * l_mat[M02] + l_mat[M03],
-				this.x * l_mat[M10] + this.y * l_mat[M11] + this.z * l_mat[M12] + l_mat[M13],
-				this.x * l_mat[M20] + this.y * l_mat[M21] + this.z * l_mat[M22] + l_mat[M23]);
-		}
+	cross(v: Vector3): Vector3 {
+		return this.set(this.y * v.z - this.z * v.y, this.z * v.x - this.x * v.z, this.x * v.y - this.y * v.x)
+	}
 
-		project (matrix: Matrix4): Vector3 {
-			let l_mat = matrix.values;
-			let l_w = 1 / (this.x * l_mat[M30] + this.y * l_mat[M31] + this.z * l_mat[M32] + l_mat[M33]);
-			return this.set((this.x * l_mat[M00] + this.y * l_mat[M01] + this.z * l_mat[M02] + l_mat[M03]) * l_w,
-				(this.x * l_mat[M10] + this.y * l_mat[M11] + this.z * l_mat[M12] + l_mat[M13]) * l_w,
-				(this.x * l_mat[M20] + this.y * l_mat[M21] + this.z * l_mat[M22] + l_mat[M23]) * l_w);
-		}
+	multiply(matrix: Matrix4): Vector3 {
+		let l_mat = matrix.values;
+		return this.set(this.x * l_mat[M00] + this.y * l_mat[M01] + this.z * l_mat[M02] + l_mat[M03],
+			this.x * l_mat[M10] + this.y * l_mat[M11] + this.z * l_mat[M12] + l_mat[M13],
+			this.x * l_mat[M20] + this.y * l_mat[M21] + this.z * l_mat[M22] + l_mat[M23]);
+	}
 
-		dot (v: Vector3): number {
-			return this.x * v.x + this.y * v.y + this.z * v.z;
-		}
+	project(matrix: Matrix4): Vector3 {
+		let l_mat = matrix.values;
+		let l_w = 1 / (this.x * l_mat[M30] + this.y * l_mat[M31] + this.z * l_mat[M32] + l_mat[M33]);
+		return this.set((this.x * l_mat[M00] + this.y * l_mat[M01] + this.z * l_mat[M02] + l_mat[M03]) * l_w,
+			(this.x * l_mat[M10] + this.y * l_mat[M11] + this.z * l_mat[M12] + l_mat[M13]) * l_w,
+			(this.x * l_mat[M20] + this.y * l_mat[M21] + this.z * l_mat[M22] + l_mat[M23]) * l_w);
+	}
 
-		length (): number {
-			return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-		}
+	dot(v: Vector3): number {
+		return this.x * v.x + this.y * v.y + this.z * v.z;
+	}
 
-		distance (v: Vector3): number {
-			let a = v.x - this.x;
-			let b = v.y - this.y;
-			let c = v.z - this.z;
-			return Math.sqrt(a * a + b * b + c * c);
-		}
+	length(): number {
+		return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+	}
+
+	distance(v: Vector3): number {
+		let a = v.x - this.x;
+		let b = v.y - this.y;
+		let c = v.z - this.z;
+		return Math.sqrt(a * a + b * b + c * c);
 	}
 }

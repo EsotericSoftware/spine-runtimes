@@ -149,5 +149,9 @@ cmake-build-debug-visual-studio
 spine-cocos2dx/build-v4/
 spine-cocos2dx/example-v4/cocos2d
 spine-cocos2dx/example-v4/cocos2dx.zip
-spine-ts/spine-canvas/dist
+
 spine-ts/spine-core/dist
+spine-ts/spine-canvas/dist
+spine-ts/spine-webgl/dist
+spine-ts/spine-player/dist
+spine-ts/spine-threejs/dist

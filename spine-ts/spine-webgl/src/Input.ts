@@ -27,207 +27,207 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-module spine.webgl {
-	export class Input {
-		element: HTMLElement;
-		lastX = 0;
-		lastY = 0;
-		buttonDown = false;
-		currTouch: Touch = null;
-		private listeners = new Array<InputListener>();
+import { Pool } from "spine-core";
 
-		touchesPool = new Pool<spine.webgl.Touch>(() => {
-			return new spine.webgl.Touch(0, 0, 0);
-		});
+export class Input {
+	element: HTMLElement;
+	lastX = 0;
+	lastY = 0;
+	buttonDown = false;
+	currTouch: Touch = null;
+	private listeners = new Array<InputListener>();
 
-		constructor (element: HTMLElement) {
-			this.element = element;
-			this.setupCallbacks(element);
+	touchesPool = new Pool<Touch>(() => {
+		return new spine.webgl.Touch(0, 0, 0);
+	});
+
+	constructor(element: HTMLElement) {
+		this.element = element;
+		this.setupCallbacks(element);
+	}
+
+	private setupCallbacks(element: HTMLElement) {
+		let mouseDown = (ev: UIEvent) => {
+			if (ev instanceof MouseEvent) {
+				let rect = element.getBoundingClientRect();
+				let x = ev.clientX - rect.left;
+				let y = ev.clientY - rect.top;
+
+				let listeners = this.listeners;
+				for (let i = 0; i < listeners.length; i++)
+					if (listeners[i].down) listeners[i].down(x, y);
+
+				this.lastX = x;
+				this.lastY = y;
+				this.buttonDown = true;
+
+				document.addEventListener("mousemove", mouseMove);
+				document.addEventListener("mouseup", mouseUp);
+			}
 		}
 
-		private setupCallbacks (element: HTMLElement) {
-			let mouseDown = (ev: UIEvent) => {
-				if (ev instanceof MouseEvent) {
-					let rect = element.getBoundingClientRect();
-					let x = ev.clientX - rect.left;
-					let y = ev.clientY - rect.top;
+		let mouseMove = (ev: UIEvent) => {
+			if (ev instanceof MouseEvent) {
+				let rect = element.getBoundingClientRect();
+				let x = ev.clientX - rect.left;
+				let y = ev.clientY - rect.top;
 
-					let listeners = this.listeners;
-					for (let i = 0; i < listeners.length; i++)
-						if (listeners[i].down) listeners[i].down(x, y);
-
-					this.lastX = x;
-					this.lastY = y;
-					this.buttonDown = true;
-
-					document.addEventListener("mousemove", mouseMove);
-					document.addEventListener("mouseup", mouseUp);
-				}
-			}
-
-			let mouseMove = (ev: UIEvent) => {
-				if (ev instanceof MouseEvent) {
-					let rect = element.getBoundingClientRect();
-					let x = ev.clientX - rect.left;
-					let y = ev.clientY - rect.top;
-
-					let listeners = this.listeners;
-					for (let i = 0; i < listeners.length; i++) {
-						if (this.buttonDown) {
-							if (listeners[i].dragged) listeners[i].dragged(x, y);
-						} else {
-							if (listeners[i].moved) listeners[i].moved(x, y);
-						}
+				let listeners = this.listeners;
+				for (let i = 0; i < listeners.length; i++) {
+					if (this.buttonDown) {
+						if (listeners[i].dragged) listeners[i].dragged(x, y);
+					} else {
+						if (listeners[i].moved) listeners[i].moved(x, y);
 					}
-
-					this.lastX = x;
-					this.lastY = y;
 				}
-			};
 
-			let mouseUp = (ev: UIEvent) => {
-				if (ev instanceof MouseEvent) {
+				this.lastX = x;
+				this.lastY = y;
+			}
+		};
+
+		let mouseUp = (ev: UIEvent) => {
+			if (ev instanceof MouseEvent) {
+				let rect = element.getBoundingClientRect();
+				let x = ev.clientX - rect.left;
+				let y = ev.clientY - rect.top;
+
+				let listeners = this.listeners;
+				for (let i = 0; i < listeners.length; i++)
+					if (listeners[i].up) listeners[i].up(x, y);
+
+				this.lastX = x;
+				this.lastY = y;
+				this.buttonDown = false;
+				document.removeEventListener("mousemove", mouseMove);
+				document.removeEventListener("mouseup", mouseUp);
+			}
+		}
+
+		element.addEventListener("mousedown", mouseDown, true);
+		element.addEventListener("mousemove", mouseMove, true);
+		element.addEventListener("mouseup", mouseUp, true);
+		element.addEventListener("touchstart", (ev: TouchEvent) => {
+			if (!this.currTouch) {
+				var touches = ev.changedTouches;
+				for (var i = 0; i < touches.length; i++) {
+					var touch = touches[i];
 					let rect = element.getBoundingClientRect();
-					let x = ev.clientX - rect.left;
-					let y = ev.clientY - rect.top;
+					let x = touch.clientX - rect.left;
+					let y = touch.clientY - rect.top;
+					this.currTouch = this.touchesPool.obtain();
+					this.currTouch.identifier = touch.identifier;
+					this.currTouch.x = x;
+					this.currTouch.y = y;
+					break;
+				}
 
-					let listeners = this.listeners;
-					for (let i = 0; i < listeners.length; i++)
-						if (listeners[i].up) listeners[i].up(x, y);
+				let listeners = this.listeners;
+				for (let i = 0; i < listeners.length; i++) {
+					if (listeners[i].down) listeners[i].down(this.currTouch.x, this.currTouch.y);
+				}
 
-					this.lastX = x;
-					this.lastY = y;
-					this.buttonDown = false;
-					document.removeEventListener("mousemove", mouseMove);
-					document.removeEventListener("mouseup", mouseUp);
+				this.lastX = this.currTouch.x;
+				this.lastY = this.currTouch.y;
+				this.buttonDown = true;
+			}
+			ev.preventDefault();
+		}, false);
+		element.addEventListener("touchend", (ev: TouchEvent) => {
+			if (this.currTouch) {
+				var touches = ev.changedTouches;
+				for (var i = 0; i < touches.length; i++) {
+					var touch = touches[i];
+					if (this.currTouch.identifier === touch.identifier) {
+						let rect = element.getBoundingClientRect();
+						let x = this.currTouch.x = touch.clientX - rect.left;
+						let y = this.currTouch.y = touch.clientY - rect.top;
+						this.touchesPool.free(this.currTouch);
+						let listeners = this.listeners;
+						for (let i = 0; i < listeners.length; i++) {
+							if (listeners[i].up) listeners[i].up(x, y);
+						}
+
+						this.lastX = x;
+						this.lastY = y;
+						this.buttonDown = false;
+						this.currTouch = null;
+						break;
+					}
 				}
 			}
+			ev.preventDefault();
+		}, false);
+		element.addEventListener("touchcancel", (ev: TouchEvent) => {
+			if (this.currTouch) {
+				var touches = ev.changedTouches;
+				for (var i = 0; i < touches.length; i++) {
+					var touch = touches[i];
+					if (this.currTouch.identifier === touch.identifier) {
+						let rect = element.getBoundingClientRect();
+						let x = this.currTouch.x = touch.clientX - rect.left;
+						let y = this.currTouch.y = touch.clientY - rect.top;
+						this.touchesPool.free(this.currTouch);
+						let listeners = this.listeners;
+						for (let i = 0; i < listeners.length; i++) {
+							if (listeners[i].up) listeners[i].up(x, y);
+						}
 
-			element.addEventListener("mousedown", mouseDown, true);
-			element.addEventListener("mousemove", mouseMove, true);
-			element.addEventListener("mouseup", mouseUp, true);
-			element.addEventListener("touchstart", (ev: TouchEvent) => {
-				if (!this.currTouch) {
-					var touches = ev.changedTouches;
-					for (var i = 0; i < touches.length; i++) {
-						var touch = touches[i];
+						this.lastX = x;
+						this.lastY = y;
+						this.buttonDown = false;
+						this.currTouch = null;
+						break;
+					}
+				}
+			}
+			ev.preventDefault();
+		}, false);
+		element.addEventListener("touchmove", (ev: TouchEvent) => {
+			if (this.currTouch) {
+				var touches = ev.changedTouches;
+				for (var i = 0; i < touches.length; i++) {
+					var touch = touches[i];
+					if (this.currTouch.identifier === touch.identifier) {
 						let rect = element.getBoundingClientRect();
 						let x = touch.clientX - rect.left;
 						let y = touch.clientY - rect.top;
-						this.currTouch = this.touchesPool.obtain();
-						this.currTouch.identifier = touch.identifier;
-						this.currTouch.x = x;
-						this.currTouch.y = y;
+
+						let listeners = this.listeners;
+						for (let i = 0; i < listeners.length; i++) {
+							if (listeners[i].dragged) listeners[i].dragged(x, y);
+						}
+
+						this.lastX = this.currTouch.x = x;
+						this.lastY = this.currTouch.y = y;
 						break;
 					}
-
-					let listeners = this.listeners;
-					for (let i = 0; i < listeners.length; i++) {
-						if (listeners[i].down) listeners[i].down(this.currTouch.x, this.currTouch.y);
-					}
-
-					this.lastX = this.currTouch.x;
-					this.lastY = this.currTouch.y;
-					this.buttonDown = true;
 				}
-				ev.preventDefault();
-			}, false);
-			element.addEventListener("touchend", (ev: TouchEvent) => {
-				if (this.currTouch) {
-					var touches = ev.changedTouches;
-					for (var i = 0; i < touches.length; i++) {
-						var touch = touches[i];
-						if (this.currTouch.identifier === touch.identifier) {
-							let rect = element.getBoundingClientRect();
-							let x = this.currTouch.x = touch.clientX - rect.left;
-							let y = this.currTouch.y = touch.clientY - rect.top;
-							this.touchesPool.free(this.currTouch);
-							let listeners = this.listeners;
-							for (let i = 0; i < listeners.length; i++) {
-								if (listeners[i].up) listeners[i].up(x, y);
-							}
-
-							this.lastX = x;
-							this.lastY = y;
-							this.buttonDown = false;
-							this.currTouch = null;
-							break;
-						}
-					}
-				}
-				ev.preventDefault();
-			}, false);
-			element.addEventListener("touchcancel", (ev: TouchEvent) => {
-				if (this.currTouch) {
-					var touches = ev.changedTouches;
-					for (var i = 0; i < touches.length; i++) {
-						var touch = touches[i];
-						if (this.currTouch.identifier === touch.identifier) {
-							let rect = element.getBoundingClientRect();
-							let x = this.currTouch.x = touch.clientX - rect.left;
-							let y = this.currTouch.y = touch.clientY - rect.top;
-							this.touchesPool.free(this.currTouch);
-							let listeners = this.listeners;
-							for (let i = 0; i < listeners.length; i++) {
-								if (listeners[i].up) listeners[i].up(x, y);
-							}
-
-							this.lastX = x;
-							this.lastY = y;
-							this.buttonDown = false;
-							this.currTouch = null;
-							break;
-						}
-					}
-				}
-				ev.preventDefault();
-			}, false);
-			element.addEventListener("touchmove", (ev: TouchEvent) => {
-				if (this.currTouch) {
-					var touches = ev.changedTouches;
-					for (var i = 0; i < touches.length; i++) {
-						var touch = touches[i];
-						if (this.currTouch.identifier === touch.identifier) {
-							let rect = element.getBoundingClientRect();
-							let x = touch.clientX - rect.left;
-							let y = touch.clientY - rect.top;
-
-							let listeners = this.listeners;
-							for (let i = 0; i < listeners.length; i++) {
-								if (listeners[i].dragged) listeners[i].dragged(x, y);
-							}
-
-							this.lastX = this.currTouch.x = x;
-							this.lastY = this.currTouch.y = y;
-							break;
-						}
-					}
-				}
-				ev.preventDefault();
-			}, false);
-		}
-
-		addListener (listener: InputListener) {
-			this.listeners.push(listener);
-		}
-
-		removeListener (listener: InputListener) {
-			let idx = this.listeners.indexOf(listener);
-			if (idx > -1) {
-				this.listeners.splice(idx, 1);
 			}
-		}
+			ev.preventDefault();
+		}, false);
 	}
 
-	export class Touch {
-		constructor (public identifier: number, public x: number, public y: number) {
-		}
+	addListener(listener: InputListener) {
+		this.listeners.push(listener);
 	}
 
-	export interface InputListener {
-		down (x: number, y: number): void;
-		up (x: number, y: number): void;
-		moved (x: number, y: number): void;
-		dragged (x: number, y: number): void;
+	removeListener(listener: InputListener) {
+		let idx = this.listeners.indexOf(listener);
+		if (idx > -1) {
+			this.listeners.splice(idx, 1);
+		}
 	}
+}
+
+export class Touch {
+	constructor(public identifier: number, public x: number, public y: number) {
+	}
+}
+
+export interface InputListener {
+	down(x: number, y: number): void;
+	up(x: number, y: number): void;
+	moved(x: number, y: number): void;
+	dragged(x: number, y: number): void;
 }

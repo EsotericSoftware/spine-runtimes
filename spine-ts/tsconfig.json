@@ -7,8 +7,5 @@
 		{
 			"path": "./spine-canvas"
 		}
-	],
-	"paths": {
-		"@esotericsoftware/spine-core": "./spine-core/src/index.ts"
-	}
+	]
 }
