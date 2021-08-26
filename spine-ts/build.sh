@@ -16,7 +16,7 @@ ls build/*.js build/*.ts | awk '{print "unexpand -t 4 ", $0, " > /tmp/e; mv /tmp
 if ! [ -z "$TS_UPDATE_URL" ] && ! [ -z "$BRANCH" ];
 then
 	echo "Deploying spine-ts $BRANCH artifacts"
-	zip -j spine-ts.zip build/* player/css/spine-player.css player/example/external/*
+	zip -j spine-ts.zip build/* spine-player/css/spine-player.css spine-player/example/external/*
 	curl -F "file=@spine-ts.zip" "$TS_UPDATE_URL$BRANCH"
 else
 	echo "Not deploying artifacts. TS_UPDATE_URL and/or BRANCH not set."
