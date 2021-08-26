@@ -12,6 +12,9 @@
 		},
 		{
 			"path": "./spine-player"
+		},
+		{
+			"path": "./spine-threejs"
 		}
 	]
 }

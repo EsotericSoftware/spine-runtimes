@@ -3,11 +3,12 @@
   "version": "4.0.1",
   "description": "The official Spine Runtimes for the web.",
   "scripts": {
-    "build": "rm -rf build && npm run build:core && npm run build:canvas && npm run build:webgl && npm run build:player",
+    "build": "rm -rf build && npm run build:core && npm run build:canvas && npm run build:webgl && npm run build:player && npm run build:threejs",
     "build:core": "npx esbuild --bundle spine-core/src/index.ts --tsconfig=spine-core/tsconfig.json --minify --sourcemap --outfile=build/spine-core.js --format=iife --global-name=\"spine\"",
     "build:canvas": "npx esbuild --bundle spine-canvas/src/index.ts --tsconfig=spine-canvas/tsconfig.json --minify --sourcemap --outfile=build/spine-canvas.js --format=iife --global-name=\"spine\"",
     "build:webgl": "npx esbuild --bundle spine-webgl/src/index.ts --tsconfig=spine-webgl/tsconfig.json --minify --sourcemap --outfile=build/spine-webgl.js --format=iife --global-name=\"spine\"",
-    "build:player": "npx esbuild --bundle spine-player/src/index.ts --tsconfig=spine-player/tsconfig.json --sourcemap --outfile=build/spine-player.js --format=iife --global-name=\"spine\""
+    "build:player": "npx esbuild --bundle spine-player/src/index.ts --tsconfig=spine-player/tsconfig.json --sourcemap --outfile=build/spine-player.js --format=iife --global-name=\"spine\"",
+    "build:threejs": "npx esbuild --bundle spine-threejs/src/index.ts --tsconfig=spine-threejs/tsconfig.json --sourcemap --outfile=build/spine-threejs.js --external:three --format=iife --global-name=\"spine\""
   },
   "repository": {
     "type": "git",

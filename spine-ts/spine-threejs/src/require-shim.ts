@@ -27,13 +27,16 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { AssetManagerBase, Downloader } from "@esotericsoftware/spine-core"
-import { ThreeJsTexture } from "./ThreeJsTexture";
+declare global {
+	var require: any;
+}
 
-export class AssetManager extends AssetManagerBase {
-	constructor(pathPrefix: string = "", downloader: Downloader = null) {
-		super((image: HTMLImageElement) => {
-			return new ThreeJsTexture(image);
-		}, pathPrefix, downloader);
+if (window.THREE) {
+	let prevRequire = window.require;
+	window.require = (x: string) => {
+		if (prevRequire) return prevRequire(x);
+		else if (x === "three") return window.THREE;
 	}
 }
+
+export { }
