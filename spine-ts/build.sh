@@ -9,12 +9,8 @@ else
 fi
 
 echo "Building spine-ts $BRANCH artifacts"
-tsc -p tsconfig.json
-tsc -p tsconfig.core.json
-tsc -p tsconfig.webgl.json
-tsc -p tsconfig.canvas.json
-tsc -p tsconfig.threejs.json
-tsc -p tsconfig.player.json
+npm install
+npm run build
 ls build/*.js build/*.ts | awk '{print "unexpand -t 4 ", $0, " > /tmp/e; mv /tmp/e ", $0}' | sh
 
 if ! [ -z "$TS_UPDATE_URL" ] && ! [ -z "$BRANCH" ];
