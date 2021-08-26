@@ -17,7 +17,7 @@ if ! [ -z "$TS_UPDATE_URL" ] && ! [ -z "$BRANCH" ];
 then
 	echo "Deploying spine-ts $BRANCH artifacts"
 	zip -j spine-ts.zip build/* spine-player/css/spine-player.css spine-player/example/external/*
-	curl -F "file=@spine-ts.zip" "$TS_UPDATE_URL$BRANCH"
+	curl -f -F "file=@spine-ts.zip" "$TS_UPDATE_URL$BRANCH"
 else
 	echo "Not deploying artifacts. TS_UPDATE_URL and/or BRANCH not set."
 fi
