@@ -31,7 +31,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 
 (function () {
 	var timeKeeper = new spine.TimeKeeper();
-	function loop () {
+	function loop() {
 		timeKeeper.update();
 		if (spineDemos.log) console.log(timeKeeper.delta + ", " + timeKeeper.framesPerSecond);
 		requestAnimationFrame(loop);
@@ -73,12 +73,12 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 		demo.visible = (vertInView && horInView);
 	}
 
-	function createCanvases (numCanvases) {
+	function createCanvases(numCanvases) {
 		for (var i = 0; i < numCanvases; i++) {
 			var canvas = document.createElement("canvas");
 			canvas.width = 1; canvas.height = 1;
-			canvas.context = new spine.webgl.ManagedWebGLRenderingContext(canvas, { alpha: false });
-			canvas.id = "canvas-" + i;		
+			canvas.context = new spine.ManagedWebGLRenderingContext(canvas, { alpha: false });
+			canvas.id = "canvas-" + i;
 			spineDemos.canvases.push(canvas);
 		}
 	}
@@ -99,9 +99,9 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 		demo.placeholder = placeholder;
 		demo.canvas = canvas;
 		demo.visible = false;
-		var renderer = new spine.webgl.SceneRenderer(canvas, canvas.context.gl);
-		demo.loadingScreen = new spine.webgl.LoadingScreen(renderer);
-		$(window).on('DOMContentLoaded load resize scroll', function() {
+		var renderer = new spine.SceneRenderer(canvas, canvas.context.gl);
+		demo.loadingScreen = new spine.LoadingScreen(renderer);
+		$(window).on('DOMContentLoaded load resize scroll', function () {
 			checkElementVisible(demo);
 			renderDemo(demo);
 		});
@@ -109,8 +109,8 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 		spineDemos.demos.push(demo);
 	}
 
-	var coords = new spine.webgl.Vector3();
-	var mouse = new spine.webgl.Vector3();
+	var coords = new spine.Vector3();
+	var mouse = new spine.Vector3();
 	spineDemos.closest = function (canvas, renderer, skeleton, controlBones, hoverTargets, x, y) {
 		mouse.set(x, canvas.clientHeight - y, 0)
 		var bestDistance = 24, index = 0;
@@ -131,7 +131,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 		return best;
 	};
 
-	var position = new spine.webgl.Vector3();
+	var position = new spine.Vector3();
 	spineDemos.dragged = function (canvas, renderer, target, x, y) {
 		if (target) {
 			x = spine.MathUtils.clamp(x, 0, canvas.clientWidth)
@@ -149,7 +149,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 	};
 
 	loadSliders = function () {
-		$(window).resize(function() {
+		$(window).resize(function () {
 			$(".slider").each(function () {
 				$(this).data("slider").resized();
 			});
@@ -164,7 +164,7 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 			var hw = handle.width(), value = 0, object, lastX;
 			handle = handle[0].style;
 			positionHandle(0);
-			function positionHandle (percent) {
+			function positionHandle(percent) {
 				var w = div.width();
 				var x = Math.round((w - hw - 3) * percent + 1);
 				if (x != lastX) {
@@ -179,14 +179,14 @@ window.onerror = function (msg, url, lineNo, columnNo, error) {
 				}
 				value = percent;
 			}
-			function mouseEvent (e) {
+			function mouseEvent(e) {
 				var x = e.pageX;
 				if (!x && e.originalEvent.touches) x = e.originalEvent.touches[0].pageX;
 				var percent = Math.max(0, Math.min(1, (x - div.offset().left - hw / 2) / (div.width() - hw - 2)));
 				positionHandle(percent);
 				if (object.changed) object.changed(percent);
 			}
-			function clearEvents () {
+			function clearEvents() {
 				$(document).off("mouseup.slider mousemove.slider touchmove.slider touchend.slider");
 			}
 			div.on("mousedown touchstart", function (e) {

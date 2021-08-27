@@ -1,4 +1,4 @@
-var skinsDemo = function(canvas, bgColor) {
+var skinsDemo = function (canvas, bgColor) {
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, offset, bounds;
 	var timeKeeper;
@@ -7,17 +7,17 @@ var skinsDemo = function(canvas, bgColor) {
 
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
-	function init () {
+	function init() {
 		gl = canvas.context.gl;
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
+		renderer = new spine.SceneRenderer(canvas, gl);
+		assetManager = new spine.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("heroes.atlas");
 		assetManager.loadJson("demos.json");
-		input = new spine.webgl.Input(canvas);
+		input = new spine.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();
 	}
 
-	function loadingComplete () {
+	function loadingComplete() {
 		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("heroes.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
 		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").heroes);
@@ -38,13 +38,13 @@ var skinsDemo = function(canvas, bgColor) {
 		setupInput();
 	}
 
-	function setupInput (){
+	function setupInput() {
 		input.addListener({
-			down: function(x, y) {
+			down: function (x, y) {
 				swingSword();
 			},
-			up: function(x, y) { },
-			dragged: function(x, y) { },
+			up: function (x, y) { },
+			dragged: function (x, y) { },
 			moved: function (x, y) { }
 		});
 	}
@@ -103,7 +103,7 @@ var skinsDemo = function(canvas, bgColor) {
 			}
 			list.append(option);
 		}
-		list.change(function() {
+		list.change(function () {
 			activeSkin = $("#skins-skin option:selected").text();
 			skeleton.setSkinByName(activeSkin);
 			skeleton.setSlotsToSetupPose();
@@ -115,7 +115,7 @@ var skinsDemo = function(canvas, bgColor) {
 		randomizeSkins = document.getElementById("skins-randomizeskins");
 	}
 
-	function setSkin (skin) {
+	function setSkin(skin) {
 		var slot = skeleton.findSlot("item_near");
 		var weapon = slot.getAttachment();
 		skeleton.setSkin(skin);
@@ -123,26 +123,26 @@ var skinsDemo = function(canvas, bgColor) {
 		slot.setAttachment(weapon);
 	}
 
-	function swingSword () {
+	function swingSword() {
 		state.setAnimation(5, (clickAnim++ % 2 == 0) ? "meleeSwing2" : "meleeSwing1", false, 0);
 	}
 
-	function randomizeSkin () {
+	function randomizeSkin() {
 		var result;
 		var count = 0;
 		for (var skin in skeleton.data.skins) {
 			if (skeleton.data.skins[skin].name === "default") continue;
-			if (Math.random() < 1/++count) {
+			if (Math.random() < 1 / ++count) {
 				result = skeleton.data.skins[skin];
 			}
 		}
 		setSkin(result);
-		$("#skins-skin option").filter(function() {
+		$("#skins-skin option").filter(function () {
 			return ($(this).text() == result.name);
 		}).prop("selected", true);
 	}
 
-	function randomizeAttachments () {
+	function randomizeAttachments() {
 		var skins = [];
 		for (var skin in skeleton.data.skins) {
 			skin = skeleton.data.skins[skin];
@@ -162,7 +162,7 @@ var skinsDemo = function(canvas, bgColor) {
 		randomizeSkins.checked = false;
 	}
 
-	function render () {
+	function render() {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
 
@@ -178,7 +178,7 @@ var skinsDemo = function(canvas, bgColor) {
 		renderer.camera.position.y = offset.y + bounds.y / 2;
 		renderer.camera.viewportWidth = bounds.x * 3;
 		renderer.camera.viewportHeight = bounds.y * 1.2;
-		renderer.resize(spine.webgl.ResizeMode.Fit);
+		renderer.resize(spine.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);

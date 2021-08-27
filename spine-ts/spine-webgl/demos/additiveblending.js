@@ -1,4 +1,4 @@
-var additiveBlendingDemo = function(canvas, bgColor) {
+var additiveBlendingDemo = function (canvas, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -11,7 +11,7 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 	var target = null;
 	var dragging = false;
 	var handle = new spine.Vector2();
-	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.webgl.Vector3();
+	var coords = new spine.Vector3(), temp = new spine.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.Vector3();
 	var isPlaying = true;
 
 	var left, right, up, down;
@@ -25,10 +25,10 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 		return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
 	};
 
-	function init () {
+	function init() {
 		gl = canvas.context.gl;
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
+		renderer = new spine.SceneRenderer(canvas, gl);
+		assetManager = new spine.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas2.atlas");
 		assetManager.loadJson("demos.json");
 		timeKeeper = new spine.TimeKeeper();
@@ -36,7 +36,7 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 		cursor = document.getElementById("cursor");
 	}
 
-	function loadingComplete () {
+	function loadingComplete() {
 		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("atlas2.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
 		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").owl);
@@ -73,17 +73,17 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 		setupInput();
 	}
 
-	function calculateBlend (x, y, isPageCoords) {
+	function calculateBlend(x, y, isPageCoords) {
 		var canvasBounds = canvas.getBoundingClientRect();
 		var centerX = canvasBounds.x + canvasBounds.width / 2;
 		var centerY = canvasBounds.y + canvasBounds.height / 2;
 		right.alpha = x < centerX ? 1 - x / centerX : 0;
-		left.alpha = x > centerX ? (x - centerX) / (window.innerWidth - centerX): 0;
+		left.alpha = x > centerX ? (x - centerX) / (window.innerWidth - centerX) : 0;
 		up.alpha = y < centerY ? 1 - y / centerY : 0;
-		down.alpha = y > centerY ? (y - centerY) / (window.innerHeight - centerY): 0;
+		down.alpha = y > centerY ? (y - centerY) / (window.innerHeight - centerY) : 0;
 	}
 
-	function setupInput () {
+	function setupInput() {
 		if (!isMobileDevice()) {
 			document.addEventListener("mousemove", function (event) {
 				clientMouseX = event.clientX;
@@ -91,18 +91,18 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 				mouseMoved = true;
 			}, false);
 		} else {
-			var input = new spine.webgl.Input(canvas);
+			var input = new spine.Input(canvas);
 			input.addListener({
-				down: function(x, y) {
+				down: function (x, y) {
 					renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.clientWidth, canvas.clientHeight);
 					if (temp.set(handle.x, handle.y, 0).distance(coords) < canvas.width * HANDLE_SIZE) {
 						dragging = true;
 					}
 				},
-				up: function(x, y) {
+				up: function (x, y) {
 					dragging = false;
 				},
-				dragged: function(x, y) {
+				dragged: function (x, y) {
 					if (dragging && x > 0 && x < canvas.width && y > 0 && y < canvas.height) {
 						renderer.camera.screenToWorld(coords.set(x, y, 0), canvas.clientWidth, canvas.clientHeight);
 						handle.x = coords.x;
@@ -114,7 +114,7 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 		}
 	}
 
-	function render () {
+	function render() {
 		if (!isMobileDevice() && mouseMoved) calculateBlend(clientMouseX, clientMouseY, true);
 
 		timeKeeper.update();
@@ -126,7 +126,7 @@ var additiveBlendingDemo = function(canvas, bgColor) {
 
 		renderer.camera.viewportWidth = bounds.x * 1.4;
 		renderer.camera.viewportHeight = bounds.y * 1.4;
-		renderer.resize(spine.webgl.ResizeMode.Fit);
+		renderer.resize(spine.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);

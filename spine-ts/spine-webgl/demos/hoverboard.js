@@ -1,4 +1,4 @@
-var hoverboardDemo = function(canvas, bgColor) {
+var hoverboardDemo = function (canvas, bgColor) {
 	var COLOR_INNER = new spine.Color(0.8, 0, 0, 0.5);
 	var COLOR_OUTER = new spine.Color(0.8, 0, 0, 0.8);
 	var COLOR_INNER_SELECTED = new spine.Color(0.0, 0, 0.8, 0.5);
@@ -10,23 +10,23 @@ var hoverboardDemo = function(canvas, bgColor) {
 	var target = null;
 	var hoverTargets = [];
 	var controlBones = ["hoverboard controller", "hip controller", "board target", "crosshair"];
-	var coords = new spine.webgl.Vector3(), temp = new spine.webgl.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.webgl.Vector3();
+	var coords = new spine.Vector3(), temp = new spine.Vector3(), temp2 = new spine.Vector2(), temp3 = new spine.Vector3();
 	var isPlaying = true;
 
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
-	function init () {
+	function init() {
 		gl = canvas.context.gl;
 
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
+		renderer = new spine.SceneRenderer(canvas, gl);
+		assetManager = new spine.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas1.atlas");
 		assetManager.loadJson("demos.json");
-		input = new spine.webgl.Input(canvas);
+		input = new spine.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();
 	}
 
-	function loadingComplete () {
+	function loadingComplete() {
 		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("atlas1.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
 		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").spineboy);
@@ -51,12 +51,12 @@ var hoverboardDemo = function(canvas, bgColor) {
 		setupInput();
 	}
 
-	function setupUI () {
+	function setupUI() {
 		var checkbox = $("#hoverboard-drawbones");
 		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
 		renderer.skeletonDebugRenderer.drawPaths = false;
 		renderer.skeletonDebugRenderer.drawBones = false;
-		checkbox.change(function() {
+		checkbox.change(function () {
 			renderer.skeletonDebugRenderer.drawPaths = this.checked;
 			renderer.skeletonDebugRenderer.drawBones = this.checked;
 		});
@@ -92,17 +92,17 @@ var hoverboardDemo = function(canvas, bgColor) {
 		});
 	}
 
-	function setupInput () {
+	function setupInput() {
 		input.addListener({
-			down: function(x, y) {
+			down: function (x, y) {
 				isPlaying = false;
 				target = spineDemos.closest(canvas, renderer, skeleton, controlBones, hoverTargets, x, y);
 			},
-			up: function(x, y) {
+			up: function (x, y) {
 				if (target && target.data.name == "crosshair") $("#hoverboard-shoot").click();
 				target = null;
 			},
-			dragged: function(x, y) {
+			dragged: function (x, y) {
 				spineDemos.dragged(canvas, renderer, target, x, y);
 			},
 			moved: function (x, y) {
@@ -111,7 +111,7 @@ var hoverboardDemo = function(canvas, bgColor) {
 		});
 	}
 
-	function render () {
+	function render() {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
 
@@ -121,7 +121,7 @@ var hoverboardDemo = function(canvas, bgColor) {
 
 		renderer.camera.viewportWidth = bounds.x * 1.2;
 		renderer.camera.viewportHeight = bounds.y * 1.2;
-		renderer.resize(spine.webgl.ResizeMode.Fit);
+		renderer.resize(spine.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);

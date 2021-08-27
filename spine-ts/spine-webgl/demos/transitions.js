@@ -1,4 +1,4 @@
-var transitionsDemo = function(canvas, loadingComplete, bgColor) {
+var transitionsDemo = function (canvas, loadingComplete, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);
 
 	var canvas, gl, renderer, input, assetManager;
@@ -8,13 +8,13 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
-	function init () {
+	function init() {
 		gl = canvas.context.gl;
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
+		renderer = new spine.SceneRenderer(canvas, gl);
+		assetManager = new spine.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas1.atlas");
 		assetManager.loadJson("demos.json");
-		input = new spine.webgl.Input(canvas);
+		input = new spine.Input(canvas);
 		timeKeeper = new spine.TimeKeeper();
 
 		timeSlider = $("#transitions-timeslider").data("slider");
@@ -22,7 +22,7 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 		timeSliderLabel = $("#transitions-timeslider-label")[0];
 	}
 
-	function loadingComplete () {
+	function loadingComplete() {
 		skeleton = loadSkeleton("spineboy");
 		skeletonNoMix = new spine.Skeleton(skeleton.data);
 		state = createState(0.25);
@@ -51,14 +51,14 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 		});
 	}
 
-	function createState (mix) {
+	function createState(mix) {
 		var stateData = new spine.AnimationStateData(skeleton.data);
 		stateData.defaultMix = mix;
 		var state = new spine.AnimationState(stateData);
 		return state;
 	}
 
-	function setAnimations (state, delay, first) {
+	function setAnimations(state, delay, first) {
 		state.addAnimation(0, "idle", true, first);
 		state.addAnimation(0, "walk", true, 0.6);
 		state.addAnimation(0, "jump", false, 1);
@@ -84,7 +84,7 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 		return skeleton;
 	}
 
-	function render () {
+	function render() {
 		timeKeeper.update();
 		var delta = timeKeeper.delta * timeSlider.get();
 		if (timeSliderLabel) {
@@ -100,7 +100,7 @@ var transitionsDemo = function(canvas, loadingComplete, bgColor) {
 		renderer.camera.position.y = offset.y + size.y / 2 - 40;
 		renderer.camera.viewportWidth = size.x * 2;
 		renderer.camera.viewportHeight = size.y * 2;
-		renderer.resize(spine.webgl.ResizeMode.Fit);
+		renderer.resize(spine.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);

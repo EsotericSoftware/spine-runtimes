@@ -1,4 +1,4 @@
-var spritesheetsDemo = function(canvas, bgColor) {
+var spritesheetsDemo = function (canvas, bgColor) {
 	var SKELETON_ATLAS_COLOR = new spine.Color(0, 0.8, 0, 0.8);
 	var FRAME_ATLAS_COLOR = new spine.Color(0.8, 0, 0, 0.8);
 
@@ -13,17 +13,17 @@ var spritesheetsDemo = function(canvas, bgColor) {
 
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
-	function init () {
+	function init() {
 		gl = canvas.context.gl;
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
+		renderer = new spine.SceneRenderer(canvas, gl);
+		assetManager = new spine.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas1.atlas");
 		assetManager.loadJson("demos.json");
 		timeKeeper = new spine.TimeKeeper();
-		input = new spine.webgl.Input(canvas);
+		input = new spine.Input(canvas);
 	}
 
-	function loadingComplete () {
+	function loadingComplete() {
 		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("atlas1.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
 		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").raptor);
@@ -55,20 +55,20 @@ var spritesheetsDemo = function(canvas, bgColor) {
 		$("#spritesheets-overlay").addClass("overlay");
 	}
 
-	function setupUI () {
+	function setupUI() {
 		timeSlider = $("#spritesheets-timeslider").data("slider");
 		timeSlider.set(0.5);
 		timeSliderLabel = $("#spritesheets-timeslider-label")[0];
 	}
 
-	function setupInput () {
+	function setupInput() {
 		input.addListener({
-			down: function(x, y) {
+			down: function (x, y) {
 				setAnimation((clickAnim++ % 2 == 0) ? "roar" : "jump");
 			},
-			up: function(x, y) { },
-			moved: function(x, y) {	},
-			dragged: function(x, y) { }
+			up: function (x, y) { },
+			moved: function (x, y) { },
+			dragged: function (x, y) { }
 		});
 		$("#spritesheets-roar").click(function () {
 			setAnimation("roar");
@@ -78,20 +78,20 @@ var spritesheetsDemo = function(canvas, bgColor) {
 		});
 	}
 
-	function setAnimation (name) {
+	function setAnimation(name) {
 		animationState.setAnimation(0, name, false);
 		animationState.addAnimation(0, "walk", true, 0);
 	}
 
-	function resize () {
+	function resize() {
 		renderer.camera.position.x = offset.x + viewportWidth / 2 - 25;
 		renderer.camera.position.y = offset.y + viewportHeight / 2 - 100;
 		renderer.camera.viewportWidth = viewportWidth * 1.2;
 		renderer.camera.viewportHeight = viewportHeight * 1.2;
-		renderer.resize(spine.webgl.ResizeMode.Fit);
+		renderer.resize(spine.ResizeMode.Fit);
 	}
 
-	function render () {
+	function render() {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
 

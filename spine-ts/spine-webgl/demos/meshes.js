@@ -1,4 +1,4 @@
-var meshesDemo = function(canvas, bgColor) {
+var meshesDemo = function (canvas, bgColor) {
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, bounds;
 	var timeKeeper;
@@ -8,17 +8,17 @@ var meshesDemo = function(canvas, bgColor) {
 
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
-	function init () {
+	function init() {
 		gl = canvas.context.gl;
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);
+		renderer = new spine.SceneRenderer(canvas, gl);
 		renderer.skeletonDebugRenderer.drawRegionAttachments = false;
-		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
+		assetManager = new spine.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas2.atlas");
 		assetManager.loadJson("demos.json");
 		timeKeeper = new spine.TimeKeeper();
 	}
 
-	function loadingComplete () {
+	function loadingComplete() {
 		timeKeeper.update();
 		skeletons["Orange Girl"] = loadSkeleton("orangegirl", "animation");
 		skeletons["Green Girl"] = loadSkeleton("greengirl", "animation");
@@ -59,7 +59,7 @@ var meshesDemo = function(canvas, bgColor) {
 			if (skeletonName === activeSkeleton) option.attr("selected", "selected");
 			list.append(option);
 		}
-		list.change(function() {
+		list.change(function () {
 			activeSkeleton = $("#meshes-skeleton option:selected").text();
 			var active = skeletons[activeSkeleton];
 			var animationDuration = active.state.getCurrent(0).animation.duration;
@@ -67,13 +67,13 @@ var meshesDemo = function(canvas, bgColor) {
 		})
 
 		renderer.skeletonDebugRenderer.drawBones = false;
-		$("#meshes-drawbonescheckbox").click(function() {
+		$("#meshes-drawbonescheckbox").click(function () {
 			renderer.skeletonDebugRenderer.drawBones = this.checked;
 		})
 
 		renderer.skeletonDebugRenderer.drawMeshHull = false;
 		renderer.skeletonDebugRenderer.drawMeshTriangles = false;
-		$("#meshes-drawmeshtrianglescheckbox").click(function() {
+		$("#meshes-drawmeshtrianglescheckbox").click(function () {
 			renderer.skeletonDebugRenderer.drawMeshHull = this.checked;
 			renderer.skeletonDebugRenderer.drawMeshTriangles = this.checked;
 		})
@@ -105,7 +105,7 @@ var meshesDemo = function(canvas, bgColor) {
 		};
 	}
 
-	function render () {
+	function render() {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
 
@@ -119,7 +119,7 @@ var meshesDemo = function(canvas, bgColor) {
 		renderer.camera.position.y = offset.y + size.y / 2 + 20;
 		renderer.camera.viewportWidth = size.x * 1.1;
 		renderer.camera.viewportHeight = size.y * 1.1;
-		renderer.resize(spine.webgl.ResizeMode.Fit);
+		renderer.resize(spine.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);

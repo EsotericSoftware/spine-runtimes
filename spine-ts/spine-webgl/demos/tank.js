@@ -1,4 +1,4 @@
-var tankDemo = function(canvas, bgColor) {
+var tankDemo = function (canvas, bgColor) {
 	var canvas, gl, renderer, input, assetManager;
 	var skeleton, state, offset, bounds;
 	var timeKeeper;
@@ -6,16 +6,16 @@ var tankDemo = function(canvas, bgColor) {
 
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
-	function init () {
+	function init() {
 		gl = canvas.context.gl;
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
+		renderer = new spine.SceneRenderer(canvas, gl);
+		assetManager = new spine.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas2.atlas");
 		assetManager.loadJson("demos.json");
 		timeKeeper = new spine.TimeKeeper();
 	}
 
-	function loadingComplete () {
+	function loadingComplete() {
 		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("atlas2.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
 		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").tank);
@@ -65,13 +65,13 @@ var tankDemo = function(canvas, bgColor) {
 
 		renderer.skeletonDebugRenderer.drawPaths = false;
 		renderer.skeletonDebugRenderer.drawBones = false;
-		$("#tank-drawbones").change(function() {
+		$("#tank-drawbones").change(function () {
 			renderer.skeletonDebugRenderer.drawPaths = this.checked;
 			renderer.skeletonDebugRenderer.drawBones = this.checked;
 		});
 	}
 
-	function render () {
+	function render() {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
 
@@ -94,7 +94,7 @@ var tankDemo = function(canvas, bgColor) {
 		renderer.camera.position.y = bounds.y - 505;
 		renderer.camera.viewportWidth = bounds.x * 1.2;
 		renderer.camera.viewportHeight = bounds.y * 1.2;
-		renderer.resize(spine.webgl.ResizeMode.Fit);
+		renderer.resize(spine.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);

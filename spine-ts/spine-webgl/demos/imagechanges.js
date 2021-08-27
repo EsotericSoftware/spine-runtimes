@@ -1,4 +1,4 @@
-var imageChangesDemo = function(canvas, bgColor) {
+var imageChangesDemo = function (canvas, bgColor) {
 	var OUTLINE_COLOR = new spine.Color(0, 0.8, 0, 1);
 
 	var canvas, gl, renderer, input, assetManager;
@@ -10,16 +10,16 @@ var imageChangesDemo = function(canvas, bgColor) {
 
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
-	function init () {
+	function init() {
 		gl = canvas.context.gl;
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
+		renderer = new spine.SceneRenderer(canvas, gl);
+		assetManager = new spine.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas1.atlas");
 		assetManager.loadJson("demos.json");
 		timeKeeper = new spine.TimeKeeper();
 	}
 
-	function loadingComplete () {
+	function loadingComplete() {
 		skeletons["Alien"] = loadSkeleton("alien", "death", ["head", "splat-fg", "splat-bg"]);
 		skeletons["Dragon"] = loadSkeleton("dragon", "flying", ["R_wing"])
 		setupUI();
@@ -58,7 +58,7 @@ var imageChangesDemo = function(canvas, bgColor) {
 			if (skeletonName === activeSkeleton) option.attr("selected", "selected");
 			list.append(option);
 		}
-		list.change(function() {
+		list.change(function () {
 			activeSkeleton = $("#imagechanges-skeleton option:selected").text();
 			var active = skeletons[activeSkeleton];
 			var animationDuration = active.state.getCurrent(0).animation.duration;
@@ -83,7 +83,7 @@ var imageChangesDemo = function(canvas, bgColor) {
 		skeleton.getBounds(offset, size, []);
 
 		var regions = [];
-		for(var i = 0; i < sequenceSlots.length; i++) {
+		for (var i = 0; i < sequenceSlots.length; i++) {
 			var slot = skeleton.findSlot(sequenceSlots[i]);
 			sequenceSlots[i] = slot;
 			var index = slot.data.index;
@@ -104,7 +104,7 @@ var imageChangesDemo = function(canvas, bgColor) {
 		};
 	}
 
-	function render () {
+	function render() {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
 
@@ -127,7 +127,7 @@ var imageChangesDemo = function(canvas, bgColor) {
 		}
 		renderer.camera.viewportWidth = size.x * 2.4 / zoom;
 		renderer.camera.viewportHeight = size.y * 1.4 / zoom;
-		renderer.resize(spine.webgl.ResizeMode.Fit);
+		renderer.resize(spine.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);
@@ -156,7 +156,7 @@ var imageChangesDemo = function(canvas, bgColor) {
 		for (var i = 0, n = active.regions.length; i < n; i++) {
 			var region = active.regions[i].region;
 			var scale = Math.min(slotSize / region.height, slotSize / region.width) / zoom;
-			renderer.drawRegion(region, x,  y, region.width * scale, region.height * scale);
+			renderer.drawRegion(region, x, y, region.width * scale, region.height * scale);
 
 			for (var ii = 0; ii < active.slots.length; ii++) {
 				var slot = active.slots[ii];

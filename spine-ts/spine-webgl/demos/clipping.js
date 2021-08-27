@@ -1,4 +1,4 @@
-var clippingDemo = function(canvas, bgColor) {
+var clippingDemo = function (canvas, bgColor) {
 	var gl, renderer, assetManager;
 	var skeleton, state, bounds;
 	var timeKeeper;
@@ -6,16 +6,16 @@ var clippingDemo = function(canvas, bgColor) {
 
 	if (!bgColor) bgColor = new spine.Color(235 / 255, 239 / 255, 244 / 255, 1);
 
-	function init () {
+	function init() {
 		gl = canvas.context.gl;
-		renderer = new spine.webgl.SceneRenderer(canvas, gl);
-		assetManager = new spine.webgl.AssetManager(gl, spineDemos.path, spineDemos.downloader);
+		renderer = new spine.SceneRenderer(canvas, gl);
+		assetManager = new spine.AssetManager(gl, spineDemos.path, spineDemos.downloader);
 		assetManager.loadTextureAtlas("atlas1.atlas");
 		assetManager.loadJson("demos.json");
 		timeKeeper = new spine.TimeKeeper();
 	}
 
-	function loadingComplete () {
+	function loadingComplete() {
 		var atlasLoader = new spine.AtlasAttachmentLoader(assetManager.get("atlas1.atlas"));
 		var skeletonJson = new spine.SkeletonJson(atlasLoader);
 		var skeletonData = skeletonJson.readSkeletonData(assetManager.get("demos.json").spineboy);
@@ -67,7 +67,7 @@ var clippingDemo = function(canvas, bgColor) {
 		renderer.skeletonDebugRenderer.drawBones = false;
 		renderer.skeletonDebugRenderer.drawMeshHull = false;
 		renderer.skeletonDebugRenderer.drawMeshTriangles = false;
-		$("#clipping-drawtriangles").click(function() {
+		$("#clipping-drawtriangles").click(function () {
 			renderer.skeletonDebugRenderer.drawMeshHull = this.checked;
 			renderer.skeletonDebugRenderer.drawMeshTriangles = this.checked;
 			renderer.skeletonDebugRenderer.drawClipping = this.checked;
@@ -75,7 +75,7 @@ var clippingDemo = function(canvas, bgColor) {
 		})
 	}
 
-	function render () {
+	function render() {
 		timeKeeper.update();
 		var delta = timeKeeper.delta;
 
@@ -93,7 +93,7 @@ var clippingDemo = function(canvas, bgColor) {
 
 		renderer.camera.viewportWidth = bounds.x * 1.6;
 		renderer.camera.viewportHeight = bounds.y * 1.6;
-		renderer.resize(spine.webgl.ResizeMode.Fit);
+		renderer.resize(spine.ResizeMode.Fit);
 
 		gl.clearColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a);
 		gl.clear(gl.COLOR_BUFFER_BIT);

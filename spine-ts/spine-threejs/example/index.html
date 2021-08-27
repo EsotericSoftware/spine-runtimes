@@ -52,7 +52,7 @@
 				canvas = renderer.domElement;
 
 				// load the assets required to display the Raptor model
-				assetManager = new spine.threejs.AssetManager(baseUrl);
+				assetManager = new spine.AssetManager(baseUrl);
 				assetManager.loadText(skeletonFile);
 				assetManager.loadTextureAtlas(atlasFile);
 
@@ -82,7 +82,7 @@
 					var skeletonData = skeletonJson.readSkeletonData(assetManager.require(skeletonFile));
 
 					// Create a SkeletonMesh from the data and attach it to the scene
-					skeletonMesh = new spine.threejs.SkeletonMesh(skeletonData, function (parameters) {
+					skeletonMesh = new spine.SkeletonMesh(skeletonData, function (parameters) {
 						parameters.depthTest = false;
 					});
 					skeletonMesh.state.setAnimation(0, animation, true);
