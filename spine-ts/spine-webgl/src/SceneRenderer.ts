@@ -60,7 +60,7 @@ export class SceneRenderer implements Disposable {
 	skeletonRenderer: SkeletonRenderer;
 	skeletonDebugRenderer: SkeletonDebugRenderer;
 
-	constructor(canvas: HTMLCanvasElement, context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true) {
+	constructor (canvas: HTMLCanvasElement, context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true) {
 		this.canvas = canvas;
 		this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 		this.twoColorTint = twoColorTint;
@@ -73,24 +73,24 @@ export class SceneRenderer implements Disposable {
 		this.skeletonDebugRenderer = new SkeletonDebugRenderer(this.context);
 	}
 
-	begin() {
+	begin () {
 		this.camera.update();
 		this.enableRenderer(this.batcher);
 	}
 
-	drawSkeleton(skeleton: Skeleton, premultipliedAlpha = false, slotRangeStart = -1, slotRangeEnd = -1) {
+	drawSkeleton (skeleton: Skeleton, premultipliedAlpha = false, slotRangeStart = -1, slotRangeEnd = -1) {
 		this.enableRenderer(this.batcher);
 		this.skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
 		this.skeletonRenderer.draw(this.batcher, skeleton, slotRangeStart, slotRangeEnd);
 	}
 
-	drawSkeletonDebug(skeleton: Skeleton, premultipliedAlpha = false, ignoredBones: Array<string> = null) {
+	drawSkeletonDebug (skeleton: Skeleton, premultipliedAlpha = false, ignoredBones: Array<string> = null) {
 		this.enableRenderer(this.shapes);
 		this.skeletonDebugRenderer.premultipliedAlpha = premultipliedAlpha;
 		this.skeletonDebugRenderer.draw(this.shapes, skeleton, ignoredBones);
 	}
 
-	drawTexture(texture: GLTexture, x: number, y: number, width: number, height: number, color: Color = null) {
+	drawTexture (texture: GLTexture, x: number, y: number, width: number, height: number, color: Color = null) {
 		this.enableRenderer(this.batcher);
 		if (color === null) color = WHITE;
 		var i = 0;
@@ -153,7 +153,7 @@ export class SceneRenderer implements Disposable {
 		this.batcher.draw(texture, quad, QUAD_TRIANGLES);
 	}
 
-	drawTextureUV(texture: GLTexture, x: number, y: number, width: number, height: number, u: number, v: number, u2: number, v2: number, color: Color = null) {
+	drawTextureUV (texture: GLTexture, x: number, y: number, width: number, height: number, u: number, v: number, u2: number, v2: number, color: Color = null) {
 		this.enableRenderer(this.batcher);
 		if (color === null) color = WHITE;
 		var i = 0;
@@ -216,7 +216,7 @@ export class SceneRenderer implements Disposable {
 		this.batcher.draw(texture, quad, QUAD_TRIANGLES);
 	}
 
-	drawTextureRotated(texture: GLTexture, x: number, y: number, width: number, height: number, pivotX: number, pivotY: number, angle: number, color: Color = null) {
+	drawTextureRotated (texture: GLTexture, x: number, y: number, width: number, height: number, pivotX: number, pivotY: number, angle: number, color: Color = null) {
 		this.enableRenderer(this.batcher);
 		if (color === null) color = WHITE;
 
@@ -346,7 +346,7 @@ export class SceneRenderer implements Disposable {
 		this.batcher.draw(texture, quad, QUAD_TRIANGLES);
 	}
 
-	drawRegion(region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color: Color = null) {
+	drawRegion (region: TextureAtlasRegion, x: number, y: number, width: number, height: number, color: Color = null) {
 		this.enableRenderer(this.batcher);
 		if (color === null) color = WHITE;
 		var i = 0;
@@ -409,53 +409,53 @@ export class SceneRenderer implements Disposable {
 		this.batcher.draw(<GLTexture>region.page.texture, quad, QUAD_TRIANGLES);
 	}
 
-	line(x: number, y: number, x2: number, y2: number, color: Color = null, color2: Color = null) {
+	line (x: number, y: number, x2: number, y2: number, color: Color = null, color2: Color = null) {
 		this.enableRenderer(this.shapes);
 		this.shapes.line(x, y, x2, y2, color);
 	}
 
-	triangle(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color: Color = null, color2: Color = null, color3: Color = null) {
+	triangle (filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color: Color = null, color2: Color = null, color3: Color = null) {
 		this.enableRenderer(this.shapes);
 		this.shapes.triangle(filled, x, y, x2, y2, x3, y3, color, color2, color3);
 	}
 
-	quad(filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, color: Color = null, color2: Color = null, color3: Color = null, color4: Color = null) {
+	quad (filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, color: Color = null, color2: Color = null, color3: Color = null, color4: Color = null) {
 		this.enableRenderer(this.shapes);
 		this.shapes.quad(filled, x, y, x2, y2, x3, y3, x4, y4, color, color2, color3, color4);
 	}
 
-	rect(filled: boolean, x: number, y: number, width: number, height: number, color: Color = null) {
+	rect (filled: boolean, x: number, y: number, width: number, height: number, color: Color = null) {
 		this.enableRenderer(this.shapes);
 		this.shapes.rect(filled, x, y, width, height, color);
 	}
 
-	rectLine(filled: boolean, x1: number, y1: number, x2: number, y2: number, width: number, color: Color = null) {
+	rectLine (filled: boolean, x1: number, y1: number, x2: number, y2: number, width: number, color: Color = null) {
 		this.enableRenderer(this.shapes);
 		this.shapes.rectLine(filled, x1, y1, x2, y2, width, color);
 	}
 
-	polygon(polygonVertices: ArrayLike<number>, offset: number, count: number, color: Color = null) {
+	polygon (polygonVertices: ArrayLike<number>, offset: number, count: number, color: Color = null) {
 		this.enableRenderer(this.shapes);
 		this.shapes.polygon(polygonVertices, offset, count, color);
 	}
 
-	circle(filled: boolean, x: number, y: number, radius: number, color: Color = null, segments: number = 0) {
+	circle (filled: boolean, x: number, y: number, radius: number, color: Color = null, segments: number = 0) {
 		this.enableRenderer(this.shapes);
 		this.shapes.circle(filled, x, y, radius, color, segments);
 	}
 
-	curve(x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color: Color = null) {
+	curve (x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color: Color = null) {
 		this.enableRenderer(this.shapes);
 		this.shapes.curve(x1, y1, cx1, cy1, cx2, cy2, x2, y2, segments, color);
 	}
 
-	end() {
+	end () {
 		if (this.activeRenderer === this.batcher) this.batcher.end();
 		else if (this.activeRenderer === this.shapes) this.shapes.end();
 		this.activeRenderer = null;
 	}
 
-	resize(resizeMode: ResizeMode) {
+	resize (resizeMode: ResizeMode) {
 		let canvas = this.canvas;
 		var dpr = window.devicePixelRatio || 1;
 		var w = Math.round(canvas.clientWidth * dpr);
@@ -481,7 +481,7 @@ export class SceneRenderer implements Disposable {
 		this.camera.update();
 	}
 
-	private enableRenderer(renderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer) {
+	private enableRenderer (renderer: PolygonBatcher | ShapeRenderer | SkeletonDebugRenderer) {
 		if (this.activeRenderer === renderer) return;
 		this.end();
 		if (renderer instanceof PolygonBatcher) {
@@ -499,7 +499,7 @@ export class SceneRenderer implements Disposable {
 			this.activeRenderer = this.skeletonDebugRenderer;
 	}
 
-	dispose() {
+	dispose () {
 		this.batcher.dispose();
 		this.batcherShader.dispose();
 		this.shapes.dispose();

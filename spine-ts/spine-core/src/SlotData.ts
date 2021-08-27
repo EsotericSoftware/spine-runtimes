@@ -55,7 +55,7 @@ export class SlotData {
 	/** The blend mode for drawing the slot's attachment. */
 	blendMode: BlendMode;
 
-	constructor(index: number, name: string, boneData: BoneData) {
+	constructor (index: number, name: string, boneData: BoneData) {
 		if (index < 0) throw new Error("index must be >= 0.");
 		if (!name) throw new Error("name cannot be null.");
 		if (!boneData) throw new Error("boneData cannot be null.");

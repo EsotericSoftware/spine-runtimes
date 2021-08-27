@@ -49,7 +49,7 @@ export class LoadingScreen {
 	backgroundColor = new Color(0.135, 0.135, 0.135, 1);
 	private tempColor = new Color();
 
-	constructor(renderer: SceneRenderer) {
+	constructor (renderer: SceneRenderer) {
 		this.renderer = renderer;
 
 		this.timeKeeper.maxDelta = 9;
@@ -70,7 +70,7 @@ export class LoadingScreen {
 		}
 	}
 
-	draw(complete = false) {
+	draw (complete = false) {
 		if (loaded < 2 || (complete && this.fadeOut > FADE_OUT)) return;
 
 		this.timeKeeper.update();

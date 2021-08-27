@@ -63,7 +63,7 @@ export class Slot {
 	 * See {@link VertexAttachment#computeWorldVertices()} and {@link DeformTimeline}. */
 	deform = new Array<number>();
 
-	constructor(data: SlotData, bone: Bone) {
+	constructor (data: SlotData, bone: Bone) {
 		if (!data) throw new Error("data cannot be null.");
 		if (!bone) throw new Error("bone cannot be null.");
 		this.data = data;
@@ -74,12 +74,12 @@ export class Slot {
 	}
 
 	/** The skeleton this slot belongs to. */
-	getSkeleton(): Skeleton {
+	getSkeleton (): Skeleton {
 		return this.bone.skeleton;
 	}
 
 	/** The current attachment for the slot, or null if the slot has no attachment. */
-	getAttachment(): Attachment {
+	getAttachment (): Attachment {
 		return this.attachment;
 	}
 
@@ -87,7 +87,7 @@ export class Slot {
 	 * The deform is not cleared if the old attachment has the same {@link VertexAttachment#getDeformAttachment()} as the specified
 	 * attachment.
 	 * @param attachment May be null. */
-	setAttachment(attachment: Attachment) {
+	setAttachment (attachment: Attachment) {
 		if (this.attachment == attachment) return;
 		if (!(attachment instanceof VertexAttachment) || !(this.attachment instanceof VertexAttachment)
 			|| (<VertexAttachment>attachment).deformAttachment != (<VertexAttachment>this.attachment).deformAttachment) {
@@ -97,18 +97,18 @@ export class Slot {
 		this.attachmentTime = this.bone.skeleton.time;
 	}
 
-	setAttachmentTime(time: number) {
+	setAttachmentTime (time: number) {
 		this.attachmentTime = this.bone.skeleton.time - time;
 	}
 
 	/** The time that has elapsed since the last time the attachment was set or cleared. Relies on Skeleton
 	 * {@link Skeleton#time}. */
-	getAttachmentTime(): number {
+	getAttachmentTime (): number {
 		return this.bone.skeleton.time - this.attachmentTime;
 	}
 
 	/** Sets this slot to the setup pose. */
-	setToSetupPose() {
+	setToSetupPose () {
 		this.color.setFromColor(this.data.color);
 		if (this.darkColor) this.darkColor.setFromColor(this.data.darkColor);
 		if (!this.data.attachmentName)

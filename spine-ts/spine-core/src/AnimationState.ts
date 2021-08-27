@@ -40,7 +40,7 @@ import { Event } from "./Event";
  *
  * See [Applying Animations](http://esotericsoftware.com/spine-applying-animations/) in the Spine Runtimes Guide. */
 export class AnimationState {
-	private static emptyAnimation(): Animation {
+	private static emptyAnimation (): Animation {
 		if (!_emptyAnimation) _emptyAnimation = new Animation("<empty>", [], 0);
 		return _emptyAnimation;
 	}
@@ -66,12 +66,12 @@ export class AnimationState {
 
 	trackEntryPool = new Pool<TrackEntry>(() => new TrackEntry());
 
-	constructor(data: AnimationStateData) {
+	constructor (data: AnimationStateData) {
 		this.data = data;
 	}
 
 	/** Increments each track entry {@link TrackEntry#trackTime()}, setting queued animations as current if needed. */
-	update(delta: number) {
+	update (delta: number) {
 		delta *= this.timeScale;
 		let tracks = this.tracks;
 		for (let i = 0, n = tracks.length; i < n; i++) {
@@ -129,7 +129,7 @@ export class AnimationState {
 	}
 
 	/** Returns true when all mixing from entries are complete. */
-	updateMixingFrom(to: TrackEntry, delta: number): boolean {
+	updateMixingFrom (to: TrackEntry, delta: number): boolean {
 		let from = to.mixingFrom;
 		if (!from) return true;
 
@@ -158,7 +158,7 @@ export class AnimationState {
 	/** Poses the skeleton using the track entry animations. There are no side effects other than invoking listeners, so the
 	 * animation state can be applied to multiple skeletons to pose them identically.
 	 * @returns True if any animations were applied. */
-	apply(skeleton: Skeleton): boolean {
+	apply (skeleton: Skeleton): boolean {
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 		if (this.animationsChanged) this._animationsChanged();
 
@@ -244,7 +244,7 @@ export class AnimationState {
 		return applied;
 	}
 
-	applyMixingFrom(to: TrackEntry, skeleton: Skeleton, blend: MixBlend) {
+	applyMixingFrom (to: TrackEntry, skeleton: Skeleton, blend: MixBlend) {
 		let from = to.mixingFrom;
 		if (from.mixingFrom) this.applyMixingFrom(from, skeleton, blend);
 
@@ -333,7 +333,7 @@ export class AnimationState {
 		return mix;
 	}
 
-	applyAttachmentTimeline(timeline: AttachmentTimeline, skeleton: Skeleton, time: number, blend: MixBlend, attachments: boolean) {
+	applyAttachmentTimeline (timeline: AttachmentTimeline, skeleton: Skeleton, time: number, blend: MixBlend, attachments: boolean) {
 		var slot = skeleton.slots[timeline.slotIndex];
 		if (!slot.bone.active) return;
 
@@ -347,12 +347,12 @@ export class AnimationState {
 		if (slot.attachmentState <= this.unkeyedState) slot.attachmentState = this.unkeyedState + SETUP;
 	}
 
-	setAttachment(skeleton: Skeleton, slot: Slot, attachmentName: string, attachments: boolean) {
+	setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: string, attachments: boolean) {
 		slot.setAttachment(!attachmentName ? null : skeleton.getAttachment(slot.data.index, attachmentName));
 		if (attachments) slot.attachmentState = this.unkeyedState + CURRENT;
 	}
 
-	applyRotateTimeline(timeline: RotateTimeline, skeleton: Skeleton, time: number, alpha: number, blend: MixBlend,
+	applyRotateTimeline (timeline: RotateTimeline, skeleton: Skeleton, time: number, alpha: number, blend: MixBlend,
 		timelinesRotation: Array<number>, i: number, firstFrame: boolean) {
 
 		if (firstFrame) timelinesRotation[i] = 0;
@@ -410,7 +410,7 @@ export class AnimationState {
 		bone.rotation = r1 + total * alpha;
 	}
 
-	queueEvents(entry: TrackEntry, animationTime: number) {
+	queueEvents (entry: TrackEntry, animationTime: number) {
 		let animationStart = entry.animationStart, animationEnd = entry.animationEnd;
 		let duration = animationEnd - animationStart;
 		let trackLastWrapped = entry.trackLast % duration;
@@ -445,7 +445,7 @@ export class AnimationState {
 	 *
 	 * It may be desired to use {@link AnimationState#setEmptyAnimation()} to mix the skeletons back to the setup pose,
 	 * rather than leaving them in their current pose. */
-	clearTracks() {
+	clearTracks () {
 		let oldDrainDisabled = this.queue.drainDisabled;
 		this.queue.drainDisabled = true;
 		for (let i = 0, n = this.tracks.length; i < n; i++)
@@ -459,7 +459,7 @@ export class AnimationState {
 	 *
 	 * It may be desired to use {@link AnimationState#setEmptyAnimation()} to mix the skeletons back to the setup pose,
 	 * rather than leaving them in their current pose. */
-	clearTrack(trackIndex: number) {
+	clearTrack (trackIndex: number) {
 		if (trackIndex >= this.tracks.length) return;
 		let current = this.tracks[trackIndex];
 		if (!current) return;
@@ -483,7 +483,7 @@ export class AnimationState {
 		this.queue.drain();
 	}
 
-	setCurrent(index: number, current: TrackEntry, interrupt: boolean) {
+	setCurrent (index: number, current: TrackEntry, interrupt: boolean) {
 		let from = this.expandToIndex(index);
 		this.tracks[index] = current;
 		current.previous = null;
@@ -507,7 +507,7 @@ export class AnimationState {
 	/** Sets an animation by name.
 	  *
 	  * See {@link #setAnimationWith()}. */
-	setAnimation(trackIndex: number, animationName: string, loop: boolean = false) {
+	setAnimation (trackIndex: number, animationName: string, loop: boolean = false) {
 		let animation = this.data.skeletonData.findAnimation(animationName);
 		if (!animation) throw new Error("Animation not found: " + animationName);
 		return this.setAnimationWith(trackIndex, animation, loop);
@@ -519,7 +519,7 @@ export class AnimationState {
 	 *           duration. In either case {@link TrackEntry#trackEnd} determines when the track is cleared.
 	 * @returns A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener#dispose()} event occurs. */
-	setAnimationWith(trackIndex: number, animation: Animation, loop: boolean = false) {
+	setAnimationWith (trackIndex: number, animation: Animation, loop: boolean = false) {
 		if (!animation) throw new Error("animation cannot be null.");
 		let interrupt = true;
 		let current = this.expandToIndex(trackIndex);
@@ -544,7 +544,7 @@ export class AnimationState {
 	/** Queues an animation by name.
 	 *
 	 * See {@link #addAnimationWith()}. */
-	addAnimation(trackIndex: number, animationName: string, loop: boolean = false, delay: number = 0) {
+	addAnimation (trackIndex: number, animationName: string, loop: boolean = false, delay: number = 0) {
 		let animation = this.data.skeletonData.findAnimation(animationName);
 		if (!animation) throw new Error("Animation not found: " + animationName);
 		return this.addAnimationWith(trackIndex, animation, loop, delay);
@@ -558,7 +558,7 @@ export class AnimationState {
 	 *           previous entry is looping, its next loop completion is used instead of its duration.
 	 * @returns A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener#dispose()} event occurs. */
-	addAnimationWith(trackIndex: number, animation: Animation, loop: boolean = false, delay: number = 0) {
+	addAnimationWith (trackIndex: number, animation: Animation, loop: boolean = false, delay: number = 0) {
 		if (!animation) throw new Error("animation cannot be null.");
 
 		let last = this.expandToIndex(trackIndex);
@@ -596,7 +596,7 @@ export class AnimationState {
 	 * {@link TrackEntry#setMixDuration()}. Mixing from an empty animation causes the new animation to be applied more and
 	 * more over the mix duration. Properties keyed in the new animation transition from the value from lower tracks or from the
 	 * setup pose value if no lower tracks key the property to the value keyed in the new animation. */
-	setEmptyAnimation(trackIndex: number, mixDuration: number = 0) {
+	setEmptyAnimation (trackIndex: number, mixDuration: number = 0) {
 		let entry = this.setAnimationWith(trackIndex, AnimationState.emptyAnimation(), false);
 		entry.mixDuration = mixDuration;
 		entry.trackEnd = mixDuration;
@@ -614,7 +614,7 @@ export class AnimationState {
 	 *           loop completion is used instead of its duration.
 	 * @return A track entry to allow further customization of animation playback. References to the track entry must not be kept
 	 *         after the {@link AnimationStateListener#dispose()} event occurs. */
-	addEmptyAnimation(trackIndex: number, mixDuration: number = 0, delay: number = 0) {
+	addEmptyAnimation (trackIndex: number, mixDuration: number = 0, delay: number = 0) {
 		let entry = this.addAnimationWith(trackIndex, AnimationState.emptyAnimation(), false, delay);
 		if (delay <= 0) entry.delay += entry.mixDuration - mixDuration;
 		entry.mixDuration = mixDuration;
@@ -624,7 +624,7 @@ export class AnimationState {
 
 	/** Sets an empty animation for every track, discarding any queued animations, and mixes to it over the specified mix
 	  * duration. */
-	setEmptyAnimations(mixDuration: number = 0) {
+	setEmptyAnimations (mixDuration: number = 0) {
 		let oldDrainDisabled = this.queue.drainDisabled;
 		this.queue.drainDisabled = true;
 		for (let i = 0, n = this.tracks.length; i < n; i++) {
@@ -635,7 +635,7 @@ export class AnimationState {
 		this.queue.drain();
 	}
 
-	expandToIndex(index: number) {
+	expandToIndex (index: number) {
 		if (index < this.tracks.length) return this.tracks[index];
 		Utils.ensureArrayCapacity(this.tracks, index + 1, null);
 		this.tracks.length = index + 1;
@@ -643,7 +643,7 @@ export class AnimationState {
 	}
 
 	/** @param last May be null. */
-	trackEntry(trackIndex: number, animation: Animation, loop: boolean, last: TrackEntry) {
+	trackEntry (trackIndex: number, animation: Animation, loop: boolean, last: TrackEntry) {
 		let entry = this.trackEntryPool.obtain();
 		entry.trackIndex = trackIndex;
 		entry.animation = animation;
@@ -675,7 +675,7 @@ export class AnimationState {
 	}
 
 	/** Removes the {@link TrackEntry#getNext() next entry} and all entries after it for the specified entry. */
-	clearNext(entry: TrackEntry) {
+	clearNext (entry: TrackEntry) {
 		let next = entry.next;
 		while (next) {
 			this.queue.dispose(next);
@@ -684,7 +684,7 @@ export class AnimationState {
 		entry.next = null;
 	}
 
-	_animationsChanged() {
+	_animationsChanged () {
 		this.animationsChanged = false;
 
 		this.propertyIDs.clear();
@@ -701,7 +701,7 @@ export class AnimationState {
 		}
 	}
 
-	computeHold(entry: TrackEntry) {
+	computeHold (entry: TrackEntry) {
 		let to = entry.mixingTo;
 		let timelines = entry.animation.timelines;
 		let timelinesCount = entry.animation.timelines.length;
@@ -742,32 +742,32 @@ export class AnimationState {
 	}
 
 	/** Returns the track entry for the animation currently playing on the track, or null if no animation is currently playing. */
-	getCurrent(trackIndex: number) {
+	getCurrent (trackIndex: number) {
 		if (trackIndex >= this.tracks.length) return null;
 		return this.tracks[trackIndex];
 	}
 
 	/** Adds a listener to receive events for all track entries. */
-	addListener(listener: AnimationStateListener) {
+	addListener (listener: AnimationStateListener) {
 		if (!listener) throw new Error("listener cannot be null.");
 		this.listeners.push(listener);
 	}
 
 	/** Removes the listener added with {@link #addListener()}. */
-	removeListener(listener: AnimationStateListener) {
+	removeListener (listener: AnimationStateListener) {
 		let index = this.listeners.indexOf(listener);
 		if (index >= 0) this.listeners.splice(index, 1);
 	}
 
 	/** Removes all listeners added with {@link #addListener()}. */
-	clearListeners() {
+	clearListeners () {
 		this.listeners.length = 0;
 	}
 
 	/** Discards all listener notifications that have not yet been delivered. This can be useful to call from an
 	 * {@link AnimationStateListener} when it is known that further notifications that may have been already queued for delivery
 	 * are not wanted because new animations are being set. */
-	clearListenerNotifications() {
+	clearListenerNotifications () {
 		this.queue.clear();
 	}
 }
@@ -930,7 +930,7 @@ export class TrackEntry {
 	timelineHoldMix = new Array<TrackEntry>();
 	timelinesRotation = new Array<number>();
 
-	reset() {
+	reset () {
 		this.next = null;
 		this.previous = null;
 		this.mixingFrom = null;
@@ -945,7 +945,7 @@ export class TrackEntry {
 	/** Uses {@link #trackTime} to compute the `animationTime`, which is between {@link #animationStart}
 	 * and {@link #animationEnd}. When the `trackTime` is 0, the `animationTime` is equal to the
 	 * `animationStart` time. */
-	getAnimationTime() {
+	getAnimationTime () {
 		if (this.loop) {
 			let duration = this.animationEnd - this.animationStart;
 			if (duration == 0) return this.animationStart;
@@ -954,7 +954,7 @@ export class TrackEntry {
 		return Math.min(this.trackTime + this.animationStart, this.animationEnd);
 	}
 
-	setAnimationLast(animationLast: number) {
+	setAnimationLast (animationLast: number) {
 		this.animationLast = animationLast;
 		this.nextAnimationLast = animationLast;
 	}
@@ -962,7 +962,7 @@ export class TrackEntry {
 	/** Returns true if at least one loop has been completed.
 	 *
 	 * See {@link AnimationStateListener#complete()}. */
-	isComplete() {
+	isComplete () {
 		return this.trackTime >= this.animationEnd - this.animationStart;
 	}
 
@@ -973,11 +973,11 @@ export class TrackEntry {
 	 * the short way or the long way around. The two rotations likely change over time, so which direction is the short or long
 	 * way also changes. If the short way was always chosen, bones would flip to the other side when that direction became the
 	 * long way. TrackEntry chooses the short way the first time it is applied and remembers that direction. */
-	resetRotationDirections() {
+	resetRotationDirections () {
 		this.timelinesRotation.length = 0;
 	}
 
-	getTrackComplete() {
+	getTrackComplete () {
 		let duration = this.animationEnd - this.animationStart;
 		if (duration != 0) {
 			if (this.loop) return duration * (1 + ((this.trackTime / duration) | 0)); // Completion of next loop.
@@ -992,44 +992,44 @@ export class EventQueue {
 	drainDisabled = false;
 	animState: AnimationState;
 
-	constructor(animState: AnimationState) {
+	constructor (animState: AnimationState) {
 		this.animState = animState;
 	}
 
-	start(entry: TrackEntry) {
+	start (entry: TrackEntry) {
 		this.objects.push(EventType.start);
 		this.objects.push(entry);
 		this.animState.animationsChanged = true;
 	}
 
-	interrupt(entry: TrackEntry) {
+	interrupt (entry: TrackEntry) {
 		this.objects.push(EventType.interrupt);
 		this.objects.push(entry);
 	}
 
-	end(entry: TrackEntry) {
+	end (entry: TrackEntry) {
 		this.objects.push(EventType.end);
 		this.objects.push(entry);
 		this.animState.animationsChanged = true;
 	}
 
-	dispose(entry: TrackEntry) {
+	dispose (entry: TrackEntry) {
 		this.objects.push(EventType.dispose);
 		this.objects.push(entry);
 	}
 
-	complete(entry: TrackEntry) {
+	complete (entry: TrackEntry) {
 		this.objects.push(EventType.complete);
 		this.objects.push(entry);
 	}
 
-	event(entry: TrackEntry, event: Event) {
+	event (entry: TrackEntry, event: Event) {
 		this.objects.push(EventType.event);
 		this.objects.push(entry);
 		this.objects.push(event);
 	}
 
-	drain() {
+	drain () {
 		if (this.drainDisabled) return;
 		this.drainDisabled = true;
 
@@ -1079,7 +1079,7 @@ export class EventQueue {
 		this.drainDisabled = false;
 	}
 
-	clear() {
+	clear () {
 		this.objects.length = 0;
 	}
 }
@@ -1095,43 +1095,43 @@ export enum EventType {
  * {@link AnimationState#addListener()}. */
 export interface AnimationStateListener {
 	/** Invoked when this entry has been set as the current entry. */
-	start(entry: TrackEntry): void;
+	start (entry: TrackEntry): void;
 
 	/** Invoked when another entry has replaced this entry as the current entry. This entry may continue being applied for
 	 * mixing. */
-	interrupt(entry: TrackEntry): void;
+	interrupt (entry: TrackEntry): void;
 
 	/** Invoked when this entry is no longer the current entry and will never be applied again. */
-	end(entry: TrackEntry): void;
+	end (entry: TrackEntry): void;
 
 	/** Invoked when this entry will be disposed. This may occur without the entry ever being set as the current entry.
 	 * References to the entry should not be kept after dispose is called, as it may be destroyed or reused. */
-	dispose(entry: TrackEntry): void;
+	dispose (entry: TrackEntry): void;
 
 	/** Invoked every time this entry's animation completes a loop. */
-	complete(entry: TrackEntry): void;
+	complete (entry: TrackEntry): void;
 
 	/** Invoked when this entry's animation triggers an event. */
-	event(entry: TrackEntry, event: Event): void;
+	event (entry: TrackEntry, event: Event): void;
 }
 
 export abstract class AnimationStateAdapter implements AnimationStateListener {
-	start(entry: TrackEntry) {
+	start (entry: TrackEntry) {
 	}
 
-	interrupt(entry: TrackEntry) {
+	interrupt (entry: TrackEntry) {
 	}
 
-	end(entry: TrackEntry) {
+	end (entry: TrackEntry) {
 	}
 
-	dispose(entry: TrackEntry) {
+	dispose (entry: TrackEntry) {
 	}
 
-	complete(entry: TrackEntry) {
+	complete (entry: TrackEntry) {
 	}
 
-	event(entry: TrackEntry, event: Event) {
+	event (entry: TrackEntry, event: Event) {
 	}
 }
 

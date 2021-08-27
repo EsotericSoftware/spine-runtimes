@@ -39,7 +39,7 @@ export class EventData {
 	volume: number;
 	balance: number;
 
-	constructor(name: string) {
+	constructor (name: string) {
 		this.name = name;
 	}
 }

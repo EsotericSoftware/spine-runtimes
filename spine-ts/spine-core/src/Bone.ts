@@ -114,7 +114,7 @@ export class Bone implements Updatable {
 	active = false;
 
 	/** @param parent May be null. */
-	constructor(data: BoneData, skeleton: Skeleton, parent: Bone) {
+	constructor (data: BoneData, skeleton: Skeleton, parent: Bone) {
 		if (!data) throw new Error("data cannot be null.");
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 		this.data = data;
@@ -125,19 +125,19 @@ export class Bone implements Updatable {
 
 	/** Returns false when the bone has not been computed because {@link BoneData#skinRequired} is true and the
 	  * {@link Skeleton#skin active skin} does not {@link Skin#bones contain} this bone. */
-	isActive() {
+	isActive () {
 		return this.active;
 	}
 
 	/** Computes the world transform using the parent bone and this bone's local applied transform. */
-	update() {
+	update () {
 		this.updateWorldTransformWith(this.ax, this.ay, this.arotation, this.ascaleX, this.ascaleY, this.ashearX, this.ashearY);
 	}
 
 	/** Computes the world transform using the parent bone and this bone's local transform.
 	 *
 	 * See {@link #updateWorldTransformWith()}. */
-	updateWorldTransform() {
+	updateWorldTransform () {
 		this.updateWorldTransformWith(this.x, this.y, this.rotation, this.scaleX, this.scaleY, this.shearX, this.shearY);
 	}
 
@@ -146,7 +146,7 @@ export class Bone implements Updatable {
 	 *
 	 * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
 	 * Runtimes Guide. */
-	updateWorldTransformWith(x: number, y: number, rotation: number, scaleX: number, scaleY: number, shearX: number, shearY: number) {
+	updateWorldTransformWith (x: number, y: number, rotation: number, scaleX: number, scaleY: number, shearX: number, shearY: number) {
 		this.ax = x;
 		this.ay = y;
 		this.arotation = rotation;
@@ -256,7 +256,7 @@ export class Bone implements Updatable {
 	}
 
 	/** Sets this bone's local transform to the setup pose. */
-	setToSetupPose() {
+	setToSetupPose () {
 		let data = this.data;
 		this.x = data.x;
 		this.y = data.y;
@@ -268,22 +268,22 @@ export class Bone implements Updatable {
 	}
 
 	/** The world rotation for the X axis, calculated using {@link #a} and {@link #c}. */
-	getWorldRotationX() {
+	getWorldRotationX () {
 		return Math.atan2(this.c, this.a) * MathUtils.radDeg;
 	}
 
 	/** The world rotation for the Y axis, calculated using {@link #b} and {@link #d}. */
-	getWorldRotationY() {
+	getWorldRotationY () {
 		return Math.atan2(this.d, this.b) * MathUtils.radDeg;
 	}
 
 	/** The magnitude (always positive) of the world scale X, calculated using {@link #a} and {@link #c}. */
-	getWorldScaleX() {
+	getWorldScaleX () {
 		return Math.sqrt(this.a * this.a + this.c * this.c);
 	}
 
 	/** The magnitude (always positive) of the world scale Y, calculated using {@link #b} and {@link #d}. */
-	getWorldScaleY() {
+	getWorldScaleY () {
 		return Math.sqrt(this.b * this.b + this.d * this.d);
 	}
 
@@ -295,7 +295,7 @@ export class Bone implements Updatable {
 	 *
 	 * Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The applied transform after
 	 * calling this method is equivalent to the local transform used to compute the world transform, but may not be identical. */
-	updateAppliedTransform() {
+	updateAppliedTransform () {
 		let parent = this.parent;
 		if (!parent) {
 			this.ax = this.worldX;
@@ -336,7 +336,7 @@ export class Bone implements Updatable {
 	}
 
 	/** Transforms a point from world coordinates to the bone's local coordinates. */
-	worldToLocal(world: Vector2) {
+	worldToLocal (world: Vector2) {
 		let invDet = 1 / (this.a * this.d - this.b * this.c);
 		let x = world.x - this.worldX, y = world.y - this.worldY;
 		world.x = x * this.d * invDet - y * this.b * invDet;
@@ -345,7 +345,7 @@ export class Bone implements Updatable {
 	}
 
 	/** Transforms a point from the bone's local coordinates to world coordinates. */
-	localToWorld(local: Vector2) {
+	localToWorld (local: Vector2) {
 		let x = local.x, y = local.y;
 		local.x = x * this.a + y * this.b + this.worldX;
 		local.y = x * this.c + y * this.d + this.worldY;
@@ -353,13 +353,13 @@ export class Bone implements Updatable {
 	}
 
 	/** Transforms a world rotation to a local rotation. */
-	worldToLocalRotation(worldRotation: number) {
+	worldToLocalRotation (worldRotation: number) {
 		let sin = MathUtils.sinDeg(worldRotation), cos = MathUtils.cosDeg(worldRotation);
 		return Math.atan2(this.a * sin - this.c * cos, this.d * cos - this.b * sin) * MathUtils.radDeg + this.rotation - this.shearX;
 	}
 
 	/** Transforms a local rotation to a world rotation. */
-	localToWorldRotation(localRotation: number) {
+	localToWorldRotation (localRotation: number) {
 		localRotation -= this.rotation - this.shearX;
 		let sin = MathUtils.sinDeg(localRotation), cos = MathUtils.cosDeg(localRotation);
 		return Math.atan2(cos * this.c + sin * this.d, cos * this.a + sin * this.b) * MathUtils.radDeg;
@@ -369,7 +369,7 @@ export class Bone implements Updatable {
 	 * <p>
 	 * After changes are made to the world transform, {@link #updateAppliedTransform()} should be called and {@link #update()} will
 	 * need to be called on any child bones, recursively. */
-	rotateWorld(degrees: number) {
+	rotateWorld (degrees: number) {
 		let a = this.a, b = this.b, c = this.c, d = this.d;
 		let cos = MathUtils.cosDeg(degrees), sin = MathUtils.sinDeg(degrees);
 		this.a = cos * a - sin * c;

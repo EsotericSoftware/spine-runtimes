@@ -45,7 +45,7 @@ export class Triangulator {
 		return new Array<number>();
 	});
 
-	public triangulate(verticesArray: NumberArrayLike): Array<number> {
+	public triangulate (verticesArray: NumberArrayLike): Array<number> {
 		let vertices = verticesArray;
 		let vertexCount = verticesArray.length >> 1;
 
@@ -121,7 +121,7 @@ export class Triangulator {
 		return triangles;
 	}
 
-	decompose(verticesArray: Array<number>, triangles: Array<number>): Array<Array<number>> {
+	decompose (verticesArray: Array<number>, triangles: Array<number>): Array<Array<number>> {
 		let vertices = verticesArray;
 		let convexPolygons = this.convexPolygons;
 		this.polygonPool.freeAll(convexPolygons);
@@ -250,7 +250,7 @@ export class Triangulator {
 		return convexPolygons;
 	}
 
-	private static isConcave(index: number, vertexCount: number, vertices: NumberArrayLike, indices: NumberArrayLike): boolean {
+	private static isConcave (index: number, vertexCount: number, vertices: NumberArrayLike, indices: NumberArrayLike): boolean {
 		let previous = indices[(vertexCount + index - 1) % vertexCount] << 1;
 		let current = indices[index] << 1;
 		let next = indices[(index + 1) % vertexCount] << 1;
@@ -258,11 +258,11 @@ export class Triangulator {
 			vertices[next + 1]);
 	}
 
-	private static positiveArea(p1x: number, p1y: number, p2x: number, p2y: number, p3x: number, p3y: number): boolean {
+	private static positiveArea (p1x: number, p1y: number, p2x: number, p2y: number, p3x: number, p3y: number): boolean {
 		return p1x * (p3y - p2y) + p2x * (p1y - p3y) + p3x * (p2y - p1y) >= 0;
 	}
 
-	private static winding(p1x: number, p1y: number, p2x: number, p2y: number, p3x: number, p3y: number): number {
+	private static winding (p1x: number, p1y: number, p2x: number, p2y: number, p3x: number, p3y: number): number {
 		let px = p2x - p1x, py = p2y - p1y;
 		return p3x * py - p3y * px + px * p1y - p1x * py >= 0 ? 1 : -1;
 	}

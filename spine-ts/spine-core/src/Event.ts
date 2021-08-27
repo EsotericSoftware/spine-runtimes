@@ -43,7 +43,7 @@ export class Event {
 	volume: number;
 	balance: number;
 
-	constructor(time: number, data: EventData) {
+	constructor (time: number, data: EventData) {
 		if (!data) throw new Error("data cannot be null.");
 		this.time = time;
 		this.data = data;

@@ -42,11 +42,11 @@ export class ClippingAttachment extends VertexAttachment {
 	 * are not usually rendered at runtime. */
 	color = new Color(0.2275, 0.2275, 0.8078, 1); // ce3a3aff
 
-	constructor(name: string) {
+	constructor (name: string) {
 		super(name);
 	}
 
-	copy(): Attachment {
+	copy (): Attachment {
 		let copy = new ClippingAttachment(this.name);
 		this.copyTo(copy);
 		copy.endSlot = this.endSlot;

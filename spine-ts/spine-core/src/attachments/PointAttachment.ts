@@ -43,24 +43,24 @@ export class PointAttachment extends VertexAttachment {
 	 * are not usually rendered at runtime. */
 	color = new Color(0.38, 0.94, 0, 1);
 
-	constructor(name: string) {
+	constructor (name: string) {
 		super(name);
 	}
 
-	computeWorldPosition(bone: Bone, point: Vector2) {
+	computeWorldPosition (bone: Bone, point: Vector2) {
 		point.x = this.x * bone.a + this.y * bone.b + bone.worldX;
 		point.y = this.x * bone.c + this.y * bone.d + bone.worldY;
 		return point;
 	}
 
-	computeWorldRotation(bone: Bone) {
+	computeWorldRotation (bone: Bone) {
 		let cos = MathUtils.cosDeg(this.rotation), sin = MathUtils.sinDeg(this.rotation);
 		let x = cos * bone.a + sin * bone.b;
 		let y = cos * bone.c + sin * bone.d;
 		return Math.atan2(y, x) * MathUtils.radDeg;
 	}
 
-	copy(): Attachment {
+	copy (): Attachment {
 		let copy = new PointAttachment(this.name);
 		copy.x = this.x;
 		copy.y = this.y;

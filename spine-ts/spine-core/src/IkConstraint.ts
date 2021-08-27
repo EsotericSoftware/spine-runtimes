@@ -65,7 +65,7 @@ export class IkConstraint implements Updatable {
 	softness = 0;
 	active = false;
 
-	constructor(data: IkConstraintData, skeleton: Skeleton) {
+	constructor (data: IkConstraintData, skeleton: Skeleton) {
 		if (!data) throw new Error("data cannot be null.");
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 		this.data = data;
@@ -81,11 +81,11 @@ export class IkConstraint implements Updatable {
 		this.target = skeleton.findBone(data.target.name);
 	}
 
-	isActive() {
+	isActive () {
 		return this.active;
 	}
 
-	update() {
+	update () {
 		if (this.mix == 0) return;
 		let target = this.target;
 		let bones = this.bones;
@@ -100,7 +100,7 @@ export class IkConstraint implements Updatable {
 	}
 
 	/** Applies 1 bone IK. The target is specified in the world coordinate system. */
-	apply1(bone: Bone, targetX: number, targetY: number, compress: boolean, stretch: boolean, uniform: boolean, alpha: number) {
+	apply1 (bone: Bone, targetX: number, targetY: number, compress: boolean, stretch: boolean, uniform: boolean, alpha: number) {
 		let p = bone.parent;
 		let pa = p.a, pb = p.b, pc = p.c, pd = p.d;
 		let rotationIK = -bone.ashearX - bone.arotation, tx = 0, ty = 0;
@@ -151,7 +151,7 @@ export class IkConstraint implements Updatable {
 
 	/** Applies 2 bone IK. The target is specified in the world coordinate system.
 	 * @param child A direct descendant of the parent bone. */
-	apply2(parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, uniform: boolean, softness: number, alpha: number) {
+	apply2 (parent: Bone, child: Bone, targetX: number, targetY: number, bendDir: number, stretch: boolean, uniform: boolean, softness: number, alpha: number) {
 		let px = parent.ax, py = parent.ay, psx = parent.ascaleX, psy = parent.ascaleY, sx = psx, sy = psy, csx = child.ascaleX;
 		let os1 = 0, os2 = 0, s2 = 0;
 		if (psx < 0) {

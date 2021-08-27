@@ -55,7 +55,7 @@ export class Matrix4 {
 	private static zAxis: Vector3 = null;
 	private static tmpMatrix = new Matrix4();
 
-	constructor() {
+	constructor () {
 		let v = this.values;
 		v[M00] = 1;
 		v[M11] = 1;
@@ -63,12 +63,12 @@ export class Matrix4 {
 		v[M33] = 1;
 	}
 
-	set(values: ArrayLike<number>): Matrix4 {
+	set (values: ArrayLike<number>): Matrix4 {
 		this.values.set(values);
 		return this;
 	}
 
-	transpose(): Matrix4 {
+	transpose (): Matrix4 {
 		let t = this.temp;
 		let v = this.values;
 		t[M00] = v[M00];
@@ -90,7 +90,7 @@ export class Matrix4 {
 		return this.set(t);
 	}
 
-	identity(): Matrix4 {
+	identity (): Matrix4 {
 		let v = this.values;
 		v[M00] = 1;
 		v[M01] = 0;
@@ -111,7 +111,7 @@ export class Matrix4 {
 		return this;
 	}
 
-	invert(): Matrix4 {
+	invert (): Matrix4 {
 		let v = this.values;
 		let t = this.temp;
 		let l_det = v[M30] * v[M21] * v[M12] * v[M03] - v[M20] * v[M31] * v[M12] * v[M03] - v[M30] * v[M11] * v[M22] * v[M03]
@@ -175,7 +175,7 @@ export class Matrix4 {
 		return this;
 	}
 
-	determinant(): number {
+	determinant (): number {
 		let v = this.values;
 		return v[M30] * v[M21] * v[M12] * v[M03] - v[M20] * v[M31] * v[M12] * v[M03] - v[M30] * v[M11] * v[M22] * v[M03]
 			+ v[M10] * v[M31] * v[M22] * v[M03] + v[M20] * v[M11] * v[M32] * v[M03] - v[M10] * v[M21] * v[M32] * v[M03]
@@ -187,7 +187,7 @@ export class Matrix4 {
 			- v[M00] * v[M21] * v[M12] * v[M33] - v[M10] * v[M01] * v[M22] * v[M33] + v[M00] * v[M11] * v[M22] * v[M33];
 	}
 
-	translate(x: number, y: number, z: number): Matrix4 {
+	translate (x: number, y: number, z: number): Matrix4 {
 		let v = this.values;
 		v[M03] += x;
 		v[M13] += y;
@@ -195,11 +195,11 @@ export class Matrix4 {
 		return this;
 	}
 
-	copy(): Matrix4 {
+	copy (): Matrix4 {
 		return new Matrix4().set(this.values);
 	}
 
-	projection(near: number, far: number, fovy: number, aspectRatio: number): Matrix4 {
+	projection (near: number, far: number, fovy: number, aspectRatio: number): Matrix4 {
 		this.identity();
 		let l_fd = (1.0 / Math.tan((fovy * (Math.PI / 180)) / 2.0));
 		let l_a1 = (far + near) / (near - far);
@@ -224,11 +224,11 @@ export class Matrix4 {
 		return this;
 	}
 
-	ortho2d(x: number, y: number, width: number, height: number): Matrix4 {
+	ortho2d (x: number, y: number, width: number, height: number): Matrix4 {
 		return this.ortho(x, x + width, y, y + height, 0, 1);
 	}
 
-	ortho(left: number, right: number, bottom: number, top: number, near: number, far: number): Matrix4 {
+	ortho (left: number, right: number, bottom: number, top: number, near: number, far: number): Matrix4 {
 		this.identity();
 		let x_orth = 2 / (right - left);
 		let y_orth = 2 / (top - bottom);
@@ -258,7 +258,7 @@ export class Matrix4 {
 		return this;
 	}
 
-	multiply(matrix: Matrix4): Matrix4 {
+	multiply (matrix: Matrix4): Matrix4 {
 		let t = this.temp;
 		let v = this.values;
 		let m = matrix.values;
@@ -281,7 +281,7 @@ export class Matrix4 {
 		return this.set(this.temp);
 	}
 
-	multiplyLeft(matrix: Matrix4): Matrix4 {
+	multiplyLeft (matrix: Matrix4): Matrix4 {
 		let t = this.temp;
 		let v = this.values;
 		let m = matrix.values;
@@ -304,7 +304,7 @@ export class Matrix4 {
 		return this.set(this.temp);
 	}
 
-	lookAt(position: Vector3, direction: Vector3, up: Vector3) {
+	lookAt (position: Vector3, direction: Vector3, up: Vector3) {
 		Matrix4.initTemps();
 		let xAxis = Matrix4.xAxis, yAxis = Matrix4.yAxis, zAxis = Matrix4.zAxis;
 		zAxis.setFrom(direction).normalize();
@@ -332,7 +332,7 @@ export class Matrix4 {
 		return this;
 	}
 
-	static initTemps() {
+	static initTemps () {
 		if (Matrix4.xAxis === null) Matrix4.xAxis = new Vector3();
 		if (Matrix4.yAxis === null) Matrix4.yAxis = new Vector3();
 		if (Matrix4.zAxis === null) Matrix4.zAxis = new Vector3();

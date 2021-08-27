@@ -34,12 +34,12 @@ import { NumberArrayLike, Utils } from "../Utils";
 export abstract class Attachment {
 	name: string;
 
-	constructor(name: string) {
+	constructor (name: string) {
 		if (!name) throw new Error("name cannot be null.");
 		this.name = name;
 	}
 
-	abstract copy(): Attachment;
+	abstract copy (): Attachment;
 }
 
 /** Base class for an attachment with vertices that are transformed by one or more bones and can be deformed by a slot's
@@ -67,7 +67,7 @@ export abstract class VertexAttachment extends Attachment {
 	/** Deform keys for the deform attachment are also applied to this attachment. May be null if no deform keys should be applied. */
 	deformAttachment: VertexAttachment = this;
 
-	constructor(name: string) {
+	constructor (name: string) {
 		super(name);
 	}
 
@@ -82,7 +82,7 @@ export abstract class VertexAttachment extends Attachment {
 	 *           `stride` / 2.
 	 * @param offset The `worldVertices` index to begin writing values.
 	 * @param stride The number of `worldVertices` entries between the value pairs written. */
-	computeWorldVertices(slot: Slot, start: number, count: number, worldVertices: NumberArrayLike, offset: number, stride: number) {
+	computeWorldVertices (slot: Slot, start: number, count: number, worldVertices: NumberArrayLike, offset: number, stride: number) {
 		count = offset + (count >> 1) * stride;
 		let skeleton = slot.bone.skeleton;
 		let deformArray = slot.deform;
@@ -141,7 +141,7 @@ export abstract class VertexAttachment extends Attachment {
 	}
 
 	/** Does not copy id (generated) or name (set on construction). **/
-	copyTo(attachment: VertexAttachment) {
+	copyTo (attachment: VertexAttachment) {
 		if (this.bones) {
 			attachment.bones = new Array<number>(this.bones.length);
 			Utils.arrayCopy(this.bones, 0, attachment.bones, 0, this.bones.length);

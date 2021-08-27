@@ -54,7 +54,7 @@ export class TransformConstraint implements Updatable {
 	temp = new Vector2();
 	active = false;
 
-	constructor(data: TransformConstraintData, skeleton: Skeleton) {
+	constructor (data: TransformConstraintData, skeleton: Skeleton) {
 		if (!data) throw new Error("data cannot be null.");
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 		this.data = data;
@@ -70,11 +70,11 @@ export class TransformConstraint implements Updatable {
 		this.target = skeleton.findBone(data.target.name);
 	}
 
-	isActive() {
+	isActive () {
 		return this.active;
 	}
 
-	update() {
+	update () {
 		if (this.mixRotate == 0 && this.mixX == 0 && this.mixY == 0 && this.mixScaleX == 0 && this.mixScaleX == 0 && this.mixShearY == 0) return;
 
 		if (this.data.local) {
@@ -90,7 +90,7 @@ export class TransformConstraint implements Updatable {
 		}
 	}
 
-	applyAbsoluteWorld() {
+	applyAbsoluteWorld () {
 		let mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
 			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 		let translate = mixX != 0 || mixY != 0;
@@ -158,7 +158,7 @@ export class TransformConstraint implements Updatable {
 		}
 	}
 
-	applyRelativeWorld() {
+	applyRelativeWorld () {
 		let mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
 			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 		let translate = mixX != 0 || mixY != 0;
@@ -222,7 +222,7 @@ export class TransformConstraint implements Updatable {
 		}
 	}
 
-	applyAbsoluteLocal() {
+	applyAbsoluteLocal () {
 		let mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
 			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 
@@ -260,7 +260,7 @@ export class TransformConstraint implements Updatable {
 		}
 	}
 
-	applyRelativeLocal() {
+	applyRelativeLocal () {
 		let mixRotate = this.mixRotate, mixX = this.mixX, mixY = this.mixY, mixScaleX = this.mixScaleX,
 			mixScaleY = this.mixScaleY, mixShearY = this.mixShearY;
 

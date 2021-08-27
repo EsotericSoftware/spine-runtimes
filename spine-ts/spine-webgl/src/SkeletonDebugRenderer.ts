@@ -58,11 +58,11 @@ export class SkeletonDebugRenderer implements Disposable {
 	private static LIGHT_GRAY = new Color(192 / 255, 192 / 255, 192 / 255, 1);
 	private static GREEN = new Color(0, 1, 0, 1);
 
-	constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext) {
+	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext) {
 		this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 	}
 
-	draw(shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones: Array<string> = null) {
+	draw (shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones: Array<string> = null) {
 		let skeletonX = skeleton.x;
 		let skeletonY = skeleton.y;
 		let gl = this.context.gl;
@@ -222,6 +222,6 @@ export class SkeletonDebugRenderer implements Disposable {
 		}
 	}
 
-	dispose() {
+	dispose () {
 	}
 }

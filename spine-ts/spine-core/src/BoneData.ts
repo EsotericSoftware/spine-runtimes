@@ -76,7 +76,7 @@ export class BoneData {
 	 * rendered at runtime. */
 	color = new Color();
 
-	constructor(index: number, name: string, parent: BoneData) {
+	constructor (index: number, name: string, parent: BoneData) {
 		if (index < 0) throw new Error("index must be >= 0.");
 		if (!name) throw new Error("name cannot be null.");
 		this.index = index;

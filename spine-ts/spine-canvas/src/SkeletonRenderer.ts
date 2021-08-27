@@ -41,16 +41,16 @@ export class SkeletonRenderer {
 	private vertices = Utils.newFloatArray(8 * 1024);
 	private tempColor = new Color();
 
-	constructor(context: CanvasRenderingContext2D) {
+	constructor (context: CanvasRenderingContext2D) {
 		this.ctx = context;
 	}
 
-	draw(skeleton: Skeleton) {
+	draw (skeleton: Skeleton) {
 		if (this.triangleRendering) this.drawTriangles(skeleton);
 		else this.drawImages(skeleton);
 	}
 
-	private drawImages(skeleton: Skeleton) {
+	private drawImages (skeleton: Skeleton) {
 		let ctx = this.ctx;
 		let color = this.tempColor;
 		let skeletonColor = skeleton.color;
@@ -107,7 +107,7 @@ export class SkeletonRenderer {
 		}
 	}
 
-	private drawTriangles(skeleton: Skeleton) {
+	private drawTriangles (skeleton: Skeleton) {
 		let ctx = this.ctx;
 		let color = this.tempColor;
 		let skeletonColor = skeleton.color;
@@ -182,7 +182,7 @@ export class SkeletonRenderer {
 
 	// Adapted from http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 	// Apache 2 licensed
-	private drawTriangle(img: HTMLImageElement, x0: number, y0: number, u0: number, v0: number,
+	private drawTriangle (img: HTMLImageElement, x0: number, y0: number, u0: number, v0: number,
 		x1: number, y1: number, u1: number, v1: number,
 		x2: number, y2: number, u2: number, v2: number) {
 		let ctx = this.ctx;
@@ -229,7 +229,7 @@ export class SkeletonRenderer {
 		ctx.restore();
 	}
 
-	private computeRegionVertices(slot: Slot, region: RegionAttachment, pma: boolean) {
+	private computeRegionVertices (slot: Slot, region: RegionAttachment, pma: boolean) {
 		let skeletonColor = slot.bone.skeleton.color;
 		let slotColor = slot.color;
 		let regionColor = region.color;
@@ -277,7 +277,7 @@ export class SkeletonRenderer {
 		return vertices;
 	}
 
-	private computeMeshVertices(slot: Slot, mesh: MeshAttachment, pma: boolean) {
+	private computeMeshVertices (slot: Slot, mesh: MeshAttachment, pma: boolean) {
 		let skeletonColor = slot.bone.skeleton.color;
 		let slotColor = slot.color;
 		let regionColor = mesh.color;

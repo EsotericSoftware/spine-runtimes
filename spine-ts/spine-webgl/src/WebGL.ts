@@ -34,7 +34,7 @@ export class ManagedWebGLRenderingContext {
 	public gl: WebGLRenderingContext;
 	private restorables = new Array<Restorable>();
 
-	constructor(canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget, contextConfig: any = { alpha: "true" }) {
+	constructor (canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget, contextConfig: any = { alpha: "true" }) {
 		if (!((canvasOrContext instanceof WebGLRenderingContext) || (typeof WebGL2RenderingContext !== 'undefined' && canvasOrContext instanceof WebGL2RenderingContext)))
 			this.setupCanvas(canvasOrContext, contextConfig);
 		else {
@@ -43,7 +43,7 @@ export class ManagedWebGLRenderingContext {
 		}
 	}
 
-	private setupCanvas(canvas: any, contextConfig: any) {
+	private setupCanvas (canvas: any, contextConfig: any) {
 		this.gl = <WebGLRenderingContext>(canvas.getContext("webgl2", contextConfig) || canvas.getContext("webgl", contextConfig));
 		this.canvas = canvas;
 		canvas.addEventListener("webglcontextlost", (e: any) => {
@@ -57,11 +57,11 @@ export class ManagedWebGLRenderingContext {
 		});
 	}
 
-	addRestorable(restorable: Restorable) {
+	addRestorable (restorable: Restorable) {
 		this.restorables.push(restorable);
 	}
 
-	removeRestorable(restorable: Restorable) {
+	removeRestorable (restorable: Restorable) {
 		let index = this.restorables.indexOf(restorable);
 		if (index > -1) this.restorables.splice(index, 1);
 	}
@@ -75,7 +75,7 @@ const ONE_MINUS_DST_ALPHA = 0x0305;
 const DST_COLOR = 0x0306;
 
 export class WebGLBlendModeConverter {
-	static getDestGLBlendMode(blendMode: BlendMode) {
+	static getDestGLBlendMode (blendMode: BlendMode) {
 		switch (blendMode) {
 			case BlendMode.Normal: return ONE_MINUS_SRC_ALPHA;
 			case BlendMode.Additive: return ONE;
@@ -85,7 +85,7 @@ export class WebGLBlendModeConverter {
 		}
 	}
 
-	static getSourceColorGLBlendMode(blendMode: BlendMode, premultipliedAlpha: boolean = false) {
+	static getSourceColorGLBlendMode (blendMode: BlendMode, premultipliedAlpha: boolean = false) {
 		switch (blendMode) {
 			case BlendMode.Normal: return premultipliedAlpha ? ONE : SRC_ALPHA;
 			case BlendMode.Additive: return premultipliedAlpha ? ONE : SRC_ALPHA;
@@ -95,7 +95,7 @@ export class WebGLBlendModeConverter {
 		}
 	}
 
-	static getSourceAlphaGLBlendMode(blendMode: BlendMode) {
+	static getSourceAlphaGLBlendMode (blendMode: BlendMode) {
 		switch (blendMode) {
 			case BlendMode.Normal: return ONE;
 			case BlendMode.Additive: return ONE;

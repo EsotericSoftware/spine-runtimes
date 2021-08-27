@@ -30,17 +30,17 @@
 export abstract class Texture {
 	protected _image: HTMLImageElement | ImageBitmap;
 
-	constructor(image: HTMLImageElement | ImageBitmap) {
+	constructor (image: HTMLImageElement | ImageBitmap) {
 		this._image = image;
 	}
 
-	getImage(): HTMLImageElement | ImageBitmap {
+	getImage (): HTMLImageElement | ImageBitmap {
 		return this._image;
 	}
 
-	abstract setFilters(minFilter: TextureFilter, magFilter: TextureFilter): void;
-	abstract setWraps(uWrap: TextureWrap, vWrap: TextureWrap): void;
-	abstract dispose(): void;
+	abstract setFilters (minFilter: TextureFilter, magFilter: TextureFilter): void;
+	abstract setWraps (uWrap: TextureWrap, vWrap: TextureWrap): void;
+	abstract dispose (): void;
 }
 
 export enum TextureFilter {
@@ -70,7 +70,7 @@ export class TextureRegion {
 }
 
 export class FakeTexture extends Texture {
-	setFilters(minFilter: TextureFilter, magFilter: TextureFilter) { }
-	setWraps(uWrap: TextureWrap, vWrap: TextureWrap) { }
-	dispose() { }
+	setFilters (minFilter: TextureFilter, magFilter: TextureFilter) { }
+	setWraps (uWrap: TextureWrap, vWrap: TextureWrap) { }
+	dispose () { }
 }

@@ -44,13 +44,13 @@ export class OrthoCamera {
 	projection = new Matrix4();
 	view = new Matrix4();
 
-	constructor(viewportWidth: number, viewportHeight: number) {
+	constructor (viewportWidth: number, viewportHeight: number) {
 		this.viewportWidth = viewportWidth;
 		this.viewportHeight = viewportHeight;
 		this.update();
 	}
 
-	update() {
+	update () {
 		let projection = this.projection;
 		let view = this.view;
 		let projectionView = this.projectionView;
@@ -65,7 +65,7 @@ export class OrthoCamera {
 		inverseProjectionView.set(projectionView.values).invert();
 	}
 
-	screenToWorld(screenCoords: Vector3, screenWidth: number, screenHeight: number) {
+	screenToWorld (screenCoords: Vector3, screenWidth: number, screenHeight: number) {
 		let x = screenCoords.x, y = screenHeight - screenCoords.y - 1;
 		screenCoords.x = (2 * x) / screenWidth - 1;
 		screenCoords.y = (2 * y) / screenHeight - 1;
@@ -74,7 +74,7 @@ export class OrthoCamera {
 		return screenCoords;
 	}
 
-	worldToScreen(worldCoords: Vector3, screenWidth: number, screenHeight: number) {
+	worldToScreen (worldCoords: Vector3, screenWidth: number, screenHeight: number) {
 		worldCoords.project(this.projectionView);
 		worldCoords.x = screenWidth * (worldCoords.x + 1) / 2;
 		worldCoords.y = screenHeight * (worldCoords.y + 1) / 2;
@@ -82,7 +82,7 @@ export class OrthoCamera {
 		return worldCoords;
 	}
 
-	setViewport(viewportWidth: number, viewportHeight: number) {
+	setViewport (viewportWidth: number, viewportHeight: number) {
 		this.viewportWidth = viewportWidth;
 		this.viewportHeight = viewportHeight;
 	}

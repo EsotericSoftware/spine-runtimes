@@ -61,7 +61,7 @@ export class SkeletonBounds {
 	 * box's polygon.
 	 * @param updateAabb If true, the axis aligned bounding box containing all the polygons is computed. If false, the
 	 *           SkeletonBounds AABB methods will always return true. */
-	update(skeleton: Skeleton, updateAabb: boolean) {
+	update (skeleton: Skeleton, updateAabb: boolean) {
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 		let boundingBoxes = this.boundingBoxes;
 		let polygons = this.polygons;
@@ -100,7 +100,7 @@ export class SkeletonBounds {
 		}
 	}
 
-	aabbCompute() {
+	aabbCompute () {
 		let minX = Number.POSITIVE_INFINITY, minY = Number.POSITIVE_INFINITY, maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
 		let polygons = this.polygons;
 		for (let i = 0, n = polygons.length; i < n; i++) {
@@ -122,12 +122,12 @@ export class SkeletonBounds {
 	}
 
 	/** Returns true if the axis aligned bounding box contains the point. */
-	aabbContainsPoint(x: number, y: number) {
+	aabbContainsPoint (x: number, y: number) {
 		return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY;
 	}
 
 	/** Returns true if the axis aligned bounding box intersects the line segment. */
-	aabbIntersectsSegment(x1: number, y1: number, x2: number, y2: number) {
+	aabbIntersectsSegment (x1: number, y1: number, x2: number, y2: number) {
 		let minX = this.minX;
 		let minY = this.minY;
 		let maxX = this.maxX;
@@ -147,13 +147,13 @@ export class SkeletonBounds {
 	}
 
 	/** Returns true if the axis aligned bounding box intersects the axis aligned bounding box of the specified bounds. */
-	aabbIntersectsSkeleton(bounds: SkeletonBounds) {
+	aabbIntersectsSkeleton (bounds: SkeletonBounds) {
 		return this.minX < bounds.maxX && this.maxX > bounds.minX && this.minY < bounds.maxY && this.maxY > bounds.minY;
 	}
 
 	/** Returns the first bounding box attachment that contains the point, or null. When doing many checks, it is usually more
 	 * efficient to only call this method if {@link #aabbContainsPoint(float, float)} returns true. */
-	containsPoint(x: number, y: number): BoundingBoxAttachment {
+	containsPoint (x: number, y: number): BoundingBoxAttachment {
 		let polygons = this.polygons;
 		for (let i = 0, n = polygons.length; i < n; i++)
 			if (this.containsPointPolygon(polygons[i], x, y)) return this.boundingBoxes[i];
@@ -161,7 +161,7 @@ export class SkeletonBounds {
 	}
 
 	/** Returns true if the polygon contains the point. */
-	containsPointPolygon(polygon: NumberArrayLike, x: number, y: number) {
+	containsPointPolygon (polygon: NumberArrayLike, x: number, y: number) {
 		let vertices = polygon;
 		let nn = polygon.length;
 
@@ -182,7 +182,7 @@ export class SkeletonBounds {
 	/** Returns the first bounding box attachment that contains any part of the line segment, or null. When doing many checks, it
 	 * is usually more efficient to only call this method if {@link #aabbIntersectsSegment()} returns
 	 * true. */
-	intersectsSegment(x1: number, y1: number, x2: number, y2: number) {
+	intersectsSegment (x1: number, y1: number, x2: number, y2: number) {
 		let polygons = this.polygons;
 		for (let i = 0, n = polygons.length; i < n; i++)
 			if (this.intersectsSegmentPolygon(polygons[i], x1, y1, x2, y2)) return this.boundingBoxes[i];
@@ -190,7 +190,7 @@ export class SkeletonBounds {
 	}
 
 	/** Returns true if the polygon contains any part of the line segment. */
-	intersectsSegmentPolygon(polygon: NumberArrayLike, x1: number, y1: number, x2: number, y2: number) {
+	intersectsSegmentPolygon (polygon: NumberArrayLike, x1: number, y1: number, x2: number, y2: number) {
 		let vertices = polygon;
 		let nn = polygon.length;
 
@@ -214,19 +214,19 @@ export class SkeletonBounds {
 	}
 
 	/** Returns the polygon for the specified bounding box, or null. */
-	getPolygon(boundingBox: BoundingBoxAttachment) {
+	getPolygon (boundingBox: BoundingBoxAttachment) {
 		if (!boundingBox) throw new Error("boundingBox cannot be null.");
 		let index = this.boundingBoxes.indexOf(boundingBox);
 		return index == -1 ? null : this.polygons[index];
 	}
 
 	/** The width of the axis aligned bounding box. */
-	getWidth() {
+	getWidth () {
 		return this.maxX - this.minX;
 	}
 
 	/** The height of the axis aligned bounding box. */
-	getHeight() {
+	getHeight () {
 		return this.maxY - this.minY;
 	}
 }

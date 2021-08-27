@@ -40,16 +40,16 @@ export class SwirlEffect implements VertexEffect {
 	private worldX = 0;
 	private worldY = 0;
 
-	constructor(radius: number) {
+	constructor (radius: number) {
 		this.radius = radius;
 	}
 
-	begin(skeleton: Skeleton): void {
+	begin (skeleton: Skeleton): void {
 		this.worldX = skeleton.x + this.centerX;
 		this.worldY = skeleton.y + this.centerY;
 	}
 
-	transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void {
+	transform (position: Vector2, uv: Vector2, light: Color, dark: Color): void {
 		let radAngle = this.angle * MathUtils.degreesToRadians;
 		let x = position.x - this.worldX;
 		let y = position.y - this.worldY;
@@ -63,6 +63,6 @@ export class SwirlEffect implements VertexEffect {
 		}
 	}
 
-	end(): void {
+	end (): void {
 	}
 }

@@ -49,11 +49,11 @@ export class PathAttachment extends VertexAttachment {
 	 * rendered at runtime. */
 	color = new Color(1, 1, 1, 1);
 
-	constructor(name: string) {
+	constructor (name: string) {
 		super(name);
 	}
 
-	copy(): Attachment {
+	copy (): Attachment {
 		let copy = new PathAttachment(this.name);
 		this.copyTo(copy);
 		copy.lengths = new Array<number>(this.lengths.length);

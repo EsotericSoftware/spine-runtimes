@@ -38,7 +38,7 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 
 	public static DISABLE_UNPACK_PREMULTIPLIED_ALPHA_WEBGL = false;
 
-	constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap, useMipMaps: boolean = false) {
+	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, image: HTMLImageElement | ImageBitmap, useMipMaps: boolean = false) {
 		super(image);
 		this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 		this.useMipMaps = useMipMaps;
@@ -46,14 +46,14 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 		this.context.addRestorable(this);
 	}
 
-	setFilters(minFilter: TextureFilter, magFilter: TextureFilter) {
+	setFilters (minFilter: TextureFilter, magFilter: TextureFilter) {
 		let gl = this.context.gl;
 		this.bind();
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, minFilter);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, GLTexture.validateMagFilter(magFilter));
 	}
 
-	static validateMagFilter(magFilter: TextureFilter) {
+	static validateMagFilter (magFilter: TextureFilter) {
 		switch (magFilter) {
 			case TextureFilter.MipMap:
 			case TextureFilter.MipMapLinearLinear:
@@ -66,14 +66,14 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 		}
 	}
 
-	setWraps(uWrap: TextureWrap, vWrap: TextureWrap) {
+	setWraps (uWrap: TextureWrap, vWrap: TextureWrap) {
 		let gl = this.context.gl;
 		this.bind();
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, uWrap);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, vWrap);
 	}
 
-	update(useMipMaps: boolean) {
+	update (useMipMaps: boolean) {
 		let gl = this.context.gl;
 		if (!this.texture) this.texture = this.context.gl.createTexture();
 		this.bind();
@@ -86,25 +86,25 @@ export class GLTexture extends Texture implements Disposable, Restorable {
 		if (useMipMaps) gl.generateMipmap(gl.TEXTURE_2D);
 	}
 
-	restore() {
+	restore () {
 		this.texture = null;
 		this.update(this.useMipMaps);
 	}
 
-	bind(unit: number = 0) {
+	bind (unit: number = 0) {
 		let gl = this.context.gl;
 		this.boundUnit = unit;
 		gl.activeTexture(gl.TEXTURE0 + unit);
 		gl.bindTexture(gl.TEXTURE_2D, this.texture);
 	}
 
-	unbind() {
+	unbind () {
 		let gl = this.context.gl;
 		gl.activeTexture(gl.TEXTURE0 + this.boundUnit);
 		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 
-	dispose() {
+	dispose () {
 		this.context.removeRestorable(this);
 		let gl = this.context.gl;
 		gl.deleteTexture(this.texture);

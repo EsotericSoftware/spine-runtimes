@@ -38,7 +38,7 @@ export class MeshBatcher extends THREE.Mesh {
 	private indices: Uint16Array;
 	private indicesLength = 0;
 
-	constructor(maxVertices: number = 10920, materialCustomizer: SkeletonMeshMaterialParametersCustomizer = (parameters) => { }) {
+	constructor (maxVertices: number = 10920, materialCustomizer: SkeletonMeshMaterialParametersCustomizer = (parameters) => { }) {
 		super();
 		if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 		let vertices = this.vertices = new Float32Array(maxVertices * MeshBatcher.VERTEX_SIZE);
@@ -57,7 +57,7 @@ export class MeshBatcher extends THREE.Mesh {
 		this.material = new SkeletonMeshMaterial(materialCustomizer);
 	}
 
-	dispose() {
+	dispose () {
 		this.geometry.dispose();
 		if (this.material instanceof THREE.Material)
 			this.material.dispose();
@@ -70,7 +70,7 @@ export class MeshBatcher extends THREE.Mesh {
 		}
 	}
 
-	clear() {
+	clear () {
 		let geo = (<THREE.BufferGeometry>this.geometry);
 		geo.drawRange.start = 0;
 		geo.drawRange.count = 0;
@@ -78,18 +78,18 @@ export class MeshBatcher extends THREE.Mesh {
 		return this;
 	}
 
-	begin() {
+	begin () {
 		this.verticesLength = 0;
 		this.indicesLength = 0;
 	}
 
-	canBatch(verticesLength: number, indicesLength: number) {
+	canBatch (verticesLength: number, indicesLength: number) {
 		if (this.indicesLength + indicesLength >= this.indices.byteLength / 2) return false;
 		if (this.verticesLength + verticesLength >= this.vertices.byteLength / 2) return false;
 		return true;
 	}
 
-	batch(vertices: ArrayLike<number>, verticesLength: number, indices: ArrayLike<number>, indicesLength: number, z: number = 0) {
+	batch (vertices: ArrayLike<number>, verticesLength: number, indices: ArrayLike<number>, indicesLength: number, z: number = 0) {
 		let indexStart = this.verticesLength / MeshBatcher.VERTEX_SIZE;
 		let vertexBuffer = this.vertices;
 		let i = this.verticesLength;
@@ -113,7 +113,7 @@ export class MeshBatcher extends THREE.Mesh {
 		this.indicesLength += indicesLength;
 	}
 
-	end() {
+	end () {
 		this.vertexBuffer.needsUpdate = this.verticesLength > 0;
 		this.vertexBuffer.updateRange.offset = 0;
 		this.vertexBuffer.updateRange.count = this.verticesLength;

@@ -61,7 +61,7 @@ export class IkConstraintData extends ConstraintData {
 	/** For two bone IK, the distance from the maximum reach of the bones that rotation will slow. */
 	softness = 0;
 
-	constructor(name: string) {
+	constructor (name: string) {
 		super(name, 0, false);
 	}
 }

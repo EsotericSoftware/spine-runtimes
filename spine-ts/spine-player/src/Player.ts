@@ -217,7 +217,7 @@ export class SpinePlayer {
 	private previousViewport: Viewport;
 	private viewportTransitionStart = 0;
 
-	constructor(parent: HTMLElement | string, private config: SpinePlayerConfig) {
+	constructor (parent: HTMLElement | string, private config: SpinePlayerConfig) {
 		this.parent = typeof parent === "string" ? document.getElementById(parent) : parent;
 		if (!this.parent) throw new Error("SpinePlayer parent not found: " + parent);
 
@@ -254,7 +254,7 @@ export class SpinePlayer {
 		requestAnimationFrame(() => this.drawFrame());
 	}
 
-	private validateConfig(config: SpinePlayerConfig) {
+	private validateConfig (config: SpinePlayerConfig) {
 		if (!config) throw new Error("A configuration object must be passed to to new SpinePlayer().");
 		if ((config as any).skelUrl) config.binaryUrl = (config as any).skelUrl;
 		if (!config.jsonUrl && !config.binaryUrl) throw new Error("A URL must be specified for the skeleton JSON or binary file.");
@@ -278,7 +278,7 @@ export class SpinePlayer {
 		if (config.defaultMix === void 0) config.defaultMix = 0.25;
 	}
 
-	private initialize(): HTMLElement {
+	private initialize (): HTMLElement {
 		let config = this.config;
 		let dom = this.dom;
 
@@ -391,7 +391,7 @@ export class SpinePlayer {
 		return dom;
 	}
 
-	private loadSkeleton() {
+	private loadSkeleton () {
 		if (this.error) return;
 
 		if (this.assetManager.hasErrors())
@@ -515,7 +515,7 @@ export class SpinePlayer {
 		}
 	}
 
-	private setupInput() {
+	private setupInput () {
 		let config = this.config;
 		let controlBones = config.controlBones;
 		if (!controlBones.length && !config.showControls) return;
@@ -621,7 +621,7 @@ export class SpinePlayer {
 		}
 	}
 
-	play() {
+	play () {
 		this.paused = false;
 		let config = this.config;
 		if (config.showControls) {
@@ -642,7 +642,7 @@ export class SpinePlayer {
 		}
 	}
 
-	pause() {
+	pause () {
 		this.paused = true;
 		if (this.config.showControls) {
 			this.playerControls.classList.remove("spine-player-controls-hidden");
@@ -653,19 +653,19 @@ export class SpinePlayer {
 	}
 
 	/* Sets a new animation and viewport on track 0. */
-	setAnimation(animation: string | Animation, loop: boolean = true): TrackEntry {
+	setAnimation (animation: string | Animation, loop: boolean = true): TrackEntry {
 		animation = this.setViewport(animation);
 		return this.animationState.setAnimationWith(0, animation, loop);
 	}
 
 	/* Adds a new animation and viewport on track 0. */
-	addAnimation(animation: string | Animation, loop: boolean = true, delay: number = 0): TrackEntry {
+	addAnimation (animation: string | Animation, loop: boolean = true, delay: number = 0): TrackEntry {
 		animation = this.setViewport(animation);
 		return this.animationState.addAnimationWith(0, animation, loop, delay);
 	}
 
 	/* Sets the viewport for the specified animation. */
-	setViewport(animation: string | Animation): Animation {
+	setViewport (animation: string | Animation): Animation {
 		if (typeof animation == "string") animation = this.skeleton.data.findAnimation(animation);
 
 		this.previousViewport = this.currentViewport;
@@ -711,13 +711,13 @@ export class SpinePlayer {
 		return animation;
 	}
 
-	private percentageToWorldUnit(size: number, percentageOrAbsolute: string | number): number {
+	private percentageToWorldUnit (size: number, percentageOrAbsolute: string | number): number {
 		if (typeof percentageOrAbsolute === "string")
 			return size * parseFloat(percentageOrAbsolute.substr(0, percentageOrAbsolute.length - 1)) / 100;
 		return percentageOrAbsolute;
 	}
 
-	private calculateAnimationViewport(animation: Animation, viewport: Viewport) {
+	private calculateAnimationViewport (animation: Animation, viewport: Viewport) {
 		this.skeleton.setToSetupPose();
 
 		let steps = 100, stepTime = animation.duration ? animation.duration / steps : 0, time = 0;
@@ -744,7 +744,7 @@ export class SpinePlayer {
 		viewport.height = maxY - minY;
 	}
 
-	private drawFrame(requestNextFrame = true) {
+	private drawFrame (requestNextFrame = true) {
 		try {
 			if (this.error) return;
 			if (requestNextFrame && !this.stopRequestAnimationFrame) requestAnimationFrame(() => this.drawFrame());
@@ -884,15 +884,15 @@ export class SpinePlayer {
 		}
 	}
 
-	stopRendering() {
+	stopRendering () {
 		this.stopRequestAnimationFrame = true;
 	}
 
-	private hidePopup(id: string): boolean {
+	private hidePopup (id: string): boolean {
 		return this.popup && this.popup.hide(id);
 	}
 
-	private showSpeedDialog(speedButton: HTMLElement) {
+	private showSpeedDialog (speedButton: HTMLElement) {
 		let id = "speed";
 		if (this.hidePopup(id)) return;
 
@@ -912,7 +912,7 @@ export class SpinePlayer {
 		popup.show();
 	}
 
-	private showAnimationsDialog(animationsButton: HTMLElement) {
+	private showAnimationsDialog (animationsButton: HTMLElement) {
 		let id = "animations";
 		if (this.hidePopup(id)) return;
 		if (!this.skeleton || !this.skeleton.data.animations.length) return;
@@ -942,7 +942,7 @@ export class SpinePlayer {
 		popup.show();
 	}
 
-	private showSkinsDialog(skinButton: HTMLElement) {
+	private showSkinsDialog (skinButton: HTMLElement) {
 		let id = "skins";
 		if (this.hidePopup(id)) return;
 		if (!this.skeleton || !this.skeleton.data.animations.length) return;
@@ -970,7 +970,7 @@ export class SpinePlayer {
 		popup.show();
 	}
 
-	private showSettingsDialog(settingsButton: HTMLElement) {
+	private showSettingsDialog (settingsButton: HTMLElement) {
 		let id = "settings";
 		if (this.hidePopup(id)) return;
 		if (!this.skeleton || !this.skeleton.data.animations.length) return;
@@ -998,7 +998,7 @@ export class SpinePlayer {
 		popup.show();
 	}
 
-	private showError(message: string, error: Error = null) {
+	private showError (message: string, error: Error = null) {
 		if (this.error) {
 			if (error) throw error; // Don't lose error if showError throws, is caught, and showError is called again.
 		} else {
@@ -1016,14 +1016,14 @@ class Popup {
 	public dom: HTMLElement;
 	private className: string;
 
-	constructor(private id: string, private button: HTMLElement, private player: SpinePlayer, parent: HTMLElement, htmlContent: string) {
+	constructor (private id: string, private button: HTMLElement, private player: SpinePlayer, parent: HTMLElement, htmlContent: string) {
 		this.dom = createElement(/*html*/`<div class="spine-player-popup spine-player-hidden"></div>`);
 		this.dom.innerHTML = htmlContent;
 		parent.appendChild(this.dom);
 		this.className = "spine-player-button-icon-" + id + "-selected";
 	}
 
-	hide(id: string): boolean {
+	hide (id: string): boolean {
 		this.dom.remove();
 		this.button.classList.remove(this.className);
 		if (this.id == id) {
@@ -1032,7 +1032,7 @@ class Popup {
 		}
 	}
 
-	show() {
+	show () {
 		this.player.popup = this;
 		this.button.classList.add(this.className);
 		this.dom.classList.remove("spine-player-hidden");
@@ -1072,9 +1072,9 @@ class Switch {
 	private enabled = false;
 	public change: (value: boolean) => void;
 
-	constructor(private text: string) { }
+	constructor (private text: string) { }
 
-	create(): HTMLElement {
+	create (): HTMLElement {
 		this.switch = createElement(/*html*/`
 <div class="spine-player-switch">
 	<span class="spine-player-switch-text">${this.text}</span>
@@ -1089,13 +1089,13 @@ class Switch {
 		return this.switch;
 	}
 
-	setEnabled(enabled: boolean) {
+	setEnabled (enabled: boolean) {
 		if (enabled) this.switch.classList.add("active");
 		else this.switch.classList.remove("active");
 		this.enabled = enabled;
 	}
 
-	isEnabled(): boolean {
+	isEnabled (): boolean {
 		return this.enabled;
 	}
 }
@@ -1106,9 +1106,9 @@ class Slider {
 	private knob: HTMLElement;
 	public change: (percentage: number) => void;
 
-	constructor(public snaps = 0, public snapPercentage = 0.1, public big = false) { }
+	constructor (public snaps = 0, public snapPercentage = 0.1, public big = false) { }
 
-	create(): HTMLElement {
+	create (): HTMLElement {
 		this.slider = createElement(/*html*/`
 <div class="spine-player-slider ${this.big ? "big" : ""}">
 	<div class="spine-player-slider-value"></div>
@@ -1140,7 +1140,7 @@ class Slider {
 		return this.slider;
 	}
 
-	setValue(percentage: number): number {
+	setValue (percentage: number): number {
 		percentage = Math.max(0, Math.min(1, percentage));
 		if (this.snaps) {
 			let snap = 1 / this.snaps;
@@ -1158,22 +1158,22 @@ class Slider {
 	}
 }
 
-function findWithClass(element: HTMLElement, className: string): HTMLElement {
+function findWithClass (element: HTMLElement, className: string): HTMLElement {
 	return element.getElementsByClassName(className)[0] as HTMLElement;
 }
 
-function createElement(html: string): HTMLElement {
+function createElement (html: string): HTMLElement {
 	let div = document.createElement("div");
 	div.innerHTML = html;
 	return div.children[0] as HTMLElement;
 }
 
-function removeClass(elements: HTMLCollection, clazz: string) {
+function removeClass (elements: HTMLCollection, clazz: string) {
 	for (let i = 0; i < elements.length; i++)
 		elements[i].classList.remove(clazz);
 }
 
-function toString(object: any) {
+function toString (object: any) {
 	return JSON.stringify(object)
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")

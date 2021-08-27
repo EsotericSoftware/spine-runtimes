@@ -35,7 +35,7 @@ export class TextureAtlas implements Disposable {
 	pages = new Array<TextureAtlasPage>();
 	regions = new Array<TextureAtlasRegion>();
 
-	constructor(atlasText: string) {
+	constructor (atlasText: string) {
 		let reader = new TextureAtlasReader(atlasText);
 		let entry = new Array<string>(4);
 		let page: TextureAtlasPage = null;
@@ -176,7 +176,7 @@ export class TextureAtlas implements Disposable {
 		}
 	}
 
-	findRegion(name: string): TextureAtlasRegion {
+	findRegion (name: string): TextureAtlasRegion {
 		for (let i = 0; i < this.regions.length; i++) {
 			if (this.regions[i].name == name) {
 				return this.regions[i];
@@ -185,12 +185,12 @@ export class TextureAtlas implements Disposable {
 		return null;
 	}
 
-	setTextures(assetManager: AssetManagerBase, pathPrefix: string = "") {
+	setTextures (assetManager: AssetManagerBase, pathPrefix: string = "") {
 		for (let page of this.pages)
 			page.setTexture(assetManager.get(pathPrefix + page.name));
 	}
 
-	dispose() {
+	dispose () {
 		for (let i = 0; i < this.pages.length; i++) {
 			this.pages[i].texture.dispose();
 		}
@@ -201,17 +201,17 @@ class TextureAtlasReader {
 	lines: Array<string>;
 	index: number = 0;
 
-	constructor(text: string) {
+	constructor (text: string) {
 		this.lines = text.split(/\r\n|\r|\n/);
 	}
 
-	readLine(): string {
+	readLine (): string {
 		if (this.index >= this.lines.length)
 			return null;
 		return this.lines[this.index++];
 	}
 
-	readEntry(entry: string[], line: string): number {
+	readEntry (entry: string[], line: string): number {
 		if (!line) return 0;
 		line = line.trim();
 		if (line.length == 0) return 0;
@@ -243,7 +243,7 @@ export class TextureAtlasPage {
 	height: number;
 	pma: boolean;
 
-	setTexture(texture: Texture) {
+	setTexture (texture: Texture) {
 		this.texture = texture;
 		texture.setFilters(this.minFilter, this.magFilter);
 		texture.setWraps(this.uWrap, this.vWrap);

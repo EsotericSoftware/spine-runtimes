@@ -30,11 +30,11 @@
 import { Texture, TextureFilter, TextureWrap } from "@esotericsoftware/spine-core";
 
 export class CanvasTexture extends Texture {
-	constructor(image: HTMLImageElement) {
+	constructor (image: HTMLImageElement) {
 		super(image);
 	}
 
-	setFilters(minFilter: TextureFilter, magFilter: TextureFilter) { }
-	setWraps(uWrap: TextureWrap, vWrap: TextureWrap) { }
-	dispose() { }
+	setFilters (minFilter: TextureFilter, magFilter: TextureFilter) { }
+	setWraps (uWrap: TextureWrap, vWrap: TextureWrap) { }
+	dispose () { }
 }

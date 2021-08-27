@@ -38,11 +38,11 @@ import { VertexAttachment, Attachment } from "./Attachment";
 export class BoundingBoxAttachment extends VertexAttachment {
 	color = new Color(1, 1, 1, 1);
 
-	constructor(name: string) {
+	constructor (name: string) {
 		super(name);
 	}
 
-	copy(): Attachment {
+	copy (): Attachment {
 		let copy = new BoundingBoxAttachment(this.name);
 		this.copyTo(copy);
 		copy.color.setFromColor(this.color);

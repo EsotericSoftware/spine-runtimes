@@ -69,7 +69,7 @@ export class TransformConstraintData extends ConstraintData {
 	relative = false;
 	local = false;
 
-	constructor(name: string) {
+	constructor (name: string) {
 		super(name, 0, false);
 	}
 }

@@ -75,12 +75,12 @@ export class RegionAttachment extends Attachment {
 
 	tempColor = new Color(1, 1, 1, 1);
 
-	constructor(name: string) {
+	constructor (name: string) {
 		super(name);
 	}
 
 	/** Calculates the {@link #offset} using the region settings. Must be called after changing region settings. */
-	updateOffset(): void {
+	updateOffset (): void {
 		let region = this.region;
 		let regionScaleX = this.width / this.region.originalWidth * this.scaleX;
 		let regionScaleY = this.height / this.region.originalHeight * this.scaleY;
@@ -111,7 +111,7 @@ export class RegionAttachment extends Attachment {
 		offset[7] = localYCos + localX2Sin;
 	}
 
-	setRegion(region: TextureRegion): void {
+	setRegion (region: TextureRegion): void {
 		this.region = region;
 		let uvs = this.uvs;
 		if (region.degrees == 90) {
@@ -142,7 +142,7 @@ export class RegionAttachment extends Attachment {
 	 * @param worldVertices The output world vertices. Must have a length >= `offset` + 8.
 	 * @param offset The `worldVertices` index to begin writing values.
 	 * @param stride The number of `worldVertices` entries between the value pairs written. */
-	computeWorldVertices(bone: Bone, worldVertices: NumberArrayLike, offset: number, stride: number) {
+	computeWorldVertices (bone: Bone, worldVertices: NumberArrayLike, offset: number, stride: number) {
 		let vertexOffset = this.offset;
 		let x = bone.worldX, y = bone.worldY;
 		let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
@@ -172,7 +172,7 @@ export class RegionAttachment extends Attachment {
 		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 	}
 
-	copy(): Attachment {
+	copy (): Attachment {
 		let copy = new RegionAttachment(this.name);
 		copy.region = this.region;
 		copy.rendererObject = this.rendererObject;

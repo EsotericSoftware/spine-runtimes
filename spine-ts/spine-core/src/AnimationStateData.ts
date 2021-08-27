@@ -42,7 +42,7 @@ export class AnimationStateData {
 	/** The mix duration to use when no mix duration has been defined between two animations. */
 	defaultMix = 0;
 
-	constructor(skeletonData: SkeletonData) {
+	constructor (skeletonData: SkeletonData) {
 		if (!skeletonData) throw new Error("skeletonData cannot be null.");
 		this.skeletonData = skeletonData;
 	}
@@ -50,7 +50,7 @@ export class AnimationStateData {
 	/** Sets a mix duration by animation name.
 	 *
 	 * See {@link #setMixWith()}. */
-	setMix(fromName: string, toName: string, duration: number) {
+	setMix (fromName: string, toName: string, duration: number) {
 		let from = this.skeletonData.findAnimation(fromName);
 		if (!from) throw new Error("Animation not found: " + fromName);
 		let to = this.skeletonData.findAnimation(toName);
@@ -61,7 +61,7 @@ export class AnimationStateData {
 	/** Sets the mix duration when changing from the specified animation to the other.
 	 *
 	 * See {@link TrackEntry#mixDuration}. */
-	setMixWith(from: Animation, to: Animation, duration: number) {
+	setMixWith (from: Animation, to: Animation, duration: number) {
 		if (!from) throw new Error("from cannot be null.");
 		if (!to) throw new Error("to cannot be null.");
 		let key = from.name + "." + to.name;
@@ -70,7 +70,7 @@ export class AnimationStateData {
 
 	/** Returns the mix duration to use when changing from the specified animation to the other, or the {@link #defaultMix} if
 	  * no mix duration has been set. */
-	getMix(from: Animation, to: Animation) {
+	getMix (from: Animation, to: Animation) {
 		let key = from.name + "." + to.name;
 		let value = this.animationToMixTime[key];
 		return value === undefined ? this.defaultMix : value;

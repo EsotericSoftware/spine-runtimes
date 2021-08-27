@@ -44,11 +44,11 @@ import { TextureAtlas } from "./TextureAtlas";
 export class AtlasAttachmentLoader implements AttachmentLoader {
 	atlas: TextureAtlas;
 
-	constructor(atlas: TextureAtlas) {
+	constructor (atlas: TextureAtlas) {
 		this.atlas = atlas;
 	}
 
-	newRegionAttachment(skin: Skin, name: string, path: string): RegionAttachment {
+	newRegionAttachment (skin: Skin, name: string, path: string): RegionAttachment {
 		let region = this.atlas.findRegion(path);
 		if (!region) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
 		region.renderObject = region;
@@ -57,7 +57,7 @@ export class AtlasAttachmentLoader implements AttachmentLoader {
 		return attachment;
 	}
 
-	newMeshAttachment(skin: Skin, name: string, path: string): MeshAttachment {
+	newMeshAttachment (skin: Skin, name: string, path: string): MeshAttachment {
 		let region = this.atlas.findRegion(path);
 		if (!region) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
 		region.renderObject = region;
@@ -66,19 +66,19 @@ export class AtlasAttachmentLoader implements AttachmentLoader {
 		return attachment;
 	}
 
-	newBoundingBoxAttachment(skin: Skin, name: string): BoundingBoxAttachment {
+	newBoundingBoxAttachment (skin: Skin, name: string): BoundingBoxAttachment {
 		return new BoundingBoxAttachment(name);
 	}
 
-	newPathAttachment(skin: Skin, name: string): PathAttachment {
+	newPathAttachment (skin: Skin, name: string): PathAttachment {
 		return new PathAttachment(name);
 	}
 
-	newPointAttachment(skin: Skin, name: string): PointAttachment {
+	newPointAttachment (skin: Skin, name: string): PointAttachment {
 		return new PointAttachment(name);
 	}
 
-	newClippingAttachment(skin: Skin, name: string): ClippingAttachment {
+	newClippingAttachment (skin: Skin, name: string): ClippingAttachment {
 		return new ClippingAttachment(name);
 	}
 }

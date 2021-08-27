@@ -46,14 +46,14 @@ export class Animation {
 	/** The duration of the animation in seconds, which is the highest time of all keys in the timeline. */
 	duration: number;
 
-	constructor(name: string, timelines: Array<Timeline>, duration: number) {
+	constructor (name: string, timelines: Array<Timeline>, duration: number) {
 		if (!name) throw new Error("name cannot be null.");
 		this.name = name;
 		this.setTimelines(timelines);
 		this.duration = duration;
 	}
 
-	setTimelines(timelines: Array<Timeline>) {
+	setTimelines (timelines: Array<Timeline>) {
 		if (!timelines) throw new Error("timelines cannot be null.");
 		this.timelines = timelines;
 		this.timelineIds = new StringSet();
@@ -61,7 +61,7 @@ export class Animation {
 			this.timelineIds.addAll(timelines[i].getPropertyIds());
 	}
 
-	hasTimeline(ids: string[]): boolean {
+	hasTimeline (ids: string[]): boolean {
 		for (let i = 0; i < ids.length; i++)
 			if (this.timelineIds.contains(ids[i])) return true;
 		return false;
@@ -72,7 +72,7 @@ export class Animation {
 	 * See Timeline {@link Timeline#apply(Skeleton, float, float, Array, float, MixBlend, MixDirection)}.
 	 * @param loop If true, the animation repeats after {@link #getDuration()}.
 	 * @param events May be null to ignore fired events. */
-	apply(skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, loop: boolean, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 
 		if (loop && this.duration != 0) {
@@ -154,37 +154,37 @@ export abstract class Timeline {
 	propertyIds: string[];
 	frames: NumberArrayLike;
 
-	constructor(frameCount: number, propertyIds: string[]) {
+	constructor (frameCount: number, propertyIds: string[]) {
 		this.propertyIds = propertyIds;
 		this.frames = Utils.newFloatArray(frameCount * this.getFrameEntries());
 	}
 
-	getPropertyIds() {
+	getPropertyIds () {
 		return this.propertyIds;
 	}
 
-	getFrameEntries(): number {
+	getFrameEntries (): number {
 		return 1;
 	}
 
-	getFrameCount() {
+	getFrameCount () {
 		return this.frames.length / this.getFrameEntries();
 	}
 
-	getDuration(): number {
+	getDuration (): number {
 		return this.frames[this.frames.length - this.getFrameEntries()];
 	}
 
-	abstract apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection): void;
+	abstract apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection): void;
 
-	static search1(frames: NumberArrayLike, time: number) {
+	static search1 (frames: NumberArrayLike, time: number) {
 		let n = frames.length;
 		for (let i = 1; i < n; i++)
 			if (frames[i] > time) return i - 1;
 		return n - 1;
 	}
 
-	static search(frames: NumberArrayLike, time: number, step: number) {
+	static search (frames: NumberArrayLike, time: number, step: number) {
 		let n = frames.length;
 		for (let i = step; i < n; i += step)
 			if (frames[i] > time) return i - step;
@@ -206,25 +206,25 @@ export interface SlotTimeline {
 export abstract class CurveTimeline extends Timeline {
 	protected curves: NumberArrayLike; // type, x, y, ...
 
-	constructor(frameCount: number, bezierCount: number, propertyIds: string[]) {
+	constructor (frameCount: number, bezierCount: number, propertyIds: string[]) {
 		super(frameCount, propertyIds);
 		this.curves = Utils.newFloatArray(frameCount + bezierCount * 18/*BEZIER_SIZE*/);
 		this.curves[frameCount - 1] = 1/*STEPPED*/;
 	}
 
 	/** Sets the specified key frame to linear interpolation. */
-	setLinear(frame: number) {
+	setLinear (frame: number) {
 		this.curves[frame] = 0/*LINEAR*/;
 	}
 
 	/** Sets the specified key frame to stepped interpolation. */
-	setStepped(frame: number) {
+	setStepped (frame: number) {
 		this.curves[frame] = 1/*STEPPED*/;
 	}
 
 	/** Shrinks the storage for Bezier curves, for use when <code>bezierCount</code> (specified in the constructor) was larger
 	 * than the actual number of Bezier curves. */
-	shrink(bezierCount: number) {
+	shrink (bezierCount: number) {
 		let size = this.getFrameCount() + bezierCount * 18/*BEZIER_SIZE*/;
 		if (this.curves.length > size) {
 			let newCurves = Utils.newFloatArray(size);
@@ -247,7 +247,7 @@ export abstract class CurveTimeline extends Timeline {
 	 * @param cy2 The value for the second Bezier handle.
 	 * @param time2 The time for the second key.
 	 * @param value2 The value for the second key. */
-	setBezier(bezier: number, frame: number, value: number, time1: number, value1: number, cx1: number, cy1: number, cx2: number,
+	setBezier (bezier: number, frame: number, value: number, time1: number, value1: number, cx1: number, cy1: number, cx2: number,
 		cy2: number, time2: number, value2: number) {
 		let curves = this.curves;
 		let i = this.getFrameCount() + bezier * 18/*BEZIER_SIZE*/;
@@ -273,7 +273,7 @@ export abstract class CurveTimeline extends Timeline {
 	 * @param frameIndex The index into {@link #getFrames()} for the values of the frame before <code>time</code>.
 	 * @param valueOffset The offset from <code>frameIndex</code> to the value this curve is used for.
 	 * @param i The index of the Bezier segments. See {@link #getCurveType(int)}. */
-	getBezierValue(time: number, frameIndex: number, valueOffset: number, i: number) {
+	getBezierValue (time: number, frameIndex: number, valueOffset: number, i: number) {
 		let curves = this.curves;
 		if (curves[i] > time) {
 			let x = this.frames[frameIndex], y = this.frames[frameIndex + valueOffset];
@@ -293,25 +293,25 @@ export abstract class CurveTimeline extends Timeline {
 }
 
 export abstract class CurveTimeline1 extends CurveTimeline {
-	constructor(frameCount: number, bezierCount: number, propertyId: string) {
+	constructor (frameCount: number, bezierCount: number, propertyId: string) {
 		super(frameCount, bezierCount, [propertyId]);
 	}
 
-	getFrameEntries() {
+	getFrameEntries () {
 		return 2/*ENTRIES*/;
 	}
 
 	/** Sets the time and value for the specified frame.
 	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 	 * @param time The frame time in seconds. */
-	setFrame(frame: number, time: number, value: number) {
+	setFrame (frame: number, time: number, value: number) {
 		frame <<= 1;
 		this.frames[frame] = time;
 		this.frames[frame + 1/*VALUE*/] = value;
 	}
 
 	/** Returns the interpolated value for the specified time. */
-	getCurveValue(time: number) {
+	getCurveValue (time: number) {
 		let frames = this.frames;
 		let i = frames.length - 2;
 		for (let ii = 2; ii <= i; ii += 2) {
@@ -337,18 +337,18 @@ export abstract class CurveTimeline1 extends CurveTimeline {
 export abstract class CurveTimeline2 extends CurveTimeline {
 	/** @param bezierCount The maximum number of Bezier curves. See {@link #shrink(int)}.
 	 * @param propertyIds Unique identifiers for the properties the timeline modifies. */
-	constructor(frameCount: number, bezierCount: number, propertyId1: string, propertyId2: string) {
+	constructor (frameCount: number, bezierCount: number, propertyId1: string, propertyId2: string) {
 		super(frameCount, bezierCount, [propertyId1, propertyId2]);
 	}
 
-	getFrameEntries() {
+	getFrameEntries () {
 		return 3/*ENTRIES*/;
 	}
 
 	/** Sets the time and values for the specified frame.
 	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
 	 * @param time The frame time in seconds. */
-	setFrame(frame: number, time: number, value1: number, value2: number) {
+	setFrame (frame: number, time: number, value1: number, value2: number) {
 		frame *= 3/*ENTRIES*/;
 		this.frames[frame] = time;
 		this.frames[frame + 1/*VALUE1*/] = value1;
@@ -360,12 +360,12 @@ export abstract class CurveTimeline2 extends CurveTimeline {
 export class RotateTimeline extends CurveTimeline1 implements BoneTimeline {
 	boneIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, boneIndex: number) {
+	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount, Property.rotate + "|" + boneIndex);
 		this.boneIndex = boneIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
 
@@ -399,7 +399,7 @@ export class RotateTimeline extends CurveTimeline1 implements BoneTimeline {
 export class TranslateTimeline extends CurveTimeline2 implements BoneTimeline {
 	boneIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, boneIndex: number) {
+	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount,
 			Property.x + "|" + boneIndex,
 			Property.y + "|" + boneIndex,
@@ -407,7 +407,7 @@ export class TranslateTimeline extends CurveTimeline2 implements BoneTimeline {
 		this.boneIndex = boneIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
 
@@ -467,12 +467,12 @@ export class TranslateTimeline extends CurveTimeline2 implements BoneTimeline {
 export class TranslateXTimeline extends CurveTimeline1 implements BoneTimeline {
 	boneIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, boneIndex: number) {
+	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount, Property.x + "|" + boneIndex);
 		this.boneIndex = boneIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
 
@@ -507,12 +507,12 @@ export class TranslateXTimeline extends CurveTimeline1 implements BoneTimeline {
 export class TranslateYTimeline extends CurveTimeline1 implements BoneTimeline {
 	boneIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, boneIndex: number) {
+	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount, Property.y + "|" + boneIndex);
 		this.boneIndex = boneIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
 
@@ -547,7 +547,7 @@ export class TranslateYTimeline extends CurveTimeline1 implements BoneTimeline {
 export class ScaleTimeline extends CurveTimeline2 implements BoneTimeline {
 	boneIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, boneIndex: number) {
+	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount,
 			Property.scaleX + "|" + boneIndex,
 			Property.scaleY + "|" + boneIndex
@@ -555,7 +555,7 @@ export class ScaleTimeline extends CurveTimeline2 implements BoneTimeline {
 		this.boneIndex = boneIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
 
@@ -657,12 +657,12 @@ export class ScaleTimeline extends CurveTimeline2 implements BoneTimeline {
 export class ScaleXTimeline extends CurveTimeline1 implements BoneTimeline {
 	boneIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, boneIndex: number) {
+	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount, Property.scaleX + "|" + boneIndex);
 		this.boneIndex = boneIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
 
@@ -726,12 +726,12 @@ export class ScaleXTimeline extends CurveTimeline1 implements BoneTimeline {
 export class ScaleYTimeline extends CurveTimeline1 implements BoneTimeline {
 	boneIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, boneIndex: number) {
+	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount, Property.scaleY + "|" + boneIndex);
 		this.boneIndex = boneIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
 
@@ -795,7 +795,7 @@ export class ScaleYTimeline extends CurveTimeline1 implements BoneTimeline {
 export class ShearTimeline extends CurveTimeline2 implements BoneTimeline {
 	boneIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, boneIndex: number) {
+	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount,
 			Property.shearX + "|" + boneIndex,
 			Property.shearY + "|" + boneIndex
@@ -803,7 +803,7 @@ export class ShearTimeline extends CurveTimeline2 implements BoneTimeline {
 		this.boneIndex = boneIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
 
@@ -863,12 +863,12 @@ export class ShearTimeline extends CurveTimeline2 implements BoneTimeline {
 export class ShearXTimeline extends CurveTimeline1 implements BoneTimeline {
 	boneIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, boneIndex: number) {
+	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount, Property.shearX + "|" + boneIndex);
 		this.boneIndex = boneIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
 
@@ -903,12 +903,12 @@ export class ShearXTimeline extends CurveTimeline1 implements BoneTimeline {
 export class ShearYTimeline extends CurveTimeline1 implements BoneTimeline {
 	boneIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, boneIndex: number) {
+	constructor (frameCount: number, bezierCount: number, boneIndex: number) {
 		super(frameCount, bezierCount, Property.shearY + "|" + boneIndex);
 		this.boneIndex = boneIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
 
@@ -943,7 +943,7 @@ export class ShearYTimeline extends CurveTimeline1 implements BoneTimeline {
 export class RGBATimeline extends CurveTimeline implements SlotTimeline {
 	slotIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, slotIndex: number) {
+	constructor (frameCount: number, bezierCount: number, slotIndex: number) {
 		super(frameCount, bezierCount, [
 			Property.rgb + "|" + slotIndex,
 			Property.alpha + "|" + slotIndex
@@ -951,12 +951,12 @@ export class RGBATimeline extends CurveTimeline implements SlotTimeline {
 		this.slotIndex = slotIndex;
 	}
 
-	getFrameEntries() {
+	getFrameEntries () {
 		return 5/*ENTRIES*/;
 	}
 
 	/** Sets the time in seconds, red, green, blue, and alpha for the specified key frame. */
-	setFrame(frame: number, time: number, r: number, g: number, b: number, a: number) {
+	setFrame (frame: number, time: number, r: number, g: number, b: number, a: number) {
 		frame *= 5/*ENTRIES*/;
 		this.frames[frame] = time;
 		this.frames[frame + 1/*R*/] = r;
@@ -965,7 +965,7 @@ export class RGBATimeline extends CurveTimeline implements SlotTimeline {
 		this.frames[frame + 4/*A*/] = a;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let slot = skeleton.slots[this.slotIndex];
 		if (!slot.bone.active) return;
 
@@ -1025,19 +1025,19 @@ export class RGBATimeline extends CurveTimeline implements SlotTimeline {
 export class RGBTimeline extends CurveTimeline implements SlotTimeline {
 	slotIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, slotIndex: number) {
+	constructor (frameCount: number, bezierCount: number, slotIndex: number) {
 		super(frameCount, bezierCount, [
 			Property.rgb + "|" + slotIndex
 		]);
 		this.slotIndex = slotIndex;
 	}
 
-	getFrameEntries() {
+	getFrameEntries () {
 		return 4/*ENTRIES*/;
 	}
 
 	/** Sets the time in seconds, red, green, blue, and alpha for the specified key frame. */
-	setFrame(frame: number, time: number, r: number, g: number, b: number) {
+	setFrame (frame: number, time: number, r: number, g: number, b: number) {
 		frame <<= 2;
 		this.frames[frame] = time;
 		this.frames[frame + 1/*R*/] = r;
@@ -1045,7 +1045,7 @@ export class RGBTimeline extends CurveTimeline implements SlotTimeline {
 		this.frames[frame + 3/*B*/] = b;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let slot = skeleton.slots[this.slotIndex];
 		if (!slot.bone.active) return;
 
@@ -1113,12 +1113,12 @@ export class RGBTimeline extends CurveTimeline implements SlotTimeline {
 export class AlphaTimeline extends CurveTimeline1 implements SlotTimeline {
 	slotIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, slotIndex: number) {
+	constructor (frameCount: number, bezierCount: number, slotIndex: number) {
 		super(frameCount, bezierCount, Property.alpha + "|" + slotIndex);
 		this.slotIndex = slotIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let slot = skeleton.slots[this.slotIndex];
 		if (!slot.bone.active) return;
 
@@ -1149,7 +1149,7 @@ export class AlphaTimeline extends CurveTimeline1 implements SlotTimeline {
 export class RGBA2Timeline extends CurveTimeline implements SlotTimeline {
 	slotIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, slotIndex: number) {
+	constructor (frameCount: number, bezierCount: number, slotIndex: number) {
 		super(frameCount, bezierCount, [
 			Property.rgb + "|" + slotIndex,
 			Property.alpha + "|" + slotIndex,
@@ -1158,12 +1158,12 @@ export class RGBA2Timeline extends CurveTimeline implements SlotTimeline {
 		this.slotIndex = slotIndex;
 	}
 
-	getFrameEntries() {
+	getFrameEntries () {
 		return 8/*ENTRIES*/;
 	}
 
 	/** Sets the time in seconds, light, and dark colors for the specified key frame. */
-	setFrame(frame: number, time: number, r: number, g: number, b: number, a: number, r2: number, g2: number, b2: number) {
+	setFrame (frame: number, time: number, r: number, g: number, b: number, a: number, r2: number, g2: number, b2: number) {
 		frame <<= 3;
 		this.frames[frame] = time;
 		this.frames[frame + 1/*R*/] = r;
@@ -1175,7 +1175,7 @@ export class RGBA2Timeline extends CurveTimeline implements SlotTimeline {
 		this.frames[frame + 7/*B2*/] = b2;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let slot = skeleton.slots[this.slotIndex];
 		if (!slot.bone.active) return;
 
@@ -1266,7 +1266,7 @@ export class RGBA2Timeline extends CurveTimeline implements SlotTimeline {
 export class RGB2Timeline extends CurveTimeline implements SlotTimeline {
 	slotIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, slotIndex: number) {
+	constructor (frameCount: number, bezierCount: number, slotIndex: number) {
 		super(frameCount, bezierCount, [
 			Property.rgb + "|" + slotIndex,
 			Property.rgb2 + "|" + slotIndex
@@ -1274,12 +1274,12 @@ export class RGB2Timeline extends CurveTimeline implements SlotTimeline {
 		this.slotIndex = slotIndex;
 	}
 
-	getFrameEntries() {
+	getFrameEntries () {
 		return 7/*ENTRIES*/;
 	}
 
 	/** Sets the time in seconds, light, and dark colors for the specified key frame. */
-	setFrame(frame: number, time: number, r: number, g: number, b: number, r2: number, g2: number, b2: number) {
+	setFrame (frame: number, time: number, r: number, g: number, b: number, r2: number, g2: number, b2: number) {
 		frame *= 7/*ENTRIES*/;
 		this.frames[frame] = time;
 		this.frames[frame + 1/*R*/] = r;
@@ -1290,7 +1290,7 @@ export class RGB2Timeline extends CurveTimeline implements SlotTimeline {
 		this.frames[frame + 6/*B2*/] = b2;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let slot = skeleton.slots[this.slotIndex];
 		if (!slot.bone.active) return;
 
@@ -1389,7 +1389,7 @@ export class AttachmentTimeline extends Timeline implements SlotTimeline {
 	/** The attachment name for each key frame. May contain null values to clear the attachment. */
 	attachmentNames: Array<string>;
 
-	constructor(frameCount: number, slotIndex: number) {
+	constructor (frameCount: number, slotIndex: number) {
 		super(frameCount, [
 			Property.attachment + "|" + slotIndex
 		]);
@@ -1397,17 +1397,17 @@ export class AttachmentTimeline extends Timeline implements SlotTimeline {
 		this.attachmentNames = new Array<string>(frameCount);
 	}
 
-	getFrameCount() {
+	getFrameCount () {
 		return this.frames.length;
 	}
 
 	/** Sets the time in seconds and the attachment name for the specified key frame. */
-	setFrame(frame: number, time: number, attachmentName: string) {
+	setFrame (frame: number, time: number, attachmentName: string) {
 		this.frames[frame] = time;
 		this.attachmentNames[frame] = attachmentName;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let slot = skeleton.slots[this.slotIndex];
 		if (!slot.bone.active) return;
 
@@ -1424,7 +1424,7 @@ export class AttachmentTimeline extends Timeline implements SlotTimeline {
 		this.setAttachment(skeleton, slot, this.attachmentNames[Timeline.search1(this.frames, time)]);
 	}
 
-	setAttachment(skeleton: Skeleton, slot: Slot, attachmentName: string) {
+	setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: string) {
 		slot.setAttachment(!attachmentName ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
 	}
 }
@@ -1439,7 +1439,7 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 	/** The vertices for each key frame. */
 	vertices: Array<NumberArrayLike>;
 
-	constructor(frameCount: number, bezierCount: number, slotIndex: number, attachment: VertexAttachment) {
+	constructor (frameCount: number, bezierCount: number, slotIndex: number, attachment: VertexAttachment) {
 		super(frameCount, bezierCount, [
 			Property.deform + "|" + slotIndex + "|" + attachment.id
 		]);
@@ -1448,20 +1448,20 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		this.vertices = new Array<NumberArrayLike>(frameCount);
 	}
 
-	getFrameCount() {
+	getFrameCount () {
 		return this.frames.length;
 	}
 
 	/** Sets the time in seconds and the vertices for the specified key frame.
 	 * @param vertices Vertex positions for an unweighted VertexAttachment, or deform offsets if it has weights. */
-	setFrame(frame: number, time: number, vertices: NumberArrayLike) {
+	setFrame (frame: number, time: number, vertices: NumberArrayLike) {
 		this.frames[frame] = time;
 		this.vertices[frame] = vertices;
 	}
 
 	/** @param value1 Ignored (0 is used for a deform timeline).
 	 * @param value2 Ignored (1 is used for a deform timeline). */
-	setBezier(bezier: number, frame: number, value: number, time1: number, value1: number, cx1: number, cy1: number, cx2: number,
+	setBezier (bezier: number, frame: number, value: number, time1: number, value1: number, cx1: number, cy1: number, cx2: number,
 		cy2: number, time2: number, value2: number) {
 		let curves = this.curves;
 		let i = this.getFrameCount() + bezier * 18/*BEZIER_SIZE*/;
@@ -1483,7 +1483,7 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		}
 	}
 
-	getCurvePercent(time: number, frame: number) {
+	getCurvePercent (time: number, frame: number) {
 		let curves = this.curves;
 		let i = curves[frame];
 		switch (i) {
@@ -1509,7 +1509,7 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		return y + (1 - y) * (time - x) / (this.frames[frame + this.getFrameEntries()] - x);
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let slot: Slot = skeleton.slots[this.slotIndex];
 		if (!slot.bone.active) return;
 		let slotAttachment: Attachment = slot.getAttachment();
@@ -1691,24 +1691,24 @@ export class EventTimeline extends Timeline {
 	/** The event for each key frame. */
 	events: Array<Event>;
 
-	constructor(frameCount: number) {
+	constructor (frameCount: number) {
 		super(frameCount, EventTimeline.propertyIds);
 
 		this.events = new Array<Event>(frameCount);
 	}
 
-	getFrameCount() {
+	getFrameCount () {
 		return this.frames.length;
 	}
 
 	/** Sets the time in seconds and the event for the specified key frame. */
-	setFrame(frame: number, event: Event) {
+	setFrame (frame: number, event: Event) {
 		this.frames[frame] = event.time;
 		this.events[frame] = event;
 	}
 
 	/** Fires events for frames > `lastTime` and <= `time`. */
-	apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		if (!firedEvents) return;
 
 		let frames = this.frames;
@@ -1744,24 +1744,24 @@ export class DrawOrderTimeline extends Timeline {
 	/** The draw order for each key frame. See {@link #setFrame(int, float, int[])}. */
 	drawOrders: Array<Array<number>>;
 
-	constructor(frameCount: number) {
+	constructor (frameCount: number) {
 		super(frameCount, DrawOrderTimeline.propertyIds);
 		this.drawOrders = new Array<Array<number>>(frameCount);
 	}
 
-	getFrameCount() {
+	getFrameCount () {
 		return this.frames.length;
 	}
 
 	/** Sets the time in seconds and the draw order for the specified key frame.
 	 * @param drawOrder For each slot in {@link Skeleton#slots}, the index of the new draw order. May be null to use setup pose
 	 *           draw order. */
-	setFrame(frame: number, time: number, drawOrder: Array<number>) {
+	setFrame (frame: number, time: number, drawOrder: Array<number>) {
 		this.frames[frame] = time;
 		this.drawOrders[frame] = drawOrder;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		if (direction == MixDirection.mixOut) {
 			if (blend == MixBlend.setup) Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
 			return;
@@ -1790,19 +1790,19 @@ export class IkConstraintTimeline extends CurveTimeline {
 	/** The index of the IK constraint slot in {@link Skeleton#ikConstraints} that will be changed. */
 	ikConstraintIndex: number;
 
-	constructor(frameCount: number, bezierCount: number, ikConstraintIndex: number) {
+	constructor (frameCount: number, bezierCount: number, ikConstraintIndex: number) {
 		super(frameCount, bezierCount, [
 			Property.ikConstraint + "|" + ikConstraintIndex
 		]);
 		this.ikConstraintIndex = ikConstraintIndex;
 	}
 
-	getFrameEntries() {
+	getFrameEntries () {
 		return 6/*ENTRIES*/;
 	}
 
 	/** Sets the time in seconds, mix, softness, bend direction, compress, and stretch for the specified key frame. */
-	setFrame(frame: number, time: number, mix: number, softness: number, bendDirection: number, compress: boolean, stretch: boolean) {
+	setFrame (frame: number, time: number, mix: number, softness: number, bendDirection: number, compress: boolean, stretch: boolean) {
 		frame *= 6/*ENTRIES*/;
 		this.frames[frame] = time;
 		this.frames[frame + 1/*MIX*/] = mix;
@@ -1812,7 +1812,7 @@ export class IkConstraintTimeline extends CurveTimeline {
 		this.frames[frame + 5/*STRETCH*/] = stretch ? 1 : 0;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let constraint: IkConstraint = skeleton.ikConstraints[this.ikConstraintIndex];
 		if (!constraint.active) return;
 
@@ -1888,19 +1888,19 @@ export class TransformConstraintTimeline extends CurveTimeline {
 	/** The index of the transform constraint slot in {@link Skeleton#transformConstraints} that will be changed. */
 	transformConstraintIndex: number;
 
-	constructor(frameCount: number, bezierCount: number, transformConstraintIndex: number) {
+	constructor (frameCount: number, bezierCount: number, transformConstraintIndex: number) {
 		super(frameCount, bezierCount, [
 			Property.transformConstraint + "|" + transformConstraintIndex
 		]);
 		this.transformConstraintIndex = transformConstraintIndex;
 	}
 
-	getFrameEntries() {
+	getFrameEntries () {
 		return 7/*ENTRIES*/;
 	}
 
 	/** The time in seconds, rotate mix, translate mix, scale mix, and shear mix for the specified key frame. */
-	setFrame(frame: number, time: number, mixRotate: number, mixX: number, mixY: number, mixScaleX: number, mixScaleY: number,
+	setFrame (frame: number, time: number, mixRotate: number, mixX: number, mixY: number, mixScaleX: number, mixScaleY: number,
 		mixShearY: number) {
 		let frames = this.frames;
 		frame *= 7/*ENTRIES*/;
@@ -1913,7 +1913,7 @@ export class TransformConstraintTimeline extends CurveTimeline {
 		frames[frame + 6/*SHEARY*/] = mixShearY;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let constraint: TransformConstraint = skeleton.transformConstraints[this.transformConstraintIndex];
 		if (!constraint.active) return;
 
@@ -2001,12 +2001,12 @@ export class PathConstraintPositionTimeline extends CurveTimeline1 {
 	/** The index of the path constraint slot in {@link Skeleton#pathConstraints} that will be changed. */
 	pathConstraintIndex: number;
 
-	constructor(frameCount: number, bezierCount: number, pathConstraintIndex: number) {
+	constructor (frameCount: number, bezierCount: number, pathConstraintIndex: number) {
 		super(frameCount, bezierCount, Property.pathConstraintPosition + "|" + pathConstraintIndex);
 		this.pathConstraintIndex = pathConstraintIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
 		if (!constraint.active) return;
 
@@ -2036,12 +2036,12 @@ export class PathConstraintSpacingTimeline extends CurveTimeline1 {
 	/** The index of the path constraint slot in {@link Skeleton#getPathConstraints()} that will be changed. */
 	pathConstraintIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, pathConstraintIndex: number) {
+	constructor (frameCount: number, bezierCount: number, pathConstraintIndex: number) {
 		super(frameCount, bezierCount, Property.pathConstraintSpacing + "|" + pathConstraintIndex);
 		this.pathConstraintIndex = pathConstraintIndex;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
 		if (!constraint.active) return;
 
@@ -2072,18 +2072,18 @@ export class PathConstraintMixTimeline extends CurveTimeline {
 	/** The index of the path constraint slot in {@link Skeleton#getPathConstraints()} that will be changed. */
 	pathConstraintIndex = 0;
 
-	constructor(frameCount: number, bezierCount: number, pathConstraintIndex: number) {
+	constructor (frameCount: number, bezierCount: number, pathConstraintIndex: number) {
 		super(frameCount, bezierCount, [
 			Property.pathConstraintMix + "|" + pathConstraintIndex
 		]);
 		this.pathConstraintIndex = pathConstraintIndex;
 	}
 
-	getFrameEntries() {
+	getFrameEntries () {
 		return 4/*ENTRIES*/;
 	}
 
-	setFrame(frame: number, time: number, mixRotate: number, mixX: number, mixY: number) {
+	setFrame (frame: number, time: number, mixRotate: number, mixX: number, mixY: number) {
 		let frames = this.frames;
 		frame <<= 2;
 		frames[frame] = time;
@@ -2092,7 +2092,7 @@ export class PathConstraintMixTimeline extends CurveTimeline {
 		frames[frame + 3/*Y*/] = mixY;
 	}
 
-	apply(skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let constraint: PathConstraint = skeleton.pathConstraints[this.pathConstraintIndex];
 		if (!constraint.active) return;
 

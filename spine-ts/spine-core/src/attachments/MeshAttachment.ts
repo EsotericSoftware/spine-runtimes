@@ -72,13 +72,13 @@ export class MeshAttachment extends VertexAttachment {
 	private parentMesh: MeshAttachment;
 	tempColor = new Color(0, 0, 0, 0);
 
-	constructor(name: string) {
+	constructor (name: string) {
 		super(name);
 	}
 
 	/** Calculates {@link #uvs} using {@link #regionUVs} and the {@link #region}. Must be called after changing the region UVs or
 	 * region. */
-	updateUVs() {
+	updateUVs () {
 		let regionUVs = this.regionUVs;
 		if (!this.uvs || this.uvs.length != regionUVs.length) this.uvs = Utils.newFloatArray(regionUVs.length);
 		let uvs = this.uvs;
@@ -140,12 +140,12 @@ export class MeshAttachment extends VertexAttachment {
 	/** The parent mesh if this is a linked mesh, else null. A linked mesh shares the {@link #bones}, {@link #vertices},
 	 * {@link #regionUVs}, {@link #triangles}, {@link #hullLength}, {@link #edges}, {@link #width}, and {@link #height} with the
 	 * parent mesh, but may have a different {@link #name} or {@link #path} (and therefore a different texture). */
-	getParentMesh() {
+	getParentMesh () {
 		return this.parentMesh;
 	}
 
 	/** @param parentMesh May be null. */
-	setParentMesh(parentMesh: MeshAttachment) {
+	setParentMesh (parentMesh: MeshAttachment) {
 		this.parentMesh = parentMesh;
 		if (parentMesh) {
 			this.bones = parentMesh.bones;
@@ -158,7 +158,7 @@ export class MeshAttachment extends VertexAttachment {
 		}
 	}
 
-	copy(): Attachment {
+	copy (): Attachment {
 		if (this.parentMesh) return this.newLinkedMesh();
 
 		let copy = new MeshAttachment(this.name);
@@ -187,7 +187,7 @@ export class MeshAttachment extends VertexAttachment {
 	}
 
 	/** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. **/
-	newLinkedMesh(): MeshAttachment {
+	newLinkedMesh (): MeshAttachment {
 		let copy = new MeshAttachment(this.name);
 		copy.region = this.region;
 		copy.path = this.path;

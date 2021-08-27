@@ -46,7 +46,7 @@ export class PolygonBatcher implements Disposable {
 	private srcAlphaBlend: number;
 	private dstBlend: number;
 
-	constructor(context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true, maxVertices: number = 10920) {
+	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true, maxVertices: number = 10920) {
 		if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 		this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 		let attributes = twoColorTint ?
@@ -59,7 +59,7 @@ export class PolygonBatcher implements Disposable {
 		this.dstBlend = gl.ONE_MINUS_SRC_ALPHA;
 	}
 
-	begin(shader: Shader) {
+	begin (shader: Shader) {
 		if (this.isDrawing) throw new Error("PolygonBatch is already drawing. Call PolygonBatch.end() before calling PolygonBatch.begin()");
 		this.drawCalls = 0;
 		this.shader = shader;
@@ -71,7 +71,7 @@ export class PolygonBatcher implements Disposable {
 		gl.blendFuncSeparate(this.srcColorBlend, this.dstBlend, this.srcAlphaBlend, this.dstBlend);
 	}
 
-	setBlendMode(srcColorBlend: number, srcAlphaBlend: number, dstBlend: number) {
+	setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstBlend: number) {
 		this.srcColorBlend = srcColorBlend;
 		this.srcAlphaBlend = srcAlphaBlend;
 		this.dstBlend = dstBlend;
@@ -82,7 +82,7 @@ export class PolygonBatcher implements Disposable {
 		}
 	}
 
-	draw(texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>) {
+	draw (texture: GLTexture, vertices: ArrayLike<number>, indices: Array<number>) {
 		if (texture != this.lastTexture) {
 			this.flush();
 			this.lastTexture = texture;
@@ -103,7 +103,7 @@ export class PolygonBatcher implements Disposable {
 		this.mesh.setIndicesLength(this.indicesLength);
 	}
 
-	flush() {
+	flush () {
 		if (this.verticesLength == 0) return;
 
 		this.lastTexture.bind();
@@ -116,7 +116,7 @@ export class PolygonBatcher implements Disposable {
 		this.drawCalls++;
 	}
 
-	end() {
+	end () {
 		if (!this.isDrawing) throw new Error("PolygonBatch is not drawing. Call PolygonBatch.begin() before calling PolygonBatch.end()");
 		if (this.verticesLength > 0 || this.indicesLength > 0) this.flush();
 		this.shader = null;
@@ -127,11 +127,11 @@ export class PolygonBatcher implements Disposable {
 		gl.disable(gl.BLEND);
 	}
 
-	getDrawCalls() {
+	getDrawCalls () {
 		return this.drawCalls;
 	}
 
-	dispose() {
+	dispose () {
 		this.mesh.dispose();
 	}
 }

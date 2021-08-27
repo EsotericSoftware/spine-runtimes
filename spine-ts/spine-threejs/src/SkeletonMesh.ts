@@ -37,7 +37,7 @@ export interface SkeletonMeshMaterialParametersCustomizer {
 }
 
 export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
-	constructor(customizer: SkeletonMeshMaterialParametersCustomizer) {
+	constructor (customizer: SkeletonMeshMaterialParametersCustomizer) {
 		let vertexShader = `
 				attribute vec4 color;
 				varying vec2 vUv;
@@ -93,7 +93,7 @@ export class SkeletonMesh extends THREE.Object3D {
 	private tempColor = new Color();
 	private materialCustomizer: SkeletonMeshMaterialParametersCustomizer;
 
-	constructor(skeletonData: SkeletonData, materialCustomizer: SkeletonMeshMaterialParametersCustomizer = (parameters) => { }) {
+	constructor (skeletonData: SkeletonData, materialCustomizer: SkeletonMeshMaterialParametersCustomizer = (parameters) => { }) {
 		super();
 		this.materialCustomizer = materialCustomizer;
 		this.skeleton = new Skeleton(skeletonData);
@@ -101,7 +101,7 @@ export class SkeletonMesh extends THREE.Object3D {
 		this.state = new AnimationState(animData);
 	}
 
-	update(deltaTime: number) {
+	update (deltaTime: number) {
 		let state = this.state;
 		let skeleton = this.skeleton;
 
@@ -112,13 +112,13 @@ export class SkeletonMesh extends THREE.Object3D {
 		this.updateGeometry();
 	}
 
-	dispose() {
+	dispose () {
 		for (var i = 0; i < this.batches.length; i++) {
 			this.batches[i].dispose();
 		}
 	}
 
-	private clearBatches() {
+	private clearBatches () {
 		for (var i = 0; i < this.batches.length; i++) {
 			this.batches[i].clear();
 			this.batches[i].visible = false;
@@ -126,7 +126,7 @@ export class SkeletonMesh extends THREE.Object3D {
 		this.nextBatchIndex = 0;
 	}
 
-	private nextBatch() {
+	private nextBatch () {
 		if (this.batches.length == this.nextBatchIndex) {
 			let batch = new MeshBatcher(10920, this.materialCustomizer);
 			this.add(batch);
@@ -137,7 +137,7 @@ export class SkeletonMesh extends THREE.Object3D {
 		return batch;
 	}
 
-	private updateGeometry() {
+	private updateGeometry () {
 		this.clearBatches();
 
 		let tempPos = this.tempPos;

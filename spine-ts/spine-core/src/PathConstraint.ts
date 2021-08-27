@@ -71,7 +71,7 @@ export class PathConstraint implements Updatable {
 
 	active = false;
 
-	constructor(data: PathConstraintData, skeleton: Skeleton) {
+	constructor (data: PathConstraintData, skeleton: Skeleton) {
 		if (!data) throw new Error("data cannot be null.");
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 		this.data = data;
@@ -86,11 +86,11 @@ export class PathConstraint implements Updatable {
 		this.mixY = data.mixY;
 	}
 
-	isActive() {
+	isActive () {
 		return this.active;
 	}
 
-	update() {
+	update () {
 		let attachment = this.target.getAttachment();
 		if (!(attachment instanceof PathAttachment)) return;
 
@@ -219,7 +219,7 @@ export class PathConstraint implements Updatable {
 		}
 	}
 
-	computeWorldPositions(path: PathAttachment, spacesCount: number, tangents: boolean) {
+	computeWorldPositions (path: PathAttachment, spacesCount: number, tangents: boolean) {
 		let target = this.target;
 		let position = this.position;
 		let spaces = this.spaces, out = Utils.setArraySize(this.positions, spacesCount * 3 + 2), world: Array<number> = null;
@@ -452,21 +452,21 @@ export class PathConstraint implements Updatable {
 		return out;
 	}
 
-	addBeforePosition(p: number, temp: Array<number>, i: number, out: Array<number>, o: number) {
+	addBeforePosition (p: number, temp: Array<number>, i: number, out: Array<number>, o: number) {
 		let x1 = temp[i], y1 = temp[i + 1], dx = temp[i + 2] - x1, dy = temp[i + 3] - y1, r = Math.atan2(dy, dx);
 		out[o] = x1 + p * Math.cos(r);
 		out[o + 1] = y1 + p * Math.sin(r);
 		out[o + 2] = r;
 	}
 
-	addAfterPosition(p: number, temp: Array<number>, i: number, out: Array<number>, o: number) {
+	addAfterPosition (p: number, temp: Array<number>, i: number, out: Array<number>, o: number) {
 		let x1 = temp[i + 2], y1 = temp[i + 3], dx = x1 - temp[i], dy = y1 - temp[i + 1], r = Math.atan2(dy, dx);
 		out[o] = x1 + p * Math.cos(r);
 		out[o + 1] = y1 + p * Math.sin(r);
 		out[o + 2] = r;
 	}
 
-	addCurvePosition(p: number, x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number,
+	addCurvePosition (p: number, x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number,
 		out: Array<number>, o: number, tangents: boolean) {
 		if (p == 0 || isNaN(p)) {
 			out[o] = x1;

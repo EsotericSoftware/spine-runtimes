@@ -65,7 +65,7 @@ export class PathConstraintData extends ConstraintData {
 	mixX = 0;
 	mixY = 0;
 
-	constructor(name: string) {
+	constructor (name: string) {
 		super(name, 0, false);
 	}
 }

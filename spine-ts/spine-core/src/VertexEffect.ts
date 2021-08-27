@@ -31,7 +31,7 @@ import { Skeleton } from "./Skeleton";
 import { Vector2, Color } from "./Utils";
 
 export interface VertexEffect {
-	begin(skeleton: Skeleton): void;
-	transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void;
-	end(): void;
+	begin (skeleton: Skeleton): void;
+	transform (position: Vector2, uv: Vector2, light: Color, dark: Color): void;
+	end (): void;
 }

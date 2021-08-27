@@ -43,7 +43,7 @@ export class SkeletonClipping {
 	private clipAttachment: ClippingAttachment;
 	private clippingPolygons: Array<Array<number>>;
 
-	clipStart(slot: Slot, clip: ClippingAttachment): number {
+	clipStart (slot: Slot, clip: ClippingAttachment): number {
 		if (this.clipAttachment) return 0;
 		this.clipAttachment = clip;
 
@@ -63,11 +63,11 @@ export class SkeletonClipping {
 		return clippingPolygons.length;
 	}
 
-	clipEndWithSlot(slot: Slot) {
+	clipEndWithSlot (slot: Slot) {
 		if (this.clipAttachment && this.clipAttachment.endSlot == slot.data) this.clipEnd();
 	}
 
-	clipEnd() {
+	clipEnd () {
 		if (!this.clipAttachment) return;
 		this.clipAttachment = null;
 		this.clippingPolygons = null;
@@ -76,11 +76,11 @@ export class SkeletonClipping {
 		this.clippingPolygon.length = 0;
 	}
 
-	isClipping(): boolean {
+	isClipping (): boolean {
 		return this.clipAttachment != null;
 	}
 
-	clipTriangles(vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike,
+	clipTriangles (vertices: NumberArrayLike, verticesLength: number, triangles: NumberArrayLike, trianglesLength: number, uvs: NumberArrayLike,
 		light: Color, dark: Color, twoColor: boolean) {
 
 		let clipOutput = this.clipOutput, clippedVertices = this.clippedVertices;
@@ -229,7 +229,7 @@ export class SkeletonClipping {
 
 	/** Clips the input triangle against the convex, clockwise clipping area. If the triangle lies entirely within the clipping
 	 * area, false is returned. The clipping area must duplicate the first vertex at the end of the vertices list. */
-	clip(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, clippingArea: Array<number>, output: Array<number>) {
+	clip (x1: number, y1: number, x2: number, y2: number, x3: number, y3: number, clippingArea: Array<number>, output: Array<number>) {
 		let originalOutput = output;
 		let clipped = false;
 
@@ -324,7 +324,7 @@ export class SkeletonClipping {
 		return clipped;
 	}
 
-	public static makeClockwise(polygon: NumberArrayLike) {
+	public static makeClockwise (polygon: NumberArrayLike) {
 		let vertices = polygon;
 		let verticeslength = polygon.length;
 

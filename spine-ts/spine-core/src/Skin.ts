@@ -36,7 +36,7 @@ import { StringMap } from "./Utils";
 
 /** Stores an entry in the skin consisting of the slot index, name, and attachment **/
 export class SkinEntry {
-	constructor(public slotIndex: number, public name: string, public attachment: Attachment) { }
+	constructor (public slotIndex: number, public name: string, public attachment: Attachment) { }
 }
 
 /** Stores attachments by slot index and attachment name.
@@ -51,13 +51,13 @@ export class Skin {
 	bones = Array<BoneData>();
 	constraints = new Array<ConstraintData>();
 
-	constructor(name: string) {
+	constructor (name: string) {
 		if (!name) throw new Error("name cannot be null.");
 		this.name = name;
 	}
 
 	/** Adds an attachment to the skin for the specified slot index and name. */
-	setAttachment(slotIndex: number, name: string, attachment: Attachment) {
+	setAttachment (slotIndex: number, name: string, attachment: Attachment) {
 		if (!attachment) throw new Error("attachment cannot be null.");
 		let attachments = this.attachments;
 		if (slotIndex >= attachments.length) attachments.length = slotIndex + 1;
@@ -66,7 +66,7 @@ export class Skin {
 	}
 
 	/** Adds all attachments, bones, and constraints from the specified skin to this skin. */
-	addSkin(skin: Skin) {
+	addSkin (skin: Skin) {
 		for (let i = 0; i < skin.bones.length; i++) {
 			let bone = skin.bones[i];
 			let contained = false;
@@ -100,7 +100,7 @@ export class Skin {
 
 	/** Adds all bones and constraints and copies of all attachments from the specified skin to this skin. Mesh attachments are not
 	 * copied, instead a new linked mesh is created. The attachment copies can be modified without affecting the originals. */
-	copySkin(skin: Skin) {
+	copySkin (skin: Skin) {
 		for (let i = 0; i < skin.bones.length; i++) {
 			let bone = skin.bones[i];
 			let contained = false;
@@ -140,19 +140,19 @@ export class Skin {
 	}
 
 	/** Returns the attachment for the specified slot index and name, or null. */
-	getAttachment(slotIndex: number, name: string): Attachment {
+	getAttachment (slotIndex: number, name: string): Attachment {
 		let dictionary = this.attachments[slotIndex];
 		return dictionary ? dictionary[name] : null;
 	}
 
 	/** Removes the attachment in the skin for the specified slot index and name, if any. */
-	removeAttachment(slotIndex: number, name: string) {
+	removeAttachment (slotIndex: number, name: string) {
 		let dictionary = this.attachments[slotIndex];
 		if (dictionary) dictionary[name] = null;
 	}
 
 	/** Returns all attachments in this skin. */
-	getAttachments(): Array<SkinEntry> {
+	getAttachments (): Array<SkinEntry> {
 		let entries = new Array<SkinEntry>();
 		for (var i = 0; i < this.attachments.length; i++) {
 			let slotAttachments = this.attachments[i];
@@ -167,7 +167,7 @@ export class Skin {
 	}
 
 	/** Returns all attachments in this skin for the specified slot index. */
-	getAttachmentsForSlot(slotIndex: number, attachments: Array<SkinEntry>) {
+	getAttachmentsForSlot (slotIndex: number, attachments: Array<SkinEntry>) {
 		let slotAttachments = this.attachments[slotIndex];
 		if (slotAttachments) {
 			for (let name in slotAttachments) {
@@ -178,14 +178,14 @@ export class Skin {
 	}
 
 	/** Clears all attachments, bones, and constraints. */
-	clear() {
+	clear () {
 		this.attachments.length = 0;
 		this.bones.length = 0;
 		this.constraints.length = 0;
 	}
 
 	/** Attach each attachment in this skin if the corresponding attachment in the old skin is currently attached. */
-	attachAll(skeleton: Skeleton, oldSkin: Skin) {
+	attachAll (skeleton: Skeleton, oldSkin: Skin) {
 		let slotIndex = 0;
 		for (let i = 0; i < skeleton.slots.length; i++) {
 			let slot = skeleton.slots[i];

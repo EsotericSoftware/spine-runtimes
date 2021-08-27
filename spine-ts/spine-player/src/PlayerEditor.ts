@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-declare function CodeMirror(el: Element, config: any): void;
+declare function CodeMirror (el: Element, config: any): void;
 
 export class SpinePlayerEditor {
 	private static DEFAULT_CODE =
@@ -57,11 +57,11 @@ body { margin: 0px; }
 	private code: any;
 	private player: HTMLIFrameElement;
 
-	constructor(parent: HTMLElement) {
+	constructor (parent: HTMLElement) {
 		this.render(parent);
 	}
 
-	private render(parent: HTMLElement) {
+	private render (parent: HTMLElement) {
 		let dom = /*html*/`
 				<div class="spine-player-editor-container">
 					<div class="spine-player-editor-code"></div>
@@ -90,19 +90,19 @@ body { margin: 0px; }
 		})
 	}
 
-	setPreAndPostfix(prefix: string, postfix: string) {
+	setPreAndPostfix (prefix: string, postfix: string) {
 		this.prefix = prefix;
 		this.postfix = postfix;
 		this.startPlayer()
 	}
 
-	setCode(code: string) {
+	setCode (code: string) {
 		this.code.setValue(code);
 		this.startPlayer();
 	}
 
 	private timerId = 0;
-	startPlayer() {
+	startPlayer () {
 		clearTimeout(this.timerId);
 		this.timerId = setTimeout(() => {
 			let code = this.code.getDoc().getValue();

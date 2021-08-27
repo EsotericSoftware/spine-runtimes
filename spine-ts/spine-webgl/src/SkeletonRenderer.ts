@@ -34,7 +34,7 @@ import { ManagedWebGLRenderingContext, WebGLBlendModeConverter } from "./WebGL";
 
 
 class Renderable {
-	constructor(public vertices: NumberArrayLike, public numVertices: number, public numFloats: number) { }
+	constructor (public vertices: NumberArrayLike, public numVertices: number, public numFloats: number) { }
 };
 
 export class SkeletonRenderer {
@@ -54,14 +54,14 @@ export class SkeletonRenderer {
 	private temp3 = new Color();
 	private temp4 = new Color();
 
-	constructor(context: ManagedWebGLRenderingContext, twoColorTint: boolean = true) {
+	constructor (context: ManagedWebGLRenderingContext, twoColorTint: boolean = true) {
 		this.twoColorTint = twoColorTint;
 		if (twoColorTint)
 			this.vertexSize += 4;
 		this.vertices = Utils.newFloatArray(this.vertexSize * 1024);
 	}
 
-	draw(batcher: PolygonBatcher, skeleton: Skeleton, slotRangeStart: number = -1, slotRangeEnd: number = -1) {
+	draw (batcher: PolygonBatcher, skeleton: Skeleton, slotRangeStart: number = -1, slotRangeEnd: number = -1) {
 		let clipper = this.clipper;
 		let premultipliedAlpha = this.premultipliedAlpha;
 		let twoColorTint = this.twoColorTint;
