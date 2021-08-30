@@ -51,7 +51,7 @@ import com.esotericsoftware.spine.Animation.Timeline;
  * <p>
  * See <a href='http://esotericsoftware.com/spine-applying-animations/'>Applying Animations</a> in the Spine Runtimes Guide. */
 public class AnimationState {
-	static private final Animation emptyAnimation = new Animation("<empty>", new Array(0), 0);
+	static final Animation emptyAnimation = new Animation("<empty>", new Array(0), 0);
 
 	/** 1) A previously applied timeline has set this property.<br>
 	 * Result: Mix from the current pose to the timeline pose. */
@@ -1219,6 +1219,12 @@ public class AnimationState {
 		/** If true, the animation will be applied in reverse. Events are not fired when an animation is applied in reverse. */
 		public boolean getReverse () {
 			return reverse;
+		}
+
+		/** Returns true if this entry is for the empty animation. See {@link AnimationState#setEmptyAnimation(int, float)},
+		 * {@link AnimationState#addEmptyAnimation(int, float, float)}, and {@link AnimationState#setEmptyAnimations(float)}. */
+		public boolean isEmptyAnimation () {
+			return animation == emptyAnimation;
 		}
 
 		public String toString () {
