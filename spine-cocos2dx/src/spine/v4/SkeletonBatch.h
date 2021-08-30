@@ -41,7 +41,7 @@ namespace spine {
     
 	struct SkeletonCommand : public cocos2d::TrianglesCommand {
 		cocos2d::backend::UniformLocation _locMVP;
-        cocos2d::backend::UniformLocation _locTexture;
+		cocos2d::backend::UniformLocation _locTexture;
 	};
 	
     class SkeletonBatch {
@@ -61,14 +61,14 @@ namespace spine {
 		cocos2d::backend::ProgramState* updateCommandPipelinePS(SkeletonCommand* command, cocos2d::backend::ProgramState* programState);
 
     protected:
-        SkeletonBatch ();
-        virtual ~SkeletonBatch ();
+		SkeletonBatch ();
+		virtual ~SkeletonBatch ();
 		
 		void reset ();
 		
 		SkeletonCommand* nextFreeCommand ();
 
-        SkeletonCommand* newCommand();
+		SkeletonCommand* newCommand();
 	
 		cocos2d::backend::ProgramState*                     _programState; // The default program state
 
