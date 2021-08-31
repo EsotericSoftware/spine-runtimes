@@ -55,7 +55,8 @@ namespace Spine.Unity {
 
 		public void Initialize () {
 			if (skeletonDataAsset == null) return;
-			this.animation = skeletonDataAsset.GetSkeletonData(AnimationReferenceAsset.QuietSkeletonData).FindAnimation(animationName);
+			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(AnimationReferenceAsset.QuietSkeletonData);
+			this.animation = skeletonData != null ? skeletonData.FindAnimation(animationName) : null;
 			if (this.animation == null) Debug.LogWarningFormat("Animation '{0}' not found in SkeletonData : {1}.", animationName, skeletonDataAsset.name);
 		}
 
