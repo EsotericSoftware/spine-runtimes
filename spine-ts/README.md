@@ -1,6 +1,6 @@
 # spine-ts
 
-# In VS Code config, set Extensions > TypeScript > Import Module Specifier to non-relative
+
 
 The spine-ts runtime provides functionality to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using TypeScript and JavaScript. spine-ts is split
 up into multiple modules:
