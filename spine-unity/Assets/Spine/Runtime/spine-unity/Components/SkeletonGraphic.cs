@@ -678,7 +678,7 @@ namespace Spine.Unity {
 				meshGenerator.Begin();
 				meshGenerator.AddSubmesh(submeshInstructionItem);
 
-				var targetMesh = meshesItems[i];
+				Mesh targetMesh = meshesItems[i];
 				meshGenerator.ScaleVertexData(scale);
 				if (OnPostProcessVertices != null) OnPostProcessVertices.Invoke(this.meshGenerator.Buffers);
 				meshGenerator.FillVertexData(targetMesh);
@@ -703,6 +703,7 @@ namespace Spine.Unity {
 					parent = separatorParts[++separatorSlotGroupIndex];
 				}
 
+				SkeletonSubmeshGraphic submeshGraphic = submeshGraphics[i];
 				if (useOriginalTextureAndMaterial) {
 					Texture usedTexture = submeshMaterial.mainTexture;
 					if (!hasBlendModeMaterials)
@@ -724,6 +725,7 @@ namespace Spine.Unity {
 						else if (blendMode == BlendMode.Screen && screenMaterial)
 							usedMaterial = screenMaterial;
 
+						usedMaterial = submeshGraphic.GetModifiedMaterial(usedMaterial);
 						canvasRenderer.SetMaterial(usedMaterial, usedTexture);
 #if HAS_CULL_TRANSPARENT_MESH
 						canvasRenderer.cullTransparentMesh = allowCullTransparentMesh ?
@@ -738,6 +740,8 @@ namespace Spine.Unity {
 						usedMaterial = material;
 					if (!customTextureOverride.TryGetValue(originalTexture, out usedTexture))
 						usedTexture = originalTexture;
+
+					usedMaterial = submeshGraphic.GetModifiedMaterial(usedMaterial);
 					canvasRenderer.SetMaterial(usedMaterial, usedTexture);
 				}
 			}

@@ -244,8 +244,8 @@ namespace Spine.Unity.Editor {
 						} else if (meshRendersIncorrectlyWithSingleRenderer) {
 							using (new SpineInspectorUtility.BoxScope()) {
 								meshGeneratorSettings.isExpanded = true;
-								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("This mesh uses multiple atlas pages. You\n" +
-																							"need to enable 'Multiple Canvas Renderers'\n" +
+								EditorGUILayout.LabelField(SpineInspectorUtility.TempContent("This mesh uses multiple atlas pages or blend modes.\n" +
+																							"You need to enable 'Multiple Canvas Renderers'\n" +
 																							"for correct rendering. Consider packing\n" +
 																							"attachments to a single atlas page if possible.", Icons.warning), GUILayout.Height(60), GUILayout.Width(340));
 							}
