@@ -1,9 +1,9 @@
 {
-  "name": "spine-ts",
+  "name": "@esotericsoftware/spine-ts",
   "version": "4.0.1",
   "description": "The official Spine Runtimes for the web.",
   "scripts": {
-    "build": "rm -rf build && concurrently \"npm run build:core\" \"npm run build:canvas\" \"npm run build:webgl\" \"npm run build:player\" \"npm run build:threejs\"",
+    "build": "rm -rf build && concurrently \"npm run build:core\" \"npm run build:canvas\" \"npm run build:webgl\" \"npm run build:player\" \"npm run build:threejs\" \"npm run build:modules\"",
     "build:modules": "tsc -b -clean && tsc -b",
     "build:core": "npx esbuild --bundle spine-core/src/index.ts --tsconfig=spine-core/tsconfig.json  --sourcemap --outfile=build/spine-core.js --format=iife --global-name=\"spine\"",
     "build:canvas": "npx esbuild --bundle spine-canvas/src/index.ts --tsconfig=spine-canvas/tsconfig.json  --sourcemap --outfile=build/spine-canvas.js --format=iife --global-name=\"spine\"",

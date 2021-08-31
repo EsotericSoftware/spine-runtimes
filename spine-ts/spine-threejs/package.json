@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@types/three": "^0.131.0",
-    "three": "^0.132.0"
+    "three": "^0.132.0",
+    "@esotericsoftware/spine-core": "4.0.1"
   }
 }

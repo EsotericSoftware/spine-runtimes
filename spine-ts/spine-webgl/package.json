@@ -26,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/esotericsoftware/spine-runtimes/issues"
   },
-  "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme"
+  "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
+  "dependencies": {
+    "@esotericsoftware/spine-core": "4.0.1"
+  }
 }
