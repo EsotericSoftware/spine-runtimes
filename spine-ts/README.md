@@ -47,17 +47,17 @@ You can include a module in your project via a `<script>` tag from the [unpkg](h
 <script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.*/dist/iife/spine-core.js">
 
 // spine-ts Canvas
-<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.*/dist/iife/spine-canvas.js">
+<script src="https://unpkg.com/@esotericsoftware/spine-canvas@4.0.*/dist/iife/spine-canvas.js">
 
 // spine-ts WebGL
-<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.*/dist/iife/spine-webgl.js">
+<script src="https://unpkg.com/@esotericsoftware/spine-webgl@4.0.*/dist/iife/spine-webgl.js">
 
 // spine-ts Player, which requires a spine-player.css as well
-<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.*/dist/iife/spine-player.js">
-<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-core@4.0.*/dist/iife/spine-player.css">
+<script src="https://unpkg.com/@esotericsoftware/spine-player@4.0.*/dist/iife/spine-player.js">
+<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.0.*/dist/iife/spine-player.css">
 
 // spine-ts WebGL
-<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.*/dist/iife/spine-webgl.js">
+<script src="https://unpkg.com/@esotericsoftware/spine-threejs@4.0.*/dist/iife/spine-webgl.js">
 ```
 
 We also provide `js.map` source maps. They will be automatically fetched from unpkg when debugging code of a spine-module in Chrome, Firefox, or Safari, mapping the JavaScript code back to its original TypeScript sources.
