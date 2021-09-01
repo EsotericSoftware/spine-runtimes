@@ -13,8 +13,7 @@ jobs:
     - name: Setup TypeScript
       uses: actions/setup-node@v1
       with:
-        node-version: '13.x'
-    - run: npm install -g typescript
+        node-version: '16.6.2'    
     - name: Build spine-ts
       working-directory: spine-ts
       env:
