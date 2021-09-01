@@ -1,9 +1,9 @@
-window.addEventListener("load", function(event) {
+window.addEventListener("load", function (event) {
 	setupDropZone();
 });
 
 if (!String.prototype.endsWith) {
-	String.prototype.endsWith = function(search, this_len) {
+	String.prototype.endsWith = function (search, this_len) {
 		if (this_len === undefined || this_len > this.length) {
 			this_len = this.length;
 		}
@@ -62,8 +62,8 @@ function loadFiles(files) {
 	for (var i = 0; i < files.length; i++) {
 		var file = files[i];
 		var reader = new FileReader();
-		reader.onload = function(file) {
-			return function(dataUrl) {
+		reader.onload = function (file) {
+			return function (dataUrl) {
 				console.log("Loaded " + file.name);
 				dataUrls[file.name] = dataUrl.target.result;
 				filesToLoad--;
@@ -100,8 +100,8 @@ function setupPlayer(dataUrls, jsonFile, skelFile, atlasFile) {
 	spine = null;
 	loadCSS(cssUrl, function () {
 		var playerUrl = "https://esotericsoftware.com/files/spine-player/" + major + "." + minor + "/spine-player.min.js";
-		//playerUrl = "../../../build/spine-player.js"; // debug
-		loadJavaScript(playerUrl, function() {
+		//playerUrl = "../../dist/iife/spine-player.js"; // debug
+		loadJavaScript(playerUrl, function () {
 			document.getElementById("sp_generator_editor").classList.remove("sp_generator_hidden");
 			document.getElementById("sp_generator_drop_zone").classList.add("sp_generator_hidden");
 			var player = document.getElementById("sp_generator_player");
@@ -121,7 +121,7 @@ function setupPlayer(dataUrls, jsonFile, skelFile, atlasFile) {
 
 			appState.player = new spine.SpinePlayer(player, config);
 
-		}, function() {
+		}, function () {
 			showError("Couldn't load script for Spine version " + version + ". Only skeletons with version 3.8+ are supported.");
 		});
 	}, function () {
@@ -180,7 +180,7 @@ function setupConfigUI() {
 	noneImage.innerText = "None";
 	noneImage.selected = true;
 	backgroundImage.append(noneImage);
-	for(var data in appState.dataUrls) {
+	for (var data in appState.dataUrls) {
 		if (data.toLowerCase().endsWith(".png")) {
 			var image = document.createElement("option");
 			image.value = data;
@@ -188,7 +188,7 @@ function setupConfigUI() {
 			backgroundImage.append(image);
 		}
 	}
-	backgroundImage.onchange = function() {
+	backgroundImage.onchange = function () {
 		var imageUrl = backgroundImage.value;
 		if (imageUrl != "none" && !appState.player.assetManager.get(imageUrl)) {
 			appState.player.assetManager.loadTexture(imageUrl);
@@ -201,7 +201,7 @@ function setupConfigUI() {
 			boundsTable.classList.remove("sp_generator_hidden");
 
 		if (appState.player.config.backgroundImage) {
-			appState.player.config.backgroundImage.url = imageUrl != "none" ? imageUrl: null;
+			appState.player.config.backgroundImage.url = imageUrl != "none" ? imageUrl : null;
 		} else {
 			appState.player.config.backgroundImage = {
 				url: imageUrl != "none" ? imageUrl : null
@@ -266,7 +266,7 @@ function getSkeletonVersion(dataUrls, jsonFile, skelFile) {
 		var input = new BinaryInput(array);
 		input.readString();
 		var version = input.readString();
-		return version;x
+		return version; x
 	}
 }
 
@@ -295,7 +295,7 @@ function showError(error) {
 function setupDropZone() {
 	var fileButton = document.getElementById("sp_generator_file_button");
 	var dropZone = document.getElementById("sp_generator_drop_zone");
-	dropZone.onclick = function() {
+	dropZone.onclick = function () {
 		fileButton.click();
 	};
 	dropZone.addEventListener("dragenter", function (event) {
@@ -323,27 +323,27 @@ function setupDropZone() {
 function generateScript(jsonFile, skelFile, atlasFile, dataUrls) {
 	var shortVersion = major + "." + minor;
 	var scriptCode =
-	'<script src="https://esotericsoftware.com/files/spine-player/' + shortVersion + '/spine-player.min.js"><' + '/script>\n' +
-	'<link rel="stylesheet" href="https://esotericsoftware.com/files/spine-player/' + shortVersion + '/spine-player.min.css">\n\n' +
-	'<div id="player-container" style="width: 100%; height: 100vh;"></div>\n\n' +
-	'<script>\n' +
-	'new spine.SpinePlayer("player-container", {\n';
+		'<script src="https://esotericsoftware.com/files/spine-player/' + shortVersion + '/spine-player.min.js"><' + '/script>\n' +
+		'<link rel="stylesheet" href="https://esotericsoftware.com/files/spine-player/' + shortVersion + '/spine-player.min.css">\n\n' +
+		'<div id="player-container" style="width: 100%; height: 100vh;"></div>\n\n' +
+		'<script>\n' +
+		'new spine.SpinePlayer("player-container", {\n';
 	if (jsonFile) scriptCode +=
-	'   jsonUrl: "' + jsonFile + '",\n';
+		'   jsonUrl: "' + jsonFile + '",\n';
 	else scriptCode +=
-	'   skelUrl: "' + skelFile + '",\n';
+		'   skelUrl: "' + skelFile + '",\n';
 
 	scriptCode +=
-	'   atlasUrl: "' + atlasFile + '",\n' +
-	'   rawDataURIs: {\n'
+		'   atlasUrl: "' + atlasFile + '",\n' +
+		'   rawDataURIs: {\n'
 
 	for (var file in dataUrls)
 		scriptCode += '       "' + file + '": "' + dataUrls[file] + '",\n';
 
 	scriptCode +=
-	'   }\n' +
-	'});\n' +
-	'<' + '/script>';
+		'   }\n' +
+		'});\n' +
+		'<' + '/script>';
 }
 
 var BinaryInput = (function () {

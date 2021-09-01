@@ -6,13 +6,16 @@
     "README.md"
   ],
   "scripts": {
-    "build": "rm -rf build && concurrently \"npm run build:core\" \"npm run build:canvas\" \"npm run build:webgl\" \"npm run build:player\" \"npm run build:threejs\" \"npm run build:modules\"",
+    "prepublish": "npm run clean && npm run build",
+    "clean": "npx rimraf spine-core/dist spine-canvas/dist spine-webgl/dist spine-player/dist spine-threejs/dist",
+    "build": "npm run clean && npm run build:modules && concurrently \"npm run build:core\" \"npm run build:canvas\" \"npm run build:webgl\" \"npm run build:player\" \"npm run build:threejs\"",
     "build:modules": "tsc -b -clean && tsc -b",
-    "build:core": "npx esbuild --bundle spine-core/src/index.ts --tsconfig=spine-core/tsconfig.json  --sourcemap --outfile=build/spine-core.js --format=iife --global-name=\"spine\"",
-    "build:canvas": "npx esbuild --bundle spine-canvas/src/index.ts --tsconfig=spine-canvas/tsconfig.json  --sourcemap --outfile=build/spine-canvas.js --format=iife --global-name=\"spine\"",
-    "build:webgl": "npx esbuild --bundle spine-webgl/src/index.ts --tsconfig=spine-webgl/tsconfig.json  --sourcemap --outfile=build/spine-webgl.js --format=iife --global-name=\"spine\"",
-    "build:player": "npx esbuild --bundle spine-player/src/index.ts --tsconfig=spine-player/tsconfig.json  --sourcemap --outfile=build/spine-player.js --format=iife --global-name=\"spine\"",
-    "build:threejs": "npx esbuild --bundle spine-threejs/src/index.ts --tsconfig=spine-threejs/tsconfig.json  --sourcemap --outfile=build/spine-threejs.js --external:three --format=iife --global-name=\"spine\"",
+    "build:core": "npx esbuild --bundle spine-core/src/index.ts --tsconfig=spine-core/tsconfig.json  --sourcemap --outfile=spine-core/dist/iife/spine-core.js --format=iife --global-name=spine",
+    "build:canvas": "npx esbuild --bundle spine-canvas/src/index.ts --tsconfig=spine-canvas/tsconfig.json  --sourcemap --outfile=spine-canvas/dist/iife/spine-canvas.js --format=iife --global-name=spine",
+    "build:webgl": "npx esbuild --bundle spine-webgl/src/index.ts --tsconfig=spine-webgl/tsconfig.json  --sourcemap --outfile=spine-webgl/dist/iife/spine-webgl.js --format=iife --global-name=spine",
+    "build:player": "npx copyfiles -f spine-player/css/spine-player.css spine-player/dist/ && npx npx esbuild --bundle spine-player/src/index.ts --tsconfig=spine-player/tsconfig.json  --sourcemap --outfile=spine-player/dist/iife/spine-player.js --format=iife --global-name=spine",
+    "build:threejs": "npx esbuild --bundle spine-threejs/src/index.ts --tsconfig=spine-threejs/tsconfig.json  --sourcemap --outfile=spine-threejs/dist/iife/spine-threejs.js --external:three --format=iife --global-name=spine",
+    "minify": "npx esbuild --minify spine-core/dist/iife/spine-core.js --outfile=spine-core/dist/iife/spine-core.min.js",
     "dev": "concurrently \"npx live-server --no-browser\" \"npm run dev:canvas\" \"npm run dev:webgl\" \"npm run dev:player\" \"npm run dev:threejs\"",
     "dev:canvas": "npm run build:canvas -- --watch",
     "dev:webgl": "npm run build:webgl -- --watch",
@@ -47,9 +50,11 @@
   ],
   "devDependencies": {
     "concurrently": "^6.2.1",
+    "copyfiles": "^2.4.1",
     "esbuild": "^0.12.22",
     "live-server": "^1.2.1",
     "npx": "^10.2.2",
+    "rimraf": "^3.0.2",
     "typescript": "^4.3.5"
   }
 }
