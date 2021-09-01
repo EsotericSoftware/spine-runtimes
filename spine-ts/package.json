@@ -1,7 +1,10 @@
 {
   "name": "@esotericsoftware/spine-ts",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "The official Spine Runtimes for the web.",
+  "files": [
+    "README.md"
+  ],
   "scripts": {
     "build": "rm -rf build && concurrently \"npm run build:core\" \"npm run build:canvas\" \"npm run build:webgl\" \"npm run build:player\" \"npm run build:threejs\" \"npm run build:modules\"",
     "build:modules": "tsc -b -clean && tsc -b",
@@ -35,7 +38,6 @@
     "url": "https://github.com/esotericsoftware/spine-runtimes/issues"
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
-  "private": true,
   "workspaces": [
     "spine-core",
     "spine-canvas",
