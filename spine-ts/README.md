@@ -1,17 +1,19 @@
 # spine-ts
 
-
-
 The spine-ts runtime provides functionality to load and manipulate [Spine](http://esotericsoftware.com) skeletal animation data using TypeScript and JavaScript. spine-ts is split
 up into multiple modules:
 
-1. **Core**: `core/`, the core classes to load and process Spine skeletons.
-1. **WebGL**: `webgl/`, a self-contained WebGL backend, built on the core classes.
-1. **Canvas**: `canvas/`, a self-contained Canvas backend, built on the core classes.
-1. **THREE.JS**: `threejs/`, a self-contained THREE.JS backend, built on the core classes.
-1. **Player**: `player/`, a self-contained player to easily display Spine animations on your website, built on core the classes and WebGL backend.
+1. `spine-core/`, the core classes to load and process Spine skeletons.
+1. `spine-webgl/`, a self-contained WebGL backend, built on the core classes.
+1. `spine-canvas/`, a self-contained Canvas backend, built on the core classes.
+1. `spine-threejs/`, a self-contained THREE.JS backend, built on the core classes.
+1. `spine-player/`, a self-contained player to easily display Spine animations on your website, built on core the classes and WebGL backend.
 
-While the source code for the core library and backends is written in TypeScript, all code is compiled to JavaScript.
+In most cases, the `spine-player` module is best suited for your needs. Please refer to the [Spine Web Player documentation](https://esotericsoftware.com/spine-player) for more information.
+
+For documentation of the core API in `spine-core`, please refer to our [Spine Runtimes Guide](http://esotericsoftware.com/spine-runtimes-guide).
+
+For module specific APIs in `spine-canvas`, `spine-webgl`, and `spine-threejs`, please refer to the [Examples](#examples) in the respecitve `spine-<modulename>/example` folder. For `spine-webgl` specifically, we have provided additional [demos](spine-webgl/demos), which you can also [view online](http://de.esotericsoftware.com/spine-demos).
 
 ## Licensing
 
@@ -35,111 +37,79 @@ spine-ts THREE.JS does not support two color tinting or blend modes. The THREE.J
 
 ## Usage
 
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it as a zip via the download button above.
-2. To use only the core library without rendering support, include the `build/spine-core.js` file in your project.
-3. To use the WebGL backend, include the `build/spine-webgl.js` file in your project.
-3. To use the Canvas backend, include the `build/spine-canvas.js` file in your project.
-4. To use the Player, include `build/spine-player.js` and `player/css/spine-player.css` file in your project.
-5. To use the THREE.JS backend, include the `build/spine-threejs.js` file in your project. THREE.JS must be loaded first.
+All spine-ts modules are published to [npm](http://npmjs.com) for consumption via vanilla JavaScript as well as 
 
-All `*.js` files are self-contained and include both the core and respective backend classes.
-
-If you write your app with TypeScript, additionally copy the corresponding `build/spine-*.d.ts` file into your project.
-
-**Note:** If you are using the compiled `.js` files with ES6 or other module systems, you need to add:
+## Usage in vanilla JavaScript
+You can include a module in your project via a `<script>` tag from the [unpkg](https://unpkg.com/) CDN, specifying the version as part of the URL. In the examples below, the version is `4.0.3`, which will work with all exports from Spine Editor version `4.0.x`.
 
 ```
-export { spine };
+// spine-ts Core
+<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.3/dist/iife/spine-core.js">
+
+// spine-ts Canvas
+<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.3/dist/iife/spine-canvas.js">
+
+// spine-ts WebGL
+<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.3/dist/iife/spine-webgl.js">
+
+// spine-ts Player, which requires a spine-player.css as well
+<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.3/dist/iife/spine-player.js">
+<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-core@4.0.3/dist/iife/spine-player.css">
+
+// spine-ts WebGL
+<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.3/dist/iife/spine-webgl.js">
 ```
 
-At the bottom of the `.js` file you are using. You can then import the module as usual, for example:
+We also provide `js.map` source maps. They will be automatically fetched from unpkg when debugging code of a spine-module in Chrome, Firefox, or Safari, mapping the JavaScript code back to its original TypeScript sources.
+
+We provide minified versions of each module, which can be used by replacing the `.js` file suffix with `.min.js` in the unpkg URLs.
+
+## Usage via NPM or Yarn
+If your project dependencies are managed through NPM or Yarn, you can add spine-ts modules the usual way:
 
 ```
-import { spine } from './spine-webgl.js';
+npm install @esotericsoftware/spine-core
+npm install @esotericsoftware/spine-canvas
+npm install @esotericsoftware/spine-webgl
+npm install @esotericsoftware/spine-player
+npm install @esotericsoftware/spine-threejs
 ```
+
+spine-ts modules are provided in the [ECMAScript format](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules), which can be consumed natively by all modern browsers, or bundled by tools like [webpack](https://webpack.js.org/), [Babel](https://babeljs.io/), [Parcel](https://parceljs.org/), or [esbuild](https://esbuild.github.io/). You can import functions and classes from a spine-ts module in your JavaScript or TypeScript code using the `import` syntax to get access to all exported constants, functions, and classes of a module:
+
+```
+import spine from "@esotericsoftware/spine-core"
+```
+
+Our module packages also contain `js.map` source maps as well as `d.ts` typings for easier debugging and development.
+
+You can find all our published modules on the [npm registry](https://www.npmjs.com/search?q=%40esotericsoftware) via the `@esotericsoftware` scope.
 
 ## Examples
 
-To run the various examples found in each of the spine-ts backend folders, the image, atlas, and JSON files must be served by a webserver. For security reasons browsers will not load these files from your local disk. To work around this, you can spawn a lightweight web server in the spine-ts folder, then navigate to the `index.html` file for the example you want to view. For example:
+Every module except `spine-core` contains an `example/` folder demonstrating usage of that module's API. To run the examples, install [Node.js](https://nodejs.org/en/), then run the following command in the `spine-runtimes/spine-ts` folder:
 
 ```
-cd spine-ts
-python -m SimpleHTTPServer // for Python 2
-python -m http.server // for Python 3
+npm run dev
 ```
 
-Then open `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example`, `https://localhost:8000/threejs/example`, or `http://localhost:8000/player/example` in your browser.
-
-### WebGL demos
-
-The spine-ts WebGL demos can be viewed [all on one page](http://esotericsoftware.com/spine-demos/) or in individual, standalone pages which are easy for you to explore and edit. See the [standalone demos source code](webgl/demos) and view the pages here:
-
-- [Spine vs sprite sheets](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/demos/spritesheets.html)
-- [Image changes](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/demos/imagechanges.html)
-- [Transitions](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/demos/transitions.html)
-- [Meshes](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/demos/meshes.html)
-- [Skins](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/demos/skins.html)
-- [Hoverboard](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/demos/hoverboard.html)
-- [Vine](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/demos/vine.html)
-- [Clipping](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/demos/clipping.html)
-- [Stretchyman](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/demos/stretchyman.html)
-- [Tank](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/demos/tank.html)
-- [Transform constraints](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/demos/transforms.html)
-
-Please note that Chrome and possibly other browsers do not use the original CORS headers when loading cached resources. After the initial page load for a demo, you may need to forcefully refresh (hold `shift` and click refresh) or clear your browser cache.
-
-### WebGL examples
-
-The WebGL demos serve well as examples, showing various ways to use the APIs. We also provide a simple, self-contained example with UI to control the skeletons:
-
-- [WebGL example](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/example/index.html)
-
-A barebones example is also available. It doesn't use JQuery and shows the minimal code necessary to use spine-ts with WebGL to load and render a skeleton:
-
-- [WebGL barebones](http://rawgit.com/EsotericSoftware/spine-runtimes/3.8/spine-ts/webgl/example/barebones.html)
+This will compile the modules and start a server that serves the example pages at http://127.0.0.1:8080. When you make changes to the source code of either the modules and the examples, the source get recompiled, and the open page in the browser is reloaded automatically.
 
 ## Development setup
+spine-ts is developed with TypeScript, we thus recommend the following development environment when working on its sources:
 
-The spine-ts runtime and the various backends are implemented in TypeScript for greater maintainability and better tooling support. To setup a development environment, follow these steps:
-
+2. Install a [Git Client](https://git-fork.com/) and make sure it's available on the command line.
 1. Install [NPM](https://nodejs.org/en/download/) and make sure it's available on the command line.
-2. On the command line, Install the TypeScript compiler via `npm install -g typescript`.
-3. Install [Visual Studio Code](https://code.visualstudio.com/).
-4. On the command line, change into the `spine-ts` directory.
-5. Start the TypeScript compiler in watcher mode for the backend you want to work on:
-  * **Core**: `tsc -w -p tsconfig.core.json`, builds `core/src`, outputs `build/spine-core.js|d.ts|js.map`.
-  * **WebGL**: `tsc -w -p tsconfig.webgl.json`, builds `core/src` and `webgl/src`, outputs `build/spine-webgl.js|d.ts|js.map`.
-  * **Canvas**: `tsc -w -p tsconfig.canvas.json`, builds `core/src` and `canvas/src`, outputs `build/spine-canvas.js|d.ts|js.map`.
-  * **THREE.JS**: `tsc -w -p tsconfig.threejs.json`, builds `core/src` and `threejs/src`, outputs `build/spine-threejs.js|d.ts|js.map`.
-  * **Player**: `tsc -w -p tsconfig.player.json`, builds `core/src` and `player/src`, outputs `build/spine-player.js|d.ts|js.map`.
-6. Open the `spine-ts` folder in Visual Studio Code. VS Code will use the `tsconfig.json` file to find all source files for your development pleasure. The actual JavaScript output is still created by the command line TypeScript compiler process from the previous step.
-
-Each backend contains an `example/` folder with an `index.html` file that demonstrates the respective backend. For development, we suggest to run a HTTP server in the root of `spine-ts`, for example:
-
+2. Install [Visual Studio Code](https://code.visualstudio.com/).
+3. Open a terminal and execute
 ```
-cd spine-ts
-python -m SimpleHTTPServer // for Python 2
-python -m http.server // for Python 3
+git clone https://github.com/esotericsoftware/spine-runtimes
+npm install
+npm run dev
 ```
 
-Then navigate to `http://localhost:8000/webgl/example`, `http://localhost:8000/canvas/example`, `http://localhost:8000/threejs/example`, or `http://localhost:8000/player/example`.
+The final command `npm run dev` will start a local web server at http://127.0.0.1:8080, which reloads any page it served automatically in case the source code has changed. The command will also start the build tools in watch mode, meaning they will recompile any source code changes in the background automatically.
 
-### WebGL backend
+You can then open Visual Studio Code to inspect, edit, and debug the source code. We also supply launch configurations to start examples and demos in debug mode, so you can debug them right inside Visual Studio code.
 
-By default, the spine-ts WebGL backend supports two-color tinting. This requires more per vertex data to be submitted to the GPU and the fragment shader has to do a few more arithmetic operations. It has a neglible effect on performance, but you can disable two-color tinting like this:
-
-```javascript
-// If you use SceneRenderer, disable two-color tinting via the last constructor argument.
-var sceneRenderer = new spine.SceneRenderer(canvas, gl, false);
-
-// If you use SkeletonRenderer and PolygonBatcher directly, disable two-color
-// tinting in the respective constructor and use the shader returned by
-// Shader.newColoredTextured() instead of Shader.newTwoColoredTextured().
-var batcher = new spine.PolygonBatcher(gl, false);
-var skeletonRenderer = new spine.SkeletonRenderer(gl, false);
-var shader = Shader.newColoredTextured();
-```
-
-### Using the Player
-
-Please see the documentation for the [Spine Web Player](https://esotericsoftware.com/spine-player).
+To build the artifacts as they are published to NPM, run `npm run build`.

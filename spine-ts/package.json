@@ -9,7 +9,7 @@
     "prepublish": "npm run clean && npm run build",
     "clean": "npx rimraf spine-core/dist spine-canvas/dist spine-webgl/dist spine-player/dist spine-threejs/dist",
     "build": "npm run clean && npm run build:modules && concurrently \"npm run build:core\" \"npm run build:canvas\" \"npm run build:webgl\" \"npm run build:player\" \"npm run build:threejs\"",
-    "build:modules": "tsc -b -clean && tsc -b",
+    "build:modules": "npx tsc -b -clean && npx tsc -b",
     "build:core": "npx esbuild --bundle spine-core/src/index.ts --tsconfig=spine-core/tsconfig.json  --sourcemap --outfile=spine-core/dist/iife/spine-core.js --format=iife --global-name=spine",
     "build:canvas": "npx esbuild --bundle spine-canvas/src/index.ts --tsconfig=spine-canvas/tsconfig.json  --sourcemap --outfile=spine-canvas/dist/iife/spine-canvas.js --format=iife --global-name=spine",
     "build:webgl": "npx esbuild --bundle spine-webgl/src/index.ts --tsconfig=spine-webgl/tsconfig.json  --sourcemap --outfile=spine-webgl/dist/iife/spine-webgl.js --format=iife --global-name=spine",
