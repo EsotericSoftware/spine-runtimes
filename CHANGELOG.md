@@ -199,6 +199,8 @@
 * **Breaking change:** spine-corona has been renamed to spine-solar2d. Change your `require "spine-corona.spine"` statements to `require "spine-solar2d.spine"`
 
 ## Typescript/Javascript
+* **Breaking change:** refactored to ECMAScript modules. See this [blog post](http://esotericsoftware.com/blog/spine-goes-npm) as well as the updated [README.md](spine-ts/README.md).
+* **Breaking change:** the `build/` folder and compiled artifacts are no longer part of the repository. Instead, `npm run build` in `spine-ts/` to generate ECMAScript modules and IIFE modules in `spine-<module-name>/dist`.
 * Updated runtime to be compatible with TypeScript 3.6.3.
 * Added `AssetManager#setRawDataURI(path, data)`. Allows to set raw data URIs for a specific path, which in turn enables embedding assets into JavaScript/HTML.
 * Expose non-essential colors on bones, bounding box, clipping, and path attachments.
@@ -216,12 +218,15 @@
 
 ### WebGL backend
 * **Breaking change:** removed `SharedAssetManager`. Use `AssetManager` with a shared `Downloader` instance instead.
+* **Breaking change:** the global object `spine.webgl` no longer exists. All classes and functions are now exposed on the global `spine` object directly. Simply replace any reference to `spine.webgl.` in your source code with `spine.`.
 
 ### Canvas backend
 * Renderer now accounts for whitespace stripping.
+* **Breaking change:** the global object `spine.canvas` no longer exists. All classes and functions are now exposed on the global `spine` object directly. Simply replace any reference to `spine.canvas.` in your source code with `spine.`.
 
 ### Three.js backend
 * `SkeletonMesh` now takes an optional `SkeletonMeshMaterialParametersCustomizer` function that allows you to modify the `ShaderMaterialParameters` before the material is finalized. Use it to modify things like THREEJS' `Material.depthTest` etc. See #1590.
+* **Breaking change:** the global object `spine.canvas` no longer exists. All classes and functions are now exposed on the global `spine` object directly. Simply replace any reference to `spine.threejs.` in your source code with `spine.`.
 
 ### Player
 * Added `SpinePlayerConfig.rawDataURIs`. Allows to embed data URIs for skeletons, atlases and atlas page images directly in the HTML/JS without needing to load it from a separate file. See the example for a demonstration.
