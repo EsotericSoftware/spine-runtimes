@@ -40,24 +40,24 @@ spine-ts THREE.JS does not support two color tinting or blend modes. The THREE.J
 All spine-ts modules are published to [npm](http://npmjs.com) for consumption via vanilla JavaScript as well as 
 
 ## Usage in vanilla JavaScript
-You can include a module in your project via a `<script>` tag from the [unpkg](https://unpkg.com/) CDN, specifying the version as part of the URL. In the examples below, the version is `4.0.3`, which will work with all exports from Spine Editor version `4.0.x`.
+You can include a module in your project via a `<script>` tag from the [unpkg](https://unpkg.com/) CDN, specifying the version as part of the URL. In the examples below, the version is `4.0.4`, which will work with all exports from Spine Editor version `4.0.x`.
 
 ```
 // spine-ts Core
-<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.3/dist/iife/spine-core.js">
+<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.4/dist/iife/spine-core.js">
 
 // spine-ts Canvas
-<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.3/dist/iife/spine-canvas.js">
+<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.4/dist/iife/spine-canvas.js">
 
 // spine-ts WebGL
-<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.3/dist/iife/spine-webgl.js">
+<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.4/dist/iife/spine-webgl.js">
 
 // spine-ts Player, which requires a spine-player.css as well
-<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.3/dist/iife/spine-player.js">
-<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-core@4.0.3/dist/iife/spine-player.css">
+<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.4/dist/iife/spine-player.js">
+<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-core@4.0.4/dist/iife/spine-player.css">
 
 // spine-ts WebGL
-<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.3/dist/iife/spine-webgl.js">
+<script src="https://unpkg.com/@esotericsoftware/spine-core@4.0.4/dist/iife/spine-webgl.js">
 ```
 
 We also provide `js.map` source maps. They will be automatically fetched from unpkg when debugging code of a spine-module in Chrome, Firefox, or Safari, mapping the JavaScript code back to its original TypeScript sources.
