@@ -29,13 +29,15 @@
 
 import { TimeKeeper, AssetManager, ManagedWebGLRenderingContext, SceneRenderer, Input, StringMap } from "./";
 
-/** An app running inside a {@link SpineCanvas}. The app life cycle
+/** An app running inside a {@link SpineCanvas}. The app life-cycle
  * is as follows:
  *
  * 1. `loadAssets()` is called. The app can queue assets for loading via {@link SpineCanvas#assetManager}.
  * 2. `initialize()` is called when all assets are loaded. The app can setup anything it needs to enter the main application logic.
  * 3. `update()` is called periodically at screen refresh rate. The app can update its state.
  * 4. `render()` is called periodically at screen refresh rate. The app can render its state via {@link SpineCanvas#renderer} or directly via the WebGL context in {@link SpineCanvas.gl}`
+ *
+ * The `error()` method is called in case the assets could not be loaded.
  */
 export interface SpineCanvasApp {
     loadAssets?(canvas: SpineCanvas): void;
