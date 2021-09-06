@@ -83,14 +83,14 @@
   * `Skin.GetAttachments()` has been replaced by `Skin.Attachments`, returning an `ICollection<SkinEntry>`. This makes access more consistent and intuitive. To fix any compile errors, replace any occurrances of `Skin.GetAttachments()` by `Skin.Attachments`.
   * Removed redundant `Spine.Unity.AttachmentTools.AttachmentCloneExtensions` extension methods `Attachment.GetCopy()` and `Attachment.GetLinkedMesh()`. To fix any compile errors, replace any occurrances with `Attachment.Copy()` and `Attachment.NewLinkedMesh()`.
   * Removed `Spine.Unity.AttachmentTools.AttachmentRegionExtensions` extension methods `Attachment.GetRegion()`. Use `Attachment.RendererObject as AtlasRegion` instead.
-  * Removed redundant `Spine.SkeletonExtensions` extension methods:  
+  * Removed redundant `Spine.SkeletonExtensions` extension methods:
     Replace:
     * `Skeleton.SetPropertyToSetupPose()`
     * `Skeleton.SetDrawOrderToSetupPose()`
     * `Skeleton.SetSlotAttachmentsToSetupPose()`
     * `Skeleton.SetSlotAttachmentToSetupPose()`
 
-    with `Skeleton.SetSlotsToSetupPose()`.  
+    with `Skeleton.SetSlotsToSetupPose()`.
     Replace:
      * `Slot.SetColorToSetupPose()`
      * `Slot.SetAttachmentToSetupPose()`
@@ -108,7 +108,7 @@
   * Reverted changes: `BoneFollower` property `followLocalScale` has intermediately been renamed to `followScale` but was renamed back to `followLocalScale`. Serialized values (scenes and prefabs) will automatically be upgraded, only code accessing `followScale` needs to be adapted.
   * Fixed Timeline not pausing (and resuming) clip playback on Director pause, this is now the default behaviour. If you require the old behaviour (e.g. to continue playing an idle animation during Director pause), there is now an additional parameter `Don't Pause with Director` provided that can be enabled for each Timeline clip.
   * Fixed Timeline `Spine AnimationState Clips` ignoring empty space on the Timeline after a clip's end. Timeline clips now also offer `Don't End with Clip` and `Clip End Mix Out Duration` parameters if you prefer the old behaviour of previous versions. By default when empty space follows the clip on the timeline, the empty animation is set on the track with a MixDuration of `Clip End Mix Out Duration`. Set `Don't End with Clip` to `true` to continue playing the clip's animation instead and mimic the old 3.8 behaviour. If you prefer pausing the animation instead of mixing out to the empty animation, set `Clip End Mix Out Duration` to a value less than 0, then the animation is paused instead.
-  
+
 * **Additions**
   * Additional **Fix Draw Order** parameter at SkeletonRenderer, defaults to `disabled` (previous behaviour).
     Applies only when 3+ submeshes are used (2+ materials with alternating order, e.g. "A B A").
@@ -216,6 +216,7 @@
 * `AssetManager` constructor now takes an option `Downloader` instance. Used to download assets only once and share them between `AssetManager` instances.
 * Added web worker support to `AssetManager`.
 * Added various default parameters to `AnimationState` methods for ease of use.
+* Added `SpineCanvas`, a simpler way to render a scene via spine-webgl. See `spine-ts/spine-webgl/examples/barebones.html` and `spine-ts/spine-webgl/examples/mix-and-match.html`.
 
 ### WebGL backend
 * **Breaking change:** removed `SharedAssetManager`. Use `AssetManager` with a shared `Downloader` instance instead.

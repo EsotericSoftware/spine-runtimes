@@ -40,36 +40,36 @@ export class AssetManagerBase implements Disposable {
 	private toLoad = 0;
 	private loaded = 0;
 
-	constructor (textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture, pathPrefix: string = "", downloader: Downloader = null) {
+	constructor(textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture, pathPrefix: string = "", downloader: Downloader = null) {
 		this.textureLoader = textureLoader;
 		this.pathPrefix = pathPrefix;
 		this.downloader = downloader || new Downloader();
 	}
 
-	private start (path: string): string {
+	private start(path: string): string {
 		this.toLoad++;
 		return this.pathPrefix + path;
 	}
 
-	private success (callback: (path: string, data: any) => void, path: string, asset: any) {
+	private success(callback: (path: string, data: any) => void, path: string, asset: any) {
 		this.toLoad--;
 		this.loaded++;
 		this.assets[path] = asset;
 		if (callback) callback(path, asset);
 	}
 
-	private error (callback: (path: string, message: string) => void, path: string, message: string) {
+	private error(callback: (path: string, message: string) => void, path: string, message: string) {
 		this.toLoad--;
 		this.loaded++;
 		this.errors[path] = message;
 		if (callback) callback(path, message);
 	}
 
-	setRawDataURI (path: string, data: string) {
+	setRawDataURI(path: string, data: string) {
 		this.downloader.rawDataUris[this.pathPrefix + path] = data;
 	}
 
-	loadBinary (path: string,
+	loadBinary(path: string,
 		success: (path: string, binary: Uint8Array) => void = null,
 		error: (path: string, message: string) => void = null) {
 		path = this.start(path);
@@ -81,7 +81,7 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
-	loadText (path: string,
+	loadText(path: string,
 		success: (path: string, text: string) => void = null,
 		error: (path: string, message: string) => void = null) {
 		path = this.start(path);
@@ -93,7 +93,7 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
-	loadJson (path: string,
+	loadJson(path: string,
 		success: (path: string, object: object) => void = null,
 		error: (path: string, message: string) => void = null) {
 		path = this.start(path);
@@ -105,7 +105,7 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
-	loadTexture (path: string,
+	loadTexture(path: string,
 		success: (path: string, texture: Texture) => void = null,
 		error: (path: string, message: string) => void = null) {
 		path = this.start(path);
@@ -136,7 +136,7 @@ export class AssetManagerBase implements Disposable {
 		}
 	}
 
-	loadTextureAtlas (path: string,
+	loadTextureAtlas(path: string,
 		success: (path: string, atlas: TextureAtlas) => void = null,
 		error: (path: string, message: string) => void = null
 	) {
@@ -170,11 +170,11 @@ export class AssetManagerBase implements Disposable {
 		});
 	}
 
-	get (path: string) {
+	get(path: string) {
 		return this.assets[this.pathPrefix + path];
 	}
 
-	require (path: string) {
+	require(path: string) {
 		path = this.pathPrefix + path;
 		let asset = this.assets[path];
 		if (asset) return asset;
@@ -182,7 +182,7 @@ export class AssetManagerBase implements Disposable {
 		throw Error("Asset not found: " + path + (error ? "\n" + error : ""));
 	}
 
-	remove (path: string) {
+	remove(path: string) {
 		path = this.pathPrefix + path;
 		let asset = this.assets[path];
 		if ((<any>asset).dispose) (<any>asset).dispose();
@@ -190,7 +190,7 @@ export class AssetManagerBase implements Disposable {
 		return asset;
 	}
 
-	removeAll () {
+	removeAll() {
 		for (let key in this.assets) {
 			let asset = this.assets[key];
 			if ((<any>asset).dispose) (<any>asset).dispose();
@@ -198,27 +198,27 @@ export class AssetManagerBase implements Disposable {
 		this.assets = {};
 	}
 
-	isLoadingComplete (): boolean {
+	isLoadingComplete(): boolean {
 		return this.toLoad == 0;
 	}
 
-	getToLoad (): number {
+	getToLoad(): number {
 		return this.toLoad;
 	}
 
-	getLoaded (): number {
+	getLoaded(): number {
 		return this.loaded;
 	}
 
-	dispose () {
+	dispose() {
 		this.removeAll();
 	}
 
-	hasErrors () {
+	hasErrors() {
 		return Object.keys(this.errors).length > 0;
 	}
 
-	getErrors () {
+	getErrors() {
 		return this.errors;
 	}
 }
@@ -227,7 +227,7 @@ export class Downloader {
 	private callbacks: StringMap<Array<Function>> = {};
 	rawDataUris: StringMap<string> = {};
 
-	downloadText (url: string, success: (data: string) => void, error: (status: number, responseText: string) => void) {
+	downloadText(url: string, success: (data: string) => void, error: (status: number, responseText: string) => void) {
 		if (this.rawDataUris[url]) url = this.rawDataUris[url];
 		if (this.start(url, success, error)) return;
 		let request = new XMLHttpRequest();
@@ -241,20 +241,20 @@ export class Downloader {
 		request.send();
 	}
 
-	downloadJson (url: string, success: (data: object) => void, error: (status: number, responseText: string) => void) {
+	downloadJson(url: string, success: (data: object) => void, error: (status: number, responseText: string) => void) {
 		this.downloadText(url, (data: string): void => {
 			success(JSON.parse(data));
 		}, error);
 	}
 
-	downloadBinary (url: string, success: (data: Uint8Array) => void, error: (status: number, responseText: string) => void) {
+	downloadBinary(url: string, success: (data: Uint8Array) => void, error: (status: number, responseText: string) => void) {
 		if (this.rawDataUris[url]) url = this.rawDataUris[url];
 		if (this.start(url, success, error)) return;
 		let request = new XMLHttpRequest();
 		request.open("GET", url, true);
 		request.responseType = "arraybuffer";
 		let onerror = () => {
-			this.finish(url, request.status, request.responseText);
+			this.finish(url, request.status, request.response);
 		};
 		request.onload = () => {
 			if (request.status == 200)
@@ -266,7 +266,7 @@ export class Downloader {
 		request.send();
 	}
 
-	private start (url: string, success: any, error: any) {
+	private start(url: string, success: any, error: any) {
 		let callbacks = this.callbacks[url];
 		try {
 			if (callbacks) return true;
@@ -276,7 +276,7 @@ export class Downloader {
 		}
 	}
 
-	private finish (url: string, status: number, data: any) {
+	private finish(url: string, status: number, data: any) {
 		let callbacks = this.callbacks[url];
 		delete this.callbacks[url];
 		let args = status == 200 ? [data] : [status, data];
