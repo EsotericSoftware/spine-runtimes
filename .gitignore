@@ -51,9 +51,6 @@ spine-cocos2d-objc/spine-cocos2d-iphone-objc.xcodeproj/project.xcworkspace/xcsha
 spine-csharp/.vs/
 spine-csharp/bin
 spine-csharp/obj
-spine-csharp/src/*.meta
-spine-csharp/src/*.cs.meta
-spine-csharp/src/Attachments/*.cs.meta
 
 spine-monogame/.vs/
 spine-monogame/example/bin
