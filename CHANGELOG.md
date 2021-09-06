@@ -202,6 +202,7 @@
 ## Typescript/Javascript
 * **Breaking change:** refactored to ECMAScript modules. See this [blog post](http://esotericsoftware.com/blog/spine-goes-npm) as well as the updated [README.md](spine-ts/README.md).
 * **Breaking change:** the `build/` folder and compiled artifacts are no longer part of the repository. Instead, `npm run build` in `spine-ts/` to generate ECMAScript modules and IIFE modules in `spine-<module-name>/dist`.
+* **Breaking change:** the `.npmignore` and `package.json` files in the root directory have been deleted. Use the corresponding files in `spine-ts/` instead, or better, depend on the packages from the NPM registry.
 * Updated runtime to be compatible with TypeScript 3.6.3.
 * Added `AssetManager#setRawDataURI(path, data)`. Allows to set raw data URIs for a specific path, which in turn enables embedding assets into JavaScript/HTML.
 * Expose non-essential colors on bones, bounding box, clipping, and path attachments.
@@ -215,7 +216,6 @@
 * `AssetManager` constructor now takes an option `Downloader` instance. Used to download assets only once and share them between `AssetManager` instances.
 * Added web worker support to `AssetManager`.
 * Added various default parameters to `AnimationState` methods for ease of use.
-* 
 
 ### WebGL backend
 * **Breaking change:** removed `SharedAssetManager`. Use `AssetManager` with a shared `Downloader` instance instead.
