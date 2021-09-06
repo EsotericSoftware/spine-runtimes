@@ -27,13 +27,13 @@
 			let assetManager = canvas.assetManager;
 
 			// Create the atlas
-			let atlas = canvas.assetManager.get("mix-and-match-pma.atlas");
+			let atlas = canvas.assetManager.require("mix-and-match-pma.atlas");
 			let atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 
 			// Create the skeleton
 			let skeletonBinary = new spine.SkeletonBinary(atlasLoader);
 			skeletonBinary.scale = 0.5;
-			let skeletonData = skeletonBinary.readSkeletonData(assetManager.get("mix-and-match-pro.skel"));
+			let skeletonData = skeletonBinary.readSkeletonData(assetManager.require("mix-and-match-pro.skel"));
 			this.skeleton = new spine.Skeleton(skeletonData);
 
 			// Create the animation state
