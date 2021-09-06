@@ -1,0 +1,28 @@
+<html>
+<meta charset="UTF-8">
+<title>Meshes - Spine Demo</title>
+<link rel="stylesheet" href="demos.css">
+<script src="../dist/iife/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="utils.js"></script>
+<script src="meshes.js"></script>
+
+<body>
+
+	<center>
+		<div class="aspect standalone"></div>
+		<div id="meshes-timeline" class="slider"></div>
+		<input id="meshes-playbutton" type="button" value="Pause"></input><br>
+		<select id="meshes-skeleton" size="3"></select><br>
+		<input type="checkbox" id="meshes-drawbonescheckbox" style="color: #fff;"></input> Draw bones<br>
+		<input type="checkbox" id="meshes-drawmeshtrianglescheckbox" style="color: #fff;"></input> Draw triangles<br>
+	</center>
+
+	<script>
+spineDemos.init();
+spineDemos.addDemo(meshesDemo, document.getElementsByClassName("aspect")[0]);
+	</script>
+
+</body>
+
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<script src="../dist/iife/spine-webgl.js"></script>
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+	<style>
+		input,
+		label {
+			display: block;
+		}
+
+		#controls {
+			position: absolute;
+		}
+
+		#controls * {
+			position: relative;
+			top: 0;
+			left: 0;
+		}
+	</style>
+</head>
+
+<body>
+	<canvas id="canvas" style="width: 640px; height: 480px;"></canvas>
+	<div id="controls">
+		<label>Up</label><input type="range" id="up" min="0" max="100" value="0"></input>
+		<label>Down</label><input type="range" id="down" min="0" max="100" value="0"></input>
+		<label>Left</label><input type="range" id="left" min="0" max="100" value="0"></input>
+		<label>Right</label><input type="range" id="right" min="0" max="100" value="0"></input>
+	</div>
+</body>
+<script>
+	var canvas = document.getElementById("canvas");
+	canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+	var context = new spine.ManagedWebGLRenderingContext(canvas, { alpha: false });
+	var gl = context.gl;
+
+	var time = new spine.TimeKeeper();
+	var assetManager = new spine.AssetManager(context, "../example/assets/");
+	var renderer = new spine.SceneRenderer(canvas, context);
+	var skeleton, animationState;
+	var upEntry, downEntry, leftEntry, rightEntry;
+
+	assetManager.loadTexture("owl-pma.png");
+	assetManager.loadText("owl-pma.atlas");
+	assetManager.loadText("owl-pro.json");
+
+	function load() {
+		if (assetManager.isLoadingComplete()) {
+			var atlas = new spine.TextureAtlas(assetManager.get("owl-pma.atlas"));
+			atlas.setTextures(assetManager);
+			var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+			var skeletonJson = new spine.SkeletonJson(atlasLoader);
+			skeletonJson.scale = 0.5;
+			var skeletonData = skeletonJson.readSkeletonData(JSON.parse(assetManager.get("owl-pro.json")));
+			skeleton = new spine.Skeleton(skeletonData);
+			var animationStateData = new spine.AnimationStateData(skeletonData);
+			animationStateData.defaultMix = 0.3;
+			animationState = new spine.AnimationState(animationStateData);
+
+			animationState.setAnimation(0, "idle", true);
+			animationState.setAnimation(1, "blink", true);
+			upEntry = animationState.setAnimation(2, "up", true);
+			upEntry.alpha = 0;
+			upEntry.mixBlend = spine.MixBlend.add;
+			downEntry = animationState.setAnimation(3, "down", true);
+			downEntry.alpha = 0;
+			downEntry.mixBlend = spine.MixBlend.add;
+			leftEntry = animationState.setAnimation(4, "left", true);
+			leftEntry.alpha = 0;
+			leftEntry.mixBlend = spine.MixBlend.add;
+			rightEntry = animationState.setAnimation(5, "right", true);
+			rightEntry.alpha = 0;
+			rightEntry.mixBlend = spine.MixBlend.add;
+
+			requestAnimationFrame(render);
+		} else {
+			requestAnimationFrame(load);
+		}
+	}
+
+	function render() {
+		time.update();
+		animationState.update(time.delta);
+		skeleton.setToSetupPose(); // Or key all bones used in the additive animations in a lower track, like idle.
+		animationState.apply(skeleton);
+		skeleton.y = -canvas.height / 2 / 2;
+		skeleton.updateWorldTransform();
+
+		gl.clearColor(0.3, 0.3, 0.3, 1);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+
+		renderer.resize(spine.ResizeMode.Fit);
+		renderer.begin();
+		renderer.drawSkeleton(skeleton);
+		renderer.end();
+
+		requestAnimationFrame(render);
+	}
+
+	function setupUI() {
+		$("#up").on("input", function () {
+			upEntry.alpha = $(this).val() / 100;
+		});
+		$("#down").on("input", function () {
+			downEntry.alpha = $(this).val() / 100;
+		});
+		$("#left").on("input", function () {
+			leftEntry.alpha = $(this).val() / 100;
+		});
+		$("#right").on("input", function () {
+			rightEntry.alpha = $(this).val() / 100;
+		});
+	}
+
+	setupUI();
+	load();
+</script>
+
+</html>

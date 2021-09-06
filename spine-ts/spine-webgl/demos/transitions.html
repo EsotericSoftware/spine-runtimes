@@ -1,0 +1,26 @@
+<html>
+<meta charset="UTF-8">
+<title>Transitions - Spine Demo</title>
+<link rel="stylesheet" href="demos.css">
+<script src="../dist/iife/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="utils.js"></script>
+<script src="transitions.js"></script>
+
+<body>
+
+	<center>
+		<div class="aspect standalone"></div>
+		Time multiplier
+		<div id="transitions-timeslider" class="slider filled"></div><br>
+		<button id="transitions-die">Die</button>
+	</center>
+
+	<script>
+		spineDemos.init();
+		spineDemos.addDemo(transitionsDemo, document.getElementsByClassName("aspect")[0]);
+	</script>
+
+</body>
+
+</html>

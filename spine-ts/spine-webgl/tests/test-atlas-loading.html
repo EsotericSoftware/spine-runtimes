@@ -1,0 +1,72 @@
+<html>
+
+<body>
+    <script src="../dist/iife/spine-webgl.js"></script>
+    <canvas width="640" height="480"></canvas>
+</body>
+<script>
+    var canvas = document.getElementsByTagName("canvas")[0];
+    canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+    var context = new spine.ManagedWebGLRenderingContext(canvas);
+    var assetManager = new spine.AssetManager(context, "../example/assets/");
+    var renderer = new spine.SceneRenderer(canvas, context);
+    var time = new spine.TimeKeeper();
+    var loadingScreen = new spine.LoadingScreen(new spine.SceneRenderer(canvas, context));
+
+    var skeleton = null;
+    var animationState = null;
+
+    assetManager.loadText("spineboy-pro.json");
+    assetManager.loadTextureAtlas("spineboy-pma.atlas");
+
+    requestAnimationFrame(load);
+
+    function load() {
+        if (assetManager.isLoadingComplete()) {
+            var atlas = assetManager.get("spineboy-pma.atlas");
+            var skeletonJson = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
+            var skeletonData = skeletonJson.readSkeletonData(assetManager.get("spineboy-pro.json"));
+            var animationStateData = new spine.AnimationStateData(skeletonData);
+            animationStateData.defaultMix = 0.3;
+
+            skeleton = new spine.Skeleton(skeletonData);
+            animationState = new spine.AnimationState(animationStateData);
+            var offset = new spine.Vector2();
+            var size = new spine.Vector2();
+            skeleton.updateWorldTransform();
+            skeleton.getBounds(offset, size, []);
+            renderer.camera.position.x = offset.x + size.x / 2;
+            renderer.camera.position.y = offset.y + size.y / 2;
+            renderer.camera.zoom = size.x > size.y ? size.x / canvas.width : size.y / canvas.height;
+
+            animationState.setAnimation(0, "walk", true);
+            animationState.addAnimation(0, "run", true, 1);
+            animationState.addAnimation(0, "jump", true, 3);
+
+            requestAnimationFrame(render);
+        } else {
+            loadingScreen.draw(false);
+            requestAnimationFrame(load);
+        }
+    }
+
+    function render() {
+        context.gl.clearColor(0.9, 0.9, 0.9, 1);
+        context.gl.clear(context.gl.COLOR_BUFFER_BIT);
+
+        time.update();
+        animationState.update(time.delta);
+        animationState.apply(skeleton);
+        skeleton.updateWorldTransform();
+
+        renderer.begin();
+        renderer.drawSkeleton(skeleton, true);
+        renderer.end();
+
+        loadingScreen.draw(true);
+
+        requestAnimationFrame(render);
+    }
+</script>
+
+</html>

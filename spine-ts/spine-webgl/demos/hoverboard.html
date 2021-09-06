@@ -1,0 +1,27 @@
+<html>
+<meta charset="UTF-8">
+<title>IK Constraints - Spine Demo</title>
+<link rel="stylesheet" href="demos.css">
+<script src="../dist/iife/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="utils.js"></script>
+<script src="hoverboard.js"></script>
+
+<body>
+
+        <center>
+                <div class="aspect standalone"></div>
+                <input id="hoverboard-drawbones" type="checkbox"></input> Display Bones<br>
+                <input id="hoverboard-aim" type="checkbox"></input> Aim<br>
+                <button id="hoverboard-shoot">Shoot</button>
+                <button id="hoverboard-jump">Jump</button>
+        </center>
+
+        <script>
+                spineDemos.init();
+                spineDemos.addDemo(hoverboardDemo, document.getElementsByClassName("aspect")[0]);
+        </script>
+
+</body>
+
+</html>

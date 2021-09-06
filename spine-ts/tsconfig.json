@@ -1,21 +1,20 @@
 {
-	"compilerOptions": {
-		"module": "none",
-		"noImplicitAny": true,
-		"removeComments": true,
-		"preserveConstEnums": true,
-		"outFile": "build/spine-all.js",
-		"sourceMap": true,
-		"declaration": true
-	},
-	"include": [
-		"core/src/**/*",
-		"canvas/src/**/*",
-		"webgl/src/**/*",
-		"threejs/src/**/*",
-		"player/src/**/*"
-	],
-	"exclude": [
-		"build"
+	"files": [],
+	"references": [
+		{
+			"path": "./spine-core"
+		},
+		{
+			"path": "./spine-canvas"
+		},
+		{
+			"path": "./spine-webgl"
+		},
+		{
+			"path": "./spine-player"
+		},
+		{
+			"path": "./spine-threejs"
+		}
 	]
 }

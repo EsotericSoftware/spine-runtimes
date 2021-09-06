@@ -1,0 +1,26 @@
+<html>
+<meta charset="UTF-8">
+<title>Clipping - Spine Demo</title>
+<link rel="stylesheet" href="demos.css">
+<script src="../dist/iife/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="utils.js"></script>
+<script src="clipping.js"></script>
+
+<body>
+
+	<center>
+		<div class="aspect standalone"></div>
+		<div id="clipping-playbutton"></div>
+		<div id="clipping-timeline" class="slider"></div>
+		<input id="clipping-drawtriangles" type="checkbox"></input> Draw triangles
+	</center>
+
+	<script>
+		spineDemos.init();
+		spineDemos.addDemo(clippingDemo, document.getElementsByClassName("aspect")[0]);
+	</script>
+
+</body>
+
+</html>

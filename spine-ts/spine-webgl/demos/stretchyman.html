@@ -1,0 +1,24 @@
+<html>
+<meta charset="UTF-8">
+<title>Strechyman - Spine Demo</title>
+<link rel="stylesheet" href="demos.css">
+<script src="../dist/iife/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script src="utils.js"></script>
+<script src="stretchyman.js"></script>
+
+<body>
+
+	<center>
+		<div class="aspect standalone"></div>
+		<input id="stretchyman-drawbones" type="checkbox"></input> Display bones
+	</center>
+
+	<script>
+		spineDemos.init();
+		spineDemos.addDemo(stretchymanDemo, document.getElementsByClassName("aspect")[0]);
+	</script>
+
+</body>
+
+</html>

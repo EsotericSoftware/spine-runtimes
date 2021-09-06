@@ -1,0 +1,24 @@
+{
+	"extends": "../tsconfig.base.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"rootDir": "./src",
+		"outDir": "./dist",
+		"paths": {
+			"@esotericsoftware/spine-core": [
+				"../spine-core/src"
+			]
+		}
+	},
+	"include": [
+		"**/*.ts"
+	],
+	"exclude": [
+		"dist/**/*.d.ts"
+	],
+	"references": [
+		{
+			"path": "../spine-core"
+		}
+	]
+}

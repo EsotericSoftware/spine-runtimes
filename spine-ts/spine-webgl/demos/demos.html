@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>Spine: Demos</title>
+	<link rel="stylesheet" href="demos.css">
+
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="../dist/iife/spine-webgl.js"></script>
+
+	<script src="utils.js"></script>
+	<script src="spritesheets.js"></script>
+	<script src="imagechanges.js"></script>
+	<script src="transitions.js"></script>
+	<script src="meshes.js"></script>
+	<script src="skins.js"></script>
+	<script src="hoverboard.js"></script>
+	<script src="vine.js"></script>
+	<script src="clipping.js"></script>
+	<script src="stretchyman.js"></script>
+	<script src="tank.js"></script>
+	<script src="transforms.js"></script>
+	<script src="additiveblending.js"></script>
+
+	<script src="demos.js"></script>
+</head>
+
+<body>
+
+	<div id="demos" class="demos-page">
+		<div class="demo">
+			<div>
+				<div>
+					<h2 id="Spine-versus-sprites-sheets"><a href="#Spine-versus-sprite-sheets">Spine versus sprite sheets</a></h2>
+					<div class="demo-container">
+						<div class="aspect"></div>
+						<div class="resize"></div>
+						<div id="spritesheets-overlay" class="overlay-hide">
+							<div class="overlay-label" style="width:50%"><b>Spine</b><br><span class="hide-small">All animations, all frame rates<br></span><b>0.18 MB</b></div>
+							<div class="overlay-label" style="left:50%;width:50%"><b>Sprite sheet</b><br><span class="hide-small">1 second of animation @ 30FPS<br></span><b>3.39 MB = 18x larger!</b></div>
+						</div>
+					</div>
+					<div class="demo-text">
+						<div class="controls">
+							<div class="control" style="padding-bottom:0px">
+								<div class="control-label"><span>Animation speed</span></div>
+								<div class="slidervalue" id="spritesheets-timeslider-label">&nbsp;</div>
+								<div class="slider filled" id="spritesheets-timeslider"></div>
+							</div>
+							<div class="control" style="margin:0">
+								<div>
+									<button id="spritesheets-roar" class="btn unit-50">Roar</button>
+									<button id="spritesheets-jump" class="btn unit-50">Jump</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="demo">
+			<div>
+				<div>
+					<h2 id="Spine-with-frame-based-animation"><a href="#Spine-with-frame-based-animation">Spine with frame-based animation</a></h2>
+					<div class="demo-container">
+						<div class="aspect"></div>
+						<table class="timeline layout">
+							<tr>
+								<td>
+									<div id="imagechanges-playbutton" class="pause"></div>
+								</td>
+								<td>
+									<div class="slider" id="imagechanges-timeline"></div>
+								</td>
+							</tr>
+						</table>
+						<div class="resize"></div>
+					</div>
+					<div class="demo-text">
+						<div class="controls">
+							<div class="control">
+								<label>Select a skeleton:</label>
+								<div class="select-container">
+									<select id="imagechanges-skeleton" size="2"></select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="demo">
+			<div>
+				<div>
+					<h2 id="Transitions-and-layering"><a href="#Transitions-and-layering">Transitions and layering</a></h2>
+					<div class="demo-container">
+						<div class="aspect"></div>
+						<div id="transitions-overlay" class="overlay-hide">
+							<div class="overlay-label" style="left:25%;"><b>Smooth</b></div>
+							<div class="overlay-label" style="right:30%;"><b>Abrupt</b></div>
+						</div>
+						<div class="resize"></div>
+					</div>
+					<div class="demo-text">
+						<div class="controls">
+							<div class="control" style="margin:0">
+								<div>
+									<button id="transitions-die" class="btn unit-50">Die</button>
+								</div>
+							</div>
+							<div class="control" style="padding-bottom:0px">
+								<div class="control-label"><span>Animation speed</span></div>
+								<div class="slidervalue" id="transitions-timeslider-label">&nbsp;</div>
+								<div class="slider filled" id="transitions-timeslider"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="demo" id="demo-mesh-deformations">
+			<div>
+				<div>
+					<h2 id="Mesh-deformations"><a href="#Mesh-deformations">Mesh deformation</a></h2>
+					<div class="demo-container">
+						<div class="aspect"></div>
+						<table class="timeline layout">
+							<tr>
+								<td>
+									<div id="meshes-playbutton" class="pause"></div>
+								</td>
+								<td>
+									<div class="slider" id="meshes-timeline"></div>
+								</td>
+							</tr>
+						</table>
+						<div class="resize"></div>
+					</div>
+					<div class="demo-text">
+						<div class="controls">
+							<div class="control" style="padding-bottom:0">
+								<label>Select a character:</label>
+								<div class="select-container">
+									<select id="meshes-skeleton" size="3"></select>
+								</div>
+							</div>
+							<div class="control" style="width:50%; display:inline-block; float:left; padding-bottom:6px">
+								<div class="checkbox">
+									<input type="checkbox" id="meshes-drawbonescheckbox" name="check">
+									<label for="meshes-drawbonescheckbox"></label>
+								</div>
+								<span style="cursor:pointer" onclick="$('#meshes-drawbonescheckbox').click()">Show bones</span>
+							</div>
+							<div class="control" style="width:50%; display:inline-block; padding-bottom:6px">
+								<div class="checkbox">
+									<input type="checkbox" id="meshes-drawmeshtrianglescheckbox" name="check">
+									<label for="meshes-drawmeshtrianglescheckbox"></label>
+								</div>
+								<span style="cursor:pointer" onclick="$('#meshes-drawmeshtrianglescheckbox').click()">Show triangles</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="demo" id="demo-skins">
+			<div>
+				<div>
+					<h2 id="Skins"><a href="#Skins">Skins</a></h2>
+					<div class="demo-container">
+						<div class="aspect"></div>
+						<div class="resize"></div>
+					</div>
+					<div class="demo-text">
+						<div class="controls">
+							<div class="control">
+								<label>Select a skin:</label>
+								<div class="select-container">
+									<select id="skins-skin"></select>
+								</div>
+							</div>
+							<div class="control" style="margin:0">
+								<div>
+									<button id="skins-randomizeattachments" class="btn unit-50">Randomize</button>
+									<button id="skins-swingsword" class="btn unit-50">Swing Sword</button>
+								</div>
+							</div>
+							<div class="control" style="padding-bottom:6px; padding-top:10px">
+								<div class="checkbox">
+									<input type="checkbox" id="skins-randomizeskins" name="check" checked="true">
+									<label for="skins-randomizeskins"></label>
+								</div>
+								<span style="cursor:pointer" onclick="$('#skins-randomizeskins').click()">Random skins</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="demo" id="demo-ik-constraint">
+			<div>
+				<div>
+					<h2 id="Inverse-kinematics"><a href="#Inverse-kinematics">Inverse kinematics</a></h2>
+					<div class="demo-container">
+						<div class="aspect"></div>
+						<div class="resize"></div>
+					</div>
+					<div class="demo-text">
+						<div class="controls">
+							<div class="control" style="margin:0">
+								<div>
+									<button id="hoverboard-shoot" class="btn unit-50">Shoot</button>
+									<button id="hoverboard-jump" class="btn unit-50">Jump</button>
+								</div>
+							</div>
+							<div class="control" style="width:50%; display:inline-block; float:left; padding-bottom:6px">
+								<div class="checkbox">
+									<input type="checkbox" id="hoverboard-aim" name="check">
+									<label for="hoverboard-aim"></label>
+								</div>
+								<span style="cursor:pointer" onclick="$('#hoverboard-aim').click()">Aim</span>
+							</div>
+							<div class="control" style="width:50%; display:inline-block; padding-bottom:6px">
+								<div class="checkbox">
+									<input type="checkbox" id="hoverboard-drawbones" name="check">
+									<label for="hoverboard-drawbones"></label>
+								</div>
+								<span style="cursor:pointer" onclick="$('#hoverboard-drawbones').click()">Show bones</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="demo" id="demo-additive-blending">
+			<div>
+				<div>
+					<h2 id="Additive-blending"><a href="#Additive-blending">Additive Blending</a></h2>
+					<div class="demo-container">
+						<div class="aspect"></div>
+						<div class="resize"></div>
+					</div>
+					<div class="demo-text">
+						<div class="controls">
+							<div class="control" style="padding-bottom:6px">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="demo" id="demo-path-constraint">
+			<div>
+				<div>
+					<h2 id="Path-constraints"><a href="#Path-constraints">Path constraints</a></h2>
+					<div class="demo-container">
+						<div class="aspect"></div>
+						<table class="timeline layout">
+							<tr>
+								<td>
+									<div id="vine-playbutton" class="pause"></div>
+								</td>
+								<td>
+									<div class="slider" id="vine-timeline"></div>
+								</td>
+							</tr>
+						</table>
+						<div class="resize"></div>
+					</div>
+					<div class="demo-text">
+						<div class="controls">
+							<div class="control" style="padding-bottom:6px">
+								<div class="checkbox">
+									<input type="checkbox" id="vine-drawbones" name="check">
+									<label for="vine-drawbones"></label>
+								</div>
+								<span style="cursor:pointer" onclick="$('#vine-drawbones').click()">Show bones &amp; paths</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div>
+					<div class="demo-container">
+						<div class="aspect"></div>
+						<div class="resize"></div>
+					</div>
+					<div class="demo-text">
+						<div class="controls">
+							<div class="control" style="padding-bottom:6px">
+								<div class="checkbox">
+									<input type="checkbox" id="stretchyman-drawbones" name="check">
+									<label for="stretchyman-drawbones"></label>
+								</div>
+								<span style="cursor:pointer" onclick="$('#stretchyman-drawbones').click()">Show bones &amp; paths</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="demo" id="demo-clipping">
+			<div>
+				<div>
+					<h2 id="Clipping"><a href="#Clipping">Clipping</a></h2>
+					<div class="demo-container">
+						<div class="aspect"></div>
+						<table class="timeline layout">
+							<tr>
+								<td>
+									<div id="clipping-playbutton" class="pause"></div>
+								</td>
+								<td>
+									<div class="slider" id="clipping-timeline"></div>
+								</td>
+							</tr>
+						</table>
+						<div class="resize"></div>
+					</div>
+					<div class="demo-text">
+						<div class="controls">
+							<div class="control" style="padding-bottom:6px">
+								<div class="checkbox">
+									<input type="checkbox" id="clipping-drawtriangles" name="check">
+									<label for="clipping-drawtriangles"></label>
+								</div>
+								<span style="cursor:pointer" onclick="$('#clipping-drawtriangles').click()">Show triangles</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="demo" id="demo-transform-constraint">
+			<div>
+				<div>
+					<h2 id="Transform-constraints"><a href="#Transform-constraints">Transform constraints</a></h2>
+					<div class="demo-container">
+						<div class="aspect"></div>
+						<table class="timeline layout">
+							<tr>
+								<td>
+									<div id="tank-playbutton" class="pause"></div>
+								</td>
+								<td>
+									<div class="slider" id="tank-timeline"></div>
+								</td>
+							</tr>
+						</table>
+						<div class="resize"></div>
+					</div>
+					<div class="demo-text">
+						<div class="controls">
+							<div class="control" style="padding-bottom:6px">
+								<div class="checkbox">
+									<input type="checkbox" id="tank-drawbones" name="check">
+									<label for="tank-drawbones" id="tank-drawbones-label"></label>
+								</div>
+								<span style="cursor:pointer" onclick="$('#tank-drawbones').click()">Show bones &amp; paths</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div>
+					<div class="demo-container">
+						<div class="aspect"></div>
+						<div class="resize"></div>
+					</div>
+					<div class="demo-text">
+						<div class="controls">
+							<div class="control" style="padding-bottom:0px">
+								<div class="control-label"><span>Rotation offset</span></div>
+								<div class="slidervalue" id="transforms-rotationoffset-label">&nbsp;</div>
+								<div class="slider filled" id="transforms-rotationoffset"></div>
+							</div>
+							<div class="control" style="padding-bottom:0px">
+								<div class="control-label"><span>Translation mix</span></div>
+								<div class="slidervalue" id="transforms-translationmix-label">&nbsp;</div>
+								<div class="slider filled" id="transforms-translationmix"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

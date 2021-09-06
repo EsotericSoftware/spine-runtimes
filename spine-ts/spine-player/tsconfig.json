@@ -1,0 +1,30 @@
+{
+	"extends": "../tsconfig.base.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"rootDir": "./src",
+		"outDir": "./dist",
+		"paths": {
+			"@esotericsoftware/spine-core": [
+				"../spine-core/src"
+			],
+			"@esotericsoftware/spine-webgl": [
+				"../spine-webgl/src"
+			]
+		}
+	},
+	"include": [
+		"**/*.ts"
+	],
+	"exclude": [
+		"dist/**/*.d.ts"
+	],
+	"references": [
+		{
+			"path": "../spine-core"
+		},
+		{
+			"path": "../spine-webgl"
+		}
+	]
+}

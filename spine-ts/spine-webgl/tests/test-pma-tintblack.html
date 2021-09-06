@@ -1,0 +1,161 @@
+<html>
+<script src="../dist/iife/spine-webgl.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<style>
+	* {
+		margin: 0;
+		padding: 0;
+	}
+
+	body,
+	html {
+		height: 100%
+	}
+
+	canvas {
+		width: 640px;
+		height: 640px;
+	}
+</style>
+
+<body>
+	<canvas id="canvas" style="background: #ff00ff;"></canvas>
+	<div>
+		<div><label>Light: </label><input type="text" value="ffffffff" id="light"></div>
+		<div><label>Dark: </label><input type="text" value="000000" id="dark"></div>
+		<div><label>PMA blend:</label><input type="checkbox" id="pmaBlend"></div>
+		<div><label>Ivan's shader:</label><input type="checkbox" id="ivan"></div>
+	</div>
+</body>
+<script>
+
+	$("#light").change(function () {
+		setColors();
+	});
+
+	$("#dark").change(function () {
+		setColors();
+	});
+
+	$("#pmaBlend").change(function () {
+		setColors();
+	});
+
+	function setColors() {
+		var light = $("#light").val();
+		var r = parseInt(light.substr(0, 2), 16) / 255;
+		var g = parseInt(light.substr(2, 2), 16) / 255;
+		var b = parseInt(light.substr(4, 2), 16) / 255;
+		var a = parseInt(light.substr(6, 2), 16) / 255;
+
+		var dark = $("#dark").val();
+		var dr = parseInt(dark.substr(0, 2), 16) / 255;
+		var dg = parseInt(dark.substr(2, 2), 16) / 255;
+		var db = parseInt(dark.substr(4, 2), 16) / 255;
+
+		var pma = $("#pmaBlend").prop("checked");
+		if (pma) {
+			r *= a;
+			g *= a;
+			b *= a;
+
+			dr *= a;
+			dg *= a;
+			db *= a;
+			da = 1;
+		} else {
+			da = 0;
+		}
+
+		for (var i = 0, j = 2, k = 8; i < 4; i++, j += 12, k += 12) {
+			vertices[j] = r;
+			vertices[j + 1] = g;
+			vertices[j + 2] = b;
+			vertices[j + 3] = a;
+
+			vertices[k] = dr;
+			vertices[k + 1] = dg;
+			vertices[k + 2] = db;
+			vertices[k + 3] = da;
+		}
+	}
+
+	var canvas = document.getElementById("canvas");
+	canvas.width = canvas.clientWidth;
+	canvas.height = canvas.clientHeight;
+	var context = new spine.ManagedWebGLRenderingContext(canvas, { alpha: false });
+	var gl = context.gl;
+
+	var vertices = [-1, -1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+		1, -1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+		1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+	-1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0];
+	var indices = [0, 1, 2, 2, 3, 0];
+
+	var shader = spine.Shader.newTwoColoredTextured(context);
+	var ivanShader = loadIvanShader(context, shader);
+
+	var assetManager = new spine.AssetManager(context);
+	assetManager.loadTexture("../example/assets/spineboy.png");
+	assetManager.loadTexture("../example/assets/spineboy-pma.png");
+
+	var camMatrix = new spine.Matrix4();
+
+	var batcher = new spine.PolygonBatcher(context, true);
+
+	requestAnimationFrame(load);
+
+	function load() {
+		if (assetManager.isLoadingComplete()) {
+			texture = assetManager.get("../example/assets/spineboy.png");
+			texturePma = assetManager.get("../example/assets/spineboy-pma.png");
+			requestAnimationFrame(render);
+		} else requestAnimationFrame(load);
+	}
+
+	function render() {
+		gl.clearColor(1, 0, 1, 1);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+
+		var pma = $("#pmaBlend").prop("checked");
+		var ivan = $("#ivan").prop("checked")
+		var s = ivan ? ivanShader : shader;
+
+		s.bind();
+		s.setUniform4x4f(spine.Shader.MVP_MATRIX, camMatrix.values);
+		s.setUniformi("u_texture", 0);
+		if (texture != null) {
+			batcher.setBlendMode(pma ? context.gl.ONE : context.gl.SRC_ALPHA, context.gl.ONE_MINUS_SRC_ALPHA)
+			batcher.begin(s);
+			batcher.draw(pma ? texturePma : texture, vertices, indices);
+			batcher.end();
+		}
+		s.unbind();
+
+		requestAnimationFrame(render);
+	}
+
+	function loadIvanShader(context, shader) {
+		var vs = shader.getVertexShaderSource();
+
+		let fs = `
+			#ifdef GL_ES
+				#define LOWP lowp
+				precision mediump float;
+			#else
+				#define LOWP
+			#endif
+			varying LOWP vec4 v_light;
+			varying LOWP vec4 v_dark;
+			varying vec2 v_texCoords;
+			uniform sampler2D u_texture;
+			void main () {
+				vec4 texColor = texture2D(u_texture, v_texCoords);
+				gl_FragColor.a = texColor.a * v_light.a;
+				gl_FragColor.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;
+			}
+		`;
+
+		return new spine.Shader(context, vs, fs);
+	}
+</script>

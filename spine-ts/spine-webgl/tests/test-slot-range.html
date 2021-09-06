@@ -1,0 +1,116 @@
+<html>
+
+<body>
+	<script src="../dist/iife/spine-webgl.js"></script>
+	<canvas width="640" height="480"></canvas>
+</body>
+<script>
+	/*
+		This test illustrates how to render one skeleton in the
+		middle of rendering another skeleton. This technique can
+		be used to e.g. render different weapons on a character that
+		are themselves animated.
+	*/
+	var canvas = document.getElementsByTagName("canvas")[0];
+	canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
+	var context = new spine.ManagedWebGLRenderingContext(canvas);
+	var assetManager = new spine.AssetManager(context, "../example/assets/");
+	var renderer = new spine.SceneRenderer(canvas, context);
+	var time = new spine.TimeKeeper();
+	var loadingScreen = new spine.LoadingScreen(new spine.SceneRenderer(canvas, context));
+
+	var spineBoy;
+	var vine;
+
+	assetManager.loadText("spineboy-pro.json");
+	assetManager.loadTextureAtlas("spineboy-pma.atlas");
+
+	assetManager.loadText("vine-pro.json");
+	assetManager.loadTextureAtlas("vine-pma.atlas");
+
+	requestAnimationFrame(load);
+
+	function loadSkeleton(json, atlas, scale) {
+		var atlas = assetManager.get(atlas);
+		var skeletonJson = new spine.SkeletonJson(new spine.AtlasAttachmentLoader(atlas));
+		skeletonJson.scale = scale;
+		var skeletonData = skeletonJson.readSkeletonData(assetManager.get(json));
+		var animationStateData = new spine.AnimationStateData(skeletonData);
+
+		skeleton = new spine.Skeleton(skeletonData);
+		animationState = new spine.AnimationState(animationStateData);
+
+		return { skeleton: skeleton, animationState: animationState };
+	}
+
+	function load() {
+		if (assetManager.isLoadingComplete()) {
+			spineBoy = loadSkeleton("spineboy-pro.json", "spineboy-pma.atlas", 1);
+			vine = loadSkeleton("vine-pro.json", "vine-pma.atlas", 0.3);
+
+
+			var offset = new spine.Vector2();
+			var size = new spine.Vector2();
+			spineBoy.skeleton.updateWorldTransform();
+			spineBoy.skeleton.getBounds(offset, size, []);
+			renderer.camera.position.x = offset.x + size.x / 2;
+			renderer.camera.position.y = offset.y + size.y / 2;
+			renderer.camera.zoom = size.x > size.y ? size.x / canvas.width : size.y / canvas.height;
+
+			spineBoy.animationState.setAnimation(0, "walk", true);
+			vine.animationState.setAnimation(0, "grow", true);
+
+			requestAnimationFrame(render);
+		} else {
+			loadingScreen.draw(false);
+			requestAnimationFrame(load);
+		}
+	}
+
+	function render() {
+		context.gl.clearColor(0.9, 0.9, 0.9, 1);
+		context.gl.clear(context.gl.COLOR_BUFFER_BIT);
+
+		time.update();
+
+		// Update Spineboy first
+		spineBoy.animationState.update(time.delta);
+		spineBoy.animationState.apply(spineBoy.skeleton);
+		spineBoy.skeleton.updateWorldTransform();
+
+		// Next figure out the world location of the bone
+		// we attach the vine to, and apply it to the vine's
+		// root bone. Note that the root bone must not be
+		// keyed! We also ignore scaling and shearing.
+		var gun = spineBoy.skeleton.findBone("gun");
+		var vineRoot = vine.skeleton.getRootBone();
+		vineRoot.x = gun.worldX;
+		vineRoot.y = gun.worldY;
+		vineRoot.rotation = gun.getWorldRotationX();
+		vine.animationState.update(time.delta);
+		vine.animationState.apply(vine.skeleton);
+		vine.skeleton.updateWorldTransform();
+
+		// Find the two slots inbetween we want to render the vine
+		var gunSlot = spineBoy.skeleton.findSlot("gun");
+		var rearFoot = spineBoy.skeleton.findSlot("rear-foot");
+
+		renderer.begin();
+		// render from the back most slot (-1) to the gun slot (inclusive)
+		renderer.drawSkeleton(spineBoy.skeleton, true, -1, gunSlot.data.index);
+
+		// now render the vine
+		renderer.drawSkeleton(vine.skeleton, false);
+
+		// finally render the remaining spineboy slots starting at the rear foot
+		// (the next slot after the gun)
+		renderer.drawSkeleton(spineBoy.skeleton, true, rearFoot.data.index, -1);
+		renderer.end();
+
+		loadingScreen.draw(true);
+
+		requestAnimationFrame(render);
+	}
+</script>
+
+</html>

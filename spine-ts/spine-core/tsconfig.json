@@ -1,0 +1,15 @@
+{
+	"extends": "../tsconfig.base.json",
+	"compilerOptions": {
+		"baseUrl": ".",
+		"rootDir": "./src",
+		"outDir": "./dist"
+	},
+	"include": [
+		"**/*.ts"
+	],
+	"exclude": [
+		"dist/**/*.d.ts"
+	],
+	"references": []
+}
