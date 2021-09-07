@@ -41,7 +41,8 @@ namespace Spine.Unity.Editor {
 
 	[CustomEditor(typeof(BoundingBoxFollower))]
 	public class BoundingBoxFollowerInspector : UnityEditor.Editor {
-		SerializedProperty skeletonRenderer, slotName, isTrigger, clearStateOnDisable;
+		SerializedProperty skeletonRenderer, slotName,
+			isTrigger, usedByEffector, usedByComposite, clearStateOnDisable;
 		BoundingBoxFollower follower;
 		bool rebuildRequired = false;
 		bool addBoneFollower = false;
@@ -60,6 +61,8 @@ namespace Spine.Unity.Editor {
 			skeletonRenderer = serializedObject.FindProperty("skeletonRenderer");
 			slotName = serializedObject.FindProperty("slotName");
 			isTrigger = serializedObject.FindProperty("isTrigger");
+			usedByEffector = serializedObject.FindProperty("usedByEffector");
+			usedByComposite = serializedObject.FindProperty("usedByComposite");
 			clearStateOnDisable = serializedObject.FindProperty("clearStateOnDisable");
 			follower = (BoundingBoxFollower)target;
 		}
@@ -118,18 +121,23 @@ namespace Spine.Unity.Editor {
 			using (new SpineInspectorUtility.LabelWidthScope(150f)) {
 				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(isTrigger);
-				bool triggerChanged = EditorGUI.EndChangeCheck();
+				EditorGUILayout.PropertyField(usedByEffector);
+				EditorGUILayout.PropertyField(usedByComposite);
+				bool colliderParamChanged = EditorGUI.EndChangeCheck();
 
 				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(clearStateOnDisable, new GUIContent(clearStateOnDisable.displayName, "Enable this if you are pooling your Spine GameObject"));
 				bool clearStateChanged = EditorGUI.EndChangeCheck();
 
-				if (clearStateChanged || triggerChanged) {
+				if (clearStateChanged || colliderParamChanged) {
 					serializedObject.ApplyModifiedProperties();
 					InitializeEditor();
-					if (triggerChanged)
-						foreach (var col in follower.colliderTable.Values)
+					if (colliderParamChanged)
+						foreach (var col in follower.colliderTable.Values) {
 							col.isTrigger = isTrigger.boolValue;
+							col.usedByEffector = usedByEffector.boolValue;
+							col.usedByComposite = usedByComposite.boolValue;
+						}
 				}
 			}
 
@@ -219,6 +227,8 @@ namespace Spine.Unity.Editor {
 			if (original != null) {
 				newFollower.slotName = original.slotName;
 				newFollower.isTrigger = original.isTrigger;
+				newFollower.usedByEffector = original.usedByEffector;
+				newFollower.usedByComposite = original.usedByComposite;
 				newFollower.clearStateOnDisable = original.clearStateOnDisable;
 			}
 			if (slotName != null)

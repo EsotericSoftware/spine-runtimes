@@ -327,8 +327,8 @@ void TransformConstraint::applyRelativeLocal() {
 		float rotation = bone._arotation + (target._arotation + _data._offsetRotation) * mixRotate;
 		float x = bone._ax + (target._ax + _data._offsetX) * mixX;
 		float y = bone._ay + (target._ay + _data._offsetY) * mixY;
-		float scaleX = (bone._ascaleX * ((target._ascaleX - 1 + _data._offsetScaleX) * mixScaleX) + 1);
-		float scaleY = (bone._ascaleY * ((target._ascaleY - 1 + _data._offsetScaleY) * mixScaleY) + 1);
+		float scaleX = bone._ascaleX * (((target._ascaleX - 1 + _data._offsetScaleX) * mixScaleX) + 1);
+		float scaleY = bone._ascaleY * (((target._ascaleY - 1 + _data._offsetScaleY) * mixScaleY) + 1);
 		float shearY = bone._ashearY + (target._ashearY + _data._offsetShearY) * mixShearY;
 
 		bone.updateWorldTransform(x, y, rotation, scaleX, scaleY, bone._ashearX, shearY);

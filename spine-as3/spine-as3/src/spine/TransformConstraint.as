@@ -263,8 +263,8 @@ package spine {
 				var rotation : Number = bone.arotation + (target.arotation + _data.offsetRotation) * mixRotate;
 				var x : Number = bone.ax + (target.ax + _data.offsetX) * mixX;
 				var y : Number = bone.ay + (target.ay + _data.offsetY) * mixY;
-				var scaleX : Number = (bone.ascaleX * ((target.ascaleX - 1 + _data.offsetScaleX) * mixScaleX) + 1);
-				var scaleY : Number = (bone.ascaleY * ((target.ascaleY - 1 + _data.offsetScaleY) * mixScaleY) + 1);
+				var scaleX : Number = bone.ascaleX * (((target.ascaleX - 1 + _data.offsetScaleX) * mixScaleX) + 1);
+				var scaleY : Number = bone.ascaleY * (((target.ascaleY - 1 + _data.offsetScaleY) * mixScaleY) + 1);
 				var shearY : Number = bone.ashearY + (target.ashearY + _data.offsetShearY) * mixShearY;
 
 				bone.updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);

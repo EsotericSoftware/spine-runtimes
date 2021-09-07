@@ -231,8 +231,8 @@ void _spTransformConstraint_applyRelativeLocal(spTransformConstraint *self) {
 		rotation = bone->arotation + (target->arotation + self->data->offsetRotation) * mixRotate;
 		x = bone->ax + (target->ax + self->data->offsetX) * mixX;
 		y = bone->ay + (target->ay + self->data->offsetY) * mixY;
-		scaleX = (bone->ascaleX * ((target->ascaleX - 1 + self->data->offsetScaleX) * mixScaleX) + 1);
-		scaleY = (bone->ascaleY * ((target->ascaleY - 1 + self->data->offsetScaleY) * mixScaleY) + 1);
+		scaleX = bone->ascaleX * (((target->ascaleX - 1 + self->data->offsetScaleX) * mixScaleX) + 1);
+		scaleY = bone->ascaleY * (((target->ascaleY - 1 + self->data->offsetScaleY) * mixScaleY) + 1);
 		shearY = bone->ashearY + (target->ashearY + self->data->offsetShearY) * mixShearY;
 
 		spBone_updateWorldTransformWith(bone, x, y, rotation, scaleX, scaleY, bone->ashearX, shearY);
