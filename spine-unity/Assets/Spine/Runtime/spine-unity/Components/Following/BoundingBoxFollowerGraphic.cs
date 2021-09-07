@@ -49,7 +49,7 @@ namespace Spine.Unity {
 		public SkeletonGraphic skeletonGraphic;
 		[SpineSlot(dataField: "skeletonGraphic", containsBoundingBoxes: true)]
 		public string slotName;
-		public bool isTrigger;
+		public bool isTrigger, usedByEffector, usedByComposite;
 		public bool clearStateOnDisable = true;
 		#endregion
 
@@ -171,9 +171,10 @@ namespace Spine.Unity {
 						++collidersCount;
 						SkeletonUtility.SetColliderPointsLocal(bbCollider, slot, boundingBoxAttachment, scale);
 						bbCollider.isTrigger = isTrigger;
+						bbCollider.usedByEffector = usedByEffector;
+						bbCollider.usedByComposite = usedByComposite;
 						bbCollider.enabled = false;
 						bbCollider.hideFlags = HideFlags.NotEditable;
-						bbCollider.isTrigger = IsTrigger;
 						colliderTable.Add(boundingBoxAttachment, bbCollider);
 						nameTable.Add(boundingBoxAttachment, entry.Name);
 					}
