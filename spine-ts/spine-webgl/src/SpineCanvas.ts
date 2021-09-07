@@ -40,87 +40,87 @@ import { TimeKeeper, AssetManager, ManagedWebGLRenderingContext, SceneRenderer, 
  * The `error()` method is called in case the assets could not be loaded.
  */
 export interface SpineCanvasApp {
-    loadAssets?(canvas: SpineCanvas): void;
-    initialize?(canvas: SpineCanvas): void;
-    update?(canvas: SpineCanvas, delta: number): void;
-    render?(canvas: SpineCanvas): void;
-    error?(canvas: SpineCanvas, errors: StringMap<string>): void;
+	loadAssets?(canvas: SpineCanvas): void;
+	initialize?(canvas: SpineCanvas): void;
+	update?(canvas: SpineCanvas, delta: number): void;
+	render?(canvas: SpineCanvas): void;
+	error?(canvas: SpineCanvas, errors: StringMap<string>): void;
 }
 
 /** Configuration passed to the {@link SpineCanvas} constructor */
 export interface SpineCanvasConfig {
-    /* The {@link SpineCanvasApp} to be run in the canvas. */
-    app: SpineCanvasApp;
-    /* The path prefix to be used by the {@link AssetManager}. */
-    pathPrefix?: string;
-    /* The WebGL context configuration */
-    webglConfig?: any;
+	/* The {@link SpineCanvasApp} to be run in the canvas. */
+	app: SpineCanvasApp;
+	/* The path prefix to be used by the {@link AssetManager}. */
+	pathPrefix?: string;
+	/* The WebGL context configuration */
+	webglConfig?: any;
 }
 
 /** Manages the life-cycle and WebGL context of a {@link SpineCanvasApp}. The app loads
  * assets and initializes itself, then updates and renders its state at the screen refresh rate. */
 export class SpineCanvas {
-    readonly context: ManagedWebGLRenderingContext;
+	readonly context: ManagedWebGLRenderingContext;
 
-    /** Tracks the current time, delta, and other time related statistics. */
-    readonly time = new TimeKeeper();
-    /** The HTML canvas to render to. */
-    readonly htmlCanvas: HTMLCanvasElement;
-    /** The WebGL rendering context. */
-    readonly gl: WebGLRenderingContext;
-    /** The scene renderer for easy drawing of skeletons, shapes, and images. */
-    readonly renderer: SceneRenderer;
-    /** The asset manager to load assets with. */
-    readonly assetManager: AssetManager;
-    /** The input processor used to listen to mouse, touch, and keyboard events. */
-    readonly input: Input;
+	/** Tracks the current time, delta, and other time related statistics. */
+	readonly time = new TimeKeeper();
+	/** The HTML canvas to render to. */
+	readonly htmlCanvas: HTMLCanvasElement;
+	/** The WebGL rendering context. */
+	readonly gl: WebGLRenderingContext;
+	/** The scene renderer for easy drawing of skeletons, shapes, and images. */
+	readonly renderer: SceneRenderer;
+	/** The asset manager to load assets with. */
+	readonly assetManager: AssetManager;
+	/** The input processor used to listen to mouse, touch, and keyboard events. */
+	readonly input: Input;
 
-    /** Constructs a new spine canvas, rendering to the provided HTML canvas. */
-    constructor(canvas: HTMLCanvasElement, config: SpineCanvasConfig) {
-        if (config.pathPrefix === undefined) config.pathPrefix = "";
-        if (config.app === undefined) config.app = {
-            loadAssets: () => { },
-            initialize: () => { },
-            update: () => { },
-            render: () => { },
-            error: () => { },
-        }
-        if (config.webglConfig === undefined) config.webglConfig = { alpha: true };
+	/** Constructs a new spine canvas, rendering to the provided HTML canvas. */
+	constructor (canvas: HTMLCanvasElement, config: SpineCanvasConfig) {
+		if (config.pathPrefix === undefined) config.pathPrefix = "";
+		if (config.app === undefined) config.app = {
+			loadAssets: () => { },
+			initialize: () => { },
+			update: () => { },
+			render: () => { },
+			error: () => { },
+		}
+		if (config.webglConfig === undefined) config.webglConfig = { alpha: true };
 
-        this.htmlCanvas = canvas;
-        this.context = new ManagedWebGLRenderingContext(canvas, config.webglConfig);
-        this.renderer = new SceneRenderer(canvas, this.context);
-        this.gl = this.context.gl;
-        this.assetManager = new AssetManager(this.context, config.pathPrefix);
-        this.input = new Input(canvas);
+		this.htmlCanvas = canvas;
+		this.context = new ManagedWebGLRenderingContext(canvas, config.webglConfig);
+		this.renderer = new SceneRenderer(canvas, this.context);
+		this.gl = this.context.gl;
+		this.assetManager = new AssetManager(this.context, config.pathPrefix);
+		this.input = new Input(canvas);
 
-        config.app.loadAssets?.(this);
+		config.app.loadAssets?.(this);
 
-        let loop = () => {
-            requestAnimationFrame(loop);
-            this.time.update();
-            config.app.update?.(this, this.time.delta);
-            config.app.render?.(this);
-        }
+		let loop = () => {
+			requestAnimationFrame(loop);
+			this.time.update();
+			config.app.update?.(this, this.time.delta);
+			config.app.render?.(this);
+		}
 
-        let waitForAssets = () => {
-            if (this.assetManager.isLoadingComplete()) {
-                if (this.assetManager.hasErrors()) {
-                    config.app.error?.(this, this.assetManager.getErrors());
-                } else {
-                    config.app.initialize?.(this);
-                    loop();
-                }
-                return;
-            }
-            requestAnimationFrame(waitForAssets);
-        }
-        requestAnimationFrame(waitForAssets);
-    }
+		let waitForAssets = () => {
+			if (this.assetManager.isLoadingComplete()) {
+				if (this.assetManager.hasErrors()) {
+					config.app.error?.(this, this.assetManager.getErrors());
+				} else {
+					config.app.initialize?.(this);
+					loop();
+				}
+				return;
+			}
+			requestAnimationFrame(waitForAssets);
+		}
+		requestAnimationFrame(waitForAssets);
+	}
 
-    /** Clears the canvas with the given color. The color values are given in the range [0,1]. */
-    clear(r: number, g: number, b: number, a: number) {
-        this.gl.clearColor(r, g, b, a);
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-    }
+	/** Clears the canvas with the given color. The color values are given in the range [0,1]. */
+	clear (r: number, g: number, b: number, a: number) {
+		this.gl.clearColor(r, g, b, a);
+		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+	}
 }
