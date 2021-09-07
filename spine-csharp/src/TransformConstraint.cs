@@ -276,8 +276,8 @@ namespace Spine {
 				float rotation = bone.arotation + (target.arotation + data.offsetRotation) * mixRotate;
 				float x = bone.ax + (target.ax + data.offsetX) * mixX;
 				float y = bone.ay + (target.ay + data.offsetY) * mixY;
-				float scaleX = (bone.ascaleX * ((target.ascaleX - 1 + data.offsetScaleX) * mixScaleX) + 1);
-				float scaleY = (bone.ascaleY * ((target.ascaleY - 1 + data.offsetScaleY) * mixScaleY) + 1);
+				float scaleX = bone.ascaleX * (((target.ascaleX - 1 + data.offsetScaleX) * mixScaleX) + 1);
+				float scaleY = bone.ascaleY * (((target.ascaleY - 1 + data.offsetScaleY) * mixScaleY) + 1);
 				float shearY = bone.ashearY + (target.ashearY + data.offsetShearY) * mixShearY;
 
 				bone.UpdateWorldTransform(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
