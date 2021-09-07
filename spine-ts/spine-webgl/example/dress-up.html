@@ -9,21 +9,18 @@
 
 	#container {
 		display: flex;
-		width: 100%;
+		width: 100vw;
 		height: 100vh;
 	}
 
-	#canvas {
-		flex-grow: 1;
-	}
-
 	#skins {
+		width: 100px;
 		flex-shrink: 0;
 		overflow: scroll;
 	}
 
-	#skins>img {
-		display: block;
+	#canvas {
+		width: calc(100% - 100px);
 	}
 </style>
 
@@ -32,6 +29,7 @@
 		<div id="skins"></div>
 		<canvas id="canvas"></canvas>
 	</div>
+
 	<script>
 		// Define the class running in the Spine canvas
 		class App {
@@ -44,6 +42,7 @@
 				this.state = null;
 				this.selectedSkins = [];
 				this.skinThumbnails = {};
+				this.lastBounds = {};
 			}
 
 			loadAssets(canvas) {
@@ -112,19 +111,17 @@
 				}
 				this.skeleton.setSkin(newSkin);
 				this.skeleton.setToSetupPose();
+				this.skeleton.updateWorldTransform();
 
-				// Center and zoom the camera
+				// Calculate the bounds so we can center and zoom
+				// the camera such that the skeleton is in full view.
 				let offset = new spine.Vector2(), size = new spine.Vector2();
 				this.skeleton.getBounds(offset, size);
-				let camera = this.canvas.renderer.camera;
-				camera.position.x = offset.x + size.x / 2;
-				camera.position.y = offset.y + size.y / 2;
-				camera.zoom = size.x > size.y ? size.x / this.canvas.htmlCanvas.width * 1.1 : size.y / this.canvas.htmlCanvas.height * 1.1;
-				camera.update();
+				this.lastBounds = { offset: offset, size: size };
 			}
 
 			createUI(canvas) {
-				const THUMBNAIL_SIZE = 300;
+				const THUMBNAIL_SIZE = 100;
 
 				// We'll reuse the webgl context used to render the skeleton for
 				// thumbnail generation. We temporarily resize it to 300x300 pixels
@@ -219,8 +216,17 @@
 			}
 
 			render(canvas) {
+				// Center and zoom the camera so the skeleton is
+				// in full view irrespective of the page size.
 				let renderer = canvas.renderer;
+				let camera = renderer.camera;
 				renderer.resize(spine.ResizeMode.Expand);
+				let offset = this.lastBounds.offset, size = this.lastBounds.size;
+				camera.position.x = offset.x + size.x / 2;
+				camera.position.y = offset.y + size.y / 2;
+				camera.zoom = size.x > size.y ? size.x / this.canvas.htmlCanvas.width * 1.1 : size.y / this.canvas.htmlCanvas.height * 1.1;
+				camera.update();
+
 				canvas.clear(0.2, 0.2, 0.2, 1);
 				renderer.begin();
 				renderer.drawSkeleton(this.skeleton, true);
