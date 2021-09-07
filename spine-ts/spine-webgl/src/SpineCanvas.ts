@@ -94,21 +94,21 @@ export class SpineCanvas {
 		this.assetManager = new AssetManager(this.context, config.pathPrefix);
 		this.input = new Input(canvas);
 
-		config.app.loadAssets?.(this);
+		config.app.loadAssets(this);
 
 		let loop = () => {
 			requestAnimationFrame(loop);
 			this.time.update();
-			config.app.update?.(this, this.time.delta);
-			config.app.render?.(this);
+			config.app.update(this, this.time.delta);
+			config.app.render(this);
 		}
 
 		let waitForAssets = () => {
 			if (this.assetManager.isLoadingComplete()) {
 				if (this.assetManager.hasErrors()) {
-					config.app.error?.(this, this.assetManager.getErrors());
+					config.app.error(this, this.assetManager.getErrors());
 				} else {
-					config.app.initialize?.(this);
+					config.app.initialize(this);
 					loop();
 				}
 				return;
@@ -119,7 +119,7 @@ export class SpineCanvas {
 	}
 
 	/** Clears the canvas with the given color. The color values are given in the range [0,1]. */
-	clear (r: number, g: number, b: number, a: number) {
+	clear(r: number, g: number, b: number, a: number) {
 		this.gl.clearColor(r, g, b, a);
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 	}
