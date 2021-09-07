@@ -273,8 +273,8 @@ export class TransformConstraint implements Updatable {
 			let rotation = bone.arotation + (target.arotation + this.data.offsetRotation) * mixRotate;
 			let x = bone.ax + (target.ax + this.data.offsetX) * mixX;
 			let y = bone.ay + (target.ay + this.data.offsetY) * mixY;
-			let scaleX = (bone.ascaleX * ((target.ascaleX - 1 + this.data.offsetScaleX) * mixScaleX) + 1);
-			let scaleY = (bone.ascaleY * ((target.ascaleY - 1 + this.data.offsetScaleY) * mixScaleY) + 1);
+			let scaleX = bone.ascaleX * (((target.ascaleX - 1 + this.data.offsetScaleX) * mixScaleX) + 1);
+			let scaleY = bone.ascaleY * (((target.ascaleY - 1 + this.data.offsetScaleY) * mixScaleY) + 1);
 			let shearY = bone.ashearY + (target.ashearY + this.data.offsetShearY) * mixShearY;
 
 			bone.updateWorldTransformWith(x, y, rotation, scaleX, scaleY, bone.ashearX, shearY);
