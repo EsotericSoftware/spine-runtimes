@@ -122,6 +122,8 @@
 
 			createUI(canvas) {
 				const THUMBNAIL_SIZE = 100;
+				let renderer = canvas.renderer;
+				let camera = renderer.camera;
 
 				// We'll reuse the webgl context used to render the skeleton for
 				// thumbnail generation. We temporarily resize it to 300x300 pixels
@@ -156,18 +158,18 @@
 					// Position the renderer camera on the center of the bounds, and
 					// set the zoom so the full skin is visible within the 300x300
 					// rendering area. We leave 10% of empty space around a skin in the
-					// thumbnail, hence the multiplication of 1.1 for the zoom factor.
-					canvas.renderer.camera.position.x = offset.x + size.x / 2;
-					canvas.renderer.camera.position.y = offset.y + size.y / 2;
-					canvas.renderer.camera.zoom = size.x > size.y ? size.x / THUMBNAIL_SIZE * 1.1 : size.y / THUMBNAIL_SIZE * 1.1;
-					canvas.renderer.camera.setViewport(THUMBNAIL_SIZE, THUMBNAIL_SIZE);
-					canvas.renderer.camera.update();
+					// thumbnail, hence the multiplication of 1.1 for the zoom factor.					
+					camera.position.x = offset.x + size.x / 2;
+					camera.position.y = offset.y + size.y / 2;
+					camera.zoom = size.x > size.y ? size.x / THUMBNAIL_SIZE * 1.1 : size.y / THUMBNAIL_SIZE * 1.1;
+					camera.setViewport(THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+					camera.update();
 
 					// Clear the canvas and render the skeleton
 					canvas.clear(0.5, 0.5, 0.5, 1);
-					canvas.renderer.begin();
-					canvas.renderer.drawSkeleton(this.skeleton, true);
-					canvas.renderer.end();
+					renderer.begin();
+					renderer.drawSkeleton(this.skeleton, true);
+					renderer.end();
 
 					// Get the image data and convert it to an img element
 					let image = new Image();
@@ -203,10 +205,10 @@
 				// Restore the canvas size and camera of the renderer
 				canvas.htmlCanvas.width = oldWidth;
 				canvas.htmlCanvas.height = oldHeight;
-				canvas.renderer.resize(spine.ResizeMode.Expand);
-				canvas.renderer.camera.position.x = 0;
-				canvas.renderer.camera.position.y = 0;
-				canvas.renderer.camera.zoom = 1;
+				renderer.resize(spine.ResizeMode.Expand);
+				camera.position.x = 0;
+				camera.position.y = 0;
+				camera.zoom = 1;
 			}
 
 			update(canvas, delta) {
