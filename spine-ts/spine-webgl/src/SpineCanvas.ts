@@ -52,7 +52,9 @@ export interface SpineCanvasConfig {
     /* The {@link SpineCanvasApp} to be run in the canvas. */
     app: SpineCanvasApp;
     /* The path prefix to be used by the {@link AssetManager}. */
-    pathPrefix: string;
+    pathPrefix?: string;
+    /* The WebGL context configuration */
+    webglConfig?: any;
 }
 
 /** Manages the life-cycle and WebGL context of a {@link SpineCanvasApp}. The app loads
@@ -83,9 +85,10 @@ export class SpineCanvas {
             render: () => { },
             error: () => { },
         }
+        if (config.webglConfig === undefined) config.webglConfig = { alpha: true };
 
         this.htmlCanvas = canvas;
-        this.context = new ManagedWebGLRenderingContext(canvas, { alpha: true });
+        this.context = new ManagedWebGLRenderingContext(canvas, config.webglConfig);
         this.renderer = new SceneRenderer(canvas, this.context);
         this.gl = this.context.gl;
         this.assetManager = new AssetManager(this.context, config.pathPrefix);

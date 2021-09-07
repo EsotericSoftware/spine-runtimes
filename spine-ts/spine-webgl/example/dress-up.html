@@ -1,0 +1,239 @@
+<html>
+<script src="../dist/iife/spine-webgl.js"></script>
+<style>
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+	}
+
+	#container {
+		display: flex;
+		width: 100%;
+		height: 100vh;
+	}
+
+	#canvas {
+		flex-grow: 1;
+	}
+
+	#skins {
+		flex-shrink: 0;
+		overflow: scroll;
+	}
+
+	#skins>img {
+		display: block;
+	}
+</style>
+
+<body>
+	<div id="container">
+		<div id="skins"></div>
+		<canvas id="canvas"></canvas>
+	</div>
+	<script>
+		// Define the class running in the Spine canvas
+		class App {
+
+			constructor() {
+				this.canvas = null;
+				this.atlas = null;
+				this.skeletonData = null;
+				this.skeleton = null;
+				this.state = null;
+				this.selectedSkins = [];
+				this.skinThumbnails = {};
+			}
+
+			loadAssets(canvas) {
+				canvas.assetManager.AnimationState
+				canvas.assetManager.loadTextureAtlas("mix-and-match-pma.atlas");
+				canvas.assetManager.loadBinary("mix-and-match-pro.skel");
+			}
+
+			initialize(canvas) {
+				this.canvas = canvas;
+				let assetManager = canvas.assetManager;
+
+				// Create the atlas
+				this.atlas = canvas.assetManager.require("mix-and-match-pma.atlas");
+				let atlasLoader = new spine.AtlasAttachmentLoader(this.atlas);
+
+				// Create the skeleton
+				let skeletonBinary = new spine.SkeletonBinary(atlasLoader);
+				this.skeletonData = skeletonBinary.readSkeletonData(assetManager.require("mix-and-match-pro.skel"));
+				this.skeleton = new spine.Skeleton(this.skeletonData);
+
+				// Create the animation state
+				let stateData = new spine.AnimationStateData(this.skeletonData);
+				this.state = new spine.AnimationState(stateData);
+				this.state.setAnimation(0, "dance", true);
+
+				// Create the user interface to selecting skins
+				this.createUI(canvas);
+
+				// Create a default skin.
+				this.addSkin("skin-base");
+				this.addSkin("nose/short");
+				this.addSkin("eyelids/girly");
+				this.addSkin("eyes/violet");
+				this.addSkin("hair/brown");
+				this.addSkin("clothes/hoodie-orange");
+				this.addSkin("legs/pants-jeans");
+				this.addSkin("accessories/bag");
+				this.addSkin("accessories/hat-red-yellow");
+			}
+
+			addSkin(skinName) {
+				if (this.selectedSkins.indexOf(skinName) != -1) return;
+				this.selectedSkins.push(skinName);
+				let thumbnail = this.skinThumbnails[skinName];
+				thumbnail.isSet = true;
+				thumbnail.style.filter = "none";
+				this.updateSkin();
+			}
+
+			removeSkin(skinName) {
+				let index = this.selectedSkins.indexOf(skinName);
+				if (index == -1) return;
+				this.selectedSkins.splice(index, 1);
+				let thumbnail = this.skinThumbnails[skinName];
+				thumbnail.isSet = false;
+				thumbnail.style.filter = "grayscale(1)";
+				this.updateSkin();
+			}
+
+			updateSkin() {
+				// Create a new skin from all the selected skins.
+				let newSkin = new spine.Skin("custom-skin");
+				for (var skinName of this.selectedSkins) {
+					newSkin.addSkin(this.skeletonData.findSkin(skinName));
+				}
+				this.skeleton.setSkin(newSkin);
+				this.skeleton.setToSetupPose();
+
+				// Center and zoom the camera
+				let offset = new spine.Vector2(), size = new spine.Vector2();
+				this.skeleton.getBounds(offset, size);
+				let camera = this.canvas.renderer.camera;
+				camera.position.x = offset.x + size.x / 2;
+				camera.position.y = offset.y + size.y / 2;
+				camera.zoom = size.x > size.y ? size.x / this.canvas.htmlCanvas.width * 1.1 : size.y / this.canvas.htmlCanvas.height * 1.1;
+				camera.update();
+			}
+
+			createUI(canvas) {
+				const THUMBNAIL_SIZE = 300;
+
+				// We'll reuse the webgl context used to render the skeleton for
+				// thumbnail generation. We temporarily resize it to 300x300 pixels
+				// Note: we passed `preserveDrawingBuffer: true` to the SpineCanvas
+				// constructor. Without it, we could not fetch the pixel data from
+				// the canvas after rendering.
+				let oldWidth = canvas.htmlCanvas.width;
+				let oldHeight = canvas.htmlCanvas.height;
+				canvas.htmlCanvas.width = canvas.htmlCanvas.height = THUMBNAIL_SIZE;
+				canvas.gl.viewport(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+
+				// For each skin, generate at thumbnail as follows
+				// 1. Set it on the skeleton
+				// 2. Determine its bounds
+				// 3. Center and scale it to the offscreen canvas and render it
+				// 4. Fetch the rendered image from the canvas and store it.
+				let images = [];
+				for (var skin of this.skeletonData.skins) {
+					// Skip the empty default skin
+					if (skin.name === "default") continue;
+
+					// Set the skin, then update the skeleton
+					// to the setup pose and calculate the world transforms
+					this.skeleton.setSkin(skin);
+					this.skeleton.setToSetupPose();
+					this.skeleton.updateWorldTransform();
+
+					// Calculate the bounding box enclosing the skeleton.
+					let offset = new spine.Vector2(), size = new spine.Vector2();
+					this.skeleton.getBounds(offset, size);
+
+					// Position the renderer camera on the center of the bounds, and
+					// set the zoom so the full skin is visible within the 300x300
+					// rendering area. We leave 10% of empty space around a skin in the
+					// thumbnail, hence the multiplication of 1.1 for the zoom factor.
+					canvas.renderer.camera.position.x = offset.x + size.x / 2;
+					canvas.renderer.camera.position.y = offset.y + size.y / 2;
+					canvas.renderer.camera.zoom = size.x > size.y ? size.x / THUMBNAIL_SIZE * 1.1 : size.y / THUMBNAIL_SIZE * 1.1;
+					canvas.renderer.camera.setViewport(THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+					canvas.renderer.camera.update();
+
+					// Clear the canvas and render the skeleton
+					canvas.clear(0.5, 0.5, 0.5, 1);
+					canvas.renderer.begin();
+					canvas.renderer.drawSkeleton(this.skeleton, true);
+					canvas.renderer.end();
+
+					// Get the image data and convert it to an img element
+					let image = new Image();
+					image.src = canvas.htmlCanvas.toDataURL();
+					image.skinName = skin.name;
+					image.isSet = false;
+					image.style.filter = "grayscale(1)";
+
+					// Set up a click listener that will add/remove the skin
+					image.onclick = () => {
+						if (image.isSet) this.removeSkin(image.skinName);
+						else this.addSkin(image.skinName);
+					}
+
+					// Store the thumbail image in the list of all skin
+					// thumbnails.
+					images.push(image);
+					this.skinThumbnails[image.skinName] = image;
+				}
+
+				// Sort the list of skin thumbnails by name, so items
+				// from the same folder end up next to each other.
+				images.sort((a, b) => {
+					return a.skinName > b.skinName ? 1 : -1;
+				});
+
+				// Add the thumbnails to the skins <div>
+				let skinsDiv = document.getElementById("skins");
+				for (var thumbnail of images) {
+					skinsDiv.appendChild(thumbnail);
+				}
+
+				// Restore the canvas size and camera of the renderer
+				canvas.htmlCanvas.width = oldWidth;
+				canvas.htmlCanvas.height = oldHeight;
+				canvas.renderer.resize(spine.ResizeMode.Expand);
+				canvas.renderer.camera.position.x = 0;
+				canvas.renderer.camera.position.y = 0;
+				canvas.renderer.camera.zoom = 1;
+			}
+
+			update(canvas, delta) {
+				this.state.update(delta);
+				this.state.apply(this.skeleton);
+				this.skeleton.updateWorldTransform();
+			}
+
+			render(canvas) {
+				let renderer = canvas.renderer;
+				renderer.resize(spine.ResizeMode.Expand);
+				canvas.clear(0.2, 0.2, 0.2, 1);
+				renderer.begin();
+				renderer.drawSkeleton(this.skeleton, true);
+				renderer.end();
+			}
+		}
+
+		// Create the Spine canvas which runs the app
+		new spine.SpineCanvas(document.getElementById("canvas"), {
+			pathPrefix: "assets/",
+			app: new App()
+		});
+	</script>
+</body>
+
+</html>
