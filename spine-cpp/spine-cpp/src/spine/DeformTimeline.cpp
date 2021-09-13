@@ -100,23 +100,23 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 					return;
 				}
 				deformArray.setSize(vertexCount, 0);
-				Vector<float> &deformInner = deformArray;
+				Vector<float> &deform = deformArray;
 				if (attachment->getBones().size() == 0) {
 					// Unweighted vertex positions.
 					Vector<float> &setupVertices = attachment->getVertices();
 					for (size_t i = 0; i < vertexCount; i++)
-						deformInner[i] += (setupVertices[i] - deformInner[i]) * alpha;
+						deform[i] += (setupVertices[i] - deform[i]) * alpha;
 				} else {
 					// Weighted deform offsets.
 					alpha = 1 - alpha;
 					for (size_t i = 0; i < vertexCount; i++)
-						deformInner[i] *= alpha;
+						deform[i] *= alpha;
 				}
 			}
 			case MixBlend_Replace:
-			case MixBlend_Add:
-				return;
+			case MixBlend_Add: {}
 		}
+		return;
 	}
 
 	deformArray.setSize(vertexCount, 0);
