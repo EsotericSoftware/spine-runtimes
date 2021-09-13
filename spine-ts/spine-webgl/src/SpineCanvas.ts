@@ -119,7 +119,7 @@ export class SpineCanvas {
 	}
 
 	/** Clears the canvas with the given color. The color values are given in the range [0,1]. */
-	clear(r: number, g: number, b: number, a: number) {
+	clear (r: number, g: number, b: number, a: number) {
 		this.gl.clearColor(r, g, b, a);
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 	}

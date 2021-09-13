@@ -114,7 +114,8 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 				}
 			}
 			case MixBlend_Replace:
-			case MixBlend_Add: {}
+			case MixBlend_Add: {
+			}
 		}
 		return;
 	}
