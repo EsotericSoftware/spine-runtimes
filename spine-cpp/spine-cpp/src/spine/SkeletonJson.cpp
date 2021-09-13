@@ -849,8 +849,8 @@ Timeline *SkeletonJson::readTimeline(Json *keyMap, CurveTimeline2 *timeline, con
 	return timeline;
 }
 
-int SkeletonJson::findSlotIndex(const SkeletonData *skeletonData, const String &slotName, Vector<Timeline *> timelines) {
-	int slotIndex = ContainerUtil::findIndexWithName(skeletonData->_slots, slotName);
+int SkeletonJson::findSlotIndex(SkeletonData *skeletonData, const String &slotName, Vector<Timeline *> timelines) {
+	int slotIndex = ContainerUtil::findIndexWithName(skeletonData->getSlots(), slotName);
 	if (slotIndex == -1) {
 		ContainerUtil::cleanUpVectorOfPointers(timelines);
 		setError(NULL, "Slot not found: ", slotName);

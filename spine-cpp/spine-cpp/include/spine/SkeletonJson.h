@@ -102,6 +102,8 @@ namespace spine {
 		void readVertices(Json *attachmentMap, VertexAttachment *attachment, size_t verticesLength);
 
 		void setError(Json *root, const String &value1, const String &value2);
+
+		int findSlotIndex(SkeletonData *skeletonData, const String &slotName, Vector<Timeline *> timelines);
 	};
 }
 

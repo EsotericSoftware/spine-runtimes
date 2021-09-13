@@ -218,44 +218,44 @@ static void cleanUpTimelines(spTimelineArray *timelines) {
 	spTimelineArray_dispose(timelines);
 }
 
-static int findSlotIndex(const spSkeletonData *skeletonData, const char *slotName, spTimelineArray *timelines) {
+static int findSlotIndex(spSkeletonJson *json, const spSkeletonData *skeletonData, const char *slotName, spTimelineArray *timelines) {
 	spSlotData *slot = spSkeletonData_findSlot(skeletonData, slotName);
 	if (slot) return slot->index;
 	cleanUpTimelines(timelines);
-	_spSkeletonJson_setError(skeletonData, NULL, "Slot not found: ", slotName);
+	_spSkeletonJson_setError(json, NULL, "Slot not found: ", slotName);
 	return -1;
 }
 
-int findIkConstraintIndex(const spSkeletonData *skeletonData, const spIkConstraintData *constraint, spTimelineArray *timelines) {
+int findIkConstraintIndex(spSkeletonJson *json, const spSkeletonData *skeletonData, const spIkConstraintData *constraint, spTimelineArray *timelines) {
 	if (constraint) {
 		int i;
 		for (i = 0; i < skeletonData->ikConstraintsCount; ++i)
 			if (skeletonData->ikConstraints[i] == constraint) return i;
 	}
 	cleanUpTimelines(timelines);
-	_spSkeletonJson_setError(skeletonData, NULL, "IK constraint not found: ", constraint->name);
+	_spSkeletonJson_setError(json, NULL, "IK constraint not found: ", constraint->name);
 	return -1;
 }
 
-int findTransformConstraintIndex(const spSkeletonData *skeletonData, const spTransformConstraintData *constraint, spTimelineArray *timelines) {
+int findTransformConstraintIndex(spSkeletonJson *json, const spSkeletonData *skeletonData, const spTransformConstraintData *constraint, spTimelineArray *timelines) {
 	if (constraint) {
 		int i;
 		for (i = 0; i < skeletonData->transformConstraintsCount; ++i)
 			if (skeletonData->transformConstraints[i] == constraint) return i;
 	}
 	cleanUpTimelines(timelines);
-	_spSkeletonJson_setError(skeletonData, NULL, "Transform constraint not found: ", constraint->name);
+	_spSkeletonJson_setError(json, NULL, "Transform constraint not found: ", constraint->name);
 	return -1;
 }
 
-int findPathConstraintIndex(const spSkeletonData *skeletonData, const spPathConstraintData *constraint, spTimelineArray *timelines) {
+int findPathConstraintIndex(spSkeletonJson *json, const spSkeletonData *skeletonData, const spPathConstraintData *constraint, spTimelineArray *timelines) {
 	if (constraint) {
 		int i;
 		for (i = 0; i < skeletonData->pathConstraintsCount; ++i)
 			if (skeletonData->pathConstraints[i] == constraint) return i;
 	}
 	cleanUpTimelines(timelines);
-	_spSkeletonJson_setError(skeletonData, NULL, "Path constraint not found: ", constraint->name);
+	_spSkeletonJson_setError(json, NULL, "Path constraint not found: ", constraint->name);
 	return -1;
 }
 
@@ -277,7 +277,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 
 	/* Slot timelines. */
 	for (slotMap = slots ? slots->child : 0; slotMap; slotMap = slotMap->next) {
-		int slotIndex = findSlotIndex(skeletonData, slotMap->name, timelines);
+		int slotIndex = findSlotIndex(self, skeletonData, slotMap->name, timelines);
 		if (slotIndex == -1) return NULL;
 
 		for (timelineMap = slotMap->child; timelineMap; timelineMap = timelineMap->next) {
@@ -454,7 +454,6 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 	/* Bone timelines. */
 	for (boneMap = bones ? bones->child : 0; boneMap; boneMap = boneMap->next) {
 		int boneIndex = -1;
-		int i;
 		for (i = 0; i < skeletonData->bonesCount; ++i) {
 			if (strcmp(skeletonData->bones[i]->name, boneMap->name) == 0) {
 				boneIndex = i;
@@ -527,7 +526,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 		if (keyMap == NULL) continue;
 
 		constraint = spSkeletonData_findIkConstraint(skeletonData, constraintMap->name);
-		constraintIndex = findIkConstraintIndex(skeletonData, constraint, timelines);
+		constraintIndex = findIkConstraintIndex(self, skeletonData, constraint, timelines);
 		if (constraintIndex == -1) return NULL;
 		timeline = spIkConstraintTimeline_create(constraintMap->size, constraintMap->size << 1, constraintIndex);
 
@@ -575,7 +574,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 		if (keyMap == NULL) continue;
 
 		constraint = spSkeletonData_findTransformConstraint(skeletonData, constraintMap->name);
-		constraintIndex = findTransformConstraintIndex(skeletonData, constraint, timelines);
+		constraintIndex = findTransformConstraintIndex(self, skeletonData, constraint, timelines);
 		if (constraintIndex == -1) return NULL;
 		timeline = spTransformConstraintTimeline_create(constraintMap->size, constraintMap->size * 6, constraintIndex);
 
@@ -630,7 +629,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 	/** Path constraint timelines. */
 	for (constraintMap = paths ? paths->child : 0; constraintMap; constraintMap = constraintMap->next) {
 		spPathConstraintData *constraint = spSkeletonData_findPathConstraint(skeletonData, constraintMap->name);
-		int constraintIndex = findPathConstraintIndex(skeletonData, constraint->name);
+		int constraintIndex = findPathConstraintIndex(self, skeletonData, constraint, timelines);
 		if (constraintIndex == -1) return NULL;
 		for (timelineMap = constraintMap->child; timelineMap; timelineMap = timelineMap->next) {
 			const char *timelineName;
@@ -696,7 +695,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 	for (constraintMap = deformJson ? deformJson->child : 0; constraintMap; constraintMap = constraintMap->next) {
 		spSkin *skin = spSkeletonData_findSkin(skeletonData, constraintMap->name);
 		for (slotMap = constraintMap->child; slotMap; slotMap = slotMap->next) {
-			int slotIndex = findSlotIndex(skeletonData, slotMap->name, timelines);
+			int slotIndex = findSlotIndex(self, skeletonData, slotMap->name, timelines);
 			if (slotIndex == -1) return NULL;
 
 			for (timelineMap = slotMap->child; timelineMap; timelineMap = timelineMap->next) {
@@ -789,7 +788,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 					drawOrder[ii] = -1;
 
 				for (offsetMap = offsets->child; offsetMap; offsetMap = offsetMap->next) {
-					int slotIndex = findSlotIndex(skeletonData, Json_getString(offsetMap, "slot", 0), timelines);
+					int slotIndex = findSlotIndex(self, skeletonData, Json_getString(offsetMap, "slot", 0), timelines);
 					if (slotIndex == -1) return NULL;
 
 					/* Collect unchanged items. */
