@@ -1,195 +1,71 @@
-
 spineboy.png
-size: 1024,1024
-format: RGBA8888
-filter: Linear,Linear
-repeat: none
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
 eye_indifferent
-  rotate: false
-  xy: 2, 460
-  size: 93, 89
-  orig: 93, 89
-  offset: 0, 0
-  index: -1
+	bounds: 2, 460, 93, 89
 eye_surprised
-  rotate: false
-  xy: 462, 492
-  size: 93, 89
-  orig: 93, 89
-  offset: 0, 0
-  index: -1
+	bounds: 462, 492, 93, 89
 front_bracer
-  rotate: true
-  xy: 907, 472
-  size: 58, 80
-  orig: 58, 80
-  offset: 0, 0
-  index: -1
+	bounds: 907, 472, 58, 80
+	rotate: 90
 front_fist_closed
-  rotate: false
-  xy: 652, 499
-  size: 75, 82
-  orig: 75, 82
-  offset: 0, 0
-  index: -1
+	bounds: 652, 499, 75, 82
 front_fist_open
-  rotate: true
-  xy: 729, 470
-  size: 86, 87
-  orig: 86, 87
-  offset: 0, 0
-  index: -1
+	bounds: 729, 470, 86, 87
+	rotate: 90
 front_foot
-  rotate: false
-  xy: 2, 551
-  size: 126, 69
-  orig: 126, 69
-  offset: 0, 0
-  index: -1
+	bounds: 2, 551, 126, 69
 front_foot_bend1
-  rotate: true
-  xy: 952, 689
-  size: 128, 70
-  orig: 128, 70
-  offset: 0, 0
-  index: -1
+	bounds: 952, 689, 128, 70
+	rotate: 90
 front_foot_bend2
-  rotate: false
-  xy: 911, 594
-  size: 108, 93
-  orig: 108, 93
-  offset: 0, 0
-  index: -1
+	bounds: 911, 594, 108, 93
 front_shin
-  rotate: true
-  xy: 766, 735
-  size: 82, 184
-  orig: 82, 184
-  offset: 0, 0
-  index: -1
+	bounds: 766, 735, 82, 184
+	rotate: 90
 front_thigh
-  rotate: true
-  xy: 249, 572
-  size: 48, 112
-  orig: 48, 112
-  offset: 0, 0
-  index: -1
+	bounds: 249, 572, 48, 112
+	rotate: 90
 front_upper_arm
-  rotate: true
-  xy: 363, 566
-  size: 54, 97
-  orig: 54, 97
-  offset: 0, 0
-  index: -1
+	bounds: 363, 566, 54, 97
+	rotate: 90
 goggles
-  rotate: false
-  xy: 466, 583
-  size: 261, 166
-  orig: 261, 166
-  offset: 0, 0
-  index: -1
+	bounds: 466, 583, 261, 166
 gun
-  rotate: false
-  xy: 766, 819
-  size: 210, 203
-  orig: 210, 203
-  offset: 0, 0
-  index: -1
+	bounds: 766, 819, 210, 203
 head
-  rotate: true
-  xy: 466, 751
-  size: 271, 298
-  orig: 271, 298
-  offset: 0, 0
-  index: -1
+	bounds: 466, 751, 271, 298
+	rotate: 90
 mouth_grind
-  rotate: false
-  xy: 355, 505
-  size: 93, 59
-  orig: 93, 59
-  offset: 0, 0
-  index: -1
+	bounds: 355, 505, 93, 59
 mouth_oooo
-  rotate: false
-  xy: 557, 522
-  size: 93, 59
-  orig: 93, 59
-  offset: 0, 0
-  index: -1
+	bounds: 557, 522, 93, 59
 mouth_smile
-  rotate: false
-  xy: 557, 461
-  size: 93, 59
-  orig: 93, 59
-  offset: 0, 0
-  index: -1
+	bounds: 557, 461, 93, 59
 muzzle
-  rotate: false
-  xy: 2, 622
-  size: 462, 400
-  orig: 462, 400
-  offset: 0, 0
-  index: -1
+	bounds: 2, 622, 462, 400
 neck
-  rotate: true
-  xy: 978, 986
-  size: 36, 41
-  orig: 36, 41
-  offset: 0, 0
-  index: -1
+	bounds: 978, 986, 36, 41
+	rotate: 90
 rear_bracer
-  rotate: true
-  xy: 652, 441
-  size: 56, 72
-  orig: 56, 72
-  offset: 0, 0
-  index: -1
+	bounds: 652, 441, 56, 72
+	rotate: 90
 rear_foot
-  rotate: false
-  xy: 909, 532
-  size: 113, 60
-  orig: 113, 60
-  offset: 0, 0
-  index: -1
+	bounds: 909, 532, 113, 60
 rear_foot_bend1
-  rotate: false
-  xy: 130, 554
-  size: 117, 66
-  orig: 117, 66
-  offset: 0, 0
-  index: -1
+	bounds: 130, 554, 117, 66
 rear_foot_bend2
-  rotate: false
-  xy: 130, 469
-  size: 103, 83
-  orig: 103, 83
-  offset: 0, 0
-  index: -1
+	bounds: 130, 469, 103, 83
 rear_shin
-  rotate: true
-  xy: 729, 558
-  size: 75, 178
-  orig: 75, 178
-  offset: 0, 0
-  index: -1
+	bounds: 729, 558, 75, 178
+	rotate: 90
 rear_thigh
-  rotate: true
-  xy: 249, 505
-  size: 65, 104
-  orig: 65, 104
-  offset: 0, 0
-  index: -1
+	bounds: 249, 505, 65, 104
+	rotate: 90
 rear_upper_arm
-  rotate: true
-  xy: 818, 509
-  size: 47, 87
-  orig: 47, 87
-  offset: 0, 0
-  index: -1
+	bounds: 818, 509, 47, 87
+	rotate: 90
 torso
-  rotate: true
-  xy: 729, 635
-  size: 98, 180
-  orig: 98, 180
-  offset: 0, 0
-  index: -1
+	bounds: 729, 635, 98, 180
+	rotate: 90

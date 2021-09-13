@@ -1,6 +1,7 @@
 mix-and-match.png
 	size: 1024, 512
 	filter: Linear, Linear
+	scale: 0.5
 base-head
 	bounds: 587, 2, 95, 73
 boy/arm-front

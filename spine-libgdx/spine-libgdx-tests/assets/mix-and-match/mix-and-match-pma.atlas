@@ -2,6 +2,7 @@ mix-and-match-pma.png
 	size: 1024, 512
 	filter: Linear, Linear
 	pma: true
+	scale: 0.5
 base-head
 	bounds: 587, 2, 95, 73
 boy/arm-front

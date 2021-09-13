@@ -2,6 +2,7 @@ owl-pma.png
 	size: 1024, 512
 	filter: Linear, Linear
 	pma: true
+	scale: 0.5
 L_eye-closed
 	bounds: 512, 5, 90, 86
 	rotate: 90

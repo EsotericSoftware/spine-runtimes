@@ -1,14 +1,14 @@
 {
 "skeleton": {
-	"hash": "iIOUMGPAhCc",
-	"spine": "4.0.27-beta",
+	"hash": "mUQaGw4LIww",
+	"spine": "4.0.31",
 	"x": -125,
 	"y": -30,
 	"width": 250,
 	"height": 60,
 	"fps": 1,
 	"images": "./images/",
-	"audio": "C:/Spine/example_projects_unity/Gauge/old_export"
+	"audio": ""
 },
 "bones": [
 	{ "name": "root" },

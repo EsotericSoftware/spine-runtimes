@@ -1,14 +1,14 @@
 {
 "skeleton": {
-	"hash": "Buu7RaVrgIg",
-	"spine": "4.0.27-beta",
+	"hash": "t48AsgsO/fQ",
+	"spine": "4.0.31",
 	"x": -79.83,
 	"y": -0.99,
 	"width": 147.64,
 	"height": 268.89,
 	"fps": 1,
 	"images": "./images/",
-	"audio": "C:/Spine/example_projects_unity/FootSoldier/old_export"
+	"audio": ""
 },
 "bones": [
 	{ "name": "Root" },
@@ -181,22 +181,8 @@
 					{ "time": 0.8332 }
 				]
 			},
-			"Root": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
-				]
-			},
 			"Hip": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.3332, "curve": "stepped" },
-					{ "time": 0.8332 }
-				],
 				"translate": [
-					{ "curve": "stepped" },
 					{ "time": 0.3332 },
 					{ "time": 0.4666, "x": 9.25, "y": -5.94, "curve": "stepped" },
 					{
@@ -232,7 +218,6 @@
 			},
 			"Leg": {
 				"rotate": [
-					{ "curve": "stepped" },
 					{ "time": 0.3332 },
 					{ "time": 0.4666, "value": -18.61, "curve": "stepped" },
 					{
@@ -240,11 +225,6 @@
 						"value": -18.61,
 						"curve": [ 0.658, -18.61, 0.775, 0 ]
 					},
-					{ "time": 0.8332 }
-				],
-				"translate": [
-					{ "curve": "stepped" },
-					{ "time": 0.3332, "curve": "stepped" },
 					{ "time": 0.8332 }
 				]
 			},
@@ -308,7 +288,6 @@
 			},
 			"Feet": {
 				"rotate": [
-					{ "curve": "stepped" },
 					{ "time": 0.3332 },
 					{ "time": 0.4666, "value": 18.36, "curve": "stepped" },
 					{
@@ -319,7 +298,6 @@
 					{ "time": 0.8332 }
 				],
 				"translate": [
-					{ "curve": "stepped" },
 					{ "time": 0.3332 },
 					{ "time": 0.4666, "x": -1.42, "y": 2.2, "curve": "stepped" },
 					{
@@ -333,7 +311,6 @@
 			},
 			"Feet2": {
 				"rotate": [
-					{ "curve": "stepped" },
 					{ "time": 0.3332 },
 					{ "time": 0.4666, "value": -2.99, "curve": "stepped" },
 					{
@@ -341,11 +318,6 @@
 						"value": -2.99,
 						"curve": [ 0.658, -2.99, 0.775, 0 ]
 					},
-					{ "time": 0.8332 }
-				],
-				"translate": [
-					{ "curve": "stepped" },
-					{ "time": 0.3332, "curve": "stepped" },
 					{ "time": 0.8332 }
 				]
 			},
@@ -365,14 +337,6 @@
 					{ "time": 0.3332, "x": -1.36, "y": -0.46 },
 					{ "time": 0.8332 }
 				]
-			},
-			"Weapon": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
-				]
 			}
 		},
 		"events": [
@@ -381,14 +345,6 @@
 	},
 	"DeathBackward": {
 		"bones": {
-			"Root": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
-				]
-			},
 			"Hip": {
 				"rotate": [
 					{},
@@ -401,9 +357,6 @@
 				]
 			},
 			"Body": {
-				"rotate": [
-					{}
-				],
 				"translate": [
 					{},
 					{ "time": 0.3332, "x": 5.05, "y": -0.03 }
@@ -413,18 +366,12 @@
 				"rotate": [
 					{},
 					{ "time": 0.3332, "value": 33.36 }
-				],
-				"translate": [
-					{}
 				]
 			},
 			"Leg2": {
 				"rotate": [
 					{},
 					{ "time": 0.3332, "value": -48.11 }
-				],
-				"translate": [
-					{}
 				]
 			},
 			"Arm": {
@@ -441,26 +388,12 @@
 				"rotate": [
 					{},
 					{ "time": 0.3332, "value": -81.7 }
-				],
-				"translate": [
-					{}
 				]
 			},
 			"Feet": {
 				"rotate": [
 					{},
 					{ "time": 0.3332, "value": -46.45 }
-				],
-				"translate": [
-					{}
-				]
-			},
-			"Feet2": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
 				]
 			},
 			"Head": {
@@ -477,23 +410,12 @@
 				"rotate": [
 					{},
 					{ "time": 0.3332, "value": -38.52 }
-				],
-				"translate": [
-					{}
 				]
 			}
 		}
 	},
 	"DeathForward": {
 		"bones": {
-			"Root": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
-				]
-			},
 			"Hip": {
 				"rotate": [
 					{
@@ -512,14 +434,6 @@
 						"curve": [ 0.251, 49.62, 0.3, 64.52, 0.251, -14.61, 0.3, -31.45 ]
 					},
 					{ "time": 0.3332, "x": 74.83, "y": -43.11 }
-				]
-			},
-			"Body": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
 				]
 			},
 			"Leg": {
@@ -542,9 +456,6 @@
 						"curve": [ 0.083, 0, 0.253, -23.2 ]
 					},
 					{ "time": 0.3332, "value": -34.63 }
-				],
-				"translate": [
-					{}
 				]
 			},
 			"Arm": {
@@ -591,9 +502,6 @@
 						"curve": [ 0.083, 0, 0.253, 20.69 ]
 					},
 					{ "time": 0.3332, "value": 30.88 }
-				],
-				"translate": [
-					{}
 				]
 			},
 			"Head": {
@@ -602,9 +510,6 @@
 						"curve": [ 0.083, 0, 0.253, 31.58 ]
 					},
 					{ "time": 0.3332, "value": 47.13 }
-				],
-				"translate": [
-					{}
 				]
 			},
 			"Weapon": {
@@ -613,9 +518,6 @@
 						"curve": [ 0.083, 0, 0.253, 29.29 ]
 					},
 					{ "time": 0.3332, "value": 43.72 }
-				],
-				"translate": [
-					{}
 				]
 			}
 		}
@@ -623,10 +525,6 @@
 	"Idle": {
 		"bones": {
 			"Body": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"curve": [ 0.125, 0, 0.375, 0, 0.125, 0, 0.375, -3.5 ]
@@ -640,10 +538,6 @@
 				]
 			},
 			"Head": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"x": -1.02,
@@ -721,11 +615,6 @@
 				]
 			},
 			"Leg": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.1, "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"y": -0.25,
@@ -741,11 +630,6 @@
 				]
 			},
 			"Feet": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.1, "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"x": -0.25,
@@ -766,11 +650,6 @@
 				]
 			},
 			"Leg2": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.1, "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"y": -0.33,
@@ -786,11 +665,6 @@
 				]
 			},
 			"Feet2": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.1, "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"x": -0.31,
@@ -809,40 +683,12 @@
 					},
 					{ "time": 1, "x": -0.31, "y": 0.09 }
 				]
-			},
-			"Root": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
-				]
-			},
-			"Hip": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
-				]
-			},
-			"Weapon": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
-				]
 			}
 		}
 	},
 	"Idle2": {
 		"bones": {
 			"Body": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"curve": [ 0.125, 0, 0.375, 0, 0.125, 0, 0.375, -3.5 ]
@@ -919,20 +765,13 @@
 						"value": 79.52,
 						"curve": [ 0.812, 52.33, 0.91, -0.46 ]
 					},
-					{ "time": 0.9666, "value": -0.46, "curve": "stepped" },
-					{ "time": 1, "value": -0.46 }
+					{ "time": 0.9666, "value": -0.46 }
 				],
 				"translate": [
-					{ "x": -0.46, "curve": "stepped" },
-					{ "time": 1, "x": -0.46 }
+					{ "x": -0.46 }
 				]
 			},
 			"Leg": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.1, "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"y": -0.25,
@@ -948,11 +787,6 @@
 				]
 			},
 			"Feet": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.1, "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"x": -0.25,
@@ -973,11 +807,6 @@
 				]
 			},
 			"Leg2": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.1, "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"y": -0.33,
@@ -993,11 +822,6 @@
 				]
 			},
 			"Feet2": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.1, "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"x": -0.31,
@@ -1017,32 +841,12 @@
 					{ "time": 1, "x": -0.31, "y": 0.09 }
 				]
 			},
-			"Root": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
-				]
-			},
-			"Hip": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
-				]
-			},
 			"Weapon": {
 				"rotate": [
 					{},
 					{ "time": 0.1666, "value": -15.06, "curve": "stepped" },
 					{ "time": 0.7332, "value": -15.06 },
-					{ "time": 0.9666, "curve": "stepped" },
-					{ "time": 1 }
-				],
-				"translate": [
-					{}
+					{ "time": 0.9666 }
 				]
 			}
 		}
@@ -1050,10 +854,6 @@
 	"Idle3": {
 		"bones": {
 			"Body": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"curve": [ 0.125, 0, 0.375, 0, 0.125, 0, 0.375, -3.5 ]
@@ -1067,10 +867,6 @@
 				]
 			},
 			"Head": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"x": -1.02,
@@ -1181,11 +977,6 @@
 				]
 			},
 			"Leg": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.1, "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"y": -0.25,
@@ -1201,11 +992,6 @@
 				]
 			},
 			"Feet": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.1, "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"x": -0.25,
@@ -1226,11 +1012,6 @@
 				]
 			},
 			"Leg2": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.1, "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"y": -0.33,
@@ -1246,11 +1027,6 @@
 				]
 			},
 			"Feet2": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.1, "curve": "stepped" },
-					{ "time": 1 }
-				],
 				"translate": [
 					{
 						"x": -0.31,
@@ -1270,31 +1046,11 @@
 					{ "time": 1, "x": -0.31, "y": 0.09 }
 				]
 			},
-			"Root": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
-				]
-			},
-			"Hip": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
-				]
-			},
 			"Weapon": {
 				"rotate": [
 					{},
 					{ "time": 0.1666, "value": -7.4, "curve": "stepped" },
 					{ "time": 0.6665, "value": -7.4 },
-					{ "time": 1 }
-				],
-				"translate": [
-					{ "curve": "stepped" },
 					{ "time": 1 }
 				]
 			}
@@ -1566,19 +1322,7 @@
 					{ "time": 0.4 }
 				]
 			},
-			"Root": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
-				]
-			},
 			"Hip": {
-				"rotate": [
-					{ "curve": "stepped" },
-					{ "time": 0.4 }
-				],
 				"translate": [
 					{ "x": 6.94, "y": -4.46 },
 					{ "time": 0.4 }
@@ -1599,10 +1343,6 @@
 			"Leg": {
 				"rotate": [
 					{ "value": -13.94 },
-					{ "time": 0.4 }
-				],
-				"translate": [
-					{ "curve": "stepped" },
 					{ "time": 0.4 }
 				]
 			},
@@ -1661,14 +1401,6 @@
 				"translate": [
 					{ "x": -1.08, "y": -0.37 },
 					{ "time": 0.4 }
-				]
-			},
-			"Weapon": {
-				"rotate": [
-					{}
-				],
-				"translate": [
-					{}
 				]
 			}
 		}

@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "F+EPhClYhR8",
-	"spine": "4.0.27-beta",
+	"spine": "4.0.31",
 	"x": -100.47,
 	"y": -9.21,
 	"width": 260.65,
@@ -426,8 +426,7 @@
 		"scaleY": -3.0E-4,
 		"shearY": 0.1,
 		"mixRotate": 0,
-		"mixScaleX": 0,
-		"mixScaleY": 0
+		"mixScaleX": 0
 	},
 	{
 		"name": "front-foot-position",
@@ -441,8 +440,7 @@
 		"scaleY": -3.0E-4,
 		"shearY": 0.1,
 		"mixRotate": 0,
-		"mixScaleX": 0,
-		"mixScaleY": 0
+		"mixScaleX": 0
 	}
 ],
 "path": [

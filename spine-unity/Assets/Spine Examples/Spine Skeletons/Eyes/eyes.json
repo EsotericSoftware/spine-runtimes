@@ -1,14 +1,14 @@
 {
 "skeleton": {
-	"hash": "wNwtgzmTRJY",
-	"spine": "4.0.27-beta",
+	"hash": "twyVt4LWmOY",
+	"spine": "4.0.31",
 	"x": -434,
 	"y": -133,
 	"width": 868,
 	"height": 322,
 	"fps": 1,
 	"images": "./images/",
-	"audio": "C:/Spine/example_projects_unity/Eyes/old_export"
+	"audio": ""
 },
 "bones": [
 	{ "name": "root" },
@@ -39,5 +39,8 @@
 			}
 		}
 	}
-]
+],
+"animations": {
+	"animation": {}
+}
 }

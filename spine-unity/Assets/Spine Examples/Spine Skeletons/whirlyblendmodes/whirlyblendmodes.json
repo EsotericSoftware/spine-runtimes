@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "wOLCjLyjs9E",
-	"spine": "4.0.27-beta",
+	"spine": "4.0.31",
 	"x": -252.71,
 	"y": -232.55,
 	"width": 456.71,
@@ -29,9 +29,7 @@
 		"bones": [ "additive", "multiply", "normal", "screen" ],
 		"target": "_rotation",
 		"mixX": 0,
-		"mixY": 0,
 		"mixScaleX": 0,
-		"mixScaleY": 0,
 		"mixShearY": 0
 	}
 ],

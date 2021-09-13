@@ -1,1042 +1,363 @@
-
 mix-and-match-pma.png
-size: 1024,512
-format: RGBA8888
-filter: Linear,Linear
-repeat: none
+	size: 1024, 512
+	filter: Linear, Linear
+	pma: true
+	scale: 0.5
 base-head
-  rotate: false
-  xy: 587, 2
-  size: 95, 73
-  orig: 95, 73
-  offset: 0, 0
-  index: -1
+	bounds: 587, 2, 95, 73
 boy/arm-front
-  rotate: false
-  xy: 558, 271
-  size: 36, 115
-  orig: 36, 115
-  offset: 0, 0
-  index: -1
+	bounds: 558, 271, 36, 115
 boy/backpack
-  rotate: false
-  xy: 235, 109
-  size: 119, 153
-  orig: 119, 153
-  offset: 0, 0
-  index: -1
+	bounds: 235, 109, 119, 153
 boy/backpack-pocket
-  rotate: true
-  xy: 328, 73
-  size: 34, 62
-  orig: 34, 62
-  offset: 0, 0
-  index: -1
+	bounds: 328, 73, 34, 62
+	rotate: 90
 boy/backpack-strap-front
-  rotate: false
-  xy: 665, 79
-  size: 38, 88
-  orig: 38, 88
-  offset: 0, 0
-  index: -1
+	bounds: 665, 79, 38, 88
 boy/backpack-up
-  rotate: true
-  xy: 395, 364
-  size: 21, 70
-  orig: 21, 70
-  offset: 0, 0
-  index: -1
+	bounds: 395, 364, 21, 70
+	rotate: 90
 boy/body
-  rotate: true
-  xy: 251, 264
-  size: 97, 132
-  orig: 97, 132
-  offset: 0, 0
-  index: -1
+	bounds: 251, 264, 97, 132
+	rotate: 90
 boy/boot-ribbon-front
-  rotate: false
-  xy: 648, 131
-  size: 9, 11
-  orig: 9, 11
-  offset: 0, 0
-  index: -1
+	bounds: 648, 131, 9, 11
 boy/collar
-  rotate: true
-  xy: 744, 4
-  size: 73, 29
-  orig: 73, 29
-  offset: 0, 0
-  index: -1
+	bounds: 744, 4, 73, 29
+	rotate: 90
 boy/ear
-  rotate: true
-  xy: 383, 109
-  size: 19, 23
-  orig: 19, 23
-  offset: 0, 0
-  index: -1
+	bounds: 383, 109, 19, 23
+	rotate: 90
 boy/eye-back-low-eyelid
-  rotate: true
-  xy: 739, 284
-  size: 17, 6
-  orig: 17, 6
-  offset: 0, 0
-  index: -1
+	bounds: 739, 284, 17, 6
+	rotate: 90
 boy/eye-back-pupil
-  rotate: true
-  xy: 832, 443
-  size: 8, 9
-  orig: 8, 9
-  offset: 0, 0
-  index: -1
+	bounds: 832, 443, 8, 9
+	rotate: 90
 boy/eye-back-up-eyelid
-  rotate: false
-  xy: 558, 264
-  size: 23, 5
-  orig: 23, 5
-  offset: 0, 0
-  index: -1
+	bounds: 558, 264, 23, 5
 boy/eye-back-up-eyelid-back
-  rotate: true
-  xy: 802, 491
-  size: 19, 10
-  orig: 19, 10
-  offset: 0, 0
-  index: -1
+	bounds: 802, 491, 19, 10
+	rotate: 90
 boy/eye-front-low-eyelid
-  rotate: true
-  xy: 386, 363
-  size: 22, 7
-  orig: 22, 7
-  offset: 0, 0
-  index: -1
+	bounds: 386, 363, 22, 7
+	rotate: 90
 boy/eye-front-pupil
-  rotate: false
-  xy: 816, 389
-  size: 9, 9
-  orig: 9, 9
-  offset: 0, 0
-  index: -1
+	bounds: 816, 389, 9, 9
 boy/eye-front-up-eyelid
-  rotate: true
-  xy: 160, 71
-  size: 31, 6
-  orig: 31, 6
-  offset: 0, 0
-  index: -1
+	bounds: 160, 71, 31, 6
+	rotate: 90
 boy/eye-front-up-eyelid-back
-  rotate: true
-  xy: 801, 434
-  size: 26, 9
-  orig: 26, 9
-  offset: 0, 0
-  index: -1
+	bounds: 801, 434, 26, 9
+	rotate: 90
 boy/eye-iris-back
-  rotate: false
-  xy: 618, 264
-  size: 17, 17
-  orig: 17, 17
-  offset: 0, 0
-  index: -1
+	bounds: 618, 264, 17, 17
 boy/eye-iris-front
-  rotate: false
-  xy: 727, 264
-  size: 18, 18
-  orig: 18, 18
-  offset: 0, 0
-  index: -1
+	bounds: 727, 264, 18, 18
 boy/eye-white-back
-  rotate: false
-  xy: 580, 131
-  size: 20, 12
-  orig: 20, 12
-  offset: 0, 0
-  index: -1
+	bounds: 580, 131, 20, 12
 boy/eye-white-front
-  rotate: false
-  xy: 510, 130
-  size: 27, 13
-  orig: 27, 13
-  offset: 0, 0
-  index: -1
+	bounds: 510, 130, 27, 13
 boy/eyebrow-back
-  rotate: true
-  xy: 751, 88
-  size: 20, 11
-  orig: 20, 11
-  offset: 0, 0
-  index: -1
+	bounds: 751, 88, 20, 11
+	rotate: 90
 boy/eyebrow-front
-  rotate: false
-  xy: 483, 130
-  size: 25, 11
-  orig: 25, 11
-  offset: 0, 0
-  index: -1
+	bounds: 483, 130, 25, 11
 boy/hair-back
-  rotate: true
-  xy: 494, 388
-  size: 122, 81
-  orig: 122, 81
-  offset: 0, 0
-  index: -1
+	bounds: 494, 388, 122, 81
+	rotate: 90
 boy/hair-bangs
-  rotate: false
-  xy: 667, 284
-  size: 70, 37
-  orig: 70, 37
-  offset: 0, 0
-  index: -1
+	bounds: 667, 284, 70, 37
 boy/hair-side
-  rotate: false
-  xy: 789, 374
-  size: 25, 43
-  orig: 25, 43
-  offset: 0, 0
-  index: -1
+	bounds: 789, 374, 25, 43
 boy/hand-backfingers
-  rotate: false
-  xy: 467, 364
-  size: 19, 21
-  orig: 19, 21
-  offset: 0, 0
-  index: -1
+	bounds: 467, 364, 19, 21
 boy/hand-front-fingers
-  rotate: false
-  xy: 488, 364
-  size: 19, 21
-  orig: 19, 21
-  offset: 0, 0
-  index: -1
+	bounds: 488, 364, 19, 21
 boy/hat
-  rotate: true
-  xy: 615, 417
-  size: 93, 56
-  orig: 93, 56
-  offset: 0, 0
-  index: -1
+	bounds: 615, 417, 93, 56
+	rotate: 90
 boy/leg-front
-  rotate: false
-  xy: 138, 104
-  size: 31, 158
-  orig: 31, 158
-  offset: 0, 0
-  index: -1
+	bounds: 138, 104, 31, 158
 boy/mouth-close
-  rotate: true
-  xy: 551, 365
-  size: 21, 5
-  orig: 21, 5
-  offset: 0, 0
-  index: -1
+	bounds: 551, 365, 21, 5
+	rotate: 90
 girl-blue-cape/mouth-close
-  rotate: true
-  xy: 551, 365
-  size: 21, 5
-  orig: 21, 5
-  offset: 0, 0
-  index: -1
+	bounds: 551, 365, 21, 5
+	rotate: 90
 girl-spring-dress/mouth-close
-  rotate: true
-  xy: 551, 365
-  size: 21, 5
-  orig: 21, 5
-  offset: 0, 0
-  index: -1
+	bounds: 551, 365, 21, 5
+	rotate: 90
 girl/mouth-close
-  rotate: true
-  xy: 551, 365
-  size: 21, 5
-  orig: 21, 5
-  offset: 0, 0
-  index: -1
+	bounds: 551, 365, 21, 5
+	rotate: 90
 boy/mouth-smile
-  rotate: false
-  xy: 705, 79
-  size: 29, 7
-  orig: 29, 7
-  offset: 0, 0
-  index: -1
+	bounds: 705, 79, 29, 7
 boy/nose
-  rotate: true
-  xy: 836, 473
-  size: 17, 10
-  orig: 17, 10
-  offset: 0, 0
-  index: -1
+	bounds: 836, 473, 17, 10
+	rotate: 90
 boy/pompom
-  rotate: true
-  xy: 747, 273
-  size: 48, 43
-  orig: 48, 43
-  offset: 0, 0
-  index: -1
+	bounds: 747, 273, 48, 43
+	rotate: 90
 boy/zip
-  rotate: false
-  xy: 648, 144
-  size: 14, 23
-  orig: 14, 23
-  offset: 0, 0
-  index: -1
+	bounds: 648, 144, 14, 23
 girl-blue-cape/back-eyebrow
-  rotate: false
-  xy: 602, 131
-  size: 18, 12
-  orig: 18, 12
-  offset: 0, 0
-  index: -1
+	bounds: 602, 131, 18, 12
 girl-blue-cape/body-dress
-  rotate: false
-  xy: 2, 264
-  size: 109, 246
-  orig: 109, 246
-  offset: 0, 0
-  index: -1
+	bounds: 2, 264, 109, 246
 girl-blue-cape/body-ribbon
-  rotate: false
-  xy: 615, 283
-  size: 50, 38
-  orig: 50, 38
-  offset: 0, 0
-  index: -1
+	bounds: 615, 283, 50, 38
 girl-blue-cape/cape-back
-  rotate: false
-  xy: 2, 69
-  size: 134, 193
-  orig: 134, 193
-  offset: 0, 0
-  index: -1
+	bounds: 2, 69, 134, 193
 girl-blue-cape/cape-back-up
-  rotate: true
-  xy: 386, 387
-  size: 123, 106
-  orig: 123, 106
-  offset: 0, 0
-  index: -1
+	bounds: 386, 387, 123, 106
+	rotate: 90
 girl-blue-cape/cape-ribbon
-  rotate: false
-  xy: 675, 264
-  size: 50, 18
-  orig: 50, 18
-  offset: 0, 0
-  index: -1
+	bounds: 675, 264, 50, 18
 girl-blue-cape/cape-shoulder-back
-  rotate: false
-  xy: 751, 110
-  size: 49, 59
-  orig: 49, 59
-  offset: 0, 0
-  index: -1
+	bounds: 751, 110, 49, 59
 girl-blue-cape/cape-shoulder-front
-  rotate: true
-  xy: 113, 264
-  size: 62, 76
-  orig: 62, 76
-  offset: 0, 0
-  index: -1
+	bounds: 113, 264, 62, 76
+	rotate: 90
 girl-blue-cape/cape-up-front
-  rotate: true
-  xy: 399, 264
-  size: 98, 117
-  orig: 98, 117
-  offset: 0, 0
-  index: -1
+	bounds: 399, 264, 98, 117
+	rotate: 90
 girl-blue-cape/ear
-  rotate: false
-  xy: 775, 2
-  size: 19, 23
-  orig: 19, 23
-  offset: 0, 0
-  index: -1
+	bounds: 775, 2, 19, 23
 girl-spring-dress/ear
-  rotate: false
-  xy: 775, 2
-  size: 19, 23
-  orig: 19, 23
-  offset: 0, 0
-  index: -1
+	bounds: 775, 2, 19, 23
 girl/ear
-  rotate: false
-  xy: 775, 2
-  size: 19, 23
-  orig: 19, 23
-  offset: 0, 0
-  index: -1
+	bounds: 775, 2, 19, 23
 girl-blue-cape/eye-back-low-eyelid
-  rotate: false
-  xy: 802, 463
-  size: 17, 6
-  orig: 17, 6
-  offset: 0, 0
-  index: -1
+	bounds: 802, 463, 17, 6
 girl-spring-dress/eye-back-low-eyelid
-  rotate: false
-  xy: 802, 463
-  size: 17, 6
-  orig: 17, 6
-  offset: 0, 0
-  index: -1
+	bounds: 802, 463, 17, 6
 girl/eye-back-low-eyelid
-  rotate: false
-  xy: 802, 463
-  size: 17, 6
-  orig: 17, 6
-  offset: 0, 0
-  index: -1
+	bounds: 802, 463, 17, 6
 girl-blue-cape/eye-back-pupil
-  rotate: false
-  xy: 816, 367
-  size: 8, 9
-  orig: 8, 9
-  offset: 0, 0
-  index: -1
+	bounds: 816, 367, 8, 9
 girl-spring-dress/eye-back-pupil
-  rotate: false
-  xy: 816, 367
-  size: 8, 9
-  orig: 8, 9
-  offset: 0, 0
-  index: -1
+	bounds: 816, 367, 8, 9
 girl/eye-back-pupil
-  rotate: false
-  xy: 816, 367
-  size: 8, 9
-  orig: 8, 9
-  offset: 0, 0
-  index: -1
+	bounds: 816, 367, 8, 9
 girl-blue-cape/eye-back-up-eyelid
-  rotate: false
-  xy: 554, 131
-  size: 24, 12
-  orig: 24, 12
-  offset: 0, 0
-  index: -1
+	bounds: 554, 131, 24, 12
 girl-spring-dress/eye-back-up-eyelid
-  rotate: false
-  xy: 554, 131
-  size: 24, 12
-  orig: 24, 12
-  offset: 0, 0
-  index: -1
+	bounds: 554, 131, 24, 12
 girl/eye-back-up-eyelid
-  rotate: false
-  xy: 554, 131
-  size: 24, 12
-  orig: 24, 12
-  offset: 0, 0
-  index: -1
+	bounds: 554, 131, 24, 12
 girl-blue-cape/eye-back-up-eyelid-back
-  rotate: true
-  xy: 832, 453
-  size: 17, 11
-  orig: 17, 11
-  offset: 0, 0
-  index: -1
+	bounds: 832, 453, 17, 11
+	rotate: 90
 girl-spring-dress/eye-back-up-eyelid-back
-  rotate: true
-  xy: 832, 453
-  size: 17, 11
-  orig: 17, 11
-  offset: 0, 0
-  index: -1
+	bounds: 832, 453, 17, 11
+	rotate: 90
 girl/eye-back-up-eyelid-back
-  rotate: true
-  xy: 832, 453
-  size: 17, 11
-  orig: 17, 11
-  offset: 0, 0
-  index: -1
+	bounds: 832, 453, 17, 11
+	rotate: 90
 girl-blue-cape/eye-front-low-eyelid
-  rotate: true
-  xy: 739, 303
-  size: 18, 6
-  orig: 18, 6
-  offset: 0, 0
-  index: -1
+	bounds: 739, 303, 18, 6
+	rotate: 90
 girl-spring-dress/eye-front-low-eyelid
-  rotate: true
-  xy: 739, 303
-  size: 18, 6
-  orig: 18, 6
-  offset: 0, 0
-  index: -1
+	bounds: 739, 303, 18, 6
+	rotate: 90
 girl/eye-front-low-eyelid
-  rotate: true
-  xy: 739, 303
-  size: 18, 6
-  orig: 18, 6
-  offset: 0, 0
-  index: -1
+	bounds: 739, 303, 18, 6
+	rotate: 90
 girl-blue-cape/eye-front-pupil
-  rotate: false
-  xy: 816, 378
-  size: 9, 9
-  orig: 9, 9
-  offset: 0, 0
-  index: -1
+	bounds: 816, 378, 9, 9
 girl-spring-dress/eye-front-pupil
-  rotate: false
-  xy: 816, 378
-  size: 9, 9
-  orig: 9, 9
-  offset: 0, 0
-  index: -1
+	bounds: 816, 378, 9, 9
 girl/eye-front-pupil
-  rotate: false
-  xy: 816, 378
-  size: 9, 9
-  orig: 9, 9
-  offset: 0, 0
-  index: -1
+	bounds: 816, 378, 9, 9
 girl-blue-cape/eye-front-up-eyelid
-  rotate: true
-  xy: 392, 77
-  size: 30, 14
-  orig: 30, 14
-  offset: 0, 0
-  index: -1
+	bounds: 392, 77, 30, 14
+	rotate: 90
 girl-spring-dress/eye-front-up-eyelid
-  rotate: true
-  xy: 392, 77
-  size: 30, 14
-  orig: 30, 14
-  offset: 0, 0
-  index: -1
+	bounds: 392, 77, 30, 14
+	rotate: 90
 girl/eye-front-up-eyelid
-  rotate: true
-  xy: 392, 77
-  size: 30, 14
-  orig: 30, 14
-  offset: 0, 0
-  index: -1
+	bounds: 392, 77, 30, 14
+	rotate: 90
 girl-blue-cape/eye-front-up-eyelid-back
-  rotate: false
-  xy: 455, 130
-  size: 26, 11
-  orig: 26, 11
-  offset: 0, 0
-  index: -1
+	bounds: 455, 130, 26, 11
 girl-spring-dress/eye-front-up-eyelid-back
-  rotate: false
-  xy: 455, 130
-  size: 26, 11
-  orig: 26, 11
-  offset: 0, 0
-  index: -1
+	bounds: 455, 130, 26, 11
 girl/eye-front-up-eyelid-back
-  rotate: false
-  xy: 455, 130
-  size: 26, 11
-  orig: 26, 11
-  offset: 0, 0
-  index: -1
+	bounds: 455, 130, 26, 11
 girl-blue-cape/eye-iris-back
-  rotate: false
-  xy: 637, 264
-  size: 17, 17
-  orig: 17, 17
-  offset: 0, 0
-  index: -1
+	bounds: 637, 264, 17, 17
 girl-blue-cape/eye-iris-front
-  rotate: false
-  xy: 802, 471
-  size: 18, 18
-  orig: 18, 18
-  offset: 0, 0
-  index: -1
+	bounds: 802, 471, 18, 18
 girl-blue-cape/eye-white-back
-  rotate: false
-  xy: 596, 264
-  size: 20, 16
-  orig: 20, 16
-  offset: 0, 0
-  index: -1
+	bounds: 596, 264, 20, 16
 girl-spring-dress/eye-white-back
-  rotate: false
-  xy: 596, 264
-  size: 20, 16
-  orig: 20, 16
-  offset: 0, 0
-  index: -1
+	bounds: 596, 264, 20, 16
 girl-blue-cape/eye-white-front
-  rotate: true
-  xy: 796, 5
-  size: 20, 16
-  orig: 20, 16
-  offset: 0, 0
-  index: -1
+	bounds: 796, 5, 20, 16
+	rotate: 90
 girl-spring-dress/eye-white-front
-  rotate: true
-  xy: 796, 5
-  size: 20, 16
-  orig: 20, 16
-  offset: 0, 0
-  index: -1
+	bounds: 796, 5, 20, 16
+	rotate: 90
 girl/eye-white-front
-  rotate: true
-  xy: 796, 5
-  size: 20, 16
-  orig: 20, 16
-  offset: 0, 0
-  index: -1
+	bounds: 796, 5, 20, 16
+	rotate: 90
 girl-blue-cape/front-eyebrow
-  rotate: true
-  xy: 608, 149
-  size: 18, 12
-  orig: 18, 12
-  offset: 0, 0
-  index: -1
+	bounds: 608, 149, 18, 12
+	rotate: 90
 girl-blue-cape/hair-back
-  rotate: true
-  xy: 508, 145
-  size: 117, 98
-  orig: 117, 98
-  offset: 0, 0
-  index: -1
+	bounds: 508, 145, 117, 98
+	rotate: 90
 girl-blue-cape/hair-bangs
-  rotate: true
-  xy: 673, 419
-  size: 91, 40
-  orig: 91, 40
-  offset: 0, 0
-  index: -1
+	bounds: 673, 419, 91, 40
+	rotate: 90
 girl-blue-cape/hair-head-side-back
-  rotate: true
-  xy: 196, 331
-  size: 30, 52
-  orig: 30, 52
-  offset: 0, 0
-  index: -1
+	bounds: 196, 331, 30, 52
+	rotate: 90
 girl-blue-cape/hair-head-side-front
-  rotate: false
-  xy: 738, 323
-  size: 41, 42
-  orig: 41, 42
-  offset: 0, 0
-  index: -1
+	bounds: 738, 323, 41, 42
 girl-blue-cape/hair-side
-  rotate: false
-  xy: 473, 3
-  size: 36, 71
-  orig: 36, 71
-  offset: 0, 0
-  index: -1
+	bounds: 473, 3, 36, 71
 girl-blue-cape/hand-front-fingers
-  rotate: false
-  xy: 509, 365
-  size: 19, 21
-  orig: 19, 21
-  offset: 0, 0
-  index: -1
+	bounds: 509, 365, 19, 21
 girl-spring-dress/hand-front-fingers
-  rotate: false
-  xy: 509, 365
-  size: 19, 21
-  orig: 19, 21
-  offset: 0, 0
-  index: -1
+	bounds: 509, 365, 19, 21
 girl-blue-cape/leg-front
-  rotate: true
-  xy: 168, 72
-  size: 30, 158
-  orig: 30, 158
-  offset: 0, 0
-  index: -1
+	bounds: 168, 72, 30, 158
+	rotate: 90
 girl-blue-cape/mouth-smile
-  rotate: false
-  xy: 736, 79
-  size: 29, 7
-  orig: 29, 7
-  offset: 0, 0
-  index: -1
+	bounds: 736, 79, 29, 7
 girl-spring-dress/mouth-smile
-  rotate: false
-  xy: 736, 79
-  size: 29, 7
-  orig: 29, 7
-  offset: 0, 0
-  index: -1
+	bounds: 736, 79, 29, 7
 girl/mouth-smile
-  rotate: false
-  xy: 736, 79
-  size: 29, 7
-  orig: 29, 7
-  offset: 0, 0
-  index: -1
+	bounds: 736, 79, 29, 7
 girl-blue-cape/nose
-  rotate: false
-  xy: 747, 264
-  size: 11, 7
-  orig: 11, 7
-  offset: 0, 0
-  index: -1
+	bounds: 747, 264, 11, 7
 girl-spring-dress/nose
-  rotate: false
-  xy: 747, 264
-  size: 11, 7
-  orig: 11, 7
-  offset: 0, 0
-  index: -1
+	bounds: 747, 264, 11, 7
 girl/nose
-  rotate: false
-  xy: 747, 264
-  size: 11, 7
-  orig: 11, 7
-  offset: 0, 0
-  index: -1
+	bounds: 747, 264, 11, 7
 girl-blue-cape/sleeve-back
-  rotate: false
-  xy: 767, 79
-  size: 42, 29
-  orig: 42, 29
-  offset: 0, 0
-  index: -1
+	bounds: 767, 79, 42, 29
 girl-blue-cape/sleeve-front
-  rotate: true
-  xy: 408, 76
-  size: 52, 119
-  orig: 52, 119
-  offset: 0, 0
-  index: -1
+	bounds: 408, 76, 52, 119
+	rotate: 90
 girl-spring-dress/arm-front
-  rotate: false
-  xy: 596, 282
-  size: 17, 111
-  orig: 17, 111
-  offset: 0, 0
-  index: -1
+	bounds: 596, 282, 17, 111
 girl-spring-dress/back-eyebrow
-  rotate: false
-  xy: 801, 420
-  size: 18, 12
-  orig: 18, 12
-  offset: 0, 0
-  index: -1
+	bounds: 801, 420, 18, 12
 girl-spring-dress/body-up
-  rotate: false
-  xy: 179, 4
-  size: 64, 66
-  orig: 64, 66
-  offset: 0, 0
-  index: -1
+	bounds: 179, 4, 64, 66
 girl-spring-dress/cloak-down
-  rotate: false
-  xy: 775, 27
-  size: 50, 50
-  orig: 50, 50
-  offset: 0, 0
-  index: -1
+	bounds: 775, 27, 50, 50
 girl-spring-dress/cloak-up
-  rotate: true
-  xy: 360, 7
-  size: 64, 58
-  orig: 64, 58
-  offset: 0, 0
-  index: -1
+	bounds: 360, 7, 64, 58
+	rotate: 90
 girl-spring-dress/eye-iris-back
-  rotate: false
-  xy: 656, 264
-  size: 17, 17
-  orig: 17, 17
-  offset: 0, 0
-  index: -1
+	bounds: 656, 264, 17, 17
 girl-spring-dress/eye-iris-front
-  rotate: false
-  xy: 814, 492
-  size: 18, 18
-  orig: 18, 18
-  offset: 0, 0
-  index: -1
+	bounds: 814, 492, 18, 18
 girl-spring-dress/front-eyebrow
-  rotate: true
-  xy: 822, 472
-  size: 18, 12
-  orig: 18, 12
-  offset: 0, 0
-  index: -1
+	bounds: 822, 472, 18, 12
+	rotate: 90
 girl-spring-dress/hair-back
-  rotate: true
-  xy: 196, 363
-  size: 147, 93
-  orig: 147, 93
-  offset: 0, 0
-  index: -1
+	bounds: 196, 363, 147, 93
+	rotate: 90
 girl-spring-dress/hair-bangs
-  rotate: true
-  xy: 696, 326
-  size: 91, 40
-  orig: 91, 40
-  offset: 0, 0
-  index: -1
+	bounds: 696, 326, 91, 40
+	rotate: 90
 girl-spring-dress/hair-head-side-back
-  rotate: false
-  xy: 529, 76
-  size: 30, 52
-  orig: 30, 52
-  offset: 0, 0
-  index: -1
+	bounds: 529, 76, 30, 52
 girl-spring-dress/hair-head-side-front
-  rotate: false
-  xy: 781, 323
-  size: 41, 42
-  orig: 41, 42
-  offset: 0, 0
-  index: -1
+	bounds: 781, 323, 41, 42
 girl-spring-dress/hair-side
-  rotate: false
-  xy: 511, 3
-  size: 36, 71
-  orig: 36, 71
-  offset: 0, 0
-  index: -1
+	bounds: 511, 3, 36, 71
 girl-spring-dress/leg-front
-  rotate: false
-  xy: 171, 104
-  size: 30, 158
-  orig: 30, 158
-  offset: 0, 0
-  index: -1
+	bounds: 171, 104, 30, 158
 girl-spring-dress/neck
-  rotate: false
-  xy: 138, 70
-  size: 20, 32
-  orig: 20, 32
-  offset: 0, 0
-  index: -1
+	bounds: 138, 70, 20, 32
 girl-spring-dress/shoulder-ribbon
-  rotate: true
-  xy: 622, 131
-  size: 36, 24
-  orig: 36, 24
-  offset: 0, 0
-  index: -1
+	bounds: 622, 131, 36, 24
+	rotate: 90
 girl-spring-dress/skirt
-  rotate: true
-  xy: 113, 328
-  size: 182, 81
-  orig: 182, 81
-  offset: 0, 0
-  index: -1
+	bounds: 113, 328, 182, 81
+	rotate: 90
 girl-spring-dress/underskirt
-  rotate: false
-  xy: 2, 2
-  size: 175, 65
-  orig: 175, 65
-  offset: 0, 0
-  index: -1
+	bounds: 2, 2, 175, 65
 girl/arm-front
-  rotate: false
-  xy: 577, 395
-  size: 36, 115
-  orig: 36, 115
-  offset: 0, 0
-  index: -1
+	bounds: 577, 395, 36, 115
 girl/back-eyebrow
-  rotate: true
-  xy: 834, 492
-  size: 18, 12
-  orig: 18, 12
-  offset: 0, 0
-  index: -1
+	bounds: 834, 492, 18, 12
+	rotate: 90
 girl/bag-base
-  rotate: true
-  xy: 191, 264
-  size: 62, 58
-  orig: 62, 58
-  offset: 0, 0
-  index: -1
+	bounds: 191, 264, 62, 58
+	rotate: 90
 girl/bag-strap-front
-  rotate: false
-  xy: 385, 265
-  size: 12, 96
-  orig: 12, 96
-  offset: 0, 0
-  index: -1
+	bounds: 385, 265, 12, 96
 girl/bag-top
-  rotate: false
-  xy: 738, 367
-  size: 49, 50
-  orig: 49, 50
-  offset: 0, 0
-  index: -1
+	bounds: 738, 367, 49, 50
 girl/body
-  rotate: false
-  xy: 356, 130
-  size: 97, 132
-  orig: 97, 132
-  offset: 0, 0
-  index: -1
+	bounds: 356, 130, 97, 132
 girl/boot-ribbon-front
-  rotate: false
-  xy: 539, 130
-  size: 13, 13
-  orig: 13, 13
-  offset: 0, 0
-  index: -1
+	bounds: 539, 130, 13, 13
 girl/eye-iris-back
-  rotate: false
-  xy: 821, 424
-  size: 17, 17
-  orig: 17, 17
-  offset: 0, 0
-  index: -1
+	bounds: 821, 424, 17, 17
 girl/eye-iris-front
-  rotate: false
-  xy: 812, 443
-  size: 18, 18
-  orig: 18, 18
-  offset: 0, 0
-  index: -1
+	bounds: 812, 443, 18, 18
 girl/eye-white-back
-  rotate: true
-  xy: 814, 5
-  size: 20, 16
-  orig: 20, 16
-  offset: 0, 0
-  index: -1
+	bounds: 814, 5, 20, 16
+	rotate: 90
 girl/front-eyebrow
-  rotate: true
-  xy: 816, 400
-  size: 18, 12
-  orig: 18, 12
-  offset: 0, 0
-  index: -1
+	bounds: 816, 400, 18, 12
+	rotate: 90
 girl/hair-back
-  rotate: true
-  xy: 291, 363
-  size: 147, 93
-  orig: 147, 93
-  offset: 0, 0
-  index: -1
+	bounds: 291, 363, 147, 93
+	rotate: 90
 girl/hair-bangs
-  rotate: true
-  xy: 715, 419
-  size: 91, 40
-  orig: 91, 40
-  offset: 0, 0
-  index: -1
+	bounds: 715, 419, 91, 40
+	rotate: 90
 girl/hair-flap-down-front
-  rotate: false
-  xy: 288, 5
-  size: 70, 65
-  orig: 70, 65
-  offset: 0, 0
-  index: -1
+	bounds: 288, 5, 70, 65
 girl/hair-head-side-back
-  rotate: false
-  xy: 561, 77
-  size: 30, 52
-  orig: 30, 52
-  offset: 0, 0
-  index: -1
+	bounds: 561, 77, 30, 52
 girl/hair-head-side-front
-  rotate: true
-  xy: 757, 419
-  size: 41, 42
-  orig: 41, 42
-  offset: 0, 0
-  index: -1
+	bounds: 757, 419, 41, 42
+	rotate: 90
 girl/hair-patch
-  rotate: true
-  xy: 245, 4
-  size: 66, 41
-  orig: 66, 41
-  offset: 0, 0
-  index: -1
+	bounds: 245, 4, 66, 41
+	rotate: 90
 girl/hair-side
-  rotate: false
-  xy: 549, 3
-  size: 36, 71
-  orig: 36, 71
-  offset: 0, 0
-  index: -1
+	bounds: 549, 3, 36, 71
 girl/hair-strand-back-1
-  rotate: false
-  xy: 684, 3
-  size: 58, 74
-  orig: 58, 74
-  offset: 0, 0
-  index: -1
+	bounds: 684, 3, 58, 74
 girl/hair-strand-back-2
-  rotate: true
-  xy: 692, 171
-  size: 91, 58
-  orig: 91, 58
-  offset: 0, 0
-  index: -1
+	bounds: 692, 171, 91, 58
+	rotate: 90
 girl/hair-strand-back-3
-  rotate: true
-  xy: 615, 323
-  size: 92, 79
-  orig: 92, 79
-  offset: 0, 0
-  index: -1
+	bounds: 615, 323, 92, 79
+	rotate: 90
 girl/hair-strand-front-1
-  rotate: false
-  xy: 518, 269
-  size: 38, 94
-  orig: 38, 94
-  offset: 0, 0
-  index: -1
+	bounds: 518, 269, 38, 94
 girl/hair-strand-front-2
-  rotate: false
-  xy: 593, 79
-  size: 70, 50
-  orig: 70, 50
-  offset: 0, 0
-  index: -1
+	bounds: 593, 79, 70, 50
 girl/hair-strand-front-3
-  rotate: false
-  xy: 705, 88
-  size: 44, 81
-  orig: 44, 81
-  offset: 0, 0
-  index: -1
+	bounds: 705, 88, 44, 81
 girl/hand-front-fingers
-  rotate: false
-  xy: 530, 365
-  size: 19, 21
-  orig: 19, 21
-  offset: 0, 0
-  index: -1
+	bounds: 530, 365, 19, 21
 girl/hat
-  rotate: true
-  xy: 608, 169
-  size: 93, 82
-  orig: 93, 82
-  offset: 0, 0
-  index: -1
+	bounds: 608, 169, 93, 82
+	rotate: 90
 girl/leg-front
-  rotate: false
-  xy: 203, 104
-  size: 30, 158
-  orig: 30, 158
-  offset: 0, 0
-  index: -1
+	bounds: 203, 104, 30, 158
 girl/pompom
-  rotate: true
-  xy: 757, 462
-  size: 48, 43
-  orig: 48, 43
-  offset: 0, 0
-  index: -1
+	bounds: 757, 462, 48, 43
+	rotate: 90
 girl/scarf
-  rotate: true
-  xy: 455, 143
-  size: 119, 51
-  orig: 119, 51
-  offset: 0, 0
-  index: -1
+	bounds: 455, 143, 119, 51
+	rotate: 90
 girl/scarf-back
-  rotate: true
-  xy: 420, 2
-  size: 72, 51
-  orig: 72, 51
-  offset: 0, 0
-  index: -1
+	bounds: 420, 2, 72, 51
+	rotate: 90
 girl/zip
-  rotate: true
-  xy: 356, 109
-  size: 19, 25
-  orig: 19, 25
-  offset: 0, 0
-  index: -1
+	bounds: 356, 109, 19, 25
+	rotate: 90

@@ -1,34 +1,16 @@
-
 Raggedy Spineboy.png
-size: 256,256
-format: RGBA8888
-filter: Linear,Linear
-repeat: none
+	size: 256, 256
+	filter: Linear, Linear
+	pma: true
 arm
-  rotate: true
-  xy: 2, 140
-  size: 71, 75
-  orig: 71, 75
-  offset: 0, 0
-  index: -1
+	bounds: 2, 140, 71, 75
+	rotate: 90
 head
-  rotate: true
-  xy: 2, 2
-  size: 136, 187
-  orig: 136, 187
-  offset: 0, 0
-  index: -1
+	bounds: 2, 2, 136, 187
+	rotate: 90
 leg
-  rotate: true
-  xy: 2, 213
-  size: 36, 99
-  orig: 36, 99
-  offset: 0, 0
-  index: -1
+	bounds: 2, 213, 36, 99
+	rotate: 90
 torso
-  rotate: true
-  xy: 103, 187
-  size: 62, 95
-  orig: 62, 95
-  offset: 0, 0
-  index: -1
+	bounds: 103, 187, 62, 95
+	rotate: 90

@@ -1,34 +1,12 @@
-
 eyes.png
-size: 1024,512
-format: RGBA8888
-filter: Linear,Linear
-repeat: none
+	size: 1024, 512
+	filter: Linear, Linear
+	pma: true
 EyeLines
-  rotate: false
-  xy: 2, 2
-  size: 868, 322
-  orig: 868, 322
-  offset: 0, 0
-  index: -1
+	bounds: 2, 2, 868, 322
 EyeWhite
-  rotate: false
-  xy: 2, 326
-  size: 700, 148
-  orig: 700, 148
-  offset: 0, 0
-  index: -1
+	bounds: 2, 326, 700, 148
 L_Eye
-  rotate: false
-  xy: 704, 326
-  size: 148, 148
-  orig: 148, 148
-  offset: 0, 0
-  index: -1
+	bounds: 704, 326, 148, 148
 R_Eye
-  rotate: false
-  xy: 704, 326
-  size: 148, 148
-  orig: 148, 148
-  offset: 0, 0
-  index: -1
+	bounds: 704, 326, 148, 148

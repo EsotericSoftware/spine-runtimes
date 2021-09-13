@@ -1,174 +1,61 @@
-
 hero-pro.png
-size: 1024,256
-format: RGBA8888
-filter: Linear,Linear
-repeat: none
+	size: 1024, 256
+	filter: Linear, Linear
+	pma: true
 body
-  rotate: true
-  xy: 452, 157
-  size: 97, 95
-  orig: 97, 95
-  offset: 0, 0
-  index: -1
+	bounds: 452, 157, 97, 95
+	rotate: 90
 cape
-  rotate: false
-  xy: 247, 95
-  size: 146, 159
-  orig: 146, 159
-  offset: 0, 0
-  index: -1
+	bounds: 247, 95, 146, 159
 chain-ball
-  rotate: false
-  xy: 241, 11
-  size: 64, 68
-  orig: 64, 68
-  offset: 0, 0
-  index: -1
+	bounds: 241, 11, 64, 68
 chain-flat
-  rotate: false
-  xy: 241, 4
-  size: 16, 5
-  orig: 16, 5
-  offset: 0, 0
-  index: -1
+	bounds: 241, 4, 16, 5
 chain-round
-  rotate: true
-  xy: 307, 10
-  size: 17, 14
-  orig: 17, 14
-  offset: 0, 0
-  index: -1
+	bounds: 307, 10, 17, 14
+	rotate: 90
 eyes
-  rotate: false
-  xy: 68, 5
-  size: 82, 31
-  orig: 82, 31
-  offset: 0, 0
-  index: -1
+	bounds: 68, 5, 82, 31
 fingers
-  rotate: false
-  xy: 2, 3
-  size: 31, 33
-  orig: 31, 33
-  offset: 0, 0
-  index: -1
+	bounds: 2, 3, 31, 33
 foot1
-  rotate: false
-  xy: 483, 2
-  size: 50, 42
-  orig: 50, 42
-  offset: 0, 0
-  index: -1
+	bounds: 483, 2, 50, 42
 foot2
-  rotate: false
-  xy: 185, 41
-  size: 53, 38
-  orig: 53, 38
-  offset: 0, 0
-  index: -1
+	bounds: 185, 41, 53, 38
 forearm1
-  rotate: true
-  xy: 73, 38
-  size: 41, 49
-  orig: 41, 49
-  offset: 0, 0
-  index: -1
+	bounds: 73, 38, 41, 49
+	rotate: 90
 forearm2
-  rotate: false
-  xy: 35, 4
-  size: 31, 32
-  orig: 31, 32
-  offset: 0, 0
-  index: -1
+	bounds: 35, 4, 31, 32
 hand1
-  rotate: true
-  xy: 191, 2
-  size: 37, 48
-  orig: 37, 48
-  offset: 0, 0
-  index: -1
+	bounds: 191, 2, 37, 48
+	rotate: 90
 hand2
-  rotate: true
-  xy: 152, 7
-  size: 31, 37
-  orig: 31, 37
-  offset: 0, 0
-  index: -1
+	bounds: 152, 7, 31, 37
+	rotate: 90
 handle
-  rotate: false
-  xy: 323, 13
-  size: 134, 14
-  orig: 134, 14
-  offset: 0, 0
-  index: -1
+	bounds: 323, 13, 134, 14
 head
-  rotate: false
-  xy: 73, 81
-  size: 172, 173
-  orig: 172, 173
-  offset: 0, 0
-  index: -1
+	bounds: 73, 81, 172, 173
 mantles
-  rotate: true
-  xy: 395, 118
-  size: 136, 55
-  orig: 136, 55
-  offset: 0, 0
-  index: -1
+	bounds: 395, 118, 136, 55
+	rotate: 90
 mouth
-  rotate: false
-  xy: 395, 103
-  size: 61, 13
-  orig: 61, 13
-  offset: 0, 0
-  index: -1
+	bounds: 395, 103, 61, 13
 shin1
-  rotate: false
-  xy: 428, 44
-  size: 53, 57
-  orig: 53, 57
-  offset: 0, 0
-  index: -1
+	bounds: 428, 44, 53, 57
 shin2
-  rotate: true
-  xy: 458, 104
-  size: 51, 54
-  orig: 51, 54
-  offset: 0, 0
-  index: -1
+	bounds: 458, 104, 51, 54
+	rotate: 90
 sword
-  rotate: true
-  xy: 2, 38
-  size: 216, 69
-  orig: 216, 69
-  offset: 0, 0
-  index: -1
+	bounds: 2, 38, 216, 69
+	rotate: 90
 thigh1
-  rotate: false
-  xy: 366, 30
-  size: 60, 63
-  orig: 60, 63
-  offset: 0, 0
-  index: -1
+	bounds: 366, 30, 60, 63
 thigh2
-  rotate: false
-  xy: 307, 29
-  size: 57, 64
-  orig: 57, 64
-  offset: 0, 0
-  index: -1
+	bounds: 307, 29, 57, 64
 upper-arm1
-  rotate: false
-  xy: 483, 46
-  size: 50, 56
-  orig: 50, 56
-  offset: 0, 0
-  index: -1
+	bounds: 483, 46, 50, 56
 upper-arm2
-  rotate: true
-  xy: 124, 40
-  size: 39, 59
-  orig: 39, 59
-  offset: 0, 0
-  index: -1
+	bounds: 124, 40, 39, 59
+	rotate: 90

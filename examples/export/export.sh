@@ -121,15 +121,19 @@ echo "Exporting assets..."
 -i ../vine/images -o ../vine/export -n vine -p atlas-1.0.json \
 -i ../vine/images -o ../vine/export -n vine-pma -p atlas-1.0-pma.json \
 \
--i ../owl/owl-pro.spine -o ../owl/export -e json.json \
--i ../owl/owl-pro.spine -o ../owl/export -e binary.json \
--i ../owl/images -o ../owl/export -n owl -p atlas-0.5.json \
--i ../owl/images -o ../owl/export -n owl-pma -p atlas-0.5-pma.json \
-\
 -i ../windmill/windmill-ess.spine -o ../windmill/export -e json.json \
 -i ../windmill/windmill-ess.spine -o ../windmill/export -e binary.json \
 -i ../windmill/images -o ../windmill/export -n windmill -p atlas-0.5.json \
 -i ../windmill/images -o ../windmill/export -n windmill-pma -p atlas-0.5-pma.json
+
+# Owl needs separate export, as cleaning would kill keys in idle animation, which
+# would lead to incorrect additive animation blending.
+"$SPINE_EXE" \
+-u $version ${@:2} \
+-i ../owl/owl-pro.spine -o ../owl/export -e json.json \
+-i ../owl/owl-pro.spine -o ../owl/export -e binary.json \
+-i ../owl/images -o ../owl/export -n owl -p atlas-0.5.json \
+-i ../owl/images -o ../owl/export -n owl-pma -p atlas-0.5-pma.json \
 
 # Export Unity Assets
 UNITY_BASE_DIR=../spine-unity

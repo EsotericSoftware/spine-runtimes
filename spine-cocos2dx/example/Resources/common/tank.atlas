@@ -1,6 +1,7 @@
 tank.png
 	size: 1024, 1024
 	filter: Linear, Linear
+	scale: 0.5
 antenna
 	bounds: 2, 712, 11, 152
 	rotate: 90

@@ -1,6 +1,7 @@
 spineboy.png
 	size: 1024, 256
 	filter: Linear, Linear
+	scale: 0.5
 crosshair
 	bounds: 813, 160, 45, 45
 eye-indifferent
