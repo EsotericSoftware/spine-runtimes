@@ -130,12 +130,12 @@ namespace spine {
 		void removeAttachment(size_t slotIndex, const String &name);
 
 		/// Finds the skin keys for a given slot. The results are added to the passed array of names.
-		/// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
+		/// @param slotIndex The target slotIndex. To find the slot index, use SkeletonData::findSlot and SlotData::getIndex.
 		/// @param names Found skin key names will be added to this array.
 		void findNamesForSlot(size_t slotIndex, Vector <String> &names);
 
 		/// Finds the attachments for a given slot. The results are added to the passed array of Attachments.
-		/// @param slotIndex The target slotIndex. To find the slot index, use Skeleton::findSlotIndex or SkeletonData::findSlotIndex
+		/// @param slotIndex The target slotIndex. To find the slot index, use SkeletonData::findSlot and SlotData::getIndex.
 		/// @param attachments Found Attachments will be added to this array.
 		void findAttachmentsForSlot(size_t slotIndex, Vector<Attachment *> &attachments);
 

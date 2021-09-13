@@ -400,25 +400,9 @@ function Skeleton:findBone (boneName)
 	return nil
 end
 
-function Skeleton:findBoneIndex(boneName)
-	if not boneName then error("boneName cannot be nil.", 2) end
-	for i,bone in ipairs(self.bones) do
-		if bone.data.name == boneName then return i end
-	end
-	return -1
-end
-
 function Skeleton:findSlot (slotName)
 	if not slotName then error("slotName cannot be nil.", 2) end
 	return self.slotsByName[slotName]
-end
-
-function Skeleton:findSlotIndex(slotName)
-	if not slotName then error("slotName cannot be nil.", 2) end
-	for i, slot in ipairs(self.slots) do
-		if slot.data.name == slotName then return i end
-	end
-	return -1
 end
 
 -- Sets the skin used to look up attachments before looking in the {@link SkeletonData#getDefaultSkin() default skin}.

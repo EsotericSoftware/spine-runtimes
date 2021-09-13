@@ -114,14 +114,6 @@ export class SkeletonData {
 		return null;
 	}
 
-	findBoneIndex (boneName: string) {
-		if (!boneName) throw new Error("boneName cannot be null.");
-		let bones = this.bones;
-		for (let i = 0, n = bones.length; i < n; i++)
-			if (bones[i].name == boneName) return i;
-		return -1;
-	}
-
 	/** Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
 	 * multiple times.
 	 * @returns May be null. */
@@ -133,14 +125,6 @@ export class SkeletonData {
 			if (slot.name == slotName) return slot;
 		}
 		return null;
-	}
-
-	findSlotIndex (slotName: string) {
-		if (!slotName) throw new Error("slotName cannot be null.");
-		let slots = this.slots;
-		for (let i = 0, n = slots.length; i < n; i++)
-			if (slots[i].name == slotName) return i;
-		return -1;
 	}
 
 	/** Finds a skin by comparing each skin's name. It is more efficient to cache the results of this method than to call it

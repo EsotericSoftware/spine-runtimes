@@ -109,7 +109,7 @@ namespace Spine {
 		}
 
 		/// <summary>Returns all attachments in this skin for the specified slot index.</summary>
-		/// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.Skeleton.FindSlotIndex"/> or <see cref="Spine.SkeletonData.FindSlotIndex"/>
+		/// <param name="slotIndex">The target slotIndex. To find the slot index, use <see cref="Spine.SkeletonData.FindSlot"/> and <see cref="Spine.SlotData.Index"/>.
 		public void GetAttachments (int slotIndex, List<SkinEntry> attachments) {
 			if (slotIndex < 0) throw new ArgumentException("slotIndex must be >= 0.");
 			if (attachments == null) throw new ArgumentNullException("attachments", "attachments cannot be null.");

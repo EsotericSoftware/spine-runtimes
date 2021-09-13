@@ -437,27 +437,29 @@ package spine {
 			var time : Number, time2 : Number;
 			var curve : Object;
 			var timelineName : String;
-			var i : int, n : int;
+			var i : int, n : int, frames : int;
 
 			// Slot timelines.
 			var slots : Object = map["slots"];
 			for (slotName in slots) {
 				slotMap = slots[slotName];
-				slotIndex = skeletonData.findSlotIndex(slotName);
+				slotIndex = skeletonData.findSlot(slotName).index;
 
 				for (timelineName in slotMap) {
 					timelineMap = slotMap[timelineName];
 					if (!timelineMap) continue;
+
+					frames = timelineMap.length;
 					if (timelineName == "attachment") {
-						var attachmentTimeline : AttachmentTimeline = new AttachmentTimeline(timelineMap.length, slotIndex);
-						for (frame = 0; frame < timelineMap.length; frame++) {
+						var attachmentTimeline : AttachmentTimeline = new AttachmentTimeline(frames, slotIndex);
+						for (frame = 0; frame < frames; frame++) {
 							keyMap = timelineMap[frame];
 							attachmentTimeline.setFrame(frame, getNumber(keyMap, "time", 0), keyMap.name);
 						}
 						timelines.push(attachmentTimeline);
 
 					} else if (timelineName == "rgba") {
-						var rgbaTimeline : RGBATimeline = new RGBATimeline(timelineMap.length, timelineMap.length << 2, slotIndex);
+						var rgbaTimeline : RGBATimeline = new RGBATimeline(frames, frames << 2, slotIndex);
 						keyMap = timelineMap[0];
 						time = getNumber(keyMap, "time", 0);
 						var rgba : Color = Color.fromString(keyMap.color);
@@ -485,7 +487,7 @@ package spine {
 						timelines.push(rgbaTimeline);
 
 					} else if (timelineName == "rgb") {
-						var rgbTimeline : RGBTimeline = new RGBTimeline(timelineMap.length, timelineMap.length * 3, slotIndex);
+						var rgbTimeline : RGBTimeline = new RGBTimeline(frames, frames * 3, slotIndex);
 						keyMap = timelineMap[0];
 						time = getNumber(keyMap, "time", 0);
 						var rgb : Color = Color.fromString(keyMap.color);
@@ -512,9 +514,9 @@ package spine {
 						timelines.push(rgbTimeline);
 
 					} else if (timelineName == "alpha") {
-						timelines.push(readTimeline(timelineMap, new AlphaTimeline(timelineMap.length, timelineMap.length, slotIndex), 0, 1));
+						timelines.push(readTimeline(timelineMap, new AlphaTimeline(frames, frames, slotIndex), 0, 1));
 					} else if (timelineName == "rgba2") {
-						var rgba2Timeline : RGBA2Timeline = new RGBA2Timeline(timelineMap.length, timelineMap.length * 7, slotIndex);
+						var rgba2Timeline : RGBA2Timeline = new RGBA2Timeline(frames, frames * 7, slotIndex);
 
 						keyMap = timelineMap[0];
 						time = getNumber(keyMap, "time", 0);
@@ -549,7 +551,7 @@ package spine {
 						timelines.push(rgba2Timeline);
 
 					} else if (timelineName == "rgb2") {
-						var rgb2Timeline : RGB2Timeline = new RGB2Timeline(timelineMap.length, timelineMap.length * 6, slotIndex);
+						var rgb2Timeline : RGB2Timeline = new RGB2Timeline(frames, frames * 6, slotIndex);
 
 						keyMap = timelineMap[0];
 						time = getNumber(keyMap, "time", 0);
@@ -590,42 +592,44 @@ package spine {
 			// Bone timelines.
 			var bones : Object = map["bones"];
 			for (var boneName : String in bones) {
-				var boneIndex : int = skeletonData.findBoneIndex(boneName);
-				if (boneIndex == -1) throw new Error("Bone not found: " + boneName);
+				var bone : BoneData = skeletonData.findBone(boneName);
+				if (!bone) throw new Error("Bone not found: " + boneName);
+				var boneIndex : int = bone.index;
 				var boneMap : Object = bones[boneName];
 
 				for (timelineName in boneMap) {
 					timelineMap = boneMap[timelineName];
-					if (timelineMap.length == 0) continue;
+					frames = timelineMap.length;
+					if (frames == 0) continue;
 
 					if (timelineName === "rotate") {
-						timelines.push(readTimeline(timelineMap, new RotateTimeline(timelineMap.length, timelineMap.length, boneIndex), 0, 1));
+						timelines.push(readTimeline(timelineMap, new RotateTimeline(frames, frames, boneIndex), 0, 1));
 					} else if (timelineName === "translate") {
-						var translateTimeline : TranslateTimeline = new TranslateTimeline(timelineMap.length, timelineMap.length << 1, boneIndex);
+						var translateTimeline : TranslateTimeline = new TranslateTimeline(frames, frames << 1, boneIndex);
 						timelines.push(readTimeline2(timelineMap, translateTimeline, "x", "y", 0, scale));
 					} else if (timelineName === "translatex") {
-						var translateXTimeline : TranslateXTimeline = new TranslateXTimeline(timelineMap.length, timelineMap.length, boneIndex);
+						var translateXTimeline : TranslateXTimeline = new TranslateXTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline(timelineMap, translateXTimeline, 0, scale));
 					} else if (timelineName === "translatey") {
-						var translateYTimeline : TranslateYTimeline = new TranslateYTimeline(timelineMap.length, timelineMap.length, boneIndex);
+						var translateYTimeline : TranslateYTimeline = new TranslateYTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline(timelineMap, translateYTimeline, 0, scale));
 					} else if (timelineName === "scale") {
-						var scaleTimeline : ScaleTimeline = new ScaleTimeline(timelineMap.length, timelineMap.length << 1, boneIndex);
+						var scaleTimeline : ScaleTimeline = new ScaleTimeline(frames, frames << 1, boneIndex);
 						timelines.push(readTimeline2(timelineMap, scaleTimeline, "x", "y", 1, 1));
 					} else if (timelineName === "scalex") {
-						var scaleXTimeline : ScaleXTimeline = new ScaleXTimeline(timelineMap.length, timelineMap.length, boneIndex);
+						var scaleXTimeline : ScaleXTimeline = new ScaleXTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline(timelineMap, scaleXTimeline, 1, 1));
 					} else if (timelineName === "scaley") {
-						var scaleYTimeline : ScaleYTimeline = new ScaleYTimeline(timelineMap.length, timelineMap.length, boneIndex);
+						var scaleYTimeline : ScaleYTimeline = new ScaleYTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline(timelineMap, scaleYTimeline, 1, 1));
 					} else if (timelineName === "shear") {
-						var shearTimeline : ShearTimeline = new ShearTimeline(timelineMap.length, timelineMap.length << 1, boneIndex);
+						var shearTimeline : ShearTimeline = new ShearTimeline(frames, frames << 1, boneIndex);
 						timelines.push(readTimeline2(timelineMap, shearTimeline, "x", "y", 0, 1));
 					} else if (timelineName === "shearx") {
-						var shearXTimeline : ShearXTimeline = new ShearXTimeline(timelineMap.length, timelineMap.length, boneIndex);
+						var shearXTimeline : ShearXTimeline = new ShearXTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline(timelineMap, shearXTimeline, 0, 1));
 					} else if (timelineName === "sheary") {
-						var shearYTimeline : ShearYTimeline = new ShearYTimeline(timelineMap.length, timelineMap.length, boneIndex);
+						var shearYTimeline : ShearYTimeline = new ShearYTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline(timelineMap, shearYTimeline, 0, 1));
 					} else
 						throw new Error("Invalid timeline type for a bone: " + timelineName + " (" + boneName + ")");
@@ -682,7 +686,7 @@ package spine {
 				if (!keyMap) continue;
 
 				var transformIndex : int = skeletonData.transformConstraints.indexOf(skeletonData.findTransformConstraint(transformName));
-				var transformTimeline : TransformConstraintTimeline = new TransformConstraintTimeline(timelineMap.length, timelineMap.length << 2, transformIndex);
+				var transformTimeline : TransformConstraintTimeline = new TransformConstraintTimeline(timelineMap.length, timelineMap.length * 6, transformIndex);
 
 				time = getNumber(keyMap, "time", 0);
 				mixRotate = getNumber(keyMap, "mixRotate", 1);
@@ -742,14 +746,15 @@ package spine {
 					keyMap = timelineMap[0];
 					if (!keyMap) continue;
 
+					frames = timelineMap.length;
 					if (timelineName === "position") {
-						var positionTimeline : PathConstraintPositionTimeline = new PathConstraintPositionTimeline(timelineMap.length, timelineMap.length, index);
+						var positionTimeline : PathConstraintPositionTimeline = new PathConstraintPositionTimeline(frames, frames, index);
 						timelines.push(readTimeline(timelineMap, positionTimeline, 0, pathData.positionMode == PositionMode.fixed ? scale : 1));
 					} else if (timelineName === "spacing") {
-						var spacingTimeline : PathConstraintSpacingTimeline = new PathConstraintSpacingTimeline(timelineMap.length, timelineMap.length, index);
+						var spacingTimeline : PathConstraintSpacingTimeline = new PathConstraintSpacingTimeline(frames, frames, index);
 						timelines.push(readTimeline(timelineMap, spacingTimeline, 0, pathData.spacingMode == SpacingMode.length || pathData.spacingMode == SpacingMode.fixed ? scale : 1));
 					} else if (timelineName === "mix") {
-						var mixTimeline : PathConstraintMixTimeline = new PathConstraintMixTimeline(timelineMap.size, timelineMap.size * 3, index);
+						var mixTimeline : PathConstraintMixTimeline = new PathConstraintMixTimeline(frames, frames * 3, index);
 						time = getNumber(keyMap, "time", 0);
 						mixRotate = getNumber(keyMap, "mixRotate", 1);
 						mixX = getNumber(keyMap, "mixX", 1);
@@ -790,7 +795,7 @@ package spine {
 				if (skin == null) throw new Error("Skin not found: " + deformName);
 				for (slotName in deformMap) {
 					slotMap = deformMap[slotName];
-					slotIndex = skeletonData.findSlotIndex(slotName);
+					slotIndex = skeletonData.findSlot(slotName).index;
 					if (slotIndex == -1) throw new Error("Slot not found: " + slotMap.name);
 					for (timelineName in slotMap) {
 						timelineMap = slotMap[timelineName];
@@ -859,7 +864,7 @@ package spine {
 						var unchanged : Vector.<int> = new Vector.<int>(slotCount - offsets.length, true);
 						var originalIndex : int = 0, unchangedIndex : int = 0;
 						for each (var offsetMap : Object in offsets) {
-							slotIndex = skeletonData.findSlotIndex(offsetMap["slot"]);
+							slotIndex = skeletonData.findSlot(offsetMap["slot"]).index;
 							if (slotIndex == -1) throw new Error("Slot not found: " + offsetMap["slot"]);
 							// Collect unchanged items.
 							while (originalIndex != slotIndex)

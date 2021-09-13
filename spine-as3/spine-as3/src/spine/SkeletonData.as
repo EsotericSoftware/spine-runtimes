@@ -62,14 +62,6 @@ package spine {
 			return null;
 		}
 
-		/** @return -1 if the bone was not found. */
-		public function findBoneIndex(boneName : String) : int {
-			if (boneName == null) throw new ArgumentError("boneName cannot be null.");
-			for (var i : int = 0, n : int = bones.length; i < n; i++)
-				if (bones[i]._name == boneName) return i;
-			return -1;
-		}
-
 		// --- Slots.
 		/** @return May be null. */
 		public function findSlot(slotName : String) : SlotData {
@@ -79,14 +71,6 @@ package spine {
 				if (slot._name == slotName) return slot;
 			}
 			return null;
-		}
-
-		/** @return -1 if the bone was not found. */
-		public function findSlotIndex(slotName : String) : int {
-			if (slotName == null) throw new ArgumentError("slotName cannot be null.");
-			for (var i : int = 0, n : int = slots.length; i < n; i++)
-				if (slots[i]._name == slotName) return i;
-			return -1;
 		}
 
 		// --- Skins.

@@ -139,14 +139,8 @@ namespace spine {
 		/// @return May be NULL.
 		Bone *findBone(const String &boneName);
 
-		/// @return -1 if the bone was not found.
-		int findBoneIndex(const String &boneName);
-
 		/// @return May be NULL.
 		Slot *findSlot(const String &slotName);
-
-		/// @return -1 if the bone was not found.
-		int findSlotIndex(const String &slotName);
 
 		/// Sets a skin by name (see setSkin).
 		void setSkin(const String &skinName);

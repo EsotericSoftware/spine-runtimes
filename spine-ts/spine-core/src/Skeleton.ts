@@ -446,15 +446,6 @@ export class Skeleton {
 		return null;
 	}
 
-	/** @returns -1 if the bone was not found. */
-	findBoneIndex (boneName: string) {
-		if (!boneName) throw new Error("boneName cannot be null.");
-		let bones = this.bones;
-		for (let i = 0, n = bones.length; i < n; i++)
-			if (bones[i].data.name == boneName) return i;
-		return -1;
-	}
-
 	/** Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
 	 * repeatedly.
 	 * @returns May be null. */
@@ -466,15 +457,6 @@ export class Skeleton {
 			if (slot.data.name == slotName) return slot;
 		}
 		return null;
-	}
-
-	/** @returns -1 if the bone was not found. */
-	findSlotIndex (slotName: string) {
-		if (!slotName) throw new Error("slotName cannot be null.");
-		let slots = this.slots;
-		for (let i = 0, n = slots.length; i < n; i++)
-			if (slots[i].data.name == slotName) return i;
-		return -1;
 	}
 
 	/** Sets a skin by name.
@@ -524,7 +506,7 @@ export class Skeleton {
 	 * See {@link #getAttachment()}.
 	 * @returns May be null. */
 	getAttachmentByName (slotName: string, attachmentName: string): Attachment {
-		return this.getAttachment(this.data.findSlotIndex(slotName), attachmentName);
+		return this.getAttachment(this.data.findSlot(slotName).index, attachmentName);
 	}
 
 	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot index and

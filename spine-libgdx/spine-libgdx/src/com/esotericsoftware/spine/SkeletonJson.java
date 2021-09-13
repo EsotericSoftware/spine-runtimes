@@ -510,16 +510,17 @@ public class SkeletonJson extends SkeletonLoader {
 			for (JsonValue timelineMap = slotMap.child; timelineMap != null; timelineMap = timelineMap.next) {
 				JsonValue keyMap = timelineMap.child;
 				if (keyMap == null) continue;
-				String timelineName = timelineMap.name;
 
+				int frames = timelineMap.size;
+				String timelineName = timelineMap.name;
 				if (timelineName.equals("attachment")) {
-					AttachmentTimeline timeline = new AttachmentTimeline(timelineMap.size, slot.index);
+					AttachmentTimeline timeline = new AttachmentTimeline(frames, slot.index);
 					for (int frame = 0; keyMap != null; keyMap = keyMap.next, frame++)
 						timeline.setFrame(frame, keyMap.getFloat("time", 0), keyMap.getString("name"));
 					timelines.add(timeline);
 
 				} else if (timelineName.equals("rgba")) {
-					RGBATimeline timeline = new RGBATimeline(timelineMap.size, timelineMap.size << 2, slot.index);
+					RGBATimeline timeline = new RGBATimeline(frames, frames << 2, slot.index);
 					float time = keyMap.getFloat("time", 0);
 					String color = keyMap.getString("color");
 					float r = Integer.parseInt(color.substring(0, 2), 16) / 255f;
@@ -556,7 +557,7 @@ public class SkeletonJson extends SkeletonLoader {
 					timelines.add(timeline);
 
 				} else if (timelineName.equals("rgb")) {
-					RGBTimeline timeline = new RGBTimeline(timelineMap.size, timelineMap.size * 3, slot.index);
+					RGBTimeline timeline = new RGBTimeline(frames, frames * 3, slot.index);
 					float time = keyMap.getFloat("time", 0);
 					String color = keyMap.getString("color");
 					float r = Integer.parseInt(color.substring(0, 2), 16) / 255f;
@@ -589,10 +590,10 @@ public class SkeletonJson extends SkeletonLoader {
 					timelines.add(timeline);
 
 				} else if (timelineName.equals("alpha")) {
-					timelines.add(readTimeline(keyMap, new AlphaTimeline(timelineMap.size, timelineMap.size, slot.index), 0, 1));
+					timelines.add(readTimeline(keyMap, new AlphaTimeline(frames, frames, slot.index), 0, 1));
 
 				} else if (timelineName.equals("rgba2")) {
-					RGBA2Timeline timeline = new RGBA2Timeline(timelineMap.size, timelineMap.size * 7, slot.index);
+					RGBA2Timeline timeline = new RGBA2Timeline(frames, frames * 7, slot.index);
 					float time = keyMap.getFloat("time", 0);
 					String color = keyMap.getString("light");
 					float r = Integer.parseInt(color.substring(0, 2), 16) / 255f;
@@ -643,7 +644,7 @@ public class SkeletonJson extends SkeletonLoader {
 					timelines.add(timeline);
 
 				} else if (timelineName.equals("rgb2")) {
-					RGB2Timeline timeline = new RGB2Timeline(timelineMap.size, timelineMap.size * 6, slot.index);
+					RGB2Timeline timeline = new RGB2Timeline(frames, frames * 6, slot.index);
 					float time = keyMap.getFloat("time", 0);
 					String color = keyMap.getString("light");
 					float r = Integer.parseInt(color.substring(0, 2), 16) / 255f;
@@ -702,32 +703,31 @@ public class SkeletonJson extends SkeletonLoader {
 				JsonValue keyMap = timelineMap.child;
 				if (keyMap == null) continue;
 
+				int frames = timelineMap.size;
 				String timelineName = timelineMap.name;
 				if (timelineName.equals("rotate"))
-					timelines.add(readTimeline(keyMap, new RotateTimeline(timelineMap.size, timelineMap.size, bone.index), 0, 1));
+					timelines.add(readTimeline(keyMap, new RotateTimeline(frames, frames, bone.index), 0, 1));
 				else if (timelineName.equals("translate")) {
-					TranslateTimeline timeline = new TranslateTimeline(timelineMap.size, timelineMap.size << 1, bone.index);
+					TranslateTimeline timeline = new TranslateTimeline(frames, frames << 1, bone.index);
 					timelines.add(readTimeline(keyMap, timeline, "x", "y", 0, scale));
 				} else if (timelineName.equals("translatex")) {
-					timelines
-						.add(readTimeline(keyMap, new TranslateXTimeline(timelineMap.size, timelineMap.size, bone.index), 0, scale));
+					timelines.add(readTimeline(keyMap, new TranslateXTimeline(frames, frames, bone.index), 0, scale));
 				} else if (timelineName.equals("translatey")) {
-					timelines
-						.add(readTimeline(keyMap, new TranslateYTimeline(timelineMap.size, timelineMap.size, bone.index), 0, scale));
+					timelines.add(readTimeline(keyMap, new TranslateYTimeline(frames, frames, bone.index), 0, scale));
 				} else if (timelineName.equals("scale")) {
-					ScaleTimeline timeline = new ScaleTimeline(timelineMap.size, timelineMap.size << 1, bone.index);
+					ScaleTimeline timeline = new ScaleTimeline(frames, frames << 1, bone.index);
 					timelines.add(readTimeline(keyMap, timeline, "x", "y", 1, 1));
 				} else if (timelineName.equals("scalex"))
-					timelines.add(readTimeline(keyMap, new ScaleXTimeline(timelineMap.size, timelineMap.size, bone.index), 1, 1));
+					timelines.add(readTimeline(keyMap, new ScaleXTimeline(frames, frames, bone.index), 1, 1));
 				else if (timelineName.equals("scaley"))
-					timelines.add(readTimeline(keyMap, new ScaleYTimeline(timelineMap.size, timelineMap.size, bone.index), 1, 1));
+					timelines.add(readTimeline(keyMap, new ScaleYTimeline(frames, frames, bone.index), 1, 1));
 				else if (timelineName.equals("shear")) {
-					ShearTimeline timeline = new ShearTimeline(timelineMap.size, timelineMap.size << 1, bone.index);
+					ShearTimeline timeline = new ShearTimeline(frames, frames << 1, bone.index);
 					timelines.add(readTimeline(keyMap, timeline, "x", "y", 0, 1));
 				} else if (timelineName.equals("shearx"))
-					timelines.add(readTimeline(keyMap, new ShearXTimeline(timelineMap.size, timelineMap.size, bone.index), 0, 1));
+					timelines.add(readTimeline(keyMap, new ShearXTimeline(frames, frames, bone.index), 0, 1));
 				else if (timelineName.equals("sheary"))
-					timelines.add(readTimeline(keyMap, new ShearYTimeline(timelineMap.size, timelineMap.size, bone.index), 0, 1));
+					timelines.add(readTimeline(keyMap, new ShearYTimeline(frames, frames, bone.index), 0, 1));
 				else
 					throw new RuntimeException("Invalid timeline type for a bone: " + timelineName + " (" + boneMap.name + ")");
 			}
@@ -770,7 +770,7 @@ public class SkeletonJson extends SkeletonLoader {
 			JsonValue keyMap = timelineMap.child;
 			if (keyMap == null) continue;
 			TransformConstraintData constraint = skeletonData.findTransformConstraint(timelineMap.name);
-			TransformConstraintTimeline timeline = new TransformConstraintTimeline(timelineMap.size, timelineMap.size << 2,
+			TransformConstraintTimeline timeline = new TransformConstraintTimeline(timelineMap.size, timelineMap.size * 6,
 				skeletonData.getTransformConstraints().indexOf(constraint, true));
 			float time = keyMap.getFloat("time", 0);
 			float mixRotate = keyMap.getFloat("mixRotate", 1);
@@ -818,16 +818,18 @@ public class SkeletonJson extends SkeletonLoader {
 			for (JsonValue timelineMap = constraintMap.child; timelineMap != null; timelineMap = timelineMap.next) {
 				JsonValue keyMap = timelineMap.child;
 				if (keyMap == null) continue;
+
+				int frames = timelineMap.size;
 				String timelineName = timelineMap.name;
 				if (timelineName.equals("position")) {
-					CurveTimeline1 timeline = new PathConstraintPositionTimeline(timelineMap.size, timelineMap.size, index);
+					CurveTimeline1 timeline = new PathConstraintPositionTimeline(frames, frames, index);
 					timelines.add(readTimeline(keyMap, timeline, 0, constraint.positionMode == PositionMode.fixed ? scale : 1));
 				} else if (timelineName.equals("spacing")) {
-					CurveTimeline1 timeline = new PathConstraintSpacingTimeline(timelineMap.size, timelineMap.size, index);
+					CurveTimeline1 timeline = new PathConstraintSpacingTimeline(frames, frames, index);
 					timelines.add(readTimeline(keyMap, timeline, 0,
 						constraint.spacingMode == SpacingMode.length || constraint.spacingMode == SpacingMode.fixed ? scale : 1));
 				} else if (timelineName.equals("mix")) {
-					PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(timelineMap.size, timelineMap.size * 3, index);
+					PathConstraintMixTimeline timeline = new PathConstraintMixTimeline(frames, frames * 3, index);
 					float time = keyMap.getFloat("time", 0);
 					float mixRotate = keyMap.getFloat("mixRotate", 1);
 					float mixX = keyMap.getFloat("mixX", 1), mixY = keyMap.getFloat("mixY", mixX);

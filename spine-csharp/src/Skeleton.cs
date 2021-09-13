@@ -428,16 +428,6 @@ namespace Spine {
 			return null;
 		}
 
-		/// <returns>-1 if the bone was not found.</returns>
-		public int FindBoneIndex (string boneName) {
-			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
-			var bones = this.bones;
-			var bonesItems = bones.Items;
-			for (int i = 0, n = bones.Count; i < n; i++)
-				if (bonesItems[i].data.name == boneName) return i;
-			return -1;
-		}
-
 		/// <summary>Finds a slot by comparing each slot's name. It is more efficient to cache the results of this method than to call it
 		/// repeatedly.</summary>
 		/// <returns>May be null.</returns>
@@ -449,16 +439,6 @@ namespace Spine {
 				if (slot.data.name == slotName) return slot;
 			}
 			return null;
-		}
-
-		/// <returns>-1 if the bone was not found.</returns>
-		public int FindSlotIndex (string slotName) {
-			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
-			var slots = this.slots;
-			var slotsItems = slots.Items;
-			for (int i = 0, n = slots.Count; i < n; i++)
-				if (slotsItems[i].data.name == slotName) return i;
-			return -1;
 		}
 
 		/// <summary>Sets a skin by name (<see cref="SetSkin(Skin)"/>).</summary>
@@ -505,7 +485,7 @@ namespace Spine {
 		/// <summary>Finds an attachment by looking in the <see cref="Skeleton.Skin"/> and <see cref="SkeletonData.DefaultSkin"/> using the slot name and attachment name.</summary>
 		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (string slotName, string attachmentName) {
-			return GetAttachment(data.FindSlotIndex(slotName), attachmentName);
+			return GetAttachment(data.FindSlot(slotName).index, attachmentName);
 		}
 
 		/// <summary>Finds an attachment by looking in the skin and skeletonData.defaultSkin using the slot index and attachment name.First the skin is checked and if the attachment was not found, the default skin is checked.</summary>

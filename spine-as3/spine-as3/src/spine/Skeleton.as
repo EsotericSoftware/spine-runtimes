@@ -411,18 +411,6 @@ package spine {
 			return null;
 		}
 
-		/** @return -1 if the bone was not found. */
-		public function findBoneIndex(boneName : String) : int {
-			if (boneName == null)
-				throw new ArgumentError("boneName cannot be null.");
-			var i : int = 0;
-			for each (var bone : Bone in bones) {
-				if (bone._data._name == boneName) return i;
-				i++;
-			}
-			return -1;
-		}
-
 		/** @return May be null. */
 		public function findSlot(slotName : String) : Slot {
 			if (slotName == null)
@@ -430,18 +418,6 @@ package spine {
 			for each (var slot : Slot in slots)
 				if (slot._data._name == slotName) return slot;
 			return null;
-		}
-
-		/** @return -1 if the bone was not found. */
-		public function findSlotIndex(slotName : String) : int {
-			if (slotName == null)
-				throw new ArgumentError("slotName cannot be null.");
-			var i : int = 0;
-			for each (var slot : Slot in slots) {
-				if (slot._data._name == slotName) return i;
-				i++;
-			}
-			return -1;
 		}
 
 		public function get skin() : Skin {
@@ -486,7 +462,7 @@ package spine {
 
 		/** @return May be null. */
 		public function getAttachmentForSlotName(slotName : String, attachmentName : String) : Attachment {
-			return getAttachmentForSlotIndex(data.findSlotIndex(slotName), attachmentName);
+			return getAttachmentForSlotIndex(data.findSlot(slotName).index, attachmentName);
 		}
 
 		/** @return May be null. */

@@ -79,16 +79,8 @@ BoneData *SkeletonData::findBone(const String &boneName) {
 	return ContainerUtil::findWithName(_bones, boneName);
 }
 
-int SkeletonData::findBoneIndex(const String &boneName) {
-	return ContainerUtil::findIndexWithName(_bones, boneName);
-}
-
 SlotData *SkeletonData::findSlot(const String &slotName) {
 	return ContainerUtil::findWithName(_slots, slotName);
-}
-
-int SkeletonData::findSlotIndex(const String &slotName) {
-	return ContainerUtil::findIndexWithName(_slots, slotName);
 }
 
 Skin *SkeletonData::findSkin(const String &skinName) {
@@ -113,10 +105,6 @@ TransformConstraintData *SkeletonData::findTransformConstraint(const String &con
 
 PathConstraintData *SkeletonData::findPathConstraint(const String &constraintName) {
 	return ContainerUtil::findWithName(_pathConstraints, constraintName);
-}
-
-int SkeletonData::findPathConstraintIndex(const String &pathConstraintName) {
-	return ContainerUtil::findIndexWithName(_pathConstraints, pathConstraintName);
 }
 
 const String &SkeletonData::getName() {

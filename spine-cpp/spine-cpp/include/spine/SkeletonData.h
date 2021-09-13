@@ -68,14 +68,8 @@ namespace spine {
 		/// @return May be NULL.
 		BoneData *findBone(const String &boneName);
 
-		/// @return -1 if the bone was not found.
-		int findBoneIndex(const String &boneName);
-
 		/// @return May be NULL.
 		SlotData *findSlot(const String &slotName);
-
-		/// @return -1 if the slot was not found.
-		int findSlotIndex(const String &slotName);
 
 		/// @return May be NULL.
 		Skin *findSkin(const String &skinName);
@@ -94,9 +88,6 @@ namespace spine {
 
 		/// @return May be NULL.
 		PathConstraintData *findPathConstraint(const String &constraintName);
-
-		/// @return -1 if the path constraint was not found.
-		int findPathConstraintIndex(const String &pathConstraintName);
 
 		const String &getName();
 

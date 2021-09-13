@@ -531,25 +531,11 @@ spBone *spSkeleton_findBone(const spSkeleton *self, const char *boneName) {
 	return 0;
 }
 
-int spSkeleton_findBoneIndex(const spSkeleton *self, const char *boneName) {
-	int i;
-	for (i = 0; i < self->bonesCount; ++i)
-		if (strcmp(self->data->bones[i]->name, boneName) == 0) return i;
-	return -1;
-}
-
 spSlot *spSkeleton_findSlot(const spSkeleton *self, const char *slotName) {
 	int i;
 	for (i = 0; i < self->slotsCount; ++i)
 		if (strcmp(self->data->slots[i]->name, slotName) == 0) return self->slots[i];
 	return 0;
-}
-
-int spSkeleton_findSlotIndex(const spSkeleton *self, const char *slotName) {
-	int i;
-	for (i = 0; i < self->slotsCount; ++i)
-		if (strcmp(self->data->slots[i]->name, slotName) == 0) return i;
-	return -1;
 }
 
 int spSkeleton_setSkinByName(spSkeleton *self, const char *skinName) {
@@ -587,7 +573,7 @@ void spSkeleton_setSkin(spSkeleton *self, spSkin *newSkin) {
 
 spAttachment *
 spSkeleton_getAttachmentForSlotName(const spSkeleton *self, const char *slotName, const char *attachmentName) {
-	int slotIndex = spSkeletonData_findSlotIndex(self->data, slotName);
+	int slotIndex = spSkeletonData_findSlot(self->data, slotName)->index;
 	return spSkeleton_getAttachmentForSlotIndex(self, slotIndex, attachmentName);
 }
 

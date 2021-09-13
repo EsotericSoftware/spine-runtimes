@@ -143,9 +143,7 @@ float readFloat(_dataInput *input) {
 char *readString(_dataInput *input) {
 	int length = readVarint(input, 1);
 	char *string;
-	if (length == 0) {
-		return 0;
-	}
+	if (length == 0) return NULL;
 	string = MALLOC(char, length);
 	memcpy(string, input->cursor, length - 1);
 	input->cursor += length - 1;
@@ -770,7 +768,7 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 						spTimeline_dispose(timelines->items[i]);
 					spTimelineArray_dispose(timelines);
 					_spSkeletonBinary_setError(self, "Attachment not found: ", attachmentName);
-					return 0;
+					return NULL;
 				}
 
 				weighted = attachment->bones != 0;
@@ -1115,7 +1113,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 		}
 	}
 
-	return 0;
+	return NULL;
 }
 
 spSkin *spSkeletonBinary_readSkin(spSkeletonBinary *self, _dataInput *input, int /*bool*/ defaultSkin,
@@ -1125,7 +1123,7 @@ spSkin *spSkeletonBinary_readSkin(spSkeletonBinary *self, _dataInput *input, int
 
 	if (defaultSkin) {
 		slotCount = readVarint(input, 1);
-		if (slotCount == 0) return 0;
+		if (slotCount == 0) return NULL;
 		skin = spSkin_create("default");
 	} else {
 		skin = spSkin_create(readStringRef(input, skeletonData));
@@ -1163,7 +1161,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonDataFile(spSkeletonBinary *self, co
 	const char *binary = _spUtil_readFile(path, &length);
 	if (length == 0 || !binary) {
 		_spSkeletonBinary_setError(self, "Unable to read skeleton file: ", path);
-		return 0;
+		return NULL;
 	}
 	skeletonData = spSkeletonBinary_readSkeletonData(self, (unsigned char *) binary, length);
 	FREE(binary);
@@ -1411,14 +1409,14 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 			FREE(input);
 			spSkeletonData_dispose(skeletonData);
 			_spSkeletonBinary_setError(self, "Skin not found: ", linkedMesh->skin);
-			return 0;
+			return NULL;
 		}
 		parent = spSkin_getAttachment(skin, linkedMesh->slotIndex, linkedMesh->parent);
 		if (!parent) {
 			FREE(input);
 			spSkeletonData_dispose(skeletonData);
 			_spSkeletonBinary_setError(self, "Parent mesh not found: ", linkedMesh->parent);
-			return 0;
+			return NULL;
 		}
 		linkedMesh->mesh->super.deformAttachment = linkedMesh->inheritDeform ? SUB_CAST(spVertexAttachment, parent)
 																			 : SUB_CAST(spVertexAttachment,
@@ -1455,7 +1453,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 		if (!animation) {
 			FREE(input);
 			spSkeletonData_dispose(skeletonData);
-			return 0;
+			return NULL;
 		}
 		skeletonData->animations[i] = animation;
 	}

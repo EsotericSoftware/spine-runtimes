@@ -436,20 +436,21 @@ export class SkeletonJson {
 		if (map.slots) {
 			for (let slotName in map.slots) {
 				let slotMap = map.slots[slotName];
-				let slotIndex = skeletonData.findSlotIndex(slotName);
+				let slotIndex = skeletonData.findSlot(slotName).index;
 				for (let timelineName in slotMap) {
 					let timelineMap = slotMap[timelineName];
 					if (!timelineMap) continue;
+					let frames = timelineMap.length;
 					if (timelineName == "attachment") {
-						let timeline = new AttachmentTimeline(timelineMap.length, slotIndex);
-						for (let frame = 0; frame < timelineMap.length; frame++) {
+						let timeline = new AttachmentTimeline(frames, slotIndex);
+						for (let frame = 0; frame < frames; frame++) {
 							let keyMap = timelineMap[frame];
 							timeline.setFrame(frame, getValue(keyMap, "time", 0), keyMap.name);
 						}
 						timelines.push(timeline);
 
 					} else if (timelineName == "rgba") {
-						let timeline = new RGBATimeline(timelineMap.length, timelineMap.length << 2, slotIndex);
+						let timeline = new RGBATimeline(frames, frames << 2, slotIndex);
 						let keyMap = timelineMap[0];
 						let time = getValue(keyMap, "time", 0);
 						let color = Color.fromString(keyMap.color);
@@ -478,7 +479,7 @@ export class SkeletonJson {
 						timelines.push(timeline);
 
 					} else if (timelineName == "rgb") {
-						let timeline = new RGBTimeline(timelineMap.length, timelineMap.length * 3, slotIndex);
+						let timeline = new RGBTimeline(frames, frames * 3, slotIndex);
 						let keyMap = timelineMap[0];
 						let time = getValue(keyMap, "time", 0);
 						let color = Color.fromString(keyMap.color);
@@ -506,9 +507,9 @@ export class SkeletonJson {
 						timelines.push(timeline);
 
 					} else if (timelineName == "alpha") {
-						timelines.push(readTimeline1(timelineMap, new AlphaTimeline(timelineMap.length, timelineMap.length, slotIndex), 0, 1));
+						timelines.push(readTimeline1(timelineMap, new AlphaTimeline(frames, frames, slotIndex), 0, 1));
 					} else if (timelineName == "rgba2") {
-						let timeline = new RGBA2Timeline(timelineMap.length, timelineMap.length * 7, slotIndex);
+						let timeline = new RGBA2Timeline(frames, frames * 7, slotIndex);
 
 						let keyMap = timelineMap[0];
 						let time = getValue(keyMap, "time", 0);
@@ -544,7 +545,7 @@ export class SkeletonJson {
 						timelines.push(timeline);
 
 					} else if (timelineName == "rgb2") {
-						let timeline = new RGB2Timeline(timelineMap.length, timelineMap.length * 6, slotIndex);
+						let timeline = new RGB2Timeline(frames, frames * 6, slotIndex);
 
 						let keyMap = timelineMap[0];
 						let time = getValue(keyMap, "time", 0);
@@ -586,39 +587,40 @@ export class SkeletonJson {
 		if (map.bones) {
 			for (let boneName in map.bones) {
 				let boneMap = map.bones[boneName];
-				let boneIndex = skeletonData.findBoneIndex(boneName);
+				let boneIndex = skeletonData.findBone(boneName).index;
 				for (let timelineName in boneMap) {
 					let timelineMap = boneMap[timelineName];
-					if (timelineMap.length == 0) continue;
+					let frames = timelineMap.length;
+					if (frames == 0) continue;
 
 					if (timelineName === "rotate") {
-						timelines.push(readTimeline1(timelineMap, new RotateTimeline(timelineMap.length, timelineMap.length, boneIndex), 0, 1));
+						timelines.push(readTimeline1(timelineMap, new RotateTimeline(frames, frames, boneIndex), 0, 1));
 					} else if (timelineName === "translate") {
-						let timeline = new TranslateTimeline(timelineMap.length, timelineMap.length << 1, boneIndex);
+						let timeline = new TranslateTimeline(frames, frames << 1, boneIndex);
 						timelines.push(readTimeline2(timelineMap, timeline, "x", "y", 0, scale));
 					} else if (timelineName === "translatex") {
-						let timeline = new TranslateXTimeline(timelineMap.length, timelineMap.length, boneIndex);
+						let timeline = new TranslateXTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline1(timelineMap, timeline, 0, scale));
 					} else if (timelineName === "translatey") {
-						let timeline = new TranslateYTimeline(timelineMap.length, timelineMap.length, boneIndex);
+						let timeline = new TranslateYTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline1(timelineMap, timeline, 0, scale));
 					} else if (timelineName === "scale") {
-						let timeline = new ScaleTimeline(timelineMap.length, timelineMap.length << 1, boneIndex);
+						let timeline = new ScaleTimeline(frames, frames << 1, boneIndex);
 						timelines.push(readTimeline2(timelineMap, timeline, "x", "y", 1, 1));
 					} else if (timelineName === "scalex") {
-						let timeline = new ScaleXTimeline(timelineMap.length, timelineMap.length, boneIndex);
+						let timeline = new ScaleXTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline1(timelineMap, timeline, 1, 1));
 					} else if (timelineName === "scaley") {
-						let timeline = new ScaleYTimeline(timelineMap.length, timelineMap.length, boneIndex);
+						let timeline = new ScaleYTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline1(timelineMap, timeline, 1, 1));
 					} else if (timelineName === "shear") {
-						let timeline = new ShearTimeline(timelineMap.length, timelineMap.length << 1, boneIndex);
+						let timeline = new ShearTimeline(frames, frames << 1, boneIndex);
 						timelines.push(readTimeline2(timelineMap, timeline, "x", "y", 0, 1));
 					} else if (timelineName === "shearx") {
-						let timeline = new ShearXTimeline(timelineMap.length, timelineMap.length, boneIndex);
+						let timeline = new ShearXTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline1(timelineMap, timeline, 0, 1));
 					} else if (timelineName === "sheary") {
-						let timeline = new ShearYTimeline(timelineMap.length, timelineMap.length, boneIndex);
+						let timeline = new ShearYTimeline(frames, frames, boneIndex);
 						timelines.push(readTimeline1(timelineMap, timeline, 0, 1));
 					}
 				}
@@ -675,7 +677,7 @@ export class SkeletonJson {
 
 				let constraint = skeletonData.findTransformConstraint(constraintName);
 				let constraintIndex = skeletonData.transformConstraints.indexOf(constraint);
-				let timeline = new TransformConstraintTimeline(timelineMap.length, timelineMap.length << 2, constraintIndex);
+				let timeline = new TransformConstraintTimeline(timelineMap.length, timelineMap.length * 6, constraintIndex);
 
 				let time = getValue(keyMap, "time", 0);
 				let mixRotate = getValue(keyMap, "mixRotate", 1);
@@ -734,14 +736,15 @@ export class SkeletonJson {
 					let keyMap = timelineMap[0];
 					if (!keyMap) continue;
 
+					let frames = timelineMap.length;
 					if (timelineName === "position") {
-						let timeline = new PathConstraintPositionTimeline(timelineMap.length, timelineMap.length, constraintIndex);
+						let timeline = new PathConstraintPositionTimeline(frames, frames, constraintIndex);
 						timelines.push(readTimeline1(timelineMap, timeline, 0, constraint.positionMode == PositionMode.Fixed ? scale : 1));
 					} else if (timelineName === "spacing") {
-						let timeline = new PathConstraintSpacingTimeline(timelineMap.length, timelineMap.length, constraintIndex);
+						let timeline = new PathConstraintSpacingTimeline(frames, frames, constraintIndex);
 						timelines.push(readTimeline1(timelineMap, timeline, 0, constraint.spacingMode == SpacingMode.Length || constraint.spacingMode == SpacingMode.Fixed ? scale : 1));
 					} else if (timelineName === "mix") {
-						let timeline = new PathConstraintMixTimeline(timelineMap.size, timelineMap.size * 3, constraintIndex);
+						let timeline = new PathConstraintMixTimeline(frames, frames * 3, constraintIndex);
 						let time = getValue(keyMap, "time", 0);
 						let mixRotate = getValue(keyMap, "mixRotate", 1);
 						let mixX = getValue(keyMap, "mixX", 1);
@@ -782,7 +785,7 @@ export class SkeletonJson {
 				let skin = skeletonData.findSkin(deformName);
 				for (let slotName in deformMap) {
 					let slotMap = deformMap[slotName];
-					let slotIndex = skeletonData.findSlotIndex(slotName);
+					let slotIndex = skeletonData.findSlot(slotName).index;
 					for (let timelineName in slotMap) {
 						let timelineMap = slotMap[timelineName];
 						let keyMap = timelineMap[0];
@@ -847,7 +850,7 @@ export class SkeletonJson {
 					let originalIndex = 0, unchangedIndex = 0;
 					for (let ii = 0; ii < offsets.length; ii++) {
 						let offsetMap = offsets[ii];
-						let slotIndex = skeletonData.findSlotIndex(offsetMap.slot);
+						let slotIndex = skeletonData.findSlot(offsetMap.slot).indexs;
 						// Collect unchanged items.
 						while (originalIndex != slotIndex)
 							unchanged[unchangedIndex++] = originalIndex++;

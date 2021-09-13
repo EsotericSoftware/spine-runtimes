@@ -61,14 +61,6 @@ function SkeletonData:findBone (boneName)
 	return nil
 end
 
-function SkeletonData:findBoneIndex (boneName)
-	if not boneName then error("boneName cannot be nil.", 2) end
-	for i,bone in ipairs(self.bones) do
-		if bone.name == boneName then return i end
-	end
-	return -1
-end
-
 function SkeletonData:findSlot (slotName)
 	if not slotName then error("slotName cannot be nil.", 2) end
 	return self.nameToSlot[slotName]

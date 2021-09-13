@@ -111,15 +111,6 @@ namespace Spine {
 			return null;
 		}
 
-		/// <returns>-1 if the bone was not found.</returns>
-		public int FindBoneIndex (string boneName) {
-			if (boneName == null) throw new ArgumentNullException("boneName", "boneName cannot be null.");
-			var bones = this.bones.Items;
-			for (int i = 0, n = this.bones.Count; i < n; i++)
-				if (bones[i].name == boneName) return i;
-			return -1;
-		}
-
 		// --- Slots.
 
 		/// <returns>May be null.</returns>
@@ -131,15 +122,6 @@ namespace Spine {
 				if (slot.name == slotName) return slot;
 			}
 			return null;
-		}
-
-		/// <returns>-1 if the slot was not found.</returns>
-		public int FindSlotIndex (string slotName) {
-			if (slotName == null) throw new ArgumentNullException("slotName", "slotName cannot be null.");
-			SlotData[] slots = this.slots.Items;
-			for (int i = 0, n = this.slots.Count; i < n; i++)
-				if (slots[i].name == slotName) return i;
-			return -1;
 		}
 
 		// --- Skins.
@@ -212,15 +194,6 @@ namespace Spine {
 				if (constraint.name.Equals(constraintName)) return constraint;
 			}
 			return null;
-		}
-
-		/// <returns>-1 if the path constraint was not found.</returns>
-		public int FindPathConstraintIndex (string pathConstraintName) {
-			if (pathConstraintName == null) throw new ArgumentNullException("pathConstraintName", "pathConstraintName cannot be null.");
-			PathConstraintData[] pathConstraints = this.pathConstraints.Items;
-			for (int i = 0, n = this.pathConstraints.Count; i < n; i++)
-				if (pathConstraints[i].name.Equals(pathConstraintName)) return i;
-			return -1;
 		}
 
 		// ---

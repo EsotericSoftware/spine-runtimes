@@ -27,7 +27,6 @@ Depending on the test agent build environment, you should build the output solut
 This build step should not execute if the previous step did not successfully complete.
 Again, depending on the test agent build environment, you should have produced an executable.  Run this executable.
 
-
 ## Usage
 Make sure [CMake](https://cmake.org/download/) is installed.
 
@@ -39,7 +38,6 @@ cmake ..
 
 ### Win32 build
 msbuild spine_unit_test.sln /t:spine_unit_test /p:Configuration="Debug" /p:Platform="Win32"
-
 
 ## Licensing
 This Spine Runtime may only be used for personal or internal use, typically to evaluate Spine before purchasing. If you would like to incorporate a Spine Runtime into your applications, distribute software containing a Spine Runtime, or modify a Spine Runtime, then you will need a valid [Spine license](https://esotericsoftware.com/spine-purchase). Please see the [Spine Runtimes Software License](https://github.com/EsotericSoftware/spine-runtimes/blob/master/LICENSE) for detailed information.

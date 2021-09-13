@@ -744,8 +744,7 @@ function SkeletonJson.new (attachmentLoader)
 		local bonesMap = map["bones"]
 		if bonesMap then
 			for boneName,boneMap in pairs(bonesMap) do
-				local boneIndex = skeletonData:findBoneIndex(boneName)
-				if boneIndex == -1 then error("Bone not found: " .. boneName) end
+				local boneIndex = skeletonData:findBone(boneName).index
 				for timelineName,timelineMap in pairs(boneMap) do
 					if not timelineMap then
 					elseif timelineName == "rotate" then
@@ -847,7 +846,7 @@ function SkeletonJson.new (attachmentLoader)
 							break
 						end
 					end
-					local timeline = Animation.TransformConstraintTimeline.new(#timelineMap, #timelineMap * 4, constraintIndex)
+					local timeline = Animation.TransformConstraintTimeline.new(#timelineMap, #timelineMap * 6, constraintIndex)
 					local time = getValue(keyMap, "time", 0)
 					local mixRotate = getValue(keyMap, "mixRotate", 0)
 					local mixX = getValue(keyMap, "mixX", 1)
@@ -962,7 +961,6 @@ function SkeletonJson.new (attachmentLoader)
 				if not skin then error("Skin not found: " .. deformName) end
 				for slotName,slotMap in pairs(deformMap) do
 					local slotIndex = skeletonData:findSlot(slotName).index
-					if slotIndex == -1 then error("Slot not found: " .. slotMap.name) end
 					for timelineName,timelineMap in pairs(slotMap) do
 						local keyMap = timelineMap[1]
 						if keyMap then
@@ -1040,7 +1038,6 @@ function SkeletonJson.new (attachmentLoader)
 					local unchangedIndex = 1
 					for _,offsetMap in ipairs(offsets) do
 						local slotIndex = skeletonData:findSlot(offsetMap["slot"]).index
-						if slotIndex == -1 then error("Slot not found: " .. offsetMap["slot"]) end
 						-- Collect unchanged items.
 						while originalIndex ~= slotIndex do
 							unchanged[unchangedIndex] = originalIndex

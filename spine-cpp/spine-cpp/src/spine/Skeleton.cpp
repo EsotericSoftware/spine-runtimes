@@ -314,16 +314,8 @@ Bone *Skeleton::findBone(const String &boneName) {
 	return ContainerUtil::findWithDataName(_bones, boneName);
 }
 
-int Skeleton::findBoneIndex(const String &boneName) {
-	return ContainerUtil::findIndexWithDataName(_bones, boneName);
-}
-
 Slot *Skeleton::findSlot(const String &slotName) {
 	return ContainerUtil::findWithDataName(_slots, slotName);
-}
-
-int Skeleton::findSlotIndex(const String &slotName) {
-	return ContainerUtil::findIndexWithDataName(_slots, slotName);
 }
 
 void Skeleton::setSkin(const String &skinName) {
@@ -357,7 +349,7 @@ void Skeleton::setSkin(Skin *newSkin) {
 }
 
 Attachment *Skeleton::getAttachment(const String &slotName, const String &attachmentName) {
-	return getAttachment(_data->findSlotIndex(slotName), attachmentName);
+	return getAttachment(_data->findSlot(slotName)->index, attachmentName);
 }
 
 Attachment *Skeleton::getAttachment(int slotIndex, const String &attachmentName) {

@@ -88,13 +88,9 @@ SP_API void spSkeleton_setSlotsToSetupPose(const spSkeleton *self);
 
 /* Returns 0 if the bone was not found. */
 SP_API spBone *spSkeleton_findBone(const spSkeleton *self, const char *boneName);
-/* Returns -1 if the bone was not found. */
-SP_API int spSkeleton_findBoneIndex(const spSkeleton *self, const char *boneName);
 
 /* Returns 0 if the slot was not found. */
 SP_API spSlot *spSkeleton_findSlot(const spSkeleton *self, const char *slotName);
-/* Returns -1 if the slot was not found. */
-SP_API int spSkeleton_findSlotIndex(const spSkeleton *self, const char *slotName);
 
 /* Sets the skin used to look up attachments before looking in the SkeletonData defaultSkin. Attachments from the new skin are
  * attached if the corresponding attachment from the old skin was attached. If there was no old skin, each slot's setup mode
