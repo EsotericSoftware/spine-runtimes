@@ -349,7 +349,7 @@ void Skeleton::setSkin(Skin *newSkin) {
 }
 
 Attachment *Skeleton::getAttachment(const String &slotName, const String &attachmentName) {
-	return getAttachment(_data->findSlot(slotName)->index, attachmentName);
+	return getAttachment(_data->findSlot(slotName)->getIndex(), attachmentName);
 }
 
 Attachment *Skeleton::getAttachment(int slotIndex, const String &attachmentName) {
