@@ -151,10 +151,10 @@ namespace Spine.Unity {
 
 		public void SetRootMotionBone (string name) {
 			var skeleton = skeletonComponent.Skeleton;
-			int index = skeleton.FindBoneIndex(name);
-			if (index >= 0) {
-				this.rootMotionBoneIndex = index;
-				this.rootMotionBone = skeleton.bones.Items[index];
+			Bone bone = skeleton.FindBone(name);
+			if (bone != null) {
+				this.rootMotionBoneIndex = bone.Data.Index;
+				this.rootMotionBone = bone;
 			} else {
 				Debug.Log("Bone named \"" + name + "\" could not be found.");
 				this.rootMotionBoneIndex = 0;

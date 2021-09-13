@@ -99,9 +99,9 @@ namespace Spine.Unity.Editor {
 				if (currentSkin != skeleton.Data.DefaultSkin) DrawPointsInSkin(skeleton.Data.DefaultSkin, skeleton, skeletonTransform);
 				if (currentSkin != null) DrawPointsInSkin(currentSkin, skeleton, skeletonTransform);
 			} else {
-				int slotIndex = skeleton.FindSlotIndex(slotName.stringValue);
-				if (slotIndex >= 0) {
-					var slot = skeleton.Slots.Items[slotIndex];
+				Slot slot = skeleton.FindSlot(slotName.stringValue);
+				if (slot != null) {
+					int slotIndex = slot.Data.Index;
 					var point = skeleton.GetAttachment(slotIndex, pointAttachmentName.stringValue) as PointAttachment;
 					if (point != null) {
 						DrawPointAttachmentWithLabel(point, slot.Bone, skeletonTransform);

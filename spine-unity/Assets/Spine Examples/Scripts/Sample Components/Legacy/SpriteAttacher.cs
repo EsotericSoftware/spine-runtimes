@@ -170,7 +170,7 @@ namespace Spine.Unity.Examples {
 		public static RegionAttachment AddUnitySprite (this SkeletonData skeletonData, string slotName, Sprite sprite, string skinName, Shader shader, bool applyPMA, float rotation = 0f) {
 			RegionAttachment att = applyPMA ? sprite.ToRegionAttachmentPMAClone(shader, rotation: rotation) : sprite.ToRegionAttachment(new Material(shader), rotation);
 
-			var slotIndex = skeletonData.FindSlotIndex(slotName);
+			var slotIndex = skeletonData.FindSlot(slotName).Index;
 			Skin skin = skeletonData.DefaultSkin;
 			if (skinName != "")
 				skin = skeletonData.FindSkin(skinName);

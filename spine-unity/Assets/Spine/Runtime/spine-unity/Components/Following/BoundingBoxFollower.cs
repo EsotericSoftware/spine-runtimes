@@ -118,13 +118,12 @@ namespace Spine.Unity {
 			if (skeleton == null)
 				return;
 			slot = skeleton.FindSlot(slotName);
-			int slotIndex = skeleton.FindSlotIndex(slotName);
-
 			if (slot == null) {
 				if (BoundingBoxFollower.DebugMessages)
 					Debug.LogWarning(string.Format("Slot '{0}' not found for BoundingBoxFollower on '{1}'. (Previous colliders were disposed.)", slotName, this.gameObject.name));
 				return;
 			}
+			int slotIndex = slot.Data.Index;
 
 			int requiredCollidersCount = 0;
 			var colliders = GetComponents<PolygonCollider2D>();

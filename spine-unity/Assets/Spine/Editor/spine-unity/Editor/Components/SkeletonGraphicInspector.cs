@@ -360,7 +360,8 @@ namespace Spine.Unity.Editor {
 				int lastSlot = skeleton.Slots.Count - 1;
 				if (skeleton != null) {
 					for (int i = 0, n = separatorSlotNames.arraySize; i < n; i++) {
-						int index = skeleton.FindSlotIndex(separatorSlotNames.GetArrayElementAtIndex(i).stringValue);
+						string slotName = separatorSlotNames.GetArrayElementAtIndex(i).stringValue;
+						int index = skeleton.Data.FindSlot(slotName).Index;
 						if (index == 0 || index == lastSlot) {
 							hasTerminalSlot = true;
 							break;

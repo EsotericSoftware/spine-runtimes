@@ -252,7 +252,10 @@ namespace Spine.Unity {
 
 		public static Spine.Attachment GetAttachment (string attachmentPath, Spine.SkeletonData skeletonData) {
 			var hierarchy = SpineAttachment.GetHierarchy(attachmentPath);
-			return string.IsNullOrEmpty(hierarchy.name) ? null : skeletonData.FindSkin(hierarchy.skin).GetAttachment(skeletonData.FindSlotIndex(hierarchy.slot), hierarchy.name);
+			return string.IsNullOrEmpty(hierarchy.name) ?
+				null :
+				skeletonData.FindSkin(hierarchy.skin).GetAttachment(
+					skeletonData.FindSlot(hierarchy.slot).Index, hierarchy.name);
 		}
 
 		public static Spine.Attachment GetAttachment (string attachmentPath, SkeletonDataAsset skeletonDataAsset) {

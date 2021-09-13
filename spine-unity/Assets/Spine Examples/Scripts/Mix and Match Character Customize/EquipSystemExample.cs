@@ -67,7 +67,7 @@ namespace Spine.Unity.Examples {
 			EquipHook howToEquip = equippables.Find(x => x.type == equipType);
 
 			var skeletonData = skeletonDataAsset.GetSkeletonData(true);
-			int slotIndex = skeletonData.FindSlotIndex(howToEquip.slot);
+			int slotIndex = skeletonData.FindSlot(howToEquip.slot).Index;
 			var attachment = GenerateAttachmentFromEquipAsset(asset, slotIndex, howToEquip.templateSkin, howToEquip.templateAttachment);
 			target.Equip(slotIndex, howToEquip.templateAttachment, attachment);
 		}

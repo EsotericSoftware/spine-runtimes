@@ -60,11 +60,11 @@ namespace Spine.Unity.Examples {
 			eyeSlot = skeleton.FindSlot(eyeSlotName);
 			mouthSlot = skeleton.FindSlot(mouthSlotName);
 
-			int eyeSlotIndex = skeleton.FindSlotIndex(eyeSlotName);
+			int eyeSlotIndex = skeleton.Data.FindSlot(eyeSlotName).Index;
 			shockEye = skeleton.GetAttachment(eyeSlotIndex, shockEyeName);
 			normalEye = skeleton.GetAttachment(eyeSlotIndex, normalEyeName);
 
-			int mouthSlotIndex = skeleton.FindSlotIndex(mouthSlotName);
+			int mouthSlotIndex = skeleton.Data.FindSlot(mouthSlotName).Index;
 			shockMouth = skeleton.GetAttachment(mouthSlotIndex, shockMouthName);
 			normalMouth = skeleton.GetAttachment(mouthSlotIndex, normalMouthName);
 		}

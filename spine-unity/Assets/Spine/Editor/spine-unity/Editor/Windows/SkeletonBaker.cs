@@ -764,8 +764,7 @@ namespace Spine.Unity.Editor {
 			if (bakeIK) {
 				foreach (IkConstraint i in skeleton.IkConstraints) {
 					foreach (Bone b in i.Bones) {
-						int index = skeleton.FindBoneIndex(b.Data.Name);
-						ignoreRotateTimelineIndexes.Add(index);
+						ignoreRotateTimelineIndexes.Add(b.Data.Index);
 						BakeBoneConstraints(b, animation, clip);
 					}
 				}
@@ -773,8 +772,7 @@ namespace Spine.Unity.Editor {
 
 			foreach (Bone b in skeleton.Bones) {
 				if (!b.Data.TransformMode.InheritsRotation()) {
-					int index = skeleton.FindBoneIndex(b.Data.Name);
-
+					int index = b.Data.Index;
 					if (ignoreRotateTimelineIndexes.Contains(index) == false) {
 						ignoreRotateTimelineIndexes.Add(index);
 						BakeBoneConstraints(b, animation, clip);

@@ -91,7 +91,7 @@ namespace Spine.Unity.Examples {
 			// Step 1.4 Add the remapped clone to the new custom skin.
 
 			// Let's do this for the visor.
-			int visorSlotIndex = skeleton.FindSlotIndex(visorSlot); // You can access GetAttachment and SetAttachment via string, but caching the slotIndex is faster.
+			int visorSlotIndex = skeleton.Data.FindSlot(visorSlot).Index; // You can access GetAttachment and SetAttachment via string, but caching the slotIndex is faster.
 			Attachment templateAttachment = templateSkin.GetAttachment(visorSlotIndex, visorKey); // STEP 1.1
 
 			// Note: Each call to `GetRemappedClone()` with parameter `premultiplyAlpha` set to `true` creates
@@ -100,7 +100,7 @@ namespace Spine.Unity.Examples {
 			customSkin.SetAttachment(visorSlotIndex, visorKey, newAttachment); // STEP 1.4
 
 			// And now for the gun.
-			int gunSlotIndex = skeleton.FindSlotIndex(gunSlot);
+			int gunSlotIndex = skeleton.Data.FindSlot(gunSlot).Index;
 			Attachment templateGun = templateSkin.GetAttachment(gunSlotIndex, gunKey); // STEP 1.1
 			Attachment newGun = templateGun.GetRemappedClone(gunSprite, sourceMaterial, pivotShiftsMeshUVCoords: false); // STEP 1.2 - 1.3
 			if (newGun != null) customSkin.SetAttachment(gunSlotIndex, gunKey, newGun); // STEP 1.4
