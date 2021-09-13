@@ -237,10 +237,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 				}
 			} else {
 				reloadTimer -= delta;
-				if (reloadTimer <= 0) {
-					loadSkeleton(skeletonFile);
-					ui.toast("Reloaded.");
-				}
+				if (reloadTimer <= 0 && loadSkeleton(skeletonFile)) ui.toast("Reloaded.");
 			}
 
 			// Pose and render skeleton.

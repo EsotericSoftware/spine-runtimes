@@ -374,10 +374,7 @@ class SkeletonViewerUI {
 		loadScaleSlider.addListener(new ChangeListener() {
 			public void changed (ChangeEvent event, Actor actor) {
 				loadScaleLabel.setText(Integer.toString((int)(loadScaleSlider.getValue() * 100)) + "%");
-				if (!loadScaleSlider.isDragging()) {
-					viewer.loadSkeleton(viewer.skeletonFile);
-					toast("Reloaded.");
-				}
+				if (!loadScaleSlider.isDragging() && viewer.loadSkeleton(viewer.skeletonFile)) toast("Reloaded.");
 				loadScaleResetButton.setText(loadScaleSlider.getValue() == 1 ? "Reload" : "Reset");
 			}
 		});
@@ -385,8 +382,7 @@ class SkeletonViewerUI {
 			public void changed (ChangeEvent event, Actor actor) {
 				viewer.resetCameraPosition();
 				if (loadScaleSlider.getValue() == 1) {
-					viewer.loadSkeleton(viewer.skeletonFile);
-					toast("Reloaded.");
+					if (viewer.loadSkeleton(viewer.skeletonFile)) toast("Reloaded.");
 				} else
 					loadScaleSlider.setValue(1);
 				loadScaleResetButton.setText("Reload");
