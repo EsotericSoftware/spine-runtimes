@@ -4,6 +4,7 @@
 		"noImplicitAny": true,
 		"preserveConstEnums": true,
 		"sourceMap": true,
+		"inlineSources": true,
 		"esModuleInterop": true,
 		"lib": [
 			"DOM",
