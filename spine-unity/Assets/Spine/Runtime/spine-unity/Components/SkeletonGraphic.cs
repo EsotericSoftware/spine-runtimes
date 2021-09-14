@@ -108,7 +108,7 @@ namespace Spine.Unity {
 					Clear();
 				} else if (skeletonDataAsset.skeletonJSON == null) {
 					Clear();
-				} else if (skeletonDataAsset.GetSkeletonData(true) != skeleton.data) {
+				} else if (skeletonDataAsset.GetSkeletonData(true) != skeleton.Data) {
 					Clear();
 					Initialize(true);
 					if (!allowMultipleCanvasRenderers && (skeletonDataAsset.atlasAssets.Length > 1 || skeletonDataAsset.atlasAssets[0].MaterialCount > 1))
@@ -117,9 +117,9 @@ namespace Spine.Unity {
 					if (freeze) return;
 
 					if (!string.IsNullOrEmpty(initialSkinName)) {
-						var skin = skeleton.data.FindSkin(initialSkinName);
+						var skin = skeleton.Data.FindSkin(initialSkinName);
 						if (skin != null) {
-							if (skin == skeleton.data.defaultSkin)
+							if (skin == skeleton.Data.DefaultSkin)
 								skeleton.SetSkin((Skin)null);
 							else
 								skeleton.SetSkin(skin);
@@ -378,7 +378,7 @@ namespace Spine.Unity {
 				skeleton = value;
 			}
 		}
-		public SkeletonData SkeletonData { get { return skeleton == null ? null : skeleton.data; } }
+		public SkeletonData SkeletonData { get { return skeleton == null ? null : skeleton.Data; } }
 		public bool IsValid { get { return skeleton != null; } }
 
 		public delegate void SkeletonRendererDelegate (SkeletonGraphic skeletonGraphic);

@@ -1,4 +1,4 @@
 ﻿{
 	"name": "spine-unity",
-	"references": []
+	"references": [ "spine-csharp" ]
 }

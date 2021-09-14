@@ -219,7 +219,7 @@ namespace Spine.Unity {
 
 		public void FillStateData () {
 			if (stateData != null) {
-				stateData.defaultMix = defaultMix;
+				stateData.DefaultMix = defaultMix;
 
 				for (int i = 0, n = fromAnimation.Length; i < n; i++) {
 					if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0)

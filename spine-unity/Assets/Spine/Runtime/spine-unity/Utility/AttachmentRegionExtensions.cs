@@ -53,12 +53,12 @@ namespace Spine.Unity.AttachmentTools {
 			// (AtlasAttachmentLoader.cs)
 			attachment.RendererObject = region;
 			attachment.SetUVs(region.u, region.v, region.u2, region.v2, region.degrees);
-			attachment.regionOffsetX = region.offsetX;
-			attachment.regionOffsetY = region.offsetY;
-			attachment.regionWidth = region.width;
-			attachment.regionHeight = region.height;
-			attachment.regionOriginalWidth = region.originalWidth;
-			attachment.regionOriginalHeight = region.originalHeight;
+			attachment.RegionOffsetX = region.offsetX;
+			attachment.RegionOffsetY = region.offsetY;
+			attachment.RegionWidth = region.width;
+			attachment.RegionHeight = region.height;
+			attachment.RegionOriginalWidth = region.originalWidth;
+			attachment.RegionOriginalHeight = region.originalHeight;
 
 			if (updateOffset) attachment.UpdateOffset();
 		}
@@ -74,12 +74,12 @@ namespace Spine.Unity.AttachmentTools {
 			attachment.RegionU2 = region.u2;
 			attachment.RegionV2 = region.v2;
 			attachment.RegionDegrees = region.degrees;
-			attachment.regionOffsetX = region.offsetX;
-			attachment.regionOffsetY = region.offsetY;
-			attachment.regionWidth = region.width;
-			attachment.regionHeight = region.height;
-			attachment.regionOriginalWidth = region.originalWidth;
-			attachment.regionOriginalHeight = region.originalHeight;
+			attachment.RegionOffsetX = region.offsetX;
+			attachment.RegionOffsetY = region.offsetY;
+			attachment.RegionWidth = region.width;
+			attachment.RegionHeight = region.height;
+			attachment.RegionOriginalWidth = region.originalWidth;
+			attachment.RegionOriginalHeight = region.originalHeight;
 
 			if (updateUVs) attachment.UpdateUVs();
 		}
@@ -130,26 +130,26 @@ namespace Spine.Unity.AttachmentTools {
 
 			attachment.RendererObject = region;
 			attachment.SetUVs(region.u, region.v, region.u2, region.v2, region.degrees);
-			attachment.regionOffsetX = region.offsetX;
-			attachment.regionOffsetY = region.offsetY;
-			attachment.regionWidth = region.width;
-			attachment.regionHeight = region.height;
-			attachment.regionOriginalWidth = region.originalWidth;
-			attachment.regionOriginalHeight = region.originalHeight;
+			attachment.RegionOffsetX = region.offsetX;
+			attachment.RegionOffsetY = region.offsetY;
+			attachment.RegionWidth = region.width;
+			attachment.RegionHeight = region.height;
+			attachment.RegionOriginalWidth = region.originalWidth;
+			attachment.RegionOriginalHeight = region.originalHeight;
 
 			attachment.Path = region.name;
-			attachment.scaleX = 1;
-			attachment.scaleY = 1;
-			attachment.rotation = rotation;
+			attachment.ScaleX = 1;
+			attachment.ScaleY = 1;
+			attachment.Rotation = rotation;
 
-			attachment.r = 1;
-			attachment.g = 1;
-			attachment.b = 1;
-			attachment.a = 1;
+			attachment.R = 1;
+			attachment.G = 1;
+			attachment.B = 1;
+			attachment.A = 1;
 
 			// pass OriginalWidth and OriginalHeight because UpdateOffset uses it in its calculation.
-			attachment.width = attachment.regionOriginalWidth * scale;
-			attachment.height = attachment.regionOriginalHeight * scale;
+			attachment.Width = attachment.RegionOriginalWidth * scale;
+			attachment.Height = attachment.RegionOriginalHeight * scale;
 
 			attachment.SetColor(Color.white);
 			attachment.UpdateOffset();
@@ -158,31 +158,31 @@ namespace Spine.Unity.AttachmentTools {
 
 		/// <summary> Sets the scale. Call regionAttachment.UpdateOffset to apply the change.</summary>
 		public static void SetScale (this RegionAttachment regionAttachment, Vector2 scale) {
-			regionAttachment.scaleX = scale.x;
-			regionAttachment.scaleY = scale.y;
+			regionAttachment.ScaleX = scale.x;
+			regionAttachment.ScaleY = scale.y;
 		}
 
 		/// <summary> Sets the scale. Call regionAttachment.UpdateOffset to apply the change.</summary>
 		public static void SetScale (this RegionAttachment regionAttachment, float x, float y) {
-			regionAttachment.scaleX = x;
-			regionAttachment.scaleY = y;
+			regionAttachment.ScaleX = x;
+			regionAttachment.ScaleY = y;
 		}
 
 		/// <summary> Sets the position offset. Call regionAttachment.UpdateOffset to apply the change.</summary>
 		public static void SetPositionOffset (this RegionAttachment regionAttachment, Vector2 offset) {
-			regionAttachment.x = offset.x;
-			regionAttachment.y = offset.y;
+			regionAttachment.X = offset.x;
+			regionAttachment.Y = offset.y;
 		}
 
 		/// <summary> Sets the position offset. Call regionAttachment.UpdateOffset to apply the change.</summary>
 		public static void SetPositionOffset (this RegionAttachment regionAttachment, float x, float y) {
-			regionAttachment.x = x;
-			regionAttachment.y = y;
+			regionAttachment.X = x;
+			regionAttachment.Y = y;
 		}
 
 		/// <summary> Sets the rotation. Call regionAttachment.UpdateOffset to apply the change.</summary>
 		public static void SetRotation (this RegionAttachment regionAttachment, float rotation) {
-			regionAttachment.rotation = rotation;
+			regionAttachment.Rotation = rotation;
 		}
 		#endregion
 	}

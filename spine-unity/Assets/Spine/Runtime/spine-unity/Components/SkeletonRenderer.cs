@@ -582,16 +582,16 @@ namespace Spine.Unity {
 			if (clearExistingSeparators)
 				separatorSlots.Clear();
 
-			var slots = skeleton.slots;
+			var slots = skeleton.Slots;
 			foreach (var slot in slots) {
-				if (slotNamePredicate.Invoke(slot.data.name))
+				if (slotNamePredicate.Invoke(slot.Data.Name))
 					separatorSlots.Add(slot);
 			}
 
 			if (updateStringArray) {
 				var detectedSeparatorNames = new List<string>();
-				foreach (var slot in skeleton.slots) {
-					string slotName = slot.data.name;
+				foreach (var slot in skeleton.Slots) {
+					string slotName = slot.Data.Name;
 					if (slotNamePredicate.Invoke(slotName))
 						detectedSeparatorNames.Add(slotName);
 				}

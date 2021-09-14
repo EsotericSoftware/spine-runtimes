@@ -63,7 +63,7 @@ namespace Spine.Unity {
 
 			var animation = track.Animation;
 			float start = track.AnimationTime;
-			float end = animation.duration;
+			float end = animation.Duration;
 			return GetAnimationRootMotion(start, end, animation);
 		}
 
@@ -112,7 +112,7 @@ namespace Spine.Unity {
 				TrackEntry next = null;
 				while (track != null) {
 					var animation = track.Animation;
-					float start = track.animationLast;
+					float start = track.AnimationLast;
 					float end = track.AnimationTime;
 					var currentDelta = GetAnimationRootMotion(start, end, animation);
 					if (currentDelta != Vector2.zero) {
@@ -122,7 +122,7 @@ namespace Spine.Unity {
 
 					// Traverse mixingFrom chain.
 					next = track;
-					track = track.mixingFrom;
+					track = track.MixingFrom;
 				}
 			}
 			return localDelta;
@@ -132,19 +132,19 @@ namespace Spine.Unity {
 			// Apply mix alpha to the delta position (based on AnimationState.cs).
 			float mix;
 			if (next != null) {
-				if (next.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
+				if (next.MixDuration == 0) { // Single frame mix to undo mixingFrom changes.
 					mix = 1;
 				} else {
-					mix = next.mixTime / next.mixDuration;
+					mix = next.MixTime / next.MixDuration;
 					if (mix > 1) mix = 1;
 				}
-				float mixAndAlpha = track.alpha * next.interruptAlpha * (1 - mix);
+				float mixAndAlpha = track.Alpha * next.InterruptAlpha * (1 - mix);
 				currentDelta *= mixAndAlpha;
 			} else {
-				if (track.mixDuration == 0) {
+				if (track.MixDuration == 0) {
 					mix = 1;
 				} else {
-					mix = track.alpha * (track.mixTime / track.mixDuration);
+					mix = track.Alpha * (track.MixTime / track.MixDuration);
 					if (mix > 1) mix = 1;
 				}
 				currentDelta *= mix;

@@ -80,7 +80,7 @@ namespace Spine.Unity {
 			GatherTopLevelBones();
 			SetRootMotionBone(rootMotionBoneName);
 			if (rootMotionBone != null)
-				initialOffset = new Vector2(rootMotionBone.x, rootMotionBone.y);
+				initialOffset = new Vector2(rootMotionBone.X, rootMotionBone.Y);
 
 			var skeletonAnimation = skeletonComponent as ISkeletonAnimation;
 			if (skeletonAnimation != null) {
@@ -190,7 +190,7 @@ namespace Spine.Unity {
 		}
 
 		public Vector2 GetAnimationRootMotion (Animation animation) {
-			return GetAnimationRootMotion(0, animation.duration, animation);
+			return GetAnimationRootMotion(0, animation.Duration, animation);
 		}
 
 		public Vector2 GetAnimationRootMotion (float startTime, float endTime,
@@ -207,7 +207,7 @@ namespace Spine.Unity {
 			RootMotionInfo rootMotion = new RootMotionInfo();
 			var timeline = animation.FindTranslateTimelineForBone(rootMotionBoneIndex);
 			if (timeline != null) {
-				float duration = animation.duration;
+				float duration = animation.Duration;
 				float mid = duration * 0.5f;
 				rootMotion.start = timeline.Evaluate(0);
 				rootMotion.current = timeline.Evaluate(currentTime);
@@ -223,7 +223,7 @@ namespace Spine.Unity {
 
 			Vector2 currentDelta;
 			if (startTime > endTime) // Looped
-				currentDelta = (timeline.Evaluate(animation.duration) - timeline.Evaluate(startTime))
+				currentDelta = (timeline.Evaluate(animation.Duration) - timeline.Evaluate(startTime))
 					+ (timeline.Evaluate(endTime) - timeline.Evaluate(0));
 			else if (startTime != endTime) // Non-looped
 				currentDelta = timeline.Evaluate(endTime) - timeline.Evaluate(startTime);
@@ -280,7 +280,7 @@ namespace Spine.Unity {
 
 			parentBoneScale = Vector2.one;
 			Bone scaleBone = rootMotionBone;
-			while ((scaleBone = scaleBone.parent) != null) {
+			while ((scaleBone = scaleBone.Parent) != null) {
 				parentBoneScale.x *= scaleBone.ScaleX;
 				parentBoneScale.y *= scaleBone.ScaleY;
 			}
@@ -313,13 +313,13 @@ namespace Spine.Unity {
 			var skeleton = skeletonComponent.Skeleton;
 			foreach (var topLevelBone in topLevelBones) {
 				if (topLevelBone == rootMotionBone) {
-					if (transformPositionX) topLevelBone.x = displacementSkeletonSpace.x / skeleton.ScaleX;
-					if (transformPositionY) topLevelBone.y = displacementSkeletonSpace.y / skeleton.ScaleY;
+					if (transformPositionX) topLevelBone.X = displacementSkeletonSpace.x / skeleton.ScaleX;
+					if (transformPositionY) topLevelBone.Y = displacementSkeletonSpace.y / skeleton.ScaleY;
 				} else {
-					float offsetX = (initialOffset.x - rootMotionBone.x) * parentBoneScale.x;
-					float offsetY = (initialOffset.y - rootMotionBone.y) * parentBoneScale.y;
-					if (transformPositionX) topLevelBone.x = (displacementSkeletonSpace.x / skeleton.ScaleX) + offsetX;
-					if (transformPositionY) topLevelBone.y = (displacementSkeletonSpace.y / skeleton.ScaleY) + offsetY;
+					float offsetX = (initialOffset.x - rootMotionBone.X) * parentBoneScale.x;
+					float offsetY = (initialOffset.y - rootMotionBone.Y) * parentBoneScale.y;
+					if (transformPositionX) topLevelBone.X = (displacementSkeletonSpace.x / skeleton.ScaleX) + offsetX;
+					if (transformPositionY) topLevelBone.Y = (displacementSkeletonSpace.y / skeleton.ScaleY) + offsetY;
 				}
 			}
 		}

@@ -47,7 +47,7 @@ namespace Spine.Unity {
 
 		#region BoundingBoxAttachment
 		public static PolygonCollider2D AddBoundingBoxGameObject (Skeleton skeleton, string skinName, string slotName, string attachmentName, Transform parent, bool isTrigger = true) {
-			Skin skin = string.IsNullOrEmpty(skinName) ? skeleton.data.defaultSkin : skeleton.data.FindSkin(skinName);
+			Skin skin = string.IsNullOrEmpty(skinName) ? skeleton.Data.DefaultSkin : skeleton.Data.FindSkin(skinName);
 			if (skin == null) {
 				Debug.LogError("Skin " + skinName + " not found!");
 				return null;
@@ -55,7 +55,7 @@ namespace Spine.Unity {
 
 			var attachment = skin.GetAttachment(skeleton.Data.FindSlot(slotName).Index, attachmentName);
 			if (attachment == null) {
-				Debug.LogFormat("Attachment in slot '{0}' named '{1}' not found in skin '{2}'.", slotName, attachmentName, skin.name);
+				Debug.LogFormat("Attachment in slot '{0}' named '{1}' not found in skin '{2}'.", slotName, attachmentName, skin.Name);
 				return null;
 			}
 
@@ -310,11 +310,11 @@ namespace Spine.Unity {
 				var constraintTargets = new List<System.Object>();
 				var ikConstraints = skeleton.IkConstraints;
 				for (int i = 0, n = ikConstraints.Count; i < n; i++)
-					constraintTargets.Add(ikConstraints.Items[i].target);
+					constraintTargets.Add(ikConstraints.Items[i].Target);
 
 				var transformConstraints = skeleton.TransformConstraints;
 				for (int i = 0, n = transformConstraints.Count; i < n; i++)
-					constraintTargets.Add(transformConstraints.Items[i].target);
+					constraintTargets.Add(transformConstraints.Items[i].Target);
 
 				var boneComponents = this.boneComponents;
 				for (int i = 0, n = boneComponents.Count; i < n; i++) {
@@ -456,7 +456,7 @@ namespace Spine.Unity {
 			if (mode == SkeletonUtilityBone.Mode.Override) {
 				if (rot) goTransform.localRotation = Quaternion.Euler(0, 0, b.bone.AppliedRotation);
 				if (pos) goTransform.localPosition = new Vector3(b.bone.X * positionScale, b.bone.Y * positionScale, 0);
-				goTransform.localScale = new Vector3(b.bone.scaleX, b.bone.scaleY, 0);
+				goTransform.localScale = new Vector3(b.bone.ScaleX, b.bone.ScaleY, 0);
 			}
 
 			return go;

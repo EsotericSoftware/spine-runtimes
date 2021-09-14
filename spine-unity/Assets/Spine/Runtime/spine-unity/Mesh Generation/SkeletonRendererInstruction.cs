@@ -92,11 +92,11 @@ namespace Spine.Unity {
 			attachments.Resize(attachmentCount);
 			var attachmentsItems = attachments.Items;
 
-			var drawOrderItems = instructionsItems[0].skeleton.drawOrder.Items;
+			var drawOrderItems = instructionsItems[0].skeleton.DrawOrder.Items;
 			for (int i = 0; i < attachmentCount; i++) {
 				Slot slot = drawOrderItems[startSlot + i];
-				if (!slot.bone.active) continue;
-				attachmentsItems[i] = slot.attachment;
+				if (!slot.Bone.Active) continue;
+				attachmentsItems[i] = slot.Attachment;
 			}
 
 #endif

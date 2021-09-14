@@ -55,15 +55,15 @@ namespace Spine.Unity {
 				var slotsItems = skeletonData.Slots.Items;
 				for (int slotIndex = 0, slotCount = skeletonData.Slots.Count; slotIndex < slotCount; slotIndex++) {
 					var slot = slotsItems[slotIndex];
-					if (slot.blendMode == BlendMode.Normal) continue;
-					if (!includeAdditiveSlots && slot.blendMode == BlendMode.Additive) continue;
+					if (slot.BlendMode == BlendMode.Normal) continue;
+					if (!includeAdditiveSlots && slot.BlendMode == BlendMode.Additive) continue;
 
 					entryBuffer.Clear();
 					foreach (var skin in skeletonData.Skins)
 						skin.GetAttachments(slotIndex, entryBuffer);
 
 					Material templateMaterial = null;
-					switch (slot.blendMode) {
+					switch (slot.BlendMode) {
 					case BlendMode.Multiply:
 						templateMaterial = multiplyTemplate;
 						break;

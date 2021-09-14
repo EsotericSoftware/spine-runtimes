@@ -1139,6 +1139,8 @@ namespace Spine {
 		/// </summary>
 		public float Alpha { get { return alpha; } set { alpha = value; } }
 
+		public float InterruptAlpha { get { return interruptAlpha; } }
+
 		/// <summary>
 		/// When the mix percentage (<see cref="TrackEntry.MixTime"/> / <see cref="TrackEntry.MixDuration"/>) is less than the
 		/// <code>EventThreshold</code>, event timelines are applied while this animation is being mixed out. Defaults to 0, so event
@@ -1256,6 +1258,14 @@ namespace Spine {
 
 		override public string ToString () {
 			return animation == null ? "<none>" : animation.name;
+		}
+
+		// Note: This method is required by SpineAnimationStateMixerBehaviour,
+		// which is part of the timeline extension package. Thus the internal member variable
+		// nextTrackLast is not accessible. We favor providing this method
+		// over exposing nextTrackLast as public property, which would rather confuse users.
+		public void AllowImmediateQueue () {
+			if (nextTrackLast < 0) nextTrackLast = 0;
 		}
 	}
 

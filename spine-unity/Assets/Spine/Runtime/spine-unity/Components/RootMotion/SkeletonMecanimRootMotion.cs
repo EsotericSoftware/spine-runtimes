@@ -69,7 +69,7 @@ namespace Spine.Unity {
 				return Vector2.zero;
 
 			float start = time;
-			float end = animation.duration;
+			float end = animation.Duration;
 			return GetAnimationRootMotion(start, end, animation);
 		}
 

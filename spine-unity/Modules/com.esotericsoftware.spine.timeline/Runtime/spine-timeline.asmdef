@@ -2,6 +2,7 @@
     "name": "spine-timeline",
     "references": [
         "spine-unity",
+        "spine-csharp",
         "Unity.Timeline"
     ],
     "optionalUnityReferences": [],

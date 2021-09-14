@@ -76,8 +76,8 @@ namespace Spine.Unity {
 			var slotsItems = skeletonData.Slots.Items;
 			for (int slotIndex = 0, slotCount = skeletonData.Slots.Count; slotIndex < slotCount; slotIndex++) {
 				var slot = slotsItems[slotIndex];
-				if (slot.blendMode == BlendMode.Normal) continue;
-				if (!applyAdditiveMaterial && slot.blendMode == BlendMode.Additive) continue;
+				if (slot.BlendMode == BlendMode.Normal) continue;
+				if (!applyAdditiveMaterial && slot.BlendMode == BlendMode.Additive) continue;
 
 				skinEntries.Clear();
 				foreach (var skin in skeletonData.Skins)
@@ -102,11 +102,11 @@ namespace Spine.Unity {
 			var slotsItems = skeletonData.Slots.Items;
 			for (int slotIndex = 0, slotCount = skeletonData.Slots.Count; slotIndex < slotCount; slotIndex++) {
 				var slot = slotsItems[slotIndex];
-				if (slot.blendMode == BlendMode.Normal) continue;
-				if (!applyAdditiveMaterial && slot.blendMode == BlendMode.Additive) continue;
+				if (slot.BlendMode == BlendMode.Normal) continue;
+				if (!applyAdditiveMaterial && slot.BlendMode == BlendMode.Additive) continue;
 
 				List<ReplacementMaterial> replacementMaterials = null;
-				switch (slot.blendMode) {
+				switch (slot.BlendMode) {
 				case BlendMode.Multiply:
 					replacementMaterials = multiplyMaterials;
 					break;

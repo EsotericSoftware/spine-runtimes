@@ -97,13 +97,10 @@ namespace Spine.Unity {
 				return;
 
 			// Don't reinitialize if the setup did not change.
-			if (!overwrite
-				&&
-				colliderTable.Count > 0 && slot != null         // Slot is set and colliders already populated.
-				&&
-				skeletonRenderer.skeleton == slot.Skeleton      // Skeleton object did not change.
-				&&
-				slotName == slot.data.name                      // Slot object did not change.
+			if (!overwrite &&
+				colliderTable.Count > 0 && slot != null &&    // Slot is set and colliders already populated.
+				skeletonRenderer.skeleton == slot.Skeleton && // Skeleton object did not change.
+				slotName == slot.Data.Name                    // Slot object did not change.
 			)
 				return;
 
@@ -131,8 +128,8 @@ namespace Spine.Unity {
 				foreach (var skin in skeleton.Data.Skins)
 					AddCollidersForSkin(skin, slotIndex, colliders, ref requiredCollidersCount);
 
-				if (skeleton.skin != null)
-					AddCollidersForSkin(skeleton.skin, slotIndex, colliders, ref requiredCollidersCount);
+				if (skeleton.Skin != null)
+					AddCollidersForSkin(skeleton.Skin, slotIndex, colliders, ref requiredCollidersCount);
 			}
 			DisposeExcessCollidersAfter(requiredCollidersCount);
 

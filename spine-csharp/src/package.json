@@ -1,7 +1,7 @@
 {
-	"name": "com.esotericsoftware.spine.spine-unity",
-	"displayName": "spine-unity Runtime",
-	"description": "This plugin provides the spine-unity runtime core.",
+	"name": "com.esotericsoftware.spine.spine-csharp",
+	"displayName": "spine-csharp Runtime",
+	"description": "This plugin provides the spine-csharp core runtime.",
 	"version": "4.0.0",
 	"unity": "2018.3",
 	"author": {
@@ -10,15 +10,17 @@
 		"url": "http://esotericsoftware.com/"
 	},
 	"dependencies": {
-		"com.esotericsoftware.spine.spine-csharp": "4.0.0"
 	},
+	"files": [
+		"src"
+	],
 	"repository": {
 		"type": "git",
 		"url": "git@github.com:EsotericSoftware/spine-runtimes.git"
 	},
 	"keywords": [
 		"spine",
-		"spine-unity",
+		"spine-csharp",
 		"runtimes",
 		"2d",
 		"skeletal",

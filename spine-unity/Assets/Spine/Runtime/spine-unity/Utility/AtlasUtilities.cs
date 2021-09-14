@@ -497,12 +497,12 @@ namespace Spine.Unity.AttachmentTools {
 			var skinAttachments = o.Attachments;
 			var newSkin = new Skin(newName);
 
-			newSkin.bones.AddRange(o.bones);
-			newSkin.constraints.AddRange(o.constraints);
+			newSkin.Bones.AddRange(o.Bones);
+			newSkin.Constraints.AddRange(o.Constraints);
 
 			inoutAttachments.Clear();
 			foreach (var entry in o.Attachments) {
-				inoutAttachments.Add(entry.attachment);
+				inoutAttachments.Add(entry.Attachment);
 			}
 			GetRepackedAttachments(inoutAttachments, inoutAttachments, materialPropertySource, out outputMaterial, out outputTexture,
 				maxAtlasSize, padding, textureFormat, mipmaps, newName, clearCache, useOriginalNonrenderables,

@@ -34,11 +34,11 @@ namespace Spine.Unity {
 
 		#region Colors
 		const float ByteToFloat = 1f / 255f;
-		public static Color GetColor (this Skeleton s) { return new Color(s.r, s.g, s.b, s.a); }
-		public static Color GetColor (this RegionAttachment a) { return new Color(a.r, a.g, a.b, a.a); }
-		public static Color GetColor (this MeshAttachment a) { return new Color(a.r, a.g, a.b, a.a); }
-		public static Color GetColor (this Slot s) { return new Color(s.r, s.g, s.b, s.a); }
-		public static Color GetColorTintBlack (this Slot s) { return new Color(s.r2, s.g2, s.b2, 1f); }
+		public static Color GetColor (this Skeleton s) { return new Color(s.R, s.G, s.B, s.A); }
+		public static Color GetColor (this RegionAttachment a) { return new Color(a.R, a.G, a.B, a.A); }
+		public static Color GetColor (this MeshAttachment a) { return new Color(a.R, a.G, a.B, a.A); }
+		public static Color GetColor (this Slot s) { return new Color(s.R, s.G, s.B, s.A); }
+		public static Color GetColorTintBlack (this Slot s) { return new Color(s.R2, s.G2, s.B2, 1f); }
 
 		public static void SetColor (this Skeleton skeleton, Color color) {
 			skeleton.A = color.a;
@@ -107,12 +107,12 @@ namespace Spine.Unity {
 		/// <summary>Gets the internal bone matrix as a Unity bonespace-to-skeletonspace transformation matrix.</summary>
 		public static Matrix4x4 GetMatrix4x4 (this Bone bone) {
 			return new Matrix4x4 {
-				m00 = bone.a,
-				m01 = bone.b,
-				m03 = bone.worldX,
-				m10 = bone.c,
-				m11 = bone.d,
-				m13 = bone.worldY,
+				m00 = bone.A,
+				m01 = bone.B,
+				m03 = bone.WorldX,
+				m10 = bone.C,
+				m11 = bone.D,
+				m13 = bone.WorldY,
 				m33 = 1
 			};
 		}
@@ -133,12 +133,12 @@ namespace Spine.Unity {
 
 		/// <summary>Gets the bone's local X and Y as a Vector2.</summary>
 		public static Vector2 GetLocalPosition (this Bone bone) {
-			return new Vector2(bone.x, bone.y);
+			return new Vector2(bone.X, bone.Y);
 		}
 
 		/// <summary>Gets the position of the bone in Skeleton-space.</summary>
 		public static Vector2 GetSkeletonSpacePosition (this Bone bone) {
-			return new Vector2(bone.worldX, bone.worldY);
+			return new Vector2(bone.WorldX, bone.WorldY);
 		}
 
 		/// <summary>Gets a local offset from the bone and converts it into Skeleton-space.</summary>
@@ -150,22 +150,22 @@ namespace Spine.Unity {
 
 		/// <summary>Gets the bone's Unity World position using its Spine GameObject Transform. UpdateWorldTransform needs to have been called for this to return the correct, updated value.</summary>
 		public static Vector3 GetWorldPosition (this Bone bone, UnityEngine.Transform spineGameObjectTransform) {
-			return spineGameObjectTransform.TransformPoint(new Vector3(bone.worldX, bone.worldY));
+			return spineGameObjectTransform.TransformPoint(new Vector3(bone.WorldX, bone.WorldY));
 		}
 
 		public static Vector3 GetWorldPosition (this Bone bone, UnityEngine.Transform spineGameObjectTransform, float positionScale) {
-			return spineGameObjectTransform.TransformPoint(new Vector3(bone.worldX * positionScale, bone.worldY * positionScale));
+			return spineGameObjectTransform.TransformPoint(new Vector3(bone.WorldX * positionScale, bone.WorldY * positionScale));
 		}
 
 		/// <summary>Gets a skeleton space UnityEngine.Quaternion representation of bone.WorldRotationX.</summary>
 		public static Quaternion GetQuaternion (this Bone bone) {
-			var halfRotation = Mathf.Atan2(bone.c, bone.a) * 0.5f;
+			var halfRotation = Mathf.Atan2(bone.C, bone.A) * 0.5f;
 			return new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation));
 		}
 
 		/// <summary>Gets a bone-local space UnityEngine.Quaternion representation of bone.rotation.</summary>
 		public static Quaternion GetLocalQuaternion (this Bone bone) {
-			var halfRotation = bone.rotation * Mathf.Deg2Rad * 0.5f;
+			var halfRotation = bone.Rotation * Mathf.Deg2Rad * 0.5f;
 			return new Quaternion(0, 0, Mathf.Sin(halfRotation), Mathf.Cos(halfRotation));
 		}
 
@@ -176,7 +176,7 @@ namespace Spine.Unity {
 
 		/// <summary>Calculates a 2x2 Transformation Matrix that can convert a skeleton-space position to a bone-local position.</summary>
 		public static void GetWorldToLocalMatrix (this Bone bone, out float ia, out float ib, out float ic, out float id) {
-			float a = bone.a, b = bone.b, c = bone.c, d = bone.d;
+			float a = bone.A, b = bone.B, c = bone.C, d = bone.D;
 			float invDet = 1 / (a * d - b * c);
 			ia = invDet * d;
 			ib = invDet * -b;
@@ -194,11 +194,11 @@ namespace Spine.Unity {
 		/// <summary>Sets the skeleton-space position of a bone.</summary>
 		/// <returns>The local position in its parent bone space, or in skeleton space if it is the root bone.</returns>
 		public static Vector2 SetPositionSkeletonSpace (this Bone bone, Vector2 skeletonSpacePosition) {
-			if (bone.parent == null) { // root bone
+			if (bone.Parent == null) { // root bone
 				bone.SetLocalPosition(skeletonSpacePosition);
 				return skeletonSpacePosition;
 			} else {
-				var parent = bone.parent;
+				var parent = bone.Parent;
 				Vector2 parentLocal = parent.WorldToLocal(skeletonSpacePosition);
 				bone.SetLocalPosition(parentLocal);
 				return parentLocal;
@@ -228,13 +228,13 @@ namespace Spine.Unity {
 		/// <param name="slot">Slot where the attachment belongs.</param>
 		/// <param name="buffer">Correctly-sized buffer. Use attachment's .WorldVerticesLength to get the correct size. If null, a new Vector2[] of the correct size will be allocated.</param>
 		public static Vector2[] GetLocalVertices (this VertexAttachment va, Slot slot, Vector2[] buffer) {
-			int floatsCount = va.worldVerticesLength;
+			int floatsCount = va.WorldVerticesLength;
 			int bufferTargetSize = floatsCount >> 1;
 			buffer = buffer ?? new Vector2[bufferTargetSize];
 			if (buffer.Length < bufferTargetSize) throw new System.ArgumentException(string.Format("Vector2 buffer too small. {0} requires an array of size {1}. Use the attachment's .WorldVerticesLength to get the correct size.", va.Name, floatsCount), "buffer");
 
-			if (va.bones == null) {
-				var localVerts = va.vertices;
+			if (va.Bones == null) {
+				var localVerts = va.Vertices;
 				for (int i = 0; i < bufferTargetSize; i++) {
 					int j = i * 2;
 					buffer[i] = new Vector2(localVerts[j], localVerts[j + 1]);
@@ -243,8 +243,8 @@ namespace Spine.Unity {
 				var floats = new float[floatsCount];
 				va.ComputeWorldVertices(slot, floats);
 
-				Bone sb = slot.bone;
-				float ia, ib, ic, id, bwx = sb.worldX, bwy = sb.worldY;
+				Bone sb = slot.Bone;
+				float ia, ib, ic, id, bwx = sb.WorldX, bwy = sb.WorldY;
 				sb.GetWorldToLocalMatrix(out ia, out ib, out ic, out id);
 
 				for (int i = 0; i < bufferTargetSize; i++) {
@@ -262,7 +262,7 @@ namespace Spine.Unity {
 		/// <param name="slot">Slot where the attachment belongs.</param>
 		/// <param name="buffer">Correctly-sized buffer. Use attachment's .WorldVerticesLength to get the correct size. If null, a new Vector2[] of the correct size will be allocated.</param>
 		public static Vector2[] GetWorldVertices (this VertexAttachment a, Slot slot, Vector2[] buffer) {
-			int worldVertsLength = a.worldVerticesLength;
+			int worldVertsLength = a.WorldVerticesLength;
 			int bufferTargetSize = worldVertsLength >> 1;
 			buffer = buffer ?? new Vector2[bufferTargetSize];
 			if (buffer.Length < bufferTargetSize) throw new System.ArgumentException(string.Format("Vector2 buffer too small. {0} requires an array of size {1}. Use the attachment's .WorldVerticesLength to get the correct size.", a.Name, worldVertsLength), "buffer");
@@ -282,7 +282,7 @@ namespace Spine.Unity {
 		public static Vector3 GetWorldPosition (this PointAttachment attachment, Slot slot, Transform spineGameObjectTransform) {
 			Vector3 skeletonSpacePosition;
 			skeletonSpacePosition.z = 0;
-			attachment.ComputeWorldPosition(slot.bone, out skeletonSpacePosition.x, out skeletonSpacePosition.y);
+			attachment.ComputeWorldPosition(slot.Bone, out skeletonSpacePosition.x, out skeletonSpacePosition.y);
 			return spineGameObjectTransform.TransformPoint(skeletonSpacePosition);
 		}
 
@@ -310,29 +310,29 @@ namespace Spine {
 				return default(BoneMatrix);
 
 			// End condition: isRootBone
-			if (boneData.parent == null)
+			if (boneData.Parent == null)
 				return GetInheritedInternal(boneData, default(BoneMatrix));
 
-			BoneMatrix result = CalculateSetupWorld(boneData.parent);
+			BoneMatrix result = CalculateSetupWorld(boneData.Parent);
 			return GetInheritedInternal(boneData, result);
 		}
 
 		static BoneMatrix GetInheritedInternal (BoneData boneData, BoneMatrix parentMatrix) {
-			var parent = boneData.parent;
+			var parent = boneData.Parent;
 			if (parent == null) return new BoneMatrix(boneData); // isRootBone
 
 			float pa = parentMatrix.a, pb = parentMatrix.b, pc = parentMatrix.c, pd = parentMatrix.d;
 			BoneMatrix result = default(BoneMatrix);
-			result.x = pa * boneData.x + pb * boneData.y + parentMatrix.x;
-			result.y = pc * boneData.x + pd * boneData.y + parentMatrix.y;
+			result.x = pa * boneData.X + pb * boneData.Y + parentMatrix.x;
+			result.y = pc * boneData.X + pd * boneData.Y + parentMatrix.y;
 
-			switch (boneData.transformMode) {
+			switch (boneData.TransformMode) {
 			case TransformMode.Normal: {
-				float rotationY = boneData.rotation + 90 + boneData.shearY;
-				float la = MathUtils.CosDeg(boneData.rotation + boneData.shearX) * boneData.scaleX;
-				float lb = MathUtils.CosDeg(rotationY) * boneData.scaleY;
-				float lc = MathUtils.SinDeg(boneData.rotation + boneData.shearX) * boneData.scaleX;
-				float ld = MathUtils.SinDeg(rotationY) * boneData.scaleY;
+				float rotationY = boneData.Rotation + 90 + boneData.ShearY;
+				float la = MathUtils.CosDeg(boneData.Rotation + boneData.ShearX) * boneData.ScaleX;
+				float lb = MathUtils.CosDeg(rotationY) * boneData.ScaleY;
+				float lc = MathUtils.SinDeg(boneData.Rotation + boneData.ShearX) * boneData.ScaleX;
+				float ld = MathUtils.SinDeg(rotationY) * boneData.ScaleY;
 				result.a = pa * la + pb * lc;
 				result.b = pa * lb + pb * ld;
 				result.c = pc * la + pd * lc;
@@ -340,11 +340,11 @@ namespace Spine {
 				break;
 			}
 			case TransformMode.OnlyTranslation: {
-				float rotationY = boneData.rotation + 90 + boneData.shearY;
-				result.a = MathUtils.CosDeg(boneData.rotation + boneData.shearX) * boneData.scaleX;
-				result.b = MathUtils.CosDeg(rotationY) * boneData.scaleY;
-				result.c = MathUtils.SinDeg(boneData.rotation + boneData.shearX) * boneData.scaleX;
-				result.d = MathUtils.SinDeg(rotationY) * boneData.scaleY;
+				float rotationY = boneData.Rotation + 90 + boneData.ShearY;
+				result.a = MathUtils.CosDeg(boneData.Rotation + boneData.ShearX) * boneData.ScaleX;
+				result.b = MathUtils.CosDeg(rotationY) * boneData.ScaleY;
+				result.c = MathUtils.SinDeg(boneData.Rotation + boneData.ShearX) * boneData.ScaleX;
+				result.d = MathUtils.SinDeg(rotationY) * boneData.ScaleY;
 				break;
 			}
 			case TransformMode.NoRotationOrReflection: {
@@ -359,12 +359,12 @@ namespace Spine {
 					pc = 0;
 					prx = 90 - MathUtils.Atan2(pd, pb) * MathUtils.RadDeg;
 				}
-				float rx = boneData.rotation + boneData.shearX - prx;
-				float ry = boneData.rotation + boneData.shearY - prx + 90;
-				float la = MathUtils.CosDeg(rx) * boneData.scaleX;
-				float lb = MathUtils.CosDeg(ry) * boneData.scaleY;
-				float lc = MathUtils.SinDeg(rx) * boneData.scaleX;
-				float ld = MathUtils.SinDeg(ry) * boneData.scaleY;
+				float rx = boneData.Rotation + boneData.ShearX - prx;
+				float ry = boneData.Rotation + boneData.ShearY - prx + 90;
+				float la = MathUtils.CosDeg(rx) * boneData.ScaleX;
+				float lb = MathUtils.CosDeg(ry) * boneData.ScaleY;
+				float lc = MathUtils.SinDeg(rx) * boneData.ScaleX;
+				float ld = MathUtils.SinDeg(ry) * boneData.ScaleY;
 				result.a = pa * la - pb * lc;
 				result.b = pa * lb - pb * ld;
 				result.c = pc * la + pd * lc;
@@ -373,7 +373,7 @@ namespace Spine {
 			}
 			case TransformMode.NoScale:
 			case TransformMode.NoScaleOrReflection: {
-				float cos = MathUtils.CosDeg(boneData.rotation), sin = MathUtils.SinDeg(boneData.rotation);
+				float cos = MathUtils.CosDeg(boneData.Rotation), sin = MathUtils.SinDeg(boneData.Rotation);
 				float za = pa * cos + pb * sin;
 				float zc = pc * cos + pd * sin;
 				float s = (float)Math.Sqrt(za * za + zc * zc);
@@ -385,11 +385,11 @@ namespace Spine {
 				float r = MathUtils.PI / 2 + MathUtils.Atan2(zc, za);
 				float zb = MathUtils.Cos(r) * s;
 				float zd = MathUtils.Sin(r) * s;
-				float la = MathUtils.CosDeg(boneData.shearX) * boneData.scaleX;
-				float lb = MathUtils.CosDeg(90 + boneData.shearY) * boneData.scaleY;
-				float lc = MathUtils.SinDeg(boneData.shearX) * boneData.scaleX;
-				float ld = MathUtils.SinDeg(90 + boneData.shearY) * boneData.scaleY;
-				if (boneData.transformMode != TransformMode.NoScaleOrReflection ? pa * pd - pb * pc < 0 : false) {
+				float la = MathUtils.CosDeg(boneData.ShearX) * boneData.ScaleX;
+				float lb = MathUtils.CosDeg(90 + boneData.ShearY) * boneData.ScaleY;
+				float lc = MathUtils.SinDeg(boneData.ShearX) * boneData.ScaleX;
+				float ld = MathUtils.SinDeg(90 + boneData.ShearY) * boneData.ScaleY;
+				if (boneData.TransformMode != TransformMode.NoScaleOrReflection ? pa * pd - pb * pc < 0 : false) {
 					zb = -zb;
 					zd = -zd;
 				}
@@ -406,28 +406,28 @@ namespace Spine {
 
 		/// <summary>Constructor for a local bone matrix based on Setup Pose BoneData.</summary>
 		public BoneMatrix (BoneData boneData) {
-			float rotationY = boneData.rotation + 90 + boneData.shearY;
-			float rotationX = boneData.rotation + boneData.shearX;
+			float rotationY = boneData.Rotation + 90 + boneData.ShearY;
+			float rotationX = boneData.Rotation + boneData.ShearX;
 
-			a = MathUtils.CosDeg(rotationX) * boneData.scaleX;
-			c = MathUtils.SinDeg(rotationX) * boneData.scaleX;
-			b = MathUtils.CosDeg(rotationY) * boneData.scaleY;
-			d = MathUtils.SinDeg(rotationY) * boneData.scaleY;
-			x = boneData.x;
-			y = boneData.y;
+			a = MathUtils.CosDeg(rotationX) * boneData.ScaleX;
+			c = MathUtils.SinDeg(rotationX) * boneData.ScaleX;
+			b = MathUtils.CosDeg(rotationY) * boneData.ScaleY;
+			d = MathUtils.SinDeg(rotationY) * boneData.ScaleY;
+			x = boneData.X;
+			y = boneData.Y;
 		}
 
 		/// <summary>Constructor for a local bone matrix based on a bone instance's current pose.</summary>
 		public BoneMatrix (Bone bone) {
-			float rotationY = bone.rotation + 90 + bone.shearY;
-			float rotationX = bone.rotation + bone.shearX;
+			float rotationY = bone.Rotation + 90 + bone.ShearY;
+			float rotationX = bone.Rotation + bone.ShearX;
 
-			a = MathUtils.CosDeg(rotationX) * bone.scaleX;
-			c = MathUtils.SinDeg(rotationX) * bone.scaleX;
-			b = MathUtils.CosDeg(rotationY) * bone.scaleY;
-			d = MathUtils.SinDeg(rotationY) * bone.scaleY;
-			x = bone.x;
-			y = bone.y;
+			a = MathUtils.CosDeg(rotationX) * bone.ScaleX;
+			c = MathUtils.SinDeg(rotationX) * bone.ScaleX;
+			b = MathUtils.CosDeg(rotationY) * bone.ScaleY;
+			d = MathUtils.SinDeg(rotationY) * bone.ScaleY;
+			x = bone.X;
+			y = bone.Y;
 		}
 
 		public BoneMatrix TransformMatrix (BoneMatrix local) {
@@ -444,7 +444,7 @@ namespace Spine {
 
 	public static class SpineSkeletonExtensions {
 		public static bool IsWeighted (this VertexAttachment va) {
-			return va.bones != null && va.bones.Length > 0;
+			return va.Bones != null && va.Bones.Length > 0;
 		}
 
 		#region Transform Modes
@@ -458,13 +458,5 @@ namespace Spine {
 			return ((int)mode & (1U << ScaleBit)) == 0;
 		}
 		#endregion
-
-		// Note: This extension method is required by SpineAnimationStateMixerBehaviour,
-		// which is part of the timeline extension package. Thus the internal member variable
-		// nextTrackLast is not accessible. We favor providing this extension method
-		// over exposing nextTrackLast as public property, which would rather confuse users.
-		public static void AllowImmediateQueue (this TrackEntry trackEntry) {
-			if (trackEntry.nextTrackLast < 0) trackEntry.nextTrackLast = 0;
-		}
 	}
 }

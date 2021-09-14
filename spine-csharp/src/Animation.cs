@@ -546,6 +546,26 @@ namespace Spine {
 			}
 
 			float x, y;
+			EvaluateCurve(out x, out y, time); // note: reference implementation has code inlined
+
+			switch (blend) {
+			case MixBlend.Setup:
+				bone.x = bone.data.x + x * alpha;
+				bone.y = bone.data.y + y * alpha;
+				break;
+			case MixBlend.First:
+			case MixBlend.Replace:
+				bone.x += (bone.data.x + x - bone.x) * alpha;
+				bone.y += (bone.data.y + y - bone.y) * alpha;
+				break;
+			case MixBlend.Add:
+				bone.x += x * alpha;
+				bone.y += y * alpha;
+				break;
+			}
+		}
+
+		protected void EvaluateCurve (out float x, out float y, float time) {
 			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
 			switch (curveType) {
 			case LINEAR:
@@ -565,21 +585,26 @@ namespace Spine {
 				y = GetBezierValue(time, i, VALUE2, curveType + BEZIER_SIZE - BEZIER);
 				break;
 			}
+		}
 
-			switch (blend) {
-			case MixBlend.Setup:
-				bone.x = bone.data.x + x * alpha;
-				bone.y = bone.data.y + y * alpha;
-				break;
-			case MixBlend.First:
-			case MixBlend.Replace:
-				bone.x += (bone.data.x + x - bone.x) * alpha;
-				bone.y += (bone.data.y + y - bone.y) * alpha;
-				break;
-			case MixBlend.Add:
-				bone.x += x * alpha;
-				bone.y += y * alpha;
-				break;
+		/// <summary>Evaluates the resulting value of a TranslateTimeline at a given time.
+		/// If no SkeletonData is given, values are returned as difference to setup pose
+		/// instead of absolute values.</summary>
+		public void Evaluate (out float outX, out float outY, float time, SkeletonData skeletonData) {
+			outX = outY = 0;
+			if (time < frames[0]) return;
+
+			float x, y;
+			EvaluateCurve(out x, out y, time);
+
+			if (skeletonData == null) {
+				outX = x;
+				outY = y;
+				return;
+			} else {
+				var boneData = skeletonData.bones.Items[boneIndex];
+				outX = x + boneData.x;
+				outY = y + boneData.y;
 			}
 		}
 	}
