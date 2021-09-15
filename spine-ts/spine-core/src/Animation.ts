@@ -622,10 +622,8 @@ export class ScaleTimeline extends CurveTimeline2 implements BoneTimeline {
 						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
 						break;
 					case MixBlend.add:
-						bx = bone.scaleX;
-						by = bone.scaleY;
-						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bone.data.scaleX) * alpha;
-						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - bone.data.scaleY) * alpha;
+						bone.scaleX = (x - bone.data.scaleX) * alpha;
+						bone.scaleY = (y - bone.data.scaleY) * alpha;
 				}
 			} else {
 				switch (blend) {
@@ -643,10 +641,8 @@ export class ScaleTimeline extends CurveTimeline2 implements BoneTimeline {
 						bone.scaleY = by + (y - by) * alpha;
 						break;
 					case MixBlend.add:
-						bx = MathUtils.signum(x);
-						by = MathUtils.signum(y);
-						bone.scaleX = Math.abs(bone.scaleX) * bx + (x - Math.abs(bone.data.scaleX) * bx) * alpha;
-						bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
+						bone.scaleX += (x - bone.data.scaleX) * alpha;
+						bone.scaleY += (y - bone.data.scaleY) * alpha;
 				}
 			}
 		}
@@ -699,8 +695,7 @@ export class ScaleXTimeline extends CurveTimeline1 implements BoneTimeline {
 						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
 						break;
 					case MixBlend.add:
-						bx = bone.scaleX;
-						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bone.data.scaleX) * alpha;
+						bone.scaleX = (x - bone.data.scaleX) * alpha;
 				}
 			} else {
 				switch (blend) {
@@ -714,8 +709,7 @@ export class ScaleXTimeline extends CurveTimeline1 implements BoneTimeline {
 						bone.scaleX = bx + (x - bx) * alpha;
 						break;
 					case MixBlend.add:
-						bx = MathUtils.signum(x);
-						bone.scaleX = Math.abs(bone.scaleX) * bx + (x - Math.abs(bone.data.scaleX) * bx) * alpha;
+						bone.scaleX += (x - bone.data.scaleX) * alpha;
 				}
 			}
 		}
@@ -768,8 +762,7 @@ export class ScaleYTimeline extends CurveTimeline1 implements BoneTimeline {
 						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
 						break;
 					case MixBlend.add:
-						by = bone.scaleY;
-						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - bone.data.scaleY) * alpha;
+						bone.scaleY = (y - bone.data.scaleY) * alpha;
 				}
 			} else {
 				switch (blend) {
@@ -783,8 +776,7 @@ export class ScaleYTimeline extends CurveTimeline1 implements BoneTimeline {
 						bone.scaleY = by + (y - by) * alpha;
 						break;
 					case MixBlend.add:
-						by = MathUtils.signum(y);
-						bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
+						bone.scaleY += (y - bone.data.scaleY) * alpha;
 				}
 			}
 		}

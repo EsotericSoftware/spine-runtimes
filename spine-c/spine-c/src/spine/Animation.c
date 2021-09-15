@@ -655,10 +655,8 @@ void _spScaleTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float la
 					bone->scaleY = by + (ABS(y) * SIGNUM(by) - by) * alpha;
 					break;
 				case SP_MIX_BLEND_ADD:
-					bx = bone->scaleX;
-					by = bone->scaleY;
-					bone->scaleX = bx + (ABS(x) * SIGNUM(bx) - bone->data->scaleX) * alpha;
-					bone->scaleY = by + (ABS(y) * SIGNUM(by) - bone->data->scaleY) * alpha;
+					bone->scaleX = (x - bone->data->scaleX) * alpha;
+					bone->scaleY = (y - bone->data->scaleY) * alpha;
 			}
 		} else {
 			switch (blend) {
@@ -676,10 +674,8 @@ void _spScaleTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float la
 					bone->scaleY = by + (y - by) * alpha;
 					break;
 				case SP_MIX_BLEND_ADD:
-					bx = SIGNUM(x);
-					by = SIGNUM(y);
-					bone->scaleX = ABS(bone->scaleX) * bx + (x - ABS(bone->data->scaleX) * bx) * alpha;
-					bone->scaleY = ABS(bone->scaleY) * by + (y - ABS(bone->data->scaleY) * by) * alpha;
+					bone->scaleX += (x - bone->data->scaleX) * alpha;
+					bone->scaleY += (y - bone->data->scaleY) * alpha;
 			}
 		}
 	}
@@ -752,8 +748,7 @@ void _spScaleXTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float l
 					bone->scaleX = bx + (ABS(x) * SIGNUM(bx) - bx) * alpha;
 					break;
 				case SP_MIX_BLEND_ADD:
-					bx = bone->scaleX;
-					bone->scaleX = bx + (ABS(x) * SIGNUM(bx) - bone->data->scaleX) * alpha;
+					bone->scaleX = (x - bone->data->scaleX) * alpha;
 			}
 		} else {
 			switch (blend) {
@@ -767,8 +762,7 @@ void _spScaleXTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float l
 					bone->scaleX = bx + (x - bx) * alpha;
 					break;
 				case SP_MIX_BLEND_ADD:
-					bx = SIGNUM(x);
-					bone->scaleX = ABS(bone->scaleX) * bx + (x - ABS(bone->data->scaleX) * bx) * alpha;
+					bone->scaleX += (x - bone->data->scaleX) * alpha;
 			}
 		}
 	}
@@ -840,8 +834,7 @@ void _spScaleYTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float l
 					bone->scaleY = by + (ABS(y) * SIGNUM(by) - by) * alpha;
 					break;
 				case SP_MIX_BLEND_ADD:
-					by = bone->scaleY;
-					bone->scaleY = by + (ABS(y) * SIGNUM(by) - bone->data->scaleY) * alpha;
+					bone->scaleY = (y - bone->data->scaleY) * alpha;
 			}
 		} else {
 			switch (blend) {
@@ -855,8 +848,7 @@ void _spScaleYTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float l
 					bone->scaleY = by + (y - by) * alpha;
 					break;
 				case SP_MIX_BLEND_ADD:
-					by = SIGNUM(y);
-					bone->scaleY = ABS(bone->scaleY) * by + (y - ABS(bone->data->scaleY) * by) * alpha;
+					bone->scaleY += (y - bone->data->scaleY) * alpha;
 			}
 		}
 	}

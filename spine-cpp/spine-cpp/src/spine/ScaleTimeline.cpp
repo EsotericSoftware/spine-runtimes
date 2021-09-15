@@ -131,10 +131,8 @@ void ScaleTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 					bone->_scaleY = by + (MathUtil::abs(y) * MathUtil::sign(by) - by) * alpha;
 					break;
 				case MixBlend_Add:
-					bx = bone->_scaleX;
-					by = bone->_scaleY;
-					bone->_scaleX = bx + (MathUtil::abs(x) * MathUtil::sign(bx) - bone->_data._scaleX) * alpha;
-					bone->_scaleY = by + (MathUtil::abs(y) * MathUtil::sign(by) - bone->_data._scaleY) * alpha;
+					bone->_scaleX = (x - bone->_data._scaleX) * alpha;
+					bone->_scaleY = (y - bone->_data._scaleY) * alpha;
 			}
 		} else {
 			switch (blend) {
@@ -152,12 +150,8 @@ void ScaleTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 					bone->_scaleY = by + (y - by) * alpha;
 					break;
 				case MixBlend_Add:
-					bx = MathUtil::sign(x);
-					by = MathUtil::sign(y);
-					bone->_scaleX =
-							MathUtil::abs(bone->_scaleX) * bx + (x - MathUtil::abs(bone->_data._scaleX) * bx) * alpha;
-					bone->_scaleY =
-							MathUtil::abs(bone->_scaleY) * by + (y - MathUtil::abs(bone->_data._scaleY) * by) * alpha;
+					bone->_scaleX += (x - bone->_data._scaleX) * alpha;
+					bone->_scaleY += (y - bone->_data._scaleY) * alpha;
 			}
 		}
 	}
@@ -216,8 +210,7 @@ void ScaleXTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 					bone->_scaleX = bx + (MathUtil::abs(x) * MathUtil::sign(bx) - bx) * alpha;
 					break;
 				case MixBlend_Add:
-					bx = bone->_scaleX;
-					bone->_scaleX = bx + (MathUtil::abs(x) * MathUtil::sign(bx) - bone->_data._scaleX) * alpha;
+					bone->_scaleX = (x - bone->_data._scaleX) * alpha;
 			}
 		} else {
 			switch (blend) {
@@ -231,9 +224,7 @@ void ScaleXTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 					bone->_scaleX = bx + (x - bx) * alpha;
 					break;
 				case MixBlend_Add:
-					bx = MathUtil::sign(x);
-					bone->_scaleX =
-							MathUtil::abs(bone->_scaleX) * bx + (x - MathUtil::abs(bone->_data._scaleX) * bx) * alpha;
+					bone->_scaleX += (x - bone->_data._scaleX) * alpha;
 			}
 		}
 	}
@@ -292,8 +283,7 @@ void ScaleYTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 					bone->_scaleY = by + (MathUtil::abs(y) * MathUtil::sign(by) - by) * alpha;
 					break;
 				case MixBlend_Add:
-					by = bone->_scaleY;
-					bone->_scaleY = by + (MathUtil::abs(y) * MathUtil::sign(by) - bone->_data._scaleY) * alpha;
+					bone->_scaleY = (y - bone->_data._scaleY) * alpha;
 			}
 		} else {
 			switch (blend) {
@@ -307,9 +297,7 @@ void ScaleYTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 					bone->_scaleY = by + (y - by) * alpha;
 					break;
 				case MixBlend_Add:
-					by = MathUtil::sign(y);
-					bone->_scaleY =
-							MathUtil::abs(bone->_scaleY) * by + (y - MathUtil::abs(bone->_data._scaleY) * by) * alpha;
+					bone->_scaleY += (y - bone->_data._scaleY) * alpha;
 			}
 		}
 	}

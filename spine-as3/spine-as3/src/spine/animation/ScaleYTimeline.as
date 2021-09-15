@@ -82,8 +82,7 @@ package spine.animation {
 						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
 						break;
 					case MixBlend.add:
-						by = bone.scaleY;
-						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - bone.data.scaleY) * alpha;
+						bone.scaleY = (y - bone.data.scaleY) * alpha;
 					}
 				} else {
 					switch (blend) {
@@ -97,8 +96,7 @@ package spine.animation {
 						bone.scaleY = by + (y - by) * alpha;
 						break;
 					case MixBlend.add:
-						by = MathUtils.signum(y);
-						bone.scaleY = Math.abs(bone.scaleY) * by + (y - Math.abs(bone.data.scaleY) * by) * alpha;
+						bone.scaleY += (y - bone.data.scaleY) * alpha;
 					}
 				}
 			}

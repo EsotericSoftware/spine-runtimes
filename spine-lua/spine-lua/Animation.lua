@@ -566,10 +566,8 @@ function Animation.ScaleTimeline.new (frameCount, bezierCount, boneIndex)
 					bone.scaleX = bx + (math_abs(x) * math_signum(bx) - bx) * alpha
 					bone.scaleY = by + (math_abs(y) * math_signum(by) - by) * alpha
 				elseif blend == MixBlend.add then
-					bx = bone.scaleX
-					by = bone.scaleY
-					bone.scaleX = bx + (math_abs(x) * math_signum(bx) - bone.data.scaleX) * alpha
-					bone.scaleY = by + (math_abs(y) * math_signum(by) - bone.data.scaleY) * alpha
+					bone.scaleX = (x - bone.data.scaleX) * alpha
+					bone.scaleY = (y - bone.data.scaleY) * alpha
 				end
 			else
 				if blend == MixBlend.setup then
@@ -583,10 +581,8 @@ function Animation.ScaleTimeline.new (frameCount, bezierCount, boneIndex)
 					bone.scaleX = bx + (x - bx) * alpha
 					bone.scaleY = by + (y - by) * alpha
 				elseif blend == MixBlend.add then
-					bx = math_signum(x)
-					by = math_signum(y)
-					bone.scaleX = math_abs(bone.scaleX) * bx + (x - math_abs(bone.data.scaleX) * bx) * alpha
-					bone.scaleY = math_abs(bone.scaleY) * by + (y - math_abs(bone.data.scaleY) * by) * alpha
+					bone.scaleX = bone.scaleX + (x - bone.data.scaleX) * alpha
+					bone.scaleY = bone.scaleY + (y - bone.data.scaleY) * alpha
 				end
 			end
 		end
@@ -631,8 +627,7 @@ function Animation.ScaleXTimeline.new (frameCount, bezierCount, boneIndex)
 					bx = bone.scaleX
 					bone.scaleX = bx + (math_abs(x) * math_signum(bx) - bx) * alpha
 				elseif blend == MixBlend.add then
-					bx = bone.scaleX
-					bone.scaleX = bx + (math_abs(x) * math_signum(bx) - bone.data.scaleX) * alpha
+					bone.scaleX = (x - bone.data.scaleX) * alpha
 				end
 			else
 				if blend == MixBlend.setup then
@@ -642,8 +637,7 @@ function Animation.ScaleXTimeline.new (frameCount, bezierCount, boneIndex)
 					bx = math_abs(bone.scaleX) * math_signum(x)
 					bone.scaleX = bx + (x - bx) * alpha
 				elseif blend == MixBlend.add then
-					bx = math_signum(x)
-					bone.scaleX = math_abs(bone.scaleX) * bx + (x - math_abs(bone.data.scaleX) * bx) * alpha
+					bone.scaleX = bone.scaleX + (x - bone.data.scaleX) * alpha
 				end
 			end
 		end
@@ -688,8 +682,7 @@ function Animation.ScaleYTimeline.new (frameCount, bezierCount, boneIndex)
 					by = bone.scaleY
 					bone.scaleY = by + (math_abs(y) * math_signum(by) - by) * alpha
 				elseif blend == MixBlend.add then
-					by = bone.scaleY
-					bone.scaleY = by + (math_abs(y) * math_signum(by) - bone.data.scaleY) * alpha
+					bone.scaleY = (y - bone.data.scaleY) * alpha
 				end
 			else
 				if blend == MixBlend.setup then
@@ -699,8 +692,7 @@ function Animation.ScaleYTimeline.new (frameCount, bezierCount, boneIndex)
 					by = math_abs(bone.scaleY) * math_signum(y)
 					bone.scaleY = by + (y - by) * alpha
 				elseif blend == MixBlend.add then
-					by = math_signum(y)
-					bone.scaleY = math_abs(bone.scaleY) * by + (y - math_abs(bone.data.scaleY) * by) * alpha
+					bone.scaleY = bone.scaleY + (y - bone.data.scaleY) * alpha
 				end
 			end
 		end

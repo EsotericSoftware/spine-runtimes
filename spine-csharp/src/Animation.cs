@@ -794,10 +794,8 @@ namespace Spine {
 						bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - by) * alpha;
 						break;
 					case MixBlend.Add:
-						bx = bone.scaleX;
-						by = bone.scaleY;
-						bone.scaleX = bx + (Math.Abs(x) * Math.Sign(bx) - bone.data.scaleX) * alpha;
-						bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - bone.data.scaleY) * alpha;
+						bone.scaleX = (x - bone.data.scaleX) * alpha;
+						bone.scaleY = (y - bone.data.scaleY) * alpha;
 						break;
 					}
 				} else {
@@ -816,10 +814,8 @@ namespace Spine {
 						bone.scaleY = by + (y - by) * alpha;
 						break;
 					case MixBlend.Add:
-						bx = Math.Sign(x);
-						by = Math.Sign(y);
-						bone.scaleX = Math.Abs(bone.scaleX) * bx + (x - Math.Abs(bone.data.scaleX) * bx) * alpha;
-						bone.scaleY = Math.Abs(bone.scaleY) * by + (y - Math.Abs(bone.data.scaleY) * by) * alpha;
+						bone.scaleX += (x - bone.data.scaleX) * alpha;
+						bone.scaleY += (y - bone.data.scaleY) * alpha;
 						break;
 					}
 				}
@@ -881,8 +877,7 @@ namespace Spine {
 						bone.scaleX = bx + (Math.Abs(x) * Math.Sign(bx) - bx) * alpha;
 						break;
 					case MixBlend.Add:
-						bx = bone.scaleX;
-						bone.scaleX = bx + (Math.Abs(x) * Math.Sign(bx) - bone.data.scaleX) * alpha;
+						bone.scaleX = (x - bone.data.scaleX) * alpha;
 						break;
 					}
 				} else {
@@ -897,8 +892,7 @@ namespace Spine {
 						bone.scaleX = bx + (x - bx) * alpha;
 						break;
 					case MixBlend.Add:
-						bx = Math.Sign(x);
-						bone.scaleX = Math.Abs(bone.scaleX) * bx + (x - Math.Abs(bone.data.scaleX) * bx) * alpha;
+						bone.scaleX += (x - bone.data.scaleX) * alpha;
 						break;
 					}
 				}
@@ -960,8 +954,7 @@ namespace Spine {
 						bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - by) * alpha;
 						break;
 					case MixBlend.Add:
-						by = bone.scaleY;
-						bone.scaleY = by + (Math.Abs(y) * Math.Sign(by) - bone.data.scaleY) * alpha;
+						bone.scaleY = (y - bone.data.scaleY) * alpha;
 						break;
 					}
 				} else {
@@ -976,8 +969,7 @@ namespace Spine {
 						bone.scaleY = by + (y - by) * alpha;
 						break;
 					case MixBlend.Add:
-						by = Math.Sign(y);
-						bone.scaleY = Math.Abs(bone.scaleY) * by + (y - Math.Abs(bone.data.scaleY) * by) * alpha;
+						bone.scaleY += (y - bone.data.scaleY) * alpha;
 						break;
 					}
 				}
