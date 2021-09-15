@@ -53,7 +53,8 @@ namespace Spine.Unity {
 				return null;
 			}
 
-			var attachment = skin.GetAttachment(skeleton.Data.FindSlot(slotName).Index, attachmentName);
+			Slot slot = skeleton.FindSlot(slotName);
+			var attachment = slot != null ? skin.GetAttachment(slot.Data.Index, attachmentName) : null;
 			if (attachment == null) {
 				Debug.LogFormat("Attachment in slot '{0}' named '{1}' not found in skin '{2}'.", slotName, attachmentName, skin.Name);
 				return null;
@@ -61,7 +62,6 @@ namespace Spine.Unity {
 
 			var box = attachment as BoundingBoxAttachment;
 			if (box != null) {
-				var slot = skeleton.FindSlot(slotName);
 				return AddBoundingBoxGameObject(box.Name, box, slot, parent, isTrigger);
 			} else {
 				Debug.LogFormat("Attachment '{0}' was not a Bounding Box.", attachmentName);
