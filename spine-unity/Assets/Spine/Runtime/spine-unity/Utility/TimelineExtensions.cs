@@ -39,9 +39,17 @@ namespace Spine.Unity.AnimationTools {
 		/// If no SkeletonData is given, values are returned as difference to setup pose
 		/// instead of absolute values.</summary>
 		public static Vector2 Evaluate (this TranslateTimeline timeline, float time, SkeletonData skeletonData = null) {
+			if (time < timeline.Frames[0]) return Vector2.zero;
+
 			float x, y;
-			timeline.Evaluate(out x, out y, time, skeletonData);
-			return new Vector2(x, y);
+			timeline.GetCurveValue(out x, out y, time);
+
+			if (skeletonData == null) {
+				return new Vector2(x, y);
+			} else {
+				BoneData boneData = skeletonData.Bones.Items[timeline.BoneIndex];
+				return new Vector2(boneData.X + x, boneData.Y + y);
+			}
 		}
 
 		/// <summary>Gets the translate timeline for a given boneIndex.
