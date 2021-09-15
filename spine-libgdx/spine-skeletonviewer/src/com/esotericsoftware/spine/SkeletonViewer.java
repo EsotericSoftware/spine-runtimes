@@ -250,6 +250,13 @@ public class SkeletonViewer extends ApplicationAdapter {
 			if (skeleton.scaleY == 0) skeleton.scaleY = 0.01f;
 			skeleton.setScale(scaleX, scaleY);
 
+			if (ui.setupPoseButton.isChecked())
+				skeleton.setToSetupPose();
+			else if (ui.bonesSetupPoseButton.isChecked())
+				skeleton.setBonesToSetupPose();
+			else if (ui.slotsSetupPoseButton.isChecked()) //
+				skeleton.setSlotsToSetupPose();
+
 			delta = Math.min(delta, 0.032f) * ui.speedSlider.getValue();
 			skeleton.update(delta);
 			state.update(delta);
