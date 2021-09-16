@@ -214,8 +214,8 @@ end
 function Bone:updateAppliedTransform ()
 	local parent = self.parent
 	if not parent then
-		self.ax = self.worldX
-		self.ay = self.worldY
+		self.ax = self.worldX - self.skeleton.x
+		self.ay = self.worldY - self.skeleton.y
 		local a = self.a
 		local b = self.b
 		local c = self.c

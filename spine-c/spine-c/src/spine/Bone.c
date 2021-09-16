@@ -218,8 +218,8 @@ float spBone_getWorldScaleY(spBone *self) {
 void spBone_updateAppliedTransform(spBone *self) {
 	spBone *parent = self->parent;
 	if (!parent) {
-		self->ax = self->worldX;
-		self->ay = self->worldY;
+		self->ax = self->worldX - self->skeleton->x;
+		self->ay = self->worldY - self->skeleton->y;
 		self->arotation = ATAN2(self->c, self->a) * RAD_DEG;
 		self->ascaleX = SQRT(self->a * self->a + self->c * self->c);
 		self->ascaleY = SQRT(self->b * self->b + self->d * self->d);

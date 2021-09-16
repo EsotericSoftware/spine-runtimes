@@ -298,8 +298,8 @@ export class Bone implements Updatable {
 	updateAppliedTransform () {
 		let parent = this.parent;
 		if (!parent) {
-			this.ax = this.worldX;
-			this.ay = this.worldY;
+			this.ax = this.worldX - this.skeleton.x;
+			this.ay = this.worldY - this.skeleton.y;
 			this.arotation = Math.atan2(this.c, this.a) * MathUtils.radDeg;
 			this.ascaleX = Math.sqrt(this.a * this.a + this.c * this.c);
 			this.ascaleY = Math.sqrt(this.b * this.b + this.d * this.d);

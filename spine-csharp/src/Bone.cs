@@ -277,8 +277,8 @@ namespace Spine {
 		internal void UpdateAppliedTransform () {
 			Bone parent = this.parent;
 			if (parent == null) {
-				ax = worldX;
-				ay = worldY;
+				ax = worldX - skeleton.x;
+				ay = worldY - skeleton.y;
 				arotation = MathUtils.Atan2(c, a) * MathUtils.RadDeg;
 				ascaleX = (float)Math.Sqrt(a * a + c * c);
 				ascaleY = (float)Math.Sqrt(b * b + d * d);

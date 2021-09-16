@@ -493,8 +493,8 @@ float Bone::getWorldScaleY() {
 void Bone::updateAppliedTransform() {
 	Bone *parent = _parent;
 	if (!parent) {
-		_ax = _worldX;
-		_ay = _worldY;
+		_ax = _worldX - _skeleton.getX();
+		_ay = _worldY - _skeleton.getY();
 		_arotation = MathUtil::atan2(_c, _a) * MathUtil::Rad_Deg;
 		_ascaleX = MathUtil::sqrt(_a * _a + _c * _c);
 		_ascaleY = MathUtil::sqrt(_b * _b + _d * _d);

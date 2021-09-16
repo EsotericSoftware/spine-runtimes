@@ -253,8 +253,8 @@ package spine {
 		internal function updateAppliedTransform() : void {
 			var parent : Bone = this.parent;
 			if (parent == null) {
-				ax = worldX;
-				ay = worldY;
+				ax = worldX - skeleton.x;
+				ay = worldY - skeleton.y;
 				arotation = Math.atan2(c, a) * MathUtils.radDeg;
 				ascaleX = Math.sqrt(a * a + c * c);
 				ascaleY = Math.sqrt(b * b + d * d);

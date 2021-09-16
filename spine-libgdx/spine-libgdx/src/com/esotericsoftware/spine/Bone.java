@@ -397,8 +397,8 @@ public class Bone implements Updatable {
 	public void updateAppliedTransform () {
 		Bone parent = this.parent;
 		if (parent == null) {
-			ax = worldX;
-			ay = worldY;
+			ax = worldX - skeleton.x;
+			ay = worldY - skeleton.y;
 			float a = this.a, b = this.b, c = this.c, d = this.d;
 			arotation = atan2(c, a) * radDeg;
 			ascaleX = (float)Math.sqrt(a * a + c * c);
