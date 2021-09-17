@@ -1,5 +1,6 @@
 export * from "./AssetManager";
 export * from "./Camera";
+export * from "./CameraController";
 export * from "./GLTexture";
 export * from "./Input";
 export * from "./LoadingScreen";

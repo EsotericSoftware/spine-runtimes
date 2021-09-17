@@ -41,12 +41,12 @@ export class Input {
 		return new Touch(0, 0, 0);
 	});
 
-	constructor (element: HTMLElement) {
+	constructor(element: HTMLElement) {
 		this.element = element;
 		this.setupCallbacks(element);
 	}
 
-	private setupCallbacks (element: HTMLElement) {
+	private setupCallbacks(element: HTMLElement) {
 		let mouseDown = (ev: UIEvent) => {
 			if (ev instanceof MouseEvent) {
 				let rect = element.getBoundingClientRect();
@@ -104,9 +104,21 @@ export class Input {
 			}
 		}
 
+		let mouseWheel = (e: WheelEvent) => {
+			e.preventDefault();
+			let deltaY = e.deltaY;
+			if (e.deltaMode == WheelEvent.DOM_DELTA_LINE) deltaY *= 8;
+			if (e.deltaMode == WheelEvent.DOM_DELTA_PAGE) deltaY *= 24;
+			let listeners = this.listeners;
+			for (let i = 0; i < listeners.length; i++)
+				if (listeners[i].zoom) listeners[i].zoom(e.deltaY);
+		};
+
 		element.addEventListener("mousedown", mouseDown, true);
 		element.addEventListener("mousemove", mouseMove, true);
 		element.addEventListener("mouseup", mouseUp, true);
+		element.addEventListener("wheel", mouseWheel, true);
+
 		element.addEventListener("touchstart", (ev: TouchEvent) => {
 			if (!this.currTouch) {
 				var touches = ev.changedTouches;
@@ -133,56 +145,7 @@ export class Input {
 			}
 			ev.preventDefault();
 		}, false);
-		element.addEventListener("touchend", (ev: TouchEvent) => {
-			if (this.currTouch) {
-				var touches = ev.changedTouches;
-				for (var i = 0; i < touches.length; i++) {
-					var touch = touches[i];
-					if (this.currTouch.identifier === touch.identifier) {
-						let rect = element.getBoundingClientRect();
-						let x = this.currTouch.x = touch.clientX - rect.left;
-						let y = this.currTouch.y = touch.clientY - rect.top;
-						this.touchesPool.free(this.currTouch);
-						let listeners = this.listeners;
-						for (let i = 0; i < listeners.length; i++) {
-							if (listeners[i].up) listeners[i].up(x, y);
-						}
 
-						this.lastX = x;
-						this.lastY = y;
-						this.buttonDown = false;
-						this.currTouch = null;
-						break;
-					}
-				}
-			}
-			ev.preventDefault();
-		}, false);
-		element.addEventListener("touchcancel", (ev: TouchEvent) => {
-			if (this.currTouch) {
-				var touches = ev.changedTouches;
-				for (var i = 0; i < touches.length; i++) {
-					var touch = touches[i];
-					if (this.currTouch.identifier === touch.identifier) {
-						let rect = element.getBoundingClientRect();
-						let x = this.currTouch.x = touch.clientX - rect.left;
-						let y = this.currTouch.y = touch.clientY - rect.top;
-						this.touchesPool.free(this.currTouch);
-						let listeners = this.listeners;
-						for (let i = 0; i < listeners.length; i++) {
-							if (listeners[i].up) listeners[i].up(x, y);
-						}
-
-						this.lastX = x;
-						this.lastY = y;
-						this.buttonDown = false;
-						this.currTouch = null;
-						break;
-					}
-				}
-			}
-			ev.preventDefault();
-		}, false);
 		element.addEventListener("touchmove", (ev: TouchEvent) => {
 			if (this.currTouch) {
 				var touches = ev.changedTouches;
@@ -206,13 +169,41 @@ export class Input {
 			}
 			ev.preventDefault();
 		}, false);
+
+		let touchEnd = (ev: TouchEvent) => {
+			if (this.currTouch) {
+				var touches = ev.changedTouches;
+				for (var i = 0; i < touches.length; i++) {
+					var touch = touches[i];
+					if (this.currTouch.identifier === touch.identifier) {
+						let rect = element.getBoundingClientRect();
+						let x = this.currTouch.x = touch.clientX - rect.left;
+						let y = this.currTouch.y = touch.clientY - rect.top;
+						this.touchesPool.free(this.currTouch);
+						let listeners = this.listeners;
+						for (let i = 0; i < listeners.length; i++) {
+							if (listeners[i].up) listeners[i].up(x, y);
+						}
+
+						this.lastX = x;
+						this.lastY = y;
+						this.buttonDown = false;
+						this.currTouch = null;
+						break;
+					}
+				}
+			}
+			ev.preventDefault();
+		};
+		element.addEventListener("touchend", touchEnd, false);
+		element.addEventListener("touchcancel", touchEnd);
 	}
 
-	addListener (listener: InputListener) {
+	addListener(listener: InputListener) {
 		this.listeners.push(listener);
 	}
 
-	removeListener (listener: InputListener) {
+	removeListener(listener: InputListener) {
 		let idx = this.listeners.indexOf(listener);
 		if (idx > -1) {
 			this.listeners.splice(idx, 1);
@@ -221,13 +212,14 @@ export class Input {
 }
 
 export class Touch {
-	constructor (public identifier: number, public x: number, public y: number) {
+	constructor(public identifier: number, public x: number, public y: number) {
 	}
 }
 
 export interface InputListener {
-	down (x: number, y: number): void;
-	up (x: number, y: number): void;
-	moved (x: number, y: number): void;
-	dragged (x: number, y: number): void;
+	down?(x: number, y: number): void;
+	up?(x: number, y: number): void;
+	moved?(x: number, y: number): void;
+	dragged?(x: number, y: number): void;
+	zoom?(zoom: number): void;
 }

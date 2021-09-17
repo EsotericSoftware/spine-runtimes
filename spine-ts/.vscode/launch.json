@@ -10,6 +10,13 @@
 			"name": "Examples",
 			"url": "http://localhost:8080",
 			"webRoot": "${workspaceFolder}"
+		},
+		{
+			"type": "pwa-chrome",
+			"request": "launch",
+			"name": "drag-and-drop",
+			"url": "http://localhost:8080/spine-webgl/example/drag-and-drop.html",
+			"webRoot": "${workspaceFolder}"
 		}
 	]
 }
