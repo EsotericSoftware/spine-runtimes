@@ -61,7 +61,7 @@ export class SkeletonJson {
 		this.attachmentLoader = attachmentLoader;
 	}
 
-	readSkeletonData(json: string | any): SkeletonData {
+	readSkeletonData (json: string | any): SkeletonData {
 		let scale = this.scale;
 		let skeletonData = new SkeletonData();
 		let root = typeof (json) === "string" ? JSON.parse(json) : json;
@@ -291,7 +291,7 @@ export class SkeletonJson {
 		return skeletonData;
 	}
 
-	readAttachment(map: any, skin: Skin, slotIndex: number, name: string, skeletonData: SkeletonData): Attachment {
+	readAttachment (map: any, skin: Skin, slotIndex: number, name: string, skeletonData: SkeletonData): Attachment {
 		let scale = this.scale;
 		name = getValue(map, "name", name);
 
@@ -399,7 +399,7 @@ export class SkeletonJson {
 		return null;
 	}
 
-	readVertices(map: any, attachment: VertexAttachment, verticesLength: number) {
+	readVertices (map: any, attachment: VertexAttachment, verticesLength: number) {
 		let scale = this.scale;
 		attachment.worldVerticesLength = verticesLength;
 		let vertices: Array<number> = map.vertices;
@@ -428,7 +428,7 @@ export class SkeletonJson {
 		attachment.vertices = Utils.toFloatArray(weights);
 	}
 
-	readAnimation(map: any, name: string, skeletonData: SkeletonData) {
+	readAnimation (map: any, name: string, skeletonData: SkeletonData) {
 		let scale = this.scale;
 		let timelines = new Array<Timeline>();
 
@@ -911,7 +911,7 @@ class LinkedMesh {
 	}
 }
 
-function readTimeline1(keys: any[], timeline: CurveTimeline1, defaultValue: number, scale: number) {
+function readTimeline1 (keys: any[], timeline: CurveTimeline1, defaultValue: number, scale: number) {
 	let keyMap = keys[0];
 	let time = getValue(keyMap, "time", 0);
 	let value = getValue(keyMap, "value", defaultValue) * scale;
@@ -932,7 +932,7 @@ function readTimeline1(keys: any[], timeline: CurveTimeline1, defaultValue: numb
 	}
 }
 
-function readTimeline2(keys: any[], timeline: CurveTimeline2, name1: string, name2: string, defaultValue: number, scale: number) {
+function readTimeline2 (keys: any[], timeline: CurveTimeline2, name1: string, name2: string, defaultValue: number, scale: number) {
 	let keyMap = keys[0];
 	let time = getValue(keyMap, "time", 0);
 	let value1 = getValue(keyMap, name1, defaultValue) * scale;
@@ -960,7 +960,7 @@ function readTimeline2(keys: any[], timeline: CurveTimeline2, name1: string, nam
 	}
 }
 
-function readCurve(curve: any, timeline: CurveTimeline, bezier: number, frame: number, value: number, time1: number, time2: number,
+function readCurve (curve: any, timeline: CurveTimeline, bezier: number, frame: number, value: number, time1: number, time2: number,
 	value1: number, value2: number, scale: number) {
 	if (curve == "stepped") {
 		timeline.setStepped(frame);
@@ -975,6 +975,6 @@ function readCurve(curve: any, timeline: CurveTimeline, bezier: number, frame: n
 	return bezier + 1;
 }
 
-function getValue(map: any, property: string, defaultValue: any) {
+function getValue (map: any, property: string, defaultValue: any) {
 	return map[property] !== undefined ? map[property] : defaultValue;
 }

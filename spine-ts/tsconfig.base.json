@@ -1,10 +1,10 @@
 {
 	"compilerOptions": {
 		"module": "es2015",
+		"target": "ES6",
 		"noImplicitAny": true,
 		"preserveConstEnums": true,
-		"sourceMap": true,
-		"inlineSources": true,
+		"inlineSourceMap": true,
 		"esModuleInterop": true,
 		"lib": [
 			"DOM",

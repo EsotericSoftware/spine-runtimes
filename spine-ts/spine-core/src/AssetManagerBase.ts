@@ -227,9 +227,52 @@ export class Downloader {
 	private callbacks: StringMap<Array<Function>> = {};
 	rawDataUris: StringMap<string> = {};
 
+	dataUriToString (dataUri: string) {
+		if (!dataUri.startsWith("data:")) {
+			throw new Error("Not a data URI.");
+		}
+
+		let base64Idx = dataUri.indexOf("base64,");
+		if (base64Idx != -1) {
+			base64Idx += "base64,".length;
+			return atob(dataUri.substr(base64Idx));
+		} else {
+			return dataUri.substr(dataUri.indexOf(",") + 1);
+		}
+	}
+
+	base64ToArrayBuffer (base64: string) {
+		var binary_string = window.atob(base64);
+		var len = binary_string.length;
+		var bytes = new Uint8Array(len);
+		for (var i = 0; i < len; i++) {
+			bytes[i] = binary_string.charCodeAt(i);
+		}
+		return bytes.buffer;
+	}
+
+	dataUriToUint8Array (dataUri: string) {
+		if (!dataUri.startsWith("data:")) {
+			throw new Error("Not a data URI.");
+		}
+
+		let base64Idx = dataUri.indexOf("base64,");
+		if (base64Idx == -1) throw new Error("Not a binary data URI.");
+		base64Idx += "base64,".length;
+		return this.base64ToArrayBuffer(dataUri.substr(base64Idx));
+	}
+
 	downloadText (url: string, success: (data: string) => void, error: (status: number, responseText: string) => void) {
-		if (this.rawDataUris[url]) url = this.rawDataUris[url];
 		if (this.start(url, success, error)) return;
+		if (this.rawDataUris[url]) {
+			try {
+				let dataUri = this.rawDataUris[url];
+				this.finish(url, 200, this.dataUriToString(dataUri));
+			} catch (e) {
+				this.finish(url, 400, JSON.stringify(e));
+			}
+			return;
+		}
 		let request = new XMLHttpRequest();
 		request.overrideMimeType("text/html");
 		request.open("GET", url, true);
@@ -248,8 +291,16 @@ export class Downloader {
 	}
 
 	downloadBinary (url: string, success: (data: Uint8Array) => void, error: (status: number, responseText: string) => void) {
-		if (this.rawDataUris[url]) url = this.rawDataUris[url];
 		if (this.start(url, success, error)) return;
+		if (this.rawDataUris[url]) {
+			try {
+				let dataUri = this.rawDataUris[url];
+				this.finish(url, 200, this.dataUriToUint8Array(dataUri));
+			} catch (e) {
+				this.finish(url, 400, JSON.stringify(e));
+			}
+			return;
+		}
 		let request = new XMLHttpRequest();
 		request.open("GET", url, true);
 		request.responseType = "arraybuffer";
