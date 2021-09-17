@@ -98,10 +98,10 @@ namespace Spine.Unity {
 		const float BoundsMinDefault = float.PositiveInfinity;
 		const float BoundsMaxDefault = float.NegativeInfinity;
 
-		[NonSerialized] readonly ExposedList<Vector3> vertexBuffer = new ExposedList<Vector3>(4);
-		[NonSerialized] readonly ExposedList<Vector2> uvBuffer = new ExposedList<Vector2>(4);
-		[NonSerialized] readonly ExposedList<Color32> colorBuffer = new ExposedList<Color32>(4);
-		[NonSerialized] readonly ExposedList<ExposedList<int>> submeshes = new ExposedList<ExposedList<int>> { new ExposedList<int>(6) }; // start with 1 submesh.
+		[NonSerialized] protected readonly ExposedList<Vector3> vertexBuffer = new ExposedList<Vector3>(4);
+		[NonSerialized] protected readonly ExposedList<Vector2> uvBuffer = new ExposedList<Vector2>(4);
+		[NonSerialized] protected readonly ExposedList<Color32> colorBuffer = new ExposedList<Color32>(4);
+		[NonSerialized] protected readonly ExposedList<ExposedList<int>> submeshes = new ExposedList<ExposedList<int>> { new ExposedList<int>(6) }; // start with 1 submesh.
 
 		[NonSerialized] Vector2 meshBoundsMin, meshBoundsMax;
 		[NonSerialized] float meshBoundsThickness;
@@ -121,6 +121,7 @@ namespace Spine.Unity {
 		#endregion
 
 		public int VertexCount { get { return vertexBuffer.Count; } }
+		public int SubmeshIndexCount (int submeshIndex) { return submeshes.Items[submeshIndex].Count; }
 
 		/// <summary>A set of mesh arrays whose values are modifiable by the user. Modify these values before they are passed to the UnityEngine mesh object in order to see the effect.</summary>
 		public MeshGeneratorBuffers Buffers {
@@ -1007,6 +1008,20 @@ namespace Spine.Unity {
 			meshBoundsThickness *= scale;
 		}
 
+		public Bounds GetMeshBounds () {
+			if (float.IsInfinity(meshBoundsMin.x)) { // meshBoundsMin.x == BoundsMinDefault // == doesn't work on float Infinity constants.
+				return new Bounds();
+			} else {
+				//mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
+				float halfWidth = (meshBoundsMax.x - meshBoundsMin.x) * 0.5f;
+				float halfHeight = (meshBoundsMax.y - meshBoundsMin.y) * 0.5f;
+				return new Bounds {
+					center = new Vector3(meshBoundsMin.x + halfWidth, meshBoundsMin.y + halfHeight),
+					extents = new Vector3(halfWidth, halfHeight, meshBoundsThickness * 0.5f)
+				};
+			}
+		}
+
 		void AddAttachmentTintBlack (float r2, float g2, float b2, float a, int vertexCount) {
 			var rg = new Vector2(r2, g2);
 			var bo = new Vector2(b2, a);
@@ -1054,18 +1069,7 @@ namespace Spine.Unity {
 				mesh.vertices = vbi;
 				mesh.uv = ubi;
 				mesh.colors32 = cbi;
-
-				if (float.IsInfinity(meshBoundsMin.x)) { // meshBoundsMin.x == BoundsMinDefault // == doesn't work on float Infinity constants.
-					mesh.bounds = new Bounds();
-				} else {
-					//mesh.bounds = ArraysMeshGenerator.ToBounds(meshBoundsMin, meshBoundsMax);
-					float halfWidth = (meshBoundsMax.x - meshBoundsMin.x) * 0.5f;
-					float halfHeight = (meshBoundsMax.y - meshBoundsMin.y) * 0.5f;
-					mesh.bounds = new Bounds {
-						center = new Vector3(meshBoundsMin.x + halfWidth, meshBoundsMin.y + halfHeight),
-						extents = new Vector3(halfWidth, halfHeight, meshBoundsThickness * 0.5f)
-					};
-				}
+				mesh.bounds = GetMeshBounds();
 			}
 
 			{
