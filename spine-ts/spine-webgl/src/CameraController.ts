@@ -31,19 +31,23 @@ import { Input, Vector3 } from "src";
 import { OrthoCamera } from "./Camera";
 
 export class CameraController {
-    constructor(public canvas: HTMLElement, public camera: OrthoCamera) {
+    constructor (public canvas: HTMLElement, public camera: OrthoCamera) {
         let cameraX = 0, cameraY = 0, cameraZoom = 0;
         let mouseX = 0, mouseY = 0;
         let lastX = 0, lastY = 0;
+        let initialZoom = 0;
 
         new Input(canvas).addListener({
             down: (x: number, y: number) => {
+                console.log(`Down ${x.toFixed(0)} ${y.toFixed(0)}`);
                 cameraX = camera.position.x;
                 cameraY = camera.position.y;
                 mouseX = lastX = x;
                 mouseY = lastY = y;
+                initialZoom = camera.zoom;
             },
             dragged: (x: number, y: number) => {
+                console.log(`Dragged ${x.toFixed(0)} ${y.toFixed(0)}`);
                 let deltaX = x - mouseX;
                 let deltaY = y - mouseY;
                 let originWorld = camera.screenToWorld(new Vector3(0, 0), canvas.clientWidth, canvas.clientHeight);
@@ -53,12 +57,12 @@ export class CameraController {
                 lastX = x;
                 lastY = y;
             },
-            zoom: (zoom: number) => {
-                let zoomAmount = zoom / 200 * camera.zoom;
+            wheel: (delta: number) => {
+                let zoomAmount = delta / 200 * camera.zoom;
                 let newZoom = camera.zoom + zoomAmount;
                 if (newZoom > 0) {
                     let x = 0, y = 0;
-                    if (zoom < 0) {
+                    if (delta < 0) {
                         x = lastX; y = lastY;
                     } else {
                         let viewCenter = new Vector3(canvas.clientWidth / 2 + 15, canvas.clientHeight / 2);
@@ -74,9 +78,15 @@ export class CameraController {
                     camera.position.add(oldDistance.sub(newDistance));
                     camera.update();
                 }
-                console.log(`${camera.zoom}, ${zoomAmount}, ${zoom}`);
+            },
+            zoom: (initialDistance, distance) => {
+                let newZoom = initialDistance / distance;
+                console.log(`${newZoom}, ${initialDistance}, ${distance}`);
+                camera.zoom = initialZoom * newZoom;
+                console.log(`zoom ${newZoom}`);
             },
             up: (x: number, y: number) => {
+                console.log(`Up ${x.toFixed(0)} ${y.toFixed(0)}`);
                 lastX = x;
                 lastY = y;
             },
