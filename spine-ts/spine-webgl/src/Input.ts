@@ -44,7 +44,7 @@ export class Input {
 		this.setupCallbacks(element);
 	}
 
-	private setupCallbacks(element: HTMLElement) {
+	private setupCallbacks (element: HTMLElement) {
 		let mouseDown = (ev: UIEvent) => {
 			if (ev instanceof MouseEvent) {
 				let rect = element.getBoundingClientRect();
@@ -196,11 +196,11 @@ export class Input {
 		element.addEventListener("touchcancel", touchEnd);
 	}
 
-	addListener(listener: InputListener) {
+	addListener (listener: InputListener) {
 		this.listeners.push(listener);
 	}
 
-	removeListener(listener: InputListener) {
+	removeListener (listener: InputListener) {
 		let idx = this.listeners.indexOf(listener);
 		if (idx > -1) {
 			this.listeners.splice(idx, 1);
