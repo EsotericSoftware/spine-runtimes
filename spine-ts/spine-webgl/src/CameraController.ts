@@ -27,8 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Input, Vector3 } from "src";
+import { Input } from "./Input";
 import { OrthoCamera } from "./Camera";
+import { Vector3 } from "./Vector3";
 
 export class CameraController {
 	constructor (public canvas: HTMLElement, public camera: OrthoCamera) {
