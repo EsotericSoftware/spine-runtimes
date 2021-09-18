@@ -162,7 +162,10 @@ class App {
 }
 
 new spine.SpineCanvas(document.getElementById("canvas"), {
-    app: new App()
+    app: new App(),
+    webglConfig: {
+        alpha: false
+    }
 });
 
 class FileDragAndDrop {
