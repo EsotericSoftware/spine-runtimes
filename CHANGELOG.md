@@ -74,6 +74,7 @@
 * Added proportional spacing mode support for path constraints.
 * Added support for uniform scaling for two bone IK.
 * Fixed applying a constraint reverting changes from other constraints.
+* **Breaking change:** Removed `SkeletonData` and `Skeleton` methods: `FindBoneIndex`, `FindSlotIndex`. Bones and slots have an `Index` field that should be used instead. Be sure to check for e.g. `bone == null` accordingly before accessing `bone.Index`.
 
 ### Unity
 
@@ -180,6 +181,7 @@
 * Added proportional spacing mode support for path constraints.
 * Added support for uniform scaling for two bone IK.
 * Fixed applying a constraint reverting changes from other constraints.
+* **Breaking change:** Removed `SkeletonData` and `Skeleton` methods: `findBoneIndex`, `findSlotIndex`. Bones and slots have an `index` field that should be used instead.
 
 ### libGDX
 * Exposed colors in `SkeletonRendererDebug`.
