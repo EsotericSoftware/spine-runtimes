@@ -40,7 +40,6 @@ export class CameraController {
 
 		new Input(canvas).addListener({
 			down: (x: number, y: number) => {
-				console.log(`Down ${x.toFixed(0)} ${y.toFixed(0)}`);
 				cameraX = camera.position.x;
 				cameraY = camera.position.y;
 				mouseX = lastX = x;
@@ -48,7 +47,6 @@ export class CameraController {
 				initialZoom = camera.zoom;
 			},
 			dragged: (x: number, y: number) => {
-				console.log(`Dragged ${x.toFixed(0)} ${y.toFixed(0)}`);
 				let deltaX = x - mouseX;
 				let deltaY = y - mouseY;
 				let originWorld = camera.screenToWorld(new Vector3(0, 0), canvas.clientWidth, canvas.clientHeight);
@@ -82,12 +80,9 @@ export class CameraController {
 			},
 			zoom: (initialDistance, distance) => {
 				let newZoom = initialDistance / distance;
-				console.log(`${newZoom}, ${initialDistance}, ${distance}`);
 				camera.zoom = initialZoom * newZoom;
-				console.log(`zoom ${newZoom}`);
 			},
 			up: (x: number, y: number) => {
-				console.log(`Up ${x.toFixed(0)} ${y.toFixed(0)}`);
 				lastX = x;
 				lastY = y;
 			},
