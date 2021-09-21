@@ -75,7 +75,7 @@ public class SkeletonAssetManagerTest extends ApplicationAdapter {
 
 		if (skeleton == null) {
 			// Not loaded yet.
-			assetManager.update();
+			assetManager.update(16);
 			// System.out.println(assetManager.getDiagnostics());
 			if (!assetManager.isFinished()) return;
 
