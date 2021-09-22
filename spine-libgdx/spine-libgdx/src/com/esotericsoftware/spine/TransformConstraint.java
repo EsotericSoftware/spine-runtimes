@@ -59,8 +59,8 @@ public class TransformConstraint implements Updatable {
 		mixShearY = data.mixShearY;
 		bones = new Array(data.bones.size);
 		for (BoneData boneData : data.bones)
-			bones.add(skeleton.findBone(boneData.name));
-		target = skeleton.findBone(data.target.name);
+			bones.add(skeleton.bones.get(boneData.index));
+		target = skeleton.bones.get(data.target.index);
 	}
 
 	/** Copy constructor. */

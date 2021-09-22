@@ -66,8 +66,8 @@ public class PathConstraint implements Updatable {
 		this.data = data;
 		bones = new Array(data.bones.size);
 		for (BoneData boneData : data.bones)
-			bones.add(skeleton.findBone(boneData.name));
-		target = skeleton.findSlot(data.target.name);
+			bones.add(skeleton.bones.get(boneData.index));
+		target = skeleton.slots.get(data.target.index);
 		position = data.position;
 		spacing = data.spacing;
 		mixRotate = data.mixRotate;
