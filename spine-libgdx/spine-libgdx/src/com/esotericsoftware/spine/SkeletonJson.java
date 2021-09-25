@@ -84,6 +84,9 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.SequenceAttachment;
+import com.esotericsoftware.spine.attachments.SequenceAttachment.SequenceMode;
+import com.esotericsoftware.spine.attachments.TextureRegionAttachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
 /** Loads skeleton data in the Spine JSON format.
@@ -452,7 +455,7 @@ public class SkeletonJson extends SkeletonLoader {
 			if (color != null) Color.valueOf(color, point.getColor());
 			return point;
 		}
-		case clipping:
+		case clipping: {
 			ClippingAttachment clip = attachmentLoader.newClippingAttachment(skin, name);
 			if (clip == null) return null;
 
@@ -468,6 +471,20 @@ public class SkeletonJson extends SkeletonLoader {
 			String color = map.getString("color", null);
 			if (color != null) Color.valueOf(color, clip.getColor());
 			return clip;
+		}
+		case sequence:
+			Attachment attachment = readAttachment(map.getChild("attachment"), skin, slotIndex, name, skeletonData);
+			if (attachment == null) return null;
+			String path = ((TextureRegionAttachment)attachment).getPath();
+			int frameCount = map.getInt("count");
+			SequenceAttachment sequence = attachmentLoader.newSequenceAttachment(skin, name, path, frameCount);
+			if (sequence == null) return null;
+			sequence.setAttachment(attachment);
+			sequence.setPath(path);
+			sequence.setFrameCount(frameCount);
+			sequence.setFrameTime(map.getInt("time"));
+			sequence.setMode(SequenceMode.valueOf(map.getString("mode", SequenceMode.forward.name())));
+			return sequence;
 		}
 		return null;
 	}
