@@ -39,6 +39,11 @@
 
 namespace spine {
     
+	struct SkeletonCommand : public cocos2d::TrianglesCommand {
+		cocos2d::backend::UniformLocation _locMVP;
+		cocos2d::backend::UniformLocation _locTexture;
+	};
+	
     class SkeletonBatch {
     public:
         static SkeletonBatch* getInstance ();
@@ -53,25 +58,22 @@ namespace spine {
 		void deallocateIndices(uint32_t numVertices);
 		cocos2d::TrianglesCommand* addCommand(cocos2d::Renderer* renderer, float globalOrder, cocos2d::Texture2D* texture, cocos2d::backend::ProgramState* programState, cocos2d::BlendFunc blendType, const cocos2d::TrianglesCommand::Triangles& triangles, const cocos2d::Mat4& mv, uint32_t flags);
         
-		void updateProgramStateLayout(cocos2d::backend::ProgramState* programState);
+		cocos2d::backend::ProgramState* updateCommandPipelinePS(SkeletonCommand* command, cocos2d::backend::ProgramState* programState);
 
     protected:
-        SkeletonBatch ();
-        virtual ~SkeletonBatch ();
+		SkeletonBatch ();
+		virtual ~SkeletonBatch ();
 		
 		void reset ();
 		
-		cocos2d::TrianglesCommand* nextFreeCommand ();
+		SkeletonCommand* nextFreeCommand ();
 
-        cocos2d::TrianglesCommand* createNewTrianglesCommand();
+		SkeletonCommand* newCommand();
+	
+		cocos2d::backend::ProgramState*                     _programState; // The default program state
 
-        // the default program state for batch draw
-        cocos2d::backend::ProgramState*                     _programState = nullptr;
-        cocos2d::backend::UniformLocation                   _locMVP;
-        cocos2d::backend::UniformLocation                   _locTexture;
-		
 		// pool of commands
-		std::vector<cocos2d::TrianglesCommand*>             _commandsPool;
+		std::vector<SkeletonCommand*>                       _commandsPool;
 		uint32_t                                            _nextFreeCommand;
 		
 		// pool of vertices
