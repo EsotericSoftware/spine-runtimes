@@ -40,7 +40,7 @@ import com.esotericsoftware.spine.Bone;
 /** An attachment that displays a textured quadrilateral.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-regions">Region attachments</a> in the Spine User Guide. */
-public class RegionAttachment extends Attachment {
+public class RegionAttachment extends Attachment implements TextureRegionAttachment {
 	static public final int BLX = 0;
 	static public final int BLY = 1;
 	static public final int ULX = 2;
@@ -61,8 +61,9 @@ public class RegionAttachment extends Attachment {
 		super(name);
 	}
 
-	/** Calculates the {@link #offset} using the region settings. Must be called after changing region settings. */
-	public void updateOffset () {
+	/** Calculates the {@link #offset} using the {@link #region}. Must be called after changing the region or the region's
+	 * properties. */
+	public void updateRegion () {
 		float width = getWidth();
 		float height = getHeight();
 		float localX2 = width / 2;
@@ -137,7 +138,7 @@ public class RegionAttachment extends Attachment {
 	}
 
 	public TextureRegion getRegion () {
-		if (region == null) throw new IllegalStateException("Region has not been set: " + this);
+		if (region == null) throw new IllegalStateException("Region has not been set: " + name);
 		return region;
 	}
 
@@ -180,7 +181,7 @@ public class RegionAttachment extends Attachment {
 
 	/** For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.
 	 * <p>
-	 * See {@link #updateOffset()}. */
+	 * See {@link #updateRegion()}. */
 	public float[] getOffset () {
 		return offset;
 	}
@@ -252,12 +253,10 @@ public class RegionAttachment extends Attachment {
 		this.height = height;
 	}
 
-	/** The color to tint the region attachment. */
 	public Color getColor () {
 		return color;
 	}
 
-	/** The name of the texture region for this attachment. */
 	public String getPath () {
 		return path;
 	}

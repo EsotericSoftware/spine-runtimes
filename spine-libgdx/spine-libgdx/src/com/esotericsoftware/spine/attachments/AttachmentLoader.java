@@ -45,6 +45,9 @@ public interface AttachmentLoader {
 	public @Null MeshAttachment newMeshAttachment (Skin skin, String name, String path);
 
 	/** @return May be null to not load the attachment. */
+	public @Null SequenceAttachment newSequenceAttachment (Skin skin, String name, String path, int frameCount);
+
+	/** @return May be null to not load the attachment. */
 	public @Null BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name);
 
 	/** @return May be null to not load the attachment. */

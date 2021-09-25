@@ -40,7 +40,7 @@ import com.badlogic.gdx.utils.Null;
  * supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-meshes">Mesh attachments</a> in the Spine User Guide. */
-public class MeshAttachment extends VertexAttachment {
+public class MeshAttachment extends VertexAttachment implements TextureRegionAttachment {
 	private TextureRegion region;
 	private String path;
 	private float[] regionUVs, uvs;
@@ -67,9 +67,9 @@ public class MeshAttachment extends VertexAttachment {
 		return region;
 	}
 
-	/** Calculates {@link #uvs} using {@link #regionUVs} and the {@link #region}. Must be called after changing the region UVs or
-	 * region. */
-	public void updateUVs () {
+	/** Calculates {@link #uvs} using {@link #regionUVs} and the {@link #region}. Must be called after changing the region or the
+	 * region's properties. */
+	public void updateRegion () {
 		float[] regionUVs = this.regionUVs;
 		if (this.uvs == null || this.uvs.length != regionUVs.length) this.uvs = new float[regionUVs.length];
 		float[] uvs = this.uvs;
@@ -152,7 +152,7 @@ public class MeshAttachment extends VertexAttachment {
 
 	/** The UV pair for each vertex, normalized within the entire texture.
 	 * <p>
-	 * See {@link #updateUVs}. */
+	 * See {@link #updateRegion()}. */
 	public float[] getUVs () {
 		return uvs;
 	}
@@ -161,12 +161,10 @@ public class MeshAttachment extends VertexAttachment {
 		this.uvs = uvs;
 	}
 
-	/** The color to tint the mesh. */
 	public Color getColor () {
 		return color;
 	}
 
-	/** The name of the texture region for this attachment. */
 	public String getPath () {
 		return path;
 	}
@@ -269,7 +267,7 @@ public class MeshAttachment extends VertexAttachment {
 		mesh.color.set(color);
 		mesh.deformAttachment = deformAttachment;
 		mesh.setParentMesh(parentMesh != null ? parentMesh : this);
-		mesh.updateUVs();
+		mesh.updateRegion();
 		return mesh;
 	}
 }

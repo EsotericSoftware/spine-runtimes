@@ -85,6 +85,9 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.SequenceAttachment;
+import com.esotericsoftware.spine.attachments.SequenceAttachment.SequenceMode;
+import com.esotericsoftware.spine.attachments.TextureRegionAttachment;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
 /** Loads skeleton data in the Spine binary format.
@@ -302,7 +305,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
 				linkedMesh.mesh.setDeformAttachment(linkedMesh.inheritDeform ? (VertexAttachment)parent : linkedMesh.mesh);
 				linkedMesh.mesh.setParentMesh((MeshAttachment)parent);
-				linkedMesh.mesh.updateUVs();
+				linkedMesh.mesh.updateRegion();
 			}
 			linkedMeshes.clear();
 
@@ -408,7 +411,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			region.setWidth(width * scale);
 			region.setHeight(height * scale);
 			Color.rgba8888ToColor(region.getColor(), color);
-			region.updateOffset();
+			region.updateRegion();
 			return region;
 		}
 		case boundingbox: {
@@ -450,7 +453,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			mesh.setWorldVerticesLength(vertexCount << 1);
 			mesh.setTriangles(triangles);
 			mesh.setRegionUVs(uvs);
-			mesh.updateUVs();
+			mesh.updateRegion();
 			mesh.setHullLength(hullLength << 1);
 			if (nonessential) {
 				mesh.setEdges(edges);
@@ -518,7 +521,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			if (nonessential) Color.rgba8888ToColor(point.getColor(), color);
 			return point;
 		}
-		case clipping:
+		case clipping: {
 			int endSlotIndex = input.readInt(true);
 			int vertexCount = input.readInt(true);
 			Vertices vertices = readVertices(input, vertexCount);
@@ -532,6 +535,25 @@ public class SkeletonBinary extends SkeletonLoader {
 			clip.setBones(vertices.bones);
 			if (nonessential) Color.rgba8888ToColor(clip.getColor(), color);
 			return clip;
+		}
+		case sequence:
+			Attachment attachment = readAttachment(input, skeletonData, skin, slotIndex, attachmentName, nonessential);
+			int frameCount = input.readInt(true);
+			float frameTime = input.readFloat();
+			SequenceMode mode = SequenceMode.values[input.readInt(true)];
+
+			if (attachment == null) return null;
+			String path = ((TextureRegionAttachment)attachment).getPath();
+
+			SequenceAttachment sequence = attachmentLoader.newSequenceAttachment(skin, name, path, frameCount);
+			if (sequence == null) return null;
+
+			sequence.setAttachment(attachment);
+			sequence.setPath(path);
+			sequence.setFrameCount(frameCount);
+			sequence.setFrameTime(frameTime);
+			sequence.setMode(mode);
+			return sequence;
 		}
 		return null;
 	}

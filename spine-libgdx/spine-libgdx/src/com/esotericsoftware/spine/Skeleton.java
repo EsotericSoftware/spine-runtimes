@@ -42,6 +42,7 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.SequenceAttachment;
 
 /** Stores the current pose for a skeleton.
  * <p>
@@ -721,6 +722,7 @@ public class Skeleton {
 			int verticesLength = 0;
 			float[] vertices = null;
 			Attachment attachment = slot.attachment;
+			if (attachment instanceof SequenceAttachment) attachment = ((SequenceAttachment)attachment).updateAttachment(slot);
 			if (attachment instanceof RegionAttachment) {
 				verticesLength = 8;
 				vertices = temp.setSize(8);

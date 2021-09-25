@@ -323,7 +323,7 @@ public class SkeletonJson extends SkeletonLoader {
 			if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
 			linkedMesh.mesh.setDeformAttachment(linkedMesh.inheritDeform ? (VertexAttachment)parent : linkedMesh.mesh);
 			linkedMesh.mesh.setParentMesh((MeshAttachment)parent);
-			linkedMesh.mesh.updateUVs();
+			linkedMesh.mesh.updateRegion();
 		}
 		linkedMeshes.clear();
 
@@ -380,7 +380,7 @@ public class SkeletonJson extends SkeletonLoader {
 			String color = map.getString("color", null);
 			if (color != null) Color.valueOf(color, region.getColor());
 
-			region.updateOffset();
+			region.updateRegion();
 			return region;
 		}
 		case boundingbox: {
@@ -416,7 +416,7 @@ public class SkeletonJson extends SkeletonLoader {
 			readVertices(map, mesh, uvs.length);
 			mesh.setTriangles(map.require("triangles").asShortArray());
 			mesh.setRegionUVs(uvs);
-			mesh.updateUVs();
+			mesh.updateRegion();
 
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() << 1);
 			if (map.has("edges")) mesh.setEdges(map.require("edges").asShortArray());

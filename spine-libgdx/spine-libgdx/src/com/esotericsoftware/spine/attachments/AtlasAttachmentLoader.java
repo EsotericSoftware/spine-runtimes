@@ -63,6 +63,18 @@ public class AtlasAttachmentLoader implements AttachmentLoader {
 		return attachment;
 	}
 
+	public SequenceAttachment newSequenceAttachment (Skin skin, String name, String path, int frameCount) {
+		AtlasRegion[] regions = new AtlasRegion[frameCount];
+		for (int i = 0; i < frameCount; i++) {
+			AtlasRegion region = atlas.findRegion(path + frameCount); // BOZO - Zero pad?
+			if (region == null)
+				throw new RuntimeException("Region not found in atlas: " + path + frameCount + " (sequence: " + name + ")");
+		}
+		SequenceAttachment sequence = new SequenceAttachment(name);
+		sequence.setRegions(regions);
+		return sequence;
+	}
+
 	public BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name) {
 		return new BoundingBoxAttachment(name);
 	}

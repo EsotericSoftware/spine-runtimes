@@ -40,6 +40,7 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.SequenceAttachment;
 
 public class BonePlotting {
 	static public void main (String[] args) throws Exception {
@@ -50,6 +51,10 @@ public class BonePlotting {
 			}
 
 			public MeshAttachment newMeshAttachment (Skin skin, String name, String path) {
+				return null;
+			}
+
+			public SequenceAttachment newSequenceAttachment (Skin skin, String name, String path, int frameCount) {
 				return null;
 			}
 
