@@ -37,7 +37,7 @@ import com.esotericsoftware.spine.Slot;
 /** An attachment that applies a sequence of texture atlas regions to a region or mesh attachment.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-sequences">Sequence attachments</a> in the Spine User Guide. */
-public class SequenceAttachment<T extends Attachment & TextureRegionAttachment> extends Attachment {
+public class SequenceAttachment<T extends Attachment & HasTextureRegion> extends Attachment {
 	private T attachment;
 	private String path;
 	private int frameCount;

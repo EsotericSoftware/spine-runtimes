@@ -40,7 +40,7 @@ import com.esotericsoftware.spine.Bone;
 /** An attachment that displays a textured quadrilateral.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-regions">Region attachments</a> in the Spine User Guide. */
-public class RegionAttachment extends Attachment implements TextureRegionAttachment {
+public class RegionAttachment extends Attachment implements HasTextureRegion {
 	static public final int BLX = 0;
 	static public final int BLY = 1;
 	static public final int ULX = 2;

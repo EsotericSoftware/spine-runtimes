@@ -87,7 +87,7 @@ import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SequenceAttachment;
 import com.esotericsoftware.spine.attachments.SequenceAttachment.SequenceMode;
-import com.esotericsoftware.spine.attachments.TextureRegionAttachment;
+import com.esotericsoftware.spine.attachments.HasTextureRegion;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
 /** Loads skeleton data in the Spine binary format.
@@ -543,7 +543,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			SequenceMode mode = SequenceMode.values[input.readInt(true)];
 
 			if (attachment == null) return null;
-			String path = ((TextureRegionAttachment)attachment).getPath();
+			String path = ((HasTextureRegion)attachment).getPath();
 
 			SequenceAttachment sequence = attachmentLoader.newSequenceAttachment(skin, name, path, frameCount);
 			if (sequence == null) return null;

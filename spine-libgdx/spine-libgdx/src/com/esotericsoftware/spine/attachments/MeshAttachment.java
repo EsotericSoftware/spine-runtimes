@@ -40,7 +40,7 @@ import com.badlogic.gdx.utils.Null;
  * supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-meshes">Mesh attachments</a> in the Spine User Guide. */
-public class MeshAttachment extends VertexAttachment implements TextureRegionAttachment {
+public class MeshAttachment extends VertexAttachment implements HasTextureRegion {
 	private TextureRegion region;
 	private String path;
 	private float[] regionUVs, uvs;
