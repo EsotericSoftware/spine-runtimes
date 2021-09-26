@@ -52,28 +52,28 @@ public class SequenceAttachment<T extends Attachment & TextureRegionAttachment> 
 	/** Updates the {@link #attachment} with the {@link #regions region} for the slot's {@link Slot#getAttachmentTime()} and
 	 * returns it. */
 	public T updateAttachment (Slot slot) {
-		int frameIndex = (int)(slot.getAttachmentTime() / frameTime);
+		int index = (int)(slot.getAttachmentTime() / frameTime);
 		switch (mode) {
 		case forward:
-			frameIndex = Math.min(frameCount - 1, frameIndex);
+			index = Math.min(frameCount - 1, index);
 			break;
 		case backward:
-			frameIndex = Math.max(frameCount - frameIndex - 1, 0);
+			index = Math.max(frameCount - index - 1, 0);
 			break;
 		case forwardLoop:
-			frameIndex = frameIndex % frameCount;
+			index = index % frameCount;
 			break;
 		case backwardLoop:
-			frameIndex = frameCount - (frameIndex % frameCount) - 1;
+			index = frameCount - (index % frameCount) - 1;
 			break;
 		case pingPong:
-			frameIndex = frameIndex % (frameCount << 1);
-			if (frameIndex >= frameCount) frameIndex = frameCount - 1 - (frameIndex - frameCount);
+			index = index % (frameCount << 1);
+			if (index >= frameCount) index = frameCount - 1 - (index - frameCount);
 			break;
 		case random:
-			frameIndex = MathUtils.random(frameCount - 1);
+			index = MathUtils.random(frameCount - 1);
 		}
-		attachment.setRegion(regions[frameIndex]);
+		attachment.setRegion(regions[index]);
 		attachment.updateRegion();
 		return attachment;
 	}
