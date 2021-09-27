@@ -125,7 +125,6 @@ public class MixTest extends ApplicationAdapter {
 		}
 
 		skeleton.updateWorldTransform();
-		skeleton.update(Gdx.graphics.getDeltaTime());
 
 		batch.begin();
 		renderer.draw(batch, skeleton);

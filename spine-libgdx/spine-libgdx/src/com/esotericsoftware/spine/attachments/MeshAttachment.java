@@ -36,6 +36,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Null;
 
+import com.esotericsoftware.spine.Slot;
+
 /** An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
  * supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
  * <p>
@@ -48,6 +50,7 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 	private final Color color = new Color(1, 1, 1, 1);
 	private int hullLength;
 	private @Null MeshAttachment parentMesh;
+	private @Null Sequence sequence;
 
 	// Nonessential.
 	private @Null short[] edges;
@@ -55,6 +58,36 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 
 	public MeshAttachment (String name) {
 		super(name);
+	}
+
+	/** Copy constructor. Use {@link #newLinkedMesh()} if the other mesh is a linked mesh. */
+	protected MeshAttachment (MeshAttachment other) {
+		super(other);
+
+		if (parentMesh != null) throw new IllegalArgumentException("Use newLinkedMesh to copy a linked mesh.");
+
+		region = other.region;
+		path = other.path;
+		color.set(other.color);
+
+		regionUVs = new float[other.regionUVs.length];
+		arraycopy(other.regionUVs, 0, regionUVs, 0, regionUVs.length);
+
+		uvs = new float[other.uvs.length];
+		arraycopy(other.uvs, 0, uvs, 0, uvs.length);
+
+		triangles = new short[other.triangles.length];
+		arraycopy(other.triangles, 0, triangles, 0, triangles.length);
+
+		hullLength = other.hullLength;
+
+		// Nonessential.
+		if (other.edges != null) {
+			edges = new short[other.edges.length];
+			arraycopy(other.edges, 0, edges, 0, edges.length);
+		}
+		width = other.width;
+		height = other.height;
 	}
 
 	public void setRegion (TextureRegion region) {
@@ -67,8 +100,8 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		return region;
 	}
 
-	/** Calculates {@link #uvs} using {@link #regionUVs} and the {@link #region}. Must be called after changing the region or the
-	 * region's properties. */
+	/** Calculates {@link #uvs} using the {@link #regionUVs} and {@link #region}. Must be called if the {@link #region},
+	 * {@link #regionUVs}, or the region's properties are changed. */
 	public void updateRegion () {
 		float[] regionUVs = this.regionUVs;
 		if (this.uvs == null || this.uvs.length != regionUVs.length) this.uvs = new float[regionUVs.length];
@@ -129,6 +162,12 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 			uvs[i] = u + regionUVs[i] * width;
 			uvs[i + 1] = v + regionUVs[i + 1] * height;
 		}
+	}
+
+	/** If the attachment has a {@link #sequence}, the {@link #region} may be changed. */
+	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride) {
+		if (sequence != null) sequence.apply(slot, this);
+		super.computeWorldVertices(slot, start, count, worldVertices, offset, stride);
 	}
 
 	/** Triplets of vertex indices which describe the mesh's triangulation. */
@@ -210,6 +249,14 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		this.height = height;
 	}
 
+	public @Null Sequence getSequence () {
+		return sequence;
+	}
+
+	public void setSequence (@Null Sequence sequence) {
+		this.sequence = sequence;
+	}
+
 	/** The parent mesh if this is a linked mesh, else null. A linked mesh shares the {@link #bones}, {@link #vertices},
 	 * {@link #regionUVs}, {@link #triangles}, {@link #hullLength}, {@link #edges}, {@link #width}, and {@link #height} with the
 	 * parent mesh, but may have a different {@link #name} or {@link #path} (and therefore a different texture). */
@@ -232,42 +279,19 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		}
 	}
 
-	public Attachment copy () {
-		if (parentMesh != null) return newLinkedMesh();
-
-		MeshAttachment copy = new MeshAttachment(name);
-		copy.region = region;
-		copy.path = path;
-		copy.color.set(color);
-
-		copyTo(copy);
-		copy.regionUVs = new float[regionUVs.length];
-		arraycopy(regionUVs, 0, copy.regionUVs, 0, regionUVs.length);
-		copy.uvs = new float[uvs.length];
-		arraycopy(uvs, 0, copy.uvs, 0, uvs.length);
-		copy.triangles = new short[triangles.length];
-		arraycopy(triangles, 0, copy.triangles, 0, triangles.length);
-		copy.hullLength = hullLength;
-
-		// Nonessential.
-		if (edges != null) {
-			copy.edges = new short[edges.length];
-			arraycopy(edges, 0, copy.edges, 0, edges.length);
-		}
-		copy.width = width;
-		copy.height = height;
-		return copy;
-	}
-
 	/** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. */
 	public MeshAttachment newLinkedMesh () {
 		MeshAttachment mesh = new MeshAttachment(name);
+		mesh.timelineAttachment = timelineAttachment;
 		mesh.region = region;
 		mesh.path = path;
 		mesh.color.set(color);
-		mesh.deformAttachment = deformAttachment;
 		mesh.setParentMesh(parentMesh != null ? parentMesh : this);
 		mesh.updateRegion();
 		return mesh;
+	}
+
+	public MeshAttachment copy () {
+		return parentMesh != null ? newLinkedMesh() : new MeshAttachment(this);
 	}
 }

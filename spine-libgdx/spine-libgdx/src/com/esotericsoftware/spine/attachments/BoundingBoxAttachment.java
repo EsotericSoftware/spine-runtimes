@@ -46,16 +46,19 @@ public class BoundingBoxAttachment extends VertexAttachment {
 		super(name);
 	}
 
+	/** Copy constructor. */
+	protected BoundingBoxAttachment (BoundingBoxAttachment other) {
+		super(other);
+		color.set(other.color);
+	}
+
 	/** The color of the bounding box as it was in Spine, or a default color if nonessential data was not exported. Bounding boxes
 	 * are not usually rendered at runtime. */
 	public Color getColor () {
 		return color;
 	}
 
-	public Attachment copy () {
-		BoundingBoxAttachment copy = new BoundingBoxAttachment(name);
-		copyTo(copy);
-		copy.color.set(color);
-		return copy;
+	public BoundingBoxAttachment copy () {
+		return new BoundingBoxAttachment(name);
 	}
 }

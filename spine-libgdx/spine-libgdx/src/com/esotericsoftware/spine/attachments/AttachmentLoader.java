@@ -39,13 +39,10 @@ import com.esotericsoftware.spine.Skin;
  * Runtimes Guide. */
 public interface AttachmentLoader {
 	/** @return May be null to not load the attachment. */
-	public @Null RegionAttachment newRegionAttachment (Skin skin, String name, String path);
+	public @Null RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence);
 
 	/** @return May be null to not load the attachment. In that case null should also be returned for child meshes. */
-	public @Null MeshAttachment newMeshAttachment (Skin skin, String name, String path);
-
-	/** @return May be null to not load the attachment. */
-	public @Null SequenceAttachment newSequenceAttachment (Skin skin, String name, String path, int frameCount);
+	public @Null MeshAttachment newMeshAttachment (Skin skin, String name, String path, @Null Sequence sequence);
 
 	/** @return May be null to not load the attachment. */
 	public @Null BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name);

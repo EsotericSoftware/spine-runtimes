@@ -85,7 +85,6 @@ public class VertexEffectTest extends ApplicationAdapter {
 	public void render () {
 		// Update the skeleton and animation time.
 		float delta = Gdx.graphics.getDeltaTime();
-		skeleton.update(delta);
 		state.update(delta);
 
 		swirlTime += delta;

@@ -258,7 +258,6 @@ public class SkeletonViewer extends ApplicationAdapter {
 				skeleton.setSlotsToSetupPose();
 
 			delta = Math.min(delta, 0.032f) * ui.speedSlider.getValue();
-			skeleton.update(delta);
 			state.update(delta);
 			state.apply(skeleton);
 			skeleton.updateWorldTransform();

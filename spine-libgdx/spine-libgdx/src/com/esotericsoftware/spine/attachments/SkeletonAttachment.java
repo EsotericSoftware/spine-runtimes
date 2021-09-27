@@ -41,8 +41,13 @@ public class SkeletonAttachment extends Attachment {
 		super(name);
 	}
 
-	/** @return May return null. */
-	public Skeleton getSkeleton () {
+	/** Copy constructor. */
+	protected SkeletonAttachment (SkeletonAttachment other) {
+		super(other);
+		skeleton = other.skeleton;
+	}
+
+	public @Null Skeleton getSkeleton () {
 		return skeleton;
 	}
 
@@ -50,9 +55,7 @@ public class SkeletonAttachment extends Attachment {
 		this.skeleton = skeleton;
 	}
 
-	public Attachment copy () {
-		SkeletonAttachment copy = new SkeletonAttachment(name);
-		copy.skeleton = skeleton;
-		return copy;
+	public SkeletonAttachment copy () {
+		return new SkeletonAttachment(this);
 	}
 }

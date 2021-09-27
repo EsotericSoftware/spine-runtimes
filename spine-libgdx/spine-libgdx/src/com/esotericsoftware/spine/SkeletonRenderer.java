@@ -98,7 +98,7 @@ public class SkeletonRenderer {
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
-				region.computeWorldVertices(slot.getBone(), vertices, 0, 5);
+				region.computeWorldVertices(slot, vertices, 0, 5);
 				Color color = region.getColor(), slotColor = slot.getColor();
 				float alpha = a * slotColor.a * color.a * 255;
 				float multiplier = pmaColors ? alpha : 255;
@@ -183,7 +183,7 @@ public class SkeletonRenderer {
 				RegionAttachment region = (RegionAttachment)attachment;
 				verticesLength = vertexSize << 2;
 				vertices = this.vertices.items;
-				region.computeWorldVertices(slot.getBone(), vertices, 0, vertexSize);
+				region.computeWorldVertices(slot, vertices, 0, vertexSize);
 				triangles = quadTriangles;
 				texture = region.getRegion().getTexture();
 				uvs = region.getUVs();
@@ -309,7 +309,7 @@ public class SkeletonRenderer {
 				RegionAttachment region = (RegionAttachment)attachment;
 				verticesLength = vertexSize << 2;
 				vertices = this.vertices.items;
-				region.computeWorldVertices(slot.getBone(), vertices, 0, vertexSize);
+				region.computeWorldVertices(slot, vertices, 0, vertexSize);
 				triangles = quadTriangles;
 				texture = region.getRegion().getTexture();
 				uvs = region.getUVs();

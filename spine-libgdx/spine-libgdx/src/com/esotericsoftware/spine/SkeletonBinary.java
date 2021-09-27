@@ -85,9 +85,6 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.SequenceAttachment;
-import com.esotericsoftware.spine.attachments.SequenceAttachment.SequenceMode;
-import com.esotericsoftware.spine.attachments.HasTextureRegion;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
 /** Loads skeleton data in the Spine binary format.
@@ -303,7 +300,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				if (skin == null) throw new SerializationException("Skin not found: " + linkedMesh.skin);
 				Attachment parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 				if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
-				linkedMesh.mesh.setDeformAttachment(linkedMesh.inheritDeform ? (VertexAttachment)parent : linkedMesh.mesh);
+				linkedMesh.mesh.setTimelineAttachment(linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh);
 				linkedMesh.mesh.setParentMesh((MeshAttachment)parent);
 				linkedMesh.mesh.updateRegion();
 			}
@@ -399,8 +396,10 @@ public class SkeletonBinary extends SkeletonLoader {
 			float height = input.readFloat();
 			int color = input.readInt();
 
+			// BOZO! - Read sequence.
+
 			if (path == null) path = name;
-			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path);
+			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path, null);
 			if (region == null) return null;
 			region.setPath(path);
 			region.setX(x * scale);
@@ -443,8 +442,10 @@ public class SkeletonBinary extends SkeletonLoader {
 				height = input.readFloat();
 			}
 
+			// BOZO! - Read sequence.
+
 			if (path == null) path = name;
-			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
+			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path, null);
 			if (mesh == null) return null;
 			mesh.setPath(path);
 			Color.rgba8888ToColor(mesh.getColor(), color);
@@ -467,15 +468,17 @@ public class SkeletonBinary extends SkeletonLoader {
 			int color = input.readInt();
 			String skinName = input.readStringRef();
 			String parent = input.readStringRef();
-			boolean inheritDeform = input.readBoolean();
+			boolean inheritTimelines = input.readBoolean();
 			float width = 0, height = 0;
 			if (nonessential) {
 				width = input.readFloat();
 				height = input.readFloat();
 			}
 
+			// BOZO! - Read sequence.
+
 			if (path == null) path = name;
-			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
+			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path, null);
 			if (mesh == null) return null;
 			mesh.setPath(path);
 			Color.rgba8888ToColor(mesh.getColor(), color);
@@ -483,7 +486,7 @@ public class SkeletonBinary extends SkeletonLoader {
 				mesh.setWidth(width * scale);
 				mesh.setHeight(height * scale);
 			}
-			linkedMeshes.add(new LinkedMesh(mesh, skinName, slotIndex, parent, inheritDeform));
+			linkedMeshes.add(new LinkedMesh(mesh, skinName, slotIndex, parent, inheritTimelines));
 			return mesh;
 		}
 		case path: {
@@ -521,7 +524,7 @@ public class SkeletonBinary extends SkeletonLoader {
 			if (nonessential) Color.rgba8888ToColor(point.getColor(), color);
 			return point;
 		}
-		case clipping: {
+		case clipping:
 			int endSlotIndex = input.readInt(true);
 			int vertexCount = input.readInt(true);
 			Vertices vertices = readVertices(input, vertexCount);
@@ -535,25 +538,6 @@ public class SkeletonBinary extends SkeletonLoader {
 			clip.setBones(vertices.bones);
 			if (nonessential) Color.rgba8888ToColor(clip.getColor(), color);
 			return clip;
-		}
-		case sequence:
-			Attachment attachment = readAttachment(input, skeletonData, skin, slotIndex, attachmentName, nonessential);
-			int frameCount = input.readInt(true);
-			float frameTime = input.readFloat();
-			SequenceMode mode = SequenceMode.values[input.readInt(true)];
-
-			if (attachment == null) return null;
-			String path = ((HasTextureRegion)attachment).getPath();
-
-			SequenceAttachment sequence = attachmentLoader.newSequenceAttachment(skin, name, path, frameCount);
-			if (sequence == null) return null;
-
-			sequence.setAttachment(attachment);
-			sequence.setPath(path);
-			sequence.setFrameCount(frameCount);
-			sequence.setFrameTime(frameTime);
-			sequence.setMode(mode);
-			return sequence;
 		}
 		return null;
 	}

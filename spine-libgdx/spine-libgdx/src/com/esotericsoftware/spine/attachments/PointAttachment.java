@@ -51,6 +51,15 @@ public class PointAttachment extends Attachment {
 		super(name);
 	}
 
+	/** Copy constructor. */
+	protected PointAttachment (PointAttachment other) {
+		super(other);
+		x = other.x;
+		y = other.y;
+		rotation = other.rotation;
+		color.set(other.color);
+	}
+
 	public float getX () {
 		return x;
 	}
@@ -94,12 +103,7 @@ public class PointAttachment extends Attachment {
 		return (float)Math.atan2(y, x) * radDeg;
 	}
 
-	public Attachment copy () {
-		PointAttachment copy = new PointAttachment(name);
-		copy.x = x;
-		copy.y = y;
-		copy.rotation = rotation;
-		copy.color.set(color);
-		return copy;
+	public PointAttachment copy () {
+		return new PointAttachment(this);
 	}
 }

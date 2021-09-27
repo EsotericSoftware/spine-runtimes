@@ -40,6 +40,9 @@ import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.ObjectSet;
 
 import com.esotericsoftware.spine.attachments.Attachment;
+import com.esotericsoftware.spine.attachments.HasTextureRegion;
+import com.esotericsoftware.spine.attachments.Sequence;
+import com.esotericsoftware.spine.attachments.Sequence.SequenceMode;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
 /** Stores a list of timelines to animate a skeleton's pose over time. */
@@ -175,7 +178,8 @@ public class Animation {
 		attachment, deform, //
 		event, drawOrder, //
 		ikConstraint, transformConstraint, //
-		pathConstraintPosition, pathConstraintSpacing, pathConstraintMix
+		pathConstraintPosition, pathConstraintSpacing, pathConstraintMix, //
+		sequence
 	}
 
 	/** The base class for all timelines. */
@@ -1646,7 +1650,7 @@ public class Animation {
 
 		/** The attachment that will be deformed.
 		 * <p>
-		 * See {@link VertexAttachment#getDeformAttachment()}. */
+		 * See {@link VertexAttachment#getTimelineAttachment()}. */
 		public VertexAttachment getAttachment () {
 			return attachment;
 		}
@@ -1724,9 +1728,9 @@ public class Animation {
 			if (!slot.bone.active) return;
 			Attachment slotAttachment = slot.attachment;
 			if (!(slotAttachment instanceof VertexAttachment)
-				|| ((VertexAttachment)slotAttachment).getDeformAttachment() != attachment) return;
+				|| ((VertexAttachment)slotAttachment).getTimelineAttachment() != attachment) return;
 
-			FloatArray deformArray = slot.getDeform();
+			FloatArray deformArray = slot.deform;
 			if (deformArray.size == 0) blend = setup;
 
 			float[][] vertices = this.vertices;
@@ -1734,7 +1738,6 @@ public class Animation {
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
-				VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 				switch (blend) {
 				case setup:
 					deformArray.clear();
@@ -1745,6 +1748,7 @@ public class Animation {
 						return;
 					}
 					float[] deform = deformArray.setSize(vertexCount);
+					VertexAttachment vertexAttachment = (VertexAttachment)slotAttachment;
 					if (vertexAttachment.getBones() == null) {
 						// Unweighted vertex positions.
 						float[] setupVertices = vertexAttachment.getVertices();
@@ -2417,6 +2421,91 @@ public class Animation {
 				constraint.mixX += (x - constraint.mixX) * alpha;
 				constraint.mixY += (y - constraint.mixY) * alpha;
 			}
+		}
+	}
+
+	/** Changes a slot's {@link Slot#getSequenceIndex()} for an attachment's {@link Sequence}. */
+	static public class SequenceTimeline<T extends Attachment & HasTextureRegion> extends Timeline implements SlotTimeline {
+		static public final int ENTRIES = 3;
+		static private final int MODE = 1, FRAME_TIME = 2;
+
+		final int slotIndex;
+		final T attachment;
+
+		public SequenceTimeline (int frameCount, int slotIndex, T attachment) {
+			super(frameCount, Property.sequence.ordinal() + "|" + slotIndex + "|" + attachment.getSequence().getId());
+			this.slotIndex = slotIndex;
+			this.attachment = attachment;
+		}
+
+		public int getFrameEntries () {
+			return ENTRIES;
+		}
+
+		public int getSlotIndex () {
+			return slotIndex;
+		}
+
+		public T getAttachment () {
+			return attachment;
+		}
+
+		/** Sets the time, mode, index, and frame time for the specified frame.
+		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+		 * @param time The frame time in seconds. */
+		public void setFrame (int frame, float time, SequenceMode mode, int index, float frameTime) {
+			frame *= ENTRIES;
+			frames[frame] = time;
+			frames[frame + MODE] = mode.ordinal() | (index << 4);
+			frames[frame + FRAME_TIME] = frameTime;
+		}
+
+		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
+			MixDirection direction) {
+
+			Slot slot = skeleton.slots.get(slotIndex);
+			if (!slot.bone.active) return;
+			Attachment slotAttachment = slot.attachment;
+			if (slotAttachment != attachment) {
+				if (!(slotAttachment instanceof VertexAttachment)
+					|| ((VertexAttachment)slotAttachment).getTimelineAttachment() != attachment) return;
+			}
+
+			float[] frames = this.frames;
+			if (time < frames[0]) { // Time is before first frame.
+				if (blend == setup || blend == first) slot.setSequenceIndex(-1);
+				return;
+			}
+
+			int i = search(frames, time, ENTRIES);
+			float before = frames[i];
+			int modeAndIndex = (int)frames[i + MODE];
+			float frameTime = frames[i + FRAME_TIME];
+
+			int index = modeAndIndex >> 4, count = attachment.getSequence().getRegions().length;
+			SequenceMode mode = SequenceMode.values[modeAndIndex & 0xf];
+			if (mode != SequenceMode.stop) {
+				index += (time - before) / frameTime;
+				switch (mode) {
+				case play:
+					index = Math.min(count - 1, index);
+					break;
+				case loop:
+					index %= count;
+					break;
+				case pingpong:
+					int n = (count << 1) - 2;
+					index %= n;
+					if (index >= count) index = n - index;
+					break;
+				case playReverse:
+					index = Math.max(count - 1 - index, 0);
+					break;
+				case loopReverse:
+					index = count - 1 - (index % count);
+				}
+			}
+			slot.setSequenceIndex(index);
 		}
 	}
 }
