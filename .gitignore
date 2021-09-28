@@ -152,3 +152,6 @@ spine-ts/spine-canvas/dist
 spine-ts/spine-webgl/dist
 spine-ts/spine-player/dist
 spine-ts/spine-threejs/dist
+spine-godot/godot
+spine-godot/spine_godot/spine-cpp
+spine-godot/spine_godot/__pycache__
