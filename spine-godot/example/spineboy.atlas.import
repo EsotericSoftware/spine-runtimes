@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+path="res://.import/spineboy.atlas-ce2b95e2abaaca5faa7726fe317501ea.spatlas"
+
+[deps]
+
+source_file="res://spineboy.atlas"
+dest_files=[ "res://.import/spineboy.atlas-ce2b95e2abaaca5faa7726fe317501ea.spatlas" ]
+
+[params]
+
+normal_texture_prefix=""

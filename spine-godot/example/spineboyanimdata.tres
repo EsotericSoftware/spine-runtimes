@@ -1,0 +1,7 @@
+[gd_resource type="SpineAnimationStateDataResource" load_steps=2 format=2]
+
+[ext_resource path="res://spineboy.tres" type="SpineSkeletonDataResource" id=1]
+
+[resource]
+skeleton = ExtResource( 1 )
+default_mix = 1.0

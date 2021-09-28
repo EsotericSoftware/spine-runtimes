@@ -31,7 +31,6 @@
 
 #include "core/class_db.h"
 
-#include "spine_runtime.h"
 #include "SpineAtlasResource.h"
 #include "ResourceFormatLoaderSpineAtlas.h"
 #include "ResourceFormatSaverSpineAtlas.h"
@@ -88,8 +87,7 @@ void register_spine_godot_types(){
 	EditorNode::add_init_callback(editor_init_callback);
 
 #endif
-
-    ClassDB::register_class<SpineRuntime>();
+    
     ClassDB::register_class<SpineAtlasResource>();
     ClassDB::register_class<SpineSprite>();
 	ClassDB::register_class<SpineSkeletonDataResource>();
