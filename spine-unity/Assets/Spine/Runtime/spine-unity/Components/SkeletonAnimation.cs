@@ -226,7 +226,7 @@ namespace Spine.Unity {
 			if (updateMode != UpdateMode.OnlyEventTimelines)
 				state.Apply(skeleton);
 			else
-				state.ApplyEventTimelinesOnly(skeleton, issueEvents : true);
+				state.ApplyEventTimelinesOnly(skeleton, issueEvents: true);
 
 			if (_UpdateLocal != null)
 				_UpdateLocal(this);
