@@ -554,11 +554,13 @@ namespace Spine.Unity {
 				OnMeshAndMaterialsUpdated(this);
 		}
 
-		public void OnBecameVisible () {
+		public virtual void OnBecameVisible () {
 			UpdateMode previousUpdateMode = updateMode;
 			updateMode = UpdateMode.FullUpdate;
+
+			// OnBecameVisible is called after LateUpdate()
 			if (previousUpdateMode != UpdateMode.FullUpdate)
-				LateUpdate(); // OnBecameVisible is called after LateUpdate()
+				LateUpdate();
 		}
 
 		public void OnBecameInvisible () {

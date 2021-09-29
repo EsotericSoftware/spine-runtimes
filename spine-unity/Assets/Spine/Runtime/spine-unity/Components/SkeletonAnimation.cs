@@ -206,8 +206,10 @@ namespace Spine.Unity {
 				return;
 			UpdateAnimationStatus(deltaTime);
 
-			if (updateMode == UpdateMode.OnlyAnimationStatus)
+			if (updateMode == UpdateMode.OnlyAnimationStatus) {
+				state.ApplyEventTimelinesOnly(skeleton, issueEvents: false);
 				return;
+			}
 			ApplyAnimation();
 		}
 
@@ -224,7 +226,7 @@ namespace Spine.Unity {
 			if (updateMode != UpdateMode.OnlyEventTimelines)
 				state.Apply(skeleton);
 			else
-				state.ApplyEventTimelinesOnly(skeleton);
+				state.ApplyEventTimelinesOnly(skeleton, issueEvents : true);
 
 			if (_UpdateLocal != null)
 				_UpdateLocal(this);
@@ -245,6 +247,18 @@ namespace Spine.Unity {
 			// instantiation can happen from Update() after this component, leading to a missing Update() call.
 			if (!wasUpdatedAfterInit) Update(0);
 			base.LateUpdate();
+		}
+
+		public override void OnBecameVisible () {
+			UpdateMode previousUpdateMode = updateMode;
+			updateMode = UpdateMode.FullUpdate;
+
+			// OnBecameVisible is called after LateUpdate()
+			if (previousUpdateMode != UpdateMode.FullUpdate &&
+				previousUpdateMode != UpdateMode.EverythingExceptMesh)
+				Update(0);
+			if (previousUpdateMode != UpdateMode.FullUpdate)
+				LateUpdate();
 		}
 	}
 

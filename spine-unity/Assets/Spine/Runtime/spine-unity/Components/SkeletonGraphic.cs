@@ -265,10 +265,13 @@ namespace Spine.Unity {
 			wasUpdatedAfterInit = true;
 			if (updateMode < UpdateMode.OnlyAnimationStatus)
 				return;
+
 			UpdateAnimationStatus(deltaTime);
 
-			if (updateMode == UpdateMode.OnlyAnimationStatus)
+			if (updateMode == UpdateMode.OnlyAnimationStatus) {
+				state.ApplyEventTimelinesOnly(skeleton, issueEvents: false);
 				return;
+			}
 			ApplyAnimation();
 		}
 
@@ -303,7 +306,7 @@ namespace Spine.Unity {
 			if (updateMode != UpdateMode.OnlyEventTimelines)
 				state.Apply(skeleton);
 			else
-				state.ApplyEventTimelinesOnly(skeleton);
+				state.ApplyEventTimelinesOnly(skeleton, issueEvents: true);
 
 			if (UpdateLocal != null)
 				UpdateLocal(this);
