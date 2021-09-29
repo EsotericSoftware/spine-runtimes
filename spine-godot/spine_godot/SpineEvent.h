@@ -36,25 +36,27 @@
 
 #include "SpineEventData.h"
 
-class SpineEvent : public Reference{
+class SpineEvent : public Reference {
 	GDCLASS(SpineEvent, Reference);
 
 protected:
 	static void _bind_methods();
+
 private:
 	spine::Event *event;
+
 public:
 	SpineEvent();
 	~SpineEvent();
 
-	inline void set_spine_object(spine::Event *e){
+	inline void set_spine_object(spine::Event *e) {
 		event = e;
 	}
-	inline spine::Event *get_spine_object() const{
+	inline spine::Event *get_spine_object() const {
 		return event;
 	}
 
-	enum EventType{
+	enum EventType {
 		EVENTTYPE_START = spine::EventType_Start,
 		EVENTTYPE_INTERRUPT = spine::EventType_Interrupt,
 		EVENTTYPE_END = spine::EventType_End,
@@ -86,4 +88,4 @@ public:
 	void set_balance(float inValue);
 };
 
-#endif //GODOT_SPINEEVENT_H
+#endif//GODOT_SPINEEVENT_H

@@ -44,25 +44,22 @@ void SpineAnimationState::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_time_scale", "time_scale"), &SpineAnimationState::set_time_scale);
 	ClassDB::bind_method(D_METHOD("disable_queue"), &SpineAnimationState::disable_queue);
 	ClassDB::bind_method(D_METHOD("enable_queue"), &SpineAnimationState::enable_queue);
-//	ClassDB::bind_method(D_METHOD("reload"), &SpineAnimationState::reload_animation_state);
+	//	ClassDB::bind_method(D_METHOD("reload"), &SpineAnimationState::reload_animation_state);
 	ClassDB::bind_method(D_METHOD("get_current", "track_id"), &SpineAnimationState::get_current);
 }
 
-SpineAnimationState::SpineAnimationState():animation_state(NULL) {
-
+SpineAnimationState::SpineAnimationState() : animation_state(NULL) {
 }
 
 SpineAnimationState::~SpineAnimationState() {
-	if(animation_state)
-	{
+	if (animation_state) {
 		delete animation_state;
 		animation_state = NULL;
 	}
 }
 
 void SpineAnimationState::load_animation_state(Ref<SpineAnimationStateDataResource> ad) {
-	if(animation_state)
-	{
+	if (animation_state) {
 		delete animation_state;
 		animation_state = NULL;
 	}
@@ -71,28 +68,33 @@ void SpineAnimationState::load_animation_state(Ref<SpineAnimationStateDataResour
 }
 
 void SpineAnimationState::reload_animation_state() {
-	if(!anim_state_data_res.is_valid())
-	{
+	if (!anim_state_data_res.is_valid()) {
 		ERR_PRINT(" Reload animation state fail, because anim_state_data_res not set!");
 		return;
 	}
-	if(animation_state)
-	{
+	if (animation_state) {
 		delete animation_state;
 		animation_state = NULL;
 	}
 	animation_state = new spine::AnimationState(anim_state_data_res->get_animation_state_data());
 }
 
-#define CHECK_V if(!animation_state){ERR_PRINT("The animation state is not loaded yet!");return;}
-#define CHECK_X(x) if(!animation_state){ERR_PRINT("The animation state is not loaded yet!");return x;}
+#define CHECK_V                                              \
+	if (!animation_state) {                                  \
+		ERR_PRINT("The animation state is not loaded yet!"); \
+		return;                                              \
+	}
+#define CHECK_X(x)                                           \
+	if (!animation_state) {                                  \
+		ERR_PRINT("The animation state is not loaded yet!"); \
+		return x;                                            \
+	}
 #define S_T(x) (spine::String(x.utf8()))
 Ref<SpineTrackEntry> SpineAnimationState::set_animation(const String &anim_name, bool loop, uint64_t track) {
 	CHECK_X(NULL);
 	auto skeleton_data = anim_state_data_res->get_skeleton();
 	auto anim = skeleton_data->find_animation(anim_name);
-	if(!anim.is_valid() || anim->get_spine_object() == NULL)
-	{
+	if (!anim.is_valid() || anim->get_spine_object() == NULL) {
 		ERR_PRINT(String("Can not find animation: ") + anim_name)
 		return NULL;
 	}
@@ -105,8 +107,7 @@ Ref<SpineTrackEntry> SpineAnimationState::add_animation(const String &anim_name,
 	CHECK_X(NULL);
 	auto skeleton_data = anim_state_data_res->get_skeleton();
 	auto anim = skeleton_data->find_animation(anim_name);
-	if(!anim.is_valid() || anim->get_spine_object() == NULL)
-	{
+	if (!anim.is_valid() || anim->get_spine_object() == NULL) {
 		ERR_PRINT(String("Can not find animation: ") + anim_name)
 		return NULL;
 	}
@@ -135,11 +136,11 @@ void SpineAnimationState::set_empty_animations(float mix_duration) {
 	animation_state->setEmptyAnimations(mix_duration);
 }
 
-void SpineAnimationState::update(float delta){
+void SpineAnimationState::update(float delta) {
 	CHECK_V;
 	animation_state->update(delta);
 }
-bool SpineAnimationState::apply(Ref<SpineSkeleton> skeleton){
+bool SpineAnimationState::apply(Ref<SpineSkeleton> skeleton) {
 	CHECK_X(false);
 	return animation_state->apply(*(skeleton->get_spine_object()));
 }
@@ -181,7 +182,7 @@ Ref<SpineTrackEntry> SpineAnimationState::get_current(uint64_t track_index) {
 	CHECK_X(NULL);
 	Ref<SpineTrackEntry> gd_entry(memnew(SpineTrackEntry));
 	auto entry = animation_state->getCurrent(track_index);
-	if(entry == NULL) return NULL;
+	if (entry == NULL) return NULL;
 	gd_entry->set_spine_object(entry);
 	return gd_entry;
 }

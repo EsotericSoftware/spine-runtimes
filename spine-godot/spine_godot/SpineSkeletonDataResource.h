@@ -45,7 +45,7 @@
 #include "SpinePathConstraintData.h"
 #include "SpineEventData.h"
 
-class SpineSkeletonDataResource : public Resource{
+class SpineSkeletonDataResource : public Resource {
 	GDCLASS(SpineSkeletonDataResource, Resource);
 
 protected:
@@ -60,14 +60,14 @@ private:
 	spine::SkeletonData *skeleton_data;
 
 	void update_skeleton_data();
-public:
 
-	inline void set_spine_object(spine::SkeletonData *s){
+public:
+	inline void set_spine_object(spine::SkeletonData *s) {
 		skeleton_data = s;
-		if(s)
+		if (s)
 			spine_object = true;
 	}
-	inline spine::SkeletonData *get_spine_object(){
+	inline spine::SkeletonData *get_spine_object() {
 		return skeleton_data;
 	}
 
@@ -76,7 +76,7 @@ public:
 	SpineSkeletonDataResource();
 	virtual ~SpineSkeletonDataResource();
 
-    void _get_property_list(List<PropertyInfo> *p_list) const;
+	void _get_property_list(List<PropertyInfo> *p_list) const;
 
 	void set_atlas_res(const Ref<SpineAtlasResource> &a);
 	Ref<SpineAtlasResource> get_atlas_res();
@@ -84,17 +84,17 @@ public:
 	void set_skeleton_json_res(const Ref<SpineSkeletonJsonDataResource> &s);
 	Ref<SpineSkeletonJsonDataResource> get_skeleton_json_res();
 
-	inline spine::SkeletonData *get_skeleton_data(){return skeleton_data;}
+	inline spine::SkeletonData *get_skeleton_data() { return skeleton_data; }
 
 	bool is_skeleton_data_loaded() const;
 
 	void get_animation_names(Vector<String> &l) const;
-    void get_skin_names(Vector<String> &l) const;
+	void get_skin_names(Vector<String> &l) const;
 
 	// spine api
-	Ref<SpineBoneData> find_bone(const String &bone_name);	
+	Ref<SpineBoneData> find_bone(const String &bone_name);
 
-	Ref<SpineSlotData> find_slot(const String &slot_name);	
+	Ref<SpineSlotData> find_slot(const String &slot_name);
 
 	Ref<SpineSkin> find_skin(const String &skin_name);
 
@@ -104,7 +104,7 @@ public:
 
 	Ref<SpineIkConstraintData> find_ik_constraint(const String &constraint_name);
 	Ref<SpineTransformConstraintData> find_transform_constraint(const String &constraint_name);
-	Ref<SpinePathConstraintData> find_path_constraint(const String &constraint_name);	
+	Ref<SpinePathConstraintData> find_path_constraint(const String &constraint_name);
 
 	Array get_bones();
 	Array get_slots();
@@ -137,4 +137,4 @@ public:
 	void set_fps(float v);
 };
 
-#endif //GODOT_SPINESKELETONDATARESOURCE_H
+#endif//GODOT_SPINESKELETONDATARESOURCE_H

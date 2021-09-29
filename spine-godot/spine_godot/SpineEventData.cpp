@@ -30,8 +30,7 @@
 #include "SpineEventData.h"
 
 void SpineEventData::_bind_methods() {
-
 }
 
-SpineEventData::SpineEventData():event_data(NULL) {}
-SpineEventData::~SpineEventData(){}
+SpineEventData::SpineEventData() : event_data(NULL) {}
+SpineEventData::~SpineEventData() {}

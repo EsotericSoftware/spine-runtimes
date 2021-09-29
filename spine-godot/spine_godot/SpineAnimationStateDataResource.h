@@ -34,7 +34,7 @@
 
 #include "SpineSkeletonDataResource.h"
 
-class SpineAnimationStateDataResource : public Resource{
+class SpineAnimationStateDataResource : public Resource {
 	GDCLASS(SpineAnimationStateDataResource, Resource);
 
 protected:
@@ -48,12 +48,12 @@ private:
 	bool animation_state_data_created;
 
 	float default_mix;
-public:
 
+public:
 	void set_skeleton(const Ref<SpineSkeletonDataResource> &s);
 	Ref<SpineSkeletonDataResource> get_skeleton();
 
-	inline spine::AnimationStateData *get_animation_state_data(){
+	inline spine::AnimationStateData *get_animation_state_data() {
 		return animation_state_data;
 	}
 
@@ -73,4 +73,4 @@ public:
 	~SpineAnimationStateDataResource();
 };
 
-#endif //GODOT_SPINEANIMATIONSTATEDATARESOURCE_H
+#endif//GODOT_SPINEANIMATIONSTATEDATARESOURCE_H

@@ -54,14 +54,15 @@ private:
 	spine::Bone *bone;
 
 	SpineSprite *the_sprite;
+
 public:
 	SpineBone();
 	~SpineBone();
 
-	inline void set_spine_object(spine::Bone *b){
+	inline void set_spine_object(spine::Bone *b) {
 		bone = b;
 	}
-	inline spine::Bone *get_spine_object(){
+	inline spine::Bone *get_spine_object() {
 		return bone;
 	}
 
@@ -171,4 +172,4 @@ public:
 	void set_godot_global_transform(Transform2D trans);
 };
 
-#endif //GODOT_SPINEBONE_H
+#endif//GODOT_SPINEBONE_H

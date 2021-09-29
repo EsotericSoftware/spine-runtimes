@@ -29,12 +29,10 @@
 
 #include "SpineAnimationStateDataResource.h"
 
-SpineAnimationStateDataResource::SpineAnimationStateDataResource():animation_state_data(NULL),animation_state_data_created(false),default_mix(0.5f) {
-
+SpineAnimationStateDataResource::SpineAnimationStateDataResource() : animation_state_data(NULL), animation_state_data_created(false), default_mix(0.5f) {
 }
 SpineAnimationStateDataResource::~SpineAnimationStateDataResource() {
-	if(animation_state_data)
-	{
+	if (animation_state_data) {
 		delete animation_state_data;
 		animation_state_data = NULL;
 	}
@@ -63,27 +61,22 @@ void SpineAnimationStateDataResource::set_skeleton(const Ref<SpineSkeletonDataRe
 	skeleton = s;
 
 	_on_skeleton_data_changed();
-	if(skeleton.is_valid())
-	{
+	if (skeleton.is_valid()) {
 		skeleton->connect("skeleton_data_loaded", this, "_on_skeleton_data_loaded");
 		skeleton->connect("atlas_res_changed", this, "_on_skeleton_data_changed");
 		skeleton->connect("skeleton_json_res_changed", this, "_on_skeleton_data_changed");
 
-		if(skeleton->is_skeleton_data_loaded())
-		{
+		if (skeleton->is_skeleton_data_loaded()) {
 			_on_skeleton_data_loaded();
 		}
-	}else{
-		if(animation_state_data)
-		{
+	} else {
+		if (animation_state_data) {
 			delete animation_state_data;
 			animation_state_data = NULL;
 			animation_state_data_created = false;
-//			print_line("Animation state data deleted.");
+			//			print_line("Animation state data deleted.");
 		}
 	}
-
-
 }
 Ref<SpineSkeletonDataResource> SpineAnimationStateDataResource::get_skeleton() {
 	return skeleton;
@@ -91,18 +84,17 @@ Ref<SpineSkeletonDataResource> SpineAnimationStateDataResource::get_skeleton() {
 
 void SpineAnimationStateDataResource::set_default_mix(float m) {
 	default_mix = m;
-	if(!is_animation_state_data_created())
-	{
-//		ERR_PRINT("'set_default_mix' fail. Animation state data is not created!");
+	if (!is_animation_state_data_created()) {
+		//		ERR_PRINT("'set_default_mix' fail. Animation state data is not created!");
 		return;
 	}
-	animation_state_data->setDefaultMix(((m >= 0 && m <= 1) ? m : m <= 0 ? 0 : 1));
-//	emit_signal("animation_state_data_changed");
+	animation_state_data->setDefaultMix(((m >= 0 && m <= 1) ? m : m <= 0 ? 0
+																		 : 1));
+	//	emit_signal("animation_state_data_changed");
 }
 float SpineAnimationStateDataResource::get_default_mix() {
-	if(!is_animation_state_data_created())
-	{
-//		ERR_PRINT("'get_default_mix' fail. Animation state data is not created!");
+	if (!is_animation_state_data_created()) {
+		//		ERR_PRINT("'get_default_mix' fail. Animation state data is not created!");
 		return default_mix;
 	}
 	default_mix = animation_state_data->getDefaultMix();
@@ -110,40 +102,34 @@ float SpineAnimationStateDataResource::get_default_mix() {
 }
 
 void SpineAnimationStateDataResource::set_mix(const String &from, const String &to, float mix_duration) {
-	if(!is_animation_state_data_created())
-	{
+	if (!is_animation_state_data_created()) {
 		ERR_PRINT("'set_mix' fail. Animation state data is not created!");
 		return;
 	}
 	auto anim_from = get_skeleton()->find_animation(from);
 	auto anim_to = get_skeleton()->find_animation(to);
-	if(!anim_from.is_valid())
-	{
+	if (!anim_from.is_valid()) {
 		ERR_PRINT("'set_mix' fail. From animation animation not found!");
 		return;
 	}
-	if(!anim_to.is_valid())
-	{
+	if (!anim_to.is_valid()) {
 		ERR_PRINT("'set_mix' fail. To animation animation not found!");
 		return;
 	}
 	animation_state_data->setMix(anim_from->get_spine_object(), anim_to->get_spine_object(), mix_duration);
 }
 float SpineAnimationStateDataResource::get_mix(const String &from, const String &to) {
-	if(!is_animation_state_data_created())
-	{
+	if (!is_animation_state_data_created()) {
 		ERR_PRINT("'set_mix' fail. Animation state data is not created!");
 		return 0;
 	}
 	auto anim_from = get_skeleton()->find_animation(from);
 	auto anim_to = get_skeleton()->find_animation(to);
-	if(!anim_from.is_valid())
-	{
+	if (!anim_from.is_valid()) {
 		ERR_PRINT("'set_mix' fail. From animation animation not found!");
 		return 0;
 	}
-	if(!anim_to.is_valid())
-	{
+	if (!anim_to.is_valid()) {
 		ERR_PRINT("'set_mix' fail. To animation animation not found!");
 		return 0;
 	}
@@ -152,7 +138,7 @@ float SpineAnimationStateDataResource::get_mix(const String &from, const String 
 
 void SpineAnimationStateDataResource::_on_skeleton_data_loaded() {
 	animation_state_data = new spine::AnimationStateData(skeleton->get_skeleton_data());
-//	print_line("Animation state data created.");
+	//	print_line("Animation state data created.");
 
 
 	emit_signal("animation_state_data_created");
@@ -162,17 +148,16 @@ void SpineAnimationStateDataResource::_on_skeleton_data_loaded() {
 
 void SpineAnimationStateDataResource::_on_skeleton_data_changed() {
 	animation_state_data_created = false;
-	if(animation_state_data)
-	{
+	if (animation_state_data) {
 		delete animation_state_data;
 		animation_state_data = NULL;
-//		print_line("Animation state data deleted.");
+		//		print_line("Animation state data deleted.");
 	}
 
-//	print_line("skeleton_data_res_changed emitted");
+	//	print_line("skeleton_data_res_changed emitted");
 	emit_signal("skeleton_data_res_changed");
 }
 
-bool SpineAnimationStateDataResource::is_animation_state_data_created(){
+bool SpineAnimationStateDataResource::is_animation_state_data_created() {
 	return animation_state_data_created;
 }

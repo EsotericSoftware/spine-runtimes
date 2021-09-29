@@ -38,7 +38,7 @@
 #include "SpineSlot.h"
 #include "SpinePathConstraintData.h"
 
-class SpinePathConstraint : public Reference{
+class SpinePathConstraint : public Reference {
 	GDCLASS(SpinePathConstraint, Reference);
 
 protected:
@@ -51,15 +51,15 @@ public:
 	SpinePathConstraint();
 	~SpinePathConstraint();
 
-	inline void set_spine_object(spine::PathConstraint *pc){
+	inline void set_spine_object(spine::PathConstraint *pc) {
 		path_constraint = pc;
 	}
-	inline spine::PathConstraint *get_spine_object(){
+	inline spine::PathConstraint *get_spine_object() {
 		return path_constraint;
 	}
 
 	// The spine-runtime-cpp 4.0 seems to not have a apply function implementation.
-	// void apply(); 
+	// void apply();
 
 	void update();
 
@@ -91,4 +91,4 @@ public:
 	void set_active(bool v);
 };
 
-#endif //GODOT_SPINEPATHCONSTRAINT_H
+#endif//GODOT_SPINEPATHCONSTRAINT_H

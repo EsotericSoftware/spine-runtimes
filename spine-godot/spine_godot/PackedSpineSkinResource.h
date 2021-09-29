@@ -34,7 +34,7 @@
 
 #include "SpineSkin.h"
 
-class PackedSpineSkinResource : public Resource{
+class PackedSpineSkinResource : public Resource {
 	GDCLASS(PackedSpineSkinResource, Resource);
 
 protected:
@@ -53,7 +53,6 @@ public:
 
 	void set_sub_skin_names(Array v);
 	Array get_sub_skin_names();
-
 };
 
-#endif //GODOT_PACKEDSPINESKINRESOURCE_H
+#endif//GODOT_PACKEDSPINESKINRESOURCE_H

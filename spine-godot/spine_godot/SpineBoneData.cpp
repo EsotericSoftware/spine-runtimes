@@ -71,93 +71,93 @@ void SpineBoneData::_bind_methods() {
 	BIND_ENUM_CONSTANT(TRANSFORMMODE_NOSCALEORREFLECTION);
 }
 
-SpineBoneData::SpineBoneData():bone_data(NULL) {}
+SpineBoneData::SpineBoneData() : bone_data(NULL) {}
 SpineBoneData::~SpineBoneData() {}
 
-int SpineBoneData::get_index(){
+int SpineBoneData::get_index() {
 	return bone_data->getIndex();
 }
 
-String SpineBoneData::get_bone_name(){
+String SpineBoneData::get_bone_name() {
 	return bone_data->getName().buffer();
 }
 
-Ref<SpineBoneData> SpineBoneData::get_parent(){
+Ref<SpineBoneData> SpineBoneData::get_parent() {
 	auto p = bone_data->getParent();
-	if(p == NULL) return NULL;
+	if (p == NULL) return NULL;
 	Ref<SpineBoneData> gd_bone_data(memnew(SpineBoneData));
 	gd_bone_data->set_spine_object(p);
 	return gd_bone_data;
 }
 
-float SpineBoneData::get_length(){
+float SpineBoneData::get_length() {
 	return bone_data->getLength();
 }
-void SpineBoneData::set_length(float v){
+void SpineBoneData::set_length(float v) {
 	bone_data->setLength(v);
 }
 
-float SpineBoneData::get_x(){
+float SpineBoneData::get_x() {
 	return bone_data->getX();
 }
-void SpineBoneData::set_x(float v){
+void SpineBoneData::set_x(float v) {
 	bone_data->setX(v);
 }
 
-float SpineBoneData::get_y(){
+float SpineBoneData::get_y() {
 	return bone_data->getY();
 }
-void SpineBoneData::set_y(float v){
+void SpineBoneData::set_y(float v) {
 	bone_data->setY(v);
 }
 
-float SpineBoneData::get_rotation(){
+float SpineBoneData::get_rotation() {
 	return bone_data->getRotation();
 }
-void SpineBoneData::set_rotation(float v){
+void SpineBoneData::set_rotation(float v) {
 	bone_data->setRotation(v);
 }
 
-float SpineBoneData::get_scale_x(){
+float SpineBoneData::get_scale_x() {
 	return bone_data->getScaleX();
 }
-void SpineBoneData::set_scale_x(float v){
+void SpineBoneData::set_scale_x(float v) {
 	bone_data->setScaleX(v);
 }
 
-float SpineBoneData::get_scale_y(){
+float SpineBoneData::get_scale_y() {
 	return bone_data->getScaleY();
 }
-void SpineBoneData::set_scale_y(float v){
+void SpineBoneData::set_scale_y(float v) {
 	bone_data->setScaleY(v);
 }
 
-float SpineBoneData::get_shear_x(){
+float SpineBoneData::get_shear_x() {
 	return bone_data->getShearX();
 }
-void SpineBoneData::set_shear_x(float v){
+void SpineBoneData::set_shear_x(float v) {
 	bone_data->setShearX(v);
 }
 
-float SpineBoneData::get_shear_y(){
+float SpineBoneData::get_shear_y() {
 	return bone_data->getShearY();
 }
-void SpineBoneData::set_shear_y(float v){
+void SpineBoneData::set_shear_y(float v) {
 	bone_data->setShearY(v);
 }
 
-SpineBoneData::TransformMode SpineBoneData::get_transform_mode(){
-	auto tm = (int)bone_data->getTransformMode();
+SpineBoneData::TransformMode SpineBoneData::get_transform_mode() {
+	auto tm = (int) bone_data->getTransformMode();
 	return (TransformMode) tm;
 }
-void SpineBoneData::set_transform_mode(TransformMode v){
+void SpineBoneData::set_transform_mode(TransformMode v) {
 	auto tm = (int) v;
-	bone_data->setTransformMode((spine::TransformMode)tm);
+	bone_data->setTransformMode((spine::TransformMode) tm);
 }
 
-bool SpineBoneData::is_skin_required(){
+bool SpineBoneData::is_skin_required() {
 	return bone_data->isSkinRequired();
 }
-void SpineBoneData::set_skin_required(bool v){
+void SpineBoneData::set_skin_required(bool v) {
 	bone_data->setSkinRequired(v);
 }

@@ -49,10 +49,10 @@ public:
 	SpineSkinAttachmentMapEntry();
 	~SpineSkinAttachmentMapEntry();
 
-	inline void set_spine_object(spine::Skin::AttachmentMap::Entry *e){
+	inline void set_spine_object(spine::Skin::AttachmentMap::Entry *e) {
 		entry = e;
 	}
-	inline spine::Skin::AttachmentMap::Entry *get_spine_object(){
+	inline spine::Skin::AttachmentMap::Entry *get_spine_object() {
 		return entry;
 	}
 
@@ -79,10 +79,10 @@ public:
 	SpineSkinAttachmentMapEntries();
 	~SpineSkinAttachmentMapEntries();
 
-	inline void set_spine_object(spine::Skin::AttachmentMap::Entries *e){
+	inline void set_spine_object(spine::Skin::AttachmentMap::Entries *e) {
 		entries = e;
 	}
-	inline spine::Skin::AttachmentMap::Entries *get_spine_object(){
+	inline spine::Skin::AttachmentMap::Entries *get_spine_object() {
 		return entries;
 	}
 
@@ -90,4 +90,4 @@ public:
 	Ref<SpineSkinAttachmentMapEntry> next();
 };
 
-#endif //GODOT_SPINESKINATTACHMENTMAPENTRIES_H
+#endif//GODOT_SPINESKINATTACHMENTMAPENTRIES_H

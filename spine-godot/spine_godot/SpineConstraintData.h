@@ -47,10 +47,10 @@ public:
 	SpineConstraintData();
 	~SpineConstraintData();
 
-	inline void set_spine_object(spine::ConstraintData *c){
+	inline void set_spine_object(spine::ConstraintData *c) {
 		constraint_data = c;
 	}
-	virtual inline spine::ConstraintData *get_spine_object(){
+	virtual inline spine::ConstraintData *get_spine_object() {
 		return constraint_data;
 	}
 
@@ -63,4 +63,4 @@ public:
 	void set_skin_required(bool v);
 };
 
-#endif //GODOT_SPINECONSTRAINTDATA_H
+#endif//GODOT_SPINECONSTRAINTDATA_H

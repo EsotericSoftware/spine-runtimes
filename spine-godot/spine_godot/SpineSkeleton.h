@@ -40,7 +40,7 @@
 
 class SpineSprite;
 
-class SpineSkeleton : public Reference{
+class SpineSkeleton : public Reference {
 	GDCLASS(SpineSkeleton, Reference);
 
 protected:
@@ -51,18 +51,18 @@ private:
 	bool spine_object;
 
 	SpineSprite *the_sprite;
-public:
 
+public:
 	SpineSkeleton();
 	~SpineSkeleton();
 
 	void load_skeleton(Ref<SpineSkeletonDataResource> sd);
 
-	inline void set_spine_object(spine::Skeleton *s){
+	inline void set_spine_object(spine::Skeleton *s) {
 		skeleton = s;
 		spine_object = true;
 	}
-	inline spine::Skeleton *get_spine_object(){
+	inline spine::Skeleton *get_spine_object() {
 		return skeleton;
 	}
 
@@ -79,7 +79,7 @@ public:
 
 	Ref<SpineBone> find_bone(const String &name);
 
-	Ref<SpineSlot> find_slot(const String &name);	
+	Ref<SpineSlot> find_slot(const String &name);
 
 	void set_skin_by_name(const String &skin_name);
 	void set_skin(Ref<SpineSkin> new_skin);
@@ -129,7 +129,6 @@ public:
 
 	float get_scale_y();
 	void set_scale_y(float v);
-
 };
 
-#endif //GODOT_SPINESKELETON_H
+#endif//GODOT_SPINESKELETON_H

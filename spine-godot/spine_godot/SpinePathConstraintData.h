@@ -48,8 +48,8 @@ public:
 	SpinePathConstraintData();
 	~SpinePathConstraintData();
 
-	virtual inline spine::PathConstraintData *get_spine_data(){
-		return (spine::PathConstraintData*) SpineConstraintData::get_spine_object();
+	virtual inline spine::PathConstraintData *get_spine_data() {
+		return (spine::PathConstraintData *) SpineConstraintData::get_spine_object();
 	}
 
 	enum PositionMode {
@@ -105,4 +105,4 @@ public:
 VARIANT_ENUM_CAST(SpinePathConstraintData::PositionMode);
 VARIANT_ENUM_CAST(SpinePathConstraintData::SpacingMode);
 VARIANT_ENUM_CAST(SpinePathConstraintData::RotateMode);
-#endif //GODOT_SPINEPATHCONSTRAINTDATA_H
+#endif//GODOT_SPINEPATHCONSTRAINTDATA_H

@@ -47,10 +47,10 @@ public:
 	SpineBoneData();
 	~SpineBoneData();
 
-	inline void set_spine_object(spine::BoneData *b){
+	inline void set_spine_object(spine::BoneData *b) {
 		bone_data = b;
 	}
-	inline spine::BoneData *get_spine_object(){
+	inline spine::BoneData *get_spine_object() {
 		return bone_data;
 	}
 
@@ -97,8 +97,7 @@ public:
 
 	bool is_skin_required();
 	void set_skin_required(bool v);
-
 };
 
 VARIANT_ENUM_CAST(SpineBoneData::TransformMode);
-#endif //GODOT_SPINEBONEDATA_H
+#endif//GODOT_SPINEBONEDATA_H

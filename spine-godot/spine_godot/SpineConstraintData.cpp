@@ -37,23 +37,23 @@ void SpineConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_skin_required", "v"), &SpineConstraintData::set_skin_required);
 }
 
-SpineConstraintData::SpineConstraintData():constraint_data(NULL) {}
+SpineConstraintData::SpineConstraintData() : constraint_data(NULL) {}
 SpineConstraintData::~SpineConstraintData() {}
 
-String SpineConstraintData::get_constraint_data_name(){
+String SpineConstraintData::get_constraint_data_name() {
 	return constraint_data->getName().buffer();
 }
 
-uint64_t SpineConstraintData::get_order(){
+uint64_t SpineConstraintData::get_order() {
 	return constraint_data->getOrder();
 }
-void SpineConstraintData::set_order(uint64_t v){
+void SpineConstraintData::set_order(uint64_t v) {
 	constraint_data->setOrder(v);
 }
 
-bool SpineConstraintData::is_skin_required(){
+bool SpineConstraintData::is_skin_required() {
 	return constraint_data->isSkinRequired();
 }
-void SpineConstraintData::set_skin_required(bool v){
+void SpineConstraintData::set_skin_required(bool v) {
 	constraint_data->setSkinRequired(v);
 }

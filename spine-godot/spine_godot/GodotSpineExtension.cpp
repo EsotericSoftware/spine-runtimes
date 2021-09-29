@@ -35,42 +35,42 @@
 #include <iostream>
 
 spine::SpineExtension *spine::getDefaultExtension() {
-    return new GodotSpineExtension();
+	return new GodotSpineExtension();
 }
 
-GodotSpineExtension::GodotSpineExtension(){}
-GodotSpineExtension::~GodotSpineExtension(){}
+GodotSpineExtension::GodotSpineExtension() {}
+GodotSpineExtension::~GodotSpineExtension() {}
 
-void *GodotSpineExtension::_alloc(size_t size, const char *file, int line){
-    return memalloc(size);
+void *GodotSpineExtension::_alloc(size_t size, const char *file, int line) {
+	return memalloc(size);
 }
 
-void *GodotSpineExtension::_calloc(size_t size, const char *file, int line){
-    auto p = memalloc(size);
-    memset(p, 0, size);
-    return p;
+void *GodotSpineExtension::_calloc(size_t size, const char *file, int line) {
+	auto p = memalloc(size);
+	memset(p, 0, size);
+	return p;
 }
 
-void *GodotSpineExtension::_realloc(void *ptr, size_t size, const char *file, int line){
-    return memrealloc(ptr, size);
+void *GodotSpineExtension::_realloc(void *ptr, size_t size, const char *file, int line) {
+	return memrealloc(ptr, size);
 }
 
-void GodotSpineExtension::_free(void *mem, const char *file, int line){
-    memfree(mem);
+void GodotSpineExtension::_free(void *mem, const char *file, int line) {
+	memfree(mem);
 }
 
-char *GodotSpineExtension::_readFile(const spine::String &path, int *length){
-    Error error;
-    auto res = FileAccess::get_file_as_array(String(path.buffer()), &error);
+char *GodotSpineExtension::_readFile(const spine::String &path, int *length) {
+	Error error;
+	auto res = FileAccess::get_file_as_array(String(path.buffer()), &error);
 
-    if (error != OK){
-        if(length) *length = 0;
-        return NULL;
-    }
+	if (error != OK) {
+		if (length) *length = 0;
+		return NULL;
+	}
 
-    if(length) *length = res.size();
-    auto r = alloc<char>(res.size(), __FILE__, __LINE__);
-    for(size_t i=0;i<res.size();++i)
-        r[i] = res[i];
-    return r;
+	if (length) *length = res.size();
+	auto r = alloc<char>(res.size(), __FILE__, __LINE__);
+	for (size_t i = 0; i < res.size(); ++i)
+		r[i] = res[i];
+	return r;
 }

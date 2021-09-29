@@ -47,12 +47,12 @@ public:
 	SpineAttachment();
 	~SpineAttachment();
 
-	inline void set_spine_object(spine::Attachment *a){
+	inline void set_spine_object(spine::Attachment *a) {
 		attachment = a;
-		if(attachment)
+		if (attachment)
 			attachment->reference();
 	}
-	inline spine::Attachment *get_spine_object(){
+	inline spine::Attachment *get_spine_object() {
 		return attachment;
 	}
 
@@ -61,4 +61,4 @@ public:
 	Ref<SpineAttachment> copy();
 };
 
-#endif //GODOT_SPINEATTACHMENT_H
+#endif//GODOT_SPINEATTACHMENT_H

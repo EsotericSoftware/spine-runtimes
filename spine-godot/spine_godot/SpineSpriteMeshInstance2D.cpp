@@ -43,6 +43,6 @@ Ref<SpineSlot> SpineSpriteMeshInstance2D::get_slot() {
 	return slot;
 }
 
-void SpineSpriteMeshInstance2D::apply_transform_2d(Variant o){
+void SpineSpriteMeshInstance2D::apply_transform_2d(Variant o) {
 	slot->get_bone()->apply_world_transform_2d(o);
 }

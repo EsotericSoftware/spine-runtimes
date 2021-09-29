@@ -51,62 +51,62 @@ void SpineSlotData::_bind_methods() {
 	BIND_ENUM_CONSTANT(BLENDMODE_SCREEN);
 }
 
-SpineSlotData::SpineSlotData():slot_data(NULL) {}
+SpineSlotData::SpineSlotData() : slot_data(NULL) {}
 SpineSlotData::~SpineSlotData() {}
 
 #define S_T(x) (spine::String(x.utf8()))
-int SpineSlotData::get_index(){
+int SpineSlotData::get_index() {
 	return slot_data->getIndex();
 }
 
-String SpineSlotData::get_slot_name(){
+String SpineSlotData::get_slot_name() {
 	return slot_data->getName().buffer();
 }
 
-Ref<SpineBoneData> SpineSlotData::get_bone_data(){
+Ref<SpineBoneData> SpineSlotData::get_bone_data() {
 	auto &bd = slot_data->getBoneData();
 	Ref<SpineBoneData> gd_bone_data(memnew(SpineBoneData));
 	gd_bone_data->set_spine_object(&bd);
 	return gd_bone_data;
 }
 
-Color SpineSlotData::get_color(){
+Color SpineSlotData::get_color() {
 	auto &c = slot_data->getColor();
 	return Color(c.r, c.g, c.b, c.a);
 }
-void SpineSlotData::set_color(Color v){
+void SpineSlotData::set_color(Color v) {
 	auto &c = slot_data->getColor();
 	c.set(v.r, v.g, v.b, v.a);
 }
 
-Color SpineSlotData::get_dark_color(){
+Color SpineSlotData::get_dark_color() {
 	auto &c = slot_data->getDarkColor();
 	return Color(c.r, c.g, c.b, c.a);
 }
-void SpineSlotData::set_dark_color(Color v){
+void SpineSlotData::set_dark_color(Color v) {
 	auto &c = slot_data->getDarkColor();
 	c.set(v.r, v.g, v.b, v.a);
 }
 
-bool SpineSlotData::has_dark_color(){
+bool SpineSlotData::has_dark_color() {
 	return slot_data->hasDarkColor();
 }
-void SpineSlotData::set_has_dark_color(bool v){
+void SpineSlotData::set_has_dark_color(bool v) {
 	slot_data->setHasDarkColor(v);
 }
 
-String SpineSlotData::get_attachment_name(){
+String SpineSlotData::get_attachment_name() {
 	return slot_data->getAttachmentName().buffer();
 }
-void SpineSlotData::set_attachment_name(const String &v){
+void SpineSlotData::set_attachment_name(const String &v) {
 	slot_data->setAttachmentName(S_T(v));
 }
 
-SpineSlotData::BlendMode SpineSlotData::get_blend_mode(){
+SpineSlotData::BlendMode SpineSlotData::get_blend_mode() {
 	auto bm = (int) slot_data->getBlendMode();
 	return (BlendMode) bm;
 }
-void SpineSlotData::set_blend_mode(BlendMode v){
+void SpineSlotData::set_blend_mode(BlendMode v) {
 	auto bm = (int) v;
 	slot_data->setBlendMode((spine::BlendMode) bm);
 }

@@ -47,8 +47,8 @@ public:
 	SpineIkConstraintData();
 	~SpineIkConstraintData();
 
-	virtual inline spine::IkConstraintData *get_spine_data(){
-		return (spine::IkConstraintData*) SpineConstraintData::get_spine_object();
+	virtual inline spine::IkConstraintData *get_spine_data() {
+		return (spine::IkConstraintData *) SpineConstraintData::get_spine_object();
 	}
 
 	Array get_bones();
@@ -73,7 +73,6 @@ public:
 
 	float get_softness();
 	void set_softness(float v);
-
 };
 
-#endif //GODOT_SPINEIKCONSTRAINTDATA_H
+#endif//GODOT_SPINEIKCONSTRAINTDATA_H

@@ -48,10 +48,10 @@ public:
 	SpineSlotData();
 	~SpineSlotData();
 
-	inline void set_spine_object(spine::SlotData *s){
+	inline void set_spine_object(spine::SlotData *s) {
 		slot_data = s;
 	}
-	inline spine::SlotData *get_spine_object(){
+	inline spine::SlotData *get_spine_object() {
 		return slot_data;
 	}
 
@@ -85,4 +85,4 @@ public:
 };
 
 VARIANT_ENUM_CAST(SpineSlotData::BlendMode);
-#endif //GODOT_SPINESLOTDATA_H
+#endif//GODOT_SPINESLOTDATA_H

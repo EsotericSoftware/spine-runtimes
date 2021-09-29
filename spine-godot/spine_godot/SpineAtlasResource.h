@@ -31,7 +31,6 @@
 #define GODOT_SPINEATLASRESOURCE_H
 
 
-
 #include "core/variant_parser.h"
 
 #include <spine/SpineString.h>
@@ -41,39 +40,40 @@
 #include <core/io/image_loader.h>
 #include "SpineRendererObject.h"
 
-class SpineAtlasResource : public Resource{
-    GDCLASS(SpineAtlasResource, Resource);
+class SpineAtlasResource : public Resource {
+	GDCLASS(SpineAtlasResource, Resource);
 
 protected:
-    static void _bind_methods();
+	static void _bind_methods();
 
-    spine::Atlas *atlas;
+	spine::Atlas *atlas;
 
-    String source_path;
-    String atlas_data;
-    String normal_texture_prefix;
+	String source_path;
+	String atlas_data;
+	String normal_texture_prefix;
 
-    Array tex_list;
-    Array ntex_list;
+	Array tex_list;
+	Array ntex_list;
+
 public:
-    inline String &get_atlas_data() {return atlas_data;}
+	inline String &get_atlas_data() { return atlas_data; }
 
-    inline spine::Atlas *get_spine_atlas() {return atlas;}
+	inline spine::Atlas *get_spine_atlas() { return atlas; }
 
-    inline void set_normal_texture_prefix(const String &p) {normal_texture_prefix = p;}
+	inline void set_normal_texture_prefix(const String &p) { normal_texture_prefix = p; }
 
-    Error load_from_atlas_file(const String &p_path); // .atlas
+	Error load_from_atlas_file(const String &p_path);// .atlas
 
-    Error load_from_file(const String &p_path); // .spatlas
-    Error save_to_file(const String &p_path); // .spatlas
+	Error load_from_file(const String &p_path);// .spatlas
+	Error save_to_file(const String &p_path);  // .spatlas
 
-    String get_source_path();
+	String get_source_path();
 	Array get_textures();
 	Array get_normal_textures();
 
 	SpineAtlasResource();
-    virtual ~SpineAtlasResource();
+	virtual ~SpineAtlasResource();
 };
 
 
-#endif //GODOT_SPINEATLASRESOURCE_H
+#endif//GODOT_SPINEATLASRESOURCE_H

@@ -39,34 +39,37 @@
 class SpineSkeleton;
 class SpineEvent;
 
-class SpineTimeline : public Reference{
-    GDCLASS(SpineTimeline, Reference);
+class SpineTimeline : public Reference {
+	GDCLASS(SpineTimeline, Reference);
+
 protected:
-    static void _bind_methods();
+	static void _bind_methods();
+
 private:
-    spine::Timeline *timeline;
+	spine::Timeline *timeline;
+
 public:
-    SpineTimeline();
-    ~SpineTimeline();
+	SpineTimeline();
+	~SpineTimeline();
 
-    inline void set_spine_object(spine::Timeline *v) {timeline = v;}
-    inline spine::Timeline *get_spine_object() {return timeline;}
+	inline void set_spine_object(spine::Timeline *v) { timeline = v; }
+	inline spine::Timeline *get_spine_object() { return timeline; }
 
-    // Vector<Event *>
-    void apply(Ref<SpineSkeleton> skeleton, float lastTime, float time, Array pEvents, float alpha, SpineConstant::MixBlend blend, SpineConstant::MixDirection direction);
+	// Vector<Event *>
+	void apply(Ref<SpineSkeleton> skeleton, float lastTime, float time, Array pEvents, float alpha, SpineConstant::MixBlend blend, SpineConstant::MixDirection direction);
 
-    int64_t get_frame_entries();
+	int64_t get_frame_entries();
 
-    int64_t get_frame_count();
+	int64_t get_frame_count();
 
-    // Vector<float>
-    Array get_frames();
+	// Vector<float>
+	Array get_frames();
 
-    float get_duration();
+	float get_duration();
 
-    // Vector <PropertyId>
-    Array getPropertyIds();
+	// Vector <PropertyId>
+	Array getPropertyIds();
 };
 
 
-#endif //GODOT_SPINETIMELINE_H
+#endif//GODOT_SPINETIMELINE_H

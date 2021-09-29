@@ -37,7 +37,7 @@
 #include "SpineTransformConstraintData.h"
 #include "SpineBone.h"
 
-class SpineTransformConstraint : public Reference{
+class SpineTransformConstraint : public Reference {
 	GDCLASS(SpineTransformConstraint, Reference);
 
 protected:
@@ -50,10 +50,10 @@ public:
 	SpineTransformConstraint();
 	~SpineTransformConstraint();
 
-	inline void set_spine_object(spine::TransformConstraint *tc){
+	inline void set_spine_object(spine::TransformConstraint *tc) {
 		transform_constraint = tc;
 	}
-	inline spine::TransformConstraint *get_spine_object(){
+	inline spine::TransformConstraint *get_spine_object() {
 		return transform_constraint;
 	}
 
@@ -90,4 +90,4 @@ public:
 	void set_active(bool v);
 };
 
-#endif //GODOT_SPINETRANSFORMCONSTRAINT_H
+#endif//GODOT_SPINETRANSFORMCONSTRAINT_H

@@ -47,8 +47,8 @@ public:
 	SpineTransformConstraintData();
 	~SpineTransformConstraintData();
 
-	virtual inline spine::TransformConstraintData *get_spine_data(){
-		return (spine::TransformConstraintData*) SpineConstraintData::get_spine_object();
+	virtual inline spine::TransformConstraintData *get_spine_data() {
+		return (spine::TransformConstraintData *) SpineConstraintData::get_spine_object();
 	}
 
 	Array get_bones();
@@ -71,4 +71,4 @@ public:
 	bool is_local();
 };
 
-#endif //GODOT_SPINETRANSFORMCONSTRAINTDATA_H
+#endif//GODOT_SPINETRANSFORMCONSTRAINTDATA_H

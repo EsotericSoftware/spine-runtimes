@@ -34,9 +34,9 @@
 
 
 struct SpineRendererObject {
-    Ref<Texture> tex;
-    Ref<Texture> normal_tex;    
+	Ref<Texture> tex;
+	Ref<Texture> normal_tex;
 };
 
 
-#endif 
+#endif

@@ -50,12 +50,12 @@ void SpineIkConstraintData::_bind_methods() {
 SpineIkConstraintData::SpineIkConstraintData() {}
 SpineIkConstraintData::~SpineIkConstraintData() {}
 
-Array SpineIkConstraintData::get_bones(){
+Array SpineIkConstraintData::get_bones() {
 	auto bs = get_spine_data()->getBones();
 	Array gd_bs;
 	gd_bs.resize(bs.size());
-	for(size_t i=0; i < bs.size(); ++i){
-		if(bs[i] == NULL) gd_bs[i] = Ref<SpineBoneData>(NULL);
+	for (size_t i = 0; i < bs.size(); ++i) {
+		if (bs[i] == NULL) gd_bs[i] = Ref<SpineBoneData>(NULL);
 		else {
 			Ref<SpineBoneData> gd_b(memnew(SpineBoneData));
 			gd_b->set_spine_object(bs[i]);
@@ -65,59 +65,59 @@ Array SpineIkConstraintData::get_bones(){
 	return gd_bs;
 }
 
-Ref<SpineBoneData> SpineIkConstraintData::get_target(){
+Ref<SpineBoneData> SpineIkConstraintData::get_target() {
 	auto b = get_spine_data()->getTarget();
-	if(b == NULL) return NULL;
+	if (b == NULL) return NULL;
 	Ref<SpineBoneData> gd_b(memnew(SpineBoneData));
 	gd_b->set_spine_object(b);
 	return gd_b;
 }
-void SpineIkConstraintData::set_target(Ref<SpineBoneData> v){
-	if(v.is_valid()){
+void SpineIkConstraintData::set_target(Ref<SpineBoneData> v) {
+	if (v.is_valid()) {
 		get_spine_data()->setTarget(v->get_spine_object());
-	}else{
+	} else {
 		get_spine_data()->setTarget(NULL);
 	}
 }
 
-int SpineIkConstraintData::get_bend_direction(){
+int SpineIkConstraintData::get_bend_direction() {
 	return get_spine_data()->getBendDirection();
 }
-void SpineIkConstraintData::set_bend_direction(int v){
+void SpineIkConstraintData::set_bend_direction(int v) {
 	get_spine_data()->setBendDirection(v);
 }
 
-bool SpineIkConstraintData::get_compress(){
+bool SpineIkConstraintData::get_compress() {
 	return get_spine_data()->getCompress();
 }
-void SpineIkConstraintData::set_compress(bool v){
+void SpineIkConstraintData::set_compress(bool v) {
 	get_spine_data()->setCompress(v);
 }
 
-bool SpineIkConstraintData::get_stretch(){
+bool SpineIkConstraintData::get_stretch() {
 	return get_spine_data()->getStretch();
 }
-void SpineIkConstraintData::set_stretch(bool v){
+void SpineIkConstraintData::set_stretch(bool v) {
 	get_spine_data()->setStretch(v);
 }
 
-bool SpineIkConstraintData::get_uniform(){
+bool SpineIkConstraintData::get_uniform() {
 	return get_spine_data()->getUniform();
 }
-void SpineIkConstraintData::set_uniform(bool v){
+void SpineIkConstraintData::set_uniform(bool v) {
 	get_spine_data()->setUniform(v);
 }
 
-float SpineIkConstraintData::get_mix(){
+float SpineIkConstraintData::get_mix() {
 	return get_spine_data()->getMix();
 }
-void SpineIkConstraintData::set_mix(float v){
+void SpineIkConstraintData::set_mix(float v) {
 	get_spine_data()->setMix(v);
 }
 
-float SpineIkConstraintData::get_softness(){
+float SpineIkConstraintData::get_softness() {
 	return get_spine_data()->getSoftness();
 }
-void SpineIkConstraintData::set_softness(float v){
+void SpineIkConstraintData::set_softness(float v) {
 	get_spine_data()->setSoftness(v);
 }

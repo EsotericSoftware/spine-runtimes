@@ -41,7 +41,7 @@ class SpineSkeleton;
 
 class SpineBone;
 
-class SpineSlot : public Reference{
+class SpineSlot : public Reference {
 	GDCLASS(SpineSlot, Reference);
 
 protected:
@@ -54,10 +54,10 @@ public:
 	SpineSlot();
 	~SpineSlot();
 
-	inline void set_spine_object(spine::Slot *s){
+	inline void set_spine_object(spine::Slot *s) {
 		slot = s;
 	}
-	inline spine::Slot *get_spine_object(){
+	inline spine::Slot *get_spine_object() {
 		return slot;
 	}
 
@@ -90,4 +90,4 @@ public:
 	void set_deform(Array v);
 };
 
-#endif //GODOT_SPINESLOT_H
+#endif//GODOT_SPINESLOT_H

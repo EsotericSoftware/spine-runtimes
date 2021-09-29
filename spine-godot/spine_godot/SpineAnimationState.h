@@ -36,7 +36,7 @@
 #include "SpineSkeleton.h"
 #include "SpineTrackEntry.h"
 
-class SpineAnimationState : public Reference{
+class SpineAnimationState : public Reference {
 	GDCLASS(SpineAnimationState, Reference);
 
 protected:
@@ -46,21 +46,22 @@ private:
 	spine::AnimationState *animation_state;
 
 	Ref<SpineAnimationStateDataResource> anim_state_data_res;
+
 public:
 	void load_animation_state(Ref<SpineAnimationStateDataResource> ad);
 
-	inline void set_animation_state(spine::AnimationState *a){
+	inline void set_animation_state(spine::AnimationState *a) {
 		animation_state = a;
 	}
-	inline spine::AnimationState *get_animation_state(){
+	inline spine::AnimationState *get_animation_state() {
 		return animation_state;
 	}
 
 	void reload_animation_state();
 
 	Ref<SpineTrackEntry> set_animation(const String &anim_name, bool loop, uint64_t track_id);
-	inline void set_animation_by_ref(Ref<SpineAnimation> anim, bool loop, uint64_t track_id){
-		if(anim.is_valid()){
+	inline void set_animation_by_ref(Ref<SpineAnimation> anim, bool loop, uint64_t track_id) {
+		if (anim.is_valid()) {
 			animation_state->setAnimation(track_id, anim->get_spine_object(), loop);
 		}
 	}
@@ -90,4 +91,4 @@ public:
 	~SpineAnimationState();
 };
 
-#endif //GODOT_SPINEANIMATIONSTATE_H
+#endif//GODOT_SPINEANIMATIONSTATE_H

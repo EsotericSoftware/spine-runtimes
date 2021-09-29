@@ -41,11 +41,12 @@ protected:
 	static void _bind_methods();
 
 	Ref<SpineSlot> slot;
+
 public:
 	SpineSpriteMeshInstance2D();
 	~SpineSpriteMeshInstance2D();
 
-	inline void set_slot(Ref<SpineSlot> s){
+	inline void set_slot(Ref<SpineSlot> s) {
 		slot = s;
 	}
 	Ref<SpineSlot> get_slot();
@@ -53,4 +54,4 @@ public:
 	void apply_transform_2d(Variant o);
 };
 
-#endif //GODOT_SPINESPRITEMESHINSTANCE2D_H
+#endif//GODOT_SPINESPRITEMESHINSTANCE2D_H

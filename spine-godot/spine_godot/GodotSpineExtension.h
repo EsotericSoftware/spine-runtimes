@@ -51,7 +51,4 @@ protected:
 };
 
 
-
-
-
-#endif //GODOT_SPINEEXTENSION_H
+#endif//GODOT_SPINEEXTENSION_H

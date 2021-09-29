@@ -29,4 +29,3 @@
 
 void register_spine_godot_types();
 void unregister_spine_godot_types();
-

@@ -36,7 +36,7 @@
 
 #include "SpineAnimation.h"
 
-class SpineTrackEntry : public Reference{
+class SpineTrackEntry : public Reference {
 	GDCLASS(SpineTrackEntry, Reference);
 
 protected:
@@ -49,10 +49,10 @@ public:
 	SpineTrackEntry();
 	~SpineTrackEntry();
 
-	inline void set_spine_object(spine::TrackEntry *t){
+	inline void set_spine_object(spine::TrackEntry *t) {
 		track_entry = t;
 	}
-	inline spine::TrackEntry *get_spine_object(){
+	inline spine::TrackEntry *get_spine_object() {
 		return track_entry;
 	}
 
@@ -73,8 +73,8 @@ public:
 	bool get_hold_previous();
 	void set_hold_previous(bool v);
 
-    bool get_reverse();
-    void set_reverse(bool v);
+	bool get_reverse();
+	void set_reverse(bool v);
 
 	float get_delay();
 	void set_delay(float v);
@@ -128,4 +128,4 @@ public:
 };
 
 VARIANT_ENUM_CAST(SpineTrackEntry::MixBlend);
-#endif //GODOT_SPINETRACKENTRY_H
+#endif//GODOT_SPINETRACKENTRY_H

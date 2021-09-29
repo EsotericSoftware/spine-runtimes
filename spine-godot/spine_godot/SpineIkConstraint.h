@@ -51,15 +51,15 @@ public:
 	SpineIkConstraint();
 	~SpineIkConstraint();
 
-	inline void set_spine_object(spine::IkConstraint * ic){
+	inline void set_spine_object(spine::IkConstraint *ic) {
 		ik_constraint = ic;
 	}
-	inline spine::IkConstraint *get_spine_object(){
+	inline spine::IkConstraint *get_spine_object() {
 		return ik_constraint;
 	}
 
 	// The spine-runtime-cpp 4.0 seems to not have a apply function implementation.
-	// void apply(); 
+	// void apply();
 
 	void update();
 
@@ -89,7 +89,6 @@ public:
 
 	bool is_active();
 	void set_active(bool v);
-
 };
 
-#endif //GODOT_SPINEIKCONSTRAINT_H
+#endif//GODOT_SPINEIKCONSTRAINT_H
