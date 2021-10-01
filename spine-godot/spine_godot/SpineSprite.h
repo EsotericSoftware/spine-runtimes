@@ -34,7 +34,7 @@
 
 #include <scene/2d/collision_polygon_2d.h>
 
-#include "PackedSpineSkinResource.h"
+#include "SpineCustomSkinResource.h"
 #include "SpineAnimationState.h"
 #include "SpineAnimationStateDataResource.h"
 #include "SpineCustomSkinResource.h"

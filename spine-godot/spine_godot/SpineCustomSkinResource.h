@@ -31,7 +31,7 @@
 #define GODOT_SPINECUSTOMSKINRESOURCE_H
 
 #include "core/variant_parser.h"
-#include "SpineSKin.h"
+#include "SpineSkin.h"
 
 class SpineCustomSkinResource : public Resource {
 	GDCLASS(SpineCustomSkinResource, Resource);
