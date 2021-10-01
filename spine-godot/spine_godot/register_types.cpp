@@ -32,8 +32,6 @@
 #include "core/class_db.h"
 
 #include "SpineAtlasResource.h"
-#include "ResourceFormatLoaderSpineAtlas.h"
-#include "ResourceFormatSaverSpineAtlas.h"
 #include "SpineSkeletonDataResource.h"
 #include "ResourceFormatLoaderSpineSkeletonJsonData.h"
 #include "ResourceFormatSaverSpineSkeletonJsonData.h"
@@ -54,15 +52,14 @@
 #include "SpineTransformConstraintData.h"
 #include "SpinePathConstraintData.h"
 #include "SpineSpriteMeshInstance2D.h"
-#include "SpineCustomSkinResource.h"
 #include "SpineTimeline.h"
 #include "SpineConstant.h"
 #include "SpineCollisionShapeProxy.h"
 #include "SpineSpriteAnimateDialog.h"
 
 
-static Ref<ResourceFormatLoaderSpineAtlas> atlas_loader;
-static Ref<ResourceFormatSaverSpineAtlas> atlas_saver;
+static Ref<SpineAtlasResourceFormatLoader> atlas_loader;
+static Ref<SpineAtlasResourceFormatSaver> atlas_saver;
 static Ref<ResourceFormatLoaderSpineSkeletonJsonData> json_skeleton_loader;
 static Ref<ResourceFormatSaverSpineSkeletonJsonData> json_skeleton_saver;
 
@@ -71,7 +68,6 @@ static Ref<ResourceFormatSaverSpineSkeletonJsonData> json_skeleton_saver;
 #include "editor/editor_export.h"
 #include "editor/editor_node.h"
 
-#include "SpineCustomSkinResource.h"
 #include "SpineRuntimeEditorPlugin.h"
 
 static void editor_init_callback() {
@@ -116,7 +112,6 @@ void register_spine_godot_types() {
 	ClassDB::register_class<SpinePathConstraint>();
 	ClassDB::register_class<SpineTransformConstraint>();
 	ClassDB::register_class<SpineSpriteMeshInstance2D>();
-	ClassDB::register_class<SpineCustomSkinResource>();
 	ClassDB::register_class<SpineTimeline>();
 	ClassDB::register_class<SpineConstant>();
 	ClassDB::register_class<SpineCollisionShapeProxy>();

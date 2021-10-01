@@ -29,7 +29,6 @@
 
 #include "SpineSprite.h"
 
-#include "SpineCustomSkinResource.h"
 #include "SpineEvent.h"
 #include "SpineTrackEntry.h"
 
@@ -62,10 +61,6 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_bind_slot_nodes", "v"), &SpineSprite::set_bind_slot_nodes);
 	ClassDB::bind_method(D_METHOD("get_overlap"), &SpineSprite::get_overlap);
 	ClassDB::bind_method(D_METHOD("set_overlap", "v"), &SpineSprite::set_overlap);
-	ClassDB::bind_method(D_METHOD("set_skin", "v"), &SpineSprite::set_skin);
-	ClassDB::bind_method(D_METHOD("get_skin"), &SpineSprite::get_skin);
-	ClassDB::bind_method(D_METHOD("_on_skin_property_changed"), &SpineSprite::_on_skin_property_changed);
-	ClassDB::bind_method(D_METHOD("gen_spine_skin_from_packed_resource", "res"), &SpineSprite::gen_spine_skin_from_packed_resource);
 
 	ClassDB::bind_method(D_METHOD("bone_get_global_transform", "bone_name"), &SpineSprite::bone_get_global_transform);
 	ClassDB::bind_method(D_METHOD("bone_set_global_transform", "bone_name", "global_transform"), &SpineSprite::bone_set_global_transform);
@@ -87,7 +82,7 @@ void SpineSprite::_bind_methods() {
 
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "overlap"), "set_overlap", "get_overlap");
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bind_slot_nodes"), "set_bind_slot_nodes", "get_bind_slot_nodes");
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "packed_skin_resource", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineCustomSkinResource"), "set_skin", "get_skin");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "custom_skin_resource", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineCustomSkinResource"), "set_skin", "get_skin");
 
 	ADD_GROUP("animation", "");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "process_mode", PROPERTY_HINT_ENUM, "Process,Physics,Manually"), "set_process_mode", "get_process_mode");
@@ -636,6 +631,7 @@ void SpineSprite::set_set_empty_animations(bool v) {
 Array SpineSprite::get_bind_slot_nodes() {
 	return bind_slot_nodes;
 }
+
 void SpineSprite::set_bind_slot_nodes(Array v) {
 	bind_slot_nodes = v;
 }
@@ -643,60 +639,9 @@ void SpineSprite::set_bind_slot_nodes(Array v) {
 bool SpineSprite::get_overlap() {
 	return overlap;
 }
+
 void SpineSprite::set_overlap(bool v) {
 	overlap = v;
-}
-
-void SpineSprite::set_skin(Ref<SpineCustomSkinResource> v) {
-	if (v != skin && skin.is_valid()) {
-		if (skin->is_connected("property_changed", this, "_on_skin_property_changed"))
-			skin->disconnect("property_changed", this, "_on_skin_property_changed");
-	}
-
-	skin = v;
-
-	if (skin.is_valid()) {
-		if (!skin->is_connected("property_changed", this, "_on_skin_property_changed"))
-			skin->connect("property_changed", this, "_on_skin_property_changed");
-		update_runtime_skin();
-	}
-}
-Ref<SpineCustomSkinResource> SpineSprite::get_skin() {
-	return skin;
-}
-void SpineSprite::update_runtime_skin() {
-	auto new_skin = gen_spine_skin_from_packed_resource(skin);
-
-	if (new_skin.is_valid()) {
-		skeleton->set_skin(new_skin);
-		skeleton->set_to_setup_pose();
-	}
-}
-void SpineSprite::_on_skin_property_changed() {
-	update_runtime_skin();
-}
-
-Ref<SpineSkin> SpineSprite::gen_spine_skin_from_packed_resource(Ref<SpineCustomSkinResource> res) {
-	if (!(animation_state.is_valid() && skeleton.is_valid()))
-		return NULL;
-	if (!res.is_valid())
-		return NULL;
-	if (res->get_skin_name().empty())
-		return NULL;
-	auto exist_skin = animation_state_data_res->get_skeleton()->find_skin(res->get_skin_name());
-	if (exist_skin.is_valid()) {
-		return exist_skin;
-	}
-
-	auto new_skin = Ref<SpineSkin>(memnew(SpineSkin))->init(res->get_skin_name());
-	auto sub_skin_names = res->get_sub_skin_names();
-	for (size_t i = 0; i < sub_skin_names.size(); ++i) {
-		auto skin_name = (String) sub_skin_names[i];
-		auto sub_skin = animation_state_data_res->get_skeleton()->find_skin(skin_name);
-		if (sub_skin.is_valid())
-			new_skin->add_skin(sub_skin);
-	}
-	return new_skin;
 }
 
 void SpineSprite::bind_slot_with_node_2d(const String &slot_name, Node2D *n) {

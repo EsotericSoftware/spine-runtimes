@@ -31,13 +31,10 @@
 #define GODOT_SPINESPRITE_H
 
 #include <scene/resources/texture.h>
-
 #include <scene/2d/collision_polygon_2d.h>
 
-#include "SpineCustomSkinResource.h"
 #include "SpineAnimationState.h"
 #include "SpineAnimationStateDataResource.h"
-#include "SpineCustomSkinResource.h"
 #include "SpineSkeleton.h"
 #include "SpineSpriteMeshInstance2D.h"
 
@@ -76,7 +73,6 @@ private:
 
 	Array bind_slot_nodes;
 	bool overlap;
-	Ref<SpineCustomSkinResource> skin;
 
 	ProcessMode process_mode;
 
@@ -145,13 +141,6 @@ public:
 	//allow z-manipulation
 	bool get_overlap();
 	void set_overlap(bool v);
-
-	void set_skin(Ref<SpineCustomSkinResource> v);
-	Ref<SpineCustomSkinResource> get_skin();
-	void _on_skin_property_changed();
-	void update_runtime_skin();
-
-	Ref<SpineSkin> gen_spine_skin_from_packed_resource(Ref<SpineCustomSkinResource> res);
 
 	// current animation count
 	int64_t get_current_animation_count() const;

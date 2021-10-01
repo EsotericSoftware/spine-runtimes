@@ -11,7 +11,7 @@ config_version=4
 [application]
 
 config/name="spine-godot-examples"
-run/main_scene="res://test.tscn"
+run/main_scene="res://spineboy.tscn"
 config/icon="res://icon.png"
 
 [physics]
