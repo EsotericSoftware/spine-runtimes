@@ -119,7 +119,6 @@ void SpineSkeletonDataResource::update_skeleton_data() {
 void SpineSkeletonDataResource::set_atlas_res(const Ref<SpineAtlasResource> &a) {
 	atlas_res = a;
 	valid = false;
-	//	print_line("atlas_res_changed emitted");
 	emit_signal("atlas_res_changed");
 	update_skeleton_data();
 }

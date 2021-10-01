@@ -32,10 +32,9 @@
 
 #include <scene/resources/texture.h>
 
-
 struct SpineRendererObject {
-	Ref<Texture> tex;
-	Ref<Texture> normal_tex;
+	Ref<Texture> texture;
+	Ref<Texture> normal_map;
 };
 
 

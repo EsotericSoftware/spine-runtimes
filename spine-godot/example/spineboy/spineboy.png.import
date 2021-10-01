@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/spineboy.png-846f399ad53ae6f7ed8bbfe03f0b1f88.stex"
+path="res://.import/spineboy.png-a63588ec3a5ca6e83ef256edf38d798a.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://spineboy.png"
-dest_files=[ "res://.import/spineboy.png-846f399ad53ae6f7ed8bbfe03f0b1f88.stex" ]
+source_file="res://spineboy/spineboy.png"
+dest_files=[ "res://.import/spineboy.png-a63588ec3a5ca6e83ef256edf38d798a.stex" ]
 
 [params]
 

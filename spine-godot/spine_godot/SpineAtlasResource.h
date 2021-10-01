@@ -52,8 +52,8 @@ protected:
 	String atlas_data;
 	String normal_texture_prefix;
 
-	Array tex_list;
-	Array ntex_list;
+	Array textures;
+	Array normal_maps;
 
 public:
 	inline String &get_atlas_data() { return atlas_data; }
@@ -69,7 +69,7 @@ public:
 
 	String get_source_path();
 	Array get_textures();
-	Array get_normal_textures();
+	Array get_normal_maps();
 
 	SpineAtlasResource();
 	virtual ~SpineAtlasResource();

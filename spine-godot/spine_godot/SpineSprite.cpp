@@ -386,8 +386,8 @@ void SpineSprite::update_mesh_from_skeleton(Ref<SpineSkeleton> s) {
 			spine::RegionAttachment *region_attachment = (spine::RegionAttachment *) attachment;
 
 			auto p_spine_renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) region_attachment->getRendererObject())->page->getRendererObject();
-			tex = p_spine_renderer_object->tex;
-			normal_tex = p_spine_renderer_object->normal_tex;
+			tex = p_spine_renderer_object->texture;
+			normal_tex = p_spine_renderer_object->normal_map;
 
 			v_num = 4;
 			vertices.setSize(v_num * VERTEX_STRIDE, 0);
@@ -410,8 +410,8 @@ void SpineSprite::update_mesh_from_skeleton(Ref<SpineSkeleton> s) {
 			spine::MeshAttachment *mesh = (spine::MeshAttachment *) attachment;
 
 			auto p_spine_renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
-			tex = p_spine_renderer_object->tex;
-			normal_tex = p_spine_renderer_object->normal_tex;
+			tex = p_spine_renderer_object->texture;
+			normal_tex = p_spine_renderer_object->normal_map;
 
 			v_num = mesh->getWorldVerticesLength() / VERTEX_STRIDE;
 			vertices.setSize(mesh->getWorldVerticesLength(), 0);
