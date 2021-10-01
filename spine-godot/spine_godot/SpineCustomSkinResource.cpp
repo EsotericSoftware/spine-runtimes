@@ -27,32 +27,38 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_PACKEDSPINESKINRESOURCE_H
-#define GODOT_PACKEDSPINESKINRESOURCE_H
+#include "SpineCustomSkinResource.h"
 
-#include "core/variant_parser.h"
+void SpineCustomSkinResource::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("set_skin_name", "v"), &SpineCustomSkinResource::set_skin_name);
+	ClassDB::bind_method(D_METHOD("get_skin_name"), &SpineCustomSkinResource::get_skin_name);
+	ClassDB::bind_method(D_METHOD("set_sub_skin_names", "v"), &SpineCustomSkinResource::set_sub_skin_names);
+	ClassDB::bind_method(D_METHOD("get_sub_skin_names"), &SpineCustomSkinResource::get_sub_skin_names);
 
-#include "SpineSkin.h"
+	ADD_SIGNAL(MethodInfo("property_changed"));
 
-class PackedSpineSkinResource : public Resource {
-	GDCLASS(PackedSpineSkinResource, Resource);
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "skin_name"), "set_skin_name", "get_skin_name");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "sub_skin_names"), "set_sub_skin_names", "get_sub_skin_names");
+}
 
-protected:
-	static void _bind_methods();
+SpineCustomSkinResource::SpineCustomSkinResource() : skin_name("custom_skin_name") {}
 
-private:
-	String skin_name;
-	Array sub_skin_names;
+SpineCustomSkinResource::~SpineCustomSkinResource() {}
 
-public:
-	PackedSpineSkinResource();
-	virtual ~PackedSpineSkinResource();
+void SpineCustomSkinResource::set_skin_name(const String &v) {
+	skin_name = v;
+	emit_signal("property_changed");
+}
 
-	void set_skin_name(const String &v);
-	String get_skin_name();
+String SpineCustomSkinResource::get_skin_name() {
+	return skin_name;
+}
 
-	void set_sub_skin_names(Array v);
-	Array get_sub_skin_names();
-};
+void SpineCustomSkinResource::set_sub_skin_names(Array v) {
+	sub_skin_names = v;
+	emit_signal("property_changed");
+}
 
-#endif//GODOT_PACKEDSPINESKINRESOURCE_H
+Array SpineCustomSkinResource::get_sub_skin_names() {
+	return sub_skin_names;
+}

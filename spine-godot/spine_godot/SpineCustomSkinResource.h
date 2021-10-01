@@ -27,35 +27,32 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "PackedSpineSkinResource.h"
+#ifndef GODOT_SPINECUSTOMSKINRESOURCE_H
+#define GODOT_SPINECUSTOMSKINRESOURCE_H
 
-void PackedSpineSkinResource::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("set_skin_name", "v"), &PackedSpineSkinResource::set_skin_name);
-	ClassDB::bind_method(D_METHOD("get_skin_name"), &PackedSpineSkinResource::get_skin_name);
-	ClassDB::bind_method(D_METHOD("set_sub_skin_names", "v"), &PackedSpineSkinResource::set_sub_skin_names);
-	ClassDB::bind_method(D_METHOD("get_sub_skin_names"), &PackedSpineSkinResource::get_sub_skin_names);
+#include "core/variant_parser.h"
+#include "SpineSKin.h"
 
-	ADD_SIGNAL(MethodInfo("property_changed"));
+class SpineCustomSkinResource : public Resource {
+	GDCLASS(SpineCustomSkinResource, Resource);
 
-	ADD_PROPERTY(PropertyInfo(Variant::STRING, "skin_name"), "set_skin_name", "get_skin_name");
-	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "sub_skin_names"), "set_sub_skin_names", "get_sub_skin_names");
-}
+protected:
+	static void _bind_methods();
 
-PackedSpineSkinResource::PackedSpineSkinResource() : skin_name("custom_skin_name") {}
-PackedSpineSkinResource::~PackedSpineSkinResource() {}
+private:
+	String skin_name;
+	Array sub_skin_names;
 
-void PackedSpineSkinResource::set_skin_name(const String &v) {
-	skin_name = v;
-	emit_signal("property_changed");
-}
-String PackedSpineSkinResource::get_skin_name() {
-	return skin_name;
-}
+public:
+	SpineCustomSkinResource();
+	virtual ~SpineCustomSkinResource();
 
-void PackedSpineSkinResource::set_sub_skin_names(Array v) {
-	sub_skin_names = v;
-	emit_signal("property_changed");
-}
-Array PackedSpineSkinResource::get_sub_skin_names() {
-	return sub_skin_names;
-}
+	void set_skin_name(const String &v);
+	String get_skin_name();
+
+	void set_sub_skin_names(Array v);
+	Array get_sub_skin_names();
+};
+#include "SpineSkin.h"
+#include "core/variant_parser.h"
+#endif //GODOT_SPINECUSTOMSKINRESOURCE_H

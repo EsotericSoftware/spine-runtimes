@@ -29,8 +29,9 @@
 
 #include "SpineSprite.h"
 
-#include "SpineTrackEntry.h"
+#include "SpineCustomSkinResource.h"
 #include "SpineEvent.h"
+#include "SpineTrackEntry.h"
 
 void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_animation_state_data_res", "animation_state_data_res"), &SpineSprite::set_animation_state_data_res);
@@ -86,7 +87,7 @@ void SpineSprite::_bind_methods() {
 
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "overlap"), "set_overlap", "get_overlap");
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bind_slot_nodes"), "set_bind_slot_nodes", "get_bind_slot_nodes");
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "packed_skin_resource", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "PackedSpineSkinResource"), "set_skin", "get_skin");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "packed_skin_resource", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineCustomSkinResource"), "set_skin", "get_skin");
 
 	ADD_GROUP("animation", "");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "process_mode", PROPERTY_HINT_ENUM, "Process,Physics,Manually"), "set_process_mode", "get_process_mode");
@@ -646,7 +647,7 @@ void SpineSprite::set_overlap(bool v) {
 	overlap = v;
 }
 
-void SpineSprite::set_skin(Ref<PackedSpineSkinResource> v) {
+void SpineSprite::set_skin(Ref<SpineCustomSkinResource> v) {
 	if (v != skin && skin.is_valid()) {
 		if (skin->is_connected("property_changed", this, "_on_skin_property_changed"))
 			skin->disconnect("property_changed", this, "_on_skin_property_changed");
@@ -660,7 +661,7 @@ void SpineSprite::set_skin(Ref<PackedSpineSkinResource> v) {
 		update_runtime_skin();
 	}
 }
-Ref<PackedSpineSkinResource> SpineSprite::get_skin() {
+Ref<SpineCustomSkinResource> SpineSprite::get_skin() {
 	return skin;
 }
 void SpineSprite::update_runtime_skin() {
@@ -675,7 +676,7 @@ void SpineSprite::_on_skin_property_changed() {
 	update_runtime_skin();
 }
 
-Ref<SpineSkin> SpineSprite::gen_spine_skin_from_packed_resource(Ref<PackedSpineSkinResource> res) {
+Ref<SpineSkin> SpineSprite::gen_spine_skin_from_packed_resource(Ref<SpineCustomSkinResource> res) {
 	if (!(animation_state.is_valid() && skeleton.is_valid()))
 		return NULL;
 	if (!res.is_valid())

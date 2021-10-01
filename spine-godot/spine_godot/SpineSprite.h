@@ -34,11 +34,12 @@
 
 #include <scene/2d/collision_polygon_2d.h>
 
-#include "SpineAnimationStateDataResource.h"
-#include "SpineSkeleton.h"
-#include "SpineAnimationState.h"
-#include "SpineSpriteMeshInstance2D.h"
 #include "PackedSpineSkinResource.h"
+#include "SpineAnimationState.h"
+#include "SpineAnimationStateDataResource.h"
+#include "SpineCustomSkinResource.h"
+#include "SpineSkeleton.h"
+#include "SpineSpriteMeshInstance2D.h"
 
 class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
 	GDCLASS(SpineSprite, Node2D);
@@ -75,7 +76,7 @@ private:
 
 	Array bind_slot_nodes;
 	bool overlap;
-	Ref<PackedSpineSkinResource> skin;
+	Ref<SpineCustomSkinResource> skin;
 
 	ProcessMode process_mode;
 
@@ -145,12 +146,12 @@ public:
 	bool get_overlap();
 	void set_overlap(bool v);
 
-	void set_skin(Ref<PackedSpineSkinResource> v);
-	Ref<PackedSpineSkinResource> get_skin();
+	void set_skin(Ref<SpineCustomSkinResource> v);
+	Ref<SpineCustomSkinResource> get_skin();
 	void _on_skin_property_changed();
 	void update_runtime_skin();
 
-	Ref<SpineSkin> gen_spine_skin_from_packed_resource(Ref<PackedSpineSkinResource> res);
+	Ref<SpineSkin> gen_spine_skin_from_packed_resource(Ref<SpineCustomSkinResource> res);
 
 	// current animation count
 	int64_t get_current_animation_count() const;
