@@ -62,15 +62,12 @@ void GodotSpineExtension::_free(void *mem, const char *file, int line) {
 char *GodotSpineExtension::_readFile(const spine::String &path, int *length) {
 	Error error;
 	auto res = FileAccess::get_file_as_array(String(path.buffer()), &error);
-
 	if (error != OK) {
 		if (length) *length = 0;
 		return NULL;
 	}
-
-	if (length) *length = res.size();
 	auto r = alloc<char>(res.size(), __FILE__, __LINE__);
-	for (size_t i = 0; i < res.size(); ++i)
-		r[i] = res[i];
+	memcpy(r, res.ptr(), res.size());
+	if (length) *length = res.size();
 	return r;
 }
