@@ -1,0 +1,13 @@
+[remap]
+
+importer="spine.json"
+type="SpineSkeletonJsonDataResource"
+path="res://.import/spineboy-pro.json-32eeb9972a49130cf636442038541a01.spjson"
+
+[deps]
+
+source_file="res://spineboy/spineboy-pro.json"
+dest_files=[ "res://.import/spineboy-pro.json-32eeb9972a49130cf636442038541a01.spjson" ]
+
+[params]
+
