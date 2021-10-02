@@ -2425,17 +2425,18 @@ public class Animation {
 	}
 
 	/** Changes a slot's {@link Slot#getSequenceIndex()} for an attachment's {@link Sequence}. */
-	static public class SequenceTimeline<T extends Attachment & HasTextureRegion> extends Timeline implements SlotTimeline {
+	static public class SequenceTimeline extends Timeline implements SlotTimeline {
 		static public final int ENTRIES = 3;
-		static private final int MODE = 1, FRAME_TIME = 2;
+		static private final int MODE = 1, DELAY = 2;
 
 		final int slotIndex;
-		final T attachment;
+		final HasTextureRegion attachment;
 
-		public SequenceTimeline (int frameCount, int slotIndex, T attachment) {
-			super(frameCount, Property.sequence.ordinal() + "|" + slotIndex + "|" + attachment.getSequence().getId());
+		public <T extends Attachment & HasTextureRegion> SequenceTimeline (int frameCount, int slotIndex, Attachment attachment) {
+			super(frameCount,
+				Property.sequence.ordinal() + "|" + slotIndex + "|" + ((HasTextureRegion)attachment).getSequence().getId());
 			this.slotIndex = slotIndex;
-			this.attachment = attachment;
+			this.attachment = (HasTextureRegion)attachment;
 		}
 
 		public int getFrameEntries () {
@@ -2446,18 +2447,18 @@ public class Animation {
 			return slotIndex;
 		}
 
-		public T getAttachment () {
-			return attachment;
+		public Attachment getAttachment () {
+			return (Attachment)attachment;
 		}
 
 		/** Sets the time, mode, index, and frame time for the specified frame.
 		 * @param frame Between 0 and <code>frameCount</code>, inclusive.
-		 * @param time The frame time in seconds. */
-		public void setFrame (int frame, float time, SequenceMode mode, int index, float frameTime) {
+		 * @param time Seconds between frames. */
+		public void setFrame (int frame, float time, SequenceMode mode, int index, float delay) {
 			frame *= ENTRIES;
 			frames[frame] = time;
 			frames[frame + MODE] = mode.ordinal() | (index << 4);
-			frames[frame + FRAME_TIME] = frameTime;
+			frames[frame + DELAY] = delay;
 		}
 
 		public void apply (Skeleton skeleton, float lastTime, float time, @Null Array<Event> events, float alpha, MixBlend blend,
@@ -2480,12 +2481,12 @@ public class Animation {
 			int i = search(frames, time, ENTRIES);
 			float before = frames[i];
 			int modeAndIndex = (int)frames[i + MODE];
-			float frameTime = frames[i + FRAME_TIME];
+			float delay = frames[i + DELAY];
 
 			int index = modeAndIndex >> 4, count = attachment.getSequence().getRegions().length;
 			SequenceMode mode = SequenceMode.values[modeAndIndex & 0xf];
 			if (mode != SequenceMode.stop) {
-				index += (time - before) / frameTime;
+				index += (time - before) / delay;
 				switch (mode) {
 				case play:
 					index = Math.min(count - 1, index);

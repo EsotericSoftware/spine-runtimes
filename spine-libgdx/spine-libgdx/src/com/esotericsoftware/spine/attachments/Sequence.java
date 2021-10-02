@@ -58,10 +58,8 @@ public class Sequence {
 
 	public <T extends Attachment & HasTextureRegion> void apply (Slot slot, T attachment) {
 		int index = slot.getSequenceIndex();
-		if (index == -1)
-			index = setupIndex;
-		else if (index >= regions.length) //
-			index = regions.length - 1;
+		if (index == -1) index = setupIndex;
+		if (index >= regions.length) index = regions.length - 1;
 		TextureRegion region = regions[index];
 		if (attachment.getRegion() != region) {
 			attachment.setRegion(region);
