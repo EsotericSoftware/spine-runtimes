@@ -156,8 +156,7 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		this.region = region;
 	}
 
-	public TextureRegion getRegion () {
-		if (region == null) throw new IllegalStateException("Region has not been set: " + name);
+	public @Null TextureRegion getRegion () {
 		return region;
 	}
 

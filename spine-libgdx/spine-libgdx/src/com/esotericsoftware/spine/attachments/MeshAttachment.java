@@ -95,8 +95,7 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		this.region = region;
 	}
 
-	public TextureRegion getRegion () {
-		if (region == null) throw new IllegalStateException("Region has not been set: " + this);
+	public @Null TextureRegion getRegion () {
 		return region;
 	}
 
