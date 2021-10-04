@@ -518,7 +518,7 @@ public class SkeletonJson extends SkeletonLoader {
 				if (timelineName.equals("attachment")) {
 					AttachmentTimeline timeline = new AttachmentTimeline(frames, slot.index);
 					for (int frame = 0; keyMap != null; keyMap = keyMap.next, frame++)
-						timeline.setFrame(frame, keyMap.getFloat("time", 0), keyMap.getString("name"));
+						timeline.setFrame(frame, keyMap.getFloat("time", 0), keyMap.getString("name", null));
 					timelines.add(timeline);
 
 				} else if (timelineName.equals("rgba")) {
