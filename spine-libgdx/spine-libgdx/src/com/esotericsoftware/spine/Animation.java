@@ -2499,7 +2499,7 @@ public class Animation {
 					index %= n;
 					if (index >= count) index = n - index;
 					break;
-				case playReverse:
+				case onceReverse:
 					index = Math.max(count - 1 - index, 0);
 					break;
 				case loopReverse:
