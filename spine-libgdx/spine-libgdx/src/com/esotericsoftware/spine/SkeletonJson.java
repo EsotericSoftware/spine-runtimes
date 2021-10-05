@@ -878,72 +878,70 @@ public class SkeletonJson extends SkeletonLoader {
 		}
 
 		// Attachment timelines.
-		for (JsonValue deformMap = map.getChild("attachments"); deformMap != null; deformMap = deformMap.next) {
-			Skin skin = skeletonData.findSkin(deformMap.name);
-			if (skin == null) throw new SerializationException("Skin not found: " + deformMap.name);
-			for (JsonValue slotMap = deformMap.child; slotMap != null; slotMap = slotMap.next) {
+		for (JsonValue attachmentsMap = map.getChild("attachments"); attachmentsMap != null; attachmentsMap = attachmentsMap.next) {
+			Skin skin = skeletonData.findSkin(attachmentsMap.name);
+			if (skin == null) throw new SerializationException("Skin not found: " + attachmentsMap.name);
+			for (JsonValue slotMap = attachmentsMap.child; slotMap != null; slotMap = slotMap.next) {
 				SlotData slot = skeletonData.findSlot(slotMap.name);
 				if (slot == null) throw new SerializationException("Slot not found: " + slotMap.name);
-				for (JsonValue timelineMap = slotMap.child; timelineMap != null; timelineMap = timelineMap.next) {
-					JsonValue keyMap = timelineMap.child;
-					if (keyMap == null) continue;
+				for (JsonValue attachmentMap = slotMap.child; attachmentMap != null; attachmentMap = attachmentMap.next) {
+					Attachment attachment = skin.getAttachment(slot.index, attachmentMap.name);
+					if (attachment == null) throw new SerializationException("Timeline attachment not found: " + attachmentMap.name);
+					for (JsonValue timelineMap = attachmentMap.child; timelineMap != null; timelineMap = timelineMap.next) {
+						JsonValue keyMap = timelineMap.child;
+						int frames = timelineMap.size;
+						String timelineName = timelineMap.name;
+						if (timelineName.equals("deform")) {
+							VertexAttachment vertexAttachment = (VertexAttachment)attachment;
+							boolean weighted = vertexAttachment.getBones() != null;
+							float[] vertices = vertexAttachment.getVertices();
+							int deformLength = weighted ? (vertices.length / 3) << 1 : vertices.length;
 
-					Attachment attachment = skin.getAttachment(slot.index, timelineMap.name);
-					if (attachment == null) throw new SerializationException("Timeline attachment not found: " + timelineMap.name);
-
-					int frames = keyMap.size;
-					String timelineName = keyMap.name;
-					keyMap = keyMap.child;
-					if (timelineName.equals("deform")) {
-						VertexAttachment vertexAttachment = (VertexAttachment)attachment;
-						boolean weighted = vertexAttachment.getBones() != null;
-						float[] vertices = vertexAttachment.getVertices();
-						int deformLength = weighted ? (vertices.length / 3) << 1 : vertices.length;
-
-						DeformTimeline timeline = new DeformTimeline(frames, frames, slot.index, vertexAttachment);
-						float time = keyMap.getFloat("time", 0);
-						for (int frame = 0, bezier = 0;; frame++) {
-							float[] deform;
-							JsonValue verticesValue = keyMap.get("vertices");
-							if (verticesValue == null)
-								deform = weighted ? new float[deformLength] : vertices;
-							else {
-								deform = new float[deformLength];
-								int start = keyMap.getInt("offset", 0);
-								arraycopy(verticesValue.asFloatArray(), 0, deform, start, verticesValue.size);
-								if (scale != 1) {
-									for (int i = start, n = i + verticesValue.size; i < n; i++)
-										deform[i] *= scale;
+							DeformTimeline timeline = new DeformTimeline(frames, frames, slot.index, vertexAttachment);
+							float time = keyMap.getFloat("time", 0);
+							for (int frame = 0, bezier = 0;; frame++) {
+								float[] deform;
+								JsonValue verticesValue = keyMap.get("vertices");
+								if (verticesValue == null)
+									deform = weighted ? new float[deformLength] : vertices;
+								else {
+									deform = new float[deformLength];
+									int start = keyMap.getInt("offset", 0);
+									arraycopy(verticesValue.asFloatArray(), 0, deform, start, verticesValue.size);
+									if (scale != 1) {
+										for (int i = start, n = i + verticesValue.size; i < n; i++)
+											deform[i] *= scale;
+									}
+									if (!weighted) {
+										for (int i = 0; i < deformLength; i++)
+											deform[i] += vertices[i];
+									}
 								}
-								if (!weighted) {
-									for (int i = 0; i < deformLength; i++)
-										deform[i] += vertices[i];
-								}
-							}
 
-							timeline.setFrame(frame, time, deform);
-							JsonValue nextMap = keyMap.next;
-							if (nextMap == null) {
-								timeline.shrink(bezier);
-								break;
+								timeline.setFrame(frame, time, deform);
+								JsonValue nextMap = keyMap.next;
+								if (nextMap == null) {
+									timeline.shrink(bezier);
+									break;
+								}
+								float time2 = nextMap.getFloat("time", 0);
+								JsonValue curve = keyMap.get("curve");
+								if (curve != null) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
+								time = time2;
+								keyMap = nextMap;
 							}
-							float time2 = nextMap.getFloat("time", 0);
-							JsonValue curve = keyMap.get("curve");
-							if (curve != null) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
-							time = time2;
-							keyMap = nextMap;
+							timelines.add(timeline);
+						} else if (timelineName.equals("sequence")) {
+							SequenceTimeline timeline = new SequenceTimeline(frames, slot.index, attachment);
+							float lastDelay = 0;
+							for (int frame = 0; keyMap != null; keyMap = keyMap.next, frame++) {
+								float delay = keyMap.getFloat("delay", lastDelay);
+								timeline.setFrame(frame, keyMap.getFloat("time", 0),
+									SequenceMode.valueOf(keyMap.getString("mode", "stop")), keyMap.getInt("index", 0), delay);
+								lastDelay = delay;
+							}
+							timelines.add(timeline);
 						}
-						timelines.add(timeline);
-					} else if (timelineName.equals("sequence")) {
-						SequenceTimeline timeline = new SequenceTimeline(frames, slot.index, attachment);
-						float lastDelay = 0;
-						for (int frame = 0; keyMap != null; keyMap = keyMap.next, frame++) {
-							float delay = keyMap.getFloat("delay", lastDelay);
-							timeline.setFrame(frame, keyMap.getFloat("time", 0), SequenceMode.valueOf(keyMap.getString("mode", "stop")),
-								keyMap.getInt("index", 0), delay);
-							delay = lastDelay;
-						}
-						timelines.add(timeline);
 					}
 				}
 			}

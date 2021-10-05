@@ -286,7 +286,7 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		mesh.path = path;
 		mesh.color.set(color);
 		mesh.setParentMesh(parentMesh != null ? parentMesh : this);
-		mesh.updateRegion();
+		if (mesh.getRegion() != null) mesh.updateRegion();
 		return mesh;
 	}
 
