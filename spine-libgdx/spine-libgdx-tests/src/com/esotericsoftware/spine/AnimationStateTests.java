@@ -36,6 +36,7 @@ import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.Pool;
 
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
@@ -47,19 +48,15 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.SequenceAttachment;
+import com.esotericsoftware.spine.attachments.Sequence;
 
 public class AnimationStateTests {
 	final SkeletonJson json = new SkeletonJson(new AttachmentLoader() {
-		public RegionAttachment newRegionAttachment (Skin skin, String name, String path) {
+		public RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
 			return null;
 		}
 
-		public MeshAttachment newMeshAttachment (Skin skin, String name, String path) {
-			return null;
-		}
-
-		public SequenceAttachment newSequenceAttachment (Skin skin, String name, String path, int frameCount) {
+		public MeshAttachment newMeshAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
 			return null;
 		}
 
@@ -893,7 +890,6 @@ public class AnimationStateTests {
 		state.apply(skeleton);
 		while (time < endTime) {
 			time += incr;
-			skeleton.update(incr);
 			state.update(incr);
 
 			// Reduce float discrepancies for tests.

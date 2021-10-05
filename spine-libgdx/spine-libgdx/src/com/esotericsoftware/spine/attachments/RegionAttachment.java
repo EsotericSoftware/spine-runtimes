@@ -34,21 +34,19 @@ import static com.esotericsoftware.spine.utils.SpineUtils.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.Bone;
+import com.esotericsoftware.spine.Slot;
 
 /** An attachment that displays a textured quadrilateral.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-regions">Region attachments</a> in the Spine User Guide. */
 public class RegionAttachment extends Attachment implements HasTextureRegion {
-	static public final int BLX = 0;
-	static public final int BLY = 1;
-	static public final int ULX = 2;
-	static public final int ULY = 3;
-	static public final int URX = 4;
-	static public final int URY = 5;
-	static public final int BRX = 6;
-	static public final int BRY = 7;
+	static public final int BLX = 0, BLY = 1;
+	static public final int ULX = 2, ULY = 3;
+	static public final int URX = 4, URY = 5;
+	static public final int BRX = 6, BRY = 7;
 
 	private TextureRegion region;
 	private String path;
@@ -56,13 +54,31 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 	private final float[] uvs = new float[8];
 	private final float[] offset = new float[8];
 	private final Color color = new Color(1, 1, 1, 1);
+	private @Null Sequence sequence;
 
 	public RegionAttachment (String name) {
 		super(name);
 	}
 
-	/** Calculates the {@link #offset} using the {@link #region}. Must be called after changing the region or the region's
-	 * properties. */
+	/** Copy constructor. */
+	protected RegionAttachment (RegionAttachment other) {
+		super(other);
+		region = other.region;
+		path = other.path;
+		x = other.x;
+		y = other.y;
+		scaleX = other.scaleX;
+		scaleY = other.scaleY;
+		rotation = other.rotation;
+		width = other.width;
+		height = other.height;
+		arraycopy(other.uvs, 0, uvs, 0, 8);
+		arraycopy(other.offset, 0, offset, 0, 8);
+		color.set(other.color);
+	}
+
+	/** Calculates the {@link #offset} and {@link #uvs} using the {@link #region} and the attachment's transform. Must be called if
+	 * the {@link #region}, transform, or the region's properties are changed. */
 	public void updateRegion () {
 		float width = getWidth();
 		float height = getHeight();
@@ -70,11 +86,13 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		float localY2 = height / 2;
 		float localX = -localX2;
 		float localY = -localY2;
+		boolean rotated = false;
 		if (region instanceof AtlasRegion) {
 			AtlasRegion region = (AtlasRegion)this.region;
 			localX += region.offsetX / region.originalWidth * width;
 			localY += region.offsetY / region.originalHeight * height;
 			if (region.degrees == 90) {
+				rotated = true;
 				localX2 -= (region.originalWidth - region.offsetX - region.packedHeight) / region.originalWidth * width;
 				localY2 -= (region.originalHeight - region.offsetY - region.packedWidth) / region.originalHeight * height;
 			} else {
@@ -110,13 +128,9 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		offset[URY] = localY2Cos + localX2Sin;
 		offset[BRX] = localX2Cos - localYSin;
 		offset[BRY] = localYCos + localX2Sin;
-	}
 
-	public void setRegion (TextureRegion region) {
-		if (region == null) throw new IllegalArgumentException("region cannot be null.");
-		this.region = region;
 		float[] uvs = this.uvs;
-		if (region instanceof AtlasRegion && ((AtlasRegion)region).degrees == 90) {
+		if (rotated) {
 			uvs[URX] = region.getU();
 			uvs[URY] = region.getV2();
 			uvs[BRX] = region.getU();
@@ -137,20 +151,28 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		}
 	}
 
-	public TextureRegion getRegion () {
-		if (region == null) throw new IllegalStateException("Region has not been set: " + name);
+	public void setRegion (TextureRegion region) {
+		if (region == null) throw new IllegalArgumentException("region cannot be null.");
+		this.region = region;
+	}
+
+	public @Null TextureRegion getRegion () {
 		return region;
 	}
 
-	/** Transforms the attachment's four vertices to world coordinates.
+	/** Transforms the attachment's four vertices to world coordinates. If the attachment has a {@link #sequence}, the
+	 * {@link #region} may be changed.
 	 * <p>
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
 	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + 8.
 	 * @param offset The <code>worldVertices</code> index to begin writing values.
 	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
-	public void computeWorldVertices (Bone bone, float[] worldVertices, int offset, int stride) {
+	public void computeWorldVertices (Slot slot, float[] worldVertices, int offset, int stride) {
+		if (sequence != null) sequence.apply(slot, this);
+
 		float[] vertexOffset = this.offset;
+		Bone bone = slot.getBone();
 		float x = bone.getWorldX(), y = bone.getWorldY();
 		float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
 		float offsetX, offsetY;
@@ -265,20 +287,15 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		this.path = path;
 	}
 
-	public Attachment copy () {
-		RegionAttachment copy = new RegionAttachment(name);
-		copy.region = region;
-		copy.path = path;
-		copy.x = x;
-		copy.y = y;
-		copy.scaleX = scaleX;
-		copy.scaleY = scaleY;
-		copy.rotation = rotation;
-		copy.width = width;
-		copy.height = height;
-		arraycopy(uvs, 0, copy.uvs, 0, 8);
-		arraycopy(offset, 0, copy.offset, 0, 8);
-		copy.color.set(color);
-		return copy;
+	public @Null Sequence getSequence () {
+		return sequence;
+	}
+
+	public void setSequence (@Null Sequence sequence) {
+		this.sequence = sequence;
+	}
+
+	public RegionAttachment copy () {
+		return new RegionAttachment(this);
 	}
 }

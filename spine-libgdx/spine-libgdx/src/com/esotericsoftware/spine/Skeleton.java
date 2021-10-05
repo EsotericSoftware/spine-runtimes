@@ -42,7 +42,6 @@ import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.SequenceAttachment;
 
 /** Stores the current pose for a skeleton.
  * <p>
@@ -60,7 +59,6 @@ public class Skeleton {
 	final Array<Updatable> updateCache = new Array();
 	@Null Skin skin;
 	final Color color;
-	float time;
 	float scaleX = 1, scaleY = 1;
 	float x, y;
 
@@ -158,7 +156,6 @@ public class Skeleton {
 
 		skin = skeleton.skin;
 		color = new Color(skeleton.color);
-		time = skeleton.time;
 		scaleX = skeleton.scaleX;
 		scaleY = skeleton.scaleY;
 
@@ -722,11 +719,11 @@ public class Skeleton {
 			int verticesLength = 0;
 			float[] vertices = null;
 			Attachment attachment = slot.attachment;
-			if (attachment instanceof SequenceAttachment) attachment = ((SequenceAttachment)attachment).updateAttachment(slot);
 			if (attachment instanceof RegionAttachment) {
+				RegionAttachment region = (RegionAttachment)attachment;
 				verticesLength = 8;
 				vertices = temp.setSize(8);
-				((RegionAttachment)attachment).computeWorldVertices(slot.getBone(), vertices, 0, 2);
+				region.computeWorldVertices(slot, vertices, 0, 2);
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
 				verticesLength = mesh.getWorldVerticesLength();
@@ -810,22 +807,6 @@ public class Skeleton {
 	public void setPosition (float x, float y) {
 		this.x = x;
 		this.y = y;
-	}
-
-	/** Returns the skeleton's time. This can be used for tracking, such as with Slot {@link Slot#getAttachmentTime()}.
-	 * <p>
-	 * See {@link #update(float)}. */
-	public float getTime () {
-		return time;
-	}
-
-	public void setTime (float time) {
-		this.time = time;
-	}
-
-	/** Increments the skeleton's {@link #time}. */
-	public void update (float delta) {
-		time += delta;
 	}
 
 	public String toString () {

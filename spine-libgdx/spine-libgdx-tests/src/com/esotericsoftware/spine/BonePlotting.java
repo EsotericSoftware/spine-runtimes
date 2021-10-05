@@ -30,6 +30,7 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Null;
 
 import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.Animation.MixDirection;
@@ -40,21 +41,17 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.SequenceAttachment;
+import com.esotericsoftware.spine.attachments.Sequence;
 
 public class BonePlotting {
 	static public void main (String[] args) throws Exception {
 		// This example shows how to load skeleton data and plot a bone transform for each animation.
 		SkeletonJson json = new SkeletonJson(new AttachmentLoader() {
-			public RegionAttachment newRegionAttachment (Skin skin, String name, String path) {
+			public RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
 				return null;
 			}
 
-			public MeshAttachment newMeshAttachment (Skin skin, String name, String path) {
-				return null;
-			}
-
-			public SequenceAttachment newSequenceAttachment (Skin skin, String name, String path, int frameCount) {
+			public MeshAttachment newMeshAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
 				return null;
 			}
 

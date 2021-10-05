@@ -41,6 +41,7 @@ import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.SerializationException;
 
 import com.esotericsoftware.spine.Animation.AlphaTimeline;
@@ -63,6 +64,7 @@ import com.esotericsoftware.spine.Animation.RotateTimeline;
 import com.esotericsoftware.spine.Animation.ScaleTimeline;
 import com.esotericsoftware.spine.Animation.ScaleXTimeline;
 import com.esotericsoftware.spine.Animation.ScaleYTimeline;
+import com.esotericsoftware.spine.Animation.SequenceTimeline;
 import com.esotericsoftware.spine.Animation.ShearTimeline;
 import com.esotericsoftware.spine.Animation.ShearXTimeline;
 import com.esotericsoftware.spine.Animation.ShearYTimeline;
@@ -84,9 +86,8 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
-import com.esotericsoftware.spine.attachments.SequenceAttachment;
-import com.esotericsoftware.spine.attachments.SequenceAttachment.SequenceMode;
-import com.esotericsoftware.spine.attachments.HasTextureRegion;
+import com.esotericsoftware.spine.attachments.Sequence;
+import com.esotericsoftware.spine.attachments.Sequence.SequenceMode;
 import com.esotericsoftware.spine.attachments.VertexAttachment;
 
 /** Loads skeleton data in the Spine JSON format.
@@ -324,9 +325,9 @@ public class SkeletonJson extends SkeletonLoader {
 			if (skin == null) throw new SerializationException("Skin not found: " + linkedMesh.skin);
 			Attachment parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 			if (parent == null) throw new SerializationException("Parent mesh not found: " + linkedMesh.parent);
-			linkedMesh.mesh.setDeformAttachment(linkedMesh.inheritDeform ? (VertexAttachment)parent : linkedMesh.mesh);
+			linkedMesh.mesh.setTimelineAttachment(linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh);
 			linkedMesh.mesh.setParentMesh((MeshAttachment)parent);
-			linkedMesh.mesh.updateRegion();
+			if (linkedMesh.mesh.getRegion() != null) linkedMesh.mesh.updateRegion();
 		}
 		linkedMeshes.clear();
 
@@ -369,7 +370,8 @@ public class SkeletonJson extends SkeletonLoader {
 		switch (AttachmentType.valueOf(map.getString("type", AttachmentType.region.name()))) {
 		case region: {
 			String path = map.getString("path", name);
-			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path);
+			Sequence sequence = readSequence(map.get("sequence"));
+			RegionAttachment region = attachmentLoader.newRegionAttachment(skin, name, path, sequence);
 			if (region == null) return null;
 			region.setPath(path);
 			region.setX(map.getFloat("x", 0) * scale);
@@ -379,11 +381,12 @@ public class SkeletonJson extends SkeletonLoader {
 			region.setRotation(map.getFloat("rotation", 0));
 			region.setWidth(map.getFloat("width") * scale);
 			region.setHeight(map.getFloat("height") * scale);
+			region.setSequence(sequence);
 
 			String color = map.getString("color", null);
 			if (color != null) Color.valueOf(color, region.getColor());
 
-			region.updateRegion();
+			if (region.getRegion() != null) region.updateRegion();
 			return region;
 		}
 		case boundingbox: {
@@ -398,7 +401,8 @@ public class SkeletonJson extends SkeletonLoader {
 		case mesh:
 		case linkedmesh: {
 			String path = map.getString("path", name);
-			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path);
+			Sequence sequence = readSequence(map.get("sequence"));
+			MeshAttachment mesh = attachmentLoader.newMeshAttachment(skin, name, path, sequence);
 			if (mesh == null) return null;
 			mesh.setPath(path);
 
@@ -407,11 +411,12 @@ public class SkeletonJson extends SkeletonLoader {
 
 			mesh.setWidth(map.getFloat("width", 0) * scale);
 			mesh.setHeight(map.getFloat("height", 0) * scale);
+			mesh.setSequence(sequence);
 
 			String parent = map.getString("parent", null);
 			if (parent != null) {
 				linkedMeshes
-					.add(new LinkedMesh(mesh, map.getString("skin", null), slotIndex, parent, map.getBoolean("deform", true)));
+					.add(new LinkedMesh(mesh, map.getString("skin", null), slotIndex, parent, map.getBoolean("timelines", true)));
 				return mesh;
 			}
 
@@ -419,7 +424,7 @@ public class SkeletonJson extends SkeletonLoader {
 			readVertices(map, mesh, uvs.length);
 			mesh.setTriangles(map.require("triangles").asShortArray());
 			mesh.setRegionUVs(uvs);
-			mesh.updateRegion();
+			if (mesh.getRegion() != null) mesh.updateRegion();
 
 			if (map.has("hull")) mesh.setHullLength(map.require("hull").asInt() << 1);
 			if (map.has("edges")) mesh.setEdges(map.require("edges").asShortArray());
@@ -455,7 +460,7 @@ public class SkeletonJson extends SkeletonLoader {
 			if (color != null) Color.valueOf(color, point.getColor());
 			return point;
 		}
-		case clipping: {
+		case clipping:
 			ClippingAttachment clip = attachmentLoader.newClippingAttachment(skin, name);
 			if (clip == null) return null;
 
@@ -472,21 +477,16 @@ public class SkeletonJson extends SkeletonLoader {
 			if (color != null) Color.valueOf(color, clip.getColor());
 			return clip;
 		}
-		case sequence:
-			Attachment attachment = readAttachment(map.getChild("attachment"), skin, slotIndex, name, skeletonData);
-			if (attachment == null) return null;
-			String path = ((HasTextureRegion)attachment).getPath();
-			int frameCount = map.getInt("count");
-			SequenceAttachment sequence = attachmentLoader.newSequenceAttachment(skin, name, path, frameCount);
-			if (sequence == null) return null;
-			sequence.setAttachment(attachment);
-			sequence.setPath(path);
-			sequence.setFrameCount(frameCount);
-			sequence.setFrameTime(map.getInt("time"));
-			sequence.setMode(SequenceMode.valueOf(map.getString("mode", SequenceMode.forward.name())));
-			return sequence;
-		}
 		return null;
+	}
+
+	private Sequence readSequence (@Null JsonValue map) {
+		if (map == null) return null;
+		Sequence sequence = new Sequence(map.getInt("count"));
+		sequence.setStart(map.getInt("start", 1));
+		sequence.setDigits(map.getInt("digits", 0));
+		sequence.setSetupIndex(map.getInt("setup", 0));
+		return sequence;
 	}
 
 	private void readVertices (JsonValue map, VertexAttachment attachment, int verticesLength) {
@@ -533,7 +533,7 @@ public class SkeletonJson extends SkeletonLoader {
 				if (timelineName.equals("attachment")) {
 					AttachmentTimeline timeline = new AttachmentTimeline(frames, slot.index);
 					for (int frame = 0; keyMap != null; keyMap = keyMap.next, frame++)
-						timeline.setFrame(frame, keyMap.getFloat("time", 0), keyMap.getString("name"));
+						timeline.setFrame(frame, keyMap.getFloat("time", 0), keyMap.getString("name", null));
 					timelines.add(timeline);
 
 				} else if (timelineName.equals("rgba")) {
@@ -877,57 +877,72 @@ public class SkeletonJson extends SkeletonLoader {
 			}
 		}
 
-		// Deform timelines.
-		for (JsonValue deformMap = map.getChild("deform"); deformMap != null; deformMap = deformMap.next) {
-			Skin skin = skeletonData.findSkin(deformMap.name);
-			if (skin == null) throw new SerializationException("Skin not found: " + deformMap.name);
-			for (JsonValue slotMap = deformMap.child; slotMap != null; slotMap = slotMap.next) {
+		// Attachment timelines.
+		for (JsonValue attachmentsMap = map.getChild("attachments"); attachmentsMap != null; attachmentsMap = attachmentsMap.next) {
+			Skin skin = skeletonData.findSkin(attachmentsMap.name);
+			if (skin == null) throw new SerializationException("Skin not found: " + attachmentsMap.name);
+			for (JsonValue slotMap = attachmentsMap.child; slotMap != null; slotMap = slotMap.next) {
 				SlotData slot = skeletonData.findSlot(slotMap.name);
 				if (slot == null) throw new SerializationException("Slot not found: " + slotMap.name);
-				for (JsonValue timelineMap = slotMap.child; timelineMap != null; timelineMap = timelineMap.next) {
-					JsonValue keyMap = timelineMap.child;
-					if (keyMap == null) continue;
+				for (JsonValue attachmentMap = slotMap.child; attachmentMap != null; attachmentMap = attachmentMap.next) {
+					Attachment attachment = skin.getAttachment(slot.index, attachmentMap.name);
+					if (attachment == null) throw new SerializationException("Timeline attachment not found: " + attachmentMap.name);
+					for (JsonValue timelineMap = attachmentMap.child; timelineMap != null; timelineMap = timelineMap.next) {
+						JsonValue keyMap = timelineMap.child;
+						int frames = timelineMap.size;
+						String timelineName = timelineMap.name;
+						if (timelineName.equals("deform")) {
+							VertexAttachment vertexAttachment = (VertexAttachment)attachment;
+							boolean weighted = vertexAttachment.getBones() != null;
+							float[] vertices = vertexAttachment.getVertices();
+							int deformLength = weighted ? (vertices.length / 3) << 1 : vertices.length;
 
-					VertexAttachment attachment = (VertexAttachment)skin.getAttachment(slot.index, timelineMap.name);
-					if (attachment == null) throw new SerializationException("Deform attachment not found: " + timelineMap.name);
-					boolean weighted = attachment.getBones() != null;
-					float[] vertices = attachment.getVertices();
-					int deformLength = weighted ? (vertices.length / 3) << 1 : vertices.length;
+							DeformTimeline timeline = new DeformTimeline(frames, frames, slot.index, vertexAttachment);
+							float time = keyMap.getFloat("time", 0);
+							for (int frame = 0, bezier = 0;; frame++) {
+								float[] deform;
+								JsonValue verticesValue = keyMap.get("vertices");
+								if (verticesValue == null)
+									deform = weighted ? new float[deformLength] : vertices;
+								else {
+									deform = new float[deformLength];
+									int start = keyMap.getInt("offset", 0);
+									arraycopy(verticesValue.asFloatArray(), 0, deform, start, verticesValue.size);
+									if (scale != 1) {
+										for (int i = start, n = i + verticesValue.size; i < n; i++)
+											deform[i] *= scale;
+									}
+									if (!weighted) {
+										for (int i = 0; i < deformLength; i++)
+											deform[i] += vertices[i];
+									}
+								}
 
-					DeformTimeline timeline = new DeformTimeline(timelineMap.size, timelineMap.size, slot.index, attachment);
-					float time = keyMap.getFloat("time", 0);
-					for (int frame = 0, bezier = 0;; frame++) {
-						float[] deform;
-						JsonValue verticesValue = keyMap.get("vertices");
-						if (verticesValue == null)
-							deform = weighted ? new float[deformLength] : vertices;
-						else {
-							deform = new float[deformLength];
-							int start = keyMap.getInt("offset", 0);
-							arraycopy(verticesValue.asFloatArray(), 0, deform, start, verticesValue.size);
-							if (scale != 1) {
-								for (int i = start, n = i + verticesValue.size; i < n; i++)
-									deform[i] *= scale;
+								timeline.setFrame(frame, time, deform);
+								JsonValue nextMap = keyMap.next;
+								if (nextMap == null) {
+									timeline.shrink(bezier);
+									break;
+								}
+								float time2 = nextMap.getFloat("time", 0);
+								JsonValue curve = keyMap.get("curve");
+								if (curve != null) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
+								time = time2;
+								keyMap = nextMap;
 							}
-							if (!weighted) {
-								for (int i = 0; i < deformLength; i++)
-									deform[i] += vertices[i];
+							timelines.add(timeline);
+						} else if (timelineName.equals("sequence")) {
+							SequenceTimeline timeline = new SequenceTimeline(frames, slot.index, attachment);
+							float lastDelay = 0;
+							for (int frame = 0; keyMap != null; keyMap = keyMap.next, frame++) {
+								float delay = keyMap.getFloat("delay", lastDelay);
+								timeline.setFrame(frame, keyMap.getFloat("time", 0),
+									SequenceMode.valueOf(keyMap.getString("mode", "stop")), keyMap.getInt("index", 0), delay);
+								lastDelay = delay;
 							}
+							timelines.add(timeline);
 						}
-
-						timeline.setFrame(frame, time, deform);
-						JsonValue nextMap = keyMap.next;
-						if (nextMap == null) {
-							timeline.shrink(bezier);
-							break;
-						}
-						float time2 = nextMap.getFloat("time", 0);
-						JsonValue curve = keyMap.get("curve");
-						if (curve != null) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
-						time = time2;
-						keyMap = nextMap;
 					}
-					timelines.add(timeline);
 				}
 			}
 		}
@@ -1068,14 +1083,14 @@ public class SkeletonJson extends SkeletonLoader {
 		String parent, skin;
 		int slotIndex;
 		MeshAttachment mesh;
-		boolean inheritDeform;
+		boolean inheritTimelines;
 
-		public LinkedMesh (MeshAttachment mesh, String skin, int slotIndex, String parent, boolean inheritDeform) {
+		public LinkedMesh (MeshAttachment mesh, String skin, int slotIndex, String parent, boolean inheritTimelines) {
 			this.mesh = mesh;
 			this.skin = skin;
 			this.slotIndex = slotIndex;
 			this.parent = parent;
-			this.inheritDeform = inheritDeform;
+			this.inheritTimelines = inheritTimelines;
 		}
 	}
 }

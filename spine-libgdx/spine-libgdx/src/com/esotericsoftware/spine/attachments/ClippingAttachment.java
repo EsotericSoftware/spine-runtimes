@@ -45,6 +45,13 @@ public class ClippingAttachment extends VertexAttachment {
 		super(name);
 	}
 
+	/** Copy constructor. */
+	protected ClippingAttachment (ClippingAttachment other) {
+		super(other);
+		endSlot = other.endSlot;
+		color.set(other.color);
+	}
+
 	/** Clipping is performed between the clipping attachment's slot and the end slot. If null clipping is done until the end of
 	 * the skeleton's rendering. */
 	public @Null SlotData getEndSlot () {
@@ -61,11 +68,7 @@ public class ClippingAttachment extends VertexAttachment {
 		return color;
 	}
 
-	public Attachment copy () {
-		ClippingAttachment copy = new ClippingAttachment(name);
-		copyTo(copy);
-		copy.endSlot = endSlot;
-		copy.color.set(color);
-		return copy;
+	public ClippingAttachment copy () {
+		return new ClippingAttachment(name);
 	}
 }

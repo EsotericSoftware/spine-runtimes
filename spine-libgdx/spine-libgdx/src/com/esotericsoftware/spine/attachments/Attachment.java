@@ -31,11 +31,16 @@ package com.esotericsoftware.spine.attachments;
 
 /** The base class for all attachments. */
 abstract public class Attachment {
-	String name;
+	final String name;
 
 	public Attachment (String name) {
 		if (name == null) throw new IllegalArgumentException("name cannot be null.");
 		this.name = name;
+	}
+
+	/** Copy constructor. */
+	protected Attachment (Attachment other) {
+		name = other.name;
 	}
 
 	/** The attachment's name. */
