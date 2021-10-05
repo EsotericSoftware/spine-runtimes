@@ -2486,7 +2486,7 @@ public class Animation {
 			int index = modeAndIndex >> 4, count = attachment.getSequence().getRegions().length;
 			SequenceMode mode = SequenceMode.values[modeAndIndex & 0xf];
 			if (mode != SequenceMode.stop) {
-				index += (time - before) / delay;
+				index += (time - before) / delay + 0.00001f;
 				switch (mode) {
 				case once:
 					index = Math.min(count - 1, index);
