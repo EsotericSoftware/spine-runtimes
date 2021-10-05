@@ -2488,7 +2488,7 @@ public class Animation {
 			if (mode != SequenceMode.stop) {
 				index += (time - before) / delay;
 				switch (mode) {
-				case play:
+				case once:
 					index = Math.min(count - 1, index);
 					break;
 				case loop:

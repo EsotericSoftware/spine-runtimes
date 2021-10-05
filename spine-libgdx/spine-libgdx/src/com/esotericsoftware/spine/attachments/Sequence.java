@@ -115,7 +115,7 @@ public class Sequence {
 	}
 
 	static public enum SequenceMode {
-		stop, play, loop, pingpong, playReverse, loopReverse, pingpongReverse;
+		stop, once, loop, pingpong, playReverse, loopReverse, pingpongReverse;
 
 		static public final SequenceMode[] values = values();
 	}
