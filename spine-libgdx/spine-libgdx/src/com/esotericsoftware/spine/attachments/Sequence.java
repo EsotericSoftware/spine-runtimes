@@ -70,9 +70,10 @@ public class Sequence {
 	public String getPath (String basePath, int index) {
 		StringBuilder buffer = new StringBuilder(basePath.length() + digits);
 		buffer.append(basePath);
-		buffer.append(start + index);
-		while (buffer.length() < digits)
+		String frame = Integer.toString(start + index);
+		for (int i = digits - frame.length(); i > 0; i--)
 			buffer.append('0');
+		buffer.append(frame);
 		return buffer.toString();
 	}
 
