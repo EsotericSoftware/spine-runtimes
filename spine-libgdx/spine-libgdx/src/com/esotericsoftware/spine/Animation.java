@@ -2432,7 +2432,7 @@ public class Animation {
 		final int slotIndex;
 		final HasTextureRegion attachment;
 
-		public <T extends Attachment & HasTextureRegion> SequenceTimeline (int frameCount, int slotIndex, Attachment attachment) {
+		public SequenceTimeline (int frameCount, int slotIndex, Attachment attachment) {
 			super(frameCount,
 				Property.sequence.ordinal() + "|" + slotIndex + "|" + ((HasTextureRegion)attachment).getSequence().getId());
 			this.slotIndex = slotIndex;
@@ -2485,7 +2485,7 @@ public class Animation {
 
 			int index = modeAndIndex >> 4, count = attachment.getSequence().getRegions().length;
 			SequenceMode mode = SequenceMode.values[modeAndIndex & 0xf];
-			if (mode != SequenceMode.stop) {
+			if (mode != SequenceMode.hold) {
 				index += (time - before) / delay + 0.00001f;
 				switch (mode) {
 				case once:
