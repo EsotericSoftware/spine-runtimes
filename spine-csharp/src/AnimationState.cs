@@ -1255,7 +1255,7 @@ namespace Spine {
 
 		/// <summary>Returns true if this entry is for the empty animation. See <see cref="AnimationState.SetEmptyAnimation(int, float)"/>,
 		/// <see cref="AnimationState.AddEmptyAnimation(int, float, float)"/>, and <see cref="AnimationState.SetEmptyAnimations(float)"/>.
-		public bool IsEmptyAnimation { get { return animation == AnimationState.EmptyAnimation; }}
+		public bool IsEmptyAnimation { get { return animation == AnimationState.EmptyAnimation; } }
 
 		/// <summary>
 		/// <para>
