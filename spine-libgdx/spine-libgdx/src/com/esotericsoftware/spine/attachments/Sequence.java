@@ -56,7 +56,7 @@ public class Sequence {
 		setupIndex = other.setupIndex;
 	}
 
-	public <T extends Attachment & HasTextureRegion> void apply (Slot slot, T attachment) {
+	public void apply (Slot slot, HasTextureRegion attachment) {
 		int index = slot.getSequenceIndex();
 		if (index == -1) index = setupIndex;
 		if (index >= regions.length) index = regions.length - 1;

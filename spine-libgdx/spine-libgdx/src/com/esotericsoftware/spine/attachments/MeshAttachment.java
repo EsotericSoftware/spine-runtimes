@@ -100,8 +100,8 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		return region;
 	}
 
-	/** Calculates {@link #uvs} using the {@link #regionUVs} and {@link #region}. Must be called if the {@link #region},
-	 * {@link #regionUVs}, or the region's properties are changed. */
+	/** Calculates {@link #uvs} using the {@link #regionUVs} and region. Must be called if the region, the region's properties, or
+	 * the {@link #regionUVs} are changed. */
 	public void updateRegion () {
 		float[] regionUVs = this.regionUVs;
 		if (this.uvs == null || this.uvs.length != regionUVs.length) this.uvs = new float[regionUVs.length];
@@ -164,7 +164,7 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		}
 	}
 
-	/** If the attachment has a {@link #sequence}, the {@link #region} may be changed. */
+	/** If the attachment has a {@link #sequence}, the region may be changed. */
 	public void computeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride) {
 		if (sequence != null) sequence.apply(slot, this);
 		super.computeWorldVertices(slot, start, count, worldVertices, offset, stride);

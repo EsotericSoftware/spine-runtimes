@@ -78,8 +78,8 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		sequence = new Sequence(sequence);
 	}
 
-	/** Calculates the {@link #offset} and {@link #uvs} using the {@link #region} and the attachment's transform. Must be called if
-	 * the {@link #region}, transform, or the region's properties are changed. */
+	/** Calculates the {@link #offset} and {@link #uvs} using the region and the attachment's transform. Must be called if the
+	 * region, the region's properties, or the transform are changed. */
 	public void updateRegion () {
 		float width = getWidth();
 		float height = getHeight();
@@ -161,8 +161,8 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		return region;
 	}
 
-	/** Transforms the attachment's four vertices to world coordinates. If the attachment has a {@link #sequence}, the
-	 * {@link #region} may be changed.
+	/** Transforms the attachment's four vertices to world coordinates. If the attachment has a {@link #sequence}, the region may
+	 * be changed.
 	 * <p>
 	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
