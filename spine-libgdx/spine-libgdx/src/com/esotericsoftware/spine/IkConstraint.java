@@ -79,6 +79,15 @@ public class IkConstraint implements Updatable {
 		stretch = constraint.stretch;
 	}
 
+	public void setToSetupPose () {
+		IkConstraintData data = this.data;
+		mix = data.mix;
+		softness = data.softness;
+		bendDirection = data.bendDirection;
+		compress = data.compress;
+		stretch = data.stretch;
+	}
+
 	/** Applies the constraint to the constrained bones. */
 	public void update () {
 		if (mix == 0) return;

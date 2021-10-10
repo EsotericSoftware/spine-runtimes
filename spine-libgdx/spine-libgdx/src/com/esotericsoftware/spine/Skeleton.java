@@ -37,6 +37,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.Null;
 
+import com.esotericsoftware.spine.PhysicsConstraintData.Node;
 import com.esotericsoftware.spine.Skin.SkinEntry;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
@@ -337,17 +338,29 @@ public class Skeleton {
 		constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true));
 		if (!constraint.active) return;
 
-		Object[] constrained = constraint.bones.items;
-		int boneCount = constraint.bones.size;
-		for (int i = 0; i < boneCount; i++)
-			sortBone((Bone)constrained[i]);
+		Object[] nodes = constraint.nodes.items;
+		int nodeCount = constraint.nodes.size;
+		for (int i = 0; i < nodeCount; i++) {
+			Node node = (Node)nodes[i];
+			if (node.parentBone != null) sortBone(node.parentBone);
+			for (Bone bone : node.bones)
+				sortBone(bone);
+		}
 
 		updateCache.add(constraint);
 
-		for (int i = 0; i < boneCount; i++)
-			sortReset(((Bone)constrained[i]).children);
-		for (int i = 0; i < boneCount; i++)
-			((Bone)constrained[i]).sorted = true;
+		for (int i = 0; i < nodeCount; i++) {
+			Node node = (Node)nodes[i];
+			if (node.parentBone != null) sortReset(node.parentBone.children);
+			for (Bone bone : node.bones)
+				sortReset(bone.children);
+		}
+		for (int i = 0; i < nodeCount; i++) {
+			Node node = (Node)nodes[i];
+			if (node.parentBone != null) node.parentBone.sorted = true;
+			for (Bone bone : node.bones)
+				bone.sorted = true;
+		}
 	}
 
 	private void sortBone (Bone bone) {
@@ -435,51 +448,20 @@ public class Skeleton {
 			((Bone)bones[i]).setToSetupPose();
 
 		Object[] ikConstraints = this.ikConstraints.items;
-		for (int i = 0, n = this.ikConstraints.size; i < n; i++) {
-			IkConstraint constraint = (IkConstraint)ikConstraints[i];
-			constraint.mix = constraint.data.mix;
-			constraint.softness = constraint.data.softness;
-			constraint.bendDirection = constraint.data.bendDirection;
-			constraint.compress = constraint.data.compress;
-			constraint.stretch = constraint.data.stretch;
-		}
+		for (int i = 0, n = this.ikConstraints.size; i < n; i++)
+			((IkConstraint)ikConstraints[i]).setToSetupPose();
 
 		Object[] transformConstraints = this.transformConstraints.items;
-		for (int i = 0, n = this.transformConstraints.size; i < n; i++) {
-			TransformConstraint constraint = (TransformConstraint)transformConstraints[i];
-			TransformConstraintData data = constraint.data;
-			constraint.mixRotate = data.mixRotate;
-			constraint.mixX = data.mixX;
-			constraint.mixY = data.mixY;
-			constraint.mixScaleX = data.mixScaleX;
-			constraint.mixScaleY = data.mixScaleY;
-			constraint.mixShearY = data.mixShearY;
-		}
+		for (int i = 0, n = this.transformConstraints.size; i < n; i++)
+			((TransformConstraint)transformConstraints[i]).setToSetupPose();
 
 		Object[] pathConstraints = this.pathConstraints.items;
-		for (int i = 0, n = this.pathConstraints.size; i < n; i++) {
-			PathConstraint constraint = (PathConstraint)pathConstraints[i];
-			PathConstraintData data = constraint.data;
-			constraint.position = data.position;
-			constraint.spacing = data.spacing;
-			constraint.mixRotate = data.mixRotate;
-			constraint.mixX = data.mixX;
-			constraint.mixY = data.mixY;
-		}
+		for (int i = 0, n = this.pathConstraints.size; i < n; i++)
+			((PathConstraint)pathConstraints[i]).setToSetupPose();
 
 		Object[] physicsConstraints = this.physicsConstraints.items;
-		for (int i = 0, n = this.physicsConstraints.size; i < n; i++) {
-			PhysicsConstraint constraint = (PhysicsConstraint)physicsConstraints[i];
-			PhysicsConstraintData data = constraint.data;
-			constraint.mix = data.mix;
-			constraint.friction = data.friction;
-			constraint.gravity = data.gravity;
-			constraint.wind = data.wind;
-			constraint.stiffness = data.stiffness;
-			constraint.damping = data.damping;
-			constraint.rope = data.rope;
-			constraint.stretch = data.stretch;
-		}
+		for (int i = 0, n = this.physicsConstraints.size; i < n; i++)
+			((PhysicsConstraint)physicsConstraints[i]).setToSetupPose();
 	}
 
 	/** Sets the slots and draw order to their setup pose values. */

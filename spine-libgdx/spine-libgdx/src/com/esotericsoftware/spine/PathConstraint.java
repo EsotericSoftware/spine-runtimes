@@ -91,6 +91,15 @@ public class PathConstraint implements Updatable {
 		mixY = constraint.mixY;
 	}
 
+	public void setToSetupPose () {
+		PathConstraintData data = this.data;
+		position = data.position;
+		spacing = data.spacing;
+		mixRotate = data.mixRotate;
+		mixX = data.mixX;
+		mixY = data.mixY;
+	}
+
 	/** Applies the constraint to the constrained bones. */
 	public void update () {
 		Attachment attachment = target.attachment;

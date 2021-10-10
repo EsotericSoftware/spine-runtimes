@@ -80,6 +80,16 @@ public class TransformConstraint implements Updatable {
 		mixShearY = constraint.mixShearY;
 	}
 
+	public void setToSetupPose () {
+		TransformConstraintData data = this.data;
+		mixRotate = data.mixRotate;
+		mixX = data.mixX;
+		mixY = data.mixY;
+		mixScaleX = data.mixScaleX;
+		mixScaleY = data.mixScaleY;
+		mixShearY = data.mixShearY;
+	}
+
 	/** Applies the constraint to the constrained bones. */
 	public void update () {
 		if (mixRotate == 0 && mixX == 0 && mixY == 0 && mixScaleX == 0 && mixScaleX == 0 && mixShearY == 0) return;

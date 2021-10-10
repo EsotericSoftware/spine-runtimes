@@ -29,23 +29,29 @@
 
 package com.esotericsoftware.spine;
 
+import static com.esotericsoftware.spine.utils.SpineUtils.*;
+
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Null;
 
 /** Stores the setup pose for a {@link PhysicsConstraint}.
  * <p>
  * See <a href="http://esotericsoftware.com/spine-physics-constraints">Physics constraints</a> in the Spine User Guide. */
 public class PhysicsConstraintData extends ConstraintData {
-	final Array<BoneData> bones = new Array();
-	float mix, friction, gravity, wind, stiffness, damping;
-	boolean rope, stretch;
+	final Array<NodeData> nodes = new Array();
+	final Array<SpringData> springs = new Array();
+	float mix, length, strength, damping, gravity, wind;
 
 	public PhysicsConstraintData (String name) {
 		super(name);
 	}
 
-	/** The bones that are constrained by this physics constraint. */
-	public Array<BoneData> getBones () {
-		return bones;
+	public Array<NodeData> getNodes () {
+		return nodes;
+	}
+
+	public Array<SpringData> getSprings () {
+		return springs;
 	}
 
 	/** A percentage (0-1) that controls the mix between the constrained and unconstrained poses. */
@@ -57,12 +63,28 @@ public class PhysicsConstraintData extends ConstraintData {
 		this.mix = mix;
 	}
 
-	public float getFriction () {
-		return friction;
+	public float getLength () {
+		return length;
 	}
 
-	public void setFriction (float friction) {
-		this.friction = friction;
+	public void setLength (float length) {
+		this.length = length;
+	}
+
+	public float getStrength () {
+		return strength;
+	}
+
+	public void setStrength (float strength) {
+		this.strength = strength;
+	}
+
+	public float getDamping () {
+		return damping;
+	}
+
+	public void setDamping (float damping) {
+		this.damping = damping;
 	}
 
 	public float getGravity () {
@@ -81,35 +103,94 @@ public class PhysicsConstraintData extends ConstraintData {
 		this.wind = wind;
 	}
 
-	public float getStiffness () {
-		return stiffness;
+	static public class NodeData {
+		public int parentBone = -1;
+		public int[] bones;
+		public float x, y;
 	}
 
-	public void setStiffness (float stiffness) {
-		this.stiffness = stiffness;
+	static public class Node {
+		public final NodeData data;
+		public final @Null Bone parentBone;
+		public final Bone[] bones;
+		public float x, y, px, py, ax, ay;
+
+		public Node (NodeData data, Skeleton skeleton) {
+			this.data = data;
+
+			parentBone = data.parentBone == -1 ? null : skeleton.bones.get(data.parentBone);
+
+			bones = new Bone[data.bones.length];
+			for (int i = 0, n = bones.length; i < n; i++)
+				bones[i] = skeleton.bones.get(data.bones[i]);
+
+			setToSetupPose();
+		}
+
+		public Node (Node node) {
+			this.data = node.data;
+			parentBone = node.parentBone;
+			bones = new Bone[node.bones.length];
+			arraycopy(node.bones, 0, bones, 0, bones.length);
+			x = node.x;
+			y = node.y;
+			px = node.px;
+			py = node.py;
+			ax = node.ax;
+			ay = node.ay;
+		}
+
+		public void setToSetupPose () {
+			x = data.x;
+			y = data.y;
+			px = x;
+			py = y;
+			ax = 0;
+			ay = 0;
+		}
 	}
 
-	public float getDamping () {
-		return damping;
+	static public class SpringData {
+		public int node1, node2;
+		public int[] bones;
+		public float length, strength, damping;
+		public boolean rope, stretch;
 	}
 
-	public void setDamping (float damping) {
-		this.damping = damping;
-	}
+	static public class Spring {
+		public final SpringData data;
+		public final Node node1, node2;
+		public final Bone[] bones;
+		public float length, strength, damping;
 
-	public boolean getRope () {
-		return rope;
-	}
+		public Spring (SpringData data, PhysicsConstraint constraint, Skeleton skeleton) {
+			this.data = data;
 
-	public void setRope (boolean rope) {
-		this.rope = rope;
-	}
+			node1 = constraint.nodes.get(data.node1);
+			node2 = constraint.nodes.get(data.node2);
 
-	public boolean getStretch () {
-		return stretch;
-	}
+			bones = new Bone[data.bones.length];
+			for (int i = 0, n = bones.length; i < n; i++)
+				bones[i] = skeleton.bones.get(data.bones[i]);
 
-	public void setStretch (boolean stretch) {
-		this.stretch = stretch;
+			setToSetupPose();
+		}
+
+		public Spring (Spring spring, PhysicsConstraint constraint) {
+			this.data = spring.data;
+			node1 = constraint.nodes.get(data.node1);
+			node2 = constraint.nodes.get(data.node2);
+			bones = new Bone[spring.bones.length];
+			arraycopy(spring.bones, 0, bones, 0, bones.length);
+			length = spring.length;
+			strength = spring.strength;
+			damping = spring.damping;
+		}
+
+		public void setToSetupPose () {
+			length = data.length;
+			strength = data.strength;
+			damping = data.damping;
+		}
 	}
 }
