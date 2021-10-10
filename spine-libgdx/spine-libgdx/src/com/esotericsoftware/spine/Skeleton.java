@@ -55,7 +55,7 @@ public class Skeleton {
 	final Array<IkConstraint> ikConstraints;
 	final Array<TransformConstraint> transformConstraints;
 	final Array<PathConstraint> pathConstraints;
-	final Array<SpringConstraint> springConstraints;
+	final Array<PhysicsConstraint> physicsConstraints;
 	final Array<Updatable> updateCache = new Array();
 	@Null Skin skin;
 	final Color color;
@@ -101,9 +101,9 @@ public class Skeleton {
 		for (PathConstraintData pathConstraintData : data.pathConstraints)
 			pathConstraints.add(new PathConstraint(pathConstraintData, this));
 
-		springConstraints = new Array(data.springConstraints.size);
-		for (SpringConstraintData springConstraintData : data.springConstraints)
-			springConstraints.add(new SpringConstraint(springConstraintData, this));
+		physicsConstraints = new Array(data.physicsConstraints.size);
+		for (PhysicsConstraintData physicsConstraintData : data.physicsConstraints)
+			physicsConstraints.add(new PhysicsConstraint(physicsConstraintData, this));
 
 		color = new Color(1, 1, 1, 1);
 
@@ -150,9 +150,9 @@ public class Skeleton {
 		for (PathConstraint pathConstraint : skeleton.pathConstraints)
 			pathConstraints.add(new PathConstraint(pathConstraint, this));
 
-		springConstraints = new Array(skeleton.springConstraints.size);
-		for (SpringConstraint springConstraint : skeleton.springConstraints)
-			springConstraints.add(new SpringConstraint(springConstraint, this));
+		physicsConstraints = new Array(skeleton.physicsConstraints.size);
+		for (PhysicsConstraint physicsConstraint : skeleton.physicsConstraints)
+			physicsConstraints.add(new PhysicsConstraint(physicsConstraint, this));
 
 		skin = skeleton.skin;
 		color = new Color(skeleton.color);
@@ -188,10 +188,10 @@ public class Skeleton {
 		}
 
 		int ikCount = ikConstraints.size, transformCount = transformConstraints.size, pathCount = pathConstraints.size,
-			springCount = springConstraints.size;
+			physicsCount = physicsConstraints.size;
 		Object[] ikConstraints = this.ikConstraints.items, transformConstraints = this.transformConstraints.items,
-			pathConstraints = this.pathConstraints.items, springConstraints = this.springConstraints.items;
-		int constraintCount = ikCount + transformCount + pathCount + springCount;
+			pathConstraints = this.pathConstraints.items, physicsConstraints = this.physicsConstraints.items;
+		int constraintCount = ikCount + transformCount + pathCount + physicsCount;
 		outer:
 		for (int i = 0; i < constraintCount; i++) {
 			for (int ii = 0; ii < ikCount; ii++) {
@@ -215,10 +215,10 @@ public class Skeleton {
 					continue outer;
 				}
 			}
-			for (int ii = 0; ii < springCount; ii++) {
-				SpringConstraint constraint = (SpringConstraint)springConstraints[ii];
+			for (int ii = 0; ii < physicsCount; ii++) {
+				PhysicsConstraint constraint = (PhysicsConstraint)physicsConstraints[ii];
 				if (constraint.data.order == i) {
-					sortSpringConstraint(constraint);
+					sortPhysicsConstraint(constraint);
 					continue outer;
 				}
 			}
@@ -333,7 +333,7 @@ public class Skeleton {
 		}
 	}
 
-	private void sortSpringConstraint (SpringConstraint constraint) {
+	private void sortPhysicsConstraint (PhysicsConstraint constraint) {
 		constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true));
 		if (!constraint.active) return;
 
@@ -467,10 +467,10 @@ public class Skeleton {
 			constraint.mixY = data.mixY;
 		}
 
-		Object[] springConstraints = this.springConstraints.items;
-		for (int i = 0, n = this.springConstraints.size; i < n; i++) {
-			SpringConstraint constraint = (SpringConstraint)springConstraints[i];
-			SpringConstraintData data = constraint.data;
+		Object[] physicsConstraints = this.physicsConstraints.items;
+		for (int i = 0, n = this.physicsConstraints.size; i < n; i++) {
+			PhysicsConstraint constraint = (PhysicsConstraint)physicsConstraints[i];
+			PhysicsConstraintData data = constraint.data;
 			constraint.mix = data.mix;
 			constraint.friction = data.friction;
 			constraint.gravity = data.gravity;
@@ -686,18 +686,18 @@ public class Skeleton {
 		return null;
 	}
 
-	/** The skeleton's spring constraints. */
-	public Array<SpringConstraint> getSpringConstraints () {
-		return springConstraints;
+	/** The skeleton's physics constraints. */
+	public Array<PhysicsConstraint> getPhysicsConstraints () {
+		return physicsConstraints;
 	}
 
-	/** Finds a spring constraint by comparing each spring constraint's name. It is more efficient to cache the results of this
+	/** Finds a physics constraint by comparing each physics constraint's name. It is more efficient to cache the results of this
 	 * method than to call it repeatedly. */
-	public @Null SpringConstraint findSpringConstraint (String constraintName) {
+	public @Null PhysicsConstraint findPhysicsConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
-		Object[] springConstraints = this.springConstraints.items;
-		for (int i = 0, n = this.springConstraints.size; i < n; i++) {
-			SpringConstraint constraint = (SpringConstraint)springConstraints[i];
+		Object[] physicsConstraints = this.physicsConstraints.items;
+		for (int i = 0, n = this.physicsConstraints.size; i < n; i++) {
+			PhysicsConstraint constraint = (PhysicsConstraint)physicsConstraints[i];
 			if (constraint.data.name.equals(constraintName)) return constraint;
 		}
 		return null;

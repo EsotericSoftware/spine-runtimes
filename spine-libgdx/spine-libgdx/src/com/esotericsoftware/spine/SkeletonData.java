@@ -47,7 +47,7 @@ public class SkeletonData {
 	final Array<IkConstraintData> ikConstraints = new Array();
 	final Array<TransformConstraintData> transformConstraints = new Array();
 	final Array<PathConstraintData> pathConstraints = new Array();
-	final Array<SpringConstraintData> springConstraints = new Array();
+	final Array<PhysicsConstraintData> physicsConstraints = new Array();
 	float x, y, width, height;
 	@Null String version, hash;
 
@@ -216,20 +216,20 @@ public class SkeletonData {
 		return null;
 	}
 
-	// --- Spring constraints
+	// --- Physics constraints
 
-	/** The skeleton's spring constraints. */
-	public Array<SpringConstraintData> getSpringConstraints () {
-		return springConstraints;
+	/** The skeleton's physics constraints. */
+	public Array<PhysicsConstraintData> getPhysicsConstraints () {
+		return physicsConstraints;
 	}
 
-	/** Finds a spring constraint by comparing each spring constraint's name. It is more efficient to cache the results of this
+	/** Finds a physics constraint by comparing each physics constraint's name. It is more efficient to cache the results of this
 	 * method than to call it multiple times. */
-	public @Null SpringConstraintData findSpringConstraint (String constraintName) {
+	public @Null PhysicsConstraintData findPhysicsConstraint (String constraintName) {
 		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
-		Object[] springConstraints = this.springConstraints.items;
-		for (int i = 0, n = this.springConstraints.size; i < n; i++) {
-			SpringConstraintData constraint = (SpringConstraintData)springConstraints[i];
+		Object[] physicsConstraints = this.physicsConstraints.items;
+		for (int i = 0, n = this.physicsConstraints.size; i < n; i++) {
+			PhysicsConstraintData constraint = (PhysicsConstraintData)physicsConstraints[i];
 			if (constraint.name.equals(constraintName)) return constraint;
 		}
 		return null;
