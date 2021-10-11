@@ -72,6 +72,7 @@ export class PolygonBatcher implements Disposable {
 	}
 
 	setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstBlend: number) {
+		if (this.srcColorBlend == srcColorBlend && this.srcAlphaBlend == srcAlphaBlend && this.dstBlend == dstBlend) return;
 		this.srcColorBlend = srcColorBlend;
 		this.srcAlphaBlend = srcAlphaBlend;
 		this.dstBlend = dstBlend;
