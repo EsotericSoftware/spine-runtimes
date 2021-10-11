@@ -79,7 +79,7 @@ namespace Spine.Unity.Editor {
 			if (timelineClip == null)
 				return;
 
-			float blendInDur = (float)timelineClip.blendInDuration;
+			float blendInDur = System.Math.Max((float)timelineClip.blendInDuration, (float)timelineClip.easeInDuration);
 			bool isBlendingNow = blendInDur > 0;
 			bool wasBlendingBefore = timelineClipInfo.previousBlendInDuration > 0;
 

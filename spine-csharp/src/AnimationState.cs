@@ -40,7 +40,7 @@ namespace Spine {
 	/// See <a href='http://esotericsoftware.com/spine-applying-animations/'>Applying Animations</a> in the Spine Runtimes Guide.</para>
 	/// </summary>
 	public class AnimationState {
-		static readonly Animation EmptyAnimation = new Animation("<empty>", new ExposedList<Timeline>(), 0);
+		internal static readonly Animation EmptyAnimation = new Animation("<empty>", new ExposedList<Timeline>(), 0);
 
 		/// 1) A previously applied timeline has set this property.<para />
 		/// Result: Mix from the current pose to the timeline pose.
@@ -309,9 +309,11 @@ namespace Spine {
 			return applied;
 		}
 
-		/// <summary>Version of <see cref="Apply"/> only applying EventTimelines for lightweight off-screen updates.</summary>
+		/// <summary>Version of <see cref="Apply"/> only applying and updating time at
+		/// EventTimelines for lightweight off-screen updates.</summary>
+		/// <param name="issueEvents">When set to false, only animation times of TrackEntries are updated.</param>
 		// Note: This method is not part of the libgdx reference implementation.
-		public bool ApplyEventTimelinesOnly (Skeleton skeleton) {
+		public bool ApplyEventTimelinesOnly (Skeleton skeleton, bool issueEvents = true) {
 			if (skeleton == null) throw new ArgumentNullException("skeleton", "skeleton cannot be null.");
 
 			ExposedList<Event> events = this.events;
@@ -323,24 +325,28 @@ namespace Spine {
 				applied = true;
 
 				// Apply mixing from entries first.
-				if (current.mixingFrom != null) ApplyMixingFromEventTimelinesOnly(current, skeleton);
+				if (current.mixingFrom != null) ApplyMixingFromEventTimelinesOnly(current, skeleton, issueEvents);
 
 				// Apply current entry.
 				float animationLast = current.animationLast, animationTime = current.AnimationTime;
-				int timelineCount = current.animation.timelines.Count;
-				Timeline[] timelines = current.animation.timelines.Items;
-				for (int ii = 0; ii < timelineCount; ii++) {
-					Timeline timeline = timelines[ii];
-					if (timeline is EventTimeline)
-						timeline.Apply(skeleton, animationLast, animationTime, events, 1.0f, MixBlend.Setup, MixDirection.In);
+
+				if (issueEvents) {
+					int timelineCount = current.animation.timelines.Count;
+					Timeline[] timelines = current.animation.timelines.Items;
+					for (int ii = 0; ii < timelineCount; ii++) {
+						Timeline timeline = timelines[ii];
+						if (timeline is EventTimeline)
+							timeline.Apply(skeleton, animationLast, animationTime, events, 1.0f, MixBlend.Setup, MixDirection.In);
+					}
+					QueueEvents(current, animationTime);
+					events.Clear(false);
 				}
-				QueueEvents(current, animationTime);
-				events.Clear(false);
 				current.nextAnimationLast = animationTime;
 				current.nextTrackLast = current.trackTime;
 			}
 
-			queue.Drain();
+			if (issueEvents)
+				queue.Drain();
 			return applied;
 		}
 
@@ -434,11 +440,14 @@ namespace Spine {
 			return mix;
 		}
 
-		/// <summary>Version of <see cref="ApplyMixingFrom"/> only applying EventTimelines for lightweight off-screen updates.</summary>
+		/// <summary>Version of <see cref="ApplyMixingFrom"/> only applying and updating time at
+		/// EventTimelines for lightweight off-screen updates.</summary>
+		/// <param name="issueEvents">When set to false, only animation times of TrackEntries are updated.</param>
 		// Note: This method is not part of the libgdx reference implementation.
-		private float ApplyMixingFromEventTimelinesOnly (TrackEntry to, Skeleton skeleton) {
+		private float ApplyMixingFromEventTimelinesOnly (TrackEntry to, Skeleton skeleton, bool issueEvents) {
 			TrackEntry from = to.mixingFrom;
-			if (from.mixingFrom != null) ApplyMixingFromEventTimelinesOnly(from, skeleton);
+			if (from.mixingFrom != null) ApplyMixingFromEventTimelinesOnly(from, skeleton, issueEvents);
+
 
 			float mix;
 			if (to.mixDuration == 0) { // Single frame mix to undo mixingFrom changes.
@@ -452,16 +461,18 @@ namespace Spine {
 			if (eventBuffer == null) return mix;
 
 			float animationLast = from.animationLast, animationTime = from.AnimationTime;
-			int timelineCount = from.animation.timelines.Count;
-			Timeline[] timelines = from.animation.timelines.Items;
-			for (int i = 0; i < timelineCount; i++) {
-				Timeline timeline = timelines[i];
-				if (timeline is EventTimeline)
-					timeline.Apply(skeleton, animationLast, animationTime, eventBuffer, 0, MixBlend.Setup, MixDirection.Out);
-			}
+			if (issueEvents) {
+				int timelineCount = from.animation.timelines.Count;
+				Timeline[] timelines = from.animation.timelines.Items;
+				for (int i = 0; i < timelineCount; i++) {
+					Timeline timeline = timelines[i];
+					if (timeline is EventTimeline)
+						timeline.Apply(skeleton, animationLast, animationTime, eventBuffer, 0, MixBlend.Setup, MixDirection.Out);
+				}
 
-			if (to.mixDuration > 0) QueueEvents(from, animationTime);
-			this.events.Clear(false);
+				if (to.mixDuration > 0) QueueEvents(from, animationTime);
+				this.events.Clear(false);
+			}
 			from.nextAnimationLast = animationTime;
 			from.nextTrackLast = from.trackTime;
 
@@ -1241,6 +1252,10 @@ namespace Spine {
 		/// <summary>
 		/// If true, the animation will be applied in reverse. Events are not fired when an animation is applied in reverse.</summary>
 		public bool Reverse { get { return reverse; } set { reverse = value; } }
+
+		/// <summary>Returns true if this entry is for the empty animation. See <see cref="AnimationState.SetEmptyAnimation(int, float)"/>,
+		/// <see cref="AnimationState.AddEmptyAnimation(int, float, float)"/>, and <see cref="AnimationState.SetEmptyAnimations(float)"/>.
+		public bool IsEmptyAnimation { get { return animation == AnimationState.EmptyAnimation; } }
 
 		/// <summary>
 		/// <para>
