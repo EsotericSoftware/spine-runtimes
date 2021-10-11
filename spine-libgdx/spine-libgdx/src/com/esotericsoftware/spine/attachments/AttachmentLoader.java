@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2021, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -39,10 +39,10 @@ import com.esotericsoftware.spine.Skin;
  * Runtimes Guide. */
 public interface AttachmentLoader {
 	/** @return May be null to not load the attachment. */
-	public @Null RegionAttachment newRegionAttachment (Skin skin, String name, String path);
+	public @Null RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence);
 
 	/** @return May be null to not load the attachment. In that case null should also be returned for child meshes. */
-	public @Null MeshAttachment newMeshAttachment (Skin skin, String name, String path);
+	public @Null MeshAttachment newMeshAttachment (Skin skin, String name, String path, @Null Sequence sequence);
 
 	/** @return May be null to not load the attachment. */
 	public @Null BoundingBoxAttachment newBoundingBoxAttachment (Skin skin, String name);

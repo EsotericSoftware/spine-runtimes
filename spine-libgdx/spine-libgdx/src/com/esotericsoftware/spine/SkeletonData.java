@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2021, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -47,6 +47,7 @@ public class SkeletonData {
 	final Array<IkConstraintData> ikConstraints = new Array();
 	final Array<TransformConstraintData> transformConstraints = new Array();
 	final Array<PathConstraintData> pathConstraints = new Array();
+	final Array<SpringConstraintData> springConstraints = new Array();
 	float x, y, width, height;
 	@Null String version, hash;
 
@@ -210,6 +211,25 @@ public class SkeletonData {
 		Object[] pathConstraints = this.pathConstraints.items;
 		for (int i = 0, n = this.pathConstraints.size; i < n; i++) {
 			PathConstraintData constraint = (PathConstraintData)pathConstraints[i];
+			if (constraint.name.equals(constraintName)) return constraint;
+		}
+		return null;
+	}
+
+	// --- Spring constraints
+
+	/** The skeleton's spring constraints. */
+	public Array<SpringConstraintData> getSpringConstraints () {
+		return springConstraints;
+	}
+
+	/** Finds a spring constraint by comparing each spring constraint's name. It is more efficient to cache the results of this
+	 * method than to call it multiple times. */
+	public @Null SpringConstraintData findSpringConstraint (String constraintName) {
+		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
+		Object[] springConstraints = this.springConstraints.items;
+		for (int i = 0, n = this.springConstraints.size; i < n; i++) {
+			SpringConstraintData constraint = (SpringConstraintData)springConstraints[i];
 			if (constraint.name.equals(constraintName)) return constraint;
 		}
 		return null;

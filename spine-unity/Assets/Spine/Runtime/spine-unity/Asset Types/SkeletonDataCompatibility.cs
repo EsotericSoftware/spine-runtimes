@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2021, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -173,11 +173,16 @@ namespace Spine.Unity {
 			int i = 0;
 			if (content.Length >= 3 && content[0] == 0xEF && content[1] == 0xBB && content[2] == 0xBF) // skip potential BOM
 				i = 3;
+			bool openingBraceFound = false;
 			for (; i < numCharsToCheck; ++i) {
 				char c = (char)content[i];
 				if (char.IsWhiteSpace(c))
 					continue;
-				return c == '{';
+				if (!openingBraceFound) {
+					if (c == '{') openingBraceFound = true;
+					else return false;
+				} else
+					return c == '"';
 			}
 			return true;
 		}

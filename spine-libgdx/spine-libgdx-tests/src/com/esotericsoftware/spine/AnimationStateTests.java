@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2021, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -36,6 +36,7 @@ import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.Pool;
 
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
@@ -47,14 +48,15 @@ import com.esotericsoftware.spine.attachments.MeshAttachment;
 import com.esotericsoftware.spine.attachments.PathAttachment;
 import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
+import com.esotericsoftware.spine.attachments.Sequence;
 
 public class AnimationStateTests {
 	final SkeletonJson json = new SkeletonJson(new AttachmentLoader() {
-		public RegionAttachment newRegionAttachment (Skin skin, String name, String path) {
+		public RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
 			return null;
 		}
 
-		public MeshAttachment newMeshAttachment (Skin skin, String name, String path) {
+		public MeshAttachment newMeshAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
 			return null;
 		}
 
@@ -888,7 +890,6 @@ public class AnimationStateTests {
 		state.apply(skeleton);
 		while (time < endTime) {
 			time += incr;
-			skeleton.update(incr);
 			state.update(incr);
 
 			// Reduce float discrepancies for tests.

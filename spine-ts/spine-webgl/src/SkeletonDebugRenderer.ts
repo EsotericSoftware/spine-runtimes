@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2021, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -76,9 +76,9 @@ export class SkeletonDebugRenderer implements Disposable {
 				let bone = bones[i];
 				if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
 				if (!bone.parent) continue;
-				let x = skeletonX + bone.data.length * bone.a + bone.worldX;
-				let y = skeletonY + bone.data.length * bone.c + bone.worldY;
-				shapes.rectLine(true, skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, this.boneWidth * this.scale);
+				let x = bone.data.length * bone.a + bone.worldX;
+				let y = bone.data.length * bone.c + bone.worldY;
+				shapes.rectLine(true, bone.worldX, bone.worldY, x, y, this.boneWidth * this.scale);
 			}
 			if (this.drawSkeletonXY) shapes.x(skeletonX, skeletonY, 4 * this.scale);
 		}
@@ -195,7 +195,7 @@ export class SkeletonDebugRenderer implements Disposable {
 			for (let i = 0, n = bones.length; i < n; i++) {
 				let bone = bones[i];
 				if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
-				shapes.circle(true, skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * this.scale, SkeletonDebugRenderer.GREEN, 8);
+				shapes.circle(true, bone.worldX, bone.worldY, 3 * this.scale, SkeletonDebugRenderer.GREEN, 8);
 			}
 		}
 

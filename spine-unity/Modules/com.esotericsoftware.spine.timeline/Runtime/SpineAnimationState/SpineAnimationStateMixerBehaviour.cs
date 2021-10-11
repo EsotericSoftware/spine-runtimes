@@ -38,8 +38,10 @@ namespace Spine.Unity.Playables {
 	public class SpineAnimationStateMixerBehaviour : PlayableBehaviour {
 
 		float[] lastInputWeights;
-		bool lastAnyTrackPlaying = false;
+		bool lastAnyClipPlaying = false;
 		public int trackIndex;
+		ScriptPlayable<SpineAnimationStateBehaviour>[] startingClips
+			= new ScriptPlayable<SpineAnimationStateBehaviour>[2];
 
 		IAnimationStateComponent animationStateComponent;
 		bool pauseWithDirector = true;
@@ -135,60 +137,81 @@ namespace Spine.Unity.Playables {
 					this.lastInputWeights[i] = default(float);
 			}
 			var lastInputWeights = this.lastInputWeights;
-			bool anyTrackPlaying = false;
+			int numStartingClips = 0;
+			bool anyClipPlaying = false;
 
 			// Check all clips. If a clip that was weight 0 turned into weight 1, call SetAnimation.
 			for (int i = 0; i < inputCount; i++) {
 				float lastInputWeight = lastInputWeights[i];
 				float inputWeight = playable.GetInputWeight(i);
-				bool trackStarted = lastInputWeight == 0 && inputWeight > 0;
+				bool clipStarted = lastInputWeight == 0 && inputWeight > 0;
 				if (inputWeight > 0)
-					anyTrackPlaying = true;
+					anyClipPlaying = true;
 				lastInputWeights[i] = inputWeight;
 
-				if (trackStarted) {
-					ScriptPlayable<SpineAnimationStateBehaviour> inputPlayable = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(i);
-					SpineAnimationStateBehaviour clipData = inputPlayable.GetBehaviour();
-
-					pauseWithDirector = !clipData.dontPauseWithDirector;
-					endAtClipEnd = !clipData.dontEndWithClip;
-					endMixOutDuration = clipData.endMixOutDuration;
-
-					if (clipData.animationReference == null) {
-						float mixDuration = clipData.customDuration ? clipData.mixDuration : state.Data.DefaultMix;
-						state.SetEmptyAnimation(trackIndex, mixDuration);
-					} else {
-						if (clipData.animationReference.Animation != null) {
-							Spine.TrackEntry trackEntry = state.SetAnimation(trackIndex, clipData.animationReference.Animation, clipData.loop);
-
-							trackEntry.EventThreshold = clipData.eventThreshold;
-							trackEntry.DrawOrderThreshold = clipData.drawOrderThreshold;
-							trackEntry.TrackTime = (float)inputPlayable.GetTime() * (float)inputPlayable.GetSpeed();
-							trackEntry.TimeScale = (float)inputPlayable.GetSpeed();
-							trackEntry.AttachmentThreshold = clipData.attachmentThreshold;
-							trackEntry.HoldPrevious = clipData.holdPrevious;
-
-							if (clipData.customDuration)
-								trackEntry.MixDuration = clipData.mixDuration;
-
-							timelineStartedTrackEntry = trackEntry;
-						}
-						//else Debug.LogWarningFormat("Animation named '{0}' not found", clipData.animationName);
-					}
-
-					// Ensure that the first frame ends with an updated mesh.
-					if (skeletonAnimation) {
-						skeletonAnimation.Update(0);
-						skeletonAnimation.LateUpdate();
-					} else if (skeletonGraphic) {
-						skeletonGraphic.Update(0);
-						skeletonGraphic.LateUpdate();
-					}
+				if (clipStarted && numStartingClips < 2) {
+					ScriptPlayable<SpineAnimationStateBehaviour> clipPlayable = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(i);
+					startingClips[numStartingClips++] = clipPlayable;
 				}
 			}
-			if (lastAnyTrackPlaying && !anyTrackPlaying)
+			// unfortunately order of clips can be wrong when two start at the same time, we have to sort clips
+			if (numStartingClips == 2) {
+				ScriptPlayable<SpineAnimationStateBehaviour> clipPlayable0 = startingClips[0];
+				ScriptPlayable<SpineAnimationStateBehaviour> clipPlayable1 = startingClips[1];
+				if (clipPlayable0.GetDuration() > clipPlayable1.GetDuration()) { // swap, clip 0 ends after clip 1
+					startingClips[0] = clipPlayable1;
+					startingClips[1] = clipPlayable0;
+				}
+			}
+
+			for (int j = 0; j < numStartingClips; ++j) {
+				ScriptPlayable<SpineAnimationStateBehaviour> clipPlayable = startingClips[j];
+				SpineAnimationStateBehaviour clipData = clipPlayable.GetBehaviour();
+				pauseWithDirector = !clipData.dontPauseWithDirector;
+				endAtClipEnd = !clipData.dontEndWithClip;
+				endMixOutDuration = clipData.endMixOutDuration;
+
+				if (clipData.animationReference == null) {
+					float mixDuration = clipData.customDuration ? clipData.mixDuration : state.Data.DefaultMix;
+					state.SetEmptyAnimation(trackIndex, mixDuration);
+				} else {
+					if (clipData.animationReference.Animation != null) {
+						TrackEntry currentEntry = state.GetCurrent(trackIndex);
+						Spine.TrackEntry trackEntry;
+						if (currentEntry == null && (clipData.customDuration && clipData.mixDuration > 0)) {
+							state.SetEmptyAnimation(trackIndex, 0); // ease in requires empty animation
+							trackEntry = state.AddAnimation(trackIndex, clipData.animationReference.Animation, clipData.loop, 0);
+						} else
+							trackEntry = state.SetAnimation(trackIndex, clipData.animationReference.Animation, clipData.loop);
+
+						trackEntry.EventThreshold = clipData.eventThreshold;
+						trackEntry.DrawOrderThreshold = clipData.drawOrderThreshold;
+						trackEntry.TrackTime = (float)clipPlayable.GetTime() * (float)clipPlayable.GetSpeed();
+						trackEntry.TimeScale = (float)clipPlayable.GetSpeed();
+						trackEntry.AttachmentThreshold = clipData.attachmentThreshold;
+						trackEntry.HoldPrevious = clipData.holdPrevious;
+
+						if (clipData.customDuration)
+							trackEntry.MixDuration = clipData.mixDuration;
+
+						timelineStartedTrackEntry = trackEntry;
+					}
+					//else Debug.LogWarningFormat("Animation named '{0}' not found", clipData.animationName);
+				}
+
+				// Ensure that the first frame ends with an updated mesh.
+				if (skeletonAnimation) {
+					skeletonAnimation.Update(0);
+					skeletonAnimation.LateUpdate();
+				} else if (skeletonGraphic) {
+					skeletonGraphic.Update(0);
+					skeletonGraphic.LateUpdate();
+				}
+			}
+			startingClips[0] = startingClips[1] = ScriptPlayable<SpineAnimationStateBehaviour>.Null;
+			if (lastAnyClipPlaying && !anyClipPlaying)
 				HandleClipEnd();
-			this.lastAnyTrackPlaying = anyTrackPlaying;
+			this.lastAnyClipPlaying = anyClipPlaying;
 		}
 
 #if SPINE_EDITMODEPOSE
@@ -251,25 +274,25 @@ namespace Spine.Unity.Playables {
 				if (fromAnimation != null && mixDuration > 0 && toClipTime < mixDuration) {
 					dummyAnimationState = dummyAnimationState ?? new AnimationState(skeletonComponent.SkeletonDataAsset.GetAnimationStateData());
 
-					var toTrack = dummyAnimationState.GetCurrent(0);
-					var fromTrack = toTrack != null ? toTrack.MixingFrom : null;
-					bool isAnimationTransitionMatch = (toTrack != null && toTrack.Animation == toAnimation && fromTrack != null && fromTrack.Animation == fromAnimation);
+					var toEntry = dummyAnimationState.GetCurrent(0);
+					var fromEntry = toEntry != null ? toEntry.MixingFrom : null;
+					bool isAnimationTransitionMatch = (toEntry != null && toEntry.Animation == toAnimation && fromEntry != null && fromEntry.Animation == fromAnimation);
 
 					if (!isAnimationTransitionMatch) {
 						dummyAnimationState.ClearTracks();
-						fromTrack = dummyAnimationState.SetAnimation(0, fromAnimation, fromClipLoop);
-						fromTrack.AllowImmediateQueue();
+						fromEntry = dummyAnimationState.SetAnimation(0, fromAnimation, fromClipLoop);
+						fromEntry.AllowImmediateQueue();
 						if (toAnimation != null) {
-							toTrack = dummyAnimationState.SetAnimation(0, toAnimation, clipData.loop);
-							toTrack.HoldPrevious = clipData.holdPrevious;
+							toEntry = dummyAnimationState.SetAnimation(0, toAnimation, clipData.loop);
+							toEntry.HoldPrevious = clipData.holdPrevious;
 						}
 					}
 
 					// Update track times.
-					fromTrack.TrackTime = fromClipTime;
-					if (toTrack != null) {
-						toTrack.TrackTime = toClipTime;
-						toTrack.MixTime = toClipTime;
+					fromEntry.TrackTime = fromClipTime;
+					if (toEntry != null) {
+						toEntry.TrackTime = toClipTime;
+						toEntry.MixTime = toClipTime;
 					}
 
 					// Apply Pose

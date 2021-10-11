@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2021, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -49,6 +49,18 @@ public class PathAttachment extends VertexAttachment {
 		super(name);
 	}
 
+	/** Copy constructor. */
+	protected PathAttachment (PathAttachment other) {
+		super(other);
+
+		lengths = new float[other.lengths.length];
+		arraycopy(other.lengths, 0, lengths, 0, lengths.length);
+
+		closed = other.closed;
+		constantSpeed = other.constantSpeed;
+		color.set(other.color);
+	}
+
 	/** If true, the start and end knots are connected. */
 	public boolean getClosed () {
 		return closed;
@@ -83,14 +95,7 @@ public class PathAttachment extends VertexAttachment {
 		return color;
 	}
 
-	public Attachment copy () {
-		PathAttachment copy = new PathAttachment(name);
-		copyTo(copy);
-		copy.lengths = new float[lengths.length];
-		arraycopy(lengths, 0, copy.lengths, 0, lengths.length);
-		copy.closed = closed;
-		copy.constantSpeed = constantSpeed;
-		copy.color.set(color);
-		return copy;
+	public PathAttachment copy () {
+		return new PathAttachment(this);
 	}
 }

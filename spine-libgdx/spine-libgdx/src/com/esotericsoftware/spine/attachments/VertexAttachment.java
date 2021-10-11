@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2021, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -44,13 +44,33 @@ abstract public class VertexAttachment extends Attachment {
 	static private int nextID;
 
 	private final int id = nextID();
+	@Null Attachment timelineAttachment = this;
 	@Null int[] bones;
 	float[] vertices;
 	int worldVerticesLength;
-	@Null VertexAttachment deformAttachment = this;
 
 	public VertexAttachment (String name) {
 		super(name);
+	}
+
+	/** Copy constructor. */
+	public VertexAttachment (VertexAttachment other) {
+		super(other);
+		timelineAttachment = other.timelineAttachment;
+
+		if (other.bones != null) {
+			bones = new int[other.bones.length];
+			arraycopy(other.bones, 0, bones, 0, bones.length);
+		} else
+			bones = null;
+
+		if (other.vertices != null) {
+			vertices = new float[other.vertices.length];
+			arraycopy(other.vertices, 0, vertices, 0, vertices.length);
+		} else
+			vertices = null;
+
+		worldVerticesLength = other.worldVerticesLength;
 	}
 
 	/** Transforms the attachment's local {@link #getVertices()} to world coordinates. If the slot's {@link Slot#getDeform()} is
@@ -120,17 +140,6 @@ abstract public class VertexAttachment extends Attachment {
 		}
 	}
 
-	/** Deform keys for the deform attachment are also applied to this attachment.
-	 * @return May be null if no deform keys should be applied. */
-	public @Null VertexAttachment getDeformAttachment () {
-		return deformAttachment;
-	}
-
-	/** @param deformAttachment May be null if no deform keys should be applied. */
-	public void setDeformAttachment (@Null VertexAttachment deformAttachment) {
-		this.deformAttachment = deformAttachment;
-	}
-
 	/** The bones which affect the {@link #getVertices()}. The array entries are, for each vertex, the number of bones affecting
 	 * the vertex followed by that many bone indices, which is the index of the bone in {@link Skeleton#getBones()}. Will be null
 	 * if this attachment has no weights. */
@@ -164,27 +173,20 @@ abstract public class VertexAttachment extends Attachment {
 		this.worldVerticesLength = worldVerticesLength;
 	}
 
+	/** Timelines for the timeline attachment are also applied to this attachment.
+	 * @return May be null if no attachment-specific timelines should be applied. */
+	public @Null Attachment getTimelineAttachment () {
+		return timelineAttachment;
+	}
+
+	/** @param timelineAttachment May be null if no attachment-specific timelines should be applied. */
+	public void setTimelineAttachment (Attachment timelineAttachment) {
+		this.timelineAttachment = timelineAttachment;
+	}
+
 	/** Returns a unique ID for this attachment. */
 	public int getId () {
 		return id;
-	}
-
-	/** Does not copy id (generated) or name (set on construction). */
-	void copyTo (VertexAttachment attachment) {
-		if (bones != null) {
-			attachment.bones = new int[bones.length];
-			arraycopy(bones, 0, attachment.bones, 0, bones.length);
-		} else
-			attachment.bones = null;
-
-		if (vertices != null) {
-			attachment.vertices = new float[vertices.length];
-			arraycopy(vertices, 0, attachment.vertices, 0, vertices.length);
-		} else
-			attachment.vertices = null;
-
-		attachment.worldVerticesLength = worldVerticesLength;
-		attachment.deformAttachment = deformAttachment;
 	}
 
 	static private synchronized int nextID () {

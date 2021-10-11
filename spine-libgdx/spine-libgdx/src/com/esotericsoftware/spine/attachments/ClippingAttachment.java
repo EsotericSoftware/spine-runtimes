@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2021, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -45,6 +45,13 @@ public class ClippingAttachment extends VertexAttachment {
 		super(name);
 	}
 
+	/** Copy constructor. */
+	protected ClippingAttachment (ClippingAttachment other) {
+		super(other);
+		endSlot = other.endSlot;
+		color.set(other.color);
+	}
+
 	/** Clipping is performed between the clipping attachment's slot and the end slot. If null clipping is done until the end of
 	 * the skeleton's rendering. */
 	public @Null SlotData getEndSlot () {
@@ -61,11 +68,7 @@ public class ClippingAttachment extends VertexAttachment {
 		return color;
 	}
 
-	public Attachment copy () {
-		ClippingAttachment copy = new ClippingAttachment(name);
-		copyTo(copy);
-		copy.endSlot = endSlot;
-		copy.color.set(color);
-		return copy;
+	public ClippingAttachment copy () {
+		return new ClippingAttachment(name);
 	}
 }

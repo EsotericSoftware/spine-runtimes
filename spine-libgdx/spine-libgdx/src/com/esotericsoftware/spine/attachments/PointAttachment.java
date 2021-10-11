@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2021, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -51,6 +51,15 @@ public class PointAttachment extends Attachment {
 		super(name);
 	}
 
+	/** Copy constructor. */
+	protected PointAttachment (PointAttachment other) {
+		super(other);
+		x = other.x;
+		y = other.y;
+		rotation = other.rotation;
+		color.set(other.color);
+	}
+
 	public float getX () {
 		return x;
 	}
@@ -94,12 +103,7 @@ public class PointAttachment extends Attachment {
 		return (float)Math.atan2(y, x) * radDeg;
 	}
 
-	public Attachment copy () {
-		PointAttachment copy = new PointAttachment(name);
-		copy.x = x;
-		copy.y = y;
-		copy.rotation = rotation;
-		copy.color.set(color);
-		return copy;
+	public PointAttachment copy () {
+		return new PointAttachment(this);
 	}
 }

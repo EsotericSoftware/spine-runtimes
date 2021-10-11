@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2021, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -1012,16 +1012,20 @@ public class AnimationState {
 			nextAnimationLast = animationLast;
 		}
 
-		/** Uses {@link #getTrackTime()} to compute the <code>animationTime</code>, which is between {@link #getAnimationStart()}
-		 * and {@link #getAnimationEnd()}. When the <code>trackTime</code> is 0, the <code>animationTime</code> is equal to the
-		 * <code>animationStart</code> time. */
+		/** Uses {@link #getTrackTime()} to compute the <code>animationTime</code>. When the <code>trackTime</code> is 0, the
+		 * <code>animationTime</code> is equal to the <code>animationStart</code> time.
+		 * <p>
+		 * The <code>animationTime</code> is between {@link #getAnimationStart()} and {@link #getAnimationEnd()}, except if this
+		 * track entry is non-looping and {@link #getAnimationEnd()} is >= to the animation {@link Animation#duration}, then
+		 * <code>animationTime</code> continues to increase past {@link #getAnimationEnd()}. */
 		public float getAnimationTime () {
 			if (loop) {
 				float duration = animationEnd - animationStart;
 				if (duration == 0) return animationStart;
 				return (trackTime % duration) + animationStart;
 			}
-			return Math.min(trackTime + animationStart, animationEnd);
+			float animationTime = trackTime + animationStart;
+			return animationEnd >= animation.duration ? animationTime : Math.min(animationTime, animationEnd);
 		}
 
 		/** Multiplier for the delta time when this track entry is updated, causing time for this animation to pass slower or

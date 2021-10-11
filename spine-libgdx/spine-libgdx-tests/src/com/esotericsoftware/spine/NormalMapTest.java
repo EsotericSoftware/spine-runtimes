@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2021, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -134,7 +134,6 @@ public class NormalMapTest extends ApplicationAdapter {
 		time += Gdx.graphics.getDeltaTime();
 		if (animation != null) animation.apply(skeleton, lastTime, time, true, null, 1, MixBlend.first, MixDirection.in);
 		skeleton.updateWorldTransform();
-		skeleton.update(Gdx.graphics.getDeltaTime());
 
 		lightPosition.x = Gdx.input.getX();
 		lightPosition.y = (Gdx.graphics.getHeight() - 1 - Gdx.input.getY());

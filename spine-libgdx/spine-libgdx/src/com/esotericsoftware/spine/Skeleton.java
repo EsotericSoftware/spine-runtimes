@@ -1,8 +1,8 @@
 /******************************************************************************
  * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
+ * Last updated September 24, 2021. Replaces all prior versions.
  *
- * Copyright (c) 2013-2020, Esoteric Software LLC
+ * Copyright (c) 2013-2021, Esoteric Software LLC
  *
  * Integration of the Spine Runtimes into software or otherwise creating
  * derivative works of the Spine Runtimes is permitted under the terms and
@@ -55,10 +55,10 @@ public class Skeleton {
 	final Array<IkConstraint> ikConstraints;
 	final Array<TransformConstraint> transformConstraints;
 	final Array<PathConstraint> pathConstraints;
+	final Array<SpringConstraint> springConstraints;
 	final Array<Updatable> updateCache = new Array();
 	@Null Skin skin;
 	final Color color;
-	float time;
 	float scaleX = 1, scaleY = 1;
 	float x, y;
 
@@ -100,6 +100,10 @@ public class Skeleton {
 		pathConstraints = new Array(data.pathConstraints.size);
 		for (PathConstraintData pathConstraintData : data.pathConstraints)
 			pathConstraints.add(new PathConstraint(pathConstraintData, this));
+
+		springConstraints = new Array(data.springConstraints.size);
+		for (SpringConstraintData springConstraintData : data.springConstraints)
+			springConstraints.add(new SpringConstraint(springConstraintData, this));
 
 		color = new Color(1, 1, 1, 1);
 
@@ -146,9 +150,12 @@ public class Skeleton {
 		for (PathConstraint pathConstraint : skeleton.pathConstraints)
 			pathConstraints.add(new PathConstraint(pathConstraint, this));
 
+		springConstraints = new Array(skeleton.springConstraints.size);
+		for (SpringConstraint springConstraint : skeleton.springConstraints)
+			springConstraints.add(new SpringConstraint(springConstraint, this));
+
 		skin = skeleton.skin;
 		color = new Color(skeleton.color);
-		time = skeleton.time;
 		scaleX = skeleton.scaleX;
 		scaleY = skeleton.scaleY;
 
@@ -180,11 +187,11 @@ public class Skeleton {
 			}
 		}
 
-		int ikCount = ikConstraints.size, transformCount = transformConstraints.size, pathCount = pathConstraints.size;
-		Object[] ikConstraints = this.ikConstraints.items;
-		Object[] transformConstraints = this.transformConstraints.items;
-		Object[] pathConstraints = this.pathConstraints.items;
-		int constraintCount = ikCount + transformCount + pathCount;
+		int ikCount = ikConstraints.size, transformCount = transformConstraints.size, pathCount = pathConstraints.size,
+			springCount = springConstraints.size;
+		Object[] ikConstraints = this.ikConstraints.items, transformConstraints = this.transformConstraints.items,
+			pathConstraints = this.pathConstraints.items, springConstraints = this.springConstraints.items;
+		int constraintCount = ikCount + transformCount + pathCount + springCount;
 		outer:
 		for (int i = 0; i < constraintCount; i++) {
 			for (int ii = 0; ii < ikCount; ii++) {
@@ -205,6 +212,13 @@ public class Skeleton {
 				PathConstraint constraint = (PathConstraint)pathConstraints[ii];
 				if (constraint.data.order == i) {
 					sortPathConstraint(constraint);
+					continue outer;
+				}
+			}
+			for (int ii = 0; ii < springCount; ii++) {
+				SpringConstraint constraint = (SpringConstraint)springConstraints[ii];
+				if (constraint.data.order == i) {
+					sortSpringConstraint(constraint);
 					continue outer;
 				}
 			}
@@ -239,34 +253,6 @@ public class Skeleton {
 		}
 	}
 
-	private void sortPathConstraint (PathConstraint constraint) {
-		constraint.active = constraint.target.bone.active
-			&& (!constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true)));
-		if (!constraint.active) return;
-
-		Slot slot = constraint.target;
-		int slotIndex = slot.getData().index;
-		Bone slotBone = slot.bone;
-		if (skin != null) sortPathConstraintAttachment(skin, slotIndex, slotBone);
-		if (data.defaultSkin != null && data.defaultSkin != skin)
-			sortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
-
-		Attachment attachment = slot.attachment;
-		if (attachment instanceof PathAttachment) sortPathConstraintAttachment(attachment, slotBone);
-
-		Object[] constrained = constraint.bones.items;
-		int boneCount = constraint.bones.size;
-		for (int i = 0; i < boneCount; i++)
-			sortBone((Bone)constrained[i]);
-
-		updateCache.add(constraint);
-
-		for (int i = 0; i < boneCount; i++)
-			sortReset(((Bone)constrained[i]).children);
-		for (int i = 0; i < boneCount; i++)
-			((Bone)constrained[i]).sorted = true;
-	}
-
 	private void sortTransformConstraint (TransformConstraint constraint) {
 		constraint.active = constraint.target.active
 			&& (!constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true)));
@@ -286,6 +272,34 @@ public class Skeleton {
 			for (int i = 0; i < boneCount; i++)
 				sortBone((Bone)constrained[i]);
 		}
+
+		updateCache.add(constraint);
+
+		for (int i = 0; i < boneCount; i++)
+			sortReset(((Bone)constrained[i]).children);
+		for (int i = 0; i < boneCount; i++)
+			((Bone)constrained[i]).sorted = true;
+	}
+
+	private void sortPathConstraint (PathConstraint constraint) {
+		constraint.active = constraint.target.bone.active
+			&& (!constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true)));
+		if (!constraint.active) return;
+
+		Slot slot = constraint.target;
+		int slotIndex = slot.getData().index;
+		Bone slotBone = slot.bone;
+		if (skin != null) sortPathConstraintAttachment(skin, slotIndex, slotBone);
+		if (data.defaultSkin != null && data.defaultSkin != skin)
+			sortPathConstraintAttachment(data.defaultSkin, slotIndex, slotBone);
+
+		Attachment attachment = slot.attachment;
+		if (attachment instanceof PathAttachment) sortPathConstraintAttachment(attachment, slotBone);
+
+		Object[] constrained = constraint.bones.items;
+		int boneCount = constraint.bones.size;
+		for (int i = 0; i < boneCount; i++)
+			sortBone((Bone)constrained[i]);
 
 		updateCache.add(constraint);
 
@@ -317,6 +331,23 @@ public class Skeleton {
 					sortBone((Bone)bones[pathBones[i++]]);
 			}
 		}
+	}
+
+	private void sortSpringConstraint (SpringConstraint constraint) {
+		constraint.active = !constraint.data.skinRequired || (skin != null && skin.constraints.contains(constraint.data, true));
+		if (!constraint.active) return;
+
+		Object[] constrained = constraint.bones.items;
+		int boneCount = constraint.bones.size;
+		for (int i = 0; i < boneCount; i++)
+			sortBone((Bone)constrained[i]);
+
+		updateCache.add(constraint);
+
+		for (int i = 0; i < boneCount; i++)
+			sortReset(((Bone)constrained[i]).children);
+		for (int i = 0; i < boneCount; i++)
+			((Bone)constrained[i]).sorted = true;
 	}
 
 	private void sortBone (Bone bone) {
@@ -434,6 +465,20 @@ public class Skeleton {
 			constraint.mixRotate = data.mixRotate;
 			constraint.mixX = data.mixX;
 			constraint.mixY = data.mixY;
+		}
+
+		Object[] springConstraints = this.springConstraints.items;
+		for (int i = 0, n = this.springConstraints.size; i < n; i++) {
+			SpringConstraint constraint = (SpringConstraint)springConstraints[i];
+			SpringConstraintData data = constraint.data;
+			constraint.mix = data.mix;
+			constraint.friction = data.friction;
+			constraint.gravity = data.gravity;
+			constraint.wind = data.wind;
+			constraint.stiffness = data.stiffness;
+			constraint.damping = data.damping;
+			constraint.rope = data.rope;
+			constraint.stretch = data.stretch;
 		}
 	}
 
@@ -641,6 +686,23 @@ public class Skeleton {
 		return null;
 	}
 
+	/** The skeleton's spring constraints. */
+	public Array<SpringConstraint> getSpringConstraints () {
+		return springConstraints;
+	}
+
+	/** Finds a spring constraint by comparing each spring constraint's name. It is more efficient to cache the results of this
+	 * method than to call it repeatedly. */
+	public @Null SpringConstraint findSpringConstraint (String constraintName) {
+		if (constraintName == null) throw new IllegalArgumentException("constraintName cannot be null.");
+		Object[] springConstraints = this.springConstraints.items;
+		for (int i = 0, n = this.springConstraints.size; i < n; i++) {
+			SpringConstraint constraint = (SpringConstraint)springConstraints[i];
+			if (constraint.data.name.equals(constraintName)) return constraint;
+		}
+		return null;
+	}
+
 	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
 	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
 	 * @param size An output value, the width and height of the AABB.
@@ -658,9 +720,10 @@ public class Skeleton {
 			float[] vertices = null;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
+				RegionAttachment region = (RegionAttachment)attachment;
 				verticesLength = 8;
 				vertices = temp.setSize(8);
-				((RegionAttachment)attachment).computeWorldVertices(slot.getBone(), vertices, 0, 2);
+				region.computeWorldVertices(slot, vertices, 0, 2);
 			} else if (attachment instanceof MeshAttachment) {
 				MeshAttachment mesh = (MeshAttachment)attachment;
 				verticesLength = mesh.getWorldVerticesLength();
@@ -744,22 +807,6 @@ public class Skeleton {
 	public void setPosition (float x, float y) {
 		this.x = x;
 		this.y = y;
-	}
-
-	/** Returns the skeleton's time. This can be used for tracking, such as with Slot {@link Slot#getAttachmentTime()}.
-	 * <p>
-	 * See {@link #update(float)}. */
-	public float getTime () {
-		return time;
-	}
-
-	public void setTime (float time) {
-		this.time = time;
-	}
-
-	/** Increments the skeleton's {@link #time}. */
-	public void update (float delta) {
-		time += delta;
 	}
 
 	public String toString () {
