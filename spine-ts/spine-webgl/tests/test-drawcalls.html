@@ -1,0 +1,106 @@
+<html>
+<script src="../dist/iife/spine-webgl.js"></script>
+<style>
+	html,
+	body {
+		margin: 0;
+		padding: 0;
+	}
+</style>
+
+<body>
+	<canvas id="canvas" style="position: absolute; width: 100%; height: 100%;"></canvas>
+	<div id="info" style="position: absolute; top: 0; left: 0; color: white; margin: 1em;">test</div>
+</body>
+<script>
+	// Define the class running in the Spine canvas
+	class App {
+		numSkeletons;
+		skeletons;
+		states;
+		info;
+
+		loadAssets(canvas) {
+			this.numSkeletons = 100;
+			this.skeletons = [];
+			this.states = [];
+			this.info = document.querySelector("#info")[0];
+			canvas.assetManager.loadTextureAtlas("mix-and-match-pma.atlas");
+			canvas.assetManager.loadBinary("mix-and-match-pro.skel");
+		}
+
+		initialize(canvas) {
+			let assetManager = canvas.assetManager;
+
+			// Create the atlas
+			let atlas = canvas.assetManager.require("mix-and-match-pma.atlas");
+			let atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+
+			// Create the skeleton
+			let skeletonBinary = new spine.SkeletonBinary(atlasLoader);
+			skeletonBinary.scale = 0.5;
+			let skeletonData = skeletonBinary.readSkeletonData(assetManager.require("mix-and-match-pro.skel"));
+			let stateData = new spine.AnimationStateData(skeletonData);
+
+			for (var i = 0; i < this.numSkeletons; i++) {
+				let skeleton = new spine.Skeleton(skeletonData);
+
+				// Create the animation state			
+				let state = new spine.AnimationState(stateData);
+				state.setAnimation(0, "dance", true);
+
+				// Create a new skin, by mixing and matching other skins
+				// that fit together. Items making up the girl are individual
+				// skins. Using the skin API, a new skin is created which is
+				// a combination of all these individual item skins.
+				let mixAndMatchSkin = new spine.Skin("custom-girl");
+				mixAndMatchSkin.addSkin(skeletonData.findSkin("skin-base"));
+				mixAndMatchSkin.addSkin(skeletonData.findSkin("nose/short"));
+				mixAndMatchSkin.addSkin(skeletonData.findSkin("eyelids/girly"));
+				mixAndMatchSkin.addSkin(skeletonData.findSkin("eyes/violet"));
+				mixAndMatchSkin.addSkin(skeletonData.findSkin("hair/brown"));
+				mixAndMatchSkin.addSkin(skeletonData.findSkin("clothes/hoodie-orange"));
+				mixAndMatchSkin.addSkin(skeletonData.findSkin("legs/pants-jeans"));
+				mixAndMatchSkin.addSkin(skeletonData.findSkin("accessories/bag"));
+				mixAndMatchSkin.addSkin(skeletonData.findSkin("accessories/hat-red-yellow"));
+				skeleton.setSkin(mixAndMatchSkin);
+				skeleton.x = Math.random() * 400;
+				skeleton.y = Math.random() * 400;
+
+				this.skeletons.push(skeleton);
+				this.states.push(state);
+			}
+		}
+
+		update(canvas, delta) {
+			for (var i = 0; i < this.numSkeletons; i++) {
+				let state = this.states[i];
+				let skeleton = this.skeletons[i];
+				state.update(delta);
+				state.apply(skeleton);
+				skeleton.updateWorldTransform();
+			}
+		}
+
+		render(canvas) {
+			let renderer = canvas.renderer;
+			renderer.resize(spine.ResizeMode.Expand);
+			canvas.clear(0.2, 0.2, 0.2, 1);
+			renderer.begin();
+			for (var i = 0; i < this.numSkeletons; i++) {
+				let skeleton = this.skeletons[i];
+				renderer.drawSkeleton(skeleton, true);
+			}
+			renderer.end();
+			info.innerText = "Draw calls: " + renderer.batcher.drawCalls;
+		}
+	}
+
+	// Create the Spine canvas which runs the app
+	new spine.SpineCanvas(document.getElementById("canvas"), {
+		pathPrefix: "assets/",
+		app: new App()
+	});
+</script>
+
+</html>
