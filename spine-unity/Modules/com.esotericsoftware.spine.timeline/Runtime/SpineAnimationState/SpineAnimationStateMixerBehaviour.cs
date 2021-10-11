@@ -95,6 +95,8 @@ namespace Spine.Unity.Playables {
 		}
 
 		protected void HandleClipEnd () {
+			if (animationStateComponent == null) return;
+
 			var state = animationStateComponent.AnimationState;
 			if (endAtClipEnd &&
 				timelineStartedTrackEntry != null &&
@@ -172,13 +174,14 @@ namespace Spine.Unity.Playables {
 				endMixOutDuration = clipData.endMixOutDuration;
 
 				if (clipData.animationReference == null) {
-					float mixDuration = clipData.customDuration ? clipData.mixDuration : state.Data.DefaultMix;
+					float mixDuration = clipData.customDuration ? GetCustomMixDuration(clipData) : state.Data.DefaultMix;
 					state.SetEmptyAnimation(trackIndex, mixDuration);
 				} else {
 					if (clipData.animationReference.Animation != null) {
 						TrackEntry currentEntry = state.GetCurrent(trackIndex);
 						Spine.TrackEntry trackEntry;
-						if (currentEntry == null && (clipData.customDuration && clipData.mixDuration > 0)) {
+						float customMixDuration = clipData.customDuration ? GetCustomMixDuration(clipData) : 0.0f;
+						if (currentEntry == null && customMixDuration > 0) {
 							state.SetEmptyAnimation(trackIndex, 0); // ease in requires empty animation
 							trackEntry = state.AddAnimation(trackIndex, clipData.animationReference.Animation, clipData.loop, 0);
 						} else
@@ -192,7 +195,7 @@ namespace Spine.Unity.Playables {
 						trackEntry.HoldPrevious = clipData.holdPrevious;
 
 						if (clipData.customDuration)
-							trackEntry.MixDuration = clipData.mixDuration;
+							trackEntry.MixDuration = customMixDuration;
 
 						timelineStartedTrackEntry = trackEntry;
 					}
@@ -314,6 +317,14 @@ namespace Spine.Unity.Playables {
 		}
 #endif
 
+		float GetCustomMixDuration (SpineAnimationStateBehaviour clipData) {
+			if (clipData.useBlendDuration) {
+				TimelineClip clip = clipData.timelineClip;
+				return (float)Math.Max(clip.blendInDuration, clip.easeInDuration);
+			} else {
+				return clipData.mixDuration;
+			}
+		}
 	}
 
 }

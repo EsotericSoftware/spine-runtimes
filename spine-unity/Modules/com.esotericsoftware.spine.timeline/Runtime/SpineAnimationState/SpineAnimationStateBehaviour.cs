@@ -41,6 +41,9 @@ namespace Spine.Unity.Playables {
 
 	[Serializable]
 	public class SpineAnimationStateBehaviour : PlayableBehaviour {
+
+		[NonSerialized] public TimelineClip timelineClip;
+
 		public AnimationReferenceAsset animationReference;
 		public bool loop;
 
