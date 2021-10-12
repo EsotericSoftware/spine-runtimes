@@ -31,12 +31,15 @@ import { TextureRegion } from "../Texture";
 import { TextureAtlasRegion } from "../TextureAtlas";
 import { Color, NumberArrayLike, Utils } from "../Utils";
 import { VertexAttachment, Attachment } from "./Attachment";
+import { HasTextureRegion } from "./HasTextureRegion";
+import { Sequence } from "./Sequence";
+import { Slot } from "../Slot";
 
 /** An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
  * supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
  *
  * See [Mesh attachments](http://esotericsoftware.com/spine-meshes) in the Spine User Guide. */
-export class MeshAttachment extends VertexAttachment {
+export class MeshAttachment extends VertexAttachment implements HasTextureRegion {
 	region: TextureRegion;
 
 	/** The name of the texture region for this attachment. */
@@ -70,15 +73,18 @@ export class MeshAttachment extends VertexAttachment {
 	edges: Array<number>;
 
 	private parentMesh: MeshAttachment;
+
+	sequence: Sequence;
+
 	tempColor = new Color(0, 0, 0, 0);
 
 	constructor (name: string) {
 		super(name);
 	}
 
-	/** Calculates {@link #uvs} using {@link #regionUVs} and the {@link #region}. Must be called after changing the region UVs or
-	 * region. */
-	updateUVs () {
+	/** Calculates {@link #uvs} using the {@link #regionUVs} and region. Must be called if the region, the region's properties, or
+	 * the {@link #regionUVs} are changed. */
+	updateRegion () {
 		let regionUVs = this.regionUVs;
 		if (!this.uvs || this.uvs.length != regionUVs.length) this.uvs = Utils.newFloatArray(regionUVs.length);
 		let uvs = this.uvs;
@@ -175,6 +181,8 @@ export class MeshAttachment extends VertexAttachment {
 		Utils.arrayCopy(this.triangles, 0, copy.triangles, 0, this.triangles.length);
 		copy.hullLength = this.hullLength;
 
+		copy.sequence = this.sequence.copy();
+
 		// Nonessential.
 		if (this.edges) {
 			copy.edges = new Array<number>(this.edges.length);
@@ -186,15 +194,20 @@ export class MeshAttachment extends VertexAttachment {
 		return copy;
 	}
 
+	computeWorldVertices (slot: Slot, start: number, count: number, worldVertices: NumberArrayLike, offset: number, stride: number) {
+		if (this.sequence != null) this.sequence.apply(slot, this);
+		super.computeWorldVertices(slot, start, count, worldVertices, offset, stride);
+	}
+
 	/** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. **/
 	newLinkedMesh (): MeshAttachment {
 		let copy = new MeshAttachment(this.name);
 		copy.region = this.region;
 		copy.path = this.path;
 		copy.color.setFromColor(this.color);
-		copy.deformAttachment = this.deformAttachment;
+		copy.timelineAttahment = this.timelineAttahment;
 		copy.setParentMesh(this.parentMesh ? this.parentMesh : this);
-		copy.updateUVs();
+		if (copy.region != null) copy.updateRegion();
 		return copy;
 	}
 }

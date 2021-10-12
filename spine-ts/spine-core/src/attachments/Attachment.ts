@@ -64,8 +64,9 @@ export abstract class VertexAttachment extends Attachment {
 	 * {@link #computeWorldVertices()} using the `count` parameter. */
 	worldVerticesLength = 0;
 
-	/** Deform keys for the deform attachment are also applied to this attachment. May be null if no deform keys should be applied. */
-	deformAttachment: VertexAttachment = this;
+	/** Timelines for the timeline attachment are also applied to this attachment.
+	 * May be null if no attachment-specific timelines should be applied. */
+	timelineAttahment: Attachment = this;
 
 	constructor (name: string) {
 		super(name);
@@ -155,6 +156,6 @@ export abstract class VertexAttachment extends Attachment {
 			attachment.vertices = null;
 
 		attachment.worldVerticesLength = this.worldVerticesLength;
-		attachment.deformAttachment = this.deformAttachment;
+		attachment.timelineAttahment = this.timelineAttahment;
 	}
 }

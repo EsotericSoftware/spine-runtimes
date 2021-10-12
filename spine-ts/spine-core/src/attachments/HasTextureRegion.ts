@@ -27,35 +27,24 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Skin } from "../Skin";
-import { BoundingBoxAttachment } from "./BoundingBoxAttachment";
-import { ClippingAttachment } from "./ClippingAttachment";
-import { MeshAttachment } from "./MeshAttachment";
-import { PathAttachment } from "./PathAttachment";
-import { PointAttachment } from "./PointAttachment";
-import { RegionAttachment } from "./RegionAttachment";
-import { Sequence } from "./Sequence";
+import { TextureRegion } from "../Texture"
+import { Color } from "../Utils"
+import { Sequence } from "./Sequence"
 
-/** The interface which can be implemented to customize creating and populating attachments.
- *
- * See [Loading skeleton data](http://esotericsoftware.com/spine-loading-skeleton-data#AttachmentLoader) in the Spine
- * Runtimes Guide. */
-export interface AttachmentLoader {
-	/** @return May be null to not load an attachment. */
-	newRegionAttachment (skin: Skin, name: string, path: string, sequence: Sequence): RegionAttachment;
+export interface HasTextureRegion {
+	/** The name used to find the {@link #region()}. */
+	path: string;
 
-	/** @return May be null to not load an attachment. */
-	newMeshAttachment (skin: Skin, name: string, path: string, sequence: Sequence): MeshAttachment;
+	/** The region used to draw the attachment. After setting the region or if the region's properties are changed,
+	 * {@link #updateRegion()} must be called. */
+	region: TextureRegion;
 
-	/** @return May be null to not load an attachment. */
-	newBoundingBoxAttachment (skin: Skin, name: string): BoundingBoxAttachment;
+	/** Updates any values the attachment calculates using the {@link #getRegion()}. Must be called after setting the
+	 * {@link #getRegion()} or if the region's properties are changed. */
+	updateRegion (): void;
 
-	/** @return May be null to not load an attachment */
-	newPathAttachment (skin: Skin, name: string): PathAttachment;
+	/** The color to tint the attachment. */
+	color: Color;
 
-	/** @return May be null to not load an attachment */
-	newPointAttachment (skin: Skin, name: string): PointAttachment;
-
-	/** @return May be null to not load an attachment */
-	newClippingAttachment (skin: Skin, name: string): ClippingAttachment;
+	sequence: Sequence;
 }

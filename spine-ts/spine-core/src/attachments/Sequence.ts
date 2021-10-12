@@ -27,35 +27,76 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Skin } from "../Skin";
-import { BoundingBoxAttachment } from "./BoundingBoxAttachment";
-import { ClippingAttachment } from "./ClippingAttachment";
-import { MeshAttachment } from "./MeshAttachment";
-import { PathAttachment } from "./PathAttachment";
-import { PointAttachment } from "./PointAttachment";
-import { RegionAttachment } from "./RegionAttachment";
-import { Sequence } from "./Sequence";
+import { TextureRegion } from "../Texture";
+import { Slot } from "../Slot";
+import { HasTextureRegion } from "./HasTextureRegion";
+import { Utils } from "src";
 
-/** The interface which can be implemented to customize creating and populating attachments.
- *
- * See [Loading skeleton data](http://esotericsoftware.com/spine-loading-skeleton-data#AttachmentLoader) in the Spine
- * Runtimes Guide. */
-export interface AttachmentLoader {
-	/** @return May be null to not load an attachment. */
-	newRegionAttachment (skin: Skin, name: string, path: string, sequence: Sequence): RegionAttachment;
 
-	/** @return May be null to not load an attachment. */
-	newMeshAttachment (skin: Skin, name: string, path: string, sequence: Sequence): MeshAttachment;
+export class Sequence {
+	private static _nextID = 0;
 
-	/** @return May be null to not load an attachment. */
-	newBoundingBoxAttachment (skin: Skin, name: string): BoundingBoxAttachment;
+	id = Sequence.nextID();
+	regions: TextureRegion[];
+	start = 0;
+	digits = 0;
+	/** The index of the region to show for the setup pose. */
+	setupIndex = 0;
 
-	/** @return May be null to not load an attachment */
-	newPathAttachment (skin: Skin, name: string): PathAttachment;
+	constructor (count: number) {
+		this.regions = new Array<TextureRegion>(count);
+	}
 
-	/** @return May be null to not load an attachment */
-	newPointAttachment (skin: Skin, name: string): PointAttachment;
+	copy (): Sequence {
+		let copy = new Sequence(this.regions.length);
+		Utils.arrayCopy(this.regions, 0, copy.regions, 0, this.regions.length);
+		copy.start = this.start;
+		copy.digits = this.digits;
+		copy.setupIndex = this.setupIndex;
+		return copy;
+	}
 
-	/** @return May be null to not load an attachment */
-	newClippingAttachment (skin: Skin, name: string): ClippingAttachment;
+	apply (slot: Slot, attachment: HasTextureRegion) {
+		let index = slot.sequenceIndex;
+		if (index == -1) index = this.setupIndex;
+		if (index >= this.regions.length) index = this.regions.length - 1;
+		let region = this.regions[index];
+		if (attachment.region != region) {
+			attachment.region = region;
+			attachment.updateRegion();
+		}
+	}
+
+	getPath (basePath: string, index: number): string {
+		let result = basePath;
+		let frame = (this.start + index).toString();
+		for (let i = this.digits - frame.length; i > 0; i--)
+			result += "0";
+		result += frame;
+		return result;
+	}
+
+	private static nextID (): number {
+		return Sequence._nextID++;
+	}
 }
+
+export enum SequenceMode {
+	hold = 0,
+	once = 1,
+	loop = 2,
+	pingpong = 3,
+	onceReverse = 4,
+	loopReverse = 5,
+	pingpongReverse = 6
+}
+
+export const SequenceModeValues = [
+	SequenceMode.hold,
+	SequenceMode.once,
+	SequenceMode.loop,
+	SequenceMode.pingpong,
+	SequenceMode.onceReverse,
+	SequenceMode.loopReverse,
+	SequenceMode.pingpongReverse
+];

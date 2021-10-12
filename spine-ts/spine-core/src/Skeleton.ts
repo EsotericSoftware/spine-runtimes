@@ -75,11 +75,6 @@ export class Skeleton {
 	/** The color to tint all the skeleton's attachments. */
 	color: Color;
 
-	/** Returns the skeleton's time. This can be used for tracking, such as with Slot {@link Slot#attachmentTime}.
-	 * <p>
-	 * See {@link #update()}. */
-	time = 0;
-
 	/** Scales the entire skeleton on the X axis. This affects all bones, even if the bone's transform mode disallows scale
 	  * inheritance. */
 	scaleX = 1;
@@ -603,7 +598,7 @@ export class Skeleton {
 			if (attachment instanceof RegionAttachment) {
 				verticesLength = 8;
 				vertices = Utils.setArraySize(temp, verticesLength, 0);
-				(<RegionAttachment>attachment).computeWorldVertices(slot.bone, vertices, 0, 2);
+				(<RegionAttachment>attachment).computeWorldVertices(slot, vertices, 0, 2);
 			} else if (attachment instanceof MeshAttachment) {
 				let mesh = (<MeshAttachment>attachment);
 				verticesLength = mesh.worldVerticesLength;
@@ -622,10 +617,5 @@ export class Skeleton {
 		}
 		offset.set(minX, minY);
 		size.set(maxX - minX, maxY - minY);
-	}
-
-	/** Increments the skeleton's {@link #time}. */
-	update (delta: number) {
-		this.time += delta;
 	}
 }

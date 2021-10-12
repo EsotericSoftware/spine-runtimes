@@ -41,6 +41,7 @@ import { Skin } from "./Skin";
 import { SlotData, BlendMode } from "./SlotData";
 import { TransformConstraintData } from "./TransformConstraintData";
 import { Utils, Color, NumberArrayLike } from "./Utils";
+import { Sequence } from "./attachments/Sequence";
 
 /** Loads skeleton data in the Spine JSON format.
  *
@@ -257,9 +258,9 @@ export class SkeletonJson {
 			let linkedMesh = this.linkedMeshes[i];
 			let skin = !linkedMesh.skin ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
 			let parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
-			linkedMesh.mesh.deformAttachment = linkedMesh.inheritDeform ? <VertexAttachment>parent : <VertexAttachment>linkedMesh.mesh;
+			linkedMesh.mesh.timelineAttahment = linkedMesh.inheritTimeline ? <VertexAttachment>parent : <VertexAttachment>linkedMesh.mesh;
 			linkedMesh.mesh.setParentMesh(<MeshAttachment>parent);
-			linkedMesh.mesh.updateUVs();
+			if (linkedMesh.mesh.region != null) linkedMesh.mesh.updateRegion();
 		}
 		this.linkedMeshes.length = 0;
 
@@ -298,7 +299,8 @@ export class SkeletonJson {
 		switch (getValue(map, "type", "region")) {
 			case "region": {
 				let path = getValue(map, "path", name);
-				let region = this.attachmentLoader.newRegionAttachment(skin, name, path);
+				let sequence = this.readSequence(getValue(map, "sequence", null));
+				let region = this.attachmentLoader.newRegionAttachment(skin, name, path, sequence);
 				if (!region) return null;
 				region.path = path;
 				region.x = getValue(map, "x", 0) * scale;
@@ -308,11 +310,12 @@ export class SkeletonJson {
 				region.rotation = getValue(map, "rotation", 0);
 				region.width = map.width * scale;
 				region.height = map.height * scale;
+				region.sequence = sequence;
 
 				let color: string = getValue(map, "color", null);
 				if (color) region.color.setFromString(color);
 
-				region.updateOffset();
+				if (region.region != null) region.updateRegion();
 				return region;
 			}
 			case "boundingbox": {
@@ -326,7 +329,8 @@ export class SkeletonJson {
 			case "mesh":
 			case "linkedmesh": {
 				let path = getValue(map, "path", name);
-				let mesh = this.attachmentLoader.newMeshAttachment(skin, name, path);
+				let sequence = this.readSequence(getValue(map, "sequence", null));
+				let mesh = this.attachmentLoader.newMeshAttachment(skin, name, path, sequence);
 				if (!mesh) return null;
 				mesh.path = path;
 
@@ -335,10 +339,11 @@ export class SkeletonJson {
 
 				mesh.width = getValue(map, "width", 0) * scale;
 				mesh.height = getValue(map, "height", 0) * scale;
+				mesh.sequence = sequence;
 
 				let parent: string = getValue(map, "parent", null);
 				if (parent) {
-					this.linkedMeshes.push(new LinkedMesh(mesh, <string>getValue(map, "skin", null), slotIndex, parent, getValue(map, "deform", true)));
+					this.linkedMeshes.push(new LinkedMesh(mesh, <string>getValue(map, "skin", null), slotIndex, parent, getValue(map, "timelines", true)));
 					return mesh;
 				}
 
@@ -346,7 +351,7 @@ export class SkeletonJson {
 				this.readVertices(map, mesh, uvs.length);
 				mesh.triangles = map.triangles;
 				mesh.regionUVs = uvs;
-				mesh.updateUVs();
+				if (mesh.region != null) mesh.updateRegion();
 
 				mesh.edges = getValue(map, "edges", null);
 				mesh.hullLength = getValue(map, "hull", 0) * 2;
@@ -399,6 +404,15 @@ export class SkeletonJson {
 		return null;
 	}
 
+	readSequence (map: any) {
+		if (map == null) return null;
+		let sequence = new Sequence(getValue(map, "count", 0));
+		sequence.start = getValue(map, "start", 1);
+		sequence.digits = getValue(map, "digits", 0);
+		sequence.setupIndex = getValue(map, "setup", 0);
+		return sequence;
+	}
+
 	readVertices (map: any, attachment: VertexAttachment, verticesLength: number) {
 		let scale = this.scale;
 		attachment.worldVerticesLength = verticesLength;
@@ -445,7 +459,7 @@ export class SkeletonJson {
 						let timeline = new AttachmentTimeline(frames, slotIndex);
 						for (let frame = 0; frame < frames; frame++) {
 							let keyMap = timelineMap[frame];
-							timeline.setFrame(frame, getValue(keyMap, "time", 0), keyMap.name);
+							timeline.setFrame(frame, getValue(keyMap, "time", 0), getValue(keyMap, "name", null));
 						}
 						timelines.push(timeline);
 
@@ -778,17 +792,18 @@ export class SkeletonJson {
 			}
 		}
 
-		// Deform timelines.
-		if (map.deform) {
-			for (let deformName in map.deform) {
-				let deformMap = map.deform[deformName];
-				let skin = skeletonData.findSkin(deformName);
-				for (let slotName in deformMap) {
-					let slotMap = deformMap[slotName];
+		// Attachment timelines.
+		if (map.attachments) {
+			for (let attachmentsName in map.attachments) {
+				let attachmentsMap = map.attachments[attachmentsName];
+				let skin = skeletonData.findSkin(attachmentsName);
+				for (let slotName in attachmentsMap) {
+					let slotMap = attachmentsMap[slotName];
 					let slotIndex = skeletonData.findSlot(slotName).index;
 					for (let timelineName in slotMap) {
-						let timelineMap = slotMap[timelineName];
-						let keyMap = timelineMap[0];
+						let attachmentMap = slotMap[timelineName];
+						let attachmentMapName = timelineName;
+						let keyMap = attachmentMap[0];
 						if (!keyMap) continue;
 
 						let attachment = <VertexAttachment>skin.getAttachment(slotIndex, timelineName);
@@ -796,7 +811,7 @@ export class SkeletonJson {
 						let vertices = attachment.vertices;
 						let deformLength = weighted ? vertices.length / 3 * 2 : vertices.length;
 
-						let timeline = new DeformTimeline(timelineMap.length, timelineMap.length, slotIndex, attachment);
+						let timeline = new DeformTimeline(attachmentMap.length, attachmentMap.length, slotIndex, attachment);
 						let time = getValue(keyMap, "time", 0);
 						for (let frame = 0, bezier = 0; ; frame++) {
 							let deform: NumberArrayLike;
@@ -818,7 +833,7 @@ export class SkeletonJson {
 							}
 
 							timeline.setFrame(frame, time, deform);
-							let nextMap = timelineMap[frame + 1];
+							let nextMap = attachmentMap[frame + 1];
 							if (!nextMap) {
 								timeline.shrink(bezier);
 								break;
@@ -900,14 +915,14 @@ class LinkedMesh {
 	parent: string; skin: string;
 	slotIndex: number;
 	mesh: MeshAttachment;
-	inheritDeform: boolean;
+	inheritTimeline: boolean;
 
 	constructor (mesh: MeshAttachment, skin: string, slotIndex: number, parent: string, inheritDeform: boolean) {
 		this.mesh = mesh;
 		this.skin = skin;
 		this.slotIndex = slotIndex;
 		this.parent = parent;
-		this.inheritDeform = inheritDeform;
+		this.inheritTimeline = inheritDeform;
 	}
 }
 

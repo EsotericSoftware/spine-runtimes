@@ -176,7 +176,7 @@ export class SkeletonMesh extends THREE.Object3D {
 				attachmentColor = region.color;
 				vertices = this.vertices;
 				numFloats = vertexSize * 4;
-				region.computeWorldVertices(slot.bone, vertices, 0, vertexSize);
+				region.computeWorldVertices(slot, vertices, 0, vertexSize);
 				triangles = SkeletonMesh.QUAD_TRIANGLES;
 				uvs = region.uvs;
 				texture = <ThreeJsTexture>(<TextureAtlasRegion>region.region.renderObject).page.texture;

@@ -53,9 +53,11 @@ export class Slot {
 
 	attachment: Attachment;
 
-	private attachmentTime: number;
-
 	attachmentState: number;
+
+	/** The index of the texture region to display when the slot's attachment has a {@link Sequence}. -1 represents the
+	 * {@link Sequence#getSetupIndex()}. */
+	sequenceIndex: number;
 
 	/** Values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
 	 * weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
@@ -83,28 +85,17 @@ export class Slot {
 		return this.attachment;
 	}
 
-	/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears the {@link #deform}.
-	 * The deform is not cleared if the old attachment has the same {@link VertexAttachment#getDeformAttachment()} as the specified
-	 * attachment.
-	 * @param attachment May be null. */
+	/** Sets the slot's attachment and, if the attachment changed, resets {@link #sequenceIndex} and clears the {@link #deform}.
+	 * The deform is not cleared if the old attachment has the same {@link VertexAttachment#getTimelineAttachment()} as the
+	 * specified attachment. */
 	setAttachment (attachment: Attachment) {
 		if (this.attachment == attachment) return;
 		if (!(attachment instanceof VertexAttachment) || !(this.attachment instanceof VertexAttachment)
-			|| (<VertexAttachment>attachment).deformAttachment != (<VertexAttachment>this.attachment).deformAttachment) {
+			|| (<VertexAttachment>attachment).timelineAttahment != (<VertexAttachment>this.attachment).timelineAttahment) {
 			this.deform.length = 0;
 		}
 		this.attachment = attachment;
-		this.attachmentTime = this.bone.skeleton.time;
-	}
-
-	setAttachmentTime (time: number) {
-		this.attachmentTime = this.bone.skeleton.time - time;
-	}
-
-	/** The time that has elapsed since the last time the attachment was set or cleared. Relies on Skeleton
-	 * {@link Skeleton#time}. */
-	getAttachmentTime (): number {
-		return this.bone.skeleton.time - this.attachmentTime;
+		this.sequenceIndex = -1;
 	}
 
 	/** Sets this slot to the setup pose. */
