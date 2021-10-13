@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "lS/mQzJwi+I",
-	"spine": "4.0.31",
+	"hash": "gt+DSJjR5MM",
+	"spine": "4.1.04-beta",
 	"x": -221.27,
 	"y": -8.57,
 	"width": 470.72,
@@ -2926,7 +2926,7 @@
 					{ "time": 0.2, "name": "muzzle02" },
 					{ "time": 0.2667, "name": "muzzle03" },
 					{ "time": 0.3333, "name": "muzzle04" },
-					{ "time": 0.3667, "name": null }
+					{ "time": 0.3667 }
 				]
 			}
 		},

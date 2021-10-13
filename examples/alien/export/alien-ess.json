@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "zgiHK9o7sFk",
-	"spine": "4.0.31",
+	"hash": "F735snjE3r4",
+	"spine": "4.1.04-beta",
 	"x": -191.3,
 	"y": -4.51,
 	"width": 365.79,
@@ -245,24 +245,24 @@
 			},
 			"eye": {
 				"attachment": [
-					{ "time": 1.3667, "name": null }
+					{ "time": 1.3667 }
 				]
 			},
 			"eye-highlight": {
 				"attachment": [
-					{ "time": 1.3667, "name": null }
+					{ "time": 1.3667 }
 				]
 			},
 			"eye-pupil": {
 				"attachment": [
-					{ "time": 1.3667, "name": null }
+					{ "time": 1.3667 }
 				]
 			},
 			"head": {
 				"attachment": [
 					{ "time": 0.2333, "name": "burst01" },
 					{ "time": 0.4667, "name": "burst02" },
-					{ "time": 1.3667, "name": null }
+					{ "time": 1.3667 }
 				]
 			},
 			"splat01": {
@@ -279,7 +279,7 @@
 					{ "time": 1.3667, "name": "splat01" },
 					{ "time": 1.5667, "name": "splat02" },
 					{ "time": 1.7333, "name": "splat03" },
-					{ "time": 1.8667, "name": null }
+					{ "time": 1.8667 }
 				]
 			}
 		},
@@ -739,7 +739,7 @@
 		"slots": {
 			"eye-highlight": {
 				"attachment": [
-					{ "name": null }
+					{}
 				]
 			}
 		},
@@ -853,7 +853,7 @@
 		"slots": {
 			"eye-highlight": {
 				"attachment": [
-					{ "name": null }
+					{}
 				]
 			}
 		},
@@ -1037,7 +1037,7 @@
 		"slots": {
 			"eye-highlight": {
 				"attachment": [
-					{ "name": null }
+					{}
 				]
 			}
 		},
