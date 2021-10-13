@@ -59,11 +59,11 @@ export class SkeletonBinary {
 	attachmentLoader: AttachmentLoader;
 	private linkedMeshes = new Array<LinkedMesh>();
 
-	constructor(attachmentLoader: AttachmentLoader) {
+	constructor (attachmentLoader: AttachmentLoader) {
 		this.attachmentLoader = attachmentLoader;
 	}
 
-	readSkeletonData(binary: Uint8Array): SkeletonData {
+	readSkeletonData (binary: Uint8Array): SkeletonData {
 		let scale = this.scale;
 
 		let skeletonData = new SkeletonData();
@@ -249,7 +249,7 @@ export class SkeletonBinary {
 		return skeletonData;
 	}
 
-	private readSkin(input: BinaryInput, skeletonData: SkeletonData, defaultSkin: boolean, nonessential: boolean): Skin {
+	private readSkin (input: BinaryInput, skeletonData: SkeletonData, defaultSkin: boolean, nonessential: boolean): Skin {
 		let skin = null;
 		let slotCount = 0;
 
@@ -284,7 +284,7 @@ export class SkeletonBinary {
 		return skin;
 	}
 
-	private readAttachment(input: BinaryInput, skeletonData: SkeletonData, skin: Skin, slotIndex: number, attachmentName: string, nonessential: boolean): Attachment {
+	private readAttachment (input: BinaryInput, skeletonData: SkeletonData, skin: Skin, slotIndex: number, attachmentName: string, nonessential: boolean): Attachment {
 		let scale = this.scale;
 
 		let name = input.readStringRef();
@@ -449,7 +449,7 @@ export class SkeletonBinary {
 		return null;
 	}
 
-	private readSequence(input: BinaryInput) {
+	private readSequence (input: BinaryInput) {
 		if (!input.readBoolean()) return null;
 		let sequence = new Sequence(input.readInt(true));
 		sequence.start = input.readInt(true);
@@ -458,7 +458,7 @@ export class SkeletonBinary {
 		return sequence;
 	}
 
-	private readVertices(input: BinaryInput, vertexCount: number): Vertices {
+	private readVertices (input: BinaryInput, vertexCount: number): Vertices {
 		let scale = this.scale;
 		let verticesLength = vertexCount << 1;
 		let vertices = new Vertices();
@@ -483,7 +483,7 @@ export class SkeletonBinary {
 		return vertices;
 	}
 
-	private readFloatArray(input: BinaryInput, n: number, scale: number): number[] {
+	private readFloatArray (input: BinaryInput, n: number, scale: number): number[] {
 		let array = new Array<number>(n);
 		if (scale == 1) {
 			for (let i = 0; i < n; i++)
@@ -495,7 +495,7 @@ export class SkeletonBinary {
 		return array;
 	}
 
-	private readShortArray(input: BinaryInput): number[] {
+	private readShortArray (input: BinaryInput): number[] {
 		let n = input.readInt(true);
 		let array = new Array<number>(n);
 		for (let i = 0; i < n; i++)
@@ -503,7 +503,7 @@ export class SkeletonBinary {
 		return array;
 	}
 
-	private readAnimation(input: BinaryInput, name: string, skeletonData: SkeletonData): Animation {
+	private readAnimation (input: BinaryInput, name: string, skeletonData: SkeletonData): Animation {
 		input.readInt(true); // Number of timelines.
 		let timelines = new Array<Timeline>();
 		let scale = this.scale;
@@ -996,30 +996,30 @@ export class SkeletonBinary {
 }
 
 export class BinaryInput {
-	constructor(data: Uint8Array, public strings = new Array<string>(), private index: number = 0, private buffer = new DataView(data.buffer)) {
+	constructor (data: Uint8Array, public strings = new Array<string>(), private index: number = 0, private buffer = new DataView(data.buffer)) {
 	}
 
-	readByte(): number {
+	readByte (): number {
 		return this.buffer.getInt8(this.index++);
 	}
 
-	readUnsignedByte(): number {
+	readUnsignedByte (): number {
 		return this.buffer.getUint8(this.index++);
 	}
 
-	readShort(): number {
+	readShort (): number {
 		let value = this.buffer.getInt16(this.index);
 		this.index += 2;
 		return value;
 	}
 
-	readInt32(): number {
+	readInt32 (): number {
 		let value = this.buffer.getInt32(this.index)
 		this.index += 4;
 		return value;
 	}
 
-	readInt(optimizePositive: boolean) {
+	readInt (optimizePositive: boolean) {
 		let b = this.readByte();
 		let result = b & 0x7F;
 		if ((b & 0x80) != 0) {
@@ -1041,12 +1041,12 @@ export class BinaryInput {
 		return optimizePositive ? result : ((result >>> 1) ^ -(result & 1));
 	}
 
-	readStringRef(): string {
+	readStringRef (): string {
 		let index = this.readInt(true);
 		return index == 0 ? null : this.strings[index - 1];
 	}
 
-	readString(): string {
+	readString (): string {
 		let byteCount = this.readInt(true);
 		switch (byteCount) {
 			case 0:
@@ -1077,13 +1077,13 @@ export class BinaryInput {
 		return chars;
 	}
 
-	readFloat(): number {
+	readFloat (): number {
 		let value = this.buffer.getFloat32(this.index);
 		this.index += 4;
 		return value;
 	}
 
-	readBoolean(): boolean {
+	readBoolean (): boolean {
 		return this.readByte() != 0;
 	}
 }
@@ -1094,7 +1094,7 @@ class LinkedMesh {
 	mesh: MeshAttachment;
 	inheritTimeline: boolean;
 
-	constructor(mesh: MeshAttachment, skin: string, slotIndex: number, parent: string, inheritDeform: boolean) {
+	constructor (mesh: MeshAttachment, skin: string, slotIndex: number, parent: string, inheritDeform: boolean) {
 		this.mesh = mesh;
 		this.skin = skin;
 		this.slotIndex = slotIndex;
@@ -1104,12 +1104,12 @@ class LinkedMesh {
 }
 
 class Vertices {
-	constructor(public bones: Array<number> = null, public vertices: Array<number> | Float32Array = null) { }
+	constructor (public bones: Array<number> = null, public vertices: Array<number> | Float32Array = null) { }
 }
 
 enum AttachmentType { Region, BoundingBox, Mesh, LinkedMesh, Path, Point, Clipping }
 
-function readTimeline1(input: BinaryInput, timeline: CurveTimeline1, scale: number): CurveTimeline1 {
+function readTimeline1 (input: BinaryInput, timeline: CurveTimeline1, scale: number): CurveTimeline1 {
 	let time = input.readFloat(), value = input.readFloat() * scale;
 	for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1; ; frame++) {
 		timeline.setFrame(frame, time, value);
@@ -1128,7 +1128,7 @@ function readTimeline1(input: BinaryInput, timeline: CurveTimeline1, scale: numb
 	return timeline;
 }
 
-function readTimeline2(input: BinaryInput, timeline: CurveTimeline2, scale: number): CurveTimeline2 {
+function readTimeline2 (input: BinaryInput, timeline: CurveTimeline2, scale: number): CurveTimeline2 {
 	let time = input.readFloat(), value1 = input.readFloat() * scale, value2 = input.readFloat() * scale;
 	for (let frame = 0, bezier = 0, frameLast = timeline.getFrameCount() - 1; ; frame++) {
 		timeline.setFrame(frame, time, value1, value2);
@@ -1149,7 +1149,7 @@ function readTimeline2(input: BinaryInput, timeline: CurveTimeline2, scale: numb
 	return timeline;
 }
 
-function setBezier(input: BinaryInput, timeline: CurveTimeline, bezier: number, frame: number, value: number,
+function setBezier (input: BinaryInput, timeline: CurveTimeline, bezier: number, frame: number, value: number,
 	time1: number, time2: number, value1: number, value2: number, scale: number) {
 	timeline.setBezier(bezier, frame, value, time1, value1, input.readFloat(), input.readFloat() * scale, input.readFloat(), input.readFloat() * scale, time2, value2);
 }

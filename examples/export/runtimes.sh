@@ -197,7 +197,7 @@ cp -f ../goblins/export/goblins-pma.png "$ROOT/spine-ts/spine-webgl/example/asse
 cp -f ../dragon/export/dragon-ess.json "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../dragon/export/dragon-ess.skel "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../dragon/export/dragon-pma.atlas "$ROOT/spine-ts/spine-webgl/example/assets/"
-cp -f ../dragon/export/dragon-pma.png "$ROOT/spine-ts/spine-webgl/example/assets/"
+cp -f ../dragon/export/dragon-pma*.png "$ROOT/spine-ts/spine-webgl/example/assets/"
 
 cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-ts/spine-webgl/example/assets/"
 cp -f ../raptor/export/raptor-pro.skel "$ROOT/spine-ts/spine-webgl/example/assets/"

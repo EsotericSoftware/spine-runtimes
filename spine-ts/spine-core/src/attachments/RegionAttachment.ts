@@ -145,7 +145,8 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 	 * @param offset The <code>worldVertices</code> index to begin writing values.
 	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
 	computeWorldVertices (slot: Slot, worldVertices: NumberArrayLike, offset: number, stride: number) {
-		if (this.sequence != null) this.sequence.apply(slot, this);
+		if (this.sequence != null)
+			this.sequence.apply(slot, this);
 
 		let bone = slot.bone;
 		let vertexOffset = this.offset;

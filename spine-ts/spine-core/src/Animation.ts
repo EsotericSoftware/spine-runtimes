@@ -2210,7 +2210,7 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 		let index = modeAndIndex >> 4, count = this.attachment.sequence.regions.length;
 		let mode = SequenceModeValues[modeAndIndex & 0xf];
 		if (mode != SequenceMode.hold) {
-			index += (time - before) / delay + 0.00001;
+			index += (((time - before) / delay + 0.00001) | 0);
 			switch (mode) {
 				case SequenceMode.once:
 					index = Math.min(count - 1, index);
