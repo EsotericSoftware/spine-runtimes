@@ -41,7 +41,9 @@ import { Skin } from "./Skin";
 import { SlotData, BlendMode } from "./SlotData";
 import { TransformConstraintData } from "./TransformConstraintData";
 import { Utils, Color, NumberArrayLike } from "./Utils";
-import { Sequence } from "./attachments/Sequence";
+import { Sequence, SequenceMode } from "./attachments/Sequence";
+import { SequenceTimeline } from "src";
+import { HasTextureRegion } from "./attachments/HasTextureRegion";
 
 /** Loads skeleton data in the Spine JSON format.
  *
@@ -797,54 +799,72 @@ export class SkeletonJson {
 			for (let attachmentsName in map.attachments) {
 				let attachmentsMap = map.attachments[attachmentsName];
 				let skin = skeletonData.findSkin(attachmentsName);
-				for (let slotName in attachmentsMap) {
-					let slotMap = attachmentsMap[slotName];
-					let slotIndex = skeletonData.findSlot(slotName).index;
-					for (let timelineName in slotMap) {
-						let attachmentMap = slotMap[timelineName];
-						let attachmentMapName = timelineName;
-						let keyMap = attachmentMap[0];
-						if (!keyMap) continue;
+				for (let slotMapName in attachmentsMap) {
+					let slotMap = attachmentsMap[slotMapName];
+					let slotIndex = skeletonData.findSlot(slotMapName).index;
+					for (let attachmentMapName in slotMap) {
+						let attachmentMap = slotMap[attachmentMapName];
+						let attachment = <VertexAttachment>skin.getAttachment(slotIndex, attachmentMapName);
 
-						let attachment = <VertexAttachment>skin.getAttachment(slotIndex, timelineName);
-						let weighted = attachment.bones;
-						let vertices = attachment.vertices;
-						let deformLength = weighted ? vertices.length / 3 * 2 : vertices.length;
+						for (let timelineMapName in attachmentMap) {
+							let timelineMap = attachmentMap[timelineMapName];
+							let keyMap = timelineMap[0];
+							if (!keyMap) continue;
 
-						let timeline = new DeformTimeline(attachmentMap.length, attachmentMap.length, slotIndex, attachment);
-						let time = getValue(keyMap, "time", 0);
-						for (let frame = 0, bezier = 0; ; frame++) {
-							let deform: NumberArrayLike;
-							let verticesValue: Array<Number> = getValue(keyMap, "vertices", null);
-							if (!verticesValue)
-								deform = weighted ? Utils.newFloatArray(deformLength) : vertices;
-							else {
-								deform = Utils.newFloatArray(deformLength);
-								let start = <number>getValue(keyMap, "offset", 0);
-								Utils.arrayCopy(verticesValue, 0, deform, start, verticesValue.length);
-								if (scale != 1) {
-									for (let i = start, n = i + verticesValue.length; i < n; i++)
-										deform[i] *= scale;
+							if (timelineMapName == "deform") {
+								let weighted = attachment.bones;
+								let vertices = attachment.vertices;
+								let deformLength = weighted ? vertices.length / 3 * 2 : vertices.length;
+
+								let timeline = new DeformTimeline(timelineMap.length, timelineMap.length, slotIndex, attachment);
+								let time = getValue(keyMap, "time", 0);
+								for (let frame = 0, bezier = 0; ; frame++) {
+									let deform: NumberArrayLike;
+									let verticesValue: Array<Number> = getValue(keyMap, "vertices", null);
+									if (!verticesValue)
+										deform = weighted ? Utils.newFloatArray(deformLength) : vertices;
+									else {
+										deform = Utils.newFloatArray(deformLength);
+										let start = <number>getValue(keyMap, "offset", 0);
+										Utils.arrayCopy(verticesValue, 0, deform, start, verticesValue.length);
+										if (scale != 1) {
+											for (let i = start, n = i + verticesValue.length; i < n; i++)
+												deform[i] *= scale;
+										}
+										if (!weighted) {
+											for (let i = 0; i < deformLength; i++)
+												deform[i] += vertices[i];
+										}
+									}
+
+									timeline.setFrame(frame, time, deform);
+									let nextMap = timelineMap[frame + 1];
+									if (!nextMap) {
+										timeline.shrink(bezier);
+										break;
+									}
+									let time2 = getValue(nextMap, "time", 0);
+									let curve = keyMap.curve;
+									if (curve) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
+									time = time2;
+									keyMap = nextMap;
 								}
-								if (!weighted) {
-									for (let i = 0; i < deformLength; i++)
-										deform[i] += vertices[i];
+								timelines.push(timeline);
+							} else if (timelineMapName == "sequence") {
+								let timeline = new SequenceTimeline(timelineMap.length, slotIndex, attachment as unknown as HasTextureRegion);
+								let lastDelay = 0;
+								for (let frame = 0; frame < timelineMap.length; frame++) {
+									let delay = getValue(keyMap, "delay", lastDelay);
+									let time = getValue(keyMap, "time", 0);
+									let mode = SequenceMode[getValue(keyMap, "mode", "hold")] as unknown as number;
+									let index = getValue(keyMap, "index", 0);
+									timeline.setFrame(frame, time, mode, index, delay);
+									lastDelay = delay;
+									keyMap = timelineMap[frame + 1];
 								}
+								timelines.push(timeline);
 							}
-
-							timeline.setFrame(frame, time, deform);
-							let nextMap = attachmentMap[frame + 1];
-							if (!nextMap) {
-								timeline.shrink(bezier);
-								break;
-							}
-							let time2 = getValue(nextMap, "time", 0);
-							let curve = keyMap.curve;
-							if (curve) bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
-							time = time2;
-							keyMap = nextMap;
 						}
-						timelines.push(timeline);
 					}
 				}
 			}
