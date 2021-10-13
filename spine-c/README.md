@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-c works with data exported from Spine 4.0.xx.
+spine-c works with data exported from Spine 4.1.xx.
 
 spine-c supports all Spine features.
 

@@ -27,7 +27,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-ts works with data exported from Spine 4.0.xx.
+spine-ts works with data exported from Spine 4.1.xx.
 
 The spine-ts WebGL and Player backends support all Spine features.
 

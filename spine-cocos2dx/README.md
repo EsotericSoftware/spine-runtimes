@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-cocos2dx works with data exported from Spine 4.0.xx.
+spine-cocos2dx works with data exported from Spine 4.1.xx.
 
 spine-cocos2dx supports all Spine features.
 

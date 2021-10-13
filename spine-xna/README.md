@@ -14,7 +14,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-xna works with data exported from Spine 4.0.xx.
+spine-xna works with data exported from Spine 4.1.xx.
 
 spine-xna supports all Spine features.
 
