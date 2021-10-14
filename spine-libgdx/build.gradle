@@ -1,8 +1,8 @@
-apply plugin: "java"
 apply plugin: "maven-publish"
+apply plugin: "java"
 
 group = "com.github.EsotericSoftware"
-version = "4.0"
+version = "4.1"
 
 ext {
     libgdxVersion = "1.10.0"

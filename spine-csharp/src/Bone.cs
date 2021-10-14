@@ -274,7 +274,7 @@ namespace Spine {
 		///  Some information is ambiguous in the world transform, such as -1,-1 scale versus 180 rotation. The applied transform after
 		/// calling this method is equivalent to the local transform used to compute the world transform, but may not be identical.
 		/// </para></summary>
-		internal void UpdateAppliedTransform () {
+		public void UpdateAppliedTransform () {
 			Bone parent = this.parent;
 			if (parent == null) {
 				ax = worldX - skeleton.x;

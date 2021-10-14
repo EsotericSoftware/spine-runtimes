@@ -241,7 +241,7 @@ export class SkeletonRenderer {
 			skeletonColor.b * slotColor.b * regionColor.b * multiplier,
 			alpha);
 
-		region.computeWorldVertices(slot.bone, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
+		region.computeWorldVertices(slot, this.vertices, 0, SkeletonRenderer.VERTEX_SIZE);
 
 		let vertices = this.vertices;
 		let uvs = region.uvs;

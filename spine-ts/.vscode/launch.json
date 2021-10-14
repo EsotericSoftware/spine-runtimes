@@ -17,6 +17,13 @@
 			"name": "drag-and-drop",
 			"url": "http://localhost:8080/spine-webgl/example/drag-and-drop.html",
 			"webRoot": "${workspaceFolder}"
+		},
+		{
+			"type": "pwa-chrome",
+			"request": "launch",
+			"name": "barebones-dragon",
+			"url": "http://localhost:8080/spine-webgl/example/barebones-dragon.html",
+			"webRoot": "${workspaceFolder}"
 		}
 	]
 }

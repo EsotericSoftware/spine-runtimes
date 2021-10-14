@@ -1,3 +1,62 @@
+# 4.1
+
+## C
+
+### SFML
+
+## C++
+
+### Cocos2d-x
+
+### SFML
+
+### UE4
+
+## C# ##
+
+### Unity
+
+* **Officially supported Unity versions are 2017.1-2021.1**.
+
+* **Breaking changes**
+
+* **Additions**
+
+* **Changes of default values**
+
+* **Deprecated**
+
+* **Restructuring (Non-Breaking)**
+
+### XNA/MonoGame
+
+## Java
+* **Breaking change**: `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.
+* **Breaking change**: `Slot#setAttachmentTime()` and `Slot#getAttachmentTime()` have been removed.
+* **Breaking change**: `VertexAttachment#setDeformAttachment()` and `VertexAttachment#getDeformAttachment()` have been replaced with `VertexAttachment#setTimelineAttachment()` and `VertexAttachment#getTimelineAttachment()`.
+* **Breaking change**: `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The called must ensure that the attachment's region is not `null`.
+* **Breaking change**: `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
+* **Addition**: full support for sequences.
+
+
+### libGDX
+
+## Typescript/Javascript
+* **Breaking change**: `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.
+* **Breaking change**: `Slot#attachmentTime` and has been removed.
+* **Breaking change**: `VertexAttachment#deformAttachment` has been replaced with `VertexAttachment#timelineAttachment`.
+* **Breaking change**: `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The called must ensure that the attachment's region is not `null`.
+* **Breaking change**: `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
+* **Addition**: full support for sequences.
+
+### WebGL backend
+
+### Canvas backend
+
+### Three.js backend
+
+### Player
+
 # 4.0
 
 ## AS3

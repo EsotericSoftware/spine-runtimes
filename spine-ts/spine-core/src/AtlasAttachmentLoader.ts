@@ -36,6 +36,7 @@ import { PointAttachment } from "./attachments/PointAttachment";
 import { RegionAttachment } from "./attachments/RegionAttachment";
 import { Skin } from "./Skin";
 import { TextureAtlas } from "./TextureAtlas";
+import { Sequence } from "./attachments/Sequence"
 
 /** An {@link AttachmentLoader} that configures attachments using texture regions from an {@link TextureAtlas}.
  *
@@ -48,21 +49,39 @@ export class AtlasAttachmentLoader implements AttachmentLoader {
 		this.atlas = atlas;
 	}
 
-	newRegionAttachment (skin: Skin, name: string, path: string): RegionAttachment {
-		let region = this.atlas.findRegion(path);
-		if (!region) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
-		region.renderObject = region;
+	loadSequence (name: string, basePath: string, sequence: Sequence) {
+		let regions = sequence.regions;
+		for (let i = 0, n = regions.length; i < n; i++) {
+			let path = sequence.getPath(basePath, i);
+			regions[i] = this.atlas.findRegion(path);
+			regions[i].renderObject = regions[i];
+			if (regions[i] == null) throw new Error("Region not found in atlas: " + path + " (sequence: " + name + ")");
+		}
+	}
+
+	newRegionAttachment (skin: Skin, name: string, path: string, sequence: Sequence): RegionAttachment {
 		let attachment = new RegionAttachment(name);
-		attachment.setRegion(region);
+		if (sequence != null) {
+			this.loadSequence(name, path, sequence);
+		} else {
+			let region = this.atlas.findRegion(path);
+			if (!region) throw new Error("Region not found in atlas: " + path + " (region attachment: " + name + ")");
+			region.renderObject = region;
+			attachment.region = region;
+		}
 		return attachment;
 	}
 
-	newMeshAttachment (skin: Skin, name: string, path: string): MeshAttachment {
-		let region = this.atlas.findRegion(path);
-		if (!region) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
-		region.renderObject = region;
+	newMeshAttachment (skin: Skin, name: string, path: string, sequence: Sequence): MeshAttachment {
 		let attachment = new MeshAttachment(name);
-		attachment.region = region;
+		if (sequence != null) {
+			this.loadSequence(name, path, sequence);
+		} else {
+			let region = this.atlas.findRegion(path);
+			if (!region) throw new Error("Region not found in atlas: " + path + " (mesh attachment: " + name + ")");
+			region.renderObject = region;
+			attachment.region = region;
+		}
 		return attachment;
 	}
 

@@ -76,9 +76,9 @@ export class SkeletonDebugRenderer implements Disposable {
 				let bone = bones[i];
 				if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
 				if (!bone.parent) continue;
-				let x = skeletonX + bone.data.length * bone.a + bone.worldX;
-				let y = skeletonY + bone.data.length * bone.c + bone.worldY;
-				shapes.rectLine(true, skeletonX + bone.worldX, skeletonY + bone.worldY, x, y, this.boneWidth * this.scale);
+				let x = bone.data.length * bone.a + bone.worldX;
+				let y = bone.data.length * bone.c + bone.worldY;
+				shapes.rectLine(true, bone.worldX, bone.worldY, x, y, this.boneWidth * this.scale);
 			}
 			if (this.drawSkeletonXY) shapes.x(skeletonX, skeletonY, 4 * this.scale);
 		}
@@ -92,7 +92,7 @@ export class SkeletonDebugRenderer implements Disposable {
 				if (attachment instanceof RegionAttachment) {
 					let regionAttachment = <RegionAttachment>attachment;
 					let vertices = this.vertices;
-					regionAttachment.computeWorldVertices(slot.bone, vertices, 0, 2);
+					regionAttachment.computeWorldVertices(slot, vertices, 0, 2);
 					shapes.line(vertices[0], vertices[1], vertices[2], vertices[3]);
 					shapes.line(vertices[2], vertices[3], vertices[4], vertices[5]);
 					shapes.line(vertices[4], vertices[5], vertices[6], vertices[7]);
@@ -195,7 +195,7 @@ export class SkeletonDebugRenderer implements Disposable {
 			for (let i = 0, n = bones.length; i < n; i++) {
 				let bone = bones[i];
 				if (ignoredBones && ignoredBones.indexOf(bone.data.name) > -1) continue;
-				shapes.circle(true, skeletonX + bone.worldX, skeletonY + bone.worldY, 3 * this.scale, SkeletonDebugRenderer.GREEN, 8);
+				shapes.circle(true, bone.worldX, bone.worldY, 3 * this.scale, SkeletonDebugRenderer.GREEN, 8);
 			}
 		}
 

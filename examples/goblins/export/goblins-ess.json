@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "vsus27NzL88",
-	"spine": "4.0.31",
+	"hash": "djttFmlR6Co",
+	"spine": "4.1.04-beta",
 	"x": -92.53,
 	"y": -5.3,
 	"width": 234.03,
@@ -347,7 +347,7 @@
 			"eyes": {
 				"attachment": [
 					{ "time": 0.7, "name": "eyes-closed" },
-					{ "time": 0.8, "name": null }
+					{ "time": 0.8 }
 				]
 			}
 		},

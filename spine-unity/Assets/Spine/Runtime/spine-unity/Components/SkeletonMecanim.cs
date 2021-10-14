@@ -140,6 +140,18 @@ namespace Spine.Unity {
 			base.LateUpdate();
 		}
 
+		public override void OnBecameVisible () {
+			UpdateMode previousUpdateMode = updateMode;
+			updateMode = UpdateMode.FullUpdate;
+
+			// OnBecameVisible is called after LateUpdate()
+			if (previousUpdateMode != UpdateMode.FullUpdate &&
+				previousUpdateMode != UpdateMode.EverythingExceptMesh)
+				Update();
+			if (previousUpdateMode != UpdateMode.FullUpdate)
+				LateUpdate();
+		}
+
 		[System.Serializable]
 		public class MecanimTranslator {
 
