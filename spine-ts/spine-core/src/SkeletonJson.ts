@@ -42,7 +42,7 @@ import { SlotData, BlendMode } from "./SlotData";
 import { TransformConstraintData } from "./TransformConstraintData";
 import { Utils, Color, NumberArrayLike } from "./Utils";
 import { Sequence, SequenceMode } from "./attachments/Sequence";
-import { SequenceTimeline } from "src";
+import { SequenceTimeline } from "./Animation";
 import { HasTextureRegion } from "./attachments/HasTextureRegion";
 
 /** Loads skeleton data in the Spine JSON format.

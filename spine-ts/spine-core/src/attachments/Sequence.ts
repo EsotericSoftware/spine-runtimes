@@ -30,7 +30,7 @@
 import { TextureRegion } from "../Texture";
 import { Slot } from "../Slot";
 import { HasTextureRegion } from "./HasTextureRegion";
-import { Utils } from "src";
+import { Utils } from "../Utils";
 
 
 export class Sequence {
