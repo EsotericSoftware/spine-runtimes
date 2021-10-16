@@ -69,6 +69,6 @@ public class ClippingAttachment extends VertexAttachment {
 	}
 
 	public ClippingAttachment copy () {
-		return new ClippingAttachment(name);
+		return new ClippingAttachment(this);
 	}
 }
