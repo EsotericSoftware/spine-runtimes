@@ -29,6 +29,8 @@
 
 import { SkeletonMeshMaterial, SkeletonMeshMaterialParametersCustomizer } from "./SkeletonMesh";
 import * as THREE from "three"
+import { ThreeJsTexture } from "./ThreeJsTexture";
+import { BlendMode } from "@esotericsoftware/spine-core";
 
 export class MeshBatcher extends THREE.Mesh {
 	private static VERTEX_SIZE = 9;
@@ -37,8 +39,9 @@ export class MeshBatcher extends THREE.Mesh {
 	private verticesLength = 0;
 	private indices: Uint16Array;
 	private indicesLength = 0;
+	private materialGroups: [number, number, number][] = [];
 
-	constructor (maxVertices: number = 10920, materialCustomizer: SkeletonMeshMaterialParametersCustomizer = (parameters) => { }) {
+	constructor (maxVertices: number = 10920, private materialCustomizer: SkeletonMeshMaterialParametersCustomizer = (parameters) => { }) {
 		super();
 		if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
 		let vertices = this.vertices = new Float32Array(maxVertices * MeshBatcher.VERTEX_SIZE);
@@ -54,7 +57,7 @@ export class MeshBatcher extends THREE.Mesh {
 		geo.drawRange.start = 0;
 		geo.drawRange.count = 0;
 		this.geometry = geo;
-		this.material = new SkeletonMeshMaterial(materialCustomizer);
+		this.material = [new SkeletonMeshMaterial(materialCustomizer)];
 	}
 
 	dispose () {
@@ -74,7 +77,19 @@ export class MeshBatcher extends THREE.Mesh {
 		let geo = (<THREE.BufferGeometry>this.geometry);
 		geo.drawRange.start = 0;
 		geo.drawRange.count = 0;
-		(<SkeletonMeshMaterial>this.material).uniforms.map.value = null;
+		geo.clearGroups();
+		this.materialGroups = [];
+		if (this.material instanceof THREE.Material) {
+			const meshMaterial = this.material as SkeletonMeshMaterial;
+			meshMaterial.uniforms.map.value = null;
+			meshMaterial.blending = THREE.NormalBlending;
+		} else if (Array.isArray(this.material)) {
+			for (let i = 0; i < this.material.length; i++) {
+				const meshMaterial = this.material[i] as SkeletonMeshMaterial;
+				meshMaterial.uniforms.map.value = null;
+				meshMaterial.blending = THREE.NormalBlending;
+			}
+		}
 		return this;
 	}
 
@@ -118,10 +133,67 @@ export class MeshBatcher extends THREE.Mesh {
 		this.vertexBuffer.updateRange.offset = 0;
 		this.vertexBuffer.updateRange.count = this.verticesLength;
 		let geo = (<THREE.BufferGeometry>this.geometry);
+		this.closeMaterialGroups();
 		geo.getIndex().needsUpdate = this.indicesLength > 0;
 		geo.getIndex().updateRange.offset = 0;
 		geo.getIndex().updateRange.count = this.indicesLength;
 		geo.drawRange.start = 0;
 		geo.drawRange.count = this.indicesLength;
 	}
+
+	addMaterialGroup (indicesLength: number, materialGroup: number) {
+		const currentGroup = this.materialGroups[this.materialGroups.length - 1];
+
+		if (currentGroup === undefined || currentGroup[2] !== materialGroup) {
+			this.materialGroups.push([this.indicesLength, indicesLength, materialGroup]);
+		} else {
+			currentGroup[1] += indicesLength;
+		}
+	}
+
+	private closeMaterialGroups () {
+		const geometry = this.geometry as THREE.BufferGeometry;
+		for (let i = 0; i < this.materialGroups.length; i++) {
+			const [startIndex, count, materialGroup] = this.materialGroups[i];
+
+			geometry.addGroup(startIndex, count, materialGroup);
+		}
+	}
+
+	findMaterialGroup (slotTexture: THREE.Texture, slotBlendMode: BlendMode) {
+		const blending = ThreeJsTexture.toThreeJsBlending(slotBlendMode);
+		let group = -1;
+
+		if (Array.isArray(this.material)) {
+			for (let i = 0; i < this.material.length; i++) {
+				const meshMaterial = this.material[i] as SkeletonMeshMaterial;
+
+				if (meshMaterial.uniforms.map.value === null) {
+					updateMeshMaterial(meshMaterial, slotTexture, blending);
+					return i;
+				}
+
+				if (meshMaterial.uniforms.map.value === slotTexture && meshMaterial.blending === blending) {
+					return i;
+				}
+			}
+
+			const meshMaterial = new SkeletonMeshMaterial(this.materialCustomizer);
+			updateMeshMaterial(meshMaterial, slotTexture, blending);
+			this.material.push(meshMaterial);
+			group = this.material.length - 1;
+		} else {
+			throw new Error("MeshBatcher.material needs to be an array for geometry groups to work");
+		}
+
+		return group;
+	}
+}
+
+function updateMeshMaterial (meshMaterial: SkeletonMeshMaterial, slotTexture: THREE.Texture, blending: THREE.Blending) {
+	meshMaterial.uniforms.map.value = slotTexture;
+	meshMaterial.blending = blending;
+	meshMaterial.blendDst = blending === THREE.CustomBlending ? THREE.OneMinusSrcColorFactor : THREE.OneMinusSrcAlphaFactor;
+	meshMaterial.blendSrc = blending === THREE.CustomBlending ? THREE.OneFactor : THREE.SrcAlphaFactor;
+	meshMaterial.needsUpdate = true;
 }

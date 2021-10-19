@@ -104,7 +104,7 @@ half4 CombinedShapeLightFragment(VertexOutputSpriteURP2D input) : SV_Target
 	pixel.rgb = applyRimLighting(input.positionWS.xyz, normalWS, pixel);
 #endif
 
-	APPLY_EMISSION(pixel.rgb, input.texcoord)
+	APPLY_EMISSION(pixel.rgb, input.texcoord.xy)
 	pixel = prepareLitPixelForOutput(pixel, texureColor.a, input.vertexColor.a);
 	COLORISE(pixel)
 	return pixel;
