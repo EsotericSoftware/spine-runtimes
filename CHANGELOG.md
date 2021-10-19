@@ -63,7 +63,7 @@
 * Generated normals are now correctly flipped for back faces.
 * Modifying parent materials updates material instances accordingly.
 * Only `.json` files that are actually encoding Spine skeletons will be loaded. Other `.json` files will be left to other importers.
-* Updated example project to UE 4.25.
+* Updated example project to UE 4.27.
 
 
 ## C# ##
