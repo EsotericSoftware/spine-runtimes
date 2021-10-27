@@ -48,9 +48,11 @@ namespace Spine.Unity.Prototyping {
 		IAnimationStateComponent animationStateComponent;
 
 		void Start () {
-			skeletonComponent = skeletonComponent ?? GetComponent<ISkeletonComponent>();
+			if (skeletonComponent == null)
+				skeletonComponent = GetComponent<ISkeletonComponent>();
 			if (skeletonComponent == null) return;
-			animationStateComponent = animationStateComponent ?? skeletonComponent as IAnimationStateComponent;
+			if (animationStateComponent == null)
+				animationStateComponent = skeletonComponent as IAnimationStateComponent;
 			if (animationStateComponent == null) return;
 			var skeleton = skeletonComponent.Skeleton;
 			if (skeleton == null) return;
@@ -66,8 +68,8 @@ namespace Spine.Unity.Prototyping {
 		}
 
 		void OnDestroy () {
-			animationStateComponent = animationStateComponent ?? GetComponent<IAnimationStateComponent>();
-			if (animationStateComponent == null) return;
+			if (animationStateComponent == null) animationStateComponent = GetComponent<IAnimationStateComponent>();
+			if (animationStateComponent.IsNullOrDestroyed()) return;
 
 			var state = animationStateComponent.AnimationState;
 			foreach (var ep in events) {

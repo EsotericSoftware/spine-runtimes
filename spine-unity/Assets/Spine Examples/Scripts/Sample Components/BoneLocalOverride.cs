@@ -53,8 +53,8 @@ namespace Spine.Unity.Examples {
 #if UNITY_EDITOR
 		void OnValidate () {
 			if (Application.isPlaying) return;
-			spineComponent = spineComponent ?? GetComponent<ISkeletonAnimation>();
-			if (spineComponent == null) return;
+			if (spineComponent == null) spineComponent = GetComponent<ISkeletonAnimation>();
+			if (spineComponent.IsNullOrDestroyed()) return;
 			if (bone != null) bone.SetToSetupPose();
 			OverrideLocal(spineComponent);
 		}
