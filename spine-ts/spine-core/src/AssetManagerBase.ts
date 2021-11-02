@@ -33,6 +33,7 @@ import { Disposable, StringMap } from "./Utils";
 
 export class AssetManagerBase implements Disposable {
 	private pathPrefix: string;
+	private pathPostfix: string;
 	private textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture;
 	private downloader: Downloader;
 	private assets: StringMap<any> = {};
@@ -40,15 +41,16 @@ export class AssetManagerBase implements Disposable {
 	private toLoad = 0;
 	private loaded = 0;
 
-	constructor (textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture, pathPrefix: string = "", downloader: Downloader = null) {
+	constructor (textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture, pathPrefix: string = "", downloader: Downloader = null, pathPostfix:string = "") {
 		this.textureLoader = textureLoader;
 		this.pathPrefix = pathPrefix;
 		this.downloader = downloader || new Downloader();
+		this.pathPostfix = pathPostfix;
 	}
 
 	private start (path: string): string {
 		this.toLoad++;
-		return this.pathPrefix + path;
+		return this.pathPrefix + path + this.pathPostfix;
 	}
 
 	private success (callback: (path: string, data: any) => void, path: string, asset: any) {
@@ -66,7 +68,7 @@ export class AssetManagerBase implements Disposable {
 	}
 
 	setRawDataURI (path: string, data: string) {
-		this.downloader.rawDataUris[this.pathPrefix + path] = data;
+		this.downloader.rawDataUris[this.pathPrefix + path  + this.pathPostfix] = data;
 	}
 
 	loadBinary (path: string,
@@ -171,11 +173,11 @@ export class AssetManagerBase implements Disposable {
 	}
 
 	get (path: string) {
-		return this.assets[this.pathPrefix + path];
+		return this.assets[this.pathPrefix + path + this.pathPostfix];
 	}
 
 	require (path: string) {
-		path = this.pathPrefix + path;
+		path = this.pathPrefix + path + this.pathPostfix;
 		let asset = this.assets[path];
 		if (asset) return asset;
 		let error = this.errors[path];
@@ -183,7 +185,7 @@ export class AssetManagerBase implements Disposable {
 	}
 
 	remove (path: string) {
-		path = this.pathPrefix + path;
+		path = this.pathPrefix + path + this.pathPostfix;
 		let asset = this.assets[path];
 		if ((<any>asset).dispose) (<any>asset).dispose();
 		delete this.assets[path];
