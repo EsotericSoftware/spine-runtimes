@@ -33,24 +33,24 @@ using System.Text;
 namespace Spine {
 	public interface IHasTextureRegion {
 		/// <summary>The name used to find the <see cref="Region"/></summary>
-		public string Path { get; set; }
+		string Path { get; set; }
 		/// <summary>
 		/// Sets the region used to draw the attachment. After setting the region or if the region's properties are changed,
 		/// <see cref="UpdateRegion()"/> must be called.
 		/// </summary>
-		public TextureRegion Region { get; set; }
+		TextureRegion Region { get; set; }
 
 		/// <summary>
 		/// Updates any values the attachment calculates using the <see cref="Region"/>. Must be called after setting the
 		/// <see cref="Region"/> or if the region's properties are changed.
 		/// </summary>
-		public void UpdateRegion ();
+		void UpdateRegion ();
 
-		public float R { get; set; }
-		public float G { get; set; }
-		public float B { get; set; }
-		public float A { get; set; }
+		float R { get; set; }
+		float G { get; set; }
+		float B { get; set; }
+		float A { get; set; }
 
-		public Sequence Sequence { get; set; }
+		Sequence Sequence { get; set; }
 	}
 }
