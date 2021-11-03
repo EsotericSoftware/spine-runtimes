@@ -183,8 +183,7 @@ namespace Spine.Unity.Editor {
 									requiredPaths.Add(sequence.GetPath(attachment.Key, index));
 							else
 								requiredPaths.Add(attachment.Key);
-						}
-						else
+						} else
 							requiredPaths.Add(attachment.Key);
 					}
 				}

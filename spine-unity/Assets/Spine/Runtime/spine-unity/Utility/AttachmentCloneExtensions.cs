@@ -68,7 +68,7 @@ namespace Spine.Unity.AttachmentTools {
 			float scale = 1f / sprite.pixelsPerUnit;
 			if (useOriginalRegionScale) {
 				var regionAttachment = o as RegionAttachment;
-				if (regionAttachment != null )
+				if (regionAttachment != null)
 					scale = regionAttachment.Width / regionAttachment.Region.OriginalWidth;
 			}
 			return o.GetRemappedClone(atlasRegion, cloneMeshAsLinked, useOriginalRegionSize, scale);
