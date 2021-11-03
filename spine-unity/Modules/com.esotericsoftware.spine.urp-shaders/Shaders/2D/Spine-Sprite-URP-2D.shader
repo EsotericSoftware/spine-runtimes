@@ -88,7 +88,6 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 
 			#pragma fragmentoption ARB_precision_hint_fastest
 			#pragma multi_compile _ PIXELSNAP_ON
-			#pragma multi_compile _ ETC1_EXTERNAL_ALPHA
 
 			//--------------------------------------
 			// GPU Instancing
@@ -132,7 +131,6 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 			#pragma shader_feature _ALPHA_CLIP
 
 			#pragma multi_compile _ PIXELSNAP_ON
-			#pragma multi_compile _ ETC1_EXTERNAL_ALPHA
 
 			//--------------------------------------
 			// GPU Instancing

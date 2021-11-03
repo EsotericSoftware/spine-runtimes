@@ -29,7 +29,7 @@
 
 // Contributed by: Mitch Thompson
 
-#if UNITY_2019_2_OR_NEWER
+#if UNITY_2019_2 || UNITY_2019_3 || UNITY_2019_4 || UNITY_2020_1 || UNITY_2020_2 // note: 2020.3+ uses old bahavior again
 #define HINGE_JOINT_NEW_BEHAVIOUR
 #endif
 
@@ -42,7 +42,7 @@ namespace Spine.Unity.Examples {
 	public class SkeletonRagdoll2D : MonoBehaviour {
 		static Transform parentSpaceHelper;
 
-		#region Inspector
+#region Inspector
 		[Header("Hierarchy")]
 		[SpineBone]
 		public string startingBoneName = "";
@@ -72,7 +72,7 @@ namespace Spine.Unity.Examples {
 		[Range(0, 1)]
 		public float mix = 1;
 		public bool oldRagdollBehaviour = false;
-		#endregion
+#endregion
 
 		ISkeletonAnimation targetSkeletonComponent;
 		Skeleton skeleton;
@@ -110,7 +110,7 @@ namespace Spine.Unity.Examples {
 			}
 		}
 
-		#region API
+#region API
 		public Rigidbody2D[] RigidbodyArray {
 			get {
 				if (!isActive)
@@ -299,7 +299,7 @@ namespace Spine.Unity.Examples {
 			var bone = skeleton.FindBone(boneName);
 			return (bone != null && boneTable.ContainsKey(bone)) ? boneTable[bone].GetComponent<Rigidbody2D>() : null;
 		}
-		#endregion
+#endregion
 
 		/// <summary>Generates the ragdoll simulation's Transform and joint setup.</summary>
 		void RecursivelyCreateBoneProxies (Bone b) {

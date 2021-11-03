@@ -75,7 +75,7 @@ namespace Spine.Unity.Playables {
 		}
 
 		protected void HandlePause (Playable playable) {
-			if (animationStateComponent == null) return;
+			if (animationStateComponent.IsNullOrDestroyed()) return;
 
 			TrackEntry current = animationStateComponent.AnimationState.GetCurrent(trackIndex);
 			if (current != null && current == timelineStartedTrackEntry) {
@@ -86,7 +86,7 @@ namespace Spine.Unity.Playables {
 		}
 
 		protected void HandleResume (Playable playable) {
-			if (animationStateComponent == null) return;
+			if (animationStateComponent.IsNullOrDestroyed()) return;
 
 			TrackEntry current = animationStateComponent.AnimationState.GetCurrent(trackIndex);
 			if (current != null && current == pausedTrackEntry) {
@@ -95,7 +95,7 @@ namespace Spine.Unity.Playables {
 		}
 
 		protected void HandleClipEnd () {
-			if (animationStateComponent == null) return;
+			if (animationStateComponent.IsNullOrDestroyed()) return;
 
 			var state = animationStateComponent.AnimationState;
 			if (endAtClipEnd &&
@@ -116,7 +116,7 @@ namespace Spine.Unity.Playables {
 			var skeletonGraphic = playerData as SkeletonGraphic;
 			animationStateComponent = playerData as IAnimationStateComponent;
 			var skeletonComponent = playerData as ISkeletonComponent;
-			if (animationStateComponent == null || skeletonComponent == null) return;
+			if (animationStateComponent.IsNullOrDestroyed() || skeletonComponent == null) return;
 
 			var skeleton = skeletonComponent.Skeleton;
 			var state = animationStateComponent.AnimationState;
@@ -226,7 +226,7 @@ namespace Spine.Unity.Playables {
 			SkeletonAnimation skeletonAnimation, SkeletonGraphic skeletonGraphic) {
 
 			if (Application.isPlaying) return;
-			if (skeletonComponent == null || animationStateComponent == null) return;
+			if (animationStateComponent.IsNullOrDestroyed() || skeletonComponent == null) return;
 
 			int inputCount = playable.GetInputCount();
 			int lastNonZeroWeightTrack = -1;
