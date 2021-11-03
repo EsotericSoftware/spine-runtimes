@@ -41,8 +41,8 @@ namespace Spine.Unity {
 	public static class SkeletonDataCompatibility {
 
 #if UNITY_EDITOR
-		static readonly int[][] compatibleBinaryVersions = { new[] { 4, 0, 0 } };
-		static readonly int[][] compatibleJsonVersions = { new[] { 4, 0, 0 } };
+		static readonly int[][] compatibleBinaryVersions = { new[] { 4, 1, 0 } };
+		static readonly int[][] compatibleJsonVersions = { new[] { 4, 1, 0 } };
 
 		static bool wasVersionDialogShown = false;
 		static readonly Regex jsonVersionRegex = new Regex(@"""spine""\s*:\s*""([^""]+)""", RegexOptions.CultureInvariant);

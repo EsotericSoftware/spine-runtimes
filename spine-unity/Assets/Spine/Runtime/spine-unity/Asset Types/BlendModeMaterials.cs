@@ -70,7 +70,7 @@ namespace Spine.Unity {
 		public bool UpdateBlendmodeMaterialsRequiredState (SkeletonData skeletonData) {
 			requiresBlendModeMaterials = false;
 
-			if (skeletonData == null) throw new ArgumentNullException("skeletonData");
+			if (skeletonData == null) return false;
 
 			var skinEntries = new List<Skin.SkinEntry>();
 			var slotsItems = skeletonData.Slots.Items;
@@ -84,7 +84,7 @@ namespace Spine.Unity {
 					skin.GetAttachments(slotIndex, skinEntries);
 
 				foreach (var entry in skinEntries) {
-					if (entry.Attachment is IHasRendererObject) {
+					if (entry.Attachment is IHasTextureRegion) {
 						requiresBlendModeMaterials = true;
 						return true;
 					}
@@ -125,10 +125,10 @@ namespace Spine.Unity {
 					skin.GetAttachments(slotIndex, skinEntries);
 
 				foreach (var entry in skinEntries) {
-					var renderableAttachment = entry.Attachment as IHasRendererObject;
+					var renderableAttachment = entry.Attachment as IHasTextureRegion;
 					if (renderableAttachment != null) {
-						renderableAttachment.RendererObject = CloneAtlasRegionWithMaterial(
-							(AtlasRegion)renderableAttachment.RendererObject, replacementMaterials);
+						renderableAttachment.Region = CloneAtlasRegionWithMaterial(
+							(AtlasRegion)renderableAttachment.Region, replacementMaterials);
 					}
 				}
 			}

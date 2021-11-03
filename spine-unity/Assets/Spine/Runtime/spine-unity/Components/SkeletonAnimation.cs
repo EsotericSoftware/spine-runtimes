@@ -215,7 +215,6 @@ namespace Spine.Unity {
 
 		protected void UpdateAnimationStatus (float deltaTime) {
 			deltaTime *= timeScale;
-			skeleton.Update(deltaTime);
 			state.Update(deltaTime);
 		}
 

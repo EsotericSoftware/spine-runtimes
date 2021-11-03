@@ -14,6 +14,22 @@
 
 ## C# ##
 
+* **Additions**
+  * Full support for sequences.
+  * `RegionAttachment` and `MeshAttachment` now provide a `Region` property. Use this property instead of the removed `RendererObject` property (see section *Breaking Changes* below).
+
+* **Breaking changes**
+  * Removed `RendererObject` property from `RegionAttachment` and `MeshAttachment`. Use `attachment.Region` property instead. Removed removed `IHasRendererObject` interface. Use `IHasTextureRegion` instead.
+  * Replaced `RegionAttachment.UpdateOffset` and `MeshAttachment.UpdateUVs` with `Attachment.UpdateRegion`. The caller must ensure that the attachment's region is not `null`.
+  * Removed `AttachmentRegionExtensions` methods `Attachment.SetRegion`, `MeshAttachment.SetRegion` and `RegionAttachment.SetRegion(region, update)`. Use `attachment.Region = region; if (update) attachment.UpdateRegion()` instead.
+  * `AttachmentLoader.NewRegionAttachment()` and `AttachmentLoader.NewMeshAttachment()` take an additional `Sequence` parameter.
+  * `VertexAttachment.DeformAttachment` property has been replaced with `VertexAttachment.TimelineAttachment`.
+  * `RegionAttachment.ComputeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
+  * Removed `Skeleton.Update(float deltaTime)` method.
+  * Removed `Slot.AttachmentTime` property.
+  * Removed extension method `AtlasRegion.GetSpineAtlasRect()` parameter `includeRotate` (with default value `true`). Most likely this method was never used with `includeRotate=false` in user code so no changes are required.
+  * `AtlasRegion.PackedWidth` and `AtlasRegion.PackedHeight` are swapped compared to 4.0 when packing rotation is equal to 90 degrees. Most likely this property was never accessed in user code so no changes are required.
+
 ### Unity
 
 * **Officially supported Unity versions are 2017.1-2021.1**.
@@ -34,7 +50,7 @@
 * **Breaking change**: `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.
 * **Breaking change**: `Slot#setAttachmentTime()` and `Slot#getAttachmentTime()` have been removed.
 * **Breaking change**: `VertexAttachment#setDeformAttachment()` and `VertexAttachment#getDeformAttachment()` have been replaced with `VertexAttachment#setTimelineAttachment()` and `VertexAttachment#getTimelineAttachment()`.
-* **Breaking change**: `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The called must ensure that the attachment's region is not `null`.
+* **Breaking change**: `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The caller must ensure that the attachment's region is not `null`.
 * **Breaking change**: `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
 * **Addition**: full support for sequences.
 
@@ -45,7 +61,7 @@
 * **Breaking change**: `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.
 * **Breaking change**: `Slot#attachmentTime` and has been removed.
 * **Breaking change**: `VertexAttachment#deformAttachment` has been replaced with `VertexAttachment#timelineAttachment`.
-* **Breaking change**: `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The called must ensure that the attachment's region is not `null`.
+* **Breaking change**: `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The caller must ensure that the attachment's region is not `null`.
 * **Breaking change**: `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
 * **Addition**: full support for sequences.
 

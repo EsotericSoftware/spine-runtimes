@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "c1+xCfJH+TE",
-	"spine": "4.0.31",
+	"hash": "cDRfwRDrCkA",
+	"spine": "4.1.04-beta",
 	"x": -809.16,
 	"y": -73.54,
 	"width": 1287.65,
@@ -879,7 +879,7 @@
 			},
 			"gun": {
 				"attachment": [
-					{ "time": 0.2333, "name": null }
+					{ "time": 0.2333 }
 				]
 			}
 		},
@@ -1006,7 +1006,7 @@
 			},
 			"gun": {
 				"attachment": [
-					{ "name": null },
+					{},
 					{ "time": 0.3, "name": "gun-nohand" }
 				]
 			}

@@ -1107,9 +1107,12 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Uses <see cref="TrackEntry.TrackTime"/> to compute the <code>AnimationTime</code>, which is between <see cref="TrackEntry.AnimationStart"/>
-		/// and <see cref="TrackEntry.AnimationEnd"/>. When the <code>TrackTime</code> is 0, the <code>AnimationTime</code> is equal to the
-		/// <code>AnimationStart</code> time.
+		/// Uses <see cref="TrackEntry.TrackTime"/> to compute the <code>AnimationTime</code>. When the <code>TrackTime</code> is 0, the
+		/// <code>AnimationTime</code> is equal to the <code>AnimationStart</code> time.
+		/// <para>
+		/// The <code>animationTime</code> is between <see cref="AnimationStart"/> and <see cref="AnimationEnd"/>, except if this
+		/// track entry is non-looping and <see cref="AnimationEnd"/> is >= to the animation <see cref="Animation.Duration"/>, then
+		/// <code>animationTime</code> continues to increase past <see cref="AnimationEnd"/>.</para>
 		/// </summary>
 		public float AnimationTime {
 			get {
@@ -1118,7 +1121,8 @@ namespace Spine {
 					if (duration == 0) return animationStart;
 					return (trackTime % duration) + animationStart;
 				}
-				return Math.Min(trackTime + animationStart, animationEnd);
+				float animationTime = trackTime + animationStart;
+				return animationEnd >= animation.duration ? animationTime : Math.Min(animationTime, animationEnd);
 			}
 		}
 

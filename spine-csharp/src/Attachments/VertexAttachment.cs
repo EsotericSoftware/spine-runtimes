@@ -37,27 +37,50 @@ namespace Spine {
 		static readonly Object nextIdLock = new Object();
 
 		internal readonly int id;
+		internal VertexAttachment timelineAttachment;
 		internal int[] bones;
 		internal float[] vertices;
 		internal int worldVerticesLength;
-		internal VertexAttachment deformAttachment;
 
 		/// <summary>Gets a unique ID for this attachment.</summary>
 		public int Id { get { return id; } }
 		public int[] Bones { get { return bones; } set { bones = value; } }
 		public float[] Vertices { get { return vertices; } set { vertices = value; } }
 		public int WorldVerticesLength { get { return worldVerticesLength; } set { worldVerticesLength = value; } }
-		///<summary>Deform keys for the deform attachment are also applied to this attachment.
-		/// May be null if no deform keys should be applied.</summary>
-		public VertexAttachment DeformAttachment { get { return deformAttachment; } set { deformAttachment = value; } }
+		///<summary>Timelines for the timeline attachment are also applied to this attachment.
+		/// May be null if no attachment-specific timelines should be applied.</summary>
+		public VertexAttachment TimelineAttachment { get { return timelineAttachment; } set { timelineAttachment = value; } }
 
 		public VertexAttachment (string name)
 			: base(name) {
 
-			deformAttachment = this;
 			lock (VertexAttachment.nextIdLock) {
 				id = VertexAttachment.nextID++;
 			}
+			timelineAttachment = this;
+		}
+
+		/// <summary>Copy constructor.</summary>
+		public VertexAttachment (VertexAttachment other)
+			: base(other) {
+
+			lock (VertexAttachment.nextIdLock) {
+				id = VertexAttachment.nextID++;
+			}
+			timelineAttachment = other.timelineAttachment;
+			if (other.bones != null) {
+				bones = new int[other.bones.Length];
+				Array.Copy(other.bones, 0, bones, 0, bones.Length);
+			} else
+				bones = null;
+
+			if (other.vertices != null) {
+				vertices = new float[other.vertices.Length];
+				Array.Copy(other.vertices, 0, vertices, 0, vertices.Length);
+			} else
+				vertices = null;
+
+			worldVerticesLength = other.worldVerticesLength;
 		}
 
 		public void ComputeWorldVertices (Slot slot, float[] worldVertices) {
@@ -76,7 +99,7 @@ namespace Spine {
 		/// <param name="worldVertices">The output world vertices. Must have a length greater than or equal to <paramref name="offset"/> + <paramref name="count"/>.</param>
 		/// <param name="offset">The <paramref name="worldVertices"/> index to begin writing values.</param>
 		/// <param name="stride">The number of <paramref name="worldVertices"/> entries between the value pairs written.</param>
-		public void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride = 2) {
+		public virtual void ComputeWorldVertices (Slot slot, int start, int count, float[] worldVertices, int offset, int stride = 2) {
 			count = offset + (count >> 1) * stride;
 			ExposedList<float> deformArray = slot.deform;
 			float[] vertices = this.vertices;
@@ -130,24 +153,6 @@ namespace Spine {
 					worldVertices[w + 1] = wy;
 				}
 			}
-		}
-
-		///<summary>Does not copy id (generated) or name (set on construction).</summary>
-		internal void CopyTo (VertexAttachment attachment) {
-			if (bones != null) {
-				attachment.bones = new int[bones.Length];
-				Array.Copy(bones, 0, attachment.bones, 0, bones.Length);
-			} else
-				attachment.bones = null;
-
-			if (vertices != null) {
-				attachment.vertices = new float[vertices.Length];
-				Array.Copy(vertices, 0, attachment.vertices, 0, vertices.Length);
-			} else
-				attachment.vertices = null;
-
-			attachment.worldVerticesLength = worldVerticesLength;
-			attachment.deformAttachment = deformAttachment;
 		}
 	}
 }

@@ -36,10 +36,13 @@ namespace Spine {
 			: base(name) {
 		}
 
+		/// <summary>Copy constructor.</summary>
+		protected BoundingBoxAttachment (BoundingBoxAttachment other)
+			: base(other) {
+		}
+
 		public override Attachment Copy () {
-			BoundingBoxAttachment copy = new BoundingBoxAttachment(this.Name);
-			CopyTo(copy);
-			return copy;
+			return new BoundingBoxAttachment(this);
 		}
 	}
 }

@@ -45,6 +45,14 @@ namespace Spine {
 			: base(name) {
 		}
 
+		/** Copy constructor. */
+		protected PointAttachment (PointAttachment other)
+			: base(other) {
+			x = other.x;
+			y = other.y;
+			rotation = other.rotation;
+		}
+
 		public void ComputeWorldPosition (Bone bone, out float ox, out float oy) {
 			bone.LocalToWorld(this.x, this.y, out ox, out oy);
 		}
@@ -57,11 +65,7 @@ namespace Spine {
 		}
 
 		public override Attachment Copy () {
-			PointAttachment copy = new PointAttachment(this.Name);
-			copy.x = x;
-			copy.y = y;
-			copy.rotation = rotation;
-			return copy;
+			return new PointAttachment(this);
 		}
 	}
 }

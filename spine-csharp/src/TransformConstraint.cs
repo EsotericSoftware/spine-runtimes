@@ -38,8 +38,8 @@ namespace Spine {
 	/// See <a href="http://esotericsoftware.com/spine-transform-constraints">Transform constraints</a> in the Spine User Guide.</para>
 	/// </summary>
 	public class TransformConstraint : IUpdatable {
-		internal TransformConstraintData data;
-		internal ExposedList<Bone> bones;
+		internal readonly TransformConstraintData data;
+		internal readonly ExposedList<Bone> bones;
 		internal Bone target;
 		internal float mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY;
 
@@ -57,9 +57,9 @@ namespace Spine {
 			mixShearY = data.mixShearY;
 			bones = new ExposedList<Bone>();
 			foreach (BoneData boneData in data.bones)
-				bones.Add(skeleton.FindBone(boneData.name));
+				bones.Add(skeleton.bones.Items[boneData.index]);
 
-			target = skeleton.FindBone(data.target.name);
+			target = skeleton.bones.Items[data.target.index];
 		}
 
 		/// <summary>Copy constructor.</summary>

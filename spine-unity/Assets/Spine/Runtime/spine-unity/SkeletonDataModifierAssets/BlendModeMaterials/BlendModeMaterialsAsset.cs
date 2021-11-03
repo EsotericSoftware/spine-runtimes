@@ -77,9 +77,10 @@ namespace Spine.Unity {
 					if (templateMaterial == null) continue;
 
 					foreach (var entry in entryBuffer) {
-						var renderableAttachment = entry.Attachment as IHasRendererObject;
+						var renderableAttachment = entry.Attachment as IHasTextureRegion;
 						if (renderableAttachment != null) {
-							renderableAttachment.RendererObject = materialCache.CloneAtlasRegionWithMaterial((AtlasRegion)renderableAttachment.RendererObject, templateMaterial);
+							renderableAttachment.Region = materialCache.CloneAtlasRegionWithMaterial(
+								(AtlasRegion)renderableAttachment.Region, templateMaterial);
 						}
 					}
 				}

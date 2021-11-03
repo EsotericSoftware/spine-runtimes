@@ -3,110 +3,127 @@ dragon.png
 	filter: Linear, Linear
 	pma: true
 back
-	bounds: 2, 334, 190, 185
+	bounds: 564, 534, 190, 185
 chest
-	bounds: 2, 697, 136, 122
+	bounds: 2, 645, 136, 122
 chin
-	bounds: 611, 613, 214, 146
+	bounds: 140, 619, 214, 146
 front-toe-a
-	bounds: 2, 914, 29, 50
+	bounds: 2, 862, 29, 50
 	rotate: 90
 front-toe-b
-	bounds: 467, 887, 56, 57
+	bounds: 467, 835, 56, 57
+	rotate: 90
+head
+	bounds: 756, 398, 296, 260
 	rotate: 90
 left-front-leg
-	bounds: 599, 886, 84, 57
+	bounds: 599, 834, 84, 57
 left-front-thigh
-	bounds: 782, 871, 84, 72
+	bounds: 782, 819, 84, 72
 left-rear-leg
-	bounds: 465, 434, 206, 177
+	bounds: 356, 558, 206, 177
 left-rear-thigh
-	bounds: 216, 819, 91, 149
+	bounds: 216, 767, 91, 149
 	rotate: 90
 left-wing01
-	bounds: 403, 241, 191, 256
+	bounds: 2, 268, 264, 589
 	rotate: 90
 left-wing02
-	bounds: 673, 401, 179, 269
+	bounds: 2, 2, 264, 589
 	rotate: 90
-left-wing03
-	bounds: 194, 286, 186, 207
-	rotate: 90
-left-wing04
-	bounds: 140, 682, 188, 135
-left-wing06
-	bounds: 661, 207, 192, 331
-	rotate: 90
-left-wing07
-	bounds: 2, 521, 159, 255
-	rotate: 90
-left-wing08
-	bounds: 827, 582, 164, 181
-	rotate: 90
-left-wing09
-	bounds: 259, 474, 204, 167
 right-front-leg
-	bounds: 113, 821, 101, 89
+	bounds: 113, 769, 101, 89
 right-front-thigh
-	bounds: 758, 761, 108, 108
+	bounds: 758, 709, 108, 108
 right-rear-leg
-	bounds: 640, 773, 116, 100
+	bounds: 640, 721, 116, 100
 right-rear-thigh
-	bounds: 367, 794, 91, 149
+	bounds: 367, 742, 91, 149
 	rotate: 90
 right-rear-toe
-	bounds: 2, 833, 109, 77
-right-wing02
-	bounds: 635, 2, 203, 305
-	rotate: 90
-right-wing04
-	bounds: 330, 643, 279, 144
-right-wing06
-	bounds: 2, 84, 200, 366
-	rotate: 90
-right-wing07
-	bounds: 370, 39, 200, 263
-	rotate: 90
+	bounds: 2, 781, 109, 77
 tail01
-	bounds: 868, 748, 120, 153
+	bounds: 868, 696, 120, 153
 	rotate: 90
 tail02
-	bounds: 518, 789, 95, 120
+	bounds: 518, 737, 95, 120
 	rotate: 90
 tail03
-	bounds: 868, 870, 73, 92
+	bounds: 868, 818, 73, 92
 	rotate: 90
 tail04
-	bounds: 526, 887, 56, 71
+	bounds: 526, 835, 56, 71
 	rotate: 90
 tail05
-	bounds: 406, 891, 52, 59
+	bounds: 406, 839, 52, 59
 	rotate: 90
 tail06
-	bounds: 685, 875, 95, 68
+	bounds: 685, 823, 95, 68
 thiagobrayner
-	bounds: 54, 912, 350, 31
+	bounds: 54, 860, 350, 31
 
 dragon2.png
-	size: 1024, 512
+	size: 1024, 1024
 	filter: Linear, Linear
 	pma: true
-head
-	bounds: 2, 214, 296, 260
+left-wing03
+	bounds: 2, 534, 264, 589
+	rotate: 90
+left-wing04
+	bounds: 2, 268, 264, 589
 	rotate: 90
 left-wing05
-	bounds: 741, 39, 218, 213
+	bounds: 593, 209, 264, 589
+left-wing06
+	bounds: 2, 2, 264, 589
 	rotate: 90
+
+dragon3.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+left-wing07
+	bounds: 2, 694, 264, 589
+	rotate: 90
+left-wing08
+	bounds: 2, 428, 264, 589
+	rotate: 90
+left-wing09
+	bounds: 593, 369, 264, 589
 right-wing01
-	bounds: 264, 200, 219, 310
+	bounds: 2, 2, 365, 643
+	rotate: 90
+
+dragon4.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
+right-wing02
+	bounds: 2, 369, 365, 643
 right-wing03
-	bounds: 485, 238, 272, 247
+	bounds: 369, 369, 365, 643
+right-wing04
+	bounds: 2, 2, 365, 643
 	rotate: 90
+
+dragon5.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
 right-wing05
-	bounds: 734, 259, 251, 229
+	bounds: 2, 369, 365, 643
+right-wing06
+	bounds: 369, 369, 365, 643
+right-wing07
+	bounds: 2, 2, 365, 643
 	rotate: 90
+
+dragon6.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	pma: true
 right-wing08
-	bounds: 485, 2, 234, 254
-	rotate: 90
+	bounds: 2, 2, 365, 643
 right-wing09
-	bounds: 2, 8, 248, 204
+	bounds: 369, 2, 365, 643
