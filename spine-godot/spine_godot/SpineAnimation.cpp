@@ -90,7 +90,7 @@ bool SpineAnimation::has_timeline(Array ids) {
 	list.setSize(ids.size(), 0);
 
 	for (size_t i = 0; i < list.size(); ++i) {
-		list[i] = ids[i];
+		list[i] = (int64_t) ids[i];
 	}
 	return animation->hasTimeline(list);
 }

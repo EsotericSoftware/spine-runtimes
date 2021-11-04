@@ -95,7 +95,7 @@ Ref<SpineTrackEntry> SpineAnimationState::set_animation(const String &anim_name,
 	auto skeleton_data = anim_state_data_res->get_skeleton();
 	auto anim = skeleton_data->find_animation(anim_name);
 	if (!anim.is_valid() || anim->get_spine_object() == NULL) {
-		ERR_PRINT(String("Can not find animation: ") + anim_name)
+		ERR_PRINT(String("Can not find animation: ") + anim_name);
 		return NULL;
 	}
 	auto entry = animation_state->setAnimation(track, anim->get_spine_object(), loop);
@@ -108,7 +108,7 @@ Ref<SpineTrackEntry> SpineAnimationState::add_animation(const String &anim_name,
 	auto skeleton_data = anim_state_data_res->get_skeleton();
 	auto anim = skeleton_data->find_animation(anim_name);
 	if (!anim.is_valid() || anim->get_spine_object() == NULL) {
-		ERR_PRINT(String("Can not find animation: ") + anim_name)
+		ERR_PRINT(String("Can not find animation: ") + anim_name);
 		return NULL;
 	}
 	auto entry = animation_state->addAnimation(track, anim->get_spine_object(), loop, delay);
