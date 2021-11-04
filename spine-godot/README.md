@@ -25,8 +25,8 @@ spine-godot works with the latest stable Godot 3.3 release. It requires compilat
 To integrate spine-godot into your project:
 
 1. Follow the [instructions on how to compilation of Godot](https://docs.godotengine.org/en/stable/development/compiling/index.html)
-2. Copy the `spine-runtimes/spine-godot` folder into the folder `modules/spine-godot` in your Godot source tree.
-3. Copy the `spine-cpp/spine-cpp`folder into the folder `modules/spine-godot/spine-cpp` in your Godot source tree.
+2. Copy the `spine-runtimes/spine-godot/spine_godot` folder into the folder `modules/spine_godot` in your Godot source tree.
+3. Copy the `spine-cpp/spine-cpp`folder into the folder `modules/spine_godot/spine-cpp` in your Godot source tree.
 4. Compile Godot via scons for your platform as per the Godot documentation.
 
 The resulting Godot engine binary will include the spine-godot runtime.
