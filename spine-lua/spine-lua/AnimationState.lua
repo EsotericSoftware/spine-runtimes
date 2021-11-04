@@ -494,7 +494,7 @@ function AnimationState:applyMixingFrom (to, skeleton, blend)
 			else -- HOLD_MIX
 				timelineBlend = MixBlend.setup
 				local holdMix = timelineHoldMix[i]
-				alpha = alphaHold * math_max(0, 1 - holdMix.mixtime / holdMix.mixDuration)
+				alpha = alphaHold * math_max(0, 1 - holdMix.mixTime / holdMix.mixDuration)
 			end
 
 			if not skipSubsequent then
