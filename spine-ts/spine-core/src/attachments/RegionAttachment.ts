@@ -193,7 +193,7 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 		Utils.arrayCopy(this.uvs, 0, copy.uvs, 0, 8);
 		Utils.arrayCopy(this.offset, 0, copy.offset, 0, 8);
 		copy.color.setFromColor(this.color);
-		copy.sequence = this.sequence.copy();
+		copy.sequence = this.sequence != null ? this.sequence.copy() : null;
 		return copy;
 	}
 
