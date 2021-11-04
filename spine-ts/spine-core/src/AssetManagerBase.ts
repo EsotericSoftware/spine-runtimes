@@ -308,7 +308,7 @@ export class Downloader {
 			this.finish(url, request.status, request.response);
 		};
 		request.onload = () => {
-			if (request.status == 200)
+			if (request.status == 200 || request.status == 0)
 				this.finish(url, 200, new Uint8Array(request.response as ArrayBuffer));
 			else
 				onerror();
@@ -330,7 +330,7 @@ export class Downloader {
 	private finish (url: string, status: number, data: any) {
 		let callbacks = this.callbacks[url];
 		delete this.callbacks[url];
-		let args = status == 200 ? [data] : [status, data];
+		let args = status == 200 || status == 0 ? [data] : [status, data];
 		for (let i = args.length - 1, n = callbacks.length; i < n; i += 2)
 			callbacks[i].apply(null, args);
 	}
