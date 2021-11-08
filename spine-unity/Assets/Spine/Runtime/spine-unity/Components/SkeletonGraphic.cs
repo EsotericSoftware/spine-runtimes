@@ -476,6 +476,11 @@ namespace Spine.Unity {
 
 			this.rectTransform.sizeDelta = size;
 			this.rectTransform.pivot = p;
+
+			foreach (var submeshGraphic in submeshGraphics) {
+				submeshGraphic.rectTransform.sizeDelta = size;
+				submeshGraphic.rectTransform.pivot = p;
+			}
 		}
 
 		public event UpdateBonesDelegate BeforeApply;
