@@ -62,10 +62,8 @@ namespace Spine.Unity.Playables {
 		}
 
 		public override void OnGraphStop (Playable playable) {
-			if (endAtClipEnd)
+			if (!isPaused && endAtClipEnd)
 				HandleClipEnd();
-			else if (isPaused) // stop event occurred after pause, so resume again
-				HandleResume(playable);
 		}
 
 		public override void OnBehaviourPlay (Playable playable, FrameData info) {
