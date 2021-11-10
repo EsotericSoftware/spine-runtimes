@@ -180,7 +180,10 @@ namespace Spine.Unity {
 			var drawOrderItems = drawOrder.Items;
 			for (int i = 0; i < drawOrderCount; i++) {
 				Slot slot = drawOrderItems[i];
-				if (!slot.bone.active) continue;
+				if (!slot.bone.active) {
+					workingAttachmentsItems[i] = null;
+					continue;
+				}
 				Attachment attachment = slot.attachment;
 
 				workingAttachmentsItems[i] = attachment;
@@ -299,7 +302,10 @@ namespace Spine.Unity {
 			var drawOrderItems = drawOrder.Items;
 			for (int i = 0; i < drawOrderCount; i++) {
 				Slot slot = drawOrderItems[i];
-				if (!slot.bone.active) continue;
+				if (!slot.bone.active) {
+					workingAttachmentsItems[i] = null;
+					continue;
+				}
 				Attachment attachment = slot.attachment;
 				#if SPINE_TRIANGLECHECK
 				workingAttachmentsItems[i] = attachment;
