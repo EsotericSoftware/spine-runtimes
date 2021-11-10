@@ -70,6 +70,8 @@ namespace Spine.Unity.Editor {
 		protected SerializedProperty maskInteraction;
 		protected SerializedProperty maskMaterialsNone, maskMaterialsInside, maskMaterialsOutside;
 		protected SpineInspectorUtility.SerializedSortingProperties sortingProperties;
+		protected bool wasInitParameterChanged = false;
+		protected bool requireRepaint = false;
 
 		protected bool isInspectingPrefab;
 		protected bool forceReloadQueued = false;
@@ -196,6 +198,13 @@ namespace Spine.Unity.Editor {
 					SceneView.RepaintAll();
 				}
 			}
+
+			if (!isInspectingPrefab) {
+				if (requireRepaint) {
+					UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
+					requireRepaint = false;
+				}
+			}
 		}
 
 		protected virtual void DrawInspectorGUI (bool multi) {
@@ -258,6 +267,9 @@ namespace Spine.Unity.Editor {
 			}
 
 			bool valid = TargetIsValid;
+
+			foreach (var o in targets)
+				ApplyModifiedMeshParameters(o as SkeletonRenderer);
 
 			// Fields.
 			if (multi) {
@@ -330,8 +342,10 @@ namespace Spine.Unity.Editor {
 
 					using (new SpineInspectorUtility.IndentScope()) {
 						using (new EditorGUILayout.HorizontalScope()) {
+							EditorGUI.BeginChangeCheck();
 							SpineInspectorUtility.ToggleLeftLayout(initialFlipX);
 							SpineInspectorUtility.ToggleLeftLayout(initialFlipY);
+							wasInitParameterChanged |= EditorGUI.EndChangeCheck(); // Value used in the next update.
 							EditorGUILayout.Space();
 						}
 
@@ -418,6 +432,23 @@ namespace Spine.Unity.Editor {
 
 				if (EditorGUI.EndChangeCheck())
 					SceneView.RepaintAll();
+			}
+		}
+
+		protected void ApplyModifiedMeshParameters (SkeletonRenderer skeletonRenderer) {
+			if (skeletonRenderer == null) return;
+			if (!skeletonRenderer.valid)
+				return;
+
+			if (!isInspectingPrefab) {
+				if (wasInitParameterChanged) {
+					wasInitParameterChanged = false;
+					if (!Application.isPlaying) {
+						skeletonRenderer.Initialize(true);
+						skeletonRenderer.LateUpdate();
+						requireRepaint = true;
+					}
+				}
 			}
 		}
 
