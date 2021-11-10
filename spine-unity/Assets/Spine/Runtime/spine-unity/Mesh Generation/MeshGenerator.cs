@@ -181,7 +181,10 @@ namespace Spine.Unity {
 			var drawOrderItems = drawOrder.Items;
 			for (int i = 0; i < drawOrderCount; i++) {
 				Slot slot = drawOrderItems[i];
-				if (!slot.Bone.Active) continue;
+				if (!slot.Bone.Active) {
+					workingAttachmentsItems[i] = null;
+					continue;
+				}
 				if (slot.Data.BlendMode == BlendMode.Additive) current.hasPMAAdditiveSlot = true;
 				Attachment attachment = slot.Attachment;
 
@@ -300,7 +303,10 @@ namespace Spine.Unity {
 			var drawOrderItems = drawOrder.Items;
 			for (int i = 0; i < drawOrderCount; i++) {
 				Slot slot = drawOrderItems[i];
-				if (!slot.Bone.Active) continue;
+				if (!slot.Bone.Active) {
+					workingAttachmentsItems[i] = null;
+					continue;
+				}
 				if (slot.Data.BlendMode == BlendMode.Additive) current.hasPMAAdditiveSlot = true;
 				Attachment attachment = slot.Attachment;
 #if SPINE_TRIANGLECHECK
