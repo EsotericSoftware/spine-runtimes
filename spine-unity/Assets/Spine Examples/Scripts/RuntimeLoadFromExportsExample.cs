@@ -32,12 +32,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Spine.Unity.Examples {
-	public class DataAssetsFromExportsExample : MonoBehaviour {
+	public class RuntimeLoadFromExportsExample : MonoBehaviour {
 
 		public TextAsset skeletonJson;
 		public TextAsset atlasText;
 		public Texture2D[] textures;
 		public Material materialPropertySource;
+
+		public float delay = 0;
+		public string skinName;
+		public string animationName;
 
 		SpineAtlasAsset runtimeAtlasAsset;
 		SkeletonDataAsset runtimeSkeletonDataAsset;
@@ -54,19 +58,19 @@ namespace Spine.Unity.Examples {
 
 		IEnumerator Start () {
 			CreateRuntimeAssetsAndGameObject();
-			runtimeSkeletonDataAsset.GetSkeletonData(false); // preload.
-			yield return new WaitForSeconds(0.5f);
-
+			if (delay > 0) {
+				runtimeSkeletonDataAsset.GetSkeletonData(false); // preload
+				yield return new WaitForSeconds(delay);
+			}
 			runtimeSkeletonAnimation = SkeletonAnimation.NewSkeletonAnimationGameObject(runtimeSkeletonDataAsset);
 
-			// Extra Stuff
+			// additional initialization
 			runtimeSkeletonAnimation.Initialize(false);
-			runtimeSkeletonAnimation.Skeleton.SetSkin("base");
+			if (skinName != "")
+				runtimeSkeletonAnimation.Skeleton.SetSkin(skinName);
 			runtimeSkeletonAnimation.Skeleton.SetSlotsToSetupPose();
-			runtimeSkeletonAnimation.AnimationState.SetAnimation(0, "run", true);
-			runtimeSkeletonAnimation.GetComponent<MeshRenderer>().sortingOrder = 10;
-			runtimeSkeletonAnimation.transform.Translate(Vector3.down * 2);
-
+			if (animationName != "")
+				runtimeSkeletonAnimation.AnimationState.SetAnimation(0, animationName, true);
 		}
 	}
 
