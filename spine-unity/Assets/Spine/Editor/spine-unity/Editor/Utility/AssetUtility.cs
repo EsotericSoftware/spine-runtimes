@@ -118,11 +118,12 @@ namespace Spine.Unity.Editor {
 		static readonly AttachmentType[] AtlasTypes = { AttachmentType.Region, AttachmentType.Linkedmesh, AttachmentType.Mesh };
 
 		public static List<string> GetRequiredAtlasRegions (string skeletonDataPath) {
-			List<string> requiredPaths = new List<string>();
+			HashSet<string> requiredPaths = new HashSet<string>();
 
 			if (skeletonDataPath.Contains(".skel")) {
-				AddRequiredAtlasRegionsFromBinary(skeletonDataPath, requiredPaths);
-				return requiredPaths;
+				List<string> requiredPathsResult = new List<string>();
+				AddRequiredAtlasRegionsFromBinary(skeletonDataPath, requiredPathsResult);
+				return requiredPathsResult;
 			}
 
 			TextReader reader = null;
@@ -143,11 +144,11 @@ namespace Spine.Unity.Editor {
 			}
 
 			if (root == null || !root.ContainsKey("skins"))
-				return requiredPaths;
+				return new List<string>();
 
 			var skinsList = root["skins"] as List<object>;
 			if (skinsList == null)
-				return requiredPaths;
+				return new List<string>();
 
 			foreach (Dictionary<string, object> skinMap in skinsList) {
 				if (!skinMap.ContainsKey("attachments"))
@@ -182,7 +183,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			return requiredPaths;
+			return requiredPaths.ToList();
 		}
 
 		internal static void AddRequiredAtlasRegionsFromBinary (string skeletonDataPath, List<string> requiredPaths) {
