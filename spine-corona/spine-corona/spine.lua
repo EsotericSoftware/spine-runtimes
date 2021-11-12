@@ -89,9 +89,11 @@ spine.Skeleton.updateWorldTransform_super = spine.Skeleton.updateWorldTransform
 spine.Skeleton.new = function(skeletonData, group)
 	local self = spine.Skeleton.new_super(skeletonData)
 	self.group = group or display.newGroup()
-	self.drawingGroup = nil
+	self.drawingGroup = display.newGroup()
+	self.group:insert(self.drawingGroup)
+
 	self.premultipliedAlpha = false
-	self.batches = 0
+	self.slotData = {}
 	self.tempColor = spine.Color.newWith(1, 1, 1, 1)
 	self.tempColor2 = spine.Color.newWith(-1, 1, 1, 1)
 	self.tempVertex = {
@@ -124,22 +126,75 @@ end
 
 local worldVertices = spine.utils.newNumberArray(10000 * 8)
 
+function spine.Skeleton:hideSlot(slot)
+	if not self.slotData[slot] then return end
+	self.slotData[slot].mesh.isVisible = false
+end
+
+function spine.Skeleton:createSlot(slot, params)
+	local mesh = display.newMesh(self.drawingGroup, 0, 0, {
+		mode     = "indexed",
+		vertices = params.vertices,
+		uvs      = params.uvs,
+		indices  = params.indices
+	})
+	
+	mesh.x, mesh.y = mesh.path:getVertexOffset()
+	mesh.blendMode = params.blendMode
+	mesh.fill      = params.texture
+	
+	local color = params.color
+	mesh:setFillColor(color.r, color.g, color.b, color.a)
+	
+	self.slotData[slot] = {
+		mesh        = mesh,
+		indices     = params.indices,
+		texture     = params.texture,
+		uvs     = params.uvs,
+	}
+end
+
+function spine.Skeleton:updateSlot(slot, params)
+	if not self.slotData[slot] then
+		return self:createSlot(slot, params) 
+	end
+	local slotData = self.slotData[slot]
+	local mesh = slotData.mesh
+	if #params.indices ~= #slotData.indices or #params.uvs ~= #slotData.uvs then
+		slotData.mesh:removeSelf()
+		self.slotData[slot] = nil
+		return self:createSlot(slot, params) 
+	end
+
+	mesh.path:update({
+		vertices = params.vertices,
+		uvs      = params.uvs,
+		indices = params.indices
+	})
+	
+	mesh.isVisible = true
+	mesh.x, mesh.y = mesh.path:getVertexOffset()
+	mesh:toFront()
+	
+	local color = params.color
+	mesh:setFillColor(color.r, color.g, color.b, color.a)
+
+	if slotData.texture ~= params.texture then
+		slotData.texture = params.texture
+		mesh.fill = params.texture
+	end
+	if mesh.blendMode ~= params.blendMode then
+		mesh.blendMode = params.blendMode
+	end
+end
+
 function spine.Skeleton:updateWorldTransform()
 	spine.Skeleton.updateWorldTransform_super(self)
 	local premultipliedAlpha = self.premultipliedAlpha
-
-	self.batches = 0
-
+	
 	if (self.vertexEffect) then self.vertexEffect:beginEffect(self) end
 
-	-- Remove old drawing group, we will start anew
-	if self.drawingGroup then self.drawingGroup:removeSelf() end
-	local drawingGroup = display.newGroup()
-	self.drawingGroup = drawingGroup
-	self.group:insert(drawingGroup)
-
 	local drawOrder = self.drawOrder
-	local currentGroup = nil
 	local groupVertices = {}
 	local groupIndices = {}
 	local groupUvs = {}
@@ -150,12 +205,12 @@ function spine.Skeleton:updateWorldTransform()
 	local lastTexture = nil
 	local blendMode = nil
 	local lastBlendMode = nil
-	local renderable = {
-		vertices = nil,
-		uvs = nil
-	}
 
-	for _,slot in ipairs(drawOrder) do
+	for k, v in pairs(self.slotData) do
+		self:hideSlot(k)
+	end
+
+	for i,slot in ipairs(drawOrder) do
 		local attachment = slot.attachment
 		local vertices = nil
 		local uvs = nil
@@ -205,7 +260,15 @@ function spine.Skeleton:updateWorldTransform()
 					if not lastBlendMode then lastBlendMode = blendMode end
 
 					if (texture ~= lastTexture or not colorEquals(color, lastColor) or blendMode ~= lastBlendMode) then
-						self:flush(groupVertices, groupUvs, groupIndices, lastTexture, lastColor, lastBlendMode, drawingGroup)
+						local lastSlot = drawOrder[i-1]
+						self:updateSlot(lastSlot, {
+							texture   = lastTexture,
+							color     = lastColor,
+							blendMode = lastBlendMode,
+							vertices  = groupVertices,
+							uvs       = groupUvs,
+							indices   = groupIndices
+						})
 						lastTexture = texture
 						lastColor:setFrom(color)
 						lastBlendMode = blendMode
@@ -230,28 +293,23 @@ function spine.Skeleton:updateWorldTransform()
 		end
 	end
 
+	
 	if #groupVertices > 0 then
-		self:flush(groupVertices, groupUvs, groupIndices, texture, color, blendMode, drawingGroup)
-	end
+		local slot = drawOrder[#drawOrder]
+		self:updateSlot(slot, {
+			texture   = texture,
+			color     = color,
+			blendMode = blendMode,
+			vertices  = groupVertices,
+			uvs       = groupUvs,
+			indices   = groupIndices
+		})
+	end	
 
 	self.clipper:clipEnd2()
 	if (self.vertexEffect) then self.vertexEffect:endEffect() end
 end
 
-function spine.Skeleton:flush(groupVertices, groupUvs, groupIndices, texture, color, blendMode, drawingGroup)
-	local mesh = display.newMesh(drawingGroup, 0, 0, {
-		mode = "indexed",
-		vertices = groupVertices,
-		uvs = groupUvs,
-		indices = groupIndices
-	})
-	mesh.fill = texture
-	mesh:setFillColor(color.r, color.g, color.b)
-	mesh.alpha = color.a
-	mesh.blendMode = blendMode
-	mesh:translate(mesh.path:getVertexOffset())
-	self.batches = self.batches + 1
-end
 
 function spine.Skeleton:batch(vertices, uvs, numVertices, indices, groupVertices, groupUvs, groupIndices)
 	local numIndices = #indices
