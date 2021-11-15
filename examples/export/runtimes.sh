@@ -95,6 +95,11 @@ cp -f ../coin/export/coin-pro.skel "$ROOT/spine-sfml/c/data/"
 cp -f ../coin/export/coin-pma.atlas "$ROOT/spine-sfml/c/data/"
 cp -f ../coin/export/coin-pma.png "$ROOT/spine-sfml/c/data/"
 
+cp -f ../dragon/export/dragon-ess.json "$ROOT/spine-sfml/c/data/"
+cp -f ../dragon/export/dragon-ess.skel "$ROOT/spine-sfml/c/data/"
+cp -f ../dragon/export/dragon-pma.atlas "$ROOT/spine-sfml/c/data/"
+cp -f ../dragon/export/dragon-pma*.png "$ROOT/spine-sfml/c/data/"
+
 cp -f ../goblins/export/goblins-pro.json "$ROOT/spine-sfml/c/data/"
 cp -f ../goblins/export/goblins-pro.skel "$ROOT/spine-sfml/c/data/"
 cp -f ../goblins/export/goblins-pma.atlas "$ROOT/spine-sfml/c/data/"
@@ -141,6 +146,11 @@ cp -f ../coin/export/coin-pro.json "$ROOT/spine-sfml/cpp/data/"
 cp -f ../coin/export/coin-pro.skel "$ROOT/spine-sfml/cpp/data/"
 cp -f ../coin/export/coin-pma.atlas "$ROOT/spine-sfml/cpp/data/"
 cp -f ../coin/export/coin-pma.png "$ROOT/spine-sfml/cpp/data/"
+
+cp -f ../dragon/export/dragon-ess.json "$ROOT/spine-sfml/cpp/data/"
+cp -f ../dragon/export/dragon-ess.skel "$ROOT/spine-sfml/cpp/data/"
+cp -f ../dragon/export/dragon-pma.atlas "$ROOT/spine-sfml/cpp/data/"
+cp -f ../dragon/export/dragon-pma*.png "$ROOT/spine-sfml/cpp/data/"
 
 cp -f ../goblins/export/goblins-pro.json "$ROOT/spine-sfml/cpp/data/"
 cp -f ../goblins/export/goblins-pro.skel "$ROOT/spine-sfml/cpp/data/"
