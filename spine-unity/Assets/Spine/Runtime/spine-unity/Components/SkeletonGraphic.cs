@@ -411,6 +411,7 @@ namespace Spine.Unity {
 		}
 
 		public bool MatchRectTransformWithBounds () {
+			if (!wasUpdatedAfterInit) Update(0);
 			UpdateMesh();
 
 			if (!this.allowMultipleCanvasRenderers)
