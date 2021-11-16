@@ -108,12 +108,10 @@ namespace Spine.Unity {
 
 				rigidBody2D.MovePosition(gravityAndVelocityMovement + new Vector2(transform.position.x, transform.position.y)
 					+ rigidbodyDisplacement);
-			}
-			else if (rigidBody != null) {
+			} else if (rigidBody != null) {
 				rigidBody.MovePosition(transform.position
 					+ new Vector3(rigidbodyDisplacement.x, rigidbodyDisplacement.y, 0));
-			}
-			else return;
+			} else return;
 
 			Vector2 parentBoneScale;
 			GetScaleAffectingRootMotion(out parentBoneScale);
