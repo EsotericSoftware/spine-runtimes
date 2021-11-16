@@ -36,7 +36,7 @@ namespace Spine.Unity.AnimationTools {
 
 		/// <summary>Evaluates the resulting value of a TranslateTimeline at a given time.
 		/// SkeletonData can be accessed from Skeleton.Data or from SkeletonDataAsset.GetSkeletonData.
-		/// If no SkeletonData is given, values are returned as difference to setup pose
+		/// If no SkeletonData is provided, values are returned as difference to setup pose
 		/// instead of absolute values.</summary>
 		public static Vector2 Evaluate (this TranslateTimeline timeline, float time, SkeletonData skeletonData = null) {
 			if (time < timeline.Frames[0]) return Vector2.zero;
@@ -52,8 +52,18 @@ namespace Spine.Unity.AnimationTools {
 			}
 		}
 
+		/// <summary>Evaluates the resulting X and Y translate mix values of a
+		/// TransformConstraintTimeline at a given time.</summary>
+		public static Vector2 EvaluateTranslateXYMix (this TransformConstraintTimeline timeline, float time) {
+			if (time < timeline.Frames[0]) return Vector2.zero;
+
+			float rotate, mixX, mixY, scaleX, scaleY, shearY;
+			timeline.GetCurveValue(out rotate, out mixX, out mixY, out scaleX, out scaleY, out shearY, time);
+			return new Vector2(mixX, mixY);
+		}
+
 		/// <summary>Gets the translate timeline for a given boneIndex.
-		/// You can get the boneIndex using SkeletonData.FindBoneIndex.
+		/// You can get the boneIndex using SkeletonData.FindBone().Index.
 		/// The root bone is always boneIndex 0.
 		/// This will return null if a TranslateTimeline is not found.</summary>
 		public static TranslateTimeline FindTranslateTimelineForBone (this Animation a, int boneIndex) {
@@ -64,6 +74,23 @@ namespace Spine.Unity.AnimationTools {
 				var translateTimeline = timeline as TranslateTimeline;
 				if (translateTimeline != null && translateTimeline.BoneIndex == boneIndex)
 					return translateTimeline;
+			}
+			return null;
+		}
+
+		/// <summary>Gets the transform constraint timeline for a given boneIndex.
+		/// You can get the boneIndex using SkeletonData.FindBone().Index.
+		/// The root bone is always boneIndex 0.
+		/// This will return null if a TranslateTimeline is not found.</summary>
+		public static TransformConstraintTimeline FindTransformConstraintTimeline (this Animation a, int transformConstraintIndex) {
+			foreach (var timeline in a.Timelines) {
+				if (timeline.GetType().IsSubclassOf(typeof(TransformConstraintTimeline)))
+					continue;
+
+				var transformConstraintTimeline = timeline as TransformConstraintTimeline;
+				if (transformConstraintTimeline != null &&
+					transformConstraintTimeline.TransformConstraintIndex == transformConstraintIndex)
+					return transformConstraintTimeline;
 			}
 			return null;
 		}
