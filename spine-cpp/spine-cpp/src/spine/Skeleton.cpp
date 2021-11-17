@@ -60,7 +60,6 @@ using namespace spine;
 Skeleton::Skeleton(SkeletonData *skeletonData) : _data(skeletonData),
 												 _skin(NULL),
 												 _color(1, 1, 1, 1),
-												 _time(0),
 												 _scaleX(1),
 												 _scaleY(1),
 												 _x(0),
@@ -427,10 +426,6 @@ PathConstraint *Skeleton::findPathConstraint(const String &constraintName) {
 	return NULL;
 }
 
-void Skeleton::update(float delta) {
-	_time += delta;
-}
-
 void Skeleton::getBounds(float &outX, float &outY, float &outWidth, float &outHeight, Vector<float> &outVertexBuffer) {
 	float minX = FLT_MAX;
 	float minY = FLT_MAX;
@@ -450,7 +445,7 @@ void Skeleton::getBounds(float &outX, float &outY, float &outWidth, float &outHe
 			if (outVertexBuffer.size() < 8) {
 				outVertexBuffer.setSize(8, 0);
 			}
-			regionAttachment->computeWorldVertices(slot->getBone(), outVertexBuffer, 0);
+			regionAttachment->computeWorldVertices(*slot, outVertexBuffer, 0);
 		} else if (attachment != NULL && attachment->getRTTI().instanceOf(MeshAttachment::rtti)) {
 			MeshAttachment *mesh = static_cast<MeshAttachment *>(attachment);
 
@@ -459,7 +454,7 @@ void Skeleton::getBounds(float &outX, float &outY, float &outWidth, float &outHe
 				outVertexBuffer.setSize(verticesLength, 0);
 			}
 
-			mesh->computeWorldVertices(*slot, 0, verticesLength, outVertexBuffer, 0);
+			mesh->computeWorldVertices(*slot, 0, verticesLength, outVertexBuffer.buffer(), 0);
 		}
 
 		for (size_t ii = 0; ii < verticesLength; ii += 2) {
@@ -521,14 +516,6 @@ Skin *Skeleton::getSkin() {
 
 Color &Skeleton::getColor() {
 	return _color;
-}
-
-float Skeleton::getTime() {
-	return _time;
-}
-
-void Skeleton::setTime(float inValue) {
-	_time = inValue;
 }
 
 void Skeleton::setPosition(float x, float y) {

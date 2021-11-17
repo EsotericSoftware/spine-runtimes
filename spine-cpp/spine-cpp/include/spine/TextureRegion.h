@@ -27,58 +27,24 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_AttachmentLoader_h
-#define Spine_AttachmentLoader_h
+#ifndef Spine_TextureRegion_h
+#define Spine_TextureRegion_h
 
-#include <spine/RTTI.h>
-#include <spine/SpineObject.h>
-#include <spine/SpineString.h>
+#include <spine/Vector.h>
 
 namespace spine {
-	class Skin;
-
-	class Attachment;
-
-	class RegionAttachment;
-
-	class MeshAttachment;
-
-	class BoundingBoxAttachment;
-
-	class PathAttachment;
-
-	class PointAttachment;
-
-	class ClippingAttachment;
-
-	class Sequence;
-
-	class SP_API AttachmentLoader : public SpineObject {
+	class SP_API TextureRegion : public SpineObject {
 	public:
-	RTTI_DECL
+		void *rendererObject;
+		float u, v, u2, v2;
+		int degrees;
+		float offsetX, offsetY;
+		int width, height;
+		int originalWidth, originalHeight;
 
-		AttachmentLoader();
-
-		virtual ~AttachmentLoader();
-
-		/// @return May be NULL to not load any attachment.
-		virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) = 0;
-
-		/// @return May be NULL to not load any attachment.
-		virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) = 0;
-
-		/// @return May be NULL to not load any attachment.
-		virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &skin, const String &name) = 0;
-
-		/// @return May be NULL to not load any attachment
-		virtual PathAttachment *newPathAttachment(Skin &skin, const String &name) = 0;
-
-		virtual PointAttachment *newPointAttachment(Skin &skin, const String &name) = 0;
-
-		virtual ClippingAttachment *newClippingAttachment(Skin &skin, const String &name) = 0;
-
-		virtual void configureAttachment(Attachment *attachment) = 0;
+		TextureRegion(): rendererObject(NULL), u(0), v(0), u2(0), v2(0), degrees(0), offsetX(0), offsetY(0), width(0), height(0), originalWidth(0), originalHeight(0) {};
+		~TextureRegion() {};
 	};
 }
 
-#endif /* Spine_AttachmentLoader_h */
+#endif

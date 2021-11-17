@@ -35,6 +35,7 @@
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 #include <spine/HasRendererObject.h>
+#include "TextureRegion.h"
 
 namespace spine {
 	enum Format {
@@ -83,16 +84,12 @@ namespace spine {
 		}
 	};
 
-	class SP_API AtlasRegion : public SpineObject {
+	class SP_API AtlasRegion : public TextureRegion {
 	public:
 		AtlasPage *page;
 		String name;
-		int x, y, width, height;
-		float u, v, u2, v2;
-		float offsetX, offsetY;
-		int originalWidth, originalHeight;
 		int index;
-		int degrees;
+		int x, y;
 		Vector<int> splits;
 		Vector<int> pads;
 		Vector <String> names;

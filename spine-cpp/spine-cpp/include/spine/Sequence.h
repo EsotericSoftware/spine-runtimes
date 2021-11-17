@@ -27,58 +27,70 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_AttachmentLoader_h
-#define Spine_AttachmentLoader_h
+#ifndef Spine_Sequence_h
+#define Spine_Sequence_h
 
-#include <spine/RTTI.h>
-#include <spine/SpineObject.h>
+#include <spine/Vector.h>
 #include <spine/SpineString.h>
+#include <spine/TextureRegion.h>
 
 namespace spine {
-	class Skin;
+	class Slot;
 
 	class Attachment;
 
-	class RegionAttachment;
+	class SP_API Sequence : public SpineObject {
 
-	class MeshAttachment;
-
-	class BoundingBoxAttachment;
-
-	class PathAttachment;
-
-	class PointAttachment;
-
-	class ClippingAttachment;
-
-	class Sequence;
-
-	class SP_API AttachmentLoader : public SpineObject {
 	public:
-	RTTI_DECL
+		explicit Sequence();
 
-		AttachmentLoader();
+		Sequence(int id, const Vector<TextureRegion *> &regions, int start, int digits, int setupIndex);
 
-		virtual ~AttachmentLoader();
+		~Sequence();
 
-		/// @return May be NULL to not load any attachment.
-		virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) = 0;
+		Sequence *copy();
 
-		/// @return May be NULL to not load any attachment.
-		virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) = 0;
+		void apply(Slot *slot, Attachment *attachment);
 
-		/// @return May be NULL to not load any attachment.
-		virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &skin, const String &name) = 0;
+		String getPath(const String &basePath, int index);
 
-		/// @return May be NULL to not load any attachment
-		virtual PathAttachment *newPathAttachment(Skin &skin, const String &name) = 0;
+		int getId() { return _id; }
 
-		virtual PointAttachment *newPointAttachment(Skin &skin, const String &name) = 0;
+		void setId(int id) { _id = id; }
 
-		virtual ClippingAttachment *newClippingAttachment(Skin &skin, const String &name) = 0;
+		int getStart() { return _start; }
 
-		virtual void configureAttachment(Attachment *attachment) = 0;
+		void setStart(int start) { _start = start; }
+
+		int getDigits() { return _digits; }
+
+		void setDigits(int digits) { _digits = digits; }
+
+		int getSetupIndex() { return _setupIndex; }
+
+		void setSetupIndex(int setupIndex) { _setupIndex = setupIndex; }
+
+		Vector<TextureRegion *> &getRegions() { return _regions; }
+
+	private:
+		int _id;
+		Vector<TextureRegion *> _regions;
+		int _start;
+		int _digits;
+		int _setupIndex;
+
+		int getNextID();
+	};
+
+	enum SequenceMode {
+		hold = 0,
+		once = 1,
+		loop = 2,
+		pingpong = 3,
+		onceReverse = 4,
+		loopReverse = 5,
+		pingpongReverse = 6
 	};
 }
 
-#endif /* Spine_AttachmentLoader_h */
+#endif

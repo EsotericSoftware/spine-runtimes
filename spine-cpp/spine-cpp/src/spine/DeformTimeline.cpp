@@ -76,7 +76,7 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	}
 
 	VertexAttachment *attachment = static_cast<VertexAttachment *>(slotAttachment);
-	if (attachment->_deformAttachment != _attachment) {
+	if (attachment->_timelineAttachment != _attachment) {
 		return;
 	}
 
