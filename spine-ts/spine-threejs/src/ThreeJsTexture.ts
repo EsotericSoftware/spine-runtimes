@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Texture, TextureFilter, TextureWrap } from "@esotericsoftware/spine-core";
+import { BlendMode, Texture, TextureFilter, TextureWrap } from "@esotericsoftware/spine-core";
 import * as THREE from "three";
 
 export class ThreeJsTexture extends Texture {
@@ -69,5 +69,13 @@ export class ThreeJsTexture extends Texture {
 		else if (wrap === TextureWrap.MirroredRepeat) return THREE.MirroredRepeatWrapping;
 		else if (wrap === TextureWrap.Repeat) return THREE.RepeatWrapping;
 		else throw new Error("Unknown texture wrap: " + wrap);
+	}
+
+	static toThreeJsBlending (blend: BlendMode) {
+		if (blend === BlendMode.Normal) return THREE.NormalBlending;
+		else if (blend === BlendMode.Additive) return THREE.AdditiveBlending;
+		else if (blend === BlendMode.Multiply) return THREE.MultiplyBlending;
+		else if (blend === BlendMode.Screen) return THREE.CustomBlending;
+		else throw new Error("Unknown blendMode: " + blend);
 	}
 }

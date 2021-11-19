@@ -209,9 +209,9 @@ namespace Spine.Unity {
 		#region Attachments
 		public static Material GetMaterial (this Attachment a) {
 			object rendererObject = null;
-			var renderableAttachment = a as IHasRendererObject;
+			var renderableAttachment = a as IHasTextureRegion;
 			if (renderableAttachment != null)
-				rendererObject = renderableAttachment.RendererObject;
+				rendererObject = renderableAttachment.Region;
 
 			if (rendererObject == null)
 				return null;

@@ -501,7 +501,8 @@ namespace Spine.Unity.Editor {
 		}
 
 		internal static Mesh ExtractRegionAttachment (string name, RegionAttachment attachment, Mesh mesh = null, bool centered = true) {
-			var bone = GetDummyBone();
+			var slot = GetDummySlot();
+			var bone = slot.Bone;
 
 			if (centered) {
 				bone.X = -attachment.X;
@@ -512,7 +513,7 @@ namespace Spine.Unity.Editor {
 
 			Vector2[] uvs = ExtractUV(attachment.UVs);
 			float[] floatVerts = new float[8];
-			attachment.ComputeWorldVertices(bone, floatVerts, 0);
+			attachment.ComputeWorldVertices(slot, floatVerts, 0);
 			Vector3[] verts = ExtractVerts(floatVerts);
 
 			//unrotate verts now that they're centered

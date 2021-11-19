@@ -38,11 +38,14 @@ namespace Spine {
 		public ClippingAttachment (string name) : base(name) {
 		}
 
+		/// <summary>Copy constructor.</summary>
+		protected ClippingAttachment (ClippingAttachment other)
+			: base(other) {
+			endSlot = other.endSlot;
+		}
+
 		public override Attachment Copy () {
-			ClippingAttachment copy = new ClippingAttachment(this.Name);
-			CopyTo(copy);
-			copy.endSlot = endSlot;
-			return copy;
+			return new ClippingAttachment(this);
 		}
 	}
 }

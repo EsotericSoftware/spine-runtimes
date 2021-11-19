@@ -109,7 +109,12 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 			EditorGUI.PropertyField(singleFieldRect, useBlendDurationProp);
 
 			singleFieldRect.y += lineHeightWithSpacing;
-			EditorGUI.PropertyField(singleFieldRect, mixDurationProp);
+
+			bool greyOutMixDuration = (!useBlendDurationProp.hasMultipleDifferentValues &&
+										useBlendDurationProp.boolValue == true);
+			using (new EditorGUI.DisabledGroupScope(greyOutMixDuration)) {
+				EditorGUI.PropertyField(singleFieldRect, mixDurationProp);
+			}
 		}
 
 		singleFieldRect.y += lineHeightWithSpacing;

@@ -75,7 +75,7 @@ public class RegionAttachment extends Attachment implements HasTextureRegion {
 		arraycopy(other.uvs, 0, uvs, 0, 8);
 		arraycopy(other.offset, 0, offset, 0, 8);
 		color.set(other.color);
-		sequence = new Sequence(other.sequence);
+		sequence = other.sequence != null ? new Sequence(other.sequence) : null;
 	}
 
 	/** Calculates the {@link #offset} and {@link #uvs} using the region and the attachment's transform. Must be called if the

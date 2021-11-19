@@ -127,7 +127,7 @@ half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiff
 #endif
 	half3 diffuseLighting = inputData.bakedGI;
 
-	half3 attenuation = mainLight.distanceAttenuation * mainLight.shadowAttenuation;
+	half3 attenuation = mainLight.distanceAttenuation* mainLight.shadowAttenuation;
 	half3 attenuatedLightColor = mainLight.color * attenuation;
 #ifndef _DIFFUSE_RAMP
 	diffuseLighting += LightingLambert(attenuatedLightColor, mainLight.direction, inputData.normalWS);
@@ -184,23 +184,14 @@ VertexOutputLWRP ForwardPassVertexSprite(VertexInput input)
 	output.positionWS = float4(positionWS, 1);
 #endif
 
-#if defined(PER_PIXEL_LIGHTING)
-
 	half3 normalWS = calculateSpriteWorldNormal(input, -backFaceSign);
 	output.normalWorld.xyz = normalWS;
-
 #if defined(_NORMALMAP)
 	output.tangentWorld.xyz = calculateWorldTangent(input.tangent);
 	output.binormalWorld.xyz = calculateSpriteWorldBinormal(input, output.normalWorld.xyz, output.tangentWorld.xyz, backFaceSign);
 #endif
 
-#else // !PER_PIXEL_LIGHTING
-	half3 fixedNormal = half3(0, 0, -1);
-	half3 normalWS = normalize(mul((float3x3)unity_ObjectToWorld, fixedNormal));
-
-#endif // !PER_PIXEL_LIGHTING
 	output.fogFactorAndVertexLight.yzw = LightweightLightVertexSimplified(positionWS, normalWS);
-
 
 #if (defined(_MAIN_LIGHT_SHADOWS) || defined(MAIN_LIGHT_CALCULATE_SHADOWS)) && !defined(_RECEIVE_SHADOWS_OFF)
 	VertexPositionInputs vertexInput;
@@ -243,16 +234,11 @@ half4 ForwardPassFragmentSprite(VertexOutputLWRP input) : SV_Target
 	inputData.viewDirectionWS = input.viewDirectionWS;
 	inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
 
-#if defined(PER_PIXEL_LIGHTING)
-	#if defined(_NORMALMAP)
+#if defined(PER_PIXEL_LIGHTING) && defined(_NORMALMAP)
 	half3 normalWS = calculateNormalFromBumpMap(input.texcoord.xy, input.tangentWorld.xyz, input.binormalWorld.xyz, input.normalWorld.xyz);
-	#else
+#else
 	half3 normalWS = input.normalWorld.xyz;
-	#endif
-#else // !PER_PIXEL_LIGHTING
-	half3 fixedNormal = half3(0, 0, -1);
-	half3 normalWS = normalize(mul((float3x3)unity_ObjectToWorld, fixedNormal));
-#endif // !PER_PIXEL_LIGHTING
+#endif
 
 	inputData.normalWS = normalWS;
 	inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);

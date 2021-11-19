@@ -295,7 +295,6 @@ namespace Spine.Unity {
 
 		protected void UpdateAnimationStatus (float deltaTime) {
 			deltaTime *= timeScale;
-			skeleton.Update(deltaTime);
 			state.Update(deltaTime);
 		}
 
@@ -477,6 +476,11 @@ namespace Spine.Unity {
 
 			this.rectTransform.sizeDelta = size;
 			this.rectTransform.pivot = p;
+
+			foreach (var submeshGraphic in submeshGraphics) {
+				submeshGraphic.rectTransform.sizeDelta = size;
+				submeshGraphic.rectTransform.pivot = p;
+			}
 		}
 
 		public event UpdateBonesDelegate BeforeApply;

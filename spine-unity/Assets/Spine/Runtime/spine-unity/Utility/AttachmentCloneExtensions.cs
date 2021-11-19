@@ -69,7 +69,7 @@ namespace Spine.Unity.AttachmentTools {
 			if (useOriginalRegionScale) {
 				var regionAttachment = o as RegionAttachment;
 				if (regionAttachment != null)
-					scale = regionAttachment.Width / regionAttachment.RegionOriginalWidth;
+					scale = regionAttachment.Width / regionAttachment.Region.OriginalWidth;
 			}
 			return o.GetRemappedClone(atlasRegion, cloneMeshAsLinked, useOriginalRegionSize, scale);
 		}
@@ -86,18 +86,19 @@ namespace Spine.Unity.AttachmentTools {
 			var regionAttachment = o as RegionAttachment;
 			if (regionAttachment != null) {
 				RegionAttachment newAttachment = (RegionAttachment)regionAttachment.Copy();
-				newAttachment.SetRegion(atlasRegion, false);
+				newAttachment.Region = atlasRegion;
 				if (!useOriginalRegionSize) {
 					newAttachment.Width = atlasRegion.width * scale;
 					newAttachment.Height = atlasRegion.height * scale;
 				}
-				newAttachment.UpdateOffset();
+				newAttachment.UpdateRegion();
 				return newAttachment;
 			} else {
 				var meshAttachment = o as MeshAttachment;
 				if (meshAttachment != null) {
 					MeshAttachment newAttachment = cloneMeshAsLinked ? meshAttachment.NewLinkedMesh() : (MeshAttachment)meshAttachment.Copy();
-					newAttachment.SetRegion(atlasRegion);
+					newAttachment.Region = atlasRegion;
+					newAttachment.UpdateRegion();
 					return newAttachment;
 				}
 			}

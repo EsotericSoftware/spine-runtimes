@@ -21,7 +21,7 @@
 		info;
 
 		loadAssets(canvas) {
-			this.numSkeletons = 100;
+			this.numSkeletons = 400;
 			this.skeletons = [];
 			this.states = [];
 			this.info = document.querySelector("#info")[0];
@@ -45,7 +45,7 @@
 			for (var i = 0; i < this.numSkeletons; i++) {
 				let skeleton = new spine.Skeleton(skeletonData);
 
-				// Create the animation state			
+				// Create the animation state
 				let state = new spine.AnimationState(stateData);
 				state.setAnimation(0, "dance", true);
 
@@ -92,7 +92,7 @@
 				renderer.drawSkeleton(skeleton, true);
 			}
 			renderer.end();
-			info.innerText = "Draw calls: " + renderer.batcher.drawCalls;
+			info.innerText = "Draw calls: " + renderer.batcher.drawCalls + ", FPS: " + canvas.time.framesPerSecond.toFixed(0);
 		}
 	}
 

@@ -47,14 +47,19 @@ namespace Spine {
 			: base(name) {
 		}
 
+		/// <summary>Copy constructor.</summary>
+		protected PathAttachment (PathAttachment other)
+			: base(other) {
+
+			lengths = new float[other.lengths.Length];
+			Array.Copy(other.lengths, 0, lengths, 0, lengths.Length);
+
+			closed = other.closed;
+			constantSpeed = other.constantSpeed;
+		}
+
 		public override Attachment Copy () {
-			PathAttachment copy = new PathAttachment(this.Name);
-			CopyTo(copy);
-			copy.lengths = new float[lengths.Length];
-			Array.Copy(lengths, 0, copy.lengths, 0, lengths.Length);
-			copy.closed = closed;
-			copy.constantSpeed = constantSpeed;
-			return copy;
+			return new PathAttachment(this);
 		}
 	}
 }

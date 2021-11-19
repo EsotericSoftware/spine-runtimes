@@ -1,13 +1,13 @@
 {
 "skeleton": {
-	"hash": "UIFpNNbbcQI",
-	"spine": "4.0.31",
+	"hash": "aPoA1GjXkVI",
+	"spine": "4.1.04-beta",
 	"x": -366.31,
-	"y": -286.62,
+	"y": -327.81,
 	"width": 660.39,
-	"height": 604.09,
+	"height": 643,
 	"images": "./images/",
-	"audio": ""
+	"audio": "././"
 },
 "bones": [
 	{ "name": "root", "y": -176.12 },
@@ -297,7 +297,7 @@
 "slots": [
 	{ "name": "left-rear-leg", "bone": "left-rear-leg", "attachment": "left-rear-leg" },
 	{ "name": "left-rear-thigh", "bone": "left-rear-thigh", "attachment": "left-rear-thigh" },
-	{ "name": "left-wing", "bone": "left-wing", "attachment": "left-wing01" },
+	{ "name": "left-wing", "bone": "left-wing", "attachment": "left-wing" },
 	{ "name": "tail6", "bone": "tail6", "attachment": "tail06" },
 	{ "name": "tail5", "bone": "tail5", "attachment": "tail05" },
 	{ "name": "tail4", "bone": "tail4", "attachment": "tail04" },
@@ -323,7 +323,7 @@
 	{ "name": "right-front-toe2", "bone": "right-front-toe2", "attachment": "front-toe-b" },
 	{ "name": "right-front-toe3", "bone": "right-front-toe3", "attachment": "front-toe-b" },
 	{ "name": "chin", "bone": "chin", "attachment": "chin" },
-	{ "name": "right-wing", "bone": "right-wing", "attachment": "right-wing01" },
+	{ "name": "right-wing", "bone": "right-wing", "attachment": "right-wing" },
 	{ "name": "head", "bone": "head", "attachment": "head" },
 	{ "name": "thiagobrayner", "bone": "root", "attachment": "thiagobrayner" }
 ],
@@ -376,15 +376,14 @@
 				"left-rear-thigh": { "x": 56.03, "y": 27.39, "rotation": 74.94, "width": 91, "height": 149 }
 			},
 			"left-wing": {
-				"left-wing01": { "x": 129.21, "y": -45.49, "rotation": -83.7, "width": 191, "height": 256 },
-				"left-wing02": { "x": 126.38, "y": -31.69, "rotation": -86.19, "width": 179, "height": 269 },
-				"left-wing03": { "x": 110.27, "y": -90.89, "rotation": -86.19, "width": 186, "height": 207 },
-				"left-wing04": { "x": -61.62, "y": -83.27, "rotation": -86.19, "width": 188, "height": 135 },
-				"left-wing05": { "x": -90.02, "y": -78.14, "rotation": -86.19, "width": 218, "height": 213 },
-				"left-wing06": { "x": -143.77, "y": -83.72, "rotation": -86.19, "width": 192, "height": 331 },
-				"left-wing07": { "x": -133.05, "y": -33.9, "rotation": -86.19, "width": 159, "height": 255 },
-				"left-wing08": { "x": 50.15, "y": -15.71, "rotation": -86.19, "width": 164, "height": 181 },
-				"left-wing09": { "x": 85.94, "y": -11.33, "rotation": -86.19, "width": 204, "height": 167 }
+				"left-wing": {
+					"x": -36.32,
+					"y": -44.53,
+					"rotation": -83.7,
+					"width": 264,
+					"height": 589,
+					"sequence": { "count": 9, "digits": 2 }
+				}
 			},
 			"right-front-leg": {
 				"right-front-leg": { "x": 17.8, "y": 4.23, "rotation": 37.63, "width": 101, "height": 89 }
@@ -417,15 +416,14 @@
 				"right-rear-toe": { "x": 47.46, "y": -7.64, "rotation": 134.34, "width": 109, "height": 77 }
 			},
 			"right-wing": {
-				"right-wing01": { "x": 170.08, "y": -23.68, "rotation": -130.34, "width": 219, "height": 310 },
-				"right-wing02": { "x": 171.15, "y": -19.33, "rotation": -130.34, "width": 203, "height": 305 },
-				"right-wing03": { "x": 166.46, "y": 29.24, "rotation": -130.34, "width": 272, "height": 247 },
-				"right-wing04": { "x": 42.94, "y": 134.06, "rotation": -130.34, "width": 279, "height": 144 },
-				"right-wing05": { "x": -8.84, "y": 142.59, "rotation": -130.34, "width": 251, "height": 229 },
-				"right-wing06": { "x": -123.33, "y": 111.22, "rotation": -130.34, "width": 200, "height": 366 },
-				"right-wing07": { "x": -40.17, "y": 118.03, "rotation": -130.34, "width": 200, "height": 263 },
-				"right-wing08": { "x": 48.02, "y": 28.76, "rotation": -130.34, "width": 234, "height": 254 },
-				"right-wing09": { "x": 128.1, "y": 21.13, "rotation": -130.34, "width": 248, "height": 204 }
+				"right-wing": {
+					"x": 35.09,
+					"y": 78.11,
+					"rotation": -130.34,
+					"width": 365,
+					"height": 643,
+					"sequence": { "count": 9, "digits": 2 }
+				}
 			},
 			"tail1": {
 				"tail01": { "x": 22.6, "y": -4.5, "rotation": 163.85, "width": 120, "height": 153 }
@@ -453,50 +451,6 @@
 ],
 "animations": {
 	"flying": {
-		"slots": {
-			"left-wing": {
-				"attachment": [
-					{ "time": 0.0667, "name": "left-wing02" },
-					{ "time": 0.1333, "name": "left-wing03" },
-					{ "time": 0.2, "name": "left-wing04" },
-					{ "time": 0.2667, "name": "left-wing05" },
-					{ "time": 0.3333, "name": "left-wing06" },
-					{ "time": 0.4, "name": "left-wing07" },
-					{ "time": 0.4667, "name": "left-wing08" },
-					{ "time": 0.5333, "name": "left-wing09" },
-					{ "time": 0.6, "name": "left-wing01" },
-					{ "time": 0.7333, "name": "left-wing02" },
-					{ "time": 0.8, "name": "left-wing03" },
-					{ "time": 0.8333, "name": "left-wing04" },
-					{ "time": 0.8667, "name": "left-wing05" },
-					{ "time": 0.9, "name": "left-wing06" },
-					{ "time": 0.9333, "name": "left-wing07" },
-					{ "time": 0.9667, "name": "left-wing08" },
-					{ "time": 1, "name": "left-wing01" }
-				]
-			},
-			"right-wing": {
-				"attachment": [
-					{ "time": 0.0667, "name": "right-wing02" },
-					{ "time": 0.1333, "name": "right-wing03" },
-					{ "time": 0.2, "name": "right-wing04" },
-					{ "time": 0.2667, "name": "right-wing05" },
-					{ "time": 0.3333, "name": "right-wing06" },
-					{ "time": 0.4, "name": "right-wing07" },
-					{ "time": 0.4667, "name": "right-wing08" },
-					{ "time": 0.5333, "name": "right-wing09" },
-					{ "time": 0.6, "name": "right-wing01" },
-					{ "time": 0.7333, "name": "right-wing02" },
-					{ "time": 0.8, "name": "right-wing03" },
-					{ "time": 0.8333, "name": "right-wing04" },
-					{ "time": 0.8667, "name": "right-wing05" },
-					{ "time": 0.9, "name": "right-wing06" },
-					{ "time": 0.9333, "name": "right-wing07" },
-					{ "time": 0.9667, "name": "right-wing08" },
-					{ "time": 1, "name": "right-wing01" }
-				]
-			}
-		},
 		"bones": {
 			"back": {
 				"rotate": [
@@ -1092,6 +1046,32 @@
 					},
 					{ "time": 1 }
 				]
+			}
+		},
+		"attachments": {
+			"default": {
+				"left-wing": {
+					"left-wing": {
+						"sequence": [
+							{ "mode": "loop", "delay": 0.0667 },
+							{ "time": 0.6 },
+							{ "time": 0.7333, "mode": "loop", "index": 1 },
+							{ "time": 0.8, "mode": "loop", "index": 2, "delay": 0.0333 },
+							{ "time": 0.9667, "index": 7 }
+						]
+					}
+				},
+				"right-wing": {
+					"right-wing": {
+						"sequence": [
+							{ "mode": "loop", "delay": 0.0667 },
+							{ "time": 0.6 },
+							{ "time": 0.7333, "mode": "loop", "index": 1 },
+							{ "time": 0.8, "mode": "loop", "index": 2, "delay": 0.0333 },
+							{ "time": 0.9667, "index": 7 }
+						]
+					}
+				}
 			}
 		}
 	}

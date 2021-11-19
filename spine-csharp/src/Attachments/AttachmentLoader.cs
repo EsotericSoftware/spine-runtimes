@@ -30,10 +30,10 @@
 namespace Spine {
 	public interface AttachmentLoader {
 		/// <return>May be null to not load any attachment.</return>
-		RegionAttachment NewRegionAttachment (Skin skin, string name, string path);
+		RegionAttachment NewRegionAttachment (Skin skin, string name, string path, Sequence sequence);
 
 		/// <return>May be null to not load any attachment.</return>
-		MeshAttachment NewMeshAttachment (Skin skin, string name, string path);
+		MeshAttachment NewMeshAttachment (Skin skin, string name, string path, Sequence sequence);
 
 		/// <return>May be null to not load any attachment.</return>
 		BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name);

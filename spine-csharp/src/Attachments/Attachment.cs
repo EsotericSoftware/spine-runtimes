@@ -30,12 +30,20 @@
 using System;
 
 namespace Spine {
+
+	/// <summary>The base class for all attachments.</summary>
 	abstract public class Attachment {
-		public string Name { get; private set; }
+		/// <summary>The attachment's name.</summary>
+		public string Name { get; }
 
 		protected Attachment (string name) {
 			if (name == null) throw new ArgumentNullException("name", "name cannot be null");
-			Name = name;
+			this.Name = name;
+		}
+
+		/// <summary>Copy constructor.</summary>
+		protected Attachment (Attachment other) {
+			Name = other.Name;
 		}
 
 		override public string ToString () {
@@ -44,9 +52,5 @@ namespace Spine {
 
 		///<summary>Returns a copy of the attachment.</summary>
 		public abstract Attachment Copy ();
-	}
-
-	public interface IHasRendererObject {
-		object RendererObject { get; set; }
 	}
 }

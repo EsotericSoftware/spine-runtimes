@@ -176,7 +176,14 @@ namespace Spine.Unity.Editor {
 							requiredPaths.Add((string)data["path"]);
 						else if (data.ContainsKey("name"))
 							requiredPaths.Add((string)data["name"]);
-						else
+						else if (data.ContainsKey("sequence")) {
+							Sequence sequence = SkeletonJson.ReadSequence(data["sequence"]);
+							if (sequence != null)
+								for (int index = 0; index < sequence.Regions.Length; ++index)
+									requiredPaths.Add(sequence.GetPath(attachment.Key, index));
+							else
+								requiredPaths.Add(attachment.Key);
+						} else
 							requiredPaths.Add(attachment.Key);
 					}
 				}
@@ -234,14 +241,26 @@ namespace Spine.Unity.Editor {
 				this.requirementList = requirementList;
 			}
 
-			public RegionAttachment NewRegionAttachment (Skin skin, string name, string path) {
-				requirementList.Add(path);
-				return new RegionAttachment(name);
+			public RegionAttachment NewRegionAttachment (Skin skin, string name, string path, Sequence sequence) {
+				var regionAttachment = new RegionAttachment(name);
+				if (sequence != null)
+					LoadSequence(path, sequence);
+				else {
+					requirementList.Add(path);
+					AssignDummyRegion(regionAttachment);
+				}
+				return regionAttachment;
 			}
 
-			public MeshAttachment NewMeshAttachment (Skin skin, string name, string path) {
-				requirementList.Add(path);
-				return new MeshAttachment(name);
+			public MeshAttachment NewMeshAttachment (Skin skin, string name, string path, Sequence sequence) {
+				var meshAttachment = new MeshAttachment(name);
+				if (sequence != null)
+					LoadSequence(path, sequence);
+				else {
+					requirementList.Add(path);
+					AssignDummyRegion(meshAttachment);
+				}
+				return meshAttachment;
 			}
 
 			public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {
@@ -258,6 +277,18 @@ namespace Spine.Unity.Editor {
 
 			public ClippingAttachment NewClippingAttachment (Skin skin, string name) {
 				return new ClippingAttachment(name);
+			}
+
+			private void LoadSequence (string basePath, Sequence sequence) {
+				TextureRegion[] regions = sequence.Regions;
+				for (int i = 0, n = regions.Length; i < n; i++) {
+					string path = sequence.GetPath(basePath, i);
+					requirementList.Add(path);
+				}
+			}
+
+			private static void AssignDummyRegion (IHasTextureRegion attachment) {
+				attachment.Region = new AtlasRegion();
 			}
 		}
 		#endregion
@@ -1215,7 +1246,6 @@ namespace Spine.Unity.Editor {
 			}
 
 			newSkeletonAnimation.loop = SpineEditorUtilities.Preferences.defaultInstantiateLoop;
-			newSkeletonAnimation.skeleton.Update(0);
 			newSkeletonAnimation.state.Update(0);
 			newSkeletonAnimation.state.Apply(newSkeletonAnimation.skeleton);
 			newSkeletonAnimation.skeleton.UpdateWorldTransform();
@@ -1301,7 +1331,6 @@ namespace Spine.Unity.Editor {
 				throw e;
 			}
 
-			newSkeletonMecanim.skeleton.Update(0);
 			newSkeletonMecanim.skeleton.UpdateWorldTransform();
 			newSkeletonMecanim.LateUpdate();
 

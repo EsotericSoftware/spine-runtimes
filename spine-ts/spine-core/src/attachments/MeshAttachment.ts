@@ -181,7 +181,7 @@ export class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		Utils.arrayCopy(this.triangles, 0, copy.triangles, 0, this.triangles.length);
 		copy.hullLength = this.hullLength;
 
-		copy.sequence = this.sequence.copy();
+		copy.sequence = this.sequence != null ? this.sequence.copy() : null;
 
 		// Nonessential.
 		if (this.edges) {
