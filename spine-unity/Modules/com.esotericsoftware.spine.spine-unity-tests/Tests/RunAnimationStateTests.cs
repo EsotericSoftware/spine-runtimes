@@ -10,7 +10,6 @@ namespace Spine.Unity.Tests {
 		public void RunAnimationStateTestsSimplePasses () {
 			AnimationStateTests.logImplementation += Log;
 			AnimationStateTests.failImplementation += Fail;
-			//AnimationStateTests.Main("Assets/SpineTests/spine-csharp-tests/tests/assets/test.json");
 
 			string testJsonFilename = "test";
 			string testJsonPathEnd = "tests/assets/" + testJsonFilename + ".json";
