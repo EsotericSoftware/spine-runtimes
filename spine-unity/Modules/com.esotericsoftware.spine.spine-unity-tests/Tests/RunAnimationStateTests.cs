@@ -39,7 +39,20 @@ namespace Spine.Unity.Tests {
 		public void RunAnimationStateTestsSimplePasses () {
 			AnimationStateTests.logImplementation += Log;
 			AnimationStateTests.failImplementation += Fail;
-			AnimationStateTests.Main("Assets/SpineTests/spine-csharp-tests/tests/assets/test.json");
+
+			string testJsonFilename = "test";
+			string testJsonPathEnd = "tests/assets/" + testJsonFilename + ".json";
+			var guids = UnityEditor.AssetDatabase.FindAssets(testJsonFilename + " t:textasset");
+			if (guids.Length <= 0) Fail(testJsonFilename + ".json asset not found.");
+
+			foreach (var guid in guids) {
+				string assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+				if (assetPath.EndsWith(testJsonPathEnd)) {
+					AnimationStateTests.Main(assetPath);
+					return;
+				}
+			}
+			Fail(testJsonPathEnd + " not found.");
 		}
 
 		public void Log (string message) {
