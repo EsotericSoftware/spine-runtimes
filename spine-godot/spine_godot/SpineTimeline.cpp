@@ -92,7 +92,7 @@ Array SpineTimeline::getPropertyIds() {
 	res.resize(ids.size());
 
 	for (size_t i = 0; i < res.size(); ++i) {
-		res[i] = ids[i];
+		res[i] = (int64_t) ids[i];
 	}
 
 	return res;
