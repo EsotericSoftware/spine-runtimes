@@ -202,6 +202,8 @@ namespace Spine.Unity {
 				return Vector2.zero;
 
 			TranslateTimeline translateTimeline = animation.FindTranslateTimelineForBone(rootMotionBoneIndex);
+			TranslateXTimeline xTimeline = animation.FindTimelineForBone<TranslateXTimeline>(rootMotionBoneIndex);
+			TranslateYTimeline yTimeline = animation.FindTimelineForBone<TranslateYTimeline>(rootMotionBoneIndex);
 
 			// Non-looped base
 			Vector2 endPos = Vector2.zero;
@@ -209,6 +211,9 @@ namespace Spine.Unity {
 			if (translateTimeline != null) {
 				endPos = translateTimeline.Evaluate(endTime);
 				startPos = translateTimeline.Evaluate(startTime);
+			} else if (xTimeline != null || yTimeline != null) {
+				endPos = TimelineExtensions.Evaluate(xTimeline, yTimeline, endTime);
+				startPos = TimelineExtensions.Evaluate(xTimeline, yTimeline, startTime);
 			}
 			var transformConstraintsItems = skeletonComponent.Skeleton.TransformConstraints.Items;
 			foreach (int constraintIndex in this.transformConstraintIndices) {
@@ -225,6 +230,9 @@ namespace Spine.Unity {
 				if (translateTimeline != null) {
 					loopPos = translateTimeline.Evaluate(animation.Duration);
 					zeroPos = translateTimeline.Evaluate(0);
+				} else if (xTimeline != null || yTimeline != null) {
+					loopPos = TimelineExtensions.Evaluate(xTimeline, yTimeline, animation.Duration);
+					zeroPos = TimelineExtensions.Evaluate(xTimeline, yTimeline, 0);
 				}
 				foreach (int constraintIndex in this.transformConstraintIndices) {
 					TransformConstraint constraint = transformConstraintsItems[constraintIndex];
@@ -266,15 +274,25 @@ namespace Spine.Unity {
 
 		public RootMotionInfo GetAnimationRootMotionInfo (Animation animation, float currentTime) {
 			RootMotionInfo rootMotion = new RootMotionInfo();
-			var timeline = animation.FindTranslateTimelineForBone(rootMotionBoneIndex);
+			float duration = animation.Duration;
+			float mid = duration * 0.5f;
+			rootMotion.timeIsPastMid = currentTime > mid;
+			TranslateTimeline timeline = animation.FindTranslateTimelineForBone(rootMotionBoneIndex);
 			if (timeline != null) {
-				float duration = animation.Duration;
-				float mid = duration * 0.5f;
 				rootMotion.start = timeline.Evaluate(0);
 				rootMotion.current = timeline.Evaluate(currentTime);
 				rootMotion.mid = timeline.Evaluate(mid);
 				rootMotion.end = timeline.Evaluate(duration);
-				rootMotion.timeIsPastMid = currentTime > mid;
+				return rootMotion;
+			}
+			TranslateXTimeline xTimeline = animation.FindTimelineForBone<TranslateXTimeline>(rootMotionBoneIndex);
+			TranslateYTimeline yTimeline = animation.FindTimelineForBone<TranslateYTimeline>(rootMotionBoneIndex);
+			if (xTimeline != null || yTimeline != null) {
+				rootMotion.start = TimelineExtensions.Evaluate(xTimeline, yTimeline, 0);
+				rootMotion.current = TimelineExtensions.Evaluate(xTimeline, yTimeline, currentTime);
+				rootMotion.mid = TimelineExtensions.Evaluate(xTimeline, yTimeline, mid);
+				rootMotion.end = TimelineExtensions.Evaluate(xTimeline, yTimeline, duration);
+				return rootMotion;
 			}
 			return rootMotion;
 		}
@@ -291,6 +309,24 @@ namespace Spine.Unity {
 					transformConstraintLastPos.Add(constraintPos);
 				}
 			}
+		}
+
+		Vector2 GetTimelineMovementDelta (float startTime, float endTime,
+			TranslateXTimeline xTimeline, TranslateYTimeline yTimeline, Animation animation) {
+
+			Vector2 currentDelta;
+			if (startTime > endTime) // Looped
+				currentDelta =
+					(TimelineExtensions.Evaluate(xTimeline, yTimeline, animation.Duration)
+					- TimelineExtensions.Evaluate(xTimeline, yTimeline, startTime))
+					+ (TimelineExtensions.Evaluate(xTimeline, yTimeline, endTime)
+					- TimelineExtensions.Evaluate(xTimeline, yTimeline, 0));
+			else if (startTime != endTime) // Non-looped
+				currentDelta = TimelineExtensions.Evaluate(xTimeline, yTimeline, endTime)
+					- TimelineExtensions.Evaluate(xTimeline, yTimeline, startTime);
+			else
+				currentDelta = Vector2.zero;
+			return currentDelta;
 		}
 
 		void GatherTopLevelBones () {
