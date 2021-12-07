@@ -52,6 +52,27 @@ namespace Spine.Unity.AnimationTools {
 			}
 		}
 
+		/// <summary>Evaluates the resulting value of a pair of split translate timelines at a given time.
+		/// SkeletonData can be accessed from Skeleton.Data or from SkeletonDataAsset.GetSkeletonData.
+		/// If no SkeletonData is given, values are returned as difference to setup pose
+		/// instead of absolute values.</summary>
+		public static Vector2 Evaluate (TranslateXTimeline xTimeline, TranslateYTimeline yTimeline,
+			float time, SkeletonData skeletonData = null) {
+
+			float x = 0, y = 0;
+			if (xTimeline != null && time > xTimeline.Frames[0]) x = xTimeline.GetCurveValue(time);
+			if (yTimeline != null && time > yTimeline.Frames[0]) y = yTimeline.GetCurveValue(time);
+
+			if (skeletonData == null) {
+				return new Vector2(x, y);
+			} else {
+				var bonesItems = skeletonData.Bones.Items;
+				BoneData boneDataX = bonesItems[xTimeline.BoneIndex];
+				BoneData boneDataY = bonesItems[yTimeline.BoneIndex];
+				return new Vector2(boneDataX.X + x, boneDataY.Y + y);
+			}
+		}
+
 		/// <summary>Gets the translate timeline for a given boneIndex.
 		/// You can get the boneIndex using SkeletonData.FindBoneIndex.
 		/// The root bone is always boneIndex 0.
@@ -62,6 +83,19 @@ namespace Spine.Unity.AnimationTools {
 					continue;
 
 				var translateTimeline = timeline as TranslateTimeline;
+				if (translateTimeline != null && translateTimeline.BoneIndex == boneIndex)
+					return translateTimeline;
+			}
+			return null;
+		}
+
+		/// <summary>Gets the IBoneTimeline timeline of a given type for a given boneIndex.
+		/// You can get the boneIndex using SkeletonData.FindBoneIndex.
+		/// The root bone is always boneIndex 0.
+		/// This will return null if a timeline of the given type is not found.</summary>
+		public static T FindTimelineForBone<T> (this Animation a, int boneIndex) where T : class, IBoneTimeline {
+			foreach (var timeline in a.Timelines) {
+				T translateTimeline = timeline as T;
 				if (translateTimeline != null && translateTimeline.BoneIndex == boneIndex)
 					return translateTimeline;
 			}
