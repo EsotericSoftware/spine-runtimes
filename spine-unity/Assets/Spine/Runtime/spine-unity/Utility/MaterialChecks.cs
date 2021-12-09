@@ -301,6 +301,7 @@ namespace Spine.Unity {
 			string shaderName = material.shader.name;
 			return shaderName.Contains("Spine/Sprite/Pixel Lit") ||
 				shaderName.Contains("Spine/Sprite/Vertex Lit") ||
+				shaderName.Contains("Spine/Sprite/Unlit") ||
 				shaderName.Contains("2D/Spine/Sprite") || // covers both URP and LWRP
 				shaderName.Contains("Pipeline/Spine/Sprite"); // covers both URP and LWRP
 		}
