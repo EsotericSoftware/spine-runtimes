@@ -293,16 +293,23 @@ namespace Spine.Unity {
 					break;
 				}
 			}
-			bool isShaderWithMeshNormals = IsSpriteShader(material);
+			bool isShaderWithMeshNormals = IsLitSpriteShader(material);
 			return isShaderWithMeshNormals && !anyFixedNormalSet;
 		}
 
-		static bool IsSpriteShader (Material material) {
+		static bool IsLitSpriteShader (Material material) {
 			string shaderName = material.shader.name;
 			return shaderName.Contains("Spine/Sprite/Pixel Lit") ||
 				shaderName.Contains("Spine/Sprite/Vertex Lit") ||
 				shaderName.Contains("2D/Spine/Sprite") || // covers both URP and LWRP
 				shaderName.Contains("Pipeline/Spine/Sprite"); // covers both URP and LWRP
+		}
+
+		static bool IsSpriteShader (Material material) {
+			if (IsLitSpriteShader(material))
+				return true;
+			string shaderName = material.shader.name;
+			return shaderName.Contains("Spine/Sprite/Unlit");
 		}
 
 		static bool RequiresTintBlack (Material material) {
