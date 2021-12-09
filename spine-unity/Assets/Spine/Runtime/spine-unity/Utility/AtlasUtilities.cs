@@ -193,18 +193,15 @@ namespace Spine.Unity.AttachmentTools {
 			region.index = -1;
 			region.degrees = s.packed && s.packingRotation != SpritePackingRotation.None ? 90 : 0;
 
-			// World space units
-			Bounds bounds = s.bounds;
-			Vector2 boundsMin = bounds.min, boundsMax = bounds.max;
-
 			// Texture space/pixel units
-			Rect spineRect = s.rect.SpineUnityFlipRect(s.texture.height);
+			Rect spineRect = s.textureRect.SpineUnityFlipRect(s.texture.height);
+			Rect originalRect = s.rect;
 			region.width = (int)spineRect.width;
-			region.originalWidth = (int)spineRect.width;
+			region.originalWidth = (int)originalRect.width;
 			region.height = (int)spineRect.height;
-			region.originalHeight = (int)spineRect.height;
-			region.offsetX = spineRect.width * (0.5f - InverseLerp(boundsMin.x, boundsMax.x, 0));
-			region.offsetY = spineRect.height * (0.5f - InverseLerp(boundsMin.y, boundsMax.y, 0));
+			region.originalHeight = (int)originalRect.height;
+			region.offsetX = s.textureRectOffset.x;
+			region.offsetY = s.textureRectOffset.y;
 
 			if (isolatedTexture) {
 				region.u = 0;
