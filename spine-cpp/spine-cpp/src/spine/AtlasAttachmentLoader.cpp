@@ -48,53 +48,44 @@ namespace spine {
 	AtlasAttachmentLoader::AtlasAttachmentLoader(Atlas *atlas) : AttachmentLoader(), _atlas(atlas) {
 	}
 
-	RegionAttachment *AtlasAttachmentLoader::newRegionAttachment(Skin &skin, const String &name, const String &path) {
-		SP_UNUSED(skin);
-
-		AtlasRegion *regionP = findRegion(path);
-		if (!regionP) return NULL;
-
-		AtlasRegion &region = *regionP;
-
-		RegionAttachment *attachmentP = new (__FILE__, __LINE__) RegionAttachment(name);
-
-		RegionAttachment &attachment = *attachmentP;
-		attachment.setRendererObject(regionP);
-		attachment.setUVs(region.u, region.v, region.u2, region.v2, region.degrees);
-		attachment._regionOffsetX = region.offsetX;
-		attachment._regionOffsetY = region.offsetY;
-		attachment._regionWidth = (float) region.width;
-		attachment._regionHeight = (float) region.height;
-		attachment._regionOriginalWidth = (float) region.originalWidth;
-		attachment._regionOriginalHeight = (float) region.originalHeight;
-		return attachmentP;
+	bool loadSequence (Atlas *atlas, const String &basePath, Sequence *sequence) {
+		Vector<TextureRegion *> &regions = sequence->getRegions();
+		for (int i = 0, n = regions.size(); i < n; i++) {
+			String path = sequence->getPath(basePath, i);
+			regions[i] = atlas->findRegion(path);
+			if (!regions[i]) return false;
+			regions[i]->rendererObject = regions[i];
+		}
+		return true;
 	}
 
-	MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const String &name, const String &path) {
+	RegionAttachment *AtlasAttachmentLoader::newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
 		SP_UNUSED(skin);
+		RegionAttachment *attachment = new(__FILE__, __LINE__) RegionAttachment(name);
+		if (sequence) {
+			if (!loadSequence(_atlas, path, sequence)) return NULL;
+		} else {
+			AtlasRegion *region = findRegion(path);
+			if (!region) return NULL;
+			attachment->setRendererObject(region);
+			attachment->setRegion(region);
+		}
+		return attachment;
+	}
 
-		AtlasRegion *regionP = findRegion(path);
-		if (!regionP) return NULL;
+	MeshAttachment *AtlasAttachmentLoader::newMeshAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
+		SP_UNUSED(skin);
+		MeshAttachment *attachment = new (__FILE__, __LINE__) MeshAttachment(name);
 
-		AtlasRegion &region = *regionP;
-
-		MeshAttachment *attachmentP = new (__FILE__, __LINE__) MeshAttachment(name);
-
-		MeshAttachment &attachment = *attachmentP;
-		attachment.setRendererObject(regionP);
-		attachment._regionU = region.u;
-		attachment._regionV = region.v;
-		attachment._regionU2 = region.u2;
-		attachment._regionV2 = region.v2;
-		attachment._regionDegrees = region.degrees;
-		attachment._regionOffsetX = region.offsetX;
-		attachment._regionOffsetY = region.offsetY;
-		attachment._regionWidth = (float) region.width;
-		attachment._regionHeight = (float) region.height;
-		attachment._regionOriginalWidth = (float) region.originalWidth;
-		attachment._regionOriginalHeight = (float) region.originalHeight;
-
-		return attachmentP;
+		if (sequence) {
+			if (!loadSequence(_atlas, path, sequence)) return NULL;
+		} else {
+			AtlasRegion *region = findRegion(path);
+			if (!region) return NULL;
+			attachment->setRendererObject(region);
+			attachment->setRegion(region);
+		}
+		return attachment;
 	}
 
 	BoundingBoxAttachment *AtlasAttachmentLoader::newBoundingBoxAttachment(Skin &skin, const String &name) {

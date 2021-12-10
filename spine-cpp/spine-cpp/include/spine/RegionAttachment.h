@@ -33,6 +33,8 @@
 #include <spine/Attachment.h>
 #include <spine/Vector.h>
 #include <spine/Color.h>
+#include <spine/Sequence.h>
+#include <spine/TextureRegion.h>
 
 #include <spine/HasRendererObject.h>
 
@@ -54,7 +56,9 @@ namespace spine {
 	public:
 		explicit RegionAttachment(const String &name);
 
-		void updateOffset();
+		virtual ~RegionAttachment();
+
+		void updateRegion();
 
 		void setUVs(float u, float v, float u2, float v2, float degrees);
 
@@ -63,9 +67,9 @@ namespace spine {
 		/// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + 8.
 		/// @param offset The worldVertices index to begin writing values.
 		/// @param stride The number of worldVertices entries between the value pairs written.
-		void computeWorldVertices(Bone &bone, float *worldVertices, size_t offset, size_t stride = 2);
+		void computeWorldVertices(Slot &slot, float *worldVertices, size_t offset, size_t stride = 2);
 
-		void computeWorldVertices(Bone &bone, Vector<float> &worldVertices, size_t offset, size_t stride = 2);
+		void computeWorldVertices(Slot &slot, Vector<float> &worldVertices, size_t offset, size_t stride = 2);
 
 		float getX();
 
@@ -101,29 +105,13 @@ namespace spine {
 
 		void setPath(const String &inValue);
 
-		float getRegionOffsetX();
+		TextureRegion *getRegion();
 
-		void setRegionOffsetX(float inValue);
+		void setRegion(TextureRegion *region);
 
-		float getRegionOffsetY();
+		Sequence *getSequence();
 
-		void setRegionOffsetY(float inValue);
-
-		float getRegionWidth();
-
-		void setRegionWidth(float inValue);
-
-		float getRegionHeight();
-
-		void setRegionHeight(float inValue);
-
-		float getRegionOriginalWidth();
-
-		void setRegionOriginalWidth(float inValue);
-
-		float getRegionOriginalHeight();
-
-		void setRegionOriginalHeight(float inValue);
+		void setSequence(Sequence *sequence);
 
 		Vector<float> &getOffset();
 
@@ -142,15 +130,12 @@ namespace spine {
 		static const int BRY;
 
 		float _x, _y, _rotation, _scaleX, _scaleY, _width, _height;
-		float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
 		Vector<float> _vertexOffset;
 		Vector<float> _uvs;
 		String _path;
-		float _regionU;
-		float _regionV;
-		float _regionU2;
-		float _regionV2;
 		Color _color;
+		TextureRegion *_region;
+		Sequence *_sequence;
 	};
 }
 

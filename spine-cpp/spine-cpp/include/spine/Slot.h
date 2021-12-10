@@ -114,11 +114,11 @@ namespace spine {
 
 		void setAttachmentState(int state);
 
-		float getAttachmentTime();
-
-		void setAttachmentTime(float inValue);
-
 		Vector<float> &getDeform();
+
+		int getSequenceIndex();
+
+		void setSequenceIndex(int index);
 
 	private:
 		SlotData &_data;
@@ -129,7 +129,7 @@ namespace spine {
 		bool _hasDarkColor;
 		Attachment *_attachment;
 		int _attachmentState;
-		float _attachmentTime;
+		int _sequenceIndex;
 		Vector<float> _deform;
 	};
 }

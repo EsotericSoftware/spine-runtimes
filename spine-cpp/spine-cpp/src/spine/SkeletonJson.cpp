@@ -569,7 +569,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							color = Json::getString(attachmentMap, "color", 0);
 							if (color) toColor(region->getColor(), color, true);
 
-							region->updateOffset();
+							region->updateRegion();
 							_attachmentLoader->configureAttachment(region);
 							break;
 						}
@@ -610,7 +610,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 
 								readVertices(attachmentMap, mesh, verticesLength);
 
-								mesh->updateUVs();
+								mesh->updateRegion();
 
 								mesh->_hullLength = Json::getInt(attachmentMap, "hull", 0);
 
@@ -722,10 +722,10 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			setError(root, "Parent mesh not found: ", linkedMesh->_parent.buffer());
 			return NULL;
 		}
-		linkedMesh->_mesh->_deformAttachment = linkedMesh->_inheritDeform ? static_cast<VertexAttachment *>(parent)
-																		  : linkedMesh->_mesh;
+		linkedMesh->_mesh->_timelineAttachment = linkedMesh->_inheritDeform ? static_cast<VertexAttachment *>(parent)
+																			: linkedMesh->_mesh;
 		linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
-		linkedMesh->_mesh->updateUVs();
+		linkedMesh->_mesh->updateRegion();
 		_attachmentLoader->configureAttachment(linkedMesh->_mesh);
 	}
 	ContainerUtil::cleanUpVectorOfPointers(_linkedMeshes);

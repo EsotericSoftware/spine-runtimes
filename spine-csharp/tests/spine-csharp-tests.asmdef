@@ -1,0 +1,4 @@
+﻿{
+	"name": "spine-csharp-tests",
+	"references": [ "spine-csharp" ]
+}

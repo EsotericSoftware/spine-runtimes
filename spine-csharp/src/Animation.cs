@@ -2348,6 +2348,30 @@ namespace Spine {
 			}
 
 			float rotate, x, y, scaleX, scaleY, shearY;
+			GetCurveValue(out rotate, out x, out y, out scaleX, out scaleY, out shearY, time);
+
+			if (blend == MixBlend.Setup) {
+				TransformConstraintData data = constraint.data;
+				constraint.mixRotate = data.mixRotate + (rotate - data.mixRotate) * alpha;
+				constraint.mixX = data.mixX + (x - data.mixX) * alpha;
+				constraint.mixY = data.mixY + (y - data.mixY) * alpha;
+				constraint.mixScaleX = data.mixScaleX + (scaleX - data.mixScaleX) * alpha;
+				constraint.mixScaleY = data.mixScaleY + (scaleY - data.mixScaleY) * alpha;
+				constraint.mixShearY = data.mixShearY + (shearY - data.mixShearY) * alpha;
+			} else {
+				constraint.mixRotate += (rotate - constraint.mixRotate) * alpha;
+				constraint.mixX += (x - constraint.mixX) * alpha;
+				constraint.mixY += (y - constraint.mixY) * alpha;
+				constraint.mixScaleX += (scaleX - constraint.mixScaleX) * alpha;
+				constraint.mixScaleY += (scaleY - constraint.mixScaleY) * alpha;
+				constraint.mixShearY += (shearY - constraint.mixShearY) * alpha;
+			}
+		}
+
+		public void GetCurveValue (out float rotate, out float x, out float y,
+			out float scaleX, out float scaleY, out float shearY, float time) {
+
+			float[] frames = this.frames;
 			int i = Search(frames, time, ENTRIES), curveType = (int)curves[i / ENTRIES];
 			switch (curveType) {
 			case LINEAR:
@@ -2382,23 +2406,6 @@ namespace Spine {
 				scaleY = GetBezierValue(time, i, SCALEY, curveType + BEZIER_SIZE * 4 - BEZIER);
 				shearY = GetBezierValue(time, i, SHEARY, curveType + BEZIER_SIZE * 5 - BEZIER);
 				break;
-			}
-
-			if (blend == MixBlend.Setup) {
-				TransformConstraintData data = constraint.data;
-				constraint.mixRotate = data.mixRotate + (rotate - data.mixRotate) * alpha;
-				constraint.mixX = data.mixX + (x - data.mixX) * alpha;
-				constraint.mixY = data.mixY + (y - data.mixY) * alpha;
-				constraint.mixScaleX = data.mixScaleX + (scaleX - data.mixScaleX) * alpha;
-				constraint.mixScaleY = data.mixScaleY + (scaleY - data.mixScaleY) * alpha;
-				constraint.mixShearY = data.mixShearY + (shearY - data.mixShearY) * alpha;
-			} else {
-				constraint.mixRotate += (rotate - constraint.mixRotate) * alpha;
-				constraint.mixX += (x - constraint.mixX) * alpha;
-				constraint.mixY += (y - constraint.mixY) * alpha;
-				constraint.mixScaleX += (scaleX - constraint.mixScaleX) * alpha;
-				constraint.mixScaleY += (scaleY - constraint.mixScaleY) * alpha;
-				constraint.mixShearY += (shearY - constraint.mixShearY) * alpha;
 			}
 		}
 	}

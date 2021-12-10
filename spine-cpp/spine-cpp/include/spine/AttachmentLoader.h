@@ -51,6 +51,8 @@ namespace spine {
 
 	class ClippingAttachment;
 
+	class Sequence;
+
 	class SP_API AttachmentLoader : public SpineObject {
 	public:
 	RTTI_DECL
@@ -60,10 +62,10 @@ namespace spine {
 		virtual ~AttachmentLoader();
 
 		/// @return May be NULL to not load any attachment.
-		virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path) = 0;
+		virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) = 0;
 
 		/// @return May be NULL to not load any attachment.
-		virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path) = 0;
+		virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) = 0;
 
 		/// @return May be NULL to not load any attachment.
 		virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &skin, const String &name) = 0;

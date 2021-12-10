@@ -479,6 +479,40 @@ void coin(SkeletonData *skeletonData, Atlas *atlas) {
 	}
 }
 
+void dragon(SkeletonData *skeletonData, Atlas *atlas) {
+	SP_UNUSED(atlas);
+
+	SkeletonDrawable drawable(skeletonData);
+	drawable.timeScale = 1;
+	drawable.setUsePremultipliedAlpha(true);
+
+	Skeleton *skeleton = drawable.skeleton;
+	skeleton->setPosition(320, 320);
+	skeleton->updateWorldTransform();
+
+	drawable.state->setAnimation(0, "flying", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - dragon");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+
+	while (window.isOpen()) {
+		while (window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed) window.close();
+		}
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable.update(delta);
+
+		window.clear();
+		window.draw(drawable);
+		window.display();
+	}
+}
+
 void owl(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
@@ -610,6 +644,7 @@ DebugExtension dbgExtension(SpineExtension::getInstance());
 int main() {
 	SpineExtension::setInstance(&dbgExtension);
 
+	testcase(dragon, "data/dragon-ess.json", "data/dragon-ess.skel", "data/dragon-pma.atlas", 0.6f);
 	testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);

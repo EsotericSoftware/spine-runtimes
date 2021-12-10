@@ -62,10 +62,10 @@ namespace spine {
 		/// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + count.
 		/// @param offset The worldVertices index to begin writing values.
 		/// @param stride The number of worldVertices entries between the value pairs written.
-		void computeWorldVertices(Slot &slot, size_t start, size_t count, float *worldVertices, size_t offset,
+		virtual void computeWorldVertices(Slot &slot, size_t start, size_t count, float *worldVertices, size_t offset,
 								  size_t stride = 2);
 
-		void computeWorldVertices(Slot &slot, size_t start, size_t count, Vector<float> &worldVertices, size_t offset,
+		virtual void computeWorldVertices(Slot &slot, size_t start, size_t count, Vector<float> &worldVertices, size_t offset,
 								  size_t stride = 2);
 
 		/// Gets a unique ID for this attachment.
@@ -79,9 +79,9 @@ namespace spine {
 
 		void setWorldVerticesLength(size_t inValue);
 
-		VertexAttachment *getDeformAttachment();
+		Attachment * getTimelineAttachment();
 
-		void setDeformAttachment(VertexAttachment *attachment);
+		void setTimelineAttachment(Attachment *attachment);
 
 		void copyTo(VertexAttachment *other);
 
@@ -89,7 +89,7 @@ namespace spine {
 		Vector <size_t> _bones;
 		Vector<float> _vertices;
 		size_t _worldVerticesLength;
-		VertexAttachment *_deformAttachment;
+		Attachment *_timelineAttachment;
 
 	private:
 		const int _id;

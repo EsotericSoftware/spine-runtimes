@@ -5,6 +5,18 @@
 ### SFML
 
 ## C++
+* **Additions**
+  * Support for sequences.
+* **Breaking changes**
+  * `RegionAttachment` and `MeshAttachment` now contain a `TextureRegion*` instead of encoding region fields directly.
+  * `AttachmentLoader::newRegionAttachment()` and `AttachmentLoader::newMeshAttachment()` now take an additional `Sequence*` parameter.
+  * `MeshAttachment::updateUVs()` was renamed to `MeshAttachment::updateRegion()`.
+  * `RegionAttachment::updateOffset()` was renamed to `RegionAttachment::updateRegion()`, `RegionAttachment::setUVs()` was merged into `updateRegion()`.
+  * `Slot::getAttachmentTime()` and `Slot::setAttachmentTime()` have been removed.
+  * `VertexAttachment::getDeformAttachment()` was renamed to `VertexAttachment::getTimelineAttachment()`.
+  * `Skeleton::update()` has been removed.
+  * `Skeleton::getTime()` has been removed.
+  
 
 ### Cocos2d-x
 

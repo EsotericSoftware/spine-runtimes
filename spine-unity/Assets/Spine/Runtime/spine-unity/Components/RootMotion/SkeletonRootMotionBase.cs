@@ -66,6 +66,8 @@ namespace Spine.Unity {
 		protected ISkeletonComponent skeletonComponent;
 		protected Bone rootMotionBone;
 		protected int rootMotionBoneIndex;
+		protected List<int> transformConstraintIndices = new List<int>();
+		protected List<Vector2> transformConstraintLastPos = new List<Vector2>();
 		protected List<Bone> topLevelBones = new List<Bone>();
 		protected Vector2 initialOffset = Vector2.zero;
 		protected Vector2 tempSkeletonDisplacement;
@@ -94,7 +96,6 @@ namespace Spine.Unity {
 				return; // Root motion is only applied when component is enabled.
 
 			if (rigidBody2D != null) {
-
 				Vector2 gravityAndVelocityMovement = Vector2.zero;
 				if (applyRigidbody2DGravity) {
 					float deltaTime = Time.fixedDeltaTime;
@@ -107,11 +108,11 @@ namespace Spine.Unity {
 
 				rigidBody2D.MovePosition(gravityAndVelocityMovement + new Vector2(transform.position.x, transform.position.y)
 					+ rigidbodyDisplacement);
-			}
-			if (rigidBody != null) {
+			} else if (rigidBody != null) {
 				rigidBody.MovePosition(transform.position
 					+ new Vector3(rigidbodyDisplacement.x, rigidbodyDisplacement.y, 0));
-			}
+			} else return;
+
 			Vector2 parentBoneScale;
 			GetScaleAffectingRootMotion(out parentBoneScale);
 			ClearEffectiveBoneOffsets(parentBoneScale);
@@ -155,6 +156,7 @@ namespace Spine.Unity {
 			if (bone != null) {
 				this.rootMotionBoneIndex = bone.Data.Index;
 				this.rootMotionBone = bone;
+				FindTransformConstraintsAffectingBone();
 			} else {
 				Debug.Log("Bone named \"" + name + "\" could not be found.");
 				this.rootMotionBoneIndex = 0;
@@ -196,37 +198,132 @@ namespace Spine.Unity {
 		public Vector2 GetAnimationRootMotion (float startTime, float endTime,
 			Animation animation) {
 
-			var timeline = animation.FindTranslateTimelineForBone(rootMotionBoneIndex);
-			if (timeline != null) {
-				return GetTimelineMovementDelta(startTime, endTime, timeline, animation);
+			if (startTime == endTime)
+				return Vector2.zero;
+
+			TranslateTimeline translateTimeline = animation.FindTranslateTimelineForBone(rootMotionBoneIndex);
+			TranslateXTimeline xTimeline = animation.FindTimelineForBone<TranslateXTimeline>(rootMotionBoneIndex);
+			TranslateYTimeline yTimeline = animation.FindTimelineForBone<TranslateYTimeline>(rootMotionBoneIndex);
+
+			// Non-looped base
+			Vector2 endPos = Vector2.zero;
+			Vector2 startPos = Vector2.zero;
+			if (translateTimeline != null) {
+				endPos = translateTimeline.Evaluate(endTime);
+				startPos = translateTimeline.Evaluate(startTime);
+			} else if (xTimeline != null || yTimeline != null) {
+				endPos = TimelineExtensions.Evaluate(xTimeline, yTimeline, endTime);
+				startPos = TimelineExtensions.Evaluate(xTimeline, yTimeline, startTime);
 			}
-			return Vector2.zero;
+			var transformConstraintsItems = skeletonComponent.Skeleton.TransformConstraints.Items;
+			foreach (int constraintIndex in this.transformConstraintIndices) {
+				TransformConstraint constraint = transformConstraintsItems[constraintIndex];
+				ApplyConstraintToPos(animation, constraint, constraintIndex, endTime, false, ref endPos);
+				ApplyConstraintToPos(animation, constraint, constraintIndex, startTime, true, ref startPos);
+			}
+			Vector2 currentDelta = endPos - startPos;
+
+			// Looped additions
+			if (startTime > endTime) {
+				Vector2 loopPos = Vector2.zero;
+				Vector2 zeroPos = Vector2.zero;
+				if (translateTimeline != null) {
+					loopPos = translateTimeline.Evaluate(animation.Duration);
+					zeroPos = translateTimeline.Evaluate(0);
+				} else if (xTimeline != null || yTimeline != null) {
+					loopPos = TimelineExtensions.Evaluate(xTimeline, yTimeline, animation.Duration);
+					zeroPos = TimelineExtensions.Evaluate(xTimeline, yTimeline, 0);
+				}
+				foreach (int constraintIndex in this.transformConstraintIndices) {
+					TransformConstraint constraint = transformConstraintsItems[constraintIndex];
+					ApplyConstraintToPos(animation, constraint, constraintIndex, animation.Duration, false, ref loopPos);
+					ApplyConstraintToPos(animation, constraint, constraintIndex, 0, false, ref zeroPos);
+				}
+				currentDelta += loopPos - zeroPos;
+			}
+			UpdateLastConstraintPos(transformConstraintsItems);
+			return currentDelta;
+		}
+
+		void ApplyConstraintToPos (Animation animation, TransformConstraint constraint,
+			int constraintIndex, float time, bool useLastConstraintPos, ref Vector2 pos) {
+			TransformConstraintTimeline timeline = animation.FindTransformConstraintTimeline(constraintIndex);
+			if (timeline == null)
+				return;
+			Vector2 mixXY = timeline.EvaluateTranslateXYMix(time);
+			Vector2 invMixXY = timeline.EvaluateTranslateXYMix(time);
+			Vector2 constraintPos;
+			if (useLastConstraintPos)
+				constraintPos = transformConstraintLastPos[constraintIndex];
+			else {
+				Bone targetBone = constraint.Target;
+				constraintPos = new Vector2(targetBone.X, targetBone.Y);
+			}
+			pos = new Vector2(
+				pos.x * invMixXY.x + constraintPos.x * mixXY.x,
+				pos.y * invMixXY.y + constraintPos.y * mixXY.y);
+		}
+
+		void UpdateLastConstraintPos (TransformConstraint[] transformConstraintsItems) {
+			foreach (int constraintIndex in this.transformConstraintIndices) {
+				TransformConstraint constraint = transformConstraintsItems[constraintIndex];
+				Bone targetBone = constraint.Target;
+				transformConstraintLastPos[constraintIndex] = new Vector2(targetBone.X, targetBone.Y);
+			}
 		}
 
 		public RootMotionInfo GetAnimationRootMotionInfo (Animation animation, float currentTime) {
 			RootMotionInfo rootMotion = new RootMotionInfo();
-			var timeline = animation.FindTranslateTimelineForBone(rootMotionBoneIndex);
+			float duration = animation.Duration;
+			float mid = duration * 0.5f;
+			rootMotion.timeIsPastMid = currentTime > mid;
+			TranslateTimeline timeline = animation.FindTranslateTimelineForBone(rootMotionBoneIndex);
 			if (timeline != null) {
-				float duration = animation.Duration;
-				float mid = duration * 0.5f;
 				rootMotion.start = timeline.Evaluate(0);
 				rootMotion.current = timeline.Evaluate(currentTime);
 				rootMotion.mid = timeline.Evaluate(mid);
 				rootMotion.end = timeline.Evaluate(duration);
-				rootMotion.timeIsPastMid = currentTime > mid;
+				return rootMotion;
+			}
+			TranslateXTimeline xTimeline = animation.FindTimelineForBone<TranslateXTimeline>(rootMotionBoneIndex);
+			TranslateYTimeline yTimeline = animation.FindTimelineForBone<TranslateYTimeline>(rootMotionBoneIndex);
+			if (xTimeline != null || yTimeline != null) {
+				rootMotion.start = TimelineExtensions.Evaluate(xTimeline, yTimeline, 0);
+				rootMotion.current = TimelineExtensions.Evaluate(xTimeline, yTimeline, currentTime);
+				rootMotion.mid = TimelineExtensions.Evaluate(xTimeline, yTimeline, mid);
+				rootMotion.end = TimelineExtensions.Evaluate(xTimeline, yTimeline, duration);
+				return rootMotion;
 			}
 			return rootMotion;
 		}
 
+		void FindTransformConstraintsAffectingBone () {
+			var constraints = skeletonComponent.Skeleton.TransformConstraints;
+			var constraintsItems = constraints.Items;
+			for (int i = 0, n = constraints.Count; i < n; ++i) {
+				TransformConstraint constraint = constraintsItems[i];
+				if (constraint.Bones.Contains(rootMotionBone)) {
+					transformConstraintIndices.Add(i);
+					Bone targetBone = constraint.Target;
+					Vector2 constraintPos = new Vector2(targetBone.X, targetBone.Y);
+					transformConstraintLastPos.Add(constraintPos);
+				}
+			}
+		}
+
 		Vector2 GetTimelineMovementDelta (float startTime, float endTime,
-			TranslateTimeline timeline, Animation animation) {
+			TranslateXTimeline xTimeline, TranslateYTimeline yTimeline, Animation animation) {
 
 			Vector2 currentDelta;
 			if (startTime > endTime) // Looped
-				currentDelta = (timeline.Evaluate(animation.Duration) - timeline.Evaluate(startTime))
-					+ (timeline.Evaluate(endTime) - timeline.Evaluate(0));
+				currentDelta =
+					(TimelineExtensions.Evaluate(xTimeline, yTimeline, animation.Duration)
+					- TimelineExtensions.Evaluate(xTimeline, yTimeline, startTime))
+					+ (TimelineExtensions.Evaluate(xTimeline, yTimeline, endTime)
+					- TimelineExtensions.Evaluate(xTimeline, yTimeline, 0));
 			else if (startTime != endTime) // Non-looped
-				currentDelta = timeline.Evaluate(endTime) - timeline.Evaluate(startTime);
+				currentDelta = TimelineExtensions.Evaluate(xTimeline, yTimeline, endTime)
+					- TimelineExtensions.Evaluate(xTimeline, yTimeline, startTime);
 			else
 				currentDelta = Vector2.zero;
 			return currentDelta;
@@ -264,6 +361,19 @@ namespace Spine.Unity {
 			} else {
 				transform.position += transform.TransformVector(skeletonDelta);
 				ClearEffectiveBoneOffsets(parentBoneScale);
+			}
+		}
+
+		void ApplyTransformConstraints () {
+			rootMotionBone.AX = rootMotionBone.X;
+			rootMotionBone.AY = rootMotionBone.Y;
+			var transformConstraintsItems = skeletonComponent.Skeleton.TransformConstraints.Items;
+			foreach (int constraintIndex in this.transformConstraintIndices) {
+				TransformConstraint constraint = transformConstraintsItems[constraintIndex];
+				// apply the constraint and sets Bone.ax and Bone.ay values.
+				/// Update is based on Bone.x and Bone.y, so skeleton.UpdateWorldTransform()
+				/// can be called afterwards without having a different starting point.
+				constraint.Update();
 			}
 		}
 
@@ -309,6 +419,9 @@ namespace Spine.Unity {
 		}
 
 		void SetEffectiveBoneOffsetsTo (Vector2 displacementSkeletonSpace, Vector2 parentBoneScale) {
+
+			ApplyTransformConstraints();
+
 			// Move top level bones in opposite direction of the root motion bone
 			var skeleton = skeletonComponent.Skeleton;
 			foreach (var topLevelBone in topLevelBones) {
@@ -316,8 +429,13 @@ namespace Spine.Unity {
 					if (transformPositionX) topLevelBone.X = displacementSkeletonSpace.x / skeleton.ScaleX;
 					if (transformPositionY) topLevelBone.Y = displacementSkeletonSpace.y / skeleton.ScaleY;
 				} else {
-					float offsetX = (initialOffset.x - rootMotionBone.X) * parentBoneScale.x;
-					float offsetY = (initialOffset.y - rootMotionBone.Y) * parentBoneScale.y;
+					bool useAppliedPosition = transformConstraintIndices.Count > 0;
+					float rootMotionBoneX = useAppliedPosition ? rootMotionBone.AX : rootMotionBone.X;
+					float rootMotionBoneY = useAppliedPosition ? rootMotionBone.AY : rootMotionBone.Y;
+
+					float offsetX = (initialOffset.x - rootMotionBoneX) * parentBoneScale.x;
+					float offsetY = (initialOffset.y - rootMotionBoneY) * parentBoneScale.y;
+
 					if (transformPositionX) topLevelBone.X = (displacementSkeletonSpace.x / skeleton.ScaleX) + offsetX;
 					if (transformPositionY) topLevelBone.Y = (displacementSkeletonSpace.y / skeleton.ScaleY) + offsetY;
 				}

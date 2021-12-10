@@ -298,10 +298,10 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 			setError("Parent mesh not found: ", linkedMesh->_parent.buffer());
 			return NULL;
 		}
-		linkedMesh->_mesh->_deformAttachment = linkedMesh->_inheritDeform ? static_cast<VertexAttachment *>(parent)
-																		  : linkedMesh->_mesh;
+		linkedMesh->_mesh->_timelineAttachment = linkedMesh->_inheritDeform ? static_cast<VertexAttachment *>(parent)
+																			: linkedMesh->_mesh;
 		linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
-		linkedMesh->_mesh->updateUVs();
+		linkedMesh->_mesh->updateRegion();
 		_attachmentLoader->configureAttachment(linkedMesh->_mesh);
 	}
 	ContainerUtil::cleanUpVectorOfPointers(_linkedMeshes);
@@ -502,7 +502,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			region->_width = readFloat(input) * _scale;
 			region->_height = readFloat(input) * _scale;
 			readColor(input, region->getColor());
-			region->updateOffset();
+			region->updateRegion();
 			_attachmentLoader->configureAttachment(region);
 			return region;
 		}
@@ -537,7 +537,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			readFloatArray(input, vertexCount << 1, 1, mesh->getRegionUVs());
 			readShortArray(input, mesh->getTriangles());
 			readVertices(input, static_cast<VertexAttachment *>(mesh), vertexCount);
-			mesh->updateUVs();
+			mesh->updateRegion();
 			mesh->_hullLength = readVarint(input, true) << 1;
 			if (nonessential) {
 				readShortArray(input, mesh->getEdges());

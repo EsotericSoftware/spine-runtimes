@@ -31,6 +31,8 @@
 #define Spine_MeshAttachment_h
 
 #include <spine/VertexAttachment.h>
+#include <spine/TextureRegion.h>
+#include <spine/Sequence.h>
 #include <spine/Vector.h>
 #include <spine/Color.h>
 #include <spine/HasRendererObject.h>
@@ -51,7 +53,10 @@ namespace spine {
 
 		virtual ~MeshAttachment();
 
-		void updateUVs();
+		virtual void computeWorldVertices(Slot &slot, size_t start, size_t count, float *worldVertices, size_t offset,
+		size_t stride = 2);
+
+		void updateRegion();
 
 		int getHullLength();
 
@@ -59,7 +64,7 @@ namespace spine {
 
 		Vector<float> &getRegionUVs();
 
-		/// The UV pair for each vertex, normalized within the entire texture. See also MeshAttachment::updateUVs
+		/// The UV pair for each vertex, normalized within the entire texture. See also MeshAttachment::updateRegion
 		Vector<float> &getUVs();
 
 		Vector<unsigned short> &getTriangles();
@@ -70,52 +75,13 @@ namespace spine {
 
 		void setPath(const String &inValue);
 
-		float getRegionU();
+		TextureRegion *getRegion();
 
-		void setRegionU(float inValue);
+		void setRegion(TextureRegion *region);
 
-		float getRegionV();
+		Sequence *getSequence();
 
-		void setRegionV(float inValue);
-
-		float getRegionU2();
-
-		void setRegionU2(float inValue);
-
-		float getRegionV2();
-
-		void setRegionV2(float inValue);
-
-		int getRegionDegrees();
-
-		void setRegionDegrees(int inValue);
-
-		float getRegionOffsetX();
-
-		void setRegionOffsetX(float inValue);
-
-		// Pixels stripped from the bottom left, unrotated.
-		float getRegionOffsetY();
-
-		void setRegionOffsetY(float inValue);
-
-		float getRegionWidth();
-
-		void setRegionWidth(float inValue);
-
-		// Unrotated, stripped size.
-		float getRegionHeight();
-
-		void setRegionHeight(float inValue);
-
-		float getRegionOriginalWidth();
-
-		void setRegionOriginalWidth(float inValue);
-
-		// Unrotated, unstripped size.
-		float getRegionOriginalHeight();
-
-		void setRegionOriginalHeight(float inValue);
+		void setSequence(Sequence *sequence);
 
 		MeshAttachment *getParentMesh();
 
@@ -137,22 +103,17 @@ namespace spine {
 		MeshAttachment *newLinkedMesh();
 
 	private:
-		float _regionOffsetX, _regionOffsetY, _regionWidth, _regionHeight, _regionOriginalWidth, _regionOriginalHeight;
 		MeshAttachment *_parentMesh;
 		Vector<float> _uvs;
 		Vector<float> _regionUVs;
 		Vector<unsigned short> _triangles;
 		Vector<unsigned short> _edges;
 		String _path;
-		float _regionU;
-		float _regionV;
-		float _regionU2;
-		float _regionV2;
-		float _width;
-		float _height;
 		Color _color;
 		int _hullLength;
-		int _regionDegrees;
+		int _width, _height;
+		TextureRegion *_region;
+		Sequence *_sequence;
 	};
 }
 

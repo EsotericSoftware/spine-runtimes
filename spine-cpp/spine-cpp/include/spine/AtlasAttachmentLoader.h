@@ -48,9 +48,9 @@ namespace spine {
 
 		explicit AtlasAttachmentLoader(Atlas *atlas);
 
-		virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path);
+		virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence);
 
-		virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path);
+		virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence);
 
 		virtual BoundingBoxAttachment *newBoundingBoxAttachment(Skin &skin, const String &name);
 

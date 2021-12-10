@@ -27,47 +27,40 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TestTools;
 
-namespace Spine.Unity.Examples {
-	public class DataAssetsFromExportsExample : MonoBehaviour {
+namespace Spine.Unity.Tests {
+	public class RunAnimationStateTests {
+		[Test]
+		public void RunAnimationStateTestsSimplePasses () {
+			AnimationStateTests.logImplementation += Log;
+			AnimationStateTests.failImplementation += Fail;
 
-		public TextAsset skeletonJson;
-		public TextAsset atlasText;
-		public Texture2D[] textures;
-		public Material materialPropertySource;
+			string testJsonFilename = "test";
+			string testJsonPathEnd = "tests/assets/" + testJsonFilename + ".json";
+			var guids = UnityEditor.AssetDatabase.FindAssets(testJsonFilename + " t:textasset");
+			if (guids.Length <= 0) Fail(testJsonFilename + ".json asset not found.");
 
-		SpineAtlasAsset runtimeAtlasAsset;
-		SkeletonDataAsset runtimeSkeletonDataAsset;
-		SkeletonAnimation runtimeSkeletonAnimation;
-
-		void CreateRuntimeAssetsAndGameObject () {
-			// 1. Create the AtlasAsset (needs atlas text asset and textures, and materials/shader);
-			// 2. Create SkeletonDataAsset (needs json or binary asset file, and an AtlasAsset)
-			// 3. Create SkeletonAnimation (needs a valid SkeletonDataAsset)
-
-			runtimeAtlasAsset = SpineAtlasAsset.CreateRuntimeInstance(atlasText, textures, materialPropertySource, true);
-			runtimeSkeletonDataAsset = SkeletonDataAsset.CreateRuntimeInstance(skeletonJson, runtimeAtlasAsset, true);
+			foreach (var guid in guids) {
+				string assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+				if (assetPath.EndsWith(testJsonPathEnd)) {
+					AnimationStateTests.Main(assetPath);
+					return;
+				}
+			}
+			Fail(testJsonPathEnd + " not found.");
 		}
 
-		IEnumerator Start () {
-			CreateRuntimeAssetsAndGameObject();
-			runtimeSkeletonDataAsset.GetSkeletonData(false); // preload.
-			yield return new WaitForSeconds(0.5f);
+		public void Log (string message) {
+			UnityEngine.Debug.Log(message);
+		}
 
-			runtimeSkeletonAnimation = SkeletonAnimation.NewSkeletonAnimationGameObject(runtimeSkeletonDataAsset);
-
-			// Extra Stuff
-			runtimeSkeletonAnimation.Initialize(false);
-			runtimeSkeletonAnimation.Skeleton.SetSkin("base");
-			runtimeSkeletonAnimation.Skeleton.SetSlotsToSetupPose();
-			runtimeSkeletonAnimation.AnimationState.SetAnimation(0, "run", true);
-			runtimeSkeletonAnimation.GetComponent<MeshRenderer>().sortingOrder = 10;
-			runtimeSkeletonAnimation.transform.Translate(Vector3.down * 2);
-
+		public void Fail (string message) {
+			Assert.Fail(message);
 		}
 	}
-
 }

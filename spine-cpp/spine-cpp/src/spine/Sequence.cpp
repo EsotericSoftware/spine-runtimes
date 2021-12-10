@@ -27,27 +27,71 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using NUnit.Framework;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.TestTools;
+#include <spine/Sequence.h>
+#include <spine/Slot.h>
+#include <spine/Attachment.h>
+#include <spine/RegionAttachment.h>
+#include <spine/MeshAttachment.h>
 
-namespace Spine.Unity.Tests {
-	public class RunAnimationStateTests {
-		[Test]
-		public void RunAnimationStateTestsSimplePasses () {
-			AnimationStateTests.logImplementation += Log;
-			AnimationStateTests.failImplementation += Fail;
-			AnimationStateTests.Main("Assets/SpineTests/spine-csharp-tests/tests/assets/test.json");
-		}
+using namespace spine;
 
-		public void Log (string message) {
-			UnityEngine.Debug.Log(message);
-		}
+Sequence::Sequence() : _id(Sequence::getNextID()),
+					   _regions(),
+					   _start(0),
+					   _digits(0),
+					   _setupIndex(0) {
 
-		public void Fail (string message) {
-			Assert.Fail(message);
+}
+
+Sequence::~Sequence() {
+
+}
+
+Sequence *Sequence::copy() {
+	Sequence *copy = new (__FILE__, __LINE__) Sequence();
+	for (size_t i = 0; i < _regions.size(); i++) {
+		copy->_regions.add(_regions[i]);
+	}
+	copy->_start = _start;
+	copy->_digits = _digits;
+	copy->_setupIndex = _setupIndex;
+	return copy;
+}
+
+void Sequence::apply(Slot *slot, Attachment *attachment) {
+	int index = slot->getSequenceIndex();
+	if (index == -1) index = _setupIndex;
+	if (index >= (int)_regions.size()) index = _regions.size() - 1;
+	TextureRegion *region = _regions[index];
+
+	if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
+		RegionAttachment *regionAttachment = static_cast<RegionAttachment *>(attachment);
+		if (regionAttachment->getRegion() != region) {
+			regionAttachment->setRegion(region);
+			regionAttachment->updateRegion();
 		}
 	}
+
+	if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
+		MeshAttachment *meshAttachment = static_cast<MeshAttachment *>(attachment);
+		if (meshAttachment->getRegion() != region) {
+			meshAttachment->setRegion(region);
+			meshAttachment->updateRegion();
+		}
+	}
+}
+
+String Sequence::getPath(const String &basePath, int index) {
+	String result(basePath);
+	String frame;
+	frame.append(_start + index);
+	for (int i = _digits - frame.length(); i > 0; i--)
+		result.append("0");
+	result.append(frame);
+	return result;
+}
+
+int Sequence::getNextID() {
+	static int _nextID = 0;
+	return _nextID;
 }
