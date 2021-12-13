@@ -1336,6 +1336,9 @@ public class AnimationState {
 	/** The interface to implement for receiving TrackEntry events. It is always safe to call AnimationState methods when receiving
 	 * events.
 	 * <p>
+	 * TrackEntry events are collected during {@link AnimationState#update(float)} and {@link AnimationState#apply(Skeleton)} and
+	 * fired only after those methods are finished.
+	 * <p>
 	 * See TrackEntry {@link TrackEntry#setListener(AnimationStateListener)} and AnimationState
 	 * {@link AnimationState#addListener(AnimationStateListener)}. */
 	static public interface AnimationStateListener {
