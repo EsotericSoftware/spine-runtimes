@@ -150,7 +150,7 @@ void VertexAttachment::setWorldVerticesLength(size_t inValue) {
 	_worldVerticesLength = inValue;
 }
 
-Attachment * VertexAttachment::getTimelineAttachment() {
+Attachment *VertexAttachment::getTimelineAttachment() {
 	return _timelineAttachment;
 }
 

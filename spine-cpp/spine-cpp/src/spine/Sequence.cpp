@@ -40,11 +40,9 @@ Sequence::Sequence() : _id(Sequence::getNextID()),
 					   _start(0),
 					   _digits(0),
 					   _setupIndex(0) {
-
 }
 
 Sequence::~Sequence() {
-
 }
 
 Sequence *Sequence::copy() {
@@ -61,7 +59,7 @@ Sequence *Sequence::copy() {
 void Sequence::apply(Slot *slot, Attachment *attachment) {
 	int index = slot->getSequenceIndex();
 	if (index == -1) index = _setupIndex;
-	if (index >= (int)_regions.size()) index = _regions.size() - 1;
+	if (index >= (int) _regions.size()) index = _regions.size() - 1;
 	TextureRegion *region = _regions[index];
 
 	if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {

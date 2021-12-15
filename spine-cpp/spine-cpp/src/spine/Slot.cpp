@@ -103,8 +103,8 @@ void Slot::setAttachment(Attachment *inValue) {
 		!_attachment ||
 		!inValue->getRTTI().instanceOf(VertexAttachment::rtti) ||
 		!_attachment->getRTTI().instanceOf(VertexAttachment::rtti) ||
-			static_cast<VertexAttachment *>(inValue)->getTimelineAttachment() !=
-		static_cast<VertexAttachment *>(_attachment)->getTimelineAttachment()) {
+		static_cast<VertexAttachment *>(inValue)->getTimelineAttachment() !=
+				static_cast<VertexAttachment *>(_attachment)->getTimelineAttachment()) {
 		_deform.clear();
 	}
 
