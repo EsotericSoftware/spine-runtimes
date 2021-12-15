@@ -34,7 +34,6 @@
 using Spine;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEngine.U2D;
 
@@ -185,7 +184,7 @@ namespace Spine.Unity {
 				texture = AccessPackedTextureEditor(spriteAtlas);
 			else
 #endif
-			texture = AccessPackedTexture(sprites);
+				texture = AccessPackedTexture(sprites);
 
 			Material material = materials[0];
 #if !UNITY_EDITOR
@@ -300,8 +299,7 @@ namespace Spine.Unity {
 			if (sprites.Length == 0) {
 				Debug.LogWarning(string.Format("SpriteAtlas '{0}' contains no sprites. Please make sure all assigned images are set to import type 'Sprite'.", spriteAtlasFile.name), spriteAtlasFile);
 				return;
-			}
-			else if (sprites[0].packingMode == SpritePackingMode.Tight) {
+			} else if (sprites[0].packingMode == SpritePackingMode.Tight) {
 				Debug.LogError(string.Format("SpriteAtlas '{0}': Tight packing is not supported. Please disable 'Tight Packing' in the SpriteAtlas Inspector.", spriteAtlasFile.name), spriteAtlasFile);
 				return;
 			}
