@@ -39,7 +39,7 @@ export class TransformConstraintData extends ConstraintData {
 	bones = new Array<BoneData>();
 
 	/** The target bone whose world transform will be copied to the constrained bones. */
-	target: BoneData;
+	target: BoneData = null;
 
 	mixRotate = 0;
 	mixX = 0;

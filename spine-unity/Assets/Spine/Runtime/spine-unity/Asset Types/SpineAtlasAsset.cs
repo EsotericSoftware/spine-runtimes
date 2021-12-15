@@ -63,7 +63,14 @@ namespace Spine.Unity {
 		}
 
 		/// <summary>
-		/// Creates a runtime AtlasAsset. Only providing the textures is slower because it has to search for atlas page matches. <seealso cref="Spine.Unity.SpineAtlasAsset.CreateRuntimeInstance(TextAsset, Material[], bool)"/></summary>
+		/// Creates a runtime AtlasAsset. Only providing the textures is slower
+		/// because it has to search for atlas page matches.
+		/// </summary>
+		/// <param name="textures">An array of all textures referenced in the provided <c>atlasText</c>
+		/// atlas asset JSON file. When procedurally creating textures, each <c>Texture.name</c>
+		/// needs to be set to the atlas page texture filename without the .png extension,
+		/// e.g. 'my_skeleton' if the png filename listed in the atlas asset file is 'my_skeleton.png'.</param>
+		/// <seealso cref="Spine.Unity.SpineAtlasAsset.CreateRuntimeInstance(TextAsset, Material[], bool)"/>
 		public static SpineAtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Material materialPropertySource, bool initialize) {
 			// Get atlas page names.
 			string atlasString = atlasText.text;
@@ -103,7 +110,12 @@ namespace Spine.Unity {
 		}
 
 		/// <summary>
-		/// Creates a runtime AtlasAsset. Only providing the textures is slower because it has to search for atlas page matches. <seealso cref="Spine.Unity.AtlasAssetBase.CreateRuntimeInstance(TextAsset, Material[], bool)"/></summary>
+		/// Creates a runtime AtlasAsset. Only providing the textures is slower because it has to search for atlas page matches.
+		/// <param name="textures">An array of all textures referenced in the provided <c>atlasText</c>
+		/// atlas asset JSON file. When procedurally creating textures, each <c>Texture.name</c>
+		/// needs to be set to the atlas page texture filename without the .png extension,
+		/// e.g. 'my_skeleton' if the png filename listed in the atlas asset file is 'my_skeleton.png'.</param>
+		/// <seealso cref="Spine.Unity.AtlasAssetBase.CreateRuntimeInstance(TextAsset, Material[], bool)"/></summary>
 		public static SpineAtlasAsset CreateRuntimeInstance (TextAsset atlasText, Texture2D[] textures, Shader shader, bool initialize) {
 			if (shader == null)
 				shader = Shader.Find("Spine/Skeleton");

@@ -64,11 +64,11 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 	color = new Color(1, 1, 1, 1);
 
 	/** The name of the texture region for this attachment. */
-	path: string;
+	path: string = null;
 
-	private rendererObject: any;
-	region: TextureRegion;
-	sequence: Sequence;
+	private rendererObject: any = null;
+	region: TextureRegion = null;
+	sequence: Sequence = null;
 
 	/** For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.
 	 *

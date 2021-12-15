@@ -56,7 +56,7 @@ export class SkeletonBinary {
 	 * See [Scaling](http://esotericsoftware.com/spine-loading-skeleton-data#Scaling) in the Spine Runtimes Guide. */
 	scale = 1;
 
-	attachmentLoader: AttachmentLoader;
+	attachmentLoader: AttachmentLoader = null;
 	private linkedMeshes = new Array<LinkedMesh>();
 
 	constructor (attachmentLoader: AttachmentLoader) {

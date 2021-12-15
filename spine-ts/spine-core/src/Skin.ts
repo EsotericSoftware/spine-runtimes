@@ -36,7 +36,7 @@ import { StringMap } from "./Utils";
 
 /** Stores an entry in the skin consisting of the slot index, name, and attachment **/
 export class SkinEntry {
-	constructor (public slotIndex: number, public name: string, public attachment: Attachment) { }
+	constructor (public slotIndex: number = 0, public name: string = null, public attachment: Attachment = null) { }
 }
 
 /** Stores attachments by slot index and attachment name.
@@ -45,7 +45,7 @@ export class SkinEntry {
  * [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the Spine Runtimes Guide. */
 export class Skin {
 	/** The skin's name, which is unique across all skins in the skeleton. */
-	name: string;
+	name: string = null;
 
 	attachments = new Array<StringMap<Attachment>>();
 	bones = Array<BoneData>();
