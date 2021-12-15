@@ -43,7 +43,7 @@ namespace Spine.Unity.Editor {
 		bool needsReset;
 
 		#region Context Menu Item
-		[MenuItem ("CONTEXT/SkeletonRenderer/Add BoneFollower GameObject")]
+		[MenuItem("CONTEXT/SkeletonRenderer/Add BoneFollower GameObject")]
 		static void AddBoneFollowerGameObject (MenuCommand cmd) {
 			var skeletonRenderer = cmd.context as SkeletonRenderer;
 			var go = EditorInstantiation.NewGameObject("New BoneFollower", true);
@@ -60,7 +60,7 @@ namespace Spine.Unity.Editor {
 		}
 
 		// Validate
-		[MenuItem ("CONTEXT/SkeletonRenderer/Add BoneFollower GameObject", true)]
+		[MenuItem("CONTEXT/SkeletonRenderer/Add BoneFollower GameObject", true)]
 		static bool ValidateAddBoneFollowerGameObject (MenuCommand cmd) {
 			var skeletonRenderer = cmd.context as SkeletonRenderer;
 			return skeletonRenderer.valid;
