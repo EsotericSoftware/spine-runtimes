@@ -48,7 +48,7 @@ import { Utils, Color, NumberArrayLike } from "./Utils";
  * [JSON and binary data](http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data) in the Spine
  * Runtimes Guide. */
 export class SkeletonJson {
-	attachmentLoader: AttachmentLoader;
+	attachmentLoader: AttachmentLoader = null;
 
 	/** Scales bone positions, image sizes, and translations as they are loaded. This allows different size images to be used at
 	 * runtime than were used in Spine.

@@ -46,34 +46,34 @@ import { Color, Utils, MathUtils, Vector2, NumberArrayLike } from "./Utils";
  * See [Instance objects](http://esotericsoftware.com/spine-runtime-architecture#Instance-objects) in the Spine Runtimes Guide. */
 export class Skeleton {
 	/** The skeleton's setup pose data. */
-	data: SkeletonData;
+	data: SkeletonData = null;
 
 	/** The skeleton's bones, sorted parent first. The root bone is always the first bone. */
-	bones: Array<Bone>;
+	bones: Array<Bone> = null;
 
 	/** The skeleton's slots. */
-	slots: Array<Slot>;
+	slots: Array<Slot> = null;
 
 	/** The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order. */
-	drawOrder: Array<Slot>;
+	drawOrder: Array<Slot> = null;
 
 	/** The skeleton's IK constraints. */
-	ikConstraints: Array<IkConstraint>;
+	ikConstraints: Array<IkConstraint> = null;
 
 	/** The skeleton's transform constraints. */
-	transformConstraints: Array<TransformConstraint>;
+	transformConstraints: Array<TransformConstraint> = null;
 
 	/** The skeleton's path constraints. */
-	pathConstraints: Array<PathConstraint>;
+	pathConstraints: Array<PathConstraint> = null;
 
 	/** The list of bones and constraints, sorted in the order they should be updated, as computed by {@link #updateCache()}. */
 	_updateCache = new Array<Updatable>();
 
 	/** The skeleton's current skin. May be null. */
-	skin: Skin;
+	skin: Skin = null;
 
 	/** The color to tint all the skeleton's attachments. */
-	color: Color;
+	color: Color = null;
 
 	/** Returns the skeleton's time. This can be used for tracking, such as with Slot {@link Slot#attachmentTime}.
 	 * <p>

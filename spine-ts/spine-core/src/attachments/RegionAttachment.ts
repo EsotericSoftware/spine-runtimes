@@ -61,10 +61,10 @@ export class RegionAttachment extends Attachment {
 	color = new Color(1, 1, 1, 1);
 
 	/** The name of the texture region for this attachment. */
-	path: string;
+	path: string = null;
 
-	rendererObject: any;
-	region: TextureRegion;
+	rendererObject: any = null;
+	region: TextureRegion = null;
 
 	/** For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.
 	 *

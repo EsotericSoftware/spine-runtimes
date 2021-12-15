@@ -33,13 +33,13 @@ import { Color } from "./Utils";
 /** Stores the setup pose for a {@link Slot}. */
 export class SlotData {
 	/** The index of the slot in {@link Skeleton#getSlots()}. */
-	index: number;
+	index: number = 0;
 
 	/** The name of the slot, which is unique across all slots in the skeleton. */
-	name: string;
+	name: string = null;
 
 	/** The bone this slot belongs to. */
-	boneData: BoneData;
+	boneData: BoneData = null;
 
 	/** The color used to tint the slot's attachment. If {@link #getDarkColor()} is set, this is used as the light color for two
 	 * color tinting. */
@@ -47,13 +47,13 @@ export class SlotData {
 
 	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
 	 * color's alpha is not used. */
-	darkColor: Color;
+	darkColor: Color = null;
 
 	/** The name of the attachment that is visible for this slot in the setup pose, or null if no attachment is visible. */
-	attachmentName: string;
+	attachmentName: string = null;
 
 	/** The blend mode for drawing the slot's attachment. */
-	blendMode: BlendMode;
+	blendMode: BlendMode = null;
 
 	constructor (index: number, name: string, boneData: BoneData) {
 		if (index < 0) throw new Error("index must be >= 0.");

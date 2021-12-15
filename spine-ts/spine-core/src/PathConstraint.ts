@@ -45,13 +45,13 @@ export class PathConstraint implements Updatable {
 	static epsilon = 0.00001;
 
 	/** The path constraint's setup pose data. */
-	data: PathConstraintData;
+	data: PathConstraintData = null;
 
 	/** The bones that will be modified by this path constraint. */
-	bones: Array<Bone>;
+	bones: Array<Bone> = null;
 
 	/** The slot whose path attachment will be used to constrained the bones. */
-	target: Slot;
+	target: Slot = null;
 
 	/** The position along the path. */
 	position = 0;

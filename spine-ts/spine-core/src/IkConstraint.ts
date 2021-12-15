@@ -40,13 +40,13 @@ import { MathUtils } from "./Utils";
  * See [IK constraints](http://esotericsoftware.com/spine-ik-constraints) in the Spine User Guide. */
 export class IkConstraint implements Updatable {
 	/** The IK constraint's setup pose data. */
-	data: IkConstraintData;
+	data: IkConstraintData = null;
 
 	/** The bones that will be modified by this IK constraint. */
-	bones: Array<Bone>;
+	bones: Array<Bone> = null;
 
 	/** The bone that is the IK target. */
-	target: Bone;
+	target: Bone = null;
 
 	/** Controls the bend direction of the IK bones, either 1 or -1. */
 	bendDirection = 0;

@@ -12,6 +12,8 @@
 		],
 		"declaration": true,
 		"composite": true,
-		"moduleResolution": "node",
+		"moduleResolution": "node"
+		/*"strictNullChecks": true,
+		"strictPropertyInitialization": true*/
 	}
 }

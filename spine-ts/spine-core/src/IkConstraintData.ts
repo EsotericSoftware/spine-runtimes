@@ -39,7 +39,7 @@ export class IkConstraintData extends ConstraintData {
 	bones = new Array<BoneData>();
 
 	/** The bone that is the IK target. */
-	target: BoneData;
+	target: BoneData = null;
 
 	/** Controls the bend direction of the IK bones, either 1 or -1. */
 	bendDirection = 1;

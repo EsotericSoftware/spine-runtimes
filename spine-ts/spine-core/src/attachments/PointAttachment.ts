@@ -37,7 +37,9 @@ import { VertexAttachment, Attachment } from "./Attachment";
  *
  * See [Point Attachments](http://esotericsoftware.com/spine-point-attachments) in the Spine User Guide. */
 export class PointAttachment extends VertexAttachment {
-	x: number; y: number; rotation: number;
+	x: number = 0;
+	y: number = 0;
+	rotation: number = 0;
 
 	/** The color of the point attachment as it was in Spine. Available only when nonessential data was exported. Point attachments
 	 * are not usually rendered at runtime. */

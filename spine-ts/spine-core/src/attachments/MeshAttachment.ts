@@ -37,39 +37,39 @@ import { VertexAttachment, Attachment } from "./Attachment";
  *
  * See [Mesh attachments](http://esotericsoftware.com/spine-meshes) in the Spine User Guide. */
 export class MeshAttachment extends VertexAttachment {
-	region: TextureRegion;
+	region: TextureRegion = null;
 
 	/** The name of the texture region for this attachment. */
-	path: string;
+	path: string = null;
 
 	/** The UV pair for each vertex, normalized within the texture region. */
-	regionUVs: NumberArrayLike;
+	regionUVs: NumberArrayLike = null;
 
 	/** The UV pair for each vertex, normalized within the entire texture.
 	 *
 	 * See {@link #updateUVs}. */
-	uvs: NumberArrayLike;
+	uvs: NumberArrayLike = null;
 
 	/** Triplets of vertex indices which describe the mesh's triangulation. */
-	triangles: Array<number>;
+	triangles: Array<number> = null;
 
 	/** The color to tint the mesh. */
 	color = new Color(1, 1, 1, 1);
 
 	/** The width of the mesh's image. Available only when nonessential data was exported. */
-	width: number;
+	width: number = 0;
 
 	/** The height of the mesh's image. Available only when nonessential data was exported. */
-	height: number;
+	height: number = 0;
 
 	/** The number of entries at the beginning of {@link #vertices} that make up the mesh hull. */
-	hullLength: number;
+	hullLength: number = 0;
 
 	/** Vertex index pairs describing edges for controling triangulation. Mesh triangles will never cross edges. Only available if
 	 * nonessential data was exported. Triangulation is not performed at runtime. */
-	edges: Array<number>;
+	edges: Array<number> = null;
 
-	private parentMesh: MeshAttachment;
+	private parentMesh: MeshAttachment = null;
 	tempColor = new Color(0, 0, 0, 0);
 
 	constructor (name: string) {

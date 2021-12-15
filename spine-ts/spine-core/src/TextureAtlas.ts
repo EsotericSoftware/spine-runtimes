@@ -198,7 +198,7 @@ export class TextureAtlas implements Disposable {
 }
 
 class TextureAtlasReader {
-	lines: Array<string>;
+	lines: Array<string> = null;
 	index: number = 0;
 
 	constructor (text: string) {
@@ -233,15 +233,15 @@ class TextureAtlasReader {
 }
 
 export class TextureAtlasPage {
-	name: string;
+	name: string = null;
 	minFilter: TextureFilter = TextureFilter.Nearest;
 	magFilter: TextureFilter = TextureFilter.Nearest;
 	uWrap: TextureWrap = TextureWrap.ClampToEdge;
 	vWrap: TextureWrap = TextureWrap.ClampToEdge;
-	texture: Texture;
-	width: number;
-	height: number;
-	pma: boolean;
+	texture: Texture = null;
+	width: number = 0;
+	height: number = 0;
+	pma: boolean = false;
 
 	setTexture (texture: Texture) {
 		this.texture = texture;
@@ -251,16 +251,16 @@ export class TextureAtlasPage {
 }
 
 export class TextureAtlasRegion extends TextureRegion {
-	page: TextureAtlasPage;
-	name: string;
-	x: number;
-	y: number;
-	offsetX: number;
-	offsetY: number;
-	originalWidth: number;
-	originalHeight: number;
-	index: number;
-	degrees: number;
-	names: string[];
-	values: number[][];
+	page: TextureAtlasPage = null;
+	name: string = null;
+	x: number = 0;
+	y: number = 0;
+	offsetX: number = 0;
+	offsetY: number = 0;
+	originalWidth: number = 0;
+	originalHeight: number = 0;
+	index: number = 0;
+	degrees: number = 0;
+	names: string[] = null;
+	values: number[][] = null;
 }

@@ -31,13 +31,13 @@
  *
  * See [Events](http://esotericsoftware.com/spine-events) in the Spine User Guide. */
 export class EventData {
-	name: string;
-	intValue: number;
-	floatValue: number;
-	stringValue: string;
-	audioPath: string;
-	volume: number;
-	balance: number;
+	name: string = null;
+	intValue: number = 0;
+	floatValue: number = 0;
+	stringValue: string = null;
+	audioPath: string = null;
+	volume: number = 0;
+	balance: number = 0;
 
 	constructor (name: string) {
 		this.name = name;

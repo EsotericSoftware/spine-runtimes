@@ -38,24 +38,24 @@ import { Color } from "./Utils";
  * across multiple skeletons. */
 export class Slot {
 	/** The slot's setup pose data. */
-	data: SlotData;
+	data: SlotData = null;
 
 	/** The bone this slot belongs to. */
-	bone: Bone;
+	bone: Bone = null;
 
 	/** The color used to tint the slot's attachment. If {@link #getDarkColor()} is set, this is used as the light color for two
 	 * color tinting. */
-	color: Color;
+	color: Color = null;
 
 	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
 	 * color's alpha is not used. */
-	darkColor: Color;
+	darkColor: Color = null;
 
-	attachment: Attachment;
+	attachment: Attachment = null;
 
-	private attachmentTime: number;
+	private attachmentTime: number = 0;
 
-	attachmentState: number;
+	attachmentState: number = 0;
 
 	/** Values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
 	 * weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.

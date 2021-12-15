@@ -32,7 +32,7 @@ import { TextureAtlas } from "./TextureAtlas";
 import { Disposable, StringMap } from "./Utils";
 
 export class AssetManagerBase implements Disposable {
-	private pathPrefix: string;
+	private pathPrefix: string = null;
 	private textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture;
 	private downloader: Downloader;
 	private assets: StringMap<any> = {};

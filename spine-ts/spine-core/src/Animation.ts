@@ -40,8 +40,8 @@ import { Event } from "./Event";
 export class Animation {
 	/** The animation's name, which is unique across all animations in the skeleton. */
 	name: string;
-	timelines: Array<Timeline>;
-	timelineIds: StringSet;
+	timelines: Array<Timeline> = null;
+	timelineIds: StringSet = null;
 
 	/** The duration of the animation in seconds, which is the highest time of all keys in the timeline. */
 	duration: number;
@@ -151,8 +151,8 @@ const Property = {
 
 /** The interface for all timelines. */
 export abstract class Timeline {
-	propertyIds: string[];
-	frames: NumberArrayLike;
+	propertyIds: string[] = null;
+	frames: NumberArrayLike = null;
 
 	constructor (frameCount: number, propertyIds: string[]) {
 		this.propertyIds = propertyIds;
@@ -204,7 +204,7 @@ export interface SlotTimeline {
 
 /** The base class for timelines that use interpolation between key frame values. */
 export abstract class CurveTimeline extends Timeline {
-	protected curves: NumberArrayLike; // type, x, y, ...
+	protected curves: NumberArrayLike = null; // type, x, y, ...
 
 	constructor (frameCount: number, bezierCount: number, propertyIds: string[]) {
 		super(frameCount, propertyIds);
@@ -1426,10 +1426,10 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 	slotIndex = 0;
 
 	/** The attachment that will be deformed. */
-	attachment: VertexAttachment;
+	attachment: VertexAttachment = null;
 
 	/** The vertices for each key frame. */
-	vertices: Array<NumberArrayLike>;
+	vertices: Array<NumberArrayLike> = null;
 
 	constructor (frameCount: number, bezierCount: number, slotIndex: number, attachment: VertexAttachment) {
 		super(frameCount, bezierCount, [
@@ -1681,7 +1681,7 @@ export class EventTimeline extends Timeline {
 	static propertyIds = ["" + Property.event];
 
 	/** The event for each key frame. */
-	events: Array<Event>;
+	events: Array<Event> = null;
 
 	constructor (frameCount: number) {
 		super(frameCount, EventTimeline.propertyIds);
@@ -1734,7 +1734,7 @@ export class DrawOrderTimeline extends Timeline {
 	static propertyIds = ["" + Property.drawOrder];
 
 	/** The draw order for each key frame. See {@link #setFrame(int, float, int[])}. */
-	drawOrders: Array<Array<number>>;
+	drawOrders: Array<Array<number>> = null;
 
 	constructor (frameCount: number) {
 		super(frameCount, DrawOrderTimeline.propertyIds);
@@ -1780,7 +1780,7 @@ export class DrawOrderTimeline extends Timeline {
  * {@link IkConstraint#bendDirection}, {@link IkConstraint#stretch}, and {@link IkConstraint#compress}. */
 export class IkConstraintTimeline extends CurveTimeline {
 	/** The index of the IK constraint slot in {@link Skeleton#ikConstraints} that will be changed. */
-	ikConstraintIndex: number;
+	ikConstraintIndex: number = 0;
 
 	constructor (frameCount: number, bezierCount: number, ikConstraintIndex: number) {
 		super(frameCount, bezierCount, [
@@ -1878,7 +1878,7 @@ export class IkConstraintTimeline extends CurveTimeline {
  * {@link TransformConstraint#scaleMix}, and {@link TransformConstraint#shearMix}. */
 export class TransformConstraintTimeline extends CurveTimeline {
 	/** The index of the transform constraint slot in {@link Skeleton#transformConstraints} that will be changed. */
-	transformConstraintIndex: number;
+	transformConstraintIndex: number = 0;
 
 	constructor (frameCount: number, bezierCount: number, transformConstraintIndex: number) {
 		super(frameCount, bezierCount, [
@@ -1991,7 +1991,7 @@ export class TransformConstraintTimeline extends CurveTimeline {
 /** Changes a path constraint's {@link PathConstraint#position}. */
 export class PathConstraintPositionTimeline extends CurveTimeline1 {
 	/** The index of the path constraint slot in {@link Skeleton#pathConstraints} that will be changed. */
-	pathConstraintIndex: number;
+	pathConstraintIndex: number = 0;
 
 	constructor (frameCount: number, bezierCount: number, pathConstraintIndex: number) {
 		super(frameCount, bezierCount, Property.pathConstraintPosition + "|" + pathConstraintIndex);
