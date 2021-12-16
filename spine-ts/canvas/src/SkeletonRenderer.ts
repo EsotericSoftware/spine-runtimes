@@ -99,13 +99,11 @@ module spine.canvas {
 				}
 				ctx.scale(1, -1);
 				ctx.translate(-w / 2, -h / 2);
-				if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
-					ctx.globalAlpha = color.a;
-					// experimental tinting via compositing, doesn't work
-					// ctx.globalCompositeOperation = "source-atop";
-					// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0)  + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
-					// ctx.fillRect(0, 0, w, h);
-				}
+				ctx.globalAlpha = color.a;
+				// experimental tinting via compositing, doesn't work
+				// ctx.globalCompositeOperation = "source-atop";
+				// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0)  + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
+				// ctx.fillRect(0, 0, w, h);
 				ctx.drawImage(image, region.x, region.y, w, h, 0, 0, w, h);
 				if (this.debugRendering) ctx.strokeRect(0, 0, w, h);
 				ctx.restore();
@@ -159,13 +157,11 @@ module spine.canvas {
 
 					let ctx = this.ctx;
 
-					if (color.r != 1 || color.g != 1 || color.b != 1 || color.a != 1) {
-						ctx.globalAlpha = color.a;
-						// experimental tinting via compositing, doesn't work
-						// ctx.globalCompositeOperation = "source-atop";
-						// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0) + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
-						// ctx.fillRect(0, 0, w, h);
-					}
+					ctx.globalAlpha = color.a;
+					// experimental tinting via compositing, doesn't work
+					// ctx.globalCompositeOperation = "source-atop";
+					// ctx.fillStyle = "rgba(" + (color.r * 255 | 0) + ", " + (color.g * 255 | 0) + ", " + (color.b * 255 | 0) + ", " + color.a + ")";
+					// ctx.fillRect(0, 0, w, h);
 
 					for (var j = 0; j < triangles.length; j+=3) {
 						let t1 = triangles[j] * 8, t2 = triangles[j+1] * 8, t3 = triangles[j+2] * 8;
