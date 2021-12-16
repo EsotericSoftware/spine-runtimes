@@ -35,11 +35,12 @@
 
 using namespace spine;
 
-Sequence::Sequence() : _id(Sequence::getNextID()),
-					   _regions(),
-					   _start(0),
-					   _digits(0),
-					   _setupIndex(0) {
+Sequence::Sequence(int count) : _id(Sequence::getNextID()),
+								_regions(),
+								_start(0),
+								_digits(0),
+								_setupIndex(0) {
+	_regions.setSize(count, NULL);
 }
 
 Sequence::~Sequence() {

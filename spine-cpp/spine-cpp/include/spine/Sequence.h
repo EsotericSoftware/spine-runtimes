@@ -39,12 +39,16 @@ namespace spine {
 
 	class Attachment;
 
-	class SP_API Sequence : public SpineObject {
+	class SkeletonBinary;
+	class SkeletonJson;
 
+	class SP_API Sequence : public SpineObject {
+		friend class SkeletonBinary;
+		friend class SkeletonJson;
 	public:
 		explicit Sequence();
 
-		Sequence(int id, const Vector<TextureRegion *> &regions, int start, int digits, int setupIndex);
+		Sequence(int count);
 
 		~Sequence();
 
