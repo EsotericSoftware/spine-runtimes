@@ -144,6 +144,22 @@ void MeshAttachment::setPath(const String &inValue) {
 	_path = inValue;
 }
 
+TextureRegion *MeshAttachment::getRegion() {
+	return _region;
+}
+
+void MeshAttachment::setRegion(TextureRegion *region) {
+	_region = region;
+}
+
+Sequence *MeshAttachment::getSequence() {
+	return _sequence;
+}
+
+void MeshAttachment::setSequence(Sequence *sequence) {
+	_sequence = sequence;
+}
+
 MeshAttachment *MeshAttachment::getParentMesh() {
 	return _parentMesh;
 }

@@ -72,6 +72,7 @@
 #include <spine/TransformConstraintTimeline.h>
 #include <spine/TranslateTimeline.h>
 #include <spine/Vertices.h>
+#include "spine/SequenceTimeline.h"
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #define strdup _strdup
@@ -548,7 +549,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 
 					switch (type) {
 						case AttachmentType_Region: {
-							attachment = _attachmentLoader->newRegionAttachment(*skin, attachmentName, attachmentPath);
+							Sequence *sequence = readSequence(Json::getItem(attachmentMap, "sequence"));
+							attachment = _attachmentLoader->newRegionAttachment(*skin, attachmentName, attachmentPath, sequence);
 							if (!attachment) {
 								delete skeletonData;
 								setError(root, "Error reading attachment: ", skinAttachmentName);
@@ -565,17 +567,19 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 							region->_rotation = Json::getFloat(attachmentMap, "rotation", 0);
 							region->_width = Json::getFloat(attachmentMap, "width", 32) * _scale;
 							region->_height = Json::getFloat(attachmentMap, "height", 32) * _scale;
+							region->_sequence = sequence;
 
 							color = Json::getString(attachmentMap, "color", 0);
 							if (color) toColor(region->getColor(), color, true);
 
-							region->updateRegion();
+							if (region->_region != NULL) region->updateRegion();
 							_attachmentLoader->configureAttachment(region);
 							break;
 						}
 						case AttachmentType_Mesh:
 						case AttachmentType_Linkedmesh: {
-							attachment = _attachmentLoader->newMeshAttachment(*skin, attachmentName, attachmentPath);
+							Sequence *sequence = readSequence(Json::getItem(attachmentMap, "sequence"));
+							attachment = _attachmentLoader->newMeshAttachment(*skin, attachmentName, attachmentPath, sequence);
 
 							if (!attachment) {
 								delete skeletonData;
@@ -591,6 +595,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 
 							mesh->_width = Json::getFloat(attachmentMap, "width", 32) * _scale;
 							mesh->_height = Json::getFloat(attachmentMap, "height", 32) * _scale;
+							mesh->_sequence = sequence;
 
 							entry = Json::getItem(attachmentMap, "parent");
 							if (!entry) {
@@ -610,7 +615,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 
 								readVertices(attachmentMap, mesh, verticesLength);
 
-								mesh->updateRegion();
+								if (mesh->_region != NULL) mesh->updateRegion();
 
 								mesh->_hullLength = Json::getInt(attachmentMap, "hull", 0);
 
@@ -623,14 +628,14 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 								}
 								_attachmentLoader->configureAttachment(mesh);
 							} else {
-								bool inheritDeform = Json::getInt(attachmentMap, "deform", 1) ? true : false;
+								bool inheritTimelines = Json::getInt(attachmentMap, "timelines", 1) ? true : false;
 								LinkedMesh *linkedMesh = new (__FILE__, __LINE__) LinkedMesh(mesh,
 																							 String(Json::getString(
 																									 attachmentMap,
 																									 "skin", 0)),
 																							 slot->getIndex(),
 																							 String(entry->_valueString),
-																							 inheritDeform);
+																							 inheritTimelines);
 								_linkedMeshes.add(linkedMesh);
 							}
 							break;
@@ -722,10 +727,10 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			setError(root, "Parent mesh not found: ", linkedMesh->_parent.buffer());
 			return NULL;
 		}
-		linkedMesh->_mesh->_timelineAttachment = linkedMesh->_inheritDeform ? static_cast<VertexAttachment *>(parent)
+		linkedMesh->_mesh->_timelineAttachment = linkedMesh->_inheritTimeline ? static_cast<VertexAttachment *>(parent)
 																			: linkedMesh->_mesh;
 		linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
-		linkedMesh->_mesh->updateRegion();
+		if (linkedMesh->_mesh->_region != NULL) linkedMesh->_mesh->updateRegion();
 		_attachmentLoader->configureAttachment(linkedMesh->_mesh);
 	}
 	ContainerUtil::cleanUpVectorOfPointers(_linkedMeshes);
@@ -775,6 +780,15 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 	delete root;
 
 	return skeletonData;
+}
+
+Sequence *SkeletonJson::readSequence(Json *item) {
+	if (item == NULL) return NULL;
+	Sequence *sequence = new Sequence(Json::getInt(item, "count", 0));
+	sequence->_start = Json::getInt(item, "start", 1);
+	sequence->_digits = Json::getInt(item, "digits", 0);
+	sequence->_setupIndex = Json::getInt(item, "setupIndex", 0);
+	return sequence;
 }
 
 void SkeletonJson::setBezier(CurveTimeline *timeline, int frame, int value, int bezier, float time1, float value1, float cx1,
@@ -865,10 +879,10 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 	Json *ik = Json::getItem(root, "ik");
 	Json *transform = Json::getItem(root, "transform");
 	Json *paths = Json::getItem(root, "path");
-	Json *deform = Json::getItem(root, "deform");
+	Json *attachments = Json::getItem(root, "attachments");
 	Json *drawOrder = Json::getItem(root, "drawOrder");
 	Json *events = Json::getItem(root, "events");
-	Json *boneMap, *slotMap, *constraintMap, *keyMap, *nextMap, *curve;
+	Json *boneMap, *slotMap, *keyMap, *nextMap, *curve;
 	int frame, bezier;
 	Color color, color2, newColor, newColor2;
 
@@ -883,7 +897,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 				AttachmentTimeline *timeline = new (__FILE__, __LINE__) AttachmentTimeline(frames, slotIndex);
 				for (keyMap = timelineMap->_child, frame = 0; keyMap; keyMap = keyMap->_next, ++frame) {
 					timeline->setFrame(frame, Json::getFloat(keyMap, "time", 0),
-									   Json::getItem(keyMap, "name")->_valueString);
+									   Json::getItem(keyMap, "name") ? Json::getItem(keyMap, "name")->_valueString : NULL);
 				}
 				timelines.add(timeline);
 
@@ -1079,7 +1093,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 	}
 
 	/** IK constraint timelines. */
-	for (constraintMap = ik ? ik->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
+	for (Json *constraintMap = ik ? ik->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
 		keyMap = constraintMap->_child;
 		if (keyMap == NULL) continue;
 
@@ -1122,7 +1136,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 	}
 
 	/** Transform constraint timelines. */
-	for (constraintMap = transform ? transform->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
+	for (Json *constraintMap = transform ? transform->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
 		keyMap = constraintMap->_child;
 		if (keyMap == NULL) continue;
 
@@ -1178,7 +1192,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 	}
 
 	/** Path constraint timelines. */
-	for (constraintMap = paths ? paths->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
+	for (Json *constraintMap = paths ? paths->_child : 0; constraintMap; constraintMap = constraintMap->_next) {
 		PathConstraintData *constraint = skeletonData->findPathConstraint(constraintMap->_name);
 		if (!constraint) {
 			ContainerUtil::cleanUpVectorOfPointers(timelines);
@@ -1239,77 +1253,98 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 		}
 	}
 
-	/** Deform timelines. */
-	for (constraintMap = deform ? deform->_child : NULL; constraintMap; constraintMap = constraintMap->_next) {
-		Skin *skin = skeletonData->findSkin(constraintMap->_name);
-		for (slotMap = constraintMap->_child; slotMap; slotMap = slotMap->_next) {
+	/** Attachment timelines. */
+	for (Json *attachmenstMap = attachments ? attachments->_child : NULL; attachmenstMap; attachmenstMap = attachmenstMap->_next) {
+		Skin *skin = skeletonData->findSkin(attachmenstMap->_name);
+		for (slotMap = attachmenstMap->_child; slotMap; slotMap = slotMap->_next) {
 			int slotIndex = findSlotIndex(skeletonData, slotMap->_name, timelines);
 			if (slotIndex == -1) return NULL;
 
-			for (Json *timelineMap = slotMap->_child; timelineMap; timelineMap = timelineMap->_next) {
-				keyMap = timelineMap->_child;
-				if (keyMap == NULL) continue;
-
-				Attachment *baseAttachment = skin->getAttachment(slotIndex, timelineMap->_name);
-				if (!baseAttachment) {
+			for (Json *attachmentMap = slotMap->_child; attachmentMap; attachmentMap = attachmentMap->_next) {
+				Attachment *attachment = skin->getAttachment(slotIndex, attachmentMap->_name);
+				if (!attachment) {
 					ContainerUtil::cleanUpVectorOfPointers(timelines);
-					setError(NULL, "Attachment not found: ", timelineMap->_name);
+					setError(NULL, "Attachment not found: ", attachmentMap->_name);
 					return NULL;
 				}
-				VertexAttachment *attachment = static_cast<VertexAttachment *>(baseAttachment);
 
-				bool weighted = attachment->_bones.size() != 0;
-				Vector<float> &verts = attachment->_vertices;
-				int deformLength = weighted ? verts.size() / 3 * 2 : verts.size();
+				for (Json *timelineMap = attachmentMap->_child; timelineMap; timelineMap = timelineMap->_next) {
+					keyMap = timelineMap->_child;
+					if (keyMap == NULL) continue;
+					int frames = timelineMap->_size;
+					String timelineName = timelineMap->_name;
+					if (timelineName == "deform") {
+						VertexAttachment *vertexAttachment = static_cast<VertexAttachment *>(attachment);
+						bool weighted = vertexAttachment->_bones.size() != 0;
+						Vector<float> &verts = vertexAttachment->_vertices;
+						int deformLength = weighted ? verts.size() / 3 * 2 : verts.size();
 
-				DeformTimeline *timeline = new (__FILE__, __LINE__) DeformTimeline(timelineMap->_size,
-																				   timelineMap->_size, slotIndex,
-																				   attachment);
-				float time = Json::getFloat(keyMap, "time", 0);
-				for (frame = 0, bezier = 0;; frame++) {
-					Json *vertices = Json::getItem(keyMap, "vertices");
-					Vector<float> deformed;
-					if (!vertices) {
-						if (weighted) {
-							deformed.setSize(deformLength, 0);
-						} else {
-							deformed.clearAndAddAll(attachment->_vertices);
+						DeformTimeline *timeline = new(__FILE__, __LINE__) DeformTimeline(frames,
+																						  frames, slotIndex,vertexAttachment);
+						float time = Json::getFloat(keyMap, "time", 0);
+						for (frame = 0, bezier = 0;; frame++) {
+							Json *vertices = Json::getItem(keyMap, "vertices");
+							Vector<float> deformed;
+							if (!vertices) {
+								if (weighted) {
+									deformed.setSize(deformLength, 0);
+								} else {
+									deformed.clearAndAddAll(vertexAttachment->_vertices);
+								}
+							} else {
+								deformed.setSize(deformLength, 0);
+								int v, start = Json::getInt(keyMap, "offset", 0);
+								Json *vertex;
+								if (_scale == 1) {
+									for (vertex = vertices->_child, v = start; vertex; vertex = vertex->_next, ++v) {
+										deformed[v] = vertex->_valueFloat;
+									}
+								} else {
+									for (vertex = vertices->_child, v = start; vertex; vertex = vertex->_next, ++v) {
+										deformed[v] = vertex->_valueFloat * _scale;
+									}
+								}
+								if (!weighted) {
+									Vector<float> &verticesAttachment = vertexAttachment->_vertices;
+									for (v = 0; v < deformLength; ++v) {
+										deformed[v] += verticesAttachment[v];
+									}
+								}
+							}
+							timeline->setFrame(frame, time, deformed);
+							nextMap = keyMap->_next;
+							if (!nextMap) {
+								// timeline.shrink(); // BOZO
+								break;
+							}
+							float time2 = Json::getFloat(nextMap, "time", 0);
+							curve = Json::getItem(keyMap, "curve");
+							if (curve) {
+								bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
+							}
+							time = time2;
+							keyMap = nextMap;
 						}
-					} else {
-						int v, start = Json::getInt(keyMap, "offset", 0);
-						Json *vertex;
-						deformed.setSize(deformLength, 0);
-						if (_scale == 1) {
-							for (vertex = vertices->_child, v = start; vertex; vertex = vertex->_next, ++v) {
-								deformed[v] = vertex->_valueFloat;
-							}
-						} else {
-							for (vertex = vertices->_child, v = start; vertex; vertex = vertex->_next, ++v) {
-								deformed[v] = vertex->_valueFloat * _scale;
-							}
-						}
-						if (!weighted) {
-							Vector<float> &verticesAttachment = attachment->_vertices;
-							for (v = 0; v < deformLength; ++v) {
-								deformed[v] += verticesAttachment[v];
-							}
+						timelines.add(timeline);
+					} else if (timelineName == "sequence") {
+						SequenceTimeline *timeline = new SequenceTimeline(frames, slotIndex, attachment);
+						float lastDelay = 0;
+						for (frame = 0; keyMap != NULL; keyMap = keyMap->_next, frame++) {
+							float delay = Json::getFloat(keyMap, "delay", lastDelay);
+							float time =  Json::getFloat(keyMap, "time", 0);
+							String modeString = Json::getString(keyMap, "mode", "hold");
+							int index = Json::getInt(keyMap, "index", 0);
+							SequenceMode mode = SequenceMode::hold;
+							if (modeString == "once") mode = SequenceMode::once;
+							if (modeString == "loop") mode = SequenceMode::loop;
+							if (modeString == "pingpong") mode = SequenceMode::pingpong;
+							if (modeString == "onceReverse") mode = SequenceMode::onceReverse;
+							if (modeString == "loopReverse") mode = SequenceMode::loopReverse;
+							if (modeString == "pingpongReverse") mode = SequenceMode::pingpongReverse;
+							timeline->setFrame(frame, time, mode, index, delay);
 						}
 					}
-					timeline->setFrame(frame, time, deformed);
-					nextMap = keyMap->_next;
-					if (!nextMap) {
-						// timeline.shrink(); // BOZO
-						break;
-					}
-					float time2 = Json::getFloat(nextMap, "time", 0);
-					curve = Json::getItem(keyMap, "curve");
-					if (curve) {
-						bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
-					}
-					time = time2;
-					keyMap = nextMap;
 				}
-				timelines.add(timeline);
 			}
 		}
 	}

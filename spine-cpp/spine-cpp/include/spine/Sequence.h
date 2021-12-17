@@ -46,8 +46,6 @@ namespace spine {
 		friend class SkeletonBinary;
 		friend class SkeletonJson;
 	public:
-		explicit Sequence();
-
 		Sequence(int count);
 
 		~Sequence();

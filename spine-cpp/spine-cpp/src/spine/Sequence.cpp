@@ -47,9 +47,9 @@ Sequence::~Sequence() {
 }
 
 Sequence *Sequence::copy() {
-	Sequence *copy = new (__FILE__, __LINE__) Sequence();
+	Sequence *copy = new (__FILE__, __LINE__) Sequence(_regions.size());
 	for (size_t i = 0; i < _regions.size(); i++) {
-		copy->_regions.add(_regions[i]);
+		copy->_regions[i] = _regions[i];
 	}
 	copy->_start = _start;
 	copy->_digits = _digits;
