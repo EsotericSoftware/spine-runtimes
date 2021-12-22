@@ -728,7 +728,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 			return NULL;
 		}
 		linkedMesh->_mesh->_timelineAttachment = linkedMesh->_inheritTimeline ? static_cast<VertexAttachment *>(parent)
-																			: linkedMesh->_mesh;
+																			  : linkedMesh->_mesh;
 		linkedMesh->_mesh->setParentMesh(static_cast<MeshAttachment *>(parent));
 		if (linkedMesh->_mesh->_region != NULL) linkedMesh->_mesh->updateRegion();
 		_attachmentLoader->configureAttachment(linkedMesh->_mesh);
@@ -1279,8 +1279,8 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 						Vector<float> &verts = vertexAttachment->_vertices;
 						int deformLength = weighted ? verts.size() / 3 * 2 : verts.size();
 
-						DeformTimeline *timeline = new(__FILE__, __LINE__) DeformTimeline(frames,
-																						  frames, slotIndex,vertexAttachment);
+						DeformTimeline *timeline = new (__FILE__, __LINE__) DeformTimeline(frames,
+																						   frames, slotIndex, vertexAttachment);
 						float time = Json::getFloat(keyMap, "time", 0);
 						for (frame = 0, bezier = 0;; frame++) {
 							Json *vertices = Json::getItem(keyMap, "vertices");
@@ -1331,7 +1331,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 						float lastDelay = 0;
 						for (frame = 0; keyMap != NULL; keyMap = keyMap->_next, frame++) {
 							float delay = Json::getFloat(keyMap, "delay", lastDelay);
-							float time =  Json::getFloat(keyMap, "time", 0);
+							float time = Json::getFloat(keyMap, "time", 0);
 							String modeString = Json::getString(keyMap, "mode", "hold");
 							int index = Json::getInt(keyMap, "index", 0);
 							SequenceMode mode = SequenceMode::hold;
@@ -1343,6 +1343,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 							if (modeString == "pingpongReverse") mode = SequenceMode::pingpongReverse;
 							timeline->setFrame(frame, time, mode, index, delay);
 						}
+						timelines.add(timeline);
 					}
 				}
 			}
