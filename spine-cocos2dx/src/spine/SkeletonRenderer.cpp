@@ -249,7 +249,6 @@ namespace spine {
 
 	void SkeletonRenderer::update(float deltaTime) {
 		Node::update(deltaTime);
-		if (_ownsSkeleton) _skeleton->update(deltaTime * _timeScale);
 	}
 
 	void SkeletonRenderer::draw(Renderer *renderer, const Mat4 &transform, uint32_t transformFlags) {
@@ -657,7 +656,7 @@ namespace spine {
 
 				RegionAttachment *attachment = (RegionAttachment *) slot->getAttachment();
 				float worldVertices[8];
-				attachment->computeWorldVertices(slot->getBone(), worldVertices, 0, 2);
+                attachment->computeWorldVertices(*slot, worldVertices, 0, 2);
 				const Vec2 points[4] =
 						{
 								{worldVertices[0], worldVertices[1]},
@@ -958,7 +957,7 @@ namespace spine {
 				if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 					RegionAttachment *const regionAttachment = static_cast<RegionAttachment *>(attachment);
 					assert(dstPtr + 8 <= dstEnd);
-					regionAttachment->computeWorldVertices(slot.getBone(), dstPtr, 0, 2);
+					regionAttachment->computeWorldVertices(slot, dstPtr, 0, 2);
 					dstPtr += 8;
 				} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 					MeshAttachment *const mesh = static_cast<MeshAttachment *>(attachment);
