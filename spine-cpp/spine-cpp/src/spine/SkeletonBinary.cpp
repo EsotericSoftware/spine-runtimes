@@ -577,6 +577,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			}
 			mesh->_path = path;
 			mesh->_color.set(color);
+			mesh->_bones.addAll(bones);
 			mesh->_vertices.addAll(vertices);
 			mesh->setWorldVerticesLength(vertexCount << 1);
 			mesh->_triangles.addAll(triangles);
