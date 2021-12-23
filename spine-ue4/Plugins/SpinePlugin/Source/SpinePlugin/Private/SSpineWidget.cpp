@@ -45,12 +45,17 @@
 
 using namespace spine;
 
+static int brushNameId = 0;
+
 // Workaround for https://github.com/EsotericSoftware/spine-runtimes/issues/1458
 // See issue comments for more information.
 struct SpineSlateMaterialBrush : public FSlateBrush {
 	SpineSlateMaterialBrush(class UMaterialInterface &InMaterial, const FVector2D &InImageSize)
 		: FSlateBrush(ESlateBrushDrawType::Image, FName(TEXT("None")), FMargin(0), ESlateBrushTileType::NoTile, ESlateBrushImageType::FullColor, InImageSize, FLinearColor::White, &InMaterial) {
-		ResourceName = FName(*InMaterial.GetFullName());
+		// Workaround for https://github.com/EsotericSoftware/spine-runtimes/issues/2006
+		FString brushName = TEXT("spineslatebrush");
+		brushName.AppendInt(brushNameId++);
+		ResourceName = FName(brushName);
 	}
 };
 
