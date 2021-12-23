@@ -39,7 +39,7 @@
 using namespace spine;
 
 #define SPINE_MAJOR_VERSION 4
-#define SPINE_MINOR_VERSION 0
+#define SPINE_MINOR_VERSION 1
 
 FName USpineSkeletonDataAsset::GetSkeletonDataFileName() const {
 #if WITH_EDITORONLY_DATA
