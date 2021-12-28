@@ -34,6 +34,7 @@
 #include <spine/Attachment.h>
 #include <spine/Atlas.h>
 #include <spine/Slot.h>
+#include <spine/Sequence.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,21 +47,21 @@ typedef struct spRegionAttachment {
 	spColor color;
 
 	void *rendererObject;
-	int regionOffsetX, regionOffsetY; /* Pixels stripped from the bottom left, unrotated. */
-	int regionWidth, regionHeight; /* Unrotated, stripped pixel size. */
-	int regionOriginalWidth, regionOriginalHeight; /* Unrotated, unstripped pixel size. */
+	spTextureRegion *region;
 
 	float offset[8];
 	float uvs[8];
+
+	spSequence *sequence;
 } spRegionAttachment;
 
 SP_API spRegionAttachment *spRegionAttachment_create(const char *name);
 
 SP_API void spRegionAttachment_setUVs(spRegionAttachment *self, float u, float v, float u2, float v2, float degrees);
 
-SP_API void spRegionAttachment_updateOffset(spRegionAttachment *self);
+SP_API void spRegionAttachment_updateRegion(spRegionAttachment *self);
 
-SP_API void spRegionAttachment_computeWorldVertices(spRegionAttachment *self, spBone *bone, float *vertices, int offset,
+SP_API void spRegionAttachment_computeWorldVertices(spRegionAttachment *self, spSlot *slot, float *vertices, int offset,
 													int stride);
 
 #ifdef __cplusplus

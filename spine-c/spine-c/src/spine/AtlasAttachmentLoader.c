@@ -43,13 +43,8 @@ spAttachment *_spAtlasAttachmentLoader_createAttachment(spAttachmentLoader *load
 			}
 			attachment = spRegionAttachment_create(name);
 			attachment->rendererObject = region;
-			spRegionAttachment_setUVs(attachment, region->u, region->v, region->u2, region->v2, region->degrees);
-			attachment->regionOffsetX = region->offsetX;
-			attachment->regionOffsetY = region->offsetY;
-			attachment->regionWidth = region->width;
-			attachment->regionHeight = region->height;
-			attachment->regionOriginalWidth = region->originalWidth;
-			attachment->regionOriginalHeight = region->originalHeight;
+			spRegionAttachment_setUVs(attachment, region->super.u, region->super.v, region->super.u2, region->super.v2, region->degrees);
+			attachment->region = SUPER(region);
 			return SUPER(attachment);
 		}
 		case SP_ATTACHMENT_MESH:
@@ -62,17 +57,7 @@ spAttachment *_spAtlasAttachmentLoader_createAttachment(spAttachmentLoader *load
 			}
 			attachment = spMeshAttachment_create(name);
 			attachment->rendererObject = region;
-			attachment->regionU = region->u;
-			attachment->regionV = region->v;
-			attachment->regionU2 = region->u2;
-			attachment->regionV2 = region->v2;
-			attachment->regionDegrees = region->degrees;
-			attachment->regionOffsetX = region->offsetX;
-			attachment->regionOffsetY = region->offsetY;
-			attachment->regionWidth = region->width;
-			attachment->regionHeight = region->height;
-			attachment->regionOriginalWidth = region->originalWidth;
-			attachment->regionOriginalHeight = region->originalHeight;
+			attachment->region = SUPER(region);
 			return SUPER(SUPER(attachment));
 		}
 		case SP_ATTACHMENT_BOUNDING_BOX:

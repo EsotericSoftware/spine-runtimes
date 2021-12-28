@@ -27,59 +27,41 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include <spine/Slot.h>
-#include <spine/extension.h>
+#ifndef SPINE_SEQUENCE_H
+#define SPINE_SEQUENCE_H
 
-spSlot *spSlot_create(spSlotData *data, spBone *bone) {
-	spSlot *self = NEW(spSlot);
-	CONST_CAST(spSlotData *, self->data) = data;
-	CONST_CAST(spBone *, self->bone) = bone;
-	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
-	self->darkColor = data->darkColor == 0 ? 0 : spColor_create();
-	spSlot_setToSetupPose(self);
-	return self;
+#include <spine/dll.h>
+#include <spine/TextureRegion.h>
+#include <spine/Atlas.h>
+#include "Attachment.h"
+#include "Slot.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+_SP_ARRAY_DECLARE_TYPE(spTextureRegionArray, spTextureRegion*)
+
+typedef struct spSequence {
+	int id;
+	int start;
+	int digits;
+	int setupIndex;
+	spTextureRegionArray *regions;
+} spSequence;
+
+SP_API spSequence *spSequence_create(int start, int digits, int setupIndex, int numRegions);
+
+SP_API void spSequence_dispose(spSequence *self);
+
+SP_API spSequence *spSequence_copy(spSequence *self);
+
+SP_API void spSequence_apply(spSequence *self, spSlot *slot, spAttachment *attachment);
+
+SP_API char *spSequence_getPath(const char* basePath, int index);
+
+#ifdef __cplusplus
 }
+#endif
 
-void spSlot_dispose(spSlot *self) {
-	FREE(self->deform);
-	FREE(self->darkColor);
-	FREE(self);
-}
-
-static int isVertexAttachment(spAttachment *attachment) {
-	if (attachment == NULL) return 0;
-	switch (attachment->type) {
-		case SP_ATTACHMENT_BOUNDING_BOX:
-		case SP_ATTACHMENT_CLIPPING:
-		case SP_ATTACHMENT_MESH:
-		case SP_ATTACHMENT_PATH:
-			return -1;
-		default:
-			return 0;
-	}
-}
-
-void spSlot_setAttachment(spSlot *self, spAttachment *attachment) {
-	if (attachment == self->attachment) return;
-
-	if (!isVertexAttachment(attachment) ||
-		!isVertexAttachment(self->attachment) || (SUB_CAST(spVertexAttachment, attachment)->timelineAttachment != SUB_CAST(spVertexAttachment, self->attachment)->timelineAttachment)) {
-		self->deformCount = 0;
-	}
-
-	CONST_CAST(spAttachment *, self->attachment) = attachment;
-}
-
-void spSlot_setToSetupPose(spSlot *self) {
-	spColor_setFromColor(&self->color, &self->data->color);
-	if (self->darkColor) spColor_setFromColor(self->darkColor, self->data->darkColor);
-
-	if (!self->data->attachmentName)
-		spSlot_setAttachment(self, 0);
-	else {
-		spAttachment *attachment = spSkeleton_getAttachmentForSlotIndex(
-				self->bone->skeleton, self->data->index, self->data->attachmentName);
-		CONST_CAST(spAttachment *, self->attachment) = 0;
-		spSlot_setAttachment(self, attachment);
-	}
-}
+#endif

@@ -35,7 +35,7 @@ static int nextID = 0;
 
 void _spVertexAttachment_init(spVertexAttachment *attachment) {
 	attachment->id = nextID++;
-	attachment->deformAttachment = attachment;
+	attachment->timelineAttachment = attachment;
 }
 
 void _spVertexAttachment_deinit(spVertexAttachment *attachment) {

@@ -35,6 +35,7 @@
 #include <spine/VertexAttachment.h>
 #include <spine/Atlas.h>
 #include <spine/Slot.h>
+#include <spine/Sequence.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,11 +46,7 @@ struct spMeshAttachment {
 	spVertexAttachment super;
 
 	void *rendererObject;
-	int regionOffsetX, regionOffsetY; /* Pixels stripped from the bottom left, unrotated. */
-	int regionWidth, regionHeight; /* Unrotated, stripped pixel size. */
-	int regionOriginalWidth, regionOriginalHeight; /* Unrotated, unstripped pixel size. */
-	float regionU, regionV, regionU2, regionV2;
-	int regionDegrees;
+	spTextureRegion *region;
 
 	const char *path;
 
@@ -65,6 +62,8 @@ struct spMeshAttachment {
 
 	spMeshAttachment *const parentMesh;
 
+	spSequence *sequence;
+
 	/* Nonessential. */
 	int edgesCount;
 	int *edges;
@@ -73,7 +72,7 @@ struct spMeshAttachment {
 
 SP_API spMeshAttachment *spMeshAttachment_create(const char *name);
 
-SP_API void spMeshAttachment_updateUVs(spMeshAttachment *self);
+SP_API void spMeshAttachment_updateRegion(spMeshAttachment *self);
 
 SP_API void spMeshAttachment_setParentMesh(spMeshAttachment *self, spMeshAttachment *parentMesh);
 

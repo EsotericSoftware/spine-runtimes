@@ -51,12 +51,12 @@ void _spRegionAttachment_dispose(spAttachment *attachment) {
 spAttachment *_spRegionAttachment_copy(spAttachment *attachment) {
 	spRegionAttachment *self = SUB_CAST(spRegionAttachment, attachment);
 	spRegionAttachment *copy = spRegionAttachment_create(attachment->name);
-	copy->regionWidth = self->regionWidth;
-	copy->regionHeight = self->regionHeight;
-	copy->regionOffsetX = self->regionOffsetX;
-	copy->regionOffsetY = self->regionOffsetY;
-	copy->regionOriginalWidth = self->regionOriginalWidth;
-	copy->regionOriginalHeight = self->regionOriginalHeight;
+	copy->region->width = self->region->width;
+	copy->region->height = self->region->height;
+	copy->region->offsetX = self->region->offsetX;
+	copy->region->offsetY = self->region->offsetY;
+	copy->region->originalWidth = self->region->originalWidth;
+	copy->region->originalHeight = self->region->originalHeight;
 	copy->rendererObject = self->rendererObject;
 	MALLOC_STR(copy->path, self->path);
 	copy->x = self->x;
@@ -103,13 +103,13 @@ void spRegionAttachment_setUVs(spRegionAttachment *self, float u, float v, float
 	}
 }
 
-void spRegionAttachment_updateOffset(spRegionAttachment *self) {
-	float regionScaleX = self->width / self->regionOriginalWidth * self->scaleX;
-	float regionScaleY = self->height / self->regionOriginalHeight * self->scaleY;
-	float localX = -self->width / 2 * self->scaleX + self->regionOffsetX * regionScaleX;
-	float localY = -self->height / 2 * self->scaleY + self->regionOffsetY * regionScaleY;
-	float localX2 = localX + self->regionWidth * regionScaleX;
-	float localY2 = localY + self->regionHeight * regionScaleY;
+void spRegionAttachment_updateRegion(spRegionAttachment *self) {
+	float regionScaleX = self->width / self->region->originalWidth * self->scaleX;
+	float regionScaleY = self->height / self->region->originalHeight * self->scaleY;
+	float localX = -self->width / 2 * self->scaleX + self->region->offsetX * regionScaleX;
+	float localY = -self->height / 2 * self->scaleY + self->region->offsetY * regionScaleY;
+	float localX2 = localX + self->region->width * regionScaleX;
+	float localY2 = localY + self->region->height * regionScaleY;
 	float radians = self->rotation * DEG_RAD;
 	float cosine = COS(radians), sine = SIN(radians);
 	float localXCos = localX * cosine + self->x;
@@ -130,9 +130,10 @@ void spRegionAttachment_updateOffset(spRegionAttachment *self) {
 	self->offset[BRY] = localYCos + localX2Sin;
 }
 
-void spRegionAttachment_computeWorldVertices(spRegionAttachment *self, spBone *bone, float *vertices, int offset,
+void spRegionAttachment_computeWorldVertices(spRegionAttachment *self, spSlot *slot, float *vertices, int offset,
 											 int stride) {
 	const float *offsets = self->offset;
+	spBone *bone = slot->bone;
 	float x = bone->worldX, y = bone->worldY;
 	float offsetX, offsetY;
 
