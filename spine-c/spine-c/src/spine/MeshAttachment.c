@@ -87,7 +87,7 @@ spMeshAttachment *spMeshAttachment_newLinkedMesh(spMeshAttachment *self) {
 	spColor_setFromColor(&copy->color, &self->color);
 	copy->super.timelineAttachment = self->super.timelineAttachment;
 	spMeshAttachment_setParentMesh(copy, self->parentMesh ? self->parentMesh : self);
-	spMeshAttachment_updateRegion(copy);
+	if (copy->region) spMeshAttachment_updateRegion(copy);
 	return copy;
 }
 

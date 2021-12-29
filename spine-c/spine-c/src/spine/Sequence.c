@@ -87,6 +87,6 @@ void spSequence_apply(spSequence *self, spSlot *slot, spAttachment *attachment) 
 	}
 }
 
-char *spSequence_getPath(const char* basePath, int index) {
+void spSequence_getPath(const char* basePath, int index, char* path) {
 	fix me
 }

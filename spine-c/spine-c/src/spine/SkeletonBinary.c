@@ -991,13 +991,13 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			region->width = readFloat(input) * self->scale;
 			region->height = readFloat(input) * self->scale;
 			readColor(input, &region->color.r, &region->color.g, &region->color.b, &region->color.a);
-			spRegionAttachment_updateOffset(region);
+			spRegionAttachment_updateRegion(region);
 			spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 			return attachment;
 		}
 		case SP_ATTACHMENT_BOUNDING_BOX: {
 			int vertexCount = readVarint(input, 1);
-			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0, NULL);
 			_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
 			if (nonessential) {
 				spBoundingBoxAttachment *bbox = SUB_CAST(spBoundingBoxAttachment, attachment);
@@ -1025,7 +1025,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			mesh->regionUVs = _readFloatArray(input, vertexCount << 1, 1);
 			mesh->triangles = (unsigned short *) _readShortArray(input, &mesh->trianglesCount);
 			_readVertices(self, input, SUPER(mesh), vertexCount);
-			spMeshAttachment_updateUVs(mesh);
+			spMeshAttachment_updateRegion(mesh);
 			mesh->hullLength = readVarint(input, 1) << 1;
 			if (nonessential) {
 				mesh->edges = (int *) _readShortArray(input, &mesh->edgesCount);
@@ -1067,7 +1067,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			return attachment;
 		}
 		case SP_ATTACHMENT_PATH: {
-			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0, NULL);
 			spPathAttachment *path = SUB_CAST(spPathAttachment, attachment);
 			int vertexCount = 0;
 			path->closed = readBoolean(input);
@@ -1086,7 +1086,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 			return attachment;
 		}
 		case SP_ATTACHMENT_POINT: {
-			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0, NULL);
 			spPointAttachment *point = SUB_CAST(spPointAttachment, attachment);
 			point->rotation = readFloat(input);
 			point->x = readFloat(input) * self->scale;
@@ -1101,7 +1101,7 @@ spAttachment *spSkeletonBinary_readAttachment(spSkeletonBinary *self, _dataInput
 		case SP_ATTACHMENT_CLIPPING: {
 			int endSlotIndex = readVarint(input, 1);
 			int vertexCount = readVarint(input, 1);
-			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0);
+			spAttachment *attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, name, 0, NULL);
 			spClippingAttachment *clip = SUB_CAST(spClippingAttachment, attachment);
 			_readVertices(self, input, SUB_CAST(spVertexAttachment, attachment), vertexCount);
 			if (nonessential) {
@@ -1422,7 +1422,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 																			   : SUB_CAST(spVertexAttachment,
 																						linkedMesh->mesh);
 		spMeshAttachment_setParentMesh(linkedMesh->mesh, SUB_CAST(spMeshAttachment, parent));
-		spMeshAttachment_updateUVs(linkedMesh->mesh);
+		spMeshAttachment_updateRegion(linkedMesh->mesh);
 		spAttachmentLoader_configureAttachment(self->attachmentLoader, SUPER(SUPER(linkedMesh->mesh)));
 	}
 

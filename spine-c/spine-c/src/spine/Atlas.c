@@ -376,9 +376,9 @@ spAtlas *spAtlas_create(const char *begin, int length, const char *dir, void *re
 					region->super.originalHeight = ss_toInt(&entry[4]);
 				} else if (ss_equals(&entry[0], "rotate")) {
 					if (ss_equals(&entry[1], "true")) {
-						region->degrees = 90;
+						region->super.degrees = 90;
 					} else if (!ss_equals(&entry[1], "false")) {
-						region->degrees = ss_toInt(&entry[1]);
+						region->super.degrees = ss_toInt(&entry[1]);
 					}
 				} else if (ss_equals(&entry[0], "index")) {
 					region->index = ss_toInt(&entry[1]);
@@ -399,7 +399,7 @@ spAtlas *spAtlas_create(const char *begin, int length, const char *dir, void *re
 
 			region->super.u = (float) region->x / page->width;
 			region->super.v = (float) region->y / page->height;
-			if (region->degrees == 90) {
+			if (region->super.degrees == 90) {
 				region->super.u2 = (float) (region->x + region->super.height) / page->width;
 				region->super.v2 = (float) (region->y + region->super.width) / page->height;
 			} else {

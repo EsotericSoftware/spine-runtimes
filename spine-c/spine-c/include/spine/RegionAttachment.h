@@ -48,16 +48,13 @@ typedef struct spRegionAttachment {
 
 	void *rendererObject;
 	spTextureRegion *region;
+	spSequence *sequence;
 
 	float offset[8];
 	float uvs[8];
-
-	spSequence *sequence;
 } spRegionAttachment;
 
 SP_API spRegionAttachment *spRegionAttachment_create(const char *name);
-
-SP_API void spRegionAttachment_setUVs(spRegionAttachment *self, float u, float v, float u2, float v2, float degrees);
 
 SP_API void spRegionAttachment_updateRegion(spRegionAttachment *self);
 

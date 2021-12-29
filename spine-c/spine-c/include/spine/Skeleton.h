@@ -64,7 +64,6 @@ typedef struct spSkeleton {
 
 	spSkin *const skin;
 	spColor color;
-	float time;
 	float scaleX, scaleY;
 	float x, y;
 } spSkeleton;
@@ -119,8 +118,6 @@ SP_API spTransformConstraint *spSkeleton_findTransformConstraint(const spSkeleto
 
 /* Returns 0 if the path constraint was not found. */
 SP_API spPathConstraint *spSkeleton_findPathConstraint(const spSkeleton *self, const char *constraintName);
-
-SP_API void spSkeleton_update(spSkeleton *self, float deltaTime);
 
 #ifdef __cplusplus
 }

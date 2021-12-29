@@ -47,6 +47,7 @@ struct spMeshAttachment {
 
 	void *rendererObject;
 	spTextureRegion *region;
+	spSequence *sequence;
 
 	const char *path;
 
@@ -61,8 +62,6 @@ struct spMeshAttachment {
 	int hullLength;
 
 	spMeshAttachment *const parentMesh;
-
-	spSequence *sequence;
 
 	/* Nonessential. */
 	int edgesCount;

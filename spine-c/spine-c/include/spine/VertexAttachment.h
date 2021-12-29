@@ -50,7 +50,7 @@ struct spVertexAttachment {
 
 	int worldVerticesLength;
 
-	spVertexAttachment *timelineAttachment;
+	spAttachment *timelineAttachment;
 
 	int id;
 };

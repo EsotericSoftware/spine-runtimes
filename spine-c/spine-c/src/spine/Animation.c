@@ -1775,7 +1775,7 @@ void _spDeformTimeline_apply(
 		case SP_ATTACHMENT_MESH:
 		case SP_ATTACHMENT_PATH: {
 			spVertexAttachment *vertexAttachment = SUB_CAST(spVertexAttachment, slot->attachment);
-			if (vertexAttachment->timelineAttachment != SUB_CAST(spVertexAttachment, self->attachment)) return;
+			if (vertexAttachment->timelineAttachment != self->attachment) return;
 			break;
 		}
 		default:

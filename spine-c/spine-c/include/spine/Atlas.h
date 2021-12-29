@@ -101,7 +101,6 @@ struct spAtlasRegion {
 	const char *name;
 	int x, y;
 	int index;
-	int degrees;
 	int *splits;
 	int *pads;
 	spKeyValueArray *keyValues;

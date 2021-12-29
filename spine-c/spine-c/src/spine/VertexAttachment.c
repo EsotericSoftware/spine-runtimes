@@ -52,6 +52,11 @@ void spVertexAttachment_computeWorldVertices(spVertexAttachment *self, spSlot *s
 	float *vertices;
 	int *bones;
 
+	if (self->super.type == SP_ATTACHMENT_MESH || self->super.type == SP_ATTACHMENT_LINKED_MESH) {
+		spMeshAttachment *mesh = SUB_CAST(spMeshAttachment, self);
+		if (mesh->sequence) spSequence_apply(mesh->sequence, slot, SUPER(self));
+	}
+
 	count = offset + (count >> 1) * stride;
 	skeleton = slot->bone->skeleton;
 	deformLength = slot->deformCount;

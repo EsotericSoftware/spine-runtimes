@@ -629,7 +629,3 @@ spPathConstraint *spSkeleton_findPathConstraint(const spSkeleton *self, const ch
 		if (strcmp(self->pathConstraints[i]->data->name, constraintName) == 0) return self->pathConstraints[i];
 	return 0;
 }
-
-void spSkeleton_update(spSkeleton *self, float deltaTime) {
-	self->time += deltaTime;
-}

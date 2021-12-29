@@ -68,6 +68,7 @@ void spSlot_setAttachment(spSlot *self, spAttachment *attachment) {
 	}
 
 	CONST_CAST(spAttachment *, self->attachment) = attachment;
+	self->sequenceIndex = -1;
 }
 
 void spSlot_setToSetupPose(spSlot *self) {

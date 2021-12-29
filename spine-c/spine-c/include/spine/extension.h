@@ -246,7 +246,7 @@ void _spAttachmentLoader_init(spAttachmentLoader *self,
 							  void (*dispose)(spAttachmentLoader *self),
 							  spAttachment *(*createAttachment)(spAttachmentLoader *self, spSkin *skin,
 																spAttachmentType type, const char *name,
-																const char *path),
+																const char *path, spSequence *sequence),
 							  void (*configureAttachment)(spAttachmentLoader *self, spAttachment *),
 							  void (*disposeAttachment)(spAttachmentLoader *self, spAttachment *)
 );

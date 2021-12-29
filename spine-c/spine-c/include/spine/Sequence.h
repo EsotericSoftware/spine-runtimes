@@ -58,7 +58,15 @@ SP_API spSequence *spSequence_copy(spSequence *self);
 
 SP_API void spSequence_apply(spSequence *self, spSlot *slot, spAttachment *attachment);
 
-SP_API char *spSequence_getPath(const char* basePath, int index);
+SP_API void spSequence_getPath(const char* basePath, int index, char *path);
+
+#define SP_SEQUENCE_MODE_HOLD 0
+#define SP_SEQUENCE_MODE_ONCE 1
+#define SP_SEQUENCE_MODE_LOOP 2
+#define SP_SEQUENCE_MODE_PINGPONG 3
+#define SP_SEQUENCE_MODE_ONCEREVERSE 4
+#define SP_SEQUENCE_MODE_LOOPREVERSE 5
+#define SP_SEQUENCE_MODE_PINGPONGREVERSE 6
 
 #ifdef __cplusplus
 }
