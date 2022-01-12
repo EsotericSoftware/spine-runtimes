@@ -48,39 +48,9 @@ namespace Spine.Unity.Playables {
 			}
 
 			var scriptPlayable = ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create(graph, inputCount);
-#if UNITY_EDITOR
-			WarnIfDuplicateTrackIndex();
-#endif
 			var mixerBehaviour = scriptPlayable.GetBehaviour();
 			mixerBehaviour.trackIndex = this.trackIndex;
 			return scriptPlayable;
 		}
-
-#if UNITY_EDITOR
-		static float lastWarningTime = 0;
-
-		public void WarnIfDuplicateTrackIndex () {
-			if (Time.frameCount == lastWarningTime) // only warn once.
-				return;
-			lastWarningTime = Time.frameCount;
-
-			var rootTracks = timelineAsset.GetRootTracks();
-			List<int> trackIndices = new List<int>();
-			int trackFromTop = -1; // first invisible track is marker track, skipped.
-			foreach (var track in rootTracks) {
-				++trackFromTop;
-				if (track.GetType() != typeof(SpineAnimationStateTrack))
-					continue;
-				var animationStateTrack = (SpineAnimationStateTrack)track;
-				int trackIndex = animationStateTrack.trackIndex;
-				if (trackIndices.Contains(trackIndex)) {
-					Debug.LogWarning(string.Format("Please change the 'Track Index' Inspector property " +
-						"at Track number {0} from the top, both tracks are setting animations at track index '{1}'.",
-						trackFromTop, trackIndex));
-				} else
-					trackIndices.Add(trackIndex);
-			}
-		}
-#endif
 	}
 }
