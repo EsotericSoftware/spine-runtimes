@@ -35,7 +35,7 @@ static int nextID = 0;
 
 void _spVertexAttachment_init(spVertexAttachment *attachment) {
 	attachment->id = nextID++;
-	attachment->timelineAttachment = attachment;
+	attachment->timelineAttachment = SUPER(attachment);
 }
 
 void _spVertexAttachment_deinit(spVertexAttachment *attachment) {

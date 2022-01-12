@@ -1514,9 +1514,8 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 			_spSkeletonJson_setError(self, 0, "Parent mesh not found: ", linkedMesh->parent);
 			return NULL;
 		}
-		linkedMesh->mesh->super.timelineAttachment = linkedMesh->inheritDeform ? SUB_CAST(spVertexAttachment, parent)
-																			   : SUB_CAST(spVertexAttachment,
-																						linkedMesh->mesh);
+		linkedMesh->mesh->super.timelineAttachment = linkedMesh->inheritDeform ? parent
+																			   : SUPER(SUPER(linkedMesh->mesh));
 		spMeshAttachment_setParentMesh(linkedMesh->mesh, SUB_CAST(spMeshAttachment, parent));
 		spMeshAttachment_updateRegion(linkedMesh->mesh);
 		spAttachmentLoader_configureAttachment(self->attachmentLoader, SUPER(SUPER(linkedMesh->mesh)));
