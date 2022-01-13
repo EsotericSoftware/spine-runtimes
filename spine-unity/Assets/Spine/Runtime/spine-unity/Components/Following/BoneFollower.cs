@@ -209,7 +209,7 @@ namespace Spine.Unity {
 			}
 
 			Bone parentBone = bone.Parent;
-			Vector3 localScale = new Vector3(1f, 1f, 1f);
+			Vector3 localScale = thisTransform.localScale;
 			if (followParentWorldScale && parentBone != null)
 				localScale = new Vector3(parentBone.WorldScaleX, parentBone.WorldScaleY, 1f);
 			if (followLocalScale)
