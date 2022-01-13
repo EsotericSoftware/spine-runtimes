@@ -188,15 +188,16 @@ namespace Spine.Unity {
 			}
 
 			Bone parentBone = bone.Parent;
-			Vector3 localScale = new Vector3(1f, 1f, 1f);
-			if (followParentWorldScale && parentBone != null)
-				localScale = new Vector3(parentBone.WorldScaleX, parentBone.WorldScaleY, 1f);
-			if (followLocalScale)
-				localScale.Scale(new Vector3(bone.ScaleX, bone.ScaleY, 1f));
-			if (followSkeletonFlip)
-				localScale.y *= Mathf.Sign(bone.Skeleton.ScaleX * bone.Skeleton.ScaleY) * additionalFlipScale;
-			thisTransform.localScale = localScale;
+			if (followParentWorldScale || followLocalScale || followSkeletonFlip) {
+				Vector3 localScale = new Vector3(1f, 1f, 1f);
+				if (followParentWorldScale && parentBone != null)
+					localScale = new Vector3(parentBone.WorldScaleX, parentBone.WorldScaleY, 1f);
+				if (followLocalScale)
+					localScale.Scale(new Vector3(bone.ScaleX, bone.ScaleY, 1f));
+				if (followSkeletonFlip)
+					localScale.y *= Mathf.Sign(bone.Skeleton.ScaleX * bone.Skeleton.ScaleY) * additionalFlipScale;
+				thisTransform.localScale = localScale;
+			}
 		}
-
 	}
 }
