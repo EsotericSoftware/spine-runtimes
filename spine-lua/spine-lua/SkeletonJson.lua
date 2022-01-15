@@ -317,7 +317,7 @@ function SkeletonJson.new (attachmentLoader)
 			if linkedMesh.skin then skin = skeletonData:findSkin(linkedMesh.skin) end
 			if not skin then error("Skin not found: " .. linkedMesh.skin) end
 			local parent = skin:getAttachment(linkedMesh.slotIndex, linkedMesh.parent)
-			if not parent then error("Parent mesh not found: " + linkedMesh.parent) end
+			if not parent then error("Parent mesh not found: " .. linkedMesh.parent) end
 			if linkedMesh.inheritDeform then
 				linkedMesh.mesh.deformAttachment = parent
 			else
@@ -486,7 +486,7 @@ function SkeletonJson.new (attachmentLoader)
 			local _end = getValue(map, "end", nil)
 			if _end then
 				local slot = skeletonData:findSlot(_end)
-				if not slot then error("Clipping end slot not found: " + _end) end
+				if not slot then error("Clipping end slot not found: " .. _end) end
 				clip.endSlot = slot
 			end
 
