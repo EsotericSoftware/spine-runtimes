@@ -116,16 +116,15 @@ namespace spine {
 
 		void setDuration(float inValue);
 
+		/// @param target After the first and before the last entry.
+		static int search(Vector<float> &values, float target);
+
+		static int search(Vector<float> &values, float target, int step);
 	private:
 		Vector<Timeline *> _timelines;
 		HashMap<PropertyId, bool> _timelineIds;
 		float _duration;
 		String _name;
-
-		/// @param target After the first and before the last entry.
-		static int search(Vector<float> &values, float target);
-
-		static int search(Vector<float> &values, float target, int step);
 	};
 }
 

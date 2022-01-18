@@ -42,6 +42,7 @@ void _spMeshAttachment_dispose(spAttachment *attachment) {
 		FREE(self->edges);
 	} else
 		_spAttachment_deinit(attachment);
+	if (self->sequence) FREE(self->sequence);
 	FREE(self);
 }
 
@@ -52,17 +53,8 @@ spAttachment *_spMeshAttachment_copy(spAttachment *attachment) {
 		return SUPER(SUPER(spMeshAttachment_newLinkedMesh(self)));
 	copy = spMeshAttachment_create(attachment->name);
 	copy->rendererObject = self->rendererObject;
-	copy->regionU = self->regionU;
-	copy->regionV = self->regionV;
-	copy->regionU2 = self->regionU2;
-	copy->regionV2 = self->regionV2;
-	copy->regionDegrees = self->regionDegrees;
-	copy->regionOffsetX = self->regionOffsetX;
-	copy->regionOffsetY = self->regionOffsetY;
-	copy->regionWidth = self->regionWidth;
-	copy->regionHeight = self->regionHeight;
-	copy->regionOriginalWidth = self->regionOriginalWidth;
-	copy->regionOriginalHeight = self->regionOriginalHeight;
+	copy->region = self->region;
+	copy->sequence = self->sequence != NULL ? spSequence_copy(self->sequence) : NULL;
 	MALLOC_STR(copy->path, self->path);
 	spColor_setFromColor(&copy->color, &self->color);
 
@@ -90,22 +82,12 @@ spMeshAttachment *spMeshAttachment_newLinkedMesh(spMeshAttachment *self) {
 	spMeshAttachment *copy = spMeshAttachment_create(self->super.super.name);
 
 	copy->rendererObject = self->rendererObject;
-	copy->regionU = self->regionU;
-	copy->regionV = self->regionV;
-	copy->regionU2 = self->regionU2;
-	copy->regionV2 = self->regionV2;
-	copy->regionDegrees = self->regionDegrees;
-	copy->regionOffsetX = self->regionOffsetX;
-	copy->regionOffsetY = self->regionOffsetY;
-	copy->regionWidth = self->regionWidth;
-	copy->regionHeight = self->regionHeight;
-	copy->regionOriginalWidth = self->regionOriginalWidth;
-	copy->regionOriginalHeight = self->regionOriginalHeight;
+	copy->region = self->region;
 	MALLOC_STR(copy->path, self->path);
 	spColor_setFromColor(&copy->color, &self->color);
-	copy->super.deformAttachment = self->super.deformAttachment;
+	copy->super.timelineAttachment = self->super.timelineAttachment;
 	spMeshAttachment_setParentMesh(copy, self->parentMesh ? self->parentMesh : self);
-	spMeshAttachment_updateUVs(copy);
+	if (copy->region) spMeshAttachment_updateRegion(copy);
 	return copy;
 }
 
@@ -117,7 +99,7 @@ spMeshAttachment *spMeshAttachment_create(const char *name) {
 	return self;
 }
 
-void spMeshAttachment_updateUVs(spMeshAttachment *self) {
+void spMeshAttachment_updateRegion(spMeshAttachment *self) {
 	int i, n;
 	float *uvs;
 	float u, v, width, height;
@@ -125,17 +107,17 @@ void spMeshAttachment_updateUVs(spMeshAttachment *self) {
 	FREE(self->uvs);
 	uvs = self->uvs = MALLOC(float, verticesLength);
 	n = verticesLength;
-	u = self->regionU;
-	v = self->regionV;
+	u = self->region->u;
+	v = self->region->v;
 
-	switch (self->regionDegrees) {
+	switch (self->region->degrees) {
 		case 90: {
-			float textureWidth = self->regionHeight / (self->regionU2 - self->regionU);
-			float textureHeight = self->regionWidth / (self->regionV2 - self->regionV);
-			u -= (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureWidth;
-			v -= (self->regionOriginalWidth - self->regionOffsetX - self->regionWidth) / textureHeight;
-			width = self->regionOriginalHeight / textureWidth;
-			height = self->regionOriginalWidth / textureHeight;
+			float textureWidth = self->region->height / (self->region->u2 - self->region->u);
+			float textureHeight = self->region->width / (self->region->v2 - self->region->v);
+			u -= (self->region->originalHeight - self->region->offsetY - self->region->height) / textureWidth;
+			v -= (self->region->originalWidth - self->region->offsetX - self->region->width) / textureHeight;
+			width = self->region->originalHeight / textureWidth;
+			height = self->region->originalWidth / textureHeight;
 			for (i = 0; i < n; i += 2) {
 				uvs[i] = u + self->regionUVs[i + 1] * width;
 				uvs[i + 1] = v + (1 - self->regionUVs[i]) * height;
@@ -143,12 +125,12 @@ void spMeshAttachment_updateUVs(spMeshAttachment *self) {
 			return;
 		}
 		case 180: {
-			float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
-			float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
-			u -= (self->regionOriginalWidth - self->regionOffsetX - self->regionWidth) / textureWidth;
-			v -= self->regionOffsetY / textureHeight;
-			width = self->regionOriginalWidth / textureWidth;
-			height = self->regionOriginalHeight / textureHeight;
+			float textureWidth = self->region->width / (self->region->u2 - self->region->u);
+			float textureHeight = self->region->height / (self->region->v2 - self->region->v);
+			u -= (self->region->originalWidth - self->region->offsetX - self->region->width) / textureWidth;
+			v -= self->region->offsetY / textureHeight;
+			width = self->region->originalWidth / textureWidth;
+			height = self->region->originalHeight / textureHeight;
 			for (i = 0; i < n; i += 2) {
 				uvs[i] = u + (1 - self->regionUVs[i]) * width;
 				uvs[i + 1] = v + (1 - self->regionUVs[i + 1]) * height;
@@ -156,12 +138,12 @@ void spMeshAttachment_updateUVs(spMeshAttachment *self) {
 			return;
 		}
 		case 270: {
-			float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
-			float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
-			u -= self->regionOffsetY / textureWidth;
-			v -= self->regionOffsetX / textureHeight;
-			width = self->regionOriginalHeight / textureWidth;
-			height = self->regionOriginalWidth / textureHeight;
+			float textureHeight = self->region->height / (self->region->v2 - self->region->v);
+			float textureWidth = self->region->width / (self->region->u2 - self->region->u);
+			u -= self->region->offsetY / textureWidth;
+			v -= self->region->offsetX / textureHeight;
+			width = self->region->originalHeight / textureWidth;
+			height = self->region->originalWidth / textureHeight;
 			for (i = 0; i < n; i += 2) {
 				uvs[i] = u + (1 - self->regionUVs[i + 1]) * width;
 				uvs[i + 1] = v + self->regionUVs[i] * height;
@@ -169,12 +151,12 @@ void spMeshAttachment_updateUVs(spMeshAttachment *self) {
 			return;
 		}
 		default: {
-			float textureWidth = self->regionWidth / (self->regionU2 - self->regionU);
-			float textureHeight = self->regionHeight / (self->regionV2 - self->regionV);
-			u -= self->regionOffsetX / textureWidth;
-			v -= (self->regionOriginalHeight - self->regionOffsetY - self->regionHeight) / textureHeight;
-			width = self->regionOriginalWidth / textureWidth;
-			height = self->regionOriginalHeight / textureHeight;
+			float textureWidth = self->region->width / (self->region->u2 - self->region->u);
+			float textureHeight = self->region->height / (self->region->v2 - self->region->v);
+			u -= self->region->offsetX / textureWidth;
+			v -= (self->region->originalHeight - self->region->offsetY - self->region->height) / textureHeight;
+			width = self->region->originalWidth / textureWidth;
+			height = self->region->originalHeight / textureHeight;
 			for (i = 0; i < n; i += 2) {
 				uvs[i] = u + self->regionUVs[i] * width;
 				uvs[i + 1] = v + self->regionUVs[i + 1] * height;

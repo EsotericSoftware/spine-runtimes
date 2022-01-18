@@ -51,16 +51,15 @@ half4 NormalsRenderingFragment(Varyings i) : SV_Target
 	half4 mainTex = i.color * tex2D(_MainTex, i.uv);
 
 #if defined(_NORMALMAP)
-	half3 normalWS = calculateNormalFromBumpMap(i.uv.xy, i.tangentWS.xyz, i.bitangentWS.xyz, i.normalWS.xyz);
+	half3 normalTS = normalize(UnpackScaleNormal(tex2D(_BumpMap, i.uv.xy), _BumpScale));
+	return NormalsRenderingShared(mainTex, normalTS, i.tangentWS.xyz, i.bitangentWS.xyz, i.normalWS.xyz);
 #else
+	half3 normalTS = half3(0, 0, 1);
+	half3 tangentWS = half3(0, 0, 0);
+	half3 bitangentWS = half3(0, 0, 0);
 	half3 normalWS = i.normalWS.xyz;
+	return NormalsRenderingShared(mainTex, normalTS, tangentWS, bitangentWS, normalWS);
 #endif
-
-	half3 normalVS = TransformWorldToViewDir(normalWS);
-	float4 normalColor;
-	normalColor.rgb = 0.5 * ((normalVS) + 1);
-	normalColor.a = mainTex.a;
-	return normalColor;
 }
 
 #endif

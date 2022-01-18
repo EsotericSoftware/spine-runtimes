@@ -2665,17 +2665,24 @@ namespace Spine {
 				case SequenceMode.Loop:
 					index %= count;
 					break;
-				case SequenceMode.Pingpong:
+				case SequenceMode.Pingpong: {
 					int n = (count << 1) - 2;
 					index %= n;
 					if (index >= count) index = n - index;
 					break;
+				}
 				case SequenceMode.OnceReverse:
 					index = Math.Max(count - 1 - index, 0);
 					break;
 				case SequenceMode.LoopReverse:
 					index = count - 1 - (index % count);
 					break;
+				case SequenceMode.PingpongReverse: {
+					int n = (count << 1) - 2;
+					index = (index + count - 1) % n;
+					if (index >= count) index = n - index;
+					break;
+				} // end case
 				}
 			}
 			slot.SequenceIndex = index;

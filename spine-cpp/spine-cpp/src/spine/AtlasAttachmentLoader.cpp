@@ -48,7 +48,7 @@ namespace spine {
 	AtlasAttachmentLoader::AtlasAttachmentLoader(Atlas *atlas) : AttachmentLoader(), _atlas(atlas) {
 	}
 
-	bool loadSequence (Atlas *atlas, const String &basePath, Sequence *sequence) {
+	bool loadSequence(Atlas *atlas, const String &basePath, Sequence *sequence) {
 		Vector<TextureRegion *> &regions = sequence->getRegions();
 		for (int i = 0, n = regions.size(); i < n; i++) {
 			String path = sequence->getPath(basePath, i);
@@ -61,7 +61,7 @@ namespace spine {
 
 	RegionAttachment *AtlasAttachmentLoader::newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
 		SP_UNUSED(skin);
-		RegionAttachment *attachment = new(__FILE__, __LINE__) RegionAttachment(name);
+		RegionAttachment *attachment = new (__FILE__, __LINE__) RegionAttachment(name);
 		if (sequence) {
 			if (!loadSequence(_atlas, path, sequence)) return NULL;
 		} else {

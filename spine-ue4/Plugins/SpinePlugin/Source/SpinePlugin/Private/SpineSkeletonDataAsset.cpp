@@ -39,7 +39,7 @@
 using namespace spine;
 
 #define SPINE_MAJOR_VERSION 4
-#define SPINE_MINOR_VERSION 0
+#define SPINE_MINOR_VERSION 1
 
 FName USpineSkeletonDataAsset::GetSkeletonDataFileName() const {
 #if WITH_EDITORONLY_DATA
@@ -100,11 +100,11 @@ void USpineSkeletonDataAsset::BeginDestroy() {
 
 class SP_API NullAttachmentLoader : public AttachmentLoader {
 public:
-	virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path) {
+	virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
 		return new (__FILE__, __LINE__) RegionAttachment(name);
 	}
 
-	virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path) {
+	virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
 		return new (__FILE__, __LINE__) MeshAttachment(name);
 	}
 

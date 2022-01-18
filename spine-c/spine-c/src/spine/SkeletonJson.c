@@ -1352,7 +1352,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 													  toColor(color, 3));
 							}
 
-							spRegionAttachment_updateOffset(region);
+							spRegionAttachment_updateRegion(region);
 
 							spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 							break;
@@ -1392,7 +1392,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 
 								_readVertices(self, attachmentMap, SUPER(mesh), verticesLength);
 
-								spMeshAttachment_updateUVs(mesh);
+								spMeshAttachment_updateRegion(mesh);
 
 								mesh->hullLength = Json_getInt(attachmentMap, "hull", 0);
 
@@ -1514,11 +1514,10 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 			_spSkeletonJson_setError(self, 0, "Parent mesh not found: ", linkedMesh->parent);
 			return NULL;
 		}
-		linkedMesh->mesh->super.deformAttachment = linkedMesh->inheritDeform ? SUB_CAST(spVertexAttachment, parent)
-																			 : SUB_CAST(spVertexAttachment,
-																						linkedMesh->mesh);
+		linkedMesh->mesh->super.timelineAttachment = linkedMesh->inheritDeform ? parent
+																			   : SUPER(SUPER(linkedMesh->mesh));
 		spMeshAttachment_setParentMesh(linkedMesh->mesh, SUB_CAST(spMeshAttachment, parent));
-		spMeshAttachment_updateUVs(linkedMesh->mesh);
+		spMeshAttachment_updateRegion(linkedMesh->mesh);
 		spAttachmentLoader_configureAttachment(self->attachmentLoader, SUPER(SUPER(linkedMesh->mesh)));
 	}
 

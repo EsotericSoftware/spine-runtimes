@@ -30,13 +30,8 @@
 #include <spine/Slot.h>
 #include <spine/extension.h>
 
-typedef struct {
-	spSlot super;
-	float attachmentTime;
-} _spSlot;
-
 spSlot *spSlot_create(spSlotData *data, spBone *bone) {
-	spSlot *self = SUPER(NEW(_spSlot));
+	spSlot *self = NEW(spSlot);
 	CONST_CAST(spSlotData *, self->data) = data;
 	CONST_CAST(spBone *, self->bone) = bone;
 	spColor_setFromFloats(&self->color, 1, 1, 1, 1);
@@ -68,20 +63,12 @@ void spSlot_setAttachment(spSlot *self, spAttachment *attachment) {
 	if (attachment == self->attachment) return;
 
 	if (!isVertexAttachment(attachment) ||
-		!isVertexAttachment(self->attachment) || (SUB_CAST(spVertexAttachment, attachment)->deformAttachment != SUB_CAST(spVertexAttachment, self->attachment)->deformAttachment)) {
+		!isVertexAttachment(self->attachment) || (SUB_CAST(spVertexAttachment, attachment)->timelineAttachment != SUB_CAST(spVertexAttachment, self->attachment)->timelineAttachment)) {
 		self->deformCount = 0;
 	}
 
 	CONST_CAST(spAttachment *, self->attachment) = attachment;
-	SUB_CAST(_spSlot, self)->attachmentTime = self->bone->skeleton->time;
-}
-
-void spSlot_setAttachmentTime(spSlot *self, float time) {
-	SUB_CAST(_spSlot, self)->attachmentTime = self->bone->skeleton->time - time;
-}
-
-float spSlot_getAttachmentTime(const spSlot *self) {
-	return self->bone->skeleton->time - SUB_CAST(_spSlot, self)->attachmentTime;
+	self->sequenceIndex = -1;
 }
 
 void spSlot_setToSetupPose(spSlot *self) {

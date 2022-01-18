@@ -43,7 +43,7 @@ import { Sequence } from "./attachments/Sequence"
  * See [Loading skeleton data](http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data) in the
  * Spine Runtimes Guide. */
 export class AtlasAttachmentLoader implements AttachmentLoader {
-	atlas: TextureAtlas;
+	atlas: TextureAtlas = null;
 
 	constructor (atlas: TextureAtlas) {
 		this.atlas = atlas;

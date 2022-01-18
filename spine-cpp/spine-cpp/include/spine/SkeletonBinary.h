@@ -61,6 +61,8 @@ namespace spine {
 
 	class CurveTimeline2;
 
+	class Sequence;
+
 	class SP_API SkeletonBinary : public SpineObject {
 	public:
 		static const int BONE_ROTATE = 0;
@@ -80,6 +82,9 @@ namespace spine {
 		static const int SLOT_RGBA2 = 3;
 		static const int SLOT_RGB2 = 4;
 		static const int SLOT_ALPHA = 5;
+
+		static const int ATTACHMENT_DEFORM = 0;
+		static const int ATTACHMENT_SEQUENCE = 1;
 
 		static const int PATH_POSITION = 0;
 		static const int PATH_SPACING = 1;
@@ -137,10 +142,12 @@ namespace spine {
 
 		Skin *readSkin(DataInput *input, bool defaultSkin, SkeletonData *skeletonData, bool nonessential);
 
+		Sequence *readSequence(DataInput *input);
+
 		Attachment *readAttachment(DataInput *input, Skin *skin, int slotIndex, const String &attachmentName,
 								   SkeletonData *skeletonData, bool nonessential);
 
-		void readVertices(DataInput *input, VertexAttachment *attachment, int vertexCount);
+		void readVertices(DataInput *input, Vector<float> &vertices, Vector<size_t> &bones, int vertexCount);
 
 		void readFloatArray(DataInput *input, int n, float scale, Vector<float> &array);
 

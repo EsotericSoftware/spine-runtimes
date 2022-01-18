@@ -32,16 +32,16 @@ import { Color } from "./Utils";
 /** Stores the setup pose for a {@link Bone}. */
 export class BoneData {
 	/** The index of the bone in {@link Skeleton#getBones()}. */
-	index: number;
+	index: number = 0;
 
 	/** The name of the bone, which is unique across all bones in the skeleton. */
-	name: string;
+	name: string = null;
 
 	/** @returns May be null. */
-	parent: BoneData;
+	parent: BoneData = null;
 
 	/** The bone's length. */
-	length: number;
+	length: number = 0;
 
 	/** The local x translation. */
 	x = 0;

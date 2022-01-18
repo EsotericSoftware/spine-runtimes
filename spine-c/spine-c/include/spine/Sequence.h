@@ -27,33 +27,49 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef Spine_Property_h
-#define Spine_Property_h
+#ifndef SPINE_SEQUENCE_H
+#define SPINE_SEQUENCE_H
 
-namespace spine {
-	typedef long long PropertyId;
-	enum Property {
-		Property_Rotate = 1 << 0,
-		Property_X = 1 << 1,
-		Property_Y = 1 << 2,
-		Property_ScaleX = 1 << 3,
-		Property_ScaleY = 1 << 4,
-		Property_ShearX = 1 << 5,
-		Property_ShearY = 1 << 6,
-		Property_Rgb = 1 << 7,
-		Property_Alpha = 1 << 8,
-		Property_Rgb2 = 1 << 9,
-		Property_Attachment = 1 << 10,
-		Property_Deform = 1 << 11,
-		Property_Event = 1 << 12,
-		Property_DrawOrder = 1 << 13,
-		Property_IkConstraint = 1 << 14,
-		Property_TransformConstraint = 1 << 15,
-		Property_PathConstraintPosition = 1 << 16,
-		Property_PathConstraintSpacing = 1 << 17,
-		Property_PathConstraintMix = 1 << 18,
-		Property_Sequence = 1 << 19
-	};
+#include <spine/dll.h>
+#include <spine/TextureRegion.h>
+#include <spine/Atlas.h>
+#include "Attachment.h"
+#include "Slot.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+_SP_ARRAY_DECLARE_TYPE(spTextureRegionArray, spTextureRegion*)
+
+typedef struct spSequence {
+	int id;
+	int start;
+	int digits;
+	int setupIndex;
+	spTextureRegionArray *regions;
+} spSequence;
+
+SP_API spSequence *spSequence_create(int start, int digits, int setupIndex, int numRegions);
+
+SP_API void spSequence_dispose(spSequence *self);
+
+SP_API spSequence *spSequence_copy(spSequence *self);
+
+SP_API void spSequence_apply(spSequence *self, spSlot *slot, spAttachment *attachment);
+
+SP_API void spSequence_getPath(const char* basePath, int index, char *path);
+
+#define SP_SEQUENCE_MODE_HOLD 0
+#define SP_SEQUENCE_MODE_ONCE 1
+#define SP_SEQUENCE_MODE_LOOP 2
+#define SP_SEQUENCE_MODE_PINGPONG 3
+#define SP_SEQUENCE_MODE_ONCEREVERSE 4
+#define SP_SEQUENCE_MODE_LOOPREVERSE 5
+#define SP_SEQUENCE_MODE_PINGPONGREVERSE 6
+
+#ifdef __cplusplus
 }
+#endif
 
-#endif /* Spine_Property_h */
+#endif

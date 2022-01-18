@@ -356,29 +356,29 @@ spAtlas *spAtlas_create(const char *begin, int length, const char *dir, void *re
 					region->x = ss_toInt(&entry[1]);
 					region->y = ss_toInt(&entry[2]);
 				} else if (ss_equals(&entry[0], "size")) {
-					region->width = ss_toInt(&entry[1]);
-					region->height = ss_toInt(&entry[2]);
+					region->super.width = ss_toInt(&entry[1]);
+					region->super.height = ss_toInt(&entry[2]);
 				} else if (ss_equals(&entry[0], "bounds")) {
 					region->x = ss_toInt(&entry[1]);
 					region->y = ss_toInt(&entry[2]);
-					region->width = ss_toInt(&entry[3]);
-					region->height = ss_toInt(&entry[4]);
+					region->super.width = ss_toInt(&entry[3]);
+					region->super.height = ss_toInt(&entry[4]);
 				} else if (ss_equals(&entry[0], "offset")) {
-					region->offsetX = ss_toInt(&entry[1]);
-					region->offsetY = ss_toInt(&entry[2]);
+					region->super.offsetX = ss_toInt(&entry[1]);
+					region->super.offsetY = ss_toInt(&entry[2]);
 				} else if (ss_equals(&entry[0], "orig")) {
-					region->originalWidth = ss_toInt(&entry[1]);
-					region->originalHeight = ss_toInt(&entry[2]);
+					region->super.originalWidth = ss_toInt(&entry[1]);
+					region->super.originalHeight = ss_toInt(&entry[2]);
 				} else if (ss_equals(&entry[0], "offsets")) {
-					region->offsetX = ss_toInt(&entry[1]);
-					region->offsetY = ss_toInt(&entry[2]);
-					region->originalWidth = ss_toInt(&entry[3]);
-					region->originalHeight = ss_toInt(&entry[4]);
+					region->super.offsetX = ss_toInt(&entry[1]);
+					region->super.offsetY = ss_toInt(&entry[2]);
+					region->super.originalWidth = ss_toInt(&entry[3]);
+					region->super.originalHeight = ss_toInt(&entry[4]);
 				} else if (ss_equals(&entry[0], "rotate")) {
 					if (ss_equals(&entry[1], "true")) {
-						region->degrees = 90;
+						region->super.degrees = 90;
 					} else if (!ss_equals(&entry[1], "false")) {
-						region->degrees = ss_toInt(&entry[1]);
+						region->super.degrees = ss_toInt(&entry[1]);
 					}
 				} else if (ss_equals(&entry[0], "index")) {
 					region->index = ss_toInt(&entry[1]);
@@ -392,19 +392,19 @@ spAtlas *spAtlas_create(const char *begin, int length, const char *dir, void *re
 					spKeyValueArray_add(region->keyValues, keyValue);
 				}
 			}
-			if (region->originalWidth == 0 && region->originalHeight == 0) {
-				region->originalWidth = region->width;
-				region->originalHeight = region->height;
+			if (region->super.originalWidth == 0 && region->super.originalHeight == 0) {
+				region->super.originalWidth = region->super.width;
+				region->super.originalHeight = region->super.height;
 			}
 
-			region->u = (float) region->x / page->width;
-			region->v = (float) region->y / page->height;
-			if (region->degrees == 90) {
-				region->u2 = (float) (region->x + region->height) / page->width;
-				region->v2 = (float) (region->y + region->width) / page->height;
+			region->super.u = (float) region->x / page->width;
+			region->super.v = (float) region->y / page->height;
+			if (region->super.degrees == 90) {
+				region->super.u2 = (float) (region->x + region->super.height) / page->width;
+				region->super.v2 = (float) (region->y + region->super.width) / page->height;
 			} else {
-				region->u2 = (float) (region->x + region->width) / page->width;
-				region->v2 = (float) (region->y + region->height) / page->height;
+				region->super.u2 = (float) (region->x + region->super.width) / page->width;
+				region->super.v2 = (float) (region->y + region->super.height) / page->height;
 			}
 		}
 	}

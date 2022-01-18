@@ -35,7 +35,7 @@ import { VertexAttachment, Attachment } from "./Attachment";
 export class ClippingAttachment extends VertexAttachment {
 	/** Clipping is performed between the clipping polygon's slot and the end slot. Returns null if clipping is done until the end of
 	 * the skeleton's rendering. */
-	endSlot: SlotData;
+	endSlot: SlotData = null;
 
 	// Nonessential.
 	/** The color of the clipping polygon as it was in Spine. Available only when nonessential data was exported. Clipping polygons

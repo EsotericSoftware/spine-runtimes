@@ -33,7 +33,7 @@
 
 typedef struct _spAttachmentLoaderVtable {
 	spAttachment *(*createAttachment)(spAttachmentLoader *self, spSkin *skin, spAttachmentType type, const char *name,
-									  const char *path);
+									  const char *path, spSequence *sequence);
 
 	void (*configureAttachment)(spAttachmentLoader *self, spAttachment *);
 
@@ -46,7 +46,7 @@ void _spAttachmentLoader_init(spAttachmentLoader *self,
 							  void (*dispose)(spAttachmentLoader *self),
 							  spAttachment *(*createAttachment)(spAttachmentLoader *self, spSkin *skin,
 																spAttachmentType type, const char *name,
-																const char *path),
+																const char *path, spSequence *sequence),
 							  void (*configureAttachment)(spAttachmentLoader *self, spAttachment *),
 							  void (*disposeAttachment)(spAttachmentLoader *self, spAttachment *)) {
 	CONST_CAST(_spAttachmentLoaderVtable *, self->vtable) = NEW(_spAttachmentLoaderVtable);
@@ -69,12 +69,12 @@ void spAttachmentLoader_dispose(spAttachmentLoader *self) {
 
 spAttachment *
 spAttachmentLoader_createAttachment(spAttachmentLoader *self, spSkin *skin, spAttachmentType type, const char *name,
-									const char *path) {
+									const char *path, spSequence *sequence) {
 	FREE(self->error1);
 	FREE(self->error2);
 	self->error1 = 0;
 	self->error2 = 0;
-	return VTABLE(spAttachmentLoader, self)->createAttachment(self, skin, type, name, path);
+	return VTABLE(spAttachmentLoader, self)->createAttachment(self, skin, type, name, path, sequence);
 }
 
 void spAttachmentLoader_configureAttachment(spAttachmentLoader *self, spAttachment *attachment) {

@@ -7,7 +7,7 @@ up into multiple modules:
 1. `spine-webgl/`, a self-contained WebGL backend, built on the core classes.
 1. `spine-canvas/`, a self-contained Canvas backend, built on the core classes.
 1. `spine-threejs/`, a self-contained THREE.JS backend, built on the core classes.
-1. `spine-player/`, a self-contained player to easily display Spine animations on your website, built on core the classes and WebGL backend.
+1. `spine-player/`, a self-contained player to easily display Spine animations on your website, built on the core classes and WebGL backend.
 
 In most cases, the `spine-player` module is best suited for your needs. Please refer to the [Spine Web Player documentation](https://esotericsoftware.com/spine-player) for more information.
 
@@ -104,6 +104,7 @@ spine-ts is developed with TypeScript, we thus recommend the following developme
 3. Open a terminal and execute
 ```
 git clone https://github.com/esotericsoftware/spine-runtimes
+cd spine-runtimes/spine-ts
 npm install
 npm run dev
 ```

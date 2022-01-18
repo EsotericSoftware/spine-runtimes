@@ -49,6 +49,9 @@
 * **Breaking changes**
 
 * **Additions**
+  * `BoneFollower` and `BoneFollowerGraphic` now provide an additional `Follow Parent World Scale` parameter to allow following simple scale of parent bones (rotated/skewed scale can't be supported). 
+  * `SpineAtlasAsset.CreateRuntimeInstance` methods now provide an optional `newCustomTextureLoader` parameter (defaults to `null`) which can be set to e.g. `(a) => new YourCustomTextureLoader(a)` to use your own `TextureLoader` subclass instead of `MaterialsTextureLoader`.
+  * Improved `Advanced - Fix Prefab Override MeshFilter` property for `SkeletonRenderer` (and subclasses`SkeletonAnimation` and `SkeletonMecanim`), now providing an additional option to use a global value which can be set in `Edit - Preferences - Spine`.
 
 * **Changes of default values**
 
@@ -246,6 +249,8 @@
   * Prefabs containing `SkeletonRenderer`, `SkeletonAnimation` and `SkeletonMecanim` now provide a proper Editor preview, including the preview thumbnail.
   * `SkeletonRenderer` (and subclasses`SkeletonAnimation` and `SkeletonMecanim`) now provide a property `Advanced - Fix Prefab Override MeshFilter`, which when enabled fixes the prefab always being marked as changed. It sets the MeshFilter's hide flags to `DontSaveInEditor`. Unfortunately this comes at the cost of references to the `MeshFilter` by other components being lost, therefore this parameter defaults to `false` to keep the safe existing behaviour.
   * `BoundingBoxFollower` and `BoundingBoxFollowerGraphic` now provide previously missing `usedByEffector` and `usedByComposite` parameters to be set at all generated colliders.
+  * `BoneFollower` and `BoneFollowerGraphic` now provide an additional `Follow Parent World Scale` parameter to allow following simple scale of parent bones (rotated/skewed scale can't be supported).
+  * Improved `Advanced - Fix Prefab Override MeshFilter` property for `SkeletonRenderer` (and subclasses`SkeletonAnimation` and `SkeletonMecanim`), now providing an additional option to use a global value which can be set in `Edit - Preferences - Spine`.
 
 * **Changes of default values**
 

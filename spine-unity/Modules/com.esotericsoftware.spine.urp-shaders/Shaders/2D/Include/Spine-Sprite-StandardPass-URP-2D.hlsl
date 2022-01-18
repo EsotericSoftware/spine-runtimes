@@ -92,7 +92,18 @@ half4 CombinedShapeLightFragment(VertexOutputSpriteURP2D input) : SV_Target
 	half4 main = texureColor * input.vertexColor;
 
 	half4 mask = SAMPLE_TEXTURE2D(_MaskTex, sampler_MaskTex, input.texcoord.xy);
+#if UNITY_VERSION  < 202120
 	half4 pixel = half4(CombinedShapeLightShared(half4(main.rgb, 1), mask, input.lightingUV).rgb, main.a);
+#else
+	SurfaceData2D surfaceData;
+	InputData2D inputData;
+	surfaceData.albedo = main.rgb;
+	surfaceData.alpha = 1;
+	surfaceData.mask = mask;
+	inputData.uv = input.texcoord;
+	inputData.lightingUV = input.lightingUV;
+	half4 pixel = half4(CombinedShapeLightShared(surfaceData, inputData).rgb, main.a);
+#endif
 
 #if defined(_RIM_LIGHTING)
 	#if defined(_NORMALMAP)

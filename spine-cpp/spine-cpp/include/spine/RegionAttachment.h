@@ -60,8 +60,6 @@ namespace spine {
 
 		void updateRegion();
 
-		void setUVs(float u, float v, float u2, float v2, float degrees);
-
 		/// Transforms the attachment's four vertices to world coordinates.
 		/// @param bone The parent bone.
 		/// @param worldVertices The output world vertices. Must have a length greater than or equal to offset + 8.

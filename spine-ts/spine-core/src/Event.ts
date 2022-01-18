@@ -35,13 +35,13 @@ import { EventData } from "./EventData";
  * AnimationStateListener {@link AnimationStateListener#event()}, and
  * [Events](http://esotericsoftware.com/spine-events) in the Spine User Guide. */
 export class Event {
-	data: EventData;
-	intValue: number;
-	floatValue: number;
-	stringValue: string;
-	time: number;
-	volume: number;
-	balance: number;
+	data: EventData = null;
+	intValue: number = 0;
+	floatValue: number = 0;
+	stringValue: string = null;
+	time: number = 0;
+	volume: number = 0;
+	balance: number = 0;
 
 	constructor (time: number, data: EventData) {
 		if (!data) throw new Error("data cannot be null.");

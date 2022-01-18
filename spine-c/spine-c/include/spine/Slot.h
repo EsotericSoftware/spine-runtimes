@@ -50,6 +50,8 @@ typedef struct spSlot {
 	int deformCapacity;
 	int deformCount;
 	float *deform;
+
+	int sequenceIndex;
 } spSlot;
 
 SP_API spSlot *spSlot_create(spSlotData *data, spBone *bone);
@@ -58,10 +60,6 @@ SP_API void spSlot_dispose(spSlot *self);
 
 /* @param attachment May be 0 to clear the attachment for the slot. */
 SP_API void spSlot_setAttachment(spSlot *self, spAttachment *attachment);
-
-SP_API void spSlot_setAttachmentTime(spSlot *self, float time);
-
-SP_API float spSlot_getAttachmentTime(const spSlot *self);
 
 SP_API void spSlot_setToSetupPose(spSlot *self);
 

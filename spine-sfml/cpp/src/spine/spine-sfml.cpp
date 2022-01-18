@@ -77,7 +77,6 @@ namespace spine {
 	}
 
 	void SkeletonDrawable::update(float deltaTime) {
-		skeleton->update(deltaTime);
 		state->update(deltaTime * timeScale);
 		state->apply(*skeleton);
 		skeleton->updateWorldTransform();
@@ -123,7 +122,7 @@ namespace spine {
 				}
 
 				worldVertices.setSize(8, 0);
-				regionAttachment->computeWorldVertices(slot.getBone(), worldVertices, 0, 2);
+				regionAttachment->computeWorldVertices(slot, worldVertices, 0, 2);
 				verticesCount = 4;
 				uvs = &regionAttachment->getUVs();
 				indices = &quadIndices;
@@ -142,7 +141,7 @@ namespace spine {
 
 				worldVertices.setSize(mesh->getWorldVerticesLength(), 0);
 				texture = (Texture *) ((AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
-				mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices, 0, 2);
+				mesh->computeWorldVertices(slot, 0, mesh->getWorldVerticesLength(), worldVertices.buffer(), 0, 2);
 				verticesCount = mesh->getWorldVerticesLength() >> 1;
 				uvs = &mesh->getUVs();
 				indices = &mesh->getTriangles();

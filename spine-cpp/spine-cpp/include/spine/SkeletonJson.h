@@ -59,6 +59,8 @@ namespace spine {
 
 	class String;
 
+	class Sequence;
+
 	class SP_API SkeletonJson : public SpineObject {
 	public:
 		explicit SkeletonJson(Atlas *atlas);
@@ -81,6 +83,8 @@ namespace spine {
 		float _scale;
 		const bool _ownsLoader;
 		String _error;
+
+		static Sequence *readSequence(Json *sequence);
 
 		static void
 		setBezier(CurveTimeline *timeline, int frame, int value, int bezier, float time1, float value1, float cx1,

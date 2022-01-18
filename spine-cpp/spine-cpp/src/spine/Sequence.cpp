@@ -35,22 +35,21 @@
 
 using namespace spine;
 
-Sequence::Sequence() : _id(Sequence::getNextID()),
-					   _regions(),
-					   _start(0),
-					   _digits(0),
-					   _setupIndex(0) {
-
+Sequence::Sequence(int count) : _id(Sequence::getNextID()),
+								_regions(),
+								_start(0),
+								_digits(0),
+								_setupIndex(0) {
+	_regions.setSize(count, NULL);
 }
 
 Sequence::~Sequence() {
-
 }
 
 Sequence *Sequence::copy() {
-	Sequence *copy = new (__FILE__, __LINE__) Sequence();
+	Sequence *copy = new (__FILE__, __LINE__) Sequence(_regions.size());
 	for (size_t i = 0; i < _regions.size(); i++) {
-		copy->_regions.add(_regions[i]);
+		copy->_regions[i] = _regions[i];
 	}
 	copy->_start = _start;
 	copy->_digits = _digits;
@@ -61,12 +60,13 @@ Sequence *Sequence::copy() {
 void Sequence::apply(Slot *slot, Attachment *attachment) {
 	int index = slot->getSequenceIndex();
 	if (index == -1) index = _setupIndex;
-	if (index >= (int)_regions.size()) index = _regions.size() - 1;
+	if (index >= (int) _regions.size()) index = _regions.size() - 1;
 	TextureRegion *region = _regions[index];
 
 	if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
 		RegionAttachment *regionAttachment = static_cast<RegionAttachment *>(attachment);
 		if (regionAttachment->getRegion() != region) {
+			regionAttachment->setRendererObject(region);
 			regionAttachment->setRegion(region);
 			regionAttachment->updateRegion();
 		}
@@ -75,6 +75,7 @@ void Sequence::apply(Slot *slot, Attachment *attachment) {
 	if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
 		MeshAttachment *meshAttachment = static_cast<MeshAttachment *>(attachment);
 		if (meshAttachment->getRegion() != region) {
+			meshAttachment->setRendererObject(region);
 			meshAttachment->setRegion(region);
 			meshAttachment->updateRegion();
 		}
