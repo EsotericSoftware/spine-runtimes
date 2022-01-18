@@ -153,7 +153,7 @@
 				float4  positionCS		: SV_POSITION;
 				float4  color			: COLOR;
 				float2	uv				: TEXCOORD0;
-				float3  normalVS		: TEXCOORD1;
+				float3  normalWS		: TEXCOORD1;
 			};
 
 			TEXTURE2D(_MainTex);
@@ -166,8 +166,7 @@
 				o.positionCS = TransformObjectToHClip(attributes.positionOS);
 				o.uv = attributes.uv;
 				o.color = attributes.color;
-				float3 normalWS = TransformObjectToWorldDir(float3(0, 0, -1));
-				o.normalVS = TransformWorldToViewDir(normalWS);
+				o.normalWS = TransformObjectToWorldDir(float3(0, 0, -1));
 				return o;
 			}
 
@@ -176,11 +175,10 @@
 			float4 NormalsRenderingFragment(Varyings i) : SV_Target
 			{
 				float4 mainTex = i.color * SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
-
-				float4 normalColor;
-				normalColor.rgb = 0.5 * ((i.normalVS)+1);
-				normalColor.a = mainTex.a;
-				return normalColor;
+				half3 normalTS = half3(0, 0, 1);
+				half3 tangentWS = half3(0, 0, 0);
+				half3 bitangentWS = half3(0, 0, 0);
+				return NormalsRenderingShared(mainTex, normalTS, tangentWS, bitangentWS, i.normalWS);
 			}
 			ENDHLSL
 		}
