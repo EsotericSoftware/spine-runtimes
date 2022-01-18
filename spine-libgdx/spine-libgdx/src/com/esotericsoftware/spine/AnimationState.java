@@ -1211,7 +1211,7 @@ public class AnimationState {
 			this.shortestRotation = shortestRotation;
 		}
 
-		/** If true, mixing rotation between tracks always uses the shortest rotation direction. When the rotation is animation the
+		/** If true, mixing rotation between tracks always uses the shortest rotation direction. If the rotation is animated, the
 		 * shortest rotation direction may change during the mix.
 		 * <p>
 		 * If false, the shortest rotation direction is remembered when the mix starts and the same direction is used for the rest
