@@ -925,7 +925,8 @@ namespace Spine.Unity.Editor {
 					skeletonDataAsset.Clear();
 				}
 				var skeletonData = skeletonDataAsset.GetSkeletonData(true);
-				BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonDataAsset, ref skeletonData);
+				if (skeletonData != null)
+					BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonDataAsset, ref skeletonData);
 				AssetDatabase.SaveAssets();
 
 				return skeletonDataAsset;
@@ -975,9 +976,9 @@ namespace Spine.Unity.Editor {
 				);
 
 				switch (result) {
-				case -1:
-					//Debug.Log("Select Atlas");
-					AtlasAssetBase selectedAtlas = BrowseAtlasDialog(Path.GetDirectoryName(skeletonPath).Replace('\\', '/'));
+				case -1: { // Select Atlas
+					string pathForwardSlash = Path.GetDirectoryName(skeletonPath).Replace('\\', '/');
+					AtlasAssetBase selectedAtlas = BrowseAtlasDialog(pathForwardSlash, localAtlases);
 					if (selectedAtlas != null) {
 						localAtlases.Clear();
 						localAtlases.Add(selectedAtlas);
@@ -988,14 +989,17 @@ namespace Spine.Unity.Editor {
 						}
 					}
 					break;
-				case 0: // Resolve AtlasAssets...
-					var atlasList = MultiAtlasDialog(requiredPaths, Path.GetDirectoryName(skeletonPath).Replace('\\', '/'),
-						Path.GetFileNameWithoutExtension(skeletonPath));
+				}
+				case 0: { // Resolve AtlasAssets...
+					string pathForwardSlash = Path.GetDirectoryName(skeletonPath).Replace('\\', '/');
+					var atlasList = MultiAtlasDialog(requiredPaths, pathForwardSlash,
+						localAtlases, filename);
 					if (atlasList != null)
 						AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath), atlasList.ToArray());
 
 					resolved = true;
 					break;
+				}
 				case 1: // Import without atlas
 					Debug.LogWarning("Imported with missing atlases. Skeleton will not render: " + Path.GetFileName(skeletonPath));
 					AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath), new AtlasAssetBase[] { });
@@ -1009,7 +1013,9 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		public static List<AtlasAssetBase> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory, string filename = "") {
+		public static List<AtlasAssetBase> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory,
+			List<AtlasAssetBase> localAtlases, string filename = "") {
+
 			List<AtlasAssetBase> atlasAssets = new List<AtlasAssetBase>();
 			bool resolved = false;
 			string lastAtlasPath = initialDirectory;
@@ -1064,7 +1070,7 @@ namespace Spine.Unity.Editor {
 
 				switch (result) {
 				case 0: // Browse...
-					AtlasAssetBase selectedAtlasAsset = BrowseAtlasDialog(lastAtlasPath);
+					AtlasAssetBase selectedAtlasAsset = BrowseAtlasDialog(lastAtlasPath, localAtlases);
 					if (selectedAtlasAsset != null) {
 						if (!atlasAssets.Contains(selectedAtlasAsset)) {
 							var atlas = selectedAtlasAsset.GetAtlas();
@@ -1092,7 +1098,7 @@ namespace Spine.Unity.Editor {
 			return atlasAssets;
 		}
 
-		public static AtlasAssetBase BrowseAtlasDialog (string dirPath) {
+		public static AtlasAssetBase BrowseAtlasDialog (string dirPath, List<AtlasAssetBase> localAtlases) {
 			string path = EditorUtility.OpenFilePanel("Select AtlasAsset...", dirPath, "asset");
 			if (path == "")
 				return null; // Canceled or closed by user.
@@ -1100,12 +1106,20 @@ namespace Spine.Unity.Editor {
 			int subLen = Application.dataPath.Length - 6;
 			string assetRelativePath = path.Substring(subLen, path.Length - subLen).Replace("\\", "/");
 
-			var obj = AssetDatabase.LoadAssetAtPath(assetRelativePath, typeof(AtlasAssetBase));
+			UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath(assetRelativePath, typeof(AtlasAssetBase));
+			if (obj == null) {
+				// atlas assets that were just created fail to load, search localAtlases
+				foreach (AtlasAssetBase localAtlas in localAtlases) {
+					string newAtlasPath = AssetDatabase.GetAssetPath(localAtlas);
+					if (newAtlasPath == assetRelativePath)
+						return localAtlas;
+				}
+			}
+
 			if (obj == null || !(obj is AtlasAssetBase)) {
 				Debug.Log("Chosen asset was not of type AtlasAssetBase");
 				return null;
 			}
-
 			return (AtlasAssetBase)obj;
 		}
 		#endregion
