@@ -908,18 +908,23 @@ namespace spine {
 			return startSlotIndex > index || endSlotIndex < index;
 		}
 
-		bool nothingToDraw(Slot &slot, int startSlotIndex, int endSlotIndex) {
+		bool nothingToDraw(Slot& slot, int startSlotIndex, int endSlotIndex) {
 			Attachment *attachment = slot.getAttachment();
 			if (!attachment ||
 				slotIsOutRange(slot, startSlotIndex, endSlotIndex) ||
-				!slot.getBone().isActive() ||
-				slot.getColor().a == 0)
+				!slot.getBone().isActive())
 				return true;
-			if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
-				if (static_cast<RegionAttachment *>(attachment)->getColor().a == 0)
+			const auto& attachmentRTTI = attachment->getRTTI();
+			if (attachmentRTTI.isExactly(ClippingAttachment::rtti))
+				return false;
+			if (slot.getColor().a == 0)
+				return true;
+			if (attachmentRTTI.isExactly(RegionAttachment::rtti)) {
+				if (static_cast<RegionAttachment*>(attachment)->getColor().a == 0)
 					return true;
-			} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
-				if (static_cast<MeshAttachment *>(attachment)->getColor().a == 0)
+			}
+			else if (attachmentRTTI.isExactly(MeshAttachment::rtti)) {
+				if (static_cast<MeshAttachment*>(attachment)->getColor().a == 0)
 					return true;
 			}
 			return false;
