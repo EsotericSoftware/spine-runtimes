@@ -161,8 +161,7 @@ static void _addToUpdateCache(_spSkeleton *const internal, _spUpdateType type, v
 	_spUpdate *update;
 	if (internal->updateCacheCount == internal->updateCacheCapacity) {
 		internal->updateCacheCapacity *= 2;
-		internal->updateCache = (_spUpdate *) realloc(internal->updateCache,
-													  sizeof(_spUpdate) * internal->updateCacheCapacity);
+		internal->updateCache = (_spUpdate *) REALLOC(internal->updateCache, _spUpdate, internal->updateCacheCapacity);
 	}
 	update = internal->updateCache + internal->updateCacheCount;
 	update->type = type;
