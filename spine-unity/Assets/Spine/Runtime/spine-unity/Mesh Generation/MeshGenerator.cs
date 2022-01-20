@@ -262,8 +262,7 @@ namespace Spine.Unity {
 					if (lastRendererMaterial != material) {
 						if (lastRendererMaterial != null)
 							return true;
-						else
-							lastRendererMaterial = material;
+						lastRendererMaterial = material;
 					}
 				}
 			}
