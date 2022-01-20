@@ -52,6 +52,7 @@ export class ShapeRenderer implements Disposable {
 		this.mesh = new Mesh(context, [new Position2Attribute(), new ColorAttribute()], maxVertices, 0);
 		let gl = this.context.gl;
 		this.srcColorBlend = gl.SRC_ALPHA;
+		this.srcAlphaBlend = gl.ONE;
 		this.dstColorBlend = gl.ONE_MINUS_SRC_ALPHA;
 		this.dstAlphaBlend = gl.ONE_MINUS_SRC_ALPHA;
 	}
