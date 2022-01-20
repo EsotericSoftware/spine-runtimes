@@ -20,7 +20,7 @@ spine-monogame supports all Spine features.
 
 ## Setup
 
-1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it as a zip via the download button above.
+1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it as a ZIP file via the download button above.
 1. Copy the contents of the `spine-csharp/src` and `spine-xna/src` directories into your project.
 
 ## Example
