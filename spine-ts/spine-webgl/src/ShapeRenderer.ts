@@ -68,7 +68,7 @@ export class ShapeRenderer implements Disposable {
 		gl.blendFuncSeparate(this.srcColorBlend, this.dstColorBlend, this.srcAlphaBlend, this.dstAlphaBlend);
 	}
 
-	setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstColorBlend: number, dstAlphaBlend = dstColorBlend) {
+	setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstColorBlend: number, dstAlphaBlend: number = dstColorBlend) {
 		if (this.srcColorBlend == srcColorBlend && this.srcAlphaBlend == srcAlphaBlend && this.dstColorBlend == dstColorBlend && this.dstAlphaBlend == dstAlphaBlend) return;
 		this.srcColorBlend = srcColorBlend;
 		this.srcAlphaBlend = srcAlphaBlend;
