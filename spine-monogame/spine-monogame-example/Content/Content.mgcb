@@ -17,5 +17,17 @@
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
-/build:SpineEffect.fx
+/build:shaders\\SpineEffect.fx
+
+#begin SpineEffectNormalMap.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders\\SpineEffectNormalMap.fx
+
+#begin SpineEffectOutline.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders\\SpineEffectOutline.fx
 

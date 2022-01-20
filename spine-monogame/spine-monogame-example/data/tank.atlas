@@ -1,0 +1,56 @@
+tank.png
+	size: 1024, 1024
+	filter: Linear, Linear
+	scale: 0.5
+antenna
+	bounds: 2, 712, 11, 152
+	rotate: 90
+cannon
+	bounds: 222, 694, 466, 29
+cannon-connector
+	bounds: 82, 654, 56, 68
+	rotate: 90
+ground
+	bounds: 2, 175, 512, 177
+guntower
+	bounds: 647, 347, 365, 145
+machinegun
+	bounds: 690, 694, 166, 29
+machinegun-mount
+	bounds: 858, 687, 36, 48
+	rotate: 90
+rock
+	bounds: 664, 607, 290, 64
+smoke-glow
+	bounds: 946, 673, 50, 50
+smoke-puff01-bg
+	bounds: 312, 630, 92, 62
+smoke-puff01-fg
+	bounds: 222, 633, 88, 59
+smoke-puff02-fg
+	bounds: 406, 630, 92, 62
+smoke-puff03-fg
+	bounds: 500, 630, 92, 62
+smoke-puff04-fg
+	bounds: 2, 662, 78, 48
+tank-bottom
+	bounds: 2, 354, 643, 138
+tank-bottom-shadow
+	bounds: 2, 2, 646, 171
+tank-top
+	bounds: 195, 494, 704, 111
+tread
+	bounds: 172, 708, 48, 15
+tread-inside
+	bounds: 156, 710, 13, 14
+	rotate: 90
+wheel-big
+	bounds: 97, 540, 96, 96
+wheel-big-overlay
+	bounds: 2, 559, 93, 93
+wheel-mid
+	bounds: 594, 624, 68, 68
+wheel-mid-overlay
+	bounds: 152, 638, 68, 68
+wheel-small
+	bounds: 908, 687, 36, 36

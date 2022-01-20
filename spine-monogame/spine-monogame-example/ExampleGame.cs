@@ -119,7 +119,7 @@ namespace Spine {
 		public TankScreen (Example game) : base(game) {
 			// Instantiate and configure the two color tinting effect and
 			// assign it to the skeleton renderer
-			var twoColorTintEffect = game.Content.Load<Effect>("Content\\SpineEffect");
+			var twoColorTintEffect = game.Content.Load<Effect>("Content\\shaders\\SpineEffect");
 			twoColorTintEffect.Parameters["World"].SetValue(Matrix.Identity);
 			twoColorTintEffect.Parameters["View"].SetValue(Matrix.CreateLookAt(new Vector3(0.0f, 0.0f, 1.0f), Vector3.Zero, Vector3.Up));
 			skeletonRenderer.Effect = twoColorTintEffect;
