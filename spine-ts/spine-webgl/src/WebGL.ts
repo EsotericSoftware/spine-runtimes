@@ -75,7 +75,17 @@ const ONE_MINUS_DST_ALPHA = 0x0305;
 const DST_COLOR = 0x0306;
 
 export class WebGLBlendModeConverter {
-	static getDestGLBlendMode (blendMode: BlendMode) {
+	static getDestColorGLBlendMode (blendMode: BlendMode) {
+		switch (blendMode) {
+			case BlendMode.Normal: return ONE_MINUS_SRC_ALPHA;
+			case BlendMode.Additive: return ONE;
+			case BlendMode.Multiply: return ONE_MINUS_SRC_ALPHA;
+			case BlendMode.Screen: return ONE;
+			default: throw new Error("Unknown blend mode: " + blendMode);
+		}
+	}
+
+	static getDestAlphaGLBlendMode (blendMode: BlendMode) {
 		switch (blendMode) {
 			case BlendMode.Normal: return ONE_MINUS_SRC_ALPHA;
 			case BlendMode.Additive: return ONE;
@@ -90,7 +100,7 @@ export class WebGLBlendModeConverter {
 			case BlendMode.Normal: return premultipliedAlpha ? ONE : SRC_ALPHA;
 			case BlendMode.Additive: return premultipliedAlpha ? ONE : SRC_ALPHA;
 			case BlendMode.Multiply: return DST_COLOR;
-			case BlendMode.Screen: return ONE;
+			case BlendMode.Screen: return SRC_ALPHA;
 			default: throw new Error("Unknown blend mode: " + blendMode);
 		}
 	}
@@ -100,7 +110,7 @@ export class WebGLBlendModeConverter {
 			case BlendMode.Normal: return ONE;
 			case BlendMode.Additive: return ONE;
 			case BlendMode.Multiply: return ONE_MINUS_SRC_ALPHA;
-			case BlendMode.Screen: return ONE_MINUS_SRC_COLOR;
+			case BlendMode.Screen: return SRC_ALPHA;
 			default: throw new Error("Unknown blend mode: " + blendMode);
 		}
 	}
