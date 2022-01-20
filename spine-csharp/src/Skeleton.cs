@@ -28,7 +28,6 @@
  *****************************************************************************/
 
 using System;
-using System.Collections.Generic;
 
 namespace Spine {
 	public class Skeleton {
@@ -122,7 +121,6 @@ namespace Spine {
 				pathConstraints.Add(new PathConstraint(pathConstraintData, this));
 
 			UpdateCache();
-			//UpdateWorldTransform();
 		}
 
 		/// <summary>Caches information about bones and constraints. Must be called if the <see cref="Skin"/> is modified or if bones, constraints, or
