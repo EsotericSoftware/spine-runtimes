@@ -8,8 +8,7 @@ setup() {
 	cp $dir/.clang-format $dir/..
 	cp $dir/build.gradle $dir/..
 	cp $dir/settings.gradle $dir/..	
-	cp $dir/.editorconfig $dir/../spine-csharp
-	cp $dir/.editorconfig $dir/../spine-xna
+	cp $dir/.editorconfig $dir/../spine-csharp	
 	cp $dir/.editorconfig $dir/../spine-monogame
 	cp $dir/.editorconfig $dir/../spine-unity
 }
@@ -18,8 +17,7 @@ cleanup() {
 	rm $dir/../.clang-format
 	rm $dir/../build.gradle
 	rm $dir/../settings.gradle
-	rm $dir/../spine-csharp/.editorconfig	
-	rm $dir/../spine-xna/.editorconfig
+	rm $dir/../spine-csharp/.editorconfig		
 	rm $dir/../spine-monogame/.editorconfig
 	rm $dir/../spine-unity/.editorconfig
 }
@@ -31,7 +29,6 @@ setup
 pushd $dir/..
 ./formatters/gradlew spotlessApply
 dotnet-format spine-csharp/spine-csharp.sln
-dotnet-format -f spine-xna
 dotnet-format -f spine-monogame
 dotnet-format -f spine-unity
 popd

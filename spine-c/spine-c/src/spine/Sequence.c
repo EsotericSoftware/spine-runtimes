@@ -30,7 +30,7 @@
 #include <spine/Sequence.h>
 #include <spine/extension.h>
 
-_SP_ARRAY_IMPLEMENT_TYPE(spTextureRegionArray, spTextureRegion*)
+_SP_ARRAY_IMPLEMENT_TYPE(spTextureRegionArray, spTextureRegion *)
 
 static int nextSequenceId = 0;
 
@@ -69,7 +69,7 @@ void spSequence_apply(spSequence *self, spSlot *slot, spAttachment *attachment) 
 	region = self->regions->items[index];
 
 	if (attachment->type == SP_ATTACHMENT_REGION) {
-		spRegionAttachment *regionAttachment = (spRegionAttachment*)attachment;
+		spRegionAttachment *regionAttachment = (spRegionAttachment *) attachment;
 		if (regionAttachment->region != region) {
 			regionAttachment->rendererObject = region;
 			regionAttachment->region = region;
@@ -78,7 +78,7 @@ void spSequence_apply(spSequence *self, spSlot *slot, spAttachment *attachment) 
 	}
 
 	if (attachment->type == SP_ATTACHMENT_MESH) {
-		spMeshAttachment *meshAttachment = (spMeshAttachment*)attachment;
+		spMeshAttachment *meshAttachment = (spMeshAttachment *) attachment;
 		if (meshAttachment->region != region) {
 			meshAttachment->rendererObject = region;
 			meshAttachment->region = region;
@@ -87,6 +87,6 @@ void spSequence_apply(spSequence *self, spSlot *slot, spAttachment *attachment) 
 	}
 }
 
-void spSequence_getPath(const char* basePath, int index, char* path) {
+void spSequence_getPath(const char *basePath, int index, char *path) {
 	fix me
 }
