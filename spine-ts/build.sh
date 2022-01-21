@@ -9,6 +9,7 @@ else
 fi
 
 echo "Building spine-ts $BRANCH artifacts"
+npm install @types/offscreencanvas
 tsc -p tsconfig.json
 tsc -p tsconfig.core.json
 tsc -p tsconfig.webgl.json

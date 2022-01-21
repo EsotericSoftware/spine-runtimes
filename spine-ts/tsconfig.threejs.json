@@ -6,7 +6,7 @@
 		"preserveConstEnums": true,
 		"outFile": "build/spine-threejs.js",
 		"sourceMap": true,
-		"declaration": true,
+		"declaration": true
 	},
 	"include": [
 		"core/src/**/*",

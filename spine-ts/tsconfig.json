@@ -6,7 +6,12 @@
 		"preserveConstEnums": true,
 		"outFile": "build/spine-all.js",
 		"sourceMap": true,
-		"declaration": true
+		"declaration": true,
+		"lib": [
+			"DOM",
+			"ES2015",
+			"WebWorker.ImportScripts"
+		]
 	},
 	"include": [
 		"core/src/**/*",

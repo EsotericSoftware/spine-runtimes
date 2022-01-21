@@ -25,5 +25,9 @@
   "bugs": {
     "url": "https://github.com/EsotericSoftware/spine-runtimes/issues"
   },
-  "homepage": "https://github.com/EsotericSoftware/spine-runtimes#readme"
+  "homepage": "https://github.com/EsotericSoftware/spine-runtimes#readme",
+  "dependencies": {
+    "@types/offscreencanvas": "^2019.6.4",
+    "@types/webvr-api": "^0.0.36"
+  }
 }

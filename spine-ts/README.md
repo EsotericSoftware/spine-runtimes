@@ -104,6 +104,7 @@ The spine-ts runtime and the various backends are implemented in TypeScript for 
 2. On the command line, Install the TypeScript compiler via `npm install -g typescript`.
 3. Install [Visual Studio Code](https://code.visualstudio.com/).
 4. On the command line, change into the `spine-ts` directory.
+5. Install the offscreen types package via `npm install @types/offscreencanvas`.
 5. Start the TypeScript compiler in watcher mode for the backend you want to work on:
   * **Core**: `tsc -w -p tsconfig.core.json`, builds `core/src`, outputs `build/spine-core.js|d.ts|js.map`.
   * **WebGL**: `tsc -w -p tsconfig.webgl.json`, builds `core/src` and `webgl/src`, outputs `build/spine-webgl.js|d.ts|js.map`.
