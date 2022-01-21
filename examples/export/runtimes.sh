@@ -264,31 +264,31 @@ cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-ts/spine-player/example/
 cp -f ../spineboy/export/spineboy-pma.atlas "$ROOT/spine-ts/spine-player/example/assets/"
 cp -f ../spineboy/export/spineboy-pma.png "$ROOT/spine-ts/spine-player/example/assets/"
 
-echo "spine-xna"
-rm "$ROOT/spine-xna/example/data/"*
-cp -f ../coin/export/coin-pro.json "$ROOT/spine-xna/example/data/"
-cp -f ../coin/export/coin-pro.skel "$ROOT/spine-xna/example/data/"
-cp -f ../coin/export/coin.atlas "$ROOT/spine-xna/example/data/"
-cp -f ../coin/export/coin.png "$ROOT/spine-xna/example/data/"
+echo "spine-monogame"
+rm "$ROOT/spine-monogame/spine-monogame-example/data/"*
+cp -f ../coin/export/coin-pro.json "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../coin/export/coin-pro.skel "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../coin/export/coin.atlas "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../coin/export/coin.png "$ROOT/spine-monogame/spine-monogame-example/data/"
 
-cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-xna/example/data/"
+cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-monogame/spine-monogame-example/data/"
 # Note: normalmap need to be created manually. Thus we use a separately prepared atlas and
 # diffuse map so that the maps always match. These atlas textures are copied to the target dir.
-cp -f ../raptor/manual-maps/raptor.atlas "$ROOT/spine-xna/example/data/"
-cp -f ../raptor/manual-maps/raptor.png "$ROOT/spine-xna/example/data/"
-cp -f ../raptor/manual-maps/raptor-normals.png "$ROOT/spine-xna/example/data/raptor_normals.png"
+cp -f ../raptor/manual-maps/raptor.atlas "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../raptor/manual-maps/raptor.png "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../raptor/manual-maps/raptor-normals.png "$ROOT/spine-monogame/spine-monogame-example/data/raptor_normals.png"
 
-cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-xna/example/data/"
-cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-xna/example/data/"
-cp -f ../spineboy/export/spineboy.png "$ROOT/spine-xna/example/data/"
+cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-monogame/spine-monogame-example/data/"
 
-cp -f ../tank/export/tank-pro.json "$ROOT/spine-xna/example/data/"
-cp -f ../tank/export/tank.atlas "$ROOT/spine-xna/example/data/"
-cp -f ../tank/export/tank.png "$ROOT/spine-xna/example/data/"
+cp -f ../tank/export/tank-pro.json "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../tank/export/tank.atlas "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../tank/export/tank.png "$ROOT/spine-monogame/spine-monogame-example/data/"
 
-cp -f ../mix-and-match/export/mix-and-match-pro.json "$ROOT/spine-xna/example/data/"
-cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-xna/example/data/"
-cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-xna/example/data/"
+cp -f ../mix-and-match/export/mix-and-match-pro.json "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-monogame/spine-monogame-example/data/"
+cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-monogame/spine-monogame-example/data/"
 
 echo "spine-ue4"
 rm "$ROOT/spine-ue4/Content/GettingStarted/Assets/Raptor/raptor.json"

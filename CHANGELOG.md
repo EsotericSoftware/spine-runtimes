@@ -60,6 +60,8 @@
 * **Restructuring (Non-Breaking)**
 
 ### XNA/MonoGame
+* **Breaking change**: Removed spine-xna in favor of spine-monogame. See https://github.com/EsotericSoftware/spine-runtimes/issues/1949
+* Added new spine-monogame solution. See [spine-monogame/README.md](spine-monogame/README.md) for updated instructions on how to use spine-monogame.
 
 ## Java
 * **Breaking change**: `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.

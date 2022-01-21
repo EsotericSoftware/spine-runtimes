@@ -118,7 +118,7 @@ namespace Spine {
 					if (attachment is RegionAttachment) {
 						var regionAttachment = (RegionAttachment)attachment;
 						var vertices = this.vertices;
-						regionAttachment.ComputeWorldVertices(slot.Bone, vertices, 0, 2);
+						regionAttachment.ComputeWorldVertices(slot, vertices, 0, 2);
 						renderer.Line(vertices[0], vertices[1], vertices[2], vertices[3]);
 						renderer.Line(vertices[2], vertices[3], vertices[4], vertices[5]);
 						renderer.Line(vertices[4], vertices[5], vertices[6], vertices[7]);

@@ -656,7 +656,7 @@ namespace spine {
 
 				RegionAttachment *attachment = (RegionAttachment *) slot->getAttachment();
 				float worldVertices[8];
-                attachment->computeWorldVertices(*slot, worldVertices, 0, 2);
+				attachment->computeWorldVertices(*slot, worldVertices, 0, 2);
 				const Vec2 points[4] =
 						{
 								{worldVertices[0], worldVertices[1]},
@@ -911,13 +911,17 @@ namespace spine {
 			Attachment *attachment = slot.getAttachment();
 			if (!attachment ||
 				slotIsOutRange(slot, startSlotIndex, endSlotIndex) ||
-				!slot.getBone().isActive() ||
-				slot.getColor().a == 0)
+				!slot.getBone().isActive())
 				return true;
-			if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
+			const auto &attachmentRTTI = attachment->getRTTI();
+			if (attachmentRTTI.isExactly(ClippingAttachment::rtti))
+				return false;
+			if (slot.getColor().a == 0)
+				return true;
+			if (attachmentRTTI.isExactly(RegionAttachment::rtti)) {
 				if (static_cast<RegionAttachment *>(attachment)->getColor().a == 0)
 					return true;
-			} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
+			} else if (attachmentRTTI.isExactly(MeshAttachment::rtti)) {
 				if (static_cast<MeshAttachment *>(attachment)->getColor().a == 0)
 					return true;
 			}

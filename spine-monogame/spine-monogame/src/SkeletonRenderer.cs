@@ -123,17 +123,17 @@ namespace Spine {
 				if (attachment is RegionAttachment) {
 					RegionAttachment regionAttachment = (RegionAttachment)attachment;
 					attachmentColorR = regionAttachment.R; attachmentColorG = regionAttachment.G; attachmentColorB = regionAttachment.B; attachmentColorA = regionAttachment.A;
-					AtlasRegion region = (AtlasRegion)regionAttachment.RendererObject;
+					AtlasRegion region = (AtlasRegion)regionAttachment.Region;
 					textureObject = region.page.rendererObject;
 					verticesCount = 4;
-					regionAttachment.ComputeWorldVertices(slot.Bone, vertices, 0, 2);
+					regionAttachment.ComputeWorldVertices(slot, vertices, 0, 2);
 					indicesCount = 6;
 					indices = quadTriangles;
 					uvs = regionAttachment.UVs;
 				} else if (attachment is MeshAttachment) {
 					MeshAttachment mesh = (MeshAttachment)attachment;
 					attachmentColorR = mesh.R; attachmentColorG = mesh.G; attachmentColorB = mesh.B; attachmentColorA = mesh.A;
-					AtlasRegion region = (AtlasRegion)mesh.RendererObject;
+					AtlasRegion region = (AtlasRegion)mesh.Region;
 					textureObject = region.page.rendererObject;
 					int vertexCount = mesh.WorldVerticesLength;
 					if (vertices.Length < vertexCount) vertices = new float[vertexCount];

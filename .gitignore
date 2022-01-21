@@ -60,13 +60,6 @@ spine-monogame/example/obj
 spine-monogame/example/Content/bin/
 spine-monogame/example/Content/obj/
 
-spine-xna/bin
-spine-xna/obj
-spine-xna/example/bin
-spine-xna/example/obj
-spine-xna/example-content/obj/
-spine-xna/.vs/
-
 spine-unity/Assets/spine-csharp*
 !spine-unity/Assets/spine-csharp/Place spine-csharp src here.*
 !spine-unity/Assets/spine-csharp/add spine-csharp src here.*
@@ -155,3 +148,10 @@ spine-ts/spine-threejs/dist
 spine-libgdx/gradle
 spine-libgdx/gradlew
 spine-libgdx/gradlew.bat
+spine-monogame/packages
+spine-monogame/spine-monogame/bin
+spine-monogame/spine-monogame/obj
+spine-monogame/spine-monogame-example/Content/bin
+spine-monogame/spine-monogame-example/Content/obj
+spine-monogame/spine-monogame-example/bin
+spine-monogame/spine-monogame-example/obj

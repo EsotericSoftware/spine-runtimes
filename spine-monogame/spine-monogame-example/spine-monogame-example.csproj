@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <TieredCompilation>false</TieredCompilation>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Icon.ico" />
+    <None Remove="Icon.bmp" />
+    <None Remove="Content\skeletons\coin-pro.json" />
+    <None Remove="Content\skeletons\coin-pro.skel" />
+    <None Remove="Content\skeletons\coin.atlas" />
+    <None Remove="Content\skeletons\coin.png" />
+    <None Remove="Content\skeletons\mix-and-match-pro.json" />
+    <None Remove="Content\skeletons\mix-and-match.atlas" />
+    <None Remove="Content\skeletons\mix-and-match.png" />
+    <None Remove="Content\skeletons\raptor_normals.png" />
+    <None Remove="Content\skeletons\raptor-pro.json" />
+    <None Remove="Content\skeletons\raptor.atlas" />
+    <None Remove="Content\skeletons\raptor.png" />
+    <None Remove="Content\skeletons\spineboy-pro.skel" />
+    <None Remove="Content\skeletons\spineboy.atlas" />
+    <None Remove="Content\skeletons\spineboy.png" />
+    <None Remove="Content\skeletons\tank-pro.json" />
+    <None Remove="Content\skeletons\tank.atlas" />
+    <None Remove="Content\skeletons\tank.png" />
+    <None Remove="Content\shaders\SpineEffect.fx" />
+    <None Remove="Content\shaders\SpineEffectOutline.fx" />
+    <None Remove="Content\shaders\SpineEffectNormalmap.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Icon.ico" />
+    <EmbeddedResource Include="Icon.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <MonoGameContentReference Include="Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.0.1641" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\spine-monogame\spine-monogame.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\shaders\SpineEffect.fx" />
+    <Content Include="Content\shaders\SpineEffectOutline.fx" />
+    <Content Include="Content\shaders\SpineEffectNormalmap.fx" />
+  </ItemGroup>
+</Project>
