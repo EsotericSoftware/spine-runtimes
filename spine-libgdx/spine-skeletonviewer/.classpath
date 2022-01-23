@@ -2,9 +2,14 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="assets"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="/gdx-box2d/libs/gdx-box2d-natives.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/spine-libgdx"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/gdx-backend-lwjgl"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gdx-backend-lwjgl3"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/gdx-lwjgl3-glfw-awt-macos"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
