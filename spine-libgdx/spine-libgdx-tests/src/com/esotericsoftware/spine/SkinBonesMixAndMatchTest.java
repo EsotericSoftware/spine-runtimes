@@ -31,7 +31,7 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -113,6 +113,6 @@ public class SkinBonesMixAndMatchTest extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-		new Lwjgl3Application(new SkinBonesMixAndMatchTest());
+		new LwjglApplication(new SkinBonesMixAndMatchTest());
 	}
 }
