@@ -152,6 +152,3 @@ spine-ts/spine-canvas/dist
 spine-ts/spine-webgl/dist
 spine-ts/spine-player/dist
 spine-ts/spine-threejs/dist
-spine-libgdx/spine-libgdx/out
-spine-libgdx/spine-libgdx-tests/out
-spine-libgdx/spine-skeletonviewer/out

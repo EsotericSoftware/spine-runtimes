@@ -1,4 +1,6 @@
 // includeBuild "../../libgdx"
+// rootProject.name = "spine-libgdx-parent"
+
 include ":spine-libgdx"
 include ":spine-libgdx-tests"
 include ":spine-skeletonviewer"
