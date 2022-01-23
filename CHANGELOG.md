@@ -73,6 +73,8 @@
 
 
 ### libGDX
+* `spine-libgdx`, `spine-libgdx-tests`, and `spine-skeletonviewer` are now fully Gradle-ified.
+* `spine-skeletonviewer` now supports quickly loading skeletons by dragging and dropping `.json` or `.skel` skeleton files onto the window.
 
 ## Typescript/Javascript
 * **Breaking change**: `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.
