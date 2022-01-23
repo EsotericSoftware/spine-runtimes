@@ -1,51 +1,56 @@
-apply plugin: "maven-publish"
-apply plugin: "java"
-
-group = "com.github.EsotericSoftware"
-version = "4.1"
+group = "com.esotericsoftware.spine"
+version = "4.0.58.1"
 
 ext {
-    libgdxVersion = "1.10.0"
+    libgdxVersion = "1.10.1-SNAPSHOT"
+    javaVersion = 8
 }
 
-sourceSets.main.java.srcDirs = ["spine-libgdx/src"]
-sourceSets.test.java.srcDirs = ["spine-libgdx-tests/src"]
-
-repositories {
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots"
+allprojects {
+    repositories {
+        mavenLocal()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+        mavenCentral()
     }
-    mavenCentral()
 }
 
-dependencies {
-    implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
+project("spine-libgdx") {
+    apply plugin: "java"
+    sourceSets.main.java.srcDirs = ["src"]
 
-    testImplementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
-    testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$libgdxVersion"
-    testImplementation "com.badlogicgames.gdx:gdx-platform:$libgdxVersion:natives-desktop"
-    testImplementation "com.badlogicgames.gdx:gdx-box2d:$libgdxVersion"
-    testImplementation "com.badlogicgames.gdx:gdx-box2d-platform:$libgdxVersion:natives-desktop"
-
+    dependencies {
+        implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
+    }
 }
 
-task myJavadocs(type: Javadoc) {
-    source = sourceSets.main.allJava
-    javadoc.options.addStringOption('Xdoclint:none', '-quiet')
+project("spine-libgdx-tests") {
+    apply plugin: "java"
+    sourceSets.main.java.srcDirs = ["src"]
+    sourceSets.main.resources.srcDirs = ["assets"]
 
+    dependencies {
+        implementation  project(":spine-libgdx")
+        implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-platform:$libgdxVersion:natives-desktop"
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$libgdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-lwjgl3-glfw-awt-macos:$libgdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-box2d:$libgdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-box2d-platform:$libgdxVersion:natives-desktop"
+    }
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
+project("spine-skeletonviewer") {
+    apply plugin: "java"
+    sourceSets.main.java.srcDirs = ["src"]
+    sourceSets.main.resources.srcDirs = ["assets"]
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
+    dependencies {
+        implementation  project(":spine-libgdx")
+        implementation "com.badlogicgames.gdx:gdx:$libgdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-platform:$libgdxVersion:natives-desktop"
+        implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$libgdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-lwjgl3-glfw-awt-macos:$libgdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-box2d:$libgdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-box2d-platform:$libgdxVersion:natives-desktop"
+    }
 }

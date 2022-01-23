@@ -33,7 +33,7 @@ import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.badlogic.gdx.Files.FileType;
-import com.badlogic.gdx.backends.lwjgl.LwjglFileHandle;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
@@ -136,7 +136,7 @@ public class AnimationStateTests {
 	int test;
 
 	AnimationStateTests () {
-		skeletonData = json.readSkeletonData(new LwjglFileHandle("test/test.json", FileType.Internal));
+		skeletonData = json.readSkeletonData(new Lwjgl3FileHandle("test/test.json", FileType.Internal));
 
 		TrackEntry entry;
 
