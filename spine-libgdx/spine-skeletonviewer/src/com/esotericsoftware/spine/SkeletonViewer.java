@@ -37,6 +37,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowAdapter;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -368,11 +369,23 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 		if (dpiScale >= 2.0f) uiScale = 2;
 
+		SkeletonViewer skeletonViewer = new SkeletonViewer();
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.disableAudio(true);
 		config.setWindowedMode((int)(800 * uiScale), (int)(600 * uiScale));
 		config.setTitle("Skeleton Viewer");
 		config.setBackBufferConfig(8, 8, 8, 8, 24, 0, 2);
-		new Lwjgl3Application(new SkeletonViewer(), config);
+		config.setWindowListener(new Lwjgl3WindowAdapter() {
+			@Override
+			public void filesDropped (String[] files) {
+				for (String file : files) {
+					if (file.endsWith(".json") || file.endsWith(".skel")) {
+						skeletonViewer.loadSkeleton(Gdx.files.absolute(file));
+						return;
+					}
+				}
+			}
+		});
+		new Lwjgl3Application(skeletonViewer, config);
 	}
 }
