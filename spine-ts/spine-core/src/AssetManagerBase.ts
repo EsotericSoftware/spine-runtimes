@@ -139,7 +139,7 @@ export class AssetManagerBase implements Disposable {
 	loadTextureAtlas (path: string,
 		success: (path: string, atlas: TextureAtlas) => void = null,
 		error: (path: string, message: string) => void = null,
-		fileAlias: {[keyword:string] : string} = null
+		fileAlias: { [keyword: string]: string } = null
 	) {
 		let index = path.lastIndexOf("/");
 		let parent = index >= 0 ? path.substring(0, index + 1) : "";
