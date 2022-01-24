@@ -32,7 +32,7 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -168,6 +168,6 @@ public class SimpleTest2 extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-		new LwjglApplication(new SimpleTest2());
+		new Lwjgl3Application(new SimpleTest2());
 	}
 }

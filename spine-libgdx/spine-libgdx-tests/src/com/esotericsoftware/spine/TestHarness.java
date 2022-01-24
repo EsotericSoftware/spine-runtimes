@@ -31,7 +31,8 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -122,6 +123,8 @@ public class TestHarness extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-		new LwjglApplication(new TestHarness(), "", 640, 640);
+		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+		config.setWindowedMode(640, 640);
+		new Lwjgl3Application(new TestHarness(), config);
 	}
 }

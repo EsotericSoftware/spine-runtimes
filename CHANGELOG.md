@@ -73,6 +73,8 @@
 
 
 ### libGDX
+* `spine-libgdx`, `spine-libgdx-tests`, and `spine-skeletonviewer` are now fully Gradle-ified.
+* `spine-skeletonviewer` now supports quickly loading skeletons by dragging and dropping `.json` or `.skel` skeleton files onto the window.
 
 ## Typescript/Javascript
 * **Breaking change**: `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.
@@ -334,6 +336,7 @@
 * Added `SpinePlayerConfig.draw`. If set, the callback is called each frame, just after the skeleton is drawn.
 * Added `SpinePlayerConfig.downloader`. The `spine.Downloader` instance can be shared between players so assets are only downloaded once.
 * If `SpinePlayerConfig.jsonURL` ends with an anchor, the anchor text is used to find the skeleton in the specified JSON file.
+* Added `SpinePlayer.dispose()`, disposes all CPU and GPU side resources, removes all listeners, and removes the player DOM from the parent.
 
 # 3.8
 

@@ -34,7 +34,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -378,6 +378,6 @@ public class NormalMapTest extends ApplicationAdapter {
 		else if (args.length == 1) //
 			args = new String[] {args[0], null};
 
-		new LwjglApplication(new NormalMapTest(args[0], args[1]));
+		new Lwjgl3Application(new NormalMapTest(args[0], args[1]));
 	}
 }

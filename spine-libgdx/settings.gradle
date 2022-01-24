@@ -1,0 +1,4 @@
+// includeBuild "../../libgdx"
+include ":spine-libgdx"
+include ":spine-libgdx-tests"
+include ":spine-skeletonviewer"

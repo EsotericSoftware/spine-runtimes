@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, Bone, Color, Downloader, MathUtils, MixBlend, MixDirection, Skeleton, SkeletonBinary, SkeletonData, SkeletonJson, StringMap, TextureAtlas, TextureFilter, TimeKeeper, TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
+import { Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, Bone, Color, Disposable, Downloader, MathUtils, MixBlend, MixDirection, Skeleton, SkeletonBinary, SkeletonData, SkeletonJson, StringMap, TextureAtlas, TextureFilter, TimeKeeper, TrackEntry, Vector2 } from "@esotericsoftware/spine-core"
 import { AssetManager, GLTexture, Input, LoadingScreen, ManagedWebGLRenderingContext, ResizeMode, SceneRenderer, Vector3 } from "@esotericsoftware/spine-webgl"
 
 export interface SpinePlayerConfig {
@@ -178,7 +178,7 @@ export interface Viewport {
 	padBottom: string | number
 }
 
-export class SpinePlayer {
+export class SpinePlayer implements Disposable {
 	public parent: HTMLElement;
 	public dom: HTMLElement;
 	public canvas: HTMLCanvasElement;
@@ -211,11 +211,13 @@ export class SpinePlayer {
 	public speed = 1;
 	public time = new TimeKeeper();
 	private stopRequestAnimationFrame = false;
+	private disposed = false;
 
 	private viewport: Viewport = {} as Viewport;
 	private currentViewport: Viewport;
 	private previousViewport: Viewport;
 	private viewportTransitionStart = 0;
+	private eventListeners: Array<{ target: any, event: any, func: any }> = [];
 
 	constructor (parent: HTMLElement | string, private config: SpinePlayerConfig) {
 		this.parent = typeof parent === "string" ? document.getElementById(parent) : parent;
@@ -248,10 +250,27 @@ export class SpinePlayer {
 		this.initialize();
 
 		// Register a global resize handler to redraw, avoiding flicker.
-		window.addEventListener("resize", () => this.drawFrame(false));
+		this.addEventListener(window, "resize", () => this.drawFrame(false));
 
 		// Start the rendering loop.
 		requestAnimationFrame(() => this.drawFrame());
+	}
+
+	dispose (): void {
+		this.sceneRenderer.dispose();
+		this.loadingScreen.dispose();
+		this.assetManager.dispose();
+		for (var i = 0; i < this.eventListeners.length; i++) {
+			var eventListener = this.eventListeners[i];
+			eventListener.target.removeEventListener(eventListener.event, eventListener.func);
+		}
+		this.parent.removeChild(this.dom);
+		this.disposed = true;
+	}
+
+	addEventListener (target: any, event: any, func: any) {
+		this.eventListeners.push({ target: target, event: event, func: func });
+		target.addEventListener(event, func);
 	}
 
 	private validateConfig (config: SpinePlayerConfig) {
@@ -583,16 +602,17 @@ export class SpinePlayer {
 		if (config.showControls) {
 			// For manual hover to work, we need to disable hidding controls if the mouse/touch entered the clickable area of a child of the controls.
 			// For this we need to register a mouse handler on the document and see if we are within the canvas area.
-			document.addEventListener("mousemove", (ev: UIEvent) => {
+			this.addEventListener(document, "mousemove", (ev: UIEvent) => {
 				if (ev instanceof MouseEvent) handleHover(ev.clientX, ev.clientY);
 			});
-			document.addEventListener("touchmove", (ev: UIEvent) => {
+			this.addEventListener(document, "touchmove", (ev: UIEvent) => {
 				if (ev instanceof TouchEvent) {
 					let touches = ev.changedTouches;
 					if (touches.length) {
 						let touch = touches[0];
 						handleHover(touch.clientX, touch.clientY);
 					}
+
 				}
 			});
 
@@ -747,6 +767,7 @@ export class SpinePlayer {
 	private drawFrame (requestNextFrame = true) {
 		try {
 			if (this.error) return;
+			if (this.disposed) return;
 			if (requestNextFrame && !this.stopRequestAnimationFrame) requestAnimationFrame(() => this.drawFrame());
 
 			let doc = document as any;
@@ -1015,12 +1036,17 @@ export class SpinePlayer {
 class Popup {
 	public dom: HTMLElement;
 	private className: string;
+	private windowClickListener: any;
 
 	constructor (private id: string, private button: HTMLElement, private player: SpinePlayer, parent: HTMLElement, htmlContent: string) {
 		this.dom = createElement(/*html*/`<div class="spine-player-popup spine-player-hidden"></div>`);
 		this.dom.innerHTML = htmlContent;
 		parent.appendChild(this.dom);
 		this.className = "spine-player-button-icon-" + id + "-selected";
+	}
+
+	dispose () {
+
 	}
 
 	hide (id: string): boolean {
@@ -1063,7 +1089,7 @@ class Popup {
 				dismissed = true;
 			}
 		};
-		window.addEventListener("click", windowClickListener);
+		this.player.addEventListener(window, "click", windowClickListener);
 	}
 }
 
@@ -1073,6 +1099,7 @@ class Switch {
 	public change: (value: boolean) => void;
 
 	constructor (private text: string) { }
+
 
 	create (): HTMLElement {
 		this.switch = createElement(/*html*/`
@@ -1092,7 +1119,8 @@ class Switch {
 	setEnabled (enabled: boolean) {
 		if (enabled) this.switch.classList.add("active");
 		else this.switch.classList.remove("active");
-		this.enabled = enabled;
+		this.enabled = enabled
+			;
 	}
 
 	isEnabled (): boolean {
