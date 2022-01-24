@@ -73,6 +73,14 @@ export class SceneRenderer implements Disposable {
 		this.skeletonDebugRenderer = new SkeletonDebugRenderer(this.context);
 	}
 
+	dispose () {
+		this.batcher.dispose();
+		this.batcherShader.dispose();
+		this.shapes.dispose();
+		this.shapesShader.dispose();
+		this.skeletonDebugRenderer.dispose();
+	}
+
 	begin () {
 		this.camera.update();
 		this.enableRenderer(this.batcher);
@@ -497,14 +505,6 @@ export class SceneRenderer implements Disposable {
 			this.activeRenderer = this.shapes;
 		} else
 			this.activeRenderer = this.skeletonDebugRenderer;
-	}
-
-	dispose () {
-		this.batcher.dispose();
-		this.batcherShader.dispose();
-		this.shapes.dispose();
-		this.shapesShader.dispose();
-		this.skeletonDebugRenderer.dispose();
 	}
 }
 
