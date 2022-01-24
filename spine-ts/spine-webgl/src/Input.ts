@@ -27,8 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Pool } from "@esotericsoftware/spine-core";
-
 export class Input {
 	element: HTMLElement;
 	mouseX = 0;
@@ -38,6 +36,7 @@ export class Input {
 	touch1: Touch = null;
 	initialPinchDistance = 0;
 	private listeners = new Array<InputListener>();
+	private eventListeners: Array<{ target: any, event: any, func: any }> = [];
 
 	constructor (element: HTMLElement) {
 		this.element = element;
