@@ -369,7 +369,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 		if (dpiScale >= 2.0f) uiScale = 2;
 
-		SkeletonViewer skeletonViewer = new SkeletonViewer();
+		final SkeletonViewer skeletonViewer = new SkeletonViewer();
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.disableAudio(true);
 		config.setWindowedMode((int)(800 * uiScale), (int)(600 * uiScale));
