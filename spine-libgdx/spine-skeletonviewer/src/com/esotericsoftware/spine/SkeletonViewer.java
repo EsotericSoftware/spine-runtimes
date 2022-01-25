@@ -102,8 +102,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 		ui.loadPrefs();
 
 		if (args.length == 0) {
-			loadSkeleton(
-				Gdx.files.internal(Gdx.app.getPreferences("spine-skeletonviewer").getString("lastFile", "spineboy/spineboy.json")));
+			FileHandle file = Gdx.files
+				.internal(Gdx.app.getPreferences("spine-skeletonviewer").getString("lastFile", "spineboy/spineboy.json"));
+			if (file.exists()) loadSkeleton(file);
 		} else
 			loadSkeleton(Gdx.files.internal(args[0]));
 
