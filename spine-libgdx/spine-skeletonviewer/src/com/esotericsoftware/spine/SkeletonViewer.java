@@ -374,7 +374,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.disableAudio(true);
 		config.setWindowedMode((int)(800 * uiScale), (int)(600 * uiScale));
-		config.setTitle("Skeleton Viewer");
+		config.setTitle("Skeleton Viewer " + version);
 		config.setBackBufferConfig(8, 8, 8, 8, 24, 0, 2);
 		config.setWindowListener(new Lwjgl3WindowAdapter() {
 			@Override
