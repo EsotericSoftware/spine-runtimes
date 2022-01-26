@@ -655,8 +655,8 @@ void _spScaleTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float la
 					bone->scaleY = by + (ABS(y) * SIGNUM(by) - by) * alpha;
 					break;
 				case SP_MIX_BLEND_ADD:
-					bone->scaleX = (x - bone->data->scaleX) * alpha;
-					bone->scaleY = (y - bone->data->scaleY) * alpha;
+					bone->scaleX += (x - bone->data->scaleX) * alpha;
+					bone->scaleY += (y - bone->data->scaleY) * alpha;
 			}
 		} else {
 			switch (blend) {
@@ -748,7 +748,7 @@ void _spScaleXTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float l
 					bone->scaleX = bx + (ABS(x) * SIGNUM(bx) - bx) * alpha;
 					break;
 				case SP_MIX_BLEND_ADD:
-					bone->scaleX = (x - bone->data->scaleX) * alpha;
+					bone->scaleX += (x - bone->data->scaleX) * alpha;
 			}
 		} else {
 			switch (blend) {
@@ -834,7 +834,7 @@ void _spScaleYTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float l
 					bone->scaleY = by + (ABS(y) * SIGNUM(by) - by) * alpha;
 					break;
 				case SP_MIX_BLEND_ADD:
-					bone->scaleY = (y - bone->data->scaleY) * alpha;
+					bone->scaleY += (y - bone->data->scaleY) * alpha;
 			}
 		} else {
 			switch (blend) {
@@ -1756,7 +1756,7 @@ void _spDeformTimeline_apply(
 		spTimeline *timeline, spSkeleton *skeleton, float lastTime, float time, spEvent **firedEvents,
 		int *eventsCount, float alpha, spMixBlend blend, spMixDirection direction) {
 	int frame, i, vertexCount;
-	float percent, frameTime;
+	float percent;
 	const float *prevVertices;
 	const float *nextVertices;
 	float *frames;
@@ -1892,7 +1892,6 @@ void _spDeformTimeline_apply(
 	percent = _spDeformTimeline_getCurvePercent(self, time, frame);
 	prevVertices = frameVertices[frame];
 	nextVertices = frameVertices[frame + 1];
-	frameTime = frames[frame];
 
 	if (alpha == 1) {
 		if (blend == SP_MIX_BLEND_ADD) {
