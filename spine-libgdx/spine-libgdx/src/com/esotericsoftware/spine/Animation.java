@@ -743,8 +743,8 @@ public class Animation {
 						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
 						break;
 					case add:
-						bone.scaleX = (x - bone.data.scaleX) * alpha;
-						bone.scaleY = (y - bone.data.scaleY) * alpha;
+						bone.scaleX += (x - bone.data.scaleX) * alpha;
+						bone.scaleY += (y - bone.data.scaleY) * alpha;
 					}
 				} else {
 					switch (blend) {
@@ -822,7 +822,7 @@ public class Animation {
 						bone.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bx) * alpha;
 						break;
 					case add:
-						bone.scaleX = (x - bone.data.scaleX) * alpha;
+						bone.scaleX += (x - bone.data.scaleX) * alpha;
 					}
 				} else {
 					switch (blend) {
@@ -895,7 +895,7 @@ public class Animation {
 						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
 						break;
 					case add:
-						bone.scaleY = (y - bone.data.scaleY) * alpha;
+						bone.scaleY += (y - bone.data.scaleY) * alpha;
 					}
 				} else {
 					switch (blend) {
