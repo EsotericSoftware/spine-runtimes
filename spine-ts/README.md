@@ -54,7 +54,7 @@ You can include a module in your project via a `<script>` tag from the [unpkg](h
 
 // spine-ts Player, which requires a spine-player.css as well
 <script src="https://unpkg.com/@esotericsoftware/spine-player@4.0.*/dist/iife/spine-player.js">
-<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.0.*/dist/iife/spine-player.css">
+<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.0.*/dist/spine-player.css">
 
 // spine-ts WebGL
 <script src="https://unpkg.com/@esotericsoftware/spine-threejs@4.0.*/dist/iife/spine-webgl.js">
