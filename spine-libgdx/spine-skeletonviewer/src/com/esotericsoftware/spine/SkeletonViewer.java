@@ -380,9 +380,10 @@ public class SkeletonViewer extends ApplicationAdapter {
 			@Override
 			public void filesDropped (String[] files) {
 				for (String file : files) {
-					if (file.endsWith(".json") || file.endsWith(".skel")) {
-						skeletonViewer.loadSkeleton(Gdx.files.absolute(file));
-						return;
+					for (String endSuffix : endSuffixes) {
+						for (String dataSuffix : dataSuffixes) {
+							if (file.endsWith(dataSuffix + endSuffix) && skeletonViewer.loadSkeleton(Gdx.files.absolute(file))) return;
+						}
 					}
 				}
 			}
