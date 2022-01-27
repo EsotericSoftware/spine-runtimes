@@ -131,8 +131,8 @@ void ScaleTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vector
 					bone->_scaleY = by + (MathUtil::abs(y) * MathUtil::sign(by) - by) * alpha;
 					break;
 				case MixBlend_Add:
-					bone->_scaleX = (x - bone->_data._scaleX) * alpha;
-					bone->_scaleY = (y - bone->_data._scaleY) * alpha;
+					bone->_scaleX += (x - bone->_data._scaleX) * alpha;
+					bone->_scaleY += (y - bone->_data._scaleY) * alpha;
 			}
 		} else {
 			switch (blend) {
@@ -210,7 +210,7 @@ void ScaleXTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 					bone->_scaleX = bx + (MathUtil::abs(x) * MathUtil::sign(bx) - bx) * alpha;
 					break;
 				case MixBlend_Add:
-					bone->_scaleX = (x - bone->_data._scaleX) * alpha;
+					bone->_scaleX += (x - bone->_data._scaleX) * alpha;
 			}
 		} else {
 			switch (blend) {
@@ -283,7 +283,7 @@ void ScaleYTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 					bone->_scaleY = by + (MathUtil::abs(y) * MathUtil::sign(by) - by) * alpha;
 					break;
 				case MixBlend_Add:
-					bone->_scaleY = (y - bone->_data._scaleY) * alpha;
+					bone->_scaleY += (y - bone->_data._scaleY) * alpha;
 			}
 		} else {
 			switch (blend) {
