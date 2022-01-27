@@ -82,7 +82,7 @@ package spine.animation {
 						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
 						break;
 					case MixBlend.add:
-						bone.scaleX = (x - bone.data.scaleX) * alpha;
+						bone.scaleX += (x - bone.data.scaleX) * alpha;
 					}
 				} else {
 					switch (blend) {
