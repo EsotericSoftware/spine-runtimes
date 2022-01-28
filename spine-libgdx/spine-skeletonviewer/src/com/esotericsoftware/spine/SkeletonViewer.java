@@ -119,8 +119,15 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 	}
 
-	boolean loadSkeleton (final @Null FileHandle skeletonFile) {
+	boolean loadSkeleton (@Null FileHandle skeletonFile) {
 		if (skeletonFile == null) return false;
+
+		try {
+			skeletonFile = new FileHandle(skeletonFile.file().getCanonicalFile());
+		} catch (Throwable ex) {
+			skeletonFile = new FileHandle(skeletonFile.file().getAbsoluteFile());
+		}
+
 		FileHandle oldSkeletonFile = this.skeletonFile;
 		this.skeletonFile = skeletonFile;
 		reloadTimer = 0;
@@ -139,7 +146,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			skeletonData = loader.readSkeletonData(skeletonFile);
 			if (skeletonData.getBones().size == 0) throw new Exception("No bones in skeleton data.");
 		} catch (Throwable ex) {
-			System.out.println("Error loading skeleton: " + skeletonFile.file().getAbsolutePath());
+			System.out.println("Error loading skeleton: " + skeletonFile.path());
 			ex.printStackTrace();
 			ui.toast("Error loading skeleton: " + skeletonFile.name());
 			this.skeletonFile = oldSkeletonFile;
