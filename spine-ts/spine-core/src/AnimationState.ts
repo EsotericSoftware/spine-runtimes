@@ -203,13 +203,14 @@ export class AnimationState {
 			} else {
 				let timelineMode = current.timelineMode;
 
-				let firstFrame = current.timelinesRotation.length != timelineCount << 1;
+				let shortestRotation = current.shortestRotation;
+				let firstFrame = !shortestRotation && current.timelinesRotation.length != timelineCount << 1;
 				if (firstFrame) current.timelinesRotation.length = timelineCount << 1;
 
 				for (let ii = 0; ii < timelineCount; ii++) {
 					let timeline = timelines[ii];
 					let timelineBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
-					if (timeline instanceof RotateTimeline) {
+					if (!shortestRotation && timeline instanceof RotateTimeline) {
 						this.applyRotateTimeline(timeline, skeleton, applyTime, mix, timelineBlend, current.timelinesRotation, ii << 1, firstFrame);
 					} else if (timeline instanceof AttachmentTimeline) {
 						this.applyAttachmentTimeline(timeline, skeleton, applyTime, blend, true);
@@ -276,8 +277,8 @@ export class AnimationState {
 			let timelineMode = from.timelineMode;
 			let timelineHoldMix = from.timelineHoldMix;
 
-			let firstFrame = from.timelinesRotation.length != timelineCount << 1;
-			if (firstFrame) from.timelinesRotation.length = timelineCount << 1;
+			let shortestRotation = from.shortestRotation;
+			let firstFrame = !shortestRotation && from.timelinesRotation.length != timelineCount << 1;
 
 			from.totalAlpha = 0;
 			for (let i = 0; i < timelineCount; i++) {
@@ -311,7 +312,7 @@ export class AnimationState {
 				}
 				from.totalAlpha += alpha;
 
-				if (timeline instanceof RotateTimeline)
+				if (shortestRotation && timeline instanceof RotateTimeline)
 					this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, from.timelinesRotation, i << 1, firstFrame);
 				else if (timeline instanceof AttachmentTimeline)
 					this.applyAttachmentTimeline(timeline, skeleton, applyTime, timelineBlend, attachments);
@@ -651,6 +652,9 @@ export class AnimationState {
 		entry.loop = loop;
 		entry.holdPrevious = false;
 
+		entry.reverse = false;
+		entry.shortestRotation = false;
+
 		entry.eventThreshold = 0;
 		entry.attachmentThreshold = 0;
 		entry.drawOrderThreshold = 0;
@@ -668,9 +672,10 @@ export class AnimationState {
 		entry.timeScale = 1;
 
 		entry.alpha = 1;
-		entry.interruptAlpha = 1;
 		entry.mixTime = 0;
 		entry.mixDuration = !last ? 0 : this.data.getMix(last.animation, animation);
+		entry.interruptAlpha = 1;
+		entry.totalAlpha = 0;
 		entry.mixBlend = MixBlend.replace;
 		return entry;
 	}
@@ -822,6 +827,8 @@ export class TrackEntry {
 	holdPrevious: boolean = false;
 
 	reverse: boolean = false;
+
+	shortestRotation: boolean = false;
 
 	/** When the mix percentage ({@link #mixTime} / {@link #mixDuration}) is less than the
 	 * `eventThreshold`, event timelines are applied while this animation is being mixed out. Defaults to 0, so event
