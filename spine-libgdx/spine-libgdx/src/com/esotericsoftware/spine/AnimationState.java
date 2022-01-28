@@ -703,6 +703,9 @@ public class AnimationState {
 		entry.loop = loop;
 		entry.holdPrevious = false;
 
+		entry.reverse = false;
+		entry.shortestRotation = false;
+
 		entry.eventThreshold = 0;
 		entry.attachmentThreshold = 0;
 		entry.drawOrderThreshold = 0;
@@ -720,9 +723,10 @@ public class AnimationState {
 		entry.timeScale = 1;
 
 		entry.alpha = 1;
-		entry.interruptAlpha = 1;
 		entry.mixTime = 0;
 		entry.mixDuration = last == null ? 0 : data.getMix(last.animation, animation);
+		entry.interruptAlpha = 1;
+		entry.totalAlpha = 0;
 		entry.mixBlend = MixBlend.replace;
 		return entry;
 	}
