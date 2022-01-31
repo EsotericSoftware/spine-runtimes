@@ -80,7 +80,7 @@ public class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		arraycopy(other.triangles, 0, triangles, 0, triangles.length);
 
 		hullLength = other.hullLength;
-		sequence = sequence != null ? new Sequence(sequence) : null;
+		sequence = other.sequence != null ? new Sequence(other.sequence) : null;
 
 		// Nonessential.
 		if (other.edges != null) {
