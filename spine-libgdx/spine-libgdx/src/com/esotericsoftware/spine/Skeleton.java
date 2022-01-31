@@ -60,8 +60,9 @@ public class Skeleton {
 	final Array<Updatable> updateCache = new Array();
 	@Null Skin skin;
 	final Color color;
-	float scaleX = 1, scaleY = 1;
 	float x, y;
+	float scaleX = 1, scaleY = 1;
+	float time;
 
 	public Skeleton (SkeletonData data) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
@@ -153,12 +154,15 @@ public class Skeleton {
 
 		physicsConstraints = new Array(skeleton.physicsConstraints.size);
 		for (PhysicsConstraint physicsConstraint : skeleton.physicsConstraints)
-			physicsConstraints.add(new PhysicsConstraint(physicsConstraint, this));
+			physicsConstraints.add(new PhysicsConstraint(physicsConstraint));
 
 		skin = skeleton.skin;
 		color = new Color(skeleton.color);
+		x = skeleton.x;
+		y = skeleton.y;
 		scaleX = skeleton.scaleX;
 		scaleY = skeleton.scaleY;
+		time = skeleton.time;
 
 		updateCache();
 	}
@@ -789,6 +793,22 @@ public class Skeleton {
 	public void setPosition (float x, float y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	/** Returns the skeleton's time. This is used for time-based manipulations, such as {@link PhysicsConstraint}.
+	 * <p>
+	 * See {@link #update(float)}. */
+	public float getTime () {
+		return time;
+	}
+
+	public void setTime (float time) {
+		this.time = time;
+	}
+
+	/** Increments the skeleton's {@link #time}. */
+	public void update (float delta) {
+		time += delta;
 	}
 
 	public String toString () {

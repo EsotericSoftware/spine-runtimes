@@ -31,6 +31,7 @@ package com.esotericsoftware.spine;
 
 import static com.esotericsoftware.spine.utils.SpineUtils.*;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Null;
 
@@ -111,9 +112,13 @@ public class PhysicsConstraintData extends ConstraintData {
 
 	static public class Node {
 		public final NodeData data;
-		public final @Null Bone parentBone;
-		public final Bone[] bones;
-		public float x, y, px, py, ax, ay;
+		public @Null Bone parentBone;
+		public Bone[] bones;
+		public float x, y, vx, vy, ax, ay;
+
+		Node (NodeData data) { // Editor.
+			this.data = data;
+		}
 
 		public Node (NodeData data, Skeleton skeleton) {
 			this.data = data;
@@ -134,8 +139,8 @@ public class PhysicsConstraintData extends ConstraintData {
 			arraycopy(node.bones, 0, bones, 0, bones.length);
 			x = node.x;
 			y = node.y;
-			px = node.px;
-			py = node.py;
+			vx = node.vx;
+			vy = node.vy;
 			ax = node.ax;
 			ay = node.ay;
 		}
@@ -143,10 +148,29 @@ public class PhysicsConstraintData extends ConstraintData {
 		public void setToSetupPose () {
 			x = data.x;
 			y = data.y;
-			px = x;
-			py = y;
+			vx = 0;
+			vy = 0;
 			ax = 0;
 			ay = 0;
+		}
+
+		public void update (PhysicsConstraint constraint) {
+			if (parentBone != null) {
+				vx = 0;
+				vy = 0;
+				ax = 0;
+				ay = 0;
+				return;
+			}
+			float friction = 0.98f;
+			vx += ax - constraint.wind / friction;
+			vy += ay - constraint.gravity / friction;
+			ax = 0;
+			ay = 0;
+			x += vx;
+			y += vy;
+			vx *= friction;
+			vy *= friction;
 		}
 	}
 
@@ -159,9 +183,13 @@ public class PhysicsConstraintData extends ConstraintData {
 
 	static public class Spring {
 		public final SpringData data;
-		public final Node node1, node2;
-		public final Bone[] bones;
+		public Node node1, node2;
+		public Bone[] bones;
 		public float length, strength, damping;
+
+		Spring (SpringData data) { // Editor.
+			this.data = data;
+		}
 
 		public Spring (SpringData data, PhysicsConstraint constraint, Skeleton skeleton) {
 			this.data = data;
@@ -191,6 +219,35 @@ public class PhysicsConstraintData extends ConstraintData {
 			length = data.length;
 			strength = data.strength;
 			damping = data.damping;
+		}
+
+		public void update () {
+			float strength = 1f;
+
+			float x = node2.x - node1.x, y = node2.y - node1.y;
+			float d = (float)Math.sqrt(Math.max(x * x + y * y, 0.00001f));
+			if (data.rope && d <= length) return;
+
+			Vector2 unit_vector = new Vector2(x / d, y / d);
+			float distance_error = unit_vector.dot(x, y) - length;
+			float distance_impulse = 0.33f * strength * distance_error;
+
+			float vx = node2.vx - node1.vx, vy = node2.vy - node1.vy;
+			float velocity_error = unit_vector.dot(vx, vy);
+			float velocity_impulse = 0.2f * velocity_error;
+
+			float impulse = -(distance_impulse + velocity_impulse);
+			Vector2 f = unit_vector.scl(impulse);
+
+			node1.ax -= f.x - vx * damping;
+			node1.ay -= f.y - vy * damping;
+			node2.ax += f.x - vx * damping;
+			node2.ay += f.y - vy * damping;
+
+			if (!data.stretch && node2.parentBone == null) {
+				node2.x = node1.x + length * x / d;
+				node2.y = node1.y + length * y / d;
+			}
 		}
 	}
 }

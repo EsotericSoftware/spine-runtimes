@@ -29,6 +29,7 @@
 
 package com.esotericsoftware.spine;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
 import com.esotericsoftware.spine.PhysicsConstraintData.Node;
@@ -47,10 +48,15 @@ public class PhysicsConstraint implements Updatable {
 
 	boolean active;
 
+	private final Skeleton skeleton;
+	float remaining, lastTime;
+	final Vector2 temp = new Vector2();
+
 	public PhysicsConstraint (PhysicsConstraintData data, Skeleton skeleton) {
 		if (data == null) throw new IllegalArgumentException("data cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		this.data = data;
+		this.skeleton = skeleton;
 
 		nodes = new Array(data.nodes.size);
 		for (NodeData nodeData : data.nodes)
@@ -69,10 +75,10 @@ public class PhysicsConstraint implements Updatable {
 	}
 
 	/** Copy constructor. */
-	public PhysicsConstraint (PhysicsConstraint constraint, Skeleton skeleton) {
+	public PhysicsConstraint (PhysicsConstraint constraint) {
 		if (constraint == null) throw new IllegalArgumentException("constraint cannot be null.");
-		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 		data = constraint.data;
+		skeleton = constraint.skeleton;
 
 		nodes = new Array(constraint.nodes.size);
 		for (Node node : constraint.nodes)
@@ -91,6 +97,9 @@ public class PhysicsConstraint implements Updatable {
 	}
 
 	public void setToSetupPose () {
+		remaining = 0;
+		lastTime = skeleton.time;
+
 		Object[] nodes = this.nodes.items;
 		for (int i = 0, n = this.nodes.size; i < n; i++)
 			((Node)nodes[i]).setToSetupPose();
@@ -110,7 +119,29 @@ public class PhysicsConstraint implements Updatable {
 
 	/** Applies the constraint to the constrained bones. */
 	public void update () {
-		// BOZO! - Physics.
+		Object[] nodes = this.nodes.items;
+		int nodeCount = this.nodes.size;
+		Vector2 temp = this.temp;
+		for (int i = 0; i < nodeCount; i++) {
+			Node node = (Node)nodes[i];
+			if (node.parentBone == null) continue;
+			node.parentBone.localToWorld(temp.set(node.data.x, node.data.y));
+			node.x = temp.x;
+			node.y = temp.y;
+		}
+
+		Object[] springs = this.springs.items;
+		int springCount = this.springs.size;
+
+		remaining += lastTime - skeleton.time;
+		lastTime = skeleton.time;
+		while (remaining > 0.016f) {
+			remaining -= 0.016f;
+			for (int i = 0; i < springCount; i++)
+				((Spring)springs[i]).update();
+			for (int i = 0; i < nodeCount; i++)
+				((Node)nodes[i]).update(this);
+		}
 	}
 
 	public Array<Node> getNodes () {
