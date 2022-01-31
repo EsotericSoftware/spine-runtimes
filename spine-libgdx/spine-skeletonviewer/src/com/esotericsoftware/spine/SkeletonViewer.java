@@ -102,8 +102,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 		ui.loadPrefs();
 
 		if (args.length == 0) {
-			loadSkeleton(
-				Gdx.files.internal(Gdx.app.getPreferences("spine-skeletonviewer").getString("lastFile", "spineboy/spineboy.json")));
+			FileHandle file = Gdx.files
+				.internal(Gdx.app.getPreferences("spine-skeletonviewer").getString("lastFile", "spineboy/spineboy.json"));
+			if (file.exists()) loadSkeleton(file);
 		} else
 			loadSkeleton(Gdx.files.internal(args[0]));
 
@@ -118,8 +119,15 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 	}
 
-	boolean loadSkeleton (final @Null FileHandle skeletonFile) {
+	boolean loadSkeleton (@Null FileHandle skeletonFile) {
 		if (skeletonFile == null) return false;
+
+		try {
+			skeletonFile = new FileHandle(skeletonFile.file().getCanonicalFile());
+		} catch (Throwable ex) {
+			skeletonFile = new FileHandle(skeletonFile.file().getAbsoluteFile());
+		}
+
 		FileHandle oldSkeletonFile = this.skeletonFile;
 		this.skeletonFile = skeletonFile;
 		reloadTimer = 0;
@@ -138,7 +146,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			skeletonData = loader.readSkeletonData(skeletonFile);
 			if (skeletonData.getBones().size == 0) throw new Exception("No bones in skeleton data.");
 		} catch (Throwable ex) {
-			System.out.println("Error loading skeleton: " + skeletonFile.file().getAbsolutePath());
+			System.out.println("Error loading skeleton: " + skeletonFile.path());
 			ex.printStackTrace();
 			ui.toast("Error loading skeleton: " + skeletonFile.name());
 			this.skeletonFile = oldSkeletonFile;
@@ -369,19 +377,20 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 		if (dpiScale >= 2.0f) uiScale = 2;
 
-		SkeletonViewer skeletonViewer = new SkeletonViewer();
+		final SkeletonViewer skeletonViewer = new SkeletonViewer();
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.disableAudio(true);
 		config.setWindowedMode((int)(800 * uiScale), (int)(600 * uiScale));
-		config.setTitle("Skeleton Viewer");
+		config.setTitle("Skeleton Viewer " + version);
 		config.setBackBufferConfig(8, 8, 8, 8, 24, 0, 2);
 		config.setWindowListener(new Lwjgl3WindowAdapter() {
 			@Override
 			public void filesDropped (String[] files) {
 				for (String file : files) {
-					if (file.endsWith(".json") || file.endsWith(".skel")) {
-						skeletonViewer.loadSkeleton(Gdx.files.absolute(file));
-						return;
+					for (String endSuffix : endSuffixes) {
+						for (String dataSuffix : dataSuffixes) {
+							if (file.endsWith(dataSuffix + endSuffix) && skeletonViewer.loadSkeleton(Gdx.files.absolute(file))) return;
+						}
 					}
 				}
 			}
