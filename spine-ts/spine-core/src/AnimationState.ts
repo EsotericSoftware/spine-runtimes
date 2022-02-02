@@ -279,6 +279,7 @@ export class AnimationState {
 
 			let shortestRotation = from.shortestRotation;
 			let firstFrame = !shortestRotation && from.timelinesRotation.length != timelineCount << 1;
+			if (firstFrame) from.timelinesRotation.length = timelineCount << 1;
 
 			from.totalAlpha = 0;
 			for (let i = 0; i < timelineCount; i++) {
@@ -312,7 +313,7 @@ export class AnimationState {
 				}
 				from.totalAlpha += alpha;
 
-				if (shortestRotation && timeline instanceof RotateTimeline)
+				if (!shortestRotation && timeline instanceof RotateTimeline)
 					this.applyRotateTimeline(timeline, skeleton, applyTime, alpha, timelineBlend, from.timelinesRotation, i << 1, firstFrame);
 				else if (timeline instanceof AttachmentTimeline)
 					this.applyAttachmentTimeline(timeline, skeleton, applyTime, timelineBlend, attachments);
