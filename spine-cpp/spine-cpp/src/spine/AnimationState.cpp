@@ -216,7 +216,7 @@ EventQueueEntry::EventQueueEntry(EventType eventType, TrackEntry *trackEntry, Ev
 }
 
 EventQueue *EventQueue::newEventQueue(AnimationState &state, Pool<TrackEntry> &trackEntryPool) {
-	return new(__FILE__, __LINE__) EventQueue(state, trackEntryPool);
+	return new (__FILE__, __LINE__) EventQueue(state, trackEntryPool);
 }
 
 EventQueueEntry EventQueue::newEventQueueEntry(EventType eventType, TrackEntry *entry, Event *event) {
@@ -497,8 +497,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		Slot *slot = slots[i];
 		if (slot->getAttachmentState() == setupState) {
 			const String &attachmentName = slot->getData().getAttachmentName();
-			slot->setAttachment(attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot->getData().getIndex(),
-																						 attachmentName));
+			slot->setAttachment(attachmentName.isEmpty() ? NULL : skeleton.getAttachment(slot->getData().getIndex(), attachmentName));
 		}
 	}
 	_unkeyedState += 2;
@@ -1036,7 +1035,7 @@ void AnimationState::computeHold(TrackEntry *entry) {
 
 	// outer:
 	size_t i = 0;
-	continue_outer:
+continue_outer:
 	for (; i < timelinesCount; ++i) {
 		Timeline *timeline = timelines[i];
 		Vector<PropertyId> &ids = timeline->getPropertyIds();
