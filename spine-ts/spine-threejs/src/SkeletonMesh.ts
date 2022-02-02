@@ -54,6 +54,7 @@ export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
 			varying vec4 vColor;
 			void main(void) {
 				gl_FragColor = texture2D(map, vUv)*vColor;
+				if (gl_FragColor.a < 0.5) discard;
 			}
 		`;
 
