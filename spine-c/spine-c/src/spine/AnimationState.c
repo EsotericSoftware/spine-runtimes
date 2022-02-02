@@ -374,7 +374,7 @@ int spAnimationState_apply(spAnimationState *self, spSkeleton *skeleton) {
 	float animationLast, animationTime;
 	int timelineCount;
 	spTimeline **timelines;
-	int /*boolean*/ firstFrame;
+	int /*boolean*/ firstFrame, shortestRotation;
 	float *timelinesRotation;
 	spTimeline *timeline;
 	int applied = 0;
@@ -427,14 +427,15 @@ int spAnimationState_apply(spAnimationState *self, spSkeleton *skeleton) {
 		} else {
 			spIntArray *timelineMode = current->timelineMode;
 
-			firstFrame = current->timelinesRotationCount != timelineCount << 1;
+			shortestRotation = current->shortestRotation;
+			firstFrame = !shortestRotation && current->timelinesRotationCount != timelineCount << 1;
 			if (firstFrame) _spAnimationState_resizeTimelinesRotation(current, timelineCount << 1);
 			timelinesRotation = current->timelinesRotation;
 
 			for (ii = 0; ii < timelineCount; ii++) {
 				timeline = timelines[ii];
 				timelineBlend = timelineMode->items[ii] == SUBSEQUENT ? blend : SP_MIX_BLEND_SETUP;
-				if (timeline->propertyIds[0] == SP_PROPERTY_ROTATE)
+				if (!shortestRotation && timeline->propertyIds[0] == SP_PROPERTY_ROTATE)
 					_spAnimationState_applyRotateTimeline(self, timeline, skeleton, applyTime, mix, timelineBlend,
 														  timelinesRotation, ii << 1, firstFrame);
 				else if (timeline->propertyIds[0] == SP_PROPERTY_ATTACHMENT)
@@ -481,7 +482,7 @@ float _spAnimationState_applyMixingFrom(spAnimationState *self, spTrackEntry *to
 	float alphaHold;
 	float alphaMix;
 	float alpha;
-	int /*boolean*/ firstFrame;
+	int /*boolean*/ firstFrame, shortestRotation;
 	float *timelinesRotation;
 	int i;
 	spTrackEntry *holdMix;
@@ -525,7 +526,8 @@ float _spAnimationState_applyMixingFrom(spAnimationState *self, spTrackEntry *to
 		timelineMode = from->timelineMode;
 		timelineHoldMix = from->timelineHoldMix;
 
-		firstFrame = from->timelinesRotationCount != timelineCount << 1;
+		shortestRotation = from->shortestRotation;
+		firstFrame = !shortestRotation && from->timelinesRotationCount != timelineCount << 1;
 		if (firstFrame) _spAnimationState_resizeTimelinesRotation(from, timelineCount << 1);
 		timelinesRotation = from->timelinesRotation;
 
@@ -559,7 +561,7 @@ float _spAnimationState_applyMixingFrom(spAnimationState *self, spTrackEntry *to
 					break;
 			}
 			from->totalAlpha += alpha;
-			if (timeline->propertyIds[0] == SP_PROPERTY_ROTATE)
+			if (!shortestRotation && timeline->propertyIds[0] == SP_PROPERTY_ROTATE)
 				_spAnimationState_applyRotateTimeline(self, timeline, skeleton, applyTime, alpha, timelineBlend,
 													  timelinesRotation, i << 1, firstFrame);
 			else if (timeline->propertyIds[0] == SP_PROPERTY_ATTACHMENT)
@@ -908,6 +910,7 @@ _spAnimationState_trackEntry(spAnimationState *self, int trackIndex, spAnimation
 	entry->loop = loop;
 	entry->holdPrevious = 0;
 	entry->reverse = 0;
+	entry->shortestRotation = 0;
 	entry->previous = 0;
 	entry->next = 0;
 
@@ -928,9 +931,10 @@ _spAnimationState_trackEntry(spAnimationState *self, int trackIndex, spAnimation
 	entry->timeScale = 1;
 
 	entry->alpha = 1;
-	entry->interruptAlpha = 1;
 	entry->mixTime = 0;
 	entry->mixDuration = !last ? 0 : spAnimationStateData_getMix(self->data, last->animation, animation);
+	entry->interruptAlpha = 1;
+	entry->totalAlpha = 0;
 	entry->mixBlend = SP_MIX_BLEND_REPLACE;
 
 	entry->timelineMode = spIntArray_create(16);
