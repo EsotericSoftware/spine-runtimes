@@ -68,6 +68,7 @@ struct spTrackEntry {
 	int /*boolean*/ loop;
 	int /*boolean*/ holdPrevious;
 	int /*boolean*/ reverse;
+	int /*boolean*/ shortestRotation;
 	float eventThreshold, attachmentThreshold, drawOrderThreshold;
 	float animationStart, animationEnd, animationLast, nextAnimationLast;
 	float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;

@@ -131,6 +131,10 @@ namespace spine {
 
 		void setReverse(bool inValue);
 
+		bool getShortestRotation();
+
+		void setShortestRotation(bool inValue);
+
 		/// Seconds to postpone playing the animation. When a track entry is the current track entry, delay postpones incrementing
 		/// the track time. When a track entry is queued, delay is the time from the start of the previous animation to when the
 		/// track entry will become the current track entry.
@@ -275,7 +279,7 @@ namespace spine {
 		TrackEntry *_mixingTo;
 		int _trackIndex;
 
-		bool _loop, _holdPrevious, _reverse;
+		bool _loop, _holdPrevious, _reverse, _shortestRotation;
 		float _eventThreshold, _attachmentThreshold, _drawOrderThreshold;
 		float _animationStart, _animationEnd, _animationLast, _nextAnimationLast;
 		float _delay, _trackTime, _trackLast, _nextTrackLast, _trackEnd, _timeScale;
