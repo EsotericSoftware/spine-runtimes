@@ -221,7 +221,7 @@ namespace Spine.Unity.Editor {
 				DrawAnimationList();
 				if (targetSkeletonData.Animations.Count > 0) {
 					const string AnimationReferenceButtonText = "Create Animation Reference Assets";
-					const string AnimationReferenceTooltipText = "AnimationReferenceAsset acts as Unity asset for a reference to a Spine.Animation. This can be used in inspectors.\n\nIt serializes a reference to a SkeletonDataAsset and an animationName.\n\nAt runtime, a reference to its Spine.Animation is loaded and cached into the object to be used as needed. This skips the need to find and cache animation references in individual MonoBehaviours.";
+					const string AnimationReferenceTooltipText = "AnimationReferenceAsset acts as Unity asset for a reference to a Spine.Animation. This can be used in inspectors.\n\nIt serializes a reference to a SkeletonData asset and an animationName.\n\nAt runtime, a reference to its Spine.Animation is loaded and cached into the object to be used as needed. This skips the need to find and cache animation references in individual MonoBehaviours.";
 					if (GUILayout.Button(SpineInspectorUtility.TempContent(AnimationReferenceButtonText, Icons.animationRoot, AnimationReferenceTooltipText), GUILayout.Width(250), GUILayout.Height(26))) {
 						CreateAnimationReferenceAssets();
 					}
@@ -672,7 +672,7 @@ namespace Spine.Unity.Editor {
 
 #if SPINE_TK2D
 								if (missingPaths.Count > 0)
-									warnings.Add("Missing regions. SkeletonDataAsset requires tk2DSpriteCollectionData or Spine AtlasAssets.");
+									warnings.Add("Missing regions. SkeletonData asset requires tk2DSpriteCollectionData or Spine AtlasAssets.");
 #endif
 							}
 

@@ -31,11 +31,8 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
-using Spine;
-using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
-using UnityEditor.AnimatedValues;
 using UnityEngine;
 
 namespace Spine.Unity.Editor {
@@ -93,7 +90,7 @@ namespace Spine.Unity.Editor {
 
 			if ((skeletonRenderer != null && !skeletonRenderer.valid) ||
 				(skeletonGraphic != null && !skeletonGraphic.IsValid)) {
-				GUILayout.Label(new GUIContent("Spine Component invalid. Check Skeleton Data Asset.", Icons.warning));
+				GUILayout.Label(new GUIContent("Spine Component invalid. Check SkeletonData asset.", Icons.warning));
 				return;
 			}
 

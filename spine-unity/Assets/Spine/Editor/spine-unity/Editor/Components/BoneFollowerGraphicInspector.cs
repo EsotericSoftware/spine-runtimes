@@ -27,7 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using Spine.Unity;
 using UnityEditor;
 using UnityEngine;
 
@@ -193,7 +192,7 @@ namespace Spine.Unity.Editor {
 						EditorGUILayout.HelpBox("Assigned SkeletonGraphic does not have SkeletonData assigned to it.", MessageType.Warning);
 
 					if (!boneFollowerSkeletonGraphic.IsValid)
-						EditorGUILayout.HelpBox("Assigned SkeletonGraphic is invalid. Check target SkeletonGraphic, its SkeletonDataAsset or the console for other errors.", MessageType.Warning);
+						EditorGUILayout.HelpBox("Assigned SkeletonGraphic is invalid. Check target SkeletonGraphic, its SkeletonData asset or the console for other errors.", MessageType.Warning);
 				}
 			}
 

@@ -34,14 +34,14 @@ using UnityEngine;
 using UnityEngine.Timeline;
 
 namespace Spine.Unity.Editor {
-	[CustomTimelineEditor(typeof(SpineAnimationStateTrack))]
+	[CustomTimelineEditor(typeof(SpineSkeletonFlipTrack))]
 	[CanEditMultipleObjects]
-	public class SpineAnimationStateTrackInspector : TrackEditor {
+	public class SpineSkeletonFlipTrackInspector : TrackEditor {
 
 		public override TrackDrawOptions GetTrackOptions (TrackAsset track, UnityEngine.Object binding) {
 			var options = base.GetTrackOptions(track, binding);
-			options.icon = SpineEditorUtilities.Icons.skeletonDataAssetIcon;
-			options.trackColor = new Color(255 / 255.0f, 64 / 255.0f, 1 / 255.0f);
+			options.icon = SpineEditorUtilities.Icons.subMeshRenderer;
+			options.trackColor = new Color(53 / 255.0f, 58 / 255.0f, 62 / 255.0f);
 			return options;
 		}
 	}

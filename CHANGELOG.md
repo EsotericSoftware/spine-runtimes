@@ -110,7 +110,7 @@
   * Fixed Timeline not pausing (and resuming) clip playback on Director pause, this is now the default behaviour. If you require the old behaviour (e.g. to continue playing an idle animation during Director pause), there is now an additional parameter `Don't Pause with Director` provided that can be enabled for each Timeline clip.
   * Fixed Timeline `Spine AnimationState Clips` ignoring empty space on the Timeline after a clip's end. Timeline clips now also offer `Don't End with Clip` and `Clip End Mix Out Duration` parameters if you prefer the old behaviour of previous versions. By default when empty space follows the clip on the timeline, the empty animation is set on the track with a MixDuration of `Clip End Mix Out Duration`. Set `Don't End with Clip` to `true` to continue playing the clip's animation instead and mimic the old 3.8 behaviour. If you prefer pausing the animation instead of mixing out to the empty animation, set `Clip End Mix Out Duration` to a value less than 0, then the animation is paused instead.
 
-* **Additions**
+* **Additions and Improvements**
   * Additional **Fix Draw Order** parameter at SkeletonRenderer, defaults to `disabled` (previous behaviour).
     Applies only when 3+ submeshes are used (2+ materials with alternating order, e.g. "A B A").
 		If `true`, MaterialPropertyBlocks are assigned at each material to prevent aggressive batching of submeshes
@@ -161,6 +161,8 @@
   * `BoundingBoxFollower` and `BoundingBoxFollowerGraphic` now provide previously missing `usedByEffector` and `usedByComposite` parameters to be set at all generated colliders.
   * `BoneFollower` and `BoneFollowerGraphic` now provide an additional `Follow Parent World Scale` parameter to allow following simple scale of parent bones (rotated/skewed scale can't be supported).
   * Improved `Advanced - Fix Prefab Override MeshFilter` property for `SkeletonRenderer` (and subclasses`SkeletonAnimation` and `SkeletonMecanim`), now providing an additional option to use a global value which can be set in `Edit - Preferences - Spine`.
+  * Timeline naming improvements: `Spine AnimationState Clip` Inspector parameter `Custom Duration` changed and inverted to `Default Mix Duration` for more clarity. Shortened all Timeline add track menu entries from: `Spine.Unity.Playables - <track type>` to `Spine - <track type>`, `Spine Animation State Track` to `SkeletonAnimation Track`, `Spine AnimationState Graphic Track` to `SkeletonGraphic Track`, and `Spine Skeleton Flip Track` to `Skeleton Flip Track`.
+  * Timeline track appearance and Inspector: Tracks now show icons and track colors to make them easier to distinguish. When a Track is selected, the Inspector now shows an editable track name which was previously only editable at the Timeline asset.
 
 * **Changes of default values**
 

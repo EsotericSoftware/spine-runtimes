@@ -27,6 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_EDITOR
+using System.ComponentModel;
+#endif
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -35,6 +38,9 @@ namespace Spine.Unity.Playables {
 	[TrackColor(0.9960785f, 0.2509804f, 0.003921569f)]
 	[TrackClipType(typeof(SpineAnimationStateClip))]
 	[TrackBindingType(typeof(SkeletonGraphic))]
+#if UNITY_EDITOR
+	[DisplayName("Spine/SkeletonGraphic Track")]
+#endif
 	public class SpineAnimationStateGraphicTrack : TrackAsset {
 		public int trackIndex = 0;
 

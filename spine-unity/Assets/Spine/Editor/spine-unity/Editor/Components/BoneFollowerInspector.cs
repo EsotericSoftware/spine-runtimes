@@ -199,7 +199,7 @@ namespace Spine.Unity.Editor {
 						EditorGUILayout.HelpBox("Assigned SkeletonRenderer does not have SkeletonData assigned to it.", MessageType.Warning);
 
 					if (!boneFollowerSkeletonRenderer.valid)
-						EditorGUILayout.HelpBox("Assigned SkeletonRenderer is invalid. Check target SkeletonRenderer, its SkeletonDataAsset or the console for other errors.", MessageType.Warning);
+						EditorGUILayout.HelpBox("Assigned SkeletonRenderer is invalid. Check target SkeletonRenderer, its SkeletonData asset or the console for other errors.", MessageType.Warning);
 				}
 			}
 

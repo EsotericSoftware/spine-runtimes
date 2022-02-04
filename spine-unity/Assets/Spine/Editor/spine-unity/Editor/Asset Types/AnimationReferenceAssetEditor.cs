@@ -28,8 +28,6 @@
  *****************************************************************************/
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
@@ -40,7 +38,7 @@ namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(AnimationReferenceAsset))]
 	public class AnimationReferenceAssetEditor : Editor {
 
-		const string InspectorHelpText = "This is a Spine-Unity Animation Reference Asset. It serializes a reference to a SkeletonDataAsset and an animationName. It does not contain actual animation data. At runtime, it stores a reference to a Spine.Animation.\n\n" +
+		const string InspectorHelpText = "This is a Spine-Unity Animation Reference Asset. It serializes a reference to a SkeletonData asset and an animationName. It does not contain actual animation data. At runtime, it stores a reference to a Spine.Animation.\n\n" +
 				"You can use this in your AnimationState calls instead of a string animation name or a Spine.Animation reference. Use its implicit conversion into Spine.Animation or its .Animation property.\n\n" +
 				"Use AnimationReferenceAssets as an alternative to storing strings or finding animations and caching per component. This only does the lookup by string once, and allows you to store and manage animations via asset references.";
 
