@@ -36,7 +36,7 @@ using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 namespace Spine.Unity.Playables {
-	[TrackColor(0.9960785f, 0.2509804f, 0.003921569f)]
+	[TrackColor(255 / 255.0f, 64 / 255.0f, 1 / 255.0f)]
 	[TrackClipType(typeof(SpineAnimationStateClip))]
 	[TrackBindingType(typeof(SkeletonAnimation))]
 #if UNITY_EDITOR
