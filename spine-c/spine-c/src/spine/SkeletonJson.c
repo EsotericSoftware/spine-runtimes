@@ -43,7 +43,7 @@ typedef struct {
 	const char *skin;
 	int slotIndex;
 	spMeshAttachment *mesh;
-	int inheritDeform;
+	int inheritTimeline;
 } _spLinkedMesh;
 
 typedef struct {
@@ -208,7 +208,7 @@ static void _spSkeletonJson_addLinkedMesh(spSkeletonJson *self, spMeshAttachment
 	linkedMesh->skin = skin;
 	linkedMesh->slotIndex = slotIndex;
 	linkedMesh->parent = parent;
-	linkedMesh->inheritDeform = inheritDeform;
+	linkedMesh->inheritTimeline = inheritDeform;
 }
 
 static void cleanUpTimelines(spTimelineArray *timelines) {
@@ -1514,8 +1514,8 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 			_spSkeletonJson_setError(self, 0, "Parent mesh not found: ", linkedMesh->parent);
 			return NULL;
 		}
-		linkedMesh->mesh->super.timelineAttachment = linkedMesh->inheritDeform ? parent
-																			   : SUPER(SUPER(linkedMesh->mesh));
+		linkedMesh->mesh->super.timelineAttachment = linkedMesh->inheritTimeline ? parent
+																				 : SUPER(SUPER(linkedMesh->mesh));
 		spMeshAttachment_setParentMesh(linkedMesh->mesh, SUB_CAST(spMeshAttachment, parent));
 		spMeshAttachment_updateRegion(linkedMesh->mesh);
 		spAttachmentLoader_configureAttachment(self->attachmentLoader, SUPER(SUPER(linkedMesh->mesh)));

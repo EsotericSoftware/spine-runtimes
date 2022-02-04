@@ -34,12 +34,9 @@ _SP_ARRAY_IMPLEMENT_TYPE(spTextureRegionArray, spTextureRegion *)
 
 static int nextSequenceId = 0;
 
-spSequence *spSequence_create(int start, int digits, int setupIndex, int numRegions) {
+spSequence *spSequence_create(int numRegions) {
 	spSequence *self = NEW(spSequence);
 	self->id = nextSequenceId++;
-	self->start = start;
-	self->digits = digits;
-	self->setupIndex = setupIndex;
 	self->regions = spTextureRegionArray_create(numRegions);
 	spTextureRegionArray_setSize(self->regions, numRegions);
 	return self;
@@ -52,7 +49,10 @@ void spSequence_dispose(spSequence *self) {
 
 spSequence *spSequence_copy(spSequence *self) {
 	int i = 0;
-	spSequence *copy = spSequence_create(self->start, self->digits, self->setupIndex, self->regions->size);
+	spSequence *copy = spSequence_create(self->regions->size);
+	copy->start = self->start;
+	copy->digits = self->digits;
+	copy->setupIndex = self->setupIndex;
 	for (; i < self->regions->size; i++)
 		copy->regions->items[i] = self->regions->items[i];
 	copy->start = self->start;

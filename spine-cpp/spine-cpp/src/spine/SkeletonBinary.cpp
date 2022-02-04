@@ -598,7 +598,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			if (path.isEmpty()) path = name;
 
 			Color color;
-			float width, height;
+			float width = 0, height = 0;
 			readColor(input, color);
 			String skinName(readStringRef(input, skeletonData));
 			String parent(readStringRef(input, skeletonData));

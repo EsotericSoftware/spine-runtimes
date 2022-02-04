@@ -50,7 +50,7 @@ typedef struct spSequence {
 	spTextureRegionArray *regions;
 } spSequence;
 
-SP_API spSequence *spSequence_create(int start, int digits, int setupIndex, int numRegions);
+SP_API spSequence *spSequence_create(int numRegions);
 
 SP_API void spSequence_dispose(spSequence *self);
 
