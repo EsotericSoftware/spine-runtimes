@@ -143,7 +143,7 @@ namespace Spine.Unity.Editor {
 			SkeletonDataAsset skeletonDataAsset) {
 
 			skeletonDataAsset.skeletonDataModifiers.Remove(modifierAsset);
-			Debug.Log(string.Format("BlendModeMaterialsAsset upgraded to built-in BlendModeMaterials at SkeletonDataAsset '{0}'.",
+			Debug.Log(string.Format("BlendModeMaterialsAsset upgraded to built-in BlendModeMaterials at SkeletonData asset '{0}'.",
 				skeletonDataAsset.name), skeletonDataAsset);
 			EditorUtility.SetDirty(skeletonDataAsset);
 		}
@@ -212,11 +212,11 @@ namespace Spine.Unity.Editor {
 								replacementMaterials.Add(replacement);
 								anyReplacementMaterialsChanged = true;
 								if (createdNewMaterial) {
-									Debug.Log(string.Format("Created blend mode Material '{0}' for SkeletonDataAsset '{1}'.",
+									Debug.Log(string.Format("Created blend mode Material '{0}' for SkeletonData asset '{1}'.",
 										replacement.material.name, skeletonDataAsset), replacement.material);
 								}
 							} else {
-								Debug.LogError(string.Format("Failed creating blend mode Material for SkeletonDataAsset '{0}'," +
+								Debug.LogError(string.Format("Failed creating blend mode Material for SkeletonData asset '{0}'," +
 									" atlas page '{1}', template '{2}'.",
 									skeletonDataAsset.name, originalRegion.page.name, materialTemplate.name),
 									skeletonDataAsset);

@@ -27,8 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using Spine;
-using Spine.Unity;
 using Spine.Unity.Editor;
 using Spine.Unity.Playables;
 using UnityEditor;
@@ -100,7 +98,10 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		EditorGUI.LabelField(singleFieldRect, "Mixing Settings", EditorStyles.boldLabel);
 
 		singleFieldRect.y += lineHeightWithSpacing;
-		EditorGUI.PropertyField(singleFieldRect, customDurationProp);
+		customDurationProp.boolValue = !EditorGUI.Toggle(singleFieldRect,
+			new GUIContent("Default Mix Duration",
+			"Use the default mix duration as specified at the SkeletonDataAsset."),
+			!customDurationProp.boolValue);
 
 		bool greyOutCustomDurations = (!customDurationProp.hasMultipleDifferentValues &&
 										customDurationProp.boolValue == false);

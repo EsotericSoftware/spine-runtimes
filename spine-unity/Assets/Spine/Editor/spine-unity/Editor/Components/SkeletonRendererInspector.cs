@@ -291,12 +291,12 @@ namespace Spine.Unity.Editor {
 				}
 
 				if (component.skeletonDataAsset == null) {
-					EditorGUILayout.HelpBox("Skeleton Data Asset required", MessageType.Warning);
+					EditorGUILayout.HelpBox("SkeletonData asset required", MessageType.Warning);
 					return;
 				}
 
 				if (!SpineEditorUtilities.SkeletonDataAssetIsValid(component.skeletonDataAsset)) {
-					EditorGUILayout.HelpBox("Skeleton Data Asset error. Please check Skeleton Data Asset.", MessageType.Error);
+					EditorGUILayout.HelpBox("SkeletonData asset error. Please check SkeletonData asset.", MessageType.Error);
 					return;
 				}
 

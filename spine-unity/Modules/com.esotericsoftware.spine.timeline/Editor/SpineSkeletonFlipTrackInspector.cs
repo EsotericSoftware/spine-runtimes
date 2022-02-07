@@ -27,28 +27,22 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#if UNITY_EDITOR
-using System.ComponentModel;
-#endif
+using Spine.Unity.Playables;
+using UnityEditor;
+using UnityEditor.Timeline;
 using UnityEngine;
-using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-namespace Spine.Unity.Playables {
-	[TrackColor(255 / 255.0f, 64 / 255.0f, 1 / 255.0f)]
-	[TrackClipType(typeof(SpineAnimationStateClip))]
-	[TrackBindingType(typeof(SkeletonGraphic))]
-#if UNITY_EDITOR
-	[DisplayName("Spine/SkeletonGraphic Track")]
-#endif
-	public class SpineAnimationStateGraphicTrack : TrackAsset {
-		public int trackIndex = 0;
+namespace Spine.Unity.Editor {
+	[CustomTimelineEditor(typeof(SpineSkeletonFlipTrack))]
+	[CanEditMultipleObjects]
+	public class SpineSkeletonFlipTrackInspector : TrackEditor {
 
-		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
-			var scriptPlayable = ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create(graph, inputCount);
-			var mixerBehaviour = scriptPlayable.GetBehaviour();
-			mixerBehaviour.trackIndex = this.trackIndex;
-			return scriptPlayable;
+		public override TrackDrawOptions GetTrackOptions (TrackAsset track, UnityEngine.Object binding) {
+			var options = base.GetTrackOptions(track, binding);
+			options.icon = SpineEditorUtilities.Icons.subMeshRenderer;
+			options.trackColor = new Color(0.855f, 0.8623f, 0.87f);
+			return options;
 		}
 	}
 }

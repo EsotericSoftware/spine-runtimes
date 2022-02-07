@@ -33,14 +33,10 @@
 
 #define SPINE_SKELETONMECANIM
 
-using Spine;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace Spine.Unity.Editor {
@@ -181,7 +177,7 @@ namespace Spine.Unity.Editor {
 
 		public static void BakeToPrefab (SkeletonDataAsset skeletonDataAsset, ExposedList<Skin> skins, string outputPath = "", bool bakeAnimations = true, bool bakeIK = true, SendMessageOptions eventOptions = SendMessageOptions.DontRequireReceiver) {
 			if (skeletonDataAsset == null || skeletonDataAsset.GetSkeletonData(true) == null) {
-				Debug.LogError("Could not export Spine Skeleton because SkeletonDataAsset is null or invalid!");
+				Debug.LogError("Could not export Spine Skeleton because SkeletonData Asset is null or invalid!");
 				return;
 			}
 
