@@ -35,7 +35,6 @@
 #define HAS_CULL_TRANSPARENT_MESH
 #endif
 
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -102,7 +101,7 @@ namespace Spine.Unity {
 #if UNITY_EDITOR
 		protected override void OnValidate () {
 			// This handles Scene View preview.
-			base.OnValidate ();
+			base.OnValidate();
 			if (this.IsValid) {
 				if (skeletonDataAsset == null) {
 					Clear();
@@ -254,8 +253,12 @@ namespace Spine.Unity {
 				return;
 			}
 #endif
+			if (freeze || updateTiming != UpdateTiming.InUpdate) return;
+			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
+		}
 
-			if (freeze) return;
+		virtual protected void FixedUpdate () {
+			if (freeze || updateTiming != UpdateTiming.InFixedUpdate) return;
 			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
 		}
 
@@ -359,8 +362,7 @@ namespace Spine.Unity {
 					separatorSlots.Add(slot);
 				}
 #if UNITY_EDITOR
-				else
-				{
+				else {
 					Debug.LogWarning(slotName + " is not a slot in " + skeletonDataAsset.skeletonJSON.name);
 				}
 #endif
@@ -488,6 +490,9 @@ namespace Spine.Unity {
 		public event UpdateBonesDelegate UpdateLocal;
 		public event UpdateBonesDelegate UpdateWorld;
 		public event UpdateBonesDelegate UpdateComplete;
+
+		[SerializeField] protected UpdateTiming updateTiming = UpdateTiming.InUpdate;
+		public UpdateTiming UpdateTiming { get { return updateTiming; } set { updateTiming = value; } }
 
 		/// <summary> Occurs after the vertex data populated every frame, before the vertices are pushed into the mesh.</summary>
 		public event Spine.Unity.MeshGeneratorDelegate OnPostProcessVertices;
@@ -838,7 +843,7 @@ namespace Spine.Unity {
 
 #if UNITY_EDITOR
 			if (Application.isEditor && !Application.isPlaying) {
-				for (int i = separatorParts.Count-1; i >= 0; --i) {
+				for (int i = separatorParts.Count - 1; i >= 0; --i) {
 					if (separatorParts[i] == null) {
 						separatorParts.RemoveAt(i);
 					}

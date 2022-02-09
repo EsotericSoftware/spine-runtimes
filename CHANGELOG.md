@@ -52,6 +52,8 @@
   * `BoneFollower` and `BoneFollowerGraphic` now provide an additional `Follow Parent World Scale` parameter to allow following simple scale of parent bones (rotated/skewed scale can't be supported). 
   * `SpineAtlasAsset.CreateRuntimeInstance` methods now provide an optional `newCustomTextureLoader` parameter (defaults to `null`) which can be set to e.g. `(a) => new YourCustomTextureLoader(a)` to use your own `TextureLoader` subclass instead of `MaterialsTextureLoader`.
   * Improved `Advanced - Fix Prefab Override MeshFilter` property for `SkeletonRenderer` (and subclasses`SkeletonAnimation` and `SkeletonMecanim`), now providing an additional option to use a global value which can be set in `Edit - Preferences - Spine`.
+  * `SkeletonAnimation`, `SkeletonMecanim` and `SkeletonGraphic` now provide an Inspector parameter `Advanced` - `Animation Update` with modes `In Update` **(previous behaviour, the default)**, `In FixedUpdate` and `Manual Update`. This allows to update animation in `FixedUpdate` when using the `SkeletonRootMotion` component (which is the recommended combination now, issuing a warning otherwise). The reason is that when root motion leads to a collision with a physics collider, it can introduce jittery excess movement when updating animation in `Update` due to more `Update` calls following a single `FixedUpdate` call.
+  * Added `SkeletonRootMotion` properties `PreviousRigidbodyRootMotion` and `AdditionalRigidbody2DMovement`. Setting or querying these movement vectors can be necessary when multiple scripts call `Rigidbody2D.MovePosition` on the same object where the last call overwrites the effect of preceding ones.
 
 * **Changes of default values**
 

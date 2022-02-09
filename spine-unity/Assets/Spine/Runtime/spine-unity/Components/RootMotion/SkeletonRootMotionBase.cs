@@ -61,6 +61,24 @@ namespace Spine.Unity {
 		public bool UsesRigidbody {
 			get { return rigidBody != null || rigidBody2D != null; }
 		}
+
+		/// <summary>Root motion translation that has been applied in the preceding <c>FixedUpdate</c> call
+		/// if a rigidbody is assigned at either <c>rigidbody</c> or <c>rigidbody2D</c>.
+		/// Returns <c>Vector2.zero</c> when <c>rigidbody</c> and <c>rigidbody2D</c> are null.
+		/// This can be necessary when multiple scripts call <c>Rigidbody2D.MovePosition</c>,
+		/// where the last call overwrites the effect of preceding ones.</summary>
+		public Vector2 PreviousRigidbodyRootMotion {
+			get { return previousRigidbodyRootMotion; }
+		}
+
+		/// <summary>Additional translation to add to <c>Rigidbody2D.MovePosition</c>
+		/// called in FixedUpdate. This can be necessary when multiple scripts call
+		/// <c>MovePosition</c>, where the last call overwrites the effect of preceding ones.
+		/// Has no effect if <c>rigidBody2D</c> is null.</summary>
+		public Vector2 AdditionalRigidbody2DMovement {
+			get { return additionalRigidbody2DMovement; }
+			set { additionalRigidbody2DMovement = value; }
+		}
 		#endregion
 
 		protected ISkeletonComponent skeletonComponent;
@@ -72,6 +90,8 @@ namespace Spine.Unity {
 		protected Vector2 initialOffset = Vector2.zero;
 		protected Vector2 tempSkeletonDisplacement;
 		protected Vector2 rigidbodyDisplacement;
+		protected Vector2 previousRigidbodyRootMotion = Vector2.zero;
+		protected Vector2 additionalRigidbody2DMovement = Vector2.zero;
 
 		protected virtual void Reset () {
 			FindRigidbodyComponent();
@@ -107,7 +127,7 @@ namespace Spine.Unity {
 				}
 
 				rigidBody2D.MovePosition(gravityAndVelocityMovement + new Vector2(transform.position.x, transform.position.y)
-					+ rigidbodyDisplacement);
+					+ rigidbodyDisplacement + additionalRigidbody2DMovement);
 			} else if (rigidBody != null) {
 				rigidBody.MovePosition(transform.position
 					+ new Vector3(rigidbodyDisplacement.x, rigidbodyDisplacement.y, 0));
@@ -116,6 +136,7 @@ namespace Spine.Unity {
 			Vector2 parentBoneScale;
 			GetScaleAffectingRootMotion(out parentBoneScale);
 			ClearEffectiveBoneOffsets(parentBoneScale);
+			previousRigidbodyRootMotion = rigidbodyDisplacement;
 			rigidbodyDisplacement = Vector2.zero;
 			tempSkeletonDisplacement = Vector2.zero;
 		}
@@ -149,6 +170,18 @@ namespace Spine.Unity {
 			public bool timeIsPastMid;
 		};
 		abstract public RootMotionInfo GetRootMotionInfo (int trackIndex = 0);
+
+		public ISkeletonComponent TargetSkeletonComponent {
+			get {
+				if (skeletonComponent == null)
+					skeletonComponent = GetComponent<ISkeletonComponent>();
+				return skeletonComponent;
+			}
+		}
+
+		public ISkeletonAnimation TargetSkeletonAnimationComponent {
+			get { return TargetSkeletonComponent as ISkeletonAnimation; }
+		}
 
 		public void SetRootMotionBone (string name) {
 			var skeleton = skeletonComponent.Skeleton;
