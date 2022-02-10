@@ -206,6 +206,14 @@ namespace Spine.Unity.Editor {
 			binary = null;
 		}
 
+		internal static AtlasAssetBase GetMatchingAtlas (List<string> requiredPaths, string skeletonName,
+			List<AtlasAssetBase> atlasAssets) {
+			atlasAssets.Sort((a, b) => (
+					string.CompareOrdinal(b.name, skeletonName)
+					- string.CompareOrdinal(a.name, skeletonName)));
+			return GetMatchingAtlas(requiredPaths, atlasAssets);
+		}
+
 		internal static AtlasAssetBase GetMatchingAtlas (List<string> requiredPaths, List<AtlasAssetBase> atlasAssets) {
 			AtlasAssetBase atlasAssetMatch = null;
 
@@ -353,13 +361,30 @@ namespace Spine.Unity.Editor {
 				IngestSpineProject(loadedAsset, null);
 #else
 				string skeletonName = Path.GetFileNameWithoutExtension(skeletonPath);
-				var atlasesForSkeleton = FindAtlasesAtPath(dir);
+				List<string> requiredPaths = GetRequiredAtlasRegions(skeletonPath);
+
+				List<AtlasAssetBase> atlasesForSkeleton = FindAtlasesAtPath(dir);
 				atlasesForSkeleton = atlasesForSkeleton.Union(newAtlases).ToList();
-				var requiredPaths = GetRequiredAtlasRegions(skeletonPath);
-				atlasesForSkeleton.Sort((a, b) => (
-					string.CompareOrdinal(b.name, skeletonName)
-					- string.CompareOrdinal(a.name, skeletonName)));
-				var atlasMatch = GetMatchingAtlas(requiredPaths, atlasesForSkeleton);
+				List<AtlasAssetBase> atlasesInSameDir = atlasesForSkeleton.Where(
+					atlas => AssetDatabase.GetAssetPath(atlas).Contains(dir)).ToList();
+
+				AtlasAssetBase atlasMatch = GetMatchingAtlas(requiredPaths, skeletonName, atlasesInSameDir);
+				if (atlasMatch == null && atlasesInSameDir.Count > 0) {
+					AtlasAssetBase firstAtlas = atlasesInSameDir[0];
+					Debug.LogWarning(string.Format(
+						"'{0}' atlas found in skeleton directory does not contain all required attachments",
+						firstAtlas.name), firstAtlas);
+
+					List<AtlasAssetBase> atlasesInOtherDir = atlasesForSkeleton.Except(atlasesInSameDir).ToList();
+					atlasMatch = GetMatchingAtlas(requiredPaths, skeletonName, atlasesInOtherDir);
+					if (atlasMatch != null) {
+						Debug.Log(string.Format(
+							"Using suitable atlas '{0}' of other imported directory. If this is the " +
+							"wrong atlas asset, please assign the correct one at the SkeletonData asset.",
+							atlasMatch.name), atlasMatch);
+					}
+				}
+
 				if (atlasMatch != null || requiredPaths.Count == 0) {
 					IngestSpineProject(loadedAsset, atlasMatch);
 				} else {
