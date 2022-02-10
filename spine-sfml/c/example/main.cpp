@@ -513,7 +513,6 @@ void test(spSkeletonData *skeletonData, spAtlas *atlas) {
 
 	float d = 3;
 	for (int i = 0; i < 1; i++) {
-		spSkeleton_update(skeleton, d);
 		spAnimationState_update(animState, d);
 		spAnimationState_apply(animState, skeleton);
 		spSkeleton_updateWorldTransform(skeleton);

@@ -192,8 +192,8 @@ static void readColor(_dataInput *input, float *r, float *g, float *b, float *a)
 #define SLOT_RGB2 4
 #define SLOT_ALPHA 5
 
-#define ATTACHMENT_DEFORM = 0
-#define ATTACHMENT_SEQUENCE = 1
+#define ATTACHMENT_DEFORM 0
+#define ATTACHMENT_SEQUENCE 1
 
 #define PATH_POSITION 0
 #define PATH_SPACING 1
@@ -705,8 +705,7 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 			int bezierCount = readVarint(input, 1);
 			switch (type) {
 				case PATH_POSITION: {
-					spTimelineArray_add(timelines, readTimeline(input, SUPER(spPathConstraintPositionTimeline_create(
-																		frameCount, bezierCount, index)),
+					spTimelineArray_add(timelines, readTimeline(input, SUPER(spPathConstraintPositionTimeline_create(frameCount, bezierCount, index)),
 																data->positionMode == SP_POSITION_MODE_FIXED ? scale
 																											 : 1));
 					break;
@@ -717,9 +716,9 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 																											 bezierCount,
 																											 index)),
 																data->spacingMode == SP_SPACING_MODE_LENGTH ||
-																data->spacingMode == SP_SPACING_MODE_FIXED
-																? scale
-																: 1));
+																				data->spacingMode == SP_SPACING_MODE_FIXED
+																		? scale
+																		: 1));
 					break;
 				}
 				case PATH_MIX: {
@@ -762,19 +761,17 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 		}
 	}
 
-	/* Deform timelines. */
+	/* Attachment timelines. */
 	for (i = 0, n = readVarint(input, 1); i < n; ++i) {
 		spSkin *skin = skeletonData->skins[readVarint(input, 1)];
 		for (ii = 0, nn = readVarint(input, 1); ii < nn; ++ii) {
 			int slotIndex = readVarint(input, 1);
 			for (iii = 0, nnn = readVarint(input, 1); iii < nnn; ++iii) {
-				float *tempDeform;
-				spDeformTimeline *timeline;
-				int weighted, deformLength;
-				const char *attachmentName = readStringRef(input, skeletonData);
 				int frameCount, frameLast, bezierCount;
 				float time, time2;
+				unsigned int timelineType;
 
+				const char *attachmentName = readStringRef(input, skeletonData);
 				spVertexAttachment *attachment = SUB_CAST(spVertexAttachment,
 														  spSkin_getAttachment(skin, slotIndex, attachmentName));
 				if (!attachment) {
@@ -785,59 +782,83 @@ static spAnimation *_spSkeletonBinary_readAnimation(spSkeletonBinary *self, cons
 					return NULL;
 				}
 
-				weighted = attachment->bones != 0;
-				deformLength = weighted ? attachment->verticesCount / 3 * 2 : attachment->verticesCount;
-				tempDeform = MALLOC(float, deformLength);
-
+				timelineType = readByte(input);
 				frameCount = readVarint(input, 1);
 				frameLast = frameCount - 1;
-				bezierCount = readVarint(input, 1);
-				timeline = spDeformTimeline_create(frameCount, deformLength, bezierCount, slotIndex, attachment);
 
-				time = readFloat(input);
-				for (frame = 0, bezier = 0;; ++frame) {
-					float *deform;
-					int end = readVarint(input, 1);
-					if (!end) {
-						if (weighted) {
-							deform = tempDeform;
-							memset(deform, 0, sizeof(float) * deformLength);
-						} else
-							deform = attachment->vertices;
-					} else {
-						int v, start = readVarint(input, 1);
-						deform = tempDeform;
-						memset(deform, 0, sizeof(float) * start);
-						end += start;
-						if (self->scale == 1) {
-							for (v = start; v < end; ++v)
-								deform[v] = readFloat(input);
-						} else {
-							for (v = start; v < end; ++v)
-								deform[v] = readFloat(input) * self->scale;
+				switch (timelineType) {
+					case ATTACHMENT_DEFORM: {
+						float *tempDeform;
+						int weighted, deformLength;
+						spDeformTimeline *timeline;
+						weighted = attachment->bones != 0;
+						deformLength = weighted ? attachment->verticesCount / 3 * 2 : attachment->verticesCount;
+						tempDeform = MALLOC(float, deformLength);
+
+						bezierCount = readVarint(input, 1);
+						timeline = spDeformTimeline_create(frameCount, deformLength, bezierCount, slotIndex,
+														   attachment);
+
+						time = readFloat(input);
+						for (frame = 0, bezier = 0;; ++frame) {
+							float *deform;
+							int end = readVarint(input, 1);
+							if (!end) {
+								if (weighted) {
+									deform = tempDeform;
+									memset(deform, 0, sizeof(float) * deformLength);
+								} else
+									deform = attachment->vertices;
+							} else {
+								int v, start = readVarint(input, 1);
+								deform = tempDeform;
+								memset(deform, 0, sizeof(float) * start);
+								end += start;
+								if (self->scale == 1) {
+									for (v = start; v < end; ++v)
+										deform[v] = readFloat(input);
+								} else {
+									for (v = start; v < end; ++v)
+										deform[v] = readFloat(input) * self->scale;
+								}
+								memset(deform + v, 0, sizeof(float) * (deformLength - v));
+								if (!weighted) {
+									float *vertices = attachment->vertices;
+									for (v = 0; v < deformLength; ++v)
+										deform[v] += vertices[v];
+								}
+							}
+							spDeformTimeline_setFrame(timeline, frame, time, deform);
+							if (frame == frameLast) break;
+							time2 = readFloat(input);
+							switch (readSByte(input)) {
+								case CURVE_STEPPED:
+									spCurveTimeline_setStepped(SUPER(timeline), frame);
+									break;
+								case CURVE_BEZIER:
+									setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, 0, 1, 1);
+							}
+							time = time2;
 						}
-						memset(deform + v, 0, sizeof(float) * (deformLength - v));
-						if (!weighted) {
-							float *vertices = attachment->vertices;
-							for (v = 0; v < deformLength; ++v)
-								deform[v] += vertices[v];
+						FREE(tempDeform);
+
+						spTimelineArray_add(timelines, (spTimeline *) timeline);
+						break;
+					}
+					case ATTACHMENT_SEQUENCE: {
+						int modeAndIndex;
+						float delay;
+						spSequenceTimeline *timeline = spSequenceTimeline_create(frameCount, slotIndex, (spAttachment *) attachment);
+						for (frame = 0; frame < frameCount; frame++) {
+							time = readFloat(input);
+							modeAndIndex = readInt(input);
+							delay = readFloat(input);
+							spSequenceTimeline_setFrame(timeline, frame, time, modeAndIndex & 0xf, modeAndIndex >> 4, delay);
 						}
+						spTimelineArray_add(timelines, (spTimeline *) timeline);
+						break;
 					}
-					spDeformTimeline_setFrame(timeline, frame, time, deform);
-					if (frame == frameLast) break;
-					time2 = readFloat(input);
-					switch (readSByte(input)) {
-						case CURVE_STEPPED:
-							spCurveTimeline_setStepped(SUPER(timeline), frame);
-							break;
-						case CURVE_BEZIER:
-							setBezier(input, SUPER(SUPER(timeline)), bezier++, frame, 0, time, time2, 0, 1, 1);
-					}
-					time = time2;
 				}
-				FREE(tempDeform);
-
-				spTimelineArray_add(timelines, (spTimeline *) timeline);
 			}
 		}
 	}
@@ -1484,8 +1505,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	/* Linked meshes. */
 	for (i = 0; i < internal->linkedMeshCount; ++i) {
 		_spLinkedMesh *linkedMesh = internal->linkedMeshes + i;
-		spSkin *skin = !linkedMesh->skin ? skeletonData->defaultSkin : spSkeletonData_findSkin(skeletonData,
-																							   linkedMesh->skin);
+		spSkin *skin = !linkedMesh->skin ? skeletonData->defaultSkin : spSkeletonData_findSkin(skeletonData, linkedMesh->skin);
 		spAttachment *parent;
 		if (!skin) {
 			FREE(input);

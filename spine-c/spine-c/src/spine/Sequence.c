@@ -50,9 +50,6 @@ void spSequence_dispose(spSequence *self) {
 spSequence *spSequence_copy(spSequence *self) {
 	int i = 0;
 	spSequence *copy = spSequence_create(self->regions->size);
-	copy->start = self->start;
-	copy->digits = self->digits;
-	copy->setupIndex = self->setupIndex;
 	for (; i < self->regions->size; i++)
 		copy->regions->items[i] = self->regions->items[i];
 	copy->start = self->start;
