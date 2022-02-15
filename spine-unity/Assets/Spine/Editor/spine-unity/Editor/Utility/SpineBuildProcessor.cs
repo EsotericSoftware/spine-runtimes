@@ -51,31 +51,73 @@ namespace Spine.Unity.Editor {
 #if HAS_ON_POSTPROCESS_PREFAB
 		static List<string> prefabsToRestore = new List<string>();
 #endif
+		static Dictionary<string, Texture> spriteAtlasTexturesToRestore = new Dictionary<string, Texture>();
 
 		internal static void PreprocessBuild () {
 			isBuilding = true;
 #if HAS_ON_POSTPROCESS_PREFAB
-			var assets = AssetDatabase.FindAssets("t:Prefab");
-			foreach(var asset in assets) {
+			PreprocessSpinePrefabMeshes();
+#endif
+			PreprocessSpriteAtlases();
+		}
+
+		internal static void PostprocessBuild () {
+			isBuilding = false;
+#if HAS_ON_POSTPROCESS_PREFAB
+			PostprocessSpinePrefabMeshes();
+#endif
+			PostprocessSpriteAtlases();
+		}
+
+#if HAS_ON_POSTPROCESS_PREFAB
+		internal static void PreprocessSpinePrefabMeshes () {
+			var prefabAssets = AssetDatabase.FindAssets("t:Prefab");
+			foreach (var asset in prefabAssets) {
 				string assetPath = AssetDatabase.GUIDToAssetPath(asset);
 				GameObject g = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
 				if (SpineEditorUtilities.CleanupSpinePrefabMesh(g)) {
 					prefabsToRestore.Add(assetPath);
 				}
 			}
-			AssetDatabase.SaveAssets();
-#endif
+			if (prefabAssets.Length > 0)
+				AssetDatabase.SaveAssets();
 		}
 
-		internal static void PostprocessBuild () {
-			isBuilding = false;
-#if HAS_ON_POSTPROCESS_PREFAB
+		internal static void PostprocessSpinePrefabMeshes () {
 			foreach (string assetPath in prefabsToRestore) {
 				GameObject g = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
 				SpineEditorUtilities.SetupSpinePrefabMesh(g, null);
 			}
-			AssetDatabase.SaveAssets();
+			if (prefabsToRestore.Count > 0)
+				AssetDatabase.SaveAssets();
+			prefabsToRestore.Clear();
+		}
 #endif
+		internal static void PreprocessSpriteAtlases () {
+			var spriteAtlasAssets = AssetDatabase.FindAssets("t:SpineSpriteAtlasAsset");
+			foreach (var asset in spriteAtlasAssets) {
+				string assetPath = AssetDatabase.GUIDToAssetPath(asset);
+				SpineSpriteAtlasAsset atlasAsset = AssetDatabase.LoadAssetAtPath<SpineSpriteAtlasAsset>(assetPath);
+				if (atlasAsset && atlasAsset.materials.Length > 0) {
+					spriteAtlasTexturesToRestore[assetPath] = atlasAsset.materials[0].mainTexture;
+					atlasAsset.materials[0].mainTexture = null;
+				}
+			}
+			if (spriteAtlasAssets.Length > 0)
+				AssetDatabase.SaveAssets();
+		}
+
+		internal static void PostprocessSpriteAtlases () {
+			foreach (var pair in spriteAtlasTexturesToRestore) {
+				string assetPath = pair.Key;
+				SpineSpriteAtlasAsset atlasAsset = AssetDatabase.LoadAssetAtPath<SpineSpriteAtlasAsset>(assetPath);
+				if (atlasAsset && atlasAsset.materials.Length > 0) {
+					atlasAsset.materials[0].mainTexture = pair.Value;
+				}
+			}
+			if (spriteAtlasTexturesToRestore.Count > 0)
+				AssetDatabase.SaveAssets();
+			spriteAtlasTexturesToRestore.Clear();
 		}
 	}
 
@@ -90,8 +132,7 @@ namespace Spine.Unity.Editor {
 			get { return -2000; }
 		}
 #if HAS_BUILD_PROCESS_WITH_REPORT
-		void IPreprocessBuildWithReport.OnPreprocessBuild(BuildReport report)
-		{
+		void IPreprocessBuildWithReport.OnPreprocessBuild (BuildReport report) {
 			SpineBuildProcessor.PreprocessBuild();
 		}
 #else
@@ -114,8 +155,7 @@ namespace Spine.Unity.Editor {
 
 
 #if HAS_BUILD_PROCESS_WITH_REPORT
-		void IPostprocessBuildWithReport.OnPostprocessBuild(BuildReport report)
-		{
+		void IPostprocessBuildWithReport.OnPostprocessBuild (BuildReport report) {
 			SpineBuildProcessor.PostprocessBuild();
 		}
 #else
