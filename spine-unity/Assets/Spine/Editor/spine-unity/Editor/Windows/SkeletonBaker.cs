@@ -808,20 +808,11 @@ namespace Spine.Unity.Editor {
 			return clip;
 		}
 
-		static int BinarySearch (float[] values, float target) {
-			int low = 0;
-			int high = values.Length - 2;
-			if (high == 0) return 1;
-			int current = (int)((uint)high >> 1);
-			while (true) {
-				if (values[(current + 1)] <= target)
-					low = current + 1;
-				else
-					high = current;
-
-				if (low == high) return (low + 1);
-				current = (int)((uint)(low + high) >> 1);
-			}
+		internal static int Search (float[] frames, float time) {
+			int n = frames.Length;
+			for (int i = 1; i < n; i++)
+				if (frames[i] > time) return i - 1;
+			return n - 1;
 		}
 
 		static void BakeBoneConstraints (Bone bone, Spine.Animation animation, AnimationClip clip) {
@@ -977,8 +968,7 @@ namespace Spine.Unity.Editor {
 
 					lastTime = time;
 					listIndex++;
-				} else if (curveType == 2) {
-
+				} else {
 					//bezier
 					Keyframe px = xKeys[pIndex];
 					Keyframe py = yKeys[pIndex];
@@ -1058,7 +1048,6 @@ namespace Spine.Unity.Editor {
 			while (currentTime < endTime) {
 				int pIndex = listIndex - 1;
 				float curveType = timeline.GetCurveType(frameIndex - 1);
-
 				if (curveType == 0) {
 					//linear
 					Keyframe px = xKeys[pIndex];
@@ -1113,7 +1102,7 @@ namespace Spine.Unity.Editor {
 
 					lastTime = time;
 					listIndex++;
-				} else if (curveType == 2) {
+				} else {
 					//bezier
 					Keyframe px = xKeys[pIndex];
 					Keyframe py = yKeys[pIndex];
@@ -1240,7 +1229,7 @@ namespace Spine.Unity.Editor {
 
 					lastTime = time;
 					listIndex++;
-				} else if (curveType == 2) {
+				} else {
 					//bezier
 					Keyframe pk = keys[pIndex];
 
@@ -1365,7 +1354,7 @@ namespace Spine.Unity.Editor {
 			while (currentTime < endTime) {
 				float time = frames[f];
 
-				int frameIndex = (time >= frames[frames.Length - 1] ? frames.Length : BinarySearch(frames, time)) - 1;
+				int frameIndex = Search(frames, time);
 
 				string name = timeline.AttachmentNames[frameIndex];
 				foreach (var pair in curveTable) {
