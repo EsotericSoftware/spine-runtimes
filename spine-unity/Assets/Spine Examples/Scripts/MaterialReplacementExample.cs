@@ -47,6 +47,13 @@ namespace Spine.Unity.Examples {
 		MaterialPropertyBlock mpb;
 
 		void Start () {
+			// Use the code below to programmatically query the original material.
+			// Note: using MeshRenderer.material will fail since it creates an instance copy of the Material,
+			// MeshRenderer.sharedMaterial might also fail when called too early or when no Attachments
+			// are visible in the initial first frame.
+			if (originalMaterial == null)
+				originalMaterial = skeletonAnimation.SkeletonDataAsset.atlasAssets[0].PrimaryMaterial;
+
 			previousEnabled = replacementEnabled;
 			SetReplacementEnabled(replacementEnabled);
 			mpb = new MaterialPropertyBlock();
