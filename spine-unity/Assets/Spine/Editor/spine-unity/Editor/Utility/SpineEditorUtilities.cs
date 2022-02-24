@@ -108,8 +108,7 @@ namespace Spine.Unity.Editor {
 			SetupSpinePrefabMesh(g, context);
 		}
 
-		public static bool SetupSpinePrefabMesh(GameObject g, UnityEditor.AssetImporters.AssetImportContext context)
-		{
+		public static bool SetupSpinePrefabMesh (GameObject g, UnityEditor.AssetImporters.AssetImportContext context) {
 			Dictionary<string, int> nameUsageCount = new Dictionary<string, int>();
 			bool wasModified = false;
 			var skeletonRenderers = g.GetComponentsInChildren<SkeletonRenderer>(true);
@@ -124,7 +123,7 @@ namespace Spine.Unity.Editor {
 				renderer.LateUpdateMesh();
 				var mesh = meshFilter.sharedMesh;
 				if (mesh == null) continue;
-				
+
 				string meshName = string.Format("Skeleton Prefab Mesh \"{0}\"", renderer.name);
 				if (nameUsageCount.ContainsKey(meshName)) {
 					nameUsageCount[meshName]++;
@@ -140,8 +139,7 @@ namespace Spine.Unity.Editor {
 			return wasModified;
 		}
 
-		public static bool CleanupSpinePrefabMesh(GameObject g)
-		{
+		public static bool CleanupSpinePrefabMesh (GameObject g) {
 			bool wasModified = false;
 			var skeletonRenderers = g.GetComponentsInChildren<SkeletonRenderer>(true);
 			foreach (SkeletonRenderer renderer in skeletonRenderers) {
