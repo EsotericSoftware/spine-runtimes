@@ -216,6 +216,24 @@ namespace Spine.Unity.Editor {
 			return null;
 		}
 
+		private static void ShowBlendModeMaterialProperty (SerializedProperty blendModeMaterialProperty,
+			string blendType, bool isTexturePresetPMA) {
+
+			EditorGUILayout.PropertyField(blendModeMaterialProperty, new GUIContent(blendType + " Material", blendType + " blend mode Material template."));
+			var material = blendModeMaterialProperty.objectReferenceValue as Material;
+			if (material == null)
+				return;
+
+			bool isMaterialPMA = MaterialChecks.IsPMATextureMaterial(material);
+			if (!isTexturePresetPMA && isMaterialPMA) {
+				EditorGUILayout.HelpBox(string.Format("'{0} Material' uses PMA but 'Atlas Texture Settings' uses Straight Alpha. " +
+					"You might want to assign 'SkeletonStraight{0}' instead.", blendType), MessageType.Warning);
+			} else if (isTexturePresetPMA && !isMaterialPMA) {
+				EditorGUILayout.HelpBox(string.Format("'{0} Material' uses Straight Alpha but 'Atlas Texture Settings' uses PMA. " +
+					"You might want to assign 'SkeletonPMA{0}' instead.", blendType), MessageType.Warning);
+			}
+		}
+
 		public static void HandlePreferencesGUI (SerializedObject settings) {
 
 			float prevLabelWidth = EditorGUIUtility.labelWidth;
@@ -254,9 +272,13 @@ namespace Spine.Unity.Editor {
 						}
 					}
 
-					EditorGUILayout.PropertyField(settings.FindProperty("blendModeMaterialAdditive"), new GUIContent("Additive Material", "Additive blend mode Material template."));
-					EditorGUILayout.PropertyField(settings.FindProperty("blendModeMaterialMultiply"), new GUIContent("Multiply Material", "Multiply blend mode Material template."));
-					EditorGUILayout.PropertyField(settings.FindProperty("blendModeMaterialScreen"), new GUIContent("Screen Material", "Screen blend mode Material template."));
+					SerializedProperty blendModeMaterialAdditive = settings.FindProperty("blendModeMaterialAdditive");
+					SerializedProperty blendModeMaterialMultiply = settings.FindProperty("blendModeMaterialMultiply");
+					SerializedProperty blendModeMaterialScreen = settings.FindProperty("blendModeMaterialScreen");
+					bool isTexturePresetPMA = IsPMAWorkflow(textureSettingsRef.stringValue);
+					ShowBlendModeMaterialProperty(blendModeMaterialAdditive, "Additive", isTexturePresetPMA);
+					ShowBlendModeMaterialProperty(blendModeMaterialMultiply, "Multiply", isTexturePresetPMA);
+					ShowBlendModeMaterialProperty(blendModeMaterialScreen, "Screen", isTexturePresetPMA);
 				}
 
 				EditorGUILayout.Space();
