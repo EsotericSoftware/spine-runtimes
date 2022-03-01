@@ -88,7 +88,6 @@ namespace Spine.Unity.Editor {
 		}
 
 		internal static void PostprocessSpinePrefabMeshes () {
-			Debug.Log("PostprocessSpinePrefabMeshes called");
 			foreach (string assetPath in prefabsToRestore) {
 				GameObject g = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
 				SpineEditorUtilities.SetupSpinePrefabMesh(g, null);
