@@ -27,6 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2017_2_OR_NEWER
+#define HAS_VECTOR_INT
+#endif
+
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -43,10 +47,14 @@ namespace Spine.Unity.Examples {
 			// due to overlapping attachment meshes.
 			normalSkeletonRenderer.Skeleton.SetColor(new Color(1, 1, 1, fadeoutAlpha));
 
+#if HAS_VECTOR_INT
 			// Thus we render the whole skeleton to a RenderTexture first using the 
 			// SkeletonRenderTexture component.
 			// Changing transparency at a single quad with a RenderTexture works as desired.
 			skeletonRenderTexture.color.a = fadeoutAlpha;
+#else
+			Debug.LogError("The SkeletonRenderTexture component requires Unity 2017.2 or newer.");
+#endif
 		}
 	}
 }

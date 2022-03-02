@@ -31,6 +31,10 @@
 #define HAS_FORCE_RENDER_OFF
 #endif
 
+#if UNITY_2017_2_OR_NEWER
+#define HAS_VECTOR_INT
+#endif
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -39,6 +43,7 @@ namespace Spine.Unity.Examples {
 
 	[RequireComponent(typeof(SkeletonRenderer))]
 	public class SkeletonRenderTexture : MonoBehaviour {
+#if HAS_VECTOR_INT
 		public Color color = Color.white;
 		public Material quadMaterial;
 		public Camera targetCamera;
@@ -230,5 +235,6 @@ namespace Spine.Unity.Examples {
 				allocatedRenderTextureSize = textureSize;
 			}
 		}
+#endif
 	}
 }
