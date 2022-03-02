@@ -27,6 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2019_3_OR_NEWER
+#define HAS_FORCE_RENDER_OFF
+#endif
+
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -92,14 +96,21 @@ namespace Spine.Unity.Examples {
 
 		void OnEnable () {
 			skeletonRenderer.OnMeshAndMaterialsUpdated += RenderOntoQuad;
+#if HAS_FORCE_RENDER_OFF
 			meshRenderer.forceRenderingOff = true;
+#else
+			Debug.LogError("This component requires Unity 2019.3 or newer for meshRenderer.forceRenderingOff. " +
+				"Otherwise you will see the mesh rendered twice.");
+#endif
 			if (quadMeshRenderer)
 				quadMeshRenderer.gameObject.SetActive(true);
 		}
 
 		void OnDisable () {
 			skeletonRenderer.OnMeshAndMaterialsUpdated -= RenderOntoQuad;
+#if HAS_FORCE_RENDER_OFF
 			meshRenderer.forceRenderingOff = false;
+#endif
 			if (quadMeshRenderer)
 				quadMeshRenderer.gameObject.SetActive(false);
 			if (renderTexture)
