@@ -50,26 +50,35 @@ export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
 		`;
 		let fragmentShader = `
 			uniform sampler2D map;
+			#ifdef USE_ALPHATEST
+			uniform float alphaTest;
+			#endif
 			varying vec2 vUv;
 			varying vec4 vColor;
 			void main(void) {
 				gl_FragColor = texture2D(map, vUv)*vColor;
-				if (gl_FragColor.a < 0.5) discard;
+				#ifdef USE_ALPHATEST
+				if (gl_FragColor.a < alphaTest) discard;
+				#endif
 			}
 		`;
 
 		let parameters: THREE.ShaderMaterialParameters = {
 			uniforms: {
-				map: { type: "t", value: null } as any
+				map: { value: null },
 			},
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader,
 			side: THREE.DoubleSide,
 			transparent: true,
 			depthWrite: false,
-			alphaTest: 0.5
+			alphaTest: 0.0
 		};
 		customizer(parameters);
+		if (parameters.alphaTest > 0) {
+			parameters.defines = { "USE_ALPHATEST": 1 };
+			parameters.uniforms["alphaTest"] = { value: parameters.alphaTest };
+		}
 		super(parameters);
 	};
 }
@@ -194,7 +203,10 @@ export class SkeletonMesh extends THREE.Object3D {
 				let clip = <ClippingAttachment>(attachment);
 				clipper.clipStart(slot, clip);
 				continue;
-			} else continue;
+			} else {
+				clipper.clipEndWithSlot(slot);
+				continue;
+			}
 
 			if (texture != null) {
 				let skeleton = slot.bone.skeleton;
