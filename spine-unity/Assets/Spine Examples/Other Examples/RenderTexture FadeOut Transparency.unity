@@ -392,8 +392,10 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "Enter play mode to see the problem of conventional alpha transparency\n
-    fadeout and how this can be fixed by using a RenderTexture."
+  m_Text: 'Enter play mode to see the problem of conventional alpha transparency
+
+    fadeout
+    and how this can be fixed by using a RenderTexture.'
 --- !u!222 &541830409
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -529,7 +531,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4cc2b5fcffcac846aacb02b6dad0440, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skeletonRenderTexture: {fileID: 1786065614}
+  renderTextureFadeout: {fileID: 1786065619}
   normalSkeletonRenderer: {fileID: 334034153}
 --- !u!1 &1369381599
 GameObject:
@@ -872,6 +874,7 @@ GameObject:
   - component: {fileID: 1786065616}
   - component: {fileID: 1786065615}
   - component: {fileID: 1786065614}
+  - component: {fileID: 1786065619}
   m_Layer: 0
   m_Name: Spineboy CorrectFadeout
   m_TagString: Untagged
@@ -886,7 +889,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1786065613}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 25e6ceb271c9af848ae53f2af1073d0d, type: 3}
   m_Name: 
@@ -998,6 +1001,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1786065619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1786065613}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fc94f89310427643babb41e000a8462, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fadeoutSeconds: 2
 --- !u!1 &1799507977
 GameObject:
   m_ObjectHideFlags: 0

@@ -41,6 +41,14 @@ using UnityEngine.Rendering;
 
 namespace Spine.Unity.Examples {
 
+	/// <summary>
+	/// When enabled, this component renders a skeleton to a RenderTexture and
+	/// then draws this RenderTexture at a quad of the same size.
+	/// This allows changing transparency at a single quad, which produces a more
+	/// natural fadeout effect.
+	/// Note: It is recommended to keep this component disabled as much as possible
+	/// because of the additional rendering overhead. Only enable it when alpha blending is required.
+	/// </summary>
 	[RequireComponent(typeof(SkeletonRenderer))]
 	public class SkeletonRenderTexture : MonoBehaviour {
 #if HAS_VECTOR_INT

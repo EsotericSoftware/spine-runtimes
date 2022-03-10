@@ -27,64 +27,62 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_2019_3_OR_NEWER
+#define HAS_FORCE_RENDER_OFF
+#endif
+
 #if UNITY_2017_2_OR_NEWER
 #define HAS_VECTOR_INT
 #endif
 
-using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Spine.Unity.Examples {
-	public class RenderTextureFadeoutExample : MonoBehaviour {
 
-		public SkeletonRenderTextureFadeout renderTextureFadeout;
-		public SkeletonRenderer normalSkeletonRenderer;
+	/// <summary>
+	/// A simple fadeout component that uses a <see cref="SkeletonRenderTexture"/> for transparency fadeout.
+	/// Attach a <see cref="SkeletonRenderTexture"/> and this component to a skeleton GameObject and disable both
+	/// components initially and keep them disabled during normal gameplay. When you need to start fadeout,
+	/// enable this component.
+	/// At the end of the fadeout, the event delegate <c>OnFadeoutComplete</c> is called, to which you can bind e.g.
+	/// a method that disables or destroys the entire GameObject.
+	/// </summary>
+	[RequireComponent(typeof(SkeletonRenderTexture))]
+	public class SkeletonRenderTextureFadeout : MonoBehaviour {
+		SkeletonRenderTexture skeletonRenderTexture;
 
-		float fadeoutSeconds = 2.0f;
-		float fadeoutSecondsRemaining;
+		public float fadeoutSeconds = 2.0f;
+		protected float fadeoutSecondsRemaining;
 
-		IEnumerator Start () {
-			while (true) {
-				StartFadeoutBad();
-				StartFadeoutGood();
-				yield return new WaitForSeconds(5.0f);
-			}
+		public delegate void FadeoutCallback (SkeletonRenderTextureFadeout skeleton);
+		public event FadeoutCallback OnFadeoutComplete;
+
+		protected void Awake () {
+			skeletonRenderTexture = this.GetComponent<SkeletonRenderTexture>();
 		}
-		void Update () {
-			UpdateBadFadeOutAlpha();
+
+		protected void OnEnable () {
+			fadeoutSecondsRemaining = fadeoutSeconds;
+			skeletonRenderTexture.enabled = true;
 		}
 
-		void UpdateBadFadeOutAlpha () {
+		protected void Update () {
 			if (fadeoutSecondsRemaining == 0)
 				return;
 
 			fadeoutSecondsRemaining -= Time.deltaTime;
 			if (fadeoutSecondsRemaining <= 0) {
 				fadeoutSecondsRemaining = 0;
+				if (OnFadeoutComplete != null)
+					OnFadeoutComplete(this);
 				return;
 			}
 			float fadeoutAlpha = fadeoutSecondsRemaining / fadeoutSeconds;
-
-			// changing transparency at a MeshRenderer does not yield the desired effect
-			// due to overlapping attachment meshes.
-			normalSkeletonRenderer.Skeleton.SetColor(new Color(1, 1, 1, fadeoutAlpha));
-		}
-
-		void StartFadeoutBad () {
-			fadeoutSecondsRemaining = fadeoutSeconds;
-		}
-
-		void StartFadeoutGood () {
-			renderTextureFadeout.gameObject.SetActive(true);
-			// enabling the SkeletonRenderTextureFadeout component starts the fadeout.
-			renderTextureFadeout.enabled = true;
-			renderTextureFadeout.OnFadeoutComplete -= DisableGameObject;
-			renderTextureFadeout.OnFadeoutComplete += DisableGameObject;
-		}
-
-		void DisableGameObject (SkeletonRenderTextureFadeout target) {
-			target.gameObject.SetActive(false);
+#if HAS_VECTOR_INT
+			skeletonRenderTexture.color.a = fadeoutAlpha;
+#else
+			Debug.LogError("The SkeletonRenderTexture component requires Unity 2017.2 or newer.");
+#endif
 		}
 	}
 }
