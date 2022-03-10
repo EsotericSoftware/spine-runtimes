@@ -54,6 +54,8 @@
   * Improved `Advanced - Fix Prefab Override MeshFilter` property for `SkeletonRenderer` (and subclasses`SkeletonAnimation` and `SkeletonMecanim`), now providing an additional option to use a global value which can be set in `Edit - Preferences - Spine`.
   * `SkeletonAnimation`, `SkeletonMecanim` and `SkeletonGraphic` now provide an Inspector parameter `Advanced` - `Animation Update` with modes `In Update` **(previous behaviour, the default)**, `In FixedUpdate` and `Manual Update`. This allows to update animation in `FixedUpdate` when using the `SkeletonRootMotion` component (which is the recommended combination now, issuing a warning otherwise). The reason is that when root motion leads to a collision with a physics collider, it can introduce jittery excess movement when updating animation in `Update` due to more `Update` calls following a single `FixedUpdate` call.
   * Added `SkeletonRootMotion` properties `PreviousRigidbodyRootMotion` and `AdditionalRigidbody2DMovement`. Setting or querying these movement vectors can be necessary when multiple scripts call `Rigidbody2D.MovePosition` on the same object where the last call overwrites the effect of preceding ones.
+  * Added example component `SkeletonRenderTexture` to render a `SkeletonRenderer` to a `RenderTexture`, mainly for proper transparency. Added an example scene named `RenderTexture FadeOut Transparency` that demonstrates usage for a fadeout transparency effect.
+  * Added another fadeout example component named `SkeletonRenderTextureFadeout` which takes over transparency fadeout when enabled. You can use this component as-is, attach it in disabled state and enable it to start a fadeout effect.
 
 * **Changes of default values**
 
