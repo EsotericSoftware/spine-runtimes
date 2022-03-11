@@ -1338,6 +1338,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 							if (modeString == "loopReverse") mode = SequenceMode::loopReverse;
 							if (modeString == "pingpongReverse") mode = SequenceMode::pingpongReverse;
 							timeline->setFrame(frame, time, mode, index, delay);
+							lastDelay = delay;
 						}
 						timelines.add(timeline);
 					}
