@@ -1291,7 +1291,7 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	highHash = readInt(input);
 	sprintf(buffer, "%x%x", highHash, lowHash);
 	buffer[31] = 0;
-	skeletonData->hash = strdup(buffer);
+	MALLOC_STR(skeletonData->hash, buffer);
 
 	skeletonData->version = readString(input);
 	if (!strlen(skeletonData->version)) {

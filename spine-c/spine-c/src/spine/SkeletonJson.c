@@ -34,10 +34,6 @@
 #include <spine/extension.h>
 #include <stdio.h>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#define strdup _strdup
-#endif
-
 typedef struct {
 	const char *parent;
 	const char *skin;
@@ -980,9 +976,17 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 		skeletonData->height = Json_getFloat(skeleton, "height", 0);
 		skeletonData->fps = Json_getFloat(skeleton, "fps", 30);
 		skeletonData->imagesPath = Json_getString(skeleton, "images", 0);
-		if (skeletonData->imagesPath) skeletonData->imagesPath = strdup(skeletonData->imagesPath);
+		if (skeletonData->imagesPath) {
+			char *tmp = NULL;
+			MALLOC_STR(tmp, skeletonData->imagesPath);
+			skeletonData->imagesPath = tmp;
+		}
 		skeletonData->audioPath = Json_getString(skeleton, "audio", 0);
-		if (skeletonData->audioPath) skeletonData->audioPath = strdup(skeletonData->audioPath);
+		if (skeletonData->audioPath) {
+			char *tmp = NULL;
+			MALLOC_STR(tmp, skeletonData->audioPath);
+			skeletonData->audioPath = tmp;
+		}
 	}
 
 	/* Bones. */
