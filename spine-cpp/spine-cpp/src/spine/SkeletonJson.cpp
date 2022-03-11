@@ -73,10 +73,6 @@
 #include <spine/TranslateTimeline.h>
 #include <spine/Vertices.h>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#define strdup _strdup
-#endif
-
 using namespace spine;
 
 static float toColor(const char *value, size_t index) {

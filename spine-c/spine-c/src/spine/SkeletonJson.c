@@ -34,10 +34,6 @@
 #include <spine/extension.h>
 #include <stdio.h>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#define strdup _strdup
-#endif
-
 typedef struct {
 	const char *parent;
 	const char *skin;
@@ -930,6 +926,8 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 
 	skeleton = Json_getItem(root, "skeleton");
 	if (skeleton) {
+		const char *imagesPath, *audioPath;
+
 		MALLOC_STR(skeletonData->hash, Json_getString(skeleton, "hash", 0));
 		MALLOC_STR(skeletonData->version, Json_getString(skeleton, "spine", 0));
 		skeletonData->x = Json_getFloat(skeleton, "x", 0);
@@ -937,10 +935,16 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 		skeletonData->width = Json_getFloat(skeleton, "width", 0);
 		skeletonData->height = Json_getFloat(skeleton, "height", 0);
 		skeletonData->fps = Json_getFloat(skeleton, "fps", 30);
-		skeletonData->imagesPath = Json_getString(skeleton, "images", 0);
-		if (skeletonData->imagesPath) skeletonData->imagesPath = strdup(skeletonData->imagesPath);
-		skeletonData->audioPath = Json_getString(skeleton, "audio", 0);
-		if (skeletonData->audioPath) skeletonData->audioPath = strdup(skeletonData->audioPath);
+
+		imagesPath = Json_getString(skeleton, "images", 0);
+		if (imagesPath) MALLOC_STR(skeletonData->imagesPath, imagesPath);
+		else
+			skeletonData->imagesPath = imagesPath;
+
+		audioPath = Json_getString(skeleton, "audio", 0);
+		if (audioPath) MALLOC_STR(skeletonData->audioPath, audioPath);
+		else
+			skeletonData->audioPath = audioPath;
 	}
 
 	/* Bones. */
