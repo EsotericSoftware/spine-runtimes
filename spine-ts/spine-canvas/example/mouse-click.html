@@ -21,10 +21,11 @@
 		canvas = document.getElementById("canvas");
 		context = canvas.getContext("2d");
 		skeletonRenderer = new spine.SkeletonRenderer(context);
+		skeletonRenderer.triangleRendering = true;
 
 		// Load the assets.
 		assetManager = new spine.AssetManager("https://esotericsoftware.com/files/examples/4.0/spineboy/export/");
-		assetManager.loadText("spineboy-ess.json");
+		assetManager.loadText("spineboy-pro.json");
 		assetManager.loadTextureAtlas("spineboy.atlas");
 		await assetManager.loadAll();
 
@@ -32,7 +33,7 @@
 		let atlas = assetManager.require("spineboy.atlas");
 		let atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 		let skeletonJson = new spine.SkeletonJson(atlasLoader);
-		let skeletonData = skeletonJson.readSkeletonData(assetManager.require("spineboy-ess.json"));
+		let skeletonData = skeletonJson.readSkeletonData(assetManager.require("spineboy-pro.json"));
 
 		// Instantiate a new skeleton based on the atlas and skeleton data.
 		skeleton = new spine.Skeleton(skeletonData);
@@ -40,8 +41,11 @@
 		skeleton.updateWorldTransform();
 		bounds = skeleton.getBoundsRect();
 
+		// Spineboy's head bounding box attachment is not attached by default. Attach it.
+		skeleton.setAttachment("head-bb", "head");
+
 		// Setup an animation state with a default mix of 0.2 seconds.
-		var animationStateData = new spine.AnimationStateData(skeleton.data);
+		let animationStateData = new spine.AnimationStateData(skeleton.data);
 		animationStateData.defaultMix = 0.2;
 		animationState = new spine.AnimationState(animationStateData);
 
@@ -50,17 +54,19 @@
 		canvas.addEventListener('click', event => {
 			// Make the mouse click coordinates relative to the canvas.
 			let canvasRect = canvas.getBoundingClientRect();
-			var mouseX = event.x - canvasRect.x;
-			var mouseY = event.y - canvasRect.y;
+			let mouseX = event.x - canvasRect.x;
+			let mouseY = event.y - canvasRect.y;
 
-			// Find the "head" bone.
-			var headBone = skeleton.findBone("head");
+			// Create and update a SkeletonBounds instance for later hit testing.
+			let skelBounds = new spine.SkeletonBounds();
+			skelBounds.update(skeleton);
 
-			// If the mouse pointer is within 100 pixels of the head bone, fire the jump animation event.
-			// Afterwards, loop the run animation.
-			if (pointInCircle(mouseX, mouseY, headBone.worldX, headBone.worldY, 100)) {
-				var jumpEntry = animationState.setAnimation(0, "jump", false);
-				var walkEntry = animationState.addAnimation(0, "run", true);
+			// Check if the mouse coordinates are inside any of the bounding box
+			// attachments of the skeleton. If so, play the jump animation, followed
+			// by a looping run animation.
+			if (skelBounds.containsPoint(mouseX, mouseY)) {
+				let jumpEntry = animationState.setAnimation(0, "jump", false);
+				let walkEntry = animationState.addAnimation(0, "run", true);
 			}
 		});
 
@@ -69,8 +75,8 @@
 
 	function render() {
 		// Calculate the delta time between this and the last frame in seconds.
-		var now = Date.now() / 1000;
-		var delta = now - lastFrameTime;
+		let now = Date.now() / 1000;
+		let delta = now - lastFrameTime;
 		lastFrameTime = now;
 
 		// Resize the canvas drawing buffer if the canvas CSS width and height changed
@@ -100,8 +106,8 @@
 
 	// Checks if the point given by x/y are within the circle.
 	function pointInCircle(x, y, circleX, circleY, circleRadius) {
-		var distX = x - circleX;
-		var distY = y - circleY;
+		let distX = x - circleX;
+		let distY = y - circleY;
 		return distX * distX + distY * distY <= circleRadius * circleRadius;
 	}
 
