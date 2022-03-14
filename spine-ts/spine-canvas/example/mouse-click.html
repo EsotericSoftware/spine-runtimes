@@ -45,7 +45,25 @@
 		animationStateData.defaultMix = 0.2;
 		animationState = new spine.AnimationState(animationStateData);
 
-		// Start rendering.
+		// Add a click listener to the canvas which checks if Spineboy's head
+		// was clicked.
+		canvas.addEventListener('click', event => {
+			// Make the mouse click coordinates relative to the canvas.
+			let canvasRect = canvas.getBoundingClientRect();
+			var mouseX = event.x - canvasRect.x;
+			var mouseY = event.y - canvasRect.y;
+
+			// Find the "head" bone.
+			var headBone = skeleton.findBone("head");
+
+			// If the mouse pointer is within 100 pixels of the head bone, fire the jump animation event.
+			// Afterwards, loop the run animation.
+			if (pointInCircle(mouseX, mouseY, headBone.worldX, headBone.worldY, 100)) {
+				var jumpEntry = animationState.setAnimation(0, "jump", false);
+				var walkEntry = animationState.addAnimation(0, "run", true);
+			}
+		});
+
 		requestAnimationFrame(render);
 	}
 
@@ -78,6 +96,13 @@
 		skeletonRenderer.draw(skeleton);
 
 		requestAnimationFrame(render);
+	}
+
+	// Checks if the point given by x/y are within the circle.
+	function pointInCircle(x, y, circleX, circleY, circleRadius) {
+		var distX = x - circleX;
+		var distY = y - circleY;
+		return distX * distX + distY * distY <= circleRadius * circleRadius;
 	}
 
 	load();

@@ -634,6 +634,8 @@
   * Added `MeshAttachment#newLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
   * Added IK softness.
   * Added `AssetManager.setRawDataURI(path, data)`. Allows to embed data URIs for skeletons, atlases and atlas page images directly in the HTML/JS without needing to load it from a separate file.
+  * Added `AssetManager.loadAll()` to allow Promise/async/await based waiting for completion of asset load. See the `spine-canvas` examples.
+  * Added `Skeleton.getBoundRect()` helper method to calculate the bouding rectangle of the current pose, returning the result as `{ x, y, width, height }`. Note that this method will create temporary objects which can add to garbage collection pressure.
 
 ### WebGL backend
 * `Input` can now take a partially defined implementation of `InputListener`.

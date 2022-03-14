@@ -65,6 +65,21 @@ export class AssetManagerBase implements Disposable {
 		if (callback) callback(path, message);
 	}
 
+	loadAll () {
+		let promise = new Promise((resolve: (assetManager: AssetManagerBase) => void, reject: (errors: StringMap<string>) => void) => {
+			let check = () => {
+				if (this.isLoadingComplete()) {
+					if (this.hasErrors()) reject(this.errors);
+					else resolve(this);
+					return;
+				}
+				requestAnimationFrame(check);
+			}
+			requestAnimationFrame(check);
+		});
+		return promise;
+	}
+
 	setRawDataURI (path: string, data: string) {
 		this.downloader.rawDataUris[this.pathPrefix + path] = data;
 	}
