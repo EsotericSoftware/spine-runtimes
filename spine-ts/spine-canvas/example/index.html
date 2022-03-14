@@ -6,7 +6,7 @@
 	<script src="../dist/iife/spine-canvas.js"></script>
 </head>
 
-<body style="margin: 0; padding: 0;">
+<body style="margin: 0; padding: 0; background: #333">
 	<canvas id="canvas" style="width: 100%; height: 100vh;"></canvas>
 </body>
 
@@ -44,6 +44,9 @@
 		var animationStateData = new spine.AnimationStateData(skeleton.data);
 		animationStateData.defaultMix = 0.2;
 		animationState = new spine.AnimationState(animationStateData);
+
+		// Set the run animation, looping.
+		animationState.setAnimation(0, "run", true);
 
 		// Start rendering.
 		requestAnimationFrame(render);
