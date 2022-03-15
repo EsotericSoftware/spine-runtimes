@@ -113,7 +113,7 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			#pragma multi_compile _ DIRLIGHTMAP_COMBINED
 			#pragma multi_compile _ LIGHTMAP_ON
 
-	//--------------------------------------
+			//--------------------------------------
 			// GPU Instancing
 			#pragma multi_compile_instancing
 
@@ -200,6 +200,36 @@ Shader "Universal Render Pipeline/Spine/Sprite"
 			#define fixed half
 			#include "Include/Spine-Input-Sprite-URP.hlsl"
 			#include "Include/Spine-Sprite-DepthOnlyPass-URP.hlsl"
+			ENDHLSL
+		}
+
+		Pass
+		{
+			Name "Unlit"
+			Tags { "LightMode" = "UniversalForward" "Queue" = "Transparent" "RenderType" = "Transparent"}
+
+			ZWrite Off
+			Cull Off
+			Blend One OneMinusSrcAlpha
+
+			HLSLPROGRAM
+			#pragma shader_feature _ _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON _ALPHAPREMULTIPLY_VERTEX_ONLY _ADDITIVEBLEND _ADDITIVEBLEND_SOFT _MULTIPLYBLEND _MULTIPLYBLEND_X2
+			#if defined(_ALPHAPREMULTIPLY_VERTEX_ONLY) || defined(_ALPHABLEND_ON)
+			#define _STRAIGHT_ALPHA_INPUT
+			#endif
+
+			#pragma prefer_hlslcc gles
+			#pragma vertex vert
+			#pragma fragment frag
+
+			#undef LIGHTMAP_ON
+
+			#define USE_URP
+			#define fixed4 half4
+			#define fixed3 half3
+			#define fixed half
+			#include "Include/Spine-Input-URP.hlsl"
+			#include "Include/Spine-Skeleton-ForwardPass-URP.hlsl"
 			ENDHLSL
 		}
 	}
