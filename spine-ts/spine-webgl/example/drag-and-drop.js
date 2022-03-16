@@ -21,7 +21,7 @@ class App {
         // Setup listener for animation selection box
         let animationSelectBox = document.body.querySelector("#animations");
         animationSelectBox.onchange = () => {
-            // this.animationState.setAnimation(0, animationSelectBox.value, true);
+            this.animationState.setAnimation(0, animationSelectBox.value, true);
         }
 
         // Setup listener for the PMA checkbox
@@ -123,8 +123,7 @@ class App {
             option.selected = animation.name == animationName;
             animationSelectBox.appendChild(option);
         }
-
-        // if (animationName) this.animationState.setAnimation(0, animationName, true);
+        this.animationState.setAnimation(0, animationName, true);
 
         // Center the skeleton in the viewport
         this.centerSkeleton();
