@@ -81,8 +81,9 @@
 					var skeletonData = skeletonJson.readSkeletonData(assetManager.require(skeletonFile));
 
 					// Create a SkeletonMesh from the data and attach it to the scene
-					skeletonMesh = new spine.SkeletonMesh(skeletonData, function (parameters) {
+					skeletonMesh = new spine.SkeletonMesh(skeletonData, (parameters) => {
 						parameters.depthTest = false;
+						parameters.alphaTest = 0.5;
 					});
 					skeletonMesh.state.setAnimation(0, animation, true);
 					mesh.add(skeletonMesh);
