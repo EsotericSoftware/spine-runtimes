@@ -37,6 +37,7 @@ namespace Spine.Unity {
 	/// <summary>
 	/// Base class for skeleton root motion components.
 	/// </summary>
+	[DefaultExecutionOrder(1)]
 	abstract public class SkeletonRootMotionBase : MonoBehaviour {
 
 		#region Inspector
@@ -155,6 +156,7 @@ namespace Spine.Unity {
 			Vector2 parentBoneScale;
 			GetScaleAffectingRootMotion(out parentBoneScale);
 			ClearEffectiveBoneOffsets(parentBoneScale);
+			skeletonComponent.Skeleton.UpdateWorldTransform();
 			previousRigidbodyRootMotion = rigidbodyDisplacement;
 
 			ClearRigidbodyTempMovement();
