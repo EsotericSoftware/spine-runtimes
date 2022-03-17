@@ -32,9 +32,7 @@ import { MeshBatcher } from "./MeshBatcher";
 import * as THREE from "three";
 import { ThreeJsTexture } from "./ThreeJsTexture";
 
-export interface SkeletonMeshMaterialParametersCustomizer {
-	(materialParameters: THREE.ShaderMaterialParameters): void;
-}
+export type SkeletonMeshMaterialParametersCustomizer = (materialParameters: THREE.ShaderMaterialParameters) => void;
 
 export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
 	constructor (customizer: SkeletonMeshMaterialParametersCustomizer) {
@@ -103,7 +101,7 @@ export class SkeletonMesh extends THREE.Object3D {
 	private vertices = Utils.newFloatArray(1024);
 	private tempColor = new Color();
 
-	constructor (skeletonData: SkeletonData) {
+	constructor (skeletonData: SkeletonData, private materialCustomerizer: SkeletonMeshMaterialParametersCustomizer = (material) => { }) {
 		super();
 
 		this.skeleton = new Skeleton(skeletonData);
@@ -138,7 +136,7 @@ export class SkeletonMesh extends THREE.Object3D {
 
 	private nextBatch () {
 		if (this.batches.length == this.nextBatchIndex) {
-			let batch = new MeshBatcher();
+			let batch = new MeshBatcher(10920, this.materialCustomerizer);
 			this.add(batch);
 			this.batches.push(batch);
 		}
