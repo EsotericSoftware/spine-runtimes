@@ -153,13 +153,15 @@ namespace Spine.Unity {
 				rigidBody.MoveRotation(rigidBody.rotation * rigidbodyRotation);
 			} else return;
 
-			Vector2 parentBoneScale;
-			GetScaleAffectingRootMotion(out parentBoneScale);
-			ClearEffectiveBoneOffsets(parentBoneScale);
-			skeletonComponent.Skeleton.UpdateWorldTransform();
-			previousRigidbodyRootMotion = rigidbodyDisplacement;
+			if (UsesRigidbody) {
+				Vector2 parentBoneScale;
+				GetScaleAffectingRootMotion(out parentBoneScale);
+				ClearEffectiveBoneOffsets(parentBoneScale);
+				skeletonComponent.Skeleton.UpdateWorldTransform();
+				previousRigidbodyRootMotion = rigidbodyDisplacement;
 
-			ClearRigidbodyTempMovement();
+				ClearRigidbodyTempMovement();
+			}
 		}
 
 		protected virtual void OnDisable () {
