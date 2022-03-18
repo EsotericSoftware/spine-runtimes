@@ -72,7 +72,10 @@ namespace Spine.Unity {
 		public override void Initialize (bool overwrite, bool quiet = false) {
 			if (valid && !overwrite)
 				return;
-
+#if UNITY_EDITOR
+			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)
+				return;
+#endif
 			base.Initialize(overwrite, quiet);
 
 			if (!valid)
@@ -104,8 +107,7 @@ namespace Spine.Unity {
 
 			if (Application.isPlaying) {
 				translator.Apply(skeleton);
-			}
-			else {
+			} else {
 				if (translatorAnimator != null && translatorAnimator.isInitialized &&
 					translatorAnimator.isActiveAndEnabled && translatorAnimator.runtimeAnimatorController != null) {
 					// Note: Rebind is required to prevent warning "Animator is not playing an AnimatorController" with prefabs
@@ -535,7 +537,7 @@ namespace Spine.Unity {
 			}
 
 #if UNITY_EDITOR
-			void GetLayerBlendModes() {
+			void GetLayerBlendModes () {
 				if (layerBlendModes.Length < animator.layerCount) {
 					System.Array.Resize<MixBlend>(ref layerBlendModes, animator.layerCount);
 				}
