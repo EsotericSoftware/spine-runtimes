@@ -90,6 +90,16 @@ namespace Spine.Unity {
 		}
 		#endregion
 
+		protected bool SkeletonAnimationUsesFixedUpdate {
+			get {
+				var skeletonAnimation = skeletonComponent as ISkeletonAnimation;
+				if (skeletonAnimation != null) {
+					return skeletonAnimation.UpdateTiming == UpdateTiming.InFixedUpdate;
+				}
+				return false;
+			}
+		}
+
 		protected ISkeletonComponent skeletonComponent;
 		protected Bone rootMotionBone;
 		protected int rootMotionBoneIndex;
@@ -129,9 +139,16 @@ namespace Spine.Unity {
 		}
 
 		protected virtual void FixedUpdate () {
+			// Root motion is only applied when component is enabled.
 			if (!this.isActiveAndEnabled)
-				return; // Root motion is only applied when component is enabled.
+				return;
+			// When SkeletonAnimation component uses UpdateTiming.InFixedUpdate,
+			// we directly call PhysicsUpdate in HandleUpdateLocal instead of here.
+			if (!SkeletonAnimationUsesFixedUpdate)
+				PhysicsUpdate(false);
+		}
 
+		protected virtual void PhysicsUpdate (bool skeletonAnimationUsesFixedUpdate) {
 			if (rigidBody2D != null) {
 				Vector2 gravityAndVelocityMovement = Vector2.zero;
 				if (applyRigidbody2DGravity) {
@@ -153,15 +170,14 @@ namespace Spine.Unity {
 				rigidBody.MoveRotation(rigidBody.rotation * rigidbodyRotation);
 			} else return;
 
-			if (UsesRigidbody) {
-				Vector2 parentBoneScale;
-				GetScaleAffectingRootMotion(out parentBoneScale);
+			Vector2 parentBoneScale;
+			GetScaleAffectingRootMotion(out parentBoneScale);
+			if (!skeletonAnimationUsesFixedUpdate) {
 				ClearEffectiveBoneOffsets(parentBoneScale);
 				skeletonComponent.Skeleton.UpdateWorldTransform();
-				previousRigidbodyRootMotion = rigidbodyDisplacement;
-
-				ClearRigidbodyTempMovement();
 			}
+			previousRigidbodyRootMotion = rigidbodyDisplacement;
+			ClearRigidbodyTempMovement();
 		}
 
 		protected virtual void OnDisable () {
@@ -480,10 +496,15 @@ namespace Spine.Unity {
 				skeletonRotationDelta = GetSkeletonSpaceRotationDelta(boneLocalDeltaRotation, totalScale);
 			}
 
-			ApplyRootMotion(skeletonTranslationDelta, skeletonRotationDelta, parentBoneScale);
+			bool usesFixedUpdate = SkeletonAnimationUsesFixedUpdate;
+			ApplyRootMotion(skeletonTranslationDelta, skeletonRotationDelta, parentBoneScale, usesFixedUpdate);
+
+			if (usesFixedUpdate)
+				PhysicsUpdate(usesFixedUpdate);
 		}
 
-		void ApplyRootMotion (Vector2 skeletonTranslationDelta, float skeletonRotationDelta, Vector2 parentBoneScale) {
+		void ApplyRootMotion (Vector2 skeletonTranslationDelta, float skeletonRotationDelta, Vector2 parentBoneScale,
+			bool skeletonAnimationUsesFixedUpdate) {
 			// Apply root motion to Transform or RigidBody;
 			if (UsesRigidbody) {
 				rigidbodyDisplacement += transform.TransformVector(skeletonTranslationDelta);
@@ -491,7 +512,8 @@ namespace Spine.Unity {
 				// Accumulated displacement is applied on the next Physics update in FixedUpdate.
 				// Until the next Physics update, tempBoneDisplacement is offsetting bone locations
 				// to prevent stutter which would otherwise occur if we don't move every Update.
-				tempSkeletonDisplacement += skeletonTranslationDelta;
+				if (!skeletonAnimationUsesFixedUpdate)
+					tempSkeletonDisplacement += skeletonTranslationDelta;
 
 				if (skeletonRotationDelta != 0.0f) {
 					if (rigidBody != null) {
@@ -502,10 +524,14 @@ namespace Spine.Unity {
 						float rotationSign = lossyScale.x * lossyScale.y > 0 ? 1 : -1;
 						rigidbody2DRotation += rotationSign * skeletonRotationDelta;
 					}
-					tempSkeletonRotation += skeletonRotationDelta;
+					if (!skeletonAnimationUsesFixedUpdate)
+						tempSkeletonRotation += skeletonRotationDelta;
 				}
 
-				SetEffectiveBoneOffsetsTo(tempSkeletonDisplacement, tempSkeletonRotation, parentBoneScale);
+				if (skeletonAnimationUsesFixedUpdate)
+					ClearEffectiveBoneOffsets(parentBoneScale);
+				else
+					SetEffectiveBoneOffsetsTo(tempSkeletonDisplacement, tempSkeletonRotation, parentBoneScale);
 			} else {
 				transform.position += transform.TransformVector(skeletonTranslationDelta);
 				if (skeletonRotationDelta != 0.0f) {
