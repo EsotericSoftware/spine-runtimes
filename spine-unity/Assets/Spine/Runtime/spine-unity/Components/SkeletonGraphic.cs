@@ -525,7 +525,10 @@ namespace Spine.Unity {
 
 		public void Initialize (bool overwrite) {
 			if (this.IsValid && !overwrite) return;
-
+#if UNITY_EDITOR
+			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)
+				return;
+#endif
 			if (this.skeletonDataAsset == null) return;
 			var skeletonData = this.skeletonDataAsset.GetSkeletonData(false);
 			if (skeletonData == null) return;

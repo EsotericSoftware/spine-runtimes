@@ -75,7 +75,10 @@ namespace Spine.Unity {
 		public override void Initialize (bool overwrite, bool quiet = false) {
 			if (valid && !overwrite)
 				return;
-
+#if UNITY_EDITOR
+			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)
+				return;
+#endif
 			base.Initialize(overwrite, quiet);
 
 			if (!valid)
