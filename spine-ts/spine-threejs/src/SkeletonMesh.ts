@@ -48,14 +48,14 @@ export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
 		`;
 		let fragmentShader = `
 			uniform sampler2D map;
-			#ifdef USE_ALPHATEST
+			#ifdef USE_SPINE_ALPHATEST
 			uniform float alphaTest;
 			#endif
 			varying vec2 vUv;
 			varying vec4 vColor;
 			void main(void) {
 				gl_FragColor = texture2D(map, vUv)*vColor;
-				#ifdef USE_ALPHATEST
+				#ifdef USE_SPINE_ALPHATEST
 				if (gl_FragColor.a < alphaTest) discard;
 				#endif
 			}
@@ -74,7 +74,7 @@ export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
 		};
 		customizer(parameters);
 		if (parameters.alphaTest > 0) {
-			parameters.defines = { "USE_ALPHATEST": 1 };
+			parameters.defines = { "USE_SPINE_ALPHATEST": 1 };
 			parameters.uniforms["alphaTest"] = { value: parameters.alphaTest };
 		}
 		super(parameters);
