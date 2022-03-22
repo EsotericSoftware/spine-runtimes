@@ -33,6 +33,7 @@
 #include <spine/SkeletonBinary.h>
 #include <spine/extension.h>
 #include <stdio.h>
+#include <spine/Version.h>
 
 typedef struct {
 	const unsigned char *cursor;
@@ -1270,6 +1271,18 @@ spSkeletonData *spSkeletonBinary_readSkeletonDataFile(spSkeletonBinary *self, co
 	return skeletonData;
 }
 
+static int string_starts_with(const char *str, const char *needle) {
+	int lenStr, lenNeedle, i;
+	if (!str) return 0;
+	lenStr = strlen(str);
+	lenNeedle = strlen(needle);
+	if (lenStr < lenNeedle) return 0;
+	for (i = 0; i < lenNeedle; i++) {
+		if (str[i] != needle[i]) return 0;
+	}
+	return -1;
+}
+
 spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const unsigned char *binary,
 												  const int length) {
 	int i, n, ii, nonessential;
@@ -1297,6 +1310,13 @@ spSkeletonData *spSkeletonBinary_readSkeletonData(spSkeletonBinary *self, const 
 	if (!strlen(skeletonData->version)) {
 		FREE(skeletonData->version);
 		skeletonData->version = 0;
+	} else {
+		if (!string_starts_with(skeletonData->version, SPINE_VERSION_STRING)) {
+			char errorMsg[255];
+			sprintf(errorMsg, "Skeleton version %s does not match runtime version %s", skeletonData->version, SPINE_VERSION_STRING);
+			_spSkeletonBinary_setError(self, errorMsg, NULL);
+			return NULL;
+		}
 	}
 
 	skeletonData->x = readFloat(input);

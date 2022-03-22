@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 #include "Json.h"
+#include <spine/Version.h>
 #include <spine/Array.h>
 #include <spine/AtlasAttachmentLoader.h>
 #include <spine/SkeletonJson.h>
@@ -949,6 +950,18 @@ spSkeletonData *spSkeletonJson_readSkeletonDataFile(spSkeletonJson *self, const 
 	return skeletonData;
 }
 
+static int string_starts_with(const char *str, const char *needle) {
+	int lenStr, lenNeedle, i;
+	if (!str) return 0;
+	lenStr = strlen(str);
+	lenNeedle = strlen(needle);
+	if (lenStr < lenNeedle) return 0;
+	for (i = 0; i < lenNeedle; i++) {
+		if (str[i] != needle[i]) return 0;
+	}
+	return -1;
+}
+
 spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char *json) {
 	int i, ii;
 	spSkeletonData *skeletonData;
@@ -971,6 +984,12 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 	if (skeleton) {
 		MALLOC_STR(skeletonData->hash, Json_getString(skeleton, "hash", 0));
 		MALLOC_STR(skeletonData->version, Json_getString(skeleton, "spine", 0));
+		if (!string_starts_with(skeletonData->version, SPINE_VERSION_STRING)) {
+			char errorMsg[255];
+			sprintf(errorMsg, "Skeleton version %s does not match runtime version %s", skeletonData->version, SPINE_VERSION_STRING);
+			_spSkeletonJson_setError(self, 0, errorMsg, NULL);
+			return NULL;
+		}
 		skeletonData->x = Json_getFloat(skeleton, "x", 0);
 		skeletonData->y = Json_getFloat(skeleton, "y", 0);
 		skeletonData->width = Json_getFloat(skeleton, "width", 0);
