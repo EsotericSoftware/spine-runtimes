@@ -2083,12 +2083,8 @@ void _spSequenceTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float
 }
 
 void _spSequenceTimeline_dispose(spTimeline *timeline) {
-	spEventTimeline *self = SUB_CAST(spEventTimeline, timeline);
-	int i;
-
-	for (i = 0; i < self->super.frames->size; ++i)
-		spEvent_dispose(self->events[i]);
-	FREE(self->events);
+	/* NO-OP */
+	UNUSED(timeline);
 }
 
 spSequenceTimeline *spSequenceTimeline_create(int framesCount, int slotIndex, spAttachment *attachment) {

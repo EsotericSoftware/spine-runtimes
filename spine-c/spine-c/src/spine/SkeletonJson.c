@@ -801,6 +801,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 							if (!strcmp(modeString, "loopReverse")) mode = SP_SEQUENCE_MODE_LOOPREVERSE;
 							if (!strcmp(modeString, "pingpongReverse")) mode = SP_SEQUENCE_MODE_PINGPONGREVERSE;
 							spSequenceTimeline_setFrame(timeline, frame, time, mode, index, delay);
+							lastDelay = delay;
 						}
 						spTimelineArray_add(timelines, SUPER(timeline));
 					}
@@ -1366,7 +1367,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 						return NULL;
 					}
 
-					sequence = readSequence(attachmentMap);
+					sequence = readSequence(Json_getItem(attachmentMap, "sequence"));
 					attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, attachmentName,
 																	 path, sequence);
 					if (!attachment) {

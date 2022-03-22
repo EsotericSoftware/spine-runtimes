@@ -29,6 +29,7 @@
 
 #include <spine/Sequence.h>
 #include <spine/extension.h>
+#include <stdio.h>
 
 _SP_ARRAY_IMPLEMENT_TYPE(spTextureRegionArray, spTextureRegion *)
 
@@ -84,6 +85,31 @@ void spSequence_apply(spSequence *self, spSlot *slot, spAttachment *attachment) 
 	}
 }
 
-void spSequence_getPath(const char *basePath, int index, char *path) {
-	fix me
+static int num_digits(int value) {
+	int count = value < 0 ? 1 : 0;
+	do {
+		value /= 10;
+		++count;
+	} while (value != 0);
+	return count;
+}
+
+static char *string_append(char *str, const char *b) {
+	int lenB = strlen(b);
+	memcpy(str, b, lenB + 1);
+	return str + lenB;
+}
+
+static char *string_append_int(char *str, int value) {
+	char intStr[20];;
+	sprintf(intStr, "%i", value);
+	return string_append(str, intStr);
+}
+
+void spSequence_getPath(spSequence *self, const char *basePath, int index, char *path) {
+	int i;
+	path = string_append(path, basePath);
+	for (i = self->digits - num_digits(self->start + index); i > 0; i--)
+		path = string_append(path, "0");
+	path = string_append_int(path, self->start + index);
 }
