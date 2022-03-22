@@ -5,6 +5,7 @@
   * Support for sequences.
   * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
   * Added CMake parameter `SPINE_SANITIZE` which will enable sanitizers on macOS and Linux.
+  * Added `SPINE_MAJOR_VERSION`, `SPINE_MINOR_VERSION`, and `SPINE_VERSION_STRING`. Parsing skeleton .JSON and .skel files will report an error if the skeleton version does not match the runtime version.
 * **Breaking changes**
   * `spRegionAttachment` and `spMeshAttachment` now contain a `spTextureRegion*` instead of encoding region fields directly.
   * `sp_AttachmentLoader_newRegionAttachment()` and `spAttachmentLoader_newMeshAttachment()` now take an additional `Sequence*` parameter.
@@ -24,6 +25,7 @@
   * Support for sequences.
   * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
   * Added CMake parameter `SPINE_SANITIZE` which will enable sanitizers on macOS and Linux.
+    * Added `SPINE_MAJOR_VERSION`, `SPINE_MINOR_VERSION`, and `SPINE_VERSION_STRING`. Parsing skeleton .JSON and .skel files will report an error if the skeleton version does not match the runtime version.
 * **Breaking changes**
   * `RegionAttachment` and `MeshAttachment` now contain a `TextureRegion*` instead of encoding region fields directly.
   * `AttachmentLoader::newRegionAttachment()` and `AttachmentLoader::newMeshAttachment()` now take an additional `Sequence*` parameter.

@@ -72,7 +72,8 @@
 #include <spine/TransformConstraintData.h>
 #include <spine/TransformConstraintTimeline.h>
 #include <spine/TranslateTimeline.h>
-#include "spine/SequenceTimeline.h"
+#include <spine/SequenceTimeline.h>
+#include <spine/Version.h>
 
 using namespace spine;
 
@@ -120,6 +121,13 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 
 	char *skeletonDataVersion = readString(input);
 	skeletonData->_version.own(skeletonDataVersion);
+
+	if (!skeletonData->_version.startsWith(SPINE_VERSION_STRING)) {
+		char errorMsg[255];
+		sprintf(errorMsg, "Skeleton version %s does not match runtime version %s", skeletonData->_version.buffer(), SPINE_VERSION_STRING);
+		setError(errorMsg, "");
+		return NULL;
+	}
 
 	skeletonData->_x = readFloat(input);
 	skeletonData->_y = readFloat(input);
