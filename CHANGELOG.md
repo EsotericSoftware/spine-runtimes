@@ -1,12 +1,29 @@
 # 4.1
 
 ## C
+* **Additions**
+  * Support for sequences.
+  * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
+  * Added CMake parameter `SPINE_SANITIZE` which will enable sanitizers on macOS and Linux.
+* **Breaking changes**
+  * `spRegionAttachment` and `spMeshAttachment` now contain a `spTextureRegion*` instead of encoding region fields directly.
+  * `sp_AttachmentLoader_newRegionAttachment()` and `spAttachmentLoader_newMeshAttachment()` now take an additional `Sequence*` parameter.
+  * `spMeshAttachment_updateUVs()` was renamed to `spMeshAttachment_updateRegion()`.
+  * `spRegionAttachment_updateOffset()` was renamed to `spRegionAttachment_updateRegion()`, `spRegionAttachment_setUVs()` was merged into `spRegionAttachment_updateRegion()`.
+  * `spSlot_getAttachmentTime()` and `spSlot_setAttachmentTime()` have been removed.
+  * `spVertexAttachment->deformAttachment` was renamed to `spVertexAttachment->timelineAttachment`.
+  * `spSkeleton_update()` has been removed.
+  * `spSkeleton->time` has been removed.
 
 ### SFML
+  * Updated example to use SFML 2.5.1.
+  * Added dragon example.
 
 ## C++
 * **Additions**
   * Support for sequences.
+  * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
+  * Added CMake parameter `SPINE_SANITIZE` which will enable sanitizers on macOS and Linux.
 * **Breaking changes**
   * `RegionAttachment` and `MeshAttachment` now contain a `TextureRegion*` instead of encoding region fields directly.
   * `AttachmentLoader::newRegionAttachment()` and `AttachmentLoader::newMeshAttachment()` now take an additional `Sequence*` parameter.
@@ -17,17 +34,20 @@
   * `Skeleton::update()` has been removed.
   * `Skeleton::getTime()` has been removed.
   
-
 ### Cocos2d-x
 
 ### SFML
+  * Updated example to use SFML 2.5.1.
+  * Added dragon example.
 
 ### UE4
+  * Updated example project to UE 4.27
 
 ## C# ##
 
 * **Additions**
   * Full support for sequences.
+  * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
   * `RegionAttachment` and `MeshAttachment` now provide a `Region` property. Use this property instead of the removed `RendererObject` property (see section *Breaking Changes* below).
 
 * **Breaking changes**
@@ -46,8 +66,6 @@
 
 * **Officially supported Unity versions are 2017.1-2021.1**.
 
-* **Breaking changes**
-
 * **Additions**
   * `BoneFollower` and `BoneFollowerGraphic` now provide an additional `Follow Parent World Scale` parameter to allow following simple scale of parent bones (rotated/skewed scale can't be supported). 
   * `SpineAtlasAsset.CreateRuntimeInstance` methods now provide an optional `newCustomTextureLoader` parameter (defaults to `null`) which can be set to e.g. `(a) => new YourCustomTextureLoader(a)` to use your own `TextureLoader` subclass instead of `MaterialsTextureLoader`.
@@ -56,6 +74,8 @@
   * Added `SkeletonRootMotion` properties `PreviousRigidbodyRootMotion` and `AdditionalRigidbody2DMovement`. Setting or querying these movement vectors can be necessary when multiple scripts call `Rigidbody2D.MovePosition` on the same object where the last call overwrites the effect of preceding ones.
   * Added example component `SkeletonRenderTexture` to render a `SkeletonRenderer` to a `RenderTexture`, mainly for proper transparency. Added an example scene named `RenderTexture FadeOut Transparency` that demonstrates usage for a fadeout transparency effect.
   * Added another fadeout example component named `SkeletonRenderTextureFadeout` which takes over transparency fadeout when enabled. You can use this component as-is, attach it in disabled state and enable it to start a fadeout effect.
+
+* **Breaking changes**
 
 * **Changes of default values**
 
@@ -68,12 +88,15 @@
 * Added new spine-monogame solution. See [spine-monogame/README.md](spine-monogame/README.md) for updated instructions on how to use spine-monogame.
 
 ## Java
-* **Breaking change**: `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.
-* **Breaking change**: `Slot#setAttachmentTime()` and `Slot#getAttachmentTime()` have been removed.
-* **Breaking change**: `VertexAttachment#setDeformAttachment()` and `VertexAttachment#getDeformAttachment()` have been replaced with `VertexAttachment#setTimelineAttachment()` and `VertexAttachment#getTimelineAttachment()`.
-* **Breaking change**: `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The caller must ensure that the attachment's region is not `null`.
-* **Breaking change**: `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
-* **Addition**: full support for sequences.
+* **Additions**
+  * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
+  * Support for sequences.
+* **Breaking changes**
+  * `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.
+  * `Slot#setAttachmentTime()` and `Slot#getAttachmentTime()` have been removed.
+  * `VertexAttachment#setDeformAttachment()` and `VertexAttachment#getDeformAttachment()` have been replaced with `VertexAttachment#setTimelineAttachment()` and `VertexAttachment#getTimelineAttachment()`.
+  * `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The caller must ensure that the attachment's region is not `null`.
+  * `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
 
 
 ### libGDX
@@ -81,20 +104,32 @@
 * `spine-skeletonviewer` now supports quickly loading skeletons by dragging and dropping `.json` or `.skel` skeleton files onto the window.
 
 ## Typescript/Javascript
-* **Breaking change**: `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.
-* **Breaking change**: `Slot#attachmentTime` and has been removed.
-* **Breaking change**: `VertexAttachment#deformAttachment` has been replaced with `VertexAttachment#timelineAttachment`.
-* **Breaking change**: `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The caller must ensure that the attachment's region is not `null`.
-* **Breaking change**: `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
-* **Addition**: full support for sequences.
+* **Additions**
+  * full support for sequences.
+  * Added `Promise` based `AssetManager.loadAll()`. Allows synchronous waiting via `await assetManager.loadAll()`, simplifying loader logic in applications.
+  * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
+  * Full support for sequences.
+* **Breaking changes**
+  * `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.
+  * `Slot#attachmentTime` and has been removed.
+  * `VertexAttachment#deformAttachment` has been replaced with `VertexAttachment#timelineAttachment`.
+  * `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The caller must ensure that the attachment's region is not `null`.
+  * `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
 
 ### WebGL backend
+  * `PolygonBatcher.start()` now disables culling and restores the previous state on `PolygonBatcher.end()`.
+  * Added `SpineCanvas`, a simpler way to render a scene via spine-webgl. See `spine-ts/spine-webgl/examples/barebones.html` and `spine-ts/spine-webgl/examples/mix-and-match.html`.
 
 ### Canvas backend
+  * Improved example.
 
 ### Three.js backend
+  * Added orbital controls to THREJS example.
+  * `SkeletonMesh` takes an optional `SkeletonMeshMaterialCustomizer`, allowing modification of materials used by `SkeletonMesh`.
+  * Added `SkeletonMeshMaterial.alphaTest`, when > 0, alpha testing will be performed and fragments will not be written to the depth buffer, if depth writes are enabled. 
 
 ### Player
+  * Added `SpinePlayer.dispose()` to explicitely dispose of all resources the player holds on to.
 
 # 4.0
 
