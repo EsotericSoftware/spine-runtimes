@@ -58,6 +58,7 @@ You can add a `Spine Animation State Clip` to a `SkeletonAnimation Track` (or `S
 - *Event Threshold.* See [TrackEntry.EventThreshold](http://esotericsoftware.com/spine-api-reference#TrackEntry-eventThreshold).
 - *Attachment Threshold.* See [TrackEntry.AttachmentThreshold](http://esotericsoftware.com/spine-api-reference#TrackEntry-attachmentThreshold).
 - *Draw Order Threshold.* See [TrackEntry.DrawOrderThreshold](http://esotericsoftware.com/spine-api-reference#TrackEntry-drawOrderThreshold).
+- *Alpha.* See [TrackEntry.Alpha](http://esotericsoftware.com/spine-api-reference#TrackEntry-alpha).
 
 *Ignored Parameters*
 - *Ease Out Duration, Blend Curves*. These parameters are ignored and have no effect.
@@ -111,5 +112,3 @@ This track type can be used to flip the skeleton of the target `SkeletonAnimatio
 
 #### Known Issues
 - The Console potentially logs an incorrect and harmless error `DrivenPropertyManager has failed to register property "m_Script" of object "Spine GameObject (spineboy-pro)" with driver "" because the property doesn't exist.`. This is a known issue on Unity's end. See more here: https://forum.unity.com/threads/default-playables-text-switcher-track-error.502903/
-
-
