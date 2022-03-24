@@ -193,6 +193,7 @@ namespace Spine.Unity.Playables {
 						trackEntry.TimeScale = clipSpeed * rootSpeed;
 						trackEntry.AttachmentThreshold = clipData.attachmentThreshold;
 						trackEntry.HoldPrevious = clipData.holdPrevious;
+						trackEntry.Alpha = clipData.alpha;
 
 						if (clipData.customDuration)
 							trackEntry.MixDuration = customMixDuration / rootSpeed;
@@ -289,6 +290,7 @@ namespace Spine.Unity.Playables {
 						if (toAnimation != null) {
 							toEntry = dummyAnimationState.SetAnimation(0, toAnimation, clipData.loop);
 							toEntry.HoldPrevious = clipData.holdPrevious;
+							toEntry.Alpha = clipData.alpha;
 						}
 					}
 
@@ -304,7 +306,7 @@ namespace Spine.Unity.Playables {
 					dummyAnimationState.Apply(skeleton);
 				} else {
 					if (toAnimation != null)
-						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, null, 1f, MixBlend.Setup, MixDirection.In);
+						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, null, clipData.alpha, MixBlend.Setup, MixDirection.In);
 				}
 
 				if (skeletonAnimation) {

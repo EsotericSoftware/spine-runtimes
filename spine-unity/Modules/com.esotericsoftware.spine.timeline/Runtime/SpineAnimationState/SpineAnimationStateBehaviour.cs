@@ -69,6 +69,9 @@ namespace Spine.Unity.Playables {
 
 		[Range(0, 1f)]
 		public float drawOrderThreshold = 0.5f;
+
+		[Range(0, 1f)]
+		public float alpha = 1.0f;
 	}
 
 }
