@@ -36,7 +36,7 @@ using UnityEngine;
 public class SpineAnimationStateDrawer : PropertyDrawer {
 
 	public override float GetPropertyHeight (SerializedProperty property, GUIContent label) {
-		const int fieldCount = 15;
+		const int fieldCount = 16;
 		return fieldCount * EditorGUIUtility.singleLineHeight;
 	}
 
@@ -48,6 +48,7 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 		SerializedProperty useBlendDurationProp = property.FindPropertyRelative("useBlendDuration");
 		SerializedProperty mixDurationProp = property.FindPropertyRelative("mixDuration");
 		SerializedProperty holdPreviousProp = property.FindPropertyRelative("holdPrevious");
+		SerializedProperty alphaProp = property.FindPropertyRelative("alpha");
 		SerializedProperty dontPauseWithDirectorProp = property.FindPropertyRelative("dontPauseWithDirector");
 		SerializedProperty dontEndWithClip = property.FindPropertyRelative("dontEndWithClip");
 		SerializedProperty endMixOutDuration = property.FindPropertyRelative("endMixOutDuration");
@@ -129,5 +130,8 @@ public class SpineAnimationStateDrawer : PropertyDrawer {
 
 		singleFieldRect.y += lineHeightWithSpacing;
 		EditorGUI.PropertyField(singleFieldRect, drawOrderProp);
+
+		singleFieldRect.y += lineHeightWithSpacing;
+		EditorGUI.PropertyField(singleFieldRect, alphaProp);
 	}
 }
