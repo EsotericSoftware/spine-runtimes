@@ -235,7 +235,7 @@ namespace Spine.Unity {
 		public override void Rebuild (CanvasUpdate update) {
 			base.Rebuild(update);
 			if (canvasRenderer.cull) return;
-			if (update == CanvasUpdate.PreRender) UpdateMesh(keepRendererCount: true);
+			if (update == CanvasUpdate.PreRender) UpdateMeshToInstructions();
 			if (allowMultipleCanvasRenderers) canvasRenderer.Clear();
 		}
 
@@ -330,7 +330,8 @@ namespace Spine.Unity {
 			if (freeze) return;
 			if (updateMode != UpdateMode.FullUpdate) return;
 
-			UpdateMesh();
+			PrepareInstructionsAndRenderers();
+			SetVerticesDirty(); // triggers Rebuild and avoids potential double-update in a single frame
 		}
 
 		protected void OnCullStateChanged (bool culled) {
@@ -574,16 +575,39 @@ namespace Spine.Unity {
 				OnRebuild(this);
 		}
 
-		public void UpdateMesh (bool keepRendererCount = false) {
-			if (!this.IsValid) return;
+		public void PrepareInstructionsAndRenderers () {
+			if (!this.allowMultipleCanvasRenderers) {
+				MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, null);
+				if (canvasRenderers.Count > 0)
+					DisableUnusedCanvasRenderers(usedCount: 0);
+				usedRenderersCount = 0;
+			} else {
+				MeshGenerator.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, null,
+					enableSeparatorSlots ? separatorSlots : null,
+					enableSeparatorSlots ? separatorSlots.Count > 0 : false,
+					false);
 
+				int submeshCount = currentInstructions.submeshInstructions.Count;
+				EnsureCanvasRendererCount(submeshCount);
+				EnsureMeshesCount(submeshCount);
+				EnsureSeparatorPartCount();
+				PrepareRendererGameObjects(currentInstructions);
+			}
+		}
+
+		public void UpdateMesh () {
+			PrepareInstructionsAndRenderers();
+			UpdateMeshToInstructions();
+		}
+
+		public void UpdateMeshToInstructions () {
+			if (!this.IsValid || currentInstructions.rawVertexCount < 0) return;
 			skeleton.SetColor(this.color);
 
-			var currentInstructions = this.currentInstructions;
 			if (!this.allowMultipleCanvasRenderers) {
-				UpdateMeshSingleCanvasRenderer();
+				UpdateMeshSingleCanvasRenderer(currentInstructions);
 			} else {
-				UpdateMeshMultipleCanvasRenderers(currentInstructions, keepRendererCount);
+				UpdateMeshMultipleCanvasRenderers(currentInstructions);
 			}
 
 			if (OnMeshAndMaterialsUpdated != null)
@@ -614,14 +638,9 @@ namespace Spine.Unity {
 			}
 		}
 
-		protected void UpdateMeshSingleCanvasRenderer () {
-			if (canvasRenderers.Count > 0)
-				DisableUnusedCanvasRenderers(usedCount: 0);
-
+		protected void UpdateMeshSingleCanvasRenderer (SkeletonRendererInstruction currentInstructions) {
 			var smartMesh = meshBuffers.GetNext();
-			MeshGenerator.GenerateSingleSubmeshInstruction(currentInstructions, skeleton, null);
 			bool updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, smartMesh.instructionUsed);
-
 			meshGenerator.Begin();
 			if (currentInstructions.hasActiveClipping && currentInstructions.submeshInstructions.Count > 0) {
 				meshGenerator.AddSubmesh(currentInstructions.submeshInstructions.Items[0], updateTriangles);
@@ -650,37 +669,16 @@ namespace Spine.Unity {
 			}
 
 			//this.UpdateMaterial(); // note: This would allocate memory.
-			usedRenderersCount = 0;
 		}
 
-		protected void UpdateMeshMultipleCanvasRenderers (SkeletonRendererInstruction currentInstructions, bool keepRendererCount) {
-			MeshGenerator.GenerateSkeletonRendererInstruction(currentInstructions, skeleton, null,
-				enableSeparatorSlots ? separatorSlots : null,
-				enableSeparatorSlots ? separatorSlots.Count > 0 : false,
-				false);
-
-			int submeshCount = currentInstructions.submeshInstructions.Count;
-			if (keepRendererCount && submeshCount != usedRenderersCount)
-				return;
-			EnsureCanvasRendererCount(submeshCount);
-			EnsureMeshesCount(submeshCount);
-			EnsureSeparatorPartCount();
-
+		protected void UpdateMeshMultipleCanvasRenderers (SkeletonRendererInstruction currentInstructions) {
 			var c = canvas;
 			float scale = (c == null) ? 100 : c.referencePixelsPerUnit;
 
 			// Generate meshes.
+			int submeshCount = currentInstructions.submeshInstructions.Count;
 			var meshesItems = meshes.Items;
 			bool useOriginalTextureAndMaterial = (customMaterialOverride.Count == 0 && customTextureOverride.Count == 0);
-			int separatorSlotGroupIndex = 0;
-			Transform parent = this.separatorSlots.Count == 0 ? this.transform : this.separatorParts[0];
-
-			if (updateSeparatorPartLocation) {
-				for (int p = 0; p < this.separatorParts.Count; ++p) {
-					separatorParts[p].position = this.transform.position;
-					separatorParts[p].rotation = this.transform.rotation;
-				}
-			}
 
 			BlendModeMaterials blendModeMaterials = skeletonDataAsset.blendModeMaterials;
 			bool hasBlendModeMaterials = blendModeMaterials.RequiresBlendModeMaterials;
@@ -688,7 +686,6 @@ namespace Spine.Unity {
 			bool mainCullTransparentMesh = this.canvasRenderer.cullTransparentMesh;
 #endif
 			bool pmaVertexColors = meshGenerator.settings.pmaVertexColors;
-			int targetSiblingIndex = 0;
 			for (int i = 0; i < submeshCount; i++) {
 				var submeshInstructionItem = currentInstructions.submeshInstructions.Items[i];
 				meshGenerator.Begin();
@@ -703,21 +700,8 @@ namespace Spine.Unity {
 
 				var submeshMaterial = submeshInstructionItem.material;
 				var canvasRenderer = canvasRenderers[i];
-				if (i >= usedRenderersCount) {
-					canvasRenderer.gameObject.SetActive(true);
-				}
 				canvasRenderer.SetMesh(targetMesh);
 				canvasRenderer.materialCount = 1;
-
-				if (canvasRenderer.transform.parent != parent.transform) {
-					canvasRenderer.transform.SetParent(parent.transform, false);
-					canvasRenderer.transform.localPosition = Vector3.zero;
-				}
-				canvasRenderer.transform.SetSiblingIndex(targetSiblingIndex++);
-				if (submeshInstructionItem.forceSeparate) {
-					targetSiblingIndex = 0;
-					parent = separatorParts[++separatorSlotGroupIndex];
-				}
 
 				SkeletonSubmeshGraphic submeshGraphic = submeshGraphics[i];
 				if (useOriginalTextureAndMaterial) {
@@ -761,9 +745,6 @@ namespace Spine.Unity {
 					canvasRenderer.SetMaterial(usedMaterial, usedTexture);
 				}
 			}
-
-			DisableUnusedCanvasRenderers(usedCount: submeshCount);
-			usedRenderersCount = submeshCount;
 		}
 
 		protected void EnsureCanvasRendererCount (int targetCount) {
@@ -782,6 +763,40 @@ namespace Spine.Unity {
 				submeshGraphic.raycastTarget = false;
 				submeshGraphics.Add(submeshGraphic);
 			}
+		}
+
+		protected void PrepareRendererGameObjects (SkeletonRendererInstruction currentInstructions) {
+			int submeshCount = currentInstructions.submeshInstructions.Count;
+			DisableUnusedCanvasRenderers(usedCount: submeshCount);
+
+			int separatorSlotGroupIndex = 0;
+			int targetSiblingIndex = 0;
+			Transform parent = this.separatorSlots.Count == 0 ? this.transform : this.separatorParts[0];
+			if (updateSeparatorPartLocation) {
+				for (int p = 0; p < this.separatorParts.Count; ++p) {
+					separatorParts[p].position = this.transform.position;
+					separatorParts[p].rotation = this.transform.rotation;
+				}
+			}
+
+			for (int i = 0; i < submeshCount; i++) {
+				var canvasRenderer = canvasRenderers[i];
+				if (i >= usedRenderersCount) {
+					canvasRenderer.gameObject.SetActive(true);
+				}
+				if (canvasRenderer.transform.parent != parent.transform) {
+					canvasRenderer.transform.SetParent(parent.transform, false);
+					canvasRenderer.transform.localPosition = Vector3.zero;
+				}
+				canvasRenderer.transform.SetSiblingIndex(targetSiblingIndex++);
+
+				var submeshInstructionItem = currentInstructions.submeshInstructions.Items[i];
+				if (submeshInstructionItem.forceSeparate) {
+					targetSiblingIndex = 0;
+					parent = separatorParts[++separatorSlotGroupIndex];
+				}
+			}
+			usedRenderersCount = submeshCount;
 		}
 
 		protected void DisableUnusedCanvasRenderers (int usedCount) {
