@@ -46,6 +46,10 @@
 		521A8E6519F0C34300D177D7 /* Default-736h@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 521A8E6319F0C34300D177D7 /* Default-736h@3x.png */; };
 		52B47A471A53D09C004E4C60 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52B47A461A53D09B004E4C60 /* Security.framework */; };
 		7602C5551D7DAA1300C7C674 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7602C5541D7DAA1300C7C674 /* CoreText.framework */; };
+		76268DDB27EE05E200D1B4E1 /* Sequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76268DD827EE05E200D1B4E1 /* Sequence.cpp */; };
+		76268DDC27EE05E200D1B4E1 /* Sequence.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76268DD827EE05E200D1B4E1 /* Sequence.cpp */; };
+		76268DDD27EE05E200D1B4E1 /* SequenceTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76268DDA27EE05E200D1B4E1 /* SequenceTimeline.cpp */; };
+		76268DDE27EE05E200D1B4E1 /* SequenceTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 76268DDA27EE05E200D1B4E1 /* SequenceTimeline.cpp */; };
 		763104C320BC1B5E00927A1E /* Event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7631048620BC1B5400927A1E /* Event.cpp */; };
 		763104C420BC1B5E00927A1E /* PathConstraint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7631048720BC1B5400927A1E /* PathConstraint.cpp */; };
 		763104C520BC1B5E00927A1E /* ScaleTimeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7631048820BC1B5400927A1E /* ScaleTimeline.cpp */; };
@@ -305,6 +309,8 @@
 		521A8E6319F0C34300D177D7 /* Default-736h@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-736h@3x.png"; sourceTree = "<group>"; };
 		52B47A461A53D09B004E4C60 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.1.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
 		7602C5541D7DAA1300C7C674 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.3.sdk/System/Library/Frameworks/CoreText.framework; sourceTree = DEVELOPER_DIR; };
+		76268DD827EE05E200D1B4E1 /* Sequence.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Sequence.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/Sequence.cpp"; sourceTree = "<group>"; };
+		76268DDA27EE05E200D1B4E1 /* SequenceTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SequenceTimeline.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/SequenceTimeline.cpp"; sourceTree = "<group>"; };
 		7631048620BC1B5400927A1E /* Event.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Event.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/Event.cpp"; sourceTree = "<group>"; };
 		7631048720BC1B5400927A1E /* PathConstraint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PathConstraint.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/PathConstraint.cpp"; sourceTree = "<group>"; };
 		7631048820BC1B5400927A1E /* ScaleTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScaleTimeline.cpp; path = "../../../spine-cpp/spine-cpp/src/spine/ScaleTimeline.cpp"; sourceTree = "<group>"; };
@@ -624,6 +630,8 @@
 		76AAA3B21D180F7300C54FCB /* spine */ = {
 			isa = PBXGroup;
 			children = (
+				76268DD827EE05E200D1B4E1 /* Sequence.cpp */,
+				76268DDA27EE05E200D1B4E1 /* SequenceTimeline.cpp */,
 				76798D1C22A95AB300F77964 /* ConstraintData.cpp */,
 				763104B620BC1B5C00927A1E /* Animation.cpp */,
 				7631049B20BC1B5600927A1E /* AnimationState.cpp */,
@@ -919,6 +927,7 @@
 				76AAA4111D18106000C54FCB /* spine-cocos2dx.cpp in Sources */,
 				763104FC20BC1B5E00927A1E /* PathConstraintData.cpp in Sources */,
 				763104DC20BC1B5E00927A1E /* Atlas.cpp in Sources */,
+				76268DDD27EE05E200D1B4E1 /* SequenceTimeline.cpp in Sources */,
 				763104FF20BC1B5E00927A1E /* TranslateTimeline.cpp in Sources */,
 				763104C320BC1B5E00927A1E /* Event.cpp in Sources */,
 				763104DA20BC1B5E00927A1E /* TextureLoader.cpp in Sources */,
@@ -929,6 +938,7 @@
 				763104DE20BC1B5E00927A1E /* Skeleton.cpp in Sources */,
 				76AAA3C21D180F7C00C54FCB /* GoblinsExample.cpp in Sources */,
 				763104FB20BC1B5E00927A1E /* DeformTimeline.cpp in Sources */,
+				76268DDB27EE05E200D1B4E1 /* Sequence.cpp in Sources */,
 				503AE10217EB989F00D1A890 /* RootViewController.mm in Sources */,
 				503AE10117EB989F00D1A890 /* main.m in Sources */,
 				76F1083B239FC8DA005B0CE9 /* SkeletonBatch.cpp in Sources */,
@@ -961,6 +971,7 @@
 				767D80E422B2A003000BD703 /* MixAndMatchExample.cpp in Sources */,
 				76798D1E22A95AEF00F77964 /* ConstraintData.cpp in Sources */,
 				7631059E20BC1B9700927A1E /* Animation.cpp in Sources */,
+				76268DDC27EE05E200D1B4E1 /* Sequence.cpp in Sources */,
 				7631059F20BC1B9700927A1E /* AnimationState.cpp in Sources */,
 				763105A020BC1B9700927A1E /* AnimationStateData.cpp in Sources */,
 				763105A120BC1B9700927A1E /* Atlas.cpp in Sources */,
@@ -1036,6 +1047,7 @@
 				76AAA4461D1811B000C54FCB /* SpineboyExample.cpp in Sources */,
 				76AAA4471D1811B000C54FCB /* SpineboyExample.h in Sources */,
 				76AAA4121D18119F00C54FCB /* AttachmentVertices.cpp in Sources */,
+				76268DDE27EE05E200D1B4E1 /* SequenceTimeline.cpp in Sources */,
 				76AAA4131D18119F00C54FCB /* AttachmentVertices.h in Sources */,
 				76AAA4161D18119F00C54FCB /* SkeletonAnimation.cpp in Sources */,
 				76AAA4171D18119F00C54FCB /* SkeletonAnimation.h in Sources */,

@@ -65,6 +65,7 @@ The Spine cocos2d-x example works on Windows, Mac OS X, iOS and Android.
 5. Type `mkdir build && cd build && cmake ../..`. This will download the cocos2d-x dependency and wire it up with the example source code in `spine-runtimes/spine-cocos2dx/example`. The download is 400mb, so get yourself a cup of tea.
 6. Open the Xcode project in `spine-runtimes/spine-cocos2dx/example/proj.ios_mac`
 7. Expand the `cocos2d_libs.xcodeproj` sub project, delete the group `editor-support/spine`. This will remove the outdated Spine cocos2d-x runtime shipped by cocos2d-x.
+8. Open `cocos2d_lib/audio/mac/CDXMacOSXSupport.h` and remove lines 43-46, deleting the `AudioSessionProperties` enum. This will allow cocos2d-x 3.7 to compile with the latest Xcode version.
 8. Click the `Run` button or type `CMD+R` to run the example
 
 #### Android (on macOS)
