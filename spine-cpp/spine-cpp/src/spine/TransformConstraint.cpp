@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/TransformConstraint.h>
 
 #include <spine/Bone.h>
@@ -82,7 +78,7 @@ void TransformConstraint::update() {
 }
 
 int TransformConstraint::getOrder() {
-	return _data.getOrder();
+	return (int)_data.getOrder();
 }
 
 TransformConstraintData &TransformConstraint::getData() {

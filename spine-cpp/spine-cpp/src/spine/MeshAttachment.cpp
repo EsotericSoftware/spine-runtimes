@@ -27,12 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
-#include <spine/HasRendererObject.h>
 #include <spine/MeshAttachment.h>
+#include <spine/HasRendererObject.h>
 
 using namespace spine;
 
@@ -57,7 +53,7 @@ void MeshAttachment::updateRegion() {
 		_uvs.setSize(_regionUVs.size(), 0);
 	}
 
-	int i = 0, n = _regionUVs.size();
+	int i = 0, n = (int)_regionUVs.size();
 	float u = _region->u, v = _region->v;
 	float width = 0, height = 0;
 

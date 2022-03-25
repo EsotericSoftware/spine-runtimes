@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/Atlas.h>
 #include <spine/ContainerUtil.h>
 #include <spine/TextureLoader.h>
@@ -159,7 +155,7 @@ struct SimpleString {
 	}
 
 	bool equals(const char *str) {
-		int otherLen = strlen(str);
+		int otherLen = (int)strlen(str);
 		if (length != otherLen) return false;
 		for (int i = 0; i < length; i++) {
 			if (start[i] != str[i]) return false;

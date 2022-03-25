@@ -47,7 +47,7 @@ Sequence::~Sequence() {
 }
 
 Sequence *Sequence::copy() {
-	Sequence *copy = new (__FILE__, __LINE__) Sequence(_regions.size());
+	Sequence *copy = new (__FILE__, __LINE__) Sequence((int)_regions.size());
 	for (size_t i = 0; i < _regions.size(); i++) {
 		copy->_regions[i] = _regions[i];
 	}
@@ -60,7 +60,7 @@ Sequence *Sequence::copy() {
 void Sequence::apply(Slot *slot, Attachment *attachment) {
 	int index = slot->getSequenceIndex();
 	if (index == -1) index = _setupIndex;
-	if (index >= (int) _regions.size()) index = _regions.size() - 1;
+	if (index >= (int) _regions.size()) index = (int)_regions.size() - 1;
 	TextureRegion *region = _regions[index];
 
 	if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
@@ -86,7 +86,7 @@ String Sequence::getPath(const String &basePath, int index) {
 	String result(basePath);
 	String frame;
 	frame.append(_start + index);
-	for (int i = _digits - frame.length(); i > 0; i--)
+	for (int i = _digits - (int)frame.length(); i > 0; i--)
 		result.append("0");
 	result.append(frame);
 	return result;

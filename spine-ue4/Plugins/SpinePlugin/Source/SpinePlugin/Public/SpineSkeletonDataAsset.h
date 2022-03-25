@@ -30,7 +30,6 @@
 #pragma once
 
 // clang-format off
-#include "Engine.h"
 #include "spine/spine.h"
 #include "SpineSkeletonDataAsset.generated.h"
 // clang-format on

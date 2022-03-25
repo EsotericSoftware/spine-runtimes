@@ -27,10 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "Engine.h"
-#include "SpinePluginPrivatePCH.h"
+#include "SpineSkeletonRendererComponent.h"
+
+#include "SpineAtlasAsset.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "spine/spine.h"
-#include <stdlib.h>
+#include "UObject/ConstructorHelpers.h"
 
 #define LOCTEXT_NAMESPACE "Spine"
 

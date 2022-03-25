@@ -27,12 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
-#include <spine/Animation.h>
 #include <spine/AnimationState.h>
+#include <spine/Animation.h>
 #include <spine/AnimationStateData.h>
 #include <spine/AttachmentTimeline.h>
 #include <spine/Bone.h>
@@ -493,7 +489,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 
 	int setupState = _unkeyedState + Setup;
 	Vector<Slot *> &slots = skeleton.getSlots();
-	for (int i = 0, n = slots.size(); i < n; i++) {
+	for (int i = 0, n = (int)slots.size(); i < n; i++) {
 		Slot *slot = slots[i];
 		if (slot->getAttachmentState() == setupState) {
 			const String &attachmentName = slot->getData().getAttachmentName();
@@ -955,7 +951,7 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 	TrackEntry *entryP = _trackEntryPool.obtain();// Pooling
 	TrackEntry &entry = *entryP;
 
-	entry._trackIndex = trackIndex;
+	entry._trackIndex = (int)trackIndex;
 	entry._animation = animation;
 	entry._loop = loop;
 	entry._holdPrevious = 0;

@@ -27,21 +27,15 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
-#include <spine/Bone.h>
 #include <spine/SequenceTimeline.h>
+#include <spine/Bone.h>
 #include <spine/RegionAttachment.h>
 #include <spine/MeshAttachment.h>
 #include <spine/Event.h>
 #include <spine/Skeleton.h>
 #include <spine/Attachment.h>
-#include <spine/PathConstraint.h>
 #include <spine/PathConstraintData.h>
 #include <spine/Slot.h>
-#include <spine/SlotData.h>
 #include <spine/Animation.h>
 
 using namespace spine;
@@ -95,7 +89,7 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 	Sequence *sequence = NULL;
 	if (_attachment->getRTTI().instanceOf(RegionAttachment::rtti)) sequence = ((RegionAttachment *) _attachment)->getSequence();
 	if (_attachment->getRTTI().instanceOf(MeshAttachment::rtti)) sequence = ((MeshAttachment *) _attachment)->getSequence();
-	int index = modeAndIndex >> 4, count = sequence->getRegions().size();
+	int index = modeAndIndex >> 4, count = (int)sequence->getRegions().size();
 	int mode = modeAndIndex & 0xf;
 	if (mode != SequenceMode::hold) {
 		index += (int) (((time - before) / delay + 0.00001));

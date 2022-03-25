@@ -27,7 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpinePluginPrivatePCH.h"
+#include "SpineSkeletonComponent.h"
+#include "SpineSkeletonRendererComponent.h"
+#include "SpineAtlasAsset.h"
 
 #include "spine/spine.h"
 

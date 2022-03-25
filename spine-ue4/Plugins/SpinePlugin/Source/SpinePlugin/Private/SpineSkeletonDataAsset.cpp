@@ -27,12 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#include "SpineSkeletonDataAsset.h"
+#include "SpinePlugin.h"
 #include "Runtime/Core/Public/Misc/MessageDialog.h"
-#include "SpinePluginPrivatePCH.h"
+#include "EditorFramework/AssetImportData.h"
 #include "spine/spine.h"
 #include "spine/Version.h"
-#include <stdlib.h>
-#include <string.h>
 #include <string>
 
 #define LOCTEXT_NAMESPACE "Spine"

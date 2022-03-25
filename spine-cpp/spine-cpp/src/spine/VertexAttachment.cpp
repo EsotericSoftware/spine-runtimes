@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/VertexAttachment.h>
 
 #include <spine/Slot.h>
@@ -87,7 +83,7 @@ void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t cou
 
 	int v = 0, skip = 0;
 	for (size_t i = 0; i < start; i += 2) {
-		int n = bones[v];
+		int n = (int)bones[v];
 		v += n + 1;
 		skip += n;
 	}
@@ -96,7 +92,7 @@ void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t cou
 	if (deformArray->size() == 0) {
 		for (size_t w = offset, b = skip * 3; w < count; w += stride) {
 			float wx = 0, wy = 0;
-			int n = bones[v++];
+			int n = (int)bones[v++];
 			n += v;
 			for (; v < n; v++, b += 3) {
 				Bone *boneP = skeletonBones[bones[v]];
@@ -113,7 +109,7 @@ void VertexAttachment::computeWorldVertices(Slot &slot, size_t start, size_t cou
 	} else {
 		for (size_t w = offset, b = skip * 3, f = skip << 1; w < count; w += stride) {
 			float wx = 0, wy = 0;
-			int n = bones[v++];
+			int n = (int)bones[v++];
 			n += v;
 			for (; v < n; v++, b += 3, f += 2) {
 				Bone *boneP = skeletonBones[bones[v]];
