@@ -45,6 +45,7 @@ The Spine cocos2d-objc example works on iOS simulators and devices.
 4. Open a terminal, and `cd` into the `spine-runtimes/spine-cocos2d-objc` folder
 5. Type `mkdir build && cd build && cmake ../..`, this will download the cocos2d-objc dependency
 6. Open the Xcode project in `spine-runtimes/spine-cocos2d-objc/spine-cocos2d-objc.xcodeproj/`
+7. In the file `spine-runtimes/spine-cocos2d-objc/cocos2d/cocos2d/CCRendererBasicTypes.m`, change line 56 from `-(id)objectForKey:(id<NSCopying>)options` to `-(id)objectForKey:(id)options`. This will allow building cocos2d-objc with the latest Xcode version.
 7. In Xcode, click the `Run` button or type `CMD+R` to run the example on the simulator
 
 ## Links

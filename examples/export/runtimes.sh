@@ -35,6 +35,29 @@ cp -f ../mix-and-match/export/*.json "$ROOT/spine-libgdx/spine-libgdx-tests/asse
 cp -f ../mix-and-match/export/*.skel "$ROOT/spine-libgdx/spine-libgdx-tests/assets/mix-and-match/"
 cp -f ../mix-and-match/export/*-pma.* "$ROOT/spine-libgdx/spine-libgdx-tests/assets/mix-and-match/"
 
+echo "spine-cocos2d-objc"
+rm "$ROOT/spine-cocos2d-objc/Resources/"*
+
+cp -f ../coin/export/coin-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../coin/export/coin.atlas "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../coin/export/coin.png "$ROOT/spine-cocos2d-objc/Resources/"
+
+cp -f ../goblins/export/goblins-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../goblins/export/goblins.atlas "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../goblins/export/goblins.png "$ROOT/spine-cocos2d-objc/Resources/"
+
+cp -f ../raptor/export/raptor-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../raptor/export/raptor.atlas "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../raptor/export/raptor.png "$ROOT/spine-cocos2d-objc/Resources/"
+
+cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../spineboy/export/spineboy.png "$ROOT/spine-cocos2d-objc/Resources/"
+
+cp -f ../tank/export/tank-pro.json "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../tank/export/tank.atlas "$ROOT/spine-cocos2d-objc/Resources/"
+cp -f ../tank/export/tank.png "$ROOT/spine-cocos2d-objc/Resources/"
+
 echo "spine-cocos2dx"
 rm -rf "$ROOT/spine-cocos2dx/example/Resources/common/"*
 
