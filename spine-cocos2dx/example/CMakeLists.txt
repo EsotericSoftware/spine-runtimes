@@ -128,6 +128,11 @@ endif()
 # Link the spine-cpp and spine-cocos2dx library to the app
 target_link_libraries(${APP_NAME} spine-cpp spine-cocos2dx)
 
+# Manually link to libz on iOS, the cocos2d-x build only pulls in libz.tbd
+if(IOS)    
+    target_link_libraries(${APP_NAME} z)
+endif()
+
 target_link_libraries(${APP_NAME} cocos2d)
 target_include_directories(${APP_NAME}
         PRIVATE ${GAME_INCLUDE}
@@ -140,9 +145,9 @@ if(APPLE)
     set_target_properties(${APP_NAME} PROPERTIES RESOURCE "${APP_UI_RES}")
 
     if(MACOSX)
-        set_target_properties(${APP_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/mac/Info.plist")
+        set_xcode_property(${APP_NAME} INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/mac/Info.plist")
     elseif(IOS)
-        set_target_properties(${APP_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/ios/Info.plist")
+        set_xcode_property(${APP_NAME} INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/ios/Info.plist")
         set_xcode_property(${APP_NAME} ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon")
     endif()
 
