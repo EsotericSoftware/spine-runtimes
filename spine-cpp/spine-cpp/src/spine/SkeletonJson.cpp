@@ -1382,7 +1382,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 					originalIndex++;
 				}
 				/* Collect remaining unchanged items. */
-				while (originalIndex < (int)skeletonData->_slots.size())
+				while ((int)originalIndex < (int)skeletonData->_slots.size())
 					unchanged[unchangedIndex++] = (int)originalIndex++;
 				/* Fill in unchanged items. */
 				for (ii = (int) skeletonData->_slots.size() - 1; ii >= 0; ii--)

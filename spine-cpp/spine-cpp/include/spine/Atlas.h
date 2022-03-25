@@ -55,7 +55,7 @@ namespace spine {
 #else
 	#define TEXTURE_FILTER_ENUM TextureFilter
 #endif
-	
+
 	enum TEXTURE_FILTER_ENUM {
 		TextureFilter_Unknown,
 		TextureFilter_Nearest,
@@ -78,8 +78,8 @@ namespace spine {
 		String name;
 		String texturePath;
 		Format format;
-		SpineTextureFilter minFilter;
-		SpineTextureFilter magFilter;
+		TEXTURE_FILTER_ENUM minFilter;
+		TEXTURE_FILTER_ENUM magFilter;
 		TextureWrap uWrap;
 		TextureWrap vWrap;
 		int width, height;

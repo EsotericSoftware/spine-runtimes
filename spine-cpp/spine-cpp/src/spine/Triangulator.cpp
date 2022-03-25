@@ -45,7 +45,7 @@ Vector<int> &Triangulator::triangulate(Vector<float> &vertices) {
 	indices.clear();
 	indices.ensureCapacity(vertexCount);
 	indices.setSize(vertexCount, 0);
-	for (int i = 0; i < vertexCount; ++i) {
+	for (int i = 0; i < (int)vertexCount; ++i) {
 		indices[i] = i;
 	}
 
