@@ -120,6 +120,7 @@
   * `VertexAttachment#deformAttachment` has been replaced with `VertexAttachment#timelineAttachment`.
   * `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The caller must ensure that the attachment's region is not `null`.
   * `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
+  * Removed `PlayerEditor`.
 
 ### WebGL backend
   * `PolygonBatcher.start()` now disables culling and restores the previous state on `PolygonBatcher.end()`.
