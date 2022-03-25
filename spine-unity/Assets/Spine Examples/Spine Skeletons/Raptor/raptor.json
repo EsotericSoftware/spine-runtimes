@@ -1,7 +1,7 @@
 {
 "skeleton": {
-	"hash": "oPVc6FExiik",
-	"spine": "4.1.04-beta",
+	"hash": "8C0Q8jcbsuI",
+	"spine": "4.1.23-beta",
 	"x": -402.84,
 	"y": -35.99,
 	"width": 611.87,
@@ -809,6 +809,177 @@
 	"footstep": {}
 },
 "animations": {
+	"debugfade": {
+		"slots": {
+			"raptor_body": {
+				"rgba": [
+					{ "color": "0000803f", "curve": "stepped" },
+					{ "time": 1, "color": "0000803f" }
+				]
+			}
+		}
+	},
+	"gungrab": {
+		"slots": {
+			"front_hand": {
+				"attachment": [
+					{ "name": "front_open_hand" },
+					{ "time": 0.1667, "name": "gun" }
+				]
+			},
+			"gun": {
+				"attachment": [
+					{ "time": 0.1667 }
+				]
+			}
+		},
+		"bones": {
+			"front_hand2": {
+				"rotate": [
+					{},
+					{ "time": 0.1333, "value": 12.34 },
+					{ "time": 0.1667, "value": -89.55 },
+					{ "time": 0.2333, "value": -79.79 },
+					{ "time": 0.4667, "value": -10.18 }
+				],
+				"scale": [
+					{},
+					{ "time": 0.1667, "x": 0.938, "y": 0.938 },
+					{ "time": 0.4667 }
+				]
+			},
+			"front_arm": {
+				"rotate": [
+					{},
+					{ "time": 0.0667, "value": -32 },
+					{
+						"time": 0.1667,
+						"value": -136.89,
+						"curve": [ 0.183, -136.89, 0.217, -204.81 ]
+					},
+					{
+						"time": 0.2333,
+						"value": -204.81,
+						"curve": [ 0.267, -204.81, 0.333, -113.86 ]
+					},
+					{
+						"time": 0.3667,
+						"value": -113.86,
+						"curve": [ 0.385, -94.44, 0.442, -56.75 ]
+					},
+					{ "time": 0.4667, "value": -56.75 }
+				],
+				"translate": [
+					{},
+					{ "time": 0.1667, "x": 3.25, "y": -1.33 },
+					{ "time": 0.2333, "x": 3.42, "y": 2.4 },
+					{ "time": 0.4667 }
+				]
+			},
+			"front_bracer": {
+				"rotate": [
+					{},
+					{ "time": 0.1667, "value": 86.02 },
+					{ "time": 0.2333, "value": 114.95 },
+					{
+						"time": 0.3667,
+						"value": 81.86,
+						"curve": [ 0.392, 81.86, 0.442, 34.74 ]
+					},
+					{ "time": 0.4667, "value": 34.74 }
+				]
+			}
+		},
+		"ik": {
+			"front_arm_goal": [
+				{ "mix": 0 }
+			]
+		}
+	},
+	"gunkeep": {
+		"slots": {
+			"front_hand": {
+				"attachment": [
+					{ "name": "gun" },
+					{ "time": 0.4, "name": "front_open_hand" },
+					{ "time": 0.5333, "name": "front_hand" }
+				]
+			},
+			"gun": {
+				"attachment": [
+					{},
+					{ "time": 0.4, "name": "gun_nohand" }
+				]
+			}
+		},
+		"bones": {
+			"front_hand2": {
+				"rotate": [
+					{ "value": -10.18, "curve": "stepped" },
+					{ "time": 0.1, "value": -10.18 },
+					{ "time": 0.3333, "value": -79.79 },
+					{ "time": 0.4, "value": -89.55 },
+					{ "time": 0.4333, "value": 12.34 },
+					{ "time": 0.5667, "curve": "stepped" },
+					{ "time": 0.7 }
+				],
+				"scale": [
+					{ "time": 0.1 },
+					{ "time": 0.4, "x": 0.938, "y": 0.938 },
+					{ "time": 0.5667 }
+				]
+			},
+			"front_arm": {
+				"rotate": [
+					{ "value": -56.75, "curve": "stepped" },
+					{ "time": 0.1, "value": -56.75 },
+					{
+						"time": 0.2,
+						"value": -113.86,
+						"curve": [ 0.225, -144.78, 0.3, -204.81 ]
+					},
+					{
+						"time": 0.3333,
+						"value": -204.81,
+						"curve": [ 0.35, -204.81, 0.383, -136.89 ]
+					},
+					{
+						"time": 0.4,
+						"value": -136.89,
+						"curve": [ 0.425, -136.89, 0.475, -32 ]
+					},
+					{ "time": 0.5, "value": -32 },
+					{ "time": 0.5667 }
+				],
+				"translate": [
+					{ "time": 0.1 },
+					{ "time": 0.3333, "x": 3.42, "y": 2.4 },
+					{ "time": 0.4, "x": 3.25, "y": -1.33 },
+					{ "time": 0.5667 }
+				]
+			},
+			"front_bracer": {
+				"rotate": [
+					{ "value": 34.74, "curve": "stepped" },
+					{ "time": 0.1, "value": 34.74 },
+					{
+						"time": 0.2,
+						"value": 81.86,
+						"curve": [ 0.233, 81.86, 0.3, 114.95 ]
+					},
+					{ "time": 0.3333, "value": 114.95 },
+					{ "time": 0.4, "value": 86.02 },
+					{ "time": 0.5667 }
+				]
+			}
+		},
+		"ik": {
+			"front_arm_goal": [
+				{ "mix": 0, "curve": "stepped" },
+				{ "time": 0.5667 }
+			]
+		}
+	},
 	"Jump": {
 		"bones": {
 			"root": {
@@ -1226,177 +1397,6 @@
 					{ "time": 1.0667, "value": 15.31 }
 				]
 			}
-		}
-	},
-	"debugfade": {
-		"slots": {
-			"raptor_body": {
-				"rgba": [
-					{ "color": "0000803f", "curve": "stepped" },
-					{ "time": 1, "color": "0000803f" }
-				]
-			}
-		}
-	},
-	"gungrab": {
-		"slots": {
-			"front_hand": {
-				"attachment": [
-					{ "name": "front_open_hand" },
-					{ "time": 0.1667, "name": "gun" }
-				]
-			},
-			"gun": {
-				"attachment": [
-					{ "time": 0.1667 }
-				]
-			}
-		},
-		"bones": {
-			"front_hand2": {
-				"rotate": [
-					{},
-					{ "time": 0.1333, "value": 12.34 },
-					{ "time": 0.1667, "value": -89.55 },
-					{ "time": 0.2333, "value": -79.79 },
-					{ "time": 0.4667, "value": -10.18 }
-				],
-				"scale": [
-					{},
-					{ "time": 0.1667, "x": 0.938, "y": 0.938 },
-					{ "time": 0.4667 }
-				]
-			},
-			"front_arm": {
-				"rotate": [
-					{},
-					{ "time": 0.0667, "value": -32 },
-					{
-						"time": 0.1667,
-						"value": -136.89,
-						"curve": [ 0.183, -136.89, 0.217, -204.81 ]
-					},
-					{
-						"time": 0.2333,
-						"value": -204.81,
-						"curve": [ 0.267, -204.81, 0.333, -113.86 ]
-					},
-					{
-						"time": 0.3667,
-						"value": -113.86,
-						"curve": [ 0.385, -94.44, 0.442, -56.75 ]
-					},
-					{ "time": 0.4667, "value": -56.75 }
-				],
-				"translate": [
-					{},
-					{ "time": 0.1667, "x": 3.25, "y": -1.33 },
-					{ "time": 0.2333, "x": 3.42, "y": 2.4 },
-					{ "time": 0.4667 }
-				]
-			},
-			"front_bracer": {
-				"rotate": [
-					{},
-					{ "time": 0.1667, "value": 86.02 },
-					{ "time": 0.2333, "value": 114.95 },
-					{
-						"time": 0.3667,
-						"value": 81.86,
-						"curve": [ 0.392, 81.86, 0.442, 34.74 ]
-					},
-					{ "time": 0.4667, "value": 34.74 }
-				]
-			}
-		},
-		"ik": {
-			"front_arm_goal": [
-				{ "mix": 0 }
-			]
-		}
-	},
-	"gunkeep": {
-		"slots": {
-			"front_hand": {
-				"attachment": [
-					{ "name": "gun" },
-					{ "time": 0.4, "name": "front_open_hand" },
-					{ "time": 0.5333, "name": "front_hand" }
-				]
-			},
-			"gun": {
-				"attachment": [
-					{},
-					{ "time": 0.4, "name": "gun_nohand" }
-				]
-			}
-		},
-		"bones": {
-			"front_hand2": {
-				"rotate": [
-					{ "value": -10.18, "curve": "stepped" },
-					{ "time": 0.1, "value": -10.18 },
-					{ "time": 0.3333, "value": -79.79 },
-					{ "time": 0.4, "value": -89.55 },
-					{ "time": 0.4333, "value": 12.34 },
-					{ "time": 0.5667, "curve": "stepped" },
-					{ "time": 0.7 }
-				],
-				"scale": [
-					{ "time": 0.1 },
-					{ "time": 0.4, "x": 0.938, "y": 0.938 },
-					{ "time": 0.5667 }
-				]
-			},
-			"front_arm": {
-				"rotate": [
-					{ "value": -56.75, "curve": "stepped" },
-					{ "time": 0.1, "value": -56.75 },
-					{
-						"time": 0.2,
-						"value": -113.86,
-						"curve": [ 0.225, -144.78, 0.3, -204.81 ]
-					},
-					{
-						"time": 0.3333,
-						"value": -204.81,
-						"curve": [ 0.35, -204.81, 0.383, -136.89 ]
-					},
-					{
-						"time": 0.4,
-						"value": -136.89,
-						"curve": [ 0.425, -136.89, 0.475, -32 ]
-					},
-					{ "time": 0.5, "value": -32 },
-					{ "time": 0.5667 }
-				],
-				"translate": [
-					{ "time": 0.1 },
-					{ "time": 0.3333, "x": 3.42, "y": 2.4 },
-					{ "time": 0.4, "x": 3.25, "y": -1.33 },
-					{ "time": 0.5667 }
-				]
-			},
-			"front_bracer": {
-				"rotate": [
-					{ "value": 34.74, "curve": "stepped" },
-					{ "time": 0.1, "value": 34.74 },
-					{
-						"time": 0.2,
-						"value": 81.86,
-						"curve": [ 0.233, 81.86, 0.3, 114.95 ]
-					},
-					{ "time": 0.3333, "value": 114.95 },
-					{ "time": 0.4, "value": 86.02 },
-					{ "time": 0.5667 }
-				]
-			}
-		},
-		"ik": {
-			"front_arm_goal": [
-				{ "mix": 0, "curve": "stepped" },
-				{ "time": 0.5667 }
-			]
 		}
 	},
 	"walk": {
