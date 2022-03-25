@@ -288,7 +288,7 @@ void IkConstraint::update() {
 }
 
 int IkConstraint::getOrder() {
-	return (int)_data.getOrder();
+	return (int) _data.getOrder();
 }
 
 IkConstraintData &IkConstraint::getData() {

@@ -711,7 +711,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 	}
 
 	/* Linked meshes. */
-	int n = (int)_linkedMeshes.size();
+	int n = (int) _linkedMeshes.size();
 	for (i = 0; i < n; ++i) {
 		LinkedMesh *linkedMesh = _linkedMeshes[i];
 		Skin *skin = linkedMesh->_skin.length() == 0 ? skeletonData->getDefaultSkin() : skeletonData->findSkin(linkedMesh->_skin);
@@ -1276,7 +1276,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 						VertexAttachment *vertexAttachment = static_cast<VertexAttachment *>(attachment);
 						bool weighted = vertexAttachment->_bones.size() != 0;
 						Vector<float> &verts = vertexAttachment->_vertices;
-						int deformLength = weighted ? (int)verts.size() / 3 * 2 : (int)verts.size();
+						int deformLength = weighted ? (int) verts.size() / 3 * 2 : (int) verts.size();
 
 						DeformTimeline *timeline = new (__FILE__, __LINE__) DeformTimeline(frames,
 																						   frames, slotIndex, vertexAttachment);
@@ -1376,14 +1376,14 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 
 					/* Collect unchanged items. */
 					while (originalIndex != (size_t) slotIndex)
-						unchanged[unchangedIndex++] = (int)originalIndex++;
+						unchanged[unchangedIndex++] = (int) originalIndex++;
 					/* Set changed items. */
-					drawOrder2[originalIndex + Json::getInt(offsetMap, "offset", 0)] = (int)originalIndex;
+					drawOrder2[originalIndex + Json::getInt(offsetMap, "offset", 0)] = (int) originalIndex;
 					originalIndex++;
 				}
 				/* Collect remaining unchanged items. */
-				while ((int)originalIndex < (int)skeletonData->_slots.size())
-					unchanged[unchangedIndex++] = (int)originalIndex++;
+				while ((int) originalIndex < (int) skeletonData->_slots.size())
+					unchanged[unchangedIndex++] = (int) originalIndex++;
 				/* Fill in unchanged items. */
 				for (ii = (int) skeletonData->_slots.size() - 1; ii >= 0; ii--)
 					if (drawOrder2[ii] == -1) drawOrder2[ii] = unchanged[--unchangedIndex];

@@ -53,7 +53,7 @@ void MeshAttachment::updateRegion() {
 		_uvs.setSize(_regionUVs.size(), 0);
 	}
 
-	int i = 0, n = (int)_regionUVs.size();
+	int i = 0, n = (int) _regionUVs.size();
 	float u = _region->u, v = _region->v;
 	float width = 0, height = 0;
 

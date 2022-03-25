@@ -94,14 +94,14 @@ void Animation::setDuration(float inValue) {
 int Animation::search(Vector<float> &frames, float target) {
 	size_t n = (int) frames.size();
 	for (size_t i = 1; i < n; i++) {
-		if (frames[i] > target) return (int)(i - 1);
+		if (frames[i] > target) return (int) (i - 1);
 	}
-	return (int)(n - 1);
+	return (int) (n - 1);
 }
 
 int Animation::search(Vector<float> &frames, float target, int step) {
 	size_t n = frames.size();
 	for (size_t i = step; i < n; i += step)
-		if (frames[i] > target) return (int)(i - step);
-	return (int)(n - step);
+		if (frames[i] > target) return (int) (i - step);
+	return (int) (n - step);
 }

@@ -111,7 +111,7 @@ void CurveTimeline1::setFrame(size_t frame, float time, float value) {
 }
 
 float CurveTimeline1::getCurveValue(float time) {
-	int i = (int)_frames.size() - 2;
+	int i = (int) _frames.size() - 2;
 	for (int ii = 2; ii <= i; ii += 2) {
 		if (_frames[ii] > time) {
 			i = ii - 2;

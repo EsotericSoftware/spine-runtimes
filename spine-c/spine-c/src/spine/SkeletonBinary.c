@@ -109,7 +109,7 @@ static int readInt(_dataInput *input) {
 	result |= readByte(input);
 	result <<= 8;
 	result |= readByte(input);
-	return (int)result;
+	return (int) result;
 }
 
 static int readVarint(_dataInput *input, int /*bool*/ optimizePositive) {
@@ -124,12 +124,12 @@ static int readVarint(_dataInput *input, int /*bool*/ optimizePositive) {
 			if (b & 0x80) {
 				b = readByte(input);
 				value |= (b & 0x7F) << 21;
-				if (b & 0x80) value |= (uint32_t)(readByte(input) & 0x7F) << 28;
+				if (b & 0x80) value |= (uint32_t) (readByte(input) & 0x7F) << 28;
 			}
 		}
 	}
 	if (!optimizePositive) value = (((unsigned int) value >> 1) ^ -(value & 1));
-	return (int)value;
+	return (int) value;
 }
 
 float readFloat(_dataInput *input) {

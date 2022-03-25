@@ -45,15 +45,15 @@ Vector<int> &Triangulator::triangulate(Vector<float> &vertices) {
 	indices.clear();
 	indices.ensureCapacity(vertexCount);
 	indices.setSize(vertexCount, 0);
-	for (int i = 0; i < (int)vertexCount; ++i) {
+	for (int i = 0; i < (int) vertexCount; ++i) {
 		indices[i] = i;
 	}
 
 	Vector<bool> &isConcaveArray = _isConcaveArray;
 	isConcaveArray.ensureCapacity(vertexCount);
 	isConcaveArray.setSize(vertexCount, 0);
-	for (int i = 0, n = (int)vertexCount; i < n; ++i) {
-		isConcaveArray[i] = isConcave(i, (int)vertexCount, vertices, indices);
+	for (int i = 0, n = (int) vertexCount; i < n; ++i) {
+		isConcaveArray[i] = isConcave(i, (int) vertexCount, vertices, indices);
 	}
 
 	Vector<int> &triangles = _triangles;
@@ -109,10 +109,10 @@ Vector<int> &Triangulator::triangulate(Vector<float> &vertices) {
 		isConcaveArray.removeAt(i);
 		vertexCount--;
 
-		int previousIndex = (int)((vertexCount + i - 1) % vertexCount);
-		int nextIndex = (int)(i == vertexCount ? 0 : i);
-		isConcaveArray[previousIndex] = isConcave(previousIndex, (int)vertexCount, vertices, indices);
-		isConcaveArray[nextIndex] = isConcave(nextIndex, (int)vertexCount, vertices, indices);
+		int previousIndex = (int) ((vertexCount + i - 1) % vertexCount);
+		int nextIndex = (int) (i == vertexCount ? 0 : i);
+		isConcaveArray[previousIndex] = isConcave(previousIndex, (int) vertexCount, vertices, indices);
+		isConcaveArray[nextIndex] = isConcave(nextIndex, (int) vertexCount, vertices, indices);
 	}
 
 	if (vertexCount == 3) {

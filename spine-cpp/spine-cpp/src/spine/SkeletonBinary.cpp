@@ -287,7 +287,7 @@ SkeletonData *SkeletonBinary::readSkeletonData(const unsigned char *binary, cons
 	}
 
 	/* Linked meshes. */
-	for (int i = 0, n = (int)_linkedMeshes.size(); i < n; ++i) {
+	for (int i = 0, n = (int) _linkedMeshes.size(); i < n; ++i) {
 		LinkedMesh *linkedMesh = _linkedMeshes[i];
 		Skin *skin = linkedMesh->_skin.length() == 0 ? skeletonData->getDefaultSkin() : skeletonData->findSkin(linkedMesh->_skin);
 		if (skin == NULL) {
@@ -753,7 +753,7 @@ void SkeletonBinary::setBezier(DataInput *input, CurveTimeline *timeline, int be
 Timeline *SkeletonBinary::readTimeline(DataInput *input, CurveTimeline1 *timeline, float scale) {
 	float time = readFloat(input);
 	float value = readFloat(input) * scale;
-	for (int frame = 0, bezier = 0, frameLast = (int)timeline->getFrameCount() - 1;; frame++) {
+	for (int frame = 0, bezier = 0, frameLast = (int) timeline->getFrameCount() - 1;; frame++) {
 		timeline->setFrame(frame, time, value);
 		if (frame == frameLast) break;
 		float time2 = readFloat(input);
@@ -775,7 +775,7 @@ Timeline *SkeletonBinary::readTimeline2(DataInput *input, CurveTimeline2 *timeli
 	float time = readFloat(input);
 	float value1 = readFloat(input) * scale;
 	float value2 = readFloat(input) * scale;
-	for (int frame = 0, bezier = 0, frameLast = (int)timeline->getFrameCount() - 1;; frame++) {
+	for (int frame = 0, bezier = 0, frameLast = (int) timeline->getFrameCount() - 1;; frame++) {
 		timeline->setFrame(frame, time, value1, value2);
 		if (frame == frameLast) break;
 		float time2 = readFloat(input);
@@ -1198,7 +1198,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 					float mixRotate = readFloat(input);
 					float mixX = readFloat(input);
 					float mixY = readFloat(input);
-					for (int frame = 0, bezier = 0, frameLast = (int)timeline->getFrameCount() - 1;; frame++) {
+					for (int frame = 0, bezier = 0, frameLast = (int) timeline->getFrameCount() - 1;; frame++) {
 						timeline->setFrame(frame, time, mixRotate, mixX, mixY);
 						if (frame == frameLast) break;
 						float time2 = readFloat(input);
@@ -1246,7 +1246,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 					case ATTACHMENT_DEFORM: {
 						bool weighted = attachment->_bones.size() > 0;
 						Vector<float> &vertices = attachment->_vertices;
-						int deformLength = weighted ? (int)vertices.size() / 3 * 2 : (int)vertices.size();
+						int deformLength = weighted ? (int) vertices.size() / 3 * 2 : (int) vertices.size();
 
 						int bezierCount = readVarint(input, true);
 						DeformTimeline *timeline = new (__FILE__, __LINE__) DeformTimeline(frameCount, bezierCount, slotIndex,
@@ -1336,15 +1336,15 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 				size_t slotIndex = (size_t) readVarint(input, true);
 				// Collect unchanged items.
 				while (originalIndex != slotIndex)
-					unchanged[unchangedIndex++] = (int)originalIndex++;
+					unchanged[unchangedIndex++] = (int) originalIndex++;
 				// Set changed items.
 				size_t index = originalIndex;
-				drawOrder[index + (size_t) readVarint(input, true)] = (int)originalIndex++;
+				drawOrder[index + (size_t) readVarint(input, true)] = (int) originalIndex++;
 			}
 
 			// Collect remaining unchanged items.
 			while (originalIndex < slotCount) {
-				unchanged[unchangedIndex++] = (int)originalIndex++;
+				unchanged[unchangedIndex++] = (int) originalIndex++;
 			}
 
 			// Fill in unchanged items.
@@ -1382,7 +1382,7 @@ Animation *SkeletonBinary::readAnimation(const String &name, DataInput *input, S
 	}
 
 	float duration = 0;
-	for (int i = 0, n = (int)timelines.size(); i < n; i++) {
+	for (int i = 0, n = (int) timelines.size(); i < n; i++) {
 		duration = MathUtil::max(duration, (timelines[i])->getDuration());
 	}
 	return new (__FILE__, __LINE__) Animation(String(name), timelines, duration);

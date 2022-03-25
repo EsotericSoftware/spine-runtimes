@@ -137,7 +137,7 @@ void USpineSkeletonDataAsset::SetRawData(TArray<uint8> &Data) {
 
 static bool checkVersion(const char *version) {
 	if (!version) return false;
-	char* result = (char*)(strstr(version, SPINE_VERSION_STRING) - version);
+	char *result = (char *) (strstr(version, SPINE_VERSION_STRING) - version);
 	return result == 0;
 }
 

@@ -78,7 +78,7 @@ void TransformConstraint::update() {
 }
 
 int TransformConstraint::getOrder() {
-	return (int)_data.getOrder();
+	return (int) _data.getOrder();
 }
 
 TransformConstraintData &TransformConstraint::getData() {

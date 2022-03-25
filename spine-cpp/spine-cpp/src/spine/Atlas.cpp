@@ -155,7 +155,7 @@ struct SimpleString {
 	}
 
 	bool equals(const char *str) {
-		int otherLen = (int)strlen(str);
+		int otherLen = (int) strlen(str);
 		if (length != otherLen) return false;
 		for (int i = 0; i < length; i++) {
 			if (start[i] != str[i]) return false;

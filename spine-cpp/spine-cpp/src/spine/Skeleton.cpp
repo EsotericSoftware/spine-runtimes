@@ -368,7 +368,7 @@ void Skeleton::setAttachment(const String &slotName, const String &attachmentNam
 		if (slot->_data.getName() == slotName) {
 			Attachment *attachment = NULL;
 			if (attachmentName.length() > 0) {
-				attachment = getAttachment((int)i, attachmentName);
+				attachment = getAttachment((int) i, attachmentName);
 
 				assert(attachment != NULL);
 			}
