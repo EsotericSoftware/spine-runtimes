@@ -30,10 +30,6 @@
 #ifndef Spine_SequenceTimeline_h
 #define Spine_SequenceTimeline_h
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/Timeline.h>
 #include <spine/Sequence.h>
 

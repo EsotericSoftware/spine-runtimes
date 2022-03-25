@@ -268,8 +268,8 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 				} else if (entry[0].equals("format")) {
 					page->format = (Format) indexOf(formatNames, 8, &entry[1]);
 				} else if (entry[0].equals("filter")) {
-					page->minFilter = (TextureFilter) indexOf(textureFilterNames, 8, &entry[1]);
-					page->magFilter = (TextureFilter) indexOf(textureFilterNames, 8, &entry[2]);
+					page->minFilter = (TEXTURE_FILTER_ENUM) indexOf(textureFilterNames, 8, &entry[1]);
+					page->magFilter = (TEXTURE_FILTER_ENUM) indexOf(textureFilterNames, 8, &entry[2]);
 				} else if (entry[0].equals("repeat")) {
 					page->uWrap = TextureWrap_ClampToEdge;
 					page->vWrap = TextureWrap_ClampToEdge;
