@@ -5,6 +5,8 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion PROP_COMPILE_SDK_VERSION.toInteger()
 
+    ndkVersion "24.0.8215888"
+
     defaultConfig {
         applicationId "com.esotericsoftware.spine"
         minSdkVersion PROP_MIN_SDK_VERSION
