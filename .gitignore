@@ -158,3 +158,8 @@ spine-monogame/spine-monogame-example/obj
 spine-libgdx/spine-libgdx/out
 spine-libgdx/spine-skeletonviewer/out
 spine-cocos2d-objc/cocos2d/
+cmake-build-release
+spine-cocos2dx/example-v4/build-ios
+spine-cocos2dx/example-v4/build-macos
+spine-cocos2dx/example/build-ios
+spine-cocos2dx/example/proj.android/app/.cxx

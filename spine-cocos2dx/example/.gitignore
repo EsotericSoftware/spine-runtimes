@@ -1,7 +1,0 @@
-bin/
-build/
-build-linux/
-proj.android/bin/
-proj.android/assets/
-proj.android/libs/
-proj.android/obj/
