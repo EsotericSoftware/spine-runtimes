@@ -43,11 +43,11 @@ For reference, have a look at our spine-cocos2dx example project in this reposit
 ## Example
 The spine-cocos2dx example works on Windows, Linux, macOS, iOS, Linux, and Android, for both cocos2d-x v3 and v4.
 
-Please [install the reprequisit software](https://docs.cocos2d-x.org/cocos2d-x/v4/en/installation/prerequisites.html) as per the Cocos2d-x documentation. Ensure that the following programs are executable from the command line:
+Please [install the reprequisit software](https://docs.cocos2d-x.org/cocos2d-x/v4/en/installation/prerequisites.html) as per the Cocos2d-x documentation. Ensure that the following programs are in your `PATH` environment variable and thus executable from the command line:
 
-* Git
-* CMake
-* Python
+* `git`
+* `cmake`
+* `python`
 
 Before you can compile and run the example project for a specific target platform, you need to clone the [Cocos2d-x repository](https://github.com/cocos2d/cocos2d-x) to `spine-runtimes/spine-cocos2dx/example/cocos2d` and download the dependencies:
 
@@ -79,7 +79,7 @@ Execute the following on the command line:
 
 ```
 cd spine-runtimes/spine-cocos2dx/example
-cmake . -GXcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -Bbuild-ios
+mkdir build-ios && cmake . -GXcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphoneos -Bbuild-ios
 open build-ios/spine-cocos2dx-example.xcodeproj
 ```
 
@@ -89,7 +89,15 @@ This will generate an Xcode project in `build-ios/spine-cocos2dx-example.xcodepr
 Open the project in `proj.android` in Android Studio. Make sure you have NDK version `24.0.8215888` installed via the SDK Manager. Alternatively, you can set the `ndkVersion` property in `proj.android/app/build.gradle` to the NDK version you have installed locally.
 
 ### Windows
-**TBD**
+Execute the following on the command line:
+
+```
+cd spine-runtimes/spine-cocos2dx/example
+mkdir build-win
+cmake . -G "Visual Studio 16 2019" -A Win32 -T host=x86 -Bbuild-win
+```
+
+You can then open the file `build-win/spine-cocos2dx-example.sln` with Visual Studio 2019. In the solution explorer, right click the `spine-cocos2dx-example` project, then click `Set as Startup Project` in the context menu. Finally, click the `Local Windows Debugger` button to build and run the example.
 
 ## Notes
 
