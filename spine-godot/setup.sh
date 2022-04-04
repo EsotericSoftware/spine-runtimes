@@ -2,7 +2,7 @@
 set -e
 rm -rf godot
 cp -r ../spine-cpp/spine-cpp spine_godot
-git clone --depth 1 https://github.com/godotengine/godot.git -b 3.3.4-stable
+git clone --depth 1 https://github.com/godotengine/godot.git -b 3.4.4-stable
 cp custom.py godot
 cp -r .idea godot
 ln -s $(pwd)/spine_godot godot/modules/spine_godot
