@@ -31,8 +31,8 @@
 #define HAS_FORCE_RENDER_OFF
 #endif
 
-#if UNITY_2017_2_OR_NEWER
-#define HAS_VECTOR_INT
+#if UNITY_2018_2_OR_NEWER
+#define HAS_GET_SHARED_MATERIALS
 #endif
 
 using System.Collections.Generic;
@@ -51,7 +51,7 @@ namespace Spine.Unity.Examples {
 	/// </summary>
 	[RequireComponent(typeof(SkeletonRenderer))]
 	public class SkeletonRenderTexture : MonoBehaviour {
-#if HAS_VECTOR_INT
+#if HAS_GET_SHARED_MATERIALS
 		public Color color = Color.white;
 		public Material quadMaterial;
 		public Camera targetCamera;
