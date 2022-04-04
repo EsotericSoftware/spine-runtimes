@@ -53,6 +53,8 @@ namespace spine {
 
 		virtual ~MeshAttachment();
 
+		using VertexAttachment::computeWorldVertices;
+
 		virtual void computeWorldVertices(Slot &slot, size_t start, size_t count, float *worldVertices, size_t offset,
 		size_t stride = 2);
 
