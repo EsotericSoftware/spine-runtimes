@@ -412,10 +412,7 @@ void SpineSprite::update_mesh_from_skeleton(Ref<SpineSkeleton> s) {
 			v_num = mesh->getWorldVerticesLength() / VERTEX_STRIDE;
 			vertices.setSize(mesh->getWorldVerticesLength(), 0);
 
-			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), vertices, 0);
-
-			//			uvs = mesh->getUVs();
-			//			indices = mesh->getTriangles();
+			mesh->computeWorldVertices(*slot, vertices);
 			TEMP_COPY(uvs, mesh->getUVs());
 			TEMP_COPY(indices, mesh->getTriangles());
 

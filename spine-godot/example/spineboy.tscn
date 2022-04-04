@@ -1,20 +1,15 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://spineboy/spineboy-pro.json" type="SpineSkeletonJsonDataResource" id=1]
-[ext_resource path="res://spineboy/spineboy.atlas" type="SpineAtlasResource" id=2]
-
-[sub_resource type="SpineSkeletonDataResource" id=1]
-atlas_res = ExtResource( 2 )
-skeleton_json_res = ExtResource( 1 )
-animations = null
-skins = null
+[ext_resource path="res://Spineboy.gd" type="Script" id=1]
+[ext_resource path="res://spineboy/spineboy-data.tres" type="SpineSkeletonDataResource" id=2]
 
 [sub_resource type="SpineAnimationStateDataResource" id=2]
-skeleton = SubResource( 1 )
+skeleton = ExtResource( 2 )
 
 [node name="Node2D" type="Node2D"]
 
-[node name="SpineSprite" type="SpineSprite" parent="."]
+[node name="Spineboy" type="SpineSprite" parent="."]
 position = Vector2( 504, 622 )
 animation_state_data_res = SubResource( 2 )
 current_animations = [ "walk" ]
+script = ExtResource( 1 )
