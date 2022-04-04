@@ -1,0 +1,13 @@
+[remap]
+
+importer="spine.json"
+type="SpineSkeletonJsonDataResource"
+path="res://.import/mix-and-match-pro.json-5ca1b9fd6cb1c37bf492ced0be2e27b8.spjson"
+
+[deps]
+
+source_file="res://mix-and-match/mix-and-match-pro.json"
+dest_files=[ "res://.import/mix-and-match-pro.json-5ca1b9fd6cb1c37bf492ced0be2e27b8.spjson" ]
+
+[params]
+

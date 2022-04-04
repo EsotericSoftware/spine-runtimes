@@ -82,7 +82,6 @@ void SpineSprite::_bind_methods() {
 
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "overlap"), "set_overlap", "get_overlap");
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bind_slot_nodes"), "set_bind_slot_nodes", "get_bind_slot_nodes");
-	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "custom_skin_resource", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineCustomSkinResource"), "set_skin", "get_skin");
 
 	ADD_GROUP("animation", "");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "process_mode", PROPERTY_HINT_ENUM, "Process,Physics,Manually"), "set_process_mode", "get_process_mode");
@@ -94,8 +93,9 @@ void SpineSprite::_bind_methods() {
 	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Manual);
 }
 
-SpineSprite::SpineSprite() : select_track_id(0), empty_animation_duration(0.2f), skeleton_clipper(NULL),
+SpineSprite::SpineSprite() : select_track_id(0), empty_animation_duration(0.2f),
 							 overlap(false),
+							 skeleton_clipper(NULL),
 							 process_mode(ProcessMode_Process) {
 	skeleton_clipper = new spine::SkeletonClipping();
 }
@@ -346,7 +346,6 @@ void SpineSprite::remove_redundant_mesh_instances() {
 
 void SpineSprite::update_mesh_from_skeleton(Ref<SpineSkeleton> s) {
 	static const unsigned short VERTEX_STRIDE = 2;
-	static const unsigned short UV_STRIDE = 2;
 	static unsigned short quad_indices[] = {0, 1, 2, 2, 3, 0};
 
 	auto sk = s->get_spine_object();
