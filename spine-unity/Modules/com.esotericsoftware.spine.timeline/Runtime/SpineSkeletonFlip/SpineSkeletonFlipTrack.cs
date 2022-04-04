@@ -27,8 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using Spine.Unity;
-using System.Collections.Generic;
+#if UNITY_EDITOR
+using System.ComponentModel;
+#endif
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -38,6 +39,9 @@ namespace Spine.Unity.Playables {
 	[TrackColor(0.855f, 0.8623f, 0.87f)]
 	[TrackClipType(typeof(SpineSkeletonFlipClip))]
 	[TrackBindingType(typeof(SpinePlayableHandleBase))]
+#if UNITY_EDITOR
+	[DisplayName("Spine/Skeleton Flip Track")]
+#endif
 	public class SpineSkeletonFlipTrack : TrackAsset {
 		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
 			return ScriptPlayable<SpineSkeletonFlipMixerBehaviour>.Create(graph, inputCount);

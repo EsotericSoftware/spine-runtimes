@@ -251,6 +251,11 @@ namespace Spine.Unity {
 		}
 
 		public void Load (AtlasPage page, string path) {
+#if UNITY_EDITOR
+			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing ||
+				BuildUtilities.IsInSkeletonAssetBuildPostProcessing)
+				return;
+#endif
 			String name = Path.GetFileNameWithoutExtension(path);
 			Material material = null;
 			foreach (Material other in atlasAsset.materials) {

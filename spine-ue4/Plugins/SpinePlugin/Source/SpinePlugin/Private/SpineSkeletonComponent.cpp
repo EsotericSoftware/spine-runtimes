@@ -27,7 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpinePluginPrivatePCH.h"
+#include "SpineSkeletonComponent.h"
+#include "SpineSkeletonRendererComponent.h"
+#include "SpineAtlasAsset.h"
 
 #include "spine/spine.h"
 
@@ -86,7 +88,7 @@ void USpineSkeletonComponent::GetSkins(TArray<FString> &Skins) {
 bool USpineSkeletonComponent::HasSkin(const FString skinName) {
 	CheckState();
 	if (skeleton) {
-		return skeleton->getData()->findAnimation(TCHAR_TO_UTF8(*skinName)) != nullptr;
+		return skeleton->getData()->findSkin(TCHAR_TO_UTF8(*skinName)) != nullptr;
 	}
 	return false;
 }
@@ -94,6 +96,10 @@ bool USpineSkeletonComponent::HasSkin(const FString skinName) {
 bool USpineSkeletonComponent::SetAttachment(const FString slotName, const FString attachmentName) {
 	CheckState();
 	if (skeleton) {
+		if (attachmentName.IsEmpty()) {
+			skeleton->setAttachment(TCHAR_TO_UTF8(*slotName), NULL);
+			return true;
+		}
 		if (!skeleton->getAttachment(TCHAR_TO_UTF8(*slotName), TCHAR_TO_UTF8(*attachmentName))) return false;
 		skeleton->setAttachment(TCHAR_TO_UTF8(*slotName), TCHAR_TO_UTF8(*attachmentName));
 		return true;

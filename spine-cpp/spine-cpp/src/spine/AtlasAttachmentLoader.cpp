@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/AtlasAttachmentLoader.h>
 #include <spine/BoundingBoxAttachment.h>
 #include <spine/ClippingAttachment.h>
@@ -50,7 +46,7 @@ namespace spine {
 
 	bool loadSequence(Atlas *atlas, const String &basePath, Sequence *sequence) {
 		Vector<TextureRegion *> &regions = sequence->getRegions();
-		for (int i = 0, n = regions.size(); i < n; i++) {
+		for (int i = 0, n = (int) regions.size(); i < n; i++) {
 			String path = sequence->getPath(basePath, i);
 			regions[i] = atlas->findRegion(path);
 			if (!regions[i]) return false;

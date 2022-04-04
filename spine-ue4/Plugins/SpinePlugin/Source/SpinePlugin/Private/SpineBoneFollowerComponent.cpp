@@ -27,7 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpinePluginPrivatePCH.h"
+#include "SpineBoneFollowerComponent.h"
+#include "SpineSkeletonComponent.h"
+#include "GameFramework/Actor.h"
 
 USpineBoneFollowerComponent::USpineBoneFollowerComponent() {
 	PrimaryComponentTick.bCanEverTick = true;

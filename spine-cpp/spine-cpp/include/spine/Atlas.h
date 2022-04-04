@@ -48,7 +48,15 @@ namespace spine {
 		Format_RGBA8888
 	};
 
-	enum TextureFilter {
+	// Our TextureFilter collides with UE4's TextureFilter in unity builds. We rename
+	// TextureFilter to SpineTextureFilter in UE4.
+#ifdef SPINE_UE4
+	#define TEXTURE_FILTER_ENUM SpineTextureFilter
+#else
+	#define TEXTURE_FILTER_ENUM TextureFilter
+#endif
+
+	enum TEXTURE_FILTER_ENUM {
 		TextureFilter_Unknown,
 		TextureFilter_Nearest,
 		TextureFilter_Linear,
@@ -70,8 +78,8 @@ namespace spine {
 		String name;
 		String texturePath;
 		Format format;
-		TextureFilter minFilter;
-		TextureFilter magFilter;
+		TEXTURE_FILTER_ENUM minFilter;
+		TEXTURE_FILTER_ENUM magFilter;
 		TextureWrap uWrap;
 		TextureWrap vWrap;
 		int width, height;

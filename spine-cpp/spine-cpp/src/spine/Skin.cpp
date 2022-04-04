@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/Skin.h>
 
 #include <spine/Attachment.h>
@@ -84,7 +80,7 @@ void Skin::AttachmentMap::remove(size_t slotIndex, const String &attachmentName)
 
 int Skin::AttachmentMap::findInBucket(Vector<Entry> &bucket, const String &attachmentName) {
 	for (size_t i = 0; i < bucket.size(); i++)
-		if (bucket[i]._name == attachmentName) return i;
+		if (bucket[i]._name == attachmentName) return (int) i;
 	return -1;
 }
 
@@ -148,7 +144,7 @@ void Skin::attachAll(Skeleton &skeleton, Skin &oldSkin) {
 	Skin::AttachmentMap::Entries entries = oldSkin.getAttachments();
 	while (entries.hasNext()) {
 		Skin::AttachmentMap::Entry &entry = entries.next();
-		int slotIndex = entry._slotIndex;
+		int slotIndex = (int) entry._slotIndex;
 		Slot *slot = slots[slotIndex];
 
 		if (slot->getAttachment() == entry._attachment) {

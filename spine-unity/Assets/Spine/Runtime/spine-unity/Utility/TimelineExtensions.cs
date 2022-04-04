@@ -73,6 +73,22 @@ namespace Spine.Unity.AnimationTools {
 			}
 		}
 
+		/// <summary>Evaluates the resulting value of a RotateTimeline at a given time.
+		/// SkeletonData can be accessed from Skeleton.Data or from SkeletonDataAsset.GetSkeletonData.
+		/// If no SkeletonData is given, values are returned as difference to setup pose
+		/// instead of absolute values.</summary>
+		public static float Evaluate (this RotateTimeline timeline, float time, SkeletonData skeletonData = null) {
+			if (time < timeline.Frames[0]) return 0f;
+
+			float rotation = timeline.GetCurveValue(time);
+			if (skeletonData == null) {
+				return rotation;
+			} else {
+				BoneData boneData = skeletonData.Bones.Items[timeline.BoneIndex];
+				return (boneData.Rotation + rotation);
+			}
+		}
+
 		/// <summary>Evaluates the resulting X and Y translate mix values of a
 		/// TransformConstraintTimeline at a given time.</summary>
 		public static Vector2 EvaluateTranslateXYMix (this TransformConstraintTimeline timeline, float time) {
@@ -81,6 +97,16 @@ namespace Spine.Unity.AnimationTools {
 			float rotate, mixX, mixY, scaleX, scaleY, shearY;
 			timeline.GetCurveValue(out rotate, out mixX, out mixY, out scaleX, out scaleY, out shearY, time);
 			return new Vector2(mixX, mixY);
+		}
+
+		/// <summary>Evaluates the resulting rotate mix values of a
+		/// TransformConstraintTimeline at a given time.</summary>
+		public static float EvaluateRotateMix (this TransformConstraintTimeline timeline, float time) {
+			if (time < timeline.Frames[0]) return 0;
+
+			float rotate, mixX, mixY, scaleX, scaleY, shearY;
+			timeline.GetCurveValue(out rotate, out mixX, out mixY, out scaleX, out scaleY, out shearY, time);
+			return rotate;
 		}
 
 		/// <summary>Gets the translate timeline for a given boneIndex.

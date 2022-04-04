@@ -43,6 +43,7 @@ typedef enum {
 
 void _spRegionAttachment_dispose(spAttachment *attachment) {
 	spRegionAttachment *self = SUB_CAST(spRegionAttachment, attachment);
+	if (self->sequence) spSequence_dispose(self->sequence);
 	_spAttachment_deinit(attachment);
 	FREE(self->path);
 	FREE(self);

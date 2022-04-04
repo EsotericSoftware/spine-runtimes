@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/Skeleton.h>
 
 #include <spine/Attachment.h>
@@ -372,7 +368,7 @@ void Skeleton::setAttachment(const String &slotName, const String &attachmentNam
 		if (slot->_data.getName() == slotName) {
 			Attachment *attachment = NULL;
 			if (attachmentName.length() > 0) {
-				attachment = getAttachment(i, attachmentName);
+				attachment = getAttachment((int) i, attachmentName);
 
 				assert(attachment != NULL);
 			}

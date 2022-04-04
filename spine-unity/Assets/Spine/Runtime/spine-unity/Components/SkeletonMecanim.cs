@@ -67,12 +67,18 @@ namespace Spine.Unity {
 		/// Use this callback if you want to use bone world space values, but don't intend to modify bone local values.
 		/// This callback can also be used when setting world position and the bone matrix.</summary>
 		public event UpdateBonesDelegate UpdateComplete { add { _UpdateComplete += value; } remove { _UpdateComplete -= value; } }
+
+		[SerializeField] protected UpdateTiming updateTiming = UpdateTiming.InUpdate;
+		public UpdateTiming UpdateTiming { get { return updateTiming; } set { updateTiming = value; } }
 		#endregion
 
 		public override void Initialize (bool overwrite, bool quiet = false) {
 			if (valid && !overwrite)
 				return;
-
+#if UNITY_EDITOR
+			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)
+				return;
+#endif
 			base.Initialize(overwrite, quiet);
 
 			if (!valid)
@@ -83,13 +89,23 @@ namespace Spine.Unity {
 			wasUpdatedAfterInit = false;
 		}
 
-		public void Update () {
-			if (!valid) return;
+		public virtual void Update () {
+			if (!valid || updateTiming != UpdateTiming.InUpdate) return;
+			UpdateAnimation();
+		}
 
+		public virtual void FixedUpdate () {
+			if (!valid || updateTiming != UpdateTiming.InFixedUpdate) return;
+			UpdateAnimation();
+		}
+
+		protected void UpdateAnimation () {
 			wasUpdatedAfterInit = true;
+
 			// animation status is kept by Mecanim Animator component
 			if (updateMode <= UpdateMode.OnlyAnimationStatus)
 				return;
+
 			ApplyAnimation();
 		}
 
@@ -104,8 +120,7 @@ namespace Spine.Unity {
 
 			if (Application.isPlaying) {
 				translator.Apply(skeleton);
-			}
-			else {
+			} else {
 				if (translatorAnimator != null && translatorAnimator.isInitialized &&
 					translatorAnimator.isActiveAndEnabled && translatorAnimator.runtimeAnimatorController != null) {
 					// Note: Rebind is required to prevent warning "Animator is not playing an AnimatorController" with prefabs
@@ -535,7 +550,7 @@ namespace Spine.Unity {
 			}
 
 #if UNITY_EDITOR
-			void GetLayerBlendModes() {
+			void GetLayerBlendModes () {
 				if (layerBlendModes.Length < animator.layerCount) {
 					System.Array.Resize<MixBlend>(ref layerBlendModes, animator.layerCount);
 				}

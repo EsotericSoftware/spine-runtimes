@@ -37,6 +37,12 @@ namespace Spine.Unity {
 		//Reserved 4 for OnlyEventTimelines
 	};
 
+	public enum UpdateTiming {
+		ManualUpdate = 0,
+		InUpdate,
+		InFixedUpdate
+	}
+
 	public delegate void UpdateBonesDelegate (ISkeletonAnimation animated);
 
 	public interface ISpineComponent { }
@@ -53,6 +59,7 @@ namespace Spine.Unity {
 		event UpdateBonesDelegate UpdateWorld;
 		event UpdateBonesDelegate UpdateComplete;
 		Skeleton Skeleton { get; }
+		UpdateTiming UpdateTiming { get; set; }
 	}
 
 	/// <summary>Holds a reference to a SkeletonDataAsset.</summary>

@@ -5,13 +5,9 @@ namespace UnrealBuildTool.Rules
 {
 	public class SpinePlugin : ModuleRules
 	{
-		public SpinePlugin(ReadOnlyTargetRules Target) : base(Target)
+		public SpinePlugin(ReadOnlyTargetRules target) : base(target)
 		{
-            PrivatePCHHeaderFile = "Private/SpinePluginPrivatePCH.h";
-			PCHUsage = PCHUsageMode.UseSharedPCHs;
-#if UE_4_24_OR_LATER
-            DefaultBuildSettings = BuildSettingsVersion.V1;
-#endif
+			PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
 			PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public/spine-cpp/include"));
@@ -20,7 +16,7 @@ namespace UnrealBuildTool.Rules
 			PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "Public/spine-cpp/include"));
 
             PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "ProceduralMeshComponent", "UMG", "Slate", "SlateCore" });
-			PublicDefinitions.Add("SPINE_UE4");
+            PublicDefinitions.Add("SPINE_UE4");
 		}
 	}
 }

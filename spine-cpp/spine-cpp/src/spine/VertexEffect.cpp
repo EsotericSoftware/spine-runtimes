@@ -27,13 +27,9 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
+#include <spine/VertexEffect.h>
 #include <spine/MathUtil.h>
 #include <spine/Skeleton.h>
-#include <spine/VertexEffect.h>
 
 using namespace spine;
 

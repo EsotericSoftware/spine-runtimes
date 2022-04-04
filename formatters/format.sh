@@ -28,9 +28,11 @@ setup
 # Execute spotless and dotnet-format
 pushd $dir/..
 ./formatters/gradlew spotlessApply
-dotnet-format spine-csharp/spine-csharp.sln
-dotnet-format -f spine-monogame
-dotnet-format -f spine-unity
+if [ "$1" != "skipdotnet" ] ; then
+	dotnet-format spine-csharp/spine-csharp.sln
+	dotnet-format -f spine-monogame
+	dotnet-format -f spine-unity
+fi
 popd
 
 # Delete Gradle, dotnet-format, and clang-format config files in root

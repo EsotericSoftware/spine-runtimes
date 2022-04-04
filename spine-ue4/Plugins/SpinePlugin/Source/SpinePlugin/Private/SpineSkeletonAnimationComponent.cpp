@@ -27,7 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpinePluginPrivatePCH.h"
+#include "SpineSkeletonAnimationComponent.h"
+#include "SpineAtlasAsset.h"
 
 #define LOCTEXT_NAMESPACE "Spine"
 

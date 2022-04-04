@@ -90,6 +90,9 @@ namespace Spine.Unity {
 		/// Use this callback if you want to use bone world space values, but don't intend to modify bone local values.
 		/// This callback can also be used when setting world position and the bone matrix.</summary>
 		public event UpdateBonesDelegate UpdateComplete { add { _UpdateComplete += value; } remove { _UpdateComplete -= value; } }
+
+		[SerializeField] protected UpdateTiming updateTiming = UpdateTiming.InUpdate;
+		public UpdateTiming UpdateTiming { get { return updateTiming; } set { updateTiming = value; } }
 		#endregion
 
 		#region Serialized state and Beginner API
@@ -166,6 +169,10 @@ namespace Spine.Unity {
 		public override void Initialize (bool overwrite, bool quiet = false) {
 			if (valid && !overwrite)
 				return;
+#if UNITY_EDITOR
+			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)
+				return;
+#endif
 			base.Initialize(overwrite, quiet);
 
 			if (!valid)
@@ -185,14 +192,19 @@ namespace Spine.Unity {
 			}
 		}
 
-		void Update () {
+		virtual protected void Update () {
 #if UNITY_EDITOR
 			if (!Application.isPlaying) {
 				Update(0f);
 				return;
 			}
 #endif
+			if (updateTiming != UpdateTiming.InUpdate) return;
+			Update(Time.deltaTime);
+		}
 
+		virtual protected void FixedUpdate () {
+			if (updateTiming != UpdateTiming.InFixedUpdate) return;
 			Update(Time.deltaTime);
 		}
 

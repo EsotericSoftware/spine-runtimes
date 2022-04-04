@@ -43,7 +43,7 @@ namespace Spine.Unity.Editor {
 
 		const string SeparatorSlotNamesFieldName = "separatorSlotNames";
 		const string ReloadButtonString = "Reload";
-		protected GUIContent SkeletonDataAssetLabel;
+		protected GUIContent SkeletonDataAssetLabel, UpdateTimingLabel;
 		static GUILayoutOption reloadButtonWidth;
 		static GUILayoutOption ReloadButtonWidth { get { return reloadButtonWidth = reloadButtonWidth ?? GUILayout.Width(GUI.skin.label.CalcSize(new GUIContent(ReloadButtonString)).x + 20); } }
 		static GUIStyle ReloadButtonStyle { get { return EditorStyles.miniButton; } }
@@ -51,11 +51,14 @@ namespace Spine.Unity.Editor {
 		SerializedProperty material, color;
 		SerializedProperty additiveMaterial, multiplyMaterial, screenMaterial;
 		SerializedProperty skeletonDataAsset, initialSkinName;
-		SerializedProperty startingAnimation, startingLoop, timeScale, freeze, updateWhenInvisible, unscaledTime, tintBlack;
+		SerializedProperty startingAnimation, startingLoop, timeScale, freeze,
+			updateTiming, updateWhenInvisible, unscaledTime, tintBlack;
 		SerializedProperty initialFlipX, initialFlipY;
 		SerializedProperty meshGeneratorSettings;
 		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation;
 		SerializedProperty raycastTarget;
+
+
 
 		SkeletonGraphic thisSkeletonGraphic;
 		protected bool isInspectingPrefab;
@@ -88,6 +91,7 @@ namespace Spine.Unity.Editor {
 
 			// Labels
 			SkeletonDataAssetLabel = new GUIContent("SkeletonData Asset", Icons.spine);
+			UpdateTimingLabel = new GUIContent("Animation Update", "Whether to update the animation in normal Update (the default), physics step FixedUpdate, or manually via a user call.");
 
 			var so = this.serializedObject;
 			thisSkeletonGraphic = target as SkeletonGraphic;
@@ -114,6 +118,7 @@ namespace Spine.Unity.Editor {
 			timeScale = so.FindProperty("timeScale");
 			unscaledTime = so.FindProperty("unscaledTime");
 			freeze = so.FindProperty("freeze");
+			updateTiming = so.FindProperty("updateTiming");
 			updateWhenInvisible = so.FindProperty("updateWhenInvisible");
 
 			meshGeneratorSettings = so.FindProperty("meshGenerator").FindPropertyRelative("settings");
@@ -156,13 +161,13 @@ namespace Spine.Unity.Editor {
 			}
 
 			if (thisSkeletonGraphic.skeletonDataAsset == null) {
-				EditorGUILayout.HelpBox("You need to assign a SkeletonDataAsset first.", MessageType.Info);
+				EditorGUILayout.HelpBox("You need to assign a SkeletonData asset first.", MessageType.Info);
 				serializedObject.ApplyModifiedProperties();
 				serializedObject.Update();
 				return;
 			}
 			if (!SpineEditorUtilities.SkeletonDataAssetIsValid(thisSkeletonGraphic.skeletonDataAsset)) {
-				EditorGUILayout.HelpBox("Skeleton Data Asset error. Please check Skeleton Data Asset.", MessageType.Error);
+				EditorGUILayout.HelpBox("SkeletonData asset error. Please check SkeletonData asset.", MessageType.Error);
 				return;
 			}
 
@@ -233,6 +238,7 @@ namespace Spine.Unity.Editor {
 							}
 						}
 
+						EditorGUILayout.PropertyField(updateTiming, UpdateTimingLabel);
 						EditorGUILayout.PropertyField(updateWhenInvisible);
 
 						// warning box

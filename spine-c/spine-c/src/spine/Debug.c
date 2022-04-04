@@ -205,6 +205,10 @@ void spDebug_printTimeline(spTimeline *timeline) {
 			_spDebug_printTimelineBase(&t->super);
 			break;
 		}
+		case SP_TIMELINE_SEQUENCE: {
+			spSequenceTimeline *t = (spSequenceTimeline *) timeline;
+			_spDebug_printTimelineBase(&t->super);
+		}
 	}
 }
 

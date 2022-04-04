@@ -367,7 +367,10 @@ namespace Spine.Unity {
 		public virtual void Initialize (bool overwrite, bool quiet = false) {
 			if (valid && !overwrite)
 				return;
-
+#if UNITY_EDITOR
+			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)
+				return;
+#endif
 			// Clear
 			{
 				// Note: do not reset meshFilter.sharedMesh or meshRenderer.sharedMaterial to null,

@@ -580,6 +580,15 @@ export class Skeleton {
 		return null;
 	}
 
+	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose as `{ x: number, y: number, width: number, height: number }`.
+	 * Note that this method will create temporary objects which can add to garbage collection pressure. Use `getBounds()` if garbage collection is a concern. */
+	getBoundsRect () {
+		let offset = new Vector2();
+		let size = new Vector2();
+		this.getBounds(offset, size);
+		return { x: offset.x, y: offset.y, width: size.x, height: size.y };
+	}
+
 	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
 	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
 	 * @param size An output value, the width and height of the AABB.

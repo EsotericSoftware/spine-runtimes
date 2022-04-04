@@ -27,18 +27,14 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpinePluginPrivatePCH.h"
-
+#include "SSpineWidget.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
-#include "Modules/ModuleManager.h"
 #include "Rendering/DrawElements.h"
 #include "Runtime/SlateRHIRenderer/Public/Interfaces/ISlateRHIRendererModule.h"
-#include "SSpineWidget.h"
 #include "Slate/SMeshWidget.h"
 #include "Slate/SlateVectorArtData.h"
-#include "Slate/SlateVectorArtInstanceData.h"
 #include "SlateMaterialBrush.h"
 #include "SpineWidget.h"
 #include <spine/spine.h>

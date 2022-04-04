@@ -128,8 +128,50 @@ namespace Spine.Unity {
 			return localDelta;
 		}
 
+		protected override float CalculateAnimationsRotationDelta () {
+			float localDelta = 0;
+			int trackCount = animationState.Tracks.Count;
+
+			for (int trackIndex = 0; trackIndex < trackCount; ++trackIndex) {
+				// note: animationTrackFlags != -1 below covers trackIndex >= 32,
+				// with -1 corresponding to entry "everything" of the dropdown list.
+				if (animationTrackFlags != -1 && (animationTrackFlags & 1 << trackIndex) == 0)
+					continue;
+
+				TrackEntry track = animationState.GetCurrent(trackIndex);
+				TrackEntry next = null;
+				while (track != null) {
+					var animation = track.Animation;
+					float start = track.AnimationLast;
+					float end = track.AnimationTime;
+					var currentDelta = GetAnimationRootMotionRotation(start, end, animation);
+					if (currentDelta != 0) {
+						ApplyMixAlphaToDelta(ref currentDelta, next, track);
+						localDelta += currentDelta;
+					}
+
+					// Traverse mixingFrom chain.
+					next = track;
+					track = track.MixingFrom;
+				}
+			}
+			return localDelta;
+		}
+
 		void ApplyMixAlphaToDelta (ref Vector2 currentDelta, TrackEntry next, TrackEntry track) {
-			// Apply mix alpha to the delta position (based on AnimationState.cs).
+			float mixAlpha = 1;
+			GetMixAlpha(ref mixAlpha, next, track);
+			currentDelta *= mixAlpha;
+		}
+
+		void ApplyMixAlphaToDelta (ref float currentDelta, TrackEntry next, TrackEntry track) {
+			float mixAlpha = 1;
+			GetMixAlpha(ref mixAlpha, next, track);
+			currentDelta *= mixAlpha;
+		}
+
+		void GetMixAlpha (ref float cumulatedMixAlpha, TrackEntry next, TrackEntry track) {
+			// code below based on AnimationState.cs
 			float mix;
 			if (next != null) {
 				if (next.MixDuration == 0) { // Single frame mix to undo mixingFrom changes.
@@ -139,7 +181,7 @@ namespace Spine.Unity {
 					if (mix > 1) mix = 1;
 				}
 				float mixAndAlpha = track.Alpha * next.InterruptAlpha * (1 - mix);
-				currentDelta *= mixAndAlpha;
+				cumulatedMixAlpha *= mixAndAlpha;
 			} else {
 				if (track.MixDuration == 0) {
 					mix = 1;
@@ -147,7 +189,7 @@ namespace Spine.Unity {
 					mix = track.Alpha * (track.MixTime / track.MixDuration);
 					if (mix > 1) mix = 1;
 				}
-				currentDelta *= mix;
+				cumulatedMixAlpha *= mix;
 			}
 		}
 	}

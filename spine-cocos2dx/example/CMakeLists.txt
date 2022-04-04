@@ -1,6 +1,6 @@
 #/****************************************************************************
 # Copyright (c) 2013-2014 cocos2d-x.org
-# Copyright (c) 2015 Chukong Technologies Inc.
+# Copyright (c) 2015-2017 Chukong Technologies Inc.
 #
 # http://www.cocos2d-x.org
 #
@@ -22,139 +22,142 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ****************************************************************************/
-#cmake_policy(SET CMP0017 NEW)
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.6)
 
 set(APP_NAME spine-cocos2dx-example)
-project (${APP_NAME})
 
-set(COCOS2D_ROOT ${CMAKE_SOURCE_DIR}/cocos2d)
+project(${APP_NAME})
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${COCOS2D_ROOT}/cmake/Modules/")
+set(BUILD_EXTENSIONS OFF CACHE BOOL "Build extensions" FORCE)
 
-set(COCOS2DX_ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cocos2d)
-set(CMAKE_MODULE_PATH ${COCOS2DX_ROOT_PATH}/cmake/Modules/)
+include(../spine-cocos2dx.cmake)
 
-# libcocos2d
-set(BUILD_CPP_EMPTY_TEST OFF CACHE BOOL "turn off build cpp-empty-test" FORCE)
-set(BUILD_CPP_TESTS OFF CACHE BOOL "turn off build cpp-tests" FORCE)
-set(BUILD_LUA_LIBS OFF CACHE BOOL "turn off build lua related targets" FORCE)
-set(BUILD_JS_LIBS OFF CACHE BOOL "turn off build js related targets" FORCE)
-
-set(BUILD_EDITOR_SPINE OFF CACHE BOOL "Build editor support for spine" FORCE)
-
-
-set(BUILD_EDITOR_SPINE ON CACHE BOOL "enable spine")
-
-include_directories(
-  ${CMAKE_CURRENT_LIST_DIR}/../../spine-cpp/spine-cpp/include
-  ${CMAKE_CURRENT_LIST_DIR}/../src
-)
-
-include(CocosBuildSet)
-add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos ${ENGINE_BINARY_PATH}/cocos/core)
-
-get_target_property(COCOS2D_X_VERSION cocos2d VERSION)
-set(COCOS2DX_ROOT_PATH ${COCOS2D_ROOT})
-
-set(PLATFORM_SPECIFIC_SRC)
-set(PLATFORM_SPECIFIC_HEADERS)
-set(cc_common_res)
-
-
-set(GAME_RES_FOLDER  ${CMAKE_CURRENT_SOURCE_DIR}/Resources)
-if(APPLE OR VS)
-  cocos_mark_multi_resources(cc_common_res RES_TO "Resources" FOLDERS ${GAME_RES_FOLDER})
+if(XCODE)
+    if(NOT DEFINED CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET)
+        SET (CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 8.0)
+    endif()
 endif()
 
-if(MACOSX OR APPLE)
-    set(APP_UI_RES
-    proj.ios_mac/mac/Icon.icns
-    proj.ios_mac/mac/Info.plist
+if(NOT DEFINED BUILD_ENGINE_DONE) # to test spine-cocos2dx-example into root project
+    set(COCOS2DX_ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cocos2d)
+    set(CMAKE_MODULE_PATH ${COCOS2DX_ROOT_PATH}/cmake/Modules/)
+
+    include(CocosBuildSet)
+    add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos ${ENGINE_BINARY_PATH}/cocos/core)
+endif()
+
+# record sources, headers, resources...
+set(GAME_RES_FOLDER
+    "${CMAKE_CURRENT_SOURCE_DIR}/Resources"
     )
-    set(PLATFORM_SPECIFIC_SRC
-      proj.ios_mac/mac/main.cpp
-    )
+if(APPLE OR WINDOWS)
+    cocos_mark_multi_resources(common_res_files RES_TO "Resources" FOLDERS ${GAME_RES_FOLDER})
+endif()
+
+# add cross-platforms source files and header files
+file(GLOB_RECURSE GAME_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/Classes/*.cpp")
+file(GLOB_RECURSE GAME_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/Classes/*.h")
+set(GAME_INCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/Classes")
+
+if(ANDROID)
+    # change APP_NAME to the share library name for Android, it's value depend on AndroidManifest.xml
+    set(APP_NAME MyGame)
+    list(APPEND GAME_SOURCE
+         proj.android/app/jni/hellocpp/main.cpp
+         )
 elseif(LINUX)
-    set(PLATFORM_SPECIFIC_SRC
-      proj.linux/main.cpp
-    )
-elseif ( WIN32 )
-    set(PLATFORM_SPECIFIC_SRC
-      proj.win32/main.cpp
-    )
-    set(PLATFORM_SPECIFIC_HEADERS
-      proj.win32/main.h
-      proj.win32/resource.h
-    )
-elseif(ANDROID)
-    set(PLATFORM_SPECIFIC_SRC
-      proj.android-studio/app/jni/hellocpp/main.cpp
-    )
-endif()
-
-
-file(GLOB GAME_CLASSES_SOURCES "Classes/*.cpp")
-file(GLOB GAME_CLASSES_HEADERS "Classes/*.h")
-
-set(GAME_SRC
-  ${GAME_CLASSES_SOURCES}
-  ${PLATFORM_SPECIFIC_SRC}
-  ${cc_common_res}
-)
-
-
-set(GAME_HEADERS
-  ${GAME_CLASSES_HEADERS}
-  ${PLATFORM_SPECIFIC_HEADERS}
-)
-
-if( ANDROID )
-    add_library(${APP_NAME} SHARED ${GAME_SRC} ${GAME_HEADERS})
-    IF(CMAKE_BUILD_TYPE MATCHES RELEASE)
-        ADD_CUSTOM_COMMAND(TARGET ${APP_NAME} POST_BUILD COMMAND ${CMAKE_STRIP} lib${APP_NAME}.so)
-    ENDIF()
-else()
-    add_executable(${APP_NAME} ${GAME_SRC} ${GAME_HEADERS})
-endif()
-
-target_include_directories(${APP_NAME} PRIVATE Classes)
-target_link_libraries(${APP_NAME} cocos2d)
-
-setup_cocos_app_config(${APP_NAME})
-
-if(COMMAND cocos_get_resource_path)
-  cocos_get_resource_path(APP_RES_DIR ${APP_NAME})
-else()
-  set(APP_RES_DIR "$<TARGET_FILE_DIR:${APP_NAME}>/Resources")
-endif()
-
-if(APPLE)
-  set_target_properties(${APP_NAME} PROPERTIES RESOURCE "${API_UI_RES}")
-  if(MACOSX)
-    set_target_properties(${APP_NAME} PROPERTIES
-                          MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/mac/Info.plist"
-                          )
-  elseif(IOS)
-    cocos_pak_xcode(${APP_NAME} INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/ios/Info.plist")
-    set_xcode_property(${APP_NAME} ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon-${APP_NAME}")
-    set_xcode_property(${APP_NAME} CODE_SIGN_IDENTITY "iPhone Developer")
-    set_xcode_property(${APP_NAME} DEVELOPMENT_TEAM "")
-    set_xcode_property(${APP_NAME} CODE_SIGN_IDENTITY "iPhone Developer")
-  endif()
+    list(APPEND GAME_SOURCE
+         proj.linux/main.cpp
+         )
 elseif(WINDOWS)
-  cocos_copy_target_dll(${APP_NAME} COPY_TO ${APP_RES_DIR}/..)
+    list(APPEND GAME_HEADER
+         proj.win32/main.h
+         proj.win32/resource.h
+         )
+    list(APPEND GAME_SOURCE
+         proj.win32/main.cpp
+         proj.win32/game.rc
+         ${common_res_files}
+         )
+elseif(APPLE)
+    if(IOS)
+        list(APPEND GAME_HEADER
+             proj.ios_mac/ios/AppController.h
+             proj.ios_mac/ios/RootViewController.h
+             )
+        set(APP_UI_RES
+            proj.ios_mac/ios/LaunchScreen.storyboard
+            proj.ios_mac/ios/LaunchScreenBackground.png
+            proj.ios_mac/ios/Images.xcassets
+            )
+        list(APPEND GAME_SOURCE
+             proj.ios_mac/ios/main.m
+             proj.ios_mac/ios/AppController.mm
+             proj.ios_mac/ios/RootViewController.mm
+             proj.ios_mac/ios/Prefix.pch
+             ${APP_UI_RES}
+             )
+    elseif(MACOSX)
+        set(APP_UI_RES
+            proj.ios_mac/mac/Icon.icns
+            proj.ios_mac/mac/Info.plist
+            )
+        list(APPEND GAME_SOURCE
+             proj.ios_mac/mac/main.cpp
+             proj.ios_mac/mac/Prefix.pch
+             ${APP_UI_RES}
+             )
+    endif()
+    list(APPEND GAME_SOURCE ${common_res_files})
+endif()
+
+# mark app complie info and libs info
+set(all_code_files
+    ${GAME_HEADER}
+    ${GAME_SOURCE}
+    )
+if(NOT ANDROID)
+    add_executable(${APP_NAME} ${all_code_files})	
+else()
+    add_library(${APP_NAME} SHARED ${all_code_files})
+    add_subdirectory(${COCOS2DX_ROOT_PATH}/cocos/platform/android ${ENGINE_BINARY_PATH}/cocos/platform)
+	target_link_libraries(${APP_NAME} -Wl,--whole-archive cpp_android_spec -Wl,--no-whole-archive)    
+endif()
+
+# Link the spine-cpp and spine-cocos2dx library to the app
+target_link_libraries(${APP_NAME} spine-cpp spine-cocos2dx)
+
+# Manually link to libz on iOS, the cocos2d-x build only pulls in libz.tbd
+if(IOS)    
+    target_link_libraries(${APP_NAME} z)
+endif()
+
+target_link_libraries(${APP_NAME} cocos2d)
+target_include_directories(${APP_NAME}
+        PRIVATE ${GAME_INCLUDE}
+        PRIVATE ${COCOS2DX_ROOT_PATH}/cocos/audio/include/
+)
+
+# mark app resources
+setup_cocos_app_config(${APP_NAME})
+if(APPLE)
+    set_target_properties(${APP_NAME} PROPERTIES RESOURCE "${APP_UI_RES}")
+
+    if(MACOSX)
+        set_xcode_property(${APP_NAME} INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/mac/Info.plist")
+    elseif(IOS)
+        set_xcode_property(${APP_NAME} INFOPLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/proj.ios_mac/ios/Info.plist")
+        set_xcode_property(${APP_NAME} ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon")
+    endif()
+
+    # For code-signing, set the DEVELOPMENT_TEAM:
+    #set_xcode_property(${APP_NAME} DEVELOPMENT_TEAM "GRLXXXX2K9")
+elseif(WINDOWS)
+    cocos_copy_target_dll(${APP_NAME})
 endif()
 
 if(LINUX OR WINDOWS)
-  if("${COCOS2D_X_VERSION}" VERSION_LESS "4.0")
-    if(COMMAND cocos_copy_res)
-      cocos_copy_res(COPY_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
-    else()
-      cocos_copy_target_res(${APP_NAME} COPY_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
-    endif()
-  else()
+    cocos_get_resource_path(APP_RES_DIR ${APP_NAME})
     cocos_copy_target_res(${APP_NAME} LINK_TO ${APP_RES_DIR} FOLDERS ${GAME_RES_FOLDER})
-  endif()
 endif()

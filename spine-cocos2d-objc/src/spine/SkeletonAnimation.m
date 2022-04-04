@@ -150,8 +150,7 @@ static _TrackEntryListeners* getListeners (spTrackEntry* entry) {
 }
 
 - (void) update:(CCTime)deltaTime {
-	deltaTime *= _timeScale;
-	spSkeleton_update(_skeleton, deltaTime);
+	deltaTime *= _timeScale;	
 	spAnimationState_update(_state, deltaTime);
 	spAnimationState_apply(_state, _skeleton);
 	if (_preUpdateWorldTransformsListener) _preUpdateWorldTransformsListener(self);

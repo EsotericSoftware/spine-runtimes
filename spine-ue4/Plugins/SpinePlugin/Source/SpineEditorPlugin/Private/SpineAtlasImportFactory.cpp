@@ -27,18 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpineEditorPluginPrivatePCH.h"
-
+#include "SpineAtlasImportFactory.h"
 #include "AssetRegistryModule.h"
 #include "AssetToolsModule.h"
 #include "Developer/AssetTools/Public/IAssetTools.h"
-#include "Developer/DesktopPlatform/Public/DesktopPlatformModule.h"
-#include "Developer/DesktopPlatform/Public/IDesktopPlatform.h"
 #include "PackageTools.h"
 #include "SpineAtlasAsset.h"
-#include <stdlib.h>
-#include <string.h>
-#include <string>
 
 #define LOCTEXT_NAMESPACE "Spine"
 

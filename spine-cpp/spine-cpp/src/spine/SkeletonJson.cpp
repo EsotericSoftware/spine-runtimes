@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/SkeletonJson.h>
 
 #include <spine/Atlas.h>
@@ -72,11 +68,8 @@
 #include <spine/TransformConstraintTimeline.h>
 #include <spine/TranslateTimeline.h>
 #include <spine/Vertices.h>
-#include "spine/SequenceTimeline.h"
-
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#define strdup _strdup
-#endif
+#include <spine/SequenceTimeline.h>
+#include <spine/Version.h>
 
 using namespace spine;
 
@@ -157,6 +150,12 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 	if (skeleton) {
 		skeletonData->_hash = Json::getString(skeleton, "hash", 0);
 		skeletonData->_version = Json::getString(skeleton, "spine", 0);
+		if (!skeletonData->_version.startsWith(SPINE_VERSION_STRING)) {
+			char errorMsg[255];
+			sprintf(errorMsg, "Skeleton version %s does not match runtime version %s", skeletonData->_version.buffer(), SPINE_VERSION_STRING);
+			setError(NULL, errorMsg, "");
+			return NULL;
+		}
 		skeletonData->_x = Json::getFloat(skeleton, "x", 0);
 		skeletonData->_y = Json::getFloat(skeleton, "y", 0);
 		skeletonData->_width = Json::getFloat(skeleton, "width", 0);
@@ -712,7 +711,7 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 	}
 
 	/* Linked meshes. */
-	int n = _linkedMeshes.size();
+	int n = (int) _linkedMeshes.size();
 	for (i = 0; i < n; ++i) {
 		LinkedMesh *linkedMesh = _linkedMeshes[i];
 		Skin *skin = linkedMesh->_skin.length() == 0 ? skeletonData->getDefaultSkin() : skeletonData->findSkin(linkedMesh->_skin);
@@ -1277,7 +1276,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 						VertexAttachment *vertexAttachment = static_cast<VertexAttachment *>(attachment);
 						bool weighted = vertexAttachment->_bones.size() != 0;
 						Vector<float> &verts = vertexAttachment->_vertices;
-						int deformLength = weighted ? verts.size() / 3 * 2 : verts.size();
+						int deformLength = weighted ? (int) verts.size() / 3 * 2 : (int) verts.size();
 
 						DeformTimeline *timeline = new (__FILE__, __LINE__) DeformTimeline(frames,
 																						   frames, slotIndex, vertexAttachment);
@@ -1342,6 +1341,7 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 							if (modeString == "loopReverse") mode = SequenceMode::loopReverse;
 							if (modeString == "pingpongReverse") mode = SequenceMode::pingpongReverse;
 							timeline->setFrame(frame, time, mode, index, delay);
+							lastDelay = delay;
 						}
 						timelines.add(timeline);
 					}
@@ -1376,14 +1376,14 @@ Animation *SkeletonJson::readAnimation(Json *root, SkeletonData *skeletonData) {
 
 					/* Collect unchanged items. */
 					while (originalIndex != (size_t) slotIndex)
-						unchanged[unchangedIndex++] = originalIndex++;
+						unchanged[unchangedIndex++] = (int) originalIndex++;
 					/* Set changed items. */
-					drawOrder2[originalIndex + Json::getInt(offsetMap, "offset", 0)] = originalIndex;
+					drawOrder2[originalIndex + Json::getInt(offsetMap, "offset", 0)] = (int) originalIndex;
 					originalIndex++;
 				}
 				/* Collect remaining unchanged items. */
-				while (originalIndex < skeletonData->_slots.size())
-					unchanged[unchangedIndex++] = originalIndex++;
+				while ((int) originalIndex < (int) skeletonData->_slots.size())
+					unchanged[unchangedIndex++] = (int) originalIndex++;
 				/* Fill in unchanged items. */
 				for (ii = (int) skeletonData->_slots.size() - 1; ii >= 0; ii--)
 					if (drawOrder2[ii] == -1) drawOrder2[ii] = unchanged[--unchangedIndex];

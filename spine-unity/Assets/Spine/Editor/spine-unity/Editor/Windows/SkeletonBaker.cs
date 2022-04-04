@@ -33,14 +33,10 @@
 
 #define SPINE_SKELETONMECANIM
 
-using Spine;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace Spine.Unity.Editor {
@@ -181,7 +177,7 @@ namespace Spine.Unity.Editor {
 
 		public static void BakeToPrefab (SkeletonDataAsset skeletonDataAsset, ExposedList<Skin> skins, string outputPath = "", bool bakeAnimations = true, bool bakeIK = true, SendMessageOptions eventOptions = SendMessageOptions.DontRequireReceiver) {
 			if (skeletonDataAsset == null || skeletonDataAsset.GetSkeletonData(true) == null) {
-				Debug.LogError("Could not export Spine Skeleton because SkeletonDataAsset is null or invalid!");
+				Debug.LogError("Could not export Spine Skeleton because SkeletonData Asset is null or invalid!");
 				return;
 			}
 
@@ -786,8 +782,16 @@ namespace Spine.Unity.Editor {
 
 				if (t is ScaleTimeline) {
 					ParseScaleTimeline(skeleton, (ScaleTimeline)t, clip);
+				} else if (t is ScaleXTimeline) {
+					ParseSingleSplitScaleTimeline(skeleton, (ScaleXTimeline)t, null, clip);
+				} else if (t is ScaleYTimeline) {
+					ParseSingleSplitScaleTimeline(skeleton, null, (ScaleYTimeline)t, clip);
 				} else if (t is TranslateTimeline) {
 					ParseTranslateTimeline(skeleton, (TranslateTimeline)t, clip);
+				} else if (t is TranslateXTimeline) {
+					ParseSingleSplitTranslateTimeline(skeleton, (TranslateXTimeline)t, null, clip);
+				} else if (t is TranslateYTimeline) {
+					ParseSingleSplitTranslateTimeline(skeleton, null, (TranslateYTimeline)t, clip);
 				} else if (t is RotateTimeline) {
 					//bypass any rotation keys if they're going to get baked anyway to prevent localEulerAngles vs Baked collision
 					if (ignoreRotateTimelineIndexes.Contains(((RotateTimeline)t).BoneIndex) == false)
@@ -813,20 +817,11 @@ namespace Spine.Unity.Editor {
 			return clip;
 		}
 
-		static int BinarySearch (float[] values, float target) {
-			int low = 0;
-			int high = values.Length - 2;
-			if (high == 0) return 1;
-			int current = (int)((uint)high >> 1);
-			while (true) {
-				if (values[(current + 1)] <= target)
-					low = current + 1;
-				else
-					high = current;
-
-				if (low == high) return (low + 1);
-				current = (int)((uint)(low + high) >> 1);
-			}
+		internal static int Search (float[] frames, float time) {
+			int n = frames.Length;
+			for (int i = 1; i < n; i++)
+				if (frames[i] > time) return i - 1;
+			return n - 1;
 		}
 
 		static void BakeBoneConstraints (Bone bone, Spine.Animation animation, AnimationClip clip) {
@@ -908,7 +903,7 @@ namespace Spine.Unity.Editor {
 			AnimationCurve yCurve = new AnimationCurve();
 			AnimationCurve zCurve = new AnimationCurve();
 
-			float endTime = timeline.Frames[(timeline.FrameCount * 3) - 3];
+			float endTime = timeline.Frames[(timeline.FrameCount * TranslateTimeline.ENTRIES) - TranslateTimeline.ENTRIES];
 
 			float currentTime = timeline.Frames[0];
 
@@ -920,7 +915,7 @@ namespace Spine.Unity.Editor {
 
 			int listIndex = 1;
 			int frameIndex = 1;
-			int f = 3;
+			int f = TranslateTimeline.ENTRIES;
 			float[] frames = timeline.Frames;
 			skeleton.SetToSetupPose();
 			float lastTime = 0;
@@ -982,8 +977,7 @@ namespace Spine.Unity.Editor {
 
 					lastTime = time;
 					listIndex++;
-				} else if (curveType == 2) {
-
+				} else {
 					//bezier
 					Keyframe px = xKeys[pIndex];
 					Keyframe py = yKeys[pIndex];
@@ -1020,7 +1014,7 @@ namespace Spine.Unity.Editor {
 				}
 
 				frameIndex++;
-				f += 3;
+				f += TranslateTimeline.ENTRIES;
 			}
 
 			xCurve = EnsureCurveKeyCount(new AnimationCurve(xKeys.ToArray()));
@@ -1036,6 +1030,107 @@ namespace Spine.Unity.Editor {
 			clip.SetCurve(path, typeof(Transform), propertyName + ".z", zCurve);
 		}
 
+		/// <summary>Parses a single TranslateXTimeline or TranslateYTimeline.
+		/// Only one of <c>timelineX</c> or <c>timelineY</c> shall be filled out, the other must be null.</summary>
+		static void ParseSingleSplitTranslateTimeline (Skeleton skeleton,
+			TranslateXTimeline timelineX, TranslateYTimeline timelineY, AnimationClip clip) {
+
+			bool isXTimeline = timelineX != null;
+			CurveTimeline1 timeline = isXTimeline ? timelineX : timelineY as CurveTimeline1;
+			IBoneTimeline boneTimeline = isXTimeline ? timelineX : timelineY as IBoneTimeline;
+
+			var boneData = skeleton.Data.Bones.Items[boneTimeline.BoneIndex];
+			var bone = skeleton.Bones.Items[boneTimeline.BoneIndex];
+			float boneDataOffset = isXTimeline ? boneData.X : boneData.Y;
+
+			AnimationCurve curve = new AnimationCurve();
+			float endTime = timeline.Frames[(timeline.FrameCount * TranslateXTimeline.ENTRIES) - TranslateXTimeline.ENTRIES];
+			float currentTime = timeline.Frames[0];
+			List<Keyframe> keys = new List<Keyframe>();
+			keys.Add(new Keyframe(timeline.Frames[0], timeline.Frames[1] + boneDataOffset, 0, 0));
+
+			int listIndex = 1;
+			int frameIndex = 1;
+			int f = TranslateXTimeline.ENTRIES;
+			float[] frames = timeline.Frames;
+			skeleton.SetToSetupPose();
+			float lastTime = 0;
+			while (currentTime < endTime) {
+				int pIndex = listIndex - 1;
+
+				float curveType = timeline.GetCurveType(frameIndex - 1);
+				if (curveType == 0) {
+					//linear
+					Keyframe p = keys[pIndex];
+
+					float time = frames[f];
+					float value = frames[f + 1] + boneDataOffset;
+					float valueOut = (value - p.value) / (time - p.time);
+					p.outTangent = valueOut;
+					keys.Add(new Keyframe(time, value, valueOut, 0));
+
+					keys[pIndex] = p;
+					currentTime = time;
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In);
+
+					lastTime = time;
+					listIndex++;
+				} else if (curveType == 1) {
+					//stepped
+					Keyframe p = keys[pIndex];
+
+					float time = frames[f];
+					float value = frames[f + 1] + boneDataOffset;
+					float valueOut = float.PositiveInfinity;
+					p.outTangent = valueOut;
+					keys.Add(new Keyframe(time, value, valueOut, 0));
+
+					keys[pIndex] = p;
+					currentTime = time;
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In);
+
+					lastTime = time;
+					listIndex++;
+				} else {
+					//bezier
+					Keyframe p = keys[pIndex];
+
+					float time = frames[f];
+
+					int steps = Mathf.FloorToInt((time - p.time) / BakeIncrement);
+
+					for (int i = 1; i <= steps; i++) {
+						currentTime += BakeIncrement;
+						if (i == steps)
+							currentTime = time;
+
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In);
+
+						p = keys[listIndex - 1];
+						float boneOffset = isXTimeline ? bone.X : bone.Y;
+						float valueOut = (boneOffset - p.value) / (currentTime - p.time);
+						p.outTangent = valueOut;
+						keys.Add(new Keyframe(currentTime, boneOffset, valueOut, 0));
+
+						keys[listIndex - 1] = p;
+
+						listIndex++;
+						lastTime = currentTime;
+					}
+				}
+
+				frameIndex++;
+				f += TranslateXTimeline.ENTRIES;
+			}
+
+			curve = EnsureCurveKeyCount(new AnimationCurve(keys.ToArray()));
+
+			string path = GetPath(boneData);
+			const string propertyName = "localPosition";
+
+			clip.SetCurve(path, typeof(Transform), propertyName + (isXTimeline ? ".x" : ".y"), curve);
+		}
+
 		static void ParseScaleTimeline (Skeleton skeleton, ScaleTimeline timeline, AnimationClip clip) {
 			var boneData = skeleton.Data.Bones.Items[timeline.BoneIndex];
 			var bone = skeleton.Bones.Items[timeline.BoneIndex];
@@ -1044,7 +1139,7 @@ namespace Spine.Unity.Editor {
 			AnimationCurve yCurve = new AnimationCurve();
 			AnimationCurve zCurve = new AnimationCurve();
 
-			float endTime = timeline.Frames[(timeline.FrameCount * 3) - 3];
+			float endTime = timeline.Frames[(timeline.FrameCount * ScaleTimeline.ENTRIES) - ScaleTimeline.ENTRIES];
 
 			float currentTime = timeline.Frames[0];
 
@@ -1056,14 +1151,13 @@ namespace Spine.Unity.Editor {
 
 			int listIndex = 1;
 			int frameIndex = 1;
-			int f = 3;
+			int f = ScaleTimeline.ENTRIES;
 			float[] frames = timeline.Frames;
 			skeleton.SetToSetupPose();
 			float lastTime = 0;
 			while (currentTime < endTime) {
 				int pIndex = listIndex - 1;
 				float curveType = timeline.GetCurveType(frameIndex - 1);
-
 				if (curveType == 0) {
 					//linear
 					Keyframe px = xKeys[pIndex];
@@ -1118,7 +1212,7 @@ namespace Spine.Unity.Editor {
 
 					lastTime = time;
 					listIndex++;
-				} else if (curveType == 2) {
+				} else {
 					//bezier
 					Keyframe px = xKeys[pIndex];
 					Keyframe py = yKeys[pIndex];
@@ -1155,7 +1249,7 @@ namespace Spine.Unity.Editor {
 				}
 
 				frameIndex++;
-				f += 3;
+				f += ScaleTimeline.ENTRIES;
 			}
 
 			xCurve = EnsureCurveKeyCount(new AnimationCurve(xKeys.ToArray()));
@@ -1167,6 +1261,103 @@ namespace Spine.Unity.Editor {
 			clip.SetCurve(path, typeof(Transform), propertyName + ".x", xCurve);
 			clip.SetCurve(path, typeof(Transform), propertyName + ".y", yCurve);
 			clip.SetCurve(path, typeof(Transform), propertyName + ".z", zCurve);
+		}
+
+		static void ParseSingleSplitScaleTimeline (Skeleton skeleton,
+			ScaleXTimeline timelineX, ScaleYTimeline timelineY, AnimationClip clip) {
+
+			bool isXTimeline = timelineX != null;
+			CurveTimeline1 timeline = isXTimeline ? timelineX : timelineY as CurveTimeline1;
+			IBoneTimeline boneTimeline = isXTimeline ? timelineX : timelineY as IBoneTimeline;
+
+			var boneData = skeleton.Data.Bones.Items[boneTimeline.BoneIndex];
+			var bone = skeleton.Bones.Items[boneTimeline.BoneIndex];
+			float boneDataOffset = isXTimeline ? boneData.ScaleX : boneData.ScaleY;
+
+			AnimationCurve curve = new AnimationCurve();
+			float endTime = timeline.Frames[(timeline.FrameCount * ScaleXTimeline.ENTRIES) - ScaleXTimeline.ENTRIES];
+			float currentTime = timeline.Frames[0];
+			List<Keyframe> keys = new List<Keyframe>();
+			keys.Add(new Keyframe(timeline.Frames[0], timeline.Frames[1] * boneDataOffset, 0, 0));
+
+			int listIndex = 1;
+			int frameIndex = 1;
+			int f = ScaleXTimeline.ENTRIES;
+			float[] frames = timeline.Frames;
+			skeleton.SetToSetupPose();
+			float lastTime = 0;
+			while (currentTime < endTime) {
+				int pIndex = listIndex - 1;
+				float curveType = timeline.GetCurveType(frameIndex - 1);
+				if (curveType == 0) {
+					//linear
+					Keyframe p = keys[pIndex];
+
+					float time = frames[f];
+					float value = frames[f + 1] * boneDataOffset;
+					float valueOut = (value - p.value) / (time - p.time);
+					p.outTangent = valueOut;
+					keys.Add(new Keyframe(time, value, valueOut, 0));
+
+					keys[pIndex] = p;
+					currentTime = time;
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In);
+
+					lastTime = time;
+					listIndex++;
+				} else if (curveType == 1) {
+					//stepped
+					Keyframe p = keys[pIndex];
+
+					float time = frames[f];
+					float value = frames[f + 1] * boneDataOffset;
+					float valueOut = float.PositiveInfinity;
+					p.outTangent = valueOut;
+					keys.Add(new Keyframe(time, value, valueOut, 0));
+
+					keys[pIndex] = p;
+					currentTime = time;
+					timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In);
+
+					lastTime = time;
+					listIndex++;
+				} else {
+					//bezier
+					Keyframe p = keys[pIndex];
+					float time = frames[f];
+					int steps = Mathf.FloorToInt((time - p.time) / BakeIncrement);
+
+					for (int i = 1; i <= steps; i++) {
+						currentTime += BakeIncrement;
+						if (i == steps)
+							currentTime = time;
+
+						timeline.Apply(skeleton, lastTime, currentTime, null, 1, MixBlend.Setup, MixDirection.In);
+
+						p = keys[listIndex - 1];
+
+						float boneScale = isXTimeline ? bone.ScaleX : bone.ScaleY;
+						float valueOut = (boneScale - p.value) / (currentTime - p.time);
+						p.outTangent = valueOut;
+						keys.Add(new Keyframe(currentTime, boneScale, valueOut, 0));
+
+						keys[listIndex - 1] = p;
+
+						listIndex++;
+						lastTime = currentTime;
+					}
+				}
+
+				frameIndex++;
+				f += ScaleXTimeline.ENTRIES;
+			}
+
+			curve = EnsureCurveKeyCount(new AnimationCurve(keys.ToArray()));
+
+			string path = GetPath(boneData);
+			string propertyName = "localScale";
+
+			clip.SetCurve(path, typeof(Transform), propertyName + (isXTimeline ? ".x" : ".y"), curve);
 		}
 
 		static void ParseRotateTimeline (Skeleton skeleton, RotateTimeline timeline, AnimationClip clip) {
@@ -1245,7 +1436,7 @@ namespace Spine.Unity.Editor {
 
 					lastTime = time;
 					listIndex++;
-				} else if (curveType == 2) {
+				} else {
 					//bezier
 					Keyframe pk = keys[pIndex];
 
@@ -1370,7 +1561,7 @@ namespace Spine.Unity.Editor {
 			while (currentTime < endTime) {
 				float time = frames[f];
 
-				int frameIndex = (time >= frames[frames.Length - 1] ? frames.Length : BinarySearch(frames, time)) - 1;
+				int frameIndex = Search(frames, time);
 
 				string name = timeline.AttachmentNames[frameIndex];
 				foreach (var pair in curveTable) {

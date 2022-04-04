@@ -11,7 +11,8 @@
 		}
 	},
 	"include": [
-		"**/*.ts"
+		"**/*.ts",
+		"src/OrbitControls.js"
 	],
 	"exclude": [
 		"dist/**/*.d.ts"

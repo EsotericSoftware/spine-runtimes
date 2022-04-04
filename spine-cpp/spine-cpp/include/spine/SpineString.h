@@ -182,6 +182,14 @@ namespace spine {
 			return *this;
 		}
 
+		bool startsWith(const String &needle) {
+			if (needle.length() > length()) return false;
+			for (int i = 0; i < (int)needle.length(); i++) {
+				if (buffer()[i] != needle.buffer()[i]) return false;
+			}
+			return true;
+		}
+
 		friend bool operator==(const String &a, const String &b) {
 			if (a._buffer == b._buffer) return true;
 			if (a._length != b._length) return false;

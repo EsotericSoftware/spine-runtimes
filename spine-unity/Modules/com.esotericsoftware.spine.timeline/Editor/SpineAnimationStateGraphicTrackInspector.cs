@@ -29,24 +29,21 @@
 
 using Spine.Unity.Playables;
 using UnityEditor;
+using UnityEditor.Timeline;
+using UnityEngine;
 using UnityEngine.Timeline;
 
 namespace Spine.Unity.Editor {
 
-	[CustomEditor(typeof(SpineAnimationStateGraphicTrack))]
+	[CustomTimelineEditor(typeof(SpineAnimationStateGraphicTrack))]
 	[CanEditMultipleObjects]
-	public class SpineAnimationStateGraphicTrackInspector : UnityEditor.Editor {
+	public class SpineAnimationStateGraphicTrackInspector : TrackEditor {
 
-		protected SerializedProperty trackIndexProperty = null;
-
-		public void OnEnable () {
-			trackIndexProperty = serializedObject.FindProperty("trackIndex");
-		}
-
-		public override void OnInspectorGUI () {
-			serializedObject.Update();
-			EditorGUILayout.PropertyField(trackIndexProperty);
-			serializedObject.ApplyModifiedProperties();
+		public override TrackDrawOptions GetTrackOptions (TrackAsset track, UnityEngine.Object binding) {
+			var options = base.GetTrackOptions(track, binding);
+			options.icon = SpineEditorUtilities.Icons.skeletonDataAssetIcon;
+			options.trackColor = new Color(255 / 255.0f, 64 / 255.0f, 1 / 255.0f);
+			return options;
 		}
 	}
 }

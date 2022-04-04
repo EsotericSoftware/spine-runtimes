@@ -564,6 +564,7 @@ void owl(SkeletonData *skeletonData, Atlas *atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
+		drawable.skeleton->setToSetupPose();
 		drawable.update(delta);
 
 		window.clear();
@@ -644,6 +645,7 @@ DebugExtension dbgExtension(SpineExtension::getInstance());
 int main() {
 	SpineExtension::setInstance(&dbgExtension);
 
+	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(dragon, "data/dragon-ess.json", "data/dragon-ess.skel", "data/dragon-pma.atlas", 0.6f);
 	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);

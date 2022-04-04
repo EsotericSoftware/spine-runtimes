@@ -151,7 +151,6 @@ namespace spine {
 	}
 
 	void SkeletonDrawable::update(float deltaTime) {
-		spSkeleton_update(skeleton, deltaTime);
 		spAnimationState_update(state, deltaTime * timeScale);
 		spAnimationState_apply(state, skeleton);
 		spSkeleton_updateWorldTransform(skeleton);
@@ -197,7 +196,7 @@ namespace spine {
 					continue;
 				}
 
-				spRegionAttachment_computeWorldVertices(regionAttachment, slot->bone, vertices, 0, 2);
+				spRegionAttachment_computeWorldVertices(regionAttachment, slot, vertices, 0, 2);
 				verticesCount = 4;
 				uvs = regionAttachment->uvs;
 				indices = quadIndices;
