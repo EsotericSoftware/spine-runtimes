@@ -34,6 +34,7 @@ import { MeshAttachment } from "./MeshAttachment";
 import { PathAttachment } from "./PathAttachment";
 import { PointAttachment } from "./PointAttachment";
 import { RegionAttachment } from "./RegionAttachment";
+import { Sequence } from "./Sequence";
 
 /** The interface which can be implemented to customize creating and populating attachments.
  *
@@ -41,10 +42,10 @@ import { RegionAttachment } from "./RegionAttachment";
  * Runtimes Guide. */
 export interface AttachmentLoader {
 	/** @return May be null to not load an attachment. */
-	newRegionAttachment (skin: Skin, name: string, path: string): RegionAttachment;
+	newRegionAttachment (skin: Skin, name: string, path: string, sequence: Sequence): RegionAttachment;
 
 	/** @return May be null to not load an attachment. */
-	newMeshAttachment (skin: Skin, name: string, path: string): MeshAttachment;
+	newMeshAttachment (skin: Skin, name: string, path: string, sequence: Sequence): MeshAttachment;
 
 	/** @return May be null to not load an attachment. */
 	newBoundingBoxAttachment (skin: Skin, name: string): BoundingBoxAttachment;

@@ -44,11 +44,11 @@ namespace Spine {
 		}
 
 		class NullAttachmentLoader : AttachmentLoader {
-			public RegionAttachment NewRegionAttachment (Skin skin, string name, string path) {
+			public RegionAttachment NewRegionAttachment (Skin skin, string name, string path, Sequence sequence) {
 				return null;
 			}
 
-			public MeshAttachment NewMeshAttachment (Skin skin, string name, string path) {
+			public MeshAttachment NewMeshAttachment (Skin skin, string name, string path, Sequence sequence) {
 				return null;
 			}
 
@@ -851,7 +851,6 @@ namespace Spine {
 			state.Apply(skeleton);
 			while (time < endTime) {
 				time += incr;
-				skeleton.Update(incr);
 				state.Update(incr);
 
 				// Reduce float discrepancies for tests.

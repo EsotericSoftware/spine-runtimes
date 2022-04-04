@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<script src="../dist/iife/spine-player.js"></script>
+	<link rel="stylesheet" href="../css/spine-player.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<style>
+	body {
+		background: gray;
+		margin: 0px;
+	}
+</style>
+
+<body>
+	<div id="container" style="width:640px; height:380px"></div>
+	<div>
+		<button id="dispose">Dispose</button>
+	</div>
+</body>
+<script>
+	var player = createPlayer();
+
+	document.getElementById("dispose").addEventListener("click", event => {
+		console.log("Disposing player.");
+		player.dispose();
+		player = createPlayer();
+	});
+
+	function createPlayer() {
+		return new spine.SpinePlayer("container", {
+			skelUrl: "assets/spineboy-pro.skel",
+			atlasUrl: "assets/spineboy-pma.atlas",
+			animation: "run",
+			premultipliedAlpha: true,
+			backgroundColor: "#cccccc",
+			viewport: {
+				debugRender: true,
+			},
+			showControls: true
+		});
+	}	
+</script>
+</body>
+
+</html>

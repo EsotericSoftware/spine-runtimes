@@ -28,9 +28,8 @@
  *****************************************************************************/
 
 #include "SpineWidget.h"
-#include "Engine.h"
 #include "SSpineWidget.h"
-#include "SpinePluginPrivatePCH.h"
+#include "SpineSkeletonAnimationComponent.h"
 #include "spine/spine.h"
 
 #define LOCTEXT_NAMESPACE "Spine"
@@ -249,7 +248,7 @@ void USpineWidget::GetSkins(TArray<FString> &Skins) {
 bool USpineWidget::HasSkin(const FString skinName) {
 	CheckState();
 	if (skeleton) {
-		return skeleton->getData()->findAnimation(TCHAR_TO_UTF8(*skinName)) != nullptr;
+		return skeleton->getData()->findSkin(TCHAR_TO_UTF8(*skinName)) != nullptr;
 	}
 	return false;
 }
@@ -257,6 +256,10 @@ bool USpineWidget::HasSkin(const FString skinName) {
 bool USpineWidget::SetAttachment(const FString slotName, const FString attachmentName) {
 	CheckState();
 	if (skeleton) {
+		if (attachmentName.IsEmpty()) {
+			skeleton->setAttachment(TCHAR_TO_UTF8(*slotName), NULL);
+			return true;
+		}
 		if (!skeleton->getAttachment(TCHAR_TO_UTF8(*slotName), TCHAR_TO_UTF8(*attachmentName))) return false;
 		skeleton->setAttachment(TCHAR_TO_UTF8(*slotName), TCHAR_TO_UTF8(*attachmentName));
 		return true;

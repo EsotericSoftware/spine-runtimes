@@ -27,19 +27,17 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#include "SpineSkeletonDataAsset.h"
+#include "SpinePlugin.h"
 #include "Runtime/Core/Public/Misc/MessageDialog.h"
-#include "SpinePluginPrivatePCH.h"
+#include "EditorFramework/AssetImportData.h"
 #include "spine/spine.h"
-#include <stdlib.h>
-#include <string.h>
+#include "spine/Version.h"
 #include <string>
 
 #define LOCTEXT_NAMESPACE "Spine"
 
 using namespace spine;
-
-#define SPINE_MAJOR_VERSION 4
-#define SPINE_MINOR_VERSION 0
 
 FName USpineSkeletonDataAsset::GetSkeletonDataFileName() const {
 #if WITH_EDITORONLY_DATA
@@ -100,11 +98,11 @@ void USpineSkeletonDataAsset::BeginDestroy() {
 
 class SP_API NullAttachmentLoader : public AttachmentLoader {
 public:
-	virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path) {
+	virtual RegionAttachment *newRegionAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
 		return new (__FILE__, __LINE__) RegionAttachment(name);
 	}
 
-	virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path) {
+	virtual MeshAttachment *newMeshAttachment(Skin &skin, const String &name, const String &path, Sequence *sequence) {
 		return new (__FILE__, __LINE__) MeshAttachment(name);
 	}
 
@@ -138,27 +136,9 @@ void USpineSkeletonDataAsset::SetRawData(TArray<uint8> &Data) {
 }
 
 static bool checkVersion(const char *version) {
-	String tokens[3];
-	int currToken = 0;
-
-	while (*version && currToken < 3) {
-		if (*version == '.') {
-			version++;
-			currToken++;
-			continue;
-		}
-
-		char str[2];
-		str[0] = *version;
-		str[1] = 0;
-		tokens[currToken].append(str);
-		version++;
-	}
-	int versionNumber[3];
-	for (int i = 0; i < 3; i++)
-		versionNumber[i] = atoi(tokens[i].buffer());
-
-	return versionNumber[0] >= SPINE_MAJOR_VERSION && versionNumber[1] >= SPINE_MINOR_VERSION;
+	if (!version) return false;
+	char *result = (char *) (strstr(version, SPINE_VERSION_STRING) - version);
+	return result == 0;
 }
 
 static bool checkJson(const char *jsonData) {

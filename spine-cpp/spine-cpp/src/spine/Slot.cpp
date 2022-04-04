@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/Slot.h>
 
 #include <spine/Attachment.h>
@@ -49,7 +45,7 @@ Slot::Slot(SlotData &data, Bone &bone) : _data(data),
 										 _hasDarkColor(data.hasDarkColor()),
 										 _attachment(NULL),
 										 _attachmentState(0),
-										 _attachmentTime(0) {
+										 _sequenceIndex(0) {
 	setToSetupPose();
 }
 
@@ -103,12 +99,13 @@ void Slot::setAttachment(Attachment *inValue) {
 		!_attachment ||
 		!inValue->getRTTI().instanceOf(VertexAttachment::rtti) ||
 		!_attachment->getRTTI().instanceOf(VertexAttachment::rtti) ||
-		static_cast<VertexAttachment *>(inValue)->getDeformAttachment() != static_cast<VertexAttachment *>(_attachment)->getDeformAttachment()) {
+		static_cast<VertexAttachment *>(inValue)->getTimelineAttachment() !=
+				static_cast<VertexAttachment *>(_attachment)->getTimelineAttachment()) {
 		_deform.clear();
 	}
 
 	_attachment = inValue;
-	_attachmentTime = _skeleton.getTime();
+	_sequenceIndex = -1;
 }
 
 int Slot::getAttachmentState() {
@@ -119,14 +116,14 @@ void Slot::setAttachmentState(int state) {
 	_attachmentState = state;
 }
 
-float Slot::getAttachmentTime() {
-	return _skeleton.getTime() - _attachmentTime;
-}
-
-void Slot::setAttachmentTime(float inValue) {
-	_attachmentTime = _skeleton.getTime() - inValue;
-}
-
 Vector<float> &Slot::getDeform() {
 	return _deform;
+}
+
+int Slot::getSequenceIndex() {
+	return _sequenceIndex;
+}
+
+void Slot::setSequenceIndex(int index) {
+	_sequenceIndex = index;
 }

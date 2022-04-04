@@ -51,7 +51,8 @@ namespace spine {
 		Property_TransformConstraint = 1 << 15,
 		Property_PathConstraintPosition = 1 << 16,
 		Property_PathConstraintSpacing = 1 << 17,
-		Property_PathConstraintMix = 1 << 18
+		Property_PathConstraintMix = 1 << 18,
+		Property_Sequence = 1 << 19
 	};
 }
 

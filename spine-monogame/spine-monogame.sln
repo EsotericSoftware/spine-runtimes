@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.810.17
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spine-monogame-example", "spine-monogame-example\spine-monogame-example.csproj", "{B6A0B6D0-1186-46A6-89C5-4CD15CA6C18D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spine-monogame", "spine-monogame\spine-monogame.csproj", "{82271611-1E77-4E5F-B78A-18F8CDBFDF84}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6A0B6D0-1186-46A6-89C5-4CD15CA6C18D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6A0B6D0-1186-46A6-89C5-4CD15CA6C18D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6A0B6D0-1186-46A6-89C5-4CD15CA6C18D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6A0B6D0-1186-46A6-89C5-4CD15CA6C18D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82271611-1E77-4E5F-B78A-18F8CDBFDF84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82271611-1E77-4E5F-B78A-18F8CDBFDF84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82271611-1E77-4E5F-B78A-18F8CDBFDF84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82271611-1E77-4E5F-B78A-18F8CDBFDF84}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D10CEBB-7A36-4BCD-A598-BF9A61769961}
+	EndGlobalSection
+EndGlobal

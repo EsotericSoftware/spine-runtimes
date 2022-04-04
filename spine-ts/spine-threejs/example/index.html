@@ -3,9 +3,9 @@
 <head>
 	<meta charset="UTF-8">
 	<title>spine-threejs</title>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.js"></script>
+	<script src="https://unpkg.com/three@0.138.3/build/three.js"></script>
 	<script src="../dist/iife/spine-threejs.js"></script>
-	<script src="index.js"></script>
+	<script src="./OrbitalControls.js"></script>
 </head>
 <style>
 	* {
@@ -28,20 +28,21 @@
 <body>
 	<script>
 		(function () {
-			var scene, camera, renderer;
-			var geometry, material, mesh, skeletonMesh;
-			var assetManager;
-			var canvas;
-			var lastFrameTime = Date.now() / 1000;
+			let scene, camera, renderer;
+			let geometry, material, mesh, skeletonMesh;
+			let assetManager;
+			let canvas;
+			let controls;
+			let lastFrameTime = Date.now() / 1000;
 
-			var baseUrl = "assets/";
-			var skeletonFile = "raptor-pro.json";
-			var atlasFile = skeletonFile.replace("-pro", "").replace("-ess", "").replace(".json", ".atlas");
-			var animation = "walk";
+			let baseUrl = "assets/";
+			let skeletonFile = "raptor-pro.json";
+			let atlasFile = skeletonFile.replace("-pro", "").replace("-ess", "").replace(".json", ".atlas");
+			let animation = "walk";
 
 			function init() {
 				// create the THREE.JS camera, scene and renderer (WebGL)
-				var width = window.innerWidth, height = window.innerHeight;
+				let width = window.innerWidth, height = window.innerHeight;
 				camera = new THREE.PerspectiveCamera(75, width / height, 1, 3000);
 				camera.position.y = 100;
 				camera.position.z = 400;
@@ -50,6 +51,7 @@
 				renderer.setSize(width, height);
 				document.body.appendChild(renderer.domElement);
 				canvas = renderer.domElement;
+				controls = new OrbitControls(camera, renderer.domElement);
 
 				// load the assets required to display the Raptor model
 				assetManager = new spine.AssetManager(baseUrl);
@@ -75,36 +77,38 @@
 					atlasLoader = new spine.AtlasAttachmentLoader(atlas);
 
 					// Create a SkeletonJson instance for parsing the .json file.
-					var skeletonJson = new spine.SkeletonJson(atlasLoader);
+					let skeletonJson = new spine.SkeletonJson(atlasLoader);
 
 					// Set the scale to apply during parsing, parse the file, and create a new skeleton.
 					skeletonJson.scale = 0.4;
-					var skeletonData = skeletonJson.readSkeletonData(assetManager.require(skeletonFile));
+					let skeletonData = skeletonJson.readSkeletonData(assetManager.require(skeletonFile));
 
 					// Create a SkeletonMesh from the data and attach it to the scene
-					skeletonMesh = new spine.SkeletonMesh(skeletonData, function (parameters) {
-						parameters.depthTest = false;
+					skeletonMesh = new spine.SkeletonMesh(skeletonData, (parameters) => {
+						parameters.depthTest = true;
+						parameters.depthWrite = true;
+						parameters.alphaTest = 0.001;
 					});
 					skeletonMesh.state.setAnimation(0, animation, true);
 					mesh.add(skeletonMesh);
+
 
 					requestAnimationFrame(render);
 				} else requestAnimationFrame(load);
 			}
 
-			var lastTime = Date.now();
+			let lastTime = Date.now();
 			function render() {
 				// calculate delta time for animation purposes
-				var now = Date.now() / 1000;
-				var delta = now - lastFrameTime;
+				let now = Date.now() / 1000;
+				let delta = now - lastFrameTime;
 				lastFrameTime = now;
 
 				// resize canvas to use full page, adjust camera/renderer
 				resize();
 
-				// rotate the cube
-				mesh.rotation.x = Math.sin(now) * Math.PI * 0.2;
-				mesh.rotation.y = Math.cos(now) * Math.PI * 0.4;
+				// Update orbital controls
+				controls.update();
 
 				// update the animation
 				skeletonMesh.update(delta);
@@ -116,8 +120,8 @@
 			}
 
 			function resize() {
-				var w = window.innerWidth;
-				var h = window.innerHeight;
+				let w = window.innerWidth;
+				let h = window.innerHeight;
 				if (canvas.width != w || canvas.height != h) {
 					canvas.width = w;
 					canvas.height = h;

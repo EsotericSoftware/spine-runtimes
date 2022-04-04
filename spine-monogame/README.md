@@ -14,18 +14,21 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-monogame works with data exported from Spine 4.0.xx.
+spine-monogame works with data exported from Spine 4.1.xx.
 
 spine-monogame supports all Spine features.
 
 ## Setup
 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it as a zip via the download button above.
-1. Copy the contents of the `spine-csharp/src` and `spine-xna/src` directories into your project.
+1. Let your MonoGame project reference the project `spine-monogame/spine-monogame/spine-monogame.csproj`.
+1. Optionally add `spine-monogame/spine-monogame-example/Content/shaders/SpineEffect.fx` to your content pipeline build if you require two color tinting support. See the `spine-monogame-example/ExampleGame.cs` on how to use it.
+
+Note: `spine-monogame` references source files from `spine-csharp/src`.
 
 ## Example
 
+1. Follow the [MonoGame Getting Started Guide](https://docs.monogame.net/articles/getting_started/0_getting_started.html) on how to setup your development environment for MonoGame. Make sure to also install the optional dependencies allowing compilation of shaders. 
 1. Download the Spine Runtimes source using [git](https://help.github.com/articles/set-up-git) or by downloading it [as a zip via the download button above.
-1. Open the `spine-monogame-example.sln` Solution in either Visual Studio 2015 or Xamarin Studio
-1. Right click the `spine-monogame-example` project in the solution explorer and select `Properties`
-1. Select `Debug` and set the working directory to point to `spine-runtimes/spine-xna/example`
+1. Open the `spine-monogame.sln` Solution in the IDE you choose based on the `Monogame Getting Started Guide`.
+1. Set the `spine-monogame-example` project as the startup project, and ensure the working directory is set to `spine-runtimes/spine-monogame/spine-monogame-example` when running or debugging the project.

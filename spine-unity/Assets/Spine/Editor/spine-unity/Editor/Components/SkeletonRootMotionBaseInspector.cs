@@ -37,6 +37,7 @@ namespace Spine.Unity.Editor {
 		protected SerializedProperty rootMotionBoneName;
 		protected SerializedProperty transformPositionX;
 		protected SerializedProperty transformPositionY;
+		protected SerializedProperty transformRotation;
 		protected SerializedProperty rootMotionScaleX;
 		protected SerializedProperty rootMotionScaleY;
 		protected SerializedProperty rootMotionTranslateXPerY;
@@ -48,6 +49,7 @@ namespace Spine.Unity.Editor {
 		protected GUIContent rootMotionBoneNameLabel;
 		protected GUIContent transformPositionXLabel;
 		protected GUIContent transformPositionYLabel;
+		protected GUIContent transformRotationLabel;
 		protected GUIContent rootMotionScaleXLabel;
 		protected GUIContent rootMotionScaleYLabel;
 		protected GUIContent rootMotionTranslateXPerYLabel;
@@ -61,6 +63,7 @@ namespace Spine.Unity.Editor {
 			rootMotionBoneName = serializedObject.FindProperty("rootMotionBoneName");
 			transformPositionX = serializedObject.FindProperty("transformPositionX");
 			transformPositionY = serializedObject.FindProperty("transformPositionY");
+			transformRotation = serializedObject.FindProperty("transformRotation");
 			rootMotionScaleX = serializedObject.FindProperty("rootMotionScaleX");
 			rootMotionScaleY = serializedObject.FindProperty("rootMotionScaleY");
 			rootMotionTranslateXPerY = serializedObject.FindProperty("rootMotionTranslateXPerY");
@@ -72,6 +75,7 @@ namespace Spine.Unity.Editor {
 			rootMotionBoneNameLabel = new UnityEngine.GUIContent("Root Motion Bone", "The bone to take the motion from.");
 			transformPositionXLabel = new UnityEngine.GUIContent("X", "Root transform position (X)");
 			transformPositionYLabel = new UnityEngine.GUIContent("Y", "Use the Y-movement of the bone.");
+			transformRotationLabel = new UnityEngine.GUIContent("Rotation", "Use the rotation of the bone.");
 			rootMotionScaleXLabel = new UnityEngine.GUIContent("Root Motion Scale (X)", "Scale applied to the horizontal root motion delta. Can be used for delta compensation to e.g. stretch a jump to the desired distance.");
 			rootMotionScaleYLabel = new UnityEngine.GUIContent("Root Motion Scale (Y)", "Scale applied to the vertical root motion delta. Can be used for delta compensation to e.g. stretch a jump to the desired distance.");
 			rootMotionTranslateXPerYLabel = new UnityEngine.GUIContent("Root Motion Translate (X)", "Added X translation per root motion Y delta. Can be used for delta compensation when scaling is not enough, to e.g. offset a horizontal jump to a vertically different goal.");
@@ -102,6 +106,7 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(rootMotionBoneName, rootMotionBoneNameLabel);
 			EditorGUILayout.PropertyField(transformPositionX, transformPositionXLabel);
 			EditorGUILayout.PropertyField(transformPositionY, transformPositionYLabel);
+			EditorGUILayout.PropertyField(transformRotation, transformRotationLabel);
 
 			EditorGUILayout.PropertyField(rootMotionScaleX, rootMotionScaleXLabel);
 			EditorGUILayout.PropertyField(rootMotionScaleY, rootMotionScaleYLabel);
@@ -119,6 +124,20 @@ namespace Spine.Unity.Editor {
 			}
 
 			EditorGUILayout.PropertyField(rigidBody, rigidBodyLabel);
+			DisplayWarnings();
+		}
+
+		protected void DisplayWarnings () {
+			bool usesRigidbodyPhysics = rigidBody.objectReferenceValue != null || rigidBody2D.objectReferenceValue != null;
+			if (usesRigidbodyPhysics) {
+				var rootMotionComponent = (SkeletonRootMotionBase)serializedObject.targetObject;
+				var skeletonComponent = rootMotionComponent ? rootMotionComponent.TargetSkeletonAnimationComponent : null;
+				if (skeletonComponent != null && skeletonComponent.UpdateTiming == UpdateTiming.InUpdate) {
+					string warningMessage = "Skeleton component uses 'Advanced - Animation Update' mode 'In Update'.\n" +
+						"When using a Rigidbody, 'In FixedUpdate' is recommended instead.";
+					EditorGUILayout.HelpBox(warningMessage, MessageType.Warning, true);
+				}
+			}
 		}
 	}
 }

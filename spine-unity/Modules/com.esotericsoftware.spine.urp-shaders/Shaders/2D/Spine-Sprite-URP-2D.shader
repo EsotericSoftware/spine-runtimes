@@ -88,7 +88,6 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 
 			#pragma fragmentoption ARB_precision_hint_fastest
 			#pragma multi_compile _ PIXELSNAP_ON
-			#pragma multi_compile _ ETC1_EXTERNAL_ALPHA
 
 			//--------------------------------------
 			// GPU Instancing
@@ -132,7 +131,6 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 			#pragma shader_feature _ALPHA_CLIP
 
 			#pragma multi_compile _ PIXELSNAP_ON
-			#pragma multi_compile _ ETC1_EXTERNAL_ALPHA
 
 			//--------------------------------------
 			// GPU Instancing
@@ -149,7 +147,28 @@ Shader "Universal Render Pipeline/2D/Spine/Sprite"
 			ENDHLSL
 		}
 
-		UsePass "Universal Render Pipeline/2D/Spine/Skeleton Lit/UNLIT"
+		Pass
+		{
+			Name "Unlit"
+			Tags { "LightMode" = "UniversalForward" "Queue" = "Transparent" "RenderType" = "Transparent"}
+
+			ZWrite Off
+			Cull Off
+			Blend One OneMinusSrcAlpha
+
+			HLSLPROGRAM
+			#pragma shader_feature _ _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON _ALPHAPREMULTIPLY_VERTEX_ONLY _ADDITIVEBLEND _ADDITIVEBLEND_SOFT _MULTIPLYBLEND _MULTIPLYBLEND_X2
+			#if defined(_ALPHAPREMULTIPLY_VERTEX_ONLY) || defined(_ALPHABLEND_ON)
+			#define _STRAIGHT_ALPHA_INPUT
+			#endif
+
+			#pragma prefer_hlslcc gles
+			#pragma vertex UnlitVertex
+			#pragma fragment UnlitFragment
+
+			#include "Include/Spine-SkeletonLit-UnlitPass-URP-2D.hlsl"
+			ENDHLSL
+		}
 	}
 
 	FallBack "Universal Render Pipeline/2D/Spine/Skeleton Lit"

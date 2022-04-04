@@ -1,0 +1,33 @@
+{
+	"name": "com.esotericsoftware.spine.spine-csharp-tests",
+	"displayName": "spine-csharp Runtime Tests",
+	"description": "This plugin provides tests for the spine-csharp core runtime.",
+	"version": "4.1.0",
+	"unity": "2018.3",
+	"author": {
+		"name": "Esoteric Software",
+		"email": "contact@esotericsoftware.com",
+		"url": "http://esotericsoftware.com/"
+	},
+	"dependencies": {
+		"com.esotericsoftware.spine.spine-csharp": "4.1.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:EsotericSoftware/spine-runtimes.git"
+	},
+	"keywords": [
+		"spine",
+		"spine-csharp",
+		"runtimes",
+		"tests",
+		"2d",
+		"skeletal",
+		"animation"
+	],
+	"license": "SEE LICENSE IN LICENSE",
+	"bugs": {
+		"url": "https://github.com/EsotericSoftware/spine-runtimes/issues"
+	},
+	"homepage": "https://github.com/EsotericSoftware/spine-runtimes#readme"
+}

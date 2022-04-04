@@ -200,7 +200,7 @@ static bool handlerQueued = false;
 		switch (slot->attachment->type) {
 		case SP_ATTACHMENT_REGION: {
 			spRegionAttachment* attachment = (spRegionAttachment*)slot->attachment;
-			spRegionAttachment_computeWorldVertices(attachment, slot->bone, vertices, 0, 2);
+			spRegionAttachment_computeWorldVertices(attachment, slot, vertices, 0, 2);
 			texture = [self getTextureForRegion:attachment];
 			uvs = attachment->uvs;
 			verticesCount = 8;

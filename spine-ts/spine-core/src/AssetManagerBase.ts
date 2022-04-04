@@ -32,7 +32,7 @@ import { TextureAtlas } from "./TextureAtlas";
 import { Disposable, StringMap } from "./Utils";
 
 export class AssetManagerBase implements Disposable {
-	private pathPrefix: string;
+	private pathPrefix: string = null;
 	private textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture;
 	private downloader: Downloader;
 	private assets: StringMap<any> = {};
@@ -63,6 +63,21 @@ export class AssetManagerBase implements Disposable {
 		this.loaded++;
 		this.errors[path] = message;
 		if (callback) callback(path, message);
+	}
+
+	loadAll () {
+		let promise = new Promise((resolve: (assetManager: AssetManagerBase) => void, reject: (errors: StringMap<string>) => void) => {
+			let check = () => {
+				if (this.isLoadingComplete()) {
+					if (this.hasErrors()) reject(this.errors);
+					else resolve(this);
+					return;
+				}
+				requestAnimationFrame(check);
+			}
+			requestAnimationFrame(check);
+		});
+		return promise;
 	}
 
 	setRawDataURI (path: string, data: string) {
@@ -138,7 +153,8 @@ export class AssetManagerBase implements Disposable {
 
 	loadTextureAtlas (path: string,
 		success: (path: string, atlas: TextureAtlas) => void = null,
-		error: (path: string, message: string) => void = null
+		error: (path: string, message: string) => void = null,
+		fileAlias: { [keyword: string]: string } = null
 	) {
 		let index = path.lastIndexOf("/");
 		let parent = index >= 0 ? path.substring(0, index + 1) : "";
@@ -149,7 +165,7 @@ export class AssetManagerBase implements Disposable {
 				let atlas = new TextureAtlas(atlasText);
 				let toLoad = atlas.pages.length, abort = false;
 				for (let page of atlas.pages) {
-					this.loadTexture(parent + page.name,
+					this.loadTexture(fileAlias == null ? parent + page.name : fileAlias[page.name],
 						(imagePath: string, texture: Texture) => {
 							if (!abort) {
 								page.setTexture(texture);
@@ -308,7 +324,7 @@ export class Downloader {
 			this.finish(url, request.status, request.response);
 		};
 		request.onload = () => {
-			if (request.status == 200)
+			if (request.status == 200 || request.status == 0)
 				this.finish(url, 200, new Uint8Array(request.response as ArrayBuffer));
 			else
 				onerror();
@@ -330,7 +346,7 @@ export class Downloader {
 	private finish (url: string, status: number, data: any) {
 		let callbacks = this.callbacks[url];
 		delete this.callbacks[url];
-		let args = status == 200 ? [data] : [status, data];
+		let args = status == 200 || status == 0 ? [data] : [status, data];
 		for (let i = args.length - 1, n = callbacks.length; i < n; i += 2)
 			callbacks[i].apply(null, args);
 	}

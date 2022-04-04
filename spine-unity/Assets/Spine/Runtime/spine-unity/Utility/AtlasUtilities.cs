@@ -193,18 +193,15 @@ namespace Spine.Unity.AttachmentTools {
 			region.index = -1;
 			region.degrees = s.packed && s.packingRotation != SpritePackingRotation.None ? 90 : 0;
 
-			// World space units
-			Bounds bounds = s.bounds;
-			Vector2 boundsMin = bounds.min, boundsMax = bounds.max;
-
 			// Texture space/pixel units
-			Rect spineRect = s.rect.SpineUnityFlipRect(s.texture.height);
+			Rect spineRect = s.textureRect.SpineUnityFlipRect(s.texture.height);
+			Rect originalRect = s.rect;
 			region.width = (int)spineRect.width;
-			region.originalWidth = (int)spineRect.width;
+			region.originalWidth = (int)originalRect.width;
 			region.height = (int)spineRect.height;
-			region.originalHeight = (int)spineRect.height;
-			region.offsetX = spineRect.width * (0.5f - InverseLerp(boundsMin.x, boundsMax.x, 0));
-			region.offsetY = spineRect.height * (0.5f - InverseLerp(boundsMin.y, boundsMax.y, 0));
+			region.originalHeight = (int)originalRect.height;
+			region.offsetX = s.textureRectOffset.x;
+			region.offsetY = s.textureRectOffset.y;
 
 			if (isolatedTexture) {
 				region.u = 0;
@@ -351,10 +348,10 @@ namespace Spine.Unity.AttachmentTools {
 			for (int attachmentIndex = 0, n = sourceAttachments.Count; attachmentIndex < n; attachmentIndex++) {
 				var originalAttachment = sourceAttachments[attachmentIndex];
 
-				if (originalAttachment is IHasRendererObject) {
+				if (originalAttachment is IHasTextureRegion) {
 					var originalMeshAttachment = originalAttachment as MeshAttachment;
 					Attachment newAttachment = (originalMeshAttachment != null) ? originalMeshAttachment.NewLinkedMesh() : originalAttachment.Copy();
-					var region = ((IHasRendererObject)newAttachment).RendererObject as AtlasRegion;
+					var region = ((IHasTextureRegion)newAttachment).Region as AtlasRegion;
 					int existingIndex;
 					if (existingRegions.TryGetValue(region, out existingIndex)) {
 						regionIndices.Add(existingIndex);
@@ -428,9 +425,12 @@ namespace Spine.Unity.AttachmentTools {
 
 			// Map the cloned attachments to the repacked atlas.
 			for (int i = 0, n = outputAttachments.Count; i < n; i++) {
-				var a = outputAttachments[i];
-				if (a is IHasRendererObject)
-					a.SetRegion(repackedRegions[regionIndices[i]]);
+				Attachment attachment = outputAttachments[i];
+				var iHasRegion = attachment as IHasTextureRegion;
+				if (iHasRegion != null) {
+					iHasRegion.Region = repackedRegions[regionIndices[i]];
+					iHasRegion.UpdateRegion();
+				}
 			}
 
 			// Clean up.
@@ -650,7 +650,7 @@ namespace Spine.Unity.AttachmentTools {
 		}
 
 		static bool IsRenderable (Attachment a) {
-			return a is IHasRendererObject;
+			return a is IHasTextureRegion;
 		}
 
 		/// <summary>
@@ -676,10 +676,7 @@ namespace Spine.Unity.AttachmentTools {
 		/// <summary>
 		/// Returns a Rect of the AtlasRegion according to Spine texture coordinates. (x-right, y-down)</summary>
 		static Rect GetSpineAtlasRect (this AtlasRegion region, bool includeRotate = true) {
-			if (includeRotate && (region.degrees == 90 || region.degrees == 270))
-				return new Rect(region.x, region.y, region.height, region.width);
-			else
-				return new Rect(region.x, region.y, region.width, region.height);
+			return new Rect(region.x, region.y, region.packedWidth, region.packedHeight);
 		}
 
 		/// <summary>
@@ -708,25 +705,17 @@ namespace Spine.Unity.AttachmentTools {
 			var tr = UVRectToTextureRect(uvRect, page.width, page.height);
 			var rr = tr.SpineUnityFlipRect(page.height);
 
-			int x = (int)rr.x, y = (int)rr.y;
-			int w, h;
-			if (referenceRegion.degrees == 90 || referenceRegion.degrees == 270) {
-				w = (int)rr.height;
-				h = (int)rr.width;
-			} else {
-				w = (int)rr.width;
-				h = (int)rr.height;
-			}
-
+			int x = (int)rr.x;
+			int y = (int)rr.y;
+			int w = (int)rr.width;
+			int h = (int)rr.height;
+			// Note: originalW and originalH need to be scaled according to the
+			// repacked width and height, repacking can mess with aspect ratio, etc.
 			int originalW = Mathf.RoundToInt((float)w * ((float)referenceRegion.originalWidth / (float)referenceRegion.width));
 			int originalH = Mathf.RoundToInt((float)h * ((float)referenceRegion.originalHeight / (float)referenceRegion.height));
+
 			int offsetX = Mathf.RoundToInt((float)referenceRegion.offsetX * ((float)w / (float)referenceRegion.width));
 			int offsetY = Mathf.RoundToInt((float)referenceRegion.offsetY * ((float)h / (float)referenceRegion.height));
-
-			if (referenceRegion.degrees == 270) {
-				w = (int)rr.width;
-				h = (int)rr.height;
-			}
 
 			float u = uvRect.xMin;
 			float u2 = uvRect.xMax;

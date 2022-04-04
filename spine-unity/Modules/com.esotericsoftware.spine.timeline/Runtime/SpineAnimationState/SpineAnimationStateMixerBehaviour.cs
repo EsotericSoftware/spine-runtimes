@@ -62,10 +62,8 @@ namespace Spine.Unity.Playables {
 		}
 
 		public override void OnGraphStop (Playable playable) {
-			if (endAtClipEnd)
+			if (!isPaused && endAtClipEnd)
 				HandleClipEnd();
-			else if (isPaused) // stop event occurred after pause, so resume again
-				HandleResume(playable);
 		}
 
 		public override void OnBehaviourPlay (Playable playable, FrameData info) {
@@ -75,7 +73,7 @@ namespace Spine.Unity.Playables {
 		}
 
 		protected void HandlePause (Playable playable) {
-			if (animationStateComponent == null) return;
+			if (animationStateComponent.IsNullOrDestroyed()) return;
 
 			TrackEntry current = animationStateComponent.AnimationState.GetCurrent(trackIndex);
 			if (current != null && current == timelineStartedTrackEntry) {
@@ -86,7 +84,7 @@ namespace Spine.Unity.Playables {
 		}
 
 		protected void HandleResume (Playable playable) {
-			if (animationStateComponent == null) return;
+			if (animationStateComponent.IsNullOrDestroyed()) return;
 
 			TrackEntry current = animationStateComponent.AnimationState.GetCurrent(trackIndex);
 			if (current != null && current == pausedTrackEntry) {
@@ -95,6 +93,8 @@ namespace Spine.Unity.Playables {
 		}
 
 		protected void HandleClipEnd () {
+			if (animationStateComponent.IsNullOrDestroyed()) return;
+
 			var state = animationStateComponent.AnimationState;
 			if (endAtClipEnd &&
 				timelineStartedTrackEntry != null &&
@@ -114,7 +114,7 @@ namespace Spine.Unity.Playables {
 			var skeletonGraphic = playerData as SkeletonGraphic;
 			animationStateComponent = playerData as IAnimationStateComponent;
 			var skeletonComponent = playerData as ISkeletonComponent;
-			if (animationStateComponent == null || skeletonComponent == null) return;
+			if (animationStateComponent.IsNullOrDestroyed() || skeletonComponent == null) return;
 
 			var skeleton = skeletonComponent.Skeleton;
 			var state = animationStateComponent.AnimationState;
@@ -128,6 +128,7 @@ namespace Spine.Unity.Playables {
 			}
 
 			int inputCount = playable.GetInputCount();
+			float rootSpeed = GetRootPlayableSpeed(playable);
 
 			// Ensure correct buffer size.
 			if (this.lastInputWeights == null || this.lastInputWeights.Length < inputCount) {
@@ -172,27 +173,30 @@ namespace Spine.Unity.Playables {
 				endMixOutDuration = clipData.endMixOutDuration;
 
 				if (clipData.animationReference == null) {
-					float mixDuration = clipData.customDuration ? clipData.mixDuration : state.Data.DefaultMix;
+					float mixDuration = clipData.customDuration ? GetCustomMixDuration(clipData) : state.Data.DefaultMix;
 					state.SetEmptyAnimation(trackIndex, mixDuration);
 				} else {
 					if (clipData.animationReference.Animation != null) {
 						TrackEntry currentEntry = state.GetCurrent(trackIndex);
 						Spine.TrackEntry trackEntry;
-						if (currentEntry == null && (clipData.customDuration && clipData.mixDuration > 0)) {
+						float customMixDuration = clipData.customDuration ? GetCustomMixDuration(clipData) : 0.0f;
+						if (currentEntry == null && customMixDuration > 0) {
 							state.SetEmptyAnimation(trackIndex, 0); // ease in requires empty animation
 							trackEntry = state.AddAnimation(trackIndex, clipData.animationReference.Animation, clipData.loop, 0);
 						} else
 							trackEntry = state.SetAnimation(trackIndex, clipData.animationReference.Animation, clipData.loop);
 
+						float clipSpeed = (float)clipPlayable.GetSpeed();
 						trackEntry.EventThreshold = clipData.eventThreshold;
 						trackEntry.DrawOrderThreshold = clipData.drawOrderThreshold;
-						trackEntry.TrackTime = (float)clipPlayable.GetTime() * (float)clipPlayable.GetSpeed();
-						trackEntry.TimeScale = (float)clipPlayable.GetSpeed();
+						trackEntry.TrackTime = (float)clipPlayable.GetTime() * clipSpeed * rootSpeed;
+						trackEntry.TimeScale = clipSpeed * rootSpeed;
 						trackEntry.AttachmentThreshold = clipData.attachmentThreshold;
 						trackEntry.HoldPrevious = clipData.holdPrevious;
+						trackEntry.Alpha = clipData.alpha;
 
 						if (clipData.customDuration)
-							trackEntry.MixDuration = clipData.mixDuration;
+							trackEntry.MixDuration = customMixDuration / rootSpeed;
 
 						timelineStartedTrackEntry = trackEntry;
 					}
@@ -223,9 +227,10 @@ namespace Spine.Unity.Playables {
 			SkeletonAnimation skeletonAnimation, SkeletonGraphic skeletonGraphic) {
 
 			if (Application.isPlaying) return;
-			if (skeletonComponent == null || animationStateComponent == null) return;
+			if (animationStateComponent.IsNullOrDestroyed() || skeletonComponent == null) return;
 
 			int inputCount = playable.GetInputCount();
+			float rootSpeed = GetRootPlayableSpeed(playable);
 			int lastNonZeroWeightTrack = -1;
 
 			for (int i = 0; i < inputCount; i++) {
@@ -255,12 +260,12 @@ namespace Spine.Unity.Playables {
 					var fromClip = (ScriptPlayable<SpineAnimationStateBehaviour>)playable.GetInput(lastNonZeroWeightTrack - 1);
 					var fromClipData = fromClip.GetBehaviour();
 					fromAnimation = fromClipData.animationReference != null ? fromClipData.animationReference.Animation : null;
-					fromClipTime = (float)fromClip.GetTime() * (float)fromClip.GetSpeed();
+					fromClipTime = (float)fromClip.GetTime() * (float)fromClip.GetSpeed() * rootSpeed;
 					fromClipLoop = fromClipData.loop;
 				}
 
 				Animation toAnimation = clipData.animationReference != null ? clipData.animationReference.Animation : null;
-				float toClipTime = (float)inputPlayableClip.GetTime() * (float)inputPlayableClip.GetSpeed();
+				float toClipTime = (float)inputPlayableClip.GetTime() * (float)inputPlayableClip.GetSpeed() * rootSpeed;
 				float mixDuration = clipData.mixDuration;
 
 				if (!clipData.customDuration && fromAnimation != null && toAnimation != null) {
@@ -285,6 +290,7 @@ namespace Spine.Unity.Playables {
 						if (toAnimation != null) {
 							toEntry = dummyAnimationState.SetAnimation(0, toAnimation, clipData.loop);
 							toEntry.HoldPrevious = clipData.holdPrevious;
+							toEntry.Alpha = clipData.alpha;
 						}
 					}
 
@@ -300,20 +306,48 @@ namespace Spine.Unity.Playables {
 					dummyAnimationState.Apply(skeleton);
 				} else {
 					if (toAnimation != null)
-						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, null, 1f, MixBlend.Setup, MixDirection.In);
+						toAnimation.Apply(skeleton, 0, toClipTime, clipData.loop, null, clipData.alpha, MixBlend.Setup, MixDirection.In);
 				}
-				skeleton.UpdateWorldTransform();
 
-				if (skeletonAnimation)
+				if (skeletonAnimation) {
+					skeletonAnimation.Update(0);
 					skeletonAnimation.LateUpdate();
-				else if (skeletonGraphic)
+				} else if (skeletonGraphic) {
+					skeletonGraphic.Update(0);
 					skeletonGraphic.LateUpdate();
+				}
 			}
 			// Do nothing outside of the first clip and the last clip.
 
 		}
 #endif
+		float GetRootPlayableSpeed (Playable playable) {
+			PlayableGraph graph = playable.GetGraph();
+			int rootPlayableCount = graph.GetRootPlayableCount();
+			if (rootPlayableCount == 1)
+				return (float)graph.GetRootPlayable(0).GetSpeed();
+			else {
+				for (int rootIndex = 0; rootIndex < rootPlayableCount; ++rootIndex) {
+					var rootPlayable = graph.GetRootPlayable(rootIndex);
+					for (int i = 0, n = rootPlayable.GetInputCount(); i < n; ++i) {
+						var playableChild = rootPlayable.GetInput(i);
+						if (playableChild.Equals(playable)) {
+							return (float)rootPlayable.GetSpeed();
+						}
+					}
+				}
+			}
+			return 1.0f;
+		}
 
+		float GetCustomMixDuration (SpineAnimationStateBehaviour clipData) {
+			if (clipData.useBlendDuration) {
+				TimelineClip clip = clipData.timelineClip;
+				return (float)Math.Max(clip.blendInDuration, clip.easeInDuration);
+			} else {
+				return clipData.mixDuration;
+			}
+		}
 	}
 
 }

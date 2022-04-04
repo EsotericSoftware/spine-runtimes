@@ -1,3 +1,142 @@
+# 4.1
+
+## C
+* **Additions**
+  * Support for sequences.
+  * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
+  * Added CMake parameter `SPINE_SANITIZE` which will enable sanitizers on macOS and Linux.
+  * Added `SPINE_MAJOR_VERSION`, `SPINE_MINOR_VERSION`, and `SPINE_VERSION_STRING`. Parsing skeleton .JSON and .skel files will report an error if the skeleton version does not match the runtime version.
+* **Breaking changes**
+  * `spRegionAttachment` and `spMeshAttachment` now contain a `spTextureRegion*` instead of encoding region fields directly.
+  * `sp_AttachmentLoader_newRegionAttachment()` and `spAttachmentLoader_newMeshAttachment()` now take an additional `Sequence*` parameter.
+  * `spMeshAttachment_updateUVs()` was renamed to `spMeshAttachment_updateRegion()`.
+  * `spRegionAttachment_updateOffset()` was renamed to `spRegionAttachment_updateRegion()`, `spRegionAttachment_setUVs()` was merged into `spRegionAttachment_updateRegion()`.
+  * `spSlot_getAttachmentTime()` and `spSlot_setAttachmentTime()` have been removed.
+  * `spVertexAttachment->deformAttachment` was renamed to `spVertexAttachment->timelineAttachment`.
+  * `spSkeleton_update()` has been removed.
+  * `spSkeleton->time` has been removed.
+
+### SFML
+  * Updated example to use SFML 2.5.1.
+  * Added dragon example.
+
+## C++
+* **Additions**
+  * Support for sequences.
+  * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
+  * Added CMake parameter `SPINE_SANITIZE` which will enable sanitizers on macOS and Linux.
+    * Added `SPINE_MAJOR_VERSION`, `SPINE_MINOR_VERSION`, and `SPINE_VERSION_STRING`. Parsing skeleton .JSON and .skel files will report an error if the skeleton version does not match the runtime version.
+* **Breaking changes**
+  * `RegionAttachment` and `MeshAttachment` now contain a `TextureRegion*` instead of encoding region fields directly.
+  * `AttachmentLoader::newRegionAttachment()` and `AttachmentLoader::newMeshAttachment()` now take an additional `Sequence*` parameter.
+  * `MeshAttachment::updateUVs()` was renamed to `MeshAttachment::updateRegion()`.
+  * `RegionAttachment::updateOffset()` was renamed to `RegionAttachment::updateRegion()`, `RegionAttachment::setUVs()` was merged into `updateRegion()`.
+  * `Slot::getAttachmentTime()` and `Slot::setAttachmentTime()` have been removed.
+  * `VertexAttachment::getDeformAttachment()` was renamed to `VertexAttachment::getTimelineAttachment()`.
+  * `Skeleton::update()` has been removed.
+  * `Skeleton::getTime()` has been removed.
+  
+### Cocos2d-x
+
+### SFML
+  * Updated example to use SFML 2.5.1.
+  * Added dragon example.
+
+### UE4
+  * Updated example project to UE 4.27
+
+## C# ##
+
+* **Additions**
+  * Full support for sequences.
+  * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
+  * `RegionAttachment` and `MeshAttachment` now provide a `Region` property. Use this property instead of the removed `RendererObject` property (see section *Breaking Changes* below).
+
+* **Breaking changes**
+  * Removed `RendererObject` property from `RegionAttachment` and `MeshAttachment`. Use `attachment.Region` property instead. Removed removed `IHasRendererObject` interface. Use `IHasTextureRegion` instead.
+  * Replaced `RegionAttachment.UpdateOffset` and `MeshAttachment.UpdateUVs` with `Attachment.UpdateRegion`. The caller must ensure that the attachment's region is not `null`.
+  * Removed `AttachmentRegionExtensions` methods `Attachment.SetRegion`, `MeshAttachment.SetRegion` and `RegionAttachment.SetRegion(region, update)`. Use `attachment.Region = region; if (update) attachment.UpdateRegion()` instead.
+  * `AttachmentLoader.NewRegionAttachment()` and `AttachmentLoader.NewMeshAttachment()` take an additional `Sequence` parameter.
+  * `VertexAttachment.DeformAttachment` property has been replaced with `VertexAttachment.TimelineAttachment`.
+  * `RegionAttachment.ComputeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
+  * Removed `Skeleton.Update(float deltaTime)` method.
+  * Removed `Slot.AttachmentTime` property.
+  * Removed extension method `AtlasRegion.GetSpineAtlasRect()` parameter `includeRotate` (with default value `true`). Most likely this method was never used with `includeRotate=false` in user code so no changes are required.
+  * `AtlasRegion.PackedWidth` and `AtlasRegion.PackedHeight` are swapped compared to 4.0 when packing rotation is equal to 90 degrees. Most likely this property was never accessed in user code so no changes are required.
+
+### Unity
+
+* **Officially supported Unity versions are 2017.1-2021.1**.
+
+* **Additions**
+  * `SpineAtlasAsset.CreateRuntimeInstance` methods now provide an optional `newCustomTextureLoader` parameter (defaults to `null`) which can be set to e.g. `(a) => new YourCustomTextureLoader(a)` to use your own `TextureLoader` subclass instead of `MaterialsTextureLoader`.
+  * `SkeletonAnimation`, `SkeletonMecanim` and `SkeletonGraphic` now provide an Inspector parameter `Advanced` - `Animation Update` with modes `In Update` **(previous behaviour, the default)**, `In FixedUpdate` and `Manual Update`. This allows to update animation in `FixedUpdate` when using the `SkeletonRootMotion` component (which is the recommended combination now, issuing a warning otherwise). The reason is that when root motion leads to a collision with a physics collider, it can introduce jittery excess movement when updating animation in `Update` due to more `Update` calls following a single `FixedUpdate` call.
+  * Added `SkeletonRootMotion` properties `PreviousRigidbodyRootMotion` and `AdditionalRigidbody2DMovement`. Setting or querying these movement vectors can be necessary when multiple scripts call `Rigidbody2D.MovePosition` on the same object where the last call overwrites the effect of preceding ones.
+  * `BoneFollower` and `BoneFollowerGraphic` now provide an additional `Follow Parent World Scale` parameter to allow following simple scale of parent bones (rotated/skewed scale can't be supported).
+  * Improved `Advanced - Fix Prefab Override MeshFilter` property for `SkeletonRenderer` (and subclasses`SkeletonAnimation` and `SkeletonMecanim`), now providing an additional option to use a global value which can be set in `Edit - Preferences - Spine`.
+  * Timeline naming improvements: `Spine AnimationState Clip` Inspector parameter `Custom Duration` changed and inverted to `Default Mix Duration` for more clarity. Shortened all Timeline add track menu entries from: `Spine.Unity.Playables - <track type>` to `Spine - <track type>`, `Spine Animation State Track` to `SkeletonAnimation Track`, `Spine AnimationState Graphic Track` to `SkeletonGraphic Track`, and `Spine Skeleton Flip Track` to `Skeleton Flip Track`.
+  * Timeline track appearance and Inspector: Tracks now show icons and track colors to make them easier to distinguish. When a Track is selected, the Inspector now shows an editable track name which was previously only editable at the Timeline asset.
+  * Added example component `SkeletonRenderTexture` to render a `SkeletonRenderer` to a `RenderTexture`, mainly for proper transparency. Added an example scene named `RenderTexture FadeOut Transparency` that demonstrates usage for a fadeout transparency effect.
+  * Added another fadeout example component named `SkeletonRenderTextureFadeout` which takes over transparency fadeout when enabled. You can use this component as-is, attach it in disabled state and enable it to start a fadeout effect.
+  * Timeline clips now offer an additional `Alpha` parameter for setting a custom constant mix alpha value other than 1.0, just as `TrackEntry.Alpha`. Defaults to 1.0.
+
+* **Breaking changes**
+
+* **Changes of default values**
+
+* **Deprecated**
+
+* **Restructuring (Non-Breaking)**
+
+### XNA/MonoGame
+* **Breaking change**: Removed spine-xna in favor of spine-monogame. See https://github.com/EsotericSoftware/spine-runtimes/issues/1949
+* Added new spine-monogame solution. See [spine-monogame/README.md](spine-monogame/README.md) for updated instructions on how to use spine-monogame.
+
+## Java
+* **Additions**
+  * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
+  * Support for sequences.
+* **Breaking changes**
+  * `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.
+  * `Slot#setAttachmentTime()` and `Slot#getAttachmentTime()` have been removed.
+  * `VertexAttachment#setDeformAttachment()` and `VertexAttachment#getDeformAttachment()` have been replaced with `VertexAttachment#setTimelineAttachment()` and `VertexAttachment#getTimelineAttachment()`.
+  * `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The caller must ensure that the attachment's region is not `null`.
+  * `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
+
+
+### libGDX
+* `spine-libgdx`, `spine-libgdx-tests`, and `spine-skeletonviewer` are now fully Gradle-ified.
+* `spine-skeletonviewer` now supports quickly loading skeletons by dragging and dropping `.json` or `.skel` skeleton files onto the window.
+
+## Typescript/Javascript
+* **Additions**
+  * full support for sequences.
+  * Added `Promise` based `AssetManager.loadAll()`. Allows synchronous waiting via `await assetManager.loadAll()`, simplifying loader logic in applications.
+  * Support for `shortestRotation` in animation state. See https://github.com/esotericsoftware/spine-runtimes/issues/2027.
+  * Full support for sequences.
+* **Breaking changes**
+  * `AttachmentLoader#newRegionAttachment()` and `AttachmentLoader#newMeshAttachment()` take an additional `Sequence` parameter.
+  * `Slot#attachmentTime` and has been removed.
+  * `VertexAttachment#deformAttachment` has been replaced with `VertexAttachment#timelineAttachment`.
+  * `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The caller must ensure that the attachment's region is not `null`.
+  * `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
+  * Removed `PlayerEditor`.
+
+### WebGL backend
+  * `PolygonBatcher.start()` now disables culling and restores the previous state on `PolygonBatcher.end()`.
+  * Added `SpineCanvas`, a simpler way to render a scene via spine-webgl. See `spine-ts/spine-webgl/examples/barebones.html` and `spine-ts/spine-webgl/examples/mix-and-match.html`.
+
+### Canvas backend
+  * Improved example.
+
+### Three.js backend
+  * Added orbital controls to THREJS example.
+  * `SkeletonMesh` takes an optional `SkeletonMeshMaterialCustomizer`, allowing modification of materials used by `SkeletonMesh`.
+  * Added `SkeletonMeshMaterial.alphaTest`, when > 0, alpha testing will be performed and fragments will not be written to the depth buffer, if depth writes are enabled. 
+
+### Player
+  * Added `SpinePlayer.dispose()` to explicitely dispose of all resources the player holds on to.
+
 # 4.0
 
 ## AS3
@@ -63,7 +202,7 @@
 * Generated normals are now correctly flipped for back faces.
 * Modifying parent materials updates material instances accordingly.
 * Only `.json` files that are actually encoding Spine skeletons will be loaded. Other `.json` files will be left to other importers.
-* Updated example project to UE 4.25.
+* Updated example project to UE 4.27.
 
 
 ## C# ##
@@ -110,7 +249,7 @@
   * Fixed Timeline not pausing (and resuming) clip playback on Director pause, this is now the default behaviour. If you require the old behaviour (e.g. to continue playing an idle animation during Director pause), there is now an additional parameter `Don't Pause with Director` provided that can be enabled for each Timeline clip.
   * Fixed Timeline `Spine AnimationState Clips` ignoring empty space on the Timeline after a clip's end. Timeline clips now also offer `Don't End with Clip` and `Clip End Mix Out Duration` parameters if you prefer the old behaviour of previous versions. By default when empty space follows the clip on the timeline, the empty animation is set on the track with a MixDuration of `Clip End Mix Out Duration`. Set `Don't End with Clip` to `true` to continue playing the clip's animation instead and mimic the old 3.8 behaviour. If you prefer pausing the animation instead of mixing out to the empty animation, set `Clip End Mix Out Duration` to a value less than 0, then the animation is paused instead.
 
-* **Additions**
+* **Additions and Improvements**
   * Additional **Fix Draw Order** parameter at SkeletonRenderer, defaults to `disabled` (previous behaviour).
     Applies only when 3+ submeshes are used (2+ materials with alternating order, e.g. "A B A").
 		If `true`, MaterialPropertyBlocks are assigned at each material to prevent aggressive batching of submeshes
@@ -159,6 +298,13 @@
   * Prefabs containing `SkeletonRenderer`, `SkeletonAnimation` and `SkeletonMecanim` now provide a proper Editor preview, including the preview thumbnail.
   * `SkeletonRenderer` (and subclasses`SkeletonAnimation` and `SkeletonMecanim`) now provide a property `Advanced - Fix Prefab Override MeshFilter`, which when enabled fixes the prefab always being marked as changed. It sets the MeshFilter's hide flags to `DontSaveInEditor`. Unfortunately this comes at the cost of references to the `MeshFilter` by other components being lost, therefore this parameter defaults to `false` to keep the safe existing behaviour.
   * `BoundingBoxFollower` and `BoundingBoxFollowerGraphic` now provide previously missing `usedByEffector` and `usedByComposite` parameters to be set at all generated colliders.
+  * `BoneFollower` and `BoneFollowerGraphic` now provide an additional `Follow Parent World Scale` parameter to allow following simple scale of parent bones (rotated/skewed scale can't be supported).
+  * Improved `Advanced - Fix Prefab Override MeshFilter` property for `SkeletonRenderer` (and subclasses`SkeletonAnimation` and `SkeletonMecanim`), now providing an additional option to use a global value which can be set in `Edit - Preferences - Spine`.
+  * Timeline naming improvements: `Spine AnimationState Clip` Inspector parameter `Custom Duration` changed and inverted to `Default Mix Duration` for more clarity. Shortened all Timeline add track menu entries from: `Spine.Unity.Playables - <track type>` to `Spine - <track type>`, `Spine Animation State Track` to `SkeletonAnimation Track`, `Spine AnimationState Graphic Track` to `SkeletonGraphic Track`, and `Spine Skeleton Flip Track` to `Skeleton Flip Track`.
+  * Timeline track appearance and Inspector: Tracks now show icons and track colors to make them easier to distinguish. When a Track is selected, the Inspector now shows an editable track name which was previously only editable at the Timeline asset.
+  * Added example component `SkeletonRenderTexture` to render a `SkeletonRenderer` to a `RenderTexture`, mainly for proper transparency. Added an example scene named `RenderTexture FadeOut Transparency` that demonstrates usage for a fadeout transparency effect.
+  * Added another fadeout example component named `SkeletonRenderTextureFadeout` which takes over transparency fadeout when enabled. You can use this component as-is, attach it in disabled state and enable it to start a fadeout effect.
+  * Timeline clips now offer an additional `Alpha` parameter for setting a custom constant mix alpha value other than 1.0, just as `TrackEntry.Alpha`. Defaults to 1.0.
 
 * **Changes of default values**
 
@@ -232,6 +378,8 @@
 ### Three.js backend
 * `SkeletonMesh` now takes an optional `SkeletonMeshMaterialParametersCustomizer` function that allows you to modify the `ShaderMaterialParameters` before the material is finalized. Use it to modify things like THREEJS' `Material.depthTest` etc. See #1590.
 * **Breaking change:** the global object `spine.canvas` no longer exists. All classes and functions are now exposed on the global `spine` object directly. Simply replace any reference to `spine.threejs.` in your source code with `spine.`.
+* **Breaking change:** the default fragment shader of `SkeletonMeshMaterial` now explicitely discards fragments with alpha < 0.5. See https://github.com/EsotericSoftware/spine-runtimes/issues/1985
+* **Breaking change:** reversal of the previous breaking change: the default fragment shader of `SkeletonMeshMaterial` does no longer discard fragments with alpha < 0.5. Pass a `SkeletonMeshMaterialParametersCustomizer` to the `SkeletonMesh` constructor, and modify `parameters.alphaTest` to be > 0.
 
 ### Player
 * Added `SpinePlayerConfig.rawDataURIs`. Allows to embed data URIs for skeletons, atlases and atlas page images directly in the HTML/JS without needing to load it from a separate file. See the example for a demonstration.
@@ -240,6 +388,7 @@
 * Added `SpinePlayerConfig.draw`. If set, the callback is called each frame, just after the skeleton is drawn.
 * Added `SpinePlayerConfig.downloader`. The `spine.Downloader` instance can be shared between players so assets are only downloaded once.
 * If `SpinePlayerConfig.jsonURL` ends with an anchor, the anchor text is used to find the skeleton in the specified JSON file.
+* Added `SpinePlayer.dispose()`, disposes all CPU and GPU side resources, removes all listeners, and removes the player DOM from the parent.
 
 # 3.8
 
@@ -625,6 +774,8 @@
   * Added `MeshAttachment#newLinkedMesh()`, creates a linked mesh linkted to either the original mesh, or the parent of the original mesh.
   * Added IK softness.
   * Added `AssetManager.setRawDataURI(path, data)`. Allows to embed data URIs for skeletons, atlases and atlas page images directly in the HTML/JS without needing to load it from a separate file.
+  * Added `AssetManager.loadAll()` to allow Promise/async/await based waiting for completion of asset load. See the `spine-canvas` examples.
+  * Added `Skeleton.getBoundRect()` helper method to calculate the bouding rectangle of the current pose, returning the result as `{ x, y, width, height }`. Note that this method will create temporary objects which can add to garbage collection pressure.
 
 ### WebGL backend
 * `Input` can now take a partially defined implementation of `InputListener`.
@@ -867,6 +1018,7 @@ This will automatically:
   * Support for audio events, see `audioPath`, `volume` and `balance` fields on event (data).
   * `TrackEntry` has an additional field called `holdPrevious`. It can be used to counter act a limitation of `AnimationState` resulting in "dipping" of parts of the animation. For a full discussion of the problem and the solution we've implemented, see this [forum thread](http://esotericsoftware.com/forum/Probably-Easy-Animation-mixing-with-multiple-tracks-10682?p=48130&hilit=holdprevious#p48130).
   * Added `AssetManager#setRawDataURI(path, data)`. Allows to set raw data URIs for a specific path, which in turn enables embedding assets into JavaScript/HTML.
+  * `PolygonBatcher` will now disable `CULL_FACE` and restore the state as it was before rendering.
 
 ### WebGL backend
 * Added `VertexEffect` interface, instances of which can be set on `SkeletonRenderer`. Allows to modify vertices before submitting them to GPU. See `SwirlEffect`, `JitterEffect`, and the example which allows to set effects.

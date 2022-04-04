@@ -268,7 +268,8 @@ namespace Spine {
 				} else {
 					int[] timelineMode = current.timelineMode.Items;
 
-					bool firstFrame = current.timelinesRotation.Count != timelineCount << 1;
+					bool shortestRotation = current.shortestRotation;
+					bool firstFrame = !shortestRotation && current.timelinesRotation.Count != timelineCount << 1;
 					if (firstFrame) current.timelinesRotation.Resize(timelineCount << 1);
 					float[] timelinesRotation = current.timelinesRotation.Items;
 
@@ -276,7 +277,7 @@ namespace Spine {
 						Timeline timeline = timelines[ii];
 						MixBlend timelineBlend = timelineMode[ii] == AnimationState.Subsequent ? blend : MixBlend.Setup;
 						var rotateTimeline = timeline as RotateTimeline;
-						if (rotateTimeline != null)
+						if (!shortestRotation && rotateTimeline != null)
 							ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation,
 												ii << 1, firstFrame);
 						else if (timeline is AttachmentTimeline)
@@ -383,7 +384,8 @@ namespace Spine {
 				int[] timelineMode = from.timelineMode.Items;
 				TrackEntry[] timelineHoldMix = from.timelineHoldMix.Items;
 
-				bool firstFrame = from.timelinesRotation.Count != timelineCount << 1;
+				bool shortestRotation = from.shortestRotation;
+				bool firstFrame = !shortestRotation && from.timelinesRotation.Count != timelineCount << 1;
 				if (firstFrame) from.timelinesRotation.Resize(timelineCount << 1);
 				float[] timelinesRotation = from.timelinesRotation.Items;
 
@@ -419,7 +421,7 @@ namespace Spine {
 					}
 					from.totalAlpha += alpha;
 					var rotateTimeline = timeline as RotateTimeline;
-					if (rotateTimeline != null) {
+					if (!shortestRotation && rotateTimeline != null) {
 						ApplyRotateTimeline(rotateTimeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1,
 							firstFrame);
 					} else if (timeline is AttachmentTimeline) {
@@ -990,7 +992,7 @@ namespace Spine {
 
 		internal int trackIndex;
 
-		internal bool loop, holdPrevious, reverse;
+		internal bool loop, holdPrevious, reverse, shortestRotation;
 		internal float eventThreshold, attachmentThreshold, drawOrderThreshold;
 		internal float animationStart, animationEnd, animationLast, nextAnimationLast;
 		internal float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale = 1f;
@@ -1107,9 +1109,12 @@ namespace Spine {
 		}
 
 		/// <summary>
-		/// Uses <see cref="TrackEntry.TrackTime"/> to compute the <code>AnimationTime</code>, which is between <see cref="TrackEntry.AnimationStart"/>
-		/// and <see cref="TrackEntry.AnimationEnd"/>. When the <code>TrackTime</code> is 0, the <code>AnimationTime</code> is equal to the
-		/// <code>AnimationStart</code> time.
+		/// Uses <see cref="TrackEntry.TrackTime"/> to compute the <code>AnimationTime</code>. When the <code>TrackTime</code> is 0, the
+		/// <code>AnimationTime</code> is equal to the <code>AnimationStart</code> time.
+		/// <para>
+		/// The <code>animationTime</code> is between <see cref="AnimationStart"/> and <see cref="AnimationEnd"/>, except if this
+		/// track entry is non-looping and <see cref="AnimationEnd"/> is >= to the animation <see cref="Animation.Duration"/>, then
+		/// <code>animationTime</code> continues to increase past <see cref="AnimationEnd"/>.</para>
 		/// </summary>
 		public float AnimationTime {
 			get {
@@ -1118,7 +1123,8 @@ namespace Spine {
 					if (duration == 0) return animationStart;
 					return (trackTime % duration) + animationStart;
 				}
-				return Math.Min(trackTime + animationStart, animationEnd);
+				float animationTime = trackTime + animationStart;
+				return animationEnd >= animation.duration ? animationTime : Math.Min(animationTime, animationEnd);
 			}
 		}
 
@@ -1252,6 +1258,14 @@ namespace Spine {
 		/// <summary>
 		/// If true, the animation will be applied in reverse. Events are not fired when an animation is applied in reverse.</summary>
 		public bool Reverse { get { return reverse; } set { reverse = value; } }
+
+		/// <summary><para>
+		/// If true, mixing rotation between tracks always uses the shortest rotation direction. If the rotation is animated, the
+		/// shortest rotation direction may change during the mix.
+		/// </para><para>
+		/// If false, the shortest rotation direction is remembered when the mix starts and the same direction is used for the rest
+		/// of the mix. Defaults to false.</para></summary>
+		public bool ShortestRotation { get { return shortestRotation; } set { shortestRotation = value; } }
 
 		/// <summary>Returns true if this entry is for the empty animation. See <see cref="AnimationState.SetEmptyAnimation(int, float)"/>,
 		/// <see cref="AnimationState.AddEmptyAnimation(int, float, float)"/>, and <see cref="AnimationState.SetEmptyAnimations(float)"/>.

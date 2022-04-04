@@ -25,15 +25,13 @@ spotless {
                'spine-sfml/**/*.cpp',
                'spine-sfml/**/*.h',
                'spine-ue4/**/*.cpp',
-               'spine-ue4/**/*.h',
-               'spine-godot/spine_godot/**.h',
-               'spine-godot/spine_godot/**.cpp'
-        clangFormat("12.0.1").pathToExe("$System.env.CLANGFORMAT").style('file')
+               'spine-ue4/**/*.h'
+        clangFormat("13.0.1").pathToExe("$System.env.CLANGFORMAT").style('file')
     }
 
     typescript {
-        target 'spine-ts/**/*.ts'
-        targetExclude 'spine-ts/**/*.d.ts'
+        target 'spine-ts/**/src/*.ts'
+        targetExclude 'spine-ts/**/*.d.ts', 'spine-ts/**/node_modules/**/*.ts'
         tsfmt('7.2.2').tsfmtFile('formatters/tsfmt.json')
     }
 }

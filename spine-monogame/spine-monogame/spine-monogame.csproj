@@ -1,0 +1,318 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="spine-csharp\" />
+    <None Remove="spine-csharp\Attachments\" />
+    <None Remove="src\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="spine-csharp\" />
+    <Folder Include="spine-csharp\Attachments\" />
+    <Folder Include="src\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\spine-csharp\src\Animation.cs">
+      <Link>spine-csharp\Animation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\AnimationState.cs">
+      <Link>spine-csharp\AnimationState.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\AnimationStateData.cs">
+      <Link>spine-csharp\AnimationStateData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Atlas.cs">
+      <Link>spine-csharp\Atlas.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\BlendMode.cs">
+      <Link>spine-csharp\BlendMode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Bone.cs">
+      <Link>spine-csharp\Bone.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\BoneData.cs">
+      <Link>spine-csharp\BoneData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\ConstraintData.cs">
+      <Link>spine-csharp\ConstraintData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Event.cs">
+      <Link>spine-csharp\Event.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\EventData.cs">
+      <Link>spine-csharp\EventData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\ExposedList.cs">
+      <Link>spine-csharp\ExposedList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\IkConstraint.cs">
+      <Link>spine-csharp\IkConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\IkConstraintData.cs">
+      <Link>spine-csharp\IkConstraintData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\IUpdatable.cs">
+      <Link>spine-csharp\IUpdatable.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Json.cs">
+      <Link>spine-csharp\Json.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\MathUtils.cs">
+      <Link>spine-csharp\MathUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\PathConstraint.cs">
+      <Link>spine-csharp\PathConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\PathConstraintData.cs">
+      <Link>spine-csharp\PathConstraintData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Skeleton.cs">
+      <Link>spine-csharp\Skeleton.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\SkeletonBinary.cs">
+      <Link>spine-csharp\SkeletonBinary.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\SkeletonBounds.cs">
+      <Link>spine-csharp\SkeletonBounds.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\SkeletonClipping.cs">
+      <Link>spine-csharp\SkeletonClipping.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\SkeletonData.cs">
+      <Link>spine-csharp\SkeletonData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\SkeletonJson.cs">
+      <Link>spine-csharp\SkeletonJson.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\SkeletonLoader.cs">
+      <Link>spine-csharp\SkeletonLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Skin.cs">
+      <Link>spine-csharp\Skin.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Slot.cs">
+      <Link>spine-csharp\Slot.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\SlotData.cs">
+      <Link>spine-csharp\SlotData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\SpringConstraint.cs">
+      <Link>spine-csharp\SpringConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\SpringConstraintData.cs">
+      <Link>spine-csharp\SpringConstraintData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\TextureRegion.cs">
+      <Link>spine-csharp\TextureRegion.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\TransformConstraint.cs">
+      <Link>spine-csharp\TransformConstraint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\TransformConstraintData.cs">
+      <Link>spine-csharp\TransformConstraintData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Triangulator.cs">
+      <Link>spine-csharp\Triangulator.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\AtlasAttachmentLoader.cs">
+      <Link>spine-csharp\Attachments\AtlasAttachmentLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\Attachment.cs">
+      <Link>spine-csharp\Attachments\Attachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\AttachmentLoader.cs">
+      <Link>spine-csharp\Attachments\AttachmentLoader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\AttachmentType.cs">
+      <Link>spine-csharp\Attachments\AttachmentType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\BoundingBoxAttachment.cs">
+      <Link>spine-csharp\Attachments\BoundingBoxAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\ClippingAttachment.cs">
+      <Link>spine-csharp\Attachments\ClippingAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\IHasTextureRegion.cs">
+      <Link>spine-csharp\Attachments\IHasTextureRegion.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\MeshAttachment.cs">
+      <Link>spine-csharp\Attachments\MeshAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\PathAttachment.cs">
+      <Link>spine-csharp\Attachments\PathAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\PointAttachment.cs">
+      <Link>spine-csharp\Attachments\PointAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\RegionAttachment.cs">
+      <Link>spine-csharp\Attachments\RegionAttachment.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\Sequence.cs">
+      <Link>spine-csharp\Attachments\Sequence.cs</Link>
+    </Compile>
+    <Compile Include="..\..\spine-csharp\src\Attachments\VertexAttachment.cs">
+      <Link>spine-csharp\Attachments\VertexAttachment.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\spine-csharp\src\Animation.cs.meta">
+      <Link>spine-csharp\Animation.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\AnimationState.cs.meta">
+      <Link>spine-csharp\AnimationState.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\AnimationStateData.cs.meta">
+      <Link>spine-csharp\AnimationStateData.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Atlas.cs.meta">
+      <Link>spine-csharp\Atlas.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments.meta">
+      <Link>spine-csharp\Attachments.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\BlendMode.cs.meta">
+      <Link>spine-csharp\BlendMode.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Bone.cs.meta">
+      <Link>spine-csharp\Bone.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\BoneData.cs.meta">
+      <Link>spine-csharp\BoneData.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\ConstraintData.cs.meta">
+      <Link>spine-csharp\ConstraintData.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Event.cs.meta">
+      <Link>spine-csharp\Event.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\EventData.cs.meta">
+      <Link>spine-csharp\EventData.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\ExposedList.cs.meta">
+      <Link>spine-csharp\ExposedList.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\IkConstraint.cs.meta">
+      <Link>spine-csharp\IkConstraint.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\IkConstraintData.cs.meta">
+      <Link>spine-csharp\IkConstraintData.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\IUpdatable.cs.meta">
+      <Link>spine-csharp\IUpdatable.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Json.cs.meta">
+      <Link>spine-csharp\Json.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\MathUtils.cs.meta">
+      <Link>spine-csharp\MathUtils.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\package.json">
+      <Link>spine-csharp\package.json</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\package.json.meta">
+      <Link>spine-csharp\package.json.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\PathConstraint.cs.meta">
+      <Link>spine-csharp\PathConstraint.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\PathConstraintData.cs.meta">
+      <Link>spine-csharp\PathConstraintData.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Skeleton.cs.meta">
+      <Link>spine-csharp\Skeleton.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\SkeletonBinary.cs.meta">
+      <Link>spine-csharp\SkeletonBinary.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\SkeletonBounds.cs.meta">
+      <Link>spine-csharp\SkeletonBounds.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\SkeletonClipping.cs.meta">
+      <Link>spine-csharp\SkeletonClipping.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\SkeletonData.cs.meta">
+      <Link>spine-csharp\SkeletonData.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\SkeletonJson.cs.meta">
+      <Link>spine-csharp\SkeletonJson.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\SkeletonLoader.cs.meta">
+      <Link>spine-csharp\SkeletonLoader.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Skin.cs.meta">
+      <Link>spine-csharp\Skin.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Slot.cs.meta">
+      <Link>spine-csharp\Slot.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\SlotData.cs.meta">
+      <Link>spine-csharp\SlotData.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\spine-csharp.asmdef">
+      <Link>spine-csharp\spine-csharp.asmdef</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\spine-csharp.asmdef.meta">
+      <Link>spine-csharp\spine-csharp.asmdef.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\SpringConstraint.cs.meta">
+      <Link>spine-csharp\SpringConstraint.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\SpringConstraintData.cs.meta">
+      <Link>spine-csharp\SpringConstraintData.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\TransformConstraint.cs.meta">
+      <Link>spine-csharp\TransformConstraint.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\TransformConstraintData.cs.meta">
+      <Link>spine-csharp\TransformConstraintData.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Triangulator.cs.meta">
+      <Link>spine-csharp\Triangulator.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\AtlasAttachmentLoader.cs.meta">
+      <Link>spine-csharp\Attachments\AtlasAttachmentLoader.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\Attachment.cs.meta">
+      <Link>spine-csharp\Attachments\Attachment.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\AttachmentLoader.cs.meta">
+      <Link>spine-csharp\Attachments\AttachmentLoader.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\AttachmentType.cs.meta">
+      <Link>spine-csharp\Attachments\AttachmentType.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\BoundingBoxAttachment.cs.meta">
+      <Link>spine-csharp\Attachments\BoundingBoxAttachment.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\ClippingAttachment.cs.meta">
+      <Link>spine-csharp\Attachments\ClippingAttachment.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\IHasTextureRegion.cs.meta">
+      <Link>spine-csharp\Attachments\IHasTextureRegion.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\MeshAttachment.cs.meta">
+      <Link>spine-csharp\Attachments\MeshAttachment.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\PathAttachment.cs.meta">
+      <Link>spine-csharp\Attachments\PathAttachment.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\PointAttachment.cs.meta">
+      <Link>spine-csharp\Attachments\PointAttachment.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\RegionAttachment.cs.meta">
+      <Link>spine-csharp\Attachments\RegionAttachment.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\Sequence.cs.meta">
+      <Link>spine-csharp\Attachments\Sequence.cs.meta</Link>
+    </None>
+    <None Include="..\..\spine-csharp\src\Attachments\VertexAttachment.cs.meta">
+      <Link>spine-csharp\Attachments\VertexAttachment.cs.meta</Link>
+    </None>
+  </ItemGroup>
+</Project>

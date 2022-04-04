@@ -245,6 +245,10 @@ namespace Spine {
 					if (region.degrees == 90) {
 						region.u2 = (region.x + region.height) / (float)page.width;
 						region.v2 = (region.y + region.width) / (float)page.height;
+
+						var tempSwap = region.packedWidth;
+						region.packedWidth = region.packedHeight;
+						region.packedHeight = tempSwap;
 					} else {
 						region.u2 = (region.x + region.width) / (float)page.width;
 						region.v2 = (region.y + region.height) / (float)page.height;
@@ -339,18 +343,22 @@ namespace Spine {
 		}
 	}
 
-	public class AtlasRegion {
+	public class AtlasRegion : TextureRegion {
 		public AtlasPage page;
 		public string name;
-		public int x, y, width, height;
-		public float u, v, u2, v2;
+		public int x, y;
 		public float offsetX, offsetY;
 		public int originalWidth, originalHeight;
+		public int packedWidth { get { return width; } set { width = value; } }
+		public int packedHeight { get { return height; } set { height = value; } }
 		public int degrees;
 		public bool rotate;
 		public int index;
 		public string[] names;
 		public int[][] values;
+
+		override public int OriginalWidth { get { return originalWidth; } }
+		override public int OriginalHeight { get { return originalHeight; } }
 
 		public AtlasRegion Clone () {
 			return MemberwiseClone() as AtlasRegion;

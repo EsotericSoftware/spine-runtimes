@@ -27,18 +27,32 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#if UNITY_EDITOR
+using System.ComponentModel;
+#endif
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
 namespace Spine.Unity.Playables {
-	[TrackColor(0.9960785f, 0.2509804f, 0.003921569f)]
+	[TrackColor(255 / 255.0f, 64 / 255.0f, 1 / 255.0f)]
 	[TrackClipType(typeof(SpineAnimationStateClip))]
 	[TrackBindingType(typeof(SkeletonAnimation))]
+#if UNITY_EDITOR
+	[DisplayName("Spine/SkeletonAnimation Track")]
+#endif
 	public class SpineAnimationStateTrack : TrackAsset {
 		public int trackIndex = 0;
 
 		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
+			IEnumerable<TimelineClip> clips = this.GetClips();
+			foreach (TimelineClip clip in clips) {
+				var animationStateClip = clip.asset as SpineAnimationStateClip;
+				if (animationStateClip != null)
+					animationStateClip.timelineClip = clip;
+			}
+
 			var scriptPlayable = ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create(graph, inputCount);
 			var mixerBehaviour = scriptPlayable.GetBehaviour();
 			mixerBehaviour.trackIndex = this.trackIndex;

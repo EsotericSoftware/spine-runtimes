@@ -32,6 +32,7 @@
 
 #include <spine/dll.h>
 #include <spine/Array.h>
+#include "TextureRegion.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -96,13 +97,10 @@ _SP_ARRAY_DECLARE_TYPE(spKeyValueArray, spKeyValue)
 /**/
 typedef struct spAtlasRegion spAtlasRegion;
 struct spAtlasRegion {
+	spTextureRegion super;
 	const char *name;
-	int x, y, width, height;
-	float u, v, u2, v2;
-	int offsetX, offsetY;
-	int originalWidth, originalHeight;
+	int x, y;
 	int index;
-	int degrees;
 	int *splits;
 	int *pads;
 	spKeyValueArray *keyValues;

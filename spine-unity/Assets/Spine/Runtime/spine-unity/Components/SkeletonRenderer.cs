@@ -73,17 +73,26 @@ namespace Spine.Unity {
 			set { editorSkipSkinSync = value; }
 		}
 		protected bool editorSkipSkinSync = false;
+
 		/// <summary>Sets the MeshFilter's hide flags to DontSaveInEditor which fixes the prefab
 		/// always being marked as changed, but at the cost of references to the MeshFilter by other
 		/// components being lost.</summary>
-		public bool fixPrefabOverrideViaMeshFilter = false;
+		public SettingsTriState fixPrefabOverrideViaMeshFilter = SettingsTriState.UseGlobalSetting;
+		public static bool fixPrefabOverrideViaMeshFilterGlobal = false;
 		public void EditorUpdateMeshFilterHideFlags () {
 			if (!meshFilter) {
 				meshFilter = GetComponent<MeshFilter>();
 				if (meshFilter == null)
 					meshFilter = gameObject.AddComponent<MeshFilter>();
 			}
-			if (fixPrefabOverrideViaMeshFilter) {
+
+			bool dontSaveInEditor = false;
+			if (fixPrefabOverrideViaMeshFilter == SettingsTriState.Enable ||
+				(fixPrefabOverrideViaMeshFilter == SettingsTriState.UseGlobalSetting &&
+					fixPrefabOverrideViaMeshFilterGlobal))
+				dontSaveInEditor = true;
+
+			if (dontSaveInEditor) {
 #if NEW_PREFAB_SYSTEM
 				if (UnityEditor.PrefabUtility.IsPartOfAnyPrefab(meshFilter)) {
 					var instanceRoot = UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(meshFilter);
@@ -99,8 +108,7 @@ namespace Spine.Unity {
 				}
 #endif
 				meshFilter.hideFlags = HideFlags.DontSaveInEditor;
-			}
-			else {
+			} else {
 				meshFilter.hideFlags = HideFlags.None;
 			}
 		}
@@ -321,7 +329,7 @@ namespace Spine.Unity {
 #endif
 
 #if UNITY_EDITOR
-		void OnEnable() {
+		void OnEnable () {
 			if (!Application.isPlaying)
 				LateUpdate();
 		}
@@ -359,7 +367,10 @@ namespace Spine.Unity {
 		public virtual void Initialize (bool overwrite, bool quiet = false) {
 			if (valid && !overwrite)
 				return;
-
+#if UNITY_EDITOR
+			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)
+				return;
+#endif
 			// Clear
 			{
 				// Note: do not reset meshFilter.sharedMesh or meshRenderer.sharedMaterial to null,
@@ -619,8 +630,7 @@ namespace Spine.Unity {
 					separatorSlots.Add(slot);
 				}
 #if UNITY_EDITOR
-				else if (!string.IsNullOrEmpty(separatorSlotNames[i]))
-				{
+				else if (!string.IsNullOrEmpty(separatorSlotNames[i])) {
 					Debug.LogWarning(separatorSlotNames[i] + " is not a slot in " + skeletonDataAsset.skeletonJSON.name);
 				}
 #endif
@@ -628,8 +638,7 @@ namespace Spine.Unity {
 		}
 
 #if BUILT_IN_SPRITE_MASK_COMPONENT
-		private void AssignSpriteMaskMaterials()
-		{
+		private void AssignSpriteMaskMaterials () {
 #if UNITY_EDITOR
 			if (!Application.isPlaying && !UnityEditor.EditorApplication.isUpdating) {
 				EditorFixStencilCompParameters();
@@ -644,15 +653,13 @@ namespace Spine.Unity {
 			if (maskMaterials.materialsMaskDisabled.Length > 0 && maskMaterials.materialsMaskDisabled[0] != null &&
 				maskInteraction == SpriteMaskInteraction.None) {
 				this.meshRenderer.materials = maskMaterials.materialsMaskDisabled;
-			}
-			else if (maskInteraction == SpriteMaskInteraction.VisibleInsideMask) {
+			} else if (maskInteraction == SpriteMaskInteraction.VisibleInsideMask) {
 				if (maskMaterials.materialsInsideMask.Length == 0 || maskMaterials.materialsInsideMask[0] == null) {
 					if (!InitSpriteMaskMaterialsInsideMask())
 						return;
 				}
 				this.meshRenderer.materials = maskMaterials.materialsInsideMask;
-			}
-			else if (maskInteraction == SpriteMaskInteraction.VisibleOutsideMask) {
+			} else if (maskInteraction == SpriteMaskInteraction.VisibleOutsideMask) {
 				if (maskMaterials.materialsOutsideMask.Length == 0 || maskMaterials.materialsOutsideMask[0] == null) {
 					if (!InitSpriteMaskMaterialsOutsideMask())
 						return;
@@ -661,18 +668,15 @@ namespace Spine.Unity {
 			}
 		}
 
-		private bool InitSpriteMaskMaterialsInsideMask()
-		{
+		private bool InitSpriteMaskMaterialsInsideMask () {
 			return InitSpriteMaskMaterialsForMaskType(STENCIL_COMP_MASKINTERACTION_VISIBLE_INSIDE, ref maskMaterials.materialsInsideMask);
 		}
 
-		private bool InitSpriteMaskMaterialsOutsideMask()
-		{
+		private bool InitSpriteMaskMaterialsOutsideMask () {
 			return InitSpriteMaskMaterialsForMaskType(STENCIL_COMP_MASKINTERACTION_VISIBLE_OUTSIDE, ref maskMaterials.materialsOutsideMask);
 		}
 
-		private bool InitSpriteMaskMaterialsForMaskType(UnityEngine.Rendering.CompareFunction maskFunction, ref Material[] materialsToFill)
-		{
+		private bool InitSpriteMaskMaterialsForMaskType (UnityEngine.Rendering.CompareFunction maskFunction, ref Material[] materialsToFill) {
 #if UNITY_EDITOR
 			if (!Application.isPlaying) {
 				return false;
@@ -690,14 +694,14 @@ namespace Spine.Unity {
 		}
 
 #if UNITY_EDITOR
-		private void EditorFixStencilCompParameters() {
+		private void EditorFixStencilCompParameters () {
 			if (!haveStencilParametersBeenFixed && HasAnyStencilComp0Material()) {
 				haveStencilParametersBeenFixed = true;
 				FixAllProjectMaterialsStencilCompParameters();
 			}
 		}
 
-		private void FixAllProjectMaterialsStencilCompParameters() {
+		private void FixAllProjectMaterialsStencilCompParameters () {
 			string[] materialGUIDS = UnityEditor.AssetDatabase.FindAssets("t:material");
 			foreach (var guid in materialGUIDS) {
 				string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
@@ -712,7 +716,7 @@ namespace Spine.Unity {
 			UnityEditor.AssetDatabase.SaveAssets();
 		}
 
-		private bool HasAnyStencilComp0Material() {
+		private bool HasAnyStencilComp0Material () {
 			if (meshRenderer == null)
 				return false;
 
@@ -739,7 +743,7 @@ namespace Spine.Unity {
 		/// Otherwise, e.g. when using Lightweight Render Pipeline, deliberately separated draw calls
 		/// "A1 B A2" are reordered to "A1A2 B", regardless of batching-related project settings.
 		/// </summary>
-		private void SetMaterialSettingsToFixDrawOrder() {
+		private void SetMaterialSettingsToFixDrawOrder () {
 			if (reusedPropertyBlock == null) reusedPropertyBlock = new MaterialPropertyBlock();
 
 			bool hasPerRendererBlock = meshRenderer.HasPropertyBlock();

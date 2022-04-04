@@ -4,7 +4,7 @@ This folder contains formatter configuration files to be used with IDEs as well 
 You will need the following on your `PATH`:
 
 - JDK 10+
-- clang-format 12 (i.e. `brew install clang-format`). Also set the environment variable `CLANGFORMAT` to the path of the `clang-format` executable.
+- clang-format 12.0.1 (i.e. `brew install clang-format`). Also set the environment variable `CLANGFORMAT` to the path of the `clang-format` executable.
 - dotnet format (i.e. `dotnet tool install -g dotnet-format`, comes with dotnet 6 out of the box)
 - tsfmt, (i.e. `npm install -g typescript-formatter`)
 

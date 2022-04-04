@@ -31,13 +31,14 @@
 
 // clang-format off
 #include "Runtime/UMG/Public/UMG.h"
-#include "Runtime/UMG/Public/UMGStyle.h"
 #include "SpineSkeletonDataAsset.h"
+#include "SpineSkeletonAnimationComponent.h"
 #include "spine/spine.h"
 #include "SpineWidget.generated.h"
 // clang-format on
 
 class SSpineWidget;
+class USpineWidget;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineWidgetBeforeUpdateWorldTransformDelegate, USpineWidget *, skeleton);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSpineWidgetAfterUpdateWorldTransformDelegate, USpineWidget *, skeleton);

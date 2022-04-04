@@ -242,14 +242,15 @@ public class AnimationState {
 			} else {
 				int[] timelineMode = current.timelineMode.items;
 
-				boolean firstFrame = current.timelinesRotation.size != timelineCount << 1;
+				boolean shortestRotation = current.shortestRotation;
+				boolean firstFrame = !shortestRotation && current.timelinesRotation.size != timelineCount << 1;
 				if (firstFrame) current.timelinesRotation.setSize(timelineCount << 1);
 				float[] timelinesRotation = current.timelinesRotation.items;
 
 				for (int ii = 0; ii < timelineCount; ii++) {
 					Timeline timeline = (Timeline)timelines[ii];
 					MixBlend timelineBlend = timelineMode[ii] == SUBSEQUENT ? blend : MixBlend.setup;
-					if (timeline instanceof RotateTimeline) {
+					if (!shortestRotation && timeline instanceof RotateTimeline) {
 						applyRotateTimeline((RotateTimeline)timeline, skeleton, applyTime, mix, timelineBlend, timelinesRotation,
 							ii << 1, firstFrame);
 					} else if (timeline instanceof AttachmentTimeline)
@@ -315,7 +316,8 @@ public class AnimationState {
 			int[] timelineMode = from.timelineMode.items;
 			Object[] timelineHoldMix = from.timelineHoldMix.items;
 
-			boolean firstFrame = from.timelinesRotation.size != timelineCount << 1;
+			boolean shortestRotation = from.shortestRotation;
+			boolean firstFrame = !shortestRotation && from.timelinesRotation.size != timelineCount << 1;
 			if (firstFrame) from.timelinesRotation.setSize(timelineCount << 1);
 			float[] timelinesRotation = from.timelinesRotation.items;
 
@@ -350,7 +352,7 @@ public class AnimationState {
 					break;
 				}
 				from.totalAlpha += alpha;
-				if (timeline instanceof RotateTimeline) {
+				if (!shortestRotation && timeline instanceof RotateTimeline) {
 					applyRotateTimeline((RotateTimeline)timeline, skeleton, applyTime, alpha, timelineBlend, timelinesRotation, i << 1,
 						firstFrame);
 				} else if (timeline instanceof AttachmentTimeline)
@@ -701,6 +703,9 @@ public class AnimationState {
 		entry.loop = loop;
 		entry.holdPrevious = false;
 
+		entry.reverse = false;
+		entry.shortestRotation = false;
+
 		entry.eventThreshold = 0;
 		entry.attachmentThreshold = 0;
 		entry.drawOrderThreshold = 0;
@@ -718,9 +723,10 @@ public class AnimationState {
 		entry.timeScale = 1;
 
 		entry.alpha = 1;
-		entry.interruptAlpha = 1;
 		entry.mixTime = 0;
 		entry.mixDuration = last == null ? 0 : data.getMix(last.animation, animation);
+		entry.interruptAlpha = 1;
+		entry.totalAlpha = 0;
 		entry.mixBlend = MixBlend.replace;
 		return entry;
 	}
@@ -871,7 +877,7 @@ public class AnimationState {
 		@Null TrackEntry previous, next, mixingFrom, mixingTo;
 		@Null AnimationStateListener listener;
 		int trackIndex;
-		boolean loop, holdPrevious, reverse;
+		boolean loop, holdPrevious, reverse, shortestRotation;
 		float eventThreshold, attachmentThreshold, drawOrderThreshold;
 		float animationStart, animationEnd, animationLast, nextAnimationLast;
 		float delay, trackTime, trackLast, nextTrackLast, trackEnd, timeScale;
@@ -1205,6 +1211,19 @@ public class AnimationState {
 			return holdPrevious;
 		}
 
+		public void setShortestRotation (boolean shortestRotation) {
+			this.shortestRotation = shortestRotation;
+		}
+
+		/** If true, mixing rotation between tracks always uses the shortest rotation direction. If the rotation is animated, the
+		 * shortest rotation direction may change during the mix.
+		 * <p>
+		 * If false, the shortest rotation direction is remembered when the mix starts and the same direction is used for the rest
+		 * of the mix. Defaults to false. */
+		public boolean getShortestRotation () {
+			return shortestRotation;
+		}
+
 		/** Resets the rotation directions for mixing this entry's rotate timelines. This can be useful to avoid bones rotating the
 		 * long way around when using {@link #alpha} and starting animations on other tracks.
 		 * <p>
@@ -1335,6 +1354,9 @@ public class AnimationState {
 
 	/** The interface to implement for receiving TrackEntry events. It is always safe to call AnimationState methods when receiving
 	 * events.
+	 * <p>
+	 * TrackEntry events are collected during {@link AnimationState#update(float)} and {@link AnimationState#apply(Skeleton)} and
+	 * fired only after those methods are finished.
 	 * <p>
 	 * See TrackEntry {@link TrackEntry#setListener(AnimationStateListener)} and AnimationState
 	 * {@link AnimationState#addListener(AnimationStateListener)}. */

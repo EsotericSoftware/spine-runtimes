@@ -35,8 +35,9 @@ import java.lang.reflect.Field;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowAdapter;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -101,8 +102,9 @@ public class SkeletonViewer extends ApplicationAdapter {
 		ui.loadPrefs();
 
 		if (args.length == 0) {
-			loadSkeleton(
-				Gdx.files.internal(Gdx.app.getPreferences("spine-skeletonviewer").getString("lastFile", "spineboy/spineboy.json")));
+			FileHandle file = Gdx.files
+				.internal(Gdx.app.getPreferences("spine-skeletonviewer").getString("lastFile", "spineboy/spineboy.json"));
+			if (file.exists()) loadSkeleton(file);
 		} else
 			loadSkeleton(Gdx.files.internal(args[0]));
 
@@ -117,8 +119,15 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 	}
 
-	boolean loadSkeleton (final @Null FileHandle skeletonFile) {
+	boolean loadSkeleton (@Null FileHandle skeletonFile) {
 		if (skeletonFile == null) return false;
+
+		try {
+			skeletonFile = new FileHandle(skeletonFile.file().getCanonicalFile());
+		} catch (Throwable ex) {
+			skeletonFile = new FileHandle(skeletonFile.file().getAbsoluteFile());
+		}
+
 		FileHandle oldSkeletonFile = this.skeletonFile;
 		this.skeletonFile = skeletonFile;
 		reloadTimer = 0;
@@ -137,7 +146,7 @@ public class SkeletonViewer extends ApplicationAdapter {
 			skeletonData = loader.readSkeletonData(skeletonFile);
 			if (skeletonData.getBones().size == 0) throw new Exception("No bones in skeleton data.");
 		} catch (Throwable ex) {
-			System.out.println("Error loading skeleton: " + skeletonFile.file().getAbsolutePath());
+			System.out.println("Error loading skeleton: " + skeletonFile.path());
 			ex.printStackTrace();
 			ui.toast("Error loading skeleton: " + skeletonFile.name());
 			this.skeletonFile = oldSkeletonFile;
@@ -368,13 +377,24 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 		if (dpiScale >= 2.0f) uiScale = 2;
 
-		LwjglApplicationConfiguration.disableAudio = true;
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = (int)(800 * uiScale);
-		config.height = (int)(600 * uiScale);
-		config.title = "Skeleton Viewer";
-		config.allowSoftwareMode = true;
-		config.samples = 2;
-		new LwjglApplication(new SkeletonViewer(), config);
+		final SkeletonViewer skeletonViewer = new SkeletonViewer();
+		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+		config.disableAudio(true);
+		config.setWindowedMode((int)(800 * uiScale), (int)(600 * uiScale));
+		config.setTitle("Skeleton Viewer " + version);
+		config.setBackBufferConfig(8, 8, 8, 8, 24, 0, 2);
+		config.setWindowListener(new Lwjgl3WindowAdapter() {
+			@Override
+			public void filesDropped (String[] files) {
+				for (String file : files) {
+					for (String endSuffix : endSuffixes) {
+						for (String dataSuffix : dataSuffixes) {
+							if (file.endsWith(dataSuffix + endSuffix) && skeletonViewer.loadSkeleton(Gdx.files.absolute(file))) return;
+						}
+					}
+				}
+			}
+		});
+		new Lwjgl3Application(skeletonViewer, config);
 	}
 }

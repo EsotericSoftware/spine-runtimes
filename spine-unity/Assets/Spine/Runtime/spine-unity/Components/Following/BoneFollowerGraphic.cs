@@ -64,8 +64,10 @@ namespace Spine.Unity {
 		public bool followBoneRotation = true;
 		[Tooltip("Follows the skeleton's flip state by controlling this Transform's local scale.")]
 		public bool followSkeletonFlip = true;
-		[Tooltip("Follows the target bone's local scale. BoneFollower cannot inherit world/skewed scale because of UnityEngine.Transform property limitations.")]
+		[Tooltip("Follows the target bone's local scale.")]
 		public bool followLocalScale = false;
+		[Tooltip("Includes the parent bone's lossy world scale. BoneFollower cannot inherit rotated/skewed scale because of UnityEngine.Transform property limitations.")]
+		public bool followParentWorldScale = false;
 		public bool followXYPosition = true;
 		public bool followZPosition = true;
 		[Tooltip("Applies when 'Follow Skeleton Flip' is disabled but 'Follow Bone Rotation' is enabled."
@@ -185,11 +187,17 @@ namespace Spine.Unity {
 												* skeletonLossyScale.y * parentLossyScale.y);
 			}
 
-			Vector3 localScale = followLocalScale ? new Vector3(bone.ScaleX, bone.ScaleY, 1f) : new Vector3(1f, 1f, 1f);
-			if (followSkeletonFlip)
-				localScale.y *= Mathf.Sign(bone.Skeleton.ScaleX * bone.Skeleton.ScaleY) * additionalFlipScale;
-			thisTransform.localScale = localScale;
+			Bone parentBone = bone.Parent;
+			if (followParentWorldScale || followLocalScale || followSkeletonFlip) {
+				Vector3 localScale = new Vector3(1f, 1f, 1f);
+				if (followParentWorldScale && parentBone != null)
+					localScale = new Vector3(parentBone.WorldScaleX, parentBone.WorldScaleY, 1f);
+				if (followLocalScale)
+					localScale.Scale(new Vector3(bone.ScaleX, bone.ScaleY, 1f));
+				if (followSkeletonFlip)
+					localScale.y *= Mathf.Sign(bone.Skeleton.ScaleX * bone.Skeleton.ScaleY) * additionalFlipScale;
+				thisTransform.localScale = localScale;
+			}
 		}
-
 	}
 }

@@ -43,14 +43,14 @@ namespace spine {
 
 	public:
 		LinkedMesh(MeshAttachment *mesh, const String &skin, size_t slotIndex, const String &parent,
-				   bool inheritDeform);
+				   bool inheritTimeline);
 
 	private:
 		MeshAttachment *_mesh;
 		String _skin;
 		size_t _slotIndex;
 		String _parent;
-		bool _inheritDeform;
+		bool _inheritTimeline;
 	};
 }
 

@@ -31,11 +31,14 @@ import { Bone } from "../Bone";
 import { TextureRegion } from "../Texture";
 import { Color, NumberArrayLike, Utils } from "../Utils";
 import { Attachment } from "./Attachment";
+import { HasTextureRegion } from "./HasTextureRegion";
+import { Sequence } from "./Sequence";
+import { Slot } from "../Slot";
 
 /** An attachment that displays a textured quadrilateral.
  *
  * See [Region attachments](http://esotericsoftware.com/spine-regions) in the Spine User Guide. */
-export class RegionAttachment extends Attachment {
+export class RegionAttachment extends Attachment implements HasTextureRegion {
 	/** The local x translation. */
 	x = 0;
 
@@ -61,10 +64,11 @@ export class RegionAttachment extends Attachment {
 	color = new Color(1, 1, 1, 1);
 
 	/** The name of the texture region for this attachment. */
-	path: string;
+	path: string = null;
 
-	rendererObject: any;
-	region: TextureRegion;
+	private rendererObject: any = null;
+	region: TextureRegion = null;
+	sequence: Sequence = null;
 
 	/** For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.
 	 *
@@ -80,7 +84,7 @@ export class RegionAttachment extends Attachment {
 	}
 
 	/** Calculates the {@link #offset} using the region settings. Must be called after changing region settings. */
-	updateOffset (): void {
+	updateRegion (): void {
 		let region = this.region;
 		let regionScaleX = this.width / this.region.originalWidth * this.scaleX;
 		let regionScaleY = this.height / this.region.originalHeight * this.scaleY;
@@ -109,10 +113,7 @@ export class RegionAttachment extends Attachment {
 		offset[5] = localY2Cos + localX2Sin;
 		offset[6] = localX2Cos - localYSin;
 		offset[7] = localYCos + localX2Sin;
-	}
 
-	setRegion (region: TextureRegion): void {
-		this.region = region;
 		let uvs = this.uvs;
 		if (region.degrees == 90) {
 			uvs[2] = region.u;
@@ -135,14 +136,19 @@ export class RegionAttachment extends Attachment {
 		}
 	}
 
-	/** Transforms the attachment's four vertices to world coordinates.
-	 *
-	 * See [World transforms](http://esotericsoftware.com/spine-runtime-skeletons#World-transforms) in the Spine
+	/** Transforms the attachment's four vertices to world coordinates. If the attachment has a {@link #sequence}, the region may
+	 * be changed.
+	 * <p>
+	 * See <a href="http://esotericsoftware.com/spine-runtime-skeletons#World-transforms">World transforms</a> in the Spine
 	 * Runtimes Guide.
-	 * @param worldVertices The output world vertices. Must have a length >= `offset` + 8.
-	 * @param offset The `worldVertices` index to begin writing values.
-	 * @param stride The number of `worldVertices` entries between the value pairs written. */
-	computeWorldVertices (bone: Bone, worldVertices: NumberArrayLike, offset: number, stride: number) {
+	 * @param worldVertices The output world vertices. Must have a length >= <code>offset</code> + 8.
+	 * @param offset The <code>worldVertices</code> index to begin writing values.
+	 * @param stride The number of <code>worldVertices</code> entries between the value pairs written. */
+	computeWorldVertices (slot: Slot, worldVertices: NumberArrayLike, offset: number, stride: number) {
+		if (this.sequence != null)
+			this.sequence.apply(slot, this);
+
+		let bone = slot.bone;
 		let vertexOffset = this.offset;
 		let x = bone.worldX, y = bone.worldY;
 		let a = bone.a, b = bone.b, c = bone.c, d = bone.d;
@@ -187,6 +193,7 @@ export class RegionAttachment extends Attachment {
 		Utils.arrayCopy(this.uvs, 0, copy.uvs, 0, 8);
 		Utils.arrayCopy(this.offset, 0, copy.offset, 0, 8);
 		copy.color.setFromColor(this.color);
+		copy.sequence = this.sequence != null ? this.sequence.copy() : null;
 		return copy;
 	}
 

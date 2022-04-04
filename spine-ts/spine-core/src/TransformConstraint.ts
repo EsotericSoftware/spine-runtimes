@@ -41,13 +41,13 @@ import { Vector2, MathUtils } from "./Utils";
 export class TransformConstraint implements Updatable {
 
 	/** The transform constraint's setup pose data. */
-	data: TransformConstraintData;
+	data: TransformConstraintData = null;
 
 	/** The bones that will be modified by this transform constraint. */
-	bones: Array<Bone>;
+	bones: Array<Bone> = null;
 
 	/** The target bone whose world transform will be copied to the constrained bones. */
-	target: Bone;
+	target: Bone = null;
 
 	mixRotate = 0; mixX = 0; mixY = 0; mixScaleX = 0; mixScaleY = 0; mixShearY = 0;
 

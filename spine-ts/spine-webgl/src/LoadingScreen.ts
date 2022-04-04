@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { Color, TimeKeeper } from "@esotericsoftware/spine-core";
+import { Color, Disposable, TimeKeeper } from "@esotericsoftware/spine-core";
 import { GLTexture } from "./GLTexture";
 import { ResizeMode, SceneRenderer } from "./SceneRenderer";
 
@@ -38,7 +38,7 @@ let loaded = 0;
 const FADE_IN = 1, FADE_OUT = 1;
 const logoWidth = 165, logoHeight = 108, spinnerSize = 163;
 
-export class LoadingScreen {
+export class LoadingScreen implements Disposable {
 	private renderer: SceneRenderer;
 	private logo: GLTexture = null;
 	private spinner: GLTexture = null;
@@ -68,6 +68,10 @@ export class LoadingScreen {
 			if (!isSafari) spinnerImage.crossOrigin = "anonymous";
 			spinnerImage.onload = onload;
 		}
+	}
+	dispose (): void {
+		this.logo.dispose();
+		this.spinner.dispose();
 	}
 
 	draw (complete = false) {

@@ -743,8 +743,8 @@ public class Animation {
 						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
 						break;
 					case add:
-						bone.scaleX = (x - bone.data.scaleX) * alpha;
-						bone.scaleY = (y - bone.data.scaleY) * alpha;
+						bone.scaleX += (x - bone.data.scaleX) * alpha;
+						bone.scaleY += (y - bone.data.scaleY) * alpha;
 					}
 				} else {
 					switch (blend) {
@@ -822,7 +822,7 @@ public class Animation {
 						bone.scaleX = bx + (Math.abs(x) * Math.signum(bx) - bx) * alpha;
 						break;
 					case add:
-						bone.scaleX = (x - bone.data.scaleX) * alpha;
+						bone.scaleX += (x - bone.data.scaleX) * alpha;
 					}
 				} else {
 					switch (blend) {
@@ -895,7 +895,7 @@ public class Animation {
 						bone.scaleY = by + (Math.abs(y) * Math.signum(by) - by) * alpha;
 						break;
 					case add:
-						bone.scaleY = (y - bone.data.scaleY) * alpha;
+						bone.scaleY += (y - bone.data.scaleY) * alpha;
 					}
 				} else {
 					switch (blend) {
@@ -2494,16 +2494,22 @@ public class Animation {
 				case loop:
 					index %= count;
 					break;
-				case pingpong:
+				case pingpong: {
 					int n = (count << 1) - 2;
 					index %= n;
 					if (index >= count) index = n - index;
 					break;
+				}
 				case onceReverse:
 					index = Math.max(count - 1 - index, 0);
 					break;
 				case loopReverse:
 					index = count - 1 - (index % count);
+					break;
+				case pingpongReverse:
+					int n = (count << 1) - 2;
+					index = (index + count - 1) % n;
+					if (index >= count) index = n - index;
 				}
 			}
 			slot.setSequenceIndex(index);

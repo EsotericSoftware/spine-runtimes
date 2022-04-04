@@ -1,0 +1,81 @@
+<html>
+<script src="../dist/iife/spine-webgl.js"></script>
+<style>
+	* {
+		margin: 0;
+		padding: 0;
+	}
+</style>
+
+<body>
+	<canvas id="canvas" style="position: absolute; width: 100%; height: 100%;"></canvas>
+	<script>
+		class App {
+			constructor() {
+				this.skeleton = null;
+				this.animationState = null;
+			}
+
+			loadAssets(canvas) {
+				// Load the skeleton file.
+				canvas.assetManager.loadBinary("assets/dragon-ess.skel");
+				// Load the atlas and its pages.
+				canvas.assetManager.loadTextureAtlas("assets/dragon-pma.atlas");
+			}
+
+			initialize(canvas) {
+				let assetManager = canvas.assetManager;
+
+				// Create the texture atlas.
+				var atlas = assetManager.require("assets/dragon-pma.atlas");
+
+				// Create a AtlasAttachmentLoader that resolves region, mesh, boundingbox and path attachments
+				var atlasLoader = new spine.AtlasAttachmentLoader(atlas);
+
+				// Create a SkeletonBinary instance for parsing the .skel file.
+				var skeletonBinary = new spine.SkeletonBinary(atlasLoader);
+
+				// Set the scale to apply during parsing, parse the file, and create a new skeleton.
+				skeletonBinary.scale = 1;
+				var skeletonData = skeletonBinary.readSkeletonData(assetManager.require("assets/dragon-ess.skel"));
+				this.skeleton = new spine.Skeleton(skeletonData);
+
+				// Create an AnimationState, and set the "run" animation in looping mode.
+				var animationStateData = new spine.AnimationStateData(skeletonData);
+				this.animationState = new spine.AnimationState(animationStateData);
+				this.animationState.setAnimation(0, "flying", true);
+			}
+
+			update(canvas, delta) {
+				// Update the animation state using the delta time.
+				this.animationState.update(delta);
+				// Apply the animation state to the skeleton.
+				this.animationState.apply(this.skeleton);
+				// Let the skeleton update the transforms of its bones.
+				this.skeleton.updateWorldTransform();
+			}
+
+			render(canvas) {
+				let renderer = canvas.renderer;
+				// Resize the viewport to the full canvas.
+				renderer.resize(spine.ResizeMode.Expand);
+
+				// Clear the canvas with a light gray color.
+				canvas.clear(0.2, 0.2, 0.2, 1);
+
+				// Begin rendering.
+				renderer.begin();
+				// Draw the skeleton
+				renderer.drawSkeleton(this.skeleton, true);
+				// Complete rendering.
+				renderer.end();
+			}
+		}
+
+		new spine.SpineCanvas(document.getElementById("canvas"), {
+			app: new App()
+		})
+	</script>
+</body>
+
+</html>

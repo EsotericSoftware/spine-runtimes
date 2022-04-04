@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/SkeletonClipping.h>
 
 #include <spine/ClippingAttachment.h>
@@ -52,7 +48,7 @@ size_t SkeletonClipping::clipStart(Slot &slot, ClippingAttachment *clip) {
 
 	_clipAttachment = clip;
 
-	int n = clip->getWorldVerticesLength();
+	int n = (int) clip->getWorldVerticesLength();
 	_clippingPolygon.setSize(n, 0);
 	clip->computeWorldVertices(slot, 0, n, _clippingPolygon, 0, 2);
 	makeClockwise(_clippingPolygon);
@@ -107,15 +103,15 @@ void SkeletonClipping::clipTriangles(float *vertices, unsigned short *triangles,
 	size_t i = 0;
 continue_outer:
 	for (; i < trianglesLength; i += 3) {
-		int vertexOffset = triangles[i] * stride;
+		int vertexOffset = triangles[i] * (int) stride;
 		float x1 = vertices[vertexOffset], y1 = vertices[vertexOffset + 1];
 		float u1 = uvs[vertexOffset], v1 = uvs[vertexOffset + 1];
 
-		vertexOffset = triangles[i + 1] * stride;
+		vertexOffset = triangles[i + 1] * (int) stride;
 		float x2 = vertices[vertexOffset], y2 = vertices[vertexOffset + 1];
 		float u2 = uvs[vertexOffset], v2 = uvs[vertexOffset + 1];
 
-		vertexOffset = triangles[i + 2] * stride;
+		vertexOffset = triangles[i + 2] * (int) stride;
 		float x3 = vertices[vertexOffset], y3 = vertices[vertexOffset + 1];
 		float u3 = uvs[vertexOffset], v3 = uvs[vertexOffset + 1];
 
@@ -318,7 +314,7 @@ void SkeletonClipping::makeClockwise(Vector<float> &polygon) {
 
 	for (size_t i = 0, lastX = verticeslength - 2, n = verticeslength >> 1; i < n; i += 2) {
 		float x = polygon[i], y = polygon[i + 1];
-		int other = lastX - i;
+		int other = (int) (lastX - i);
 		polygon[i] = polygon[other];
 		polygon[i + 1] = polygon[other + 1];
 		polygon[other] = x;

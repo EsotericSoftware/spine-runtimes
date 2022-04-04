@@ -53,19 +53,20 @@ export abstract class VertexAttachment extends Attachment {
 	/** The bones which affect the {@link #getVertices()}. The array entries are, for each vertex, the number of bones affecting
 	 * the vertex followed by that many bone indices, which is the index of the bone in {@link Skeleton#bones}. Will be null
 	 * if this attachment has no weights. */
-	bones: Array<number>;
+	bones: Array<number> = null;
 
 	/** The vertex positions in the bone's coordinate system. For a non-weighted attachment, the values are `x,y`
 	 * entries for each vertex. For a weighted attachment, the values are `x,y,weight` entries for each bone affecting
 	 * each vertex. */
-	vertices: NumberArrayLike;
+	vertices: NumberArrayLike = null;
 
 	/** The maximum number of world vertex values that can be output by
 	 * {@link #computeWorldVertices()} using the `count` parameter. */
 	worldVerticesLength = 0;
 
-	/** Deform keys for the deform attachment are also applied to this attachment. May be null if no deform keys should be applied. */
-	deformAttachment: VertexAttachment = this;
+	/** Timelines for the timeline attachment are also applied to this attachment.
+	 * May be null if no attachment-specific timelines should be applied. */
+	timelineAttahment: Attachment = this;
 
 	constructor (name: string) {
 		super(name);
@@ -155,6 +156,6 @@ export abstract class VertexAttachment extends Attachment {
 			attachment.vertices = null;
 
 		attachment.worldVerticesLength = this.worldVerticesLength;
-		attachment.deformAttachment = this.deformAttachment;
+		attachment.timelineAttahment = this.timelineAttahment;
 	}
 }

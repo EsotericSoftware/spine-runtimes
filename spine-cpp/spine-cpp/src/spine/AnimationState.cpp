@@ -27,12 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
-#include <spine/Animation.h>
 #include <spine/AnimationState.h>
+#include <spine/Animation.h>
 #include <spine/AnimationStateData.h>
 #include <spine/AttachmentTimeline.h>
 #include <spine/Bone.h>
@@ -59,6 +55,7 @@ void dummyOnAnimationEventFunc(AnimationState *state, spine::EventType type, Tra
 
 TrackEntry::TrackEntry() : _animation(NULL), _previous(NULL), _next(NULL), _mixingFrom(NULL), _mixingTo(0),
 						   _trackIndex(0), _loop(false), _holdPrevious(false), _reverse(false),
+						   _shortestRotation(false),
 						   _eventThreshold(0), _attachmentThreshold(0), _drawOrderThreshold(0), _animationStart(0),
 						   _animationEnd(0), _animationLast(0), _nextAnimationLast(0), _delay(0), _trackTime(0),
 						   _trackLast(0), _nextTrackLast(0), _trackEnd(0), _timeScale(1.0f), _alpha(0), _mixTime(0),
@@ -85,6 +82,10 @@ void TrackEntry::setHoldPrevious(bool inValue) { _holdPrevious = inValue; }
 bool TrackEntry::getReverse() { return _reverse; }
 
 void TrackEntry::setReverse(bool inValue) { _reverse = inValue; }
+
+bool TrackEntry::getShortestRotation() { return _shortestRotation; }
+
+void TrackEntry::setShortestRotation(bool inValue) { _shortestRotation = inValue; }
 
 float TrackEntry::getDelay() { return _delay; }
 
@@ -457,7 +458,8 @@ bool AnimationState::apply(Skeleton &skeleton) {
 		} else {
 			Vector<int> &timelineMode = current._timelineMode;
 
-			bool firstFrame = current._timelinesRotation.size() != timelines.size() << 1;
+			bool shortestRotation = current._shortestRotation;
+			bool firstFrame = !shortestRotation && current._timelinesRotation.size() != timelines.size() << 1;
 			if (firstFrame) current._timelinesRotation.setSize(timelines.size() << 1, 0);
 			Vector<float> &timelinesRotation = current._timelinesRotation;
 
@@ -467,7 +469,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 
 				MixBlend timelineBlend = timelineMode[ii] == Subsequent ? blend : MixBlend_Setup;
 
-				if (timeline->getRTTI().isExactly(RotateTimeline::rtti))
+				if (!shortestRotation && timeline->getRTTI().isExactly(RotateTimeline::rtti))
 					applyRotateTimeline(static_cast<RotateTimeline *>(timeline), skeleton, applyTime, mix,
 										timelineBlend, timelinesRotation, ii << 1, firstFrame);
 				else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti))
@@ -487,7 +489,7 @@ bool AnimationState::apply(Skeleton &skeleton) {
 
 	int setupState = _unkeyedState + Setup;
 	Vector<Slot *> &slots = skeleton.getSlots();
-	for (int i = 0, n = slots.size(); i < n; i++) {
+	for (int i = 0, n = (int) slots.size(); i < n; i++) {
 		Slot *slot = slots[i];
 		if (slot->getAttachmentState() == setupState) {
 			const String &attachmentName = slot->getData().getAttachmentName();
@@ -816,7 +818,8 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 		Vector<int> &timelineMode = from->_timelineMode;
 		Vector<TrackEntry *> &timelineHoldMix = from->_timelineHoldMix;
 
-		bool firstFrame = from->_timelinesRotation.size() != timelines.size() << 1;
+		bool shortestRotation = from->_shortestRotation;
+		bool firstFrame = !shortestRotation && from->_timelinesRotation.size() != timelines.size() << 1;
 		if (firstFrame) from->_timelinesRotation.setSize(timelines.size() << 1, 0);
 
 		Vector<float> &timelinesRotation = from->_timelinesRotation;
@@ -852,7 +855,7 @@ float AnimationState::applyMixingFrom(TrackEntry *to, Skeleton &skeleton, MixBle
 					break;
 			}
 			from->_totalAlpha += alpha;
-			if ((timeline->getRTTI().isExactly(RotateTimeline::rtti))) {
+			if (!shortestRotation && (timeline->getRTTI().isExactly(RotateTimeline::rtti))) {
 				applyRotateTimeline((RotateTimeline *) timeline, skeleton, applyTime, alpha, timelineBlend,
 									timelinesRotation, i << 1, firstFrame);
 			} else if (timeline->getRTTI().isExactly(AttachmentTimeline::rtti)) {
@@ -948,10 +951,13 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 	TrackEntry *entryP = _trackEntryPool.obtain();// Pooling
 	TrackEntry &entry = *entryP;
 
-	entry._trackIndex = trackIndex;
+	entry._trackIndex = (int) trackIndex;
 	entry._animation = animation;
 	entry._loop = loop;
 	entry._holdPrevious = 0;
+
+	entry._reverse = false;
+	entry._shortestRotation = false;
 
 	entry._eventThreshold = 0;
 	entry._attachmentThreshold = 0;
@@ -970,9 +976,10 @@ TrackEntry *AnimationState::newTrackEntry(size_t trackIndex, Animation *animatio
 	entry._timeScale = 1;
 
 	entry._alpha = 1;
-	entry._interruptAlpha = 1;
 	entry._mixTime = 0;
 	entry._mixDuration = (last == NULL) ? 0 : _data->getMix(last->_animation, animation);
+	entry._interruptAlpha = 1;
+	entry._totalAlpha = 0;
 	entry._mixBlend = MixBlend_Replace;
 
 	return entryP;

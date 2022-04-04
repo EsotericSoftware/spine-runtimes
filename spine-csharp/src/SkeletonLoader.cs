@@ -77,14 +77,14 @@ namespace Spine {
 			internal string parent, skin;
 			internal int slotIndex;
 			internal MeshAttachment mesh;
-			internal bool inheritDeform;
+			internal bool inheritTimelines;
 
-			public LinkedMesh (MeshAttachment mesh, string skin, int slotIndex, string parent, bool inheritDeform) {
+			public LinkedMesh (MeshAttachment mesh, string skin, int slotIndex, string parent, bool inheritTimelines) {
 				this.mesh = mesh;
 				this.skin = skin;
 				this.slotIndex = slotIndex;
 				this.parent = parent;
-				this.inheritDeform = inheritDeform;
+				this.inheritTimelines = inheritTimelines;
 			}
 		}
 

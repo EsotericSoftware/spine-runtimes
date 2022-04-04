@@ -38,8 +38,11 @@ namespace Spine.Unity.Playables {
 		public SpineAnimationStateBehaviour template = new SpineAnimationStateBehaviour();
 
 		public ClipCaps clipCaps { get { return ClipCaps.Blending | ClipCaps.ClipIn | ClipCaps.SpeedMultiplier | (template.loop ? ClipCaps.Looping : 0); } }
+		[NonSerialized] public TimelineClip timelineClip;
 
 		public override Playable CreatePlayable (PlayableGraph graph, GameObject owner) {
+			template.timelineClip = this.timelineClip;
+
 			var playable = ScriptPlayable<SpineAnimationStateBehaviour>.Create(graph, template);
 			playable.GetBehaviour();
 			return playable;

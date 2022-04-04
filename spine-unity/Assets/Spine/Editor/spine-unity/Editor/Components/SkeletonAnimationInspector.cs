@@ -38,7 +38,6 @@ namespace Spine.Unity.Editor {
 	public class SkeletonAnimationInspector : SkeletonRendererInspector {
 		protected SerializedProperty animationName, loop, timeScale, autoReset;
 		protected bool wasAnimationParameterChanged = false;
-		protected bool requireRepaint;
 		readonly GUIContent LoopLabel = new GUIContent("Loop", "Whether or not .AnimationName should loop. This only applies to the initial animation specified in the inspector, or any subsequent Animations played through .AnimationName. Animations set through state.SetAnimation are unaffected.");
 		readonly GUIContent TimeScaleLabel = new GUIContent("Time Scale", "The rate at which animations progress over time. 1 means normal speed. 0.5 means 50% speed.");
 
@@ -79,13 +78,6 @@ namespace Spine.Unity.Editor {
 			SkeletonRootMotionParameter();
 
 			serializedObject.ApplyModifiedProperties();
-
-			if (!isInspectingPrefab) {
-				if (requireRepaint) {
-					UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
-					requireRepaint = false;
-				}
-			}
 		}
 
 		protected void TrySetAnimation (SkeletonAnimation skeletonAnimation) {

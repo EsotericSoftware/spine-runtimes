@@ -27,7 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-using Spine.Unity;
 using UnityEditor;
 using UnityEngine;
 
@@ -40,7 +39,7 @@ namespace Spine.Unity.Editor {
 	public class BoneFollowerGraphicInspector : Editor {
 
 		SerializedProperty boneName, skeletonGraphic, followXYPosition, followZPosition, followBoneRotation,
-			followLocalScale, followSkeletonFlip, maintainedAxisOrientation;
+			followLocalScale, followParentWorldScale, followSkeletonFlip, maintainedAxisOrientation;
 		BoneFollowerGraphic targetBoneFollower;
 		bool needsReset;
 
@@ -77,6 +76,7 @@ namespace Spine.Unity.Editor {
 			followXYPosition = serializedObject.FindProperty("followXYPosition");
 			followZPosition = serializedObject.FindProperty("followZPosition");
 			followLocalScale = serializedObject.FindProperty("followLocalScale");
+			followParentWorldScale = serializedObject.FindProperty("followParentWorldScale");
 			followSkeletonFlip = serializedObject.FindProperty("followSkeletonFlip");
 			maintainedAxisOrientation = serializedObject.FindProperty("maintainedAxisOrientation");
 
@@ -172,6 +172,7 @@ namespace Spine.Unity.Editor {
 				EditorGUILayout.PropertyField(followXYPosition);
 				EditorGUILayout.PropertyField(followZPosition);
 				EditorGUILayout.PropertyField(followLocalScale);
+				EditorGUILayout.PropertyField(followParentWorldScale);
 				EditorGUILayout.PropertyField(followSkeletonFlip);
 				if ((followSkeletonFlip.hasMultipleDifferentValues || followSkeletonFlip.boolValue == false) &&
 					(followBoneRotation.hasMultipleDifferentValues || followBoneRotation.boolValue == true)) {
@@ -191,7 +192,7 @@ namespace Spine.Unity.Editor {
 						EditorGUILayout.HelpBox("Assigned SkeletonGraphic does not have SkeletonData assigned to it.", MessageType.Warning);
 
 					if (!boneFollowerSkeletonGraphic.IsValid)
-						EditorGUILayout.HelpBox("Assigned SkeletonGraphic is invalid. Check target SkeletonGraphic, its SkeletonDataAsset or the console for other errors.", MessageType.Warning);
+						EditorGUILayout.HelpBox("Assigned SkeletonGraphic is invalid. Check target SkeletonGraphic, its SkeletonData asset or the console for other errors.", MessageType.Warning);
 				}
 			}
 

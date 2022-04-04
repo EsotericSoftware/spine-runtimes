@@ -276,7 +276,7 @@ GameObject:
   - component: {fileID: 651278530}
   - component: {fileID: 651278529}
   m_Layer: 0
-  m_Name: 2 DataAssets from Exports
+  m_Name: 2 RuntimeLoadFromExports
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

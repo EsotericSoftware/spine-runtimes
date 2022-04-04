@@ -21,10 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 /* Json */
 /* JSON parser in CPP, from json.c in the spine-c runtime */
 
@@ -38,8 +34,8 @@ THE SOFTWARE.
 #define _BSD_SOURCE
 #endif
 
-#include <spine/Extension.h>
 #include <spine/Json.h>
+#include <spine/Extension.h>
 #include <spine/SpineString.h>
 
 #include <assert.h>

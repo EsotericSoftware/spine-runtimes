@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/DeformTimeline.h>
 
 #include <spine/Event.h>
@@ -76,7 +72,7 @@ void DeformTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vecto
 	}
 
 	VertexAttachment *attachment = static_cast<VertexAttachment *>(slotAttachment);
-	if (attachment->_deformAttachment != _attachment) {
+	if (attachment->_timelineAttachment != _attachment) {
 		return;
 	}
 

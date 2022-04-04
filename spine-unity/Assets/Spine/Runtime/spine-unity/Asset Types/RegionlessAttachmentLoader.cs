@@ -50,16 +50,16 @@ namespace Spine.Unity {
 			}
 		}
 
-		public RegionAttachment NewRegionAttachment (Skin skin, string name, string path) {
+		public RegionAttachment NewRegionAttachment (Skin skin, string name, string path, Sequence sequence) {
 			RegionAttachment attachment = new RegionAttachment(name) {
-				RendererObject = EmptyRegion
+				Region = EmptyRegion
 			};
 			return attachment;
 		}
 
-		public MeshAttachment NewMeshAttachment (Skin skin, string name, string path) {
+		public MeshAttachment NewMeshAttachment (Skin skin, string name, string path, Sequence sequence) {
 			MeshAttachment attachment = new MeshAttachment(name) {
-				RendererObject = EmptyRegion
+				Region = EmptyRegion
 			};
 			return attachment;
 		}

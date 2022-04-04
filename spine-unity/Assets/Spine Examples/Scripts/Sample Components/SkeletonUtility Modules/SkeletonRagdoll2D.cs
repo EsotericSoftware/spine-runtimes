@@ -29,8 +29,8 @@
 
 // Contributed by: Mitch Thompson
 
-#if UNITY_2019_2_OR_NEWER
-#define HINGE_JOINT_NEW_BEHAVIOUR
+#if UNITY_2019_2 || UNITY_2019_3 || UNITY_2019_4 || UNITY_2020_1 || UNITY_2020_2 // note: 2020.3+ uses old bahavior again
+#define HINGE_JOINT_2019_BEHAVIOUR
 #endif
 
 using System.Collections;
@@ -174,7 +174,7 @@ namespace Spine.Unity.Examples {
 
 					joint.GetComponent<Rigidbody2D>().mass = joint.connectedBody.mass * massFalloffFactor;
 
-#if HINGE_JOINT_NEW_BEHAVIOUR
+#if HINGE_JOINT_2019_BEHAVIOUR
 					float referenceAngle = (rbParent.transform.eulerAngles.z - t.eulerAngles.z + 360f) % 360f;
 					float minAngle = referenceAngle - rotationLimit;
 					float maxAngle = referenceAngle + rotationLimit;

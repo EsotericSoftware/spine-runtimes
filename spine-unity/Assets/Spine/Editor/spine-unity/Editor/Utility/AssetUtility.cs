@@ -118,11 +118,12 @@ namespace Spine.Unity.Editor {
 		static readonly AttachmentType[] AtlasTypes = { AttachmentType.Region, AttachmentType.Linkedmesh, AttachmentType.Mesh };
 
 		public static List<string> GetRequiredAtlasRegions (string skeletonDataPath) {
-			List<string> requiredPaths = new List<string>();
+			HashSet<string> requiredPaths = new HashSet<string>();
 
 			if (skeletonDataPath.Contains(".skel")) {
-				AddRequiredAtlasRegionsFromBinary(skeletonDataPath, requiredPaths);
-				return requiredPaths;
+				List<string> requiredPathsResult = new List<string>();
+				AddRequiredAtlasRegionsFromBinary(skeletonDataPath, requiredPathsResult);
+				return requiredPathsResult;
 			}
 
 			TextReader reader = null;
@@ -143,11 +144,11 @@ namespace Spine.Unity.Editor {
 			}
 
 			if (root == null || !root.ContainsKey("skins"))
-				return requiredPaths;
+				return new List<string>();
 
 			var skinsList = root["skins"] as List<object>;
 			if (skinsList == null)
-				return requiredPaths;
+				return new List<string>();
 
 			foreach (Dictionary<string, object> skinMap in skinsList) {
 				if (!skinMap.ContainsKey("attachments"))
@@ -176,13 +177,20 @@ namespace Spine.Unity.Editor {
 							requiredPaths.Add((string)data["path"]);
 						else if (data.ContainsKey("name"))
 							requiredPaths.Add((string)data["name"]);
-						else
+						else if (data.ContainsKey("sequence")) {
+							Sequence sequence = SkeletonJson.ReadSequence(data["sequence"]);
+							if (sequence != null)
+								for (int index = 0; index < sequence.Regions.Length; ++index)
+									requiredPaths.Add(sequence.GetPath(attachment.Key, index));
+							else
+								requiredPaths.Add(attachment.Key);
+						} else
 							requiredPaths.Add(attachment.Key);
 					}
 				}
 			}
 
-			return requiredPaths;
+			return requiredPaths.ToList();
 		}
 
 		internal static void AddRequiredAtlasRegionsFromBinary (string skeletonDataPath, List<string> requiredPaths) {
@@ -203,6 +211,14 @@ namespace Spine.Unity.Editor {
 					input.Dispose();
 			}
 			binary = null;
+		}
+
+		internal static AtlasAssetBase GetMatchingAtlas (List<string> requiredPaths, string skeletonName,
+			List<AtlasAssetBase> atlasAssets) {
+			atlasAssets.Sort((a, b) => (
+					string.CompareOrdinal(b.name, skeletonName)
+					- string.CompareOrdinal(a.name, skeletonName)));
+			return GetMatchingAtlas(requiredPaths, atlasAssets);
 		}
 
 		internal static AtlasAssetBase GetMatchingAtlas (List<string> requiredPaths, List<AtlasAssetBase> atlasAssets) {
@@ -234,14 +250,26 @@ namespace Spine.Unity.Editor {
 				this.requirementList = requirementList;
 			}
 
-			public RegionAttachment NewRegionAttachment (Skin skin, string name, string path) {
-				requirementList.Add(path);
-				return new RegionAttachment(name);
+			public RegionAttachment NewRegionAttachment (Skin skin, string name, string path, Sequence sequence) {
+				var regionAttachment = new RegionAttachment(name);
+				if (sequence != null)
+					LoadSequence(path, sequence);
+				else {
+					requirementList.Add(path);
+					AssignDummyRegion(regionAttachment);
+				}
+				return regionAttachment;
 			}
 
-			public MeshAttachment NewMeshAttachment (Skin skin, string name, string path) {
-				requirementList.Add(path);
-				return new MeshAttachment(name);
+			public MeshAttachment NewMeshAttachment (Skin skin, string name, string path, Sequence sequence) {
+				var meshAttachment = new MeshAttachment(name);
+				if (sequence != null)
+					LoadSequence(path, sequence);
+				else {
+					requirementList.Add(path);
+					AssignDummyRegion(meshAttachment);
+				}
+				return meshAttachment;
 			}
 
 			public BoundingBoxAttachment NewBoundingBoxAttachment (Skin skin, string name) {
@@ -258,6 +286,18 @@ namespace Spine.Unity.Editor {
 
 			public ClippingAttachment NewClippingAttachment (Skin skin, string name) {
 				return new ClippingAttachment(name);
+			}
+
+			private void LoadSequence (string basePath, Sequence sequence) {
+				TextureRegion[] regions = sequence.Regions;
+				for (int i = 0, n = regions.Length; i < n; i++) {
+					string path = sequence.GetPath(basePath, i);
+					requirementList.Add(path);
+				}
+			}
+
+			private static void AssignDummyRegion (IHasTextureRegion attachment) {
+				attachment.Region = new AtlasRegion();
 			}
 		}
 		#endregion
@@ -352,13 +392,30 @@ namespace Spine.Unity.Editor {
 				IngestSpineProject(loadedAsset, null);
 #else
 				string skeletonName = Path.GetFileNameWithoutExtension(skeletonPath);
-				var atlasesForSkeleton = FindAtlasesAtPath(dir);
+				List<string> requiredPaths = GetRequiredAtlasRegions(skeletonPath);
+
+				List<AtlasAssetBase> atlasesForSkeleton = FindAtlasesAtPath(dir);
 				atlasesForSkeleton = atlasesForSkeleton.Union(newAtlases).ToList();
-				var requiredPaths = GetRequiredAtlasRegions(skeletonPath);
-				atlasesForSkeleton.Sort((a, b) => (
-					string.CompareOrdinal(b.name, skeletonName)
-					- string.CompareOrdinal(a.name, skeletonName)));
-				var atlasMatch = GetMatchingAtlas(requiredPaths, atlasesForSkeleton);
+				List<AtlasAssetBase> atlasesInSameDir = atlasesForSkeleton.Where(
+					atlas => AssetDatabase.GetAssetPath(atlas).Contains(dir)).ToList();
+
+				AtlasAssetBase atlasMatch = GetMatchingAtlas(requiredPaths, skeletonName, atlasesInSameDir);
+				if (atlasMatch == null && atlasesInSameDir.Count > 0) {
+					AtlasAssetBase firstAtlas = atlasesInSameDir[0];
+					Debug.LogWarning(string.Format(
+						"'{0}' atlas found in skeleton directory does not contain all required attachments",
+						firstAtlas.name), firstAtlas);
+
+					List<AtlasAssetBase> atlasesInOtherDir = atlasesForSkeleton.Except(atlasesInSameDir).ToList();
+					atlasMatch = GetMatchingAtlas(requiredPaths, skeletonName, atlasesInOtherDir);
+					if (atlasMatch != null) {
+						Debug.Log(string.Format(
+							"Using suitable atlas '{0}' of other imported directory. If this is the " +
+							"wrong atlas asset, please assign the correct one at the SkeletonData asset.",
+							atlasMatch.name), atlasMatch);
+					}
+				}
+
 				if (atlasMatch != null || requiredPaths.Count == 0) {
 					IngestSpineProject(loadedAsset, atlasMatch);
 				} else {
@@ -924,7 +981,8 @@ namespace Spine.Unity.Editor {
 					skeletonDataAsset.Clear();
 				}
 				var skeletonData = skeletonDataAsset.GetSkeletonData(true);
-				BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonDataAsset, ref skeletonData);
+				if (skeletonData != null)
+					BlendModeMaterialsUtility.UpdateBlendModeMaterials(skeletonDataAsset, ref skeletonData);
 				AssetDatabase.SaveAssets();
 
 				return skeletonDataAsset;
@@ -974,9 +1032,9 @@ namespace Spine.Unity.Editor {
 				);
 
 				switch (result) {
-				case -1:
-					//Debug.Log("Select Atlas");
-					AtlasAssetBase selectedAtlas = BrowseAtlasDialog(Path.GetDirectoryName(skeletonPath).Replace('\\', '/'));
+				case -1: { // Select Atlas
+					string pathForwardSlash = Path.GetDirectoryName(skeletonPath).Replace('\\', '/');
+					AtlasAssetBase selectedAtlas = BrowseAtlasDialog(pathForwardSlash, localAtlases);
 					if (selectedAtlas != null) {
 						localAtlases.Clear();
 						localAtlases.Add(selectedAtlas);
@@ -987,14 +1045,17 @@ namespace Spine.Unity.Editor {
 						}
 					}
 					break;
-				case 0: // Resolve AtlasAssets...
-					var atlasList = MultiAtlasDialog(requiredPaths, Path.GetDirectoryName(skeletonPath).Replace('\\', '/'),
-						Path.GetFileNameWithoutExtension(skeletonPath));
+				}
+				case 0: { // Resolve AtlasAssets...
+					string pathForwardSlash = Path.GetDirectoryName(skeletonPath).Replace('\\', '/');
+					var atlasList = MultiAtlasDialog(requiredPaths, pathForwardSlash,
+						localAtlases, filename);
 					if (atlasList != null)
 						AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath), atlasList.ToArray());
 
 					resolved = true;
 					break;
+				}
 				case 1: // Import without atlas
 					Debug.LogWarning("Imported with missing atlases. Skeleton will not render: " + Path.GetFileName(skeletonPath));
 					AssetUtility.IngestSpineProject(AssetDatabase.LoadAssetAtPath<TextAsset>(skeletonPath), new AtlasAssetBase[] { });
@@ -1008,7 +1069,9 @@ namespace Spine.Unity.Editor {
 			}
 		}
 
-		public static List<AtlasAssetBase> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory, string filename = "") {
+		public static List<AtlasAssetBase> MultiAtlasDialog (List<string> requiredPaths, string initialDirectory,
+			List<AtlasAssetBase> localAtlases, string filename = "") {
+
 			List<AtlasAssetBase> atlasAssets = new List<AtlasAssetBase>();
 			bool resolved = false;
 			string lastAtlasPath = initialDirectory;
@@ -1063,7 +1126,7 @@ namespace Spine.Unity.Editor {
 
 				switch (result) {
 				case 0: // Browse...
-					AtlasAssetBase selectedAtlasAsset = BrowseAtlasDialog(lastAtlasPath);
+					AtlasAssetBase selectedAtlasAsset = BrowseAtlasDialog(lastAtlasPath, localAtlases);
 					if (selectedAtlasAsset != null) {
 						if (!atlasAssets.Contains(selectedAtlasAsset)) {
 							var atlas = selectedAtlasAsset.GetAtlas();
@@ -1091,7 +1154,7 @@ namespace Spine.Unity.Editor {
 			return atlasAssets;
 		}
 
-		public static AtlasAssetBase BrowseAtlasDialog (string dirPath) {
+		public static AtlasAssetBase BrowseAtlasDialog (string dirPath, List<AtlasAssetBase> localAtlases) {
 			string path = EditorUtility.OpenFilePanel("Select AtlasAsset...", dirPath, "asset");
 			if (path == "")
 				return null; // Canceled or closed by user.
@@ -1099,12 +1162,20 @@ namespace Spine.Unity.Editor {
 			int subLen = Application.dataPath.Length - 6;
 			string assetRelativePath = path.Substring(subLen, path.Length - subLen).Replace("\\", "/");
 
-			var obj = AssetDatabase.LoadAssetAtPath(assetRelativePath, typeof(AtlasAssetBase));
+			UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath(assetRelativePath, typeof(AtlasAssetBase));
+			if (obj == null) {
+				// atlas assets that were just created fail to load, search localAtlases
+				foreach (AtlasAssetBase localAtlas in localAtlases) {
+					string newAtlasPath = AssetDatabase.GetAssetPath(localAtlas);
+					if (newAtlasPath == assetRelativePath)
+						return localAtlas;
+				}
+			}
+
 			if (obj == null || !(obj is AtlasAssetBase)) {
 				Debug.Log("Chosen asset was not of type AtlasAssetBase");
 				return null;
 			}
-
 			return (AtlasAssetBase)obj;
 		}
 		#endregion
@@ -1215,7 +1286,6 @@ namespace Spine.Unity.Editor {
 			}
 
 			newSkeletonAnimation.loop = SpineEditorUtilities.Preferences.defaultInstantiateLoop;
-			newSkeletonAnimation.skeleton.Update(0);
 			newSkeletonAnimation.state.Update(0);
 			newSkeletonAnimation.state.Apply(newSkeletonAnimation.skeleton);
 			newSkeletonAnimation.skeleton.UpdateWorldTransform();
@@ -1301,7 +1371,6 @@ namespace Spine.Unity.Editor {
 				throw e;
 			}
 
-			newSkeletonMecanim.skeleton.Update(0);
 			newSkeletonMecanim.skeleton.UpdateWorldTransform();
 			newSkeletonMecanim.LateUpdate();
 

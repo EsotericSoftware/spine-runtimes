@@ -32,7 +32,7 @@ package com.esotericsoftware.spine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -129,6 +129,6 @@ public class FboTest extends ApplicationAdapter {
 	}
 
 	static public void main (String[] args) throws Exception {
-		new LwjglApplication(new FboTest());
+		new Lwjgl3Application(new FboTest());
 	}
 }

@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/Atlas.h>
 #include <spine/ContainerUtil.h>
 #include <spine/TextureLoader.h>
@@ -159,7 +155,7 @@ struct SimpleString {
 	}
 
 	bool equals(const char *str) {
-		int otherLen = strlen(str);
+		int otherLen = (int) strlen(str);
 		if (length != otherLen) return false;
 		for (int i = 0; i < length; i++) {
 			if (start[i] != str[i]) return false;
@@ -272,8 +268,8 @@ void Atlas::load(const char *begin, int length, const char *dir, bool createText
 				} else if (entry[0].equals("format")) {
 					page->format = (Format) indexOf(formatNames, 8, &entry[1]);
 				} else if (entry[0].equals("filter")) {
-					page->minFilter = (TextureFilter) indexOf(textureFilterNames, 8, &entry[1]);
-					page->magFilter = (TextureFilter) indexOf(textureFilterNames, 8, &entry[2]);
+					page->minFilter = (TEXTURE_FILTER_ENUM) indexOf(textureFilterNames, 8, &entry[1]);
+					page->magFilter = (TEXTURE_FILTER_ENUM) indexOf(textureFilterNames, 8, &entry[2]);
 				} else if (entry[0].equals("repeat")) {
 					page->uWrap = TextureWrap_ClampToEdge;
 					page->vWrap = TextureWrap_ClampToEdge;

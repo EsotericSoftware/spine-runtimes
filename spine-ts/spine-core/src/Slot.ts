@@ -38,24 +38,26 @@ import { Color } from "./Utils";
  * across multiple skeletons. */
 export class Slot {
 	/** The slot's setup pose data. */
-	data: SlotData;
+	data: SlotData = null;
 
 	/** The bone this slot belongs to. */
-	bone: Bone;
+	bone: Bone = null;
 
 	/** The color used to tint the slot's attachment. If {@link #getDarkColor()} is set, this is used as the light color for two
 	 * color tinting. */
-	color: Color;
+	color: Color = null;
 
 	/** The dark color used to tint the slot's attachment for two color tinting, or null if two color tinting is not used. The dark
 	 * color's alpha is not used. */
-	darkColor: Color;
+	darkColor: Color = null;
 
-	attachment: Attachment;
+	attachment: Attachment = null;
 
-	private attachmentTime: number;
+	attachmentState: number = 0;
 
-	attachmentState: number;
+	/** The index of the texture region to display when the slot's attachment has a {@link Sequence}. -1 represents the
+	 * {@link Sequence#getSetupIndex()}. */
+	sequenceIndex: number;
 
 	/** Values to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
 	 * weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.
@@ -83,28 +85,17 @@ export class Slot {
 		return this.attachment;
 	}
 
-	/** Sets the slot's attachment and, if the attachment changed, resets {@link #attachmentTime} and clears the {@link #deform}.
-	 * The deform is not cleared if the old attachment has the same {@link VertexAttachment#getDeformAttachment()} as the specified
-	 * attachment.
-	 * @param attachment May be null. */
+	/** Sets the slot's attachment and, if the attachment changed, resets {@link #sequenceIndex} and clears the {@link #deform}.
+	 * The deform is not cleared if the old attachment has the same {@link VertexAttachment#getTimelineAttachment()} as the
+	 * specified attachment. */
 	setAttachment (attachment: Attachment) {
 		if (this.attachment == attachment) return;
 		if (!(attachment instanceof VertexAttachment) || !(this.attachment instanceof VertexAttachment)
-			|| (<VertexAttachment>attachment).deformAttachment != (<VertexAttachment>this.attachment).deformAttachment) {
+			|| (<VertexAttachment>attachment).timelineAttahment != (<VertexAttachment>this.attachment).timelineAttahment) {
 			this.deform.length = 0;
 		}
 		this.attachment = attachment;
-		this.attachmentTime = this.bone.skeleton.time;
-	}
-
-	setAttachmentTime (time: number) {
-		this.attachmentTime = this.bone.skeleton.time - time;
-	}
-
-	/** The time that has elapsed since the last time the attachment was set or cleared. Relies on Skeleton
-	 * {@link Skeleton#time}. */
-	getAttachmentTime (): number {
-		return this.bone.skeleton.time - this.attachmentTime;
+		this.sequenceIndex = -1;
 	}
 
 	/** Sets this slot to the setup pose. */

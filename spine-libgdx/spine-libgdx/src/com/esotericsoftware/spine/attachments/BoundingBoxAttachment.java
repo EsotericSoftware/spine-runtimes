@@ -59,6 +59,6 @@ public class BoundingBoxAttachment extends VertexAttachment {
 	}
 
 	public BoundingBoxAttachment copy () {
-		return new BoundingBoxAttachment(name);
+		return new BoundingBoxAttachment(this);
 	}
 }

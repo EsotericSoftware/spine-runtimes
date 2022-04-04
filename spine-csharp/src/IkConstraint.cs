@@ -38,8 +38,8 @@ namespace Spine {
 	/// See <a href="http://esotericsoftware.com/spine-ik-constraints">IK constraints</a> in the Spine User Guide.</para>
 	/// </summary>
 	public class IkConstraint : IUpdatable {
-		internal IkConstraintData data;
-		internal ExposedList<Bone> bones = new ExposedList<Bone>();
+		internal readonly IkConstraintData data;
+		internal readonly ExposedList<Bone> bones = new ExposedList<Bone>();
 		internal Bone target;
 		internal int bendDirection;
 		internal bool compress, stretch;
@@ -59,8 +59,8 @@ namespace Spine {
 
 			bones = new ExposedList<Bone>(data.bones.Count);
 			foreach (BoneData boneData in data.bones)
-				bones.Add(skeleton.FindBone(boneData.name));
-			target = skeleton.FindBone(data.target.name);
+				bones.Add(skeleton.bones.Items[boneData.index]);
+			target = skeleton.bones.Items[data.target.index];
 		}
 
 		/// <summary>Copy constructor.</summary>

@@ -27,10 +27,12 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "Engine.h"
-#include "SpinePluginPrivatePCH.h"
+#include "SpineSkeletonRendererComponent.h"
+
+#include "SpineAtlasAsset.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "spine/spine.h"
-#include <stdlib.h>
+#include "UObject/ConstructorHelpers.h"
 
 #define LOCTEXT_NAMESPACE "Spine"
 
@@ -226,7 +228,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 
 			attachmentColor.set(regionAttachment->getColor());
 			attachmentAtlasRegion = (AtlasRegion *) regionAttachment->getRendererObject();
-			regionAttachment->computeWorldVertices(slot->getBone(), *attachmentVertices, 0, 2);
+			regionAttachment->computeWorldVertices(*slot, *attachmentVertices, 0, 2);
 			attachmentIndices = quadIndices;
 			attachmentUvs = regionAttachment->getUVs().buffer();
 			numVertices = 4;
@@ -242,7 +244,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 
 			attachmentColor.set(mesh->getColor());
 			attachmentAtlasRegion = (AtlasRegion *) mesh->getRendererObject();
-			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), *attachmentVertices, 0, 2);
+			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), attachmentVertices->buffer(), 0, 2);
 			attachmentIndices = mesh->getTriangles().buffer();
 			attachmentUvs = mesh->getUVs().buffer();
 			numVertices = mesh->getWorldVerticesLength() >> 1;

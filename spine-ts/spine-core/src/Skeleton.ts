@@ -46,39 +46,34 @@ import { Color, Utils, MathUtils, Vector2, NumberArrayLike } from "./Utils";
  * See [Instance objects](http://esotericsoftware.com/spine-runtime-architecture#Instance-objects) in the Spine Runtimes Guide. */
 export class Skeleton {
 	/** The skeleton's setup pose data. */
-	data: SkeletonData;
+	data: SkeletonData = null;
 
 	/** The skeleton's bones, sorted parent first. The root bone is always the first bone. */
-	bones: Array<Bone>;
+	bones: Array<Bone> = null;
 
 	/** The skeleton's slots. */
-	slots: Array<Slot>;
+	slots: Array<Slot> = null;
 
 	/** The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order. */
-	drawOrder: Array<Slot>;
+	drawOrder: Array<Slot> = null;
 
 	/** The skeleton's IK constraints. */
-	ikConstraints: Array<IkConstraint>;
+	ikConstraints: Array<IkConstraint> = null;
 
 	/** The skeleton's transform constraints. */
-	transformConstraints: Array<TransformConstraint>;
+	transformConstraints: Array<TransformConstraint> = null;
 
 	/** The skeleton's path constraints. */
-	pathConstraints: Array<PathConstraint>;
+	pathConstraints: Array<PathConstraint> = null;
 
 	/** The list of bones and constraints, sorted in the order they should be updated, as computed by {@link #updateCache()}. */
 	_updateCache = new Array<Updatable>();
 
 	/** The skeleton's current skin. May be null. */
-	skin: Skin;
+	skin: Skin = null;
 
 	/** The color to tint all the skeleton's attachments. */
-	color: Color;
-
-	/** Returns the skeleton's time. This can be used for tracking, such as with Slot {@link Slot#attachmentTime}.
-	 * <p>
-	 * See {@link #update()}. */
-	time = 0;
+	color: Color = null;
 
 	/** Scales the entire skeleton on the X axis. This affects all bones, even if the bone's transform mode disallows scale
 	  * inheritance. */
@@ -585,6 +580,15 @@ export class Skeleton {
 		return null;
 	}
 
+	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose as `{ x: number, y: number, width: number, height: number }`.
+	 * Note that this method will create temporary objects which can add to garbage collection pressure. Use `getBounds()` if garbage collection is a concern. */
+	getBoundsRect () {
+		let offset = new Vector2();
+		let size = new Vector2();
+		this.getBounds(offset, size);
+		return { x: offset.x, y: offset.y, width: size.x, height: size.y };
+	}
+
 	/** Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
 	 * @param offset An output value, the distance from the skeleton origin to the bottom left corner of the AABB.
 	 * @param size An output value, the width and height of the AABB.
@@ -603,7 +607,7 @@ export class Skeleton {
 			if (attachment instanceof RegionAttachment) {
 				verticesLength = 8;
 				vertices = Utils.setArraySize(temp, verticesLength, 0);
-				(<RegionAttachment>attachment).computeWorldVertices(slot.bone, vertices, 0, 2);
+				(<RegionAttachment>attachment).computeWorldVertices(slot, vertices, 0, 2);
 			} else if (attachment instanceof MeshAttachment) {
 				let mesh = (<MeshAttachment>attachment);
 				verticesLength = mesh.worldVerticesLength;
@@ -622,10 +626,5 @@ export class Skeleton {
 		}
 		offset.set(minX, minY);
 		size.set(maxX - minX, maxY - minY);
-	}
-
-	/** Increments the skeleton's {@link #time}. */
-	update (delta: number) {
-		this.time += delta;
 	}
 }

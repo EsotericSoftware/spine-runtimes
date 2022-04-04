@@ -35,13 +35,15 @@ import { Slot } from "./Slot";
 import { TransformConstraint } from "./TransformConstraint";
 import { StringSet, Utils, MathUtils, NumberArrayLike } from "./Utils";
 import { Event } from "./Event";
+import { HasTextureRegion } from "./attachments/HasTextureRegion";
+import { SequenceMode, SequenceModeValues } from "./attachments/Sequence";
 
 /** A simple container for a list of timelines and a name. */
 export class Animation {
 	/** The animation's name, which is unique across all animations in the skeleton. */
 	name: string;
-	timelines: Array<Timeline>;
-	timelineIds: StringSet;
+	timelines: Array<Timeline> = null;
+	timelineIds: StringSet = null;
 
 	/** The duration of the animation in seconds, which is the highest time of all keys in the timeline. */
 	duration: number;
@@ -146,13 +148,15 @@ const Property = {
 
 	pathConstraintPosition: 16,
 	pathConstraintSpacing: 17,
-	pathConstraintMix: 18
+	pathConstraintMix: 18,
+
+	sequence: 19
 }
 
 /** The interface for all timelines. */
 export abstract class Timeline {
-	propertyIds: string[];
-	frames: NumberArrayLike;
+	propertyIds: string[] = null;
+	frames: NumberArrayLike = null;
 
 	constructor (frameCount: number, propertyIds: string[]) {
 		this.propertyIds = propertyIds;
@@ -204,7 +208,7 @@ export interface SlotTimeline {
 
 /** The base class for timelines that use interpolation between key frame values. */
 export abstract class CurveTimeline extends Timeline {
-	protected curves: NumberArrayLike; // type, x, y, ...
+	protected curves: NumberArrayLike = null; // type, x, y, ...
 
 	constructor (frameCount: number, bezierCount: number, propertyIds: string[]) {
 		super(frameCount, propertyIds);
@@ -622,8 +626,8 @@ export class ScaleTimeline extends CurveTimeline2 implements BoneTimeline {
 						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
 						break;
 					case MixBlend.add:
-						bone.scaleX = (x - bone.data.scaleX) * alpha;
-						bone.scaleY = (y - bone.data.scaleY) * alpha;
+						bone.scaleX += (x - bone.data.scaleX) * alpha;
+						bone.scaleY += (y - bone.data.scaleY) * alpha;
 				}
 			} else {
 				switch (blend) {
@@ -695,7 +699,7 @@ export class ScaleXTimeline extends CurveTimeline1 implements BoneTimeline {
 						bone.scaleX = bx + (Math.abs(x) * MathUtils.signum(bx) - bx) * alpha;
 						break;
 					case MixBlend.add:
-						bone.scaleX = (x - bone.data.scaleX) * alpha;
+						bone.scaleX += (x - bone.data.scaleX) * alpha;
 				}
 			} else {
 				switch (blend) {
@@ -762,7 +766,7 @@ export class ScaleYTimeline extends CurveTimeline1 implements BoneTimeline {
 						bone.scaleY = by + (Math.abs(y) * MathUtils.signum(by) - by) * alpha;
 						break;
 					case MixBlend.add:
-						bone.scaleY = (y - bone.data.scaleY) * alpha;
+						bone.scaleY += (y - bone.data.scaleY) * alpha;
 				}
 			} else {
 				switch (blend) {
@@ -1426,10 +1430,10 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 	slotIndex = 0;
 
 	/** The attachment that will be deformed. */
-	attachment: VertexAttachment;
+	attachment: VertexAttachment = null;
 
 	/** The vertices for each key frame. */
-	vertices: Array<NumberArrayLike>;
+	vertices: Array<NumberArrayLike> = null;
 
 	constructor (frameCount: number, bezierCount: number, slotIndex: number, attachment: VertexAttachment) {
 		super(frameCount, bezierCount, [
@@ -1505,7 +1509,7 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		let slot: Slot = skeleton.slots[this.slotIndex];
 		if (!slot.bone.active) return;
 		let slotAttachment: Attachment = slot.getAttachment();
-		if (!(slotAttachment instanceof VertexAttachment) || (<VertexAttachment>slotAttachment).deformAttachment != this.attachment) return;
+		if (!(slotAttachment instanceof VertexAttachment) || (<VertexAttachment>slotAttachment).timelineAttahment != this.attachment) return;
 
 		let deform: Array<number> = slot.deform;
 		if (deform.length == 0) blend = MixBlend.setup;
@@ -1515,7 +1519,6 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 
 		let frames = this.frames;
 		if (time < frames[0]) {
-			let vertexAttachment = <VertexAttachment>slotAttachment;
 			switch (blend) {
 				case MixBlend.setup:
 					deform.length = 0;
@@ -1526,6 +1529,7 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 						return;
 					}
 					deform.length = vertexCount;
+					let vertexAttachment = <VertexAttachment>slotAttachment;
 					if (!vertexAttachment.bones) {
 						// Unweighted vertex positions.
 						let setupVertices = vertexAttachment.vertices;
@@ -1681,7 +1685,7 @@ export class EventTimeline extends Timeline {
 	static propertyIds = ["" + Property.event];
 
 	/** The event for each key frame. */
-	events: Array<Event>;
+	events: Array<Event> = null;
 
 	constructor (frameCount: number) {
 		super(frameCount, EventTimeline.propertyIds);
@@ -1734,7 +1738,7 @@ export class DrawOrderTimeline extends Timeline {
 	static propertyIds = ["" + Property.drawOrder];
 
 	/** The draw order for each key frame. See {@link #setFrame(int, float, int[])}. */
-	drawOrders: Array<Array<number>>;
+	drawOrders: Array<Array<number>> = null;
 
 	constructor (frameCount: number) {
 		super(frameCount, DrawOrderTimeline.propertyIds);
@@ -1780,7 +1784,7 @@ export class DrawOrderTimeline extends Timeline {
  * {@link IkConstraint#bendDirection}, {@link IkConstraint#stretch}, and {@link IkConstraint#compress}. */
 export class IkConstraintTimeline extends CurveTimeline {
 	/** The index of the IK constraint slot in {@link Skeleton#ikConstraints} that will be changed. */
-	ikConstraintIndex: number;
+	ikConstraintIndex: number = 0;
 
 	constructor (frameCount: number, bezierCount: number, ikConstraintIndex: number) {
 		super(frameCount, bezierCount, [
@@ -1878,7 +1882,7 @@ export class IkConstraintTimeline extends CurveTimeline {
  * {@link TransformConstraint#scaleMix}, and {@link TransformConstraint#shearMix}. */
 export class TransformConstraintTimeline extends CurveTimeline {
 	/** The index of the transform constraint slot in {@link Skeleton#transformConstraints} that will be changed. */
-	transformConstraintIndex: number;
+	transformConstraintIndex: number = 0;
 
 	constructor (frameCount: number, bezierCount: number, transformConstraintIndex: number) {
 		super(frameCount, bezierCount, [
@@ -1991,7 +1995,7 @@ export class TransformConstraintTimeline extends CurveTimeline {
 /** Changes a path constraint's {@link PathConstraint#position}. */
 export class PathConstraintPositionTimeline extends CurveTimeline1 {
 	/** The index of the path constraint slot in {@link Skeleton#pathConstraints} that will be changed. */
-	pathConstraintIndex: number;
+	pathConstraintIndex: number = 0;
 
 	constructor (frameCount: number, bezierCount: number, pathConstraintIndex: number) {
 		super(frameCount, bezierCount, Property.pathConstraintPosition + "|" + pathConstraintIndex);
@@ -2139,5 +2143,100 @@ export class PathConstraintMixTimeline extends CurveTimeline {
 			constraint.mixX += (x - constraint.mixX) * alpha;
 			constraint.mixY += (y - constraint.mixY) * alpha;
 		}
+	}
+}
+
+/** Changes a slot's {@link Slot#getSequenceIndex()} for an attachment's {@link Sequence}. */
+export class SequenceTimeline extends Timeline implements SlotTimeline {
+	static ENTRIES = 3;
+	static MODE = 1;
+	static DELAY = 2;
+
+	slotIndex: number;
+	attachment: HasTextureRegion;
+
+	constructor (frameCount: number, slotIndex: number, attachment: HasTextureRegion) {
+		super(frameCount, [
+			Property.sequence + "|" + slotIndex + "|" + attachment.sequence.id
+		]);
+		this.slotIndex = slotIndex;
+		this.attachment = attachment;
+	}
+
+	getFrameEntries () {
+		return SequenceTimeline.ENTRIES;
+	}
+
+	getSlotIndex () {
+		return this.slotIndex;
+	}
+
+	getAttachment () {
+		return this.attachment as unknown as Attachment;
+	}
+
+	/** Sets the time, mode, index, and frame time for the specified frame.
+	 * @param frame Between 0 and <code>frameCount</code>, inclusive.
+	 * @param time Seconds between frames. */
+	setFrame (frame: number, time: number, mode: SequenceMode, index: number, delay: number) {
+		let frames = this.frames;
+		frame *= SequenceTimeline.ENTRIES;
+		frames[frame] = time;
+		frames[frame + SequenceTimeline.MODE] = mode | (index << 4);
+		frames[frame + SequenceTimeline.DELAY] = delay;
+	}
+
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+		let slot = skeleton.slots[this.slotIndex];
+		if (!slot.bone.active) return;
+		let slotAttachment = slot.attachment;
+		let attachment = this.attachment as unknown as Attachment;
+		if (slotAttachment != attachment) {
+			if (!(slotAttachment instanceof VertexAttachment)
+				|| (slotAttachment as VertexAttachment).timelineAttahment != attachment) return;
+		}
+
+		let frames = this.frames;
+		if (time < frames[0]) { // Time is before first frame.
+			if (blend == MixBlend.setup || blend == MixBlend.first) slot.sequenceIndex = -1;
+			return;
+		}
+
+		let i = Timeline.search(frames, time, SequenceTimeline.ENTRIES);
+		let before = frames[i];
+		let modeAndIndex = frames[i + SequenceTimeline.MODE];
+		let delay = frames[i + SequenceTimeline.DELAY];
+
+		let index = modeAndIndex >> 4, count = this.attachment.sequence.regions.length;
+		let mode = SequenceModeValues[modeAndIndex & 0xf];
+		if (mode != SequenceMode.hold) {
+			index += (((time - before) / delay + 0.00001) | 0);
+			switch (mode) {
+				case SequenceMode.once:
+					index = Math.min(count - 1, index);
+					break;
+				case SequenceMode.loop:
+					index %= count;
+					break;
+				case SequenceMode.pingpong: {
+					let n = (count << 1) - 2;
+					index %= n;
+					if (index >= count) index = n - index;
+					break;
+				}
+				case SequenceMode.onceReverse:
+					index = Math.max(count - 1 - index, 0);
+					break;
+				case SequenceMode.loopReverse:
+					index = count - 1 - (index % count);
+					break;
+				case SequenceMode.pingpongReverse: {
+					let n = (count << 1) - 2;
+					index = (index + count - 1) % n;
+					if (index >= count) index = n - index;
+				}
+			}
+		}
+		slot.sequenceIndex = index;
 	}
 }

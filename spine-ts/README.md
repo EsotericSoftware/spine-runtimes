@@ -7,7 +7,7 @@ up into multiple modules:
 1. `spine-webgl/`, a self-contained WebGL backend, built on the core classes.
 1. `spine-canvas/`, a self-contained Canvas backend, built on the core classes.
 1. `spine-threejs/`, a self-contained THREE.JS backend, built on the core classes.
-1. `spine-player/`, a self-contained player to easily display Spine animations on your website, built on core the classes and WebGL backend.
+1. `spine-player/`, a self-contained player to easily display Spine animations on your website, built on the core classes and WebGL backend.
 
 In most cases, the `spine-player` module is best suited for your needs. Please refer to the [Spine Web Player documentation](https://esotericsoftware.com/spine-player) for more information.
 
@@ -27,13 +27,13 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-ts works with data exported from Spine 4.0.xx.
+spine-ts works with data exported from Spine 4.1.xx.
 
 The spine-ts WebGL and Player backends support all Spine features.
 
 spine-ts Canvas does not support mesh attachments, clipping attachments, or color tinting. Only the alpha channel from tint colors is applied. Experimental support for mesh attachments can be enabled by setting `spine.SkeletonRenderer.useTriangleRendering` to true. Note that this experimental mesh rendering is slow and render with artifacts on some browsers.
 
-spine-ts THREE.JS does not support two color tinting or blend modes. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
+spine-ts THREE.JS does not support two color tinting. The THREE.JS backend provides `SkeletonMesh.zOffset` to avoid z-fighting. Adjust to your near/far plane settings.
 
 ## Usage
 
@@ -54,7 +54,7 @@ You can include a module in your project via a `<script>` tag from the [unpkg](h
 
 // spine-ts Player, which requires a spine-player.css as well
 <script src="https://unpkg.com/@esotericsoftware/spine-player@4.0.*/dist/iife/spine-player.js">
-<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.0.*/dist/iife/spine-player.css">
+<link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.0.*/dist/spine-player.css">
 
 // spine-ts WebGL
 <script src="https://unpkg.com/@esotericsoftware/spine-threejs@4.0.*/dist/iife/spine-webgl.js">
@@ -104,6 +104,7 @@ spine-ts is developed with TypeScript, we thus recommend the following developme
 3. Open a terminal and execute
 ```
 git clone https://github.com/esotericsoftware/spine-runtimes
+cd spine-runtimes/spine-ts
 npm install
 npm run dev
 ```

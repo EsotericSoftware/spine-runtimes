@@ -172,8 +172,6 @@ namespace spine {
 		/// @return May be NULL.
 		PathConstraint *findPathConstraint(const String &constraintName);
 
-		void update(float delta);
-
 		/// Returns the axis aligned bounding box (AABB) of the region and mesh attachments for the current pose.
 		/// @param outX The horizontal distance between the skeleton origin and the left side of the AABB.
 		/// @param outY The vertical distance between the skeleton origin and the bottom side of the AABB.
@@ -204,10 +202,6 @@ namespace spine {
 
 		Color &getColor();
 
-		float getTime();
-
-		void setTime(float inValue);
-
 		void setPosition(float x, float y);
 
 		float getX();
@@ -237,7 +231,6 @@ namespace spine {
 		Vector<Updatable *> _updateCache;
 		Skin *_skin;
 		Color _color;
-		float _time;
 		float _scaleX, _scaleY;
 		float _x, _y;
 

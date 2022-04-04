@@ -42,16 +42,16 @@ namespace Spine {
 		const int NONE = -1, BEFORE = -2, AFTER = -3;
 		const float Epsilon = 0.00001f;
 
-		internal PathConstraintData data;
-		internal ExposedList<Bone> bones;
+		internal readonly PathConstraintData data;
+		internal readonly ExposedList<Bone> bones;
 		internal Slot target;
 		internal float position, spacing, mixRotate, mixX, mixY;
 
 		internal bool active;
 
-		internal ExposedList<float> spaces = new ExposedList<float>(), positions = new ExposedList<float>();
-		internal ExposedList<float> world = new ExposedList<float>(), curves = new ExposedList<float>(), lengths = new ExposedList<float>();
-		internal float[] segments = new float[10];
+		internal readonly ExposedList<float> spaces = new ExposedList<float>(), positions = new ExposedList<float>();
+		internal readonly ExposedList<float> world = new ExposedList<float>(), curves = new ExposedList<float>(), lengths = new ExposedList<float>();
+		internal readonly float[] segments = new float[10];
 
 		public PathConstraint (PathConstraintData data, Skeleton skeleton) {
 			if (data == null) throw new ArgumentNullException("data", "data cannot be null.");
@@ -59,8 +59,8 @@ namespace Spine {
 			this.data = data;
 			bones = new ExposedList<Bone>(data.Bones.Count);
 			foreach (BoneData boneData in data.bones)
-				bones.Add(skeleton.FindBone(boneData.name));
-			target = skeleton.FindSlot(data.target.name);
+				bones.Add(skeleton.bones.Items[boneData.index]);
+			target = skeleton.slots.Items[data.target.index];
 			position = data.position;
 			spacing = data.spacing;
 			mixRotate = data.mixRotate;
@@ -73,9 +73,9 @@ namespace Spine {
 			if (constraint == null) throw new ArgumentNullException("constraint cannot be null.");
 			if (skeleton == null) throw new ArgumentNullException("skeleton cannot be null.");
 			data = constraint.data;
-			bones = new ExposedList<Bone>(constraint.Bones.Count);
-			foreach (Bone bone in constraint.Bones)
-				bones.Add(skeleton.Bones.Items[bone.data.index]);
+			bones = new ExposedList<Bone>(constraint.bones.Count);
+			foreach (Bone bone in constraint.bones)
+				bones.Add(skeleton.bones.Items[bone.data.index]);
 			target = skeleton.slots.Items[constraint.target.data.index];
 			position = constraint.position;
 			spacing = constraint.spacing;
@@ -506,5 +506,9 @@ namespace Spine {
 		public bool Active { get { return active; } }
 		/// <summary>The path constraint's setup pose data.</summary>
 		public PathConstraintData Data { get { return data; } }
+
+		override public string ToString () {
+			return data.name;
+		}
 	}
 }

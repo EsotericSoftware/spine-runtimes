@@ -31,54 +31,60 @@ import { TextureRegion } from "../Texture";
 import { TextureAtlasRegion } from "../TextureAtlas";
 import { Color, NumberArrayLike, Utils } from "../Utils";
 import { VertexAttachment, Attachment } from "./Attachment";
+import { HasTextureRegion } from "./HasTextureRegion";
+import { Sequence } from "./Sequence";
+import { Slot } from "../Slot";
 
 /** An attachment that displays a textured mesh. A mesh has hull vertices and internal vertices within the hull. Holes are not
  * supported. Each vertex has UVs (texture coordinates) and triangles are used to map an image on to the mesh.
  *
  * See [Mesh attachments](http://esotericsoftware.com/spine-meshes) in the Spine User Guide. */
-export class MeshAttachment extends VertexAttachment {
-	region: TextureRegion;
+export class MeshAttachment extends VertexAttachment implements HasTextureRegion {
+	region: TextureRegion = null;
 
 	/** The name of the texture region for this attachment. */
-	path: string;
+	path: string = null;
 
 	/** The UV pair for each vertex, normalized within the texture region. */
-	regionUVs: NumberArrayLike;
+	regionUVs: NumberArrayLike = null;
 
 	/** The UV pair for each vertex, normalized within the entire texture.
 	 *
 	 * See {@link #updateUVs}. */
-	uvs: NumberArrayLike;
+	uvs: NumberArrayLike = null;
 
 	/** Triplets of vertex indices which describe the mesh's triangulation. */
-	triangles: Array<number>;
+	triangles: Array<number> = null;
 
 	/** The color to tint the mesh. */
 	color = new Color(1, 1, 1, 1);
 
 	/** The width of the mesh's image. Available only when nonessential data was exported. */
-	width: number;
+	width: number = 0;
 
 	/** The height of the mesh's image. Available only when nonessential data was exported. */
-	height: number;
+	height: number = 0;
 
 	/** The number of entries at the beginning of {@link #vertices} that make up the mesh hull. */
-	hullLength: number;
+	hullLength: number = 0;
 
 	/** Vertex index pairs describing edges for controling triangulation. Mesh triangles will never cross edges. Only available if
 	 * nonessential data was exported. Triangulation is not performed at runtime. */
-	edges: Array<number>;
+	edges: Array<number> = null;
 
-	private parentMesh: MeshAttachment;
+	private parentMesh: MeshAttachment = null;
+
+	sequence: Sequence = null;
+
 	tempColor = new Color(0, 0, 0, 0);
 
 	constructor (name: string) {
 		super(name);
 	}
 
-	/** Calculates {@link #uvs} using {@link #regionUVs} and the {@link #region}. Must be called after changing the region UVs or
-	 * region. */
-	updateUVs () {
+	/** Calculates {@link #uvs} using the {@link #regionUVs} and region. Must be called if the region, the region's properties, or
+	 * the {@link #regionUVs} are changed. */
+	updateRegion () {
 		let regionUVs = this.regionUVs;
 		if (!this.uvs || this.uvs.length != regionUVs.length) this.uvs = Utils.newFloatArray(regionUVs.length);
 		let uvs = this.uvs;
@@ -175,6 +181,8 @@ export class MeshAttachment extends VertexAttachment {
 		Utils.arrayCopy(this.triangles, 0, copy.triangles, 0, this.triangles.length);
 		copy.hullLength = this.hullLength;
 
+		copy.sequence = this.sequence != null ? this.sequence.copy() : null;
+
 		// Nonessential.
 		if (this.edges) {
 			copy.edges = new Array<number>(this.edges.length);
@@ -186,15 +194,20 @@ export class MeshAttachment extends VertexAttachment {
 		return copy;
 	}
 
+	computeWorldVertices (slot: Slot, start: number, count: number, worldVertices: NumberArrayLike, offset: number, stride: number) {
+		if (this.sequence != null) this.sequence.apply(slot, this);
+		super.computeWorldVertices(slot, start, count, worldVertices, offset, stride);
+	}
+
 	/** Returns a new mesh with the {@link #parentMesh} set to this mesh's parent mesh, if any, else to this mesh. **/
 	newLinkedMesh (): MeshAttachment {
 		let copy = new MeshAttachment(this.name);
 		copy.region = this.region;
 		copy.path = this.path;
 		copy.color.setFromColor(this.color);
-		copy.deformAttachment = this.deformAttachment;
+		copy.timelineAttahment = this.timelineAttahment;
 		copy.setParentMesh(this.parentMesh ? this.parentMesh : this);
-		copy.updateUVs();
+		if (copy.region != null) copy.updateRegion();
 		return copy;
 	}
 }

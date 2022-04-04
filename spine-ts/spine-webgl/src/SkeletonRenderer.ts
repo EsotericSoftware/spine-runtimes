@@ -109,7 +109,7 @@ export class SkeletonRenderer {
 				renderable.vertices = this.vertices;
 				renderable.numVertices = 4;
 				renderable.numFloats = clippedVertexSize << 2;
-				region.computeWorldVertices(slot.bone, renderable.vertices, 0, clippedVertexSize);
+				region.computeWorldVertices(slot, renderable.vertices, 0, clippedVertexSize);
 				triangles = SkeletonRenderer.QUAD_TRIANGLES;
 				uvs = region.uvs;
 				texture = <GLTexture>(<TextureAtlasRegion>region.region.renderObject).page.texture;

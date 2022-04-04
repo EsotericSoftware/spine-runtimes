@@ -27,30 +27,31 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpinePluginPrivatePCH.h"
-
+#include "SSpineWidget.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
-#include "Modules/ModuleManager.h"
 #include "Rendering/DrawElements.h"
 #include "Runtime/SlateRHIRenderer/Public/Interfaces/ISlateRHIRendererModule.h"
-#include "SSpineWidget.h"
 #include "Slate/SMeshWidget.h"
 #include "Slate/SlateVectorArtData.h"
-#include "Slate/SlateVectorArtInstanceData.h"
 #include "SlateMaterialBrush.h"
 #include "SpineWidget.h"
 #include <spine/spine.h>
 
 using namespace spine;
 
+static int brushNameId = 0;
+
 // Workaround for https://github.com/EsotericSoftware/spine-runtimes/issues/1458
 // See issue comments for more information.
 struct SpineSlateMaterialBrush : public FSlateBrush {
 	SpineSlateMaterialBrush(class UMaterialInterface &InMaterial, const FVector2D &InImageSize)
 		: FSlateBrush(ESlateBrushDrawType::Image, FName(TEXT("None")), FMargin(0), ESlateBrushTileType::NoTile, ESlateBrushImageType::FullColor, InImageSize, FLinearColor::White, &InMaterial) {
-		ResourceName = FName(*InMaterial.GetFullName());
+		// Workaround for https://github.com/EsotericSoftware/spine-runtimes/issues/2006
+		FString brushName = TEXT("spineslatebrush");
+		brushName.AppendInt(brushNameId++);
+		ResourceName = FName(brushName);
 	}
 };
 
@@ -269,7 +270,7 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList &OutDrawEle
 			RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
 			attachmentColor.set(regionAttachment->getColor());
 			attachmentAtlasRegion = (AtlasRegion *) regionAttachment->getRendererObject();
-			regionAttachment->computeWorldVertices(slot->getBone(), *attachmentVertices, 0, 2);
+			regionAttachment->computeWorldVertices(*slot, *attachmentVertices, 0, 2);
 			attachmentIndices = quadIndices;
 			attachmentUvs = regionAttachment->getUVs().buffer();
 			numVertices = 4;
@@ -278,7 +279,7 @@ void SSpineWidget::UpdateMesh(int32 LayerId, FSlateWindowElementList &OutDrawEle
 			MeshAttachment *mesh = (MeshAttachment *) attachment;
 			attachmentColor.set(mesh->getColor());
 			attachmentAtlasRegion = (AtlasRegion *) mesh->getRendererObject();
-			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), *attachmentVertices, 0, 2);
+			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), attachmentVertices->buffer(), 0, 2);
 			attachmentIndices = mesh->getTriangles().buffer();
 			attachmentUvs = mesh->getUVs().buffer();
 			numVertices = mesh->getWorldVerticesLength() >> 1;

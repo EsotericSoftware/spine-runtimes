@@ -41,25 +41,25 @@ export class PathConstraintData extends ConstraintData {
 	bones = new Array<BoneData>();
 
 	/** The slot whose path attachment will be used to constrained the bones. */
-	target: SlotData;
+	target: SlotData = null;
 
 	/** The mode for positioning the first bone on the path. */
-	positionMode: PositionMode;
+	positionMode: PositionMode = null;
 
 	/** The mode for positioning the bones after the first bone on the path. */
-	spacingMode: SpacingMode;
+	spacingMode: SpacingMode = null;
 
 	/** The mode for adjusting the rotation of the bones. */
-	rotateMode: RotateMode;
+	rotateMode: RotateMode = null;
 
 	/** An offset added to the constrained bone rotation. */
-	offsetRotation: number;
+	offsetRotation: number = 0;
 
 	/** The position along the path. */
-	position: number;
+	position: number = 0;
 
 	/** The spacing between bones. */
-	spacing: number;
+	spacing: number = 0;
 
 	mixRotate = 0;
 	mixX = 0;

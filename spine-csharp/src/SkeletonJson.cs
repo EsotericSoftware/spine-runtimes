@@ -336,9 +336,9 @@ namespace Spine {
 				if (skin == null) throw new Exception("Slot not found: " + linkedMesh.skin);
 				Attachment parent = skin.GetAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 				if (parent == null) throw new Exception("Parent mesh not found: " + linkedMesh.parent);
-				linkedMesh.mesh.DeformAttachment = linkedMesh.inheritDeform ? (VertexAttachment)parent : linkedMesh.mesh;
+				linkedMesh.mesh.TimelineAttachment = linkedMesh.inheritTimelines ? (VertexAttachment)parent : linkedMesh.mesh;
 				linkedMesh.mesh.ParentMesh = (MeshAttachment)parent;
-				linkedMesh.mesh.UpdateUVs();
+				if (linkedMesh.mesh.Region != null) linkedMesh.mesh.UpdateRegion();
 			}
 			linkedMeshes.Clear();
 
@@ -386,11 +386,13 @@ namespace Spine {
 			var typeName = GetString(map, "type", "region");
 			var type = (AttachmentType)Enum.Parse(typeof(AttachmentType), typeName, true);
 
-			string path = GetString(map, "path", name);
-
 			switch (type) {
-			case AttachmentType.Region:
-				RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, name, path);
+			case AttachmentType.Region: {
+				string path = GetString(map, "path", name);
+				object sequenceJson;
+				map.TryGetValue("sequence", out sequenceJson);
+				Sequence sequence = ReadSequence(sequenceJson);
+				RegionAttachment region = attachmentLoader.NewRegionAttachment(skin, name, path, sequence);
 				if (region == null) return null;
 				region.Path = path;
 				region.x = GetFloat(map, "x", 0) * scale;
@@ -400,6 +402,7 @@ namespace Spine {
 				region.rotation = GetFloat(map, "rotation", 0);
 				region.width = GetFloat(map, "width", 32) * scale;
 				region.height = GetFloat(map, "height", 32) * scale;
+				region.sequence = sequence;
 
 				if (map.ContainsKey("color")) {
 					var color = (string)map["color"];
@@ -409,8 +412,9 @@ namespace Spine {
 					region.a = ToColor(color, 3);
 				}
 
-				region.UpdateOffset();
+				if (region.Region != null) region.UpdateRegion();
 				return region;
+			}
 			case AttachmentType.Boundingbox:
 				BoundingBoxAttachment box = attachmentLoader.NewBoundingBoxAttachment(skin, name);
 				if (box == null) return null;
@@ -418,7 +422,11 @@ namespace Spine {
 				return box;
 			case AttachmentType.Mesh:
 			case AttachmentType.Linkedmesh: {
-				MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path);
+				string path = GetString(map, "path", name);
+				object sequenceJson;
+				map.TryGetValue("sequence", out sequenceJson);
+				Sequence sequence = ReadSequence(sequenceJson);
+				MeshAttachment mesh = attachmentLoader.NewMeshAttachment(skin, name, path, sequence);
 				if (mesh == null) return null;
 				mesh.Path = path;
 
@@ -432,10 +440,11 @@ namespace Spine {
 
 				mesh.Width = GetFloat(map, "width", 0) * scale;
 				mesh.Height = GetFloat(map, "height", 0) * scale;
+				mesh.Sequence = sequence;
 
 				string parent = GetString(map, "parent", null);
 				if (parent != null) {
-					linkedMeshes.Add(new LinkedMesh(mesh, GetString(map, "skin", null), slotIndex, parent, GetBoolean(map, "deform", true)));
+					linkedMeshes.Add(new LinkedMesh(mesh, GetString(map, "skin", null), slotIndex, parent, GetBoolean(map, "timelines", true)));
 					return mesh;
 				}
 
@@ -443,7 +452,7 @@ namespace Spine {
 				ReadVertices(map, mesh, uvs.Length);
 				mesh.triangles = GetIntArray(map, "triangles");
 				mesh.regionUVs = uvs;
-				mesh.UpdateUVs();
+				if (mesh.Region != null) mesh.UpdateRegion();
 
 				if (map.ContainsKey("hull")) mesh.HullLength = GetInt(map, "hull", 0) << 1;
 				if (map.ContainsKey("edges")) mesh.Edges = GetIntArray(map, "edges");
@@ -492,6 +501,16 @@ namespace Spine {
 			}
 			}
 			return null;
+		}
+
+		public static Sequence ReadSequence (object sequenceJson) {
+			var map = sequenceJson as Dictionary<string, Object>;
+			if (map == null) return null;
+			Sequence sequence = new Sequence(GetInt(map, "count"));
+			sequence.start = GetInt(map, "start", 1);
+			sequence.digits = GetInt(map, "digits", 0);
+			sequence.setupIndex = GetInt(map, "setup", 0);
+			return sequence;
 		}
 
 		private void ReadVertices (Dictionary<string, Object> map, VertexAttachment attachment, int verticesLength) {
@@ -549,7 +568,7 @@ namespace Spine {
 							var timeline = new AttachmentTimeline(frames, slotIndex);
 							int frame = 0;
 							foreach (Dictionary<string, Object> keyMap in values) {
-								timeline.SetFrame(frame++, GetFloat(keyMap, "time", 0), (string)keyMap["name"]);
+								timeline.SetFrame(frame++, GetFloat(keyMap, "time", 0), GetString(keyMap, "name", null));
 							}
 							timelines.Add(timeline);
 
@@ -945,59 +964,82 @@ namespace Spine {
 				}
 			}
 
-			// Deform timelines.
-			if (map.ContainsKey("deform")) {
-				foreach (KeyValuePair<string, Object> deformMap in (Dictionary<string, Object>)map["deform"]) {
-					Skin skin = skeletonData.FindSkin(deformMap.Key);
-					foreach (KeyValuePair<string, Object> slotMap in (Dictionary<string, Object>)deformMap.Value) {
-						int slotIndex = FindSlotIndex(skeletonData, slotMap.Key);
-						foreach (KeyValuePair<string, Object> timelineMap in (Dictionary<string, Object>)slotMap.Value) {
-							var values = (List<Object>)timelineMap.Value;
-							var keyMapEnumerator = values.GetEnumerator();
-							if (!keyMapEnumerator.MoveNext()) continue;
-							var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
-							VertexAttachment attachment = (VertexAttachment)skin.GetAttachment(slotIndex, timelineMap.Key);
-							if (attachment == null) throw new Exception("Deform attachment not found: " + timelineMap.Key);
-							bool weighted = attachment.bones != null;
-							float[] vertices = attachment.vertices;
-							int deformLength = weighted ? (vertices.Length / 3) << 1 : vertices.Length;
-							DeformTimeline timeline = new DeformTimeline(values.Count, values.Count, slotIndex, attachment);
-							float time = GetFloat(keyMap, "time", 0);
-							for (int frame = 0, bezier = 0; ; frame++) {
-								float[] deform;
-								if (!keyMap.ContainsKey("vertices")) {
-									deform = weighted ? new float[deformLength] : vertices;
-								} else {
-									deform = new float[deformLength];
-									int start = GetInt(keyMap, "offset", 0);
-									float[] verticesValue = GetFloatArray(keyMap, "vertices", 1);
-									Array.Copy(verticesValue, 0, deform, start, verticesValue.Length);
-									if (scale != 1) {
-										for (int i = start, n = i + verticesValue.Length; i < n; i++)
-											deform[i] *= scale;
-									}
+			// Attachment timelines.
+			if (map.ContainsKey("attachments")) {
+				foreach (KeyValuePair<string, Object> attachmentsMap in (Dictionary<string, Object>)map["attachments"]) {
+					Skin skin = skeletonData.FindSkin(attachmentsMap.Key);
+					foreach (KeyValuePair<string, Object> slotMap in (Dictionary<string, Object>)attachmentsMap.Value) {
+						SlotData slot = skeletonData.FindSlot(slotMap.Key);
+						if (slot == null) throw new Exception("Slot not found: " + slotMap.Key);
+						foreach (KeyValuePair<string, Object> attachmentMap in (Dictionary<string, Object>)slotMap.Value) {
+							Attachment attachment = skin.GetAttachment(slot.index, attachmentMap.Key);
+							if (attachment == null) throw new Exception("Timeline attachment not found: " + attachmentMap.Key);
+							foreach (KeyValuePair<string, Object> timelineMap in (Dictionary<string, Object>)attachmentMap.Value) {
+								var values = (List<Object>)timelineMap.Value;
+								var keyMapEnumerator = values.GetEnumerator();
+								if (!keyMapEnumerator.MoveNext()) continue;
+								var keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
+								int frames = values.Count;
+								string timelineName = timelineMap.Key;
+								if (timelineName == "deform") {
+									VertexAttachment vertexAttachment = (VertexAttachment)attachment;
+									bool weighted = vertexAttachment.bones != null;
+									float[] vertices = vertexAttachment.vertices;
+									int deformLength = weighted ? (vertices.Length / 3) << 1 : vertices.Length;
 
-									if (!weighted) {
-										for (int i = 0; i < deformLength; i++)
-											deform[i] += vertices[i];
-									}
-								}
+									DeformTimeline timeline = new DeformTimeline(frames, frames, slot.Index, vertexAttachment);
+									float time = GetFloat(keyMap, "time", 0);
+									for (int frame = 0, bezier = 0; ; frame++) {
+										float[] deform;
+										if (!keyMap.ContainsKey("vertices")) {
+											deform = weighted ? new float[deformLength] : vertices;
+										} else {
+											deform = new float[deformLength];
+											int start = GetInt(keyMap, "offset", 0);
+											float[] verticesValue = GetFloatArray(keyMap, "vertices", 1);
+											Array.Copy(verticesValue, 0, deform, start, verticesValue.Length);
+											if (scale != 1) {
+												for (int i = start, n = i + verticesValue.Length; i < n; i++)
+													deform[i] *= scale;
+											}
 
-								timeline.SetFrame(frame, time, deform);
-								if (!keyMapEnumerator.MoveNext()) {
-									timeline.Shrink(bezier);
-									break;
+											if (!weighted) {
+												for (int i = 0; i < deformLength; i++)
+													deform[i] += vertices[i];
+											}
+										}
+
+										timeline.SetFrame(frame, time, deform);
+										if (!keyMapEnumerator.MoveNext()) {
+											timeline.Shrink(bezier);
+											break;
+										}
+										var nextMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
+										float time2 = GetFloat(nextMap, "time", 0);
+										if (keyMap.ContainsKey("curve")) {
+											object curve = keyMap["curve"];
+											bezier = ReadCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
+										}
+										time = time2;
+										keyMap = nextMap;
+									}
+									timelines.Add(timeline);
+								} else if (timelineName == "sequence") {
+									SequenceTimeline timeline = new SequenceTimeline(frames, slot.index, attachment);
+									float lastDelay = 0;
+									for (int frame = 0; keyMap != null;
+										keyMapEnumerator.MoveNext(), keyMap = (Dictionary<string, Object>)keyMapEnumerator.Current, frame++) {
+
+										float delay = GetFloat(keyMap, "delay", lastDelay);
+										SequenceMode sequenceMode = (SequenceMode)Enum.Parse(typeof(SequenceMode),
+											GetString(keyMap, "mode", "hold"), true);
+										timeline.SetFrame(frame, GetFloat(keyMap, "time", 0),
+											sequenceMode, GetInt(keyMap, "index", 0), delay);
+										lastDelay = delay;
+									}
+									timelines.Add(timeline);
 								}
-								var nextMap = (Dictionary<string, Object>)keyMapEnumerator.Current;
-								float time2 = GetFloat(nextMap, "time", 0);
-								if (keyMap.ContainsKey("curve")) {
-									object curve = keyMap["curve"];
-									bezier = ReadCurve(curve, timeline, bezier, frame, 0, time, time2, 0, 1, 1);
-								}
-								time = time2;
-								keyMap = nextMap;
 							}
-							timelines.Add(timeline);
 						}
 					}
 				}
@@ -1171,6 +1213,11 @@ namespace Spine {
 
 		static int GetInt (Dictionary<string, Object> map, string name, int defaultValue) {
 			if (!map.ContainsKey(name)) return defaultValue;
+			return (int)(float)map[name];
+		}
+
+		static int GetInt (Dictionary<string, Object> map, string name) {
+			if (!map.ContainsKey(name)) throw new ArgumentException("Named value not found: " + name);
 			return (int)(float)map[name];
 		}
 

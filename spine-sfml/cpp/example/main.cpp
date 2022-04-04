@@ -479,6 +479,40 @@ void coin(SkeletonData *skeletonData, Atlas *atlas) {
 	}
 }
 
+void dragon(SkeletonData *skeletonData, Atlas *atlas) {
+	SP_UNUSED(atlas);
+
+	SkeletonDrawable drawable(skeletonData);
+	drawable.timeScale = 1;
+	drawable.setUsePremultipliedAlpha(true);
+
+	Skeleton *skeleton = drawable.skeleton;
+	skeleton->setPosition(320, 320);
+	skeleton->updateWorldTransform();
+
+	drawable.state->setAnimation(0, "flying", true);
+
+	sf::RenderWindow window(sf::VideoMode(640, 640), "Spine SFML - dragon");
+	window.setFramerateLimit(60);
+	sf::Event event;
+	sf::Clock deltaClock;
+
+	while (window.isOpen()) {
+		while (window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed) window.close();
+		}
+
+		float delta = deltaClock.getElapsedTime().asSeconds();
+		deltaClock.restart();
+
+		drawable.update(delta);
+
+		window.clear();
+		window.draw(drawable);
+		window.display();
+	}
+}
+
 void owl(SkeletonData *skeletonData, Atlas *atlas) {
 	SP_UNUSED(atlas);
 
@@ -530,6 +564,7 @@ void owl(SkeletonData *skeletonData, Atlas *atlas) {
 		float delta = deltaClock.getElapsedTime().asSeconds();
 		deltaClock.restart();
 
+		drawable.skeleton->setToSetupPose();
 		drawable.update(delta);
 
 		window.clear();
@@ -610,13 +645,15 @@ DebugExtension dbgExtension(SpineExtension::getInstance());
 int main() {
 	SpineExtension::setInstance(&dbgExtension);
 
+	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
+	testcase(dragon, "data/dragon-ess.json", "data/dragon-ess.skel", "data/dragon-pma.atlas", 0.6f);
+	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
+	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(ikDemo, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(mixAndMatch, "data/mix-and-match-pro.json", "data/mix-and-match-pro.skel", "data/mix-and-match-pma.atlas", 0.5f);
 	testcase(coin, "data/coin-pro.json", "data/coin-pro.skel", "data/coin-pma.atlas", 0.5f);
-	testcase(owl, "data/owl-pro.json", "data/owl-pro.skel", "data/owl-pma.atlas", 0.5f);
 	testcase(spineboy, "data/spineboy-pro.json", "data/spineboy-pro.skel", "data/spineboy-pma.atlas", 0.6f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
-	testcase(vine, "data/vine-pro.json", "data/vine-pro.skel", "data/vine-pma.atlas", 0.5f);
 	testcase(tank, "data/tank-pro.json", "data/tank-pro.skel", "data/tank-pma.atlas", 0.2f);
 	testcase(raptor, "data/raptor-pro.json", "data/raptor-pro.skel", "data/raptor-pma.atlas", 0.5f);
 	testcase(goblins, "data/goblins-pro.json", "data/goblins-pro.skel", "data/goblins-pma.atlas", 1.4f);

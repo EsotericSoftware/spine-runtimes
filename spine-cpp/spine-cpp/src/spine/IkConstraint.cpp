@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/IkConstraint.h>
 
 #include <spine/Bone.h>
@@ -292,7 +288,7 @@ void IkConstraint::update() {
 }
 
 int IkConstraint::getOrder() {
-	return _data.getOrder();
+	return (int) _data.getOrder();
 }
 
 IkConstraintData &IkConstraint::getData() {

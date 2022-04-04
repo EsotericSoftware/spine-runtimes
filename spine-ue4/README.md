@@ -13,7 +13,7 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-ue4 works with data exported from Spine 4.0.xx.
+spine-ue4 works with data exported from Spine 4.1.xx.
 
 spine-ue4 supports all Spine features.
 
@@ -26,6 +26,7 @@ spine-ue4 does not support multiply and screen blending. spine-ue4 does not supp
 2. Download the Spine Runtimes source using git (`git clone https://github.com/esotericsoftware/spine-runtimes`) or download it as a zip via the download button above.
 3. Copy the `Plugins` folder from this directory to your new project's root directory.
 4. Copy the folder `spine-runtimes/spine-cpp/spine-cpp` to your project's `Plugins/SpinePlugin/Source/SpinePlugin/Public/` folder.
+5. Add `SpinePlugin` to `PublicDependencyModuleNames` in your project's `Build.cs` file.
 5. Open the Unreal Project in the Unreal Editor
 
 See the [Spine Runtimes documentation](http://esotericsoftware.com/spine-documentation#runtimesTitle) on how to use the APIs or check out the Spine UE4 example.

@@ -45,6 +45,7 @@ export class PolygonBatcher implements Disposable {
 	private srcColorBlend: number;
 	private srcAlphaBlend: number;
 	private dstBlend: number;
+	private cullWasEnabled: boolean;
 
 	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true, maxVertices: number = 10920) {
 		if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
@@ -69,6 +70,9 @@ export class PolygonBatcher implements Disposable {
 		let gl = this.context.gl;
 		gl.enable(gl.BLEND);
 		gl.blendFuncSeparate(this.srcColorBlend, this.dstBlend, this.srcAlphaBlend, this.dstBlend);
+
+		this.cullWasEnabled = gl.isEnabled(gl.CULL_FACE);
+		if (this.cullWasEnabled) gl.disable(gl.CULL_FACE);
 	}
 
 	setBlendMode (srcColorBlend: number, srcAlphaBlend: number, dstBlend: number) {
@@ -126,6 +130,7 @@ export class PolygonBatcher implements Disposable {
 
 		let gl = this.context.gl;
 		gl.disable(gl.BLEND);
+		if (this.cullWasEnabled) gl.enable(gl.CULL_FACE);
 	}
 
 	getDrawCalls () {

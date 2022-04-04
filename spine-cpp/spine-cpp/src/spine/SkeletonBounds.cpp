@@ -27,10 +27,6 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifdef SPINE_UE4
-#include "SpinePluginPrivatePCH.h"
-#endif
-
 #include <spine/SkeletonBounds.h>
 
 #include <spine/Bone.h>
@@ -78,7 +74,7 @@ void SkeletonBounds::update(Skeleton &skeleton, bool updateAabb) {
 		Polygon &polygon = *polygonP;
 
 		size_t count = boundingBox->getWorldVerticesLength();
-		polygon._count = count;
+		polygon._count = (int) count;
 		if (polygon._vertices.size() < count) {
 			polygon._vertices.setSize(count, 0);
 		}
@@ -198,10 +194,10 @@ float SkeletonBounds::getHeight() {
 }
 
 void SkeletonBounds::aabbCompute() {
-	float minX = FLT_MIN;
-	float minY = FLT_MIN;
-	float maxX = FLT_MAX;
-	float maxY = FLT_MAX;
+	float minX = FLT_MAX;
+	float minY = FLT_MAX;
+	float maxX = FLT_MIN;
+	float maxY = FLT_MIN;
 
 	for (size_t i = 0, n = _polygons.size(); i < n; ++i) {
 		spine::Polygon *polygon = _polygons[i];

@@ -43,7 +43,7 @@ namespace Spine {
 		internal float r2, g2, b2;
 		internal bool hasSecondColor;
 		internal Attachment attachment;
-		internal float attachmentTime;
+		internal int sequenceIndex;
 		internal ExposedList<float> deform = new ExposedList<float>();
 		internal int attachmentState;
 
@@ -83,7 +83,7 @@ namespace Spine {
 			hasSecondColor = slot.hasSecondColor;
 
 			attachment = slot.attachment;
-			attachmentTime = slot.attachmentTime;
+			sequenceIndex = slot.sequenceIndex;
 			deform.AddRange(slot.deform);
 		}
 
@@ -135,27 +135,26 @@ namespace Spine {
 			/// <summary>The current attachment for the slot, or null if the slot has no attachment.</summary>
 			get { return attachment; }
 			/// <summary>
-			/// Sets the slot's attachment and, if the attachment changed, resets <see cref="AttachmentTime"/> and clears the <see cref="Deform"/>.
-			/// The deform is not cleared if the old attachment has the same <see cref="VertexAttachment.DeformAttachment"/> as the specified
-			/// attachment.</summary>
+			/// Sets the slot's attachment and, if the attachment changed, resets <see cref="SequenceIndex"/> and clears the <see cref="Deform"/>.
+			/// The deform is not cleared if the old attachment has the same <see cref="VertexAttachment.TimelineAttachment"/> as the
+			/// specified attachment.</summary>
 			/// <param name="value">May be null.</param>
 			set {
 				if (attachment == value) return;
 				if (!(value is VertexAttachment) || !(this.attachment is VertexAttachment)
-					|| ((VertexAttachment)value).DeformAttachment != ((VertexAttachment)this.attachment).DeformAttachment) {
+					|| ((VertexAttachment)value).TimelineAttachment != ((VertexAttachment)this.attachment).TimelineAttachment) {
 					deform.Clear();
 				}
 				this.attachment = value;
-				attachmentTime = bone.skeleton.time;
+				sequenceIndex = -1;
 			}
 		}
 
-		/// <summary> The time that has elapsed since the last time the attachment was set or cleared. Relies on Skeleton
-		/// <see cref="Skeleton.Time"/></summary>
-		public float AttachmentTime {
-			get { return bone.skeleton.time - attachmentTime; }
-			set { attachmentTime = bone.skeleton.time - value; }
-		}
+		/// <summary>
+		/// The index of the texture region to display when the slot's attachment has a <see cref="Sequence"/>. -1 represents the
+		/// <see cref="Sequence.SetupIndex"/>.
+		/// </summary>
+		public int SequenceIndex { get { return sequenceIndex; } set { sequenceIndex = value; } }
 
 		/// <summary> Vertices to deform the slot's attachment. For an unweighted mesh, the entries are local positions for each vertex. For a
 		/// weighted mesh, the entries are an offset for each vertex which will be added to the mesh's local vertex positions.

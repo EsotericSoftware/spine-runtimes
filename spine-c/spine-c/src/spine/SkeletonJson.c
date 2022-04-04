@@ -28,22 +28,19 @@
  *****************************************************************************/
 
 #include "Json.h"
+#include <spine/Version.h>
 #include <spine/Array.h>
 #include <spine/AtlasAttachmentLoader.h>
 #include <spine/SkeletonJson.h>
 #include <spine/extension.h>
 #include <stdio.h>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-#define strdup _strdup
-#endif
-
 typedef struct {
 	const char *parent;
 	const char *skin;
 	int slotIndex;
 	spMeshAttachment *mesh;
-	int inheritDeform;
+	int inheritTimeline;
 } _spLinkedMesh;
 
 typedef struct {
@@ -188,6 +185,16 @@ readTimeline2(Json *keyMap, spCurveTimeline2 *timeline, const char *name1, const
 	return SUPER(timeline);
 }
 
+static spSequence *readSequence(Json *item) {
+	spSequence *sequence;
+	if (item == NULL) return NULL;
+	sequence = spSequence_create(Json_getInt(item, "count", 0));
+	sequence->start = Json_getInt(item, "start", 1);
+	sequence->digits = Json_getInt(item, "digits", 0);
+	sequence->setupIndex = Json_getInt(item, "setupIndex", 0);
+	return sequence;
+}
+
 static void _spSkeletonJson_addLinkedMesh(spSkeletonJson *self, spMeshAttachment *mesh, const char *skin, int slotIndex,
 										  const char *parent, int inheritDeform) {
 	_spLinkedMesh *linkedMesh;
@@ -208,7 +215,7 @@ static void _spSkeletonJson_addLinkedMesh(spSkeletonJson *self, spMeshAttachment
 	linkedMesh->skin = skin;
 	linkedMesh->slotIndex = slotIndex;
 	linkedMesh->parent = parent;
-	linkedMesh->inheritDeform = inheritDeform;
+	linkedMesh->inheritTimeline = inheritDeform;
 }
 
 static void cleanUpTimelines(spTimelineArray *timelines) {
@@ -268,10 +275,11 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 	Json *ik = Json_getItem(root, "ik");
 	Json *transform = Json_getItem(root, "transform");
 	Json *paths = Json_getItem(root, "path");
-	Json *deformJson = Json_getItem(root, "deform");
+	Json *attachmentsJson = Json_getItem(root, "attachments");
 	Json *drawOrderJson = Json_getItem(root, "drawOrder");
 	Json *events = Json_getItem(root, "events");
-	Json *boneMap, *slotMap, *constraintMap, *keyMap, *nextMap, *curve, *timelineMap;
+	Json *boneMap, *slotMap, *keyMap, *nextMap, *curve, *timelineMap;
+	Json *attachmentsMap, *constraintMap;
 	int frame, bezier, i, n;
 	spColor color, color2, newColor, newColor2;
 
@@ -286,7 +294,7 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 				spAttachmentTimeline *timeline = spAttachmentTimeline_create(frames, slotIndex);
 				for (keyMap = timelineMap->child, frame = 0; keyMap; keyMap = keyMap->next, ++frame) {
 					spAttachmentTimeline_setFrame(timeline, frame, Json_getFloat(keyMap, "time", 0),
-												  Json_getItem(keyMap, "name")->valueString);
+												  Json_getItem(keyMap, "name") ? Json_getItem(keyMap, "name")->valueString : NULL);
 				}
 				spTimelineArray_add(timelines, SUPER(timeline));
 
@@ -691,82 +699,114 @@ static spAnimation *_spSkeletonJson_readAnimation(spSkeletonJson *self, Json *ro
 		}
 	}
 
-	/* Deform timelines. */
-	for (constraintMap = deformJson ? deformJson->child : 0; constraintMap; constraintMap = constraintMap->next) {
-		spSkin *skin = spSkeletonData_findSkin(skeletonData, constraintMap->name);
-		for (slotMap = constraintMap->child; slotMap; slotMap = slotMap->next) {
+	/* Attachment timelines. */
+	for (attachmentsMap = attachmentsJson ? attachmentsJson->child : 0; attachmentsMap; attachmentsMap = attachmentsMap->next) {
+		spSkin *skin = spSkeletonData_findSkin(skeletonData, attachmentsMap->name);
+		for (slotMap = attachmentsMap->child; slotMap; slotMap = slotMap->next) {
+			Json *attachmentMap;
 			int slotIndex = findSlotIndex(self, skeletonData, slotMap->name, timelines);
 			if (slotIndex == -1) return NULL;
 
-			for (timelineMap = slotMap->child; timelineMap; timelineMap = timelineMap->next) {
-				float *tempDeform;
-				spVertexAttachment *attachment;
-				int weighted, deformLength;
-				spDeformTimeline *timeline;
-				float time;
-				keyMap = timelineMap->child;
-				if (keyMap == NULL) continue;
-
-				attachment = SUB_CAST(spVertexAttachment, spSkin_getAttachment(skin, slotIndex, timelineMap->name));
-				if (!attachment) {
+			for (attachmentMap = slotMap->child; attachmentMap; attachmentMap = attachmentMap->next) {
+				spAttachment *baseAttachment = spSkin_getAttachment(skin, slotIndex, attachmentMap->name);
+				if (!baseAttachment) {
 					cleanUpTimelines(timelines);
-					_spSkeletonJson_setError(self, 0, "Attachment not found: ", timelineMap->name);
+					_spSkeletonJson_setError(self, 0, "Attachment not found: ", attachmentMap->name);
 					return NULL;
 				}
-				weighted = attachment->bones != 0;
-				deformLength = weighted ? attachment->verticesCount / 3 * 2 : attachment->verticesCount;
-				tempDeform = MALLOC(float, deformLength);
-				timeline = spDeformTimeline_create(timelineMap->size, deformLength, timelineMap->size, slotIndex,
-												   attachment);
 
-				time = Json_getFloat(keyMap, "time", 0);
-				for (frame = 0, bezier = 0;; ++frame) {
-					Json *vertices = Json_getItem(keyMap, "vertices");
-					float *deform;
-					float time2;
+				for (timelineMap = attachmentMap->child; timelineMap; timelineMap = timelineMap->next) {
+					int frames;
+					const char *timelineName;
+					keyMap = timelineMap->child;
+					if (keyMap == NULL) continue;
+					frames = timelineMap->size;
+					timelineName = timelineMap->name;
+					if (!strcmp("deform", timelineName)) {
+						float *tempDeform;
+						spVertexAttachment *vertexAttachment;
+						int weighted, deformLength;
+						spDeformTimeline *timeline;
+						float time;
 
-					if (!vertices) {
-						if (weighted) {
-							deform = tempDeform;
-							memset(deform, 0, sizeof(float) * deformLength);
-						} else
-							deform = attachment->vertices;
-					} else {
-						int v, start = Json_getInt(keyMap, "offset", 0);
-						Json *vertex;
-						deform = tempDeform;
-						memset(deform, 0, sizeof(float) * start);
-						if (self->scale == 1) {
-							for (vertex = vertices->child, v = start; vertex; vertex = vertex->next, ++v)
-								deform[v] = vertex->valueFloat;
-						} else {
-							for (vertex = vertices->child, v = start; vertex; vertex = vertex->next, ++v)
-								deform[v] = vertex->valueFloat * self->scale;
+						vertexAttachment = SUB_CAST(spVertexAttachment, baseAttachment);
+						weighted = vertexAttachment->bones != 0;
+						deformLength = weighted ? vertexAttachment->verticesCount / 3 * 2 : vertexAttachment->verticesCount;
+						tempDeform = MALLOC(float, deformLength);
+
+						timeline = spDeformTimeline_create(timelineMap->size, deformLength, timelineMap->size,
+														   slotIndex,
+														   vertexAttachment);
+
+						time = Json_getFloat(keyMap, "time", 0);
+						for (frame = 0, bezier = 0;; ++frame) {
+							Json *vertices = Json_getItem(keyMap, "vertices");
+							float *deform;
+							float time2;
+
+							if (!vertices) {
+								if (weighted) {
+									deform = tempDeform;
+									memset(deform, 0, sizeof(float) * deformLength);
+								} else
+									deform = vertexAttachment->vertices;
+							} else {
+								int v, start = Json_getInt(keyMap, "offset", 0);
+								Json *vertex;
+								deform = tempDeform;
+								memset(deform, 0, sizeof(float) * start);
+								if (self->scale == 1) {
+									for (vertex = vertices->child, v = start; vertex; vertex = vertex->next, ++v)
+										deform[v] = vertex->valueFloat;
+								} else {
+									for (vertex = vertices->child, v = start; vertex; vertex = vertex->next, ++v)
+										deform[v] = vertex->valueFloat * self->scale;
+								}
+								memset(deform + v, 0, sizeof(float) * (deformLength - v));
+								if (!weighted) {
+									float *verticesValues = vertexAttachment->vertices;
+									for (v = 0; v < deformLength; ++v)
+										deform[v] += verticesValues[v];
+								}
+							}
+							spDeformTimeline_setFrame(timeline, frame, time, deform);
+							nextMap = keyMap->next;
+							if (!nextMap) {
+								/* timeline.shrink(); // BOZO */
+								break;
+							}
+							time2 = Json_getFloat(nextMap, "time", 0);
+							curve = Json_getItem(keyMap, "curve");
+							if (curve) {
+								bezier = readCurve(curve, SUPER(timeline), bezier, frame, 0, time, time2, 0, 1, 1);
+							}
+							time = time2;
+							keyMap = nextMap;
 						}
-						memset(deform + v, 0, sizeof(float) * (deformLength - v));
-						if (!weighted) {
-							float *verticesValues = attachment->vertices;
-							for (v = 0; v < deformLength; ++v)
-								deform[v] += verticesValues[v];
+						FREE(tempDeform);
+
+						spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
+					} else if (!strcmp(timelineName, "sequence")) {
+						spSequenceTimeline *timeline = spSequenceTimeline_create(frames, slotIndex, baseAttachment);
+						float lastDelay = 0;
+						for (frame = 0; keyMap != NULL; keyMap = keyMap->next, frame++) {
+							float delay = Json_getFloat(keyMap, "delay", lastDelay);
+							float time = Json_getFloat(keyMap, "time", 0);
+							const char *modeString = Json_getString(keyMap, "mode", "hold");
+							int index = Json_getInt(keyMap, "index", 0);
+							int mode = SP_SEQUENCE_MODE_HOLD;
+							if (!strcmp(modeString, "once")) mode = SP_SEQUENCE_MODE_ONCE;
+							if (!strcmp(modeString, "loop")) mode = SP_SEQUENCE_MODE_LOOP;
+							if (!strcmp(modeString, "pingpong")) mode = SP_SEQUENCE_MODE_PINGPONG;
+							if (!strcmp(modeString, "onceReverse")) mode = SP_SEQUENCE_MODE_ONCEREVERSE;
+							if (!strcmp(modeString, "loopReverse")) mode = SP_SEQUENCE_MODE_LOOPREVERSE;
+							if (!strcmp(modeString, "pingpongReverse")) mode = SP_SEQUENCE_MODE_PINGPONGREVERSE;
+							spSequenceTimeline_setFrame(timeline, frame, time, mode, index, delay);
+							lastDelay = delay;
 						}
+						spTimelineArray_add(timelines, SUPER(timeline));
 					}
-					spDeformTimeline_setFrame(timeline, frame, time, deform);
-					nextMap = keyMap->next;
-					if (!nextMap) {
-						/* timeline.shrink(); // BOZO */
-						break;
-					}
-					time2 = Json_getFloat(nextMap, "time", 0);
-					curve = Json_getItem(keyMap, "curve");
-					if (curve) {
-						bezier = readCurve(curve, SUPER(timeline), bezier, frame, 0, time, time2, 0, 1, 1);
-					}
-					time = time2;
-					keyMap = nextMap;
 				}
-				FREE(tempDeform);
-
-				spTimelineArray_add(timelines, SUPER(SUPER(timeline)));
 			}
 		}
 	}
@@ -910,6 +950,18 @@ spSkeletonData *spSkeletonJson_readSkeletonDataFile(spSkeletonJson *self, const 
 	return skeletonData;
 }
 
+static int string_starts_with(const char *str, const char *needle) {
+	int lenStr, lenNeedle, i;
+	if (!str) return 0;
+	lenStr = (int)strlen(str);
+	lenNeedle = (int)strlen(needle);
+	if (lenStr < lenNeedle) return 0;
+	for (i = 0; i < lenNeedle; i++) {
+		if (str[i] != needle[i]) return 0;
+	}
+	return -1;
+}
+
 spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char *json) {
 	int i, ii;
 	spSkeletonData *skeletonData;
@@ -932,15 +984,29 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 	if (skeleton) {
 		MALLOC_STR(skeletonData->hash, Json_getString(skeleton, "hash", 0));
 		MALLOC_STR(skeletonData->version, Json_getString(skeleton, "spine", 0));
+		if (!string_starts_with(skeletonData->version, SPINE_VERSION_STRING)) {
+			char errorMsg[255];
+			sprintf(errorMsg, "Skeleton version %s does not match runtime version %s", skeletonData->version, SPINE_VERSION_STRING);
+			_spSkeletonJson_setError(self, 0, errorMsg, NULL);
+			return NULL;
+		}
 		skeletonData->x = Json_getFloat(skeleton, "x", 0);
 		skeletonData->y = Json_getFloat(skeleton, "y", 0);
 		skeletonData->width = Json_getFloat(skeleton, "width", 0);
 		skeletonData->height = Json_getFloat(skeleton, "height", 0);
 		skeletonData->fps = Json_getFloat(skeleton, "fps", 30);
 		skeletonData->imagesPath = Json_getString(skeleton, "images", 0);
-		if (skeletonData->imagesPath) skeletonData->imagesPath = strdup(skeletonData->imagesPath);
+		if (skeletonData->imagesPath) {
+			char *tmp = NULL;
+			MALLOC_STR(tmp, skeletonData->imagesPath);
+			skeletonData->imagesPath = tmp;
+		}
 		skeletonData->audioPath = Json_getString(skeleton, "audio", 0);
-		if (skeletonData->audioPath) skeletonData->audioPath = strdup(skeletonData->audioPath);
+		if (skeletonData->audioPath) {
+			char *tmp = NULL;
+			MALLOC_STR(tmp, skeletonData->audioPath);
+			skeletonData->audioPath = tmp;
+		}
 	}
 
 	/* Bones. */
@@ -1297,6 +1363,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 					const char *path = Json_getString(attachmentMap, "path", attachmentName);
 					const char *color;
 					Json *entry;
+					spSequence *sequence;
 
 					const char *typeString = Json_getString(attachmentMap, "type", "region");
 					spAttachmentType type;
@@ -1319,8 +1386,9 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 						return NULL;
 					}
 
+					sequence = readSequence(Json_getItem(attachmentMap, "sequence"));
 					attachment = spAttachmentLoader_createAttachment(self->attachmentLoader, skin, type, attachmentName,
-																	 path);
+																	 path, sequence);
 					if (!attachment) {
 						if (self->attachmentLoader->error1) {
 							spSkeletonData_dispose(skeletonData);
@@ -1342,6 +1410,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 							region->rotation = Json_getFloat(attachmentMap, "rotation", 0);
 							region->width = Json_getFloat(attachmentMap, "width", 32) * self->scale;
 							region->height = Json_getFloat(attachmentMap, "height", 32) * self->scale;
+							region->sequence = sequence;
 
 							color = Json_getString(attachmentMap, "color", 0);
 							if (color) {
@@ -1352,7 +1421,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 													  toColor(color, 3));
 							}
 
-							spRegionAttachment_updateOffset(region);
+							if (region->region != NULL) spRegionAttachment_updateRegion(region);
 
 							spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 							break;
@@ -1374,6 +1443,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 
 							mesh->width = Json_getFloat(attachmentMap, "width", 32) * self->scale;
 							mesh->height = Json_getFloat(attachmentMap, "height", 32) * self->scale;
+							mesh->sequence = sequence;
 
 							entry = Json_getItem(attachmentMap, "parent");
 							if (!entry) {
@@ -1392,7 +1462,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 
 								_readVertices(self, attachmentMap, SUPER(mesh), verticesLength);
 
-								spMeshAttachment_updateUVs(mesh);
+								if (mesh->region != NULL) spMeshAttachment_updateRegion(mesh);
 
 								mesh->hullLength = Json_getInt(attachmentMap, "hull", 0);
 
@@ -1406,10 +1476,10 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 
 								spAttachmentLoader_configureAttachment(self->attachmentLoader, attachment);
 							} else {
-								int inheritDeform = Json_getInt(attachmentMap, "deform", 1);
+								int inheritTimelines = Json_getInt(attachmentMap, "timelines", 1);
 								_spSkeletonJson_addLinkedMesh(self, SUB_CAST(spMeshAttachment, attachment),
 															  Json_getString(attachmentMap, "skin", 0), slot->index,
-															  entry->valueString, inheritDeform);
+															  entry->valueString, inheritTimelines);
 							}
 							break;
 						}
@@ -1514,11 +1584,10 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 			_spSkeletonJson_setError(self, 0, "Parent mesh not found: ", linkedMesh->parent);
 			return NULL;
 		}
-		linkedMesh->mesh->super.deformAttachment = linkedMesh->inheritDeform ? SUB_CAST(spVertexAttachment, parent)
-																			 : SUB_CAST(spVertexAttachment,
-																						linkedMesh->mesh);
+		linkedMesh->mesh->super.timelineAttachment = linkedMesh->inheritTimeline ? parent
+																				 : SUPER(SUPER(linkedMesh->mesh));
 		spMeshAttachment_setParentMesh(linkedMesh->mesh, SUB_CAST(spMeshAttachment, parent));
-		spMeshAttachment_updateUVs(linkedMesh->mesh);
+		if (linkedMesh->mesh->region != NULL) spMeshAttachment_updateRegion(linkedMesh->mesh);
 		spAttachmentLoader_configureAttachment(self->attachmentLoader, SUPER(SUPER(linkedMesh->mesh)));
 	}
 
