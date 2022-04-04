@@ -320,13 +320,10 @@ void SpineSprite::remove_mesh_instances() {
 void SpineSprite::remove_redundant_mesh_instances() {
 	Vector<Node *> ms;
 	// remove the redundant mesh instances that added by duplicating
-	//	print_line("start clearing");
 	for (size_t i = 0, n = get_child_count(); i < n; ++i) {
 		auto node = get_child(i);
-		//		print_line(String("get a node: ") + node->get_name());
 		if (node && node->is_class("SpineSpriteMeshInstance2D")) {
 			if (mesh_instances.find((SpineSpriteMeshInstance2D *) node) == -1) {
-				//				print_line("marked clear");
 				ms.push_back(node);
 			}
 		}
@@ -336,7 +333,6 @@ void SpineSprite::remove_redundant_mesh_instances() {
 		memdelete(ms[i]);
 	}
 	ms.clear();
-	//	print_line("end clearing");
 }
 
 #define TEMP_COPY(t, get_res)                   \
@@ -347,6 +343,7 @@ void SpineSprite::remove_redundant_mesh_instances() {
 			t[j] = temp_uvs[j];                 \
 		}                                       \
 	} while (false);
+
 void SpineSprite::update_mesh_from_skeleton(Ref<SpineSkeleton> s) {
 	static const unsigned short VERTEX_STRIDE = 2;
 	static const unsigned short UV_STRIDE = 2;
@@ -362,7 +359,6 @@ void SpineSprite::update_mesh_from_skeleton(Ref<SpineSkeleton> s) {
 
 		spine::Attachment *attachment = slot->getAttachment();
 		if (!attachment) {
-			// set invisible to mesh instance
 			mesh_instances[i]->set_visible(false);
 
 			skeleton_clipper->clipEnd(*slot);
