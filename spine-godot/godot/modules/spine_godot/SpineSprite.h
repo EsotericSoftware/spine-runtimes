@@ -65,17 +65,13 @@ private:
 	Ref<SpineSkeleton> skeleton;
 	Ref<SpineAnimationState> animation_state;
 
-	Vector<SpineSpriteMeshInstance2D *> mesh_instances;
-
-	Array current_animations;
-	int select_track_id;
-	float empty_animation_duration;
-
+	String preview_animation;
 	Array bind_slot_nodes;
 	bool overlap;
 
 	ProcessMode process_mode;
 
+	Vector<SpineSpriteMeshInstance2D *> mesh_instances;
 	spine::SkeletonClipping *skeleton_clipper;
 
 public:
@@ -106,45 +102,17 @@ public:
 
 	void _update_all(float delta);
 
-	// External feature functions
-	Array get_current_animations();
-	void set_current_animations(Array as);
-
-	int get_select_track_id();
-	void set_select_track_id(int v);
-
-	bool get_clear_track();
-	void set_clear_track(bool v);
-
-	bool get_clear_tracks();
-	void set_clear_tracks(bool v);
-
-	float get_empty_animation_duration();
-	void set_empty_animation_duration(float v);
-
-	bool get_set_empty_animation();
-	void set_set_empty_animation(bool v);
-
-	bool get_set_empty_animations();
-	void set_set_empty_animations(bool v);
+	String get_preview_animation();
+	void set_preview_animation(String animation);
 
 	Array get_bind_slot_nodes();
 	void set_bind_slot_nodes(Array v);
 
-	void bind_slot_with_node_2d(const String &slot_name, Node2D *n);
-	void unbind_slot_with_node_2d(const String &slot_name, Node2D *n);
-
-	// bone manipulations
 	Transform2D bone_get_global_transform(const String &bone_name);
 	void bone_set_global_transform(const String &bone_name, Transform2D transform);
 
-	//allow z-manipulation
 	bool get_overlap();
 	void set_overlap(bool v);
-
-	// current animation count
-	int64_t get_current_animation_count() const;
-	void set_current_animation_count(int64_t v);
 
 	ProcessMode get_process_mode();
 	void set_process_mode(ProcessMode v);
