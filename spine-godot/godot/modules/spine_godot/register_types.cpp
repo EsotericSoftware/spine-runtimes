@@ -78,10 +78,7 @@ static void editor_init_callback() {
 
 void register_spine_godot_types() {
 #ifdef TOOLS_ENABLED
-	ClassDB::register_class<SpineSpriteAnimateDialog>();
-
 	EditorNode::add_init_callback(editor_init_callback);
-
 #endif
 
 	ClassDB::register_class<SpineAtlasResource>();

@@ -73,13 +73,8 @@ public:
 	Error import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) override;
 };
 
-class SpineSpriteAnimateDialog;
-
 class SpineRuntimeEditorPlugin : public EditorPlugin {
 	GDCLASS(SpineRuntimeEditorPlugin, EditorPlugin);
-
-protected:
-	SpineSpriteAnimateDialog *animate_dialog;
 
 public:
 	SpineRuntimeEditorPlugin(EditorNode *p_node);
