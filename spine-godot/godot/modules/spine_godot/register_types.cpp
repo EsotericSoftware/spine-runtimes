@@ -55,7 +55,6 @@
 #include "SpineTimeline.h"
 #include "SpineConstant.h"
 #include "SpineCollisionShapeProxy.h"
-#include "SpineSpriteAnimateDialog.h"
 
 
 static Ref<SpineAtlasResourceFormatLoader> atlas_loader;

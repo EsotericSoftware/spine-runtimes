@@ -78,7 +78,7 @@ void SpineAnimationStateDataResource::set_skeleton(const Ref<SpineSkeletonDataRe
 		}
 	}
 }
-Ref<SpineSkeletonDataResource> SpineAnimationStateDataResource::get_skeleton() {
+Ref<SpineSkeletonDataResource> SpineAnimationStateDataResource::get_skeleton() const {
 	return skeleton;
 }
 

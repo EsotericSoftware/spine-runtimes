@@ -102,9 +102,6 @@ public:
 
 	void _update_all(float delta);
 
-	String get_preview_animation();
-	void set_preview_animation(String animation);
-
 	Array get_bind_slot_nodes();
 	void set_bind_slot_nodes(Array v);
 

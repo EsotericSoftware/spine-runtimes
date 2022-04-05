@@ -51,7 +51,7 @@ private:
 
 public:
 	void set_skeleton(const Ref<SpineSkeletonDataResource> &s);
-	Ref<SpineSkeletonDataResource> get_skeleton();
+	Ref<SpineSkeletonDataResource> get_skeleton() const;
 
 	inline spine::AnimationStateData *get_animation_state_data() {
 		return animation_state_data;

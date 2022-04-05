@@ -40,9 +40,6 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_animation_state"), &SpineSprite::get_animation_state);
 	ClassDB::bind_method(D_METHOD("_on_animation_data_changed"), &SpineSprite::_on_animation_data_changed);
 
-	ClassDB::bind_method(D_METHOD("get_preview_animation"), &SpineSprite::get_preview_animation);
-	ClassDB::bind_method(D_METHOD("set_preview_animation", "preview_animation"), &SpineSprite::set_preview_animation);
-
 	ClassDB::bind_method(D_METHOD("get_bind_slot_nodes"), &SpineSprite::get_bind_slot_nodes);
 	ClassDB::bind_method(D_METHOD("set_bind_slot_nodes", "v"), &SpineSprite::set_bind_slot_nodes);
 
@@ -55,7 +52,7 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_process_mode", "v"), &SpineSprite::set_process_mode);
 	ClassDB::bind_method(D_METHOD("get_process_mode"), &SpineSprite::get_process_mode);
 
-	ClassDB::bind_method(D_METHOD("manual_update", "delta"), &SpineSprite::_update_all);
+	ClassDB::bind_method(D_METHOD("update_all", "delta"), &SpineSprite::_update_all);
 
 	ADD_SIGNAL(MethodInfo("animation_state_ready", PropertyInfo(Variant::OBJECT, "animation_state", PROPERTY_HINT_TYPE_STRING, "SpineAnimationState"), PropertyInfo(Variant::OBJECT, "skeleton", PROPERTY_HINT_TYPE_STRING, "SpineSkeleton")));
 	ADD_SIGNAL(MethodInfo("animation_start", PropertyInfo(Variant::OBJECT, "animation_state", PROPERTY_HINT_TYPE_STRING, "SpineAnimationState"), PropertyInfo(Variant::OBJECT, "track_entry", PROPERTY_HINT_TYPE_STRING, "SpineTrackEntry"), PropertyInfo(Variant::OBJECT, "event", PROPERTY_HINT_TYPE_STRING, "SpineEvent")));
@@ -66,11 +63,10 @@ void SpineSprite::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("animation_event", PropertyInfo(Variant::OBJECT, "animation_state", PROPERTY_HINT_TYPE_STRING, "SpineAnimationState"), PropertyInfo(Variant::OBJECT, "track_entry", PROPERTY_HINT_TYPE_STRING, "SpineTrackEntry"), PropertyInfo(Variant::OBJECT, "event", PROPERTY_HINT_TYPE_STRING, "SpineEvent")));
 
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "animation_state_data_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineAnimationStateDataResource"), "set_animation_state_data_res", "get_animation_state_data_res");
-	ADD_PROPERTY(PropertyInfo(Variant::STRING, "preview_animation"), "set_preview_animation", "get_preview_animation");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "overlap"), "set_overlap", "get_overlap");
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bind_slot_nodes"), "set_bind_slot_nodes", "get_bind_slot_nodes");
 
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "process_mode", PROPERTY_HINT_ENUM, "Process,Physics,Manually"), "set_process_mode", "get_process_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "process_mode", PROPERTY_HINT_ENUM, "Process,Physics,Manual"), "set_process_mode", "get_process_mode");
 
 	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Process);
 	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Physics);
@@ -531,14 +527,6 @@ void SpineSprite::callback(spine::AnimationState *state, spine::EventType type, 
 	}
 }
 
-String SpineSprite::get_preview_animation() {
-	return preview_animation;
-}
-void SpineSprite::set_preview_animation(String animation) {
-	preview_animation = animation;
-	_validate_and_play_current_animations();
-}
-
 Array SpineSprite::get_bind_slot_nodes() {
 	return bind_slot_nodes;
 }
@@ -589,6 +577,29 @@ void SpineSprite::set_process_mode(SpineSprite::ProcessMode v) {
 }
 
 void SpineSprite::_get_property_list(List<PropertyInfo> *p_list) const {
+	Vector<String> animations;
+	Vector<String> skins;
+	if (animation_state_data_res.is_valid() && animation_state_data_res->get_skeleton().is_valid()) {
+		animation_state_data_res->get_skeleton()->get_animation_names(animations);
+		animation_state_data_res->get_skeleton()->get_skin_names(skins);
+	}
+	animations.insert(0, "- None -");
+
+	PropertyInfo animationListProperty;
+	animationListProperty.name = "Preview animation";
+	animationListProperty.type = Variant::STRING;
+	animationListProperty.hint_string = String(",").join(animations);
+	animationListProperty.hint = PROPERTY_HINT_ENUM;
+	animationListProperty.usage = PROPERTY_USAGE_EDITOR;
+	p_list->push_back(animationListProperty);
+
+	PropertyInfo skinListProperty;
+	skinListProperty.name = "Preview skin";
+	skinListProperty.type = Variant::STRING;
+	skinListProperty.hint_string = String(",").join(skins);
+	skinListProperty.hint = PROPERTY_HINT_ENUM;
+	skinListProperty.usage = PROPERTY_USAGE_EDITOR;
+	p_list->push_back(skinListProperty);
 }
 
 bool SpineSprite::_get(const StringName &p_property, Variant &r_value) const {
@@ -596,13 +607,28 @@ bool SpineSprite::_get(const StringName &p_property, Variant &r_value) const {
 }
 
 bool SpineSprite::_set(const StringName &p_property, const Variant &p_value) {
-	return false;
-}
-
-void SpineSprite::_validate_and_play_current_animations() {
-	if (animation_state.is_valid() && skeleton.is_valid()) {
-		if (skeleton->get_data()->find_animation(preview_animation).is_valid()) {
-			animation_state->set_animation(preview_animation, true, 0);
+	if (p_property == "Preview animation") {
+		if (animation_state.is_valid() && skeleton.is_valid()) {
+			auto animName = p_value.operator String();
+			skeleton->set_to_setup_pose();
+			if (skeleton->get_data()->find_animation(animName).is_valid()) {
+				animation_state->set_animation(animName, true, 0);
+			} else {
+				animation_state->clear_tracks();
+			}
 		}
 	}
+
+	if (p_property == "Preview skin") {
+		if (animation_state.is_valid() && skeleton.is_valid()) {
+			auto skinName = p_value.operator String();
+			if (skeleton->get_data()->find_skin(skinName).is_valid()) {
+				skeleton->set_skin_by_name(skinName);
+			} else {
+				skeleton->set_skin(NULL);
+			}
+			skeleton->set_to_setup_pose();
+		}
+	}
+	return false;
 }

@@ -420,17 +420,15 @@ void SpineSkeletonDataResource::get_animation_names(Vector<String> &res) const {
 }
 void SpineSkeletonDataResource::get_skin_names(Vector<String> &res) const {
 	res.clear();
-	if (!is_skeleton_data_loaded()) {
-		return;
-	}
+	if (!is_skeleton_data_loaded()) return;
 	auto as = get_skins();
 	res.resize(as.size());
 	for (size_t i = 0; i < as.size(); ++i) {
 		auto a = Ref<SpineSkin>(as[i]);
 		if (a.is_valid()) {
-			res.push_back(a->get_skin_name());
+			res.set(i, a->get_skin_name());
 		} else {
-			res.push_back("");
+			res.set(i, "");
 		}
 	}
 }
