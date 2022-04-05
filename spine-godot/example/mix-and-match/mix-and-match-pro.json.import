@@ -1,7 +1,7 @@
 [remap]
 
 importer="spine.json"
-type="SpineSkeletonJsonDataResource"
+type="SpineSkeletonFileResource"
 path="res://.import/mix-and-match-pro.json-5ca1b9fd6cb1c37bf492ced0be2e27b8.spjson"
 
 [deps]

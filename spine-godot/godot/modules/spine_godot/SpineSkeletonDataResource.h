@@ -35,7 +35,7 @@
 #include <spine/spine.h>
 
 #include "SpineAtlasResource.h"
-#include "SpineSkeletonJsonDataResource.h"
+#include "SpineSkeletonFileResource.h"
 #include "SpineAnimation.h"
 #include "SpineBoneData.h"
 #include "SpineSlotData.h"
@@ -53,7 +53,7 @@ protected:
 
 private:
 	Ref<SpineAtlasResource> atlas_res;
-	Ref<SpineSkeletonJsonDataResource> skeleton_json_res;
+	Ref<SpineSkeletonFileResource> skeleton_file_res;
 	bool valid;
 	bool spine_object;
 
@@ -62,6 +62,9 @@ private:
 	void update_skeleton_data();
 
 public:
+	SpineSkeletonDataResource();
+	virtual ~SpineSkeletonDataResource();
+
 	inline void set_spine_object(spine::SkeletonData *s) {
 		skeleton_data = s;
 		if (s)
@@ -71,18 +74,15 @@ public:
 		return skeleton_data;
 	}
 
-	void load_res(spine::Atlas *a, const String &json_path);
-
-	SpineSkeletonDataResource();
-	virtual ~SpineSkeletonDataResource();
+	void load_res(spine::Atlas *atlas, const String &json, const Vector<uint8_t> &binary);
 
 	void _get_property_list(List<PropertyInfo> *p_list) const;
 
 	void set_atlas_res(const Ref<SpineAtlasResource> &a);
 	Ref<SpineAtlasResource> get_atlas_res();
 
-	void set_skeleton_json_res(const Ref<SpineSkeletonJsonDataResource> &s);
-	Ref<SpineSkeletonJsonDataResource> get_skeleton_json_res();
+	void set_skeleton_file_res(const Ref<SpineSkeletonFileResource> &s);
+	Ref<SpineSkeletonFileResource> get_skeleton_file_res();
 
 	inline spine::SkeletonData *get_skeleton_data() { return skeleton_data; }
 

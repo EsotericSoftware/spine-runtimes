@@ -14,4 +14,5 @@ func _ready():
 	customSkin.add_skin(data.find_skin("accessories/bag"))
 	customSkin.add_skin(data.find_skin("accessories/hat-red-yellow"))
 	get_skeleton().set_skin(customSkin);
+	
 	get_animation_state().set_animation("dance", true, 0)

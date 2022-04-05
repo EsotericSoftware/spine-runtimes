@@ -31,7 +31,7 @@
 #include "SpineRuntimeEditorPlugin.h"
 
 #include "SpineAtlasResource.h"
-#include "SpineSkeletonJsonDataResource.h"
+#include "SpineSkeletonFileResource.h"
 
 Error SpineAtlasResourceImportPlugin::import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) {
 	Ref<SpineAtlasResource> res(memnew(SpineAtlasResource));
@@ -55,7 +55,16 @@ void SpineAtlasResourceImportPlugin::get_import_options(List<ImportOption> *r_op
 }
 
 Error SpineJsonResourceImportPlugin::import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) {
-	Ref<SpineSkeletonJsonDataResource> res(memnew(SpineSkeletonJsonDataResource));
+	Ref<SpineSkeletonFileResource> res(memnew(SpineSkeletonFileResource));
+	res->load_from_file(p_source_file);
+
+	String file_name = vformat("%s.%s", p_save_path, get_save_extension());
+	auto err = ResourceSaver::save(file_name, res);
+	return err;
+}
+
+Error SpineBinaryResourceImportPlugin::import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) {
+	Ref<SpineSkeletonFileResource> res(memnew(SpineSkeletonFileResource));
 	res->load_from_file(p_source_file);
 
 	String file_name = vformat("%s.%s", p_save_path, get_save_extension());
@@ -67,6 +76,7 @@ Error SpineJsonResourceImportPlugin::import(const String &p_source_file, const S
 SpineRuntimeEditorPlugin::SpineRuntimeEditorPlugin(EditorNode *p_node) {
 	add_import_plugin(memnew(SpineAtlasResourceImportPlugin));
 	add_import_plugin(memnew(SpineJsonResourceImportPlugin));
+	add_import_plugin(memnew(SpineBinaryResourceImportPlugin));
 }
 
 SpineRuntimeEditorPlugin::~SpineRuntimeEditorPlugin() {
@@ -75,12 +85,5 @@ SpineRuntimeEditorPlugin::~SpineRuntimeEditorPlugin() {
 bool SpineRuntimeEditorPlugin::handles(Object *p_object) const {
 	return p_object->is_class("SpineSprite");
 }
-
-void SpineRuntimeEditorPlugin::make_visible(bool p_visible) {
-	if (get_editor_interface()->get_selection()->get_selected_node_list().size() != 1) {
-		p_visible = false;
-	}
-}
-
 
 #endif

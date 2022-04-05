@@ -1,7 +1,7 @@
 [remap]
 
 importer="spine.json"
-type="SpineSkeletonJsonDataResource"
+type="SpineSkeletonFileResource"
 path="res://.import/spineboy-pro.json-32eeb9972a49130cf636442038541a01.spjson"
 
 [deps]

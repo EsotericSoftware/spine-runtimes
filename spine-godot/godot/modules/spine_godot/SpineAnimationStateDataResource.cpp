@@ -64,7 +64,7 @@ void SpineAnimationStateDataResource::set_skeleton(const Ref<SpineSkeletonDataRe
 	if (skeleton.is_valid()) {
 		skeleton->connect("skeleton_data_loaded", this, "_on_skeleton_data_loaded");
 		skeleton->connect("atlas_res_changed", this, "_on_skeleton_data_changed");
-		skeleton->connect("skeleton_json_res_changed", this, "_on_skeleton_data_changed");
+		skeleton->connect("skeleton_file_res_changed", this, "_on_skeleton_data_changed");
 
 		if (skeleton->is_skeleton_data_loaded()) {
 			_on_skeleton_data_loaded();
@@ -74,7 +74,6 @@ void SpineAnimationStateDataResource::set_skeleton(const Ref<SpineSkeletonDataRe
 			delete animation_state_data;
 			animation_state_data = NULL;
 			animation_state_data_created = false;
-			//			print_line("Animation state data deleted.");
 		}
 	}
 }
@@ -84,20 +83,10 @@ Ref<SpineSkeletonDataResource> SpineAnimationStateDataResource::get_skeleton() c
 
 void SpineAnimationStateDataResource::set_default_mix(float m) {
 	default_mix = m;
-	if (!is_animation_state_data_created()) {
-		//		ERR_PRINT("'set_default_mix' fail. Animation state data is not created!");
-		return;
-	}
-	animation_state_data->setDefaultMix(((m >= 0 && m <= 1) ? m : m <= 0 ? 0
-																		 : 1));
-	//	emit_signal("animation_state_data_changed");
+	if (!is_animation_state_data_created()) return;
+	animation_state_data->setDefaultMix(m);
 }
 float SpineAnimationStateDataResource::get_default_mix() {
-	if (!is_animation_state_data_created()) {
-		//		ERR_PRINT("'get_default_mix' fail. Animation state data is not created!");
-		return default_mix;
-	}
-	default_mix = animation_state_data->getDefaultMix();
 	return default_mix;
 }
 

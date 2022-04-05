@@ -32,9 +32,8 @@
 #include "core/class_db.h"
 
 #include "SpineAtlasResource.h"
+#include "SpineSkeletonFileResource.h"
 #include "SpineSkeletonDataResource.h"
-#include "ResourceFormatLoaderSpineSkeletonJsonData.h"
-#include "ResourceFormatSaverSpineSkeletonJsonData.h"
 #include "SpineSprite.h"
 #include "SpineAnimationStateDataResource.h"
 #include "SpineSkeleton.h"
@@ -59,8 +58,8 @@
 
 static Ref<SpineAtlasResourceFormatLoader> atlas_loader;
 static Ref<SpineAtlasResourceFormatSaver> atlas_saver;
-static Ref<ResourceFormatLoaderSpineSkeletonJsonData> json_skeleton_loader;
-static Ref<ResourceFormatSaverSpineSkeletonJsonData> json_skeleton_saver;
+static Ref<SpineSkeletonFileResourceFormatLoader> skeleton_file_loader;
+static Ref<SpineSkeletonFileResourceFormatSaver> skeleton_file_saver;
 
 // editor plugin
 #ifdef TOOLS_ENABLED
@@ -82,10 +81,10 @@ void register_spine_godot_types() {
 #endif
 
 	ClassDB::register_class<SpineAtlasResource>();
-	ClassDB::register_class<SpineSprite>();
+	ClassDB::register_class<SpineSkeletonFileResource>();
 	ClassDB::register_class<SpineSkeletonDataResource>();
 	ClassDB::register_class<SpineAnimationStateDataResource>();
-	ClassDB::register_class<SpineSkeletonJsonDataResource>();
+	ClassDB::register_class<SpineSprite>();
 	ClassDB::register_class<SpineSkeleton>();
 	ClassDB::register_class<SpineAnimationState>();
 	ClassDB::register_class<SpineAnimation>();
@@ -118,11 +117,11 @@ void register_spine_godot_types() {
 	atlas_saver.instance();
 	ResourceSaver::add_resource_format_saver(atlas_saver);
 
-	json_skeleton_loader.instance();
-	ResourceLoader::add_resource_format_loader(json_skeleton_loader);
+	skeleton_file_loader.instance();
+	ResourceLoader::add_resource_format_loader(skeleton_file_loader);
 
-	json_skeleton_saver.instance();
-	ResourceSaver::add_resource_format_saver(json_skeleton_saver);
+	skeleton_file_saver.instance();
+	ResourceSaver::add_resource_format_saver(skeleton_file_saver);
 }
 
 void unregister_spine_godot_types() {
@@ -132,9 +131,9 @@ void unregister_spine_godot_types() {
 	ResourceSaver::remove_resource_format_saver(atlas_saver);
 	atlas_saver.unref();
 
-	ResourceLoader::remove_resource_format_loader(json_skeleton_loader);
-	json_skeleton_loader.unref();
+	ResourceLoader::remove_resource_format_loader(skeleton_file_loader);
+	skeleton_file_loader.unref();
 
-	ResourceSaver::remove_resource_format_saver(json_skeleton_saver);
-	json_skeleton_saver.unref();
+	ResourceSaver::remove_resource_format_saver(skeleton_file_saver);
+	skeleton_file_saver.unref();
 }

@@ -1,17 +1,18 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Spineboy.gd" type="Script" id=1]
 [ext_resource path="res://spineboy/spineboy-data.tres" type="SpineSkeletonDataResource" id=2]
-[ext_resource path="res://mix-and-match/mix-and-match-pro.json" type="SpineSkeletonJsonDataResource" id=3]
+[ext_resource path="res://mix-and-match/mix-and-match-pro.json" type="SpineSkeletonFileResource" id=3]
 [ext_resource path="res://mix-and-match/mix-and-match.atlas" type="SpineAtlasResource" id=4]
 [ext_resource path="res://mix-and-match.gd" type="Script" id=5]
+[ext_resource path="res://raptor/raprot-data.tres" type="SpineSkeletonDataResource" id=6]
 
 [sub_resource type="SpineAnimationStateDataResource" id=2]
 skeleton = ExtResource( 2 )
 
 [sub_resource type="SpineSkeletonDataResource" id=4]
 atlas_res = ExtResource( 4 )
-skeleton_json_res = ExtResource( 3 )
+skeleton_file_res = ExtResource( 3 )
 animations = null
 skins = null
 
@@ -19,7 +20,7 @@ skins = null
 skeleton = SubResource( 4 )
 
 [sub_resource type="SpineAnimationStateDataResource" id=5]
-skeleton = ExtResource( 2 )
+skeleton = ExtResource( 6 )
 
 [node name="Node2D" type="Node2D"]
 
