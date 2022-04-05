@@ -453,17 +453,29 @@ Skin *SkeletonBinary::readSkin(DataInput *input, bool defaultSkin, SkeletonData 
 		skin = new (__FILE__, __LINE__) Skin("default");
 	} else {
 		skin = new (__FILE__, __LINE__) Skin(readStringRef(input, skeletonData));
-		for (int i = 0, n = readVarint(input, true); i < n; i++)
-			skin->getBones().add(skeletonData->_bones[readVarint(input, true)]);
+		for (int i = 0, n = readVarint(input, true); i < n; i++) {
+			int boneIndex = readVarint(input, true);
+			if (boneIndex >= skeletonData->_bones.size()) return NULL;
+			skin->getBones().add(skeletonData->_bones[boneIndex]);
+		}
 
-		for (int i = 0, n = readVarint(input, true); i < n; i++)
-			skin->getConstraints().add(skeletonData->_ikConstraints[readVarint(input, true)]);
+		for (int i = 0, n = readVarint(input, true); i < n; i++) {
+			int ikIndex = readVarint(input, true);
+			if (ikIndex >= skeletonData->_ikConstraints.size()) return NULL;
+			skin->getConstraints().add(skeletonData->_ikConstraints[ikIndex]);
+		}
 
-		for (int i = 0, n = readVarint(input, true); i < n; i++)
-			skin->getConstraints().add(skeletonData->_transformConstraints[readVarint(input, true)]);
+		for (int i = 0, n = readVarint(input, true); i < n; i++) {
+			int transformIndex = readVarint(input, true);
+			if (transformIndex >= skeletonData->_transformConstraints.size()) return NULL;
+			skin->getConstraints().add(skeletonData->_transformConstraints[transformIndex]);
+		}
 
-		for (int i = 0, n = readVarint(input, true); i < n; i++)
-			skin->getConstraints().add(skeletonData->_pathConstraints[readVarint(input, true)]);
+		for (int i = 0, n = readVarint(input, true); i < n; i++) {
+			int pathIndex = readVarint(input, true);
+			if (pathIndex >= skeletonData->_pathConstraints.size()) return NULL;
+			skin->getConstraints().add(skeletonData->_pathConstraints[pathIndex]);
+		}
 		slotCount = readVarint(input, true);
 	}
 
@@ -476,7 +488,7 @@ Skin *SkeletonBinary::readSkin(DataInput *input, bool defaultSkin, SkeletonData 
 				skin->setAttachment(slotIndex, String(name), attachment);
 			else {
 				delete skin;
-				return nullptr;
+				return NULL;
 			}
 		}
 	}
@@ -515,7 +527,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			RegionAttachment *region = _attachmentLoader->newRegionAttachment(*skin, String(name), String(path), sequence);
 			if (!region) {
 				setError("Error reading attachment: ", name.buffer());
-				return nullptr;
+				return NULL;
 			}
 			region->_path = path;
 			region->_rotation = rotation;
@@ -536,7 +548,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			BoundingBoxAttachment *box = _attachmentLoader->newBoundingBoxAttachment(*skin, String(name));
 			if (!box) {
 				setError("Error reading attachment: ", name.buffer());
-				return nullptr;
+				return NULL;
 			}
 			readVertices(input, box->getVertices(), box->getBones(), vertexCount);
 			box->setWorldVerticesLength(vertexCount << 1);
@@ -577,7 +589,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			MeshAttachment *mesh = _attachmentLoader->newMeshAttachment(*skin, String(name), String(path), sequence);
 			if (!mesh) {
 				setError("Error reading attachment: ", name.buffer());
-				return nullptr;
+				return NULL;
 			}
 			mesh->_path = path;
 			mesh->_color.set(color);
@@ -616,7 +628,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			MeshAttachment *mesh = _attachmentLoader->newMeshAttachment(*skin, String(name), String(path), sequence);
 			if (!mesh) {
 				setError("Error reading attachment: ", name.buffer());
-				return nullptr;
+				return NULL;
 			}
 			mesh->_path = path;
 			mesh->_color.set(color);
@@ -635,7 +647,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			PathAttachment *path = _attachmentLoader->newPathAttachment(*skin, String(name));
 			if (!path) {
 				setError("Error reading attachment: ", name.buffer());
-				return nullptr;
+				return NULL;
 			}
 			path->_closed = readBoolean(input);
 			path->_constantSpeed = readBoolean(input);
@@ -657,7 +669,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			PointAttachment *point = _attachmentLoader->newPointAttachment(*skin, String(name));
 			if (!point) {
 				setError("Error reading attachment: ", name.buffer());
-				return nullptr;
+				return NULL;
 			}
 			point->_rotation = readFloat(input);
 			point->_x = readFloat(input) * _scale;
@@ -675,7 +687,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			ClippingAttachment *clip = _attachmentLoader->newClippingAttachment(*skin, name);
 			if (!clip) {
 				setError("Error reading attachment: ", name.buffer());
-				return nullptr;
+				return NULL;
 			}
 			readVertices(input, clip->getVertices(), clip->getBones(), vertexCount);
 			clip->setWorldVerticesLength(vertexCount << 1);
@@ -687,7 +699,7 @@ Attachment *SkeletonBinary::readAttachment(DataInput *input, Skin *skin, int slo
 			return clip;
 		}
 	}
-	return nullptr;
+	return NULL;
 }
 
 void SkeletonBinary::readVertices(DataInput *input, Vector<float> &vertices, Vector<size_t> &bones, int vertexCount) {
