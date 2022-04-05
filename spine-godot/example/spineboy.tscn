@@ -25,16 +25,18 @@ skeleton = ExtResource( 6 )
 [node name="Node2D" type="Node2D"]
 
 [node name="Spineboy" type="SpineSprite" parent="."]
-position = Vector2( 696.833, 438.135 )
+position = Vector2( 862.76, 472.89 )
 scale = Vector2( 0.5, 0.5 )
 animation_state_data_res = SubResource( 2 )
 script = ExtResource( 1 )
 
 [node name="MixAndMatch" type="SpineSprite" parent="."]
-position = Vector2( 487.69, 515.718 )
+position = Vector2( 639.042, 497.78 )
+scale = Vector2( 0.5, 0.5 )
 animation_state_data_res = SubResource( 3 )
 script = ExtResource( 5 )
 
 [node name="SpineSprite" type="SpineSprite" parent="."]
-position = Vector2( 181.623, 491.053 )
+position = Vector2( 261.223, 541.504 )
+scale = Vector2( 0.5, 0.5 )
 animation_state_data_res = SubResource( 5 )

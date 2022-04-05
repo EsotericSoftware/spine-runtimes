@@ -86,13 +86,27 @@ cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-cocos2dx/example/
 cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-cocos2dx/example/Resources/common/"
 
 echo "spine-godot"
-rm "$ROOT"/spine-godot/example/spineboy/*.atlas
-rm "$ROOT"/spine-godot/example/spineboy/*.json
-rm "$ROOT"/spine-godot/example/spineboy/*.skel
+rm -f "$ROOT"/spine-godot/example/spineboy/*.atlas
+rm -f "$ROOT"/spine-godot/example/spineboy/*.json
+rm -f "$ROOT"/spine-godot/example/spineboy/*.skel
+rm -f "$ROOT"/spine-godot/example/raptor/*.atlas
+rm -f "$ROOT"/spine-godot/example/raptor/*.skel
+rm -f "$ROOT"/spine-godot/example/mix-and-match/*.atlas
+rm -f "$ROOT"/spine-godot/example/mix-and-match/*.json
+rm -f "$ROOT"/spine-godot/example/mix-and-match/*.skel
+
 cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-godot/example/spineboy/"
 cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-godot/example/spineboy/"
 cp -f ../spineboy/export/spineboy.atlas "$ROOT/spine-godot/example/spineboy/"
 cp -f ../spineboy/export/spineboy.png "$ROOT/spine-godot/example/spineboy/"
+
+cp -f ../mix-and-match/export/mix-and-match-pro.json "$ROOT/spine-godot/example/mix-and-match/"
+cp -f ../mix-and-match/export/mix-and-match.atlas "$ROOT/spine-godot/example/mix-and-match/"
+cp -f ../mix-and-match/export/mix-and-match.png "$ROOT/spine-godot/example/mix-and-match/"
+
+cp -f ../raptor/export/raptor-pro.skel "$ROOT/spine-godot/example/raptor/"
+cp -f ../raptor/export/raptor.atlas "$ROOT/spine-godot/example/raptor/"
+cp -f ../raptor/export/raptor.png "$ROOT/spine-godot/example/raptor/"
 
 echo "spine-sfml-c"
 rm "$ROOT/spine-sfml/c/data/"*
