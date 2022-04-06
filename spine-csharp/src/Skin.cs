@@ -93,7 +93,19 @@ namespace Spine {
 					SetAttachment(entry.slotIndex, entry.name, entry.attachment != null ? entry.attachment.Copy() : null);
 			}
 		}
-
+		
+		///<summary>Removes all attachments, bones, and constraints from the specified skin from this skin.</summary>
+		public void RemoveSkin (Skin skin) {
+			foreach (BoneData data in skin.bones)
+				bones.Clear();
+			foreach (ConstraintData data in skin.constraints)
+				constraints.Clear();
+			foreach (var item in skin.attachments) {
+				SkinEntry entry = item.Value;
+				RemoveAttachment(entry.slotIndex, entry.name);
+			}
+		}
+		
 		/// <summary>Returns the attachment for the specified slot index and name, or null.</summary>
 		/// <returns>May be null.</returns>
 		public Attachment GetAttachment (int slotIndex, string name) {
