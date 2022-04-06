@@ -30,8 +30,8 @@
 #ifndef GODOT_SPINEEXTENSION_H
 #define GODOT_SPINEEXTENSION_H
 
-
 #include <spine/Extension.h>
+
 class GodotSpineExtension : public spine::SpineExtension {
 public:
 	GodotSpineExtension();

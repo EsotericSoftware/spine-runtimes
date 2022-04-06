@@ -28,11 +28,10 @@
  *****************************************************************************/
 
 #include "GodotSpineExtension.h"
+#include "core/os/memory.h"
+#include "core/os/file_access.h"
 
-#include "core/variant_parser.h"
 #include <spine/SpineString.h>
-
-#include <iostream>
 
 spine::SpineExtension *spine::getDefaultExtension() {
 	return new GodotSpineExtension();
