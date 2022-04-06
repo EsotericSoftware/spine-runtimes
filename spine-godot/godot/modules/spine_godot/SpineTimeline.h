@@ -30,11 +30,9 @@
 #ifndef GODOT_SPINETIMELINE_H
 #define GODOT_SPINETIMELINE_H
 
-#include "core/variant_parser.h"
-
 #include "spine/Timeline.h"
-
 #include "SpineConstant.h"
+#include "core/reference.h"
 
 class SpineSkeleton;
 class SpineEvent;
@@ -52,24 +50,22 @@ public:
 	SpineTimeline();
 	~SpineTimeline();
 
-	inline void set_spine_object(spine::Timeline *v) { timeline = v; }
+	inline void set_spine_object(spine::Timeline *timeline) { this->timeline = timeline; }
 	inline spine::Timeline *get_spine_object() { return timeline; }
 
-	// Vector<Event *>
-	void apply(Ref<SpineSkeleton> skeleton, float lastTime, float time, Array pEvents, float alpha, SpineConstant::MixBlend blend, SpineConstant::MixDirection direction);
+	void apply(Ref<SpineSkeleton> skeleton, float lastTime, float time, Array events, float alpha, SpineConstant::MixBlend blend, SpineConstant::MixDirection direction);
 
 	int64_t get_frame_entries();
 
 	int64_t get_frame_count();
 
-	// Vector<float>
 	Array get_frames();
 
 	float get_duration();
 
-	// Vector <PropertyId>
-	Array getPropertyIds();
-};
+	Array get_property_ids();
 
+	String get_type();
+};
 
 #endif//GODOT_SPINETIMELINE_H

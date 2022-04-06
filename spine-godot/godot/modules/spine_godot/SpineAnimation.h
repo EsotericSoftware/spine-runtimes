@@ -31,7 +31,7 @@
 #define GODOT_SPINEANIMATION_H
 
 #include "SpineConstant.h"
-
+#include "core/reference.h"
 #include <spine/spine.h>
 
 class SpineEvent;
@@ -51,19 +51,14 @@ public:
 	SpineAnimation();
 	~SpineAnimation();
 
-	inline void set_spine_object(spine::Animation *animation) {
-		this->animation = animation;
-	}
-	inline spine::Animation *get_spine_object() {
-		return animation;
-	}
+	inline void set_spine_object(spine::Animation *animation) { this->animation = animation; }
+	inline spine::Animation *get_spine_object() { return animation; }
 
-	// Vector<Ref<SpineEvent>> pEvents
 	void apply(Ref<SpineSkeleton> skeleton, float lastTime, float time, bool loop, Array pEvents, float alpha, SpineConstant::MixBlend blend, SpineConstant::MixDirection direction);
 
-	Array get_timelines();       // Vector<Ref<SpineTimeline>>
+	Array get_timelines();
 
-	bool has_timeline(Array ids);// Vector<SpineConstant::PropertyId>
+	bool has_timeline(Array ids);
 
 	String get_name();
 

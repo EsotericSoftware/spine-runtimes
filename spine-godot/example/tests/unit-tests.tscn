@@ -219,75 +219,57 @@ material = SubResource( 20 )
 
 [node name="rear-upper-arm" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 21 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="rear-bracer" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 22 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="gun" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 23 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="rear-foot" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 24 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="rear-thigh" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 25 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="rear-shin" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 26 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="neck" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 27 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="torso" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 28 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="front-upper-arm" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 29 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="head" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 30 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="eye" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 31 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="front-thigh" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 32 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="front-foot" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 33 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="front-shin" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 34 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="mouth" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 35 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="goggles" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 36 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="front-bracer" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 37 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="front-fist" type="SpineSpriteMeshInstance2D" parent="."]
 material = SubResource( 38 )
-scale = Vector2( 0.7, 0.7 )
 
 [node name="muzzle" type="SpineSpriteMeshInstance2D" parent="."]
 visible = false

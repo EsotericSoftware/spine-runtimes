@@ -57,4 +57,5 @@ void SpineConstant::_bind_methods() {
 	BIND_ENUM_CONSTANT(Property_PathConstraintPosition);
 	BIND_ENUM_CONSTANT(Property_PathConstraintSpacing);
 	BIND_ENUM_CONSTANT(Property_PathConstraintMix);
+	BIND_ENUM_CONSTANT(Property_Sequence);
 }
