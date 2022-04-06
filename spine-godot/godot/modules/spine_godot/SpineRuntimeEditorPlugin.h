@@ -74,7 +74,7 @@ public:
 };
 
 class SpineBinaryResourceImportPlugin : public EditorImportPlugin {
-GDCLASS(SpineBinaryResourceImportPlugin, EditorImportPlugin);
+	GDCLASS(SpineBinaryResourceImportPlugin, EditorImportPlugin);
 
 public:
 	String get_importer_name() const override { return "spine.skel"; }

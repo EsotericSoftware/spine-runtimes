@@ -953,8 +953,8 @@ spSkeletonData *spSkeletonJson_readSkeletonDataFile(spSkeletonJson *self, const 
 static int string_starts_with(const char *str, const char *needle) {
 	int lenStr, lenNeedle, i;
 	if (!str) return 0;
-	lenStr = (int)strlen(str);
-	lenNeedle = (int)strlen(needle);
+	lenStr = (int) strlen(str);
+	lenNeedle = (int) strlen(needle);
 	if (lenStr < lenNeedle) return 0;
 	for (i = 0; i < lenNeedle; i++) {
 		if (str[i] != needle[i]) return 0;

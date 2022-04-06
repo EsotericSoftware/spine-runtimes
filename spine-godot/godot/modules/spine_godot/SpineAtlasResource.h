@@ -78,7 +78,7 @@ public:
 };
 
 class SpineAtlasResourceFormatLoader : public ResourceFormatLoader {
-GDCLASS(SpineAtlasResourceFormatLoader, ResourceFormatLoader);
+	GDCLASS(SpineAtlasResourceFormatLoader, ResourceFormatLoader);
 
 public:
 	virtual RES load(const String &p_path, const String &p_original_path, Error *r_error = NULL);
@@ -88,7 +88,7 @@ public:
 };
 
 class SpineAtlasResourceFormatSaver : public ResourceFormatSaver {
-GDCLASS(SpineAtlasResourceFormatSaver, ResourceFormatSaver);
+	GDCLASS(SpineAtlasResourceFormatSaver, ResourceFormatSaver);
 
 public:
 	Error save(const String &p_path, const RES &p_resource, uint32_t p_flags = 0) override;

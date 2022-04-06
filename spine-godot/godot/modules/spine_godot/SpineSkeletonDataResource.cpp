@@ -99,7 +99,7 @@ void SpineSkeletonDataResource::load_res(spine::Atlas *atlas, const String &json
 	spine::SkeletonData *skeletonData = NULL;
 	if (!json.empty()) {
 		spine::SkeletonJson skeletonJson(atlas);
-		 skeletonData = skeletonJson.readSkeletonData(json.utf8());
+		skeletonData = skeletonJson.readSkeletonData(json.utf8());
 		if (!skeletonData) {
 			print_error(String("Error while loading skeleton data: ") + get_path());
 			print_error(String("Error message: ") + skeletonJson.getError().buffer());
