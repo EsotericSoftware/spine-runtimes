@@ -30,8 +30,6 @@
 #ifndef GODOT_SPINEANIMATION_H
 #define GODOT_SPINEANIMATION_H
 
-#include "core/variant_parser.h"
-
 #include "SpineConstant.h"
 
 #include <spine/spine.h>
@@ -53,8 +51,8 @@ public:
 	SpineAnimation();
 	~SpineAnimation();
 
-	inline void set_spine_object(spine::Animation *a) {
-		animation = a;
+	inline void set_spine_object(spine::Animation *animation) {
+		this->animation = animation;
 	}
 	inline spine::Animation *get_spine_object() {
 		return animation;
@@ -64,11 +62,14 @@ public:
 	void apply(Ref<SpineSkeleton> skeleton, float lastTime, float time, bool loop, Array pEvents, float alpha, SpineConstant::MixBlend blend, SpineConstant::MixDirection direction);
 
 	Array get_timelines();       // Vector<Ref<SpineTimeline>>
+
 	bool has_timeline(Array ids);// Vector<SpineConstant::PropertyId>
 
-	String get_anim_name();
+	String get_name();
+
 	float get_duration();
-	void set_duration(float v);
+
+	void set_duration(float duration);
 };
 
 #endif//GODOT_SPINEANIMATION_H
