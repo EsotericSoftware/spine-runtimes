@@ -28,9 +28,7 @@
  *****************************************************************************/
 
 #include "register_types.h"
-
 #include "core/class_db.h"
-
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
 #include "SpineSkeletonDataResource.h"
@@ -55,23 +53,19 @@
 #include "SpineConstant.h"
 #include "SpineCollisionShapeProxy.h"
 
-
 static Ref<SpineAtlasResourceFormatLoader> atlas_loader;
 static Ref<SpineAtlasResourceFormatSaver> atlas_saver;
 static Ref<SpineSkeletonFileResourceFormatLoader> skeleton_file_loader;
 static Ref<SpineSkeletonFileResourceFormatSaver> skeleton_file_saver;
 
-// editor plugin
 #ifdef TOOLS_ENABLED
 #include "editor/editor_export.h"
 #include "editor/editor_node.h"
-
 #include "SpineRuntimeEditorPlugin.h"
 
 static void editor_init_callback() {
 	EditorNode::get_singleton()->add_editor_plugin(memnew(SpineRuntimeEditorPlugin(EditorNode::get_singleton())));
 }
-
 
 #endif
 
