@@ -44,7 +44,6 @@ void SpineAnimationState::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_time_scale", "time_scale"), &SpineAnimationState::set_time_scale);
 	ClassDB::bind_method(D_METHOD("disable_queue"), &SpineAnimationState::disable_queue);
 	ClassDB::bind_method(D_METHOD("enable_queue"), &SpineAnimationState::enable_queue);
-	//	ClassDB::bind_method(D_METHOD("reload"), &SpineAnimationState::reload_animation_state);
 	ClassDB::bind_method(D_METHOD("get_current", "track_id"), &SpineAnimationState::get_current);
 }
 
@@ -58,25 +57,13 @@ SpineAnimationState::~SpineAnimationState() {
 	}
 }
 
-void SpineAnimationState::load_animation_state(Ref<SpineAnimationStateDataResource> ad) {
+void SpineAnimationState::load_animation_state(Ref<SpineAnimationStateDataResource> animation_state_data) {
 	if (animation_state) {
 		delete animation_state;
 		animation_state = NULL;
 	}
-	animation_state = new spine::AnimationState(ad->get_animation_state_data());
-	anim_state_data_res = ad;
-}
-
-void SpineAnimationState::reload_animation_state() {
-	if (!anim_state_data_res.is_valid()) {
-		ERR_PRINT(" Reload animation state fail, because anim_state_data_res not set!");
-		return;
-	}
-	if (animation_state) {
-		delete animation_state;
-		animation_state = NULL;
-	}
-	animation_state = new spine::AnimationState(anim_state_data_res->get_animation_state_data());
+	animation_state = new spine::AnimationState(animation_state_data->get_animation_state_data());
+	anim_state_data_res = animation_state_data;
 }
 
 #define CHECK_V                                              \
@@ -164,9 +151,9 @@ float SpineAnimationState::get_time_scale() {
 	CHECK_X(0);
 	return animation_state->getTimeScale();
 }
-void SpineAnimationState::set_time_scale(float v) {
+void SpineAnimationState::set_time_scale(float time_scale) {
 	CHECK_V;
-	animation_state->setTimeScale(v);
+	animation_state->setTimeScale(time_scale);
 }
 
 void SpineAnimationState::disable_queue() {

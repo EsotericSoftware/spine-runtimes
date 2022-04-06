@@ -63,14 +63,14 @@ void SpineAnimation::set_duration(float duration) {
 }
 
 void SpineAnimation::apply(Ref<SpineSkeleton> skeleton, float lastTime, float time, bool loop,
-						   Array pEvents, float alpha, SpineConstant::MixBlend blend,
-						   SpineConstant::MixDirection direction) {
-	spine::Vector<spine::Event *> events;
-	events.setSize(pEvents.size(), nullptr);
+                           Array events, float alpha, SpineConstant::MixBlend blend,
+                           SpineConstant::MixDirection direction) {
+	spine::Vector<spine::Event *> spineEvents;
+	spineEvents.setSize(events.size(), nullptr);
 	for (size_t i = 0; i < events.size(); ++i) {
-		events[i] = ((Ref<SpineEvent>) (pEvents[i]))->get_spine_object();
+		spineEvents[i] = ((Ref<SpineEvent>) (events[i]))->get_spine_object();
 	}
-	animation->apply(*(skeleton->get_spine_object()), lastTime, time, loop, &events, alpha, (spine::MixBlend) blend, (spine::MixDirection) direction);
+	animation->apply(*(skeleton->get_spine_object()), lastTime, time, loop, &spineEvents, alpha, (spine::MixBlend) blend, (spine::MixDirection) direction);
 }
 
 Array SpineAnimation::get_timelines() {
@@ -88,11 +88,11 @@ Array SpineAnimation::get_timelines() {
 }
 
 bool SpineAnimation::has_timeline(Array ids) {
-	spine::Vector<spine::PropertyId> propertyIds;
-	propertyIds.setSize(ids.size(), 0);
+	spine::Vector<spine::PropertyId> property_ids;
+	property_ids.setSize(ids.size(), 0);
 
-	for (size_t i = 0; i < propertyIds.size(); ++i) {
-		propertyIds[i] = (int64_t) ids[i];
+	for (size_t i = 0; i < property_ids.size(); ++i) {
+		property_ids[i] = (int64_t) ids[i];
 	}
-	return animation->hasTimeline(propertyIds);
+	return animation->hasTimeline(property_ids);
 }
