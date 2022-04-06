@@ -37,7 +37,7 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_animation_state_data_res"), &SpineSprite::get_animation_state_data_res);
 	ClassDB::bind_method(D_METHOD("_on_animation_data_created"), &SpineSprite::_on_animation_data_created);
 	ClassDB::bind_method(D_METHOD("get_skeleton"), &SpineSprite::get_skeleton);
-	ClassDB::bind_method(D_METHOD("get_spine_object"), &SpineSprite::get_animation_state);
+	ClassDB::bind_method(D_METHOD("get_animation_state"), &SpineSprite::get_animation_state);
 	ClassDB::bind_method(D_METHOD("_on_animation_data_changed"), &SpineSprite::_on_animation_data_changed);
 
 	ClassDB::bind_method(D_METHOD("get_bind_slot_nodes"), &SpineSprite::get_bind_slot_nodes);

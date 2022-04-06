@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/mix-and-match.png-9b5652df6ad1d929562c4c4464642a95.stex"
+path="res://.import/raptor.png-505be50f63fd1d0fb9175a9efbb9776c.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://mix-and-match/mix-and-match.png"
-dest_files=[ "res://.import/mix-and-match.png-9b5652df6ad1d929562c4c4464642a95.stex" ]
+source_file="res://assets/raptor/raptor.png"
+dest_files=[ "res://.import/raptor.png-505be50f63fd1d0fb9175a9efbb9776c.stex" ]
 
 [params]
 

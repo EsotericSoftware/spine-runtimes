@@ -1,7 +1,7 @@
 [gd_scene load_steps=56 format=2]
 
 [ext_resource path="res://tests/unit-tests.gd" type="Script" id=1]
-[ext_resource path="res://spineboy/spineboy-data.tres" type="SpineSkeletonDataResource" id=2]
+[ext_resource path="res://assets/spineboy/spineboy-data.tres" type="SpineSkeletonDataResource" id=2]
 
 [sub_resource type="SpineAnimationStateDataResource" id=1]
 skeleton = ExtResource( 2 )

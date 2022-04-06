@@ -1,10 +1,10 @@
 [gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Spineboy.gd" type="Script" id=1]
-[ext_resource path="res://spineboy/spineboy-data.tres" type="SpineSkeletonDataResource" id=2]
-[ext_resource path="res://mix-and-match/mix-and-match-data.tres" type="SpineSkeletonDataResource" id=3]
+[ext_resource path="res://assets/spineboy/spineboy-data.tres" type="SpineSkeletonDataResource" id=2]
+[ext_resource path="res://assets/mix-and-match/mix-and-match-data.tres" type="SpineSkeletonDataResource" id=3]
 [ext_resource path="res://mix-and-match.gd" type="Script" id=5]
-[ext_resource path="res://raptor/raprot-data.tres" type="SpineSkeletonDataResource" id=6]
+[ext_resource path="res://assets/raptor/raprot-data.tres" type="SpineSkeletonDataResource" id=6]
 
 [sub_resource type="SpineAnimationStateDataResource" id=2]
 skeleton = ExtResource( 2 )
@@ -29,7 +29,7 @@ scale = Vector2( 0.5, 0.5 )
 animation_state_data_res = SubResource( 3 )
 script = ExtResource( 5 )
 
-[node name="SpineSprite" type="SpineSprite" parent="."]
+[node name="Raptor" type="SpineSprite" parent="."]
 position = Vector2( 261.223, 541.504 )
 scale = Vector2( 0.5, 0.5 )
 animation_state_data_res = SubResource( 5 )

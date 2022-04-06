@@ -1,4 +1,4 @@
 extends SpineSprite
 
-func _ready():
-	get_animation_state().set_animation("walk", true, 0);
+func _ready():	
+	get_animation_state().set_animation("walk", true, 0)
