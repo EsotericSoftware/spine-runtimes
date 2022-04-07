@@ -418,6 +418,8 @@ SkeletonData *SkeletonJson::readSkeletonData(const char *json) {
 				data->_spacingMode = SpacingMode_Fixed;
 			else if (strcmp(item, "percent") == 0)
 				data->_spacingMode = SpacingMode_Percent;
+			else
+				data->_spacingMode = SpacingMode_Proportional;
 
 			item = Json::getString(constraintMap, "rotateMode", "tangent");
 			if (strcmp(item, "tangent") == 0) data->_rotateMode = RotateMode_Tangent;
