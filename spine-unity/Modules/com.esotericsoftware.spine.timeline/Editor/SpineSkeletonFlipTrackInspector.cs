@@ -34,6 +34,7 @@ using UnityEngine;
 using UnityEngine.Timeline;
 
 namespace Spine.Unity.Editor {
+#if UNITY_2019_1_OR_NEWER
 	[CustomTimelineEditor(typeof(SpineSkeletonFlipTrack))]
 	[CanEditMultipleObjects]
 	public class SpineSkeletonFlipTrackInspector : TrackEditor {
@@ -45,4 +46,5 @@ namespace Spine.Unity.Editor {
 			return options;
 		}
 	}
+#endif
 }

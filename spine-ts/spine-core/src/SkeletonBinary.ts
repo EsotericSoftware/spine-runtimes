@@ -1058,7 +1058,7 @@ export class BinaryInput {
 		let chars = "";
 		let charCount = 0;
 		for (let i = 0; i < byteCount;) {
-			let b = this.readByte();
+			let b = this.readUnsignedByte();
 			switch (b >> 4) {
 				case 12:
 				case 13:
