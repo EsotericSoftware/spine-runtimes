@@ -41,9 +41,9 @@ class SpineCollisionShapeProxy : public CollisionPolygon2D {
 protected:
 	static void _bind_methods();
 
-	NodePath spine_sprite_path;
+	NodePath sprite_path;
 
-	String slot;
+	String slot_name;
 
 	bool sync_transform;
 
@@ -56,24 +56,26 @@ protected:
 
 	SpineSprite *get_spine_sprite() const;
 
-	void _update_polygon_from_spine_sprite(SpineSprite *sprite);
-	void _clear_polygon();
-	void _sync_transform(SpineSprite *sprite);
+	void update_polygon_from_spine_sprite(SpineSprite *sprite);
 
-	void _get_slot_list(Vector<String> &res) const;
+	void clear_polygon();
+
+	void synchronize_transform(SpineSprite *sprite);
+
+	void get_slot_list(Vector<String> &slotNames) const;
 
 public:
 	SpineCollisionShapeProxy();
 	~SpineCollisionShapeProxy();
 
 	NodePath get_spine_sprite_path();
-	void set_spine_sprite_path(NodePath v);
+	void set_spine_sprite_path(NodePath path);
 
 	String get_slot() const;
-	void set_slot(const String &v);
+	void set_slot(const String &slotName);
 
 	bool get_sync_transform();
-	void set_sync_transform(bool v);
+	void set_sync_transform(bool sync_transform);
 };
 
 

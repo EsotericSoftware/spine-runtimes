@@ -41,7 +41,7 @@ void SpineCollisionShapeProxy::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_sync_transform"), &SpineCollisionShapeProxy::get_sync_transform);
 	ClassDB::bind_method(D_METHOD("set_sync_transform", "v"), &SpineCollisionShapeProxy::set_sync_transform);
 
-	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "spine_sprite_path"), "set_spine_sprite_path", "get_spine_sprite_path");
+	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "sprite_path"), "set_spine_sprite_path", "get_spine_sprite_path");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "sync_transform"), "set_sync_transform", "get_sync_transform");
 }
 
@@ -58,8 +58,8 @@ void SpineCollisionShapeProxy::_notification(int p_what) {
 		} break;
 		case NOTIFICATION_INTERNAL_PROCESS: {
 			if (!disabled) {
-				if (sync_transform) _sync_transform(get_spine_sprite());
-				_update_polygon_from_spine_sprite(get_spine_sprite());
+				if (sync_transform) synchronize_transform(get_spine_sprite());
+				update_polygon_from_spine_sprite(get_spine_sprite());
 				if (is_visible()) update();
 			}
 		} break;
@@ -67,56 +67,43 @@ void SpineCollisionShapeProxy::_notification(int p_what) {
 }
 
 SpineSprite *SpineCollisionShapeProxy::get_spine_sprite() const {
-	return (SpineSprite *) get_node_or_null(spine_sprite_path);
+	return (SpineSprite *) get_node_or_null(sprite_path);
 }
 
 NodePath SpineCollisionShapeProxy::get_spine_sprite_path() {
-	return spine_sprite_path;
+	return sprite_path;
 }
 
-void SpineCollisionShapeProxy::set_spine_sprite_path(NodePath v) {
-	spine_sprite_path = v;
-
-	_update_polygon_from_spine_sprite(get_spine_sprite());
+void SpineCollisionShapeProxy::set_spine_sprite_path(NodePath path) {
+	sprite_path = path;
+	update_polygon_from_spine_sprite(get_spine_sprite());
 }
 
 String SpineCollisionShapeProxy::get_slot() const {
-	return slot;
+	return slot_name;
 }
 
-void SpineCollisionShapeProxy::set_slot(const String &v) {
-	slot = v;
-	_update_polygon_from_spine_sprite(get_spine_sprite());
+void SpineCollisionShapeProxy::set_slot(const String &slotName) {
+	slot_name = slotName;
+	update_polygon_from_spine_sprite(get_spine_sprite());
 }
 
-void SpineCollisionShapeProxy::_update_polygon_from_spine_sprite(SpineSprite *sprite) {
-	_clear_polygon();
-	if (sprite == nullptr || slot.empty()) {
-		return;
-	}
+void SpineCollisionShapeProxy::update_polygon_from_spine_sprite(SpineSprite *sprite) {
+	clear_polygon();
+	if (sprite == NULL || slot_name.empty()) return;
+	if (!sprite->get_skeleton().is_valid()) return;
 
-	if (!sprite->get_skeleton().is_valid()) {
-		return;
-	}
-
-	auto sk = sprite->get_skeleton()->get_spine_object();
+	spine::Skeleton *skeleton = sprite->get_skeleton()->get_spine_object();
+	spine::Slot *slot = skeleton->findSlot(spine::String(slot_name.utf8()));
+	if (!slot) return;
+	spine::Attachment *attachment = slot->getAttachment();
+	if (!attachment) return;
 
 	spine::Vector<float> vertices;
-
-	spine::Slot *s = sk->findSlot(spine::String(slot.utf8()));
-	if (!s) {
-		return;
-	}
-	spine::Attachment *attachment = s->getAttachment();
-	if (!attachment) {
-		return;
-	}
-
 	if (attachment->getRTTI().isExactly(spine::BoundingBoxAttachment::rtti)) {
 		auto *box = (spine::BoundingBoxAttachment *) attachment;
-
 		vertices.setSize(box->getWorldVerticesLength(), 0);
-		box->computeWorldVertices(*s, vertices);
+		box->computeWorldVertices(*slot, vertices);
 	} else {
 		return;
 	}
@@ -129,12 +116,12 @@ void SpineCollisionShapeProxy::_update_polygon_from_spine_sprite(SpineSprite *sp
 	set_polygon(polygon);
 }
 
-void SpineCollisionShapeProxy::_clear_polygon() {
+void SpineCollisionShapeProxy::clear_polygon() {
 	polygon.clear();
 	set_polygon(polygon);
 }
 
-void SpineCollisionShapeProxy::_sync_transform(SpineSprite *sprite) {
+void SpineCollisionShapeProxy::synchronize_transform(SpineSprite *sprite) {
 	if (sprite == nullptr) return;
 	set_global_transform(sprite->get_global_transform());
 }
@@ -143,25 +130,24 @@ bool SpineCollisionShapeProxy::get_sync_transform() {
 	return sync_transform;
 }
 
-void SpineCollisionShapeProxy::set_sync_transform(bool v) {
-	sync_transform = v;
+void SpineCollisionShapeProxy::set_sync_transform(bool sync_transform) {
+	this->sync_transform = sync_transform;
 }
 
 void SpineCollisionShapeProxy::_get_property_list(List<PropertyInfo> *p_list) const {
 	PropertyInfo p;
 	Vector<String> res;
-
-	p.name = "slot";
+	p.name = "Slot";
 	p.type = Variant::STRING;
-	_get_slot_list(res);
-	if (res.empty()) res.push_back("No Slot");
+	get_slot_list(res);
+	if (res.empty()) res.push_back("None");
 	p.hint_string = String(",").join(res);
 	p.hint = PROPERTY_HINT_ENUM;
 	p_list->push_back(p);
 }
 
 bool SpineCollisionShapeProxy::_get(const StringName &p_property, Variant &r_value) const {
-	if (p_property == "slot") {
+	if (p_property == "Slot") {
 		r_value = get_slot();
 		return true;
 	}
@@ -169,28 +155,23 @@ bool SpineCollisionShapeProxy::_get(const StringName &p_property, Variant &r_val
 }
 
 bool SpineCollisionShapeProxy::_set(const StringName &p_property, const Variant &p_value) {
-	if (p_property == "slot") {
+	if (p_property == "Slot") {
 		set_slot(p_value);
 		return true;
 	}
 	return false;
 }
 
-void SpineCollisionShapeProxy::_get_slot_list(Vector<String> &res) const {
-	if (get_spine_sprite() == nullptr) {
-		return;
-	}
-
+void SpineCollisionShapeProxy::get_slot_list(Vector<String> &slotNames) const {
+	if (get_spine_sprite() == nullptr) return;
 	auto sprite = get_spine_sprite();
-	if (!sprite->get_skeleton().is_valid()) {
-		return;
-	}
+	if (!sprite->get_skeleton().is_valid()) return;
 
 	auto slots = sprite->get_skeleton()->get_slots();
-	res.resize(slots.size());
-	for (size_t i = 0; i < res.size(); ++i) {
-		auto slot = (Ref<SpineSlot>) slots[i];
+	slots.resize(slotNames.size());
+	for (size_t i = 0; i < slotNames.size(); ++i) {
+		auto slot = (Ref<SpineSlot>) slotNames[i];
 		if (slot.is_valid())
-			res.set(i, slot->get_data()->get_slot_name());
+			slots.set(i, slot->get_data()->get_slot_name());
 	}
 }
