@@ -40,8 +40,8 @@ const logoWidth = 165, logoHeight = 108, spinnerSize = 163;
 
 export class LoadingScreen implements Disposable {
 	private renderer: SceneRenderer;
-	private logo: GLTexture = null;
-	private spinner: GLTexture = null;
+	private logo: GLTexture | null = null;
+	private spinner: GLTexture | null = null;
 	private angle = 0;
 	private fadeOut = 0;
 	private fadeIn = 0;
@@ -70,8 +70,8 @@ export class LoadingScreen implements Disposable {
 		}
 	}
 	dispose (): void {
-		this.logo.dispose();
-		this.spinner.dispose();
+		this.logo?.dispose();
+		this.spinner?.dispose();
 	}
 
 	draw (complete = false) {
@@ -122,7 +122,7 @@ export class LoadingScreen implements Disposable {
 		renderer.camera.zoom = Math.max(1, spinnerSize / canvas.height);
 		renderer.begin();
 		renderer.drawTexture(this.logo, (canvas.width - logoWidth) / 2, (canvas.height - logoHeight) / 2, logoWidth, logoHeight, tempColor);
-		renderer.drawTextureRotated(this.spinner, (canvas.width - spinnerSize) / 2, (canvas.height - spinnerSize) / 2, spinnerSize, spinnerSize, spinnerSize / 2, spinnerSize / 2, this.angle, tempColor);
+		if (this.spinner) renderer.drawTextureRotated(this.spinner, (canvas.width - spinnerSize) / 2, (canvas.height - spinnerSize) / 2, spinnerSize, spinnerSize, spinnerSize / 2, spinnerSize / 2, this.angle, tempColor);
 		renderer.end();
 	}
 }

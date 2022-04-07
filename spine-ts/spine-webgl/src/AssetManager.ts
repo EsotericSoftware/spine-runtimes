@@ -33,7 +33,7 @@ import { GLTexture } from "./GLTexture";
 
 
 export class AssetManager extends AssetManagerBase {
-	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, pathPrefix: string = "", downloader: Downloader = null) {
+	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, pathPrefix: string = "", downloader: Downloader = new Downloader()) {
 		super((image: HTMLImageElement | ImageBitmap) => {
 			return new GLTexture(context, image);
 		}, pathPrefix, downloader);

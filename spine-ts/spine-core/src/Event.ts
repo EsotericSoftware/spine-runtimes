@@ -35,10 +35,10 @@ import { EventData } from "./EventData";
  * AnimationStateListener {@link AnimationStateListener#event()}, and
  * [Events](http://esotericsoftware.com/spine-events) in the Spine User Guide. */
 export class Event {
-	data: EventData = null;
+	data: EventData;
 	intValue: number = 0;
 	floatValue: number = 0;
-	stringValue: string = null;
+	stringValue: string | null = null;
 	time: number = 0;
 	volume: number = 0;
 	balance: number = 0;

@@ -30,7 +30,7 @@
 import { Texture, TextureFilter, TextureWrap } from "@esotericsoftware/spine-core";
 
 export class CanvasTexture extends Texture {
-	constructor (image: HTMLImageElement) {
+	constructor (image: HTMLImageElement | ImageBitmap) {
 		super(image);
 	}
 

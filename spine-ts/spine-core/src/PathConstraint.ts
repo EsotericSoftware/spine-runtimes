@@ -45,13 +45,13 @@ export class PathConstraint implements Updatable {
 	static epsilon = 0.00001;
 
 	/** The path constraint's setup pose data. */
-	data: PathConstraintData = null;
+	data: PathConstraintData;
 
 	/** The bones that will be modified by this path constraint. */
-	bones: Array<Bone> = null;
+	bones: Array<Bone>;
 
 	/** The slot whose path attachment will be used to constrained the bones. */
-	target: Slot = null;
+	target: Slot;
 
 	/** The position along the path. */
 	position = 0;
@@ -76,9 +76,14 @@ export class PathConstraint implements Updatable {
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 		this.data = data;
 		this.bones = new Array<Bone>();
-		for (let i = 0, n = data.bones.length; i < n; i++)
-			this.bones.push(skeleton.findBone(data.bones[i].name));
-		this.target = skeleton.findSlot(data.target.name);
+		for (let i = 0, n = data.bones.length; i < n; i++) {
+			let bone = skeleton.findBone(data.bones[i].name);
+			if (!bone) throw new Error(`Couldn't find bone ${data.bones[i].name}.`);
+			this.bones.push(bone);
+		}
+		let target = skeleton.findSlot(data.target.name);
+		if (!target) throw new Error(`Couldn't find target bone ${data.target.name}`);
+		this.target = target;
 		this.position = data.position;
 		this.spacing = data.spacing;
 		this.mixRotate = data.mixRotate;
@@ -102,7 +107,7 @@ export class PathConstraint implements Updatable {
 
 		let bones = this.bones;
 		let boneCount = bones.length, spacesCount = tangents ? boneCount : boneCount + 1;
-		let spaces = Utils.setArraySize(this.spaces, spacesCount), lengths: Array<number> = scale ? this.lengths = Utils.setArraySize(this.lengths, boneCount) : null;
+		let spaces = Utils.setArraySize(this.spaces, spacesCount), lengths: Array<number> = scale ? this.lengths = Utils.setArraySize(this.lengths, boneCount) : [];
 		let spacing = this.spacing;
 
 		switch (data.spacingMode) {
@@ -222,7 +227,7 @@ export class PathConstraint implements Updatable {
 	computeWorldPositions (path: PathAttachment, spacesCount: number, tangents: boolean) {
 		let target = this.target;
 		let position = this.position;
-		let spaces = this.spaces, out = Utils.setArraySize(this.positions, spacesCount * 3 + 2), world: Array<number> = null;
+		let spaces = this.spaces, out = Utils.setArraySize(this.positions, spacesCount * 3 + 2), world: Array<number> = this.world;
 		let closed = path.closed;
 		let verticesLength = path.worldVerticesLength, curveCount = verticesLength / 6, prevCurve = PathConstraint.NONE;
 

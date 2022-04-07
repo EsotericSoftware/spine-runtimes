@@ -39,11 +39,11 @@ export class Shader implements Disposable, Restorable {
 	public static SAMPLER = "u_texture";
 
 	private context: ManagedWebGLRenderingContext;
-	private vs: WebGLShader = null;
+	private vs: WebGLShader | null = null;
 	private vsSource: string;
-	private fs: WebGLShader = null;
+	private fs: WebGLShader | null = null;
 	private fsSource: string;
-	private program: WebGLProgram = null;
+	private program: WebGLProgram | null = null;
 	private tmp2x2: Float32Array = new Float32Array(2 * 2);
 	private tmp3x3: Float32Array = new Float32Array(3 * 3);
 	private tmp4x4: Float32Array = new Float32Array(4 * 4);
@@ -66,7 +66,9 @@ export class Shader implements Disposable, Restorable {
 		let gl = this.context.gl;
 		try {
 			this.vs = this.compileShader(gl.VERTEX_SHADER, this.vertexShader);
+			if (!this.vs) throw new Error("Couldn't compile vertex shader.");
 			this.fs = this.compileShader(gl.FRAGMENT_SHADER, this.fragmentShader);
+			if (!this.fs) throw new Error("Couldn#t compile fragment shader.");
 			this.program = this.compileProgram(this.vs, this.fs);
 		} catch (e) {
 			this.dispose();
@@ -77,6 +79,7 @@ export class Shader implements Disposable, Restorable {
 	private compileShader (type: number, source: string) {
 		let gl = this.context.gl;
 		let shader = gl.createShader(type);
+		if (!shader) throw new Error("Couldn't create shader.");
 		gl.shaderSource(shader, source);
 		gl.compileShader(shader);
 		if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
@@ -90,6 +93,7 @@ export class Shader implements Disposable, Restorable {
 	private compileProgram (vs: WebGLShader, fs: WebGLShader) {
 		let gl = this.context.gl;
 		let program = gl.createProgram();
+		if (!program) throw new Error("Couldn't compile program.");
 		gl.attachShader(program, vs);
 		gl.attachShader(program, fs);
 		gl.linkProgram(program);
@@ -152,8 +156,9 @@ export class Shader implements Disposable, Restorable {
 		gl.uniformMatrix4fv(this.getUniformLocation(uniform), false, this.tmp4x4);
 	}
 
-	public getUniformLocation (uniform: string): WebGLUniformLocation {
+	public getUniformLocation (uniform: string): WebGLUniformLocation | null {
 		let gl = this.context.gl;
+		if (!this.program) throw new Error("Shader not compiled.");
 		let location = gl.getUniformLocation(this.program, uniform);
 		if (!location && !gl.isContextLost()) throw new Error(`Couldn't find location for uniform ${uniform}`);
 		return location;
@@ -161,6 +166,7 @@ export class Shader implements Disposable, Restorable {
 
 	public getAttributeLocation (attribute: string): number {
 		let gl = this.context.gl;
+		if (!this.program) throw new Error("Shader not compiled.");
 		let location = gl.getAttribLocation(this.program, attribute);
 		if (location == -1 && !gl.isContextLost()) throw new Error(`Couldn't find location for attribute ${attribute}`);
 		return location;

@@ -31,49 +31,49 @@ import { Animation, AnimationState, AnimationStateData, AtlasAttachmentLoader, B
 import { AssetManager, GLTexture, Input, LoadingScreen, ManagedWebGLRenderingContext, ResizeMode, SceneRenderer, Vector3 } from "@esotericsoftware/spine-webgl"
 
 export interface SpinePlayerConfig {
-	/* The URL of the skeleton JSON file (.json). */
-	jsonUrl: string
+	/* The URL of the skeleton JSON file (.json). Undefined if binaryUrl is given. */
+	jsonUrl?: string
 
 	/* Optional: The name of a field in the JSON that holds the skeleton data. Default: none */
-	jsonField: string
+	jsonField?: string
 
-	/* The URL of the skeleton binary file (.skel). */
-	binaryUrl: string
+	/* The URL of the skeleton binary file (.skel). Undefined if jsonUrl is given. */
+	binaryUrl?: string
 
 	/* The URL of the skeleton atlas file (.atlas). Atlas page images are automatically resolved. */
-	atlasUrl: string
+	atlasUrl?: string
 
 	/* Raw data URIs, mapping a path to base64 encoded raw data. When player's asset manager resolves the jsonUrl, binaryUrl,
 	   atlasUrl, or the image paths referenced in the atlas, it will first look for that path in the raw data URIs. This
 	   allows embedding assets directly in HTML/JS. Default: none */
-	rawDataURIs: StringMap<string>
+	rawDataURIs?: StringMap<string>
 
 	/* Optional: The name of the animation to be played. Default: empty animation */
-	animation: string
+	animation?: string
 
 	/* Optional: List of animation names from which the user can choose. Default: all animations */
-	animations: string[]
+	animations?: string[]
 
 	/* Optional: The default mix time used to switch between two animations. Default: 0.25 */
-	defaultMix: number
+	defaultMix?: number
 
 	/* Optional: The name of the skin to be set. Default: the default skin */
-	skin: string
+	skin?: string
 
 	/* Optional: List of skin names from which the user can choose. Default: all skins */
-	skins: string[]
+	skins?: string[]
 
 	/* Optional: Whether the skeleton's atlas images use premultiplied alpha. Default: true */
-	premultipliedAlpha: boolean
+	premultipliedAlpha?: boolean
 
 	/* Optional: Whether to show the player controls. When false, no external CSS file is needed. Default: true */
-	showControls: boolean
+	showControls?: boolean
 
 	/* Optional: Whether to show the loading animation. Default: true */
-	showLoading: boolean
+	showLoading?: boolean
 
 	/* Optional: Which debugging visualizations are shown. Default: none */
-	debug: {
+	debug?: {
 		bones: boolean
 		regions: boolean
 		meshes: boolean
@@ -86,81 +86,81 @@ export interface SpinePlayerConfig {
 
 	/* Optional: The position and size of the viewport in the skeleton's world coordinates. Default: the bounding box that fits
 	  the current animation, 10% padding, 0.25 transition time */
-	viewport: {
+	viewport?: {
 		/* Optional: The position and size of the viewport in the skeleton's world coordinates. Default: the bounding box that
 		   fits the current animation */
-		x: number
-		y: number
-		width: number
-		height: number
+		x?: number
+		y?: number
+		width?: number
+		height?: number
 
 		/* Optional: Padding around the viewport size, given as a number or percentage (eg "25%"). Default: 10% */
-		padLeft: string | number
-		padRight: string | number
-		padTop: string | number
-		padBottom: string | number
+		padLeft?: string | number
+		padRight?: string | number
+		padTop?: string | number
+		padBottom?: string | number
 
 		/* Optional: Whether to draw lines showing the viewport bounds. Default: false */
-		debugRender: boolean,
+		debugRender?: boolean,
 
 		/* Optional: When the current viewport changes, the time to animate to the new viewport. Default: 0.25 */
-		transitionTime: number
+		transitionTime?: number
 
 		/* Optional: Viewports for specific animations. Default: none */
-		animations: StringMap<Viewport>
+		animations?: StringMap<Viewport>
 	}
 
 	/* Optional: Whether the canvas is transparent, allowing the web page behind the canvas to show through when
 	   backgroundColor alpha is < ff. Default: false */
-	alpha: boolean
+	alpha?: boolean
 
 	/* Optional: The canvas background color, given in the format #rrggbb or #rrggbbaa. Default: #000000ff (black) or when
 	   alpha is true #00000000 (transparent) */
-	backgroundColor: string
+	backgroundColor?: string
 
 	/* Optional: The background color used in fullscreen mode, given in the format #rrggbb or #rrggbbaa. Default: backgroundColor */
-	fullScreenBackgroundColor: string
+	fullScreenBackgroundColor?: string
 
 	/* Optional: An image to draw behind the skeleton. Default: none */
-	backgroundImage: {
+	backgroundImage?: {
 		url: string
 
 		/* Optional: The position and size of the background image in the skeleton's world coordinates. Default: fills the viewport */
-		x: number
-		y: number
-		width: number
-		height: number
+		x?: number
+		y?: number
+		width?: number
+		height?: number
 	}
 
 	/* Optional: Whether mipmapping and anisotropic filtering are used for highest quality scaling when available, otherwise the
 	   filter settings from the texture atlas are used. Default: true */
-	mipmaps: true
+	mipmaps?: boolean
 
 	/* Optional: List of bone names that the user can drag to position. Default: none */
-	controlBones: string[]
+	controlBones?: string[]
 
 	/* Optional: Callback when the skeleton and its assets have been successfully loaded. If an animation is set on track 0,
 	   the player won't set its own animation. Default: none */
-	success: (player: SpinePlayer) => void
+	success?: (player: SpinePlayer) => void
 
 	/* Optional: Callback when the skeleton could not be loaded or rendered. Default: none */
-	error: (player: SpinePlayer, msg: string) => void
+	error?: (player: SpinePlayer, msg: string) => void
 
 	/* Optional: Callback at the start of each frame, before the skeleton is posed or drawn. Default: none */
-	frame: (player: SpinePlayer, delta: number) => void
+	frame?: (player: SpinePlayer, delta: number) => void
 
 	/* Optional: Callback after the skeleton is posed each frame, before it is drawn. Default: none */
-	update: (player: SpinePlayer, delta: number) => void
+	update?: (player: SpinePlayer, delta: number) => void
 
 	/* Optional: Callback after the skeleton is drawn each frame. Default: none */
-	draw: (player: SpinePlayer, delta: number) => void
+	draw?: (player: SpinePlayer, delta: number) => void
 
 	/* Optional: Callback each frame before the skeleton is loaded. Default: none */
-	loading: (player: SpinePlayer, delta: number) => void
+	loading?: (player: SpinePlayer, delta: number) => void
 
 	/* Optional: The downloader used by the player's asset manager. Passing the same downloader to multiple players using the
 	   same assets ensures the assets are only downloaded once. Default: new instance */
-	downloader: Downloader
+	downloader?: Downloader
 }
 
 export interface Viewport {
@@ -181,31 +181,31 @@ export interface Viewport {
 export class SpinePlayer implements Disposable {
 	public parent: HTMLElement;
 	public dom: HTMLElement;
-	public canvas: HTMLCanvasElement;
-	public context: ManagedWebGLRenderingContext;
-	public sceneRenderer: SceneRenderer;
-	public loadingScreen: LoadingScreen;
-	public assetManager: AssetManager;
+	public canvas: HTMLCanvasElement | null = null;
+	public context: ManagedWebGLRenderingContext | null = null;
+	public sceneRenderer: SceneRenderer | null = null;
+	public loadingScreen: LoadingScreen | null = null;
+	public assetManager: AssetManager | null = null;
 	public bg = new Color();
 	public bgFullscreen = new Color();
 
-	private playerControls: HTMLElement;
-	private timelineSlider: Slider;
-	private playButton: HTMLElement;
-	private skinButton: HTMLElement;
-	private animationButton: HTMLElement;
+	private playerControls: HTMLElement | null = null;
+	private timelineSlider: Slider | null = null;
+	private playButton: HTMLElement | null = null;
+	private skinButton: HTMLElement | null = null;
+	private animationButton: HTMLElement | null = null;
 
 	private playTime = 0;
-	private selectedBones: Bone[];
+	private selectedBones: (Bone | null)[] = [];
 	private cancelId = 0;
-	popup: Popup;
+	popup: Popup | null = null;
 
 	/* True if the player is unable to load or render the skeleton. */
-	public error: boolean;
+	public error: boolean = false;
 	/* The player's skeleton. Null until loading is complete (access after config.success). */
-	public skeleton: Skeleton;
+	public skeleton: Skeleton | null = null;
 	/* The animation state controlling the skeleton. Null until loading is complete (access after config.success). */
-	public animationState: AnimationState;
+	public animationState: AnimationState | null = null;
 
 	public paused = true;
 	public speed = 1;
@@ -214,14 +214,15 @@ export class SpinePlayer implements Disposable {
 	private disposed = false;
 
 	private viewport: Viewport = {} as Viewport;
-	private currentViewport: Viewport;
-	private previousViewport: Viewport;
+	private currentViewport: Viewport = {} as Viewport;
+	private previousViewport: Viewport = {} as Viewport;
 	private viewportTransitionStart = 0;
 	private eventListeners: Array<{ target: any, event: any, func: any }> = [];
 
 	constructor (parent: HTMLElement | string, private config: SpinePlayerConfig) {
-		this.parent = typeof parent === "string" ? document.getElementById(parent) : parent;
-		if (!this.parent) throw new Error("SpinePlayer parent not found: " + parent);
+		let parentDom = typeof parent === "string" ? document.getElementById(parent) : parent;
+		if (parentDom == null) throw new Error("SpinePlayer parent not found: " + parent);
+		this.parent = parentDom;
 
 		if (config.showControls === void 0) config.showControls = true;
 		let controls = config.showControls ? /*html*/`
@@ -244,7 +245,7 @@ export class SpinePlayer implements Disposable {
 		try {
 			this.validateConfig(config);
 		} catch (e) {
-			this.showError(e.message, e);
+			this.showError((e as any).message, e as any);
 		}
 
 		this.initialize();
@@ -257,9 +258,9 @@ export class SpinePlayer implements Disposable {
 	}
 
 	dispose (): void {
-		this.sceneRenderer.dispose();
-		if (this.loadingScreen) this.loadingScreen.dispose();
-		this.assetManager.dispose();
+		this.sceneRenderer?.dispose();
+		this.loadingScreen?.dispose();
+		this.assetManager?.dispose();
 		for (var i = 0; i < this.eventListeners.length; i++) {
 			var eventListener = this.eventListeners[i];
 			eventListener.target.removeEventListener(eventListener.event, eventListener.func);
@@ -280,29 +281,38 @@ export class SpinePlayer implements Disposable {
 		if (!config.atlasUrl) throw new Error("A URL must be specified for the atlas file.");
 		if (!config.backgroundColor) config.backgroundColor = config.alpha ? "00000000" : "000000";
 		if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
-		if (config.backgroundImage && !config.backgroundImage.url) config.backgroundImage = null;
+		if (config.backgroundImage && !config.backgroundImage.url) config.backgroundImage = undefined;
 		if (config.premultipliedAlpha === void 0) config.premultipliedAlpha = true;
 		if (config.mipmaps === void 0) config.mipmaps = true;
-		if (!config.debug) config.debug = {} as any;
+		if (!config.debug) config.debug = {
+			bones: false,
+			clipping: false,
+			bounds: false,
+			hulls: false,
+			meshes: false,
+			paths: false,
+			points: false,
+			regions: false
+		};
 		if (config.animations && config.animation && config.animations.indexOf(config.animation) < 0)
 			throw new Error("Animation '" + config.animation + "' is not in the config animation list: " + toString(config.animations));
 		if (config.skins && config.skin && config.skins.indexOf(config.skin) < 0)
 			throw new Error("Default skin '" + config.skin + "' is not in the config skins list: " + toString(config.skins));
 		if (!config.viewport) config.viewport = {} as any;
-		if (!config.viewport.animations) config.viewport.animations = {};
-		if (config.viewport.debugRender === void 0) config.viewport.debugRender = false;
-		if (config.viewport.transitionTime === void 0) config.viewport.transitionTime = 0.25;
+		if (!config.viewport!.animations) config.viewport!.animations = {};
+		if (config.viewport!.debugRender === void 0) config.viewport!.debugRender = false;
+		if (config.viewport!.transitionTime === void 0) config.viewport!.transitionTime = 0.25;
 		if (!config.controlBones) config.controlBones = [];
 		if (config.showLoading === void 0) config.showLoading = true;
 		if (config.defaultMix === void 0) config.defaultMix = 0.25;
 	}
 
-	private initialize (): HTMLElement {
+	private initialize (): HTMLElement | null {
 		let config = this.config;
 		let dom = this.dom;
 
 		if (!config.alpha) { // Prevents a flash before the first frame is drawn.
-			let hex = config.backgroundColor;
+			let hex = config.backgroundColor!;
 			this.dom.style.backgroundColor = (hex.charAt(0) == '#' ? hex : "#" + hex).substr(0, 7);
 		}
 
@@ -315,7 +325,8 @@ export class SpinePlayer implements Disposable {
 			this.sceneRenderer = new SceneRenderer(this.canvas, this.context, true);
 			if (config.showLoading) this.loadingScreen = new LoadingScreen(this.sceneRenderer);
 		} catch (e) {
-			this.showError("Sorry, your browser does not support \nPlease use the latest version of Firefox, Chrome, Edge, or Safari.", e);
+			this.showError("Sorry, your browser does not support \nPlease use the latest version of Firefox, Chrome, Edge, or Safari.", e as any);
+			return null;
 		}
 
 		// Load the assets.
@@ -327,13 +338,13 @@ export class SpinePlayer implements Disposable {
 		if (config.jsonUrl)
 			this.assetManager.loadJson(config.jsonUrl);
 		else
-			this.assetManager.loadBinary(config.binaryUrl);
-		this.assetManager.loadTextureAtlas(config.atlasUrl);
+			this.assetManager.loadBinary(config.binaryUrl!);
+		this.assetManager.loadTextureAtlas(config.atlasUrl!);
 		if (config.backgroundImage) this.assetManager.loadTexture(config.backgroundImage.url);
 
 		// Setup the UI elements.
-		this.bg.setFromString(config.backgroundColor);
-		this.bgFullscreen.setFromString(config.fullScreenBackgroundColor);
+		this.bg.setFromString(config.backgroundColor!);
+		this.bgFullscreen.setFromString(config.fullScreenBackgroundColor!);
 		if (config.showControls) {
 			this.playerControls = dom.children[1] as HTMLElement;
 			let controls = this.playerControls.children;
@@ -351,18 +362,18 @@ export class SpinePlayer implements Disposable {
 			timeline.appendChild(this.timelineSlider.create());
 			this.timelineSlider.change = (percentage) => {
 				this.pause();
-				let animationDuration = this.animationState.getCurrent(0).animation.duration;
+				let animationDuration = this.animationState!.getCurrent(0)!.animation!.duration;
 				let time = animationDuration * percentage;
-				this.animationState.update(time - this.playTime);
-				this.animationState.apply(this.skeleton);
-				this.skeleton.updateWorldTransform();
+				this.animationState!.update(time - this.playTime);
+				this.animationState!.apply(this.skeleton!);
+				this.skeleton!.updateWorldTransform();
 				this.playTime = time;
 			};
 
 			this.playButton.onclick = () => (this.paused ? this.play() : this.pause());
 			speedButton.onclick = () => this.showSpeedDialog(speedButton);
-			this.animationButton.onclick = () => this.showAnimationsDialog(this.animationButton);
-			this.skinButton.onclick = () => this.showSkinsDialog(this.skinButton);
+			this.animationButton.onclick = () => this.showAnimationsDialog(this.animationButton!);
+			this.skinButton.onclick = () => this.showSkinsDialog(this.skinButton!);
 			settingsButton.onclick = () => this.showSettingsDialog(settingsButton);
 
 			let oldWidth = this.canvas.clientWidth, oldHeight = this.canvas.clientHeight;
@@ -372,13 +383,13 @@ export class SpinePlayer implements Disposable {
 				let fullscreenChanged = () => {
 					isFullscreen = !isFullscreen;
 					if (!isFullscreen) {
-						this.canvas.style.width = oldWidth + "px";
-						this.canvas.style.height = oldHeight + "px";
+						this.canvas!.style.width = oldWidth + "px";
+						this.canvas!.style.height = oldHeight + "px";
 						this.drawFrame(false);
 						// Got to reset the style to whatever the user set after the next layouting.
 						requestAnimationFrame(() => {
-							this.canvas.style.width = oldStyleWidth;
-							this.canvas.style.height = oldStyleHeight;
+							this.canvas!.style.width = oldStyleWidth;
+							this.canvas!.style.height = oldStyleHeight;
 						});
 					}
 				};
@@ -394,10 +405,10 @@ export class SpinePlayer implements Disposable {
 					else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen()
 					else if (doc.msExitFullscreen) doc.msExitFullscreen();
 				} else {
-					oldWidth = this.canvas.clientWidth;
-					oldHeight = this.canvas.clientHeight;
-					oldStyleWidth = this.canvas.style.width;
-					oldStyleHeight = this.canvas.style.height;
+					oldWidth = this.canvas!.clientWidth;
+					oldHeight = this.canvas!.clientHeight;
+					oldStyleWidth = this.canvas!.style.width;
+					oldStyleHeight = this.canvas!.style.height;
 					if (player.requestFullscreen) player.requestFullscreen();
 					else if (player.webkitRequestFullScreen) player.webkitRequestFullScreen();
 					else if (player.mozRequestFullScreen) player.mozRequestFullScreen();
@@ -413,18 +424,18 @@ export class SpinePlayer implements Disposable {
 	private loadSkeleton () {
 		if (this.error) return;
 
-		if (this.assetManager.hasErrors())
-			this.showError("Error: Assets could not be loaded.\n" + toString(this.assetManager.getErrors()));
+		if (this.assetManager!.hasErrors())
+			this.showError("Error: Assets could not be loaded.\n" + toString(this.assetManager!.getErrors()));
 
 		let config = this.config;
 
 		// Configure filtering, don't use mipmaps in WebGL1 if the atlas page is non-POT
-		let atlas = this.assetManager.require(config.atlasUrl) as TextureAtlas;
-		let gl = this.context.gl, anisotropic = gl.getExtension("EXT_texture_filter_anisotropic");
+		let atlas = this.assetManager!.require(config.atlasUrl!) as TextureAtlas;
+		let gl = this.context!.gl, anisotropic = gl.getExtension("EXT_texture_filter_anisotropic");
 		let isWebGL1 = gl.getParameter(gl.VERSION).indexOf("WebGL 1.0") != -1;
 		for (let page of atlas.pages) {
 			let minFilter = page.minFilter;
-			var useMipMaps: boolean = config.mipmaps;
+			var useMipMaps: boolean = config.mipmaps!;
 			var isPOT = MathUtils.isPowerOfTwo(page.width) && MathUtils.isPowerOfTwo(page.height);
 			if (isWebGL1 && !isPOT) useMipMaps = false;
 
@@ -434,7 +445,7 @@ export class SpinePlayer implements Disposable {
 					minFilter = TextureFilter.MipMapLinearLinear;
 				} else
 					minFilter = TextureFilter.Linear; // Don't use mipmaps without anisotropic.
-				page.texture.setFilters(minFilter, TextureFilter.Nearest);
+				page.texture!.setFilters(minFilter, TextureFilter.Nearest);
 			}
 			if (minFilter != TextureFilter.Nearest && minFilter != TextureFilter.Linear) (page.texture as GLTexture).update(true);
 		}
@@ -443,7 +454,7 @@ export class SpinePlayer implements Disposable {
 		let skeletonData: SkeletonData;
 		if (config.jsonUrl) {
 			try {
-				let jsonData = this.assetManager.remove(config.jsonUrl);
+				let jsonData = this.assetManager!.remove(config.jsonUrl);
 				if (!jsonData) throw new Error("Empty JSON data.");
 				if (config.jsonField) {
 					jsonData = jsonData[config.jsonField];
@@ -452,32 +463,34 @@ export class SpinePlayer implements Disposable {
 				let json = new SkeletonJson(new AtlasAttachmentLoader(atlas));
 				skeletonData = json.readSkeletonData(jsonData);
 			} catch (e) {
-				this.showError(`Error: Could not load skeleton JSON.\n${e.message}`, e);
+				this.showError(`Error: Could not load skeleton JSON.\n${(e as any).message}`, e as any);
+				return;
 			}
 		} else {
-			let binaryData = this.assetManager.remove(config.binaryUrl);
+			let binaryData = this.assetManager!.remove(config.binaryUrl!);
 			let binary = new SkeletonBinary(new AtlasAttachmentLoader(atlas));
 			try {
 				skeletonData = binary.readSkeletonData(binaryData);
 			} catch (e) {
-				this.showError(`Error: Could not load skeleton binary.\n${e.message}`, e);
+				this.showError(`Error: Could not load skeleton binary.\n${(e as any).message}`, e as any);
+				return;
 			}
 		}
 		this.skeleton = new Skeleton(skeletonData);
 		let stateData = new AnimationStateData(skeletonData);
-		stateData.defaultMix = config.defaultMix;
+		stateData.defaultMix = config.defaultMix!;
 		this.animationState = new AnimationState(stateData);
 
 		// Check if all control bones are in the skeleton
-		config.controlBones.forEach(bone => {
+		config.controlBones!.forEach(bone => {
 			if (!skeletonData.findBone(bone)) this.showError(`Error: Control bone does not exist in skeleton: ${bone}`);
 		})
 
 		// Setup skin.
 		if (!config.skin && skeletonData.skins.length) config.skin = skeletonData.skins[0].name;
-		if (config.skins && config.skin.length) {
+		if (config.skins && config.skin!.length) {
 			config.skins.forEach(skin => {
-				if (!this.skeleton.data.findSkin(skin))
+				if (!this.skeleton!.data.findSkin(skin))
 					this.showError(`Error: Skin in config list does not exist in skeleton: ${skin}`);
 			});
 		}
@@ -489,7 +502,7 @@ export class SpinePlayer implements Disposable {
 		}
 
 		// Check if all animations given a viewport exist.
-		Object.getOwnPropertyNames(config.viewport.animations).forEach((animation: string) => {
+		Object.getOwnPropertyNames(config.viewport!.animations).forEach((animation: string) => {
 			if (!skeletonData.findAnimation(animation))
 				this.showError(`Error: Animation for which a viewport was specified does not exist in skeleton: ${animation}`);
 		});
@@ -497,7 +510,7 @@ export class SpinePlayer implements Disposable {
 		// Setup the animations after the viewport, so default bounds don't get messed up.
 		if (config.animations && config.animations.length) {
 			config.animations.forEach(animation => {
-				if (!this.skeleton.data.findAnimation(animation))
+				if (!this.skeleton!.data.findAnimation(animation))
 					this.showError(`Error: Animation in config list does not exist in skeleton: ${animation}`);
 			});
 			if (!config.animation) config.animation = config.animations[0];
@@ -511,8 +524,8 @@ export class SpinePlayer implements Disposable {
 
 		if (config.showControls) {
 			// Hide skin and animation if there's only the default skin / no animation
-			if (skeletonData.skins.length == 1 || (config.skins && config.skins.length == 1)) this.skinButton.classList.add("spine-player-hidden");
-			if (skeletonData.animations.length == 1 || (config.animations && config.animations.length == 1)) this.animationButton.classList.add("spine-player-hidden");
+			if (skeletonData.skins.length == 1 || (config.skins && config.skins.length == 1)) this.skinButton!.classList.add("spine-player-hidden");
+			if (skeletonData.animations.length == 1 || (config.animations && config.animations.length == 1)) this.animationButton!.classList.add("spine-player-hidden");
 		}
 
 		if (config.success) config.success(this);
@@ -525,37 +538,38 @@ export class SpinePlayer implements Disposable {
 			} else {
 				entry = this.animationState.setEmptyAnimation(0);
 				entry.trackEnd = 100000000;
-				this.setViewport(entry.animation);
+				this.setViewport(entry.animation!);
 				this.pause();
 			}
 		} else if (!this.currentViewport) {
-			this.setViewport(entry.animation);
+			this.setViewport(entry.animation!);
 			this.play();
 		}
 	}
 
 	private setupInput () {
 		let config = this.config;
-		let controlBones = config.controlBones;
+		let controlBones = config.controlBones!;
 		if (!controlBones.length && !config.showControls) return;
-		let selectedBones = this.selectedBones = new Array<Bone>(controlBones.length);
-		let canvas = this.canvas;
-		let target: Bone = null;
+		let selectedBones = this.selectedBones = new Array<Bone | null>(controlBones.length);
+		let canvas = this.canvas!;
+		let target: Bone | null = null;
 		let offset = new Vector2();
 		let coords = new Vector3();
 		let mouse = new Vector3();
 		let position = new Vector2();
-		let skeleton = this.skeleton;
-		let renderer = this.sceneRenderer;
+		let skeleton = this.skeleton!;
+		let renderer = this.sceneRenderer!;
 
-		let closest = function (x: number, y: number): Bone {
+		let closest = function (x: number, y: number): Bone | null {
 			mouse.set(x, canvas.clientHeight - y, 0)
 			offset.x = offset.y = 0;
 			let bestDistance = 24, index = 0;
-			let best: Bone;
+			let best: Bone | null = null;
 			for (let i = 0; i < controlBones.length; i++) {
 				selectedBones[i] = null;
 				let bone = skeleton.findBone(controlBones[i]);
+				if (!bone) continue;
 				let distance = renderer.camera.worldToScreen(
 					coords.set(bone.worldX, bone.worldY, 0),
 					canvas.clientWidth, canvas.clientHeight).distance(mouse);
@@ -624,17 +638,17 @@ export class SpinePlayer implements Disposable {
 			let mouseOverControls = true, mouseOverCanvas = false;
 			let handleHover = (mouseX: number, mouseY: number) => {
 				let popup = findWithClass(this.dom, "spine-player-popup");
-				mouseOverControls = overlap(mouseX, mouseY, this.playerControls.getBoundingClientRect());
+				mouseOverControls = overlap(mouseX, mouseY, this.playerControls!.getBoundingClientRect());
 				mouseOverCanvas = overlap(mouseX, mouseY, canvas.getBoundingClientRect());
 				clearTimeout(this.cancelId);
 				let hide = !popup && !mouseOverControls && !mouseOverCanvas && !this.paused;
 				if (hide)
-					this.playerControls.classList.add("spine-player-controls-hidden");
+					this.playerControls!.classList.add("spine-player-controls-hidden");
 				else
-					this.playerControls.classList.remove("spine-player-controls-hidden");
+					this.playerControls!.classList.remove("spine-player-controls-hidden");
 				if (!mouseOverControls && !popup && !this.paused) {
 					this.cancelId = setTimeout(() => {
-						if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
+						if (!this.paused) this.playerControls!.classList.add("spine-player-controls-hidden");
 					}, 1000);
 				}
 			}
@@ -646,17 +660,17 @@ export class SpinePlayer implements Disposable {
 		let config = this.config;
 		if (config.showControls) {
 			this.cancelId = setTimeout(() => {
-				if (!this.paused) this.playerControls.classList.add("spine-player-controls-hidden");
+				if (!this.paused) this.playerControls!.classList.add("spine-player-controls-hidden");
 			}, 1000);
-			this.playButton.classList.remove("spine-player-button-icon-play");
-			this.playButton.classList.add("spine-player-button-icon-pause");
+			this.playButton!.classList.remove("spine-player-button-icon-play");
+			this.playButton!.classList.add("spine-player-button-icon-pause");
 
 			// If no config animation, set one when first clicked.
 			if (!config.animation) {
 				if (config.animations && config.animations.length)
 					config.animation = config.animations[0];
-				else if (this.skeleton.data.animations.length)
-					config.animation = this.skeleton.data.animations[0].name;
+				else if (this.skeleton!.data.animations.length)
+					config.animation = this.skeleton!.data.animations[0].name;
 				if (config.animation) this.setAnimation(config.animation);
 			}
 		}
@@ -665,33 +679,37 @@ export class SpinePlayer implements Disposable {
 	pause () {
 		this.paused = true;
 		if (this.config.showControls) {
-			this.playerControls.classList.remove("spine-player-controls-hidden");
+			this.playerControls!.classList.remove("spine-player-controls-hidden");
 			clearTimeout(this.cancelId);
-			this.playButton.classList.remove("spine-player-button-icon-pause");
-			this.playButton.classList.add("spine-player-button-icon-play");
+			this.playButton!.classList.remove("spine-player-button-icon-pause");
+			this.playButton!.classList.add("spine-player-button-icon-play");
 		}
 	}
 
 	/* Sets a new animation and viewport on track 0. */
 	setAnimation (animation: string | Animation, loop: boolean = true): TrackEntry {
 		animation = this.setViewport(animation);
-		return this.animationState.setAnimationWith(0, animation, loop);
+		return this.animationState!.setAnimationWith(0, animation, loop);
 	}
 
 	/* Adds a new animation and viewport on track 0. */
 	addAnimation (animation: string | Animation, loop: boolean = true, delay: number = 0): TrackEntry {
 		animation = this.setViewport(animation);
-		return this.animationState.addAnimationWith(0, animation, loop, delay);
+		return this.animationState!.addAnimationWith(0, animation, loop, delay);
 	}
 
 	/* Sets the viewport for the specified animation. */
 	setViewport (animation: string | Animation): Animation {
-		if (typeof animation == "string") animation = this.skeleton.data.findAnimation(animation);
+		if (typeof animation == "string") {
+			let foundAnimation = this.skeleton!.data.findAnimation(animation);
+			if (!foundAnimation) throw new Error("Animation not found: " + animation);
+			animation = foundAnimation;
+		}
 
 		this.previousViewport = this.currentViewport;
 
 		// Determine the base viewport.
-		let globalViewport = this.config.viewport;
+		let globalViewport = this.config.viewport!;
 		let viewport = this.currentViewport = {
 			padLeft: globalViewport.padLeft !== void 0 ? globalViewport.padLeft : "10%",
 			padRight: globalViewport.padRight !== void 0 ? globalViewport.padRight : "10%",
@@ -707,7 +725,7 @@ export class SpinePlayer implements Disposable {
 			this.calculateAnimationViewport(animation, viewport);
 
 		// Override with the animation specific viewport for the final result.
-		let userAnimViewport = this.config.viewport.animations[animation.name];
+		let userAnimViewport = this.config.viewport!.animations![animation.name];
 		if (userAnimViewport) {
 			if (userAnimViewport.x !== void 0 && userAnimViewport.y !== void 0 && userAnimViewport.width && userAnimViewport.height) {
 				viewport.x = userAnimViewport.x;
@@ -738,16 +756,16 @@ export class SpinePlayer implements Disposable {
 	}
 
 	private calculateAnimationViewport (animation: Animation, viewport: Viewport) {
-		this.skeleton.setToSetupPose();
+		this.skeleton!.setToSetupPose();
 
 		let steps = 100, stepTime = animation.duration ? animation.duration / steps : 0, time = 0;
 		let minX = 100000000, maxX = -100000000, minY = 100000000, maxY = -100000000;
 		let offset = new Vector2(), size = new Vector2();
 
 		for (let i = 0; i < steps; i++, time += stepTime) {
-			animation.apply(this.skeleton, time, time, false, null, 1, MixBlend.setup, MixDirection.mixIn);
-			this.skeleton.updateWorldTransform();
-			this.skeleton.getBounds(offset, size);
+			animation.apply(this.skeleton!, time, time, false, [], 1, MixBlend.setup, MixDirection.mixIn);
+			this.skeleton!.updateWorldTransform();
+			this.skeleton!.getBounds(offset, size);
 
 			if (!isNaN(offset.x) && !isNaN(offset.y) && !isNaN(size.x) && !isNaN(size.y)) {
 				minX = Math.min(offset.x, minX);
@@ -778,13 +796,13 @@ export class SpinePlayer implements Disposable {
 			let delta = this.time.delta;
 
 			// Load the skeleton if the assets are ready.
-			let loading = this.assetManager.isLoadingComplete();
+			let loading = this.assetManager!.isLoadingComplete();
 			if (!this.skeleton && loading) this.loadSkeleton();
-			let skeleton = this.skeleton;
-			let config = this.config;
+			let skeleton = this.skeleton!;
+			let config = this.config!;
 			if (skeleton) {
 				// Resize the canvas.
-				let renderer = this.sceneRenderer;
+				let renderer = this.sceneRenderer!;
 				renderer.resize(ResizeMode.Expand);
 
 				let playDelta = this.paused ? 0 : delta * this.speed;
@@ -792,19 +810,19 @@ export class SpinePlayer implements Disposable {
 
 				// Update animation time and pose the skeleton.
 				if (!this.paused) {
-					this.animationState.update(playDelta);
-					this.animationState.apply(skeleton);
+					this.animationState!.update(playDelta);
+					this.animationState!.apply(skeleton);
 					skeleton.updateWorldTransform();
 
 					if (config.showControls) {
 						this.playTime += playDelta;
-						let entry = this.animationState.getCurrent(0);
+						let entry = this.animationState!.getCurrent(0);
 						if (entry) {
-							let duration = entry.animation.duration;
+							let duration = entry.animation!.duration;
 							while (this.playTime >= duration && duration != 0)
 								this.playTime -= duration;
 							this.playTime = Math.max(0, Math.min(this.playTime, duration));
-							this.timelineSlider.setValue(this.playTime / duration);
+							this.timelineSlider!.setValue(this.playTime / duration);
 						}
 					}
 				}
@@ -817,7 +835,7 @@ export class SpinePlayer implements Disposable {
 					viewport.height = this.currentViewport.height + (this.currentViewport.padBottom as number) + (this.currentViewport.padTop as number)
 
 				if (this.previousViewport) {
-					let transitionAlpha = (performance.now() - this.viewportTransitionStart) / 1000 / config.viewport.transitionTime;
+					let transitionAlpha = (performance.now() - this.viewportTransitionStart) / 1000 / config.viewport!.transitionTime!;
 					if (transitionAlpha < 1) {
 						let x = this.previousViewport.x - (this.previousViewport.padLeft as number);
 						let y = this.previousViewport.y - (this.previousViewport.padBottom as number);
@@ -830,13 +848,13 @@ export class SpinePlayer implements Disposable {
 					}
 				}
 
-				renderer.camera.zoom = this.canvas.height / this.canvas.width > viewport.height / viewport.width
-					? viewport.width / this.canvas.width : viewport.height / this.canvas.height;
+				renderer.camera.zoom = this.canvas!.height / this.canvas!.width > viewport.height / viewport.width
+					? viewport.width / this.canvas!.width : viewport.height / this.canvas!.height;
 				renderer.camera.position.x = viewport.x + viewport.width / 2;
 				renderer.camera.position.y = viewport.y + viewport.height / 2;
 
 				// Clear the screen.
-				let gl = this.context.gl;
+				let gl = this.context!.gl;
 				gl.clearColor(bg.r, bg.g, bg.b, bg.a);
 				gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -847,7 +865,7 @@ export class SpinePlayer implements Disposable {
 				// Draw the background image.
 				let bgImage = config.backgroundImage;
 				if (bgImage) {
-					let texture = this.assetManager.require(bgImage.url);
+					let texture = this.assetManager!.require(bgImage.url);
 					if (bgImage.x !== void 0 && bgImage.y !== void 0 && bgImage.width && bgImage.height)
 						renderer.drawTexture(texture, bgImage.x, bgImage.y, bgImage.width, bgImage.height);
 					else
@@ -856,19 +874,19 @@ export class SpinePlayer implements Disposable {
 
 				// Draw the skeleton and debug output.
 				renderer.drawSkeleton(skeleton, config.premultipliedAlpha);
-				if ((renderer.skeletonDebugRenderer.drawBones = config.debug.bones)
-					|| (renderer.skeletonDebugRenderer.drawBoundingBoxes = config.debug.bounds)
-					|| (renderer.skeletonDebugRenderer.drawClipping = config.debug.clipping)
-					|| (renderer.skeletonDebugRenderer.drawMeshHull = config.debug.hulls)
-					|| (renderer.skeletonDebugRenderer.drawPaths = config.debug.paths)
-					|| (renderer.skeletonDebugRenderer.drawRegionAttachments = config.debug.regions)
-					|| (renderer.skeletonDebugRenderer.drawMeshTriangles = config.debug.meshes)
+				if ((renderer.skeletonDebugRenderer.drawBones = config.debug!.bones!)
+					|| (renderer.skeletonDebugRenderer.drawBoundingBoxes = config.debug!.bounds!)
+					|| (renderer.skeletonDebugRenderer.drawClipping = config.debug!.clipping!)
+					|| (renderer.skeletonDebugRenderer.drawMeshHull = config.debug!.hulls!)
+					|| (renderer.skeletonDebugRenderer.drawPaths = config.debug!.paths!)
+					|| (renderer.skeletonDebugRenderer.drawRegionAttachments = config.debug!.regions!)
+					|| (renderer.skeletonDebugRenderer.drawMeshTriangles = config.debug!.meshes!)
 				) {
 					renderer.drawSkeletonDebug(skeleton, config.premultipliedAlpha);
 				}
 
 				// Draw the control bones.
-				let controlBones = config.controlBones;
+				let controlBones = config.controlBones!;
 				if (controlBones.length) {
 					let selectedBones = this.selectedBones;
 					gl.lineWidth(2);
@@ -883,7 +901,7 @@ export class SpinePlayer implements Disposable {
 				}
 
 				// Draw the viewport bounds.
-				if (config.viewport.debugRender) {
+				if (config.viewport!.debugRender) {
 					gl.lineWidth(1);
 					renderer.rect(false, this.currentViewport.x, this.currentViewport.y, this.currentViewport.width, this.currentViewport.height, Color.GREEN);
 					renderer.rect(false, viewport.x, viewport.y, viewport.width, viewport.height, Color.RED);
@@ -896,12 +914,12 @@ export class SpinePlayer implements Disposable {
 
 			// Draw the loading screen.
 			if (config.showLoading) {
-				this.loadingScreen.backgroundColor.setFromColor(bg);
-				this.loadingScreen.draw(loading);
+				this.loadingScreen!.backgroundColor.setFromColor(bg);
+				this.loadingScreen!.draw(loading);
 			}
 			if (loading && config.loading) config.loading(this, delta);
 		} catch (e) {
-			this.showError(`Error: Unable to render skeleton.\n${e.message}`, e);
+			this.showError(`Error: Unable to render skeleton.\n${(e as any).message}`, e as any);
 		}
 	}
 
@@ -910,14 +928,14 @@ export class SpinePlayer implements Disposable {
 	}
 
 	private hidePopup (id: string): boolean {
-		return this.popup && this.popup.hide(id);
+		return this.popup != null && this.popup.hide(id);
 	}
 
 	private showSpeedDialog (speedButton: HTMLElement) {
 		let id = "speed";
 		if (this.hidePopup(id)) return;
 
-		let popup = new Popup(id, speedButton, this, this.playerControls, /*html*/`
+		let popup = new Popup(id, speedButton, this, this.playerControls!, /*html*/`
 <div class="spine-player-popup-title">Speed</div>
 <hr>
 <div class="spine-player-row" style="align-items:center;padding:8px">
@@ -938,7 +956,7 @@ export class SpinePlayer implements Disposable {
 		if (this.hidePopup(id)) return;
 		if (!this.skeleton || !this.skeleton.data.animations.length) return;
 
-		let popup = new Popup(id, animationsButton, this, this.playerControls,
+		let popup = new Popup(id, animationsButton, this, this.playerControls!,
 				/*html*/`<div class="spine-player-popup-title">Animations</div><hr><ul class="spine-player-list"></ul>`);
 
 		let rows = findWithClass(popup.dom, "spine-player-list");
@@ -968,7 +986,7 @@ export class SpinePlayer implements Disposable {
 		if (this.hidePopup(id)) return;
 		if (!this.skeleton || !this.skeleton.data.animations.length) return;
 
-		let popup = new Popup(id, skinButton, this, this.playerControls,
+		let popup = new Popup(id, skinButton, this, this.playerControls!,
 				/*html*/`<div class="spine-player-popup-title">Skins</div><hr><ul class="spine-player-list"></ul>`);
 
 		let rows = findWithClass(popup.dom, "spine-player-list");
@@ -984,8 +1002,8 @@ export class SpinePlayer implements Disposable {
 				removeClass(rows.children, "selected");
 				row.classList.add("selected");
 				this.config.skin = skin.name;
-				this.skeleton.setSkinByName(this.config.skin);
-				this.skeleton.setSlotsToSetupPose();
+				this.skeleton!.setSkinByName(this.config.skin);
+				this.skeleton!.setSlotsToSetupPose();
 			}
 		});
 		popup.show();
@@ -996,7 +1014,7 @@ export class SpinePlayer implements Disposable {
 		if (this.hidePopup(id)) return;
 		if (!this.skeleton || !this.skeleton.data.animations.length) return;
 
-		let popup = new Popup(id, settingsButton, this, this.playerControls, /*html*/`<div class="spine-player-popup-title">Debug</div><hr><ul class="spine-player-list"></li>`);
+		let popup = new Popup(id, settingsButton, this, this.playerControls!, /*html*/`<div class="spine-player-popup-title">Debug</div><hr><ul class="spine-player-list"></li>`);
 
 		let rows = findWithClass(popup.dom, "spine-player-list");
 		let makeItem = (label: string, name: string) => {
@@ -1019,7 +1037,7 @@ export class SpinePlayer implements Disposable {
 		popup.show();
 	}
 
-	private showError (message: string, error: Error = null) {
+	private showError (message: string, error?: Error) {
 		if (this.error) {
 			if (error) throw error; // Don't lose error if showError throws, is caught, and showError is called again.
 		} else {
@@ -1056,6 +1074,7 @@ class Popup {
 			this.player.popup = null;
 			return true;
 		}
+		return false;
 	}
 
 	show () {
@@ -1094,9 +1113,9 @@ class Popup {
 }
 
 class Switch {
-	private switch: HTMLElement;
+	private switch: HTMLElement | null = null;
 	private enabled = false;
-	public change: (value: boolean) => void;
+	public change: (value: boolean) => void = () => { };
 
 	constructor (private text: string) { }
 
@@ -1117,10 +1136,9 @@ class Switch {
 	}
 
 	setEnabled (enabled: boolean) {
-		if (enabled) this.switch.classList.add("active");
-		else this.switch.classList.remove("active");
-		this.enabled = enabled
-			;
+		if (enabled) this.switch?.classList.add("active");
+		else this.switch?.classList.remove("active");
+		this.enabled = enabled;
 	}
 
 	isEnabled (): boolean {
@@ -1129,10 +1147,10 @@ class Switch {
 }
 
 class Slider {
-	private slider: HTMLElement;
-	private value: HTMLElement;
-	private knob: HTMLElement;
-	public change: (percentage: number) => void;
+	private slider: HTMLElement | null = null;
+	private value: HTMLElement | null = null;
+	private knob: HTMLElement | null = null;
+	public change: (percentage: number) => void = () => { };
 
 	constructor (public snaps = 0, public snapPercentage = 0.1, public big = false) { }
 
@@ -1150,18 +1168,18 @@ class Slider {
 		new Input(this.slider).addListener({
 			down: (x, y) => {
 				dragging = true;
-				this.value.classList.add("hovering");
+				this.value?.classList.add("hovering");
 			},
 			up: (x, y) => {
 				dragging = false;
-				if (this.change) this.change(this.setValue(x / this.slider.clientWidth));
-				this.value.classList.remove("hovering");
+				if (this.change) this.change(this.setValue(x / this.slider!.clientWidth));
+				this.value?.classList.remove("hovering");
 			},
 			moved: (x, y) => {
-				if (dragging && this.change) this.change(this.setValue(x / this.slider.clientWidth));
+				if (dragging && this.change) this.change(this.setValue(x / this.slider!.clientWidth));
 			},
 			dragged: (x, y) => {
-				if (this.change) this.change(this.setValue(x / this.slider.clientWidth));
+				if (this.change) this.change(this.setValue(x / this.slider!.clientWidth));
 			}
 		});
 
@@ -1180,7 +1198,7 @@ class Slider {
 				percentage = percentage - modulo + snap;
 			percentage = Math.max(0, Math.min(1, percentage));
 		}
-		this.value.style.width = "" + (percentage * 100) + "%";
+		this.value!.style.width = "" + (percentage * 100) + "%";
 		// this.knob.style.left = "" + (-8 + percentage * this.slider.clientWidth) + "px";
 		return percentage;
 	}

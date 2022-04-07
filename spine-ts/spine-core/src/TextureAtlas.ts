@@ -38,66 +38,64 @@ export class TextureAtlas implements Disposable {
 	constructor (atlasText: string) {
 		let reader = new TextureAtlasReader(atlasText);
 		let entry = new Array<string>(4);
-		let page: TextureAtlasPage = null;
-		let region: TextureAtlasRegion = null;
 
-		let pageFields: StringMap<Function> = {};
-		pageFields["size"] = () => {
-			page.width = parseInt(entry[1]);
-			page.height = parseInt(entry[2]);
+		let pageFields: StringMap<(page: TextureAtlasPage) => void> = {};
+		pageFields["size"] = (page: TextureAtlasPage) => {
+			page!.width = parseInt(entry[1]);
+			page!.height = parseInt(entry[2]);
 		};
 		pageFields["format"] = () => {
 			// page.format = Format[tuple[0]]; we don't need format in WebGL
 		};
-		pageFields["filter"] = () => {
-			page.minFilter = Utils.enumValue(TextureFilter, entry[1]);
-			page.magFilter = Utils.enumValue(TextureFilter, entry[2]);
+		pageFields["filter"] = (page: TextureAtlasPage) => {
+			page!.minFilter = Utils.enumValue(TextureFilter, entry[1]);
+			page!.magFilter = Utils.enumValue(TextureFilter, entry[2]);
 		};
-		pageFields["repeat"] = () => {
-			if (entry[1].indexOf('x') != -1) page.uWrap = TextureWrap.Repeat;
-			if (entry[1].indexOf('y') != -1) page.vWrap = TextureWrap.Repeat;
+		pageFields["repeat"] = (page: TextureAtlasPage) => {
+			if (entry[1].indexOf('x') != -1) page!.uWrap = TextureWrap.Repeat;
+			if (entry[1].indexOf('y') != -1) page!.vWrap = TextureWrap.Repeat;
 		};
-		pageFields["pma"] = () => {
-			page.pma = entry[1] == "true";
+		pageFields["pma"] = (page: TextureAtlasPage) => {
+			page!.pma = entry[1] == "true";
 		};
 
-		var regionFields: StringMap<Function> = {};
-		regionFields["xy"] = () => { // Deprecated, use bounds.
+		var regionFields: StringMap<(region: TextureAtlasRegion) => void> = {};
+		regionFields["xy"] = (region: TextureAtlasRegion) => { // Deprecated, use bounds.
 			region.x = parseInt(entry[1]);
 			region.y = parseInt(entry[2]);
 		};
-		regionFields["size"] = () => { // Deprecated, use bounds.
+		regionFields["size"] = (region: TextureAtlasRegion) => { // Deprecated, use bounds.
 			region.width = parseInt(entry[1]);
 			region.height = parseInt(entry[2]);
 		};
-		regionFields["bounds"] = () => {
+		regionFields["bounds"] = (region: TextureAtlasRegion) => {
 			region.x = parseInt(entry[1]);
 			region.y = parseInt(entry[2]);
 			region.width = parseInt(entry[3]);
 			region.height = parseInt(entry[4]);
 		};
-		regionFields["offset"] = () => { // Deprecated, use offsets.
+		regionFields["offset"] = (region: TextureAtlasRegion) => { // Deprecated, use offsets.
 			region.offsetX = parseInt(entry[1]);
 			region.offsetY = parseInt(entry[2]);
 		};
-		regionFields["orig"] = () => { // Deprecated, use offsets.
+		regionFields["orig"] = (region: TextureAtlasRegion) => { // Deprecated, use offsets.
 			region.originalWidth = parseInt(entry[1]);
 			region.originalHeight = parseInt(entry[2]);
 		};
-		regionFields["offsets"] = () => {
+		regionFields["offsets"] = (region: TextureAtlasRegion) => {
 			region.offsetX = parseInt(entry[1]);
 			region.offsetY = parseInt(entry[2]);
 			region.originalWidth = parseInt(entry[3]);
 			region.originalHeight = parseInt(entry[4]);
 		};
-		regionFields["rotate"] = () => {
+		regionFields["rotate"] = (region: TextureAtlasRegion) => {
 			let value = entry[1];
 			if (value == "true")
 				region.degrees = 90;
 			else if (value != "false")
 				region.degrees = parseInt(value);
 		};
-		regionFields["index"] = () => {
+		regionFields["index"] = (region: TextureAtlasRegion) => {
 			region.index = parseInt(entry[1]);
 		};
 
@@ -113,38 +111,34 @@ export class TextureAtlas implements Disposable {
 		}
 
 		// Page and region entries.
-		let names: string[] = null;
-		let values: number[][] = null;
+		let page: TextureAtlasPage | null = null;
+		let names: string[] | null = null;
+		let values: number[][] | null = null;
 		while (true) {
 			if (line === null) break;
 			if (line.trim().length == 0) {
 				page = null;
 				line = reader.readLine();
 			} else if (!page) {
-				page = new TextureAtlasPage();
-				page.name = line.trim();
+				page = new TextureAtlasPage(line.trim());
 				while (true) {
 					if (reader.readEntry(entry, line = reader.readLine()) == 0) break;
-					let field: Function = pageFields[entry[0]];
-					if (field) field();
+					let field = pageFields[entry[0]];
+					if (field) field(page);
 				}
 				this.pages.push(page);
 			} else {
-				region = new TextureAtlasRegion();
+				let region = new TextureAtlasRegion(page, line);
 
-				region.page = page;
-				region.name = line;
 				while (true) {
 					let count = reader.readEntry(entry, line = reader.readLine());
 					if (count == 0) break;
-					let field: Function = regionFields[entry[0]];
+					let field = regionFields[entry[0]];
 					if (field)
-						field();
+						field(region);
 					else {
-						if (!names) {
-							names = [];
-							values = [];
-						}
+						if (!names) names = [];
+						if (!values) values = [];
 						names.push(entry[0]);
 						let entryValues: number[] = [];
 						for (let i = 0; i < count; i++)
@@ -156,7 +150,7 @@ export class TextureAtlas implements Disposable {
 					region.originalWidth = region.width;
 					region.originalHeight = region.height;
 				}
-				if (names && names.length > 0) {
+				if (names && names.length > 0 && values && values.length > 0) {
 					region.names = names;
 					region.values = values;
 					names = null;
@@ -176,7 +170,7 @@ export class TextureAtlas implements Disposable {
 		}
 	}
 
-	findRegion (name: string): TextureAtlasRegion {
+	findRegion (name: string): TextureAtlasRegion | null {
 		for (let i = 0; i < this.regions.length; i++) {
 			if (this.regions[i].name == name) {
 				return this.regions[i];
@@ -192,26 +186,26 @@ export class TextureAtlas implements Disposable {
 
 	dispose () {
 		for (let i = 0; i < this.pages.length; i++) {
-			this.pages[i].texture.dispose();
+			this.pages[i].texture?.dispose();
 		}
 	}
 }
 
 class TextureAtlasReader {
-	lines: Array<string> = null;
+	lines: Array<string>;
 	index: number = 0;
 
 	constructor (text: string) {
 		this.lines = text.split(/\r\n|\r|\n/);
 	}
 
-	readLine (): string {
+	readLine (): string | null {
 		if (this.index >= this.lines.length)
 			return null;
 		return this.lines[this.index++];
 	}
 
-	readEntry (entry: string[], line: string): number {
+	readEntry (entry: string[], line: string | null): number {
 		if (!line) return 0;
 		line = line.trim();
 		if (line.length == 0) return 0;
@@ -233,15 +227,19 @@ class TextureAtlasReader {
 }
 
 export class TextureAtlasPage {
-	name: string = null;
+	name: string;
 	minFilter: TextureFilter = TextureFilter.Nearest;
 	magFilter: TextureFilter = TextureFilter.Nearest;
 	uWrap: TextureWrap = TextureWrap.ClampToEdge;
 	vWrap: TextureWrap = TextureWrap.ClampToEdge;
-	texture: Texture = null;
+	texture: Texture | null = null;
 	width: number = 0;
 	height: number = 0;
 	pma: boolean = false;
+
+	constructor (name: string) {
+		this.name = name;
+	}
 
 	setTexture (texture: Texture) {
 		this.texture = texture;
@@ -251,8 +249,8 @@ export class TextureAtlasPage {
 }
 
 export class TextureAtlasRegion extends TextureRegion {
-	page: TextureAtlasPage = null;
-	name: string = null;
+	page: TextureAtlasPage;
+	name: string;
 	x: number = 0;
 	y: number = 0;
 	offsetX: number = 0;
@@ -261,6 +259,12 @@ export class TextureAtlasRegion extends TextureRegion {
 	originalHeight: number = 0;
 	index: number = 0;
 	degrees: number = 0;
-	names: string[] = null;
-	values: number[][] = null;
+	names: string[] | null = null;
+	values: number[][] | null = null;
+
+	constructor (page: TextureAtlasPage, name: string) {
+		super();
+		this.page = page;
+		this.name = name;
+	}
 }

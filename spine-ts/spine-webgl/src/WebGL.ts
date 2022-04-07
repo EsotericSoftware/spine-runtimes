@@ -34,27 +34,23 @@ export class ManagedWebGLRenderingContext {
 	public gl: WebGLRenderingContext;
 	private restorables = new Array<Restorable>();
 
-	constructor (canvasOrContext: HTMLCanvasElement | WebGLRenderingContext | EventTarget, contextConfig: any = { alpha: "true" }) {
-		if (!((canvasOrContext instanceof WebGLRenderingContext) || (typeof WebGL2RenderingContext !== 'undefined' && canvasOrContext instanceof WebGL2RenderingContext)))
-			this.setupCanvas(canvasOrContext, contextConfig);
-		else {
+	constructor (canvasOrContext: HTMLCanvasElement | WebGLRenderingContext, contextConfig: any = { alpha: "true" }) {
+		if (!((canvasOrContext instanceof WebGLRenderingContext) || (typeof WebGL2RenderingContext !== 'undefined' && canvasOrContext instanceof WebGL2RenderingContext))) {
+			let canvas: HTMLCanvasElement = canvasOrContext;
+			this.gl = <WebGLRenderingContext>(canvas.getContext("webgl2", contextConfig) || canvas.getContext("webgl", contextConfig));
+			this.canvas = canvas;
+			canvas.addEventListener("webglcontextlost", (e: any) => {
+				let event = <WebGLContextEvent>e;
+				if (e) e.preventDefault();
+			});
+			canvas.addEventListener("webglcontextrestored", (e: any) => {
+				for (let i = 0, n = this.restorables.length; i < n; i++)
+					this.restorables[i].restore();
+			});
+		} else {
 			this.gl = canvasOrContext;
 			this.canvas = this.gl.canvas;
 		}
-	}
-
-	private setupCanvas (canvas: any, contextConfig: any) {
-		this.gl = <WebGLRenderingContext>(canvas.getContext("webgl2", contextConfig) || canvas.getContext("webgl", contextConfig));
-		this.canvas = canvas;
-		canvas.addEventListener("webglcontextlost", (e: any) => {
-			let event = <WebGLContextEvent>e;
-			if (e) e.preventDefault();
-		});
-
-		canvas.addEventListener("webglcontextrestored", (e: any) => {
-			for (let i = 0, n = this.restorables.length; i < n; i++)
-				this.restorables[i].restore();
-		});
 	}
 
 	addRestorable (restorable: Restorable) {

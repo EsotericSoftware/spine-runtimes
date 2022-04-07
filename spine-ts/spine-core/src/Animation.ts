@@ -42,8 +42,8 @@ import { SequenceMode, SequenceModeValues } from "./attachments/Sequence";
 export class Animation {
 	/** The animation's name, which is unique across all animations in the skeleton. */
 	name: string;
-	timelines: Array<Timeline> = null;
-	timelineIds: StringSet = null;
+	timelines: Array<Timeline> = [];
+	timelineIds: StringSet = new StringSet();
 
 	/** The duration of the animation in seconds, which is the highest time of all keys in the timeline. */
 	duration: number;
@@ -58,7 +58,7 @@ export class Animation {
 	setTimelines (timelines: Array<Timeline>) {
 		if (!timelines) throw new Error("timelines cannot be null.");
 		this.timelines = timelines;
-		this.timelineIds = new StringSet();
+		this.timelineIds.clear();
 		for (var i = 0; i < timelines.length; i++)
 			this.timelineIds.addAll(timelines[i].getPropertyIds());
 	}
@@ -155,8 +155,8 @@ const Property = {
 
 /** The interface for all timelines. */
 export abstract class Timeline {
-	propertyIds: string[] = null;
-	frames: NumberArrayLike = null;
+	propertyIds: string[];
+	frames: NumberArrayLike;
 
 	constructor (frameCount: number, propertyIds: string[]) {
 		this.propertyIds = propertyIds;
@@ -179,7 +179,7 @@ export abstract class Timeline {
 		return this.frames[this.frames.length - this.getFrameEntries()];
 	}
 
-	abstract apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection): void;
+	abstract apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event> | null, alpha: number, blend: MixBlend, direction: MixDirection): void;
 
 	static search1 (frames: NumberArrayLike, time: number) {
 		let n = frames.length;
@@ -208,7 +208,7 @@ export interface SlotTimeline {
 
 /** The base class for timelines that use interpolation between key frame values. */
 export abstract class CurveTimeline extends Timeline {
-	protected curves: NumberArrayLike = null; // type, x, y, ...
+	protected curves: NumberArrayLike; // type, x, y, ...
 
 	constructor (frameCount: number, bezierCount: number, propertyIds: string[]) {
 		super(frameCount, propertyIds);
@@ -369,7 +369,7 @@ export class RotateTimeline extends CurveTimeline1 implements BoneTimeline {
 		this.boneIndex = boneIndex;
 	}
 
-	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
+	apply (skeleton: Skeleton, lastTime: number, time: number, events: Array<Event> | null, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let bone = skeleton.bones[this.boneIndex];
 		if (!bone.active) return;
 
@@ -1176,9 +1176,9 @@ export class RGBA2Timeline extends CurveTimeline implements SlotTimeline {
 		if (!slot.bone.active) return;
 
 		let frames = this.frames;
-		let light = slot.color, dark = slot.darkColor;
+		let light = slot.color, dark = slot.darkColor!;
 		if (time < frames[0]) {
-			let setupLight = slot.data.color, setupDark = slot.data.darkColor;
+			let setupLight = slot.data.color, setupDark = slot.data.darkColor!;
 			switch (blend) {
 				case MixBlend.setup:
 					light.setFromColor(setupLight);
@@ -1245,7 +1245,7 @@ export class RGBA2Timeline extends CurveTimeline implements SlotTimeline {
 		} else {
 			if (blend == MixBlend.setup) {
 				light.setFromColor(slot.data.color);
-				let setupDark = slot.data.darkColor;
+				let setupDark = slot.data.darkColor!;
 				dark.r = setupDark.r;
 				dark.g = setupDark.g;
 				dark.b = setupDark.b;
@@ -1291,9 +1291,9 @@ export class RGB2Timeline extends CurveTimeline implements SlotTimeline {
 		if (!slot.bone.active) return;
 
 		let frames = this.frames;
-		let light = slot.color, dark = slot.darkColor;
+		let light = slot.color, dark = slot.darkColor!;
 		if (time < frames[0]) {
-			let setupLight = slot.data.color, setupDark = slot.data.darkColor;
+			let setupLight = slot.data.color, setupDark = slot.data.darkColor!;
 			switch (blend) {
 				case MixBlend.setup:
 					light.r = setupLight.r;
@@ -1360,7 +1360,7 @@ export class RGB2Timeline extends CurveTimeline implements SlotTimeline {
 			dark.b = b2;
 		} else {
 			if (blend == MixBlend.setup) {
-				let setupLight = slot.data.color, setupDark = slot.data.darkColor;
+				let setupLight = slot.data.color, setupDark = slot.data.darkColor!;
 				light.r = setupLight.r;
 				light.g = setupLight.g;
 				light.b = setupLight.b;
@@ -1383,7 +1383,7 @@ export class AttachmentTimeline extends Timeline implements SlotTimeline {
 	slotIndex = 0;
 
 	/** The attachment name for each key frame. May contain null values to clear the attachment. */
-	attachmentNames: Array<string>;
+	attachmentNames: Array<string | null>;
 
 	constructor (frameCount: number, slotIndex: number) {
 		super(frameCount, [
@@ -1398,7 +1398,7 @@ export class AttachmentTimeline extends Timeline implements SlotTimeline {
 	}
 
 	/** Sets the time in seconds and the attachment name for the specified key frame. */
-	setFrame (frame: number, time: number, attachmentName: string) {
+	setFrame (frame: number, time: number, attachmentName: string | null) {
 		this.frames[frame] = time;
 		this.attachmentNames[frame] = attachmentName;
 	}
@@ -1420,7 +1420,7 @@ export class AttachmentTimeline extends Timeline implements SlotTimeline {
 		this.setAttachment(skeleton, slot, this.attachmentNames[Timeline.search1(this.frames, time)]);
 	}
 
-	setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: string) {
+	setAttachment (skeleton: Skeleton, slot: Slot, attachmentName: string | null) {
 		slot.setAttachment(!attachmentName ? null : skeleton.getAttachment(this.slotIndex, attachmentName));
 	}
 }
@@ -1430,10 +1430,10 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 	slotIndex = 0;
 
 	/** The attachment that will be deformed. */
-	attachment: VertexAttachment = null;
+	attachment: VertexAttachment;
 
 	/** The vertices for each key frame. */
-	vertices: Array<NumberArrayLike> = null;
+	vertices: Array<NumberArrayLike>;
 
 	constructor (frameCount: number, bezierCount: number, slotIndex: number, attachment: VertexAttachment) {
 		super(frameCount, bezierCount, [
@@ -1508,7 +1508,8 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 	apply (skeleton: Skeleton, lastTime: number, time: number, firedEvents: Array<Event>, alpha: number, blend: MixBlend, direction: MixDirection) {
 		let slot: Slot = skeleton.slots[this.slotIndex];
 		if (!slot.bone.active) return;
-		let slotAttachment: Attachment = slot.getAttachment();
+		let slotAttachment: Attachment | null = slot.getAttachment();
+		if (!slotAttachment) return;
 		if (!(slotAttachment instanceof VertexAttachment) || (<VertexAttachment>slotAttachment).timelineAttahment != this.attachment) return;
 
 		let deform: Array<number> = slot.deform;
@@ -1685,7 +1686,7 @@ export class EventTimeline extends Timeline {
 	static propertyIds = ["" + Property.event];
 
 	/** The event for each key frame. */
-	events: Array<Event> = null;
+	events: Array<Event>;
 
 	constructor (frameCount: number) {
 		super(frameCount, EventTimeline.propertyIds);
@@ -1738,11 +1739,11 @@ export class DrawOrderTimeline extends Timeline {
 	static propertyIds = ["" + Property.drawOrder];
 
 	/** The draw order for each key frame. See {@link #setFrame(int, float, int[])}. */
-	drawOrders: Array<Array<number>> = null;
+	drawOrders: Array<Array<number> | null>;
 
 	constructor (frameCount: number) {
 		super(frameCount, DrawOrderTimeline.propertyIds);
-		this.drawOrders = new Array<Array<number>>(frameCount);
+		this.drawOrders = new Array<Array<number> | null>(frameCount);
 	}
 
 	getFrameCount () {
@@ -1752,7 +1753,7 @@ export class DrawOrderTimeline extends Timeline {
 	/** Sets the time in seconds and the draw order for the specified key frame.
 	 * @param drawOrder For each slot in {@link Skeleton#slots}, the index of the new draw order. May be null to use setup pose
 	 *           draw order. */
-	setFrame (frame: number, time: number, drawOrder: Array<number>) {
+	setFrame (frame: number, time: number, drawOrder: Array<number> | null) {
 		this.frames[frame] = time;
 		this.drawOrders[frame] = drawOrder;
 	}
@@ -1768,7 +1769,8 @@ export class DrawOrderTimeline extends Timeline {
 			return;
 		}
 
-		let drawOrderToSetupIndex = this.drawOrders[Timeline.search1(this.frames, time)];
+		let idx = Timeline.search1(this.frames, time);
+		let drawOrderToSetupIndex = this.drawOrders[idx];
 		if (!drawOrderToSetupIndex)
 			Utils.arrayCopy(skeleton.slots, 0, skeleton.drawOrder, 0, skeleton.slots.length);
 		else {
@@ -2157,7 +2159,7 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 
 	constructor (frameCount: number, slotIndex: number, attachment: HasTextureRegion) {
 		super(frameCount, [
-			Property.sequence + "|" + slotIndex + "|" + attachment.sequence.id
+			Property.sequence + "|" + slotIndex + "|" + attachment.sequence!.id
 		]);
 		this.slotIndex = slotIndex;
 		this.attachment = attachment;
@@ -2207,7 +2209,7 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 		let modeAndIndex = frames[i + SequenceTimeline.MODE];
 		let delay = frames[i + SequenceTimeline.DELAY];
 
-		let index = modeAndIndex >> 4, count = this.attachment.sequence.regions.length;
+		let index = modeAndIndex >> 4, count = this.attachment.sequence!.regions.length;
 		let mode = SequenceModeValues[modeAndIndex & 0xf];
 		if (mode != SequenceMode.hold) {
 			index += (((time - before) / delay + 0.00001) | 0);

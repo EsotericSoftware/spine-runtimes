@@ -35,17 +35,17 @@ import { ManagedWebGLRenderingContext } from "./WebGL";
 
 export class PolygonBatcher implements Disposable {
 	private context: ManagedWebGLRenderingContext;
-	private drawCalls: number;
+	private drawCalls = 0;
 	private isDrawing = false;
 	private mesh: Mesh;
-	private shader: Shader = null;
-	private lastTexture: GLTexture = null;
+	private shader: Shader | null = null;
+	private lastTexture: GLTexture | null = null;
 	private verticesLength = 0;
 	private indicesLength = 0;
 	private srcColorBlend: number;
 	private srcAlphaBlend: number;
 	private dstBlend: number;
-	private cullWasEnabled: boolean;
+	private cullWasEnabled = false;
 
 	constructor (context: ManagedWebGLRenderingContext | WebGLRenderingContext, twoColorTint: boolean = true, maxVertices: number = 10920) {
 		if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
@@ -110,7 +110,8 @@ export class PolygonBatcher implements Disposable {
 
 	flush () {
 		if (this.verticesLength == 0) return;
-
+		if (!this.lastTexture) throw new Error("No texture set.");
+		if (!this.shader) throw new Error("No shader set.");
 		this.lastTexture.bind();
 		this.mesh.draw(this.shader, this.context.gl.TRIANGLES);
 

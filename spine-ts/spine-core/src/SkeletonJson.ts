@@ -51,7 +51,7 @@ import { HasTextureRegion } from "./attachments/HasTextureRegion";
  * [JSON and binary data](http://esotericsoftware.com/spine-loading-skeleton-data#JSON-and-binary-data) in the Spine
  * Runtimes Guide. */
 export class SkeletonJson {
-	attachmentLoader: AttachmentLoader = null;
+	attachmentLoader: AttachmentLoader;
 
 	/** Scales bone positions, image sizes, and translations as they are loaded. This allows different size images to be used at
 	 * runtime than were used in Spine.
@@ -87,7 +87,7 @@ export class SkeletonJson {
 			for (let i = 0; i < root.bones.length; i++) {
 				let boneMap = root.bones[i];
 
-				let parent: BoneData = null;
+				let parent: BoneData | null = null;
 				let parentName: string = getValue(boneMap, "parent", null);
 				if (parentName) parent = skeletonData.findBone(parentName);
 				let data = new BoneData(skeletonData.bones.length, boneMap.name, parent);
@@ -114,6 +114,7 @@ export class SkeletonJson {
 			for (let i = 0; i < root.slots.length; i++) {
 				let slotMap = root.slots[i];
 				let boneData = skeletonData.findBone(slotMap.bone);
+				if (!boneData) throw new Error(`Couldn't find bone ${slotMap.bone} for slot ${slotMap.name}`);
 				let data = new SlotData(skeletonData.slots.length, slotMap.name, boneData);
 
 				let color: string = getValue(slotMap, "color", null);
@@ -136,10 +137,15 @@ export class SkeletonJson {
 				data.order = getValue(constraintMap, "order", 0);
 				data.skinRequired = getValue(constraintMap, "skin", false);
 
-				for (let ii = 0; ii < constraintMap.bones.length; ii++)
-					data.bones.push(skeletonData.findBone(constraintMap.bones[ii]));
+				for (let ii = 0; ii < constraintMap.bones.length; ii++) {
+					let bone = skeletonData.findBone(constraintMap.bones[ii]);
+					if (!bone) throw new Error(`Couldn't find bone ${constraintMap.bones[ii]} for IK constraint ${constraintMap.name}.`);
+					data.bones.push(bone);
+				}
 
-				data.target = skeletonData.findBone(constraintMap.target);
+				let target = skeletonData.findBone(constraintMap.target);;
+				if (!target) throw new Error(`Couldn't find target bone ${constraintMap.target} for IK constraint ${constraintMap.name}.`);
+				data.target = target;
 
 				data.mix = getValue(constraintMap, "mix", 1);
 				data.softness = getValue(constraintMap, "softness", 0) * scale;
@@ -160,11 +166,17 @@ export class SkeletonJson {
 				data.order = getValue(constraintMap, "order", 0);
 				data.skinRequired = getValue(constraintMap, "skin", false);
 
-				for (let ii = 0; ii < constraintMap.bones.length; ii++)
-					data.bones.push(skeletonData.findBone(constraintMap.bones[ii]));
+				for (let ii = 0; ii < constraintMap.bones.length; ii++) {
+					let boneName = constraintMap.bones[ii];
+					let bone = skeletonData.findBone(boneName);
+					if (!bone) throw new Error(`Couldn't find bone ${boneName} for transform constraint ${constraintMap.name}.`);
+					data.bones.push(bone);
+				}
 
 				let targetName: string = constraintMap.target;
-				data.target = skeletonData.findBone(targetName);
+				let target = skeletonData.findBone(targetName);
+				if (!target) throw new Error(`Couldn't find target bone ${targetName} for transform constraint ${constraintMap.name}.`);
+				data.target = target;
 
 				data.local = getValue(constraintMap, "local", false);
 				data.relative = getValue(constraintMap, "relative", false);
@@ -194,11 +206,17 @@ export class SkeletonJson {
 				data.order = getValue(constraintMap, "order", 0);
 				data.skinRequired = getValue(constraintMap, "skin", false);
 
-				for (let ii = 0; ii < constraintMap.bones.length; ii++)
-					data.bones.push(skeletonData.findBone(constraintMap.bones[ii]));
+				for (let ii = 0; ii < constraintMap.bones.length; ii++) {
+					let boneName = constraintMap.bones[ii];
+					let bone = skeletonData.findBone(boneName);
+					if (!bone) throw new Error(`Couldn't find bone ${boneName} for path constraint ${constraintMap.name}.`);
+					data.bones.push(bone);
+				}
 
 				let targetName: string = constraintMap.target;
-				data.target = skeletonData.findSlot(targetName);
+				let target = skeletonData.findSlot(targetName);
+				if (!target) throw new Error(`Couldn't find target slot ${targetName} for path constraint ${constraintMap.name}.`);
+				data.target = target;
 
 				data.positionMode = Utils.enumValue(PositionMode, getValue(constraintMap, "positionMode", "Percent"));
 				data.spacingMode = Utils.enumValue(SpacingMode, getValue(constraintMap, "spacingMode", "Length"));
@@ -223,27 +241,44 @@ export class SkeletonJson {
 				let skin = new Skin(skinMap.name);
 
 				if (skinMap.bones) {
-					for (let ii = 0; ii < skinMap.bones.length; ii++)
-						skin.bones.push(skeletonData.findBone(skinMap.bones[ii]));
+					for (let ii = 0; ii < skinMap.bones.length; ii++) {
+						let boneName = skinMap.bones[ii];
+						let bone = skeletonData.findBone(boneName);
+						if (!bone) throw new Error(`Couldn't find bone ${boneName} for skin ${skinMap.name}.`);
+						skin.bones.push(bone);
+					}
 				}
 
 				if (skinMap.ik) {
-					for (let ii = 0; ii < skinMap.ik.length; ii++)
-						skin.constraints.push(skeletonData.findIkConstraint(skinMap.ik[ii]));
+					for (let ii = 0; ii < skinMap.ik.length; ii++) {
+						let constraintName = skinMap.ik[ii];
+						let constraint = skeletonData.findIkConstraint(constraintName);
+						if (!constraint) throw new Error(`Couldn't find IK constraint ${constraintName} for skin ${skinMap.name}.`);
+						skin.constraints.push(constraint);
+					}
 				}
 
 				if (skinMap.transform) {
-					for (let ii = 0; ii < skinMap.transform.length; ii++)
-						skin.constraints.push(skeletonData.findTransformConstraint(skinMap.transform[ii]));
+					for (let ii = 0; ii < skinMap.transform.length; ii++) {
+						let constraintName = skinMap.transform[ii];
+						let constraint = skeletonData.findTransformConstraint(constraintName);
+						if (!constraint) throw new Error(`Couldn't find transform constraint ${constraintName} for skin ${skinMap.name}.`);
+						skin.constraints.push(constraint);
+					}
 				}
 
 				if (skinMap.path) {
-					for (let ii = 0; ii < skinMap.path.length; ii++)
-						skin.constraints.push(skeletonData.findPathConstraint(skinMap.path[ii]));
+					for (let ii = 0; ii < skinMap.path.length; ii++) {
+						let constraintName = skinMap.path[ii];
+						let constraint = skeletonData.findPathConstraint(constraintName);
+						if (!constraint) throw new Error(`Couldn't find path constraint ${constraintName} for skin ${skinMap.name}.`);
+						skin.constraints.push(constraint);
+					}
 				}
 
 				for (let slotName in skinMap.attachments) {
 					let slot = skeletonData.findSlot(slotName);
+					if (!slot) throw new Error(`Couldn't find slot ${slotName} for skin ${skinMap.name}.`);
 					let slotMap = skinMap.attachments[slotName];
 					for (let entryName in slotMap) {
 						let attachment = this.readAttachment(slotMap[entryName], skin, slot.index, entryName, skeletonData);
@@ -259,7 +294,9 @@ export class SkeletonJson {
 		for (let i = 0, n = this.linkedMeshes.length; i < n; i++) {
 			let linkedMesh = this.linkedMeshes[i];
 			let skin = !linkedMesh.skin ? skeletonData.defaultSkin : skeletonData.findSkin(linkedMesh.skin);
+			if (!skin) throw new Error(`Skin not found: ${linkedMesh.skin}`);
 			let parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
+			if (!parent) throw new Error(`Parent mesh not found: ${linkedMesh.parent}`);
 			linkedMesh.mesh.timelineAttahment = linkedMesh.inheritTimeline ? <VertexAttachment>parent : <VertexAttachment>linkedMesh.mesh;
 			linkedMesh.mesh.setParentMesh(<MeshAttachment>parent);
 			if (linkedMesh.mesh.region != null) linkedMesh.mesh.updateRegion();
@@ -294,7 +331,7 @@ export class SkeletonJson {
 		return skeletonData;
 	}
 
-	readAttachment (map: any, skin: Skin, slotIndex: number, name: string, skeletonData: SkeletonData): Attachment {
+	readAttachment (map: any, skin: Skin, slotIndex: number, name: string, skeletonData: SkeletonData): Attachment | null {
 		let scale = this.scale;
 		name = getValue(map, "name", name);
 
@@ -452,7 +489,9 @@ export class SkeletonJson {
 		if (map.slots) {
 			for (let slotName in map.slots) {
 				let slotMap = map.slots[slotName];
-				let slotIndex = skeletonData.findSlot(slotName).index;
+				let slot = skeletonData.findSlot(slotName);
+				if (!slot) throw new Error("Slot not found: " + slotName);
+				let slotIndex = slot.index;
 				for (let timelineName in slotMap) {
 					let timelineMap = slotMap[timelineName];
 					if (!timelineMap) continue;
@@ -603,7 +642,9 @@ export class SkeletonJson {
 		if (map.bones) {
 			for (let boneName in map.bones) {
 				let boneMap = map.bones[boneName];
-				let boneIndex = skeletonData.findBone(boneName).index;
+				let bone = skeletonData.findBone(boneName);
+				if (!bone) throw new Error("Bone not found: " + boneName);
+				let boneIndex = bone.index;
 				for (let timelineName in boneMap) {
 					let timelineMap = boneMap[timelineName];
 					let frames = timelineMap.length;
@@ -651,6 +692,7 @@ export class SkeletonJson {
 				if (!keyMap) continue;
 
 				let constraint = skeletonData.findIkConstraint(constraintName);
+				if (!constraint) throw new Error("IK Constraint not found: " + constraintName);
 				let constraintIndex = skeletonData.ikConstraints.indexOf(constraint);
 				let timeline = new IkConstraintTimeline(constraintMap.length, constraintMap.length << 1, constraintIndex);
 
@@ -692,6 +734,7 @@ export class SkeletonJson {
 				if (!keyMap) continue;
 
 				let constraint = skeletonData.findTransformConstraint(constraintName);
+				if (!constraint) throw new Error("Transform constraint not found: " + constraintName);
 				let constraintIndex = skeletonData.transformConstraints.indexOf(constraint);
 				let timeline = new TransformConstraintTimeline(timelineMap.length, timelineMap.length * 6, constraintIndex);
 
@@ -746,6 +789,7 @@ export class SkeletonJson {
 			for (let constraintName in map.path) {
 				let constraintMap = map.path[constraintName];
 				let constraint = skeletonData.findPathConstraint(constraintName);
+				if (!constraint) throw new Error("Path constraint not found: " + constraintName);
 				let constraintIndex = skeletonData.pathConstraints.indexOf(constraint);
 				for (let timelineName in constraintMap) {
 					let timelineMap = constraintMap[timelineName];
@@ -799,9 +843,12 @@ export class SkeletonJson {
 			for (let attachmentsName in map.attachments) {
 				let attachmentsMap = map.attachments[attachmentsName];
 				let skin = skeletonData.findSkin(attachmentsName);
+				if (!skin) throw new Error("Skin not found: " + attachmentsName);
 				for (let slotMapName in attachmentsMap) {
 					let slotMap = attachmentsMap[slotMapName];
-					let slotIndex = skeletonData.findSlot(slotMapName).index;
+					let slot = skeletonData.findSlot(slotMapName);
+					if (!slot) throw new Error("Slot not found: " + slotMapName);
+					let slotIndex = slot.index;
 					for (let attachmentMapName in slotMap) {
 						let attachmentMap = slotMap[attachmentMapName];
 						let attachment = <VertexAttachment>skin.getAttachment(slotIndex, attachmentMapName);
@@ -877,7 +924,7 @@ export class SkeletonJson {
 			let frame = 0;
 			for (let i = 0; i < map.drawOrder.length; i++, frame++) {
 				let drawOrderMap = map.drawOrder[i];
-				let drawOrder: Array<number> = null;
+				let drawOrder: Array<number> | null = null;
 				let offsets = getValue(drawOrderMap, "offsets", null);
 				if (offsets) {
 					drawOrder = Utils.newArray<number>(slotCount, -1);
@@ -885,7 +932,9 @@ export class SkeletonJson {
 					let originalIndex = 0, unchangedIndex = 0;
 					for (let ii = 0; ii < offsets.length; ii++) {
 						let offsetMap = offsets[ii];
-						let slotIndex = skeletonData.findSlot(offsetMap.slot).index;
+						let slot = skeletonData.findSlot(offsetMap.slot);
+						if (!slot) throw new Error("Slot not found: " + slot);
+						let slotIndex = slot.index;
 						// Collect unchanged items.
 						while (originalIndex != slotIndex)
 							unchanged[unchangedIndex++] = originalIndex++;
@@ -911,6 +960,7 @@ export class SkeletonJson {
 			for (let i = 0; i < map.events.length; i++, frame++) {
 				let eventMap = map.events[i];
 				let eventData = skeletonData.findEvent(eventMap.name);
+				if (!eventData) throw new Error("Event not found: " + eventMap.name);
 				let event = new Event(Utils.toSinglePrecision(getValue(eventMap, "time", 0)), eventData);
 				event.intValue = getValue(eventMap, "int", eventData.intValue);
 				event.floatValue = getValue(eventMap, "float", eventData.floatValue);

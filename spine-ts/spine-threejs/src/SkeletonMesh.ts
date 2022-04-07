@@ -73,8 +73,9 @@ export class SkeletonMeshMaterial extends THREE.ShaderMaterial {
 			alphaTest: 0.0
 		};
 		customizer(parameters);
-		if (parameters.alphaTest > 0) {
+		if (parameters.alphaTest && parameters.alphaTest > 0) {
 			parameters.defines = { "USE_SPINE_ALPHATEST": 1 };
+			if (!parameters.uniforms) parameters.uniforms = {};
 			parameters.uniforms["alphaTest"] = { value: parameters.alphaTest };
 		}
 		super(parameters);
@@ -89,7 +90,7 @@ export class SkeletonMesh extends THREE.Object3D {
 	skeleton: Skeleton;
 	state: AnimationState;
 	zOffset: number = 0.1;
-	vertexEffect: VertexEffect;
+	vertexEffect: VertexEffect | null = null;
 
 	private batches = new Array<MeshBatcher>();
 	private nextBatchIndex = 0;
@@ -152,17 +153,11 @@ export class SkeletonMesh extends THREE.Object3D {
 		let tempUv = this.tempUv;
 		let tempLight = this.tempLight;
 		let tempDark = this.tempDark;
-
-		var numVertices = 0;
-		var verticesLength = 0;
-		var indicesLength = 0;
-
-		let blendMode: BlendMode = null;
 		let clipper = this.clipper;
 
 		let vertices: NumberArrayLike = this.vertices;
-		let triangles: Array<number> = null;
-		let uvs: NumberArrayLike = null;
+		let triangles: Array<number> | null = null;
+		let uvs: NumberArrayLike | null = null;
 		let drawOrder = this.skeleton.drawOrder;
 		let batch = this.nextBatch();
 		batch.begin();
@@ -176,8 +171,8 @@ export class SkeletonMesh extends THREE.Object3D {
 				continue;
 			}
 			let attachment = slot.getAttachment();
-			let attachmentColor: Color = null;
-			let texture: ThreeJsTexture = null;
+			let attachmentColor: Color | null;
+			let texture: ThreeJsTexture | null;
 			let numFloats = 0;
 			if (attachment instanceof RegionAttachment) {
 				let region = <RegionAttachment>attachment;
@@ -187,7 +182,7 @@ export class SkeletonMesh extends THREE.Object3D {
 				region.computeWorldVertices(slot, vertices, 0, vertexSize);
 				triangles = SkeletonMesh.QUAD_TRIANGLES;
 				uvs = region.uvs;
-				texture = <ThreeJsTexture>(<TextureAtlasRegion>region.region.renderObject).page.texture;
+				texture = <ThreeJsTexture>(<TextureAtlasRegion>region.region!.renderObject).page.texture;
 			} else if (attachment instanceof MeshAttachment) {
 				let mesh = <MeshAttachment>attachment;
 				attachmentColor = mesh.color;
@@ -199,7 +194,7 @@ export class SkeletonMesh extends THREE.Object3D {
 				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, vertices, 0, vertexSize);
 				triangles = mesh.triangles;
 				uvs = mesh.uvs;
-				texture = <ThreeJsTexture>(<TextureAtlasRegion>mesh.region.renderObject).page.texture;
+				texture = <ThreeJsTexture>(<TextureAtlasRegion>mesh.region!.renderObject).page.texture;
 			} else if (attachment instanceof ClippingAttachment) {
 				let clip = <ClippingAttachment>(attachment);
 				clipper.clipStart(slot, clip);
@@ -226,7 +221,7 @@ export class SkeletonMesh extends THREE.Object3D {
 				let finalIndicesLength: number;
 
 				if (clipper.isClipping()) {
-					clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, null, false);
+					clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, tempLight, false);
 					let clippedVertices = clipper.clippedVertices;
 					let clippedTriangles = clipper.clippedTriangles;
 					if (this.vertexEffect != null) {

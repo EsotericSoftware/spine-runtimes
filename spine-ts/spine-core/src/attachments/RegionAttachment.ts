@@ -64,11 +64,11 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 	color = new Color(1, 1, 1, 1);
 
 	/** The name of the texture region for this attachment. */
-	path: string = null;
+	path: string;
 
 	private rendererObject: any = null;
-	region: TextureRegion = null;
-	sequence: Sequence = null;
+	region: TextureRegion | null = null;
+	sequence: Sequence | null = null;
 
 	/** For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.
 	 *
@@ -79,12 +79,14 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 
 	tempColor = new Color(1, 1, 1, 1);
 
-	constructor (name: string) {
+	constructor (name: string, path: string) {
 		super(name);
+		this.path = path;
 	}
 
 	/** Calculates the {@link #offset} using the region settings. Must be called after changing region settings. */
 	updateRegion (): void {
+		if (!this.region) throw new Error("Region not set.");
 		let region = this.region;
 		let regionScaleX = this.width / this.region.originalWidth * this.scaleX;
 		let regionScaleY = this.height / this.region.originalHeight * this.scaleY;
@@ -179,10 +181,9 @@ export class RegionAttachment extends Attachment implements HasTextureRegion {
 	}
 
 	copy (): Attachment {
-		let copy = new RegionAttachment(this.name);
+		let copy = new RegionAttachment(this.name, this.path);
 		copy.region = this.region;
 		copy.rendererObject = this.rendererObject;
-		copy.path = this.path;
 		copy.x = this.x;
 		copy.y = this.y;
 		copy.scaleX = this.scaleX;

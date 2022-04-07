@@ -62,7 +62,7 @@ export class SkeletonDebugRenderer implements Disposable {
 		this.context = context instanceof ManagedWebGLRenderingContext ? context : new ManagedWebGLRenderingContext(context);
 	}
 
-	draw (shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones: Array<string> = null) {
+	draw (shapes: ShapeRenderer, skeleton: Skeleton, ignoredBones?: Array<string>) {
 		let skeletonX = skeleton.x;
 		let skeletonY = skeleton.y;
 		let gl = this.context.gl;

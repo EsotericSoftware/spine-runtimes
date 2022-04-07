@@ -32,7 +32,7 @@ import { ManagedWebGLRenderingContext } from "./WebGL";
 
 export class GLTexture extends Texture implements Disposable, Restorable {
 	context: ManagedWebGLRenderingContext;
-	private texture: WebGLTexture = null;
+	private texture: WebGLTexture | null = null;
 	private boundUnit = 0;
 	private useMipMaps = false;
 
