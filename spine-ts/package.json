@@ -1,6 +1,6 @@
 {
   "name": "@esotericsoftware/spine-ts",
-  "version": "4.0.25",
+  "version": "4.0.26",
   "description": "The official Spine Runtimes for the web.",
   "files": [
     "README.md"
