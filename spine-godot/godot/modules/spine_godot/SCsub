@@ -2,6 +2,6 @@ Import('env')
 
 env_spine_runtime = env.Clone()
 
-env_spine_runtime.Prepend(CPPPATH=["spine-cpp/include"])
+env_spine_runtime.Prepend(CPPPATH=["spine-cpp/include", "modules/spine_godot/spine-cpp/include"])
 env_spine_runtime.add_source_files(env.modules_sources, "spine-cpp/src/spine/*.cpp")
 env_spine_runtime.add_source_files(env.modules_sources, "*.cpp")

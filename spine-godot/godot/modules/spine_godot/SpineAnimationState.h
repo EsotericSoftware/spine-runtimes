@@ -43,13 +43,11 @@ protected:
 private:
 	spine::AnimationState *animation_state;
 
-	Ref<SpineAnimationStateDataResource> anim_state_data_res;
-
 public:
 	SpineAnimationState();
 	~SpineAnimationState();
 
-	void load_animation_state(Ref<SpineAnimationStateDataResource> animation_state_data);
+	void create_animation_state(spine::AnimationStateData *animation_state_data);
 
 	inline void set_spine_object(spine::AnimationState *animation_state) { this->animation_state = animation_state; }
 	inline spine::AnimationState *get_spine_object() { return animation_state; }

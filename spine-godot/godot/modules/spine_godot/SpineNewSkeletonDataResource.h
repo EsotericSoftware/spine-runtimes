@@ -21,86 +21,92 @@ protected:
 private:
 	Ref<SpineAtlasResource> atlas_res;
 	Ref<SpineSkeletonFileResource> skeleton_file_res;
-	bool valid;
-	bool spine_object;
 
 	spine::SkeletonData *skeleton_data;
+	spine::AnimationStateData *animation_state_data;
 
 	void update_skeleton_data();
+
+	void load_res(spine::Atlas *atlas, const String &json, const Vector<uint8_t> &binary);
 
 public:
 	SpineNewSkeletonDataResource();
 	virtual ~SpineNewSkeletonDataResource();
 
-	inline void set_spine_object(spine::SkeletonData *s) {
-		skeleton_data = s;
-		if (s)
-			spine_object = true;
-	}
-	inline spine::SkeletonData *get_spine_object() {
-		return skeleton_data;
-	}
+	bool is_skeleton_data_loaded() const;
 
-	void load_res(spine::Atlas *atlas, const String &json, const Vector<uint8_t> &binary);
-
-	void _get_property_list(List<PropertyInfo> *p_list) const;
-
-	void set_atlas_res(const Ref<SpineAtlasResource> &a);
+	void set_atlas_res(const Ref<SpineAtlasResource> &atlas);
 	Ref<SpineAtlasResource> get_atlas_res();
 
-	void set_skeleton_file_res(const Ref<SpineSkeletonFileResource> &s);
+	void set_skeleton_file_res(const Ref<SpineSkeletonFileResource> &skeleton_file);
 	Ref<SpineSkeletonFileResource> get_skeleton_file_res();
 
 	inline spine::SkeletonData *get_skeleton_data() { return skeleton_data; }
 
-	bool is_skeleton_data_loaded() const;
+	inline spine::AnimationStateData *get_animation_state_data() { return animation_state_data; }
 
-	void get_animation_names(Vector<String> &l) const;
+	void get_animation_names(Vector<String> &animation_names) const;
+
 	void get_skin_names(Vector<String> &l) const;
 
-	Ref<SpineBoneData> find_bone(const String &bone_name);
+	void _get_property_list(List<PropertyInfo> *p_list) const;
 
-	Ref<SpineSlotData> find_slot(const String &slot_name);
+	// Spine API
+	Ref<SpineBoneData> find_bone(const String &bone_name) const;
 
-	Ref<SpineSkin> find_skin(const String &skin_name);
+	Ref<SpineSlotData> find_slot(const String &slot_name) const;
 
-	Ref<SpineEventData> find_event(const String &event_data_name);
+	Ref<SpineSkin> find_skin(const String &skin_name) const;
 
-	Ref<SpineAnimation> find_animation(const String &animation_name);
+	Ref<SpineEventData> find_event(const String &event_data_name) const;
 
-	Ref<SpineIkConstraintData> find_ik_constraint(const String &constraint_name);
-	Ref<SpineTransformConstraintData> find_transform_constraint(const String &constraint_name);
-	Ref<SpinePathConstraintData> find_path_constraint(const String &constraint_name);
+	Ref<SpineAnimation> find_animation(const String &animation_name) const;
 
-	Array get_bones();
-	Array get_slots();
+	Ref<SpineIkConstraintData> find_ik_constraint(const String &constraint_name) const;
+
+	Ref<SpineTransformConstraintData> find_transform_constraint(const String &constraint_name) const;
+
+	Ref<SpinePathConstraintData> find_path_constraint(const String &constraint_name) const;
+
+	String get_skeleton_name() const;
+
+	Array get_bones() const;
+
+	Array get_slots() const;
+
 	Array get_skins() const;
 
-	Ref<SpineSkin> get_default_skin();
-	void set_default_skin(Ref<SpineSkin> v);
+	Ref<SpineSkin> get_default_skin() const;
 
-	Array get_events();
-	Array get_animations();
-	Array get_ik_constraints();
-	Array get_transform_constraints();
-	Array get_path_constraints();
+	void set_default_skin(Ref<SpineSkin> skin);
 
-	String get_skeleton_name();
-	void set_skeleton_name(const String &v);
+	Array get_events() const;
 
-	float get_x();
-	void set_x(float v);
+	Array get_animations() const;
 
-	float get_y();
-	void set_y(float v);
+	Array get_ik_constraints() const;
 
-	float get_width();
-	float get_height();
+	Array get_transform_constraints() const;
 
-	String get_version();
+	Array get_path_constraints() const;
 
-	float get_fps();
-	void set_fps(float v);
+	float get_x() const;
+
+	float get_y() const;
+
+	float get_width() const;
+
+	float get_height() const;
+
+	String get_version() const;
+
+	String get_hash() const;
+
+	String get_images_path() const;
+
+	String get_audio_path() const;
+
+	float get_fps() const;
 };
 
 
