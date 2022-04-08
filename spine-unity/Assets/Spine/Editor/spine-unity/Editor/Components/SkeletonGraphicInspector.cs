@@ -31,6 +31,10 @@
 #define NEW_PREFAB_SYSTEM
 #endif
 
+#if UNITY_2018_2_OR_NEWER
+#define HAS_CULL_TRANSPARENT_MESH
+#endif
+
 using UnityEditor;
 using UnityEngine;
 
@@ -469,6 +473,11 @@ namespace Spine.Unity.Editor {
 			graphic.additiveMaterial = SkeletonGraphicInspector.DefaultSkeletonGraphicAdditiveMaterial;
 			graphic.multiplyMaterial = SkeletonGraphicInspector.DefaultSkeletonGraphicMultiplyMaterial;
 			graphic.screenMaterial = SkeletonGraphicInspector.DefaultSkeletonGraphicScreenMaterial;
+
+#if HAS_CULL_TRANSPARENT_MESH
+			var canvasRenderer = go.GetComponent<CanvasRenderer>();
+			canvasRenderer.cullTransparentMesh = false;
+#endif
 			return go;
 		}
 

@@ -169,13 +169,17 @@ namespace Spine.Unity {
 		/// <summary>Add a SkeletonGraphic component to a GameObject.</summary>
 		/// <param name="material">Material for the canvas renderer to use. Usually, the default SkeletonGraphic material will work.</param>
 		public static SkeletonGraphic AddSkeletonGraphicComponent (GameObject gameObject, SkeletonDataAsset skeletonDataAsset, Material material) {
-			var c = gameObject.AddComponent<SkeletonGraphic>();
+			var skeletonGraphic = gameObject.AddComponent<SkeletonGraphic>();
 			if (skeletonDataAsset != null) {
-				c.material = material;
-				c.skeletonDataAsset = skeletonDataAsset;
-				c.Initialize(false);
+				skeletonGraphic.material = material;
+				skeletonGraphic.skeletonDataAsset = skeletonDataAsset;
+				skeletonGraphic.Initialize(false);
 			}
-			return c;
+#if HAS_CULL_TRANSPARENT_MESH
+			var canvasRenderer = gameObject.GetComponent<CanvasRenderer>();
+			if (canvasRenderer) canvasRenderer.cullTransparentMesh = false;
+#endif
+			return skeletonGraphic;
 		}
 		#endregion
 
