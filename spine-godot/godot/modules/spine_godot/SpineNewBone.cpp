@@ -98,8 +98,13 @@ void SpineNewBone::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("apply_world_transform_2d", "node2d"), &SpineNewBone::apply_world_transform_2d);
 }
 
-SpineNewBone::SpineNewBone() : bone(NULL), the_sprite(nullptr) {}
+SpineNewBone::SpineNewBone() : bone(nullptr), sprite(nullptr) {}
+
 SpineNewBone::~SpineNewBone() {}
+
+void SpineNewBone::set_spine_sprite(SpineNewSprite* sprite) {
+	this->sprite = sprite;
+}
 
 void SpineNewBone::update_world_transform() {
 	bone->updateWorldTransform();
@@ -151,7 +156,7 @@ Ref<SpineNewSkeleton> SpineNewBone::get_skeleton() {
 	auto &s = bone->getSkeleton();
 	Ref<SpineNewSkeleton> gd_s(memnew(SpineNewSkeleton));
 	gd_s->set_spine_object(&s);
-	gd_s->set_spine_sprite(the_sprite);
+	gd_s->set_spine_sprite(sprite);
 	return gd_s;
 }
 
@@ -160,7 +165,7 @@ Ref<SpineNewBone> SpineNewBone::get_parent() {
 	if (b == NULL) return NULL;
 	Ref<SpineNewBone> gd_b(memnew(SpineNewBone));
 	gd_b->set_spine_object(b);
-	gd_b->set_spine_sprite(the_sprite);
+	gd_b->set_spine_sprite(sprite);
 	return gd_b;
 }
 
@@ -173,7 +178,7 @@ Array SpineNewBone::get_children() {
 		if (b == NULL) gd_bs[i] = Ref<SpineNewBone>(NULL);
 		Ref<SpineNewBone> gd_b(memnew(SpineNewBone));
 		gd_b->set_spine_object(b);
-		gd_b->set_spine_sprite(the_sprite);
+		gd_b->set_spine_sprite(sprite);
 		gd_bs[i] = gd_b;
 	}
 	return gd_bs;
@@ -390,13 +395,13 @@ void SpineNewBone::set_godot_transform(Transform2D trans) {
 Transform2D SpineNewBone::get_godot_global_transform() {
 	if (get_spine_object() == nullptr)
 		return Transform2D();
-	if (the_sprite == nullptr)
+	if (sprite == nullptr)
 		return get_godot_transform();
-	Transform2D res = the_sprite->get_transform();
+	Transform2D res = sprite->get_transform();
 	res.translate(get_world_x(), -get_world_y());
 	res.rotate(Math::deg2rad(-get_world_rotation_x()));
 	res.scale(Vector2(get_world_scale_x(), get_world_scale_y()));
-	auto p = the_sprite->get_parent() ? Object::cast_to<CanvasItem>(the_sprite->get_parent()) : nullptr;
+	auto p = sprite->get_parent() ? Object::cast_to<CanvasItem>(sprite->get_parent()) : nullptr;
 	if (p) {
 		return p->get_global_transform() * res;
 	}
@@ -406,9 +411,9 @@ Transform2D SpineNewBone::get_godot_global_transform() {
 void SpineNewBone::set_godot_global_transform(Transform2D transform) {
 	if (get_spine_object() == nullptr)
 		return;
-	if (the_sprite == nullptr)
+	if (sprite == nullptr)
 		set_godot_transform(transform);
-	transform = the_sprite->get_global_transform().affine_inverse() * transform;
+	transform = sprite->get_global_transform().affine_inverse() * transform;
 	Vector2 position = transform.get_origin();
 	real_t rotation = transform.get_rotation();
 	Vector2 scale = transform.get_scale();
@@ -432,8 +437,4 @@ void SpineNewBone::set_godot_global_transform(Transform2D transform) {
 	set_rotation(rotation);
 	set_scale_x(scale.x);
 	set_scale_y(scale.y);
-}
-
-void SpineNewBone::set_spine_sprite(SpineNewSprite *s) {
-	the_sprite = s;
 }

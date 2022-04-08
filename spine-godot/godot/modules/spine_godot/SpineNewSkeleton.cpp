@@ -46,7 +46,7 @@ void SpineNewSkeleton::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("find_path_constraint", "constraint_name"), &SpineNewSkeleton::find_path_constraint);
 	ClassDB::bind_method(D_METHOD("get_bounds"), &SpineNewSkeleton::get_bounds);
 	ClassDB::bind_method(D_METHOD("get_root_bone"), &SpineNewSkeleton::get_root_bone);
-	ClassDB::bind_method(D_METHOD("get_data"), &SpineNewSkeleton::get_data);
+	ClassDB::bind_method(D_METHOD("get_data"), &SpineNewSkeleton::get_skeleton_data_res);
 	ClassDB::bind_method(D_METHOD("get_bones"), &SpineNewSkeleton::get_bones);
 	ClassDB::bind_method(D_METHOD("get_slots"), &SpineNewSkeleton::get_slots);
 	ClassDB::bind_method(D_METHOD("get_draw_orders"), &SpineNewSkeleton::get_draw_orders);
@@ -77,9 +77,17 @@ SpineNewSkeleton::~SpineNewSkeleton() {
 void SpineNewSkeleton::set_skeleton_data_res(Ref<SpineNewSkeletonDataResource> data_res) {
 	delete skeleton;
 	skeleton = nullptr;
-	if (!data_res.is_valid()) return;
-	skeleton = new spine::Skeleton(data_res->get_skeleton_data());
 	skeleton_data_res = data_res;
+	if (!data_res.is_valid() || !data_res->is_skeleton_data_loaded()) return;
+	skeleton = new spine::Skeleton(data_res->get_skeleton_data());
+}
+
+Ref<SpineNewSkeletonDataResource> SpineNewSkeleton::get_skeleton_data_res() const {
+	return skeleton_data_res;
+}
+
+void SpineNewSkeleton::set_spine_sprite(SpineNewSprite* sprite) {
+	this->sprite = sprite;
 }
 
 #define S_T(x) (spine::String((x).utf8()))
@@ -203,10 +211,6 @@ Ref<SpineNewBone> SpineNewSkeleton::get_root_bone() {
 	gd_b->set_spine_object(b);
 	gd_b->set_spine_sprite(sprite);
 	return gd_b;
-}
-
-Ref<SpineNewSkeletonDataResource> SpineNewSkeleton::get_data() const {
-	return skeleton_data_res;
 }
 
 Array SpineNewSkeleton::get_bones() {
@@ -336,8 +340,4 @@ float SpineNewSkeleton::get_scale_y() {
 }
 void SpineNewSkeleton::set_scale_y(float v) {
 	skeleton->setScaleY(v);
-}
-
-void SpineNewSkeleton::set_spine_sprite(SpineNewSprite *s) {
-	sprite = s;
 }

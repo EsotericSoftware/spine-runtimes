@@ -32,9 +32,8 @@
 
 #include <scene/resources/texture.h>
 
-#include "SpineAnimationState.h"
-#include "SpineAnimationStateDataResource.h"
 #include "SpineNewSkeleton.h"
+#include "SpineNewAnimationState.h"
 #include "SpineSpriteMeshInstance2D.h"
 
 class SpineNewSprite : public Node2D, public spine::AnimationStateListenerObject {
@@ -62,7 +61,7 @@ private:
 	Ref<SpineNewSkeletonDataResource> skeleton_data_res;
 
 	Ref<SpineNewSkeleton> skeleton;
-	Ref<SpineAnimationState> animation_state;
+	Ref<SpineNewAnimationState> animation_state;
 
 	String preview_animation;
 	Array bind_slot_nodes;
@@ -80,14 +79,14 @@ public:
 	void set_skeleton_data_res(const Ref<SpineNewSkeletonDataResource> &a);
 	Ref<SpineNewSkeletonDataResource> get_skeleton_data_res();
 
-	Ref<SpineSkeleton> get_skeleton();
-	Ref<SpineAnimationState> get_animation_state();
+	Ref<SpineNewSkeleton> get_skeleton();
+	Ref<SpineNewAnimationState> get_animation_state();
 
-	void gen_mesh_from_skeleton(Ref<SpineSkeleton> s);
+	void gen_mesh_from_skeleton(Ref<SpineNewSkeleton> s);
 	void remove_mesh_instances();
 	void remove_redundant_mesh_instances();
 
-	void update_mesh_from_skeleton(Ref<SpineSkeleton> s);
+	void update_mesh_from_skeleton(Ref<SpineNewSkeleton> s);
 
 	void update_bind_slot_nodes();
 	void update_bind_slot_node_transform(Ref<SpineBone> bone, Node2D *node2d);
@@ -96,8 +95,7 @@ public:
 
 	virtual void callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event);
 
-	void _on_animation_data_created();
-	void _on_animation_data_changed();
+	void _on_skeleton_data_changed();
 
 	void _update_all(float delta);
 

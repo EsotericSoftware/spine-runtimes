@@ -36,10 +36,9 @@
 void SpineNewSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_skeleton_data_res", "skeleton_data_res"), &SpineNewSprite::set_skeleton_data_res);
 	ClassDB::bind_method(D_METHOD("get_skeleton_data_res"), &SpineNewSprite::get_skeleton_data_res);
-	ClassDB::bind_method(D_METHOD("_on_animation_data_created"), &SpineNewSprite::_on_animation_data_created);
 	ClassDB::bind_method(D_METHOD("get_skeleton"), &SpineNewSprite::get_skeleton);
 	ClassDB::bind_method(D_METHOD("get_animation_state"), &SpineNewSprite::get_animation_state);
-	ClassDB::bind_method(D_METHOD("_on_animation_data_changed"), &SpineNewSprite::_on_animation_data_changed);
+	ClassDB::bind_method(D_METHOD("_on_skeleton_data_changed"), &SpineNewSprite::_on_skeleton_data_changed);
 
 	ClassDB::bind_method(D_METHOD("get_bind_slot_nodes"), &SpineNewSprite::get_bind_slot_nodes);
 	ClassDB::bind_method(D_METHOD("set_bind_slot_nodes", "v"), &SpineNewSprite::set_bind_slot_nodes);
@@ -73,11 +72,10 @@ void SpineNewSprite::_bind_methods() {
 	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Manual);
 }
 
-SpineNewSprite::SpineNewSprite() : overlap(false),
-							 skeleton_clipper(nullptr),
-							 process_mode(ProcessMode_Process) {
+SpineNewSprite::SpineNewSprite() : overlap(false), process_mode(ProcessMode_Process), skeleton_clipper(nullptr) {
 	skeleton_clipper = new spine::SkeletonClipping();
 }
+
 SpineNewSprite::~SpineNewSprite() {
 	delete skeleton_clipper;
 }
@@ -161,9 +159,11 @@ void SpineNewSprite::update_bind_slot_nodes() {
 		}
 	}
 }
+
 void SpineNewSprite::update_bind_slot_node_transform(Ref<SpineBone> bone, Node2D *node2d) {
 	bone->apply_world_transform_2d(node2d);
 }
+
 void SpineNewSprite::update_bind_slot_node_draw_order(const String &slot_name, Node2D *node2d) {
 	auto mesh_ins = find_node(slot_name);
 	if (mesh_ins) {
@@ -184,55 +184,53 @@ Node *SpineNewSprite::find_child_node_by_node(Node *node) {
 
 void SpineNewSprite::set_skeleton_data_res(const Ref<SpineNewSkeletonDataResource> &s) {
 	skeleton_data_res = s;
-	_on_animation_data_changed();
+	_on_skeleton_data_changed();
 }
 Ref<SpineNewSkeletonDataResource> SpineNewSprite::get_skeleton_data_res() {
 	return skeleton_data_res;
 }
 
-void SpineNewSprite::_on_animation_data_created() {
-	skeleton = Ref<SpineNewSkeleton>(memnew(SpineNewSkeleton));
-	skeleton->set_skeleton_data_res(skeleton_data_res);
-	skeleton->set_spine_sprite(this);
-
-	animation_state = Ref<SpineAnimationState>(memnew(SpineAnimationState));
-	animation_state->create_animation_state(skeleton_data_res->get_animation_state_data());
-	animation_state->get_spine_object()->setListener(this);
-
-	animation_state->update(0);
-	animation_state->apply(skeleton);
-	skeleton->update_world_transform();
-	gen_mesh_from_skeleton(skeleton);
-
-	if (process_mode == ProcessMode_Process) {
-		_notification(NOTIFICATION_INTERNAL_PROCESS);
-	} else if (process_mode == ProcessMode_Physics) {
-		_notification(NOTIFICATION_INTERNAL_PHYSICS_PROCESS);
-	}
-}
-
-void SpineNewSprite::_on_animation_data_changed() {
+void SpineNewSprite::_on_skeleton_data_changed() {
 	remove_mesh_instances();
 	skeleton.unref();
 	animation_state.unref();
-	if (skeleton_data_res.is_valid()) {
-		if (!skeleton_data_res->is_connected("skeleton_data_changed", this, "_on_animation_data_created"))
-			skeleton_data_res->connect("skeleton_data_changed", this, "_on_animation_data_created");
 
-		if (skeleton_data_res->is_skeleton_data_loaded()) {
-			_on_animation_data_created();
+	if (skeleton_data_res.is_valid()) {
+		if (!skeleton_data_res->is_connected("skeleton_data_changed", this, "_on_skeleton_data_changed"))
+			skeleton_data_res->connect("skeleton_data_changed", this, "_on_skeleton_data_changed");
+	}
+
+	if (skeleton_data_res.is_valid() && skeleton_data_res->is_skeleton_data_loaded()) {
+		skeleton = Ref<SpineNewSkeleton>(memnew(SpineNewSkeleton));
+		skeleton->set_skeleton_data_res(skeleton_data_res);
+		skeleton->set_spine_sprite(this);
+
+		animation_state = Ref<SpineNewAnimationState>(memnew(SpineNewAnimationState));
+		animation_state->set_skeleton_data_res(skeleton_data_res);
+		if (animation_state->get_spine_object()) animation_state->get_spine_object()->setListener(this);
+
+		animation_state->update(0);
+		animation_state->apply(skeleton);
+		skeleton->update_world_transform();
+		gen_mesh_from_skeleton(skeleton);
+
+		if (process_mode == ProcessMode_Process) {
+			_notification(NOTIFICATION_INTERNAL_PROCESS);
+		} else if (process_mode == ProcessMode_Physics) {
+			_notification(NOTIFICATION_INTERNAL_PHYSICS_PROCESS);
 		}
 	}
 }
 
-Ref<SpineSkeleton> SpineNewSprite::get_skeleton() {
+Ref<SpineNewSkeleton> SpineNewSprite::get_skeleton() {
 	return skeleton;
 }
-Ref<SpineAnimationState> SpineNewSprite::get_animation_state() {
+
+Ref<SpineNewAnimationState> SpineNewSprite::get_animation_state() {
 	return animation_state;
 }
 
-void SpineNewSprite::gen_mesh_from_skeleton(Ref<SpineSkeleton> s) {
+void SpineNewSprite::gen_mesh_from_skeleton(Ref<SpineNewSkeleton> s) {
 	auto sk = s->get_spine_object();
 	for (size_t i = 0, n = sk->getSlots().size(); i < n; ++i) {
 		auto mesh_ins = memnew(SpineSpriteMeshInstance2D);
@@ -305,7 +303,7 @@ void SpineNewSprite::remove_redundant_mesh_instances() {
 		}                                       \
 	} while (false);
 
-void SpineNewSprite::update_mesh_from_skeleton(Ref<SpineSkeleton> s) {
+void SpineNewSprite::update_mesh_from_skeleton(Ref<SpineNewSkeleton> s) {
 	static const unsigned short VERTEX_STRIDE = 2;
 	static unsigned short quad_indices[] = {0, 1, 2, 2, 3, 0};
 
@@ -606,7 +604,7 @@ bool SpineNewSprite::_set(const StringName &p_property, const Variant &p_value) 
 		if (animation_state.is_valid() && skeleton.is_valid()) {
 			auto animName = p_value.operator String();
 			skeleton->set_to_setup_pose();
-			if (skeleton->get_data()->find_animation(animName).is_valid()) {
+			if (skeleton->get_skeleton_data_res()->find_animation(animName).is_valid()) {
 				animation_state->set_animation(animName, true, 0);
 			} else {
 				animation_state->clear_tracks();
@@ -617,7 +615,7 @@ bool SpineNewSprite::_set(const StringName &p_property, const Variant &p_value) 
 	if (p_property == "Preview skin") {
 		if (animation_state.is_valid() && skeleton.is_valid()) {
 			auto skinName = p_value.operator String();
-			if (skeleton->get_data()->find_skin(skinName).is_valid()) {
+			if (skeleton->get_skeleton_data_res()->find_skin(skinName).is_valid()) {
 				skeleton->set_skin_by_name(skinName);
 			} else {
 				skeleton->set_skin(nullptr);

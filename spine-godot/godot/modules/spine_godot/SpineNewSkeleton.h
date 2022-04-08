@@ -56,6 +56,7 @@ public:
 	~SpineNewSkeleton();
 
 	void set_skeleton_data_res(Ref<SpineNewSkeletonDataResource> data_res);
+	Ref<SpineNewSkeletonDataResource> get_skeleton_data_res() const;
 
 	inline void set_spine_object(spine::Skeleton *s) {
 		skeleton = s;
@@ -64,8 +65,7 @@ public:
 		return skeleton;
 	}
 
-	void set_spine_sprite(SpineNewSprite *s);
-
+	void set_spine_sprite(SpineNewSprite *sprite);
 
 	void update_world_transform();
 
@@ -94,8 +94,6 @@ public:
 	Dictionary get_bounds();
 
 	Ref<SpineNewBone> get_root_bone();
-
-	Ref<SpineNewSkeletonDataResource> get_data() const;
 
 	Array get_bones();
 	Array get_slots();

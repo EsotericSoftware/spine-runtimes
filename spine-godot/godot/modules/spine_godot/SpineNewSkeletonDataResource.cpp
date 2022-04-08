@@ -29,6 +29,11 @@
 
 #include "SpineNewSkeletonDataResource.h"
 
+#ifdef TOOLS_ENABLED
+#include "editor/editor_node.h"
+#include "editor/editor_inspector.h"
+#endif
+
 void SpineNewSkeletonDataResource::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_skeleton_data_loaded"), &SpineNewSkeletonDataResource::is_skeleton_data_loaded);
 	ClassDB::bind_method(D_METHOD("set_atlas_res", "atlas_res"), &SpineNewSkeletonDataResource::set_atlas_res);
@@ -81,13 +86,6 @@ SpineNewSkeletonDataResource::~SpineNewSkeletonDataResource() {
 }
 
 void SpineNewSkeletonDataResource::update_skeleton_data() {
-	if (atlas_res.is_valid() && skeleton_file_res.is_valid()) {
-		load_res(atlas_res->get_spine_atlas(), skeleton_file_res->get_json(), skeleton_file_res->get_binary());
-		emit_signal("skeleton_data_changed");
-	}
-}
-
-void SpineNewSkeletonDataResource::load_res(spine::Atlas *atlas, const String &json, const Vector<uint8_t> &binary) {
 	if (skeleton_data) {
 		delete skeleton_data;
 		skeleton_data = nullptr;
@@ -97,6 +95,16 @@ void SpineNewSkeletonDataResource::load_res(spine::Atlas *atlas, const String &j
 		animation_state_data = nullptr;
 	}
 
+	if (atlas_res.is_valid() && skeleton_file_res.is_valid()) {
+		load_res(atlas_res->get_spine_atlas(), skeleton_file_res->get_json(), skeleton_file_res->get_binary());
+	}
+	emit_signal("skeleton_data_changed");
+#ifdef TOOLS_ENABLED
+	property_list_changed_notify();
+#endif
+}
+
+void SpineNewSkeletonDataResource::load_res(spine::Atlas *atlas, const String &json, const Vector<uint8_t> &binary) {
 	if ((json.empty() && binary.empty()) || atlas == nullptr) return;
 
 	spine::SkeletonData *data;

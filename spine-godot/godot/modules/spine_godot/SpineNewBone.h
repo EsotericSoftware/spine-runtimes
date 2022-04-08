@@ -46,8 +46,7 @@ protected:
 
 private:
 	spine::Bone *bone;
-
-	SpineNewSprite *the_sprite;
+	SpineNewSprite* sprite;
 
 public:
 	SpineNewBone();
@@ -56,11 +55,12 @@ public:
 	inline void set_spine_object(spine::Bone *b) {
 		bone = b;
 	}
+
 	inline spine::Bone *get_spine_object() {
 		return bone;
 	}
 
-	void set_spine_sprite(SpineNewSprite *s);
+	void set_spine_sprite(SpineNewSprite* sprite);
 
 	void update_world_transform();
 
