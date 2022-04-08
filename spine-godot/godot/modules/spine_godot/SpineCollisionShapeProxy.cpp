@@ -59,7 +59,6 @@ void SpineCollisionShapeProxy::_notification(int p_what) {
 		case NOTIFICATION_INTERNAL_PROCESS: {
 			if (!disabled) {
 				if (sync_transform) synchronize_transform(get_spine_sprite());
-				update_polygon_from_spine_sprite(get_spine_sprite());
 				if (is_visible()) update();
 			}
 		} break;
@@ -85,40 +84,57 @@ String SpineCollisionShapeProxy::get_slot() const {
 
 void SpineCollisionShapeProxy::set_slot(const String &slotName) {
 	slot_name = slotName;
+	spine::Slot *slot = get_spine_slot(slot_name);
+	if (!slot) return;
+	spine::Attachment *attachment = slot->getAttachment();
+	if (!attachment) {
+		print_line(vformat("Slot %s has no attachment set.", slot_name));
+		return;
+	}
+	if (!attachment->getRTTI().isExactly(spine::BoundingBoxAttachment::rtti)) {
+		print_line(vformat("Attachment in slot %s is not a bounding box attachment.", slot_name));
+		return;
+	}
 	update_polygon_from_spine_sprite(get_spine_sprite());
+}
+
+spine::Slot *SpineCollisionShapeProxy::get_spine_slot(const String &slotName) const {
+	auto sprite = get_spine_sprite();
+	if (sprite == NULL || slot_name.empty()) return NULL;
+	if (!sprite->get_skeleton().is_valid()) return NULL;
+	spine::Skeleton *skeleton = sprite->get_skeleton()->get_spine_object();
+	spine::Slot *slot = skeleton->findSlot(spine::String(slot_name.utf8()));
+	return slot;
 }
 
 void SpineCollisionShapeProxy::update_polygon_from_spine_sprite(SpineSprite *sprite) {
 	clear_polygon();
-	if (sprite == NULL || slot_name.empty()) return;
-	if (!sprite->get_skeleton().is_valid()) return;
-
-	spine::Skeleton *skeleton = sprite->get_skeleton()->get_spine_object();
-	spine::Slot *slot = skeleton->findSlot(spine::String(slot_name.utf8()));
+	spine::Slot *slot = get_spine_slot(slot_name);
 	if (!slot) return;
 	spine::Attachment *attachment = slot->getAttachment();
-	if (!attachment) return;
+	if(!attachment) return;
 
-	spine::Vector<float> vertices;
 	if (attachment->getRTTI().isExactly(spine::BoundingBoxAttachment::rtti)) {
 		auto *box = (spine::BoundingBoxAttachment *) attachment;
-		vertices.setSize(box->getWorldVerticesLength(), 0);
-		box->computeWorldVertices(*slot, vertices);
+		scratch_vertices.setSize(box->getWorldVerticesLength(), 0);
+		box->computeWorldVertices(*slot, scratch_vertices);
 	} else {
 		return;
 	}
 
-	polygon.resize(vertices.size() / 2);
-	for (size_t j = 0; j < vertices.size(); j += 2) {
-		polygon.set(j / 2, Vector2(vertices[j], -vertices[j + 1]));
+	polygon.resize(scratch_vertices.size() / 2);
+	for (size_t j = 0; j < scratch_vertices.size(); j += 2) {
+		polygon.set(j / 2, Vector2(scratch_vertices[j], -scratch_vertices[j + 1]));
 	}
 
-	set_polygon(polygon);
+	_set("polygon", polygon);
+	// set_polygon(polygon);
 }
 
 void SpineCollisionShapeProxy::clear_polygon() {
 	polygon.clear();
-	set_polygon(polygon);
+	_set("polygon", polygon);
+	// set_polygon(polygon);
 }
 
 void SpineCollisionShapeProxy::synchronize_transform(SpineSprite *sprite) {
@@ -136,12 +152,13 @@ void SpineCollisionShapeProxy::set_sync_transform(bool sync_transform) {
 
 void SpineCollisionShapeProxy::_get_property_list(List<PropertyInfo> *p_list) const {
 	PropertyInfo p;
-	Vector<String> res;
+	Vector<String> slot_names;
 	p.name = "Slot";
 	p.type = Variant::STRING;
-	get_slot_list(res);
-	if (res.empty()) res.push_back("None");
-	p.hint_string = String(",").join(res);
+	get_slot_names(slot_names);
+	if (slot_names.empty())
+		slot_names.push_back("None");
+	p.hint_string = String(",").join(slot_names);
 	p.hint = PROPERTY_HINT_ENUM;
 	p_list->push_back(p);
 }
@@ -162,16 +179,16 @@ bool SpineCollisionShapeProxy::_set(const StringName &p_property, const Variant 
 	return false;
 }
 
-void SpineCollisionShapeProxy::get_slot_list(Vector<String> &slotNames) const {
+void SpineCollisionShapeProxy::get_slot_names(Vector<String> &slot_names) const {
 	if (get_spine_sprite() == nullptr) return;
 	auto sprite = get_spine_sprite();
 	if (!sprite->get_skeleton().is_valid()) return;
 
 	auto slots = sprite->get_skeleton()->get_slots();
-	slots.resize(slotNames.size());
-	for (size_t i = 0; i < slotNames.size(); ++i) {
-		auto slot = (Ref<SpineSlot>) slotNames[i];
+	slot_names.resize(slots.size());
+	for (size_t i = 0; i < slots.size(); ++i) {
+		auto slot = (Ref<SpineSlot>) slots[i];
 		if (slot.is_valid())
-			slots.set(i, slot->get_data()->get_slot_name());
+			slot_names.set(i, slot->get_data()->get_slot_name());
 	}
 }

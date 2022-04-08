@@ -1,34 +1,5 @@
-/******************************************************************************
- * Spine Runtimes License Agreement
- * Last updated January 1, 2020. Replaces all prior versions.
- *
- * Copyright (c) 2013-2020, Esoteric Software LLC
- *
- * Integration of the Spine Runtimes into software or otherwise creating
- * derivative works of the Spine Runtimes is permitted under the terms and
- * conditions of Section 2 of the Spine Editor License Agreement:
- * http://esotericsoftware.com/spine-editor-license
- *
- * Otherwise, it is permitted to integrate the Spine Runtimes into software
- * or otherwise create derivative works of the Spine Runtimes (collectively,
- * "Products"), provided that each user of the Products must obtain their own
- * Spine Editor license and redistribution of the Products in any form must
- * include this license and copyright notice.
- *
- * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
- * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *****************************************************************************/
-
-#ifndef GODOT_SPINESKELETONDATARESOURCE_H
-#define GODOT_SPINESKELETONDATARESOURCE_H
+#ifndef GODOT_SPINENEWSKELETONDATARESOURCE_H
+#define GODOT_SPINENEWSKELETONDATARESOURCE_H
 
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
@@ -41,8 +12,8 @@
 #include "SpinePathConstraintData.h"
 #include "SpineEventData.h"
 
-class SpineSkeletonDataResource : public Resource {
-	GDCLASS(SpineSkeletonDataResource, Resource);
+class SpineNewSkeletonDataResource : public Resource {
+	GDCLASS(SpineNewSkeletonDataResource, Resource);
 
 protected:
 	static void _bind_methods();
@@ -58,8 +29,8 @@ private:
 	void update_skeleton_data();
 
 public:
-	SpineSkeletonDataResource();
-	virtual ~SpineSkeletonDataResource();
+	SpineNewSkeletonDataResource();
+	virtual ~SpineNewSkeletonDataResource();
 
 	inline void set_spine_object(spine::SkeletonData *s) {
 		skeleton_data = s;
@@ -87,7 +58,6 @@ public:
 	void get_animation_names(Vector<String> &l) const;
 	void get_skin_names(Vector<String> &l) const;
 
-	// spine api
 	Ref<SpineBoneData> find_bone(const String &bone_name);
 
 	Ref<SpineSlotData> find_slot(const String &slot_name);
@@ -115,8 +85,8 @@ public:
 	Array get_transform_constraints();
 	Array get_path_constraints();
 
-	String get_sk_name();
-	void set_sk_name(const String &v);
+	String get_skeleton_name();
+	void set_skeleton_name(const String &v);
 
 	float get_x();
 	void set_x(float v);
@@ -133,4 +103,5 @@ public:
 	void set_fps(float v);
 };
 
-#endif//GODOT_SPINESKELETONDATARESOURCE_H
+
+#endif //GODOT_SPINENEWSKELETONDATARESOURCE_H

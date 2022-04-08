@@ -31,6 +31,7 @@
 #define GODOT_SPINECOLLISIONSHAPEPROXY_H
 
 #include "scene/2d/collision_polygon_2d.h"
+#include <spine/spine.h>
 
 class SpineSprite;
 class SpineAnimationState;
@@ -47,6 +48,8 @@ protected:
 
 	bool sync_transform;
 
+	spine::Vector<float> scratch_vertices;
+
 protected:
 	void _notification(int p_what);
 	void _get_property_list(List<PropertyInfo> *p_list) const;
@@ -56,13 +59,15 @@ protected:
 
 	SpineSprite *get_spine_sprite() const;
 
+	spine::Slot *get_spine_slot(const String &slotName) const;
+
 	void update_polygon_from_spine_sprite(SpineSprite *sprite);
 
 	void clear_polygon();
 
 	void synchronize_transform(SpineSprite *sprite);
 
-	void get_slot_list(Vector<String> &slotNames) const;
+	void get_slot_names(Vector<String> &slot_names) const;
 
 public:
 	SpineCollisionShapeProxy();
