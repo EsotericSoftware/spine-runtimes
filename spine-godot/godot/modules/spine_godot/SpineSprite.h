@@ -30,13 +30,12 @@
 #ifndef GODOT_SPINESPRITE_H
 #define GODOT_SPINESPRITE_H
 
-#include <scene/resources/texture.h>
-#include <scene/2d/collision_polygon_2d.h>
+#include "scene/2d/node_2d.h"
+#include "scene/resources/texture.h"
 
-#include "SpineAnimationState.h"
-#include "SpineAnimationStateDataResource.h"
 #include "SpineSkeleton.h"
-#include "SpineSpriteMeshInstance2D.h"
+#include "SpineAnimationState.h"
+#include "scene/2d/mesh_instance_2d.h"
 
 class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
 	GDCLASS(SpineSprite, Node2D);
@@ -60,7 +59,7 @@ public:
 	};
 
 private:
-	Ref<SpineAnimationStateDataResource> animation_state_data_res;
+	Ref<SpineSkeletonDataResource> skeleton_data_res;
 
 	Ref<SpineSkeleton> skeleton;
 	Ref<SpineAnimationState> animation_state;
@@ -71,24 +70,24 @@ private:
 
 	ProcessMode process_mode;
 
-	Vector<SpineSpriteMeshInstance2D *> mesh_instances;
+	Vector<MeshInstance2D *> mesh_instances;
 	spine::SkeletonClipping *skeleton_clipper;
+	static Ref<CanvasItemMaterial> materials[4];
 
 public:
 	SpineSprite();
 	~SpineSprite();
 
-	void set_animation_state_data_res(const Ref<SpineAnimationStateDataResource> &a);
-	Ref<SpineAnimationStateDataResource> get_animation_state_data_res();
+	void set_skeleton_data_res(const Ref<SpineSkeletonDataResource> &a);
+	Ref<SpineSkeletonDataResource> get_skeleton_data_res();
 
 	Ref<SpineSkeleton> get_skeleton();
 	Ref<SpineAnimationState> get_animation_state();
 
-	void gen_mesh_from_skeleton(Ref<SpineSkeleton> s);
-	void remove_mesh_instances();
-	void remove_redundant_mesh_instances();
+	void generate_meshes_for_slots(Ref<SpineSkeleton> skeleton_ref);
+	void remove_meshes();
 
-	void update_mesh_from_skeleton(Ref<SpineSkeleton> s);
+	void update_meshes(Ref<SpineSkeleton> s);
 
 	void update_bind_slot_nodes();
 	void update_bind_slot_node_transform(Ref<SpineBone> bone, Node2D *node2d);
@@ -97,8 +96,7 @@ public:
 
 	virtual void callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event);
 
-	void _on_animation_data_created();
-	void _on_animation_data_changed();
+	void _on_skeleton_data_changed();
 
 	void _update_all(float delta);
 
@@ -113,6 +111,11 @@ public:
 
 	ProcessMode get_process_mode();
 	void set_process_mode(ProcessMode v);
+
+#ifdef TOOLS_ENABLED
+	virtual Rect2 _edit_get_rect() const;
+	virtual bool _edit_use_rect() const;
+#endif
 };
 
 VARIANT_ENUM_CAST(SpineSprite::ProcessMode);

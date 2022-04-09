@@ -30,7 +30,6 @@
 #ifndef GODOT_SPINEANIMATIONSTATE_H
 #define GODOT_SPINEANIMATIONSTATE_H
 
-#include "SpineAnimationStateDataResource.h"
 #include "SpineSkeleton.h"
 #include "SpineTrackEntry.h"
 
@@ -42,12 +41,14 @@ protected:
 
 private:
 	spine::AnimationState *animation_state;
+	Ref<SpineSkeletonDataResource> skeleton_data_res;
 
 public:
 	SpineAnimationState();
 	~SpineAnimationState();
 
-	void create_animation_state(spine::AnimationStateData *animation_state_data);
+	void set_skeleton_data_res(Ref<SpineSkeletonDataResource> skeleton_data_res);
+	Ref<SpineSkeletonDataResource> get_skeleton_data_res() const;
 
 	inline void set_spine_object(spine::AnimationState *animation_state) { this->animation_state = animation_state; }
 	inline spine::AnimationState *get_spine_object() { return animation_state; }
@@ -60,8 +61,6 @@ public:
 
 	Ref<SpineTrackEntry> add_empty_animation(uint64_t track_id, float mix_duration, float delay);
 	void set_empty_animations(float mix_duration);
-
-	Ref<SpineAnimationStateDataResource> get_data();
 
 	float get_time_scale();
 	void set_time_scale(float time_scale);

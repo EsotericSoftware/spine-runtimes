@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINERUNTIMEEDITORPLUGIN_H
-#define GODOT_SPINERUNTIMEEDITORPLUGIN_H
+#ifndef GODOT_SPINEEDITORPLUGIN_H
+#define GODOT_SPINEEDITORPLUGIN_H
 
 #ifdef TOOLS_ENABLED
 #include "editor/editor_node.h"
@@ -93,17 +93,17 @@ public:
 	Error import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) override;
 };
 
-class SpineRuntimeEditorPlugin : public EditorPlugin {
-	GDCLASS(SpineRuntimeEditorPlugin, EditorPlugin);
+class SpineEditorPlugin : public EditorPlugin {
+	GDCLASS(SpineEditorPlugin, EditorPlugin);
 
 public:
-	SpineRuntimeEditorPlugin(EditorNode *p_node);
-	~SpineRuntimeEditorPlugin();
+	SpineEditorPlugin(EditorNode *p_node);
+	~SpineEditorPlugin();
 
-	String get_name() const override { return "SpineRuntimeEditorPlugin"; }
+	String get_name() const override { return "SpineEditorPlugin"; }
 	bool has_main_screen() const { return false; }
 	bool handles(Object *p_object) const override;
 };
 #endif
 
-#endif//GODOT_SPINERUNTIMEEDITORPLUGIN_H
+#endif//GODOT_SPINEEDITORPLUGIN_H

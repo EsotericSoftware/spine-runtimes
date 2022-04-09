@@ -30,13 +30,14 @@
 #ifndef GODOT_SPINESKELETON_H
 #define GODOT_SPINESKELETON_H
 
-#include "core/variant_parser.h"
-
 #include <spine/spine.h>
 
 #include "SpineSkeletonDataResource.h"
 #include "SpineBone.h"
 #include "SpineSlot.h"
+#include "SpineIkConstraint.h"
+#include "SpineTransformConstraint.h"
+#include "SpinePathConstraint.h"
 
 class SpineSprite;
 
@@ -48,26 +49,24 @@ protected:
 
 private:
 	spine::Skeleton *skeleton;
-	bool spine_object;
-
-	SpineSprite *the_sprite;
+	SpineSprite *sprite;
+	Ref<SpineSkeletonDataResource> skeleton_data_res;
 
 public:
 	SpineSkeleton();
 	~SpineSkeleton();
 
-	void load_skeleton(Ref<SpineSkeletonDataResource> sd);
+	void set_skeleton_data_res(Ref<SpineSkeletonDataResource> data_res);
+	Ref<SpineSkeletonDataResource> get_skeleton_data_res() const;
 
 	inline void set_spine_object(spine::Skeleton *s) {
 		skeleton = s;
-		spine_object = true;
 	}
 	inline spine::Skeleton *get_spine_object() {
 		return skeleton;
 	}
 
-	void set_spine_sprite(SpineSprite *s);
-
+	void set_spine_sprite(SpineSprite *sprite);
 
 	void update_world_transform();
 
@@ -96,8 +95,6 @@ public:
 	Dictionary get_bounds();
 
 	Ref<SpineBone> get_root_bone();
-
-	Ref<SpineSkeletonDataResource> get_data() const;
 
 	Array get_bones();
 	Array get_slots();

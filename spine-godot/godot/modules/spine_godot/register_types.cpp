@@ -33,7 +33,6 @@
 #include "SpineSkeletonFileResource.h"
 #include "SpineSkeletonDataResource.h"
 #include "SpineSprite.h"
-#include "SpineAnimationStateDataResource.h"
 #include "SpineSkeleton.h"
 #include "SpineAnimationState.h"
 #include "SpineEventData.h"
@@ -48,7 +47,6 @@
 #include "SpineIkConstraintData.h"
 #include "SpineTransformConstraintData.h"
 #include "SpinePathConstraintData.h"
-#include "SpineSpriteMeshInstance2D.h"
 #include "SpineTimeline.h"
 #include "SpineConstant.h"
 #include "SpineCollisionShapeProxy.h"
@@ -61,12 +59,12 @@ static Ref<SpineSkeletonFileResourceFormatSaver> skeleton_file_saver;
 #ifdef TOOLS_ENABLED
 #include "editor/editor_export.h"
 #include "editor/editor_node.h"
-#include "SpineRuntimeEditorPlugin.h"
-#include "SpineNewSkeletonDataResource.h"
-#include "SpineNewSprite.h"
+#include "SpineEditorPlugin.h"
+#include "SpineSkeletonDataResource.h"
+#include "SpineSprite.h"
 
 static void editor_init_callback() {
-	EditorNode::get_singleton()->add_editor_plugin(memnew(SpineRuntimeEditorPlugin(EditorNode::get_singleton())));
+	EditorNode::get_singleton()->add_editor_plugin(memnew(SpineEditorPlugin(EditorNode::get_singleton())));
 }
 
 #endif
@@ -79,12 +77,11 @@ void register_spine_godot_types() {
 	ClassDB::register_class<SpineAtlasResource>();
 	ClassDB::register_class<SpineSkeletonFileResource>();
 	ClassDB::register_class<SpineSkeletonDataResource>();
-	ClassDB::register_class<SpineNewSkeletonDataResource>();
-	ClassDB::register_class<SpineAnimationStateDataResource>();
+	ClassDB::register_class<SpineSkeletonDataResource>();
 	ClassDB::register_class<SpineSprite>();
-	ClassDB::register_class<SpineNewSprite>();
+	ClassDB::register_class<SpineSprite>();
 	ClassDB::register_class<SpineSkeleton>();
-	ClassDB::register_class<SpineNewSkeleton>();
+	ClassDB::register_class<SpineSkeleton>();
 	ClassDB::register_class<SpineAnimationState>();
 	ClassDB::register_class<SpineAnimation>();
 	ClassDB::register_class<SpineEventData>();
@@ -101,12 +98,11 @@ void register_spine_godot_types() {
 	ClassDB::register_class<SpineTransformConstraintData>();
 	ClassDB::register_class<SpinePathConstraintData>();
 	ClassDB::register_class<SpineBone>();
-	ClassDB::register_class<SpineNewBone>();
+	ClassDB::register_class<SpineBone>();
 	ClassDB::register_class<SpineSlot>();
 	ClassDB::register_class<SpineIkConstraint>();
 	ClassDB::register_class<SpinePathConstraint>();
 	ClassDB::register_class<SpineTransformConstraint>();
-	ClassDB::register_class<SpineSpriteMeshInstance2D>();
 	ClassDB::register_class<SpineTimeline>();
 	ClassDB::register_class<SpineConstant>();
 	ClassDB::register_class<SpineCollisionShapeProxy>();

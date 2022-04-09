@@ -37,5 +37,4 @@ struct SpineRendererObject {
 	Ref<Texture> normal_map;
 };
 
-
 #endif

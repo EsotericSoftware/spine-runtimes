@@ -30,16 +30,10 @@
 #ifndef GODOT_SPINEBONE_H
 #define GODOT_SPINEBONE_H
 
-#include "core/variant_parser.h"
-#include <scene/2d/node_2d.h>
-
 #include <scene/2d/node_2d.h>
 #include <spine/spine.h>
 
 #include "SpineBoneData.h"
-#include "SpineIkConstraint.h"
-#include "SpinePathConstraint.h"
-#include "SpineTransformConstraint.h"
 
 class SpineSkeleton;
 class SpineSprite;
@@ -52,8 +46,7 @@ protected:
 
 private:
 	spine::Bone *bone;
-
-	SpineSprite *the_sprite;
+	SpineSprite* sprite;
 
 public:
 	SpineBone();
@@ -62,11 +55,12 @@ public:
 	inline void set_spine_object(spine::Bone *b) {
 		bone = b;
 	}
+
 	inline spine::Bone *get_spine_object() {
 		return bone;
 	}
 
-	void set_spine_sprite(SpineSprite *s);
+	void set_spine_sprite(SpineSprite* sprite);
 
 	void update_world_transform();
 

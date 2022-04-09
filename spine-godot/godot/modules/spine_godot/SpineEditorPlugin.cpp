@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 #ifdef TOOLS_ENABLED
-#include "SpineRuntimeEditorPlugin.h"
+#include "SpineEditorPlugin.h"
 
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
@@ -72,17 +72,17 @@ Error SpineBinaryResourceImportPlugin::import(const String &p_source_file, const
 	return err;
 }
 
-//=======================| SpineRuntimeEditorPlugin |============================
-SpineRuntimeEditorPlugin::SpineRuntimeEditorPlugin(EditorNode *p_node) {
+//=======================| SpineEditorPlugin |============================
+SpineEditorPlugin::SpineEditorPlugin(EditorNode *p_node) {
 	add_import_plugin(memnew(SpineAtlasResourceImportPlugin));
 	add_import_plugin(memnew(SpineJsonResourceImportPlugin));
 	add_import_plugin(memnew(SpineBinaryResourceImportPlugin));
 }
 
-SpineRuntimeEditorPlugin::~SpineRuntimeEditorPlugin() {
+SpineEditorPlugin::~SpineEditorPlugin() {
 }
 
-bool SpineRuntimeEditorPlugin::handles(Object *p_object) const {
+bool SpineEditorPlugin::handles(Object *p_object) const {
 	return p_object->is_class("SpineSprite");
 }
 
