@@ -1,7 +1,7 @@
 [gd_resource type="SpineNewSkeletonDataResource" load_steps=3 format=2]
 
 [ext_resource path="res://assets/spineboy/spineboy.atlas" type="SpineAtlasResource" id=1]
-[ext_resource path="res://assets/spineboy/spineboy-pro.skel" type="SpineSkeletonFileResource" id=2]
+[ext_resource path="res://assets/spineboy/spineboy-pro.json" type="SpineSkeletonFileResource" id=2]
 
 [resource]
 atlas_res = ExtResource( 1 )

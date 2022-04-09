@@ -30,11 +30,12 @@
 #ifndef GODOT_SPINENEWSPRITE_H
 #define GODOT_SPINENEWSPRITE_H
 
-#include <scene/resources/texture.h>
+#include "scene/2d/node_2d.h"
+#include "scene/resources/texture.h"
 
 #include "SpineNewSkeleton.h"
 #include "SpineNewAnimationState.h"
-#include "SpineSpriteMeshInstance2D.h"
+#include "scene/2d/mesh_instance_2d.h"
 
 class SpineNewSprite : public Node2D, public spine::AnimationStateListenerObject {
 	GDCLASS(SpineNewSprite, Node2D);
@@ -69,8 +70,9 @@ private:
 
 	ProcessMode process_mode;
 
-	Vector<SpineSpriteMeshInstance2D *> mesh_instances;
+	Vector<MeshInstance2D *> mesh_instances;
 	spine::SkeletonClipping *skeleton_clipper;
+	static Ref<CanvasItemMaterial> materials[4];
 
 public:
 	SpineNewSprite();
@@ -82,11 +84,10 @@ public:
 	Ref<SpineNewSkeleton> get_skeleton();
 	Ref<SpineNewAnimationState> get_animation_state();
 
-	void gen_mesh_from_skeleton(Ref<SpineNewSkeleton> s);
-	void remove_mesh_instances();
-	void remove_redundant_mesh_instances();
+	void generate_meshes_for_slots(Ref<SpineNewSkeleton> skeleton_ref);
+	void remove_meshes();
 
-	void update_mesh_from_skeleton(Ref<SpineNewSkeleton> s);
+	void update_meshes(Ref<SpineNewSkeleton> s);
 
 	void update_bind_slot_nodes();
 	void update_bind_slot_node_transform(Ref<SpineBone> bone, Node2D *node2d);
