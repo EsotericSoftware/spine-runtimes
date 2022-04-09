@@ -2,7 +2,7 @@
   <tool name="scons debug" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="true" showConsoleOnStdOut="false" showConsoleOnStdErr="false" synchronizeAfterRun="true">
     <exec>
       <option name="COMMAND" value="scons" />
-      <option name="PARAMETERS" value="target=debug -j8" />
+      <option name="PARAMETERS" value="target=debug custom_modules=&quot;../spine_godot&quot; -j8" />
       <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
     </exec>
   </tool>

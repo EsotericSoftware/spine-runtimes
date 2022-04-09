@@ -1,13 +1,11 @@
 #!/bin/bash
 set -e
-git clean -x -f -d
-cp -r ../spine-cpp/spine-cpp godot/modules/spine_godot
-git clone --depth 1 https://github.com/godotengine/godot.git -b 3.4.4-stable godot-copy
-rm -rf godot-copy/.git
-cp -r godot-copy/* godot
-rm -rf godot-copy
+#git clean -x -f -d
+git clone --depth 1 https://github.com/godotengine/godot.git -b 3.4.4-stable
 cp -r .idea godot
+cp custom.py godot
+cp -r ../spine-cpp/spine-cpp spine_godot
 pushd godot
-scons -Q compiledb
-scons target=debug --jobs=$(sysctl -n hw.logicalcpu)
+scons -Q compiledb custom_modules="../spine_godot"
+scons target=debug custom_modules="../spine_godot" --jobs=$(sysctl -n hw.logicalcpu)
 popd

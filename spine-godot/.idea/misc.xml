@@ -12,6 +12,8 @@
       </CompDBProjectSettings>
     </option>
   </component>
-  <component name="CompDBWorkspace" PROJECT_DIR="$PROJECT_DIR$" />
+  <component name="CompDBWorkspace" PROJECT_DIR="$PROJECT_DIR$">
+    <contentRoot DIR="$PROJECT_DIR$/.." />
+  </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
 </project>

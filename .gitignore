@@ -164,12 +164,8 @@ spine-cocos2dx/example-v4/build-macos
 spine-cocos2dx/example/build-ios
 spine-cocos2dx/example/proj.android/app/.cxx
 spine-cocos2dx/example/build-win
-spine-godot/godot/*
-!spine-godot/godot/modules/
-spine-godot/godot/modules/*
-!spine-godot/godot/modules/spine_godot/
-spine-godot/godot/modules/spine_godot/*.o
-spine-godot/godot/modules/spine_godot/__pycache__
-spine-godot/godot/modules/spine_godot/spine-cpp
-spine-godot/godot/modules/godot-copy
+spine-godot/godot
+spine-godot/spine_godot/*.o
+spine-godot/spine_godot/spine-cpp
+spine-godot/spine_godot/__pycache__
 spine-godot/example/.import
