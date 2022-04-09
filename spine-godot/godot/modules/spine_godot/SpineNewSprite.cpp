@@ -598,7 +598,7 @@ bool SpineNewSprite::_set(const StringName &p_property, const Variant &p_value) 
 Rect2 SpineNewSprite::_edit_get_rect() const {
 	if (skeleton_data_res.is_valid() && skeleton_data_res->is_skeleton_data_loaded()) {
 		auto data = skeleton_data_res->get_skeleton_data();
-		return Rect2(data->getX(), data->getY() - data->getHeight(), data->getWidth(), data->getHeight());
+		return Rect2(data->getX(), -data->getY() - data->getHeight(), data->getWidth(), data->getHeight());
 	}
 
 	return Node2D::_edit_get_rect();
