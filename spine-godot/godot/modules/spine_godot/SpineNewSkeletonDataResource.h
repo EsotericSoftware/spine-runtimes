@@ -41,9 +41,9 @@ public:
 	void set_skeleton_file_res(const Ref<SpineSkeletonFileResource> &skeleton_file);
 	Ref<SpineSkeletonFileResource> get_skeleton_file_res();
 
-	inline spine::SkeletonData *get_skeleton_data() { return skeleton_data; }
+	inline spine::SkeletonData *get_skeleton_data() const { return skeleton_data; }
 
-	inline spine::AnimationStateData *get_animation_state_data() { return animation_state_data; }
+	inline spine::AnimationStateData *get_animation_state_data() const { return animation_state_data; }
 
 	void get_animation_names(Vector<String> &animation_names) const;
 

@@ -111,6 +111,11 @@ public:
 
 	ProcessMode get_process_mode();
 	void set_process_mode(ProcessMode v);
+
+#ifdef TOOLS_ENABLED
+	virtual Rect2 _edit_get_rect() const;
+	virtual bool _edit_use_rect() const;
+#endif
 };
 
 VARIANT_ENUM_CAST(SpineNewSprite::ProcessMode);
