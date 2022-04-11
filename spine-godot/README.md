@@ -14,13 +14,13 @@ For the official legal terms governing the Spine Runtimes, please read the [Spin
 
 ## Spine version
 
-spine-godot works with data exported from Spine 4.0.xx.
+spine-godot works with data exported from Spine 4.2.xx.
 
-spine-godot supports all Spine features.
+spine-godot supports all Spine features, except two-color tinting and the screen blend mode.
 
 ## Setup
 
-spine-godot works with the latest stable Godot 3.3 release. It requires compilation of Godot, as spine-godot is implemented as a module.
+spine-godot works with the latest stable Godot 3.4 release. It requires compilation of Godot, as spine-godot is implemented as a module.
 
 To integrate spine-godot into your project:
 
@@ -32,7 +32,16 @@ To integrate spine-godot into your project:
 The resulting Godot engine binary will include the spine-godot runtime.
 
 ## Example
-The Spine Godot example work on all platforms supported by Godot.
+Install the [software required to build Godot] for your operating system. This generally means:
+
+1. Git
+1. A C++ compiler (MSVC, Clang, GCC)
+1. Python 3+
+1. Scons
+
+Then execute the `setup.bat` file on Windows, or the `setup.sh` file on Linux and macOS. After the script completes, you should find the Godot editor binary in `spine-runtimes/spine-godot/godot/bin`. Run it, and open the Godot example project in `spine-runtimes/spine-godot/example`.
+
+
 
 
 
