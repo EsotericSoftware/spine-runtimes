@@ -169,3 +169,4 @@ spine-godot/spine_godot/*.o
 spine-godot/spine_godot/spine-cpp
 spine-godot/spine_godot/__pycache__
 spine-godot/example/.import
+spine-godot/spine_godot/*.obj
