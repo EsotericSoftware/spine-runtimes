@@ -4,7 +4,4 @@ git clone --depth 1 https://github.com/godotengine/godot.git -b 3.4.4-stable
 xcopy /E /I .idea godot\.idea
 copy custom.py godot
 xcopy /E /I ..\spine-cpp\spine-cpp spine_godot\spine-cpp
-cd godot
-scons -Q compiledb custom_modules="../spine_godot"
-scons target=debug custom_modules="../spine_godot" --jobs=8
-cd ..
+cd godot & scons target=debug compiledb custom_modules=../spine_godot --jobs=8 & scons target=debug custom_modules=../spine_godot --jobs=8 & cd ..
