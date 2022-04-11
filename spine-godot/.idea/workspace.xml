@@ -61,6 +61,9 @@
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
   </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="c2b84taq" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -82,13 +85,23 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="CLionExternalConfigurable" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Custom Build Application.godot debug Windows">
     <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="godot debug" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--editor --path $ProjectFileDir$/../example" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="godot" TARGET_NAME="scons debug" CONFIG_NAME="scons debug" RUN_PATH="$PROJECT_DIR$/bin/godot.osx.tools.64">
+    <configuration name="godot debug Linux" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--editor --path $ProjectFileDir$/../example" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="godot" TARGET_NAME="scons debug macOS/Linux" CONFIG_NAME="scons debug macOS/Linux" RUN_PATH="$PROJECT_DIR$/bin/godot.linux.tools.64">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="godot debug Windows" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--editor --path $ProjectFileDir$/../example" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="godot" TARGET_NAME="scons debug Windows" CONFIG_NAME="scons debug Windows" RUN_PATH="$PROJECT_DIR$/bin/godot.windows.tools.64.exe">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="godot debug macOS" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--editor --path $ProjectFileDir$/../example" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="godot" TARGET_NAME="scons debug macOS/Linux" CONFIG_NAME="scons debug macOS/Linux" RUN_PATH="$PROJECT_DIR$/bin/godot.osx.tools.64">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
       </method>
@@ -98,6 +111,11 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="Custom Build Application.godot debug macOS" />
+      <item itemvalue="Custom Build Application.godot debug Linux" />
+      <item itemvalue="Custom Build Application.godot debug Windows" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -114,5 +132,16 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/../spine_godot/register_types.cpp</url>
+          <line>76</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
