@@ -1,12 +1,10 @@
-#!/bin/bash
-set -e
 git clean -x -f -d
-rm -rf godot
+rmdir godot /s /q
 git clone --depth 1 https://github.com/godotengine/godot.git -b 3.4.4-stable
-cp -r .idea godot
-cp custom.py godot
-cp -r ../spine-cpp/spine-cpp spine_godot
-pushd godot
+xcopy /E /I .idea godot\.idea
+copy custom.py godot
+xcopy /E /I ..\spine-cpp\spine-cpp spine_godot\spine-cpp
+cd godot
 scons -Q compiledb custom_modules="../spine_godot"
 scons target=debug custom_modules="../spine_godot" --jobs=8
-popd
+cd ..
