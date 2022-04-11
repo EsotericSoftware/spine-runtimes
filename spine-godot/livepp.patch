@@ -1,25 +1,31 @@
-From 3077827d8145f4689b6f43db9924dd71d9963b5d Mon Sep 17 00:00:00 2001
-From: badlogic <badlogicgames@gmail.com>
-Date: Mon, 11 Apr 2022 13:33:10 +0200
-Subject: [PATCH] Add support for Live++ on Windows
-
-When the LIVEPP_PATH environment variable is set, the build adds a CPPDEFINE called LIVEPP_PATH, which then triggers setup, synchronization, and tear down of Live++.
-
-Improve inclusion of Live++ API header as per PR review.
-
-Still requires a separate wide char version of _MKSTR as that's what lpp::lppLoadAndRegister requires.
-
-Use build option livepp instead of environment variable LIVEPP_PATH
-
-E.g. `scons livepp=c:/tools/LivePP`
----
- platform/windows/detect.py         | 13 ++++++++++++-
- platform/windows/godot_windows.cpp | 20 ++++++++++++++++++++
- platform/windows/os_windows.cpp    |  8 ++++++++
- 3 files changed, 40 insertions(+), 1 deletion(-)
-
+diff --git a/platform/windows/os_windows.cpp b/platform/windows/os_windows.cpp
+index 8b28cbf1f23d6574aac41a3676fea64ddf786fc4..0124d4ac9652df9ba682ab8cc18b4008461d74cf 100644
+--- a/platform/windows/os_windows.cpp
++++ b/platform/windows/os_windows.cpp
+@@ -53,6 +53,11 @@
+ #include <regstr.h>
+ #include <shlobj.h>
+ 
++#ifdef LIVEPP_PATH
++#include "API/LPP_API.h"
++extern HMODULE livePP;
++#endif
++
+ static const WORD MAX_CONSOLE_LINES = 1500;
+ 
+ extern "C" {
+@@ -3371,6 +3376,9 @@ void OS_Windows::run() {
+ 		process_events(); // get rid of pending events
+ 		if (Main::iteration())
+ 			break;
++#ifdef LIVEPP_PATH
++		lpp::lppSyncPoint(livePP);
++#endif
+ 	};
+ 
+ 	main_loop->finish();
 diff --git a/platform/windows/detect.py b/platform/windows/detect.py
-index 249a0d2e79..fb42edff8b 100644
+index e4facad816b7584fe38dc760356310e0a3937288..2d9da3df65cd3a0b0882ace984002320ebf6c3fc 100644
 --- a/platform/windows/detect.py
 +++ b/platform/windows/detect.py
 @@ -44,7 +44,7 @@ def can_build():
@@ -31,7 +37,7 @@ index 249a0d2e79..fb42edff8b 100644
  
      mingw32 = ""
      mingw64 = ""
-@@ -73,6 +73,7 @@ def get_opts():
+@@ -72,6 +72,7 @@ def get_opts():
          BoolVariable("use_thinlto", "Use ThinLTO", False),
          BoolVariable("use_static_cpp", "Link MinGW/MSVC C++ runtime libraries statically", True),
          BoolVariable("use_asan", "Use address sanitizer (ASAN)", False),
@@ -39,7 +45,7 @@ index 249a0d2e79..fb42edff8b 100644
      ]
  
  
-@@ -309,6 +310,16 @@ def configure_msvc(env, manual_msvc_config):
+@@ -296,6 +297,18 @@ def configure_msvc(env, manual_msvc_config):
  
      env.AppendUnique(LINKFLAGS=["/STACK:" + str(STACK_SIZE)])
  
@@ -53,11 +59,13 @@ index 249a0d2e79..fb42edff8b 100644
 +            env.AppendUnique(LINKFLAGS=["/FUNCTIONPADMIN"])
 +        else:
 +            print("Live++ can only be used with targets 'debug' and 'release_debug'")
++    else:
++        print("No Live++ specified.")
  
  def configure_mingw(env):
      # Workaround for MinGW. See:
 diff --git a/platform/windows/godot_windows.cpp b/platform/windows/godot_windows.cpp
-index ad4e3ae77c..0974d3d9ae 100644
+index d7d9e4eace00a696abbb47cb9632f40e183a4ec4..e362320e51c725cd01f292887bd93442752c1c48 100644
 --- a/platform/windows/godot_windows.cpp
 +++ b/platform/windows/godot_windows.cpp
 @@ -34,6 +34,11 @@
@@ -75,7 +83,7 @@ index ad4e3ae77c..0974d3d9ae 100644
 @@ -136,6 +141,16 @@ char *wc_to_utf8(const wchar_t *wc) {
  }
  
- int widechar_main(int argc, wchar_t **argv) {
+ __declspec(dllexport) int widechar_main(int argc, wchar_t **argv) {
 +#ifdef LIVEPP_PATH
 +#define _MKSTR_L(x) _STR_L(x)
 +#define _STR_L(x) L#x
@@ -86,10 +94,10 @@ index ad4e3ae77c..0974d3d9ae 100644
 +#undef _STR_L
 +#endif
 +
- 	OS_Windows os(nullptr);
+ 	OS_Windows os(NULL);
  
  	setlocale(LC_CTYPE, "");
-@@ -173,6 +188,11 @@ int widechar_main(int argc, wchar_t **argv) {
+@@ -170,6 +185,11 @@ __declspec(dllexport) int widechar_main(int argc, wchar_t **argv) {
  	}
  	delete[] argv_utf8;
  
@@ -99,34 +107,5 @@ index ad4e3ae77c..0974d3d9ae 100644
 +#endif
 +
  	return os.get_exit_code();
- }
+ };
  
-diff --git a/platform/windows/os_windows.cpp b/platform/windows/os_windows.cpp
-index b4669e452a..42f675598a 100644
---- a/platform/windows/os_windows.cpp
-+++ b/platform/windows/os_windows.cpp
-@@ -53,6 +53,11 @@
- #include <regstr.h>
- #include <shlobj.h>
- 
-+#ifdef LIVEPP_PATH
-+#include "API/LPP_API.h"
-+extern HMODULE livePP;
-+#endif
-+
- extern "C" {
- __declspec(dllexport) DWORD NvOptimusEnablement = 1;
- __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
-@@ -677,6 +682,9 @@ void OS_Windows::run() {
- 		if (Main::iteration()) {
- 			break;
- 		}
-+#ifdef LIVEPP_PATH
-+		lpp::lppSyncPoint(livePP);
-+#endif
- 	}
- 
- 	main_loop->finalize();
--- 
-2.27.0.windows.1
-

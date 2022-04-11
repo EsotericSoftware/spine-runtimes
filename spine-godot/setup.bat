@@ -1,4 +1,3 @@
-git clean -x -f -d
 rmdir godot /s /q
 git clone --depth 1 https://github.com/godotengine/godot.git -b 3.4.4-stable
 xcopy /E /I .idea godot\.idea

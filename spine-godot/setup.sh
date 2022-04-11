@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-git clean -x -f -d
 rm -rf godot
 git clone --depth 1 https://github.com/godotengine/godot.git -b 3.4.4-stable
 cp -r .idea godot
