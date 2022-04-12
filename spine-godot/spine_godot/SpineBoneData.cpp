@@ -28,7 +28,6 @@
  *****************************************************************************/
 
 #include "SpineBoneData.h"
-#include <spine/BoneData.h>
 #include "common.h"
 
 void SpineBoneData::_bind_methods() {

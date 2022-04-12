@@ -41,16 +41,15 @@ class SpineConstraintData : public Reference {
 
 protected:
 	static void _bind_methods();
-
-private:
+	
 	spine::ConstraintData *constraint_data;
 
 public:
 	SpineConstraintData();
 	~SpineConstraintData();
 
-	void set_spine_object(spine::ConstraintData *c) {
-		constraint_data = c;
+	void set_spine_object(spine::ConstraintData *_constraint_data) {
+		constraint_data = _constraint_data;
 	}
 	
 	spine::ConstraintData *get_spine_object() {

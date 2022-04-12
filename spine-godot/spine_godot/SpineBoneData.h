@@ -32,10 +32,7 @@
 
 #include "core/reference.h"
 #include "SpineConstant.h"
-
-namespace spine {
-	class BoneData;
-}
+#include <spine/BoneData.h>
 
 class SpineBoneData : public Reference {
 	GDCLASS(SpineBoneData, Reference);
