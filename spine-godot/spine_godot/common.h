@@ -1,5 +1,5 @@
-/******************************************************************************
- * Spine Runtimes License Agreement
+﻿/******************************************************************************
+* Spine Runtimes License Agreement
  * Last updated January 1, 2020. Replaces all prior versions.
  *
  * Copyright (c) 2013-2020, Esoteric Software LLC
@@ -27,59 +27,15 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEANIMATIONSTATE_H
-#define GODOT_SPINEANIMATIONSTATE_H
+#ifndef SPINE_COMMON_H
+#define SPINE_COMMON_H
 
-#include "SpineSkeleton.h"
-#include "SpineTrackEntry.h"
+#include "core/error_macros.h"
 
-class SpineAnimationState : public Reference {
-	GDCLASS(SpineAnimationState, Reference)
+#define SPINE_CHECK(obj, ret) \
+ if (!(obj)) { \
+  ERR_PRINT("Native Spine object not set."); \
+  return ret; \
+ }
 
-protected:
-	static void _bind_methods();
-
-private:
-	spine::AnimationState *animation_state;
-	Ref<SpineSkeletonDataResource> skeleton_data_res;
-
-public:
-	SpineAnimationState();
-	~SpineAnimationState();
-	
-	spine::AnimationState *get_spine_object() { return animation_state; }
-
-	void set_skeleton_data_res(Ref<SpineSkeletonDataResource> skeleton_data_res);
-	
-	Ref<SpineSkeletonDataResource> get_skeleton_data_res() const;
-
-	void update(float delta);
-
-	bool apply(Ref<SpineSkeleton> skeleton);
-
-	void clear_tracks();
-
-	void clear_track(uint64_t track_id);
-
-	Ref<SpineTrackEntry> set_animation(const String &animation_name, bool loop, uint64_t track_id);
-
-	Ref<SpineTrackEntry> add_animation(const String &animation_name, float delay, bool loop, uint64_t track_id);
-
-	Ref<SpineTrackEntry> set_empty_animation(uint64_t track_id, float mix_duration);
-
-	Ref<SpineTrackEntry> add_empty_animation(uint64_t track_id, float mix_duration, float delay);
-	
-	void set_empty_animations(float mix_duration);
-
-	Ref<SpineTrackEntry> get_current(uint64_t track_index);
-
-	float get_time_scale();
-	
-	void set_time_scale(float time_scale);
-
-	void disable_queue();
-	
-	void enable_queue();
-};
-
-#endif//GODOT_SPINEANIMATIONSTATE_H
+#endif

@@ -27,23 +27,24 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#include "common.h"
 #include "SpineAnimationState.h"
 
 void SpineAnimationState::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("set_animation", "anim_name", "loop", "track_id"), &SpineAnimationState::set_animation, DEFVAL(true), DEFVAL(0));
 	ClassDB::bind_method(D_METHOD("update", "delta"), &SpineAnimationState::update, DEFVAL(0));
 	ClassDB::bind_method(D_METHOD("apply", "skeleton"), &SpineAnimationState::apply);
 	ClassDB::bind_method(D_METHOD("clear_tracks"), &SpineAnimationState::clear_tracks);
 	ClassDB::bind_method(D_METHOD("clear_track"), &SpineAnimationState::clear_track);
-	ClassDB::bind_method(D_METHOD("add_animation", "anim_name", "delay", "loop", "track_id"), &SpineAnimationState::add_animation, DEFVAL(0), DEFVAL(true), DEFVAL(0));
+	ClassDB::bind_method(D_METHOD("set_animation", "animation_name", "loop", "track_id"), &SpineAnimationState::set_animation, DEFVAL(true), DEFVAL(0));
+	ClassDB::bind_method(D_METHOD("add_animation", "animation_name", "delay", "loop", "track_id"), &SpineAnimationState::add_animation, DEFVAL(0), DEFVAL(true), DEFVAL(0));
 	ClassDB::bind_method(D_METHOD("set_empty_animation", "track_id", "mix_duration"), &SpineAnimationState::set_empty_animation);
 	ClassDB::bind_method(D_METHOD("add_empty_animation", "track_id", "mix_duration", "delay"), &SpineAnimationState::add_empty_animation);
 	ClassDB::bind_method(D_METHOD("set_empty_animations", "mix_duration"), &SpineAnimationState::set_empty_animations);
+	ClassDB::bind_method(D_METHOD("get_current", "track_id"), &SpineAnimationState::get_current);
 	ClassDB::bind_method(D_METHOD("get_time_scale"), &SpineAnimationState::get_time_scale);
 	ClassDB::bind_method(D_METHOD("set_time_scale", "time_scale"), &SpineAnimationState::set_time_scale);
 	ClassDB::bind_method(D_METHOD("disable_queue"), &SpineAnimationState::disable_queue);
 	ClassDB::bind_method(D_METHOD("enable_queue"), &SpineAnimationState::enable_queue);
-	ClassDB::bind_method(D_METHOD("get_current", "track_id"), &SpineAnimationState::get_current);
 }
 
 SpineAnimationState::SpineAnimationState() : animation_state(nullptr), skeleton_data_res(nullptr) {
@@ -65,107 +66,98 @@ Ref<SpineSkeletonDataResource> SpineAnimationState::get_skeleton_data_res() cons
 	return skeleton_data_res;
 }
 
-#define CHECK_V                                              \
-	if (!animation_state) {                                  \
-		ERR_PRINT("The animation state is not loaded yet!"); \
-		return;                                              \
-	}
-#define CHECK_X(x)                                           \
-	if (!animation_state) {                                  \
-		ERR_PRINT("The animation state is not loaded yet!"); \
-		return x;                                            \
-	}
-#define S_T(x) (spine::String(x.utf8()))
-Ref<SpineTrackEntry> SpineAnimationState::set_animation(const String &anim_name, bool loop, uint64_t track) {
-	CHECK_X(nullptr);
-	auto skeleton_data = animation_state->getData()->getSkeletonData();
-	auto anim = skeleton_data->findAnimation(anim_name.utf8().ptr());
-	if (!anim) {
-		ERR_PRINT(String("Can not find animation: ") + anim_name);
-		return nullptr;
-	}
-	auto entry = animation_state->setAnimation(track, anim, loop);
-	Ref<SpineTrackEntry> gd_entry(memnew(SpineTrackEntry));
-	gd_entry->set_spine_object(entry);
-	return gd_entry;
-}
-Ref<SpineTrackEntry> SpineAnimationState::add_animation(const String &anim_name, float delay, bool loop, uint64_t track) {
-	CHECK_X(nullptr);
-	auto skeleton_data = animation_state->getData()->getSkeletonData();
-	auto anim = skeleton_data->findAnimation(anim_name.utf8().ptr());
-	if (!anim) {
-		ERR_PRINT(String("Can not find animation: ") + anim_name);
-		return nullptr;
-	}
-	auto entry = animation_state->addAnimation(track, anim, loop, delay);
-	Ref<SpineTrackEntry> gd_entry(memnew(SpineTrackEntry));
-	gd_entry->set_spine_object(entry);
-	return gd_entry;
-}
-
-Ref<SpineTrackEntry> SpineAnimationState::set_empty_animation(uint64_t track_id, float mix_duration) {
-	CHECK_X(nullptr);
-	auto entry = animation_state->setEmptyAnimation(track_id, mix_duration);
-	Ref<SpineTrackEntry> gd_entry(memnew(SpineTrackEntry));
-	gd_entry->set_spine_object(entry);
-	return gd_entry;
-}
-Ref<SpineTrackEntry> SpineAnimationState::add_empty_animation(uint64_t track_id, float mix_duration, float delay) {
-	CHECK_X(nullptr);
-	auto entry = animation_state->addEmptyAnimation(track_id, mix_duration, delay);
-	Ref<SpineTrackEntry> gd_entry(memnew(SpineTrackEntry));
-	gd_entry->set_spine_object(entry);
-	return gd_entry;
-}
-void SpineAnimationState::set_empty_animations(float mix_duration) {
-	CHECK_V;
-	animation_state->setEmptyAnimations(mix_duration);
-}
-
 void SpineAnimationState::update(float delta) {
-	CHECK_V;
+	SPINE_CHECK(animation_state,)
 	animation_state->update(delta);
 }
+
 bool SpineAnimationState::apply(Ref<SpineSkeleton> skeleton) {
-	CHECK_X(false);
+	SPINE_CHECK(animation_state, false)
 	return animation_state->apply(*(skeleton->get_spine_object()));
 }
 
 void SpineAnimationState::clear_tracks() {
-	CHECK_V;
+	SPINE_CHECK(animation_state,)
 	animation_state->clearTracks();
 }
+
 void SpineAnimationState::clear_track(uint64_t track_id) {
-	CHECK_V;
+	SPINE_CHECK(animation_state,)
 	animation_state->clearTrack(track_id);
 }
 
+Ref<SpineTrackEntry> SpineAnimationState::set_animation(const String &animation_name, bool loop, uint64_t track) {
+	SPINE_CHECK(animation_state, nullptr)
+	auto skeleton_data = animation_state->getData()->getSkeletonData();
+	auto animation = skeleton_data->findAnimation(animation_name.utf8().ptr());
+	if (!animation) {
+		ERR_PRINT(String("Can not find animation: ") + animation_name);
+		return nullptr;
+	}
+	auto track_entry = animation_state->setAnimation(track, animation, loop);
+	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
+	track_entry_ref->set_spine_object(track_entry);
+	return track_entry_ref;
+}
+
+Ref<SpineTrackEntry> SpineAnimationState::add_animation(const String &animation_name, float delay, bool loop, uint64_t track) {
+	SPINE_CHECK(animation_state, nullptr)
+	auto skeleton_data = animation_state->getData()->getSkeletonData();
+	auto animation = skeleton_data->findAnimation(animation_name.utf8().ptr());
+	if (!animation) {
+		ERR_PRINT(String("Can not find animation: ") + animation_name);
+		return nullptr;
+	}
+	auto track_entry = animation_state->addAnimation(track, animation, loop, delay);
+	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
+	track_entry_ref->set_spine_object(track_entry);
+	return track_entry_ref;
+}
+
+Ref<SpineTrackEntry> SpineAnimationState::set_empty_animation(uint64_t track_id, float mix_duration) {
+	SPINE_CHECK(animation_state, nullptr)
+	auto track_entry = animation_state->setEmptyAnimation(track_id, mix_duration);
+	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
+	track_entry_ref->set_spine_object(track_entry);
+	return track_entry_ref;
+}
+Ref<SpineTrackEntry> SpineAnimationState::add_empty_animation(uint64_t track_id, float mix_duration, float delay) {
+	SPINE_CHECK(animation_state, nullptr)
+	auto track_entry = animation_state->addEmptyAnimation(track_id, mix_duration, delay);
+	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
+	track_entry_ref->set_spine_object(track_entry);
+	return track_entry_ref;
+}
+void SpineAnimationState::set_empty_animations(float mix_duration) {
+	SPINE_CHECK(animation_state,)
+	animation_state->setEmptyAnimations(mix_duration);
+}
+
+Ref<SpineTrackEntry> SpineAnimationState::get_current(uint64_t track_index) {
+	SPINE_CHECK(animation_state, nullptr)
+	auto track_entry = animation_state->getCurrent(track_index);
+	if (!track_entry) return nullptr;
+	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
+	track_entry_ref->set_spine_object(track_entry);
+	return track_entry_ref;
+}
+
 float SpineAnimationState::get_time_scale() {
-	CHECK_X(0);
+	SPINE_CHECK(animation_state, 0)
 	return animation_state->getTimeScale();
 }
+
 void SpineAnimationState::set_time_scale(float time_scale) {
-	CHECK_V;
+	SPINE_CHECK(animation_state,)
 	animation_state->setTimeScale(time_scale);
 }
 
 void SpineAnimationState::disable_queue() {
-	CHECK_V;
+	SPINE_CHECK(animation_state,)
 	animation_state->disableQueue();
 }
+
 void SpineAnimationState::enable_queue() {
-	CHECK_V;
+	SPINE_CHECK(animation_state,)
 	animation_state->enableQueue();
 }
-
-Ref<SpineTrackEntry> SpineAnimationState::get_current(uint64_t track_index) {
-	CHECK_X(nullptr);
-	Ref<SpineTrackEntry> gd_entry(memnew(SpineTrackEntry));
-	auto entry = animation_state->getCurrent(track_index);
-	if (entry == nullptr) return nullptr;
-	gd_entry->set_spine_object(entry);
-	return gd_entry;
-}
-
-#undef CHECK_V
-#undef CHECK_X

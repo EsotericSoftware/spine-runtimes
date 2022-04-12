@@ -51,10 +51,11 @@ public:
 	SpineAnimation();
 	~SpineAnimation();
 
-	inline void set_spine_object(spine::Animation *animation) { this->animation = animation; }
-	inline spine::Animation *get_spine_object() { return animation; }
+	void set_spine_object(spine::Animation *animation) { this->animation = animation; }
+	
+	spine::Animation *get_spine_object() { return animation; }
 
-	void apply(Ref<SpineSkeleton> skeleton, float lastTime, float time, bool loop, Array events, float alpha, SpineConstant::MixBlend blend, SpineConstant::MixDirection direction);
+	void apply(Ref<SpineSkeleton> skeleton, float last_time, float time, bool loop, Array events, float alpha, SpineConstant::MixBlend blend, SpineConstant::MixDirection direction);
 
 	Array get_timelines();
 
