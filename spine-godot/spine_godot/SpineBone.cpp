@@ -30,6 +30,7 @@
 #include "SpineBone.h"
 #include "SpineSprite.h"
 #include "SpineSkeleton.h"
+#include "common.h"
 
 void SpineBone::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update_world_transform"), &SpineBone::update_world_transform);
@@ -91,262 +92,345 @@ void SpineBone::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_world_scale_y"), &SpineBone::get_world_scale_y);
 	ClassDB::bind_method(D_METHOD("is_active"), &SpineBone::is_active);
 	ClassDB::bind_method(D_METHOD("set_active", "v"), &SpineBone::set_active);
+	ClassDB::bind_method(D_METHOD("apply_world_transform_2d", "node2d"), &SpineBone::apply_world_transform_2d);
 	ClassDB::bind_method(D_METHOD("get_godot_transform"), &SpineBone::get_godot_transform);
 	ClassDB::bind_method(D_METHOD("set_godot_transform", "local_transform"), &SpineBone::set_godot_transform);
 	ClassDB::bind_method(D_METHOD("get_godot_global_transform"), &SpineBone::get_godot_global_transform);
 	ClassDB::bind_method(D_METHOD("set_godot_global_transform", "global_transform"), &SpineBone::set_godot_global_transform);
-	ClassDB::bind_method(D_METHOD("apply_world_transform_2d", "node2d"), &SpineBone::apply_world_transform_2d);
 }
 
 SpineBone::SpineBone() : bone(nullptr), sprite(nullptr) {}
 
 SpineBone::~SpineBone() {}
 
-void SpineBone::set_spine_sprite(SpineSprite* sprite) {
-	this->sprite = sprite;
+void SpineBone::set_spine_sprite(SpineSprite* _sprite) {
+	this->sprite = _sprite;
 }
 
 void SpineBone::update_world_transform() {
+	SPINE_CHECK(bone,)
 	bone->updateWorldTransform();
 }
 
 void SpineBone::set_to_setup_pose() {
+	SPINE_CHECK(bone,)
 	bone->setToSetupPose();
 }
 
 Vector2 SpineBone::world_to_local(Vector2 world_position) {
+	SPINE_CHECK(bone, Vector2())
 	float x, y;
 	bone->worldToLocal(world_position.x, world_position.y, x, y);
 	return Vector2(x, y);
 }
 
 Vector2 SpineBone::local_to_world(Vector2 local_position) {
+	SPINE_CHECK(bone, Vector2())
 	float x, y;
 	bone->localToWorld(local_position.x, local_position.y, x, y);
 	return Vector2(x, y);
 }
 
 float SpineBone::world_to_local_rotation(float world_rotation) {
+	SPINE_CHECK(bone, 0)
 	return bone->worldToLocalRotation(world_rotation);
 }
 
 float SpineBone::local_to_world_rotation(float local_rotation) {
+	SPINE_CHECK(bone, 0)
 	return bone->localToWorldRotation(local_rotation);
 }
 
 void SpineBone::rotate_world(float degrees) {
+	SPINE_CHECK(bone,)
 	bone->rotateWorld(degrees);
 }
 
 float SpineBone::get_world_to_local_rotation_x() {
+	SPINE_CHECK(bone, 0)
 	return bone->getWorldToLocalRotationX();
 }
+
 float SpineBone::get_world_to_local_rotation_y() {
+	SPINE_CHECK(bone, 0)
 	return bone->getWorldToLocalRotationY();
 }
 
 Ref<SpineBoneData> SpineBone::get_data() {
-	auto &bd = bone->getData();
-	Ref<SpineBoneData> gd_bd(memnew(SpineBoneData));
-	gd_bd->set_spine_object(&bd);
-	return gd_bd;
+	SPINE_CHECK(bone, nullptr)
+	auto &bone_data = bone->getData();
+	Ref<SpineBoneData> bone_data_ref(memnew(SpineBoneData));
+	bone_data_ref->set_spine_object(&bone_data);
+	return bone_data_ref;
 }
 
 Ref<SpineSkeleton> SpineBone::get_skeleton() {
-	auto &s = bone->getSkeleton();
-	Ref<SpineSkeleton> gd_s(memnew(SpineSkeleton));
-	gd_s->set_spine_object(&s);
-	gd_s->set_spine_sprite(sprite);
-	return gd_s;
+	SPINE_CHECK(bone, nullptr)
+	auto &skeleton = bone->getSkeleton();
+	Ref<SpineSkeleton> skeleton_ref(memnew(SpineSkeleton));
+	skeleton_ref->set_spine_object(&skeleton);
+	skeleton_ref->set_spine_sprite(sprite);
+	return skeleton_ref;
 }
 
 Ref<SpineBone> SpineBone::get_parent() {
-	auto b = bone->getParent();
-	if (b == NULL) return NULL;
-	Ref<SpineBone> gd_b(memnew(SpineBone));
-	gd_b->set_spine_object(b);
-	gd_b->set_spine_sprite(sprite);
-	return gd_b;
+	SPINE_CHECK(bone, nullptr)
+	auto parent = bone->getParent();
+	if (!parent) return nullptr;
+	Ref<SpineBone> parent_ref(memnew(SpineBone));
+	parent_ref->set_spine_object(parent);
+	parent_ref->set_spine_sprite(sprite);
+	return parent_ref;
 }
 
 Array SpineBone::get_children() {
-	auto bs = bone->getChildren();
-	Array gd_bs;
-	gd_bs.resize(bs.size());
-	for (size_t i = 0; i < bs.size(); ++i) {
-		auto b = bs[i];
-		if (b == NULL) gd_bs[i] = Ref<SpineBone>(NULL);
-		Ref<SpineBone> gd_b(memnew(SpineBone));
-		gd_b->set_spine_object(b);
-		gd_b->set_spine_sprite(sprite);
-		gd_bs[i] = gd_b;
+	Array result;
+	SPINE_CHECK(bone, result)
+	auto children = bone->getChildren();
+	result.resize((int)children.size());
+	for (int i = 0; i < children.size(); ++i) {
+		auto child = children[i];
+		Ref<SpineBone> bone_ref(memnew(SpineBone));
+		bone_ref->set_spine_object(child);
+		bone_ref->set_spine_sprite(sprite);
+		result[i] = bone_ref;
 	}
-	return gd_bs;
+	return result;
 }
 
 float SpineBone::get_x() {
+	SPINE_CHECK(bone, 0)
 	return bone->getX();
 }
+
 void SpineBone::set_x(float v) {
+	SPINE_CHECK(bone,)
 	bone->setX(v);
 }
 
 float SpineBone::get_y() {
+	SPINE_CHECK(bone, 0)
 	return bone->getY();
 }
+
 void SpineBone::set_y(float v) {
+	SPINE_CHECK(bone,)
 	bone->setY(v);
 }
 
 float SpineBone::get_rotation() {
+	SPINE_CHECK(bone, 0)
 	return bone->getRotation();
 }
+
 void SpineBone::set_rotation(float v) {
+	SPINE_CHECK(bone,)
 	bone->setRotation(v);
 }
 
 float SpineBone::get_scale_x() {
+	SPINE_CHECK(bone, 0)
 	return bone->getScaleX();
 }
+
 void SpineBone::set_scale_x(float v) {
+	SPINE_CHECK(bone,)
 	bone->setScaleX(v);
 }
 
 float SpineBone::get_scale_y() {
+	SPINE_CHECK(bone, 0)
 	return bone->getScaleY();
 }
+
 void SpineBone::set_scale_y(float v) {
+	SPINE_CHECK(bone,)
 	bone->setScaleY(v);
 }
 
 float SpineBone::get_shear_x() {
+	SPINE_CHECK(bone, 0)
 	return bone->getShearX();
 }
+
 void SpineBone::set_shear_x(float v) {
+	SPINE_CHECK(bone,)
 	bone->setShearX(v);
 }
 
 float SpineBone::get_shear_y() {
+	SPINE_CHECK(bone, 0)
 	return bone->getShearY();
 }
+
 void SpineBone::set_shear_y(float v) {
+	SPINE_CHECK(bone,)
 	bone->setShearY(v);
 }
 
 float SpineBone::get_applied_rotation() {
+	SPINE_CHECK(bone, 0)
 	return bone->getAppliedRotation();
 }
+
 void SpineBone::set_applied_rotation(float v) {
+	SPINE_CHECK(bone,)
 	bone->setAppliedRotation(v);
 }
 
 float SpineBone::get_a_x() {
+	SPINE_CHECK(bone, 0)
 	return bone->getAX();
 }
+
 void SpineBone::set_a_x(float v) {
+	SPINE_CHECK(bone,)
 	bone->setAX(v);
 }
 
 float SpineBone::get_a_y() {
+	SPINE_CHECK(bone, 0)
 	return bone->getAY();
 }
+
 void SpineBone::set_a_y(float v) {
+	SPINE_CHECK(bone,)
 	bone->setAY(v);
 }
 
 float SpineBone::get_a_scale_x() {
+	SPINE_CHECK(bone, 0)
 	return bone->getAScaleX();
 }
+
 void SpineBone::set_a_scale_x(float v) {
+	SPINE_CHECK(bone,)
 	bone->setAScaleX(v);
 }
 
 float SpineBone::get_a_scale_y() {
+	SPINE_CHECK(bone, 0)
 	return bone->getAScaleY();
 }
+
 void SpineBone::set_a_scale_y(float v) {
+	SPINE_CHECK(bone,)
 	bone->setAScaleY(v);
 }
 
 float SpineBone::get_a_shear_x() {
+	SPINE_CHECK(bone, 0)
 	return bone->getAShearX();
 }
+
 void SpineBone::set_a_shear_x(float v) {
+	SPINE_CHECK(bone,)
 	bone->setAShearX(v);
 }
 
 float SpineBone::get_a_shear_y() {
+	SPINE_CHECK(bone, 0)
 	return bone->getAShearY();
 }
+
 void SpineBone::set_a_shear_y(float v) {
+	SPINE_CHECK(bone,)
 	bone->setAShearY(v);
 }
 
 float SpineBone::get_a() {
+	SPINE_CHECK(bone, 0)
 	return bone->getA();
 }
+
 void SpineBone::set_a(float v) {
+	SPINE_CHECK(bone,)
 	bone->setA(v);
 }
 
 float SpineBone::get_b() {
+	SPINE_CHECK(bone, 0)
 	return bone->getB();
 }
+
 void SpineBone::set_b(float v) {
+	SPINE_CHECK(bone,)
 	bone->setB(v);
 }
 
 float SpineBone::get_c() {
+	SPINE_CHECK(bone, 0)
 	return bone->getC();
 }
+
 void SpineBone::set_c(float v) {
+	SPINE_CHECK(bone,)
 	bone->setC(v);
 }
 
 float SpineBone::get_d() {
+	SPINE_CHECK(bone, 0)
 	return bone->getD();
 }
+
 void SpineBone::set_d(float v) {
+	SPINE_CHECK(bone,)
 	bone->setD(v);
 }
 
 float SpineBone::get_world_x() {
+	SPINE_CHECK(bone, 0)
 	return bone->getWorldX();
 }
+
 void SpineBone::set_world_x(float v) {
+	SPINE_CHECK(bone,)
 	bone->setWorldX(v);
 }
 
 float SpineBone::get_world_y() {
+	SPINE_CHECK(bone, 0)
 	return bone->getWorldY();
 }
+
 void SpineBone::set_world_y(float v) {
+	SPINE_CHECK(bone,)
 	bone->setWorldY(v);
 }
 
 float SpineBone::get_world_rotation_x() {
+	SPINE_CHECK(bone, 0)
 	return bone->getWorldRotationX();
 }
+
 float SpineBone::get_world_rotation_y() {
+	SPINE_CHECK(bone, 0)
 	return bone->getWorldRotationY();
 }
 
+
 float SpineBone::get_world_scale_x() {
+	SPINE_CHECK(bone, 0)
 	return bone->getWorldScaleX();
 }
+
 float SpineBone::get_world_scale_y() {
+	SPINE_CHECK(bone, 0)
 	return bone->getWorldScaleY();
 }
 
 bool SpineBone::is_active() {
+	SPINE_CHECK(bone, false)
 	return bone->isActive();
 }
 void SpineBone::set_active(bool v) {
+	SPINE_CHECK(bone,)
 	bone->setActive(v);
 }
 
 // External feature functions
 void SpineBone::apply_world_transform_2d(Variant o) {
+	SPINE_CHECK(bone,)
 	if (o.get_type() == Variant::OBJECT) {
 		auto node = (Node *) o;
 		if (node->is_class("Node2D")) {
@@ -366,75 +450,68 @@ void SpineBone::apply_world_transform_2d(Variant o) {
 }
 
 Transform2D SpineBone::get_godot_transform() {
-	if (get_spine_object() == nullptr)
-		return Transform2D();
+	SPINE_CHECK(bone, Transform2D())
 	Transform2D trans;
 	trans.translate(get_x(), -get_y());
-	// It seems that spine uses degree for rotation
 	trans.rotate(Math::deg2rad(-get_rotation()));
 	trans.scale(Size2(get_scale_x(), get_scale_y()));
 	return trans;
 }
 
 void SpineBone::set_godot_transform(Transform2D trans) {
-	if (get_spine_object() == nullptr)
-		return;
+	SPINE_CHECK(bone,)
 	Vector2 position = trans.get_origin();
 	position.y *= -1;
 	real_t rotation = trans.get_rotation();
 	rotation = Math::rad2deg(-rotation);
-	Vector2 scale = trans.get_scale();
+	Vector2 scale_x_y = trans.get_scale();
 
 	set_x(position.x);
 	set_y(position.y);
 	set_rotation(rotation);
-	set_scale_x(scale.x);
-	set_scale_y(scale.y);
+	set_scale_x(scale_x_y.x);
+	set_scale_y(scale_x_y.y);
 }
 
 Transform2D SpineBone::get_godot_global_transform() {
-	if (get_spine_object() == nullptr)
-		return Transform2D();
-	if (sprite == nullptr)
-		return get_godot_transform();
-	Transform2D res = sprite->get_transform();
-	res.translate(get_world_x(), -get_world_y());
-	res.rotate(Math::deg2rad(-get_world_rotation_x()));
-	res.scale(Vector2(get_world_scale_x(), get_world_scale_y()));
-	auto p = sprite->get_parent() ? Object::cast_to<CanvasItem>(sprite->get_parent()) : nullptr;
-	if (p) {
-		return p->get_global_transform() * res;
+	SPINE_CHECK(bone, Transform2D())
+	if (!sprite) return get_godot_transform();
+	Transform2D result = sprite->get_transform();
+	result.translate(get_world_x(), -get_world_y());
+	result.rotate(Math::deg2rad(-get_world_rotation_x()));
+	result.scale(Vector2(get_world_scale_x(), get_world_scale_y()));
+	auto parent = sprite->get_parent() ? Object::cast_to<CanvasItem>(sprite->get_parent()) : nullptr;
+	if (parent) {
+		return parent->get_global_transform() * result;
 	}
-	return res;
+	return result;
 }
 
 void SpineBone::set_godot_global_transform(Transform2D transform) {
-	if (get_spine_object() == nullptr)
-		return;
-	if (sprite == nullptr)
-		set_godot_transform(transform);
+	SPINE_CHECK(bone,)
+	if (!sprite) set_godot_transform(transform);
 	transform = sprite->get_global_transform().affine_inverse() * transform;
 	Vector2 position = transform.get_origin();
 	real_t rotation = transform.get_rotation();
-	Vector2 scale = transform.get_scale();
+	Vector2 scale_x_y = transform.get_scale();
 	position.y *= -1;
 	auto parent = get_parent();
 	if (parent.is_valid()) {
 		position = parent->world_to_local(position);
 		if (parent->get_world_scale_x() != 0)
-			scale.x /= parent->get_world_scale_x();
+			scale_x_y.x /= parent->get_world_scale_x();
 		else
-			print_error("The parent scale.x is zero.");
+			ERR_PRINT("The parent scale.x is zero.");
 		if (parent->get_world_scale_y() != 0)
-			scale.y /= parent->get_world_scale_y();
+			scale_x_y.y /= parent->get_world_scale_y();
 		else
-			print_error("The parent scale.y is zero.");
+			ERR_PRINT("The parent scale.y is zero.");
 	}
 	rotation = world_to_local_rotation(Math::rad2deg(-rotation));
 
 	set_x(position.x);
 	set_y(position.y);
 	set_rotation(rotation);
-	set_scale_x(scale.x);
-	set_scale_y(scale.y);
+	set_scale_x(scale_x_y.x);
+	set_scale_y(scale_x_y.y);
 }
