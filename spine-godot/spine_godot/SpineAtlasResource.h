@@ -30,14 +30,11 @@
 #ifndef GODOT_SPINEATLASRESOURCE_H
 #define GODOT_SPINEATLASRESOURCE_H
 
-
-#include <spine/Atlas.h>
-
 #include "core/io/resource_loader.h"
 #include "core/io/resource_saver.h"
 #include "core/io/image_loader.h"
+#include <spine/Atlas.h>
 
-class spine::Atlas;
 class GodotSpineTextureLoader;
 
 class SpineAtlasResource : public Resource {

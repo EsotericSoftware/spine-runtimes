@@ -31,6 +31,7 @@
 #define GODOT_SPINEIKCONSTRAINT_H
 
 #include "SpineIkConstraintData.h"
+#include <spine/IkConstraint.h>
 
 class SpineBone;
 

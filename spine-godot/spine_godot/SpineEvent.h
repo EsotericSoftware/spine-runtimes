@@ -31,6 +31,8 @@
 #define GODOT_SPINEEVENT_H
 
 #include "SpineEventData.h"
+#include "core/reference.h"
+#include <spine/Event.h>
 
 class SpineEvent : public Reference {
 	GDCLASS(SpineEvent, Reference)
