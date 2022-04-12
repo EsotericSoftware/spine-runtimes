@@ -30,9 +30,8 @@
 #ifndef GODOT_SPINEEVENTDATA_H
 #define GODOT_SPINEEVENTDATA_H
 
-#include "core/variant_parser.h"
-
-#include <spine/spine.h>
+#include "core/reference.h"
+#include <spine/EventData.h>
 
 class SpineEventData : public Reference {
 	GDCLASS(SpineEventData, Reference);

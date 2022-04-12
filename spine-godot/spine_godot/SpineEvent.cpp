@@ -28,10 +28,11 @@
  *****************************************************************************/
 
 #include "SpineEvent.h"
+#include <spine/Event.h>
+#include "common.h"
 
 void SpineEvent::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_data"), &SpineEvent::get_data);
-	ClassDB::bind_method(D_METHOD("get_event_name"), &SpineEvent::get_event_name);
 	ClassDB::bind_method(D_METHOD("get_time"), &SpineEvent::get_time);
 	ClassDB::bind_method(D_METHOD("get_int_value"), &SpineEvent::get_int_value);
 	ClassDB::bind_method(D_METHOD("set_int_value", "v"), &SpineEvent::set_int_value);
@@ -43,68 +44,72 @@ void SpineEvent::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_volume", "v"), &SpineEvent::set_volume);
 	ClassDB::bind_method(D_METHOD("get_balance"), &SpineEvent::get_balance);
 	ClassDB::bind_method(D_METHOD("set_balance", "v"), &SpineEvent::set_balance);
-	//
-	//	BIND_ENUM_CONSTANT(EVENTTYPE_START);
-	//	BIND_ENUM_CONSTANT(EVENTTYPE_INTERRUPT);
-	//	BIND_ENUM_CONSTANT(EVENTTYPE_END);
-	//	BIND_ENUM_CONSTANT(EVENTTYPE_COMPLETE);
-	//	BIND_ENUM_CONSTANT(EVENTTYPE_DISPOSE);
-	//	BIND_ENUM_CONSTANT(EVENTTYPE_EVENT);
 }
 
-SpineEvent::SpineEvent() : event(NULL) {}
-SpineEvent::~SpineEvent() {}
+SpineEvent::SpineEvent() : event(nullptr) {
+}
+
+SpineEvent::~SpineEvent() {
+}
 
 Ref<SpineEventData> SpineEvent::get_data() {
+	SPINE_CHECK(event, nullptr)
 	Ref<SpineEventData> event_data(memnew(SpineEventData));
 	event_data->set_spine_object(&(event->getData()));
 	return event_data;
 }
 
-String SpineEvent::get_event_name() {
-	return event->getData().getName().buffer();
-}
-
 float SpineEvent::get_time() {
+	SPINE_CHECK(event, 0)
 	return event->getTime();
 }
 
 int SpineEvent::get_int_value() {
+	SPINE_CHECK(event, 0)
 	return event->getIntValue();
 }
 
 void SpineEvent::set_int_value(int v) {
+	SPINE_CHECK(event,)
 	event->setIntValue(v);
 }
 
 float SpineEvent::get_float_value() {
+	SPINE_CHECK(event, 0)
 	return event->getFloatValue();
 }
 
 void SpineEvent::set_float_value(float v) {
+	SPINE_CHECK(event,)
 	event->setFloatValue(v);
 }
 
 String SpineEvent::get_string_value() {
+	SPINE_CHECK(event, "")
 	return event->getStringValue().buffer();
 }
 
 void SpineEvent::set_string_value(const String &v) {
+	SPINE_CHECK(event,)
 	event->setStringValue(spine::String(v.utf8()));
 }
 
 float SpineEvent::get_volume() {
+	SPINE_CHECK(event, 0)
 	return event->getVolume();
 }
 
 void SpineEvent::set_volume(float v) {
+	SPINE_CHECK(event,)
 	event->setVolume(v);
 }
 
 float SpineEvent::get_balance() {
+	SPINE_CHECK(event, 0)
 	return event->getBalance();
 }
 
 void SpineEvent::set_balance(float v) {
+	SPINE_CHECK(event,)
 	event->setBalance(v);
 }
