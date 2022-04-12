@@ -45,7 +45,7 @@ public:
 	SpineEvent();
 	~SpineEvent();
 
-	void set_spine_object(spine::Event *e) { event = e; }
+	void set_spine_object(spine::Event *_event) { event = _event; }
 
 	spine::Event *get_spine_object() const { return event; }
 	
@@ -55,23 +55,23 @@ public:
 
 	int get_int_value();
 	
-	void set_int_value(int inValue);
+	void set_int_value(int v);
 
 	float get_float_value();
 	
-	void set_float_value(float inValue);
+	void set_float_value(float v);
 
 	String get_string_value();
 	
-	void set_string_value(const String &inValue);
+	void set_string_value(const String &v);
 
 	float get_volume();
 	
-	void set_volume(float inValue);
+	void set_volume(float v);
 
 	float get_balance();
 	
-	void set_balance(float inValue);
+	void set_balance(float v);
 };
 
 #endif//GODOT_SPINEEVENT_H

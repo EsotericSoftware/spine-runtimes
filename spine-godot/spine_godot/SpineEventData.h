@@ -40,18 +40,37 @@ protected:
 	static void _bind_methods();
 
 private:
-	const spine::EventData *event_data;
+	spine::EventData *event_data;
 
 public:
 	SpineEventData();
 	~SpineEventData();
 
-	inline void set_spine_object(const spine::EventData *e) {
-		event_data = e;
-	}
-	inline const spine::EventData *get_spine_object() {
-		return event_data;
-	}
+	void set_spine_object(spine::EventData *_event_data) { event_data = _event_data; }
+
+	spine::EventData *get_spine_object() const { return event_data; }
+
+	String get_event_name();
+
+	int get_int_value();
+	
+	void set_int_value(int v);
+
+	float get_float_value();
+	
+	void set_float_value(float v);
+
+	String get_string_value();
+	
+	void set_string_value(const String &v);
+
+	float get_volume();
+	
+	void set_volume(float v);
+
+	float get_balance();
+	
+	void set_balance(float v);
 };
 
 #endif//GODOT_SPINEEVENTDATA_H

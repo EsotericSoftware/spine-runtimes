@@ -55,7 +55,7 @@ SpineEvent::~SpineEvent() {
 Ref<SpineEventData> SpineEvent::get_data() {
 	SPINE_CHECK(event, nullptr)
 	Ref<SpineEventData> event_data(memnew(SpineEventData));
-	event_data->set_spine_object(&(event->getData()));
+	event_data->set_spine_object((spine::EventData*)&(event->getData()));
 	return event_data;
 }
 
