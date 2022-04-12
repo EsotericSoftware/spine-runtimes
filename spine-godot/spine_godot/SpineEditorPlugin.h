@@ -34,43 +34,53 @@
 #include "editor/editor_node.h"
 
 class SpineAtlasResourceImportPlugin : public EditorImportPlugin {
-	GDCLASS(SpineAtlasResourceImportPlugin, EditorImportPlugin);
+	GDCLASS(SpineAtlasResourceImportPlugin, EditorImportPlugin)
 
 public:
 	String get_importer_name() const override { return "spine.atlas"; }
+	
 	String get_visible_name() const override { return "Spine Runtime Atlas"; }
-	void get_recognized_extensions(List<String> *p_extensions) const override { p_extensions->push_back("atlas"); }
-	String get_preset_name(int p_idx) const override {
-		if (p_idx == 0) return "Default";
-		else
-			return "Unknown";
-	}
+	
+	void get_recognized_extensions(List<String> *extensions) const override { extensions->push_back("atlas"); }
+	
+	String get_preset_name(int idx) const override { return idx == 0 ? "Default" : "Unknown"; }
+	
 	int get_preset_count() const override { return 1; }
+	
 	String get_save_extension() const override { return "spatlas"; }
+	
 	String get_resource_type() const override { return "SpineAtlasResource"; }
-	void get_import_options(List<ImportOption> *r_options, int p_preset) const override;
-	bool get_option_visibility(const String &p_option, const Map<StringName, Variant> &p_options) const override { return true; }
-	Error import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) override;
+	
+	void get_import_options(List<ImportOption> *options, int preset) const override;
+	
+	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
+	
+	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 };
 
 class SpineJsonResourceImportPlugin : public EditorImportPlugin {
-	GDCLASS(SpineJsonResourceImportPlugin, EditorImportPlugin);
+	GDCLASS(SpineJsonResourceImportPlugin, EditorImportPlugin)
 
 public:
 	String get_importer_name() const override { return "spine.json"; }
-	String get_visible_name() const override { return "Spine Runtime Json"; }
-	void get_recognized_extensions(List<String> *p_extensions) const override { p_extensions->push_back("json"); }
-	String get_preset_name(int p_idx) const override {
-		if (p_idx == 0) return "Default";
-		else
-			return "Unknown";
-	}
+	
+	String get_visible_name() const override { return "Spine Skeleton Json"; }
+	
+	void get_recognized_extensions(List<String> *extensions) const override { extensions->push_back("json"); }
+	
+	String get_preset_name(int idx) const override { return idx == 0 ? "Default" : "Unknown"; }
+	
 	int get_preset_count() const override { return 1; }
+	
 	String get_save_extension() const override { return "spjson"; }
+	
 	String get_resource_type() const override { return "SpineSkeletonFileResource"; }
-	void get_import_options(List<ImportOption> *r_options, int p_preset) const override {}
-	bool get_option_visibility(const String &p_option, const Map<StringName, Variant> &p_options) const override { return true; }
-	Error import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) override;
+	
+	void get_import_options(List<ImportOption> *options, int preset) const override {}
+	
+	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
+	
+	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 };
 
 class SpineBinaryResourceImportPlugin : public EditorImportPlugin {
@@ -78,31 +88,38 @@ class SpineBinaryResourceImportPlugin : public EditorImportPlugin {
 
 public:
 	String get_importer_name() const override { return "spine.skel"; }
-	String get_visible_name() const override { return "Spine Runtime Binary"; }
-	void get_recognized_extensions(List<String> *p_extensions) const override { p_extensions->push_back("skel"); }
-	String get_preset_name(int p_idx) const override {
-		if (p_idx == 0) return "Default";
-		else
-			return "Unknown";
-	}
+
+	String get_visible_name() const override { return "Spine Skeleton Binary"; }
+
+	void get_recognized_extensions(List<String> *extensions) const override { extensions->push_back("skel"); }
+
+	String get_preset_name(int idx) const override { return idx == 0 ? "Default" : "Unknown"; }
+
 	int get_preset_count() const override { return 1; }
+
 	String get_save_extension() const override { return "spskel"; }
+
 	String get_resource_type() const override { return "SpineSkeletonFileResource"; }
-	void get_import_options(List<ImportOption> *r_options, int p_preset) const override {}
-	bool get_option_visibility(const String &p_option, const Map<StringName, Variant> &p_options) const override { return true; }
-	Error import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) override;
+
+	void get_import_options(List<ImportOption> *options, int preset) const override {}
+
+	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
+
+	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 };
 
 class SpineEditorPlugin : public EditorPlugin {
-	GDCLASS(SpineEditorPlugin, EditorPlugin);
+	GDCLASS(SpineEditorPlugin, EditorPlugin)
 
 public:
-	SpineEditorPlugin(EditorNode *p_node);
+	SpineEditorPlugin(EditorNode *node);
 	~SpineEditorPlugin();
 
 	String get_name() const override { return "SpineEditorPlugin"; }
+	
 	bool has_main_screen() const { return false; }
-	bool handles(Object *p_object) const override;
+	
+	bool handles(Object *object) const override;
 };
 #endif
 

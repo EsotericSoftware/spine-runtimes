@@ -33,47 +33,46 @@
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
 
-Error SpineAtlasResourceImportPlugin::import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) {
-	Ref<SpineAtlasResource> res(memnew(SpineAtlasResource));
-	res->set_normal_texture_prefix(p_options["normal_texture_prefix"]);
-	res->load_from_atlas_file(p_source_file);
+Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+	Ref<SpineAtlasResource> atlas(memnew(SpineAtlasResource));
+	atlas->set_normal_texture_prefix(options["normal_map_prefix"]);
+	atlas->load_from_atlas_file(source_file);
 
-	String file_name = vformat("%s.%s", p_save_path, get_save_extension());
-	auto err = ResourceSaver::save(file_name, res);
-	return err;
+	String file_name = vformat("%s.%s", save_path, get_save_extension());
+	auto error = ResourceSaver::save(file_name, atlas);
+	return error;
 }
 
-void SpineAtlasResourceImportPlugin::get_import_options(List<ImportOption> *r_options, int p_preset) const {
-	if (p_preset == 0) {
+void SpineAtlasResourceImportPlugin::get_import_options(List<ImportOption> *options, int preset) const {
+	if (preset == 0) {
 		ImportOption op;
-		op.option.name = "normal_texture_prefix";
+		op.option.name = "normal_map_prefix";
 		op.option.type = Variant::STRING;
 		op.option.hint_string = "String";
 		op.default_value = String("n");
-		r_options->push_back(op);
+		options->push_back(op);
 	}
 }
 
-Error SpineJsonResourceImportPlugin::import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) {
-	Ref<SpineSkeletonFileResource> res(memnew(SpineSkeletonFileResource));
-	res->load_from_file(p_source_file);
+Error SpineJsonResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+	Ref<SpineSkeletonFileResource> skeleton_file_res(memnew(SpineSkeletonFileResource));
+	skeleton_file_res->load_from_file(source_file);
 
-	String file_name = vformat("%s.%s", p_save_path, get_save_extension());
-	auto err = ResourceSaver::save(file_name, res);
-	return err;
+	String file_name = vformat("%s.%s", save_path, get_save_extension());
+	auto error = ResourceSaver::save(file_name, skeleton_file_res);
+	return error;
 }
 
-Error SpineBinaryResourceImportPlugin::import(const String &p_source_file, const String &p_save_path, const Map<StringName, Variant> &p_options, List<String> *r_platform_variants, List<String> *r_gen_files, Variant *r_metadata) {
-	Ref<SpineSkeletonFileResource> res(memnew(SpineSkeletonFileResource));
-	res->load_from_file(p_source_file);
+Error SpineBinaryResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+	Ref<SpineSkeletonFileResource> skeleton_file_res(memnew(SpineSkeletonFileResource));
+	skeleton_file_res->load_from_file(source_file);
 
-	String file_name = vformat("%s.%s", p_save_path, get_save_extension());
-	auto err = ResourceSaver::save(file_name, res);
-	return err;
+	String file_name = vformat("%s.%s", save_path, get_save_extension());
+	auto error = ResourceSaver::save(file_name, skeleton_file_res);
+	return error;
 }
 
-//=======================| SpineEditorPlugin |============================
-SpineEditorPlugin::SpineEditorPlugin(EditorNode *p_node) {
+SpineEditorPlugin::SpineEditorPlugin(EditorNode *node) {
 	add_import_plugin(memnew(SpineAtlasResourceImportPlugin));
 	add_import_plugin(memnew(SpineJsonResourceImportPlugin));
 	add_import_plugin(memnew(SpineBinaryResourceImportPlugin));
@@ -82,8 +81,8 @@ SpineEditorPlugin::SpineEditorPlugin(EditorNode *p_node) {
 SpineEditorPlugin::~SpineEditorPlugin() {
 }
 
-bool SpineEditorPlugin::handles(Object *p_object) const {
-	return p_object->is_class("SpineSprite");
+bool SpineEditorPlugin::handles(Object *object) const {
+	return object->is_class("SpineSprite");
 }
 
 #endif
