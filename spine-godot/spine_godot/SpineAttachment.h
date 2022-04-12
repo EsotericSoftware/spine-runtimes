@@ -30,12 +30,11 @@
 #ifndef GODOT_SPINEATTACHMENT_H
 #define GODOT_SPINEATTACHMENT_H
 
-#include "core/variant_parser.h"
-
 #include <spine/spine.h>
+#include "core/reference.h"
 
 class SpineAttachment : public Reference {
-	GDCLASS(SpineAttachment, Reference);
+	GDCLASS(SpineAttachment, Reference)
 
 protected:
 	static void _bind_methods();
@@ -47,12 +46,12 @@ public:
 	SpineAttachment();
 	~SpineAttachment();
 
-	inline void set_spine_object(spine::Attachment *a) {
-		attachment = a;
-		if (attachment)
-			attachment->reference();
+	void set_spine_object(spine::Attachment *_attachment) {
+		attachment = _attachment;
+		if (attachment) attachment->reference();
 	}
-	inline spine::Attachment *get_spine_object() {
+
+	spine::Attachment *get_spine_object() {
 		return attachment;
 	}
 

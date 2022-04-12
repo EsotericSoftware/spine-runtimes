@@ -28,28 +28,30 @@
  *****************************************************************************/
 
 #include "SpineAttachment.h"
+#include "common.h"
 
 void SpineAttachment::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_attachment_name"), &SpineAttachment::get_attachment_name);
 	ClassDB::bind_method(D_METHOD("copy"), &SpineAttachment::copy);
 }
 
-SpineAttachment::SpineAttachment() : attachment(NULL) {}
+SpineAttachment::SpineAttachment() : attachment(nullptr) {
+}
+
 SpineAttachment::~SpineAttachment() {
-	if (attachment) {
-		attachment->dereference();
-		attachment = NULL;
-	}
+	if (attachment) attachment->dereference();
 }
 
 String SpineAttachment::get_attachment_name() {
+	SPINE_CHECK(attachment, "")
 	return attachment->getName().buffer();
 }
 
 Ref<SpineAttachment> SpineAttachment::copy() {
-	auto a = attachment->copy();
-	if (a == NULL) return NULL;
-	Ref<SpineAttachment> gd_attachment(memnew(SpineAttachment));
-	gd_attachment->set_spine_object(a);
-	return gd_attachment;
+	SPINE_CHECK(attachment, nullptr)
+	auto copy = attachment->copy();
+	if (!copy) return nullptr;
+	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
+	attachment_ref->set_spine_object(copy);
+	return attachment_ref;
 }
