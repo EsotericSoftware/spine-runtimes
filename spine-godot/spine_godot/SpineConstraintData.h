@@ -30,9 +30,11 @@
 #ifndef GODOT_SPINECONSTRAINTDATA_H
 #define GODOT_SPINECONSTRAINTDATA_H
 
-#include "core/variant_parser.h"
+#include "core/reference.h"
 
-#include <spine/spine.h>
+namespace spine {
+	class ConstraintData;
+}
 
 class SpineConstraintData : public Reference {
 	GDCLASS(SpineConstraintData, Reference);
@@ -47,19 +49,22 @@ public:
 	SpineConstraintData();
 	~SpineConstraintData();
 
-	inline void set_spine_object(spine::ConstraintData *c) {
+	void set_spine_object(spine::ConstraintData *c) {
 		constraint_data = c;
 	}
-	virtual inline spine::ConstraintData *get_spine_object() {
+	
+	spine::ConstraintData *get_spine_object() {
 		return constraint_data;
 	}
 
-	String get_constraint_data_name();
+	String get_constraint_name();
 
 	uint64_t get_order();
+	
 	void set_order(uint64_t v);
 
 	bool is_skin_required();
+	
 	void set_skin_required(bool v);
 };
 
