@@ -73,10 +73,19 @@ public:
 		Property_PathConstraintMix = 1 << 18,
 		Property_Sequence = 1 << 19
 	};
+
+	enum TransformMode {
+		TransformMode_Normal = 0,
+		TransformMode_OnlyTranslation,
+		TransformMode_NoRotationOrReflection,
+		TransformMode_NoScale,
+		TransformMode_NoScaleOrReflection
+	};
 };
 
 VARIANT_ENUM_CAST(SpineConstant::MixBlend);
 VARIANT_ENUM_CAST(SpineConstant::MixDirection);
 VARIANT_ENUM_CAST(SpineConstant::PropertyId);
+VARIANT_ENUM_CAST(SpineConstant::TransformMode);
 
 #endif//GODOT_SPINECONSTANT_H
