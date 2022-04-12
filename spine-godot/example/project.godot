@@ -11,7 +11,7 @@ config_version=4
 [application]
 
 config/name="spine-godot-examples"
-run/main_scene="res://tests/batch-test.tscn"
+run/main_scene="res://examples/simple-input/simple-input.tscn"
 run/low_processor_mode=true
 config/icon="res://icon.png"
 

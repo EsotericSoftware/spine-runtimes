@@ -29,10 +29,48 @@
 
 #include "SpineSkeletonDataResource.h"
 
-#ifdef TOOLS_ENABLED
-#include "editor/editor_node.h"
-#include "editor/editor_inspector.h"
-#endif
+void SpineAnimationMix::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("set_from", "from"), &SpineAnimationMix::set_from);
+	ClassDB::bind_method(D_METHOD("get_from"), &SpineAnimationMix::get_from);
+	ClassDB::bind_method(D_METHOD("set_to", "to"), &SpineAnimationMix::set_to);
+	ClassDB::bind_method(D_METHOD("get_to"), &SpineAnimationMix::get_to);
+	ClassDB::bind_method(D_METHOD("set_mix", "mix"), &SpineAnimationMix::set_mix);
+	ClassDB::bind_method(D_METHOD("get_mix"), &SpineAnimationMix::get_mix);
+
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "from"), "set_from", "get_from");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "to"), "set_to", "get_to");
+	ADD_PROPERTY(PropertyInfo(Variant::REAL, "mix"), "set_mix", "get_mix");
+}
+
+SpineAnimationMix::SpineAnimationMix() {
+}
+
+SpineAnimationMix::~SpineAnimationMix() {
+}
+
+void SpineAnimationMix::set_from(const StringName &from) {
+	this->from = from;
+}
+
+String SpineAnimationMix::get_from() {
+	return from;
+}
+
+void SpineAnimationMix::set_to(const StringName &to) {
+	this->to = to;
+}
+
+String SpineAnimationMix::get_to() {
+	return to;
+}
+
+void SpineAnimationMix::set_mix(float mix) {
+	this->mix = mix;
+}
+
+float SpineAnimationMix::get_mix() {
+	return mix;
+}
 
 void SpineSkeletonDataResource::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_skeleton_data_loaded"), &SpineSkeletonDataResource::is_skeleton_data_loaded);
@@ -40,6 +78,10 @@ void SpineSkeletonDataResource::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_atlas_res"), &SpineSkeletonDataResource::get_atlas_res);
 	ClassDB::bind_method(D_METHOD("set_skeleton_file_res", "skeleton_file_res"), &SpineSkeletonDataResource::set_skeleton_file_res);
 	ClassDB::bind_method(D_METHOD("get_skeleton_file_res"), &SpineSkeletonDataResource::get_skeleton_file_res);
+	ClassDB::bind_method(D_METHOD("set_default_mix", "default_mix"), &SpineSkeletonDataResource::set_default_mix);
+	ClassDB::bind_method(D_METHOD("get_default_mix"), &SpineSkeletonDataResource::get_default_mix);
+	ClassDB::bind_method(D_METHOD("set_animation_mixes", "mixes"), &SpineSkeletonDataResource::set_animation_mixes);
+	ClassDB::bind_method(D_METHOD("get_animation_mixes"), &SpineSkeletonDataResource::get_animation_mixes);
 
 	// Spine API
 	ClassDB::bind_method(D_METHOD("find_bone", "bone_name"), &SpineSkeletonDataResource::find_bone);
@@ -75,9 +117,12 @@ void SpineSkeletonDataResource::_bind_methods() {
 
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "atlas_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineAtlasResource"), "set_atlas_res", "get_atlas_res");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skeleton_file_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineSkeletonFileResource"), "set_skeleton_file_res", "get_skeleton_file_res");
+	ADD_PROPERTY(PropertyInfo(Variant::REAL, "default_mix"), "set_default_mix", "get_default_mix");
+	ADD_GROUP("Animation mixes", "");
+	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "animation_mixes"), "set_animation_mixes", "get_animation_mixes");
 }
 
-SpineSkeletonDataResource::SpineSkeletonDataResource() : skeleton_data(nullptr), animation_state_data(nullptr) {
+SpineSkeletonDataResource::SpineSkeletonDataResource() : skeleton_data(nullptr), animation_state_data(nullptr), default_mix(0) {
 }
 
 SpineSkeletonDataResource::~SpineSkeletonDataResource() {
@@ -137,6 +182,7 @@ void SpineSkeletonDataResource::set_atlas_res(const Ref<SpineAtlasResource> &atl
 	atlas_res = atlas;
 	update_skeleton_data();
 }
+
 Ref<SpineAtlasResource> SpineSkeletonDataResource::get_atlas_res() {
 	return atlas_res;
 }
@@ -145,6 +191,7 @@ void SpineSkeletonDataResource::set_skeleton_file_res(const Ref<SpineSkeletonFil
 	skeleton_file_res = skeleton_file;
 	update_skeleton_data();
 }
+
 Ref<SpineSkeletonFileResource> SpineSkeletonDataResource::get_skeleton_file_res() {
 	return skeleton_file_res;
 }
@@ -169,23 +216,21 @@ void SpineSkeletonDataResource::get_skin_names(Vector<String> &skin_names) const
 	}
 }
 
-void SpineSkeletonDataResource::_get_property_list(List<PropertyInfo> *p_list) const {
-	PropertyInfo property;
-	Vector<String> animation_names;
+void SpineSkeletonDataResource::set_default_mix(float default_mix) {
+	this->default_mix = default_mix;
+	if (animation_state_data) animation_state_data->setDefaultMix(default_mix);
+}
 
-	property.name = "animations";
-	property.type = Variant::STRING;
-	get_animation_names(animation_names);
-	property.hint_string = String(",").join(animation_names);
-	property.hint = PROPERTY_HINT_ENUM;
-	p_list->push_back(property);
+float SpineSkeletonDataResource::get_default_mix() {
+	return default_mix;
+}
 
-	property.name = "skins";
-	property.type = Variant::STRING;
-	get_skin_names(animation_names);
-	property.hint_string = String(",").join(animation_names);
-	property.hint = PROPERTY_HINT_ENUM;
-	p_list->push_back(property);
+void SpineSkeletonDataResource::set_animation_mixes(Array animation_mixes) {
+	this->animation_mixes = animation_mixes;
+}
+
+Array SpineSkeletonDataResource::get_animation_mixes() {
+	return animation_mixes;
 }
 
 #define CHECK(x)                                      \

@@ -73,11 +73,10 @@ void register_spine_godot_types() {
 #ifdef TOOLS_ENABLED
 	EditorNode::add_init_callback(editor_init_callback);
 #endif
-
 	ClassDB::register_class<SpineAtlasResource>();
 	ClassDB::register_class<SpineSkeletonFileResource>();
 	ClassDB::register_class<SpineSkeletonDataResource>();
-	ClassDB::register_class<SpineSkeletonDataResource>();
+	ClassDB::register_class<SpineAnimationMix>();
 	ClassDB::register_class<SpineSprite>();
 	ClassDB::register_class<SpineSprite>();
 	ClassDB::register_class<SpineSkeleton>();

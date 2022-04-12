@@ -76,13 +76,46 @@ SpineEditorPlugin::SpineEditorPlugin(EditorNode *node) {
 	add_import_plugin(memnew(SpineAtlasResourceImportPlugin));
 	add_import_plugin(memnew(SpineJsonResourceImportPlugin));
 	add_import_plugin(memnew(SpineBinaryResourceImportPlugin));
+	add_inspector_plugin(memnew(SpineAnimationMixesInspectorPlugin));
 }
 
 SpineEditorPlugin::~SpineEditorPlugin() {
 }
 
 bool SpineEditorPlugin::handles(Object *object) const {
-	return object->is_class("SpineSprite");
+	return object->is_class("SpineSprite") || object->is_class("SpineSkeletonDataResource");
+}
+
+SpineAnimationMixesInspectorPlugin::SpineAnimationMixesInspectorPlugin() {
+
+}
+
+SpineAnimationMixesInspectorPlugin::~SpineAnimationMixesInspectorPlugin() {
+
+}
+
+bool SpineAnimationMixesInspectorPlugin::can_handle(Object *object) {
+	return object->is_class("SpineSkeletonDataResource");
+}
+
+void SpineAnimationMixesInspectorPlugin::parse_begin(Object *object) {
+	EditorInspectorPlugin::parse_begin(object);
+}
+
+void SpineAnimationMixesInspectorPlugin::parse_category(Object *object, const String &parse_category) {
+	EditorInspectorPlugin::parse_category(object, parse_category);
+	if (parse_category == "Animation mixes") {
+
+	}
+}
+
+bool SpineAnimationMixesInspectorPlugin::parse_property(Object *object, Variant::Type type, const String &path,
+														PropertyHint hint, const String &hint_text, int usage) {
+	return false;
+}
+
+void SpineAnimationMixesInspectorPlugin::parse_end() {
+	EditorInspectorPlugin::parse_end();
 }
 
 #endif
