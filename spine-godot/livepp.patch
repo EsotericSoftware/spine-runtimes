@@ -1,29 +1,15 @@
-diff --git a/platform/windows/os_windows.cpp b/platform/windows/os_windows.cpp
-index 8b28cbf1f23d6574aac41a3676fea64ddf786fc4..0124d4ac9652df9ba682ab8cc18b4008461d74cf 100644
---- a/platform/windows/os_windows.cpp
-+++ b/platform/windows/os_windows.cpp
-@@ -53,6 +53,11 @@
- #include <regstr.h>
- #include <shlobj.h>
+diff --git a/methods.py b/methods.py
+index 9b8cb38c0c1c0fd4ba2917815fdfb7efafb4b646..874e10bcc637632db26b4ac062a5359cd44eaa25 100644
+--- a/methods.py
++++ b/methods.py
+@@ -688,6 +688,7 @@ def generate_vs_project(env, num_jobs):
+                 "target=$(Configuration)",
+                 "progress=no",
+                 "tools=!tools!",
++                "livepp=%s" % env["livepp"],
+                 "-j%s" % num_jobs,
+             ]
  
-+#ifdef LIVEPP_PATH
-+#include "API/LPP_API.h"
-+extern HMODULE livePP;
-+#endif
-+
- static const WORD MAX_CONSOLE_LINES = 1500;
- 
- extern "C" {
-@@ -3371,6 +3376,9 @@ void OS_Windows::run() {
- 		process_events(); // get rid of pending events
- 		if (Main::iteration())
- 			break;
-+#ifdef LIVEPP_PATH
-+		lpp::lppSyncPoint(livePP);
-+#endif
- 	};
- 
- 	main_loop->finish();
 diff --git a/platform/windows/detect.py b/platform/windows/detect.py
 index e4facad816b7584fe38dc760356310e0a3937288..2d9da3df65cd3a0b0882ace984002320ebf6c3fc 100644
 --- a/platform/windows/detect.py
@@ -109,3 +95,29 @@ index d7d9e4eace00a696abbb47cb9632f40e183a4ec4..e362320e51c725cd01f292887bd93442
  	return os.get_exit_code();
  };
  
+diff --git a/platform/windows/os_windows.cpp b/platform/windows/os_windows.cpp
+index 8b28cbf1f23d6574aac41a3676fea64ddf786fc4..0124d4ac9652df9ba682ab8cc18b4008461d74cf 100644
+--- a/platform/windows/os_windows.cpp
++++ b/platform/windows/os_windows.cpp
+@@ -53,6 +53,11 @@
+ #include <regstr.h>
+ #include <shlobj.h>
+ 
++#ifdef LIVEPP_PATH
++#include "API/LPP_API.h"
++extern HMODULE livePP;
++#endif
++
+ static const WORD MAX_CONSOLE_LINES = 1500;
+ 
+ extern "C" {
+@@ -3371,6 +3376,9 @@ void OS_Windows::run() {
+ 		process_events(); // get rid of pending events
+ 		if (Main::iteration())
+ 			break;
++#ifdef LIVEPP_PATH
++		lpp::lppSyncPoint(livePP);
++#endif
+ 	};
+ 
+ 	main_loop->finish();
