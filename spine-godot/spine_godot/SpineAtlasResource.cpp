@@ -27,20 +27,21 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "SpineAtlasResource.h"
 #include "core/io/json.h"
+#include "scene/resources/texture.h"
 
-#include <spine/Atlas.h>
+#include "SpineAtlasResource.h"
+#include "SpineRendererObject.h"
+#include <spine/TextureLoader.h>
 
 class GodotSpineTextureLoader : public spine::TextureLoader {
-private:
-	Array *textures, *normal_maps;
+
+	Array *textures;
+	Array *normal_maps;
 	String normal_map_prefix;
 
 public:
-	GodotSpineTextureLoader(Array *t, Array *nt, const String &p) : textures(t), normal_maps(nt), normal_map_prefix(p) {
-		if (textures) textures->clear();
-		if (normal_maps) normal_maps->clear();
+	GodotSpineTextureLoader(Array *_textures, Array *_normal_maps, const String &normal_map_prefix) : textures(_textures), normal_maps(_normal_maps), normal_map_prefix(normal_map_prefix) {
 	}
 
 	String fix_path(const String &path) {
@@ -62,55 +63,50 @@ public:
 	}
 
 	virtual void load(spine::AtlasPage &page, const spine::String &path) {
-		Error err = OK;
+		Error error = OK;
 		auto fixed_path = fix_path(String(path.buffer()));
 
-		Ref<Texture> texture = ResourceLoader::load(fixed_path, "", false, &err);
-		if (err != OK) {
-			print_error(vformat("Can't load texture: \"%s\"", String(path.buffer())));
-			page.setRendererObject((void *) memnew(SpineRendererObject{nullptr}));
+		Ref<Texture> texture = ResourceLoader::load(fixed_path, "", false, &error);
+		if (error != OK) {
+			ERR_PRINT(vformat("Can't load texture: \"%s\"", String(path.buffer())));
+			auto renderer_object = memnew(SpineRendererObject);
+			renderer_object->texture = nullptr;
+			renderer_object->normal_map = nullptr;
+			page.setRendererObject((void *) renderer_object);
 			return;
 		}
 
-		if (textures) textures->append(texture);
-		auto spine_renderer_object = memnew(SpineRendererObject);
-		spine_renderer_object->texture = texture;
+		textures->append(texture);
+		auto renderer_object = memnew(SpineRendererObject);
+		renderer_object->texture = texture;
+		renderer_object->normal_map = nullptr;
 
 		String temp_path = fixed_path;
 		String new_path = vformat("%s/%s_%s", temp_path.get_base_dir(), normal_map_prefix, temp_path.get_file());
 		if (ResourceLoader::exists(new_path)) {
 			Ref<Texture> normal_map = ResourceLoader::load(new_path);
-			if (normal_maps) normal_maps->append(normal_map);
-			spine_renderer_object->normal_map = normal_map;
+			normal_maps->append(normal_map);
+			renderer_object->normal_map = normal_map;
 		}
-
-		page.setRendererObject((void *) spine_renderer_object);
-
+		
+		page.setRendererObject((void *) renderer_object);
 		page.width = texture->get_width();
 		page.height = texture->get_height();
 	}
 
-	virtual void unload(void *p) {
-		auto spine_renderer_object = (SpineRendererObject *) p;
-		Ref<Texture> &texture = spine_renderer_object->texture;
+	virtual void unload(void *data) {
+		auto renderer_object = (SpineRendererObject *) data;
+		Ref<Texture> &texture = renderer_object->texture;
 		if (texture.is_valid()) texture.unref();
-		Ref<Texture> &normal_map = spine_renderer_object->normal_map;
+		Ref<Texture> &normal_map = renderer_object->normal_map;
 		if (normal_map.is_valid()) normal_map.unref();
-		memdelete(spine_renderer_object);
+		memdelete(renderer_object);
 	}
 };
 
-SpineAtlasResource::SpineAtlasResource() : atlas(nullptr), normal_texture_prefix("n") {}
-
-SpineAtlasResource::~SpineAtlasResource() {
-	if (atlas) delete atlas;
-}
-
 void SpineAtlasResource::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("load_from_atlas_file", "path"), &SpineAtlasResource::load_from_atlas_file);
-
 	ClassDB::bind_method(D_METHOD("get_source_path"), &SpineAtlasResource::get_source_path);
-
 	ClassDB::bind_method(D_METHOD("get_textures"), &SpineAtlasResource::get_textures);
 	ClassDB::bind_method(D_METHOD("get_normal_maps"), &SpineAtlasResource::get_normal_maps);
 
@@ -119,6 +115,22 @@ void SpineAtlasResource::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "normal_maps"), "", "get_normal_maps");
 }
 
+SpineAtlasResource::SpineAtlasResource() : atlas(nullptr), texture_loader(nullptr), normal_map_prefix("n") {
+}
+
+SpineAtlasResource::~SpineAtlasResource() {
+	delete atlas;
+	delete texture_loader;
+}
+
+void SpineAtlasResource::clear() {
+	delete atlas;
+	atlas = nullptr;
+	delete texture_loader;
+	texture_loader = nullptr;
+	textures.clear();
+	normal_maps.clear();
+}
 
 Array SpineAtlasResource::get_textures() {
 	return textures;
@@ -132,27 +144,24 @@ String SpineAtlasResource::get_source_path() {
 	return source_path;
 }
 
-Error SpineAtlasResource::load_from_atlas_file(const String &p_path) {
-	source_path = p_path;
+Error SpineAtlasResource::load_from_atlas_file(const String &path) {
 	Error err;
-
-	atlas_data = FileAccess::get_file_as_string(p_path, &err);
+	source_path = path;
+	atlas_data = FileAccess::get_file_as_string(path, &err);
 	if (err != OK) return err;
 
-	if (atlas) delete atlas;
-	textures.clear();
-	normal_maps.clear();
-	atlas = new spine::Atlas(atlas_data.utf8(), atlas_data.size(), source_path.get_base_dir().utf8(), new GodotSpineTextureLoader(&textures, &normal_maps, normal_texture_prefix));
+	clear();
+	texture_loader = new GodotSpineTextureLoader(&textures, &normal_maps, normal_map_prefix);
+	atlas = new spine::Atlas(atlas_data.utf8(), atlas_data.size(), source_path.get_base_dir().utf8(), texture_loader);
 	if (atlas) return OK;
 
-	textures.clear();
-	normal_maps.clear();
+	clear();
 	return ERR_FILE_UNRECOGNIZED;
 }
 
-Error SpineAtlasResource::load_from_file(const String &p_path) {
+Error SpineAtlasResource::load_from_file(const String &path) {
 	Error err;
-	String json_string = FileAccess::get_file_as_string(p_path, &err);
+	String json_string = FileAccess::get_file_as_string(path, &err);
 	if (err != OK) return err;
 
 	String error_string;
@@ -165,22 +174,20 @@ Error SpineAtlasResource::load_from_file(const String &p_path) {
 	Dictionary content = Dictionary(result);
 	source_path = content["source_path"];
 	atlas_data = content["atlas_data"];
-	normal_texture_prefix = content["normal_texture_prefix"];
+	normal_map_prefix = content["normal_texture_prefix"];
 
-	if (atlas) delete atlas;
-	textures.clear();
-	normal_maps.clear();
-	atlas = new spine::Atlas(atlas_data.utf8(), atlas_data.size(), source_path.get_base_dir().utf8(), new GodotSpineTextureLoader(&textures, &normal_maps, normal_texture_prefix));
+	clear();
+	texture_loader = new GodotSpineTextureLoader(&textures, &normal_maps, normal_map_prefix);
+	atlas = new spine::Atlas(atlas_data.utf8(), atlas_data.size(), source_path.get_base_dir().utf8(), texture_loader);
 	if (atlas) return OK;
 
-	textures.clear();
-	normal_maps.clear();
+	clear();
 	return ERR_FILE_UNRECOGNIZED;
 }
 
-Error SpineAtlasResource::save_to_file(const String &p_path) {
+Error SpineAtlasResource::save_to_file(const String &path) {
 	Error err;
-	FileAccess *file = FileAccess::open(p_path, FileAccess::WRITE, &err);
+	FileAccess *file = FileAccess::open(path, FileAccess::WRITE, &err);
 	if (err != OK) {
 		if (file) file->close();
 		return err;
@@ -189,51 +196,43 @@ Error SpineAtlasResource::save_to_file(const String &p_path) {
 	Dictionary content;
 	content["source_path"] = source_path;
 	content["atlas_data"] = atlas_data;
-	content["normal_texture_prefix"] = normal_texture_prefix;
-
+	content["normal_texture_prefix"] = normal_map_prefix;
 	file->store_string(JSON::print(content));
 	file->close();
-
 	return OK;
 }
 
-RES SpineAtlasResourceFormatLoader::load(const String &p_path, const String &p_original_path, Error *r_error) {
+RES SpineAtlasResourceFormatLoader::load(const String &path, const String &original_path, Error *error) {
 	Ref<SpineAtlasResource> atlas = memnew(SpineAtlasResource);
-	atlas->load_from_file(p_path);
-
-	if (r_error) {
-		*r_error = OK;
-	}
+	atlas->load_from_file(path);
+	if (error) *error = OK;
 	return atlas;
 }
 
-void SpineAtlasResourceFormatLoader::get_recognized_extensions(List<String> *r_extensions) const {
+void SpineAtlasResourceFormatLoader::get_recognized_extensions(List<String> *extensions) const {
 	const char atlas_ext[] = "spatlas";
-	if (!r_extensions->find(atlas_ext)) {
-		r_extensions->push_back(atlas_ext);
-	}
+	if (!extensions->find(atlas_ext))
+		extensions->push_back(atlas_ext);
 }
 
-String SpineAtlasResourceFormatLoader::get_resource_type(const String &p_path) const {
+String SpineAtlasResourceFormatLoader::get_resource_type(const String &path) const {
 	return "SpineAtlasResource";
 }
 
-bool SpineAtlasResourceFormatLoader::handles_type(const String &p_type) const {
-	return p_type == "SpineAtlasResource" || ClassDB::is_parent_class(p_type, "SpineAtlasResource");
+bool SpineAtlasResourceFormatLoader::handles_type(const String &type) const {
+	return type == "SpineAtlasResource" || ClassDB::is_parent_class(type, "SpineAtlasResource");
 }
 
-Error SpineAtlasResourceFormatSaver::save(const String &p_path, const RES &p_resource, uint32_t p_flags) {
-	Ref<SpineAtlasResource> res = p_resource.get_ref_ptr();
-	Error error = res->save_to_file(p_path);
-	return error;
+Error SpineAtlasResourceFormatSaver::save(const String &path, const RES &resource, uint32_t flags) {
+	Ref<SpineAtlasResource> res = resource.get_ref_ptr();
+	return res->save_to_file(path);
 }
 
-void SpineAtlasResourceFormatSaver::get_recognized_extensions(const RES &p_resource, List<String> *p_extensions) const {
-	if (Object::cast_to<SpineAtlasResource>(*p_resource)) {
-		p_extensions->push_back("spatlas");
-	}
+void SpineAtlasResourceFormatSaver::get_recognized_extensions(const RES &resource, List<String> *extensions) const {
+	if (Object::cast_to<SpineAtlasResource>(*resource))
+		extensions->push_back("spatlas");
 }
 
-bool SpineAtlasResourceFormatSaver::recognize(const RES &p_resource) const {
-	return Object::cast_to<SpineAtlasResource>(*p_resource) != nullptr;
+bool SpineAtlasResourceFormatSaver::recognize(const RES &resource) const {
+	return Object::cast_to<SpineAtlasResource>(*resource) != nullptr;
 }

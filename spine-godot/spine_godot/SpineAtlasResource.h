@@ -31,69 +31,79 @@
 #define GODOT_SPINEATLASRESOURCE_H
 
 
-#include "core/variant_parser.h"
+#include <spine/Atlas.h>
+
 #include "core/io/resource_loader.h"
 #include "core/io/resource_saver.h"
 #include "core/io/image_loader.h"
-#include "scene/resources/texture.h"
 
-#include <spine/SpineString.h>
-#include <spine/TextureLoader.h>
-#include <spine/Atlas.h>
-#include "SpineRendererObject.h"
+class spine::Atlas;
+class GodotSpineTextureLoader;
 
 class SpineAtlasResource : public Resource {
-	GDCLASS(SpineAtlasResource, Resource);
+	GDCLASS(SpineAtlasResource, Resource)
 
+	void clear();
+	
 protected:
 	static void _bind_methods();
 
 	spine::Atlas *atlas;
+	GodotSpineTextureLoader *texture_loader;
 
 	String source_path;
 	String atlas_data;
-	String normal_texture_prefix;
+	String normal_map_prefix;
 
 	Array textures;
 	Array normal_maps;
 
 public:
-	inline String &get_atlas_data() { return atlas_data; }
+	SpineAtlasResource();
+	
+	virtual ~SpineAtlasResource();
+	
+	String &get_atlas_data() { return atlas_data; }
 
-	inline spine::Atlas *get_spine_atlas() { return atlas; }
+	spine::Atlas *get_spine_atlas() { return atlas; }
 
-	inline void set_normal_texture_prefix(const String &p) { normal_texture_prefix = p; }
+	void set_normal_texture_prefix(const String &prefix) { normal_map_prefix = prefix; }
 
-	Error load_from_atlas_file(const String &p_path);// .atlas
+	Error load_from_atlas_file(const String &path);// .atlas
 
-	Error load_from_file(const String &p_path);// .spatlas
-	Error save_to_file(const String &p_path);  // .spatlas
+	Error load_from_file(const String &path); // .spatlas
+	
+	Error save_to_file(const String &path);  // .spatlas
 
 	String get_source_path();
+	
 	Array get_textures();
+	
 	Array get_normal_maps();
-
-	SpineAtlasResource();
-	virtual ~SpineAtlasResource();
 };
 
 class SpineAtlasResourceFormatLoader : public ResourceFormatLoader {
-	GDCLASS(SpineAtlasResourceFormatLoader, ResourceFormatLoader);
+	GDCLASS(SpineAtlasResourceFormatLoader, ResourceFormatLoader)
 
 public:
-	virtual RES load(const String &p_path, const String &p_original_path, Error *r_error = NULL);
-	virtual void get_recognized_extensions(List<String> *r_extensions) const;
-	virtual bool handles_type(const String &p_type) const;
-	virtual String get_resource_type(const String &p_path) const;
+	virtual RES load(const String &path, const String &original_path, Error *error = nullptr);
+	
+	virtual void get_recognized_extensions(List<String> *extensions) const;
+	
+	virtual bool handles_type(const String &type) const;
+	
+	virtual String get_resource_type(const String &path) const;
 };
 
 class SpineAtlasResourceFormatSaver : public ResourceFormatSaver {
-	GDCLASS(SpineAtlasResourceFormatSaver, ResourceFormatSaver);
+	GDCLASS(SpineAtlasResourceFormatSaver, ResourceFormatSaver)
 
 public:
-	Error save(const String &p_path, const RES &p_resource, uint32_t p_flags = 0) override;
-	void get_recognized_extensions(const RES &p_resource, List<String> *p_extensions) const override;
-	bool recognize(const RES &p_resource) const override;
+	Error save(const String &path, const RES &resource, uint32_t flags = 0) override;
+	
+	void get_recognized_extensions(const RES &resource, List<String> *extensions) const override;
+	
+	bool recognize(const RES &resource) const override;
 };
 
 

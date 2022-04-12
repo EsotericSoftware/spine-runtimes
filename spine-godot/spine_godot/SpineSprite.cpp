@@ -28,10 +28,10 @@
  *****************************************************************************/
 
 #include "SpineSprite.h"
-
 #include "SpineEvent.h"
 #include "SpineTrackEntry.h"
 #include "SpineSkeleton.h"
+#include "SpineRendererObject.h"
 
 Ref<CanvasItemMaterial> SpineSprite::materials[4] = {};
 static int sprite_count = 0;
