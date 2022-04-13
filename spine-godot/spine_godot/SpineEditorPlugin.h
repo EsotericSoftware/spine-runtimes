@@ -32,6 +32,8 @@
 
 #ifdef TOOLS_ENABLED
 #include "editor/editor_node.h"
+#include "SpineSprite.h"
+#include "editor/editor_properties.h"
 
 class SpineAtlasResourceImportPlugin : public EditorImportPlugin {
 	GDCLASS(SpineAtlasResourceImportPlugin, EditorImportPlugin)
@@ -125,15 +127,18 @@ public:
 class SpineAnimationMixesInspectorPlugin: public EditorInspectorPlugin {
 	GDCLASS(SpineAnimationMixesInspectorPlugin, EditorInspectorPlugin)
 
+	SpineSprite *sprite;
+
+	Button *add_mix_button;
+	Vector<Button *> delete_mix;
+
 public:
 	SpineAnimationMixesInspectorPlugin();
 	~SpineAnimationMixesInspectorPlugin() override;
 
 	bool can_handle(Object *object) override;
 	void parse_begin(Object *object) override;
-	void parse_category(Object *object, const String &parse_category) override;
 	bool parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, int usage) override;
-	void parse_end() override;
 };
 
 class SpineAnimationMixesProperty: public EditorProperty {
@@ -142,6 +147,16 @@ class SpineAnimationMixesProperty: public EditorProperty {
 public:
 	SpineAnimationMixesProperty();
 	~SpineAnimationMixesProperty();
+};
+
+class SpineEditorPropertyMix: public EditorProperty {
+	GDCLASS(SpineEditorPropertyMix, EditorProperty)
+
+	EditorPropertyText *from_property;
+	EditorPropertyText *to_property;
+	EditorPropertyFloat *mix_property;
+public:
+
 };
 #endif
 
