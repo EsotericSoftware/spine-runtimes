@@ -72,6 +72,7 @@ static void editor_init_callback() {
 void register_spine_godot_types() {
 #ifdef TOOLS_ENABLED
 	EditorNode::add_init_callback(editor_init_callback);
+	ClassDB::register_class<SpineEditorPropertyAnimationMixes>();
 #endif
 	ClassDB::register_class<SpineAtlasResource>();
 	ClassDB::register_class<SpineSkeletonFileResource>();

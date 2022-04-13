@@ -69,7 +69,7 @@ SpinePathConstraintData::SpinePathConstraintData() {}
 SpinePathConstraintData::~SpinePathConstraintData() {}
 
 Array SpinePathConstraintData::get_bones() {
-	auto bs = get_spine_data()->getBones();
+	auto bs = get_spine_constraint_data()->getBones();
 	Array gd_bs;
 	gd_bs.resize(bs.size());
 	for (size_t i = 0; i < bs.size(); ++i) {
@@ -84,7 +84,7 @@ Array SpinePathConstraintData::get_bones() {
 }
 
 Ref<SpineSlotData> SpinePathConstraintData::get_target() {
-	auto s = get_spine_data()->getTarget();
+	auto s = get_spine_constraint_data()->getTarget();
 	if (s == NULL) return NULL;
 	Ref<SpineSlotData> gd_s(memnew(SpineSlotData));
 	gd_s->set_spine_object(s);
@@ -92,77 +92,77 @@ Ref<SpineSlotData> SpinePathConstraintData::get_target() {
 }
 void SpinePathConstraintData::set_target(Ref<SpineSlotData> v) {
 	if (v.is_valid()) {
-		get_spine_data()->setTarget(v->get_spine_object());
+		get_spine_constraint_data()->setTarget(v->get_spine_object());
 	} else {
-		get_spine_data()->setTarget(NULL);
+		get_spine_constraint_data()->setTarget(NULL);
 	}
 }
 
 SpinePathConstraintData::PositionMode SpinePathConstraintData::get_position_mode() {
-	auto m = (int) get_spine_data()->getPositionMode();
+	auto m = (int) get_spine_constraint_data()->getPositionMode();
 	return (PositionMode) m;
 }
 void SpinePathConstraintData::set_position_mode(PositionMode v) {
 	auto m = (int) v;
-	get_spine_data()->setPositionMode((spine::PositionMode) m);
+	get_spine_constraint_data()->setPositionMode((spine::PositionMode) m);
 }
 
 SpinePathConstraintData::SpacingMode SpinePathConstraintData::get_spacing_mode() {
-	auto m = (int) get_spine_data()->getSpacingMode();
+	auto m = (int) get_spine_constraint_data()->getSpacingMode();
 	return (SpacingMode) m;
 }
 void SpinePathConstraintData::set_spacing_mode(SpacingMode v) {
 	auto m = (int) v;
-	get_spine_data()->setSpacingMode((spine::SpacingMode) m);
+	get_spine_constraint_data()->setSpacingMode((spine::SpacingMode) m);
 }
 
 SpinePathConstraintData::RotateMode SpinePathConstraintData::get_rotate_mode() {
-	auto m = (int) get_spine_data()->getRotateMode();
+	auto m = (int) get_spine_constraint_data()->getRotateMode();
 	return (RotateMode) m;
 }
 void SpinePathConstraintData::set_rotate_mode(RotateMode v) {
 	auto m = (int) v;
-	get_spine_data()->setRotateMode((spine::RotateMode) m);
+	get_spine_constraint_data()->setRotateMode((spine::RotateMode) m);
 }
 
 float SpinePathConstraintData::get_offset_rotation() {
-	return get_spine_data()->getOffsetRotation();
+	return get_spine_constraint_data()->getOffsetRotation();
 }
 void SpinePathConstraintData::set_offset_rotation(float v) {
-	get_spine_data()->setOffsetRotation(v);
+	get_spine_constraint_data()->setOffsetRotation(v);
 }
 
 float SpinePathConstraintData::get_position() {
-	return get_spine_data()->getPosition();
+	return get_spine_constraint_data()->getPosition();
 }
 void SpinePathConstraintData::set_position(float v) {
-	get_spine_data()->setPosition(v);
+	get_spine_constraint_data()->setPosition(v);
 }
 
 float SpinePathConstraintData::get_spacing() {
-	return get_spine_data()->getSpacing();
+	return get_spine_constraint_data()->getSpacing();
 }
 void SpinePathConstraintData::set_spacing(float v) {
-	get_spine_data()->setSpacing(v);
+	get_spine_constraint_data()->setSpacing(v);
 }
 
 float SpinePathConstraintData::get_mix_rotate() {
-	return get_spine_data()->getMixRotate();
+	return get_spine_constraint_data()->getMixRotate();
 }
 void SpinePathConstraintData::set_mix_rotate(float v) {
-	get_spine_data()->setMixRotate(v);
+	get_spine_constraint_data()->setMixRotate(v);
 }
 
 float SpinePathConstraintData::get_mix_x() {
-	return get_spine_data()->getMixX();
+	return get_spine_constraint_data()->getMixX();
 }
 void SpinePathConstraintData::set_mix_x(float v) {
-	get_spine_data()->setMixX(v);
+	get_spine_constraint_data()->setMixX(v);
 }
 
 float SpinePathConstraintData::get_mix_y() {
-	return get_spine_data()->getMixY();
+	return get_spine_constraint_data()->getMixY();
 }
 void SpinePathConstraintData::set_mix_y(float v) {
-	get_spine_data()->setMixY(v);
+	get_spine_constraint_data()->setMixY(v);
 }

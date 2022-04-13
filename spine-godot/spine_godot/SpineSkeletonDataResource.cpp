@@ -42,7 +42,7 @@ void SpineAnimationMix::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::REAL, "mix"), "set_mix", "get_mix");
 }
 
-SpineAnimationMix::SpineAnimationMix() {
+SpineAnimationMix::SpineAnimationMix(): from(""), to(""), mix(0) {
 }
 
 SpineAnimationMix::~SpineAnimationMix() {
@@ -118,7 +118,6 @@ void SpineSkeletonDataResource::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "atlas_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineAtlasResource"), "set_atlas_res", "get_atlas_res");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skeleton_file_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineSkeletonFileResource"), "set_skeleton_file_res", "get_skeleton_file_res");
 	ADD_PROPERTY(PropertyInfo(Variant::REAL, "default_mix"), "set_default_mix", "get_default_mix");
-	ADD_GROUP("Animation mixes", "");
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "animation_mixes"), "set_animation_mixes", "get_animation_mixes");
 }
 

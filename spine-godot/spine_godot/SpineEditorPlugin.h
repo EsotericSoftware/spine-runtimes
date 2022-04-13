@@ -29,6 +29,7 @@
 
 #ifndef GODOT_SPINEEDITORPLUGIN_H
 #define GODOT_SPINEEDITORPLUGIN_H
+#include "editor/editor_properties_array_dict.h"
 
 #ifdef TOOLS_ENABLED
 #include "editor/editor_node.h"
@@ -127,37 +128,31 @@ public:
 class SpineAnimationMixesInspectorPlugin: public EditorInspectorPlugin {
 	GDCLASS(SpineAnimationMixesInspectorPlugin, EditorInspectorPlugin)
 
-	SpineSprite *sprite;
-
-	Button *add_mix_button;
-	Vector<Button *> delete_mix;
-
 public:
-	SpineAnimationMixesInspectorPlugin();
-	~SpineAnimationMixesInspectorPlugin() override;
+	SpineAnimationMixesInspectorPlugin() = default;
 
 	bool can_handle(Object *object) override;
-	void parse_begin(Object *object) override;
 	bool parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, int usage) override;
 };
 
-class SpineAnimationMixesProperty: public EditorProperty {
-	GDCLASS(SpineAnimationMixesProperty, EditorProperty)
+class SpineEditorPropertyAnimationMixes: public EditorProperty {
+	GDCLASS(SpineEditorPropertyAnimationMixes, EditorProperty)
 
+	Ref<SpineSkeletonDataResource> skeleton_data;
+	VBoxContainer *container;
+	Button *add_mix_button;
+	Vector<HBoxContainer *> cells;
+	Vector<Button *> delete_mix;
+	bool updating;
+
+	static void _bind_methods();
+	void add_mix();
 public:
-	SpineAnimationMixesProperty();
-	~SpineAnimationMixesProperty();
+	SpineEditorPropertyAnimationMixes();
+	void setup(Ref<SpineSkeletonDataResource> skeleton_data) { this->skeleton_data = skeleton_data; };
+	virtual void update_property();
 };
 
-class SpineEditorPropertyMix: public EditorProperty {
-	GDCLASS(SpineEditorPropertyMix, EditorProperty)
-
-	EditorPropertyText *from_property;
-	EditorPropertyText *to_property;
-	EditorPropertyFloat *mix_property;
-public:
-
-};
 #endif
 
 #endif//GODOT_SPINEEDITORPLUGIN_H

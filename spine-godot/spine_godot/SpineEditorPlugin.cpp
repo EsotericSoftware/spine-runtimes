@@ -86,30 +86,75 @@ bool SpineEditorPlugin::handles(Object *object) const {
 	return object->is_class("SpineSprite") || object->is_class("SpineSkeletonDataResource");
 }
 
-SpineAnimationMixesInspectorPlugin::SpineAnimationMixesInspectorPlugin(): add_mix_button(nullptr) {
-	add_mix_button = memnew(Button);
-	add_mix_button->set_text("Add mix");
-}
-
-SpineAnimationMixesInspectorPlugin::~SpineAnimationMixesInspectorPlugin() {
-
-}
-
 bool SpineAnimationMixesInspectorPlugin::can_handle(Object *object) {
 	return object->is_class("SpineSkeletonDataResource");
 }
 
-void SpineAnimationMixesInspectorPlugin::parse_begin(Object *object) {
-	sprite = object->cast_to<SpineSprite>(object);
-}
-
 bool SpineAnimationMixesInspectorPlugin::parse_property(Object *object, Variant::Type type, const String &path,
 														PropertyHint hint, const String &hint_text, int usage) {
-	if (path == "animation_mixes") {
-		add_custom_control(add_mix_button);
+	if (path == "animation_mixes" && object) {
+		auto mixes_property = memnew(SpineEditorPropertyAnimationMixes);
+		mixes_property->setup(Object::cast_to<SpineSkeletonDataResource>(object));
+		add_property_editor(path, mixes_property);
 		return true;
 	}
 	return false;
 }
+
+SpineEditorPropertyAnimationMixes::SpineEditorPropertyAnimationMixes() {
+	container = memnew(VBoxContainer);
+	add_child(container);
+	set_bottom_editor(container);
+}
+
+void SpineEditorPropertyAnimationMixes::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("add_mix"), &SpineEditorPropertyAnimationMixes::add_mix);
+}
+
+
+void SpineEditorPropertyAnimationMixes::add_mix() {
+	if (!skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded() || updating) return;
+	
+	Ref<SpineAnimationMix> mix = Ref<SpineAnimationMix>(memnew(SpineAnimationMix));
+	Array mixes = skeleton_data->get_animation_mixes().duplicate();
+	mixes.push_back(mix);
+	skeleton_data->set_animation_mixes(mixes);
+	emit_changed(get_edited_property(), mixes);
+}
+
+void SpineEditorPropertyAnimationMixes::update_property() {
+	if (updating) return;
+	updating = true;
+	
+	for (int i = 0; container->get_child_count() != 0; i++) {
+		auto child = container->get_child(i);
+		child->queue_delete();
+		container->remove_child(child);
+	}
+
+	Array mixes = skeleton_data->get_animation_mixes();
+	for (int i = 0; i < mixes.size(); i++) {
+		auto hbox = memnew(HBoxContainer);
+
+		auto from_label = memnew(Label);
+		from_label->set_text("From:" );
+		hbox->add_child(from_label);
+
+		auto to_label = memnew(Label);
+		to_label->set_text("To: ");
+		hbox->add_child(to_label);
+		
+		container->add_child(hbox);
+	}
+
+	add_mix_button = memnew(Button);
+	add_mix_button->set_text("Add mix");
+	add_mix_button->set_h_size_flags(SIZE_EXPAND_FILL);
+	add_mix_button->connect("pressed", this, "add_mix");
+	container->add_child(add_mix_button);
+
+	updating = false;
+}
+
 
 #endif
