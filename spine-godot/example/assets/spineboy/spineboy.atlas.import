@@ -11,4 +11,4 @@ dest_files=[ "res://.import/spineboy.atlas-54c12b5ff1cdaaa1b4e452a7d0d868c9.spat
 
 [params]
 
-normal_texture_prefix="n"
+normal_map_prefix="n"
