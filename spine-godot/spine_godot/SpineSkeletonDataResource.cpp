@@ -171,6 +171,7 @@ void SpineSkeletonDataResource::load_res(spine::Atlas *atlas, const String &json
 	}
 	skeleton_data = data;
 	animation_state_data = new spine::AnimationStateData(data);
+	update_mixes();
 }
 
 bool SpineSkeletonDataResource::is_skeleton_data_loaded() const {
@@ -217,7 +218,7 @@ void SpineSkeletonDataResource::get_skin_names(Vector<String> &skin_names) const
 
 void SpineSkeletonDataResource::set_default_mix(float default_mix) {
 	this->default_mix = default_mix;
-	if (animation_state_data) animation_state_data->setDefaultMix(default_mix);
+	update_mixes();
 }
 
 float SpineSkeletonDataResource::get_default_mix() {
@@ -226,11 +227,33 @@ float SpineSkeletonDataResource::get_default_mix() {
 
 void SpineSkeletonDataResource::set_animation_mixes(Array animation_mixes) {
 	this->animation_mixes = animation_mixes;
+	update_mixes();
 }
 
 Array SpineSkeletonDataResource::get_animation_mixes() {
 	return animation_mixes;
 }
+
+void SpineSkeletonDataResource::update_mixes() {
+	if (!is_skeleton_data_loaded()) return;
+	animation_state_data->clear();
+	animation_state_data->setDefaultMix(default_mix);
+	for (int i = 0; i < animation_mixes.size(); i++) {
+		Ref<SpineAnimationMix> mix = animation_mixes[i];
+		spine::Animation *from = skeleton_data->findAnimation(mix->get_from().utf8().ptr());
+		spine::Animation *to = skeleton_data->findAnimation(mix->get_to().utf8().ptr());
+		if (!from) {
+			ERR_PRINT(vformat("Failed to set animation mix %s->%s. Animation %s does not exist in skeleton.", from, to, from));
+			continue;
+		}
+		if (!to) {
+			ERR_PRINT(vformat("Failed to set animation mix %s->%s. Animation %s does not exist in skeleton.", from, to, to));
+			continue;
+		}
+		animation_state_data->setMix(from, to, mix->get_mix());
+	}
+}
+
 
 #define CHECK(x)                                      \
 	if (!is_skeleton_data_loaded()) {                   \

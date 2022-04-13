@@ -140,13 +140,12 @@ class SpineEditorPropertyAnimationMixes: public EditorProperty {
 
 	Ref<SpineSkeletonDataResource> skeleton_data;
 	VBoxContainer *container;
-	Button *add_mix_button;
-	Vector<HBoxContainer *> cells;
-	Vector<Button *> delete_mix;
 	bool updating;
 
 	static void _bind_methods();
 	void add_mix();
+	void delete_mix(int64_t idx);
+	void property_changed(const String &property, Variant value, const String &name, bool changing, Ref<SpineAnimationMix> mix);
 public:
 	SpineEditorPropertyAnimationMixes();
 	void setup(Ref<SpineSkeletonDataResource> skeleton_data) { this->skeleton_data = skeleton_data; };

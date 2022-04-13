@@ -57,6 +57,8 @@ private:
 
 	void load_res(spine::Atlas *atlas, const String &json, const Vector<uint8_t> &binary);
 
+	void update_mixes();
+
 public:
 	SpineSkeletonDataResource();
 	virtual ~SpineSkeletonDataResource();
