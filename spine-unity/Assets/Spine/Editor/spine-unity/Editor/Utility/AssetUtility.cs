@@ -493,7 +493,7 @@ namespace Spine.Unity.Editor {
 						}
 
 						Debug.LogFormat("Changes to '{0}' or atlas detected. Clearing SkeletonDataAsset: {1}", skeletonJSONPath, localPath);
-						skeletonDataAsset.Clear();
+						SpineEditorUtilities.ClearSkeletonDataAsset(skeletonDataAsset);
 
 						string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(skeletonDataAsset));
 						string lastHash = EditorPrefs.GetString(guid + "_hash");
@@ -978,7 +978,7 @@ namespace Spine.Unity.Editor {
 					AssetDatabase.CreateAsset(skeletonDataAsset, filePath);
 				} else {
 					skeletonDataAsset.atlasAssets = atlasAssets;
-					skeletonDataAsset.Clear();
+					SpineEditorUtilities.ClearSkeletonDataAsset(skeletonDataAsset);
 				}
 				var skeletonData = skeletonDataAsset.GetSkeletonData(true);
 				if (skeletonData != null)
