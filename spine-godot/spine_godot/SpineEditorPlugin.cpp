@@ -76,13 +76,40 @@ SpineEditorPlugin::SpineEditorPlugin(EditorNode *node) {
 	add_import_plugin(memnew(SpineAtlasResourceImportPlugin));
 	add_import_plugin(memnew(SpineJsonResourceImportPlugin));
 	add_import_plugin(memnew(SpineBinaryResourceImportPlugin));
+	add_inspector_plugin(memnew(SpineAnimationMixesInspectorPlugin));
 }
 
 SpineEditorPlugin::~SpineEditorPlugin() {
 }
 
 bool SpineEditorPlugin::handles(Object *object) const {
-	return object->is_class("SpineSprite");
+	return object->is_class("SpineSprite") || object->is_class("SpineSkeletonDataResource");
+}
+
+SpineAnimationMixesInspectorPlugin::SpineAnimationMixesInspectorPlugin(): add_mix_button(nullptr) {
+	add_mix_button = memnew(Button);
+	add_mix_button->set_text("Add mix");
+}
+
+SpineAnimationMixesInspectorPlugin::~SpineAnimationMixesInspectorPlugin() {
+
+}
+
+bool SpineAnimationMixesInspectorPlugin::can_handle(Object *object) {
+	return object->is_class("SpineSkeletonDataResource");
+}
+
+void SpineAnimationMixesInspectorPlugin::parse_begin(Object *object) {
+	sprite = object->cast_to<SpineSprite>(object);
+}
+
+bool SpineAnimationMixesInspectorPlugin::parse_property(Object *object, Variant::Type type, const String &path,
+														PropertyHint hint, const String &hint_text, int usage) {
+	if (path == "animation_mixes") {
+		add_custom_control(add_mix_button);
+		return true;
+	}
+	return false;
 }
 
 #endif

@@ -70,8 +70,8 @@ public:
 		if (error != OK) {
 			ERR_PRINT(vformat("Can't load texture: \"%s\"", String(path.buffer())));
 			auto renderer_object = memnew(SpineRendererObject);
-			renderer_object->texture = nullptr;
-			renderer_object->normal_map = nullptr;
+			renderer_object->texture = Ref<Texture>(nullptr);
+			renderer_object->normal_map = Ref<Texture>(nullptr);
 			page.setRendererObject((void *) renderer_object);
 			return;
 		}
@@ -79,7 +79,7 @@ public:
 		textures->append(texture);
 		auto renderer_object = memnew(SpineRendererObject);
 		renderer_object->texture = texture;
-		renderer_object->normal_map = nullptr;
+		renderer_object->normal_map = Ref<Texture>(nullptr);
 
 		String temp_path = fixed_path;
 		String new_path = vformat("%s/%s_%s", temp_path.get_base_dir(), normal_map_prefix, temp_path.get_file());

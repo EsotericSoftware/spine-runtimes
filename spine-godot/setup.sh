@@ -6,6 +6,5 @@ cp -r .idea godot
 cp custom.py godot
 cp -r ../spine-cpp/spine-cpp spine_godot
 pushd godot
-scons -Q compiledb custom_modules="../spine_godot"
-scons target=debug custom_modules="../spine_godot" --jobs=8
+scons compiledb=yes custom_modules="../spine_godot" -j16
 popd

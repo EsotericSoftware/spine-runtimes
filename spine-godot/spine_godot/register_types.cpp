@@ -73,14 +73,11 @@ void register_spine_godot_types() {
 #ifdef TOOLS_ENABLED
 	EditorNode::add_init_callback(editor_init_callback);
 #endif
-
 	ClassDB::register_class<SpineAtlasResource>();
 	ClassDB::register_class<SpineSkeletonFileResource>();
 	ClassDB::register_class<SpineSkeletonDataResource>();
-	ClassDB::register_class<SpineSkeletonDataResource>();
+	ClassDB::register_class<SpineAnimationMix>();
 	ClassDB::register_class<SpineSprite>();
-	ClassDB::register_class<SpineSprite>();
-	ClassDB::register_class<SpineSkeleton>();
 	ClassDB::register_class<SpineSkeleton>();
 	ClassDB::register_class<SpineAnimationState>();
 	ClassDB::register_class<SpineAnimation>();
@@ -97,7 +94,6 @@ void register_spine_godot_types() {
 	ClassDB::register_class<SpineIkConstraintData>();
 	ClassDB::register_class<SpineTransformConstraintData>();
 	ClassDB::register_class<SpinePathConstraintData>();
-	ClassDB::register_class<SpineBone>();
 	ClassDB::register_class<SpineBone>();
 	ClassDB::register_class<SpineSlot>();
 	ClassDB::register_class<SpineIkConstraint>();

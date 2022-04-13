@@ -32,7 +32,7 @@
 
 #include "SpineConstant.h"
 #include "core/reference.h"
-#include <spine/spine.h>
+#include <spine/Animation.h>
 
 class SpineEvent;
 class SpineSkeleton;

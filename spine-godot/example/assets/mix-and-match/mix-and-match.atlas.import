@@ -11,4 +11,4 @@ dest_files=[ "res://.import/mix-and-match.atlas-3d349b543ecdcc01fb29033adaef0841
 
 [params]
 
-normal_texture_prefix="n"
+normal_map_prefix="n"

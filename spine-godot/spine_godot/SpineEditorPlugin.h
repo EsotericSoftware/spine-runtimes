@@ -32,29 +32,31 @@
 
 #ifdef TOOLS_ENABLED
 #include "editor/editor_node.h"
+#include "SpineSprite.h"
+#include "editor/editor_properties.h"
 
 class SpineAtlasResourceImportPlugin : public EditorImportPlugin {
 	GDCLASS(SpineAtlasResourceImportPlugin, EditorImportPlugin)
 
 public:
 	String get_importer_name() const override { return "spine.atlas"; }
-	
+
 	String get_visible_name() const override { return "Spine Runtime Atlas"; }
-	
+
 	void get_recognized_extensions(List<String> *extensions) const override { extensions->push_back("atlas"); }
-	
+
 	String get_preset_name(int idx) const override { return idx == 0 ? "Default" : "Unknown"; }
-	
+
 	int get_preset_count() const override { return 1; }
-	
+
 	String get_save_extension() const override { return "spatlas"; }
-	
+
 	String get_resource_type() const override { return "SpineAtlasResource"; }
-	
+
 	void get_import_options(List<ImportOption> *options, int preset) const override;
-	
+
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
-	
+
 	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 };
 
@@ -63,23 +65,23 @@ class SpineJsonResourceImportPlugin : public EditorImportPlugin {
 
 public:
 	String get_importer_name() const override { return "spine.json"; }
-	
+
 	String get_visible_name() const override { return "Spine Skeleton Json"; }
-	
+
 	void get_recognized_extensions(List<String> *extensions) const override { extensions->push_back("json"); }
-	
+
 	String get_preset_name(int idx) const override { return idx == 0 ? "Default" : "Unknown"; }
-	
+
 	int get_preset_count() const override { return 1; }
-	
+
 	String get_save_extension() const override { return "spjson"; }
-	
+
 	String get_resource_type() const override { return "SpineSkeletonFileResource"; }
-	
+
 	void get_import_options(List<ImportOption> *options, int preset) const override {}
-	
+
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
-	
+
 	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 };
 
@@ -116,10 +118,45 @@ public:
 	~SpineEditorPlugin();
 
 	String get_name() const override { return "SpineEditorPlugin"; }
-	
+
 	bool has_main_screen() const { return false; }
-	
+
 	bool handles(Object *object) const override;
+};
+
+class SpineAnimationMixesInspectorPlugin: public EditorInspectorPlugin {
+	GDCLASS(SpineAnimationMixesInspectorPlugin, EditorInspectorPlugin)
+
+	SpineSprite *sprite;
+
+	Button *add_mix_button;
+	Vector<Button *> delete_mix;
+
+public:
+	SpineAnimationMixesInspectorPlugin();
+	~SpineAnimationMixesInspectorPlugin() override;
+
+	bool can_handle(Object *object) override;
+	void parse_begin(Object *object) override;
+	bool parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, int usage) override;
+};
+
+class SpineAnimationMixesProperty: public EditorProperty {
+	GDCLASS(SpineAnimationMixesProperty, EditorProperty)
+
+public:
+	SpineAnimationMixesProperty();
+	~SpineAnimationMixesProperty();
+};
+
+class SpineEditorPropertyMix: public EditorProperty {
+	GDCLASS(SpineEditorPropertyMix, EditorProperty)
+
+	EditorPropertyText *from_property;
+	EditorPropertyText *to_property;
+	EditorPropertyFloat *mix_property;
+public:
+
 };
 #endif
 

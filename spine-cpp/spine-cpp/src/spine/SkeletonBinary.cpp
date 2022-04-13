@@ -455,25 +455,25 @@ Skin *SkeletonBinary::readSkin(DataInput *input, bool defaultSkin, SkeletonData 
 		skin = new (__FILE__, __LINE__) Skin(readStringRef(input, skeletonData));
 		for (int i = 0, n = readVarint(input, true); i < n; i++) {
 			int boneIndex = readVarint(input, true);
-			if (boneIndex >= skeletonData->_bones.size()) return NULL;
+			if (boneIndex >= (int)skeletonData->_bones.size()) return NULL;
 			skin->getBones().add(skeletonData->_bones[boneIndex]);
 		}
 
 		for (int i = 0, n = readVarint(input, true); i < n; i++) {
 			int ikIndex = readVarint(input, true);
-			if (ikIndex >= skeletonData->_ikConstraints.size()) return NULL;
+			if (ikIndex >= (int)skeletonData->_ikConstraints.size()) return NULL;
 			skin->getConstraints().add(skeletonData->_ikConstraints[ikIndex]);
 		}
 
 		for (int i = 0, n = readVarint(input, true); i < n; i++) {
 			int transformIndex = readVarint(input, true);
-			if (transformIndex >= skeletonData->_transformConstraints.size()) return NULL;
+			if (transformIndex >= (int)skeletonData->_transformConstraints.size()) return NULL;
 			skin->getConstraints().add(skeletonData->_transformConstraints[transformIndex]);
 		}
 
 		for (int i = 0, n = readVarint(input, true); i < n; i++) {
 			int pathIndex = readVarint(input, true);
-			if (pathIndex >= skeletonData->_pathConstraints.size()) return NULL;
+			if (pathIndex >= (int)skeletonData->_pathConstraints.size()) return NULL;
 			skin->getConstraints().add(skeletonData->_pathConstraints[pathIndex]);
 		}
 		slotCount = readVarint(input, true);

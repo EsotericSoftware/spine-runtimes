@@ -12,8 +12,34 @@
 #include "SpinePathConstraintData.h"
 #include "SpineEventData.h"
 
+class SpineAnimationMix : public Resource {
+	GDCLASS(SpineAnimationMix, Resource)
+
+protected:
+	static void _bind_methods();
+
+	String from;
+	String to;
+	float mix;
+public:
+	SpineAnimationMix();
+	~SpineAnimationMix();
+
+	void set_from(const StringName &from);
+
+	String get_from();
+
+	void set_to(const StringName &to);
+
+	String get_to();
+
+	void set_mix(float mix);
+
+	float get_mix();
+};
+
 class SpineSkeletonDataResource : public Resource {
-	GDCLASS(SpineSkeletonDataResource, Resource);
+	GDCLASS(SpineSkeletonDataResource, Resource)
 
 protected:
 	static void _bind_methods();
@@ -21,6 +47,8 @@ protected:
 private:
 	Ref<SpineAtlasResource> atlas_res;
 	Ref<SpineSkeletonFileResource> skeleton_file_res;
+	float default_mix;
+	Array animation_mixes;
 
 	spine::SkeletonData *skeleton_data;
 	spine::AnimationStateData *animation_state_data;
@@ -49,7 +77,13 @@ public:
 
 	void get_skin_names(Vector<String> &l) const;
 
-	void _get_property_list(List<PropertyInfo> *p_list) const;
+	void set_default_mix(float default_mix);
+
+	float get_default_mix();
+
+	void set_animation_mixes(Array animation_mixes);
+
+	Array get_animation_mixes();
 
 	// Spine API
 	Ref<SpineBoneData> find_bone(const String &bone_name) const;
