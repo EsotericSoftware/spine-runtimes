@@ -30,27 +30,22 @@
 #ifndef GODOT_SPINEPATHCONSTRAINTDATA_H
 #define GODOT_SPINEPATHCONSTRAINTDATA_H
 
-#include "core/variant_parser.h"
-
-#include <spine/spine.h>
-
 #include "SpineConstraintData.h"
 #include "SpineBoneData.h"
 #include "SpineSlotData.h"
+#include <spine/PathConstraintData.h>
 
 class SpinePathConstraintData : public SpineConstraintData {
 	GDCLASS(SpinePathConstraintData, SpineConstraintData);
 
+	spine::PathConstraintData *get_spine_constraint_data() { return (spine::PathConstraintData *)get_spine_object(); }
+	
 protected:
 	static void _bind_methods();
 
 public:
 	SpinePathConstraintData();
 	~SpinePathConstraintData();
-
-	virtual inline spine::PathConstraintData *get_spine_data() {
-		return (spine::PathConstraintData *) SpineConstraintData::get_spine_object();
-	}
 
 	enum PositionMode {
 		POSITIONMODE_FIXED = 0,
