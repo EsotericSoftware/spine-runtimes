@@ -91,8 +91,7 @@ namespace Spine.Unity.Editor {
 				}
 
 				foreach (var skeletonDataAsset in skeletonDataAssetsToReload) {
-					skeletonDataAsset.Clear();
-					skeletonDataAsset.GetSkeletonData(true);
+					ReloadSkeletonDataAsset(skeletonDataAsset, false);
 				}
 
 				foreach (var skeletonRenderer in activeSkeletonRenderers)
@@ -119,14 +118,24 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
+			public static void ClearAnimationReferenceAssets (SkeletonDataAsset skeletonDataAsset) {
+				ForEachAnimationReferenceAsset(skeletonDataAsset, (referenceAsset) => referenceAsset.Clear());
+			}
+
 			public static void ReloadAnimationReferenceAssets (SkeletonDataAsset skeletonDataAsset) {
+				ForEachAnimationReferenceAsset(skeletonDataAsset, (referenceAsset) => referenceAsset.Initialize());
+			}
+
+			private static void ForEachAnimationReferenceAsset (SkeletonDataAsset skeletonDataAsset,
+				System.Action<AnimationReferenceAsset> func) {
+
 				string[] guids = UnityEditor.AssetDatabase.FindAssets("t:AnimationReferenceAsset");
 				foreach (string guid in guids) {
 					string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
 					if (!string.IsNullOrEmpty(path)) {
 						var referenceAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<AnimationReferenceAsset>(path);
 						if (referenceAsset.SkeletonDataAsset == skeletonDataAsset)
-							referenceAsset.Initialize();
+							func(referenceAsset);
 					}
 				}
 			}

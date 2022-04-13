@@ -154,7 +154,7 @@ namespace Spine.Unity.Editor {
 
 		void Clear () {
 			preview.Clear();
-			targetSkeletonDataAsset.Clear();
+			SpineEditorUtilities.ClearSkeletonDataAsset(targetSkeletonDataAsset);
 			targetSkeletonData = null;
 		}
 
