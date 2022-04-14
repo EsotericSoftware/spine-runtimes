@@ -121,15 +121,13 @@ public:
 	String get_name() const override { return "SpineEditorPlugin"; }
 
 	bool has_main_screen() const { return false; }
-
-	bool handles(Object *object) const override;
 };
 
-class SpineAnimationMixesInspectorPlugin: public EditorInspectorPlugin {
-	GDCLASS(SpineAnimationMixesInspectorPlugin, EditorInspectorPlugin)
+class SpineSkeletonDataResourceInspectorPlugin: public EditorInspectorPlugin {
+	GDCLASS(SpineSkeletonDataResourceInspectorPlugin, EditorInspectorPlugin)
 
 public:
-	SpineAnimationMixesInspectorPlugin() = default;
+	SpineSkeletonDataResourceInspectorPlugin() = default;
 
 	bool can_handle(Object *object) override;
 	bool parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, int usage) override;
@@ -145,10 +143,25 @@ class SpineEditorPropertyAnimationMixes: public EditorProperty {
 	static void _bind_methods();
 	void add_mix();
 	void delete_mix(int64_t idx);
-	void property_changed(const String &property, Variant value, const String &name, bool changing, Ref<SpineAnimationMix> mix);
 public:
 	SpineEditorPropertyAnimationMixes();
 	void setup(Ref<SpineSkeletonDataResource> skeleton_data) { this->skeleton_data = skeleton_data; };
+	virtual void update_property();
+};
+
+class SpineEditorPropertyAnimationMix: public EditorProperty {
+	GDCLASS(SpineEditorPropertyAnimationMix, EditorProperty)
+
+	Ref<SpineSkeletonDataResource> skeleton_data;
+	Ref<SpineAnimationMix> mix;
+	HBoxContainer *container;
+	bool updating;
+
+	static void _bind_methods();
+	void data_changed(const String &property, Variant value, const String &name, bool changing);
+public:
+	SpineEditorPropertyAnimationMix();
+	void setup(Ref<SpineSkeletonDataResource> skeleton_data, Ref<SpineAnimationMix> mix);
 	virtual void update_property();
 };
 

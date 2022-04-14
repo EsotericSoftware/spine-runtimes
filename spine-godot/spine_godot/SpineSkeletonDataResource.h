@@ -57,8 +57,6 @@ private:
 
 	void load_res(spine::Atlas *atlas, const String &json, const Vector<uint8_t> &binary);
 
-	void update_mixes();
-
 public:
 	SpineSkeletonDataResource();
 	virtual ~SpineSkeletonDataResource();
@@ -86,6 +84,9 @@ public:
 	void set_animation_mixes(Array animation_mixes);
 
 	Array get_animation_mixes();
+
+	// Used by SpineEditorPropertyAnimationMix(es) to update the underlying AnimationState
+	void update_mixes();
 
 	// Spine API
 	Ref<SpineBoneData> find_bone(const String &bone_name) const;
