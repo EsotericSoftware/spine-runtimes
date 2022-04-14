@@ -136,6 +136,7 @@ public:
 class SpineEditorPropertyAnimationMixes: public EditorProperty {
 	GDCLASS(SpineEditorPropertyAnimationMixes, EditorProperty)
 
+	Ref<EditorPropertyArrayObject> array_object;
 	Ref<SpineSkeletonDataResource> skeleton_data;
 	VBoxContainer *container;
 	bool updating;
@@ -154,7 +155,7 @@ class SpineEditorPropertyAnimationMix: public EditorProperty {
 
 	Ref<SpineSkeletonDataResource> skeleton_data;
 	Ref<SpineAnimationMix> mix;
-	HBoxContainer *container;
+	Container *container;
 	bool updating;
 
 	static void _bind_methods();

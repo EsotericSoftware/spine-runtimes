@@ -99,6 +99,7 @@ bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Va
 }
 
 SpineEditorPropertyAnimationMixes::SpineEditorPropertyAnimationMixes(): skeleton_data(nullptr), container(nullptr), updating(false) {
+	array_object.instance();
 }
 
 void SpineEditorPropertyAnimationMixes::_bind_methods() {
@@ -164,6 +165,7 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 		
 		auto mix_property = memnew(SpineEditorPropertyAnimationMix);
 		mix_property->set_h_size_flags(SIZE_EXPAND_FILL);
+		mix_property->set_name_split_ratio(0);
 		hbox->add_child(mix_property);
 		mix_property->setup(skeleton_data, mix);
 		mix_property->set_object_and_property(*mix, "");
@@ -171,7 +173,7 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 		
 		auto delete_button = memnew(Button);
 		hbox->add_child(delete_button);
-		delete_button->set_text("Delete");
+		delete_button->set_text("Remove");
 		delete_button->connect("pressed", this, "delete_mix", varray(i));
 	}
 
@@ -228,27 +230,33 @@ void SpineEditorPropertyAnimationMix::update_property() {
 
 	auto from_enum = memnew(EditorPropertyTextEnum);
 	from_enum->set_h_size_flags(SIZE_EXPAND_FILL);
-	container->add_child(from_enum);
+	from_enum->set_name_split_ratio(0);
+	from_enum->set_selectable(false);
 	from_enum->setup(animation_names);
 	from_enum->set_object_and_property(get_edited_object(), "from");
 	from_enum->update_property();
 	from_enum->connect("property_changed", this, "data_changed");
+	container->add_child(from_enum);
 
 	auto to_enum = memnew(EditorPropertyTextEnum);
 	to_enum->set_h_size_flags(SIZE_EXPAND_FILL);
-	container->add_child(to_enum);
+	to_enum->set_name_split_ratio(0);
+	to_enum->set_selectable(false);
 	to_enum->setup(animation_names);
 	to_enum->set_object_and_property(get_edited_object(), "to");
 	to_enum->update_property();
 	to_enum->connect("property_changed", this, "data_changed");
+	container->add_child(to_enum);
 
 	auto mix_float = memnew(EditorPropertyFloat);
 	mix_float->set_h_size_flags(SIZE_EXPAND_FILL);
-	container->add_child(mix_float);
+	mix_float->set_name_split_ratio(0);
+	mix_float->set_selectable(false);
 	mix_float->setup(0, 9999999, 0.001, true, false, false, false);
 	mix_float->set_object_and_property(get_edited_object(), "mix");
 	mix_float->update_property();
-	mix_float->connect("property_changed", this, "property_changed");
+	mix_float->connect("property_changed", this, "data_changed");
+	container->add_child(mix_float);
 	
 	updating = false;
 }
