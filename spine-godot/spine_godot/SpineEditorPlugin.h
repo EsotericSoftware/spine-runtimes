@@ -133,17 +133,21 @@ public:
 	bool parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, int usage) override;
 };
 
+class SpineEditorPropertyAnimationMix;
+
 class SpineEditorPropertyAnimationMixes: public EditorProperty {
 	GDCLASS(SpineEditorPropertyAnimationMixes, EditorProperty)
 
 	Ref<EditorPropertyArrayObject> array_object;
 	Ref<SpineSkeletonDataResource> skeleton_data;
 	VBoxContainer *container;
+	Vector<SpineEditorPropertyAnimationMix*> mix_properties;
 	bool updating;
 
 	static void _bind_methods();
 	void add_mix();
 	void delete_mix(int64_t idx);
+	void update_mix_property(int64_t index);
 public:
 	SpineEditorPropertyAnimationMixes();
 	void setup(Ref<SpineSkeletonDataResource> skeleton_data) { this->skeleton_data = skeleton_data; };
@@ -153,8 +157,9 @@ public:
 class SpineEditorPropertyAnimationMix: public EditorProperty {
 	GDCLASS(SpineEditorPropertyAnimationMix, EditorProperty)
 
+	SpineEditorPropertyAnimationMixes *mixes_property;
 	Ref<SpineSkeletonDataResource> skeleton_data;
-	Ref<SpineAnimationMix> mix;
+	int index;
 	Container *container;
 	bool updating;
 
@@ -162,7 +167,7 @@ class SpineEditorPropertyAnimationMix: public EditorProperty {
 	void data_changed(const String &property, Variant value, const String &name, bool changing);
 public:
 	SpineEditorPropertyAnimationMix();
-	void setup(Ref<SpineSkeletonDataResource> skeleton_data, Ref<SpineAnimationMix> mix);
+	void setup(SpineEditorPropertyAnimationMixes *mixes_property, Ref<SpineSkeletonDataResource> skeleton_data, int index);
 	virtual void update_property();
 };
 

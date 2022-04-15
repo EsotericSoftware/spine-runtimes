@@ -29,6 +29,8 @@
 
 #include "SpineSkeletonDataResource.h"
 
+#include "core/io/marshalls.h"
+
 void SpineAnimationMix::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_from", "from"), &SpineAnimationMix::set_from);
 	ClassDB::bind_method(D_METHOD("get_from"), &SpineAnimationMix::get_from);
@@ -226,6 +228,14 @@ float SpineSkeletonDataResource::get_default_mix() {
 }
 
 void SpineSkeletonDataResource::set_animation_mixes(Array animation_mixes) {
+	for (int i = 0; i < animation_mixes.size(); i++) {
+		auto objectId = Object::cast_to<EncodedObjectAsID>(animation_mixes[0]);
+		if (objectId) {
+			ERR_PRINT("Live-editing of animation mixes is not supported.");
+			return;
+		}
+	}
+	
 	this->animation_mixes = animation_mixes;
 	update_mixes();
 }
