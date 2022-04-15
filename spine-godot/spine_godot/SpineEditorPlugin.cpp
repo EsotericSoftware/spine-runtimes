@@ -94,6 +94,7 @@ bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Va
 		auto mixes_property = memnew(SpineEditorPropertyAnimationMixes);
 		mixes_property->setup(skeleton_data);
 		add_property_editor(path, mixes_property);
+		return true;
 	}
 	return false;
 }

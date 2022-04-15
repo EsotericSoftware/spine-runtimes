@@ -5,7 +5,7 @@
 
 [sub_resource type="SpineAnimationMix" id=1]
 from = "idle"
-to = "death"
+to = "run"
 mix = 1.0
 
 [sub_resource type="SpineAnimationMix" id=2]
