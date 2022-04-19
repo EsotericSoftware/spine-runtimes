@@ -6,7 +6,7 @@
 [node name="Node2D" type="Node2D"]
 
 [node name="MixAndMatch" type="SpineSprite" parent="."]
-position = Vector2( 775.779, 516.856 )
+position = Vector2( 532.982, 480.287 )
 scale = Vector2( 0.441932, 0.441932 )
 skeleton_data_res = ExtResource( 1 )
 script = ExtResource( 2 )
