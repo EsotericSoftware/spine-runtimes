@@ -56,8 +56,8 @@ You can include a module in your project via a `<script>` tag from the [unpkg](h
 <script src="https://unpkg.com/@esotericsoftware/spine-player@4.0.*/dist/iife/spine-player.js">
 <link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.0.*/dist/spine-player.css">
 
-// spine-ts WebGL
-<script src="https://unpkg.com/@esotericsoftware/spine-threejs@4.0.*/dist/iife/spine-webgl.js">
+// spine-ts ThreeJS
+<script src="https://unpkg.com/@esotericsoftware/spine-threejs@4.0.*/dist/iife/spine-threejs.js">
 ```
 
 We also provide `js.map` source maps. They will be automatically fetched from unpkg when debugging code of a spine-module in Chrome, Firefox, or Safari, mapping the JavaScript code back to its original TypeScript sources.
