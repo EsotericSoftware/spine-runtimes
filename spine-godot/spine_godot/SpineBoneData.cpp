@@ -76,11 +76,11 @@ String SpineBoneData::get_bone_name() {
 
 Ref<SpineBoneData> SpineBoneData::get_parent() {
 	SPINE_CHECK(bone_data, nullptr)
-	auto p = bone_data->getParent();
-	if (p == nullptr) return nullptr;
-	Ref<SpineBoneData> gd_bone_data(memnew(SpineBoneData));
-	gd_bone_data->set_spine_object(p);
-	return gd_bone_data;
+	auto parent = bone_data->getParent();
+	if (!parent) return nullptr;
+	Ref<SpineBoneData> parent_ref(memnew(SpineBoneData));
+	parent_ref->set_spine_object(parent);
+	return parent_ref;
 }
 
 float SpineBoneData::get_length() {

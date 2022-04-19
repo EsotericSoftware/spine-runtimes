@@ -131,7 +131,7 @@ Array SpinePathConstraint::get_bones() {
 Ref<SpineSlot> SpinePathConstraint::get_target() {
 	SPINE_CHECK(path_constraint, nullptr)
 	auto target = path_constraint->getTarget();
-	if (target == nullptr) return nullptr;
+	if (!target) return nullptr;
 	Ref<SpineSlot> target_ref(memnew(SpineSlot));
 	target_ref->set_spine_object(target);
 	return target_ref;

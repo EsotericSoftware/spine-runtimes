@@ -38,4 +38,6 @@
   return ret; \
  }
 
+#define SPINE_STRING(x) spine::String((x).utf8())
+
 #endif
