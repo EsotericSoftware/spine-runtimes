@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 #include "SpineEventData.h"
-#include "common.h"
+#include "SpineCommon.h"
 
 void SpineEventData::_bind_methods() {
  ClassDB::bind_method(D_METHOD("get_event_name"), &SpineEventData::get_event_name);

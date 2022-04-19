@@ -81,11 +81,31 @@ public:
 		TransformMode_NoScale,
 		TransformMode_NoScaleOrReflection
 	};
+
+	enum PositionMode {
+		PositionMode_Fixed = 0,
+		PositionMode_Percent
+	};
+
+	enum SpacingMode {
+		SpacingMode_Length = 0,
+		SpacingMode_Fixed,
+		SpacingMode_Percent
+	};
+
+	enum RotateMode {
+		RotateMode_Tangent = 0,
+		RotateMode_Chain,
+		RotateMode_ChainScale
+	};
 };
 
 VARIANT_ENUM_CAST(SpineConstant::MixBlend);
 VARIANT_ENUM_CAST(SpineConstant::MixDirection);
 VARIANT_ENUM_CAST(SpineConstant::PropertyId);
 VARIANT_ENUM_CAST(SpineConstant::TransformMode);
+VARIANT_ENUM_CAST(SpineConstant::PositionMode);
+VARIANT_ENUM_CAST(SpineConstant::SpacingMode);
+VARIANT_ENUM_CAST(SpineConstant::RotateMode);
 
 #endif//GODOT_SPINECONSTANT_H

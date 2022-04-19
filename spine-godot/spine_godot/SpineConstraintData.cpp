@@ -29,7 +29,7 @@
 
 #include "SpineConstraintData.h"
 #include <spine/ConstraintData.h>
-#include "common.h"
+#include "SpineCommon.h"
 
 void SpineConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_constraint_name"), &SpineConstraintData::get_constraint_name);

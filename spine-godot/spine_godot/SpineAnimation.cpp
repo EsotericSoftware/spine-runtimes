@@ -27,11 +27,11 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "common.h"
 #include "SpineAnimation.h"
 #include "SpineSkeleton.h"
 #include "SpineEvent.h"
 #include "SpineTimeline.h"
+#include "SpineCommon.h"
 
 #include "core/method_bind_ext.gen.inc"
 

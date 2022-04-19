@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "common.h"
 #include "SpineAnimationState.h"
+#include "SpineCommon.h"
 
 void SpineAnimationState::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update", "delta"), &SpineAnimationState::update, DEFVAL(0));

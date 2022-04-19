@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 #include "SpineBoneData.h"
-#include "common.h"
+#include "SpineCommon.h"
 
 void SpineBoneData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_index"), &SpineBoneData::get_index);

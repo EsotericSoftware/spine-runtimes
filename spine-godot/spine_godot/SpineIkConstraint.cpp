@@ -29,7 +29,7 @@
 
 #include "SpineIkConstraint.h"
 #include "SpineBone.h"
-#include "common.h"
+#include "SpineCommon.h"
 
 void SpineIkConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update"), &SpineIkConstraint::update);

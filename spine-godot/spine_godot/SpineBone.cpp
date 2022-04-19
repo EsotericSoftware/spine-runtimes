@@ -30,7 +30,7 @@
 #include "SpineBone.h"
 #include "SpineSprite.h"
 #include "SpineSkeleton.h"
-#include "common.h"
+#include "SpineCommon.h"
 
 void SpineBone::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update_world_transform"), &SpineBone::update_world_transform);

@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 #include "SpineAttachment.h"
-#include "common.h"
+#include "SpineCommon.h"
 
 void SpineAttachment::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_attachment_name"), &SpineAttachment::get_attachment_name);

@@ -29,7 +29,7 @@
 
 #include "SpinePathConstraint.h"
 #include "SpineBone.h"
-#include "common.h"
+#include "SpineCommon.h"
 
 void SpinePathConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update"), &SpinePathConstraint::update);

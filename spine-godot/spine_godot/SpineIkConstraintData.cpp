@@ -28,8 +28,7 @@
  *****************************************************************************/
 
 #include "SpineIkConstraintData.h"
-
-#include "common.h"
+#include "SpineCommon.h"
 
 void SpineIkConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_bones"), &SpineIkConstraintData::get_bones);
