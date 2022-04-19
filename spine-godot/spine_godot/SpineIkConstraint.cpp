@@ -154,7 +154,7 @@ void SpineIkConstraint::set_softness(float v) {
 }
 
 bool SpineIkConstraint::is_active() {
-	SPINE_CHECK(ik_constraint, nullptr)
+	SPINE_CHECK(ik_constraint, false)
 	return ik_constraint->isActive();
 }
 void SpineIkConstraint::set_active(bool v) {
