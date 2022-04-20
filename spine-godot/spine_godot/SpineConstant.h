@@ -98,6 +98,13 @@ public:
 		RotateMode_Chain,
 		RotateMode_ChainScale
 	};
+
+	enum BlendMode {
+		BLENDMODE_NORMAL = 0,
+		BLENDMODE_ADDITIVE,
+		BLENDMODE_MULTIPLY,
+		BLENDMODE_SCREEN
+	};
 };
 
 VARIANT_ENUM_CAST(SpineConstant::MixBlend);
@@ -107,5 +114,6 @@ VARIANT_ENUM_CAST(SpineConstant::TransformMode);
 VARIANT_ENUM_CAST(SpineConstant::PositionMode);
 VARIANT_ENUM_CAST(SpineConstant::SpacingMode);
 VARIANT_ENUM_CAST(SpineConstant::RotateMode);
+VARIANT_ENUM_CAST(SpineConstant::BlendMode);
 
 #endif//GODOT_SPINECONSTANT_H

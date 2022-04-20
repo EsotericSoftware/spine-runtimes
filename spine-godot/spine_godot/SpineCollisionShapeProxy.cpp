@@ -189,6 +189,6 @@ void SpineCollisionShapeProxy::get_slot_names(Vector<String> &slot_names) const 
 	for (size_t i = 0; i < slots.size(); ++i) {
 		auto slot = (Ref<SpineSlot>) slots[i];
 		if (slot.is_valid())
-			slot_names.set(i, slot->get_data()->get_slot_name());
+			slot_names.set(i, slot->get_data()->get_name());
 	}
 }

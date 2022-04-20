@@ -28,13 +28,16 @@
  *****************************************************************************/
 
 #include "SpineSlotData.h"
+#include "SpineCommon.h"
 
 void SpineSlotData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_index"), &SpineSlotData::get_index);
-	ClassDB::bind_method(D_METHOD("get_slot_name"), &SpineSlotData::get_slot_name);
+	ClassDB::bind_method(D_METHOD("get_name"), &SpineSlotData::get_name);
 	ClassDB::bind_method(D_METHOD("get_bone_data"), &SpineSlotData::get_bone_data);
 	ClassDB::bind_method(D_METHOD("get_color"), &SpineSlotData::get_color);
+	ClassDB::bind_method(D_METHOD("set_color", "v"), &SpineSlotData::set_color);
 	ClassDB::bind_method(D_METHOD("get_dark_color"), &SpineSlotData::get_dark_color);
+	ClassDB::bind_method(D_METHOD("set_dark_color", "v"), &SpineSlotData::set_dark_color);
 	ClassDB::bind_method(D_METHOD("has_dark_color"), &SpineSlotData::has_dark_color);
 	ClassDB::bind_method(D_METHOD("set_has_dark_color", "v"), &SpineSlotData::set_has_dark_color);
 	ClassDB::bind_method(D_METHOD("get_attachment_name"), &SpineSlotData::get_attachment_name);
@@ -42,73 +45,77 @@ void SpineSlotData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_blend_mode"), &SpineSlotData::get_blend_mode);
 	ClassDB::bind_method(D_METHOD("set_blend_mode", "v"), &SpineSlotData::set_blend_mode);
 
-	ClassDB::bind_method(D_METHOD("set_color", "v"), &SpineSlotData::set_color);
-	ClassDB::bind_method(D_METHOD("set_dark_color", "v"), &SpineSlotData::set_dark_color);
-
-	BIND_ENUM_CONSTANT(BLENDMODE_NORMAL);
-	BIND_ENUM_CONSTANT(BLENDMODE_ADDITIVE);
-	BIND_ENUM_CONSTANT(BLENDMODE_MULTIPLY);
-	BIND_ENUM_CONSTANT(BLENDMODE_SCREEN);
 }
 
-SpineSlotData::SpineSlotData() : slot_data(NULL) {}
-SpineSlotData::~SpineSlotData() {}
+SpineSlotData::SpineSlotData() : slot_data(nullptr) {
+}
 
-#define S_T(x) (spine::String(x.utf8()))
 int SpineSlotData::get_index() {
+	SPINE_CHECK(slot_data, 0)
 	return slot_data->getIndex();
 }
 
-String SpineSlotData::get_slot_name() {
+String SpineSlotData::get_name() {
+	SPINE_CHECK(slot_data, String(""))
 	return slot_data->getName().buffer();
 }
 
 Ref<SpineBoneData> SpineSlotData::get_bone_data() {
-	auto &bd = slot_data->getBoneData();
-	Ref<SpineBoneData> gd_bone_data(memnew(SpineBoneData));
-	gd_bone_data->set_spine_object(&bd);
-	return gd_bone_data;
+	SPINE_CHECK(slot_data, nullptr)
+	auto &bone_data = slot_data->getBoneData();
+	Ref<SpineBoneData> bone_data_ref(memnew(SpineBoneData));
+	bone_data_ref->set_spine_object(&bone_data);
+	return bone_data_ref;
 }
 
 Color SpineSlotData::get_color() {
-	auto &c = slot_data->getColor();
-	return Color(c.r, c.g, c.b, c.a);
+	SPINE_CHECK(slot_data, Color(0, 0, 0, 0))
+	auto &color = slot_data->getColor();
+	return Color(color.r, color.g, color.b, color.a);
 }
+
 void SpineSlotData::set_color(Color v) {
-	auto &c = slot_data->getColor();
-	c.set(v.r, v.g, v.b, v.a);
+	SPINE_CHECK(slot_data,)
+	auto &color = slot_data->getColor();
+	color.set(v.r, v.g, v.b, v.a);
 }
 
 Color SpineSlotData::get_dark_color() {
-	auto &c = slot_data->getDarkColor();
-	return Color(c.r, c.g, c.b, c.a);
+	SPINE_CHECK(slot_data, Color(0, 0, 0, 0))
+	auto &color = slot_data->getDarkColor();
+	return Color(color.r, color.g, color.b, color.a);
 }
+
 void SpineSlotData::set_dark_color(Color v) {
-	auto &c = slot_data->getDarkColor();
-	c.set(v.r, v.g, v.b, v.a);
+	SPINE_CHECK(slot_data,)
+	auto &color = slot_data->getDarkColor();
+	color.set(v.r, v.g, v.b, v.a);
 }
 
 bool SpineSlotData::has_dark_color() {
+	SPINE_CHECK(slot_data, false)
 	return slot_data->hasDarkColor();
 }
+
 void SpineSlotData::set_has_dark_color(bool v) {
+	SPINE_CHECK(slot_data,)
 	slot_data->setHasDarkColor(v);
 }
 
 String SpineSlotData::get_attachment_name() {
+	SPINE_CHECK(slot_data, "")
 	return slot_data->getAttachmentName().buffer();
 }
 void SpineSlotData::set_attachment_name(const String &v) {
-	slot_data->setAttachmentName(S_T(v));
+	SPINE_CHECK(slot_data,)
+	slot_data->setAttachmentName(SPINE_STRING(v));
 }
 
-SpineSlotData::BlendMode SpineSlotData::get_blend_mode() {
-	auto bm = (int) slot_data->getBlendMode();
-	return (BlendMode) bm;
+SpineConstant::BlendMode SpineSlotData::get_blend_mode() {
+	SPINE_CHECK(slot_data, SpineConstant::BLENDMODE_NORMAL)
+	return (SpineConstant::BlendMode)slot_data->getBlendMode();
 }
-void SpineSlotData::set_blend_mode(BlendMode v) {
-	auto bm = (int) v;
-	slot_data->setBlendMode((spine::BlendMode) bm);
+void SpineSlotData::set_blend_mode(SpineConstant::BlendMode v) {
+	SPINE_CHECK(slot_data,)
+	slot_data->setBlendMode((spine::BlendMode) v);
 }
-
-#undef S_T
