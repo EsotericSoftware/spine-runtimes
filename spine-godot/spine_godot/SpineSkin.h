@@ -30,10 +30,6 @@
 #ifndef GODOT_SPINESKIN_H
 #define GODOT_SPINESKIN_H
 
-#include "core/variant_parser.h"
-
-#include <spine/spine.h>
-
 #include "SpineAttachment.h"
 #include "SpineSkinAttachmentMapEntries.h"
 
@@ -45,17 +41,14 @@ protected:
 
 private:
 	spine::Skin *skin;
+	bool owns_skin;
 
 public:
 	SpineSkin();
 	~SpineSkin();
 
-	inline void set_spine_object(spine::Skin *s) {
-		skin = s;
-	}
-	spine::Skin *get_spine_object() {
-		return skin;
-	}
+	void set_spine_object(spine::Skin *s) { skin = s; }
+	spine::Skin *get_spine_object() { return skin; }
 
 	Ref<SpineSkin> init(const String &name);
 
@@ -69,7 +62,7 @@ public:
 
 	Array find_attachments_for_slot(uint64_t slot_index);
 
-	String get_skin_name();
+	String get_name();
 
 	void add_skin(Ref<SpineSkin> other);
 
@@ -79,7 +72,7 @@ public:
 
 	Array get_bones();
 
-	Array get_constraint();
+	Array get_constraints();
 };
 
 #endif//GODOT_SPINESKIN_H

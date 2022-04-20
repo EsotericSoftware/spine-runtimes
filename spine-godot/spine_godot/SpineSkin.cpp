@@ -28,9 +28,9 @@
  *****************************************************************************/
 
 #include "SpineSkin.h"
-
 #include "SpineBoneData.h"
 #include "SpineConstraintData.h"
+#include "SpineCommon.h"
 
 void SpineSkin::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("init", "name"), &SpineSkin::init);
@@ -39,123 +39,133 @@ void SpineSkin::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("remove_attachment", "slot_index", "name"), &SpineSkin::remove_attachment);
 	ClassDB::bind_method(D_METHOD("find_names_for_slot", "slot_index"), &SpineSkin::find_names_for_slot);
 	ClassDB::bind_method(D_METHOD("find_attachments_for_slot", "slot_index"), &SpineSkin::find_attachments_for_slot);
-	ClassDB::bind_method(D_METHOD("get_skin_name"), &SpineSkin::get_skin_name);
+	ClassDB::bind_method(D_METHOD("get_name"), &SpineSkin::get_name);
 	ClassDB::bind_method(D_METHOD("add_skin", "other"), &SpineSkin::add_skin);
 	ClassDB::bind_method(D_METHOD("copy_skin", "other"), &SpineSkin::copy_skin);
 	ClassDB::bind_method(D_METHOD("get_attachments"), &SpineSkin::get_attachments);
-	ClassDB::bind_method(D_METHOD("get_all_bone_data"), &SpineSkin::get_bones);
-	ClassDB::bind_method(D_METHOD("get_all_constraint_data"), &SpineSkin::get_constraint);
+	ClassDB::bind_method(D_METHOD("get_bones"), &SpineSkin::get_bones);
+	ClassDB::bind_method(D_METHOD("get_constraints"), &SpineSkin::get_constraints);
 }
 
-SpineSkin::SpineSkin() : skin(NULL) {}
-SpineSkin::~SpineSkin() {}
+SpineSkin::SpineSkin() : skin(nullptr), owns_skin(false) {
+}
 
-#define S_T(x) (spine::String(x.utf8()))
+SpineSkin::~SpineSkin() {
+	if (owns_skin) delete skin;
+}
+
 Ref<SpineSkin> SpineSkin::init(const String &name) {
-	skin = new spine::Skin(S_T(name));
+	if (skin) {
+		ERR_PRINT("Can not initialize an already initialized skin.");
+		return this;
+	}
+	owns_skin = true;
+	skin = new spine::Skin(SPINE_STRING(name));
 	return this;
 }
 
 void SpineSkin::set_attachment(uint64_t slot_index, const String &name, Ref<SpineAttachment> attachment) {
-	if (!attachment.is_valid()) {
-		ERR_PRINT("attachment is invalid!");
-		return;
-	}
-	skin->setAttachment(slot_index, S_T(name), attachment->get_spine_object());
+	SPINE_CHECK(skin,)
+	skin->setAttachment(slot_index, SPINE_STRING(name), attachment.is_valid() ? attachment->get_spine_object() : nullptr);
 }
 
 Ref<SpineAttachment> SpineSkin::get_attachment(uint64_t slot_index, const String &name) {
-	auto a = skin->getAttachment(slot_index, S_T(name));
-	if (a == NULL) return NULL;
-	Ref<SpineAttachment> gd_attachment(memnew(SpineAttachment));
-	gd_attachment->set_spine_object(a);
-	return gd_attachment;
+	SPINE_CHECK(skin, nullptr)
+	auto attachment = skin->getAttachment(slot_index, SPINE_STRING(name));
+	if (attachment) return nullptr;
+	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
+	attachment_ref->set_spine_object(attachment);
+	return attachment_ref;
 }
 
 void SpineSkin::remove_attachment(uint64_t slot_index, const String &name) {
-	skin->removeAttachment(slot_index, S_T(name));
+	SPINE_CHECK(skin,)
+	skin->removeAttachment(slot_index, SPINE_STRING(name));
 }
 
 Array SpineSkin::find_names_for_slot(uint64_t slot_index) {
+	Array result;
+	SPINE_CHECK(skin, result)
 	spine::Vector<spine::String> names;
 	skin->findNamesForSlot(slot_index, names);
-	Array gd_names;
-	gd_names.resize(names.size());
-	for (size_t i = 0; i < names.size(); ++i) {
-		gd_names[i] = names[i].buffer();
+	result.resize((int)names.size());
+	for (int i = 0; i < names.size(); ++i) {
+		result[i] = names[i].buffer();
 	}
-	return gd_names;
+	return result;
 }
 
 Array SpineSkin::find_attachments_for_slot(uint64_t slot_index) {
-	spine::Vector<spine::Attachment *> as;
-	skin->findAttachmentsForSlot(slot_index, as);
-	Array gd_as;
-	gd_as.resize(as.size());
-	for (size_t i = 0; i < as.size(); ++i) {
-		if (as[i] == NULL) gd_as[i] = Ref<SpineAttachment>(NULL);
-		else {
-			Ref<SpineAttachment> gd_a(memnew(SpineAttachment));
-			gd_a->set_spine_object(as[i]);
-			gd_as[i] = gd_a;
+	Array result;
+	SPINE_CHECK(skin, result)
+	spine::Vector<spine::Attachment *> attachments;
+	skin->findAttachmentsForSlot(slot_index, attachments);
+	result.resize((int)attachments.size());
+	for (int i = 0; i < attachments.size(); ++i) {
+		if (!attachments[i]) {
+			result[i] = Ref<SpineAttachment>(nullptr);
+		} else {
+			Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
+			attachment_ref->set_spine_object(attachments[i]);
+			result[i] = attachment_ref;
 		}
 	}
-	return gd_as;
+	return result;
 }
 
-String SpineSkin::get_skin_name() {
+String SpineSkin::get_name() {
+	SPINE_CHECK(skin, "")
 	return skin->getName().buffer();
 }
 
 void SpineSkin::add_skin(Ref<SpineSkin> other) {
-	if (other.is_valid() && other->get_spine_object()) {
-		skin->addSkin(other->get_spine_object());
-	} else {
-		ERR_PRINT("other is NULL!");
+	SPINE_CHECK(skin,)
+	if (!other.is_valid() || !other->get_spine_object()) {
+		ERR_PRINT("other is not a valid SpineSkin.");
+		return;
 	}
+	skin->addSkin(other->get_spine_object());
 }
 
 void SpineSkin::copy_skin(Ref<SpineSkin> other) {
-	if (other.is_valid() && other->get_spine_object()) {
-		skin->copySkin(other->get_spine_object());
-	} else {
-		ERR_PRINT("other is NULL!");
+	SPINE_CHECK(skin,)
+	if (!other.is_valid() || !other->get_spine_object()) {
+		ERR_PRINT("other is not a valid SpineSkin.");
+		return;
 	}
+	skin->copySkin(other->get_spine_object());
 }
 
 Ref<SpineSkinAttachmentMapEntries> SpineSkin::get_attachments() {
-	auto *es = new spine::Skin::AttachmentMap::Entries(skin->getAttachments());
-	Ref<SpineSkinAttachmentMapEntries> gd_es(memnew(SpineSkinAttachmentMapEntries));
-	gd_es->set_spine_object(es);
-	return gd_es;
+	SPINE_CHECK(skin, nullptr)
+	auto *entries = new spine::Skin::AttachmentMap::Entries(skin->getAttachments());
+	Ref<SpineSkinAttachmentMapEntries> entries_ref(memnew(SpineSkinAttachmentMapEntries));
+	entries_ref->set_spine_object(entries);
+	return entries_ref;
 }
 
 Array SpineSkin::get_bones() {
-	auto bs = skin->getBones();
-	Array gd_bs;
-	gd_bs.resize(bs.size());
-	for (size_t i = 0; i < bs.size(); ++i) {
-		if (bs[i] == NULL) gd_bs[i] = Ref<SpineBoneData>(NULL);
-		else {
-			Ref<SpineBoneData> gd_b(memnew(SpineBoneData));
-			gd_b->set_spine_object(bs[i]);
-			gd_bs[i] = gd_b;
-		}
+	Array result;
+	SPINE_CHECK(skin, result)
+	auto bones = skin->getBones();
+	result.resize((int)bones.size());
+	for (int i = 0; i < bones.size(); ++i) {
+		Ref<SpineBoneData> bone_ref(memnew(SpineBoneData));
+		bone_ref->set_spine_object(bones[i]);
+		result[i] = bone_ref;
 	}
-	return gd_bs;
+	return result;
 }
 
-Array SpineSkin::get_constraint() {
-	auto cs = skin->getConstraints();
-	Array gd_cs;
-	gd_cs.resize(cs.size());
-	for (size_t i = 0; i < cs.size(); ++i) {
-		if (cs[i] == NULL) gd_cs[i] = Ref<SpineConstraintData>(NULL);
-		else {
-			Ref<SpineConstraintData> gd_c(memnew(SpineConstraintData));
-			gd_c->set_spine_object(cs[i]);
-			gd_cs[i] = gd_c;
-		}
+Array SpineSkin::get_constraints() {
+	Array result;
+	SPINE_CHECK(skin, result)
+	auto constraints = skin->getConstraints();
+	result.resize((int)constraints.size());
+	for (int i = 0; i < constraints.size(); ++i) {
+		Ref<SpineConstraintData> constraint_ref(memnew(SpineConstraintData));
+		constraint_ref->set_spine_object(constraints[i]);
+		result[i] = constraint_ref;
 	}
-	return gd_cs;
+	return result;
 }
