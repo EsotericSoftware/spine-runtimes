@@ -112,7 +112,7 @@ void SpineSlotData::set_attachment_name(const String &v) {
 }
 
 SpineConstant::BlendMode SpineSlotData::get_blend_mode() {
-	SPINE_CHECK(slot_data, SpineConstant::BLENDMODE_NORMAL)
+	SPINE_CHECK(slot_data, SpineConstant::BlendMode_Normal)
 	return (SpineConstant::BlendMode)slot_data->getBlendMode();
 }
 void SpineSlotData::set_blend_mode(SpineConstant::BlendMode v) {

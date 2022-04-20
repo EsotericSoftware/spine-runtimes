@@ -100,20 +100,20 @@ public:
 	};
 
 	enum BlendMode {
-		BLENDMODE_NORMAL = 0,
-		BLENDMODE_ADDITIVE,
-		BLENDMODE_MULTIPLY,
-		BLENDMODE_SCREEN
+		BlendMode_Normal = 0,
+		BlendMode_Additive,
+		BlendMode_Multiply,
+		BlendMode_Screen
 	};
 };
 
-VARIANT_ENUM_CAST(SpineConstant::MixBlend);
-VARIANT_ENUM_CAST(SpineConstant::MixDirection);
-VARIANT_ENUM_CAST(SpineConstant::PropertyId);
-VARIANT_ENUM_CAST(SpineConstant::TransformMode);
-VARIANT_ENUM_CAST(SpineConstant::PositionMode);
-VARIANT_ENUM_CAST(SpineConstant::SpacingMode);
-VARIANT_ENUM_CAST(SpineConstant::RotateMode);
-VARIANT_ENUM_CAST(SpineConstant::BlendMode);
+VARIANT_ENUM_CAST(SpineConstant::MixBlend)
+VARIANT_ENUM_CAST(SpineConstant::MixDirection)
+VARIANT_ENUM_CAST(SpineConstant::PropertyId)
+VARIANT_ENUM_CAST(SpineConstant::TransformMode)
+VARIANT_ENUM_CAST(SpineConstant::PositionMode)
+VARIANT_ENUM_CAST(SpineConstant::SpacingMode)
+VARIANT_ENUM_CAST(SpineConstant::RotateMode)
+VARIANT_ENUM_CAST(SpineConstant::BlendMode)
 
 #endif//GODOT_SPINECONSTANT_H
