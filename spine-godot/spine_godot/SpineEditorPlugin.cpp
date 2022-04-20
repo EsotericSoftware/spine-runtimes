@@ -124,13 +124,13 @@ void SpineEditorPropertyAnimationMixes::delete_mix(int64_t idx) {
 	if (!skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded() || updating) return;
 
 	auto mixes = skeleton_data->get_animation_mixes().duplicate();
-	mixes.remove(idx);
+	mixes.remove((int)idx);
 	emit_changed(get_edited_property(), mixes);
 }
 
 void SpineEditorPropertyAnimationMixes::update_mix_property(int64_t index) {
 	if (index < 0 || index > mix_properties.size()) return;
-	mix_properties[index]->update_property();
+	mix_properties[(int)index]->update_property();
 }
 
 void SpineEditorPropertyAnimationMixes::update_property() {
@@ -191,20 +191,20 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 	updating = false;
 }
 
-SpineEditorPropertyAnimationMix::SpineEditorPropertyAnimationMix(): skeleton_data(nullptr), container(nullptr), updating(false) {
+SpineEditorPropertyAnimationMix::SpineEditorPropertyAnimationMix(): mixes_property(nullptr), skeleton_data(nullptr), index(0), container(nullptr), updating(false) {
 }
 
-void SpineEditorPropertyAnimationMix::setup(SpineEditorPropertyAnimationMixes *mixes_property, Ref<SpineSkeletonDataResource> skeleton_data, int index) {
-	this->mixes_property = mixes_property;
-	this->skeleton_data = skeleton_data;
-	this->index = index;
+void SpineEditorPropertyAnimationMix::setup(SpineEditorPropertyAnimationMixes *_mixes_property, const Ref<SpineSkeletonDataResource> &_skeleton_data, int _index) {
+	this->mixes_property = _mixes_property;
+	this->skeleton_data = _skeleton_data;
+	this->index = _index;
 }
 
 void SpineEditorPropertyAnimationMix::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("data_changed"), &SpineEditorPropertyAnimationMix::data_changed);
 }
 
-void SpineEditorPropertyAnimationMix::data_changed(const String &property, Variant value, const String &name, bool changing) {
+void SpineEditorPropertyAnimationMix::data_changed(const String &property, const Variant &value, const String &name, bool changing) {
 	auto mix = Object::cast_to<SpineAnimationMix>(get_edited_object()->get(get_edited_property()));
 
 	UndoRedo *undo_redo = EditorNode::get_undo_redo();

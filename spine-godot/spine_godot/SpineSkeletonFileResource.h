@@ -43,7 +43,7 @@ protected:
 	Vector<uint8_t> binary;
 
 public:
-	const bool is_binary() { return !binary.empty(); }
+	bool is_binary() { return !binary.empty(); }
 
 	const Vector<uint8_t> &get_binary() { return binary; }
 
@@ -58,13 +58,13 @@ class SpineSkeletonFileResourceFormatLoader : public ResourceFormatLoader {
 	GDCLASS(SpineSkeletonFileResourceFormatLoader, ResourceFormatLoader);
 
 public:
-	virtual RES load(const String &path, const String &original_path, Error *error);
+	RES load(const String &path, const String &original_path, Error *error) override;
 
-	virtual void get_recognized_extensions(List<String> *extensions) const;
+	void get_recognized_extensions(List<String> *extensions) const override;
 
-	virtual bool handles_type(const String &type) const;
+	bool handles_type(const String &type) const override;
 
-	virtual String get_resource_type(const String &path) const;
+	String get_resource_type(const String &path) const override;
 };
 
 class SpineSkeletonFileResourceFormatSaver : public ResourceFormatSaver {

@@ -57,14 +57,14 @@ void SpineTimeline::apply(Ref<SpineSkeleton> skeleton, float last_time, float ti
 	timeline->apply(*(skeleton->get_spine_object()), last_time, time, &spine_events, alpha, (spine::MixBlend) blend, (spine::MixDirection) direction);
 }
 
-int64_t SpineTimeline::get_frame_entries() {
+int SpineTimeline::get_frame_entries() {
 	SPINE_CHECK(timeline, 0)
-	return timeline->getFrameEntries();
+	return (int)timeline->getFrameEntries();
 }
 
-int64_t SpineTimeline::get_frame_count() {
+int SpineTimeline::get_frame_count() {
 	SPINE_CHECK(timeline, 0)
-	return timeline->getFrameCount();
+	return (int)timeline->getFrameCount();
 }
 
 Array SpineTimeline::get_frames() {

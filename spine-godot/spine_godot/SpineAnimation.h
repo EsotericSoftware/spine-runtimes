@@ -50,7 +50,7 @@ protected:
 public:
 	SpineAnimation();
 
-	void set_spine_object(spine::Animation *animation) { this->animation = animation; }
+	void set_spine_object(spine::Animation *_animation) { this->animation = _animation; }
 
 	spine::Animation *get_spine_object() { return animation; }
 

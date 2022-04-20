@@ -54,16 +54,12 @@ SpineAnimationState::~SpineAnimationState() {
 	delete animation_state;
 }
 
-void SpineAnimationState::set_skeleton_data_res(Ref<SpineSkeletonDataResource> data_res) {
+void SpineAnimationState::set_skeleton_data_res(const Ref<SpineSkeletonDataResource> &data_res) {
 	delete animation_state;
 	animation_state = nullptr;
 	skeleton_data_res = data_res;
 	if (!skeleton_data_res.is_valid() || !skeleton_data_res->is_skeleton_data_loaded()) return;
 	animation_state = new spine::AnimationState(skeleton_data_res->get_animation_state_data());
-}
-
-Ref<SpineSkeletonDataResource> SpineAnimationState::get_skeleton_data_res() const {
-	return skeleton_data_res;
 }
 
 void SpineAnimationState::update(float delta) {

@@ -44,7 +44,7 @@ private:
 
 public:
 	SpineAttachment();
-	~SpineAttachment();
+	~SpineAttachment() override;
 
 	void set_spine_object(spine::Attachment *_attachment) {
 		attachment = _attachment;

@@ -427,7 +427,7 @@ void SpineBone::set_active(bool v) {
 }
 
 // External feature functions
-void SpineBone::apply_world_transform_2d(Variant o) {
+void SpineBone::apply_world_transform_2d(const Variant &o) {
 	SPINE_CHECK(bone,)
 	if (o.get_type() == Variant::OBJECT) {
 		auto node = (Node *) o;

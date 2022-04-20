@@ -69,7 +69,7 @@ private:
 
 public:
 	SpineSkeleton();
-	~SpineSkeleton();
+	~SpineSkeleton() override;
 
 	void update_world_transform();
 

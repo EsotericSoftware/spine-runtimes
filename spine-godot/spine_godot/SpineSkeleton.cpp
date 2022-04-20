@@ -87,8 +87,8 @@ Ref<SpineSkeletonDataResource> SpineSkeleton::get_skeleton_data_res() const {
 	return skeleton_data_res;
 }
 
-void SpineSkeleton::set_spine_sprite(SpineSprite* sprite) {
-	this->sprite = sprite;
+void SpineSkeleton::set_spine_sprite(SpineSprite* _sprite) {
+	this->sprite = _sprite;
 }
 
 void SpineSkeleton::update_world_transform() {

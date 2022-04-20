@@ -118,8 +118,6 @@ public:
 	explicit SpineEditorPlugin(EditorNode *node);
 
 	String get_name() const override { return "SpineEditorPlugin"; }
-
-	bool has_main_screen() const { return false; }
 };
 
 class SpineSkeletonDataResourceInspectorPlugin: public EditorInspectorPlugin {
@@ -149,8 +147,8 @@ class SpineEditorPropertyAnimationMixes: public EditorProperty {
 	void update_mix_property(int64_t index);
 public:
 	SpineEditorPropertyAnimationMixes();
-	void setup(Ref<SpineSkeletonDataResource> skeleton_data) { this->skeleton_data = skeleton_data; };
-	virtual void update_property();
+	void setup(const Ref<SpineSkeletonDataResource> &_skeleton_data) { this->skeleton_data = _skeleton_data; };
+	void update_property() override;
 };
 
 class SpineEditorPropertyAnimationMix: public EditorProperty {
@@ -163,11 +161,11 @@ class SpineEditorPropertyAnimationMix: public EditorProperty {
 	bool updating;
 
 	static void _bind_methods();
-	void data_changed(const String &property, Variant value, const String &name, bool changing);
+	void data_changed(const String &property, const Variant &value, const String &name, bool changing);
 public:
 	SpineEditorPropertyAnimationMix();
-	void setup(SpineEditorPropertyAnimationMixes *mixes_property, Ref<SpineSkeletonDataResource> skeleton_data, int index);
-	virtual void update_property();
+	void setup(SpineEditorPropertyAnimationMixes *mixes_property, const Ref<SpineSkeletonDataResource> &skeleton_data, int index);
+	void update_property() override;
 };
 
 #endif

@@ -33,11 +33,6 @@
 #include <spine/Extension.h>
 
 class GodotSpineExtension : public spine::SpineExtension {
-public:
-	GodotSpineExtension();
-
-	virtual ~GodotSpineExtension();
-
 protected:
 	virtual void *_alloc(size_t size, const char *file, int line);
 

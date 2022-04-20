@@ -175,7 +175,7 @@ public:
 	void set_active(bool v);
 
 	// External feature functions
-	void apply_world_transform_2d(Variant o);
+	void apply_world_transform_2d(const Variant &o);
 
 	Transform2D get_godot_transform();
 

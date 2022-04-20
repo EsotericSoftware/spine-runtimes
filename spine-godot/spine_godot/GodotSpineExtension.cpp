@@ -36,9 +36,6 @@ spine::SpineExtension *spine::getDefaultExtension() {
 	return new GodotSpineExtension();
 }
 
-GodotSpineExtension::GodotSpineExtension() {}
-GodotSpineExtension::~GodotSpineExtension() {}
-
 void *GodotSpineExtension::_alloc(size_t size, const char *file, int line) {
 	return memalloc(size);
 }

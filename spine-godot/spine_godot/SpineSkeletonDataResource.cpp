@@ -47,24 +47,24 @@ void SpineAnimationMix::_bind_methods() {
 SpineAnimationMix::SpineAnimationMix(): from(""), to(""), mix(0) {
 }
 
-void SpineAnimationMix::set_from(const StringName &from) {
-	this->from = from;
+void SpineAnimationMix::set_from(const StringName &_from) {
+	this->from = _from;
 }
 
 String SpineAnimationMix::get_from() {
 	return from;
 }
 
-void SpineAnimationMix::set_to(const StringName &to) {
-	this->to = to;
+void SpineAnimationMix::set_to(const StringName &_to) {
+	this->to = _to;
 }
 
 String SpineAnimationMix::get_to() {
 	return to;
 }
 
-void SpineAnimationMix::set_mix(float mix) {
-	this->mix = mix;
+void SpineAnimationMix::set_mix(float _mix) {
+	this->mix = _mix;
 }
 
 float SpineAnimationMix::get_mix() {
@@ -215,8 +215,8 @@ void SpineSkeletonDataResource::get_skin_names(Vector<String> &skin_names) const
 	}
 }
 
-void SpineSkeletonDataResource::set_default_mix(float default_mix) {
-	this->default_mix = default_mix;
+void SpineSkeletonDataResource::set_default_mix(float _default_mix) {
+	this->default_mix = _default_mix;
 	update_mixes();
 }
 
@@ -224,16 +224,16 @@ float SpineSkeletonDataResource::get_default_mix() {
 	return default_mix;
 }
 
-void SpineSkeletonDataResource::set_animation_mixes(Array animation_mixes) {
-	for (int i = 0; i < animation_mixes.size(); i++) {
-		auto objectId = Object::cast_to<EncodedObjectAsID>(animation_mixes[0]);
+void SpineSkeletonDataResource::set_animation_mixes(Array _animation_mixes) {
+	for (int i = 0; i < _animation_mixes.size(); i++) {
+		auto objectId = Object::cast_to<EncodedObjectAsID>(_animation_mixes[0]);
 		if (objectId) {
 			ERR_PRINT("Live-editing of animation mixes is not supported.");
 			return;
 		}
 	}
 
-	this->animation_mixes = animation_mixes;
+	this->animation_mixes = _animation_mixes;
 	update_mixes();
 }
 

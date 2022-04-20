@@ -44,7 +44,7 @@ private:
 
 public:
 	SpineSkin();
-	~SpineSkin();
+	~SpineSkin() override;
 
 	void set_spine_object(spine::Skin *s) { skin = s; }
 	spine::Skin *get_spine_object() { return skin; }
@@ -82,20 +82,20 @@ GDCLASS(SpineSkinEntry, Reference);
 protected:
 	static void _bind_methods();
 
-	void init(uint64_t slot_index, const String &name, Ref<SpineAttachment> attachment) {
-		this->slot_index = slot_index;
-		this->name = name;
-		this->attachment = attachment;
+	void init(int _slot_index, const String &_name, Ref<SpineAttachment> _attachment) {
+		this->slot_index = _slot_index;
+		this->name = _name;
+		this->attachment = _attachment;
 	}
 private:
-	uint64_t slot_index;
+	int slot_index;
 	String name;
 	Ref<SpineAttachment> attachment;
 
 public:
 	SpineSkinEntry();
 
-	uint64_t get_slot_index();
+	int get_slot_index();
 
 	const String &get_name();
 

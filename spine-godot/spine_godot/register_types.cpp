@@ -59,8 +59,6 @@ static Ref<SpineSkeletonFileResourceFormatSaver> skeleton_file_saver;
 #include "editor/editor_export.h"
 #include "editor/editor_node.h"
 #include "SpineEditorPlugin.h"
-#include "SpineSkeletonDataResource.h"
-#include "SpineSprite.h"
 
 static void editor_init_callback() {
 	EditorNode::get_singleton()->add_editor_plugin(memnew(SpineEditorPlugin(EditorNode::get_singleton())));

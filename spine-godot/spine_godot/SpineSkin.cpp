@@ -145,7 +145,7 @@ Array SpineSkin::get_attachments() {
 		Ref<SpineSkinEntry> entry_ref = memnew(SpineSkinEntry);
 		Ref<SpineAttachment> attachment_ref = nullptr;
 		if (entry._attachment) {
-			Ref<SpineAttachment> attachment_ref = memnew(SpineAttachment);
+			attachment_ref = Ref<SpineAttachment>(memnew(SpineAttachment));
 			attachment_ref->set_spine_object(entry._attachment);
 		}
 		entry_ref->init(entry._slotIndex, entry._name.buffer(), attachment_ref);
@@ -189,7 +189,7 @@ void SpineSkinEntry::_bind_methods() {
 SpineSkinEntry::SpineSkinEntry() : slot_index(0) {
 }
 
-uint64_t SpineSkinEntry::get_slot_index() {
+int SpineSkinEntry::get_slot_index() {
 	return slot_index;
 }
 

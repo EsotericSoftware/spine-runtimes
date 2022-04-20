@@ -41,7 +41,7 @@ class SpineAtlasResource : public Resource {
 	GDCLASS(SpineAtlasResource, Resource)
 
 	void clear();
-	
+
 protected:
 	static void _bind_methods();
 
@@ -57,10 +57,7 @@ protected:
 
 public:
 	SpineAtlasResource();
-	
-	virtual ~SpineAtlasResource();
-	
-	String &get_atlas_data() { return atlas_data; }
+	~SpineAtlasResource() override;
 
 	spine::Atlas *get_spine_atlas() { return atlas; }
 
@@ -69,13 +66,13 @@ public:
 	Error load_from_atlas_file(const String &path);// .atlas
 
 	Error load_from_file(const String &path); // .spatlas
-	
+
 	Error save_to_file(const String &path);  // .spatlas
 
 	String get_source_path();
-	
+
 	Array get_textures();
-	
+
 	Array get_normal_maps();
 };
 
@@ -83,23 +80,23 @@ class SpineAtlasResourceFormatLoader : public ResourceFormatLoader {
 	GDCLASS(SpineAtlasResourceFormatLoader, ResourceFormatLoader)
 
 public:
-	virtual RES load(const String &path, const String &original_path, Error *error = nullptr);
-	
-	virtual void get_recognized_extensions(List<String> *extensions) const;
-	
-	virtual bool handles_type(const String &type) const;
-	
-	virtual String get_resource_type(const String &path) const;
+	RES load(const String &path, const String &original_path, Error *error) override;
+
+	void get_recognized_extensions(List<String> *extensions) const override;
+
+	bool handles_type(const String &type) const override;
+
+	String get_resource_type(const String &path) const override;
 };
 
 class SpineAtlasResourceFormatSaver : public ResourceFormatSaver {
 	GDCLASS(SpineAtlasResourceFormatSaver, ResourceFormatSaver)
 
 public:
-	Error save(const String &path, const RES &resource, uint32_t flags = 0) override;
-	
+	Error save(const String &path, const RES &resource, uint32_t flags) override;
+
 	void get_recognized_extensions(const RES &resource, List<String> *extensions) const override;
-	
+
 	bool recognize(const RES &resource) const override;
 };
 

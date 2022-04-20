@@ -43,7 +43,7 @@ public:
 	GodotSpineTextureLoader(Array *_textures, Array *_normal_maps, const String &normal_map_prefix) : textures(_textures), normal_maps(_normal_maps), normal_map_prefix(normal_map_prefix) {
 	}
 
-	String fix_path(const String &path) {
+	static String fix_path(const String &path) {
 		if (path.size() > 5 && path[4] == '/' && path[5] == '/') return path;
 		const String prefix = "res:/";
 		auto i = path.find(prefix);
@@ -51,7 +51,7 @@ public:
 		if (sub_str_pos < 0) return path;
 		auto res = path.substr(sub_str_pos);
 
-		if (res.size() > 0) {
+		if (!res.empty()) {
 			if (res[0] != '/') {
 				return prefix + "/" + res;
 			} else {
@@ -61,7 +61,7 @@ public:
 		return path;
 	}
 
-	virtual void load(spine::AtlasPage &page, const spine::String &path) {
+	void load(spine::AtlasPage &page, const spine::String &path) override {
 		Error error = OK;
 		auto fixed_path = fix_path(String(path.buffer()));
 
@@ -80,8 +80,7 @@ public:
 		renderer_object->texture = texture;
 		renderer_object->normal_map = Ref<Texture>(nullptr);
 
-		String temp_path = fixed_path;
-		String new_path = vformat("%s/%s_%s", temp_path.get_base_dir(), normal_map_prefix, temp_path.get_file());
+		String new_path = vformat("%s/%s_%s", fixed_path.get_base_dir(), normal_map_prefix, fixed_path.get_file());
 		if (ResourceLoader::exists(new_path)) {
 			Ref<Texture> normal_map = ResourceLoader::load(new_path);
 			normal_maps->append(normal_map);
@@ -93,7 +92,7 @@ public:
 		page.height = texture->get_height();
 	}
 
-	virtual void unload(void *data) {
+	void unload(void *data) override {
 		auto renderer_object = (SpineRendererObject *) data;
 		Ref<Texture> &texture = renderer_object->texture;
 		if (texture.is_valid()) texture.unref();
@@ -159,16 +158,15 @@ Error SpineAtlasResource::load_from_atlas_file(const String &path) {
 }
 
 Error SpineAtlasResource::load_from_file(const String &path) {
-	Error err;
-	String json_string = FileAccess::get_file_as_string(path, &err);
-	if (err != OK) return err;
+	Error error;
+	String json_string = FileAccess::get_file_as_string(path, &error);
+	if (error != OK) return error;
 
 	String error_string;
 	int error_line;
-	JSON json;
 	Variant result;
-	err = json.parse(json_string, result, error_string, error_line);
-	if (err != OK) return err;
+	error = JSON::parse(json_string, result, error_string, error_line);
+	if (error != OK) return error;
 
 	Dictionary content = Dictionary(result);
 	source_path = content["source_path"];

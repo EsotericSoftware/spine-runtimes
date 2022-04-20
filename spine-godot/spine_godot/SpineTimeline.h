@@ -49,14 +49,14 @@ private:
 public:
 	SpineTimeline();
 
-	void set_spine_object(spine::Timeline *timeline) { this->timeline = timeline; }
+	void set_spine_object(spine::Timeline *_timeline) { this->timeline = _timeline; }
 	spine::Timeline *get_spine_object() { return timeline; }
 
 	void apply(Ref<SpineSkeleton> skeleton, float last_time, float time, Array events, float alpha, SpineConstant::MixBlend blend, SpineConstant::MixDirection direction);
 
-	int64_t get_frame_entries();
+	int get_frame_entries();
 
-	int64_t get_frame_count();
+	int get_frame_count();
 
 	Array get_frames();
 
