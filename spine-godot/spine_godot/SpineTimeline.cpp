@@ -43,7 +43,7 @@ void SpineTimeline::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_type"), &SpineTimeline::get_type);
 }
 
-SpineTimeline::SpineTimeline() : timeline(NULL) {
+SpineTimeline::SpineTimeline() : timeline(nullptr) {
 }
 
 void SpineTimeline::apply(Ref<SpineSkeleton> skeleton, float last_time, float time, Array events, float alpha,
