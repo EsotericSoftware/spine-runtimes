@@ -28,67 +28,63 @@
  *****************************************************************************/
 
 #include "SpineSkeletonFileResource.h"
+#include "core/os/file_access.h"
 
 void SpineSkeletonFileResource::_bind_methods() {
 }
 
-Error SpineSkeletonFileResource::load_from_file(const String &p_path) {
-	Error err;
-
-	if (p_path.ends_with("spjson"))
-		json = FileAccess::get_file_as_string(p_path, &err);
+Error SpineSkeletonFileResource::load_from_file(const String &path) {
+	Error error;
+	if (path.ends_with("spjson"))
+		json = FileAccess::get_file_as_string(path, &error);
 	else
-		binary = FileAccess::get_file_as_array(p_path, &err);
-	return err;
+		binary = FileAccess::get_file_as_array(path, &error);
+	return error;
 }
 
-Error SpineSkeletonFileResource::save_to_file(const String &p_path) {
-	Error err;
-	FileAccess *file = FileAccess::open(p_path, FileAccess::WRITE, &err);
-	if (err != OK) {
+Error SpineSkeletonFileResource::save_to_file(const String &path) {
+	Error error;
+	FileAccess *file = FileAccess::open(path, FileAccess::WRITE, &error);
+	if (error != OK) {
 		if (file) file->close();
-		return err;
+		return error;
 	}
-
 	if (!is_binary())
 		file->store_string(json);
 	else
 		file->store_buffer(binary.ptr(), binary.size());
 	file->close();
-
 	return OK;
 }
 
-RES SpineSkeletonFileResourceFormatLoader::load(const String &p_path, const String &p_original_path, Error *r_error) {
-	Ref<SpineSkeletonFileResource> skeleton = memnew(SpineSkeletonFileResource);
-	skeleton->load_from_file(p_path);
-
-	if (r_error) {
-		*r_error = OK;
-	}
-	return skeleton;
+RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String &original_path, Error *error) {
+	Ref<SpineSkeletonFileResource> skeleton_file = memnew(SpineSkeletonFileResource);
+	skeleton_file->load_from_file(path);
+	if (error) *error = OK;
+	return skeleton_file;
 }
 
-void SpineSkeletonFileResourceFormatLoader::get_recognized_extensions(List<String> *r_extensions) const {
-	r_extensions->push_back("spjson");
-	r_extensions->push_back("spskel");
+void SpineSkeletonFileResourceFormatLoader::get_recognized_extensions(List<String> *extensions) const {
+	extensions->push_back("spjson");
+	extensions->push_back("spskel");
 }
 
-String SpineSkeletonFileResourceFormatLoader::get_resource_type(const String &p_path) const {
+String SpineSkeletonFileResourceFormatLoader::get_resource_type(const String &path) const {
 	return "SpineSkeletonFileResource";
 }
 
-bool SpineSkeletonFileResourceFormatLoader::handles_type(const String &p_type) const {
-	return p_type == "SpineSkeletonFileResource" || ClassDB::is_parent_class(p_type, "SpineSkeletonFileResource");
+bool SpineSkeletonFileResourceFormatLoader::handles_type(const String &type) const {
+	return type == "SpineSkeletonFileResource" || ClassDB::is_parent_class(type, "SpineSkeletonFileResource");
 }
-Error SpineSkeletonFileResourceFormatSaver::save(const String &p_path, const RES &p_resource, uint32_t p_flags) {
-	Ref<SpineSkeletonFileResource> res = p_resource.get_ref_ptr();
-	Error error = res->save_to_file(p_path);
+
+Error SpineSkeletonFileResourceFormatSaver::save(const String &path, const RES &resource, uint32_t flags) {
+	Ref<SpineSkeletonFileResource> res = resource.get_ref_ptr();
+	Error error = res->save_to_file(path);
 	return error;
 }
 
-void SpineSkeletonFileResourceFormatSaver::get_recognized_extensions(const RES &p_resource, List<String> *p_extensions) const {
-	if (Object::cast_to<SpineSkeletonFileResource>(*p_resource)) {
+void SpineSkeletonFileResourceFormatSaver::get_recognized_extensions(const RES &resource, List<String> *p_extensions) const {
+	if (Object::cast_to<SpineSkeletonFileResource>(*resource)) {
 		p_extensions->push_back("spjson");
 		p_extensions->push_back("spskel");
 	}
