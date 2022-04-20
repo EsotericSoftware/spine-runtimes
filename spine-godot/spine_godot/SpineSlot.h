@@ -32,10 +32,10 @@
 
 #include "SpineSlotData.h"
 #include "SpineAttachment.h"
+#include "SpineBone.h"
 
+// Breaks cyclic dependency.
 class SpineSkeleton;
-
-class SpineBone;
 
 class SpineSlot : public Reference {
 	GDCLASS(SpineSlot, Reference);

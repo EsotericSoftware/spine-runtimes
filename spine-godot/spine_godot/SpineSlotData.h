@@ -30,8 +30,8 @@
 #ifndef GODOT_SPINESLOTDATA_H
 #define GODOT_SPINESLOTDATA_H
 
-#include "core/object.h"
 #include "SpineBoneData.h"
+#include "core/object.h"
 #include <spine/SlotData.h>
 
 class SpineSlotData : public Reference {

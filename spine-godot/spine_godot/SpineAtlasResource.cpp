@@ -27,11 +27,10 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "core/io/json.h"
-#include "scene/resources/texture.h"
-
 #include "SpineAtlasResource.h"
 #include "SpineRendererObject.h"
+#include "core/io/json.h"
+#include "scene/resources/texture.h"
 #include <spine/TextureLoader.h>
 
 class GodotSpineTextureLoader : public spine::TextureLoader {
@@ -88,7 +87,7 @@ public:
 			normal_maps->append(normal_map);
 			renderer_object->normal_map = normal_map;
 		}
-		
+
 		page.setRendererObject((void *) renderer_object);
 		page.width = texture->get_width();
 		page.height = texture->get_height();

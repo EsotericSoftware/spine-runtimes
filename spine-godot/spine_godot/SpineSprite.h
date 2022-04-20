@@ -30,12 +30,11 @@
 #ifndef GODOT_SPINESPRITE_H
 #define GODOT_SPINESPRITE_H
 
-#include "scene/2d/node_2d.h"
-#include "scene/resources/texture.h"
-
 #include "SpineSkeleton.h"
 #include "SpineAnimationState.h"
+#include "scene/2d/node_2d.h"
 #include "scene/2d/mesh_instance_2d.h"
+#include "scene/resources/texture.h"
 
 class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
 	GDCLASS(SpineSprite, Node2D);

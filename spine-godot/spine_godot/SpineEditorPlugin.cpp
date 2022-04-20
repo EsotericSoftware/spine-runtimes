@@ -29,7 +29,6 @@
 
 #ifdef TOOLS_ENABLED
 #include "SpineEditorPlugin.h"
-
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
 
@@ -118,7 +117,7 @@ void SpineEditorPropertyAnimationMixes::add_mix() {
 	mix->set_from(animation_names[0]);
 	mix->set_to(animation_names[0]);
 	mix->set_mix(0);
-	
+
 	Array mixes = skeleton_data->get_animation_mixes().duplicate();
 	mixes.push_back(mix);
 	emit_changed(get_edited_property(), mixes);
@@ -142,7 +141,7 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 	updating = true;
 
 	mix_properties.clear();
-	
+
 	if (container) {
 		set_bottom_editor(nullptr);
 		memdelete(container);
@@ -154,14 +153,14 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 		updating = false;
 		return;
 	}
-	
+
 	Vector<String> animation_names;
 	skeleton_data->get_animation_names(animation_names);
-	
+
 	container = memnew(VBoxContainer);
 	add_child(container);
 	set_bottom_editor(container);
-	
+
 	Array mixes = skeleton_data->get_animation_mixes();
 	array_object->set_array(mixes);
 	for (int i = 0; i < mixes.size(); i++) {
@@ -171,7 +170,7 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 		auto hbox = memnew(HBoxContainer);
 		hbox->set_h_size_flags(SIZE_EXPAND_FILL);
 		container->add_child(hbox);
-		
+
 		auto mix_property = memnew(SpineEditorPropertyAnimationMix);
 		mix_property->set_h_size_flags(SIZE_EXPAND_FILL);
 		mix_property->set_name_split_ratio(0);
@@ -180,7 +179,7 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 		mix_property->set_object_and_property(*array_object, property_name);
 		mix_property->update_property();
 		mix_properties.push_back(mix_property);
-		
+
 		auto delete_button = memnew(Button);
 		hbox->add_child(delete_button);
 		delete_button->set_text("Remove");
@@ -228,7 +227,7 @@ void SpineEditorPropertyAnimationMix::data_changed(const String &property, Varia
 void SpineEditorPropertyAnimationMix::update_property() {
 	if (updating) return;
 	updating = true;
-	
+
 	if (container) {
 		memdelete(container);
 		container->queue_delete();
@@ -245,14 +244,14 @@ void SpineEditorPropertyAnimationMix::update_property() {
 		updating = false;
 		return;
 	}
-	
+
 	Vector<String> animation_names;
 	skeleton_data->get_animation_names(animation_names);
-	
+
 	container = memnew(HBoxContainer);
 	container->set_h_size_flags(SIZE_EXPAND_FILL);
 	add_child(container);
-	
+
 	auto from_enum = memnew(EditorPropertyTextEnum);
 	from_enum->set_h_size_flags(SIZE_EXPAND_FILL);
 	from_enum->set_name_split_ratio(0);
@@ -282,7 +281,7 @@ void SpineEditorPropertyAnimationMix::update_property() {
 	mix_float->update_property();
 	mix_float->connect("property_changed", this, "data_changed");
 	container->add_child(mix_float);
-	
+
 	updating = false;
 }
 

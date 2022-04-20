@@ -32,7 +32,6 @@
 #include "SpineEvent.h"
 #include "SpineTimeline.h"
 #include "SpineCommon.h"
-
 #include "core/method_bind_ext.gen.inc"
 
 void SpineAnimation::_bind_methods() {

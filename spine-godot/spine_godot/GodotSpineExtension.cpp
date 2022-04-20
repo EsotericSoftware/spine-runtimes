@@ -30,7 +30,6 @@
 #include "GodotSpineExtension.h"
 #include "core/os/memory.h"
 #include "core/os/file_access.h"
-
 #include <spine/SpineString.h>
 
 spine::SpineExtension *spine::getDefaultExtension() {

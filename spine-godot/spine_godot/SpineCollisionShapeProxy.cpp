@@ -28,7 +28,6 @@
  *****************************************************************************/
 
 #include "SpineCollisionShapeProxy.h"
-
 #include "SpineSprite.h"
 
 void SpineCollisionShapeProxy::_bind_methods() {

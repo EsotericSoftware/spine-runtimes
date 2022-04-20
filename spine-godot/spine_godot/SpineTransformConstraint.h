@@ -32,6 +32,7 @@
 
 #include "SpineTransformConstraintData.h"
 #include "SpineBone.h"
+#include <spine/TransformConstraint.h>
 
 class SpineTransformConstraint : public Reference {
 	GDCLASS(SpineTransformConstraint, Reference);

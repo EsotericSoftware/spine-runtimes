@@ -32,8 +32,8 @@
 #include "editor/editor_properties_array_dict.h"
 
 #ifdef TOOLS_ENABLED
-#include "editor/editor_node.h"
 #include "SpineSprite.h"
+#include "editor/editor_node.h"
 #include "editor/editor_properties.h"
 
 class SpineAtlasResourceImportPlugin : public EditorImportPlugin {
