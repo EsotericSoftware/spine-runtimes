@@ -47,9 +47,6 @@ void SpineAnimationMix::_bind_methods() {
 SpineAnimationMix::SpineAnimationMix(): from(""), to(""), mix(0) {
 }
 
-SpineAnimationMix::~SpineAnimationMix() {
-}
-
 void SpineAnimationMix::set_from(const StringName &from) {
 	this->from = from;
 }

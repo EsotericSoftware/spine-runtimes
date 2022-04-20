@@ -49,7 +49,6 @@ private:
 
 public:
 	SpineBone();
-	~SpineBone();
 
 	void set_spine_object(spine::Bone *_bone) { bone = _bone; }
 

@@ -101,8 +101,6 @@ void SpineBone::_bind_methods() {
 
 SpineBone::SpineBone() : bone(nullptr), sprite(nullptr) {}
 
-SpineBone::~SpineBone() {}
-
 void SpineBone::set_spine_sprite(SpineSprite* _sprite) {
 	this->sprite = _sprite;
 }

@@ -43,7 +43,6 @@ protected:
 	static void _bind_methods();
 
 public:
-
 	Array get_bones();
 
 	Ref<SpineBoneData> get_target();

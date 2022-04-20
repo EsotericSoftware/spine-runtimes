@@ -47,9 +47,6 @@ void SpineEventData::_bind_methods() {
 SpineEventData::SpineEventData() : event_data(nullptr) {
 }
 
-SpineEventData::~SpineEventData() {
-}
-
 String SpineEventData::get_event_name() {
  SPINE_CHECK(event_data, "")
  return event_data->getName().buffer();

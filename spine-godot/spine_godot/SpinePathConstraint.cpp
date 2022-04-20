@@ -52,7 +52,8 @@ void SpinePathConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_active", "v"), &SpinePathConstraint::set_active);
 }
 
-SpinePathConstraint::SpinePathConstraint() : path_constraint(nullptr) {}
+SpinePathConstraint::SpinePathConstraint() : path_constraint(nullptr) {
+}
 
 void SpinePathConstraint::update() {
 	SPINE_CHECK(path_constraint,)

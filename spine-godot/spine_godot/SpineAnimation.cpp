@@ -47,9 +47,6 @@ void SpineAnimation::_bind_methods() {
 SpineAnimation::SpineAnimation() : animation(nullptr) {
 }
 
-SpineAnimation::~SpineAnimation() {
-}
-
 String SpineAnimation::get_name() {
 	SPINE_CHECK(animation, "")
 	return animation->getName().buffer();

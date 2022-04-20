@@ -48,9 +48,6 @@ void SpineIkConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_softness", "v"), &SpineIkConstraintData::set_softness);
 }
 
-SpineIkConstraintData::SpineIkConstraintData() {}
-SpineIkConstraintData::~SpineIkConstraintData() {}
-
 Array SpineIkConstraintData::get_bones() {
 	Array result;
 	SPINE_CHECK(constraint_data, result)

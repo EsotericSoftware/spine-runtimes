@@ -23,7 +23,6 @@ protected:
 	float mix;
 public:
 	SpineAnimationMix();
-	~SpineAnimationMix();
 
 	void set_from(const StringName &from);
 

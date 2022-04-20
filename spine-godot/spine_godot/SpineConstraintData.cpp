@@ -42,9 +42,6 @@ void SpineConstraintData::_bind_methods() {
 SpineConstraintData::SpineConstraintData() : constraint_data(nullptr) {
 }
 
-SpineConstraintData::~SpineConstraintData() {
-}
-
 String SpineConstraintData::get_constraint_name() {
 	SPINE_CHECK(constraint_data, "")
 	return constraint_data->getName().buffer();

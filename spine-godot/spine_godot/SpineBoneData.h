@@ -45,7 +45,6 @@ private:
 
 public:
 	SpineBoneData();
-	~SpineBoneData();
 
 	void set_spine_object(spine::BoneData *_bone_data) { bone_data = _bone_data; }
 

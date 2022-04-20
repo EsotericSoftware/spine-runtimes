@@ -45,7 +45,6 @@ private:
 
 public:
 	SpinePathConstraint();
-	~SpinePathConstraint() = default;
 
 	void set_spine_object(spine::PathConstraint *_path_constraint) { path_constraint = _path_constraint; }
 	spine::PathConstraint *get_spine_object() { return path_constraint; }

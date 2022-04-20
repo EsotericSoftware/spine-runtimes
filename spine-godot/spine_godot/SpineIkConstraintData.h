@@ -43,9 +43,6 @@ protected:
 	static void _bind_methods();
 
 public:
-	SpineIkConstraintData();
-	~SpineIkConstraintData();
-
 	Array get_bones();
 
 	Ref<SpineBoneData> get_target();

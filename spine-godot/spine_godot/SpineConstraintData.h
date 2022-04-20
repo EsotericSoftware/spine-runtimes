@@ -41,17 +41,16 @@ class SpineConstraintData : public Reference {
 
 protected:
 	static void _bind_methods();
-	
+
 	spine::ConstraintData *constraint_data;
 
 public:
 	SpineConstraintData();
-	~SpineConstraintData();
 
 	void set_spine_object(spine::ConstraintData *_constraint_data) {
 		constraint_data = _constraint_data;
 	}
-	
+
 	spine::ConstraintData *get_spine_object() {
 		return constraint_data;
 	}
@@ -59,11 +58,11 @@ public:
 	String get_constraint_name();
 
 	uint64_t get_order();
-	
+
 	void set_order(uint64_t v);
 
 	bool is_skin_required();
-	
+
 	void set_skin_required(bool v);
 };
 

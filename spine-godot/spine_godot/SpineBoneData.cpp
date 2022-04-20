@@ -61,9 +61,6 @@ void SpineBoneData::_bind_methods() {
 SpineBoneData::SpineBoneData() : bone_data(nullptr) {
 }
 
-SpineBoneData::~SpineBoneData() {
-}
-
 int SpineBoneData::get_index() {
 	SPINE_CHECK(bone_data, 0)
 	return bone_data->getIndex();

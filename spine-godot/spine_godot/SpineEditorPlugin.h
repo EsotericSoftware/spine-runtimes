@@ -115,8 +115,7 @@ class SpineEditorPlugin : public EditorPlugin {
 	GDCLASS(SpineEditorPlugin, EditorPlugin)
 
 public:
-	SpineEditorPlugin(EditorNode *node);
-	~SpineEditorPlugin();
+	explicit SpineEditorPlugin(EditorNode *node);
 
 	String get_name() const override { return "SpineEditorPlugin"; }
 

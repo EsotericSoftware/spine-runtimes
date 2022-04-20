@@ -44,7 +44,6 @@ private:
 
 public:
 	SpineEventData();
-	~SpineEventData();
 
 	void set_spine_object(spine::EventData *_event_data) { event_data = _event_data; }
 
@@ -53,23 +52,23 @@ public:
 	String get_event_name();
 
 	int get_int_value();
-	
+
 	void set_int_value(int v);
 
 	float get_float_value();
-	
+
 	void set_float_value(float v);
 
 	String get_string_value();
-	
+
 	void set_string_value(const String &v);
 
 	float get_volume();
-	
+
 	void set_volume(float v);
 
 	float get_balance();
-	
+
 	void set_balance(float v);
 };
 

@@ -55,9 +55,6 @@ void SpineIkConstraint::_bind_methods() {
 SpineIkConstraint::SpineIkConstraint() : ik_constraint(nullptr) {
 }
 
-SpineIkConstraint::~SpineIkConstraint() {
-}
-
 void SpineIkConstraint::update() {
 	SPINE_CHECK(ik_constraint,)
 	ik_constraint->update();

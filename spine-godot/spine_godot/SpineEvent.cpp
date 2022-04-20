@@ -48,9 +48,6 @@ void SpineEvent::_bind_methods() {
 SpineEvent::SpineEvent() : event(nullptr) {
 }
 
-SpineEvent::~SpineEvent() {
-}
-
 Ref<SpineEventData> SpineEvent::get_data() {
 	SPINE_CHECK(event, nullptr)
 	Ref<SpineEventData> event_data(memnew(SpineEventData));
