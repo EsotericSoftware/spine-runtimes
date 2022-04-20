@@ -45,9 +45,6 @@ protected:
 	static void _bind_methods();
 
 public:
-	SpinePathConstraintData() = default;
-	~SpinePathConstraintData() = default;
-
 	Array get_bones();
 
 	Ref<SpineSlotData> get_target();
