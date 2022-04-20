@@ -136,12 +136,22 @@ void SpineSkin::copy_skin(Ref<SpineSkin> other) {
 	skin->copySkin(other->get_spine_object());
 }
 
-Ref<SpineSkinAttachmentMapEntries> SpineSkin::get_attachments() {
-	SPINE_CHECK(skin, nullptr)
-	auto *entries = new spine::Skin::AttachmentMap::Entries(skin->getAttachments());
-	Ref<SpineSkinAttachmentMapEntries> entries_ref(memnew(SpineSkinAttachmentMapEntries));
-	entries_ref->set_spine_object(entries);
-	return entries_ref;
+Array SpineSkin::get_attachments() {
+	Array result;
+	SPINE_CHECK(skin, result)
+	auto entries = skin->getAttachments();
+	while(entries.hasNext()) {
+		spine::Skin::AttachmentMap::Entry &entry = entries.next();
+		Ref<SpineSkinEntry> entry_ref = memnew(SpineSkinEntry);
+		Ref<SpineAttachment> attachment_ref = nullptr;
+		if (entry._attachment) {
+			Ref<SpineAttachment> attachment_ref = memnew(SpineAttachment);
+			attachment_ref->set_spine_object(entry._attachment);
+		}
+		entry_ref->init(entry._slotIndex, entry._name.buffer(), attachment_ref);
+		result.push_back(entry_ref);
+	}
+	return result;
 }
 
 Array SpineSkin::get_bones() {
@@ -168,4 +178,25 @@ Array SpineSkin::get_constraints() {
 		result[i] = constraint_ref;
 	}
 	return result;
+}
+
+void SpineSkinEntry::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("get_slot_index"), &SpineSkinEntry::get_slot_index);
+	ClassDB::bind_method(D_METHOD("get_name"), &SpineSkinEntry::get_name);
+	ClassDB::bind_method(D_METHOD("get_attachment"), &SpineSkinEntry::get_attachment);
+}
+
+SpineSkinEntry::SpineSkinEntry() : slot_index(0) {
+}
+
+uint64_t SpineSkinEntry::get_slot_index() {
+	return slot_index;
+}
+
+const String &SpineSkinEntry::get_name() {
+	return name;
+}
+
+Ref<SpineAttachment> SpineSkinEntry::get_attachment() {
+	return attachment;
 }

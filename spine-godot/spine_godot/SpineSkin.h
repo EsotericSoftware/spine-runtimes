@@ -31,7 +31,6 @@
 #define GODOT_SPINESKIN_H
 
 #include "SpineAttachment.h"
-#include "SpineSkinAttachmentMapEntries.h"
 
 class SpineSkin : public Reference {
 	GDCLASS(SpineSkin, Reference);
@@ -68,11 +67,39 @@ public:
 
 	void copy_skin(Ref<SpineSkin> other);
 
-	Ref<SpineSkinAttachmentMapEntries> get_attachments();
+	Array get_attachments();
 
 	Array get_bones();
 
 	Array get_constraints();
+};
+
+class SpineSkinEntry : public Reference {
+GDCLASS(SpineSkinEntry, Reference);
+
+	friend class SpineSkin;
+
+protected:
+	static void _bind_methods();
+
+	void init(uint64_t slot_index, const String &name, Ref<SpineAttachment> attachment) {
+		this->slot_index = slot_index;
+		this->name = name;
+		this->attachment = attachment;
+	}
+private:
+	uint64_t slot_index;
+	String name;
+	Ref<SpineAttachment> attachment;
+
+public:
+	SpineSkinEntry();
+
+	uint64_t get_slot_index();
+
+	const String &get_name();
+
+	Ref<SpineAttachment> get_attachment();
 };
 
 #endif//GODOT_SPINESKIN_H

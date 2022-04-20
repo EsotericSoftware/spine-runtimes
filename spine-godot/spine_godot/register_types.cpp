@@ -41,7 +41,6 @@
 #include "SpineBoneData.h"
 #include "SpineSlotData.h"
 #include "SpineAttachment.h"
-#include "SpineSkinAttachmentMapEntries.h"
 #include "SpineConstraintData.h"
 #include "SpineSkin.h"
 #include "SpineIkConstraintData.h"
@@ -88,8 +87,7 @@ void register_spine_godot_types() {
 	ClassDB::register_class<SpineBoneData>();
 	ClassDB::register_class<SpineSlotData>();
 	ClassDB::register_class<SpineAttachment>();
-	ClassDB::register_class<SpineSkinAttachmentMapEntry>();
-	ClassDB::register_class<SpineSkinAttachmentMapEntries>();
+	ClassDB::register_class<SpineSkinEntry>();
 	ClassDB::register_class<SpineConstraintData>();
 	ClassDB::register_class<SpineSkin>();
 	ClassDB::register_class<SpineIkConstraintData>();
