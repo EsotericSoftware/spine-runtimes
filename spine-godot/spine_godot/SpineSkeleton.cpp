@@ -57,7 +57,7 @@ void SpineSkeleton::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_skin"), &SpineSkeleton::get_skin);
 	ClassDB::bind_method(D_METHOD("get_color"), &SpineSkeleton::get_color);
 	ClassDB::bind_method(D_METHOD("set_color", "v"), &SpineSkeleton::set_color);
-	ClassDB::bind_method(D_METHOD("set_position", "pos"), &SpineSkeleton::set_position);
+	ClassDB::bind_method(D_METHOD("set_position", "position"), &SpineSkeleton::set_position);
 	ClassDB::bind_method(D_METHOD("get_x"), &SpineSkeleton::get_x);
 	ClassDB::bind_method(D_METHOD("set_x", "v"), &SpineSkeleton::set_x);
 	ClassDB::bind_method(D_METHOD("get_y"), &SpineSkeleton::get_y);
@@ -318,9 +318,9 @@ void SpineSkeleton::set_color(Color v) {
 	color.set(v.r, v.g, v.b, v.a);
 }
 
-void SpineSkeleton::set_position(Vector2 pos) {
+void SpineSkeleton::set_position(Vector2 position) {
 	SPINE_CHECK(skeleton,)
-	skeleton->setPosition(pos.x, pos.y);
+	skeleton->setPosition(position.x, position.y);
 }
 
 float SpineSkeleton::get_x() {

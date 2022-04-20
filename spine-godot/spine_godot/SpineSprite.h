@@ -100,15 +100,15 @@ public:
 	void _update_all(float delta);
 
 	Array get_bind_slot_nodes();
+
 	void set_bind_slot_nodes(Array v);
 
 	Transform2D bone_get_global_transform(const String &bone_name);
+
 	void bone_set_global_transform(const String &bone_name, Transform2D transform);
 
-	bool get_overlap();
-	void set_overlap(bool v);
-
 	ProcessMode get_process_mode();
+
 	void set_process_mode(ProcessMode v);
 
 #ifdef TOOLS_ENABLED

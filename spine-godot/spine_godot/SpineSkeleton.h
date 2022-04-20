@@ -121,7 +121,7 @@ public:
 
 	void set_color(Color v);
 
-	void set_position(Vector2 pos);
+	void set_position(Vector2 position);
 
 	float get_x();
 

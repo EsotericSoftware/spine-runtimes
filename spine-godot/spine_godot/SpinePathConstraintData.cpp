@@ -33,25 +33,25 @@
 void SpinePathConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_bones"), &SpinePathConstraintData::get_bones);
 	ClassDB::bind_method(D_METHOD("get_target"), &SpinePathConstraintData::get_target);
-	ClassDB::bind_method(D_METHOD("set_target", "V"), &SpinePathConstraintData::set_target);
+	ClassDB::bind_method(D_METHOD("set_target", "v"), &SpinePathConstraintData::set_target);
 	ClassDB::bind_method(D_METHOD("get_position_mode"), &SpinePathConstraintData::get_position_mode);
-	ClassDB::bind_method(D_METHOD("set_position_mode", "V"), &SpinePathConstraintData::set_position_mode);
+	ClassDB::bind_method(D_METHOD("set_position_mode", "v"), &SpinePathConstraintData::set_position_mode);
 	ClassDB::bind_method(D_METHOD("get_spacing_mode"), &SpinePathConstraintData::get_spacing_mode);
-	ClassDB::bind_method(D_METHOD("set_spacing_mode", "V"), &SpinePathConstraintData::set_spacing_mode);
+	ClassDB::bind_method(D_METHOD("set_spacing_mode", "v"), &SpinePathConstraintData::set_spacing_mode);
 	ClassDB::bind_method(D_METHOD("get_rotate_mode"), &SpinePathConstraintData::get_rotate_mode);
-	ClassDB::bind_method(D_METHOD("set_rotate_mode", "V"), &SpinePathConstraintData::set_rotate_mode);
+	ClassDB::bind_method(D_METHOD("set_rotate_mode", "v"), &SpinePathConstraintData::set_rotate_mode);
 	ClassDB::bind_method(D_METHOD("get_offset_rotation"), &SpinePathConstraintData::get_offset_rotation);
-	ClassDB::bind_method(D_METHOD("set_offset_rotation", "V"), &SpinePathConstraintData::set_offset_rotation);
+	ClassDB::bind_method(D_METHOD("set_offset_rotation", "v"), &SpinePathConstraintData::set_offset_rotation);
 	ClassDB::bind_method(D_METHOD("get_position"), &SpinePathConstraintData::get_position);
-	ClassDB::bind_method(D_METHOD("set_position", "V"), &SpinePathConstraintData::set_position);
+	ClassDB::bind_method(D_METHOD("set_position", "v"), &SpinePathConstraintData::set_position);
 	ClassDB::bind_method(D_METHOD("get_spacing"), &SpinePathConstraintData::get_spacing);
-	ClassDB::bind_method(D_METHOD("set_spacing", "V"), &SpinePathConstraintData::set_spacing);
+	ClassDB::bind_method(D_METHOD("set_spacing", "v"), &SpinePathConstraintData::set_spacing);
 	ClassDB::bind_method(D_METHOD("get_mix_rotate"), &SpinePathConstraintData::get_mix_rotate);
-	ClassDB::bind_method(D_METHOD("set_mix_rotate", "V"), &SpinePathConstraintData::set_mix_rotate);
+	ClassDB::bind_method(D_METHOD("set_mix_rotate", "v"), &SpinePathConstraintData::set_mix_rotate);
 	ClassDB::bind_method(D_METHOD("get_mix_x"), &SpinePathConstraintData::get_mix_x);
-	ClassDB::bind_method(D_METHOD("set_mix_x", "V"), &SpinePathConstraintData::set_mix_x);
+	ClassDB::bind_method(D_METHOD("set_mix_x", "v"), &SpinePathConstraintData::set_mix_x);
 	ClassDB::bind_method(D_METHOD("get_mix_y"), &SpinePathConstraintData::get_mix_y);
-	ClassDB::bind_method(D_METHOD("set_mix_y", "V"), &SpinePathConstraintData::set_mix_y);
+	ClassDB::bind_method(D_METHOD("set_mix_y", "v"), &SpinePathConstraintData::set_mix_y);
 }
 
 Array SpinePathConstraintData::get_bones() {

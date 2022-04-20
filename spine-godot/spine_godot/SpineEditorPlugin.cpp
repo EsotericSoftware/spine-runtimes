@@ -78,9 +78,6 @@ SpineEditorPlugin::SpineEditorPlugin(EditorNode *node) {
 	add_inspector_plugin(memnew(SpineSkeletonDataResourceInspectorPlugin));
 }
 
-SpineEditorPlugin::~SpineEditorPlugin() {
-}
-
 bool SpineSkeletonDataResourceInspectorPlugin::can_handle(Object *object) {
 	return object->is_class("SpineSkeletonDataResource");
 }

@@ -46,9 +46,6 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_bind_slot_nodes"), &SpineSprite::get_bind_slot_nodes);
 	ClassDB::bind_method(D_METHOD("set_bind_slot_nodes", "v"), &SpineSprite::set_bind_slot_nodes);
 
-	ClassDB::bind_method(D_METHOD("get_overlap"), &SpineSprite::get_overlap);
-	ClassDB::bind_method(D_METHOD("set_overlap", "v"), &SpineSprite::set_overlap);
-
 	ClassDB::bind_method(D_METHOD("bone_get_global_transform", "bone_name"), &SpineSprite::bone_get_global_transform);
 	ClassDB::bind_method(D_METHOD("bone_set_global_transform", "bone_name", "global_transform"), &SpineSprite::bone_set_global_transform);
 
@@ -65,7 +62,6 @@ void SpineSprite::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("animation_event", PropertyInfo(Variant::OBJECT, "animation_state", PROPERTY_HINT_TYPE_STRING, "SpineAnimationState"), PropertyInfo(Variant::OBJECT, "track_entry", PROPERTY_HINT_TYPE_STRING, "SpineTrackEntry"), PropertyInfo(Variant::OBJECT, "event", PROPERTY_HINT_TYPE_STRING, "SpineEvent")));
 
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skeleton_data_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineSkeletonDataResource"), "set_skeleton_data_res", "get_skeleton_data_res");
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "overlap"), "set_overlap", "get_overlap");
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bind_slot_nodes"), "set_bind_slot_nodes", "get_bind_slot_nodes");
 
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "process_mode", PROPERTY_HINT_ENUM, "Process,Physics,Manual"), "set_process_mode", "get_process_mode");
@@ -494,14 +490,6 @@ Array SpineSprite::get_bind_slot_nodes() {
 
 void SpineSprite::set_bind_slot_nodes(Array v) {
 	bind_slot_nodes = v;
-}
-
-bool SpineSprite::get_overlap() {
-	return overlap;
-}
-
-void SpineSprite::set_overlap(bool v) {
-	overlap = v;
 }
 
 Transform2D SpineSprite::bone_get_global_transform(const String &bone_name) {
