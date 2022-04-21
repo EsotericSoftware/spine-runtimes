@@ -51,10 +51,10 @@ protected:
 	void _validate_and_play_current_animations();
 
 public:
-	enum ProcessMode {
-		ProcessMode_Process,
-		ProcessMode_Physics,
-		ProcessMode_Manual
+	enum UpdateMode {
+		UpdateMode_Process,
+		UpdateMode_Physics,
+		UpdateMode_Manual
 	};
 
 private:
@@ -67,7 +67,7 @@ private:
 	Array bind_slot_nodes;
 	bool overlap;
 
-	ProcessMode process_mode;
+	UpdateMode update_mode;
 
 	Vector<MeshInstance2D *> mesh_instances;
 	spine::SkeletonClipping *skeleton_clipper;
@@ -106,9 +106,9 @@ public:
 
 	void bone_set_global_transform(const String &bone_name, Transform2D transform);
 
-	ProcessMode get_process_mode();
+	UpdateMode get_update_mode();
 
-	void set_process_mode(ProcessMode v);
+	void set_update_mode(UpdateMode v);
 
 #ifdef TOOLS_ENABLED
 	virtual Rect2 _edit_get_rect() const;
@@ -116,5 +116,5 @@ public:
 #endif
 };
 
-VARIANT_ENUM_CAST(SpineSprite::ProcessMode);
+VARIANT_ENUM_CAST(SpineSprite::UpdateMode);
 #endif//GODOT_SPINESPRITE_H

@@ -49,8 +49,8 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("bone_get_global_transform", "bone_name"), &SpineSprite::bone_get_global_transform);
 	ClassDB::bind_method(D_METHOD("bone_set_global_transform", "bone_name", "global_transform"), &SpineSprite::bone_set_global_transform);
 
-	ClassDB::bind_method(D_METHOD("set_process_mode", "v"), &SpineSprite::set_process_mode);
-	ClassDB::bind_method(D_METHOD("get_process_mode"), &SpineSprite::get_process_mode);
+	ClassDB::bind_method(D_METHOD("set_update_mode", "v"), &SpineSprite::set_update_mode);
+	ClassDB::bind_method(D_METHOD("get_update_mode"), &SpineSprite::get_update_mode);
 
 	ClassDB::bind_method(D_METHOD("update_all", "delta"), &SpineSprite::_update_all);
 
@@ -64,14 +64,14 @@ void SpineSprite::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skeleton_data_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineSkeletonDataResource"), "set_skeleton_data_res", "get_skeleton_data_res");
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bind_slot_nodes"), "set_bind_slot_nodes", "get_bind_slot_nodes");
 
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "process_mode", PROPERTY_HINT_ENUM, "Process,Physics,Manual"), "set_process_mode", "get_process_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "update_mode", PROPERTY_HINT_ENUM, "Process,Physics,Manual"), "set_update_mode", "get_update_mode");
 
-	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Process)
-	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Physics)
-	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Manual)
+	BIND_ENUM_CONSTANT(UpdateMode::UpdateMode_Process)
+	BIND_ENUM_CONSTANT(UpdateMode::UpdateMode_Physics)
+	BIND_ENUM_CONSTANT(UpdateMode::UpdateMode_Manual)
 }
 
-SpineSprite::SpineSprite() : overlap(false), process_mode(ProcessMode_Process), skeleton_clipper(nullptr) {
+SpineSprite::SpineSprite() : overlap(false), update_mode(UpdateMode_Process), skeleton_clipper(nullptr) {
 	skeleton_clipper = new spine::SkeletonClipping();
 
 	// One material per blend mode, shared across all sprites.
@@ -140,9 +140,9 @@ void SpineSprite::_on_skeleton_data_changed() {
 		skeleton->update_world_transform();
 		generate_meshes_for_slots(skeleton);
 
-		if (process_mode == ProcessMode_Process) {
+		if (update_mode == UpdateMode_Process) {
 			_notification(NOTIFICATION_INTERNAL_PROCESS);
-		} else if (process_mode == ProcessMode_Physics) {
+		} else if (update_mode == UpdateMode_Physics) {
 			_notification(NOTIFICATION_INTERNAL_PHYSICS_PROCESS);
 		}
 	}
@@ -161,17 +161,17 @@ Ref<SpineAnimationState> SpineSprite::get_animation_state() {
 void SpineSprite::_notification(int p_what) {
 	switch (p_what) {
 		case NOTIFICATION_READY: {
-			set_process_internal(process_mode == ProcessMode_Process);
-			set_physics_process_internal(process_mode == ProcessMode_Physics);
+			set_process_internal(update_mode == UpdateMode_Process);
+			set_physics_process_internal(update_mode == UpdateMode_Physics);
 			break;
 		}
 		case NOTIFICATION_INTERNAL_PROCESS: {
-			if (process_mode == ProcessMode_Process)
+			if (update_mode == UpdateMode_Process)
 				_update_all(get_process_delta_time());
 			break;
 		}
 		case NOTIFICATION_INTERNAL_PHYSICS_PROCESS: {
-			if (process_mode == ProcessMode_Physics)
+			if (update_mode == UpdateMode_Physics)
 				_update_all(get_physics_process_delta_time());
 			break;
 		}
@@ -566,14 +566,14 @@ void SpineSprite::bone_set_global_transform(const String &bone_name, Transform2D
 	bone->set_godot_global_transform(transform);
 }
 
-SpineSprite::ProcessMode SpineSprite::get_process_mode() {
-	return process_mode;
+SpineSprite::UpdateMode SpineSprite::get_update_mode() {
+	return update_mode;
 }
 
-void SpineSprite::set_process_mode(SpineSprite::ProcessMode v) {
-	process_mode = v;
-	set_process_internal(process_mode == ProcessMode_Process);
-	set_physics_process_internal(process_mode == ProcessMode_Physics);
+void SpineSprite::set_update_mode(SpineSprite::UpdateMode v) {
+	update_mode = v;
+	set_process_internal(update_mode == UpdateMode_Process);
+	set_physics_process_internal(update_mode == UpdateMode_Physics);
 }
 
 void SpineSprite::_get_property_list(List<PropertyInfo> *p_list) const {
