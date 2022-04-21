@@ -37,18 +37,7 @@
 #include "scene/resources/texture.h"
 
 class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
-	GDCLASS(SpineSprite, Node2D);
-
-protected:
-	static void _bind_methods();
-
-	void _notification(int p_what);
-
-	void _get_property_list(List<PropertyInfo> *p_list) const;
-	bool _get(const StringName &p_property, Variant &r_value) const;
-	bool _set(const StringName &p_property, const Variant &p_value);
-
-	void _validate_and_play_current_animations();
+	GDCLASS(SpineSprite, Node2D)
 
 public:
 	enum UpdateMode {
@@ -56,56 +45,55 @@ public:
 		UpdateMode_Physics,
 		UpdateMode_Manual
 	};
-
-private:
+	
+protected:
 	Ref<SpineSkeletonDataResource> skeleton_data_res;
-
 	Ref<SpineSkeleton> skeleton;
 	Ref<SpineAnimationState> animation_state;
-
-	String preview_animation;
 	Array bind_slot_nodes;
-	bool overlap;
-
 	UpdateMode update_mode;
 
 	Vector<MeshInstance2D *> mesh_instances;
 	spine::SkeletonClipping *skeleton_clipper;
-	static Ref<CanvasItemMaterial> materials[4];
-
-public:
-	SpineSprite();
-	~SpineSprite();
-
-	void set_skeleton_data_res(const Ref<SpineSkeletonDataResource> &a);
-	Ref<SpineSkeletonDataResource> get_skeleton_data_res();
-
-	Ref<SpineSkeleton> get_skeleton();
-	Ref<SpineAnimationState> get_animation_state();
+	static Ref<CanvasItemMaterial> default_materials[4];
+	
+	static void _bind_methods();
+	void _notification(int what);
 
 	void generate_meshes_for_slots(Ref<SpineSkeleton> skeleton_ref);
 	void remove_meshes();
-
-	void update_meshes(Ref<SpineSkeleton> s);
+	void update_meshes(Ref<SpineSkeleton> skeleton);
 
 	void update_bind_slot_nodes();
 	void update_bind_slot_node_draw_order(const String &slot_name, Node2D *node2d);
 	Node *find_child_node_by_node(Node *node);
 
-	virtual void callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event);
+	void callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event);
 
-	void _on_skeleton_data_changed();
+public:
+	SpineSprite();
+	~SpineSprite();
 
-	void _update_all(float delta);
+	void set_skeleton_data_res(const Ref<SpineSkeletonDataResource> &_spine_skeleton_data_resource);
+	
+	Ref<SpineSkeletonDataResource> get_skeleton_data_res();
+
+	Ref<SpineSkeleton> get_skeleton();
+	
+	Ref<SpineAnimationState> get_animation_state();
+
+	void on_skeleton_data_changed();
+
+	void update_skeleton(float delta);
 
 	Array get_bind_slot_nodes();
 
 	void set_bind_slot_nodes(Array v);
 
-	Transform2D bone_get_global_transform(const String &bone_name);
+	Transform2D get_global_bone_transform(const String &bone_name);
 
-	void bone_set_global_transform(const String &bone_name, Transform2D transform);
-
+	void set_global_bone_transform(const String &bone_name, Transform2D transform);
+	
 	UpdateMode get_update_mode();
 
 	void set_update_mode(UpdateMode v);
