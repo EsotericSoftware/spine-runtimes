@@ -35,8 +35,8 @@
 
 class SpineBone;
 
-class SpineIkConstraint : public Reference {
-	GDCLASS(SpineIkConstraint, Reference);
+class SpineIkConstraint : public REFCOUNTED {
+	GDCLASS(SpineIkConstraint, REFCOUNTED);
 
 protected:
 	static void _bind_methods();

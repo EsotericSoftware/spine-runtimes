@@ -30,7 +30,25 @@
 #ifndef SPINE_COMMON_H
 #define SPINE_COMMON_H
 
+#include "core/version.h"
+#if VERSION_MAJOR > 3
+#include "core/core_bind.h"
+#include "core/error/error_macros.h"
+#define REFCOUNTED RefCounted
+#define EMPTY(x) ((x).is_empty())
+#define EMPTY_PTR(x) ((x)->is_empty())
+#define INSTANTIATE(x) (x).instantiate()
+#define NOTIFY_PROPERTY_LIST_CHANGED() notify_property_list_changed()
+#else
+#include "core/object.h"
+#include "core/reference.h"
 #include "core/error_macros.h"
+#define REFCOUNTED Reference
+#define EMPTY(x) ((x).empty())
+#define EMPTY_PTR(x) ((x)->empty())
+#define INSTANTIATE(x) (x).instance()
+#define NOTIFY_PROPERTY_LIST_CHANGED() property_list_changed_notify()
+#endif
 
 #define SPINE_CHECK(obj, ret) \
  if (!(obj)) { \

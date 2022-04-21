@@ -41,7 +41,11 @@ void SpineAnimationMix::_bind_methods() {
 
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "from"), "set_from", "get_from");
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "to"), "set_to", "get_to");
+#if VERSION_MAJOR > 3
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "mix"), "set_mix", "get_mix");
+#else
 	ADD_PROPERTY(PropertyInfo(Variant::REAL, "mix"), "set_mix", "get_mix");
+#endif
 }
 
 SpineAnimationMix::SpineAnimationMix(): from(""), to(""), mix(0) {
@@ -116,7 +120,11 @@ void SpineSkeletonDataResource::_bind_methods() {
 
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "atlas_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineAtlasResource"), "set_atlas_res", "get_atlas_res");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skeleton_file_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineSkeletonFileResource"), "set_skeleton_file_res", "get_skeleton_file_res");
+#if VERSION_MAJOR > 3
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "default_mix"), "set_default_mix", "get_default_mix");
+#else
 	ADD_PROPERTY(PropertyInfo(Variant::REAL, "default_mix"), "set_default_mix", "get_default_mix");
+#endif
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "animation_mixes"), "set_animation_mixes", "get_animation_mixes");
 }
 
@@ -143,15 +151,15 @@ void SpineSkeletonDataResource::update_skeleton_data() {
 	}
 	emit_signal("skeleton_data_changed");
 #ifdef TOOLS_ENABLED
-	property_list_changed_notify();
+	NOTIFY_PROPERTY_LIST_CHANGED();
 #endif
 }
 
 void SpineSkeletonDataResource::load_resources(spine::Atlas *atlas, const String &json, const Vector<uint8_t> &binary) {
-	if ((json.empty() && binary.empty()) || atlas == nullptr) return;
+	if ((EMPTY(json) && EMPTY(binary)) || atlas == nullptr) return;
 
 	spine::SkeletonData *data;
-	if (!json.empty()) {
+	if (!EMPTY(json)) {
 		spine::SkeletonJson skeletonJson(atlas);
 		data = skeletonJson.readSkeletonData(json.utf8());
 		if (!data) {
@@ -263,7 +271,7 @@ void SpineSkeletonDataResource::update_mixes() {
 
 Ref<SpineAnimation> SpineSkeletonDataResource::find_animation(const String &animation_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
-	if (animation_name.empty()) return nullptr;
+	if (EMPTY(animation_name)) return nullptr;
 	auto animation = skeleton_data->findAnimation(SPINE_STRING(animation_name));
 	if (!animation) return nullptr;
 	Ref<SpineAnimation> animation_ref(memnew(SpineAnimation));
@@ -273,7 +281,7 @@ Ref<SpineAnimation> SpineSkeletonDataResource::find_animation(const String &anim
 
 Ref<SpineBoneData> SpineSkeletonDataResource::find_bone(const String &bone_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
-	if (bone_name.empty()) return nullptr;
+	if (EMPTY(bone_name)) return nullptr;
 	auto bone = skeleton_data->findBone(SPINE_STRING(bone_name));
 	if (!bone) return nullptr;
 	Ref<SpineBoneData> bone_ref(memnew(SpineBoneData));
@@ -283,7 +291,7 @@ Ref<SpineBoneData> SpineSkeletonDataResource::find_bone(const String &bone_name)
 
 Ref<SpineSlotData> SpineSkeletonDataResource::find_slot(const String &slot_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
-	if (slot_name.empty()) return nullptr;
+	if (EMPTY(slot_name)) return nullptr;
 	auto slot = skeleton_data->findSlot(SPINE_STRING(slot_name));
 	if (!slot) return nullptr;
 	Ref<SpineSlotData> slot_ref(memnew(SpineSlotData));
@@ -293,7 +301,7 @@ Ref<SpineSlotData> SpineSkeletonDataResource::find_slot(const String &slot_name)
 
 Ref<SpineSkin> SpineSkeletonDataResource::find_skin(const String &skin_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
-	if (skin_name.empty()) return nullptr;
+	if (EMPTY(skin_name)) return nullptr;
 	auto skin = skeleton_data->findSkin(SPINE_STRING(skin_name));
 	if (!skin) return nullptr;
 	Ref<SpineSkin> skin_ref(memnew(SpineSkin));
@@ -303,7 +311,7 @@ Ref<SpineSkin> SpineSkeletonDataResource::find_skin(const String &skin_name) con
 
 Ref<SpineEventData> SpineSkeletonDataResource::find_event(const String &event_data_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
-	if (event_data_name.empty()) return nullptr;
+	if (EMPTY(event_data_name)) return nullptr;
 	auto event = skeleton_data->findEvent(SPINE_STRING(event_data_name));
 	if (!event) return nullptr;
 	Ref<SpineEventData> event_ref(memnew(SpineEventData));
@@ -313,7 +321,7 @@ Ref<SpineEventData> SpineSkeletonDataResource::find_event(const String &event_da
 
 Ref<SpineIkConstraintData> SpineSkeletonDataResource::find_ik_constraint(const String &constraint_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
-	if (constraint_name.empty()) return nullptr;
+	if (EMPTY(constraint_name)) return nullptr;
 	auto constraint = skeleton_data->findIkConstraint(SPINE_STRING(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpineIkConstraintData> constraint_ref(memnew(SpineIkConstraintData));
@@ -323,7 +331,7 @@ Ref<SpineIkConstraintData> SpineSkeletonDataResource::find_ik_constraint(const S
 
 Ref<SpineTransformConstraintData> SpineSkeletonDataResource::find_transform_constraint(const String &constraint_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
-	if (constraint_name.empty()) return nullptr;
+	if (EMPTY(constraint_name)) return nullptr;
 	auto constraint = skeleton_data->findTransformConstraint(SPINE_STRING(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpineTransformConstraintData> constraint_ref(memnew(SpineTransformConstraintData));
@@ -332,7 +340,7 @@ Ref<SpineTransformConstraintData> SpineSkeletonDataResource::find_transform_cons
 }
 Ref<SpinePathConstraintData> SpineSkeletonDataResource::find_path_constraint(const String &constraint_name) const {
 	SPINE_CHECK(skeleton_data, nullptr)
-	if (constraint_name.empty()) return nullptr;
+	if (EMPTY(constraint_name)) return nullptr;
 	auto constraint = skeleton_data->findPathConstraint(SPINE_STRING(constraint_name));
 	if (constraint == nullptr) return nullptr;
 	Ref<SpinePathConstraintData> constraint_ref(memnew(SpinePathConstraintData));

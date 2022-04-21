@@ -171,3 +171,4 @@ spine-godot/spine_godot/__pycache__
 spine-godot/example/.import
 spine-godot/spine_godot/*.obj
 *.bc
+spine-godot/example/.godot

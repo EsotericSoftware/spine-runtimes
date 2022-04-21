@@ -30,15 +30,15 @@
 #ifndef GODOT_SPINETIMELINE_H
 #define GODOT_SPINETIMELINE_H
 
+#include "SpineCommon.h"
 #include "SpineConstant.h"
-#include "core/reference.h"
 #include <spine/Timeline.h>
 
 class SpineSkeleton;
 class SpineEvent;
 
-class SpineTimeline : public Reference {
-	GDCLASS(SpineTimeline, Reference);
+class SpineTimeline : public REFCOUNTED {
+	GDCLASS(SpineTimeline, REFCOUNTED);
 
 protected:
 	static void _bind_methods();

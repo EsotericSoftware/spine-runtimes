@@ -30,7 +30,7 @@
 #ifndef GODOT_SPINECONSTANT_H
 #define GODOT_SPINECONSTANT_H
 
-#include "core/object.h"
+#include "SpineCommon.h"
 
 class SpineConstant : public Object {
 	GDCLASS(SpineConstant, Object);

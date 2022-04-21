@@ -30,16 +30,16 @@
 #ifndef GODOT_SPINEANIMATION_H
 #define GODOT_SPINEANIMATION_H
 
+#include "SpineCommon.h"
 #include "SpineConstant.h"
-#include "core/reference.h"
 #include <spine/Animation.h>
 
 class SpineEvent;
 class SpineSkeleton;
 class SpineTimeline;
 
-class SpineAnimation : public Reference {
-	GDCLASS(SpineAnimation, Reference);
+class SpineAnimation : public REFCOUNTED {
+	GDCLASS(SpineAnimation, REFCOUNTED);
 
 private:
 	spine::Animation *animation;

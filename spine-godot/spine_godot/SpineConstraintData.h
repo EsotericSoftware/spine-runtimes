@@ -30,14 +30,11 @@
 #ifndef GODOT_SPINECONSTRAINTDATA_H
 #define GODOT_SPINECONSTRAINTDATA_H
 
-#include "core/reference.h"
+#include "SpineCommon.h"
+#include <spine/ConstraintData.h>
 
-namespace spine {
-	class ConstraintData;
-}
-
-class SpineConstraintData : public Reference {
-	GDCLASS(SpineConstraintData, Reference);
+class SpineConstraintData : public REFCOUNTED {
+	GDCLASS(SpineConstraintData, REFCOUNTED);
 
 protected:
 	static void _bind_methods();

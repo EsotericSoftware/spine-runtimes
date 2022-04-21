@@ -28,7 +28,11 @@
  *****************************************************************************/
 
 #include "SpineSkeletonFileResource.h"
+#if VERSION_MAJOR > 3
+#include "core/io/file_access.h"
+#else
 #include "core/os/file_access.h"
+#endif
 
 void SpineSkeletonFileResource::_bind_methods() {
 }
@@ -44,20 +48,33 @@ Error SpineSkeletonFileResource::load_from_file(const String &path) {
 
 Error SpineSkeletonFileResource::save_to_file(const String &path) {
 	Error error;
+#if VERSION_MAJOR > 3
+	Ref<FileAccess> file = FileAccess::open(path, FileAccess::WRITE, &error);
+	if (error != OK) return error;
+#else
 	FileAccess *file = FileAccess::open(path, FileAccess::WRITE, &error);
 	if (error != OK) {
 		if (file) file->close();
 		return error;
 	}
+#endif
 	if (!is_binary())
 		file->store_string(json);
 	else
 		file->store_buffer(binary.ptr(), binary.size());
+#if VERSION_MAJOR > 3
+	file->flush();
+#else
 	file->close();
+#endif
 	return OK;
 }
 
+#if VERSION_MAJOR > 3
+RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) {
+#else
 RES SpineSkeletonFileResourceFormatLoader::load(const String &path, const String &original_path, Error *error) {
+#endif
 	Ref<SpineSkeletonFileResource> skeleton_file = memnew(SpineSkeletonFileResource);
 	skeleton_file->load_from_file(path);
 	if (error) *error = OK;
@@ -78,7 +95,7 @@ bool SpineSkeletonFileResourceFormatLoader::handles_type(const String &type) con
 }
 
 Error SpineSkeletonFileResourceFormatSaver::save(const String &path, const RES &resource, uint32_t flags) {
-	Ref<SpineSkeletonFileResource> res = resource.get_ref_ptr();
+	Ref<SpineSkeletonFileResource> res = resource;
 	Error error = res->save_to_file(path);
 	return error;
 }

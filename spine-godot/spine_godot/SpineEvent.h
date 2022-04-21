@@ -30,12 +30,12 @@
 #ifndef GODOT_SPINEEVENT_H
 #define GODOT_SPINEEVENT_H
 
+#include "SpineCommon.h"
 #include "SpineEventData.h"
-#include "core/reference.h"
 #include <spine/Event.h>
 
-class SpineEvent : public Reference {
-	GDCLASS(SpineEvent, Reference)
+class SpineEvent : public REFCOUNTED {
+	GDCLASS(SpineEvent, REFCOUNTED)
 
 protected:
 	static void _bind_methods();

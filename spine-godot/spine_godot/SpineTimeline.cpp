@@ -30,8 +30,9 @@
 #include "SpineTimeline.h"
 #include "SpineSkeleton.h"
 #include "SpineEvent.h"
-#include "SpineCommon.h"
+#if VERSION_MAJOR == 3
 #include "core/method_bind_ext.gen.inc"
+#endif
 
 void SpineTimeline::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("apply", "skeleton", "last_time", "time", "events", "alpha", "blend", "direction"), &SpineTimeline::apply);

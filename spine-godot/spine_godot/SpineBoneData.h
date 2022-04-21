@@ -30,12 +30,12 @@
 #ifndef GODOT_SPINEBONEDATA_H
 #define GODOT_SPINEBONEDATA_H
 
+#include "SpineCommon.h"
 #include "SpineConstant.h"
-#include "core/reference.h"
 #include <spine/BoneData.h>
 
-class SpineBoneData : public Reference {
-	GDCLASS(SpineBoneData, Reference);
+class SpineBoneData : public REFCOUNTED {
+	GDCLASS(SpineBoneData, REFCOUNTED);
 
 protected:
 	static void _bind_methods();

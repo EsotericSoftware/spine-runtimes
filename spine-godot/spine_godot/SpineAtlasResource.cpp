@@ -51,7 +51,7 @@ public:
 		if (sub_str_pos < 0) return path;
 		auto res = path.substr(sub_str_pos);
 
-		if (!res.empty()) {
+		if (!EMPTY(res)) {
 			if (res[0] != '/') {
 				return prefix + "/" + res;
 			} else {
@@ -65,8 +65,12 @@ public:
 		Error error = OK;
 		auto fixed_path = fix_path(String(path.buffer()));
 
+#if VERSION_MAJOR > 3
+		Ref<Texture2D> texture = ResourceLoader::load(fixed_path, "", ResourceFormatLoader::CACHE_MODE_REUSE, &error);
+#else
 		Ref<Texture> texture = ResourceLoader::load(fixed_path, "", false, &error);
-		if (error != OK) {
+#endif
+		if (error != OK || !texture.is_valid()) {
 			ERR_PRINT(vformat("Can't load texture: \"%s\"", String(path.buffer())));
 			auto renderer_object = memnew(SpineRendererObject);
 			renderer_object->texture = Ref<Texture>(nullptr);
@@ -162,11 +166,18 @@ Error SpineAtlasResource::load_from_file(const String &path) {
 	String json_string = FileAccess::get_file_as_string(path, &error);
 	if (error != OK) return error;
 
+#if VERSION_MAJOR > 3
+	JSON json;
+	error = json.parse(json_string);
+	if (error != OK) return error;
+	Variant result = json.get_data();
+#else
 	String error_string;
 	int error_line;
 	Variant result;
 	error = JSON::parse(json_string, result, error_string, error_line);
 	if (error != OK) return error;
+#endif
 
 	Dictionary content = Dictionary(result);
 	source_path = content["source_path"];
@@ -184,22 +195,37 @@ Error SpineAtlasResource::load_from_file(const String &path) {
 
 Error SpineAtlasResource::save_to_file(const String &path) {
 	Error err;
+#if VERSION_MAJOR > 3
+	Ref<FileAccess> file = FileAccess::open(path, FileAccess::WRITE, &err);
+	if (err != OK) return err;
+#else
 	FileAccess *file = FileAccess::open(path, FileAccess::WRITE, &err);
 	if (err != OK) {
 		if (file) file->close();
 		return err;
 	}
+#endif
 
 	Dictionary content;
 	content["source_path"] = source_path;
 	content["atlas_data"] = atlas_data;
 	content["normal_texture_prefix"] = normal_map_prefix;
+#if VERSION_MAJOR > 3
+	JSON json;
+	file->store_string(json.stringify(content));
+	file->flush();
+#else
 	file->store_string(JSON::print(content));
 	file->close();
+#endif
 	return OK;
 }
 
+#if VERSION_MAJOR > 3
+RES SpineAtlasResourceFormatLoader::load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) {
+#else
 RES SpineAtlasResourceFormatLoader::load(const String &path, const String &original_path, Error *error) {
+#endif
 	Ref<SpineAtlasResource> atlas = memnew(SpineAtlasResource);
 	atlas->load_from_file(path);
 	if (error) *error = OK;
@@ -221,7 +247,7 @@ bool SpineAtlasResourceFormatLoader::handles_type(const String &type) const {
 }
 
 Error SpineAtlasResourceFormatSaver::save(const String &path, const RES &resource, uint32_t flags) {
-	Ref<SpineAtlasResource> res = resource.get_ref_ptr();
+	Ref<SpineAtlasResource> res = resource;
 	return res->save_to_file(path);
 }
 

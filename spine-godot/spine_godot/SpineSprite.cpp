@@ -117,8 +117,13 @@ void SpineSprite::_on_skeleton_data_changed() {
 	animation_state.unref();
 
 	if (skeleton_data_res.is_valid()) {
+#if VERSION_MAJOR > 3
+		if (!skeleton_data_res->is_connected("skeleton_data_changed", callable_mp(this, &SpineSprite::_on_skeleton_data_changed)))
+			skeleton_data_res->connect("skeleton_data_changed", callable_mp(this, &SpineSprite::_on_skeleton_data_changed));
+#else
 		if (!skeleton_data_res->is_connected("skeleton_data_changed", this, "_on_skeleton_data_changed"))
 			skeleton_data_res->connect("skeleton_data_changed", this, "_on_skeleton_data_changed");
+#endif
 	}
 
 	if (skeleton_data_res.is_valid() && skeleton_data_res->is_skeleton_data_loaded()) {
@@ -142,7 +147,7 @@ void SpineSprite::_on_skeleton_data_changed() {
 		}
 	}
 
-	property_list_changed_notify();
+	NOTIFY_PROPERTY_LIST_CHANGED();
 }
 
 Ref<SpineSkeleton> SpineSprite::get_skeleton() {
@@ -176,7 +181,7 @@ void SpineSprite::_notification(int p_what) {
 }
 
 void SpineSprite::_update_all(float delta) {
-	if (!(skeleton.is_valid() && animation_state.is_valid()) || mesh_instances.empty())
+	if (!(skeleton.is_valid() && animation_state.is_valid()) || EMPTY(mesh_instances))
 		return;
 
 	animation_state->update(delta);
@@ -238,6 +243,21 @@ void SpineSprite::update_bind_slot_nodes() {
 }
 
 void SpineSprite::update_bind_slot_node_draw_order(const String &slot_name, Node2D *node2d) {
+#if VERSION_MAJOR > 3
+	auto nodes = find_nodes(slot_name);
+	if (!nodes.is_empty()) {
+		auto mesh_ins = Object::cast_to<MeshInstance2D>(nodes[0]);
+		if (mesh_ins) {
+			auto pos = mesh_ins->get_index();
+
+			// get child
+			auto node = find_child_node_by_node(node2d);
+			if (node && node->get_index() != pos + 1) {
+				move_child(node, pos + 1);
+			}
+		}
+	}
+#else
 	auto mesh_ins = find_node(slot_name);
 	if (mesh_ins) {
 		auto pos = mesh_ins->get_index();
@@ -248,6 +268,7 @@ void SpineSprite::update_bind_slot_node_draw_order(const String &slot_name, Node
 			move_child(node, pos + 1);
 		}
 	}
+#endif
 }
 Node *SpineSprite::find_child_node_by_node(Node *node) {
 	if (node == nullptr) return nullptr;
@@ -368,7 +389,11 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 		}
 
 		auto mesh_ins = mesh_instances[i];
+#if VERSION_MAJOR > 3
+		RenderingServer::get_singleton()->canvas_item_clear(mesh_ins->get_canvas_item());
+#else
 		VisualServer::get_singleton()->canvas_item_clear(mesh_ins->get_canvas_item());
+#endif
 
 		if (skeleton_clipper->isClipping()) {
 			skeleton_clipper->clipTriangles(vertices, indices, uvs, VERTEX_STRIDE);
@@ -400,6 +425,18 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 					p_indices.set(j, clipped_indices[j]);
 				}
 
+#if VERSION_MAJOR > 3
+				RenderingServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
+																			  p_indices,
+																			  p_points,
+																			  p_colors,
+																			  p_uvs,
+																			  Vector<int>(),
+																			  Vector<float>(),
+																			  tex.is_null() ? RID() : tex->get_rid(),
+																			  -1
+																			  );
+#else
 				VisualServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
 																			  p_indices,
 																			  p_points,
@@ -410,6 +447,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 																			  tex.is_null() ? RID() : tex->get_rid(),
 																			  -1,
 																			  normal_tex.is_null() ? RID() : normal_tex->get_rid());
+#endif
 			}
 		} else {
 			if (indices.size() > 0) {
@@ -429,6 +467,17 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 					p_indices.set(j, indices[j]);
 				}
 
+#if VERSION_MAJOR > 3
+				RenderingServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
+																			  p_indices,
+																			  p_points,
+																			  p_colors,
+																			  p_uvs,
+																			  Vector<int>(),
+																			  Vector<float>(),
+																			  tex.is_null() ? RID() : tex->get_rid(),
+																			  -1);
+#else
 				VisualServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
 																			  p_indices,
 																			  p_points,
@@ -439,6 +488,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 																			  tex.is_null() ? RID() : tex->get_rid(),
 																			  -1,
 																			  normal_tex.is_null() ? RID() : normal_tex->get_rid());
+#endif
 			}
 		}
 		skeleton_clipper->clipEnd(*slot);

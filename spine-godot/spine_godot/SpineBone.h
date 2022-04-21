@@ -30,15 +30,16 @@
 #ifndef GODOT_SPINEBONE_H
 #define GODOT_SPINEBONE_H
 
+#include "SpineCommon.h"
 #include "SpineBoneData.h"
-#include <scene/2d/node_2d.h>
+#include "scene/2d/node_2d.h"
 #include <spine/Bone.h>
 
 class SpineSkeleton;
 class SpineSprite;
 
-class SpineBone : public Reference {
-	GDCLASS(SpineBone, Reference)
+class SpineBone : public REFCOUNTED {
+	GDCLASS(SpineBone, REFCOUNTED)
 
 protected:
 	static void _bind_methods();

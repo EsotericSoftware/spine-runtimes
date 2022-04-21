@@ -30,6 +30,7 @@
 #ifndef GODOT_SPINESLOT_H
 #define GODOT_SPINESLOT_H
 
+#include "SpineCommon.h"
 #include "SpineSlotData.h"
 #include "SpineAttachment.h"
 #include "SpineBone.h"
@@ -37,8 +38,8 @@
 // Breaks cyclic dependency.
 class SpineSkeleton;
 
-class SpineSlot : public Reference {
-	GDCLASS(SpineSlot, Reference);
+class SpineSlot : public REFCOUNTED {
+	GDCLASS(SpineSlot, REFCOUNTED);
 
 protected:
 	static void _bind_methods();

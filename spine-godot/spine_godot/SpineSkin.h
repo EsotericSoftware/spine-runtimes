@@ -30,10 +30,11 @@
 #ifndef GODOT_SPINESKIN_H
 #define GODOT_SPINESKIN_H
 
+#include "SpineCommon.h"
 #include "SpineAttachment.h"
 
-class SpineSkin : public Reference {
-	GDCLASS(SpineSkin, Reference);
+class SpineSkin : public REFCOUNTED {
+	GDCLASS(SpineSkin, REFCOUNTED);
 
 protected:
 	static void _bind_methods();
@@ -74,8 +75,8 @@ public:
 	Array get_constraints();
 };
 
-class SpineSkinEntry : public Reference {
-GDCLASS(SpineSkinEntry, Reference);
+class SpineSkinEntry : public REFCOUNTED {
+GDCLASS(SpineSkinEntry, REFCOUNTED);
 
 	friend class SpineSkin;
 

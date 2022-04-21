@@ -113,7 +113,7 @@ void SpineSkeleton::set_slots_to_setup_pose() {
 
 Ref<SpineBone> SpineSkeleton::find_bone(const String &name) {
 	SPINE_CHECK(skeleton, nullptr)
-	if (name.empty()) return nullptr;
+	if (EMPTY(name)) return nullptr;
 	auto bone = skeleton->findBone(SPINE_STRING(name));
 	if (!bone) return nullptr;
 	Ref<SpineBone> bone_ref(memnew(SpineBone));
@@ -124,7 +124,7 @@ Ref<SpineBone> SpineSkeleton::find_bone(const String &name) {
 
 Ref<SpineSlot> SpineSkeleton::find_slot(const String &name) {
 	SPINE_CHECK(skeleton, nullptr)
-	if (name.empty()) return nullptr;
+	if (EMPTY(name)) return nullptr;
 	auto slot = skeleton->findSlot(SPINE_STRING(name));
 	if (!slot) return nullptr;
 	Ref<SpineSlot> slot_ref(memnew(SpineSlot));
@@ -162,13 +162,12 @@ Ref<SpineAttachment> SpineSkeleton::get_attachment_by_slot_index(int slot_index,
 
 void SpineSkeleton::set_attachment(const String &slot_name, const String &attachment_name) {
 	SPINE_CHECK(skeleton,)
-	ERR_FAIL_COND(slot_name.empty());
 	skeleton->setAttachment(SPINE_STRING(slot_name), SPINE_STRING(attachment_name));
 }
 
 Ref<SpineIkConstraint> SpineSkeleton::find_ik_constraint(const String &constraint_name) {
 	SPINE_CHECK(skeleton, nullptr)
-	if (constraint_name.empty()) return nullptr;
+	if (EMPTY(constraint_name)) return nullptr;
 	auto constraint = skeleton->findIkConstraint(SPINE_STRING(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpineIkConstraint> constraint_ref(memnew(SpineIkConstraint));
@@ -178,7 +177,7 @@ Ref<SpineIkConstraint> SpineSkeleton::find_ik_constraint(const String &constrain
 
 Ref<SpineTransformConstraint> SpineSkeleton::find_transform_constraint(const String &constraint_name) {
 	SPINE_CHECK(skeleton, nullptr)
-	if (constraint_name.empty()) return nullptr;
+	if (EMPTY(constraint_name)) return nullptr;
 	auto constraint = skeleton->findTransformConstraint(SPINE_STRING(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpineTransformConstraint> constraint_ref(memnew(SpineTransformConstraint));
@@ -188,7 +187,7 @@ Ref<SpineTransformConstraint> SpineSkeleton::find_transform_constraint(const Str
 
 Ref<SpinePathConstraint> SpineSkeleton::find_path_constraint(const String &constraint_name) {
 	SPINE_CHECK(skeleton, nullptr)
-	if (constraint_name.empty()) return nullptr;
+	if (EMPTY(constraint_name)) return nullptr;
 	auto constraint = skeleton->findPathConstraint(SPINE_STRING(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpinePathConstraint> constraint_ref(memnew(SpinePathConstraint));

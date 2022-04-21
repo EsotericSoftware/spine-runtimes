@@ -30,12 +30,13 @@
 #ifndef GODOT_SPINETRANSFORMCONSTRAINT_H
 #define GODOT_SPINETRANSFORMCONSTRAINT_H
 
+#include "SpineCommon.h"
 #include "SpineTransformConstraintData.h"
 #include "SpineBone.h"
 #include <spine/TransformConstraint.h>
 
-class SpineTransformConstraint : public Reference {
-	GDCLASS(SpineTransformConstraint, Reference);
+class SpineTransformConstraint : public REFCOUNTED {
+	GDCLASS(SpineTransformConstraint, REFCOUNTED);
 
 protected:
 	static void _bind_methods();

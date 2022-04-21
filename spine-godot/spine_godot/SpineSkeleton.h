@@ -30,6 +30,7 @@
 #ifndef GODOT_SPINESKELETON_H
 #define GODOT_SPINESKELETON_H
 
+#include "SpineCommon.h"
 #include "SpineSkeletonDataResource.h"
 #include "SpineBone.h"
 #include "SpineSlot.h"
@@ -39,8 +40,8 @@
 
 class SpineSprite;
 
-class SpineSkeleton : public Reference {
-	GDCLASS(SpineSkeleton, Reference);
+class SpineSkeleton : public REFCOUNTED {
+	GDCLASS(SpineSkeleton, REFCOUNTED);
 
 	friend class SpineBone;
 	friend class SpineSlot;

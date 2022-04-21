@@ -30,6 +30,7 @@
 #ifndef GODOT_SPINESKELETONFILERESOURCE_H
 #define GODOT_SPINESKELETONFILERESOURCE_H
 
+#include "SpineCommon.h"
 #include "core/io/resource_loader.h"
 #include "core/io/resource_saver.h"
 
@@ -43,7 +44,7 @@ protected:
 	Vector<uint8_t> binary;
 
 public:
-	bool is_binary() { return !binary.empty(); }
+	bool is_binary() { return binary.size() > 0; }
 
 	const Vector<uint8_t> &get_binary() { return binary; }
 
@@ -58,7 +59,11 @@ class SpineSkeletonFileResourceFormatLoader : public ResourceFormatLoader {
 	GDCLASS(SpineSkeletonFileResourceFormatLoader, ResourceFormatLoader);
 
 public:
+#if VERSION_MAJOR > 3
+	RES load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode);
+#else
 	RES load(const String &path, const String &original_path, Error *error) override;
+#endif
 
 	void get_recognized_extensions(List<String> *extensions) const override;
 

@@ -430,9 +430,8 @@ void SpineBone::set_active(bool v) {
 void SpineBone::apply_world_transform_2d(const Variant &o) {
 	SPINE_CHECK(bone,)
 	if (o.get_type() == Variant::OBJECT) {
-		auto node = (Node *) o;
-		if (node->is_class("Node2D")) {
-			auto node2d = (Node2D *) node;
+		auto node2d = Object::cast_to<Node2D>(o.operator Object*());
+		if (node2d) {			
 			// In godot the y-axis is nag to spine
 			node2d->set_transform(Transform2D(
 					get_a(), get_c(),

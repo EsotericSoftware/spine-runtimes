@@ -29,12 +29,13 @@
 
 #ifndef GODOT_SPINEEDITORPLUGIN_H
 #define GODOT_SPINEEDITORPLUGIN_H
-#include "editor/editor_properties_array_dict.h"
 
 #ifdef TOOLS_ENABLED
+#include "SpineCommon.h"
 #include "SpineSprite.h"
 #include "editor/editor_node.h"
 #include "editor/editor_properties.h"
+#include "editor/editor_properties_array_dict.h"
 
 class SpineAtlasResourceImportPlugin : public EditorImportPlugin {
 	GDCLASS(SpineAtlasResourceImportPlugin, EditorImportPlugin)
@@ -54,9 +55,17 @@ public:
 
 	String get_resource_type() const override { return "SpineAtlasResource"; }
 
+#if VERSION_MAJOR > 3
+	int get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
+
+	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override;
+
+	bool get_option_visibility(const String &path, const String &option, const Map<StringName, Variant> &options) const override { return true; }
+#else
 	void get_import_options(List<ImportOption> *options, int preset) const override;
 
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
+#endif
 
 	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 };
@@ -79,10 +88,17 @@ public:
 
 	String get_resource_type() const override { return "SpineSkeletonFileResource"; }
 
-	void get_import_options(List<ImportOption> *options, int preset) const override {}
+#if VERSION_MAJOR > 3
+	int get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
+
+	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override { }
+
+	bool get_option_visibility(const String &path, const String &option, const Map<StringName, Variant> &options) const override { return true; }
+#else
+	void get_import_options(List<ImportOption> *options, int preset) const override { }
 
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
-
+#endif
 	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 };
 
@@ -104,10 +120,17 @@ public:
 
 	String get_resource_type() const override { return "SpineSkeletonFileResource"; }
 
-	void get_import_options(List<ImportOption> *options, int preset) const override {}
+#if VERSION_MAJOR > 3
+	int get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
+
+	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override { }
+
+	bool get_option_visibility(const String &path, const String &option, const Map<StringName, Variant> &options) const override { return true; }
+#else
+	void get_import_options(List<ImportOption> *options, int preset) const override { }
 
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
-
+#endif
 	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 };
 
@@ -127,7 +150,11 @@ public:
 	SpineSkeletonDataResourceInspectorPlugin() = default;
 
 	bool can_handle(Object *object) override;
+#if VERSION_MAJOR > 3
+	bool parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, uint32_t usage, bool wide) override;
+#else
 	bool parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, int usage) override;
+#endif
 };
 
 class SpineEditorPropertyAnimationMix;

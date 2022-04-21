@@ -30,11 +30,12 @@
 #ifndef GODOT_SPINEANIMATIONSTATE_H
 #define GODOT_SPINEANIMATIONSTATE_H
 
+#include "SpineCommon.h"
 #include "SpineSkeleton.h"
 #include "SpineTrackEntry.h"
 
-class SpineAnimationState : public Reference {
-	GDCLASS(SpineAnimationState, Reference)
+class SpineAnimationState : public REFCOUNTED {
+	GDCLASS(SpineAnimationState, REFCOUNTED)
 
 protected:
 	static void _bind_methods();

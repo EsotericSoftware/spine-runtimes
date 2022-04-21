@@ -30,10 +30,12 @@
 #ifndef GODOT_SPINEATLASRESOURCE_H
 #define GODOT_SPINEATLASRESOURCE_H
 
+#include "SpineCommon.h"
 #include "core/io/resource_loader.h"
 #include "core/io/resource_saver.h"
 #include "core/io/image_loader.h"
 #include <spine/Atlas.h>
+
 
 class GodotSpineTextureLoader;
 
@@ -80,7 +82,11 @@ class SpineAtlasResourceFormatLoader : public ResourceFormatLoader {
 	GDCLASS(SpineAtlasResourceFormatLoader, ResourceFormatLoader)
 
 public:
+#if VERSION_MAJOR > 3
+	RES load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode) override;
+#else
 	RES load(const String &path, const String &original_path, Error *error) override;
+#endif
 
 	void get_recognized_extensions(List<String> *extensions) const override;
 

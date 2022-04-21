@@ -31,8 +31,9 @@
 #include "SpineSkeleton.h"
 #include "SpineEvent.h"
 #include "SpineTimeline.h"
-#include "SpineCommon.h"
+#if VERSION_MAJOR == 3
 #include "core/method_bind_ext.gen.inc"
+#endif
 
 void SpineAnimation::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_name"), &SpineAnimation::get_name);
