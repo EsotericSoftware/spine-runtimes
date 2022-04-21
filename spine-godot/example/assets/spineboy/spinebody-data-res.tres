@@ -16,4 +16,5 @@ mix = 0.2
 [resource]
 atlas_res = ExtResource( 1 )
 skeleton_file_res = ExtResource( 2 )
+default_mix = 0.2
 animation_mixes = [ SubResource( 1 ), SubResource( 2 ) ]

@@ -1,9 +1,11 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://examples/helloworld/spineboy-helloworld.gd" type="Script" id=1]
+[ext_resource path="res://examples/01-helloworld/spineboy-helloworld.gd" type="Script" id=1]
+[ext_resource path="res://examples/02-animation-state-listeners/animation-state-listeners.gd" type="Script" id=2]
 [ext_resource path="res://assets/spineboy/spinebody-data-res.tres" type="SpineSkeletonDataResource" id=3]
 
 [node name="Node2D" type="Node2D"]
+script = ExtResource( 2 )
 
 [node name="Spineboy" type="SpineSprite" parent="."]
 position = Vector2( 496.207, 477.185 )
