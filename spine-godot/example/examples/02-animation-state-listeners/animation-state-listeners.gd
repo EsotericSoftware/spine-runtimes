@@ -1,5 +1,7 @@
 extends Node2D
 
+onready var footstep_audio: AudioStreamPlayer = $FootstepAudio
+
 func _animation_started(sprite: SpineSprite, animation_state: SpineAnimationState, track_entry: SpineTrackEntry):
 	print("Animation started: " + track_entry.get_animation().get_name())
 
@@ -17,9 +19,8 @@ func _animation_disposed(sprite: SpineSprite, animation_state: SpineAnimationSta
 	
 func _animation_event(sprite: SpineSprite, animation_state: SpineAnimationState, track_entry: SpineTrackEntry, event: SpineEvent):
 	print("Animation event: " + track_entry.get_animation().get_name() + ", " + event.get_data().get_event_name())
-	if (event.get_data().get_event_name() == "footstep"):
-		var audio = $FootstepAudio
-		audio.play()
+	if (event.get_data().get_event_name() == "footstep"):		
+		footstep_audio.play()
 
 func _ready():
 	var spineboy = $Spineboy
