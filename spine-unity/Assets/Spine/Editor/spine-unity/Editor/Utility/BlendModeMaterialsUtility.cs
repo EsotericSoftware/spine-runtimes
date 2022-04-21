@@ -96,7 +96,7 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			skeletonDataAsset.Clear();
+			SpineEditorUtilities.ClearSkeletonDataAsset(skeletonDataAsset);
 			skeletonData = skeletonDataAsset.GetSkeletonData(true);
 			if (anyMaterialsChanged)
 				ReloadSceneSkeletons(skeletonDataAsset);
@@ -164,7 +164,7 @@ namespace Spine.Unity.Editor {
 
 			var skinEntries = new List<Skin.SkinEntry>();
 
-			skeletonDataAsset.Clear();
+			SpineEditorUtilities.ClearSkeletonDataAsset(skeletonDataAsset);
 			skeletonDataAsset.isUpgradingBlendModeMaterials = true;
 			SkeletonData skeletonData = skeletonDataAsset.GetSkeletonData(true);
 

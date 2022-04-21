@@ -39,13 +39,13 @@ import { MathUtils, Vector2 } from "./Utils";
  * constraint or application code modifies the world transform after it was computed from the local transform. */
 export class Bone implements Updatable {
 	/** The bone's setup pose data. */
-	data: BoneData = null;
+	data: BoneData;
 
 	/** The skeleton this bone belongs to. */
-	skeleton: Skeleton = null;
+	skeleton: Skeleton;
 
 	/** The parent bone, or null if this is the root bone. */
-	parent: Bone = null;
+	parent: Bone | null = null;
 
 	/** The immediate children of this bone. */
 	children = new Array<Bone>();
@@ -114,7 +114,7 @@ export class Bone implements Updatable {
 	active = false;
 
 	/** @param parent May be null. */
-	constructor (data: BoneData, skeleton: Skeleton, parent: Bone) {
+	constructor (data: BoneData, skeleton: Skeleton, parent: Bone | null) {
 		if (!data) throw new Error("data cannot be null.");
 		if (!skeleton) throw new Error("skeleton cannot be null.");
 		this.data = data;

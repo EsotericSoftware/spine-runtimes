@@ -41,13 +41,13 @@ export class SkeletonRenderer {
 	static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
 
 	premultipliedAlpha = false;
-	vertexEffect: VertexEffect = null;
+	vertexEffect: VertexEffect | null = null;
 	private tempColor = new Color();
 	private tempColor2 = new Color();
 	private vertices: NumberArrayLike;
 	private vertexSize = 2 + 2 + 4;
 	private twoColorTint = false;
-	private renderable: Renderable = new Renderable(null, 0, 0);
+	private renderable: Renderable = new Renderable([], 0, 0);
 	private clipper: SkeletonClipping = new SkeletonClipping();
 	private temp = new Vector2();
 	private temp2 = new Vector2();
@@ -65,7 +65,7 @@ export class SkeletonRenderer {
 		let clipper = this.clipper;
 		let premultipliedAlpha = this.premultipliedAlpha;
 		let twoColorTint = this.twoColorTint;
-		let blendMode: BlendMode = null;
+		let blendMode: BlendMode | null = null;
 
 		let tempPos = this.temp;
 		let tempUv = this.temp2;
@@ -73,10 +73,10 @@ export class SkeletonRenderer {
 		let tempDark = this.temp4;
 
 		let renderable: Renderable = this.renderable;
-		let uvs: NumberArrayLike = null;
-		let triangles: Array<number> = null;
+		let uvs: NumberArrayLike;
+		let triangles: Array<number>;
 		let drawOrder = skeleton.drawOrder;
-		let attachmentColor: Color = null;
+		let attachmentColor: Color;
 		let skeletonColor = skeleton.color;
 		let vertexSize = twoColorTint ? 12 : 8;
 		let inRange = false;
@@ -103,7 +103,7 @@ export class SkeletonRenderer {
 			}
 
 			let attachment = slot.getAttachment();
-			let texture: GLTexture = null;
+			let texture: GLTexture;
 			if (attachment instanceof RegionAttachment) {
 				let region = <RegionAttachment>attachment;
 				renderable.vertices = this.vertices;
@@ -112,7 +112,7 @@ export class SkeletonRenderer {
 				region.computeWorldVertices(slot, renderable.vertices, 0, clippedVertexSize);
 				triangles = SkeletonRenderer.QUAD_TRIANGLES;
 				uvs = region.uvs;
-				texture = <GLTexture>(<TextureAtlasRegion>region.region.renderObject).page.texture;
+				texture = <GLTexture>(<TextureAtlasRegion>region.region!.renderObject).page.texture;
 				attachmentColor = region.color;
 			} else if (attachment instanceof MeshAttachment) {
 				let mesh = <MeshAttachment>attachment;
@@ -124,7 +124,7 @@ export class SkeletonRenderer {
 				}
 				mesh.computeWorldVertices(slot, 0, mesh.worldVerticesLength, renderable.vertices, 0, clippedVertexSize);
 				triangles = mesh.triangles;
-				texture = <GLTexture>(<TextureAtlasRegion>mesh.region.renderObject).page.texture;
+				texture = <GLTexture>(<TextureAtlasRegion>mesh.region!.renderObject).page.texture;
 				uvs = mesh.uvs;
 				attachmentColor = mesh.color;
 			} else if (attachment instanceof ClippingAttachment) {

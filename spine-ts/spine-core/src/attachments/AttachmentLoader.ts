@@ -42,10 +42,10 @@ import { Sequence } from "./Sequence";
  * Runtimes Guide. */
 export interface AttachmentLoader {
 	/** @return May be null to not load an attachment. */
-	newRegionAttachment (skin: Skin, name: string, path: string, sequence: Sequence): RegionAttachment;
+	newRegionAttachment (skin: Skin, name: string, path: string, sequence: Sequence | null): RegionAttachment;
 
 	/** @return May be null to not load an attachment. */
-	newMeshAttachment (skin: Skin, name: string, path: string, sequence: Sequence): MeshAttachment;
+	newMeshAttachment (skin: Skin, name: string, path: string, sequence: Sequence | null): MeshAttachment;
 
 	/** @return May be null to not load an attachment. */
 	newBoundingBoxAttachment (skin: Skin, name: string): BoundingBoxAttachment;

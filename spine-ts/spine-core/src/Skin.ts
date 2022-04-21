@@ -36,7 +36,7 @@ import { StringMap } from "./Utils";
 
 /** Stores an entry in the skin consisting of the slot index, name, and attachment **/
 export class SkinEntry {
-	constructor (public slotIndex: number = 0, public name: string = null, public attachment: Attachment = null) { }
+	constructor (public slotIndex: number = 0, public name: string, public attachment: Attachment) { }
 }
 
 /** Stores attachments by slot index and attachment name.
@@ -45,7 +45,7 @@ export class SkinEntry {
  * [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the Spine Runtimes Guide. */
 export class Skin {
 	/** The skin's name, which is unique across all skins in the skeleton. */
-	name: string = null;
+	name: string;
 
 	attachments = new Array<StringMap<Attachment>>();
 	bones = Array<BoneData>();
@@ -140,7 +140,7 @@ export class Skin {
 	}
 
 	/** Returns the attachment for the specified slot index and name, or null. */
-	getAttachment (slotIndex: number, name: string): Attachment {
+	getAttachment (slotIndex: number, name: string): Attachment | null {
 		let dictionary = this.attachments[slotIndex];
 		return dictionary ? dictionary[name] : null;
 	}
@@ -148,7 +148,7 @@ export class Skin {
 	/** Removes the attachment in the skin for the specified slot index and name, if any. */
 	removeAttachment (slotIndex: number, name: string) {
 		let dictionary = this.attachments[slotIndex];
-		if (dictionary) dictionary[name] = null;
+		if (dictionary) delete dictionary[name];
 	}
 
 	/** Returns all attachments in this skin. */

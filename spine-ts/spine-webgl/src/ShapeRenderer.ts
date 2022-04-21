@@ -38,7 +38,7 @@ export class ShapeRenderer implements Disposable {
 	private mesh: Mesh;
 	private shapeType = ShapeType.Filled;
 	private color = new Color(1, 1, 1, 1);
-	private shader: Shader;
+	private shader: Shader | null = null;
 	private vertexIndex = 0;
 	private tmp = new Vector2();
 	private srcColorBlend: number;
@@ -85,28 +85,28 @@ export class ShapeRenderer implements Disposable {
 		this.color.set(r, g, b, a);
 	}
 
-	point (x: number, y: number, color: Color = null) {
+	point (x: number, y: number, color?: Color) {
 		this.check(ShapeType.Point, 1);
-		if (color === null) color = this.color;
+		if (!color) color = this.color;
 		this.vertex(x, y, color);
 	}
 
-	line (x: number, y: number, x2: number, y2: number, color: Color = null) {
+	line (x: number, y: number, x2: number, y2: number, color?: Color) {
 		this.check(ShapeType.Line, 2);
 		let vertices = this.mesh.getVertices();
 		let idx = this.vertexIndex;
-		if (color === null) color = this.color;
+		if (!color) color = this.color;
 		this.vertex(x, y, color);
 		this.vertex(x2, y2, color);
 	}
 
-	triangle (filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color: Color = null, color2: Color = null, color3: Color = null) {
+	triangle (filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, color?: Color, color2?: Color, color3?: Color) {
 		this.check(filled ? ShapeType.Filled : ShapeType.Line, 3);
 		let vertices = this.mesh.getVertices();
 		let idx = this.vertexIndex;
-		if (color === null) color = this.color;
-		if (color2 === null) color2 = this.color;
-		if (color3 === null) color3 = this.color;
+		if (!color) color = this.color;
+		if (!color2) color2 = this.color;
+		if (!color3) color3 = this.color;
 		if (filled) {
 			this.vertex(x, y, color);
 			this.vertex(x2, y2, color2);
@@ -123,14 +123,14 @@ export class ShapeRenderer implements Disposable {
 		}
 	}
 
-	quad (filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, color: Color = null, color2: Color = null, color3: Color = null, color4: Color = null) {
+	quad (filled: boolean, x: number, y: number, x2: number, y2: number, x3: number, y3: number, x4: number, y4: number, color?: Color, color2?: Color, color3?: Color, color4?: Color) {
 		this.check(filled ? ShapeType.Filled : ShapeType.Line, 3);
 		let vertices = this.mesh.getVertices();
 		let idx = this.vertexIndex;
-		if (color === null) color = this.color;
-		if (color2 === null) color2 = this.color;
-		if (color3 === null) color3 = this.color;
-		if (color4 === null) color4 = this.color;
+		if (!color) color = this.color;
+		if (!color2) color2 = this.color;
+		if (!color3) color3 = this.color;
+		if (!color4) color4 = this.color;
 		if (filled) {
 			this.vertex(x, y, color); this.vertex(x2, y2, color2); this.vertex(x3, y3, color3);
 			this.vertex(x3, y3, color3); this.vertex(x4, y4, color4); this.vertex(x, y, color);
@@ -142,13 +142,13 @@ export class ShapeRenderer implements Disposable {
 		}
 	}
 
-	rect (filled: boolean, x: number, y: number, width: number, height: number, color: Color = null) {
+	rect (filled: boolean, x: number, y: number, width: number, height: number, color?: Color) {
 		this.quad(filled, x, y, x + width, y, x + width, y + height, x, y + height, color, color, color, color);
 	}
 
-	rectLine (filled: boolean, x1: number, y1: number, x2: number, y2: number, width: number, color: Color = null) {
+	rectLine (filled: boolean, x1: number, y1: number, x2: number, y2: number, width: number, color?: Color) {
 		this.check(filled ? ShapeType.Filled : ShapeType.Line, 8);
-		if (color === null) color = this.color;
+		if (!color) color = this.color;
 		let t = this.tmp.set(y2 - y1, x1 - x2);
 		t.normalize();
 		width *= 0.5;
@@ -181,10 +181,10 @@ export class ShapeRenderer implements Disposable {
 		this.line(x - size, y + size, x + size, y - size);
 	}
 
-	polygon (polygonVertices: ArrayLike<number>, offset: number, count: number, color: Color = null) {
+	polygon (polygonVertices: ArrayLike<number>, offset: number, count: number, color?: Color) {
 		if (count < 3) throw new Error("Polygon must contain at least 3 vertices");
 		this.check(ShapeType.Line, count * 2);
-		if (color === null) color = this.color;
+		if (color) color = this.color;
 		let vertices = this.mesh.getVertices();
 		let idx = this.vertexIndex;
 
@@ -210,15 +210,15 @@ export class ShapeRenderer implements Disposable {
 				y2 = polygonVertices[i + 3];
 			}
 
-			this.vertex(x1, y1, color);
-			this.vertex(x2, y2, color);
+			this.vertex(x1, y1, color!);
+			this.vertex(x2, y2, color!);
 		}
 	}
 
-	circle (filled: boolean, x: number, y: number, radius: number, color: Color = null, segments: number = 0) {
-		if (segments === 0) segments = Math.max(1, (6 * MathUtils.cbrt(radius)) | 0);
+	circle (filled: boolean, x: number, y: number, radius: number, color?: Color, segments: number = 0) {
+		if (segments == 0) segments = Math.max(1, (6 * MathUtils.cbrt(radius)) | 0);
 		if (segments <= 0) throw new Error("segments must be > 0.");
-		if (color === null) color = this.color;
+		if (!color) color = this.color;
 		let angle = 2 * MathUtils.PI / segments;
 		let cos = Math.cos(angle);
 		let sin = Math.sin(angle);
@@ -256,9 +256,9 @@ export class ShapeRenderer implements Disposable {
 		this.vertex(x + cx, y + cy, color);
 	}
 
-	curve (x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color: Color = null) {
+	curve (x1: number, y1: number, cx1: number, cy1: number, cx2: number, cy2: number, x2: number, y2: number, segments: number, color?: Color) {
 		this.check(ShapeType.Line, segments * 2 + 2);
-		if (color === null) color = this.color;
+		if (color) color = this.color;
 
 		// Algorithm from: http://www.antigrain.com/research/bezier_interpolation/index.html#PAGE_BEZIER_INTERPOLATION
 		let subdiv_step = 1 / segments;
@@ -289,17 +289,17 @@ export class ShapeRenderer implements Disposable {
 		let dddfy = tmp2y * pre5;
 
 		while (segments-- > 0) {
-			this.vertex(fx, fy, color);
+			this.vertex(fx, fy, color!);
 			fx += dfx;
 			fy += dfy;
 			dfx += ddfx;
 			dfy += ddfy;
 			ddfx += dddfx;
 			ddfy += dddfy;
-			this.vertex(fx, fy, color);
+			this.vertex(fx, fy, color!);
 		}
-		this.vertex(fx, fy, color);
-		this.vertex(x2, y2, color);
+		this.vertex(fx, fy, color!);
+		this.vertex(x2, y2, color!);
 	}
 
 	private vertex (x: number, y: number, color: Color) {
@@ -324,6 +324,7 @@ export class ShapeRenderer implements Disposable {
 
 	private flush () {
 		if (this.vertexIndex == 0) return;
+		if (!this.shader) throw new Error("No shader set.");
 		this.mesh.setVerticesLength(this.vertexIndex);
 		this.mesh.draw(this.shader, this.shapeType);
 		this.vertexIndex = 0;

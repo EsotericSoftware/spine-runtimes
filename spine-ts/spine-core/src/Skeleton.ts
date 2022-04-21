@@ -46,34 +46,34 @@ import { Color, Utils, MathUtils, Vector2, NumberArrayLike } from "./Utils";
  * See [Instance objects](http://esotericsoftware.com/spine-runtime-architecture#Instance-objects) in the Spine Runtimes Guide. */
 export class Skeleton {
 	/** The skeleton's setup pose data. */
-	data: SkeletonData = null;
+	data: SkeletonData;
 
 	/** The skeleton's bones, sorted parent first. The root bone is always the first bone. */
-	bones: Array<Bone> = null;
+	bones: Array<Bone>;
 
 	/** The skeleton's slots. */
-	slots: Array<Slot> = null;
+	slots: Array<Slot>;
 
 	/** The skeleton's slots in the order they should be drawn. The returned array may be modified to change the draw order. */
-	drawOrder: Array<Slot> = null;
+	drawOrder: Array<Slot>;
 
 	/** The skeleton's IK constraints. */
-	ikConstraints: Array<IkConstraint> = null;
+	ikConstraints: Array<IkConstraint>;
 
 	/** The skeleton's transform constraints. */
-	transformConstraints: Array<TransformConstraint> = null;
+	transformConstraints: Array<TransformConstraint>;
 
 	/** The skeleton's path constraints. */
-	pathConstraints: Array<PathConstraint> = null;
+	pathConstraints: Array<PathConstraint>;
 
 	/** The list of bones and constraints, sorted in the order they should be updated, as computed by {@link #updateCache()}. */
 	_updateCache = new Array<Updatable>();
 
 	/** The skeleton's current skin. May be null. */
-	skin: Skin = null;
+	skin: Skin | null = null;
 
 	/** The color to tint all the skeleton's attachments. */
-	color: Color = null;
+	color: Color;
 
 	/** Scales the entire skeleton on the X axis. This affects all bones, even if the bone's transform mode disallows scale
 	  * inheritance. */
@@ -155,7 +155,7 @@ export class Skeleton {
 		if (this.skin) {
 			let skinBones = this.skin.bones;
 			for (let i = 0, n = this.skin.bones.length; i < n; i++) {
-				let bone = this.bones[skinBones[i].index];
+				let bone: Bone | null = this.bones[skinBones[i].index];
 				do {
 					bone.sorted = false;
 					bone.active = true;
@@ -201,7 +201,7 @@ export class Skeleton {
 	}
 
 	sortIkConstraint (constraint: IkConstraint) {
-		constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)));
+		constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)))!;
 		if (!constraint.active) return;
 
 		let target = constraint.target;
@@ -226,7 +226,7 @@ export class Skeleton {
 	}
 
 	sortPathConstraint (constraint: PathConstraint) {
-		constraint.active = constraint.target.bone.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)));
+		constraint.active = constraint.target.bone.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)))!;
 		if (!constraint.active) return;
 
 		let slot = constraint.target;
@@ -255,7 +255,7 @@ export class Skeleton {
 	}
 
 	sortTransformConstraint (constraint: TransformConstraint) {
-		constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)));
+		constraint.active = constraint.target.isActive() && (!constraint.data.skinRequired || (this.skin && Utils.contains(this.skin.constraints, constraint.data, true)))!;
 		if (!constraint.active) return;
 
 		this.sortBone(constraint.target);
@@ -265,7 +265,7 @@ export class Skeleton {
 		if (constraint.data.local) {
 			for (let i = 0; i < boneCount; i++) {
 				let child = constrained[i];
-				this.sortBone(child.parent);
+				this.sortBone(child.parent!);
 				this.sortBone(child);
 			}
 		} else {
@@ -307,6 +307,7 @@ export class Skeleton {
 	}
 
 	sortBone (bone: Bone) {
+		if (!bone) return;
 		if (bone.sorted) return;
 		let parent = bone.parent;
 		if (parent) this.sortBone(parent);
@@ -348,6 +349,7 @@ export class Skeleton {
 	updateWorldTransformWith (parent: Bone) {
 		// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
 		let rootBone = this.getRootBone();
+		if (!rootBone) throw new Error("Root bone must not be null.");
 		let pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;
 		rootBone.worldX = pa * this.x + pb * this.y + parent.worldX;
 		rootBone.worldY = pc * this.x + pd * this.y + parent.worldY;
@@ -484,7 +486,7 @@ export class Skeleton {
 					let slot = slots[i];
 					let name = slot.data.attachmentName;
 					if (name) {
-						let attachment: Attachment = newSkin.getAttachment(i, name);
+						let attachment = newSkin.getAttachment(i, name);
 						if (attachment) slot.setAttachment(attachment);
 					}
 				}
@@ -500,8 +502,10 @@ export class Skeleton {
 	 *
 	 * See {@link #getAttachment()}.
 	 * @returns May be null. */
-	getAttachmentByName (slotName: string, attachmentName: string): Attachment {
-		return this.getAttachment(this.data.findSlot(slotName).index, attachmentName);
+	getAttachmentByName (slotName: string, attachmentName: string): Attachment | null {
+		let slot = this.data.findSlot(slotName);
+		if (!slot) throw new Error(`Can't find slot with name ${slotName}`);
+		return this.getAttachment(slot.index, attachmentName);
 	}
 
 	/** Finds an attachment by looking in the {@link #skin} and {@link SkeletonData#defaultSkin} using the slot index and
@@ -509,10 +513,10 @@ export class Skeleton {
 	 *
 	 * See [Runtime skins](http://esotericsoftware.com/spine-runtime-skins) in the Spine Runtimes Guide.
 	 * @returns May be null. */
-	getAttachment (slotIndex: number, attachmentName: string): Attachment {
+	getAttachment (slotIndex: number, attachmentName: string): Attachment | null {
 		if (!attachmentName) throw new Error("attachmentName cannot be null.");
 		if (this.skin) {
-			let attachment: Attachment = this.skin.getAttachment(slotIndex, attachmentName);
+			let attachment = this.skin.getAttachment(slotIndex, attachmentName);
 			if (attachment) return attachment;
 		}
 		if (this.data.defaultSkin) return this.data.defaultSkin.getAttachment(slotIndex, attachmentName);
@@ -528,7 +532,7 @@ export class Skeleton {
 		for (let i = 0, n = slots.length; i < n; i++) {
 			let slot = slots[i];
 			if (slot.data.name == slotName) {
-				let attachment: Attachment = null;
+				let attachment: Attachment | null = null;
 				if (attachmentName) {
 					attachment = this.getAttachment(i, attachmentName);
 					if (!attachment) throw new Error("Attachment not found: " + attachmentName + ", for slot: " + slotName);
@@ -602,7 +606,7 @@ export class Skeleton {
 			let slot = drawOrder[i];
 			if (!slot.bone.active) continue;
 			let verticesLength = 0;
-			let vertices: NumberArrayLike = null;
+			let vertices: NumberArrayLike | null = null;
 			let attachment = slot.getAttachment();
 			if (attachment instanceof RegionAttachment) {
 				verticesLength = 8;

@@ -37,7 +37,7 @@ export interface HasTextureRegion {
 
 	/** The region used to draw the attachment. After setting the region or if the region's properties are changed,
 	 * {@link #updateRegion()} must be called. */
-	region: TextureRegion;
+	region: TextureRegion | null;
 
 	/** Updates any values the attachment calculates using the {@link #getRegion()}. Must be called after setting the
 	 * {@link #getRegion()} or if the region's properties are changed. */
@@ -46,5 +46,5 @@ export interface HasTextureRegion {
 	/** The color to tint the attachment. */
 	color: Color;
 
-	sequence: Sequence;
+	sequence: Sequence | null;
 }

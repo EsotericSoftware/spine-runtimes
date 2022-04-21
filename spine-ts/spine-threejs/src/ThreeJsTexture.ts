@@ -33,8 +33,9 @@ import * as THREE from "three";
 export class ThreeJsTexture extends Texture {
 	texture: THREE.Texture;
 
-	constructor (image: HTMLImageElement) {
+	constructor (image: HTMLImageElement | ImageBitmap) {
 		super(image);
+		if (image instanceof ImageBitmap) throw new Error("ImageBitmap not supported.");
 		this.texture = new THREE.Texture(image);
 		this.texture.flipY = false;
 		this.texture.needsUpdate = true;

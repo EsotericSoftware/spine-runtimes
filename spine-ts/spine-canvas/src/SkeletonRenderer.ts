@@ -85,7 +85,7 @@ export class SkeletonRenderer {
 
 			let w = region.width, h = region.height;
 			ctx.translate(w / 2, h / 2);
-			if (attachment.region.degrees == 90) {
+			if (attachment.region!.degrees == 90) {
 				let t = w;
 				w = h;
 				h = t;
@@ -107,9 +107,9 @@ export class SkeletonRenderer {
 		let skeletonColor = skeleton.color;
 		let drawOrder = skeleton.drawOrder;
 
-		let blendMode: BlendMode = null;
+		let blendMode: BlendMode | null = null;
 		let vertices: ArrayLike<number> = this.vertices;
-		let triangles: Array<number> = null;
+		let triangles: Array<number> | null = null;
 
 		for (let i = 0, n = drawOrder.length; i < n; i++) {
 			let slot = drawOrder[i];
@@ -127,7 +127,8 @@ export class SkeletonRenderer {
 				let mesh = <MeshAttachment>attachment;
 				vertices = this.computeMeshVertices(slot, mesh, false);
 				triangles = mesh.triangles;
-				texture = (<TextureAtlasRegion>mesh.region.renderObject).page.texture.getImage() as HTMLImageElement;
+				let region = (<TextureAtlasRegion>mesh.region!.renderObject);
+				texture = region.page.texture!.getImage() as HTMLImageElement;
 			} else
 				continue;
 

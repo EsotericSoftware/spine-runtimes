@@ -32,7 +32,7 @@ import { TextureAtlas } from "./TextureAtlas";
 import { Disposable, StringMap } from "./Utils";
 
 export class AssetManagerBase implements Disposable {
-	private pathPrefix: string = null;
+	private pathPrefix: string = "";
 	private textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture;
 	private downloader: Downloader;
 	private assets: StringMap<any> = {};
@@ -40,10 +40,10 @@ export class AssetManagerBase implements Disposable {
 	private toLoad = 0;
 	private loaded = 0;
 
-	constructor (textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture, pathPrefix: string = "", downloader: Downloader = null) {
+	constructor (textureLoader: (image: HTMLImageElement | ImageBitmap) => Texture, pathPrefix: string = "", downloader: Downloader = new Downloader()) {
 		this.textureLoader = textureLoader;
 		this.pathPrefix = pathPrefix;
-		this.downloader = downloader || new Downloader();
+		this.downloader = downloader;
 	}
 
 	private start (path: string): string {
@@ -85,8 +85,8 @@ export class AssetManagerBase implements Disposable {
 	}
 
 	loadBinary (path: string,
-		success: (path: string, binary: Uint8Array) => void = null,
-		error: (path: string, message: string) => void = null) {
+		success: (path: string, binary: Uint8Array) => void = () => { },
+		error: (path: string, message: string) => void = () => { }) {
 		path = this.start(path);
 
 		this.downloader.downloadBinary(path, (data: Uint8Array): void => {
@@ -97,8 +97,8 @@ export class AssetManagerBase implements Disposable {
 	}
 
 	loadText (path: string,
-		success: (path: string, text: string) => void = null,
-		error: (path: string, message: string) => void = null) {
+		success: (path: string, text: string) => void = () => { },
+		error: (path: string, message: string) => void = () => { }) {
 		path = this.start(path);
 
 		this.downloader.downloadText(path, (data: string): void => {
@@ -109,8 +109,8 @@ export class AssetManagerBase implements Disposable {
 	}
 
 	loadJson (path: string,
-		success: (path: string, object: object) => void = null,
-		error: (path: string, message: string) => void = null) {
+		success: (path: string, object: object) => void = () => { },
+		error: (path: string, message: string) => void = () => { }) {
 		path = this.start(path);
 
 		this.downloader.downloadJson(path, (data: object): void => {
@@ -121,8 +121,8 @@ export class AssetManagerBase implements Disposable {
 	}
 
 	loadTexture (path: string,
-		success: (path: string, texture: Texture) => void = null,
-		error: (path: string, message: string) => void = null) {
+		success: (path: string, texture: Texture) => void = () => { },
+		error: (path: string, message: string) => void = () => { }) {
 		path = this.start(path);
 
 		let isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document);
@@ -152,9 +152,9 @@ export class AssetManagerBase implements Disposable {
 	}
 
 	loadTextureAtlas (path: string,
-		success: (path: string, atlas: TextureAtlas) => void = null,
-		error: (path: string, message: string) => void = null,
-		fileAlias: { [keyword: string]: string } = null
+		success: (path: string, atlas: TextureAtlas) => void = () => { },
+		error: (path: string, message: string) => void = () => { },
+		fileAlias?: { [keyword: string]: string }
 	) {
 		let index = path.lastIndexOf("/");
 		let parent = index >= 0 ? path.substring(0, index + 1) : "";
@@ -165,7 +165,7 @@ export class AssetManagerBase implements Disposable {
 				let atlas = new TextureAtlas(atlasText);
 				let toLoad = atlas.pages.length, abort = false;
 				for (let page of atlas.pages) {
-					this.loadTexture(fileAlias == null ? parent + page.name : fileAlias[page.name],
+					this.loadTexture(!fileAlias ? parent + page.name : fileAlias[page.name!],
 						(imagePath: string, texture: Texture) => {
 							if (!abort) {
 								page.setTexture(texture);
@@ -179,7 +179,7 @@ export class AssetManagerBase implements Disposable {
 					);
 				}
 			} catch (e) {
-				this.error(error, path, `Couldn't parse texture atlas ${path}: ${e.message}`);
+				this.error(error, path, `Couldn't parse texture atlas ${path}: ${(e as any).message}`);
 			}
 		}, (status: number, responseText: string): void => {
 			this.error(error, path, `Couldn't load texture atlas ${path}: status ${status}, ${responseText}`);

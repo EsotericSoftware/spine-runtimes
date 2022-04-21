@@ -40,13 +40,13 @@ import { MathUtils } from "./Utils";
  * See [IK constraints](http://esotericsoftware.com/spine-ik-constraints) in the Spine User Guide. */
 export class IkConstraint implements Updatable {
 	/** The IK constraint's setup pose data. */
-	data: IkConstraintData = null;
+	data: IkConstraintData;
 
 	/** The bones that will be modified by this IK constraint. */
-	bones: Array<Bone> = null;
+	bones: Array<Bone>;
 
 	/** The bone that is the IK target. */
-	target: Bone = null;
+	target: Bone;
 
 	/** Controls the bend direction of the IK bones, either 1 or -1. */
 	bendDirection = 0;
@@ -76,9 +76,14 @@ export class IkConstraint implements Updatable {
 		this.stretch = data.stretch;
 
 		this.bones = new Array<Bone>();
-		for (let i = 0; i < data.bones.length; i++)
-			this.bones.push(skeleton.findBone(data.bones[i].name));
-		this.target = skeleton.findBone(data.target.name);
+		for (let i = 0; i < data.bones.length; i++) {
+			let bone = skeleton.findBone(data.bones[i].name);
+			if (!bone) throw new Error(`Couldn't find bone ${data.bones[i].name}`);
+			this.bones.push(bone);
+		}
+		let target = skeleton.findBone(data.target.name);
+		if (!target) throw new Error(`Couldn't find bone ${data.target.name}`);
+		this.target = target;
 	}
 
 	isActive () {
@@ -102,6 +107,7 @@ export class IkConstraint implements Updatable {
 	/** Applies 1 bone IK. The target is specified in the world coordinate system. */
 	apply1 (bone: Bone, targetX: number, targetY: number, compress: boolean, stretch: boolean, uniform: boolean, alpha: number) {
 		let p = bone.parent;
+		if (!p) throw new Error("IK bone must have parent.");
 		let pa = p.a, pb = p.b, pc = p.c, pd = p.d;
 		let rotationIK = -bone.ashearX - bone.arotation, tx = 0, ty = 0;
 
@@ -183,6 +189,7 @@ export class IkConstraint implements Updatable {
 			cwy = c * cx + d * cy + parent.worldY;
 		}
 		let pp = parent.parent;
+		if (!pp) throw new Error("IK parent must itself have a parent.");
 		a = pp.a;
 		b = pp.b;
 		c = pp.c;
