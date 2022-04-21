@@ -91,10 +91,7 @@ public class SkeletonRenderer {
 		Object[] drawOrder = skeleton.drawOrder.items;
 		for (int i = 0, n = skeleton.drawOrder.size; i < n; i++) {
 			Slot slot = (Slot)drawOrder[i];
-			if (!slot.bone.active) {
-				clipper.clipEnd(slot);
-				continue;
-			}
+			if (!slot.bone.active) continue;
 			Attachment attachment = slot.attachment;
 			if (attachment instanceof RegionAttachment) {
 				RegionAttachment region = (RegionAttachment)attachment;
@@ -129,8 +126,8 @@ public class SkeletonRenderer {
 				batch.draw(region.getRegion().getTexture(), vertices, 0, 20);
 
 			} else if (attachment instanceof ClippingAttachment) {
-				clipper.clipStart(slot, (ClippingAttachment)attachment);
-				continue;
+				throw new RuntimeException(batch.getClass().getSimpleName()
+					+ " cannot perform clipping, PolygonSpriteBatch or TwoColorPolygonBatch is required.");
 
 			} else if (attachment instanceof MeshAttachment) {
 				throw new RuntimeException(batch.getClass().getSimpleName()
@@ -140,10 +137,7 @@ public class SkeletonRenderer {
 				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
 				if (attachmentSkeleton != null) draw(batch, attachmentSkeleton);
 			}
-
-			clipper.clipEnd(slot);
 		}
-		clipper.clipEnd();
 		if (vertexEffect != null) vertexEffect.end();
 	}
 
