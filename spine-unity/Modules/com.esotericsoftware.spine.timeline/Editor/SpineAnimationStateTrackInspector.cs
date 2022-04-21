@@ -34,6 +34,7 @@ using UnityEngine;
 using UnityEngine.Timeline;
 
 namespace Spine.Unity.Editor {
+#if UNITY_2019_1_OR_NEWER
 	[CustomTimelineEditor(typeof(SpineAnimationStateTrack))]
 	[CanEditMultipleObjects]
 	public class SpineAnimationStateTrackInspector : TrackEditor {
@@ -45,4 +46,22 @@ namespace Spine.Unity.Editor {
 			return options;
 		}
 	}
+#else
+	[CustomEditor(typeof(SpineAnimationStateTrack))]
+	[CanEditMultipleObjects]
+	public class SpineAnimationStateTrackInspector : UnityEditor.Editor {
+
+		protected SerializedProperty trackIndexProperty = null;
+
+		public void OnEnable () {
+			trackIndexProperty = serializedObject.FindProperty("trackIndex");
+		}
+
+		public override void OnInspectorGUI () {
+			serializedObject.Update();
+			EditorGUILayout.PropertyField(trackIndexProperty);
+			serializedObject.ApplyModifiedProperties();
+		}
+	}
+#endif
 }

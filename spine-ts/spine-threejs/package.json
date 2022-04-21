@@ -1,6 +1,6 @@
 {
   "name": "@esotericsoftware/spine-threejs",
-  "version": "4.0.20",
+  "version": "4.0.27",
   "description": "The official Spine Runtimes for the web.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,8 +30,8 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@types/three": "^0.133.1",
-    "three": "^0.133.1",
-    "@esotericsoftware/spine-core": "^4.0.20"
+    "@types/three": "^0.138.0",
+    "three": "^0.138.3",
+    "@esotericsoftware/spine-core": "^4.0.27"
   }
 }

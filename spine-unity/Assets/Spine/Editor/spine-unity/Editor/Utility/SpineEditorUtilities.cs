@@ -266,14 +266,23 @@ namespace Spine.Unity.Editor {
 			ReinitializeComponent(component);
 		}
 
-		public static void ReloadSkeletonDataAsset (SkeletonDataAsset skeletonDataAsset) {
-			if (skeletonDataAsset != null) {
+		public static void ClearSkeletonDataAsset (SkeletonDataAsset skeletonDataAsset) {
+			skeletonDataAsset.Clear();
+			DataReloadHandler.ClearAnimationReferenceAssets(skeletonDataAsset);
+		}
+
+		public static void ReloadSkeletonDataAsset (SkeletonDataAsset skeletonDataAsset, bool clearAtlasAssets = true) {
+			if (skeletonDataAsset == null)
+				return;
+
+			if (clearAtlasAssets) {
 				foreach (AtlasAssetBase aa in skeletonDataAsset.atlasAssets) {
 					if (aa != null) aa.Clear();
 				}
-				skeletonDataAsset.Clear();
 			}
+			ClearSkeletonDataAsset(skeletonDataAsset);
 			skeletonDataAsset.GetSkeletonData(true);
+			DataReloadHandler.ReloadAnimationReferenceAssets(skeletonDataAsset);
 		}
 
 		public static void ReinitializeComponent (SkeletonRenderer component) {

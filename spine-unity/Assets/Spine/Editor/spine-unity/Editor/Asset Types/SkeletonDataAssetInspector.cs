@@ -71,6 +71,7 @@ namespace Spine.Unity.Editor {
 		readonly List<string> warnings = new List<string>();
 		CompatibilityProblemInfo compatibilityProblemInfo = null;
 		readonly SkeletonInspectorPreview preview = new SkeletonInspectorPreview();
+		bool requiresReload = false;
 
 		GUIStyle activePlayButtonStyle, idlePlayButtonStyle;
 		readonly GUIContent DefaultMixLabel = new GUIContent("Default Mix Duration", "Sets 'SkeletonDataAsset.defaultMix' in the asset and 'AnimationState.data.defaultMix' at runtime load time.");
@@ -153,7 +154,7 @@ namespace Spine.Unity.Editor {
 
 		void Clear () {
 			preview.Clear();
-			targetSkeletonDataAsset.Clear();
+			SpineEditorUtilities.ClearSkeletonDataAsset(targetSkeletonDataAsset);
 			targetSkeletonData = null;
 		}
 
@@ -192,13 +193,12 @@ namespace Spine.Unity.Editor {
 				}
 
 				if (changeCheck.changed) {
-					if (serializedObject.ApplyModifiedProperties()) {
+					if (requiresReload || serializedObject.ApplyModifiedProperties()) {
 						this.Clear();
 						this.InitializeEditor();
 
-						if (SpineEditorUtilities.Preferences.autoReloadSceneSkeletons)
+						if (SpineEditorUtilities.Preferences.autoReloadSceneSkeletons && NoProblems())
 							SpineEditorUtilities.DataReloadHandler.ReloadSceneSkeletonComponents(targetSkeletonDataAsset);
-
 						return;
 					}
 				}
@@ -361,18 +361,24 @@ namespace Spine.Unity.Editor {
 
 		void DrawAtlasAssetsFields () {
 			EditorGUILayout.LabelField("Atlas", EditorStyles.boldLabel);
-#if !SPINE_TK2D
-			EditorGUILayout.PropertyField(atlasAssets, true);
-#else
-			using (new EditorGUI.DisabledGroupScope(spriteCollection.objectReferenceValue != null)) {
-				EditorGUILayout.PropertyField(atlasAssets, true);
-			}
-			EditorGUILayout.LabelField("spine-tk2d", EditorStyles.boldLabel);
-			EditorGUILayout.PropertyField(spriteCollection, true);
-#endif
 
-			if (atlasAssets.arraySize == 0)
-				EditorGUILayout.HelpBox("AtlasAssets array is empty. Skeleton's attachments will load without being mapped to images.", MessageType.Info);
+			using (var changeCheck = new EditorGUI.ChangeCheckScope()) {
+#if !SPINE_TK2D
+				EditorGUILayout.PropertyField(atlasAssets, true);
+#else
+				using (new EditorGUI.DisabledGroupScope(spriteCollection.objectReferenceValue != null)) {
+					EditorGUILayout.PropertyField(atlasAssets, true);
+				}
+				EditorGUILayout.LabelField("spine-tk2d", EditorStyles.boldLabel);
+				EditorGUILayout.PropertyField(spriteCollection, true);
+#endif
+				if (atlasAssets.arraySize == 0)
+					EditorGUILayout.HelpBox("AtlasAssets array is empty. Skeleton's attachments will load without being mapped to images.", MessageType.Info);
+
+				if (changeCheck.changed) {
+					requiresReload = true;
+				}
+			}
 		}
 
 		void HandleAtlasAssetsNulls () {

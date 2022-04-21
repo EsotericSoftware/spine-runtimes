@@ -102,7 +102,7 @@ namespace Spine.Unity {
 #if UNITY_EDITOR
 		protected override void OnValidate () {
 			// This handles Scene View preview.
-			base.OnValidate ();
+			base.OnValidate();
 			if (this.IsValid) {
 				if (skeletonDataAsset == null) {
 					Clear();
@@ -360,8 +360,7 @@ namespace Spine.Unity {
 					separatorSlots.Add(slot);
 				}
 #if UNITY_EDITOR
-				else
-				{
+				else {
 					Debug.LogWarning(slotName + " is not a slot in " + skeletonDataAsset.skeletonJSON.name);
 				}
 #endif
@@ -521,7 +520,10 @@ namespace Spine.Unity {
 
 		public void Initialize (bool overwrite) {
 			if (this.IsValid && !overwrite) return;
-
+#if UNITY_EDITOR
+			if (BuildUtilities.IsInSkeletonAssetBuildPreProcessing)
+				return;
+#endif
 			if (this.skeletonDataAsset == null) return;
 			var skeletonData = this.skeletonDataAsset.GetSkeletonData(false);
 			if (skeletonData == null) return;
@@ -839,7 +841,7 @@ namespace Spine.Unity {
 
 #if UNITY_EDITOR
 			if (Application.isEditor && !Application.isPlaying) {
-				for (int i = separatorParts.Count-1; i >= 0; --i) {
+				for (int i = separatorParts.Count - 1; i >= 0; --i) {
 					if (separatorParts[i] == null) {
 						separatorParts.RemoveAt(i);
 					}

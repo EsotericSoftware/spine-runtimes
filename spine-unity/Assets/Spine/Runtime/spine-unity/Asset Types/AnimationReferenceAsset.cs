@@ -48,9 +48,14 @@ namespace Spine.Unity {
 				if (animation == null)
 					Initialize();
 #endif
-
 				return animation;
 			}
+		}
+
+		/// <summary>Clears the cached animation corresponding to a loaded SkeletonData object.
+		/// Use this to force a reload for the next time Animation is called.</summary>
+		public void Clear () {
+			animation = null;
 		}
 
 		public void Initialize () {
