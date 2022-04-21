@@ -27,8 +27,8 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#include "SpineCommon.h"
 #include "register_types.h"
-#include "core/class_db.h"
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
 #include "SpineSkeletonDataResource.h"
@@ -41,7 +41,6 @@
 #include "SpineBoneData.h"
 #include "SpineSlotData.h"
 #include "SpineAttachment.h"
-#include "SpineSkinAttachmentMapEntries.h"
 #include "SpineConstraintData.h"
 #include "SpineSkin.h"
 #include "SpineIkConstraintData.h"
@@ -57,11 +56,8 @@ static Ref<SpineSkeletonFileResourceFormatLoader> skeleton_file_loader;
 static Ref<SpineSkeletonFileResourceFormatSaver> skeleton_file_saver;
 
 #ifdef TOOLS_ENABLED
-#include "editor/editor_export.h"
 #include "editor/editor_node.h"
 #include "SpineEditorPlugin.h"
-#include "SpineSkeletonDataResource.h"
-#include "SpineSprite.h"
 
 static void editor_init_callback() {
 	EditorNode::get_singleton()->add_editor_plugin(memnew(SpineEditorPlugin(EditorNode::get_singleton())));
@@ -88,8 +84,7 @@ void register_spine_godot_types() {
 	ClassDB::register_class<SpineBoneData>();
 	ClassDB::register_class<SpineSlotData>();
 	ClassDB::register_class<SpineAttachment>();
-	ClassDB::register_class<SpineSkinAttachmentMapEntry>();
-	ClassDB::register_class<SpineSkinAttachmentMapEntries>();
+	ClassDB::register_class<SpineSkinEntry>();
 	ClassDB::register_class<SpineConstraintData>();
 	ClassDB::register_class<SpineSkin>();
 	ClassDB::register_class<SpineIkConstraintData>();
@@ -104,6 +99,19 @@ void register_spine_godot_types() {
 	ClassDB::register_class<SpineConstant>();
 	ClassDB::register_class<SpineCollisionShapeProxy>();
 
+#if VERSION_MAJOR > 3
+	atlas_loader.instantiate();
+	ResourceLoader::add_resource_format_loader(atlas_loader);
+
+	atlas_saver.instantiate();
+	ResourceSaver::add_resource_format_saver(atlas_saver);
+
+	skeleton_file_loader.instantiate();
+	ResourceLoader::add_resource_format_loader(skeleton_file_loader);
+
+	skeleton_file_saver.instantiate();
+	ResourceSaver::add_resource_format_saver(skeleton_file_saver);
+#else
 	atlas_loader.instance();
 	ResourceLoader::add_resource_format_loader(atlas_loader);
 
@@ -115,6 +123,7 @@ void register_spine_godot_types() {
 
 	skeleton_file_saver.instance();
 	ResourceSaver::add_resource_format_saver(skeleton_file_saver);
+#endif
 }
 
 void unregister_spine_godot_types() {

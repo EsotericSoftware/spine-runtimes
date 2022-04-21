@@ -30,32 +30,25 @@
 #ifndef GODOT_SPINESKIN_H
 #define GODOT_SPINESKIN_H
 
-#include "core/variant_parser.h"
-
-#include <spine/spine.h>
-
+#include "SpineCommon.h"
 #include "SpineAttachment.h"
-#include "SpineSkinAttachmentMapEntries.h"
 
-class SpineSkin : public Reference {
-	GDCLASS(SpineSkin, Reference);
+class SpineSkin : public REFCOUNTED {
+	GDCLASS(SpineSkin, REFCOUNTED);
 
 protected:
 	static void _bind_methods();
 
 private:
 	spine::Skin *skin;
+	bool owns_skin;
 
 public:
 	SpineSkin();
-	~SpineSkin();
+	~SpineSkin() override;
 
-	inline void set_spine_object(spine::Skin *s) {
-		skin = s;
-	}
-	spine::Skin *get_spine_object() {
-		return skin;
-	}
+	void set_spine_object(spine::Skin *s) { skin = s; }
+	spine::Skin *get_spine_object() { return skin; }
 
 	Ref<SpineSkin> init(const String &name);
 
@@ -69,17 +62,45 @@ public:
 
 	Array find_attachments_for_slot(uint64_t slot_index);
 
-	String get_skin_name();
+	String get_name();
 
 	void add_skin(Ref<SpineSkin> other);
 
 	void copy_skin(Ref<SpineSkin> other);
 
-	Ref<SpineSkinAttachmentMapEntries> get_attachments();
+	Array get_attachments();
 
 	Array get_bones();
 
-	Array get_constraint();
+	Array get_constraints();
+};
+
+class SpineSkinEntry : public REFCOUNTED {
+GDCLASS(SpineSkinEntry, REFCOUNTED);
+
+	friend class SpineSkin;
+
+protected:
+	static void _bind_methods();
+
+	void init(int _slot_index, const String &_name, Ref<SpineAttachment> _attachment) {
+		this->slot_index = _slot_index;
+		this->name = _name;
+		this->attachment = _attachment;
+	}
+private:
+	int slot_index;
+	String name;
+	Ref<SpineAttachment> attachment;
+
+public:
+	SpineSkinEntry();
+
+	int get_slot_index();
+
+	const String &get_name();
+
+	Ref<SpineAttachment> get_attachment();
 };
 
 #endif//GODOT_SPINESKIN_H

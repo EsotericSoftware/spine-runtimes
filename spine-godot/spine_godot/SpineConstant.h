@@ -30,7 +30,7 @@
 #ifndef GODOT_SPINECONSTANT_H
 #define GODOT_SPINECONSTANT_H
 
-#include "core/object.h"
+#include "SpineCommon.h"
 
 class SpineConstant : public Object {
 	GDCLASS(SpineConstant, Object);
@@ -81,11 +81,39 @@ public:
 		TransformMode_NoScale,
 		TransformMode_NoScaleOrReflection
 	};
+
+	enum PositionMode {
+		PositionMode_Fixed = 0,
+		PositionMode_Percent
+	};
+
+	enum SpacingMode {
+		SpacingMode_Length = 0,
+		SpacingMode_Fixed,
+		SpacingMode_Percent
+	};
+
+	enum RotateMode {
+		RotateMode_Tangent = 0,
+		RotateMode_Chain,
+		RotateMode_ChainScale
+	};
+
+	enum BlendMode {
+		BlendMode_Normal = 0,
+		BlendMode_Additive,
+		BlendMode_Multiply,
+		BlendMode_Screen
+	};
 };
 
-VARIANT_ENUM_CAST(SpineConstant::MixBlend);
-VARIANT_ENUM_CAST(SpineConstant::MixDirection);
-VARIANT_ENUM_CAST(SpineConstant::PropertyId);
-VARIANT_ENUM_CAST(SpineConstant::TransformMode);
+VARIANT_ENUM_CAST(SpineConstant::MixBlend)
+VARIANT_ENUM_CAST(SpineConstant::MixDirection)
+VARIANT_ENUM_CAST(SpineConstant::PropertyId)
+VARIANT_ENUM_CAST(SpineConstant::TransformMode)
+VARIANT_ENUM_CAST(SpineConstant::PositionMode)
+VARIANT_ENUM_CAST(SpineConstant::SpacingMode)
+VARIANT_ENUM_CAST(SpineConstant::RotateMode)
+VARIANT_ENUM_CAST(SpineConstant::BlendMode)
 
 #endif//GODOT_SPINECONSTANT_H

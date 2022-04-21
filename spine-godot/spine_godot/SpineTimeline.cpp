@@ -30,7 +30,9 @@
 #include "SpineTimeline.h"
 #include "SpineSkeleton.h"
 #include "SpineEvent.h"
+#if VERSION_MAJOR == 3
 #include "core/method_bind_ext.gen.inc"
+#endif
 
 void SpineTimeline::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("apply", "skeleton", "last_time", "time", "events", "alpha", "blend", "direction"), &SpineTimeline::apply);
@@ -42,58 +44,58 @@ void SpineTimeline::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_type"), &SpineTimeline::get_type);
 }
 
-SpineTimeline::SpineTimeline() : timeline(NULL) {
+SpineTimeline::SpineTimeline() : timeline(nullptr) {
 }
 
-SpineTimeline::~SpineTimeline() {
-}
-
-void SpineTimeline::apply(Ref<SpineSkeleton> skeleton, float lastTime, float time, Array events, float alpha,
+void SpineTimeline::apply(Ref<SpineSkeleton> skeleton, float last_time, float time, Array events, float alpha,
 						  SpineConstant::MixBlend blend, SpineConstant::MixDirection direction) {
-	spine::Vector<spine::Event *> spineEvents;
-	spineEvents.setSize(events.size(), nullptr);
-	for (size_t i = 0; i < events.size(); ++i) {
-		events[i] = ((Ref<SpineEvent>) spineEvents[i])->get_spine_object();
+	SPINE_CHECK(timeline,)
+	spine::Vector<spine::Event *> spine_events;
+	spine_events.setSize((int)events.size(), nullptr);
+	for (int i = 0; i < events.size(); ++i) {
+		events[i] = ((Ref<SpineEvent>) spine_events[i])->get_spine_object();
 	}
-	timeline->apply(*(skeleton->get_spine_object()), lastTime, time, &spineEvents, alpha, (spine::MixBlend) blend, (spine::MixDirection) direction);
+	timeline->apply(*(skeleton->get_spine_object()), last_time, time, &spine_events, alpha, (spine::MixBlend) blend, (spine::MixDirection) direction);
 }
 
-int64_t SpineTimeline::get_frame_entries() {
-	return timeline->getFrameEntries();
+int SpineTimeline::get_frame_entries() {
+	SPINE_CHECK(timeline, 0)
+	return (int)timeline->getFrameEntries();
 }
 
-int64_t SpineTimeline::get_frame_count() {
-	return timeline->getFrameCount();
+int SpineTimeline::get_frame_count() {
+	SPINE_CHECK(timeline, 0)
+	return (int)timeline->getFrameCount();
 }
 
 Array SpineTimeline::get_frames() {
-	auto &frames = timeline->getFrames();
 	Array result;
-	result.resize(frames.size());
-
-	for (size_t i = 0; i < result.size(); ++i) {
+	SPINE_CHECK(timeline, result)
+	auto &frames = timeline->getFrames();
+	result.resize((int)frames.size());
+	for (int i = 0; i < result.size(); ++i) {
 		result[i] = frames[i];
 	}
-
 	return result;
 }
 
 float SpineTimeline::get_duration() {
+	SPINE_CHECK(timeline, 0)
 	return timeline->getDuration();
 }
 
 Array SpineTimeline::get_property_ids() {
-	auto &ids = timeline->getPropertyIds();
 	Array result;
-	result.resize(ids.size());
-
-	for (size_t i = 0; i < result.size(); ++i) {
+	SPINE_CHECK(timeline, result)
+	auto &ids = timeline->getPropertyIds();
+	result.resize((int)ids.size());
+	for (int i = 0; i < result.size(); ++i) {
 		result[i] = (int64_t) ids[i];
 	}
-
 	return result;
 }
 
 String SpineTimeline::get_type() {
+	SPINE_CHECK(timeline, "")
 	return timeline->getRTTI().getClassName();
 }

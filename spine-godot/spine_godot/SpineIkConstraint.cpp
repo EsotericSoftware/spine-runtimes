@@ -29,7 +29,7 @@
 
 #include "SpineIkConstraint.h"
 #include "SpineBone.h"
-#include "common.h"
+#include "SpineCommon.h"
 
 void SpineIkConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update"), &SpineIkConstraint::update);
@@ -53,9 +53,6 @@ void SpineIkConstraint::_bind_methods() {
 }
 
 SpineIkConstraint::SpineIkConstraint() : ik_constraint(nullptr) {
-}
-
-SpineIkConstraint::~SpineIkConstraint() {
 }
 
 void SpineIkConstraint::update() {
@@ -154,7 +151,7 @@ void SpineIkConstraint::set_softness(float v) {
 }
 
 bool SpineIkConstraint::is_active() {
-	SPINE_CHECK(ik_constraint, nullptr)
+	SPINE_CHECK(ik_constraint, false)
 	return ik_constraint->isActive();
 }
 void SpineIkConstraint::set_active(bool v) {

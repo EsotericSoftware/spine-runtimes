@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 #include "SpineSkeleton.h"
+#include "SpineCommon.h"
 
 void SpineSkeleton::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update_world_transform"), &SpineSkeleton::update_world_transform);
@@ -49,14 +50,14 @@ void SpineSkeleton::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_data"), &SpineSkeleton::get_skeleton_data_res);
 	ClassDB::bind_method(D_METHOD("get_bones"), &SpineSkeleton::get_bones);
 	ClassDB::bind_method(D_METHOD("get_slots"), &SpineSkeleton::get_slots);
-	ClassDB::bind_method(D_METHOD("get_draw_orders"), &SpineSkeleton::get_draw_orders);
+	ClassDB::bind_method(D_METHOD("get_draw_order"), &SpineSkeleton::get_draw_order);
 	ClassDB::bind_method(D_METHOD("get_ik_constraints"), &SpineSkeleton::get_ik_constraints);
 	ClassDB::bind_method(D_METHOD("get_path_constraints"), &SpineSkeleton::get_path_constraints);
 	ClassDB::bind_method(D_METHOD("get_transform_constraints"), &SpineSkeleton::get_transform_constraints);
 	ClassDB::bind_method(D_METHOD("get_skin"), &SpineSkeleton::get_skin);
 	ClassDB::bind_method(D_METHOD("get_color"), &SpineSkeleton::get_color);
 	ClassDB::bind_method(D_METHOD("set_color", "v"), &SpineSkeleton::set_color);
-	ClassDB::bind_method(D_METHOD("set_position", "pos"), &SpineSkeleton::set_position);
+	ClassDB::bind_method(D_METHOD("set_position", "position"), &SpineSkeleton::set_position);
 	ClassDB::bind_method(D_METHOD("get_x"), &SpineSkeleton::get_x);
 	ClassDB::bind_method(D_METHOD("set_x", "v"), &SpineSkeleton::set_x);
 	ClassDB::bind_method(D_METHOD("get_y"), &SpineSkeleton::get_y);
@@ -86,30 +87,34 @@ Ref<SpineSkeletonDataResource> SpineSkeleton::get_skeleton_data_res() const {
 	return skeleton_data_res;
 }
 
-void SpineSkeleton::set_spine_sprite(SpineSprite* sprite) {
-	this->sprite = sprite;
+void SpineSkeleton::set_spine_sprite(SpineSprite* _sprite) {
+	this->sprite = _sprite;
 }
 
-#define S_T(x) (spine::String((x).utf8()))
 void SpineSkeleton::update_world_transform() {
+	SPINE_CHECK(skeleton,)
 	skeleton->updateWorldTransform();
 }
 
 void SpineSkeleton::set_to_setup_pose() {
+	SPINE_CHECK(skeleton,)
 	skeleton->setToSetupPose();
 }
 
 void SpineSkeleton::set_bones_to_setup_pose() {
+	SPINE_CHECK(skeleton,)
 	skeleton->setBonesToSetupPose();
 }
 
 void SpineSkeleton::set_slots_to_setup_pose() {
+	SPINE_CHECK(skeleton,)
 	skeleton->setSlotsToSetupPose();
 }
 
 Ref<SpineBone> SpineSkeleton::find_bone(const String &name) {
-	if (name.empty()) return nullptr;
-	auto bone = skeleton->findBone(S_T(name));
+	SPINE_CHECK(skeleton, nullptr)
+	if (EMPTY(name)) return nullptr;
+	auto bone = skeleton->findBone(SPINE_STRING(name));
 	if (!bone) return nullptr;
 	Ref<SpineBone> bone_ref(memnew(SpineBone));
 	bone_ref->set_spine_object(bone);
@@ -118,8 +123,9 @@ Ref<SpineBone> SpineSkeleton::find_bone(const String &name) {
 }
 
 Ref<SpineSlot> SpineSkeleton::find_slot(const String &name) {
-	if (name.empty()) return nullptr;
-	auto slot = skeleton->findSlot(S_T(name));
+	SPINE_CHECK(skeleton, nullptr)
+	if (EMPTY(name)) return nullptr;
+	auto slot = skeleton->findSlot(SPINE_STRING(name));
 	if (!slot) return nullptr;
 	Ref<SpineSlot> slot_ref(memnew(SpineSlot));
 	slot_ref->set_spine_object(slot);
@@ -127,217 +133,231 @@ Ref<SpineSlot> SpineSkeleton::find_slot(const String &name) {
 }
 
 void SpineSkeleton::set_skin_by_name(const String &skin_name) {
-	skeleton->setSkin(S_T(skin_name));
+	SPINE_CHECK(skeleton,)
+	skeleton->setSkin(SPINE_STRING(skin_name));
 }
+
 void SpineSkeleton::set_skin(Ref<SpineSkin> new_skin) {
-	if (new_skin.is_valid())
-		skeleton->setSkin(new_skin->get_spine_object());
-	else
-		skeleton->setSkin(nullptr);
+	SPINE_CHECK(skeleton,)
+	skeleton->setSkin(new_skin.is_valid() ? new_skin->get_spine_object() : nullptr);
 }
 
 Ref<SpineAttachment> SpineSkeleton::get_attachment_by_slot_name(const String &slot_name, const String &attachment_name) {
-	auto a = skeleton->getAttachment(S_T(slot_name), S_T(attachment_name));
-	if (a == nullptr) return nullptr;
-	Ref<SpineAttachment> gd_a(memnew(SpineAttachment));
-	gd_a->set_spine_object(a);
-	return gd_a;
+	SPINE_CHECK(skeleton, nullptr)
+	auto attachment = skeleton->getAttachment(SPINE_STRING(slot_name), SPINE_STRING(attachment_name));
+	if (!attachment) return nullptr;
+	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
+	attachment_ref->set_spine_object(attachment);
+	return attachment_ref;
 }
 
 Ref<SpineAttachment> SpineSkeleton::get_attachment_by_slot_index(int slot_index, const String &attachment_name) {
-	auto a = skeleton->getAttachment(slot_index, S_T(attachment_name));
-	if (a == nullptr) return nullptr;
-	Ref<SpineAttachment> gd_a(memnew(SpineAttachment));
-	gd_a->set_spine_object(a);
-	return gd_a;
+	SPINE_CHECK(skeleton, nullptr)
+	auto attachment = skeleton->getAttachment(slot_index, SPINE_STRING(attachment_name));
+	if (!attachment) return nullptr;
+	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
+	attachment_ref->set_spine_object(attachment);
+	return attachment_ref;
 }
 
 void SpineSkeleton::set_attachment(const String &slot_name, const String &attachment_name) {
-	ERR_FAIL_COND(slot_name.empty());
-	ERR_FAIL_COND(get_attachment_by_slot_name(slot_name, attachment_name) == nullptr);
-	skeleton->setAttachment(S_T(slot_name), S_T(attachment_name));
+	SPINE_CHECK(skeleton,)
+	skeleton->setAttachment(SPINE_STRING(slot_name), SPINE_STRING(attachment_name));
 }
 
 Ref<SpineIkConstraint> SpineSkeleton::find_ik_constraint(const String &constraint_name) {
-	if (constraint_name.empty()) return nullptr;
-	auto c = skeleton->findIkConstraint(S_T(constraint_name));
-	if (c == nullptr) return nullptr;
-	Ref<SpineIkConstraint> gd_c(memnew(SpineIkConstraint));
-	gd_c->set_spine_object(c);
-	return gd_c;
+	SPINE_CHECK(skeleton, nullptr)
+	if (EMPTY(constraint_name)) return nullptr;
+	auto constraint = skeleton->findIkConstraint(SPINE_STRING(constraint_name));
+	if (!constraint) return nullptr;
+	Ref<SpineIkConstraint> constraint_ref(memnew(SpineIkConstraint));
+	constraint_ref->set_spine_object(constraint);
+	return constraint_ref;
 }
+
 Ref<SpineTransformConstraint> SpineSkeleton::find_transform_constraint(const String &constraint_name) {
-	if (constraint_name.empty()) return nullptr;
-	auto c = skeleton->findTransformConstraint(S_T(constraint_name));
-	if (c == nullptr) return nullptr;
-	Ref<SpineTransformConstraint> gd_c(memnew(SpineTransformConstraint));
-	gd_c->set_spine_object(c);
-	return gd_c;
+	SPINE_CHECK(skeleton, nullptr)
+	if (EMPTY(constraint_name)) return nullptr;
+	auto constraint = skeleton->findTransformConstraint(SPINE_STRING(constraint_name));
+	if (!constraint) return nullptr;
+	Ref<SpineTransformConstraint> constraint_ref(memnew(SpineTransformConstraint));
+	constraint_ref->set_spine_object(constraint);
+	return constraint_ref;
 }
+
 Ref<SpinePathConstraint> SpineSkeleton::find_path_constraint(const String &constraint_name) {
-	if (constraint_name.empty()) return nullptr;
-	auto c = skeleton->findPathConstraint(S_T(constraint_name));
-	if (c == nullptr) return nullptr;
-	Ref<SpinePathConstraint> gd_c(memnew(SpinePathConstraint));
-	gd_c->set_spine_object(c);
-	return gd_c;
+	SPINE_CHECK(skeleton, nullptr)
+	if (EMPTY(constraint_name)) return nullptr;
+	auto constraint = skeleton->findPathConstraint(SPINE_STRING(constraint_name));
+	if (!constraint) return nullptr;
+	Ref<SpinePathConstraint> constraint_ref(memnew(SpinePathConstraint));
+	constraint_ref->set_spine_object(constraint);
+	return constraint_ref;
 }
 
-Dictionary SpineSkeleton::get_bounds() {
+Rect2 SpineSkeleton::get_bounds() {
+	SPINE_CHECK(skeleton, Rect2(0, 0, 0, 0))
 	float x, y, w, h;
-	spine::Vector<float> vertex_buffer;
-	skeleton->getBounds(x, y, w, h, vertex_buffer);
-
-	Dictionary res;
-	res["x"] = x;
-	res["y"] = y;
-	res["w"] = w;
-	res["h"] = h;
-
-	Array gd_a;
-	gd_a.resize(vertex_buffer.size());
-	for (size_t i = 0; i < gd_a.size(); ++i) {
-		gd_a[i] = vertex_buffer[i];
-	}
-	res["vertex_buffer"] = gd_a;
-
-	return res;
+	skeleton->getBounds(x, y, w, h, bounds_vertex_buffer);
+	return Rect2(x, y, w, h);
 }
 
 Ref<SpineBone> SpineSkeleton::get_root_bone() {
-	auto b = skeleton->getRootBone();
-	if (b == nullptr) return nullptr;
-	Ref<SpineBone> gd_b(memnew(SpineBone));
-	gd_b->set_spine_object(b);
-	gd_b->set_spine_sprite(sprite);
-	return gd_b;
+	SPINE_CHECK(skeleton, nullptr)
+	auto bone = skeleton->getRootBone();
+	if (!bone) return nullptr;
+	Ref<SpineBone> bone_ref(memnew(SpineBone));
+	bone_ref->set_spine_object(bone);
+	bone_ref->set_spine_sprite(sprite);
+	return bone_ref;
 }
 
 Array SpineSkeleton::get_bones() {
-	auto &as = skeleton->getBones();
-	Array gd_as;
-	gd_as.resize(as.size());
-	for (size_t i = 0; i < gd_as.size(); ++i) {
-		auto b = as[i];
-		if (b == nullptr) gd_as[i] = Ref<SpineBone>(nullptr);
-		Ref<SpineBone> gd_a(memnew(SpineBone));
-		gd_a->set_spine_object(b);
-		gd_a->set_spine_sprite(sprite);
-		gd_as[i] = gd_a;
+	Array result;
+	SPINE_CHECK(skeleton, result)
+	auto &bones = skeleton->getBones();
+	result.resize((int)bones.size());
+	for (int i = 0; i < result.size(); ++i) {
+		auto bone = bones[i];
+		Ref<SpineBone> bone_ref(memnew(SpineBone));
+		bone_ref->set_spine_object(bone);
+		bone_ref->set_spine_sprite(sprite);
+		result[i] = bone_ref;
 	}
-	return gd_as;
+	return result;
 }
+
 Array SpineSkeleton::get_slots() {
-	auto &as = skeleton->getSlots();
-	Array gd_as;
-	gd_as.resize(as.size());
-	for (size_t i = 0; i < gd_as.size(); ++i) {
-		auto b = as[i];
-		if (b == nullptr) gd_as[i] = Ref<SpineSlot>(nullptr);
-		Ref<SpineSlot> gd_a(memnew(SpineSlot));
-		gd_a->set_spine_object(b);
-		gd_as[i] = gd_a;
+	Array result;
+	SPINE_CHECK(skeleton, result)
+	auto &slots = skeleton->getSlots();
+	result.resize((int)slots.size());
+	for (int i = 0; i < result.size(); ++i) {
+		auto slot = slots[i];
+		Ref<SpineSlot> slot_ref(memnew(SpineSlot));
+		slot_ref->set_spine_object(slot);
+		result[i] = slot_ref;
 	}
-	return gd_as;
+	return result;
 }
-Array SpineSkeleton::get_draw_orders() {
-	auto &as = skeleton->getDrawOrder();
-	Array gd_as;
-	gd_as.resize(as.size());
-	for (size_t i = 0; i < gd_as.size(); ++i) {
-		auto b = as[i];
-		if (b == nullptr) gd_as[i] = Ref<SpineSlot>(nullptr);
-		Ref<SpineSlot> gd_a(memnew(SpineSlot));
-		gd_a->set_spine_object(b);
-		gd_as[i] = gd_a;
+
+Array SpineSkeleton::get_draw_order() {
+	Array result;
+	SPINE_CHECK(skeleton, result)
+	auto &slots = skeleton->getDrawOrder();
+	result.resize((int)slots.size());
+	for (int i = 0; i < result.size(); ++i) {
+		auto slot = slots[i];
+		Ref<SpineSlot> slot_ref(memnew(SpineSlot));
+		slot_ref->set_spine_object(slot);
+		result[i] = slot_ref;
 	}
-	return gd_as;
+	return result;
 }
+
 Array SpineSkeleton::get_ik_constraints() {
-	auto &as = skeleton->getIkConstraints();
-	Array gd_as;
-	gd_as.resize(as.size());
-	for (size_t i = 0; i < gd_as.size(); ++i) {
-		auto b = as[i];
-		if (b == nullptr) gd_as[i] = Ref<SpineIkConstraint>(nullptr);
-		Ref<SpineIkConstraint> gd_a(memnew(SpineIkConstraint));
-		gd_a->set_spine_object(b);
-		gd_as[i] = gd_a;
+	Array result;
+	SPINE_CHECK(skeleton, result)
+	auto &constraints = skeleton->getIkConstraints();
+	result.resize((int)constraints.size());
+	for (int i = 0; i < result.size(); ++i) {
+		auto constraint = constraints[i];
+		Ref<SpineIkConstraint> constraint_ref(memnew(SpineIkConstraint));
+		constraint_ref->set_spine_object(constraint);
+		result[i] = constraint_ref;
 	}
-	return gd_as;
+	return result;
 }
+
 Array SpineSkeleton::get_path_constraints() {
-	auto &as = skeleton->getPathConstraints();
-	Array gd_as;
-	gd_as.resize(as.size());
-	for (size_t i = 0; i < gd_as.size(); ++i) {
-		auto b = as[i];
-		if (b == nullptr) gd_as[i] = Ref<SpinePathConstraint>(nullptr);
-		Ref<SpinePathConstraint> gd_a(memnew(SpinePathConstraint));
-		gd_a->set_spine_object(b);
-		gd_as[i] = gd_a;
+	Array result;
+	SPINE_CHECK(skeleton, result)
+	auto &constraints = skeleton->getPathConstraints();
+	result.resize((int)constraints.size());
+	for (int i = 0; i < result.size(); ++i) {
+		auto constraint = constraints[i];
+		Ref<SpinePathConstraint> constraint_ref(memnew(SpinePathConstraint));
+		constraint_ref->set_spine_object(constraint);
+		result[i] = constraint_ref;
 	}
-	return gd_as;
+	return result;
 }
 Array SpineSkeleton::get_transform_constraints() {
-	auto &as = skeleton->getTransformConstraints();
-	Array gd_as;
-	gd_as.resize(as.size());
-	for (size_t i = 0; i < gd_as.size(); ++i) {
-		auto b = as[i];
-		if (b == nullptr) gd_as[i] = Ref<SpineTransformConstraint>(nullptr);
-		Ref<SpineTransformConstraint> gd_a(memnew(SpineTransformConstraint));
-		gd_a->set_spine_object(b);
-		gd_as[i] = gd_a;
+	Array result;
+	SPINE_CHECK(skeleton, result)
+	auto &constraints = skeleton->getTransformConstraints();
+	result.resize((int)constraints.size());
+	for (int i = 0; i < result.size(); ++i) {
+		auto constraint = constraints[i];
+		Ref<SpineTransformConstraint> constraint_ref(memnew(SpineTransformConstraint));
+		constraint_ref->set_spine_object(constraint);
+		result[i] = constraint_ref;
 	}
-	return gd_as;
+	return result;
 }
 
 Ref<SpineSkin> SpineSkeleton::get_skin() {
-	auto s = skeleton->getSkin();
-	if (s == nullptr) return nullptr;
-	Ref<SpineSkin> gd_s(memnew(SpineSkin));
-	gd_s->set_spine_object(s);
-	return gd_s;
+	SPINE_CHECK(skeleton, nullptr)
+	auto skin = skeleton->getSkin();
+	if (!skin) return nullptr;
+	Ref<SpineSkin> skin_ref(memnew(SpineSkin));
+	skin_ref->set_spine_object(skin);
+	return skin_ref;
 }
 
 Color SpineSkeleton::get_color() {
-	auto &c = skeleton->getColor();
-	return Color(c.r, c.g, c.b, c.a);
-}
-void SpineSkeleton::set_color(Color v) {
-	auto &c = skeleton->getColor();
-	c.set(v.r, v.g, v.b, v.a);
+	SPINE_CHECK(skeleton, Color(0, 0, 0, 0))
+	auto &color = skeleton->getColor();
+	return Color(color.r, color.g, color.b, color.a);
 }
 
-void SpineSkeleton::set_position(Vector2 pos) {
-	skeleton->setPosition(pos.x, pos.y);
+void SpineSkeleton::set_color(Color v) {
+	SPINE_CHECK(skeleton,)
+	auto &color = skeleton->getColor();
+	color.set(v.r, v.g, v.b, v.a);
+}
+
+void SpineSkeleton::set_position(Vector2 position) {
+	SPINE_CHECK(skeleton,)
+	skeleton->setPosition(position.x, position.y);
 }
 
 float SpineSkeleton::get_x() {
+	SPINE_CHECK(skeleton, 0)
 	return skeleton->getX();
 }
+
 void SpineSkeleton::set_x(float v) {
+	SPINE_CHECK(skeleton,)
 	skeleton->setX(v);
 }
 
 float SpineSkeleton::get_y() {
+	SPINE_CHECK(skeleton, 0)
 	return skeleton->getY();
 }
+
 void SpineSkeleton::set_y(float v) {
+	SPINE_CHECK(skeleton,)
 	skeleton->setY(v);
 }
 
 float SpineSkeleton::get_scale_x() {
+	SPINE_CHECK(skeleton, 1)
 	return skeleton->getScaleX();
 }
+
 void SpineSkeleton::set_scale_x(float v) {
+	SPINE_CHECK(skeleton,)
 	skeleton->setScaleX(v);
 }
 
 float SpineSkeleton::get_scale_y() {
+	SPINE_CHECK(skeleton, 1)
 	return skeleton->getScaleY();
 }
+
 void SpineSkeleton::set_scale_y(float v) {
+	SPINE_CHECK(skeleton,)
 	skeleton->setScaleY(v);
 }

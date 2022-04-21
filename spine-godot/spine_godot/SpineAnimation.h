@@ -30,16 +30,16 @@
 #ifndef GODOT_SPINEANIMATION_H
 #define GODOT_SPINEANIMATION_H
 
+#include "SpineCommon.h"
 #include "SpineConstant.h"
-#include "core/reference.h"
 #include <spine/Animation.h>
 
 class SpineEvent;
 class SpineSkeleton;
 class SpineTimeline;
 
-class SpineAnimation : public Reference {
-	GDCLASS(SpineAnimation, Reference);
+class SpineAnimation : public REFCOUNTED {
+	GDCLASS(SpineAnimation, REFCOUNTED);
 
 private:
 	spine::Animation *animation;
@@ -49,10 +49,9 @@ protected:
 
 public:
 	SpineAnimation();
-	~SpineAnimation();
 
-	void set_spine_object(spine::Animation *animation) { this->animation = animation; }
-	
+	void set_spine_object(spine::Animation *_animation) { this->animation = _animation; }
+
 	spine::Animation *get_spine_object() { return animation; }
 
 	void apply(Ref<SpineSkeleton> skeleton, float last_time, float time, bool loop, Array events, float alpha, SpineConstant::MixBlend blend, SpineConstant::MixDirection direction);

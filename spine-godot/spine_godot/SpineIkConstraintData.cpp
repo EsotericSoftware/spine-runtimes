@@ -28,8 +28,7 @@
  *****************************************************************************/
 
 #include "SpineIkConstraintData.h"
-
-#include "common.h"
+#include "SpineCommon.h"
 
 void SpineIkConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_bones"), &SpineIkConstraintData::get_bones);
@@ -48,9 +47,6 @@ void SpineIkConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_softness"), &SpineIkConstraintData::get_softness);
 	ClassDB::bind_method(D_METHOD("set_softness", "v"), &SpineIkConstraintData::set_softness);
 }
-
-SpineIkConstraintData::SpineIkConstraintData() {}
-SpineIkConstraintData::~SpineIkConstraintData() {}
 
 Array SpineIkConstraintData::get_bones() {
 	Array result;

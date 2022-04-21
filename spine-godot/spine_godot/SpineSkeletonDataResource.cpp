@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 #include "SpineSkeletonDataResource.h"
-
+#include "SpineCommon.h"
 #include "core/io/marshalls.h"
 
 void SpineAnimationMix::_bind_methods() {
@@ -41,33 +41,34 @@ void SpineAnimationMix::_bind_methods() {
 
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "from"), "set_from", "get_from");
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "to"), "set_to", "get_to");
+#if VERSION_MAJOR > 3
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "mix"), "set_mix", "get_mix");
+#else
 	ADD_PROPERTY(PropertyInfo(Variant::REAL, "mix"), "set_mix", "get_mix");
+#endif
 }
 
 SpineAnimationMix::SpineAnimationMix(): from(""), to(""), mix(0) {
 }
 
-SpineAnimationMix::~SpineAnimationMix() {
-}
-
-void SpineAnimationMix::set_from(const StringName &from) {
-	this->from = from;
+void SpineAnimationMix::set_from(const StringName &_from) {
+	this->from = _from;
 }
 
 String SpineAnimationMix::get_from() {
 	return from;
 }
 
-void SpineAnimationMix::set_to(const StringName &to) {
-	this->to = to;
+void SpineAnimationMix::set_to(const StringName &_to) {
+	this->to = _to;
 }
 
 String SpineAnimationMix::get_to() {
 	return to;
 }
 
-void SpineAnimationMix::set_mix(float mix) {
-	this->mix = mix;
+void SpineAnimationMix::set_mix(float _mix) {
+	this->mix = _mix;
 }
 
 float SpineAnimationMix::get_mix() {
@@ -119,11 +120,15 @@ void SpineSkeletonDataResource::_bind_methods() {
 
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "atlas_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineAtlasResource"), "set_atlas_res", "get_atlas_res");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skeleton_file_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineSkeletonFileResource"), "set_skeleton_file_res", "get_skeleton_file_res");
+#if VERSION_MAJOR > 3
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "default_mix"), "set_default_mix", "get_default_mix");
+#else
 	ADD_PROPERTY(PropertyInfo(Variant::REAL, "default_mix"), "set_default_mix", "get_default_mix");
+#endif
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "animation_mixes"), "set_animation_mixes", "get_animation_mixes");
 }
 
-SpineSkeletonDataResource::SpineSkeletonDataResource() : skeleton_data(nullptr), animation_state_data(nullptr), default_mix(0) {
+SpineSkeletonDataResource::SpineSkeletonDataResource() : default_mix(0), skeleton_data(nullptr), animation_state_data(nullptr) {
 }
 
 SpineSkeletonDataResource::~SpineSkeletonDataResource() {
@@ -142,32 +147,32 @@ void SpineSkeletonDataResource::update_skeleton_data() {
 	}
 
 	if (atlas_res.is_valid() && skeleton_file_res.is_valid()) {
-		load_res(atlas_res->get_spine_atlas(), skeleton_file_res->get_json(), skeleton_file_res->get_binary());
+		load_resources(atlas_res->get_spine_atlas(), skeleton_file_res->get_json(), skeleton_file_res->get_binary());
 	}
 	emit_signal("skeleton_data_changed");
 #ifdef TOOLS_ENABLED
-	property_list_changed_notify();
+	NOTIFY_PROPERTY_LIST_CHANGED();
 #endif
 }
 
-void SpineSkeletonDataResource::load_res(spine::Atlas *atlas, const String &json, const Vector<uint8_t> &binary) {
-	if ((json.empty() && binary.empty()) || atlas == nullptr) return;
+void SpineSkeletonDataResource::load_resources(spine::Atlas *atlas, const String &json, const Vector<uint8_t> &binary) {
+	if ((EMPTY(json) && EMPTY(binary)) || atlas == nullptr) return;
 
 	spine::SkeletonData *data;
-	if (!json.empty()) {
+	if (!EMPTY(json)) {
 		spine::SkeletonJson skeletonJson(atlas);
 		data = skeletonJson.readSkeletonData(json.utf8());
 		if (!data) {
-			print_error(String("Error while loading skeleton data: ") + get_path());
-			print_error(String("Error message: ") + skeletonJson.getError().buffer());
+			ERR_PRINT(String("Error while loading skeleton data: ") + get_path());
+			ERR_PRINT(String("Error message: ") + skeletonJson.getError().buffer());
 			return;
 		}
 	} else {
 		spine::SkeletonBinary skeletonBinary(atlas);
 		data = skeletonBinary.readSkeletonData(binary.ptr(), binary.size());
 		if (!data) {
-			print_error(String("Error while loading skeleton data: ") + get_path());
-			print_error(String("Error message: ") + skeletonBinary.getError().buffer());
+			ERR_PRINT(String("Error while loading skeleton data: ") + get_path());
+			ERR_PRINT(String("Error message: ") + skeletonBinary.getError().buffer());
 			return;
 		}
 	}
@@ -218,8 +223,8 @@ void SpineSkeletonDataResource::get_skin_names(Vector<String> &skin_names) const
 	}
 }
 
-void SpineSkeletonDataResource::set_default_mix(float default_mix) {
-	this->default_mix = default_mix;
+void SpineSkeletonDataResource::set_default_mix(float _default_mix) {
+	this->default_mix = _default_mix;
 	update_mixes();
 }
 
@@ -227,16 +232,16 @@ float SpineSkeletonDataResource::get_default_mix() {
 	return default_mix;
 }
 
-void SpineSkeletonDataResource::set_animation_mixes(Array animation_mixes) {
-	for (int i = 0; i < animation_mixes.size(); i++) {
-		auto objectId = Object::cast_to<EncodedObjectAsID>(animation_mixes[0]);
+void SpineSkeletonDataResource::set_animation_mixes(Array _animation_mixes) {
+	for (int i = 0; i < _animation_mixes.size(); i++) {
+		auto objectId = Object::cast_to<EncodedObjectAsID>(_animation_mixes[0]);
 		if (objectId) {
 			ERR_PRINT("Live-editing of animation mixes is not supported.");
 			return;
 		}
 	}
-	
-	this->animation_mixes = animation_mixes;
+
+	this->animation_mixes = _animation_mixes;
 	update_mixes();
 }
 
@@ -264,18 +269,10 @@ void SpineSkeletonDataResource::update_mixes() {
 	}
 }
 
-
-#define CHECK(x)                                      \
-	if (!is_skeleton_data_loaded()) {                   \
-		ERR_PRINT("skeleton data has not loaded yet!"); \
-		return x;                                       \
-	}
-
-#define S_T(x) (spine::String((x).utf8()))
 Ref<SpineAnimation> SpineSkeletonDataResource::find_animation(const String &animation_name) const {
-	CHECK(nullptr)
-	if (animation_name.empty()) return nullptr;
-	auto animation = skeleton_data->findAnimation(S_T(animation_name));
+	SPINE_CHECK(skeleton_data, nullptr)
+	if (EMPTY(animation_name)) return nullptr;
+	auto animation = skeleton_data->findAnimation(SPINE_STRING(animation_name));
 	if (!animation) return nullptr;
 	Ref<SpineAnimation> animation_ref(memnew(SpineAnimation));
 	animation_ref->set_spine_object(animation);
@@ -283,67 +280,68 @@ Ref<SpineAnimation> SpineSkeletonDataResource::find_animation(const String &anim
 }
 
 Ref<SpineBoneData> SpineSkeletonDataResource::find_bone(const String &bone_name) const {
-	CHECK(nullptr)
-	if (bone_name.empty()) return nullptr;
-	auto bone = skeleton_data->findBone(S_T(bone_name));
-	if (bone == nullptr) return nullptr;
+	SPINE_CHECK(skeleton_data, nullptr)
+	if (EMPTY(bone_name)) return nullptr;
+	auto bone = skeleton_data->findBone(SPINE_STRING(bone_name));
+	if (!bone) return nullptr;
 	Ref<SpineBoneData> bone_ref(memnew(SpineBoneData));
 	bone_ref->set_spine_object(bone);
 	return bone_ref;
 }
 
 Ref<SpineSlotData> SpineSkeletonDataResource::find_slot(const String &slot_name) const {
-	CHECK(nullptr)
-	if (slot_name.empty()) return nullptr;
-	auto slot = skeleton_data->findSlot(S_T(slot_name));
-	if (slot == nullptr) return nullptr;
+	SPINE_CHECK(skeleton_data, nullptr)
+	if (EMPTY(slot_name)) return nullptr;
+	auto slot = skeleton_data->findSlot(SPINE_STRING(slot_name));
+	if (!slot) return nullptr;
 	Ref<SpineSlotData> slot_ref(memnew(SpineSlotData));
 	slot_ref->set_spine_object(slot);
 	return slot_ref;
 }
 
 Ref<SpineSkin> SpineSkeletonDataResource::find_skin(const String &skin_name) const {
-	CHECK(nullptr)
-	if (skin_name.empty()) return nullptr;
-	auto skin = skeleton_data->findSkin(S_T(skin_name));
-	if (skin == nullptr) return nullptr;
+	SPINE_CHECK(skeleton_data, nullptr)
+	if (EMPTY(skin_name)) return nullptr;
+	auto skin = skeleton_data->findSkin(SPINE_STRING(skin_name));
+	if (!skin) return nullptr;
 	Ref<SpineSkin> skin_ref(memnew(SpineSkin));
 	skin_ref->set_spine_object(skin);
 	return skin_ref;
 }
 
 Ref<SpineEventData> SpineSkeletonDataResource::find_event(const String &event_data_name) const {
-	CHECK(nullptr)
-	if (event_data_name.empty()) return nullptr;
-	auto event = skeleton_data->findEvent(S_T(event_data_name));
-	if (event == nullptr) return nullptr;
+	SPINE_CHECK(skeleton_data, nullptr)
+	if (EMPTY(event_data_name)) return nullptr;
+	auto event = skeleton_data->findEvent(SPINE_STRING(event_data_name));
+	if (!event) return nullptr;
 	Ref<SpineEventData> event_ref(memnew(SpineEventData));
 	event_ref->set_spine_object(event);
 	return event_ref;
 }
 
 Ref<SpineIkConstraintData> SpineSkeletonDataResource::find_ik_constraint(const String &constraint_name) const {
-	CHECK(nullptr)
-	if (constraint_name.empty()) return nullptr;
-	auto constraint = skeleton_data->findIkConstraint(S_T(constraint_name));
-	if (constraint == nullptr) return nullptr;
+	SPINE_CHECK(skeleton_data, nullptr)
+	if (EMPTY(constraint_name)) return nullptr;
+	auto constraint = skeleton_data->findIkConstraint(SPINE_STRING(constraint_name));
+	if (!constraint) return nullptr;
 	Ref<SpineIkConstraintData> constraint_ref(memnew(SpineIkConstraintData));
 	constraint_ref->set_spine_object(constraint);
 	return constraint_ref;
 }
+
 Ref<SpineTransformConstraintData> SpineSkeletonDataResource::find_transform_constraint(const String &constraint_name) const {
-	CHECK(nullptr)
-	if (constraint_name.empty()) return nullptr;
-	auto constraint = skeleton_data->findTransformConstraint(S_T(constraint_name));
-	if (constraint == nullptr) return nullptr;
+	SPINE_CHECK(skeleton_data, nullptr)
+	if (EMPTY(constraint_name)) return nullptr;
+	auto constraint = skeleton_data->findTransformConstraint(SPINE_STRING(constraint_name));
+	if (!constraint) return nullptr;
 	Ref<SpineTransformConstraintData> constraint_ref(memnew(SpineTransformConstraintData));
 	constraint_ref->set_spine_object(constraint);
 	return constraint_ref;
 }
 Ref<SpinePathConstraintData> SpineSkeletonDataResource::find_path_constraint(const String &constraint_name) const {
-	CHECK(nullptr)
-	if (constraint_name.empty()) return nullptr;
-	auto constraint = skeleton_data->findPathConstraint(S_T(constraint_name));
+	SPINE_CHECK(skeleton_data, nullptr)
+	if (EMPTY(constraint_name)) return nullptr;
+	auto constraint = skeleton_data->findPathConstraint(SPINE_STRING(constraint_name));
 	if (constraint == nullptr) return nullptr;
 	Ref<SpinePathConstraintData> constraint_ref(memnew(SpinePathConstraintData));
 	constraint_ref->set_spine_object(constraint);
@@ -351,173 +349,170 @@ Ref<SpinePathConstraintData> SpineSkeletonDataResource::find_path_constraint(con
 }
 
 String SpineSkeletonDataResource::get_skeleton_name() const{
-	CHECK("")
+	SPINE_CHECK(skeleton_data, "")
 	return skeleton_data->getName().buffer();
 }
 
 Array SpineSkeletonDataResource::get_bones() const {
-	Array bone_refs;
-	CHECK(bone_refs)
+	Array result;
+	SPINE_CHECK(skeleton_data, result)
 	auto bones = skeleton_data->getBones();
-	bone_refs.resize((int)bones.size());
+	result.resize((int)bones.size());
 	for (int i = 0; i < bones.size(); ++i) {
 		Ref<SpineBoneData> bone_ref(memnew(SpineBoneData));
 		bone_ref->set_spine_object(bones[i]);
-		bone_refs[i] = bone_ref;
+		result[i] = bone_ref;
 	}
-	return bone_refs;
+	return result;
 }
 
 Array SpineSkeletonDataResource::get_slots() const {
-	Array slot_refs;
-	CHECK(slot_refs)
+	Array result;
+	SPINE_CHECK(skeleton_data, result)
 	auto slots = skeleton_data->getSlots();
-	slot_refs.resize((int)slots.size());
+	result.resize((int)slots.size());
 	for (int i = 0; i < slots.size(); ++i) {
 		Ref<SpineSlotData> slot_ref(memnew(SpineSlotData));
 		slot_ref->set_spine_object(slots[i]);
-		slot_refs[i] = slot_ref;
+		result[i] = slot_ref;
 	}
-	return slot_refs;
+	return result;
 }
 
 Array SpineSkeletonDataResource::get_skins() const {
-	Array skin_refs;
-	CHECK(skin_refs)
+	Array result;
+	SPINE_CHECK(skeleton_data, result)
 	auto skins = skeleton_data->getSkins();
-	skin_refs.resize((int)skins.size());
+	result.resize((int)skins.size());
 	for (int i = 0; i < skins.size(); ++i) {
 		Ref<SpineSkin> skin_ref(memnew(SpineSkin));
 		skin_ref->set_spine_object(skins[i]);
-		skin_refs[i] = skin_ref;
+		result[i] = skin_ref;
 	}
-	return skin_refs;
+	return result;
 }
 
 Ref<SpineSkin> SpineSkeletonDataResource::get_default_skin() const {
-	CHECK(nullptr)
+	SPINE_CHECK(skeleton_data, nullptr)
 	auto skin = skeleton_data->getDefaultSkin();
-	if (skin == nullptr) return nullptr;
+	if (skin) return nullptr;
 	Ref<SpineSkin> skin_ref(memnew(SpineSkin));
 	skin_ref->set_spine_object(skin);
 	return skin_ref;
 }
 
 void SpineSkeletonDataResource::set_default_skin(Ref<SpineSkin> skin) {
-	CHECK()
-	if (skin.is_valid())
-		skeleton_data->setDefaultSkin(skin->get_spine_object());
-	else
-		skeleton_data->setDefaultSkin(nullptr);
+	SPINE_CHECK(skeleton_data,)
+	skeleton_data->setDefaultSkin(skin.is_valid() ? skin->get_spine_object() : nullptr);
 }
 
 Array SpineSkeletonDataResource::get_events() const {
-	Array event_refs;
-	CHECK(event_refs)
+	Array result;
+	SPINE_CHECK(skeleton_data, result)
 	auto events = skeleton_data->getEvents();
-	event_refs.resize((int)events.size());
+	result.resize((int)events.size());
 	for (int i = 0; i < events.size(); ++i) {
 		Ref<SpineEventData> event_ref(memnew(SpineEventData));
 		event_ref->set_spine_object(events[i]);
-		event_refs[i] = event_ref;
+		result[i] = event_ref;
 	}
-	return event_refs;
+	return result;
 }
 
 Array SpineSkeletonDataResource::get_animations() const {
-	Array animation_refs;
-	CHECK(animation_refs)
+	Array result;
+	SPINE_CHECK(skeleton_data, result)
 	auto animations = skeleton_data->getAnimations();
-	animation_refs.resize((int)animations.size());
+	result.resize((int)animations.size());
 	for (int i = 0; i < animations.size(); ++i) {
 		Ref<SpineAnimation> animation_ref(memnew(SpineAnimation));
 		animation_ref->set_spine_object(animations[i]);
-		animation_refs[i] = animation_ref;
+		result[i] = animation_ref;
 	}
-	return animation_refs;
+	return result;
 }
 
 Array SpineSkeletonDataResource::get_ik_constraints() const {
-	Array constraint_refs;
-	CHECK(constraint_refs)
+	Array result;
+	SPINE_CHECK(skeleton_data, result)
 	auto constraints = skeleton_data->getIkConstraints();
-	constraint_refs.resize((int)constraints.size());
+	result.resize((int)constraints.size());
 	for (int i = 0; i < constraints.size(); ++i) {
 		Ref<SpineIkConstraintData> constraint_ref(memnew(SpineIkConstraintData));
 		constraint_ref->set_spine_object(constraints[i]);
-		constraint_refs[i] = constraint_ref;
+		result[i] = constraint_ref;
 	}
-	return constraint_refs;
+	return result;
 }
 
 Array SpineSkeletonDataResource::get_transform_constraints() const {
-	Array constraint_refs;
-	CHECK(constraint_refs)
+	Array result;
+	SPINE_CHECK(skeleton_data, result)
 	auto constraints = skeleton_data->getTransformConstraints();
-	constraint_refs.resize((int)constraints.size());
+	result.resize((int)constraints.size());
 	for (int i = 0; i < constraints.size(); ++i) {
 		Ref<SpineTransformConstraintData> constraint_ref(memnew(SpineTransformConstraintData));
 		constraint_ref->set_spine_object(constraints[i]);
-		constraint_refs[i] = constraint_ref;
+		result[i] = constraint_ref;
 	}
-	return constraint_refs;
+	return result;
 }
 
 Array SpineSkeletonDataResource::get_path_constraints() const {
-	Array constraint_refs;
-	CHECK(constraint_refs)
+	Array result;
+	SPINE_CHECK(skeleton_data, result)
 	auto constraints = skeleton_data->getPathConstraints();
-	constraint_refs.resize((int)constraints.size());
+	result.resize((int)constraints.size());
 	for (int i = 0; i < constraints.size(); ++i) {
 		Ref<SpinePathConstraintData> constraint_ref(memnew(SpinePathConstraintData));
 		constraint_ref->set_spine_object(constraints[i]);
-		constraint_refs[i] = constraint_ref;
+		result[i] = constraint_ref;
 	}
-	return constraint_refs;
+	return result;
 }
 
 float SpineSkeletonDataResource::get_x() const{
-	CHECK(0)
+	SPINE_CHECK(skeleton_data, 0)
 	return skeleton_data->getX();
 }
 
 float SpineSkeletonDataResource::get_y() const {
-	CHECK(0)
+	SPINE_CHECK(skeleton_data, 0)
 	return skeleton_data->getY();
 }
 
 float SpineSkeletonDataResource::get_width() const{
-	CHECK(0)
+	SPINE_CHECK(skeleton_data, 0)
 	return skeleton_data->getWidth();
 }
 
 float SpineSkeletonDataResource::get_height() const {
-	CHECK(0)
+	SPINE_CHECK(skeleton_data, 0)
 	return skeleton_data->getHeight();
 }
 
 String SpineSkeletonDataResource::get_version() const {
-	CHECK("")
+	SPINE_CHECK(skeleton_data, "")
 	return skeleton_data->getVersion().buffer();
 }
 
 String SpineSkeletonDataResource::get_hash() const {
-	CHECK("")
+	SPINE_CHECK(skeleton_data, "")
 	return skeleton_data->getHash().buffer();
 }
 
-
 String SpineSkeletonDataResource::get_images_path() const {
-	CHECK("")
+	SPINE_CHECK(skeleton_data, "")
 	return skeleton_data->getImagesPath().buffer();
 }
 
 String SpineSkeletonDataResource::get_audio_path() const {
-	CHECK("")
+	SPINE_CHECK(skeleton_data, "")
 	return skeleton_data->getAudioPath().buffer();
 }
 
 float SpineSkeletonDataResource::get_fps() const {
-	CHECK(0)
+	SPINE_CHECK(skeleton_data, 0)
 	return skeleton_data->getFps();
 }
+//

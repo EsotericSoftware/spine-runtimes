@@ -30,7 +30,7 @@
 #include "SpineBone.h"
 #include "SpineSprite.h"
 #include "SpineSkeleton.h"
-#include "common.h"
+#include "SpineCommon.h"
 
 void SpineBone::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update_world_transform"), &SpineBone::update_world_transform);
@@ -100,8 +100,6 @@ void SpineBone::_bind_methods() {
 }
 
 SpineBone::SpineBone() : bone(nullptr), sprite(nullptr) {}
-
-SpineBone::~SpineBone() {}
 
 void SpineBone::set_spine_sprite(SpineSprite* _sprite) {
 	this->sprite = _sprite;
@@ -429,12 +427,11 @@ void SpineBone::set_active(bool v) {
 }
 
 // External feature functions
-void SpineBone::apply_world_transform_2d(Variant o) {
+void SpineBone::apply_world_transform_2d(const Variant &o) {
 	SPINE_CHECK(bone,)
 	if (o.get_type() == Variant::OBJECT) {
-		auto node = (Node *) o;
-		if (node->is_class("Node2D")) {
-			auto node2d = (Node2D *) node;
+		auto node2d = Object::cast_to<Node2D>(o.operator Object*());
+		if (node2d) {			
 			// In godot the y-axis is nag to spine
 			node2d->set_transform(Transform2D(
 					get_a(), get_c(),

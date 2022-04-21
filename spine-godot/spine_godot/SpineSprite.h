@@ -30,12 +30,11 @@
 #ifndef GODOT_SPINESPRITE_H
 #define GODOT_SPINESPRITE_H
 
-#include "scene/2d/node_2d.h"
-#include "scene/resources/texture.h"
-
 #include "SpineSkeleton.h"
 #include "SpineAnimationState.h"
+#include "scene/2d/node_2d.h"
 #include "scene/2d/mesh_instance_2d.h"
+#include "scene/resources/texture.h"
 
 class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
 	GDCLASS(SpineSprite, Node2D);
@@ -90,7 +89,6 @@ public:
 	void update_meshes(Ref<SpineSkeleton> s);
 
 	void update_bind_slot_nodes();
-	void update_bind_slot_node_transform(Ref<SpineBone> bone, Node2D *node2d);
 	void update_bind_slot_node_draw_order(const String &slot_name, Node2D *node2d);
 	Node *find_child_node_by_node(Node *node);
 
@@ -101,15 +99,15 @@ public:
 	void _update_all(float delta);
 
 	Array get_bind_slot_nodes();
+
 	void set_bind_slot_nodes(Array v);
 
 	Transform2D bone_get_global_transform(const String &bone_name);
+
 	void bone_set_global_transform(const String &bone_name, Transform2D transform);
 
-	bool get_overlap();
-	void set_overlap(bool v);
-
 	ProcessMode get_process_mode();
+
 	void set_process_mode(ProcessMode v);
 
 #ifdef TOOLS_ENABLED

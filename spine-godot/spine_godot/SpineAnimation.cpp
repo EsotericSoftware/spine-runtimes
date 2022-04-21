@@ -27,13 +27,13 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "common.h"
 #include "SpineAnimation.h"
 #include "SpineSkeleton.h"
 #include "SpineEvent.h"
 #include "SpineTimeline.h"
-
+#if VERSION_MAJOR == 3
 #include "core/method_bind_ext.gen.inc"
+#endif
 
 void SpineAnimation::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_name"), &SpineAnimation::get_name);
@@ -46,9 +46,6 @@ void SpineAnimation::_bind_methods() {
 }
 
 SpineAnimation::SpineAnimation() : animation(nullptr) {
-}
-
-SpineAnimation::~SpineAnimation() {
 }
 
 String SpineAnimation::get_name() {

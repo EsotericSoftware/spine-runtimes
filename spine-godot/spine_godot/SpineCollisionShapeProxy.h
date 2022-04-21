@@ -31,7 +31,7 @@
 #define GODOT_SPINECOLLISIONSHAPEPROXY_H
 
 #include "scene/2d/collision_polygon_2d.h"
-#include <spine/spine.h>
+#include <spine/Slot.h>
 
 class SpineSprite;
 class SpineAnimationState;

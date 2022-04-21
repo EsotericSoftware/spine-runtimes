@@ -29,16 +29,17 @@
 
 #include "GodotSpineExtension.h"
 #include "core/os/memory.h"
+#include "core/version.h"
+#if VERSION_MAJOR > 3
+#include "core/io/file_access.h"
+#else
 #include "core/os/file_access.h"
-
+#endif
 #include <spine/SpineString.h>
 
 spine::SpineExtension *spine::getDefaultExtension() {
 	return new GodotSpineExtension();
 }
-
-GodotSpineExtension::GodotSpineExtension() {}
-GodotSpineExtension::~GodotSpineExtension() {}
 
 void *GodotSpineExtension::_alloc(size_t size, const char *file, int line) {
 	return memalloc(size);

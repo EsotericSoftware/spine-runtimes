@@ -30,12 +30,12 @@
 #ifndef GODOT_SPINEBONEDATA_H
 #define GODOT_SPINEBONEDATA_H
 
-#include "core/reference.h"
+#include "SpineCommon.h"
 #include "SpineConstant.h"
 #include <spine/BoneData.h>
 
-class SpineBoneData : public Reference {
-	GDCLASS(SpineBoneData, Reference);
+class SpineBoneData : public REFCOUNTED {
+	GDCLASS(SpineBoneData, REFCOUNTED);
 
 protected:
 	static void _bind_methods();
@@ -45,7 +45,6 @@ private:
 
 public:
 	SpineBoneData();
-	~SpineBoneData();
 
 	void set_spine_object(spine::BoneData *_bone_data) { bone_data = _bone_data; }
 
@@ -58,43 +57,43 @@ public:
 	Ref<SpineBoneData> get_parent();
 
 	float get_length();
-	
+
 	void set_length(float v);
 
 	float get_x();
-	
+
 	void set_x(float v);
 
 	float get_y();
-	
+
 	void set_y(float v);
 
 	float get_rotation();
-	
+
 	void set_rotation(float v);
 
 	float get_scale_x();
-	
+
 	void set_scale_x(float v);
 
 	float get_scale_y();
-	
+
 	void set_scale_y(float v);
 
 	float get_shear_x();
-	
+
 	void set_shear_x(float v);
 
 	float get_shear_y();
-	
+
 	void set_shear_y(float v);
 
 	SpineConstant::TransformMode get_transform_mode();
-	
+
 	void set_transform_mode(SpineConstant::TransformMode v);
 
 	bool is_skin_required();
-	
+
 	void set_skin_required(bool v);
 
 	Color get_color();

@@ -30,19 +30,16 @@
 #ifndef GODOT_SPINESLOT_H
 #define GODOT_SPINESLOT_H
 
-#include "core/variant_parser.h"
-
-#include <spine/spine.h>
-
+#include "SpineCommon.h"
 #include "SpineSlotData.h"
 #include "SpineAttachment.h"
+#include "SpineBone.h"
 
+// Breaks cyclic dependency.
 class SpineSkeleton;
 
-class SpineBone;
-
-class SpineSlot : public Reference {
-	GDCLASS(SpineSlot, Reference);
+class SpineSlot : public REFCOUNTED {
+	GDCLASS(SpineSlot, REFCOUNTED);
 
 protected:
 	static void _bind_methods();
@@ -52,16 +49,11 @@ private:
 
 public:
 	SpineSlot();
-	~SpineSlot();
 
-	inline void set_spine_object(spine::Slot *s) {
-		slot = s;
-	}
-	inline spine::Slot *get_spine_object() {
-		return slot;
-	}
+	void set_spine_object(spine::Slot *s) { slot = s; }
+	spine::Slot *get_spine_object() { return slot; }
 
-	void set_to_setup_pos();
+	void set_to_setup_pose();
 
 	Ref<SpineSlotData> get_data();
 
@@ -70,21 +62,30 @@ public:
 	Ref<SpineSkeleton> get_skeleton();
 
 	Color get_color();
+
 	void set_color(Color v);
 
 	Color get_dark_color();
+
 	void set_dark_color(Color v);
 
 	bool has_dark_color();
 
 	Ref<SpineAttachment> get_attachment();
+
 	void set_attachment(Ref<SpineAttachment> v);
 
 	int get_attachment_state();
+
 	void set_attachment_state(int v);
 
 	Array get_deform();
+
 	void set_deform(Array v);
+
+	int get_sequence_index();
+
+	void set_sequence_index(int v);
 };
 
 #endif//GODOT_SPINESLOT_H

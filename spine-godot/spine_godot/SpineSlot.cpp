@@ -28,13 +28,12 @@
  *****************************************************************************/
 
 #include "SpineSlot.h"
-
 #include "SpineBone.h"
 #include "SpineSkeleton.h"
-
+#include "SpineCommon.h"
 
 void SpineSlot::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("set_to_setup_pos"), &SpineSlot::set_to_setup_pos);
+	ClassDB::bind_method(D_METHOD("set_to_setup_pose"), &SpineSlot::set_to_setup_pose);
 	ClassDB::bind_method(D_METHOD("get_data"), &SpineSlot::get_data);
 	ClassDB::bind_method(D_METHOD("get_bone"), &SpineSlot::get_bone);
 	ClassDB::bind_method(D_METHOD("get_skeleton"), &SpineSlot::get_skeleton);
@@ -49,93 +48,121 @@ void SpineSlot::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_attachment_state", "v"), &SpineSlot::set_attachment_state);
 	ClassDB::bind_method(D_METHOD("get_deform"), &SpineSlot::get_deform);
 	ClassDB::bind_method(D_METHOD("set_deform", "v"), &SpineSlot::set_deform);
+	ClassDB::bind_method(D_METHOD("get_sequence_index"), &SpineSlot::get_sequence_index);
+	ClassDB::bind_method(D_METHOD("set_sequence_index", "v"), &SpineSlot::set_sequence_index);
 }
 
-SpineSlot::SpineSlot() : slot(NULL) {}
-SpineSlot::~SpineSlot() {}
+SpineSlot::SpineSlot() : slot(nullptr) {
+}
 
-void SpineSlot::set_to_setup_pos() {
+void SpineSlot::set_to_setup_pose() {
+	SPINE_CHECK(slot,)
 	slot->setToSetupPose();
 }
 
 Ref<SpineSlotData> SpineSlot::get_data() {
-	auto &sd = slot->getData();
-	Ref<SpineSlotData> gd_sd(memnew(SpineSlotData));
-	gd_sd->set_spine_object(&sd);
-	return gd_sd;
+	SPINE_CHECK(slot, nullptr)
+	auto &slot_data = slot->getData();
+	Ref<SpineSlotData> slot_data_ref(memnew(SpineSlotData));
+	slot_data_ref->set_spine_object(&slot_data);
+	return slot_data_ref;
 }
 
 Ref<SpineBone> SpineSlot::get_bone() {
-	auto &b = slot->getBone();
-	Ref<SpineBone> gd_b(memnew(SpineBone));
-	gd_b->set_spine_object(&b);
-	return gd_b;
+	SPINE_CHECK(slot, nullptr)
+	auto &bone = slot->getBone();
+	Ref<SpineBone> bone_ref(memnew(SpineBone));
+	bone_ref->set_spine_object(&bone);
+	return bone_ref;
 }
 
 Ref<SpineSkeleton> SpineSlot::get_skeleton() {
-	auto &s = slot->getSkeleton();
-	Ref<SpineSkeleton> gd_s(memnew(SpineSkeleton));
-	gd_s->set_spine_object(&s);
-	return gd_s;
+	SPINE_CHECK(slot, nullptr)
+	auto &skeleton = slot->getSkeleton();
+	Ref<SpineSkeleton> skeleton_ref(memnew(SpineSkeleton));
+	skeleton_ref->set_spine_object(&skeleton);
+	return skeleton_ref;
 }
 
 Color SpineSlot::get_color() {
-	auto &c = slot->getColor();
-	return Color(c.r, c.g, c.b, c.a);
+	SPINE_CHECK(slot, Color(0, 0, 0, 0))
+	auto &color = slot->getColor();
+	return Color(color.r, color.g, color.b, color.a);
 }
+
 void SpineSlot::set_color(Color v) {
-	auto &c = slot->getColor();
-	c.set(v.r, v.g, v.b, v.a);
+	SPINE_CHECK(slot,)
+	auto &color = slot->getColor();
+	color.set(v.r, v.g, v.b, v.a);
 }
 
 Color SpineSlot::get_dark_color() {
-	auto &c = slot->getDarkColor();
-	return Color(c.r, c.g, c.b, c.a);
+	SPINE_CHECK(slot, Color(0, 0, 0, 0))
+	auto &color = slot->getDarkColor();
+	return Color(color.r, color.g, color.b, color.a);
 }
+
 void SpineSlot::set_dark_color(Color v) {
-	auto &c = slot->getDarkColor();
-	c.set(v.r, v.g, v.b, v.a);
+	SPINE_CHECK(slot,)
+	auto &color = slot->getDarkColor();
+	color.set(v.r, v.g, v.b, v.a);
 }
 
 bool SpineSlot::has_dark_color() {
+	SPINE_CHECK(slot, false)
 	return slot->hasDarkColor();
 }
 
 Ref<SpineAttachment> SpineSlot::get_attachment() {
-	auto a = slot->getAttachment();
-	if (a == NULL) return NULL;
-	Ref<SpineAttachment> gd_a(memnew(SpineAttachment));
-	gd_a->set_spine_object(a);
-	return gd_a;
+	SPINE_CHECK(slot, nullptr)
+	auto attachment = slot->getAttachment();
+	if (!attachment) return nullptr;
+	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
+	attachment_ref->set_spine_object(attachment);
+	return attachment_ref;
 }
+
 void SpineSlot::set_attachment(Ref<SpineAttachment> v) {
-	if (v.is_valid()) {
-		slot->setAttachment(v->get_spine_object());
-	} else {
-		slot->setAttachment(NULL);
-	}
+	SPINE_CHECK(slot,)
+	slot->setAttachment(v.is_valid() ? v->get_spine_object() : nullptr);
 }
 
 int SpineSlot::get_attachment_state() {
+	SPINE_CHECK(slot, 0)
 	return slot->getAttachmentState();
 }
+
 void SpineSlot::set_attachment_state(int v) {
+	SPINE_CHECK(slot,)
 	slot->setAttachmentState(v);
 }
 
 Array SpineSlot::get_deform() {
-	auto &ds = slot->getDeform();
-	Array gd_ds;
-	gd_ds.resize(ds.size());
-	for (size_t i = 0; i < ds.size(); ++i) {
-		gd_ds[i] = ds[i];
+	Array result;
+	SPINE_CHECK(slot, result)
+	auto &deform = slot->getDeform();
+	result.resize((int)deform.size());
+	for (int i = 0; i < deform.size(); ++i) {
+		result[i] = deform[i];
 	}
-	return gd_ds;
+	return result;
 }
-void SpineSlot::set_deform(Array gd_ds) {
-	auto &ds = slot->getDeform();
-	ds.setSize(gd_ds.size(), 0);
-	for (size_t i = 0; i < gd_ds.size(); ++i) {
-		ds[i] = gd_ds[i];
+
+void SpineSlot::set_deform(Array v) {
+	SPINE_CHECK(slot,)
+	auto &deform = slot->getDeform();
+	deform.setSize(v.size(), 0);
+	for (int i = 0; i < v.size(); ++i) {
+		deform[i] = v[i];
 	}
+}
+
+int SpineSlot::get_sequence_index() {
+	SPINE_CHECK(slot, 0)
+	return slot->getAttachmentState();
+}
+
+void SpineSlot::set_sequence_index(int v) {
+	SPINE_CHECK(slot,)
+	slot->setAttachmentState(v);
 }

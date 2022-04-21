@@ -30,12 +30,12 @@
 #ifndef GODOT_SPINEEVENT_H
 #define GODOT_SPINEEVENT_H
 
+#include "SpineCommon.h"
 #include "SpineEventData.h"
-#include "core/reference.h"
 #include <spine/Event.h>
 
-class SpineEvent : public Reference {
-	GDCLASS(SpineEvent, Reference)
+class SpineEvent : public REFCOUNTED {
+	GDCLASS(SpineEvent, REFCOUNTED)
 
 protected:
 	static void _bind_methods();
@@ -45,34 +45,33 @@ private:
 
 public:
 	SpineEvent();
-	~SpineEvent();
 
 	void set_spine_object(spine::Event *_event) { event = _event; }
 
 	spine::Event *get_spine_object() const { return event; }
-	
+
 	Ref<SpineEventData> get_data();
 
 	float get_time();
 
 	int get_int_value();
-	
+
 	void set_int_value(int v);
 
 	float get_float_value();
-	
+
 	void set_float_value(float v);
 
 	String get_string_value();
-	
+
 	void set_string_value(const String &v);
 
 	float get_volume();
-	
+
 	void set_volume(float v);
 
 	float get_balance();
-	
+
 	void set_balance(float v);
 };
 

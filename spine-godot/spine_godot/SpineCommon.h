@@ -1,5 +1,5 @@
-/******************************************************************************
- * Spine Runtimes License Agreement
+﻿/******************************************************************************
+* Spine Runtimes License Agreement
  * Last updated January 1, 2020. Replaces all prior versions.
  *
  * Copyright (c) 2013-2020, Esoteric Software LLC
@@ -27,67 +27,35 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINESKINATTACHMENTMAPENTRIES_H
-#define GODOT_SPINESKINATTACHMENTMAPENTRIES_H
+#ifndef SPINE_COMMON_H
+#define SPINE_COMMON_H
 
-#include "core/variant_parser.h"
+#include "core/version.h"
+#if VERSION_MAJOR > 3
+#include "core/core_bind.h"
+#include "core/error/error_macros.h"
+#define REFCOUNTED RefCounted
+#define EMPTY(x) ((x).is_empty())
+#define EMPTY_PTR(x) ((x)->is_empty())
+#define INSTANTIATE(x) (x).instantiate()
+#define NOTIFY_PROPERTY_LIST_CHANGED() notify_property_list_changed()
+#else
+#include "core/object.h"
+#include "core/reference.h"
+#include "core/error_macros.h"
+#define REFCOUNTED Reference
+#define EMPTY(x) ((x).empty())
+#define EMPTY_PTR(x) ((x)->empty())
+#define INSTANTIATE(x) (x).instance()
+#define NOTIFY_PROPERTY_LIST_CHANGED() property_list_changed_notify()
+#endif
 
-#include <spine/spine.h>
+#define SPINE_CHECK(obj, ret) \
+ if (!(obj)) { \
+  ERR_PRINT("Native Spine object not set."); \
+  return ret; \
+ }
 
-#include "SpineAttachment.h"
+#define SPINE_STRING(x) spine::String((x).utf8())
 
-class SpineSkinAttachmentMapEntry : public Reference {
-	GDCLASS(SpineSkinAttachmentMapEntry, Reference);
-
-protected:
-	static void _bind_methods();
-
-private:
-	spine::Skin::AttachmentMap::Entry *entry;
-
-public:
-	SpineSkinAttachmentMapEntry();
-	~SpineSkinAttachmentMapEntry();
-
-	inline void set_spine_object(spine::Skin::AttachmentMap::Entry *e) {
-		entry = e;
-	}
-	inline spine::Skin::AttachmentMap::Entry *get_spine_object() {
-		return entry;
-	}
-
-	uint64_t get_slot_index();
-	void set_slot_index(uint64_t v);
-
-	String get_entry_name();
-	void set_entry_name(const String &v);
-
-	Ref<SpineAttachment> get_attachment();
-	void set_attachment(Ref<SpineAttachment> v);
-};
-
-class SpineSkinAttachmentMapEntries : public Reference {
-	GDCLASS(SpineSkinAttachmentMapEntries, Reference);
-
-protected:
-	static void _bind_methods();
-
-private:
-	spine::Skin::AttachmentMap::Entries *entries;
-
-public:
-	SpineSkinAttachmentMapEntries();
-	~SpineSkinAttachmentMapEntries();
-
-	inline void set_spine_object(spine::Skin::AttachmentMap::Entries *e) {
-		entries = e;
-	}
-	inline spine::Skin::AttachmentMap::Entries *get_spine_object() {
-		return entries;
-	}
-
-	bool has_next();
-	Ref<SpineSkinAttachmentMapEntry> next();
-};
-
-#endif//GODOT_SPINESKINATTACHMENTMAPENTRIES_H
+#endif

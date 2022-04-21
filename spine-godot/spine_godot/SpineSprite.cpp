@@ -46,9 +46,6 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_bind_slot_nodes"), &SpineSprite::get_bind_slot_nodes);
 	ClassDB::bind_method(D_METHOD("set_bind_slot_nodes", "v"), &SpineSprite::set_bind_slot_nodes);
 
-	ClassDB::bind_method(D_METHOD("get_overlap"), &SpineSprite::get_overlap);
-	ClassDB::bind_method(D_METHOD("set_overlap", "v"), &SpineSprite::set_overlap);
-
 	ClassDB::bind_method(D_METHOD("bone_get_global_transform", "bone_name"), &SpineSprite::bone_get_global_transform);
 	ClassDB::bind_method(D_METHOD("bone_set_global_transform", "bone_name", "global_transform"), &SpineSprite::bone_set_global_transform);
 
@@ -65,14 +62,13 @@ void SpineSprite::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("animation_event", PropertyInfo(Variant::OBJECT, "animation_state", PROPERTY_HINT_TYPE_STRING, "SpineAnimationState"), PropertyInfo(Variant::OBJECT, "track_entry", PROPERTY_HINT_TYPE_STRING, "SpineTrackEntry"), PropertyInfo(Variant::OBJECT, "event", PROPERTY_HINT_TYPE_STRING, "SpineEvent")));
 
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skeleton_data_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineSkeletonDataResource"), "set_skeleton_data_res", "get_skeleton_data_res");
-	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "overlap"), "set_overlap", "get_overlap");
 	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "bind_slot_nodes"), "set_bind_slot_nodes", "get_bind_slot_nodes");
 
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "process_mode", PROPERTY_HINT_ENUM, "Process,Physics,Manual"), "set_process_mode", "get_process_mode");
 
-	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Process);
-	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Physics);
-	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Manual);
+	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Process)
+	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Physics)
+	BIND_ENUM_CONSTANT(ProcessMode::ProcessMode_Manual)
 }
 
 SpineSprite::SpineSprite() : overlap(false), process_mode(ProcessMode_Process), skeleton_clipper(nullptr) {
@@ -121,8 +117,13 @@ void SpineSprite::_on_skeleton_data_changed() {
 	animation_state.unref();
 
 	if (skeleton_data_res.is_valid()) {
+#if VERSION_MAJOR > 3
+		if (!skeleton_data_res->is_connected("skeleton_data_changed", callable_mp(this, &SpineSprite::_on_skeleton_data_changed)))
+			skeleton_data_res->connect("skeleton_data_changed", callable_mp(this, &SpineSprite::_on_skeleton_data_changed));
+#else
 		if (!skeleton_data_res->is_connected("skeleton_data_changed", this, "_on_skeleton_data_changed"))
 			skeleton_data_res->connect("skeleton_data_changed", this, "_on_skeleton_data_changed");
+#endif
 	}
 
 	if (skeleton_data_res.is_valid() && skeleton_data_res->is_skeleton_data_loaded()) {
@@ -146,7 +147,7 @@ void SpineSprite::_on_skeleton_data_changed() {
 		}
 	}
 
-	property_list_changed_notify();
+	NOTIFY_PROPERTY_LIST_CHANGED();
 }
 
 Ref<SpineSkeleton> SpineSprite::get_skeleton() {
@@ -162,20 +163,25 @@ void SpineSprite::_notification(int p_what) {
 		case NOTIFICATION_READY: {
 			set_process_internal(process_mode == ProcessMode_Process);
 			set_physics_process_internal(process_mode == ProcessMode_Physics);
-		} break;
+			break;
+		}
 		case NOTIFICATION_INTERNAL_PROCESS: {
 			if (process_mode == ProcessMode_Process)
 				_update_all(get_process_delta_time());
-		} break;
+			break;
+		}
 		case NOTIFICATION_INTERNAL_PHYSICS_PROCESS: {
 			if (process_mode == ProcessMode_Physics)
 				_update_all(get_physics_process_delta_time());
-		} break;
+			break;
+		}
+		default:
+			break;
 	}
 }
 
 void SpineSprite::_update_all(float delta) {
-	if (!(skeleton.is_valid() && animation_state.is_valid()) || mesh_instances.empty())
+	if (!(skeleton.is_valid() && animation_state.is_valid()) || EMPTY(mesh_instances))
 		return;
 
 	animation_state->update(delta);
@@ -191,7 +197,7 @@ void SpineSprite::_update_all(float delta) {
 
 void SpineSprite::update_bind_slot_nodes() {
 	if (animation_state.is_valid() && skeleton.is_valid()) {
-		for (size_t i = 0, n = bind_slot_nodes.size(); i < n; ++i) {
+		for (int i = 0, n = bind_slot_nodes.size(); i < n; ++i) {
 			auto a = bind_slot_nodes[i];
 			if (a.get_type() == Variant::DICTIONARY) {
 				auto d = (Dictionary) a;
@@ -199,14 +205,14 @@ void SpineSprite::update_bind_slot_nodes() {
 					NodePath node_path = d["node_path"];
 					Node *node = get_node_or_null(node_path);
 					if (node && node->is_class("Node2D")) {
-						Node2D *node2d = (Node2D *) node;
+						auto *node2d = (Node2D *) node;
 
 						String slot_name = d["slot_name"];
 						auto slot = skeleton->find_slot(slot_name);
 						if (slot.is_valid()) {
 							auto bone = slot->get_bone();
 							if (bone.is_valid()) {
-								update_bind_slot_node_transform(bone, node2d);
+								bone->apply_world_transform_2d(node2d);
 								update_bind_slot_node_draw_order(slot_name, node2d);
 							}
 						}
@@ -218,14 +224,14 @@ void SpineSprite::update_bind_slot_nodes() {
 					NodePath node_path = as[1];
 					Node *node = get_node_or_null(node_path);
 					if (node && node->is_class("Node2D")) {
-						Node2D *node2d = (Node2D *) node;
+						auto *node2d = (Node2D *) node;
 
 						String slot_name = as[0];
 						auto slot = skeleton->find_slot(slot_name);
 						if (slot.is_valid()) {
 							auto bone = slot->get_bone();
 							if (bone.is_valid()) {
-								update_bind_slot_node_transform(bone, node2d);
+								bone->apply_world_transform_2d(node2d);
 								update_bind_slot_node_draw_order(slot_name, node2d);
 							}
 						}
@@ -236,11 +242,22 @@ void SpineSprite::update_bind_slot_nodes() {
 	}
 }
 
-void SpineSprite::update_bind_slot_node_transform(Ref<SpineBone> bone, Node2D *node2d) {
-	bone->apply_world_transform_2d(node2d);
-}
-
 void SpineSprite::update_bind_slot_node_draw_order(const String &slot_name, Node2D *node2d) {
+#if VERSION_MAJOR > 3
+	auto nodes = find_nodes(slot_name);
+	if (!nodes.is_empty()) {
+		auto mesh_ins = Object::cast_to<MeshInstance2D>(nodes[0]);
+		if (mesh_ins) {
+			auto pos = mesh_ins->get_index();
+
+			// get child
+			auto node = find_child_node_by_node(node2d);
+			if (node && node->get_index() != pos + 1) {
+				move_child(node, pos + 1);
+			}
+		}
+	}
+#else
 	auto mesh_ins = find_node(slot_name);
 	if (mesh_ins) {
 		auto pos = mesh_ins->get_index();
@@ -251,6 +268,7 @@ void SpineSprite::update_bind_slot_node_draw_order(const String &slot_name, Node
 			move_child(node, pos + 1);
 		}
 	}
+#endif
 }
 Node *SpineSprite::find_child_node_by_node(Node *node) {
 	if (node == nullptr) return nullptr;
@@ -283,9 +301,9 @@ void SpineSprite::remove_meshes() {
 #define TEMP_COPY(t, get_res)                   \
 	do {                                        \
 		auto &temp_uvs = get_res;               \
-		t.setSize(temp_uvs.size(), 0);          \
-		for (size_t j = 0; j < t.size(); ++j) { \
-			t[j] = temp_uvs[j];                 \
+		(t).setSize(temp_uvs.size(), 0);          \
+		for (size_t j = 0; j < (t).size(); ++j) { \
+			(t)[j] = temp_uvs[j];                 \
 		}                                       \
 	} while (false);
 
@@ -294,7 +312,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 	static unsigned short quad_indices[] = {0, 1, 2, 2, 3, 0};
 
 	auto sk = s->get_spine_object();
-	for (size_t i = 0, n = sk->getSlots().size(); i < n; ++i) {
+	for (int i = 0, n = sk->getSlots().size(); i < n; ++i) {
 		spine::Vector<float> vertices;
 		spine::Vector<float> uvs;
 		spine::Vector<unsigned short> indices;
@@ -319,7 +337,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 		size_t v_num = 0;
 
 		if (attachment->getRTTI().isExactly(spine::RegionAttachment::rtti)) {
-			spine::RegionAttachment *region_attachment = (spine::RegionAttachment *) attachment;
+			auto *region_attachment = (spine::RegionAttachment *) attachment;
 
 			auto p_spine_renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) region_attachment->getRendererObject())->page->getRendererObject();
 			tex = p_spine_renderer_object->texture;
@@ -343,7 +361,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 			tint.b *= attachment_color.b;
 			tint.a *= attachment_color.a;
 		} else if (attachment->getRTTI().isExactly(spine::MeshAttachment::rtti)) {
-			spine::MeshAttachment *mesh = (spine::MeshAttachment *) attachment;
+			auto *mesh = (spine::MeshAttachment *) attachment;
 
 			auto p_spine_renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
 			tex = p_spine_renderer_object->texture;
@@ -371,7 +389,11 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 		}
 
 		auto mesh_ins = mesh_instances[i];
+#if VERSION_MAJOR > 3
+		RenderingServer::get_singleton()->canvas_item_clear(mesh_ins->get_canvas_item());
+#else
 		VisualServer::get_singleton()->canvas_item_clear(mesh_ins->get_canvas_item());
+#endif
 
 		if (skeleton_clipper->isClipping()) {
 			skeleton_clipper->clipTriangles(vertices, indices, uvs, VERTEX_STRIDE);
@@ -403,6 +425,18 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 					p_indices.set(j, clipped_indices[j]);
 				}
 
+#if VERSION_MAJOR > 3
+				RenderingServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
+																			  p_indices,
+																			  p_points,
+																			  p_colors,
+																			  p_uvs,
+																			  Vector<int>(),
+																			  Vector<float>(),
+																			  tex.is_null() ? RID() : tex->get_rid(),
+																			  -1
+																			  );
+#else
 				VisualServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
 																			  p_indices,
 																			  p_points,
@@ -413,6 +447,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 																			  tex.is_null() ? RID() : tex->get_rid(),
 																			  -1,
 																			  normal_tex.is_null() ? RID() : normal_tex->get_rid());
+#endif
 			}
 		} else {
 			if (indices.size() > 0) {
@@ -432,6 +467,17 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 					p_indices.set(j, indices[j]);
 				}
 
+#if VERSION_MAJOR > 3
+				RenderingServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
+																			  p_indices,
+																			  p_points,
+																			  p_colors,
+																			  p_uvs,
+																			  Vector<int>(),
+																			  Vector<float>(),
+																			  tex.is_null() ? RID() : tex->get_rid(),
+																			  -1);
+#else
 				VisualServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
 																			  p_indices,
 																			  p_points,
@@ -442,6 +488,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> s) {
 																			  tex.is_null() ? RID() : tex->get_rid(),
 																			  -1,
 																			  normal_tex.is_null() ? RID() : normal_tex->get_rid());
+#endif
 			}
 		}
 		skeleton_clipper->clipEnd(*slot);
@@ -494,14 +541,6 @@ Array SpineSprite::get_bind_slot_nodes() {
 
 void SpineSprite::set_bind_slot_nodes(Array v) {
 	bind_slot_nodes = v;
-}
-
-bool SpineSprite::get_overlap() {
-	return overlap;
-}
-
-void SpineSprite::set_overlap(bool v) {
-	overlap = v;
 }
 
 Transform2D SpineSprite::bone_get_global_transform(const String &bone_name) {

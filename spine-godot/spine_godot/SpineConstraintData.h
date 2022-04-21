@@ -30,28 +30,24 @@
 #ifndef GODOT_SPINECONSTRAINTDATA_H
 #define GODOT_SPINECONSTRAINTDATA_H
 
-#include "core/reference.h"
+#include "SpineCommon.h"
+#include <spine/ConstraintData.h>
 
-namespace spine {
-	class ConstraintData;
-}
-
-class SpineConstraintData : public Reference {
-	GDCLASS(SpineConstraintData, Reference);
+class SpineConstraintData : public REFCOUNTED {
+	GDCLASS(SpineConstraintData, REFCOUNTED);
 
 protected:
 	static void _bind_methods();
-	
+
 	spine::ConstraintData *constraint_data;
 
 public:
 	SpineConstraintData();
-	~SpineConstraintData();
 
 	void set_spine_object(spine::ConstraintData *_constraint_data) {
 		constraint_data = _constraint_data;
 	}
-	
+
 	spine::ConstraintData *get_spine_object() {
 		return constraint_data;
 	}
@@ -59,11 +55,11 @@ public:
 	String get_constraint_name();
 
 	uint64_t get_order();
-	
+
 	void set_order(uint64_t v);
 
 	bool is_skin_required();
-	
+
 	void set_skin_required(bool v);
 };
 

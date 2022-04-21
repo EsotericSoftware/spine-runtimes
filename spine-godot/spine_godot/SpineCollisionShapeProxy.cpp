@@ -28,7 +28,6 @@
  *****************************************************************************/
 
 #include "SpineCollisionShapeProxy.h"
-
 #include "SpineSprite.h"
 
 void SpineCollisionShapeProxy::_bind_methods() {
@@ -100,7 +99,7 @@ void SpineCollisionShapeProxy::set_slot(const String &slotName) {
 
 spine::Slot *SpineCollisionShapeProxy::get_spine_slot(const String &slotName) const {
 	auto sprite = get_spine_sprite();
-	if (sprite == NULL || slot_name.empty()) return NULL;
+	if (sprite == NULL || EMPTY(slot_name)) return NULL;
 	if (!sprite->get_skeleton().is_valid()) return NULL;
 	spine::Skeleton *skeleton = sprite->get_skeleton()->get_spine_object();
 	spine::Slot *slot = skeleton->findSlot(spine::String(slot_name.utf8()));
@@ -156,7 +155,7 @@ void SpineCollisionShapeProxy::_get_property_list(List<PropertyInfo> *p_list) co
 	p.name = "Slot";
 	p.type = Variant::STRING;
 	get_slot_names(slot_names);
-	if (slot_names.empty())
+	if (EMPTY(slot_names))
 		slot_names.push_back("None");
 	p.hint_string = String(",").join(slot_names);
 	p.hint = PROPERTY_HINT_ENUM;
@@ -189,6 +188,6 @@ void SpineCollisionShapeProxy::get_slot_names(Vector<String> &slot_names) const 
 	for (size_t i = 0; i < slots.size(); ++i) {
 		auto slot = (Ref<SpineSlot>) slots[i];
 		if (slot.is_valid())
-			slot_names.set(i, slot->get_data()->get_slot_name());
+			slot_names.set(i, slot->get_data()->get_name());
 	}
 }

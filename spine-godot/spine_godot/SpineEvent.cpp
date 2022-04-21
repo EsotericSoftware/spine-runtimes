@@ -28,8 +28,7 @@
  *****************************************************************************/
 
 #include "SpineEvent.h"
-#include <spine/Event.h>
-#include "common.h"
+#include "SpineCommon.h"
 
 void SpineEvent::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_data"), &SpineEvent::get_data);
@@ -47,9 +46,6 @@ void SpineEvent::_bind_methods() {
 }
 
 SpineEvent::SpineEvent() : event(nullptr) {
-}
-
-SpineEvent::~SpineEvent() {
 }
 
 Ref<SpineEventData> SpineEvent::get_data() {

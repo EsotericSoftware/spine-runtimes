@@ -30,11 +30,12 @@
 #ifndef GODOT_SPINEANIMATIONSTATE_H
 #define GODOT_SPINEANIMATIONSTATE_H
 
+#include "SpineCommon.h"
 #include "SpineSkeleton.h"
 #include "SpineTrackEntry.h"
 
-class SpineAnimationState : public Reference {
-	GDCLASS(SpineAnimationState, Reference)
+class SpineAnimationState : public REFCOUNTED {
+	GDCLASS(SpineAnimationState, REFCOUNTED)
 
 protected:
 	static void _bind_methods();
@@ -46,12 +47,10 @@ private:
 public:
 	SpineAnimationState();
 	~SpineAnimationState();
-	
+
 	spine::AnimationState *get_spine_object() { return animation_state; }
 
-	void set_skeleton_data_res(Ref<SpineSkeletonDataResource> skeleton_data_res);
-	
-	Ref<SpineSkeletonDataResource> get_skeleton_data_res() const;
+	void set_skeleton_data_res(const Ref<SpineSkeletonDataResource> &skeleton_data_res);
 
 	void update(float delta);
 
@@ -68,17 +67,17 @@ public:
 	Ref<SpineTrackEntry> set_empty_animation(uint64_t track_id, float mix_duration);
 
 	Ref<SpineTrackEntry> add_empty_animation(uint64_t track_id, float mix_duration, float delay);
-	
+
 	void set_empty_animations(float mix_duration);
 
 	Ref<SpineTrackEntry> get_current(uint64_t track_index);
 
 	float get_time_scale();
-	
+
 	void set_time_scale(float time_scale);
 
 	void disable_queue();
-	
+
 	void enable_queue();
 };
 

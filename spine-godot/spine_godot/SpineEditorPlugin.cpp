@@ -29,7 +29,6 @@
 
 #ifdef TOOLS_ENABLED
 #include "SpineEditorPlugin.h"
-
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
 
@@ -43,7 +42,11 @@ Error SpineAtlasResourceImportPlugin::import(const String &source_file, const St
 	return error;
 }
 
+#if VERSION_MAJOR > 3
+void SpineAtlasResourceImportPlugin::get_import_options(const String &path, List<ImportOption> *options, int preset) const {
+#else
 void SpineAtlasResourceImportPlugin::get_import_options(List<ImportOption> *options, int preset) const {
+#endif
 	if (preset == 0) {
 		ImportOption op;
 		op.option.name = "normal_map_prefix";
@@ -79,15 +82,16 @@ SpineEditorPlugin::SpineEditorPlugin(EditorNode *node) {
 	add_inspector_plugin(memnew(SpineSkeletonDataResourceInspectorPlugin));
 }
 
-SpineEditorPlugin::~SpineEditorPlugin() {
-}
-
 bool SpineSkeletonDataResourceInspectorPlugin::can_handle(Object *object) {
 	return object->is_class("SpineSkeletonDataResource");
 }
 
+#if VERSION_MAJOR > 3
+bool SpineSkeletonDataResourceInspectorPlugin:: parse_property(Object *object, const Variant::Type type, const String &path, const PropertyHint hint, const String &hint_text, const uint32_t usage, const bool wide) {
+#else
 bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Variant::Type type, const String &path,
                                                         PropertyHint hint, const String &hint_text, int usage) {
+#endif
 	if (path == "animation_mixes") {
 		Ref<SpineSkeletonDataResource> skeleton_data = Object::cast_to<SpineSkeletonDataResource>(object);
 		if (!skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded()) return true;
@@ -100,7 +104,7 @@ bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Va
 }
 
 SpineEditorPropertyAnimationMixes::SpineEditorPropertyAnimationMixes(): skeleton_data(nullptr), container(nullptr), updating(false) {
-	array_object.instance();
+	INSTANTIATE(array_object);
 }
 
 void SpineEditorPropertyAnimationMixes::_bind_methods() {
@@ -118,7 +122,7 @@ void SpineEditorPropertyAnimationMixes::add_mix() {
 	mix->set_from(animation_names[0]);
 	mix->set_to(animation_names[0]);
 	mix->set_mix(0);
-	
+
 	Array mixes = skeleton_data->get_animation_mixes().duplicate();
 	mixes.push_back(mix);
 	emit_changed(get_edited_property(), mixes);
@@ -128,13 +132,17 @@ void SpineEditorPropertyAnimationMixes::delete_mix(int64_t idx) {
 	if (!skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded() || updating) return;
 
 	auto mixes = skeleton_data->get_animation_mixes().duplicate();
-	mixes.remove(idx);
+#if VERSION_MAJOR > 3
+	mixes.remove_at((int)idx);
+#else
+	mixes.remove((int)idx);
+#endif
 	emit_changed(get_edited_property(), mixes);
 }
 
 void SpineEditorPropertyAnimationMixes::update_mix_property(int64_t index) {
 	if (index < 0 || index > mix_properties.size()) return;
-	mix_properties[index]->update_property();
+	mix_properties[(int)index]->update_property();
 }
 
 void SpineEditorPropertyAnimationMixes::update_property() {
@@ -142,7 +150,7 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 	updating = true;
 
 	mix_properties.clear();
-	
+
 	if (container) {
 		set_bottom_editor(nullptr);
 		memdelete(container);
@@ -154,14 +162,14 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 		updating = false;
 		return;
 	}
-	
+
 	Vector<String> animation_names;
 	skeleton_data->get_animation_names(animation_names);
-	
+
 	container = memnew(VBoxContainer);
 	add_child(container);
 	set_bottom_editor(container);
-	
+
 	Array mixes = skeleton_data->get_animation_mixes();
 	array_object->set_array(mixes);
 	for (int i = 0; i < mixes.size(); i++) {
@@ -171,7 +179,7 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 		auto hbox = memnew(HBoxContainer);
 		hbox->set_h_size_flags(SIZE_EXPAND_FILL);
 		container->add_child(hbox);
-		
+
 		auto mix_property = memnew(SpineEditorPropertyAnimationMix);
 		mix_property->set_h_size_flags(SIZE_EXPAND_FILL);
 		mix_property->set_name_split_ratio(0);
@@ -180,35 +188,43 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 		mix_property->set_object_and_property(*array_object, property_name);
 		mix_property->update_property();
 		mix_properties.push_back(mix_property);
-		
+
 		auto delete_button = memnew(Button);
 		hbox->add_child(delete_button);
 		delete_button->set_text("Remove");
+#if VERSION_MAJOR > 3
+		delete_button->connect("pressed", callable_mp(this, &SpineEditorPropertyAnimationMixes::delete_mix), varray(i));
+#else
 		delete_button->connect("pressed", this, "delete_mix", varray(i));
+#endif
 	}
 
 	auto add_mix_button = memnew(Button);
 	add_mix_button->set_text("Add mix");
+#if VERSION_MAJOR > 3
+	add_mix_button->connect("pressed", callable_mp(this, &SpineEditorPropertyAnimationMixes::add_mix));
+#else
 	add_mix_button->connect("pressed", this, "add_mix");
+#endif
 	container->add_child(add_mix_button);
 
 	updating = false;
 }
 
-SpineEditorPropertyAnimationMix::SpineEditorPropertyAnimationMix(): skeleton_data(nullptr), container(nullptr), updating(false) {
+SpineEditorPropertyAnimationMix::SpineEditorPropertyAnimationMix(): mixes_property(nullptr), skeleton_data(nullptr), index(0), container(nullptr), updating(false) {
 }
 
-void SpineEditorPropertyAnimationMix::setup(SpineEditorPropertyAnimationMixes *mixes_property, Ref<SpineSkeletonDataResource> skeleton_data, int index) {
-	this->mixes_property = mixes_property;
-	this->skeleton_data = skeleton_data;
-	this->index = index;
+void SpineEditorPropertyAnimationMix::setup(SpineEditorPropertyAnimationMixes *_mixes_property, const Ref<SpineSkeletonDataResource> &_skeleton_data, int _index) {
+	this->mixes_property = _mixes_property;
+	this->skeleton_data = _skeleton_data;
+	this->index = _index;
 }
 
 void SpineEditorPropertyAnimationMix::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("data_changed"), &SpineEditorPropertyAnimationMix::data_changed);
 }
 
-void SpineEditorPropertyAnimationMix::data_changed(const String &property, Variant value, const String &name, bool changing) {
+void SpineEditorPropertyAnimationMix::data_changed(const String &property, const Variant &value, const String &name, bool changing) {
 	auto mix = Object::cast_to<SpineAnimationMix>(get_edited_object()->get(get_edited_property()));
 
 	UndoRedo *undo_redo = EditorNode::get_undo_redo();
@@ -228,7 +244,7 @@ void SpineEditorPropertyAnimationMix::data_changed(const String &property, Varia
 void SpineEditorPropertyAnimationMix::update_property() {
 	if (updating) return;
 	updating = true;
-	
+
 	if (container) {
 		memdelete(container);
 		container->queue_delete();
@@ -245,14 +261,14 @@ void SpineEditorPropertyAnimationMix::update_property() {
 		updating = false;
 		return;
 	}
-	
+
 	Vector<String> animation_names;
 	skeleton_data->get_animation_names(animation_names);
-	
+
 	container = memnew(HBoxContainer);
 	container->set_h_size_flags(SIZE_EXPAND_FILL);
 	add_child(container);
-	
+
 	auto from_enum = memnew(EditorPropertyTextEnum);
 	from_enum->set_h_size_flags(SIZE_EXPAND_FILL);
 	from_enum->set_name_split_ratio(0);
@@ -260,7 +276,11 @@ void SpineEditorPropertyAnimationMix::update_property() {
 	from_enum->setup(animation_names);
 	from_enum->set_object_and_property(mix, "from");
 	from_enum->update_property();
+#if VERSION_MAJOR > 3
+	from_enum->connect("property_changed", callable_mp(this, &SpineEditorPropertyAnimationMix::data_changed));
+#else
 	from_enum->connect("property_changed", this, "data_changed");
+#endif
 	container->add_child(from_enum);
 
 	auto to_enum = memnew(EditorPropertyTextEnum);
@@ -270,7 +290,11 @@ void SpineEditorPropertyAnimationMix::update_property() {
 	to_enum->setup(animation_names);
 	to_enum->set_object_and_property(mix, "to");
 	to_enum->update_property();
+#if VERSION_MAJOR > 3
+	to_enum->connect("property_changed", callable_mp(this, &SpineEditorPropertyAnimationMix::data_changed));
+#else
 	to_enum->connect("property_changed", this, "data_changed");
+#endif
 	container->add_child(to_enum);
 
 	auto mix_float = memnew(EditorPropertyFloat);
@@ -280,9 +304,13 @@ void SpineEditorPropertyAnimationMix::update_property() {
 	mix_float->setup(0, 9999999, 0.001, true, false, false, false);
 	mix_float->set_object_and_property(mix, "mix");
 	mix_float->update_property();
+#if VERSION_MAJOR > 3
+	mix_float->connect("property_changed", callable_mp(this, &SpineEditorPropertyAnimationMix::data_changed));
+#else
 	mix_float->connect("property_changed", this, "data_changed");
+#endif
 	container->add_child(mix_float);
-	
+
 	updating = false;
 }
 

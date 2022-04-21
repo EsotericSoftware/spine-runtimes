@@ -64,4 +64,20 @@ void SpineConstant::_bind_methods() {
 	BIND_ENUM_CONSTANT(TransformMode_NoRotationOrReflection)
 	BIND_ENUM_CONSTANT(TransformMode_NoScale)
 	BIND_ENUM_CONSTANT(TransformMode_NoScaleOrReflection)
+
+	BIND_ENUM_CONSTANT(PositionMode_Fixed)
+	BIND_ENUM_CONSTANT(PositionMode_Percent)
+
+	BIND_ENUM_CONSTANT(SpacingMode_Length)
+	BIND_ENUM_CONSTANT(SpacingMode_Fixed)
+	BIND_ENUM_CONSTANT(SpacingMode_Percent)
+
+	BIND_ENUM_CONSTANT(RotateMode_Tangent)
+	BIND_ENUM_CONSTANT(RotateMode_Chain)
+	BIND_ENUM_CONSTANT(RotateMode_ChainScale)
+
+	BIND_ENUM_CONSTANT(BlendMode_Normal)
+	BIND_ENUM_CONSTANT(BlendMode_Additive)
+	BIND_ENUM_CONSTANT(BlendMode_Multiply)
+	BIND_ENUM_CONSTANT(BlendMode_Screen)
 }

@@ -30,8 +30,7 @@
 #ifndef GODOT_SPINESKELETON_H
 #define GODOT_SPINESKELETON_H
 
-#include <spine/spine.h>
-
+#include "SpineCommon.h"
 #include "SpineSkeletonDataResource.h"
 #include "SpineBone.h"
 #include "SpineSlot.h"
@@ -41,32 +40,37 @@
 
 class SpineSprite;
 
-class SpineSkeleton : public Reference {
-	GDCLASS(SpineSkeleton, Reference);
+class SpineSkeleton : public REFCOUNTED {
+	GDCLASS(SpineSkeleton, REFCOUNTED);
+
+	friend class SpineBone;
+	friend class SpineSlot;
+	friend class SpineTimeline;
+	friend class SpineSprite;
+	friend class SpineAnimation;
+	friend class SpineAnimationState;
+	friend class SpineCollisionShapeProxy;
 
 protected:
 	static void _bind_methods();
+
+	void set_skeleton_data_res(Ref<SpineSkeletonDataResource> data_res);
+	Ref<SpineSkeletonDataResource> get_skeleton_data_res() const;
+
+	void set_spine_object(spine::Skeleton *s) { skeleton = s; }
+	spine::Skeleton *get_spine_object() { return skeleton; }
+
+	void set_spine_sprite(SpineSprite *sprite);
 
 private:
 	spine::Skeleton *skeleton;
 	SpineSprite *sprite;
 	Ref<SpineSkeletonDataResource> skeleton_data_res;
+	spine::Vector<float> bounds_vertex_buffer;
 
 public:
 	SpineSkeleton();
-	~SpineSkeleton();
-
-	void set_skeleton_data_res(Ref<SpineSkeletonDataResource> data_res);
-	Ref<SpineSkeletonDataResource> get_skeleton_data_res() const;
-
-	inline void set_spine_object(spine::Skeleton *s) {
-		skeleton = s;
-	}
-	inline spine::Skeleton *get_spine_object() {
-		return skeleton;
-	}
-
-	void set_spine_sprite(SpineSprite *sprite);
+	~SpineSkeleton() override;
 
 	void update_world_transform();
 
@@ -81,45 +85,59 @@ public:
 	Ref<SpineSlot> find_slot(const String &name);
 
 	void set_skin_by_name(const String &skin_name);
+
 	void set_skin(Ref<SpineSkin> new_skin);
 
 	Ref<SpineAttachment> get_attachment_by_slot_name(const String &slot_name, const String &attachment_name);
+
 	Ref<SpineAttachment> get_attachment_by_slot_index(int slot_index, const String &attachment_name);
 
 	void set_attachment(const String &slot_name, const String &attachment_name);
 
 	Ref<SpineIkConstraint> find_ik_constraint(const String &constraint_name);
+
 	Ref<SpineTransformConstraint> find_transform_constraint(const String &constraint_name);
+
 	Ref<SpinePathConstraint> find_path_constraint(const String &constraint_name);
 
-	Dictionary get_bounds();
+	Rect2 get_bounds();
 
 	Ref<SpineBone> get_root_bone();
 
 	Array get_bones();
+
 	Array get_slots();
-	Array get_draw_orders();
+
+	Array get_draw_order();
+
 	Array get_ik_constraints();
+
 	Array get_path_constraints();
+
 	Array get_transform_constraints();
 
 	Ref<SpineSkin> get_skin();
 
 	Color get_color();
+
 	void set_color(Color v);
 
-	void set_position(Vector2 pos);
+	void set_position(Vector2 position);
 
 	float get_x();
+
 	void set_x(float v);
 
 	float get_y();
+
 	void set_y(float v);
 
 	float get_scale_x();
+
 	void set_scale_x(float v);
 
 	float get_scale_y();
+
 	void set_scale_y(float v);
 };
 

@@ -30,11 +30,12 @@
 #ifndef GODOT_SPINEATTACHMENT_H
 #define GODOT_SPINEATTACHMENT_H
 
+#include "SpineCommon.h"
 #include <spine/spine.h>
-#include "core/reference.h"
 
-class SpineAttachment : public Reference {
-	GDCLASS(SpineAttachment, Reference)
+
+class SpineAttachment : public REFCOUNTED {
+	GDCLASS(SpineAttachment, REFCOUNTED)
 
 protected:
 	static void _bind_methods();
@@ -44,7 +45,7 @@ private:
 
 public:
 	SpineAttachment();
-	~SpineAttachment();
+	~SpineAttachment() override;
 
 	void set_spine_object(spine::Attachment *_attachment) {
 		attachment = _attachment;

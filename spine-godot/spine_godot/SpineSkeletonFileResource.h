@@ -30,7 +30,7 @@
 #ifndef GODOT_SPINESKELETONFILERESOURCE_H
 #define GODOT_SPINESKELETONFILERESOURCE_H
 
-#include "core/variant_parser.h"
+#include "SpineCommon.h"
 #include "core/io/resource_loader.h"
 #include "core/io/resource_saver.h"
 
@@ -44,30 +44,42 @@ protected:
 	Vector<uint8_t> binary;
 
 public:
-	inline const bool is_binary() { return !binary.empty(); }
-	inline const Vector<uint8_t> &get_binary() { return binary; }
-	inline const String &get_json() { return json; }
+	bool is_binary() { return binary.size() > 0; }
 
-	Error load_from_file(const String &p_path);
-	Error save_to_file(const String &p_path);
+	const Vector<uint8_t> &get_binary() { return binary; }
+
+	const String &get_json() { return json; }
+
+	Error load_from_file(const String &path);
+
+	Error save_to_file(const String &path);
 };
 
 class SpineSkeletonFileResourceFormatLoader : public ResourceFormatLoader {
 	GDCLASS(SpineSkeletonFileResourceFormatLoader, ResourceFormatLoader);
 
 public:
-	virtual RES load(const String &p_path, const String &p_original_path, Error *r_error = NULL);
-	virtual void get_recognized_extensions(List<String> *r_extensions) const;
-	virtual bool handles_type(const String &p_type) const;
-	virtual String get_resource_type(const String &p_path) const;
+#if VERSION_MAJOR > 3
+	RES load(const String &path, const String &original_path, Error *error, bool use_sub_threads, float *progress, CacheMode cache_mode);
+#else
+	RES load(const String &path, const String &original_path, Error *error) override;
+#endif
+
+	void get_recognized_extensions(List<String> *extensions) const override;
+
+	bool handles_type(const String &type) const override;
+
+	String get_resource_type(const String &path) const override;
 };
 
 class SpineSkeletonFileResourceFormatSaver : public ResourceFormatSaver {
 	GDCLASS(SpineSkeletonFileResourceFormatSaver, ResourceFormatSaver);
 
 public:
-	Error save(const String &p_path, const RES &p_resource, uint32_t p_flags = 0) override;
-	void get_recognized_extensions(const RES &p_resource, List<String> *p_extensions) const override;
+	Error save(const String &path, const RES &resource, uint32_t flags) override;
+
+	void get_recognized_extensions(const RES &resource, List<String> *p_extensions) const override;
+
 	bool recognize(const RES &p_resource) const override;
 };
 
