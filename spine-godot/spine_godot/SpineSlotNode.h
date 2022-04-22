@@ -18,6 +18,7 @@ protected:
     bool _get(const StringName &property, Variant &value) const;
     bool _set(const StringName &property, const Variant &value);
     void on_world_transforms_changed(const Variant &_sprite);
+    void update_transform(SpineSprite *sprite);
 public:
     SpineSlotNode();
 

@@ -1,5 +1,8 @@
 ﻿#include "SpineSlotNode.h"
 
+#include "editor/editor_node.h"
+#include "scene/main/viewport.h"
+
 void SpineSlotNode::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_slot_name"), &SpineSlotNode::set_slot_name);
     ClassDB::bind_method(D_METHOD("get_slot_name"), &SpineSlotNode::get_slot_name);
@@ -15,6 +18,14 @@ void SpineSlotNode::_notification(int what) {
         sprite = Object::cast_to<SpineSprite>(get_parent());
         if (sprite) {
             sprite->connect("world_transforms_changed", this, "_on_world_transforms_changed");
+            update_transform(sprite);
+            _change_notify("transform/translation");
+            _change_notify("transform/rotation");
+            _change_notify("transform/scale");
+            _change_notify("translation");
+            _change_notify("rotation");
+            _change_notify("rotation_deg");
+            _change_notify("scale");
         } else {
             WARN_PRINT("SpineSlotProxy parent is not a SpineSprite.");
         }
@@ -55,6 +66,14 @@ bool SpineSlotNode::_get(const StringName& property, Variant& value) const {
 bool SpineSlotNode::_set(const StringName& property, const Variant& value) {
     if (property == "slot_name") {
         slot_name = value;
+        update_transform(sprite);
+        _change_notify("transform/translation");
+        _change_notify("transform/rotation");
+        _change_notify("transform/scale");
+        _change_notify("translation");
+        _change_notify("rotation");
+        _change_notify("rotation_deg");
+        _change_notify("scale");
         return true;
     }
     return false;
@@ -62,6 +81,10 @@ bool SpineSlotNode::_set(const StringName& property, const Variant& value) {
 
 void SpineSlotNode::on_world_transforms_changed(const Variant& _sprite) {
     SpineSprite* sprite = Object::cast_to<SpineSprite>(_sprite.operator Object*());
+    update_transform(sprite);
+}
+
+void SpineSlotNode::update_transform(SpineSprite *sprite) {
     if (!sprite) return;
     auto slot = sprite->get_skeleton()->find_slot(slot_name);
     if (!slot.is_valid()) return;
