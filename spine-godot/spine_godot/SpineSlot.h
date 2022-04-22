@@ -46,12 +46,14 @@ protected:
 
 private:
 	spine::Slot *slot;
+	SpineSprite *sprite;
 
 public:
 	SpineSlot();
 
-	void set_spine_object(spine::Slot *s) { slot = s; }
+	void set_spine_object(SpineSprite *_sprite, spine::Slot *_slot) { sprite = _sprite; slot = _slot; }
 	spine::Slot *get_spine_object() { return slot; }
+	SpineSprite *get_spine_sprite() { return sprite; }
 
 	void set_to_setup_pose();
 

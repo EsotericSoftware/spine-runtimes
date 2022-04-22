@@ -52,7 +52,7 @@ void SpineIkConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_active", "v"), &SpineIkConstraint::set_active);
 }
 
-SpineIkConstraint::SpineIkConstraint() : ik_constraint(nullptr) {
+SpineIkConstraint::SpineIkConstraint() : ik_constraint(nullptr), sprite(nullptr) {
 }
 
 void SpineIkConstraint::update() {
@@ -81,7 +81,7 @@ Array SpineIkConstraint::get_bones() {
 	for (int i = 0; i < bones.size(); ++i) {
 		auto bone = bones[i];
 		Ref<SpineBone> bone_ref(memnew(SpineBone));
-		bone_ref->set_spine_object(bone);
+		bone_ref->set_spine_object(sprite, bone);
 		result[i] = bone_ref;
 	}
 	return result;
@@ -92,7 +92,7 @@ Ref<SpineBone> SpineIkConstraint::get_target() {
 	auto target = ik_constraint->getTarget();
 	if (!target) return nullptr;
 	Ref<SpineBone> target_ref(memnew(SpineBone));
-	target_ref->set_spine_object(target);
+	target_ref->set_spine_object(sprite, target);
 	return target_ref;
 }
 

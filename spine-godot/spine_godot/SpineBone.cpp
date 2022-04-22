@@ -101,10 +101,6 @@ void SpineBone::_bind_methods() {
 
 SpineBone::SpineBone() : bone(nullptr), sprite(nullptr) {}
 
-void SpineBone::set_spine_sprite(SpineSprite* _sprite) {
-	this->sprite = _sprite;
-}
-
 void SpineBone::update_world_transform() {
 	SPINE_CHECK(bone,)
 	bone->updateWorldTransform();
@@ -166,8 +162,7 @@ Ref<SpineSkeleton> SpineBone::get_skeleton() {
 	SPINE_CHECK(bone, nullptr)
 	auto &skeleton = bone->getSkeleton();
 	Ref<SpineSkeleton> skeleton_ref(memnew(SpineSkeleton));
-	skeleton_ref->set_spine_object(&skeleton);
-	skeleton_ref->set_spine_sprite(sprite);
+	skeleton_ref->set_spine_object(sprite, &skeleton);
 	return skeleton_ref;
 }
 
@@ -176,8 +171,7 @@ Ref<SpineBone> SpineBone::get_parent() {
 	auto parent = bone->getParent();
 	if (!parent) return nullptr;
 	Ref<SpineBone> parent_ref(memnew(SpineBone));
-	parent_ref->set_spine_object(parent);
-	parent_ref->set_spine_sprite(sprite);
+	parent_ref->set_spine_object(sprite, parent);
 	return parent_ref;
 }
 
@@ -189,8 +183,7 @@ Array SpineBone::get_children() {
 	for (int i = 0; i < children.size(); ++i) {
 		auto child = children[i];
 		Ref<SpineBone> bone_ref(memnew(SpineBone));
-		bone_ref->set_spine_object(child);
-		bone_ref->set_spine_sprite(sprite);
+		bone_ref->set_spine_object(sprite, child);
 		result[i] = bone_ref;
 	}
 	return result;

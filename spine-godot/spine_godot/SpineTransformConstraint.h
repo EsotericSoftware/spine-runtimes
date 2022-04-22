@@ -43,12 +43,14 @@ protected:
 
 private:
 	spine::TransformConstraint *transform_constraint;
+	SpineSprite *sprite;
 
 public:
 	SpineTransformConstraint();
 
-	void set_spine_object(spine::TransformConstraint *tc) { transform_constraint = tc; }
+	void set_spine_object(SpineSprite *_sprite, spine::TransformConstraint *_transform_constraint) { sprite = _sprite; transform_constraint = _transform_constraint; }
 	spine::TransformConstraint *get_spine_object() { return transform_constraint; }
+	SpineSprite *get_spine_sprite() { return sprite; }
 
 	void update();
 

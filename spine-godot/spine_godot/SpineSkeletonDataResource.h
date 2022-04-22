@@ -76,6 +76,8 @@ public:
 
 	void get_skin_names(Vector<String> &l) const;
 
+	void get_slot_names(Vector<String> &slot_names);
+
 	void set_default_mix(float default_mix);
 
 	float get_default_mix();

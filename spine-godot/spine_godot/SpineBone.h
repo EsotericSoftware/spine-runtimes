@@ -51,11 +51,9 @@ private:
 public:
 	SpineBone();
 
-	void set_spine_object(spine::Bone *_bone) { bone = _bone; }
-
+	void set_spine_object(SpineSprite *_sprite, spine::Bone *_bone) { sprite = _sprite; bone = _bone; }
 	spine::Bone *get_spine_object() { return bone; }
-
-	void set_spine_sprite(SpineSprite* _sprite);
+	SpineSprite *get_spine_sprite() { return sprite; }
 
 	void update_world_transform();
 

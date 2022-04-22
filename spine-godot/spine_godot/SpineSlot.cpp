@@ -52,7 +52,7 @@ void SpineSlot::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_sequence_index", "v"), &SpineSlot::set_sequence_index);
 }
 
-SpineSlot::SpineSlot() : slot(nullptr) {
+SpineSlot::SpineSlot() : slot(nullptr), sprite(nullptr) {
 }
 
 void SpineSlot::set_to_setup_pose() {
@@ -72,7 +72,7 @@ Ref<SpineBone> SpineSlot::get_bone() {
 	SPINE_CHECK(slot, nullptr)
 	auto &bone = slot->getBone();
 	Ref<SpineBone> bone_ref(memnew(SpineBone));
-	bone_ref->set_spine_object(&bone);
+	bone_ref->set_spine_object(sprite, &bone);
 	return bone_ref;
 }
 
@@ -80,7 +80,7 @@ Ref<SpineSkeleton> SpineSlot::get_skeleton() {
 	SPINE_CHECK(slot, nullptr)
 	auto &skeleton = slot->getSkeleton();
 	Ref<SpineSkeleton> skeleton_ref(memnew(SpineSkeleton));
-	skeleton_ref->set_spine_object(&skeleton);
+	skeleton_ref->set_spine_object(sprite, &skeleton);
 	return skeleton_ref;
 }
 

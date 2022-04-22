@@ -57,10 +57,10 @@ protected:
 	void set_skeleton_data_res(Ref<SpineSkeletonDataResource> data_res);
 	Ref<SpineSkeletonDataResource> get_skeleton_data_res() const;
 
-	void set_spine_object(spine::Skeleton *s) { skeleton = s; }
+	void set_spine_object(SpineSprite *_sprite, spine::Skeleton *_skeleton) { sprite = _sprite; skeleton = _skeleton; }
 	spine::Skeleton *get_spine_object() { return skeleton; }
-
-	void set_spine_sprite(SpineSprite *sprite);
+	void set_spine_sprite(SpineSprite *_sprite) { sprite = _sprite; }
+	SpineSprite *get_spine_sprite() { return sprite; }
 
 private:
 	spine::Skeleton *skeleton;

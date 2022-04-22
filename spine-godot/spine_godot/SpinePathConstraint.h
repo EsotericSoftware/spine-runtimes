@@ -42,12 +42,14 @@ protected:
 
 private:
 	spine::PathConstraint *path_constraint;
+	SpineSprite *sprite;
 
 public:
 	SpinePathConstraint();
 
-	void set_spine_object(spine::PathConstraint *_path_constraint) { path_constraint = _path_constraint; }
+	void set_spine_object(SpineSprite *_sprite, spine::PathConstraint *_path_constraint) { sprite = _sprite; path_constraint = _path_constraint; }
 	spine::PathConstraint *get_spine_object() { return path_constraint; }
+	SpineSprite *get_spine_sprite() { return sprite; }
 
 	void update();
 

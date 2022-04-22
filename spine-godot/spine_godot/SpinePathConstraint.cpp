@@ -52,7 +52,7 @@ void SpinePathConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_active", "v"), &SpinePathConstraint::set_active);
 }
 
-SpinePathConstraint::SpinePathConstraint() : path_constraint(nullptr) {
+SpinePathConstraint::SpinePathConstraint() : path_constraint(nullptr), sprite(nullptr) {
 }
 
 void SpinePathConstraint::update() {
@@ -123,7 +123,7 @@ Array SpinePathConstraint::get_bones() {
 	for (int i = 0; i < bones.size(); ++i) {
 		auto bone = bones[i];
 		Ref<SpineBone> bone_ref(memnew(SpineBone));
-		bone_ref->set_spine_object(bone);
+		bone_ref->set_spine_object(sprite, bone);
 		result[i] = bone_ref;
 	}
 	return result;
@@ -134,7 +134,7 @@ Ref<SpineSlot> SpinePathConstraint::get_target() {
 	auto target = path_constraint->getTarget();
 	if (!target) return nullptr;
 	Ref<SpineSlot> target_ref(memnew(SpineSlot));
-	target_ref->set_spine_object(target);
+	target_ref->set_spine_object(sprite, target);
 	return target_ref;
 }
 

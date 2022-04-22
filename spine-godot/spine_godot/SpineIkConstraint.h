@@ -34,6 +34,7 @@
 #include <spine/IkConstraint.h>
 
 class SpineBone;
+class SpineSprite;
 
 class SpineIkConstraint : public REFCOUNTED {
 	GDCLASS(SpineIkConstraint, REFCOUNTED);
@@ -43,13 +44,14 @@ protected:
 
 private:
 	spine::IkConstraint *ik_constraint;
+	SpineSprite *sprite;
 
 public:
 	SpineIkConstraint();
 
-	void set_spine_object(spine::IkConstraint *_ik_constraint) { ik_constraint = _ik_constraint; }
-
+	void set_spine_object(SpineSprite *_sprite, spine::IkConstraint *_ik_constraint) { sprite = _sprite; ik_constraint = _ik_constraint; }
 	spine::IkConstraint *get_spine_object() { return ik_constraint; }
+	SpineSprite *get_spine_sprite() { return sprite; }
 
 	void update();
 
