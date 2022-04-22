@@ -551,7 +551,7 @@ Transform2D SpineSprite::get_global_bone_transform(const String &bone_name) {
 		print_error(vformat("Bone: '%s' not found.", bone_name));
 		return get_global_transform();
 	}
-	return bone->get_godot_global_transform();
+	return bone->get_global_transform();
 }
 
 void SpineSprite::set_global_bone_transform(const String &bone_name, Transform2D transform) {
@@ -562,7 +562,7 @@ void SpineSprite::set_global_bone_transform(const String &bone_name, Transform2D
 	if (!bone.is_valid()) {
 		return;
 	}
-	bone->set_godot_global_transform(transform);
+	bone->set_global_transform(transform);
 }
 
 SpineSprite::UpdateMode SpineSprite::get_update_mode() {

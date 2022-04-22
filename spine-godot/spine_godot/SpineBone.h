@@ -178,13 +178,13 @@ public:
 	// External feature functions
 	void apply_world_transform_2d(const Variant &o);
 
-	Transform2D get_godot_transform();
+	Transform2D get_transform();
 
-	void set_godot_transform(Transform2D trans);
+	void set_transform(Transform2D transform);
 
-	Transform2D get_godot_global_transform();
+	Transform2D get_global_transform();
 
-	void set_godot_global_transform(Transform2D trans);
+	void set_global_transform(Transform2D trans);
 };
 
 #endif//GODOT_SPINEBONE_H

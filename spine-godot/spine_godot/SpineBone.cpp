@@ -93,10 +93,10 @@ void SpineBone::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_active"), &SpineBone::is_active);
 	ClassDB::bind_method(D_METHOD("set_active", "v"), &SpineBone::set_active);
 	ClassDB::bind_method(D_METHOD("apply_world_transform_2d", "node2d"), &SpineBone::apply_world_transform_2d);
-	ClassDB::bind_method(D_METHOD("get_godot_transform"), &SpineBone::get_godot_transform);
-	ClassDB::bind_method(D_METHOD("set_godot_transform", "local_transform"), &SpineBone::set_godot_transform);
-	ClassDB::bind_method(D_METHOD("get_godot_global_transform"), &SpineBone::get_godot_global_transform);
-	ClassDB::bind_method(D_METHOD("set_godot_global_transform", "global_transform"), &SpineBone::set_godot_global_transform);
+	ClassDB::bind_method(D_METHOD("get_transform"), &SpineBone::get_transform);
+	ClassDB::bind_method(D_METHOD("set_transform", "local_transform"), &SpineBone::set_transform);
+	ClassDB::bind_method(D_METHOD("get_global_transform"), &SpineBone::get_global_transform);
+	ClassDB::bind_method(D_METHOD("set_global_transform", "global_transform"), &SpineBone::set_global_transform);
 }
 
 SpineBone::SpineBone() : bone(nullptr), sprite(nullptr) {}
@@ -446,69 +446,51 @@ void SpineBone::apply_world_transform_2d(const Variant &o) {
 	}
 }
 
-Transform2D SpineBone::get_godot_transform() {
+Transform2D SpineBone::get_transform() {
 	SPINE_CHECK(bone, Transform2D())
-	Transform2D trans;
-	trans.translate(get_x(), -get_y());
-	trans.rotate(Math::deg2rad(-get_rotation()));
-	trans.scale(Size2(get_scale_x(), get_scale_y()));
-	return trans;
+	Transform2D transform;
+	transform.rotate(Math::deg2rad(-get_rotation()));
+	transform.scale(Size2(get_scale_x(), get_scale_y()));
+	transform.set_origin(Vector2(get_x(), -get_y()));
+	return transform;
 }
 
-void SpineBone::set_godot_transform(Transform2D trans) {
+void SpineBone::set_transform(Transform2D transform) {
 	SPINE_CHECK(bone,)
-	Vector2 position = trans.get_origin();
+	Vector2 position = transform.get_origin();
 	position.y *= -1;
-	real_t rotation = trans.get_rotation();
-	rotation = Math::rad2deg(-rotation);
-	Vector2 scale_x_y = trans.get_scale();
+	float rotation = Math::rad2deg(-transform.get_rotation());
+	Vector2 scale = transform.get_scale();
 
 	set_x(position.x);
 	set_y(position.y);
 	set_rotation(rotation);
-	set_scale_x(scale_x_y.x);
-	set_scale_y(scale_x_y.y);
+	set_scale_x(scale.x);
+	set_scale_y(scale.y);
 }
 
-Transform2D SpineBone::get_godot_global_transform() {
+Transform2D SpineBone::get_global_transform() {
 	SPINE_CHECK(bone, Transform2D())
-	if (!sprite) return get_godot_transform();
-	Transform2D result = sprite->get_transform();
-	result.translate(get_world_x(), -get_world_y());
-	result.rotate(Math::deg2rad(-get_world_rotation_x()));
-	result.scale(Vector2(get_world_scale_x(), get_world_scale_y()));
-	auto parent = sprite->get_parent() ? Object::cast_to<CanvasItem>(sprite->get_parent()) : nullptr;
-	if (parent) {
-		return parent->get_global_transform() * result;
-	}
-	return result;
+	if (!sprite) return get_transform();
+	Transform2D local;
+	local.rotate(Math::deg2rad(-get_world_rotation_x()));
+	local.scale(Vector2(get_world_scale_x(), get_world_scale_y()));
+	local.set_origin(Vector2(get_world_x(), -get_world_y()));
+	return sprite->get_global_transform() * local;
 }
 
-void SpineBone::set_godot_global_transform(Transform2D transform) {
+void SpineBone::set_global_transform(Transform2D transform) {
 	SPINE_CHECK(bone,)
-	if (!sprite) set_godot_transform(transform);
+	if (!sprite) set_transform(transform);
 	transform = sprite->get_global_transform().affine_inverse() * transform;
 	Vector2 position = transform.get_origin();
-	real_t rotation = transform.get_rotation();
-	Vector2 scale_x_y = transform.get_scale();
 	position.y *= -1;
-	auto parent = get_parent();
-	if (parent.is_valid()) {
-		position = parent->world_to_local(position);
-		if (parent->get_world_scale_x() != 0)
-			scale_x_y.x /= parent->get_world_scale_x();
-		else
-			ERR_PRINT("The parent scale.x is zero.");
-		if (parent->get_world_scale_y() != 0)
-			scale_x_y.y /= parent->get_world_scale_y();
-		else
-			ERR_PRINT("The parent scale.y is zero.");
-	}
-	rotation = world_to_local_rotation(Math::rad2deg(-rotation));
+	float rotation = world_to_local_rotation(Math::rad2deg(-transform.get_rotation()));
+	Vector2 scale = transform.get_scale();
 
 	set_x(position.x);
 	set_y(position.y);
 	set_rotation(rotation);
-	set_scale_x(scale_x_y.x);
-	set_scale_y(scale_x_y.y);
+	set_scale_x(scale.x);
+	set_scale_y(scale.y);
 }
