@@ -9,7 +9,7 @@ void SpineSlotNode::_bind_methods() {
     ClassDB::bind_method(D_METHOD("_on_world_transforms_changed", "spine_sprite"), &SpineSlotNode::on_world_transforms_changed);
 }
 
-SpineSlotNode::SpineSlotNode(): sprite(nullptr) {
+SpineSlotNode::SpineSlotNode(): slot_index(-1), sprite(nullptr) {
 }
 
 void SpineSlotNode::_notification(int what) {
@@ -87,7 +87,12 @@ void SpineSlotNode::on_world_transforms_changed(const Variant& _sprite) {
 void SpineSlotNode::update_transform(SpineSprite *sprite) {
     if (!sprite) return;
     auto slot = sprite->get_skeleton()->find_slot(slot_name);
-    if (!slot.is_valid()) return;
+    if (!slot.is_valid()) {
+        slot_index = -1;
+        return;
+    } else {
+        slot_index = slot->get_data()->get_index();
+    }
     auto bone = slot->get_bone();
     if (!bone.is_valid()) return;
     this->set_global_transform(bone->get_global_transform());

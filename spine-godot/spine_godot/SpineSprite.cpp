@@ -32,6 +32,7 @@
 #include "SpineTrackEntry.h"
 #include "SpineSkeleton.h"
 #include "SpineRendererObject.h"
+#include "SpineSlotNode.h"
 
 Ref<CanvasItemMaterial> SpineSprite::default_materials[4] = {};
 static int sprite_count = 0;
@@ -42,8 +43,6 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_skeleton"), &SpineSprite::get_skeleton);
 	ClassDB::bind_method(D_METHOD("get_animation_state"), &SpineSprite::get_animation_state);
 	ClassDB::bind_method(D_METHOD("on_skeleton_data_changed"), &SpineSprite::on_skeleton_data_changed);
-	ClassDB::bind_method(D_METHOD("get_bind_slot_nodes"), &SpineSprite::get_bind_slot_nodes);
-	ClassDB::bind_method(D_METHOD("set_bind_slot_nodes", "v"), &SpineSprite::set_bind_slot_nodes);
 
 	ClassDB::bind_method(D_METHOD("get_global_bone_transform", "bone_name"), &SpineSprite::get_global_bone_transform);
 	ClassDB::bind_method(D_METHOD("set_global_bone_transform", "bone_name", "global_transform"), &SpineSprite::set_global_bone_transform);
@@ -162,6 +161,7 @@ void SpineSprite::generate_meshes_for_slots(Ref<SpineSkeleton> skeleton_ref) {
 		add_child(mesh_instance);
 		mesh_instance->set_owner(this);
 		mesh_instances.push_back(mesh_instance);
+		slot_nodes.add(spine::Vector<SpineSlotNode*>());
 	}
 }
 
@@ -171,6 +171,33 @@ void SpineSprite::remove_meshes() {
 		memdelete(mesh_instances[i]);
 	}
 	mesh_instances.clear();
+	slot_nodes.clear();
+}
+
+void SpineSprite::sort_slot_nodes() {
+	for (int i = 0; i < slot_nodes.size(); i++) {
+		slot_nodes[i].setSize(0, nullptr);
+	}
+	
+	auto draw_order = skeleton->get_spine_object()->getDrawOrder();
+	for (int i = 0; i < get_child_count(); i++) {
+		auto slot_node = Object::cast_to<SpineSlotNode>(get_child(i));
+		if (!slot_node) continue;
+		if (slot_node->get_slot_index() == -1 || slot_node->get_slot_index() >= draw_order.size()) {
+			continue;
+		}
+		slot_nodes[slot_node->get_slot_index()].add(slot_node);
+	}
+	
+	for (int i = 0; i < draw_order.size(); i++) {
+		int slot_index = draw_order[i]->getData().getIndex();
+		int mesh_index = mesh_instances[i]->get_index();
+		spine::Vector<SpineSlotNode*> &nodes = slot_nodes[slot_index];
+		for (int j = 0; j < nodes.size(); j++) {
+			auto node = nodes[j];
+			move_child(node, mesh_index + 1);
+		}
+	}
 }
 
 Ref<SpineSkeleton> SpineSprite::get_skeleton() {
@@ -217,88 +244,7 @@ void SpineSprite::update_skeleton(float delta) {
 	emit_signal("world_transforms_changed", this);
 	update_meshes(skeleton);
 	update();
-	update_bind_slot_nodes();
-}
-
-void SpineSprite::update_bind_slot_nodes() {
-	if (animation_state.is_valid() && skeleton.is_valid()) {
-		for (int i = 0, n = bind_slot_nodes.size(); i < n; ++i) {
-			auto a = bind_slot_nodes[i];
-			if (a.get_type() == Variant::DICTIONARY) {
-				auto d = (Dictionary) a;
-				if (d.has("slot_name") && d.has("node_path")) {
-					NodePath node_path = d["node_path"];
-					Node *node = get_node_or_null(node_path);
-					if (node && node->is_class("Node2D")) {
-						auto *node2d = (Node2D *) node;
-
-						String slot_name = d["slot_name"];
-						auto slot = skeleton->find_slot(slot_name);
-						if (slot.is_valid()) {
-							auto bone = slot->get_bone();
-							if (bone.is_valid()) {
-								bone->apply_world_transform_2d(node2d);
-								update_bind_slot_node_draw_order(slot_name, node2d);
-							}
-						}
-					}
-				}
-			} else if (a.get_type() == Variant::ARRAY) {
-				auto as = (Array) a;// 0: slot_name, 1: node_path
-				if (as.size() >= 2 && as[0].get_type() == Variant::STRING && as[1].get_type() == Variant::NODE_PATH) {
-					NodePath node_path = as[1];
-					Node *node = get_node_or_null(node_path);
-					if (node && node->is_class("Node2D")) {
-						auto *node2d = (Node2D *) node;
-
-						String slot_name = as[0];
-						auto slot = skeleton->find_slot(slot_name);
-						if (slot.is_valid()) {
-							auto bone = slot->get_bone();
-							if (bone.is_valid()) {
-								bone->apply_world_transform_2d(node2d);
-								update_bind_slot_node_draw_order(slot_name, node2d);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-void SpineSprite::update_bind_slot_node_draw_order(const String &slot_name, Node2D *node2d) {
-#if VERSION_MAJOR > 3
-	auto nodes = find_nodes(slot_name);
-	if (!nodes.is_empty()) {
-		auto mesh_ins = Object::cast_to<MeshInstance2D>(nodes[0]);
-		if (mesh_ins) {
-			auto pos = mesh_ins->get_index();
-
-			// get child
-			auto node = find_child_node_by_node(node2d);
-			if (node && node->get_index() != pos + 1) {
-				move_child(node, pos + 1);
-			}
-		}
-	}
-#else
-	auto mesh_ins = find_node(slot_name);
-	if (mesh_ins) {
-		auto pos = mesh_ins->get_index();
-
-		// get child
-		auto node = find_child_node_by_node(node2d);
-		if (node && node->get_index() != pos + 1) {
-			move_child(node, pos + 1);
-		}
-	}
-#endif
-}
-Node *SpineSprite::find_child_node_by_node(Node *node) {
-	if (node == nullptr) return nullptr;
-	while (node && node->get_parent() != this) node = node->get_parent();
-	return node;
+	sort_slot_nodes();
 }
 
 #define TEMP_COPY(t, get_res)                   \
@@ -532,14 +478,6 @@ void SpineSprite::callback(spine::AnimationState *state, spine::EventType type, 
 			emit_signal("animation_event", this, animation_state, entry_ref, event_ref);
 			break;
 	}
-}
-
-Array SpineSprite::get_bind_slot_nodes() {
-	return bind_slot_nodes;
-}
-
-void SpineSprite::set_bind_slot_nodes(Array v) {
-	bind_slot_nodes = v;
 }
 
 Transform2D SpineSprite::get_global_bone_transform(const String &bone_name) {

@@ -36,6 +36,8 @@
 #include "scene/2d/mesh_instance_2d.h"
 #include "scene/resources/texture.h"
 
+class SpineSlotNode;
+
 class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
 	GDCLASS(SpineSprite, Node2D)
 
@@ -50,9 +52,9 @@ protected:
 	Ref<SpineSkeletonDataResource> skeleton_data_res;
 	Ref<SpineSkeleton> skeleton;
 	Ref<SpineAnimationState> animation_state;
-	Array bind_slot_nodes;
 	UpdateMode update_mode;
 
+	spine::Vector<spine::Vector<SpineSlotNode*> > slot_nodes;
 	Vector<MeshInstance2D *> mesh_instances;
 	spine::SkeletonClipping *skeleton_clipper;
 	static Ref<CanvasItemMaterial> default_materials[4];
@@ -62,11 +64,8 @@ protected:
 
 	void generate_meshes_for_slots(Ref<SpineSkeleton> skeleton_ref);
 	void remove_meshes();
+	void sort_slot_nodes();
 	void update_meshes(Ref<SpineSkeleton> skeleton);
-
-	void update_bind_slot_nodes();
-	void update_bind_slot_node_draw_order(const String &slot_name, Node2D *node2d);
-	Node *find_child_node_by_node(Node *node);
 
 	void callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event);
 

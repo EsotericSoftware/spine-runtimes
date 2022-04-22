@@ -10,6 +10,7 @@ class SpineSlotNode: public Node2D {
 
 protected:
     String slot_name;
+    int slot_index;
     SpineSprite *sprite;
 
     static void _bind_methods();
@@ -25,6 +26,8 @@ public:
     void set_slot_name(const String &_slot_name);
 
     String get_slot_name();
+
+    int get_slot_index() { return slot_index; }
 };
 
 #endif
