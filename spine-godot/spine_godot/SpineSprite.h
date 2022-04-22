@@ -85,10 +85,6 @@ public:
 
 	void update_skeleton(float delta);
 
-	Array get_bind_slot_nodes();
-
-	void set_bind_slot_nodes(Array v);
-
 	Transform2D get_global_bone_transform(const String &bone_name);
 
 	void set_global_bone_transform(const String &bone_name, Transform2D transform);
