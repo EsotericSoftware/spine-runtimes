@@ -465,6 +465,7 @@ void SpineBone::set_transform(Transform2D transform) {
 Transform2D SpineBone::get_global_transform() {
 	SPINE_CHECK(bone, Transform2D())
 	if (!sprite) return get_transform();
+	if (!sprite->is_visible_in_tree()) return get_transform();
 	Transform2D local;
 	local.rotate(Math::deg2rad(-get_world_rotation_x()));
 	local.scale(Vector2(get_world_scale_x(), get_world_scale_y()));
@@ -475,6 +476,7 @@ Transform2D SpineBone::get_global_transform() {
 void SpineBone::set_global_transform(Transform2D transform) {
 	SPINE_CHECK(bone,)
 	if (!sprite) set_transform(transform);
+	if (!sprite->is_visible_in_tree()) return;
 	transform = sprite->get_global_transform().affine_inverse() * transform;
 	Vector2 position = transform.get_origin();
 	position.y *= -1;

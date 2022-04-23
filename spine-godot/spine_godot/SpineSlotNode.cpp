@@ -95,6 +95,7 @@ void SpineSlotNode::update_transform(SpineSprite *sprite) {
     }
     auto bone = slot->get_bone();
     if (!bone.is_valid()) return;
+    if (!is_visible_in_tree()) return;
     this->set_global_transform(bone->get_global_transform());
 }
 

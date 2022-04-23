@@ -480,9 +480,7 @@ void SpineSprite::callback(spine::AnimationState *state, spine::EventType type, 
 }
 
 Transform2D SpineSprite::get_global_bone_transform(const String &bone_name) {
-	if (!animation_state.is_valid() && !skeleton.is_valid()) {
-		return get_global_transform();
-	}
+	if (!animation_state.is_valid() && !skeleton.is_valid()) return get_global_transform();
 	auto bone = skeleton->find_bone(bone_name);
 	if (!bone.is_valid()) {
 		print_error(vformat("Bone: '%s' not found.", bone_name));
@@ -492,9 +490,7 @@ Transform2D SpineSprite::get_global_bone_transform(const String &bone_name) {
 }
 
 void SpineSprite::set_global_bone_transform(const String &bone_name, Transform2D transform) {
-	if (!animation_state.is_valid() && !skeleton.is_valid()) {
-		return;
-	}
+	if (!animation_state.is_valid() && !skeleton.is_valid()) return;
 	auto bone = skeleton->find_bone(bone_name);
 	if (!bone.is_valid()) {
 		return;
