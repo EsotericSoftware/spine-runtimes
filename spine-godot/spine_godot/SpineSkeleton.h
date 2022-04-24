@@ -50,6 +50,7 @@ class SpineSkeleton : public REFCOUNTED {
 	friend class SpineAnimation;
 	friend class SpineAnimationState;
 	friend class SpineCollisionShapeProxy;
+	friend class SpineAnimationTrack;
 
 protected:
 	static void _bind_methods();

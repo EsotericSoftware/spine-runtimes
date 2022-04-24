@@ -80,6 +80,7 @@ SpineEditorPlugin::SpineEditorPlugin(EditorNode *node) {
 	add_import_plugin(memnew(SpineJsonResourceImportPlugin));
 	add_import_plugin(memnew(SpineBinaryResourceImportPlugin));
 	add_inspector_plugin(memnew(SpineSkeletonDataResourceInspectorPlugin));
+	add_inspector_plugin(memnew(SpineSpriteInspectorPlugin));
 }
 
 bool SpineSkeletonDataResourceInspectorPlugin::can_handle(Object *object) {
@@ -312,6 +313,23 @@ void SpineEditorPropertyAnimationMix::update_property() {
 	container->add_child(mix_float);
 
 	updating = false;
+}
+
+void SpineSpriteInspectorPlugin::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("button_clicked"), &SpineSpriteInspectorPlugin::button_clicked);
+}
+
+void SpineSpriteInspectorPlugin::button_clicked(const String& button_name) {
+}
+
+bool SpineSpriteInspectorPlugin::can_handle(Object* object) {
+	return Object::cast_to<SpineSprite>(object) != nullptr;
+}
+
+void SpineSpriteInspectorPlugin::parse_begin(Object* object) {
+	sprite = Object::cast_to<SpineSprite>(object);
+	if (!sprite) return;
+	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
 }
 
 #endif

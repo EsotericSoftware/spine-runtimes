@@ -27,7 +27,7 @@ void SpineSlotNode::_notification(int what) {
             _change_notify("rotation_deg");
             _change_notify("scale");
         } else {
-            WARN_PRINT("SpineSlotProxy parent is not a SpineSprite.");
+            WARN_PRINT("SpineSlotNode parent is not a SpineSprite.");
         }
         NOTIFY_PROPERTY_LIST_CHANGED();
         break;

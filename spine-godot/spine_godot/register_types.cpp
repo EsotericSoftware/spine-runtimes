@@ -35,6 +35,7 @@
 #include "SpineSprite.h"
 #include "SpineSkeleton.h"
 #include "SpineAnimationState.h"
+#include "SpineAnimationTrack.h"
 #include "SpineEventData.h"
 #include "SpineEvent.h"
 #include "SpineTrackEntry.h"
@@ -98,8 +99,10 @@ void register_spine_godot_types() {
 	ClassDB::register_class<SpineTransformConstraint>();
 	ClassDB::register_class<SpineTimeline>();
 	ClassDB::register_class<SpineConstant>();
+	
 	ClassDB::register_class<SpineCollisionShapeProxy>();
 	ClassDB::register_class<SpineSlotNode>();
+	ClassDB::register_class<SpineAnimationTrack>();
 
 #if VERSION_MAJOR > 3
 	atlas_loader.instantiate();

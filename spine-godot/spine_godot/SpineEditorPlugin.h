@@ -147,8 +147,6 @@ class SpineSkeletonDataResourceInspectorPlugin: public EditorInspectorPlugin {
 	GDCLASS(SpineSkeletonDataResourceInspectorPlugin, EditorInspectorPlugin)
 
 public:
-	SpineSkeletonDataResourceInspectorPlugin() = default;
-
 	bool can_handle(Object *object) override;
 #if VERSION_MAJOR > 3
 	bool parse_property(Object *object, Variant::Type type, const String &path, PropertyHint hint, const String &hint_text, uint32_t usage, bool wide) override;
@@ -193,6 +191,18 @@ public:
 	SpineEditorPropertyAnimationMix();
 	void setup(SpineEditorPropertyAnimationMixes *mixes_property, const Ref<SpineSkeletonDataResource> &skeleton_data, int index);
 	void update_property() override;
+};
+
+class SpineSpriteInspectorPlugin: public EditorInspectorPlugin {
+	GDCLASS(SpineSpriteInspectorPlugin, EditorInspectorPlugin)
+
+	SpineSprite *sprite;
+	
+	static void _bind_methods();
+	void button_clicked(const String &button_name);
+public:
+	bool can_handle(Object *object) override;
+	void parse_begin(Object *object) override;
 };
 
 #endif

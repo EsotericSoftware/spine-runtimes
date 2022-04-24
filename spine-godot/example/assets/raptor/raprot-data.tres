@@ -6,5 +6,4 @@
 [resource]
 atlas_res = ExtResource( 1 )
 skeleton_file_res = ExtResource( 2 )
-animations = null
-skins = null
+default_mix = 0.2
