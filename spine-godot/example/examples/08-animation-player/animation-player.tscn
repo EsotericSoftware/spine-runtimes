@@ -1623,7 +1623,6 @@ tracks/1/keys = {
 }
 
 [sub_resource type="Animation" id=25]
-length = 10.0
 loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath("Spineboy:position")
@@ -1695,11 +1694,11 @@ tracks/5/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "update": 0,
-"values": [ 0.5 ]
+"values": [ 1.0 ]
 }
 
 [sub_resource type="Animation" id=83]
-resource_name = "reverse-additive-timescale"
+resource_name = "reverse-timescale"
 length = 2.0
 loop = true
 tracks/0/type = "value"
@@ -1723,6 +1722,18 @@ tracks/1/enabled = true
 tracks/1/keys = {
 "clips": PoolStringArray( "walk_looped" ),
 "times": PoolRealArray( 0 )
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Spineboy/SpineAnimationTrack:time_scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0.5 ]
 }
 
 [sub_resource type="Animation" id=1]
@@ -1796,6 +1807,18 @@ tracks/5/keys = {
 "clips": PoolStringArray( "walk_looped", "roar_looped", "-- Empty --" ),
 "times": PoolRealArray( 0.46, 3.7, 9.64 )
 }
+tracks/6/type = "value"
+tracks/6/path = NodePath("Spineboy/SpineAnimationTrack:mix_duration")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0.2 ]
+}
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 2 )
@@ -1807,7 +1830,6 @@ skeleton_data_res = ExtResource( 1 )
 
 [node name="SpineAnimationTrack" type="SpineAnimationTrack" parent="Spineboy"]
 track_index = 0
-time_scale = 0.5
 debug = true
 
 [node name="Spineboy Track 0" type="AnimationPlayer" parent="Spineboy/SpineAnimationTrack"]
@@ -1891,5 +1913,5 @@ anims/walk_looped = SubResource( 140 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/RESET = SubResource( 25 )
-anims/reverse-additive-timescale = SubResource( 83 )
+anims/reverse-timescale = SubResource( 83 )
 anims/walk-run-die = SubResource( 1 )
