@@ -39,6 +39,7 @@
 #define EMPTY_PTR(x) ((x)->is_empty())
 #define INSTANTIATE(x) (x).instantiate()
 #define NOTIFY_PROPERTY_LIST_CHANGED() notify_property_list_changed()
+#define VARIANT_FLOAT Variant::FLOAT
 #else
 #include "core/object.h"
 #include "core/reference.h"
@@ -48,6 +49,7 @@
 #define EMPTY_PTR(x) ((x)->empty())
 #define INSTANTIATE(x) (x).instance()
 #define NOTIFY_PROPERTY_LIST_CHANGED() property_list_changed_notify()
+#define VARIANT_FLOAT Variant::REAL
 #endif
 
 #define SPINE_CHECK(obj, ret) \
