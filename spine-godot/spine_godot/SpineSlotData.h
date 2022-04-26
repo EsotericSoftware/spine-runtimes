@@ -36,8 +36,8 @@
 
 class SpineSkeletonDataResource;
 
-class SpineSlotData : public REFCOUNTED, public SpineObjectWrapper<SpineSkeletonDataResource, spine::SlotData> {
-	GDCLASS(SpineSlotData, REFCOUNTED)
+class SpineSlotData : public SpineObjectWrapper<SpineSkeletonDataResource, spine::SlotData> {
+	GDCLASS(SpineSlotData, SpineObjectWrapper)
 
 protected:
 	static void _bind_methods();

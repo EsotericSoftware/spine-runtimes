@@ -37,8 +37,8 @@
 
 #include "SpineSprite.h"
 
-class SpineTrackEntry : public REFCOUNTED, public SpineObjectWrapper<SpineSprite, spine::TrackEntry> {
-	GDCLASS(SpineTrackEntry, REFCOUNTED);
+class SpineTrackEntry : public SpineObjectWrapper<SpineSprite, spine::TrackEntry> {
+	GDCLASS(SpineTrackEntry, SpineObjectWrapper);
 
 protected:
 	static void _bind_methods();

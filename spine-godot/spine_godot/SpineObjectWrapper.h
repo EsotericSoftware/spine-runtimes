@@ -30,7 +30,9 @@
 #ifndef GODOT_SPINEOBJECTWRAPPER_H
 #define GODOT_SPINEOBJECTWRAPPER_H
 
-template <typename OWNER, typename OBJECT> class SpineObjectWrapper {
+#include "SpineCommon.h"
+
+template <typename OWNER, typename OBJECT> class SpineObjectWrapper: public REFCOUNTED {
 protected:
 	Object *owner;
 	OBJECT *spine_object;

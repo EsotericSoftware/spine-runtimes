@@ -35,8 +35,8 @@
 #include "SpineBone.h"
 #include <spine/TransformConstraint.h>
 
-class SpineTransformConstraint : public REFCOUNTED, public SpineObjectWrapper<SpineSprite, spine::TransformConstraint> {
-	GDCLASS(SpineTransformConstraint, REFCOUNTED)
+class SpineTransformConstraint : public SpineObjectWrapper<SpineSprite, spine::TransformConstraint> {
+	GDCLASS(SpineTransformConstraint, SpineObjectWrapper)
 
 protected:
 	static void _bind_methods();

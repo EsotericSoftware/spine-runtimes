@@ -34,8 +34,8 @@
 #include "SpineSlot.h"
 #include <spine/PathConstraint.h>
 
-class SpinePathConstraint : public REFCOUNTED, public SpineObjectWrapper<SpineSprite, spine::PathConstraint> {
-	GDCLASS(SpinePathConstraint, REFCOUNTED);
+class SpinePathConstraint : public SpineObjectWrapper<SpineSprite, spine::PathConstraint> {
+	GDCLASS(SpinePathConstraint, SpineObjectWrapper)
 
 protected:
 	static void _bind_methods();

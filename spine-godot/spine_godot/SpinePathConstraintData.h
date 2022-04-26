@@ -37,7 +37,7 @@
 #include <spine/PathConstraintData.h>
 
 class SpinePathConstraintData : public SpineConstraintData {
-	GDCLASS(SpinePathConstraintData, SpineConstraintData);
+	GDCLASS(SpinePathConstraintData, SpineConstraintData)
 
 	spine::PathConstraintData *get_spine_constraint_data() { return (spine::PathConstraintData *)get_spine_object(); }
 

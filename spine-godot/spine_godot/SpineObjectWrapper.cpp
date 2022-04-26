@@ -1,5 +1,5 @@
-/******************************************************************************
- * Spine Runtimes License Agreement
+﻿/******************************************************************************
+* Spine Runtimes License Agreement
  * Last updated January 1, 2020. Replaces all prior versions.
  *
  * Copyright (c) 2013-2020, Esoteric Software LLC
@@ -27,53 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINETRANSFORMCONSTRAINTDATA_H
-#define GODOT_SPINETRANSFORMCONSTRAINTDATA_H
+#include "SpineObjectWrapper.h"
 
-#include "SpineConstraintData.h"
-#include "SpineBoneData.h"
-#include <spine/TransformConstraintData.h>
 
-class SpineTransformConstraintData : public SpineConstraintData {
-	GDCLASS(SpineTransformConstraintData, SpineConstraintData)
 
-	spine::TransformConstraintData *get_spine_constraint_data() { return (spine::TransformConstraintData *) SpineConstraintData::get_spine_object(); }
-
-protected:
-	static void _bind_methods();
-
-public:
-	Array get_bones();
-
-	Ref<SpineBoneData> get_target();
-
-	float get_mix_rotate();
-
-	float get_mix_x();
-
-	float get_mix_y();
-
-	float get_mix_scale_x();
-
-	float get_mix_scale_y();
-
-	float get_mix_shear_y();
-
-	float get_offset_rotation();
-
-	float get_offset_x();
-
-	float get_offset_y();
-
-	float get_offset_scale_x();
-
-	float get_offset_scale_y();
-
-	float get_offset_shear_y();
-
-	bool is_relative();
-
-	bool is_local();
-};
-
-#endif//GODOT_SPINETRANSFORMCONSTRAINTDATA_H

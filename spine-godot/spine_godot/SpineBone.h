@@ -38,8 +38,8 @@
 class SpineSkeleton;
 class SpineSprite;
 
-class SpineBone : public REFCOUNTED, public SpineObjectWrapper<SpineSprite, spine::Bone> {
-	GDCLASS(SpineBone, REFCOUNTED)
+class SpineBone : public SpineObjectWrapper<SpineSprite, spine::Bone> {
+	GDCLASS(SpineBone, SpineObjectWrapper)
 
 protected:
 	static void _bind_methods();

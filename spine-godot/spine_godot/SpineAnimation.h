@@ -39,8 +39,8 @@ class SpineSkeleton;
 class SpineTimeline;
 class SpineSkeletonDataResource;
 
-class SpineAnimation : public REFCOUNTED, public SpineObjectWrapper<SpineSkeletonDataResource, spine::Animation> {
-	GDCLASS(SpineAnimation, REFCOUNTED);
+class SpineAnimation : public SpineObjectWrapper<SpineSkeletonDataResource, spine::Animation> {
+	GDCLASS(SpineAnimation, SpineObjectWrapper)
 
 protected:
 	static void _bind_methods();

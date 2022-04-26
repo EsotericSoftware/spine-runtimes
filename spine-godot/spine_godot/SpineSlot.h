@@ -35,12 +35,11 @@
 #include "SpineAttachment.h"
 #include "SpineBone.h"
 
-// Breaks cyclic dependency.
 class SpineSkeleton;
 class SpineSprite;
 
-class SpineSlot : public REFCOUNTED, public SpineObjectWrapper<SpineSprite, spine::Slot> {
-	GDCLASS(SpineSlot, REFCOUNTED)
+class SpineSlot : public SpineObjectWrapper<SpineSprite, spine::Slot> {
+	GDCLASS(SpineSlot, SpineObjectWrapper)
 
 protected:
 	static void _bind_methods();

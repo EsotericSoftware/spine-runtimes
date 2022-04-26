@@ -36,8 +36,8 @@
 class SpineBone;
 class SpineSprite;
 
-class SpineIkConstraint : public REFCOUNTED, public SpineObjectWrapper<SpineSprite, spine::IkConstraint> {
-	GDCLASS(SpineIkConstraint, REFCOUNTED);
+class SpineIkConstraint : public SpineObjectWrapper<SpineSprite, spine::IkConstraint> {
+	GDCLASS(SpineIkConstraint, SpineObjectWrapper)
 
 protected:
 	static void _bind_methods();
