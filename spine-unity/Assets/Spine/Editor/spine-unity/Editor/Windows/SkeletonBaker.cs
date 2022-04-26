@@ -67,6 +67,9 @@ namespace Spine.Unity.Editor {
 	/// </summary>
 	public static class SkeletonBaker {
 
+		const string SpineEventStringId = "SpineEvent";
+		const float EventTimeEqualityEpsilon = 0.01f;
+
 		#region SkeletonMecanim's Mecanim Clips
 #if SPINE_SKELETONMECANIM
 		public static void UpdateMecanimClips (SkeletonDataAsset skeletonDataAsset) {
@@ -145,11 +148,14 @@ namespace Spine.Unity.Editor {
 				settings.stopTime = animations.Duration;
 				SetAnimationSettings(clip, settings);
 
-				AnimationUtility.SetAnimationEvents(clip, new AnimationEvent[0]);
+				var previousAnimationEvents = AnimationUtility.GetAnimationEvents(clip);
+				var animationEvents = new List<AnimationEvent>();
 				foreach (Timeline t in animations.Timelines) {
 					if (t is EventTimeline)
-						ParseEventTimeline((EventTimeline)t, clip, SendMessageOptions.DontRequireReceiver);
+						ParseEventTimeline(ref animationEvents, (EventTimeline)t, SendMessageOptions.DontRequireReceiver);
 				}
+				AddPreviousUserEvents(ref animationEvents, previousAnimationEvents);
+				AnimationUtility.SetAnimationEvents(clip, animationEvents.ToArray());
 
 				EditorUtility.SetDirty(clip);
 				unityAnimationClipTable.Remove(animationName);
@@ -1288,10 +1294,17 @@ namespace Spine.Unity.Editor {
 		}
 
 		static void ParseEventTimeline (EventTimeline timeline, AnimationClip clip, SendMessageOptions eventOptions) {
+			var animationEvents = new List<AnimationEvent>();
+			ParseEventTimeline(ref animationEvents, timeline, eventOptions);
+			AnimationUtility.SetAnimationEvents(clip, animationEvents.ToArray());
+		}
+
+		static void ParseEventTimeline (ref List<AnimationEvent> animationEvents,
+			EventTimeline timeline, SendMessageOptions eventOptions) {
+
 			float[] frames = timeline.Frames;
 			var events = timeline.Events;
 
-			var animEvents = new List<AnimationEvent>();
 			for (int i = 0, n = frames.Length; i < n; i++) {
 				var spineEvent = events[i];
 				string eventName = spineEvent.Data.Name;
@@ -1302,7 +1315,8 @@ namespace Spine.Unity.Editor {
 				var unityAnimationEvent = new AnimationEvent {
 					time = frames[i],
 					functionName = eventName,
-					messageOptions = eventOptions
+					messageOptions = eventOptions,
+					stringParameter = SpineEventStringId
 				};
 
 				if (!string.IsNullOrEmpty(spineEvent.String)) {
@@ -1313,10 +1327,23 @@ namespace Spine.Unity.Editor {
 					unityAnimationEvent.floatParameter = spineEvent.Float;
 				} // else, paramless function/Action.
 
-				animEvents.Add(unityAnimationEvent);
+				animationEvents.Add(unityAnimationEvent);
 			}
+		}
 
-			AnimationUtility.SetAnimationEvents(clip, animEvents.ToArray());
+		static void AddPreviousUserEvents (ref List<AnimationEvent> allEvents, AnimationEvent[] previousEvents) {
+			foreach (AnimationEvent previousEvent in previousEvents) {
+				if (previousEvent.stringParameter == SpineEventStringId)
+					continue;
+				var identicalEvent = allEvents.Find(newEvent => {
+					return newEvent.functionName == previousEvent.functionName &&
+						Mathf.Abs(newEvent.time - previousEvent.time) < EventTimeEqualityEpsilon;
+				});
+				if (identicalEvent != null)
+					continue;
+
+				allEvents.Add(previousEvent);
+			}
 		}
 
 		static void ParseAttachmentTimeline (Skeleton skeleton, AttachmentTimeline timeline, Dictionary<int, List<string>> slotLookup, AnimationClip clip) {
