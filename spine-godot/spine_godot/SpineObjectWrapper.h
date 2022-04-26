@@ -1,5 +1,5 @@
-/******************************************************************************
- * Spine Runtimes License Agreement
+﻿/******************************************************************************
+* Spine Runtimes License Agreement
  * Last updated January 1, 2020. Replaces all prior versions.
  *
  * Copyright (c) 2013-2020, Esoteric Software LLC
@@ -27,61 +27,28 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINECOLLISIONSHAPEPROXY_H
-#define GODOT_SPINECOLLISIONSHAPEPROXY_H
+#ifndef GODOT_SPINEOBJECTWRAPPER_H
+#define GODOT_SPINEOBJECTWRAPPER_H
 
-#include "scene/2d/collision_polygon_2d.h"
-#include <spine/Slot.h>
-
-class SpineSprite;
-class SpineAnimationState;
-class SpineSkeleton;
-
-class SpineCollisionShapeProxy : public CollisionPolygon2D {
-	GDCLASS(SpineCollisionShapeProxy, CollisionPolygon2D)
-protected:
-	static void _bind_methods();
-
-	NodePath sprite_path;
-
-	String slot_name;
-
-	bool sync_transform;
-
-	spine::Vector<float> scratch_vertices;
-
-protected:
-	void _notification(int p_what);
-	void _get_property_list(List<PropertyInfo> *p_list) const;
-	bool _get(const StringName &p_property, Variant &r_value) const;
-	bool _set(const StringName &p_property, const Variant &p_value);
-
-
-	SpineSprite *get_spine_sprite() const;
-
-	spine::Slot *get_spine_slot(const String &slotName) const;
-
-	void update_polygon_from_spine_sprite(SpineSprite *sprite);
-
-	void clear_polygon();
-
-	void synchronize_transform(SpineSprite *sprite);
-
-	void get_slot_names(Vector<String> &slot_names) const;
-
+template <typename OWNER, typename OBJECT> class SpineObjectWrapper {
+	Object *owner;
+	OBJECT *object;
+	
 public:
-	SpineCollisionShapeProxy();
-	~SpineCollisionShapeProxy();
-
-	NodePath get_spine_sprite_path();
-	void set_spine_sprite_path(NodePath path);
-
-	String get_slot() const;
-	void set_slot(const String &slotName);
-
-	bool get_sync_transform();
-	void set_sync_transform(bool sync_transform);
+	SpineObjectWrapper(): owner(nullptr), object(nullptr) {};
+	
+	void set_spine_object(OWNER *_owner, OBJECT *_object) {
+		owner = (Object*)_owner;
+		object = _object;
+	}
+	
+	OBJECT *get_spine_object() {
+		return object;
+	}
+	
+	OWNER *get_spine_owner() {
+		return (OWNER*)owner;
+	}
 };
 
-
-#endif//GODOT_SPINECOLLISIONSHAPEPROXY_H
+#endif

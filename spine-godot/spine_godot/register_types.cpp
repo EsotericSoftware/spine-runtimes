@@ -49,7 +49,6 @@
 #include "SpinePathConstraintData.h"
 #include "SpineTimeline.h"
 #include "SpineConstant.h"
-#include "SpineCollisionShapeProxy.h"
 #include "SpineSlotNode.h"
 
 static Ref<SpineAtlasResourceFormatLoader> atlas_loader;
@@ -100,7 +99,6 @@ void register_spine_godot_types() {
 	ClassDB::register_class<SpineTimeline>();
 	ClassDB::register_class<SpineConstant>();
 	
-	ClassDB::register_class<SpineCollisionShapeProxy>();
 	ClassDB::register_class<SpineSlotNode>();
 	ClassDB::register_class<SpineAnimationTrack>();
 
