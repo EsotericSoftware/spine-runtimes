@@ -47,12 +47,12 @@ String SpineConstraintData::get_constraint_name() {
 	return constraint_data->getName().buffer();
 }
 
-uint64_t SpineConstraintData::get_order() {
+int SpineConstraintData::get_order() {
 	SPINE_CHECK(constraint_data, 0)
-	return constraint_data->getOrder();
+	return (int)constraint_data->getOrder();
 }
 
-void SpineConstraintData::set_order(uint64_t v) {
+void SpineConstraintData::set_order(int v) {
 	SPINE_CHECK(constraint_data,)
 	constraint_data->setOrder(v);
 }

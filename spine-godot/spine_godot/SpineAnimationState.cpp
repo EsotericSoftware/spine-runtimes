@@ -76,12 +76,12 @@ void SpineAnimationState::clear_tracks() {
 	animation_state->clearTracks();
 }
 
-void SpineAnimationState::clear_track(uint64_t track_id) {
+void SpineAnimationState::clear_track(int track_id) {
 	SPINE_CHECK(animation_state,)
 	animation_state->clearTrack(track_id);
 }
 
-Ref<SpineTrackEntry> SpineAnimationState::set_animation(const String &animation_name, bool loop, uint64_t track) {
+Ref<SpineTrackEntry> SpineAnimationState::set_animation(const String &animation_name, bool loop, int track) {
 	SPINE_CHECK(animation_state, nullptr)
 	auto skeleton_data = animation_state->getData()->getSkeletonData();
 	auto animation = skeleton_data->findAnimation(animation_name.utf8().ptr());
@@ -95,7 +95,7 @@ Ref<SpineTrackEntry> SpineAnimationState::set_animation(const String &animation_
 	return track_entry_ref;
 }
 
-Ref<SpineTrackEntry> SpineAnimationState::add_animation(const String &animation_name, float delay, bool loop, uint64_t track) {
+Ref<SpineTrackEntry> SpineAnimationState::add_animation(const String &animation_name, float delay, bool loop, int track) {
 	SPINE_CHECK(animation_state, nullptr)
 	auto skeleton_data = animation_state->getData()->getSkeletonData();
 	auto animation = skeleton_data->findAnimation(animation_name.utf8().ptr());
@@ -109,14 +109,14 @@ Ref<SpineTrackEntry> SpineAnimationState::add_animation(const String &animation_
 	return track_entry_ref;
 }
 
-Ref<SpineTrackEntry> SpineAnimationState::set_empty_animation(uint64_t track_id, float mix_duration) {
+Ref<SpineTrackEntry> SpineAnimationState::set_empty_animation(int track_id, float mix_duration) {
 	SPINE_CHECK(animation_state, nullptr)
 	auto track_entry = animation_state->setEmptyAnimation(track_id, mix_duration);
 	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
 	track_entry_ref->set_spine_object(track_entry);
 	return track_entry_ref;
 }
-Ref<SpineTrackEntry> SpineAnimationState::add_empty_animation(uint64_t track_id, float mix_duration, float delay) {
+Ref<SpineTrackEntry> SpineAnimationState::add_empty_animation(int track_id, float mix_duration, float delay) {
 	SPINE_CHECK(animation_state, nullptr)
 	auto track_entry = animation_state->addEmptyAnimation(track_id, mix_duration, delay);
 	Ref<SpineTrackEntry> track_entry_ref(memnew(SpineTrackEntry));
@@ -128,7 +128,7 @@ void SpineAnimationState::set_empty_animations(float mix_duration) {
 	animation_state->setEmptyAnimations(mix_duration);
 }
 
-Ref<SpineTrackEntry> SpineAnimationState::get_current(uint64_t track_index) {
+Ref<SpineTrackEntry> SpineAnimationState::get_current(int track_index) {
 	SPINE_CHECK(animation_state, nullptr)
 	auto track_entry = animation_state->getCurrent(track_index);
 	if (!track_entry) return nullptr;

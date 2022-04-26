@@ -90,7 +90,7 @@ Array SpineTimeline::get_property_ids() {
 	auto &ids = timeline->getPropertyIds();
 	result.resize((int)ids.size());
 	for (int i = 0; i < result.size(); ++i) {
-		result[i] = (int64_t) ids[i];
+		result[i] = (spine::PropertyId) ids[i];
 	}
 	return result;
 }

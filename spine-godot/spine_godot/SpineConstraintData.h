@@ -54,9 +54,9 @@ public:
 
 	String get_constraint_name();
 
-	uint64_t get_order();
+	int get_order();
 
-	void set_order(uint64_t v);
+	void set_order(int v);
 
 	bool is_skin_required();
 

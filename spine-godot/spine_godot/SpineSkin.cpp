@@ -64,12 +64,12 @@ Ref<SpineSkin> SpineSkin::init(const String &name) {
 	return this;
 }
 
-void SpineSkin::set_attachment(uint64_t slot_index, const String &name, Ref<SpineAttachment> attachment) {
+void SpineSkin::set_attachment(int slot_index, const String &name, Ref<SpineAttachment> attachment) {
 	SPINE_CHECK(skin,)
 	skin->setAttachment(slot_index, SPINE_STRING(name), attachment.is_valid() ? attachment->get_spine_object() : nullptr);
 }
 
-Ref<SpineAttachment> SpineSkin::get_attachment(uint64_t slot_index, const String &name) {
+Ref<SpineAttachment> SpineSkin::get_attachment(int slot_index, const String &name) {
 	SPINE_CHECK(skin, nullptr)
 	auto attachment = skin->getAttachment(slot_index, SPINE_STRING(name));
 	if (attachment) return nullptr;
@@ -78,12 +78,12 @@ Ref<SpineAttachment> SpineSkin::get_attachment(uint64_t slot_index, const String
 	return attachment_ref;
 }
 
-void SpineSkin::remove_attachment(uint64_t slot_index, const String &name) {
+void SpineSkin::remove_attachment(int slot_index, const String &name) {
 	SPINE_CHECK(skin,)
 	skin->removeAttachment(slot_index, SPINE_STRING(name));
 }
 
-Array SpineSkin::find_names_for_slot(uint64_t slot_index) {
+Array SpineSkin::find_names_for_slot(int slot_index) {
 	Array result;
 	SPINE_CHECK(skin, result)
 	spine::Vector<spine::String> names;
@@ -95,7 +95,7 @@ Array SpineSkin::find_names_for_slot(uint64_t slot_index) {
 	return result;
 }
 
-Array SpineSkin::find_attachments_for_slot(uint64_t slot_index) {
+Array SpineSkin::find_attachments_for_slot(int slot_index) {
 	Array result;
 	SPINE_CHECK(skin, result)
 	spine::Vector<spine::Attachment *> attachments;

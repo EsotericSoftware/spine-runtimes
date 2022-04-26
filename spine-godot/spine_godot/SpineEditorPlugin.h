@@ -168,8 +168,8 @@ class SpineEditorPropertyAnimationMixes: public EditorProperty {
 
 	static void _bind_methods();
 	void add_mix();
-	void delete_mix(int64_t idx);
-	void update_mix_property(int64_t index);
+	void delete_mix(int idx);
+	void update_mix_property(int index);
 public:
 	SpineEditorPropertyAnimationMixes();
 	void setup(const Ref<SpineSkeletonDataResource> &_skeleton_data) { this->skeleton_data = _skeleton_data; };

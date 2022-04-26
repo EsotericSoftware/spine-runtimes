@@ -52,15 +52,15 @@ public:
 
 	Ref<SpineSkin> init(const String &name);
 
-	void set_attachment(uint64_t slot_index, const String &name, Ref<SpineAttachment> attachment);
+	void set_attachment(int slot_index, const String &name, Ref<SpineAttachment> attachment);
 
-	Ref<SpineAttachment> get_attachment(uint64_t slot_index, const String &name);
+	Ref<SpineAttachment> get_attachment(int slot_index, const String &name);
 
-	void remove_attachment(uint64_t slot_index, const String &name);
+	void remove_attachment(int slot_index, const String &name);
 
-	Array find_names_for_slot(uint64_t slot_index);
+	Array find_names_for_slot(int slot_index);
 
-	Array find_attachments_for_slot(uint64_t slot_index);
+	Array find_attachments_for_slot(int slot_index);
 
 	String get_name();
 

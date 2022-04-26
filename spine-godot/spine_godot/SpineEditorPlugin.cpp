@@ -129,7 +129,7 @@ void SpineEditorPropertyAnimationMixes::add_mix() {
 	emit_changed(get_edited_property(), mixes);
 }
 
-void SpineEditorPropertyAnimationMixes::delete_mix(int64_t idx) {
+void SpineEditorPropertyAnimationMixes::delete_mix(int idx) {
 	if (!skeleton_data.is_valid() || !skeleton_data->is_skeleton_data_loaded() || updating) return;
 
 	auto mixes = skeleton_data->get_animation_mixes().duplicate();
@@ -141,9 +141,9 @@ void SpineEditorPropertyAnimationMixes::delete_mix(int64_t idx) {
 	emit_changed(get_edited_property(), mixes);
 }
 
-void SpineEditorPropertyAnimationMixes::update_mix_property(int64_t index) {
+void SpineEditorPropertyAnimationMixes::update_mix_property(int index) {
 	if (index < 0 || index > mix_properties.size()) return;
-	mix_properties[(int)index]->update_property();
+	mix_properties[index]->update_property();
 }
 
 void SpineEditorPropertyAnimationMixes::update_property() {

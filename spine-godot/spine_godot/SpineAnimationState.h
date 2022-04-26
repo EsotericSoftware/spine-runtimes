@@ -58,19 +58,19 @@ public:
 
 	void clear_tracks();
 
-	void clear_track(uint64_t track_id);
+	void clear_track(int track_id);
 
-	Ref<SpineTrackEntry> set_animation(const String &animation_name, bool loop, uint64_t track_id);
+	Ref<SpineTrackEntry> set_animation(const String &animation_name, bool loop, int track_id);
 
-	Ref<SpineTrackEntry> add_animation(const String &animation_name, float delay, bool loop, uint64_t track_id);
+	Ref<SpineTrackEntry> add_animation(const String &animation_name, float delay, bool loop, int track_id);
 
-	Ref<SpineTrackEntry> set_empty_animation(uint64_t track_id, float mix_duration);
+	Ref<SpineTrackEntry> set_empty_animation(int track_id, float mix_duration);
 
-	Ref<SpineTrackEntry> add_empty_animation(uint64_t track_id, float mix_duration, float delay);
+	Ref<SpineTrackEntry> add_empty_animation(int track_id, float mix_duration, float delay);
 
 	void set_empty_animations(float mix_duration);
 
-	Ref<SpineTrackEntry> get_current(uint64_t track_index);
+	Ref<SpineTrackEntry> get_current(int track_index);
 
 	float get_time_scale();
 
