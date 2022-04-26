@@ -59,18 +59,18 @@ void SpineBoneData::_bind_methods() {
 }
 
 int SpineBoneData::get_index() {
-	SPINE_CHECK(spine_object, 0)
-	return spine_object->getIndex();
+	SPINE_CHECK(get_spine_object(), 0)
+	return get_spine_object()->getIndex();
 }
 
 String SpineBoneData::get_bone_name() {
-	SPINE_CHECK(spine_object, "")
-	return spine_object->getName().buffer();
+	SPINE_CHECK(get_spine_object(), "")
+	return get_spine_object()->getName().buffer();
 }
 
 Ref<SpineBoneData> SpineBoneData::get_parent() {
-	SPINE_CHECK(spine_object, nullptr)
-	auto parent = spine_object->getParent();
+	SPINE_CHECK(get_spine_object(), nullptr)
+	auto parent = get_spine_object()->getParent();
 	if (!parent) return nullptr;
 	Ref<SpineBoneData> parent_ref(memnew(SpineBoneData));
 	parent_ref->set_spine_object(get_spine_owner(), parent);
@@ -78,112 +78,112 @@ Ref<SpineBoneData> SpineBoneData::get_parent() {
 }
 
 float SpineBoneData::get_length() {
-	SPINE_CHECK(spine_object, 0)
-	return spine_object->getLength();
+	SPINE_CHECK(get_spine_object(), 0)
+	return get_spine_object()->getLength();
 }
 
 void SpineBoneData::set_length(float v) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setLength(v);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setLength(v);
 }
 
 float SpineBoneData::get_x() {
-	SPINE_CHECK(spine_object, 0)
-	return spine_object->getX();
+	SPINE_CHECK(get_spine_object(), 0)
+	return get_spine_object()->getX();
 }
 
 void SpineBoneData::set_x(float v) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setX(v);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setX(v);
 }
 
 float SpineBoneData::get_y() {
-	SPINE_CHECK(spine_object, 0)
-	return spine_object->getY();
+	SPINE_CHECK(get_spine_object(), 0)
+	return get_spine_object()->getY();
 }
 
 void SpineBoneData::set_y(float v) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setY(v);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setY(v);
 }
 
 float SpineBoneData::get_rotation() {
-	SPINE_CHECK(spine_object, 0)
-	return spine_object->getRotation();
+	SPINE_CHECK(get_spine_object(), 0)
+	return get_spine_object()->getRotation();
 }
 
 void SpineBoneData::set_rotation(float v) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setRotation(v);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setRotation(v);
 }
 
 float SpineBoneData::get_scale_x() {
-	SPINE_CHECK(spine_object, 0)
-	return spine_object->getScaleX();
+	SPINE_CHECK(get_spine_object(), 0)
+	return get_spine_object()->getScaleX();
 }
 
 void SpineBoneData::set_scale_x(float v) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setScaleX(v);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setScaleX(v);
 }
 
 float SpineBoneData::get_scale_y() {
-	SPINE_CHECK(spine_object, 0)
-	return spine_object->getScaleY();
+	SPINE_CHECK(get_spine_object(), 0)
+	return get_spine_object()->getScaleY();
 }
 
 void SpineBoneData::set_scale_y(float v) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setScaleY(v);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setScaleY(v);
 }
 
 float SpineBoneData::get_shear_x() {
-	SPINE_CHECK(spine_object, 0)
-	return spine_object->getShearX();
+	SPINE_CHECK(get_spine_object(), 0)
+	return get_spine_object()->getShearX();
 }
 
 void SpineBoneData::set_shear_x(float v) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setShearX(v);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setShearX(v);
 }
 
 float SpineBoneData::get_shear_y() {
-	SPINE_CHECK(spine_object, 0)
-	return spine_object->getShearY();
+	SPINE_CHECK(get_spine_object(), 0)
+	return get_spine_object()->getShearY();
 }
 
 void SpineBoneData::set_shear_y(float v) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setShearY(v);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setShearY(v);
 }
 
 SpineConstant::TransformMode SpineBoneData::get_transform_mode() {
-	SPINE_CHECK(spine_object, SpineConstant::TransformMode::TransformMode_Normal)
-	return (SpineConstant::TransformMode) spine_object->getTransformMode();
+	SPINE_CHECK(get_spine_object(), SpineConstant::TransformMode::TransformMode_Normal)
+	return (SpineConstant::TransformMode) get_spine_object()->getTransformMode();
 }
 
 void SpineBoneData::set_transform_mode(SpineConstant::TransformMode v) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setTransformMode((spine::TransformMode) v);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setTransformMode((spine::TransformMode) v);
 }
 
 bool SpineBoneData::is_skin_required() {
-	SPINE_CHECK(spine_object, false)
-	return spine_object->isSkinRequired();
+	SPINE_CHECK(get_spine_object(), false)
+	return get_spine_object()->isSkinRequired();
 }
 
 void SpineBoneData::set_skin_required(bool v) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setSkinRequired(v);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setSkinRequired(v);
 }
 
 Color SpineBoneData::get_color() {
-	SPINE_CHECK(spine_object, Color())
-	auto color = spine_object->getColor();
+	SPINE_CHECK(get_spine_object(), Color())
+	auto color = get_spine_object()->getColor();
 	return Color(color.r, color.g, color.b, color.a);
 }
 
 void SpineBoneData::set_color(Color color) {
-	SPINE_CHECK(spine_object,)
-	spine_object->getColor().set(color.r, color.g, color.b, color.a);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->getColor().set(color.r, color.g, color.b, color.a);
 }

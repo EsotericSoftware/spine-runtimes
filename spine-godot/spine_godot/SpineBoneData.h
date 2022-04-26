@@ -36,7 +36,7 @@
 
 class SpineSkeletonDataResource;
 
-class SpineBoneData : public SpineObjectWrapper<SpineSkeletonDataResource, spine::BoneData> {
+class SpineBoneData : public SpineSkeletonDataResourceOwnedObject<spine::BoneData> {
 	GDCLASS(SpineBoneData, SpineObjectWrapper)
 
 protected:

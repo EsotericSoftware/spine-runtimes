@@ -19,8 +19,21 @@ func test_spine_timeline():
 	assert(timeline.get_property_ids() == [4294967300])
 	assert(timeline.get_type() == "RotateTimeline")
 
+func test_spine_object_invalidation():
+	var skeleton_data = get_skeleton().get_data()
+	var bone_data = skeleton_data.find_bone("gun");
+	var old_bone_data_x = bone_data.get_x();
+	var bone = get_skeleton().find_bone("gun")
+	var old_bone_x = bone.get_x()
+	skeleton_data_res = null
+	assert(old_bone_x != bone.get_x())
+	assert(old_bone_data_x == bone_data.get_x())
+	skeleton_data.atlas_res = null;
+	assert(old_bone_data_x != bone_data.get_x())
+
 func _ready():
 	
 	test_spine_animation()
 	test_spine_timeline()
+	test_spine_object_invalidation()
 	print("All tests passed")

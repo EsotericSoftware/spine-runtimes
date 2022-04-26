@@ -46,26 +46,26 @@ void SpineAnimation::_bind_methods() {
 }
 
 String SpineAnimation::get_name() {
-	SPINE_CHECK(spine_object, "")
-	return spine_object->getName().buffer();
+	SPINE_CHECK(get_spine_object(), "")
+	return get_spine_object()->getName().buffer();
 }
 
 float SpineAnimation::get_duration() {
-	SPINE_CHECK(spine_object, 0)
-	return spine_object->getDuration();
+	SPINE_CHECK(get_spine_object(), 0)
+	return get_spine_object()->getDuration();
 }
 
 void SpineAnimation::set_duration(float duration) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setDuration(duration);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setDuration(duration);
 }
 
 void SpineAnimation::apply(Ref<SpineSkeleton> skeleton, float last_time, float time, bool loop,
                            Array events, float alpha, SpineConstant::MixBlend blend,
                            SpineConstant::MixDirection direction) {
-	SPINE_CHECK(spine_object,)
+	SPINE_CHECK(get_spine_object(),)
 	spine::Vector<spine::Event *> spineEvents;
-	spine_object->apply(*(skeleton->get_spine_object()), last_time, time, loop, &spineEvents, alpha, (spine::MixBlend) blend, (spine::MixDirection) direction);
+	get_spine_object()->apply(*(skeleton->get_spine_object()), last_time, time, loop, &spineEvents, alpha, (spine::MixBlend) blend, (spine::MixDirection) direction);
 	for (int i = 0; i < (int)spineEvents.size(); ++i) {
 		auto event_ref = memnew(SpineEvent);
 		event_ref->set_spine_object(skeleton->get_spine_owner(), spineEvents[i]);
@@ -75,8 +75,8 @@ void SpineAnimation::apply(Ref<SpineSkeleton> skeleton, float last_time, float t
 
 Array SpineAnimation::get_timelines() {
 	Array result;
-	SPINE_CHECK(spine_object, result)
-	auto &timelines = spine_object->getTimelines();
+	SPINE_CHECK(get_spine_object(), result)
+	auto &timelines = get_spine_object()->getTimelines();
 	result.resize((int)timelines.size());
 
 	for (int i = 0; i < (int)result.size(); ++i) {
@@ -88,12 +88,12 @@ Array SpineAnimation::get_timelines() {
 }
 
 bool SpineAnimation::has_timeline(Array ids) {
-	SPINE_CHECK(spine_object, false)
+	SPINE_CHECK(get_spine_object(), false)
 	spine::Vector<spine::PropertyId> property_ids;
 	property_ids.setSize(ids.size(), 0);
 
 	for (int i = 0; i < (int)property_ids.size(); ++i) {
 		property_ids[i] = (spine::PropertyId) ids[i];
 	}
-	return spine_object->hasTimeline(property_ids);
+	return get_spine_object()->hasTimeline(property_ids);
 }

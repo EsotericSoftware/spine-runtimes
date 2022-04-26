@@ -35,7 +35,7 @@
 #include "SpineBone.h"
 #include <spine/TransformConstraint.h>
 
-class SpineTransformConstraint : public SpineObjectWrapper<SpineSprite, spine::TransformConstraint> {
+class SpineTransformConstraint : public SpineSpriteOwnedObject<spine::TransformConstraint> {
 	GDCLASS(SpineTransformConstraint, SpineObjectWrapper)
 
 protected:

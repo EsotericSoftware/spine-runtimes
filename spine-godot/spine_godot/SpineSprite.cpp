@@ -63,6 +63,7 @@ void SpineSprite::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("before_animation_state_apply", PropertyInfo(Variant::OBJECT, "spine_sprite", PROPERTY_HINT_TYPE_STRING, "SpineSprite")));
 	ADD_SIGNAL(MethodInfo("before_world_transforms_change", PropertyInfo(Variant::OBJECT, "spine_sprite", PROPERTY_HINT_TYPE_STRING, "SpineSprite")));
 	ADD_SIGNAL(MethodInfo("world_transforms_changed", PropertyInfo(Variant::OBJECT, "spine_sprite", PROPERTY_HINT_TYPE_STRING, "SpineSprite")));
+	ADD_SIGNAL(MethodInfo("_internal_spine_objects_invalidated"));
 
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skeleton_data_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineSkeletonDataResource"), "set_skeleton_data_res", "get_skeleton_data_res");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "update_mode", PROPERTY_HINT_ENUM, "Process,Physics,Manual"), "set_update_mode", "get_update_mode");
@@ -117,6 +118,8 @@ void SpineSprite::on_skeleton_data_changed() {
 	remove_meshes();
 	skeleton.unref();
 	animation_state.unref();
+
+	emit_signal("_internal_spine_objects_invalidated");
 
 	if (skeleton_data_res.is_valid()) {
 #if VERSION_MAJOR > 3

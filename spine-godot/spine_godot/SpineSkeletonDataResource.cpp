@@ -117,6 +117,7 @@ void SpineSkeletonDataResource::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_fps"), &SpineSkeletonDataResource::get_fps);
 
 	ADD_SIGNAL(MethodInfo("skeleton_data_changed"));
+	ADD_SIGNAL(MethodInfo("_internal_spine_objects_invalidated"));
 
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "atlas_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineAtlasResource"), "set_atlas_res", "get_atlas_res");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skeleton_file_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineSkeletonFileResource"), "set_skeleton_file_res", "get_skeleton_file_res");
@@ -145,6 +146,8 @@ void SpineSkeletonDataResource::update_skeleton_data() {
 		delete animation_state_data;
 		animation_state_data = nullptr;
 	}
+
+	emit_signal("_internal_spine_objects_invalidated");
 
 	if (atlas_res.is_valid() && skeleton_file_res.is_valid()) {
 		load_resources(atlas_res->get_spine_atlas(), skeleton_file_res->get_json(), skeleton_file_res->get_binary());

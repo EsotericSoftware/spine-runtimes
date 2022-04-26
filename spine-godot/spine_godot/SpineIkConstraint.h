@@ -36,7 +36,7 @@
 class SpineBone;
 class SpineSprite;
 
-class SpineIkConstraint : public SpineObjectWrapper<SpineSprite, spine::IkConstraint> {
+class SpineIkConstraint : public SpineSpriteOwnedObject<spine::IkConstraint> {
 	GDCLASS(SpineIkConstraint, SpineObjectWrapper)
 
 protected:

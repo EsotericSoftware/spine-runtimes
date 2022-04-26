@@ -46,30 +46,30 @@ void SpineTimeline::_bind_methods() {
 
 void SpineTimeline::apply(Ref<SpineSkeleton> skeleton, float last_time, float time, Array events, float alpha,
 						  SpineConstant::MixBlend blend, SpineConstant::MixDirection direction) {
-	SPINE_CHECK(spine_object,)
+	SPINE_CHECK(get_spine_object(),)
 	if (!skeleton->get_spine_object()) return;
 	spine::Vector<spine::Event *> spine_events;
 	spine_events.setSize((int)events.size(), nullptr);
 	for (int i = 0; i < events.size(); ++i) {
 		events[i] = ((Ref<SpineEvent>) spine_events[i])->get_spine_object();
 	}
-	spine_object->apply(*(skeleton->get_spine_object()), last_time, time, &spine_events, alpha, (spine::MixBlend) blend, (spine::MixDirection) direction);
+	get_spine_object()->apply(*(skeleton->get_spine_object()), last_time, time, &spine_events, alpha, (spine::MixBlend) blend, (spine::MixDirection) direction);
 }
 
 int SpineTimeline::get_frame_entries() {
-	SPINE_CHECK(spine_object, 0)
-	return (int)spine_object->getFrameEntries();
+	SPINE_CHECK(get_spine_object(), 0)
+	return (int)get_spine_object()->getFrameEntries();
 }
 
 int SpineTimeline::get_frame_count() {
-	SPINE_CHECK(spine_object, 0)
-	return (int)spine_object->getFrameCount();
+	SPINE_CHECK(get_spine_object(), 0)
+	return (int)get_spine_object()->getFrameCount();
 }
 
 Array SpineTimeline::get_frames() {
 	Array result;
-	SPINE_CHECK(spine_object, result)
-	auto &frames = spine_object->getFrames();
+	SPINE_CHECK(get_spine_object(), result)
+	auto &frames = get_spine_object()->getFrames();
 	result.resize((int)frames.size());
 	for (int i = 0; i < result.size(); ++i) {
 		result[i] = frames[i];
@@ -78,14 +78,14 @@ Array SpineTimeline::get_frames() {
 }
 
 float SpineTimeline::get_duration() {
-	SPINE_CHECK(spine_object, 0)
-	return spine_object->getDuration();
+	SPINE_CHECK(get_spine_object(), 0)
+	return get_spine_object()->getDuration();
 }
 
 Array SpineTimeline::get_property_ids() {
 	Array result;
-	SPINE_CHECK(spine_object, result)
-	auto &ids = spine_object->getPropertyIds();
+	SPINE_CHECK(get_spine_object(), result)
+	auto &ids = get_spine_object()->getPropertyIds();
 	result.resize((int)ids.size());
 	for (int i = 0; i < result.size(); ++i) {
 		result[i] = (spine::PropertyId) ids[i];
@@ -94,6 +94,6 @@ Array SpineTimeline::get_property_ids() {
 }
 
 String SpineTimeline::get_type() {
-	SPINE_CHECK(spine_object, "")
-	return spine_object->getRTTI().getClassName();
+	SPINE_CHECK(get_spine_object(), "")
+	return get_spine_object()->getRTTI().getClassName();
 }

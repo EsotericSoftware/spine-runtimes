@@ -39,7 +39,7 @@ class SpineSkeleton;
 class SpineTimeline;
 class SpineSkeletonDataResource;
 
-class SpineAnimation : public SpineObjectWrapper<SpineSkeletonDataResource, spine::Animation> {
+class SpineAnimation : public SpineSkeletonDataResourceOwnedObject<spine::Animation> {
 	GDCLASS(SpineAnimation, SpineObjectWrapper)
 
 protected:

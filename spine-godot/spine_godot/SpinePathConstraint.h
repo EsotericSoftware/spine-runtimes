@@ -34,7 +34,7 @@
 #include "SpineSlot.h"
 #include <spine/PathConstraint.h>
 
-class SpinePathConstraint : public SpineObjectWrapper<SpineSprite, spine::PathConstraint> {
+class SpinePathConstraint : public SpineSpriteOwnedObject<spine::PathConstraint> {
 	GDCLASS(SpinePathConstraint, SpineObjectWrapper)
 
 protected:

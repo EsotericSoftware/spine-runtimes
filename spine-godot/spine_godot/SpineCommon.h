@@ -52,8 +52,6 @@
 #define VARIANT_FLOAT Variant::REAL
 #endif
 
-#include "SpineObjectWrapper.h"
-
 #define SPINE_CHECK(obj, ret) \
  if (!(obj)) { \
   ERR_PRINT("Native Spine object not set."); \
@@ -61,5 +59,82 @@
  }
 
 #define SPINE_STRING(x) spine::String((x).utf8())
+
+// Can't do template classes with Godot's object model :(
+class SpineObjectWrapper : public REFCOUNTED {
+	GDCLASS(SpineObjectWrapper, REFCOUNTED)
+	
+	Object* spine_owner;
+	void* spine_object;
+
+protected:
+	static void _bind_methods() {
+		ClassDB::bind_method(D_METHOD("_internal_spine_objects_invalidated"), &SpineObjectWrapper::spine_objects_invalidated);
+	}
+
+	void spine_objects_invalidated() {
+		spine_object = nullptr;
+		spine_owner->disconnect("_internal_spine_objects_invalidated", this, "_internal_spine_objects_invalidated");
+	}
+	
+	SpineObjectWrapper(): spine_owner(nullptr), spine_object(nullptr) {
+	}
+	
+	template <typename OWNER, typename OBJECT> void _set_spine_object_internal(const OWNER* _owner, OBJECT* _object) {
+		if (spine_owner) {
+			ERR_PRINT("Owner already set.");
+			return;
+		}
+		if (spine_object) {
+			ERR_PRINT("Object already set.");
+			return;
+		}
+		if (!_owner) {
+			ERR_PRINT("Owner must not be null.");
+			return;
+		}
+
+		spine_owner = (Object*)_owner;
+		spine_object = _object;
+		spine_owner->connect("_internal_spine_objects_invalidated", this, "_internal_spine_objects_invalidated");
+	}
+
+	void *_get_spine_object_internal() { return spine_object; }
+	void *_get_spine_owner_internal() { return spine_owner; }
+};
+
+class SpineSprite;
+
+template <typename OBJECT> class SpineSpriteOwnedObject: public SpineObjectWrapper {
+public:
+	void set_spine_object(const SpineSprite* _owner, OBJECT* _object) {
+		_set_spine_object_internal(_owner, _object);
+	}
+	
+	OBJECT *get_spine_object() {
+		return (OBJECT*)_get_spine_object_internal();
+	}
+
+	SpineSprite *get_spine_owner() {
+		return (SpineSprite*)_get_spine_owner_internal();
+	}
+};
+
+class SpineSkeletonDataResource;
+
+template <typename OBJECT> class SpineSkeletonDataResourceOwnedObject: public SpineObjectWrapper {
+public:
+	void set_spine_object(const SpineSkeletonDataResource* _owner, OBJECT* _object) {
+		_set_spine_object_internal(_owner, _object);
+	}
+	
+	OBJECT *get_spine_object() {
+		return (OBJECT*)_get_spine_object_internal();
+	}
+
+	SpineSkeletonDataResource *get_spine_owner() {
+		return (SpineSkeletonDataResource*)_get_spine_owner_internal();
+	}
+};
 
 #endif

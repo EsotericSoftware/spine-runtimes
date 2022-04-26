@@ -38,7 +38,7 @@
 class SpineSkeleton;
 class SpineSprite;
 
-class SpineSlot : public SpineObjectWrapper<SpineSprite, spine::Slot> {
+class SpineSlot : public SpineSpriteOwnedObject<spine::Slot> {
 	GDCLASS(SpineSlot, SpineObjectWrapper)
 
 protected:

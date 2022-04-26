@@ -36,17 +36,17 @@ void SpineAttachment::_bind_methods() {
 }
 
 SpineAttachment::~SpineAttachment() {
-	if (spine_object) spine_object->dereference();
+	if (get_spine_object()) get_spine_object()->dereference();
 }
 
 String SpineAttachment::get_attachment_name() {
-	SPINE_CHECK(spine_object, "")
-	return spine_object->getName().buffer();
+	SPINE_CHECK(get_spine_object(), "")
+	return get_spine_object()->getName().buffer();
 }
 
 Ref<SpineAttachment> SpineAttachment::copy() {
-	SPINE_CHECK(spine_object, nullptr)
-	auto copy = spine_object->copy();
+	SPINE_CHECK(get_spine_object(), nullptr)
+	auto copy = get_spine_object()->copy();
 	if (!copy) return nullptr;
 	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
 	attachment_ref->set_spine_object(get_spine_owner(), copy);

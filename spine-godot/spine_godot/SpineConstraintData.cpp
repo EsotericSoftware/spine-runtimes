@@ -40,26 +40,26 @@ void SpineConstraintData::_bind_methods() {
 }
 
 String SpineConstraintData::get_constraint_name() {
-	SPINE_CHECK(spine_object, "")
-	return spine_object->getName().buffer();
+	SPINE_CHECK(get_spine_object(), "")
+	return get_spine_object()->getName().buffer();
 }
 
 int SpineConstraintData::get_order() {
-	SPINE_CHECK(spine_object, 0)
-	return (int)spine_object->getOrder();
+	SPINE_CHECK(get_spine_object(), 0)
+	return (int)get_spine_object()->getOrder();
 }
 
 void SpineConstraintData::set_order(int v) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setOrder(v);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setOrder(v);
 }
 
 bool SpineConstraintData::is_skin_required() {
-	SPINE_CHECK(spine_object, false)
-	return spine_object->isSkinRequired();
+	SPINE_CHECK(get_spine_object(), false)
+	return get_spine_object()->isSkinRequired();
 }
 
 void SpineConstraintData::set_skin_required(bool v) {
-	SPINE_CHECK(spine_object,)
-	spine_object->setSkinRequired(v);
+	SPINE_CHECK(get_spine_object(),)
+	get_spine_object()->setSkinRequired(v);
 }
