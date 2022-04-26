@@ -52,6 +52,8 @@
 #define VARIANT_FLOAT Variant::REAL
 #endif
 
+#include "SpineObjectWrapper.h"
+
 #define SPINE_CHECK(obj, ret) \
  if (!(obj)) { \
   ERR_PRINT("Native Spine object not set."); \

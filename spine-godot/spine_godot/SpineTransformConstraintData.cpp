@@ -54,9 +54,9 @@ Array SpineTransformConstraintData::get_bones() {
 	SPINE_CHECK(get_spine_constraint_data(), result)
 	auto bones = get_spine_constraint_data()->getBones();
 	result.resize((int)bones.size());
-	for (int i = 0; i < bones.size(); ++i) {
+	for (int i = 0; i < (int)bones.size(); ++i) {
 		Ref<SpineBoneData> bone_ref(memnew(SpineBoneData));
-		bone_ref->set_spine_object(bones[i]);
+		bone_ref->set_spine_object(get_spine_owner(), bones[i]);
 		result[i] = bone_ref;
 	}
 	return result;
@@ -67,7 +67,7 @@ Ref<SpineBoneData> SpineTransformConstraintData::get_target() {
 	auto bone = get_spine_constraint_data()->getTarget();
 	if (!bone) return nullptr;
 	Ref<SpineBoneData> slot_ref(memnew(SpineBoneData));
-	slot_ref->set_spine_object(bone);
+	slot_ref->set_spine_object(get_spine_owner(), bone);
 	return slot_ref;
 }
 

@@ -55,18 +55,13 @@ class SpineSkeleton : public REFCOUNTED {
 protected:
 	static void _bind_methods();
 
-	void set_skeleton_data_res(Ref<SpineSkeletonDataResource> data_res);
-	Ref<SpineSkeletonDataResource> get_skeleton_data_res() const;
-
-	void set_spine_object(SpineSprite *_sprite, spine::Skeleton *_skeleton) { sprite = _sprite; skeleton = _skeleton; }
+	void set_spine_sprite(SpineSprite *sprite);
 	spine::Skeleton *get_spine_object() { return skeleton; }
-	void set_spine_sprite(SpineSprite *_sprite) { sprite = _sprite; }
-	SpineSprite *get_spine_sprite() { return sprite; }
+	Ref<SpineSkeletonDataResource> get_skeleton_data_res() const;
 
 private:
 	spine::Skeleton *skeleton;
 	SpineSprite *sprite;
-	Ref<SpineSkeletonDataResource> skeleton_data_res;
 	spine::Vector<float> bounds_vertex_buffer;
 
 public:

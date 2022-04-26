@@ -30,6 +30,7 @@
 #include "SpinePathConstraint.h"
 #include "SpineBone.h"
 #include "SpineCommon.h"
+#include "SpineSprite.h"
 
 void SpinePathConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update"), &SpinePathConstraint::update);
@@ -52,111 +53,108 @@ void SpinePathConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_active", "v"), &SpinePathConstraint::set_active);
 }
 
-SpinePathConstraint::SpinePathConstraint() : path_constraint(nullptr), sprite(nullptr) {
-}
-
 void SpinePathConstraint::update() {
-	SPINE_CHECK(path_constraint,)
-	path_constraint->update();
+	SPINE_CHECK(spine_object,)
+	spine_object->update();
 }
 
 int SpinePathConstraint::get_order() {
-	SPINE_CHECK(path_constraint, 0)
-	return path_constraint->getOrder();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getOrder();
 }
 
 float SpinePathConstraint::get_position() {
-	SPINE_CHECK(path_constraint, 0)
-	return path_constraint->getPosition();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getPosition();
 }
 
 void SpinePathConstraint::set_position(float v) {
-	SPINE_CHECK(path_constraint,)
-	path_constraint->setPosition(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setPosition(v);
 }
 
 float SpinePathConstraint::get_spacing() {
-	SPINE_CHECK(path_constraint, 0)
-	return path_constraint->getSpacing();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getSpacing();
 }
 
 void SpinePathConstraint::set_spacing(float v) {
-	SPINE_CHECK(path_constraint,)
-	path_constraint->setSpacing(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setSpacing(v);
 }
 
 float SpinePathConstraint::get_mix_rotate() {
-	SPINE_CHECK(path_constraint, 0)
-	return path_constraint->getMixRotate();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getMixRotate();
 }
 
 void SpinePathConstraint::set_mix_rotate(float v) {
-	SPINE_CHECK(path_constraint,)
-	path_constraint->setMixRotate(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setMixRotate(v);
 }
 
 float SpinePathConstraint::get_mix_x() {
-	SPINE_CHECK(path_constraint, 0)
-	return path_constraint->getMixX();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getMixX();
 }
 
 void SpinePathConstraint::set_mix_x(float v) {
-	SPINE_CHECK(path_constraint,)
-	path_constraint->setMixX(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setMixX(v);
 }
 
 float SpinePathConstraint::get_mix_y() {
-	SPINE_CHECK(path_constraint, 0)
-	return path_constraint->getMixY();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getMixY();
 }
 
 void SpinePathConstraint::set_mix_y(float v) {
-	SPINE_CHECK(path_constraint,)
-	path_constraint->setMixY(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setMixY(v);
 }
 
 Array SpinePathConstraint::get_bones() {
 	Array result;
-	SPINE_CHECK(path_constraint, result)
-	auto &bones = path_constraint->getBones();
+	SPINE_CHECK(spine_object, result)
+	auto &bones = spine_object->getBones();
 	result.resize((int)bones.size());
 	for (int i = 0; i < bones.size(); ++i) {
 		auto bone = bones[i];
 		Ref<SpineBone> bone_ref(memnew(SpineBone));
-		bone_ref->set_spine_object(sprite, bone);
+		bone_ref->set_spine_object(get_spine_owner(), bone);
 		result[i] = bone_ref;
 	}
 	return result;
 }
 
 Ref<SpineSlot> SpinePathConstraint::get_target() {
-	SPINE_CHECK(path_constraint, nullptr)
-	auto target = path_constraint->getTarget();
+	SPINE_CHECK(spine_object, nullptr)
+	auto target = spine_object->getTarget();
 	if (!target) return nullptr;
 	Ref<SpineSlot> target_ref(memnew(SpineSlot));
-	target_ref->set_spine_object(sprite, target);
+	target_ref->set_spine_object(get_spine_owner(), target);
 	return target_ref;
 }
 
 void SpinePathConstraint::set_target(Ref<SpineSlot> v) {
-	SPINE_CHECK(path_constraint,)
-	path_constraint->setTarget(v.is_valid() ? v->get_spine_object() : nullptr);
+	SPINE_CHECK(spine_object,)
+	spine_object->setTarget(v.is_valid() ? v->get_spine_object() : nullptr);
 }
 
 Ref<SpinePathConstraintData> SpinePathConstraint::get_data() {
-	SPINE_CHECK(path_constraint, nullptr)
-	auto &data = path_constraint->getData();
+	SPINE_CHECK(spine_object, nullptr)
+	auto &data = spine_object->getData();
 	Ref<SpinePathConstraintData> data_ref(memnew(SpinePathConstraintData));
-	data_ref->set_spine_object(&data);
+	data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &data);
 	return data_ref;
 }
 
 bool SpinePathConstraint::is_active() {
-	SPINE_CHECK(path_constraint, false)
-	return path_constraint->isActive();
+	SPINE_CHECK(spine_object, false)
+	return spine_object->isActive();
 }
 
 void SpinePathConstraint::set_active(bool v) {
-	SPINE_CHECK(path_constraint,)
-	path_constraint->setActive(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setActive(v);
 }

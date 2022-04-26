@@ -93,6 +93,8 @@ public:
 
 	void set_update_mode(UpdateMode v);
 
+	Ref<SpineSkin> new_skin(const String &name);
+
 #ifdef TOOLS_ENABLED
 	virtual Rect2 _edit_get_rect() const;
 	virtual bool _edit_use_rect() const;

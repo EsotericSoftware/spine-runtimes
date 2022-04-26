@@ -50,6 +50,7 @@ SpineTimeline::SpineTimeline() : timeline(nullptr) {
 void SpineTimeline::apply(Ref<SpineSkeleton> skeleton, float last_time, float time, Array events, float alpha,
 						  SpineConstant::MixBlend blend, SpineConstant::MixDirection direction) {
 	SPINE_CHECK(timeline,)
+	if (!skeleton->get_spine_object()) return;
 	spine::Vector<spine::Event *> spine_events;
 	spine_events.setSize((int)events.size(), nullptr);
 	for (int i = 0; i < events.size(); ++i) {

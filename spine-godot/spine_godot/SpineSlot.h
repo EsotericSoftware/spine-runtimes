@@ -37,31 +37,20 @@
 
 // Breaks cyclic dependency.
 class SpineSkeleton;
+class SpineSprite;
 
-class SpineSlot : public REFCOUNTED {
-	GDCLASS(SpineSlot, REFCOUNTED);
+class SpineSlot : public REFCOUNTED, public SpineObjectWrapper<SpineSprite, spine::Slot> {
+	GDCLASS(SpineSlot, REFCOUNTED)
 
 protected:
 	static void _bind_methods();
 
-private:
-	spine::Slot *slot;
-	SpineSprite *sprite;
-
 public:
-	SpineSlot();
-
-	void set_spine_object(SpineSprite *_sprite, spine::Slot *_slot) { sprite = _sprite; slot = _slot; }
-	spine::Slot *get_spine_object() { return slot; }
-	SpineSprite *get_spine_sprite() { return sprite; }
-
 	void set_to_setup_pose();
 
 	Ref<SpineSlotData> get_data();
 
 	Ref<SpineBone> get_bone();
-
-	Ref<SpineSkeleton> get_skeleton();
 
 	Color get_color();
 

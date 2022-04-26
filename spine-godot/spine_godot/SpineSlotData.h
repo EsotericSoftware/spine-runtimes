@@ -34,21 +34,15 @@
 #include "SpineBoneData.h"
 #include <spine/SlotData.h>
 
-class SpineSlotData : public REFCOUNTED {
-	GDCLASS(SpineSlotData, REFCOUNTED);
+class SpineSkeletonDataResource;
+
+class SpineSlotData : public REFCOUNTED, public SpineObjectWrapper<SpineSkeletonDataResource, spine::SlotData> {
+	GDCLASS(SpineSlotData, REFCOUNTED)
 
 protected:
 	static void _bind_methods();
 
-private:
-	spine::SlotData *slot_data;
-
 public:
-	SpineSlotData();
-
-	void set_spine_object(spine::SlotData *s) { slot_data = s; }
-	spine::SlotData *get_spine_object() { return slot_data; }
-
 	int get_index();
 
 	String get_name();

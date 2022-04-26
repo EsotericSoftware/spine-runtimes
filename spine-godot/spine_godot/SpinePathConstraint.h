@@ -34,23 +34,13 @@
 #include "SpineSlot.h"
 #include <spine/PathConstraint.h>
 
-class SpinePathConstraint : public REFCOUNTED {
+class SpinePathConstraint : public REFCOUNTED, public SpineObjectWrapper<SpineSprite, spine::PathConstraint> {
 	GDCLASS(SpinePathConstraint, REFCOUNTED);
 
 protected:
 	static void _bind_methods();
 
-private:
-	spine::PathConstraint *path_constraint;
-	SpineSprite *sprite;
-
 public:
-	SpinePathConstraint();
-
-	void set_spine_object(SpineSprite *_sprite, spine::PathConstraint *_path_constraint) { sprite = _sprite; path_constraint = _path_constraint; }
-	spine::PathConstraint *get_spine_object() { return path_constraint; }
-	SpineSprite *get_spine_sprite() { return sprite; }
-
 	void update();
 
 	int get_order();

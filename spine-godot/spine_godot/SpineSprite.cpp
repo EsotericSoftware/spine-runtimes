@@ -129,11 +129,10 @@ void SpineSprite::on_skeleton_data_changed() {
 
 	if (skeleton_data_res.is_valid() && skeleton_data_res->is_skeleton_data_loaded()) {
 		skeleton = Ref<SpineSkeleton>(memnew(SpineSkeleton));
-		skeleton->set_skeleton_data_res(skeleton_data_res);
 		skeleton->set_spine_sprite(this);
 
 		animation_state = Ref<SpineAnimationState>(memnew(SpineAnimationState));
-		animation_state->set_skeleton_data_res(skeleton_data_res);
+		animation_state->set_spine_sprite(this);
 		if (animation_state->get_spine_object()) animation_state->get_spine_object()->setListener(this);
 
 		animation_state->update(0);
@@ -452,7 +451,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton) {
 
 void SpineSprite::callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event) {
 	Ref<SpineTrackEntry> entry_ref = Ref<SpineTrackEntry>(memnew(SpineTrackEntry));
-	entry_ref->set_spine_object(entry);
+	entry_ref->set_spine_object(this,  entry);
 	
 	Ref<SpineEvent> event_ref(nullptr);
 	if (event) {
@@ -509,6 +508,12 @@ void SpineSprite::set_update_mode(SpineSprite::UpdateMode v) {
 	update_mode = v;
 	set_process_internal(update_mode == UpdateMode_Process);
 	set_physics_process_internal(update_mode == UpdateMode_Physics);
+}
+
+Ref<SpineSkin> SpineSprite::new_skin(const String& name) {
+	auto skin = memnew(SpineSkin);
+	skin->init(name, this);
+	return skin;
 }
 
 #ifdef TOOLS_ENABLED

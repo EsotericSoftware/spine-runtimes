@@ -45,31 +45,28 @@ void SpineAnimation::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("has_timeline", "ids"), &SpineAnimation::has_timeline);
 }
 
-SpineAnimation::SpineAnimation() : animation(nullptr) {
-}
-
 String SpineAnimation::get_name() {
-	SPINE_CHECK(animation, "")
-	return animation->getName().buffer();
+	SPINE_CHECK(spine_object, "")
+	return spine_object->getName().buffer();
 }
 
 float SpineAnimation::get_duration() {
-	SPINE_CHECK(animation, 0)
-	return animation->getDuration();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getDuration();
 }
 
 void SpineAnimation::set_duration(float duration) {
-	SPINE_CHECK(animation,)
-	animation->setDuration(duration);
+	SPINE_CHECK(spine_object,)
+	spine_object->setDuration(duration);
 }
 
 void SpineAnimation::apply(Ref<SpineSkeleton> skeleton, float last_time, float time, bool loop,
                            Array events, float alpha, SpineConstant::MixBlend blend,
                            SpineConstant::MixDirection direction) {
-	SPINE_CHECK(animation,)
+	SPINE_CHECK(spine_object,)
 	spine::Vector<spine::Event *> spineEvents;
-	animation->apply(*(skeleton->get_spine_object()), last_time, time, loop, &spineEvents, alpha, (spine::MixBlend) blend, (spine::MixDirection) direction);
-	for (int i = 0; i < spineEvents.size(); ++i) {
+	spine_object->apply(*(skeleton->get_spine_object()), last_time, time, loop, &spineEvents, alpha, (spine::MixBlend) blend, (spine::MixDirection) direction);
+	for (int i = 0; i < (int)spineEvents.size(); ++i) {
 		auto event_ref = memnew(SpineEvent);
 		event_ref->set_spine_object(spineEvents[i]);
 		events.append(event_ref);
@@ -78,11 +75,11 @@ void SpineAnimation::apply(Ref<SpineSkeleton> skeleton, float last_time, float t
 
 Array SpineAnimation::get_timelines() {
 	Array result;
-	SPINE_CHECK(animation, result)
-	auto &timelines = animation->getTimelines();
+	SPINE_CHECK(spine_object, result)
+	auto &timelines = spine_object->getTimelines();
 	result.resize((int)timelines.size());
 
-	for (int i = 0; i < result.size(); ++i) {
+	for (int i = 0; i < (int)result.size(); ++i) {
 		auto timeline_ref = Ref<SpineTimeline>(memnew(SpineTimeline));
 		timeline_ref->set_spine_object(timelines[i]);
 		result.set(i, timeline_ref);
@@ -91,12 +88,12 @@ Array SpineAnimation::get_timelines() {
 }
 
 bool SpineAnimation::has_timeline(Array ids) {
-	SPINE_CHECK(animation, false)
+	SPINE_CHECK(spine_object, false)
 	spine::Vector<spine::PropertyId> property_ids;
 	property_ids.setSize(ids.size(), 0);
 
-	for (int i = 0; i < property_ids.size(); ++i) {
+	for (int i = 0; i < (int)property_ids.size(); ++i) {
 		property_ids[i] = (spine::PropertyId) ids[i];
 	}
-	return animation->hasTimeline(property_ids);
+	return spine_object->hasTimeline(property_ids);
 }

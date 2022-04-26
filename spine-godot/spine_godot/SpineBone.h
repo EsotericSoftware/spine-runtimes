@@ -38,23 +38,13 @@
 class SpineSkeleton;
 class SpineSprite;
 
-class SpineBone : public REFCOUNTED {
+class SpineBone : public REFCOUNTED, public SpineObjectWrapper<SpineSprite, spine::Bone> {
 	GDCLASS(SpineBone, REFCOUNTED)
 
 protected:
 	static void _bind_methods();
 
-private:
-	spine::Bone *bone;
-	SpineSprite *sprite;
-
 public:
-	SpineBone();
-
-	void set_spine_object(SpineSprite *_sprite, spine::Bone *_bone) { sprite = _sprite; bone = _bone; }
-	spine::Bone *get_spine_object() { return bone; }
-	SpineSprite *get_spine_sprite() { return sprite; }
-
 	void update_world_transform();
 
 	void set_to_setup_pose();
@@ -74,8 +64,6 @@ public:
 	float get_world_to_local_rotation_y();
 
 	Ref<SpineBoneData> get_data();
-
-	Ref<SpineSkeleton> get_skeleton();
 
 	Ref<SpineBone> get_parent();
 

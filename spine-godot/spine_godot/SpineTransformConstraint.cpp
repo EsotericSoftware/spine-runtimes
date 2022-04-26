@@ -29,6 +29,7 @@
 
 #include "SpineTransformConstraint.h"
 #include "SpineCommon.h"
+#include "SpineSprite.h"
 
 void SpineTransformConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("update"), &SpineTransformConstraint::update);
@@ -52,121 +53,118 @@ void SpineTransformConstraint::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_active", "v"), &SpineTransformConstraint::set_active);
 }
 
-SpineTransformConstraint::SpineTransformConstraint() : transform_constraint(nullptr), sprite(nullptr) {
-}
-
 void SpineTransformConstraint::update() {
-	SPINE_CHECK(transform_constraint,)
-	transform_constraint->update();
+	SPINE_CHECK(spine_object,)
+	spine_object->update();
 }
 
 int SpineTransformConstraint::get_order() {
-	SPINE_CHECK(transform_constraint, 0)
-	return transform_constraint->getOrder();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getOrder();
 }
 
 Ref<SpineTransformConstraintData> SpineTransformConstraint::get_data() {
-	SPINE_CHECK(transform_constraint, nullptr)
-	auto &data = transform_constraint->getData();
+	SPINE_CHECK(spine_object, nullptr)
+	auto &data = spine_object->getData();
 	Ref<SpineTransformConstraintData> data_ref(memnew(SpineTransformConstraintData));
-	data_ref->set_spine_object(&data);
+	data_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), &data);
 	return data_ref;
 }
 
 Array SpineTransformConstraint::get_bones() {
 	Array result;
-	SPINE_CHECK(transform_constraint, result)
-	auto &bones = transform_constraint->getBones();
+	SPINE_CHECK(spine_object, result)
+	auto &bones = spine_object->getBones();
 	result.resize((int)bones.size());
 	for (int i = 0; i < bones.size(); ++i) {
 		auto bone = bones[i];
 		Ref<SpineBone> bone_ref(memnew(SpineBone));
-		bone_ref->set_spine_object(sprite, bone);
+		bone_ref->set_spine_object(get_spine_owner(), bone);
 		result[i] = bone_ref;
 	}
 	return result;
 }
 
 Ref<SpineBone> SpineTransformConstraint::get_target() {
-	SPINE_CHECK(transform_constraint, nullptr)
-	auto target = transform_constraint->getTarget();
+	SPINE_CHECK(spine_object, nullptr)
+	auto target = spine_object->getTarget();
 	if (!target) return nullptr;
 	Ref<SpineBone> target_ref(memnew(SpineBone));
-	target_ref->set_spine_object(sprite, target);
+	target_ref->set_spine_object(get_spine_owner(), target);
 	return target_ref;
 }
 
 void SpineTransformConstraint::set_target(Ref<SpineBone> v) {
-	SPINE_CHECK(transform_constraint,)
-	transform_constraint->setTarget(v.is_valid() ? v->get_spine_object() : nullptr);
+	SPINE_CHECK(spine_object,)
+	spine_object->setTarget(v.is_valid() ? v->get_spine_object() : nullptr);
 }
 
 float SpineTransformConstraint::get_mix_rotate() {
-	SPINE_CHECK(transform_constraint, 0)
-	return transform_constraint->getMixRotate();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getMixRotate();
 }
 
 void SpineTransformConstraint::set_mix_rotate(float v) {
-	SPINE_CHECK(transform_constraint,)
-	transform_constraint->setMixRotate(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setMixRotate(v);
 }
 
 float SpineTransformConstraint::get_mix_x() {
-	SPINE_CHECK(transform_constraint, 0)
-	return transform_constraint->getMixX();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getMixX();
 }
 
 void SpineTransformConstraint::set_mix_x(float v) {
-	SPINE_CHECK(transform_constraint,)
-	transform_constraint->setMixX(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setMixX(v);
 }
 
 float SpineTransformConstraint::get_mix_y() {
-	SPINE_CHECK(transform_constraint, 0)
-	return transform_constraint->getMixY();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getMixY();
 }
 
 void SpineTransformConstraint::set_mix_y(float v) {
-	SPINE_CHECK(transform_constraint,)
-	transform_constraint->setMixY(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setMixY(v);
 }
 
 float SpineTransformConstraint::get_mix_scale_x() {
-	SPINE_CHECK(transform_constraint, 0)
-	return transform_constraint->getMixScaleX();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getMixScaleX();
 }
 
 void SpineTransformConstraint::set_mix_scale_x(float v) {
-	SPINE_CHECK(transform_constraint,)
-	transform_constraint->setMixScaleX(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setMixScaleX(v);
 }
 
 float SpineTransformConstraint::get_mix_scale_y() {
-	SPINE_CHECK(transform_constraint, 0)
-	return transform_constraint->getMixScaleY();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getMixScaleY();
 }
 
 void SpineTransformConstraint::set_mix_scale_y(float v) {
-	SPINE_CHECK(transform_constraint,)
-	transform_constraint->setMixScaleY(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setMixScaleY(v);
 }
 
 float SpineTransformConstraint::get_mix_shear_y() {
-	SPINE_CHECK(transform_constraint, 0)
-	return transform_constraint->getMixShearY();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getMixShearY();
 }
 
 void SpineTransformConstraint::set_mix_shear_y(float v) {
-	SPINE_CHECK(transform_constraint,)
-	transform_constraint->setMixShearY(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setMixShearY(v);
 }
 
 bool SpineTransformConstraint::is_active() {
-	SPINE_CHECK(transform_constraint, false)
-	return transform_constraint->isActive();
+	SPINE_CHECK(spine_object, false)
+	return spine_object->isActive();
 }
 
 void SpineTransformConstraint::set_active(bool v) {
-	SPINE_CHECK(transform_constraint,)
-	transform_constraint->setActive(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setActive(v);
 }

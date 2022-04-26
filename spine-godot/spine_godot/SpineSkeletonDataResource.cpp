@@ -285,7 +285,7 @@ Ref<SpineAnimation> SpineSkeletonDataResource::find_animation(const String &anim
 	auto animation = skeleton_data->findAnimation(SPINE_STRING(animation_name));
 	if (!animation) return nullptr;
 	Ref<SpineAnimation> animation_ref(memnew(SpineAnimation));
-	animation_ref->set_spine_object(animation);
+	animation_ref->set_spine_object(this, animation);
 	return animation_ref;
 }
 
@@ -295,7 +295,7 @@ Ref<SpineBoneData> SpineSkeletonDataResource::find_bone(const String &bone_name)
 	auto bone = skeleton_data->findBone(SPINE_STRING(bone_name));
 	if (!bone) return nullptr;
 	Ref<SpineBoneData> bone_ref(memnew(SpineBoneData));
-	bone_ref->set_spine_object(bone);
+	bone_ref->set_spine_object(this, bone);
 	return bone_ref;
 }
 
@@ -305,7 +305,7 @@ Ref<SpineSlotData> SpineSkeletonDataResource::find_slot(const String &slot_name)
 	auto slot = skeleton_data->findSlot(SPINE_STRING(slot_name));
 	if (!slot) return nullptr;
 	Ref<SpineSlotData> slot_ref(memnew(SpineSlotData));
-	slot_ref->set_spine_object(slot);
+	slot_ref->set_spine_object(this, slot);
 	return slot_ref;
 }
 
@@ -315,7 +315,7 @@ Ref<SpineSkin> SpineSkeletonDataResource::find_skin(const String &skin_name) con
 	auto skin = skeleton_data->findSkin(SPINE_STRING(skin_name));
 	if (!skin) return nullptr;
 	Ref<SpineSkin> skin_ref(memnew(SpineSkin));
-	skin_ref->set_spine_object(skin);
+	skin_ref->set_spine_object(this, skin);
 	return skin_ref;
 }
 
@@ -335,7 +335,7 @@ Ref<SpineIkConstraintData> SpineSkeletonDataResource::find_ik_constraint(const S
 	auto constraint = skeleton_data->findIkConstraint(SPINE_STRING(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpineIkConstraintData> constraint_ref(memnew(SpineIkConstraintData));
-	constraint_ref->set_spine_object(constraint);
+	constraint_ref->set_spine_object(this, constraint);
 	return constraint_ref;
 }
 
@@ -345,7 +345,7 @@ Ref<SpineTransformConstraintData> SpineSkeletonDataResource::find_transform_cons
 	auto constraint = skeleton_data->findTransformConstraint(SPINE_STRING(constraint_name));
 	if (!constraint) return nullptr;
 	Ref<SpineTransformConstraintData> constraint_ref(memnew(SpineTransformConstraintData));
-	constraint_ref->set_spine_object(constraint);
+	constraint_ref->set_spine_object(this, constraint);
 	return constraint_ref;
 }
 Ref<SpinePathConstraintData> SpineSkeletonDataResource::find_path_constraint(const String &constraint_name) const {
@@ -354,7 +354,7 @@ Ref<SpinePathConstraintData> SpineSkeletonDataResource::find_path_constraint(con
 	auto constraint = skeleton_data->findPathConstraint(SPINE_STRING(constraint_name));
 	if (constraint == nullptr) return nullptr;
 	Ref<SpinePathConstraintData> constraint_ref(memnew(SpinePathConstraintData));
-	constraint_ref->set_spine_object(constraint);
+	constraint_ref->set_spine_object(this, constraint);
 	return constraint_ref;
 }
 
@@ -370,7 +370,7 @@ Array SpineSkeletonDataResource::get_bones() const {
 	result.resize((int)bones.size());
 	for (int i = 0; i < bones.size(); ++i) {
 		Ref<SpineBoneData> bone_ref(memnew(SpineBoneData));
-		bone_ref->set_spine_object(bones[i]);
+		bone_ref->set_spine_object(this, bones[i]);
 		result[i] = bone_ref;
 	}
 	return result;
@@ -383,7 +383,7 @@ Array SpineSkeletonDataResource::get_slots() const {
 	result.resize((int)slots.size());
 	for (int i = 0; i < slots.size(); ++i) {
 		Ref<SpineSlotData> slot_ref(memnew(SpineSlotData));
-		slot_ref->set_spine_object(slots[i]);
+		slot_ref->set_spine_object(this, slots[i]);
 		result[i] = slot_ref;
 	}
 	return result;
@@ -396,7 +396,7 @@ Array SpineSkeletonDataResource::get_skins() const {
 	result.resize((int)skins.size());
 	for (int i = 0; i < skins.size(); ++i) {
 		Ref<SpineSkin> skin_ref(memnew(SpineSkin));
-		skin_ref->set_spine_object(skins[i]);
+		skin_ref->set_spine_object(this, skins[i]);
 		result[i] = skin_ref;
 	}
 	return result;
@@ -407,7 +407,7 @@ Ref<SpineSkin> SpineSkeletonDataResource::get_default_skin() const {
 	auto skin = skeleton_data->getDefaultSkin();
 	if (skin) return nullptr;
 	Ref<SpineSkin> skin_ref(memnew(SpineSkin));
-	skin_ref->set_spine_object(skin);
+	skin_ref->set_spine_object(this, skin);
 	return skin_ref;
 }
 
@@ -436,7 +436,7 @@ Array SpineSkeletonDataResource::get_animations() const {
 	result.resize((int)animations.size());
 	for (int i = 0; i < animations.size(); ++i) {
 		Ref<SpineAnimation> animation_ref(memnew(SpineAnimation));
-		animation_ref->set_spine_object(animations[i]);
+		animation_ref->set_spine_object(this, animations[i]);
 		result[i] = animation_ref;
 	}
 	return result;
@@ -449,7 +449,7 @@ Array SpineSkeletonDataResource::get_ik_constraints() const {
 	result.resize((int)constraints.size());
 	for (int i = 0; i < constraints.size(); ++i) {
 		Ref<SpineIkConstraintData> constraint_ref(memnew(SpineIkConstraintData));
-		constraint_ref->set_spine_object(constraints[i]);
+		constraint_ref->set_spine_object(this, constraints[i]);
 		result[i] = constraint_ref;
 	}
 	return result;
@@ -462,7 +462,7 @@ Array SpineSkeletonDataResource::get_transform_constraints() const {
 	result.resize((int)constraints.size());
 	for (int i = 0; i < constraints.size(); ++i) {
 		Ref<SpineTransformConstraintData> constraint_ref(memnew(SpineTransformConstraintData));
-		constraint_ref->set_spine_object(constraints[i]);
+		constraint_ref->set_spine_object(this, constraints[i]);
 		result[i] = constraint_ref;
 	}
 	return result;
@@ -475,7 +475,7 @@ Array SpineSkeletonDataResource::get_path_constraints() const {
 	result.resize((int)constraints.size());
 	for (int i = 0; i < constraints.size(); ++i) {
 		Ref<SpinePathConstraintData> constraint_ref(memnew(SpinePathConstraintData));
-		constraint_ref->set_spine_object(constraints[i]);
+		constraint_ref->set_spine_object(this, constraints[i]);
 		result[i] = constraint_ref;
 	}
 	return result;

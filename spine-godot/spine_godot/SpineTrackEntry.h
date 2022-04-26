@@ -35,21 +35,15 @@
 #include "SpineConstant.h"
 #include <spine/AnimationState.h>
 
-class SpineTrackEntry : public REFCOUNTED {
+#include "SpineSprite.h"
+
+class SpineTrackEntry : public REFCOUNTED, public SpineObjectWrapper<SpineSprite, spine::TrackEntry> {
 	GDCLASS(SpineTrackEntry, REFCOUNTED);
 
 protected:
 	static void _bind_methods();
 
-private:
-	spine::TrackEntry *track_entry;
-
 public:
-	SpineTrackEntry();
-
-	void set_spine_object(spine::TrackEntry *_track_entry) { this->track_entry = _track_entry; }
-	spine::TrackEntry *get_spine_object() { return track_entry; }
-
 	int get_track_index();
 
 	Ref<SpineAnimation> get_animation();

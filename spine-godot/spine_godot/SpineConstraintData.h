@@ -33,25 +33,15 @@
 #include "SpineCommon.h"
 #include <spine/ConstraintData.h>
 
-class SpineConstraintData : public REFCOUNTED {
-	GDCLASS(SpineConstraintData, REFCOUNTED);
+class SpineSkeletonDataResource;
+
+class SpineConstraintData : public REFCOUNTED, public SpineObjectWrapper<SpineSkeletonDataResource, spine::ConstraintData> {
+	GDCLASS(SpineConstraintData, REFCOUNTED)
 
 protected:
 	static void _bind_methods();
 
-	spine::ConstraintData *constraint_data;
-
 public:
-	SpineConstraintData();
-
-	void set_spine_object(spine::ConstraintData *_constraint_data) {
-		constraint_data = _constraint_data;
-	}
-
-	spine::ConstraintData *get_spine_object() {
-		return constraint_data;
-	}
-
 	String get_constraint_name();
 
 	int get_order();

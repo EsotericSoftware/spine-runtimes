@@ -29,6 +29,7 @@
 
 #include "SpinePathConstraintData.h"
 #include "SpineCommon.h"
+#include "SpineSkeletonDataResource.h"
 
 void SpinePathConstraintData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_bones"), &SpinePathConstraintData::get_bones);
@@ -61,7 +62,7 @@ Array SpinePathConstraintData::get_bones() {
 	result.resize((int)bones.size());
 	for (int i = 0; i < bones.size(); ++i) {
 		Ref<SpineBoneData> bone_ref(memnew(SpineBoneData));
-		bone_ref->set_spine_object(bones[i]);
+		bone_ref->set_spine_object(get_spine_owner(), bones[i]);
 		result[i] = bone_ref;
 	}
 	return result;
@@ -72,7 +73,7 @@ Ref<SpineSlotData> SpinePathConstraintData::get_target() {
 	auto slot = get_spine_constraint_data()->getTarget();
 	if (!slot) return nullptr;
 	Ref<SpineSlotData> slot_ref(memnew(SpineSlotData));
-	slot_ref->set_spine_object(slot);
+	slot_ref->set_spine_object(get_spine_owner(), slot);
 	return slot_ref;
 }
 

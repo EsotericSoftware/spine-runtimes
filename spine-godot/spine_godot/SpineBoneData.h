@@ -34,22 +34,15 @@
 #include "SpineConstant.h"
 #include <spine/BoneData.h>
 
-class SpineBoneData : public REFCOUNTED {
-	GDCLASS(SpineBoneData, REFCOUNTED);
+class SpineSkeletonDataResource;
+
+class SpineBoneData : public REFCOUNTED, public SpineObjectWrapper<SpineSkeletonDataResource, spine::BoneData> {
+	GDCLASS(SpineBoneData, REFCOUNTED)
 
 protected:
 	static void _bind_methods();
 
-private:
-	spine::BoneData *bone_data;
-
 public:
-	SpineBoneData();
-
-	void set_spine_object(spine::BoneData *_bone_data) { bone_data = _bone_data; }
-
-	spine::BoneData *get_spine_object() { return bone_data; }
-
 	int get_index();
 
 	String get_bone_name();

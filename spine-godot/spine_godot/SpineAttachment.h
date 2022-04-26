@@ -33,28 +33,16 @@
 #include "SpineCommon.h"
 #include <spine/spine.h>
 
+class SpineSkeletonDataResource;
 
-class SpineAttachment : public REFCOUNTED {
+class SpineAttachment : public REFCOUNTED, public SpineObjectWrapper<SpineSkeletonDataResource, spine::Attachment> {
 	GDCLASS(SpineAttachment, REFCOUNTED)
 
 protected:
 	static void _bind_methods();
 
-private:
-	spine::Attachment *attachment;
-
 public:
-	SpineAttachment();
 	~SpineAttachment() override;
-
-	void set_spine_object(spine::Attachment *_attachment) {
-		attachment = _attachment;
-		if (attachment) attachment->reference();
-	}
-
-	spine::Attachment *get_spine_object() {
-		return attachment;
-	}
 
 	String get_attachment_name();
 

@@ -32,7 +32,8 @@
 
 #include "SpineCommon.h"
 #include "SpineSkeleton.h"
-#include "SpineTrackEntry.h"
+
+class SpineTrackEntry;
 
 class SpineAnimationState : public REFCOUNTED {
 	GDCLASS(SpineAnimationState, REFCOUNTED)
@@ -42,7 +43,7 @@ protected:
 
 private:
 	spine::AnimationState *animation_state;
-	Ref<SpineSkeletonDataResource> skeleton_data_res;
+	SpineSprite *sprite;
 
 public:
 	SpineAnimationState();
@@ -50,7 +51,7 @@ public:
 
 	spine::AnimationState *get_spine_object() { return animation_state; }
 
-	void set_skeleton_data_res(const Ref<SpineSkeletonDataResource> &skeleton_data_res);
+	void set_spine_sprite(SpineSprite *sprite);
 
 	void update(float delta);
 

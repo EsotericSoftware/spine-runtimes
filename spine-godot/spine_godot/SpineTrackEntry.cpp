@@ -79,254 +79,252 @@ void SpineTrackEntry::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_track_complete"), &SpineTrackEntry::get_track_complete);
 }
 
-SpineTrackEntry::SpineTrackEntry() : track_entry(nullptr) {
-}
-
 int SpineTrackEntry::get_track_index() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getTrackIndex();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getTrackIndex();
 }
 
 Ref<SpineAnimation> SpineTrackEntry::get_animation() {
-	SPINE_CHECK(track_entry, nullptr)
-	auto animation = track_entry->getAnimation();
+	SPINE_CHECK(spine_object, nullptr)
+	auto animation = spine_object->getAnimation();
 	if (!animation) return nullptr;
 	Ref<SpineAnimation> animation_ref(memnew(SpineAnimation));
-	animation_ref->set_spine_object(animation);
+	animation_ref->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), animation);
 	return animation_ref;
 }
 
 Ref<SpineTrackEntry> SpineTrackEntry::get_previous() {
-	SPINE_CHECK(track_entry, nullptr)
-	auto previous = track_entry->getPrevious();
+	SPINE_CHECK(spine_object, nullptr)
+	auto previous = spine_object->getPrevious();
 	if (!previous) return nullptr;
 	Ref<SpineTrackEntry> previous_ref(memnew(SpineTrackEntry));
-	previous_ref->set_spine_object(previous);
+	previous_ref->set_spine_object(get_spine_owner(), previous);
 	return previous_ref;
 }
 
 bool SpineTrackEntry::get_loop() {
-	SPINE_CHECK(track_entry, false)
-	return track_entry->getLoop();
+	SPINE_CHECK(spine_object, false)
+	return spine_object->getLoop();
 }
 
 void SpineTrackEntry::set_loop(bool v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setLoop(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setLoop(v);
 }
 
 bool SpineTrackEntry::get_hold_previous() {
-	SPINE_CHECK(track_entry, false)
-	return track_entry->getHoldPrevious();
+	SPINE_CHECK(spine_object, false)
+	return spine_object->getHoldPrevious();
 }
 
 void SpineTrackEntry::set_hold_previous(bool v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setHoldPrevious(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setHoldPrevious(v);
 }
 
 bool SpineTrackEntry::get_reverse() {
-	SPINE_CHECK(track_entry, false)
-	return track_entry->getReverse();
+	SPINE_CHECK(spine_object, false)
+	return spine_object->getReverse();
 }
 
 void SpineTrackEntry::set_reverse(bool v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setReverse(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setReverse(v);
 }
 
 bool  SpineTrackEntry::get_shortest_rotation() {
-	SPINE_CHECK(track_entry, false)
-	return track_entry->getShortestRotation();
+	SPINE_CHECK(spine_object, false)
+	return spine_object->getShortestRotation();
 }
 
 void  SpineTrackEntry::set_shortest_rotation(bool v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setShortestRotation(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setShortestRotation(v);
 }
 
 float SpineTrackEntry::get_delay() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getDelay();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getDelay();
 }
 
 void SpineTrackEntry::set_delay(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setDelay(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setDelay(v);
 }
 
 float SpineTrackEntry::get_track_time() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getTrackTime();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getTrackTime();
 }
 
 void SpineTrackEntry::set_track_time(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setTrackTime(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setTrackTime(v);
 }
 
 float SpineTrackEntry::get_track_end() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getTrackEnd();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getTrackEnd();
 }
 
 void SpineTrackEntry::set_track_end(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setTrackEnd(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setTrackEnd(v);
 }
 
 float SpineTrackEntry::get_animation_start() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getAnimationStart();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getAnimationStart();
 }
 
 void SpineTrackEntry::set_animation_start(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setAnimationStart(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setAnimationStart(v);
 }
 
 float SpineTrackEntry::get_animation_end() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getAnimationEnd();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getAnimationEnd();
 }
 
 void SpineTrackEntry::set_animation_end(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setAnimationEnd(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setAnimationEnd(v);
 }
 
 float SpineTrackEntry::get_animation_last() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getAnimationLast();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getAnimationLast();
 }
 
 void SpineTrackEntry::set_animation_last(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setAnimationLast(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setAnimationLast(v);
 }
 
 float SpineTrackEntry::get_animation_time() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getAnimationTime();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getAnimationTime();
 }
 
 float SpineTrackEntry::get_time_scale() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getTimeScale();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getTimeScale();
 }
 
 void SpineTrackEntry::set_time_scale(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setTimeScale(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setTimeScale(v);
 }
 
 float SpineTrackEntry::get_alpha() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getAlpha();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getAlpha();
 }
 
 void SpineTrackEntry::set_alpha(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setAlpha(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setAlpha(v);
 }
 
 float SpineTrackEntry::get_event_threshold() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getEventThreshold();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getEventThreshold();
 }
 
 void SpineTrackEntry::set_event_threshold(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setEventThreshold(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setEventThreshold(v);
 }
 
 float SpineTrackEntry::get_attachment_threshold() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getAttachmentThreshold();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getAttachmentThreshold();
 }
 
 void SpineTrackEntry::set_attachment_threshold(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setAttachmentThreshold(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setAttachmentThreshold(v);
 }
 
 float SpineTrackEntry::get_draw_order_threshold() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getDrawOrderThreshold();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getDrawOrderThreshold();
 }
 
 void SpineTrackEntry::set_draw_order_threshold(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setDrawOrderThreshold(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setDrawOrderThreshold(v);
 }
 
 Ref<SpineTrackEntry> SpineTrackEntry::get_next() {
-	SPINE_CHECK(track_entry, nullptr)
-	auto next = track_entry->getNext();
+	SPINE_CHECK(spine_object, nullptr)
+	auto next = spine_object->getNext();
 	if (!next) return nullptr;
 	Ref<SpineTrackEntry> next_ref(memnew(SpineTrackEntry));
-	next_ref->set_spine_object(next);
+	next_ref->set_spine_object(get_spine_owner(), next);
 	return next_ref;
 }
 
 bool SpineTrackEntry::is_complete() {
-	SPINE_CHECK(track_entry, false)
-	return track_entry->isComplete();
+	SPINE_CHECK(spine_object, false)
+	return spine_object->isComplete();
 }
 
 float SpineTrackEntry::get_mix_time() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getMixTime();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getMixTime();
 }
 
 void SpineTrackEntry::set_mix_time(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setMixTime(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setMixTime(v);
 }
 
 float SpineTrackEntry::get_mix_duration() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getMixDuration();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getMixDuration();
 }
 
 void SpineTrackEntry::set_mix_duration(float v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setMixDuration(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setMixDuration(v);
 }
 
 SpineConstant::MixBlend SpineTrackEntry::get_mix_blend() {
-	SPINE_CHECK(track_entry, SpineConstant::MixBlend_Setup)
-	return (SpineConstant::MixBlend)track_entry->getMixBlend();
+	SPINE_CHECK(spine_object, SpineConstant::MixBlend_Setup)
+	return (SpineConstant::MixBlend)spine_object->getMixBlend();
 }
 
 void SpineTrackEntry::set_mix_blend(SpineConstant::MixBlend v) {
-	SPINE_CHECK(track_entry,)
-	track_entry->setMixBlend((spine::MixBlend) v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setMixBlend((spine::MixBlend) v);
 }
 
 Ref<SpineTrackEntry> SpineTrackEntry::get_mixing_from() {
-	SPINE_CHECK(track_entry, nullptr)
-	auto mixing_from = track_entry->getMixingFrom();
+	SPINE_CHECK(spine_object, nullptr)
+	auto mixing_from = spine_object->getMixingFrom();
 	if (!mixing_from) return nullptr;
 	Ref<SpineTrackEntry> mixing_from_ref(memnew(SpineTrackEntry));
-	mixing_from_ref->set_spine_object(mixing_from);
+	mixing_from_ref->set_spine_object(get_spine_owner(), mixing_from);
 	return mixing_from_ref;
 }
+
 Ref<SpineTrackEntry> SpineTrackEntry::get_mixing_to() {
-	SPINE_CHECK(track_entry, nullptr)
-	auto mixing_to = track_entry->getMixingTo();
+	SPINE_CHECK(spine_object, nullptr)
+	auto mixing_to = spine_object->getMixingTo();
 	if (!mixing_to) return nullptr;
 	Ref<SpineTrackEntry> mixing_to_ref(memnew(SpineTrackEntry));
-	mixing_to_ref->set_spine_object(mixing_to);
+	mixing_to_ref->set_spine_object(get_spine_owner(), mixing_to);
 	return mixing_to_ref;
 }
 
 void SpineTrackEntry::reset_rotation_directions() {
-	SPINE_CHECK(track_entry,)
-	track_entry->resetRotationDirections();
+	SPINE_CHECK(spine_object,)
+	spine_object->resetRotationDirections();
 }
 
 float SpineTrackEntry::get_track_complete() {
-	SPINE_CHECK(track_entry, 0)
-	return track_entry->getTrackComplete();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getTrackComplete();
 }

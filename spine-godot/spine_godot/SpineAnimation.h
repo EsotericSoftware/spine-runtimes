@@ -37,23 +37,15 @@
 class SpineEvent;
 class SpineSkeleton;
 class SpineTimeline;
+class SpineSkeletonDataResource;
 
-class SpineAnimation : public REFCOUNTED {
+class SpineAnimation : public REFCOUNTED, public SpineObjectWrapper<SpineSkeletonDataResource, spine::Animation> {
 	GDCLASS(SpineAnimation, REFCOUNTED);
-
-private:
-	spine::Animation *animation;
 
 protected:
 	static void _bind_methods();
 
 public:
-	SpineAnimation();
-
-	void set_spine_object(spine::Animation *_animation) { this->animation = _animation; }
-
-	spine::Animation *get_spine_object() { return animation; }
-
 	void apply(Ref<SpineSkeleton> skeleton, float last_time, float time, bool loop, Array events, float alpha, SpineConstant::MixBlend blend, SpineConstant::MixDirection direction);
 
 	Array get_timelines();

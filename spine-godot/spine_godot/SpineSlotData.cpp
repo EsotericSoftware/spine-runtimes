@@ -47,75 +47,72 @@ void SpineSlotData::_bind_methods() {
 
 }
 
-SpineSlotData::SpineSlotData() : slot_data(nullptr) {
-}
-
 int SpineSlotData::get_index() {
-	SPINE_CHECK(slot_data, 0)
-	return slot_data->getIndex();
+	SPINE_CHECK(spine_object, 0)
+	return spine_object->getIndex();
 }
 
 String SpineSlotData::get_name() {
-	SPINE_CHECK(slot_data, String(""))
-	return slot_data->getName().buffer();
+	SPINE_CHECK(spine_object, String(""))
+	return spine_object->getName().buffer();
 }
 
 Ref<SpineBoneData> SpineSlotData::get_bone_data() {
-	SPINE_CHECK(slot_data, nullptr)
-	auto &bone_data = slot_data->getBoneData();
+	SPINE_CHECK(spine_object, nullptr)
+	auto &bone_data = spine_object->getBoneData();
 	Ref<SpineBoneData> bone_data_ref(memnew(SpineBoneData));
-	bone_data_ref->set_spine_object(&bone_data);
+	bone_data_ref->set_spine_object(get_spine_owner(), &bone_data);
 	return bone_data_ref;
 }
 
 Color SpineSlotData::get_color() {
-	SPINE_CHECK(slot_data, Color(0, 0, 0, 0))
-	auto &color = slot_data->getColor();
+	SPINE_CHECK(spine_object, Color(0, 0, 0, 0))
+	auto &color = spine_object->getColor();
 	return Color(color.r, color.g, color.b, color.a);
 }
 
 void SpineSlotData::set_color(Color v) {
-	SPINE_CHECK(slot_data,)
-	auto &color = slot_data->getColor();
+	SPINE_CHECK(spine_object,)
+	auto &color = spine_object->getColor();
 	color.set(v.r, v.g, v.b, v.a);
 }
 
 Color SpineSlotData::get_dark_color() {
-	SPINE_CHECK(slot_data, Color(0, 0, 0, 0))
-	auto &color = slot_data->getDarkColor();
+	SPINE_CHECK(spine_object, Color(0, 0, 0, 0))
+	auto &color = spine_object->getDarkColor();
 	return Color(color.r, color.g, color.b, color.a);
 }
 
 void SpineSlotData::set_dark_color(Color v) {
-	SPINE_CHECK(slot_data,)
-	auto &color = slot_data->getDarkColor();
+	SPINE_CHECK(spine_object,)
+	auto &color = spine_object->getDarkColor();
 	color.set(v.r, v.g, v.b, v.a);
 }
 
 bool SpineSlotData::has_dark_color() {
-	SPINE_CHECK(slot_data, false)
-	return slot_data->hasDarkColor();
+	SPINE_CHECK(spine_object, false)
+	return spine_object->hasDarkColor();
 }
 
 void SpineSlotData::set_has_dark_color(bool v) {
-	SPINE_CHECK(slot_data,)
-	slot_data->setHasDarkColor(v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setHasDarkColor(v);
 }
 
 String SpineSlotData::get_attachment_name() {
-	SPINE_CHECK(slot_data, "")
-	return slot_data->getAttachmentName().buffer();
+	SPINE_CHECK(spine_object, "")
+	return spine_object->getAttachmentName().buffer();
 }
 void SpineSlotData::set_attachment_name(const String &v) {
-	SPINE_CHECK(slot_data,)
-	slot_data->setAttachmentName(SPINE_STRING(v));
+	SPINE_CHECK(spine_object,)
+	spine_object->setAttachmentName(SPINE_STRING(v));
 }
 
 SpineConstant::BlendMode SpineSlotData::get_blend_mode() {
-	SPINE_CHECK(slot_data, SpineConstant::BlendMode_Normal)
-	return (SpineConstant::BlendMode)slot_data->getBlendMode();
+	SPINE_CHECK(spine_object, SpineConstant::BlendMode_Normal)
+	return (SpineConstant::BlendMode)spine_object->getBlendMode();
 }
 void SpineSlotData::set_blend_mode(SpineConstant::BlendMode v) {
-	SPINE_CHECK(slot_data,)
-	slot_data->setBlendMode((spine::BlendMode) v);
+	SPINE_CHECK(spine_object,)
+	spine_object->setBlendMode((spine::BlendMode) v);
 }

@@ -31,19 +31,24 @@
 #define GODOT_SPINEOBJECTWRAPPER_H
 
 template <typename OWNER, typename OBJECT> class SpineObjectWrapper {
+protected:
 	Object *owner;
-	OBJECT *object;
+	OBJECT *spine_object;
 	
 public:
-	SpineObjectWrapper(): owner(nullptr), object(nullptr) {};
+	SpineObjectWrapper(): owner(nullptr), spine_object(nullptr) {};
 	
-	void set_spine_object(OWNER *_owner, OBJECT *_object) {
+	void set_spine_object(const OWNER *_owner, OBJECT *_object) {
+		if (!_owner) {
+			ERR_PRINT("Owner must not be null.");
+			return;
+		}
 		owner = (Object*)_owner;
-		object = _object;
+		spine_object = _object;
 	}
 	
 	OBJECT *get_spine_object() {
-		return object;
+		return spine_object;
 	}
 	
 	OWNER *get_spine_owner() {

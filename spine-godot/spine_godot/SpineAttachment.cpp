@@ -35,23 +35,20 @@ void SpineAttachment::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("copy"), &SpineAttachment::copy);
 }
 
-SpineAttachment::SpineAttachment() : attachment(nullptr) {
-}
-
 SpineAttachment::~SpineAttachment() {
-	if (attachment) attachment->dereference();
+	if (spine_object) spine_object->dereference();
 }
 
 String SpineAttachment::get_attachment_name() {
-	SPINE_CHECK(attachment, "")
-	return attachment->getName().buffer();
+	SPINE_CHECK(spine_object, "")
+	return spine_object->getName().buffer();
 }
 
 Ref<SpineAttachment> SpineAttachment::copy() {
-	SPINE_CHECK(attachment, nullptr)
-	auto copy = attachment->copy();
+	SPINE_CHECK(spine_object, nullptr)
+	auto copy = spine_object->copy();
 	if (!copy) return nullptr;
 	Ref<SpineAttachment> attachment_ref(memnew(SpineAttachment));
-	attachment_ref->set_spine_object(copy);
+	attachment_ref->set_spine_object(get_spine_owner(), copy);
 	return attachment_ref;
 }

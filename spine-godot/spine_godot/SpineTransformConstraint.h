@@ -35,23 +35,13 @@
 #include "SpineBone.h"
 #include <spine/TransformConstraint.h>
 
-class SpineTransformConstraint : public REFCOUNTED {
-	GDCLASS(SpineTransformConstraint, REFCOUNTED);
+class SpineTransformConstraint : public REFCOUNTED, public SpineObjectWrapper<SpineSprite, spine::TransformConstraint> {
+	GDCLASS(SpineTransformConstraint, REFCOUNTED)
 
 protected:
 	static void _bind_methods();
 
-private:
-	spine::TransformConstraint *transform_constraint;
-	SpineSprite *sprite;
-
 public:
-	SpineTransformConstraint();
-
-	void set_spine_object(SpineSprite *_sprite, spine::TransformConstraint *_transform_constraint) { sprite = _sprite; transform_constraint = _transform_constraint; }
-	spine::TransformConstraint *get_spine_object() { return transform_constraint; }
-	SpineSprite *get_spine_sprite() { return sprite; }
-
 	void update();
 
 	int get_order();
