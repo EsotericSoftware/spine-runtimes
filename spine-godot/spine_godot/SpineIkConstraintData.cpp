@@ -72,7 +72,7 @@ Ref<SpineBoneData> SpineIkConstraintData::get_target() {
 
 void SpineIkConstraintData::set_target(Ref<SpineBoneData> v) {
 	SPINE_CHECK(spine_object,)
-	get_spine_constraint_data()->setTarget(v.is_valid() ? v->get_spine_object() : nullptr);
+	get_spine_constraint_data()->setTarget(v.is_valid() && v->get_spine_object() ? v->get_spine_object() : nullptr);
 }
 
 int SpineIkConstraintData::get_bend_direction() {

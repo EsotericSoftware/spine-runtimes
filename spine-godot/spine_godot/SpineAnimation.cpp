@@ -68,7 +68,7 @@ void SpineAnimation::apply(Ref<SpineSkeleton> skeleton, float last_time, float t
 	spine_object->apply(*(skeleton->get_spine_object()), last_time, time, loop, &spineEvents, alpha, (spine::MixBlend) blend, (spine::MixDirection) direction);
 	for (int i = 0; i < (int)spineEvents.size(); ++i) {
 		auto event_ref = memnew(SpineEvent);
-		event_ref->set_spine_object(spineEvents[i]);
+		event_ref->set_spine_object(skeleton->get_spine_owner(), spineEvents[i]);
 		events.append(event_ref);
 	}
 }
@@ -81,7 +81,7 @@ Array SpineAnimation::get_timelines() {
 
 	for (int i = 0; i < (int)result.size(); ++i) {
 		auto timeline_ref = Ref<SpineTimeline>(memnew(SpineTimeline));
-		timeline_ref->set_spine_object(timelines[i]);
+		timeline_ref->set_spine_object(get_spine_owner(), timelines[i]);
 		result.set(i, timeline_ref);
 	}
 	return result;

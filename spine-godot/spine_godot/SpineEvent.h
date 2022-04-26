@@ -34,22 +34,15 @@
 #include "SpineEventData.h"
 #include <spine/Event.h>
 
-class SpineEvent : public REFCOUNTED {
-	GDCLASS(SpineEvent, REFCOUNTED)
+class SpineSprite;
+
+class SpineEvent : public SpineObjectWrapper<SpineSprite, spine::Event> {
+	GDCLASS(SpineEvent, SpineObjectWrapper)
 
 protected:
 	static void _bind_methods();
 
-private:
-	spine::Event *event;
-
 public:
-	SpineEvent();
-
-	void set_spine_object(spine::Event *_event) { event = _event; }
-
-	spine::Event *get_spine_object() const { return event; }
-
 	Ref<SpineEventData> get_data();
 
 	float get_time();

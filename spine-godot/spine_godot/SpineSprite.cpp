@@ -51,6 +51,7 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_update_mode"), &SpineSprite::get_update_mode);
 
 	ClassDB::bind_method(D_METHOD("update_skeleton", "delta"), &SpineSprite::update_skeleton);
+	ClassDB::bind_method(D_METHOD("new_skin", "name"), &SpineSprite::new_skin);
 
 	ADD_SIGNAL(MethodInfo("animation_started", PropertyInfo(Variant::OBJECT, "spine_sprite", PROPERTY_HINT_TYPE_STRING, "SpineSprite"), PropertyInfo(Variant::OBJECT, "animation_state", PROPERTY_HINT_TYPE_STRING, "SpineAnimationState"), PropertyInfo(Variant::OBJECT, "track_entry", PROPERTY_HINT_TYPE_STRING, "SpineTrackEntry")));
 	ADD_SIGNAL(MethodInfo("animation_interrupted", PropertyInfo(Variant::OBJECT, "spine_sprite", PROPERTY_HINT_TYPE_STRING, "SpineSprite"), PropertyInfo(Variant::OBJECT, "animation_state", PROPERTY_HINT_TYPE_STRING, "SpineAnimationState"), PropertyInfo(Variant::OBJECT, "track_entry", PROPERTY_HINT_TYPE_STRING, "SpineTrackEntry")));
@@ -456,7 +457,7 @@ void SpineSprite::callback(spine::AnimationState *state, spine::EventType type, 
 	Ref<SpineEvent> event_ref(nullptr);
 	if (event) {
 		event_ref = Ref<SpineEvent>(memnew(SpineEvent));
-		event_ref->set_spine_object(event);
+		event_ref->set_spine_object(this, event);
 	}
 
 	switch (type) {
@@ -473,7 +474,7 @@ void SpineSprite::callback(spine::AnimationState *state, spine::EventType type, 
 			emit_signal("animation_completed", this, animation_state, entry_ref);
 			break;
 		case spine::EventType_Dispose:
-			emit_signal("animation_disposed", this, animation_state, entry_ref, event_ref);
+			emit_signal("animation_disposed", this, animation_state, entry_ref);
 			break;
 		case spine::EventType_Event:
 			emit_signal("animation_event", this, animation_state, entry_ref, event_ref);
@@ -494,9 +495,7 @@ Transform2D SpineSprite::get_global_bone_transform(const String &bone_name) {
 void SpineSprite::set_global_bone_transform(const String &bone_name, Transform2D transform) {
 	if (!animation_state.is_valid() && !skeleton.is_valid()) return;
 	auto bone = skeleton->find_bone(bone_name);
-	if (!bone.is_valid()) {
-		return;
-	}
+	if (!bone.is_valid()) return;
 	bone->set_global_transform(transform);
 }
 
@@ -511,7 +510,7 @@ void SpineSprite::set_update_mode(SpineSprite::UpdateMode v) {
 }
 
 Ref<SpineSkin> SpineSprite::new_skin(const String& name) {
-	auto skin = memnew(SpineSkin);
+	Ref<SpineSkin> skin = memnew(SpineSkin);
 	skin->init(name, this);
 	return skin;
 }

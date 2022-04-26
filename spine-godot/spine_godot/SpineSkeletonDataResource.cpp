@@ -325,7 +325,7 @@ Ref<SpineEventData> SpineSkeletonDataResource::find_event(const String &event_da
 	auto event = skeleton_data->findEvent(SPINE_STRING(event_data_name));
 	if (!event) return nullptr;
 	Ref<SpineEventData> event_ref(memnew(SpineEventData));
-	event_ref->set_spine_object(event);
+	event_ref->set_spine_object(this, event);
 	return event_ref;
 }
 
@@ -413,7 +413,7 @@ Ref<SpineSkin> SpineSkeletonDataResource::get_default_skin() const {
 
 void SpineSkeletonDataResource::set_default_skin(Ref<SpineSkin> skin) {
 	SPINE_CHECK(skeleton_data,)
-	skeleton_data->setDefaultSkin(skin.is_valid() ? skin->get_spine_object() : nullptr);
+	skeleton_data->setDefaultSkin(skin.is_valid() && skin->get_spine_object() ? skin->get_spine_object() : nullptr);
 }
 
 Array SpineSkeletonDataResource::get_events() const {
@@ -423,7 +423,7 @@ Array SpineSkeletonDataResource::get_events() const {
 	result.resize((int)events.size());
 	for (int i = 0; i < events.size(); ++i) {
 		Ref<SpineEventData> event_ref(memnew(SpineEventData));
-		event_ref->set_spine_object(events[i]);
+		event_ref->set_spine_object(this, events[i]);
 		result[i] = event_ref;
 	}
 	return result;

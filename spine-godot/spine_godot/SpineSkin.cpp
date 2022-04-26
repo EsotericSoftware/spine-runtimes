@@ -65,6 +65,7 @@ Ref<SpineSkin> SpineSkin::init(const String &name, SpineSprite *sprite) {
 	}
 	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) {
 		ERR_PRINT("SpineSkeletonDataResource on SpineSprite must be valid and loaded.");
+		return this;
 	}
 	owns_skin = true;
 	set_spine_object(*sprite->get_skeleton_data_res(), new spine::Skin(SPINE_STRING(name)));
@@ -73,7 +74,7 @@ Ref<SpineSkin> SpineSkin::init(const String &name, SpineSprite *sprite) {
 
 void SpineSkin::set_attachment(int slot_index, const String &name, Ref<SpineAttachment> attachment) {
 	SPINE_CHECK(spine_object,)
-	spine_object->setAttachment(slot_index, SPINE_STRING(name), attachment.is_valid() ? attachment->get_spine_object() : nullptr);
+	spine_object->setAttachment(slot_index, SPINE_STRING(name), attachment.is_valid() && attachment->get_spine_object()? attachment->get_spine_object() : nullptr);
 }
 
 Ref<SpineAttachment> SpineSkin::get_attachment(int slot_index, const String &name) {

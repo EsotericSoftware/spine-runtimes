@@ -34,24 +34,18 @@
 #include "SpineConstant.h"
 #include <spine/Timeline.h>
 
+#include "SpineSkeletonDataResource.h"
+
 class SpineSkeleton;
 class SpineEvent;
 
-class SpineTimeline : public REFCOUNTED {
-	GDCLASS(SpineTimeline, REFCOUNTED);
+class SpineTimeline : public SpineObjectWrapper<SpineSkeletonDataResource, spine::Timeline> {
+	GDCLASS(SpineTimeline, SpineObjectWrapper)
 
 protected:
 	static void _bind_methods();
 
-private:
-	spine::Timeline *timeline;
-
 public:
-	SpineTimeline();
-
-	void set_spine_object(spine::Timeline *_timeline) { this->timeline = _timeline; }
-	spine::Timeline *get_spine_object() { return timeline; }
-
 	void apply(Ref<SpineSkeleton> skeleton, float last_time, float time, Array events, float alpha, SpineConstant::MixBlend blend, SpineConstant::MixDirection direction);
 
 	int get_frame_entries();

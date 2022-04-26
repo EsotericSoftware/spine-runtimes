@@ -2,7 +2,7 @@ extends SpineSprite
 
 func _ready():
 	var data = get_skeleton().get_data()
-	var custom_skin = SpineSkin.new().init("custom-skin")
+	var custom_skin = new_skin("custom-skin")
 	var skin_base = data.find_skin("skin-base")
 	custom_skin.add_skin(skin_base)
 	custom_skin.add_skin(data.find_skin("nose/short"))

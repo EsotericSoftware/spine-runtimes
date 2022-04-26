@@ -138,7 +138,7 @@ Ref<SpineSlot> SpinePathConstraint::get_target() {
 
 void SpinePathConstraint::set_target(Ref<SpineSlot> v) {
 	SPINE_CHECK(spine_object,)
-	spine_object->setTarget(v.is_valid() ? v->get_spine_object() : nullptr);
+	spine_object->setTarget(v.is_valid() && v->get_spine_object() ? v->get_spine_object() : nullptr);
 }
 
 Ref<SpinePathConstraintData> SpinePathConstraint::get_data() {

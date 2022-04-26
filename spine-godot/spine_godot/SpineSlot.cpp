@@ -113,7 +113,7 @@ Ref<SpineAttachment> SpineSlot::get_attachment() {
 
 void SpineSlot::set_attachment(Ref<SpineAttachment> v) {
 	SPINE_CHECK(spine_object,)
-	spine_object->setAttachment(v.is_valid() ? v->get_spine_object() : nullptr);
+	spine_object->setAttachment(v.is_valid() && v->get_spine_object() ? v->get_spine_object() : nullptr);
 }
 
 int SpineSlot::get_attachment_state() {

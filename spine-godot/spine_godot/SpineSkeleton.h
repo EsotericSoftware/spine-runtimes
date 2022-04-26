@@ -55,8 +55,9 @@ class SpineSkeleton : public REFCOUNTED {
 protected:
 	static void _bind_methods();
 
-	void set_spine_sprite(SpineSprite *sprite);
+	void set_spine_sprite(SpineSprite *_sprite);
 	spine::Skeleton *get_spine_object() { return skeleton; }
+	SpineSprite *get_spine_owner() { return sprite; }
 	Ref<SpineSkeletonDataResource> get_skeleton_data_res() const;
 
 private:

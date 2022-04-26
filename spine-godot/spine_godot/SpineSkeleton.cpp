@@ -76,16 +76,17 @@ SpineSkeleton::~SpineSkeleton() {
 	delete skeleton;
 }
 
-void SpineSkeleton::set_spine_sprite(SpineSprite *sprite) {
+void SpineSkeleton::set_spine_sprite(SpineSprite *_sprite) {
 	delete skeleton;
 	skeleton = nullptr;
+	sprite = _sprite;
 	if (!sprite || !sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
 	skeleton = new spine::Skeleton(sprite->get_skeleton_data_res()->get_skeleton_data());
 }
 
 Ref<SpineSkeletonDataResource> SpineSkeleton::get_skeleton_data_res() const {
 	if (!sprite) return nullptr;
-	return sprite->get_skeleton();
+	return sprite->get_skeleton_data_res();
 }
 
 void SpineSkeleton::update_world_transform() {
@@ -135,7 +136,7 @@ void SpineSkeleton::set_skin_by_name(const String &skin_name) {
 
 void SpineSkeleton::set_skin(Ref<SpineSkin> new_skin) {
 	SPINE_CHECK(skeleton,)
-	skeleton->setSkin(new_skin.is_valid() ? new_skin->get_spine_object() : nullptr);
+	skeleton->setSkin(new_skin.is_valid() && new_skin->get_spine_object() ? new_skin->get_spine_object() : nullptr);
 }
 
 Ref<SpineAttachment> SpineSkeleton::get_attachment_by_slot_name(const String &slot_name, const String &attachment_name) {

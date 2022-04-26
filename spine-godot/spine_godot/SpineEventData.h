@@ -33,22 +33,15 @@
 #include "SpineCommon.h"
 #include <spine/EventData.h>
 
-class SpineEventData : public REFCOUNTED {
+class SpineSkeletonDataResource;
+
+class SpineEventData : public SpineObjectWrapper<SpineSkeletonDataResource, spine::EventData> {
 	GDCLASS(SpineEventData, REFCOUNTED);
 
 protected:
 	static void _bind_methods();
 
-private:
-	spine::EventData *event_data;
-
 public:
-	SpineEventData();
-
-	void set_spine_object(spine::EventData *_event_data) { event_data = _event_data; }
-
-	spine::EventData *get_spine_object() const { return event_data; }
-
 	String get_event_name();
 
 	int get_int_value();

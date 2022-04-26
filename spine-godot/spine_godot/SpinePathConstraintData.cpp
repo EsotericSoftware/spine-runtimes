@@ -79,7 +79,7 @@ Ref<SpineSlotData> SpinePathConstraintData::get_target() {
 
 void SpinePathConstraintData::set_target(Ref<SpineSlotData> v) {
 	SPINE_CHECK(get_spine_constraint_data(),)
-	get_spine_constraint_data()->setTarget(v.is_valid() ? v->get_spine_object() : nullptr);
+	get_spine_constraint_data()->setTarget(v.is_valid() && v->get_spine_object()? v->get_spine_object() : nullptr);
 }
 
 SpineConstant::PositionMode SpinePathConstraintData::get_position_mode() {
