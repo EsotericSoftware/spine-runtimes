@@ -1646,7 +1646,7 @@ tracks/1/keys = {
 "times": PoolRealArray( 0 ),
 "transitions": PoolRealArray( 1 ),
 "update": 0,
-"values": [ Vector2( 1284, 540 ) ]
+"values": [ Vector2( 1284, 520 ) ]
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("Spineboy/SpineAnimationTrack:mix_duration")
@@ -1697,49 +1697,9 @@ tracks/5/keys = {
 "values": [ 1.0 ]
 }
 
-[sub_resource type="Animation" id=83]
-resource_name = "reverse-timescale"
-length = 2.0
-loop = true
-tracks/0/type = "value"
-tracks/0/path = NodePath("Spineboy/SpineAnimationTrack:reverse")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 1,
-"values": [ true ]
-}
-tracks/1/type = "animation"
-tracks/1/path = NodePath("Spineboy/SpineAnimationTrack/Spineboy Track 0")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"clips": PoolStringArray( "walk_looped" ),
-"times": PoolRealArray( 0 )
-}
-tracks/2/type = "value"
-tracks/2/path = NodePath("Spineboy/SpineAnimationTrack:time_scale")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ 0.5 ]
-}
-
 [sub_resource type="Animation" id=1]
-resource_name = "walk-run-die"
+resource_name = "cutscene"
 length = 10.0
-loop = true
 step = 0.02
 tracks/0/type = "value"
 tracks/0/path = NodePath("Spineboy:position")
@@ -1760,8 +1720,8 @@ tracks/1/loop_wrap = true
 tracks/1/imported = false
 tracks/1/enabled = true
 tracks/1/keys = {
-"clips": PoolStringArray( "walk_looped", "idle", "death" ),
-"times": PoolRealArray( 0, 4, 4.34 )
+"clips": PoolStringArray( "walk_looped", "idle", "death", "idle" ),
+"times": PoolRealArray( 0, 4, 4.34, 8.86 )
 }
 tracks/2/type = "value"
 tracks/2/path = NodePath("Spineboy/SpineAnimationTrack2:mix_duration")
@@ -1795,7 +1755,7 @@ tracks/4/keys = {
 "times": PoolRealArray( 0, 2.02, 3.7, 10 ),
 "transitions": PoolRealArray( 1, 1, 1, 1 ),
 "update": 0,
-"values": [ Vector2( 1284, 540 ), Vector2( 1284, 540 ), Vector2( 800, 540 ), Vector2( 800, 540 ) ]
+"values": [ Vector2( 1284, 520 ), Vector2( 1284, 520 ), Vector2( 750, 520 ), Vector2( 750, 520 ) ]
 }
 tracks/5/type = "animation"
 tracks/5/path = NodePath("Raptor/SpineAnimationTrack/Raptor Track 0")
@@ -1818,6 +1778,69 @@ tracks/6/keys = {
 "transitions": PoolRealArray( 1 ),
 "update": 0,
 "values": [ 0.2 ]
+}
+tracks/7/type = "value"
+tracks/7/path = NodePath("Raptor/SpineAnimationTrack:mix_duration")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0.2 ]
+}
+
+[sub_resource type="Animation" id=83]
+resource_name = "slow-moonwalk"
+length = 5.0
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Spineboy:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 5 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 905, 565 ), Vector2( 70, 565 ) ]
+}
+tracks/1/type = "animation"
+tracks/1/path = NodePath("Spineboy/SpineAnimationTrack/Spineboy Track 0")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"clips": PoolStringArray( "walk_looped" ),
+"times": PoolRealArray( 0 )
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Spineboy/SpineAnimationTrack:reverse")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ true ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("Spineboy/SpineAnimationTrack:time_scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0.5 ]
 }
 
 [node name="Node2D" type="Node2D"]
@@ -1890,7 +1913,7 @@ anims/walk = SubResource( 128 )
 anims/walk_looped = SubResource( 129 )
 
 [node name="Raptor" type="SpineSprite" parent="."]
-position = Vector2( 1284, 540 )
+position = Vector2( 1284, 520 )
 scale = Vector2( -0.328761, 0.328761 )
 skeleton_data_res = ExtResource( 3 )
 
@@ -1913,5 +1936,5 @@ anims/walk_looped = SubResource( 140 )
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 anims/RESET = SubResource( 25 )
-anims/reverse-timescale = SubResource( 83 )
-anims/walk-run-die = SubResource( 1 )
+anims/cutscene = SubResource( 1 )
+anims/slow-moonwalk = SubResource( 83 )

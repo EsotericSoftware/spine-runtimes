@@ -57,11 +57,12 @@ protected:
 	bool debug;
 
 	SpineSprite *sprite;
-	AnimationPlayer *animation_player;
 
 	static void _bind_methods();
 	
 	void _notification(int what);
+
+	AnimationPlayer *find_animation_player();
 	
 	void setup_animation_player();
 

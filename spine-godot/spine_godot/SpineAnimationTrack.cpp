@@ -67,8 +67,7 @@ SpineAnimationTrack::SpineAnimationTrack():
 	draw_order_threshold(0),
 	mix_blend(SpineConstant::MixBlend_Replace),
 	debug(false),
-	sprite(nullptr),
-	animation_player(nullptr) {
+	sprite(nullptr) {
 }
 
 void SpineAnimationTrack::_notification(int what) {
@@ -85,8 +84,10 @@ void SpineAnimationTrack::_notification(int what) {
 			break;
 	}
 	case NOTIFICATION_UNPARENTED: {
-			if (sprite)
+			if (sprite) {
 				sprite->disconnect("before_animation_state_update", this, "update_animation_state");
+				sprite = nullptr;
+			}
 			break;
 	}
 	default:
@@ -94,9 +95,22 @@ void SpineAnimationTrack::_notification(int what) {
 	}
 }
 
+AnimationPlayer* SpineAnimationTrack::find_animation_player() {
+	AnimationPlayer *animation_player = nullptr;
+	for (int i = 0; i < get_child_count(); i++) {
+		animation_player = cast_to<AnimationPlayer>(get_child(i));
+		if (animation_player) {
+			break;
+		}
+	}
+	return animation_player;
+}
+
 void SpineAnimationTrack::setup_animation_player() {
 	if (!sprite) return;
 	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
+	AnimationPlayer *animation_player = find_animation_player();
+	if (!animation_player) return;
 
 	// If we don't have a track index yet, find the highest track number used
 	// by existing tracks.
@@ -114,14 +128,6 @@ void SpineAnimationTrack::setup_animation_player() {
 
 	// Find the animation player under the track and reset its animation. Create a new one
 	// if there isn't one already.
-	animation_player = nullptr;
-	for (int i = 0; i < get_child_count(); i++) {
-		animation_player = cast_to<AnimationPlayer>(get_child(i));
-		if (animation_player) {
-			break;
-		}
-	}
-
 	if (!animation_player) {
 		animation_player = memnew(AnimationPlayer);
 		animation_player->set_name(String("{0} Track {1}").format(varray(sprite->get_name(), String::num_int64(track_index))));
@@ -186,6 +192,9 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 	if (!sprite) return;
 	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
 	if (track_index < 0) return;
+
+	AnimationPlayer *animation_player = find_animation_player();
+	if (!animation_player) return;
 
 	spine::AnimationState *animation_state = sprite->get_animation_state()->get_spine_object();
 	if (!animation_state) return;
