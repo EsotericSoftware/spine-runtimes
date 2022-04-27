@@ -40,6 +40,7 @@
 #define INSTANTIATE(x) (x).instantiate()
 #define NOTIFY_PROPERTY_LIST_CHANGED() notify_property_list_changed()
 #define VARIANT_FLOAT Variant::FLOAT
+#define PROPERTY_USAGE_NOEDITOR PROPERTY_USAGE_NO_EDITOR
 #else
 #include "core/object.h"
 #include "core/reference.h"
@@ -74,7 +75,11 @@ protected:
 
 	void spine_objects_invalidated() {
 		spine_object = nullptr;
+#if VERSION_MAJOR > 3
+		spine_owner->disconnect("_internal_spine_objects_invalidated", callable_mp(this, &SpineObjectWrapper::spine_objects_invalidated));
+#else
 		spine_owner->disconnect("_internal_spine_objects_invalidated", this, "_internal_spine_objects_invalidated");
+#endif
 	}
 	
 	SpineObjectWrapper(): spine_owner(nullptr), spine_object(nullptr) {
@@ -96,7 +101,11 @@ protected:
 
 		spine_owner = (Object*)_owner;
 		spine_object = _object;
+#if VERSION_MAJOR > 3
+		spine_owner->connect("_internal_spine_objects_invalidated", callable_mp(this, &SpineObjectWrapper::spine_objects_invalidated));
+#else
 		spine_owner->connect("_internal_spine_objects_invalidated", this, "_internal_spine_objects_invalidated");
+#endif
 	}
 
 	void *_get_spine_object_internal() { return spine_object; }

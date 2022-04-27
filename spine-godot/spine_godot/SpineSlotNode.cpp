@@ -17,8 +17,13 @@ void SpineSlotNode::_notification(int what) {
     case NOTIFICATION_PARENTED: {
         sprite = Object::cast_to<SpineSprite>(get_parent());
         if (sprite) {
+#if VERSION_MAJOR > 3
+            sprite->connect("world_transforms_changed", callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
+#else
             sprite->connect("world_transforms_changed", this, "_on_world_transforms_changed");
+#endif
             update_transform(sprite);
+#if VERSION_MAJOR == 3
             _change_notify("transform/translation");
             _change_notify("transform/rotation");
             _change_notify("transform/scale");
@@ -26,6 +31,7 @@ void SpineSlotNode::_notification(int what) {
             _change_notify("rotation");
             _change_notify("rotation_deg");
             _change_notify("scale");
+#endif
         } else {
             WARN_PRINT("SpineSlotNode parent is not a SpineSprite.");
         }
@@ -34,7 +40,11 @@ void SpineSlotNode::_notification(int what) {
     }
     case NOTIFICATION_UNPARENTED: {
         if (sprite) {
-            sprite->disconnect("world_transforms_changed", this, "_on_world_transforms_changed");
+#if VERSION_MAJOR > 3
+			sprite->disconnect("world_transforms_changed", callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
+#else
+			sprite->disconnect("world_transforms_changed", this, "_on_world_transforms_changed");
+#endif
         }       
     }
     default:
@@ -67,6 +77,7 @@ bool SpineSlotNode::_set(const StringName& property, const Variant& value) {
     if (property == "slot_name") {
         slot_name = value;
         update_transform(sprite);
+#if VERSION_MAJOR == 3
         _change_notify("transform/translation");
         _change_notify("transform/rotation");
         _change_notify("transform/scale");
@@ -74,6 +85,7 @@ bool SpineSlotNode::_set(const StringName& property, const Variant& value) {
         _change_notify("rotation");
         _change_notify("rotation_deg");
         _change_notify("scale");
+#endif
         return true;
     }
     return false;

@@ -1,5 +1,10 @@
 ﻿#include "SpineAnimationTrack.h"
+#if VERSION_MAJOR > 3
+#include "core/config/engine.h"
+#else
 #include "core/engine.h"
+#endif
+#include "godot/editor/editor_node.h"
 #include "scene/animation/animation_player.h"
 #include "scene/resources/animation.h"
 
@@ -75,7 +80,11 @@ void SpineAnimationTrack::_notification(int what) {
 	case NOTIFICATION_PARENTED: {
 			sprite = Object::cast_to<SpineSprite>(get_parent());
 			if (sprite)
+#if VERSION_MAJOR > 3
+				sprite->connect("before_animation_state_update", callable_mp(this,  &SpineAnimationTrack::update_animation_state));
+#else
 				sprite->connect("before_animation_state_update", this, "update_animation_state");
+#endif
 			NOTIFY_PROPERTY_LIST_CHANGED();
 			break;
 	}
@@ -85,7 +94,11 @@ void SpineAnimationTrack::_notification(int what) {
 	}
 	case NOTIFICATION_UNPARENTED: {
 			if (sprite) {
+#if VERSION_MAJOR > 3
+				sprite->disconnect("before_animation_state_update", callable_mp(this, &SpineAnimationTrack::update_animation_state));
+#else
 				sprite->disconnect("before_animation_state_update", this, "update_animation_state");
+#endif
 				sprite = nullptr;
 			}
 			break;
@@ -134,27 +147,49 @@ void SpineAnimationTrack::setup_animation_player() {
 		add_child(animation_player);
 		animation_player->set_owner(sprite->get_owner());
 	} else {
+#if VERSION_MAJOR > 3
+		List<StringName> animation_libraries;
+		animation_player->get_animation_library_list(&animation_libraries);
+		for (int i = 0; i < animation_libraries.size(); i++) {
+			animation_player->remove_animation_library(animation_libraries[i]);
+		}
+#else
 		List<StringName> animation_names;
 		animation_player->get_animation_list(&animation_names);
 		for (int i = 0; i < animation_names.size(); i++) {
 			animation_player->remove_animation(animation_names[i]);
 		}
+#endif
 	}
 	
 	auto skeleton_data = sprite->get_skeleton_data_res()->get_skeleton_data();
 	auto &animations = skeleton_data->getAnimations();
+#if VERSION_MAJOR > 3
+	Ref<AnimationLibrary> animation_library;
+	animation_library.instantiate();
+	animation_player->add_animation_library("", animation_library);
+#endif
 	for (int i = 0; i < (int)animations.size(); i++) {
 		auto &animation = animations[i];
 		Ref<Animation> animation_ref = create_animation(animation, false);
-		animation_player->add_animation(animation_ref->get_name(), animation_ref);
 		Ref<Animation> animation_looped_ref = create_animation(animation, true);
+#if VERSION_MAJOR > 3
+		animation_library->add_animation(animation_ref->get_name(), animation_ref);
+		animation_library->add_animation(animation_looped_ref->get_name(), animation_looped_ref);
+#else
+		animation_player->add_animation(animation_ref->get_name(), animation_ref);
 		animation_player->add_animation(animation_looped_ref->get_name(), animation_looped_ref);
+#endif
 	}
 	
 	Ref<Animation> reset_animation_ref;
 	INSTANTIATE(reset_animation_ref);	
 	reset_animation_ref->set_name("RESET");
+#if VERSION_MAJOR > 3
+	// reset_animation_ref->set_loop(true);
+#else
 	reset_animation_ref->set_loop(true);
+#endif
 	reset_animation_ref->set_length(0.5f);
 	reset_animation_ref->add_track(Animation::TYPE_VALUE);
 	reset_animation_ref->track_set_path(0, NodePath(".:animation_name"));	
@@ -162,8 +197,13 @@ void SpineAnimationTrack::setup_animation_player() {
 	reset_animation_ref->add_track(Animation::TYPE_VALUE);
 	reset_animation_ref->track_set_path(1, NodePath(".:loop"));	
 	reset_animation_ref->track_insert_key(1, 0, false);
+#if VERSION_MAJOR > 3
+	animation_library->add_animation(reset_animation_ref->get_name(), reset_animation_ref);
+	animation_library->add_animation("-- Empty --", reset_animation_ref);
+#else
 	animation_player->add_animation(reset_animation_ref->get_name(), reset_animation_ref);
 	animation_player->add_animation("-- Empty --", reset_animation_ref);
+#endif
 }
 
 Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation, bool loop) {
@@ -173,7 +213,7 @@ Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation
 	Ref<Animation> animation_ref;
 	INSTANTIATE(animation_ref);	
 	animation_ref->set_name(String(animation->getName().buffer()) + (loop ? "" : "_looped"));
-	animation_ref->set_loop(!loop);
+	// animation_ref->set_loop(!loop);
 	animation_ref->set_length(duration);
 
 	animation_ref->add_track(Animation::TYPE_VALUE);
@@ -205,7 +245,11 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 #ifdef TOOLS_ENABLED
 		// When the animation dock is no longer visible or we aren't being 
 		// keyed in the current animation, bail.
+#if VERSION_MAJOR > 3
+		auto player_editor = AnimationPlayerEditor::get_singleton();
+#else
 		auto player_editor = AnimationPlayerEditor::singleton;
+#endif
 		if (!player_editor->is_visible_in_tree()) {
 			skeleton->setToSetupPose();
 			animation_state->clearTracks();
