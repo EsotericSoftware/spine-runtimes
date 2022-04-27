@@ -172,3 +172,4 @@ spine-godot/example/.import
 spine-godot/spine_godot/*.obj
 *.bc
 spine-godot/example/.godot
+spine-godot/example-v4/.godot
