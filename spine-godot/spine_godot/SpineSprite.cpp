@@ -50,6 +50,15 @@ void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_update_mode", "v"), &SpineSprite::set_update_mode);
 	ClassDB::bind_method(D_METHOD("get_update_mode"), &SpineSprite::get_update_mode);
 
+	ClassDB::bind_method(D_METHOD("set_normal_material", "material"), &SpineSprite::set_normal_material);
+	ClassDB::bind_method(D_METHOD("get_normal_material"), &SpineSprite::get_normal_material);
+	ClassDB::bind_method(D_METHOD("set_additive_material", "material"), &SpineSprite::set_additive_material);
+	ClassDB::bind_method(D_METHOD("get_additive_material"), &SpineSprite::get_additive_material);
+	ClassDB::bind_method(D_METHOD("set_multiply_material", "material"), &SpineSprite::set_multiply_material);
+	ClassDB::bind_method(D_METHOD("get_multiply_material"), &SpineSprite::get_multiply_material);
+	ClassDB::bind_method(D_METHOD("set_screen_material", "material"), &SpineSprite::set_screen_material);
+	ClassDB::bind_method(D_METHOD("get_screen_material"), &SpineSprite::get_screen_material);
+
 	ClassDB::bind_method(D_METHOD("update_skeleton", "delta"), &SpineSprite::update_skeleton);
 	ClassDB::bind_method(D_METHOD("new_skin", "name"), &SpineSprite::new_skin);
 
@@ -67,6 +76,11 @@ void SpineSprite::_bind_methods() {
 
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "skeleton_data_res", PropertyHint::PROPERTY_HINT_RESOURCE_TYPE, "SpineSkeletonDataResource"), "set_skeleton_data_res", "get_skeleton_data_res");
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "update_mode", PROPERTY_HINT_ENUM, "Process,Physics,Manual"), "set_update_mode", "get_update_mode");
+	ADD_GROUP("Materials", "");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "normal_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_normal_material", "get_normal_material");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "additive_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_additive_material", "get_additive_material");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "multiply_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_multiply_material", "get_multiply_material");
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "screen_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_screen_material", "get_screen_material");
 
 	BIND_ENUM_CONSTANT(UpdateMode::UpdateMode_Process)
 	BIND_ENUM_CONSTANT(UpdateMode::UpdateMode_Physics)
@@ -91,7 +105,7 @@ SpineSprite::SpineSprite() : update_mode(UpdateMode_Process), skeleton_clipper(n
 		default_materials[spine::BlendMode_Multiply] = material_multiply;
 
 		Ref<CanvasItemMaterial> material_screen(memnew(CanvasItemMaterial));
-		material_screen->set_blend_mode(CanvasItemMaterial::BLEND_MODE_MIX);
+		material_screen->set_blend_mode(CanvasItemMaterial::BLEND_MODE_SUB);
 		default_materials[spine::BlendMode_Screen] = material_screen;
 	}
 	sprite_count++;
@@ -446,9 +460,17 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton) {
 		}
 		skeleton_clipper->clipEnd(*slot);
 
-		if (mesh_ins->get_material()->is_class("CanvasItemMaterial")) {
-			mesh_ins->set_material(default_materials[slot->getData().getBlendMode()]);
+		spine::BlendMode blend_mode = slot->getData().getBlendMode();
+		Ref<Material> custom_material;
+		switch (blend_mode) {
+		case spine::BlendMode_Normal: custom_material = normal_material; break;
+		case spine::BlendMode_Additive: custom_material = additive_material; break;
+		case spine::BlendMode_Multiply: custom_material = multiply_material; break;
+		case spine::BlendMode_Screen: custom_material = screen_material; break;
+		default: ;
 		}
+		if (custom_material.is_valid()) mesh_ins->set_material(custom_material);
+		else mesh_ins->set_material(default_materials[slot->getData().getBlendMode()]);
 	}
 	skeleton_clipper->clipEnd();
 }
@@ -516,6 +538,38 @@ Ref<SpineSkin> SpineSprite::new_skin(const String& name) {
 	Ref<SpineSkin> skin = memnew(SpineSkin);
 	skin->init(name, this);
 	return skin;
+}
+
+Ref<Material> SpineSprite::get_normal_material() {
+	return normal_material;
+}
+
+void SpineSprite::set_normal_material(Ref<Material> material) {
+	normal_material = material;
+}
+
+Ref<Material> SpineSprite::get_additive_material() {
+	return additive_material;
+}
+
+void SpineSprite::set_additive_material(Ref<Material> material) {
+	additive_material = material;
+}
+
+Ref<Material> SpineSprite::get_multiply_material() {
+	return multiply_material;
+}
+
+void SpineSprite::set_multiply_material(Ref<Material> material) {
+	multiply_material = material;
+}
+
+Ref<Material> SpineSprite::get_screen_material() {
+	return screen_material;
+}
+
+void SpineSprite::set_screen_material(Ref<Material> material) {
+	screen_material = material;
 }
 
 #ifdef TOOLS_ENABLED

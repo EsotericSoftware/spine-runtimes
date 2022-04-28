@@ -58,6 +58,10 @@ protected:
 	Vector<MeshInstance2D *> mesh_instances;
 	spine::SkeletonClipping *skeleton_clipper;
 	static Ref<CanvasItemMaterial> default_materials[4];
+	Ref<Material> normal_material;
+	Ref<Material> additive_material;
+	Ref<Material> multiply_material;
+	Ref<Material> screen_material;
 	
 	static void _bind_methods();
 	void _notification(int what);
@@ -94,6 +98,22 @@ public:
 	void set_update_mode(UpdateMode v);
 
 	Ref<SpineSkin> new_skin(const String &name);
+
+	Ref<Material> get_normal_material();
+
+	void set_normal_material(Ref<Material> material);
+
+	Ref<Material> get_additive_material();
+
+	void set_additive_material(Ref<Material> material);
+
+	Ref<Material> get_multiply_material();
+
+	void set_multiply_material(Ref<Material> material);
+
+	Ref<Material> get_screen_material();
+
+	void set_screen_material(Ref<Material> material);
 
 #ifdef TOOLS_ENABLED
 	virtual Rect2 _edit_get_rect() const;

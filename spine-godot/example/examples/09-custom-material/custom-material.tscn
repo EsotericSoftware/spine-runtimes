@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://assets/spineboy/spinebody-data-res.tres" type="SpineSkeletonDataResource" id=1]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+void fragment() {
+  COLOR = vec4(0.4, 0.6, 0.9, 1.0);
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+
+[node name="Node2D" type="Node2D"]
+
+[node name="SpineSprite" type="SpineSprite" parent="."]
+position = Vector2( 471, 482 )
+scale = Vector2( 0.546374, 0.546373 )
+skeleton_data_res = ExtResource( 1 )
+normal_material = SubResource( 2 )
