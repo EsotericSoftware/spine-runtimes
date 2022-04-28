@@ -213,7 +213,11 @@ Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation
 	Ref<Animation> animation_ref;
 	INSTANTIATE(animation_ref);	
 	animation_ref->set_name(String(animation->getName().buffer()) + (loop ? "" : "_looped"));
+#if VERSION_MAJOR > 3
 	// animation_ref->set_loop(!loop);
+#else
+	animation_ref->set_loop(loop);
+#endif
 	animation_ref->set_length(duration);
 
 	animation_ref->add_track(Animation::TYPE_VALUE);
