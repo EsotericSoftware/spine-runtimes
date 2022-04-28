@@ -349,6 +349,8 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
+			AddDependentAtlasIfImageChanged(atlasPaths, imagePaths);
+
 			// Import atlases first.
 			var newAtlases = new List<AtlasAssetBase>();
 			foreach (string ap in atlasPaths) {
@@ -449,6 +451,18 @@ namespace Spine.Unity.Editor {
 						string assetPath = SpineEditorUtilities.DataReloadHandler.savedSkeletonDataAssetAtSKeletonGraphicID[skeletonGraphicID];
 						skeletonGraphic.skeletonDataAsset = (SkeletonDataAsset)AssetDatabase.LoadAssetAtPath<SkeletonDataAsset>(assetPath);
 					}
+				}
+			}
+		}
+
+		static void AddDependentAtlasIfImageChanged (List<string> atlasPaths, List<string> imagePaths) {
+			foreach (var imagePath in imagePaths) {
+				string atlasPath = imagePath.Replace(".png", ".atlas.txt");
+				if (!System.IO.File.Exists(atlasPath))
+					continue;
+
+				if (!atlasPaths.Contains(atlasPath)) {
+					atlasPaths.Add(atlasPath);
 				}
 			}
 		}
