@@ -8,6 +8,7 @@ xcopy /E /I .idea godot\.idea  || goto error
 copy custom.py godot  || goto error
 rmdir spine_godot\spine-cpp /s /q  || goto error
 xcopy /E /I ..\spine-cpp\spine-cpp spine_godot\spine-cpp  || goto error
+cd godot & git apply ../livepp.patch & git apply ../livepp-v4.patch & cd ..
 build.bat || goto error
 exit 0
 
