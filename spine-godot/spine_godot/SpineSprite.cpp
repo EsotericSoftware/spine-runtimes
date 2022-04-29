@@ -36,6 +36,12 @@
 
 Ref<CanvasItemMaterial> SpineSprite::default_materials[4] = {};
 static int sprite_count = 0;
+static spine::Vector<unsigned short> quad_indices;
+static spine::Vector<float> scratch_vertices;
+static Vector<Vector2> scratch_points;
+static Vector<Vector2> scratch_uvs;
+static Vector<Color> scratch_colors;
+static Vector<int> scratch_indices;
 
 void SpineSprite::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_skeleton_data_res", "skeleton_data_res"), &SpineSprite::set_skeleton_data_res);
@@ -108,6 +114,18 @@ SpineSprite::SpineSprite() : update_mode(UpdateMode_Process), skeleton_clipper(n
 		material_screen->set_blend_mode(CanvasItemMaterial::BLEND_MODE_SUB);
 		default_materials[spine::BlendMode_Screen] = material_screen;
 	}
+
+	// Setup static scratch buffers
+	if (quad_indices.size() == 0) {
+		quad_indices.setSize(6, 0);
+		quad_indices[0] = 0;
+		quad_indices[1] = 1;
+		quad_indices[2] = 2;
+		quad_indices[3] = 2;
+		quad_indices[4] = 3;
+		quad_indices[5] = 0;
+		scratch_vertices.ensureCapacity(1200);
+	}
 	sprite_count++;
 }
 
@@ -120,8 +138,8 @@ SpineSprite::~SpineSprite() {
 	}
 }
 
-void SpineSprite::set_skeleton_data_res(const Ref<SpineSkeletonDataResource> &s) {
-	skeleton_data_res = s;
+void SpineSprite::set_skeleton_data_res(const Ref<SpineSkeletonDataResource> &_skeleton_data) {
+	skeleton_data_res = _skeleton_data;
 	on_skeleton_data_changed();
 }
 Ref<SpineSkeletonDataResource> SpineSprite::get_skeleton_data_res() {
@@ -132,7 +150,6 @@ void SpineSprite::on_skeleton_data_changed() {
 	remove_meshes();
 	skeleton.unref();
 	animation_state.unref();
-
 	emit_signal("_internal_spine_objects_invalidated");
 
 	if (skeleton_data_res.is_valid()) {
@@ -148,10 +165,11 @@ void SpineSprite::on_skeleton_data_changed() {
 	if (skeleton_data_res.is_valid() && skeleton_data_res->is_skeleton_data_loaded()) {
 		skeleton = Ref<SpineSkeleton>(memnew(SpineSkeleton));
 		skeleton->set_spine_sprite(this);
+		skeleton->get_spine_object()->setScaleY(-1);
 
 		animation_state = Ref<SpineAnimationState>(memnew(SpineAnimationState));
 		animation_state->set_spine_sprite(this);
-		if (animation_state->get_spine_object()) animation_state->get_spine_object()->setListener(this);
+		animation_state->get_spine_object()->setListener(this);
 
 		animation_state->update(0);
 		animation_state->apply(skeleton);
@@ -170,12 +188,10 @@ void SpineSprite::on_skeleton_data_changed() {
 
 void SpineSprite::generate_meshes_for_slots(Ref<SpineSkeleton> skeleton_ref) {
 	auto skeleton = skeleton_ref->get_spine_object();
-	for (int i = 0, n = skeleton->getSlots().size(); i < n; i++) {
-
+	for (int i = 0, n = (int)skeleton->getSlots().size(); i < n; i++) {
 		auto mesh_instance = memnew(MeshInstance2D);
 		mesh_instance->set_position(Vector2(0, 0));
 		mesh_instance->set_material(default_materials[spine::BlendMode_Normal]);
-
 		add_child(mesh_instance);
 		mesh_instances.push_back(mesh_instance);
 		slot_nodes.add(spine::Vector<SpineSlotNode*>());
@@ -183,7 +199,7 @@ void SpineSprite::generate_meshes_for_slots(Ref<SpineSkeleton> skeleton_ref) {
 }
 
 void SpineSprite::remove_meshes() {
-	for (size_t i = 0; i < mesh_instances.size(); ++i) {
+	for (int i = 0; i < mesh_instances.size(); ++i) {
 		remove_child(mesh_instances[i]);
 		memdelete(mesh_instances[i]);
 	}
@@ -192,7 +208,7 @@ void SpineSprite::remove_meshes() {
 }
 
 void SpineSprite::sort_slot_nodes() {
-	for (int i = 0; i < slot_nodes.size(); i++) {
+	for (int i = 0; i < (int)slot_nodes.size(); i++) {
 		slot_nodes[i].setSize(0, nullptr);
 	}
 	
@@ -200,17 +216,17 @@ void SpineSprite::sort_slot_nodes() {
 	for (int i = 0; i < get_child_count(); i++) {
 		auto slot_node = Object::cast_to<SpineSlotNode>(get_child(i));
 		if (!slot_node) continue;
-		if (slot_node->get_slot_index() == -1 || slot_node->get_slot_index() >= draw_order.size()) {
+		if (slot_node->get_slot_index() == -1 || slot_node->get_slot_index() >= (int)draw_order.size()) {
 			continue;
 		}
 		slot_nodes[slot_node->get_slot_index()].add(slot_node);
 	}
 	
-	for (int i = 0; i < draw_order.size(); i++) {
+	for (int i = 0; i < (int)draw_order.size(); i++) {
 		int slot_index = draw_order[i]->getData().getIndex();
 		int mesh_index = mesh_instances[i]->get_index();
 		spine::Vector<SpineSlotNode*> &nodes = slot_nodes[slot_index];
-		for (int j = 0; j < nodes.size(); j++) {
+		for (int j = 0; j < (int)nodes.size(); j++) {
 			auto node = nodes[j];
 			move_child(node, mesh_index + 1);
 		}
@@ -248,98 +264,115 @@ void SpineSprite::_notification(int what) {
 }
 
 void SpineSprite::update_skeleton(float delta) {
-	if (!(skeleton.is_valid() && animation_state.is_valid()) || EMPTY(mesh_instances))
+	if (!skeleton_data_res.is_valid() ||
+		!skeleton_data_res->is_skeleton_data_loaded() ||
+		!skeleton.is_valid() ||
+		!skeleton->get_spine_object() ||
+		!animation_state.is_valid() ||
+		!animation_state->get_spine_object())
 		return;
 
 	emit_signal("before_animation_state_update", this);
 	animation_state->update(delta);
-	if (!is_visible_in_tree())
-		return;
-
+	if (!is_visible_in_tree()) return;
 	emit_signal("before_animation_state_apply", this);
 	animation_state->apply(skeleton);
 	emit_signal("before_world_transforms_change", this);
 	skeleton->update_world_transform();
 	emit_signal("world_transforms_changed", this);
+	sort_slot_nodes();
 	update_meshes(skeleton);
 	update();
-	sort_slot_nodes();
 }
 
-#define TEMP_COPY(t, get_res)                   \
-	do {                                        \
-		auto &temp_uvs = get_res;               \
-		(t).setSize(temp_uvs.size(), 0);          \
-		for (size_t j = 0; j < (t).size(); ++j) { \
-			(t)[j] = temp_uvs[j];                 \
-		}                                       \
-	} while (false);
+static void clear_mesh_instance(MeshInstance2D *mesh_instance) {
+#if VERSION_MAJOR > 3
+	RenderingServer::get_singleton()->canvas_item_clear(mesh_instance->get_canvas_item());
+#else
+	VisualServer::get_singleton()->canvas_item_clear(mesh_instance->get_canvas_item());
+#endif
+}
 
-void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton) {
-	static const unsigned short VERTEX_STRIDE = 2;
-	static unsigned short quad_indices[] = {0, 1, 2, 2, 3, 0};
+static void add_triangles(MeshInstance2D *mesh_instance,
+	const Vector<Point2> &vertices,
+	const Vector<Point2> &uvs,
+	const Vector<Color> &colors,
+	const Vector<int> &indices,
+	Ref<Texture> texture,
+	Ref<Texture> normal_map) {
+#if VERSION_MAJOR > 3
+	RenderingServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
+																  indices,
+																  vertices,
+																  colors,
+																  uvs,
+																  Vector<int>(),
+																  Vector<float>(),
+																  tex.is_null() ? RID() : tex->get_rid(),
+																  -1);
+#else
+	VisualServer::get_singleton()->canvas_item_add_triangle_array(mesh_instance->get_canvas_item(),
+																  indices,
+																  vertices,
+																  colors,
+																  uvs,
+																  Vector<int>(),
+																  Vector<float>(),
+																  texture.is_null() ? RID() : texture->get_rid(),
+																  -1,
+																  normal_map.is_null() ? RID() : normal_map->get_rid());
+#endif
+}
 
-	auto sk = skeleton->get_spine_object();
-	for (int i = 0, n = sk->getSlots().size(); i < n; ++i) {
-		spine::Vector<float> vertices;
-		spine::Vector<float> uvs;
-		spine::Vector<unsigned short> indices;
-
-		spine::Slot *slot = sk->getDrawOrder()[i];
-
+void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
+	spine::Skeleton *skeleton = skeleton_ref->get_spine_object();
+	for (int i = 0, n = (int)skeleton->getSlots().size(); i < n; ++i) {
+		spine::Slot *slot = skeleton->getDrawOrder()[i];
 		spine::Attachment *attachment = slot->getAttachment();
+		MeshInstance2D *mesh_instance = mesh_instances[i];
 		if (!attachment) {
 			mesh_instances[i]->set_visible(false);
 			skeleton_clipper->clipEnd(*slot);
 			continue;
 		}
-		mesh_instances[i]->set_visible(true);
+		mesh_instance->set_visible(true);
+		clear_mesh_instance(mesh_instance);
 
-		spine::Color skeleton_color = sk->getColor();
+		spine::Color skeleton_color = skeleton->getColor();
 		spine::Color slot_color = slot->getColor();
 		spine::Color tint(skeleton_color.r * slot_color.r, skeleton_color.g * slot_color.g, skeleton_color.b * slot_color.b, skeleton_color.a * slot_color.a);
-
-		Ref<Texture> tex;
-		Ref<Texture> normal_tex;
-		size_t v_num = 0;
+		Ref<Texture> texture;
+		Ref<Texture> normal_map;
+		spine::Vector<float> *vertices = &scratch_vertices;
+		spine::Vector<float> *uvs;
+		spine::Vector<unsigned short> *indices;
 
 		if (attachment->getRTTI().isExactly(spine::RegionAttachment::rtti)) {
-			auto *region_attachment = (spine::RegionAttachment *) attachment;
+			auto *region = (spine::RegionAttachment *) attachment;
+			auto renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) region->getRendererObject())->page->getRendererObject();
+			texture = renderer_object->texture;
+			normal_map = renderer_object->normal_map;
+			
+			vertices->setSize(8, 0);
+			region->computeWorldVertices(*slot, *vertices, 0);
+			uvs = &region->getUVs();
+			indices = &quad_indices;
 
-			auto p_spine_renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) region_attachment->getRendererObject())->page->getRendererObject();
-			tex = p_spine_renderer_object->texture;
-			normal_tex = p_spine_renderer_object->normal_map;
-
-			v_num = 4;
-			vertices.setSize(v_num * VERTEX_STRIDE, 0);
-
-			region_attachment->computeWorldVertices(*slot, vertices, 0);
-
-			TEMP_COPY(uvs, region_attachment->getUVs());
-
-			indices.setSize(sizeof(quad_indices) / sizeof(unsigned short), 0);
-			for (size_t j = 0, qn = indices.size(); j < qn; ++j) {
-				indices[j] = quad_indices[j];
-			}
-
-			auto attachment_color = region_attachment->getColor();
+			auto attachment_color = region->getColor();
 			tint.r *= attachment_color.r;
 			tint.g *= attachment_color.g;
 			tint.b *= attachment_color.b;
 			tint.a *= attachment_color.a;
 		} else if (attachment->getRTTI().isExactly(spine::MeshAttachment::rtti)) {
 			auto *mesh = (spine::MeshAttachment *) attachment;
-
-			auto p_spine_renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
-			tex = p_spine_renderer_object->texture;
-			normal_tex = p_spine_renderer_object->normal_map;
-
-			v_num = mesh->getWorldVerticesLength() / VERTEX_STRIDE;
-			vertices.setSize(mesh->getWorldVerticesLength(), 0);
-
-			mesh->computeWorldVertices(*slot, vertices);
-			TEMP_COPY(uvs, mesh->getUVs());
-			TEMP_COPY(indices, mesh->getTriangles());
+			auto renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
+			texture = renderer_object->texture;
+			normal_map = renderer_object->normal_map;
+			
+			vertices->setSize(mesh->getWorldVerticesLength(), 0);
+			mesh->computeWorldVertices(*slot, *vertices);
+			uvs = &mesh->getUVs();
+			indices = &mesh->getTriangles();
 
 			auto attachment_color = mesh->getColor();
 			tint.r *= attachment_color.r;
@@ -355,122 +388,47 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton) {
 			continue;
 		}
 
-		auto mesh_ins = mesh_instances[i];
-#if VERSION_MAJOR > 3
-		RenderingServer::get_singleton()->canvas_item_clear(mesh_ins->get_canvas_item());
-#else
-		VisualServer::get_singleton()->canvas_item_clear(mesh_ins->get_canvas_item());
-#endif
-
 		if (skeleton_clipper->isClipping()) {
-			skeleton_clipper->clipTriangles(vertices, indices, uvs, VERTEX_STRIDE);
-
+			skeleton_clipper->clipTriangles(*vertices, *indices, *uvs, 2);
 			if (skeleton_clipper->getClippedTriangles().size() == 0) {
 				skeleton_clipper->clipEnd(*slot);
 				continue;
 			}
 
-			auto &clipped_vertices = skeleton_clipper->getClippedVertices();
-			v_num = clipped_vertices.size() / VERTEX_STRIDE;
-			auto &clipped_uvs = skeleton_clipper->getClippedUVs();
-			auto &clipped_indices = skeleton_clipper->getClippedTriangles();
-
-			if (indices.size() > 0) {
-				Vector<Vector2> p_points, p_uvs;
-				Vector<Color> p_colors;
-				Vector<int> p_indices;
-				p_points.resize(v_num);
-				p_uvs.resize(v_num);
-				p_colors.resize(v_num);
-				for (size_t j = 0; j < v_num; j++) {
-					p_points.set(j, Vector2(clipped_vertices[j * VERTEX_STRIDE], -clipped_vertices[j * VERTEX_STRIDE + 1]));
-					p_uvs.set(j, Vector2(clipped_uvs[j * VERTEX_STRIDE], clipped_uvs[j * VERTEX_STRIDE + 1]));
-					p_colors.set(j, Color(tint.r, tint.g, tint.b, tint.a));
-				}
-				p_indices.resize(clipped_indices.size());
-				for (size_t j = 0; j < clipped_indices.size(); ++j) {
-					p_indices.set(j, clipped_indices[j]);
-				}
-
-#if VERSION_MAJOR > 3
-				RenderingServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
-																			  p_indices,
-																			  p_points,
-																			  p_colors,
-																			  p_uvs,
-																			  Vector<int>(),
-																			  Vector<float>(),
-																			  tex.is_null() ? RID() : tex->get_rid(),
-																			  -1
-																			  );
-#else
-				VisualServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
-																			  p_indices,
-																			  p_points,
-																			  p_colors,
-																			  p_uvs,
-																			  Vector<int>(),
-																			  Vector<float>(),
-																			  tex.is_null() ? RID() : tex->get_rid(),
-																			  -1,
-																			  normal_tex.is_null() ? RID() : normal_tex->get_rid());
-#endif
+			vertices = &skeleton_clipper->getClippedVertices();
+			uvs = &skeleton_clipper->getClippedUVs();
+			indices = &skeleton_clipper->getClippedTriangles();
+		}
+		
+		if (indices->size() > 0) {
+			size_t num_vertices = vertices->size() / 2;
+			scratch_points.resize((int)num_vertices);
+			memcpy(scratch_points.ptrw(), vertices->buffer(), num_vertices * 2 * sizeof(float));
+			scratch_uvs.resize((int)num_vertices);
+			memcpy(scratch_uvs.ptrw(), uvs->buffer(), num_vertices * 2 * sizeof(float));
+			scratch_colors.resize((int)num_vertices);
+			for (int j = 0; j < (int)num_vertices; j++) {
+				scratch_colors.set(j, Color(tint.r, tint.g, tint.b, tint.a));
 			}
-		} else {
-			if (indices.size() > 0) {
-				Vector<Vector2> p_points, p_uvs;
-				Vector<Color> p_colors;
-				Vector<int> p_indices;
-				p_points.resize(v_num);
-				p_uvs.resize(v_num);
-				p_colors.resize(v_num);
-				for (size_t j = 0; j < v_num; j++) {
-					p_points.set(j, Vector2(vertices[j * VERTEX_STRIDE], -vertices[j * VERTEX_STRIDE + 1]));
-					p_uvs.set(j, Vector2(uvs[j * VERTEX_STRIDE], uvs[j * VERTEX_STRIDE + 1]));
-					p_colors.set(j, Color(tint.r, tint.g, tint.b, tint.a));
-				}
-				p_indices.resize(indices.size());
-				for (size_t j = 0; j < indices.size(); ++j) {
-					p_indices.set(j, indices[j]);
-				}
-
-#if VERSION_MAJOR > 3
-				RenderingServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
-																			  p_indices,
-																			  p_points,
-																			  p_colors,
-																			  p_uvs,
-																			  Vector<int>(),
-																			  Vector<float>(),
-																			  tex.is_null() ? RID() : tex->get_rid(),
-																			  -1);
-#else
-				VisualServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
-																			  p_indices,
-																			  p_points,
-																			  p_colors,
-																			  p_uvs,
-																			  Vector<int>(),
-																			  Vector<float>(),
-																			  tex.is_null() ? RID() : tex->get_rid(),
-																			  -1,
-																			  normal_tex.is_null() ? RID() : normal_tex->get_rid());
-#endif
+			scratch_indices.resize((int)indices->size());
+			for (int j = 0; j < (int)indices->size(); ++j) {
+				scratch_indices.set(j, indices->buffer()[j]);
 			}
+
+			add_triangles(mesh_instance, scratch_points, scratch_uvs, scratch_colors, scratch_indices, texture, normal_map);
+
+			spine::BlendMode blend_mode = slot->getData().getBlendMode();
+			Ref<Material> custom_material;
+			switch (blend_mode) {
+				case spine::BlendMode_Normal: custom_material = normal_material; break;
+				case spine::BlendMode_Additive: custom_material = additive_material; break;
+				case spine::BlendMode_Multiply: custom_material = multiply_material; break;
+				case spine::BlendMode_Screen: custom_material = screen_material; break;
+			}
+			if (custom_material.is_valid()) mesh_instance->set_material(custom_material);
+			else mesh_instance->set_material(default_materials[slot->getData().getBlendMode()]);
 		}
 		skeleton_clipper->clipEnd(*slot);
-
-		spine::BlendMode blend_mode = slot->getData().getBlendMode();
-		Ref<Material> custom_material;
-		switch (blend_mode) {
-		case spine::BlendMode_Normal: custom_material = normal_material; break;
-		case spine::BlendMode_Additive: custom_material = additive_material; break;
-		case spine::BlendMode_Multiply: custom_material = multiply_material; break;
-		case spine::BlendMode_Screen: custom_material = screen_material; break;
-		default: ;
-		}
-		if (custom_material.is_valid()) mesh_ins->set_material(custom_material);
-		else mesh_ins->set_material(default_materials[slot->getData().getBlendMode()]);
 	}
 	skeleton_clipper->clipEnd();
 }

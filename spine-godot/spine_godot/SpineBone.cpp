@@ -456,9 +456,9 @@ Transform2D SpineBone::get_global_transform() {
 	if (!get_spine_owner()) return get_transform();
 	if (!get_spine_owner()->is_visible_in_tree()) return get_transform();
 	Transform2D local;
-	local.rotate(Math::deg2rad(-get_world_rotation_x()));
+	local.rotate(Math::deg2rad(get_world_rotation_x()));
 	local.scale(Vector2(get_world_scale_x(), get_world_scale_y()));
-	local.set_origin(Vector2(get_world_x(), -get_world_y()));
+	local.set_origin(Vector2(get_world_x(), get_world_y()));
 	return get_spine_owner()->get_global_transform() * local;
 }
 
@@ -469,7 +469,7 @@ void SpineBone::set_global_transform(Transform2D transform) {
 	transform = get_spine_owner()->get_global_transform().affine_inverse() * transform;
 	Vector2 position = transform.get_origin();
 	position.y *= -1;
-	float rotation = world_to_local_rotation(Math::rad2deg(-transform.get_rotation()));
+	float rotation = world_to_local_rotation(Math::rad2deg(transform.get_rotation()));
 	Vector2 scale = transform.get_scale();
 
 	set_x(position.x);

@@ -349,10 +349,10 @@ void SpineSkeleton::set_scale_x(float v) {
 
 float SpineSkeleton::get_scale_y() {
 	SPINE_CHECK(skeleton, 1)
-	return skeleton->getScaleY();
+	return -skeleton->getScaleY();
 }
 
 void SpineSkeleton::set_scale_y(float v) {
 	SPINE_CHECK(skeleton,)
-	skeleton->setScaleY(v);
+	skeleton->setScaleY(-v);
 }

@@ -56,12 +56,12 @@ protected:
 
 	spine::Vector<spine::Vector<SpineSlotNode*> > slot_nodes;
 	Vector<MeshInstance2D *> mesh_instances;
-	spine::SkeletonClipping *skeleton_clipper;
 	static Ref<CanvasItemMaterial> default_materials[4];
 	Ref<Material> normal_material;
 	Ref<Material> additive_material;
 	Ref<Material> multiply_material;
 	Ref<Material> screen_material;
+	spine::SkeletonClipping *skeleton_clipper;
 	
 	static void _bind_methods();
 	void _notification(int what);
@@ -69,7 +69,7 @@ protected:
 	void generate_meshes_for_slots(Ref<SpineSkeleton> skeleton_ref);
 	void remove_meshes();
 	void sort_slot_nodes();
-	void update_meshes(Ref<SpineSkeleton> skeleton);
+	void update_meshes(Ref<SpineSkeleton> skeleton_ref);
 
 	void callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event);
 
