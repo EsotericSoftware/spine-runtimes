@@ -1,8 +1,8 @@
 [gd_scene load_steps=64 format=2]
 
-[ext_resource path="res://assets/spineboy/spinebody-data-res.tres" type="SpineSkeletonDataResource" id=1]
+[ext_resource path="res://assets/spineboy/spineboy-data-res.tres" type="SpineSkeletonDataResource" id=1]
 [ext_resource path="res://examples/08-animation-player/animation-player.gd" type="Script" id=2]
-[ext_resource path="res://assets/raptor/raprot-data.tres" type="SpineSkeletonDataResource" id=3]
+[ext_resource path="res://assets/raptor/raptor-data.tres" type="SpineSkeletonDataResource" id=3]
 
 [sub_resource type="Animation" id=84]
 resource_name = "RESET"

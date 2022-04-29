@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://assets/spineboy/spinebody-data-res.tres" type="SpineSkeletonDataResource" id=1]
+[ext_resource path="res://assets/spineboy/spineboy-data-res.tres" type="SpineSkeletonDataResource" id=1]
 [ext_resource path="res://examples/06-bone-following/bone-following.gd" type="Script" id=2]
 [ext_resource path="res://icon.png" type="Texture" id=3]
 

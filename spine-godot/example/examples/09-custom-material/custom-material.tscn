@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=2]
 
-[ext_resource path="res://assets/spineboy/spinebody-data-res.tres" type="SpineSkeletonDataResource" id=1]
+[ext_resource path="res://assets/spineboy/spineboy-data-res.tres" type="SpineSkeletonDataResource" id=1]
 
 [sub_resource type="Shader" id=1]
 code = "shader_type canvas_item;

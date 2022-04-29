@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://examples/07-slot-node/slot-node.gd" type="Script" id=1]
-[ext_resource path="res://assets/spineboy/spinebody-data-res.tres" type="SpineSkeletonDataResource" id=2]
-[ext_resource path="res://assets/raptor/raprot-data.tres" type="SpineSkeletonDataResource" id=3]
+[ext_resource path="res://assets/spineboy/spineboy-data-res.tres" type="SpineSkeletonDataResource" id=2]
+[ext_resource path="res://assets/raptor/raptor-data.tres" type="SpineSkeletonDataResource" id=3]
 [ext_resource path="res://icon.png" type="Texture" id=4]
 
 [node name="Node2D" type="Node2D"]
