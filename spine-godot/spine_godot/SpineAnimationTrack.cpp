@@ -216,7 +216,7 @@ Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation
 #if VERSION_MAJOR > 3
 	// animation_ref->set_loop(!loop);
 #else
-	animation_ref->set_loop(loop);
+	animation_ref->set_loop(!loop);
 #endif
 	animation_ref->set_length(duration);
 
@@ -232,18 +232,17 @@ Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation
 }
 
 void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) {
+	if (track_index < 0) return;
 	sprite = Object::cast_to<SpineSprite>(variant_sprite);
 	if (!sprite) return;
 	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;
-	if (track_index < 0) return;
-
-	AnimationPlayer *animation_player = find_animation_player();
-	if (!animation_player) return;
-
+	if (!sprite->get_skeleton().is_valid() || !sprite->get_animation_state().is_valid()) return;
 	spine::AnimationState *animation_state = sprite->get_animation_state()->get_spine_object();
 	if (!animation_state) return;
 	spine::Skeleton *skeleton = sprite->get_skeleton()->get_spine_object();
 	if (!skeleton) return;
+	AnimationPlayer *animation_player = find_animation_player();
+	if (!animation_player) return;
 
 	if (Engine::get_singleton()->is_editor_hint()) {
 #ifdef TOOLS_ENABLED
