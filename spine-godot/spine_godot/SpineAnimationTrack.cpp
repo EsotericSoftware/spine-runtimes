@@ -294,8 +294,8 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 		animation_state->clearTrack(track_index);
 		if (found_track_index == -1) return;
 
-		// If no animation is set, we are done.
-		if (EMPTY(animation_name)) return;
+		// If no animation is set or it's set to "[stop]", we are done.
+		if (EMPTY(animation_name) || animation_name == "[stop]") return;
 		
 		// If there's no keys on the timeline for this track, we are done.
 		if (edited_animation->track_get_key_count(found_track_index) == 0) return;
