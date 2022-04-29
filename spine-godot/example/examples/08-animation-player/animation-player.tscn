@@ -36,7 +36,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=85]
 resource_name = "aim"
 length = 0.5
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -65,6 +64,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=86]
 resource_name = "aim_looped"
 length = 0.5
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -93,7 +93,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=87]
 resource_name = "death"
 length = 4.9333
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -122,6 +121,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=88]
 resource_name = "death_looped"
 length = 4.9333
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -149,7 +149,6 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id=89]
 resource_name = "hoverboard"
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -177,6 +176,7 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id=90]
 resource_name = "hoverboard_looped"
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -205,7 +205,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=91]
 resource_name = "idle"
 length = 1.6667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -234,7 +233,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=92]
 resource_name = "idle-turn"
 length = 0.2667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -263,6 +261,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=93]
 resource_name = "idle-turn_looped"
 length = 0.2667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -291,6 +290,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=94]
 resource_name = "idle_looped"
 length = 1.6667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -319,7 +319,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=95]
 resource_name = "jump"
 length = 1.3333
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -348,6 +347,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=96]
 resource_name = "jump_looped"
 length = 1.3333
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -376,7 +376,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=97]
 resource_name = "portal"
 length = 3.1667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -405,6 +404,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=98]
 resource_name = "portal_looped"
 length = 3.1667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -433,7 +433,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=99]
 resource_name = "run"
 length = 0.6667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -462,7 +461,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=100]
 resource_name = "run-to-idle"
 length = 0.2667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -491,6 +489,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=101]
 resource_name = "run-to-idle_looped"
 length = 0.2667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -519,6 +518,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=102]
 resource_name = "run_looped"
 length = 0.6667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -547,7 +547,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=103]
 resource_name = "shoot"
 length = 0.6333
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -576,6 +575,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=104]
 resource_name = "shoot_looped"
 length = 0.6333
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -603,7 +603,6 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id=105]
 resource_name = "walk"
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -631,6 +630,7 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id=106]
 resource_name = "walk_looped"
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -688,7 +688,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=108]
 resource_name = "aim"
 length = 0.5
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -717,6 +716,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=109]
 resource_name = "aim_looped"
 length = 0.5
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -745,7 +745,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=110]
 resource_name = "death"
 length = 4.9333
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -774,6 +773,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=111]
 resource_name = "death_looped"
 length = 4.9333
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -801,7 +801,6 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id=112]
 resource_name = "hoverboard"
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -829,6 +828,7 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id=113]
 resource_name = "hoverboard_looped"
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -857,7 +857,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=114]
 resource_name = "idle"
 length = 1.6667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -886,7 +885,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=115]
 resource_name = "idle-turn"
 length = 0.2667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -915,6 +913,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=116]
 resource_name = "idle-turn_looped"
 length = 0.2667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -943,6 +942,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=117]
 resource_name = "idle_looped"
 length = 1.6667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -971,7 +971,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=118]
 resource_name = "jump"
 length = 1.3333
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1000,6 +999,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=119]
 resource_name = "jump_looped"
 length = 1.3333
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1028,7 +1028,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=120]
 resource_name = "portal"
 length = 3.1667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1057,6 +1056,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=121]
 resource_name = "portal_looped"
 length = 3.1667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1085,7 +1085,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=122]
 resource_name = "run"
 length = 0.6667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1114,7 +1113,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=123]
 resource_name = "run-to-idle"
 length = 0.2667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1143,6 +1141,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=124]
 resource_name = "run-to-idle_looped"
 length = 0.2667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1171,6 +1170,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=125]
 resource_name = "run_looped"
 length = 0.6667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1199,7 +1199,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=126]
 resource_name = "shoot"
 length = 0.6333
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1228,6 +1227,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=127]
 resource_name = "shoot_looped"
 length = 0.6333
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1255,7 +1255,6 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id=128]
 resource_name = "walk"
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1283,6 +1282,7 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id=129]
 resource_name = "walk_looped"
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1340,7 +1340,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=131]
 resource_name = "gun-grab"
 length = 0.666667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1369,6 +1368,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=132]
 resource_name = "gun-grab_looped"
 length = 0.666667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1397,7 +1397,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=133]
 resource_name = "gun-holster"
 length = 0.666667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1426,6 +1425,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=134]
 resource_name = "gun-holster_looped"
 length = 0.666667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1454,7 +1454,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=135]
 resource_name = "jump"
 length = 1.53333
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1483,6 +1482,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=136]
 resource_name = "jump_looped"
 length = 1.53333
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1511,7 +1511,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=137]
 resource_name = "roar"
 length = 2.13333
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1540,6 +1539,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=138]
 resource_name = "roar_looped"
 length = 2.13333
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1568,7 +1568,6 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=139]
 resource_name = "walk"
 length = 1.26667
-loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1
@@ -1597,6 +1596,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id=140]
 resource_name = "walk_looped"
 length = 1.26667
+loop = true
 tracks/0/type = "value"
 tracks/0/path = NodePath(".:animation_name")
 tracks/0/interp = 1

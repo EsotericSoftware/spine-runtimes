@@ -419,12 +419,32 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 
 			spine::BlendMode blend_mode = slot->getData().getBlendMode();
 			Ref<Material> custom_material;
-			switch (blend_mode) {
+
+			// See if we have a slot node for this slot with a custom material
+			auto &nodes = slot_nodes[i];
+			if (nodes.size() > 0) {
+				auto slot_node = nodes[0];
+				if (slot_node) {
+					switch (blend_mode) {
+					case spine::BlendMode_Normal: custom_material = slot_node->get_normal_material(); break;
+					case spine::BlendMode_Additive: custom_material = slot_node->get_additive_material(); break;
+					case spine::BlendMode_Multiply: custom_material = slot_node->get_multiply_material(); break;
+					case spine::BlendMode_Screen: custom_material = slot_node->get_screen_material(); break;
+					}
+				}
+			}
+
+			// Else, check if we have a material on the sprite itself
+			if (!custom_material.is_valid()) {
+				switch (blend_mode) {
 				case spine::BlendMode_Normal: custom_material = normal_material; break;
 				case spine::BlendMode_Additive: custom_material = additive_material; break;
 				case spine::BlendMode_Multiply: custom_material = multiply_material; break;
 				case spine::BlendMode_Screen: custom_material = screen_material; break;
+				}
 			}
+
+			// Set the custom material, or the default material
 			if (custom_material.is_valid()) mesh_instance->set_material(custom_material);
 			else mesh_instance->set_material(default_materials[slot->getData().getBlendMode()]);
 		}

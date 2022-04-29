@@ -11,6 +11,10 @@ class SpineSlotNode: public Node2D {
 protected:
     String slot_name;
     int slot_index;
+    Ref<Material> normal_material;
+    Ref<Material> additive_material;
+    Ref<Material> multiply_material;
+    Ref<Material> screen_material;
     SpineSprite *sprite;
 
     static void _bind_methods();
@@ -28,6 +32,22 @@ public:
     String get_slot_name();
 
     int get_slot_index() { return slot_index; }
+
+    Ref<Material> get_normal_material();
+
+    void set_normal_material(Ref<Material> material);
+
+    Ref<Material> get_additive_material();
+
+    void set_additive_material(Ref<Material> material);
+
+    Ref<Material> get_multiply_material();
+
+    void set_multiply_material(Ref<Material> material);
+
+    Ref<Material> get_screen_material();
+
+    void set_screen_material(Ref<Material> material);
 };
 
 #endif
