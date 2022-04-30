@@ -27,8 +27,7 @@
 * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-#ifndef GODOT_SPINESKELETONFILERESOURCE_H
-#define GODOT_SPINESKELETONFILERESOURCE_H
+#pragma once
 
 #include "SpineCommon.h"
 #include "core/io/resource_loader.h"
@@ -82,5 +81,3 @@ public:
 
 	bool recognize(const RES &p_resource) const override;
 };
-
-#endif//GODOT_SPINESKELETONFILERESOURCE_H

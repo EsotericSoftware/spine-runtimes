@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEANIMATION_H
-#define GODOT_SPINEANIMATION_H
+#pragma once
 
 #include "SpineCommon.h"
 #include "SpineConstant.h"
@@ -58,5 +57,3 @@ public:
 
 	void set_duration(float duration);
 };
-
-#endif//GODOT_SPINEANIMATION_H

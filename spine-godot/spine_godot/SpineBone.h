@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEBONE_H
-#define GODOT_SPINEBONE_H
+#pragma once
 
 #include "SpineCommon.h"
 #include "SpineBoneData.h"
@@ -172,5 +171,3 @@ public:
 
 	void set_global_transform(Transform2D trans);
 };
-
-#endif//GODOT_SPINEBONE_H

@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINETRACKENTRY_H
-#define GODOT_SPINETRACKENTRY_H
+#pragma once
 
 #include "SpineCommon.h"
 #include "SpineAnimation.h"
@@ -136,5 +135,3 @@ public:
 
 	float get_track_complete();
 };
-
-#endif//GODOT_SPINETRACKENTRY_H

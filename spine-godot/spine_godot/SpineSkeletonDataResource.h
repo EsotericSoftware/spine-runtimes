@@ -1,5 +1,4 @@
-#ifndef GODOT_SPINESKELETONDATARESOURCE_H
-#define GODOT_SPINESKELETONDATARESOURCE_H
+#pragma once
 
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
@@ -78,6 +77,8 @@ public:
 
 	void get_slot_names(Vector<String> &slot_names);
 
+	void get_bone_names(Vector<String> &bone_names);
+
 	void set_default_mix(float default_mix);
 
 	float get_default_mix();
@@ -146,6 +147,3 @@ public:
 
 	float get_fps() const;
 };
-
-
-#endif //GODOT_SPINESKELETONDATARESOURCE_H

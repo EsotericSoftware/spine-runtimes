@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEEDITORPLUGIN_H
-#define GODOT_SPINEEDITORPLUGIN_H
+#pragma once
 
 #ifdef TOOLS_ENABLED
 #include "SpineCommon.h"
@@ -206,5 +205,3 @@ public:
 };
 
 #endif
-
-#endif//GODOT_SPINEEDITORPLUGIN_H

@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEPATHCONSTRAINTDATA_H
-#define GODOT_SPINEPATHCONSTRAINTDATA_H
+#pragma once
 
 #include "SpineConstraintData.h"
 #include "SpineConstant.h"
@@ -87,4 +86,3 @@ public:
 
 	void set_mix_y(float v);
 };
-#endif//GODOT_SPINEPATHCONSTRAINTDATA_H

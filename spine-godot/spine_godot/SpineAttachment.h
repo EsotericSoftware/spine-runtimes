@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEATTACHMENT_H
-#define GODOT_SPINEATTACHMENT_H
+#pragma once
 
 #include "SpineCommon.h"
 #include <spine/spine.h>
@@ -48,5 +47,3 @@ public:
 
 	Ref<SpineAttachment> copy();
 };
-
-#endif//GODOT_SPINEATTACHMENT_H

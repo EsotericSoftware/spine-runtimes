@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINECONSTANT_H
-#define GODOT_SPINECONSTANT_H
+#pragma once
 
 #include "SpineCommon.h"
 
@@ -105,6 +104,17 @@ public:
 		BlendMode_Multiply,
 		BlendMode_Screen
 	};
+
+	enum UpdateMode {
+		UpdateMode_Process,
+		UpdateMode_Physics,
+		UpdateMode_Manual
+	};
+
+	enum BoneMode {
+		BoneMode_Follow,
+		BoneMode_Drive
+	};
 };
 
 VARIANT_ENUM_CAST(SpineConstant::MixBlend)
@@ -115,5 +125,5 @@ VARIANT_ENUM_CAST(SpineConstant::PositionMode)
 VARIANT_ENUM_CAST(SpineConstant::SpacingMode)
 VARIANT_ENUM_CAST(SpineConstant::RotateMode)
 VARIANT_ENUM_CAST(SpineConstant::BlendMode)
-
-#endif//GODOT_SPINECONSTANT_H
+VARIANT_ENUM_CAST(SpineConstant::UpdateMode)
+VARIANT_ENUM_CAST(SpineConstant::BoneMode)

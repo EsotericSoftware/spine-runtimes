@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINESPRITE_H
-#define GODOT_SPINESPRITE_H
+#pragma once
 
 #include "SpineSkeleton.h"
 #include "SpineAnimationState.h"
@@ -40,19 +39,12 @@ class SpineSlotNode;
 
 class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
 	GDCLASS(SpineSprite, Node2D)
-
-public:
-	enum UpdateMode {
-		UpdateMode_Process,
-		UpdateMode_Physics,
-		UpdateMode_Manual
-	};
 	
 protected:
 	Ref<SpineSkeletonDataResource> skeleton_data_res;
 	Ref<SpineSkeleton> skeleton;
 	Ref<SpineAnimationState> animation_state;
-	UpdateMode update_mode;
+	SpineConstant::UpdateMode update_mode;
 
 	spine::Vector<spine::Vector<SpineSlotNode*> > slot_nodes;
 	Vector<MeshInstance2D *> mesh_instances;
@@ -93,9 +85,9 @@ public:
 
 	void set_global_bone_transform(const String &bone_name, Transform2D transform);
 	
-	UpdateMode get_update_mode();
+	SpineConstant::UpdateMode get_update_mode();
 
-	void set_update_mode(UpdateMode v);
+	void set_update_mode(SpineConstant::UpdateMode v);
 
 	Ref<SpineSkin> new_skin(const String &name);
 
@@ -120,6 +112,3 @@ public:
 	virtual bool _edit_use_rect() const;
 #endif
 };
-
-VARIANT_ENUM_CAST(SpineSprite::UpdateMode);
-#endif//GODOT_SPINESPRITE_H

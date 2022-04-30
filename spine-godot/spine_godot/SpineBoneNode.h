@@ -1,5 +1,5 @@
-/******************************************************************************
- * Spine Runtimes License Agreement
+﻿/******************************************************************************
+* Spine Runtimes License Agreement
  * Last updated January 1, 2020. Replaces all prior versions.
  *
  * Copyright (c) 2013-2020, Esoteric Software LLC
@@ -29,52 +29,34 @@
 
 #pragma once
 
-#include "SpineIkConstraintData.h"
-#include <spine/IkConstraint.h>
+#include "SpineCommon.h"
+#include "SpineSprite.h"
+#include "scene/2d/node_2d.h"
 
-class SpineBone;
-class SpineSprite;
-
-class SpineIkConstraint : public SpineSpriteOwnedObject<spine::IkConstraint> {
-	GDCLASS(SpineIkConstraint, SpineObjectWrapper)
+class SpineBoneNode: public Node2D {
+	GDCLASS(SpineBoneNode, Node2D)
 
 protected:
+	String bone_name;
+	SpineConstant::BoneMode bone_mode;
+	
 	static void _bind_methods();
-
+	void _notification(int what);
+	void _get_property_list(List<PropertyInfo> *list) const;
+	bool _get(const StringName &property, Variant &value) const;
+	bool _set(const StringName &property, const Variant &value);
+	void before_world_transforms_change(const Variant &_sprite);
+	void on_world_transforms_changed(const Variant &_sprite);
+	void update_transform(SpineSprite *sprite);
+	
 public:
-	void update();
+	SpineBoneNode(): bone_mode(SpineConstant::BoneMode_Follow) {}
 
-	int get_order();
+	String get_bone_name();
 
-	Ref<SpineIkConstraintData> get_data();
+	void set_bone_name(const String &_bone_name);
 
-	Array get_bones();
+	SpineConstant::BoneMode get_bone_mode();
 
-	Ref<SpineBone> get_target();
-
-	void set_target(Ref<SpineBone> v);
-
-	int get_bend_direction();
-
-	void set_bend_direction(int v);
-
-	bool get_compress();
-
-	void set_compress(bool v);
-
-	bool get_stretch();
-
-	void set_stretch(bool v);
-
-	float get_mix();
-
-	void set_mix(float v);
-
-	float get_softness();
-
-	void set_softness(float v);
-
-	bool is_active();
-
-	void set_active(bool v);
+	void set_bone_mode(SpineConstant::BoneMode bone_mode);
 };

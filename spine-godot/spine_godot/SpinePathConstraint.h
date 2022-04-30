@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEPATHCONSTRAINT_H
-#define GODOT_SPINEPATHCONSTRAINT_H
+#pragma once
 
 #include "SpinePathConstraintData.h"
 #include "SpineSlot.h"
@@ -77,5 +76,3 @@ public:
 
 	void set_active(bool v);
 };
-
-#endif//GODOT_SPINEPATHCONSTRAINT_H

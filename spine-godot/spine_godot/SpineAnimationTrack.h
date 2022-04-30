@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEANIMATIONTRACK_H
-#define GODOT_SPINEANIMATIONTRACK_H
+#pragma once
 
 #include "SpineSprite.h"
 #include "scene/animation/animation_player.h"
@@ -129,5 +128,3 @@ public:
 
 	bool get_debug();
 };
-
-#endif

@@ -27,15 +27,13 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEATLASRESOURCE_H
-#define GODOT_SPINEATLASRESOURCE_H
+#pragma once
 
 #include "SpineCommon.h"
 #include "core/io/resource_loader.h"
 #include "core/io/resource_saver.h"
 #include "core/io/image_loader.h"
 #include <spine/Atlas.h>
-
 
 class GodotSpineTextureLoader;
 
@@ -105,6 +103,3 @@ public:
 
 	bool recognize(const RES &resource) const override;
 };
-
-
-#endif//GODOT_SPINEATLASRESOURCE_H

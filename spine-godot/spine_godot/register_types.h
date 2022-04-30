@@ -27,5 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
+#pragma once
+
 void register_spine_godot_types();
 void unregister_spine_godot_types();

@@ -50,6 +50,7 @@
 #include "SpineTimeline.h"
 #include "SpineConstant.h"
 #include "SpineSlotNode.h"
+#include "SpineBoneNode.h"
 
 static Ref<SpineAtlasResourceFormatLoader> atlas_loader;
 static Ref<SpineAtlasResourceFormatSaver> atlas_saver;
@@ -100,6 +101,7 @@ void register_spine_godot_types() {
 	ClassDB::register_class<SpineConstant>();
 	
 	ClassDB::register_class<SpineSlotNode>();
+	ClassDB::register_class<SpineBoneNode>();
 	ClassDB::register_class<SpineAnimationTrack>();
 
 #if VERSION_MAJOR > 3

@@ -87,13 +87,9 @@ void SpineSprite::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "additive_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_additive_material", "get_additive_material");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "multiply_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_multiply_material", "get_multiply_material");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "screen_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_screen_material", "get_screen_material");
-
-	BIND_ENUM_CONSTANT(UpdateMode::UpdateMode_Process)
-	BIND_ENUM_CONSTANT(UpdateMode::UpdateMode_Physics)
-	BIND_ENUM_CONSTANT(UpdateMode::UpdateMode_Manual)
 }
 
-SpineSprite::SpineSprite() : update_mode(UpdateMode_Process), skeleton_clipper(nullptr) {
+SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), skeleton_clipper(nullptr) {
 	skeleton_clipper = new spine::SkeletonClipping();
 
 	// One material per blend mode, shared across all sprites.
@@ -176,9 +172,9 @@ void SpineSprite::on_skeleton_data_changed() {
 		skeleton->update_world_transform();
 		generate_meshes_for_slots(skeleton);
 
-		if (update_mode == UpdateMode_Process) {
+		if (update_mode == SpineConstant::UpdateMode_Process) {
 			_notification(NOTIFICATION_INTERNAL_PROCESS);
-		} else if (update_mode == UpdateMode_Physics) {
+		} else if (update_mode == SpineConstant::UpdateMode_Physics) {
 			_notification(NOTIFICATION_INTERNAL_PHYSICS_PROCESS);
 		}
 	}
@@ -244,17 +240,17 @@ Ref<SpineAnimationState> SpineSprite::get_animation_state() {
 void SpineSprite::_notification(int what) {
 	switch (what) {
 		case NOTIFICATION_READY: {
-			set_process_internal(update_mode == UpdateMode_Process);
-			set_physics_process_internal(update_mode == UpdateMode_Physics);
+			set_process_internal(update_mode == SpineConstant::UpdateMode_Process);
+			set_physics_process_internal(update_mode == SpineConstant::UpdateMode_Physics);
 			break;
 		}
 		case NOTIFICATION_INTERNAL_PROCESS: {
-			if (update_mode == UpdateMode_Process)
+			if (update_mode == SpineConstant::UpdateMode_Process)
 				update_skeleton(get_process_delta_time());
 			break;
 		}
 		case NOTIFICATION_INTERNAL_PHYSICS_PROCESS: {
-			if (update_mode == UpdateMode_Physics)
+			if (update_mode == SpineConstant::UpdateMode_Physics)
 				update_skeleton(get_physics_process_delta_time());
 			break;
 		}
@@ -502,14 +498,14 @@ void SpineSprite::set_global_bone_transform(const String &bone_name, Transform2D
 	bone->set_global_transform(transform);
 }
 
-SpineSprite::UpdateMode SpineSprite::get_update_mode() {
+SpineConstant::UpdateMode SpineSprite::get_update_mode() {
 	return update_mode;
 }
 
-void SpineSprite::set_update_mode(SpineSprite::UpdateMode v) {
+void SpineSprite::set_update_mode(SpineConstant::UpdateMode v) {
 	update_mode = v;
-	set_process_internal(update_mode == UpdateMode_Process);
-	set_physics_process_internal(update_mode == UpdateMode_Physics);
+	set_process_internal(update_mode == SpineConstant::UpdateMode_Process);
+	set_physics_process_internal(update_mode == SpineConstant::UpdateMode_Physics);
 }
 
 Ref<SpineSkin> SpineSprite::new_skin(const String& name) {

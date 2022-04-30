@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEIKCONSTRAINTDATA_H
-#define GODOT_SPINEIKCONSTRAINTDATA_H
+#pragma once
 
 #include "SpineConstraintData.h"
 #include "SpineBoneData.h"
@@ -73,5 +72,3 @@ public:
 
 	void set_softness(float v);
 };
-
-#endif//GODOT_SPINEIKCONSTRAINTDATA_H

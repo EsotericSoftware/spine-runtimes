@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINETRANSFORMCONSTRAINTDATA_H
-#define GODOT_SPINETRANSFORMCONSTRAINTDATA_H
+#pragma once
 
 #include "SpineConstraintData.h"
 #include "SpineBoneData.h"
@@ -75,5 +74,3 @@ public:
 
 	bool is_local();
 };
-
-#endif//GODOT_SPINETRANSFORMCONSTRAINTDATA_H

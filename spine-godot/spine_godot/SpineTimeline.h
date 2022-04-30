@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINETIMELINE_H
-#define GODOT_SPINETIMELINE_H
+#pragma once
 
 #include "SpineCommon.h"
 #include "SpineConstant.h"
@@ -60,5 +59,3 @@ public:
 
 	String get_type();
 };
-
-#endif//GODOT_SPINETIMELINE_H

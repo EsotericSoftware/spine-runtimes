@@ -1,11 +1,38 @@
-﻿#include "SpineSlotNode.h"
+﻿/******************************************************************************
+* Spine Runtimes License Agreement
+ * Last updated January 1, 2020. Replaces all prior versions.
+ *
+ * Copyright (c) 2013-2020, Esoteric Software LLC
+ *
+ * Integration of the Spine Runtimes into software or otherwise creating
+ * derivative works of the Spine Runtimes is permitted under the terms and
+ * conditions of Section 2 of the Spine Editor License Agreement:
+ * http://esotericsoftware.com/spine-editor-license
+ *
+ * Otherwise, it is permitted to integrate the Spine Runtimes into software
+ * or otherwise create derivative works of the Spine Runtimes (collectively,
+ * "Products"), provided that each user of the Products must obtain their own
+ * Spine Editor license and redistribution of the Products in any form must
+ * include this license and copyright notice.
+ *
+ * THE SPINE RUNTIMES ARE PROVIDED BY ESOTERIC SOFTWARE LLC "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL ESOTERIC SOFTWARE LLC BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES,
+ * BUSINESS INTERRUPTION, OR LOSS OF USE, DATA, OR PROFITS) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *****************************************************************************/
+
+#include "SpineSlotNode.h"
 
 #include "editor/editor_node.h"
 #include "scene/main/viewport.h"
 
 void SpineSlotNode::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_slot_name"), &SpineSlotNode::set_slot_name);
-    ClassDB::bind_method(D_METHOD("get_slot_name"), &SpineSlotNode::get_slot_name);
     ClassDB::bind_method(D_METHOD("_on_world_transforms_changed", "spine_sprite"), &SpineSlotNode::on_world_transforms_changed);
 
     ClassDB::bind_method(D_METHOD("set_normal_material", "material"), &SpineSlotNode::set_normal_material);
@@ -24,13 +51,13 @@ void SpineSlotNode::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "screen_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_screen_material", "get_screen_material");
 }
 
-SpineSlotNode::SpineSlotNode(): slot_index(-1), sprite(nullptr) {
+SpineSlotNode::SpineSlotNode(): slot_index(-1) {
 }
 
 void SpineSlotNode::_notification(int what) {
     switch(what) {
     case NOTIFICATION_PARENTED: {
-        sprite = Object::cast_to<SpineSprite>(get_parent());
+        SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
         if (sprite) {
 #if VERSION_MAJOR > 3
             sprite->connect("world_transforms_changed", callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
@@ -54,13 +81,15 @@ void SpineSlotNode::_notification(int what) {
         break;
     }
     case NOTIFICATION_UNPARENTED: {
+        SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
         if (sprite) {
 #if VERSION_MAJOR > 3
 			sprite->disconnect("world_transforms_changed", callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
 #else
 			sprite->disconnect("world_transforms_changed", this, "_on_world_transforms_changed");
 #endif
-        }       
+        }
+        break;
     }
     default:
         break;
@@ -69,6 +98,7 @@ void SpineSlotNode::_notification(int what) {
 
 void SpineSlotNode::_get_property_list(List<PropertyInfo>* list) const {
     Vector<String> slot_names;
+    SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
     if (sprite) sprite->get_skeleton_data_res()->get_slot_names(slot_names);
     else slot_names.push_back(slot_name);
     auto element = list->front();
@@ -97,6 +127,7 @@ bool SpineSlotNode::_get(const StringName& property, Variant& value) const {
 bool SpineSlotNode::_set(const StringName& property, const Variant& value) {
     if (property == "slot_name") {
         slot_name = value;
+        SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
         update_transform(sprite);
 #if VERSION_MAJOR == 3
         _change_notify("transform/translation");
@@ -113,12 +144,13 @@ bool SpineSlotNode::_set(const StringName& property, const Variant& value) {
 }
 
 void SpineSlotNode::on_world_transforms_changed(const Variant& _sprite) {
-    SpineSprite* sprite = Object::cast_to<SpineSprite>(_sprite.operator Object*());
+    SpineSprite* sprite = cast_to<SpineSprite>(_sprite.operator Object*());
     update_transform(sprite);
 }
 
 void SpineSlotNode::update_transform(SpineSprite *sprite) {
     if (!sprite) return;
+    if (!sprite->get_skeleton().is_valid() || !sprite->get_skeleton()->get_spine_object()) return;
     auto slot = sprite->get_skeleton()->find_slot(slot_name);
     if (!slot.is_valid()) {
         slot_index = -1;

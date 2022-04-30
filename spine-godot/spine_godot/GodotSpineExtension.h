@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEEXTENSION_H
-#define GODOT_SPINEEXTENSION_H
+#pragma once
 
 #include <spine/Extension.h>
 
@@ -44,6 +43,3 @@ protected:
 
 	virtual char *_readFile(const spine::String &path, int *length);
 };
-
-
-#endif//GODOT_SPINEEXTENSION_H

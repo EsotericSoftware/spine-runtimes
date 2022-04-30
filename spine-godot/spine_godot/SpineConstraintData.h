@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINECONSTRAINTDATA_H
-#define GODOT_SPINECONSTRAINTDATA_H
+#pragma once
 
 #include "SpineCommon.h"
 #include <spine/ConstraintData.h>
@@ -52,5 +51,3 @@ public:
 
 	void set_skin_required(bool v);
 };
-
-#endif//GODOT_SPINECONSTRAINTDATA_H

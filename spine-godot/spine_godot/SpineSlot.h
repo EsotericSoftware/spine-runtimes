@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINESLOT_H
-#define GODOT_SPINESLOT_H
+#pragma once
 
 #include "SpineCommon.h"
 #include "SpineSlotData.h"
@@ -77,5 +76,3 @@ public:
 
 	void set_sequence_index(int v);
 };
-
-#endif//GODOT_SPINESLOT_H

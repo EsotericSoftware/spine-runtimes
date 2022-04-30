@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEEVENT_H
-#define GODOT_SPINEEVENT_H
+#pragma once
 
 #include "SpineCommon.h"
 #include "SpineEventData.h"
@@ -67,5 +66,3 @@ public:
 
 	void set_balance(float v);
 };
-
-#endif//GODOT_SPINEEVENT_H

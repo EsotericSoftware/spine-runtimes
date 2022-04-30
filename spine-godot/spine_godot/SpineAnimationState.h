@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINEANIMATIONSTATE_H
-#define GODOT_SPINEANIMATIONSTATE_H
+#pragma once
 
 #include "SpineCommon.h"
 #include "SpineSkeleton.h"
@@ -81,5 +80,3 @@ public:
 
 	void enable_queue();
 };
-
-#endif//GODOT_SPINEANIMATIONSTATE_H

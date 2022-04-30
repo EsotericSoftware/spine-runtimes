@@ -236,6 +236,16 @@ void SpineSkeletonDataResource::get_slot_names(Vector<String>& slot_names) {
 	}
 }
 
+void SpineSkeletonDataResource::get_bone_names(Vector<String>& bone_names) {
+	bone_names.clear();
+	if (!is_skeleton_data_loaded()) return;
+	auto bones = skeleton_data->getBones();
+	for (size_t i = 0; i < bones.size(); ++i) {
+		auto bone = bones[i];
+		bone_names.push_back(bone->getName().buffer());
+	}
+}
+
 void SpineSkeletonDataResource::set_default_mix(float _default_mix) {
 	this->default_mix = _default_mix;
 	update_mixes();

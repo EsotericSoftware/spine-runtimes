@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINETRANSFORMCONSTRAINT_H
-#define GODOT_SPINETRANSFORMCONSTRAINT_H
+#pragma once
 
 #include "SpineCommon.h"
 #include "SpineTransformConstraintData.h"
@@ -82,5 +81,3 @@ public:
 
 	void set_active(bool v);
 };
-
-#endif//GODOT_SPINETRANSFORMCONSTRAINT_H

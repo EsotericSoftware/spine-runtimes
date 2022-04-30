@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINESLOTDATA_H
-#define GODOT_SPINESLOTDATA_H
+#pragma once
 
 #include "SpineCommon.h"
 #include "SpineBoneData.h"
@@ -69,5 +68,3 @@ public:
 
 	void set_blend_mode(SpineConstant::BlendMode v);
 };
-
-#endif//GODOT_SPINESLOTDATA_H

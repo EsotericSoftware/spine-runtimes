@@ -27,8 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#ifndef GODOT_SPINESKELETON_H
-#define GODOT_SPINESKELETON_H
+#pragma once
 
 #include "SpineCommon.h"
 #include "SpineSkeletonDataResource.h"
@@ -51,6 +50,8 @@ class SpineSkeleton : public REFCOUNTED {
 	friend class SpineAnimationState;
 	friend class SpineCollisionShapeProxy;
 	friend class SpineAnimationTrack;
+	friend class SpineBoneNode;
+	friend class SpineSlotNode;
 
 protected:
 	static void _bind_methods();
@@ -137,5 +138,3 @@ public:
 
 	void set_scale_y(float v);
 };
-
-#endif//GODOT_SPINESKELETON_H
