@@ -481,7 +481,7 @@ void SpineBone::set_global_transform(Transform2D transform) {
 	if (parent) {
 		parent->worldToLocal(local_x, local_y, local_x, local_y);
 		parent->worldToLocal(position.x + local_scale.x, position.y + local_scale.y, local_scale.x, local_scale.y);
-		local_scale.x -= local_x;
+		local_scale.x = (local_scale.x - local_x);
 		local_scale.y = -(local_scale.y - local_y);
 		local_rotation = 180 + bone->worldToLocalRotation(local_rotation);
 	}

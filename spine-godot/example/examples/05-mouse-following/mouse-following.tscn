@@ -13,3 +13,9 @@ skeleton_data_res = ExtResource( 2 )
 preview_animation = "-- Empty --"
 preview_frame = false
 preview_time = 0.0
+
+[node name="CrosshairBone" type="SpineBoneNode" parent="Spineboy"]
+position = Vector2( 302.333, -569.714 )
+rotation = -0.000872665
+bone_name = "crosshair"
+bone_mode = 1
