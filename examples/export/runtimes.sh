@@ -97,6 +97,10 @@ rm -f "$ROOT"/spine-godot/example/assets/mix-and-match/*.atlas
 rm -f "$ROOT"/spine-godot/example/assets/mix-and-match/*.png
 rm -f "$ROOT"/spine-godot/example/assets/mix-and-match/*.json
 rm -f "$ROOT"/spine-godot/example/assets/mix-and-match/*.skel
+rm -f "$ROOT"/spine-godot/example/assets/raggedyspineboy/*.atlas
+rm -f "$ROOT"/spine-godot/example/assets/raggedyspineboy/*.png
+rm -f "$ROOT"/spine-godot/example/assets/raggedyspineboy/*.json
+
 
 cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-godot/example/assets/spineboy/"
 cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-godot/example/assets/spineboy/"
@@ -113,6 +117,10 @@ cp -f ../raptor/export/raptor.png "$ROOT/spine-godot/example/assets/raptor/"
 cp -f ../raptor/manual-maps/raptor-normals.png "$ROOT/spine-godot/example/assets/raptor/n_raptor.png"
 cp -f ../raptor/manual-maps/light-sprite.png "$ROOT/spine-godot/example/assets/raptor/light-sprite.png"
 
+cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/raggedy\ spineboy.json "$ROOT/spine-godot/example/assets/raggedyspineboy/"
+cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.atlas.txt "$ROOT/spine-godot/example/assets/raggedyspineboy/Raggedy Spineboy.atlas"
+cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.png "$ROOT/spine-godot/example/assets/raggedyspineboy/"
+
 rm -f "$ROOT"/spine-godot/example-v4/assets/spineboy/*.atlas
 rm -f "$ROOT"/spine-godot/example-v4/assets/spineboy/*.png
 rm -f "$ROOT"/spine-godot/example-v4/assets/spineboy/*.json
@@ -124,6 +132,9 @@ rm -f "$ROOT"/spine-godot/example-v4/assets/mix-and-match/*.atlas
 rm -f "$ROOT"/spine-godot/example-v4/assets/mix-and-match/*.png
 rm -f "$ROOT"/spine-godot/example-v4/assets/mix-and-match/*.json
 rm -f "$ROOT"/spine-godot/example-v4/assets/mix-and-match/*.skel
+rm -f "$ROOT"/spine-godot/example-v4/assets/raggedyspineboy/*.atlas
+rm -f "$ROOT"/spine-godot/example-v4/assets/raggedyspineboy/*.png
+rm -f "$ROOT"/spine-godot/example-v4/assets/raggedyspineboy/*.json
 
 cp -f ../spineboy/export/spineboy-pro.json "$ROOT/spine-godot/example-v4/assets/spineboy/"
 cp -f ../spineboy/export/spineboy-pro.skel "$ROOT/spine-godot/example-v4/assets/spineboy/"
@@ -139,6 +150,10 @@ cp -f ../raptor/export/raptor.atlas "$ROOT/spine-godot/example-v4/assets/raptor/
 cp -f ../raptor/export/raptor.png "$ROOT/spine-godot/example-v4/assets/raptor/"
 cp -f ../raptor/manual-maps/raptor-normals.png "$ROOT/spine-godot/example-v4/assets/raptor/n_raptor.png"
 cp -f ../raptor/manual-maps/light-sprite.png "$ROOT/spine-godot/example-v4/assets/raptor/light-sprite.png"
+
+cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/raggedy\ spineboy.json "$ROOT/spine-godot/example-v4/assets/raggedyspineboy/"
+cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.atlas.txt "$ROOT/spine-godot/example-v4/assets/raggedyspineboy/Raggedy Spineboy.atlas"
+cp -f ../../spine-unity/Assets/Spine\ Examples/Spine\ Skeletons/Raggedy\ Spineboy/Raggedy\ Spineboy.png "$ROOT/spine-godot/example-v4/assets/raggedyspineboy/"
 
 echo "spine-sfml-c"
 rm "$ROOT/spine-sfml/c/data/"*
