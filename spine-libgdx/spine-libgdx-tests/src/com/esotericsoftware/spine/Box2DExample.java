@@ -58,6 +58,7 @@ import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.Sequence;
 
+/** Demonstrates positioning physics bodies for a skeleton. */
 public class Box2DExample extends ApplicationAdapter {
 	SpriteBatch batch;
 	ShapeRenderer renderer;
@@ -84,8 +85,8 @@ public class Box2DExample extends ApplicationAdapter {
 
 		atlas = new TextureAtlas(Gdx.files.internal("spineboy/spineboy-pma.atlas"));
 
-		// This loader creates Box2dAttachments instead of RegionAttachments for an easy way to keep
-		// track of the Box2D body for each attachment.
+		// This loader creates Box2dAttachments instead of RegionAttachments for an easy way to keep track of the Box2D body for
+		// each attachment.
 		AtlasAttachmentLoader atlasLoader = new AtlasAttachmentLoader(atlas) {
 			public RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence) {
 				Box2dAttachment attachment = new Box2dAttachment(name);
@@ -154,7 +155,7 @@ public class Box2DExample extends ApplicationAdapter {
 
 		batch.end();
 
-		// Position each attachment body.
+		// Position the physics body for each attachment.
 		for (Slot slot : skeleton.getSlots()) {
 			if (!(slot.getAttachment() instanceof Box2dAttachment)) continue;
 			Box2dAttachment attachment = (Box2dAttachment)slot.getAttachment();
@@ -182,25 +183,19 @@ public class Box2DExample extends ApplicationAdapter {
 		PolygonShape shape = new PolygonShape();
 		shape.set(vertices);
 
-		// next we create a static ground platform. This platform
-		// is not moveable and will not react to any influences from
-		// outside. It will however influence other bodies. First we
-		// create a PolygonShape that holds the form of the platform.
-		// it will be 100 meters wide and 2 meters high, centered
-		// around the origin
+		// Next we create a static ground platform. This platform is not moveable and will not react to any outside influences. It
+		// will however influence other bodies. First we create a PolygonShape that holds the form of the platform. It will be
+		// 100 meters wide and 2 meters high, centered around the origin.
 		PolygonShape groundPoly = new PolygonShape();
 		groundPoly.setAsBox(50, 1);
 
-		// next we create the body for the ground platform. It's
-		// simply a static body.
+		// Next we create the body for the ground platform. It's simply a static body.
 		BodyDef groundBodyDef = new BodyDef();
 		groundBodyDef.type = BodyType.StaticBody;
 		groundBody = world.createBody(groundBodyDef);
 
-		// finally we add a fixture to the body using the polygon
-		// defined above. Note that we have to dispose PolygonShapes
-		// and CircleShapes once they are no longer used. This is the
-		// only time you have to care explicitely for memomry managment.
+		// Finally we add a fixture to the body using the polygon defined above. Note that we have to dispose PolygonShapes and
+		// CircleShapes once they are no longer used. This is the only time you have to care explicitely for memomry managment.
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = groundPoly;
 		fixtureDef.filter.groupIndex = 0;
@@ -210,12 +205,10 @@ public class Box2DExample extends ApplicationAdapter {
 		PolygonShape boxPoly = new PolygonShape();
 		boxPoly.setAsBox(1, 1);
 
-		// Next we create the 50 box bodies using the PolygonShape we just
-		// defined. This process is similar to the one we used for the ground
-		// body. Note that we reuse the polygon for each body fixture.
+		// Next we create the 50 box bodies using the PolygonShape we just defined. This process is similar to the one we used for
+		// the ground body. Note that we reuse the polygon for each body fixture.
 		for (int i = 0; i < 45; i++) {
-			// Create the BodyDef, set a random position above the
-			// ground and create a new body
+			// Create the BodyDef, set a random position above the ground and create a new body.
 			BodyDef boxBodyDef = new BodyDef();
 			boxBodyDef.type = BodyType.DynamicBody;
 			boxBodyDef.position.x = -24 + (float)(Math.random() * 48);
@@ -225,7 +218,7 @@ public class Box2DExample extends ApplicationAdapter {
 			boxBody.createFixture(boxPoly, 1);
 		}
 
-		// we are done, all that's left is disposing the boxPoly
+		// We are done, all that's left is disposing the boxPoly.
 		boxPoly.dispose();
 	}
 

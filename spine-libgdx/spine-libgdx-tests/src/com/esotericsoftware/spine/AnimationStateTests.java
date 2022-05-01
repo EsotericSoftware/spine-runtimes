@@ -50,6 +50,7 @@ import com.esotericsoftware.spine.attachments.PointAttachment;
 import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.Sequence;
 
+/** Unit tests to ensure {@link AnimationState} is working as expected. */
 public class AnimationStateTests {
 	final SkeletonJson json = new SkeletonJson(new AttachmentLoader() {
 		public RegionAttachment newRegionAttachment (Skin skin, String name, String path, @Null Sequence sequence) {

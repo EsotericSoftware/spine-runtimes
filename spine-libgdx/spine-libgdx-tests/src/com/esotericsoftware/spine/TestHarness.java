@@ -42,6 +42,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.esotericsoftware.spine.vertexeffects.SwirlEffect;
 
+/** Boilerplate for basic skeleton rendering, used for various testing. */
 public class TestHarness extends ApplicationAdapter {
 // static String JSON = "coin/coin-pro.json";
 // static String ATLAS = "coin/coin-pma.atlas";

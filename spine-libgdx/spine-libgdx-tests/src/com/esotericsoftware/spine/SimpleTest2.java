@@ -38,11 +38,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
+
 import com.esotericsoftware.spine.AnimationState.AnimationStateListener;
 import com.esotericsoftware.spine.AnimationState.TrackEntry;
 import com.esotericsoftware.spine.attachments.BoundingBoxAttachment;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
+/** Demonstrates loading, animating, and rendering a skeleton with hit detectiong using a bounding box attachment. */
 public class SimpleTest2 extends ApplicationAdapter {
 	OrthographicCamera camera;
 	TwoColorPolygonBatch batch;
