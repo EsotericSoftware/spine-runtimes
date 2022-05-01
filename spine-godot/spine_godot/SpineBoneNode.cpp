@@ -32,7 +32,6 @@
 void SpineBoneNode::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_bone_mode"), &SpineBoneNode::set_bone_mode);
 	ClassDB::bind_method(D_METHOD("get_bone_mode"), &SpineBoneNode::get_bone_mode);
-	ClassDB::bind_method(D_METHOD("_before_world_transforms_change", "spine_sprite"), &SpineBoneNode::before_world_transforms_change);
 	ClassDB::bind_method(D_METHOD("_on_world_transforms_changed", "spine_sprite"), &SpineBoneNode::on_world_transforms_changed);
 
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "bone_mode", PROPERTY_HINT_ENUM, "Follow,Drive"), "set_bone_mode", "get_bone_mode");
@@ -44,10 +43,8 @@ void SpineBoneNode::_notification(int what) {
 			SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
 			if (sprite) {
 #if VERSION_MAJOR > 3
-				sprite->connect("before_world_transforms_change", callable_mp(this, &SpineBoneNode::before_world_transforms_change));
 				sprite->connect("world_transforms_changed", callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
 #else
-				sprite->connect("before_world_transforms_change", this, "_before_world_transforms_change");
 				sprite->connect("world_transforms_changed", this, "_on_world_transforms_changed");
 #endif
 				update_transform(sprite);
@@ -70,10 +67,8 @@ void SpineBoneNode::_notification(int what) {
 			SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
 			if (sprite) {
 #if VERSION_MAJOR > 3
-				sprite->disconnect("before_world_transforms_change", callable_mp(this, &SpineBoneNode::before_world_transforms_change));
 				sprite->disconnect("world_transforms_changed", callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
 #else
-				sprite->disconnect("before_world_transforms_change", this, "_before_world_transforms_change");
 				sprite->disconnect("world_transforms_changed", this, "_on_world_transforms_changed");
 #endif
 			}       
@@ -114,19 +109,16 @@ bool SpineBoneNode::_get(const StringName& property, Variant& value) const {
 bool SpineBoneNode::_set(const StringName& property, const Variant& value) {
 	if (property == "bone_name") {
 		bone_name = value;
+		SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
+		init_transform(sprite);
 		return true;
 	}
 	return false;
 }
 
-void SpineBoneNode::before_world_transforms_change(const Variant& _sprite) {
-	SpineSprite* sprite = cast_to<SpineSprite>(_sprite.operator Object*());
-	if (bone_mode == SpineConstant::BoneMode_Drive) update_transform(sprite);
-}
-
 void SpineBoneNode::on_world_transforms_changed(const Variant& _sprite) {
 	SpineSprite* sprite = cast_to<SpineSprite>(_sprite.operator Object*());
-	if (bone_mode == SpineConstant::BoneMode_Follow) update_transform(sprite);
+	update_transform(sprite);
 }
 
 void SpineBoneNode::update_transform(SpineSprite* sprite) {
@@ -143,10 +135,29 @@ void SpineBoneNode::update_transform(SpineSprite* sprite) {
 	}
 }
 
+void SpineBoneNode::init_transform(SpineSprite* sprite) {
+	if (!sprite) return;
+	if (bone_mode == SpineConstant::BoneMode_Drive) return;
+	sprite->get_skeleton()->set_to_setup_pose();
+	set_global_transform(sprite->get_global_bone_transform(bone_name));
+	update_transform(sprite);
+#if VERSION_MAJOR == 3
+	_change_notify("transform/translation");
+	_change_notify("transform/rotation");
+	_change_notify("transform/scale");
+	_change_notify("translation");
+	_change_notify("rotation");
+	_change_notify("rotation_deg");
+	_change_notify("scale");
+#endif
+}
+
 SpineConstant::BoneMode SpineBoneNode::get_bone_mode() {
 	return bone_mode;
 }
 
 void SpineBoneNode::set_bone_mode(SpineConstant::BoneMode _bone_mode) {
 	bone_mode = _bone_mode;
+	SpineSprite *sprite = cast_to<SpineSprite>(get_parent());
+	init_transform(sprite);
 }

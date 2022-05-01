@@ -313,6 +313,7 @@ bool SpineSprite::_get(const StringName& property, Variant& value) const {
 }
 
 static void update_preview_animation(SpineSprite *sprite, const String &animation, bool frame, float time) {
+	sprite->get_skeleton()->set_to_setup_pose();
 	if (EMPTY(animation) || animation == "-- Empty --") {
 		sprite->get_animation_state()->set_empty_animation(0, 0);
 		return;
@@ -365,7 +366,9 @@ void SpineSprite::update_skeleton(float delta) {
 	animation_state->apply(skeleton);
 	emit_signal("before_world_transforms_change", this);
 	skeleton->update_world_transform();
+	modified_bones = false;
 	emit_signal("world_transforms_changed", this);
+	if (modified_bones) skeleton->update_world_transform();
 	sort_slot_nodes();
 	update_meshes(skeleton);
 	update();

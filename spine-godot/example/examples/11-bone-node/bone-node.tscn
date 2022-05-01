@@ -15,8 +15,7 @@ preview_frame = true
 preview_time = 0.0
 
 [node name="HoverboardCenterBone" type="SpineBoneNode" parent="SpineSprite"]
-position = Vector2( -6.26196, -111.618 )
-rotation = -0.0046904
+position = Vector2( 21.5753, -111.472 )
 bone_name = "hoverboard-controller"
 bone_mode = 1
 
@@ -35,7 +34,6 @@ cast_to = Vector2( 0, 1000 )
 
 [node name="HipBone" type="SpineBoneNode" parent="SpineSprite"]
 position = Vector2( -36.9481, -338.198 )
-rotation = 3.14072
 bone_name = "hip"
 bone_mode = 1
 

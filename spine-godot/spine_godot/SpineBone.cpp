@@ -449,6 +449,8 @@ void SpineBone::set_transform(Transform2D transform) {
 	set_rotation(rotation);
 	set_scale_x(scale.x);
 	set_scale_y(scale.y);
+
+	get_spine_owner()->set_modified_bones();
 }
 
 Transform2D SpineBone::get_global_transform() {
@@ -466,15 +468,28 @@ void SpineBone::set_global_transform(Transform2D transform) {
 	SPINE_CHECK(get_spine_object(),)
 	if (!get_spine_owner()) set_transform(transform);
 	if (!get_spine_owner()->is_visible_in_tree()) return;
-	transform = get_spine_owner()->get_global_transform().affine_inverse() * transform;
-	Vector2 position = transform.get_origin();
-	position.y *= -1;
-	float rotation = world_to_local_rotation(Math::rad2deg(transform.get_rotation()));
-	Vector2 scale = transform.get_scale();
 
-	set_x(position.x);
-	set_y(position.y);
-	set_rotation(rotation);
-	set_scale_x(scale.x);
-	set_scale_y(scale.y);
+	auto bone = get_spine_object();
+	
+	Transform2D inverse_sprite_transform = get_spine_owner()->get_global_transform().affine_inverse();
+	transform = inverse_sprite_transform * transform;
+	Vector2 position = transform.get_origin();
+	float local_x = position.x, local_y = position.y;
+	float local_rotation = Math::rad2deg(transform.get_rotation());
+	Vector2 local_scale = transform.get_scale();
+	spine::Bone *parent = bone->getParent();
+	if (parent) {
+		parent->worldToLocal(local_x, local_y, local_x, local_y);
+		parent->worldToLocal(position.x + local_scale.x, position.y + local_scale.y, local_scale.x, local_scale.y);
+		local_scale.x -= local_x;
+		local_scale.y = -(local_scale.y - local_y);
+		local_rotation = 180 + bone->worldToLocalRotation(local_rotation);
+	}
+	bone->setX(local_x);
+	bone->setY(local_y);
+	bone->setRotation(local_rotation);
+	bone->setScaleX(local_scale.x);
+	bone->setScaleY(local_scale.y);
+
+	get_spine_owner()->set_modified_bones();
 }

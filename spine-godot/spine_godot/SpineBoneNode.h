@@ -45,9 +45,9 @@ protected:
 	void _get_property_list(List<PropertyInfo> *list) const;
 	bool _get(const StringName &property, Variant &value) const;
 	bool _set(const StringName &property, const Variant &value);
-	void before_world_transforms_change(const Variant &_sprite);
 	void on_world_transforms_changed(const Variant &_sprite);
 	void update_transform(SpineSprite *sprite);
+	void init_transform(SpineSprite *sprite);
 	
 public:
 	SpineBoneNode(): bone_mode(SpineConstant::BoneMode_Follow) {}

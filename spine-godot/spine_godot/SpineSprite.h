@@ -39,6 +39,8 @@ class SpineSlotNode;
 
 class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
 	GDCLASS(SpineSprite, Node2D)
+
+	friend class SpineBone;
 	
 protected:
 	Ref<SpineSkeletonDataResource> skeleton_data_res;
@@ -58,6 +60,7 @@ protected:
 	Ref<Material> multiply_material;
 	Ref<Material> screen_material;
 	spine::SkeletonClipping *skeleton_clipper;
+	bool modified_bones;
 	
 	static void _bind_methods();
 	void _notification(int what);
@@ -69,6 +72,7 @@ protected:
 	void remove_meshes();
 	void sort_slot_nodes();
 	void update_meshes(Ref<SpineSkeleton> skeleton_ref);
+	void set_modified_bones() { modified_bones = true; }
 
 	void callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event);
 
