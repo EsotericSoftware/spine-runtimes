@@ -87,6 +87,7 @@ void SpineSprite::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "additive_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_additive_material", "get_additive_material");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "multiply_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_multiply_material", "get_multiply_material");
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "screen_material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_screen_material", "get_screen_material");
+	ADD_GROUP("Preview", "");
 }
 
 SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), skeleton_clipper(nullptr) {
@@ -257,6 +258,94 @@ void SpineSprite::_notification(int what) {
 		default:
 			break;
 	}
+}
+
+void SpineSprite::_get_property_list(List<PropertyInfo>* list) const {
+	if (!skeleton_data_res.is_valid() || !skeleton_data_res->is_skeleton_data_loaded()) return;
+	Vector<String> animation_names;
+	skeleton_data_res->get_animation_names(animation_names);
+	animation_names.insert(0, "-- Empty --");
+	
+	PropertyInfo preview_anim_property; 
+	preview_anim_property.name = "preview_animation";
+	preview_anim_property.type = Variant::STRING;
+	preview_anim_property.usage = PROPERTY_USAGE_EDITOR;
+	preview_anim_property.hint_string = String(",").join(animation_names);
+	preview_anim_property.hint = PROPERTY_HINT_ENUM;
+	list->push_back(preview_anim_property);
+
+	PropertyInfo preview_frame_property; 
+	preview_frame_property.name = "preview_frame";
+	preview_frame_property.type = Variant::BOOL;
+	preview_frame_property.usage = PROPERTY_USAGE_EDITOR;
+	list->push_back(preview_frame_property);
+
+	PropertyInfo preview_time_property; 
+	preview_time_property.name = "preview_time";
+	preview_time_property.type = VARIANT_FLOAT;
+	preview_time_property.usage = PROPERTY_USAGE_EDITOR;
+	float animation_duration = 0;
+	if (!EMPTY(preview_animation) && preview_animation != "-- Empty --") {
+		auto animation = skeleton_data_res->find_animation(preview_animation);
+		if (animation.is_valid()) animation_duration = animation->get_duration();
+	}
+	preview_time_property.hint_string = String("0.0,{0},0.01").format(varray(animation_duration));
+	preview_time_property.hint = PROPERTY_HINT_RANGE;
+	list->push_back(preview_time_property);
+}
+
+bool SpineSprite::_get(const StringName& property, Variant& value) const {
+	if (property == "preview_animation") {
+		value = preview_animation;
+		return true;
+	}
+
+	if (property == "preview_frame") {
+		value = preview_frame;
+		return true;
+	}
+
+	if (property == "preview_time") {
+		value = preview_time;
+		return true;
+	}
+	return false;
+}
+
+static void update_preview_animation(SpineSprite *sprite, const String &animation, bool frame, float time) {
+	if (EMPTY(animation) || animation == "-- Empty --") {
+		sprite->get_animation_state()->set_empty_animation(0, 0);
+		return;
+	}
+
+	auto track_entry = sprite->get_animation_state()->set_animation(animation, true, 0);
+	track_entry->set_mix_duration(0);
+	if (frame) {
+		track_entry->set_time_scale(0);
+		track_entry->set_track_time(time);
+	}
+}
+
+bool SpineSprite::_set(const StringName& property, const Variant& value) {
+	if (property == "preview_animation") {
+		preview_animation = value;
+		update_preview_animation(this, preview_animation, preview_frame, preview_time);
+		return true;
+	}
+
+	if (property == "preview_frame") {
+		preview_frame = value;
+		update_preview_animation(this, preview_animation, preview_frame, preview_time);
+		return true;
+	}
+
+	if (property == "preview_time") {
+		preview_time = value;
+		update_preview_animation(this, preview_animation, preview_frame, preview_time);
+		return true;
+	}
+	
+	return false;
 }
 
 void SpineSprite::update_skeleton(float delta) {

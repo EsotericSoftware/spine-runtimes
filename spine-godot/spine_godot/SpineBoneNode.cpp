@@ -130,6 +130,7 @@ void SpineBoneNode::on_world_transforms_changed(const Variant& _sprite) {
 }
 
 void SpineBoneNode::update_transform(SpineSprite* sprite) {
+	if (!is_visible_in_tree()) return;
 	if (!sprite) return;
 	if (!sprite->get_skeleton().is_valid() || !sprite->get_skeleton()->get_spine_object()) return;
 	auto bone = sprite->get_skeleton()->find_bone(bone_name);

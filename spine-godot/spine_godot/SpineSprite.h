@@ -45,6 +45,10 @@ protected:
 	Ref<SpineSkeleton> skeleton;
 	Ref<SpineAnimationState> animation_state;
 	SpineConstant::UpdateMode update_mode;
+	
+	String preview_animation;
+	bool preview_frame;
+	float preview_time;
 
 	spine::Vector<spine::Vector<SpineSlotNode*> > slot_nodes;
 	Vector<MeshInstance2D *> mesh_instances;
@@ -57,6 +61,9 @@ protected:
 	
 	static void _bind_methods();
 	void _notification(int what);
+	void _get_property_list(List<PropertyInfo> *list) const;
+	bool _get(const StringName &property, Variant &value) const;
+	bool _set(const StringName &property, const Variant &value);
 
 	void generate_meshes_for_slots(Ref<SpineSkeleton> skeleton_ref);
 	void remove_meshes();
