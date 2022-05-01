@@ -90,7 +90,7 @@ void SpineSprite::_bind_methods() {
 	ADD_GROUP("Preview", "");
 }
 
-SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), skeleton_clipper(nullptr) {
+SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), skeleton_clipper(nullptr), preview_frame(false), preview_time(0), modified_bones(false) {
 	skeleton_clipper = new spine::SkeletonClipping();
 
 	// One material per blend mode, shared across all sprites.

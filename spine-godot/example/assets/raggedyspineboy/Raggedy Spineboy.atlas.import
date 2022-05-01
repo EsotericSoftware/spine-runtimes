@@ -1,0 +1,14 @@
+[remap]
+
+importer="spine.atlas"
+type="SpineAtlasResource"
+path="res://.import/Raggedy Spineboy.atlas-07f7c6b30431397bcf472b18d48851e0.spatlas"
+
+[deps]
+
+source_file="res://assets/raggedyspineboy/Raggedy Spineboy.atlas"
+dest_files=[ "res://.import/Raggedy Spineboy.atlas-07f7c6b30431397bcf472b18d48851e0.spatlas" ]
+
+[params]
+
+normal_map_prefix="n"
