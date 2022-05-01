@@ -16,7 +16,7 @@ fi
 echo "Spine exe: $SPINE_EXE"
 
 if [ "$#" -eq 0 ]; then
-	echo "Enter the Spine editor version to use for the export (eg 3.8.99):"
+	echo "Enter the Spine editor version to use for the export (eg 4.1.xx):"
 	read version
 else
 	version=${1%/}
@@ -100,6 +100,7 @@ echo "Exporting assets..."
 -i ../spineboy/spineboy-ess.spine -o ../spineboy/export -e binary.json \
 -i ../spineboy/spineboy-pro.spine -o ../spineboy/export -e json.json \
 -i ../spineboy/spineboy-pro.spine -o ../spineboy/export -e binary.json \
+-i ../spineboy/spineboy-pro.spine -o ../spineboy/export/spineboy-run.atlas -e png-0.5-frame-by-frame.json \
 -i ../spineboy/images -o ../spineboy/export -n spineboy -p atlas-0.5.json \
 -i ../spineboy/images -o ../spineboy/export -n spineboy-pma -p atlas-0.5-pma.json \
 \

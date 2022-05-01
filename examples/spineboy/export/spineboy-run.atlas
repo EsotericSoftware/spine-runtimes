@@ -1,0 +1,60 @@
+spineboy-run.png
+	size: 1181, 687
+	filter: Linear, Linear
+	pma: true
+spineboy-pro-run
+	index: 8
+	bounds: 2, 371, 303, 314
+	offsets: 11, 22, 316, 341
+	origin: 142, 3
+spineboy-pro-run
+	index: 9
+	bounds: 2, 44, 278, 325
+	offsets: 30, 2, 316, 341
+	origin: 142, 3
+spineboy-pro-run
+	index: 0
+	bounds: 307, 439, 246, 320
+	offsets: 67, 1, 316, 341
+	rotate: 90
+	origin: 142, 3
+spineboy-pro-run
+	index: 3
+	bounds: 629, 443, 242, 320
+	offsets: 12, 20, 316, 341
+	rotate: 90
+	origin: 142, 3
+spineboy-pro-run
+	index: 7
+	bounds: 951, 389, 228, 296
+	offsets: 36, 33, 316, 341
+	origin: 142, 3
+spineboy-pro-run
+	index: 4
+	bounds: 307, 195, 242, 320
+	offsets: 2, 4, 316, 341
+	rotate: 90
+	origin: 142, 3
+spineboy-pro-run
+	index: 5
+	bounds: 629, 200, 241, 316
+	offsets: 8, 3, 316, 341
+	rotate: 90
+	origin: 142, 3
+spineboy-pro-run
+	index: 1
+	bounds: 282, 2, 191, 318
+	offsets: 70, 3, 316, 341
+	rotate: 90
+	origin: 142, 3
+spineboy-pro-run
+	index: 2
+	bounds: 947, 81, 226, 306
+	offsets: 34, 26, 316, 341
+	origin: 142, 3
+spineboy-pro-run
+	index: 6
+	bounds: 629, 4, 194, 316
+	offsets: 68, 4, 316, 341
+	rotate: 90
+	origin: 142, 3
