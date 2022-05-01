@@ -269,7 +269,7 @@ void SpineSprite::_get_property_list(List<PropertyInfo>* list) const {
 	PropertyInfo preview_anim_property; 
 	preview_anim_property.name = "preview_animation";
 	preview_anim_property.type = Variant::STRING;
-	preview_anim_property.usage = PROPERTY_USAGE_EDITOR;
+	preview_anim_property.usage = PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_STORAGE;
 	preview_anim_property.hint_string = String(",").join(animation_names);
 	preview_anim_property.hint = PROPERTY_HINT_ENUM;
 	list->push_back(preview_anim_property);
@@ -277,13 +277,13 @@ void SpineSprite::_get_property_list(List<PropertyInfo>* list) const {
 	PropertyInfo preview_frame_property; 
 	preview_frame_property.name = "preview_frame";
 	preview_frame_property.type = Variant::BOOL;
-	preview_frame_property.usage = PROPERTY_USAGE_EDITOR;
+	preview_frame_property.usage = PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_STORAGE;
 	list->push_back(preview_frame_property);
 
 	PropertyInfo preview_time_property; 
 	preview_time_property.name = "preview_time";
 	preview_time_property.type = VARIANT_FLOAT;
-	preview_time_property.usage = PROPERTY_USAGE_EDITOR;
+	preview_time_property.usage = PROPERTY_USAGE_EDITOR | PROPERTY_USAGE_STORAGE;
 	float animation_duration = 0;
 	if (!EMPTY(preview_animation) && preview_animation != "-- Empty --") {
 		auto animation = skeleton_data_res->find_animation(preview_animation);
@@ -330,6 +330,7 @@ bool SpineSprite::_set(const StringName& property, const Variant& value) {
 	if (property == "preview_animation") {
 		preview_animation = value;
 		update_preview_animation(this, preview_animation, preview_frame, preview_time);
+		NOTIFY_PROPERTY_LIST_CHANGED();
 		return true;
 	}
 

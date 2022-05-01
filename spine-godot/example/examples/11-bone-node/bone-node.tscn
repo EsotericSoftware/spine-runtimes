@@ -10,11 +10,13 @@ script = ExtResource( 1 )
 position = Vector2( 63, 549 )
 scale = Vector2( 0.278096, 0.278096 )
 skeleton_data_res = ExtResource( 2 )
+preview_animation = "hoverboard"
+preview_frame = true
+preview_time = 0.0
 
 [node name="HoverboardCenterBone" type="SpineBoneNode" parent="SpineSprite"]
 position = Vector2( -6.26196, -111.618 )
 rotation = -0.0046904
-scale = Vector2( 1, 1 )
 bone_name = "hoverboard-controller"
 bone_mode = 1
 
@@ -34,7 +36,6 @@ cast_to = Vector2( 0, 1000 )
 [node name="HipBone" type="SpineBoneNode" parent="SpineSprite"]
 position = Vector2( -36.9481, -338.198 )
 rotation = 3.14072
-scale = Vector2( 1, 1 )
 bone_name = "hip"
 bone_mode = 1
 
