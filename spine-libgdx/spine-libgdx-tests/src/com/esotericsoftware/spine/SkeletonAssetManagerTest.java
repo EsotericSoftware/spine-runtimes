@@ -41,7 +41,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.spine.utils.SkeletonDataLoader;
 import com.esotericsoftware.spine.utils.SkeletonDataLoader.SkeletonDataParameter;
 
-/** Like {@link SimpleTest1}, but using {@link AssetManager} to load the atlas and skeleton data. */
+/** Demonstrates loading an atlas and skeleton using {@link AssetManager}. */
 public class SkeletonAssetManagerTest extends ApplicationAdapter {
 	OrthographicCamera camera;
 	PolygonSpriteBatch batch;
@@ -85,8 +85,8 @@ public class SkeletonAssetManagerTest extends ApplicationAdapter {
 			skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
 			skeleton.setPosition(250, 20);
 
-			AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between
-																										// animations.
+			// Define the default mixing (crossfading) between animations.
+			AnimationStateData stateData = new AnimationStateData(skeletonData);
 			stateData.setMix("run", "jump", 0.2f);
 			stateData.setMix("jump", "run", 0.2f);
 

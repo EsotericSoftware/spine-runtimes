@@ -40,7 +40,10 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.Animation.MixDirection;
 
-public class MixTest extends ApplicationAdapter {
+/** Demonstrates using the timeline API. See {@link SimpleTest1} for a higher level API using {@link AnimationState}.
+ * <p>
+ * See: http://esotericsoftware.com/spine-applying-animations */
+public class TimelineApiTest extends ApplicationAdapter {
 	SpriteBatch batch;
 	float time;
 	Array<Event> events = new Array();
@@ -139,6 +142,6 @@ public class MixTest extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-		new Lwjgl3Application(new MixTest());
+		new Lwjgl3Application(new TimelineApiTest());
 	}
 }

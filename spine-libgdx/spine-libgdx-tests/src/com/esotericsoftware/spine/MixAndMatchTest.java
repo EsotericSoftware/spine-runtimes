@@ -33,14 +33,14 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
-
-public class SimpleTest4 extends ApplicationAdapter {
+/** Demonstrates creating and configuring a new skin at runtime. */
+public class MixAndMatchTest extends ApplicationAdapter {
 	OrthographicCamera camera;
-	TwoColorPolygonBatch batch;
+	PolygonSpriteBatch batch;
 	SkeletonRenderer renderer;
 	SkeletonRendererDebug debugRenderer;
 
@@ -50,36 +50,40 @@ public class SimpleTest4 extends ApplicationAdapter {
 
 	public void create () {
 		camera = new OrthographicCamera();
-		batch = new TwoColorPolygonBatch();
+		batch = new PolygonSpriteBatch();
 		renderer = new SkeletonRenderer();
 		renderer.setPremultipliedAlpha(true); // PMA results in correct blending without outlines.
 		debugRenderer = new SkeletonRendererDebug();
 		debugRenderer.setBoundingBoxes(false);
 		debugRenderer.setRegionAttachments(false);
 
-		atlas = new TextureAtlas(Gdx.files.internal("goblins/goblins-pma.atlas"));
-
-		SkeletonJson loader = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
-		// SkeletonLoader loader = new SkeletonBinary(atlas); // Or use SkeletonBinary to load binary data.
-		loader.setScale(1.3f); // Load the skeleton at 130% the size it was in Spine.
-		SkeletonData skeletonData = loader.readSkeletonData(Gdx.files.internal("goblins/goblins-pro.json"));
+		atlas = new TextureAtlas(Gdx.files.internal("mix-and-match/mix-and-match-pma.atlas"));
+		SkeletonJson json = new SkeletonJson(atlas); // This loads skeleton JSON data, which is stateless.
+		json.setScale(0.6f); // Load the skeleton at 60% the size it was in Spine.
+		SkeletonData skeletonData = json.readSkeletonData(Gdx.files.internal("mix-and-match/mix-and-match-pro.json"));
 
 		skeleton = new Skeleton(skeletonData); // Skeleton holds skeleton state (bone positions, slot attachments, etc).
-		skeleton.setPosition(250, 20);
+		skeleton.setPosition(320, 20);
 
 		AnimationStateData stateData = new AnimationStateData(skeletonData); // Defines mixing (crossfading) between animations.
-
 		state = new AnimationState(stateData); // Holds the animation state for a skeleton (current animation, time, etc).
-		state.setTimeScale(0.5f); // Slow all animations down to 50% speed.
 
-		// Queue animations on track 0.
-		state.setAnimation(0, "walk", true);
+		// Set animations on track 0.
+		state.setAnimation(0, "dance", true);
 
-		// Create an empty skin and copy the goblingirl skin into it.
-		Skin skin = new Skin("test");
-		skin.copySkin(skeletonData.findSkin("goblingirl"));
-		skeleton.setSkin(skin);
-		skeleton.setSlotsToSetupPose();
+		// Create a new skin, by mixing and matching other skins that fit together. Items making up the girl are individual skins.
+		// Using the skin API, a new skin is created which is a combination of all these individual item skins.
+		Skin mixAndMatchSkin = new Skin("custom-girl");
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("skin-base"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("nose/short"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("eyelids/girly"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("eyes/violet"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("hair/brown"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("clothes/hoodie-orange"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("legs/pants-jeans"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("accessories/bag"));
+		mixAndMatchSkin.addSkin(skeletonData.findSkin("accessories/hat-red-yellow"));
+		skeleton.setSkin(mixAndMatchSkin);
 	}
 
 	public void render () {
@@ -90,16 +94,13 @@ public class SimpleTest4 extends ApplicationAdapter {
 		state.apply(skeleton); // Poses skeleton using current animations. This sets the bones' local SRT.
 		skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
 
-		// Configure the camera, SpriteBatch, and SkeletonRendererDebug.
+		// Configure the camera, and PolygonSpriteBatch
 		camera.update();
 		batch.getProjectionMatrix().set(camera.combined);
-		debugRenderer.getShapeRenderer().setProjectionMatrix(camera.combined);
 
 		batch.begin();
 		renderer.draw(batch, skeleton); // Draw the skeleton images.
 		batch.end();
-
-		debugRenderer.draw(skeleton); // Draw debug lines.
 	}
 
 	public void resize (int width, int height) {
@@ -111,6 +112,6 @@ public class SimpleTest4 extends ApplicationAdapter {
 	}
 
 	public static void main (String[] args) throws Exception {
-		new Lwjgl3Application(new SimpleTest4());
+		new Lwjgl3Application(new MixAndMatchTest());
 	}
 }

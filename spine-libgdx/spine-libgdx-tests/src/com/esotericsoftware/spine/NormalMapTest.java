@@ -59,6 +59,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.Animation.MixDirection;
 
+/** Demonstrates simplistic usage of lighting with normal maps.
+ * <p>
+ * Note the normals are not rotated when bones are rotated, making lighting incorrect. */
 public class NormalMapTest extends ApplicationAdapter {
 	String skeletonPath, animationName;
 	SpriteBatch batch;

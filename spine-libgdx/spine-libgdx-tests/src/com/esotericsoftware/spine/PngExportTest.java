@@ -31,21 +31,27 @@ package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import com.esotericsoftware.spine.Animation.MixBlend;
+import com.esotericsoftware.spine.Animation.MixDirection;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
-/** Demonstrates rendering an animation to a frame buffer (FBO) and then rendering the FBO to the screen. */
-public class FboTest extends ApplicationAdapter {
+/** Demonstrates rendering an animation to a frame buffer (FBO) and then writing each frame as a PNG. */
+public class PngExportTest extends ApplicationAdapter {
 	OrthographicCamera camera;
 	TwoColorPolygonBatch batch;
 	SkeletonRenderer renderer;
@@ -77,59 +83,56 @@ public class FboTest extends ApplicationAdapter {
 		skeleton.setPosition(250, 20);
 		skeleton.updateWorldTransform();
 
-		// Create an FBO and a texture region with Y flipped.
+		// Create an FBO and a texture region.
 		fbo = new FrameBuffer(Pixmap.Format.RGBA8888, 512, 512, false);
 		fboRegion = new TextureRegion(fbo.getColorBufferTexture());
-		fboRegion.flip(false, true);
+
+		// Create a pixmap of the same size.
+		Pixmap pixmap = new Pixmap(fbo.getWidth(), fbo.getHeight(), Format.RGBA8888);
 
 		// Configure the camera and batch for rendering to the FBO's size.
-		camera.setToOrtho(false, fbo.getWidth(), fbo.getHeight());
+		camera.setToOrtho(true, fbo.getWidth(), fbo.getHeight());
 		camera.update();
 		batch.getProjectionMatrix().set(camera.combined);
 
-		// Render the skeleton to the FBO.
+		// Start rendering to the FBO.
 		fbo.begin();
-		ScreenUtils.clear(0, 0, 0, 0);
-		batch.begin();
-		renderer.draw(batch, skeleton);
-		batch.end();
+
+		// Pose the skeleton at regular intervals throughout the animation.
+		Animation animation = skeletonData.findAnimation("run");
+		float fps = 1 / 15f, time = 0;
+		int frame = 1;
+		while (time < animation.getDuration()) {
+			animation.apply(skeleton, time, time, false, null, 1, MixBlend.first, MixDirection.in);
+			skeleton.updateWorldTransform();
+
+			// Render the skeleton to the FBO.
+			ScreenUtils.clear(0, 0, 0, 0);
+			batch.begin();
+			renderer.draw(batch, skeleton);
+			batch.end();
+
+			// Copy the FBO to the pixmap and write it to a PNG file.
+			String name = animation.getName() + "_" + frame + ".png";
+			System.out.println(name);
+			Gdx.gl.glPixelStorei(GL20.GL_PACK_ALIGNMENT, 1); // Have glReadPixels use byte alignment for each pixel row.
+			Gdx.gl.glReadPixels(0, 0, fbo.getWidth(), fbo.getHeight(), GL20.GL_RGBA, GL20.GL_UNSIGNED_BYTE, pixmap.getPixels());
+			PixmapIO.writePNG(new FileHandle(name), pixmap);
+
+			frame++;
+			time += fps;
+		}
+
+		pixmap.dispose();
 		fbo.end();
 
-		// Configure the camera and batch for rendering to the screen's size.
-		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		camera.update();
-		batch.getProjectionMatrix().set(camera.combined);
-	}
-
-	public void render () {
-		ScreenUtils.clear(1, 1, 1, 1);
-
-		batch.begin();
-
-		if (drawFbo) {
-			// Render the FBO color buffer texture to screen.
-			batch.draw(fboRegion, 0, 0);
-		} else {
-			// Render the skeleton directly to the screen.
-			renderer.draw(batch, skeleton);
-		}
-
-		font.draw(batch, drawFbo ? "Drawing FBO." : "Not drawing FBO.", 10, 10 + font.getCapHeight());
-		batch.end();
-
-		if (Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-			drawFbo = !drawFbo;
-			Gdx.app.log("SpineFBOTest", "Using FBO: " + drawFbo);
-		}
-	}
-
-	public void resize (int width, int height) {
-		camera.setToOrtho(false, width, height);
-		camera.update();
-		batch.getProjectionMatrix().set(camera.combined);
+		// Terminate without showing a window.
+		System.exit(0);
 	}
 
 	static public void main (String[] args) throws Exception {
-		new Lwjgl3Application(new FboTest());
+		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+		config.setInitialVisible(false);
+		new Lwjgl3Application(new PngExportTest(), config);
 	}
 }
