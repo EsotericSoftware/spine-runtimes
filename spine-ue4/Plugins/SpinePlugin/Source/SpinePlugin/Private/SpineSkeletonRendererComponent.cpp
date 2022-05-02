@@ -167,6 +167,7 @@ void USpineSkeletonRendererComponent::Flush(int &Idx, TArray<FVector> &Vertices,
 		}
 	}
 	
+	GetBodySetup()->bGenerateMirroredCollision = GetComponentScale().X < 0 || GetComponentScale().Y < 0 || GetComponentScale().Z < 0;
 	CreateMeshSection(Idx, Vertices, Indices, Normals, Uvs, Colors, TArray<FProcMeshTangent>(), bShouldCreateCollision);
 
 	Vertices.SetNum(0);
