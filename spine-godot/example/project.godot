@@ -11,7 +11,7 @@ config_version=4
 [application]
 
 config/name="spine-godot-examples"
-run/main_scene="res://examples/11-bone-node/bone-node.tscn"
+run/main_scene="res://examples/01-helloworld/helloworld.tscn"
 run/low_processor_mode=true
 config/icon="res://icon.png"
 

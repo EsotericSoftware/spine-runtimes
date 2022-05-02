@@ -33,7 +33,6 @@
 #include "SpineAnimationState.h"
 #include "scene/2d/node_2d.h"
 #include "scene/2d/mesh_instance_2d.h"
-#include "scene/resources/texture.h"
 
 class SpineSlotNode;
 
@@ -51,6 +50,20 @@ protected:
 	String preview_animation;
 	bool preview_frame;
 	float preview_time;
+
+	bool debug_bones;
+	Color debug_bones_color;
+	float debug_bones_thickness;
+	bool debug_regions;
+	Color debug_regions_color;
+	bool debug_meshes;
+	Color debug_meshes_color;
+	bool debug_bounding_boxes;
+	Color debug_bounding_boxes_color;
+	bool debug_paths;
+	Color debug_paths_color;
+	bool debug_clipping;
+	Color debug_clipping_color;
 
 	spine::Vector<spine::Vector<SpineSlotNode*> > slot_nodes;
 	Vector<MeshInstance2D *> mesh_instances;
@@ -73,6 +86,8 @@ protected:
 	void sort_slot_nodes();
 	void update_meshes(Ref<SpineSkeleton> skeleton_ref);
 	void set_modified_bones() { modified_bones = true; }
+	void draw();
+	void draw_bone(spine::Bone *bone, const Color &color);
 
 	void callback(spine::AnimationState *state, spine::EventType type, spine::TrackEntry *entry, spine::Event *event);
 
@@ -117,6 +132,58 @@ public:
 	Ref<Material> get_screen_material();
 
 	void set_screen_material(Ref<Material> material);
+
+	bool get_debug_bones() { return debug_bones; }
+
+	void set_debug_bones (bool bones) { debug_bones = bones; }
+
+	Color get_debug_bones_color() { return debug_bones_color; }
+
+	void set_debug_bones_color(const Color &color) { debug_bones_color = color; }
+
+	float get_debug_bones_thickness() { return debug_bones_thickness; }
+
+	void set_debug_bones_thickness(float thickness) { debug_bones_thickness = thickness; }
+
+	bool get_debug_regions() { return debug_regions; }
+
+	void set_debug_regions(bool regions) { debug_regions = regions; }
+
+	Color get_debug_regions_color() { return debug_regions_color; }
+
+	void set_debug_regions_color(const Color &color) { debug_regions_color = color; }
+
+	bool get_debug_meshes() { return debug_meshes; }
+
+	void set_debug_meshes(bool meshes) { debug_meshes = meshes; }
+
+	Color get_debug_meshes_color() { return debug_meshes_color; }
+
+	void set_debug_meshes_color(const Color &color) { debug_meshes_color = color; }
+
+	bool get_debug_paths() { return debug_paths; }
+
+	void set_debug_paths(bool paths) { debug_paths = paths; }
+
+	Color get_debug_paths_color() { return debug_paths_color; }
+
+	void set_debug_paths_color(const Color &color) { debug_paths_color = color; }
+	
+	bool get_debug_bounding_boxes() { return debug_bounding_boxes; }
+
+	void set_debug_bounding_boxes(bool paths) { debug_bounding_boxes = paths; }
+
+	Color get_debug_bounding_boxes_color() { return debug_bounding_boxes_color; }
+
+	void set_debug_bounding_boxes_color(const Color &color) { debug_bounding_boxes_color = color; }
+
+	bool get_debug_clipping() { return debug_clipping; }
+
+	void set_debug_clipping(bool clipping) { debug_clipping = clipping; }
+
+	Color get_debug_clipping_color() { return debug_clipping_color; }
+
+	void set_debug_clipping_color(const Color &color) { debug_clipping_color = color; }
 
 #ifdef TOOLS_ENABLED
 	virtual Rect2 _edit_get_rect() const;
