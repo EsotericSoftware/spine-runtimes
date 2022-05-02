@@ -431,17 +431,16 @@ void SpineBone::apply_world_transform_2d(const Variant &o) {
 Transform2D SpineBone::get_transform() {
 	SPINE_CHECK(get_spine_object(), Transform2D())
 	Transform2D transform;
-	transform.rotate(Math::deg2rad(-get_rotation()));
+	transform.rotate(Math::deg2rad(get_rotation()));
 	transform.scale(Size2(get_scale_x(), get_scale_y()));
-	transform.set_origin(Vector2(get_x(), -get_y()));
+	transform.set_origin(Vector2(get_x(), get_y()));
 	return transform;
 }
 
 void SpineBone::set_transform(Transform2D transform) {
 	SPINE_CHECK(get_spine_object(),)
 	Vector2 position = transform.get_origin();
-	position.y *= -1;
-	float rotation = Math::rad2deg(-transform.get_rotation());
+	float rotation = Math::rad2deg(transform.get_rotation());
 	Vector2 scale = transform.get_scale();
 
 	set_x(position.x);
@@ -474,19 +473,17 @@ void SpineBone::set_global_transform(Transform2D transform) {
 	Transform2D inverse_sprite_transform = get_spine_owner()->get_global_transform().affine_inverse();
 	transform = inverse_sprite_transform * transform;
 	Vector2 position = transform.get_origin();
-	float local_x = position.x, local_y = position.y;
-	float local_rotation = Math::rad2deg(transform.get_rotation());
-	Vector2 local_scale = transform.get_scale();
+	float rotation = Math::rad2deg(transform.get_rotation());
+	Vector2 scale = transform.get_scale();
+	Vector2 local_position = position;
+	float local_rotation = bone->worldToLocalRotation(rotation) - 180;
+	Vector2 local_scale = scale;
 	spine::Bone *parent = bone->getParent();
 	if (parent) {
-		parent->worldToLocal(local_x, local_y, local_x, local_y);
-		parent->worldToLocal(position.x + local_scale.x, position.y + local_scale.y, local_scale.x, local_scale.y);
-		local_scale.x = (local_scale.x - local_x);
-		local_scale.y = -(local_scale.y - local_y);
-		local_rotation = 180 + bone->worldToLocalRotation(local_rotation);
+		parent->worldToLocal(local_position.x, local_position.y, local_position.x, local_position.y);		
 	}
-	bone->setX(local_x);
-	bone->setY(local_y);
+	bone->setX(local_position.x);
+	bone->setY(local_position.y);
 	bone->setRotation(local_rotation);
 	bone->setScaleX(local_scale.x);
 	bone->setScaleY(local_scale.y);

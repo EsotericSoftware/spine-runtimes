@@ -90,7 +90,7 @@ void SpineSprite::_bind_methods() {
 	ADD_GROUP("Preview", "");
 }
 
-SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), skeleton_clipper(nullptr), preview_frame(false), preview_time(0), modified_bones(false) {
+SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), preview_animation("-- Empty --"), preview_frame(false), preview_time(0), skeleton_clipper(nullptr), modified_bones(false) {
 	skeleton_clipper = new spine::SkeletonClipping();
 
 	// One material per blend mode, shared across all sprites.
@@ -162,7 +162,6 @@ void SpineSprite::on_skeleton_data_changed() {
 	if (skeleton_data_res.is_valid() && skeleton_data_res->is_skeleton_data_loaded()) {
 		skeleton = Ref<SpineSkeleton>(memnew(SpineSkeleton));
 		skeleton->set_spine_sprite(this);
-		skeleton->get_spine_object()->setScaleY(-1);
 
 		animation_state = Ref<SpineAnimationState>(memnew(SpineAnimationState));
 		animation_state->set_spine_sprite(this);

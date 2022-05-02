@@ -22,5 +22,4 @@ scale = Vector2( 1, 1 )
 bone_name = "gun-tip"
 
 [node name="Sprite" type="Sprite" parent="Spineboy/GunTipBone"]
-scale = Vector2( 1, 1 )
 texture = ExtResource( 3 )

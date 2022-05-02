@@ -6,8 +6,6 @@
 [node name="Node2D" type="Node2D"]
 
 [node name="SpineSprite" type="SpineSprite" parent="."]
-position = Vector2( 483, 490 )
-scale = Vector2( 0.548763, 0.548763 )
 skeleton_data_res = ExtResource( 1 )
 preview_animation = ""
 preview_frame = false
@@ -16,11 +14,8 @@ preview_time = 0.0
 [node name="SpineBoneNode" type="SpineBoneNode" parent="SpineSprite"]
 position = Vector2( 40.8752, -276.036 )
 rotation = 0.837234
-scale = Vector2( 1, 1 )
 bone_name = "gun"
 bone_mode = 1
 
-[node name="Sprite" type="Sprite" parent="."]
-visible = false
-position = Vector2( 505.431, 338.522 )
+[node name="Sprite" type="Sprite" parent="SpineSprite/SpineBoneNode"]
 texture = ExtResource( 2 )

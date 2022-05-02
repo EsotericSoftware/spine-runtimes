@@ -149,6 +149,7 @@ void SpineSlotNode::on_world_transforms_changed(const Variant& _sprite) {
 }
 
 void SpineSlotNode::update_transform(SpineSprite *sprite) {
+    if (!is_visible_in_tree()) return;
     if (!sprite) return;
     if (!sprite->get_skeleton().is_valid() || !sprite->get_skeleton()->get_spine_object()) return;
     auto slot = sprite->get_skeleton()->find_slot(slot_name);
@@ -160,7 +161,6 @@ void SpineSlotNode::update_transform(SpineSprite *sprite) {
     }
     auto bone = slot->get_bone();
     if (!bone.is_valid()) return;
-    if (!is_visible_in_tree()) return;
     this->set_global_transform(bone->get_global_transform());
 }
 

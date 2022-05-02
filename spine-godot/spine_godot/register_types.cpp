@@ -72,6 +72,8 @@ void register_spine_godot_types() {
 	EditorNode::add_init_callback(editor_init_callback);
 	ClassDB::register_class<SpineEditorPropertyAnimationMixes>();
 #endif
+	spine::Bone::setYDown(true);
+	
 	ClassDB::register_class<SpineAtlasResource>();
 	ClassDB::register_class<SpineSkeletonFileResource>();
 	ClassDB::register_class<SpineSkeletonDataResource>();

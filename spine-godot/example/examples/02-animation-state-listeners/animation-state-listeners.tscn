@@ -11,6 +11,9 @@ script = ExtResource( 1 )
 position = Vector2( 473, 487 )
 scale = Vector2( 0.575051, 0.575051 )
 skeleton_data_res = ExtResource( 2 )
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
 
 [node name="FootstepAudio" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 3 )

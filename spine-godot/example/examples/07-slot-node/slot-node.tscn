@@ -12,6 +12,9 @@ script = ExtResource( 1 )
 position = Vector2( 474, 506 )
 scale = Vector2( 0.560712, 0.560712 )
 skeleton_data_res = ExtResource( 2 )
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
 
 [node name="GunSlot" type="SpineSlotNode" parent="Spineboy"]
 position = Vector2( 40.8753, -276.036 )
@@ -23,6 +26,9 @@ slot_name = "gun"
 position = Vector2( 84.6909, -67.9174 )
 scale = Vector2( 0.193472, 0.193472 )
 skeleton_data_res = ExtResource( 3 )
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
 
 [node name="EyeSlot" type="SpineSlotNode" parent="Spineboy"]
 position = Vector2( -23.4598, -402.301 )
@@ -45,3 +51,6 @@ slot_name = "front-fist"
 position = Vector2( -2.64624, -10.8111 )
 scale = Vector2( 0.193389, 0.193389 )
 skeleton_data_res = ExtResource( 2 )
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0

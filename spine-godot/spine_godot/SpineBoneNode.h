@@ -48,6 +48,9 @@ protected:
 	void on_world_transforms_changed(const Variant &_sprite);
 	void update_transform(SpineSprite *sprite);
 	void init_transform(SpineSprite *sprite);
+	SpineSprite *find_parent_sprite() const;
+	Ref<SpineBone> find_bone() const;
+	void draw();;
 	
 public:
 	SpineBoneNode(): bone_mode(SpineConstant::BoneMode_Follow) {}

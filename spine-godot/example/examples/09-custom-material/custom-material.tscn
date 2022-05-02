@@ -31,9 +31,12 @@ position = Vector2( 501, 507 )
 scale = Vector2( 0.546374, 0.546373 )
 skeleton_data_res = ExtResource( 1 )
 normal_material = SubResource( 2 )
+preview_animation = "-- Empty --"
+preview_frame = false
+preview_time = 0.0
 
 [node name="GunSlot" type="SpineSlotNode" parent="SpineSprite"]
-position = Vector2( 40.8752, -276.036 )
+position = Vector2( 40.8753, -276.036 )
 rotation = 0.837234
 scale = Vector2( 1, 1 )
 slot_name = "gun"
