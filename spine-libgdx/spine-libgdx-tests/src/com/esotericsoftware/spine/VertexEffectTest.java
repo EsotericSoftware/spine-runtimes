@@ -39,8 +39,10 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.ScreenUtils;
 
+import com.esotericsoftware.spine.SkeletonRenderer.VertexEffect;
 import com.esotericsoftware.spine.vertexeffects.SwirlEffect;
 
+/** Demonstrates applying a {@link VertexEffect}. */
 public class VertexEffectTest extends ApplicationAdapter {
 	OrthographicCamera camera;
 	PolygonSpriteBatch batch;

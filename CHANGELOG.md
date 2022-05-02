@@ -79,6 +79,8 @@
   * Added example component `SkeletonRenderTexture` to render a `SkeletonRenderer` to a `RenderTexture`, mainly for proper transparency. Added an example scene named `RenderTexture FadeOut Transparency` that demonstrates usage for a fadeout transparency effect.
   * Added another fadeout example component named `SkeletonRenderTextureFadeout` which takes over transparency fadeout when enabled. You can use this component as-is, attach it in disabled state and enable it to start a fadeout effect.
   * Timeline clips now offer an additional `Alpha` parameter for setting a custom constant mix alpha value other than 1.0, just as `TrackEntry.Alpha`. Defaults to 1.0.
+  * `GetRemappedClone` copying from `Sprite` now provides additional `pmaCloneTextureFormat` and `pmaCloneMipmaps` parameters to explicitly specify the texture format of a newly created PMA texture.
+  * Spine property Inspector fields (`Animation Name`, `Bone Name`, `Slot` and similar) now display the name in red when the respective animation/bone/etc no longer exists at the skeleton data. This may be helpful when such items have been renamed or deleted.
 
 * **Breaking changes**
 

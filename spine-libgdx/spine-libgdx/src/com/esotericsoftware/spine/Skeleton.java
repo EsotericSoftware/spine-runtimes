@@ -364,6 +364,18 @@ public class Skeleton {
 	public void updateWorldTransform (Bone parent) {
 		if (parent == null) throw new IllegalArgumentException("parent cannot be null.");
 
+		Object[] bones = this.bones.items;
+		for (int i = 1, n = this.bones.size; i < n; i++) { // Skip root bone.
+			Bone bone = (Bone)bones[i];
+			bone.ax = bone.x;
+			bone.ay = bone.y;
+			bone.arotation = bone.rotation;
+			bone.ascaleX = bone.scaleX;
+			bone.ascaleY = bone.scaleY;
+			bone.ashearX = bone.shearX;
+			bone.ashearY = bone.shearY;
+		}
+
 		// Apply the parent bone transform to the root bone. The root bone always inherits scale, rotation and reflection.
 		Bone rootBone = getRootBone();
 		float pa = parent.a, pb = parent.b, pc = parent.c, pd = parent.d;

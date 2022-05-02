@@ -38,7 +38,7 @@ import com.esotericsoftware.spine.Animation.EventTimeline;
 import com.esotericsoftware.spine.Animation.MixBlend;
 import com.esotericsoftware.spine.Animation.MixDirection;
 
-/** Unit tests for {@link EventTimeline}. */
+/** Unit tests to ensure {@link EventTimeline} is working as expected. */
 public class EventTimelineTests {
 	private final SkeletonData skeletonData;
 	private final Skeleton skeleton;

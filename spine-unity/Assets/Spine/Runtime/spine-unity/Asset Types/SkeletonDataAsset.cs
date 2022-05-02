@@ -217,14 +217,30 @@ namespace Spine.Unity {
 			FillStateData();
 		}
 
-		public void FillStateData () {
+		public void FillStateData (bool quiet = false) {
 			if (stateData != null) {
 				stateData.DefaultMix = defaultMix;
 
 				for (int i = 0, n = fromAnimation.Length; i < n; i++) {
-					if (fromAnimation[i].Length == 0 || toAnimation[i].Length == 0)
+					string fromAnimationName = fromAnimation[i];
+					string toAnimationName = toAnimation[i];
+					if (fromAnimationName.Length == 0 || toAnimationName.Length == 0)
 						continue;
-					stateData.SetMix(fromAnimation[i], toAnimation[i], duration[i]);
+#if UNITY_EDITOR
+					if (skeletonData.FindAnimation(fromAnimationName) == null) {
+						if (!quiet) Debug.LogError(
+							string.Format("Custom Mix Durations: Animation '{0}' not found, was it renamed?",
+								fromAnimationName), this);
+						continue;
+					}
+					if (skeletonData.FindAnimation(toAnimationName) == null) {
+						if (!quiet) Debug.LogError(
+							string.Format("Custom Mix Durations: Animation '{0}' not found, was it renamed?",
+								toAnimationName), this);
+						continue;
+					}
+#endif
+					stateData.SetMix(fromAnimationName, toAnimationName, duration[i]);
 				}
 			}
 		}

@@ -455,7 +455,7 @@ namespace Spine.Unity.Editor {
 				}
 
 				if (cc.changed) {
-					targetSkeletonDataAsset.FillStateData();
+					targetSkeletonDataAsset.FillStateData(quiet: true);
 					EditorUtility.SetDirty(targetSkeletonDataAsset);
 					serializedObject.ApplyModifiedProperties();
 				}

@@ -52,14 +52,23 @@ namespace Spine.Unity.AttachmentTools {
 		///	<param name="useOriginalRegionScale">If <c>true</c> and the original Attachment is a RegionAttachment, then
 		///	the original region's scale value is used instead of the Sprite's pixels per unit property. Since uniform scale is used,
 		///	x scale of the original attachment (width scale) is used, scale in y direction (height scale) is ignored.</param>
+		///	<param name="pmaCloneTextureFormat">If <c>premultiplyAlpha</c> is <c>true></c>, the TextureFormat of the
+		///	newly created PMA attachment Texture.</param>
+		///	<param name="pmaCloneMipmaps">If <c>premultiplyAlpha</c> is <ctrue></c>, whether the newly created
+		///	PMA attachment Texture has mipmaps enabled.</param>
 		///	<remarks>When parameter <c>premultiplyAlpha</c> is set to <c>true</c>, a premultiply alpha clone of the
 		///	original texture will be created. Additionally, this PMA Texture clone is cached for later re-use,
 		///	which might steadily increase the Texture memory footprint when used excessively.
 		///	See <see cref="AtlasUtilities.ClearCache()"/> on how to clear these cached textures.</remarks>
 		public static Attachment GetRemappedClone (this Attachment o, Sprite sprite, Material sourceMaterial,
 			bool premultiplyAlpha = true, bool cloneMeshAsLinked = true, bool useOriginalRegionSize = false,
-			bool pivotShiftsMeshUVCoords = true, bool useOriginalRegionScale = false) {
-			var atlasRegion = premultiplyAlpha ? sprite.ToAtlasRegionPMAClone(sourceMaterial) : sprite.ToAtlasRegion(new Material(sourceMaterial) { mainTexture = sprite.texture });
+			bool pivotShiftsMeshUVCoords = true, bool useOriginalRegionScale = false,
+			TextureFormat pmaCloneTextureFormat = AtlasUtilities.SpineTextureFormat,
+			bool pmaCloneMipmaps = AtlasUtilities.UseMipMaps) {
+
+			var atlasRegion = premultiplyAlpha ?
+				sprite.ToAtlasRegionPMAClone(sourceMaterial, pmaCloneTextureFormat, pmaCloneMipmaps) :
+				sprite.ToAtlasRegion(new Material(sourceMaterial) { mainTexture = sprite.texture });
 			if (!pivotShiftsMeshUVCoords && o is MeshAttachment) {
 				// prevent non-central sprite pivot setting offsetX/Y and shifting uv coords out of mesh bounds
 				atlasRegion.offsetX = 0;

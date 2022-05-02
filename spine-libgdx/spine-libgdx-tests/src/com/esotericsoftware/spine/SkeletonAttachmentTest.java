@@ -39,6 +39,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
 
+/** Demonstrates using {@link SkeletonAttachment} to use an entire skeleton as an attachment. */
 public class SkeletonAttachmentTest extends ApplicationAdapter {
 	OrthographicCamera camera;
 	PolygonSpriteBatch batch;
