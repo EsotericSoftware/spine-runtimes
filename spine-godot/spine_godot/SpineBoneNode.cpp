@@ -30,13 +30,24 @@
 #include "SpineBoneNode.h"
 
 #include "core/engine.h"
+#include "editor/editor_about.h"
 
 void SpineBoneNode::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_bone_mode"), &SpineBoneNode::set_bone_mode);
 	ClassDB::bind_method(D_METHOD("get_bone_mode"), &SpineBoneNode::get_bone_mode);
+	ClassDB::bind_method(D_METHOD("set_enabled"), &SpineBoneNode::set_enabled);
+	ClassDB::bind_method(D_METHOD("get_enabled"), &SpineBoneNode::get_enabled);
+	ClassDB::bind_method(D_METHOD("set_debug_thickness"), &SpineBoneNode::set_debug_thickness);
+	ClassDB::bind_method(D_METHOD("get_debug_thickness"), &SpineBoneNode::get_debug_thickness);
+	ClassDB::bind_method(D_METHOD("set_debug_color"), &SpineBoneNode::set_debug_color);
+	ClassDB::bind_method(D_METHOD("get_debug_color"), &SpineBoneNode::get_debug_color);
 	ClassDB::bind_method(D_METHOD("_on_world_transforms_changed", "spine_sprite"), &SpineBoneNode::on_world_transforms_changed);
 
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "bone_mode", PROPERTY_HINT_ENUM, "Follow,Drive"), "set_bone_mode", "get_bone_mode");
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "enabled"), "set_enabled", "get_enabled");
+	ADD_GROUP("Debug", "");
+	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "thickness"), "set_debug_thickness", "get_debug_thickness");
+	ADD_PROPERTY(PropertyInfo(Variant::COLOR, "color"), "set_debug_color", "get_debug_color");
 }
 
 void SpineBoneNode::_notification(int what) {
@@ -130,6 +141,7 @@ void SpineBoneNode::on_world_transforms_changed(const Variant& _sprite) {
 }
 
 void SpineBoneNode::update_transform(SpineSprite* sprite) {
+	if (!enabled) return;
 	Ref<SpineBone> bone = find_bone();
 	if (!bone.is_valid()) return;
 
@@ -190,7 +202,19 @@ void SpineBoneNode::draw() {
 	Ref<SpineBone> bone = find_bone();
 	if (!bone.is_valid()) return;
 
-	draw_circle(get_global_position(), 10, Color::hex(0xffff0000));
+	spine::Bone *spine_bone = bone->get_spine_object();
+	if (!spine_bone) return;
+	float bone_length = spine_bone->getData().getLength();
+	if (bone_length == 0) {
+		draw_circle(Vector2(0, 0), debug_thickness, debug_color);
+	} else {
+		Vector<Vector2> points;
+		points.push_back(Vector2(-debug_thickness, 0));
+		points.push_back(Vector2(0, debug_thickness));
+		points.push_back(Vector2(bone_length, 0));
+		points.push_back(Vector2(0, -debug_thickness));
+		draw_colored_polygon(points, debug_color);
+	}
 }
 
 SpineConstant::BoneMode SpineBoneNode::get_bone_mode() {
@@ -201,4 +225,34 @@ void SpineBoneNode::set_bone_mode(SpineConstant::BoneMode _bone_mode) {
 	bone_mode = _bone_mode;
 	SpineSprite *sprite = find_parent_sprite();
 	init_transform(sprite);
+}
+
+void SpineBoneNode::set_debug_thickness(float _thickness) {
+	debug_thickness = _thickness;
+}
+
+float SpineBoneNode::get_debug_thickness() {
+	return debug_thickness;
+}
+
+void SpineBoneNode::set_debug_color(Color _color) {
+	debug_color = _color;
+}
+
+Color SpineBoneNode::get_debug_color() {
+	return debug_color;
+}
+
+void SpineBoneNode::set_enabled(bool _enabled) {
+	enabled = _enabled;
+	if (!enabled && Engine::get_singleton()->is_editor_hint()) {
+		auto sprite = find_parent_sprite();
+		if (!sprite) return;
+		sprite->get_skeleton()->set_to_setup_pose();
+		sprite->get_skeleton()->update_world_transform();
+	}
+}
+
+bool SpineBoneNode::get_enabled() {
+	return enabled;
 }

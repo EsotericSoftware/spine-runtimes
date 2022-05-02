@@ -39,6 +39,9 @@ class SpineBoneNode: public Node2D {
 protected:
 	String bone_name;
 	SpineConstant::BoneMode bone_mode;
+	bool enabled;
+	Color debug_color;
+	float debug_thickness;
 	
 	static void _bind_methods();
 	void _notification(int what);
@@ -50,16 +53,24 @@ protected:
 	void init_transform(SpineSprite *sprite);
 	SpineSprite *find_parent_sprite() const;
 	Ref<SpineBone> find_bone() const;
-	void draw();;
+	void draw();
 	
 public:
-	SpineBoneNode(): bone_mode(SpineConstant::BoneMode_Follow) {}
-
-	String get_bone_name();
-
-	void set_bone_name(const String &_bone_name);
+	SpineBoneNode(): bone_mode(SpineConstant::BoneMode_Follow), enabled(true), debug_color(Color::hex(0xff000077)), debug_thickness(5) {}
 
 	SpineConstant::BoneMode get_bone_mode();
 
 	void set_bone_mode(SpineConstant::BoneMode bone_mode);
+
+	void set_enabled(bool _enabled);
+
+	bool get_enabled();
+
+	void set_debug_thickness(float _thickness);
+
+	float get_debug_thickness();
+
+	void set_debug_color(Color _color);
+
+	Color get_debug_color();
 };
