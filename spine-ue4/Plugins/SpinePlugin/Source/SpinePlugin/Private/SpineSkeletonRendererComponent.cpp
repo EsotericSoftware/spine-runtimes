@@ -157,7 +157,15 @@ void USpineSkeletonRendererComponent::Flush(int &Idx, TArray<FVector> &Vertices,
 	if (Vertices.Num() == 0) return;
 	SetMaterial(Idx, Material);
 
-	CreateMeshSection(Idx, Vertices, Indices, Normals, Uvs, Colors, TArray<FProcMeshTangent>(), bCreateCollision);
+	bool bShouldCreateCollision = false;
+	if (bCreateCollision) {
+		UWorld* world = GetWorld();
+		if (world && world->IsGameWorld()) {
+			bShouldCreateCollision = true;
+		}
+	}
+	
+	CreateMeshSection(Idx, Vertices, Indices, Normals, Uvs, Colors, TArray<FProcMeshTangent>(), bShouldCreateCollision);
 
 	Vertices.SetNum(0);
 	Indices.SetNum(0);
