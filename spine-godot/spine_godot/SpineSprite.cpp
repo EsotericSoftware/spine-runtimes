@@ -176,14 +176,14 @@ SpineSprite::SpineSprite() : update_mode(SpineConstant::UpdateMode_Process), pre
 
 	// Default debug settings
 	debug_bones = false;
-	debug_bones_color = Color(1, 0, 0, 0.5);
+	debug_bones_color = Color(1, 1, 0, 0.5);
 	debug_bones_thickness = 5;
 	debug_regions = false;
-	debug_regions_color = Color(0, 0, 1, 0.8);
+	debug_regions_color = Color(0, 0, 1, 0.5);
 	debug_meshes = false;
-	debug_meshes_color = Color(0, 0, 1, 0.8);
+	debug_meshes_color = Color(0, 0, 1, 0.5);
 	debug_bounding_boxes = false;
-	debug_bounding_boxes_color = Color(0, 1, 0, 0.8);
+	debug_bounding_boxes_color = Color(0, 1, 0, 0.5);
 	debug_paths = false;
 	debug_paths_color = Color::hex(0xff7f0077);
 	debug_clipping = false;
@@ -618,6 +618,7 @@ void SpineSprite::draw() {
 	if (!animation_state.is_valid() && !skeleton.is_valid()) return;
 
 	auto mouse_position = get_local_mouse_position();
+	spine::Slot *hovered_slot = nullptr;
 	
 	if (debug_regions) {
 		draw_set_transform(Vector2(0, 0), 0, Vector2(1, 1));
@@ -639,7 +640,14 @@ void SpineSprite::draw() {
 				scratch_points.push_back(Vector2(x, y));
 			}
 			scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
-			draw_polyline(scratch_points, debug_meshes_color, 2);
+
+			if (Geometry::is_point_in_polygon(mouse_position, scratch_points)) {
+				hovered_slot = slot;
+				draw_colored_polygon(scratch_points, debug_regions_color);
+			} else {
+				scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
+				draw_polyline(scratch_points, debug_regions_color, 2);
+			}
 		}
 	}
 
@@ -662,8 +670,14 @@ void SpineSprite::draw() {
 				float y = vertices->buffer()[j + 1];
 				scratch_points.push_back(Vector2(x, y));
 			}
-			scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
-			draw_polyline(scratch_points, debug_meshes_color, 2);
+			
+			if (Geometry::is_point_in_polygon(mouse_position, scratch_points)) {
+				hovered_slot = slot;
+				draw_colored_polygon(scratch_points, debug_meshes_color);
+			} else {
+				scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
+				draw_polyline(scratch_points, debug_meshes_color, 2);
+			}
 		}
 	}
 
@@ -712,7 +726,6 @@ void SpineSprite::draw() {
 
 	spine::Bone *hovered_bone = nullptr;
 	if (debug_bones) {
-		float hovered_bone_distance = FLT_MAX;
 		auto &bones = skeleton->get_spine_object()->getBones();
 		for (int i = 0; i < (int)bones.size(); i++) {
 			auto *bone = bones[i];
@@ -738,20 +751,31 @@ void SpineSprite::draw() {
 	}
 
 #if TOOLS_ENABLED
+	Ref<Font> default_font;
+	auto control = memnew(Control);
+	default_font = control->get_font("font", "Label");
+	memfree(control);
+
+	float editor_scale = EditorInterface::get_singleton()->get_editor_scale();
+	float inverse_zoom = 1 / get_viewport()->get_global_canvas_transform().get_scale().x * editor_scale;
+	Vector<String> hover_text_lines;
+	if (hovered_slot) {
+		hover_text_lines.push_back(String("Slot: ") + hovered_slot->getData().getName().buffer());
+	}
+	
 	if (hovered_bone) {
-		Ref<Font> default_font;
-		auto control = memnew(Control);
-		default_font = control->get_font("font", "Label");
-		memfree(control);
 		float thickness = debug_bones_thickness;
 		debug_bones_thickness *= 1.1;
 		draw_bone(hovered_bone, Color(debug_bones_color.r, debug_bones_color.g, debug_bones_color.b, 1));
 		debug_bones_thickness = thickness;
-		float editor_scale = EditorInterface::get_singleton()->get_editor_scale();
-		float inverse_zoom = 1 / get_viewport()->get_global_canvas_transform().get_scale().x * editor_scale * 2.5;
-		draw_set_transform(Vector2(hovered_bone->getWorldX(), hovered_bone->getWorldY()), 0, Vector2(inverse_zoom, inverse_zoom));
-		draw_string(default_font, Vector2(11, 1), hovered_bone->getData().getName().buffer(), Color(0, 0, 0, 1));
-		draw_string(default_font, Vector2(10, 0), hovered_bone->getData().getName().buffer());
+		hover_text_lines.push_back(String("Bone: ") + hovered_bone->getData().getName().buffer());
+	}
+	
+	auto global_scale = get_global_scale();
+	draw_set_transform(mouse_position, -get_global_rotation(), Vector2(inverse_zoom * (1 / global_scale.x), inverse_zoom * (1 / global_scale.y)));
+	for (int i = 0; i < hover_text_lines.size(); i++) {
+		draw_string(default_font, Vector2(11, 1 + i * default_font->get_height()), hover_text_lines[i], Color(0, 0, 0, 1));
+		draw_string(default_font, Vector2(10, 0 + i * default_font->get_height()), hover_text_lines[i], Color (1, 1, 1, 1));
 	}
 #endif
 }
