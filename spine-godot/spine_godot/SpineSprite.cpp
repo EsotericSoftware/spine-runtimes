@@ -641,13 +641,13 @@ void SpineSprite::draw() {
 			}
 			scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
 
+			Color color = debug_regions_color;
 			if (Geometry::is_point_in_polygon(mouse_position, scratch_points)) {
 				hovered_slot = slot;
-				draw_colored_polygon(scratch_points, debug_regions_color);
-			} else {
-				scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
-				draw_polyline(scratch_points, debug_regions_color, 2);
+				color = Color(1, 1, 1, 1);
 			}
+			scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
+			draw_polyline(scratch_points, color, 2);
 		}
 	}
 
@@ -671,13 +671,13 @@ void SpineSprite::draw() {
 				scratch_points.push_back(Vector2(x, y));
 			}
 			
+			Color color = debug_meshes_color;
 			if (Geometry::is_point_in_polygon(mouse_position, scratch_points)) {
 				hovered_slot = slot;
-				draw_colored_polygon(scratch_points, debug_meshes_color);
-			} else {
-				scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
-				draw_polyline(scratch_points, debug_meshes_color, 2);
+				color = Color(1, 1, 1, 1);
 			}
+			scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
+			draw_polyline(scratch_points, color, 2);
 		}
 	}
 
@@ -772,9 +772,16 @@ void SpineSprite::draw() {
 	}
 	
 	auto global_scale = get_global_scale();
-	draw_set_transform(mouse_position, -get_global_rotation(), Vector2(inverse_zoom * (1 / global_scale.x), inverse_zoom * (1 / global_scale.y)));
+	draw_set_transform(mouse_position + Vector2(20, 0), -get_global_rotation(), Vector2(inverse_zoom * (1 / global_scale.x), inverse_zoom * (1 / global_scale.y)));
+
+	float line_height = default_font->get_height() + default_font->get_descent();
+	float rect_width = 0;
 	for (int i = 0; i < hover_text_lines.size(); i++) {
-		draw_string(default_font, Vector2(11, 1 + i * default_font->get_height()), hover_text_lines[i], Color(0, 0, 0, 1));
+		rect_width = MAX(rect_width, default_font->get_string_size(hover_text_lines[i]).x);
+	}
+	Rect2 background_rect(0, -default_font->get_height() - 5, rect_width + 20, line_height * hover_text_lines.size() + 10);
+	if (hover_text_lines.size() > 0) draw_rect(background_rect, Color(0, 0, 0 ,0.8));
+	for (int i = 0; i < hover_text_lines.size(); i++) {
 		draw_string(default_font, Vector2(10, 0 + i * default_font->get_height()), hover_text_lines[i], Color (1, 1, 1, 1));
 	}
 #endif

@@ -7,6 +7,7 @@
 [node name="SpineSprite" type="SpineSprite" parent="."]
 position = Vector2( 502, 480 )
 skeleton_data_res = ExtResource( 1 )
+bones = true
 preview_animation = "-- Empty --"
 preview_frame = false
 preview_time = 0.0
