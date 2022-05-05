@@ -66,6 +66,10 @@ namespace Spine.Unity.Editor {
 
 		internal const string DEFAULT_DEFAULT_SHADER = "Spine/Skeleton";
 		public string defaultShader = DEFAULT_DEFAULT_SHADER;
+		public string DefaultShader {
+			get { return !string.IsNullOrEmpty(defaultShader) ? defaultShader : DEFAULT_DEFAULT_SHADER; }
+			set { defaultShader = value; }
+		}
 
 		internal const float DEFAULT_DEFAULT_ZSPACING = 0f;
 		public float defaultZSpacing = DEFAULT_DEFAULT_ZSPACING;
