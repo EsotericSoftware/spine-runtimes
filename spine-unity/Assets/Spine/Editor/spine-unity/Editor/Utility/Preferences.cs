@@ -104,8 +104,8 @@ namespace Spine.Unity.Editor {
 
 			const string DEFAULT_SHADER_KEY = "SPINE_DEFAULT_SHADER";
 			public static string defaultShader = SpinePreferences.DEFAULT_DEFAULT_SHADER;
-			public string DefaultShader {
-				get { return !string.IsNullOrEmpty(defaultShader) ? defaultShader : DEFAULT_DEFAULT_SHADER; }
+			public static string DefaultShader {
+				get { return !string.IsNullOrEmpty(defaultShader) ? defaultShader : SpinePreferences.DEFAULT_DEFAULT_SHADER; }
 				set { defaultShader = value; }
 			}
 
