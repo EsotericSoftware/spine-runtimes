@@ -29,5 +29,13 @@
 
 #pragma once
 
+#include "SpineCommon.h"
+
+#if VERSION_MAJOR > 3
+#include "modules/register_module_types.h"
+void initialize_spine_godot_module(ModuleInitializationLevel level);
+void uninitialize_spine_godot_module(ModuleInitializationLevel level);
+#else
 void register_spine_godot_types();
 void unregister_spine_godot_types();
+#endif

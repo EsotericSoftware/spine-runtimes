@@ -29,8 +29,11 @@
 
 #include "SpineBoneNode.h"
 
+#if VERSION_MAJOR > 3
+#include "core/config/engine.h"
+#else
 #include "core/engine.h"
-#include "editor/editor_about.h"
+#endif
 
 void SpineBoneNode::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_bone_mode"), &SpineBoneNode::set_bone_mode);
@@ -56,7 +59,7 @@ void SpineBoneNode::_notification(int what) {
 			SpineSprite *sprite = find_parent_sprite();
 			if (sprite) {
 #if VERSION_MAJOR > 3
-				sprite->connect("world_transforms_changed", callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
+				sprite->connect("world_transforms_changed", callable_mp(this, &SpineBoneNode::on_world_transforms_changed));
 #else
 				sprite->connect("world_transforms_changed", this, "_on_world_transforms_changed");
 #endif
@@ -71,7 +74,7 @@ void SpineBoneNode::_notification(int what) {
 				_change_notify("scale");
 #endif
 			} else {
-				WARN_PRINT("SpineSlotNode parent is not a SpineSprite.");
+				WARN_PRINT("SpineBoneNode parent is not a SpineSprite.");
 			}
 			NOTIFY_PROPERTY_LIST_CHANGED();
 			break;
@@ -80,7 +83,7 @@ void SpineBoneNode::_notification(int what) {
 			SpineSprite *sprite = find_parent_sprite();
 			if (sprite) {
 #if VERSION_MAJOR > 3
-				sprite->disconnect("world_transforms_changed", callable_mp(this, &SpineSlotNode::on_world_transforms_changed));
+				sprite->disconnect("world_transforms_changed", callable_mp(this, &SpineBoneNode::on_world_transforms_changed));
 #else
 				sprite->disconnect("world_transforms_changed", this, "_on_world_transforms_changed");
 #endif

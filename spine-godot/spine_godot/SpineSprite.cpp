@@ -33,9 +33,17 @@
 #include "SpineSkeleton.h"
 #include "SpineRendererObject.h"
 #include "SpineSlotNode.h"
+
+#if VERSION_MAJOR > 3
+#include "core/config/engine.h"
+#include "core/math/geometry_2d.h"
+#else
 #include "core/engine.h"
+#endif
+
 #include "scene/gui/control.h"
 #include "scene/main/viewport.h"
+
 #if TOOLS_ENABLED
 #include "editor/editor_plugin.h"
 #endif
@@ -461,14 +469,14 @@ static void add_triangles(MeshInstance2D *mesh_instance,
 	Ref<Texture> texture,
 	Ref<Texture> normal_map) {
 #if VERSION_MAJOR > 3
-	RenderingServer::get_singleton()->canvas_item_add_triangle_array(mesh_ins->get_canvas_item(),
+	RenderingServer::get_singleton()->canvas_item_add_triangle_array(mesh_instance->get_canvas_item(),
 																  indices,
 																  vertices,
 																  colors,
 																  uvs,
 																  Vector<int>(),
 																  Vector<float>(),
-																  tex.is_null() ? RID() : tex->get_rid(),
+																  texture.is_null() ? RID() : texture->get_rid(),
 																  -1);
 #else
 	VisualServer::get_singleton()->canvas_item_add_triangle_array(mesh_instance->get_canvas_item(),
@@ -642,7 +650,7 @@ void SpineSprite::draw() {
 			scratch_points.push_back(Vector2(vertices->buffer()[0], vertices->buffer()[1]));
 
 			Color color = debug_regions_color;
-			if (Geometry::is_point_in_polygon(mouse_position, scratch_points)) {
+			if (GEOMETRY2D::is_point_in_polygon(mouse_position, scratch_points)) {
 				hovered_slot = slot;
 				color = Color(1, 1, 1, 1);
 			}
@@ -672,7 +680,7 @@ void SpineSprite::draw() {
 			}
 			
 			Color color = debug_meshes_color;
-			if (Geometry::is_point_in_polygon(mouse_position, scratch_points)) {
+			if (GEOMETRY2D::is_point_in_polygon(mouse_position, scratch_points)) {
 				hovered_slot = slot;
 				color = Color(1, 1, 1, 1);
 			}
@@ -744,7 +752,7 @@ void SpineSprite::draw() {
 			Transform2D bone_transform(Math::deg2rad(bone->getWorldRotationX()), Vector2(bone->getWorldX(), bone->getWorldY()));
 			bone_transform.scale_basis(Vector2(bone->getWorldScaleX(), bone->getWorldScaleY()));
 			auto mouse_local_position = bone_transform.affine_inverse().xform(mouse_position);
-			if (Geometry::is_point_in_polygon(mouse_local_position, scratch_points)) {
+			if (GEOMETRY2D::is_point_in_polygon(mouse_local_position, scratch_points)) {
 				hovered_bone = bone;
 			}
 		}
@@ -753,7 +761,11 @@ void SpineSprite::draw() {
 #if TOOLS_ENABLED
 	Ref<Font> default_font;
 	auto control = memnew(Control);
+#if VERSION_MAJOR > 3
+	default_font = control->get_theme_default_font();
+#else
 	default_font = control->get_font("font", "Label");
+#endif
 	memfree(control);
 
 	float editor_scale = EditorInterface::get_singleton()->get_editor_scale();
@@ -782,7 +794,11 @@ void SpineSprite::draw() {
 	Rect2 background_rect(0, -default_font->get_height() - 5, rect_width + 20, line_height * hover_text_lines.size() + 10);
 	if (hover_text_lines.size() > 0) draw_rect(background_rect, Color(0, 0, 0 ,0.8));
 	for (int i = 0; i < hover_text_lines.size(); i++) {
+#if VERSION_MAJOR > 3
+		draw_string(default_font, Vector2(10, 0 + i * default_font->get_height()), hover_text_lines[i], HORIZONTAL_ALIGNMENT_LEFT, -1, Font::DEFAULT_FONT_SIZE, Color (1, 1, 1, 1));
+#else
 		draw_string(default_font, Vector2(10, 0 + i * default_font->get_height()), hover_text_lines[i], Color (1, 1, 1, 1));
+#endif
 	}
 #endif
 }

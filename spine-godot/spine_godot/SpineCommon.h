@@ -41,6 +41,9 @@
 #define NOTIFY_PROPERTY_LIST_CHANGED() notify_property_list_changed()
 #define VARIANT_FLOAT Variant::FLOAT
 #define PROPERTY_USAGE_NOEDITOR PROPERTY_USAGE_NO_EDITOR
+#define RES Ref<Resource>
+#define REF Ref<RefCounted>
+#define GEOMETRY2D Geometry2D
 #else
 #include "core/object.h"
 #include "core/reference.h"
@@ -51,6 +54,8 @@
 #define INSTANTIATE(x) (x).instance()
 #define NOTIFY_PROPERTY_LIST_CHANGED() property_list_changed_notify()
 #define VARIANT_FLOAT Variant::REAL
+#define GDREGISTER_CLASS(x) ClassDB::register_class<x>()
+#define GEOMETRY2D Geometry
 #endif
 
 #define SPINE_CHECK(obj, ret) \

@@ -51,6 +51,7 @@
 #include "SpineConstant.h"
 #include "SpineSlotNode.h"
 #include "SpineBoneNode.h"
+#include "spine/Bone.h"
 
 static Ref<SpineAtlasResourceFormatLoader> atlas_loader;
 static Ref<SpineAtlasResourceFormatSaver> atlas_saver;
@@ -67,44 +68,48 @@ static void editor_init_callback() {
 
 #endif
 
+#if VERSION_MAJOR > 3
+void initialize_spine_godot_module(ModuleInitializationLevel level) {
+#else
 void register_spine_godot_types() {
+#endif
 #ifdef TOOLS_ENABLED
 	EditorNode::add_init_callback(editor_init_callback);
-	ClassDB::register_class<SpineEditorPropertyAnimationMixes>();
+	GDREGISTER_CLASS(SpineEditorPropertyAnimationMixes);
 #endif
 	spine::Bone::setYDown(true);
 	
-	ClassDB::register_class<SpineAtlasResource>();
-	ClassDB::register_class<SpineSkeletonFileResource>();
-	ClassDB::register_class<SpineSkeletonDataResource>();
-	ClassDB::register_class<SpineAnimationMix>();
-	ClassDB::register_class<SpineSprite>();
-	ClassDB::register_class<SpineSkeleton>();
-	ClassDB::register_class<SpineAnimationState>();
-	ClassDB::register_class<SpineAnimation>();
-	ClassDB::register_class<SpineEventData>();
-	ClassDB::register_class<SpineTrackEntry>();
-	ClassDB::register_class<SpineEvent>();
-	ClassDB::register_class<SpineBoneData>();
-	ClassDB::register_class<SpineSlotData>();
-	ClassDB::register_class<SpineAttachment>();
-	ClassDB::register_class<SpineSkinEntry>();
-	ClassDB::register_class<SpineConstraintData>();
-	ClassDB::register_class<SpineSkin>();
-	ClassDB::register_class<SpineIkConstraintData>();
-	ClassDB::register_class<SpineTransformConstraintData>();
-	ClassDB::register_class<SpinePathConstraintData>();
-	ClassDB::register_class<SpineBone>();
-	ClassDB::register_class<SpineSlot>();
-	ClassDB::register_class<SpineIkConstraint>();
-	ClassDB::register_class<SpinePathConstraint>();
-	ClassDB::register_class<SpineTransformConstraint>();
-	ClassDB::register_class<SpineTimeline>();
-	ClassDB::register_class<SpineConstant>();
+	GDREGISTER_CLASS(SpineAtlasResource);
+	GDREGISTER_CLASS(SpineSkeletonFileResource);
+	GDREGISTER_CLASS(SpineSkeletonDataResource);
+	GDREGISTER_CLASS(SpineAnimationMix);
+	GDREGISTER_CLASS(SpineSprite);
+	GDREGISTER_CLASS(SpineSkeleton);
+	GDREGISTER_CLASS(SpineAnimationState);
+	GDREGISTER_CLASS(SpineAnimation);
+	GDREGISTER_CLASS(SpineEventData);
+	GDREGISTER_CLASS(SpineTrackEntry);
+	GDREGISTER_CLASS(SpineEvent);
+	GDREGISTER_CLASS(SpineBoneData);
+	GDREGISTER_CLASS(SpineSlotData);
+	GDREGISTER_CLASS(SpineAttachment);
+	GDREGISTER_CLASS(SpineSkinEntry);
+	GDREGISTER_CLASS(SpineConstraintData);
+	GDREGISTER_CLASS(SpineSkin);
+	GDREGISTER_CLASS(SpineIkConstraintData);
+	GDREGISTER_CLASS(SpineTransformConstraintData);
+	GDREGISTER_CLASS(SpinePathConstraintData);
+	GDREGISTER_CLASS(SpineBone);
+	GDREGISTER_CLASS(SpineSlot);
+	GDREGISTER_CLASS(SpineIkConstraint);
+	GDREGISTER_CLASS(SpinePathConstraint);
+	GDREGISTER_CLASS(SpineTransformConstraint);
+	GDREGISTER_CLASS(SpineTimeline);
+	GDREGISTER_CLASS(SpineConstant);
 	
-	ClassDB::register_class<SpineSlotNode>();
-	ClassDB::register_class<SpineBoneNode>();
-	ClassDB::register_class<SpineAnimationTrack>();
+	GDREGISTER_CLASS(SpineSlotNode);
+	GDREGISTER_CLASS(SpineBoneNode);
+	GDREGISTER_CLASS(SpineAnimationTrack);
 
 #if VERSION_MAJOR > 3
 	atlas_loader.instantiate();
@@ -133,7 +138,11 @@ void register_spine_godot_types() {
 #endif
 }
 
+#if VERSION_MAJOR > 3
+void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
+#else
 void unregister_spine_godot_types() {
+#endif
 	ResourceLoader::remove_resource_format_loader(atlas_loader);
 	atlas_loader.unref();
 
