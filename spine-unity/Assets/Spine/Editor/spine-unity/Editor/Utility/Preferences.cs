@@ -56,16 +56,12 @@ namespace Spine.Unity.Editor {
 	public partial class SpineEditorUtilities {
 
 #if NEW_PREFERENCES_SETTINGS_PROVIDER
-		static class SpineSettingsProviderRegistration
-		{
+		static class SpineSettingsProviderRegistration {
 			[SettingsProvider]
-			public static SettingsProvider CreateSpineSettingsProvider()
-			{
-				var provider = new SettingsProvider("Spine", SettingsScope.User)
-				{
+			public static SettingsProvider CreateSpineSettingsProvider () {
+				var provider = new SettingsProvider("Spine", SettingsScope.User) {
 					label = "Spine",
-					guiHandler = (searchContext) =>
-					{
+					guiHandler = (searchContext) => {
 						var settings = SpinePreferences.GetOrCreateSettings();
 						var serializedSettings = new SerializedObject(settings);
 						SpinePreferences.HandlePreferencesGUI(serializedSettings);
@@ -108,6 +104,10 @@ namespace Spine.Unity.Editor {
 
 			const string DEFAULT_SHADER_KEY = "SPINE_DEFAULT_SHADER";
 			public static string defaultShader = SpinePreferences.DEFAULT_DEFAULT_SHADER;
+			public string DefaultShader {
+				get { return !string.IsNullOrEmpty(defaultShader) ? defaultShader : DEFAULT_DEFAULT_SHADER; }
+				set { defaultShader = value; }
+			}
 
 			const string DEFAULT_ZSPACING_KEY = "SPINE_DEFAULT_ZSPACING";
 			public static float defaultZSpacing = SpinePreferences.DEFAULT_DEFAULT_ZSPACING;
@@ -201,7 +201,7 @@ namespace Spine.Unity.Editor {
 			}
 
 #if NEW_PREFERENCES_SETTINGS_PROVIDER
-			public static void CopyOldToNewPreferences(ref SpinePreferences newPreferences) {
+			public static void CopyOldToNewPreferences (ref SpinePreferences newPreferences) {
 				newPreferences.defaultMix = EditorPrefs.GetFloat(DEFAULT_MIX_KEY, SpinePreferences.DEFAULT_DEFAULT_MIX);
 				newPreferences.defaultScale = EditorPrefs.GetFloat(DEFAULT_SCALE_KEY, SpinePreferences.DEFAULT_DEFAULT_SCALE);
 				newPreferences.defaultZSpacing = EditorPrefs.GetFloat(DEFAULT_ZSPACING_KEY, SpinePreferences.DEFAULT_DEFAULT_ZSPACING);
@@ -218,7 +218,7 @@ namespace Spine.Unity.Editor {
 				newPreferences.handleScale = EditorPrefs.GetFloat(SCENE_ICONS_SCALE_KEY, SpinePreferences.DEFAULT_SCENE_ICONS_SCALE);
 			}
 
-			public static void SaveToEditorPrefs(SpinePreferences preferences) {
+			public static void SaveToEditorPrefs (SpinePreferences preferences) {
 				EditorPrefs.SetFloat(DEFAULT_MIX_KEY, preferences.defaultMix);
 				EditorPrefs.SetFloat(DEFAULT_SCALE_KEY, preferences.defaultScale);
 				EditorPrefs.SetFloat(DEFAULT_ZSPACING_KEY, preferences.defaultZSpacing);
