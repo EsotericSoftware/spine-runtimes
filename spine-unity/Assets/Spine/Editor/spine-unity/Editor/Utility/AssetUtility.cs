@@ -580,18 +580,23 @@ namespace Spine.Unity.Editor {
 				if (material == null) {
 					Shader defaultShader = Shader.Find(SpineEditorUtilities.Preferences.DefaultShader);
 					material = defaultShader != null ? new Material(defaultShader) : null;
-					ApplyPMAOrStraightAlphaSettings(material, SpineEditorUtilities.Preferences.textureSettingsReference);
-					AssetDatabase.CreateAsset(material, materialPath);
+					if (material) {
+						ApplyPMAOrStraightAlphaSettings(material, SpineEditorUtilities.Preferences.textureSettingsReference);
+						AssetDatabase.CreateAsset(material, materialPath);
+					}
 				} else {
 					vestigialMaterials.Remove(material);
 				}
 
-				if (texture != null)
-					material.mainTexture = texture;
+				if (material != null) {
+					if (texture != null) {
+						material.mainTexture = texture;
+					}
 
-				EditorUtility.SetDirty(material);
-				// note: don't call AssetDatabase.SaveAssets() since this would trigger OnPostprocessAllAssets() every time unnecessarily.
-				populatingMaterials.Add(material); //atlasAsset.materials[i] = mat;
+					EditorUtility.SetDirty(material);
+					// note: don't call AssetDatabase.SaveAssets() since this would trigger OnPostprocessAllAssets() every time unnecessarily.
+					populatingMaterials.Add(material); //atlasAsset.materials[i] = mat;
+				}
 			}
 
 			atlasAsset.materials = populatingMaterials.ToArray();
