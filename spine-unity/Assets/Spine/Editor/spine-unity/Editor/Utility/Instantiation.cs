@@ -48,6 +48,7 @@ namespace Spine.Unity.Editor {
 			public struct SpawnMenuData {
 				public Vector3 spawnPoint;
 				public Transform parent;
+				public int siblingIndex;
 				public SkeletonDataAsset skeletonDataAsset;
 				public EditorInstantiation.InstantiateDelegate instantiateDelegate;
 				public bool isUI;
@@ -82,7 +83,7 @@ namespace Spine.Unity.Editor {
 								RectTransform rectTransform = (Selection.activeGameObject == null) ? null : Selection.activeGameObject.GetComponent<RectTransform>();
 								Plane plane = (rectTransform == null) ? new Plane(Vector3.back, Vector3.zero) : new Plane(-rectTransform.forward, rectTransform.position);
 								Vector3 spawnPoint = MousePointToWorldPoint2D(mousePos, sceneview.camera, plane);
-								ShowInstantiateContextMenu(skeletonDataAsset, spawnPoint, null);
+								ShowInstantiateContextMenu(skeletonDataAsset, spawnPoint, null, 0);
 								DragAndDrop.AcceptDrag();
 								current.Use();
 							}
@@ -91,7 +92,8 @@ namespace Spine.Unity.Editor {
 				}
 			}
 
-			public static void ShowInstantiateContextMenu (SkeletonDataAsset skeletonDataAsset, Vector3 spawnPoint, Transform parent) {
+			public static void ShowInstantiateContextMenu (SkeletonDataAsset skeletonDataAsset, Vector3 spawnPoint,
+				Transform parent, int siblingIndex = 0) {
 				var menu = new GenericMenu();
 
 				// SkeletonAnimation
@@ -99,6 +101,7 @@ namespace Spine.Unity.Editor {
 					skeletonDataAsset = skeletonDataAsset,
 					spawnPoint = spawnPoint,
 					parent = parent,
+					siblingIndex = siblingIndex,
 					instantiateDelegate = (data) => EditorInstantiation.InstantiateSkeletonAnimation(data),
 					isUI = false
 				});
@@ -112,6 +115,7 @@ namespace Spine.Unity.Editor {
 							skeletonDataAsset = skeletonDataAsset,
 							spawnPoint = spawnPoint,
 							parent = parent,
+							siblingIndex = siblingIndex,
 							instantiateDelegate = System.Delegate.CreateDelegate(typeof(EditorInstantiation.InstantiateDelegate), graphicInstantiateDelegate) as EditorInstantiation.InstantiateDelegate,
 							isUI = true
 						});
@@ -124,6 +128,7 @@ namespace Spine.Unity.Editor {
 					skeletonDataAsset = skeletonDataAsset,
 					spawnPoint = spawnPoint,
 					parent = parent,
+					siblingIndex = siblingIndex,
 					instantiateDelegate = (data) => EditorInstantiation.InstantiateSkeletonMecanim(data),
 					isUI = false
 				});
@@ -149,6 +154,8 @@ namespace Spine.Unity.Editor {
 				var usedParent = data.parent != null ? data.parent.gameObject : isUI ? Selection.activeGameObject : null;
 				if (usedParent)
 					newTransform.SetParent(usedParent.transform, false);
+				if (data.siblingIndex != 0)
+					newTransform.SetSiblingIndex(data.siblingIndex);
 
 				newTransform.position = isUI ? data.spawnPoint : RoundVector(data.spawnPoint, 2);
 
