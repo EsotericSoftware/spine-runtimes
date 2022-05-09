@@ -446,10 +446,11 @@ namespace Spine.Unity.Editor {
 
 #if UNITY_2021_2_OR_NEWER
 			internal static DragAndDropVisualMode HandleDragAndDrop (int dropTargetInstanceID, HierarchyDropFlags dropMode, Transform parentForDraggedObjects, bool perform) {
-				if (!perform || DragAndDrop.objectReferences.Length == 0)
-					return DragAndDropVisualMode.Copy;
-				SkeletonDataAsset skeletonDataAsset = DragAndDrop.objectReferences[0] as SkeletonDataAsset;
+				SkeletonDataAsset skeletonDataAsset = DragAndDrop.objectReferences.Length == 0 ? null :
+					DragAndDrop.objectReferences[0] as SkeletonDataAsset;
 				if (skeletonDataAsset == null)
+					return DragAndDropVisualMode.None;
+				if (!perform)
 					return DragAndDropVisualMode.Copy;
 
 				GameObject dropTargetObject = UnityEditor.EditorUtility.InstanceIDToObject(dropTargetInstanceID) as GameObject;
