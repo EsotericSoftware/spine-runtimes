@@ -286,6 +286,10 @@ void SpineSprite::sort_slot_nodes() {
 	
 	auto draw_order = skeleton->get_spine_object()->getDrawOrder();
 	for (int i = 0; i < get_child_count(); i++) {
+		auto child = cast_to<Node2D>(get_child(i));
+		if (!child) continue;
+		// Needed so that debug drawables are rendered in front of attachments and other nodes under the sprite.
+		child->set_draw_behind_parent(true);
 		auto slot_node = Object::cast_to<SpineSlotNode>(get_child(i));
 		if (!slot_node) continue;
 		if (slot_node->get_slot_index() == -1 || slot_node->get_slot_index() >= (int)draw_order.size()) {
