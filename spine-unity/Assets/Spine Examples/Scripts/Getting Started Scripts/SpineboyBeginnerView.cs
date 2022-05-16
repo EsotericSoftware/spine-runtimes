@@ -126,15 +126,13 @@ namespace Spine.Unity.Examples {
 			var shootTrack = skeletonAnimation.AnimationState.SetAnimation(1, shoot, false);
 			shootTrack.AttachmentThreshold = 1f;
 			shootTrack.MixDuration = 0f;
-			var empty1 = skeletonAnimation.state.AddEmptyAnimation(1, 0.5f, 0.1f);
-			empty1.AttachmentThreshold = 1f;
+			skeletonAnimation.state.AddEmptyAnimation(1, 0.5f, 0.1f);
 
 			// Play the aim animation on track 2 to aim at the mouse target.
 			var aimTrack = skeletonAnimation.AnimationState.SetAnimation(2, aim, false);
 			aimTrack.AttachmentThreshold = 1f;
 			aimTrack.MixDuration = 0f;
-			var empty2 = skeletonAnimation.state.AddEmptyAnimation(2, 0.5f, 0.1f);
-			empty2.AttachmentThreshold = 1f;
+			skeletonAnimation.state.AddEmptyAnimation(2, 0.5f, 0.1f);
 
 			gunSource.pitch = GetRandomPitch(gunsoundPitchOffset);
 			gunSource.Play();
@@ -150,8 +148,7 @@ namespace Spine.Unity.Examples {
 		}
 
 		public void StopPlayingAim () {
-			var empty2 = skeletonAnimation.state.AddEmptyAnimation(2, 0.5f, 0.1f);
-			empty2.AttachmentThreshold = 1f;
+			skeletonAnimation.state.AddEmptyAnimation(2, 0.5f, 0.1f);
 		}
 
 		public void Turn (bool facingLeft) {
