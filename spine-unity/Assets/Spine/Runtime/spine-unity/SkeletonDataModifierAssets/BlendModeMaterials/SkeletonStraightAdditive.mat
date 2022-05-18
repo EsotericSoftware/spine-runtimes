@@ -6,9 +6,9 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: SkeletonPMAAdditive
+  m_Name: SkeletonStraightAdditive
   m_Shader: {fileID: 4800000, guid: 53efa1d97f5d9f74285d4330cda14e36, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _STRAIGHT_ALPHA_INPUT
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -29,7 +29,16 @@ Material:
     m_Floats:
     - <noninit>: 0
     - _Cutoff: 0.1
-    - _StraightAlphaInput: 0
+    - _OutlineMipLevel: 0
+    - _OutlineReferenceTexWidth: 1024
+    - _OutlineSmoothness: 1
+    - _OutlineWidth: 3
+    - _StencilComp: 8
+    - _StencilRef: 1
+    - _StraightAlphaInput: 1
+    - _ThresholdEnd: 0.25
+    - _Use8Neighbourhood: 1
     m_Colors:
     - <noninit>: {r: 0, g: 2.018574, b: 1e-45, a: 0.000007110106}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _OutlineColor: {r: 1, g: 1, b: 0, a: 1}
