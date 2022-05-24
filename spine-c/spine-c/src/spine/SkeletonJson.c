@@ -1202,6 +1202,7 @@ spSkeletonData *spSkeletonJson_readSkeletonData(spSkeletonJson *self, const char
 			data->offsetScaleY = Json_getFloat(constraintMap, "scaleY", 0);
 			data->offsetShearY = Json_getFloat(constraintMap, "shearY", 0);
 
+			data->mixRotate = Json_getFloat(constraintMap, "mixRotate", 1);
 			data->mixX = Json_getFloat(constraintMap, "mixX", 1);
 			data->mixY = Json_getFloat(constraintMap, "mixY", data->mixX);
 			data->mixScaleX = Json_getFloat(constraintMap, "mixScaleX", 1);
