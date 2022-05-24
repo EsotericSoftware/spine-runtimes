@@ -633,14 +633,14 @@ namespace Spine.Unity.Editor {
 					}
 				} else {
 					vestigialMaterials.Remove(material);
-				}
-
-				if (material != null) {
 					if (texture != null)
 						material.mainTexture = texture;
 					EditorUtility.SetDirty(material);
 					// note: don't call AssetDatabase.SaveAssets() since this would trigger OnPostprocessAllAssets() every time unnecessarily.
-					populatingMaterials.Add(material); //atlasAsset.materials[i] = mat;
+				}
+
+				if (material != null) {
+					populatingMaterials.Add(material);
 				}
 			}
 
