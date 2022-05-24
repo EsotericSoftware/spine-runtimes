@@ -582,6 +582,8 @@ namespace Spine.Unity.Editor {
 					material = defaultShader != null ? new Material(defaultShader) : null;
 					if (material) {
 						ApplyPMAOrStraightAlphaSettings(material, SpineEditorUtilities.Preferences.textureSettingsReference);
+						if (texture != null)
+							material.mainTexture = texture;
 						AssetDatabase.CreateAsset(material, materialPath);
 					}
 				} else {
@@ -589,10 +591,8 @@ namespace Spine.Unity.Editor {
 				}
 
 				if (material != null) {
-					if (texture != null) {
+					if (texture != null)
 						material.mainTexture = texture;
-					}
-
 					EditorUtility.SetDirty(material);
 					// note: don't call AssetDatabase.SaveAssets() since this would trigger OnPostprocessAllAssets() every time unnecessarily.
 					populatingMaterials.Add(material); //atlasAsset.materials[i] = mat;
