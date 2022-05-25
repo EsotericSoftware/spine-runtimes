@@ -66,7 +66,7 @@
 
 ### Unity
 
-* **Officially supported Unity versions are 2017.1-2021.1**.
+* **Officially supported Unity versions are 2017.1-2022.1**.
 
 * **Additions**
   * `SpineAtlasAsset.CreateRuntimeInstance` methods now provide an optional `newCustomTextureLoader` parameter (defaults to `null`) which can be set to e.g. `(a) => new YourCustomTextureLoader(a)` to use your own `TextureLoader` subclass instead of `MaterialsTextureLoader`.
