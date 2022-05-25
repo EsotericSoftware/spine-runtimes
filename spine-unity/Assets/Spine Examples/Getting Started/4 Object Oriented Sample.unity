@@ -193,7 +193,7 @@ TextMesh:
   m_Text: 'Enter <b>PLAY MODE</b> in Unity to see Spineboy animate.
 
     Try moving, jumping, aiming and shooting. (WASD+Spacebar+Left&Right Click, or
-    XBOX Controller)'
+    Gamepad)'
   m_OffsetZ: 0
   m_CharacterSize: 0.12
   m_LineSpacing: 1

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 11145981673336645838492a2d98e247, type: 3}
-  m_Name: Demo 2D URP Renderer Data
+  m_Name: Example 2D URP Renderer Data
   m_EditorClassIdentifier: 
   m_RendererFeatures: []
   m_HDREmulationScale: 1
