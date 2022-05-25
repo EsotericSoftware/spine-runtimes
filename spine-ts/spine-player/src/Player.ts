@@ -114,6 +114,9 @@ export interface SpinePlayerConfig {
 	   backgroundColor alpha is < ff. Default: false */
 	alpha?: boolean
 
+	/* Optional: Whether to preserve the drawing buffer. This is needed if you want to take a screenshot via canvas.getDataURL(), Default: false */
+	preserveDrawingBuffer: boolean
+
 	/* Optional: The canvas background color, given in the format #rrggbb or #rrggbbaa. Default: #000000ff (black) or when
 	   alpha is true #00000000 (transparent) */
 	backgroundColor?: string
@@ -283,6 +286,7 @@ export class SpinePlayer implements Disposable {
 		if (!config.fullScreenBackgroundColor) config.fullScreenBackgroundColor = config.backgroundColor;
 		if (config.backgroundImage && !config.backgroundImage.url) config.backgroundImage = undefined;
 		if (config.premultipliedAlpha === void 0) config.premultipliedAlpha = true;
+		if (config.preserveDrawingBuffer === void 0) config.preserveDrawingBuffer = false;
 		if (config.mipmaps === void 0) config.mipmaps = true;
 		if (!config.debug) config.debug = {
 			bones: false,
@@ -319,7 +323,7 @@ export class SpinePlayer implements Disposable {
 		try {
 			// Setup the OpenGL context.
 			this.canvas = findWithClass(dom, "spine-player-canvas") as HTMLCanvasElement;
-			this.context = new ManagedWebGLRenderingContext(this.canvas, { alpha: config.alpha });
+			this.context = new ManagedWebGLRenderingContext(this.canvas, { alpha: config.alpha, preserveDrawingBuffer: config.preserveDrawingBuffer });
 
 			// Setup the scene renderer and loading screen.
 			this.sceneRenderer = new SceneRenderer(this.canvas, this.context, true);
