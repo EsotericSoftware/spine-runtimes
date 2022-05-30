@@ -37,10 +37,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.ScreenUtils;
-
-import com.esotericsoftware.spine.vertexeffects.SwirlEffect;
 
 /** Boilerplate for basic skeleton rendering, used for various testing. */
 public class TestHarness extends ApplicationAdapter {
@@ -60,9 +57,6 @@ public class TestHarness extends ApplicationAdapter {
 	Skeleton skeleton;
 	AnimationState state;
 
-	SwirlEffect swirl;
-	float swirlTime;
-
 	public void create () {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(true);
@@ -70,10 +64,6 @@ public class TestHarness extends ApplicationAdapter {
 		renderer = new SkeletonRenderer();
 		renderer.setPremultipliedAlpha(true);
 		shapes = new ShapeRenderer();
-
-		swirl = new SwirlEffect(400);
-		swirl.setCenterY(-200);
-		renderer.setVertexEffect(swirl);
 
 		atlas = new TextureAtlas(Gdx.files.internal(ATLAS));
 		SkeletonJson json = new SkeletonJson(atlas);
@@ -100,11 +90,6 @@ public class TestHarness extends ApplicationAdapter {
 		skeleton.updateWorldTransform(); // Uses the bones' local SRT to compute their world SRT.
 
 		ScreenUtils.clear(0, 0, 0, 0);
-
-		swirlTime += Gdx.graphics.getDeltaTime();
-		float percent = swirlTime % 2;
-		if (percent > 1) percent = 1 - (percent - 1);
-		swirl.setAngle(Interpolation.pow2.apply(-60, 60, percent));
 
 		// Configure the camera, SpriteBatch, and SkeletonRendererDebug.
 		camera.update();
