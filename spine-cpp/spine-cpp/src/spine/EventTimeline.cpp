@@ -104,7 +104,7 @@ void EventTimeline::setFrame(size_t frameIndex, Event *event) {
 	_events[frameIndex] = event;
 }
 
-Vector<float> EventTimeline::getFrames() { return _frames; }
+const Vector<float>& EventTimeline::getFrames() { return _frames; }
 
 Vector<Event *> &EventTimeline::getEvents() { return _events; }
 
