@@ -59,14 +59,16 @@ public:
 
 	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override;
 
-	bool get_option_visibility(const String &path, const String &option, const Map<StringName, Variant> &options) const override { return true; }
+	virtual bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
+
+	Error import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 #else
 	void get_import_options(List<ImportOption> *options, int preset) const override;
 
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
-#endif
 
 	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
+#endif	
 };
 
 class SpineJsonResourceImportPlugin : public EditorImportPlugin {
@@ -92,13 +94,16 @@ public:
 
 	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override { }
 
-	bool get_option_visibility(const String &path, const String &option, const Map<StringName, Variant> &options) const override { return true; }
+	bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
+
+	Error import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 #else
 	void get_import_options(List<ImportOption> *options, int preset) const override { }
 
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
-#endif
+
 	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
+#endif	
 };
 
 class SpineBinaryResourceImportPlugin : public EditorImportPlugin {
@@ -124,13 +129,16 @@ public:
 
 	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override { }
 
-	bool get_option_visibility(const String &path, const String &option, const Map<StringName, Variant> &options) const override { return true; }
+	bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
+
+	Error import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 #else
 	void get_import_options(List<ImportOption> *options, int preset) const override { }
 
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
-#endif
+
 	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
+#endif	
 };
 
 class SpineEditorPlugin : public EditorPlugin {

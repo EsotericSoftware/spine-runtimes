@@ -32,7 +32,11 @@
 #include "SpineAtlasResource.h"
 #include "SpineSkeletonFileResource.h"
 
+#if VERSION_MAJOR > 3
+Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+#else
 Error SpineAtlasResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+#endif
 	Ref<SpineAtlasResource> atlas(memnew(SpineAtlasResource));
 	atlas->set_normal_texture_prefix(options["normal_map_prefix"]);
 	atlas->load_from_atlas_file(source_file);
@@ -57,7 +61,11 @@ void SpineAtlasResourceImportPlugin::get_import_options(List<ImportOption> *opti
 	}
 }
 
+#if VERSION_MAJOR > 3
+Error SpineJsonResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+#else
 Error SpineJsonResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+#endif
 	Ref<SpineSkeletonFileResource> skeleton_file_res(memnew(SpineSkeletonFileResource));
 	skeleton_file_res->load_from_file(source_file);
 
@@ -66,7 +74,11 @@ Error SpineJsonResourceImportPlugin::import(const String &source_file, const Str
 	return error;
 }
 
+#if VERSION_MAJOR > 3
+Error SpineBinaryResourceImportPlugin::import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+#else
 Error SpineBinaryResourceImportPlugin::import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) {
+#endif
 	Ref<SpineSkeletonFileResource> skeleton_file_res(memnew(SpineSkeletonFileResource));
 	skeleton_file_res->load_from_file(source_file);
 
