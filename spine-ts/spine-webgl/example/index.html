@@ -27,7 +27,6 @@
 			<span>Skeleton:</span><select id="skeletonList"></select>
 			<span>Animation:</span><select id="animationList"></select>
 			<span>Skin:</span><select id="skinList"></select>
-			<span>Vertex Effect:</span><select id="effectList"></select>
 			<span>Debug:</span><input type="checkbox" id="debug">
 		</div>
 	</center>
@@ -48,10 +47,6 @@
 		let skeletons = {};
 		let format = "JSON";
 		let activeSkeleton = "spineboy";
-		let pow2 = new spine.Pow(2);
-		let swirlEffect = new spine.SwirlEffect(0);
-		let jitterEffect = new spine.JitterEffect(20, 20);
-		let swirlTime = 0;
 
 		function init() {
 			// Create the managed WebGL context. Managed contexts will restore resources like shaders
@@ -242,14 +237,6 @@
 				if (skeletonName === activeSkeleton) option.attr("selected", "selected");
 				skeletonList.append(option);
 			}
-			let effectList = $("#effectList");
-			let effects = ["None", "Swirl", "Jitter"];
-			for (let effect in effects) {
-				let effectName = effects[effect];
-				let option = $("<option></option>");
-				option.attr("value", effectName).text(effectName);
-				effectList.append(option);
-			}
 			let setupAnimationUI = function () {
 				let animationList = $("#animationList");
 				animationList.empty();
@@ -338,21 +325,6 @@
 
 			// Start the batch and tell the SkeletonRenderer to render the active skeleton.
 			batcher.begin(shader);
-
-			let effect = $("#effectList option:selected").text();
-			if (effect == "None") {
-				skeletonRenderer.vertexEffect = null;
-			} else if (effect == "Swirl") {
-				swirlTime += delta;
-				let percent = swirlTime % 2;
-				if (percent > 1) percent = 1 - (percent - 1);
-				swirlEffect.angle = pow2.apply(-60, 60, percent);
-				swirlEffect.centerX = bounds.offset.x + bounds.size.x / 2;
-				swirlEffect.centerY = bounds.offset.y + bounds.size.y / 2;
-				swirlEffect.radius = Math.sqrt(bounds.size.x * bounds.size.x + bounds.size.y * bounds.size.y) * 0.75;
-				skeletonRenderer.vertexEffect = swirlEffect;
-			} else if (effect == "Jitter")
-				skeletonRenderer.vertexEffect = jitterEffect;
 
 			skeletonRenderer.premultipliedAlpha = premultipliedAlpha;
 			skeletonRenderer.draw(batcher, skeleton);
