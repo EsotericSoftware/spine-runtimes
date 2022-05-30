@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-import { AnimationState, AnimationStateData, BlendMode, ClippingAttachment, Color, MeshAttachment, NumberArrayLike, RegionAttachment, Skeleton, SkeletonClipping, SkeletonData, TextureAtlasRegion, Utils, Vector2, VertexEffect } from "@esotericsoftware/spine-core";
+import { AnimationState, AnimationStateData, BlendMode, ClippingAttachment, Color, MeshAttachment, NumberArrayLike, RegionAttachment, Skeleton, SkeletonClipping, SkeletonData, TextureAtlasRegion, Utils, Vector2 } from "@esotericsoftware/spine-core";
 import { MeshBatcher } from "./MeshBatcher";
 import * as THREE from "three";
 import { ThreeJsTexture } from "./ThreeJsTexture";
@@ -90,7 +90,6 @@ export class SkeletonMesh extends THREE.Object3D {
 	skeleton: Skeleton;
 	state: AnimationState;
 	zOffset: number = 0.1;
-	vertexEffect: VertexEffect | null = null;
 
 	private batches = new Array<MeshBatcher>();
 	private nextBatchIndex = 0;
@@ -224,61 +223,19 @@ export class SkeletonMesh extends THREE.Object3D {
 					clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, tempLight, false);
 					let clippedVertices = clipper.clippedVertices;
 					let clippedTriangles = clipper.clippedTriangles;
-					if (this.vertexEffect != null) {
-						let vertexEffect = this.vertexEffect;
-						let verts = clippedVertices;
-						for (let v = 0, n = clippedVertices.length; v < n; v += vertexSize) {
-							tempPos.x = verts[v];
-							tempPos.y = verts[v + 1];
-							tempLight.setFromColor(color);
-							tempDark.set(0, 0, 0, 0);
-							tempUv.x = verts[v + 6];
-							tempUv.y = verts[v + 7];
-							vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
-							verts[v] = tempPos.x;
-							verts[v + 1] = tempPos.y;
-							verts[v + 2] = tempLight.r;
-							verts[v + 3] = tempLight.g;
-							verts[v + 4] = tempLight.b;
-							verts[v + 5] = tempLight.a;
-							verts[v + 6] = tempUv.x;
-							verts[v + 7] = tempUv.y;
-						}
-					}
 					finalVertices = clippedVertices;
 					finalVerticesLength = clippedVertices.length;
 					finalIndices = clippedTriangles;
 					finalIndicesLength = clippedTriangles.length;
 				} else {
 					let verts = vertices;
-					if (this.vertexEffect != null) {
-						let vertexEffect = this.vertexEffect;
-						for (let v = 0, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
-							tempPos.x = verts[v];
-							tempPos.y = verts[v + 1];
-							tempLight.setFromColor(color);
-							tempDark.set(0, 0, 0, 0);
-							tempUv.x = uvs[u];
-							tempUv.y = uvs[u + 1];
-							vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
-							verts[v] = tempPos.x;
-							verts[v + 1] = tempPos.y;
-							verts[v + 2] = tempLight.r;
-							verts[v + 3] = tempLight.g;
-							verts[v + 4] = tempLight.b;
-							verts[v + 5] = tempLight.a;
-							verts[v + 6] = tempUv.x;
-							verts[v + 7] = tempUv.y;
-						}
-					} else {
-						for (let v = 2, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
-							verts[v] = color.r;
-							verts[v + 1] = color.g;
-							verts[v + 2] = color.b;
-							verts[v + 3] = color.a;
-							verts[v + 4] = uvs[u];
-							verts[v + 5] = uvs[u + 1];
-						}
+					for (let v = 2, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
+						verts[v] = color.r;
+						verts[v + 1] = color.g;
+						verts[v + 2] = color.b;
+						verts[v + 3] = color.a;
+						verts[v + 4] = uvs[u];
+						verts[v + 5] = uvs[u + 1];
 					}
 					finalVertices = vertices;
 					finalVerticesLength = numFloats;

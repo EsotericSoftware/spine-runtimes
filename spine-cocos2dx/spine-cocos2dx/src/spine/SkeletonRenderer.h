@@ -102,9 +102,6 @@ namespace spine {
 		/* Whether two color tinting is enabled */
 		bool isTwoColorTint();
 
-		/* Sets the vertex effect to be used, set to 0 to disable vertex effects */
-		void setVertexEffect(VertexEffect *effect);
-
 		/* Sets the range of slots that should be rendered. Use -1, -1 to clear the range */
 		void setSlotsRange(int startSlotIndex, int endSlotIndex);
 
@@ -150,8 +147,7 @@ namespace spine {
 		bool _debugBones;
 		bool _debugMeshes;
 		bool _debugBoundingRect;
-		SkeletonClipping *_clipper;
-		VertexEffect *_effect;
+		SkeletonClipping *_clipper;		
 		cocos2d::Rect _boundingRect;
 
 		int _startSlotIndex;

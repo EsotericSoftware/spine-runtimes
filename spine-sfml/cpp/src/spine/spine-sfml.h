@@ -46,9 +46,9 @@ namespace spine {
 		AnimationState *state;
 		float timeScale;
 		sf::VertexArray *vertexArray;
-		VertexEffect *vertexEffect;
 
 		SkeletonDrawable(SkeletonData *skeleton, AnimationStateData *stateData = 0);
+
 
 		~SkeletonDrawable();
 

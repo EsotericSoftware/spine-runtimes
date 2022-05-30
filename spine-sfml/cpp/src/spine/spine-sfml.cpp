@@ -49,7 +49,7 @@ namespace spine {
 
 	SkeletonDrawable::SkeletonDrawable(SkeletonData *skeletonData, AnimationStateData *stateData) : timeScale(1),
 																									vertexArray(new VertexArray(Triangles, skeletonData->getBones().size() * 4)),
-																									vertexEffect(NULL), worldVertices(), clipper() {
+																									worldVertices(), clipper() {
 		Bone::setYDown(true);
 		worldVertices.ensureCapacity(SPINE_MESH_VERTEX_COUNT_MAX);
 		skeleton = new (__FILE__, __LINE__) Skeleton(skeletonData);
@@ -88,8 +88,6 @@ namespace spine {
 
 		// Early out if skeleton is invisible
 		if (skeleton->getColor().a == 0) return;
-
-		if (vertexEffect != NULL) vertexEffect->begin(*skeleton);
 
 		sf::Vertex vertex;
 		Texture *texture = NULL;
@@ -226,55 +224,18 @@ namespace spine {
 
 			Vector2u size = texture->getSize();
 
-			if (vertexEffect != 0) {
-				tempUvs.clear();
-				tempColors.clear();
-				for (int ii = 0; ii < verticesCount; ii++) {
-					Color vertexColor = light;
-					Color dark;
-					dark.r = dark.g = dark.b = dark.a = 0;
-					int index = ii << 1;
-					float x = (*vertices)[index];
-					float y = (*vertices)[index + 1];
-					float u = (*uvs)[index];
-					float v = (*uvs)[index + 1];
-					vertexEffect->transform(x, y, u, v, vertexColor, dark);
-					(*vertices)[index] = x;
-					(*vertices)[index + 1] = y;
-					tempUvs.add(u);
-					tempUvs.add(v);
-					tempColors.add(vertexColor);
-				}
-
-				for (int ii = 0; ii < indicesCount; ++ii) {
-					int index = (*indices)[ii] << 1;
-					vertex.position.x = (*vertices)[index];
-					vertex.position.y = (*vertices)[index + 1];
-					vertex.texCoords.x = (*uvs)[index] * size.x;
-					vertex.texCoords.y = (*uvs)[index + 1] * size.y;
-					Color vertexColor = tempColors[index >> 1];
-					vertex.color.r = static_cast<Uint8>(vertexColor.r * 255);
-					vertex.color.g = static_cast<Uint8>(vertexColor.g * 255);
-					vertex.color.b = static_cast<Uint8>(vertexColor.b * 255);
-					vertex.color.a = static_cast<Uint8>(vertexColor.a * 255);
-					vertexArray->append(vertex);
-				}
-			} else {
-				for (int ii = 0; ii < indicesCount; ++ii) {
-					int index = (*indices)[ii] << 1;
-					vertex.position.x = (*vertices)[index];
-					vertex.position.y = (*vertices)[index + 1];
-					vertex.texCoords.x = (*uvs)[index] * size.x;
-					vertex.texCoords.y = (*uvs)[index + 1] * size.y;
-					vertexArray->append(vertex);
-				}
+			for (int ii = 0; ii < indicesCount; ++ii) {
+				int index = (*indices)[ii] << 1;
+				vertex.position.x = (*vertices)[index];
+				vertex.position.y = (*vertices)[index + 1];
+				vertex.texCoords.x = (*uvs)[index] * size.x;
+				vertex.texCoords.y = (*uvs)[index + 1] * size.y;
+				vertexArray->append(vertex);
 			}
 			clipper.clipEnd(slot);
 		}
 		target.draw(*vertexArray, states);
 		clipper.clipEnd();
-
-		if (vertexEffect != 0) vertexEffect->end();
 	}
 
 	void SFMLTextureLoader::load(AtlasPage &page, const String &path) {
