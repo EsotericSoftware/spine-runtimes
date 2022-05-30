@@ -30,8 +30,8 @@
   },
   "homepage": "https://github.com/esotericsoftware/spine-runtimes#readme",
   "dependencies": {
-    "@types/three": "^0.133.1",
-    "three": "^0.133.1",
+    "@types/three": "^0.140.0",
+    "three": "^0.140.0",
     "@esotericsoftware/spine-core": "^4.1.17"
   }
 }
