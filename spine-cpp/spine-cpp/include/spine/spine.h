@@ -105,7 +105,6 @@
 #include <spine/Updatable.h>
 #include <spine/Vector.h>
 #include <spine/VertexAttachment.h>
-#include <spine/VertexEffect.h>
 #include <spine/Vertices.h>
 
 #endif
