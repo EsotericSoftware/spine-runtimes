@@ -241,6 +241,7 @@
 
     Also removed less commonly used extension methods:
     `TrackEntry.AllowImmediateQueue()`, `Animation.SetKeyedItemsToSetupPose()` and `Attachment.IsRenderable()`.
+  * Made `SkeletonGraphic.unscaledTime` parameter protected, use the new property `UnscaledTime` instead.
 
   * **`SkeletonGraphic` now no longer uses a `RawImage` component at each submesh renderer** GameObject when `allowMultipleCanvasRenderers` is true. Instead,  a new custom component `SkeletonSubmeshGraphic` is used which is more resource friendly. Replacement of these components will be performed automatically through editor scripting, saving scenes or prefabs will persist the upgrade.
   * **Linear color space:** Previously Slot colors were not displayed the same in Unity as in the Spine Editor. This is now fixed at all shaders, including URP and LWRP shaders. See section *Additions* below for more details. If you have tweaked Slot colors to look correct in `Linear` color space in Unity but incorrect in Spine, you might want to adjust the tweaked colors. Slot colors displayed in Unity should now match colors displayed in the Spine Editor when configured to display as `Linear` color space in the Spine Editor Settings.
@@ -307,6 +308,7 @@
   * Added example component `SkeletonRenderTexture` to render a `SkeletonRenderer` to a `RenderTexture`, mainly for proper transparency. Added an example scene named `RenderTexture FadeOut Transparency` that demonstrates usage for a fadeout transparency effect.
   * Added another fadeout example component named `SkeletonRenderTextureFadeout` which takes over transparency fadeout when enabled. You can use this component as-is, attach it in disabled state and enable it to start a fadeout effect.
   * Timeline clips now offer an additional `Alpha` parameter for setting a custom constant mix alpha value other than 1.0, just as `TrackEntry.Alpha`. Defaults to 1.0.
+  * Added `UnscaledTime` property at `SkeletonAnimation` as well, behaving like `SkeletonGraphic.UnscaledTime`. If enabled, AnimationState uses unscaled game time (`Time.unscaledDeltaTime`), running animations independent of e.g. game pause (`Time.timeScale`).
 
 * **Changes of default values**
 

@@ -62,7 +62,10 @@ namespace Spine.Unity.Editor {
 		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation;
 		SerializedProperty raycastTarget;
 
-
+		readonly GUIContent UnscaledTimeLabel = new GUIContent("Unscaled Time",
+			"If enabled, AnimationState uses unscaled game time (Time.unscaledDeltaTime), " +
+				"running animations independent of e.g. game pause (Time.timeScale). " +
+				"Instance SkeletonAnimation.timeScale will still be applied.");
 
 		SkeletonGraphic thisSkeletonGraphic;
 		protected bool isInspectingPrefab;
@@ -284,7 +287,7 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(startingAnimation);
 			EditorGUILayout.PropertyField(startingLoop);
 			EditorGUILayout.PropertyField(timeScale);
-			EditorGUILayout.PropertyField(unscaledTime, SpineInspectorUtility.TempContent(unscaledTime.displayName, tooltip: "If checked, this will use Time.unscaledDeltaTime to make this update independent of game Time.timeScale. Instance SkeletonGraphic.timeScale will still be applied."));
+			EditorGUILayout.PropertyField(unscaledTime, UnscaledTimeLabel);
 			EditorGUILayout.Space();
 			EditorGUILayout.PropertyField(freeze);
 			EditorGUILayout.Space();

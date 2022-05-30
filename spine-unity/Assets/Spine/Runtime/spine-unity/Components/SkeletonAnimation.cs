@@ -93,6 +93,13 @@ namespace Spine.Unity {
 
 		[SerializeField] protected UpdateTiming updateTiming = UpdateTiming.InUpdate;
 		public UpdateTiming UpdateTiming { get { return updateTiming; } set { updateTiming = value; } }
+
+		/// <summary>If enabled, AnimationState uses unscaled game time
+		/// (<c>Time.unscaledDeltaTime</c> instead of normal game time(<c>Time.deltaTime</c>),
+		/// running animations independent of e.g. game pause (<c>Time.timeScale</c>).
+		/// Instance SkeletonAnimation.timeScale will still be applied.</summary>
+		[SerializeField] protected bool unscaledTime;
+		public bool UnscaledTime { get { return unscaledTime; } set { unscaledTime = value; } }
 		#endregion
 
 		#region Serialized state and Beginner API
@@ -200,12 +207,12 @@ namespace Spine.Unity {
 			}
 #endif
 			if (updateTiming != UpdateTiming.InUpdate) return;
-			Update(Time.deltaTime);
+			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
 		}
 
 		virtual protected void FixedUpdate () {
 			if (updateTiming != UpdateTiming.InFixedUpdate) return;
-			Update(Time.deltaTime);
+			Update(unscaledTime ? Time.unscaledDeltaTime : Time.deltaTime);
 		}
 
 		/// <summary>Progresses the AnimationState according to the given deltaTime, and applies it to the Skeleton. Use Time.deltaTime to update manually. Use deltaTime 0 to update without progressing the time.</summary>
