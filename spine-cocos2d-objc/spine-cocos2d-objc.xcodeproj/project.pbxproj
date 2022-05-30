@@ -86,7 +86,6 @@
 		76F5BDAD1D2BDFA2005917E5 /* TankExample.m in Sources */ = {isa = PBXBuildFile; fileRef = 76F5BDAC1D2BDFA2005917E5 /* TankExample.m */; };
 		76FAC1961E3FA15E001CCC8C /* Color.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC1941E3FA15E001CCC8C /* Color.c */; };
 		76FAC1971E3FA15E001CCC8C /* PointAttachment.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FAC1951E3FA15E001CCC8C /* PointAttachment.c */; };
-		76FB151A1F01413B00C5377F /* VertexEffect.c in Sources */ = {isa = PBXBuildFile; fileRef = 76FB15191F01413B00C5377F /* VertexEffect.c */; };
 		83F1A0EF1986955A001F6B44 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 83F1A0EE1986955A001F6B44 /* GLKit.framework */; };
 		9A5D2499170A94DA0030D4DD /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D2498170A94DA0030D4DD /* QuartzCore.framework */; };
 		9A5D249B170A94DA0030D4DD /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A5D249A170A94DA0030D4DD /* OpenGLES.framework */; };
@@ -202,7 +201,6 @@
 		76F28D021DEC810300CDE54D /* IkConstraintData.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = IkConstraintData.c; path = "../spine-c/spine-c/src/spine/IkConstraintData.c"; sourceTree = "<group>"; };
 		76F28D031DEC810300CDE54D /* Json.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Json.c; path = "../spine-c/spine-c/src/spine/Json.c"; sourceTree = "<group>"; };
 		76F28D041DEC810300CDE54D /* Json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Json.h; path = "../spine-c/spine-c/src/spine/Json.h"; sourceTree = "<group>"; };
-		76F28D051DEC810300CDE54D /* kvec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = kvec.h; path = "../spine-c/spine-c/src/spine/kvec.h"; sourceTree = "<group>"; };
 		76F28D061DEC810300CDE54D /* MeshAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = MeshAttachment.c; path = "../spine-c/spine-c/src/spine/MeshAttachment.c"; sourceTree = "<group>"; };
 		76F28D071DEC810300CDE54D /* PathAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = PathAttachment.c; path = "../spine-c/spine-c/src/spine/PathAttachment.c"; sourceTree = "<group>"; };
 		76F28D081DEC810300CDE54D /* PathConstraint.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = PathConstraint.c; path = "../spine-c/spine-c/src/spine/PathConstraint.c"; sourceTree = "<group>"; };
@@ -231,7 +229,6 @@
 		76F5BDAC1D2BDFA2005917E5 /* TankExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TankExample.m; path = example/TankExample.m; sourceTree = "<group>"; };
 		76FAC1941E3FA15E001CCC8C /* Color.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Color.c; path = "../spine-c/spine-c/src/spine/Color.c"; sourceTree = "<group>"; };
 		76FAC1951E3FA15E001CCC8C /* PointAttachment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = PointAttachment.c; path = "../spine-c/spine-c/src/spine/PointAttachment.c"; sourceTree = "<group>"; };
-		76FB15191F01413B00C5377F /* VertexEffect.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = VertexEffect.c; path = "../spine-c/spine-c/src/spine/VertexEffect.c"; sourceTree = "<group>"; };
 		83F1A0EE1986955A001F6B44 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		9A5D2495170A94DA0030D4DD /* SpineExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpineExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A5D2498170A94DA0030D4DD /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -309,7 +306,6 @@
 			isa = PBXGroup;
 			children = (
 				766ECCEA27EDFC110074EA8B /* Sequence.c */,
-				76FB15191F01413B00C5377F /* VertexEffect.c */,
 				76EE4E421EB36DE6000254F4 /* Array.c */,
 				76EE4E431EB36DE6000254F4 /* ClippingAttachment.c */,
 				76EE4E441EB36DE6000254F4 /* SkeletonClipping.c */,
@@ -333,7 +329,6 @@
 				76F28D021DEC810300CDE54D /* IkConstraintData.c */,
 				76F28D031DEC810300CDE54D /* Json.c */,
 				76F28D041DEC810300CDE54D /* Json.h */,
-				76F28D051DEC810300CDE54D /* kvec.h */,
 				76F28D061DEC810300CDE54D /* MeshAttachment.c */,
 				76F28D071DEC810300CDE54D /* PathAttachment.c */,
 				76F28D081DEC810300CDE54D /* PathConstraint.c */,
@@ -610,7 +605,6 @@
 				76BF7E071E66ED9C00485998 /* GLUtils.c in Sources */,
 				76EE4E481EB36DE6000254F4 /* SkeletonClipping.c in Sources */,
 				43C3282F170B0C19004A9460 /* spine-cocos2d-objc.m in Sources */,
-				76FB151A1F01413B00C5377F /* VertexEffect.c in Sources */,
 				76F28D1F1DEC810300CDE54D /* BoundingBoxAttachment.c in Sources */,
 				76F28D281DEC810300CDE54D /* PathConstraint.c in Sources */,
 				76F28D2F1DEC810300CDE54D /* SkeletonJson.c in Sources */,
