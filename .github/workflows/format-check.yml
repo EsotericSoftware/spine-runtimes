@@ -20,7 +20,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: clang
-        key: ${{ runner.os }}-clang
+        key: ${{ runner.os }}-clang-13-0-1
 
     - name: Install Clang
       if: steps.cache-clang.outputs.cache-hit != 'true'
