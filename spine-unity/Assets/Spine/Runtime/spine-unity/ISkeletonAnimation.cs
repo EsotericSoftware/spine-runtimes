@@ -48,6 +48,7 @@ namespace Spine.Unity {
 		UnscaledGameTime
 	}
 
+	public delegate void ISkeletonAnimationDelegate (ISkeletonAnimation animated);
 	public delegate void UpdateBonesDelegate (ISkeletonAnimation animated);
 
 	public interface ISpineComponent { }
@@ -60,6 +61,7 @@ namespace Spine.Unity {
 
 	/// <summary>A Spine-Unity Component that animates a Skeleton but not necessarily with a Spine.AnimationState.</summary>
 	public interface ISkeletonAnimation : ISpineComponent {
+		event ISkeletonAnimationDelegate OnAnimationRebuild;
 		event UpdateBonesDelegate UpdateLocal;
 		event UpdateBonesDelegate UpdateWorld;
 		event UpdateBonesDelegate UpdateComplete;

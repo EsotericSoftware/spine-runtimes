@@ -61,11 +61,15 @@ namespace Spine.Unity {
 		private bool wasUpdatedAfterInit = true;
 		#endregion
 
-		#region Bone Callbacks ISkeletonAnimation
+		#region Bone and Initialization Callbacks ISkeletonAnimation
+		protected event ISkeletonAnimationDelegate _OnAnimationRebuild;
 		protected event UpdateBonesDelegate _BeforeApply;
 		protected event UpdateBonesDelegate _UpdateLocal;
 		protected event UpdateBonesDelegate _UpdateWorld;
 		protected event UpdateBonesDelegate _UpdateComplete;
+
+		/// <summary>OnAnimationRebuild is raised after the SkeletonAnimation component is successfully initialized.</summary>
+		public event ISkeletonAnimationDelegate OnAnimationRebuild { add { _OnAnimationRebuild += value; } remove { _OnAnimationRebuild -= value; } }
 
 		/// <summary>
 		/// Occurs before the animations are applied.
@@ -197,6 +201,9 @@ namespace Spine.Unity {
 #endif
 				}
 			}
+
+			if (_OnAnimationRebuild != null)
+				_OnAnimationRebuild(this);
 		}
 
 		virtual protected void Update () {
