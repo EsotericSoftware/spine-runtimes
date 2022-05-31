@@ -25,9 +25,9 @@ jobs:
     - name: Install Clang
       if: steps.cache-clang.outputs.cache-hit != 'true'
       run: |
-        curl -L https://github.com/llvm/llvm-project/releases/download/llvmorg-12.0.1/clang+llvm-12.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz --output clang.tar.xz
+        curl -L https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.1/clang+llvm-13.0.1-x86_64-linux-gnu-ubuntu-18.04.tar.xz --output clang.tar.xz
         tar -xf clang.tar.xz
-        mv clang+llvm-12.0.1-x86_64-linux-gnu-ubuntu- clang
+        mv clang+llvm-13.0.1-x86_64-linux-gnu-ubuntu- clang
 
     - name: Install dotnet
       uses: actions/setup-dotnet@v1
