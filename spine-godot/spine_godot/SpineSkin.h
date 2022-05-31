@@ -74,7 +74,7 @@ public:
 };
 
 class SpineSkinEntry : public REFCOUNTED {
-GDCLASS(SpineSkinEntry, REFCOUNTED);
+	GDCLASS(SpineSkinEntry, REFCOUNTED);
 
 	friend class SpineSkin;
 
@@ -86,6 +86,7 @@ protected:
 		this->name = _name;
 		this->attachment = _attachment;
 	}
+
 private:
 	int slot_index;
 	String name;

@@ -17,7 +17,7 @@ void SpineAnimationTrack::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_animation_name"), &SpineAnimationTrack::get_animation_name);
 	ClassDB::bind_method(D_METHOD("set_loop", "loop"), &SpineAnimationTrack::set_loop);
 	ClassDB::bind_method(D_METHOD("get_loop"), &SpineAnimationTrack::get_loop);
-	
+
 	ClassDB::bind_method(D_METHOD("set_track_index", "track_index"), &SpineAnimationTrack::set_track_index);
 	ClassDB::bind_method(D_METHOD("get_track_index"), &SpineAnimationTrack::get_track_index);
 	ClassDB::bind_method(D_METHOD("set_mix_duration", "mix_duration"), &SpineAnimationTrack::set_mix_duration);
@@ -40,12 +40,12 @@ void SpineAnimationTrack::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_mix_blend"), &SpineAnimationTrack::get_mix_blend);
 	ClassDB::bind_method(D_METHOD("set_debug", "debug"), &SpineAnimationTrack::set_debug);
 	ClassDB::bind_method(D_METHOD("get_debug"), &SpineAnimationTrack::get_debug);
-	
+
 	ClassDB::bind_method(D_METHOD("update_animation_state", "spine_sprite"), &SpineAnimationTrack::update_animation_state);
-	
+
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "animation_name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_STORAGE | PROPERTY_USAGE_INTERNAL | PROPERTY_USAGE_NOEDITOR), "set_animation_name", "get_animation_name");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "loop", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_STORAGE | PROPERTY_USAGE_INTERNAL | PROPERTY_USAGE_NOEDITOR), "set_loop", "get_loop");
-	
+
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "track_index", PROPERTY_HINT_RANGE, "0,256,0"), "set_track_index", "get_track_index");
 	ADD_PROPERTY(PropertyInfo(VARIANT_FLOAT, "mix_duration"), "set_mix_duration", "get_mix_duration");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "hold_previous"), "set_hold_previous", "get_hold_previous");
@@ -59,40 +59,39 @@ void SpineAnimationTrack::_bind_methods() {
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "debug"), "set_debug", "get_debug");
 }
 
-SpineAnimationTrack::SpineAnimationTrack():
-	loop(false),
-	track_index(-1),
-	mix_duration(-1),
-	hold_previous(false),
-	reverse(false),
-	shortest_rotation(false),
-	time_scale(1),
-	alpha(1),
-	attachment_threshold(0),
-	draw_order_threshold(0),
-	mix_blend(SpineConstant::MixBlend_Replace),
-	debug(false),
-	sprite(nullptr) {
+SpineAnimationTrack::SpineAnimationTrack() : loop(false),
+											 track_index(-1),
+											 mix_duration(-1),
+											 hold_previous(false),
+											 reverse(false),
+											 shortest_rotation(false),
+											 time_scale(1),
+											 alpha(1),
+											 attachment_threshold(0),
+											 draw_order_threshold(0),
+											 mix_blend(SpineConstant::MixBlend_Replace),
+											 debug(false),
+											 sprite(nullptr) {
 }
 
 void SpineAnimationTrack::_notification(int what) {
-	switch(what) {
-	case NOTIFICATION_PARENTED: {
+	switch (what) {
+		case NOTIFICATION_PARENTED: {
 			sprite = Object::cast_to<SpineSprite>(get_parent());
 			if (sprite)
 #if VERSION_MAJOR > 3
-				sprite->connect("before_animation_state_update", callable_mp(this,  &SpineAnimationTrack::update_animation_state));
+				sprite->connect("before_animation_state_update", callable_mp(this, &SpineAnimationTrack::update_animation_state));
 #else
 				sprite->connect("before_animation_state_update", this, "update_animation_state");
 #endif
 			NOTIFY_PROPERTY_LIST_CHANGED();
 			break;
-	}
-	case NOTIFICATION_READY: {
+		}
+		case NOTIFICATION_READY: {
 			setup_animation_player();
 			break;
-	}
-	case NOTIFICATION_UNPARENTED: {
+		}
+		case NOTIFICATION_UNPARENTED: {
 			if (sprite) {
 #if VERSION_MAJOR > 3
 				sprite->disconnect("before_animation_state_update", callable_mp(this, &SpineAnimationTrack::update_animation_state));
@@ -102,13 +101,13 @@ void SpineAnimationTrack::_notification(int what) {
 				sprite = nullptr;
 			}
 			break;
-	}
-	default:
-		break;
+		}
+		default:
+			break;
 	}
 }
 
-AnimationPlayer* SpineAnimationTrack::find_animation_player() {
+AnimationPlayer *SpineAnimationTrack::find_animation_player() {
 	AnimationPlayer *animation_player = nullptr;
 	for (int i = 0; i < get_child_count(); i++) {
 		animation_player = cast_to<AnimationPlayer>(get_child(i));
@@ -132,7 +131,7 @@ void SpineAnimationTrack::setup_animation_player() {
 		for (int i = 0; i < sprite->get_child_count(); i++) {
 			auto other_track = cast_to<SpineAnimationTrack>(sprite->get_child(i));
 			if (other_track) {
-				if (other_track->track_index > highest_track_number) 
+				if (other_track->track_index > highest_track_number)
 					highest_track_number = other_track->track_index;
 			}
 		}
@@ -161,7 +160,7 @@ void SpineAnimationTrack::setup_animation_player() {
 		}
 #endif
 	}
-	
+
 	auto skeleton_data = sprite->get_skeleton_data_res()->get_skeleton_data();
 	auto &animations = skeleton_data->getAnimations();
 #if VERSION_MAJOR > 3
@@ -169,7 +168,7 @@ void SpineAnimationTrack::setup_animation_player() {
 	animation_library.instantiate();
 	animation_player->add_animation_library("", animation_library);
 #endif
-	for (int i = 0; i < (int)animations.size(); i++) {
+	for (int i = 0; i < (int) animations.size(); i++) {
 		auto &animation = animations[i];
 		Ref<Animation> animation_ref = create_animation(animation, false);
 		Ref<Animation> animation_looped_ref = create_animation(animation, true);
@@ -181,9 +180,9 @@ void SpineAnimationTrack::setup_animation_player() {
 		animation_player->add_animation(animation_looped_ref->get_name(), animation_looped_ref);
 #endif
 	}
-	
+
 	Ref<Animation> reset_animation_ref;
-	INSTANTIATE(reset_animation_ref);	
+	INSTANTIATE(reset_animation_ref);
 	reset_animation_ref->set_name("RESET");
 #if VERSION_MAJOR > 3
 	// reset_animation_ref->set_loop(true);
@@ -192,10 +191,10 @@ void SpineAnimationTrack::setup_animation_player() {
 #endif
 	reset_animation_ref->set_length(0.5f);
 	reset_animation_ref->add_track(Animation::TYPE_VALUE);
-	reset_animation_ref->track_set_path(0, NodePath(".:animation_name"));	
+	reset_animation_ref->track_set_path(0, NodePath(".:animation_name"));
 	reset_animation_ref->track_insert_key(0, 0, "");
 	reset_animation_ref->add_track(Animation::TYPE_VALUE);
-	reset_animation_ref->track_set_path(1, NodePath(".:loop"));	
+	reset_animation_ref->track_set_path(1, NodePath(".:loop"));
 	reset_animation_ref->track_insert_key(1, 0, false);
 #if VERSION_MAJOR > 3
 	animation_library->add_animation(reset_animation_ref->get_name(), reset_animation_ref);
@@ -209,9 +208,9 @@ void SpineAnimationTrack::setup_animation_player() {
 Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation, bool loop) {
 	float duration = animation->getDuration();
 	if (duration == 0) duration = 0.5;
-	
+
 	Ref<Animation> animation_ref;
-	INSTANTIATE(animation_ref);	
+	INSTANTIATE(animation_ref);
 	animation_ref->set_name(String(animation->getName().buffer()) + (loop ? "" : "_looped"));
 #if VERSION_MAJOR > 3
 	// animation_ref->set_loop(!loop);
@@ -221,9 +220,9 @@ Ref<Animation> SpineAnimationTrack::create_animation(spine::Animation *animation
 	animation_ref->set_length(duration);
 
 	animation_ref->add_track(Animation::TYPE_VALUE);
-	animation_ref->track_set_path(0, NodePath(".:animation_name"));	
+	animation_ref->track_set_path(0, NodePath(".:animation_name"));
 	animation_ref->track_insert_key(0, 0, animation->getName().buffer());
-	
+
 	animation_ref->add_track(Animation::TYPE_VALUE);
 	animation_ref->track_set_path(1, NodePath(".:loop"));
 	animation_ref->track_insert_key(1, 0, !loop);
@@ -246,7 +245,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 
 	if (Engine::get_singleton()->is_editor_hint()) {
 #ifdef TOOLS_ENABLED
-		// When the animation dock is no longer visible or we aren't being 
+		// When the animation dock is no longer visible or we aren't being
 		// keyed in the current animation, bail.
 #if VERSION_MAJOR > 3
 		auto player_editor = AnimationPlayerEditor::get_singleton();
@@ -259,7 +258,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 			animation_state->setTimeScale(1);
 			return;
 		}
-		
+
 		// Check if the player is actually editing an animation for which there is a track
 		// for us.
 		Ref<Animation> edited_animation = player_editor->get_track_editor()->get_current_animation();
@@ -269,7 +268,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 			animation_state->setTimeScale(1);
 			return;
 		}
-		
+
 		int found_track_index = -1;
 		auto scene_path = EditorNode::get_singleton()->get_edited_scene()->get_path();
 		auto animation_player_path = scene_path.rel_path_to(animation_player->get_path());
@@ -279,9 +278,9 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 			if (path == animation_player_path) {
 				found_track_index = i;
 				break;
-			} 
+			}
 		}
-		
+
 		// if we are track 0, set the skeleton to the setup pose
 		// and the animation state time scale to 0, as we are
 		// setting track times manually. Also, kill anything
@@ -295,10 +294,10 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 
 		// If no animation is set or it's set to "[stop]", we are done.
 		if (EMPTY(animation_name) || animation_name == "[stop]") return;
-		
+
 		// If there's no keys on the timeline for this track, we are done.
 		if (edited_animation->track_get_key_count(found_track_index) == 0) return;
-		
+
 		// Find the key in the track that matches the editor's playback position
 		auto playback_position = player_editor->get_player()->get_current_animation_position();
 		int key_index = -1;
@@ -338,7 +337,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 		entry->setAlpha(alpha);
 		entry->setAttachmentThreshold(attachment_threshold);
 		entry->setDrawOrderThreshold(draw_order_threshold);
-		entry->setMixBlend((spine::MixBlend)mix_blend);
+		entry->setMixBlend((spine::MixBlend) mix_blend);
 #endif
 	} else {
 		if (animation_player->is_playing()) {
@@ -358,14 +357,14 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 					entry->setAlpha(alpha);
 					entry->setAttachmentThreshold(attachment_threshold);
 					entry->setDrawOrderThreshold(draw_order_threshold);
-					entry->setMixBlend((spine::MixBlend)mix_blend);
-					
+					entry->setMixBlend((spine::MixBlend) mix_blend);
+
 					if (debug) print_line(String("Setting animation {0} with mix_duration {1} on track {2} on {3}").format(varray(animation_name, mix_duration, track_index, sprite->get_name())).utf8().ptr());
 				} else {
 					if (!current_entry || (String("<empty>") != current_entry->getAnimation()->getName().buffer())) {
 						auto entry = animation_state->setEmptyAnimation(track_index, should_set_mix ? mix_duration : 0);
 						entry->setTrackEnd(FLT_MAX);
-						if (debug) print_line(String("Setting empty animation with mix_duration {0} on track {1} on {2}").format(varray(mix_duration, track_index,		sprite->get_name())).utf8().ptr());
+						if (debug) print_line(String("Setting empty animation with mix_duration {0} on track {1} on {2}").format(varray(mix_duration, track_index, sprite->get_name())).utf8().ptr());
 					}
 				}
 			}
@@ -373,7 +372,7 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 	}
 }
 
-void SpineAnimationTrack::set_animation_name(const String& _animation_name) {
+void SpineAnimationTrack::set_animation_name(const String &_animation_name) {
 	animation_name = _animation_name;
 }
 

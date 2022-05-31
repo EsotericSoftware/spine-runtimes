@@ -83,7 +83,7 @@ float SpineBoneData::get_length() {
 }
 
 void SpineBoneData::set_length(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setLength(v);
 }
 
@@ -93,7 +93,7 @@ float SpineBoneData::get_x() {
 }
 
 void SpineBoneData::set_x(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setX(v);
 }
 
@@ -103,7 +103,7 @@ float SpineBoneData::get_y() {
 }
 
 void SpineBoneData::set_y(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setY(v);
 }
 
@@ -113,7 +113,7 @@ float SpineBoneData::get_rotation() {
 }
 
 void SpineBoneData::set_rotation(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setRotation(v);
 }
 
@@ -123,7 +123,7 @@ float SpineBoneData::get_scale_x() {
 }
 
 void SpineBoneData::set_scale_x(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setScaleX(v);
 }
 
@@ -133,7 +133,7 @@ float SpineBoneData::get_scale_y() {
 }
 
 void SpineBoneData::set_scale_y(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setScaleY(v);
 }
 
@@ -143,7 +143,7 @@ float SpineBoneData::get_shear_x() {
 }
 
 void SpineBoneData::set_shear_x(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setShearX(v);
 }
 
@@ -153,7 +153,7 @@ float SpineBoneData::get_shear_y() {
 }
 
 void SpineBoneData::set_shear_y(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setShearY(v);
 }
 
@@ -163,7 +163,7 @@ SpineConstant::TransformMode SpineBoneData::get_transform_mode() {
 }
 
 void SpineBoneData::set_transform_mode(SpineConstant::TransformMode v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setTransformMode((spine::TransformMode) v);
 }
 
@@ -173,7 +173,7 @@ bool SpineBoneData::is_skin_required() {
 }
 
 void SpineBoneData::set_skin_required(bool v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setSkinRequired(v);
 }
 
@@ -184,6 +184,6 @@ Color SpineBoneData::get_color() {
 }
 
 void SpineBoneData::set_color(Color color) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->getColor().set(color.r, color.g, color.b, color.a);
 }

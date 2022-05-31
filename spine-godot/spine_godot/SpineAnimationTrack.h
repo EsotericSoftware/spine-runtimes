@@ -58,34 +58,34 @@ protected:
 	SpineSprite *sprite;
 
 	static void _bind_methods();
-	
+
 	void _notification(int what);
 
 	AnimationPlayer *find_animation_player();
-	
+
 	void setup_animation_player();
 
 	static Ref<Animation> create_animation(spine::Animation *animation, bool loop);
-	
+
 	void update_animation_state(const Variant &variant_sprite);
-	
+
 public:
 	SpineAnimationTrack();
 
-	void set_animation_name(const String& _animation_name);
-	
+	void set_animation_name(const String &_animation_name);
+
 	String get_animation_name();
 
-	void set_animation_time (float _animation_time);
-	
+	void set_animation_time(float _animation_time);
+
 	float get_animation_time();
 
 	void set_loop(bool _loop);
-	
+
 	bool get_loop();
 
 	void set_track_index(int _track_index);
-	
+
 	int get_track_index();
 
 	void set_mix_duration(float _mix_duration);

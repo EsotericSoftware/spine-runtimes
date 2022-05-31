@@ -44,7 +44,6 @@ void SpineSlotData::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_attachment_name", "v"), &SpineSlotData::set_attachment_name);
 	ClassDB::bind_method(D_METHOD("get_blend_mode"), &SpineSlotData::get_blend_mode);
 	ClassDB::bind_method(D_METHOD("set_blend_mode", "v"), &SpineSlotData::set_blend_mode);
-
 }
 
 int SpineSlotData::get_index() {
@@ -72,7 +71,7 @@ Color SpineSlotData::get_color() {
 }
 
 void SpineSlotData::set_color(Color v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	auto &color = get_spine_object()->getColor();
 	color.set(v.r, v.g, v.b, v.a);
 }
@@ -84,7 +83,7 @@ Color SpineSlotData::get_dark_color() {
 }
 
 void SpineSlotData::set_dark_color(Color v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	auto &color = get_spine_object()->getDarkColor();
 	color.set(v.r, v.g, v.b, v.a);
 }
@@ -95,7 +94,7 @@ bool SpineSlotData::has_dark_color() {
 }
 
 void SpineSlotData::set_has_dark_color(bool v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setHasDarkColor(v);
 }
 
@@ -104,15 +103,15 @@ String SpineSlotData::get_attachment_name() {
 	return get_spine_object()->getAttachmentName().buffer();
 }
 void SpineSlotData::set_attachment_name(const String &v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAttachmentName(SPINE_STRING(v));
 }
 
 SpineConstant::BlendMode SpineSlotData::get_blend_mode() {
 	SPINE_CHECK(get_spine_object(), SpineConstant::BlendMode_Normal)
-	return (SpineConstant::BlendMode)get_spine_object()->getBlendMode();
+	return (SpineConstant::BlendMode) get_spine_object()->getBlendMode();
 }
 void SpineSlotData::set_blend_mode(SpineConstant::BlendMode v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setBlendMode((spine::BlendMode) v);
 }

@@ -58,20 +58,20 @@
 #define GEOMETRY2D Geometry
 #endif
 
-#define SPINE_CHECK(obj, ret) \
- if (!(obj)) { \
-  ERR_PRINT("Native Spine object not set."); \
-  return ret; \
- }
+#define SPINE_CHECK(obj, ret)                      \
+	if (!(obj)) {                                  \
+		ERR_PRINT("Native Spine object not set."); \
+		return ret;                                \
+	}
 
 #define SPINE_STRING(x) spine::String((x).utf8())
 
 // Can't do template classes with Godot's object model :(
 class SpineObjectWrapper : public REFCOUNTED {
 	GDCLASS(SpineObjectWrapper, REFCOUNTED)
-	
-	Object* spine_owner;
-	void* spine_object;
+
+	Object *spine_owner;
+	void *spine_object;
 
 protected:
 	static void _bind_methods() {
@@ -86,11 +86,12 @@ protected:
 		spine_owner->disconnect("_internal_spine_objects_invalidated", this, "_internal_spine_objects_invalidated");
 #endif
 	}
-	
-	SpineObjectWrapper(): spine_owner(nullptr), spine_object(nullptr) {
+
+	SpineObjectWrapper() : spine_owner(nullptr), spine_object(nullptr) {
 	}
-	
-	template <typename OWNER, typename OBJECT> void _set_spine_object_internal(const OWNER* _owner, OBJECT* _object) {
+
+	template<typename OWNER, typename OBJECT>
+	void _set_spine_object_internal(const OWNER *_owner, OBJECT *_object) {
 		if (spine_owner) {
 			ERR_PRINT("Owner already set.");
 			return;
@@ -104,7 +105,7 @@ protected:
 			return;
 		}
 
-		spine_owner = (Object*)_owner;
+		spine_owner = (Object *) _owner;
 		spine_object = _object;
 #if VERSION_MAJOR > 3
 		spine_owner->connect("_internal_spine_objects_invalidated", callable_mp(this, &SpineObjectWrapper::spine_objects_invalidated));
@@ -119,35 +120,37 @@ protected:
 
 class SpineSprite;
 
-template <typename OBJECT> class SpineSpriteOwnedObject: public SpineObjectWrapper {
+template<typename OBJECT>
+class SpineSpriteOwnedObject : public SpineObjectWrapper {
 public:
-	void set_spine_object(const SpineSprite* _owner, OBJECT* _object) {
+	void set_spine_object(const SpineSprite *_owner, OBJECT *_object) {
 		_set_spine_object_internal(_owner, _object);
 	}
-	
+
 	OBJECT *get_spine_object() {
-		return (OBJECT*)_get_spine_object_internal();
+		return (OBJECT *) _get_spine_object_internal();
 	}
 
 	SpineSprite *get_spine_owner() {
-		return (SpineSprite*)_get_spine_owner_internal();
+		return (SpineSprite *) _get_spine_owner_internal();
 	}
 };
 
 class SpineSkeletonDataResource;
 
-template <typename OBJECT> class SpineSkeletonDataResourceOwnedObject: public SpineObjectWrapper {
+template<typename OBJECT>
+class SpineSkeletonDataResourceOwnedObject : public SpineObjectWrapper {
 public:
-	void set_spine_object(const SpineSkeletonDataResource* _owner, OBJECT* _object) {
+	void set_spine_object(const SpineSkeletonDataResource *_owner, OBJECT *_object) {
 		_set_spine_object_internal(_owner, _object);
 	}
-	
+
 	OBJECT *get_spine_object() {
-		return (OBJECT*)_get_spine_object_internal();
+		return (OBJECT *) _get_spine_object_internal();
 	}
 
 	SpineSkeletonDataResource *get_spine_owner() {
-		return (SpineSkeletonDataResource*)_get_spine_owner_internal();
+		return (SpineSkeletonDataResource *) _get_spine_owner_internal();
 	}
 };
 

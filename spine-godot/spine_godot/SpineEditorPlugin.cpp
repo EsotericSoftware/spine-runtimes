@@ -100,10 +100,10 @@ bool SpineSkeletonDataResourceInspectorPlugin::can_handle(Object *object) {
 }
 
 #if VERSION_MAJOR > 3
-bool SpineSkeletonDataResourceInspectorPlugin:: parse_property(Object *object, const Variant::Type type, const String &path, const PropertyHint hint, const String &hint_text, const uint32_t usage, const bool wide) {
+bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, const Variant::Type type, const String &path, const PropertyHint hint, const String &hint_text, const uint32_t usage, const bool wide) {
 #else
 bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Variant::Type type, const String &path,
-                                                        PropertyHint hint, const String &hint_text, int usage) {
+															  PropertyHint hint, const String &hint_text, int usage) {
 #endif
 	if (path == "animation_mixes") {
 		Ref<SpineSkeletonDataResource> skeleton_data = Object::cast_to<SpineSkeletonDataResource>(object);
@@ -116,7 +116,7 @@ bool SpineSkeletonDataResourceInspectorPlugin::parse_property(Object *object, Va
 	return false;
 }
 
-SpineEditorPropertyAnimationMixes::SpineEditorPropertyAnimationMixes(): skeleton_data(nullptr), container(nullptr), updating(false) {
+SpineEditorPropertyAnimationMixes::SpineEditorPropertyAnimationMixes() : skeleton_data(nullptr), container(nullptr), updating(false) {
 	INSTANTIATE(array_object);
 }
 
@@ -146,9 +146,9 @@ void SpineEditorPropertyAnimationMixes::delete_mix(int idx) {
 
 	auto mixes = skeleton_data->get_animation_mixes().duplicate();
 #if VERSION_MAJOR > 3
-	mixes.remove_at((int)idx);
+	mixes.remove_at((int) idx);
 #else
-	mixes.remove((int)idx);
+	mixes.remove((int) idx);
 #endif
 	emit_changed(get_edited_property(), mixes);
 }
@@ -224,7 +224,7 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 	updating = false;
 }
 
-SpineEditorPropertyAnimationMix::SpineEditorPropertyAnimationMix(): mixes_property(nullptr), skeleton_data(nullptr), index(0), container(nullptr), updating(false) {
+SpineEditorPropertyAnimationMix::SpineEditorPropertyAnimationMix() : mixes_property(nullptr), skeleton_data(nullptr), index(0), container(nullptr), updating(false) {
 }
 
 void SpineEditorPropertyAnimationMix::setup(SpineEditorPropertyAnimationMixes *_mixes_property, const Ref<SpineSkeletonDataResource> &_skeleton_data, int _index) {
@@ -331,14 +331,14 @@ void SpineSpriteInspectorPlugin::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("button_clicked"), &SpineSpriteInspectorPlugin::button_clicked);
 }
 
-void SpineSpriteInspectorPlugin::button_clicked(const String& button_name) {
+void SpineSpriteInspectorPlugin::button_clicked(const String &button_name) {
 }
 
-bool SpineSpriteInspectorPlugin::can_handle(Object* object) {
+bool SpineSpriteInspectorPlugin::can_handle(Object *object) {
 	return Object::cast_to<SpineSprite>(object) != nullptr;
 }
 
-void SpineSpriteInspectorPlugin::parse_begin(Object* object) {
+void SpineSpriteInspectorPlugin::parse_begin(Object *object) {
 	sprite = Object::cast_to<SpineSprite>(object);
 	if (!sprite) return;
 	if (!sprite->get_skeleton_data_res().is_valid() || !sprite->get_skeleton_data_res()->is_skeleton_data_loaded()) return;

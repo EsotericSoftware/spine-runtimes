@@ -78,7 +78,7 @@ void register_spine_godot_types() {
 	GDREGISTER_CLASS(SpineEditorPropertyAnimationMixes);
 #endif
 	spine::Bone::setYDown(true);
-	
+
 	GDREGISTER_CLASS(SpineAtlasResource);
 	GDREGISTER_CLASS(SpineSkeletonFileResource);
 	GDREGISTER_CLASS(SpineSkeletonDataResource);
@@ -106,7 +106,7 @@ void register_spine_godot_types() {
 	GDREGISTER_CLASS(SpineTransformConstraint);
 	GDREGISTER_CLASS(SpineTimeline);
 	GDREGISTER_CLASS(SpineConstant);
-	
+
 	GDREGISTER_CLASS(SpineSlotNode);
 	GDREGISTER_CLASS(SpineBoneNode);
 	GDREGISTER_CLASS(SpineAnimationTrack);

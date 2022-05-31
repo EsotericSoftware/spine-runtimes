@@ -53,7 +53,7 @@ void SpineSlot::_bind_methods() {
 }
 
 void SpineSlot::set_to_setup_pose() {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setToSetupPose();
 }
 
@@ -80,7 +80,7 @@ Color SpineSlot::get_color() {
 }
 
 void SpineSlot::set_color(Color v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	auto &color = get_spine_object()->getColor();
 	color.set(v.r, v.g, v.b, v.a);
 }
@@ -92,7 +92,7 @@ Color SpineSlot::get_dark_color() {
 }
 
 void SpineSlot::set_dark_color(Color v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	auto &color = get_spine_object()->getDarkColor();
 	color.set(v.r, v.g, v.b, v.a);
 }
@@ -112,7 +112,7 @@ Ref<SpineAttachment> SpineSlot::get_attachment() {
 }
 
 void SpineSlot::set_attachment(Ref<SpineAttachment> v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAttachment(v.is_valid() && v->get_spine_object() ? v->get_spine_object() : nullptr);
 }
 
@@ -122,7 +122,7 @@ int SpineSlot::get_attachment_state() {
 }
 
 void SpineSlot::set_attachment_state(int v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAttachmentState(v);
 }
 
@@ -130,15 +130,15 @@ Array SpineSlot::get_deform() {
 	Array result;
 	SPINE_CHECK(get_spine_object(), result)
 	auto &deform = get_spine_object()->getDeform();
-	result.resize((int)deform.size());
-	for (int i = 0; i < (int)deform.size(); ++i) {
+	result.resize((int) deform.size());
+	for (int i = 0; i < (int) deform.size(); ++i) {
 		result[i] = deform[i];
 	}
 	return result;
 }
 
 void SpineSlot::set_deform(Array v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	auto &deform = get_spine_object()->getDeform();
 	deform.setSize(v.size(), 0);
 	for (int i = 0; i < v.size(); ++i) {
@@ -152,6 +152,6 @@ int SpineSlot::get_sequence_index() {
 }
 
 void SpineSlot::set_sequence_index(int v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAttachmentState(v);
 }

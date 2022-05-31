@@ -68,7 +68,7 @@ public:
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
 
 	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
-#endif	
+#endif
 };
 
 class SpineJsonResourceImportPlugin : public EditorImportPlugin {
@@ -92,18 +92,18 @@ public:
 #if VERSION_MAJOR > 3
 	int get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
 
-	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override { }
+	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override {}
 
 	bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
 
 	Error import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 #else
-	void get_import_options(List<ImportOption> *options, int preset) const override { }
+	void get_import_options(List<ImportOption> *options, int preset) const override {}
 
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
 
 	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
-#endif	
+#endif
 };
 
 class SpineBinaryResourceImportPlugin : public EditorImportPlugin {
@@ -127,18 +127,18 @@ public:
 #if VERSION_MAJOR > 3
 	int get_import_order() const override { return IMPORT_ORDER_DEFAULT; }
 
-	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override { }
+	void get_import_options(const String &path, List<ImportOption> *options, int preset) const override {}
 
 	bool get_option_visibility(const String &path, const String &option, const HashMap<StringName, Variant> &options) const override { return true; }
 
 	Error import(const String &source_file, const String &save_path, const HashMap<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
 #else
-	void get_import_options(List<ImportOption> *options, int preset) const override { }
+	void get_import_options(List<ImportOption> *options, int preset) const override {}
 
 	bool get_option_visibility(const String &option, const Map<StringName, Variant> &options) const override { return true; }
 
 	Error import(const String &source_file, const String &save_path, const Map<StringName, Variant> &options, List<String> *platform_variants, List<String> *gen_files, Variant *metadata) override;
-#endif	
+#endif
 };
 
 class SpineEditorPlugin : public EditorPlugin {
@@ -150,7 +150,7 @@ public:
 	String get_name() const override { return "SpineEditorPlugin"; }
 };
 
-class SpineSkeletonDataResourceInspectorPlugin: public EditorInspectorPlugin {
+class SpineSkeletonDataResourceInspectorPlugin : public EditorInspectorPlugin {
 	GDCLASS(SpineSkeletonDataResourceInspectorPlugin, EditorInspectorPlugin)
 
 public:
@@ -164,26 +164,27 @@ public:
 
 class SpineEditorPropertyAnimationMix;
 
-class SpineEditorPropertyAnimationMixes: public EditorProperty {
+class SpineEditorPropertyAnimationMixes : public EditorProperty {
 	GDCLASS(SpineEditorPropertyAnimationMixes, EditorProperty)
 
 	Ref<EditorPropertyArrayObject> array_object;
 	Ref<SpineSkeletonDataResource> skeleton_data;
 	VBoxContainer *container;
-	Vector<SpineEditorPropertyAnimationMix*> mix_properties;
+	Vector<SpineEditorPropertyAnimationMix *> mix_properties;
 	bool updating;
 
 	static void _bind_methods();
 	void add_mix();
 	void delete_mix(int idx);
 	void update_mix_property(int index);
+
 public:
 	SpineEditorPropertyAnimationMixes();
 	void setup(const Ref<SpineSkeletonDataResource> &_skeleton_data) { this->skeleton_data = _skeleton_data; };
 	void update_property() override;
 };
 
-class SpineEditorPropertyAnimationMix: public EditorProperty {
+class SpineEditorPropertyAnimationMix : public EditorProperty {
 	GDCLASS(SpineEditorPropertyAnimationMix, EditorProperty)
 
 	SpineEditorPropertyAnimationMixes *mixes_property;
@@ -194,19 +195,21 @@ class SpineEditorPropertyAnimationMix: public EditorProperty {
 
 	static void _bind_methods();
 	void data_changed(const String &property, const Variant &value, const String &name, bool changing);
+
 public:
 	SpineEditorPropertyAnimationMix();
 	void setup(SpineEditorPropertyAnimationMixes *mixes_property, const Ref<SpineSkeletonDataResource> &skeleton_data, int index);
 	void update_property() override;
 };
 
-class SpineSpriteInspectorPlugin: public EditorInspectorPlugin {
+class SpineSpriteInspectorPlugin : public EditorInspectorPlugin {
 	GDCLASS(SpineSpriteInspectorPlugin, EditorInspectorPlugin)
 
 	SpineSprite *sprite;
-	
+
 	static void _bind_methods();
 	void button_clicked(const String &button_name);
+
 public:
 	bool can_handle(Object *object) override;
 	void parse_begin(Object *object) override;

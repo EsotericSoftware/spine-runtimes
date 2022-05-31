@@ -38,7 +38,7 @@
 class SpinePathConstraintData : public SpineConstraintData {
 	GDCLASS(SpinePathConstraintData, SpineConstraintData)
 
-	spine::PathConstraintData *get_spine_constraint_data() { return (spine::PathConstraintData *)get_spine_object(); }
+	spine::PathConstraintData *get_spine_constraint_data() { return (spine::PathConstraintData *) get_spine_object(); }
 
 protected:
 	static void _bind_methods();

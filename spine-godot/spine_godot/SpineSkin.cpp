@@ -73,8 +73,8 @@ Ref<SpineSkin> SpineSkin::init(const String &name, SpineSprite *sprite) {
 }
 
 void SpineSkin::set_attachment(int slot_index, const String &name, Ref<SpineAttachment> attachment) {
-	SPINE_CHECK(get_spine_object(),)
-	get_spine_object()->setAttachment(slot_index, SPINE_STRING(name), attachment.is_valid() && attachment->get_spine_owner()? attachment->get_spine_object() : nullptr);
+	SPINE_CHECK(get_spine_object(), )
+	get_spine_object()->setAttachment(slot_index, SPINE_STRING(name), attachment.is_valid() && attachment->get_spine_owner() ? attachment->get_spine_object() : nullptr);
 }
 
 Ref<SpineAttachment> SpineSkin::get_attachment(int slot_index, const String &name) {
@@ -87,7 +87,7 @@ Ref<SpineAttachment> SpineSkin::get_attachment(int slot_index, const String &nam
 }
 
 void SpineSkin::remove_attachment(int slot_index, const String &name) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->removeAttachment(slot_index, SPINE_STRING(name));
 }
 
@@ -96,7 +96,7 @@ Array SpineSkin::find_names_for_slot(int slot_index) {
 	SPINE_CHECK(get_spine_object(), result)
 	spine::Vector<spine::String> names;
 	get_spine_object()->findNamesForSlot(slot_index, names);
-	result.resize((int)names.size());
+	result.resize((int) names.size());
 	for (int i = 0; i < names.size(); ++i) {
 		result[i] = names[i].buffer();
 	}
@@ -108,7 +108,7 @@ Array SpineSkin::find_attachments_for_slot(int slot_index) {
 	SPINE_CHECK(get_spine_object(), result)
 	spine::Vector<spine::Attachment *> attachments;
 	get_spine_object()->findAttachmentsForSlot(slot_index, attachments);
-	result.resize((int)attachments.size());
+	result.resize((int) attachments.size());
 	for (int i = 0; i < attachments.size(); ++i) {
 		if (!attachments[i]) {
 			result[i] = Ref<SpineAttachment>(nullptr);
@@ -127,7 +127,7 @@ String SpineSkin::get_name() {
 }
 
 void SpineSkin::add_skin(Ref<SpineSkin> other) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	if (!other.is_valid() || !other->get_spine_object()) {
 		ERR_PRINT("other is not a valid SpineSkin.");
 		return;
@@ -136,7 +136,7 @@ void SpineSkin::add_skin(Ref<SpineSkin> other) {
 }
 
 void SpineSkin::copy_skin(Ref<SpineSkin> other) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	if (!other.is_valid() || !other->get_spine_object()) {
 		ERR_PRINT("other is not a valid SpineSkin.");
 		return;
@@ -148,7 +148,7 @@ Array SpineSkin::get_attachments() {
 	Array result;
 	SPINE_CHECK(get_spine_object(), result)
 	auto entries = get_spine_object()->getAttachments();
-	while(entries.hasNext()) {
+	while (entries.hasNext()) {
 		spine::Skin::AttachmentMap::Entry &entry = entries.next();
 		Ref<SpineSkinEntry> entry_ref = memnew(SpineSkinEntry);
 		Ref<SpineAttachment> attachment_ref = nullptr;
@@ -166,7 +166,7 @@ Array SpineSkin::get_bones() {
 	Array result;
 	SPINE_CHECK(get_spine_object(), result)
 	auto bones = get_spine_object()->getBones();
-	result.resize((int)bones.size());
+	result.resize((int) bones.size());
 	for (int i = 0; i < bones.size(); ++i) {
 		Ref<SpineBoneData> bone_ref(memnew(SpineBoneData));
 		bone_ref->set_spine_object(get_spine_owner(), bones[i]);
@@ -179,7 +179,7 @@ Array SpineSkin::get_constraints() {
 	Array result;
 	SPINE_CHECK(get_spine_object(), result)
 	auto constraints = get_spine_object()->getConstraints();
-	result.resize((int)constraints.size());
+	result.resize((int) constraints.size());
 	for (int i = 0; i < constraints.size(); ++i) {
 		Ref<SpineConstraintData> constraint_ref(memnew(SpineConstraintData));
 		constraint_ref->set_spine_object(get_spine_owner(), constraints[i]);

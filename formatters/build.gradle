@@ -26,8 +26,8 @@ spotless {
                'spine-sfml/**/*.h',
                'spine-ue4/**/*.cpp',
                'spine-ue4/**/*.h',
-               'spine-godot/godot/modules/spine_godot/*.cpp',
-               'spine-godot/godot/modules/spine_godot/*.h'
+               'spine-godot/spine_godot/*.cpp',
+               'spine-godot/spine_godot/*.h'
         clangFormat("13.0.1").pathToExe("$System.env.CLANGFORMAT").style('file')
     }
 

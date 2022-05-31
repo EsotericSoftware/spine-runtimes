@@ -20,6 +20,7 @@ protected:
 	String from;
 	String to;
 	float mix;
+
 public:
 	SpineAnimationMix();
 

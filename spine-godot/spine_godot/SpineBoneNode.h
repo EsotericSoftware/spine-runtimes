@@ -33,7 +33,7 @@
 #include "SpineSprite.h"
 #include "scene/2d/node_2d.h"
 
-class SpineBoneNode: public Node2D {
+class SpineBoneNode : public Node2D {
 	GDCLASS(SpineBoneNode, Node2D)
 
 protected:
@@ -42,7 +42,7 @@ protected:
 	bool enabled;
 	Color debug_color;
 	float debug_thickness;
-	
+
 	static void _bind_methods();
 	void _notification(int what);
 	void _get_property_list(List<PropertyInfo> *list) const;
@@ -54,9 +54,9 @@ protected:
 	SpineSprite *find_parent_sprite() const;
 	Ref<SpineBone> find_bone() const;
 	void draw();
-	
+
 public:
-	SpineBoneNode(): bone_mode(SpineConstant::BoneMode_Follow), enabled(true), debug_color(Color::hex(0xff000077)), debug_thickness(5) {}
+	SpineBoneNode() : bone_mode(SpineConstant::BoneMode_Follow), enabled(true), debug_color(Color::hex(0xff000077)), debug_thickness(5) {}
 
 	SpineConstant::BoneMode get_bone_mode();
 

@@ -40,13 +40,13 @@ class SpineSprite : public Node2D, public spine::AnimationStateListenerObject {
 	GDCLASS(SpineSprite, Node2D)
 
 	friend class SpineBone;
-	
+
 protected:
 	Ref<SpineSkeletonDataResource> skeleton_data_res;
 	Ref<SpineSkeleton> skeleton;
 	Ref<SpineAnimationState> animation_state;
 	SpineConstant::UpdateMode update_mode;
-	
+
 	String preview_animation;
 	bool preview_frame;
 	float preview_time;
@@ -65,7 +65,7 @@ protected:
 	bool debug_clipping;
 	Color debug_clipping_color;
 
-	spine::Vector<spine::Vector<SpineSlotNode*> > slot_nodes;
+	spine::Vector<spine::Vector<SpineSlotNode *>> slot_nodes;
 	Vector<MeshInstance2D *> mesh_instances;
 	static Ref<CanvasItemMaterial> default_materials[4];
 	Ref<Material> normal_material;
@@ -74,7 +74,7 @@ protected:
 	Ref<Material> screen_material;
 	spine::SkeletonClipping *skeleton_clipper;
 	bool modified_bones;
-	
+
 	static void _bind_methods();
 	void _notification(int what);
 	void _get_property_list(List<PropertyInfo> *list) const;
@@ -96,11 +96,11 @@ public:
 	~SpineSprite();
 
 	void set_skeleton_data_res(const Ref<SpineSkeletonDataResource> &_spine_skeleton_data_resource);
-	
+
 	Ref<SpineSkeletonDataResource> get_skeleton_data_res();
 
 	Ref<SpineSkeleton> get_skeleton();
-	
+
 	Ref<SpineAnimationState> get_animation_state();
 
 	void on_skeleton_data_changed();
@@ -110,7 +110,7 @@ public:
 	Transform2D get_global_bone_transform(const String &bone_name);
 
 	void set_global_bone_transform(const String &bone_name, Transform2D transform);
-	
+
 	SpineConstant::UpdateMode get_update_mode();
 
 	void set_update_mode(SpineConstant::UpdateMode v);
@@ -135,7 +135,7 @@ public:
 
 	bool get_debug_bones() { return debug_bones; }
 
-	void set_debug_bones (bool bones) { debug_bones = bones; }
+	void set_debug_bones(bool bones) { debug_bones = bones; }
 
 	Color get_debug_bones_color() { return debug_bones_color; }
 
@@ -168,7 +168,7 @@ public:
 	Color get_debug_paths_color() { return debug_paths_color; }
 
 	void set_debug_paths_color(const Color &color) { debug_paths_color = color; }
-	
+
 	bool get_debug_bounding_boxes() { return debug_bounding_boxes; }
 
 	void set_debug_bounding_boxes(bool paths) { debug_bounding_boxes = paths; }

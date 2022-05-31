@@ -36,7 +36,7 @@
 class SpineIkConstraintData : public SpineConstraintData {
 	GDCLASS(SpineIkConstraintData, SpineConstraintData)
 
-	spine::IkConstraintData *get_spine_constraint_data() { return (spine::IkConstraintData *)get_spine_object(); }
+	spine::IkConstraintData *get_spine_constraint_data() { return (spine::IkConstraintData *) get_spine_object(); }
 
 protected:
 	static void _bind_methods();

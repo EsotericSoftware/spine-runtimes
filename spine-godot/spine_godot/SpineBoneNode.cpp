@@ -54,8 +54,8 @@ void SpineBoneNode::_bind_methods() {
 }
 
 void SpineBoneNode::_notification(int what) {
-	switch(what) {
-	case NOTIFICATION_PARENTED: {
+	switch (what) {
+		case NOTIFICATION_PARENTED: {
 			SpineSprite *sprite = find_parent_sprite();
 			if (sprite) {
 #if VERSION_MAJOR > 3
@@ -78,8 +78,8 @@ void SpineBoneNode::_notification(int what) {
 			}
 			NOTIFY_PROPERTY_LIST_CHANGED();
 			break;
-	}
-	case NOTIFICATION_UNPARENTED: {
+		}
+		case NOTIFICATION_UNPARENTED: {
 			SpineSprite *sprite = find_parent_sprite();
 			if (sprite) {
 #if VERSION_MAJOR > 3
@@ -89,21 +89,22 @@ void SpineBoneNode::_notification(int what) {
 #endif
 			}
 			break;
-	}
-	case NOTIFICATION_DRAW: {
+		}
+		case NOTIFICATION_DRAW: {
 			draw();
 			break;
-	}
-	default:
-		break;
+		}
+		default:
+			break;
 	}
 }
 
-void SpineBoneNode::_get_property_list(List<PropertyInfo>* list) const {
+void SpineBoneNode::_get_property_list(List<PropertyInfo> *list) const {
 	Vector<String> bone_names;
 	SpineSprite *sprite = find_parent_sprite();
 	if (sprite) sprite->get_skeleton_data_res()->get_bone_names(bone_names);
-	else bone_names.push_back(bone_name);
+	else
+		bone_names.push_back(bone_name);
 	auto element = list->front();
 	while (element) {
 		auto property_info = element->get();
@@ -119,7 +120,7 @@ void SpineBoneNode::_get_property_list(List<PropertyInfo>* list) const {
 	list->insert_after(element, slot_name_property);
 }
 
-bool SpineBoneNode::_get(const StringName& property, Variant& value) const {
+bool SpineBoneNode::_get(const StringName &property, Variant &value) const {
 	if (property == "bone_name") {
 		value = bone_name;
 		return true;
@@ -127,7 +128,7 @@ bool SpineBoneNode::_get(const StringName& property, Variant& value) const {
 	return false;
 }
 
-bool SpineBoneNode::_set(const StringName& property, const Variant& value) {
+bool SpineBoneNode::_set(const StringName &property, const Variant &value) {
 	if (property == "bone_name") {
 		bone_name = value;
 		SpineSprite *sprite = find_parent_sprite();
@@ -137,20 +138,20 @@ bool SpineBoneNode::_set(const StringName& property, const Variant& value) {
 	return false;
 }
 
-void SpineBoneNode::on_world_transforms_changed(const Variant& _sprite) {
-	SpineSprite* sprite = cast_to<SpineSprite>(_sprite.operator Object*());
+void SpineBoneNode::on_world_transforms_changed(const Variant &_sprite) {
+	SpineSprite *sprite = cast_to<SpineSprite>(_sprite.operator Object *());
 	update_transform(sprite);
 	update();
 }
 
-void SpineBoneNode::update_transform(SpineSprite* sprite) {
+void SpineBoneNode::update_transform(SpineSprite *sprite) {
 	if (!enabled) return;
 	Ref<SpineBone> bone = find_bone();
 	if (!bone.is_valid()) return;
 
 	Transform2D bone_transform = bone->get_global_transform();
 	Transform2D this_transform = get_global_transform();
-	
+
 	if (bone_mode == SpineConstant::BoneMode_Drive) {
 		bone->set_global_transform(this_transform);
 	} else {
@@ -170,7 +171,7 @@ void SpineBoneNode::update_transform(SpineSprite* sprite) {
 	}
 }
 
-void SpineBoneNode::init_transform(SpineSprite* sprite) {
+void SpineBoneNode::init_transform(SpineSprite *sprite) {
 	if (!sprite) return;
 	if (bone_mode == SpineConstant::BoneMode_Drive) return;
 	sprite->get_skeleton()->set_to_setup_pose();

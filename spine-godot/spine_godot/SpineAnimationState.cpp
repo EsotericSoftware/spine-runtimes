@@ -63,7 +63,7 @@ void SpineAnimationState::set_spine_sprite(SpineSprite *_sprite) {
 }
 
 void SpineAnimationState::update(float delta) {
-	SPINE_CHECK(animation_state,)
+	SPINE_CHECK(animation_state, )
 	animation_state->update(delta);
 }
 
@@ -74,12 +74,12 @@ bool SpineAnimationState::apply(Ref<SpineSkeleton> skeleton) {
 }
 
 void SpineAnimationState::clear_tracks() {
-	SPINE_CHECK(animation_state,)
+	SPINE_CHECK(animation_state, )
 	animation_state->clearTracks();
 }
 
 void SpineAnimationState::clear_track(int track_id) {
-	SPINE_CHECK(animation_state,)
+	SPINE_CHECK(animation_state, )
 	animation_state->clearTrack(track_id);
 }
 
@@ -126,7 +126,7 @@ Ref<SpineTrackEntry> SpineAnimationState::add_empty_animation(int track_id, floa
 	return track_entry_ref;
 }
 void SpineAnimationState::set_empty_animations(float mix_duration) {
-	SPINE_CHECK(animation_state,)
+	SPINE_CHECK(animation_state, )
 	animation_state->setEmptyAnimations(mix_duration);
 }
 
@@ -145,16 +145,16 @@ float SpineAnimationState::get_time_scale() {
 }
 
 void SpineAnimationState::set_time_scale(float time_scale) {
-	SPINE_CHECK(animation_state,)
+	SPINE_CHECK(animation_state, )
 	animation_state->setTimeScale(time_scale);
 }
 
 void SpineAnimationState::disable_queue() {
-	SPINE_CHECK(animation_state,)
+	SPINE_CHECK(animation_state, )
 	animation_state->disableQueue();
 }
 
 void SpineAnimationState::enable_queue() {
-	SPINE_CHECK(animation_state,)
+	SPINE_CHECK(animation_state, )
 	animation_state->enableQueue();
 }

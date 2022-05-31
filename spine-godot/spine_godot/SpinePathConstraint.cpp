@@ -54,7 +54,7 @@ void SpinePathConstraint::_bind_methods() {
 }
 
 void SpinePathConstraint::update() {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->update();
 }
 
@@ -69,7 +69,7 @@ float SpinePathConstraint::get_position() {
 }
 
 void SpinePathConstraint::set_position(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setPosition(v);
 }
 
@@ -79,7 +79,7 @@ float SpinePathConstraint::get_spacing() {
 }
 
 void SpinePathConstraint::set_spacing(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setSpacing(v);
 }
 
@@ -89,7 +89,7 @@ float SpinePathConstraint::get_mix_rotate() {
 }
 
 void SpinePathConstraint::set_mix_rotate(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setMixRotate(v);
 }
 
@@ -99,7 +99,7 @@ float SpinePathConstraint::get_mix_x() {
 }
 
 void SpinePathConstraint::set_mix_x(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setMixX(v);
 }
 
@@ -109,7 +109,7 @@ float SpinePathConstraint::get_mix_y() {
 }
 
 void SpinePathConstraint::set_mix_y(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setMixY(v);
 }
 
@@ -117,7 +117,7 @@ Array SpinePathConstraint::get_bones() {
 	Array result;
 	SPINE_CHECK(get_spine_object(), result)
 	auto &bones = get_spine_object()->getBones();
-	result.resize((int)bones.size());
+	result.resize((int) bones.size());
 	for (int i = 0; i < bones.size(); ++i) {
 		auto bone = bones[i];
 		Ref<SpineBone> bone_ref(memnew(SpineBone));
@@ -137,7 +137,7 @@ Ref<SpineSlot> SpinePathConstraint::get_target() {
 }
 
 void SpinePathConstraint::set_target(Ref<SpineSlot> v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setTarget(v.is_valid() && v->get_spine_object() ? v->get_spine_object() : nullptr);
 }
 
@@ -155,6 +155,6 @@ bool SpinePathConstraint::is_active() {
 }
 
 void SpinePathConstraint::set_active(bool v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setActive(v);
 }

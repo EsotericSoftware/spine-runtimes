@@ -108,7 +108,7 @@ bool SpineTrackEntry::get_loop() {
 }
 
 void SpineTrackEntry::set_loop(bool v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setLoop(v);
 }
 
@@ -118,7 +118,7 @@ bool SpineTrackEntry::get_hold_previous() {
 }
 
 void SpineTrackEntry::set_hold_previous(bool v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setHoldPrevious(v);
 }
 
@@ -128,17 +128,17 @@ bool SpineTrackEntry::get_reverse() {
 }
 
 void SpineTrackEntry::set_reverse(bool v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setReverse(v);
 }
 
-bool  SpineTrackEntry::get_shortest_rotation() {
+bool SpineTrackEntry::get_shortest_rotation() {
 	SPINE_CHECK(get_spine_object(), false)
 	return get_spine_object()->getShortestRotation();
 }
 
-void  SpineTrackEntry::set_shortest_rotation(bool v) {
-	SPINE_CHECK(get_spine_object(),)
+void SpineTrackEntry::set_shortest_rotation(bool v) {
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setShortestRotation(v);
 }
 
@@ -148,7 +148,7 @@ float SpineTrackEntry::get_delay() {
 }
 
 void SpineTrackEntry::set_delay(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setDelay(v);
 }
 
@@ -158,7 +158,7 @@ float SpineTrackEntry::get_track_time() {
 }
 
 void SpineTrackEntry::set_track_time(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setTrackTime(v);
 }
 
@@ -168,7 +168,7 @@ float SpineTrackEntry::get_track_end() {
 }
 
 void SpineTrackEntry::set_track_end(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setTrackEnd(v);
 }
 
@@ -178,7 +178,7 @@ float SpineTrackEntry::get_animation_start() {
 }
 
 void SpineTrackEntry::set_animation_start(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAnimationStart(v);
 }
 
@@ -188,7 +188,7 @@ float SpineTrackEntry::get_animation_end() {
 }
 
 void SpineTrackEntry::set_animation_end(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAnimationEnd(v);
 }
 
@@ -198,7 +198,7 @@ float SpineTrackEntry::get_animation_last() {
 }
 
 void SpineTrackEntry::set_animation_last(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAnimationLast(v);
 }
 
@@ -213,7 +213,7 @@ float SpineTrackEntry::get_time_scale() {
 }
 
 void SpineTrackEntry::set_time_scale(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setTimeScale(v);
 }
 
@@ -223,7 +223,7 @@ float SpineTrackEntry::get_alpha() {
 }
 
 void SpineTrackEntry::set_alpha(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAlpha(v);
 }
 
@@ -233,7 +233,7 @@ float SpineTrackEntry::get_event_threshold() {
 }
 
 void SpineTrackEntry::set_event_threshold(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setEventThreshold(v);
 }
 
@@ -243,7 +243,7 @@ float SpineTrackEntry::get_attachment_threshold() {
 }
 
 void SpineTrackEntry::set_attachment_threshold(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setAttachmentThreshold(v);
 }
 
@@ -253,7 +253,7 @@ float SpineTrackEntry::get_draw_order_threshold() {
 }
 
 void SpineTrackEntry::set_draw_order_threshold(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setDrawOrderThreshold(v);
 }
 
@@ -277,7 +277,7 @@ float SpineTrackEntry::get_mix_time() {
 }
 
 void SpineTrackEntry::set_mix_time(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setMixTime(v);
 }
 
@@ -287,17 +287,17 @@ float SpineTrackEntry::get_mix_duration() {
 }
 
 void SpineTrackEntry::set_mix_duration(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setMixDuration(v);
 }
 
 SpineConstant::MixBlend SpineTrackEntry::get_mix_blend() {
 	SPINE_CHECK(get_spine_object(), SpineConstant::MixBlend_Setup)
-	return (SpineConstant::MixBlend)get_spine_object()->getMixBlend();
+	return (SpineConstant::MixBlend) get_spine_object()->getMixBlend();
 }
 
 void SpineTrackEntry::set_mix_blend(SpineConstant::MixBlend v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setMixBlend((spine::MixBlend) v);
 }
 
@@ -320,7 +320,7 @@ Ref<SpineTrackEntry> SpineTrackEntry::get_mixing_to() {
 }
 
 void SpineTrackEntry::reset_rotation_directions() {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->resetRotationDirections();
 }
 

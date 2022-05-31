@@ -90,22 +90,22 @@ Ref<SpineSkeletonDataResource> SpineSkeleton::get_skeleton_data_res() const {
 }
 
 void SpineSkeleton::update_world_transform() {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	skeleton->updateWorldTransform();
 }
 
 void SpineSkeleton::set_to_setup_pose() {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	skeleton->setToSetupPose();
 }
 
 void SpineSkeleton::set_bones_to_setup_pose() {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	skeleton->setBonesToSetupPose();
 }
 
 void SpineSkeleton::set_slots_to_setup_pose() {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	skeleton->setSlotsToSetupPose();
 }
 
@@ -130,12 +130,12 @@ Ref<SpineSlot> SpineSkeleton::find_slot(const String &name) {
 }
 
 void SpineSkeleton::set_skin_by_name(const String &skin_name) {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	skeleton->setSkin(SPINE_STRING(skin_name));
 }
 
 void SpineSkeleton::set_skin(Ref<SpineSkin> new_skin) {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	skeleton->setSkin(new_skin.is_valid() && new_skin->get_spine_object() ? new_skin->get_spine_object() : nullptr);
 }
 
@@ -158,7 +158,7 @@ Ref<SpineAttachment> SpineSkeleton::get_attachment_by_slot_index(int slot_index,
 }
 
 void SpineSkeleton::set_attachment(const String &slot_name, const String &attachment_name) {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	skeleton->setAttachment(SPINE_STRING(slot_name), SPINE_STRING(attachment_name));
 }
 
@@ -212,7 +212,7 @@ Array SpineSkeleton::get_bones() {
 	Array result;
 	SPINE_CHECK(skeleton, result)
 	auto &bones = skeleton->getBones();
-	result.resize((int)bones.size());
+	result.resize((int) bones.size());
 	for (int i = 0; i < result.size(); ++i) {
 		auto bone = bones[i];
 		Ref<SpineBone> bone_ref(memnew(SpineBone));
@@ -226,7 +226,7 @@ Array SpineSkeleton::get_slots() {
 	Array result;
 	SPINE_CHECK(skeleton, result)
 	auto &slots = skeleton->getSlots();
-	result.resize((int)slots.size());
+	result.resize((int) slots.size());
 	for (int i = 0; i < result.size(); ++i) {
 		auto slot = slots[i];
 		Ref<SpineSlot> slot_ref(memnew(SpineSlot));
@@ -240,7 +240,7 @@ Array SpineSkeleton::get_draw_order() {
 	Array result;
 	SPINE_CHECK(skeleton, result)
 	auto &slots = skeleton->getDrawOrder();
-	result.resize((int)slots.size());
+	result.resize((int) slots.size());
 	for (int i = 0; i < result.size(); ++i) {
 		auto slot = slots[i];
 		Ref<SpineSlot> slot_ref(memnew(SpineSlot));
@@ -254,7 +254,7 @@ Array SpineSkeleton::get_ik_constraints() {
 	Array result;
 	SPINE_CHECK(skeleton, result)
 	auto &constraints = skeleton->getIkConstraints();
-	result.resize((int)constraints.size());
+	result.resize((int) constraints.size());
 	for (int i = 0; i < result.size(); ++i) {
 		auto constraint = constraints[i];
 		Ref<SpineIkConstraint> constraint_ref(memnew(SpineIkConstraint));
@@ -268,7 +268,7 @@ Array SpineSkeleton::get_path_constraints() {
 	Array result;
 	SPINE_CHECK(skeleton, result)
 	auto &constraints = skeleton->getPathConstraints();
-	result.resize((int)constraints.size());
+	result.resize((int) constraints.size());
 	for (int i = 0; i < result.size(); ++i) {
 		auto constraint = constraints[i];
 		Ref<SpinePathConstraint> constraint_ref(memnew(SpinePathConstraint));
@@ -281,7 +281,7 @@ Array SpineSkeleton::get_transform_constraints() {
 	Array result;
 	SPINE_CHECK(skeleton, result)
 	auto &constraints = skeleton->getTransformConstraints();
-	result.resize((int)constraints.size());
+	result.resize((int) constraints.size());
 	for (int i = 0; i < result.size(); ++i) {
 		auto constraint = constraints[i];
 		Ref<SpineTransformConstraint> constraint_ref(memnew(SpineTransformConstraint));
@@ -307,13 +307,13 @@ Color SpineSkeleton::get_color() {
 }
 
 void SpineSkeleton::set_color(Color v) {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	auto &color = skeleton->getColor();
 	color.set(v.r, v.g, v.b, v.a);
 }
 
 void SpineSkeleton::set_position(Vector2 position) {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	skeleton->setPosition(position.x, position.y);
 }
 
@@ -323,7 +323,7 @@ float SpineSkeleton::get_x() {
 }
 
 void SpineSkeleton::set_x(float v) {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	skeleton->setX(v);
 }
 
@@ -333,7 +333,7 @@ float SpineSkeleton::get_y() {
 }
 
 void SpineSkeleton::set_y(float v) {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	skeleton->setY(v);
 }
 
@@ -343,7 +343,7 @@ float SpineSkeleton::get_scale_x() {
 }
 
 void SpineSkeleton::set_scale_x(float v) {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	skeleton->setScaleX(v);
 }
 
@@ -353,6 +353,6 @@ float SpineSkeleton::get_scale_y() {
 }
 
 void SpineSkeleton::set_scale_y(float v) {
-	SPINE_CHECK(skeleton,)
+	SPINE_CHECK(skeleton, )
 	skeleton->setScaleY(v);
 }

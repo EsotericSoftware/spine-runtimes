@@ -46,11 +46,11 @@ String SpineConstraintData::get_constraint_name() {
 
 int SpineConstraintData::get_order() {
 	SPINE_CHECK(get_spine_object(), 0)
-	return (int)get_spine_object()->getOrder();
+	return (int) get_spine_object()->getOrder();
 }
 
 void SpineConstraintData::set_order(int v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setOrder(v);
 }
 
@@ -60,6 +60,6 @@ bool SpineConstraintData::is_skin_required() {
 }
 
 void SpineConstraintData::set_skin_required(bool v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setSkinRequired(v);
 }

@@ -49,7 +49,7 @@ void SpineEvent::_bind_methods() {
 Ref<SpineEventData> SpineEvent::get_data() {
 	SPINE_CHECK(get_spine_object(), nullptr)
 	Ref<SpineEventData> event_data(memnew(SpineEventData));
-	event_data->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), (spine::EventData*)&get_spine_object()->getData());
+	event_data->set_spine_object(*get_spine_owner()->get_skeleton_data_res(), (spine::EventData *) &get_spine_object()->getData());
 	return event_data;
 }
 
@@ -64,7 +64,7 @@ int SpineEvent::get_int_value() {
 }
 
 void SpineEvent::set_int_value(int v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setIntValue(v);
 }
 
@@ -74,7 +74,7 @@ float SpineEvent::get_float_value() {
 }
 
 void SpineEvent::set_float_value(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setFloatValue(v);
 }
 
@@ -84,7 +84,7 @@ String SpineEvent::get_string_value() {
 }
 
 void SpineEvent::set_string_value(const String &v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setStringValue(spine::String(v.utf8()));
 }
 
@@ -94,7 +94,7 @@ float SpineEvent::get_volume() {
 }
 
 void SpineEvent::set_volume(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setVolume(v);
 }
 
@@ -104,6 +104,6 @@ float SpineEvent::get_balance() {
 }
 
 void SpineEvent::set_balance(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setBalance(v);
 }

@@ -52,7 +52,7 @@ Array SpineIkConstraintData::get_bones() {
 	Array result;
 	SPINE_CHECK(get_spine_object(), result)
 	auto bones = get_spine_constraint_data()->getBones();
-	result.resize((int)bones.size());
+	result.resize((int) bones.size());
 	for (int i = 0; i < bones.size(); ++i) {
 		Ref<SpineBoneData> bone_ref(memnew(SpineBoneData));
 		bone_ref->set_spine_object(get_spine_owner(), bones[i]);
@@ -71,7 +71,7 @@ Ref<SpineBoneData> SpineIkConstraintData::get_target() {
 }
 
 void SpineIkConstraintData::set_target(Ref<SpineBoneData> v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_constraint_data()->setTarget(v.is_valid() && v->get_spine_object() ? v->get_spine_object() : nullptr);
 }
 
@@ -81,7 +81,7 @@ int SpineIkConstraintData::get_bend_direction() {
 }
 
 void SpineIkConstraintData::set_bend_direction(int v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_constraint_data()->setBendDirection(v);
 }
 
@@ -91,7 +91,7 @@ bool SpineIkConstraintData::get_compress() {
 }
 
 void SpineIkConstraintData::set_compress(bool v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_constraint_data()->setCompress(v);
 }
 
@@ -101,7 +101,7 @@ bool SpineIkConstraintData::get_stretch() {
 }
 
 void SpineIkConstraintData::set_stretch(bool v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_constraint_data()->setStretch(v);
 }
 
@@ -111,7 +111,7 @@ bool SpineIkConstraintData::get_uniform() {
 }
 
 void SpineIkConstraintData::set_uniform(bool v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_constraint_data()->setUniform(v);
 }
 
@@ -121,7 +121,7 @@ float SpineIkConstraintData::get_mix() {
 }
 
 void SpineIkConstraintData::set_mix(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_constraint_data()->setMix(v);
 }
 
@@ -131,6 +131,6 @@ float SpineIkConstraintData::get_softness() {
 }
 
 void SpineIkConstraintData::set_softness(float v) {
-	SPINE_CHECK(get_spine_object(),)
+	SPINE_CHECK(get_spine_object(), )
 	get_spine_constraint_data()->setSoftness(v);
 }
