@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dkpeve6qcxa70"
-path="res://.godot/imported/mix-and-match.png-c2d8e28d9f2efc380ff8b95a22dadcc3.ctex"
+uid="uid://couyrsq850nh6"
+path="res://.godot/imported/Raggedy Spineboy.png-8982b59aad5b612b7ed1a5da8b447d00.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/mix-and-match/mix-and-match.png"
-dest_files=["res://.godot/imported/mix-and-match.png-c2d8e28d9f2efc380ff8b95a22dadcc3.ctex"]
+source_file="res://assets/raggedyspineboy/Raggedy Spineboy.png"
+dest_files=["res://.godot/imported/Raggedy Spineboy.png-8982b59aad5b612b7ed1a5da8b447d00.ctex"]
 
 [params]
 

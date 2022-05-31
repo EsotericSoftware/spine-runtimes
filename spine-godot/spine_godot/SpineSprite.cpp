@@ -396,6 +396,7 @@ bool SpineSprite::_get(const StringName &property, Variant &value) const {
 }
 
 static void update_preview_animation(SpineSprite *sprite, const String &animation, bool frame, float time) {
+	if (!sprite->get_skeleton().is_valid()) return;
 	sprite->get_skeleton()->set_to_setup_pose();
 	if (EMPTY(animation) || animation == "-- Empty --") {
 		sprite->get_animation_state()->set_empty_animation(0, 0);

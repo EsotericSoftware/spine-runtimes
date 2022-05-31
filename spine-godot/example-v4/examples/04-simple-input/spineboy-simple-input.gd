@@ -1,6 +1,6 @@
 extends SpineSprite
 
-func _ready():	
+func _ready():
 	get_animation_state().set_animation("idle", true, 0)
 
 func _process(_delta):
