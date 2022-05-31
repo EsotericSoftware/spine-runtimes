@@ -15,6 +15,7 @@
   * `spVertexAttachment->deformAttachment` was renamed to `spVertexAttachment->timelineAttachment`.
   * `spSkeleton_update()` has been removed.
   * `spSkeleton->time` has been removed.
+  * `spVertexEffect` has been removed.
 
 ### SFML
   * Updated example to use SFML 2.5.1.
@@ -35,6 +36,7 @@
   * `VertexAttachment::getDeformAttachment()` was renamed to `VertexAttachment::getTimelineAttachment()`.
   * `Skeleton::update()` has been removed.
   * `Skeleton::getTime()` has been removed.
+  * `VertexEffect` has been removed.
   
 ### Cocos2d-x
 
@@ -104,6 +106,7 @@
   * `VertexAttachment#setDeformAttachment()` and `VertexAttachment#getDeformAttachment()` have been replaced with `VertexAttachment#setTimelineAttachment()` and `VertexAttachment#getTimelineAttachment()`.
   * `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The caller must ensure that the attachment's region is not `null`.
   * `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
+  * `VertexEffect` has been removed.
 
 
 ### libGDX
@@ -123,6 +126,7 @@
   * `RegionAttachment#updateOffset()` has been renamed to `RegionAttachment#updateRegion()`. The caller must ensure that the attachment's region is not `null`.
   * `RegionAttachment#computeWorldVertices()` takes a `Slot` instead of a `Bone` as the first argument.
   * Removed `PlayerEditor`.
+  * `VertexEffect` has been removed.
 
 ### WebGL backend
   * `PolygonBatcher.start()` now disables culling and restores the previous state on `PolygonBatcher.end()`.
