@@ -36,16 +36,21 @@ namespace Spine.Unity.Editor {
 	[CustomEditor(typeof(SkeletonAnimation))]
 	[CanEditMultipleObjects]
 	public class SkeletonAnimationInspector : SkeletonRendererInspector {
-		protected SerializedProperty animationName, loop, timeScale, autoReset;
+		protected SerializedProperty animationName, loop, timeScale, unscaledTime, autoReset;
 		protected bool wasAnimationParameterChanged = false;
 		readonly GUIContent LoopLabel = new GUIContent("Loop", "Whether or not .AnimationName should loop. This only applies to the initial animation specified in the inspector, or any subsequent Animations played through .AnimationName. Animations set through state.SetAnimation are unaffected.");
 		readonly GUIContent TimeScaleLabel = new GUIContent("Time Scale", "The rate at which animations progress over time. 1 means normal speed. 0.5 means 50% speed.");
+		readonly GUIContent UnscaledTimeLabel = new GUIContent("Unscaled Time",
+			"If enabled, AnimationState uses unscaled game time (Time.unscaledDeltaTime), " +
+				"running animations independent of e.g. game pause (Time.timeScale). " +
+				"Instance SkeletonAnimation.timeScale will still be applied.");
 
 		protected override void OnEnable () {
 			base.OnEnable();
 			animationName = serializedObject.FindProperty("_animationName");
 			loop = serializedObject.FindProperty("loop");
 			timeScale = serializedObject.FindProperty("timeScale");
+			unscaledTime = serializedObject.FindProperty("unscaledTime");
 		}
 
 		protected override void DrawInspectorGUI (bool multi) {
@@ -69,6 +74,7 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(loop, LoopLabel);
 			wasAnimationParameterChanged |= EditorGUI.EndChangeCheck(); // Value used in the next update.
 			EditorGUILayout.PropertyField(timeScale, TimeScaleLabel);
+			EditorGUILayout.PropertyField(unscaledTime, UnscaledTimeLabel);
 			foreach (var o in targets) {
 				var component = o as SkeletonAnimation;
 				component.timeScale = Mathf.Max(component.timeScale, 0);

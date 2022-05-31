@@ -77,7 +77,6 @@ namespace Spine.Unity {
 		/// reset to <c>UpdateMode.FullUpdate</c> when the mesh becomes visible again.</summary>
 		public UpdateMode updateWhenInvisible = UpdateMode.FullUpdate;
 
-		public bool unscaledTime;
 		public bool allowMultipleCanvasRenderers = false;
 		public List<CanvasRenderer> canvasRenderers = new List<CanvasRenderer>();
 		protected List<SkeletonSubmeshGraphic> submeshGraphics = new List<SkeletonSubmeshGraphic>();
@@ -498,6 +497,9 @@ namespace Spine.Unity {
 
 		[SerializeField] protected UpdateTiming updateTiming = UpdateTiming.InUpdate;
 		public UpdateTiming UpdateTiming { get { return updateTiming; } set { updateTiming = value; } }
+
+		[SerializeField] protected bool unscaledTime;
+		public bool UnscaledTime { get { return unscaledTime; } set { unscaledTime = value; } }
 
 		/// <summary> Occurs after the vertex data populated every frame, before the vertices are pushed into the mesh.</summary>
 		public event Spine.Unity.MeshGeneratorDelegate OnPostProcessVertices;
