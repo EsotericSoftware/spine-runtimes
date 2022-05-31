@@ -39,7 +39,7 @@ public:
 
 	CREATE_FUNC(RaptorExample);
 
-	virtual bool init();	
+	virtual bool init();
 
 private:
 	spine::SkeletonAnimation *skeletonNode;
