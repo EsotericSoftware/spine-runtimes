@@ -93,7 +93,7 @@ namespace Spine.Unity {
 		/// (<c>Time.unscaledDeltaTime</c> instead of the default Game Time(<c>Time.deltaTime</c>).
 		/// to animate independent of game <c>Time.timeScale</c>.
 		/// Instance SkeletonGraphic.timeScale and SkeletonAnimation.timeScale will still be applied.</summary>
-		public bool UnscaledTime { get; set; }
+		bool UnscaledTime { get; set; }
 	}
 
 	/// <summary>A Spine-Unity Component that holds a reference to a SkeletonRenderer.</summary>
