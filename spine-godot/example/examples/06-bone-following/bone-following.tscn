@@ -16,6 +16,7 @@ preview_frame = false
 preview_time = 0.0
 
 [node name="GunTipBone" type="SpineBoneNode" parent="Spineboy"]
+show_behind_parent = true
 position = Vector2( 214.298, -162.047 )
 rotation = 0.713316
 scale = Vector2( 1, 1 )

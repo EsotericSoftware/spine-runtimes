@@ -36,6 +36,7 @@ preview_frame = false
 preview_time = 0.0
 
 [node name="GunSlot" type="SpineSlotNode" parent="SpineSprite"]
+show_behind_parent = true
 position = Vector2( 40.8753, -276.036 )
 rotation = 0.837234
 scale = Vector2( 1, 1 )
