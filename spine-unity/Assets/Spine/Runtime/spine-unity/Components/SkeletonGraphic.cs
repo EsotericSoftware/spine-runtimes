@@ -653,7 +653,15 @@ namespace Spine.Unity {
 			var smartMesh = meshBuffers.GetNext();
 			bool updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, smartMesh.instructionUsed);
 			meshGenerator.Begin();
-			if (currentInstructions.hasActiveClipping && currentInstructions.submeshInstructions.Count > 0) {
+
+			bool useAddSubmesh = currentInstructions.hasActiveClipping && currentInstructions.submeshInstructions.Count > 0;
+#if UNITY_EDITOR
+			// Editor triggers Graphic.Rebuild without prior LateUpdate call, which
+			// can lead to filling unprepared vertex buffer and out-of-bounds write access.
+			if (!Application.isPlaying)
+				useAddSubmesh = true;
+#endif
+			if (useAddSubmesh) {
 				meshGenerator.AddSubmesh(currentInstructions.submeshInstructions.Items[0], updateTriangles);
 			} else {
 				meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
