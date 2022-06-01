@@ -30,6 +30,7 @@
 #if UNITY_EDITOR
 using System.ComponentModel;
 #endif
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -45,6 +46,13 @@ namespace Spine.Unity.Playables {
 		public int trackIndex = 0;
 
 		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
+			IEnumerable<TimelineClip> clips = this.GetClips();
+			foreach (TimelineClip clip in clips) {
+				var animationStateClip = clip.asset as SpineAnimationStateClip;
+				if (animationStateClip != null)
+					animationStateClip.timelineClip = clip;
+			}
+
 			var scriptPlayable = ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create(graph, inputCount);
 			var mixerBehaviour = scriptPlayable.GetBehaviour();
 			mixerBehaviour.trackIndex = this.trackIndex;
