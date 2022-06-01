@@ -34,6 +34,8 @@ These track types can be used to set animations at the AnimationState of the tar
 - *Track Index.* The target AnimationState track index to set animations at. Do not forget to set this value accordingly when using multiple timeline tracks.
 > **Important Note:** Currently it is required to order the timeline tracks with base track at the top and overlay tracks below, otherwise the Editor Preview will display incorrect results.
 
+- *Unscaled Time.* Whenever starting a new animation clip of this track, `SkeletonAnimation.UnscaledTime` (or `SkeletonGraphic.UnscaledTime` respectively) will be set to this value. This allows you to play back Timeline clips either in normal game time or unscaled game time. Note that `PlayableDirector.UpdateMethod` is ignored and replaced by this property, which allows more fine-granular control per Timeline track.
+
 ##### Spine Animation State Clip
 
 You can add a `Spine Animation State Clip` to a `SkeletonAnimation Track` (or `SkeletonGraphic Track`) by dragging an `AnimationReferenceAsset` onto a Timeline track. See the [SkeletonData - Preview](#Preview) section on how to generate `AnimationReferenceAssets` for a `SkeletonDataAsset`.
