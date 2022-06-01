@@ -44,6 +44,13 @@ namespace Spine.Unity.Playables {
 #endif
 	public class SpineAnimationStateTrack : TrackAsset {
 		public int trackIndex = 0;
+		[Tooltip("Whenever starting a new animation clip of this track, " +
+			"SkeletonAnimation.UnscaledTime will be set to this value. " +
+			"This allows you to play back Timeline clips either in normal game time " +
+			"or unscaled game time. Note that PlayableDirector.UpdateMethod " +
+			"is ignored and replaced by this property, which allows more fine-granular " +
+			"control per Timeline track.")]
+		public bool unscaledTime = false;
 
 		public override Playable CreateTrackMixer (PlayableGraph graph, GameObject go, int inputCount) {
 			IEnumerable<TimelineClip> clips = this.GetClips();
@@ -56,6 +63,7 @@ namespace Spine.Unity.Playables {
 			var scriptPlayable = ScriptPlayable<SpineAnimationStateMixerBehaviour>.Create(graph, inputCount);
 			var mixerBehaviour = scriptPlayable.GetBehaviour();
 			mixerBehaviour.trackIndex = this.trackIndex;
+			mixerBehaviour.unscaledTime = this.unscaledTime;
 			return scriptPlayable;
 		}
 	}
