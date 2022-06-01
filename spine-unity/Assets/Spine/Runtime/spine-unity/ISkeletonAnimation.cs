@@ -43,11 +43,6 @@ namespace Spine.Unity {
 		InFixedUpdate
 	}
 
-	public enum UpdateTimeScale {
-		GameTime = 0,
-		UnscaledGameTime
-	}
-
 	public delegate void ISkeletonAnimationDelegate (ISkeletonAnimation animated);
 	public delegate void UpdateBonesDelegate (ISkeletonAnimation animated);
 
