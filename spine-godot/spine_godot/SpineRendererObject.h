@@ -32,9 +32,16 @@
 
 #include <scene/resources/texture.h>
 
+#if VERSION_MAJOR > 3
+#include <scene/main/canvas_item.h>
+#endif
+
 struct SpineRendererObject {
 	Ref<Texture> texture;
 	Ref<Texture> normal_map;
+#if VERSION_MAJOR > 3
+	Ref<CanvasTexture> canvas_texture;
+#endif	
 };
 
 #endif

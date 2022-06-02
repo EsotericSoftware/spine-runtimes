@@ -471,8 +471,7 @@ static void add_triangles(MeshInstance2D *mesh_instance,
 						  const Vector<Point2> &uvs,
 						  const Vector<Color> &colors,
 						  const Vector<int> &indices,
-						  Ref<Texture> texture,
-						  Ref<Texture> normal_map) {
+						  SpineRendererObject *renderer_object) {
 #if VERSION_MAJOR > 3
 	RenderingServer::get_singleton()->canvas_item_add_triangle_array(mesh_instance->get_canvas_item(),
 																	 indices,
@@ -481,9 +480,11 @@ static void add_triangles(MeshInstance2D *mesh_instance,
 																	 uvs,
 																	 Vector<int>(),
 																	 Vector<float>(),
-																	 texture.is_null() ? RID() : texture->get_rid(),
+																	 renderer_object->canvas_texture.is_valid() ?  renderer_object->canvas_texture->get_rid() : RID(),
 																	 -1);
 #else
+	auto texture = renderer_object->texture;
+	auto normal_map = renderer_object->normal_map;
 	VisualServer::get_singleton()->canvas_item_add_triangle_array(mesh_instance->get_canvas_item(),
 																  indices,
 																  vertices,
@@ -514,17 +515,14 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 		spine::Color skeleton_color = skeleton->getColor();
 		spine::Color slot_color = slot->getColor();
 		spine::Color tint(skeleton_color.r * slot_color.r, skeleton_color.g * slot_color.g, skeleton_color.b * slot_color.b, skeleton_color.a * slot_color.a);
-		Ref<Texture> texture;
-		Ref<Texture> normal_map;
+		SpineRendererObject *renderer_object;
 		spine::Vector<float> *vertices = &scratch_vertices;
 		spine::Vector<float> *uvs;
 		spine::Vector<unsigned short> *indices;
 
 		if (attachment->getRTTI().isExactly(spine::RegionAttachment::rtti)) {
 			auto *region = (spine::RegionAttachment *) attachment;
-			auto renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) region->getRendererObject())->page->getRendererObject();
-			texture = renderer_object->texture;
-			normal_map = renderer_object->normal_map;
+			renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) region->getRendererObject())->page->getRendererObject();
 
 			vertices->setSize(8, 0);
 			region->computeWorldVertices(*slot, *vertices, 0);
@@ -538,9 +536,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 			tint.a *= attachment_color.a;
 		} else if (attachment->getRTTI().isExactly(spine::MeshAttachment::rtti)) {
 			auto *mesh = (spine::MeshAttachment *) attachment;
-			auto renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
-			texture = renderer_object->texture;
-			normal_map = renderer_object->normal_map;
+			renderer_object = (SpineRendererObject *) ((spine::AtlasRegion *) mesh->getRendererObject())->page->getRendererObject();
 
 			vertices->setSize(mesh->getWorldVerticesLength(), 0);
 			mesh->computeWorldVertices(*slot, *vertices);
@@ -588,7 +584,7 @@ void SpineSprite::update_meshes(Ref<SpineSkeleton> skeleton_ref) {
 				scratch_indices.set(j, indices->buffer()[j]);
 			}
 
-			add_triangles(mesh_instance, scratch_points, scratch_uvs, scratch_colors, scratch_indices, texture, normal_map);
+			add_triangles(mesh_instance, scratch_points, scratch_uvs, scratch_colors, scratch_indices, renderer_object);
 
 			spine::BlendMode blend_mode = slot->getData().getBlendMode();
 			Ref<Material> custom_material;

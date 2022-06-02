@@ -91,6 +91,12 @@ public:
 			renderer_object->normal_map = normal_map;
 		}
 
+#if VERSION_MAJOR > 3
+		renderer_object->canvas_texture.instantiate();
+		renderer_object->canvas_texture->set_diffuse_texture(renderer_object->texture);
+		renderer_object->canvas_texture->set_normal_texture(renderer_object->normal_map);
+#endif
+
 		page.setRendererObject((void *) renderer_object);
 		page.width = texture->get_width();
 		page.height = texture->get_height();
@@ -98,10 +104,11 @@ public:
 
 	void unload(void *data) override {
 		auto renderer_object = (SpineRendererObject *) data;
-		Ref<Texture> &texture = renderer_object->texture;
-		if (texture.is_valid()) texture.unref();
-		Ref<Texture> &normal_map = renderer_object->normal_map;
-		if (normal_map.is_valid()) normal_map.unref();
+		if (renderer_object->texture.is_valid()) renderer_object->texture.unref();
+		if (renderer_object->normal_map.is_valid()) renderer_object->normal_map.unref();
+#if VERSION_MAJOR > 3
+		if (renderer_object->canvas_texture.is_valid()) renderer_object->canvas_texture.unref();
+#endif
 		memdelete(renderer_object);
 	}
 };
