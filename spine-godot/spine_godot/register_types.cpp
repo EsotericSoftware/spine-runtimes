@@ -53,10 +53,10 @@
 #include "SpineBoneNode.h"
 #include "spine/Bone.h"
 
-static Ref<SpineAtlasResourceFormatLoader> atlas_loader;
-static Ref<SpineAtlasResourceFormatSaver> atlas_saver;
-static Ref<SpineSkeletonFileResourceFormatLoader> skeleton_file_loader;
-static Ref<SpineSkeletonFileResourceFormatSaver> skeleton_file_saver;
+static SpineAtlasResourceFormatLoader *atlas_loader;
+static SpineAtlasResourceFormatSaver *atlas_saver;
+static SpineSkeletonFileResourceFormatLoader *skeleton_file_loader;
+static SpineSkeletonFileResourceFormatSaver *skeleton_file_saver;
 
 #ifdef TOOLS_ENABLED
 #include "editor/editor_node.h"
@@ -112,28 +112,28 @@ void register_spine_godot_types() {
 	GDREGISTER_CLASS(SpineAnimationTrack);
 
 #if VERSION_MAJOR > 3
-	atlas_loader.instantiate();
+	atlas_loader = memnew(SpineAtlasResourceFormatLoader);
 	ResourceLoader::add_resource_format_loader(atlas_loader);
 
-	atlas_saver.instantiate();
+	atlas_saver = memnew(SpineAtlasResourceFormatSaver);
 	ResourceSaver::add_resource_format_saver(atlas_saver);
 
-	skeleton_file_loader.instantiate();
+	skeleton_file_loader = memnew(SpineSkeletonFileResourceFormatLoader);
 	ResourceLoader::add_resource_format_loader(skeleton_file_loader);
 
-	skeleton_file_saver.instantiate();
+	skeleton_file_saver = memnew(SpineSkeletonFileResourceFormatSaver);
 	ResourceSaver::add_resource_format_saver(skeleton_file_saver);
 #else
-	atlas_loader.instance();
+	atlas_loader = memnew(SpineAtlasResourceFormatLoader);
 	ResourceLoader::add_resource_format_loader(atlas_loader);
 
-	atlas_saver.instance();
+	atlas_saver = memnew(SpineAtlasResourceFormatSaver);
 	ResourceSaver::add_resource_format_saver(atlas_saver);
 
-	skeleton_file_loader.instance();
+	skeleton_file_loader = memnew(SpineSkeletonFileResourceFormatLoader);
 	ResourceLoader::add_resource_format_loader(skeleton_file_loader);
 
-	skeleton_file_saver.instance();
+	skeleton_file_saver = memnew(SpineSkeletonFileResourceFormatSaver);
 	ResourceSaver::add_resource_format_saver(skeleton_file_saver);
 #endif
 }
@@ -144,14 +144,12 @@ void uninitialize_spine_godot_module(ModuleInitializationLevel level) {
 void unregister_spine_godot_types() {
 #endif
 	ResourceLoader::remove_resource_format_loader(atlas_loader);
-	atlas_loader.unref();
-
 	ResourceSaver::remove_resource_format_saver(atlas_saver);
-	atlas_saver.unref();
-
 	ResourceLoader::remove_resource_format_loader(skeleton_file_loader);
-	skeleton_file_loader.unref();
-
 	ResourceSaver::remove_resource_format_saver(skeleton_file_saver);
-	skeleton_file_saver.unref();
+	
+	memdelete(atlas_loader);
+	memdelete(atlas_saver);
+	memdelete(skeleton_file_saver);
+	memdelete(skeleton_file_loader);
 }
