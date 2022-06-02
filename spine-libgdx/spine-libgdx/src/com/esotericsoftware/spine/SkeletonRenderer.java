@@ -33,9 +33,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ShortArray;
 
@@ -53,12 +51,6 @@ public class SkeletonRenderer {
 	private boolean pmaColors, pmaBlendModes;
 	private final FloatArray vertices = new FloatArray(32);
 	private final SkeletonClipping clipper = new SkeletonClipping();
-	private final Vector2 temp = new Vector2();
-	private final Vector2 temp2 = new Vector2();
-	private final Color temp3 = new Color();
-	private final Color temp4 = new Color();
-	private final Color temp5 = new Color();
-	private final Color temp6 = new Color();
 
 	/** Renders the specified skeleton. If the batch is a PolygonSpriteBatch, {@link #draw(PolygonSpriteBatch, Skeleton)} is
 	 * called. If the batch is a TwoColorPolygonBatch, {@link #draw(TwoColorPolygonBatch, Skeleton)} is called. Otherwise the
@@ -142,10 +134,6 @@ public class SkeletonRenderer {
 	public void draw (PolygonSpriteBatch batch, Skeleton skeleton) {
 		if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
-
-		Vector2 tempPosition = this.temp, tempUV = this.temp2;
-		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
-		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
 
 		boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
 		BlendMode blendMode = null;
@@ -245,10 +233,6 @@ public class SkeletonRenderer {
 		if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
 		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
 
-		Vector2 tempPosition = this.temp, tempUV = this.temp2;
-		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
-		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
-
 		boolean pmaColors = this.pmaColors, pmaBlendModes = this.pmaBlendModes;
 		batch.setPremultipliedAlpha(pmaColors);
 		BlendMode blendMode = null;
@@ -346,44 +330,6 @@ public class SkeletonRenderer {
 			clipper.clipEnd(slot);
 		}
 		clipper.clipEnd();
-	}
-
-	private void applyVertexEffect (float[] vertices, int verticesLength, int stride, float light, float dark) {
-		Vector2 tempPosition = this.temp, tempUV = this.temp2;
-		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
-		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
-		tempLight1.set(NumberUtils.floatToIntColor(light));
-		tempDark1.set(NumberUtils.floatToIntColor(dark));
-		if (stride == 5) {
-			for (int v = 0; v < verticesLength; v += stride) {
-				tempPosition.x = vertices[v];
-				tempPosition.y = vertices[v + 1];
-				tempUV.x = vertices[v + 3];
-				tempUV.y = vertices[v + 4];
-				tempLight2.set(tempLight1);
-				tempDark2.set(tempDark1);
-				vertices[v] = tempPosition.x;
-				vertices[v + 1] = tempPosition.y;
-				vertices[v + 2] = tempLight2.toFloatBits();
-				vertices[v + 3] = tempUV.x;
-				vertices[v + 4] = tempUV.y;
-			}
-		} else {
-			for (int v = 0; v < verticesLength; v += stride) {
-				tempPosition.x = vertices[v];
-				tempPosition.y = vertices[v + 1];
-				tempUV.x = vertices[v + 4];
-				tempUV.y = vertices[v + 5];
-				tempLight2.set(tempLight1);
-				tempDark2.set(tempDark1);
-				vertices[v] = tempPosition.x;
-				vertices[v + 1] = tempPosition.y;
-				vertices[v + 2] = tempLight2.toFloatBits();
-				vertices[v + 3] = tempDark2.toFloatBits();
-				vertices[v + 4] = tempUV.x;
-				vertices[v + 5] = tempUV.y;
-			}
-		}
 	}
 
 	public boolean getPremultipliedAlphaColors () {
