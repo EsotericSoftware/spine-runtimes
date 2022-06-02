@@ -148,8 +148,8 @@ void unregister_spine_godot_types() {
 	ResourceLoader::remove_resource_format_loader(skeleton_file_loader);
 	ResourceSaver::remove_resource_format_saver(skeleton_file_saver);
 	
-	memdelete(atlas_loader);
+	/*memdelete(atlas_loader);
 	memdelete(atlas_saver);
 	memdelete(skeleton_file_saver);
-	memdelete(skeleton_file_loader);
+	memdelete(skeleton_file_loader);*/
 }
