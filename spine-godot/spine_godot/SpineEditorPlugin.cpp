@@ -167,7 +167,6 @@ void SpineEditorPropertyAnimationMixes::update_property() {
 	if (container) {
 		set_bottom_editor(nullptr);
 		memdelete(container);
-		container->queue_delete();
 		container = nullptr;
 	}
 
