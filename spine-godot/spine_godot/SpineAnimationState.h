@@ -60,6 +60,8 @@ public:
 
 	void clear_track(int track_id);
 
+	int get_num_tracks();
+
 	Ref<SpineTrackEntry> set_animation(const String &animation_name, bool loop, int track_id);
 
 	Ref<SpineTrackEntry> add_animation(const String &animation_name, float delay, bool loop, int track_id);

@@ -35,6 +35,7 @@ void SpineAnimationState::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("apply", "skeleton"), &SpineAnimationState::apply);
 	ClassDB::bind_method(D_METHOD("clear_tracks"), &SpineAnimationState::clear_tracks);
 	ClassDB::bind_method(D_METHOD("clear_track"), &SpineAnimationState::clear_track);
+	ClassDB::bind_method(D_METHOD("get_num_tracks"), &SpineAnimationState::get_num_tracks);
 	ClassDB::bind_method(D_METHOD("set_animation", "animation_name", "loop", "track_id"), &SpineAnimationState::set_animation, DEFVAL(true), DEFVAL(0));
 	ClassDB::bind_method(D_METHOD("add_animation", "animation_name", "delay", "loop", "track_id"), &SpineAnimationState::add_animation, DEFVAL(0), DEFVAL(true), DEFVAL(0));
 	ClassDB::bind_method(D_METHOD("set_empty_animation", "track_id", "mix_duration"), &SpineAnimationState::set_empty_animation);
@@ -82,6 +83,16 @@ void SpineAnimationState::clear_track(int track_id) {
 	SPINE_CHECK(animation_state, )
 	animation_state->clearTrack(track_id);
 }
+
+int SpineAnimationState::get_num_tracks() {
+	SPINE_CHECK(animation_state, 0)
+	int highest_index = -1;
+	for (int i = 0; i < animation_state->getTracks().size(); i++) {
+		if (animation_state->getTracks()[i]) highest_index = i;
+	}
+	return highest_index + 1;
+}
+
 
 Ref<SpineTrackEntry> SpineAnimationState::set_animation(const String &animation_name, bool loop, int track) {
 	SPINE_CHECK(animation_state, nullptr)
