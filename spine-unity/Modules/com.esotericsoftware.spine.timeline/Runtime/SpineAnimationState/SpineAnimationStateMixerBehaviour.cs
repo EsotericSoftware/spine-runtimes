@@ -40,6 +40,7 @@ namespace Spine.Unity.Playables {
 		float[] lastInputWeights;
 		bool lastAnyClipPlaying = false;
 		public int trackIndex;
+		public bool unscaledTime;
 		ScriptPlayable<SpineAnimationStateBehaviour>[] startingClips
 			= new ScriptPlayable<SpineAnimationStateBehaviour>[2];
 
@@ -177,6 +178,8 @@ namespace Spine.Unity.Playables {
 					state.SetEmptyAnimation(trackIndex, mixDuration);
 				} else {
 					if (clipData.animationReference.Animation != null) {
+						animationStateComponent.UnscaledTime = this.unscaledTime;
+
 						TrackEntry currentEntry = state.GetCurrent(trackIndex);
 						Spine.TrackEntry trackEntry;
 						float customMixDuration = clipData.customDuration ? GetCustomMixDuration(clipData) : 0.0f;

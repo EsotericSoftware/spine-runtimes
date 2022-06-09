@@ -39,11 +39,15 @@ namespace Spine.Unity {
 		public MecanimTranslator Translator { get { return translator; } }
 		private bool wasUpdatedAfterInit = true;
 
-		#region Bone Callbacks (ISkeletonAnimation)
+		#region Bone and Initialization Callbacks ISkeletonAnimation
+		protected event ISkeletonAnimationDelegate _OnAnimationRebuild;
 		protected event UpdateBonesDelegate _BeforeApply;
 		protected event UpdateBonesDelegate _UpdateLocal;
 		protected event UpdateBonesDelegate _UpdateWorld;
 		protected event UpdateBonesDelegate _UpdateComplete;
+
+		/// <summary>OnAnimationRebuild is raised after the SkeletonAnimation component is successfully initialized.</summary>
+		public event ISkeletonAnimationDelegate OnAnimationRebuild { add { _OnAnimationRebuild += value; } remove { _OnAnimationRebuild -= value; } }
 
 		/// <summary>
 		/// Occurs before the animations are applied.
@@ -87,6 +91,9 @@ namespace Spine.Unity {
 			if (translator == null) translator = new MecanimTranslator();
 			translator.Initialize(GetComponent<Animator>(), this.skeletonDataAsset);
 			wasUpdatedAfterInit = false;
+
+			if (_OnAnimationRebuild != null)
+				_OnAnimationRebuild(this);
 		}
 
 		public virtual void Update () {

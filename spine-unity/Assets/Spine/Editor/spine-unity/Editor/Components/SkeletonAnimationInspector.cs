@@ -74,11 +74,11 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.PropertyField(loop, LoopLabel);
 			wasAnimationParameterChanged |= EditorGUI.EndChangeCheck(); // Value used in the next update.
 			EditorGUILayout.PropertyField(timeScale, TimeScaleLabel);
-			EditorGUILayout.PropertyField(unscaledTime, UnscaledTimeLabel);
 			foreach (var o in targets) {
 				var component = o as SkeletonAnimation;
 				component.timeScale = Mathf.Max(component.timeScale, 0);
 			}
+			EditorGUILayout.PropertyField(unscaledTime, UnscaledTimeLabel);
 
 			EditorGUILayout.Space();
 			SkeletonRootMotionParameter();

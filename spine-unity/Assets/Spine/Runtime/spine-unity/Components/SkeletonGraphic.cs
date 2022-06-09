@@ -490,6 +490,8 @@ namespace Spine.Unity {
 			}
 		}
 
+		/// <summary>OnAnimationRebuild is raised after the SkeletonAnimation component is successfully initialized.</summary>
+		public event ISkeletonAnimationDelegate OnAnimationRebuild;
 		public event UpdateBonesDelegate BeforeApply;
 		public event UpdateBonesDelegate UpdateLocal;
 		public event UpdateBonesDelegate UpdateWorld;
@@ -542,12 +544,6 @@ namespace Spine.Unity {
 
 			if (skeletonDataAsset.atlasAssets.Length <= 0 || skeletonDataAsset.atlasAssets[0].MaterialCount <= 0) return;
 
-			this.state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
-			if (state == null) {
-				Clear();
-				return;
-			}
-
 			this.skeleton = new Skeleton(skeletonData) {
 				ScaleX = this.initialFlipX ? -1 : 1,
 				ScaleY = this.initialFlipY ? -1 : 1
@@ -565,7 +561,16 @@ namespace Spine.Unity {
 			for (int i = 0; i < separatorSlotNames.Length; i++)
 				separatorSlots.Add(skeleton.FindSlot(separatorSlotNames[i]));
 
+			if (OnRebuild != null)
+				OnRebuild(this);
+
 			wasUpdatedAfterInit = false;
+			this.state = new Spine.AnimationState(skeletonDataAsset.GetAnimationStateData());
+			if (state == null) {
+				Clear();
+				return;
+			}
+
 			if (!string.IsNullOrEmpty(startingAnimation)) {
 				var animationObject = skeletonDataAsset.GetSkeletonData(false).FindAnimation(startingAnimation);
 				if (animationObject != null) {
@@ -577,8 +582,8 @@ namespace Spine.Unity {
 				}
 			}
 
-			if (OnRebuild != null)
-				OnRebuild(this);
+			if (OnAnimationRebuild != null)
+				OnAnimationRebuild(this);
 		}
 
 		public void PrepareInstructionsAndRenderers () {
@@ -648,7 +653,15 @@ namespace Spine.Unity {
 			var smartMesh = meshBuffers.GetNext();
 			bool updateTriangles = SkeletonRendererInstruction.GeometryNotEqual(currentInstructions, smartMesh.instructionUsed);
 			meshGenerator.Begin();
-			if (currentInstructions.hasActiveClipping && currentInstructions.submeshInstructions.Count > 0) {
+
+			bool useAddSubmesh = currentInstructions.hasActiveClipping && currentInstructions.submeshInstructions.Count > 0;
+#if UNITY_EDITOR
+			// Editor triggers Graphic.Rebuild without prior LateUpdate call, which
+			// can lead to filling unprepared vertex buffer and out-of-bounds write access.
+			if (!Application.isPlaying)
+				useAddSubmesh = true;
+#endif
+			if (useAddSubmesh) {
 				meshGenerator.AddSubmesh(currentInstructions.submeshInstructions.Items[0], updateTriangles);
 			} else {
 				meshGenerator.BuildMeshWithArrays(currentInstructions, updateTriangles);
