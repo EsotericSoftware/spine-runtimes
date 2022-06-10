@@ -161,7 +161,8 @@ Error SpineAtlasResource::load_from_atlas_file(const String &path) {
 
 	clear();
 	texture_loader = new GodotSpineTextureLoader(&textures, &normal_maps, normal_map_prefix);
-	atlas = new spine::Atlas(atlas_data.utf8(), atlas_data.size(), source_path.get_base_dir().utf8(), texture_loader);
+	auto atlas_utf8 = atlas_data.utf8();
+	atlas = new spine::Atlas(atlas_utf8, atlas_utf8.length(), source_path.get_base_dir().utf8(), texture_loader);
 	if (atlas) return OK;
 
 	clear();

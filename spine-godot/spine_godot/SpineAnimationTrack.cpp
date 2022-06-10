@@ -274,7 +274,6 @@ void SpineAnimationTrack::update_animation_state(const Variant &variant_sprite) 
 		auto animation_player_path = scene_path.rel_path_to(animation_player->get_path());
 		for (int i = 0; i < edited_animation->get_track_count(); i++) {
 			auto path = edited_animation->track_get_path(i);
-			auto node = Node::get_node_or_null(path);
 			if (path == animation_player_path) {
 				found_track_index = i;
 				break;
