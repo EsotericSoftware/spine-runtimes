@@ -2471,6 +2471,8 @@ public class Animation {
 				if (!(slotAttachment instanceof VertexAttachment)
 					|| ((VertexAttachment)slotAttachment).getTimelineAttachment() != attachment) return;
 			}
+			Sequence sequence = ((HasTextureRegion)slotAttachment).getSequence();
+			if (sequence == null) return;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
@@ -2483,7 +2485,7 @@ public class Animation {
 			int modeAndIndex = (int)frames[i + MODE];
 			float delay = frames[i + DELAY];
 
-			int index = modeAndIndex >> 4, count = attachment.getSequence().getRegions().length;
+			int index = modeAndIndex >> 4, count = sequence.getRegions().length;
 			SequenceMode mode = SequenceMode.values[modeAndIndex & 0xf];
 			if (mode != SequenceMode.hold) {
 				index += (time - before) / delay + 0.00001f;
