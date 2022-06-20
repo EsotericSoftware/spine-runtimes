@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSkin" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="add_skin">
+			<return type="void" />
+			<argument index="0" name="other" type="SpineSkin" />
+			<description>
+			</description>
+		</method>
+		<method name="copy_skin">
+			<return type="void" />
+			<argument index="0" name="other" type="SpineSkin" />
+			<description>
+			</description>
+		</method>
+		<method name="find_attachments_for_slot">
+			<return type="Array" />
+			<argument index="0" name="slot_index" type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="find_names_for_slot">
+			<return type="Array" />
+			<argument index="0" name="slot_index" type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="get_attachment">
+			<return type="SpineAttachment" />
+			<argument index="0" name="slot_index" type="int" />
+			<argument index="1" name="name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_attachments">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_bones">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_constraints">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_name">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="remove_attachment">
+			<return type="void" />
+			<argument index="0" name="slot_index" type="int" />
+			<argument index="1" name="name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="set_attachment">
+			<return type="void" />
+			<argument index="0" name="slot_index" type="int" />
+			<argument index="1" name="name" type="String" />
+			<argument index="2" name="attachment" type="SpineAttachment" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

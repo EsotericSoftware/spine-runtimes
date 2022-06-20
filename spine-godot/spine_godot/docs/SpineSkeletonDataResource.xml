@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSkeletonDataResource" inherits="Resource" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="find_animation" qualifiers="const">
+			<return type="SpineAnimation" />
+			<argument index="0" name="animation_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="find_bone" qualifiers="const">
+			<return type="SpineBoneData" />
+			<argument index="0" name="bone_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="find_event" qualifiers="const">
+			<return type="SpineEventData" />
+			<argument index="0" name="event_data_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="find_ik_constraint_data" qualifiers="const">
+			<return type="SpineIkConstraintData" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="find_path_constraint_data" qualifiers="const">
+			<return type="SpinePathConstraintData" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="find_skin" qualifiers="const">
+			<return type="SpineSkin" />
+			<argument index="0" name="skin_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="find_slot" qualifiers="const">
+			<return type="SpineSlotData" />
+			<argument index="0" name="slot_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="find_transform_constraint_data" qualifiers="const">
+			<return type="SpineTransformConstraintData" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_animations" qualifiers="const">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_audio_path" qualifiers="const">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_bones" qualifiers="const">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_default_skin" qualifiers="const">
+			<return type="SpineSkin" />
+			<description>
+			</description>
+		</method>
+		<method name="get_events" qualifiers="const">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_fps" qualifiers="const">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_hash" qualifiers="const">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_height" qualifiers="const">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_ik_constraints" qualifiers="const">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_images_path" qualifiers="const">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_path_constraints" qualifiers="const">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_skeleton_name" qualifiers="const">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_skins" qualifiers="const">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_slots" qualifiers="const">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_transform_constraints" qualifiers="const">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_version" qualifiers="const">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_width" qualifiers="const">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_x" qualifiers="const">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_y" qualifiers="const">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="is_skeleton_data_loaded" qualifiers="const">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_default_skin">
+			<return type="void" />
+			<argument index="0" name="skin" type="SpineSkin" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="animation_mixes" type="Array" setter="set_animation_mixes" getter="get_animation_mixes" default="[  ]">
+		</member>
+		<member name="atlas_res" type="SpineAtlasResource" setter="set_atlas_res" getter="get_atlas_res">
+		</member>
+		<member name="default_mix" type="float" setter="set_default_mix" getter="get_default_mix" default="0.0">
+		</member>
+		<member name="skeleton_file_res" type="SpineSkeletonFileResource" setter="set_skeleton_file_res" getter="get_skeleton_file_res">
+		</member>
+	</members>
+	<signals>
+		<signal name="_internal_spine_objects_invalidated">
+			<description>
+			</description>
+		</signal>
+		<signal name="skeleton_data_changed">
+			<description>
+			</description>
+		</signal>
+	</signals>
+	<constants>
+	</constants>
+</class>

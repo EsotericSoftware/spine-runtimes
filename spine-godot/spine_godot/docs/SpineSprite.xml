@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSprite" inherits="Node2D" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_animation_state">
+			<return type="SpineAnimationState" />
+			<description>
+			</description>
+		</method>
+		<method name="get_global_bone_transform">
+			<return type="Transform2D" />
+			<argument index="0" name="bone_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_skeleton">
+			<return type="SpineSkeleton" />
+			<description>
+			</description>
+		</method>
+		<method name="new_skin">
+			<return type="SpineSkin" />
+			<argument index="0" name="name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="on_skeleton_data_changed">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="set_global_bone_transform">
+			<return type="void" />
+			<argument index="0" name="bone_name" type="String" />
+			<argument index="1" name="global_transform" type="Transform2D" />
+			<description>
+			</description>
+		</method>
+		<method name="update_skeleton">
+			<return type="void" />
+			<argument index="0" name="delta" type="float" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="additive_material" type="Material" setter="set_additive_material" getter="get_additive_material">
+		</member>
+		<member name="bones" type="bool" setter="set_debug_bones" getter="get_debug_bones" default="false">
+		</member>
+		<member name="bones_color" type="Color" setter="set_debug_bones_color" getter="get_debug_bones_color" default="Color( 1, 1, 0, 0.5 )">
+		</member>
+		<member name="bones_thickness" type="float" setter="set_debug_bones_thickness" getter="get_debug_bones_thickness" default="5.0">
+		</member>
+		<member name="bounding_boxes" type="bool" setter="set_debug_bounding_boxes" getter="get_debug_bounding_boxes" default="false">
+		</member>
+		<member name="bounding_boxes_color" type="Color" setter="set_debug_bounding_boxes_color" getter="get_debug_bounding_boxes_color" default="Color( 0, 1, 0, 0.5 )">
+		</member>
+		<member name="clipping" type="bool" setter="set_debug_clipping" getter="get_debug_clipping" default="false">
+		</member>
+		<member name="meshes" type="bool" setter="set_debug_meshes" getter="get_debug_meshes" default="false">
+		</member>
+		<member name="meshes_color" type="Color" setter="set_debug_meshes_color" getter="get_debug_meshes_color" default="Color( 0, 0, 1, 0.5 )">
+		</member>
+		<member name="multiply_material" type="Material" setter="set_multiply_material" getter="get_multiply_material">
+		</member>
+		<member name="normal_material" type="Material" setter="set_normal_material" getter="get_normal_material">
+		</member>
+		<member name="paths" type="bool" setter="set_debug_paths" getter="get_debug_paths" default="false">
+		</member>
+		<member name="paths_clipping" type="Color" setter="set_debug_clipping_color" getter="get_debug_clipping_color" default="Color( 0.8, 0, 0, 0.8 )">
+		</member>
+		<member name="paths_color" type="Color" setter="set_debug_paths_color" getter="get_debug_paths_color" default="Color( 1, 0.498039, 0, 0.466667 )">
+		</member>
+		<member name="regions" type="bool" setter="set_debug_regions" getter="get_debug_regions" default="false">
+		</member>
+		<member name="regions_color" type="Color" setter="set_debug_regions_color" getter="get_debug_regions_color" default="Color( 0, 0, 1, 0.5 )">
+		</member>
+		<member name="screen_material" type="Material" setter="set_screen_material" getter="get_screen_material">
+		</member>
+		<member name="skeleton_data_res" type="SpineSkeletonDataResource" setter="set_skeleton_data_res" getter="get_skeleton_data_res">
+		</member>
+		<member name="update_mode" type="int" setter="set_update_mode" getter="get_update_mode" enum="SpineConstant.UpdateMode" default="0">
+		</member>
+	</members>
+	<signals>
+		<signal name="_internal_spine_objects_invalidated">
+			<description>
+			</description>
+		</signal>
+		<signal name="animation_completed">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<argument index="1" name="animation_state" type="Object" />
+			<argument index="2" name="track_entry" type="Object" />
+			<description>
+			</description>
+		</signal>
+		<signal name="animation_disposed">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<argument index="1" name="animation_state" type="Object" />
+			<argument index="2" name="track_entry" type="Object" />
+			<description>
+			</description>
+		</signal>
+		<signal name="animation_ended">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<argument index="1" name="animation_state" type="Object" />
+			<argument index="2" name="track_entry" type="Object" />
+			<description>
+			</description>
+		</signal>
+		<signal name="animation_event">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<argument index="1" name="animation_state" type="Object" />
+			<argument index="2" name="track_entry" type="Object" />
+			<argument index="3" name="event" type="Object" />
+			<description>
+			</description>
+		</signal>
+		<signal name="animation_interrupted">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<argument index="1" name="animation_state" type="Object" />
+			<argument index="2" name="track_entry" type="Object" />
+			<description>
+			</description>
+		</signal>
+		<signal name="animation_started">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<argument index="1" name="animation_state" type="Object" />
+			<argument index="2" name="track_entry" type="Object" />
+			<description>
+			</description>
+		</signal>
+		<signal name="before_animation_state_apply">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<description>
+			</description>
+		</signal>
+		<signal name="before_animation_state_update">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<description>
+			</description>
+		</signal>
+		<signal name="before_world_transforms_change">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<description>
+			</description>
+		</signal>
+		<signal name="world_transforms_changed">
+			<argument index="0" name="spine_sprite" type="Object" />
+			<description>
+			</description>
+		</signal>
+	</signals>
+	<constants>
+	</constants>
+</class>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpinePathConstraintData" inherits="SpineConstraintData" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_bones">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_rotate">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_offset_rotation">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_position">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_position_mode">
+			<return type="int" enum="SpineConstant.PositionMode" />
+			<description>
+			</description>
+		</method>
+		<method name="get_rotate_mode">
+			<return type="int" enum="SpineConstant.RotateMode" />
+			<description>
+			</description>
+		</method>
+		<method name="get_spacing">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_spacing_mode">
+			<return type="int" enum="SpineConstant.SpacingMode" />
+			<description>
+			</description>
+		</method>
+		<method name="get_target">
+			<return type="SpineSlotData" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_rotate">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_offset_rotation">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_position">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_position_mode">
+			<return type="void" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.PositionMode" />
+			<description>
+			</description>
+		</method>
+		<method name="set_rotate_mode">
+			<return type="void" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.RotateMode" />
+			<description>
+			</description>
+		</method>
+		<method name="set_spacing">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_spacing_mode">
+			<return type="void" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.SpacingMode" />
+			<description>
+			</description>
+		</method>
+		<method name="set_target">
+			<return type="void" />
+			<argument index="0" name="v" type="SpineSlotData" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

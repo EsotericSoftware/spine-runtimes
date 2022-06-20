@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpinePathConstraint" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_bones">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_data">
+			<return type="SpinePathConstraintData" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_rotate">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_order">
+			<return type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="get_position">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_spacing">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_target">
+			<return type="SpineSlot" />
+			<description>
+			</description>
+		</method>
+		<method name="is_active">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_active">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_rotate">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_position">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_spacing">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_target">
+			<return type="void" />
+			<argument index="0" name="v" type="SpineSlot" />
+			<description>
+			</description>
+		</method>
+		<method name="update">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

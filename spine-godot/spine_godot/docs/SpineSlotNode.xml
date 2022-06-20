@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSlotNode" inherits="Node2D" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+	</methods>
+	<members>
+		<member name="additive_material" type="Material" setter="set_additive_material" getter="get_additive_material">
+		</member>
+		<member name="multiply_material" type="Material" setter="set_multiply_material" getter="get_multiply_material">
+		</member>
+		<member name="normal_material" type="Material" setter="set_normal_material" getter="get_normal_material">
+		</member>
+		<member name="screen_material" type="Material" setter="set_screen_material" getter="get_screen_material">
+		</member>
+	</members>
+	<constants>
+	</constants>
+</class>

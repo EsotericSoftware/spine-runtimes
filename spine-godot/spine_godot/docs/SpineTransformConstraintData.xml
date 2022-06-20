@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineTransformConstraintData" inherits="SpineConstraintData" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_bones">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_rotate">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_scale_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_scale_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_shear_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_offset_rotation">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_offset_scale_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_offset_scale_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_offset_shear_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_offset_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_offset_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_target">
+			<return type="SpineBoneData" />
+			<description>
+			</description>
+		</method>
+		<method name="is_local">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="is_relative">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

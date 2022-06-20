@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineAnimationState" inherits="Reference" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="add_animation">
+			<return type="SpineTrackEntry" />
+			<argument index="0" name="animation_name" type="String" />
+			<argument index="1" name="delay" type="float" default="0" />
+			<argument index="2" name="loop" type="bool" default="true" />
+			<argument index="3" name="track_id" type="int" default="0" />
+			<description>
+			</description>
+		</method>
+		<method name="add_empty_animation">
+			<return type="SpineTrackEntry" />
+			<argument index="0" name="track_id" type="int" />
+			<argument index="1" name="mix_duration" type="float" />
+			<argument index="2" name="delay" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="apply">
+			<return type="bool" />
+			<argument index="0" name="skeleton" type="SpineSkeleton" />
+			<description>
+			</description>
+		</method>
+		<method name="clear_track">
+			<return type="void" />
+			<argument index="0" name="arg0" type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="clear_tracks">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="disable_queue">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="enable_queue">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="get_current">
+			<return type="SpineTrackEntry" />
+			<argument index="0" name="track_id" type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="get_num_tracks">
+			<return type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="get_time_scale">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_animation">
+			<return type="SpineTrackEntry" />
+			<argument index="0" name="animation_name" type="String" />
+			<argument index="1" name="loop" type="bool" default="true" />
+			<argument index="2" name="track_id" type="int" default="0" />
+			<description>
+			</description>
+		</method>
+		<method name="set_empty_animation">
+			<return type="SpineTrackEntry" />
+			<argument index="0" name="track_id" type="int" />
+			<argument index="1" name="mix_duration" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_empty_animations">
+			<return type="void" />
+			<argument index="0" name="mix_duration" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_time_scale">
+			<return type="void" />
+			<argument index="0" name="time_scale" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="update">
+			<return type="void" />
+			<argument index="0" name="delta" type="float" default="0" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

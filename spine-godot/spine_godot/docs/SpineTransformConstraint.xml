@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineTransformConstraint" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_bones">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_data">
+			<return type="SpineTransformConstraintData" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_rotate">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_scale_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_scale_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_shear_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_target">
+			<return type="SpineBone" />
+			<description>
+			</description>
+		</method>
+		<method name="is_active">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_active">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_rotate">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_scale_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_scale_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_shear_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_target">
+			<return type="void" />
+			<argument index="0" name="v" type="SpineBone" />
+			<description>
+			</description>
+		</method>
+		<method name="update">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

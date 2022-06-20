@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineTrackEntry" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_alpha">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_animation">
+			<return type="SpineAnimation" />
+			<description>
+			</description>
+		</method>
+		<method name="get_animation_end">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_animation_last">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_animation_start">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_animation_time">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_attachment_threshold">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_delay">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_draw_order_threshold">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_event_threshold">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_hold_previous">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="get_loop">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_blend">
+			<return type="int" enum="SpineConstant.MixBlend" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_duration">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix_time">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mixing_from">
+			<return type="SpineTrackEntry" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mixing_to">
+			<return type="SpineTrackEntry" />
+			<description>
+			</description>
+		</method>
+		<method name="get_next">
+			<return type="SpineTrackEntry" />
+			<description>
+			</description>
+		</method>
+		<method name="get_previous">
+			<return type="SpineTrackEntry" />
+			<description>
+			</description>
+		</method>
+		<method name="get_reverse">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="get_shortest_rotation">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="get_time_scale">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_track_complete">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_track_end">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_track_index">
+			<return type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="get_track_time">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="is_complete">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="reset_rotation_directions">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="set_alpha">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_animation_end">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_animation_last">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_animation_start">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_attachment_threshold">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_delay">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_draw_order_threshold">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_event_threshold">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_hold_previous">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_loop">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_blend">
+			<return type="void" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.MixBlend" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_duration">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix_time">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_reverse">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_shortest_rotation">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_time_scale">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_track_end">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_track_time">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

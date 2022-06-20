@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineBoneData" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_bone_name">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_color">
+			<return type="Color" />
+			<description>
+			</description>
+		</method>
+		<method name="get_index">
+			<return type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="get_length">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_parent">
+			<return type="SpineBoneData" />
+			<description>
+			</description>
+		</method>
+		<method name="get_rotation">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_scale_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_scale_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_shear_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_shear_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_transform_mode">
+			<return type="int" enum="SpineConstant.TransformMode" />
+			<description>
+			</description>
+		</method>
+		<method name="get_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="is_skin_required">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_color">
+			<return type="void" />
+			<argument index="0" name="v" type="Color" />
+			<description>
+			</description>
+		</method>
+		<method name="set_length">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_rotation">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_scale_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_scale_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_shear_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_shear_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_skin_required">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_transform_mode">
+			<return type="void" />
+			<argument index="0" name="v" type="int" enum="SpineConstant.TransformMode" />
+			<description>
+			</description>
+		</method>
+		<method name="set_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

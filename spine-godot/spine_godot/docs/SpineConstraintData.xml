@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineConstraintData" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_constraint_name">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_order">
+			<return type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="is_skin_required">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_order">
+			<return type="void" />
+			<argument index="0" name="v" type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="set_skin_required">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

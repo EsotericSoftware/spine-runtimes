@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSlot" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_attachment">
+			<return type="SpineAttachment" />
+			<description>
+			</description>
+		</method>
+		<method name="get_attachment_state">
+			<return type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="get_bone">
+			<return type="SpineBone" />
+			<description>
+			</description>
+		</method>
+		<method name="get_color">
+			<return type="Color" />
+			<description>
+			</description>
+		</method>
+		<method name="get_dark_color">
+			<return type="Color" />
+			<description>
+			</description>
+		</method>
+		<method name="get_data">
+			<return type="SpineSlotData" />
+			<description>
+			</description>
+		</method>
+		<method name="get_deform">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_sequence_index">
+			<return type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="has_dark_color">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_attachment">
+			<return type="void" />
+			<argument index="0" name="v" type="SpineAttachment" />
+			<description>
+			</description>
+		</method>
+		<method name="set_attachment_state">
+			<return type="void" />
+			<argument index="0" name="v" type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="set_color">
+			<return type="void" />
+			<argument index="0" name="arg0" type="Color" />
+			<description>
+			</description>
+		</method>
+		<method name="set_dark_color">
+			<return type="void" />
+			<argument index="0" name="v" type="Color" />
+			<description>
+			</description>
+		</method>
+		<method name="set_deform">
+			<return type="void" />
+			<argument index="0" name="v" type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="set_sequence_index">
+			<return type="void" />
+			<argument index="0" name="v" type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="set_to_setup_pose">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

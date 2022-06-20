@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineBone" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="apply_world_transform_2d">
+			<return type="void" />
+			<argument index="0" name="node2d" type="Variant" />
+			<description>
+			</description>
+		</method>
+		<method name="get_a">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_a_scale_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_a_scale_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_a_shear_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_a_shear_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_a_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_a_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_applied_rotation">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_b">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_c">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_children">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_d">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_data">
+			<return type="SpineBoneData" />
+			<description>
+			</description>
+		</method>
+		<method name="get_global_transform">
+			<return type="Transform2D" />
+			<description>
+			</description>
+		</method>
+		<method name="get_parent">
+			<return type="SpineBone" />
+			<description>
+			</description>
+		</method>
+		<method name="get_rotation">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_scale_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_scale_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_shear_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_shear_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_transform">
+			<return type="Transform2D" />
+			<description>
+			</description>
+		</method>
+		<method name="get_world_rotation_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_world_rotation_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_world_scale_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_world_scale_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_world_to_local_rotation_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_world_to_local_rotation_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_world_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_world_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="is_active">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="local_to_world">
+			<return type="Vector2" />
+			<argument index="0" name="local_position" type="Vector2" />
+			<description>
+			</description>
+		</method>
+		<method name="local_to_world_rotation">
+			<return type="float" />
+			<argument index="0" name="local_rotation" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="rotate_world">
+			<return type="void" />
+			<argument index="0" name="arg0" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a_scale_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a_scale_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a_shear_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a_shear_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_a_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_active">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_applied_rotation">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_b">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_c">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_d">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_global_transform">
+			<return type="void" />
+			<argument index="0" name="global_transform" type="Transform2D" />
+			<description>
+			</description>
+		</method>
+		<method name="set_rotation">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_scale_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_scale_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_shear_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_shear_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_to_setup_pose">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="set_transform">
+			<return type="void" />
+			<argument index="0" name="local_transform" type="Transform2D" />
+			<description>
+			</description>
+		</method>
+		<method name="set_world_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_world_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="update_world_transform">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="world_to_local">
+			<return type="Vector2" />
+			<argument index="0" name="world_position" type="Vector2" />
+			<description>
+			</description>
+		</method>
+		<method name="world_to_local_rotation">
+			<return type="float" />
+			<argument index="0" name="world_rotation" type="float" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineIkConstraint" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_bend_direction">
+			<return type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="get_bones">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_compress">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="get_data">
+			<return type="SpineIkConstraintData" />
+			<description>
+			</description>
+		</method>
+		<method name="get_mix">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_order">
+			<return type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="get_softness">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_stretch">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="get_target">
+			<return type="SpineBone" />
+			<description>
+			</description>
+		</method>
+		<method name="is_active">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_active">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_bend_direction">
+			<return type="void" />
+			<argument index="0" name="v" type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="set_compress">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_mix">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_softness">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_stretch">
+			<return type="void" />
+			<argument index="0" name="v" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="set_target">
+			<return type="void" />
+			<argument index="0" name="v" type="SpineBone" />
+			<description>
+			</description>
+		</method>
+		<method name="update">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

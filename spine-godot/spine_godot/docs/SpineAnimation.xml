@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineAnimation" inherits="SpineObjectWrapper" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="apply">
+			<return type="void" />
+			<argument index="0" name="skeleton" type="SpineSkeleton" />
+			<argument index="1" name="last_time" type="float" />
+			<argument index="2" name="time" type="float" />
+			<argument index="3" name="loop" type="bool" />
+			<argument index="4" name="events" type="Array" />
+			<argument index="5" name="alpha" type="float" />
+			<argument index="6" name="blend" type="int" enum="SpineConstant.MixBlend" />
+			<argument index="7" name="direction" type="int" enum="SpineConstant.MixDirection" />
+			<description>
+			</description>
+		</method>
+		<method name="get_duration">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_name">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_timelines">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="has_timeline">
+			<return type="bool" />
+			<argument index="0" name="ids" type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="set_duration">
+			<return type="void" />
+			<argument index="0" name="duration" type="float" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>

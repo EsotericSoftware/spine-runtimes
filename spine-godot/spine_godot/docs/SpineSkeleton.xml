@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="SpineSkeleton" inherits="Reference" version="3.4">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="find_bone">
+			<return type="SpineBone" />
+			<argument index="0" name="bone_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="find_ik_constraint">
+			<return type="SpineIkConstraint" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="find_path_constraint">
+			<return type="SpinePathConstraint" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="find_slot">
+			<return type="SpineSlot" />
+			<argument index="0" name="slot_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="find_transform_constraint">
+			<return type="SpineTransformConstraint" />
+			<argument index="0" name="constraint_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_attachment_by_slot_index">
+			<return type="SpineAttachment" />
+			<argument index="0" name="slot_index" type="int" />
+			<argument index="1" name="attachment_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_attachment_by_slot_name">
+			<return type="SpineAttachment" />
+			<argument index="0" name="slot_name" type="String" />
+			<argument index="1" name="attachment_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_bones">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_bounds">
+			<return type="Rect2" />
+			<description>
+			</description>
+		</method>
+		<method name="get_color">
+			<return type="Color" />
+			<description>
+			</description>
+		</method>
+		<method name="get_data" qualifiers="const">
+			<return type="SpineSkeletonDataResource" />
+			<description>
+			</description>
+		</method>
+		<method name="get_draw_order">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_ik_constraints">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_path_constraints">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_root_bone">
+			<return type="SpineBone" />
+			<description>
+			</description>
+		</method>
+		<method name="get_scale_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_scale_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_skin">
+			<return type="SpineSkin" />
+			<description>
+			</description>
+		</method>
+		<method name="get_slots">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_transform_constraints">
+			<return type="Array" />
+			<description>
+			</description>
+		</method>
+		<method name="get_x">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="get_y">
+			<return type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_attachment">
+			<return type="void" />
+			<argument index="0" name="slot_name" type="String" />
+			<argument index="1" name="attachment_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="set_bones_to_setup_pose">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="set_color">
+			<return type="void" />
+			<argument index="0" name="v" type="Color" />
+			<description>
+			</description>
+		</method>
+		<method name="set_position">
+			<return type="void" />
+			<argument index="0" name="position" type="Vector2" />
+			<description>
+			</description>
+		</method>
+		<method name="set_scale_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_scale_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_skin">
+			<return type="void" />
+			<argument index="0" name="new_skin" type="SpineSkin" />
+			<description>
+			</description>
+		</method>
+		<method name="set_skin_by_name">
+			<return type="void" />
+			<argument index="0" name="skin_name" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="set_slots_to_setup_pose">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="set_to_setup_pose">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="set_x">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="set_y">
+			<return type="void" />
+			<argument index="0" name="v" type="float" />
+			<description>
+			</description>
+		</method>
+		<method name="update_world_transform">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>
