@@ -2042,6 +2042,7 @@ void _spSequenceTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float
 
 	if (self->attachment->type == SP_ATTACHMENT_REGION) sequence = ((spRegionAttachment *) self->attachment)->sequence;
 	if (self->attachment->type == SP_ATTACHMENT_MESH) sequence = ((spMeshAttachment *) self->attachment)->sequence;
+	if (!sequence) return;
 	index = modeAndIndex >> 4;
 	count = sequence->regions->size;
 	mode = modeAndIndex & 0xf;
@@ -2056,7 +2057,7 @@ void _spSequenceTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float
 				break;
 			case SP_SEQUENCE_MODE_PINGPONG: {
 				int n = (count << 1) - 2;
-				index %= n;
+				index = n == 0 ? 0 : index % n;
 				if (index >= count) index = n - index;
 				break;
 			}
@@ -2068,7 +2069,7 @@ void _spSequenceTimeline_apply(spTimeline *timeline, spSkeleton *skeleton, float
 				break;
 			case SP_SEQUENCE_MODE_PINGPONGREVERSE: {
 				int n = (count << 1) - 2;
-				index = (index + count - 1) % n;
+				index = n == 0 ? 0 : (index + count - 1) % n;
 				if (index >= count) index = n - index;
 			}
 		}
