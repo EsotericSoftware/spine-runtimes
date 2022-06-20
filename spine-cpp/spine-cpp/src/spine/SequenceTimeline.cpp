@@ -89,6 +89,7 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 	Sequence *sequence = NULL;
 	if (_attachment->getRTTI().instanceOf(RegionAttachment::rtti)) sequence = ((RegionAttachment *) _attachment)->getSequence();
 	if (_attachment->getRTTI().instanceOf(MeshAttachment::rtti)) sequence = ((MeshAttachment *) _attachment)->getSequence();
+	if (!sequence) return;
 	int index = modeAndIndex >> 4, count = (int) sequence->getRegions().size();
 	int mode = modeAndIndex & 0xf;
 	if (mode != SequenceMode::hold) {
@@ -102,7 +103,7 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 				break;
 			case SequenceMode::pingpong: {
 				int n = (count << 1) - 2;
-				index %= n;
+				index = n == 0 ? 0 : index % n;
 				if (index >= count) index = n - index;
 				break;
 			}
@@ -114,7 +115,7 @@ void SequenceTimeline::apply(Skeleton &skeleton, float lastTime, float time, Vec
 				break;
 			case SequenceMode::pingpongReverse: {
 				int n = (count << 1) - 2;
-				index = (index + count - 1) % n;
+				index = n == 0 ? 0 : (index + count - 1) % n;
 				if (index >= count) index = n - index;
 			}
 		}

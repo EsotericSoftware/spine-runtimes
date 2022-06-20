@@ -758,8 +758,9 @@ public class Skeleton {
 		color.set(r, g, b, a);
 	}
 
-	/** Scales the entire skeleton on the X axis. This affects all bones, even if the bone's transform mode disallows scale
-	 * inheritance. */
+	/** Scales the entire skeleton on the X axis.
+	 * <p>
+	 * Bones that do not inherit scale are still affected by this property. */
 	public float getScaleX () {
 		return scaleX;
 	}
@@ -768,8 +769,9 @@ public class Skeleton {
 		this.scaleX = scaleX;
 	}
 
-	/** Scales the entire skeleton on the Y axis. This affects all bones, even if the bone's transform mode disallows scale
-	 * inheritance. */
+	/** Scales the entire skeleton on the Y axis.
+	 * <p>
+	 * Bones that do not inherit scale are still affected by this property. */
 	public float getScaleY () {
 		return scaleY;
 	}
@@ -778,12 +780,17 @@ public class Skeleton {
 		this.scaleY = scaleY;
 	}
 
+	/** Scales the entire skeleton on the X and Y axes.
+	 * <p>
+	 * Bones that do not inherit scale are still affected by this property. */
 	public void setScale (float scaleX, float scaleY) {
 		this.scaleX = scaleX;
 		this.scaleY = scaleY;
 	}
 
-	/** Sets the skeleton X position, which is added to the root bone worldX position. */
+	/** Sets the skeleton X position, which is added to the root bone worldX position.
+	 * <p>
+	 * Bones that do not inherit translation are still affected by this property. */
 	public float getX () {
 		return x;
 	}
@@ -792,7 +799,9 @@ public class Skeleton {
 		this.x = x;
 	}
 
-	/** Sets the skeleton Y position, which is added to the root bone worldY position. */
+	/** Sets the skeleton Y position, which is added to the root bone worldY position.
+	 * <p>
+	 * Bones that do not inherit translation are still affected by this property. */
 	public float getY () {
 		return y;
 	}
@@ -801,7 +810,9 @@ public class Skeleton {
 		this.y = y;
 	}
 
-	/** Sets the skeleton X and Y position, which is added to the root bone worldX and worldY position. */
+	/** Sets the skeleton X and Y position, which is added to the root bone worldX and worldY position.
+	 * <p>
+	 * Bones that do not inherit translation are still affected by this property. */
 	public void setPosition (float x, float y) {
 		this.x = x;
 		this.y = y;

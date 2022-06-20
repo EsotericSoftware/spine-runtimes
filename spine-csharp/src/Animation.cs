@@ -2642,6 +2642,8 @@ namespace Spine {
 				if ((vertexAttachment == null)
 					|| vertexAttachment.TimelineAttachment != attachment) return;
 			}
+			Sequence sequence = ((IHasTextureRegion)slotAttachment).Sequence;
+			if (sequence == null) return;
 
 			float[] frames = this.frames;
 			if (time < frames[0]) { // Time is before first frame.
@@ -2654,7 +2656,7 @@ namespace Spine {
 			int modeAndIndex = (int)frames[i + MODE];
 			float delay = frames[i + DELAY];
 
-			int index = modeAndIndex >> 4, count = attachment.Sequence.Regions.Length;
+			int index = modeAndIndex >> 4, count = sequence.Regions.Length;
 			SequenceMode mode = (SequenceMode)(modeAndIndex & 0xf);
 			if (mode != SequenceMode.Hold) {
 				index += (int)((time - before) / delay + 0.00001f);
@@ -2667,7 +2669,7 @@ namespace Spine {
 					break;
 				case SequenceMode.Pingpong: {
 					int n = (count << 1) - 2;
-					index %= n;
+					index = n == 0 ? 0 : index % n;
 					if (index >= count) index = n - index;
 					break;
 				}
@@ -2679,7 +2681,7 @@ namespace Spine {
 					break;
 				case SequenceMode.PingpongReverse: {
 					int n = (count << 1) - 2;
-					index = (index + count - 1) % n;
+					index = n == 0 ? 0 : (index + count - 1) % n;
 					if (index >= count) index = n - index;
 					break;
 				} // end case
