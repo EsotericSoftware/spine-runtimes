@@ -26,8 +26,7 @@
 		<method name="get_duration">
 			<return type="float" />
 			<description>
-				The duration of the animation in seconds, which is usually the highest time of all frames in the timeline. The duration is
-				used to know when it has completed and when it should loop back to the start.
+				The duration of the animation in seconds, which is usually the highest time of all frames in the timeline. The duration is used to know when it has completed and when it should loop back to the start.
 			</description>
 		</method>
 		<method name="get_name">

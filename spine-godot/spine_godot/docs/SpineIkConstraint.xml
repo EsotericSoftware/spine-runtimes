@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="SpineIkConstraint" inherits="SpineObjectWrapper" version="3.4">
 	<brief_description>
+		Stores the current pose for an IK constraint.
 	</brief_description>
 	<description>
+		Stores the current pose for an IK constraint. An IK constraint adjusts the rotation of 1 or 2 constrained bones so the tip of the last bone is as close to the target bone as possible.
+		See [url]http://esotericsoftware.com/spine-ik-constraints[/url] in the Spine User Guide.
 	</description>
 	<tutorials>
 	</tutorials>

@@ -5,13 +5,8 @@
 	</brief_description>
 	<description>
 		A bone of a Spine skeleton, storing its current pose.
-
-		A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a
-		local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a
-		constraint or application code modifies the world transform after it was computed from the local transform.
-
-		The bone's world transform is relative to the skeleton's coordinate system origin. Use [code]set_global_transform()[/code]
-		and [code]get_global_transform()[/code] to convert from and to Godot's Canvas coordinate system.
+		A bone has a local transform which is used to compute its world transform. A bone also has an applied transform, which is a local transform that can be applied to compute the world transform. The local transform and applied transform may differ if a constraint or application code modifies the world transform after it was computed from the local transform.
+		The bone's world transform is relative to the skeleton's coordinate system origin. Use [code]set_global_transform()[/code] and [code]get_global_transform()[/code] to convert from and to Godot's Canvas coordinate system.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -205,8 +200,7 @@
 		<method name="is_active">
 			<return type="bool" />
 			<description>
-				Returns false when the bone has not been computed because [code]BoneData.get_skin_required()[/code] is true and the
-				active skin does not contain this bone.
+				Returns false when the bone has not been computed because [code]BoneData.get_skin_required()[/code] is true and the active skin does not contain this bone.
 			</description>
 		</method>
 		<method name="local_to_world">
@@ -228,9 +222,7 @@
 			<argument index="0" name="arg0" type="float" />
 			<description>
 				Rotates the world transform the specified amount.
-
-				After changes are made to the world transform, [code]update_applied_transform[/code] should be called and [code]update()[/code] will
-				need to be called on any child bones, recursively.
+				After changes are made to the world transform, [code]update_applied_transform[/code] should be called and [code]update()[/code] will need to be called on any child bones, recursively.
 			</description>
 		</method>
 		<method name="set_a">

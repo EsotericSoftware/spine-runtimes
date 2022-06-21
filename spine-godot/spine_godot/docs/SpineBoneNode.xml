@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="SpineBoneNode" inherits="Node2D" version="3.4">
 	<brief_description>
+		Node2D that either follows or drives a bone in a [code]SpineSprite[/code].
 	</brief_description>
 	<description>
+		Node2D that either follows or drives a bone in a [code]SpineSprite[/code]. If set to follow a bone, the bone's shear will be ignored.
 	</description>
 	<tutorials>
 	</tutorials>

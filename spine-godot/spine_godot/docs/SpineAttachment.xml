@@ -4,8 +4,7 @@
 		Represents an attachment in a Spine skeleton's skin.
 	</brief_description>
 	<description>
-		Represents an attachment in a Spine skeleton's skin. See [link]http://en.esotericsoftware.com/spine-runtime-skins[/link].
-
+		Represents an attachment in a Spine skeleton's skin. See [url]http://en.esotericsoftware.com/spine-runtime-skins[/url].
 		Attachments can only be queried for their name and can not be manipulated.
 	</description>
 	<tutorials>

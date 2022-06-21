@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="SpineEvent" inherits="SpineObjectWrapper" version="3.4">
 	<brief_description>
+		Stores the current pose values for an event. See [url]http://esotericsoftware.com/spine-events[/url] in the Spine User Guide.
 	</brief_description>
 	<description>
+		Stores the current pose values for an event. See [url]http://esotericsoftware.com/spine-events[/url] in the Spine User Guide.
 	</description>
 	<tutorials>
 	</tutorials>
