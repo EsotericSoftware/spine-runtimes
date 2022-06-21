@@ -91,7 +91,6 @@ void SpineBone::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_world_scale_y"), &SpineBone::get_world_scale_y);
 	ClassDB::bind_method(D_METHOD("is_active"), &SpineBone::is_active);
 	ClassDB::bind_method(D_METHOD("set_active", "v"), &SpineBone::set_active);
-	ClassDB::bind_method(D_METHOD("apply_world_transform_2d", "node2d"), &SpineBone::apply_world_transform_2d);
 	ClassDB::bind_method(D_METHOD("get_transform"), &SpineBone::get_transform);
 	ClassDB::bind_method(D_METHOD("set_transform", "local_transform"), &SpineBone::set_transform);
 	ClassDB::bind_method(D_METHOD("get_global_transform"), &SpineBone::get_global_transform);
@@ -406,26 +405,6 @@ bool SpineBone::is_active() {
 void SpineBone::set_active(bool v) {
 	SPINE_CHECK(get_spine_object(), )
 	get_spine_object()->setActive(v);
-}
-
-// External feature functions
-void SpineBone::apply_world_transform_2d(const Variant &o) {
-	SPINE_CHECK(get_spine_object(), )
-	if (o.get_type() == Variant::OBJECT) {
-		auto node2d = Object::cast_to<Node2D>(o.operator Object *());
-		if (node2d) {
-			// In godot the y-axis is nag to spine
-			node2d->set_transform(Transform2D(
-					get_a(), get_c(),
-					get_b(), get_d(),
-					get_world_x(), -get_world_y()));
-			// Fix the rotation
-			auto pos = node2d->get_position();
-			node2d->translate(-pos);
-			node2d->set_rotation(-node2d->get_rotation());
-			node2d->translate(pos);
-		}
-	}
 }
 
 Transform2D SpineBone::get_transform() {

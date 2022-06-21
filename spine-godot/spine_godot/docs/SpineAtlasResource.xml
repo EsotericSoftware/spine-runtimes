@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="SpineAtlasResource" inherits="Resource" version="3.4">
 	<brief_description>
+		A Godot resource encapsulating a Spine atlas and its atlas page images.
 	</brief_description>
 	<description>
+		A Godot resource encapsulating a Spine atlas and its atlas page images.
 	</description>
 	<tutorials>
 	</tutorials>

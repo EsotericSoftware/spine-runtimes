@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="SpineAnimationTrack" inherits="Node" version="3.4">
 	<brief_description>
+		Internal class to allow composing animations on [code]SpineSprite[/code] instances via Godot's animation player and animation editor.
 	</brief_description>
 	<description>
+		Internal class to allow composing animations on [code]SpineSprite[/code] instances via Godot's animation player and animation editor.
 	</description>
 	<tutorials>
 	</tutorials>
