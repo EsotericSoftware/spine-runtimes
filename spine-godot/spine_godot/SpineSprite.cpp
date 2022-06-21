@@ -480,7 +480,7 @@ static void add_triangles(MeshInstance2D *mesh_instance,
 																	 uvs,
 																	 Vector<int>(),
 																	 Vector<float>(),
-																	 renderer_object->canvas_texture.is_valid() ?  renderer_object->canvas_texture->get_rid() : RID(),
+																	 renderer_object->canvas_texture.is_valid() ? renderer_object->canvas_texture->get_rid() : RID(),
 																	 -1);
 #else
 	auto texture = renderer_object->texture;

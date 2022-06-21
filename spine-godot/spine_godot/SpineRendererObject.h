@@ -41,7 +41,7 @@ struct SpineRendererObject {
 	Ref<Texture> normal_map;
 #if VERSION_MAJOR > 3
 	Ref<CanvasTexture> canvas_texture;
-#endif	
+#endif
 };
 
 #endif
