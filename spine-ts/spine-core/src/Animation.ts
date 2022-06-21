@@ -2222,7 +2222,7 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 					break;
 				case SequenceMode.pingpong: {
 					let n = (count << 1) - 2;
-					index %= n;
+					index = n == 0 ? 0 : index % n;
 					if (index >= count) index = n - index;
 					break;
 				}
@@ -2234,7 +2234,7 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 					break;
 				case SequenceMode.pingpongReverse: {
 					let n = (count << 1) - 2;
-					index = (index + count - 1) % n;
+					index = n == 0 ? 0 : (index + count - 1) % n;
 					if (index >= count) index = n - index;
 				}
 			}
