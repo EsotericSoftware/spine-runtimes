@@ -91,7 +91,7 @@ export class Slot {
 	setAttachment (attachment: Attachment | null) {
 		if (this.attachment == attachment) return;
 		if (!(attachment instanceof VertexAttachment) || !(this.attachment instanceof VertexAttachment)
-			|| (<VertexAttachment>attachment).timelineAttahment != (<VertexAttachment>this.attachment).timelineAttahment) {
+			|| (<VertexAttachment>attachment).timelineAttachment != (<VertexAttachment>this.attachment).timelineAttachment) {
 			this.deform.length = 0;
 		}
 		this.attachment = attachment;

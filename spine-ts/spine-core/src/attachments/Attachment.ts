@@ -66,7 +66,7 @@ export abstract class VertexAttachment extends Attachment {
 
 	/** Timelines for the timeline attachment are also applied to this attachment.
 	 * May be null if no attachment-specific timelines should be applied. */
-	timelineAttahment: Attachment = this;
+	timelineAttachment: Attachment = this;
 
 	constructor (name: string) {
 		super(name);
@@ -155,6 +155,6 @@ export abstract class VertexAttachment extends Attachment {
 		}
 
 		attachment.worldVerticesLength = this.worldVerticesLength;
-		attachment.timelineAttahment = this.timelineAttahment;
+		attachment.timelineAttachment = this.timelineAttachment;
 	}
 }

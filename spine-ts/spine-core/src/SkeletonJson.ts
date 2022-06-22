@@ -297,7 +297,7 @@ export class SkeletonJson {
 			if (!skin) throw new Error(`Skin not found: ${linkedMesh.skin}`);
 			let parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 			if (!parent) throw new Error(`Parent mesh not found: ${linkedMesh.parent}`);
-			linkedMesh.mesh.timelineAttahment = linkedMesh.inheritTimeline ? <VertexAttachment>parent : <VertexAttachment>linkedMesh.mesh;
+			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimeline ? <VertexAttachment>parent : <VertexAttachment>linkedMesh.mesh;
 			linkedMesh.mesh.setParentMesh(<MeshAttachment>parent);
 			if (linkedMesh.mesh.region != null) linkedMesh.mesh.updateRegion();
 		}

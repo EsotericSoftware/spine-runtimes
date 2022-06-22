@@ -238,7 +238,7 @@ export class SkeletonBinary {
 			if (!linkedMesh.parent) throw new Error("Linked mesh parent must not be null");
 			let parent = skin.getAttachment(linkedMesh.slotIndex, linkedMesh.parent);
 			if (!parent) throw new Error(`Parent mesh not found: ${linkedMesh.parent}`);
-			linkedMesh.mesh.timelineAttahment = linkedMesh.inheritTimeline ? parent as VertexAttachment : linkedMesh.mesh;
+			linkedMesh.mesh.timelineAttachment = linkedMesh.inheritTimeline ? parent as VertexAttachment : linkedMesh.mesh;
 			linkedMesh.mesh.setParentMesh(parent as MeshAttachment);
 			if (linkedMesh.mesh.region != null) linkedMesh.mesh.updateRegion();
 		}
