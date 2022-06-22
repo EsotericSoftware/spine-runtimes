@@ -1510,7 +1510,7 @@ export class DeformTimeline extends CurveTimeline implements SlotTimeline {
 		if (!slot.bone.active) return;
 		let slotAttachment: Attachment | null = slot.getAttachment();
 		if (!slotAttachment) return;
-		if (!(slotAttachment instanceof VertexAttachment) || (<VertexAttachment>slotAttachment).timelineAttahment != this.attachment) return;
+		if (!(slotAttachment instanceof VertexAttachment) || (<VertexAttachment>slotAttachment).timelineAttachment != this.attachment) return;
 
 		let deform: Array<number> = slot.deform;
 		if (deform.length == 0) blend = MixBlend.setup;
@@ -2195,7 +2195,7 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 		let attachment = this.attachment as unknown as Attachment;
 		if (slotAttachment != attachment) {
 			if (!(slotAttachment instanceof VertexAttachment)
-				|| (slotAttachment as VertexAttachment).timelineAttahment != attachment) return;
+				|| (slotAttachment as VertexAttachment).timelineAttachment != attachment) return;
 		}
 
 		let frames = this.frames;
@@ -2209,6 +2209,7 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 		let modeAndIndex = frames[i + SequenceTimeline.MODE];
 		let delay = frames[i + SequenceTimeline.DELAY];
 
+		if (!this.attachment.sequence) return;
 		let index = modeAndIndex >> 4, count = this.attachment.sequence!.regions.length;
 		let mode = SequenceModeValues[modeAndIndex & 0xf];
 		if (mode != SequenceMode.hold) {
@@ -2222,7 +2223,7 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 					break;
 				case SequenceMode.pingpong: {
 					let n = (count << 1) - 2;
-					index %= n;
+					index = n == 0 ? 0 : index % n;
 					if (index >= count) index = n - index;
 					break;
 				}
@@ -2234,7 +2235,7 @@ export class SequenceTimeline extends Timeline implements SlotTimeline {
 					break;
 				case SequenceMode.pingpongReverse: {
 					let n = (count << 1) - 2;
-					index = (index + count - 1) % n;
+					index = n == 0 ? 0 : (index + count - 1) % n;
 					if (index >= count) index = n - index;
 				}
 			}

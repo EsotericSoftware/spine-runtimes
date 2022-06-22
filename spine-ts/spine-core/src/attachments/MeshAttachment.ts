@@ -205,7 +205,7 @@ export class MeshAttachment extends VertexAttachment implements HasTextureRegion
 		let copy = new MeshAttachment(this.name, this.path);
 		copy.region = this.region;
 		copy.color.setFromColor(this.color);
-		copy.timelineAttahment = this.timelineAttahment;
+		copy.timelineAttachment = this.timelineAttachment;
 		copy.setParentMesh(this.parentMesh ? this.parentMesh : this);
 		if (copy.region != null) copy.updateRegion();
 		return copy;
