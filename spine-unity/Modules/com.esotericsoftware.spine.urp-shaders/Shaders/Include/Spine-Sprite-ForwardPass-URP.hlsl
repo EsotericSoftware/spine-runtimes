@@ -43,6 +43,22 @@ struct VertexOutputLWRP
 ///////////////////////////////////////////////////////////////////////////////
 //                  Vertex and Fragment functions                            //
 ///////////////////////////////////////////////////////////////////////////////
+#if defined(_ADDITIONAL_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+half4 CalculateShadowMaskBackwardsCompatible(InputData inputData)
+{
+	// To ensure backward compatibility we have to avoid using shadowMask input, as it is not present in older shaders
+#if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+	half4 shadowMask = inputData.shadowMask;
+#elif !defined (LIGHTMAP_ON)
+	half4 shadowMask = unity_ProbesOcclusion;
+#else
+	half4 shadowMask = half4(1, 1, 1, 1);
+#endif
+
+	return shadowMask;
+}
+#endif
+
 half3 LightweightLightVertexSimplified(float3 positionWS, half3 normalWS) {
 #ifdef _MAIN_LIGHT_VERTEX
 	Light mainLight = GetMainLight();
@@ -101,7 +117,12 @@ half4 LightweightFragmentPBRSimplified(InputData inputData, half4 texAlbedoAlpha
 	int pixelLightCount = GetAdditionalLightsCount();
 	for (int i = 0; i < pixelLightCount; ++i)
 	{
+#if defined(_ADDITIONAL_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+		half4 shadowMask = CalculateShadowMaskBackwardsCompatible(inputData);
+		Light light = GetAdditionalLight(i, inputData.positionWS, shadowMask);
+#else
 		Light light = GetAdditionalLight(i, inputData.positionWS);
+#endif
 		finalColor += LightingPhysicallyBased(brdfData, light, inputData.normalWS, inputData.viewDirectionWS);
 	}
 #endif
@@ -142,7 +163,12 @@ half4 LightweightFragmentBlinnPhongSimplified(InputData inputData, half4 texDiff
 	int pixelLightCount = GetAdditionalLightsCount();
 	for (int i = 0; i < pixelLightCount; ++i)
 	{
+#if defined(_ADDITIONAL_LIGHT_SHADOWS) && !defined(_RECEIVE_SHADOWS_OFF)
+		half4 shadowMask = CalculateShadowMaskBackwardsCompatible(inputData);
+		Light light = GetAdditionalLight(i, inputData.positionWS, shadowMask);
+#else
 		Light light = GetAdditionalLight(i, inputData.positionWS);
+#endif
 		half3 attenuation = (light.distanceAttenuation * light.shadowAttenuation);
 		half3 attenuatedLightColor = light.color * attenuation;
 #ifndef _DIFFUSE_RAMP
