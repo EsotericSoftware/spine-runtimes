@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="SpineTimeline" inherits="SpineObjectWrapper" version="3.4">
 	<brief_description>
+		The base class for all timelines.
 	</brief_description>
 	<description>
+		The base class for all timelines.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -22,31 +24,37 @@
 		<method name="get_duration">
 			<return type="float" />
 			<description>
+				The duration in seconds.
 			</description>
 		</method>
 		<method name="get_frame_count">
 			<return type="int" />
 			<description>
+				The number of frames for this timeline.
 			</description>
 		</method>
 		<method name="get_frame_entries">
 			<return type="int" />
 			<description>
+				The number of entries stored per frame.
 			</description>
 		</method>
 		<method name="get_frames">
 			<return type="Array" />
 			<description>
+				The time in seconds and any other values for each frame. Modifying the array has no effect.
 			</description>
 		</method>
 		<method name="get_property_ids">
 			<return type="Array" />
 			<description>
+				Uniquely encodes both the type of this timeline and the skeleton properties that it affects. Modifying the array has no effect.
 			</description>
 		</method>
 		<method name="get_type">
 			<return type="String" />
 			<description>
+				The timeline's type encoded as a string.
 			</description>
 		</method>
 	</methods>
