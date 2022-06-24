@@ -350,7 +350,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 			indices.Add(idx + attachmentIndices[j]);
 		}
 
-		//Smooth normal calculation.
+
 
 		//Calculate total triangle to add on this loof.
 
@@ -358,17 +358,9 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 
 		int TriangleToAddNum = indices.Num() / 3 - TriangleInitialCount;
 
-		//Add empty normals for that represent all the vertices we are going to add for this mesh.
+		int FirstVertexIndex = vertices.Num() - numVertices;
 
-		for (int j = 0; j < numVertices; j++) {
-
-			normals.Add(FVector::ZeroVector);
-
-		}
-
-		FVector normal = FVector(0, 1, 0);
-
-		//loof through all the triangles and add a result of the cross product to the consisting vertice's normal of the triangles.
+		//loof through all the triangles and resolve to be reversed if the triangle has winding order as CCW.
 
 		for (int j = 0; j < TriangleToAddNum; j++) {
 
@@ -376,34 +368,32 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 
 			if (FVector::CrossProduct(
 				vertices[indices[TargetTringleIndex + 2]] - vertices[indices[TargetTringleIndex]],
-				vertices[indices[TargetTringleIndex + 1]] - vertices[indices[TargetTringleIndex]]).Y > 0.f)
+				vertices[indices[TargetTringleIndex + 1]] - vertices[indices[TargetTringleIndex]]).Y < 0.f)
 			{
 
-				normals[indices[TargetTringleIndex]] += normal;
-				normals[indices[TargetTringleIndex + 1]] += normal;
-				normals[indices[TargetTringleIndex + 2]] += normal;
-			}
-			else {
-				normals[indices[TargetTringleIndex]] -= normal;
-				normals[indices[TargetTringleIndex + 1]] -= normal;
-				normals[indices[TargetTringleIndex + 2]] -= normal;
+				const int32 targetVertex = indices[TargetTringleIndex];
+				indices[TargetTringleIndex] = indices[TargetTringleIndex + 2];
+				indices[TargetTringleIndex + 2] = targetVertex;
+
 			}
 		}
 
 
 
+		FVector normal = FVector(0, 1, 0);
+
+		//Add normals for vertices.
+
+		for (int j = 0; j < numVertices; j++) {
+
+			normals.Add(normal);
+
+		}
+
 		idx += numVertices;
 		depthOffset += this->DepthOffset;
 
 		clipper.clipEnd(*slot);
-	}
-
-	//Normalize all the normals 
-
-	const int TotalNormalNum = normals.Num();
-
-	for (int i = 0; i < TotalNormalNum; i++) {
-		normals[i] = normals[i].GetSafeNormal();
 	}
 
 	Flush(meshSection, vertices, indices, normals, uvs, colors, darkColors, lastMaterial);
