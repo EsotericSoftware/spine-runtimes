@@ -93,7 +93,7 @@ bool SpineAnimation::has_timeline(Array ids) {
 	property_ids.setSize(ids.size(), 0);
 
 	for (int i = 0; i < (int) property_ids.size(); ++i) {
-		property_ids[i] = (spine::PropertyId) ids[i];
+		property_ids[i] = (int64_t) ids[i];
 	}
 	return get_spine_object()->hasTimeline(property_ids);
 }
