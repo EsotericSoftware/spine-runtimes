@@ -88,7 +88,7 @@ Array SpineTimeline::get_property_ids() {
 	auto &ids = get_spine_object()->getPropertyIds();
 	result.resize((int) ids.size());
 	for (int i = 0; i < result.size(); ++i) {
-		result[i] = (spine::PropertyId) ids[i];
+		result[i] = (int64_t) ids[i];
 	}
 	return result;
 }
