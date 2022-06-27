@@ -60,7 +60,7 @@ namespace Spine.Unity.Editor {
 		SerializedProperty initialFlipX, initialFlipY;
 		SerializedProperty meshGeneratorSettings;
 		SerializedProperty allowMultipleCanvasRenderers, separatorSlotNames, enableSeparatorSlots, updateSeparatorPartLocation;
-		SerializedProperty raycastTarget;
+		SerializedProperty raycastTarget, maskable;
 
 		readonly GUIContent UnscaledTimeLabel = new GUIContent("Unscaled Time",
 			"If enabled, AnimationState uses unscaled game time (Time.unscaledDeltaTime), " +
@@ -107,6 +107,7 @@ namespace Spine.Unity.Editor {
 			material = so.FindProperty("m_Material");
 			color = so.FindProperty("m_Color");
 			raycastTarget = so.FindProperty("m_RaycastTarget");
+			maskable = so.FindProperty("m_Maskable");
 
 			// SkeletonRenderer
 			additiveMaterial = so.FindProperty("additiveMaterial");
@@ -295,6 +296,7 @@ namespace Spine.Unity.Editor {
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("UI", EditorStyles.boldLabel);
 			EditorGUILayout.PropertyField(raycastTarget);
+			if (maskable != null) EditorGUILayout.PropertyField(maskable);
 
 			EditorGUILayout.BeginHorizontal(GUILayout.Height(EditorGUIUtility.singleLineHeight + 5));
 			EditorGUILayout.PrefixLabel("Match RectTransform with Mesh");
