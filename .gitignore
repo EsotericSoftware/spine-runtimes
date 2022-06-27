@@ -175,4 +175,5 @@ spine-godot/example/.godot
 spine-godot/example-v4/.godot
 spine-cocos2dx/example/build-macos
 spine-godot/logs
+!spine-godot/build
 spine-ts/spine-ts.zip
