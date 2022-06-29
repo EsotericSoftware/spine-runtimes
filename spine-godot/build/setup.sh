@@ -4,14 +4,13 @@ set -e
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 pushd $dir > /dev/null
 
-if [ ! "$#" -eq 0 ] && [ ! "$#" -eq 2 ]; then
+if [ ! "$#" -eq 2 ]; then
 	echo "Usage: ./setup.sh <Godot branch or tag> <dev:true|false>"
 	echo
 	echo "e.g.:"
 	echo "       ./setup.sh 3.4.4-stable true"
 	echo "       ./setup.sh master false"
-	echo	
-	read version
+	echo		
 	exit 1
 fi
 
