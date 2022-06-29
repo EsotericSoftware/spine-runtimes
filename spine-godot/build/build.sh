@@ -5,43 +5,33 @@ dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 pushd $dir > /dev/null
 
 if [ ! "$#" -eq 0 ] && [ ! "$#" -eq 2 ]; then
-	echo "Usage: ./build.sh <Godot branch or tag> <dev>"
+	echo "Usage: ./build.sh <target>"
 	echo
 	echo "e.g.:"
-	echo "       ./build.sh 3.4.4-stable true"
-	echo "       ./build.sh master master"
-	echo
-	echo "If no arguments are given"
+	echo "       ./build.sh release_debug"
+	echo "       ./build.sh debug"
+	echo	
 	read version
 	exit 1
 fi
 
-if [ "$#" -eq 0 ] && [ ! -d ../godot ]; then
-	echo "No Godot clone found. Run ./build.sh <Godot branch or tag> <dev> first."
+if [ "$#" -eq 0 ]; then
+	echo "Please specify a target, either 'debug' or 'release_debug'"
+	exit 1
+fi
+
+if [ ! -d ../godot ]; then
+	echo "No Godot clone found. Run ./setup.sh <Godot branch or tag> <dev> first."
 	exit 1
 fi
 
 branch=${1%/}
-if [ "${2}" = "true" ]; then
-target="target=debug"
-else
-target=""
-fi
 
-pushd ..
-echo `pwd`
-if [ ! -z "$branch" ]; then
-	rm -rf godot
-	git clone --depth 1 https://github.com/godotengine/godot.git -b $branch
-	if [ "${2}" = "true" ]; then
-		cp -r .idea godot
-		cp build/custom.py godot
-		rm -rf example/.import
-		rm -rf example/.godot
-	fi
+if [ "${2}" = "true" ]; then
+	target="target=debug"
+else
+	target=""
 fi
-cp -r ../spine-cpp/spine-cpp spine_godot
-popd
 
 
 pushd ../godot
