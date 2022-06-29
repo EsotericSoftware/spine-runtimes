@@ -72,7 +72,14 @@ elif [ "$platform" = "ios" ]; then
 	pushd ios_xcode
 	zip -q -9 -r ../iphone.zip *
 	popd
-	popd 
+	popd
+elif [ "$platform" = "web" ]; then
+	# --- WEB ---
+	# generates 
+	scons platform=javascript tools=no target=release custom_modules="../spine_godot" -j8
+	scons platform=javascript tools=no target=release_debug custom_modules="../spine_godot" -j8
+	mv bin/godot.javascript.opt.zip bin/webassembly_release.zip
+	mv bin/godot.javascript.opt.debug.zip bin/webassembly_debug.zip
 else
 	echo "Unknown platform: $platform"
 	exit 1

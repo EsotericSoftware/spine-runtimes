@@ -39,7 +39,7 @@ if [ `uname` == 'Darwin' ] && [ $dev = "false" ]; then
 		strip -S -x godot.osx.tools.universal
 		cp godot.osx.tools.universal Godot.app/Contents/MacOS/Godot
 	else
-		lipo -create godot.osx.opt.tools.x86_64 godot.osx.opt.tools.arm64 -output godot.osx.tools.universal
+		lipo -create godot.osx.opt.tools.x86_64 godot.osx.opt.tools.arm64 -output godot.osx.opt.tools.universal
 		strip -S -x godot.osx.opt.tools.universal
 		cp godot.osx.opt.tools.universal Godot.app/Contents/MacOS/Godot
 	fi	
