@@ -26,7 +26,13 @@ fi
 platform=${1%/}
 
 pushd ../godot
-if [ "$platform" = "macos" ]; then
+if [ "$platform" = "windows" ]; then
+	# --- Windows ---
+	#generates windows_64_debug.exe and windows_64_release.exe
+	scons platform=windows tools=no target=release custom_modules="../spine_godot" -j8
+	scons platform=windows tools=no target=release_debug custom_modules="../spine_godot" -j8
+
+elif [ "$platform" = "macos" ]; then
 	# --- macOS ---
 	# generates osx.zip
 
