@@ -46,6 +46,9 @@ if [ `uname` == 'Darwin' ] && [ $dev = "false" ]; then
 	chmod +x Godot.app/Contents/MacOS/Godot	
 	popd
 else
+	if [ "$OSTYPE" = "msys" ]; then
+		target="$target vsproj=yes livepp=$LIVEPP"
+	fi
 	scons $target compiledb=yes custom_modules="../spine_godot" -j16
 fi
 popd
