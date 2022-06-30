@@ -25,6 +25,13 @@ if [ $dev = "true" ]; then
 	cp build/custom.py godot
 	rm -rf example/.import
 	rm -rf example/.godot
+
+	if [ "$OSTYPE" = "msys" ]; then
+		pushd godot
+		git apply ../build/livepp.patch
+		git apply ../build/livepp-v4.patch
+		popd
+	fi
 fi
 cp -r ../spine-cpp/spine-cpp spine_godot
 popd
