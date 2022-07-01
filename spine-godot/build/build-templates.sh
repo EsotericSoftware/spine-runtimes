@@ -31,7 +31,7 @@ if [ "$OSTYPE" = "msys" ]; then
 elif [[ "$OSTYPE" = "darwin"* ]]; then
 	cpus=$(sysctl -n hw.logicalcpu)
 else
-	cpus=$(grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}')
+	cpus=$(grep -c ^processor /proc/cpuinfo)
 fi
 
 pushd ../godot
@@ -110,8 +110,8 @@ elif [ "$platform" = "android" ]; then
 		./gradlew generateGodotTemplates
 	popd
 elif [ "$platform" = "linux" ]; then
-	echo "Unknown platform: $platform"
-	exit 1
+	scons platform=x11 tools=no target=release bits=64 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=x11 tools=no target=release_debug bits=64 custom_modules="../spine_godot" --jobs=$cpus
 else
 	echo "Unknown platform: $platform"
 	exit 1
