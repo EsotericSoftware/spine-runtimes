@@ -25,12 +25,21 @@ fi
 
 platform=${1%/}
 
+cpus=2
+if [ "$OSTYPE" = "msys" ]; then
+	cpus=$NUMBER_OF_PROCESSORS
+elif [[ "$OSTYPE" = "darwin"* ]]; then
+	cpus=$(sysctl -n hw.logicalcpu)
+else
+	cpus=$(grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}')
+fi
+
 pushd ../godot
 if [ "$platform" = "windows" ]; then
 	# --- Windows ---
 	#generates windows_64_debug.exe and windows_64_release.exe
-	scons platform=windows tools=no target=release custom_modules="../spine_godot" -j8
-	scons platform=windows tools=no target=release_debug custom_modules="../spine_godot" -j8
+	scons platform=windows tools=no target=release custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=windows tools=no target=release_debug custom_modules="../spine_godot" --jobs=$cpus
 	cp bin/godot.windows.opt.64.exe bin/windows_64_release.exe
 	cp bin/godot.windows.opt.debug.64.exe bin/windows_64_debug.exe
 
@@ -38,10 +47,10 @@ elif [ "$platform" = "macos" ]; then
 	# --- macOS ---
 	# generates osx.zip
 
-	scons platform=osx tools=no target=release arch=x86_64 custom_modules="../spine_godot" --jobs=$(sysctl -n hw.logicalcpu)
-	scons platform=osx tools=no target=release_debug arch=x86_64 custom_modules="../spine_godot" --jobs=$(sysctl -n hw.logicalcpu)
-	scons platform=osx tools=no target=release arch=arm64 custom_modules="../spine_godot" --jobs=$(sysctl -n hw.logicalcpu)
-	scons platform=osx tools=no target=release_debug arch=arm64 custom_modules="../spine_godot" --jobs=$(sysctl -n hw.logicalcpu)
+	scons platform=osx tools=no target=release arch=x86_64 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=osx tools=no target=release_debug arch=x86_64 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=osx tools=no target=release arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=osx tools=no target=release_debug arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
 	lipo -create bin/godot.osx.opt.x86_64 bin/godot.osx.opt.arm64 -output bin/godot.osx.opt.universal
 	lipo -create bin/godot.osx.opt.debug.x86_64 bin/godot.osx.opt.debug.arm64 -output bin/godot.osx.opt.debug.universal
 	strip -S -x bin/godot.osx.opt.universal
@@ -59,12 +68,12 @@ elif [ "$platform" = "ios" ]; then
 	# --- iOS --
 	# generates iphone.zip
 
-	scons p=iphone tools=no target=release arch=arm64 custom_modules="../spine_godot" --jobs=$(sysctl -n hw.logicalcpu)
-	scons p=iphone tools=no target=release_debug arch=arm64 custom_modules="../spine_godot" --jobs=$(sysctl -n hw.logicalcpu)
-	scons p=iphone tools=no target=release arch=arm64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$(sysctl -n hw.logicalcpu)
-	scons p=iphone tools=no target=release arch=x86_64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$(sysctl -n hw.logicalcpu)
-	scons p=iphone tools=no target=release_debug arch=arm64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$(sysctl -n hw.logicalcpu)
-	scons p=iphone tools=no target=release_debug arch=x86_64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$(sysctl -n hw.logicalcpu)
+	scons p=iphone tools=no target=release arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
+	scons p=iphone tools=no target=release_debug arch=arm64 custom_modules="../spine_godot" --jobs=$cpus
+	scons p=iphone tools=no target=release arch=arm64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons p=iphone tools=no target=release arch=x86_64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons p=iphone tools=no target=release_debug arch=arm64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons p=iphone tools=no target=release_debug arch=x86_64 ios_simulator=yes custom_modules="../spine_godot" --jobs=$cpus
 	lipo -create bin/libgodot.iphone.opt.arm64.simulator.a bin/libgodot.iphone.opt.x86_64.simulator.a -output bin/libgodot.iphone.opt.simulator.a
 	lipo -create bin/libgodot.iphone.opt.debug.arm64.simulator.a bin/libgodot.iphone.opt.debug.x86_64.simulator.a -output bin/libgodot.iphone.opt.debug.simulator.a
 	strip -S -x bin/libgodot.iphone.opt.arm64.a
@@ -80,14 +89,29 @@ elif [ "$platform" = "ios" ]; then
 	pushd ios_xcode
 	zip -q -9 -r ../iphone.zip *
 	popd
-	popd
+	popd	
 elif [ "$platform" = "web" ]; then
 	# --- WEB ---
 	# generates webassembly_debug.zip, webassembly_release.zip
-	scons platform=javascript tools=no target=release custom_modules="../spine_godot" -j8
-	scons platform=javascript tools=no target=release_debug custom_modules="../spine_godot" -j8
+	scons platform=javascript tools=no target=release custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=javascript tools=no target=release_debug custom_modules="../spine_godot" --jobs=$cpus
 	mv bin/godot.javascript.opt.zip bin/webassembly_release.zip
 	mv bin/godot.javascript.opt.debug.zip bin/webassembly_debug.zip
+elif [ "$platform" = "android" ]; then
+	# --- ANROID ---
+	# generates android_release.apk, android_debug.apk, android_source.zip
+	scons platform=android target=release android_arch=armv7 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=android target=release_debug android_arch=armv7 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=android target=release android_arch=arm64v8 custom_modules="../spine_godot" --jobs=$cpus
+	scons platform=android target=release_debug android_arch=arm64v8 custom_modules="../spine_godot" --jobs=$cpus
+
+	pushd platform/android/java
+		chmod a+x gradlew
+		./gradlew generateGodotTemplates
+	popd
+elif [ "$platform" = "linux" ]; then
+	echo "Unknown platform: $platform"
+	exit 1
 else
 	echo "Unknown platform: $platform"
 	exit 1

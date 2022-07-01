@@ -25,10 +25,19 @@ if [ -f "../godot/custom.py" ]; then
 	dev="true"
 fi
 
+cpus=2
+if [ "$OSTYPE" = "msys" ]; then
+	cpus=$NUMBER_OF_PROCESSORS
+elif [[ "$OSTYPE" = "darwin"* ]]; then
+	cpus=$(sysctl -n hw.logicalcpu)
+else
+	cpus=$(grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}')
+fi
+
 pushd ../godot
 if [ `uname` == 'Darwin' ] && [ $dev = "false" ]; then	
-	scons $target arch=x86_64 compiledb=yes custom_modules="../spine_godot" -j16
-	scons $target arch=arm64 compiledb=yes custom_modules="../spine_godot" -j16
+	scons $target arch=x86_64 compiledb=yes custom_modules="../spine_godot" --jobs=$cpus
+	scons $target arch=arm64 compiledb=yes custom_modules="../spine_godot" --jobs=$cpus
 
 	pushd bin
 	cp -r ../misc/dist/osx_tools.app .
@@ -49,7 +58,7 @@ else
 	if [ "$OSTYPE" = "msys" ]; then
 		target="$target vsproj=yes livepp=$LIVEPP"
 	fi
-	scons $target compiledb=yes custom_modules="../spine_godot" -j16
+	scons $target compiledb=yes custom_modules="../spine_godot" --jobs=$cpus
 fi
 popd
 
