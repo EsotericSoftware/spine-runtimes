@@ -75,7 +75,7 @@ elif [ "$platform" = "ios" ]; then
 	popd
 elif [ "$platform" = "web" ]; then
 	# --- WEB ---
-	# generates 
+	# generates webassembly_debug.zip, webassembly_release.zip
 	scons platform=javascript tools=no target=release custom_modules="../spine_godot" -j8
 	scons platform=javascript tools=no target=release_debug custom_modules="../spine_godot" -j8
 	mv bin/godot.javascript.opt.zip bin/webassembly_release.zip
