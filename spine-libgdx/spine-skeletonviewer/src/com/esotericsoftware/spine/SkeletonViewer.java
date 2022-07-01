@@ -35,9 +35,8 @@ import java.lang.reflect.Field;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowAdapter;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -377,24 +376,13 @@ public class SkeletonViewer extends ApplicationAdapter {
 		}
 		if (dpiScale >= 2.0f) uiScale = 2;
 
-		final SkeletonViewer skeletonViewer = new SkeletonViewer();
-		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.disableAudio(true);
-		config.setWindowedMode((int)(800 * uiScale), (int)(600 * uiScale));
-		config.setTitle("Skeleton Viewer " + version);
-		config.setBackBufferConfig(8, 8, 8, 8, 24, 0, 2);
-		config.setWindowListener(new Lwjgl3WindowAdapter() {
-			@Override
-			public void filesDropped (String[] files) {
-				for (String file : files) {
-					for (String endSuffix : endSuffixes) {
-						for (String dataSuffix : dataSuffixes) {
-							if (file.endsWith(dataSuffix + endSuffix) && skeletonViewer.loadSkeleton(Gdx.files.absolute(file))) return;
-						}
-					}
-				}
-			}
-		});
-		new Lwjgl3Application(skeletonViewer, config);
+		LwjglApplicationConfiguration.disableAudio = true;
+		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		config.width = (int)(800 * uiScale);
+		config.height = (int)(600 * uiScale);
+		config.title = "Skeleton Viewer";
+		config.allowSoftwareMode = true;
+		config.samples = 2;
+		new LwjglApplication(new SkeletonViewer(), config);
 	}
 }
