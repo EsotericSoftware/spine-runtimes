@@ -31,8 +31,10 @@ if [ "$OSTYPE" = "msys" ]; then
 elif [[ "$OSTYPE" = "darwin"* ]]; then
 	cpus=$(sysctl -n hw.logicalcpu)
 else
-	cpus=$(grep ^cpu\\scores /proc/cpuinfo | uniq |  awk '{print $4}')
+	cpus=$(grep -c ^processor /proc/cpuinfo)
 fi
+
+echo "CPUS: $cpus"
 
 pushd ../godot
 if [ `uname` == 'Darwin' ] && [ $dev = "false" ]; then	
