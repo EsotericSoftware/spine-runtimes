@@ -36,7 +36,7 @@
 
 using namespace spine;
 
-USpineSkeletonRendererComponent::USpineSkeletonRendererComponent(const FObjectInitializer &ObjectInitializer)
+USpineSkeletonRendererComponent::USpineSkeletonRendererComponent(const FObjectInitializer& ObjectInitializer)
 	: UProceduralMeshComponent(ObjectInitializer) {
 	PrimaryComponentTick.bCanEverTick = true;
 	bTickInEditor = true;
@@ -67,19 +67,19 @@ void USpineSkeletonRendererComponent::BeginPlay() {
 	Super::BeginPlay();
 }
 
-void USpineSkeletonRendererComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) {
+void USpineSkeletonRendererComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	AActor *owner = GetOwner();
+	AActor* owner = GetOwner();
 	if (owner) {
-		UClass *skeletonClass = USpineSkeletonComponent::StaticClass();
-		USpineSkeletonComponent *skeleton = Cast<USpineSkeletonComponent>(owner->GetComponentByClass(skeletonClass));
+		UClass* skeletonClass = USpineSkeletonComponent::StaticClass();
+		USpineSkeletonComponent* skeleton = Cast<USpineSkeletonComponent>(owner->GetComponentByClass(skeletonClass));
 
 		UpdateRenderer(skeleton);
 	}
 }
 
-void USpineSkeletonRendererComponent::UpdateRenderer(USpineSkeletonComponent *skeleton) {
+void USpineSkeletonRendererComponent::UpdateRenderer(USpineSkeletonComponent* skeleton) {
 	if (skeleton && !skeleton->IsBeingDestroyed() && skeleton->GetSkeleton() && skeleton->Atlas) {
 		skeleton->GetSkeleton()->getColor().set(Color.R, Color.G, Color.B, Color.A);
 
@@ -94,9 +94,9 @@ void USpineSkeletonRendererComponent::UpdateRenderer(USpineSkeletonComponent *sk
 			pageToScreenBlendMaterial.Empty();
 
 			for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
-				AtlasPage *currPage = skeleton->Atlas->GetAtlas()->getPages()[i];
+				AtlasPage* currPage = skeleton->Atlas->GetAtlas()->getPages()[i];
 
-				UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(NormalBlendMaterial, this);
+				UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(NormalBlendMaterial, this);
 				material->SetTextureParameterValue(TextureParameterName, skeleton->Atlas->atlasPages[i]);
 				atlasNormalBlendMaterials.Add(material);
 				pageToNormalBlendMaterial.Add(currPage, material);
@@ -116,15 +116,16 @@ void USpineSkeletonRendererComponent::UpdateRenderer(USpineSkeletonComponent *sk
 				atlasScreenBlendMaterials.Add(material);
 				pageToScreenBlendMaterial.Add(currPage, material);
 			}
-		} else {
+		}
+		else {
 			pageToNormalBlendMaterial.Empty();
 			pageToAdditiveBlendMaterial.Empty();
 			pageToMultiplyBlendMaterial.Empty();
 			pageToScreenBlendMaterial.Empty();
 
 			for (int i = 0; i < skeleton->Atlas->atlasPages.Num(); i++) {
-				AtlasPage *currPage = skeleton->Atlas->GetAtlas()->getPages()[i];
-				UTexture2D *texture = skeleton->Atlas->atlasPages[i];
+				AtlasPage* currPage = skeleton->Atlas->GetAtlas()->getPages()[i];
+				UTexture2D* texture = skeleton->Atlas->atlasPages[i];
 
 				UpdateRendererMaterial(currPage, texture, atlasNormalBlendMaterials[i], NormalBlendMaterial, pageToNormalBlendMaterial);
 				UpdateRendererMaterial(currPage, texture, atlasAdditiveBlendMaterials[i], AdditiveBlendMaterial, pageToAdditiveBlendMaterial);
@@ -133,27 +134,28 @@ void USpineSkeletonRendererComponent::UpdateRenderer(USpineSkeletonComponent *sk
 			}
 		}
 		UpdateMesh(skeleton->GetSkeleton());
-	} else {
+	}
+	else {
 		ClearAllMeshSections();
 	}
 }
 
-void USpineSkeletonRendererComponent::UpdateRendererMaterial(spine::AtlasPage *CurrentPage, UTexture2D *Texture,
-															 UMaterialInstanceDynamic *&CurrentInstance, UMaterialInterface *ParentMaterial,
-															 TMap<spine::AtlasPage *, UMaterialInstanceDynamic *> &PageToBlendMaterial) {
+void USpineSkeletonRendererComponent::UpdateRendererMaterial(spine::AtlasPage* CurrentPage, UTexture2D* Texture,
+	UMaterialInstanceDynamic*& CurrentInstance, UMaterialInterface* ParentMaterial,
+	TMap<spine::AtlasPage*, UMaterialInstanceDynamic*>& PageToBlendMaterial) {
 
-	UTexture *oldTexture = nullptr;
+	UTexture* oldTexture = nullptr;
 	if (!CurrentInstance || !CurrentInstance->GetTextureParameterValue(TextureParameterName, oldTexture) ||
 		oldTexture != Texture || CurrentInstance->Parent != ParentMaterial) {
 
-		UMaterialInstanceDynamic *material = UMaterialInstanceDynamic::Create(ParentMaterial, this);
+		UMaterialInstanceDynamic* material = UMaterialInstanceDynamic::Create(ParentMaterial, this);
 		material->SetTextureParameterValue(TextureParameterName, Texture);
 		CurrentInstance = material;
 	}
 	PageToBlendMaterial.Add(CurrentPage, CurrentInstance);
 }
 
-void USpineSkeletonRendererComponent::Flush(int &Idx, TArray<FVector> &Vertices, TArray<int32> &Indices, TArray<FVector> &Normals, TArray<FVector2D> &Uvs, TArray<FColor> &Colors, TArray<FVector> &Colors2, UMaterialInstanceDynamic *Material) {
+void USpineSkeletonRendererComponent::Flush(int& Idx, TArray<FVector>& Vertices, TArray<int32>& Indices, TArray<FVector>& Normals, TArray<FVector2D>& Uvs, TArray<FColor>& Colors, TArray<FVector>& Colors2, UMaterialInstanceDynamic* Material) {
 	if (Vertices.Num() == 0) return;
 	SetMaterial(Idx, Material);
 
@@ -164,7 +166,7 @@ void USpineSkeletonRendererComponent::Flush(int &Idx, TArray<FVector> &Vertices,
 			bShouldCreateCollision = true;
 		}
 	}
-	
+
 	GetBodySetup()->bGenerateMirroredCollision = GetComponentScale().X < 0 || GetComponentScale().Y < 0 || GetComponentScale().Z < 0;
 	CreateMeshSection(Idx, Vertices, Indices, Normals, Uvs, Colors, TArray<FProcMeshTangent>(), bShouldCreateCollision);
 
@@ -177,7 +179,7 @@ void USpineSkeletonRendererComponent::Flush(int &Idx, TArray<FVector> &Vertices,
 	Idx++;
 }
 
-void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
+void USpineSkeletonRendererComponent::UpdateMesh(Skeleton* Skeleton) {
 	TArray<FVector> vertices;
 	TArray<int32> indices;
 	TArray<FVector> normals;
@@ -187,7 +189,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 
 	int idx = 0;
 	int meshSection = 0;
-	UMaterialInstanceDynamic *lastMaterial = nullptr;
+	UMaterialInstanceDynamic* lastMaterial = nullptr;
 
 	ClearAllMeshSections();
 
@@ -195,20 +197,20 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 	if (Skeleton->getColor().a == 0) return;
 
 	float depthOffset = 0;
-	unsigned short quadIndices[] = {0, 1, 2, 0, 2, 3};
+	unsigned short quadIndices[] = { 0, 1, 2, 0, 2, 3 };
 
 	for (size_t i = 0; i < Skeleton->getSlots().size(); ++i) {
-		Vector<float> *attachmentVertices = &worldVertices;
-		unsigned short *attachmentIndices = nullptr;
+		Vector<float>* attachmentVertices = &worldVertices;
+		unsigned short* attachmentIndices = nullptr;
 		int numVertices;
 		int numIndices;
-		AtlasRegion *attachmentAtlasRegion = nullptr;
+		AtlasRegion* attachmentAtlasRegion = nullptr;
 		spine::Color attachmentColor;
 		attachmentColor.set(1, 1, 1, 1);
-		float *attachmentUvs = nullptr;
+		float* attachmentUvs = nullptr;
 
-		Slot *slot = Skeleton->getDrawOrder()[i];
-		Attachment *attachment = slot->getAttachment();
+		Slot* slot = Skeleton->getDrawOrder()[i];
+		Attachment* attachment = slot->getAttachment();
 
 		if (slot->getColor().a == 0 || !slot->getBone().isActive()) {
 			clipper.clipEnd(*slot);
@@ -225,7 +227,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 		}
 
 		if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
-			RegionAttachment *regionAttachment = (RegionAttachment *) attachment;
+			RegionAttachment* regionAttachment = (RegionAttachment*)attachment;
 
 			// Early out if region is invisible
 			if (regionAttachment->getColor().a == 0) {
@@ -234,14 +236,15 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 			}
 
 			attachmentColor.set(regionAttachment->getColor());
-			attachmentAtlasRegion = (AtlasRegion *) regionAttachment->getRendererObject();
+			attachmentAtlasRegion = (AtlasRegion*)regionAttachment->getRendererObject();
 			regionAttachment->computeWorldVertices(slot->getBone(), *attachmentVertices, 0, 2);
 			attachmentIndices = quadIndices;
 			attachmentUvs = regionAttachment->getUVs().buffer();
 			numVertices = 4;
 			numIndices = 6;
-		} else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
-			MeshAttachment *mesh = (MeshAttachment *) attachment;
+		}
+		else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
+			MeshAttachment* mesh = (MeshAttachment*)attachment;
 
 			// Early out if region is invisible
 			if (mesh->getColor().a == 0) {
@@ -250,14 +253,15 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 			}
 
 			attachmentColor.set(mesh->getColor());
-			attachmentAtlasRegion = (AtlasRegion *) mesh->getRendererObject();
+			attachmentAtlasRegion = (AtlasRegion*)mesh->getRendererObject();
 			mesh->computeWorldVertices(*slot, 0, mesh->getWorldVerticesLength(), *attachmentVertices, 0, 2);
 			attachmentIndices = mesh->getTriangles().buffer();
 			attachmentUvs = mesh->getUVs().buffer();
 			numVertices = mesh->getWorldVerticesLength() >> 1;
 			numIndices = mesh->getTriangles().size();
-		} else /* clipping */ {
-			ClippingAttachment *clip = (ClippingAttachment *) attachment;
+		}
+		else /* clipping */ {
+			ClippingAttachment* clip = (ClippingAttachment*)attachment;
 			clipper.clipStart(*slot, clip);
 			continue;
 		}
@@ -265,42 +269,42 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 		// if the user switches the atlas data while not having switched
 		// to the correct skeleton data yet, we won't find any regions.
 		// ignore regions for which we can't find a material
-		UMaterialInstanceDynamic *material = nullptr;
+		UMaterialInstanceDynamic* material = nullptr;
 		switch (slot->getData().getBlendMode()) {
-			case BlendMode_Normal:
-				if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-					clipper.clipEnd(*slot);
-					continue;
-				}
-				material = pageToNormalBlendMaterial[attachmentAtlasRegion->page];
-				break;
-			case BlendMode_Additive:
-				if (!pageToAdditiveBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-					clipper.clipEnd(*slot);
-					continue;
-				}
-				material = pageToAdditiveBlendMaterial[attachmentAtlasRegion->page];
-				break;
-			case BlendMode_Multiply:
-				if (!pageToMultiplyBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-					clipper.clipEnd(*slot);
-					continue;
-				}
-				material = pageToMultiplyBlendMaterial[attachmentAtlasRegion->page];
-				break;
-			case BlendMode_Screen:
-				if (!pageToScreenBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-					clipper.clipEnd(*slot);
-					continue;
-				}
-				material = pageToScreenBlendMaterial[attachmentAtlasRegion->page];
-				break;
-			default:
-				if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
-					clipper.clipEnd(*slot);
-					continue;
-				}
-				material = pageToNormalBlendMaterial[attachmentAtlasRegion->page];
+		case BlendMode_Normal:
+			if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
+			material = pageToNormalBlendMaterial[attachmentAtlasRegion->page];
+			break;
+		case BlendMode_Additive:
+			if (!pageToAdditiveBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
+			material = pageToAdditiveBlendMaterial[attachmentAtlasRegion->page];
+			break;
+		case BlendMode_Multiply:
+			if (!pageToMultiplyBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
+			material = pageToMultiplyBlendMaterial[attachmentAtlasRegion->page];
+			break;
+		case BlendMode_Screen:
+			if (!pageToScreenBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
+			material = pageToScreenBlendMaterial[attachmentAtlasRegion->page];
+			break;
+		default:
+			if (!pageToNormalBlendMaterial.Contains(attachmentAtlasRegion->page)) {
+				clipper.clipEnd(*slot);
+				continue;
+			}
+			material = pageToNormalBlendMaterial[attachmentAtlasRegion->page];
 		}
 
 		if (clipper.isClipping()) {
@@ -333,7 +337,7 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 		float dg = slot->hasDarkColor() ? slot->getDarkColor().g : 0.0f;
 		float db = slot->hasDarkColor() ? slot->getDarkColor().b : 0.0f;
 
-		float *verticesPtr = attachmentVertices->buffer();
+		float* verticesPtr = attachmentVertices->buffer();
 		for (int j = 0; j < numVertices << 1; j += 2) {
 			colors.Add(FColor(r, g, b, a));
 			darkColors.Add(FVector(dr, dg, db));
@@ -346,16 +350,44 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 			indices.Add(idx + attachmentIndices[j]);
 		}
 
-		FVector normal = FVector(0, -1, 0);
-		if (numVertices > 2 &&
-			FVector::CrossProduct(
-					vertices[indices[firstIndex + 2]] - vertices[indices[firstIndex]],
-					vertices[indices[firstIndex + 1]] - vertices[indices[firstIndex]])
-							.Y > 0.f) {
-			normal.Y = 1;
+
+
+		//Calculate total triangle to add on this loof.
+
+		int TriangleInitialCount = firstIndex / 3;
+
+		int TriangleToAddNum = indices.Num() / 3 - TriangleInitialCount;
+
+		int FirstVertexIndex = vertices.Num() - numVertices;
+
+		//loof through all the triangles and resolve to be reversed if the triangle has winding order as CCW.
+
+		for (int j = 0; j < TriangleToAddNum; j++) {
+
+			const int TargetTringleIndex = firstIndex + j * 3;
+
+			if (FVector::CrossProduct(
+				vertices[indices[TargetTringleIndex + 2]] - vertices[indices[TargetTringleIndex]],
+				vertices[indices[TargetTringleIndex + 1]] - vertices[indices[TargetTringleIndex]]).Y < 0.f)
+			{
+
+				const int32 targetVertex = indices[TargetTringleIndex];
+				indices[TargetTringleIndex] = indices[TargetTringleIndex + 2];
+				indices[TargetTringleIndex + 2] = targetVertex;
+
+			}
 		}
+
+
+
+		FVector normal = FVector(0, 1, 0);
+
+		//Add normals for vertices.
+
 		for (int j = 0; j < numVertices; j++) {
+
 			normals.Add(normal);
+
 		}
 
 		idx += numVertices;
