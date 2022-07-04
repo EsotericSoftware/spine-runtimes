@@ -348,15 +348,39 @@ void USpineSkeletonRendererComponent::UpdateMesh(Skeleton *Skeleton) {
 			indices.Add(idx + attachmentIndices[j]);
 		}
 
-		FVector normal = FVector(0, -1, 0);
-		if (numVertices > 2 &&
-			FVector::CrossProduct(
-					vertices[indices[firstIndex + 2]] - vertices[indices[firstIndex]],
-					vertices[indices[firstIndex + 1]] - vertices[indices[firstIndex]])
-							.Y > 0.f) {
-			normal.Y = 1;
+
+		//Calculate total triangle to add on this loof.
+
+		int TriangleInitialCount = firstIndex / 3;
+
+		int TriangleToAddNum = indices.Num() / 3 - TriangleInitialCount;
+
+		int FirstVertexIndex = vertices.Num() - numVertices;
+
+		//loof through all the triangles and resolve to be reversed if the triangle has winding order as CCW.
+
+		for (int j = 0; j < TriangleToAddNum; j++) {
+
+			const int TargetTringleIndex = firstIndex + j * 3;
+
+			if (FVector::CrossProduct(
+						vertices[indices[TargetTringleIndex + 2]] - vertices[indices[TargetTringleIndex]],
+						vertices[indices[TargetTringleIndex + 1]] - vertices[indices[TargetTringleIndex]])
+						.Y < 0.f) {
+
+				const int32 targetVertex = indices[TargetTringleIndex];
+				indices[TargetTringleIndex] = indices[TargetTringleIndex + 2];
+				indices[TargetTringleIndex + 2] = targetVertex;
+			}
 		}
+
+
+		FVector normal = FVector(0, 1, 0);
+
+		//Add normals for vertices.
+
 		for (int j = 0; j < numVertices; j++) {
+
 			normals.Add(normal);
 		}
 
