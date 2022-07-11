@@ -18,8 +18,8 @@ jobs:
 
       - name: Build Godot artifact
         run: |
-          ./spine-godot/setup.sh 3.4.4-stable false
-          ./spine-godot/build-templates.sh ios
+          ./spine-godot/build/setup.sh 3.4.4-stable false
+          ./spine-godot/build/build-templates.sh ios
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
