@@ -1,0 +1,30 @@
+name: Build and Publish Godot editor and templates
+
+on:
+  push:
+    paths:
+      - ".github/workflows/spine-godot.yml"
+      - 'spine-godot/**'
+      - 'spine-cpp/**'
+  workflow_dispatch:      
+
+jobs:
+  godot-ios-template:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0          
+
+      - name: Build Godot artifact
+        run: |
+          ./spine-godot/setup.sh 3.4.4-stable false
+          ./spine-godot/build-templates.sh ios
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: spine-godot-ios-template.zip
+          path: spine-godot/godot/bin/iphone.zip
+
+  
