@@ -42,6 +42,7 @@ jobs:
 
       - name: Build Godot artifact
         run: |
+          sudo apt install libxcursor-dev
           ./spine-godot/build/setup.sh 3.4.4-stable false
           ./spine-godot/build/build-templates.sh linux
 
