@@ -30,4 +30,31 @@ jobs:
           name: spine-godot-ios-template.zip
           path: spine-godot/godot/bin/iphone.zip
 
+  godot-linux-template:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps   
+
+      - name: Build Godot artifact
+        run: |
+          ./spine-godot/build/setup.sh 3.4.4-stable false
+          ./spine-godot/build/build-templates.sh ios
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux_x11_64_release
+          path: spine-godot/godot/bin/linux_x11_64_release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux_x11_64_debug
+          path: spine-godot/godot/bin/linux_x11_64_debug
+
   
