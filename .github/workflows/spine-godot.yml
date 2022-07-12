@@ -117,7 +117,7 @@ jobs:
         shell: bash
         if: env.AWS_ACCESS_KEY_ID != null
         run: |
-          aws s3 cp godot-editor-windows.zip s3://spine-godot/spine-godot/3.4.4-stable/
-          aws s3 cp godot-editor-linux.zip s3://spine-godot/spine-godot/3.4.4-stable/
+          aws s3 cp godot.windows.opt.tools.64.exe s3://spine-godot/spine-godot/3.4.4-stable/
+          aws s3 cp godot.x11.opt.tools.64 s3://spine-godot/spine-godot/3.4.4-stable/
           aws s3 cp godot-editor-macos.zip s3://spine-godot/spine-godot/3.4.4-stable/            
   
