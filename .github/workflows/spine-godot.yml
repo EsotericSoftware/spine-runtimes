@@ -15,7 +15,7 @@ env:
 
 jobs:
 
-  godot-windows-editor:
+  godot-editor-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,9 +27,11 @@ jobs:
 
       - name: Build Godot artifact
         shell: bash
-        run: |          
-          ./spine-godot/build/setup.sh 3.4.4-stable false
-          ./spine-godot/build/build.sh release_debug
+        run: |
+          mkdir -p spine-godot/godot/bin/
+          touch spine-godot/godot/bin/godot.windows.opt.tools.64.exe
+        # ./spine-godot/build/setup.sh 3.4.4-stable false
+        # ./spine-godot/build/build.sh release_debug
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
@@ -37,16 +39,84 @@ jobs:
           name: godot-editor-windows.zip
           path: spine-godot/godot/bin/godot.windows.opt.tools.64.exe
 
+  godot-editor-linux:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps
+
+      - name: Build Godot artifact
+        shell: bash
+        run: |
+          mkdir -p spine-godot/godot/bin/
+          touch spine-godot/godot/bin/godot.x11.opt.tools.64
+        # ./spine-godot/build/setup.sh 3.4.4-stable false
+        # ./spine-godot/build/build.sh release_debug
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-editor-linux.zip
+          path: spine-godot/godot/bin/godot.x11.opt.tools.64
+
+  godot-editor-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup python and scons
+        uses: ./.github/actions/setup-godot-deps
+
+      - name: Build Godot artifact
+        shell: bash
+        run: |
+          mkdir -p spine-godot/godot/bin/
+          mkdir -p spine-godot/godot/bin/Godot.app
+          pushd spine-godot/godot/bin
+          zip -r godot-editor-macos.zip Godot.app
+          popd
+        # ./spine-godot/build/setup.sh 3.4.4-stable false
+        # ./spine-godot/build/build.sh release_debug
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-editor-macos.zip
+          path: spine-godot/godot/bin/godot-editor-macos.zip
+
     upload-to-s3:
       runs-on: ubuntu-latest
       steps:
-        - name: Download godot-windows-editor artifact
+        - name: Download godot-editor-windows artifact
           uses: actions/download-artifact@v2
           with:
             name: godot-editor-windows.zip
 
+        - name: Download godot-editor-linux artifact
+          uses: actions/download-artifact@v2
+          with:
+            name: godot-editor-linux.zip
+
+        - name: Download godot-editor-macos artifact
+          uses: actions/download-artifact@v2
+          with:
+            name: godot-editor-macos.zip
+
         - name: Unpack editors and templates
+          run: |            
+            ls -lah
+
+        - name: Upload artifacts to S3
+          shell: bash
+          if: env.AWS_ACCESS_KEY_ID != null
           run: |
-            unzip godot-editor-windows.zip
-            find .
+            aws s3 cp godot-editor-windows.zip s3://spine-godot/spine-godot/3.4.4-stable/
+            aws s3 cp godot-editor-linux.zip s3://spine-godot/spine-godot/3.4.4-stable/
+            aws s3 cp godot-editor-macos.zip s3://spine-godot/spine-godot/3.4.4-stable/            
   
