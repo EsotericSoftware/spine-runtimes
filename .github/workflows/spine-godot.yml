@@ -8,54 +8,34 @@ on:
       - 'spine-cpp/**'
   workflow_dispatch:      
 
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_EC2_METADATA_DISABLED: true
+
 jobs:
-  godot-ios-template:
-    runs-on: macos-latest
+
+  godot-windows-template:
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
       - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps   
+        uses: ./.github/actions/setup-godot-deps
 
       - name: Build Godot artifact
-        run: |
+        shell: bash
+        run: |          
           ./spine-godot/build/setup.sh 3.4.4-stable false
-          ./spine-godot/build/build-templates.sh ios
+          ./spine-godot/build/build-templates.sh windows
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: spine-godot-ios-template.zip
-          path: spine-godot/godot/bin/iphone.zip
-
-  godot-linux-template:
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Setup python and scons
-        uses: ./.github/actions/setup-godot-deps   
-
-      - name: Build Godot artifact
+      - name: Upload artifacts to S3
+        shell: bash
+        if: env.AWS_ACCESS_KEY_ID != null
         run: |
-          sudo apt-get install build-essential scons pkg-config libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev
-          ./spine-godot/build/setup.sh 3.4.4-stable false
-          ./spine-godot/build/build-templates.sh linux
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: linux_x11_64_release
-          path: spine-godot/godot/bin/linux_x11_64_release
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: linux_x11_64_debug
-          path: spine-godot/godot/bin/linux_x11_64_debug
+          aws s3 cp spine-godot/godot/bin/windows_64_debug.exe s3://spine-godot/spine-godot/3.4.4-stable/windows_64_debug.exe
+          aws s3 cp spine-godot/godot/bin/windows_64_release.exe s3://spine-godot/spine-godot/3.4.4-stable/windows_64_release.exe
 
   
