@@ -15,7 +15,7 @@ env:
 
 jobs:
 
-  godot-windows-template:
+  godot-windows-editor:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,13 +29,11 @@ jobs:
         shell: bash
         run: |          
           ./spine-godot/build/setup.sh 3.4.4-stable false
-          ./spine-godot/build/build-templates.sh windows
+          ./spine-godot/build/build.sh release_debug
 
-      - name: Upload artifacts to S3
-        shell: bash
-        if: env.AWS_ACCESS_KEY_ID != null
-        run: |
-          aws s3 cp spine-godot/godot/bin/windows_64_debug.exe s3://spine-godot/spine-godot/3.4.4-stable/windows_64_debug.exe
-          aws s3 cp spine-godot/godot/bin/windows_64_release.exe s3://spine-godot/spine-godot/3.4.4-stable/windows_64_release.exe
-
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: godot-editor-windows.zip
+          path: spine-godot/godot/bin/godot.windows.opt.tools.x86_64.exe 
   
