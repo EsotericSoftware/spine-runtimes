@@ -289,7 +289,7 @@ jobs:
           path: spine-godot/godot/bin/webassembly_release.zip
 
   upload-to-s3:
-    needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos, godot-template-ios, godot-template-macos, godot-template-windows, godot-template-linux, godot-template-android]
+    needs: [godot-editor-windows, godot-editor-linux, godot-editor-macos, godot-template-ios, godot-template-macos, godot-template-windows, godot-template-linux, godot-template-android, godot-template-web]
     runs-on: ubuntu-latest
     steps:
       - name: Download godot-editor-windows artifact
